@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — Candidate Portal (prototype)</title>
+<style>
+:root{
+  --bg:#f6f7f9;--pn:#fff;--ln:#e3e5ea;--ln2:#cfd2da;--fa:#f2f3f6;
+  --ink:#16181d;--mid:#4d5361;--mut:#868c9b;
+  --ac:#5b3fd6;--acw:#f0ecfd;--acd:#4a31b8;
+  --ok:#0a8055;--okw:#e8f7f0;--wa:#a55a00;--waw:#fdf4e6;--bad:#c02626;--badw:#fdeeee;
+  --sh:0 1px 2px rgba(16,20,40,.05),0 6px 18px -10px rgba(16,20,40,.14);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font:14px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.014em}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit}
+
+/* ---------- prototype control bar ---------- */
+#proto{background:#16181d;color:#fff;padding:7px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12px;position:sticky;top:0;z-index:60}
+#proto b{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8b93a7;font-weight:700;margin-right:2px}
+#proto .pill{border:1px solid #3a3f4c;background:#22252e;color:#c3c8d4;border-radius:99px;padding:3px 11px;font-size:11.5px}
+#proto .pill:hover{background:#2d313c;color:#fff}
+#proto .pill.on{background:#fff;color:#16181d;border-color:#fff;font-weight:650}
+#proto .rs{margin-left:auto;border:1px solid #3a3f4c;background:none;color:#8b93a7;border-radius:6px;padding:3px 10px;font-size:11.5px}
+#proto .rs:hover{color:#fff;border-color:#6b7280}
+
+/* ---------- app shell ---------- */
+header{background:var(--pn);border-bottom:1px solid var(--ln);position:sticky;top:34px;z-index:50}
+.hin{max-width:1120px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:26px;height:56px}
+.logo{font-weight:750;font-size:15.5px;letter-spacing:-.03em;flex:0 0 auto}
+.logo i{font-style:normal;color:var(--ac)}
+nav.main{display:flex;gap:3px;flex:1;overflow-x:auto}
+nav.main button{background:none;border:0;padding:8px 11px;font-size:13px;color:var(--mid);border-radius:7px;white-space:nowrap}
+nav.main button:hover{background:var(--fa);color:var(--ink)}
+nav.main button.on{background:var(--acw);color:var(--ac);font-weight:600}
+.hact{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.bell{position:relative;background:none;border:1px solid var(--ln);width:33px;height:33px;border-radius:8px;color:var(--mid);display:grid;place-items:center;font-size:14px}
+.bell:hover{background:var(--fa)}
+.bell u{position:absolute;top:-5px;right:-5px;background:var(--bad);color:#fff;font-size:9.5px;font-weight:750;min-width:16px;height:16px;border-radius:99px;display:grid;place-items:center;text-decoration:none;padding:0 3px}
+.who{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 3px;border:1px solid var(--ln);border-radius:99px;background:none}
+.who:hover{background:var(--fa)}
+.av{width:26px;height:26px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700;flex:0 0 26px}
+.who span{font-size:12.5px;color:var(--mid);padding-right:6px}
+main{max-width:1120px;margin:0 auto;padding:22px 20px 90px}
+
+/* ---------- generic ---------- */
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:11px;padding:17px}
+.card>h3{font-size:13px;display:flex;align-items:center;gap:9px;margin-bottom:13px;flex-wrap:wrap}
+.card>h3 .r{margin-left:auto;font-size:11.5px;color:var(--mut);font-weight:500;display:flex;gap:8px;align-items:center}
+.sub{color:var(--mut);font-size:12.5px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.g21{display:grid;grid-template-columns:1fr 330px;gap:18px;align-items:start}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.ac{align-items:center}
+.f1{flex:1;min-width:0}
+.mt{margin-top:15px}.mt8{margin-top:9px}
+hr.d{border:0;border-top:1px solid var(--ln);margin:14px 0}
+.ph{border:1px dashed var(--ln2);border-radius:9px;background:var(--fa);display:grid;place-items:center;color:var(--mut);font-size:12px;padding:16px;text-align:center}
+
+.btn{border:1px solid var(--ln2);background:#fff;border-radius:8px;padding:8px 14px;font-size:12.5px;color:var(--mid);font-weight:500}
+.btn:hover{background:var(--fa);color:var(--ink)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.btn.p:hover{background:var(--acd);border-color:var(--acd);color:#fff}
+.btn.sm{padding:5px 11px;font-size:12px;border-radius:7px}
+.btn.lg{padding:11px 20px;font-size:13.5px}
+.btn.gh{background:none;border-color:transparent;color:var(--ac);font-weight:600}
+.btn.gh:hover{background:var(--acw)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.dg{border-color:#eccaca;color:var(--bad)}
+.btn.dg:hover{background:var(--badw)}
+
+.tag{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--ln2);border-radius:99px;padding:2px 10px;font-size:11.5px;color:var(--mid);background:#fff;white-space:nowrap}
+.tag.ok{background:var(--okw);border-color:#bde3d2;color:var(--ok)}
+.tag.wa{background:var(--waw);border-color:#f3d6a5;color:var(--wa)}
+.tag.bad{background:var(--badw);border-color:#f2c9c9;color:var(--bad)}
+.tag.ac{background:var(--acw);border-color:#d6ccf8;color:var(--ac)}
+.tag.lv{background:#16181d;border-color:#16181d;color:#fff;font-weight:700;letter-spacing:.02em}
+
+.bar{height:8px;border-radius:99px;background:var(--fa);overflow:hidden;border:1px solid var(--ln)}
+.bar i{display:block;height:100%;background:var(--ac);border-radius:99px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+.bar.t{height:5px}
+.bar i.ok{background:var(--ok)}.bar i.wa{background:#d98a08}
+.blab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);margin-bottom:6px}
+
+.stat{border:1px solid var(--ln);border-radius:10px;padding:13px;background:var(--pn)}
+.stat .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750}
+.stat .v{font-size:25px;font-weight:680;letter-spacing:-.03em;margin-top:7px;line-height:1}
+.stat .v s{text-decoration:none;font-size:12.5px;color:var(--mut);font-weight:500}
+.stat .f{font-size:11.5px;color:var(--mut);margin-top:6px}
+
+.li{display:flex;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--ln)}
+.li:last-child{border-bottom:0}
+.li .t{font-size:13px;font-weight:600}
+.li .s{font-size:12px;color:var(--mut);margin-top:2px}
+.dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:750;flex:0 0 22px;border:1px solid var(--ln2);color:var(--mut);background:#fff}
+.dot.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.dot.now{background:var(--ac);border-color:var(--ac);color:#fff}
+
+table.tb{width:100%;border-collapse:collapse;font-size:12.5px}
+table.tb th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:750;padding:8px 10px;border-bottom:1px solid var(--ln2);white-space:nowrap}
+table.tb td{padding:10px;border-bottom:1px solid var(--ln);vertical-align:middle}
+table.tb tr:last-child td{border-bottom:0}
+table.tb .nm{font-weight:600}
+.mono{font-variant-numeric:tabular-nums;color:var(--mid)}
+
+.kv{display:flex;justify-content:space-between;gap:14px;font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.kv:last-child{border-bottom:0}
+.kv>span{color:var(--mut)}
+.kv>b{font-weight:600;text-align:right}
+
+.note{border-radius:9px;padding:12px 14px;font-size:12.5px;border:1px solid}
+.note.i{background:var(--acw);border-color:#d9d0f9;color:#33257a}
+.note.w{background:var(--waw);border-color:#f3d6a5;color:#7a4300}
+.note.b{background:var(--badw);border-color:#f2c9c9;color:#8f1d1d}
+.note.g{background:var(--okw);border-color:#bde3d2;color:#065f42}
+.note b{display:block;margin-bottom:3px}
+
+label.fl{display:block;font-size:11.5px;color:var(--mut);font-weight:600;margin-bottom:5px}
+.inp,textarea.inp,select.inp{width:100%;border:1px solid var(--ln2);border-radius:8px;padding:9px 11px;font-size:13px;background:#fff;color:var(--ink)}
+.inp:focus,textarea.inp:focus{outline:2px solid var(--acw);border-color:var(--ac)}
+textarea.inp{resize:vertical;min-height:92px;line-height:1.55}
+
+/* ---------- journey stepper ---------- */
+.step{display:flex;gap:0;overflow-x:auto;padding:2px}
+.step>div{flex:1;min-width:104px;position:relative;padding:0 4px}
+.step .b{height:5px;border-radius:99px;background:var(--ln);margin-bottom:9px}
+.step>div.done .b{background:var(--ok)}
+.step>div.now .b{background:var(--ac)}
+.step .n{font-size:11.5px;font-weight:650;color:var(--mut);line-height:1.3}
+.step>div.done .n{color:var(--ok)}
+.step>div.now .n{color:var(--ac)}
+.step .x{font-size:10.5px;color:var(--mut);margin-top:2px}
+
+/* ---------- chapter player ---------- */
+.vid{border-radius:10px;background:#14161c;aspect-ratio:16/9;display:grid;place-items:center;position:relative;overflow:hidden}
+.vid .play{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:19px;display:grid;place-items:center;backdrop-filter:blur(3px)}
+.vid .play:hover{background:rgba(255,255,255,.28)}
+.vid .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#e9eaee;font-size:11.5px}
+.vid .tl{height:4px;background:rgba(255,255,255,.22);border-radius:99px;margin-top:7px;overflow:hidden}
+.vid .tl i{display:block;height:100%;background:#fff;width:0}
+.vid .ttl{color:#fff;font-size:13px;font-weight:600;text-align:center;padding:0 20px}
+
+.q{border:1px solid var(--ln);border-radius:10px;padding:14px;margin-bottom:11px}
+.q .qt{font-size:13px;font-weight:600;margin-bottom:11px;display:flex;gap:8px}
+.q .qt u{text-decoration:none;color:var(--mut);font-weight:700;flex:0 0 auto}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--ln);border-radius:8px;padding:9px 11px;margin-bottom:7px;background:#fff;width:100%;text-align:left;font-size:12.5px;color:var(--mid)}
+.opt:hover{border-color:var(--ln2);background:var(--fa)}
+.opt.sel{border-color:var(--ac);background:var(--acw);color:var(--ink);font-weight:500}
+.opt.right{border-color:#bde3d2;background:var(--okw);color:#065f42}
+.opt.wrong{border-color:#f2c9c9;background:var(--badw);color:#8f1d1d}
+.opt .mk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--ln2);flex:0 0 18px;display:grid;place-items:center;font-size:10px;margin-top:1px}
+.opt.sel .mk{border-color:var(--ac);background:var(--ac);color:#fff}
+.opt.right .mk{border-color:var(--ok);background:var(--ok);color:#fff}
+.opt.wrong .mk{border-color:var(--bad);background:var(--bad);color:#fff}
+
+/* ---------- modal / toast / drawer ---------- */
+#mk{position:fixed;inset:0;background:rgba(16,20,40,.42);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:56px 18px;overflow-y:auto}
+#mk.on{display:flex}
+.mbox{background:#fff;border-radius:14px;width:100%;max-width:520px;box-shadow:0 24px 70px -18px rgba(10,14,30,.4);overflow:hidden}
+.mbox.wide{max-width:760px}
+.mh{padding:16px 18px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:12px}
+.mh h3{font-size:14.5px;flex:1}
+.mh .x{background:none;border:0;color:var(--mut);font-size:19px;line-height:1;padding:2px 6px;border-radius:6px}
+.mh .x:hover{background:var(--fa);color:var(--ink)}
+.mb{padding:18px}
+.mf{padding:13px 18px;border-top:1px solid var(--ln);display:flex;gap:9px;justify-content:flex-end;background:var(--fa)}
+
+#tst{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;z-index:300;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.ts{background:#16181d;color:#fff;padding:10px 16px;border-radius:9px;font-size:12.5px;box-shadow:0 12px 34px -10px rgba(0,0,0,.5);animation:up .22s ease}
+.ts.g{background:var(--ok)}.ts.b{background:var(--bad)}
+@keyframes up{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+#drw{position:fixed;top:0;right:0;bottom:0;width:340px;background:#fff;border-left:1px solid var(--ln);z-index:210;transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column}
+#drw.on{transform:none}
+#drw .dh{padding:15px 17px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:10px}
+#drw .dh h3{flex:1;font-size:14px}
+#drw .db{overflow-y:auto;padding:6px 17px 20px}
+.nf{padding:12px 0;border-bottom:1px solid var(--ln);display:flex;gap:10px}
+.nf:last-child{border-bottom:0}
+.nf .u{width:7px;height:7px;border-radius:50%;background:var(--ac);flex:0 0 7px;margin-top:6px}
+.nf.rd .u{background:var(--ln2)}
+.nf .t{font-size:12.5px;line-height:1.5}
+.nf .w{font-size:11px;color:var(--mut);margin-top:3px}
+
+.msg{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding:2px}
+.bub{max-width:76%;padding:10px 13px;border-radius:12px;font-size:12.5px;line-height:1.55}
+.bub.them{background:var(--fa);border:1px solid var(--ln);border-bottom-left-radius:4px;align-self:flex-start}
+.bub.me{background:var(--ac);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.bub .w{font-size:10.5px;opacity:.65;margin-top:4px}
+
+.empty{text-align:center;padding:44px 20px;color:var(--mut)}
+.empty .e{font-size:26px;margin-bottom:10px;opacity:.5}
+.empty p{margin:6px 0 0;font-size:12.5px}
+@media(max-width:940px){.g21,.g2,.g3,.g4{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="proto"></div>
+<header><div class="hin">
+  <div class="logo">Talent<i>Next</i></div>
+  <nav class="main" id="nav"></nav>
+  <div class="hact">
+    <button class="bell" data-act="drawer" title="Notifications">◎<u id="nbadge">0</u></button>
+    <button class="who" data-act="nav:account"><span class="av" id="avi">MN</span><span id="whoname">Name</span></button>
+  </div>
+</div></header>
+
+<main id="view"></main>
+
+<div id="mk"><div class="mbox" id="mbox"></div></div>
+<div id="drw">
+  <div class="dh"><h3>Notifications</h3><button class="btn sm" data-act="readall">Mark all read</button><button class="btn sm" data-act="drawer">✕</button></div>
+  <div class="db" id="dbody"></div>
+</div>
+<div id="tst"></div>
+
+<script>
+/* =========================================================
+   CONTENT
+   ========================================================= */
+const CH = [
+ ['Why We Exist',14,[
+   ['A new manager inherits a team with no shared sense of purpose. What comes first?',['Set individual performance targets','Articulate why the work matters','Redraw the reporting lines','Book a team social'],1],
+   ['Purpose statements most often fail because they are…',['Too short','Never referenced in day-to-day decisions','Written by one person','Not displayed publicly'],1]]],
+ ['The Operator Mindset',22,[
+   ['An operator’s first instinct when a process breaks should be to…',['Escalate immediately','Find who is responsible','Understand the system that allowed it','Add an approval step'],2],
+   ['Which is the strongest sign you are operating rather than firefighting?',['You are the busiest person on the team','Problems recur less often','You answer every message within an hour','Your calendar is full'],1]]],
+ ['Reading the Room',18,[
+   ['Your proposal gets silence in a meeting. The most useful read is…',['Everyone agrees','You need to present it again louder','Something unspoken is blocking it','The topic is boring'],2],
+   ['The best moment to test for disagreement is…',['After the decision is announced','Before you have committed publicly','During the retro','Never, it invites conflict'],1]]],
+ ['Delegation Without Drop-Off',26,[
+   ['Delegation fails most often at the point of…',['Choosing the person','Defining what "done" looks like','Setting the deadline','Following up'],1],
+   ['You delegate a task and it comes back wrong. First response?',['Redo it yourself quietly','Reassign it','Check what you left ambiguous','Add a checklist for everyone'],2]]],
+ ['Hard Conversations',24,[
+   ['The opening line of a difficult conversation should…',['Soften the message with praise','Name the issue plainly','Ask how they think it’s going','Reference company policy'],1],
+   ['Feedback lands best when it is about…',['Character','Observable behaviour and its effect','Comparison to peers','What others have said'],1]]],
+ ['Building Trust at Speed',19,[
+   ['Trust builds fastest through…',['Shared social time','Small commitments reliably kept','Transparency about everything','Being liked'],1],
+   ['A leader admitting a mistake typically…',['Undermines their authority','Increases perceived competence and safety','Should be avoided with new teams','Invites blame'],1]]],
+ ['Decisions Under Incomplete Information',23,[
+   ['With 60% of the information you need, the usual right move is…',['Wait for more data','Decide, and make the decision reversible','Delegate the decision','Escalate upward'],1],
+   ['The most expensive kind of decision is…',['A wrong one made quickly','One that is never made','One made by committee','One made without data'],1]]],
+ ['Managing Up',17,[
+   ['The most valuable thing you can give your manager is…',['Good news','Early warning','Detailed reports','Enthusiasm'],1],
+   ['"No surprises" in practice means…',['Escalating everything','Flagging risk before it becomes an issue','Only reporting completed work','Weekly written updates'],1]]],
+ ['Feedback That Lands',21,[
+   ['Feedback given weeks after the event is mostly…',['Still useful','Hard to act on and easy to dispute','Better received','More objective'],1],
+   ['A good feedback conversation ends with…',['Agreement that you were right','A specific next action','A written record','Reassurance'],1]]],
+ ['Running the Weekly Rhythm',20,[
+   ['A weekly team meeting earns its place when it…',['Covers every project','Surfaces blockers and decides things','Keeps everyone informed','Runs to time'],1],
+   ['The first thing to cut from an overloaded weekly is…',['The blockers section','Status updates that could be written','The decisions','Attendance'],1]]],
+ ['Conflict and Repair',22,[
+   ['Two strong performers are in open conflict. Your first step is…',['Separate their work streams','Understand what each believes is at stake','Ask them to resolve it privately','Escalate to HR'],1],
+   ['Repair after conflict requires…',['Forgetting it happened','An explicit reset of expectations','A written agreement','Time apart'],1]]],
+ ['Coaching vs Fixing',25,[
+   ['You know the answer and they don’t. Coaching means…',['Telling them efficiently','Asking the question that gets them there','Waiting for them to ask','Documenting the answer'],1],
+   ['The cost of always fixing is…',['Slower delivery','A team that cannot operate without you','Lower quality','More meetings'],1]]],
+ ['Leading Through Change',28,[
+   ['During uncertainty, people need most…',['A guarantee','Frequent honest updates, even when incomplete','Fewer meetings','A detailed plan'],1],
+   ['Change fails most often because…',['The plan was wrong','The reason was never made real to people','It moved too fast','Budget ran out'],1]]]
+];
+const TASK = [
+ ['Map your stakeholders','List the five people whose support you need this quarter, and one sentence on what each of them needs from you.'],
+ ['Audit one broken process','Pick something that keeps going wrong. Describe the system that allows it, not the person involved.'],
+ ['Run a silence test','In your next meeting, deliberately invite disagreement. Write down what surfaced that you had not heard before.'],
+ ['Delegate one thing properly','Hand over a task you normally keep. Write the definition of "done" you gave, before you gave it.'],
+ ['Have the conversation you have been avoiding','Describe the opening line you used and how the first two minutes went.'],
+ ['Make three small commitments','Name three things you promised this week and whether you kept them exactly as stated.'],
+ ['Decide something reversible','Make a call you have been delaying at 60% information. Note how you built the escape hatch.'],
+ ['Give early warning','Flag one risk upward before you were asked. Record the reaction.'],
+ ['Give one piece of same-day feedback','Behaviour, effect, next action. Write all three as you said them.'],
+ ['Cut your weekly agenda in half','List what you removed and what you protected, with reasoning.'],
+ ['Sit inside a disagreement','Find a live tension on your team. Write what each side believes is at stake.'],
+ ['Coach instead of fixing','Recall a moment you knew the answer and asked a question instead. What did they arrive at?'],
+ ['Write your change message','Draft the six sentences you would use to explain a hard change to your team.']
+];
+const AGENTS = [
+ {id:'a1',n:'Dana Whitfield',rk:4.9,pr:180,mn:45,sp:'T-band operators',cp:84,iv:62,bio:'Fifteen years running operations teams in logistics and healthcare. Direct, fast, does not pad the feedback.',sl:['Tue 10:00','Tue 15:30','Wed 09:00','Thu 14:00','Fri 11:30']},
+ {id:'a2',n:'Marcus Ozoro',rk:4.7,pr:0,mn:30,sp:'First-time managers',cp:76,iv:41,bio:'Runs free first interviews to build his cohort pipeline. Strong with people newly stepping into leadership.',sl:['Tue 12:00','Wed 16:00','Thu 08:30','Fri 13:00']},
+ {id:'a3',n:'Priya Raman',rk:4.8,pr:225,mn:60,sp:'B-band, scale-ups',cp:88,iv:97,bio:'Longest sessions on the platform. Detailed written assessment, high completion rate among her candidates.',sl:['Mon 09:30','Wed 11:00','Thu 16:30']},
+ {id:'a4',n:'Tom Okafor',rk:4.4,pr:95,mn:45,sp:'E-band, early career',cp:71,iv:28,bio:'Newer to the platform, competitive pricing, good with candidates who are nervous about being assessed.',sl:['Tue 08:00','Tue 17:00','Wed 13:30','Thu 10:00','Fri 09:00','Fri 16:00']},
+ {id:'a5',n:'Elena Sorak',rk:4.6,pr:150,mn:45,sp:'T-band, technical leads',cp:80,iv:55,bio:'Focused on engineers and technical specialists moving into leadership for the first time.',sl:['Mon 14:00','Wed 10:30','Thu 12:00']}
+];
+const PEERS = ['Aisha Bello','Daniel Kerr','Sofia Marchetti','Ravi Chandran','Nora Lindqvist','James Whitby','Chloe Ferreira','Tobias Mensah','Yuki Tanaka'];
+const LEVELS = ['T1','T2','T3','T4','T5'];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+let S, tmr=null;
+
+function blankCh(){
+  return CH.map((c,i)=>({i,t:c[0],mins:c[1],qs:c[2],st:i===0?'open':'locked',watch:0,score:null,att:0,mins_spent:0,note:''}));
+}
+function blankTasks(){
+  return TASK.map((t,i)=>({i,t:t[0],p:t[1],st:'locked',resp:'',late:false}));
+}
+function seed(stage){
+  S={
+    stage, view:'dashboard', name:'Maryam Naz', email:'maryam.naz@tkxel.io',
+    quiz:{bucket:'The Operator',score:64,band:'T2–T3',
+      str:['Execution under pressure','Comfortable with ambiguity','Holds a line under challenge'],
+      dev:['Delegates too late','Avoids conflict until it escalates','Coaches by telling']},
+    agent:null, slot:null, interviewPaid:0, interviewAt:null,
+    level:null, aiLevel:null, override:false,
+    report:null, enrolled:false, coursePaid:0,
+    cohort:null, day:0, ch:blankCh(), tasks:blankTasks(),
+    curCh:0, cycle:1, summary:null, reinterview:null,
+    notif:[], msgs:[], pay:[], drawer:false
+  };
+
+  const M=(t,w)=>S.notif.push({t,w,rd:false});
+
+  if(stage==='new'){
+    M('Your leadership profile is ready. Book an interview to get formally levelled.','Just now');
+  }
+  if(stage==='booked'){
+    S.agent=AGENTS[0]; S.slot='Thu 14:00'; S.interviewPaid=180; S.interviewAt='Thursday 14:00';
+    S.pay.push({d:'12 Mar',w:'Interview — Dana Whitfield',a:180});
+    M('Interview confirmed with Dana Whitfield for Thursday 14:00.','2 days ago');
+  }
+  if(stage==='assessed'||stage==='week1'||stage==='mid'||stage==='end'||stage==='next'){
+    S.agent=AGENTS[0]; S.slot='Thu 14:00'; S.interviewPaid=180;
+    S.aiLevel='T2'; S.level='T3'; S.override=true;
+    S.report={by:'Dana Whitfield',on:'14 Mar'};
+    S.pay.push({d:'12 Mar',w:'Interview — Dana Whitfield',a:180});
+    if(stage==='assessed') M('Your assessment is complete. You have been levelled T3.','Yesterday');
+  }
+  if(stage==='week1'||stage==='mid'||stage==='end'||stage==='next'){
+    S.enrolled=true; S.coursePaid=2400; S.cohort={n:12,day:'Thursday',time:'18:00',size:10,agent:'Dana Whitfield'};
+    S.pay.push({d:'15 Mar',w:'Operator Track T3 — 90 days',a:2400});
+    S.tasks[0].st='open';
+    S.ch[0].st='open';
+  }
+  if(stage==='week1'){
+    S.day=4;
+    M('Welcome to Cohort 12. Your first call is Thursday at 18:00.','3 days ago');
+    M('Week 1 task is open: Map your stakeholders.','3 days ago');
+    S.msgs=[{me:0,t:'Welcome aboard. Before Thursday, get chapter 1 done and start the stakeholder map — we will use it live on the call.',w:'3 days ago'}];
+  }
+  if(stage==='mid'){
+    S.day=34; S.curCh=5;
+    for(let i=0;i<5;i++){ const c=S.ch[i]; c.st='done'; c.watch=100; c.att=i===2?2:1; c.score=[100,86,68,92,79][i]; c.mins_spent=c.mins+[4,9,31,6,12][i]; }
+    S.ch[5].st='open'; S.ch[5].watch=60; S.ch[5].mins_spent=12;
+    for(let i=0;i<4;i++){ S.tasks[i].st='done'; S.tasks[i].resp='Submitted.'; }
+    S.tasks[1].late=true;
+    S.tasks[4].st='open';
+    M('Chapter 5 assessment marked: 79%.','2 days ago');
+    M('Week 5 task closes Friday at 17:00.','Yesterday');
+    S.msgs=[
+      {me:0,t:'Good recovery on chapter 3 — you went back and re-did it rather than moving on. That is the right instinct.',w:'5 days ago'},
+      {me:1,t:'Thanks. The delegation material was harder than I expected.',w:'5 days ago'},
+      {me:0,t:'It is the one most people re-take. Bring a real example to Thursday and we will work it through with the group.',w:'4 days ago'}];
+  }
+  if(stage==='end'||stage==='next'){
+    S.day=88; S.curCh=12;
+    for(let i=0;i<12;i++){ const c=S.ch[i]; c.st='done'; c.watch=100; c.att=[1,1,2,1,1,1,2,1,1,1,2,1][i]; c.score=[100,86,68,92,79,88,74,95,81,90,72,84][i]; c.mins_spent=c.mins+[4,9,31,6,12,5,22,3,8,6,19,7][i]; }
+    S.ch[12].st='open';
+    for(let i=0;i<12;i++){ S.tasks[i].st='done'; S.tasks[i].resp='Submitted.'; }
+    S.tasks[1].late=true; S.tasks[6].late=true; S.tasks[10].late=true;
+    S.tasks[12].st='open';
+    S.summary={
+      obs:'Started cautious and got steadily more direct. The delegation and coaching material was the real turning point — you stopped taking work back. Still slow to raise a problem before it becomes visible, and that is the thing to work on next.',
+      grew:['Delegating with a clear definition of done','Opening hard conversations without padding','Deciding at 60% information'],
+      next:['Raising risk early rather than absorbing it','Coaching without reverting to telling under time pressure'],
+      rec:'promote', calls:11, of:13
+    };
+  }
+  if(stage==='end'){
+    M('Your 90-day summary has been published by Dana Whitfield.','Yesterday');
+    M('You are eligible to re-interview. Book when ready.','Yesterday');
+    S.msgs=[{me:0,t:'Summary is published. My recommendation is promotion to T4 — book the re-interview whenever you are ready and whoever you pick will see the full write-up first.',w:'Yesterday'}];
+  }
+  if(stage==='next'){
+    S.cycle=2; S.level='T4'; S.reinterview={agent:AGENTS[2],on:'2 Jul',outcome:'promoted',from:'T3',to:'T4'};
+    S.pay.push({d:'28 Jun',w:'Re-interview — Priya Raman',a:225});
+    M('Re-interview complete. You have been promoted to T4.','4 days ago');
+    M('Operator Track T4 is available. Cohort 19 starts Monday.','4 days ago');
+  }
+  S.notif.reverse();
+  save();
+}
+
+const KEY='tn-portal-v1';
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{ const r=localStorage.getItem(KEY); if(r){ S=JSON.parse(r); return true; } }catch(e){}
+  return false;
+}
+
+/* =========================================================
+   DERIVED
+   ========================================================= */
+const pct = ()=> Math.round(S.ch.filter(c=>c.st==='done').length/S.ch.length*100);
+const paceP = ()=> Math.round(Math.min(S.day,90)/90*100);
+const doneN = ()=> S.ch.filter(c=>c.st==='done').length;
+const timeSpent = ()=> S.ch.reduce((a,c)=>a+c.mins_spent,0);
+const avgScore = ()=>{ const s=S.ch.filter(c=>c.score!=null); return s.length?Math.round(s.reduce((a,c)=>a+c.score,0)/s.length):0; };
+const points = ()=> doneN()*120 + S.tasks.filter(t=>t.st==='done').length*45 + (S.ch.filter(c=>c.score>=90).length*30);
+const hrs = m => Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
+const week = ()=> Math.max(1,Math.min(13,Math.ceil(S.day/7)));
+const unread = ()=> S.notif.filter(n=>!n.rd).length;
+const paid = ()=> S.pay.reduce((a,p)=>a+p.a,0);
+const inCourse = ()=> ['week1','mid','end'].includes(S.stage) || (S.stage==='next'&&S.enrolled&&S.cycle>1&&S.day>0);
+</script>
+<script>
+/* =========================================================
+   SHELL RENDER
+   ========================================================= */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const STAGES=[['new','Just joined'],['booked','Interview booked'],['assessed','Levelled, not enrolled'],['week1','Week 1'],['mid','Day 34'],['end','Day 88'],['next','Promoted to T4']];
+
+function navItems(){
+  const s=S.stage;
+  if(s==='new') return [['dashboard','Dashboard'],['result','My quiz result'],['agents','Find an agent'],['billing','Billing'],['account','Account']];
+  if(s==='booked') return [['dashboard','Dashboard'],['interview','My interview'],['result','My quiz result'],['billing','Billing'],['account','Account']];
+  if(s==='assessed') return [['dashboard','Dashboard'],['report','My report'],['enrol','Enrol'],['billing','Billing'],['account','Account']];
+  if(s==='next'&&!S.enrolledNext) return [['dashboard','Dashboard'],['report','My report'],['progress','Past progress'],['enrol','Next course'],['billing','Billing'],['account','Account']];
+  if(s==='end') return S.pendingRe
+    ? [['dashboard','Dashboard'],['interview','My re-interview'],['progress','My progress'],['course','My course'],['cohort','My cohort'],['messages','Messages'],['report','My report'],['account','Account']]
+    : [['dashboard','Dashboard'],['progress','My progress'],['course','My course'],['agents','Re-interview'],['cohort','My cohort'],['messages','Messages'],['report','My report'],['account','Account']];
+  return [['dashboard','Dashboard'],['course','My course'],['tasks','Weekly tasks'],['progress','My progress'],['cohort','My cohort'],['messages','Messages'],['report','My report'],['account','Account']];
+}
+
+function renderShell(){
+  $('#proto').innerHTML = '<b>Prototype</b>'+STAGES.map(([k,l])=>
+    `<button class="pill ${S.stage===k?'on':''}" data-act="jump:${k}">${l}</button>`).join('')
+    + '<button class="rs" data-act="reset">Reset prototype</button>';
+  $('#nav').innerHTML = navItems().map(([k,l])=>
+    `<button class="${S.view===k?'on':''}" data-act="nav:${k}">${l}</button>`).join('');
+  $('#whoname').textContent = S.name.split(' ')[0];
+  $('#avi').textContent = S.name.split(' ').map(x=>x[0]).join('').slice(0,2);
+  const u=unread(); const b=$('#nbadge');
+  b.textContent=u; b.style.display=u?'grid':'none';
+  $('#drw').classList.toggle('on',!!S.drawer);
+  $('#dbody').innerHTML = S.notif.length? S.notif.map(n=>
+    `<div class="nf ${n.rd?'rd':''}"><div class="u"></div><div><div class="t">${esc(n.t)}</div><div class="w">${esc(n.w)}</div></div></div>`).join('')
+    : '<div class="empty"><div class="e">◎</div><p>Nothing yet.</p></div>';
+}
+
+function render(){
+  renderShell();
+  const f = VIEWS[S.view] || VIEWS.dashboard;
+  $('#view').innerHTML = f();
+  window.scrollTo({top:0,behavior:'instant'});
+  save();
+}
+function go(v){ S.view=v; render(); }
+function toast(m,k){ const d=document.createElement('div'); d.className='ts '+(k||''); d.textContent=m; $('#tst').appendChild(d); setTimeout(()=>d.remove(),2600); }
+function notify(t){ S.notif.unshift({t,w:'Just now',rd:false}); }
+function modal(h,w){ $('#mbox').className='mbox'+(w?' wide':''); $('#mbox').innerHTML=h; $('#mk').classList.add('on'); }
+function closeM(){
+  $('#mk').classList.remove('on');
+  if(tmr){clearInterval(tmr);tmr=null;}
+  if(!S) return;
+  // keep an in-progress note so re-rendering never loses typing
+  const n=$('#note'); if(n && S.ch[S.curCh]) S.ch[S.curCh].note=n.value;
+  render();
+}
+$('#mk').addEventListener('click',e=>{ if(e.target.id==='mk') closeM(); });
+
+/* ---------- shared partials ---------- */
+function stepper(){
+  const order=['quiz','interview','level','enrol','course','summary','next'];
+  const lab={quiz:['Quiz','Complete'],interview:['Interview',''],level:['Level assigned',''],enrol:['Enrol',''],course:['90-day course',''],summary:['Summary',''],next:['Next level','']};
+  let cur='quiz';
+  if(S.stage==='new') cur='interview';
+  if(S.stage==='booked'){cur='interview';lab.interview[1]=S.interviewAt||S.slot;}
+  if(S.stage==='assessed'){cur='enrol';lab.interview[1]='Done';lab.level[1]=S.level;}
+  if(inCourse()){cur='course';lab.interview[1]='Done';lab.level[1]=S.level;lab.enrol[1]='Paid';lab.course[1]='Day '+S.day+' of 90';}
+  if(S.stage==='end'){cur='summary';lab.interview[1]='Done';lab.level[1]='T3';lab.enrol[1]='Paid';lab.course[1]=pct()+'%';lab.summary[1]='Published';}
+  if(S.stage==='next'){cur='next';['interview','level','enrol','course','summary'].forEach(k=>lab[k][1]='Done');lab.level[1]='T3 → T4';lab.next[1]=S.enrolledNext?'Cohort 19':'Choose course';}
+  const ci=order.indexOf(cur);
+  return `<div class="card"><div class="step">${order.map((k,i)=>
+    `<div class="${i<ci?'done':i===ci?'now':''}"><div class="b"></div><div class="n">${lab[k][0]}</div><div class="x">${lab[k][1]||'&nbsp;'}</div></div>`).join('')}</div></div>`;
+}
+function paceTag(){
+  const d=pct()-paceP();
+  if(!S.day) return '';
+  if(d>=5) return `<span class="tag ok">${d} pts ahead of pace</span>`;
+  if(d<=-10) return `<span class="tag bad">${Math.abs(d)} pts behind pace</span>`;
+  if(d<0) return `<span class="tag wa">${Math.abs(d)} pts behind pace</span>`;
+  return `<span class="tag">On pace</span>`;
+}
+const VIEWS={};
+
+/* =========================================================
+   VIEW · DASHBOARD
+   ========================================================= */
+VIEWS.dashboard = ()=>{
+  let hero='';
+  if(S.stage==='new') hero=`
+    <div class="card">
+      <h3>Your next step</h3>
+      <div class="row ac">
+        <div class="f1">
+          <div style="font-size:16px;font-weight:660">Book an interview to get formally levelled</div>
+          <p class="sub" style="margin:6px 0 0;max-width:62ch">Your quiz put you provisionally at <b>${S.quiz.band}</b>. A talent agent confirms your level in a live interview — that level decides which course you take and what employers eventually see.</p>
+        </div>
+        <button class="btn p lg" data-act="nav:agents">Browse agents</button>
+      </div>
+    </div>`;
+  if(S.stage==='booked') hero=`
+    <div class="card">
+      <h3>Your interview <span class="r"><span class="tag ac">Confirmed</span></span></h3>
+      <div class="row ac">
+        <div class="av" style="width:44px;height:44px;flex:0 0 44px;font-size:15px">${S.agent.n.split(' ').map(x=>x[0]).join('')}</div>
+        <div class="f1">
+          <div style="font-size:15.5px;font-weight:660">${S.agent.n} · ${esc(S.slot)}</div>
+          <div class="sub" style="margin-top:3px">${S.agent.mn} minutes, recorded. ${S.interviewPaid?'£'+S.interviewPaid+' paid':'Free session'}.</div>
+        </div>
+        <button class="btn" data-act="nav:interview">Details</button>
+        <button class="btn p" data-act="joinint">Join interview</button>
+      </div>
+      <hr class="d">
+      <div class="note i"><b>Before you join</b>Have one real leadership situation from the last three months ready to talk through. That single example does more for your level than anything else in the conversation.</div>
+    </div>`;
+  if(S.stage==='assessed') hero=`
+    <div class="card">
+      <h3>You have been levelled <span class="r">${esc(S.report.on)} · ${esc(S.report.by)}</span></h3>
+      <div class="row ac">
+        <span class="tag lv" style="font-size:17px;padding:7px 17px">${S.level}</span>
+        <div class="f1">
+          <div style="font-size:14.5px;font-weight:640">Operator Track ${S.level} is your recommended course</div>
+          <div class="sub" style="margin-top:3px">90 days · 13 chapters · weekly cohort of 10 with a live agent</div>
+        </div>
+        <button class="btn" data-act="nav:report">Read report</button>
+        <button class="btn p" data-act="nav:enrol">Enrol</button>
+      </div>
+    </div>`;
+  if(inCourse()){
+    const d=pct()-paceP();
+    hero=`
+    <div class="card">
+      <div class="row ac" style="margin-bottom:14px">
+        <div class="f1">
+          <div style="font-size:17px;font-weight:670">Day ${S.day} of 90 <span class="sub" style="font-weight:400">· week ${week()} of 13</span></div>
+          <div class="sub" style="margin-top:4px">Operator Track ${S.level} · Cohort ${S.cohort.n} · ${esc(S.cohort.agent)}</div>
+        </div>
+        ${paceTag()}
+      </div>
+      <div class="blab"><span>Course progress</span><span>${pct()}% · ${doneN()} of 13 chapters</span></div>
+      <div class="bar"><i class="${d>=0?'ok':'wa'}" style="width:${pct()}%"></i></div>
+      <div class="g4 mt">
+        <div class="stat"><div class="l">Chapters</div><div class="v">${doneN()}<s>/13</s></div></div>
+        <div class="stat"><div class="l">Assessment avg</div><div class="v">${avgScore()}<s>%</s></div></div>
+        <div class="stat"><div class="l">Time invested</div><div class="v" style="font-size:20px">${hrs(timeSpent())}</div></div>
+        <div class="stat"><div class="l">Points</div><div class="v">${points()}</div><div class="f">Cohort rank ${cohortRank()} of 10</div></div>
+      </div>
+    </div>`;
+  }
+  if(S.stage==='end'&&S.pendingRe) hero=`
+    <div class="card">
+      <h3>Your re-interview <span class="r"><span class="tag ac">Confirmed</span></span></h3>
+      <div class="row ac">
+        <div class="av" style="width:44px;height:44px;flex:0 0 44px;font-size:15px">${S.agent.n.split(' ').map(x=>x[0]).join('')}</div>
+        <div class="f1">
+          <div style="font-size:15.5px;font-weight:660">${esc(S.agent.n)} · ${esc(S.slot)}</div>
+          <div class="sub" style="margin-top:3px">${S.agent.mn} minutes. They have already read your 90-day summary.</div>
+        </div>
+        <button class="btn" data-act="nav:interview">Details</button>
+        <button class="btn p" data-act="joinint">Join re-interview</button>
+      </div>
+      <hr class="d">
+      <div class="note i"><b>What is being decided</b>Whether ninety days of work moves you from ${S.level} to ${LEVELS[Math.min(4,LEVELS.indexOf(S.level)+1)]}. Dana has recommended promotion — this session confirms or declines it.</div>
+    </div>`;
+  else if(S.stage==='end') hero=`
+    <div class="card">
+      <div class="row ac" style="margin-bottom:14px">
+        <div class="f1"><div style="font-size:17px;font-weight:670">Day 88 of 90 — nearly there</div>
+          <div class="sub" style="margin-top:4px">Operator Track T3 · Cohort 12 · summary published</div></div>
+        <span class="tag ok">${pct()}% complete</span>
+      </div>
+      <div class="bar"><i class="ok" style="width:${pct()}%"></i></div>
+      <hr class="d">
+      <div class="row ac">
+        <div class="f1"><div style="font-size:14.5px;font-weight:640">Dana recommends promotion to T4</div>
+        <div class="sub" style="margin-top:3px">Book a re-interview to have it confirmed. Any agent can take it — they will read your summary first.</div></div>
+        <button class="btn" data-act="nav:progress">See summary</button>
+        <button class="btn p" data-act="nav:agents">Book re-interview</button>
+      </div>
+      ${S.ch[12].st!=='done'?`<div class="note w mt"><b>One chapter left</b>Chapter 13 is still open. Finish it before the re-interview — an incomplete course weakens the case for promotion.</div>`:''}
+    </div>`;
+  if(S.stage==='next'&&!S.enrolledNext) hero=`
+    <div class="card">
+      <h3>Promoted <span class="r">${esc(S.reinterview.on)} · ${esc(S.reinterview.agent.n)}</span></h3>
+      <div class="row ac">
+        <span class="tag" style="font-size:15px;padding:6px 14px">T3</span>
+        <span style="color:var(--mut);font-size:17px">→</span>
+        <span class="tag lv" style="font-size:17px;padding:7px 17px">T4</span>
+        <div class="f1" style="margin-left:6px">
+          <div style="font-size:14.5px;font-weight:640">Cycle 1 complete. Operator Track T4 is open to you.</div>
+          <div class="sub" style="margin-top:3px">New cohort, same 90-day structure, harder material.</div>
+        </div>
+        <button class="btn p" data-act="nav:enrol">See T4 course</button>
+      </div>
+    </div>`;
+  if(S.stage==='next'&&S.enrolledNext) hero=`
+    <div class="card">
+      <div class="row ac"><div class="f1">
+        <div style="font-size:17px;font-weight:670">Day ${S.day} of 90 · cycle 2</div>
+        <div class="sub" style="margin-top:4px">Operator Track T4 · Cohort 19 · ${esc(S.cohort.agent)}</div></div>
+        <span class="tag ac">Cycle 2</span></div>
+      <div class="blab mt"><span>Course progress</span><span>${pct()}%</span></div>
+      <div class="bar"><i style="width:${pct()}%"></i></div>
+    </div>`;
+
+  /* right column */
+  let side='';
+  if(inCourse()||S.stage==='end'){
+    const nx=S.ch.find(c=>c.st==='open')||S.ch.find(c=>c.st!=='done');
+    const tk=S.tasks.find(t=>t.st==='open');
+    side=`
+    <div class="card">
+      <h3>Next cohort call</h3>
+      <div style="font-size:15.5px;font-weight:660">${esc(S.cohort.day)} · ${esc(S.cohort.time)}</div>
+      <div class="sub" style="margin:4px 0 12px">Week ${week()} · ${esc(S.cohort.agent)} · 9 of 10 attending</div>
+      <div class="row"><button class="btn p sm" data-act="joincall">Join call</button><button class="btn sm" data-act="addcal">Add to calendar</button></div>
+    </div>
+    <div class="card mt">
+      <h3>Do this next</h3>
+      ${nx?`<div class="li"><div class="dot now">▸</div><div class="f1"><div class="t">${esc(nx.t)}</div><div class="s">Chapter ${nx.i+1} · ${nx.mins} min${nx.watch?' · '+nx.watch+'% watched':''}</div></div><button class="btn sm" data-act="open:${nx.i}">Open</button></div>`:''}
+      ${tk?`<div class="li"><div class="dot">○</div><div class="f1"><div class="t">${esc(tk.t)}</div><div class="s">Week ${tk.i+1} task · due Friday 17:00</div></div><button class="btn sm" data-act="task:${tk.i}">Write</button></div>`:''}
+      ${!nx&&!tk?'<div class="sub">All caught up.</div>':''}
+    </div>
+    <div class="card mt">
+      <h3>Cohort standings <span class="r">points</span></h3>
+      ${leaderboard()}
+      <button class="btn sm mt8" data-act="nav:cohort">View cohort</button>
+    </div>`;
+  } else {
+    side=`
+    <div class="card">
+      <h3>Your profile</h3>
+      <div class="kv"><span>Quiz bucket</span><b>${esc(S.quiz.bucket)}</b></div>
+      <div class="kv"><span>Quiz score</span><b>${S.quiz.score} / 100</b></div>
+      <div class="kv"><span>Provisional band</span><b>${esc(S.quiz.band)}</b></div>
+      <div class="kv"><span>Confirmed level</span><b>${S.level?S.level:'Not yet assessed'}</b></div>
+      <div class="kv"><span>Cycles completed</span><b>${S.cycle-1}</b></div>
+      <button class="btn sm mt8" data-act="nav:result">View quiz result</button>
+    </div>
+    <div class="card mt">
+      <h3>How this works</h3>
+      <div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">Take the quiz</div><div class="s">Provisional band</div></div></div>
+      <div class="li"><div class="dot ${S.level?'ok':'now'}">${S.level?'✓':'2'}</div><div class="f1"><div class="t">Interview with an agent</div><div class="s">Confirms your real level</div></div></div>
+      <div class="li"><div class="dot ${S.enrolled?'ok':S.level?'now':''}">${S.enrolled?'✓':'3'}</div><div class="f1"><div class="t">Join a 90-day cohort</div><div class="s">Ten people, one agent, weekly</div></div></div>
+      <div class="li"><div class="dot">4</div><div class="f1"><div class="t">Re-interview</div><div class="s">Move up a level, or repeat</div></div></div>
+    </div>`;
+  }
+
+  return `${stepper()}
+  <div class="g21 mt">
+    <div>${hero}${activityCard()}</div>
+    <div>${side}</div>
+  </div>`;
+};
+
+function cohortRank(){
+  const mine=points();
+  const others=PEERS.map((n,i)=>[1240,980,860,760,690,600,540,470,320][i]);
+  return others.filter(o=>o>mine).length+1;
+}
+function leaderboard(){
+  const rows=PEERS.map((n,i)=>({n,p:[1240,980,860,760,690,600,540,470,320][i]}));
+  rows.push({n:S.name,p:points(),me:1});
+  rows.sort((a,b)=>b.p-a.p);
+  return rows.slice(0,5).map((r,i)=>
+    `<div class="kv"><span>${i+1} · ${r.me?'<b style="color:var(--ac)">You</b>':esc(r.n)}</span><b>${r.p}</b></div>`).join('');
+}
+function activityCard(){
+  if(!inCourse()&&S.stage!=='end') return '';
+  const ev=[];
+  S.ch.filter(c=>c.st==='done').slice(-4).reverse().forEach(c=>
+    ev.push(['ok','Completed chapter '+(c.i+1)+' — '+c.t, 'Assessment '+c.score+'%'+(c.att>1?' · '+c.att+' attempts':'')]));
+  S.tasks.filter(t=>t.st==='done').slice(-2).reverse().forEach(t=>
+    ev.push(['','Submitted week '+(t.i+1)+' task', t.t+(t.late?' · late':'')]));
+  if(!ev.length) return '';
+  return `<div class="card mt"><h3>Recent activity</h3>${ev.slice(0,5).map(e=>
+    `<div class="li"><div class="dot ${e[0]}">${e[0]==='ok'?'✓':'•'}</div><div class="f1"><div class="t">${esc(e[1])}</div><div class="s">${esc(e[2])}</div></div></div>`).join('')}</div>`;
+}
+
+/* =========================================================
+   VIEW · QUIZ RESULT
+   ========================================================= */
+VIEWS.result = ()=>`
+  <div class="g21">
+    <div>
+      <div class="card">
+        <h3>Leadership profile <span class="r">taken 8 Mar</span></h3>
+        <div style="text-align:center;padding:14px 0 18px">
+          <div class="sub">Your bucket</div>
+          <div style="font-size:30px;font-weight:700;letter-spacing:-.03em;margin-top:5px">${esc(S.quiz.bucket)}</div>
+          <div style="margin-top:11px"><span class="tag lv">Provisional ${esc(S.quiz.band)}</span></div>
+        </div>
+        <hr class="d">
+        <div class="g2">
+          <div><div class="stat" style="border:0;padding:0"><div class="l">What you do well</div></div>
+            <div style="margin-top:9px">${S.quiz.str.map(s=>`<div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">${esc(s)}</div></div></div>`).join('')}</div></div>
+          <div><div class="stat" style="border:0;padding:0"><div class="l">Where you lose ground</div></div>
+            <div style="margin-top:9px">${S.quiz.dev.map(s=>`<div class="li"><div class="dot">!</div><div class="f1"><div class="t">${esc(s)}</div></div></div>`).join('')}</div></div>
+        </div>
+      </div>
+      <div class="card mt">
+        <h3>How you scored</h3>
+        ${[['Decisiveness',78],['Delegation',41],['Directness',66],['Coaching',38],['Composure',84]].map(([k,v])=>
+          `<div style="margin-bottom:12px"><div class="blab"><span>${k}</span><span>${v}</span></div><div class="bar t"><i class="${v>=70?'ok':v>=50?'wa':''}" style="width:${v}%;${v<50?'background:var(--bad)':''}"></i></div></div>`).join('')}
+        <div class="note i">The two lowest bands here are the ones the interview will probe hardest. They are also what the T3 course spends most of its time on.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>This is provisional</h3>
+        <p class="sub" style="margin:0">A quiz can only tell you so much. Your real level comes from a live interview with an agent, who can push on the answers a quiz has to take at face value.</p>
+        <hr class="d">
+        ${S.level?`<div class="kv"><span>Confirmed level</span><b>${S.level}</b></div><button class="btn sm mt8" data-act="nav:report">View full report</button>`
+          :`<button class="btn p mt8" data-act="nav:agents">Book an interview</button>`}
+      </div>
+      <div class="card mt"><h3>Retake</h3>
+        <p class="sub" style="margin:0 0 11px">You can retake the quiz once every 90 days. It will not change a confirmed level.</p>
+        <button class="btn sm" data-act="retake">Retake quiz</button></div>
+    </div>
+  </div>`;
+
+/* =========================================================
+   VIEW · AGENT MARKETPLACE
+   ========================================================= */
+VIEWS.agents = ()=>{
+  const re = S.stage==='end'||S.stage==='next';
+  return `
+  <div class="row ac" style="margin-bottom:16px">
+    <div class="f1">
+      <h2 style="font-size:19px">${re?'Book your re-interview':'Choose an agent'}</h2>
+      <p class="sub" style="margin:5px 0 0;max-width:70ch">Agents set their own price and their own availability. Rank reflects how their past candidates actually performed over 90 days, not just how the interview felt.${re?' Whoever you pick reads your 90-day summary before the session.':''}</p>
+    </div>
+  </div>
+  ${re?`<div class="note g" style="margin-bottom:15px"><b>Your summary travels with you</b>Dana has recommended promotion to T4. The agent you choose will see the full write-up, your chapter scores and your attendance before deciding.</div>`:''}
+  <div class="card" style="padding:8px 17px">
+    ${AGENTS.map(a=>`
+      <div class="li">
+        <div class="av" style="width:40px;height:40px;flex:0 0 40px;font-size:14px;background:${a.pr?'var(--ac)':'#0a8055'}">${a.n.split(' ').map(x=>x[0]).join('')}</div>
+        <div class="f1">
+          <div class="t">${esc(a.n)} <span class="tag">★ ${a.rk}</span> ${a.pr===0?'<span class="tag ok">Free first interview</span>':''}</div>
+          <div class="s">${esc(a.sp)} · ${a.iv} interviews · ${a.cp}% of their candidates finish the 90 days</div>
+        </div>
+        <div style="text-align:right;min-width:78px">
+          <div style="font-weight:660;font-size:14px">${a.pr?'£'+a.pr:'Free'}</div>
+          <div class="sub">${a.mn} min</div>
+        </div>
+        <button class="btn sm" data-act="agent:${a.id}">View</button>
+        <button class="btn p sm" data-act="book:${a.id}">Book</button>
+      </div>`).join('')}
+  </div>
+  <div class="note i mt"><b>Not satisfied afterwards?</b>You can pay again and interview with a different agent. Both assessments stay on your record — the most recent one sets your level.</div>`;
+};
+
+/* =========================================================
+   VIEW · INTERVIEW
+   ========================================================= */
+VIEWS.interview = ()=>{
+  if(!S.agent) return `<div class="empty"><div class="e">◔</div><h3>No interview booked</h3><p>Choose an agent to get formally levelled.</p><button class="btn p mt" data-act="nav:agents">Browse agents</button></div>`;
+  return `<div class="g21">
+    <div>
+      <div class="card">
+        <h3>Your interview <span class="r"><span class="tag ac">Confirmed</span></span></h3>
+        <div class="row ac">
+          <div class="av" style="width:46px;height:46px;flex:0 0 46px;font-size:16px">${S.agent.n.split(' ').map(x=>x[0]).join('')}</div>
+          <div class="f1">
+            <div style="font-size:15.5px;font-weight:660">${esc(S.agent.n)}</div>
+            <div class="sub">${esc(S.agent.sp)} · ★ ${S.agent.rk}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:660">${esc(S.slot)}</div>
+            <div class="sub">${S.agent.mn} minutes</div>
+          </div>
+        </div>
+        <hr class="d">
+        <div class="ph" style="height:150px">Video call opens here at the scheduled time.<br>Recorded and transcribed — you keep access to both.</div>
+        <div class="row mt"><button class="btn p" data-act="joinint">Join interview</button>
+          <button class="btn" data-act="resched">Reschedule</button>
+          <button class="btn dg" data-act="cancelint">Cancel</button></div>
+      </div>
+      <div class="card mt">
+        <h3>How you will be assessed</h3>
+        <div class="li"><div class="dot now">1</div><div class="f1"><div class="t">The conversation</div><div class="s">${S.agent.mn} minutes, recorded, transcript generated automatically</div></div></div>
+        <div class="li"><div class="dot">2</div><div class="f1"><div class="t">AI analysis</div><div class="s">Transcript combined with your quiz data to propose a level and cite the evidence</div></div></div>
+        <div class="li"><div class="dot">3</div><div class="f1"><div class="t">Human review</div><div class="s">A reviewer confirms or overrides the AI. The human decision always wins</div></div></div>
+        <div class="li"><div class="dot">4</div><div class="f1"><div class="t">Your report</div><div class="s">Level, strengths, growth areas, recommended course — usually within 48 hours</div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>Prepare</h3>
+        <div class="li"><div class="dot">○</div><div class="f1"><div class="t">One real situation</div><div class="s">Something from the last three months that did not go smoothly</div></div></div>
+        <div class="li"><div class="dot">○</div><div class="f1"><div class="t">A decision you regret</div><div class="s">How you would make it differently now</div></div></div>
+        <div class="li"><div class="dot">○</div><div class="f1"><div class="t">Somewhere quiet</div><div class="s">The transcript is part of the assessment</div></div></div>
+      </div>
+      <div class="card mt"><h3>Paid</h3>
+        <div class="kv"><span>Interview fee</span><b>${S.interviewPaid?'£'+S.interviewPaid:'Free'}</b></div>
+        <div class="kv"><span>Status</span><b>${S.interviewPaid?'Paid 12 Mar':'No charge'}</b></div>
+        <button class="btn sm mt8" data-act="nav:billing">Billing history</button></div>
+    </div>
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · REPORT
+   ========================================================= */
+VIEWS.report = ()=>{
+  if(!S.level) return `<div class="empty"><div class="e">◔</div><h3>No report yet</h3><p>Your report is written after your interview is assessed.</p><button class="btn p mt" data-act="nav:agents">Book an interview</button></div>`;
+  const r=S.report;
+  return `<div class="g21">
+    <div>
+      <div class="card">
+        <h3>Assessment report <span class="r">${esc(r.on)} · reviewed by ${esc(r.by)}</span></h3>
+        <div class="row ac">
+          <span class="tag lv" style="font-size:19px;padding:8px 19px">${S.level}</span>
+          <div class="f1">
+            <div style="font-size:14px;font-weight:640">Confirmed level</div>
+            <div class="sub">Quiz suggested ${esc(S.quiz.band)} · AI proposed ${esc(S.aiLevel)} · reviewer assigned ${S.level}</div>
+          </div>
+          ${S.override?'<span class="tag wa">Reviewer override</span>':'<span class="tag ok">AI agreed</span>'}
+        </div>
+        ${S.override?`<div class="note i mt"><b>Why you were moved up</b>The AI weighted your delegation answers heavily and proposed T2. The reviewer disagreed — you described a situation where you did delegate well under real pressure, which the transcript captured but the scoring missed.</div>`:''}
+        <hr class="d">
+        <div class="g2">
+          <div><div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750">Strengths</div>
+            ${S.quiz.str.map(s=>`<div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">${esc(s)}</div></div></div>`).join('')}</div>
+          <div><div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750">Growth areas</div>
+            ${S.quiz.dev.map(s=>`<div class="li"><div class="dot">!</div><div class="f1"><div class="t">${esc(s)}</div></div></div>`).join('')}</div>
+        </div>
+        <hr class="d">
+        <div class="row ac"><div class="f1"><div style="font-size:13px;font-weight:620">Interview recording</div><div class="sub">${S.agent.mn} minutes · transcript available</div></div>
+          <button class="btn sm" data-act="watchint">Watch</button><button class="btn sm" data-act="transcript">Transcript</button></div>
+      </div>
+      ${S.summary?summaryCard():''}
+    </div>
+    <div>
+      <div class="card"><h3>What ${S.level} means</h3>
+        <p class="sub" style="margin:0">Third of five in the T band. You can run a team and hold a line, but you are still absorbing work that should be delegated and avoiding conflict until it costs something.</p>
+        <hr class="d">
+        <div class="kv"><span>Band</span><b>T — team leadership</b></div>
+        <div class="kv"><span>Level</span><b>3 of 5</b></div>
+        <div class="kv"><span>Next level</span><b>T4</b></div>
+        <div class="kv"><span>Route to T4</span><b>90 days + re-interview</b></div>
+      </div>
+      ${!S.enrolled&&S.stage==='assessed'?`<div class="card mt"><h3>Recommended course</h3>
+        <div style="font-size:14px;font-weight:640">Operator Track T3</div>
+        <div class="sub" style="margin:4px 0 11px">90 days · 13 chapters · cohort of 10</div>
+        <div class="kv"><span>Price</span><b>£2,400</b></div>
+        <div class="kv"><span>Payment</span><b>One payment, upfront</b></div>
+        <button class="btn p mt8" data-act="nav:enrol">Enrol now</button></div>`:''}
+      <div class="card mt"><h3>Share</h3>
+        <p class="sub" style="margin:0 0 11px">Your report is private until you choose otherwise.</p>
+        <button class="btn sm" data-act="dl">Download PDF</button></div>
+    </div>
+  </div>`;
+};
+function summaryCard(){
+  const s=S.summary;
+  return `<div class="card mt">
+    <h3>90-day completion summary <span class="r">Cohort 12 · published</span></h3>
+    <div class="g4">
+      <div class="stat"><div class="l">Course</div><div class="v" style="font-size:15px">${pct()}% done</div></div>
+      <div class="stat"><div class="l">Assessment avg</div><div class="v">${avgScore()}<s>%</s></div></div>
+      <div class="stat"><div class="l">Time</div><div class="v" style="font-size:17px">${hrs(timeSpent())}</div></div>
+      <div class="stat"><div class="l">Calls attended</div><div class="v">${s.calls}<s>/${s.of}</s></div></div>
+    </div>
+    <hr class="d">
+    <div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750;margin-bottom:8px">Your agent's assessment</div>
+    <p style="margin:0;font-size:13px;line-height:1.65;color:var(--mid)">${esc(s.obs)}</p>
+    <div class="g2 mt">
+      <div><div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750">Grew</div>
+        ${s.grew.map(x=>`<div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">${esc(x)}</div></div></div>`).join('')}</div>
+      <div><div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750">Still to develop</div>
+        ${s.next.map(x=>`<div class="li"><div class="dot">!</div><div class="f1"><div class="t">${esc(x)}</div></div></div>`).join('')}</div>
+    </div>
+    <hr class="d">
+    <div class="row ac"><div class="f1"><div style="font-size:13px;font-weight:620">Recommendation</div>
+      <div class="sub">Promote to T4, subject to re-interview</div></div>
+      <span class="tag ok">Ready to promote</span></div>
+  </div>`;
+}
+
+/* =========================================================
+   VIEW · ENROL / PAY
+   ========================================================= */
+VIEWS.enrol = ()=>{
+  const nextCycle = S.stage==='next';
+  const lvl = nextCycle?'T4':S.level;
+  const price = nextCycle?2650:2400;
+  if(nextCycle&&S.enrolledNext) return VIEWS.course();
+  return `<div class="g21">
+    <div>
+      <div class="card">
+        <h3>Operator Track ${lvl} <span class="r">90 days</span></h3>
+        <p class="sub" style="margin:0 0 14px;max-width:66ch">Thirteen chapters of video and assessment, a written practical task every week, and a live cohort call with your agent. Ten people, self-paced within the week, one payment covering the whole ninety days.</p>
+        <div class="g3">
+          <div class="stat"><div class="l">Chapters</div><div class="v">13</div><div class="f">Video + assessment</div></div>
+          <div class="stat"><div class="l">Weekly tasks</div><div class="v">13</div><div class="f">Reviewed by your agent</div></div>
+          <div class="stat"><div class="l">Cohort size</div><div class="v">10</div><div class="f">Live weekly call</div></div>
+        </div>
+        <hr class="d">
+        <div class="l" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--mut);font-weight:750;margin-bottom:10px">What you will cover</div>
+        <div class="g2">
+          ${CH.map((c,i)=>`<div class="kv"><span>${i+1} · ${esc(c[0])}</span><b class="sub">${c[1]}m</b></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>Enrol</h3>
+        <div class="kv"><span>Course</span><b>Operator Track ${lvl}</b></div>
+        <div class="kv"><span>Duration</span><b>90 days</b></div>
+        <div class="kv"><span>Cohort</span><b>${nextCycle?'19 — starts Monday':'Next available'}</b></div>
+        <div class="kv"><span>Total</span><b style="font-size:16px">£${price.toLocaleString()}</b></div>
+        <div class="sub" style="margin:9px 0 12px">One payment. No monthly billing, no renewal.</div>
+        <button class="btn p lg" style="width:100%" data-act="paycourse:${price}">Pay £${price.toLocaleString()} and start</button>
+      </div>
+      <div class="card mt"><h3>How the cohort is picked</h3>
+        <p class="sub" style="margin:0">Built from your quiz and interview data so the group is at a comparable level. Maximum ten people. You get one call slot — if you cannot make it, the recording and your agent's notes are in the portal.</p></div>
+    </div>
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · COURSE (chapter list)
+   ========================================================= */
+VIEWS.course = ()=>{
+  if(!S.enrolled) return `<div class="empty"><div class="e">◔</div><h3>Not enrolled yet</h3><p>Your course unlocks when you enrol.</p><button class="btn p mt" data-act="nav:enrol">See the course</button></div>`;
+  return `
+  <div class="row ac" style="margin-bottom:15px">
+    <div class="f1"><h2 style="font-size:19px">Operator Track ${S.level}</h2>
+      <p class="sub" style="margin:5px 0 0">${doneN()} of 13 chapters · ${pct()}% · ${hrs(timeSpent())} invested</p></div>
+    ${paceTag()}
+  </div>
+  <div class="bar" style="margin-bottom:16px"><i class="${pct()>=paceP()?'ok':'wa'}" style="width:${pct()}%"></i></div>
+  <div class="card" style="padding:8px 17px">
+    ${S.ch.map(c=>{
+      const st=c.st;
+      const dot = st==='done'?'<div class="dot ok">✓</div>' : st==='open'?'<div class="dot now">'+(c.i+1)+'</div>' : '<div class="dot">'+(c.i+1)+'</div>';
+      let meta = `${c.mins} min · ${c.qs.length} assessment questions`;
+      if(st==='done') meta = `Assessment ${c.score}%${c.att>1?' · '+c.att+' attempts':''} · ${hrs(c.mins_spent)} spent`;
+      else if(st==='open'&&c.watch) meta = `${c.watch}% watched · assessment not taken`;
+      else if(st==='locked') meta = `Unlocks when chapter ${c.i} is complete`;
+      const btn = st==='locked' ? '<button class="btn sm" disabled>Locked</button>'
+        : st==='done' ? `<button class="btn sm" data-act="open:${c.i}">Review</button>`
+        : `<button class="btn p sm" data-act="open:${c.i}">${c.watch?'Continue':'Start'}</button>`;
+      return `<div class="li">${dot}<div class="f1"><div class="t">${esc(c.t)}</div><div class="s">${meta}</div>
+        ${st==='open'&&c.watch?`<div class="bar t" style="max-width:220px;margin-top:7px"><i style="width:${c.watch}%"></i></div>`:''}</div>
+        ${c.score!=null?`<span class="tag ${c.score>=85?'ok':c.score>=70?'':'wa'}">${c.score}%</span>`:''}
+        ${btn}</div>`;
+    }).join('')}
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · CHAPTER PLAYER
+   ========================================================= */
+VIEWS.chapter = ()=>{
+  const c=S.ch[S.curCh];
+  if(!c) return VIEWS.course();
+  const watched = c.watch>=100;
+  const done = c.st==='done';
+  return `
+  <div class="row ac" style="margin-bottom:14px">
+    <button class="btn sm" data-act="nav:course">← All chapters</button>
+    <div class="f1"></div>
+    <span class="sub">Chapter ${c.i+1} of 13</span>
+    ${c.i>0?`<button class="btn sm" data-act="open:${c.i-1}">Prev</button>`:''}
+    ${c.i<12&&S.ch[c.i+1].st!=='locked'?`<button class="btn sm" data-act="open:${c.i+1}">Next</button>`:''}
+  </div>
+  <div class="g21">
+    <div>
+      <div class="card">
+        <div class="row ac" style="margin-bottom:13px">
+          <div class="f1"><h2 style="font-size:17px">${esc(c.t)}</h2>
+            <div class="sub" style="margin-top:4px">${c.mins} minutes · ${c.qs.length} questions${done?' · completed':''}</div></div>
+          ${done?`<span class="tag ok">Complete · ${c.score}%</span>`:watched?'<span class="tag ac">Video watched</span>':'<span class="tag">Not started</span>'}
+        </div>
+        <div class="vid" id="vid">
+          ${watched?`<div class="ttl">Video complete<br><span style="font-size:11.5px;opacity:.6">${esc(c.t)} · ${c.mins} min</span></div>`
+            :`<button class="play" data-act="play">▶</button>`}
+          <div class="cap"><div>${esc(c.t)} — Operator Track ${S.level}</div>
+            <div class="tl"><i id="tl" style="width:${c.watch}%"></i></div></div>
+        </div>
+        <div class="row ac mt">
+          <div class="f1 sub" id="vstat">${watched?'Watched in full.':c.watch?c.watch+'% watched — press play to continue.':'Press play to begin. The assessment unlocks when the video finishes.'}</div>
+          ${!watched?'<button class="btn sm" data-act="skipvid">Skip to end</button>':''}
+        </div>
+      </div>
+
+      <div class="card mt" id="assess">
+        <h3>Assessment <span class="r">${c.att?'Attempt '+(c.att+ (done?0:1)):'Not attempted'} · pass mark 70%</span></h3>
+        ${!watched?`<div class="note w"><b>Locked</b>Finish the video first. The questions refer directly to it.</div>`
+        : done?`<div class="note g"><b>Passed with ${c.score}%</b>${c.att>1?'Took '+c.att+' attempts. Re-doing material is recorded, not penalised.':'First attempt.'} You can review your answers below.</div>
+            ${renderQs(c,true)}
+            <div class="row mt"><button class="btn" data-act="retry:${c.i}">Retake for a higher score</button>
+            ${c.i<12?`<button class="btn p" data-act="open:${c.i+1}">Next chapter →</button>`:`<button class="btn p" data-act="nav:progress">See my progress</button>`}</div>`
+        : `${renderQs(c,false)}
+            <div class="row ac mt"><div class="f1 sub" id="qcount">Answer all ${c.qs.length} questions to submit.</div>
+            <button class="btn p" data-act="submitq:${c.i}">Submit assessment</button></div>`}
+      </div>
+    </div>
+
+    <div>
+      <div class="card"><h3>Chapters</h3>
+        ${S.ch.map(x=>`<div class="kv"><span style="${x.i===c.i?'color:var(--ac);font-weight:650':''}">${x.i+1} · ${esc(x.t.length>22?x.t.slice(0,21)+'…':x.t)}</span>
+          <b>${x.st==='done'?'<span style="color:var(--ok)">✓</span>':x.st==='open'?'<span style="color:var(--ac)">▸</span>':'<span style="color:var(--mut)">🔒</span>'}</b></div>`).join('')}
+      </div>
+      <div class="card mt"><h3>My notes <span class="r">private</span></h3>
+        <textarea class="inp" id="note" placeholder="Anything you want to bring to Thursday's call…">${esc(c.note)}</textarea>
+        <button class="btn sm mt8" data-act="savenote:${c.i}">Save note</button>
+      </div>
+      <div class="card mt"><h3>Resources</h3>
+        <div class="li"><div class="f1"><div class="t">Chapter workbook</div><div class="s">PDF · 4 pages</div></div><button class="btn sm" data-act="dl">Get</button></div>
+        <div class="li"><div class="f1"><div class="t">Cohort discussion</div><div class="s">${3+c.i} replies this week</div></div><button class="btn sm" data-act="nav:cohort">Open</button></div>
+      </div>
+    </div>
+  </div>`;
+};
+function renderQs(c,reveal){
+  return c.qs.map((q,qi)=>{
+    const sel = (S.answers&&S.answers[c.i]) ? S.answers[c.i][qi] : (reveal? q[2] : undefined);
+    return `<div class="q"><div class="qt"><u>${qi+1}.</u><span>${esc(q[0])}</span></div>
+      ${q[1].map((o,oi)=>{
+        let cls='opt';
+        if(reveal){ if(oi===q[2]) cls+=' right'; else if(oi===sel) cls+=' wrong'; }
+        else if(sel===oi) cls+=' sel';
+        const mk = reveal? (oi===q[2]?'✓':(oi===sel?'✕':'')) : (sel===oi?'✓':'');
+        return `<button class="${cls}" ${reveal?'disabled':`data-act="ans:${c.i}:${qi}:${oi}"`}>
+          <span class="mk">${mk}</span><span>${esc(o)}</span></button>`;
+      }).join('')}</div>`;
+  }).join('');
+}
+
+/* =========================================================
+   VIEW · WEEKLY TASKS
+   ========================================================= */
+VIEWS.tasks = ()=>{
+  if(!S.enrolled) return VIEWS.course();
+  const done=S.tasks.filter(t=>t.st==='done').length;
+  const late=S.tasks.filter(t=>t.late).length;
+  return `
+  <div class="row ac" style="margin-bottom:15px">
+    <div class="f1"><h2 style="font-size:19px">Weekly practical tasks</h2>
+    <p class="sub" style="margin:5px 0 0;max-width:72ch">One a week, written in your own words. Your agent reads these before the cohort call — this is what they will pull you up on.</p></div>
+    <span class="tag">${done} of 13 submitted</span>${late?`<span class="tag wa">${late} late</span>`:''}
+  </div>
+  <div class="card" style="padding:8px 17px">
+    ${S.tasks.map(t=>{
+      const dot = t.st==='done'?'<div class="dot ok">✓</div>':t.st==='open'?'<div class="dot now">'+(t.i+1)+'</div>':'<div class="dot">'+(t.i+1)+'</div>';
+      const btn = t.st==='locked'?'<button class="btn sm" disabled>Week '+(t.i+1)+'</button>'
+        : t.st==='done'?`<button class="btn sm" data-act="task:${t.i}">View</button>`
+        : `<button class="btn p sm" data-act="task:${t.i}">Write response</button>`;
+      return `<div class="li">${dot}<div class="f1"><div class="t">Week ${t.i+1} · ${esc(t.t)}</div>
+        <div class="s">${t.st==='done'?'Submitted'+(t.late?' late':' on time'):t.st==='open'?'Due Friday 17:00':'Opens in week '+(t.i+1)}</div></div>
+        ${t.late?'<span class="tag wa">Late</span>':t.st==='done'?'<span class="tag ok">Submitted</span>':''}
+        ${btn}</div>`;
+    }).join('')}
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · PROGRESS
+   ========================================================= */
+VIEWS.progress = ()=>{
+  if(!S.enrolled) return `<div class="empty"><div class="e">◔</div><h3>Nothing to show yet</h3><p>Progress appears once you start a course.</p></div>`;
+  const retakes=S.ch.filter(c=>c.att>1).length;
+  const onTime=S.tasks.filter(t=>t.st==='done'&&!t.late).length;
+  const tdone=S.tasks.filter(t=>t.st==='done').length;
+  return `
+  <div class="row ac" style="margin-bottom:15px">
+    <div class="f1"><h2 style="font-size:19px">My progress</h2>
+      <p class="sub" style="margin:5px 0 0">Operator Track ${S.level} · Cohort ${S.cohort.n} · day ${S.day} of 90</p></div>
+    <button class="btn sm" data-act="dl">Export PDF</button>
+  </div>
+  <div class="g4">
+    <div class="stat"><div class="l">Overall</div><div class="v">${pct()}<s>%</s></div>
+      <div class="bar t" style="margin-top:9px"><i class="${pct()>=paceP()?'ok':'wa'}" style="width:${pct()}%"></i></div></div>
+    <div class="stat"><div class="l">Assessment avg</div><div class="v">${avgScore()}<s>%</s></div><div class="f">${retakes} chapter${retakes===1?'':'s'} retaken</div></div>
+    <div class="stat"><div class="l">Time invested</div><div class="v" style="font-size:20px">${hrs(timeSpent())}</div><div class="f">Across ${doneN()+ (S.ch.filter(c=>c.st==='open'&&c.watch>0).length)} chapters</div></div>
+    <div class="stat"><div class="l">Tasks on time</div><div class="v">${onTime}<s>/${tdone||0}</s></div><div class="f">${13-tdone} still to come</div></div>
+  </div>
+  ${S.summary?summaryCard():''}
+  <div class="card mt">
+    <h3>Chapter record</h3>
+    <table class="tb">
+      <tr><th>#</th><th>Chapter</th><th>Video</th><th>Assessment</th><th>Attempts</th><th>Time</th><th>Status</th></tr>
+      ${S.ch.map(c=>`<tr>
+        <td class="mono">${c.i+1}</td>
+        <td class="nm">${esc(c.t)}</td>
+        <td>${c.watch>=100?'<span class="tag ok">Watched</span>':c.watch?`<span class="tag wa">${c.watch}%</span>`:'<span class="sub">—</span>'}</td>
+        <td>${c.score!=null?`<span class="tag ${c.score>=85?'ok':c.score>=70?'':'wa'}">${c.score}%</span>`:'<span class="sub">—</span>'}</td>
+        <td class="mono">${c.att||'—'}</td>
+        <td class="mono">${c.mins_spent?hrs(c.mins_spent):'—'}</td>
+        <td>${c.st==='done'?'<span class="tag ok">Complete</span>':c.st==='open'?'<span class="tag ac">In progress</span>':'<span class="sub">Locked</span>'}</td>
+      </tr>`).join('')}
+    </table>
+  </div>
+  <div class="g2 mt">
+    <div class="card"><h3>Weekly tasks</h3>
+      ${S.tasks.filter(t=>t.st!=='locked').length? S.tasks.filter(t=>t.st!=='locked').map(t=>
+        `<div class="kv"><span>Week ${t.i+1} · ${esc(t.t)}</span><b>${t.st==='done'?(t.late?'<span class="tag wa">Late</span>':'<span class="tag ok">On time</span>'):'<span class="tag">Open</span>'}</b></div>`).join('')
+        : '<div class="sub">No tasks open yet.</div>'}
+    </div>
+    <div class="card"><h3>Achievements</h3>
+      <div class="kv"><span>Points</span><b>${points()}</b></div>
+      <div class="kv"><span>Cohort rank</span><b>${cohortRank()} of 10</b></div>
+      <div class="kv"><span>Chapters above 85%</span><b>${S.ch.filter(c=>c.score>=85).length}</b></div>
+      <div class="kv"><span>Certificate</span><b>${pct()===100?'<span class="tag ok">Issued</span>':'On completion'}</b></div>
+      ${pct()===100?'<button class="btn sm mt8" data-act="dl">Download certificate</button>':''}
+    </div>
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · COHORT
+   ========================================================= */
+VIEWS.cohort = ()=>{
+  if(!S.enrolled) return VIEWS.course();
+  const rows=PEERS.map((n,i)=>({n,p:[1240,980,860,760,690,600,540,470,320][i],pc:[71,58,52,46,44,39,36,28,18][i]}));
+  rows.push({n:S.name,p:points(),pc:pct(),me:1});
+  rows.sort((a,b)=>b.p-a.p);
+  return `
+  <div class="row ac" style="margin-bottom:15px">
+    <div class="f1"><h2 style="font-size:19px">Cohort ${S.cohort.n}</h2>
+      <p class="sub" style="margin:5px 0 0">Ten people at a comparable level, led by ${esc(S.cohort.agent)} · week ${week()} of 13</p></div>
+    <button class="btn p sm" data-act="joincall">Join ${esc(S.cohort.day)} call</button>
+  </div>
+  <div class="g21">
+    <div>
+      <div class="card">
+        <h3>Members <span class="r">progress is visible to the group</span></h3>
+        <table class="tb">
+          <tr><th>#</th><th>Member</th><th>Progress</th><th>Points</th></tr>
+          ${rows.map((r,i)=>`<tr>
+            <td class="mono">${i+1}</td>
+            <td class="nm">${r.me?'<span style="color:var(--ac)">You</span>':esc(r.n)}</td>
+            <td><div class="row ac" style="gap:8px"><div class="bar t" style="width:70px"><i class="${r.pc>=paceP()?'ok':'wa'}" style="width:${r.pc}%"></i></div><span class="mono">${r.pc}%</span></div></td>
+            <td class="mono">${r.p}</td></tr>`).join('')}
+        </table>
+      </div>
+      <div class="card mt">
+        <h3>Discussion <span class="r">week ${week()}</span></h3>
+        <div class="li"><div class="av" style="width:30px;height:30px;flex:0 0 30px;font-size:11px;background:#6b7280">AB</div>
+          <div class="f1"><div class="t">Aisha Bello</div><div class="s">The delegation chapter broke something for me. I have been calling it "helping" for two years.</div></div></div>
+        <div class="li"><div class="av" style="width:30px;height:30px;flex:0 0 30px;font-size:11px;background:#6b7280">DK</div>
+          <div class="f1"><div class="t">Daniel Kerr</div><div class="s">Same. Retook the assessment twice and still think I got it for the wrong reasons.</div></div></div>
+        <div class="row mt"><input class="inp f1" id="post" placeholder="Add to the discussion…"><button class="btn p" data-act="post">Post</button></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>Your call</h3>
+        <div class="kv"><span>Day</span><b>${esc(S.cohort.day)}</b></div>
+        <div class="kv"><span>Time</span><b>${esc(S.cohort.time)}</b></div>
+        <div class="kv"><span>Led by</span><b>${esc(S.cohort.agent)}</b></div>
+        <div class="kv"><span>This week</span><b>Week ${week()} of 13</b></div>
+        <div class="row mt8"><button class="btn p sm" data-act="joincall">Join</button><button class="btn sm" data-act="addcal">Calendar</button></div>
+      </div>
+      <div class="card mt"><h3>Missed a call?</h3>
+        <p class="sub" style="margin:0 0 11px">Recordings stay available for the full 90 days, along with your agent's notes.</p>
+        <div class="li"><div class="f1"><div class="t">Week ${Math.max(1,week()-1)} recording</div><div class="s">58 min</div></div><button class="btn sm" data-act="watchint">Watch</button></div>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* =========================================================
+   VIEW · MESSAGES
+   ========================================================= */
+VIEWS.messages = ()=>`
+  <div class="g21">
+    <div>
+      <div class="card">
+        <h3>${S.cohort?esc(S.cohort.agent):'Your agent'} <span class="r"><span class="tag ok">Usually replies same day</span></span></h3>
+        <div class="msg" id="msgbox">
+          ${S.msgs.length? S.msgs.map(m=>`<div class="bub ${m.me?'me':'them'}">${esc(m.t)}<div class="w">${esc(m.w)}</div></div>`).join('')
+            : '<div class="empty"><div class="e">◌</div><p>No messages yet. Ask your agent anything.</p></div>'}
+        </div>
+        <hr class="d">
+        <div class="row"><input class="inp f1" id="msgin" placeholder="Write a message…"><button class="btn p" data-act="send">Send</button></div>
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>Your agent</h3>
+        <div class="row ac"><div class="av" style="width:40px;height:40px;flex:0 0 40px;font-size:14px">DW</div>
+          <div class="f1"><div style="font-weight:640">${S.cohort?esc(S.cohort.agent):'—'}</div><div class="sub">Cohort ${S.cohort?S.cohort.n:'—'} · ★ 4.9</div></div></div>
+        <hr class="d">
+        <p class="sub" style="margin:0">Your agent can see your chapter progress, assessment scores and weekly task responses. They read them before each call.</p>
+      </div>
+    </div>
+  </div>`;
+
+/* =========================================================
+   VIEW · BILLING + ACCOUNT
+   ========================================================= */
+VIEWS.billing = ()=>`
+  <div class="row ac" style="margin-bottom:15px"><div class="f1"><h2 style="font-size:19px">Billing</h2>
+    <p class="sub" style="margin:5px 0 0">One-off payments only. Nothing here recurs.</p></div>
+    <span class="tag">Total paid £${paid().toLocaleString()}</span></div>
+  <div class="card">
+    ${S.pay.length?`<table class="tb"><tr><th>Date</th><th>Item</th><th>Amount</th><th></th></tr>
+      ${S.pay.map(p=>`<tr><td class="mono">${esc(p.d)}</td><td class="nm">${esc(p.w)}</td><td class="mono">£${p.a.toLocaleString()}</td>
+        <td style="text-align:right"><button class="btn sm" data-act="dl">Receipt</button></td></tr>`).join('')}</table>`
+      :'<div class="empty"><div class="e">◇</div><p>No payments yet.</p></div>'}
+  </div>
+  <div class="note i mt"><b>How agents get paid</b>You pay TalentNext, not the agent directly. The platform takes a percentage and settles the rest to your agent after the session.</div>`;
+
+VIEWS.account = ()=>`
+  <div class="g21">
+    <div>
+      <div class="card">
+        <h3>Your details</h3>
+        <div class="g2">
+          <div><label class="fl">Full name</label><input class="inp" id="acname" value="${esc(S.name)}"></div>
+          <div><label class="fl">Email</label><input class="inp" id="acmail" value="${esc(S.email)}"></div>
+        </div>
+        <div class="g2 mt">
+          <div><label class="fl">How you found us</label><select class="inp" id="acorig">
+            <option>Referral from a colleague</option><option>Employer sponsored</option><option>Social</option><option>University</option><option>An agent invited me</option></select></div>
+          <div><label class="fl">Time zone</label><select class="inp"><option>Europe/London</option><option>Asia/Karachi</option><option>America/New_York</option></select></div>
+        </div>
+        <button class="btn p mt" data-act="saveacc">Save changes</button>
+      </div>
+      <div class="card mt"><h3>Notifications</h3>
+        ${[['Cohort call reminders',1],['Weekly task due',1],['Assessment marked',1],['Messages from my agent',1],['Marketing and new courses',0]].map((x,i)=>
+          `<div class="kv"><span>${x[0]}</span><b><button class="btn sm" data-act="togg:${i}">${x[1]?'On':'Off'}</button></b></div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <div class="card"><h3>Status</h3>
+        <div class="kv"><span>Level</span><b>${S.level||'Not assessed'}</b></div>
+        <div class="kv"><span>Course</span><b>${S.enrolled?'Operator Track '+S.level:'None'}</b></div>
+        <div class="kv"><span>Cohort</span><b>${S.cohort?S.cohort.n:'—'}</b></div>
+        <div class="kv"><span>Cycles complete</span><b>${S.cycle-1}</b></div>
+        <div class="kv"><span>Member since</span><b>8 Mar 2026</b></div>
+      </div>
+      <div class="card mt"><h3>Danger zone</h3>
+        <p class="sub" style="margin:0 0 11px">Deleting your account removes your reports, progress and level permanently.</p>
+        <button class="btn dg sm" data-act="delacc">Delete account</button></div>
+    </div>
+  </div>`;
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+const A = {};
+
+A.nav = v => go(v);
+A.jump = st => { seed(st); render(); toast('Jumped to: '+(STAGES.find(x=>x[0]===st)||['','?'])[1]); };
+A.reset = () => { try{localStorage.removeItem(KEY);}catch(e){} seed('new'); render(); toast('Prototype reset'); };
+A.drawer = () => { S.drawer=!S.drawer; renderShell(); save(); };
+A.readall = () => { S.notif.forEach(n=>n.rd=true); renderShell(); save(); toast('All marked read'); };
+
+/* ---- agents & interview ---- */
+A.agent = id => {
+  const a=AGENTS.find(x=>x.id===id);
+  modal(`<div class="mh"><h3>${esc(a.n)}</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="row ac"><div class="av" style="width:46px;height:46px;flex:0 0 46px;font-size:16px">${a.n.split(' ').map(x=>x[0]).join('')}</div>
+      <div class="f1"><div style="font-weight:650">${esc(a.sp)}</div><div class="sub">★ ${a.rk} · ${a.iv} interviews</div></div>
+      <div style="text-align:right"><div style="font-weight:660;font-size:16px">${a.pr?'£'+a.pr:'Free'}</div><div class="sub">${a.mn} min</div></div></div>
+    <hr class="d">
+    <p style="margin:0;font-size:13px;line-height:1.6;color:var(--mid)">${esc(a.bio)}</p>
+    <div class="g3 mt">
+      <div class="stat"><div class="l">Completion</div><div class="v">${a.cp}<s>%</s></div><div class="f">Of their candidates</div></div>
+      <div class="stat"><div class="l">Interviews</div><div class="v">${a.iv}</div></div>
+      <div class="stat"><div class="l">Rank</div><div class="v">${a.rk}</div></div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Close</button><button class="btn p" data-act="book:${a.id}">Choose a time</button></div>`);
+};
+A.book = id => {
+  const a=AGENTS.find(x=>x.id===id);
+  S.pick=id;
+  modal(`<div class="mh"><h3>Book with ${esc(a.n)}</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="sub" style="margin-bottom:11px">${a.mn}-minute recorded interview · ${a.pr?'£'+a.pr:'no charge'}</div>
+    <label class="fl">Available times this week</label>
+    <div class="row" style="gap:8px">${a.sl.map(s=>`<button class="btn" data-act="slot:${id}:${encodeURIComponent(s)}">${esc(s)}</button>`).join('')}</div>
+    <div class="note i mt"><b>What to expect</b>A real conversation, not a test. It is recorded and transcribed, and both are yours to keep.</div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Cancel</button></div>`);
+};
+A.slot = (id,slot) => {
+  const a=AGENTS.find(x=>x.id===id); const s=decodeURIComponent(slot);
+  if(a.pr===0){ confirmBooking(a,s,0); return; }
+  modal(`<div class="mh"><h3>Payment</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="kv"><span>Agent</span><b>${esc(a.n)}</b></div>
+    <div class="kv"><span>Time</span><b>${esc(s)}</b></div>
+    <div class="kv"><span>Duration</span><b>${a.mn} minutes</b></div>
+    <div class="kv"><span>Total</span><b style="font-size:15px">£${a.pr}</b></div>
+    <hr class="d">
+    <label class="fl">Card number</label><input class="inp" placeholder="4242 4242 4242 4242">
+    <div class="g2 mt"><div><label class="fl">Expiry</label><input class="inp" placeholder="12 / 28"></div>
+      <div><label class="fl">CVC</label><input class="inp" placeholder="123"></div></div>
+    <div class="sub" style="margin-top:11px">Paid to TalentNext. Your agent is settled after the session.</div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Cancel</button>
+    <button class="btn p" data-act="payint:${id}:${slot}">Pay £${a.pr}</button></div>`);
+};
+A.payint = (id,slot) => { const a=AGENTS.find(x=>x.id===id); confirmBooking(a,decodeURIComponent(slot),a.pr); };
+function confirmBooking(a,s,amt){
+  const re = S.stage==='end'||S.stage==='next';
+  S.agent=a; S.slot=s; S.interviewPaid=amt;
+  if(amt) S.pay.unshift({d:'Today',w:(re?'Re-interview':'Interview')+' — '+a.n,a:amt});
+  if(re){ S.pendingRe=true; } else { S.stage='booked'; }
+  notify('Interview confirmed with '+a.n+' for '+s+'.');
+  closeM();
+  modal(`<div class="mh"><h3>Booked</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><div class="note g"><b>${esc(a.n)} · ${esc(s)}</b>${amt?'£'+amt+' paid. ':''}You will get a reminder an hour before. Bring one real situation from the last three months.</div></div>
+  <div class="mf"><button class="btn p" data-act="afterbook">Done</button></div>`);
+  save();
+}
+A.afterbook = () => { closeM(); go(S.pendingRe?'dashboard':'interview'); toast('Interview booked','g'); };
+A.resched = () => {
+  const a=S.agent;
+  modal(`<div class="mh"><h3>Reschedule</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><label class="fl">Pick a new time</label>
+    <div class="row" style="gap:8px">${a.sl.map(s=>`<button class="btn" data-act="doresched:${encodeURIComponent(s)}">${esc(s)}</button>`).join('')}</div>
+    <div class="sub mt8">Free of charge up to 24 hours before.</div></div>
+  <div class="mf"><button class="btn" data-act="closem">Cancel</button></div>`);
+};
+A.doresched = s => { S.slot=decodeURIComponent(s); notify('Interview moved to '+S.slot+'.'); closeM(); render(); toast('Moved to '+S.slot,'g'); };
+A.cancelint = () => {
+  modal(`<div class="mh"><h3>Cancel interview?</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><div class="note w"><b>You will be refunded in full</b>Cancelling more than 24 hours before the session is free. You can rebook with any agent.</div></div>
+  <div class="mf"><button class="btn" data-act="closem">Keep it</button><button class="btn dg" data-act="docancel">Cancel interview</button></div>`);
+};
+A.docancel = () => {
+  if(S.interviewPaid) S.pay.unshift({d:'Today',w:'Refund — interview cancelled',a:-S.interviewPaid});
+  S.agent=null;S.slot=null;S.interviewPaid=0;S.stage='new';
+  notify('Interview cancelled and refunded.');
+  closeM(); go('dashboard'); toast('Cancelled and refunded');
+};
+A.joinint = () => {
+  const re=S.pendingRe;
+  modal(`<div class="mh"><h3>${re?'Re-interview':'Interview'} in progress</h3></div>
+  <div class="mb">
+    <div class="vid" style="aspect-ratio:16/9"><div class="ttl">Live with ${esc(S.agent.n)}<br><span style="font-size:11.5px;opacity:.6">Recording · transcript generating</span></div></div>
+    <div class="blab mt"><span>Session</span><span id="ipc">0%</span></div>
+    <div class="bar"><i id="ibar" style="width:0"></i></div>
+    <div class="sub mt8" id="istat">Connecting…</div>
+  </div>
+  <div class="mf"><button class="btn p" id="idone" disabled data-act="endint">End session</button></div>`,true);
+  let p=0; const steps=['Connecting…','Discussing a recent leadership situation…','Probing delegation and conflict…','Working through a decision you regret…','Wrapping up…'];
+  tmr=setInterval(()=>{
+    p+=5; if(p>100)p=100;
+    const b=$('#ibar'), pc=$('#ipc'), st=$('#istat');
+    if(!b){clearInterval(tmr);tmr=null;return;}
+    b.style.width=p+'%'; pc.textContent=p+'%';
+    st.textContent=steps[Math.min(steps.length-1,Math.floor(p/21))];
+    if(p>=100){ clearInterval(tmr);tmr=null; $('#idone').disabled=false; st.textContent='Session complete. Transcript ready for analysis.'; }
+  },90);
+};
+A.endint = () => {
+  closeM();
+  modal(`<div class="mh"><h3>Assessment in progress</h3></div>
+  <div class="mb">
+    <div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">Interview recorded</div><div class="s">${S.agent.mn} minutes captured</div></div></div>
+    <div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">Transcript generated</div><div class="s">Combined with your quiz data</div></div></div>
+    <div class="li"><div class="dot now">▸</div><div class="f1"><div class="t">AI analysis</div><div class="s">Proposing a level with supporting evidence</div></div></div>
+    <div class="li"><div class="dot">○</div><div class="f1"><div class="t">Human review</div><div class="s">A reviewer confirms or overrides</div></div></div>
+    <div class="note i mt">Normally this takes up to 48 hours. Skip the wait for the prototype.</div>
+  </div>
+  <div class="mf"><button class="btn p" data-act="finishassess">Skip the wait →</button></div>`);
+};
+A.finishassess = () => {
+  if(S.pendingRe){
+    const from=S.level, to=LEVELS[Math.min(4,LEVELS.indexOf(S.level)+1)];
+    S.pendingRe=false; S.cycle++; S.level=to;
+    S.reinterview={agent:S.agent,on:'Today',outcome:'promoted',from,to};
+    S.stage='next'; S.view='dashboard';
+    notify('Re-interview complete. Promoted from '+from+' to '+to+'.');
+    closeM(); render();
+    modal(`<div class="mh"><h3>Promoted</h3><button class="x" data-act="closem">✕</button></div>
+    <div class="mb" style="text-align:center;padding:26px 18px">
+      <div class="row ac" style="justify-content:center;gap:12px">
+        <span class="tag" style="font-size:15px;padding:6px 14px">${from}</span><span style="color:var(--mut);font-size:18px">→</span>
+        <span class="tag lv" style="font-size:20px;padding:8px 20px">${to}</span></div>
+      <p class="sub" style="margin:16px auto 0;max-width:44ch">Ninety days of work confirmed by a second agent. Operator Track ${to} is now open to you.</p>
+    </div>
+    <div class="mf"><button class="btn" data-act="closem">Later</button><button class="btn p" data-act="seenext">See the T4 course</button></div>`);
+    return;
+  }
+  S.aiLevel='T2'; S.level='T3'; S.override=true;
+  S.report={by:S.agent.n,on:'Today'}; S.stage='assessed'; S.view='report';
+  notify('Your assessment is complete. You have been levelled T3.');
+  closeM(); render(); toast('Levelled T3','g');
+};
+A.seenext = () => { closeM(); go('enrol'); };
+
+/* ---- enrol ---- */
+A.paycourse = price => {
+  price=+price;
+  const nextCycle=S.stage==='next';
+  modal(`<div class="mh"><h3>Enrol — Operator Track ${nextCycle?'T4':S.level}</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="kv"><span>Course</span><b>Operator Track ${nextCycle?'T4':S.level}</b></div>
+    <div class="kv"><span>Duration</span><b>90 days · 13 chapters</b></div>
+    <div class="kv"><span>Cohort</span><b>${nextCycle?'19 — starts Monday':'Next available, max 10 people'}</b></div>
+    <div class="kv"><span>Total</span><b style="font-size:15px">£${price.toLocaleString()}</b></div>
+    <hr class="d">
+    <label class="fl">Card number</label><input class="inp" placeholder="4242 4242 4242 4242">
+    <div class="g2 mt"><div><label class="fl">Expiry</label><input class="inp" placeholder="12 / 28"></div>
+      <div><label class="fl">CVC</label><input class="inp" placeholder="123"></div></div>
+    <div class="note i mt"><b>One payment</b>This covers the full ninety days. There is no monthly charge and nothing renews.</div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Cancel</button><button class="btn p" data-act="doenrol:${price}">Pay £${price.toLocaleString()}</button></div>`);
+};
+A.doenrol = price => {
+  price=+price;
+  const nextCycle=S.stage==='next';
+  S.pay.unshift({d:'Today',w:'Operator Track '+(nextCycle?'T4':S.level)+' — 90 days',a:price});
+  S.enrolled=true; S.coursePaid=price; S.day=1;
+  S.ch=blankCh(); S.tasks=blankTasks(); S.tasks[0].st='open'; S.answers={};
+  S.summary=null; S.curCh=0;
+  if(nextCycle){ S.enrolledNext=true; S.cohort={n:19,day:'Monday',time:'18:00',size:10,agent:'Priya Raman'}; }
+  else { S.stage='week1'; S.cohort={n:12,day:'Thursday',time:'18:00',size:10,agent:'Dana Whitfield'}; }
+  notify('Enrolled in Operator Track '+(nextCycle?'T4':S.level)+'. Cohort '+S.cohort.n+' starts soon.');
+  notify('Week 1 task is open: '+TASK[0][0]+'.');
+  closeM();
+  modal(`<div class="mh"><h3>You are in</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="note g"><b>Cohort ${S.cohort.n} · ${esc(S.cohort.agent)}</b>Calls every ${esc(S.cohort.day)} at ${esc(S.cohort.time)} for the next thirteen weeks.</div>
+    <div class="li"><div class="dot now">1</div><div class="f1"><div class="t">Start chapter 1</div><div class="s">${esc(CH[0][0])} · ${CH[0][1]} minutes</div></div></div>
+    <div class="li"><div class="dot">2</div><div class="f1"><div class="t">Write your week 1 task</div><div class="s">${esc(TASK[0][0])}</div></div></div>
+    <div class="li"><div class="dot">3</div><div class="f1"><div class="t">Join the first call</div><div class="s">${esc(S.cohort.day)} ${esc(S.cohort.time)}</div></div></div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Later</button><button class="btn p" data-act="startch">Start chapter 1</button></div>`);
+  save();
+};
+A.startch = () => { closeM(); S.curCh=0; go('chapter'); };
+
+/* ---- chapters ---- */
+A.open = i => { S.curCh=+i; go('chapter'); };
+A.play = () => {
+  const c=S.ch[S.curCh];
+  const bar=$('#tl'), st=$('#vstat');
+  if(tmr) clearInterval(tmr);
+  const btn=document.querySelector('.vid .play'); if(btn) btn.textContent='❙❙';
+  tmr=setInterval(()=>{
+    c.watch=Math.min(100,c.watch+4);
+    c.mins_spent=Math.round(c.mins*c.watch/100);
+    if(bar) bar.style.width=c.watch+'%';
+    if(st) st.textContent=c.watch+'% watched';
+    if(c.watch>=100){ clearInterval(tmr); tmr=null; save(); render(); toast('Video complete — assessment unlocked','g'); }
+  },70);
+};
+A.skipvid = () => {
+  const c=S.ch[S.curCh]; c.watch=100; c.mins_spent=c.mins;
+  if(tmr){clearInterval(tmr);tmr=null;}
+  render(); toast('Assessment unlocked','g');
+};
+A.ans = (ci,qi,oi) => {
+  S.answers=S.answers||{}; S.answers[ci]=S.answers[ci]||{};
+  S.answers[ci][+qi]=+oi;
+  render();
+  const c=S.ch[+ci], n=Object.keys(S.answers[ci]).length, el=$('#qcount');
+  if(el) el.textContent = n<c.qs.length ? `${c.qs.length-n} question${c.qs.length-n===1?'':'s'} left.` : 'All answered — submit when ready.';
+};
+A.submitq = ci => {
+  ci=+ci; const c=S.ch[ci]; const a=(S.answers||{})[ci]||{};
+  if(Object.keys(a).length<c.qs.length){ toast('Answer every question first','b'); return; }
+  let right=0; c.qs.forEach((q,qi)=>{ if(a[qi]===q[2]) right++; });
+  const score=Math.round(right/c.qs.length*100);
+  c.att++; c.score=score; c.mins_spent+=6;
+  if(score>=70){
+    c.st='done';
+    if(ci<12 && S.ch[ci+1].st==='locked') S.ch[ci+1].st='open';
+    const wk=Math.min(12,ci);
+    if(S.tasks[wk] && S.tasks[wk].st==='locked') S.tasks[wk].st='open';
+    notify('Chapter '+(ci+1)+' complete — assessment '+score+'%.');
+    save();
+    modal(`<div class="mh"><h3>Chapter complete</h3><button class="x" data-act="closem">✕</button></div>
+    <div class="mb">
+      <div class="note g"><b>${right} of ${c.qs.length} correct · ${score}%</b>${c.att>1?'Attempt '+c.att+'. Retakes are recorded but not penalised.':'First attempt.'}</div>
+      <div class="g3 mt">
+        <div class="stat"><div class="l">Course</div><div class="v">${pct()}<s>%</s></div></div>
+        <div class="stat"><div class="l">Chapters</div><div class="v">${doneN()}<s>/13</s></div></div>
+        <div class="stat"><div class="l">Points</div><div class="v">${points()}</div></div>
+      </div>
+      ${ci<12?`<div class="li mt"><div class="dot now">▸</div><div class="f1"><div class="t">Next: ${esc(S.ch[ci+1].t)}</div><div class="s">${S.ch[ci+1].mins} minutes</div></div></div>`
+        :`<div class="note i mt"><b>That was the last chapter</b>Your course is complete. Your agent will publish a summary, then you can re-interview.</div>`}
+    </div>
+    <div class="mf"><button class="btn" data-act="closem">Stay here</button>
+      ${ci<12?`<button class="btn p" data-act="gonext:${ci+1}">Next chapter →</button>`:`<button class="btn p" data-act="finishcourse">See my progress</button>`}</div>`);
+  } else {
+    notify('Chapter '+(ci+1)+' assessment: '+score+'% — below the 70% pass mark.');
+    save();
+    modal(`<div class="mh"><h3>Not quite</h3><button class="x" data-act="closem">✕</button></div>
+    <div class="mb"><div class="note w"><b>${right} of ${c.qs.length} correct · ${score}%</b>The pass mark is 70%. Re-watch the parts you are unsure about and try again — retakes are recorded as attempts, which your agent sees, but they are not held against you.</div></div>
+    <div class="mf"><button class="btn" data-act="closem">Later</button><button class="btn p" data-act="retry:${ci}">Try again</button></div>`);
+  }
+  render();
+};
+A.gonext = i => { closeM(); S.curCh=+i; go('chapter'); };
+A.retry = ci => { ci=+ci; if(S.answers) S.answers[ci]={}; S.ch[ci].st='open'; S.ch[ci].score=null; closeM(); S.curCh=ci; go('chapter'); toast('Attempt '+(S.ch[ci].att+1)); };
+A.finishcourse = () => {
+  closeM();
+  S.summary={obs:'Finished the full thirteen chapters. Steady throughout, and the delegation and coaching material clearly shifted something — you stopped taking work back. Still slow to raise a problem before it becomes visible.',
+    grew:['Delegating with a clear definition of done','Opening hard conversations without padding','Deciding at 60% information'],
+    next:['Raising risk early rather than absorbing it','Coaching without reverting to telling under pressure'],
+    rec:'promote',calls:11,of:13};
+  S.stage='end'; S.day=88;
+  notify('Your 90-day summary has been published.');
+  go('progress'); toast('Course complete','g');
+};
+A.savenote = i => {
+  const el=$('#note'); if(!el) return;
+  S.ch[+i].note=el.value; save(); toast('Note saved','g');
+};
+
+/* ---- weekly tasks ---- */
+A.task = i => {
+  i=+i; const t=S.tasks[i]; const done=t.st==='done';
+  modal(`<div class="mh"><h3>Week ${i+1} · ${esc(t.t)}</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="note i"><b>The task</b>${esc(t.p)}</div>
+    <label class="fl mt" style="margin-top:14px">Your response</label>
+    <textarea class="inp" id="tresp" style="min-height:150px" ${done?'disabled':''} placeholder="Write it in your own words. Your agent reads this before the call.">${esc(t.resp==='Submitted.'?'':t.resp)}</textarea>
+    <div class="sub mt8">${done?'Submitted'+(t.late?' late.':' on time.'):'Due Friday 17:00. Your agent reads every response before the cohort call.'}</div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">${done?'Close':'Save for later'}</button>
+    ${done?'':`<button class="btn p" data-act="dotask:${i}">Submit</button>`}</div>`);
+};
+A.dotask = i => {
+  i=+i; const el=$('#tresp'); const v=el?el.value.trim():'';
+  if(v.length<20){ toast('Write a bit more before submitting','b'); return; }
+  const t=S.tasks[i]; t.resp=v; t.st='done';
+  if(i+1<13 && S.tasks[i+1].st==='locked') S.tasks[i+1].st='open';
+  notify('Week '+(i+1)+' task submitted.');
+  closeM(); render(); toast('Submitted — your agent will read it before the call','g');
+};
+
+/* ---- cohort / messages ---- */
+A.joincall = () => {
+  modal(`<div class="mh"><h3>Cohort ${S.cohort?S.cohort.n:''} · week ${week()}</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb">
+    <div class="vid" style="aspect-ratio:16/9"><div class="ttl">Waiting for ${S.cohort?esc(S.cohort.agent):'your agent'} to start<br><span style="font-size:11.5px;opacity:.6">8 of 10 already here</span></div></div>
+    <div class="note i mt"><b>Your agent has already read your week ${week()} work</b>They will have your chapter scores, your task response and where you are against the rest of the cohort.</div>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Leave</button><button class="btn p" data-act="closem">Join with camera on</button></div>`,true);
+};
+A.addcal = () => toast('Calendar invite sent to '+S.email,'g');
+A.post = () => {
+  const el=$('#post'); if(!el||!el.value.trim()){ toast('Write something first','b'); return; }
+  toast('Posted to the cohort discussion','g'); el.value='';
+  notify('You posted in the Cohort '+(S.cohort?S.cohort.n:'')+' discussion.'); renderShell();
+};
+A.send = () => {
+  const el=$('#msgin'); if(!el||!el.value.trim()){ toast('Write a message first','b'); return; }
+  S.msgs.push({me:1,t:el.value.trim(),w:'Just now'});
+  render();
+  setTimeout(()=>{
+    S.msgs.push({me:0,t:'Got it — I will pick this up on Thursday and we can work through it with the group.',w:'Just now'});
+    notify('New message from '+(S.cohort?S.cohort.agent:'your agent')+'.');
+    if(S.view==='messages') render(); else renderShell();
+  },1400);
+  toast('Sent','g');
+};
+
+/* ---- misc ---- */
+A.closem = () => closeM();
+A.retake = () => {
+  modal(`<div class="mh"><h3>Retake the quiz?</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><div class="note w"><b>This will not change a confirmed level</b>Only an interview can do that. Retaking replaces your provisional band and bucket.</div></div>
+  <div class="mf"><button class="btn" data-act="closem">Cancel</button><button class="btn p" data-act="closem">Start quiz</button></div>`);
+};
+A.watchint = () => modal(`<div class="mh"><h3>Recording</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><div class="vid" style="aspect-ratio:16/9"><button class="play" data-act="closem">▶</button>
+    <div class="cap"><div>Interview · ${S.agent?esc(S.agent.n):''}</div><div class="tl"><i style="width:0"></i></div></div></div></div>
+  <div class="mf"><button class="btn" data-act="closem">Close</button></div>`,true);
+A.transcript = () => modal(`<div class="mh"><h3>Transcript</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb" style="max-height:400px;overflow-y:auto;font-size:12.5px;line-height:1.7;color:var(--mid)">
+    <p style="margin:0 0 12px"><b style="color:var(--ink)">${S.agent?esc(S.agent.n):'Agent'} 00:12</b><br>Tell me about something in the last three months that did not go the way you wanted.</p>
+    <p style="margin:0 0 12px"><b style="color:var(--ink)">You 00:19</b><br>We missed a delivery date by two weeks. I knew by week three it was slipping and I did not say anything until it was obvious.</p>
+    <p style="margin:0 0 12px"><b style="color:var(--ink)">${S.agent?esc(S.agent.n):'Agent'} 00:41</b><br>What stopped you?</p>
+    <p style="margin:0 0 12px"><b style="color:var(--ink)">You 00:46</b><br>I thought I could pull it back. And I did not want to be the person bringing a problem without a solution.</p>
+    <p style="margin:0"><b style="color:var(--ink)">${S.agent?esc(S.agent.n):'Agent'} 01:02</b><br>That instinct is the thing we are going to spend ninety days on.</p>
+  </div>
+  <div class="mf"><button class="btn" data-act="closem">Close</button><button class="btn p" data-act="dl">Download</button></div>`,true);
+A.dl = () => toast('Downloading…','g');
+A.saveacc = () => {
+  const n=$('#acname'), m=$('#acmail');
+  if(n&&n.value.trim()) S.name=n.value.trim();
+  if(m&&m.value.trim()) S.email=m.value.trim();
+  render(); toast('Saved','g');
+};
+A.togg = () => toast('Preference updated','g');
+A.delacc = () => {
+  modal(`<div class="mh"><h3>Delete your account?</h3><button class="x" data-act="closem">✕</button></div>
+  <div class="mb"><div class="note b"><b>This cannot be undone</b>Your level, reports, progress and cohort history are removed permanently. Payments already made are not refunded.</div></div>
+  <div class="mf"><button class="btn" data-act="closem">Keep my account</button><button class="btn dg" data-act="reset">Delete everything</button></div>`);
+};
+
+/* =========================================================
+   WIRING
+   ========================================================= */
+document.addEventListener('click', e=>{
+  const el = e.target.closest('[data-act]');
+  if(!el) return;
+  if(el.disabled) return;
+  const parts = el.dataset.act.split(':');
+  const fn = A[parts[0]];
+  if(typeof fn === 'function'){ e.preventDefault(); fn.apply(null, parts.slice(1)); }
+  else console.warn('no handler for', el.dataset.act);
+});
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeM(); });
+
+if(!load()) seed('new');
+if(!S.answers) S.answers={};
+render();
+</script>
+</body>
+</html>

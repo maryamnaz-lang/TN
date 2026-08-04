@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TalentNext × LightspeedVT — Portal Wireframes</title>
+<style>
+:root{
+  --bg:#fafafa; --panel:#fff; --line:#e4e4e7; --line2:#d4d4d8;
+  --ink:#18181b; --mid:#52525b; --mut:#8b8b93; --faint:#f4f4f5;
+  --acc:#7c3aed; --acc-w:#f3effe;
+  --lsvt:#b45309; --lsvt-bg:#fef6e7; --lsvt-ln:#f0d9a8;
+  --tn:#1d4ed8; --tn-bg:#eef2ff; --tn-ln:#c7d2fe;
+  --der:#047857; --der-bg:#ecfdf5; --der-ln:#b7e4cd;
+  --warn:#b91c1c; --warn-bg:#fef2f2;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+a{color:inherit}
+.app{display:flex;min-height:100vh}
+
+/* ---------- left navigator ---------- */
+.nav{width:262px;flex:0 0 262px;background:#fff;border-right:1px solid var(--line);position:sticky;top:0;height:100vh;overflow-y:auto;padding:18px 0 40px}
+.nav .brand{padding:0 18px 16px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.nav .brand h1{font-size:15px}
+.nav .brand p{margin:4px 0 0;font-size:11.5px;color:var(--mut);line-height:1.45}
+.nav .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--mut);padding:14px 18px 6px;font-weight:700}
+.nav button{display:block;width:100%;text-align:left;background:none;border:0;padding:7px 18px 7px 18px;font:inherit;font-size:13px;color:var(--mid);cursor:pointer;border-left:3px solid transparent}
+.nav button:hover{background:var(--faint);color:var(--ink)}
+.nav button.on{background:var(--acc-w);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.nav button i{font-style:normal;color:var(--mut);font-size:11px;margin-right:7px;font-variant-numeric:tabular-nums}
+.nav button.on i{color:var(--acc)}
+.legend{margin:20px 14px 0;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--faint)}
+.legend h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-bottom:9px}
+.legend div{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mid);margin-bottom:6px}
+.toggle{margin:14px 14px 0;display:flex;gap:8px;align-items:center;font-size:11.5px;color:var(--mid);padding:0 4px}
+.toggle input{accent-color:var(--acc)}
+
+/* ---------- canvas ---------- */
+.canvas{flex:1;padding:26px 30px 80px;max-width:1180px}
+.scr{display:none}
+.scr.on{display:block}
+.scr-head{margin-bottom:16px}
+.scr-head .eyebrow{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--mut);font-weight:700}
+.scr-head h2{font-size:21px;margin:5px 0 6px}
+.scr-head p{margin:0;color:var(--mid);font-size:13px;max-width:78ch}
+
+/* ---------- fake browser frame ---------- */
+.frame{border:1px solid var(--line2);border-radius:10px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px -12px rgba(0,0,0,.12)}
+.chrome{display:flex;align-items:center;gap:7px;padding:9px 12px;background:var(--faint);border-bottom:1px solid var(--line)}
+.chrome span{width:9px;height:9px;border-radius:50%;background:var(--line2)}
+.chrome .url{flex:1;margin-left:8px;background:#fff;border:1px solid var(--line);border-radius:5px;padding:3px 9px;font-size:11px;color:var(--mut);font-family:ui-monospace,monospace}
+
+/* ---------- app chrome inside frame ---------- */
+.top{display:flex;align-items:center;gap:22px;padding:11px 18px;border-bottom:1px solid var(--line)}
+.top .logo{font-weight:750;font-size:14px;letter-spacing:-.02em}
+.top .logo em{font-style:normal;color:var(--acc)}
+.top nav{display:flex;gap:18px;font-size:12.5px;color:var(--mut)}
+.top nav b{color:var(--ink);font-weight:600;border-bottom:2px solid var(--acc);padding-bottom:12px;margin-bottom:-13px}
+.top .sp{flex:1}
+.top .av{width:26px;height:26px;border-radius:50%;background:var(--line);border:1px solid var(--line2)}
+.body{padding:20px}
+.body.grey{background:#fcfcfd}
+
+/* ---------- layout helpers ---------- */
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.row>*{min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.g12{display:grid;grid-template-columns:1fr 2fr;gap:14px}
+.mt{margin-top:14px}
+.f1{flex:1}
+
+/* ---------- cards ---------- */
+.card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:14px}
+.card.f{background:var(--faint)}
+.card>h3{font-size:12.5px;margin-bottom:10px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.card>h3 .r{margin-left:auto;font-size:11px;color:var(--mut);font-weight:500}
+.sub{font-size:11.5px;color:var(--mut);margin:-4px 0 10px}
+hr.d{border:0;border-top:1px dashed var(--line2);margin:12px 0}
+
+/* ---------- bits ---------- */
+.stat{border:1px solid var(--line);border-radius:8px;padding:12px}
+.stat .lab{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.stat .val{font-size:24px;font-weight:680;letter-spacing:-.02em;margin-top:7px;line-height:1}
+.stat .val small{font-size:12px;color:var(--mut);font-weight:500}
+.stat .foot{font-size:11px;color:var(--mut);margin-top:5px}
+
+.bar{height:7px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.bar.thin{height:5px}
+.bar i.ok{background:#059669}.bar i.warn{background:#d97706}.bar i.bad{background:#dc2626}
+.barlab{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-bottom:5px}
+
+.btn{display:inline-block;border:1px solid var(--line2);background:#fff;border-radius:6px;padding:6px 12px;font-size:12px;color:var(--mid);cursor:default}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.btn.sm{padding:3px 9px;font-size:11px}
+.btn.gh{border-style:dashed;color:var(--mut)}
+
+.chip{display:inline-block;border:1px solid var(--line2);border-radius:99px;padding:2px 9px;font-size:11px;color:var(--mid);background:#fff}
+.chip.lv{background:#111;color:#fff;border-color:#111;font-weight:650;letter-spacing:.02em}
+.chip.ok{background:var(--der-bg);border-color:var(--der-ln);color:var(--der)}
+.chip.wa{background:#fffbeb;border-color:#fcd9a3;color:#92400e}
+.chip.bad{background:var(--warn-bg);border-color:#fbcaca;color:var(--warn)}
+
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700;padding:7px 9px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl td{padding:8px 9px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .nm{font-weight:600}
+.tbl .mono{font-variant-numeric:tabular-nums;color:var(--mid)}
+
+.ph{border:1px dashed var(--line2);border-radius:6px;background:repeating-linear-gradient(45deg,#fafafa,#fafafa 7px,#f2f2f4 7px,#f2f2f4 14px);display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:11.5px;text-align:center;padding:14px}
+.ph.vid{height:190px}
+.ph.av{width:30px;height:30px;border-radius:50%;padding:0;flex:0 0 30px}
+.embed{border:2px dashed var(--lsvt-ln);border-radius:8px;background:var(--lsvt-bg);padding:10px}
+.embed>.tag{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--lsvt);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+ul.tick,ul.plain{margin:0;padding-left:18px;font-size:12.5px;color:var(--mid)}
+ul.tick li,ul.plain li{margin-bottom:6px}
+ul.tick li::marker{color:var(--acc)}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--mut)}
+.kv b{font-weight:600;text-align:right}
+
+.list-item{display:flex;gap:11px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.list-item .f1 .t{font-size:12.5px;font-weight:600}
+.list-item .f1 .s{font-size:11.5px;color:var(--mut)}
+
+.alert{border:1px solid #fbcaca;background:var(--warn-bg);border-radius:7px;padding:10px 12px;font-size:12px;color:#7f1d1d}
+.alert b{display:block;margin-bottom:2px}
+.info{border:1px solid var(--tn-ln);background:var(--tn-bg);border-radius:7px;padding:10px 12px;font-size:12px;color:#1e3a8a}
+
+/* ---------- annotations ---------- */
+.ann{font-style:normal;display:inline-block;font-size:9px;font-weight:800;letter-spacing:.06em;padding:1.5px 5px;border-radius:3px;vertical-align:middle;white-space:nowrap;text-transform:uppercase}
+.ann.l{background:var(--lsvt-bg);color:var(--lsvt);border:1px solid var(--lsvt-ln)}
+.ann.t{background:var(--tn-bg);color:var(--tn);border:1px solid var(--tn-ln)}
+.ann.d{background:var(--der-bg);color:var(--der);border:1px solid var(--der-ln)}
+.ann.q{background:#fff;color:var(--mut);border:1px dashed var(--line2)}
+body.hide-ann .ann{display:none}
+.sw{width:11px;height:11px;border-radius:3px;flex:0 0 11px}
+.sw.l{background:var(--lsvt-bg);border:1px solid var(--lsvt-ln)}
+.sw.t{background:var(--tn-bg);border:1px solid var(--tn-ln)}
+.sw.d{background:var(--der-bg);border:1px solid var(--der-ln)}
+.sw.q{background:#fff;border:1px dashed var(--line2)}
+
+/* ---------- notes under each screen ---------- */
+.notes{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.notes .card h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}
+.notes ul{padding-left:16px;margin:0;font-size:12px;color:var(--mid)}
+.notes ul li{margin-bottom:6px}
+.notes .q li{color:#7c2d12}
+@media(max-width:1000px){.notes{grid-template-columns:1fr}.g2,.g3,.g4,.g21,.g12{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ============ NAVIGATOR ============ -->
+<aside class="nav">
+  <div class="brand">
+    <h1>TalentNext × LightspeedVT</h1>
+    <p>Portal wireframes v0.1 · low fidelity · candidate &amp; talent agent</p>
+  </div>
+
+  <div class="grp">Candidate</div>
+  <button data-s="C1" class="on"><i>C1</i>Quiz result &amp; bucket</button>
+  <button data-s="C2"><i>C2</i>Talent agent marketplace</button>
+  <button data-s="C3"><i>C3</i>Assessment report &amp; level</button>
+  <button data-s="C4"><i>C4</i>Learning dashboard</button>
+  <button data-s="C5"><i>C5</i>Course player (LSVT embed)</button>
+  <button data-s="C6"><i>C6</i>My progress &amp; transcript</button>
+  <button data-s="C7"><i>C7</i>90-day completion summary</button>
+
+  <div class="grp">Talent agent</div>
+  <button data-s="A1"><i>A1</i>Agent dashboard</button>
+  <button data-s="A2"><i>A2</i>Cohort roster</button>
+  <button data-s="A3"><i>A3</i>Pre-meeting AI brief</button>
+  <button data-s="A4"><i>A4</i>Member detail</button>
+  <button data-s="A5"><i>A5</i>Completion summary builder</button>
+
+  <div class="grp">Reference</div>
+  <button data-s="R1"><i>R1</i>Data source map</button>
+
+  <div class="legend">
+    <h4>Data source</h4>
+    <div><span class="sw t"></span> TN — TalentNext owns it</div>
+    <div><span class="sw l"></span> LSVT — pulled from Lightspeed</div>
+    <div><span class="sw d"></span> DER — derived / computed in TN</div>
+    <div><span class="sw q"></span> ? — unconfirmed, ask LSVT</div>
+  </div>
+  <label class="toggle"><input type="checkbox" id="tg" checked> Show data-source tags</label>
+</aside>
+
+<!-- ============ CANVAS ============ -->
+<main class="canvas">
+
+<!-- ================= C1 ================= -->
+<section class="scr on" id="C1">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · pre-account</div>
+    <h2>C1 · Quiz result &amp; bucket</h2>
+    <p>End of the 10–15 question leadership quiz. Name and email captured, no account yet. Zero LSVT involvement — this is the "minimal barrier to entry" step and must not require a Lightspeed identity.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">nextinleadership.com/quiz/result</div></div>
+    <div class="body grey">
+      <div style="max-width:660px;margin:0 auto">
+        <div class="card" style="text-align:center;padding:24px">
+          <div class="sub" style="margin:0 0 8px">Your leadership profile <i class="ann t">TN</i></div>
+          <div style="font-size:30px;font-weight:700;letter-spacing:-.02em">The Operator</div>
+          <div style="margin-top:8px"><span class="chip lv">Provisional band · T2–T3</span> <i class="ann t">TN</i></div>
+          <hr class="d">
+          <div class="g3" style="text-align:left">
+            <div><div class="stat" style="border:0;padding:0"><div class="lab">Strength</div><div style="font-size:13px;font-weight:600;margin-top:6px">Execution under pressure</div></div></div>
+            <div><div class="stat" style="border:0;padding:0"><div class="lab">Watch</div><div style="font-size:13px;font-weight:600;margin-top:6px">Delegating too late</div></div></div>
+            <div><div class="stat" style="border:0;padding:0"><div class="lab">Quiz score</div><div style="font-size:13px;font-weight:600;margin-top:6px">64 / 100 <i class="ann t">TN</i></div></div></div>
+          </div>
+        </div>
+
+        <div class="card mt">
+          <h3>Where you could go next <span class="r">bucket-specific marketing <i class="ann t">TN</i></span></h3>
+          <div class="g2">
+            <div class="card f">
+              <div style="font-size:13px;font-weight:650">Operator Track · 90 days</div>
+              <div class="sub" style="margin:4px 0 8px">Weekly cohort of 10, live agent, self-paced coursework.</div>
+              <div style="font-weight:650">$X,XXX <span style="font-size:11px;color:var(--mut);font-weight:400">one payment</span></div>
+              <div class="mt"><span class="btn p">Create account to continue</span></div>
+            </div>
+            <div class="card f">
+              <div style="font-size:13px;font-weight:650">Interview only</div>
+              <div class="sub" style="margin:4px 0 8px">Get assessed and levelled without enrolling.</div>
+              <div style="font-weight:650">from $XX <span style="font-size:11px;color:var(--mut);font-weight:400">agent sets price</span></div>
+              <div class="mt"><span class="btn">Browse agents</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="info mt">Exit without an account and you keep the result — TN stores the lead and can re-surface it. No LSVT seat is consumed, so no billing impact.</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>TN only.</b> Quiz engine, scoring, bucket logic, lead capture.</li>
+      <li>No LSVT user is created here — seats are billed per active user, so provisioning at quiz stage would be expensive and pointless.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Your flow diagram notes the quiz is being rebuilt and references LSVT's version. Recommend keeping it TN-native — an LSVT-hosted quiz forces an account before this point.</li>
+      <li>Is the provisional band shown to the candidate, or held back until after the interview so the assessed level isn't anchored?</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C2 ================= -->
+<section class="scr" id="C2">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · post-account, pre-course</div>
+    <h2>C2 · Talent agent marketplace</h2>
+    <p>Candidate browses agents, each self-priced and ranked. Money routes to the platform, agent takes a percentage. Still no LSVT contact.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agents</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><b>Find an agent</b><span>My interviews</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="g12">
+        <div class="card" style="align-self:start">
+          <h3>Filter</h3>
+          <div class="kv"><span>Band focus</span><b>T2–T3</b></div>
+          <div class="kv"><span>Price</span><b>$0 – $250</b></div>
+          <div class="kv"><span>Availability</span><b>This week</b></div>
+          <div class="kv"><span>Language</span><b>English</b></div>
+          <hr class="d">
+          <div class="sub" style="margin:0">Agent rank is fed partly by how their past candidates performed in the 90-day loop <i class="ann d">DER</i> <i class="ann l">LSVT</i></div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="list-item">
+              <div class="ph av"></div>
+              <div class="f1"><div class="t">Agent name · <span class="chip">Rank 4.7</span> <i class="ann d">DER</i></div>
+              <div class="s">62 interviews · avg candidate completion 81% <i class="ann l">LSVT</i> · specialises T-band</div></div>
+              <div style="text-align:right"><div style="font-weight:650">$180</div><div class="sub" style="margin:2px 0 0">45 min</div></div>
+              <span class="btn p sm">Book</span>
+            </div>
+            <div class="list-item">
+              <div class="ph av"></div>
+              <div class="f1"><div class="t">Agent name · <span class="chip">Rank 4.4</span></div>
+              <div class="s">28 interviews · avg candidate completion 74% <i class="ann l">LSVT</i></div></div>
+              <div style="text-align:right"><div style="font-weight:650">Free</div><div class="sub" style="margin:2px 0 0">30 min</div></div>
+              <span class="btn sm">Book</span>
+            </div>
+            <div class="list-item">
+              <div class="ph av"></div>
+              <div class="f1"><div class="t">Agent name · <span class="chip">Rank 4.1</span></div>
+              <div class="s">15 interviews · new to platform</div></div>
+              <div style="text-align:right"><div style="font-weight:650">$95</div><div class="sub" style="margin:2px 0 0">45 min</div></div>
+              <span class="btn sm">Book</span>
+            </div>
+          </div>
+          <div class="info mt">Interview is a marketplace choice, not an assignment. If the candidate isn't satisfied they can pay again and pick a different agent — TN must model repeat interviews as separate paid events.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>TN:</b> agent profiles, pricing, calendar, Stripe checkout, platform cut.</li>
+      <li><b>LSVT (indirect):</b> "avg candidate completion" is aggregated from Report Card progress of candidates this agent previously levelled — a genuine differentiator and a reason to store LSVT history against the agent record.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Agent rank formula — how much weight goes to LSVT completion data vs. candidate ratings vs. volume?</li>
+      <li>Do agents see their own LSVT-derived stats? Likely yes, and it becomes a retention lever.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C3 ================= -->
+<section class="scr" id="C3">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · post-interview</div>
+    <h2>C3 · Assessment report &amp; level assigned</h2>
+    <p>AI analyses interview transcript plus quiz data, reviewer confirms or overrides, level is assigned (E/B/T 1–5). This is the gate into the course — and the level is what drives LSVT content visibility.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/report</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><b>My report</b><span>My course</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="g21">
+        <div>
+          <div class="card">
+            <h3>Assessment outcome <span class="r">reviewed by [name] · 12 Mar <i class="ann t">TN</i></span></h3>
+            <div class="row" style="align-items:center;gap:10px">
+              <span class="chip lv" style="font-size:15px;padding:5px 14px">T3</span>
+              <div class="sub" style="margin:0">Assigned level · up one from provisional band <i class="ann t">TN</i></div>
+            </div>
+            <hr class="d">
+            <div class="g2">
+              <div><div class="lab" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700">Strengths</div>
+                <ul class="tick mt" style="margin-top:8px"><li>Placeholder strength line</li><li>Placeholder strength line</li><li>Placeholder strength line</li></ul></div>
+              <div><div class="lab" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700">Growth areas</div>
+                <ul class="tick mt" style="margin-top:8px"><li>Placeholder growth line</li><li>Placeholder growth line</li><li>Placeholder growth line</li></ul></div>
+            </div>
+            <hr class="d">
+            <div class="ph" style="height:120px">Interview recording · playback with transcript scrub <i class="ann t">TN</i></div>
+          </div>
+          <div class="card mt">
+            <h3>Your recommended course</h3>
+            <div class="row" style="align-items:center">
+              <div class="f1">
+                <div style="font-size:13.5px;font-weight:650">Operator Track T3 <i class="ann l">LSVT</i></div>
+                <div class="sub" style="margin:4px 0 0">90 days · 12 modules · weekly cohort of 10 · course title, module count and duration read from the LSVT courseware record</div>
+              </div>
+              <div style="text-align:right"><div style="font-weight:650">$X,XXX</div><div class="sub" style="margin:2px 0 0">one payment</div></div>
+              <span class="btn p">Enrol &amp; pay</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>What happens on enrolment</h3>
+            <ul class="plain">
+              <li>TN creates your Lightspeed user <i class="ann l">LSVT</i></li>
+              <li>Level T3 maps to an LSVT <b>Content Role</b> so you only see T3 material <i class="ann l">LSVT</i></li>
+              <li>You're placed in a cohort <span class="chip">= LSVT Team</span> <i class="ann l">LSVT</i></li>
+              <li>Weekly tasks arrive as LSVT <b>Assignments</b> with due dates <i class="ann l">LSVT</i></li>
+              <li>Single sign-on — no second password <i class="ann q">? SAML</i></li>
+            </ul>
+          </div>
+          <div class="alert mt"><b>Timing constraint</b>Seat billing starts the moment the LSVT user is active. Provision on payment, not on level assignment.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>TN:</b> AI analysis, reviewer decision, level, strengths/growth text, recording, payment.</li>
+      <li><b>LSVT:</b> course catalogue metadata only — title, module/chapter count, category. Everything else is TN.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>One LSVT course per level (15 courses across E/B/T × 1–5), or one course with chapters gated by Content Role? The chapter editor screenshot shows per-chapter enable + rank, so gating within a course looks feasible and cheaper to maintain.</li>
+      <li>Confirm TN can create users, Teams and Content Role assignments <b>via API</b> — the screenshots only prove UI and CSV bulk import.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C4 ================= -->
+<section class="scr" id="C4">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · during the 90-day loop · primary screen</div>
+    <h2>C4 · Learning dashboard</h2>
+    <p>The screen a candidate lands on every day. Almost everything here is LSVT data wrapped in TN chrome — this is where the integration either feels seamless or feels bolted on.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/learn</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><b>Dashboard</b><span>Course</span><span>Progress</span><span>Cohort</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+
+      <div class="row" style="align-items:center;margin-bottom:14px">
+        <div class="f1">
+          <div style="font-size:17px;font-weight:680;letter-spacing:-.02em">Day 34 of 90 <i class="ann d">DER</i></div>
+          <div class="sub" style="margin:3px 0 0">Operator Track · <span class="chip lv" style="font-size:10px">T3</span> · Cohort 12 · Agent [name]</div>
+        </div>
+        <div style="min-width:240px">
+          <div class="barlab"><span>Elapsed</span><span>38%</span></div>
+          <div class="bar"><i style="width:38%"></i></div>
+        </div>
+      </div>
+
+      <div class="g4">
+        <div class="stat"><div class="lab">Course progress <i class="ann l">LSVT</i></div><div class="val">46<small>%</small></div>
+          <div class="bar thin" style="margin-top:8px"><i class="ok" style="width:46%"></i></div>
+          <div class="foot">Ahead of pace by 8 pts <i class="ann d">DER</i></div></div>
+        <div class="stat"><div class="lab">Modules done <i class="ann l">LSVT</i></div><div class="val">6<small>/13</small></div><div class="foot">Chapter-level count <i class="ann q">? granularity</i></div></div>
+        <div class="stat"><div class="lab">Time invested <i class="ann l">LSVT</i></div><div class="val">11<small>h 20m</small></div><div class="foot">From LSVT usage report</div></div>
+        <div class="stat"><div class="lab">Points <i class="ann l">LSVT</i></div><div class="val">895</div><div class="foot">1-Star · 0 of 4 badges</div></div>
+      </div>
+
+      <div class="g21 mt">
+        <div>
+          <div class="card">
+            <h3>This week · week 5 <span class="r">assignment due Fri 5pm <i class="ann l">LSVT</i></span></h3>
+            <div class="list-item">
+              <div style="width:22px;text-align:center;color:#059669;font-weight:700">✓</div>
+              <div class="f1"><div class="t">Chapter — Why We Exist</div><div class="s">Video 14m · assessment 1 question · completed 3 Apr <i class="ann l">LSVT</i></div></div>
+              <span class="chip ok">Complete</span>
+            </div>
+            <div class="list-item">
+              <div style="width:22px;text-align:center;color:var(--acc);font-weight:700">▸</div>
+              <div class="f1"><div class="t">Chapter — Placeholder chapter title</div>
+                <div class="s">Video 22m · assessment 4 questions</div>
+                <div class="bar thin" style="margin-top:6px;max-width:220px"><i style="width:60%"></i></div></div>
+              <span class="btn p sm">Continue</span>
+            </div>
+            <div class="list-item">
+              <div style="width:22px;text-align:center;color:var(--mut)">○</div>
+              <div class="f1"><div class="t">Practical task — Placeholder task title</div><div class="s">Written reflection · agent reviews before Thursday's call</div></div>
+              <span class="btn sm">Open</span>
+            </div>
+            <div class="list-item">
+              <div style="width:22px;text-align:center;color:var(--mut)">○</div>
+              <div class="f1"><div class="t">Chapter — Placeholder chapter title</div><div class="s">Video 18m · assessment 3 questions</div></div>
+              <span class="btn sm">Start</span>
+            </div>
+          </div>
+
+          <div class="card mt">
+            <h3>Assessment results <span class="r">latest 4 <i class="ann l">LSVT</i></span></h3>
+            <table class="tbl">
+              <tr><th>Chapter</th><th>Score</th><th>Attempts</th><th>Date</th></tr>
+              <tr><td class="nm">Placeholder chapter</td><td><span class="chip ok">92%</span></td><td class="mono">1</td><td class="mono">3 Apr</td></tr>
+              <tr><td class="nm">Placeholder chapter</td><td><span class="chip wa">68%</span></td><td class="mono">2 <i class="ann l">revolutions</i></td><td class="mono">1 Apr</td></tr>
+              <tr><td class="nm">Placeholder chapter</td><td><span class="chip ok">85%</span></td><td class="mono">1</td><td class="mono">28 Mar</td></tr>
+              <tr><td class="nm">Placeholder chapter</td><td><span class="chip ok">100%</span></td><td class="mono">1</td><td class="mono">25 Mar</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Next cohort call</h3>
+            <div style="font-size:15px;font-weight:650">Thursday · 6:00pm</div>
+            <div class="sub" style="margin:4px 0 10px">Week 5 · Agent [name] · 9 of 10 attending <i class="ann t">TN</i></div>
+            <span class="btn p">Join call</span> <span class="btn">Add to calendar</span>
+            <hr class="d">
+            <div class="sub" style="margin:0">Your agent will have seen your week-5 answers before the call.</div>
+          </div>
+
+          <div class="card mt">
+            <h3>Your cohort <span class="r">10 members <i class="ann t">TN</i></span></h3>
+            <div class="sub" style="margin:-4px 0 8px">Optional leaderboard mirror from LSVT points <i class="ann l">LSVT</i></div>
+            <div class="kv"><span>1 · Member name</span><b>1,240</b></div>
+            <div class="kv"><span>2 · <b style="font-weight:700">You</b></span><b>895</b></div>
+            <div class="kv"><span>3 · Member name</span><b>760</b></div>
+            <div class="kv"><span>4 · Member name</span><b>520</b></div>
+          </div>
+
+          <div class="card mt">
+            <h3>Resources</h3>
+            <ul class="plain">
+              <li>Workbook.pdf <i class="ann l">LSVT File Vault</i></li>
+              <li>Cohort 12 discussion <i class="ann l">LSVT Community</i></li>
+              <li>My notes <i class="ann l">LSVT</i></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> progress %, course status, modules complete, time invested, assignment names + due dates + status, assessment scores, Revolutions (attempts), points/badges/rank, File Vault docs, notes, community threads.</li>
+      <li><b>TN:</b> day counter, cohort roster, meeting schedule, level chip, agent identity, all navigation and branding.</li>
+      <li><b>Derived:</b> "ahead/behind pace" = progress % vs. days elapsed. Cheap, and the single most useful signal on the screen.</li>
+    </ul></div>
+    <div class="card q"><h3>Blocking questions</h3><ul>
+      <li><b>Chapter-level progress.</b> The Report Card screenshot only exposes course-level %. Everything in the "This week" card needs per-chapter status. If the API can't give it, this card collapses into a single progress bar and the screen loses most of its value.</li>
+      <li><b>Assessment scores per chapter</b> — visible in the LSVT authoring UI, but retrieval is unproven.</li>
+      <li>Refresh model: webhook on chapter complete, or poll? Polling every page load will be slow and may hit rate limits.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C5 ================= -->
+<section class="scr" id="C5">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · during the 90-day loop</div>
+    <h2>C5 · Course player — LSVT embedded</h2>
+    <p>"Lightspeed VT opens inside the portal — embedded, seamless login, no separate account." The design question is how much TN chrome survives around the iframe, and how TN knows what happened inside it.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/learn/course/242081/chapter/1202308</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><span>Dashboard</span><b>Course</b><span>Progress</span><span>Cohort</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="row" style="align-items:center;margin-bottom:12px">
+        <div class="f1"><div style="font-size:15px;font-weight:660">Chapter 4 — Placeholder chapter title</div>
+          <div class="sub" style="margin:3px 0 0">Operator Track T3 · week 5 · <span class="chip">Due Fri</span> <i class="ann l">LSVT</i></div></div>
+        <span class="btn sm">◀ Prev</span> <span class="btn sm">Next ▶</span>
+      </div>
+
+      <div class="g21">
+        <div class="embed">
+          <div class="tag">▣ LightspeedVT iframe — TN renders nothing inside this boundary</div>
+          <div class="ph vid">Video player · HLS (.m3u8) + VTT captions <i class="ann l">LSVT</i></div>
+          <div class="card mt" style="background:#fff">
+            <h3>Assessment · 4 questions <i class="ann l">LSVT</i></h3>
+            <div class="ph" style="height:44px;margin-bottom:8px">Multiple choice · placeholder</div>
+            <div class="ph" style="height:70px">Free-text reflection · placeholder <i class="ann q">? retrievable</i></div>
+          </div>
+          <div class="card mt" style="background:#fff"><h3>Summary &amp; completion message <i class="ann l">LSVT</i></h3><div class="ph" style="height:40px">Recap copy</div></div>
+        </div>
+
+        <div>
+          <div class="alert"><b>Integration risk</b>Inside the iframe TN is blind. Progress only reaches TN when LSVT tells it — via webhook, or on the next poll. Plan for the dashboard being a few minutes stale, and never let TN's copy of progress be authoritative.</div>
+          <div class="card mt">
+            <h3>Chapter list <i class="ann l">LSVT</i></h3>
+            <div class="kv"><span>1 · Why We Exist</span><b style="color:#059669">✓</b></div>
+            <div class="kv"><span>2 · Placeholder</span><b style="color:#059669">✓</b></div>
+            <div class="kv"><span>3 · Placeholder</span><b style="color:#059669">✓</b></div>
+            <div class="kv"><span>4 · Placeholder</span><b style="color:var(--acc)">▸ 60%</b></div>
+            <div class="kv"><span>5 · Placeholder</span><b style="color:var(--mut)">○</b></div>
+            <div class="kv"><span>6 · Placeholder</span><b style="color:var(--mut)">🔒 locked</b></div>
+            <div class="sub" style="margin:8px 0 0">Order and lock state come from chapter Rank + Enable Chapter in LSVT.</div>
+          </div>
+          <div class="card mt">
+            <h3>My notes <i class="ann l">LSVT</i></h3>
+            <div class="ph" style="height:70px">Notes editor — LSVT native, or TN-side?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> everything inside the boundary — video, captions, assessment, summary, chapter order/lock, notes.</li>
+      <li><b>TN:</b> the frame around it — nav, breadcrumb, level chip, cohort context, due date surfacing.</li>
+    </ul></div>
+    <div class="card q"><h3>Blocking questions</h3><ul>
+      <li><b>SSO mechanics.</b> SAML Admin exists in LSVT. Need: SP- or IdP-initiated, JIT provisioning y/n, and whether the session survives inside an iframe (third-party cookie behaviour is the usual killer here — may force a new tab or a popup handoff instead).</li>
+      <li><b>Free-text answers.</b> Your flow depends on "answer quality" reaching the agent brief. If these aren't API-retrievable the whole A3 screen degrades.</li>
+      <li>Video telemetry — real % watched, or only a chapter-complete flag?</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C6 ================= -->
+<section class="scr" id="C6">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · during and after the loop</div>
+    <h2>C6 · My progress &amp; transcript</h2>
+    <p>The full record. Essentially TN's rendering of the LSVT Report Card plus usage data, kept because candidates re-interview and want evidence of what they did.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/progress</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><span>Dashboard</span><span>Course</span><b>Progress</b><span>Cohort</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="g4">
+        <div class="stat"><div class="lab">Overall <i class="ann l">LSVT</i></div><div class="val">46<small>%</small></div></div>
+        <div class="stat"><div class="lab">Status <i class="ann l">LSVT</i></div><div class="val" style="font-size:17px">In Progress</div><div class="foot">LSVT course status</div></div>
+        <div class="stat"><div class="lab">Time <i class="ann l">LSVT</i></div><div class="val">11<small>h 20m</small></div></div>
+        <div class="stat"><div class="lab">Last active <i class="ann l">LSVT</i></div><div class="val" style="font-size:17px">Yesterday</div><div class="foot">Signed-in users report</div></div>
+      </div>
+
+      <div class="card mt">
+        <h3>Chapter transcript <span class="r"><span class="btn sm">Export PDF</span> <span class="btn sm">Export XLS</span> <i class="ann l">LSVT native</i></span></h3>
+        <table class="tbl">
+          <tr><th>#</th><th>Chapter</th><th>Video</th><th>Assessment</th><th>Attempts</th><th>Time</th><th>Completed</th></tr>
+          <tr><td class="mono">1</td><td class="nm">Why We Exist</td><td><span class="chip ok">Watched</span></td><td><span class="chip ok">100%</span></td><td class="mono">1</td><td class="mono">18m</td><td class="mono">3 Apr</td></tr>
+          <tr><td class="mono">2</td><td class="nm">Placeholder chapter</td><td><span class="chip ok">Watched</span></td><td><span class="chip ok">85%</span></td><td class="mono">1</td><td class="mono">31m</td><td class="mono">28 Mar</td></tr>
+          <tr><td class="mono">3</td><td class="nm">Placeholder chapter</td><td><span class="chip ok">Watched</span></td><td><span class="chip wa">68%</span></td><td class="mono">2</td><td class="mono">54m</td><td class="mono">1 Apr</td></tr>
+          <tr><td class="mono">4</td><td class="nm">Placeholder chapter</td><td><span class="chip wa">60%</span></td><td><span class="chip">—</span></td><td class="mono">0</td><td class="mono">12m</td><td class="mono">—</td></tr>
+          <tr><td class="mono">5</td><td class="nm">Placeholder chapter</td><td><span class="chip">—</span></td><td><span class="chip">—</span></td><td class="mono">0</td><td class="mono">—</td><td class="mono">—</td></tr>
+        </table>
+      </div>
+
+      <div class="g2 mt">
+        <div class="card"><h3>Assignments <i class="ann l">LSVT</i></h3>
+          <div class="kv"><span>Week 5 · Placeholder</span><b><span class="chip wa">Due Fri</span></b></div>
+          <div class="kv"><span>Week 4 · Placeholder</span><b><span class="chip ok">Submitted</span></b></div>
+          <div class="kv"><span>Week 3 · Placeholder</span><b><span class="chip ok">Submitted</span></b></div>
+          <div class="kv"><span>Week 2 · Placeholder</span><b><span class="chip bad">Late</span></b></div>
+        </div>
+        <div class="card"><h3>Achievements <i class="ann l">LSVT</i></h3>
+          <div class="kv"><span>Points</span><b>895</b></div>
+          <div class="kv"><span>Rank</span><b>1-Star</b></div>
+          <div class="kv"><span>Bronze · 2,500 pts</span><b style="color:var(--mut)">Locked</b></div>
+          <div class="kv"><span>Get Involved · post in community</span><b style="color:var(--mut)">Locked</b></div>
+          <div class="kv"><span>Certificate</span><b style="color:var(--mut)">On completion <i class="ann l">LSVT</i></b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT, almost entirely.</b> Report Card (progress, status, Revolutions, complete date), usage report, assignments, achievements, certifications.</li>
+      <li>The chapter-level table is the most demanding thing in the whole wireframe set. If only course-level data is available, this becomes a single row.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Do we mirror LSVT data into TN's DB, or read live? Recommend mirroring — you need history after seats are deactivated at day 90, and re-interviews reference past cohorts.</li>
+      <li>Reuse LSVT's own PDF/XLS export, or build TN-branded ones? LSVT's export is free but carries their branding.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= C7 ================= -->
+<section class="scr" id="C7">
+  <div class="scr-head">
+    <div class="eyebrow">Candidate · day 90</div>
+    <h2>C7 · Completion summary &amp; what's next</h2>
+    <p>Built from LSVT engagement data plus the agent's observations. Feeds forward into the re-interview, where the next agent sees it before deciding.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/summary/cohort-12</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em></div><nav><span>Dashboard</span><b>Summary</b><span>Progress</span><span>Account</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div style="max-width:760px;margin:0 auto">
+        <div class="card">
+          <h3>90-day completion summary <span class="r">Cohort 12 · closed 14 Jun <i class="ann t">TN</i></span></h3>
+          <div class="g4">
+            <div class="stat"><div class="lab">Course <i class="ann l">LSVT</i></div><div class="val" style="font-size:17px">Complete</div></div>
+            <div class="stat"><div class="lab">Final progress <i class="ann l">LSVT</i></div><div class="val">100<small>%</small></div></div>
+            <div class="stat"><div class="lab">Total time <i class="ann l">LSVT</i></div><div class="val">31<small>h</small></div></div>
+            <div class="stat"><div class="lab">Calls attended <i class="ann t">TN</i></div><div class="val">11<small>/13</small></div></div>
+          </div>
+          <hr class="d">
+          <div class="g2">
+            <div><div class="lab" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700">Agent's observations <i class="ann t">TN</i></div>
+              <div class="ph mt" style="height:100px;text-align:left;justify-content:flex-start;align-items:flex-start">Free text written by the agent</div></div>
+            <div><div class="lab" style="font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);font-weight:700">Engagement signals <i class="ann l">LSVT</i></div>
+              <div class="kv mt"><span>Assessment average</span><b>84%</b></div>
+              <div class="kv"><span>Chapters needing 2+ attempts</span><b>3</b></div>
+              <div class="kv"><span>Assignments on time</span><b>11 / 13</b></div>
+              <div class="kv"><span>Longest inactive gap</span><b>6 days <i class="ann d">DER</i></b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mt">
+          <h3>Your next step</h3>
+          <div class="g3">
+            <div class="card f"><div style="font-weight:650;font-size:13px">Re-interview</div><div class="sub" style="margin:4px 0 8px">Pay again, choose any agent. Your summary goes with you.</div><span class="btn p sm">Browse agents</span></div>
+            <div class="card f"><div style="font-weight:650;font-size:13px">Next course</div><div class="sub" style="margin:4px 0 8px">New 90-day loop, new cohort, same structure.</div><span class="btn sm">See options</span></div>
+            <div class="card f"><div style="font-weight:650;font-size:13px">Employer visibility</div><div class="sub" style="margin:4px 0 8px">Unlocks above a threshold level.</div><span class="chip">Not yet eligible <i class="ann q">? scope</i></span></div>
+          </div>
+        </div>
+        <div class="info mt">Outcome branches from your diagram: promoted a level, held, or moved down. Level change is a TN decision — but it triggers an LSVT Content Role change so the next course shows the right material.</div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> final progress/status, total time, assessment averages, attempt counts, assignment punctuality.</li>
+      <li><b>TN:</b> agent observations, call attendance, level decision, payments, re-interview routing.</li>
+      <li><b>Derived:</b> inactivity gaps, on-time ratios — computed in TN from mirrored LSVT timestamps.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>What happens to the LSVT seat at day 90? Billing is per active user. Deactivating frees the seat — confirm history survives it, otherwise TN must have mirrored everything first.</li>
+      <li>Employer placement is marked as largely unagreed in your diagram. Kept as a stub here deliberately.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= A1 ================= -->
+<section class="scr" id="A1">
+  <div class="scr-head">
+    <div class="eyebrow">Talent agent</div>
+    <h2>A1 · Agent dashboard</h2>
+    <p>An agent runs several things at once: interviews they're selling, and cohorts they're already leading. The dashboard's job is to surface who needs attention before the next call.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agent</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em> <span class="chip" style="font-size:9.5px;margin-left:4px">AGENT</span></div><nav><b>Dashboard</b><span>Cohorts</span><span>Interviews</span><span>Earnings</span><span>Profile</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="g4">
+        <div class="stat"><div class="lab">Active cohorts <i class="ann t">TN</i></div><div class="val">3</div><div class="foot">28 candidates total</div></div>
+        <div class="stat"><div class="lab">Needs attention <i class="ann d">DER</i></div><div class="val" style="color:#b91c1c">5</div><div class="foot">Behind pace or inactive</div></div>
+        <div class="stat"><div class="lab">Interviews booked <i class="ann t">TN</i></div><div class="val">4</div><div class="foot">Next: tomorrow 10am</div></div>
+        <div class="stat"><div class="lab">Agent rank <i class="ann d">DER</i></div><div class="val">4.7</div><div class="foot">Avg candidate completion 81% <i class="ann l">LSVT</i></div></div>
+      </div>
+
+      <div class="g21 mt">
+        <div>
+          <div class="card">
+            <h3>Upcoming cohort calls</h3>
+            <div class="list-item">
+              <div class="f1"><div class="t">Cohort 12 · week 5 <span class="chip">10 members</span></div>
+                <div class="s">Thursday 6:00pm · avg progress 44% <i class="ann l">LSVT</i> · <span style="color:#b91c1c">2 behind pace</span> <i class="ann d">DER</i></div></div>
+              <span class="btn p sm">Open brief</span>
+            </div>
+            <div class="list-item">
+              <div class="f1"><div class="t">Cohort 09 · week 11 <span class="chip">9 members</span></div>
+                <div class="s">Friday 5:00pm · avg progress 78% <i class="ann l">LSVT</i> · <span style="color:#b91c1c">1 inactive 9 days</span> <i class="ann d">DER</i></div></div>
+              <span class="btn sm">Open brief</span>
+            </div>
+            <div class="list-item">
+              <div class="f1"><div class="t">Cohort 14 · week 1 <span class="chip">10 members</span></div>
+                <div class="s">Monday 6:00pm · avg progress 6% <i class="ann l">LSVT</i> · <span style="color:#b45309">3 never signed in</span> <i class="ann l">LSVT</i></div></div>
+              <span class="btn sm">Open brief</span>
+            </div>
+          </div>
+
+          <div class="card mt">
+            <h3>Flags across all cohorts <span class="r">computed nightly <i class="ann d">DER</i></span></h3>
+            <table class="tbl">
+              <tr><th>Candidate</th><th>Cohort</th><th>Flag</th><th>Signal</th><th></th></tr>
+              <tr><td class="nm">Member name</td><td class="mono">14</td><td><span class="chip bad">Never signed in</span></td><td class="mono">day 6, 0% <i class="ann l">LSVT</i></td><td><span class="btn sm">Message</span></td></tr>
+              <tr><td class="nm">Member name</td><td class="mono">09</td><td><span class="chip bad">Inactive 9 days</span></td><td class="mono">last active 4 Jun <i class="ann l">LSVT</i></td><td><span class="btn sm">Message</span></td></tr>
+              <tr><td class="nm">Member name</td><td class="mono">12</td><td><span class="chip wa">Behind pace</span></td><td class="mono">18% vs 38% <i class="ann d">DER</i></td><td><span class="btn sm">Message</span></td></tr>
+              <tr><td class="nm">Member name</td><td class="mono">12</td><td><span class="chip wa">Repeat failures</span></td><td class="mono">3 chapters, 3+ attempts <i class="ann l">LSVT</i></td><td><span class="btn sm">Message</span></td></tr>
+              <tr><td class="nm">Member name</td><td class="mono">09</td><td><span class="chip wa">Assignments late</span></td><td class="mono">3 of 11 late <i class="ann l">LSVT</i></td><td><span class="btn sm">Message</span></td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Next interview <i class="ann t">TN</i></h3>
+            <div style="font-size:14px;font-weight:650">Tomorrow · 10:00am</div>
+            <div class="sub" style="margin:4px 0 10px">Candidate name · quiz bucket "The Operator" · provisional T2–T3</div>
+            <span class="btn p sm">Join</span> <span class="btn sm">Review quiz</span>
+          </div>
+          <div class="card mt">
+            <h3>Earnings <i class="ann t">TN</i></h3>
+            <div class="kv"><span>This month</span><b>$X,XXX</b></div>
+            <div class="kv"><span>Interview fees</span><b>$XXX</b></div>
+            <div class="kv"><span>Cohort facilitation</span><b>$X,XXX</b></div>
+            <div class="kv"><span>Platform cut</span><b>−$XXX</b></div>
+            <div class="sub" style="margin:8px 0 0">Stripe-settled. Nothing here touches LSVT.</div>
+          </div>
+          <div class="card mt">
+            <h3>Message a cohort</h3>
+            <div class="sub" style="margin:-4px 0 8px">Send via TN, or via LSVT's LightPad / email / SMS to the Team?</div>
+            <span class="btn gh">Compose <i class="ann q">? channel</i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> per-candidate progress %, last-active date, attempt counts, assignment status. Aggregated by TN into cohort averages.</li>
+      <li><b>TN:</b> cohort definitions, meeting schedule, interview bookings, earnings.</li>
+      <li><b>Derived:</b> every flag. Behind pace = progress % vs. day count. Inactive = today minus last-active. Repeat failures = Revolutions &gt; threshold.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Flag thresholds need real numbers — how far behind is "behind"? Suggest making them configurable per course rather than hardcoded.</li>
+      <li>Messaging: LSVT has LightPad + email + SMS to a Team, which is free and already built. Using it means messages live outside TN's record. Probably TN-native for anything the agent should be accountable for.</li>
+      <li>"Never signed in" needs the LSVT signed-in-users data — confirm it's API-exposed and not report-only.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= A2 ================= -->
+<section class="scr" id="A2">
+  <div class="scr-head">
+    <div class="eyebrow">Talent agent</div>
+    <h2>A2 · Cohort roster</h2>
+    <p>One cohort, ten people, every LSVT signal in one table. This is effectively LSVT's Report Card filtered by Team — rebuilt in TN so it can be sorted by the derived flags LSVT doesn't know about.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agent/cohort/12</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em> <span class="chip" style="font-size:9.5px;margin-left:4px">AGENT</span></div><nav><span>Dashboard</span><b>Cohorts</b><span>Interviews</span><span>Earnings</span><span>Profile</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="row" style="align-items:center;margin-bottom:12px">
+        <div class="f1"><div style="font-size:16px;font-weight:670">Cohort 12 · Operator Track T3</div>
+          <div class="sub" style="margin:3px 0 0">Week 5 of 13 · day 34 of 90 · LSVT Team #XXXX <i class="ann l">LSVT</i> · next call Thu 6pm</div></div>
+        <span class="btn sm">Export</span> <span class="btn p sm">Generate brief</span>
+      </div>
+
+      <div class="g4" style="margin-bottom:14px">
+        <div class="stat"><div class="lab">Avg progress <i class="ann l">LSVT</i></div><div class="val">44<small>%</small></div><div class="bar thin" style="margin-top:8px"><i style="width:44%"></i></div></div>
+        <div class="stat"><div class="lab">Expected pace <i class="ann d">DER</i></div><div class="val">38<small>%</small></div><div class="foot">Cohort is ahead overall</div></div>
+        <div class="stat"><div class="lab">Avg assessment <i class="ann l">LSVT</i></div><div class="val">81<small>%</small></div></div>
+        <div class="stat"><div class="lab">At risk <i class="ann d">DER</i></div><div class="val" style="color:#b91c1c">2</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Members <span class="r">sortable on every column</span></h3>
+        <table class="tbl">
+          <tr>
+            <th>Member <i class="ann t">TN</i></th>
+            <th>Progress <i class="ann l">LSVT</i></th>
+            <th>vs pace <i class="ann d">DER</i></th>
+            <th>Assess. avg <i class="ann l">LSVT</i></th>
+            <th>Attempts <i class="ann l">LSVT</i></th>
+            <th>Time <i class="ann l">LSVT</i></th>
+            <th>Last active <i class="ann l">LSVT</i></th>
+            <th>Wk5 task <i class="ann l">LSVT</i></th>
+            <th>Flag</th>
+          </tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="ok" style="width:71%"></i></div><span class="mono">71%</span></td><td class="mono" style="color:#059669">+33</td><td class="mono">94%</td><td class="mono">1.0</td><td class="mono">19h</td><td class="mono">Today</td><td><span class="chip ok">Done</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="ok" style="width:58%"></i></div><span class="mono">58%</span></td><td class="mono" style="color:#059669">+20</td><td class="mono">88%</td><td class="mono">1.2</td><td class="mono">14h</td><td class="mono">Today</td><td><span class="chip ok">Done</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="ok" style="width:46%"></i></div><span class="mono">46%</span></td><td class="mono" style="color:#059669">+8</td><td class="mono">84%</td><td class="mono">1.3</td><td class="mono">11h</td><td class="mono">Yesterday</td><td><span class="chip wa">In prog.</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i style="width:41%"></i></div><span class="mono">41%</span></td><td class="mono">+3</td><td class="mono">79%</td><td class="mono">1.0</td><td class="mono">9h</td><td class="mono">2d ago</td><td><span class="chip wa">In prog.</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i style="width:39%"></i></div><span class="mono">39%</span></td><td class="mono">+1</td><td class="mono">72%</td><td class="mono">1.8</td><td class="mono">13h</td><td class="mono">Today</td><td><span class="chip ok">Done</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i style="width:36%"></i></div><span class="mono">36%</span></td><td class="mono">−2</td><td class="mono">81%</td><td class="mono">1.1</td><td class="mono">10h</td><td class="mono">3d ago</td><td><span class="chip wa">In prog.</span></td><td></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="warn" style="width:31%"></i></div><span class="mono">31%</span></td><td class="mono" style="color:#b45309">−7</td><td class="mono">65%</td><td class="mono">2.4</td><td class="mono">15h</td><td class="mono">Today</td><td><span class="chip wa">In prog.</span></td><td><span class="chip wa">Struggling</span></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="warn" style="width:28%"></i></div><span class="mono">28%</span></td><td class="mono" style="color:#b45309">−10</td><td class="mono">77%</td><td class="mono">1.0</td><td class="mono">6h</td><td class="mono">5d ago</td><td><span class="chip bad">Not started</span></td><td><span class="chip wa">Slowing</span></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="bad" style="width:18%"></i></div><span class="mono">18%</span></td><td class="mono" style="color:#b91c1c">−20</td><td class="mono">61%</td><td class="mono">2.0</td><td class="mono">4h</td><td class="mono">8d ago</td><td><span class="chip bad">Not started</span></td><td><span class="chip bad">At risk</span></td></tr>
+          <tr><td class="nm">Member name</td><td><div class="bar thin" style="width:60px"><i class="bad" style="width:9%"></i></div><span class="mono">9%</span></td><td class="mono" style="color:#b91c1c">−29</td><td class="mono">—</td><td class="mono">0</td><td class="mono">1h</td><td class="mono">12d ago</td><td><span class="chip bad">Not started</span></td><td><span class="chip bad">At risk</span></td></tr>
+        </table>
+      </div>
+      <div class="info mt">"Attempts" is LSVT's <b>Revolutions</b> column — how many times a candidate went through content. Above ~2.0 alongside a low assessment average is the clearest struggle signal available without reading their actual answers.</div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> progress, assessment averages, Revolutions, time, last-active, per-assignment status — all filterable by Team, which is why cohort→Team mapping matters.</li>
+      <li><b>TN:</b> member names/identity, cohort membership, week number.</li>
+      <li><b>Derived:</b> vs-pace delta and all three flag tiers.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Confirm the API can return a whole Team's progress in one call. If it's one call per user, ten calls per cohort per refresh gets expensive fast — this is where rate limits bite.</li>
+      <li>Is "last active" available per user via API, or only through the Signed In Users report screen?</li>
+      <li>Privacy: agents seeing time-on-platform per person is a reasonable coaching tool but worth a line in the candidate T&amp;Cs.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= A3 ================= -->
+<section class="scr" id="A3">
+  <div class="scr-head">
+    <div class="eyebrow">Talent agent · the highest-value screen</div>
+    <h2>A3 · Pre-meeting AI brief</h2>
+    <p>"AI briefs the agent before the meeting — per-member insight, gaps and what to raise privately." Generated in TN from mirrored LSVT data. Its quality is capped entirely by how much LSVT exposes.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agent/cohort/12/brief/week-5</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em> <span class="chip" style="font-size:9.5px;margin-left:4px">AGENT</span></div><nav><span>Dashboard</span><b>Cohorts</b><span>Interviews</span><span>Earnings</span><span>Profile</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="row" style="align-items:center;margin-bottom:12px">
+        <div class="f1"><div style="font-size:16px;font-weight:670">Week 5 brief · Cohort 12</div>
+          <div class="sub" style="margin:3px 0 0">Generated Thu 2:00pm, 4h before the call <i class="ann d">DER</i> · data as of Thu 1:55pm <i class="ann l">LSVT</i></div></div>
+        <span class="btn sm">Regenerate</span> <span class="btn sm">Print</span>
+      </div>
+
+      <div class="card">
+        <h3>Run the call like this <span class="r">AI-generated <i class="ann d">DER</i></span></h3>
+        <ul class="tick">
+          <li><b>Open with:</b> placeholder — a theme most of the cohort got wrong in week 5's assessment.</li>
+          <li><b>Spend time on:</b> placeholder — the chapter with the lowest cohort assessment average (61%) and highest re-attempt rate.</li>
+          <li><b>Skip:</b> placeholder — near-universal completion and high scores, no need to cover.</li>
+          <li><b>Raise privately, not in the group:</b> two members at risk (see below).</li>
+        </ul>
+      </div>
+
+      <div class="g2 mt">
+        <div class="card">
+          <h3>Cohort-wide patterns <i class="ann l">LSVT</i> <i class="ann d">DER</i></h3>
+          <div class="kv"><span>Weakest chapter</span><b>Placeholder · 61% avg</b></div>
+          <div class="kv"><span>Most re-attempted</span><b>Placeholder · 2.4 avg</b></div>
+          <div class="kv"><span>Week-5 task submitted</span><b>6 of 10</b></div>
+          <div class="kv"><span>Common wrong answer</span><b>Q3 option B · 7 of 10 <i class="ann q">? needs item-level data</i></b></div>
+          <div class="kv"><span>Recurring theme in reflections</span><b><i class="ann q">? needs free-text</i></b></div>
+        </div>
+        <div class="card">
+          <h3>Attention list <i class="ann d">DER</i></h3>
+          <div class="list-item"><span class="chip bad">At risk</span><div class="f1"><div class="t">Member name</div><div class="s">9% at day 34, last active 12 days ago, week-5 task not started. Third consecutive week slipping.</div></div></div>
+          <div class="list-item"><span class="chip bad">At risk</span><div class="f1"><div class="t">Member name</div><div class="s">18% at day 34, 2.0 avg attempts, assessment avg 61%. Engaging but not absorbing.</div></div></div>
+          <div class="list-item"><span class="chip wa">Watch</span><div class="f1"><div class="t">Member name</div><div class="s">2.4 avg attempts on 31% progress — spending real time and still re-doing content.</div></div></div>
+        </div>
+      </div>
+
+      <div class="card mt">
+        <h3>Per-member notes <span class="r">10 members · one block each</span></h3>
+        <div class="list-item">
+          <div class="ph av"></div>
+          <div class="f1"><div class="t">Member name · <span class="chip ok">On track</span> <span class="chip">71%</span></div>
+            <div class="s"><b>Since last week:</b> 3 chapters, 4h 10m, assessment avg 94%, task submitted early. <b>Raise:</b> placeholder — ready for a stretch question. <i class="ann d">DER</i></div></div>
+        </div>
+        <div class="list-item">
+          <div class="ph av"></div>
+          <div class="f1"><div class="t">Member name · <span class="chip wa">Struggling</span> <span class="chip">31%</span></div>
+            <div class="s"><b>Since last week:</b> 1 chapter, 5h 30m, 3 re-attempts on the same assessment, score 65%. <b>Raise privately:</b> placeholder — effort is there, comprehension isn't. <i class="ann d">DER</i></div></div>
+        </div>
+        <div class="list-item">
+          <div class="ph av"></div>
+          <div class="f1"><div class="t">Member name · <span class="chip bad">At risk</span> <span class="chip">9%</span></div>
+            <div class="s"><b>Since last week:</b> no activity. Last sign-in 12 days ago. <b>Action:</b> placeholder — direct outreach before the call, not during it. <i class="ann d">DER</i></div></div>
+        </div>
+        <div class="ph mt" style="height:40px">…7 more members</div>
+      </div>
+
+      <div class="alert mt"><b>This screen is the integration's load-bearing wall</b>Two LSVT capabilities decide how good it gets. <b>(1) Item-level assessment data</b> — without it, "common wrong answer" disappears and the brief can't tell the agent what to teach. <b>(2) Free-text reflection content</b> — without it, "answer quality" from your flow diagram is unachievable and the brief is reduced to activity metrics. Both are worth confirming before any of this gets built.</div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> per-chapter completion + timestamps, assessment scores, Revolutions, time, assignment submissions. Ideally also item-level responses and free text.</li>
+      <li><b>TN:</b> LLM generation, cohort/week context, prior weeks' briefs for trend language ("third consecutive week").</li>
+      <li>Generating a few hours pre-call, rather than live, sidesteps stale-data problems and lets you use a scheduled job instead of hammering the API.</li>
+    </ul></div>
+    <div class="card q"><h3>Blocking questions</h3><ul>
+      <li>Item-level assessment responses via API — yes or no?</li>
+      <li>Free-text answers retrievable — yes or no?</li>
+      <li>Does LSVT's own <b>AI Insights (412, beta)</b> already do part of this? Worth asking before building it twice.</li>
+      <li>Data freshness: webhooks would let the brief reflect activity up to generation time. Nightly exports would make Thursday's brief reflect Wednesday.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= A4 ================= -->
+<section class="scr" id="A4">
+  <div class="scr-head">
+    <div class="eyebrow">Talent agent</div>
+    <h2>A4 · Member detail</h2>
+    <p>Drill-down on one candidate. Combines the interview that levelled them, their LSVT activity, and the agent's running notes — the raw material for the day-90 summary.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agent/candidate/6021447</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em> <span class="chip" style="font-size:9.5px;margin-left:4px">AGENT</span></div><nav><span>Dashboard</span><b>Cohorts</b><span>Interviews</span><span>Earnings</span><span>Profile</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="row" style="align-items:center;margin-bottom:14px">
+        <div class="ph av" style="width:44px;height:44px;flex:0 0 44px"></div>
+        <div class="f1"><div style="font-size:16px;font-weight:670">Member name <span class="chip lv" style="font-size:10px">T3</span> <span class="chip wa">Struggling</span></div>
+          <div class="sub" style="margin:3px 0 0">Cohort 12 · TN ID #XXXXX <i class="ann t">TN</i> · LSVT user #6021447 <i class="ann l">LSVT</i> · enrolled 12 Mar</div></div>
+        <span class="btn sm">Message</span> <span class="btn sm">Add note</span>
+      </div>
+
+      <div class="g21">
+        <div>
+          <div class="card">
+            <h3>Activity timeline <span class="r">last 14 days <i class="ann l">LSVT</i></span></h3>
+            <div class="ph" style="height:110px">Daily activity strip — time in system per day, chapter completions plotted<br>built from LSVT usage + completion timestamps</div>
+            <div class="sub" style="margin-top:8px">Reveals the pattern the aggregate hides: is this a slow-and-steady candidate or a Sunday-night crammer?</div>
+          </div>
+
+          <div class="card mt">
+            <h3>Chapter detail <i class="ann l">LSVT</i></h3>
+            <table class="tbl">
+              <tr><th>#</th><th>Chapter</th><th>Status</th><th>Score</th><th>Attempts</th><th>Time</th><th>Done</th></tr>
+              <tr><td class="mono">1</td><td class="nm">Why We Exist</td><td><span class="chip ok">Complete</span></td><td class="mono">100%</td><td class="mono">1</td><td class="mono">18m</td><td class="mono">14 Mar</td></tr>
+              <tr><td class="mono">2</td><td class="nm">Placeholder</td><td><span class="chip ok">Complete</span></td><td class="mono">72%</td><td class="mono">2</td><td class="mono">51m</td><td class="mono">19 Mar</td></tr>
+              <tr><td class="mono">3</td><td class="nm">Placeholder</td><td><span class="chip ok">Complete</span></td><td class="mono">65%</td><td class="mono">3</td><td class="mono">1h 22m</td><td class="mono">28 Mar</td></tr>
+              <tr><td class="mono">4</td><td class="nm">Placeholder</td><td><span class="chip wa">In progress</span></td><td class="mono">—</td><td class="mono">1</td><td class="mono">34m</td><td class="mono">—</td></tr>
+              <tr><td class="mono">5</td><td class="nm">Placeholder</td><td><span class="chip">Not started</span></td><td class="mono">—</td><td class="mono">0</td><td class="mono">—</td><td class="mono">—</td></tr>
+            </table>
+          </div>
+
+          <div class="card mt">
+            <h3>Written responses <i class="ann q">? depends on LSVT exposing free text</i></h3>
+            <div class="ph" style="height:80px;text-align:left;align-items:flex-start;justify-content:flex-start">Week 4 reflection — candidate's own words<br><br>If unavailable via API, fallback options: (a) agent opens LSVT directly, (b) written tasks move to TN and LSVT keeps only video + quizzes</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>How they were levelled <i class="ann t">TN</i></h3>
+            <div class="kv"><span>Quiz bucket</span><b>The Operator</b></div>
+            <div class="kv"><span>Provisional</span><b>T2–T3</b></div>
+            <div class="kv"><span>Interviewed by</span><b>Agent name</b></div>
+            <div class="kv"><span>AI recommended</span><b>T2</b></div>
+            <div class="kv"><span>Reviewer assigned</span><b>T3 <span class="chip wa">override</span></b></div>
+            <div class="sub" style="margin:8px 0 0">Overrides matter here — a candidate bumped up may legitimately struggle with T3 material.</div>
+          </div>
+          <div class="card mt">
+            <h3>Summary stats <i class="ann l">LSVT</i></h3>
+            <div class="kv"><span>Progress</span><b>31%</b></div>
+            <div class="kv"><span>Assessment avg</span><b>65%</b></div>
+            <div class="kv"><span>Avg attempts</span><b>2.4</b></div>
+            <div class="kv"><span>Total time</span><b>15h 10m</b></div>
+            <div class="kv"><span>Last active</span><b>Today</b></div>
+            <div class="kv"><span>Points / rank</span><b>520 · 1-Star</b></div>
+            <div class="kv"><span>Assignments on time</span><b>3 of 5</b></div>
+          </div>
+          <div class="card mt">
+            <h3>Agent notes <i class="ann t">TN</i></h3>
+            <div class="ph" style="height:70px">Running private notes — feeds the day-90 summary</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> everything behavioural — chapter status, scores, attempts, time, timestamps, points, assignment punctuality.</li>
+      <li><b>TN:</b> the interview and levelling history, the AI-vs-reviewer decision, agent notes.</li>
+      <li>Putting the levelling decision next to LSVT performance is the useful bit — it shows when a level was set too high.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Daily activity granularity — does the usage data come per session with timestamps, or only as a rolled-up total? Determines whether the timeline is buildable.</li>
+      <li>ID mapping: store the LSVT user ID on the TN user record from provisioning onward. Non-negotiable, and easy to forget until it's painful.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= A5 ================= -->
+<section class="scr" id="A5">
+  <div class="scr-head">
+    <div class="eyebrow">Talent agent · day 90</div>
+    <h2>A5 · Completion summary builder</h2>
+    <p>Pre-filled from LSVT data, the agent adds judgement and a recommendation. Output is what the candidate sees on C7 and what the next interviewer reads first.</p>
+  </div>
+  <div class="frame">
+    <div class="chrome"><span></span><span></span><span></span><div class="url">app.talentnext.com/agent/candidate/6021447/summary</div></div>
+    <div class="top"><div class="logo">Talent<em>Next</em> <span class="chip" style="font-size:9.5px;margin-left:4px">AGENT</span></div><nav><span>Dashboard</span><b>Cohorts</b><span>Interviews</span><span>Earnings</span><span>Profile</span></nav><div class="sp"></div><div class="av"></div></div>
+    <div class="body grey">
+      <div class="g21">
+        <div>
+          <div class="card">
+            <h3>Auto-filled from Lightspeed <span class="r">read-only <i class="ann l">LSVT</i></span></h3>
+            <div class="g3">
+              <div class="stat"><div class="lab">Final progress</div><div class="val">92<small>%</small></div></div>
+              <div class="stat"><div class="lab">Assessment avg</div><div class="val">74<small>%</small></div></div>
+              <div class="stat"><div class="lab">Total time</div><div class="val">27<small>h</small></div></div>
+            </div>
+            <hr class="d">
+            <div class="kv"><span>Chapters completed</span><b>12 of 13</b></div>
+            <div class="kv"><span>Chapters needing 2+ attempts</span><b>5</b></div>
+            <div class="kv"><span>Assignments on time</span><b>9 of 13</b></div>
+            <div class="kv"><span>Longest inactive gap</span><b>11 days <i class="ann d">DER</i></b></div>
+            <div class="kv"><span>Calls attended</span><b>10 of 13 <i class="ann t">TN</i></b></div>
+            <div class="kv"><span>Certificate issued</span><b>No — course incomplete <i class="ann l">LSVT</i></b></div>
+          </div>
+
+          <div class="card mt">
+            <h3>Agent assessment <i class="ann t">TN</i></h3>
+            <div class="sub" style="margin:-4px 0 8px">Growth demonstrated</div>
+            <div class="ph" style="height:64px">Free text</div>
+            <div class="sub" style="margin:10px 0 8px">Still to develop</div>
+            <div class="ph" style="height:64px">Free text</div>
+            <div class="sub" style="margin:10px 0 8px">Notes for the next interviewer <span class="chip">not shown to candidate</span></div>
+            <div class="ph" style="height:64px">Free text</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Recommendation <i class="ann t">TN</i></h3>
+            <div class="sub" style="margin:-4px 0 10px">Drives the level outcome after re-interview</div>
+            <div class="kv"><span>◉ Ready to promote</span><b>T3 → T4</b></div>
+            <div class="kv"><span>○ Hold at level</span><b>Repeat T3</b></div>
+            <div class="kv"><span>○ Move down</span><b>T3 → T2</b></div>
+            <div class="kv"><span>○ Not ready to re-interview</span><b>—</b></div>
+            <hr class="d">
+            <span class="btn p">Publish summary</span>
+            <div class="sub" style="margin:8px 0 0">Publishing releases it to the candidate and attaches it to their profile for the next interview.</div>
+          </div>
+          <div class="info mt">Your diagram flags a case worth handling explicitly: candidate completes the LSVT course but declines the re-interview. They've done the work and have no level movement. Needs a distinct state, not just "incomplete".</div>
+          <div class="card mt">
+            <h3>Post-publish actions <i class="ann q">? sequencing</i></h3>
+            <ul class="plain">
+              <li>Level change → update LSVT Content Role</li>
+              <li>Cohort closes → LSVT Team archived?</li>
+              <li>Seat handling → deactivate to stop billing, after TN has mirrored history</li>
+              <li>Next cohort → new Team, same LSVT user</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="notes">
+    <div class="card"><h3>Feeds this screen</h3><ul>
+      <li><b>LSVT:</b> all the quantitative fields, read-only.</li>
+      <li><b>TN:</b> agent narrative, recommendation, publish workflow, level change.</li>
+      <li>The level decision writing <i>back</i> to LSVT (Content Role change) is the only meaningful write direction in the whole integration besides provisioning.</li>
+    </ul></div>
+    <div class="card q"><h3>Open decisions</h3><ul>
+      <li>Certificates — use LSVT's certification engine, or issue TN-branded ones? LSVT's is built but branded to them.</li>
+      <li>Seat lifecycle at cohort close. This is a real cost question at scale and depends on whether deactivation preserves history.</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- ================= R1 ================= -->
+<section class="scr" id="R1">
+  <div class="scr-head">
+    <div class="eyebrow">Reference</div>
+    <h2>R1 · Data source map</h2>
+    <p>Every field used across the wireframes, where it comes from, and how confident we are. Confidence is based only on the LSVT screenshots — nothing here is confirmed against an API.</p>
+  </div>
+
+  <div class="card">
+    <h3>Pulled from LightspeedVT → shown in TN</h3>
+    <table class="tbl">
+      <tr><th>Field</th><th>LSVT source seen in UI</th><th>Used on</th><th>Confidence</th></tr>
+      <tr><td class="nm">Course progress %</td><td>Report Card · Progress</td><td class="mono">C4 C6 A1 A2 A3 A4 A5</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Course status</td><td>Report Card · Course Status</td><td class="mono">C6 A5</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Completion date</td><td>Report Card · Complete Date</td><td class="mono">C6 C7 A5</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Attempts (Revolutions)</td><td>Report Card · Revolutions</td><td class="mono">C4 A2 A3 A4</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Category / course name</td><td>Report Card · Category, Course</td><td class="mono">C3 C6</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Time in system</td><td>My Usage Report</td><td class="mono">C4 C6 A2 A4</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Last sign-in / active</td><td>Report 408 Signed In Users</td><td class="mono">A1 A2 A4</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Assignment name, due date, status</td><td>Assign Training · Manage Assignments</td><td class="mono">C4 C6 A2 A3</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Chapter-level status</td><td>Courseware editor implies chapters exist; no per-chapter report seen</td><td class="mono">C4 C5 C6 A4</td><td><span class="chip bad">Low</span></td></tr>
+      <tr><td class="nm">Assessment score per chapter</td><td>Chapter editor · Assessment block</td><td class="mono">C4 C6 A2 A3 A4</td><td><span class="chip bad">Low</span></td></tr>
+      <tr><td class="nm">Item-level answers</td><td>Report 411 Interactivity Report (unseen contents)</td><td class="mono">A3</td><td><span class="chip bad">Low</span></td></tr>
+      <tr><td class="nm">Free-text responses</td><td>Not visible anywhere in screenshots</td><td class="mono">A3 A4</td><td><span class="chip bad">Unknown</span></td></tr>
+      <tr><td class="nm">Video % watched</td><td>Not visible; chapter-complete flag likely</td><td class="mono">C6</td><td><span class="chip bad">Unknown</span></td></tr>
+      <tr><td class="nm">Points / badges / rank</td><td>Leaderboard · Achievements</td><td class="mono">C4 C6 A4</td><td><span class="chip ok">High</span></td></tr>
+      <tr><td class="nm">Certificate</td><td>Certifications 306 · Reports 402</td><td class="mono">C6 A5</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Files / workbooks</td><td>File Vault · Global File Vault 308</td><td class="mono">C4</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Community threads</td><td>Community · Feed, Groups</td><td class="mono">C4</td><td><span class="chip wa">Medium</span></td></tr>
+      <tr><td class="nm">Notes</td><td>My Notes</td><td class="mono">C5 C6</td><td><span class="chip wa">Medium</span></td></tr>
+    </table>
+  </div>
+
+  <div class="g2 mt">
+    <div class="card">
+      <h3>Written from TN → into LightspeedVT</h3>
+      <table class="tbl">
+        <tr><th>Action</th><th>LSVT concept</th><th>When</th></tr>
+        <tr><td class="nm">Create user</td><td>User · Location · Access Level [7] Member</td><td>On course payment</td></tr>
+        <tr><td class="nm">Assign cohort</td><td>Team</td><td>On cohort formation</td></tr>
+        <tr><td class="nm">Gate content by level</td><td>Content Role</td><td>On enrolment; on promotion</td></tr>
+        <tr><td class="nm">Create weekly tasks</td><td>Assignment (from Template)</td><td>On cohort start</td></tr>
+        <tr><td class="nm">Deactivate</td><td>User status</td><td>Cohort close · frees seat</td></tr>
+      </table>
+      <div class="sub" style="margin-top:10px">All five are proven in the UI. None is proven via API — that's the single biggest unknown, because if provisioning is CSV-only the enrolment flow can't be instant.</div>
+    </div>
+    <div class="card">
+      <h3>Stays entirely in TN</h3>
+      <ul class="plain">
+        <li>Quiz, scoring, buckets, lead capture</li>
+        <li>Accounts, auth, origin capture</li>
+        <li>Agent marketplace, pricing, Stripe, platform cut</li>
+        <li>Interview scheduling, recording, transcript</li>
+        <li>AI assessment + reviewer override</li>
+        <li>Level (E/B/T 1–5) — TN is authoritative</li>
+        <li>Cohort definition and meeting schedule</li>
+        <li>Agent notes, briefs, completion summaries</li>
+        <li>Employer visibility and placement</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>The five questions that change the design</h3>
+    <ul class="tick">
+      <li><b>Is progress available per chapter, or only per course?</b> Course-only guts C4, C6 and A4.</li>
+      <li><b>Are assessment scores and free-text answers retrievable?</b> Without them A3 drops from a coaching tool to an attendance report.</li>
+      <li><b>Can TN provision users, Teams and Content Roles via API?</b> If not, enrolment can't be instant and cohort setup stays manual.</li>
+      <li><b>Are there outbound webhooks, and for which events?</b> Determines whether the portal feels live or feels like yesterday's data.</li>
+      <li><b>Does SAML SSO work inside an iframe?</b> If not, C5's embed becomes a new-tab handoff and "seamless" needs redefining.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+const btns=[...document.querySelectorAll('.nav button[data-s]')];
+btns.forEach(b=>b.addEventListener('click',()=>{
+  btns.forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  const t=document.getElementById(b.dataset.s); if(t){t.classList.add('on');}
+  window.scrollTo({top:0,behavior:'instant'});
+}));
+document.getElementById('tg').addEventListener('change',e=>{
+  document.body.classList.toggle('hide-ann',!e.target.checked);
+});
+</script>
+</body>
+</html>

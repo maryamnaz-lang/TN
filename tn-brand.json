@@ -1,0 +1,179 @@
+{
+  "name": "TalentNext",
+  "version": "1.0",
+  "type": {
+    "family": "Lato",
+    "stack": "'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    "weights": {
+      "regular": 400,
+      "bold": 700
+    },
+    "embedded": "woff2, base64, shipped inside the file - no webfont request",
+    "scale": {
+      "h1": {
+        "size": "26px",
+        "weight": 700,
+        "tracking": "-.03em"
+      },
+      "h1-desc": {
+        "size": "13.5px",
+        "weight": 400,
+        "colour": "ink.muted"
+      },
+      "h2": {
+        "size": "20px",
+        "weight": 700,
+        "tracking": "-.025em"
+      },
+      "card-head": {
+        "size": "15px",
+        "weight": 700,
+        "tracking": "-.02em"
+      },
+      "body": {
+        "size": "13px",
+        "weight": 400,
+        "line": 1.6
+      },
+      "small": {
+        "size": "12px",
+        "weight": 400,
+        "colour": "ink.muted"
+      },
+      "eyebrow": {
+        "size": "10.5px",
+        "weight": 700,
+        "transform": "uppercase",
+        "tracking": ".08em"
+      }
+    },
+    "heading-gap": "6px - heading to its description, matched inside every card"
+  },
+  "palette": {
+    "primary": {
+      "base": "#5b3fd6",
+      "hover": "#5335c9",
+      "deep": "#4a31b8",
+      "deeper": "#3f22a8",
+      "darkest": "#3d2a9e",
+      "lift": "#7c5cf0",
+      "lift2": "#7a55f2",
+      "violet": "#8b3fd6",
+      "magenta": "#7d2fc4",
+      "wash": "#f0ecfd",
+      "wash2": "#ece6fd",
+      "wash3": "#f7f5ff",
+      "wash4": "#fbfaff",
+      "wash5": "#f1ecff",
+      "line": "#cfc4f5",
+      "line2": "#ddd6f7",
+      "line3": "#d9d0f9",
+      "ink": "#33257a"
+    },
+    "ink": {
+      "black": "#000000",
+      "near": "#141414",
+      "base": "#16181d",
+      "soft": "#2c313c",
+      "mid": "#4d5361",
+      "muted": "#868c9b",
+      "faint": "#9aa0ad",
+      "onDark": "#ffffff"
+    },
+    "surface": {
+      "page": "#f7f7f7",
+      "card": "#ffffff",
+      "sunken": "#f4f5f8",
+      "sunken2": "#f2f3f6",
+      "hover": "#fcfbff"
+    },
+    "line": {
+      "base": "#e6e8ed",
+      "soft": "#eceef2",
+      "strong": "#cfd2da",
+      "alt": "#e3e5ea",
+      "onBlack": "#262626"
+    },
+    "state": {
+      "ok": "#0a8055",
+      "okWash": "#e6f7f0",
+      "okLine": "#bde3d2",
+      "okInk": "#065f42",
+      "warn": "#a55a00",
+      "warnWash": "#fdf4e6",
+      "warnLine": "#f3d6a5",
+      "warnInk": "#7a4300",
+      "pending": "#b4530a",
+      "pendWash": "#fdf1e3",
+      "bad": "#c02626",
+      "badWash": "#fdeeee",
+      "badLine": "#f2c9c9",
+      "badInk": "#8f1d1d",
+      "info": "#1d63c9",
+      "infoWash": "#e8f1fd",
+      "infoLine": "#bcd8f7",
+      "infoInk": "#123a5f",
+      "star": "#f0b429"
+    },
+    "sidenav": {
+      "bg": "#000000",
+      "item": "#b4b4b4",
+      "itemIcon": "#8f8f8f",
+      "hover": "rgba(255,255,255,.05)",
+      "selected": "#5b3fd6",
+      "divider": "#262626",
+      "chipBg": "#141414",
+      "chipLine": "#262626",
+      "scrollThumb": "rgba(255,255,255,.16)"
+    },
+    "scrollbar": {
+      "thumb": "#dcdee5",
+      "thumbHover": "#c7cad3",
+      "track": "transparent",
+      "width": "6px"
+    }
+  },
+  "gradients": {
+    "session-card": "linear-gradient(146deg,#7a55f2 0%,#5b3fd6 46%,#7d2fc4 100%)",
+    "assistant-glow": "soft primary bloom at the foot of the assistant rail, slow drift",
+    "banner": "solid primary with a lighter primary sweep across the top-right"
+  },
+  "radius": {
+    "sidenav": "24px",
+    "card": "16px",
+    "control": "14px",
+    "pill": "12px",
+    "chip": "99px",
+    "avatar": "50%"
+  },
+  "shadow": {
+    "card": "0 1px 2px rgba(16,20,40,.05), 0 6px 18px -10px rgba(16,20,40,.14)",
+    "raised": "0 6px 18px -10px rgba(16,20,40,.18)",
+    "panel": "-20px 0 60px -22px rgba(10,14,30,.45)"
+  },
+  "imagery": {
+    "branded": "Real portraits for every person - agents, peers, the signed-in user. Round, object-fit cover, initials underneath as the fallback.",
+    "wireframe": "No photography. Every image slot becomes a crossed box: light grey fill, hairline border, two diagonals. Initials hidden."
+  },
+  "wireframe": {
+    "principle": "One tone. Colour carries no meaning, so meaning moves to type weight, size and position.",
+    "method": "Every colour in the build is mapped to its perceptual luminance and snapped to a 14-step grey ramp. Contrast is preserved; hue is not.",
+    "ramp": [
+      "#000000",
+      "#1a1a1a",
+      "#333333",
+      "#4d4d4d",
+      "#666666",
+      "#808080",
+      "#999999",
+      "#b3b3b3",
+      "#c6c6c6",
+      "#d6d6d6",
+      "#e2e2e2",
+      "#ededed",
+      "#f5f5f5",
+      "#ffffff"
+    ],
+    "images": "crossed box"
+  }
+}
