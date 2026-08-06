@@ -270,7 +270,8 @@ body{font:14px/1.55 'Lato',ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-se
 .ui .bk-done h3{margin:0;font-size:19px;font-weight:700;letter-spacing:-.02em}
 .ui .bk-done p{margin:6px 0 0;font-size:13px;color:#000000}
 
-.ui .bk-f{display:flex;align-items:center;gap:12px;padding:14px 18px;border-top:1px solid #d6d6d6;flex:0 0 auto}
+.ui .bk-f{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-top:1px solid #d6d6d6;flex:0 0 auto}
+.ui .bk-f>*:only-child{margin-left:auto}
 .ui .bk-amt{flex:1;font-size:12.5px;color:#000000;font-weight:700}
 .ui .bk-cta{height:44px;padding:0 20px;border-radius:14px;font-size:13.5px}
 .ui .bk-cta.off{opacity:.45}
@@ -754,6 +755,7 @@ html.boot-agent #sdAgent{display:block!important}
     <div id="agModal" class="mk-a"><div class="mbox" id="agBox"></div></div>
     <div id="agToast" class="tst-a"></div>
     <div class="bk-wrap" id="agBkWrap"><aside class="bk" id="agBk"></aside></div>
+    <div class="bk-wrap" id="agSheetWrap"><aside class="bk" id="agSheet"></aside></div>
   </div>
 </section>
 </div><!-- /.panes -->
@@ -802,7 +804,7 @@ html.boot-agent #sdAgent{display:block!important}
 
 <style>
 /* agent modal + toast reuse the shared system's look */
-.ui .mk-a{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:56px 18px;overflow-y:auto}
+.ui .mk-a{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:200;display:none;align-items:center;justify-content:center;padding:28px 18px;overflow-y:auto}
 .ui .mk-a.on{display:flex}
 .ui .tst-a{position:fixed;left:50%;transform:translateX(-50%);bottom:26px;z-index:300;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
 .ui .tst-a .ts{background:#000000;color:#ffffff;padding:10px 16px;border-radius:12px;font-size:12.5px;box-shadow:0 12px 34px -10px rgba(0,0,0,.5)}
@@ -812,6 +814,16 @@ html.boot-agent #sdAgent{display:block!important}
 
 /* inner cards share one radius, a step below the 24px containers */
 .ui .stat{border-radius:16px}
+/* clickable stat card — signals it drills into a section */
+.ui .stat-link{position:relative;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.ui .stat-link:hover{border-color:var(--ink);box-shadow:0 6px 18px -10px rgba(0,0,0,.35);transform:translateY(-1px)}
+.ui .stat-link:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ui .stat-link .stat-arrow{position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;border:1px solid var(--ln2);background:#ffffff;color:var(--mid);display:grid;place-items:center;transition:background .15s,color .15s,transform .15s}
+.ui .stat-link:hover .stat-arrow{background:var(--ink);color:#ffffff;transform:translateX(2px)}
+.ui .stat-go{display:inline-flex;align-items:center;gap:4px;margin-left:6px;color:var(--ink);font-weight:700}
+.ui .stat-link:hover .stat-go{text-decoration:underline}
+@keyframes agFlash{0%{box-shadow:0 0 0 0 rgba(0,0,0,.22)}100%{box-shadow:0 0 0 6px rgba(0,0,0,0)}}
+.ui #ag-attn-queue.flash{animation:agFlash 1s ease-out;border-color:var(--ink)}
 
 /* informational tip card — deliberately not brand purple */
 .ui .card.tip{background:#ffffff;border:0}
@@ -1362,9 +1374,17 @@ body,.app{background:#f7f7f7}
 
 /* SCENES: clipped moments from the candidate's own interview */
 .ui .scenes{display:grid;grid-template-columns:1fr 1fr;gap:11px}
-.ui .scene{display:flex;gap:12px;border:1px solid #d6d6d6;border-radius:16px;padding:11px}
+.ui .scene{display:flex;gap:12px;align-items:center;border:1px solid #d6d6d6;border-radius:16px;padding:11px}
 .ui .scene.on{border-color:#000000;border-width:2px;padding:10px}
 .ui .scene.sc-dim{opacity:.5}
+/* selection checkbox — left, vertically centred on the card */
+.ui .sc-check{flex:0 0 22px;width:22px;height:22px;align-self:center;padding:0;border:1.6px solid #b0b0b0;
+  border-radius:6px;background:#ffffff;color:#ffffff;display:grid;place-items:center;cursor:pointer;
+  transition:background .15s,border-color .15s}
+.ui .sc-check:hover{border-color:#000000}
+.ui .sc-check.on{background:#000000;border-color:#000000}
+.ui .sc-check:disabled{cursor:not-allowed;opacity:.4}
+.ui .sc-check svg{display:block}
 .ui .sc-thumb{position:relative;flex:0 0 92px;width:92px;height:62px;border:1px solid #000000;
   border-radius:10px;overflow:hidden;background:#ffffff}
 .ui .sc-thumb .wf-img{position:absolute;inset:0;display:block}
@@ -1840,11 +1860,14 @@ body.ob-mode #ai,body.ob-mode #aiFab,body.ob-mode .ai-fab,body.ob-mode #aiTip{di
 .ui .ob-next-tile.p{border-color:#000000;box-shadow:0 0 0 1px #000000 inset}
 .ui .ob-next-tile .t{font-size:13px;font-weight:700}
 @media(max-width:560px){.ui .ob-next3{grid-template-columns:1fr}}
-/* quiz-result: full-page-height card — content scrolls, footer button stays static (card padding respected) */
-.ui .nil-body:has(.qr-card){min-height:0;align-items:stretch;overflow:hidden;padding-top:24px;padding-bottom:24px}
-.ui .qr-card{display:flex;flex-direction:column;height:100%;max-height:100%;overflow:hidden}
+/* quiz-result: full-page-height card — content scrolls, footer buttons stay sticky (card padding respected) */
+.ui .nil-body:has(.qr-card){flex:1 1 auto;height:auto;min-height:0;align-items:stretch;overflow:hidden;padding-top:24px;padding-bottom:24px}
+.ui .nil-body:has(.qr-card) .nil-inner{height:100%;min-height:0;display:flex;flex-direction:column}
+.ui .qr-card{position:relative;display:flex;flex-direction:column;height:100%;max-height:100%;overflow:hidden}
 .ui .qr-scroll{flex:1 1 auto;min-height:0;overflow-y:auto}
-.ui .qr-foot{flex:0 0 auto;padding-top:16px;margin-top:4px;border-top:1px solid var(--ln)}
+.ui .qr-foot{flex:0 0 auto;position:relative;padding-top:16px;background:var(--pn)}
+/* fade the cut content into the card so it never bleeds into the sticky buttons */
+.ui .qr-foot::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:38px;pointer-events:none;background:linear-gradient(to top,var(--pn) 30%,rgba(255,255,255,0))}
 /* create-account terms box */
 .ui .ob-terms{border:1px solid var(--ln2);border-radius:12px;background:var(--fa);padding:14px;max-height:230px;overflow-y:auto;font-size:12.5px;color:var(--mid);line-height:1.6}
 .ui .ob-terms p{margin:0 0 10px}
@@ -1889,7 +1912,7 @@ body.ob-mode #view{max-width:none;margin:0;padding:0}
 .ui .nil-links a:hover{opacity:1}
 .ui .nil-quiz{border:1px solid rgba(255,255,255,.55);background:none;color:#ffffff;border-radius:10px;padding:9px 15px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
 .ui .nil-quiz:hover{background:#ffffff;color:#0e0e0e}
-.ui .nil-body{background:var(--fa);min-height:calc(100vh - 34px - 56px);padding:44px 20px 60px;display:flex;justify-content:center;align-items:flex-start}
+.ui .nil-body{background:var(--fa);min-height:calc(100vh - 34px - 56px);padding:44px 20px 60px;display:flex;justify-content:center;align-items:center}
 .ui .nil-inner{width:100%;max-width:600px}
 .ui .nil-inner .card>h3{font-size:20px;margin-bottom:14px}
 @media(max-width:640px){.ui .nil-links{display:none}}
@@ -1903,12 +1926,43 @@ body.ob-mode #view{max-width:none;margin:0;padding:0}
 .ui .tal-ask .tal-av.sm{width:20px;height:20px;flex:0 0 20px;border-radius:6px;margin:0}
 .ui .tal-ask .tal-av.sm svg{width:12px;height:12px}
 /* Tal read on agent screens interpreting an analytical view — reuses .tal-read */
-.ui #agView .tal-read{margin-bottom:16px}
+.ui #agView .tal-read{margin-bottom:16px;align-items:center}
+/* agent Tal cards keep their action chips on the same row, pinned to the far right */
+.ui #agView .tal-read .tal-chips{flex-basis:auto;flex-wrap:nowrap;margin:0 0 0 auto;align-self:center}
+@media(max-width:760px){
+  .ui #agView .tal-read{align-items:flex-start}
+  .ui #agView .tal-read .tal-chips{flex-basis:100%;margin:10px 0 0;flex-wrap:wrap}
+}
+/* agent private notes — a stack of individual notes (like the candidate's course notes) */
+.ui .ag-note{display:flex;align-items:stretch;gap:0;border:1px solid var(--ln2);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.ui .ag-note-body{flex:1;min-width:0;text-align:left;background:none;border:0;padding:10px 12px;cursor:pointer;font:inherit;color:var(--ink)}
+.ui .ag-note-body:hover{background:var(--fa)}
+.ui .ag-note-t{font-size:12.5px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ui .ag-note-w{font-size:10.5px;color:var(--mut);margin-top:4px}
+.ui .ag-note-del{flex:0 0 36px;border:0;border-left:1px solid var(--ln);background:none;color:var(--mut);cursor:pointer;font-size:13px;line-height:1}
+.ui .ag-note-del:hover{background:var(--badw);color:var(--bad)}
+/* agent profile — photo area + availability box */
+.ui .pf-photo{display:flex;align-items:center;gap:15px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--ln)}
+.ui .pf-photo .pf-av{flex:0 0 auto}
+.ui .pf-photo-t{font-size:13px;font-weight:700;margin-bottom:2px}
+.ui .avl-box{display:flex;align-items:center;gap:14px;border:1px solid var(--ln2);border-radius:14px;padding:14px}
+.ui .avl-ic{flex:0 0 44px;width:44px;height:44px;border-radius:12px;border:1px solid var(--ln);background:var(--fa);display:grid;place-items:center;color:var(--ink)}
+.ui .avl-t{font-size:13px;font-weight:700;margin-bottom:2px}
+/* cohort filter tabs on Course Reports */
+.ui .rep-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ui .rep-tab{border:1px solid var(--ln2);background:#ffffff;border-radius:99px;padding:7px 14px;font-size:12.5px;color:var(--mid);font-weight:400;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.ui .rep-tab:hover{background:var(--fa);color:var(--ink)}
+.ui .rep-tab.on{background:var(--ac);border-color:var(--ac);color:#ffffff;font-weight:700}
+.ui .rep-tab em{font-style:normal;font-size:11px;opacity:.7}
+.ui .rep-tab.on em{opacity:.85}
 /* Messages: candidate threads on the left, the open conversation on the right —
    both columns full height; the conversation is anchored to the bottom so the
    latest message sits at the bottom and the thread reads bottom-up. */
 .ui .g12{display:grid;grid-template-columns:288px 1fr;gap:18px;align-items:stretch}
-.ui .msg-ag{height:calc(100vh - 200px);min-height:440px}
+/* messages fills the content column so both cards' bases line up with the sidenav base */
+.ui main:has(.msg-ag),.ui #agMain:has(.msg-ag){padding-bottom:0}
+.ui #agView:has(.msg-ag){flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.ui .msg-ag{flex:1 1 auto;height:auto;min-height:440px}
 .ui .msg-ag>.card{height:100%;display:flex;flex-direction:column;min-height:0}
 .ui .msg-ag-list{overflow-y:auto}
 .ui .msg-ag-conv>h3{flex:0 0 auto}
@@ -3841,13 +3895,13 @@ function scenesSelectCard(){
     <div class="scenes">
       ${SCENES.map((s,i)=>{const on=sel.indexOf(i)>-1, lock=done&&!on;
       return `<div class="scene${on?' on':''}${lock?' sc-dim':''}">
+        <button class="sc-check${on?' on':''}" data-act="scenepick:${i}"${lock?' disabled':''} role="checkbox" aria-checked="${on}" aria-label="Choose scene: ${esc(s[0])}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button>
         <div class="sc-thumb"><span class="wf-img"></span><span class="sc-dur">${s[1]}</span></div>
         <div class="sc-body f1">
           <div class="sc-t">${esc(s[0])}</div>
           <div class="sc-m">${esc(s[2])} &middot; ${esc(s[3])}</div>
           <div class="row mt8" style="gap:8px">
             <button class="btn sm" data-act="playscene:${i}">Watch</button>
-            <button class="btn ${on?'p':''} sm" data-act="scenepick:${i}"${lock?' disabled':''}>${on?'✓ Chosen':'Choose'}</button>
           </div>
         </div>
       </div>`;}).join('')}
@@ -3859,11 +3913,11 @@ function scenesSelectCard(){
   </div>`;
 }
 function scenesKeptCard(){
-  const kept=S.sceneKept, on=kept.filter(i=>sceneShared(i)).length;
+  const kept=S.sceneKept;
   return `<div class="card mt">
-    <h3>Your scenes <span class="r">${kept.length} kept${on?' · '+on+' shared':''}</span></h3>
+    <h3>Your scenes <span class="r">${kept.length} kept</span></h3>
     <p class="sub hd-desc">The three scenes you kept from your interview. They stay with your interview details,
-      and each one is yours to download. Sharing with an employer is separate — switch it on only when you want to.</p>
+      and each one is yours to download.</p>
     <div class="scenes">
       ${kept.map(i=>{const s=SCENES[i];
       return `<div class="scene on">
@@ -3874,13 +3928,12 @@ function scenesKeptCard(){
           <div class="row mt8" style="gap:8px">
             <button class="btn sm" data-act="playscene:${i}">Watch</button>
             <button class="btn sm" data-act="scenedl:${i}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg>Download</button>
-            <button class="btn ${sceneShared(i)?'p':''} sm" data-act="scene:${i}">${sceneShared(i)?'Shared':'Share'}</button>
           </div>
         </div>
       </div>`;}).join('')}
     </div>
-    <div class="note i mt">You own these clips. Downloading saves the clip to your device; sharing shows it to an
-      employer &mdash; never your full recording, the transcript, or your level.</div>
+    <div class="note i mt">You own these clips. Downloading saves the clip to your device &mdash; we never expose
+      your full recording, the transcript, or your level.</div>
   </div>`;
 }
 function summaryCard2(){ return summaryCard().replace('card mt','card'); }
@@ -6239,7 +6292,7 @@ VIEWS.interviews = ()=>{
     document.getElementById('sdAgent').style.display = p==='agent'?'':'none';
     document.getElementById('swC').classList.toggle('on',p==='candidate');
     document.getElementById('swA').classList.toggle('on',p==='agent');
-    document.getElementById('proto').style.display = 'flex';
+    document.getElementById('proto').style.display = p==='candidate' ? 'flex' : 'none';
     var BELL='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"'
       +' stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
       +'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>'
@@ -6483,16 +6536,47 @@ const SESSIONS=[
 ];
 let THREADS=[
  {who:'Maryam Naz',cohort:12,msgs:[
+   {me:0,t:'Hi Dana — quick question before Thursday. Should I prep the whole delegation chapter or just the part I re-took?',w:'1w ago'},
+   {me:1,t:'Just the part you re-took is fine. The rest of the group is roughly where you are, so we will not spend long on the basics.',w:'1w ago'},
+   {me:0,t:'Got it. I redid the scenario where the handover goes wrong — that was the one that tripped me up.',w:'6d ago'},
    {me:1,t:'Good recovery on chapter 3 — you went back and re-did it rather than moving on. That is the right instinct.',w:'5d ago'},
    {me:0,t:'Thanks. The delegation material was harder than I expected.',w:'5d ago'},
-   {me:1,t:'It is the one most people re-take. Bring a real example on Thursday and we will work it through with the group.',w:'4d ago'}]},
+   {me:1,t:'It is the one most people re-take. Bring a real example on Thursday and we will work it through with the group.',w:'4d ago'},
+   {me:0,t:'Will do. I have one from my last job where I held onto a project too long — is that a good fit?',w:'4d ago'},
+   {me:1,t:'Perfect fit. That is exactly the tension the chapter is about. Jot down what you would do differently and we will start there.',w:'3d ago'},
+   {me:0,t:'Done. Looking forward to it.',w:'3d ago'}]},
  {who:'James Whitby',cohort:12,msgs:[
-   {me:0,t:'I keep failing the same assessment. Not sure what I am missing.',w:'2d ago'}]},
+   {me:0,t:'I keep failing the same assessment. Not sure what I am missing.',w:'2d ago'},
+   {me:1,t:'You are close — the answers are right, but you are not showing your reasoning. Walk me through how you got to the last one.',w:'2d ago'},
+   {me:0,t:'I picked the option that felt safest, but I could not really say why.',w:'1d ago'},
+   {me:1,t:'That is the gap. Try writing one sentence of "why" under each choice before you submit. Send me your next attempt and I will read it.',w:'1d ago'}]},
  {who:'Zoe Bennett',cohort:9,msgs:[
-   {me:1,t:'Noticed you have been quiet for over a week. Everything alright? Happy to move your call slot if timing is the problem.',w:'1d ago'}]}
+   {me:1,t:'Noticed you have been quiet for over a week. Everything alright? Happy to move your call slot if timing is the problem.',w:'1d ago'},
+   {me:0,t:'Sorry — work got heavy. Timing is the issue, the 17:00 call clashes with a standup.',w:'22h ago'},
+   {me:1,t:'No problem at all. I can move you to the Tuesday 14:30 group for the next three weeks. Want me to switch it?',w:'20h ago'},
+   {me:0,t:'Yes please, that would really help.',w:'18h ago'}]},
+ {who:'Priya Nair',cohort:9,msgs:[
+   {me:0,t:'Just finished my 90-day summary read-through. Thank you for the note on stakeholder mapping — it clicked.',w:'2d ago'},
+   {me:1,t:'You earned it. That was the strongest part of your interview, and it showed all cycle. Proud of the progress.',w:'2d ago'},
+   {me:0,t:'Any advice on what to focus on next?',w:'1d ago'},
+   {me:1,t:'Conflict repair. You are great at reading the room — next step is staying in the hard conversation a beat longer. We will cover it in the re-interview.',w:'1d ago'}]},
+ {who:'Emeka Obi',cohort:14,msgs:[
+   {me:1,t:'Welcome to the cohort — you are in week one, so no pressure yet. Watch the intro chapter and come to Monday’s call with one question.',w:'3d ago'},
+   {me:0,t:'Thanks! Excited to start. Is it okay if I move a bit faster than the weekly pace?',w:'3d ago'},
+   {me:1,t:'Go for it, as long as you are not skipping the reflections — those are where the real work happens.',w:'2d ago'}]},
+ {who:'Freya Olsen',cohort:14,msgs:[
+   {me:0,t:'Loving the course so far. The first scenario really made me rethink how I run my standups.',w:'2d ago'},
+   {me:1,t:'That is exactly the point of it. Bring that change to the group call — others will learn from it.',w:'2d ago'}]},
+ {who:'Gabriel Souza',cohort:14,msgs:[
+   {me:1,t:'I saw you have not signed in yet — the course opened three days ago. Anything blocking you getting started?',w:'1d ago'}]},
+ {who:'Owen Clarke',cohort:9,msgs:[
+   {me:0,t:'Can we reschedule my re-interview? Something came up that week.',w:'4d ago'},
+   {me:1,t:'Of course. Send me two or three windows that work and I will lock one in.',w:'4d ago'},
+   {me:0,t:'Any afternoon the following week works for me.',w:'3d ago'},
+   {me:1,t:'Booked you for the Wednesday at 15:00. You will get the confirmation shortly.',w:'3d ago'}]}
 ];
 
-let G={view:'overview',cohort:null,member:null,thread:0,clips:null,proto:'assigned',nb:{step:'apply',data:{},started:false,done:false},
+let G={view:'overview',cohort:null,member:null,thread:0,clips:null,
   drawer:false,
   /* agent notifications — newest first, same shape as the candidate portal (h, t, w, rd) */
   notif:[
@@ -6518,23 +6602,17 @@ const behind=()=>allMembers().filter(x=>x.m.pc < pace(x.c)-5)
   .sort((a,b)=>(a.m.pc-pace(a.c))-(b.m.pc-pace(b.c)));
 const weakAssess=()=>allMembers().filter(x=>x.m.avg<75);
 
-const NAV=[['overview','Dashboard'],['interviews','Interviews'],
-['evaluations','Evaluations'],['clips','Highlight clips'],['cohorts','Cohorts'],
+const NAV=[['overview','Dashboard'],['interviews','Sessions'],
+['evaluations','Evaluations'],['cohorts','Cohorts'],
 ['reports','Course Reports'],['messages','Messages'],
 ['earnings','Earnings']];
 
-/* A brand-new agent sees a reduced nav — cohort-operations modules only appear
-   once they are assigned. */
-const NEW_NAV=[['overview','Dashboard'],['interviews','Interviews'],['cohorts','Cohorts'],['earnings','Earnings'],['profile','Profile']];
 function navHTML(){
-  var isNew=G.proto==='new';
-  return (isNew?NEW_NAV:NAV).map(function(n){
+  return NAV.map(function(n){
     var k=n[0],l=n[1],ic=(window.TNICON?TNICON(k):''),badge='';
-    if(!isNew){
-      if(k==='evaluations'&&pendingWork()) badge='<u>'+pendingWork()+'</u>';
-      if(k==='reports'&&behind().length) badge='<u class="q">'+behind().length+'</u>';
-      if(k==='messages') badge='<u class="q">1</u>';
-    }
+    if(k==='evaluations'&&pendingWork()) badge='<u>'+pendingWork()+'</u>';
+    if(k==='reports'&&behind().length) badge='<u class="q">'+behind().length+'</u>';
+    if(k==='messages') badge='<u class="q">1</u>';
     return '<button data-ag="nav:'+k+'" title="'+l+'"'+(G.view===k?' class="on"':'')
       +'><i>'+ic+'</i><span class="lbl">'+l+'</span>'+badge+'</button>';
   }).join('');
@@ -6542,16 +6620,11 @@ function navHTML(){
 function agPageDesc(){
   var a=null;
   try{ a=window.__agentCtx?window.__agentCtx():null; }catch(e){}
-  if(G.proto==='new'){
-    return G.view==='wizard'
-      ? 'Apply, get vetted by the platform team, set up your listing and money, then train and certify.'
-      : 'Welcome — get set up as a Talent Agent. The rest of the portal fills in once you are assigned to a cohort.';
-  }
   if(G.view==='cohorts'&&G.cohort){
     var c=COHORTS.filter(function(x){return x.id===G.cohort;})[0];
     if(c && G.member){
       var m=c.members.filter(function(x){return x.name===G.member;})[0];
-      return m ? 'Cohort '+c.id+' · '+lvlLabel(m.lvl)+' · last active '+String(m.last).toLowerCase() : '';
+      return m ? ''+cohortName(c)+' · '+lvlLabel(m.lvl)+' · last active '+String(m.last).toLowerCase() : '';
     }
     if(c) return 'Week '+c.week+' of 13 · day '+c.day+' of 90 · next call '+c.call;
   }
@@ -6560,7 +6633,6 @@ function agPageDesc(){
       +pendingWork()+' pieces of work waiting on you.';
     case 'interviews': return 'Sessions you conduct. Each produces an evaluation you sign off before the candidate gets a level.';
     case 'evaluations': return 'Level decisions and 90-day summaries. Both are yours to sign.';
-    case 'clips': return 'AI shortlists highlights from the interview transcript. You approve a shortlist; the candidate picks the final clips.';
     case 'cohorts': return 'Each cohort is a fixed group of up to ten, running one 90-day cycle together.';
     case 'reports': return 'Course progress and assessment results across every cohort, straight from the course platform.';
     case 'messages': return 'One-to-one with candidates. Private, and persists after a cohort closes.';
@@ -6569,18 +6641,18 @@ function agPageDesc(){
     default: return '';
   }
 }
-var AGTITLE={overview:'Dashboard',interviews:'Interviews',evaluations:'Evaluations',cohorts:'Cohorts',
-  reports:'Course Reports',messages:'Messages',earnings:'Earnings',profile:'Profile',clips:'Highlight clips',wizard:'Get set up'};
+var AGTITLE={overview:'Dashboard',interviews:'Sessions',evaluations:'Evaluations',cohorts:'Cohorts',
+  reports:'Course Reports',messages:'Messages',earnings:'Earnings',profile:'Profile'};
 function crumb(){
   var el=$('#agCrumb'); if(!el) return;
   var t=[];
   if(G.view==='cohorts'&&G.cohort){
     t.push({l:'Cohorts',a:'nav:cohorts'});
     if(G.member){
-      t.push({l:'Cohort '+G.cohort,a:'cohort:'+G.cohort});
+      t.push({l:cohortName(G.cohort),a:'cohort:'+G.cohort});
       t.push({l:G.member});
     } else {
-      t.push({l:'Cohort '+G.cohort});
+      t.push({l:cohortName(G.cohort)});
     }
   } else if(G.view==='messages' && G.thread){
     t.push({l:'Messages',a:'nav:messages'});
@@ -6614,52 +6686,32 @@ function callCard(){
   cc.innerHTML='<div class="cc"><div class="cc-top"><span class="cc-ic">'+ic+'</span>'
     +'<span class="cc-lab">Next cohort call</span></div>'
     +'<div class="cc-when">'+withRel(c.call)+'</div>'
-    +'<div class="cc-sub">Cohort '+c.id+' · week '+c.week+' of 13</div>'
+    +'<div class="cc-sub">'+cohortName(c)+' · week '+c.week+' of 13</div>'
     +'<button class="cc-btn" data-ag="brief:'+c.id+'">Open brief</button></div>';
 }
-function protoBar(){
-  var el=document.getElementById('proto'); if(!el) return;
-  var pane=document.getElementById('paneAgent');
-  if(!pane || !pane.classList.contains('on')) return;
-  el.innerHTML='<b>Prototype</b>'
-   +'<button class="pill'+(G.proto==='new'?' on':'')+'" data-ag="proto:new" title="A brand-new agent who just landed — onboarding and an empty dashboard">New agent</button>'
-   +'<button class="pill'+(G.proto==='assigned'?' on':'')+'" data-ag="proto:assigned" title="An agent assigned to cohorts — the full operating dashboard">Assigned agent</button>';
-}
 function render(){
-  var isNew=G.proto==='new';
-  window.__agentNew=isNew;
   var n=$('#agNav'); if(n) n.innerHTML=navHTML();
   var ns=$('#agNavSet');
   if(ns) ns.innerHTML=
-    (isNew?'':'<button data-ag="nav:profile" title="Profile"'+(G.view==='profile'?' class="on"':'')+'><i>'
-    +(window.TNICON?TNICON('profile'):'')+'</i><span class="lbl">Profile</span></button>')
+    '<button data-ag="nav:profile" title="Profile"'+(G.view==='profile'?' class="on"':'')+'><i>'
+    +(window.TNICON?TNICON('profile'):'')+'</i><span class="lbl">Profile</span></button>'
     +'<button data-logout="1" title="Log out"><i>'
     +(window.TNICON?TNICON('logout'):'')+'</i><span class="lbl">Log out</span></button>';
-  protoBar();
-  var who=$('#sdWho');
-  if(who){
-    if(isNew){ var nm=(G.nb.data.name||'New agent');
-      who.innerHTML='<span class="a" style="background:#000000">'+esc((nm.trim().split(/\s+/).map(function(x){return x[0];}).join('').slice(0,2).toUpperCase())||'NA')+'</span><div><div class="n">'+esc(nm)+'</div><div class="r">Talent Agent · setting up</div></div>';
-    } else {
-      who.innerHTML='<span class="a" style="background:#000000">DW</span><div><div class="n">Dana Whitfield</div><div class="r">Talent Agent</div></div>';
-    }
-  }
-  crumb();
-  if(isNew){ var cc0=$('#sdCall'); if(cc0) cc0.innerHTML=''; } else { callCard(); }
+  crumb(); callCard();
   agRenderNotif();
   renderAgBk();
   var v=$('#agView'); if(!v) return;
-  v.innerHTML= isNew ? (G.view==='wizard' ? nbWizard(G.nb.step) : (NV[G.view]||NV.overview)()) : (V[G.view]||V.overview)();
+  v.innerHTML=(V[G.view]||V.overview)();
   v.classList.remove('vin'); void v.offsetWidth; v.classList.add('vin');
   var m=$('#agMain'); if(m) m.scrollTop=0;
   /* the conversation reads bottom-up — jump it to the latest message */
   var mt=$('#agMsgScroll'); if(mt) mt.scrollTop=mt.scrollHeight;
 }
-function go(v){ G.view=v; render(); }
+function go(v){ closeSheet(); closeM(); G.view=v; render(); }
 /* notifications in the shared rail — mirrors the candidate portal's dropdown,
    reading G.notif and toggling #agNtDrop / #agNbadge. A brand-new agent has none. */
 function agRenderNotif(){
-  var list=(G.proto==='new')?[]:G.notif;
+  var list=G.notif;
   var nb=document.getElementById('agNbadge');
   var u=list.filter(function(n){return !n.rd;}).length;
   if(nb){ nb.textContent=u; nb.style.display=u?'grid':'none'; }
@@ -6685,6 +6737,17 @@ function modal(h,wide){
   $('#agModal').classList.add('on');
 }
 function closeM(){ $('#agModal').classList.remove('on'); }
+/* Cohorts are named by their level band — every member shares one level — e.g. "Cohort E1".
+   The numeric id stays internal for routing (data-ag) and Tal queries. */
+function cohortLvlOf(id){ var c=COHORTS.filter(function(x){return x.id===+id;})[0]; return c?c.level:id; }
+function cohortName(cOrId){ return 'Cohort '+((cOrId&&typeof cOrId==='object')?cOrId.level:cohortLvlOf(cOrId)); }
+/* generic right-hand slide-over — reuses the booking slide-over shell (.bk-wrap/.bk) */
+function sheet(h){
+  var b=$('#agSheet'); if(!b) return;
+  b.innerHTML=h;
+  $('#agSheetWrap').classList.add('on');
+}
+function closeSheet(){ var w=$('#agSheetWrap'); if(w) w.classList.remove('on'); }
 function flagTag(f){ return f? '<span class="tag '+(f.k==='bad'?'bad':'wa')+'">'+esc(f.t)+'</span>' : ''; }
 function paceCell(m,c){
   var d=m.pc-pace(c);
@@ -6745,17 +6808,6 @@ function withRel(when){ var r=relOf(when); return esc(when)+(r?' · '+r:''); }
 /* Tal's opening read for the dashboard — the one thing that matters right now,
    built from the same priority the banner uses. Chips are actions, not nav. */
 function agTalDashData(){
-  if(G.proto==='new'){
-    if(G.nb.done) return {lead:'Setup complete — you’re awaiting your first cohort assignment.',
-      sub:'There’s nothing for you to act on until the platform assigns you to a cohort. Your roster, briefs and evaluations will appear here once that happens.',
-      chips:[{l:'Review profile',a:'nav:profile',p:1}]};
-    if(G.nb.started) return {lead:'You’re mid-setup — pick up where you left off.',
-      sub:'Finish setting up your listing, payout, training and certification before the platform can assign you to a cohort.',
-      chips:[{l:'Continue setup',a:'nbstart',p:1}]};
-    return {lead:'Welcome — let’s get you set up as a Talent Agent.',
-      sub:'A short setup before you interview: apply, get vetted by the platform team, set up your listing and money, then train and certify. Then the platform matches you to a cohort.',
-      chips:[{l:'Start setup',a:'nbstart',p:1}]};
-  }
   var pend=pendingWork(), att=attention(), bh=behind().length;
   var nx=SESSIONS.filter(function(s){return s.state==='upcoming';})[0];
   var evs=EVALS.filter(function(e){return e.status==='pending';});
@@ -6777,7 +6829,7 @@ function agTalDashData(){
       chips:[{l:'Open course reports',a:'nav:reports',p:1},{l:'Who is at risk right now?',a:'talask:Who is at risk right now'}]};
   }
   var c=COHORTS[0];
-  return {lead:'Nothing waiting on you — next up is Cohort '+c.id+', '+withRel(c.call)+'.',
+  return {lead:'Nothing waiting on you — next up is '+cohortName(c)+', '+withRel(c.call)+'.',
     sub:'Week '+c.week+' of 13. I can pull a brief from where the cohort actually is.',
     chips:[{l:'Open brief',a:'brief:'+c.id,p:1},{l:'Brief me for the next call',a:'talask:Brief me for the next call'}]};
 }
@@ -6801,7 +6853,7 @@ function banner(){
     h:bh+' candidate'+(bh===1?'':'s')+' behind the expected pace',
     s:'Their chapter progress and assessment scores come back from the course platform.',
     c:'Open course reports',a:'nav:reports'};
-  else { var c=COHORTS[0]; b={i:'cohorts',k:'Next call',h:'Cohort '+c.id+' \u00b7 '+esc(c.call),
+  else { var c=COHORTS[0]; b={i:'cohorts',k:'Next call',h:''+cohortName(c)+' \u00b7 '+esc(c.call),
     s:'Week '+c.week+' of 13.',c:'Open brief',a:'brief:'+c.id}; }
   return '<div class="bnr"><span class="bnr-ic">'+ico(b.i)+'</span>'
     +'<div class="bnr-t"><div class="bnr-k">'+b.k+'</div><div class="bnr-h">'+b.h+'</div>'
@@ -6815,23 +6867,23 @@ V.overview=function(){
   +'</div></div>'
   +'<div class="g4">'
   +'<div class="stat"><div class="l">Active cohorts</div><div class="v">'+COHORTS.length+'</div><div class="f">'+allMembers().length+' candidates</div></div>'
-  +'<div class="stat"><div class="l">Need attention</div><div class="v" style="color:#000000">'+att.length+'</div><div class="f">Behind, idle or struggling</div></div>'
+  +'<div class="stat stat-link" data-ag="attn" role="button" tabindex="0" title="View the attention queue"><div class="l">Need attention</div><div class="v" style="color:#000000">'+att.length+'</div><div class="f">Behind, idle or struggling <span class="stat-go">View queue <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path d="M3 8h8M8 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="stat-arrow" aria-hidden="true"><svg viewBox="0 0 16 16" width="13" height="13"><path d="M3 8h8M8 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>'
   +'<div class="stat"><div class="l">Waiting on you</div><div class="v" style="color:#000000">'+pendingWork()+'</div><div class="f">Evaluations and summaries</div></div>'
   +'<div class="stat"><div class="l">Interviews booked</div><div class="v">'+SESSIONS.filter(function(s){return s.state==='upcoming';}).length+'</div><div class="f">'+(next?withRel(next.when):'none')+'</div></div>'
   +'</div></div><div class="g21 mt"><div><div class="card"><h3>Upcoming cohort calls</h3>'
   +COHORTS.map(function(c){
     var bad=c.members.filter(function(m){return m.flag&&m.flag.k==='bad';}).length;
-    return '<div class="li"><div class="dot '+(bad?'':'ok')+'">'+c.id+'</div><div class="f1">'
-    +'<div class="t">Cohort '+c.id+' · week '+c.week+' of 13 <span class="tag">'+lvlLabel(c.level)+'</span></div>'
+    return '<div class="li"><div class="dot '+(bad?'':'ok')+'">'+c.level+'</div><div class="f1">'
+    +'<div class="t">'+cohortName(c)+' · week '+c.week+' of 13 <span class="tag">'+lvlLabel(c.level)+'</span></div>'
     +'<div class="s">'+withRel(c.call)+' · avg progress '+avgOf(c,'pc')+'% vs '+pace(c)+'% expected'
     +(bad?' · <span style="color:#000000">'+bad+' at risk</span>':'')+'</div></div>'
     +'<button class="btn sm" data-ag="brief:'+c.id+'">Brief</button>'
     +'<button class="btn p sm" data-ag="cohort:'+c.id+'">Open</button></div>';
   }).join('')
-  +'</div><div class="card mt"><h3>Attention queue <span class="r">derived from course activity</span></h3>'
+  +'</div><div class="card mt" id="ag-attn-queue"><h3>Attention queue <span class="r">derived from course activity</span></h3>'
   +'<table class="tb"><tr><th>Candidate</th><th>Cohort</th><th>Flag</th><th>Signal</th><th></th></tr>'
   +att.slice(0,7).map(function(x){
-    return '<tr><td class="nm">'+esc(x.m.name)+'</td><td class="mono">'+x.c.id+'</td>'
+    return '<tr><td class="nm">'+esc(x.m.name)+'</td><td class="mono">'+x.c.level+'</td>'
     +'<td>'+flagTag(x.m.flag)+'</td><td class="mono">'+x.m.pc+'% vs '+pace(x.c)+'% · last active '+esc(x.m.last).toLowerCase()+'</td>'
     +'<td style="text-align:right"><button class="btn sm" data-ag="member:'+x.c.id+':'+esc(x.m.name)+'">View</button></td></tr>';
   }).join('')
@@ -6847,8 +6899,8 @@ V.overview=function(){
     +'<button class="btn sm" data-ag="eval:'+e.id+'">Decide</button></div>';}).join('')
   +SUMMARIES.filter(function(s){return s.status==='pending';}).map(function(s){
     return '<div class="li"><div class="dot">✎</div><div class="f1"><div class="t">'+esc(s.name)+'</div>'
-    +'<div class="s">90-day summary · cohort '+s.cohort+'</div></div>'
-    +'<button class="btn sm" data-ag="summary:'+s.id+'">Write</button></div>';}).join('')
+    +'<div class="s">90-day summary · cohort '+cohortLvlOf(s.cohort)+'</div></div>'
+    +'<button class="btn sm" data-ag="summary:'+s.id+'">Recommend</button></div>';}).join('')
   +(!pendingWork()?'<div class="sub">Nothing outstanding.</div>':'')
   +'</div><div class="card mt"><h3>Your standing</h3>'
   +'<div class="kv"><span>Rank</span><b>4.9</b></div>'
@@ -6867,8 +6919,6 @@ V.interviews=function(){
   var sub=(pendEv?pendEv+' completed session'+(pendEv===1?'':'s')+' still need'+(pendEv===1?'s':'')+' an evaluation within 48 hours. ':'')
     +(nx?'You have their quiz title but not their level — that number is what the session sets.':'Open availability to let candidates book you.');
   return talRead(lead,sub,nx?[{l:'Join session',a:'join:'+nx.id,p:1},{l:'Who am I interviewing?',a:'talask:Tell me about my upcoming interviews'}]:[{l:'Manage availability',a:'avail',p:1}])
-  +'<div class="row ac" style="margin-bottom:16px"><div class="f1"></div>'
-  +'<button class="btn sm" data-ag="avail">Manage availability</button></div>'
   +'<div class="card"><h3>Upcoming</h3>'
   +SESSIONS.filter(function(s){return s.state==='upcoming';}).map(function(s){
     return '<div class="li"><div class="dot now">◔</div><div class="f1"><div class="t">'+esc(s.name)+'</div>'
@@ -6905,8 +6955,8 @@ V.evaluations=function(){
   +SUMMARIES.map(function(s){
     return '<div class="li"><div class="dot '+(s.status==='pending'?'':'ok')+'">'+(s.status==='pending'?'✎':'✓')+'</div>'
     +'<div class="f1"><div class="t">'+esc(s.name)+'</div>'
-    +'<div class="s">Cohort '+s.cohort+' · '+s.pc+'% complete · assessment avg '+s.avg+'% · '+s.calls+' of '+s.of+' calls</div></div>'
-    +(s.status==='pending'?'<button class="btn p sm" data-ag="summary:'+s.id+'">Write</button>'
+    +'<div class="s">'+cohortName(s.cohort)+' · '+s.pc+'% complete · assessment avg '+s.avg+'% · '+s.calls+' of '+s.of+' calls</div></div>'
+    +(s.status==='pending'?'<button class="btn p sm" data-ag="summary:'+s.id+'">Recommend</button>'
       :'<span class="tag ok">Published · '+esc(s.rec)+'</span>')+'</div>';}).join('')
   +'</div>'
   +'<div class="note i mt"><b>Open question — client decision (deferred; Maryam asked)</b>The candidate is scored by the AI on how well the interview surfaced their best material. Whether the agent sees their own score — and what a low score costs them (pay, visibility or delisting) — is not yet decided. Scores show here for the prototype with no downstream consequence.</div>';
@@ -6917,12 +6967,12 @@ V.cohorts=function(){
   var worst=COHORTS.slice().sort(function(a,b){return (avgOf(a,'pc')-pace(a))-(avgOf(b,'pc')-pace(b));})[0];
   var totFlag=allMembers().filter(function(x){return x.m.flag;}).length;
   var lead=COHORTS.length+' cohorts running · '+totFlag+' candidate'+(totFlag===1?'':'s')+' flagged across them.';
-  var sub=worst?('Cohort '+worst.id+' is furthest off its expected pace ('+avgOf(worst,'pc')+'% vs '+pace(worst)+'%) — the group most worth a look first. Behind-pace usually recovers; it is the never-signed-in and long-idle names inside each roster that need action.'):'All cohorts are roughly on their expected pace.';
-  return talRead(lead,sub,worst?[{l:'Open Cohort '+worst.id,a:'cohort:'+worst.id,p:1},{l:'Analyse cohort '+worst.id,a:'talask:Analyse cohort '+worst.id}]:[])
+  var sub=worst?(cohortName(worst)+' is furthest off its expected pace ('+avgOf(worst,'pc')+'% vs '+pace(worst)+'%) — the group most worth a look first. Behind-pace usually recovers; it is the never-signed-in and long-idle names inside each roster that need action.'):'All cohorts are roughly on their expected pace.';
+  return talRead(lead,sub,worst?[{l:'Open '+cohortName(worst),a:'cohort:'+worst.id,p:1},{l:'Analyse cohort '+worst.id,a:'talask:Analyse cohort '+worst.id}]:[])
   +'<div class="g3">'+COHORTS.map(function(c){
     var bad=c.members.filter(function(m){return m.flag&&m.flag.k==='bad';}).length;
     var wa=c.members.filter(function(m){return m.flag&&m.flag.k==='wa';}).length;
-    return '<div class="card"><h3>Cohort '+c.id+' <span class="r"><span class="tag">'+lvlLabel(c.level)+'</span></span></h3>'
+    return '<div class="card"><h3>'+cohortName(c)+' <span class="r"><span class="tag">'+lvlLabel(c.level)+'</span></span></h3>'
     +'<div class="sub" style="margin:-6px 0 12px">Week '+c.week+' of 13 · day '+c.day+' of 90</div>'
     +'<div class="blab"><span>Avg progress</span><span>'+avgOf(c,'pc')+'% vs '+pace(c)+'%</span></div>'
     +'<div class="bar"><i class="'+(avgOf(c,'pc')>=pace(c)?'ok':'wa')+'" style="width:'+avgOf(c,'pc')+'%"></i></div>'
@@ -6945,7 +6995,7 @@ function cohortDetail(c){
   var d=avgOf(c,'pc')-pace(c);
   var weakest=c.members.slice().filter(function(m){return m.avg>0;}).sort(function(a,b){return a.avg-b.avg;})[0];
   var risk=c.members.filter(function(m){return m.flag&&m.flag.k==='bad';});
-  var lead='Cohort '+c.id+' is '+(d>=0?'on pace':Math.abs(d)+' points behind')+' at week '+c.week+' of 13.';
+  var lead=''+cohortName(c)+' is '+(d>=0?'on pace':Math.abs(d)+' points behind')+' at week '+c.week+' of 13.';
   var sub=(risk.length?risk.length+' at risk — '+risk.slice(0,2).map(function(m){return esc(m.name);}).join(' and ')+(risk.length>2?' and others':'')+'. Raise them privately, never in the group. ':'Nobody is at risk right now. ')
     +(weakest?'Weakest on assessments is '+esc(weakest.name)+' at '+weakest.avg+'%.':'');
   return talRead(lead,sub,[{l:'Generate brief',a:'brief:'+c.id,p:1},{l:'Who needs attention here?',a:'talask:Who is at risk in cohort '+c.id}])
@@ -6990,13 +7040,13 @@ function memberDetail(m,c){
     +'<td class="mono">'+(at||'—')+'</td></tr>';
   }
   return '<div class="row ac" style="margin-bottom:14px">'
-  +'<button class="btn sm" data-ag="cohort:'+c.id+'">← Cohort '+c.id+'</button><div class="f1"></div>'
+  +'<button class="btn sm" data-ag="cohort:'+c.id+'">← '+cohortName(c)+'</button><div class="f1"></div>'
   +'<button class="btn sm" data-ag="msgone:'+esc(m.name)+'">Message</button>'
-  +'<button class="btn p sm" data-ag="note:'+esc(m.name)+'">'+(m.note?'Edit note':'Add note')+'</button></div>'
+  +'<button class="btn p sm" data-ag="note:'+esc(m.name)+'">+ Add note</button></div>'
   +'<div class="row ac" style="margin-bottom:15px">'
   +(window.TNAVATAR?TNAVATAR(m.name,'','width:44px;height:44px;flex:0 0 44px;font-size:15px'):'')
   +'<div class="f1"><h2 style="font-size:18px">'+esc(m.name)+' <span class="tag lv" style="font-size:10px">'+m.lvl+'</span> '+flagTag(m.flag)+'</h2>'
-  +'<p class="sub hd-desc">Cohort '+c.id+' · week '+c.week+' · last active '+esc(m.last).toLowerCase()+'</p></div></div>'
+  +'<p class="sub hd-desc">'+cohortName(c)+' · week '+c.week+' · last active '+esc(m.last).toLowerCase()+'</p></div></div>'
   +(function(){
     var read = m.att>=2&&m.avg<75 ? 'High attempts with a low average — '+esc(m.name.split(' ')[0])+' is trying, not absorbing. The material is landing badly, not the effort.'
       : d<=-15 ? esc(m.name.split(' ')[0])+' is well behind pace ('+m.pc+'% vs '+pace(c)+'% expected). Worth direct outreach before the next call.'
@@ -7004,7 +7054,7 @@ function memberDetail(m,c){
       : d<=-5 ? 'A few points behind pace, which usually recovers on its own. Keep an eye rather than intervene.'
       : 'Nothing alarming in the numbers — on or ahead of pace with assessments holding up.';
     return talRead('Tal reads '+esc(m.name.split(' ')[0])+'’s record',read,
-      [{l:'Full report',a:'talask:Report on '+m.name,p:1},{l:m.note?'Edit note':'Add note',a:'note:'+esc(m.name)}]);
+      [{l:'Full report',a:'talask:Report on '+m.name,p:1},{l:'Add note',a:'note:'+esc(m.name)}]);
   })()
   +'<div class="g21"><div><div class="card"><h3>Where they are</h3><div class="g4">'
   +'<div class="stat"><div class="l">Progress</div><div class="v">'+m.pc+'<s>%</s></div><div class="f">'+(d>=0?'+':'')+d+' vs pace</div></div>'
@@ -7027,9 +7077,14 @@ function memberDetail(m,c){
   +'<div class="kv"><span>AI proposed</span><b>'+m.lvl[0]+Math.min(5,+m.lvl[1]+1)+'</b></div>'
   +'<div class="kv"><span>Assigned</span><b>'+m.lvl+' <span class="tag wa">override</span></b></div>'+'<div class="kv"><span>Next step</span><b>'+lvlLabel(nextLvl(m.lvl))+'</b></div>'
   +'<div class="sub" style="margin-top:9px">The reviewer went below the AI here, so this level should be within reach. Persistent struggle means something other than placement is going on.</div></div>'
-  +'<div class="card mt"><h3>Private notes</h3><div class="ph" style="min-height:70px;padding:12px">'
-  +(m.note?esc(m.note):'No notes yet. These feed the 90-day summary.')+'</div>'
-  +'<button class="btn sm mt8" data-ag="note:'+esc(m.name)+'">'+(m.note?'Edit note':'Add note')+'</button></div>'
+  +(function(){var ns=memberNotes(m);
+    return '<div class="card mt"><h3>Private notes'+(ns.length?' <span class="r">'+ns.length+'</span>':'')+'</h3>'
+    +(ns.length?ns.map(function(n,i){
+      return '<div class="ag-note"><button class="ag-note-body" data-ag="noteedit:'+esc(m.name)+':'+i+'">'
+      +'<div class="ag-note-t">'+esc(n.t)+'</div><div class="ag-note-w">'+esc(n.w||'')+'</div></button>'
+      +'<button class="ag-note-del" data-ag="notedel:'+esc(m.name)+':'+i+'" aria-label="Delete note" title="Delete">✕</button></div>';}).join('')
+      :'<div class="ph" style="min-height:60px;padding:12px">No notes yet. These feed the 90-day summary.</div>')
+    +'<button class="btn sm mt8" data-ag="note:'+esc(m.name)+'">+ Add note</button></div>';})()
   +'<div class="card mt"><h3>Attendance</h3>'
   +'<div class="kv"><span>Calls attended</span><b>'+Math.max(0,c.week-(m.flag&&m.flag.k==='bad'?3:1))+' of '+c.week+'</b></div>'
   +'<div class="kv"><span>Assessments passed first time</span><b>'+Math.max(0,Math.round(m.pc/100*13)-(m.att>1?1:0))+' of '+Math.round(m.pc/100*13)+'</b></div></div>'
@@ -7037,22 +7092,31 @@ function memberDetail(m,c){
 }
 
 V.reports=function(){
-  var all=allMembers(), bh=behind(), wk=weakAssess();
-  var worst=bh[0];
-  var lead=bh.length?bh.length+' candidate'+(bh.length===1?' is':'s are')+' behind the expected pace'+(wk.length?', and '+wk.length+' '+(wk.length===1?'is':'are')+' scoring below the 75% pass mark.':'.'):'Everyone is on or ahead of pace.';
+  var bhAll=behind(), wkAll=weakAssess(), allAll=allMembers();
+  var worst=bhAll[0];
+  var lead=bhAll.length?bhAll.length+' candidate'+(bhAll.length===1?' is':'s are')+' behind the expected pace'+(wkAll.length?', and '+wkAll.length+' '+(wkAll.length===1?'is':'are')+' scoring below the 75% pass mark.':'.'):'Everyone is on or ahead of pace.';
   var sub=(worst?esc(worst.m.name)+' is furthest behind ('+worst.m.pc+'% vs '+pace(worst.c)+'% expected). ':'')
-    +'Everything here comes straight from the course platform — chapters, assessment scores and revolutions. I cannot see the quality of their thinking from this; that needs their written answers.';
-  return talRead(lead,sub,bh.length?[{l:worst?'Open '+esc(worst.m.name.split(' ')[0]):'Open first',a:worst?'member:'+worst.c.id+':'+esc(worst.m.name):'nav:reports',p:1},{l:'Who is at risk right now?',a:'talask:Who is at risk right now'}]:[])
+    +'These are course-platform metrics only — not the quality of their thinking, which needs their written answers.';
+  /* cohort filter — the reports list is scoped to the selected cohort */
+  var sel=(G.repCohort==null?'all':String(G.repCohort));
+  var inSel=function(x){ return sel==='all' || x.c.id===+sel; };
+  var all=allAll.filter(inSel), bh=bhAll.filter(inSel), wk=wkAll.filter(inSel);
+  var tabs='<div class="rep-tabs">'
+    +'<button class="rep-tab'+(sel==='all'?' on':'')+'" data-ag="reptab:all">All cohorts <em>'+allAll.length+'</em></button>'
+    +COHORTS.map(function(c){return '<button class="rep-tab'+(sel!=='all'&&+sel===c.id?' on':'')+'" data-ag="reptab:'+c.id+'">'+cohortName(c)+' <em>'+c.members.length+'</em></button>';}).join('')
+    +'</div>';
+  return talRead(lead,sub,bhAll.length?[{l:worst?'Open '+esc(worst.m.name.split(' ')[0]):'Open first',a:worst?'member:'+worst.c.id+':'+esc(worst.m.name):'nav:reports',p:1},{l:'Who is at risk right now?',a:'talask:Who is at risk right now'}]:[])
+  +tabs
   +'<div class="row ac" style="margin-bottom:16px"><div class="f1"></div>'
-  +'<span class="tag">'+all.length+' candidates</span>'
+  +'<span class="tag">'+all.length+' candidate'+(all.length===1?'':'s')+'</span>'
   +(bh.length?'<span class="tag wa">'+bh.length+' behind pace</span>':'')
   +(wk.length?'<span class="tag wa">'+wk.length+' below 75%</span>':'')+'</div>'
   +'<div class="card" style="padding:0 17px 8px">'
-  +'<h3 style="padding-top:15px">Course progress <span class="r">chapters, assessments and revolutions</span></h3>'
+  +'<h3 style="padding-top:15px">Course progress <span class="r">'+(sel==='all'?'chapters, assessments and revolutions':cohortName(+sel)+' · chapters, assessments and revolutions')+'</span></h3>'
   +all.map(function(x){
     var m=x.m, d=m.pc-pace(x.c), chDone=Math.round(m.pc/100*13);
     return '<div class="li">'+barFor(m,x.c)
-    +'<div class="f1"><div class="t">'+esc(m.name)+' <span class="tag">Cohort '+x.c.id+'</span> '
+    +'<div class="f1"><div class="t">'+esc(m.name)+' <span class="tag">'+cohortName(x.c)+'</span> '
     +(d<=-5?'<span class="tag wa">'+Math.abs(d)+' behind</span>':'')
     +(m.avg<75?'<span class="tag wa">assessments '+m.avg+'%</span>':'')+'</div>'
     +'<div class="s">'+chDone+' of 13 chapters · assessment avg '+m.avg+'% · '+m.att+' revolutions · '
@@ -7069,9 +7133,9 @@ V.messages=function(){
     return '<div class="li" style="cursor:pointer'+(i===G.thread?';background:var(--fa);border-radius:10px;padding-left:8px;padding-right:8px':'')+'" data-ag="thread:'+i+'">'
     +(window.TNAVATAR?TNAVATAR(x.who,'','width:30px;height:30px;flex:0 0 30px;font-size:11px'):'')
     +'<div class="f1"><div class="t" style="'+(i===G.thread?'color:#000000':'')+'">'+esc(x.who)+'</div>'
-    +'<div class="s">Cohort '+x.cohort+' · '+x.msgs.length+' message'+(x.msgs.length===1?'':'s')+'</div></div>'
+    +'<div class="s">'+cohortName(x.cohort)+' · '+x.msgs.length+' message'+(x.msgs.length===1?'':'s')+'</div></div>'
     +(x.msgs[x.msgs.length-1].me===0?'<span class="tag wa">Reply</span>':'')+'</div>';}).join('')
-  +'</div><div class="card msg-ag-conv"><h3>'+esc(t.who)+' <span class="r">Cohort '+t.cohort+'</span></h3>'
+  +'</div><div class="card msg-ag-conv"><h3>'+esc(t.who)+' <span class="r">'+cohortName(t.cohort)+'</span></h3>'
   +'<div class="msg-ag-scroll" id="agMsgScroll"><div class="msg">'
   +t.msgs.map(function(m){return '<div class="bub '+(m.me?'me':'them')+'">'+esc(m.t)+'<div class="w">'+esc(m.w)+'</div></div>';}).join('')
   +'</div></div><hr class="d"><div class="row"><input class="inp f1" id="agMsgIn" placeholder="Write a reply…">'
@@ -7105,7 +7169,11 @@ V.earnings=function(){
 };
 
 V.profile=function(){
-  return '<div class="g21"><div><div class="card"><h3>Listing</h3><div class="g2">'
+  return '<div class="g21"><div><div class="card"><h3>Listing</h3>'
+  +'<div class="pf-photo"><span class="pf-av">'+(window.TNAVATAR?TNAVATAR('Dana Whitfield','','width:64px;height:64px;flex:0 0 64px;font-size:22px'):'')+'</span>'
+  +'<div class="f1"><div class="pf-photo-t">Profile photo</div><div class="sub">Shown on your marketplace card — a square image, at least 400×400px.</div>'
+  +'<button class="btn sm mt8" data-ag="photo"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Upload photo</button></div></div>'
+  +'<div class="g2">'
   +'<div><label class="fl">Display name</label><input class="inp" value="Dana Whitfield"></div>'
   +'<div><label class="fl">Specialism</label><input class="inp" value="T-band operators"></div></div>'
   +'<div class="mt"><label class="fl">Bio shown on your card</label>'
@@ -7114,8 +7182,10 @@ V.profile=function(){
   +'<div><label class="fl">Session length</label><select class="inp"><option>45 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>'
   +'<div><label class="fl">Free first interview</label><select class="inp"><option>No</option><option>Yes</option></select></div></div>'
   +'<button class="btn p mt" data-ag="saveprofile">Save profile</button></div>'
-  +'<div class="card mt"><h3>Availability</h3><p class="sub" style="margin:0 0 11px">Candidates can only book slots you open here.</p>'
-  +'<div class="row">'+['Mon','Tue','Wed','Thu','Fri'].map(function(d){return '<button class="btn sm" data-ag="avail">'+d+'</button>';}).join('')+'</div></div></div>'
+  +'<div class="card mt"><h3>Availability</h3><p class="sub" style="margin:0 0 12px">Candidates can only book the slots you open.</p>'
+  +'<div class="avl-box"><span class="avl-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>'
+  +'<div class="f1"><div class="avl-t">Weekly calendar</div><div class="sub">Open the times you want candidates to book from your card.</div></div>'
+  +'<button class="btn p sm" data-ag="availcal">Manage availability</button></div></div></div>'
   +'<div><div class="card"><h3>Rank inputs <span class="r">read-only</span></h3>'
   +'<div class="kv"><span>Overall rank</span><b>4.9</b></div>'
   +'<div class="kv"><span>Interviews conducted</span><b>62</b></div>'
@@ -7132,173 +7202,6 @@ V.profile=function(){
   +'</div></div></div>';
 };
 
-/* Highlight-clip approval (new agent step from Aug 05: AI shortlists → agent approves → candidate picks finals) */
-V.clips=function(){
-  if(!G.clips) G.clips={picks:{}};
-  var done=SESSIONS.filter(function(s){return s.state==='done';});
-  var CLIPS=[
-   {t:'“The handover I avoided twice”',len:'0:42',theme:'Ownership',ai:92},
-   {t:'“Reading the room before the restructure”',len:'1:05',theme:'Judgement',ai:88},
-   {t:'“Why I cut the weekly meeting”',len:'0:37',theme:'Decisiveness',ai:81},
-   {t:'“The feedback that did not land”',len:'0:55',theme:'Growth',ai:74}];
-  var picked=Object.keys(G.clips.picks).filter(function(k){return G.clips.picks[k];}).length;
-  var top=CLIPS.slice().sort(function(a,b){return b.ai-a.ai;})[0];
-  return talRead('I pulled '+CLIPS.length+' highlight'+(CLIPS.length===1?'':'s')+' from '+esc((done[0]||{name:'this'}).name)+'’s interview.',
-    'Ranked by how strongly each moment lands — the strongest is '+esc(top.t)+' ('+top.theme.toLowerCase()+', '+top.ai+'% confidence). Approve the ones worth keeping; the candidate picks their finals from your shortlist. I shortlist, you approve, they choose — nobody is skipped.',
-    [{l:'Send shortlist',a:'sendclips',p:1}])
-  +'<div class="row ac" style="margin-bottom:16px"><div class="f1"></div>'
-  +'<span class="tag">'+picked+' approved</span></div>'
-  +'<div class="card"><h3>Highlight clips <span class="r">'+esc((done[0]||{name:'—'}).name)+' · '+esc((done[0]||{when:''}).when)+'</span></h3>'
-  +'<div class="sub" style="margin:-4px 0 12px">AI identifies highlights from the interview transcript. You approve a shortlist; the candidate then picks the final clips for their profile and socials.</div>'
-  +CLIPS.map(function(c,i){
-    var on=!!G.clips.picks[i];
-    return '<div class="li"><div class="dot '+(on?'ok':'')+'">'+(on?'✓':(i+1))+'</div>'
-    +'<div class="f1"><div class="t">'+esc(c.t)+'</div>'
-    +'<div class="s">'+esc(c.len)+' · '+esc(c.theme)+' · AI confidence '+c.ai+'%</div></div>'
-    +'<button class="btn sm" data-ag="watch">Preview</button>'
-    +'<button class="btn '+(on?'':'p ')+'sm" data-ag="clip:'+i+'">'+(on?'Approved':'Approve')+'</button></div>';
-  }).join('')
-  +'<div class="row mt"><div class="f1"></div><button class="btn p" data-ag="sendclips">Send shortlist to candidate</button></div></div>'
-  +'<div class="note i mt"><b>Automation to come</b>The clip identification is manual today and will be replaced by an automated tool; the agent-approval step stays human.</div>';
-};
-
-/* =========================================================
-   NEW-AGENT STAGE  (Prototype chip: "New agent")
-   How a brand-new agent lands: a getting-started dashboard with empty
-   operate sections + the onboarding wizard. No go-live — an agent does not
-   publish themselves; the platform assigns them to a cohort, and that
-   assignment (the "Assigned agent" chip) is where the operating dashboard begins.
-   Grounding flagged inline: .note w = assumption, .note i = open question.
-   ========================================================= */
-var NB_STEPS=[
- {v:'apply',stage:0},{v:'vetting',stage:0},
- {v:'account',stage:1},{v:'profile',stage:1},{v:'fee',stage:1},{v:'payout',stage:1},
- {v:'training',stage:2},{v:'certify',stage:2},{v:'ready',stage:2}];
-var NB_STAGES=['Apply & vet','Account, listing & money','Enablement'];
-function nbIdx(v){ for(var i=0;i<NB_STEPS.length;i++){ if(NB_STEPS[i].v===v) return i; } return 0; }
-function nbStepper(cur){ var si=NB_STEPS[nbIdx(cur)].stage;
-  return '<div class="card"><div class="step">'+NB_STAGES.map(function(l,i){
-    return '<div class="'+(i<si?'done':i===si?'now':'')+'"><div class="b"></div><div class="n">'+esc(l)+'</div><div class="x">&nbsp;</div></div>';
-  }).join('')+'</div></div>'; }
-function assume(t){ return '<div class="note w mt"><b>Assumption — not yet confirmed by Derek/Umair</b>'+esc(t)+'</div>'; }
-function openQ(t){ return '<div class="note i mt"><b>Open question — client decision needed</b>'+esc(t)+'</div>'; }
-function nbHead(cur){ return '<div class="row ac" style="margin-bottom:14px">'
-  +'<button class="btn sm" data-ag="nav:overview">✕ Exit setup</button><div class="f1"></div>'
-  +'<span class="tag">Step '+(nbIdx(cur)+1)+' of '+NB_STEPS.length+'</span></div>'+nbStepper(cur); }
-function nbFoot(cur,label,go){ var i=nbIdx(cur);
-  var back=i>0?'<button class="btn sm" data-ag="nbgo:'+NB_STEPS[i-1].v+'">← Back</button>':'<span></span>';
-  return '<div class="row mt"><div class="f1">'+back+'</div><button class="btn p" data-ag="'+go+'">'+esc(label)+'</button></div>'; }
-function nbSnap(){ var m={'nb-name':'name','nb-role':'role','nb-exp':'exp','nb-spec':'spec','nb-letters':'letters','nb-mot':'mot','nb-bio':'bio','nb-fee':'fee','nb-len':'len'};
-  Object.keys(m).forEach(function(id){ var el=document.getElementById(id); if(el) G.nb.data[m[id]]=el.value; }); }
-
-var NV={};
-NV.overview=function(){
-  var d=G.nb.data, name=d.name||'';
-  var status=G.nb.done?'Setup complete · awaiting your first cohort assignment':(G.nb.started?'Setup in progress':'Not started yet');
-  var lastOfStage=function(i){ var last=-1; NB_STEPS.forEach(function(o,ix){ if(o.stage===i) last=ix; }); return last; };
-  var stageDone=function(i){ return G.nb.done || (G.nb.started && nbIdx(G.nb.step)>lastOfStage(i)); };
-  var cta=G.nb.done?'nav:profile':'nbstart', ctaLabel=G.nb.done?'Review profile':(G.nb.started?'Continue setup':'Start setup');
-  return '<div class="bnr"><span class="bnr-ic">'+(window.TNICON?TNICON('profile'):'★')+'</span>'
-   +'<div class="bnr-t"><div class="bnr-k">Welcome to TalentNext</div>'
-   +'<div class="bnr-h">'+esc(name?('Welcome, '+name):'You’re a new Talent Agent')+'</div>'
-   +'<div class="bnr-s">You’ve been approved to become a Talent Agent. There’s a short setup before you interview — then the platform matches you to a cohort. — <b>'+esc(status)+'</b></div></div>'
-   +'<button class="bnr-b" data-ag="'+cta+'">'+ctaLabel+'</button></div>'
-   +'<div class="card mt"><h3>Get set up <span class="r">'+(G.nb.done?'Done':((nbIdx(G.nb.step)+(G.nb.started?1:0))+' of '+NB_STEPS.length+' steps'))+'</span></h3>'
-   +NB_STAGES.map(function(s,i){ return '<div class="li"><div class="dot '+(stageDone(i)?'ok':'')+'">'+(stageDone(i)?'✓':(i+1))+'</div><div class="f1"><div class="t">'+esc(s)+'</div></div>'+(stageDone(i)?'<span class="tag ok">Done</span>':'<span class="tag">To do</span>')+'</div>'; }).join('')
-   +'<div class="row mt"><div class="f1"></div><button class="btn p" data-ag="'+cta+'">'+ctaLabel+'</button></div></div>'
-   +'<div class="g2"><div class="card"><h3>Your cohorts</h3><div class="empty"><div class="e">◇</div><h3>No cohort yet</h3><p>You’ll be assigned to your first cohort after setup. That’s where the working dashboard begins — roster, briefs, evaluations.</p></div></div>'
-   +'<div class="card"><h3>Interviews</h3><div class="empty"><div class="e">◔</div><h3>No interviews yet</h3><p>Once you’re set up, candidates can book interviews with you here.</p></div></div></div>'
-   +'<div class="card"><h3>Earnings</h3><div class="empty"><div class="e">£</div><h3>Nothing to settle yet</h3><p>Your settlements appear here after your first paid interview or cohort.</p></div></div>';
-};
-NV.interviews=function(){ return '<div class="card"><div class="empty"><div class="e">◔</div><h3>No interviews scheduled</h3><p>Candidates book interviews once you’re set up and listed. Finish setup to continue.</p></div>'
-  +'<div class="row mt"><div class="f1"></div><button class="btn p sm" data-ag="'+(G.nb.done?'nav:overview':'nbstart')+'">'+(G.nb.done?'Back to dashboard':'Finish setup')+'</button></div></div>'; };
-NV.cohorts=function(){ return '<div class="card"><div class="empty"><div class="e">◇</div><h3>Not assigned to a cohort</h3><p>A new agent isn’t running a cohort yet. The platform assigns you once you’re set up — that assignment unlocks the full operating dashboard.</p></div></div>'
-  +openQ('The assignment step — who assigns an agent to a cohort, and on what basis — sits outside this prototype and is still to be defined with the client.'); };
-NV.earnings=function(){ return '<div class="card"><div class="empty"><div class="e">£</div><h3>No earnings yet</h3><p>Candidates pay TalentNext into escrow; your share is released on completion. Nothing has run yet.</p></div></div>'
-  +assume('Prototyping the 20/80 split (you keep 80%). This conflicts with the earlier $100/month listing-fee model, which the client hasn’t reconciled.'); };
-NV.profile=function(){ var d=G.nb.data;
-  if(!G.nb.done && !d.name) return '<div class="card"><div class="empty"><div class="e">☺</div><h3>Profile not built yet</h3><p>Your public profile is created during setup.</p></div><div class="row mt"><div class="f1"></div><button class="btn p sm" data-ag="nbstart">Start setup</button></div></div>';
-  return '<div class="card"><h3>Public profile <span class="r">'+(G.nb.done?'ready — pending assignment':'draft')+'</span></h3>'
-   +'<div class="kv"><span>Name</span><b>'+esc(d.name||'—')+'</b></div>'
-   +'<div class="kv"><span>Specialism</span><b>'+esc(d.spec||'—')+'</b></div>'
-   +'<div class="kv"><span>Fee</span><b>'+(d.fee?'£'+esc(d.fee):'—')+' · '+esc(d.len||'45 minutes')+'</b></div>'
-   +'<div class="kv"><span>Bio</span><b style="max-width:60%;text-align:right;font-weight:400">'+esc(d.bio||'—')+'</b></div></div>'; };
-
-function nbWizard(step){
-  var d=G.nb.data;
-  switch(step){
-  case 'apply': return nbHead('apply')+'<div class="card"><h3>Apply to become a Talent Agent</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Grounded (Aug 05): agents apply via a form and are vetted by the platform team.</div>'
-    +'<div class="g2"><div><label class="fl">Full name</label><input class="inp" id="nb-name" value="'+esc(d.name||'')+'" placeholder="e.g. Dana Whitfield"></div>'
-    +'<div><label class="fl">Current role &amp; company</label><input class="inp" id="nb-role" value="'+esc(d.role||'')+'" placeholder="Director of Operations · Meridian Logistics"></div></div>'
-    +'<div class="mt"><label class="fl">Leadership experience</label><textarea class="inp" id="nb-exp" placeholder="Years leading teams, sectors, what you are known for">'+esc(d.exp||'')+'</textarea></div>'
-    +'<div class="g2 mt"><div><label class="fl">Specialism</label><input class="inp" id="nb-spec" value="'+esc(d.spec||'')+'" placeholder="e.g. B-band, scale-ups"></div>'
-    +'<div><label class="fl">TALENT letters you interview for</label><input class="inp" id="nb-letters" value="'+esc(d.letters||'')+'" placeholder="E, B, T"></div></div>'
-    +'<div class="mt"><label class="fl">Why do you want to interview candidates?</label><textarea class="inp" id="nb-mot" placeholder="Your motivation">'+esc(d.mot||'')+'</textarea></div>'
-    +'<div class="mt"><label class="fl">References</label><input class="inp" id="nb-ref" placeholder="Two professional referees"></div></div>'
-    +nbFoot('apply','Submit application','nbgo:vetting');
-  case 'vetting': return nbHead('vetting')+'<div class="card"><h3>Application under review</h3>'
-    +'<div class="li"><div class="dot now">◔</div><div class="f1"><div class="t">Vetted by the platform team</div><div class="s">Grounded (Aug 05): approval sits with the TalentNext platform team.</div></div><span class="tag wa">Pending review</span></div>'
-    +'<hr class="d"><div class="sub" style="margin-bottom:8px">Reviewer controls (admin shell — act as the reviewer for the prototype):</div>'
-    +'<div class="row"><button class="btn p" data-ag="nbgo:account">Approve</button><button class="btn" data-ag="nbreject">Reject</button></div></div>'
-    +openQ('The vetting BAR, the rejection path, and background checks are undefined. This is a live safeguarding gap: agents run recorded 1:1 video interviews with 18–24 year olds, so background checking is a safeguarding question, not an admin one.')
-    +'<div class="row mt"><button class="btn sm" data-ag="nbgo:apply">← Back</button></div>';
-  case 'account': return nbHead('account')+'<div class="card"><h3>Add the agent role to your account</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Roles stack: an approved applicant is often already a candidate, so being an agent is a role added to the existing account — not a separate account type.</div>'
-    +'<div class="kv"><span>Signed in as</span><b>'+esc(d.name||'You')+' · Candidate</b></div>'
-    +'<div class="kv"><span>Adding role</span><b>Talent Agent <span class="tag">new</span></b></div>'
-    +'<label class="row ac mt" style="gap:8px"><input type="checkbox" checked> I understand my agent and candidate roles share one login.</label></div>'
-    +assume('The account model was never discussed in the calls. We’re prototyping the roles-stack rule (a role flag on the existing account) rather than a separate agent account type.')
-    +nbFoot('account','Continue','nbgo:profile');
-  case 'profile': return nbHead('profile')+'<div class="card"><h3>Your public profile</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Grounded (Aug 05): approved agents create a public profile with a photo, bio and specialisms.</div>'
-    +'<div class="g2"><div><label class="fl">Display name</label><input class="inp" id="nb-name" value="'+esc(d.name||'')+'"></div>'
-    +'<div><label class="fl">Photo</label><div><button class="btn sm" data-ag="nbphoto">Upload photo</button></div></div></div>'
-    +'<div class="mt"><label class="fl">Specialism</label><input class="inp" id="nb-spec" value="'+esc(d.spec||'')+'"></div>'
-    +'<div class="mt"><label class="fl">Bio shown on your card</label><textarea class="inp" id="nb-bio" placeholder="How you interview, what you are known for">'+esc(d.bio||'')+'</textarea></div></div>'
-    +openQ('Which fields appear on the browse card versus the full profile is not yet decided.')
-    +nbFoot('profile','Continue','nbgo:fee');
-  case 'fee': return nbHead('fee')+'<div class="card"><h3>Set your interview fee</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Grounded (Aug 05): agents set their own fee, within platform-defined rate bands.</div>'
-    +'<div class="g3 mt"><div><label class="fl">Fee per interview (£)</label><input class="inp" id="nb-fee" value="'+esc(d.fee||'150')+'"></div>'
-    +'<div><label class="fl">Session length</label><select class="inp" id="nb-len"><option>45 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>'
-    +'<div><label class="fl">Rate band</label><input class="inp" value="£95 – £240 (Standard)" disabled></div></div></div>'
-    +openQ('The fee must sit inside a platform band, but the exact band values, whether it can change mid-cycle, and whether it varies by TALENT letter are not yet set.')
-    +nbFoot('fee','Continue','nbgo:payout');
-  case 'payout': return nbHead('payout')+'<div class="card"><h3>Payout &amp; escrow setup</h3>'
-    +'<div class="g2"><div><label class="fl">Payout method</label><select class="inp"><option>Bank transfer (BACS)</option><option>PayPal</option><option>Stripe Connect</option></select></div>'
-    +'<div><label class="fl">Account name</label><input class="inp" placeholder="Account holder name"></div></div>'
-    +'<div class="mt"><label class="fl">Account details (prototype — do not enter real bank details)</label><input class="inp" placeholder="•• •• ••   ••••••••" disabled></div>'
-    +'<hr class="d"><div class="kv"><span>Revenue split</span><b>You keep 80% · platform 20%</b></div>'
-    +'<div class="kv"><span>Flow of funds</span><b>Candidate → escrow → released to you on completion</b></div></div>'
-    +assume('Prototyping the 20/80 revenue split. This conflicts with the earlier $100/month listing-fee model, and the client hasn’t reconciled the two. Settlement timing and your tax/contractor status are also undecided.')
-    +nbFoot('payout','Continue','nbgo:training');
-  case 'training': { var mods=[
-     ['The interview method','How a TalentNext interview draws out strong stories — the agent surfaces material, it does not assess.'],
-     ['Calibration exercises','Score three recorded mock interviews against the rubric and compare to the reference marks.'],
-     ['Safeguarding basics','Conduct and boundaries for recorded 1:1 video with 18–24 year olds.']];
-    return nbHead('training')+'<div class="card"><h3>Training &amp; calibration</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Grounded (Aug 05): mandatory before you can be assigned.</div>'
-    +mods.map(function(m,i){ return '<div class="li"><div class="dot '+(i<2?'ok':'now')+'">'+(i<2?'✓':'◔')+'</div><div class="f1"><div class="t">'+esc(m[0])+'</div><div class="s">'+esc(m[1])+'</div></div>'+(i<2?'<span class="tag ok">Complete</span>':'<span class="tag wa">In progress</span>')+'</div>'; }).join('')
-    +'</div>'+openQ('Who delivers the training, and exactly how calibration is scored, is not yet defined.')
-    +nbFoot('training','Mark training complete','nbgo:certify'); }
-  case 'certify': return nbHead('certify')+'<div class="card"><h3>Certification</h3>'
-    +'<div class="sub" style="margin:-4px 0 12px">Grounded (Aug 05): training and calibration are a mandatory gate.</div>'
-    +'<div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">Interview method — passed</div></div><span class="tag ok">Certified</span></div>'
-    +'<div class="li"><div class="dot ok">✓</div><div class="f1"><div class="t">Calibration — passed</div></div><span class="tag ok">Certified</span></div>'
-    +'<div class="kv mt"><span>Status</span><b><span class="tag ok">Certified to interview</span></b></div></div>'
-    +nbFoot('certify','Continue','nbgo:ready');
-  case 'ready': return nbHead('ready')+'<div class="card"><h3>You’re all set</h3>'
-    +'<div class="sub" style="margin:-4px 0 14px">Setup is complete. You don’t go live yourself — the platform assigns you to a cohort, and that’s when your working dashboard opens.</div>'
-    +'<div class="kv"><span>Name</span><b>'+esc(d.name||'—')+'</b></div>'
-    +'<div class="kv"><span>Specialism</span><b>'+esc(d.spec||'—')+'</b></div>'
-    +'<div class="kv"><span>Fee</span><b>£'+esc(d.fee||'150')+' · '+esc(d.len||'45 minutes')+'</b></div>'
-    +'<div class="kv"><span>Status</span><b><span class="tag ok">Ready</span> <span class="tag wa">Awaiting cohort assignment</span></b></div></div>'
-    +openQ('What happens between “ready” and a cohort — who assigns the agent, and on what basis — is not defined. The full operating dashboard is the assigned-agent stage (switch the Prototype chip to “Assigned agent”).')
-    +'<div class="row mt"><div class="f1"><button class="btn sm" data-ag="nbgo:certify">← Back</button></div><button class="btn p" data-ag="nbfinish">Finish setup</button></div>';
-  }
-  return NV.overview();
-}
 
 const A={};
 A.nav=function(v){ if(v==='cohorts'){G.cohort=null;G.member=null;} if(v==='messages'){G.thread=0;} go(v); };
@@ -7307,10 +7210,22 @@ A.nav=function(v){ if(v==='cohorts'){G.cohort=null;G.member=null;} if(v==='messa
 A.talask=function(){ var q=Array.prototype.slice.call(arguments).join(':'); if(window.__talAsk) window.__talAsk(q); };
 A.talopen=function(){ if(window.__talOpen) window.__talOpen(); };
 A.talclose=function(){ var n=document.querySelector('#agView .tal-read.has-x'); if(n) n.remove(); };
+/* "Need attention" stat → jump to the attention queue on the dashboard */
+A.attn=function(){
+  if(G.view!=='overview'){ go('overview'); }
+  setTimeout(function(){
+    var q=document.getElementById('ag-attn-queue');
+    if(!q) return;
+    q.scrollIntoView({behavior:'smooth',block:'start'});
+    q.classList.remove('flash'); void q.offsetWidth; q.classList.add('flash');
+  },G.view!=='overview'?60:0);
+};
+A.reptab=function(id){ G.repCohort=(id==='all'?'all':+id); render(); };
 A.cohort=function(id){ G.cohort=+id; G.member=null; go('cohorts'); };
 A.member=function(id,name){ G.cohort=+id; G.member=name; go('cohorts'); };
 A.thread=function(i){ G.thread=+i; render(); };
 A.closem=function(){ closeM(); };
+A.closesheet=function(){ closeSheet(); };
 /* notifications dropdown: toggle open, and mark-all-read — mirrors candidate A.drawer / A.readall */
 A.agdrawer=function(){ G.drawer=!G.drawer; agRenderNotif(); };
 A.agreadall=function(){ G.notif.forEach(function(n){n.rd=true;}); agRenderNotif(); toast('All marked read'); };
@@ -7320,56 +7235,98 @@ A.brief=function(id){
   var att=c.members.filter(function(m){return m.flag;});
   var weakest=c.members.slice().sort(function(a,b){return a.avg-b.avg;}).filter(function(m){return m.avg>0;})[0];
   var badN=att.filter(function(m){return m.flag.k==='bad';}).length;
-  modal('<div class="mh"><h3>Week '+c.week+' brief · Cohort '+c.id+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb"><div class="sub" style="margin-bottom:12px">Generated from course activity up to now. Call is '+esc(c.call)+'.</div>'
+  sheet('<div class="bk-h"><h2>Week '+c.week+' brief · '+cohortName(c)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b"><div class="sub" style="margin-bottom:12px">Generated from course activity up to now. Call is '+esc(c.call)+'.</div>'
   +'<div class="card f"><h3>Run the call like this</h3><ul class="tick">'
   +'<li><b>Open with</b> the theme most of the cohort got wrong in week '+c.week+'’s assessment.</li>'
   +'<li><b>Spend time on</b> '+esc(CHNAMES[Math.min(12,c.week)])+' — lowest cohort average and highest re-attempt rate.</li>'
   +'<li><b>Skip</b> anything with near-universal completion and high scores.</li>'
   +'<li><b>Raise privately, not in the group</b> — '+badN+' candidate'+(badN===1?'':'s')+' at risk.</li></ul></div>'
-  +'<div class="g2 mt"><div class="card"><h3>Cohort patterns</h3>'
+  +'<div class="card mt"><h3>Cohort patterns</h3>'
   +'<div class="kv"><span>Avg progress</span><b>'+avgOf(c,'pc')+'% vs '+pace(c)+'% expected</b></div>'
   +'<div class="kv"><span>Assessment avg</span><b>'+avgOf(c,'avg')+'%</b></div>'
   +'<div class="kv"><span>Weakest performer</span><b>'+(weakest?esc(weakest.name)+' · '+weakest.avg+'%':'—')+'</b></div>'
   +'<div class="kv"><span>Behind pace</span><b>'+c.members.filter(function(m){return m.pc<pace(c)-5;}).length+' of '+c.members.length+'</b></div></div>'
-  +'<div class="card"><h3>Attention list</h3>'
+  +'<div class="card mt"><h3>Attention list</h3>'
   +(att.length?att.slice(0,4).map(function(m){
     return '<div class="li"><div class="f1"><div class="t">'+esc(m.name)+' '+flagTag(m.flag)+'</div>'
     +'<div class="s">'+m.pc+'% at day '+c.day+' · last active '+esc(m.last).toLowerCase()+'</div></div></div>';}).join('')
-    :'<div class="sub">Nobody flagged.</div>')+'</div></div>'
+    :'<div class="sub">Nobody flagged.</div>')+'</div>'
   +'<div class="note w mt"><b>Ceiling on this brief</b>Everything above is computed from activity — progress, scores, attempts, timing. To say anything about the <i>quality</i> of their thinking it needs their written answers, which is the open question with the course platform.</div>'
-  +'</div><div class="mf"><button class="btn" data-ag="closem">Close</button>'
-  +'<button class="btn p" data-ag="closem">Print for the call</button></div>',true);
+  +'</div><div class="bk-f"><button class="btn" data-ag="closesheet">Close</button>'
+  +'<button class="btn p" data-ag="closesheet">Print for the call</button></div>');
 };
 
-A.eval=function(id){
-  var e=EVALS.filter(function(x){return x.id===id;})[0];
+/* Level decision lives in the right slide-over. Picking a level only *selects* it —
+   nothing is submitted until "Submit", and any override must carry a reason. */
+function agEvalCapture(){
+  var d=G.evalDraft; if(!d) return;
+  var r=document.getElementById('evReason'); if(r) d.reason=r.value;
+  var n=document.getElementById('evNotes'); if(n) d.notes=n.value;
+}
+function agRenderEval(){
+  var d=G.evalDraft; if(!d) return;
+  var e=EVALS.filter(function(x){return x.id===d.id;})[0]; if(!e) return;
   var band=e.ai[0], opts=[1,2,3,4,5].map(function(n){return band+n;});
-  modal('<div class="mh"><h3>Level decision · '+esc(e.name)+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb"><div class="kv"><span>Interviewed</span><b>'+esc(e.when)+'</b></div>'
+  var over=d.lvl!==e.ai;
+  sheet('<div class="bk-h"><h2>Level decision · '+esc(e.name)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b"><div class="kv"><span>Interviewed</span><b>'+esc(e.when)+'</b></div>'
   +'<div class="kv"><span>Quiz title</span><b>'+esc(e.bucket)+' · '+e.quiz+'/100</b></div>'
   +'<div class="kv"><span>AI recommendation</span><b>'+lvlLabel(e.ai)+'</b></div>'
   +'<div class="note i mt"><b>Why the AI proposed '+e.ai+'</b>'+esc(e.aiwhy)+'</div>'
   +'<label class="fl mt" style="margin-top:14px">Your decision — '+esc(e.bucket)+', level 1 to 5</label><div class="row" style="gap:7px">'
-  +opts.map(function(o){return '<button class="btn '+(o===e.ai?'p':'')+'" data-ag="setlevel:'+e.id+':'+o+'">'+o+'</button>';}).join('')
-  +'</div><div class="sub mt8">The title came from the quiz and is fixed — you are choosing the number within it. Anything other than '+e.ai+' is recorded as an override with a reason. The human decision always wins.</div>'
+  +opts.map(function(o){return '<button class="btn '+(o===d.lvl?'p':'')+'" data-ag="picklevel:'+o+'">'+o+'</button>';}).join('')
+  +'</div>'
+  +(over?'<div class="note b mt" style="margin-top:12px"><b>Reason for overriding the AI ('+e.ai+' → '+d.lvl+')</b>'
+    +'<textarea class="inp" id="evReason" style="margin-top:8px" placeholder="Why '+d.lvl+' instead of '+e.ai+'? Recorded on the decision.">'+esc(d.reason||'')+'</textarea></div>'
+    :'')
+  +'<div class="sub mt8">The quiz fixes the title — you set the number. Overrides are logged with your reason; the human decision wins.</div>'
   +'<label class="fl" style="margin-top:14px">Notes for the candidate’s report</label>'
-  +'<textarea class="inp" placeholder="Strengths, growth areas, what to work on in the course…"></textarea>'
-  +'</div><div class="mf"><button class="btn" data-ag="closem">Later</button>'
-  +'<button class="btn p" data-ag="setlevel:'+e.id+':'+e.ai+'">Submit as '+e.ai+'</button></div>');
+  +'<textarea class="inp" id="evNotes" placeholder="Strengths, growth areas, what to work on in the course…">'+esc(d.notes||'')+'</textarea>'
+  +'</div><div class="bk-f"><button class="btn" data-ag="closesheet">Later</button>'
+  +'<button class="btn p" data-ag="evalsubmit">'+(over?'Submit override as '+d.lvl:'Submit as '+e.ai)+'</button></div>');
+}
+A.eval=function(id){
+  var e=EVALS.filter(function(x){return x.id===id;})[0]; if(!e) return;
+  G.evalDraft={id:id,lvl:e.ai,ai:e.ai,reason:'',notes:''};
+  agRenderEval();
 };
-A.setlevel=function(id,lvl){
-  var e=EVALS.filter(function(x){return x.id===id;})[0];
-  var over=lvl!==e.ai;
-  e.status='done'; e.assigned=lvl;
-  closeM(); render();
-  toast(e.name+' titled '+lvlLabel(lvl)+(over?' (override)':''),'g');
+A.picklevel=function(lvl){ agEvalCapture(); if(G.evalDraft){ G.evalDraft.lvl=lvl; } agRenderEval(); };
+A.evalsubmit=function(){
+  agEvalCapture();
+  var d=G.evalDraft; if(!d) return;
+  var e=EVALS.filter(function(x){return x.id===d.id;})[0]; if(!e) return;
+  var over=d.lvl!==e.ai;
+  if(over && !(d.reason && d.reason.trim())){
+    toast('Add a reason for the override first','b');
+    var r=document.getElementById('evReason'); if(r) r.focus();
+    return;
+  }
+  e.status='done'; e.assigned=d.lvl; e.override=over; e.reason=d.reason||''; e.notes=d.notes||'';
+  G.evalDraft=null; closeSheet(); render();
+  toast(e.name+' titled '+lvlLabel(d.lvl)+(over?' (override)':''),'g');
 };
 
-A.summary=function(id){
-  var s=SUMMARIES.filter(function(x){return x.id===id;})[0];
-  modal('<div class="mh"><h3>90-day summary · '+esc(s.name)+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb"><div class="card f"><h3>Auto-filled from their course record <span class="r">read-only</span></h3><div class="g3">'
+/* 90-day summary lives in the right slide-over. Recommendation chips only *select* —
+   nothing publishes until "Publish", and any recommendation other than promote needs a reason. */
+var SUM_REC=[{k:'promote',l:'Ready to promote'},{k:'hold',l:'Hold at level'},{k:'down',l:'Move down'},{k:'notready',l:'Not ready to re-interview'}];
+function sumRecLabel(k){ for(var i=0;i<SUM_REC.length;i++){ if(SUM_REC[i].k===k) return SUM_REC[i].l; } return k; }
+function agSumCapture(){
+  var d=G.sumDraft; if(!d) return;
+  var g=document.getElementById('sumGrowth'); if(g) d.growth=g.value;
+  var v=document.getElementById('sumDevelop'); if(v) d.develop=v.value;
+  var n=document.getElementById('sumNotes'); if(n) d.notes=n.value;
+  var r=document.getElementById('sumReason'); if(r) d.reason=r.value;
+}
+function agRenderSummary(){
+  var d=G.sumDraft; if(!d) return;
+  var s=SUMMARIES.filter(function(x){return x.id===d.id;})[0]; if(!s) return;
+  var over=d.rec!=='promote';
+  sheet('<div class="bk-h"><h2>90-day summary · '+esc(s.name)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b"><div class="card f"><h3>Auto-filled from their course record <span class="r">read-only</span></h3><div class="g3">'
   +'<div class="stat"><div class="l">Final progress</div><div class="v">'+s.pc+'<s>%</s></div></div>'
   +'<div class="stat"><div class="l">Assessment avg</div><div class="v">'+s.avg+'<s>%</s></div></div>'
   +'<div class="stat"><div class="l">Total time</div><div class="v" style="font-size:17px">'+hrs(s.mins)+'</div></div></div>'
@@ -7377,23 +7334,39 @@ A.summary=function(id){
   +'<div class="kv"><span>Assignments on time</span><b>'+s.onTime+' of '+s.of+'</b></div>'
   +'<div class="kv"><span>Calls attended</span><b>'+s.calls+' of '+s.of+'</b></div></div>'
   +'<label class="fl mt" style="margin-top:14px">Growth you observed</label>'
-  +'<textarea class="inp" placeholder="What actually changed over the ninety days…"></textarea>'
+  +'<textarea class="inp" id="sumGrowth" placeholder="What actually changed over the ninety days…">'+esc(d.growth||'')+'</textarea>'
   +'<label class="fl" style="margin-top:12px">Still to develop</label>'
-  +'<textarea class="inp" placeholder="What they should work on next…"></textarea>'
+  +'<textarea class="inp" id="sumDevelop" placeholder="What they should work on next…">'+esc(d.develop||'')+'</textarea>'
   +'<label class="fl" style="margin-top:12px">Notes for the next interviewer <span style="font-weight:400;color:#000000">not shown to the candidate</span></label>'
-  +'<textarea class="inp" placeholder="Anything the next agent should know…"></textarea>'
+  +'<textarea class="inp" id="sumNotes" placeholder="Anything the next agent should know…">'+esc(d.notes||'')+'</textarea>'
   +'<label class="fl" style="margin-top:14px">Recommendation</label><div class="row" style="gap:7px">'
-  +'<button class="btn p" data-ag="pub:'+s.id+':promote">Ready to promote</button>'
-  +'<button class="btn" data-ag="pub:'+s.id+':hold">Hold at level</button>'
-  +'<button class="btn" data-ag="pub:'+s.id+':down">Move down</button>'
-  +'<button class="btn" data-ag="pub:'+s.id+':notready">Not ready to re-interview</button></div>'
-  +'</div><div class="mf"><button class="btn" data-ag="closem">Save draft</button></div>',true);
+  +SUM_REC.map(function(o){return '<button class="btn '+(o.k===d.rec?'p':'')+'" data-ag="pickrec:'+o.k+'">'+o.l+'</button>';}).join('')
+  +'</div>'
+  +(over?'<div class="note b mt" style="margin-top:12px"><b>Reason for recommending “'+esc(sumRecLabel(d.rec))+'”</b>'
+    +'<textarea class="inp" id="sumReason" style="margin-top:8px" placeholder="Why '+esc(sumRecLabel(d.rec))+' rather than promote? Recorded with the summary.">'+esc(d.reason||'')+'</textarea></div>'
+    :'')
+  +'</div><div class="bk-f"><button class="btn" data-ag="closesheet">Save draft</button>'
+  +'<button class="btn p" data-ag="pubsummary">Submit Recommendation</button></div>');
+}
+A.summary=function(id){
+  var s=SUMMARIES.filter(function(x){return x.id===id;})[0]; if(!s) return;
+  G.sumDraft={id:id,rec:'promote',growth:'',develop:'',notes:'',reason:''};
+  agRenderSummary();
 };
-A.pub=function(id,rec){
-  var s=SUMMARIES.filter(function(x){return x.id===id;})[0];
+A.pickrec=function(rec){ agSumCapture(); if(G.sumDraft){ G.sumDraft.rec=rec; } agRenderSummary(); };
+A.pubsummary=function(){
+  agSumCapture();
+  var d=G.sumDraft; if(!d) return;
+  var s=SUMMARIES.filter(function(x){return x.id===d.id;})[0]; if(!s) return;
   var L={promote:'Promote',hold:'Hold',down:'Move down',notready:'Not ready'};
-  s.status='done'; s.rec=L[rec];
-  closeM(); render(); toast('Summary published for '+s.name+' · '+L[rec],'g');
+  var over=d.rec!=='promote';
+  if(over && !(d.reason && d.reason.trim())){
+    toast('Add a reason for this recommendation first','b');
+    var r=document.getElementById('sumReason'); if(r) r.focus();
+    return;
+  }
+  s.status='done'; s.rec=L[d.rec]; s.reason=d.reason||''; s.growth=d.growth||''; s.develop=d.develop||''; s.notes=d.notes||'';
+  G.sumDraft=null; closeSheet(); render(); toast('Summary published for '+s.name+' · '+L[d.rec],'g');
 };
 
 A.creport=function(cid,name){
@@ -7408,8 +7381,9 @@ A.creport=function(cid,name){
       +'<td class="mono">'+(sc!=null?sc+'%':'—')+'</td>'
       +'<td class="mono">'+(done?(i%4===1?2:1):'—')+'</td></tr>';
   }
-  modal('<div class="mh"><h3>Course report · '+esc(name)+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb">'
+  sheet('<div class="bk-h"><h2>Course report · '+esc(name)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b">'
   +'<div class="note i"><b>Straight from the course platform</b>Course status, progress, assessment score, '
   +'revolutions and completion date are all fields their Report Card already carries. Nothing here is our own record.</div>'
   +'<div class="g3 mt"><div class="stat"><div class="l">Progress</div><div class="v">'+m.pc+'<s>%</s></div></div>'
@@ -7417,7 +7391,7 @@ A.creport=function(cid,name){
   +'<div class="stat"><div class="l">Revolutions</div><div class="v">'+m.att+'</div></div></div>'
   +'<div class="tbl-wrap mt"><table class="tbl"><tr><th>#</th><th>Chapter</th><th>Status</th><th>Score</th><th>Rev</th></tr>'
   +rows+'</table></div></div>'
-  +'<div class="mf"><button class="btn" data-ag="closem">Close</button>'
+  +'<div class="bk-f"><button class="btn" data-ag="closesheet">Close</button>'
   +'<button class="btn p" data-ag="member:'+c.id+':'+esc(name)+'">Open profile</button></div>');
 };
 A.read=function(cid,name){
@@ -7433,19 +7407,37 @@ A.read=function(cid,name){
 };
 A.marked=function(name){ closeM(); toast('Marked reviewed · '+name,'g'); };
 
-A.note=function(name){
-  var f=allMembers().filter(function(x){return x.m.name===name;})[0];
-  modal('<div class="mh"><h3>Private note · '+esc(name)+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb"><p class="sub" style="margin:0 0 11px">Only you see this. It feeds the 90-day summary at the end of the cohort.</p>'
-  +'<textarea class="inp" id="agNoteIn" style="min-height:120px">'+(f?esc(f.m.note):'')+'</textarea></div>'
-  +'<div class="mf"><button class="btn" data-ag="closem">Cancel</button>'
-  +'<button class="btn p" data-ag="savenote:'+esc(name)+'">Save note</button></div>');
+/* Resolve the member being acted on. Prefer the one in the cohort currently open
+   so notes never land on a same-named member in another cohort. */
+function memberRef(name){
+  var list=allMembers();
+  return list.filter(function(x){return x.m.name===name && (!G.cohort||x.c.id===G.cohort);})[0]
+      || list.filter(function(x){return x.m.name===name;})[0];
+}
+/* Multiple private notes per member — mirrors the candidate's course-notes model (array of {t,w}). */
+function memberNotes(m){ if(!m) return []; if(!m.notes){ m.notes = m.note ? [{t:m.note,w:'Earlier'}] : []; } return m.notes; }
+function agNoteModal(name,idx){
+  var f=memberRef(name), ns=f?memberNotes(f.m):[];
+  var isEdit=(idx!=null&&idx!==''&&idx!=='new'), n=isEdit?ns[+idx]:null;
+  sheet('<div class="bk-h"><h2>'+(isEdit?'Edit note':'Add note')+' · '+esc(name)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b"><p class="sub" style="margin:0 0 11px">Only you see this. Each note feeds the 90-day summary at the end of the cohort.</p>'
+  +'<textarea class="inp" id="agNoteIn" style="min-height:140px" placeholder="Anything worth remembering about this candidate…">'+(n?esc(n.t):'')+'</textarea></div>'
+  +'<div class="bk-f">'+(isEdit?'<button class="btn dg" data-ag="notedel:'+esc(name)+':'+idx+'">Delete</button>':'<button class="btn" data-ag="closesheet">Cancel</button>')
+  +'<button class="btn p" data-ag="savenote:'+esc(name)+(isEdit?':'+idx:'')+'">Save note</button></div>');
+}
+A.note=function(name){ agNoteModal(name,null); };
+A.noteedit=function(name,i){ agNoteModal(name,i); };
+A.savenote=function(name,i){
+  var el=$('#agNoteIn'), f=memberRef(name), v=el?el.value.trim():'';
+  if(!v){ toast('Write something first','b'); return; }
+  if(f){ var ns=memberNotes(f.m);
+    if(i!=null&&i!==''){ if(ns[+i]) ns[+i]={t:v,w:'Edited'}; }
+    else { ns.unshift({t:v,w:'Just now'}); }
+  }
+  closeSheet(); render(); toast(i!=null&&i!==''?'Note updated':'Note added','g');
 };
-A.savenote=function(name){
-  var el=$('#agNoteIn'), f=allMembers().filter(function(x){return x.m.name===name;})[0];
-  if(f&&el) f.m.note=el.value;
-  closeM(); render(); toast('Note saved','g');
-};
+A.notedel=function(name,i){ var f=memberRef(name); if(f){ memberNotes(f.m).splice(+i,1); } closeSheet(); render(); toast('Note deleted'); };
 
 /* A live interview takes the whole screen (shared #ses overlay), exactly as the
    candidate's joinint does — here from the interviewer's side. */
@@ -7512,20 +7504,22 @@ A.endint=function(){
 A.writeeval=function(){ closeM(); go('evaluations'); };
 
 A.msgone=function(name){
+  var ref=memberRef(name), coh=ref?ref.c.id:(G.cohort||12);
   var i=-1;
   THREADS.forEach(function(t,j){ if(t.who===name) i=j; });
-  if(i<0){ THREADS.push({who:name,cohort:G.cohort||12,msgs:[]}); i=THREADS.length-1; }
+  if(i<0){ THREADS.push({who:name,cohort:coh,msgs:[]}); i=THREADS.length-1; }
   G.thread=i; go('messages');
 };
 A.msgall=function(id){
-  var c=COHORTS.filter(function(x){return x.id===+id;})[0];
-  modal('<div class="mh"><h3>Message Cohort '+id+'</h3><button class="x" data-ag="closem">✕</button></div>'
-  +'<div class="mb"><p class="sub" style="margin:0 0 11px">Goes to all '+c.members.length+' members. Use one-to-one for anything a candidate should not read in front of the group.</p>'
-  +'<textarea class="inp" style="min-height:110px" placeholder="Message the whole cohort…"></textarea></div>'
-  +'<div class="mf"><button class="btn" data-ag="closem">Cancel</button>'
+  var c=COHORTS.filter(function(x){return x.id===+id;})[0]; if(!c) return;
+  sheet('<div class="bk-h"><h2>Message '+cohortName(id)+'</h2>'
+  +'<button class="bk-ic" data-ag="closesheet" aria-label="Close"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>'
+  +'<div class="bk-b"><p class="sub" style="margin:0 0 11px">Goes to all '+c.members.length+' members. Use one-to-one for anything a candidate should not read in front of the group.</p>'
+  +'<textarea class="inp" id="agMsgAllIn" style="min-height:130px" placeholder="Message the whole cohort…"></textarea></div>'
+  +'<div class="bk-f"><button class="btn" data-ag="closesheet">Cancel</button>'
   +'<button class="btn p" data-ag="sentall">Send</button></div>');
 };
-A.sentall=function(){ closeM(); toast('Sent to the cohort','g'); };
+A.sentall=function(){ closeSheet(); toast('Sent to the cohort','g'); };
 A.send=function(){
   var el=$('#agMsgIn');
   if(!el||!el.value.trim()){ toast('Write something first','b'); return; }
@@ -7535,6 +7529,8 @@ A.send=function(){
 A.watch=function(){ toast('Opening recording…'); };
 A.dl=function(){ toast('Downloading…','g'); };
 A.saveprofile=function(){ toast('Profile saved','g'); };
+A.photo=function(){ toast('Photo upload is coming soon'); };
+A.availcal=function(){ toast('Availability calendar is coming soon'); };
 
 /* =========================================================
    BOOKING — reschedule a session, or manage availability.
@@ -7677,21 +7673,8 @@ A.agbkresched=function(){ if(!G.bk||!G.bk.slot) return; G.bk.done=true; renderAg
 A.agavailtoggle=function(dow,idx){ if(!G.bk||!G.bk.avail) return; var tm=AG_TIMES[+idx]; if(!tm) return; var arr=G.bk.avail[dow]||(G.bk.avail[dow]=[]); var i=arr.indexOf(tm); if(i>-1) arr.splice(i,1); else arr.push(tm); renderAgBk(); };
 A.agavailsave=function(){ if(G.bk&&G.bk.avail){ var c={}; AG_WEEKDAYS.forEach(function(d){c[d]=(G.bk.avail[d]||[]).slice();}); G.avail=c; } if(G.bk){G.bk.open=false;} renderAgBk(); toast('Availability saved','g'); };
 
-/* --- prototype stage chips + new-agent onboarding --- */
-A.proto=function(mode){ G.proto=mode; G.view='overview'; if(mode==='assigned'){ G.cohort=null; G.member=null; } window.__agentNew=(mode==='new'); if(window.__talReset) window.__talReset(); render(); };
-A.nbstart=function(){ G.nb.started=true; G.view='wizard'; G.nb.step=G.nb.done?'ready':'apply'; render(); };
-A.nbgo=function(v){ nbSnap(); G.nb.started=true; G.view='wizard'; G.nb.step=v; render(); };
-A.nbfinish=function(){ nbSnap(); G.nb.done=true; G.view='overview'; render(); toast('Setup complete — you’ll be notified when you’re assigned to a cohort','g'); };
-A.nbreject=function(){ toast('Application rejected — the applicant is notified (rejection path undefined)','b'); };
-A.nbphoto=function(){ toast('Photo upload — not built in this prototype'); };
 
 /* --- highlight-clip approval --- */
-A.clip=function(i){ if(!G.clips) G.clips={picks:{}}; i=+i; G.clips.picks[i]=!G.clips.picks[i]; render(); };
-A.sendclips=function(){
-  var n=G.clips?Object.keys(G.clips.picks).filter(function(k){return G.clips.picks[k];}).length:0;
-  if(!n){ toast('Approve at least one clip first','b'); return; }
-  toast('Shortlist of '+n+' clip'+(n===1?'':'s')+' sent to the candidate to pick finals','g');
-};
 
 /* click outside the bell/dropdown closes it — mirrors the candidate portal */
 document.addEventListener('click',function(e){
@@ -7705,10 +7688,19 @@ document.addEventListener('click',function(e){
   if(typeof fn==='function'){ e.preventDefault(); fn.apply(null,parts.slice(1)); }
   else console.warn('agent portal: no handler for',el.dataset.ag);
 });
+/* keyboard: Enter/Space activate role="button" data-ag elements (e.g. the stat cards) */
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  var el=e.target.closest && e.target.closest('[data-ag][role="button"]');
+  if(!el) return;
+  e.preventDefault(); el.click();
+});
 var mk2=document.getElementById('agModal');
 if(mk2) mk2.addEventListener('click',function(e){ if(e.target.id==='agModal') closeM(); });
 var agbw=document.getElementById('agBkWrap');
 if(agbw) agbw.addEventListener('click',function(e){ if(e.target.id==='agBkWrap'){ if(G.bk){G.bk.open=false;} renderAgBk(); } });
+var agsw=document.getElementById('agSheetWrap');
+if(agsw) agsw.addEventListener('click',function(e){ if(e.target.id==='agSheetWrap'){ closeSheet(); } });
 
 window.__agentCtx=function(){
   var mem=function(m){return {name:m.name,pc:m.pc,avg:m.avg,att:m.att,mins:m.mins,
@@ -8199,17 +8191,19 @@ function candReply(q){
      We read three signals — explain / define-a-term / stuck — plus a loose match
      of which chapter or term the question is about, and route to the right helper.
      Gated by !offTopic so it never steals level / pace / payment / booking questions. */
-  var offTopic=/(my level|what level|which level|why (was|am) i.*level|on pace|behind pace|ahead of|my rank|ranking|leaderboard|payment|invoice|receipt|refund|\bprice\b|quiz score|book (an|my|a)|reschedule|cohort call|upcoming|when is|my interview|\bsummary\b|90[ -]?day)/.test(t);
+  var offTopic=/(my level|what level|which level|why (was|am) i.*level|on pace|behind pace|ahead of|my rank|ranking|leaderboard|payment|invoice|receipt|refund|\bprice\b|quiz score|book (an|my|a)|reschedule|cohort call|upcoming|when is|my interview|90[ -]?day|ninety[ -]?day)/.test(t);
   if(!offTopic){
     var explainSig=/(explain|overview|summar[iy]|walk (me )?through|break ?down|go over|recap|the gist|tell me about|what(?:'?s| is| are)?[^?]*\b(about|cover))/.test(t);
     var stuckSig=/(stuck|confus|\blost\b|struggl|don'?t (get|understand|follow)|do not understand|can'?t (follow|understand|grasp|get)|cannot understand|not getting|makes? no sense|doesn'?t make sense|having trouble|hard to (understand|grasp|follow)|not clear|unclear|over my head|where (should|do) i (focus|start)|help me (understand|with))/.test(t);
     var termSig=/(mean(s|ing)?\b|\bdefine\b|definition|\bterms?\b|\bwords?\b|jargon|vocab|in plain)/.test(t);
     var chap=chapterMatch(t), termHit=termName(t);
-    if(explainSig && chap && !termSig)              return candChapterExplain(q);
+    /* "this chapter", being on a chapter, or the word "chapter" all count as a chapter reference */
+    var chapRef=chap || S.view==='chapter' || /\bchapter\b/.test(t);
+    if(explainSig && chapRef && !termSig)           return candChapterExplain(q);
     if(termHit && !stuckSig)                        return candTermDefine(q);
     if(termSig && (chap||S.enrolled))               return candTermDefine(q);
     if(stuckSig && (chap||S.enrolled))              return candStuck(q);
-    if(explainSig && chap)                          return candChapterExplain(q);
+    if(explainSig && chapRef)                       return candChapterExplain(q);
   }
   if(m(['what happens','how does the interview','interview work','how the interview',
         'prepare','what should i bring','what do i bring']))               return candInterviewInfo();
@@ -8276,7 +8270,7 @@ function agMemberReport(m,c){
   }
   return W('Report · '+esc(m.name),
     '<div class="aw-pi big">'+(window.TNAVATAR?TNAVATAR(m.name,'','width:38px;height:38px;font-size:13px'):'')
-    +'<div><div class="n">'+esc(m.name)+'</div><div class="l">Cohort '+c.id+' · '+esc(m.lvl)+'</div></div>'
+    +'<div><div class="n">'+esc(m.name)+'</div><div class="l">'+cohortName(c)+' · '+esc(m.lvl)+'</div></div>'
     +(m.flag?tag(m.flag.t,m.flag.k==='bad'?'bad':'wa'):tag('On track','ok'))+'</div>'
     + stats([['Progress',m.pc+'%'],['vs pace',(d>0?'+':'')+d],
              ['Assessment avg',(m.avg||0)+'%'],['Avg attempts',(m.att||0).toFixed(1)]])
@@ -8291,7 +8285,7 @@ function agMemberReport(m,c){
 }
 function agCohortReport(c){
   var mem=(c.members||[]).slice().sort(function(a,b){return b.pc-a.pc;});
-  return W('Cohort '+c.id+' · '+esc(lvlLabel(c.level)),
+  return W(''+cohortName(c)+' · '+esc(lvlLabel(c.level)),
     stats([['Avg progress',c.avg+'%'],['Expected',c.pace+'%'],
            ['Assessment avg',c.avgAssess+'%'],['Flagged',String(c.flagged)]])
     + bar('Cohort average',c.avg,c.avg+'%',tone(c.avg,c.pace))
@@ -8310,7 +8304,7 @@ function agAttention(){
   if(!list.length) return W('Nobody flagged', rows([['At risk','0'],['Watch','0']]),'Queue is clear.');
   return W(list.length+' candidates need attention',
     people(list.slice(0,8).map(function(x){
-      return {name:x.name, line:'Cohort '+x.cohort+' · '+x.pc+'% vs '+x.pace+'% · last active '+esc(String(x.last).toLowerCase()),
+      return {name:x.name, line:cohortName(x.cohort)+' · '+x.pc+'% vs '+x.pace+'% · last active '+esc(String(x.last).toLowerCase()),
               tag:tag(x.flag.t, x.flag.k==='bad'?'bad':'wa')};})),
     'Never-signed-in and long-idle are the ones to act on. Behind-pace usually recovers.')
     + link('Open Dashboard','data-ag="nav:overview"');
@@ -8319,7 +8313,7 @@ function agCohortsAll(){
   var a=agCtx();
   return W('All cohorts',
     (a.cohorts||[]).map(function(c){
-      return '<div class="aw-sec">Cohort '+c.id+' · '+esc(lvlLabel(c.level))+' · week '+c.week+'</div>'
+      return '<div class="aw-sec">'+cohortName(c)+' · '+esc(lvlLabel(c.level))+' · week '+c.week+'</div>'
         + bar('Average', c.avg, c.avg+'% vs '+c.pace+'%', tone(c.avg,c.pace))
         + rows([['Members',String((c.members||[]).length)],['Flagged',String(c.flagged)],
                 ['Assessment avg',c.avgAssess+'%'],['Next call',esc(c.call)]]);}).join(''),
@@ -8336,7 +8330,7 @@ function agWaiting(){
       + people(ev.map(function(e){return {name:e.name,line:esc(e.bucket)+' · quiz '+e.quiz+'/100 · interviewed '+esc(e.when),
         tag:tag('AI: '+e.ai)};})):'')
     + (su.length?'<div class="aw-sec">90-day summaries</div>'
-      + people(su.map(function(s){return {name:s.name,line:'Cohort '+s.cohort+' · '+s.pc+'% · avg '+s.avg+'% · '+s.calls+'/'+s.of+' calls',
+      + people(su.map(function(s){return {name:s.name,line:cohortName(s.cohort)+' · '+s.pc+'% · avg '+s.avg+'% · '+s.calls+'/'+s.of+' calls',
         tag:tag('Draft')};})):''),
     'Candidates cannot enroll until a level is signed.')
     + link('Open Evaluations','data-ag="nav:evaluations"');
@@ -8345,7 +8339,7 @@ function agSubs(){
   var a=agCtx(), l=a.subsList||[];
   if(!l.length) return W('Everyone is on pace', rows([['Behind','0']]),'Nothing needs chasing.');
   return W(l.length+' behind the expected pace',
-    people(l.map(function(x){return {name:x.name,line:'Cohort '+x.cohort+' · '+x.pc+'% at week '+x.week
+    people(l.map(function(x){return {name:x.name,line:cohortName(x.cohort)+' · '+x.pc+'% at week '+x.week
       +' · expected '+x.expected+'% · assessments '+x.avg+'%',
       tag:tag(Math.abs(x.pc-x.expected)+' behind','wa')};})),
     'Chapter progress and assessment scores, straight from the course platform.')
@@ -8358,7 +8352,7 @@ function agSessions(){
     people(up.map(function(s){return {name:s.name,line:esc(s.when)+' · '+s.mins+' min',
       tag:tag('£'+s.fee)};})),
     'You have their quiz title but not their level — that is what you set.')
-    + link('Open Interviews','data-ag="nav:interviews"');
+    + link('Open Sessions','data-ag="nav:interviews"');
 }
 function agEarnings(){
   var rowsx=[['Today','Interview — Thomas Beck',180,54,126],
@@ -8380,7 +8374,7 @@ function agBrief(c){
   var weakest=mem.slice().filter(function(m){return m.avg>0;}).sort(function(x,y){return x.avg-y.avg;})[0];
   var att=mem.filter(function(m){return m.flag;});
   var submitted=mem.filter(function(m){return m.taskSt==='done'||m.taskSt==='late';}).length;
-  return W('Week '+c.week+' brief · Cohort '+c.id,
+  return W('Week '+c.week+' brief · '+cohortName(c),
     rows([['Avg progress',c.avg+'% vs '+c.pace+'% expected'],['Assessment avg',c.avgAssess+'%'],
           ['Task submitted',submitted+' of '+mem.length],
           ['Weakest performer',weakest?esc(weakest.name)+' · '+weakest.avg+'%':'—'],
@@ -8395,24 +8389,6 @@ function agBrief(c){
 function agReply(q){
   var t=q.toLowerCase(), a=agCtx();
   var m=function(arr){for(var i=0;i<arr.length;i++){if(t.indexOf(arr[i])>-1)return true;}return false;};
-  if(window.__agentNew){
-    if(m(['payout','money','earning','paid','cut','80','settle'])) return W('Payout — 80/20',
-      '<div class="aw-li">Candidates pay TalentNext into escrow, never you directly.</div>'
-      +'<div class="aw-li">You keep 80%; the platform takes 20%.</div>'
-      +'<div class="aw-li">Your share is released from escrow on completion.</div>',
-      'Note: this 20/80 split is an assumption not yet confirmed with the client, and settlement timing is undecided.');
-    if(m(['vet','approve','background','safeguard','reject'])) return W('Vetting',
-      '<div class="aw-li">You apply via a form; the platform team vets and approves.</div>'
-      +'<div class="aw-li">The exact bar, rejection path and background/safeguarding checks are not yet defined.</div>',
-      'Open question for the client — surfaced, not invented.');
-    return W('Getting set up',
-      '<div class="aw-li">Apply and get vetted by the platform team</div>'
-      +'<div class="aw-li">Add the agent role, build your public profile, set your fee</div>'
-      +'<div class="aw-li">Connect payout — you keep 80%, released from escrow</div>'
-      +'<div class="aw-li">Complete mandatory training and certification</div>'
-      +'<div class="aw-li">Then the platform assigns you to a cohort</div>',
-      'Use “Start setup” on the dashboard to begin. Your cohorts, interviews and earnings appear once you’re assigned.');
-  }
   var hit=agFindMember(t);
   if(hit && m(['report','how is','how are','tell me about','on ','profile','doing','analysis']))
     return agMemberReport(hit.m,hit.c);
@@ -8452,12 +8428,9 @@ function agReply(q){
 
 /* ---------- suggestions — scoped to whatever screen you are on ---------- */
 function suggestions(){
-  if(portal()==='agent'){
-    if(window.__agentNew)
-      return ['What do I need to set up?','How does vetting work?','How does the 80/20 payout work?','What happens after setup?'];
+  if(portal()==='agent')
     return ['Who is at risk right now?','Analyse cohort 12','What is waiting on me?',
             'Report on James Whitby','Brief me for the next call','Show my earnings'];
-  }
   var k=candCtx();
   var v=(typeof S!=='undefined' && S && S.view) || 'dashboard';
   /* on a chapter, Tal leads with course-guide help grounded in that chapter's content */
