@@ -163,7 +163,7 @@ body{font:14px/1.55 'Lato',ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-se
 /* ---------- book a call: right-hand slide-over ---------- */
 .ui .bk-wrap{position:fixed;inset:0;z-index:230;display:none;background:rgba(0,0,0,.42)}
 .ui .bk-wrap.on{display:block}
-.ui .bk{position:absolute;top:0;right:0;bottom:0;width:470px;max-width:100%;background:#ffffff;
+.ui .bk{position:absolute;top:0;right:0;bottom:0;width:502px;max-width:100%;background:#ffffff;
   display:flex;flex-direction:column;box-shadow:-20px 0 60px -22px rgba(0,0,0,.45)}
 .ui .bk-h{display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid #d6d6d6;flex:0 0 auto}
 .ui .bk-h h2{flex:1;margin:0;font-size:17px;font-weight:700;letter-spacing:-.02em}
@@ -196,6 +196,31 @@ body{font:14px/1.55 'Lato',ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-se
   margin:0 0 10px}
 .ui .bk-sec:not(:first-child){margin-top:20px}
 .ui .bk-note{font-size:12px;color:#000000;line-height:1.6;margin-top:12px}
+
+/* AI analysis (level-decision drawer) */
+.ui .aia{border:1px solid #d6d6d6;border-radius:16px;padding:15px;margin-top:12px;background:var(--fa)}
+.ui .aia-h{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.ui .aia-h .ic{width:25px;height:25px;border-radius:8px;background:#000000;color:#ffffff;display:grid;place-items:center;flex:0 0 25px}
+.ui .aia-h .ic svg{display:block}
+.ui .aia-h .t{font-size:12.5px;font-weight:700;flex:1;letter-spacing:-.01em}
+.ui .aia-sum{font-size:12.5px;line-height:1.6;color:#000000;margin:0}
+.ui .aia-line{font-size:12px;line-height:1.55;color:#000000;margin-top:9px;padding-top:9px;border-top:1px solid var(--ln)}
+.ui .aia-line b{font-weight:700}
+.ui .aia-sub{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:700;margin:15px 0 9px}
+.ui .aia-cmp{margin-bottom:12px}
+.ui .aia-cmp:last-child{margin-bottom:0}
+.ui .aia-cmp-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ui .aia-cmp-h .nm{font-size:12px;font-weight:700;flex:1}
+.ui .aia-cmp-h .tag{padding:1px 8px;font-size:10.5px}
+.ui .aia-cmp-r{font-size:11.5px;color:var(--mut);line-height:1.5;margin-top:6px}
+.ui .aia-ev{display:flex;gap:10px;padding:11px 0;border-top:1px solid var(--ln)}
+.ui .aia-ev:first-of-type{border-top:0;padding-top:2px}
+.ui .aia-ev .qm{flex:1;min-width:0}
+.ui .aia-ev .qt{font-size:12px;color:#000000;line-height:1.5;font-style:italic}
+.ui .aia-ev .en{font-size:11px;color:var(--mut);margin-top:4px;line-height:1.45}
+.ui .aia-dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;margin-top:5px;background:var(--mut)}
+.ui .aia-dot.pos{background:var(--ok)}
+.ui .aia-dot.neg{background:var(--bad)}
 
 /* chosen agent */
 .ui .bk-agent{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid #d6d6d6;border-radius:16px}
@@ -6772,8 +6797,40 @@ function flagOf(m,c){
 COHORTS.forEach(c=>c.members.forEach(m=>m.flag=flagOf(m,c)));
 
 const EVALS=[
- {id:'e1',name:'Thomas Beck',when:'Today 10:00',bucket:'Explorer',quiz:64,ai:'E1',aiwhy:'Quiz put them as an Explorer. The transcript supports the entry rung — they described avoiding a handover twice.',status:'pending'},
- {id:'e2',name:'Rachel Okonjo',when:'Yesterday 15:30',bucket:'Builder',quiz:71,ai:'B3',aiwhy:'Strong on ambiguity and stakeholder mapping. Weaker on conflict repair.',status:'pending'}
+ {id:'e1',name:'Thomas Beck',when:'Today 10:00',bucket:'Explorer',quiz:64,ai:'E1',aiwhy:'Quiz put them as an Explorer. The transcript supports the entry rung — they described avoiding a handover twice.',status:'pending',
+  an:{
+   confidence:'High',
+   summary:'Quiz and interview agree on the Explorer band, and the interview places them at the entry rung. Solid foundations and clear intent, but two moments of doing the work themselves rather than handing it to an agent cap the number at 1.',
+   quizRead:'64/100 sits inside the Explorer band (55–74). Foundational tool-use questions carried the score; the multi-step delegation items were where points were lost — the same gap the interview surfaced.',
+   comps:[
+    {name:'Task delegation',rung:'E1',pct:34,read:'Preferred to complete steps personally; handed work to an agent only when explicitly prompted.'},
+    {name:'Handling ambiguity',rung:'E2',pct:54,read:'Asked scoping questions before acting — a notch above the entry rung.'},
+    {name:'Quality checking',rung:'E1',pct:40,read:'Accepted the first output without a verification pass on two of three tasks.'},
+    {name:'Communication',rung:'E2',pct:58,read:'Narrated intent clearly; left some tool jargon unexplained.'}
+   ],
+   evidence:[
+    {t:'positive',q:'Let me confirm the date range before I pull anything.',n:'Scoped the task before acting — a genuine strength.'},
+    {t:'concern',q:'I’d rather just write that part myself than explain it to the agent.',n:'Handover avoidance, said twice. This is the entry-rung tell.'}
+   ],
+   watch:'The two handover-avoidance moments are what hold this at E1 rather than E2. Worth re-checking delegation at the 90-day mark.'
+  }},
+ {id:'e2',name:'Rachel Okonjo',when:'Yesterday 15:30',bucket:'Builder',quiz:71,ai:'B3',aiwhy:'Strong on ambiguity and stakeholder mapping. Weaker on conflict repair.',status:'pending',
+  an:{
+   confidence:'Medium',
+   summary:'Clearly a Builder, with standout systems thinking. Ambiguity handling and stakeholder mapping read a rung above the rest, but a weak conflict-repair scenario pulls the blend down to 3.',
+   quizRead:'71/100 sits at the top of the Builder band (55–79). Systems-design questions drove the score; the interpersonal items pulled it back — consistent with the interview.',
+   comps:[
+    {name:'Handling ambiguity',rung:'B4',pct:80,read:'Reframed an under-specified brief into three testable options unprompted.'},
+    {name:'Stakeholder mapping',rung:'B4',pct:76,read:'Named the real decision-makers and their competing incentives.'},
+    {name:'Conflict repair',rung:'B2',pct:42,read:'Deflected the disagreement scenario to escalation rather than working it through.'},
+    {name:'Delegation',rung:'B3',pct:64,read:'Comfortable splitting work across agents; lighter on verifying their output.'}
+   ],
+   evidence:[
+    {t:'positive',q:'There are really three readings of this ask — here’s how I’d test which one they mean.',n:'Strong ambiguity handling, at the B4 level.'},
+    {t:'concern',q:'If they pushed back I’d probably just escalate to the lead.',n:'Avoids repairing the conflict directly — the B2 signal.'}
+   ],
+   watch:'Ambiguity and mapping sit at B4; conflict repair at B2 is what averages this to B3. Confidence is medium — one more interpersonal scenario would firm it up.'
+  }}
 ];
 const SUMMARIES=[
  {id:'s1',name:'Priya Nair',cohort:9,pc:96,avg:91,mins:1680,calls:12,of:13,retakes:1,onTime:12,status:'pending'},
@@ -7579,6 +7636,34 @@ function agEvalCapture(){
   var r=document.getElementById('evReason'); if(r) d.reason=r.value;
   var n=document.getElementById('evNotes'); if(n) d.notes=n.value;
 }
+/* The AI's read of the interview — a proper analysis, not a one-liner:
+   overall verdict + confidence, how the quiz maps, a competency breakdown
+   with evidence from the transcript, and why it landed on this rung. */
+var AI_SPARK='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2.6l1.85 4.98L18.9 9.4l-5.05 1.82L12 16.2l-1.85-4.98L5.1 9.4l5.05-1.82z"/><path d="M18.6 14.4l.9 2.42 2.45.88-2.45.88-.9 2.42-.9-2.42-2.45-.88 2.45-.88z" opacity=".65"/></svg>';
+function agEvalAnalysis(e){
+  var a=e.an;
+  if(!a){ return '<div class="note i mt"><b>Why the AI proposed '+e.ai+'</b>'+esc(e.aiwhy||'')+'</div>'; }
+  var comps=(a.comps||[]).map(function(c){
+    return '<div class="aia-cmp"><div class="aia-cmp-h"><span class="nm">'+esc(c.name)+'</span>'
+      +'<span class="tag lv">'+esc(c.rung)+'</span></div>'
+      +'<div class="bar t"><i style="width:'+c.pct+'%"></i></div>'
+      +'<div class="aia-cmp-r">'+esc(c.read)+'</div></div>';
+  }).join('');
+  var ev=(a.evidence||[]).map(function(x){
+    var cls=x.t==='positive'?'pos':(x.t==='concern'?'neg':'');
+    return '<div class="aia-ev"><span class="aia-dot '+cls+'"></span><div class="qm">'
+      +'<div class="qt">“'+esc(x.q)+'”</div><div class="en">'+esc(x.n)+'</div></div></div>';
+  }).join('');
+  return '<div class="aia mt">'
+    +'<div class="aia-h"><span class="ic">'+AI_SPARK+'</span><span class="t">Tal’s analysis</span>'
+    +'<span class="tag'+(a.confidence==='High'?' ok':(a.confidence==='Low'?' bad':' wa'))+'">'+esc(a.confidence)+' confidence</span></div>'
+    +'<p class="aia-sum">'+esc(a.summary)+'</p>'
+    +(a.quizRead?'<div class="aia-line"><b>Quiz → title.</b> '+esc(a.quizRead)+'</div>':'')
+    +(comps?'<div class="aia-sub">Competency read</div>'+comps:'')
+    +(ev?'<div class="aia-sub">From the interview</div>'+ev:'')
+    +(a.watch?'<div class="aia-line"><b>Why '+esc(e.ai)+'.</b> '+esc(a.watch)+'</div>':'')
+    +'</div>';
+}
 function agRenderEval(){
   var d=G.evalDraft; if(!d) return;
   var e=EVALS.filter(function(x){return x.id===d.id;})[0]; if(!e) return;
@@ -7589,7 +7674,7 @@ function agRenderEval(){
   +'<div class="bk-b"><div class="kv"><span>Interviewed</span><b>'+esc(e.when)+'</b></div>'
   +'<div class="kv"><span>Quiz title</span><b>'+esc(e.bucket)+' · '+e.quiz+'/100</b></div>'
   +'<div class="kv"><span>AI recommendation</span><b>'+lvlLabel(e.ai)+'</b></div>'
-  +'<div class="note i mt"><b>Why the AI proposed '+e.ai+'</b>'+esc(e.aiwhy)+'</div>'
+  +agEvalAnalysis(e)
   +'<label class="fl mt" style="margin-top:14px">Your decision — '+esc(e.bucket)+', level 1 to 5</label><div class="row" style="gap:7px">'
   +opts.map(function(o){return '<button class="btn '+(o===d.lvl?'p':'')+'" data-ag="picklevel:'+o+'">'+o+'</button>';}).join('')
   +'</div>'
