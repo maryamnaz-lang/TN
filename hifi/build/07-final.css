@@ -1,0 +1,84 @@
+/* ==========================================================================
+   50. THE ESCAPEES, NOW BOUND TO TOKENS
+   The v14 post-mortem: "six colour values had escaped the token block ...
+   sweep hardcoded rgba() as well as hex before any future palette change."
+   Every value the sweep found is now declared in section 1 and referenced
+   here, so the next palette change is a single-file edit.
+   ========================================================================== */
+.pt-bar{background:var(--pt-bar-bg);border-bottom-color:var(--pt-bar-bg)}
+.pt-sel,.pt-nav button,.pt-vp button{border-color:var(--pt-line)}
+.pt-sel:hover,.pt-nav button:hover,.pt-vp button:hover{background:var(--pt-hover)}
+.pt-vp{border-left-color:var(--pt-line)}
+/* controls are outlined on the canvas, not filled white — see the white
+   audit in verify.mjs. --pure-white survives only as ink on dark grounds. */
+.btn-d{color:var(--pure-white)}
+.btn-d:hover{background:var(--error-hover)}
+.tag.green,.tag.succ,.badge.done{color:var(--on-success-bg)}
+.tag.red{color:var(--on-error-bg)}
+.tag.warn,.tag.org{color:var(--on-warning-bg)}
+.ai-pop{box-shadow:0 2px 12px var(--accent-shadow)}
+.thumb .t{background:var(--thumb-scrim);color:var(--pure-white)}
+
+/* status notes: the fill is Carbon's, the type on it has to clear AA */
+.note.err{color:var(--on-error-bg)}
+.note.err .nb b{color:var(--on-error-bg)}
+.note.succ{color:var(--on-success-bg)}
+.note.succ .nb b{color:var(--on-success-bg)}
+.note.warn{color:var(--on-warning-bg)}
+.note.warn .nb b{color:var(--on-warning-bg)}
+
+/* the middot between two meta values is a text node, so it carries a text
+   colour and has to clear AA on every ground it appears over */
+.sep,.ch-m .sep,.ag-m .sep,.nrow-d .sep,.mdot{color:var(--text-helper)}
+.sec.tint .sep,.layer-02 .sep{color:var(--text-secondary)}
+
+/* ==========================================================================
+   51. AGENT ROWS — the horizontal shortlist card becomes a list row
+   ========================================================================== */
+.rail,.rail-wrap{display:flex;flex-direction:column;width:100%;overflow:visible}
+.agh{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:'av name go' 'av rate go' 'av meta go' 'av foot go';
+  align-items:center;column-gap:var(--s05);row-gap:2px;
+  width:100%;padding:var(--s05) var(--gutter);
+  border-bottom:1px solid var(--border-subtle-01);
+  background:transparent;position:relative;
+  transition:background var(--dur-short) var(--ease-standard)}
+.agh:hover{background:var(--overlay-hover);cursor:pointer}
+.agh:last-child{border-bottom:0}
+.agh > .av{grid-area:av;width:48px;height:48px;font-size:15px;align-self:start}
+.agh-n{grid-area:name;font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+.agh-r{grid-area:rate;display:flex;align-items:center;gap:var(--s02)}
+.agh-r .num{font-size:12.5px;font-weight:600;color:var(--text-secondary)}
+.agh-m{grid-area:meta;font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+/* .agh-f is the footer line — slot and price — not an avatar */
+.agh-f{
+  grid-area:foot;display:flex;align-items:baseline;gap:var(--s04);flex-wrap:wrap;
+  width:auto;height:auto;background:transparent;color:inherit;
+  margin-top:var(--s02);font-size:12.5px;overflow:visible}
+.agh-slot{color:var(--text-secondary);min-width:0;overflow-wrap:anywhere}
+.ag-price{margin-left:auto;font-weight:600;color:var(--text-primary);
+  font-variant-numeric:tabular-nums;flex:none}
+.agh > .card-go{grid-area:go;align-self:center}
+.agh .bd,.ag .bd{display:none}
+.agh .tal-star,.ag .tal-star{position:absolute;top:var(--s03);right:var(--s08);z-index:2}
+
+/* ==========================================================================
+   52. 320px — the narrowest supported width
+   ========================================================================== */
+.btn-row > .btn,.btn-set > .btn{min-width:0}
+.tg{display:flex;max-width:100%;overflow:hidden}
+.tg button{flex:1;min-width:0;padding:0 var(--s03);font-size:12.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inp,select.inp,textarea.inp,.otp input{max-width:100%;min-width:0}
+.f,.sec,.page,.tile,.aw,.ag,.agh,.ch{min-width:0}
+.spaced{flex-wrap:wrap}
+.slots{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+@container app (max-width:359px){
+  :root{--gutter:12px}
+  .btn{padding-left:var(--s04);padding-right:var(--s04)}
+  .score-pts .n{font-size:34px;line-height:38px}
+  .lvl-hero .big{font-size:30px;line-height:36px}
+  .ph h1{font-size:23px;line-height:29px}
+}

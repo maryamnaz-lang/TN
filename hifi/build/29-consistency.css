@@ -1,0 +1,968 @@
+/* ==========================================================================
+   29. THE HEAD BAND, THE ASK CONTROL, AND TWO WALLS THAT TOUCH
+
+   Four corrections, each measured rather than guessed. They are stated in a
+   layer of their own, last in the cascade, because three of them override a
+   rule that is written earlier and correct in the place it was written — the
+   alternative was editing §02, §24 and §25 in ways that would each need a
+   second thought about what else the rule was holding up.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE REQUIRED ACTION TAKES THE WIDTH OF ITS WORDS
+
+   §25.11 gives the action `justify-self:stretch;width:100%` below 900, on the
+   argument that a phone expects a full-width button. That argument holds for
+   a form's submit control, which is the last thing on a screen and has the
+   screen to itself. It does not hold here: this button sits INSIDE Tal's
+   card, above a row of question chips that are all sized to their own text,
+   and a bar running the full width of the band reads as the end of the page
+   rather than as one of several things Tal is offering. At 744 it was 680px
+   of orange to carry seventeen characters.
+
+   So it is sized by its label at every width. It keeps `align-self:start`
+   and the `act` area, so nothing about the band's rhythm moves; only the
+   box's width changes.
+
+   `max-width:100%` with `white-space:normal` is the safety line: a long
+   label on a 390 screen wraps inside the button instead of running past the
+   gutter. Short labels — every one in the build today — stay on one line and
+   the button stays snug.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.ai-act-top > .ai-head > .ai-do,
+.app .modhead .ai-aura.ai-act-top > .ai-head > .btn-p{
+  justify-self:start;
+  width:auto;
+  max-width:100%}
+
+/* the desktop composition is unchanged: the action holds the top-right
+   corner of the card, which is the page spine. Restated because the rule
+   above is unconditional and this layer is read after §25's own 900 block. */
+@container app (min-width:900px){
+  .app .modhead .ai-aura.ai-act-top > .ai-head > .ai-do,
+  .app .modhead .ai-aura.ai-act-top > .ai-head > .btn-p{
+    justify-self:end;width:auto;max-width:100%}
+}
+
+/* --------------------------------------------------------------------- 2 ---
+   "ASK TAL" SITS ON THE BUTTON'S CENTRELINE
+
+   The label was 4px high in a 36px box, and the cause is not alignment: the
+   button is `align-items:center` and the star mark beside it centres
+   correctly at 18. `.lbl` is the form-label utility from §02, which carries
+   `margin-bottom:var(--s02)` so that a label sits 8px clear of the field it
+   names. Reused as the text inside a button there is no field under it, but
+   the margin comes along — and a flex container centres the MARGIN box, so
+   an 18px line with 8px hanging off the bottom centres as a 26px item and
+   the words land 4px above where they belong.
+
+   Zeroing the margin is the whole fix. The mark was never wrong, which is
+   why the pair looked subtly out of true rather than obviously broken: one
+   of the two members was centred and the other was not.
+   -------------------------------------------------------------------------- */
+.app .agh-book .tal-star .lbl,
+.app .agh .tal-star .lbl,
+.app .ag .tal-star .lbl{margin:0}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE PLATE AND THE STEPPER ARE ONE COLUMN OF BANDS
+
+   §25's own rule for this adjacency zeroes `margin-top` and `border-top` on
+   the section under the plate. Both were already zero. The 32px of white
+   between the black plate and the grey stepper is PADDING, and it is paid
+   twice: 16px on the bottom of the section holding the plate, 16px on the
+   top of the section holding the stepper.
+
+   Only the first one is removed. The plate's section pays no bottom, so the
+   black ends where the grey begins and the two read as one column of bands
+   with a colour change between them — which is what the two full-bleed
+   surfaces are for. The stepper KEEPS its 16px top: that padding is inside
+   the tinted box, so it is air above "Where you are" rather than a gap
+   between two blocks, and removing it would jam the heading against the
+   plate's bottom edge.
+   -------------------------------------------------------------------------- */
+.app .page > .sec:has(> .plate):has(+ .sec.sec-stp),
+.app .page > .sec:has(> .plate):has(+ .sec.tint),
+.app .page > .sec:has(> .plate):has(+ .sec.sec-cs),
+.app .page > .sec:has(> .lvl-hero):has(+ .sec.sec-stp),
+.app .page > .sec:has(> .lvl-hero):has(+ .sec.tint){padding-bottom:0}
+
+/* AND RESTATED FOR THE DESKTOP TIER. The rule above holds below 900 and lost
+   at 900 and up: the DOM is identical at both widths and the selector matches
+   at both, so what beats it is a declaration inside a `min-width:900px` block
+   — a container query is a cascade tier of its own, and a later one wins over
+   an unconditional rule of the same weight regardless of which layer it sits
+   in. Restating it inside the same tier is the fix §25.7 already reaches for
+   twice, for exactly this reason. */
+@container app (min-width:900px){
+  .app .page > .sec:has(> .plate):has(+ .sec.sec-stp),
+  .app .page > .sec:has(> .plate):has(+ .sec.tint),
+  .app .page > .sec:has(> .plate):has(+ .sec.sec-cs),
+  .app .page > .sec:has(> .lvl-hero):has(+ .sec.sec-stp),
+  .app .page > .sec:has(> .lvl-hero):has(+ .sec.tint){padding-bottom:0}
+}
+
+/* --------------------------------------------------------------------- 4 ---
+   BEFORE THE INTERVIEW, THE LADDER STILL SHOWS FIFTEEN RUNGS
+
+   The pre-interview level card drew the three tracks as a three-column grid
+   with "YOU ARE HERE" under one of them, and the confirmed card drew the
+   same ladder every other level surface draws. Two drawings of one idea, and
+   the grid was the one that could not answer the question the page is about:
+   how far is it from here to the top. Fifteen rungs at a glance answers it;
+   three named boxes do not.
+
+   So the unconfirmed state takes the ladder too. What it must NOT do is
+   claim a rung — that is exactly what the interview decides, and a filled
+   segment would be a promise the product has not made. The five rungs of
+   your own track are marked instead, at a weight between an empty rung and a
+   confirmed one: enough to say "you are somewhere in here", not enough to
+   read as a position.
+   -------------------------------------------------------------------------- */
+/* AND IT IS THE FULL BRAND FILL, NOT A DIMMED ONE.
+   This went through two wrong versions before the right one, and both were
+   wrong in the same direction — trying to say "less than a confirmed rung"
+   by draining the colour.
+
+   `opacity:.28` was the first, and it does not survive at all: §13's entrance
+   animations run with `fill-mode:both`, so once one has played its final
+   keyframe keeps applying, and an animation beats any normal declaration
+   whatever its specificity. The segment measured `opacity:1` at rest with
+   exactly one rule matching it and that rule saying `.28`.
+
+   `color-mix(… 34%, transparent)` was the second. It fixed the flicker —
+   nothing animates `background-color` here — but 34% of orange over near
+   black is a muddy brown, and on the page it read as five DISABLED cells
+   rather than five quiet ones. The client's word for it was "light blocks",
+   and the answer is that this band does not need to be quieter than a rung
+   at all: it is the only marked run on its own bar, there is no confirmed
+   rung beside it to be outranked by, and the caption under it already says
+   YOUR TRACK, FROM THE QUIZ.
+
+   So it takes `--accent-grad`, the same fill §19 gives every other marked
+   segment in the product. `background-image` over a `background-color` of
+   solid accent, which is exactly how §19 states it — the colour is the
+   fallback the gradient paints on top of, and neither is an opacity, so the
+   trap above cannot come back. */
+.app .lvl-hero .ladder-track i.mine{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  --on-brand-fill:1}
+
+/* A RUNG YOU HAVE CLIMBED IS NOT A RUNG YOU HAVE HALF CLIMBED.
+   `.done` had the same `opacity` treatment as `.mine` above — §15 sets .42
+   — and it is the same bug with a worse symptom, because `.done` and
+   `.mine` do not mean the same thing. `.mine` is a PREDICTION: five rungs
+   you might be on, deliberately quieter than a fact. `.done` is a fact —
+   four rungs you actually climbed, signed off in a report — and drawn at
+   42% it read as the disabled state of the rung beside it.
+
+   IT ALSO FLICKERED. §13's entrance animations carry `fill-mode:both`, so
+   the played keyframe's `opacity:1` keeps applying and beats any normal
+   declaration: the rungs were full strength after any navigation and 42%
+   on the first paint of a reload, where no animation has run. The same
+   signature the note above records, on the neighbouring selector.
+
+   No opacity at all, so §19's accent gradient — which `.done` is already in
+   the generated list for — is what shows, exactly as it does on `.on`. The
+   run of orange ends at the rung you are on and the boundary with the grey
+   is what says how far up you are; the hero's own line ("rung 4 of 15")
+   says it in words directly beside it. */
+.app .ladder i.done,
+.app .lvl-hero .ladder i.done{opacity:1}
+
+/* the track's own name is the one the eye should find first in the row of
+   three under the bar; the other two are where you are going, not where you
+   are */
+.app .lvl-hero .ladder-track ~ .ladder-lab > span.on,
+.app .lvl-hero .ladder-lab > span.on{
+  color:var(--on-dark);
+  font-weight:600}
+
+/* --------------------------------------------------------------------- 5 ---
+   THE AGENT LIST IS A CLOSED BOX AT EVERY WIDTH
+
+   §24.12 gives the three-agent rail its left and right edges unconditionally,
+   on the argument that inside the gutter the outer page rails are too far
+   away to bound it. §14 adds the top and bottom — but only inside its
+   `min-width:900px` block, because that is the layer where the rail becomes a
+   three-column grid.
+
+   Below 900 the rail is a stack of rows instead, and it was left with two
+   vertical edges and no horizontal ones: a box open at both ends, with the
+   last row's own hairline doing duty as a bottom edge and nothing at all
+   closing the top. The four edges are one decision, so they are stated
+   together and unconditionally. Desktop already draws them, so restating
+   costs nothing there and the box stops depending on which layer is in force.
+   -------------------------------------------------------------------------- */
+.app .page > .rail-wrap > .rail{
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule)}
+
+/* --------------------------------------------------------------------- 7 ---
+   INSIDE THE BAND, THE BAND'S RHYTHM GOVERNS — NOT `.tight`
+
+   Measured across all twelve module first pages that carry a Tal card, at
+   three widths, with motion off: the band's spacing came out in THREE
+   different signatures where there should be one. Distance from the band's
+   top to the title was a reliable 34 everywhere, and the bottom closed
+   correctly everywhere; the variance was all in the middle.
+
+   Five of the twelve — enrol at two stages, and the dashboard from week 1
+   on — put `.tight` on the Tal card. §04 gives `.ai-aura.tight` 16px of
+   padding on every side, which is right for a Tal card sitting in the body
+   of a page, where it is one block among several and needs its own inset.
+   Inside the module head it is 16 above the heading and 16 below the
+   question, against a rhythm §25.6 read off the Figma frame join by join —
+   so those five pages ran 12 looser between the description and Tal's row,
+   and 36 looser between the question and the ask line.
+
+   The horizontal inset stays: the left rule and its gutter are what mark
+   Tal's block, and §10 sets that with `!important` in any case. Only the
+   vertical padding goes, because vertically the band is already spacing
+   these members and two systems doing one job is what the three signatures
+   were.
+
+   It matches the plain card rather than zeroing: `.ai-aura` carries 4px top
+   and bottom, so `var(--s02)` is what the other seven cards actually have,
+   and 0 would leave these five 4px TIGHTER than the reference instead of
+   16px looser. Matching means matching, not overshooting.
+
+   The other half of this was not a stylesheet problem at all. Two of the
+   view's sections carried `style="padding-bottom:var(--s06)"` — an inline
+   24px, written when these Tal cards sat in the body of a page and needed
+   air beneath them. `placeBand` now lifts them into the band, where the band
+   supplies that air, but the attribute came along. An inline declaration
+   outranks every rule in the stylesheet regardless of specificity, which is
+   why three separate attempts to state this in CSS changed nothing. It is
+   removed at source in `views.js` (the two sections that wrap a Tal card
+   only — the progress strip and the score card keep theirs, since they are
+   still page-body blocks).
+
+   The section's bottom is still stated here, with `:has(.ai-aura)` rather
+   than `:has(> .ai-aura)`, so a card wrapped one level deeper is caught too.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.tight{padding-top:var(--s02);padding-bottom:var(--s02)}
+.app .modhead > .sec:has(.ai-aura){padding-bottom:0}
+
+/* --------------------------------------------------------------------- 8 ---
+   THE COHORT-LEADER WALL IS THE SAME BLACK CARD AS THE REST
+
+   Three things had drifted apart from the plate — the component this card is,
+   in every respect that matters.
+
+   THE GLOW. `.lead-b` was missing from §21.23's host list and from ai4's
+   `GLOW_ON`, so it was the one dark surface in the product with no warm haze:
+   flat #111 next to five cards carrying light off their top-right corner.
+   Added in ai4; the two CSS halves are stated here — the card has to clip and
+   position the glow, and everything that is not the glow has to sit above it.
+
+   THE ACTION. §28 gave it a white fill with black text. On every other dark
+   surface the primary action is the brand gradient — §15 states it for the
+   plate in as many words ("the plate is dark, so its primary action cannot be
+   black"), and the same argument makes it not-white here: white is the card's
+   TEXT colour, so a white button is the one element that competes with the
+   heading instead of standing out from it. It takes `--accent-grad`, the fill
+   §19 runs through every primary action in the product, and it declares
+   `--on-brand-fill` so the contrast sweep counts it like the others.
+
+   THE LAYOUT. §16 lays this card out as two columns above 900 with the action
+   in column two — and §28, later and unconditional, sets `display:block` on
+   the same selector. The grid template survived in the computed style with
+   nothing to apply it to, so the copy kept its 72ch measure on the left, the
+   right half of a full-bleed band stayed empty, and the action floated to the
+   bottom-right corner of the void with nothing to align to. The grid is
+   restated in the tier that needs it, matching the plate: text in column one,
+   the action bottom-right in column two, on the same baseline as the last
+   line of tags.
+   -------------------------------------------------------------------------- */
+.app .lead-b{position:relative;overflow:hidden}
+.app .lead-b > :not(.dark-glow){position:relative;z-index:2}
+
+.app .lead-b .lead-a .btn{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  color:var(--on-accent);
+  border-color:transparent;
+  --on-brand-fill:1}
+.app .lead-b .lead-a .btn svg{fill:var(--on-accent)}
+
+@container app (min-width:900px){
+  .app .lead-b{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    column-gap:var(--s08);align-items:end}
+  .app .lead-b .lead-eb,
+  .app .lead-b .lead-t,
+  .app .lead-b .lead-x,
+  .app .lead-b .lead-tags,
+  .app .lead-b .lead-ok{grid-column:1}
+  .app .lead-b .lead-a{
+    grid-column:2;grid-row:1 / span 4;
+    margin-top:0;justify-self:end;align-self:end}
+}
+
+/* --------------------------------------------------------------------- 9 ---
+   A FULL-WIDTH BUTTON PUTS ITS LABEL ON ONE EDGE AND ITS MARK ON THE OTHER
+
+   §12 already states this, and states it correctly, for `.btn-full`:
+   `width:100%;justify-content:space-between`. The label goes to the left rail,
+   the icon to the right, and the button reads as a row rather than as a
+   centred pill that happens to be wide — which is the whole reason a wide
+   button is allowed to be wide.
+
+   Six other places take a button to 100% without saying the second half, so
+   the label and icon stayed bunched in the middle with the rest of the width
+   as empty plate either side. They are named here rather than fixed one layer
+   at a time, because it is one rule about one thing.
+
+   Stated unconditionally on purpose: several of these only reach 100% inside a
+   container query, and at their natural width `space-between` has no free
+   space to distribute — the flex `gap` still sets the spacing, so the narrow
+   case is untouched and there is no breakpoint to keep in sync.
+   -------------------------------------------------------------------------- */
+.app .btn-full,
+.app .stickybar .btn,
+.app .otp-act > .btn,
+.app .lead-b .lead-a .btn,
+.app .lvl-split .lvl-split-a .btn,
+.app .lvl-hero .lvl-foot-a .btn,
+.app .auth-card .foot-row .btn-full{justify-content:space-between}
+
+/* -------------------------------------------------------------------- 10 ---
+   EDIT HOLDS THE RIGHT END OF THE IDENTITY ROW
+
+   `.idhead` is already a flex row — photo, then the name block. The edit
+   control joins it as a third member and takes the far end with an auto
+   margin, opposite the name and photo it edits.
+
+   The row wraps rather than squeezing. At 390 there is no room for a 72px
+   photo, a name, an email, a track tag and a 150px button on one line, so the
+   button drops to a second line — and the auto margin still holds it right,
+   so it reads as the same control in the same place rather than as a new
+   full-width action at the bottom of the block.
+
+   It aligns to the NAME, not to the block. `.idhead` centres its members, and
+   the name block is three lines tall — email and track tag under the name — so
+   a centred button sat level with the email, one line below the row it is
+   named for. `align-self:flex-start` puts it on the name's own line.
+   -------------------------------------------------------------------------- */
+.app .idhead{flex-wrap:wrap}
+.app .idhead .idhead-a{margin-left:auto;flex:none;align-self:flex-start}
+
+/* --------------------------------------------------------------------- 6 ---
+   THE ASK PAGE'S EMPTY STATE IS A COLUMN WITH ROOM TO CENTRE IN
+
+   §27.4's hero is now shared with the ask thread (its selectors take an
+   `:is()` so there is one definition, at the same specificity it always
+   had). The panel's body is already a flex column, which is what lets the
+   hero sit on the centre line with `margin:auto 0`. The thread on the ask
+   page is a scrolling block, so it needs the same two properties before the
+   hero has anything to centre against — otherwise the mark and the greeting
+   sit at the top of a very tall empty column.
+
+   THE `min-height:100%` THAT USED TO BE HERE TOOK THE FOOT OFF THE PAGE.
+   `.ask-page` is a flex column of a definite height, and 21-ask §3 gives
+   the thread `flex:1 1 auto;min-height:0` — which already hands it exactly
+   the room left over once the top bar and the foot have taken theirs, and
+   that leftover is what the hero centres in. Adding `min-height:100%` on
+   top resolved against the PAGE's height, so the thread demanded the whole
+   column on its own and pushed `.ask-foot` past the bottom of an `.app`
+   that is `overflow:hidden`. The chips and the ask field were not hidden or
+   missing — they were rendered, 97px below the visible page, and clipped.
+
+   So the min-height goes back to 0 rather than away: it is restating
+   21-ask's value at this reach, which is the only thing this rule needs to
+   do now that the flex column is stated there as well.
+   -------------------------------------------------------------------------- */
+.app .ask-thread:has(> .tal-hero){
+  display:flex;flex-direction:column;min-height:0}
+
+/* no `.ladder-note` here on purpose — see the note in `trackBand`. The bar
+   draws the track's five rungs, the sub says where the rung comes from, and
+   the heading is the track's name; a line repeating all three was the grid's
+   redundancy in new clothes. */
+
+/* -------------------------------------------------------------------- 11 ---
+   THE ACHIEVEMENT BAND IS A BAND, WITH A MARK AND A CONTROL ON IT
+
+   The one moment on this dashboard that exists to say "you won something"
+   was drawn out of the parts a list row is made of, and read like one.
+   Three corrections, all the same correction.
+
+   THE GROUND is `--surface-ach`, the client's #F4FEF6 — see the note on the
+   token in §12 for why the one cool tone in a warm palette is the right
+   ground for a notification. (This line read #EAEFEF, which the token has
+   never been: it was #E8F9F9 before the move to #F4FEF6. A hex written into
+   prose does not get updated when the token does — the token is the source,
+   and this sentence should have named it and stopped.) It is a FILL, which settles the band's edges
+   under §18's rule: a block with a ground of its own keeps its full-width
+   boundary, and the tone change is that boundary. Nothing here needs a
+   contrast exception — the normal ink pair clears AA on it.
+
+   THE MARK is the artwork, not a glyph. `.ach-ic` is the 40px chip every
+   list row leads with, so a Bronze shield you can see on the rewards page
+   arrived here as a line drawing in a box. It takes the same 44px award mark
+   §15 gives the rewards list, and drops the chip with it: a box drawn around
+   a rendered object is a frame around a photograph. The glyph is kept as the
+   fallback for the one achievement that is not an award — a promotion has no
+   artwork — and that case keeps the chip, because a glyph does need one.
+
+   VIEW IS A BUTTON. It was a `<button>` inside `.ach-b`, the TEXT slot,
+   where §02's trailing-icon rule sized it 20x20 as though it were a chevron
+   — so the one thing this band asks you to do was drawn as underlined text
+   at the foot of a sentence, the same shape as the two ordinary links either
+   side of it on the page. It leaves the text slot, takes the black primary
+   every other action on this dashboard wears, and sits at the end of the row
+   next to the dismiss. `min-height` is restated because §10 takes `.btn-sm`
+   down to 32px and 36 is what the rest of this page offers.
+
+   THE ROW HAS FOUR SLOTS, and only the phone gets two lines. Mark, text,
+   action and dismiss will not fit across a 390 screen — 44 + 16 + a sentence
+   + a button + 40 leaves the sentence about 150px — so there the action drops
+   to a second line and starts on the text's own spine, which is what
+   `.plate` does with the same problem. It turns back into one row at 672,
+   not at 900: the tablet frame is 624px of column, which leaves the sentence
+   ~400px next to a 70px button, and the two-line version was only ever a
+   concession to the phone. 672 is also where `.stand` goes three-across, so
+   the dashboard changes shape at one width rather than two.
+
+   The dismiss holds the top right corner in both layouts, because it closes
+   the band, not the line it happens to sit on.
+   -------------------------------------------------------------------------- */
+.app .ach{
+  display:grid;align-items:center;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:
+    'mk b  x'
+    '.  go go';
+  column-gap:var(--s05);row-gap:var(--s05);
+  padding:var(--s06) var(--pad-x);
+  background-color:var(--surface-ach)}
+.app .ach > .ach-art,.app .ach > .ach-ic{grid-area:mk}
+.app .ach > .ach-b{grid-area:b}
+.app .ach > .ach-go{grid-area:go;justify-self:start}
+.app .ach > .ach-x{grid-area:x;align-self:start}
+
+@container app (min-width:672px){
+  .app .ach{
+    grid-template-columns:auto minmax(0,1fr) auto auto;
+    grid-template-areas:'mk b go x';
+    column-gap:var(--s06)}
+  .app .ach > .ach-go{justify-self:end}
+  .app .ach > .ach-x{align-self:center}
+}
+
+/* the mark: sized and cropped exactly as §15's award marks, so the shield on
+   this band and the shield on the rewards page are one recognisable object */
+.app .ach-art{
+  flex:none;display:grid;place-items:center;
+  width:44px;height:44px;background:none;border:0}
+.app .ach-art img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* AND THE FALLBACK GLYPH GETS ITS INK BACK. §03 filled this chip with the
+   accent and set its glyph white to sit on it. §24 later took the accent
+   away — the chip joined the warm-pair family every list row's mark belongs
+   to — and never revisited the glyph, so it stayed white: #fff on #f6efe5,
+   1.1:1, an empty box. It takes `--icon-primary`, which is what every other
+   mark in that family already uses. Only the promotion band draws this, so
+   it was one glyph on one stage, invisible in plain sight. */
+.app .ach > .ach-ic svg{fill:var(--icon-primary)}
+
+/* the two lines. A band is not a list row, so the title carries a step more
+   size than `.ach-t` inherits from §02's shared list-text definition. */
+.app .ach .ach-t{font-size:16px;line-height:21px}
+.app .ach .ach-d{font-size:13px;line-height:18px}
+
+.app .ach .ach-go{
+  flex:none;min-height:36px;padding:0 var(--s05);
+  font-size:13px;white-space:nowrap}
+
+/* -------------------------------------------------------------------- 12 ---
+   ONE RULE ABOUT RULES: A SEPARATOR NEVER TOUCHES THE WALL
+
+   §18 settled this for sections — a separator belongs to the content and
+   stops where the content stops; only a block with a ground of its own keeps
+   a full-width edge, because that edge is the shape of the block. It settled
+   it for SECTIONS and for LIST ROWS, and then a second family of blocks kept
+   doing the old thing, because they reach the rails by a different mechanism:
+   not `left:-50vw` on a pseudo, but `margin:0 calc(var(--pad-x) * -1)` on the
+   block itself. §18's rule never saw them.
+
+   Two shapes, measured across all 55 stage x view combinations:
+
+   THE CELL GRIDS — `.stand`, `.prog-figs`, `.stats`, `.facts`. Each is a
+   grid with `gap:1px` over a rule-coloured ground, which is a clean way to
+   get exact single dividers however the cells wrap. The ground is `--rule`,
+   not a tone: it is the dividers, not a fill. So the block is unfilled, and
+   its top and bottom borders and its gap lines were all running out to the
+   rails. They come in to the column. The first and last cells give up the
+   `--pad-x` they were paying to put their content back on the spine — the
+   grid now starts ON the spine, so paying it again would push the first
+   figure a gutter further in than the heading above it.
+
+   THE ROW LISTS — `.ivlist` / `.ivrow` and `.steps > li`. Same mechanism,
+   same fix: the list stops bleeding and the row stops paying a gutter it no
+   longer needs, so the border between two rows lands exactly where §18 puts
+   every other list divider in the product.
+
+   THE COMPOSER FOOT keeps its padding and moves its box, because its rule is
+   a real `border-top` and a border cannot be inset. Margin in, padding out,
+   by the same amount: the field does not move by a pixel and the rule stops
+   at the column.
+
+   AND THE TWO TAB STRIPS GO THE OTHER WAY. `.tabs` and `.cs` are runs of
+   filled cells, and §15 is right that insetting the strip leaves a notch of
+   canvas before the first tab and makes the live one look like it is
+   floating. The strip is not the offender — the empty tail after the last
+   tab is, because the strip's rules kept going across it with nothing
+   underneath. So the strip takes the panel tone its own inactive cells are
+   already painted with, and becomes what it was drawing itself as: a filled
+   band, whose edges may run the full width because they are its shape.
+   -------------------------------------------------------------------------- */
+
+/* --- the cell grids sit inside the column ------------------------------- */
+.app .page .stand,
+.app .page .prog-figs,
+.app .page .stats,
+.app .page .facts{margin-left:0;margin-right:0}
+
+/* --- and the cells at a ROW edge give up the padding the bleed needed -----
+   The grid now starts on the spine, so a first cell that still pays a gutter
+   puts its figure one gutter further in than the heading above it. Which
+   cells are at a row edge is a function of the COLUMN COUNT, not of document
+   order, and the rule these grids used — `:first-child{padding-left:pad-x}` —
+   is only correct for a single-row grid: on `.stats` at two columns it left
+   cell 3, which starts the second row, indented against cell 1.
+
+   So the counts are stated and the edges are keyed to them. `.facts` gives up
+   `auto-fit` for the same two counts `.stats` uses: it holds four cells on
+   every page that draws it, `auto-fit` was resolving to 2 and then 4 anyway,
+   and a count you can read is a count nth-child can be written against.
+
+   Inside each container tier the padding is restated for ALL cells before the
+   edges are re-zeroed. That is not belt-and-braces: the outer `2n+1` rule
+   would otherwise still be zeroing cell 3, which is a middle cell once there
+   are four columns — and per the §25 trap, a rule inside a container query
+   outranks an unconditional one of equal weight, so the restatement lands.
+
+   AND THEN ALL FOUR OF THEM GOT A BOX INSTEAD — see §29.17. Everything in the
+   paragraph above is superseded and the row-edge rules are gone, which is
+   worth recording rather than quietly deleting: the whole `:nth-child`
+   apparatus existed to put a row-edge cell's CONTENT on the column spine,
+   and a bordered grid puts its BORDER there instead, with the content inset
+   from it the way any table's is. The simpler layout is also the correct one
+   — no column counts to keep in sync, and nothing that breaks when a grid
+   wraps to a number of rows nobody predicted.
+
+   One thing to know if this is ever reverted: those `:nth-child` rules carried
+   one pseudo-class more than a plain cell selector, so they won on specificity
+   from any layer or tier. They had to be deleted, not overridden. */
+
+/* --- the row lists ------------------------------------------------------- */
+.app .page .ivlist,
+.app .page .steps{margin-left:0;margin-right:0}
+.app .page .ivrow,
+.app .page .steps > li{padding-left:0;padding-right:0}
+
+/* --- the composer foot: margin in, padding out -------------------------- */
+.app .msg-page > .msg-foot{
+  margin-left:var(--pad-x);margin-right:var(--pad-x);
+  padding-left:0;padding-right:0}
+
+/* --- and the tab strips become the filled band they were drawing --------- */
+.app .tabs,.app .cs{background-color:var(--surface-2)}
+
+/* -------------------------------------------------------------------- 13 ---
+   A DIVIDER INSIDE A TILE PAYS THE GUTTER ONCE
+
+   §18 draws every list row's divider as a rule inset by `--pad-x`, and that
+   is right for the rows it was written for: they bleed to the rails and pay
+   the gutter back as their own padding, so the divider has to pay it too or
+   it runs out past the content.
+
+   `.kv` does not bleed. It sits inside a `.tile`, and the tile sits inside a
+   section that has already paid the gutter — so the row's content starts ON
+   the spine and the divider was paying a second gutter on top of the first.
+   At 1200 that is a hairline starting 64px in while the word next to it
+   starts at 32: the line looks indented from the list it belongs to, which
+   is the one thing a divider must never look like.
+
+   Measured, not guessed — the identity tile on the account page, the fee
+   rows on Enroll and the two tiles on the transcript are every instance in
+   the build, and all four report the same 32px of double-count.
+
+   The reach matches §18's on purpose: that rule carries `.app .view-col
+   .main .page .kv`, and the note there says anything shorter loses the
+   cascade. This adds `.tile` to the same chain rather than trying to
+   outweigh it from a shorter selector.
+   -------------------------------------------------------------------------- */
+.app .view-col .main .page .tile .kv::after{left:0;right:0}
+
+/* -------------------------------------------------------------------- 14 ---
+   CLOSING YOUR ACCOUNT IS ONE ROW: WHAT IT DOES, AND THE CONTROL THAT DOES IT
+
+   The paragraph and the delete button were two stacked blocks under a
+   heading, so the section read as three things when it is one: a consequence
+   and the action that accepts it. They become a row — text left, control held
+   at the far end by an auto margin — which is the same shape §29.10 gives the
+   identity row and §15 gives the plate's action.
+
+   It wraps rather than squeezing. There is no width at which a 68ch paragraph
+   and a 190px destructive control share a phone line, so below that the
+   button drops to its own line and the auto margin still holds it right: same
+   control, same place, one line lower. `align-items:start` keeps it level with
+   the paragraph's FIRST line when they do share a row — a centred control on a
+   three-line paragraph floats in the middle of the text with nothing to align
+   to.
+   -------------------------------------------------------------------------- */
+.app .close-b{
+  display:flex;align-items:flex-start;flex-wrap:wrap;
+  gap:var(--s05) var(--s06)}
+.app .close-x{
+  flex:1 1 34ch;min-width:0;max-width:68ch;
+  color:var(--text-secondary)}
+.app .close-a{flex:none;margin-left:auto}
+
+/* ==========================================================================
+   9. THE COURSEWORK MODULE IS THE FRAME
+   The whole module is LightspeedVT's interface in an iframe, so the views
+   render one element and the frame fills it edge to edge, top to bottom of
+   the view column (see the note above `lsvtFrame` in views.js). What lands in
+   it has to BE the page, not a card on a page.
+
+   `padding-bottom` comes off: §05 puts it there to clear the floating Tal
+   button, which may float over the courseware but must not push it up.
+
+   BUT THE MODULE STILL SITS IN THE PAGE'S MARGIN — REVISED.
+   This block first took the side gutters off `.main` as well, on the argument
+   that an embedded application is the frame's whole width. Maryam's note says
+   otherwise, and measuring the two pages side by side at 1560 is the whole
+   argument: every other module page runs 1114px wide starting 187px in, and
+   coursework ran the full 1488 hard against the rail. The result does not read
+   as an application given the whole frame, it reads as one page that forgot
+   the setting the other nine keep — and the rail is right there for
+   comparison, one click away.
+
+   So §14.3b's content margin is restated here, at the weight it needs. The
+   `padding:0` above is `.app .main.lsvt-blank`, three classes; §14's margin is
+   `.app .main`, two. Specificity decides that one whatever the layer order or
+   the container tier, which is why the margin was lost and why getting it back
+   means saying it again at this selector rather than adjusting §14.
+
+   AND THE TWO RAILS COME BACK WITH IT. They were switched off with the same
+   reasoning — two hairlines around an embedded application read as a border
+   someone forgot to remove — and that was true of a frame touching the rail.
+   Inside a margin they are the opposite: on every other page they are what
+   says where our content column starts and stops, and a column set 187px in
+   with no edges is a block floating in a gap. Desktop only, because below
+   900 there is no margin and no column to bound. Note that at those widths
+   NOTHING changes here: `.main` pays no side padding on any page below 900
+   (the gutter is `.sec`'s job there), so coursework already matched.
+
+   Height has to be asked for twice. Below 900px `.main` is a plain scroll box
+   and `min-height:100%` on `.page` (§10) is what fills it; at 900px and up §16
+   makes `.main` a flex column with `.page{flex:1 0 auto}`, and inside a flex
+   item a percentage min-height has nothing to resolve against. So the page is
+   a flex column too and the slot grows in it.
+   ========================================================================== */
+.app .main.lsvt-blank{padding:0}
+@container app (min-width:900px){
+  /* the same clamp as §14.3b, to the pixel: 12% of the frame, floored at 24
+     and capped at 200, so the courseware's column tracks every other page's
+     as the window changes rather than agreeing with it at one width */
+  .app .main.lsvt-blank{
+    padding-left:clamp(var(--s06), 12cqw, 200px);
+    padding-right:clamp(var(--s06), 12cqw, 200px);
+    padding-bottom:0}
+}
+.app .lsvt-blank > .page{
+  max-width:none;padding:0;border-left:0;border-right:0;
+  display:flex;flex-direction:column}
+.app .lsvt-blank > .page::before,
+.app .lsvt-blank > .page::after{display:none}
+/* AND BACK ON ABOVE 900, WHERE THERE IS A COLUMN TO BOUND.
+   THE ORDER OF THESE TWO BLOCKS IS THE WHOLE MECHANISM, and it is worth being
+   exact about because the note in §29.3 and CLAUDE.md trap 3 both overstate
+   it. A container query is NOT a cascade tier: `@container` and `@media` rules
+   compete on origin, layer, specificity and then SOURCE ORDER like anything
+   else. Every case in this build where "the container query won" was a case
+   where it also came later. Written above the `display:none` — which is where
+   it went first, next to the padding it belongs with — this rule matched, had
+   equal specificity, and simply lost. It has to sit after it. */
+@container app (min-width:900px){
+  .app .lsvt-blank > .page::before,
+  .app .lsvt-blank > .page::after{display:block}
+}
+
+/* the slot is the positioning context and the frame fills it absolutely, so
+   the frame's height is the slot's height rather than a number either of them
+   has to agree on */
+.app .lsvt-slot{
+  position:relative;flex:1 0 auto;min-height:100%;width:100%;
+  background:var(--background)}
+@container app (min-width:900px){
+  .app .lsvt-slot{min-height:0}
+}
+
+/* §15 SIZES `.lsvt-if` FOR THE CHAPTER PLAYER IT USED TO SIT IN — a frame a
+   few hundred pixels tall, embedded in a page of ours. It is the module now
+   and it takes the module's whole box. The height is restated inside the
+   container tier because §15's desktop height is declared in one, and a
+   container query is its own cascade tier: an unconditional rule here loses to
+   it whatever the layer order says. Same move as §25 §7. */
+.app .lsvt-blank .lsvt-if{
+  position:absolute;inset:0;width:100%;height:100%;min-height:0;
+  border:0;display:block;background:var(--background)}
+@container app (min-width:900px){
+  .app .lsvt-blank .lsvt-if{height:100%}
+}
+
+/* -------------------------------------------------------------------- 15 ---
+   WHERE YOU STAND IS A TABLE OF THREE CELLS, AND IT CLOSES
+
+   Four things, one idea: the block should read as a small table of readings,
+   not as three cards that happen to be adjacent.
+
+   IT CLOSES ON ALL FOUR SIDES. §29.12 brought the grid in off the rails, which
+   left it with a rule above and below and nothing at either end — three cells
+   hanging in the column with their dividers stopping in mid-air. A border all
+   round finishes the box, and because the grid already paints `--rule` behind
+   a 1px gap, the same colour on the border is literally the same line
+   continued: no new value, no second tone.
+
+   AND SO THE CELLS PAY PADDING AGAIN. §29.12 zeroed the outer cells' side
+   padding to put the first figure on the column's spine, which was right for
+   an open grid — the grid edge WAS the spine. With a border there, the box
+   edge is what sits on the spine and the content is inset from it, the way a
+   table cell is inset from its frame. Zeroing it now would put the coin stack
+   hard against a hairline.
+
+   THE MARK COMES DOWN TO 28. At 44 it was the largest thing in the cell and
+   the figure it belongs to was the second largest — a badge with a number
+   beside it rather than a number with a badge. 28 is the same artwork read as
+   a mark: still unmistakably the bronze shield, no longer the subject.
+
+   AND THE FIGURE GOES TO THE RIGHT-HAND END. The label used to sit above it,
+   so each cell was a four-line column and nothing lined up across the three.
+   Paired on one line — name at the left edge of the cell, figure at the
+   right — the three read across as one row, the notes sit under the names
+   where a caption belongs, and the points bar keeps the full width. Baseline
+   alignment, not centre: an 11px label and a 24px figure share a baseline or
+   they look like two unrelated things at the ends of a line.
+   -------------------------------------------------------------------------- */
+/* the border itself is stated once for all four cell grids, in §29.17 */
+
+.app .page .stand > .stand-c{
+  align-items:center;gap:var(--s04);
+  padding:var(--s05)}
+@container app (min-width:672px){
+  .app .page .stand > .stand-c{padding:var(--s05)}
+}
+
+/* the mark, as a mark */
+.app .page .stand .stand-mk{width:28px;height:28px}
+
+/* the label and the figure are one line, held apart — and NO WORD IS EVER
+   BROKEN. `overflow-wrap:break-word` is inherited here, and at three columns
+   in a 612px content width the cell is ~204px, which was enough for it to
+   snap "POINTS" into "POINT / S". The fix is `normal`, not `nowrap`: a word
+   stays whole, but a label of two words may still wrap between them. That
+   distinction matters one component down — `.stats` carries "Assessment
+   average", and `nowrap` there put 371px of content in a 354px box.
+
+   With the word kept whole, a label that cannot share its line simply pushes
+   the figure to the next one, still held right by the auto margin: "label ...
+   figure" degrades to "label / ... figure", same reading order, no break. */
+.app .page .stand .stand-top{
+  display:flex;align-items:baseline;flex-wrap:wrap;
+  gap:0 var(--s04);width:100%}
+.app .page .stand .stand-l{flex:none;overflow-wrap:normal}
+.app .page .stand .stand-v{
+  flex:none;margin-left:auto;text-align:right;white-space:nowrap}
+
+/* the note and the bar run the full width under the pair */
+.app .page .stand .stand-d{margin-top:2px}
+/* `.stand-bar` had a margin rule here and no longer needs one: `standRow` does
+   not emit the bar. §15's definition of the component is left where it is —
+   the class is unused rather than wrong, and the next thing that wants a
+   progress stripe in a figure cell should find it already drawn. */
+
+/* THE CELL CONTENT SITS ON THE CENTRE LINE. `align-items:center` is stated at
+   the head of this block and always was, but with one cell a row taller than
+   the other two there was nothing to centre against: the box took the tall
+   cell's height and the short ones centred inside it, which reads as two
+   cells floating and one filling. All three hold two lines now, so the
+   declaration finally does what it says. */
+
+/* -------------------------------------------------------------------- 16 ---
+   THE SIGNED REPORT IS ONE BLOCK, NOT A RULED FORM
+
+   Three hairlines crossed this card: under the name row, above the closing
+   link, and the section rule beneath the whole thing. The card is 120 words
+   and one action — there is nothing in it that needs separating from anything
+   else, and three lines through six lines of text is a form, not a document.
+   All three go. What is left holding it together is the 2px accent bar §10
+   draws down its left edge, which is the one mark that says "this is the
+   signed thing" rather than "this is a table".
+
+   AND THE LINK BECOMES THE BUTTON. §29.8 already argued this for Tal's cards
+   — a blue link is not an action — and this is the same case with the same
+   answer, except here it also inherits the job of the black button that used
+   to sit above the card duplicating it. One primary action on the page, at
+   the foot of the block it acts on. The foot keeps its own top margin and
+   loses the padding that only existed to stand off the rule that is gone.
+   -------------------------------------------------------------------------- */
+/* the third rule — the section's own closing hairline — needs saying at BOTH
+   widths, and each half has to go where it can win. Above 900 the exclusion is
+   in §14's survivor list, because that rule is (0,5,0) and nothing keyed on
+   one class reaches it. Below 900 no such rule exists: §10 simply gives every
+   section a pseudo with no `display` of its own, so one declaration here ends
+   it. Two statements, one decision — the same shape §28 needed for the
+   cohort-leader band. */
+.app .page > .sec:has(> .signed)::after{display:none}
+
+.app .page .signed-h{
+  padding-bottom:0;margin-bottom:var(--s05);border-bottom:0}
+.app .page .signed .ai-foot{
+  margin-top:var(--s06);padding-top:0;border-top:0}
+/* the foot holds one button, so it does not need to behave as a chip rail */
+.app .page .signed .ai-foot.signed-foot{display:flex;justify-content:flex-start}
+.app .page .signed .ai-foot.signed-foot .btn{flex:none;min-height:36px}
+
+/* -------------------------------------------------------------------- 17 ---
+   A GRID OF FIGURE CELLS IS A CLOSED TABLE, AND EACH CELL IS ONE READING
+
+   Four grids in this product draw a run of readings sharing single hairlines:
+   `.stand` (points, badges, rank), `.stats` (the quiz result, the course
+   summary, the transcript), `.prog-figs` (chapters, tasks, minutes) and
+   `.facts` (the interview's length, format, turnaround, fee). §10.16 built
+   them all the same way and the construction is good: `gap:1px` over a
+   rule-coloured ground gives exact single dividers however the cells wrap.
+
+   THEY CLOSE. §29.12 brought them in off the rails, which left each one with
+   a rule above and below and nothing at either end — cells hanging in the
+   column with their dividers stopping in mid-air. A border on all four sides
+   in the same `--rule` is literally the same line continued: no new value, no
+   second tone, and the box is what says these readings belong together.
+
+   AND THE CELLS PAY UNIFORM PADDING, which is the other half of the same
+   change. Content on the spine was right for an open grid, where the grid
+   edge WAS the spine. With a border there the box edge takes that job and the
+   content is inset from it — so the row-edge exceptions go, and with them the
+   column-count bookkeeping they needed.
+
+   ------------------------------------------------------------------ .stat ---
+   THE FIGURE GOES TO THE RIGHT-HAND END, as it does in `.stand`. §24 laid the
+   cell out as `'ic l' 'ic n' 'ic d'` — a mark beside a three-line column — so
+   each cell read as a little paragraph and nothing lined up across the four.
+   Label at the left edge, figure at the right, note beneath: the row reads
+   across, and the four figures form a column of their own at the right of
+   each cell.
+
+   THE MARK IS A MARK, NOT A BOX. §24 gives this chip the warm pair every list
+   row's glyph sits in — a tinted ground, a 1px hairline, a radial highlight.
+   On a 32px square holding a 17px grey glyph, inside a cell that already has
+   a border around it and hairlines either side, that is three edges deep and
+   it read as an empty placeholder someone forgot to fill: a grey box attached
+   to the text. The hairline and the highlight go. What is left is a 28px wash
+   of the cell's own hue with the glyph in that hue at full strength — the
+   mark IS the colour, so it needs no container to be seen in.
+
+   AND EACH CELL TAKES A DIFFERENT HUE, by position, from the four in §12.
+   Four readings drawn in one colour look like four instances of one thing;
+   four hues say "these are different measurements" before you have read a
+   word of them. The wash is mixed FROM the hue rather than being a fifth
+   token — one declaration per cell sets both, so the pair can never drift.
+   -------------------------------------------------------------------------- */
+
+/* --- the four boxes ------------------------------------------------------ */
+.app .page .stand,
+.app .page .stats,
+.app .page .prog-figs,
+.app .page .facts{border:1px solid var(--rule)}
+
+/* --- and every cell pays the same padding ------------------------------- */
+.app .page .stats > .stat,
+.app .page .prog-figs > span,
+.app .page .facts > div{padding:var(--s05)}
+@container app (min-width:700px){
+  .app .page .stats > .stat,
+  .app .page .facts > div{padding:var(--s05)}
+}
+
+/* --- the cell: mark, then the pair, then the note ----------------------- */
+.app .page .stats > .stat{
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'ic top' 'ic d';
+  column-gap:var(--s04);row-gap:2px;
+  align-content:start}
+.app .page .stats > .stat > .stat-ic{grid-area:ic}
+.app .page .stats > .stat > .stat-top{grid-area:top}
+.app .page .stats > .stat > .d{grid-area:d}
+
+/* the label and the figure share a line and neither breaks — the label holds
+   its line, and when the two cannot fit the PAIR wraps, exactly as §29.15
+   describes for the standings */
+.app .page .stats .stat-top{
+  display:flex;align-items:baseline;flex-wrap:wrap;
+  gap:0 var(--s04);width:100%}
+.app .page .stats .stat-top > .l{flex:0 1 auto;min-width:0;overflow-wrap:normal}
+.app .page .stats .stat-top > .n{
+  flex:none;margin-left:auto;text-align:right;white-space:nowrap}
+
+/* --- the mark ------------------------------------------------------------ */
+.app .page .stats > .stat > .stat-ic{
+  width:28px;height:28px;margin-top:0;align-self:start;
+  border:0;
+  background-color:color-mix(in srgb, var(--mk) 13%, var(--background));
+  background-image:none}
+.app .page .stats > .stat > .stat-ic svg{
+  width:16px;height:16px;fill:var(--mk)}
+
+/* one hue per cell, by position. `--mk` is inherited by the chip and the
+   glyph from the cell, so the wash and the mark can only ever agree. */
+.app .page .stats > .stat:nth-child(4n+1){--mk:var(--mk-1)}
+.app .page .stats > .stat:nth-child(4n+2){--mk:var(--mk-2)}
+.app .page .stats > .stat:nth-child(4n+3){--mk:var(--mk-3)}
+.app .page .stats > .stat:nth-child(4n+4){--mk:var(--mk-4)}
+
+/* -------------------------------------------------------------------- 18 ---
+   A BOX NEEDS AIR UNDER IT; A BLED GRID DID NOT
+
+   §16 zeroes the bottom padding of the section holding `.stand`, on the
+   argument that "where you stand" and the week's work beneath it are one
+   region — what you have earned, and what earns the next of it. That argument
+   is still right, and the rule was still right while the grid ran rail to
+   rail: its bottom border WAS the boundary between the two, so any padding
+   under it would have been a white stripe inside a single region.
+
+   §29.17 closed the grid into a box inset in the column, and that changes what
+   zero means. The box's own bottom border now stops a gutter short of the
+   rails, and with no padding under it that border lands directly on the top
+   edge of the tinted section below — a 1px line and a change of ground on the
+   same pixel row, with the box's two ends hanging over the tint. The region
+   still reads as one region; it just needs the section to breathe under the
+   box the way it breathes above it.
+
+   The closing RULE stays suppressed. That half of §16 is untouched: the box
+   draws its own bottom edge and the tone change marks the section boundary,
+   so a third line between them would be the same statement a third time.
+   -------------------------------------------------------------------------- */
+.app .page > .sec:has(> .stand){padding-bottom:var(--s06)}
+.app .page > .sec:has(> .facts:only-child),
+.app .page > .sec:has(> .prog-figs:only-child),
+.app .page > .sec:has(> .stats:only-child){
+  padding-top:var(--s06);padding-bottom:var(--s06)}
+
+/* AND THE SAME SENTENCE, TWO LAYERS EARLIER. §10 says it about the other
+   three: "a section whose only content is a bled grid has no need of its own
+   padding". Same reasoning, same inversion — the grid is not bled any more, so
+   the section's padding is the only thing between the box's border and the
+   next block's ground. Measured at all three frames: the transcript's four
+   figures, Enroll's course summary and the interview's four facts were all
+   sitting with their bottom border on the section edge.
+
+   §10's companion rule zeroing the grid's own `margin-top` and `border-top`
+   is left alone: the border is restored by §29.17 at a weight that outranks
+   it, and with the section paying padding again the zeroed margin is exactly
+   right — otherwise the air above the box would be paid twice. */

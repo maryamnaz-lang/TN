@@ -1,0 +1,494 @@
+/* ==========================================================================
+   TalentNext candidate portal — v15
+   Baseline: Material UI (MUI v5 / Material Design 3 anatomy)
+   Overrides: shape radius 0, elevation 0, Inter in place of Roboto
+   Structure: linear. No cards anywhere. Sections divide with hairline rules.
+   Responsive: container queries on the app frame, MUI breakpoints
+   ========================================================================== */
+
+@font-face{
+  font-family:'Inter';
+  font-style:normal;
+  font-weight:100 900;
+  font-display:block;
+  src:url(__INTER__) format('woff2');
+}
+
+/* ==========================================================================
+   1. TOKENS
+   The v14 palette, unchanged in value, re-expressed in MUI's theme shape.
+   Every colour in the build resolves here. Nothing is hardcoded downstream —
+   see the v14 post-mortem: six values escaped the token block last rebrand.
+   ========================================================================== */
+:root{
+  /* --- palette.primary --- */
+  --brand-primary:#000000;
+  --brand-primary-hover:#262625;
+  --brand-primary-active:#393938;
+  --on-brand:#ffffff;
+  --brand-tint:#f7f7f7;
+  --brand-tint-2:#fcdbc7;
+
+  /* --- palette.secondary (the accent) ---
+     #ab4fc1 is 4.06:1 on bone: fills only, never text.
+     --accent-text is the 4.63:1 variant for accent-coloured type. */
+  /* THE SECONDARY COLOUR IS THE BRAND GRADIENT. --accent and --accent-2 are
+     its two ends, exactly as the Figma file states them for the Create
+     Account button, and --accent-grad is the gradient itself at the file's
+     angle. Every accent FILL in the product runs it.
+
+     White on this gradient reads 2.8:1 at the light end. That is under AA,
+     and it is the brand: the same decision as the sign-up button, taken
+     once and applied everywhere rather than left as a one-off. verify.mjs
+     counts these pairs and reports them as a stated exception rather than
+     passing them silently — anything filled with the gradient carries
+     --on-brand-fill:1 and the contrast sweep reads that flag.
+
+     Accent INK is a different value and stays AA-safe: --accent-text and
+     --accent-on-2 are the gradient's hue at a luminance that passes, and
+     they are what any accent-coloured TEXT resolves to. */
+  --accent:#f57414;
+  --accent-2:#f0530c;
+  --accent-grad:linear-gradient(104.86deg,
+    var(--accent) 10.02%, var(--accent-2) 115.55%);
+  /* THE STATES ARE GRADIENTS TOO. There is no solid secondary colour in this
+     product, so hover and pressed cannot be one: each is the same gradient
+     stepped one stop deeper, which keeps the direction of the light and
+     still reads as a state change. */
+  --accent-grad-hover:linear-gradient(104.86deg,
+    var(--accent-2) 10.02%, var(--accent-hover) 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,
+    var(--accent-hover) 10.02%, var(--accent-text) 115.55%);
+  --accent-text:#b94a09;
+  --accent-hover:#ae4508;
+  --on-accent:#ffffff;
+
+  /* --- palette.auth — the sign-up card, from the Figma file (255:7673 and
+     257:7784). Orange is the FRONT DOOR only. Past login the primary action
+     is black again and purple is still the one accent, so this set is
+     namespaced and nothing outside `.auth-card` may reach for it.
+
+     Three values are not the file's, and in each case the reason is
+     contrast rather than taste:
+       --auth-o-ink   the file sets "Let's begin." in #F47113, which is
+                      2.9:1 on white. This is the same hue at 4.6:1.
+       the address    takes --accent-text (5.2:1). The file's #B948C7 is
+                      4.4:1, a hair under AA.
+       the links      take --link, which is already the file's #0488C5
+                      darkened to 4.9:1 for exactly this reason.
+     The gradient itself is the file's, unchanged. White on it reads 2.8:1,
+     which is under AA for a 13.5px label — stated here so it is a decision
+     and not an oversight. --- */
+  --auth-o-1:#f57414;
+  --auth-o-2:#f0530c;
+  --auth-o-3:#d64708;
+  --auth-o-ink:#c2540a;
+  --auth-card-bg:#ffffff;
+  --auth-shadow:rgba(149,149,149,.1);
+  --auth-rule:rgba(17,17,17,.1);
+  /* THE TWO BLURRED ELLIPSES.
+     Geometry is the file's exactly: Ellipse 42 is 2132 x 128 at top -30,
+     centred on the frame; Ellipse 43 is 431 x 138 rotated 11.08deg, centred
+     at (194, 691) inside the card.
+
+     The blur radius is DERIVED from the file rather than eyeballed. Figma
+     exports a blurred layer as a flattened SVG padded by 3 sigma, and the
+     export tells us that padding: Ellipse 42 comes back inset -234.38% of
+     its 128 height and -14.07% of its 2132 width, which is 300px on both
+     axes; Ellipse 43 comes back inset -362.32% and -116.01%, which is 500px
+     on both. 3 sigma = 300 and 500, so sigma = 100 and 167 — and CSS
+     `blur(r)` takes sigma directly.
+
+     The fill colours are matched against the Figma render by eye, because
+     the fill is inside that flattened SVG and this sandbox cannot reach
+     figma.com to read it. Two hex values, one line each, when they land. */
+  --auth-wash-1:#f6dcc9;       --auth-wash-1-blur:100px;
+  --auth-wash-2:#ecd3de;       --auth-wash-2-blur:167px;
+  --auth-sub:#767676;
+
+  /* --- the Tal chip's fill (Figma 284:179) ---
+     Two layers, as the file draws them: a warm ground, and a cool pool
+     blurred in from below the chip's right-hand corner.
+
+     The pool's geometry is derived from the export rather than guessed.
+     Figma pads a blurred layer's SVG by 3 sigma and reports it as an inset:
+     -121.16% of the height and -47.2% of the width. Those agree in pixels
+     only for a 423.8 x 165.1 ellipse rotated 25.29deg — which is the
+     rotation that produces the 453.65 x 330.30 bounding box the file
+     states. So 3 sigma = 200, sigma = 67, and the ellipse's centre sits 8
+     in from the chip's right edge and 118 BELOW its bottom. A blurred
+     ellipse of that size is a radial gradient of roughly 346 x 217 once the
+     falloff is folded in, and at 25deg under 67 of blur the rotation is not
+     visible. */
+  /* THE COOL POOL IS GREEN NOW, AND IT IS THE SAME GREEN AS THE BAND.
+     Maryam asked for #F4FEF6 in the module-head gradient, on the Tal chips
+     and on the achievement banners. The banners were #E8F9F9 exactly; the
+     gradient's cool half was #EEF7FB — a near neighbour of it, not the same
+     value — so the two had drifted a step apart while doing the same job.
+     Both take #F4FEF6, which is what makes this one colour with one meaning
+     rather than two that merely look alike. See --surface-ach in §12.
+
+     `--tal-chip-2` is the whole cool layer, so this lands in four places at
+     once and is meant to: the module head wash (§25.1), every Tal chip
+     (§22/§24), and the icon boxes in §24, which carry "the same two layers
+     the Tal chip carries" by explicit decision. Those stay in step.
+
+     It is a step LIGHTER as well as a different hue — luminance .917 -> .968
+     — so the pool is subtler against the warm ground than the blue was. That
+     is the value as given; if the wash reads too faint at the top of a
+     module, this is the line to deepen. */
+  --tal-chip-1:#f6efe5;
+  --tal-chip-2:#f4fef6;
+
+  /* --- palette.background / surface ---
+     The ramp is re-cast warm (b* +2.0). Pure-neutral greys read blue on bone. */
+  /* TWO TONES, AND THE BASE IS WHITE.
+     The canvas, the app bar and the navigation rail are all #FFFFFF — one
+     sheet, separated by hairlines rather than by tone, which is what the
+     lattice was always for. The second tone, #FBF8F4, is what a supporting
+     block sits on: a panel, a grouped list, a stepper. There is no third.
+     --layer-01 and --layer-02 are the same two values under their older
+     names, so nothing downstream had to be rewritten to find them. */
+  --background:#ffffff;
+  --layer-01:#ffffff;
+  --layer-02:#f7f7f7;
+  --layer-accent-01:#dcdad3;
+  --shell-bg:#ffffff;
+  --surround:#dcdad3;
+
+  --border-subtle-01:#dcdad3;
+  --border-subtle-02:#c7c6c3;
+  --border-strong-01:#8e8d8a;
+
+  --gray-10:#f5f4f0;  --gray-20:#e1e0dc;  --gray-30:#c7c6c3;  --gray-40:#a9a8a5;
+  --gray-50:#8e8d8a;  --gray-60:#706f6d;  --gray-70:#525250;  --gray-80:#393938;
+  --gray-90:#262625;  --gray-100:#111111;
+
+  --text-primary:#111111;
+  --text-secondary:#525250;
+  --text-helper:#666563;
+  --text-placeholder:#a9a8a5;
+  --text-disabled:#a9a8a5;
+  --icon-primary:#111111;
+  --icon-secondary:#525250;
+
+  --surface-dark:#111111;
+  --surface-dark-2:#262625;
+  --on-dark:#ffffff;
+  --on-dark-2:#c7c6c3;
+  --overlay:rgba(17,17,17,.55);
+
+  /* --- palette.error / success / warning / info — Carbon status, unchanged.
+     #ab4fc1 sits 72deg off the error red, so these survive the rebrand. --- */
+  --support-error:#da1e28;    --support-error-bg:#ffd7d9;
+  --support-success:#24a148;  --support-success-bg:#d7f0dd;
+  /* an orange dark enough to be ink: 5.2:1 on the canvas, 4.9:1 on the
+     panel. `--support-warning-ic` is tuned as an ICON fill and fails as text. */
+  --support-attention:#96540a;
+  /* red as INK: --support-error is tuned as a fill and lands at 4.47:1,
+     which is under AA by a hair. This holds 5.5:1 on both grounds. */
+  --danger-ink:#c21520;
+  /* a star is gold; as a mark it only needs 3:1, and this holds 3.4:1 */
+  --star:#c9971a;
+  /* green as INK: --support-success is tuned as a fill and fails as text */
+  --support-success-ink:#1a7f37;
+  --support-warning:#f1c21b;  --support-warning-bg:#fcf4d6;  --support-warning-ic:#b28600;
+  /* INFORMATION IS BLUE. It was black, which made an info note and a plain
+     block of text the same object, and after the rebrand every note's mark
+     came out orange regardless of what it was saying. This is the link blue
+     — 4.8:1 as ink, and well past the 3:1 a mark needs. */
+  --support-info:#111111;     --support-info-bg:#f7f7f7;
+  --support-info-ic:#0371a4;
+  --support-orange-bg:#ffd9be;
+
+  /* --- data viz — a green ramp, monotonic in L*.
+     It is deliberately NOT drawn out of the accent. Purple is the product's
+     one signal colour: it marks Tal, the primary action and the current
+     item. When a bar is also purple, a reading looks like a control. The
+     ramp shares nothing with the accent or with the link blue, and the
+     marked point takes terracotta, which nothing else in the product uses. */
+  --dv-1:#cfded4;  --dv-2:#8fbca6;  --dv-3:#3d8a6e;  --dv-4:#1e5546;
+  --dv-hi:#c2703d;  --dv-gold:#a8791b;
+  /* the one place two brand colours run together: a single series drawn
+     from the accent to the link blue, so the direction is in the colour */
+  --dv-grad-a:#a54208;  --dv-grad-b:#0d6f9e;
+  --chart-ink:#111111;
+
+  /* --- MUI state layers. Material expresses interaction as an overlay
+     opacity over the base colour, not as a separate palette entry. --- */
+  --state-hover:.04;
+  --state-selected:.08;
+  --state-focus:.12;
+  --state-pressed:.12;
+  --state-disabled:.38;
+  --overlay-hover:rgba(17,17,17,.04);
+  --overlay-selected:rgba(17,17,17,.08);
+  --overlay-pressed:rgba(17,17,17,.12);
+  --overlay-hover-dark:rgba(255,255,255,.08);
+
+  /* --- spacing. MUI's spacing(n) = 8n. The v14 scale is a superset. --- */
+  --s01:2px; --s02:4px; --s03:8px;  --s04:12px; --s05:16px; --s06:24px;
+  --s07:32px; --s08:40px; --s09:48px; --s10:64px; --s11:80px; --s12:96px;
+
+  /* --- shape. MUI default is 4. The brand is square. --- */
+  --radius:0px;
+
+  /* --- motion. MUI's standard easing and durations. --- */
+  --ease-standard:cubic-bezier(.4,0,.2,1);
+  --ease-decelerate:cubic-bezier(0,0,.2,1);
+  --ease-accelerate:cubic-bezier(.4,0,1,1);
+  --dur-short:150ms;
+  --dur-standard:250ms;
+  --dur-long:375ms;
+
+  /* --- alpha overlays on dark surfaces --- */
+  --on-dark-border:rgba(255,255,255,.42);
+  --on-dark-track:rgba(255,255,255,.24);
+  --on-dark-rule:rgba(255,255,255,.16);
+  --on-dark-fill:rgba(255,255,255,.12);
+  --on-dark-fill-2:rgba(255,255,255,.28);
+  --on-dark-dim:rgba(255,255,255,.3);
+
+  /* --- type that has to clear AA on a status fill --- */
+  --on-success-bg:#0b5c26;
+  --on-error-bg:#a2191f;
+  --on-warning-bg:#684e00;
+  --error-hover:#b81922;
+  --pure-white:#ffffff;
+  --accent-shadow:rgba(200,80,9,.18);
+  --thumb-scrim:rgba(0,0,0,.7);
+
+  /* --- prototype chrome, not the product --- */
+  --pt-bar-bg:#000000;
+  --pt-line:#4a4a48;
+  --pt-hover:#333331;
+
+  /* --- layout --- */
+  --appbar-h:56px;
+  --drawer-w:260px;
+  --content-max:960px;
+  --gutter:16px;
+}
+
+/* ==========================================================================
+   2. RESET
+   ========================================================================== */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+h1,h2,h3,h4,h5,h6,p,figure,ul,ol{margin:0;padding:0}
+ul,ol{list-style:none}
+img,svg{display:block;max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit;margin:0}
+button{background:none;border:0;padding:0;cursor:pointer;text-align:left;color:inherit}
+a{color:inherit}
+table{border-collapse:collapse;width:100%}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--brand-primary);outline-offset:-2px}
+.app :focus-visible{outline:2px solid var(--brand-primary);outline-offset:-2px}
+::selection{background:var(--brand-tint-2);color:var(--text-primary)}
+
+/* ==========================================================================
+   3. TYPOGRAPHY
+   The v14 scale, carried over intact, now set in Inter. Per the handover:
+   display tracking eases from -1 to -0.6, and 11-12px sizes gain 0.5px
+   because Inter's x-height makes them read heavier than Plex at parity.
+   Class names are Carbon's because the markup already speaks them; the
+   values and roles are Material's.
+   ========================================================================== */
+body,.app{
+  font-family:var(--font-sans);
+  font-feature-settings:'cv05' 1,'ss03' 1;
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+.t-heading-01,h1.ttl{font-size:26px;line-height:32px;font-weight:600;letter-spacing:-.6px}
+.t-heading-02{font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.2px}
+.t-heading-03{font-size:16px;line-height:22px;font-weight:600;letter-spacing:-.1px}
+.t-heading-04{font-size:14px;line-height:20px;font-weight:600;letter-spacing:.1px}
+.t-heading-05,.eyebrow{
+  font-size:11.5px;line-height:16px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.t-heading-compact-01{font-size:14px;line-height:18px;font-weight:600;letter-spacing:.1px}
+.t-body-01{font-size:16px;line-height:24px;font-weight:400;letter-spacing:0}
+.t-body-02{font-size:14px;line-height:20px;font-weight:400;letter-spacing:.1px}
+.t-body-compact-01{font-size:14px;line-height:18px;font-weight:400;letter-spacing:.1px}
+.t-helper-01{font-size:12.5px;line-height:16px;font-weight:400;letter-spacing:.2px;color:var(--text-helper)}
+.t-label-01{font-size:12.5px;line-height:16px;font-weight:500;letter-spacing:.2px}
+.t-legal-01{font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.2px;color:var(--text-helper)}
+.t-code-01{font-family:var(--font-sans);font-variant-numeric:tabular-nums;
+  font-size:12.5px;line-height:16px;letter-spacing:0}
+
+/* display sizes — hero numerals and level names */
+.big{font-size:40px;line-height:44px;font-weight:600;letter-spacing:-1.2px}
+.lg{font-size:34px;line-height:42px;font-weight:600;letter-spacing:-.8px}
+.mono{font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* ==========================================================================
+   4. PROTOTYPE CHROME — not part of the product
+   ========================================================================== */
+body{background:var(--surround);color:var(--text-primary);
+  font-family:var(--font-sans)}
+.pt-bar{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:var(--s05);
+  height:52px;padding:0 var(--s05);background:var(--surface-dark);color:var(--on-dark);
+  border-bottom:1px solid var(--pt-bar-bg)}
+.pt-bar .dot{width:3px;height:3px;background:var(--on-dark-2);flex:none}
+.pt-meta{font-size:12px;letter-spacing:.2px;color:var(--on-dark-2);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt-lab{margin-left:auto;font-size:10.5px;font-weight:600;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--on-dark-2);flex:none}
+.pt-sel{
+  height:32px;padding:0 var(--s04);background:var(--surface-dark-2);color:var(--on-dark);
+  border:1px solid var(--pt-line);border-radius:var(--radius);font-size:12.5px;flex:none;cursor:pointer}
+.pt-sel:hover{background:var(--pt-hover)}
+.pt-nav{display:flex;gap:var(--s02);flex:none}
+.pt-nav button,.pt-vp button{
+  width:32px;height:32px;display:grid;place-items:center;
+  border:1px solid var(--pt-line);background:var(--surface-dark-2);border-radius:var(--radius)}
+.pt-nav button svg{width:16px;height:16px;fill:var(--on-dark)}
+.pt-nav button:hover,.pt-vp button:hover{background:var(--pt-hover)}
+/* viewport switcher — the one piece of chrome v15 adds */
+.pt-vp{display:flex;gap:var(--s02);flex:none;
+  border-left:1px solid var(--pt-line);padding-left:var(--s05);margin-left:var(--s02)}
+.pt-vp button{width:auto;padding:0 var(--s04);font-size:11.5px;font-weight:500;
+  letter-spacing:.3px;color:var(--on-dark-2)}
+.pt-vp button.on{background:var(--on-dark);color:var(--surface-dark);border-color:var(--on-dark)}
+.pt-vp button.on:hover{background:var(--on-dark)}
+
+.pt-stage{padding:var(--s06) var(--s05) var(--s10);display:flex;flex-direction:column;
+  align-items:center;gap:var(--s05)}
+.pt-cap{max-width:640px;text-align:center;font-size:12.5px;line-height:18px;
+  color:var(--gray-70);letter-spacing:.2px}
+.pt-cap b{color:var(--text-primary);font-weight:600}
+
+/* the app frame. container-type is what makes one file render three sizes:
+   the app responds to the frame, not to the browser window. */
+.device{
+  container-type:inline-size;
+  container-name:app;
+  width:100%;max-width:390px;height:844px;
+  background:var(--background);
+  border:1px solid var(--gray-40);
+  overflow:hidden;position:relative;
+  transition:max-width var(--dur-standard) var(--ease-standard),
+             height var(--dur-standard) var(--ease-standard);
+}
+.device[data-vp="tablet"] {max-width:744px;height:1133px}
+.device[data-vp="fluid"]  {max-width:none;height:900px}
+
+/* ==========================================================================
+   5. APP SHELL — MUI AppBar + Drawer
+   Mobile: AppBar with a menu button, temporary Drawer over a scrim.
+   >= 900px (MUI 'md'): permanent Drawer, AppBar spans the content only.
+   ========================================================================== */
+.app{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  background:var(--background);color:var(--text-primary);overflow:hidden}
+
+.shell{
+  flex:none;display:flex;align-items:center;gap:var(--s02);
+  height:var(--appbar-h);padding:0 var(--s03) 0 0;
+  background:var(--layer-01);
+  border-bottom:1px solid var(--border-subtle-01);
+  position:relative;z-index:30}
+.shell-act{
+  width:48px;height:48px;flex:none;display:grid;place-items:center;
+  border-radius:var(--radius);position:relative;
+  transition:background var(--dur-short) var(--ease-standard)}
+.shell-act svg{width:24px;height:24px;fill:var(--icon-primary)}
+.shell-act:hover{background:var(--overlay-hover)}
+.shell-act:active{background:var(--overlay-pressed)}
+.shell-act.on{background:var(--overlay-selected)}
+.shell-logo{display:flex;align-items:center;height:100%;padding:0 var(--s03);
+  border-radius:var(--radius)}
+.shell-logo img{height:17px;width:auto}
+.shell-logo:hover{background:var(--overlay-hover)}
+.shell-right{margin-left:auto;display:flex;align-items:center;gap:var(--s01)}
+.shell-badge{
+  position:absolute;top:8px;right:8px;min-width:16px;height:16px;padding:0 4px;
+  display:grid;place-items:center;background:var(--accent);color:var(--on-accent);
+  font-size:10px;font-weight:600;line-height:1;border-radius:var(--radius)}
+.shell-avatar{
+  width:32px;height:32px;display:grid;place-items:center;
+  background:var(--brand-primary);color:var(--on-brand);
+  font-size:12px;font-weight:600;letter-spacing:.3px}
+.shell-name{display:none}
+
+/* body row: drawer + main */
+.shell-body{flex:1;display:flex;min-height:0;position:relative}
+
+/* --- MUI Drawer --- */
+.sidenav{
+  position:absolute;inset:0 auto 0 0;width:var(--drawer-w);z-index:40;
+  background:var(--layer-01);
+  border-right:1px solid var(--border-subtle-01);
+  display:flex;flex-direction:column;
+  transform:translateX(-100%);
+  transition:transform var(--dur-standard) var(--ease-standard);
+  overflow-y:auto;overscroll-behavior:contain}
+.sidenav.on{transform:translateX(0)}
+.sn-head{display:none}
+.sn-item{
+  display:flex;align-items:center;gap:var(--s05);
+  width:100%;min-height:48px;padding:0 var(--s05);
+  position:relative;color:var(--text-primary);
+  font-size:14px;font-weight:400;letter-spacing:.1px;
+  transition:background var(--dur-short) var(--ease-standard)}
+.sn-item svg{width:22px;height:22px;fill:var(--icon-secondary);flex:none;
+  transition:fill var(--dur-short) var(--ease-standard)}
+.sn-item:hover{background:var(--overlay-hover)}
+.sn-item:active{background:var(--overlay-pressed)}
+.sn-item.on{background:var(--overlay-selected);font-weight:600}
+.sn-item.on svg{fill:var(--icon-primary)}
+/* the accent marks what belongs to the candidate — here, where they are */
+.sn-item.on::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.sn-item .badge{
+  margin-left:auto;min-width:20px;height:20px;padding:0 6px;display:grid;place-items:center;
+  background:var(--accent);color:var(--on-accent);font-size:11px;font-weight:600}
+.sn-div{height:1px;background:var(--border-subtle-01);margin:var(--s03) 0}
+.sn-cap{padding:var(--s05) var(--s05) var(--s03);
+  font-size:11.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text-helper)}
+.sn-av{display:none}
+
+.scrim{
+  position:absolute;inset:0;z-index:35;background:var(--overlay);
+  opacity:0;visibility:hidden;
+  transition:opacity var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
+.scrim.on{opacity:1;visibility:visible}
+
+/* --- main scroll region --- */
+.main{
+  flex:1;min-width:0;overflow-y:auto;overscroll-behavior:contain;
+  background:var(--background);position:relative;scroll-behavior:smooth}
+.page{
+  max-width:var(--content-max);margin:0 auto;
+  padding-bottom:var(--s12)}
+
+/* ==========================================================================
+   6. RESPONSIVE — MUI breakpoints, driven by the frame
+   ========================================================================== */
+@container app (min-width:600px){
+  :root{--gutter:24px}
+  .page{padding-bottom:var(--s12)}
+}
+@container app (min-width:900px){
+  .shell{height:64px;padding-right:var(--s05)}
+  .shell-act[data-toggle="nav"]{display:none}      /* permanent drawer, no hamburger */
+  .shell-logo{padding-left:var(--s06);width:var(--drawer-w);flex:none}
+  .shell-logo img{height:19px}
+  .sidenav{position:static;transform:none;flex:none}
+  .scrim{display:none}
+  .shell-name{
+    display:block;font-size:13px;font-weight:500;letter-spacing:.1px;
+    color:var(--text-secondary);margin-right:var(--s02)}
+  .main{padding:0 var(--s06)}
+  .page{padding-top:var(--s02)}
+}
+@container app (min-width:1200px){
+  :root{--drawer-w:280px;--gutter:32px}
+  .main{padding:0 var(--s08)}
+}

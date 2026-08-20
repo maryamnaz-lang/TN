@@ -1,5 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/tn-portals.html" }
+    { "source": "/", "destination": "/tn-portals.html" },
+    { "source": "/candidate", "destination": "/hifi/talentnext-candidate-portal-v24.html" }
   ]
 }

@@ -1,0 +1,143 @@
+/* ==========================================================================
+   34. THE RAIL, AND WHAT IT SAYS IN COLOUR
+   Three decisions, all of them about the left edge of the product.
+
+     1. A count is red. It is the one alert in the frame and it was wearing
+        the brand.
+     2. The module you are on is orange. The marker beside it already was;
+        the icon it marks was not.
+     3. The rail's own corner is one control: the TalentNext mark, which
+        becomes the menu under the pointer and the close when the drawer is
+        open. `shell()` in views.js builds it and the note there is where the
+        decision is written down.
+
+   Last in the cascade, and here the reason is specific rather than the
+   "everything is a new class" of §30-§32: two of these three are direct
+   overrides of §19, which paints every accent fill in the product from a
+   GENERATED list — a fill added in an earlier layer cannot quietly stay
+   flat, and by the same mechanism a fill that must NOT be accent cannot be
+   corrected from inside those layers. It has to be later than the generated
+   block. §33 is later still and touches nothing here.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. A COUNT IS AN ALERT, NOT THE BRAND
+   Orange is this product's PROGRESS colour: the ring, the bars, the rungs,
+   the marker on the module you are on. An unread count is none of those —
+   it is the one thing in the frame asking to be dealt with, and drawn in
+   the progress colour it read as one more piece of the furniture. Red is
+   what the rest of the build already says "attend to this" with
+   (`.btn-d`, `--support-error`), and it is the only red in the chrome, so
+   there is nothing for it to be confused with.
+
+   BOTH DECLARATIONS, BECAUSE §19 USES BOTH. The counters are in §19's
+   generated list, which sets `background-image:var(--accent-grad)` over
+   §10's `background-color:var(--accent)`. Answering only the colour leaves
+   the gradient painting on top of it and nothing changes.
+
+   White at 9.5px on #da1e28 is 4.53:1 — over AA for the size, and the
+   figure inside a 16px disc is bold, which is what the ratio is measured
+   against.
+   -------------------------------------------------------------------------- */
+.app .shell-badge,
+.app .sn-item .badge{
+  background-color:var(--support-error);
+  background-image:none;
+  color:#fff}
+
+/* --------------------------------------------------------------------------
+   2. THE MODULE YOU ARE ON IS ORANGE
+   The rail says where you are twice: a 2px accent marker down the left edge
+   of the row, and the row's own weight. The icon between them stayed
+   `--icon-primary` — the same black as the seven modules you are NOT on —
+   so the marker was carrying the whole signal from the very edge of the
+   screen, four pixels from the frame, and at 72px collapsed there is no
+   label to help it. The icon takes the accent too, so the mark and the
+   marker say the same thing.
+
+   THE LABEL DOES NOT. At `--drawer-w` the row's text stays in the page's
+   ink at 600 weight: orange type at 13.5px on white is legible but it reads
+   as a link, and nothing else in this product colours a label to mean
+   "selected". The icon is a mark and can take a brand colour; the word is
+   text and keeps the text colour.
+   -------------------------------------------------------------------------- */
+.app .sn-item.on svg{fill:var(--accent)}
+
+/* --------------------------------------------------------------------------
+   3. THE MARK IS THE MENU
+   Desktop only. Below 900 the rail is a drawer over the page and the header
+   keeps the pattern a phone expects: a plain hamburger, then the wordmark.
+
+   THE PHONE'S DEFAULT IS STATED FIRST, AND IT HAS TO BE. `shell()` prints
+   both glyphs into the button at every width — it does not know how wide the
+   frame is — and the swap that hides one of them lives in the container
+   query below. Without these two lines the phone drew BOTH: the button is
+   `display:grid`, so two visible spans take a row each and the header grew a
+   stacked mark-over-hamburger where one 24px glyph belongs. The mark earns
+   its place at desktop because it sits over the rail it opens and there is
+   nothing else in that corner; on a phone the wordmark is already six pixels
+   to its right, so a second copy of the brand is just a second copy.
+   -------------------------------------------------------------------------- */
+.app .nav-t-mark{display:none}
+.app .nav-t-menu{display:grid;place-items:center}
+
+@container app (min-width:900px){
+
+  /* The header's left cell IS the rail's column, so it pays no gap: the rule
+     down its right edge has to land on the same pixel as the rail's own
+     border-right or the frame has two vertical lines a hair apart. §01 sets
+     `gap:var(--s02)` on the shell for the phone's row of round controls;
+     here the first child owns its width exactly and the switch that follows
+     brings its own margin. */
+  .app .shell{gap:0}
+  .app .shell-act.nav-t{
+    height:100%;border-radius:0;flex:none;
+    border-right:1px solid var(--border-subtle-01)}
+  .app .pswitch{margin-left:var(--s05)}
+
+  /* --- COLLAPSED: one control, the width of the rail under it ------------ */
+  .app[data-rail="shut"] .shell-logo{display:none}
+  .app[data-rail="shut"] .shell-act.nav-t{width:var(--rail-w-nav)}
+
+  /* --- OPEN: the drawer's head — wordmark left, close right -------------- */
+  /* `order:-1` rather than swapping the source: the toggle is first in the
+     DOM because that is the order a phone wants and the order a screen
+     reader should hear (the control, then the link home). Open, the two are
+     one object and the wordmark holds its left end. */
+  .app[data-rail="open"] .shell-logo{
+    order:-1;flex:none;padding-left:var(--s06);
+    width:calc(var(--drawer-w) - 56px)}
+  .app[data-rail="open"] .shell-act.nav-t{width:56px}
+
+  /* --- THE TWO GLYPHS ---------------------------------------------------- */
+  /* The button is `display:grid;place-items:center` (§01), so both spans are
+     grid items and would take a row each. Only ever one is displayed, which
+     is what keeps the button one cell tall and the glyph centred in it.
+
+     THE MARK IS DRAWN SMALLER THAN THE HAMBURGER IT SWAPS WITH. Material's
+     24px canvas is drawn to fill; the brand mark is three thin chevrons with
+     air around them, and at 24 it read as the heavier of the two, so the
+     swap looked like a size change rather than a change of glyph. 21 puts
+     the two at the same optical weight. */
+  .app .nav-t-mark,
+  .app .nav-t-menu{display:grid;place-items:center;grid-area:1 / 1}
+  .app .nav-t-mark svg{width:21px;height:21px;fill:var(--icon-primary)}
+  .app .nav-t-menu{display:none}
+  .app .shell-act.nav-t:hover .nav-t-mark{display:none}
+  .app .shell-act.nav-t:hover .nav-t-menu{display:grid}
+}
+
+/* THE HOVER IS REAL, AND IT IS ONE OF FIVE THAT ARE.
+   `build.py` rewrites every `:hover` in this stylesheet to
+   `:hover:where(.__nh)` — a class that never appears in the DOM — so the
+   rule never matches. `nav-t` is in `HOVER_KEEP` beside `sn-item`, `btn-p`,
+   `tal-fab` and `tal-star`, because here the hover is not a state layer
+   decorating a control, it is the control telling you what it does. Take it
+   out of that list and the mark simply never becomes a menu. */
+
+@media (prefers-reduced-motion:reduce){
+  /* nothing here animates — the swap is a display change, which is what
+     reduced motion asks for anyway. Named so the next person does not add
+     a transition to it without deciding. */
+  .app .nav-t-mark,.app .nav-t-menu{transition:none}
+}

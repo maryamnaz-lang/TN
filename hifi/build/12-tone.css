@@ -1,0 +1,814 @@
+/* ==========================================================================
+   TWO TONES
+   From the Attio reference: the page has one base ground and one light-toned
+   panel, and the panel — not a heavier rule — is what says "this is a
+   distinct block". The hairlines stay, but they no longer have to carry the
+   separation on their own.
+
+   Two values only. Base is the bone canvas; the panel is one step down in
+   the same warm family, close enough that it reads as a tone rather than a
+   colour change, and far enough to be legible on a laptop screen.
+   ========================================================================== */
+:root{
+  --surface-2:#f7f7f7;      /* the panel. One step off white, same warm hue. */
+  --rule-on-2:#ede9e2;      /* the hairline, one step darker on the panel */
+  --link:#0371a4;           /* the stated #0488C5, darkened just enough to
+                               hold AA: the original is 3.5:1 on the canvas
+                               and 3.3:1 on the panel, under the 4.5:1 body
+                               minimum. This is 4.8:1 and 4.5:1, same hue. */
+  --link-hover:#025c86;
+  --tal-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14.4 9.6 22.5 12 14.4 14.4 12 22.5 9.6 14.4 1.5 12 9.6 9.6 12 1.5Z'/%3E%3C/svg%3E");
+  --sheen:rgba(255,255,255,.42); /* the highlight that travels across the
+                               Tal label. White as light, not as a surface. */
+  --sheen-0:rgba(255,255,255,0);
+  --in-progress:#b34d00;    /* the amber a chapter in flight is marked with.
+                               3:1 against both grounds as a non-text mark,
+                               and 4.7:1 if it is ever used as ink. */
+  --accent-tint:#fde3d4;    /* the accent at 8% — a chip ground, not a surface */
+  --accent-on-2:#ae4508;    /* accent ink ON the panel. --accent-text is tuned
+                               to 4.63:1 against the canvas and drops to
+                               4.35:1 here, under AA. This holds 4.8:1. */
+  /* --- FOUR MARK HUES, for a row of figure cells -------------------------
+     A row of readings is four different measurements, and drawing all four
+     marks in one colour makes them look like four instances of one thing.
+     These give each cell its own hue.
+
+     Why not the brand and why not black: orange is the accent and means "this
+     is yours / this is the action", black is ink and the primary control. A
+     mark that is neither is free to mean nothing except "this cell is not
+     that cell", which is all it is being asked to do. They are also NOT the
+     --dv-* ramp: that is one hue in four steps, built to read as a sequence
+     in a stacked bar, and a sequence is the wrong idea here.
+
+     Ratios are against the canvas: 5.7, 5.3, 6.0 and 6.0 to 1. A mark only
+     needs 3:1, so all four clear it with room and would pass as text if they
+     were ever used that way. */
+  --mk-1:#0f6ba8;           /* blue */
+  --mk-2:#1c7a5e;           /* green */
+  --mk-3:#7c4bb0;           /* violet */
+  --mk-4:#a83a6b;           /* rose — distinct from --support-error's red */
+
+  --surface-ach:#f4fef6;    /* the achievement band, from the client. The one
+                               COOL ground in a warm palette, and that is the
+                               point of it: the band is a notification, not a
+                               part of the page's own material, and the hue
+                               break is what says so in a product where every
+                               other tone is a step along one warm ramp. Ink
+                               on it is the normal pair — #111 reads 18.3:1
+                               and --text-secondary 7.6:1 — so unlike a brand
+                               fill it needs no contrast exception.
+
+                               Was #E8F9F9 (cyan). Maryam moved it to #F4FEF6,
+                               which keeps the hue break — it is still the one
+                               cool ground — but takes it from cyan to green
+                               and lightens it a step: luminance .918 -> .968,
+                               so the band sits closer to the canvas than it
+                               did and reads as a wash rather than a panel.
+                               Every ratio went UP with it. Paired with
+                               --tal-chip-2 in §01, which took the same value
+                               in the same pass so the notification ground and
+                               the assistant's cool pool stay one colour. */
+}
+
+/* the sections the content model already marks as supporting material */
+.app .sec.tint,.app .sec.flat.tint,.app .sec.warm,.app .cool{
+  background-color:var(--surface-2)}
+.app .sec.tint::after,.app .sec.flat.tint::after{background:var(--rule)}
+
+/* a panel's own internal rules step down so they stay visible on it */
+.app .sec.tint .kv,.app .sec.tint .ch,.app .sec.tint .aw,.app .sec.tint .mem,
+.app .sec.tint .cardrow,.app .sec.tint .gcard,.app .sec.tint .tile.clk,
+.app .sec.tint .acc-i,.app .sec.tint .steps > li{border-bottom-color:var(--rule-on-2)}
+.app .sec.tint .prog-figs,.app .sec.tint .stats,.app .sec.tint .facts{
+  background:var(--rule-on-2);border-color:var(--rule-on-2)}
+.app .sec.tint .prog-figs > span,.app .sec.tint .stats > .stat,
+.app .sec.tint .facts > div{background:var(--surface-2)}
+.app .sec.tint .inp,.app .sec.tint .tag,.app .sec.tint .ch-num,
+.app .sec.tint .aw-ic,.app .sec.tint .cardrow-ic,.app .sec.tint .nrow-ic,
+.app .sec.tint .s-n,.app .sec.tint .slot,.app .sec.tint .day{
+  background-color:transparent;border-color:var(--rule-on-2)}
+.app .sec.tint .chart-ref > span{background:var(--surface-2)}
+
+/* A long grouped list still sits on the panel so it reads as one object.
+   `.tile-stack` is NOT in this set: it is used for short runs of two or three
+   navigation rows, and those runs sit directly beneath a tinted stepper. Two
+   tinted blocks in a row, with base-coloured rows inside them, is three tones
+   in one region — which is exactly the thing the two-tone rule exists to
+   prevent. A short run alternates with the panel above it instead. */
+/* `.sec.flat.bleed` was in this list and is no longer: the chapter-list
+   section further down this same layer sets it back to transparent, so the
+   declaration here had nothing to do but mislead the next reader — and §18
+   was reading this list to decide which blocks keep a full-width edge, which
+   is how an unfilled block ended up with a fill edge. */
+.app .sec:has(> .aw-list),
+.app .sec:has(> .pointsList),.app .sec:has(> .badgeList),
+.app .sec:has(> .rankList),.app .sec:has(> .msgs){
+  background-color:var(--surface-2)}
+
+/* and a row inside a panel takes the panel's tone rather than the canvas —
+   otherwise every list is a set of pale blocks floating on a darker ground */
+.app .sec.tint .tile,.app .sec.tint .tile.clk,.app .sec.tint .gcard,
+.app .sec.tint .ag,.app .sec.tint .agh,.app .sec.tint .ch,
+.app .sec.tint .cardrow,.app .sec.tint .mem,.app .sec.tint .nrow,
+.app .sec:has(> .aw-list) .aw,.app .sec:has(> .pointsList) .aw,
+.app .sec:has(> .badgeList) .aw,.app .sec:has(> .rankList) .aw,
+.app .sec:has(> .msgs) .msg,.app .sec.flat.bleed .ch{
+  background-color:transparent}
+.app .sec:has(> .tile-stack) .tile.clk,.app .sec:has(> .tile-stack) .gcard,
+.app .sec:has(> .tile-stack) .ag,.app .sec:has(> .tile-stack) .ch,
+.app .sec:has(> .tile-stack) .cardrow,.app .sec:has(> .tile-stack) .mem,
+.app .sec:has(> .aw-list) .aw,.app .sec:has(> .pointsList) .aw,
+.app .sec:has(> .badgeList) .aw,.app .sec:has(> .rankList) .aw,
+.app .sec.flat.bleed .ch{border-bottom-color:var(--rule-on-2)}
+.app .sec:has(> .tile-stack) .ch-num,.app .sec:has(> .tile-stack) .cardrow-ic,
+.app .sec:has(> .tile-stack) .nrow-ic,.app .sec:has(> .aw-list) .aw-ic,
+.app .sec:has(> .pointsList) .aw-ic,.app .sec.flat.bleed .ch-num{
+  background-color:transparent;border-color:var(--rule-on-2)}
+.app .sec:has(> .tile-stack) .ch.done .ch-num,.app .sec.flat.bleed .ch.done .ch-num,
+.app .sec:has(> .aw-list) .aw.got .aw-ic,.app .sec:has(> .pointsList) .aw.got .aw-ic{
+  background-color:var(--accent);border-color:transparent}
+.app .sec:has(> .tile-stack) .ch.open .ch-num,.app .sec.flat.bleed .ch.open .ch-num{
+  background-color:var(--accent);border-color:transparent}
+
+/* the tabs strip belongs to the panel below it */
+.app .tabs,.app .cs{background-color:transparent}
+
+/* state layers still read on the panel */
+.app .sec.tint .tile.clk:hover,.app .sec.tint .gcard:hover,
+.app .sec:has(> .tile-stack) .tile.clk:hover,
+.app .sec:has(> .tile-stack) .gcard:hover,.app .sec:has(> .tile-stack) .ag:hover,
+.app .sec:has(> .tile-stack) .ch:hover,.app .sec.flat.bleed .ch:hover{
+  background-color:var(--overlay-hover)}
+
+/* --------------------------------------------------------------------------
+   CONTRAST ON THE PANEL
+   The blanket "strip the fill inside a panel" rule also stripped the two
+   tags that carry white type, and the accent text needed one more step of
+   darkness to clear AA on the panel rather than on the base.
+   -------------------------------------------------------------------------- */
+:root{--accent-text-2:#a24007}
+.app .sec.tint .tag.brand,.app .sec:has(> .tile-stack) .tag.brand{
+  background-color:var(--brand-primary);border-color:var(--brand-primary);
+  color:var(--on-brand)}
+.app .sec.tint .tag.acc,.app .sec:has(> .tile-stack) .tag.acc{
+  background-color:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.app .sec.tint .ai-inline,.app .sec:has(> .tile-stack) .ai-inline,
+.app .sec.flat.bleed .ai-inline{color:var(--accent-text-2)}
+/* a number sitting on the accent takes the accent's own ink */
+.app .ch.done .ch-num,.app .ch.open .ch-num,
+.app .sec.tint .ch.done .ch-num,.app .sec.tint .ch.open .ch-num,
+.app .sec:has(> .tile-stack) .ch.done .ch-num,
+.app .sec:has(> .tile-stack) .ch.open .ch-num,
+.app .sec.flat.bleed .ch.done .ch-num,.app .sec.flat.bleed .ch.open .ch-num,
+.app .aw.got .aw-ic svg{color:var(--on-accent);fill:var(--on-accent)}
+
+/* the reserved scrollbar gutter left a strip of base colour down the right
+   edge of every panel; the frame hides its scrollbar instead */
+.main{scrollbar-gutter:auto;scrollbar-width:none}
+.main::-webkit-scrollbar{width:0;height:0}
+
+/* ==========================================================================
+   NO WHITE SURFACES
+   The canvas is #F3F2EE and nothing sits on top of it in white. White
+   survives in exactly two places, both of them justified and both of them
+   allowlisted in the audit:
+
+     1. INK on a dark or accent ground — --on-brand, --on-accent, --on-dark.
+        White type on black is legibility, not a surface.
+     2. The payment card brand marks. Visa, Mastercard, Amex and Discover
+        contain white in their own artwork; monochroming another party's
+        mark misrepresents it and breaches the card networks' guidelines.
+
+   Everything else resolves to the canvas. `verify.mjs` walks every element
+   and every ::before/::after in all 117 views, in seven open/closed states,
+   and fails the build on any surface at or near white.
+   ========================================================================== */
+.app .sw::after{background-color:var(--background);border:1px solid var(--rule)}
+.app .tg input:checked ~ .sw::after{background-color:var(--accent);border-color:var(--accent)}
+.app .cbx .box,.app .rad .box{background-color:transparent}
+.app .rad input:checked + .box::after{background-color:var(--background)}
+.app .cbx input:checked + .box svg{fill:var(--on-brand)}
+
+/* ==========================================================================
+   PREVIEW FIT
+   The frame is never squashed: it holds its real pixel size — 390, 834, 1280
+   — so the container queries inside it resolve to the viewport being
+   previewed, and it is scaled to fit the pane instead. Without this, any
+   pane narrower than about 850px clamped tablet, desktop and fluid to the
+   same width and the desktop layout was never reachable.
+   ========================================================================== */
+.pt-fit{position:relative;margin:0 auto;overflow:visible}
+.device{
+  width:390px;max-width:none;
+  transform-origin:top center;
+  transition:none}
+.pt-stage{padding-left:var(--s03);padding-right:var(--s03)}
+.pt-scale{
+  display:inline-grid;place-items:center;height:32px;padding:0 var(--s03);
+  margin-left:var(--s02);font-size:11px;letter-spacing:.4px;
+  color:var(--on-dark-2);font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   THE TAL BUTTON
+   ========================================================================== */
+.app .tal-fab:hover,.app .tal-fab:focus-visible{
+  background-color:var(--accent)}
+.app .tal-fab:active{background-color:var(--accent-hover)}
+.app .tal-fab:hover::before{opacity:1;border-color:var(--accent)}
+
+/* ==========================================================================
+   THE SIGNUP SCREENS
+   They build their own page rather than going through the shell, so they
+   need the spine stated explicitly. The wordmark is also the only brand
+   present on these screens, so it carries more weight here.
+   ========================================================================== */
+.app .page > .stp,.app .page > .f,.app .page > .pw-rules,
+.app .page > .cbx,.app .page > .otp,.app .page > p,.app .page > .btn,
+.app .page > .note,.app .page > .btn-row{
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.authShell .shell-logo img,.app .page ~ * .shell-logo img{height:28px}
+.app .shell:has(.shell-act[aria-label="Help"]) .shell-logo img{height:30px}
+@container app (min-width:900px){
+  .app .shell:has(.shell-act[aria-label="Help"]) .shell-logo img{height:34px}
+}
+
+/* a form's primary action fills the measure */
+.app .btn-full{width:100%;justify-content:space-between}
+.app .btn-full.noic{justify-content:center}
+
+/* fields are ruled on the baseline only — the box was reading as a container */
+.app .inp,.app select.inp,.app textarea.inp{
+  border:0;border-bottom:1px solid var(--border-strong-01);
+  padding-left:0;padding-right:var(--s08);background-color:transparent}
+.app .inp:hover{border-bottom-color:var(--text-primary);background-color:transparent}
+.app .inp:focus{border:0;border-bottom:2px solid var(--brand-primary);
+  padding-bottom:0;background-color:transparent}
+.app .inp[readonly]{border-bottom-style:dashed}
+.app .pw-wrap .inp{padding-right:52px}
+.app .pw-eye{right:0;width:44px;height:44px}
+.app .inp-mk .inp{padding-right:64px}
+.app .inp-mk .bmk{right:0}
+.app .srch .inp{padding-left:32px}
+.app .srch > svg{left:0}
+.app .otp input{border:0;border-bottom:1px solid var(--border-strong-01);
+  padding:0;text-align:center}
+.app .otp input:focus{border-bottom:2px solid var(--brand-primary)}
+.app textarea.inp{padding-top:var(--s03)}
+.app .composer .inp{padding-left:0}
+
+/* ==========================================================================
+   CREATE YOUR ACCOUNT
+   The mockup asks for a filled field on the panel tone rather than a bare
+   baseline rule, so a form reads as a form and not as a run of loose lines.
+   Two variants:
+
+     .inp.fill    — you type into it. Panel ground, baseline rule.
+     .inp-static  — you do not. Panel ground, no rule, accent ink, because
+                    the address is a thing the candidate owns rather than a
+                    thing the form is asking for.
+
+   Accent ink on the panel needs its own value: --accent-text is tuned to
+   4.63:1 against the canvas and falls to 4.35:1 on the panel, under AA.
+   --accent-on-2 holds 4.8:1 there.
+   ========================================================================== */
+/* A field you type into is a line, not a box. The baseline rule is the whole
+   affordance; a fill behind it puts a container back on a layout whose whole
+   argument is that it does not need them. The read-only address is the same
+   line, marked as a value rather than a field by its accent ink alone — a
+   dashed rule said the same thing twice and read as a broken border.
+
+   The two spacings do the grouping the boxes used to do: a label sits 2px off
+   its own field so the pair reads as one object, and 32px of air separates one
+   pair from the next. Proximity, not enclosure. */
+.app .inp.fill{
+  background-color:transparent;padding-left:0;min-height:44px;
+  border:0;border-bottom:1px solid var(--border-strong-01)}
+.app .inp.fill:hover{background-color:transparent;
+  border-bottom-color:var(--text-primary)}
+.app .inp.fill:focus{background-color:transparent;
+  border:0;border-bottom:2px solid var(--brand-primary);padding-bottom:0}
+.app .inp-static{
+  background-color:transparent;padding-left:0;min-height:44px;
+  display:flex;align-items:center;
+  color:var(--accent-text);
+  border:0;border-bottom:1px solid var(--border-strong-01);
+  font-size:13.5px;line-height:19px;letter-spacing:.1px}
+
+/* field labels are sentence case. An uppercase micro-label above every input
+   was a Carbon habit; it fights the sentence-case voice used everywhere else
+   in the product and reads as a different application. */
+.app .f > label,.app .lbl{
+  font-size:12.5px;line-height:17px;font-weight:500;letter-spacing:.15px;
+  text-transform:none;color:var(--text-secondary);margin-bottom:var(--s03)}
+.app .f.last{margin-bottom:0}
+
+/* consents are read, so they are set as prose, not as fine print */
+.app .cbx-list{display:flex;flex-direction:column;gap:var(--s02)}
+.app .cbx-list .cbx{padding:var(--s02) 0;align-items:flex-start}
+.app .cbx-list .cbx .box{margin-top:1px}
+.app .cbx .txt{font-size:13.5px;line-height:19px;font-weight:400;
+  letter-spacing:.1px;color:var(--text-primary)}
+
+/* the two headings on this form carry the section, so they are stated at the
+   section-title size rather than the row-title size */
+.app .sec-h h2.u-h2{font-size:17px;line-height:23px;letter-spacing:-.2px}
+
+/* a form is read in one column at every width. The label column is the right
+   pattern for a page you scan; it is the wrong one for a page you fill in,
+   and it left the first section (which has no heading) hanging wider than
+   the two below it. */
+@container app (min-width:900px){
+  .app .form-page .sec:has(> .sec-h){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .form-page .sec:has(> .sec-h) > .sec-h{
+    padding:0;border-right:0;margin-bottom:var(--s05);min-height:0}
+  .app .form-page .sec:has(> .sec-h) > :not(.sec-h){padding-left:0}
+  .app .form-page{max-width:720px}
+}
+
+/* the code boxes are fields too */
+.app .form-page .otp input{
+  background-color:transparent;
+  border-bottom:1px solid var(--border-strong-01)}
+.app .form-page .otp input:focus{
+  background-color:transparent;border-bottom:2px solid var(--brand-primary)}
+
+/* ==========================================================================
+   THE MENU ON MOBILE AND TABLET
+   Below the permanent-drawer breakpoint the navigation is not a panel that
+   slides over the page — it takes the whole frame under the app bar, the
+   scrim goes (there is nothing behind it to dim), and the hamburger becomes
+   the close control.
+
+   That is the ONLY thing that changes. The rows keep the type size, the row
+   height and the density they have at every other width; a full-width menu
+   is a menu that is full width, not a different component. The leading icons
+   go, because at full width the label has the whole row to itself and an
+   icon beside it is decoration standing in for a hit target it no longer
+   needs. The two account rows pin to the bottom edge so the destination and
+   the exit are never in the same scroll.
+   ========================================================================== */
+@container app (max-width:899px){
+  .app .sidenav{
+    width:100%;border-right:0;padding:0;
+    background-color:var(--background);
+    display:flex;flex-direction:column}
+  .app .scrim{display:none}
+  .app .sn-main{flex:1;min-height:0;overflow-y:auto;padding:0}
+  .app .sn-foot{flex:none;padding:0;border-top:1px solid var(--rule)}
+  .app .sn-item svg{display:none}
+  .app .sn-item{min-height:52px;padding:0 var(--pad-x);gap:0}
+  .app .sn-main .sn-item + .sn-item,
+  .app .sn-foot .sn-item + .sn-item{border-top:1px solid var(--rule)}
+}
+
+/* ==========================================================================
+   LINKS
+   Inline links are the one place in the product that is neither ink nor
+   accent: the accent means "this is yours", and a link that borrowed it
+   would dilute that. Blue is the convention and carries no other meaning
+   here.
+   ========================================================================== */
+.app a[data-go],.app .lk,.app .lnk,.app .score-link{
+  color:var(--link);border-bottom-color:currentColor}
+.app a[data-go]{text-decoration-color:currentColor}
+.app a[data-go]:hover,.app .lk:hover,.app .lnk:hover,.app .score-link:hover{
+  color:var(--link-hover);background-color:transparent;
+  border-bottom-color:currentColor}
+.app .lk svg,.app .lnk svg{fill:currentColor}
+/* links on a dark ground stay ink — blue on black is unreadable */
+.app .on-dark a[data-go],.app .cert a[data-go],.app .lvl-hero a[data-go],
+.app .on-dark .lk,.app .on-dark .lnk{color:var(--on-dark)}
+/* the breadcrumb is navigation furniture, not a link in prose */
+.app .crumb a{color:var(--text-helper)}
+.app .crumb a:hover{color:var(--text-primary)}
+
+/* ==========================================================================
+   TAL'S MARK
+   The leading glyph on a Tal chip is a shimmer bar in the source markup,
+   squared off at chip scale by an earlier layer. A purple square says
+   nothing; the four-pointed star is Tal's own mark and is already the
+   floating button's glyph. Same element, masked rather than filled, so no
+   markup anywhere has to change.
+   ========================================================================== */
+.app .chip-tal .sk-mark,.app .tal-star .sk-mark,.app .av .sk-mark{
+  width:13px;height:13px;flex:none;animation:none;
+  background-color:var(--accent);
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+.app .tal-h .av .sk-mark,.app .tal-msg .av .sk-mark{
+  width:16px;height:16px;background-color:var(--on-brand)}
+
+/* a suggested question that follows a navigation link sits on its own line */
+.app .ai-asks{display:flex;flex-wrap:wrap;gap:var(--s03);margin-top:var(--s04)}
+.app .ai-asks .chip-tal{
+  height:auto;min-height:30px;padding:var(--s02) var(--s04);
+  white-space:normal;text-align:left;max-width:100%;
+  font-size:12.5px;line-height:17px}
+
+/* ==========================================================================
+   MY LEVEL — the dark panel
+   Three stacked figures at display size made the panel taller than the
+   viewport before the reader reached the thing the page is actually about.
+   The track name drops from the display role to the page-title role: it is
+   still the largest thing in the panel, and the panel now fits.
+   ========================================================================== */
+.app .lvl-hero{padding-top:var(--s06);padding-bottom:0}
+.app .lvl-hero .big{font-size:24px;line-height:30px;letter-spacing:-.5px}
+.app .lvl-hero .eb{margin-bottom:var(--s02)}
+.app .lvl-hero .sub{margin-top:var(--s02)}
+.app .lvl-hero .path{margin-top:var(--s05)}
+.app .path-facts > div{padding:var(--s03) var(--s04)}
+.app .path-step{padding-top:var(--s04);padding-bottom:var(--s04)}
+@container app (min-width:900px){
+  .app .lvl-hero{padding-top:var(--s07)}
+  .app .lvl-hero .big{font-size:28px;line-height:34px;letter-spacing:-.7px}
+}
+
+/* ==========================================================================
+   THE BREADCRUMB
+   On a phone or a tablet the drawer is one tap away and the trail is one
+   level deep, so the crumb is a row of chrome that earns nothing. It stays
+   at desktop, where the permanent drawer means the app bar has no back.
+   ========================================================================== */
+/* No module is a child of the dashboard — they are siblings in the rail, and
+   the rail shows which one you are on. A trail with one hop above it is a row
+   of chrome asserting a hierarchy the product does not have. */
+.app .crumb{display:none}
+
+/* ==========================================================================
+   THE PREVIEW FRAME
+   A phone and a tablet have a physical edge, so the border around those two
+   frames is telling the truth about where the screen stops. A desktop
+   browser does not — the border there was drawing a device that is not
+   there, and boxing the layout in when the point of the desktop view is that
+   it runs to the edge.
+   ========================================================================== */
+.device[data-vp="fluid"]{border:0}
+.pt-stage:has(.device[data-vp="fluid"]){padding:0}
+.pt-fit:has(.device[data-vp="fluid"]){margin:0}
+
+/* an auth form has one way forward and no history worth offering: the app bar
+   already carries a back control on the screens that need one */
+.app .form-page .ph-back{display:none}
+
+/* a link under a field is a route out of the form, not a caption on the field:
+   it takes the body size the other auth links use, and it stands off the
+   baseline rule instead of hanging from it */
+.app .form-page .aux{margin:var(--s05) 0 0}
+.app .form-page .f + .aux{margin-top:var(--s05)}
+
+/* ==========================================================================
+   THE ACCENT AS A POINTER
+   The accent means "this is yours" on data. On chrome it has a second, non-
+   conflicting job: marking the thing you are on and the thing you can open.
+   A disclosure caret and a selected tab are both that, and both were reading
+   as ink — indistinguishable from the text they sit beside.
+   ========================================================================== */
+.app .acc-h .chev svg,.app .chev svg{fill:var(--accent)}
+.app .tabs button.on,.app .tb.on{border-bottom-color:var(--accent)}
+
+/* ==========================================================================
+   THE SUMMARY NOTE
+   A left rule plus an indent made the summary read as a quotation pulled out
+   of the document. It is the document's own opening paragraph, so it takes
+   the full measure like everything else and states itself in the accent.
+   ========================================================================== */
+.app .note{border-left:0;padding-left:0;padding-right:0;
+  background-color:transparent}
+.app .note.warn,.app .note.err,.app .note.succ{padding-left:var(--s05)}
+.app .note .nb b{color:var(--accent-on-2)}
+
+/* ==========================================================================
+   HOVER WITHOUT A PLATE
+   Material's state layer is a translucent grey wash behind the whole
+   control. On a bordered, container-free layout it is the one thing that
+   puts a box back on the page: a grey band appears under a row that
+   otherwise has no fill, and it reads as a rendering fault rather than as
+   feedback.
+
+   Every full-bleed row therefore says "live" the way the rest of this
+   product says everything — with the accent and with the rule. The title
+   takes the accent, the trailing arrow takes the accent and steps toward the
+   edge it points at. Nothing changes size, nothing gains a background.
+
+   The wash survives in exactly two places: on a control that already has a
+   box of its own (a bordered button, an icon button in the app bar), where
+   there is no new container to introduce; and on a dark ground, where it is
+   the only available signal.
+   ========================================================================== */
+.app .acc-h:hover,.app .sn-item:hover,.app .tile.clk:hover,.app .gcard:hover,
+.app .ag:hover,.app .agh:hover,.app .ch:hover,.app .ch.open:hover,
+.app .cardrow:hover,.app .mem:hover,.app .nrow.clk:hover,.app .aw-r.clk:hover,
+.app .ai-clickable:hover,.app .signed.clk:hover,.app .tabs button:hover,
+.app .cs button:hover,.app .tg:hover,.app .sc-col:hover,
+.app .sec.tint .tile.clk:hover,.app .sec.tint .gcard:hover,
+.app .sec:has(> .aw-list) .aw:hover,.app .sec:has(> .msgs) .msg:hover,
+.app .sec.flat.bleed .ch:hover,.app a[data-go]:hover{
+  background-color:transparent}
+
+/* what replaces it */
+.app .acc-h:hover .ttl,.app .sn-item:hover > span:first-of-type,
+.app .tile.clk:hover .gcard-b h3,.app .gcard:hover .gcard-b h3,
+.app .ag:hover .ag-n,.app .agh:hover .agh-n,.app .ch:hover .ch-n,
+.app .cardrow:hover .cardrow-t,.app .mem:hover .mem-n,
+.app .nrow.clk:hover .nrow-t,.app .aw-r.clk:hover .aw-n,
+.app .tabs button:hover,.app .cs button:hover{color:var(--accent-text)}
+.app .tile.clk:hover .tile-arrow,.app .gcard:hover .tile-arrow,
+.app .cardrow:hover .tile-arrow,.app .nrow.clk:hover .tile-arrow,
+.app .ag:hover .tile-arrow,.app .signed.clk:hover .tile-arrow{
+  fill:var(--accent);transform:translateX(3px)}
+.app .tile-arrow{transition:transform var(--mo-quick) var(--mo-standard),
+                            fill var(--mo-quick) var(--mo-standard)}
+.app .acc-h:hover .chev svg{fill:var(--accent-hover)}
+/* No left rule. A bar down the side of a row is a fourth kind of edge on a
+   page that already has rails, section rules and row separators, and on
+   hover it reads as the row having been selected rather than pointed at. */
+.app .tile.clk,.app .gcard,.app .ag,.app .agh,.app .ch,.app .cardrow,
+.app .mem,.app .nrow,.app .aw,.app .signed,.app .signed.clk,.app .ai-aura{
+  border-left:0}
+.app .tile.clk:hover,.app .gcard:hover,.app .ag:hover,.app .ch:hover,
+.app .cardrow:hover,.app .nrow.clk:hover,.app .sn-item:hover,
+.app .signed.clk:hover{box-shadow:none;border-left:0}
+
+/* the two places the wash is still right */
+.app .btn-s:hover,.app .btn-t:hover,.app .btn-g:hover,.app .btn.ghost:hover,
+.app .shell-act:hover,.app .pw-eye:hover,.app .ph-back:hover,
+.app .sheet-h .x:hover,.app .ach-x:hover,.app .post-act button:hover,
+.app .shell-logo:hover{background-color:var(--overlay-hover)}
+.app .on-dark .btn-s:hover{background-color:var(--overlay-hover-dark)}
+
+/* ==========================================================================
+   THE SUMMARY NOTE, PART TWO
+   The icon belongs to the heading — it is the heading's own bullet, not a
+   column of its own — so it floats out of the first line and the body below
+   it runs the full measure.
+   ========================================================================== */
+.app .note{display:block}
+.app .note > span:first-child{
+  float:left;width:17px;height:17px;margin:1px var(--s03) 0 0;display:block}
+.app .note svg{width:17px;height:17px;fill:var(--accent)}
+.app .note .nb{display:block}
+.app .note .nb b{display:block;color:var(--accent-on-2)}
+
+/* ==========================================================================
+   A HEADING PAYS THE SPINE ONCE
+   Several layers gave `.sec-h` its own `padding-left:var(--pad-x)` back when
+   sections of rows zeroed their own padding. §28 later made every section
+   pay the spine itself, so those rules became a second payment and the
+   heading sat one gutter right of the page title — visibly out of line with
+   the section above it.
+
+   The rule is stated once here, declaratively: a heading inherits its
+   section's edge. Only a section that has genuinely surrendered its padding
+   (`.flat`, `.flush`) asks its heading to pay. `verify.mjs` now measures
+   every heading against the spine and fails on a mismatch in either
+   direction, which is how this stays fixed.
+   ========================================================================== */
+@container app (max-width:899px){
+  .app .sec > .sec-h,.app .sec > .eyebrow{padding-left:0;padding-right:0}
+  .app .sec.flush > .sec-h,.app .sec.flush > .eyebrow{
+    padding-left:var(--pad-x);padding-right:var(--pad-x)}
+}
+/* At desktop the label-column rule zeroes the section's own padding, which
+   makes the heading the one that pays. That is §4's arrangement and it is
+   correct there, so this layer stays out of it — except for `.flat`, which
+   keeps its padding at every width and so was paying twice. */
+@container app (min-width:900px){
+  .app .sec.flat > .sec-h,.app .sec.flat > .eyebrow{
+    padding-left:0;padding-right:0}
+}
+
+/* a `.flat` section keeps its own padding at every width, so its heading
+   never pays — the lattice's §16 rule predates §28 and is superseded here */
+.app .sec.flat > .sec-h,.app .sec.flat > .eyebrow{
+  padding-left:0;padding-right:0}
+
+/* ==========================================================================
+   AN OPEN QUESTION IS MARKED
+   A disclosure that is open looked identical to seven that are shut. The
+   title and its number take the accent, which is the same signal the caret
+   already carries.
+   ========================================================================== */
+.app .acc-i.on .acc-h .ttl,.app .acc-i.on .acc-h{color:var(--accent-text)}
+.app .acc-i.on .acc-h .chev svg{fill:var(--accent)}
+
+/* ==========================================================================
+   HOVER RUNS TO THE EDGE
+   The wash is back — the objection was never the wash, it was that it
+   stopped short of the frame while the rules around it did not, so it read
+   as a misaligned block rather than as the row lighting up. A row is
+   full-bleed in this layout, so its hover is too: the ::after reaches past
+   both rails the way the section rules already do, and sits behind the
+   content.
+   ========================================================================== */
+.app .acc-h,.app .sn-item,.app .tile.clk,.app .gcard,.app .ag,.app .agh,
+.app .ch,.app .cardrow,.app .mem,.app .nrow.clk,.app .aw-r.clk,
+.app .ai-clickable,.app .signed.clk,.app .msg{position:relative;isolation:isolate}
+.app .acc-h::after,.app .sn-item::after,.app .tile.clk::after,
+.app .gcard::after,.app .ag::after,.app .agh::after,.app .ch::after,
+.app .cardrow::after,.app .mem::after,.app .nrow.clk::after,
+.app .aw-r.clk::after,.app .ai-clickable::after,.app .signed.clk::after{
+  content:'';position:absolute;top:0;bottom:0;left:-50vw;right:-50vw;
+  z-index:-1;background-color:transparent;pointer-events:none;
+  transition:background-color var(--mo-quick) var(--mo-standard)}
+.app .acc-h:hover::after,.app .sn-item:hover::after,
+.app .tile.clk:hover::after,.app .gcard:hover::after,.app .ag:hover::after,
+.app .agh:hover::after,.app .ch:hover::after,.app .cardrow:hover::after,
+.app .mem:hover::after,.app .nrow.clk:hover::after,
+.app .aw-r.clk:hover::after,.app .ai-clickable:hover::after,
+.app .signed.clk:hover::after{background-color:var(--overlay-hover)}
+/* the drawer is a panel, not a page: its rows stop at its own edge */
+.app .sidenav .sn-item::after{left:0;right:0}
+
+/* ==========================================================================
+   THE TAL CARD
+   The left rule was a third kind of edge on a page that already has rails
+   and section rules, and it pushed the card's text off the spine. The card
+   is now identified by its label alone — which earns the accent fill it was
+   only outlining before, carries Tal's star, and holds a slow sheen so the
+   one machine-written thing on the page is the one thing that is alive.
+   ========================================================================== */
+.app .ai-aura{
+  border-left:0;padding-left:0;padding-right:0;background:transparent}
+.app .ai-aura.tile{padding-left:0!important;padding-right:0!important}
+.app .ai-label{
+  border-color:transparent;color:var(--on-accent);gap:5px;
+  padding:0 var(--s03) 0 7px;
+  background-color:var(--accent);
+  background-image:linear-gradient(105deg,
+    var(--sheen-0) 35%,var(--sheen) 50%,var(--sheen-0) 65%);
+  background-size:260% 100%;background-repeat:no-repeat;
+  animation:tal-sheen 3.6s var(--mo-standard) infinite}
+.app .ai-label::before{
+  content:'';width:11px;height:11px;flex:none;
+  background-color:var(--on-accent);
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+@keyframes tal-sheen{
+  0%{background-position:150% 0}
+  55%,100%{background-position:-150% 0}}
+@media (prefers-reduced-motion:reduce){
+  .app .ai-label{animation:none;background-image:none}
+}
+
+/* ==========================================================================
+   SUGGESTED QUESTIONS
+   Three bordered pills stacked vertically is three boxes doing the job one
+   list does. They become a divided list: a rule between each, an accent
+   star in front, nothing around them.
+   ========================================================================== */
+/* INSIDE A CARD OR A BUBBLE the offer sits in a column under a paragraph, so
+   it is a list: a rule between each, nothing around them. Three pills
+   stacked vertically was three boxes doing the work of one list. */
+.app .ai-asks,.app .bub .sugg{
+  display:flex;flex-direction:column;align-items:stretch;gap:0}
+.app .ai-foot{display:flex;flex-direction:row;align-items:center;
+  flex-wrap:wrap;gap:var(--s03)}
+.app .ai-asks .chip-tal,.app .bub .chip-tal{
+  border:0;border-top:1px solid var(--rule);border-radius:0;
+  background:transparent;width:100%;min-height:44px;
+  padding:var(--s03) 0;justify-content:flex-start;text-align:left;
+  font-size:13.5px;line-height:19px;font-weight:400}
+.app .ai-asks .chip-tal:hover,.app .bub .chip-tal:hover{
+  background:transparent;color:var(--accent-text)}
+.app .ai-asks{margin-top:var(--s04)}
+
+/* IN THE PANEL FOOTER they are a horizontal rail above the composer, where a
+   list would read as a menu you have to get past to type. There they are
+   chips proper: the accent at 8% behind accent ink, so they are legible as
+   Tal's offer and not as more of the conversation. */
+.app .tal-sugg{display:flex;flex-direction:row;flex-wrap:wrap;gap:var(--s03)}
+.app .tal-sugg > button,.app .tal-sugg .chip-tal{
+  height:auto;min-height:32px;width:auto;
+  padding:var(--s02) var(--s04);border:0;
+  background-color:var(--accent-tint);color:var(--accent-on-2);
+  font-size:12.5px;line-height:17px;font-weight:500;
+  white-space:normal;text-align:left}
+.app .tal-sugg > button .sk-mark,.app .tal-sugg .chip-tal .sk-mark{background-color:var(--accent-on-2)}
+.app .tal-sugg > button:hover,.app .tal-sugg .chip-tal:hover{
+  background-color:var(--accent);color:var(--on-accent)}
+.app .tal-sugg > button:hover .sk-mark,.app .tal-sugg .chip-tal:hover .sk-mark{background-color:var(--on-accent)}
+
+/* the last section of a form has nothing under it, so the rule that divides
+   it from the next section is dividing it from the end of the page */
+.app .form-page > .sec:last-child::after{display:none}
+
+/* label and field are one object; one field and the next are two */
+.app .form-page .f > label,.app .form-page .lbl{margin-bottom:var(--s01)}
+.app .form-page .f{margin-bottom:var(--s07)}
+.app .form-page .f.last{margin-bottom:0}
+.app .form-page .f .help,.app .form-page .pw-rules{margin-top:var(--s03)}
+
+/* the page header on a form is the form's own first line, not a section
+   above it, so no rule divides them */
+.app .form-page > .ph::after{display:none}
+
+/* the form's header and its first field are the same conversation, so the air
+   between them is a paragraph break, not a section gap */
+.app .form-page > .ph{padding-bottom:var(--s04)}
+.app .form-page > .ph + .sec{padding-top:var(--s05)}
+
+/* the nav toggle is the only control in the bar that changes meaning, so it
+   changes glyph. It does not also need a plate behind it. */
+.app .shell-act.nav-t.on{background-color:transparent}
+.app .shell-act.nav-t.on:hover{background-color:var(--overlay-hover)}
+
+/* ==========================================================================
+   A ROW OPENS WHEN YOU POINT AT IT
+   The wash on its own was the row's exact box, so the title, the arrow and
+   the progress bar all sat hard against the edge of it — the plate looked
+   like a crop of the row rather than a state of it.
+
+   Pointing at a row now gives its content room: the content inset grows on
+   both sides, and the plate grows a little past the row's top and bottom.
+   Neither moves anything else. The inset is real padding on the row, so the
+   text travels; the vertical breathing is on the plate, so the rows below do
+   not shuffle down. 240ms on the decelerate curve, which is long enough to
+   read as the row opening and short enough not to lag the pointer.
+   ========================================================================== */
+.app .tile.clk,.app .gcard,.app .ag,.app .ch,.app .cardrow,.app .mem,
+.app .nrow.clk,.app .aw-r.clk,.app .acc-h,.app .signed.clk{
+  transition:padding var(--mo-base) var(--mo-enter),
+             color var(--mo-quick) var(--mo-standard)}
+.app .tile.clk:hover,.app .gcard:hover,.app .ag:hover,.app .ch:hover,
+.app .cardrow:hover,.app .mem:hover,.app .nrow.clk:hover,
+.app .aw-r.clk:hover,.app .acc-h:hover,.app .signed.clk:hover{
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .tile.clk::after,.app .gcard::after,.app .ag::after,.app .ch::after,
+.app .cardrow::after,.app .mem::after,.app .nrow.clk::after,
+.app .aw-r.clk::after,.app .acc-h::after,.app .signed.clk::after{
+  transition:background-color var(--mo-quick) var(--mo-standard),
+             top var(--mo-base) var(--mo-enter),
+             bottom var(--mo-base) var(--mo-enter)}
+.app .tile.clk:hover::after,.app .gcard:hover::after,.app .ag:hover::after,
+.app .ch:hover::after,.app .cardrow:hover::after,.app .mem:hover::after,
+.app .nrow.clk:hover::after,.app .aw-r.clk:hover::after,
+.app .acc-h:hover::after,.app .signed.clk:hover::after{top:-5px;bottom:-5px}
+/* the arrow keeps its own nudge, but it is now travelling inside a plate that
+   has somewhere for it to go */
+.app .tile.clk:hover .tile-arrow,.app .gcard:hover .tile-arrow{
+  transform:translateX(2px)}
+@media (prefers-reduced-motion:reduce){
+  .app .tile.clk:hover,.app .gcard:hover,.app .ag:hover,.app .ch:hover,
+  .app .cardrow:hover,.app .mem:hover,.app .nrow.clk:hover,
+  .app .aw-r.clk:hover,.app .acc-h:hover{padding-left:0;padding-right:0}
+}
+
+/* ==========================================================================
+   TABS AS CELLS
+   The underline tab is a Material default: a strip of labels with a bar
+   under the live one. On a page built from ruled cells it is the odd one
+   out — the only place a state is drawn with a bar rather than with the
+   grid itself.
+
+   Each tab becomes a cell instead. The inactive cells sit on the panel tone,
+   the live one is the canvas and overlaps the strip's bottom rule by a pixel
+   so it joins the content below it. Nothing is underlined; the tab you are
+   on is the one the page is open at.
+   ========================================================================== */
+.app .tabs{
+  position:relative;display:flex;padding:0;overflow-x:auto;
+  background-color:transparent;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.app .tabs button{
+  flex:none;min-height:48px;padding:0 var(--s06);
+  background-color:var(--surface-2);
+  border:0;border-right:1px solid var(--rule);border-radius:0;
+  color:var(--text-secondary);font-weight:400}
+.app .tabs button.on{
+  position:relative;z-index:1;
+  margin-bottom:-1px;padding-bottom:1px;
+  background-color:var(--background);
+  color:var(--text-primary);font-weight:600}
+
+/* ==========================================================================
+   THE CHAPTER LIST
+   Three things it was getting wrong.
+
+   The list sat on the panel tone, which put a filled block behind thirteen
+   rows that already divide themselves with hairlines — two devices doing one
+   job. The rows keep the rules and lose the ground.
+
+   The state mark was drawing in the accent, which in this product means
+   "yours", not "done". Done is green, in flight is amber, and the accent is
+   left to mean what it means everywhere else.
+
+   The knockout inside the filled tick showed the canvas through it, which on
+   the panel read as a white chip behind the mark. With the panel gone it
+   reads as what it is.
+   ========================================================================== */
+.app .sec.flat.bleed,.app .sec:has(> .tile-stack.chapters){
+  background-color:transparent}
+.app .sec.flat.bleed .ch{border-bottom-color:var(--rule)}
+.app .ch-ic,.app .ch-ic span{background-color:transparent}
+.app .ch.done .ch-ic svg{fill:var(--support-success)}
+.app .ch.open .ch-ic svg{fill:var(--in-progress)}
+
+/* the cohort note is one sentence and it belongs on one line — the 68ch
+   measure is for paragraphs, and this is a caption on the bar above it */
+.app .note .nb{max-width:none}
+
+/* the open chapter is marked by its state icon, not by a bar down its side —
+   no row in the product carries a left rule any more */
+.app .ch.open::before{display:none}

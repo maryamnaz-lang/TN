@@ -1,0 +1,157 @@
+/* ==========================================================================
+   33. THE PAGE SUMMARY
+   Tal's block at the head of every page, in the shape Maryam's frame draws
+   it: the mark, Tal's name in the accent, and one prominent sentence in the
+   page's own ink saying what is going on here. `placePageSummary` in ai6.js
+   builds it — the note at the head of that file is where the content
+   decision and the three removals are written down.
+
+   WHAT THIS LAYER ACTUALLY CHANGES is three things, and it is worth being
+   precise because §25 already states this card's layout once and for all:
+
+     the mark    an orange chip carrying a star  ->  Tal's own circle, and
+                 the name in accent ink beside it, on no ground at all
+     the shape   mark | text in two columns      ->  mark over text, stacked,
+                 both on the page's spine
+     the ink     a grey secondary paragraph      ->  the page's primary ink
+
+   Last in the cascade for the reason §30-§32 are, with one difference worth
+   naming: this layer is NOT all new classes. It restates §25's named-area
+   grid and §12's `.ai-label`, deliberately, because both of those have to
+   be overridden and §25's live inside a container query — per the trap in
+   the handover, a rule inside `@container app (min-width:900px)` beats an
+   unconditional rule of equal weight whatever the layer order, so the
+   desktop shape is restated inside the same query at the foot.
+
+   EVERY RULE IS GATED ON `.talsum`, the class ai6.js adds. A Tal card
+   further down a page — the cohort's "What to bring on Thursday", the week
+   card's "What is expected of me" — is doing its old job and keeps its old
+   drawing.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE SHAPE — STACKED, BOTH HALVES ON THE SPINE
+   §25 gives the band's Tal card `'mark title' / 'mark body'` at 900 and up:
+   the mark holds a column of its own and the text is indented past it. That
+   was right when the mark was a 24px chip labelling a heading. It is wrong
+   for a summary, because the summary is the page's opening sentence and an
+   opening sentence starts where every other line on the page starts — the
+   heading above it, the section titles below it. Two rows, full width, and
+   the text lands on the spine.
+
+   `title` and `act` stay in the template even though ai6.js removes the
+   heading and this card never carries an action: an area named in
+   `grid-template-areas` costs nothing when no child claims it, and leaving
+   them in means a card that somehow keeps a heading degrades into a stack
+   rather than into an auto-placement.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.talsum,
+.app .modhead .ai-aura.talsum.ai-act-top{
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:'mark' 'title' 'body' 'act' 'asks';
+  row-gap:0}
+
+/* --------------------------------------------------------------------------
+   2. THE MARK AND THE NAME
+   The chip is gone. An orange fill with white type is the drawing this
+   product uses for a BUTTON — the plate's action, the primary on every
+   page — and Tal's name is not a control. What identifies the block is the
+   mark itself, which is Tal's face everywhere else in the build (§27), with
+   the name beside it in accent ink.
+
+   AND THE SHEEN GOES WITH IT. §12 runs a 3.6s gradient sweep across the
+   chip so "the one machine-written thing on the page is the one thing that
+   is alive". That was a property of the FILL; with no fill there is nothing
+   for it to sweep, and `background-image` on a transparent element would
+   paint the sheen as a bar behind the letters. Killed explicitly rather
+   than left to `background:none` — `animation` and `background-image` are
+   separate declarations in §12 and both have to be answered.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label{
+  grid-area:mark;justify-self:start;align-self:center;
+  height:auto;min-height:0;padding:0;border:0;gap:var(--s03);
+  background:none;background-image:none;animation:none;
+  color:var(--accent-text)}
+
+/* TAL'S CIRCLE, NOT THE STAR. §12 draws the ::before as a star-shaped MASK
+   over a flat fill, which is how it takes the chip's white ink. Here the
+   mark is the artwork itself — `--tal-mark` is the embedded PNG §27 defines
+   — so the mask has to be cleared as well as the fill, or the file is drawn
+   through a star and comes out as a star.
+
+   16px because the name it sits beside is 12.5/17: the mark reads as the
+   same weight as a capital letter on that line rather than as a bullet
+   before it. `background-size:contain` on a file whose orange is only ~50%
+   of its canvas (see §27) puts about 8px of actual orange on the line. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  width:16px;height:16px;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none}
+
+/* --------------------------------------------------------------------------
+   3. THE SENTENCE
+   The one change is the ink. §11 is authoritative on the type scale and
+   this stays inside it: `body` — 13.5/22/400 — is the role for prose and a
+   summary is prose. What made the old card's sentence recede was
+   `--text-secondary` (§03), set back when the sentence was the SUPPORTING
+   line under a bold heading. It is now the only line, so it takes the ink
+   the page's own paragraphs take, and against the grey page description
+   directly above it that alone is the whole difference between background
+   and foreground.
+
+   FULL WIDTH, AND IT IS THE ONE PLACE THIS BLOCK LEAVES §05'S MEASURE.
+   Every other run of prose in the build is capped at `--measure` so the eye
+   does not lose the start of the next line. A summary is two sentences read
+   once, at the top of a page, before anything else is on screen — the
+   failure a measure prevents needs a third line to happen, and uncapped
+   these still land on two at every width the frame offers. Capped, the
+   sentence read as a paragraph squeezed into the left half of a band whose
+   own wash runs the whole column. `p` is named as well as the wrapper
+   because §05 caps `.ai-body` and `.ai-body p` separately.
+
+   TRUE BLACK, NOT THE PAGE'S INK. `--text-primary` is #111 — correct for
+   the twenty other places a paragraph appears, and against this band's warm
+   wash still one step back from the front. #000 is stated flat because this
+   line is meant to be the first thing read on the page.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.talsum > .ai-body{
+  grid-area:body;margin:var(--s03) 0 0;
+  max-width:none;
+  color:#000}
+.app .modhead .ai-aura.talsum > .ai-body p{color:inherit;max-width:none}
+
+/* --------------------------------------------------------------------------
+   4. THE BLOCK'S OWN AIR
+   §25 closes the band under the Tal card with 28px and opens the card with
+   28px, sized for a card that was three lines tall with a row of chips at
+   its foot. Two lines and no chips does not need the same room, and the
+   band was reading as a mostly empty region above the page. The head keeps
+   its top (that distance is the page header's, not this card's) and gives
+   back at the bottom.
+   -------------------------------------------------------------------------- */
+.app .modhead > .sec:has(> .ai-aura.talsum){padding-top:var(--s05);padding-bottom:0}
+.app .modhead > .sec:has(> .ai-aura.talsum):last-child{padding-bottom:var(--s06)}
+
+/* A BAND WITH NOTHING IN IT BUT TAL. Report, agent, booking and messages
+   have no page header, so ai6.js gives them a band of one member. With no
+   `.ph` above it the card is paying only its own top, and 16px of wash
+   above a sentence reads as a strip rather than as the head of a page. */
+.app .modhead:not(:has(> .ph)) > .sec:has(> .ai-aura.talsum){padding-top:var(--s06)}
+
+/* --------------------------------------------------------------------------
+   5. DESKTOP — THE SAME SHAPE, RESTATED WHERE IT CAN WIN
+   Nothing here is a different decision from §1-§3; every line is one of
+   those rules written again inside the container query, because §25 states
+   the two-column template inside one and an unconditional rule cannot
+   outrank it however late the layer. See the trap in the handover.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .modhead .ai-aura.talsum,
+  .app .modhead .ai-aura.talsum.ai-act-top{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:'mark' 'title' 'body' 'act' 'asks'}
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label{align-self:center}
+  .app .modhead .ai-aura.talsum > .ai-body{margin:var(--s03) 0 0}
+}

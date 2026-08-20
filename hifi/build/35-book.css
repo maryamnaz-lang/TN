@@ -1,0 +1,185 @@
+/* ==========================================================================
+   35. BOOKING INSIDE THE CONVERSATION
+
+   ai7.js draws the booking flow in Tal's thread out of components that were
+   written for pages: the agent card off the agents page, the profile header,
+   the day-and-time picker, the saved card off Payments, the confirmation note
+   off the booking screen. It can do that because `.ask-page` carries `.page`
+   — every `.app .page ...` rule in the sheet already reaches inside a Tal
+   bubble, which is why the card in the chat is the same object as the card on
+   the page and not a chat-sized redraw of it.
+
+   THIS LAYER PAYS FOR EXACTLY WHAT THE BUBBLE CHANGES, and nothing else.
+   There are only two things:
+
+     THE GUTTER. Those components indent themselves — `.agh` pays
+     `--gutter`, `.slots` and `.kv-bands > .kv` pay `--pad-x` — because on a
+     page they bleed to the column edge and have to find their own left and
+     right. In a bubble the bubble's 17px IS that edge, so the second indent
+     is a stripe of empty down both sides. Every rule in §1 is one of those
+     paddings coming off.
+
+     THE WIDTH. A Tal bubble is capped at `min(55%, 620px)` (§27.8) because a
+     paragraph 1400px wide is a log file. A CARD is not a paragraph: 55% of a
+     390px phone is 190px, and a 72px portrait with a name, a rating and a fee
+     beside it does not go in 190px. §2 gives a bubble with a widget in it the
+     whole measure and leaves every other bubble alone.
+
+   LAST, because everything above is a page rule and this is the one place
+   those pages do not go. Only `.bkw` and `.bk-*` are new; the rest of this
+   file is subtraction.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE PAGE GUTTERS COME OFF
+
+   Scoped to `.bkw` throughout, so the page versions of all five components
+   are untouched — this is the same component with its outer indent removed,
+   not a variant.
+   ------------------------------------------------------------------------ */
+/* the widget is the second half of Tal's turn, so it is spaced off the
+   sentence the way `.tw` — the widgets Tal already had — is spaced off its */
+.app .bkw{display:block;margin-top:var(--s05)}
+.app .bkw .bk{display:flex;flex-direction:column;gap:var(--s05)}
+
+/* the card list. `.agh` pays `--gutter` left and right and closes on a rule;
+   in a bubble it keeps the rule between cards — that is what makes three of
+   them read as one list — and loses the indent. */
+.app .bkw .bk-list{display:flex;flex-direction:column}
+.app .bkw .agh{padding-left:0;padding-right:0}
+.app .bkw .agh:first-child{padding-top:0}
+.app .bkw .agh:last-child{border-bottom:0;padding-bottom:0}
+/* THE CARD IS A CONTROL HERE. On the agents page `.agh-book` is explicitly
+   `cursor:default` (§24.3) — the card is a container and the two buttons in
+   its foot are the controls. In the thread the card itself opens the profile,
+   so it says so. */
+.app .bkw .agh.bk-ag{cursor:pointer}
+
+/* the picker and the fact rows */
+.app .bkw .slots{padding-left:0;padding-right:0}
+.app .bkw .kv-bands > .kv{padding-left:0;padding-right:0}
+.app .bkw .agid-bio{margin:0}
+.app .bkw .tile{margin:0}
+
+/* ------------------------------------------------------------------ 2 ---
+   A BUBBLE WITH A WIDGET IN IT TAKES THE WHOLE MEASURE
+
+   `:has()` rather than a class on the bubble: `askBubble` (ai4) and
+   `bubble()` (views.js) are deliberately one component printed on two
+   surfaces, and adding a parameter to both so a widget could flag itself is
+   the kind of edit that ends with the two drifting apart. The bubble does not
+   need to be told — it can be asked what is inside it.
+
+   Both surfaces, because a thread that changes shape when it changes surface
+   is two threads, which is the argument §27.8 makes for every other rule
+   about these bubbles.
+   ------------------------------------------------------------------------ */
+.app .ask-thread .tal-msg > .bb:has(.bkw),
+.app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%;width:100%}
+
+/* ------------------------------------------------------------------ 3 ---
+   WHAT IS ACTUALLY NEW
+
+   Six small things, all of them the join between one borrowed component and
+   the next: a heading over a picker, the line that reads back what you have
+   chosen, the way out of a profile, and the row the step's action sits on.
+   ------------------------------------------------------------------------ */
+/* a heading inside a bubble is a LABEL, not a page heading — the same
+   treatment `.tw-h` gives the widgets Tal already had */
+.app .bkw .bk-h{
+  display:flex;align-items:baseline;gap:var(--s04);
+  margin-bottom:calc(var(--s05) * -1 + var(--s03));
+  font-size:11.5px;line-height:16px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper)}
+.app .bkw .bk-h-x{
+  margin-left:auto;font-size:11px;font-weight:400;letter-spacing:.15px;
+  text-transform:none;color:var(--text-secondary)}
+
+/* THE CHOSEN SLOT, READ BACK IN FULL. The strip says "Thu 20" and the grid
+   says "6:30 PM"; neither of them says Thursday, August 20 at 6:30 PM ET,
+   which is the sentence you are about to pay for. It is the sticky bar off
+   the agent page (`.sb-when` / `.sb-price`) — same two facts, same order,
+   inside a bubble instead of welded to the bottom of a screen. */
+.app .bkw .bk-when{
+  display:flex;align-items:baseline;gap:var(--s04);flex-wrap:wrap;
+  padding:var(--s04) 0;border-top:1px solid var(--rule)}
+.app .bkw .bk-when-t{
+  font-size:13.5px;line-height:19px;font-weight:600;letter-spacing:.05px;
+  color:var(--text-primary)}
+.app .bkw .bk-when-p{
+  margin-left:auto;font-size:17px;line-height:23px;font-weight:600;
+  letter-spacing:-.2px;font-variant-numeric:tabular-nums;
+  color:var(--text-primary)}
+
+/* the way back out of a profile, above the profile rather than under it —
+   it is navigation, and navigation goes over the thing it navigates */
+.app .bkw .bk-back{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  align-self:flex-start;min-height:28px;padding:0 var(--s03) 0 0;
+  background:transparent;border:0;
+  font-size:12.5px;line-height:17px;font-weight:600;letter-spacing:.15px;
+  color:var(--text-secondary);cursor:pointer}
+.app .bkw .bk-back svg{width:16px;height:16px;flex:none;fill:currentColor}
+.app .bkw .bk-back:hover{color:var(--text-primary)}
+
+/* the step's actions. `.btn-set`'s shape without its 180px floor, which on a
+   190px bubble would put one button per line and nothing beside it. */
+.app .bkw .bk-a{display:flex;flex-wrap:wrap;gap:var(--s04);align-items:center}
+.app .bkw .bk-a > .btn{flex:0 1 auto;min-width:0}
+
+/* A STEP THAT IS DONE KEEPS ITS PLACE AND LOSES ITS BUTTON. The thread is a
+   record of what you did, so the scheduling and payment widgets stay legible
+   after the booking — with the action replaced by the fact, in the success
+   ink the confirmation note uses. */
+.app .bkw .bk-flag{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  font-size:13px;line-height:18px;font-weight:600;letter-spacing:.15px;
+  color:var(--support-success-ink)}
+.app .bkw .bk-flag svg{
+  width:18px;height:18px;flex:none;fill:var(--support-success-ink);display:block}
+
+.app .bkw .bk-note{
+  margin:0;font-size:11.5px;line-height:16px;color:var(--text-helper)}
+
+/* ------------------------------------------------------------------ 4 ---
+   THE PAYMENT METHOD IS A CHOICE OF TWO ROWS
+
+   `.cardrow` is Payments' saved-card row, where it is a static record with
+   two text links on the end. Here it is a radio: pressed, and one of them is
+   selected. It gets the affordance the product already uses for a chosen
+   thing — the black border of `.slot.on` reduced to a ring, and the check
+   that `.day.on` does not have room for.
+   ------------------------------------------------------------------------ */
+.app .bkw .bk-cards{display:flex;flex-direction:column;gap:1px}
+.app .bkw .cardrow.bk-pick{
+  width:100%;text-align:left;cursor:pointer;
+  border:1px solid var(--rule);background:var(--layer-01)}
+.app .bkw .cardrow.bk-pick:hover{background:var(--overlay-hover)}
+.app .bkw .cardrow.bk-pick.on{border-color:var(--text-primary)}
+.app .bkw .cardrow.bk-pick .bk-tick{
+  margin-left:auto;flex:none;display:grid;place-items:center;
+  width:20px;height:20px;opacity:0}
+.app .bkw .cardrow.bk-pick.on .bk-tick{opacity:1}
+.app .bkw .cardrow.bk-pick .bk-tick svg{
+  width:20px;height:20px;display:block;fill:var(--text-primary)}
+.app .bkw .cardrow.bk-pick[disabled]{cursor:default;opacity:.75}
+
+.app .bkw .bk-form{display:flex;flex-direction:column;gap:var(--s04)}
+.app .bkw .bk-form .f{margin:0}
+/* expiry and security code share a line at any width — they are two halves
+   of one number and a bubble is never wide enough to make that worth a
+   breakpoint */
+.app .bkw .bk-2up{display:flex;gap:var(--s04)}
+.app .bkw .bk-2up > .f{flex:1 1 0;min-width:0}
+
+/* ------------------------------------------------------------------ 5 ---
+   AT DESKTOP THE BUBBLE IS ALREADY WIDE
+
+   §21.5 keeps the ask in the column it was opened in, so at 900px and up the
+   thread has real width and a card list would run to 700px of one-line rows.
+   The widget takes the measure a form takes on a page instead, which is also
+   what stops the day strip from spreading its five days across half a screen.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .ask-thread .tal-msg > .bb:has(.bkw){max-width:min(100%, 560px)}
+}

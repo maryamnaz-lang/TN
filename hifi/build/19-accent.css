@@ -1,0 +1,122 @@
+/* ==========================================================================
+   19. THE SECONDARY COLOUR IS A GRADIENT
+   Not an orange — the gradient. The one on the Create Account button, at the
+   angle the Figma file states for it, running across every fill in the
+   product that used to be purple: Tal's chip, the send control, progress
+   bars and rungs, a selected day, an open chapter's number, an earned
+   badge, a counter, the rail marker on the page you are on.
+
+   The list below is GENERATED from the stylesheet, not hand-written. Every
+   selector in it is one that fills with `var(--accent)` or `var(--accent-hover)`
+   somewhere in layers 1-17; the build re-derives it, so a fill added later
+   cannot quietly stay flat. Marks that are drawn rather than filled — a
+   masked glyph, an SVG path, a border, a caret — keep the solid, because a
+   gradient inside an 11px star is not a gradient, it is a smudge.
+
+   `--on-brand-fill` is the flag the contrast sweep reads. White on this
+   gradient is 2.8:1 at its light end, under AA, and that is the brand's
+   decision rather than an oversight — so it is declared here, inherited by
+   whatever text sits on the fill, and counted and reported by verify.mjs
+   instead of passing silently.
+   ========================================================================== */
+
+.shell-badge,
+.sn-item.on::before,
+.sn-item .badge,
+.tag.acc,
+.badge.on,
+.badge.acc,
+.dot.on,
+.pb-fill,
+.pb > i,
+.tw-bar > i,
+.aw-s > i,
+.prog-seg i.done,
+.prog-seg i.now,
+.chev-you,
+.ladder i.done,
+.ladder i.on,
+.stp .on .stp-c,
+.stp-now .stp-c,
+.ch.done .ch-num,
+.bar > i,
+.aw-r.got .aw-ic,
+.ach-ic,
+.nrow.un::after,
+.tw-rungs i.on,
+.u-acc-fill,
+.stp-rail i.done,
+.stp-rail i.on,
+.aw.got .aw-ic,
+.msg.un::before,
+.day.on,
+.day.sel,
+.slot.on,
+.slot.sel,
+.btn.btn-p:active,
+button.btn-p:active,
+.lvl-hero .ladder i.done,
+.lvl-hero .ladder i.on,
+.ch.open::before,
+.ch.open .ch-num,
+.tg input:checked ~ .sw::before,
+.tg input:checked ~ .sw::after,
+.photopick.on::after,
+.app .sec:has(> .tile-stack) .ch.done .ch-num,
+.app .sec.flat.bleed .ch.done .ch-num,
+.app .sec:has(> .aw-list) .aw.got .aw-ic,
+.app .sec:has(> .pointsList) .aw.got .aw-ic,
+.app .sec:has(> .tile-stack) .ch.open .ch-num,
+.app .sec.flat.bleed .ch.open .ch-num,
+.app .sec.tint .tag.acc,
+.app .sec:has(> .tile-stack) .tag.acc,
+.app .tg input:checked ~ .sw::after,
+.app .tal-fab:focus-visible,
+.app .tal-fab:active,
+.app .app .app .app .ai-label,
+.app .sec.nofill .aw.got .aw-ic,
+.app .ladder i.done,
+.app .ladder i.on,
+.app .nrow.un .nrow-ic,
+.app .pill-def,
+.app .m-unread::before,
+.app .vn-play,
+.app .vn-wave i,
+.app .composer-send,
+.app .callband-d,
+.app .plate .btn-p,
+.app .ivt-f.on{
+  background-image:var(--accent-grad);
+  /* NOTHING WEARING THE GRADIENT WEARS A BORDER. A chip, a tag, a button and
+     a counter all inherit a hairline from the component they are — and a
+     hairline drawn around a brand fill reads as a box someone forgot to
+     remove. The border stays in the box model so nothing shifts by a pixel;
+     it just stops being drawn. */
+  border-color:transparent;
+  --on-brand-fill:1}
+
+/* Tal's chip already spends its background-image on the sheen that makes it
+   the one live thing on the page. Both layers fit: the sheen rides on top,
+   the brand gradient is the ground under it. */
+.app .ai-label{
+  background-image:
+    linear-gradient(105deg,var(--sheen-0) 35%,var(--sheen) 50%,var(--sheen-0) 65%),
+    var(--accent-grad);
+  background-size:260% 100%, 100% 100%;
+  background-repeat:no-repeat, no-repeat;
+  animation:tal-sheen-grad 3.6s var(--mo-standard) infinite;
+  border-color:transparent;
+  --on-brand-fill:1}
+/* the sheen slides; the ground does not. With two layers, one
+   `background-position` moves BOTH — which slid the gradient out of the chip
+   and left the flat colour behind it. The keyframes now name a position per
+   layer, and the second one never changes. */
+@keyframes tal-sheen-grad{
+  0%{background-position:150% 0, 0 0}
+  55%,100%{background-position:-150% 0, 0 0}}
+@media (prefers-reduced-motion:reduce){
+  .app .ai-label{animation:none;background-image:var(--accent-grad)}
+}
+
+/* the sign-up button is the same fill, said the same way */
+.auth-card .btn-p{--on-brand-fill:1}

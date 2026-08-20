@@ -1,0 +1,491 @@
+/* ==========================================================================
+   30-NIL.CSS — THE NEXT IN LEADERSHIP RUN-UP
+   TEMPORARY. Delete this file, nil.js, the `nil` STAGES/CFG rows and the
+   `S.stage==='nil'` branch in render() to remove the whole thing.
+
+   WHY IT EXISTS
+   Everyone who sees the candidate portal starts at Create Account, which
+   makes the product look like it begins there. It does not: a candidate has
+   already taken the What's Next quiz on nextinleadership.com, verified a
+   phone number, read a result, and filled in a talent-consultant form before
+   TalentNext has ever heard of them. This layer draws that run-up so the
+   journey can be walked end to end in one file, from the first quiz field to
+   the Create Account screen the product already had.
+
+   IT IS A DIFFERENT BRAND AND IT IS SCOPED LIKE ONE
+   Next In Leadership is navy and lime; TalentNext is black, bone and orange.
+   Nothing here may leak. Every token is `--nil-*`, every selector is under
+   `.nil`, and the product's own tokens are not reached for once — the same
+   discipline `--auth-*` follows in 17-auth.css, and for the same reason:
+   this is the FRONT DOOR, not the product.
+
+   EVERY SELECTOR CARRIES `.nil` AND IT IS NOT DECORATION.
+   11-type.css §1 neutralises the HTML defaults with one rule listing
+   `.app h1 … .app p, .app span, .app div, .app button, .app label` at
+   `font-size:inherit;line-height:inherit;font-weight:inherit;
+   letter-spacing:inherit`. That is a class plus a type — 0,1,1 — and it
+   therefore beats ANY single-class rule on a typed element no matter how
+   late the layer sits. Written as `.nil-h1{font-size:40px}` this file looked
+   correct in source and rendered every heading at the body size: the rule
+   matched, was never overridden by anything with `!important`, and simply
+   lost. `.nil .nil-h1` is 0,2,0, which clears it. Same shape of problem as
+   20-group.css's thirteen-class desktop rule (see CLAUDE.md): a broad rule
+   that cannot be outweighed from a single class, so you meet it at its own
+   weight rather than reaching for `!important`.
+
+   KNOWN, INTENDED EXCEPTION TO THE TYPE SCALE.
+   11-type.css is the single source of truth for the product's nine type
+   roles and verify.mjs fails the build on any size outside them. The run-up
+   is another company's page and none of its sizes are in that set. It is
+   stated here as a decision rather than left to be discovered as a
+   regression; exclude `.nil` from that sweep, or expect it in the report.
+
+   THE VALUES ARE SAMPLED BY EYE FROM THE SUPPLIED SCREENSHOTS.
+   This sandbox cannot reach nextinleadership.com, so navy, lime and the
+   field grey are matched against the PNGs rather than read from a brand
+   sheet. They are close, not authoritative. Swap them for the real hex when
+   the brand file lands — one line each, all of them in this block.
+   ========================================================================== */
+.nil{
+  --nil-navy:#0b2245;
+  --nil-navy-2:#153260;
+  --nil-lime:#c8fa4b;
+  --nil-lime-2:#bdf033;
+  --nil-ink:#333333;
+  --nil-white:#ffffff;
+
+  /* the form fields on the quiz card are a fill with no border — the grey IS
+     the affordance, so it has to sit far enough off white to read as one */
+  --nil-field:#ebedee;
+  --nil-field-ink:#1b2c3f;
+  --nil-ph:#9aa4ac;
+
+  --nil-card-line:#e4e7ea;
+  --nil-hair:#c9ced3;
+
+  /* the asterisk on a required label, and the outline on the consultant
+     form's checkboxes. Both are the embedded form's own colours, which are
+     not NIL's — the form is a third-party embed on their page and it looks
+     like one. Kept as they are rather than harmonised, because the point of
+     these screens is what the candidate actually saw. */
+  --nil-req:#e0264c;
+  --nil-cbx:#33a8c4;
+  --nil-note-line:#2f80ed;
+
+  /* CONDENSED DISPLAY TYPE, WITHOUT A CONDENSED FILE
+     NIL sets every heading in a heavy condensed grotesque. There is no
+     condensed face in this build — the only embedded family is Inter, whose
+     variable axis is weight, not width, so `font-stretch` has nothing to
+     act on. The stack asks the machine for a narrow face first (Arial
+     Narrow ships on macOS and Windows, the Liberation/Nimbus cuts on Linux)
+     and falls back to Inter at 800, which reads as a display heading even
+     though it is not the right one. Embed the real face here when it is
+     licensed for the prototype. */
+  --nil-display:'Arial Narrow','Liberation Sans Narrow','Nimbus Sans Narrow',
+    'Inter',system-ui,sans-serif;
+
+  flex:1;min-height:0;display:flex;flex-direction:column;
+  background:var(--nil-white);color:var(--nil-ink);
+  font-family:'Inter',system-ui,sans-serif;
+}
+
+/* every display heading in here is the same treatment, so it is one class */
+.nil .dsp{
+  font-family:var(--nil-display);
+  font-weight:800;text-transform:uppercase;
+  letter-spacing:-.005em;line-height:1.02;margin:0;
+  font-synthesis-weight:none;
+}
+
+/* ==========================================================================
+   1. THE SITE BAR
+   Navy, full bleed, one row: mark, links, quiz CTA. The links are not
+   destinations in this prototype — the run-up is a single line — so they are
+   spans, not buttons. Nothing here pretends to be clickable.
+   ========================================================================== */
+.nil .nil-bar{
+  flex:none;display:flex;align-items:center;gap:var(--s05);
+  padding:10px var(--s06);background:var(--nil-navy);
+}
+.nil .nil-logo{height:38px;width:auto;flex:none}
+.nil .nil-nav{
+  margin:0 auto;display:flex;align-items:center;gap:var(--s06);
+  font-family:var(--nil-display);font-weight:700;text-transform:uppercase;
+  font-size:13px;line-height:1.2;letter-spacing:.04em;color:#fff;
+}
+.nil .nil-cta{
+  flex:none;display:inline-flex;align-items:center;gap:var(--s03);
+  padding:9px var(--s05);
+  border:2px solid var(--nil-lime);color:var(--nil-lime);
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:12.5px;line-height:1.2;letter-spacing:.05em;border-radius:3px;
+}
+.nil .nil-cta svg{width:15px;height:15px;fill:var(--nil-lime)}
+
+/* the bar collapses to mark + CTA long before the links would wrap onto a
+   second row: a two-row navy bar is a different design, not this one */
+@container app (max-width:899px){
+  .nil .nil-bar{padding:10px var(--s05);gap:var(--s04)}
+  .nil .nil-nav{display:none}
+  .nil .nil-logo{height:32px}
+}
+
+/* ==========================================================================
+   2. THE SCROLLER
+   `.app` is a fixed-height flex column with overflow hidden, so the run-up
+   scrolls inside its own box rather than moving the frame.
+   ========================================================================== */
+.nil .nil-scroll{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch}
+.nil .nil-wrap{max-width:1064px;margin:0 auto;padding:var(--s09) var(--s06) var(--s10)}
+.nil .nil-wrap.wide{max-width:1196px}
+.nil .nil-wrap.plain{max-width:1240px;padding-top:var(--s10)}
+@container app (max-width:899px){
+  .nil .nil-wrap,.nil .nil-wrap.wide,.nil .nil-wrap.plain{
+    padding:var(--s06) var(--s05) var(--s08)}
+}
+
+/* ==========================================================================
+   3. THE QUIZ CARD — screens 1 and 2
+   ========================================================================== */
+.nil .nil-card{
+  background:#fff;border:1px solid var(--nil-card-line);border-radius:10px;
+  padding:var(--s07) var(--s07) var(--s08);
+}
+@container app (max-width:899px){
+  .nil .nil-card{padding:var(--s06) var(--s05) var(--s07);border-radius:8px}
+}
+.nil .nil-eyebrow{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:20px;line-height:1.1;letter-spacing:.01em;
+  color:var(--nil-navy);margin:0;
+}
+.nil .nil-pill{
+  display:inline-block;margin:var(--s05) 0 0;
+  padding:6px var(--s04);background:var(--nil-navy);color:#fff;border-radius:4px;
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:12.5px;line-height:1.2;letter-spacing:.06em;
+}
+.nil .nil-h1{font-size:42px;color:var(--nil-navy);margin:var(--s05) 0 0}
+@container app (max-width:899px){ .nil .nil-h1{font-size:27px} }
+
+.nil .nil-sub{margin:var(--s05) 0 0;font-size:14.5px;line-height:23px;
+  font-weight:400;color:#5d6a76;max-width:60ch}
+.nil .nil-sub b{color:var(--nil-navy);font-weight:600}
+.nil .nil-lnk{color:var(--nil-note-line);text-decoration:underline;cursor:pointer}
+
+/* --- fields ---------------------------------------------------------------
+   TWO COLUMNS, AND THE EMAIL SPANS BOTH. That is the screenshot's layout and
+   it is also the right one: an address is longer than a first name and a
+   half-width field for it invites a truncated-looking value. */
+.nil .nil-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s05) var(--s06);
+  margin-top:var(--s07)}
+.nil .nil-grid .span2{grid-column:1/-1}
+@container app (max-width:899px){ .nil .nil-grid{grid-template-columns:1fr} }
+
+.nil .nil-f{display:flex;flex-direction:column;gap:8px;min-width:0}
+.nil .nil-f label{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:12.5px;line-height:1.2;letter-spacing:.05em;color:var(--nil-navy);
+}
+/* THE ASTERISK IS THE WHOLE POINT OF SCREEN 1.
+   Maryam's note: every field on this screen is mandatory and the screenshot
+   said so nowhere. `aria-hidden` on the mark because the input itself carries
+   `required` and `aria-required` — a screen reader announcing "star" after
+   every label is noise on top of information it already has. */
+.nil .nil-f .req{color:var(--nil-req);margin-left:2px;font-weight:800}
+.nil .nil-f input{
+  height:52px;padding:0 var(--s05);background:var(--nil-field);
+  border:1px solid transparent;border-radius:6px;
+  font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:52px;
+  font-weight:400;letter-spacing:normal;color:var(--nil-field-ink);width:100%;
+}
+.nil .nil-f input::placeholder{color:var(--nil-ph)}
+.nil .nil-f input:focus-visible{outline:none;border-color:var(--nil-navy);
+  box-shadow:0 0 0 3px rgba(11,34,69,.14)}
+
+/* --- the one-time code --------------------------------------------------- */
+.nil .nil-otp{display:flex;gap:var(--s04);margin-top:var(--s06);flex-wrap:wrap}
+.nil .nil-otp input{
+  width:62px;height:70px;text-align:center;
+  background:var(--nil-field);border:1px solid transparent;border-radius:6px;
+  font-family:var(--nil-display);font-weight:800;font-size:30px;line-height:70px;
+  letter-spacing:normal;color:var(--nil-navy);
+}
+.nil .nil-otp input:focus-visible{outline:none;border-color:var(--nil-navy);
+  box-shadow:0 0 0 3px rgba(11,34,69,.14)}
+@container app (max-width:899px){
+  .nil .nil-otp{gap:var(--s03)}
+  .nil .nil-otp input{width:44px;height:56px;font-size:24px;line-height:56px}
+}
+.nil .nil-resend{margin:var(--s05) 0 0;font-size:13.5px;line-height:20px;
+  font-weight:400;color:#5d6a76}
+.nil .nil-resend b{color:var(--nil-navy);font-weight:600}
+
+/* --- the card's foot ---------------------------------------------------- */
+.nil .nil-acts{display:flex;gap:var(--s04);margin-top:var(--s07);flex-wrap:wrap}
+.nil .nil-btn{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  height:48px;padding:0 var(--s06);border-radius:6px;
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:14.5px;line-height:1.2;letter-spacing:.05em;cursor:pointer;
+  background:var(--nil-navy);color:#fff;border:1px solid var(--nil-navy);
+  transition:background var(--dur-short) var(--ease-standard);
+}
+.nil .nil-btn svg{width:17px;height:17px;fill:currentColor;flex:none}
+.nil .nil-btn:hover{background:var(--nil-navy-2);border-color:var(--nil-navy-2)}
+.nil .nil-btn.ghost{background:#fff;color:var(--nil-navy);border-color:var(--nil-hair)}
+.nil .nil-btn.ghost:hover{background:#f4f6f7}
+/* THE FIRST SCREEN HAS NOWHERE TO GO BACK TO.
+   The screenshot draws a Back button and so does this, because removing it
+   would be redrawing their page. It is disabled rather than wired to a
+   guess: the run-up starts here, and a Back that reloads the same screen
+   reads as a broken control. Same argument as `trimAuthBack()` in ai5.js,
+   opposite conclusion, because there the arrow was not in the design.
+
+   `pointer-events:none` rather than a second rule cancelling the hover.
+   `:hover` still MATCHES a disabled button — the attribute suppresses the
+   click, not the pointer — and a cancelling rule would have to survive
+   build.py's hover pass, which keeps a selector only if its compound ENDS
+   with a name in HOVER_KEEP. `.nil-btn:disabled` does not, so the cancel
+   would be disarmed while `.nil-btn:hover` stayed armed, and the dead
+   control would be the one button on the screen that lit up. Taking the
+   element out of hit-testing settles it in one declaration. */
+.nil .nil-btn:disabled{opacity:.45;cursor:default;pointer-events:none}
+.nil .nil-priv{margin:var(--s05) 0 0;font-size:12.5px;line-height:18px;
+  font-weight:400;color:#8b959d}
+
+/* ==========================================================================
+   4. THE RESULT — screen 3
+   Two columns that are one object: a navy/lime panel on the left, a stack of
+   two ruled boxes on the right, sharing one outer hairline.
+   ========================================================================== */
+.nil .nil-res{display:flex;gap:var(--s05);align-items:flex-start}
+/* the rotated caption sits OUTSIDE the panel, as on their page */
+.nil .nil-res-tab{
+  flex:none;writing-mode:vertical-rl;transform:rotate(180deg);
+  font-family:var(--nil-display);font-weight:700;text-transform:uppercase;
+  font-size:12.5px;line-height:1.2;letter-spacing:.14em;color:var(--nil-navy);
+  padding:var(--s03) 0;
+}
+.nil .nil-res-grid{
+  flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;
+  border:1px solid var(--nil-navy);
+}
+@container app (max-width:899px){
+  .nil .nil-res-tab{display:none}
+  .nil .nil-res-grid{grid-template-columns:1fr}
+}
+
+/* --- the left panel ----------------------------------------------------- */
+.nil .nil-you{background:var(--nil-lime);display:flex;flex-direction:column}
+/* THE NAVY BLOCK IS A SPEECH BUBBLE.
+   Their page draws it as a slab whose bottom edge rises to the right with a
+   tail hanging off the left third — the NIL mark's own shape, at panel
+   scale. `clip-path` rather than a rotated pseudo-element because the shape
+   is one outline, and one polygon cannot come apart at a seam the way two
+   stacked triangles do at fractional widths. */
+.nil .nil-you-head{
+  background:var(--nil-navy);color:var(--nil-lime);
+  padding:var(--s07) var(--s07) var(--s10);
+  clip-path:polygon(0 0,100% 0,100% 72%,26% 84%,20% 100%,15% 85%,0 88%);
+}
+.nil .nil-you-hey{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:25px;letter-spacing:.01em;margin:0;line-height:1.1;
+}
+.nil .nil-you-type{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:72px;line-height:.92;letter-spacing:-.01em;margin:2px 0 0;
+}
+@container app (max-width:899px){
+  .nil .nil-you-head{padding:var(--s06) var(--s05) var(--s09)}
+  .nil .nil-you-hey{font-size:19px}
+  .nil .nil-you-type{font-size:48px}
+}
+.nil .nil-you-body{padding:var(--s07);color:var(--nil-navy);flex:1}
+@container app (max-width:899px){ .nil .nil-you-body{padding:var(--s05)} }
+.nil .nil-you-body h3{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:24px;line-height:1.1;margin:0;color:var(--nil-navy);
+}
+.nil .nil-you-body h3+p{margin:var(--s04) 0 0;font-size:15px;line-height:24px;
+  font-weight:400;max-width:42ch}
+.nil .nil-you-body .grp{margin-top:var(--s07)}
+.nil .nil-ticks{list-style:none;margin:var(--s05) 0 0;padding:0;
+  display:flex;flex-direction:column;gap:var(--s04)}
+.nil .nil-ticks li{display:flex;gap:var(--s04);align-items:flex-start;
+  font-size:15px;line-height:23px;font-weight:400}
+.nil .nil-ticks svg{width:19px;height:19px;flex:none;margin-top:2px;fill:var(--nil-navy)}
+
+/* --- the right stack ---------------------------------------------------- */
+.nil .nil-side{display:flex;flex-direction:column;
+  border-left:1px solid var(--nil-navy)}
+@container app (max-width:899px){
+  .nil .nil-side{border-left:0;border-top:1px solid var(--nil-navy)}
+}
+.nil .nil-side-box{padding:var(--s07);flex:1}
+.nil .nil-side-box+.nil-side-box{border-top:1px solid var(--nil-navy)}
+@container app (max-width:899px){ .nil .nil-side-box{padding:var(--s05)} }
+.nil .nil-side-box h2{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:46px;line-height:1;letter-spacing:-.01em;margin:0;color:var(--nil-navy);
+}
+@container app (max-width:899px){ .nil .nil-side-box h2{font-size:30px} }
+.nil .nil-ideas{list-style:none;margin:var(--s05) 0 0;padding:0;
+  display:flex;flex-direction:column;gap:var(--s04)}
+.nil .nil-ideas li{display:flex;gap:var(--s04);align-items:flex-start;
+  font-size:14.5px;line-height:21px;font-weight:400;color:var(--nil-ink)}
+.nil .nil-ideas svg{width:19px;height:19px;flex:none;margin-top:1px;fill:var(--nil-navy)}
+/* THE GAP UNDER THE HEADING IS ON THE PARAGRAPH, NOT ON `h2 + *`.
+   It was written as `.nil .nil-side-box h2+*{margin-top:var(--s05)}` — two
+   classes and a type, 0,2,1 — and lost to `.nil .nil-side-box p{margin:0}`,
+   which is ALSO 0,2,1 and comes later in the file. A tie is decided by
+   source order, and the paragraph's own reset is the rule that has to hold
+   for every other paragraph in the box. So the spacing is stated where it
+   cannot be a coin toss: on the element that carries it. */
+.nil .nil-side-box p{margin:var(--s05) 0 0;font-size:14.5px;line-height:22px;
+  font-weight:400;color:var(--nil-ink)}
+
+/* --- the three next steps ----------------------------------------------- */
+.nil .nil-steps{display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--nil-navy)}
+.nil .nil-step{
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  gap:var(--s04);padding:var(--s06) var(--s04);text-align:center;
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:14px;line-height:19px;font-weight:400;letter-spacing:normal;
+  color:var(--nil-ink);background:#fff;cursor:default;
+}
+.nil .nil-step+.nil-step{border-left:1px solid var(--nil-navy)}
+.nil .nil-step svg{width:26px;height:26px;fill:var(--nil-navy);flex:none}
+/* only one of the three is wired, so only one is drawn as a control. The
+   other two are in the screenshot and stay in it — an affordance on a tile
+   that does nothing is worse than a tile that never offered. */
+.nil .nil-step.live{cursor:pointer}
+.nil .nil-step.live:hover{background:var(--nil-lime)}
+@container app (max-width:600px){
+  .nil .nil-steps{grid-template-columns:1fr}
+  .nil .nil-step+.nil-step{border-left:0;border-top:1px solid var(--nil-navy)}
+}
+
+/* --- share row + the word band ------------------------------------------ */
+.nil .nil-share{display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap;
+  margin:var(--s06) 0 0;padding-left:var(--s07)}
+@container app (max-width:899px){ .nil .nil-share{padding-left:0} }
+.nil .nil-share em{font-size:14.5px;line-height:22px;font-weight:400;
+  color:var(--nil-ink)}
+.nil .nil-share-pill{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  background:var(--nil-lime);border-radius:999px;padding:7px var(--s05);
+  font-size:13px;line-height:1.4;font-weight:400;color:var(--nil-navy);
+}
+.nil .nil-share-pill svg{width:16px;height:16px;fill:var(--nil-navy);flex:none}
+/* THE BAND IS A RULE MADE OF A WORD.
+   It bleeds the full width of the frame and is clipped, not wrapped: the
+   partial word at each end is what makes it read as a strip running past the
+   page rather than a sentence that happens to repeat. Which is why it is
+   rendered OUTSIDE `.nil-wrap` — inside the 1196px column it stopped at the
+   panel's own edges and read as a caption. */
+.nil .nil-band{
+  margin-top:var(--s08);background:var(--nil-lime);overflow:hidden;
+  display:flex;gap:var(--s07);padding:var(--s04) var(--s06);
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:36px;line-height:1.1;letter-spacing:.01em;
+  color:var(--nil-navy);white-space:nowrap;
+}
+.nil .nil-band span{flex:none}
+
+/* ==========================================================================
+   5. THE CONSULTANT FORM — screens 4, 5 and 6
+   A THIRD-PARTY EMBED, AND IT LOOKS LIKE ONE. Their page drops this form on
+   a bare white field: no card, no display type, system-ish body text, a
+   progress bar the form supplies itself. Drawing it in NIL's own clothes
+   would be tidier and would misrepresent what the candidate met, so the
+   plainness is deliberate and it is the only place in this file that is.
+   ========================================================================== */
+.nil .nil-form h2{
+  font-size:30px;line-height:1.25;font-weight:700;color:#1c3a5e;margin:0;
+  letter-spacing:-.01em;
+}
+@container app (max-width:899px){ .nil .nil-form h2{font-size:22px} }
+.nil .nil-qgrp{margin-top:var(--s07)}
+.nil .nil-q{font-size:15px;line-height:23px;font-weight:400;
+  color:var(--nil-ink);margin:0 0 var(--s03)}
+.nil .nil-q .req{color:var(--nil-req)}
+.nil .nil-opts{display:flex;flex-direction:column;gap:6px}
+
+/* the checkbox: a real input, so these actually toggle. The square is drawn
+   on the label's own span and the input is the thing that holds state. */
+.nil .nil-opt{display:inline-flex;align-items:center;gap:var(--s04);cursor:pointer;
+  font-size:15px;line-height:22px;font-weight:400;color:var(--nil-ink);
+  padding:2px 0;width:fit-content;position:relative}
+.nil .nil-opt input{position:absolute;opacity:0;width:18px;height:18px;margin:0}
+.nil .nil-opt .bx{
+  width:18px;height:18px;flex:none;border:2px solid var(--nil-cbx);
+  border-radius:2px;background:#fff;display:grid;place-items:center;
+}
+.nil .nil-opt .bx svg{width:16px;height:16px;fill:var(--nil-navy);opacity:0}
+.nil .nil-opt input:checked+.bx svg{opacity:1}
+.nil .nil-opt input:focus-visible+.bx{
+  outline:2px solid var(--nil-lime);outline-offset:2px;
+  box-shadow:0 0 0 1px var(--nil-navy)}
+
+.nil .nil-text{margin-top:var(--s03)}
+.nil .nil-text input{
+  width:100%;height:46px;padding:0 var(--s04);
+  background:#f8fafb;border:1px solid #cfe0e8;border-radius:5px;
+  font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:46px;
+  font-weight:400;letter-spacing:normal;color:var(--nil-field-ink);
+}
+.nil .nil-text input::placeholder{color:#8fa3ae}
+.nil .nil-text input:focus-visible{outline:none;border-color:var(--nil-navy)}
+
+/* --- progress ----------------------------------------------------------- */
+.nil .nil-prog{margin-top:var(--s07)}
+.nil .nil-prog .pct{font-size:14px;line-height:20px;font-weight:400;
+  color:var(--nil-ink);display:block;margin-bottom:6px}
+.nil .nil-prog .trk{height:9px;background:#d7d7d7;border-radius:2px;overflow:hidden}
+.nil .nil-prog .trk i{display:block;height:100%;background:var(--nil-navy);
+  border-radius:2px}
+
+/* --- the form's own foot ------------------------------------------------ */
+.nil .nil-frow{display:flex;align-items:center;margin-top:var(--s07);gap:var(--s04)}
+.nil .nil-frow .right{margin-left:auto}
+.nil .nil-fbtn{
+  min-width:88px;height:44px;padding:0 var(--s05);border-radius:4px;
+  background:var(--nil-navy);color:#fff;border:1px solid var(--nil-navy);
+  font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.2;
+  font-weight:600;letter-spacing:normal;cursor:pointer;
+  transition:background var(--dur-short) var(--ease-standard);
+}
+.nil .nil-fbtn:hover{background:var(--nil-navy-2)}
+
+/* --- screen 6 ----------------------------------------------------------- */
+.nil .nil-note{border:1px solid var(--nil-note-line);padding:var(--s08) var(--s07)}
+.nil .nil-note h2{font-size:27px;line-height:1.25;font-weight:700;color:#1c3a5e;
+  margin:0;letter-spacing:-.01em}
+.nil .nil-note p{margin:var(--s05) 0 0;font-size:15px;line-height:23px;
+  font-weight:400;color:var(--nil-ink)}
+.nil .nil-rule{border:0;border-top:1px solid #2f2f2f;margin:var(--s08) 0 0}
+.nil .nil-recv{margin-top:var(--s10);text-align:center}
+.nil .nil-recv h2{font-size:64px;line-height:1;color:#3a3a3a;margin:0}
+@container app (max-width:899px){ .nil .nil-recv h2{font-size:36px} }
+.nil .nil-recv-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s06);
+  margin-top:var(--s09);
+}
+@container app (max-width:600px){ .nil .nil-recv-grid{grid-template-columns:1fr} }
+.nil .nil-recv-grid p{
+  font-family:var(--nil-display);font-weight:800;text-transform:uppercase;
+  font-size:21px;line-height:1.16;letter-spacing:.005em;
+  color:#3a3a3a;margin:0;text-align:center;
+}
+
+/* THE HAND-OFF.
+   The one control on this page that is ours rather than theirs, and the seam
+   the whole run-up exists to reach: past it the candidate is inside
+   TalentNext and the product's own Create Account screen takes over. It is
+   drawn in NIL's navy because the candidate is still on NIL's page when they
+   press it — the brand changes on the next screen, not on this button. */
+.nil .nil-hand{margin-top:var(--s10);display:flex;justify-content:center}
+.nil .nil-foot-band{flex:none;height:34px;background:var(--nil-lime)}

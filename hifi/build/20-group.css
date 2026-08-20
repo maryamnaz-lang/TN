@@ -1,0 +1,109 @@
+/* ==========================================================================
+   20. A RULE IS WHERE A SECTION ENDS, AND SPACE FOLLOWS THE RULE
+   The page header used to close itself with a hairline, which said: the
+   greeting is one thing, and everything under it is another. It is not. The
+   greeting, what Tal says about it, and the one input that answers Tal are
+   a single opening block — you read them as one thought and act on them in
+   one place. A rule through the middle of that is a rule through a
+   sentence.
+
+   So the header's rule goes, and with it the rules between any two blocks
+   that were never separate to begin with. What is left is the rule that
+   still earns its place: the one immediately before a section that
+   introduces itself with a heading, an accordion, a tab strip or the level
+   hero — the point where the page genuinely changes subject.
+
+   And the spacing follows from that, which is the half of this that
+   actually makes it read as one section rather than three that happen to
+   have lost their lines. TWO BLOCKS WITH NO RULE BETWEEN THEM PAY HALF THE
+   GAP: 16 and 16 rather than 24 and 24. Where a rule does fall, the full 24
+   stays on both sides of it, because there the space is doing the same job
+   the rule is.
+
+   The `:not()` chain below is not decoration — it is the same condition
+   layer 14 uses to decide which rules survive, restated so that the spacing
+   and the rules can never disagree with each other. If one changes, both
+   have to.
+   ========================================================================== */
+
+/* the page header no longer closes itself */
+.app .page > .ph::after{display:none}
+
+@container app (min-width:900px){
+
+  /* --- the opening block: header, then whatever answers it -------------- */
+  .app .page > .ph{padding-bottom:var(--s05)}
+  .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
+
+  /* --- and every other pair the rules already joined -------------------- */
+  /* "a section that is not followed by a rule" — the exact inverse of the
+     set layer 14 re-enables. It pays half at the bottom. */
+  /* TWO FULL-BLEED SURFACES DO NOT PAY THE SPLIT. A section carrying the
+     black plate, or the level card, followed by the stepper or any tinted
+     band, is not a pair of blocks with a gap between them — both surfaces
+     own their own ground and run rail to rail, so they read as one column
+     of bands and the half-gap shows as a white strip cutting across it.
+     They join the exclusions rather than being fought in a later layer:
+     this list IS where "which pairs are already joined" is decided, and a
+     rule with thirteen classes in it cannot be outweighed from outside.
+
+     THE COHORT-LEADER WALL IS THE THIRD SUCH SURFACE, and it is the worst
+     case of the three because its section carries no padding at all (§28
+     zeroes it so the band can run the height it draws). The half-gap
+     therefore lands as a 16px white stripe BETWEEN the notifications panel
+     and the black band — two grounds that should meet on a single line. It
+     is excluded on both sides: `+ .sec > .lead-b` on the block above, and
+     `:has(> .lead-b)` on the band's own section below.
+
+     AND THE LOG-OUT SECTION GOES THE OTHER WAY. §14 now draws a rule before
+     it, and this layer's whole argument is that the full 24 stays wherever a
+     rule falls — the space and the line do the same job there. So the pair
+     either side of that rule is excluded from the split too. */
+  /* THE TAB-STRIP PAIR IS EXCLUDED ON BOTH SIDES, like every other wall pair
+     in this list. It has to be excluded HERE and not corrected in §29: this
+     rule carries thirteen classes and §29's restatement carries six, so the
+     restatement never lands — plate-then-stepper works because of the
+     exclusion below, not because of §29. The same 16px was appearing under
+     the cohort page's call plate, between it and the Discussion strip. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)){
+    padding-bottom:var(--s05)}
+  /* and the block under it pays half at the top. Same condition on the
+     PREVIOUS element, which is what the sibling combinator is for. */
+  /* A TAB STRIP UNDER A WALL PAYS NOTHING AT ALL, which is why the pair is
+     excluded here rather than corrected later. `.cs` and `.tabs` carry
+     `--surface-2` edge to edge, so a section holding one is a third full-bleed
+     surface alongside the plate and the stepper — and unlike the stepper it
+     has no heading inside it. §29.3's argument for the stepper keeping its
+     16px ("air above 'Where you are', not a gap between two blocks") does not
+     transfer: here the strip IS the top edge, so 16px above it is a white
+     stripe between two grounds that should meet on one line. The cohort page
+     is where this shows, with the weekly-call plate directly above Discussion
+     / Ranking / Members.
+
+     Excluded NARROWLY — `:has(> .plate):has(+ .sec.sec-cs)` — so
+     plate-then-stepper and plate-then-tint keep the 16px §29.3 asks for. And
+     excluded rather than overridden because, per the trap in the handover,
+     this rule carries eleven classes and cannot be outweighed from a later
+     layer; with it out of the way the pair falls to §10's 24px default,
+     which the rule below zeroes.
+
+     AND THE TAB SECTION IS NAMED, NOT SNIFFED. The obvious selector was
+     `:has(+ .sec:has(> .cs))` — and `:has()` INSIDE `:has()` is invalid CSS.
+     `:not()` is not a forgiving selector list, so the invalid argument took
+     the WHOLE rule with it: the browser dropped rule 2 entirely and every
+     joined pair in the product silently lost its 16px top, on every page. It
+     parsed, it built, it shipped, and the only symptom was that the spacing
+     went quietly wrong everywhere at once.
+
+     So the section carries `.sec-cs`, exactly as `.cap-sec`, `.sec-stp`,
+     `.sec-out` and `.lead-b` are named in this same list. One level of
+     `:has()`, valid, and the marker says what the section IS rather than
+     asking what it happens to contain. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(:has(> .lead-b)){
+    padding-top:var(--s05)}
+  .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
+  /* the capture strip is a zero-padding pass-through: it sits between two
+     blocks without being one, so the pair either side of it still has to
+     behave as a pair. */
+  .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
+}

@@ -1,0 +1,3478 @@
+
+/* ============================================================
+   ICONS — IBM Carbon icon set (16/20/32), traced from @carbon/icons
+   ============================================================ */
+;
+
+/* ============================================================
+   STATE — one object. Every screen is derived from it.
+   ============================================================ */
+;
+;
+
+/* Views the nav does not offer at a given stage can still be reached by deep link,
+   so every stage resolves against a complete base. Nothing renders undefined. */
+;
+const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
+
+/* `portal` IS NOT A STAGE. Every other axis of this state object describes one
+   candidate moving through ninety days; `portal` describes WHICH PERSON is
+   signed in — the candidate, or the cohort leader who runs their calls. The two
+   are separate accounts in the real product and a leader has no stage at all,
+   so the stage picker and `portal` are deliberately independent: switching
+   stage returns you to the candidate (see setStage), and switching portal
+   leaves the stage untouched so you come back to where you were. */
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], hideAch:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+  addCard:false, editProfile:false, editPhoto:false, piOpen:{}, stg:0, notes:false, iv:'level',
+  cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true}]};
+const isLead = () => S.portal === 'leader';
+;
+const lvlName = c => 'Explorer – ' + c;
+const who = f => f.pred ? f.track + ' track' : lvlName(f.level);
+const rungOf  = c => RUNG[c] || 2;
+;
+;
+;
+;   /* chapters that map to this candidate's growth areas */
+
+/* ============================================================
+   NOTIFICATIONS — derived from the stage, newest first
+   ============================================================ */
+;
+/* THE BELL BELONGS TO WHOEVER IS SIGNED IN. A candidate's notifications are
+   keyed by stage because everything that happens to them is a consequence of
+   where they are in the ninety days. A leader has no stage: what reaches them
+   is other people's work arriving — an interview finished, a candidate going
+   quiet — so their list is one list. `LEAD_NOTIF` is declared in lead.js,
+   which is parsed after this file, hence the guard rather than a direct read. */
+const notifList = () => isLead()
+  ? (typeof LEAD_NOTIF !== 'undefined' ? LEAD_NOTIF : [])
+  : (NOTIF[S.stage] || []);
+const unreadCount = () => notifList().filter(n=>n.unread && !S.read.includes(n.t)).length;
+
+function notifPanel(){
+  const list = notifList();
+  const rows = (group) => list.filter(n=>group==='today' ? /ago|Today/.test(n.w) : !/ago|Today/.test(n.w))
+    .map(n=>{
+      const un = n.unread && !S.read.includes(n.t);
+      return `<button class="nrow ${un?'un':''}" data-go="${n.go}" data-read="${n.t}">
+        <span class="nrow-ic">${I[n.ic]}</span>
+        <span class="nrow-b"><span class="nrow-t">${n.t}</span><span class="nrow-d">${n.b}</span></span>
+        <span class="nrow-w">${n.w}</span>
+      </button>`;
+    }).join('');
+  const today = rows('today'), earlier = rows('earlier');
+  return `<div class="notif ${S.notif?'on':''}">
+    <div class="notif-h">
+      <h2>Notifications</h2>
+      ${unreadCount()?`<button class="notif-all" data-readall="1">Mark all read</button>`:''}
+      <button class="x" data-toggle="notif" aria-label="Close">${I.close}</button>
+    </div>
+    <div class="notif-b">
+      ${list.length?`
+        ${today?`<div class="notif-g">Today</div>${today}`:''}
+        ${earlier?`<div class="notif-g">Earlier</div>${earlier}`:''}`
+      :`<div class="empty" style="border:0">${I.time}
+        <h3>Nothing yet</h3><p>${isLead()?'Finished interviews, cohort activity and messages will show up here.':'Course updates, cohort calls and points will show up here.'}</p></div>`}
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+;
+;
+
+function sidenav(f){
+  const active = PARENT[S.view] || S.view;
+  /* The leader's rail is a FIXED set. A candidate's nav grows with their stage —
+     four items when they join, nine once enrolled — because the nav is the
+     record of what they have unlocked. A cohort leader unlocks nothing: they
+     have the same seven modules on their first day as on their last, so the set
+     is named directly rather than read off `f.nav`, which is a candidate fact. */
+  const items = NAVSETS[isLead() ? 'leader' : f.nav].map(([k,l,ic,badge]) =>
+    `<button class="sn-item ${k===active?'on':''}" title="${l}" data-go="${k}"${k===active?' aria-current="page"':''}>${I[ic]}<span>${l}</span>${badge?`<span class="badge">${badge}</span>`:''}</button>`).join('');
+  return `
+  <div class="scrim ${S.nav?'on':''}" data-close="nav"></div>
+  <nav class="sidenav ${S.nav?'on':''}" aria-label="Portal">
+    <div class="sn-main">${items}</div>
+    <div class="sn-foot">
+      <button class="sn-item ${active===(isLead()?'leadProfile':'account')?'on':''}" title="Profile" data-go="${isLead()?'leadProfile':'account'}">${I.user}<span>Profile</span></button>
+      <button class="sn-item" title="Log out" data-go="stage:signup/login">${I.logout}<span>Log out</span></button>
+    </div>
+  </nav>`;
+}
+
+/* ============================================================
+   THE PORTAL SWITCH
+   Two accounts, one prototype. A candidate and the cohort leader who runs
+   their calls see genuinely different products — different rail, different
+   pages, different notifications — and the client needs to walk from one to
+   the other in a demo without a reload.
+
+   IT SITS NEXT TO THE LOGO because that is where a product says which product
+   this is. The right-hand end of the bar is already the row of things about
+   YOU (your name, your bell, your face); putting a portal switch there would
+   read as another personal control rather than as the frame around everything
+   below it. Next to the mark it reads the way it should: TalentNext, and then
+   which side of TalentNext you are looking at.
+
+   IT IS NOT A NAV ITEM. `data-portal` is its own branch in the delegated
+   listener rather than a `data-go`, because `go()` pushes history and swaps a
+   view inside the current portal — and this changes who is signed in. Crossing
+   that line resets the stack rather than adding to it (see swapPortal).
+   ============================================================ */
+const PORTALS = [['candidate','Candidate'],['leader','Cohort Leader']];
+function pswitch(){
+  return `<div class="pswitch" role="tablist" aria-label="Portal">
+    ${PORTALS.map(([k,l])=>`<button class="psw-t ${S.portal===k?'on':''}" role="tab" aria-selected="${S.portal===k}" data-portal="${k}">${l}</button>`).join('')}
+  </div>`;
+}
+
+function shell(){
+  const f = cfg(S.stage);
+  /* The leader's own line is their ROLE, not a level. `who(f)` prints the
+     candidate's track or rung, which a leader does not have — they are not on
+     the ladder they assess against.
+
+     THE LEADER SIGNED IN IS PRIYA NAIR, on purpose. She is already the person
+     this candidate's portal names as their agent and the leader of Cohort 41,
+     so flipping the tab shows the other side of a cohort the demo has just
+     been looking at rather than introducing a stranger. The wireframe used a
+     separate name (Dana Whitfield) because it had no candidate beside it. */
+  const name = isLead() ? 'Cohort Leader &middot; Explorer and Builder' : who(f);
+  /* THE MARK IS THE MENU.
+     Collapsed, the rail's own 72px column had two things in it at the top:
+     a hamburger, and the full wordmark beside it in a header wide enough for
+     neither. Maryam's frame puts ONE control there — the TalentNext icon
+     mark, sitting over the rail it opens — and turns it into the hamburger
+     under the pointer, so the mark says which product this is and the hover
+     says what it does. Open, the same corner is the drawer's own head: the
+     full wordmark on the left, the close on the right, and the pair is
+     exactly `--drawer-w` wide so the rule under it is the rail's rule.
+
+     TWO GLYPHS IN ONE BUTTON, swapped in CSS rather than on a `mouseenter`
+     handler. A JS swap would have to fire on a re-render too, and the mark
+     is the only thing on this header that is not already state-driven.
+     `nav-t` is in `HOVER_KEEP` in build.py for exactly this — everything
+     else in the build has its `:hover` disarmed. §34 draws it.
+
+     THE WORDMARK STAYS A LINK HOME and the toggle stays a toggle, even
+     though open they read as one object. Pressing a logo goes to the
+     dashboard everywhere in this product; making it close the drawer
+     instead, only here, would be a third behaviour for the same mark. */
+  return `
+  <header class="shell">
+    <button class="shell-act nav-t ${S.nav?'on':''}" data-toggle="nav" aria-label="${S.nav?'Collapse':'Expand'} navigation" title="${S.nav?'Collapse':'Expand'} navigation">${S.nav?I.close
+      :`<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
+    <button class="shell-logo" data-go="${isLead()?'leadDash':'dashboard'}" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+    ${pswitch()}
+    <div class="shell-right">
+      <span class="shell-name">${name}</span>
+      <button class="shell-act ${S.notif?'on':''}" data-toggle="notif" aria-label="Notifications">${I.notification}${unreadCount()?`<span class="shell-badge">${unreadCount()}</span>`:''}</button>
+      <button class="shell-act" data-go="${isLead()?'leadProfile':'account'}" aria-label="Account"><span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></button>
+    </div>
+  </header>`;
+}
+
+function authShell(back){
+  return `
+  <header class="shell">
+    ${back?`<button class="shell-act" data-go="${back}" aria-label="Back">${I.arrowLeft}</button>
+    <span class="shell-logo" style="padding-left:var(--s02)"><img src="${LOGO_K}" alt="TalentNext"></span>`
+    :`<span class="shell-logo" style="padding-left:var(--s05)"><img src="${LOGO_K}" alt="TalentNext"></span>`}
+  </header>`;
+}
+
+/* ============================================================
+   SHARED PIECES
+   ============================================================ */
+const talLabel = (s) => `<span class="ai-label${s?' '+s:''}">Tal</span>`;
+
+function stars(n){
+  let out='';
+  for(let i=1;i<=5;i++) out += `<svg class="${i<=Math.round(n)?'f':''}" viewBox="0 0 24 24">${inner('star')}</svg>`;
+  return `<span class="stars">${out}</span>`;
+}
+/* Photos point at a portrait service so the prototype shows real faces when
+   online; if the request fails the initials underneath show through. Swap the
+   `img` values for embedded headshots when they are available. */
+/* Agent headshots, cropped square on the face and embedded, so the cards render
+   with no network request. The initials stay behind each one as a fallback. */
+;
+;
+function avatar(a,size){
+  return `<span class="av-ph" style="width:${size}px;height:${size}px">
+    <i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`;
+}
+const talStar = (q) => `<button class="tal-star" data-tal-ask="${q}" aria-label="Ask Tal"><span class="lbl">Ask Tal</span><span class="sk-mark xs"></span></button>`;
+
+/* horizontal card for the shortlist rail */
+function agentCardH(key){
+  const a=AGENTS[key];
+  return `<div class="agh draw agh-book">
+    <span class="bd"><i></i><i></i><i></i><i></i></span>
+    ${avatar(a,72)}
+    <span class="agh-n">${a.n}<span class="ag-price">${a.price}</span></span>
+    <span class="agh-r">${stars(a.r)}<span class="num">${a.r.toFixed(1)}</span></span>
+    <span class="agh-m">${a.range} · ${a.ivs} interviews</span>
+    <span class="agh-f"><span class="agh-slot">${a.slot}</span>
+      <span class="agh-act">
+        ${talStar('What is '+a.n.split(' ')[0]+' like to be interviewed by?')}
+        <button class="btn btn-p btn-sm noic" data-go="agent:${key}">Book</button>
+      </span></span>
+  </div>`;
+}
+
+/* row for the full list */
+function agentCard(key){
+  const a=AGENTS[key];
+  return `<div class="ag draw" role="button" tabindex="0" data-go="agent:${key}">
+    <span class="bd"><i></i><i></i><i></i><i></i></span>
+    ${talStar('What is '+a.n.split(' ')[0]+' like to be interviewed by?')}
+    ${avatar(a,48)}
+    <span class="ag-b">
+      <span class="ag-n">${a.n}</span>
+      <span class="ag-r">${stars(a.r)}<span class="num">${a.r.toFixed(1)}</span></span>
+      <span class="ag-m">${a.range} · ${a.ivs} interviews</span>
+      <span class="ag-foot"><span style="color:var(--text-secondary)">Next: ${a.slot}</span><span class="ag-price">${a.price}</span></span>
+    </span>
+    <svg class="card-go" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </div>`;
+}
+function mem(name,ini,meta,you,img){
+  return `<div class="mem">
+    <span class="mem-av mem-ph">${avatar({i:ini, img:AV[img||'priya']}, 36)}</span>
+    <span class="mem-b"><span class="mem-n">${name}</span><span class="mem-m">${meta}</span></span>
+    ${you?'<span class="tag brand sm">You</span>':''}
+  </div>`;
+}
+function clip(title,note,stamp,len,kept){
+  return `<div class="clip">
+    <span class="thumb">${I.play}<span class="t">${len}</span></span>
+    <span class="cb"><span class="ct">${title}</span><span class="cq">${note} · from ${stamp}</span></span>
+    <label class="cbx clip-pick" style="padding:0;margin-top:2px"><input type="checkbox" ${kept?'checked':''}><span class="box">${I.check}</span></label>
+  </div>`;
+}
+function chRow(i,f){
+  const n=i+1, name=CH[i][0], mins=CH[i][1];
+  let state='', meta='';
+  if(i < f.done){ state='done'; meta=`${mins} min · ${SCORE[i]}% assessment`; }
+  else if(i === f.open && f.enrolled){ state='open'; meta = S.stage==='day34'&&i===3 ? '12 of 70 min · 4 opens' : `Started · ${mins} min`; }
+  else if(OPEN_DATES[i] && f.week < i){ state='locked'; meta='Opens '+OPEN_DATES[i]; }
+  else { state=''; meta='Not started · '+mins+' min'; }
+  const flag = GROWTH.includes(i) ? 'Your growth area' : '';
+  const trail = state==='done'
+      ? `<span class="ch-act">Restart</span>`
+    : state==='open'
+      ? `<span class="ch-act resume">Resume</span>`
+    : state==='locked'
+      ? `<span class="ch-ic"><span style="fill:var(--gray-50)">${I.locked}</span></span>`
+      : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`;
+  return `<button class="ch ${state}" data-go="chapter:${i}">
+    <span class="ch-num">${String(n).padStart(2,'0')}</span>
+    <span class="ch-b"><span class="ch-n">${name}${state==='done'?`<span class="ch-tick">${I.checkFilled}</span>`:''}</span>
+      <span class="ch-m">${meta}${flag?`<span class="sep">·</span><span class="ai-inline"><span class="sk"></span>${flag}</span>`:''}</span></span>
+    ${trail}
+  </button>`;
+}
+
+/* Tal — the layer over whatever screen you are on. */
+;
+
+/* ============================================================
+   TAL'S REPLIES: a keyword router that answers with widgets, the
+   way the wireframes had Tal reply with cards rather than prose
+   ============================================================ */
+const tw = (title,body,action) => `<span class="tw">
+  ${title?`<span class="tw-h">${title}</span>`:''}${body}
+  ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
+const twBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}${I.arrowRight}</button>`;
+const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${q}</button>`).join('')}</span>`;
+
+function wChapter(i){
+  const g = GAME[S.stage];
+  const done = g && i < g.done, inprog = S.stage==='day34' && i===3;
+  return tw(`Chapter ${i+1} · ${CH[i][0]}`,
+    `<span class="tw-row"><span class="tw-bar"><i style="width:${inprog?17:done?100:0}%"></i></span>
+     <span class="tw-k">${inprog?'12 of 70':done?CH[i][1]+' of '+CH[i][1]:'0 of '+CH[i][1]} min</span></span>`,
+    twBtn('Open chapter '+(i+1),'chapter:'+i));
+}
+function wTerms(){
+  return tw('Two terms this chapter turns on',
+    `<span class="tw-def"><b>Operating rhythm</b>The regular cadence of check-ins that lets you follow work without hovering over it.</span>
+     <span class="tw-def"><b>Drop-off point</b>The moment work stops moving and nobody has said so out loud.</span>`);
+}
+function wLadder(){
+  const f = cfg(S.stage);
+  /* NO RUNG IS MARKED BEFORE THE INTERVIEW.
+     `cfg()` merges CFG_BASE, which carries `level:'E3'` so that nothing
+     downstream renders undefined — but on `consult`, `new` and `booked` that
+     E3 is a DEFAULT, not a fact, and this widget was drawing it as the
+     current rung. On the consultant-call dashboard that is the one claim the
+     whole screen exists to deny, and Tal is one chip away from saying it.
+
+     `trackBand()` already settled this for the My Level page, in those words:
+     no segment is filled, because the rung is what the interview decides and
+     a solid one would be a claim the product has not made. `f.pred` is the
+     flag that says the level is still a prediction, and it is what both
+     drawings now read. The list changes with it — "finish the chapters" is
+     advice for somebody enrolled, not for somebody four days in. */
+  const cur = f.pred ? null : f.level;
+  return tw('The Explorer track',
+    `<span class="tw-rungs">${['E1','E2','E3','E4','E5'].map(r=>`<i class="${r===cur?'on':''}">${r}</i>`).join('')}</span>
+     <span class="tw-list">
+       ${f.pred
+         ? `<span>An interview with a talent agent confirms which rung you are on</span>
+            <span>Your level opens the 90-day course built for it</span>
+            <span>Re-interview at day 91: move up, hold, or drop back</span>`
+         : `<span>Finish the 13 chapters and keep your weekly tasks on time</span>
+            <span>Re-interview once the 90 days are up</span>
+            <span>Your cohort leader decides: move up, hold, or drop back</span>`}
+     </span>`,
+    twBtn('See my level','level'));
+}
+function wPoints(){
+  const g = GAME[S.stage];
+  if(!g) return tw('Points','<span class="tw-k">Points start when your cohort does.</span>');
+  return tw('Fastest points from here',
+    `<span class="tw-lines">
+      <span><b>+25</b>each chapter you finish</span>
+      <span><b>+50</b>each cohort call you attend</span>
+      <span><b>+10</b>a post on the cohort board</span>
+      <span><b>+20</b>someone reacts to your post</span>
+     </span>
+     <span class="tw-k">You are on ${g.pts.toLocaleString()}. Bronze lands at 2,500.</span>`,
+    twBtn('Open Points','rewards'));
+}
+function wPrep(){
+  return tw('A 10-minute run-through',
+    `<span class="tw-check">
+      <span>One story where you handed work over and it went wrong</span>
+      <span>What you would do differently, in one sentence</span>
+      <span>One decision you changed after listening to someone</span>
+     </span>`,
+    twBtn('Start the practice run'));
+}
+function wAgent(){
+  const a = AGENTS[S.agent||'priya'];
+  return tw(null,
+    `<span class="tw-ag">${avatar(a,40)}<span><b>${a.n}</b><span class="tw-k">${a.range} · ${a.ivs} interviews · ${a.price}</span></span></span>
+     <span class="tw-list">
+       <span>Opens with a situation from your own answers</span>
+       <span>Pushes hardest on delegation</span>
+       <span>Reports inside 24 hours</span>
+     </span>`,
+    twBtn('See '+a.n.split(' ')[0]+'&rsquo;s slots','agents'));
+}
+function wCall(){
+  return tw('Thursday 6:00 PM ET · 60 minutes',
+    `<span class="tw-list">
+       <span>Week ${cfg(S.stage).week} is on hard conversations</span>
+       <span>Bring the Sam handover from your notes</span>
+       <span>Three others flagged the same chapter</span>
+     </span>`,
+    twBtn('Open Cohort 41','cohort'));
+}
+function wDraft(){
+  return tw('A reply you could send',
+    `<span class="tw-quote">Thanks Priya. I will bring the vendor review to Thursday. The part I am stuck on is telling someone I am taking work back without it reading as a lack of trust.</span>`,
+    `${twBtn('Use this','messages')}<button class="tw-btn ghost" data-ask="1">Try another wording</button>`);
+}
+function wWorkload(){
+  return tw('What the weeks look like',
+    `<span class="tw-lines">
+      <span><b>~55 min</b>chapters and assessment</span>
+      <span><b>60 min</b>the live cohort call</span>
+      <span><b>~15 min</b>the weekly task</span>
+     </span>
+     <span class="tw-k">Two hours a week, near enough. Weeks 4 and 12 run longer.</span>`);
+}
+;
+function talReply(q){
+  for(const [m,fn] of TAL_ROUTES) if(m.test(q)) return fn();
+  return 'I can help with your course, your level, the cohort call and your points. Try one of these.'
+    + twChips(TALCTX[S.view] || TALCTX.dashboard);
+}
+
+function talPanel(f){
+  /* TAL READS THE PORTAL, NOT JUST THE PAGE. The opener names where you are and
+     what is true of you, and both halves change with who is signed in: a leader
+     is not on day 34 of anything, and "my level" is not one of their pages. The
+     leader's page names and state line come from lead.js (parsed later, hence
+     the guards); everything else about the panel — the thread, the composer,
+     the hero — is the same surface for both. */
+  const lead = isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL : null;
+  const ctx = (lead ? (lead.ctx[S.view] || lead.ctx.leadDash) : (TALCTX[S.view] || TALCTX.dashboard));
+  const where = (lead ? lead.where[S.view] : ({dashboard:'Dashboard',level:'My Level',report:'Your report',interviews:'Interviews',
+    agents:'Choosing an agent',agent:'Agent profile',booking:'Interview booked',enrol:'Enrolling',
+    payment:'Payment',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
+    cohort:'Cohort 41',billing:'Payments',account:'Profile',messages:'Messages'})[S.view]) || 'TalentNext';
+  const state = lead ? lead.state()
+    : f.complete ? lvlName(f.level)+', cohort complete'
+    : f.enrolled ? lvlName(f.level)+', day '+f.day+' of 90'
+    : f.pred ? f.track+' track, level not set yet'
+    : lvlName(f.level)+' confirmed, not enrolled';
+
+  const opener = S.view==='chapter' && S.ch===3
+    ? `You are 12 minutes into chapter 4. Want the short version before you go back in?`
+    : `You are on <b>${where.toLowerCase()}</b>, ${state.toLowerCase()}. Ask me anything, or start with one of these.`;
+  const bubble = (who,html) => who==='me'
+    ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
+    : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+  const hero = `<div class="tal-hero">
+      <span class="tal-mk lg"></span>
+      <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
+      <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
+    </div>`;
+  const thread = (S.thread.length ? '' : hero)
+    + S.thread.map(m=>bubble(m.who,m.html)).join('')
+    + (S.typing?bubble('tal',`<div class="ai-stream"><i></i><i></i><i></i></div>`):'');
+
+  return `<div class="tal-panel ${S.tal?'on':''}" id="talPanel">
+    <div class="tal-h">
+      <span class="tal-mk"></span>
+      <span class="nm"><b>Tal</b></span>
+      <button class="shell-act tal-x" data-toggle="tal" aria-label="Close Tal" style="color:var(--icon-primary)">${I.close}</button>
+    </div>
+    <div class="tal-body" id="talBody">${thread}</div>
+    ${S.thread.length?'':`<div class="tal-sugg">${ctx.map(s=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
+    
+    <div class="composer">
+      <span class="tal-mk sm composer-mk"></span>
+      <input class="inp ai-field" placeholder="Ask Tal anything" aria-label="Ask Tal">
+      <button aria-label="Send">${I.send}</button>
+    </div>
+  </div>`;
+}
+
+const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span class="sk-mark xs"></span>${label||'Ask Tal'}</button>`;
+/* THE FAB WEARS TAL'S MARK AND A CHAT ICON. The button used to be a black
+   square carrying the sparkle — the generic "there is AI here" mark, which
+   said what the control was made of rather than what it does. It is now the
+   gradient circle (27-tal.css §8 draws it as a pseudo-element, so nothing
+   here has to hold it) with the chat mark on top: the circle is WHO you are
+   about to talk to, the icon is WHAT happens when you press. `.tal-fab-t`
+   stays in the markup and is hidden by that same section — see the note
+   there about the desktop label 15-course.css added.
+
+   `I.talChat` and not `I.chat`: the mark is Maryam's, traced — the note in
+   icons.js says why the two are different icons and why the rail keeps the
+   Material one. */
+const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal">${I.talChat}<span class="tal-fab-t">Tal</span></button>`;
+
+/* ============================================================
+   PICTOGRAMS — IBM Design Language line art. Carbon ships icons,
+   not pictograms, so these are drawn to the DL spec: 1.5px stroke,
+   no fill, 48px canvas, currentColor.
+   ============================================================ */
+;
+
+/* ============================================================
+   GRAPHIC PANELS — IBM Design Language "layered planes": flat
+   geometric fields in one hue family with a white object on top.
+   These replace the line pictograms at the top of cards.
+   ============================================================ */
+/* Each panel gets its own colour family from the Carbon ramps, the way IBM
+   varies its card illustrations. Lime is a highlight inside them, not the
+   ground, so the brand marks the graphic rather than flooding it. */
+/* kept as a name so the stage reads cleanly; the corner plane takes the family's
+   deepest tone, which balances the stepped planes bottom left */
+
+;
+/* One construction for all six panels, so nothing drifts between them: a 400x160
+   stage that matches the banner's 5:2 box exactly, so the art never crops and
+   never stretches at any width. Ground plane, a quarter disc anchored bottom
+   right, two stepped planes bottom left, one lime block top right, and a white
+   card just left of centre carrying the motif. Only the motif changes. */
+const gstage = (P,motif) => `<svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid meet" role="img" aria-hidden="true">
+  <rect width="400" height="160" fill="${P.a}"/>
+  <path d="M264 160A136 136 0 0 1 400 24L400 160Z" fill="${P.b}"/>
+  <rect x="0" y="96" width="72" height="64" fill="${P.b}"/>
+  <rect x="0" y="128" width="36" height="32" fill="${P.c}"/>
+  <rect x="356" y="0" width="44" height="26" fill="${P.d}"/>
+  <rect x="168" y="60" width="124" height="96" fill="${P.c}"/>
+  <rect x="160" y="52" width="124" height="96" fill="#fff"/>
+  <g transform="translate(20,18)">${motif}</g>
+</svg>`;
+
+/* every motif is drawn in a 154,46 to 250,118 box and translated into the card */
+;
+/* a card whose top is a graphic panel with the category pill over it */
+/* A quiet variant: grey outlines that fade into the card rather than a colour
+   panel. For explainer cards, where a full-colour banner would outshout the copy. */
+const GFXLINE = `<svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid meet" role="img" aria-hidden="true">
+  <rect width="400" height="160" fill="var(--gray-10)"/>
+  <g fill="none" stroke="var(--gray-30)" stroke-width="1.25">
+    <circle cx="330" cy="152" r="150"/><circle cx="330" cy="152" r="112"/><circle cx="330" cy="152" r="74"/>
+  </g>
+  <g fill="none" stroke="var(--gray-20)" stroke-width="1">
+    <path d="M0 34h400M0 68h400M0 102h400M0 136h400"/>
+  </g>
+  <g fill="none" stroke="var(--gray-40)" stroke-width="1.5">
+    <rect x="40" y="28" width="172" height="106"/>
+    <rect x="58" y="94" width="26" height="24"/>
+    <rect x="96" y="76" width="26" height="42"/>
+    <rect x="134" y="60" width="26" height="58"/>
+  </g>
+  <rect x="172" y="42" width="26" height="76" fill="none" stroke="var(--brand-primary)" stroke-width="2"/>
+  <path d="M71 88 109 70 147 54 185 36" fill="none" stroke="var(--gray-60)" stroke-width="1.5"/>
+  <circle cx="185" cy="36" r="4.5" fill="var(--brand-primary)"/>
+</svg>`;
+const gfxLine = tag => `<span class="gfx wide line lead">${GFXLINE}${tag?`<span class="gfx-tag">${tag}</span>`:''}</span>`;
+
+const gfxLead = (kind,tag) => `<span class="gfx wide lead" style="background:${PAL[kind].a}">${GFX[kind]}${tag?`<span class="gfx-tag">${tag}</span>`:''}</span>`;
+const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'group',
+               points:'trophy', certificate:'certificate', time:'time', community:'chat'};
+const gcard = (kind,tag,title,sub,go) => `<button class="tile clk gcard" data-go="${go}">
+  <span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>
+  <span class="gcard-b">
+    ${tag?`<span class="eyebrow">${tag}</span>`:''}
+    <h3>${title}</h3><span class="sub">${sub}</span>
+  </span>
+  <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+</button>`;
+
+const pict = (k,cls) => `<span class="pict ${cls||''}">${PG[k]}</span>`;
+
+/* Card brand marks. Drawn, not fetched, so the file stays self-contained. */
+
+;
+const bmk = (b,cls) => `<span class="bmk ${cls||''}" aria-hidden="true">${BMK[b]||BMK.card}</span>`;
+const brandOf = n => { n=(n||'').replace(/\D/g,'');
+  if(/^4/.test(n)) return 'Visa';
+  if(/^3[47]/.test(n)) return 'Amex';
+  if(/^(5[1-5]|2[2-7])/.test(n)) return 'Mastercard';
+  if(/^6(011|5|4[4-9])/.test(n)) return 'Discover';
+  return null; };
+
+/* ============================================================
+   POINTS, BADGES, RANK
+   The criteria come from LightSpeed VT and arrive over their API,
+   so the shapes below mirror their payload exactly: an award list
+   with positive and negative values, four badges, three star ranks.
+   ============================================================ */
+;
+;
+;
+/* per stage: total, which awards have fired, badges held, star rank, minutes per week */
+;
+
+/* what to celebrate at the top of the dashboard, dismissible */
+;
+/* THE MARK IS THE AWARD, AND VIEW IS A BUTTON.
+   Two things were wrong with the first drawing of this band, and they were
+   the same mistake twice: the one moment on the dashboard that exists to
+   say "you won something" was drawn out of the parts a list row is made of.
+
+   The mark took `.ach-ic`, the 40px glyph chip every list row leads with,
+   so a Bronze shield you can see on the rewards page arrived here as a
+   line drawing in a box. It takes the artwork instead — see the note on
+   ACH — and drops the box with it, because a photograph of an object does
+   not need a frame drawn around it.
+
+   And "View" was a `<button>` sitting inside `.ach-b`, the TEXT slot, where
+   §02's trailing-icon rule sized it 20x20 as though it were a chevron. It
+   reads as underlined text at the foot of a sentence: the same shape as the
+   two links either side of it on the page and none of the weight of the one
+   thing this band is asking you to do. It comes out of the text slot and
+   becomes a real control at the end of the row, next to the dismiss. */
+function achBanner(){
+  const a = ACH[S.stage];
+  if(!a || S.hideAch.includes(S.stage)) return '';
+  return `<div class="ach">
+    ${a.art
+      ? `<span class="ach-art"><img src="${AWARD[a.art]}" alt=""></span>`
+      : `<span class="ach-ic">${I[a.ic]}</span>`}
+    <span class="ach-b"><span class="ach-t">${a.t}</span><span class="ach-d">${a.b}</span></span>
+    <button class="btn btn-p btn-sm noic ach-go" data-go="${a.go}">View</button>
+    <button class="ach-x" data-hideach="1" aria-label="Dismiss">${I.close}</button>
+  </div>`;
+}
+
+/* progress strip: one percentage, thirteen chapter blocks, three figures */
+function progressStrip(f){
+  const pct = Math.round(f.done/13*100);
+  const tasks = S.stage==='week1'?'0 of 3':S.stage==='day34'?'1 of 3':'3 of 3';
+  const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
+  return `<div class="prog">
+    <div class="prog-top">
+      <div><div class="prog-pct">${pct}<small>%</small></div><div class="prog-l">of the course done</div></div>
+      <div class="prog-day"><div class="prog-dn">Day ${f.day}</div><div class="prog-l">of 90</div></div>
+    </div>
+    <div class="prog-seg">${CH.map((c,i)=>
+      `<i class="${i<f.done?'done':(i===f.open?'now':'')}" title="Chapter ${i+1}"></i>`).join('')}</div>
+    <div class="prog-figs">
+      <span><b>${f.done} of 13</b>chapters</span>
+      <span><b>${tasks}</b>week ${f.week} tasks</span>
+      <span><b>${hrs}</b>invested</span>
+    </div>
+  </div>`;
+}
+
+/* THE RING IS THE BAR, BENT.
+   A full-width track under a two-line title is a lot of page spent on one
+   percentage, and it spends it in the worst place: the eye reads the title,
+   crosses eight hundred pixels of grey, and arrives at a number set below in
+   helper type. Bent into a 64px ring the same figure sits at the end of the
+   title line, reads as one object with it, and gives the row a right-hand
+   anchor the card can hang its other numbers off.
+
+   SOLID, NOT THE GRADIENT. §19 runs the brand gradient through every FILL in
+   the product, progress bars included, and states the exception this falls
+   under: marks that are DRAWN rather than filled — an SVG path, a border, a
+   caret — keep the solid, because a gradient across a 6px stroke is not a
+   gradient, it is a smudge. A ring is a stroke.
+
+   `--arc` carries the visible arc length rather than a `width` percentage,
+   because a dash pattern is the only way to fill part of a circle and the
+   pattern needs the length in user units. 2πr for r=26 is 163.4, so the arc
+   is that times the fraction; the gap is any number larger than the
+   circumference, which is what stops the pattern repeating.
+
+   The figure is the OPEN CHAPTER's progress — the number the old bar drew —
+   not the week's minutes. `GAME[stage].weeks` and `CFG.mins` disagree about
+   week 1 (see the note above WEEKLY in data.js), and the strip below this
+   card already prints one of them. */
+function ring(pct, label){
+  const arc = (2 * Math.PI * 26 * Math.min(pct, 100) / 100).toFixed(1);
+  return `<div class="ring" role="img" aria-label="${label || pct + '% done'}">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="ring-t" cx="32" cy="32" r="26"></circle>
+      <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:${arc}"></circle>
+    </svg>
+    <span class="ring-n u-h2">${pct}<small>%</small></span>
+  </div>`;
+}
+
+/* THIS WEEK — TWO HALVES AND A RING
+   What the card used to be: the open chapter, a bar, and its minutes. What it
+   left out is the whole of the week either side of that chapter — so it now
+   answers two questions in order, and the chapter it used to be about is the
+   band across the top.
+
+     what I have done      chapters finished and assessments scored, from
+                           WEEKLY[stage].did. Facts only, past tense; see the
+                           note above WEEKLY for why nothing undone is in it.
+     what is expected      Tal, comparing you with the members of the cohort
+                           who are furthest ahead. Attributed, because it is
+                           the one place in the card reading somebody else's
+                           numbers, and closed by the question a person
+                           actually has at that point.
+
+   THE CARD IS NOT A BUTTON ANY MORE. It was `tile clk arrow` — the whole
+   block one click target to the chapter. It cannot stay one: it now contains
+   a Tal chip, and a control inside a control is a click whose destination
+   depends on where in the block you land. Same conclusion §29.16 reached for
+   the report card on My Level, and the same fix — the way in becomes a real
+   button where the reading ends.
+
+   Used at both stages that draw the section (week1, day34). Day 90 does not:
+   `f.finished` hides the section entirely, which is why the old markup's
+   `f.finished ? 'Course complete' : …` branch was unreachable and is gone. */
+function weekCard(f){
+  const w = WEEKLY[S.stage] || WEEKLY.week1;
+  const i = f.open, mins = CH[i][1];
+  const did = S.stage === 'day34' ? 12 : 0;
+  const pct = Math.round(did / mins * 100);
+  return `<div class="wkc">
+    <div class="wkc-top">
+      <div class="wkc-tb">
+        <div class="wkc-eb t-label-01">Chapter ${i + 1} &middot; ${S.stage === 'week1' ? 'unlocked today' : 'in progress'}</div>
+        <h3 class="u-h3">${CH[i][0]}</h3>
+        <div class="wkc-min sub">${did} of ${mins} minutes</div>
+      </div>
+      ${ring(pct, `${pct}% of chapter ${i + 1} done`)}
+    </div>
+    <div class="wkc-blk">
+      <div class="wkc-h"><span class="u-overline">What I have done this week</span></div>
+      ${w.did.length
+        ? `<ul class="wkc-did">${w.did.map(([t, m]) => `<li class="u-compact">
+            <span class="wkc-tick">${I.checkFilled}</span>
+            <span class="wkc-db"><b>${t}</b><span class="u-caption">${m}</span></span></li>`).join('')}</ul>`
+        : `<p class="wkc-none u-body">${w.none}</p>`}
+    </div>
+    <div class="wkc-blk">
+      <!-- THE ROLE CLASS GOES ON THE SPAN, NOT THE ROW. u-overline is
+           uppercase and text-transform inherits, so on the wrapper it
+           renders Tal's chip as "TAL". The chip is a name. -->
+      <div class="wkc-h">${talLabel()}<span class="u-overline">What is expected of me this week</span></div>
+      <p class="wkc-p u-body">${w.tal}</p>
+      <div class="wkc-a">
+        ${askChip(w.ask[0], w.ask[1])}
+        <button class="btn btn-g btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* stacked bars: four activity types, Carbon data-viz palette, 2px surface gaps */
+;
+;
+const segsOf = t => { const a = SPLIT.map(s=>Math.round(t*s)); a[0] += t - a.reduce((x,y)=>x+y,0); return a; };
+function stackChart(id,{title,sub,weeks,target,targetLabel}){
+  const n = 13;
+  const max = Math.max(...weeks, target||0) * 1.2 || 1;
+  const cols = Array.from({length:n},(_,i)=>{
+    const t = weeks[i];
+    if(!(t>0)) return `<button class="sc-col none" data-chart="${id}" data-i="${i}" aria-label="Week ${i+1}, nothing yet"><i></i></button>`;
+    const segs = segsOf(t).map((v,k)=>`<u style="height:${(v/max*100).toFixed(2)}%;background:${SERIES[k][1]}"></u>`).reverse().join('');
+    return `<button class="sc-col" data-chart="${id}" data-i="${i}"
+      aria-label="Week ${i+1}, ${t} min">${segs}</button>`;
+  }).join('');
+  const refTop = target ? (100 - target/max*100) : null;
+  const ticks = Array.from({length:n},(_,i)=>`<span>${(i%4===0||i===n-1)?(i+1):'&nbsp;'}</span>`).join('');
+  const li = weeks.length-1;
+  return `<div class="chart chart-stacked" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="sc-plot">
+      ${target?`<div class="chart-ref" style="top:${refTop}%"><span>${targetLabel}</span></div>`:''}
+      ${cols}
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-read" data-read="${id}">
+      <span class="k">Week ${li+1}</span><span class="v">${weeks[li]} min</span></div>
+    <div class="legend">${SERIES.map(([nm,c])=>`<span><i style="background:${c}"></i>${nm}</span>`).join('')}</div>
+    <div class="chart-table sc-table">
+      <div class="sc-row sc-head">
+        <span>Week</span>${SERIES.map(([nm])=>`<span class="num">${nm}</span>`).join('')}<span class="num">Total</span>
+      </div>
+      ${weeks.map((t,i)=>`<div class="sc-row">
+        <span class="sc-w">Week ${i+1}</span>${
+        segsOf(t).map(v=>`<span class="num">${v}</span>`).join('')}<span class="num sc-t">${t} min</span>
+      </div>`).join('')}
+    </div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+const nextBadge = pts => BDG.filter(b=>b.need && b.need>pts).sort((a,b)=>a.need-b.need)[0] || null;
+
+/* dashboard summary: total, rank and the next badge in one block */
+function scoreCard(g){
+  const nb = nextBadge(g.pts);
+  const prev = [0,2500,5000,10000].filter(x=>x<=g.pts).pop();
+  const pct = nb ? Math.round((g.pts-prev)/(nb.need-prev)*100) : 100;
+  return `<div class="score">
+    <div class="score-top">
+      <div class="score-pts"><div class="l">Points</div><div class="n">${g.pts.toLocaleString()}</div></div>
+      <div class="score-rank"><div class="n"><img class="rank-mk" src="${AWARD['rank'+g.rank]}" alt="">${RANKS[g.rank-1].n}</div><div class="l">${g.badges} of 4 badges</div></div>
+    </div>
+    ${nb?`<div class="score-next">
+      <div class="pb-track"><div class="pb-fill" style="width:${pct}%"></div></div>
+      <div class="score-meta"><span>${(nb.need-g.pts).toLocaleString()} points to ${nb.n}</span><span>${pct}%</span></div>
+    </div>`:''}
+  </div>`;
+}
+
+/* the three award lists, each rendered as one row grid */
+/* The client's own award artwork, embedded at build time. Lossless-enough
+   WebP at 160px: these are read at 40-56px and never printed. */
+const BDG_ART = ['bronze','silver','gold','involved'];
+
+function awardRow({name,desc,val,state,when,pct,tone,art}){
+  const neg = val<0;
+  const mark = art
+    ? `<span class="aw-art"><img src="${AWARD[art]}" alt="" loading="lazy"></span>`
+    : `<span class="aw-ic"${tone?` style="color:${tone}"`:''}>${state==='got'?I.checkFilled:(neg?I.subtract:I.locked)}</span>`;
+  return `<div class="aw ${state}${art?' has-art':''}">
+    ${mark}
+    <span class="aw-b">
+      <span class="aw-n">${name}</span>
+      <span class="aw-d">${desc}</span>
+    </span>
+    <span class="aw-r">
+      <span class="aw-v">${neg?'&minus;':'+'}${Math.abs(val)}</span>
+      <span class="aw-s">${state==='got'?'Awarded '+when:(pct!==undefined?pct+'%':'Not yet')}</span>
+    </span>
+  </div>`;
+}
+function pointsList(g){
+  const got = PTS.map((r,i)=>({r,i})).filter(x=>g.got.includes(x.i));
+  const rest = PTS.map((r,i)=>({r,i})).filter(x=>!g.got.includes(x.i));
+  return [...got,...rest].map(({r,i})=>awardRow({
+    name:r.n, desc:r.d, val:r.v, art:'points',
+    state:g.got.includes(i)?'got':'not', when:g.last[i]
+  })).join('');
+}
+function badgeList(g){
+  return BDG.map((b,i)=>{
+    const got = i < g.badges;
+    return awardRow({name:b.n, desc:b.d, val:b.v, state:got?'got':'not', art:BDG_ART[i],
+      when:'11/06/2026', pct: got?undefined:(b.need?Math.min(99,Math.round(g.pts/b.need*100)):0)});
+  }).join('');
+}
+function rankList(g){
+  return RANKS.map((r,i)=>awardRow({name:r.n, desc:r.d, val:r.v, art:'rank'+(i+1),
+    state:i<g.rank?'got':'not', when:'07/23/2026', pct:i<g.rank?undefined:0})).join('');
+}
+
+/* One bar chart, one hue, a dashed reference line for the comparison and a
+   tappable readout. Table view sits behind a toggle. */
+function barChart(id,{title,sub,data,labels,slots,target,targetLabel,unit}){
+  const n = slots || data.length;
+  const max = Math.max(...data, target||0) * 1.2 || 1;
+  const bars = Array.from({length:n},(_,i)=>{
+    const v = data[i];
+    const hasV = v!==undefined && v!==null && v>0;
+    return `<button class="chart-bar ${hasV?'':'none'}" data-chart="${id}" data-i="${i}" aria-label="${labels[i]}, ${hasV?v+' '+unit:'nothing yet'}">
+      <i style="height:${hasV?Math.max(3,Math.round(v/max*100)):1}%"></i></button>`;
+  }).join('');
+  const refTop = target ? (100 - target/max*100) : null;
+  const ticks = Array.from({length:n},(_,i)=>`<span>${(i%4===0||i===n-1)?(i+1):'&nbsp;'}</span>`).join('');
+  const last = data.length-1;
+  return `<div class="chart" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="chart-plot">
+      ${target?`<div class="chart-ref" style="top:${refTop}%"><span>${targetLabel}</span></div>`:''}
+      ${bars}
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-read" data-read="${id}">
+      <span class="k">${labels[last]}</span><span class="v">${data[last]} ${unit}</span></div>
+    <div class="chart-table">
+      ${data.map((v,i)=>`<div class="kv"><span class="k">${labels[i]}</span><span class="v n">${v} ${unit}</span></div>`).join('')}
+    </div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+
+/* Scores sit between 79 and 92, so a zero-baseline bar hides the differences
+   and truncating a bar axis would misread. Chapters are sequential, so this is
+   a line: 2px stroke, 8px markers with a 2px surface ring, a dashed reference
+   line for the cohort average, and the same table view behind the toggle. */
+function lineChart(id,{title,sub,data,labels,slots,target,targetLabel,unit,min,max}){
+  const W=320,H=104;
+  const PAD=5, IW=W-PAD*2;
+  const x=i=> slots>1 ? (PAD + i*(IW/(slots-1))) : W/2;
+  const y=v=> H - ((v-min)/(max-min))*H;
+  const pts = data.map((v,i)=>[x(i),y(v)]);
+  const path = pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const dots = pts.map((p,i)=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"
+      fill="url(#g-${id})" stroke="var(--background)" stroke-width="2"/>`).join('');
+  const hits = data.map((v,i)=>{
+    const w = IW/slots, x0 = Math.max(0, Math.min(W-w, x(i)-w/2));
+    return `<rect class="hit" data-chart="${id}" data-i="${i}" x="${x0.toFixed(1)}" y="0"
+      width="${w.toFixed(1)}" height="${H}" fill="transparent" aria-label="${labels[i]}, ${v}${unit}"/>`;
+  }).join('');
+  const ticks = Array.from({length:slots},(_,i)=>`<span>${(i%4===0||i===slots-1)?(i+1):'&nbsp;'}</span>`).join('');
+  const last=data.length-1;
+  return `<div class="chart" id="${id}">
+    <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
+    <div class="chart-line">
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="${title}">
+        <defs><linearGradient id="g-${id}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="var(--dv-grad-a)"/>
+          <stop offset="1" stop-color="var(--dv-grad-b)"/>
+        </linearGradient></defs>
+        <line x1="0" x2="${W}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}"
+          stroke="var(--border-strong-01)" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>
+        <path d="${path}" fill="none" stroke="url(#g-${id})" stroke-width="2"
+          stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        ${dots}${hits}
+      </svg>
+      <span class="chart-reflab" style="top:calc(${(y(target)/H*100).toFixed(1)}% + 3px)">${targetLabel}</span>
+    </div>
+    <div class="chart-x">${ticks}</div>
+    <div class="chart-read" data-read="${id}"><span class="k">${labels[last]}</span><span class="v">${data[last]}${unit}</span></div>
+    <div class="chart-table ct-bars">${data.map((v,i)=>`<div class="kv" style="--p:${Math.round((v-min)/(max-min)*100)}%"><span class="k">${labels[i]}</span><span class="ct-bar"><i></i></span><span class="v n">${v}${unit}</span></div>`).join('')}</div>
+    <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
+  </div>`;
+}
+
+/* the cohort board — the community surface the LightSpeed VT points refer to */
+;
+function discussionList(){
+  return `
+  <div class="mb5" style="display:flex;gap:var(--s03)">
+    <button class="btn btn-p btn-sm" style="flex:1">Start a conversation ${I.add}</button>
+  </div>
+  <div class="tile-stack">
+    ${POSTS.map(p=>`<div class="post">
+      <div class="post-h">
+        <span class="av-ph" style="width:32px;height:32px;font-size:11px${p.mine?';background:var(--brand-primary);color:var(--on-brand)':''}"><i>${p.i}</i></span>
+        <span class="post-who"><b>${p.mine?'You':p.a}</b><span>${p.w}</span></span>
+      </div>
+      <div class="post-t">${p.t}</div>
+      <div class="post-b">${p.b}</div>
+      <div class="post-f">
+        <span class="post-act">${I.chat}<b>${p.r}</b> replies</span>
+        <span class="post-act">${I.thumbsUp}<b>${p.k}</b></span>
+        <span class="post-tal">${askChip('Help me reply to &ldquo;'+p.t+'&rdquo;','Ask Tal')}</span>
+      </div>
+    </div>`).join('')}
+  </div>
+  <p class="t-helper-01 mt5">Posting, replying and getting a reaction all earn points.</p>`;
+}
+
+/* page furniture */
+function crumb(...parts){
+  const last = parts.pop();
+  return `<div class="crumb">${parts.map(([l,v])=>`<a data-go="${v}">${l}</a><span class="sep">/</span>`).join('')}<span>${last}</span></div>`;
+}
+/* A MODULE'S FRONT PAGE HAS NOWHERE TO GO BACK TO.
+   The back arrow was drawn on any page with history behind it, which meant
+   it appeared beside "My Level", "Points", "Cohort 41" — the destinations
+   the rail itself takes you to. Back from one module lands you in another,
+   and an arrow that means "the last module you were looking at" is not a
+   back button, it is browser history wearing the page's chrome. The rail is
+   how you move between modules and it is on screen at every width.
+
+   Inside a module the arrow is exactly right and stays: Report is under My
+   Level, an agent is under Interviews, a chapter is under Coursework, and
+   from any of them there is a real parent to return to.
+
+   THE TEST IS THE RAIL'S OWN LIST, not a hand-kept set of view names. A
+   module's front page is precisely a page the rail can reach — plus Profile
+   and Log out, which sit in the rail's foot rather than its body. Read off
+   `NAVSETS` so a module added to the rail needs no edit here, and off the
+   candidate's CURRENT set so a page that is not in the rail yet at this
+   stage (Enroll before they are levelled) still offers the way back. */
+const railRoots = () => {
+  const set = NAVSETS[isLead() ? 'leader' : cfg(S.stage).nav] || [];
+  return set.map(([k]) => k).concat(isLead() ? ['leadProfile'] : ['account']);
+};
+const bk = () => (S.hist.length && !railRoots().includes(S.view))
+  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>` : '';
+function ph(title,sub,act){
+  return `<div class="ph${act?' ph-has-act':''}">
+    <div class="ph-main"><div class="ph-top">${bk()}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
+    ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
+}
+/* BEFORE THE INTERVIEW, THE SAME BAR — SEE §29.4
+   This drew a three-column grid of the three tracks with "You are here" under
+   one of them. The confirmed card next door drew the fifteen-rung ladder, so
+   one page had two drawings of one idea, and the grid was the one that could
+   not show how far it is from here to the top.
+
+   It draws the ladder now. The five rungs of your own track are marked; NO
+   rung is filled, because the rung is what the interview decides and a solid
+   segment would be a claim the product has not made yet.
+
+   Nothing replaces the grid's fact row. "Rungs in this track" is what the five
+   marked segments are showing, "your rung" is what the sub already says, and
+   "your track" is the card's own heading — a line restating all three under a
+   bar that draws them is the grid's redundancy carried across in text. */
+function trackBand(track){
+  const T = ['Explorer','Builder','Trailblazer'];
+  const ti = Math.max(0, T.indexOf(track));
+  const lo = ti * 5;
+  return `<div class="ladder ladder-track" role="img" aria-label="${track} track, rungs ${lo+1} to ${lo+5} of 15. Your rung is set at the interview.">
+    ${Array.from({length:15},(_,i)=>`<i class="${i>=lo&&i<lo+5?'mine':''}"></i>`).join('')}
+  </div>
+  <div class="ladder-lab">${T.map(n=>`<span${n===track?' class="on"':''}>${n}</span>`).join('')}</div>`;
+}
+function ladder(cur,confirmed){
+  const r = rungOf(cur);
+  return `<div class="ladder">${Array.from({length:15},(_,i)=>`<i class="${i<r-1?'done':(i===r-1?'on':'')}"></i>`).join('')}</div>
+  <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
+}
+
+/* A stepper on a phone eats a screen. Show the rail, the step you are on,
+   and keep the rest one tap away. */
+function stepper(id, steps, flush, title){
+  let i = steps.findIndex(x=>x.st==='on');
+  if(i<0) i = steps.filter(x=>x.st==='done').length ? steps.length-1 : 0;
+  const open = !!S.piOpen[id], cur = steps[i];
+  const ic = st => st==='done' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.checkFilled}</span>`
+    : st==='on' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.circleDash}</span>`
+    : `<span class="pi-ic" style="fill:var(--gray-50)">${I.circle}</span>`;
+  const meter = `<span class="stp-meter">
+      <span class="stp-rail" role="img" aria-label="Step ${i+1} of ${steps.length}">
+        ${steps.map(x=>`<i class="${x.st}"></i>`).join('')}
+      </span>
+      <span class="stp-c">Step ${i+1} of ${steps.length}</span>
+    </span>`;
+  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}">${open?'Hide steps':'All steps'}${I.chevDown}</button>`;
+  return `<div class="stp${flush?' flush':''}${open?' open':''}${title?' stp-titled':''}">
+    ${title
+      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${toggle}</div>`
+      : `${meter}<div class="stp-h">${toggle}</div>`}
+    <div class="stp-now">
+      <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
+    </div>
+    <div class="stp-all"><div class="pi" style="padding:0">
+      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
+        <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
+    </div></div>
+  </div>`;
+}
+
+/* ============================================================
+   AUTH — stage: signup
+   ============================================================ */
+const AUTH_ART = `
+<div class="auth-brand">
+  <span class="auth-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+  <div class="auth-intro">
+    <h2 class="t-heading-01">Welcome to TALENTnext</h2>
+    <p class="t-body-02">TalentNext is the AI-native leadership platform that assesses you in real conversation, compounds every interview, chapter and call into a live picture of where you stand, then moves you up the ladder a rung at a time.</p>
+    <p class="t-body-02">From here, growth stops being guesswork.</p>
+    <p class="t-body-02 auth-begin">Let&rsquo;s begin.</p>
+  </div>
+  <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
+</div>
+<i class="auth-mark" aria-hidden="true"></i>`;
+
+const AUTH = {
+login: () => `${authShell()}
+<main class="main"><div class="page form-page">
+  ${ph('Log in','Enter the email address and password on your TalentNext account.')}
+  <div class="sec sec-rule">
+    <div class="f"><label for="lem">Email address</label>
+      <input class="inp fill" id="lem" type="email" value="maryam.naz@tkxel.io"></div>
+    <div class="f last"><label for="lpw">Password</label>
+      <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
+        <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div></div>
+    <p class="t-body-02 aux"><a data-go="forgot">Forgotten your password?</a></p>
+  </div>
+  <div class="sec sec-act">
+    <div class="foot-row"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
+  </div>
+</div></main>`,
+
+forgot: () => `${authShell('login')}
+<main class="main"><div class="page form-page">
+  ${ph('Reset your password','Give us the email address on your account and we will send you a link to set a new password.')}
+  <div class="sec">
+    <div class="f last"><label for="fem">Email address</label>
+      <input class="inp fill" id="fem" type="email" value="maryam.naz@tkxel.io"></div>
+  </div>
+  <div class="sec">
+    <button class="btn btn-p btn-full" data-go="sent">Send the reset link ${I.arrowRight}</button>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Remembered it? <a data-go="login">Back to log in</a></p>
+  </div>
+</div></main>`,
+
+sent: () => `${authShell('forgot')}
+<main class="main"><div class="page form-page">
+  ${ph('Check your email','A reset link is on its way to maryam.naz@tkxel.io. It expires in 30 minutes and can be used once.')}
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Nothing yet?</b>Give it a minute, then look in spam. The sender is hello@talentnext.com.</div></div>
+  </div>
+  <div class="sec">
+    <button class="btn btn-p btn-full" data-go="reset">Open the link ${I.arrowRight}</button>
+    <div class="mt4"><button class="btn btn-g btn-full" data-go="sent">Send it again ${I.restart}</button></div>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Wrong address? <a data-go="forgot">Change it</a> and try again.</p>
+  </div>
+</div></main>`,
+
+reset: () => `${authShell('login')}
+<main class="main"><div class="page form-page">
+  ${ph('Set a new password','Choose something you have not used here before. You will be logged in once it is saved.')}
+  <div class="sec">
+    <div class="f-row"><div class="f"><label for="rpw">New password</label>
+      <div class="pw-wrap"><input class="inp fill" id="rpw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
+        <button class="pw-eye" data-eye="rpw" aria-label="Show password">${I.view}</button></div>
+      <ul class="pw-rules">
+        <li class="ok">${I.checkFilled}At least 12 characters</li>
+        <li class="ok">${I.checkFilled}Upper and lower case</li>
+        <li>${I.circle}One number or symbol</li>
+      </ul></div>
+    <div class="f last"><label for="rpw2">Confirm new password</label>
+      <div class="pw-wrap"><input class="inp fill" id="rpw2" type="password" placeholder="Re-enter password">
+        <button class="pw-eye" data-eye="rpw2" aria-label="Show password">${I.view}</button></div></div></div>
+  </div>
+  <div class="sec">
+    <button class="btn btn-p btn-full" data-go="stage:new">Save and log in ${I.arrowRight}</button>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Changed your mind? <a data-go="login">Back to log in</a></p>
+  </div>
+</div></main>`,
+
+create: () => `${authShell()}
+<main class="main"><div class="page form-page">
+  ${ph('Create your account','You&rsquo;re one step away. Create your password to continue.')}
+  <div class="sec sec-id">
+    <div class="f last"><label for="em">Your Email Address</label>
+      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div><div class="help">From your NIL profile. <a data-go="terms">Not you?</a></div></div></div>
+  </div>
+  <div class="sec sec-rule">
+    <div class="sec-h"><h2 class="u-h2">Set a Password</h2></div>
+    <div class="f-row"><div class="f"><label for="pw">Password</label>
+      <div class="pw-wrap"><input class="inp fill" id="pw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
+        <button class="pw-eye" data-eye="pw" aria-label="Show password">${I.view}</button></div>
+      <ul class="pw-rules">
+        <li class="ok">${I.checkFilled}At least 12 characters</li>
+        <li class="ok">${I.checkFilled}Upper and lower case</li>
+        <li>${I.circle}One number or symbol</li>
+      </ul></div>
+    <div class="f last"><label for="pw2">Confirm Password</label>
+      <div class="pw-wrap"><input class="inp fill" id="pw2" type="password" placeholder="Re-enter password">
+        <button class="pw-eye" data-eye="pw2" aria-label="Show password">${I.view}</button></div></div></div>
+  </div>
+  <div class="sec sec-cbx">
+    <div class="cbx-list">
+      <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span>
+        <span class="txt">I accept the <a data-go="terms">Terms of Service</a> and <a data-go="terms">Privacy Policy</a>.</span></label>
+      <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span>
+        <span class="txt">I consent to my interviews being recorded and transcribed.</span></label>
+      <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span>
+        <span class="txt">Send me occasional product and course emails.</span></label>
+    </div>
+    </div>
+  <div class="sec sec-act"><div class="foot-row"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
+  </div>
+</div></main>`,
+
+terms: () => `${authShell('create')}
+<main class="main"><div class="page" style="padding-bottom:0">
+  <div class="tabs"><button>Terms</button><button>Privacy</button><button class="on">Data use</button><button>Cookies</button></div>
+  <div class="ph" style="padding-bottom:var(--s05)">
+    <div class="ph-top"><h1 class="u-h2">Data use notice</h1></div>
+    <p class="t-helper-01" style="color:var(--text-helper);margin-top:var(--s03)">Version 3.1 · Effective July 1, 2026 · 4 min read</p>
+  </div>
+  <div class="sec"><div class="note"><span>${I.info}</span><div class="nb"><b>The short version</b>Your interview is recorded so your agent can write your report. You can ask for your level to be reviewed, and you can delete a recording at any time.</div></div></div>
+  <div class="acc">
+    <div class="acc-i on"><button class="acc-h"><span class="ttl">1. What we record</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>Every interview and re-interview is recorded as video and audio, and transcribed so your agent can write your report. Recordings are stored for 24 months, then deleted. Your weekly cohort calls are not recorded.</p><p>You can request deletion of a specific recording at any time. Deleting the recording behind a confirmed level does not reverse the level.</p></div></div>
+    <div class="acc-i"><button class="acc-h"><span class="ttl">2. Who sees your interview</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>The agent who interviewed you, and the cohort leader who runs your course. Nobody else, unless you share your report yourself.</p></div></div>
+    <div class="acc-i"><button class="acc-h"><span class="ttl">3. Your level and who sets it</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>A talent agent sets your level from the interview and signs the report. At the end of each course your cohort leader decides whether you move up, hold or drop back, and records the reason.</p><p>You can ask for your level to be reviewed by a second agent.</p></div></div>
+    <div class="acc-i"><button class="acc-h"><span class="ttl">4. Tal, your assistant</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>Tal is the assistant inside your course. It can see your course progress, your chapter notes and your points so that it can help you with the material. Tal cannot see your one-to-one messages, your payment details, or other candidates' data.</p></div></div>
+    <div class="acc-i"><button class="acc-h"><span class="ttl">5. What we never do</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>We do not sell your data. We do not share your individual progress with an employer without your written instruction.</p></div></div>
+    <div class="acc-i"><button class="acc-h"><span class="ttl">6. Your controls</span><span class="chev">${I.chevDown}</span></button>
+      <div class="acc-b"><p>Profile holds every switch: pause Tal, ask for a level review, download everything we hold, delete a recording, or close your account.</p></div></div>
+  </div>
+  <div class="sec mt6"><button class="btn btn-g noic" style="padding-left:var(--s04)">${I.download} Download as PDF</button></div>
+</div></main>
+<div style="flex:none;border-top:1px solid var(--border-subtle-01);display:flex;gap:1px">
+  <button class="btn btn-s noic" data-go="create" style="flex:1;max-width:none;justify-content:center">Back</button>
+  <button class="btn btn-p noic" data-go="create" style="flex:1;max-width:none;justify-content:center">Accept</button>
+</div>`,
+
+/* THE SEAM MOVED. "Verify & Continue" used to land on the `new` stage, which
+   opens by asking a four-second-old member to choose and pay a talent agent —
+   the biggest decision on the ladder, put first. It lands on `consult` now:
+   account created, a free fifteen-minute screening call already booked,
+   nothing asked for. `new` is still reachable from the stage picker and from
+   a returning log-in, which is what it has always described.
+
+   A NOTE FOR THE NEXT PERSON TO ANNOTATE A VIEW: this was first written as an
+   HTML comment inside the template literal below, and a backtick in the word
+   `new` closed the literal — the whole bundle stopped parsing and the app
+   rendered as an empty frame with nothing in the console, because the failure
+   is at parse time. Reasoning about a template goes ABOVE it, in a JS comment,
+   which build.py strips from the output anyway. */
+verify: () => `${authShell('create')}
+<main class="main"><div class="page form-page">
+  <div class="ph"><div class="ph-main">
+    <div class="ph-top"><button class="ph-back" data-go="create" aria-label="Back">${I.arrowLeft}</button><h1>Verify Your Email Address</h1></div>
+    <p>Enter the 6 digits code sent to your email address.</p>
+  </div></div>
+  <div class="sec sec-id">
+    <div class="f last"><label for="vem">Sent on</label>
+      <div class="static-row"><div class="inp-static" id="vem">maryam.naz@tkxel.io</div></div></div>
+  </div>
+  <div class="sec sec-rule">
+    <div class="sec-h"><h2 class="u-h2">Verification Code</h2></div>
+    <div class="otp">${[7,5,2,8,9,1].map((d,i)=>`<input value="${d}" size="1" inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}">`).join('')}</div>
+  </div>
+  <div class="sec sec-act"><div class="foot-row">
+    <div class="mt6"><button class="btn btn-p btn-full" data-go="stage:consult">Verify &amp; Continue ${I.arrowRight}</button></div>
+    <button class="btn btn-g btn-lead noic">${I.restart}<span>Resend Code in 0:40</span></button>
+  </div></div>
+</div></main>`,
+
+created: () => `${authShell()}
+<main class="main"><div class="page form-page">
+  <div class="sec" style="padding-top:var(--s07)">
+    <span style="display:block;width:32px;height:32px;fill:var(--support-success);margin-bottom:var(--s05)">${I.checkFilled}</span>
+    <h1 class="t-heading-04" style="margin:0 0 var(--s03)">You are in</h1>
+    <p class="t-body-02" style="margin:0;color:var(--text-secondary)">Welcome to TalentNext, Maryam. Your quiz result carried over, so you already know which track you are on.</p>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="t-label-01" style="color:var(--text-secondary)">Your track, from the quiz</div>
+      <div class="t-heading-03 mt3">Explorer</div>
+      <p class="t-body-01 mt4" style="margin:0;color:var(--text-secondary)">The quiz places you on one of three tracks. Your level inside that track is set by an interview with a talent agent.</p>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>Meet Tal</h3></div>
+      <div class="ai-body"><p>Tal knows your level and your course. Start here.</p></div>
+      <div class="mt5" style="display:flex;flex-direction:column;gap:1px">
+        ${['What happens in the interview?','How do I move up a level?','Which agent suits me?'].map(q=>
+        `<button class="tile clk arrow band" data-go="stage:new">
+          <span class="t-body-compact-01">${q}</span>
+          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`).join('')}
+      </div>
+    </div>
+  </div>
+  <div class="sec"><button class="btn btn-p" data-go="stage:new">Go to my dashboard ${I.arrowRight}</button></div>
+</div></main>`
+};
+
+/* ============================================================
+   VIEWS
+   ============================================================ */
+const V = {};
+
+V.dashboard = (f) => {
+  let body = '';
+  /* ============================================================
+     THE CONSULTANT CALL
+     Wireframe: the "Consultant Call" frame. Redrawn in the product's own
+     components rather than transcribed — same six facts, four existing
+     parts.
+
+     THE CALL IS THE SAME OBJECT AS THE OTHER TWO CALLS. There are three
+     appointments in this product: the agent interview (`booked`), the weekly
+     cohort call (`week1`..`day34`), and now the consultant screening. All
+     three are "a named person, at a time, that you join" and all three are
+     `.plate` — the black wall with a face, an eyebrow, a title, a line of
+     detail and up to two actions. Drawing a fourth card for a third
+     appointment would be three drawings of one idea, which is the mistake
+     §29.4 records for the level card.
+
+     WHAT THE EYEBROW CARRIES. The wireframe puts a "Booked" tag in the
+     block's top-right corner. The plate has no tag slot and does not need
+     one: `plate-eb` is where the other two calls say "Next up" and "Weekly
+     call · in 2 days", so it says the state AND the distance here too.
+     One line, in the place the component already keeps that line.
+
+     "WHAT TO EXPECT" IS A TINTED BAND, NOT A BOX INSIDE THE PLATE. The
+     wireframe nests a grey panel inside the call block. On black that would
+     be a third tone inside a wall, and §25/§29 already establish the
+     alternative: plate followed by `.sec.tint` joins flush, with no white
+     strip and no rule between them. So the reassurance reads as the bottom
+     half of the call block, which is what the wireframe was drawing.
+     ============================================================ */
+  if(S.stage==='consult') body = `
+    ${ph('Hi Maryam','Your next step, and everything decided so far.')}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
+        <div class="ai-body"><p>You are all set up. A talent consultant, <b>Jordan</b>, will call for a quick fifteen-minute chat to get to know you and point you in the right direction. Nothing to prepare, and it does not set your level.</p></div>
+        <div class="ai-foot">
+          ${askChip('What happens on the consultant call?','What happens on the call?')}
+          ${askChip('Show me my quiz results','Show my quiz results')}
+          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      </div>
+    </div>
+    ${/* "BOOKED" WAS THE CARD SAYING WHAT THE CARD IS. A call with a person,
+          a time and a Join button is booked; the word above it added nothing
+          the four lines under it did not already say, and it was the only
+          part of the eyebrow that was not the countdown. `data-when` carries
+          the countdown on its own now — `placePlates` reads it and seats the
+          title in the head row beside it (the note in ai5.js is where that
+          is written down), so the card loses a row of label AND a row of
+          heading and is the same six facts, closer together.
+
+          AND "WHAT TO EXPECT" COMES INSIDE. It was a tinted band under the
+          plate, joined flush to it by §25/§29 so the two already read as one
+          block — which is the tell that they were one block being drawn as
+          two. Everything in it is about this call: who Jordan is, what the
+          fifteen minutes are like, what they do not decide. Inside the card,
+          under a hairline, it is the second half of the thing it describes
+          rather than a note about the thing above it. The tint band goes;
+          nothing else on the page moves. */''}
+    <div class="sec">
+      <div class="plate" data-when="in 2 days">
+        <div class="plate-who">${avatar(CONSULTANT,56)}
+          <span class="plate-wb"><b>${CONSULTANT.n}</b><span>Talent consultant &middot; screens Explorer candidates</span></span>
+        </div>
+        <div class="plate-t">Your consultant call</div>
+        <div class="plate-b">Thursday, August 13 at 2:00 PM ET &middot; 15 minutes, online</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic">Join call ${I.video}</button>
+          <button class="btn btn-sm noic plate-b2" data-go="interviews">Add to calendar</button>
+        </div>
+        <div class="plate-x">
+          <b>What to expect</b>
+          <p>An initial screening, and a relaxed one &mdash; peer to peer, not an assessment. Jordan asks where you are and what you are after. It does not set your level: that comes later, from an agent interview, if you choose to go further.</p>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
+      <div class="stats">
+        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
+        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
+        ${statCell(I.calendar, `Taken`, `3 Aug`, `2026 &middot; one attempt`)}
+        ${statCell(I.growth, `Level`, `Not set`, `the interview decides it`)}
+      </div>
+    </div>
+    <div class="sec tint sec-stp">
+      ${stepper('whereConsult',[
+        {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 3'},
+        {st:'done',lab:'Account created',sec:'Aug 12'},
+        {st:'on',  lab:'Consultant call',sec:'Jordan Blake · Thu, Aug 13 · 15 minutes'},
+        {st:'',    lab:'Interview with an agent',sec:'Sets your level · 45 minutes'},
+        {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
+        {st:'',    lab:'Enroll and start your 90 days'}
+      ],1,'Where you are')}
+    </div>
+    <div class="sec flat">
+      <div class="sec-h"><h2>How this works</h2></div>
+      <div class="acc">
+        <div class="acc-i"><button class="acc-h"><span class="ttl">The quiz gives you a title</span><span class="chev">${I.chevDown}</span></button>
+          <div class="acc-b"><p>Explorer, Builder or Trailblazer. It is the band you start in, and it came across with your account &mdash; you do not retake it.</p></div></div>
+        <div class="acc-i"><button class="acc-h"><span class="ttl">The interview sets your level</span><span class="chev">${I.chevDown}</span></button>
+          <div class="acc-b"><p>Each title has five rungs, E1 to E5. A talent agent talks to you for forty-five minutes, confirms the rung and signs a report. A quiz cannot do this and the consultant call does not either.</p></div></div>
+        <div class="acc-i"><button class="acc-h"><span class="ttl">Every 90 days you can move up</span><span class="chev">${I.chevDown}</span></button>
+          <div class="acc-b"><p>Your level opens the course built for it. Ninety days later you re-interview, and you move up a rung, hold where you are, or drop back one.</p></div></div>
+      </div>
+    </div>`;
+
+  else if(S.stage==='new') body = `
+    ${ph('Welcome Back, Maryam!','Your next step, and everything decided so far.')}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p><b>Book your interview.</b> Three agents have slots this week. Booking early usually means starting in 10 days rather than 4 weeks.</p></div>
+        <div class="ai-foot noline">
+          <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
+          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
+      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
+    </div>
+    <div class="rail-wrap">
+      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
+    </div>
+    <div class="sec tint sec-stp">
+      ${stepper('whereNew',[
+        {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 12'},
+        {st:'on',  lab:'Interview with an agent',sec:'Not booked yet · 45 minutes'},
+        {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
+        {st:'',    lab:'Enroll and start your 90 days'}
+      ],1,'Where you are')}
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Decided so far</h2><button class="btn btn-g btn-sm noic" data-go="level">View My Level</button></div>
+      <div class="tile-stack spaced">
+        ${gcard('track','Your track','Explorer','From your quiz. Your level is set at the interview.','level')}
+        ${gcard('course','What comes next','A 90-day course','13 chapters, a cohort of ten and a live cohort leader. Course and price follow your level.','level')}
+      </div>
+    </div>`;
+
+  else if(S.stage==='booked') body = `
+    ${ph('Welcome Back, Maryam!','Interview in 6 days. Everything decided so far is below.')}
+    <div class="sec">
+      <div class="plate">
+        <div class="plate-who">${avatar(AGENTS.priya,56)}
+          <span class="plate-wb"><b>Priya Nair</b><span>Talent agent &middot; assesses Explorer</span></span>
+        </div>
+        <div class="plate-eb">Next up</div>
+        <div class="plate-t">Your level interview</div>
+        <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
+          <button class="btn btn-sm noic plate-b2" data-go="interviews">Reschedule</button>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p><b>Prepare one delegation story.</b> It is the question this agent asks most often. Ten minutes of practice is usually enough.</p></div>
+        <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
+          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      </div>
+    </div>
+    <div class="sec tint sec-stp">
+      ${stepper('whereBooked',[
+        {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
+        {st:'done',lab:'Interview booked',sec:'Priya Nair · Thu, Aug 20'},
+        {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
+        {st:'',    lab:'Enroll and start your 90 days'}
+      ],1,'Where you are')}
+    </div>`;
+
+  else if(S.stage==='assessed') body = `
+    ${ph('Welcome Back, Maryam!','Your level is confirmed. One step left before the 90 days start.')}
+    <div class="sec">
+      <div class="lvl-hero on-dark lvl-foot-card" style="margin:0">
+        <div class="big">Explorer &ndash; E3</div>
+        <div class="sub">Rung 3 of 15 on the Explorer track</div>
+        ${ladder('E3')}
+        <div class="lvl-foot">
+          <div class="eb"><span class="eb-ok">${I.checkFilled}</span>Confirmed &middot; signed by Priya Nair, 21 August</div>
+          <div class="lvl-foot-a">
+            <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>
+            <button class="btn btn-s" data-go="report">Read my report ${I.document}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p><b>Enroll on Explorer Track &ndash; E3.</b> The next cohort starts within two weeks, and you keep it for all 90 days.</p></div>
+        <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
+      <p class="all-desc">Thirteen chapters, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
+      <div class="ch-two">${CH.map((c,i)=>`
+        <div class="ch ch-flat">
+          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
+        </div>`).join('')}</div>
+    </div>`;
+
+  else if(f.complete) body = `
+    ${ph('Welcome Back, Maryam!','Cohort 41 is complete. You moved up a rung.')}
+    ${achBanner()}
+    <div class="sec">
+      <div class="lvl-hero" style="margin:0">
+        <div class="eb">Re-interview · 21 November · signed by Priya Nair</div>
+        <div class="big">Explorer &ndash; E4</div>
+        <div class="sub">Promoted from E3 · rung 4 of 15</div>
+        ${ladder('E4')}
+      </div>
+    </div>
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p><b>Explorer Track &ndash; E4 opens on December 1.</b> Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
+      </div>
+    </div>
+    <div class="sec"><div class="btn-set">
+      <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E4 ${I.arrowRight}</button>
+      <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
+    </div></div>
+    <div class="sec tint">
+      <div class="sec-h"><h2>Cohort 41, in the end</h2><a data-go="transcript">Course Progress</a></div>
+      <button class="score-link" data-go="rewards">${scoreCard(GAME.promoted)}</button>
+    </div>
+    <div class="sec">
+      <div class="tile" style="padding-top:var(--s04)">
+        ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:GAME.promoted.weeks,
+          target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
+      </div>
+    </div>
+    <div class="sec tint">
+      <div class="sec-h"><h2>What changes at E4</h2></div>
+      ${/* THE ACTION GOES TO THE END OF THE ROW IT BELONGS TO.
+            Both of these were a heading, a line, and a button on a line of
+            its own underneath — three rows for one offer, twice, in a block
+            whose two halves are the same shape. There is a column and a
+            half of empty tile to the right of each sentence and the button
+            is the only other thing in the row, so that is where it goes:
+            what changes on the left, what to do about it at the right-hand
+            end, one row each. `.chgrow` is the shape; §24 draws it. */''}
+      <div class="tile-stack">
+        <div class="tile chgrow"><div class="chgrow-b"><h3>You can lead a cohort</h3>
+          <div class="sub">Volunteer to lead any cohort below E4. It is recognition, not payment, and your request goes to the admin team.</div></div>
+          <button class="btn btn-g btn-sm" data-go="transcript">Become a Cohort Leader ${I.arrowRight}</button></div>
+        <div class="tile chgrow"><div class="chgrow-b"><h3>Your listing goes public</h3>
+          <div class="sub">Your level and certificates become a shareable page. Nothing else on your profile is published.</div></div>
+          <button class="btn btn-g btn-sm" data-go="account">Manage what is shown ${I.arrowRight}</button></div>
+      </div>
+    </div>`;
+
+  else { /* enrolled: week1, day34, day90 */
+    const g = GAME[S.stage];
+    const stalling = S.stage==='day34';
+    const dueRe = S.stage==='day90';
+    /* THE ONE REQUIRED ACTION GOES ABOVE THE READING.
+       On day 90 the re-interview is the only thing on this page that has a
+       deadline: everything else — where you stand, the progress strip, the
+       weekly chart — is a record of ninety days that are already over. It
+       sat at the FOOT of that record, four blocks and a chart below the
+       fold, which is the one place a due action cannot be. It sits directly
+       under the achievement band instead, so the top of the page reads:
+       here is what you just won, and here is the thing to do next.
+
+       Order in the source is not order on the page: `talFirst` (below) lifts
+       Tal's card to sit against the header, and `placeBand` in ai5.js then
+       wraps the two into the module head. The plate lands after the band and
+       after the achievement banner, which is where it is wanted. */
+    const reBook = dueRe?`<div class="sec">
+      <div class="plate">
+        <div class="plate-eb">Due now</div>
+        <div class="plate-t">Book your re-interview</div>
+        <div class="plate-b">Your ninety days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.</div>
+        <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
+      </div></div>`:'';
+    body = `
+    ${ph('Welcome Back, Maryam!', f.finished?'Explorer Track &ndash; E3 · Cohort 41 · ninety days complete':`Explorer Track &ndash; E3 · Cohort 41 · week ${f.week} of 13`)}
+    ${achBanner()}
+    ${reBook}
+    <div class="sec">
+      <div class="ai-aura tile tight">
+        <div class="ai-head">${talLabel()}<h3>${stalling?'Where you are stuck':dueRe?'Before your re-interview':'Getting started'}</h3></div>
+        <div class="ai-body"><p>${stalling
+          ?'You have opened chapter 4 four times without finishing it, and it is the growth area in your report. Worth the extra time.'
+          :dueRe?'All thirteen chapters are done and your average is 87%. Book the re-interview and Priya will assess the ninety days against your summary.'
+          :'Chapter 1 unlocks today and your first call is Thursday. Nothing is assessed this week.'}</p></div>
+        <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
+          stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
+      </div>
+    </div>
+    ${/* NO EYEBROW ON THIS ONE. "Weekly call" over "Cohort … Session" was the
+          same fact said twice — the title already names the thing — and the
+          label was costing a whole row above the title on a card whose only
+          real content is four short lines. `data-when` carries the distance
+          in time instead of the old "label · when" eyebrow; `placePlates` in
+          ai5.js reads it and, finding no label, seats the TITLE in the head
+          row so the timer chip holds the opposite corner of the title's own
+          line rather than of an empty one. The note there is where that is
+          written down. */''}
+    ${f.finished?'':`<div class="sec">
+      <div class="plate" data-when="in 2 days">
+        <div class="plate-who">${avatar(AGENTS.priya,56)}
+          <span class="plate-wb"><b>Priya Nair</b><span>Cohort leader &middot; leads Cohort 41</span></span>
+        </div>
+        <div class="plate-t">Cohort Week 36 Session</div>
+        <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic" data-go="cohort">Join Call ${I.video}</button>
+        </div>
+      </div>
+    </div>`}
+  ${g?`<div class="sec">
+    <div class="sec-h"><h2>Where you stand</h2><a data-go="rewards">View more</a></div>
+    ${standRow(g)}
+  </div>`:''}
+    ${f.finished?'':`<div class="sec tint">
+      <div class="sec-h"><h2>This week</h2><a data-go="coursework">Coursework</a></div>
+      ${weekCard(f)}
+    </div>`}
+    <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
+    <div class="sec">
+      <div class="tile" style="padding-top:var(--s05)">
+        ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:g.weeks,
+          target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
+      </div>
+    </div>
+`;
+  }
+  return `<main class="main"><div class="page">${body}</div></main>`;
+};
+
+V.level = (f) => {
+  const confirmed = !f.pred;
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'My Level')}
+  ${ph('My Level', confirmed?'Your level, what it is based on, and how you move up.':'Your track, and how your level gets set.')}
+  <div class="lvl-hero">
+    <div class="eb">${confirmed?(f.complete?'Promoted November 21 · signed by Priya Nair':'Confirmed August 21 · signed by Priya Nair'):'Your track, from the quiz'}</div>
+    <div class="big">${confirmed?lvlName(f.level):f.track}</div>
+    <div class="sub">${confirmed?'Rung '+rungOf(f.level)+' of 15':'Your level is set at the interview'}</div>
+    ${confirmed?ladder(f.level):trackBand(f.track)}
+  </div>
+  <!-- ONE WAY INTO THE REPORT, NOT THREE. A black primary button sat here
+       saying "Read my full report", the signed card below it is itself a
+       button to the same place, and that card closes with "Read the full
+       report" as a link. Three controls, one destination, stacked. The two
+       that belong to the card stay — the card IS the report's summary, so
+       the way in reads off the thing it summarises — and the loose button
+       above goes. The link at the foot of the card is where the reading
+       ends, which is where the next step belongs. -->
+  <div class="sec mt6">
+    <!-- ONE CONTROL, AT THE FOOT. The card used to be a button — the whole
+         block clickable, with a trailing arrow saying so — AND it closed with
+         a link to the same place. Now that the link is a real button (§29.16)
+         the card stops being one: two controls wrapping one destination is a
+         click target inside a click target, and the arrow was the only thing
+         announcing the outer one. The button says it better, and says it
+         where the reading ends. -->
+    <div class="${confirmed?'signed':'tile bordered'}">
+      ${confirmed?`<div class="signed-h">
+        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
+        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>Level interview · 20 August 2026</span></span>
+      </div>`:'<div class="ai-head"><h3>What the Explorer track means</h3></div>'}
+      <div class="ai-body">
+        ${confirmed?`<p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p>You reason from consequence to people, not policy. Three examples, each with a date and a name attached.</p>
+        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p>Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.</p>`
+        :`<p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
+        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>`}
+      </div>
+      ${confirmed?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
+    </div>
+  </div>
+  ${!confirmed?`<div class="sec">
+    <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
+  </div>`:''}
+  <!-- THE REFERENCE BLOCK SITS ON THE PANEL TONE. Everything above this on
+       the page is about YOUR level; this is how the ladder works for
+       everyone, which is supporting material — exactly what §12's second
+       tone is for. It also ends the run of white blocks at the foot of the
+       page, so the tone change is what separates it rather than one more
+       hairline. -->
+  <div class="sec flat tint">
+    <div class="sec-h"><h2>How the ladder works</h2></div>
+    <div class="acc">
+      <div class="acc-i"><button class="acc-h"><span class="ttl">The three tracks</span><span class="chev">${I.chevDown}</span></button>
+        <div class="acc-b"><p>Explorer (E1&ndash;E5), Builder (B1&ndash;B5), Trailblazer (T1&ndash;T5). Fifteen rungs in one line. You do not jump tracks, you move up one rung at a time.</p></div></div>
+      <div class="acc-i"><button class="acc-h"><span class="ttl">Moving up</span><span class="chev">${I.chevDown}</span></button>
+        <div class="acc-b"><p>Every course is 90 days. Once the ninety days are up you re-interview, and you move up a rung, hold where you are, or drop back one.</p></div></div>
+      <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
+        <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
+    </div>
+  </div>
+</div></main>`;
+};
+
+V.report = (f) => `<main class="main"><div class="page">
+  ${crumb(['My Level','level'],'Report')}
+  <div class="lvl-hero">
+    <div class="eb">${S.iv==='re'?'Re-interview · confirmed November 22':'Level interview · confirmed August 21'}</div>
+    <div class="big">${lvlName(f.level)}</div>
+    <div class="sub">Rung ${rungOf(f.level)} of 15 on the Explorer track</div>
+    ${ladder(f.level)}
+  </div>
+  <div class="sec mt6">
+    <div class="tile">
+      <div class="row-lead">
+        ${avatar(AGENTS.priya,40)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">Assessed and signed by Priya Nair</div>
+          <div class="t-helper-01 mt3">August 21, 2026 · 45-minute interview</div>
+        </div>
+      </div>
+      <div class="note mt5 band">
+        <span style="fill:var(--icon-secondary)">${I.user}</span>
+        <div class="nb"><b>Priya&rsquo;s note</b>&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;</div>
+      </div>
+      <div class="mt5"><button class="btn btn-g" data-go="account">Ask for your level to be reviewed ${I.renew}</button></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="ai-head"><h3>Strengths and growth areas</h3></div>
+      <div class="ai-body">
+        <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p>You reason from consequence to people, not policy. You gave three examples where you changed a decision after listening, and each one had a date and a name attached.</p>
+        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p>You describe delegation as risk. Twice you took work back rather than let it land badly. Chapters 4 and 12 are built on exactly this.</p>
+      </div>
+      <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">Written by Priya Nair from your interview</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>From this interview</h2><span class="t-helper-01">Kept for 24 months</span></div>
+    <div class="rec">
+      <div class="rec-plate"><span class="rec-play">${I.play}</span><span class="rec-len">45:12</span></div>
+      <div class="rec-b">
+        <div class="t-heading-compact-01">${S.iv==='re'?'Re-interview':'Level interview'} recording</div>
+        <div class="t-helper-01 mt3">${S.iv==='re'?'November 21, 2026':'August 20, 2026'} &middot; video and audio &middot; Priya Nair</div>
+        <div class="btn-set mt5">
+          <button class="btn btn-g btn-sm">Watch the recording ${I.play}</button>
+          <button class="btn btn-t btn-sm" data-go="ivt" data-iv="${S.iv}">Read the transcript ${I.document}</button>
+          <button class="btn btn-t btn-sm">Download ${I.download}</button>
+        </div>
+      </div>
+    </div>
+    <p class="t-legal-01 mt5" style="color:var(--text-helper)">You can ask for this recording to be deleted at any time. Deleting it does not reverse the level it confirmed.</p>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Scenes from this interview</h2></div>
+    <p class="t-body-01 mb5" style="color:var(--text-secondary)">Priya marked six moments from your interview. Keep the three you would be happy to show an employer. The rest are removed from the shared version.</p>
+    <div class="tile-stack">
+      ${clip('The reorganization call','Where you changed your mind after listening','02:14','1:48',true)}
+      ${clip('Handing over the vendor review','You explain why you took it back','11:02','2:10',true)}
+      ${clip('The Friday rhythm','How your weekly meeting actually runs','19:37','1:22',true)}
+      ${clip('Managing up','Answer trails off at the end','24:50','2:41',false)}
+      ${clip('Conflict with a peer','Strong opening, thin resolution','31:15','1:56',false)}
+      ${clip('Closing reflection','Summary of your own gaps','41:03','1:11',false)}
+    </div>
+    <p class="t-helper-01 mt4" id="clipCount">3 of 3 kept. Deselect one to swap.</p>
+    <div class="mt5">${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}</div>
+  </div>
+  <div class="sec"><div class="btn-set">
+    ${f.enrolled||f.complete?'':`<button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>`}
+    <button class="btn btn-t">Download report as PDF ${I.download}</button>
+    <button class="btn btn-t">Watch the full interview ${I.video}</button>
+  </div></div>
+</div></main>`;
+
+V.interviews = (f) => {
+  const booked = S.stage==='booked';
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Interviews')}
+  ${ph('Interviews', f.complete?'Your interview history, and the re-interview that set your current level.'
+    : f.reinterview?'Your ninety days are complete. Book a re-interview to have them assessed, and whoever you pick reads your summary first.'
+    : booked?'Your booked interview, and what happens after it.'
+    : 'A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.',
+    booked ? '' : `<button class="btn btn-p" data-go="agents">${f.reinterview?'Book your re-interview':'Choose an agent'} ${I.arrowRight}</button>`)}
+  ${(f.enrolled||f.complete||!f.pred)?`
+  <div class="sec">
+    <div class="sec-h"><h2>Past interviews</h2><span class="t-helper-01">Kept for 24 months</span></div>
+    <div class="ivlist">
+      ${f.complete?ivRow('re','Re-interview','November 21, 2026','Promoted to Explorer &ndash; E4','44:06'):''}
+      ${ivRow('level','Level interview','August 20, 2026','Confirmed Explorer &ndash; E3','45:12')}
+    </div>
+  </div>`:''}
+  ${booked?`
+  <div class="sec">
+    <div class="sec-h"><h2>Scheduled</h2></div>
+    <div class="tile">
+      <div class="kv"><span class="k">Agent</span><span class="v">Priya Nair</span></div>
+      <div class="kv"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
+      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
+      <div class="kv"><span class="k">Paid</span><span class="v n">$95 · Visa ending 4242</span></div>
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-p">Join the interview ${I.video}</button>
+      <button class="btn btn-t">Add to calendar ${I.calendar}</button>
+      <button class="btn btn-t" data-go="agents">Reschedule or cancel ${I.time}</button>
+    </div>
+    <p class="t-helper-01 mt4">Free to reschedule up to 24 hours before. Inside 24 hours the fee is not refundable.</p>
+  </div>`:`
+  <div class="sec">
+    <div class="facts">
+      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
+      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
+      <div><span class="l">Your report</span><span class="v">Within 24 hours</span></div>
+      <div><span class="l">Fee</span><span class="v">From $80</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>How it works</h2></div>
+    <ol class="steps">
+      <li><span class="s-n">1</span><span class="s-b"><b>You choose the agent</b>
+        Every agent who assesses your track is listed with their next free slot. You pick who you talk to.</span></li>
+      <li><span class="s-n">2</span><span class="s-b"><b>You have the conversation</b>
+        Forty-five minutes by video. Your agent walks you through real situations from your own answers and asks what you did and why. There is nothing to revise and no way to fail it.</span></li>
+      <li><span class="s-n">3</span><span class="s-b"><b>Your agent writes your report</b>
+        Within 24 hours, signed by the person who interviewed you: your strengths, your growth areas, and the level they have confirmed you at.</span></li>
+      <li><span class="s-n">4</span><span class="s-b"><b>The report is yours</b>
+        It stays in your account and you decide who ever sees it. Your level opens the course built for that level.</span></li>
+    </ol>
+  </div>
+`}
+</div></main>`;
+};
+
+V.agents = (f) => `<main class="main"><div class="page">
+  ${crumb(['Interviews','interviews'],'All agents')}
+  ${ph(f.reinterview?'Choose an agent for your re-interview':'Choose an agent','A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.')}
+
+  <div class="sec" style="padding-bottom:var(--s05)">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>Suggested for you</h3></div>
+      <div class="ai-body"><p>3 of 24 agents assess ${f.pred?'Explorer candidates':'at your level'} and have a slot inside seven days. They are ordered by how their past candidates progressed.</p></div>
+    </div>
+  </div>
+
+  <div class="rail-wrap">
+    <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
+  </div>
+
+  <div class="sec">
+    <div class="hd-srch">
+      <div class="hd-srch-t">
+        <div class="sec-h"><h2>All agents</h2></div>
+        <p class="all-desc">Select an agent from whom you want to be interviewed.</p>
+      </div>
+      <div class="srch all-srch">
+        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+        <input class="inp" placeholder="Search all 24 agents" aria-label="Search agents">
+      </div>
+    </div>
+  </div>
+
+  <div class="rail-wrap">
+    <div class="rail rail-all">${['priya','owen','lena','samuel','hana','priya'].map(k=>agentCardH(k)).join('')}</div>
+  </div>
+</div></main>`;
+
+V.agent = (f) => {
+  const a = AGENTS[S.agent||'priya'];
+  const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
+  return `<main class="main"><div class="page">
+  ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
+  <div class="sec" style="padding-top:var(--s05)">
+    <div class="agid">
+      ${avatar(a,96)}
+      <div class="agid-b">
+        <div class="agid-n">${a.n}</div>
+        <div class="agid-r">${stars(a.r)}<span class="num">${a.r.toFixed(1)}</span><span class="agid-iv">&middot; ${a.ivs} interviews</span></div>
+        <div class="agid-c"><span>Assesses ${a.range}</span><span class="agid-v">${I.checkFilled}Verified</span></div>
+      </div>
+    </div>
+    ${a.bio?`<p class="agid-bio">${a.bio}</p>`:''}
+    <div class="mt5 kv-bands">
+      <div class="kv"><span class="k">Interview fee</span><span class="v">${a.price}</span></div>
+      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
+      <div class="kv"><span class="k">Report turnaround</span><span class="v n">Within 24 hours</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>What to expect with ${a.n.split(' ')[0]}</h3></div>
+      <div class="ai-body"><p>She opens with a situation from your own answers, then asks what you decided. Have a delegation example ready.</p></div>
+      <div class="ai-foot">${askChip('Run a practice interview with me for '+a.n.split(' ')[0],'Practice with Tal')}</div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Pick a slot</h2><span class="t-helper-01">Times in ET</span></div>
+    <div class="daystrip">
+      ${[['Wed',19],['Thu',20],['Fri',21],['Mon',24],['Tue',25]].map(([d,n],i)=>
+        `<button class="day ${i===1?'on':''}"><div class="d">${d}</div><div class="n">${n}</div></button>`).join('')}
+    </div>
+    <div class="slots">${slots.map((t,i)=>
+      `<button class="slot ${i===4?'on':''}" ${i===0||i===5?'disabled':''}>${t}</button>`).join('')}</div>
+    <p class="slots-note">Two other candidates are looking at Thursday. Slots are held for 10 minutes once you continue.</p>
+  </div>
+</div></main>
+<div class="stickybar">
+  <div class="sb-b">
+    <span class="sb-when">Thu, Aug 20 &middot; 6:30 PM</span>
+    <span class="sb-price">${a.price}</span>
+  </div>
+  <button class="btn btn-p sb-go" data-go="booking">Continue to payment ${I.arrowRight}</button>
+</div>`;
+};
+
+V.booking = (f) => `<main class="main"><div class="page">
+  <div class="sec" style="padding-top:var(--s06)">
+    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${(AGENTS[S.agent||'priya']).n}. A calendar invite and joining link are in your email.</div></div>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="kv"><span class="k">Agent</span><span class="v">${(AGENTS[S.agent||'priya']).n}</span></div>
+      <div class="kv"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
+      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
+      <div class="kv"><span class="k">Paid</span><span class="v n">${(AGENTS[S.agent||'priya']).price} · Visa ending 4242</span></div>
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-t">Add to calendar ${I.calendar}</button>
+      <button class="btn btn-t" data-go="interviews">Reschedule or cancel ${I.time}</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>Time to prepare</h3></div>
+      <div class="ai-body"><p>Your quiz flagged delegation and hard conversations. Ten minutes of practice on either, with feedback.</p></div>
+      <div class="mt5" style="display:flex;flex-direction:column;gap:1px">
+        <button class="tile clk band" data-tal-ask="Run a mock interview on delegation"><span class="t-body-compact-01">Run a mock on delegation</span></button>
+        <button class="tile clk band" data-tal-ask="Help me find a real delegation example from my own work"><span class="t-body-compact-01">Help me find a real example</span></button>
+      </div>
+      
+    </div>
+  </div>
+  <div class="sec"><button class="btn btn-p" data-go="stage:booked">Back to my dashboard ${I.arrowRight}</button></div>
+</div></main>`;
+
+V.enrol = (f) => {
+  const next = f.complete;
+  const lvl = next?'E4':'E3';
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],next?'Next course':'Enroll')}
+  <div class="ph">
+    <div class="ph-top">${bk()}<h1>Explorer Track &ndash; ${lvl}</h1></div>
+    <p>90 days, 13 chapters, and a cohort of ten with a live cohort leader.</p>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile tight">
+      <div class="ai-head">${talLabel()}<h3>What the 90 days ask of you</h3></div>
+      <div class="ai-body"><p>An hour a week, plus the 60-minute cohort call. People who keep to that average above 85%.</p></div>
+      <div class="ai-foot">${askChip('How much time does the course really take each week?','Ask Tal about the workload')}</div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.book, `Chapters`, `13`, `one a week`)}
+      ${statCell(I.video, `Live calls`, `13`, `60 min, weekly`)}
+      ${statCell(I.group, `Cohort size`, `10`, `max, all at ${lvl}`)}
+      ${statCell(I.calendar, `Re-interview`, `Day 91`, `then you move`)}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="note"><span>${I.group}</span><div class="nb"><b>Your cohort is assigned for you</b>You join a group of up to ten people at your level, led by a cohort leader. Your cohort and its weekly call time appear on your dashboard as soon as you enroll.</div></div>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="kv"><span class="k">Course fee</span><span class="v">$690</span></div>
+      <div class="kv"><span class="k">${next?'Returning candidate credit':'Interview already paid'}</span><span class="v n">&minus;$95</span></div>
+      <div class="kv kv-due"><span class="k">Due today</span><span class="v">$595</span></div>
+    </div>
+    <p class="t-helper-01 mt4">One payment. Nothing recurs, and the re-interview at the end is included.</p>
+    <div class="pay-act mt5">
+      <button class="btn btn-p" data-go="payment">Continue to payment ${I.arrowRight}</button>
+      ${askChip('What happens on the weekly cohort call?','Ask Tal about the calls')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>What the 90 days cover</h2><a data-go="coursework">All 13</a></div>
+    <div class="tile-stack">${[0,1,2,3].map(i=>chRow(i,{done:0,open:-1,week:99,enrolled:false})).join('')}</div>
+  </div>
+</div></main>`;
+};
+
+V.payment = (f) => `<main class="main"><div class="page">
+  ${crumb(['Enroll','enrol'],'Payment')}
+  ${ph('Payment','Explorer Track &ndash; E3 · 90 days · your cohort starts within two weeks.')}
+  <div class="sec">
+    <div class="f"><label for="cn">Card number</label><input class="inp" id="cn" inputmode="numeric" placeholder="1234 5678 9012 3456"></div>
+    <div class="f"><label for="cnm">Name on card</label><input class="inp" id="cnm" placeholder="Maryam Naz"></div>
+    <div style="display:flex;gap:var(--s05)">
+      <div class="f" style="flex:1"><label for="cx">Expiry</label><input class="inp" id="cx" placeholder="MM/YY"></div>
+      <div class="f" style="flex:1"><label for="cv">Security code</label><input class="inp" id="cv" placeholder="123"></div>
+    </div>
+    <div class="f"><label for="cz">Billing ZIP code</label><input class="inp" id="cz" placeholder="10018"></div>
+    <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span><span class="txt">Save this card for future courses</span></label>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="kv"><span class="k">Explorer Track &ndash; E3</span><span class="v n">$690</span></div>
+      <div class="kv"><span class="k">Interview credit</span><span class="v n">&minus;$95</span></div>
+      <div class="kv"><span class="k" style="color:var(--text-primary);font-weight:600">Total</span><span class="v">$595</span></div>
+    </div>
+    <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
+    <div class="mt5"><button class="btn btn-p" data-go="stage:week1">Pay $595 and start ${I.arrowRight}</button></div>
+    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Full refund up to 7 days after your cohort starts, provided you have not completed more than one chapter.</p>
+  </div>
+</div></main>`;
+
+/* ==========================================================================
+   THE COURSEWORK MODULE IS BLANK ON PURPOSE
+
+   LightspeedVT is the courseware, and in the product the whole of this module
+   is THEIR interface inside an iframe — not ours with a frame somewhere in it.
+   The moment a candidate opens Coursework they are looking at LightspeedVT, so
+   anything we draw here is a second set of chrome around a screen that already
+   has its own.
+
+   So both views in the module — the chapter list and the chapter itself —
+   render one empty slot and nothing else: no crumb, no page header, no Tal
+   card. The slot is `.lsvt-slot`, sized in §29 to fill the view column, and it
+   is where the iframe goes once the LightspeedVT screens are confirmed.
+
+   Consequences worth knowing, so the blank does not look broken:
+     - `placeBand` (ai5) and `placeAI` (ai2) both bail on a page with no `.ph`
+       and no `.lsvt-sec`, so neither injects anything here. Nothing to undo.
+     - `coursework` is dropped from `ASK_ON` in ai4 for the same reason — an
+       ask line is a member of the head band, and there is no head.
+     - The rail entry, the dashboard tiles and the transcript rows still point
+       here. They are how you REACH the courseware, and they stay.
+
+   What was here is parked below in `PARKED`, unreferenced. It is the design we
+   drew for a world where we owned this module, and it is the reference for
+   anything that turns out to live outside the iframe (progress, notes, the
+   chapter's Tal card) once we see how much of it LightspeedVT already does.
+
+   BOTH VIEWS ARE THE SAME FRAME. `coursework` and `chapter` were two screens
+   of ours; they are now one embedded application that has its own screens, and
+   which one it is showing is `S.ls`, not `S.view`. The pair is kept rather
+   than collapsed to one because the rail, the dashboard tiles and the
+   transcript rows all still point at both names, and `PARENT` maps `chapter`
+   under `coursework` so the rail highlights correctly either way.
+   ========================================================================== */
+const lsvtFrame = () => `<main class="main lsvt-blank"><div class="page"><div class="lsvt-slot">
+  <iframe class="lsvt-if" title="Coursework &mdash; LightspeedVT"></iframe></div></div></main>`;
+
+V.coursework = lsvtFrame;
+V.chapter = lsvtFrame;
+
+const PARKED = {};
+
+PARKED.coursework = (f) => {
+  const pct = Math.round(f.done/13*100);
+  const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Coursework')}
+  ${ph('Coursework',`${f.done} of 13 chapters &middot; ${pct}% &middot; ${hrs} invested`)}
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb">Your cohort moves together. Chapter ${Math.min(f.week+1,13)} opens on Monday, whether or not you finish the ones before it.</div></div>
+  </div>
+  <div class="sec flat bleed">
+    <div class="tile-stack">${CH.map((_,i)=>chRow(i,f)).join('')}</div>
+  </div>
+</div></main>`;
+};
+
+PARKED.chapter = (f) => {
+  const i = S.ch ?? f.open ?? 3;
+  const name = CH[i][0], mins = CH[i][1];
+  const inprog = S.stage==='day34' && i===3;
+  const stg = Math.min(S.stg||0, STAGE_L.length-1);
+  const done = i < f.done;
+  return `<main class="main"><div class="page">
+  ${crumb(['Coursework','coursework'],'Chapter '+(i+1))}
+  <div class="ph">
+    <span class="card-tag">Chapter ${i+1} of 13 · week ${i+1}</span>
+    <div class="ph-top">${bk()}<h1>${name}</h1></div>
+    <p>${i===3?'The shift from doing the work to owning the outcome, and what has to be true before you hand something over.':'Part of the Explorer Track &ndash; E3 curriculum.'}</p>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="pb" style="margin-bottom:var(--s05)">
+        <div class="pb-top"><span class="l">Your progress</span><span class="v">${done?mins+' of '+mins:(inprog?'12 of '+mins:'0 of '+mins)} min</span></div>
+        <div class="pb-track"><div class="pb-fill${done?' succ':''}" style="width:${done?100:(inprog?17:0)}%"></div></div>
+      </div>
+      <div class="kv"><span class="k">Video</span><span class="v n">${done?'6 of 6 watched':inprog?'4 of 6 watched':'Not started'}</span></div>
+      <div class="kv"><span class="k">Reading</span><span class="v n">${done?'Complete':'Not opened'}</span></div>
+      <div class="kv"><span class="k">Roleplay</span><span class="v n"><button class="lnk" data-go="rp">${done?'Complete &middot; run it again':'Practice with Tal'}</button></span></div>
+      <div class="kv"><span class="k">Assessment</span><span class="v n">${done?SCORE[i]+'%':'Locked until the roleplay is done'}</span></div>
+    </div>
+  </div>
+  <div class="sec lsvt-sec">
+    <div class="lsvt-head">
+      <div class="lsvt-ttl"><b>${STAGE_L[stg][0]}</b><span class="lsvt-n">${stg+1} of ${STAGE_L.length}</span></div>
+      <button class="btn btn-g btn-sm${S.notes?' on':''}" data-toggle="notes">${S.notes?'Hide notes':'Notes'} ${I.edit}</button>
+    </div>
+    <div class="lsvt-wrap">
+      <ol class="stp-list">
+        ${STAGE_L.map((s,n)=>`<li class="stp-row${n===stg?' on':''}${n<stg?' did':''}" data-stage="${n}" role="button" tabindex="0">
+          <span class="stp-ic">${n<stg?I.checkFilled:(n===stg?I.play:I.circle)}</span>
+          <span class="stp-b"><b>${s[0]}</b><span>${s[1]}</span></span></li>`).join('')}
+      </ol>
+      <div class="lsvt-frame">
+        <iframe class="lsvt-if" data-lsvt="${stg}" data-ttl="${name}" title="Course content"></iframe>
+      </div>
+    </div>
+    ${S.notes?`<div class="lsvt-notes">
+      <label class="t-label-01" for="chn">Your notes on this chapter</label>
+      <textarea class="inp ai-field" id="chn" placeholder="What landed, what did not">${i===3?'Handed the vendor review to Sam and took it back after two days. Did not tell him why.':''}</textarea>
+      <div class="lsvt-notes-f">${askChip('Turn my note into a reflection for this chapter','Turn this into a reflection')}<span class="t-legal-01">Saved to this chapter. Only you and Tal can see it.</span></div>
+    </div>`:''}
+    <div class="lsvt-foot">
+      <span class="t-helper-01">${stg===STAGE_L.length-1?'Finish the summary to complete this chapter.':'Time required before you can continue &middot; '+STAGE_L[stg][2]}</span>
+      <button class="btn btn-p" data-stage="${Math.min(stg+1,STAGE_L.length-1)}">${stg===STAGE_L.length-1?'Complete chapter':'Continue'} ${I.arrowRight}</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>Help with this chapter</h3></div>
+      <div class="ai-body"><p>${i===3?'This chapter comes down to one question: what has to be true before you hand something over. Most people get stuck because they treat it as a question about trust when it is a question about clarity.':'You can get a summary of this chapter, its key terms, or a few questions to test yourself once you have watched the video.'}</p></div>
+      <div class="mt5" style="display:flex;flex-direction:column;gap:1px">
+        ${['Explain this chapter in 60 seconds','Give me the two key terms','I am stuck, ask me a question instead'].map(q=>
+          `<button class="tile clk band" data-tal-ask="${q}"><span class="t-body-compact-01">${q}</span></button>`).join('')}
+      </div>
+    </div>
+  </div>
+</div></main>`;
+};
+
+V.rewards = (f) => {
+  const g = GAME[S.stage];
+  if(!g) return `<main class="main"><div class="page">${ph('Points','Points start once you enroll on a course.')}
+    <div class="sec"><div class="empty" style="padding:0 0 var(--s07)">${I.trophy}<h3 style="margin-top:var(--s06)">Nothing to show yet</h3>
+      <p>Points, badges and rank begin when your cohort starts.</p></div></div></div></main>`;
+  const tab = S.rtab || 'points';
+  const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`};
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Points')}
+  ${ph('Points','Points, badges and rank come from your activity across the course and the community.')}
+  ${/* THE QUESTION BELONGS AT THE TOP OF THE MODULE, NOT AT THE BOTTOM OF IT.
+        This chip sat at the very foot of the last section, under the points
+        table and the "updates within a few minutes" line — so the one thing
+        on the page that offers to explain the page was the last thing you
+        could reach, and on `day90` that is a scroll past nine rows.
+
+        It is a head-band member now, directly above the field you would type
+        the same question into. That is the structure every module landing
+        page already has (§25): header, what Tal offers, the line you ask in.
+        Points was the ONLY page in the build with a `.chip-tal` outside the
+        band — every other one measures zero — so this is a page catching up
+        with the pattern rather than a new pattern.
+
+        `.ask-chips` is the marker the two passes read: `_mhIsTal` in ai5
+        takes it into the band, and `placeAsk` in ai4 anchors the field under
+        it rather than under the header. The inner `.ai-asks` is the chip row
+        itself, borrowed from Tal's card — it carries the flex layout, the
+        chip styling and the §13 entrance, none of which needs a card around
+        it.
+
+        It no longer switches off outside the Points tab. A band member that
+        blinks in and out as you move between Points, Badges and Rank would
+        be the header changing shape under a tab strip below it, and the
+        question is about the module, which is all three tabs. */''}
+  <div class="sec ask-chips"><div class="ai-asks">
+    ${askChip('How do I earn points fastest?','Ask Tal how to earn more')}
+  </div></div>
+  <div class="sec" style="padding-bottom:var(--s06)">${scoreCard(g)}</div>
+  <div class="tabs">
+    ${['points','badges','rank'].map(k=>`<button class="${k===tab?'on':''}" data-rtab="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}
+  </div>
+  <div class="sec nofill" style="padding-top:var(--s05)">
+    <div class="sec-h" style="margin-bottom:var(--s04)"><span class="t-helper-01">${counts[tab]}</span>
+      <span class="t-helper-01" style="margin-left:auto">Updated today</span></div>
+    <div class="aw-list">
+      ${tab==='points'?pointsList(g):tab==='badges'?badgeList(g):rankList(g)}
+    </div>
+    ${tab==='points'?`<p class="t-helper-01 mt5">Points update within a few minutes of the activity.</p>`:''}
+    ${tab==='rank'?`<p class="t-helper-01 mt5">Rank reflects your activity. It is separate from your level.</p>`:''}
+  </div>
+</div></main>`;
+};
+
+V.transcript = (f) => {
+  const pct = Math.round(f.done/13*100);
+  const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Course Progress')}
+  ${ph('Course Progress', (f.complete||f.finished)?'Explorer Track &ndash; E3 · Cohort 41 · ninety days complete':`Explorer Track &ndash; E3 · Cohort 41 · day ${f.day} of 90`)}
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
+      ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
+      ${statCell(I.time, `Time invested`, `${hrs.split(' ')[0]}<small>${hrs.replace(/^\S+/,'')}</small>`, `${f.done?Math.round(f.mins/f.done)+' min per chapter':'not started'}`)}
+      ${statCell(I.flag, `Tasks on time`, `${S.stage==='day34'?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="tile">
+      <div class="ai-head"><h3>90-day summary · ${f.complete?'signed':'in progress'}</h3></div>
+      <div class="ai-body"><p>${f.complete?'Priya signed this on November 21. It is what your re-interview was assessed against, and it is yours to share.':'Priya adds to this after each weekly call and signs it at the end of the ninety days. Until then nothing in it is final.'}</p></div>
+      <div class="tag-row mt5">${f.complete?`<span class="tag green">${I.checkFilled}Signed by Priya Nair</span>`:`<span class="tag warm">${I.warningAlt}Not signed yet</span><span class="tag cool">Updated today</span>`}</div>
+      <div class="ai-foot"><a class="lk">${f.complete?'Read the summary':'Read what Priya has written'}</a></div>
+    </div>
+  </div>
+  ${f.done?`<div class="sec">
+    <div class="tile" style="padding-top:var(--s04)">
+      ${lineChart('sc',{title:'Assessment scores',sub:'70 to 100%',
+        data:SCORE.slice(0,f.done),labels:CH.map((c,i)=>'Chapter '+(i+1)),slots:13,
+        target:79,targetLabel:'Cohort average 79%',unit:'%',min:70,max:100})}
+    </div>
+  </div>
+`:''}
+  <div class="sec tint">
+    <div class="sec-h"><h2>Chapter record</h2></div>
+    <div class="tile-stack">${CH.slice(0,5).map((_,i)=>chRow(i,f)).join('')}</div>
+    <div class="mt4"><button class="btn btn-g" data-go="coursework">Show all 13 ${I.chevDown}</button></div>
+  </div>
+  ${f.done>0?`<div class="sec">
+    <div class="cert">
+      <span class="cert-mark">${I.certificate}</span>
+      <div class="cert-b">
+        <div class="cert-eb">Certificate of completion</div>
+        <div class="n">Explorer Track &ndash; ${f.complete?'E3':'E2'}</div>
+        <div class="m">${f.complete?'Completed November 21, 2026 · Cohort 41':'Completed May 4, 2026 · Cohort 12'}</div>
+        <div class="m">Signed by ${f.complete?'Priya Nair':'Daniel Kerr'}</div>
+      </div>
+      <div class="cert-act">
+        <button class="btn btn-sm noic cert-btn">Download</button>
+        <button class="btn btn-sm noic cert-btn">Share link</button>
+      </div>
+    </div>
+  </div>`:''}
+</div></main>`;
+};
+
+V.cohort = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Cohort 41')}
+  ${ph('Cohort 41',`Ten people at Explorer &ndash; E3, led by Priya Nair &middot; week ${f.week} of 13`)}
+  ${/* THE FOURTH CALL IS THE SAME CARD AS THE OTHER THREE.
+        This drew `.callband` — an orange date tile, the detail beside it, one
+        button at the right — and it was the only appointment in the product
+        that did. The agent interview, the consultant screening and this same
+        weekly call ON THE DASHBOARD are all `.plate`: the black wall with the
+        leader's face, an eyebrow, a title, a line of detail and up to two
+        actions. So the cohort page showed a candidate a different drawing of
+        the very call its own dashboard had just shown them, one click
+        earlier, and the orange tile was the loudest thing on a page whose
+        subject is the discussion below it.
+
+        Same six facts, in the component that already carries them. The
+        actions are the consultant plate's pair rather than the dashboard's
+        "Open the cohort" — you are already in the cohort, so the thing to
+        offer is joining the call and putting it in a calendar, which is what
+        `.callband` offered.
+
+        `.callband`'s CSS stays in §15/§19/§22 unreferenced. It is the only
+        drawing of a date-tile row in the build and worth keeping around until
+        someone decides it is not; nothing renders it today. */''}
+  <div class="sec">
+    <div class="plate">
+      <div class="plate-who">${avatar(AGENTS.priya,56)}
+        <span class="plate-wb"><b>Priya Nair</b><span>Cohort leader &middot; leads Cohort 41</span></span>
+      </div>
+      <div class="plate-eb">Weekly call &middot; in 2 days</div>
+      <div class="plate-t">Cohort 41, week ${f.week}</div>
+      <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic">Join call ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2">Add to calendar</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="ai-aura tile">
+      <div class="ai-head">${talLabel()}<h3>What to bring on Thursday</h3></div>
+      <div class="ai-body"><p>Priya is running week ${f.week} on ${f.week<=1?'why we exist':'hard conversations'}. Bring the Sam handover from your notes — it is the closest example you have.</p></div>
+      
+    </div>
+  </div>
+  ${/* sec-cs: this section holds a full-bleed tab strip, and §20 needs to know
+        so the call plate above it can sit flush. Named rather than sniffed —
+        the `:has()` that would have detected it has to nest, and nested
+        `:has()` is invalid CSS that takes its whole rule down with it. */''}
+  <div class="sec sec-cs">
+    <div class="cs">
+      <button class="${(S.ctab||'discussion')==='discussion'?'on':''}" data-ctab="discussion">Discussion</button>
+      <button class="${S.ctab==='ranking'?'on':''}" data-ctab="ranking">Ranking</button>
+      <button class="${S.ctab==='members'?'on':''}" data-ctab="members">Members</button>
+    </div>
+    ${S.ctab==='members'
+      ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,meta,you,img)).join('')}</div>`
+      : S.ctab==='ranking' ? boardList() : discussionRoom()}
+  </div>
+</div></main>`;
+
+V.messages = (f) => {
+  const her = AGENTS.priya;
+  const you = {i:'MN', img: AV.hana};
+  const av = a => avatar(a, 32);
+  const m = (side, who, body, when) => `<div class="m ${side}">
+    <span class="m-av">${av(side === 'me' ? you : her)}</span>
+    <div class="m-c">
+      <div class="m-b">${body}</div>
+      <div class="m-w">${who} &middot; ${when}</div>
+    </div>
+  </div>`;
+  const voice = (len) => `<span class="vn">
+    <span class="vn-play">${I.play}</span>
+    <span class="vn-wave">${Array.from({length:28},(_,i)=>`<i style="height:${4 + ((i*7)%11)}px"></i>`).join('')}</span>
+    <span class="vn-len">${len}</span></span>`;
+  const file = (n, s) => `<span class="fa">
+    <span class="fa-ic">${I.document}</span>
+    <span class="fa-b"><b>${n}</b><span>${s}</span></span>
+    <span class="fa-dl">${I.download}</span></span>`;
+  return `<main class="main"><div class="page msg-page">
+  <div class="ph" style="padding-bottom:var(--s04)"><h1>Messages</h1>
+    <p>One-to-one with Priya Nair. Private, and it stays after the cohort closes.</p></div>
+
+  <div class="msgs">
+    <div class="m-day"><span>Monday</span></div>
+    ${m('them','Priya Nair','Week 5 is the one people find hardest. If chapter 4 is not landing, say so on Thursday rather than pushing through it.','11:04 AM')}
+    ${m('me','You','It is not landing. I keep taking work back and I do not know how to stop doing that.','9:36 PM')}
+    <div class="m-day"><span>Tuesday</span></div>
+    ${m('them','Priya Nair','Good. That is the actual chapter. Bring the vendor review example on Thursday and we will work through it with the group, if you are happy with that.','9:12 AM')}
+    ${m('me','You','Yes. I will bring the handover I took back from Sam.','9:40 AM')}
+    <div class="m-unread"><span>2 unread messages</span></div>
+    ${m('them','Priya Nair', voice('0:38'),'Wed 8:15 AM')}
+    ${m('them','Priya Nair','Listen to that before Thursday. The one-pager below is the frame I want you to use for the handover.<br>' + file('Handover one-pager.pdf','PDF &middot; 240 KB'),'Wed 8:17 AM')}
+  </div>
+  <div class="msg-foot">
+    <div class="composer">
+      <span class="composer-star">${I.ai}</span>
+      <input class="inp" placeholder="Message Priya" aria-label="Message">
+      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
+      <button class="composer-act" aria-label="Record a voice message">${I.microphone}</button>
+      <button class="composer-send" aria-label="Send">${I.send}</button>
+    </div>
+  </div>
+</div></main>`;
+};
+
+V.billing = (f) => {
+  const rows = [];
+  if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
+  if(!f.pred) rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
+  if(S.stage==='booked') rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
+  rows.push(['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210']);
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Payments')}
+  ${ph('Payments','One-off payments only. Nothing here recurs.')}
+  <div class="sec pay-sec">
+    <div class="paytbl">
+      <div class="payrow payhead">
+        <span>What</span><span>When</span><span>Card</span>
+        <span class="num">Amount</span><span></span>
+      </div>
+      ${rows.map(([n,d,amt,br,last])=>`<div class="payrow">
+        <span class="pay-n">${n}</span>
+        <span class="pay-d">${d}</span>
+        <span class="pay-c">${br?bmk(br)+`<span class="n">&bull;&bull;&bull;&bull; ${last}</span>`:''}</span>
+        <span class="pay-a num">${amt}</span>
+        <span class="pay-r"><button class="lnk">Receipt</button></span>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Saved cards</h2><span class="t-helper-01">${S.cards.length} of 3</span>${S.cards.length<3?`<button class="btn btn-p btn-sm noic sec-h-act" data-addcard="1">Add a card ${I.add}</button>`:''}</div>
+    <div class="tile-stack">
+      ${S.cards.map((c,i)=>`<div class="cardrow">
+        <span class="cardrow-ic">${BMK[c.brand]||BMK.card}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${c.brand} ending ${c.last}${c.def?' <span class="pill-def">Default</span>':''}</span>
+          <span class="cardrow-d">Expires ${c.exp}</span>
+        </span>
+        <span class="cardrow-a">
+          ${c.def?'':`<button class="lnk" data-setdef="${i}">Make default</button>`}
+          <button class="lnk" data-delcard="${i}">Remove</button>
+        </span>
+      </div>`).join('')}
+    </div>
+    ${S.cards.length<3?'':`<p class="t-helper-01 mt4">Three cards is the maximum. Remove one to add another.</p>`}
+  </div>
+</div></main>`;
+};
+
+/* add-a-card sheet */
+function profileSheet(){
+  return `<div class="modal ${S.editProfile?'on':''}" data-close="editprofile">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Edit details</h2>
+        <button class="x" data-editprofile="0" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="idhead mb6">
+          <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
+            <span class="av-ph" style="width:64px;height:64px"><i>MN</i><img src="${AV.hana}" alt=""></span>
+            <span class="idphoto-edit">${I.edit}</span>
+          </button>
+          <div class="idhead-b">
+            <span class="idname">Your photo</span>
+            <span class="idmeta">Shown to your agent and your cohort.</span>
+            <button class="lk" data-editphoto="1">Change photo</button>
+          </div>
+        </div>
+        <div class="f"><label for="pn">Name</label><input class="inp" id="pn" value="Maryam Naz"></div>
+        <div class="f"><label for="pz">Time zone</label>
+          <select class="inp" id="pz">
+            <option>Eastern Time (ET)</option><option>Central Time (CT)</option>
+            <option>Mountain Time (MT)</option><option>Pacific Time (PT)</option>
+            <option>Pakistan Standard Time (PKT)</option>
+          </select></div>
+        <p class="t-helper-01">Your level is set by your agent and cannot be edited here.</p>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-editprofile="0">Cancel</button>
+        <button class="btn btn-p noic" data-editprofile="0">Save changes</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function photoSheet(){
+  const opts = ['hana','priya','lena','owen','samuel'];
+  return `<div class="modal ${S.editPhoto?'on':''}" data-close="editphoto">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Your photo</h2>
+        <button class="x" data-editphoto="0" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="photogrid">
+          ${opts.map((k,i)=>`<button class="photopick ${i===0?'on':''}" data-pick="${k}">
+            <span class="av-ph" style="width:100%;height:100%"><img src="${AV[k]}" alt=""></span></button>`).join('')}
+        </div>
+        <div class="btn-row mt6">
+          <button class="btn btn-s" data-editphoto="0">Upload a photo ${I.add}</button>
+          <button class="btn btn-t" data-editphoto="0">Remove ${I.close}</button>
+        </div>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-editphoto="0">Cancel</button>
+        <button class="btn btn-p noic" data-editphoto="0">Use this photo</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function cardSheet(){
+  return `<div class="modal ${S.addCard?'on':''}">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Add a card</h2><button class="x" data-addcard="0" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="f"><label for="nc">Card number</label>
+          <div class="inp-mk"><input class="inp" id="nc" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="1234 5678 9012 3456">
+            <span class="bmk lg" id="ncb">${BMK.card}</span></div>
+          <div class="bmk-row mt3"><span class="lab">We accept</span>
+            ${['Visa','Mastercard','Amex','Discover'].map(b=>bmk(b)).join('')}</div></div>
+        <div class="f"><label for="nn">Name on card</label><input class="inp" id="nn" placeholder="Maryam Naz"></div>
+        <div style="display:flex;gap:var(--s05)">
+          <div class="f" style="flex:1"><label for="nx">Expiry</label><input class="inp" id="nx" placeholder="MM/YY"></div>
+          <div class="f" style="flex:1"><label for="nv">Security code</label><input class="inp" id="nv" placeholder="123"></div>
+        </div>
+        <div class="f"><label for="nz">Billing ZIP code</label><input class="inp" id="nz" placeholder="10018"></div>
+        <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span><span class="txt">Make this my default card</span></label>
+        <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-addcard="0" style="justify-content:center">Cancel</button>
+        <button class="btn btn-p noic" data-savecard="1" style="justify-content:center">Add card</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+V.account = (f) => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','dashboard'],'Profile')}
+  ${ph('Profile','Your details, your preferences, and what Tal is allowed to do.')}
+  <div class="sec">
+    <div class="idhead">
+      <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
+        <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
+        <span class="idphoto-edit">${I.edit}</span>
+      </button>
+      <div class="idhead-b">
+        <span class="idname">Maryam Naz</span>
+        <span class="idmeta">maryam.naz@tkxel.io</span>
+        <span class="tag">${f.pred ? f.track + ' track' : lvlName(f.level)}</span>
+      </div>
+      <!-- EDIT SITS ON THE ROW IT EDITS. It was below the table, so the
+           control was two blocks away from the name and photo it changes, and
+           it read as the section's action rather than as this row's. On the
+           right end of the identity row it is opposite the thing it acts on,
+           which is where the photo's own edit affordance already is. -->
+      <div class="idhead-a"><button class="btn btn-g" data-editprofile="1">Edit details ${I.edit}</button></div>
+    </div>
+    <div class="tile">
+      <div class="kv"><span class="k">Name</span><span class="v">Maryam Naz</span></div>
+      <div class="kv"><span class="k">Email</span><span class="v n">maryam.naz@tkxel.io</span></div>
+      <div class="kv"><span class="k">Time zone</span><span class="v n">Eastern Time (ET)</span></div>
+      <div class="kv"><span class="k">Level</span><span class="v n">${f.pred?f.track+' track · set at the interview':lvlName(f.level)+' · confirmed'}</span></div>
+    </div>
+  </div>
+
+  <div class="sec tint">
+    <div class="sec-h"><h2>Notifications</h2></div>
+    <label class="tg"><div class="tb"><b>Weekly call reminders</b><span>24 hours and 1 hour before</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Task deadlines</b><span>The morning a task is due</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Product and course emails</b><span>Occasional, never more than monthly</span></div><input type="checkbox"><span class="sw"></span></label>
+  </div>
+  <div class="sec">
+    <div class="lead-b">
+      <div class="lead-eb">Give back &amp; grow</div>
+      <div class="lead-t">Become a cohort leader</div>
+      <div class="lead-x">Volunteer to guide a cohort through the ninety days. It is unpaid &mdash; what you get back is a recognised cohort-leader certification, and the growth that comes from teaching what you have already learned. You can only lead cohorts at a level below your own, so you are always a step ahead of the people you are mentoring.</div>
+      <div class="lead-tags"><span>Volunteer role</span><span>Earns a certification</span><span>Teaches below ${lvlName(f.level)}</span></div>
+      <div class="lead-a">${S.ledApplied
+        ? `<button class="btn btn-p btn-sm noic" disabled>Request sent ${I.checkFilled}</button>`
+        : `<button class="btn btn-p btn-sm noic" data-leadapply="1">Apply to lead a cohort ${I.arrowRight}</button>`}</div>
+      ${S.ledApplied?`<div class="lead-ok">${I.checkFilled}<span>Your request is with the TalentNext team. They review applications weekly and will email you either way.</span></div>`:''}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Closing your account</h2></div>
+    <!-- THE ACTION SITS ON THE LINE IT IS EXPLAINED BY. The control was a
+         btn-set UNDER the paragraph, which made a third stacked block out
+         of a sentence and the one thing it is telling you about. They are one
+         row: what deleting does on the left, the control that does it held at
+         the right end — the same shape §29.10 gives the identity row and
+         §15 gives the plate. The inline style goes with it; a measure and a
+         tone belong in the stylesheet, and an inline declaration is the one
+         thing no later layer can correct (trap 1). -->
+    <div class="close-b">
+      <p class="t-body-01 close-x">Deleting your account removes your profile, your notes and your interview recordings. Certificates you have already earned stay valid and stay downloadable.</p>
+      <div class="close-a">
+        <button class="btn btn-t danger" data-del="1">Delete my account ${I.misuse}</button>
+      </div>
+    </div>
+  </div>
+  <!-- LOGGING OUT IS NOT CLOSING YOUR ACCOUNT. It sat inside "Closing your
+       account", under the delete control and above that section's closing
+       rule, which put the mildest thing on the page inside the block about
+       the most destructive one. Its own section puts the rule between them.
+
+       The sec-out class is what makes that rule actually appear above 900:
+       §14 draws a rule only before a section that introduces itself with a
+       heading, and this one introduces itself with a button. It is named so
+       §14 can list it and §20 can keep the full gap either side of it. -->
+  <div class="sec sec-out">
+    <button class="btn btn-g" data-go="stage:signup/login">Log out ${I.logout}</button>
+  </div>
+</div></main>
+${S.delAsk?`<div class="modal" data-del="0">
+  <div class="sheet sheet-c" role="dialog" aria-modal="true" aria-label="Delete your account">
+    <div class="sheet-h"><h2>Delete your account?</h2><button class="x" data-del="0" aria-label="Close">${I.close}</button></div>
+    <div class="sheet-b">
+      <div class="note err"><span>${I.warning}</span><div class="nb"><b>This cannot be undone</b>Your profile, your notes and every interview recording are deleted. Your certificates stay valid and downloadable from the link in your email.</div></div>
+      <div class="f mt5"><label for="delc">Type DELETE to confirm</label><input class="inp" id="delc" placeholder="DELETE" autocomplete="off"></div>
+    </div>
+    <div class="sheet-f">
+      <button class="btn btn-s noic" data-del="0">Keep my account</button>
+      <button class="btn btn-p noic danger" data-delgo="1">Delete everything</button>
+    </div>
+  </div>
+</div>`:''}`;
+
+V.terms = AUTH.terms;
+
+/* ============================================================
+   RUNTIME
+   ============================================================ */
+const device = document.getElementById('device');
+const pick   = document.getElementById('pick');
+const cap    = document.getElementById('cap');
+
+document.getElementById('ptLogo').src = LOGO_W;
+pick.innerHTML = STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+
+/* A STAGE WITH ITS OWN FRONT DOOR IS NOT REACHED THROUGH THE NAVIGATION.
+   `signup` was the only one, so the two lines below said "signup" by name.
+   `nil` — the Next in Leadership run-up — is the second, and naming it twice
+   more would leave the next one to be found by whoever adds it and wonders
+   why their stage lands on the dashboard. The table is the test now: a stage
+   listed here opens on the view it names and the reachability check, which
+   only knows about views the rail can get to, does not apply to it. */
+const DEFAULT_VIEW = {signup:'create', nil:'quiz'};
+function setStage(k,keepView){
+  /* A STAGE IS A CANDIDATE FACT, so picking one puts you back in the candidate
+     portal. Without this the picker silently changes a candidate who is not on
+     screen: you would be looking at the leader's cohorts while the host bar
+     claims Day 34, and the reachability check below — which only knows candidate
+     views — would bounce the leader's page to a dashboard that is not theirs. */
+  S.portal = 'candidate';
+  S.stage = k;
+  const f = CFG[k];
+  if(!keepView){
+    S.view = DEFAULT_VIEW[k] || 'dashboard';
+    S.ch = f.open;
+  }
+  /* if the current view is not reachable at this stage, fall back */
+  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem','rp']);
+  if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
+  if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
+  S.hist = [];
+  render();
+}
+/* ==========================================================================
+   THE HISTORY STACK IS A CONVENIENCE, NOT A DEPENDENCY
+
+   `pushState` and `replaceState` can THROW, and the way they throw is the
+   worst kind: Chrome rate-limits them, and once it has, every subsequent call
+   raises. It logs "Throttling navigation to prevent the browser from hanging"
+   ONCE, to the console, and then says nothing.
+
+   Every navigation in this prototype ran through an unguarded `pushState`
+   sitting BEFORE `S.view = target`, so the throw took the assignment and the
+   `render()` with it. The result is a page that stops navigating: the rail
+   still highlights, the pointer still changes, every click does nothing, and
+   there is no error to find because the only one was logged minutes earlier.
+   It reads exactly like the app having frozen.
+
+   The limit is real and reachable — a browser hammered by an automated sweep
+   hits it, and so does anyone clicking around a prototype fast enough. The
+   URL is a nicety here (it makes a screen linkable and lets the hardware back
+   button work); the app must not depend on writing one. So both calls go
+   through this, and a refused write costs the back button and nothing else.
+   ========================================================================== */
+function histWrite(fn, arg1, arg2, arg3){
+  try { history[fn](arg1, arg2, arg3); } catch(e){ /* rate-limited: the URL
+    stops tracking, the app keeps working */ }
+}
+
+function go(target, fresh){
+  if(target.startsWith('stage:')){ const p = target.slice(6).split('/');
+    setStage(p[0]); if(p[1]){ S.view = p[1]; S.nav = false; render(); } return; }
+  if(target.startsWith('agent:')){ S.agent = target.slice(6); S.hist.push(S.view); histWrite('pushState',{v:'agent'},''); S.view='agent'; S.nav=false; render(); return; }
+  /* ENTERING THE MODULE LANDS ON THE CHAPTER MENU, ALWAYS.
+     `chapter:N` used to open our chapter N directly, and thirteen of our
+     chapters do not map onto LightspeedVT's four. More to the point, where you
+     land inside the courseware is the courseware's decision, not ours — every
+     one of these links now means "open Coursework" and LightspeedVT opens on
+     its menu. Kept as a distinct branch so `S.ch` still tracks for the parked
+     views and for anything that reads it. */
+  if(target.startsWith('chapter:')){ S.ch = +target.slice(8); S.stg = 0; S.notes = false; S.ls = {screen:'menu', ch:1}; S.hist.push(S.view); histWrite('pushState',{v:'chapter'},''); S.view='chapter'; S.nav=false; render(); return; }
+  if(target === 'coursework') S.ls = {screen:'menu', ch:1};
+  if(S.view!==target) talReset();
+  if(fresh) S.hist = [];
+  else if(S.view!==target){ S.hist.push(S.view); histWrite('pushState',{v:target},''); }
+  S.view = target;
+  S.nav = false;
+  render();
+}
+
+/* Ask Tal something: the question lands, Tal thinks, then answers with widgets.
+   Questions queue, so asking three things in a row gets three answers in order. */
+let talTimer = null;
+let talQueue = [];
+function ask(q){
+  if(!q) return;
+  S.thread.push({who:'me', html:q});
+  talQueue.push(q);
+  S.typing = true;
+  render();
+  talPump();
+}
+function talPump(){
+  if(talTimer || !talQueue.length) return;
+  const q = talQueue.shift();
+  talTimer = setTimeout(() => {
+    talTimer = null;
+    let html;
+    try { html = talReply(q); } catch(e){ html = null; }
+    if(!html) html = 'I did not follow that one. Try one of these.'
+      + twChips(TALCTX[S.view] || TALCTX.dashboard);
+    S.thread.push({who:'tal', html});
+    S.typing = talQueue.length > 0;
+    render();
+    talPump();
+  }, 650);
+}
+function talReset(){ talQueue = []; clearTimeout(talTimer); talTimer = null; S.thread = []; S.typing = false; }
+function back(){
+  const prev = S.hist.pop();
+  if(prev){ S.view = prev; S.nav=false; S.notif=false; render(); }
+}
+const TAL_CARDS = [
+  [/^Meet Tal/,             'What can you help me with?',
+     ['What can you help me with?', 'How does the interview work?']],
+  [/^Your next step/,       'What should I do next?',
+     ['What should I do next?', 'How long does the whole thing take?']],
+  [/^Getting started/,      'How should I start week 1?',
+     ['How should I start week 1?', 'What gets assessed this week?']],
+  [/^Where you are stuck/,  'Walk me through chapter 4',
+     ['Walk me through chapter 4', 'Why is this my growth area?']],
+  [/^Before your re-interview/, 'Prepare me for the re-interview',
+     ['Prepare me for the re-interview', 'What will Priya assess?']],
+  [/^Suggested for you/,    'How should I choose between these agents?',
+     ['How should I choose between these agents?', 'What happens in the interview?']],
+  [/^What to expect with/,  'What is this agent like to be interviewed by?',
+     ['What are they like to be interviewed by?', 'What should I prepare?']],
+  [/^Time to prepare/,      'What should I prepare for the interview?',
+     ['What should I prepare?', 'What happens on the day?']],
+  [/^What the 90 days/,     'What does the course actually involve?',
+     ['What does the course involve?', 'How much time will it take each week?']],
+  [/^Help with this chapter/, 'Explain this chapter',
+     ['Explain this chapter', 'I am stuck — help me']],
+  [/^What to bring/,        'What should I say on Thursday’s call?',
+     ['What should I say on the call?', 'What is week 5 about?']]
+];
+
+function enhanceTalCards(){
+  device.querySelectorAll('.ai-aura').forEach(card => {
+    const h = card.querySelector('.ai-head h3');
+    const title = h ? h.textContent.trim() : '';
+    const hit = TAL_CARDS.find(([re]) => re.test(title));
+    if(!card.hasAttribute('data-tal-ask')){
+      card.setAttribute('data-tal-ask', hit ? hit[1] : ('Tell me about ' + (title || 'this').toLowerCase()));
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', 'Ask Tal about ' + (title || 'this'));
+      card.classList.add('ai-clickable');
+    }
+    const want = hit ? hit[2] : [];
+    if(!want.length) return;
+    let foot = card.querySelector('.ai-foot');
+    if(!foot){ foot = document.createElement('div'); foot.className = 'ai-foot'; card.appendChild(foot); }
+    /* A card that already carries a navigation link has one job to offer, not
+       three. The link keeps the footer row to itself and a single suggested
+       question goes on the line below it, so the two never read as peers. */
+    const hasLink = !!foot.querySelector('a[data-go],.lk,.lnk,button[data-go]');
+    let rail = foot;
+    if(hasLink){
+      rail = card.querySelector('.ai-asks');
+      if(!rail){ rail = document.createElement('div'); rail.className = 'ai-asks';
+                 foot.insertAdjacentElement('afterend', rail); }
+    }
+    const cap = hasLink ? 1 : 2;
+    const have = [...rail.querySelectorAll('[data-tal-ask]')].map(b => b.dataset.talAsk);
+    for(const q of want){
+      if(have.length >= cap || have.includes(q)) continue;
+      rail.insertAdjacentHTML('beforeend', askChip(q, q));
+      have.push(q);
+    }
+  });
+}
+
+const IOS_TOP = `<div class="ios-top" aria-hidden="true">
+  <span class="ios-time">9:41</span>
+  <span class="ios-ind">
+    <svg viewBox="0 0 18 12"><path d="M1 9h2v3H1zM5 6.5h2V12H5zM9 4h2v8H9zM13 1.5h2V12h-2z"/></svg>
+    <svg viewBox="0 0 16 12"><path d="M8 10.2 6 8.2a2.9 2.9 0 0 1 4 0l-2 2Zm0-4.1a5.8 5.8 0 0 0-4.1 1.7L2.5 6.4a7.8 7.8 0 0 1 11 0L12.1 7.8A5.8 5.8 0 0 0 8 6.1Zm0-4A9.8 9.8 0 0 0 1.1 5L-.3 3.6a11.8 11.8 0 0 1 16.6 0L14.9 5A9.8 9.8 0 0 0 8 2Z"/></svg>
+    <svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="2.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="15" height="8" rx="1"/><path d="M23 4.2v3.6a2 2 0 0 0 0-3.6Z" opacity=".45"/></svg>
+  </span>
+</div>`;
+const IOS_BOTTOM = `<div class="ios-home" aria-hidden="true"><i></i></div>`;
+
+const MO = {key:'', thread:0, open:{}};
+/* The five stages of a chapter, as LightSpeed VT delivers them. The third
+   value is the gate: the time that has to pass before Continue is honest. */
+const STAGE_L = [
+  ['Video','12 min · Sarah Kaplan','6:00 of 12:00 watched'],
+  ['Reading','6 min · 3 pages','2 of 3 pages'],
+  ['Workbook','10 min · 4 prompts','1 of 4 answered'],
+  ['Assessment','8 questions · 70% to pass','0 of 8 answered'],
+  ['Summary','3 min · what to try this week','']];
+
+/* ==========================================================================
+   WHAT LIGHTSPEEDVT SHOWS INSIDE THE FRAME
+   Three screens, drawn from Maryam's captures of the real LMS: the chapter
+   menu, a chapter, and the completion screen. Only the PAGE CONTENT is
+   reproduced — the captures also show our own top bar and rail around it, and
+   those are ours and already on the page. Drawing them twice is the mistake
+   the captures were made to prevent.
+
+   IT IS A REAL IFRAME, WRITTEN NOT EMBEDDED. `about:blank` is same-origin, so
+   the parent can `document.write` into it (this is how the old chapter player
+   worked, and it is kept). Two reasons it is a frame and not markup on our
+   page. The honest one: in the product this region IS a third-party document,
+   and a mock that shares our cascade would quietly inherit our type ramp and
+   our button rules and then look right for the wrong reason. The practical
+   one: 28 layers of stylesheet cannot reach into a separate document, so none
+   of it has to be fought off.
+
+   THE FRAME NAVIGATES ITSELF. Pressing a chapter re-writes the frame; it does
+   NOT call `render()`. An embedded application moving between its own screens
+   does not re-render its host, and routing it through our render would reset
+   our scroll and replay our entrance animations for a click that never
+   touched us. `S.ls` is therefore read at write time, not at render time.
+   ========================================================================== */
+const LS_COURSE = 'TalentAgent Training', LS_CID = '242081';
+const LS_CH = [
+  ['Welcome and Orientation', '1198420', 'done'],
+  ['Test Chapter',            '1203797', 'now' ],
+  ['Working the Pipeline',    '1211044', 'todo'],
+  ['Closing and Handover',    '1216508', 'todo']];
+const LS_STATE = {done:['Complete',100], now:['Not started &middot; up next',0], todo:['Not started',0]};
+
+/* the completion ring. One drawing serves the 56px one on the hero, the 46px
+   one on the card and the 44px one on a chapter row, so `dark` is the only
+   thing that varies: on the hero it stands on near-black and needs a light
+   track and white figure, everywhere else it stands on white. */
+const lsRing = (pct, size, dark) => {
+  const r = size/2 - 3.5, c = 2*Math.PI*r, m = size/2;
+  return `<svg class=ls-ring width=${size} height=${size} viewBox="0 0 ${size} ${size}" aria-hidden=true>
+    <circle cx=${m} cy=${m} r=${r+3.5} fill="${dark?'#1b1b1b':'#f2f2f2'}"></circle>
+    <circle cx=${m} cy=${m} r=${r} fill=none stroke="${dark?'#3c3c3c':'#e2e2e2'}" stroke-width=4></circle>
+    <circle cx=${m} cy=${m} r=${r} fill=none stroke="#79c142" stroke-width=4 stroke-linecap=round
+      stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${(c*(1-pct/100)).toFixed(1)}"
+      transform="rotate(-90 ${m} ${m})"></circle>
+    <text x=${m} y=${m} text-anchor=middle dy=".36em" font-size="${Math.round(size*0.27)}"
+      font-weight=700 fill="${dark?'#fff':'#4a4a4a'}">${pct}%</text></svg>`;
+};
+
+const LS_GLYPH = `<svg viewBox="0 0 64 46" class=ls-gl aria-hidden=true>
+  <rect x=2 y=2 width=36 height=26 rx=2 fill=#fff opacity=.92></rect>
+  <path d="M15 9v12l11-6z" fill=#7d7d7d></path>
+  <path d="M6 33h26v2.4H6zM6 38h18v2.4H6z" fill=#fff opacity=.92></path>
+  <rect x=34 y=20 width=28 height=24 rx=2 fill=#fff opacity=.92></rect>
+  <path d="M40 30h10v2.2H40zM40 35h14v2.2H40z" fill=#8a8a8a></path>
+  <path d="M55 24l2.6 2.6L62 22" fill=none stroke=#8a8a8a stroke-width=2></path></svg>`;
+
+const LS_MENU_IC = `<svg viewBox="0 0 20 20" class=ls-mi aria-hidden=true>
+  <circle cx=3 cy=4 r=1.6></circle><circle cx=3 cy=10 r=1.6></circle><circle cx=3 cy=16 r=1.6></circle>
+  <path d="M8 3h11v2H8zM8 9h11v2H8zM8 15h11v2H8z"></path></svg>`;
+
+/* the black bar a chapter runs under. The course is the small line and the
+   chapter is the big one, both with their LightspeedVT ids in parentheses —
+   that pairing is how you know which record you are looking at when someone
+   sends you a screenshot, which is exactly what happened here. */
+const lsHead = (ch) => `<header class=ls-top>
+  <button class=ls-burger data-ls=menu title="Chapter menu">${LS_MENU_IC}</button>
+  <span class=ls-rule></span>
+  <span class=ls-tt><small>${LS_COURSE} (${LS_CID})</small>
+    <b>${LS_CH[ch][0]} <i>(${LS_CH[ch][1]})</i></b></span>
+  <button class=ls-x data-ls=close title="Close chapter" aria-label="Close chapter">
+    <svg viewBox="0 0 24 24"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg>
+  </button></header>`;
+
+const LS_SCREEN = {};
+
+LS_SCREEN.menu = () => `<div class=ls-bar><svg viewBox="0 0 20 16" class=ls-bi aria-hidden=true>
+    <path d="M1 2.5h7l1.6 2H19v9H1z" fill=none stroke=currentColor stroke-width=1.6></path></svg>
+  <span class=ls-rule></span><span>AgentTraining</span></div>
+<section class=ls-hero><div class=ls-hero-in>
+  <div class=ls-hero-t><button class=ls-back data-ls=close aria-label="Back to course list">&#8249;</button>
+    <span class=ls-rule></span><h1>${LS_COURSE}</h1></div>
+  <div class=ls-hero-p>${lsRing(25,56,1)}
+    <span><b>Course Completion:</b><span>In Progress (1 / 4)</span></span></div>
+</div></section>
+<nav class=ls-tabs><button class="ls-tab on">Curriculum</button><button class=ls-tab>Course Report</button></nav>
+<div class=ls-body>
+  <ol class=ls-list>${LS_CH.map((c,i) => {
+    const [lab, pct] = LS_STATE[c[2]];
+    return `<li><button class="ls-row${c[2]==='now'?' now':''}" data-ls=open data-ch=${i}>
+      <span class=ls-thumb>${LS_GLYPH}</span>
+      <span class=ls-rb><b>Chapter ${i+1}: ${c[0]}</b><span>${lab}</span></span>
+      ${lsRing(pct,44)}</button></li>`;
+  }).join('')}</ol>
+  <aside class=ls-card><div class=ls-card-art>${LS_GLYPH}</div>
+    <div class=ls-card-b><span><b>Course Completion:</b><span>In Progress (1 / 4)</span></span>${lsRing(25,46)}</div>
+  </aside>
+</div>`;
+
+LS_SCREEN.chapter = (ch) => `${lsHead(ch)}
+<div class=ls-doc>
+  <h1>${LS_CH[ch][0]}</h1>
+  <p class=ls-lead>This page provides reference content for testing LMS formatting, layout, and accessibility components.</p>
+  <h2>1. Purpose of This &ldquo;Test Chapter&rdquo; Content</h2>
+  <p>The &ldquo;Test Chapter&rdquo; section below includes common LMS elements such as headings, lists, a callout, a quote, a structured table, and responsive images&mdash;intended for layout and rendering checks.</p>
+  <div class=ls-note><b>Testing note:</b> Review spacing, typography hierarchy, and component alignment across devices. This content is intentionally neutral and reusable.</div>
+  <h2>2. Reference Concepts (Sample)</h2>
+  <div class=ls-cols>
+    <div><h3>Key idea A</h3><ul>
+      <li><b>Clarity:</b> Short sentences and predictable structure improve readability.</li>
+      <li><b>Consistency:</b> Use the same heading levels and spacing patterns throughout.</li>
+      <li><b>Accessibility:</b> Semantic elements and meaningful alternative text support learners.</li></ul></div>
+    <div><h3>Key idea B</h3><ul>
+      <li><b>Responsiveness:</b> Components should adapt cleanly from mobile to desktop.</li>
+      <li><b>Legibility:</b> Maintain strong contrast and avoid dense paragraphs.</li>
+      <li><b>Reusability:</b> &ldquo;Test Chapter&rdquo; blocks can be repurposed for other lessons.</li></ul></div>
+  </div>
+  <h2>3. Example Visual Block</h2>
+  <div class=ls-fig>Test Chapter Reference Image</div>
+</div>
+<footer class=ls-foot>
+  <span class=ls-gate><small>Time required before continuing</small>
+    <span class=ls-clock><svg viewBox="0 0 24 24" aria-hidden=true>
+      <path d="M9 1h6v2H9zM11 8h2v6h-2z"/><path d="M12 4a9 9 0 1 0 9 9 9 9 0 0 0-9-9Zm0 16a7 7 0 1 1 7-7 7 7 0 0 1-7 7Z"/>
+      <path d="m18.7 5.3 1.6-1.6 1.4 1.4-1.6 1.6z"/></svg><b>0:49</b></span></span>
+  <button class=ls-btn data-ls=done>Continue</button></footer>`;
+
+LS_SCREEN.done = (ch) => `${lsHead(ch)}
+<div class=ls-end>
+  <svg class=ls-check viewBox="0 0 80 80" aria-hidden=true>
+    <circle cx=40 cy=40 r=34 fill=none stroke=#79c142 stroke-width=6></circle>
+    <path d="M24 41.5 34.5 52 57 28.5" fill=none stroke=#111 stroke-width=7
+      stroke-linecap=round stroke-linejoin=round></path></svg>
+  <p>Your progress has been recorded and is viewable on your REPORT CARD. Please click the &quot;NEXT CHAPTER&quot; button below to continue training, or you can click on the &quot;CHAPTER MENU&quot; button to return to the Chapter Menu where you can select another chapter for training.</p>
+  <div class=ls-acts><button class=ls-btn data-ls=menu>Chapter menu</button>
+    <button class=ls-btn data-ls=next>Next chapter</button></div>
+</div>`;
+
+const LS_CSS = `*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:#fff;color:#111;
+  font:400 15px/1.6 "Segoe UI",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.ls-rule{width:1px;height:20px;background:currentColor;opacity:.4;flex:none}
+.ls-top{flex:none;display:flex;align-items:center;gap:14px;padding:0 20px;height:70px;background:#000;color:#fff}
+.ls-burger{display:grid;place-items:center;padding:6px;opacity:.95}
+.ls-mi{width:20px;height:20px;fill:#fff}
+.ls-tt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.ls-tt small{font-size:11px;opacity:.82}
+.ls-tt b{font-size:22px;font-weight:700;letter-spacing:-.2px}
+.ls-tt i{font-style:normal;font-size:11px;font-weight:400;opacity:.82}
+.ls-x{margin-left:auto;display:grid;place-items:center;width:44px;height:44px}
+.ls-x svg{width:30px;height:30px;fill:#fff}
+.ls-bar{flex:none;display:flex;align-items:center;gap:12px;padding:0 22px;height:40px;
+  background:#1d1d1d;color:#fff;font-size:13px}
+.ls-bi{width:19px;height:15px;color:#fff}
+.ls-hero{flex:none;position:relative;background:#2c2c2c;overflow:hidden;padding:34px 62px 30px}
+.ls-hero::before{content:"";position:absolute;inset:-60px;filter:blur(30px);
+  background:radial-gradient(230px 150px at 44% 42%,rgba(255,255,255,.22),transparent 70%),
+    radial-gradient(300px 190px at 72% 38%,rgba(255,255,255,.14),transparent 70%),
+    radial-gradient(260px 200px at 28% 82%,rgba(255,255,255,.10),transparent 70%),#303030}
+.ls-hero-in{position:relative;color:#fff}
+.ls-hero-t{display:flex;align-items:center;gap:16px}
+.ls-back{font-size:34px;line-height:1;padding:0 2px}
+.ls-hero-t h1{margin:0;font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.6px}
+.ls-hero-p{display:flex;align-items:center;gap:14px;margin-top:18px}
+.ls-hero-p span{display:flex;flex-direction:column;font-size:15px;line-height:1.45}
+.ls-tabs{flex:none;display:flex;padding:0 62px;border-bottom:1px solid #e4e4e4;background:#fff}
+.ls-tab{padding:15px 18px;font-size:15px;color:#666;border-bottom:3px solid transparent;margin-bottom:-1px}
+.ls-tab.on{color:#111;font-weight:700;border-bottom-color:#111}
+.ls-body{flex:1;min-height:0;overflow:auto;padding:28px 62px 60px;display:grid;gap:34px;
+  grid-template-columns:minmax(0,1fr) 390px;align-items:start;background:#fff}
+.ls-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ls-row{width:100%;display:flex;align-items:center;gap:16px;padding:12px;text-align:left;
+  border:1px solid #e0e0e0;background:#fff}
+.ls-row.now{border-color:#111;box-shadow:inset 3px 0 0 #111}
+.ls-thumb{flex:none;width:118px;height:66px;background:#7a7a7a;display:grid;place-items:center}
+.ls-gl{width:52px;height:38px}
+.ls-rb{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.ls-rb b{font-size:15px;font-weight:700}
+.ls-rb span{font-size:13px;color:#6a6a6a}
+.ls-card{border:1px solid #ddd;background:#fff}
+.ls-card-art{height:200px;background:#7a7a7a;display:grid;place-items:center}
+.ls-card-art .ls-gl{width:132px;height:96px}
+.ls-card-b{display:flex;align-items:center;gap:14px;padding:16px}
+.ls-card-b > span{flex:1;display:flex;flex-direction:column;font-size:15px;line-height:1.45}
+.ls-doc{flex:1;min-height:0;overflow:auto;padding:34px 122px 48px;background:#fff}
+.ls-doc h1{margin:0 0 14px;font-size:44px;line-height:1.1;font-weight:700;letter-spacing:-1px}
+.ls-doc h2{margin:34px 0 12px;font-size:28px;line-height:1.2;font-weight:700;letter-spacing:-.4px}
+.ls-doc h3{margin:0 0 10px;font-size:22px;line-height:1.25;font-weight:700;letter-spacing:-.2px}
+.ls-doc p{margin:0 0 12px}
+.ls-lead{color:#222}
+.ls-note{margin:18px 0 6px;padding:16px 20px;background:#f6f6f6;border:1px solid #e6e6e6}
+.ls-cols{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin-top:4px}
+.ls-cols ul{margin:0;padding-left:20px}
+.ls-cols li{margin-bottom:8px}
+.ls-fig{margin-top:14px;max-width:830px;height:300px;background:#d9d9d9;display:grid;place-items:center;
+  color:#8f8f8f;font-size:31px;text-align:center;padding:0 20px}
+.ls-foot{flex:none;display:flex;align-items:center;justify-content:flex-end;gap:22px;
+  padding:14px 62px;border-top:1px solid #e4e4e4;background:#fff}
+.ls-gate{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.ls-gate small{font-size:11px;font-weight:600;color:#555}
+.ls-clock{display:flex;align-items:center;gap:7px;color:#e8342a}
+.ls-clock svg{width:19px;height:19px;fill:currentColor}
+.ls-clock b{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.ls-btn{background:#111;color:#fff;padding:15px 26px;font-size:12px;font-weight:700;
+  letter-spacing:.6px;text-transform:uppercase}
+.ls-row:hover{background:#fafafa;border-color:#bdbdbd}
+.ls-btn:hover{background:#333}
+.ls-x:hover,.ls-burger:hover,.ls-back:hover{opacity:.7}
+.ls-end{flex:1;min-height:0;overflow:auto;padding:110px 40px 60px;text-align:center}
+.ls-check{width:82px;height:82px;display:block;margin:0 auto 26px}
+.ls-end p{max-width:820px;margin:0 auto}
+.ls-acts{display:flex;justify-content:center;gap:20px;margin-top:64px}
+@media (max-width:1000px){
+  .ls-hero,.ls-tabs,.ls-body,.ls-foot{padding-left:24px;padding-right:24px}
+  .ls-doc{padding-left:24px;padding-right:24px}
+  .ls-body{grid-template-columns:minmax(0,1fr)}
+  .ls-hero-t h1{font-size:28px}
+  .ls-doc h1{font-size:32px}.ls-doc h2{font-size:23px}
+  .ls-cols{grid-template-columns:1fr;gap:20px}
+  .ls-fig{height:200px;font-size:22px}}
+@media (max-width:620px){
+  .ls-row{flex-wrap:wrap}.ls-thumb{width:88px;height:52px}
+  .ls-acts{flex-direction:column;align-items:center;gap:12px}
+  .ls-end{padding-top:56px}}`;
+
+const LSVT_PAGE = () => `<!doctype html><html lang=en><head><meta charset=utf-8>
+<title>${LS_COURSE}</title><style>${LS_CSS}</style></head>
+<body>${(LS_SCREEN[S.ls.screen] || LS_SCREEN.menu)(S.ls.ch)}</body></html>`;
+
+/* Where the frame is, between writes. It is on `S` so a stage change or a trip
+   out to the dashboard and back finds the module where it was left. */
+S.ls = {screen:'menu', ch:1};
+
+/* about:blank is same-origin, so the document can simply be written. */
+function mountLsvt(){
+  device.querySelectorAll('iframe.lsvt-if').forEach(fr => {
+    const d = fr.contentDocument;
+    if(!d) return;
+    d.open(); d.write(LSVT_PAGE()); d.close();
+    /* the listener goes on the document we just wrote, and is lost with it on
+       the next write — which is why it is re-attached here every time rather
+       than once at mount */
+    d.addEventListener('click', e => {
+      const b = e.target.closest('[data-ls]');
+      if(b) lsGo(b.dataset.ls, b.dataset.ch);
+    });
+  });
+}
+
+/* THE FIVE THINGS YOU CAN PRESS IN THERE
+   open  — a chapter row on the menu
+   done  — Continue, at the foot of a chapter
+   next  — Next chapter, on the completion screen
+   menu  — Chapter menu, and the list control in the black bar
+   close — the cross, and the chevron on the hero. It leaves the chapter, which
+           for us means the chapter menu: the module is the whole of Coursework,
+           so there is nothing above the menu to close out to. */
+function lsGo(what, ch){
+  if(what === 'open') S.ls = {screen:'chapter', ch:+ch};
+  else if(what === 'done') S.ls = {screen:'done', ch:S.ls.ch};
+  else if(what === 'next') S.ls = {screen:'chapter', ch:Math.min(S.ls.ch+1, LS_CH.length-1)};
+  else S.ls = {screen:'menu', ch:S.ls.ch};
+  mountLsvt();
+}
+
+/* ============================================================
+   TAL COMES FIRST
+   Wherever Tal has something to say about a page, it is the first thing on
+   that page — above the panels it is talking about, on every device. The
+   card is authored where it reads best in source order; this moves it.
+   ============================================================ */
+function talFirst(){
+  device.querySelectorAll('.main > .page').forEach(page => {
+    const kids = [...page.children];
+    const sec = kids.find(el => el.classList.contains('sec') && el.querySelector('.ai-aura'));
+    if(!sec) return;
+    const anchor = page.querySelector(':scope > .ph, :scope > .lvl-hero')
+                || page.querySelector(':scope > .crumb');
+    if(anchor){
+      if(anchor.nextElementSibling !== sec) anchor.insertAdjacentElement('afterend', sec);
+    } else if(page.firstElementChild !== sec){
+      page.prepend(sec);
+    }
+  });
+}
+
+/* One past interview: who set what, and the three things it left behind. */
+function ivRow(kind, label, date, outcome, len){
+  const a = AGENTS.priya;
+  return `<div class="ivrow" role="button" tabindex="0" data-go="report" data-iv="${kind}">
+    <div class="ivrow-h">
+      <span class="ivrow-eb">${label} &middot; ${date}</span>
+      <span class="ivrow-out">${outcome}</span>
+    </div>
+    <div class="ivrow-who">
+      ${avatar(a,40)}
+      <span class="ivrow-wb"><b>${a.n}</b><span>45 minutes &middot; report signed</span></span>
+      <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    </div>
+    <div class="ivrow-kit">
+      <span class="kit"><span class="kit-ic">${I.play}</span><span class="kit-b"><b>Recording</b><span>${len} &middot; video and audio</span></span></span>
+      <button class="kit kit-go" data-ivt="${kind}"><span class="kit-ic">${I.document}</span><span class="kit-b"><b>Transcript</b><span>Searchable, full text</span></span></button>
+      <span class="kit"><span class="kit-ic">${I.video}</span><span class="kit-b"><b>6 scenes</b><span>Marked by ${a.n.split(' ')[0]}</span></span></span>
+    </div>
+  </div>`;
+}
+
+/* The cohort. Five photographs are available and the group is ten, so the
+   faces repeat — a prototype fidelity choice, not a claim about the people. */
+const COHORT = [
+  ['Maryam Naz','MN','hana','Chapter 13 &middot; active today',true],
+  ['Aisha Bello','AB','priya','Active today'],
+  ['Daniel Kerr','DK','owen','Active today'],
+  ['Sofia Marchetti','SM','lena','Active 2 days ago'],
+  ['Ravi Chandran','RC','samuel','Active today'],
+  ['Nora Lindqvist','NL','lena','Active 3 days ago'],
+  ['James Whitby','JW','owen','Active today'],
+  ['Chloe Ferreira','CF','priya','Active 5 days ago'],
+  ['Tobias Mensah','TM','samuel','Active 8 days ago'],
+  ['Yuki Tanaka','YT','hana','Not active recently']];
+
+/* The room. Everyone is somebody else, so everything sits on the left. */
+const ROOM = [
+  ['day','Yesterday'],
+  ['Daniel Kerr','owen','DK','Did anyone else find chapter 4 harder than the three before it? I have read the handover section twice.','4:12 PM'],
+  ['Aisha Bello','priya','AB','Yes. It is the first one that asks you to change something at work rather than understand something.','4:31 PM'],
+  ['Maryam Naz','hana','MN','I took a piece of work back off someone this week and could not explain why. That is the whole chapter, I think.','7:02 PM',true],
+  ['day','Today'],
+  ['Ravi Chandran','samuel','RC','Priya said on the call that the handover is where it fails, not the work. That helped me.','8:40 AM'],
+  ['Sofia Marchetti','lena','SM','Bringing my example on Thursday. Mine is a vendor review that went badly and I still think I was right to take it back.','9:15 AM']];
+
+function roomLine(name, img, ini, body, when, mine){
+  return `<div class="m them">
+    <span class="m-av">${avatar({i:ini, img:AV[img]}, 32)}</span>
+    <div class="m-c">
+      <div class="m-b">${body}</div>
+      <div class="m-w">${mine ? 'You' : name} &middot; ${when}</div>
+    </div>
+  </div>`;
+}
+
+function discussionRoom(){
+  return `<div class="msgs room">
+    ${ROOM.map(r => r[0] === 'day'
+      ? `<div class="m-day"><span>${r[1]}</span></div>`
+      : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
+  </div>
+  <div class="composer room-composer">
+    <span class="composer-star">${I.ai}</span>
+    <input class="inp" placeholder="Say something to Cohort 41" aria-label="Message the cohort">
+    <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
+    <button class="composer-send" aria-label="Send">${I.send}</button>
+  </div>`;
+}
+
+/* The cohort standing. Points, badges earned and star rank per member;
+   the candidate's own row is marked wherever it lands. */
+const BOARD = [
+  ['Aisha Bello','AB','priya',   3420, 1, 2],
+  ['Ravi Chandran','RC','samuel',2980, 1, 2],
+  ['Daniel Kerr','DK','owen',    2610, 1, 1],
+  ['James Whitby','JW','owen',   2240, 0, 1],
+  ['Maryam Naz','MN','hana',     1095, 0, 1, true],
+  ['Sofia Marchetti','SM','lena',1040, 0, 1],
+  ['Chloe Ferreira','CF','priya',  920, 0, 1],
+  ['Nora Lindqvist','NL','lena',   780, 0, 1],
+  ['Tobias Mensah','TM','samuel',  610, 0, 1],
+  ['Yuki Tanaka','YT','hana',      240, 0, 1]];
+
+function boardList(){
+  return `<div class="board">
+    <div class="brow bhead">
+      <span>#</span><span>Member</span><span>Earned</span><span class="num">Points</span>
+    </div>
+    ${BOARD.map(([n,i,img,pts,bdg,rank,mine],k)=>`<div class="brow${mine?' mine':''}">
+      <span class="b-n">${k+1}</span>
+      <span class="b-who">${avatar({i, img:AV[img]}, 32)}<span class="b-nm">${mine?'You':n}</span></span>
+      <span class="b-earn">
+        <span class="b-mk" title="${rank}-Star"><img src="${AWARD['rank'+rank]}" alt="${rank}-Star"></span>
+        ${bdg?`<span class="b-mk" title="Bronze"><img src="${AWARD.bronze}" alt="Bronze"></span>`:''}
+        <span class="b-earn-t">${rank}-Star${bdg?' &middot; '+bdg+' badge':''}</span>
+      </span>
+      <span class="b-pts num">${pts.toLocaleString()}</span>
+    </div>`).join('')}
+  </div>`;
+}
+
+/* ONE FIGURE CELL, IN ONE PLACE. Three views drew this cell inline — the quiz
+   results, the course summary on Enroll, the transcript — twelve copies of the
+   same four-part shape, which is twelve places to miss when the shape changes.
+   It changed: the label and the figure now share a line, so they need a wrapper
+   the inline version did not have. One function, three call sites.
+
+   `.stat-top` is the wrapper, and the reason it is a flex row rather than two
+   more grid areas is the same reason `.stand-top` is: when the label and the
+   figure cannot share a line they have to wrap as a PAIR, and a grid cell
+   cannot do that. §29.17 has the layout. */
+/* `jump` IS OPTIONAL AND CHANGES THE ELEMENT, NOT THE CONTENTS. A figure cell
+   that scrolls the page to the section it counts is a control, and a control
+   has to be a button — a div with a click handler is unreachable by keyboard
+   and unannounced by a screen reader. Every existing call site passes four
+   arguments and keeps the div it always had; the leader's dashboard passes a
+   fifth and gets four buttons. The contents are identical either way, which is
+   the point of the helper: §29.17's one-line label-and-figure pair is stated
+   once whether the cell is read or pressed.
+
+   The local is `body`, not `inner` — `inner()` is the global that returns an
+   icon's paths, and shadowing it inside the one helper every figure band goes
+   through is a trap set for whoever adds an icon to this cell next. */
+function statCell(ic, label, value, note, jump){
+  const body = `<span class="stat-ic">${ic}</span>
+      <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
+      <div class="d">${note}</div>`;
+  return jump
+    ? `<button class="stat stat-jump" data-jump="${jump}">${body}</button>`
+    : `<div class="stat">${body}</div>`;
+}
+
+/* Three standings, three marks. Points is a number moving toward a target,
+   badges are a count out of four, rank is where those two put you. */
+function standRow(g){
+  const nb = nextBadge(g.pts);
+  const bdgArt = ['bronze','silver','gold','involved'][Math.max(0, Math.min(3, g.badges-1))];
+  /* THE LABEL AND THE FIGURE ARE ONE LINE. `.stand-top` is the only structural
+     change: the label used to stack above the figure, which put four things in
+     a column and made each cell read as a little paragraph. Paired on one line
+     — name hard left, number hard right — the three cells line up as a table
+     you can read across, and the note keeps the full width beneath them.
+
+     AND THE THIRD CELL IS THE SAME AS THE OTHER TWO. Points used to carry a
+     progress bar under its note, which made one cell of three a row taller
+     than its neighbours: the box took its height from that cell, and the two
+     without a bar had their content stranded above centre in the space it
+     left. The bar was also saying what the note already says in words —
+     "1,405 to Bronze" is the same fact, and the only one of the two you can
+     read without measuring a stripe. Gone, so all three cells hold two lines,
+     the box is as tall as it needs to be, and every cell's content sits on
+     the same centre line. §29.15 has the rest. */
+  const cell = (art, artOff, label, value, note) => `
+    <button class="stand-c" data-go="rewards">
+      <span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>
+      <span class="stand-b">
+        <span class="stand-top">
+          <span class="stand-l">${label}</span>
+          <span class="stand-v">${value}</span>
+        </span>
+        <span class="stand-d">${note}</span>
+      </span>
+    </button>`;
+  return `<div class="stand">
+    ${cell(AWARD.points, false, 'Points', g.pts.toLocaleString(),
+      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned')}
+    ${cell(AWARD[bdgArt], !g.badges, 'Badges', g.badges+' <small>of 4</small>',
+      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points')}
+    ${cell(AWARD['rank'+g.rank], false, 'Rank', RANKS[g.rank-1].n,
+      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder')}
+  </div>`;
+}
+
+function render(){
+  const f = cfg(S.stage);
+  let html;
+  /* THE RUN-UP IS NOT THE PRODUCT, so it gets neither shell nor auth card:
+     nil.js draws its own site bar and its own scroller, and the branch is
+     first because `nil` is first in the journey. TEMPORARY — this branch, the
+     two `nil` rows in data.js, nil.js and 30-nil.css are the whole feature.
+     `NIL` is declared in nil.js, which is the last file in the bundle; every
+     render before it is parsed is on some other stage, and this branch is
+     never taken until a stage change brings you here. */
+  if(S.stage==='nil'){
+    html = '<div class="nil">' + (NIL[S.view] || NIL.quiz)() + '</div>';
+  } else if(S.stage==='signup'){
+    const inner = (AUTH[S.view]||AUTH.create)();
+    html = S.view === 'terms' ? inner
+         : '<div class="auth-card">' + AUTH_ART
+           + '<div class="auth-col">' + inner + '</div></div>';
+  } else {
+    /* THE FALLBACK HAS TO KNOW WHICH PORTAL IT IS FALLING BACK INTO. `V.dashboard`
+       is the candidate's, and landing a leader on it after a bad deep link would
+       show them somebody else's ninety days behind their own rail. */
+    const view = V[S.view] || (isLead() ? V.leadDash : V.dashboard);
+    /* NO FLOATING TAL OVER THE COURSEWARE. The button is bottom-right of the
+       view column, and bottom-right of a LightspeedVT chapter is its Continue
+       — the two land on each other, and ours is on top. We do not get to put a
+       control over somebody else's control. It is also the one region of the
+       product where Tal can see nothing: the chapter is in a frame we do not
+       read. Tal is a rail away on every page that leads here. */
+    const NO_FAB = ['terms','coursework','chapter'];
+    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div></div>' + (NO_FAB.includes(S.view)?'':talFab())
+         + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
+         + (S.view==='account'?profileSheet()+photoSheet():'');
+  }
+  const key = S.stage + '/' + S.view;
+  const entered = key !== MO.key;
+  const OVERLAYS = ['nav','notif','tal','editProfile','editPhoto','addCard','notes'];
+  /* `data-open` is a TRANSITION MARKER and it is meant to be: §13.2 gates every
+     entrance on it precisely because it lasts one render, so an animation does
+     not replay each time a switch is flipped or a character is typed.
+
+     `data-shown` is the STATE. It lists what is open right now, on every render
+     for as long as it stays open, and it is what a LAYOUT rule has to ask —
+     "is Tal open", not "did Tal just open". Three rules had the margins on
+     `data-open` and so they held for exactly one frame: opening Tal from the
+     rail happened to be that frame, but a chip on the page sets `S.tal` and
+     then asks, and the ask renders again — by which point the marker is gone
+     and the page took its margins back with the panel still open.
+
+     Two attributes because they answer two different questions. Motion keeps
+     `data-open`; anything that must survive the next render reads `data-shown`. */
+  const opened = OVERLAYS.filter(k => S[k] && !MO.open[k]);
+  const shown  = OVERLAYS.filter(k => S[k]);
+  const grew = S.thread.length > MO.thread;
+  MO.key = key;
+  MO.thread = S.thread.length;
+  for(const k of OVERLAYS) MO.open[k] = !!S[k];
+  const at = ` data-rail="${S.nav ? 'open' : 'shut'}"`
+           + (entered ? ' data-enter' : '')
+           + (opened.length ? ` data-open="${opened.join(' ')}"` : '')
+           + (shown.length ? ` data-shown="${shown.join(' ')}"` : '')
+           + (grew ? ' data-said' : '');
+  device.innerHTML = IOS_TOP + `<div class="app"${at}>${html}</div>` + IOS_BOTTOM;
+  pick.value = S.stage;
+  const st = STAGES.find(s=>s[0]===S.stage);
+  histWrite('replaceState',null,'','#'+(isLead()?'leader':S.stage)+'/'+S.view);
+  for(const pass of [talFirst, enhanceTalCards, mountLsvt]){
+    try { pass(); } catch(e) { console.warn('pass failed:', e); }
+  }
+  /* the cascade is a per-section delay, capped so a long page never waits */
+  const app = device.querySelector('.app');
+  if(app && app.hasAttribute('data-enter')){
+    const kids = device.querySelectorAll('.page > .sec, .page > .ph, .page > .lvl-hero, .page > .acc, .page > .tabs');
+    kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
+  }
+  const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
+}
+
+pick.onchange = e => setStage(e.target.value);
+document.getElementById('back').onclick = back;
+/* the browser and hardware back buttons drive the same stack */
+window.addEventListener('popstate', () => { if(S.hist.length) back(); });
+document.getElementById('reset').onclick = () => setStage(S.stage);
+
+/* card number: group the digits and show the brand as it is recognised */
+device.addEventListener('input', e => {
+  if(e.target.id !== 'nc') return;
+  const el = e.target, dig = el.value.replace(/\D/g,'').slice(0,19);
+  const amex = /^3[47]/.test(dig);
+  const g = amex ? [4,6,5] : [4,4,4,4,3];
+  let out = '', i = 0;
+  for(const n of g){ if(i>=dig.length) break; out += (out?' ':'') + dig.substr(i,n); i += n; }
+  el.value = out;
+  const mk = document.getElementById('ncb'), b = brandOf(dig);
+  if(mk){ mk.innerHTML = BMK[b] || BMK.card; mk.classList.toggle('on', !!b); }
+});
+
+/* one delegated listener runs the whole product */
+device.addEventListener('click', e => {
+  const t = e.target;
+
+  /* EVERY ASK OPENS THE SAME SURFACE.
+     This used to be `S.tal = true; ask(q)` — the question went into the side
+     panel. The panel is off (§27.9 in the stylesheet): there is one Tal now,
+     the field docked at the bottom of every page, and asking from anywhere
+     opens that. `askOpen` lives in ai4.js and is a function declaration in a
+     bundle that is one script, so it is hoisted above this listener however
+     late in the file it is written. */
+  const askT = t.closest('[data-tal-ask]');
+  if(askT){
+    const goT = t.closest('[data-go]');
+    if(!(goT && askT.contains(goT))){
+      e.preventDefault(); askOpen(askT.dataset.talAsk); return;
+    }
+  }
+
+  const stgT = t.closest('[data-stage]');
+  if(stgT){ S.stg = +stgT.dataset.stage || 0; render(); return; }
+
+  const ivt = t.closest('[data-iv]');
+  if(ivt) S.iv = ivt.dataset.iv;
+
+  const bk = t.closest('[data-back]');
+  if(bk){ back(); return; }
+
+  const stp = t.closest('[data-stp]');
+  if(stp){ const k=stp.dataset.stp; S.piOpen[k] = !S.piOpen[k]; render(); return; }
+
+  const ep = t.closest('[data-editprofile]');
+  if(ep){ S.editProfile = ep.dataset.editprofile==='1'; render(); return; }
+
+  const eph = t.closest('[data-editphoto]');
+  if(eph){ S.editPhoto = eph.dataset.editphoto==='1'; render(); return; }
+
+  const pk = t.closest('[data-pick]');
+  if(pk){ device.querySelectorAll('.photopick').forEach(x=>x.classList.remove('on'));
+    pk.classList.add('on'); return; }
+
+  const ac = t.closest('[data-addcard]');
+  if(ac){ S.addCard = ac.dataset.addcard==='1'; render(); return; }
+  if(t.closest('[data-savecard]')){
+    const num = (document.getElementById('nc')||{}).value || '';
+    const dig = num.replace(/\D/g,'');
+    const def = !!(document.querySelector('.sheet .cbx input')||{}).checked;
+    const exp = ((document.getElementById('nx')||{}).value || '').trim();
+    if(def) S.cards.forEach(c=>c.def=false);
+    S.cards.push({brand: brandOf(dig) || 'Mastercard',
+      last: dig.length>=4 ? dig.slice(-4) : '8210',
+      exp: /^\d\d\/\d\d$/.test(exp) ? exp : '04/30', def});
+    S.addCard=false; render(); return;
+  }
+  const sd = t.closest('[data-setdef]');
+  if(sd){ S.cards.forEach((c,i)=>c.def = i===+sd.dataset.setdef); render(); return; }
+  const dc = t.closest('[data-delcard]');
+  if(dc){ const i=+dc.dataset.delcard; const wasDef=S.cards[i].def;
+    S.cards.splice(i,1); if(wasDef && S.cards[0]) S.cards[0].def=true; render(); return; }
+
+  const ha = t.closest('[data-hideach]');
+  if(ha){ if(!S.hideAch.includes(S.stage)) S.hideAch.push(S.stage); render(); return; }
+
+  const ra = t.closest('[data-readall]');
+  if(ra){ notifList().forEach(n=>{ if(!S.read.includes(n.t)) S.read.push(n.t); }); render(); return; }
+
+  /* CROSSING PORTALS IS NOT NAVIGATION. It changes who is signed in, so the
+     back stack, the open overlays and anything Tal was mid-conversation about
+     all belong to the account you are leaving. Everything resets except the
+     stage, which is the candidate's and is waiting where you left it. */
+  /* ONE ATTRIBUTE CANNOT BE BOTH A CONTROL AND A STATE STAMP.
+     This branch was `t.closest('[data-portal]')`, which was right when
+     `data-portal` appeared only on the two switch buttons. It does not any
+     more: `lead.js`'s render wrapper stamps `data-portal` on `.app` so that
+     31-lead.css can scope its rules with `.app[data-portal="leader"]`, and
+     `.app` is the ancestor of EVERYTHING. So `closest` matched the root on
+     every click in the product, `k !== S.portal` was false, and the
+     unconditional `return` below swallowed the event before it could reach
+     the `[data-go]` branch four lines down.
+
+     Every navigation in the app died at once — the rail, the shell logo, every
+     card, every button — while the stage picker went on working, because that
+     is an `onchange` on the prototype chrome and never enters this listener.
+     A page that highlights on click and then does nothing, with nothing in the
+     console.
+
+     The selector is scoped to the control's own class. The stamp keeps its
+     name, so 31-lead.css is untouched. */
+  const pw = t.closest('.psw-t[data-portal]');
+  if(pw){
+    const k = pw.dataset.portal;
+    if(k !== S.portal){
+      S.portal = k;
+      S.view = k==='leader' ? 'leadDash' : 'dashboard';
+      S.hist = []; S.nav = false; S.notif = false; S.tal = false;
+      talReset();
+      render();
+    }
+    return;
+  }
+
+  const g = t.closest('[data-go]');
+  if(g){ e.preventDefault();
+    const mark = g.dataset.read; if(mark && !S.read.includes(mark)) S.read.push(mark);
+    if(S.notif) S.notif=false;
+    /* a module opened from the side nav is a top-level destination, so it starts
+       a fresh stack and shows no back control */
+    const fresh = !!(g.closest('.sn-item') || g.classList.contains('shell-logo'));
+    go(g.dataset.go, fresh); return; }
+
+  const tog = t.closest('[data-toggle]');
+  if(tog){
+    const w = tog.dataset.toggle;
+    if(w==='nav'){ S.nav=!S.nav; render(); }
+    if(w==='tal'){ S.tal=!S.tal; if(!S.tal) talReset(); render(); }
+    if(w==='notif'){ S.notif=!S.notif; render(); }
+    return;
+  }
+  if(t.closest('[data-close="nav"]')){ S.nav=false; render(); return; }
+
+  const p = t.closest('[data-pop]');
+  if(p){
+    const el = device.querySelector('#'+p.dataset.pop);
+    if(el){
+      const on = el.classList.toggle('on');
+      if(on){
+        const r = p.getBoundingClientRect(), d = device.getBoundingClientRect();
+        el.style.top = Math.max(56, Math.min(r.bottom - d.top + 8, d.height - 280)) + 'px';
+      }
+    }
+    return;
+  }
+
+  const eye = t.closest('[data-eye]');
+  if(eye){
+    const inp = device.querySelector('#'+eye.dataset.eye);
+    const show = inp.type==='password';
+    inp.type = show?'text':'password';
+    if(show && inp.value.startsWith('•')) inp.value='NewYork-2026!';
+    eye.innerHTML = show?I.viewOff:I.view;
+    return;
+  }
+
+  const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
+  const sl = t.closest('.slot');        if(sl && !sl.disabled){ device.querySelectorAll('.slot').forEach(x=>x.classList.remove('on')); sl.classList.add('on'); return; }
+  const dy = t.closest('.day');         if(dy){ device.querySelectorAll('.day').forEach(x=>x.classList.remove('on')); dy.classList.add('on'); return; }
+  /* A tab that carries data-ctab / data-rtab changes what is RENDERED, so it
+     must not be intercepted by the generic strip handler below it — that one
+     only moves the `.on` class and returns, which is why the cohort tabs
+     highlighted but never switched. It handles unwired strips only. */
+  const cs = t.closest('.cs button:not([data-ctab]):not([data-rtab])');
+  if(cs){ cs.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); cs.classList.add('on'); return; }
+  const rt2 = t.closest('[data-rtab]');
+  if(rt2){ S.rtab = rt2.dataset.rtab; render(); return; }
+  const ct = t.closest('[data-ctab]');
+  if(ct){ S.ctab = ct.dataset.ctab; render(); return; }
+  const tb = t.closest('.tabs button'); if(tb){ tb.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); tb.classList.add('on'); return; }
+
+  const rt = t.closest('[data-rtab]');
+  if(rt){ S.rtab = rt.dataset.rtab; render(); return; }
+
+  const tbl = t.closest('[data-tbl]');
+  if(tbl){
+    const c = device.querySelector('#'+tbl.dataset.tbl);
+    const on = c.classList.toggle('tbl');
+    tbl.textContent = on ? 'View as a chart' : 'View as a table';
+    return;
+  }
+
+  const hit = t.closest('.hit');
+  if(hit){
+    const c = device.querySelector('#'+hit.dataset.chart);
+    const read = c.querySelector('[data-read]');
+    const [lab,val] = hit.getAttribute('aria-label').split(', ');
+    read.innerHTML = `<span class="k">${lab}</span><span class="v">${val}</span>`;
+    return;
+  }
+
+  const col = t.closest('.sc-col');
+  if(col){
+    const c = device.querySelector('#'+col.dataset.chart);
+    c.querySelectorAll('.sc-col').forEach(x=>x.classList.remove('on'));
+    col.classList.add('on');
+    const i = +col.dataset.i, tot = GAME[S.stage].weeks[i]||0;
+    const parts = tot? segsOf(tot).map((v,k)=>SERIES[k][0]+' '+v).join(' · ') : 'nothing yet';
+    c.querySelector('[data-read]').innerHTML =
+      `<span class="k">Week ${i+1} · ${parts}</span><span class="v">${tot} min</span>`;
+    return;
+  }
+
+  const bar = t.closest('.chart-bar');
+  if(bar){
+    const c = device.querySelector('#'+bar.dataset.chart);
+    c.querySelectorAll('.chart-bar').forEach(x=>x.classList.remove('on'));
+    bar.classList.add('on');
+    const read = c.querySelector('[data-read]');
+    const [lab,val] = bar.getAttribute('aria-label').split(', ');
+    read.innerHTML = `<span class="k">${lab}</span><span class="v">${val}</span>`;
+    return;
+  }
+
+  const sg = t.closest('[data-ask]');
+  if(sg){ ask(sg.textContent.trim()); return; }
+
+  if(t.closest('.composer button')){
+    const inp = device.querySelector('.tal-panel .composer .inp');
+    if(inp && inp.value.trim()){ const v=inp.value.trim(); inp.value=''; ask(v); }
+    return;
+  }
+});
+
+/* keep the clip counter honest on the report screen */
+device.addEventListener('change', e => {
+  if(e.target.closest('.clip-pick')){
+    const n = device.querySelectorAll('.clip-pick input:checked').length;
+    const el = device.querySelector('#clipCount');
+    if(el) el.textContent = n===3 ? '3 of 3 kept. Deselect one to swap.' : `${n} of 3 kept. Pick ${3-n} more.`;
+  }
+});
+
+device.addEventListener('keydown', e => {
+  const card = e.target.closest('.ai-clickable');
+  if(card && (e.key === 'Enter' || e.key === ' ')){
+    e.preventDefault(); askOpen(card.dataset.talAsk); return;
+  }
+  if(e.key==='Enter' && e.target.closest('.tal-panel .composer')){
+    e.preventDefault(); const v=e.target.value.trim(); if(v){ e.target.value=''; ask(v); }
+  }
+});
+document.addEventListener('keydown', e => {
+  if(e.target.matches('input,textarea,select')) return;
+  const i = STAGES.findIndex(s=>s[0]===S.stage);
+  if(e.key==='ArrowRight') setStage(STAGES[(i+1)%STAGES.length][0]);
+  if(e.key==='ArrowLeft')  setStage(STAGES[(i-1+STAGES.length)%STAGES.length][0]);
+});
+
+const hash = location.hash.slice(1).split('/');
+if(hash[0] && CFG[hash[0]]){ S.stage=hash[0]; S.view = hash[1] || (DEFAULT_VIEW[hash[0]]||'dashboard'); S.ch=CFG[hash[0]].open; render(); }
+else setStage('new');

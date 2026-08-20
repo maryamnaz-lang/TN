@@ -1,0 +1,612 @@
+/* ==========================================================================
+   16. THE PROVENANCE LAYER
+   The system has eleven invariants for geometry and, until now, none for
+   where a sentence came from. Everything else in this design is a resolved
+   fact — a rule, a number, a row — and it is drawn that way. Model output is
+   not that. It is provisional, it is derived from something, and the person
+   reading it is entitled to know which.
+
+   So generated content gets its own construction: a mark, a line naming what
+   it was drawn from, and the evidence itself as clickable quotations. It
+   still obeys the spine and the rules; it just never pretends to be a fact
+   the product recorded.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   A GENERATED BLOCK
+   Left rule is out — the product does not use them. What marks this as
+   generated is the header strip and the source line, which say it in words.
+   -------------------------------------------------------------------------- */
+.app .gen{
+  background-color:var(--surface-2);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s06) var(--pad-x)}
+.app .gen-h{
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  margin-bottom:var(--s05)}
+.app .gen-src{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .gen > p{
+  margin:0 0 var(--s05);max-width:68ch;
+  font-size:13.5px;line-height:22px;color:var(--text-primary)}
+.app .gen-more{
+  margin-top:var(--s04);font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .gen-f{
+  display:flex;align-items:baseline;gap:var(--s05);flex-wrap:wrap;
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule-on-2)}
+.app .gen-note{
+  font-size:11px;line-height:15px;color:var(--text-helper)}
+
+/* --------------------------------------------------------------------------
+   A QUOTATION IS THE EVIDENCE
+   Not a footnote number, not a link that says "source" — the line itself, at
+   the second it was said, and clicking it puts you there in the transcript.
+   The timestamp is the citation.
+   -------------------------------------------------------------------------- */
+.app .quotes{display:flex;flex-direction:column;gap:1px;
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .quote{
+  display:grid;grid-template-columns:56px minmax(0,1fr);
+  gap:var(--s04);align-items:baseline;text-align:left;
+  padding:var(--s04) var(--pad-x);
+  background-color:var(--background);border:0;cursor:pointer;width:auto}
+.app .q-t{
+  font-size:11.5px;line-height:18px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--accent-text)}
+.app .q-b{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .q-w{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .q-x{
+  font-size:13px;line-height:20px;color:var(--text-primary);
+  overflow-wrap:anywhere}
+
+/* two interviews side by side, when the question is what changed */
+.app .ivt-cmp{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s05);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .ivt-col{display:flex;flex-direction:column;gap:1px}
+.app .ivt-col-h{
+  padding:0 var(--pad-x) var(--s03);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+@container app (min-width:672px){
+  .app .ivt-cmp{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s06)}
+}
+
+/* --------------------------------------------------------------------------
+   ASKING THE RECORD A QUESTION
+   The one field in the product that takes a question rather than a value, so
+   it is marked as such: the accent star sits inside it, not beside it.
+   -------------------------------------------------------------------------- */
+.app .askbar{
+  display:flex;align-items:center;gap:0;
+  border:1px solid var(--accent);background-color:var(--background)}
+.app .askbar-mk{
+  flex:none;display:grid;place-items:center;width:44px;height:48px}
+.app .askbar-mk svg{width:18px;height:18px;fill:var(--accent);display:block}
+.app .askbar .inp{
+  flex:1;min-width:0;height:48px;
+  border:0;background:transparent;padding-left:0;padding-right:var(--s05)}
+.app .askbar .composer-send{width:48px;height:48px}
+.app .askbar-sugg{
+  display:flex;gap:var(--s04);flex-wrap:wrap;margin-top:var(--s05)}
+/* a suggested question is a whole sentence; on a phone it wraps rather than
+   pushing the column wider than the frame */
+.app .askbar-sugg .chip-tal{
+  max-width:100%;white-space:normal;height:auto;min-height:32px;
+  padding-top:var(--s02);padding-bottom:var(--s02);text-align:left}
+
+/* --------------------------------------------------------------------------
+   THE TRANSCRIPT
+   A reading surface. Speaker in the margin as a label, the line as prose,
+   the marked scenes flagged where they fall. Rules between, nothing filled —
+   except the line you arrived at, which is the one thing on the page that
+   needs to find your eye.
+   -------------------------------------------------------------------------- */
+.app .ivt-srch{margin-bottom:var(--s05)}
+.app .ivt-filters{
+  display:flex;gap:var(--s03);flex-wrap:wrap;margin-bottom:var(--s05)}
+.app .ivt-f{
+  min-height:32px;padding:0 var(--s05);
+  border:1px solid var(--rule);background-color:transparent;
+  font-size:12.5px;line-height:17px;color:var(--text-secondary);cursor:pointer}
+.app .ivt-f.on{
+  background-color:var(--accent);border-color:var(--accent);
+  color:var(--on-accent);font-weight:600}
+
+.app .ivt-lines{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule)}
+.app .tq{
+  display:grid;grid-template-columns:56px minmax(0,1fr);
+  gap:var(--s04);align-items:baseline;
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid var(--rule)}
+.app .tq-t{
+  font-size:11.5px;line-height:16px;font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}
+.app .tq-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+.app .tq-w{
+  display:flex;align-items:center;gap:var(--s04);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .tq.me .tq-w{color:var(--accent-text)}
+.app .tq-x{font-size:13.5px;line-height:22px;overflow-wrap:anywhere}
+.app .tq-x mark{background-color:var(--accent-tint);color:var(--accent-on-2)}
+.app .tq-scene{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  letter-spacing:.6px;color:var(--support-attention)}
+.app .tq-scene svg{width:13px;height:13px;fill:var(--support-attention);display:block}
+/* the line an answer sent you to */
+.app .tq.at{background-color:var(--accent-tint)}
+.app .tq.at .tq-x{color:var(--accent-on-2)}
+
+@container app (min-width:900px){
+  .app .tq,.app .quote{grid-template-columns:72px minmax(0,1fr)}
+  .app .tq-x{max-width:76ch}
+}
+
+/* ==========================================================================
+   WHAT TAL KNOWS
+   A claim, the thing it was drawn from, and the two buttons that matter. A
+   system that remembers you and will not show you what it remembers is
+   worse than one that forgets, so this is a plain list with no persuasion
+   in it — including the part where you tell it that it is wrong.
+   ========================================================================== */
+.app .memo{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule)}
+.app .memo-r{
+  padding:var(--s06) var(--pad-x);border-bottom:1px solid var(--rule)}
+.app .memo-k{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.1px;
+  max-width:68ch}
+.app .memo-w{
+  margin-top:var(--s03);max-width:68ch;
+  font-size:13px;line-height:23px;color:var(--text-secondary)}
+.app .memo-f{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap;
+  margin-top:var(--s05)}
+.app .memo-src{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:28px;padding:0 var(--s04);
+  border:1px solid var(--rule);background-color:transparent;
+  font-size:11.5px;line-height:16px;font-weight:600;
+  color:var(--accent-text);cursor:pointer}
+.app .memo-src.flat{color:var(--text-secondary);cursor:default}
+.app .memo-src svg{width:13px;height:13px;fill:currentColor;display:block}
+.app .memo-when{font-size:11.5px;line-height:16px;color:var(--text-helper)}
+.app .memo-act{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap;margin-left:auto}
+.app .memo-act .lnk{min-height:0;padding:0;font-size:12.5px;line-height:17px}
+.app .memo-flag{
+  font-size:11.5px;line-height:16px;font-weight:600;color:var(--support-attention)}
+/* a claim you have marked wrong stays visible and stops being used */
+.app .memo-r.wrong .memo-k{
+  color:var(--text-helper);text-decoration:line-through;text-decoration-thickness:1px}
+.app .memo-r.wrong .memo-w{color:var(--text-helper)}
+
+.app .never{list-style:none;margin:0;padding:0}
+.app .never li{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule);
+  font-size:13px;line-height:23px;color:var(--text-secondary)}
+.app .never li:last-child{border-bottom:0}
+.app .never svg{
+  flex:none;width:17px;height:17px;fill:var(--icon-secondary);margin-top:2px}
+
+/* ==========================================================================
+   AN ASSISTANT THAT ACTS
+   Two pieces of chrome the product did not need until Tal could change
+   something: a bar that says what was done and reverses it, and a draft that
+   is visibly not yours yet.
+   ========================================================================== */
+.app .did{
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  background-color:var(--accent-tint);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s04) var(--pad-x)}
+.app .did-mk{flex:none;display:grid;place-items:center}
+.app .did-mk svg{width:16px;height:16px;fill:var(--accent-on-2);display:block}
+.app .did-t{
+  flex:1;min-width:0;font-size:12.5px;line-height:17px;font-weight:600;
+  color:var(--accent-on-2)}
+.app .did .lnk{min-height:0;padding:0;font-size:12.5px;line-height:17px;color:var(--accent-on-2)}
+.app .did-sec{padding-top:0;padding-bottom:0}
+
+.app .draft{
+  background-color:var(--surface-2);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s05) var(--pad-x);
+  border-top:1px solid var(--rule)}
+.app .draft-h{
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  margin-bottom:var(--s04)}
+.app .draft-l{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--support-attention)}
+.app .draft-x{
+  width:100%;min-height:104px;
+  background-color:var(--background);
+  border:1px solid var(--accent);
+  padding:var(--s05);
+  font-size:13.5px;line-height:22px}
+.app .draft-a{
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  margin-top:var(--s05)}
+.app .draft-n{font-size:11px;line-height:15px;color:var(--text-helper)}
+/* a field holding something Tal wrote says so until it is sent */
+.app .inp.is-draft,.app textarea.is-draft{border-color:var(--accent)}
+
+/* ==========================================================================
+   PRACTICE
+   A rehearsal room. It borrows the conversation shape from Messages because
+   that is what it is — but it is not a record of anything, and the brief
+   above it says who you are talking to and what they have been told, which
+   is the part that makes it trustworthy rather than uncanny.
+   ========================================================================== */
+.app .rp-list{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule)}
+.app .rp-c{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:var(--s05);align-items:center;text-align:left;width:auto;
+  padding:var(--s06) var(--pad-x);
+  background:none;border:0;border-bottom:1px solid var(--rule);cursor:pointer}
+.app .rp-av{flex:none}
+.app .rp-av .av-ph{width:44px;height:44px}
+.app .rp-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+.app .rp-t{font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.1px}
+.app .rp-w{font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .rp-src{
+  display:inline-flex;align-items:center;gap:var(--s03);margin-top:var(--s02);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .rp-src svg{width:13px;height:13px;fill:currentColor;display:block}
+
+.app .rp-thread{padding-left:0;padding-right:0}
+.app .rp-opts{
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:var(--s04);align-items:flex-end}
+.app .rp-opts-h{
+  align-self:flex-start;
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .rp-o{
+  max-width:min(560px,100%);text-align:left;
+  padding:var(--s05);cursor:pointer;
+  background-color:var(--background);
+  border:1px solid var(--accent);
+  font-size:13.5px;line-height:20px;color:var(--accent-on-2)}
+
+/* ==========================================================================
+   CAPTURE
+   One line about the week the cohort has just had. It sits directly under
+   Tal on the dashboard because it is the only input in the product that is
+   not a click, and everything Tal knows is better for having it.
+   ========================================================================== */
+.app .cap{
+  display:flex;gap:var(--s05);align-items:flex-start;
+  background-color:var(--accent-tint);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s06) var(--pad-x)}
+.app .cap-mk{flex:none;display:grid;place-items:center;width:22px;height:22px}
+.app .cap-mk svg{width:18px;height:18px;fill:var(--accent-on-2);display:block}
+.app .cap-b{flex:1;min-width:0}
+.app .cap-t{
+  font-size:14px;line-height:19px;font-weight:600;color:var(--accent-on-2)}
+.app .cap-x{
+  margin-top:var(--s03);max-width:68ch;
+  font-size:12.5px;line-height:17px;color:var(--accent-on-2)}
+.app .cap-in{
+  display:flex;align-items:center;gap:var(--s04);margin-top:var(--s05)}
+/* with the explanation gone the question sits right on top of the field */
+.app .cap:not(.done) .cap-in{margin-top:var(--s04)}
+.app .cap-in .inp{
+  flex:1;min-width:0;min-height:44px;
+  background-color:var(--pure-white);
+  border:1px solid var(--accent);
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .cap-in .composer-act svg{fill:var(--accent-on-2)}
+.app .cap.done .cap-x{
+  margin-top:var(--s04);font-size:13.5px;line-height:20px;font-style:italic}
+.app .cap-f{
+  display:flex;align-items:baseline;gap:var(--s05);flex-wrap:wrap;
+  margin-top:var(--s04)}
+.app .cap-f .lnk{min-height:0;padding:0;font-size:12.5px;line-height:17px;color:var(--accent-on-2)}
+.app .cap-n{font-size:11px;line-height:15px;color:var(--accent-on-2);opacity:.8}
+.app .cap-sec{padding-top:0;padding-bottom:0}
+
+/* the capture bar is the ask bar: one bordered field with the mark inside it
+   and the action attached, rather than a white box floating on a tint */
+.app .cap{background-color:transparent;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.app .cap .cap-t{color:var(--text-primary)}
+.app .cap .askbar{margin-top:var(--s04)}
+.app .cap .askbar .inp{background:transparent}
+.app .cap.done{
+  background-color:var(--accent-tint);
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.app .cap.done .cap-t{color:var(--accent-on-2)}
+
+/* ==========================================================================
+   LATE CORRECTIONS
+   Four places where a box, a push or a stacked line was costing height or
+   breaking an alignment. Nothing structural — each is the same principle
+   applied where it had not reached yet.
+   ========================================================================== */
+
+/* the name on a dark plate is on the scale */
+.app .plate-wb b{font-size:14px;line-height:19px}
+
+/* THE STEPPER carries no plates. "Step 2 of 4" is a caption, not a chip, and
+   an unstarted step is an outline on the canvas rather than a white disc. */
+.app .stp-c,.app .stp .stp-c{
+  background-color:transparent;border:0;padding-left:0;padding-right:0;
+  color:var(--text-helper)}
+.app .stp .done .stp-c,.app .stp .on .stp-c,.app .stp-now .stp-c{
+  background-color:transparent;border:0;color:var(--accent-text)}
+.app .pi-ic,.app .stp .pi-ic{background-color:transparent;border:0}
+
+/* THE TRACK BAND's first row is as tall as what is in it */
+.app .path-l{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s05);flex-wrap:wrap}
+.app .path-you{margin-top:0;padding-top:0;align-self:baseline;white-space:nowrap}
+.app .path-step{padding-top:var(--s05);padding-bottom:var(--s05)}
+@container app (min-width:900px){
+  .app .path-step{padding-top:var(--s06);padding-bottom:var(--s06)}
+}
+
+/* THE SHORTLIST CARD keeps its facts against the photograph rather than
+   opening a new full-width row for one short line */
+@container app (min-width:900px){
+  .app .rail .agh{
+    grid-template-areas:
+      'av   name name'
+      'av   rate rate'
+      'av   meta meta'
+      'foot foot go'}
+  .app .rail .agh > .agh-m{margin-top:var(--s03)}
+}
+
+/* THE AGENT'S RATING sits on one baseline: the stars, the number and the
+   count were on three different ones because two of them are set in the
+   tabular face and one is not. */
+.app .agid-r{align-items:baseline}
+.app .agid-r .stars{align-self:center;line-height:0}
+.app .agid-r .stars svg{display:block}
+.app .agid-r .num,.app .agid-iv{line-height:19px}
+.app .agh-r .stars{line-height:0}
+.app .agh-r .stars svg{display:block}
+
+/* THE RAILS REACH THE BOTTOM OF THE FRAME
+   They are drawn on the page, and the page was only as tall as its content —
+   so on a short page the column stopped in mid-air. The page fills the view
+   it sits in; the rails then run the whole height, which is what makes the
+   column read as a drawn thing rather than a box round the text. */
+@container app (min-width:900px){
+  .app .view-col > .main{display:flex;flex-direction:column}
+  /* `1 1 auto` let it SHRINK: on a page taller than the frame the item was
+     squeezed back to the frame's height and the rails stopped in mid-air
+     halfway down the content. It may grow to fill a short page and must
+     never shrink below what it holds. */
+  .app .view-col > .main > .page{flex:1 0 auto}
+}
+
+/* THE ACTION BAR IS ONE ROW, TRULY
+   §37 laid the bar out as a centred column with each child at full width,
+   from when the button spanned it. It is a row: what you are booking on the
+   left, the price beside it, the one action hard right. */
+.app .stickybar{
+  flex-direction:row;align-items:center;justify-content:space-between;
+  gap:var(--s06);
+  padding-left:calc(var(--main-pad) + var(--pad-x));
+  padding-right:calc(var(--main-pad) + var(--pad-x))}
+.app .stickybar > *{width:auto;max-width:none;padding-left:0;padding-right:0}
+.app .stickybar > .sb-b{justify-content:flex-start;margin-bottom:0!important}
+@container app (max-width:599px){
+  .app .stickybar{flex-direction:column;align-items:stretch}
+  .app .stickybar > .sb-b{justify-content:space-between}
+}
+
+/* A TABLE'S COLUMNS ARE THE TABLE'S, NOT EACH ROW'S
+   Every row was its own grid, so each one sized its columns to its own
+   content and the header lined up with nothing. The table owns the columns
+   and the rows dissolve into it. Headers then sit over what they name. */
+@container app (min-width:900px){
+  .app .paytbl{
+    display:grid;
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(72px,auto) minmax(64px,auto);
+    column-gap:0}
+  .app .paytbl > .payrow{display:contents}
+  /* the rule between rows is carried by the cells, since the row is gone */
+  /* no column gap: the rule between rows has to be continuous, and a gap
+     would cut it into five pieces. The space between columns is padding. */
+  .app .paytbl > .payrow > *{
+    padding:var(--s05) var(--s06) var(--s05) 0;
+    border-bottom:1px solid var(--rule);align-self:center}
+  .app .paytbl > .payrow:last-child > *{border-bottom:0}
+  .app .paytbl > .payrow > *:first-child{padding-left:var(--pad-x)}
+  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
+  .app .paytbl > .payhead > span{
+    padding-top:var(--s04);padding-bottom:var(--s04)}
+  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
+  /* left over what they name; the money and its header share the right edge */
+  .app .paytbl .pay-d,.app .paytbl .pay-c,
+  .app .paytbl > .payhead > span{text-align:left}
+  .app .paytbl .pay-a,.app .paytbl > .payhead > .num,
+  .app .paytbl .pay-r{text-align:right}
+}
+
+/* the Tal button never sits on top of the page's own action: where a view
+   ends in a sticky action bar, it steps up above it */
+.app:has(.stickybar) .tal-fab{bottom:calc(var(--s05) + 84px)}
+@container app (min-width:900px){
+  .app:has(.stickybar) .tal-fab{bottom:calc(var(--s05) + 92px)}
+}
+
+/* WHERE YOU STAND joins the week's work beneath it: they are one region —
+   what you have earned, and what earns the next of it */
+.app .page > .sec:has(> .stand){padding-bottom:0}
+.app .page > .sec:has(> .stand)::after{display:none}
+
+/* ONE RULE BETWEEN TWO QUESTIONS. A stack of rows separates them with a
+   border AND a 1px gap showing the ground behind, which reads as two lines
+   at every join. The border is the one that belongs to the row. */
+.app .ai-aura .tile-stack,.app .ai-aura .tile-stack > *{row-gap:0}
+.app .ai-aura .tile-stack{gap:0}
+
+/* AN ACCORDION ROW STARTS WHERE ITS HEADING DOES */
+.app .sec > .acc > .acc-i > .acc-h,
+.app .sec > .acc > .acc-i > .acc-b,
+.app .page .sec > .acc > .acc-i > .acc-h,
+.app .page .sec > .acc > .acc-i > .acc-b{
+  padding-left:0;padding-right:0}
+
+/* ALL AGENTS reads down, not across: the heading, the one sentence that says
+   what to do with the list, then the field you do it with. The desktop label
+   column is for a heading that names a set of rows you scan; this heading
+   introduces an instruction, and an instruction belongs under it. */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .all-desc){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h{
+    border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
+  .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2{
+    font-size:15px;line-height:20px;letter-spacing:-.05px}
+  .app .page:not(.form-page) .sec:has(> .all-desc) > :not(.sec-h){
+    padding-left:0;padding-right:0}
+}
+.app .all-desc{margin-bottom:var(--s06)}
+
+/* a section heading can carry an action as well as a link: it goes to the
+   end of the row, like the link does */
+.app .sec-h > .sec-h-act{margin-left:auto;flex:none}
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h{
+    display:flex;align-items:center;gap:var(--s05);
+    border-right:0;min-height:0;margin:0 0 var(--s05);padding:0}
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
+    font-size:15px;line-height:20px;letter-spacing:-.05px}
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > :not(.sec-h){
+    padding-left:0;padding-right:0}
+}
+
+/* the toggle rows take the tone of the panel they sit on rather than
+   floating on it as pale plates */
+.app .sec.tint .tg{background-color:transparent}
+
+/* ==========================================================================
+   BECOME A COHORT LEADER
+   The one place the product asks something of the person. It reads as an
+   invitation rather than a setting: a band across the column with the ask on
+   the left and the action at the right-hand end.
+   ========================================================================== */
+.app .lead-b{
+  background-color:var(--surface-2);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s06) var(--pad-x)}
+.app .lead-eb{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .lead-t{
+  margin-top:var(--s03);
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+.app .lead-x{
+  margin-top:var(--s04);max-width:72ch;
+  font-size:13.5px;line-height:22px;color:var(--text-secondary)}
+.app .lead-tags{display:flex;gap:var(--s04);flex-wrap:wrap;margin-top:var(--s05)}
+.app .lead-tags > span{
+  min-height:28px;display:inline-flex;align-items:center;padding:0 var(--s05);
+  border:1px solid var(--rule-on-2);
+  font-size:11.5px;line-height:16px;color:var(--text-secondary)}
+.app .lead-a{margin-top:var(--s06)}
+.app .lead-b .btn[disabled]{opacity:.6;cursor:default}
+.app .lead-ok{
+  display:flex;align-items:flex-start;gap:var(--s04);margin-top:var(--s05);
+  font-size:12.5px;line-height:18px;color:var(--support-success-ink)}
+.app .lead-ok svg{flex:none;width:16px;height:16px;fill:var(--support-success-ink);margin-top:1px}
+@container app (min-width:900px){
+  .app .lead-b{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    column-gap:var(--s08);align-items:start}
+  .app .lead-eb,.app .lead-t,.app .lead-x,.app .lead-tags,.app .lead-ok{grid-column:1}
+  .app .lead-a{grid-column:2;grid-row:1 / span 4;margin-top:0;justify-self:end}
+}
+
+/* deleting an account is the one destructive action in the product */
+.app .btn.danger{color:var(--danger-ink);border-color:var(--danger-ink)}
+.app .btn.danger svg,.app .btn.danger span svg{fill:var(--danger-ink)}
+.app .btn.btn-p.danger{
+  background-color:var(--danger-ink);border-color:var(--danger-ink);
+  color:var(--on-brand)}
+.app .btn.btn-p.danger svg{fill:var(--on-brand)}
+
+/* ==========================================================================
+   THE CONVERSATION SCROLLS, THE FIELD DOES NOT
+   A messaging surface has two parts with different jobs: a thread you scroll
+   back through, and a field that has to be where you left it. The page holds
+   the frame's height, the thread takes the slack and scrolls inside it, and
+   the composer is pinned under it. You arrive at the latest message, because
+   that is the one you came for.
+   ========================================================================== */
+/* the page grows into the frame rather than being sized to its content, so
+   the thread gets every pixel the composer is not using */
+.app .view-col > .main:has(> .msg-page){min-height:0}
+.app .msg-page{flex:1 1 auto;height:auto;min-height:0}
+.app .msg-page > .msgs{
+  flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.app .msg-page > .msg-foot{flex:none;margin-top:0;border-top:1px solid var(--rule)}
+
+/* a face belongs beside the first line of what was said, not the last */
+.app .m{align-items:flex-start}
+.app .m-av{margin-top:2px}
+
+/* ==========================================================================
+   ONE FIELD, EVERYWHERE
+   The ask bar's construction — a bordered box with the send attached to its
+   right edge — is the right one for every place the product takes a sentence
+   rather than a value. The chrome is shared; what each field carries is not.
+   Messages keeps its attachment and its microphone, the cohort room keeps
+   the attachment, the transcript keeps neither.
+   ========================================================================== */
+/* the message field is not an ask: it takes the page's own hairline on all
+   four sides, the same rule that closes the thread above it. The accent
+   border is reserved for the one field that puts a question to the record. */
+.app .msg-page .composer,.app .composer.room-composer{
+  display:flex;align-items:center;gap:0;
+  border:1px solid var(--rule);background-color:var(--background);
+  padding:0}
+.app .msg-page .composer .inp,.app .composer.room-composer .inp{
+  flex:1;min-width:0;min-height:48px;
+  border:0;background:transparent;
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .msg-page .composer .composer-star{width:44px;height:48px}
+.app .composer-act{width:44px;height:48px}
+.app .composer-send{width:48px;height:48px}
+/* the padding moves out of the field and onto the row that holds it */
+.app .msg-page > .msg-foot{padding:var(--s05) var(--pad-x) var(--s06)}
+.app .msg-page > .msg-foot > .composer{padding:0}
+.app .composer.room-composer{margin-top:var(--s06)}
+
+/* IN THE ROOM everybody is somebody else, so a message takes the width of
+   the column rather than two-thirds of it */
+.app .msgs.room .m-c{max-width:100%}
+.app .msgs.room .m{align-items:flex-start}
+
+/* A TAB STRIP ATTACHES TO WHAT IS ABOVE IT */
+.app .page > .sec:has(> .cs){padding-top:0}
+.app .sec > .cs{margin-top:0}
+
+/* the page reserves 96px at its foot so the Tal button never covers the last
+   line of a scrolling page. The conversation does not scroll as a page — its
+   thread scrolls inside itself — so it keeps that space for the thread and
+   the button steps aside instead. */
+.app .msg-page{padding-bottom:0}
+.app:has(.msg-page) .tal-fab{bottom:calc(var(--s05) + 76px)}

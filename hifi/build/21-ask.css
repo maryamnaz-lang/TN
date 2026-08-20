@@ -1,0 +1,531 @@
+/* ==========================================================================
+   21. THE ASK
+   One line at the head of every module, and the page it turns into.
+
+   The collapsed line is deliberately quiet: a hairline in the same grey
+   every other edge in the product uses, no fill, no send control. It is an
+   invitation, not a form. The accent appears only on the mark, because that
+   is the one thing on it that says whose line this is.
+
+   The open state is the same column with different contents. The chrome
+   does not move — app bar, rail and page width are exactly where they were,
+   which is what makes it read as the page expanding rather than a new
+   screen arriving. The thread scrolls; the field and the legal line do not.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE LINE
+   ------------------------------------------------------------------------ */
+.app .ask-sec{padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .askline{
+  display:flex;align-items:center;gap:var(--s04);
+  width:100%;min-height:48px;padding:0 var(--s05);
+  background:transparent;border:1px solid var(--rule);
+  /* the prompt is REAL TEXT, not a placeholder attribute, so it is held to
+     the body minimum rather than to the softer grey a placeholder gets away
+     with: --text-placeholder reads 2.4:1 on white. */
+  color:var(--text-helper);
+  font-size:13.5px;line-height:19px;font-weight:400;letter-spacing:.1px;
+  text-align:left;cursor:text;
+  transition:border-color var(--dur-short) var(--ease-standard)}
+.app .askline:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+.app .askline-mark{flex:none;display:grid;place-items:center;width:18px;height:18px}
+.app .askline-mark .sk-mark{width:16px;height:16px;flex:none}
+.app .askline-t{flex:1 1 auto;min-width:0;
+  /* the prompt is one line, and the control is a fixed-height row wherever it
+     is drawn — so at the narrowest column it ends in an ellipsis rather than
+     wrapping the line to two */
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ----------------------------------------------------------------- 1b ---
+   THE DOCK — THE BOTTOM ROW OF EVERY PAGE
+   The line is no longer a member of the module head band. It holds the bottom
+   of the view, at the page's own full width, on every page of both portals.
+   The reasoning for the move — and for where in the DOM it hangs — is in
+   `placeAsk` (ai4.js); the geometry is here.
+
+   IT FLOATS. Absolutely positioned in the column, over the page rather than
+   at the end of it — the page passes behind it and the page's own 96px of
+   bottom padding (§10.39) is what keeps the last row of content clear of it.
+
+   One version in between sat in the FLOW, as the last child of `.main`, so
+   that it would inherit the page's exact width — the page's width is not a
+   stated value, since §14 gives `.main` a `clamp(24px, 12cqw, 200px)` margin
+   at desktop and the page takes what is left. It did line up with the black
+   card's edges, and that was the problem: welded to the page's bottom edge at
+   the page's exact width, it read as a docked band, not as a control hovering
+   over the page. Floating is what this is.
+
+   THE WIDTH IS THE CONTENT COLUMN — `min(100%, content-max)` less its two
+   gutters, which is what every section on the page is drawn to. So the field
+   lines up with the text it sits under, and the gutter left on each side is
+   what says it is floating rather than filling. The gutter is restated at 900
+   because the page takes `--s07` there (§14) while `:root` is still on 24,
+   and the dock sits outside the page, so it would otherwise measure against
+   the wrong one.
+
+   IT WAS HALF THIS WIDTH, and the reason is worth keeping. The half existed
+   to clear Tal's floating button: 56px plus a 16 gutter at the bottom-right
+   of this same column, and at 390 an exact half was the widest the dock could
+   be without the two landing on each other. §27.9 turns the button off — the
+   field is the only way into Tal now, so the row is the field's, and nothing
+   is parked in it to dodge.
+   ------------------------------------------------------------------------ */
+.app .view-col{position:relative}
+/* CENTRED ON AUTO MARGINS, NOT ON `translateX(-50%)`. §13's entrance
+   animations run with `fill-mode:both` and every one of them ends at
+   `transform:none` — so a transform used for LAYOUT here is a transform the
+   next played keyframe deletes, permanently (the §13 trap). The margins are
+   not something an animation can reach. */
+.app .askdock{
+  position:absolute;left:0;right:0;margin:0 auto;bottom:var(--s05);z-index:30;
+  width:calc(min(100%, var(--content-max)) - 2 * var(--pad-x))}
+@container app (min-width:900px){.app .askdock{--pad-x:var(--s07)}}
+
+/* THE FIELD IS OPAQUE, AND IT CASTS A SHADOW.
+   §1 leaves the line transparent because in the band it sat on the band's own
+   wash. Floating over live content it has to have a ground of its own, or the
+   page reads straight through the prompt.
+
+   THE SHADOW IS A STATED EXCEPTION TO ELEVATION 0. §01 sets the whole product
+   at elevation zero and nothing else in the build casts one — but nothing
+   else in the build is a control suspended over moving content either. An
+   opaque box with a hairline is separation enough when what is behind it
+   holds still; when the page slides underneath, the hairline is one more edge
+   among the page's own edges and the field stops reading as a separate plane.
+   This is a deliberate departure asked for by name, not an oversight —
+   recorded here so the next reader does not "fix" it back to flat.
+
+   THREE LAYERS, AND EACH ONE IS DOING A DIFFERENT JOB. A single soft shadow
+   is what makes a floating control look like a smudge: too tight and the box
+   reads as stuck to the page, too wide and it reads as fog. The reference for
+   this (Chronilogix's floating player, which does exactly one thing well: a
+   white card on a white ground that is unmistakably above it) stacks them,
+   and the reason it works is that the three carry different distances:
+
+     0 1px 2px      .06   CONTACT. The underside of the box. This is the layer
+                          that says there is an edge at all, and it is the one
+                          you would miss if it were absent.
+     0 8px 18px     .08   NEAR. The gap between the box and the page. Pulled
+                          in 2px so it stays under the field rather than
+                          leaking out past its sides.
+     0 26px 54px    .16   AMBIENT, and the one that does the work. Wide, low
+                          and pulled in 12px, so it is a soft pool under the
+                          control rather than a halo around it. On white this
+                          is what reads as height; without it the other two
+                          are just a darker hairline.
+
+   AND A LIGHTER HAIRLINE THAN §1's. The border went off entirely for one
+   pass, on the argument that under a three-layer shadow a `--rule` edge is a
+   second edge saying the same thing a step louder. Off was too far: on a
+   white page the top edge of a white box with no line at all disappears into
+   it, because a shadow cast downward puts almost nothing above the box. The
+   reference card has a line — a very light one, doing exactly this job. So
+   the border stays and steps down to `--border-subtle-01`, which is the
+   lightest edge in the token set: enough to close the top of the box, not
+   enough to compete with the pool underneath it.
+
+   The shadow ink is the page's own near-black rather than a grey: a grey
+   shadow on a warm white goes green. Opacities are the highest the page will
+   take before the pool has a visible edge of its own — the thing §24's wash
+   was pulled down to .1 to avoid.
+
+   AND NO WASH BEHIND IT. The composer in §24 earns one — a white field in a
+   white thread, separated only by a hairline, reads as more thread. An
+   earlier cut of this dock borrowed that wash and it failed for the reason
+   §24's own note gives: at the scale of a pill, a gradient behind it is a
+   SHAPE on the page rather than the warm edge of one — a peach rectangle with
+   a visible top edge, unmissable over the dashboard's black call plate. The
+   shadow does that job without drawing a second object. */
+:root{
+  --dock-shadow-1:rgba(17,17,17,.06);
+  --dock-shadow-2:rgba(17,17,17,.08);
+  --dock-shadow-3:rgba(17,17,17,.16)}
+.app .askdock > .askline{
+  background-color:var(--background);
+  border-color:var(--border-subtle-01);
+  min-height:56px;padding:0 var(--s04) 0 var(--s05);
+  gap:var(--s05);
+  box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+/* pressed, the edge comes back — §5's own rule, restated at this weight
+   because the declaration above it now outranks it */
+.app .askdock > .askline:active{border-color:var(--text-primary)}
+
+/* ----------------------------------------------------------------- 1c ---
+   WHAT IS INSIDE THE LINE
+   Four things, and the order is the sentence they make: Tal, what you can
+   do, an example of doing it, and where it goes. `askBar` in ai4.js builds
+   them and the note above it is where the content decision is written down.
+
+   THE PROMPT IS IN FULL INK. §1 sets it to `--text-helper` and says why —
+   it is real text rather than a placeholder attribute, so it is held to the
+   body minimum rather than to the softer grey a placeholder gets away with.
+   That was the right call for a line sitting inside the band's wash, where
+   grey read as quiet. Floating on white as the page's one standing
+   invitation, grey reads as DISABLED — the same grey the send control next
+   to it is deliberately wearing. The prompt takes `--text-primary`, and the
+   grey moves to the thing that is genuinely an aside.
+
+   THE SUGGESTION IS THE ASIDE, so it keeps the helper tone and it is
+   quoted. The quotes are doing real work: they mark the words as an example
+   of something you could type rather than as a second label. It sits
+   directly after the prompt, which is where the eye already is — parked at
+   the far right it would read as a caption belonging to the send control.
+   -------------------------------------------------------------------------- */
+.app .askdock .askline-t{
+  flex:none;color:var(--text-primary)}
+.app .askdock .askline-q{
+  flex:1 1 auto;min-width:0;color:var(--text-helper);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:opacity 180ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+/* the swap happens behind a fade, so the text never changes mid-read. The
+   resting state is the DECLARED one (opacity 1, untouched) and only this
+   transient class moves it — §13's trap is about entrance animations whose
+   final keyframe outlives them, which a transition on a class cannot do. */
+.app .askdock .askline-q.going{opacity:0}
+
+/* NOT ON A PHONE. At 388 the line is 356 wide and the prompt, a suggestion
+   and the send control do not fit — the suggestion would take the space by
+   ellipsing to three words, which is worse than not offering one. The prompt
+   and the send stay; the example is the part a narrow screen can do without.
+   Stated as `max-width` on the container query the build already splits on
+   (§10.339 moves `--pad-x` at exactly 600), so this changes shape where
+   everything else does. */
+@container app (max-width:599px){
+  .app .askdock .askline-q{display:none}
+}
+
+/* THE SEND CONTROL IS OFF, AND SAYS SO.
+   §21's opening note argues against a send control on a collapsed line: "a
+   button that submits an empty field is a button that lies". That holds
+   against an ARMED one. Drawn off — a grey plate, a grey glyph, no border,
+   no pointer — it stops being a lie and starts being the answer to "what
+   happens when I have typed something", which the bare row never gave. It
+   is a `<span>`, not a button: nothing to focus, nothing to tab to, and no
+   control nested inside the control that owns the whole row.
+
+   `arrowUp` and not `arrowRight`, for the reason stated where the glyph is
+   added in icons.js: right is this product's GO, up is submit. */
+/* `margin-left:auto` AND NOT "the question grows". The send held the right
+   edge because `.askline-q` above it takes the free space — which stops being
+   true at the one width where the question is not there. Below 600 it is
+   `display:none`, so nothing in the row grew and the send came to rest
+   directly beside the prompt, mid-row, reading as part of the label rather
+   than as the end of the field. The auto margin puts the space in front of
+   the send itself, so the edge is held by the thing that has to hold it,
+   whatever else is in the row. */
+.app .askdock .askline-send{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;margin-left:auto;
+  background-color:var(--layer-accent-01)}
+.app .askdock .askline-send svg{
+  width:18px;height:18px;fill:var(--text-placeholder);display:block}
+
+/* THE MARK, AT THE SIZE THE ROW CAN CARRY, AND MOVING.
+   §1 draws the line's mark at 16px as a flat star masked out of `--accent`.
+   That was a label on a line inside a band. This row is the product's only
+   Tal presence now — the floating button that used to carry the animated orb
+   is off (§27.9) — so the orb comes here instead, at 32px in a 56px row,
+   which is the same proportion the button drew it at.
+
+   IT IS THE PNG, NOT THE MASKED STAR. §21.3 masks `.askline-mark .sk-mark`
+   into the flat star deliberately; the orb is a different object — a core
+   with its own falloff — and it is what §27 spent three animation layers on.
+   `askBar` prints `.tal-mk` (§27.1's standalone mark) rather than `.sk-mark`,
+   so the star rule does not reach it and there is nothing to override.
+
+   THREE LAYERS, THE BUTTON'S OWN, AT THE BUTTON'S OWN TIMINGS — 14s for the
+   turn, 6.4s for the breath. Both were tuned to be legible without reading
+   as a spinner, and a control that says "working" when nothing is working is
+   worse than a still one:
+
+     the mark    turns and breathes. The core is off-centre in the file, so
+                 rotation is what makes the movement visible at all — a
+                 centred disc rotating looks like nothing is happening.
+     the halo    a wash of accent under it, pulsing against the breath, on
+                 the same 6.4s clock. This is what carries at 32px: the
+                 mark's own falloff is subtle and the halo is what makes the
+                 movement read from across the row.
+
+   The halo is `inset:-6px` on a 32px box, so it stays inside the row's own
+   padding and never touches the prompt beside it.
+   -------------------------------------------------------------------------- */
+.app .askdock .askline-mark{
+  position:relative;flex:none;width:32px;height:32px;
+  display:grid;place-items:center;isolation:isolate}
+.app .askdock .askline-mark::before{
+  content:'';position:absolute;inset:-6px;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,
+    color-mix(in srgb,var(--accent) 34%,transparent) 0%,
+    color-mix(in srgb,var(--accent) 12%,transparent) 48%,
+    transparent 72%);
+  animation:tal-orb-pulse 6.4s ease-in-out infinite}
+.app .askdock .askline-mark .tal-mk{
+  position:relative;z-index:1;width:32px;height:32px;
+  animation:tal-orb-spin 14s linear infinite,
+            tal-orb-breathe 6.4s ease-in-out infinite}
+
+/* REDUCED MOTION NEEDS ITS OWN BLOCK, not §13's blanket clamp. §13.187 takes
+   every duration to 1ms, which for an INFINITE animation is not "off" — it
+   is the same movement at a thousand times the speed, which is a strobe. The
+   mark holds still and the halo settles at its bright end, so the row still
+   reads as lit rather than as switched off. Exactly what §27.8 does for the
+   button's copy of these three. */
+@media (prefers-reduced-motion:reduce){
+  .app .askdock .askline-mark::before{animation:none;opacity:1;scale:1}
+  .app .askdock .askline-mark .tal-mk{animation:none;scale:1}
+}
+
+/* IT YIELDS TO EVERY SURFACE THAT COVERS THE PAGE, much as the floating
+   button used to (§10.554): the notifications, and the ask page — which is
+   in the list for a second reason, since it has its own field at its own
+   foot, and that field is the one this dock turns into.
+
+   Tal's side panel was the third entry here and is gone from it because the
+   panel itself is gone (§27.9). It is not left in as a defensive clause: the
+   dock IS the Tal surface now, and a rule saying what it does when the other
+   Tal surface opens would be describing a state the product cannot reach. */
+.app:has(.notif.on) .askdock,
+.app:has(.ask-page) .askdock{opacity:0;visibility:hidden;pointer-events:none}
+
+/* THE RAIL IS ONLY IN THAT LIST WHERE THE RAIL IS AN OVERLAY.
+   §10.554 hides the floating button for `.sidenav.on` unconditionally, and
+   below the split that is right: the rail is `position:absolute` over the
+   page with a scrim (§01.406), so it covers the dock. At 900 it becomes a
+   static flex item sharing the row (§01.466) — it takes width from the view
+   column and the dock simply re-centres in what is left, because the dock
+   hangs in that column. Hiding it there would mean a field that vanishes
+   from the bottom of the page whenever the navigation is expanded, on the
+   one control the product now says is always available. */
+@container app (max-width:899px){
+  .app:has(.sidenav.on) .askdock{opacity:0;visibility:hidden;pointer-events:none}
+}
+
+/* AND IT SITS ABOVE A STICKY ACTION BAR, on the same offset §16 gives the
+   button for it: the bar is the page's own required action and it owns the
+   bottom edge while it is there. */
+.app:has(.stickybar) .askdock{bottom:calc(var(--s05) + 84px)}
+
+/* the dock arrives with the page rather than after it — it is chrome, not a
+   member of the band's cascade, so it takes the band's single rise (§13) and
+   not the 26ms stagger the sections used to run */
+.app[data-enter] .askdock{
+  animation:mo-rise var(--mo-base) var(--mo-enter) both}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE PAGE IT BECOMES
+   A column: a fixed head, a scrolling thread, a fixed foot. The page's own
+   bottom padding goes — the foot IS the bottom of the page — and Tal's
+   floating button goes with it, because you are already in Tal.
+   ------------------------------------------------------------------------ */
+.app .ask-page{
+  display:flex;flex-direction:column;height:100%;min-height:0;
+  padding-bottom:0;overflow:hidden}
+.app:has(.ask-page) .tal-fab{display:none}
+
+.app .ask-top{
+  flex:none;display:flex;align-items:center;gap:var(--s03);
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid var(--rule)}
+.app .ask-top .ph-back{
+  display:grid;place-items:center;width:32px;height:32px;flex:none;
+  margin-left:calc(var(--s03) * -1);background:transparent}
+.app .ask-top .ph-back svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .ask-top-t{
+  font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px}
+.app .ask-top-s{
+  margin-left:auto;color:var(--text-secondary);
+  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE THREAD
+   ------------------------------------------------------------------------ */
+.app .ask-thread{
+  flex:1 1 auto;min-height:0;overflow-y:auto;
+  display:flex;flex-direction:column;gap:var(--s05);
+  padding:var(--s06) var(--pad-x)}
+.app .ask-thread .tal-msg{max-width:100%}
+.app .ask-thread .tal-msg .bb{max-width:60ch}
+
+/* THE MARK IS A STAR, NOT A SQUARE. `.sk-mark` ships as a shimmer bar and is
+   masked into Tal's star only where the sheet says so — chip, avatar, FAB.
+   These two are the same mark in two more places, so they say so too. */
+.app .askline-mark .sk-mark,.app .askfield .askline-mark .sk-mark{
+  animation:none;background-color:var(--accent);
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+
+/* ------------------------------------------------------------------ 4 ---
+   THE FOOT
+   ------------------------------------------------------------------------ */
+.app .ask-foot{
+  flex:none;padding:var(--s05) var(--pad-x) var(--s05);
+  border-top:1px solid var(--rule);background:var(--background)}
+.app .ask-sugg{
+  display:flex;flex-wrap:wrap;gap:var(--s03);margin-bottom:var(--s05)}
+
+.app .askfield{
+  display:flex;align-items:center;gap:var(--s04);
+  min-height:48px;padding:0 0 0 var(--s05);
+  background:var(--layer-01);border:1px solid var(--rule)}
+.app .askfield:focus-within{border-color:var(--text-primary)}
+.app .askfield .inp{
+  flex:1 1 auto;min-width:0;border:0;background:transparent;
+  padding:0;height:46px;min-height:0}
+.app .askfield .inp:focus,.app .askfield .inp:focus-visible{outline:0;box-shadow:none}
+.app .askfield-send{
+  flex:none;width:46px;height:46px;display:grid;place-items:center;
+  background-image:var(--accent-grad);background-color:var(--accent);
+  border:0;--on-brand-fill:1}
+.app .askfield-send svg{width:20px;height:20px;fill:var(--on-accent);display:block}
+.app .ask-foot .tal-legal{margin:var(--s04) 0 0}
+
+/* ------------------------------------------------------------------ 5 ---
+   AT DESKTOP the ask keeps the column it was opened in, rails and all, so
+   the page has not moved out from under you.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .ask-top,.app .ask-thread,.app .ask-foot{
+    padding-left:var(--s07);padding-right:var(--s07)}
+  .app .ask-page{--pad-x:var(--s07)}
+  .app .ask-thread{padding-top:var(--s07);padding-bottom:var(--s07)}
+}
+
+/* ==========================================================================
+   22. THE GLOW ON A DARK CARD
+   Figma 281:142 — a blurred ellipse in the brand orange, off the top right
+   corner of every black card and clipped by it. Geometry derived from the
+   export's blur padding: a 703 x 97 ellipse, rotated 11.85deg, sigma 167,
+   centred 163 in from the right edge and 19 below the top.
+
+   WHICH CARDS GET ONE is decided in `GLOW_ON` in ai4.js, not here — this
+   layer only says what the thing looks like and how the stack is ordered.
+   `.lvl-hero` is no longer on that list (the reason is written where the
+   decision is), so it never receives a `.dark-glow` child. It is still named
+   below on purpose: the `overflow:hidden` and the z-index stack belong to
+   its own `::before` ground, which needs to stay behind its content whether
+   or not there is a light above it.
+   ========================================================================== */
+.app .plate,.app .lvl-hero,.app .cert,
+.app .sec.on-dark,.app .score.on-dark{position:relative;overflow:hidden}
+.app .dark-glow{
+  /* A BROAD WARM HAZE OFF THE TOP RIGHT, not a lamp with an edge. The
+     earlier version was a small blurred ellipse and it read as a discrete
+     object sitting on the card — you could see where it stopped. This is
+     one radial reaching in from just past the top-right corner and dying
+     out around two thirds of the way across, which is the only way a glow
+     on a black surface looks like light rather than like paint. */
+  position:absolute;inset:0;
+  background:radial-gradient(78% 135% at 92% -8%,
+    var(--accent) 0%, transparent 64%);
+  opacity:.22;
+  pointer-events:none;z-index:1}
+/* THE LIGHT IS ALWAYS BEHIND. Three layers, stated: the card's own ground at
+   the back, the glow above it, and every piece of content above both. The
+   level hero paints its ground with a ::before, so that has to be named too
+   or the glow lands under it and disappears. */
+.app .lvl-hero::before{z-index:0}
+.app .plate > :not(.dark-glow),
+.app .lvl-hero > :not(.dark-glow),
+.app .cert > :not(.dark-glow),
+.app .sec.on-dark > :not(.dark-glow),
+.app .score.on-dark > :not(.dark-glow){position:relative;z-index:2}
+
+/* ==========================================================================
+   24. THE ASK TAKES TIME
+   Opening the ask is a change of state, not a change of page, and the motion
+   has to say so: nothing cuts, and the two states are never on screen
+   competing. Order carries the direction — going in, the page leaves before
+   the conversation arrives; coming back, the conversation leaves before the
+   page returns.
+
+   Distances are small (10-14px) and durations short (170-320ms) because the
+   thing being animated is a page you are looking at, not a screen arriving
+   from off-stage. The one exception is the field, which rises further and
+   lands last: it is where you were pointing when you clicked, so it is the
+   thing the eye should follow.
+   ========================================================================== */
+
+@keyframes ask-drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes ask-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes ask-lift{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes ask-fade{from{opacity:0}to{opacity:1}}
+@keyframes ask-up-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-10px)}}
+@keyframes ask-down-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(14px)}}
+@keyframes ask-shrink{from{opacity:1;transform:none}to{opacity:0;transform:scale(.985)}}
+
+/* --- the page stepping aside ------------------------------------------- */
+.app .page.page-to-ask{
+  animation:ask-shrink 170ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both;
+  transform-origin:50% 30%;pointer-events:none}
+/* the line does not leave with it: it is the thing you clicked, and it stays
+   put while everything around it goes */
+.app .page.page-to-ask .ask-sec{animation:none;opacity:1;transform:none}
+
+/* --- and coming back ---------------------------------------------------- */
+.app .page.page-from-ask{
+  animation:ask-fade 260ms var(--mo-standard, cubic-bezier(.4,0,.2,1)) both}
+.app .page.page-from-ask > *{
+  animation:ask-rise 300ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .page.page-from-ask > :nth-child(2){animation-delay:40ms}
+.app .page.page-from-ask > :nth-child(3){animation-delay:80ms}
+.app .page.page-from-ask > :nth-child(n+4){animation-delay:120ms}
+
+/* --- the conversation arriving ------------------------------------------ */
+.app .ask-page.ask-in .ask-top{
+  animation:ask-drop 240ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-page.ask-in .ask-thread{
+  animation:ask-rise 300ms 70ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-page.ask-in .ask-foot{
+  animation:ask-lift 340ms 40ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+
+/* --- and leaving -------------------------------------------------------- */
+.app .ask-page.ask-out{pointer-events:none}
+.app .ask-page.ask-out .ask-top{
+  animation:ask-up-out 180ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+.app .ask-page.ask-out .ask-thread{
+  animation:ask-shrink 160ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+.app .ask-page.ask-out .ask-foot{
+  animation:ask-down-out 190ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+
+/* --- a message, and the suggestions it replaces -------------------------- */
+.app .ask-thread .tal-msg.msg-in{
+  animation:ask-rise 260ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-sugg{transition:opacity 160ms var(--mo-standard, cubic-bezier(.4,0,.2,1)),
+                          transform 160ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .ask-sugg.going{opacity:0;transform:translateY(6px)}
+
+/* --- the line itself ----------------------------------------------------- */
+/* it is a control you press, so it says so before the page moves */
+.app .askline{transition:border-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1)),
+                         background-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .askline:active{border-color:var(--text-primary)}
+
+@media (prefers-reduced-motion:reduce){
+  .app .page.page-to-ask,.app .page.page-from-ask,.app .page.page-from-ask > *,
+  .app .ask-page.ask-in .ask-top,.app .ask-page.ask-in .ask-thread,
+  .app .ask-page.ask-in .ask-foot,.app .ask-page.ask-out .ask-top,
+  .app .ask-page.ask-out .ask-thread,.app .ask-page.ask-out .ask-foot,
+  .app .ask-thread .tal-msg.msg-in{animation:none}
+}
+
+/* --------------------------------------------------------------------------
+   THE LIGHT PASSES THROUGH THE GRID
+   The track band and the facts row are drawn with the gap technique: the
+   grid paints the hairline colour and each cell paints the card's black
+   over it, leaving 1px lines showing. On a card with a glow behind it that
+   black is a second, flat black sitting ON the light — which is why the
+   gradient stopped dead at the top of the grid.
+
+   Same lines, drawn the other way: no fill anywhere, and the rules are
+   borders on the cells. The card's own black is the only black, and the
+   light reaches the whole card.
+   -------------------------------------------------------------------------- */
+.app .path,.app .path-facts{background:transparent;gap:0}
+.app .path-step,.app .path-facts > div{
+  background:transparent;border-right:1px solid var(--on-dark-rule)}
+.app .path-step:last-child,.app .path-facts > div:last-child{border-right:0}

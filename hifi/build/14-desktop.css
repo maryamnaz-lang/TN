@@ -1,0 +1,378 @@
+/* ==========================================================================
+   14. THE DESKTOP
+   Everything above this layer was designed at 390 and allowed to grow. That
+   produces a page that fits a desktop without ever being one: a single
+   column of full-width rows, a permanent 260px drawer holding eight words
+   that never change, and a rule under every one of them.
+
+   This layer states what changes when there is room, and only that.
+
+     1. The navigation is an icon rail. Expanded is a state, not the default.
+     2. Rules mark boundaries. A boundary is where a group ends, not where a
+        block does.
+     3. The page is composed in two columns: what you act on, and what you
+        check.
+     4. Prose keeps a measure even when the page does not.
+   ========================================================================== */
+
+@container app (min-width:900px){
+
+/* --------------------------------------------------------------------------
+   1. THE RAIL
+   72px of icons. It expands over the content rather than pushing it, so
+   toggling it does not reflow the page you are reading, and `go()` already
+   clears the flag — open it, pick a module, and it is shut again when the
+   new page arrives.
+   -------------------------------------------------------------------------- */
+  .app .shell-act[data-toggle="nav"]{display:grid}
+  .app .shell-logo{width:auto;padding-left:var(--s02)}
+
+  .app{--rail-w-nav:72px}
+  .app .sidenav{
+    width:var(--rail-w-nav);flex:none;padding:var(--s04) 0;
+    background-color:var(--background);
+    border-right:1px solid var(--rule);
+    transition:width var(--mo-base) var(--mo-standard)}
+  .app .sn-item{
+    min-height:48px;padding:0;gap:0;justify-content:center;
+    border-top:0;position:relative}
+  .app .sn-item svg{display:block;width:22px;height:22px}
+  .app .sn-item > span:not(.badge){
+    position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .app .sn-item .badge{
+    position:absolute;top:6px;right:14px;margin:0;
+    min-width:16px;height:16px;font-size:9.5px;line-height:10px;padding:0 4px}
+  .app .sn-foot{margin-top:auto;border-top:1px solid var(--rule);
+    padding-top:var(--s04);padding-bottom:var(--s04)}
+  .app .sn-item.on::before{width:2px}
+
+  /* expanded: the same rail, wider. It pushes the page across rather than
+     covering it — at this size there is room for both, and a panel that
+     hides the thing you are navigating away from is a phone pattern. */
+  .app[data-rail="open"] .sidenav{width:var(--drawer-w)}
+  .app[data-rail="open"] .sn-item{
+    justify-content:flex-start;padding:0 var(--s05);gap:var(--s05)}
+  .app[data-rail="open"] .sn-item > span:not(.badge){
+    position:static;width:auto;height:auto;overflow:visible;clip-path:none;
+    flex:1;min-width:0}
+  .app[data-rail="open"] .sn-item .badge{
+    position:static;margin-left:auto;min-width:20px;height:20px;
+    font-size:11px;line-height:16px;padding:0 6px}
+
+/* --------------------------------------------------------------------------
+   2. FEWER LINES
+   The lattice drew two full-height rails, a tick mark at every crossing and
+   a rule under every section. At phone width that reads as structure; at
+   desktop width, with a column of short blocks, it reads as ruled paper.
+
+   The rails and the ticks go. A rule survives only where it separates one
+   group from the next — which in practice means: immediately before a
+   section that introduces itself with a heading, and under the page header.
+   A button that belongs to the paragraph above it is no longer fenced off
+   from it.
+   -------------------------------------------------------------------------- */
+  .app .page{border-left:0;border-right:0;max-width:none}
+  /* the rails are restored further down, at the content margin */
+  .app .sec::before,.app .ph::before,.app .score::before{display:none}
+
+  .app .page > .sec::after{display:none}
+  /* A BAND THAT ENDS ITSELF NEEDS NO RULE. The exclusion is on this line and
+     not stated as an override in §28, because `:has(+ .sec > .sec-h)` counts
+     TWO classes inside the `:has()` and is therefore (0,5,0) — a section
+     rule keyed on one class cannot reach it from a later layer, whatever the
+     layer order or the container tier. The case is the cohort-leader wall:
+     its section carries no padding, so the rule had nowhere to sit but the
+     last pixel row of the black band, where it read as a broken bottom edge
+     — grey across the middle, black for a gutter at each end. */
+  /* `.signed` joins the exclusion for a different reason: the section under
+     it is the tinted reference block, so the boundary is a change of ground.
+     A hairline on top of a tone change is the same statement made twice, and
+     the card it would close has had its own two internal rules taken out
+     (§29.16) precisely so it stops reading as a ruled table. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed))::after,
+  .app .page > .sec:has(+ .sec > .eyebrow)::after,
+  .app .page > .sec:has(+ .lvl-hero)::after,
+  .app .page > .sec:has(+ .acc)::after,
+  .app .page > .sec:has(+ .tabs)::after,
+  /* A SECTION CAN ALSO INTRODUCE ITSELF WITH A BUTTON. The test above is
+     "does the next block name itself" and a heading is how a block usually
+     does that — but Log out is a section whose entire content is one control,
+     and it still changes the subject: everything above it is about the
+     account, and it is about leaving. With no heading to match, it went
+     unruled and read as a second action belonging to the delete block above
+     it, which is the one neighbour it must not read as. `sec-out` is the
+     marker; the list stays the single place this is decided. */
+  .app .page > .sec:has(+ .sec.sec-out)::after{display:block}
+  .app .page > .sec:last-child::after{display:none}
+  /* the label column no longer draws a third vertical line */
+  .app .sec:has(> .sec-h) > .sec-h,
+  .app .sec:has(> .eyebrow) > .eyebrow{border-right:0}
+
+/* --------------------------------------------------------------------------
+   3. MEASURE
+   The page fills the width the rail gave back, but a paragraph does not: 68
+   characters is where a line stops being comfortable, and no amount of
+   screen changes that.
+   -------------------------------------------------------------------------- */
+  /* a measure for paragraphs. The cohort note is a one-sentence caption on
+     the bar above it, not a paragraph, so it keeps the column. */
+  .app .ph .lead,.app .sec > p,.app .ai-body p,.app .acc-b p,
+  .app .tile > p,.app .empty p{max-width:68ch}
+  .app .ph{padding-top:var(--s08);padding-bottom:var(--s06)}
+
+/* --------------------------------------------------------------------------
+   3b. THE CONTENT MARGIN
+   The rail gave width back and the page took all of it, so the content ran
+   from the rail to the frame with only its own 32px gutter. A desktop page
+   needs a margin, not a gutter: the column is set in from both sides so the
+   layout reads as placed on the screen rather than poured into it.
+
+   It is proportional and capped — 12% of the frame, never less than 24px and
+   never more than 200px — so the margin grows with the window until the
+   measure is right, then stops. The section rules still run past it to the
+   frame edge, because the rule is the sheet and the margin is the setting.
+   -------------------------------------------------------------------------- */
+  .app .main{
+    padding-left:clamp(var(--s06), 12cqw, 200px);
+    padding-right:clamp(var(--s06), 12cqw, 200px)}
+  .app .page{max-width:none;margin:0}
+}
+
+/* ==========================================================================
+   THE SIGN-UP FLOW AT DESKTOP
+   Measured off the 1920 x 1028 frame:
+
+     graphic   0    -> 870    (its own width; the canvas shows past it)
+     modal     1111 -> 1686   (575 wide, 20px gutter, 535 of content)
+     strip     1686 -> 1920   (234)
+     rules     y=140 and y=886, from x=607 to the modal's right edge
+
+   Expressed as proportions of the frame with the modal's 575 held fixed, so
+   the arrangement holds at 1500 and at 2560. That width is the one number
+   that never moves: create, log in, verify and reset all sit in it, which is
+   what makes them read as one object at four moments rather than four pages.
+
+   The outer rules hang off the form block, so they follow its height —
+   verify is a third the height of create and its rules close a third of the
+   way down without being told to.
+   ========================================================================== */
+.auth-art{display:none}
+
+@container app (min-width:900px){
+  .app:has(> .auth-art){flex-direction:row}
+
+  /* the graphic holds its own width and the canvas shows past it, rather
+     than the panel stretching to fill whatever is left of the row */
+  /* THE GRAPHIC IS THE EXPORT. It is placed, not drawn: one image at its own
+     aspect (1740 x 2056, so 870 x 1028 at 1x), anchored to the top-left of
+     the panel and sized by height, so its width follows from its height and
+     it can never be stretched. It carries its own dark ground, its own two
+     hairlines and its own two labels, and it is transparent everywhere else
+     — which is why the panel behind it stays the page canvas rather than
+     painting a ground the artwork does not want. */
+  .app > .auth-art{
+    display:block;position:relative;flex:1 1 auto;min-width:0;
+    max-width:870px;background-color:transparent;overflow:hidden}
+  .app .auth-img{
+    display:block;position:absolute;left:0;top:0;height:100%;
+    aspect-ratio:1740 / 2056;
+    background-image:url('__AUTHART__');
+    background-size:100% 100%;background-repeat:no-repeat}
+
+  .app .auth-col{
+    flex:none;width:575px;min-width:0;margin-left:auto;
+    display:flex;flex-direction:column;justify-content:center;
+    border-left:1px solid var(--rule);border-right:1px solid var(--rule);
+    margin-right:clamp(var(--s06), 12cqw, 234px)}
+
+  /* the app bar becomes the modal's own first row */
+  .app .auth-col > .shell{
+    position:relative;height:auto;flex:none;
+    padding:16px 20px;background-color:transparent;
+    border-bottom:1px solid var(--rule)}
+  .app .auth-col > .shell .shell-logo{padding:0}
+  .app .auth-col > .shell .shell-logo img{height:26px}
+  .app .auth-col > .shell .shell-right{display:none}
+
+  .app .auth-col > .main{flex:0 1 auto;overflow:visible;padding:0}
+  .app .auth-col .page{
+    position:relative;max-width:none;margin:0;min-height:0;padding-bottom:0}
+
+  /* the two rules that run past the modal — left, to x=607 on a 1920 frame */
+  .app .auth-col > .shell::before,
+  .app .auth-col .page::after{
+    content:'';position:absolute;right:0;height:1px;background:var(--rule);
+    left:calc(-1 * clamp(0px, 26cqw, 504px))}
+  .app .auth-col > .shell::before{top:0}
+  .app .auth-col .page::after{bottom:0}
+
+  /* 20px gutter, 535 of content. Inside the modal the rules stop at the
+     modal; only the outer two run past it. */
+  .app .auth-col .sec{padding:16px 20px}
+  .app .auth-col .sec::after{left:0;right:0;display:block}
+  .app .auth-col .page > .sec:last-child::after{display:none}
+  .app .auth-col .form-page > .ph{padding:12px 20px 20px}
+  /* the heading and the address are one block: no rule between them */
+  .app .auth-col .form-page > .ph::after{display:none}
+  .app .auth-col .sec:has(> .sec-h),
+  .app .auth-col .sec:has(> .eyebrow){
+    display:block;padding-left:20px;padding-right:20px}
+  .app .auth-col .sec > .sec-h,.app .auth-col .sec > .eyebrow{
+    padding:0;border-right:0;min-height:0;margin-bottom:var(--s05)}
+  .app .auth-col .sec:has(> .sec-h) > :not(.sec-h){padding-left:0}
+  .app .auth-col .form-page .f{margin-bottom:var(--s05)}
+  .app .auth-col .form-page .f.last{margin-bottom:0}
+
+  /* password and confirm are one decision, so they are one row */
+  .app .f-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    column-gap:16px}
+  .app .f-row > .f{margin-bottom:0}
+  .app .f-row .pw-rules{grid-column:1 / -1;margin-top:var(--s05)}
+  /* the address and the line explaining where it came from share a line */
+  .app .static-row{display:flex;align-items:baseline;
+    justify-content:space-between;gap:var(--s05)}
+  .app .static-row .inp-static{flex:0 1 auto;min-height:36px}
+  .app .static-row .help{flex:none;margin-top:0;text-align:right}
+  /* the action and the way out share the closing line */
+  .app .foot-row{display:flex;align-items:center;
+    justify-content:space-between;gap:var(--s05)}
+  .app .foot-row > div{margin:0}
+  .app .foot-row .btn-full{width:auto;min-width:217px}
+  .app .foot-row p{margin:0}
+}
+
+/* ==========================================================================
+   THE BARE CLICKABLE TILE
+   `.tile.clk` is display:flex so a leading icon, a text block and a trailing
+   arrow sit on one line. Most callers wrap the text in `.gcard-b`, which
+   makes it one flex item. A few pass the label, the title and the sub as
+   three direct children, and those became three columns of text.
+
+   It becomes a two-column grid instead: everything that is not the arrow
+   stacks in the first column, the arrow holds the second. Same anatomy, no
+   dependence on how the caller happened to wrap its content.
+   ========================================================================== */
+.app .tile.clk.arrow{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;column-gap:var(--s05)}
+.app .tile.clk.arrow > :not(.tile-arrow){grid-column:1;min-width:0}
+.app .tile.clk.arrow > .tile-arrow{grid-column:2;grid-row:1 / -1;align-self:center}
+
+/* ==========================================================================
+   THE RAILS COME BACK
+   The content column is bounded again — a hairline down each side of it,
+   running the full height of the page rather than stopping where the content
+   happens to end, so the column reads as a drawn thing.
+
+   They sit exactly on the margin the layer above set, and the content keeps
+   its own 32px inside them, so nothing touches a rail. The section rules
+   still cross them to the frame edge: the rail says where the column is, the
+   rule says where a section ends, and they are allowed to intersect.
+
+   Everything pays the same 32 — header, section, row — which is what keeps
+   the left edge single. The gutter is back for that reason: with the second
+   column gone there is no longer anything that pays a different one.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .main{position:relative}
+  .app .page:not(.form-page){position:relative}
+  .app .page:not(.form-page)::before,
+  .app .page:not(.form-page)::after{
+    content:'';display:block;position:absolute;top:0;bottom:0;width:1px;
+    background:var(--rule);z-index:2;pointer-events:none}
+  .app .page:not(.form-page)::before{left:0}
+  .app .page:not(.form-page)::after{right:0}
+  /* and the content keeps a full gutter inside them, so nothing touches a rail */
+  .app .page:not(.form-page) > .sec,
+  .app .page:not(.form-page) > .sec.tight,
+  .app .page:not(.form-page) > .ph,
+  .app .page:not(.form-page) > .sec.flat,
+  .app .page:not(.form-page) > .acc,
+  .app .page:not(.form-page) > .tabs{
+    padding-left:var(--s07);padding-right:var(--s07)}
+  .app .page:not(.form-page){--pad-x:var(--s07)}
+  .app .lvl-hero{padding-left:var(--s07);padding-right:var(--s07)}
+}
+
+/* ==========================================================================
+   A FIGURE IS NOT A BUTTON
+   The cells of a figure grid — chapters done, tasks on time, minutes
+   invested — are readings. Nothing happens when you click one.
+   ========================================================================== */
+.app .prog-figs > span,.app .stats > .stat,.app .facts > div{cursor:default}
+
+/* ==========================================================================
+   A CHIP DOES NOT GAIN AN OUTLINE
+   The chip inherited the bordered-button hover, so pointing at a suggested
+   question drew a hard black rule around it — the one place in the product
+   where hover adds a container rather than a colour. It takes the accent at
+   8% and accent ink, the same pair the panel chips use, and no border at all.
+   ========================================================================== */
+.app .chip-tal{border-color:var(--rule)}
+.app .chip-tal:hover,.app .chip-tal:focus-visible{
+  border-color:transparent;background-color:var(--accent-tint);
+  color:var(--accent-on-2)}
+.app .chip-tal:hover .sk-mark{background-color:var(--accent-on-2)}
+.app .ai-asks .chip-tal:hover,.app .bub .chip-tal:hover{
+  border-color:transparent;background-color:transparent}
+
+
+/* the closing line is its own block, so the margins the buttons carried
+   inside a shared section are no longer needed */
+@container app (min-width:900px){
+  .app .auth-col .foot-row .mt6{margin-top:0}
+  .app .auth-col .foot-row p{margin-top:0}
+}
+.app .foot-row .mt6{margin-top:var(--s05)}
+
+/* the modal's gutter outranks the page-level rules that zero a gutter at
+   this size — inside the column, 20px is the edge and nothing else sets it */
+@container app (min-width:900px){
+  .app .auth-col .page > .sec,
+  .app .auth-col .page > .sec.tight,
+  .app .auth-col .page > .sec.flat,
+  .app .auth-col .page > .sec.flush{padding-left:20px;padding-right:20px}
+  .app .auth-col .page > .sec[style]{padding-left:20px;padding-right:20px}
+  .app .auth-col .page > .ph{padding-left:20px;padding-right:20px}
+}
+
+/* With the gutter restored, a section pays it and its heading must not — the
+   §16 rules that gave `.sec-h` its own padding predate §28 and would charge
+   it twice. Stated once, for every page that has rails. */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec > .sec-h,
+  .app .page:not(.form-page) .sec > .eyebrow{
+    padding-left:0;padding-right:var(--s06)}
+  .app .page:not(.form-page) .sec:has(> .sec-h) > :not(.sec-h),
+  .app .page:not(.form-page) .sec:has(> .eyebrow) > :not(.eyebrow){
+    padding-left:0}
+}
+
+/* ==========================================================================
+   THE SHORTLIST IS THREE ACROSS
+   Tal proposes exactly three agents, and on a phone they stack because there
+   is no other option. At desktop they are a comparison — same four facts in
+   the same place three times — so they sit side by side as cells of one
+   ruled band, which is the only arrangement that lets you read down a column
+   (all three ratings, all three prices) rather than hunting for each fact.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .rail-wrap{padding-left:var(--s07);padding-right:var(--s07)}
+  .app .rail{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .app .rail .agh{
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:'av av' 'name name' 'rate rate' 'meta meta' 'foot go';
+    align-items:start;row-gap:var(--s02);
+    padding:var(--s06);
+    border-bottom:0;border-right:1px solid var(--rule)}
+  .app .rail .agh:last-child{border-right:0}
+  .app .rail .agh > .av,.app .rail .agh > .av-ph{
+    width:56px;height:56px;margin-bottom:var(--s04);align-self:start}
+  .app .rail .agh-f{
+    grid-area:foot;display:flex;align-items:baseline;gap:var(--s04);
+    justify-content:flex-start;margin-top:var(--s05)}
+  .app .rail .card-go{grid-area:go;align-self:center;margin-top:var(--s05)}
+  .app .rail .tal-star{position:absolute;top:var(--s05);right:var(--s05)}
+}

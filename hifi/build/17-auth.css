@@ -1,0 +1,508 @@
+/* ==========================================================================
+   17. THE FRONT DOOR
+   The sign-up screens are the one place the product is not yet the product.
+   Nobody has a level, a cohort or a report; there is nothing to navigate and
+   nothing to check. So the desktop composition stops pretending to be an app
+   shell and becomes what it actually is: one card on a ground, with the
+   brand on the left and the one thing you have to do on the right.
+
+   Taken from Figma — TalentNext / Create your account (255:7673) and Verify
+   Your Email Address (257:7784). The geometry is stated at the numbers the
+   file states them at:
+
+     card      1196 x 715, padding 40 / 32 / 40 / 142, gap 50
+     brand     511 wide, a hairline down its right edge
+     form      461 wide
+     mark      112 x 294, on the card's left edge, top 88
+
+   Below 900 none of this exists: the card is a desktop object and the phone
+   keeps the single column it already had. `.auth-card` is `display:contents`
+   there, so the column is unchanged rather than re-derived.
+
+   Three of the file's colours are not used as stated, and the reason in each
+   case is contrast, not taste — the value is in the token block above with
+   its ratio. Everything else is the file's value.
+   ========================================================================== */
+
+.auth-card{display:contents}
+.auth-brand,.auth-mark{display:none}
+
+/* ==========================================================================
+   THE WASH IS ON BOTH FRAMES
+   Ellipse 42 — 2132 x 128, centred, sitting 30 above the top edge, under a
+   100 blur — is drawn on the phone frames (292:310, 292:512) at exactly the
+   numbers it is drawn on the desktop one. It is the door's warmth, and the
+   door is the same door on a phone.
+
+   The shell has to stop painting for it to be visible. Everywhere else in
+   the product the app bar is white because the canvas is white and the two
+   are one sheet; here the sheet has a wash on it and an opaque bar across
+   the top is a white stripe over the warm part.
+   ========================================================================== */
+.app:has(> .auth-card){position:relative}
+/* Ellipse 42 is placed against the FRAME on the phone mocks, and the frame
+   there starts 44 above `.app` — that is where the simulated status bar
+   sits. Same ellipse, same 30 above the top edge, measured from the edge
+   the file measures from. */
+.device[data-vp="mobile"]:has(.auth-card) .ios-top{background:transparent}
+.device[data-vp="mobile"] .app:has(> .auth-card)::before{top:-74px}
+.app:has(> .auth-card)::before{
+  content:'';position:absolute;left:50%;top:-30px;width:2132px;height:128px;
+  transform:translateX(-50%);pointer-events:none;z-index:0;
+  border-radius:50%;background:var(--auth-wash-1);
+  filter:blur(var(--auth-wash-1-blur));
+  /* the ellipse is 128 tall against a 100 blur — a third of a sigma from
+     centre to edge — so the file's own render never gets near the fill.
+     A CSS blur of a hard-edged div does, and reads as a peach stripe. */
+  opacity:.55}
+.app:has(> .auth-card) > .auth-col{position:relative;z-index:1}
+/* everything between the wash and the eye has to stop painting, or the
+   blur shows only in the gaps between the opaque parts and reads as a
+   rectangle with hard edges rather than as light on the page */
+.app:has(> .auth-card) .shell,
+.app:has(> .auth-card) .shell .bar,
+.app:has(> .auth-card) .auth-col,
+.app:has(> .auth-card) .auth-col > .main,
+.app:has(> .auth-card) .page,
+.app:has(> .auth-card) .page > .sec{background:transparent}
+
+@container app (min-width:900px){
+
+  /* ------------------------------------------------------------------ 1 ---
+     THE GROUND
+     The app fills the frame and centres one child. It scrolls, because a
+     715px card in a 700px window is still a card — it just needs somewhere
+     to go. The wash across the top is the file's Ellipse 42: a blurred band
+     the full width of the frame, sitting just above its top edge.
+     ------------------------------------------------------------------------ */
+  /* THE CARD NEEDS A GROUND TO BE A CARD. The Figma file stands it on
+     #F3F2EE, which was the platform canvas when the file was drawn. The
+     canvas is white now, and a white card on a white ground is not a card —
+     so it stands on the panel tone instead. Same relationship the file
+     draws, inside the two tones the product has. */
+  .app:has(> .auth-card){
+    display:block;overflow:auto;background:var(--surface-2)}
+  /* It is an ELLIPSE WITH A LAYER BLUR, not a gradient box — that is what
+     the file draws, and the two do not look alike: a gradient in a box has
+     an edge where the box ends, and a blurred ellipse has none. Stated at
+     the file's geometry: 2132 x 128, centred, sitting 30 above the frame. */
+  .app:has(> .auth-card)::before{
+    content:'';position:absolute;left:50%;top:-30px;width:2132px;height:128px;
+    transform:translateX(-50%);pointer-events:none;z-index:0;
+    border-radius:50%;background:var(--auth-wash-1);
+    filter:blur(var(--auth-wash-1-blur))}
+
+  .auth-card{
+    display:flex;align-items:stretch;gap:50px;
+    position:relative;z-index:1;
+    box-sizing:border-box;
+    width:1196px;max-width:calc(100% - 48px);min-height:715px;
+    margin:clamp(24px, 6cqh, 76px) auto;
+    padding:40px 32px 40px clamp(40px, 7.4cqw, 142px);
+    background:var(--auth-card-bg);
+    box-shadow:0 26px 39px var(--auth-shadow);
+    overflow:hidden}
+
+  /* the file's Ellipse 43 — a rose wash tucked under the brand column's
+     bottom-left corner, rotated 11 degrees and heavily blurred */
+  /* the file's Ellipse 43: a 431 x 138 ellipse rotated 11.08 degrees, blurred,
+     sitting under the brand column's bottom-left corner. Same construction
+     as the band above — the shape is an ellipse and the softness is a blur. */
+  .auth-card::before{
+    content:'';position:absolute;left:-21px;top:622px;
+    width:431px;height:138px;pointer-events:none;z-index:0;
+    border-radius:50%;background:var(--auth-wash-2);
+    transform:rotate(11.08deg);
+    filter:blur(var(--auth-wash-2-blur))}
+
+  /* ------------------------------------------------------------------ 2 ---
+     THE MARK
+     112 x 294 of the brand chevron, clipped by the card's own left edge.
+     Placed at its export size, not scaled: the crop is part of the artwork.
+     ------------------------------------------------------------------------ */
+  /* the bleed needs the 142 of left padding to bleed INTO. Below the card's
+     full width that padding is what gives first, and a mark standing on the
+     welcome copy is worse than no mark: it shows at full width and nowhere
+     else. */
+  .auth-card > .auth-mark{
+    display:none;position:absolute;left:0;top:88px;
+    width:112px;height:294px;pointer-events:none;z-index:2;
+    background-image:url('__AUTHMARK__');
+    background-size:112px 294px;background-repeat:no-repeat}
+
+  /* ------------------------------------------------------------------ 3 ---
+     THE BRAND COLUMN
+     Logo, the welcome, and the line that closes the card. The hairline on
+     its right edge is the file's Line 17 — it runs the full height of the
+     content box, not the height of the text.
+     ------------------------------------------------------------------------ */
+  .auth-card > .auth-brand{
+    display:flex;flex-direction:column;position:relative;z-index:3;
+    flex:0 1 511px;min-width:0;box-sizing:border-box;
+    padding:60px 50px 0 0;
+    border-right:1px solid var(--auth-rule)}
+  .auth-brand .auth-logo{display:block;margin:0}
+  .auth-brand .auth-logo img{display:block;width:173px;height:auto}
+  .auth-brand .auth-intro{margin-top:40px;padding:12px 0;max-width:min(421px,100%)}
+  .auth-brand .auth-intro h2{margin:0 0 8px}
+  .auth-brand .auth-intro p{margin:0 0 19px;color:var(--text-secondary)}
+  .auth-brand .auth-intro p:last-child{margin-bottom:0}
+  .auth-brand .auth-intro p.auth-begin{font-weight:600;color:var(--auth-o-ink)}
+  .auth-brand .auth-foot{margin:auto 0 0;color:var(--text-secondary)}
+
+  /* ------------------------------------------------------------------ 4 ---
+     THE FORM COLUMN
+     461 wide. The app bar goes: the logo is in the brand column now, and the
+     back control moves inline with the title where the file puts it. The
+     closing row is pushed to the foot of the card, so verify — which is a
+     third of create's height — still closes on the same line create does.
+     ------------------------------------------------------------------------ */
+  .auth-card > .auth-col{
+    flex:none;width:461px;min-width:0;margin:0;
+    border-left:0;border-right:0;
+    display:flex;flex-direction:column;position:relative;z-index:3}
+  /* THE CARD IS THE ONLY SURFACE IN HERE. Every shell part paints the canvas
+     by default — that is the rule everywhere else in the product — and three
+     of them stacked inside a white card read as a grey plate sitting on it.
+     Inside the card they are structure and nothing else. */
+  .auth-card > .auth-col,
+  .auth-card > .auth-col > .main,
+  .auth-card > .auth-col .page,
+  .auth-card > .auth-col .sec{background:transparent}
+  .auth-card > .auth-col > .shell{display:none}
+  .auth-card > .auth-col > .shell::before,
+  .auth-card > .auth-col .page::after{content:none}
+  .auth-card > .auth-col > .main{flex:1 1 auto;display:flex;min-height:0}
+  .auth-card > .auth-col .page{
+    flex:1 1 auto;display:flex;flex-direction:column;width:100%;
+    padding:0;max-width:none;margin:0}
+  .auth-card .form-page > .sec:last-child{margin-top:auto}
+
+  /* every section in the card pays nothing on the sides — the card's own
+     padding is the gutter — and the hairlines between sections go. The file
+     draws exactly one rule in this column, above the password block. */
+  .app .auth-card .page > .sec,
+  .app .auth-card .page > .sec.tight,
+  .app .auth-card .page > .sec.flat,
+  .app .auth-card .page > .sec.flush,
+  .app .auth-card .page > .sec[style],
+  .app .auth-card .page > .ph{padding-left:0;padding-right:0}
+  /* stated again outside this block: the file draws exactly one rule in
+     this column at every width, and at 900 and up §14 was switching the
+     others off for its own reasons rather than for this one */
+  /* and the column's own rails go with them. The card draws two vertical
+     lines in the file — its own edge, and the hairline between the brand
+     and the form. A third one inside the form column is the app's lattice
+     showing through an object that is not a page. */
+  .auth-card .page::before,
+  .auth-card .page::after,
+  .auth-card .sec::before,
+  .auth-card .ph::before,
+  .auth-card .score::before{content:none;display:none}
+}
+
+/* ==========================================================================
+   AND THE SAME CARD ON A PHONE
+   Everything above this line is the CARD: a two-column object 1196 wide with
+   a brand panel, a ground and a mark. That only exists at 900 and up, and
+   below it the column stands on its own, which is what it always did.
+
+   Everything BELOW this line is what is IN the column — the title block, the
+   address, the fields, the consents, the code, the buttons and the scale
+   they are all set at. Maryam asked for the phone to follow the same frames
+   (292:310 and 292:512), and it is the same frames: the file draws create
+   and verify at one set of sizes and the width of the window does not change
+   what a password field is. So these rules are stated once, ungated, and the
+   phone and the card get the same column.
+
+   Two things stay behind: the horizontal padding (the card's own padding is
+   the gutter, the phone's is `--pad-x`) and the 217px action, which is a
+   fixed width inside a 461 column and full width on a phone. Everything that
+   sets padding here therefore sets the VERTICAL only; the sides are decided
+   above, per width.
+   ========================================================================== */
+
+/* the title block: 12 above, 8 between, and the back arrow inline */
+  .app .auth-card .form-page > .ph{padding-top:12px;padding-bottom:12px}
+  .auth-card .form-page .ph-top{margin-bottom:8px;gap:8px}
+  /* 20 x 20 on the title's centre line, eight across to the word. It was
+     inheriting the app bar's 24 and sitting on the text's box rather than
+     on its cap height, which put it low and made it the largest thing on
+     the row. */
+  .auth-card .form-page .ph-top{align-items:center}
+  .auth-card .form-page .ph-back{
+    display:grid;place-items:center;width:20px;height:20px;min-height:0;
+    padding:0;flex:none;background:transparent}
+  .auth-card .form-page .ph-back svg{width:20px;height:20px;display:block}
+  .auth-card .form-page .ph-main > p{margin:0;color:var(--auth-sub)}
+
+  /* ------------------------------------------------------------------ 5 ---
+     THE ADDRESS ROW
+     Label over value on the left, and the line explaining where the address
+     came from on the right — sitting on the value's baseline, not the
+     label's, which is what `items-end` does in the file.
+     ------------------------------------------------------------------------ */
+  .app .auth-card .form-page .sec.sec-id{padding-top:12px;padding-bottom:20px}
+  .auth-card .sec-id .f,.auth-card .sec-id .f.last{margin:0}
+  .auth-card .sec-id label{
+    display:block;margin:0 0 4px;color:var(--text-secondary)}
+  .auth-card .sec-id .static-row{align-items:flex-end;gap:8px}
+  /* the row wraps below the card, and the file stacks the address over the
+     line that says where it came from at 4, not at the 8 the row pays
+     across */
+  .auth-card .sec-id .static-row{flex-wrap:wrap;row-gap:4px}
+  .auth-card .sec-id .inp-static{
+    min-height:0;padding:0;border:0;background:transparent;
+    color:var(--accent-text);font-weight:600}
+  .auth-card .sec-id .help{color:var(--text-secondary)}
+
+  /* ------------------------------------------------------------------ 6 ---
+     THE ONE RULE IN THE COLUMN
+     Above "Set a Password" and above "Verification Code": the same block,
+     24 above and below, 16 under its heading.
+     ------------------------------------------------------------------------ */
+  .app .auth-card .page > .sec.sec-rule{
+    padding-top:24px;padding-bottom:24px;border-top:1px solid var(--auth-rule)}
+  .auth-card .sec-rule > .sec-h{margin-bottom:16px;min-height:0;padding:0}
+  .auth-card .sec-rule > .sec-h h2{margin:0}
+
+  /* ------------------------------------------------------------------ 7 ---
+     THE FIELDS
+     A rule under the text, not a box around it. Password and confirm stack:
+     they are two steps of one decision, and the file reads them top to
+     bottom at this width.
+     ------------------------------------------------------------------------ */
+  .auth-card .f-row{display:flex;flex-direction:column;gap:24px}
+  .auth-card .form-page .f{margin-bottom:24px}
+  .auth-card .form-page .f.last{margin-bottom:0}
+  /* THE STACK OWNS THE GAP. `.f-row` is a 24 flex gap and `.f` carries a 24
+     bottom margin, and both were landing on the same join — 48 between the
+     password rules and Confirm where the file draws 24. The margin is the
+     one that goes: it is the default for a field standing on its own, and
+     inside the stack the field is not standing on its own. Stated after
+     `.form-page .f` because the two have the same specificity and the file
+     is read top to bottom. */
+  .app .auth-card .form-page .f-row > .f{margin:0}
+  .auth-card .f > label{display:block;margin:0;color:var(--text-secondary)}
+  .auth-card .inp,.auth-card .inp.fill{
+    background:transparent;border:0;border-bottom:1px solid var(--auth-rule);
+    padding:8px 16px;height:auto;min-height:0;width:100%;
+    color:var(--text-primary);font-weight:600}
+  .auth-card .inp::placeholder{color:var(--text-placeholder);font-weight:400}
+  .auth-card .inp:focus,.auth-card .inp:focus-visible{
+    outline:0;border-bottom-color:var(--text-primary)}
+  .auth-card .pw-wrap{position:relative}
+  .auth-card .pw-eye{
+    position:absolute;right:16px;top:50%;transform:translateY(-50%);
+    width:16px;height:16px;display:grid;place-items:center;background:transparent}
+  .auth-card .pw-eye svg{width:16px;height:16px}
+  .auth-card .pw-rules{
+    display:flex;flex-direction:column;gap:6px;margin:16px 0 0;padding:0}
+  .auth-card .pw-rules li{gap:4px;color:var(--text-secondary)}
+  .auth-card .pw-rules li svg{width:16px;height:16px}
+  .auth-card .f-row .pw-rules{margin-top:16px}
+
+  /* ------------------------------------------------------------------ 8 ---
+     THE CONSENTS
+     16px boxes, 8 across to the text, 6 between rows.
+     ------------------------------------------------------------------------ */
+  .app .auth-card .page > .sec.sec-cbx{padding-top:16px;padding-bottom:16px}
+  .auth-card .cbx-list{display:flex;flex-direction:column;gap:6px}
+  .auth-card .cbx{gap:8px;align-items:flex-start;padding:0;min-height:0}
+  .auth-card .cbx .box{width:16px;height:16px;flex:none;margin-top:0}
+  .auth-card .cbx .box svg{width:16px;height:16px}
+  .auth-card .cbx .txt{
+    color:var(--text-secondary);
+    font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+
+  /* ------------------------------------------------------------------ 9 ---
+     THE CLOSING ROW
+     24 above it, the action on the left at 217 x 48, the way out on the
+     right. Both screens close on this line.
+     ------------------------------------------------------------------------ */
+  .app .auth-card .page > .sec.sec-act{padding-top:24px;padding-bottom:0}
+  .auth-card .foot-row{gap:16px}
+  .auth-card .foot-row .mt6,.auth-card .foot-row p{margin:0}
+  .auth-card .foot-row p{color:var(--text-secondary)}
+
+  /* --------------------------------------------------------------- 10 ---
+     THE CODE
+     Six cells, each a rule with a digit standing on it, sharing the width.
+     ------------------------------------------------------------------------ */
+  .auth-card .otp{display:flex;gap:16px;width:100%}
+  .auth-card .otp input{
+    flex:1 1 0;min-width:0;width:auto;
+    background:transparent;border:0;border-bottom:1px solid var(--auth-rule);
+    padding:8px 16px;text-align:center;
+    font-size:24px;line-height:30px;font-weight:400;
+    color:var(--text-primary)}
+  .auth-card .otp input:focus,.auth-card .otp input:focus-visible{
+    outline:0;border-bottom-color:var(--text-primary)}
+
+/* ==========================================================================
+   THE ORANGE
+   Auth is the one place the product wears the brand orange: it is the front
+   door, and the door is branded. Past it the primary action is black again
+   and purple is still the accent. The gradient is the file's, at its angle.
+   ========================================================================== */
+.auth-card .btn-p{
+  background-color:var(--auth-o-2);
+  background-image:linear-gradient(104.86deg,
+    var(--auth-o-1) 10.02%, var(--auth-o-2) 115.55%);
+  color:var(--on-brand);border:0}
+.auth-card .btn-p:hover{
+  background-color:var(--auth-o-3);
+  background-image:linear-gradient(104.86deg,
+    var(--auth-o-2) 10.02%, var(--auth-o-3) 115.55%)}
+.auth-card .btn-p:active{background:var(--auth-o-3)}
+.auth-card .btn-p:focus-visible{outline-color:var(--auth-o-3)}
+
+.auth-card .btn{height:48px;min-height:48px;padding:16px}
+.auth-card .btn:not(.noic){padding-right:16px}
+.auth-card .btn svg{width:20px;height:20px}
+/* the action is 217 wide inside a 461 column and the full width of a phone —
+   the one measurement on these screens that is genuinely about the width */
+/* resend leads with its icon: it is a repeat of something, and the glyph
+   says which something before the countdown does */
+.auth-card .btn-lead{
+  justify-content:flex-start;gap:12px;padding:16px 20px 16px 16px;width:auto}
+@container app (min-width:900px){
+  .auth-card .foot-row .btn-full{width:217px;min-width:217px;max-width:none}
+}
+
+/* ==========================================================================
+   THE COLUMN DRAWS ONE RULE
+   Above "Set a Password" and above "Verification Code", and nowhere else.
+   Every other section hairline the product hands out is the lattice showing
+   through a form, and the file does not draw it on either frame.
+   ========================================================================== */
+.app .auth-card .page > .sec::after,
+.app .auth-card .page > .ph::after{display:none}
+
+/* ==========================================================================
+   THE PHONE, WHERE IT DIFFERS FROM THE CARD
+   Three things, and all three are about width rather than about taste.
+   ========================================================================== */
+@container app (max-width:899.98px){
+  /* ONE BACK CONTROL. The app bar carries one and the file puts one inline
+     with the title; on the phone both were drawn, one above the other. The
+     file's is the inline one — it belongs to the heading it undoes — so the
+     bar keeps the logo and nothing else. */
+  .app:has(> .auth-card) .shell > .shell-act{display:none}
+  .app:has(> .auth-card) .shell > .shell-logo{padding-left:var(--s05)!important}
+
+  /* A RULE IN THIS COLUMN IS NOT AN EDGE. Inside the card the section's own
+     padding is zero and its rule runs the width of the form, which is
+     right — the card's padding is the margin. On a phone the section pays
+     `--pad-x` and a rule drawn edge to edge crosses that gutter, so it
+     reads as the boundary of the SCREEN rather than of the block above it.
+     Nothing on these two frames is a fill edge; every rule stops where the
+     text does. */
+  .app .auth-card .page > .sec.sec-rule{
+    border-top:0;position:relative}
+  .app .auth-card .page > .sec.sec-rule::before{
+    content:'';position:absolute;top:0;left:var(--pad-x);right:var(--pad-x);
+    height:1px;background:var(--auth-rule)}
+
+  /* THE CLOSING ROW STACKS, AND THE WAY OUT GOES ON TOP.
+     292:512 puts Resend above Verify at 12 apart, both the full width of the
+     column. Side by side is a card composition: at 461 wide there is room
+     for a 217 action and a way out beside it, and at 356 there is not. */
+  .auth-card .foot-row{
+    display:flex;flex-direction:column;align-items:stretch;gap:12px}
+  .auth-card .foot-row > .btn-lead{order:1;width:100%;justify-content:flex-start}
+  .auth-card .foot-row > .mt6,
+  .auth-card .foot-row > div{order:2}
+  .auth-card .foot-row p{order:3;margin:0}
+  .auth-card .foot-row .btn-full{width:100%;min-width:0;max-width:none}
+
+  /* THE ACTIONS FOLLOW THE FORM, THEY ARE NOT PINNED.
+     Both frames draw the buttons at the foot of the phone, and getting them
+     there needs a definite height all the way down — app, column, scroller,
+     page — so the page can be told to fill what is left. On this device
+     chrome `.app` is `position:relative` with no height of its own, so the
+     `min-height:100%` at the bottom of that chain had nothing to resolve
+     against, resolved to `auto`, and grew the column past the frame instead:
+     the scroller had nothing to scroll and the foot of create account was
+     cut off rather than reachable. A form you cannot scroll to the end of is
+     worse than one whose button sits under the last field, so the chain is
+     gone. Verify's actions now follow its code; create's follow its
+     consents, which is where they already were.  */
+  .auth-card .form-page > .sec.sec-act{padding-bottom:24px}
+
+  /* AND THE FORM SCROLLS. `.app` is `position:relative` on this chrome, so
+     the `top:44 / bottom:26` the phone frame states for it does nothing and
+     it simply grows to its content — 879 inside an 844 frame, with the last
+     35 clipped and no way to reach them. Making it absolute is what those
+     two offsets were always for; from there the column and the scroller
+     have a definite height to divide, and create account scrolls to its own
+     button. */
+  .device[data-vp="mobile"] .app:has(> .auth-card){
+    position:absolute;left:0;right:0;top:44px;bottom:26px;
+    display:flex;flex-direction:column}
+  .app:has(> .auth-card) .auth-col{
+    display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+  .app:has(> .auth-card) .auth-col > .main{
+    flex:1 1 auto;min-height:0;overflow:auto}
+}
+
+/* the mark bleeds only when the card is at full width — stated after the
+   block above, not inside it, so the block it overrides stays whole */
+@container app (min-width:1244px){
+  .auth-card > .auth-mark{display:block}
+}
+
+/* ==========================================================================
+   THE CARD RUNS ON THE FILE'S TYPE SCALE
+   Everywhere else in the product, type is one of nine roles and `verify.mjs`
+   fails the build for anything else. The sign-up card is the exception, and
+   deliberately: it is drawn in Figma at its own sizes — 20/28 for a card
+   title, 16/24 for a block heading, 14/20 for everything you read, 12/16 for
+   the small print — and those are what is stated here rather than the
+   nearest role. They are declared as a set, in one place, so the exception
+   is a scale and not a scattering of one-offs. `ALLOWED` in verify.mjs
+   carries them, and the type sweep now runs at 1280 as well as 390 so this
+   block is checked rather than merely permitted.
+   ========================================================================== */
+/* 20/28 — a card title */
+  .app .auth-card .form-page .ph h1,
+  .app .auth-brand .auth-intro h2{
+    font-size:20px;line-height:28px;font-weight:600;letter-spacing:.16px}
+
+  /* 16/24 — a block heading, and the address it belongs to */
+  .app .auth-card .sec-h h2,
+  .app .auth-card .u-h2,
+  .app .auth-card .sec-id .inp-static{
+    font-size:16px;line-height:24px;font-weight:600;letter-spacing:.16px}
+
+  /* 14/20 — everything you read */
+  .app .auth-card .form-page .ph-main > p,
+  .app .auth-brand .auth-intro p,
+  .app .auth-card .f > label,
+  .app .auth-card .sec-id label,
+  .app .auth-card .sec-id .help,
+  .app .auth-card .foot-row p{
+    font-size:14px;line-height:20px;font-weight:400;letter-spacing:.16px}
+  .app .auth-brand .auth-intro p.auth-begin{font-weight:600}
+
+  /* 14/24 — what you have typed into a field */
+  .app .auth-card .inp,.app .auth-card .inp.fill{
+    font-size:14px;line-height:24px;font-weight:600;letter-spacing:.16px}
+  .app .auth-card .inp::placeholder{font-weight:400}
+
+  /* 12/16 — the small print: password rules and consents */
+  .app .auth-card .pw-rules li,
+  .app .auth-card .cbx .txt{
+    font-size:12px;line-height:16px;font-weight:400;letter-spacing:.16px}
+
+  /* 12/20 — the line that closes the card */
+  .app .auth-brand .auth-foot{
+    font-size:12px;line-height:20px;font-weight:400;letter-spacing:.16px}
+
+  /* 14/18 — a button label */
+  .app .auth-card .btn{
+    font-size:14px;line-height:18px;font-weight:600;letter-spacing:.16px}
+
+/* 24/32 — a digit of the code */
+.app .auth-card .otp input{
+  font-size:24px;line-height:32px;font-weight:400;letter-spacing:.16px}

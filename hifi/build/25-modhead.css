@@ -1,0 +1,558 @@
+/* ==========================================================================
+   25. THE MODULE HEAD
+   Figma 292:288 — "the AI section".
+
+   The head of every module landing page is one band: crumb, title and
+   description, what Tal says, and the line you type a question into. The
+   frame draws them on a single warm wash and closes them with a single rule
+   that runs the full width of the column — not the inset rule a section
+   gets, because a block with its own ground owns its edge. That is the same
+   fill-edge rule §18 already states, applied to the biggest block on the
+   page.
+
+   The wrapper is assembled at runtime by `placeBand` in ai5.js: the ask line
+   is injected after render, so the band cannot be built in the view layer.
+   Wrapping moves the members one level deeper, which stops a handful of
+   `.page > .sec` rules from matching. The ones that mattered are restated
+   here, marked RESTATED, rather than left to fall back to a default that
+   was never designed for this.
+   ========================================================================== */
+
+.modhead{
+  position:relative;
+  /* the wash sits at z-index -1 so it is behind the text without the text
+     needing a z-index of its own. That only stays local if the band makes
+     its own stacking context — otherwise -1 escapes to the page and the
+     wash paints under the canvas instead of under the band. Same
+     construction as the Ask Tal foot in §24. */
+  isolation:isolate}
+
+/* --------------------------------------------------------------------- 1 ---
+   THE WASH
+   Two blurred ellipses in the file, both at sigma 66.7 — the padding Figma
+   puts on each export is 200px on both axes, and 200 = 3 sigma. Neither is
+   rotated enough to read at that much blur, so each becomes one radial
+   gradient whose radii are the ellipse's own plus the falloff, stated as a
+   percentage of the band so it holds at any height:
+
+     Ellipse 43  1289 x 297 at (-39, 76) in a 1394 x 352 frame
+                 -> centre 43.4% 63.8%, radii 60.6% x 99.0%   the warm ground
+     Ellipse 44  914 x 429 at (1044, 70), centre off the right edge
+                 -> centre 107.7% 80.9%, radii 47.1% x 117.8% the cool pool
+
+   Figma paints 44 over 43; the first background layer in CSS is the top one,
+   so the order here is the file's order reversed. The two colours are the
+   Tal chip's own — this is the same pair of layers the chip and the icon
+   boxes carry, at the scale of a page. No `background-color`: the band has
+   no fill of its own, which is what keeps the canvas one of two tones.
+   -------------------------------------------------------------------------- */
+.app .modhead::before{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    radial-gradient(47.1% 117.8% at 107.7% 80.9%,
+      var(--tal-chip-2) 0%, var(--tal-chip-2) 26%, transparent 100%),
+    radial-gradient(60.6% 99.0% at 43.4% 63.8%,
+      var(--tal-chip-1) 0%, var(--tal-chip-1) 26%, transparent 100%)}
+/* the 26% stop is the flat core of the blur, not a taste decision: a
+   Gaussian of sigma 66.7 over a 1289-wide ellipse still reads at full
+   strength for (a - 3sigma) / (a + 3sigma) of its radius, and a plain
+   two-stop radial gradient falls off from the centre pixel, which loses
+   the middle of the wash entirely. */
+
+/* --------------------------------------------------------------------- 2 ---
+   THE ONE RULE, END TO END
+   Every hairline inside the band goes; the band closes with a single line
+   at `left:0;right:0`. It is the boundary of a block that pays no gutter,
+   so it cannot have an edge that does — and the wash has to end ON the line
+   rather than a gutter short of it, or the gradient looks unfinished at
+   both corners.
+   -------------------------------------------------------------------------- */
+.app .modhead::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:var(--rule);pointer-events:none}
+
+/* RESTATED. `.page > .sec::after` and `.page > .ph::after` no longer match
+   a member, so the generic `.sec::after` shows through — at desktop §14
+   turns those off wholesale and back on selectively, and neither half
+   reaches in here now. Every internal hairline is stated off in one place
+   instead. */
+.app .modhead > .ph::after,
+.app .modhead > .sec::after,
+.app .modhead > .crumb::after{display:none}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE MEMBERS KEEP THEIR RHYTHM
+   RESTATED from §24.10: the suggested question and the field you would type
+   one into close the gap between them, and the band ends on the field with
+   the same air under it that the rule used to stand off with.
+   -------------------------------------------------------------------------- */
+.app .modhead > .sec:has(> .ai-aura){padding-bottom:var(--s03)}
+.app .modhead > .sec.ask-sec{padding-top:var(--s03);padding-bottom:var(--s06)}
+
+/* RESTATED from §13: the band arrives as one object now, which is what it
+   is. Animating four members on a 26ms cascade was right when they were
+   four sections and reads as a stutter inside a single surface. */
+.app[data-enter] .page > .modhead{
+  animation:mo-rise var(--mo-base) var(--mo-enter) both}
+.app[data-enter] .modhead > .ph,
+.app[data-enter] .modhead > .sec,
+.app[data-enter] .modhead > .crumb{animation:none}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE REQUIRED ACTION RIDES TAL'S ROW
+   `.ai-aura` is a two-track grid: the mark, then everything Tal says. The
+   action becomes a third track — declared ONLY on the cards that have one,
+   because a bare `auto` third column on a card without a button is the
+   phantom track that cost an afternoon on `.agh`.
+
+   It is `justify-self:end` rather than a margin so the button lands on the
+   card's right edge, which is the page spine, which is the same edge the
+   header's own action lands on. That is the alignment the frame is about.
+   -------------------------------------------------------------------------- */
+.app .ai-aura.ai-act-top{grid-template-columns:auto minmax(0,1fr) auto}
+.app .ai-aura.ai-act-top > .ai-head > .ai-do,
+.app .ai-aura.ai-act-top > .ai-head > .btn-p{
+  grid-column:3;grid-row:1;justify-self:end;align-self:center;
+  flex:none;min-height:36px;padding:0 var(--s05);
+  background-color:var(--accent);background-image:var(--accent-grad);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+/* the body and everything under it still belong to column two: the action
+   is beside the heading, not above the sentence */
+.app .ai-aura.ai-act-top > .ai-body,
+.app .ai-aura.ai-act-top > .ai-asks,
+.app .ai-aura.ai-act-top > .ai-foot,
+.app .ai-aura.ai-act-top > .ai-src{grid-column:2}
+
+/* below the label column the card has no room for a third track: the button
+   drops under the sentence, full width, where a phone expects it */
+/* --------------------------------------------------------------------- 9 ---
+   BELOW THE LABEL COLUMN, TAL'S CARD IS A STACK
+   The two-track grid — mark in column one, everything Tal says in column
+   two — is a desktop composition. At 744 the second column is 400px wide
+   and an action pinned to its right-hand end lands ON the sentence; at 390
+   there is no right-hand end to pin to. So below 900 the card stops being
+   a grid and becomes one column, in the order Maryam gave:
+
+     the mark, the heading, what Tal says, the action, the questions
+
+   and the ask field follows as the next block. One structure at every
+   width below the split, so a component does not change shape between a
+   phone and a tablet.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .ai-aura,
+  .app .ai-aura.ai-act-top{
+    display:flex;flex-direction:column;align-items:stretch;
+    grid-template-columns:none;gap:0;position:static}
+  .app .ai-aura > .ai-head{display:contents}
+  .app .ai-aura > .ai-head > .ai-label{
+    order:0;align-self:flex-start;grid-column:auto;grid-row:auto}
+  .app .ai-aura > .ai-head > h3{
+    order:1;grid-column:auto;grid-row:auto;padding-right:0;
+    margin-top:var(--s04)}
+  .app .ai-aura > .ai-body{order:2;grid-column:auto;margin-top:var(--s02)}
+  .app .ai-aura.ai-act-top > .ai-head > .ai-do,
+  .app .ai-aura.ai-act-top > .ai-head > .btn-p{
+    position:static;order:3;grid-column:auto;grid-row:auto;
+    align-self:stretch;justify-self:stretch;width:100%;
+    margin-top:var(--s05);white-space:normal}
+  .app .ai-aura > .ai-asks,
+  .app .ai-aura > .ai-foot{order:4;grid-column:auto;margin-top:var(--s05)}
+  .app .ai-aura > .ai-src{order:5;grid-column:auto}
+}
+
+/* WHAT IS LEFT IN THE FOOT. With the button gone the thumbs-and-overflow
+   pair is the entire row, and two quiet controls alone under a sentence
+   read as a toolbar. They keep their place at the right-hand end but stop
+   claiming a row of their own. */
+.app .ai-foot.ai-foot-bare{margin-top:var(--s02);justify-content:flex-end}
+.app .ai-asks:has(> .sp){display:flex;align-items:center;gap:var(--s03)}
+.app .ai-asks > .sp{margin-left:auto;flex:none;display:flex;gap:var(--s02)}
+
+/* --------------------------------------------------------------------- 5 ---
+   NOTHING IN THE BAND PAINTS OVER THE WASH
+   Both members carry the canvas fill — that is the rule everywhere else,
+   where the canvas is the only surface and a section painting it costs
+   nothing. Here it is two opaque white blocks over three quarters of the
+   gradient, which is why the wash was only visible above the Tal card.
+
+   The FIELD is the exception, and stays opaque. Everything else in the band
+   is something to read; the ask line is something to type into, and a tinted
+   field reads as disabled. Same call as the Ask Tal foot in §24.
+   -------------------------------------------------------------------------- */
+.app .modhead > .sec,
+.app .modhead > .sec.ask-sec,
+.app .modhead > .ph,
+.app .modhead > .crumb,
+.app .modhead .ai-aura,
+.app .modhead .ai-aura.tile{background:transparent}
+.app .modhead .askline{background:var(--layer-01)}
+
+/* --------------------------------------------------------------------- 5b --
+   NOTHING AUTO-PLACES INTO THE MARK'S COLUMN
+   `.ai-aura` is a two-track grid and §24 assigns four known children to
+   track two by name. A card with a fifth — the welcome card's list of three
+   questions, which is a plain `.mt5` div — auto-placed into track ONE, the
+   track that exists to be as wide as a 51px chip. Track one became 225 wide,
+   the chip stretched to fill it, and the body text was left in a 119px
+   gutter beside a stack of rows it was supposed to sit above.
+
+   Assigning by name is the trap: it only holds for the names you listed.
+   Everything that is not the head belongs to track two, so that is what is
+   stated, and a sixth child cannot reopen this.
+   -------------------------------------------------------------------------- */
+.app .ai-aura > *:not(.ai-head){grid-column:2}
+
+/* --------------------------------------------------------------------- 6 ---
+   THE BAND'S RHYTHM IS THE FILE'S
+   292:306 is one screenshot cut up and re-laid, and every crop in it is at
+   the same zoom (each slice's box x scale% comes to 1402 without exception,
+   so the content is 1:1 and only the POSITIONS are Maryam's). That makes the
+   frame a spacing spec rather than a sketch. Read off it, in a 1394 x 352
+   band with a 32 gutter:
+
+     band top      ->  title            34
+     title block   ->  Tal's row        13
+     Tal's row     ->  what Tal says     0     they are one paragraph
+     what Tal says ->  the question     27
+     the question  ->  the ask line     15
+     the ask line  ->  the closing rule 25
+
+   The band came out 400 tall against the file's 352, and all 48 of it was
+   in two joins: the description to Tal (58 where the file draws 13) and the
+   heading to the sentence (36 where the file draws 0).
+   -------------------------------------------------------------------------- */
+.app .modhead > .ph{padding-top:34px;padding-bottom:0}
+.app .modhead > .sec:has(> .ai-aura){padding-top:28px;padding-bottom:0}
+/* THE HEADING AND THE SENTENCE ARE ONE PARAGRAPH. The grid's first row is
+   as tall as the mark (24) against a 19 heading, so even at margin zero the
+   sentence started five clear of the heading's descender and read as a
+   second block. It closes up: they are one thing Tal is saying, and the
+   space that separates blocks belongs between Tal and the question under
+   it, not inside what Tal said.
+   This is on `.modhead .ai-aura`, so it is every Tal card at the head of
+   every module, not the dashboard's alone. */
+.app .modhead .ai-aura{row-gap:0}
+.app .modhead .ai-aura > .ai-body{margin-top:-4px}
+.app .modhead .ai-aura > .ai-asks{margin-top:12px}
+/* AND THE QUESTION SITS ON THE FIELD. A suggested question and the line you
+   would type one into are the same offer made twice, so the gap between
+   them is the smallest in the band — 8, against the 27 that separates them
+   from what Tal said. Every Tal section at the head of a module, not just
+   this one. */
+.app .modhead > .sec.ask-sec{padding-top:8px;padding-bottom:30px}
+
+/* THE QUESTION GOES BACK TO THE GUTTER. The file puts "What should I do
+   next?" at x=31 — the page spine, level with Tal's own mark — not indented
+   into the column Tal speaks in. It is your line, not Tal's. */
+.app .modhead .ai-aura > .ai-asks{grid-column:1 / -1}
+
+/* THE ACTION HANGS FROM THE TOP AND SETS NOTHING. As a grid item a 36px
+   button made the heading's row 36 tall, and the sentence under it started
+   below the BUTTON instead of below the heading — 26 of air the file does
+   not draw. Spanning rows does not fix it either, because the button still
+   contributes to the row it starts in. It comes out of flow: its top is the
+   card's top, which is where the file puts it (chip and button both at
+   y=136), and the rows are then sized by what Tal actually says. Same move
+   as the fee on the agent card, for the same reason. */
+.app .ai-aura.ai-act-top{position:relative}
+.app .ai-aura.ai-act-top > .ai-head > .ai-do,
+.app .ai-aura.ai-act-top > .ai-head > .btn-p{
+  position:absolute;top:0;right:0;white-space:nowrap}
+/* and with the action out of the way the card is two tracks again */
+.app .ai-aura.ai-act-top{grid-template-columns:auto minmax(0,1fr)}
+.app .ai-aura.ai-act-top > .ai-body,
+.app .ai-aura.ai-act-top > .ai-foot,
+.app .ai-aura.ai-act-top > .ai-src{grid-column:2}
+/* the sentence must not run under the button */
+.app .ai-aura.ai-act-top > .ai-head > h3{padding-right:200px}
+
+/* --------------------------------------------------------------------- 7 ---
+   AND THE PHONE PUTS IT BACK IN FLOW — STATED LAST
+   §6 takes the action out of flow so it cannot set the heading row's height.
+   That rule is unconditional and it is written after the phone override in
+   §4, so at 390 the button was still absolute and sat on top of the sentence
+   it belongs to. The override is restated here, at the foot of the layer,
+   where the cascade reaches it.
+   -------------------------------------------------------------------------- */
+@container app (max-width:599.98px){
+  .app .ai-aura.ai-act-top > .ai-head > .ai-do,
+  .app .ai-aura.ai-act-top > .ai-head > .btn-p{
+    position:static;grid-column:2;grid-row:auto;justify-self:stretch;
+    order:2;margin-top:var(--s04);white-space:normal}
+  .app .ai-aura.ai-act-top > .ai-head > h3{padding-right:0}
+}
+
+/* --------------------------------------------------------------------- 8 ---
+   THE QUESTIONS START WHERE THE FIELD STARTS
+   Every chip Tal offers — the one the view prints and the one the page
+   appends — sits in one row that begins on the page spine, level with Tal's
+   own mark and with the left edge of the ask field directly under it. They
+   were living in column two, indented to the sentence, which put them on a
+   third left edge in a band that has two.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura > .ai-asks,
+.app .modhead .ai-aura > .ai-foot{
+  grid-column:1 / -1;
+  display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:flex-start;gap:var(--s03);margin-top:12px}
+.app .modhead .ai-aura > .ai-asks > .sp,
+.app .modhead .ai-aura > .ai-foot > .sp{margin-left:auto;flex:none}
+
+/* ==========================================================================
+   TWO WALLS IN A ROW DO NOT NEED A GAP BETWEEN THEM
+   The black plate and the stepper under it are both full-width blocks with
+   their own ground, and §26 already stopped the plate paying the page
+   gutter. The section under it was still paying its own top padding, which
+   left a white strip between two things that are meant to read as one
+   column of bands.
+   ========================================================================== */
+/* A TAB STRIP IS THE THIRD WALL. `.cs` and `.tabs` carry `--surface-2` edge
+   to edge (§29.20), so a section holding one is the same kind of object as
+   the stepper and the tinted band: its own ground, running rail to rail. The
+   cohort page puts the call plate directly above its Discussion / Ranking /
+   Members strip, and the 32px of white between them read as a page break in
+   the middle of one column of surfaces. */
+.app .page > .sec:has(> .plate) + .sec.sec-stp,
+.app .page > .sec:has(> .plate) + .sec.tint,
+.app .page > .sec:has(> .plate) + .sec.sec-cs,
+.app .page > .sec:has(> .lvl-hero) + .sec.sec-stp,
+.app .page > .sec:has(> .lvl-hero) + .sec.tint{margin-top:0;border-top:0}
+
+/* ==========================================================================
+   TAL TAKES THE MARGINS, NOT THE COLUMN
+   Above 900 the page is a white sheet on a panel-toned ground, and the
+   ground is the margin either side of it. With Tal open there is no room
+   for a margin: the column has to run from the collapsed rail to the edge
+   of the panel or the layout reads as three gutters and two contents.
+   ========================================================================== */
+/* ON `data-shown`, NOT `data-open`. This is a layout, and it has to hold for
+   as long as Tal is open rather than for the one render on which Tal opened.
+   `data-open` is the transition marker §13.2 gates the entrance animations on;
+   it is gone by the next render. Opening Tal from the rail is a single render,
+   so this looked right — but a chip on the page sets `S.tal` and then asks,
+   the ask renders again, and the page took its margins back underneath a panel
+   that was still open. See the note in `render()`. */
+@container app (min-width:900px){
+  .app[data-shown~="tal"] .view-col > .main{background-color:var(--background)}
+  .app[data-shown~="tal"] .view-col > .main > .page{
+    max-width:none;margin-left:0;margin-right:0;width:100%}
+}
+
+/* --------------------------------------------------------------------- 10 ---
+   A BAND WITH NOTHING UNDER THE DESCRIPTION STILL PAYS A BOTTOM
+   §6 zeroes the header's bottom padding because on most pages Tal's card
+   follows immediately and the two are one paragraph. On the pages that have
+   no Tal card — settings, payments, transcript — that left the description
+   sitting on the closing rule with nothing between them. The band pays the
+   air itself when it is only a header and an ask line, and the same again
+   when it is only a header.
+   -------------------------------------------------------------------------- */
+.app .modhead:not(:has(.ai-aura)) > .ph{padding-bottom:var(--s06)}
+.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph{
+  padding-bottom:var(--s07)}
+
+/* --------------------------------------------------------------------- 10b ---
+   A ROW OF QUESTIONS, WITH NO CARD AROUND IT
+
+   Points offers one suggested question and has nothing for Tal to say — so it
+   has no card, and the chip was left at the foot of the page instead, under
+   the points table (see the note in `V.rewards`). It is a band member now,
+   `.sec.ask-chips`, and it plays exactly the part the Tal card plays: the
+   thing between the description and the field.
+
+   So it takes the Tal card's spacing, not a section's default. The three
+   numbers above are the ones being matched:
+
+     header -> the card      28   (the card's own padding-top)
+     the question -> field    8   (the ask line's padding-top, §9)
+     card -> its bottom       0
+
+   `.ai-asks` gives up its 16px `margin-top` here. Inside a card that margin
+   is the gap between what Tal said and the question under it; there is no
+   sentence above this row, so the margin would stack onto the 28 and put the
+   chip 44 clear of the heading.
+
+   And the header gives up the 24px §10 just charged it. That rule exists so a
+   description does not sit on the closing rule when nothing follows it —
+   something follows it here, and the 28 above belongs to the follower, the
+   same way it does on every page that has a card. `:has(.ask-chips)` and
+   `:not(:has(.ai-aura))` are both 0,4,0, so this has to sit AFTER §10 rather
+   than merely being more specific than it.
+   -------------------------------------------------------------------------- */
+.app .modhead > .sec.ask-chips{padding-top:0;padding-bottom:var(--s03)}
+.app .modhead > .sec.ask-chips > .ai-asks{margin-top:0}
+@container app (min-width:900px){
+  .app .modhead:has(.ask-chips) > .ph{padding-bottom:0}
+  .app .modhead > .sec.ask-chips{padding-top:28px;padding-bottom:0}
+}
+
+/* --------------------------------------------------------------------- 10c ---
+   AND A BAND WITH NOTHING UNDER TAL'S CARD PAYS ONE TOO
+   §10 is the same argument one member up: the header's zero bottom is right
+   only because something follows it. §6 zeroes the CARD's bottom for exactly
+   that reason — in the band the file draws, the card is followed by the
+   suggested question and the ask line, and it is the ask line that stands 25
+   off the closing rule.
+
+   THE ASK LINE IS NO LONGER IN THE BAND. §21.1b floats it at the bottom of
+   the view column instead, on every page of both portals, so `.sec.ask-sec`
+   is not built any more and Tal's card is the last member of every band that
+   has one. §6's zero therefore lands on the band's own bottom edge every
+   time — which is how this was found: on the two enrolled dashboards, the
+   only ones whose ask line had already moved onto the page, the chips came
+   to rest 4px off the closing rule with the dark weekly-call plate
+   immediately under them. Air at the top of the card, none at the foot.
+
+   Nothing above this block changed with the move: §3, §6 and §10b still
+   state the ask line's own spacing, and they are kept deliberately. The line
+   is one `placeAsk` away from being a band member again, and a rule deleted
+   is a decision that has to be re-derived.
+
+   28 rather than a step off the scale, because it is the card's OWN top
+   padding read off the same frame (§6, "header -> the card 28"): the card
+   closes the band inset by the amount it opens with. §10 reaches for --s06
+   and --s07 for the header cases, which is right there — a header is not a
+   card and has no inset of its own to match.
+
+   `:last-child` IS STILL THE WHOLE RULE, and now for a second reason. When
+   the ask line was a band member it kept this off every band that ended on
+   the line and already paid the file's 30 (§6) — 58 under the question. That
+   case is gone, but the condition it tested is exactly the condition that
+   matters, so nothing has to change: the card takes the closing air when the
+   card IS the close, and the day the line comes back to the band it stops,
+   without a view name anywhere in the selector to go stale. 0,5,0 against
+   §6's 0,4,0, and it also has to sit after §6 in the file, since §6 sets the
+   same property. */
+.app .modhead > .sec:has(> .ai-aura):last-child{padding-bottom:28px}
+
+/* AND THE SAME FOR THE ROW OF QUESTIONS, which is the other thing a band can
+   now end on. §10b gives `.sec.ask-chips` the Tal card's spacing exactly —
+   28 above, 0 below — on the stated ground that it "plays the part the Tal
+   card plays". That includes this: Points is the one page that draws the
+   chips instead of a card, so with the ask line gone the chips are the last
+   member and the zero landed on the closing rule. Same rule, same 28, for
+   the same reason one member along.
+
+   Restated inside the query as well as outside it. §10b's desktop half is in
+   a container block, and per the §7 trap a rule in one wins a specificity
+   tie against an unconditional rule whatever its layer number — this is not
+   a tie (0,5,0 against 0,4,0) but the pair costs one line and removes the
+   question. */
+.app .modhead > .sec.ask-chips:last-child{padding-bottom:28px}
+@container app (min-width:900px){
+  .app .modhead > .sec.ask-chips:last-child{padding-bottom:28px}
+}
+
+/* ==========================================================================
+   11. THE BAND'S TAL CARD, STATED ONCE AND FOR ALL
+   Everything above this block that positions a child of `.ai-aura` is
+   superseded here. It kept coming back because the card was being placed
+   three different ways at once — `order` on a flex column, `grid-column` on
+   a grid, and `position:absolute` for the action — in three layers with
+   three specificities, and whichever won depended on the page. That is not
+   a layout, it is a race.
+
+   One mechanism: a grid with NAMED AREAS at both widths. Every child is
+   assigned an area by name, nothing auto-places, nothing depends on source
+   order, and the only thing the breakpoint changes is the shape of the
+   template. Below 900 that shape is the one Maryam specified:
+
+       mark
+       title
+       body
+       action        full width
+       questions     one row, on the spine
+
+   and at 900 and up:
+
+       mark   title   action
+       .      body    action
+       questions across
+
+   `.ai-head` stays `display:contents` so its two children can take areas of
+   their own; that is what it is for.
+   ========================================================================== */
+.app .modhead .ai-aura,
+.app .modhead .ai-aura.ai-act-top{
+  display:grid;position:relative;
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:'mark' 'title' 'body' 'act' 'asks';
+  align-items:start;justify-items:stretch;
+  column-gap:var(--s04);row-gap:0}
+
+.app .modhead .ai-aura > .ai-head{display:contents}
+.app .modhead .ai-aura > .ai-head > .ai-label{
+  grid-area:mark;justify-self:start;align-self:center;position:static}
+.app .modhead .ai-aura > .ai-head > h3{
+  grid-area:title;justify-self:start;align-self:center;
+  margin:var(--s04) 0 0;padding:0;text-align:left}
+.app .modhead .ai-aura > .ai-body{
+  grid-area:body;margin:var(--s02) 0 0;text-align:left}
+.app .modhead .ai-aura.ai-act-top > .ai-head > .ai-do,
+.app .modhead .ai-aura.ai-act-top > .ai-head > .btn-p{
+  grid-area:act;position:static;
+  justify-self:stretch;align-self:start;width:100%;
+  margin:var(--s05) 0 0;white-space:normal}
+.app .modhead .ai-aura > .ai-asks,
+.app .modhead .ai-aura > .ai-foot{
+  grid-area:asks;
+  display:flex;flex-wrap:wrap;align-items:center;
+  justify-content:flex-start;gap:var(--s03);margin:var(--s05) 0 0}
+.app .modhead .ai-aura > .ai-src{grid-area:asks;align-self:end}
+
+@container app (min-width:900px){
+  .app .modhead .ai-aura,
+  .app .modhead .ai-aura.ai-act-top{
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-areas:'mark title' 'mark body' 'asks asks'}
+  .app .modhead .ai-aura.ai-act-top,
+  .app .modhead .ai-aura.ai-act-top{
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:'mark title act' '.    body act' 'asks asks asks'}
+  .app .modhead .ai-aura > .ai-head > .ai-label{align-self:center}
+  .app .modhead .ai-aura > .ai-head > h3{margin:0}
+  .app .modhead .ai-aura > .ai-body{margin:var(--s02) 0 0}
+  /* the action holds the top-right corner and sets no row's height: it is
+     `align-self:start` in a cell that spans the two rows Tal speaks in, so
+     a 36px button cannot push a 19px heading's row to 36 */
+  .app .modhead .ai-aura.ai-act-top > .ai-head > .ai-do,
+  .app .modhead .ai-aura.ai-act-top > .ai-head > .btn-p{
+    justify-self:end;align-self:start;width:auto;margin:0;white-space:nowrap}
+  .app .modhead .ai-aura > .ai-asks,
+  .app .modhead .ai-aura > .ai-foot{margin-top:12px}
+}
+
+/* --------------------------------------------------------------------- 12 ---
+   THE BLACK CARD IS A MEMBER OF THE BAND
+   `placeDark` in ai5.js moves it in here — the note above it is where that
+   decision is written down. What the band has to do about it is take the
+   card's bleed off and give it the closing air.
+
+   THE BLEED COMES OFF. A dark card is drawn as a band of the COLUMN: §15's
+   plate, §15's certificate and §16's leader wall all carry
+   `margin:0 calc(pad-x * -1)` so they escape their section's gutter and reach
+   rule to rule. That is right on the page body, where the card is its own
+   block. In the head band it is a member among members, and a member that
+   escapes the gutter every other member pays is the one thing that would stop
+   the band reading as one surface. Take the margins off and the card's edges
+   land on the band's spine — the same left edge as the description and the
+   chips — while its own padding carries its text one gutter further in, which
+   is the two-step inset the frame draws.
+
+   0,3,0 against the three bleed rules' 0,2,0, so this outranks all of them
+   from here — including §16's, which is a LATER layer than this one. Stated
+   as `.modhead <descendant>` rather than `> .sec >` because the card sits one
+   level down inside its host section, and which section that is depends on
+   whether the view wrapped it or `placeDark` did.
+
+   THE CLOSING AIR. The card now ends the band, so it pays the bottom the way
+   §10c's Tal card and §10d's question row do when THEY end it — the same 28,
+   for the same reason, and the wash below the card is what says the card is
+   inside the band rather than butted against it.
+   -------------------------------------------------------------------------- */
+.app .modhead .plate,
+.app .modhead .cert,
+.app .modhead .lead-b,
+.app .modhead .lvl-hero{margin-left:0;margin-right:0}
+.app .modhead > .sec-dark{padding-bottom:28px}

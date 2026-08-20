@@ -1,0 +1,172 @@
+/* ==========================================================================
+   32. THIS WEEK — THE CARD, AND THE RING
+   The dashboard's "This week" block used to be a `tile clk arrow`: an
+   eyebrow, a chapter title, a full-width progress track and its minutes,
+   the whole thing one click target. It said what you were in the middle of
+   and nothing about the week around it, so it now carries two halves —
+   what you have DONE, and what Tal says is expected of you — with the
+   chapter's own figure bent into a ring beside the title. `weekCard()` in
+   views.js builds it; the note above it is where the content decision is
+   written down, and the note above WEEKLY in data.js is where the numbers
+   are.
+
+   NO TYPE IS DECLARED IN THIS LAYER. §11 is the authoritative scale and
+   verify.mjs fails the build on any size outside its nine roles, so every
+   line in the card wears a role class from the markup — `u-h3`, `u-body`,
+   `u-compact`, `u-caption`, `u-overline`, `sub`, `t-label-01` — and this
+   file only ever says where things sit and what colour they are.
+
+   Last in the cascade, and for the same reason §30 and §31 are: every
+   selector here is either a new class (`.wkc*`, `.ring*`) that no earlier
+   layer mentions, or — in the one container-query block at the foot — a
+   deliberate restatement of an earlier rule that has to land after it. So
+   its position cannot cause an argument with anything above it.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE CARD
+   Not a tile. It sits directly on the tinted panel and divides internally
+   with the same hairline every other list on a panel uses, because the
+   product's whole layout model is rules rather than boxes — and a bordered
+   box on a tinted ground would be the third tone in one region, which is
+   what §12's two-tone rule exists to prevent.
+   -------------------------------------------------------------------------- */
+.app .wkc{display:flex;flex-direction:column}
+
+/* --------------------------------------------------------------------------
+   2. THE TOP BAND — TITLE LEFT, FIGURE RIGHT
+   `align-items:center` rather than `flex-start`: the ring is a 64px object
+   against three short lines of roughly the same height, and centring the
+   two makes one row instead of two things that start together and end
+   apart. `min-width:0` on the text half is what lets a long chapter title
+   wrap instead of pushing the ring off the right edge — every chapter name
+   in CH is longer than a phone column.
+   -------------------------------------------------------------------------- */
+.app .wkc-top{
+  display:flex;align-items:center;gap:var(--s05);padding-bottom:var(--s05)}
+.app .wkc-tb{flex:1;min-width:0}
+.app .wkc-eb{color:var(--text-secondary)}
+.app .wkc-tb h3{margin:var(--s02) 0 0}
+.app .wkc-min{margin-top:var(--s03);font-variant-numeric:tabular-nums}
+
+/* --------------------------------------------------------------------------
+   3. THE RING
+   A 64px viewBox with r=26 and a 6px stroke, so the ring's own edge pays
+   3px on each side and the arc never clips. Two circles, not one with a
+   background: the track has to be a full circle under a partial arc, and a
+   dash pattern can only draw one of the two.
+
+   `--arc` arrives inline from `ring()` as the arc's length in user units,
+   because a dash pattern needs a length and not a percentage. The gap is
+   999 — any number past the 163.4 circumference — which is what stops the
+   pattern from repeating around the circle. At 0% the arc is 0 and with a
+   BUTT cap that draws nothing at all; a round cap would leave a dot sitting
+   at twelve o'clock claiming progress that has not happened.
+
+   The rotation is on the svg rather than the circle so the number inside
+   does not turn with it. -90deg starts the arc at twelve o'clock, which is
+   the only place a person reads a ring from.
+
+   SOLID ACCENT, NOT THE GRADIENT — §19's own stated exception. Every FILL
+   in the product runs `--accent-grad`, and marks that are DRAWN rather than
+   filled keep the solid because a gradient across a 6px stroke is a smudge
+   rather than a gradient. A ring is a stroke.
+   -------------------------------------------------------------------------- */
+.app .ring{
+  position:relative;flex:none;width:64px;height:64px;
+  display:grid;place-items:center}
+.app .ring > svg{
+  position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.app .ring circle{fill:none;stroke-width:6;stroke-linecap:butt}
+.app .ring .ring-t{stroke:var(--layer-accent-01)}
+.app .ring .ring-f{stroke:var(--accent);stroke-dasharray:var(--arc) 999}
+/* on a panel the track steps down with every other track on a panel (§12) */
+.app .sec.tint .ring .ring-t{stroke:var(--rule-on-2)}
+.app .ring-n{position:relative;font-variant-numeric:tabular-nums}
+
+/* THE ARC ARRIVES BY GROWING, like every other figure on the page (§13.5).
+   The keyframe names only `from`, so the animation's own end state IS the
+   element's declared `stroke-dasharray` — which is the one shape of this
+   that `fill-mode:both` cannot strand at a value the resting rule disagrees
+   with (§13's trap). Delay matches the bars: the figures are the last thing
+   to move, so the eye lands on them after the sentence. */
+.app[data-enter] .ring .ring-f{
+  animation:mo-arc var(--mo-slow) var(--mo-enter) both;animation-delay:180ms}
+@keyframes mo-arc{from{stroke-dasharray:0 999}}
+
+/* --------------------------------------------------------------------------
+   4. THE TWO HALVES
+   One hairline above each, none below the last: the section's own bottom
+   edge is already drawn by §18, and a second rule 16px above it reads as a
+   block someone forgot to fill.
+   -------------------------------------------------------------------------- */
+.app .wkc-blk{padding:var(--s05) 0;border-top:1px solid var(--layer-accent-01)}
+.app .sec.tint .wkc-blk{border-top-color:var(--rule-on-2)}
+.app .wkc-blk:last-child{padding-bottom:0}
+.app .wkc-h{
+  display:flex;align-items:center;gap:var(--s03);
+  margin-bottom:var(--s04);color:var(--text-secondary)}
+.app .wkc-p{margin:0}
+
+/* --------------------------------------------------------------------------
+   5. WHAT IS DONE
+   A tick per fact, and the tick is green rather than the accent. The accent
+   is this product's PROGRESS colour — it is what the ring above and every
+   bar in the build are drawn in — and a row in this list is not progress,
+   it is a thing that is finished. Green ink is what the rest of the build
+   already says that with (`tag green`, `.lead-ok`), at the AA-safe value
+   §01 keeps for green as type rather than as a fill.
+   -------------------------------------------------------------------------- */
+.app .wkc-did{
+  display:flex;flex-direction:column;gap:var(--s04);
+  margin:0;padding:0;list-style:none}
+.app .wkc-did > li{display:flex;align-items:flex-start;gap:var(--s04)}
+.app .wkc-tick{flex:none;display:grid;place-items:center;
+  width:18px;height:18px;margin-top:1px}
+.app .wkc-tick svg{width:18px;height:18px;fill:var(--support-success-ink)}
+.app .wkc-db{display:flex;flex-direction:column;min-width:0}
+.app .wkc-db > .u-caption{color:var(--text-helper)}
+/* the empty week reads as a sentence, not as a missing list */
+.app .wkc-none{margin:0;color:var(--text-secondary)}
+
+/* --------------------------------------------------------------------------
+   6. THE TWO WAYS OUT
+   Tal's chip and the way into the chapter, on one row and in that order:
+   the question belongs to the paragraph it follows, and the chapter is
+   where the whole card has been pointing since its first line. `wrap`
+   because at 320px the two do not fit side by side and a button that
+   overflows its card is worse than a button on its own line.
+   -------------------------------------------------------------------------- */
+.app .wkc-a{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--s04);margin-top:var(--s05)}
+
+/* --------------------------------------------------------------------------
+   7. DESKTOP — THE SECTION KEEPS ITS HEADING ABOVE IT
+   §10 turns any `.sec` with a `.sec-h` into a label column at 900px: the
+   heading becomes a 184px left column with a rule down its right, and the
+   content moves over. Sections made of ROWS opt out of that by name in the
+   same block, and this card was one of them until it stopped being a
+   `.tile-stack` — losing the class silently opted it in, and 184px of the
+   column went to the words "This week" while a three-part card was asked to
+   render in what was left.
+
+   Restated here rather than added to §10's list because §10's list is
+   inside a container query, and per the §25 trap a rule inside one outranks
+   an unconditional rule of equal weight whatever its layer number. Matching
+   the query is the only way to be later than it.
+
+   THREE PROPERTIES, AND DELIBERATELY NOT THE FOURTH. §10's opt-out also
+   restates the heading's `padding`, and this must not: §14 has since taken
+   that over for every non-form page (`padding-left:0;padding-right:s06`) at
+   a specificity §10's opt-out cannot reach, which is what every other
+   opted-out section on the product actually renders with. Restating the
+   shorthand here would win — and would give this one heading a left inset
+   no other section has. The content's own `padding-left` is §14's too, so
+   it is left alone for the same reason.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .wkc){display:block}
+  .app .sec:has(> .wkc) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05)}
+}

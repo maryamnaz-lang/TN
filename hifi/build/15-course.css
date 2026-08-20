@@ -1,0 +1,1745 @@
+/* ==========================================================================
+   15. THE COURSE, AND THE BAND
+   Two things that arrived together and belong to the same idea: the page is
+   the container, and anything with a fill in it is a band of the container
+   rather than a plate floating inside it.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   A FILL RUNS RAIL TO RAIL
+   The column is drawn by two vertical rules and set in from them by one
+   gutter. A tinted row that also pays that gutter reads as a card someone
+   dropped on the page — two edges where the design has one.
+
+   `.band` cancels the gutter with a negative margin and immediately pays it
+   back as padding. The fill reaches the rules; the text inside it still
+   starts exactly where every other line on the page starts. One token,
+   `--pad-x`, is on both sides of that trade, so it stays true at every width
+   the gutter changes at.
+   -------------------------------------------------------------------------- */
+.app .band{
+  background-color:var(--surface-2);
+  padding-top:var(--s04);padding-bottom:var(--s04);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding-left:var(--pad-x);padding-right:var(--pad-x);
+  width:auto;border-left:0}
+/* the note's 20px inset is set with !important three layers down */
+.app .note.band{
+  padding-left:var(--pad-x)!important;padding-right:var(--pad-x)!important;
+  padding-top:var(--s05);padding-bottom:var(--s05)}
+/* on a panel the band takes the canvas tone, or it disappears into its host */
+.app .sec.tint .band,.app .sec.warm .band,.app .cool .band{
+  background-color:var(--background)}
+
+/* ==========================================================================
+   THE CHAPTER PLAYS IN THE PAGE
+   Candidates never see LightSpeed VT's own shell, so the chapter cannot be a
+   button that leaves. The course is embedded and the page keeps the parts
+   that are ours: which of the five stages you are on, what has to happen
+   before Continue means anything, and somewhere to write while you watch.
+   ========================================================================== */
+.app .lsvt-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s05);padding-bottom:var(--s04);
+  border-bottom:1px solid var(--rule)}
+.app .lsvt-ttl{display:flex;align-items:baseline;gap:var(--s04);min-width:0}
+.app .lsvt-ttl b{font-size:14px;line-height:19px;font-weight:600}
+.app .lsvt-n{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.app .lsvt-wrap{display:grid;grid-template-columns:minmax(0,1fr)}
+
+/* the five stages. A row is a state, not a card: rule between, nothing round,
+   nothing filled. The icon carries the state and the weight carries focus. */
+.app .stp-list{
+  list-style:none;margin:0;padding:0;
+  border-bottom:1px solid var(--rule)}
+.app .stp-row{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule);
+  cursor:pointer;background:none;text-align:left}
+.app .stp-row:last-child{border-bottom:0}
+.app .stp-ic{flex:none;display:grid;place-items:center;height:20px}
+.app .stp-ic svg{display:block;width:17px;height:17px;fill:var(--icon-secondary)}
+.app .stp-row.did .stp-ic svg{fill:var(--support-success)}
+.app .stp-row.on  .stp-ic svg{fill:var(--accent)}
+.app .stp-b{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .stp-b b{font-size:13.5px;line-height:19px;font-weight:400}
+.app .stp-row.on .stp-b b{font-weight:600}
+.app .stp-b > span{font-size:11.5px;line-height:16px;color:var(--text-secondary)}
+
+/* the frame itself. It is somebody else's document, so it gets a rule around
+   it and nothing else — no shadow, no radius, no chrome pretending it is a
+   part of this page. */
+.app .lsvt-frame{border:1px solid var(--rule);background:var(--background)}
+.app .lsvt-if{
+  display:block;width:100%;height:min(62cqw, 460px);min-height:320px;
+  border:0;background:var(--background)}
+
+.app .lsvt-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s05);flex-wrap:wrap;
+  padding-top:var(--s05);border-top:1px solid var(--rule)}
+.app .lsvt-foot .t-helper-01{color:var(--text-secondary)}
+
+.app .lsvt-notes{padding-top:var(--s05);border-top:1px solid var(--rule)}
+.app .lsvt-notes label{display:block;margin-bottom:var(--s03)}
+.app .lsvt-notes .ai-field{min-height:96px}
+.app .lsvt-notes-f{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap;
+  margin-top:var(--s04)}
+.app .lsvt-notes-f .t-legal-01{color:var(--text-helper)}
+
+/* at desktop the stages stand beside the frame, so the shape of the chapter
+   is visible while you are inside one of its parts */
+@container app (min-width:900px){
+  .app .lsvt-wrap{grid-template-columns:minmax(190px,248px) minmax(0,1fr)}
+  .app .stp-list{
+    border-bottom:0;border-right:1px solid var(--rule);
+    padding-right:var(--s06);align-self:start}
+  .app .lsvt-frame{border:0;border-left:0;margin-left:var(--s06)}
+  .app .lsvt-if{height:min(46cqw, 560px)}
+  .app .lsvt-head{padding-bottom:var(--s05)}
+}
+
+/* ==========================================================================
+   AN INTERVIEW KEEPS ITS RECORDING
+   Every interview taken — the first and every re-interview — carries its own
+   recording, its own transcript and its own marked scenes, and they open
+   from the report that interview produced.
+   ========================================================================== */
+.app .rec{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s05)}
+.app .rec-plate{
+  position:relative;aspect-ratio:16/9;background:var(--surface-dark);
+  display:grid;place-items:center}
+.app .rec-play svg{width:34px;height:34px;fill:var(--on-dark);display:block;opacity:.94}
+.app .rec-len{
+  position:absolute;right:var(--s04);bottom:var(--s03);
+  color:var(--on-dark-2);font-size:11px;line-height:15px;font-variant-numeric:tabular-nums}
+.app .rec-b{min-width:0}
+@container app (min-width:672px){
+  .app .rec{grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:var(--s06);
+    align-items:start}
+}
+
+/* ==========================================================================
+   ONE RULE BETWEEN TWO THINGS
+   A section closes with a rule and a tab strip opens with one, so the two
+   met and drew a pair with a band of nothing between them. The strip's own
+   top rule is the one that belongs to the strip; the section's is dropped.
+   ========================================================================== */
+.app .page > .sec:has(+ .tabs)::after,
+.app .page > .sec:has(+ .cs)::after{display:none}
+@container app (min-width:900px){
+  .app .page > .sec:has(+ .tabs)::after{display:none}
+}
+
+/* ==========================================================================
+   THE TAB STRIP STARTS AT THE RULE
+   A tab is a cell of a strip that spans the column. Insetting the strip by
+   the gutter leaves a notch of canvas before the first cell and makes the
+   selected tab look like it is floating rather than sitting in a run.
+   ========================================================================== */
+.app .page .tabs{padding-left:0;padding-right:0}
+@container app (min-width:900px){
+  .app .page:not(.form-page) > .tabs{padding-left:0;padding-right:0}
+}
+
+/* ==========================================================================
+   POINTS, BADGES AND RANK ARE A LIST, NOT A PANEL
+   The rewards lists are the page's own content — the only content on their
+   tab — so there is nothing for a panel tone to separate them from. They sit
+   on the canvas and the rules between rows do the work.
+   ========================================================================== */
+.app .sec.nofill,
+.app .sec.nofill .aw,
+.app .sec.nofill .aw-ic,
+.app .sec.nofill .aw.got .aw-ic{background-color:transparent}
+.app .sec.nofill .aw.got .aw-ic{background-color:var(--accent)}
+.app .sec.nofill .aw{border-bottom-color:var(--rule)}
+
+/* ==========================================================================
+   THE CONVERSATION AND ITS FIELD ARE ONE COLUMN
+   The composer used to live outside <main>, which meant it spanned the whole
+   view — under the rail, past the content margin, across both vertical
+   rules. It is the page's own footer: it sits inside the column, aligned to
+   the same spine as the heading and the messages above it, and it holds the
+   bottom of the page rather than the bottom of the window.
+   ========================================================================== */
+.app .msg-page{display:flex;flex-direction:column;min-height:100%}
+.app .msg-page > .msgs{flex:1 1 auto}
+.app .msg-page > .msg-foot{flex:none;margin-top:auto}
+.app .msg-page > .msg-foot > .tal-sugg{
+  padding:var(--s04) var(--pad-x);border-top:1px solid var(--rule)}
+.app .msg-page > .msg-foot > .composer{
+  padding:var(--s04) var(--pad-x);border-top:1px solid var(--rule)}
+
+/* the field is the one white surface in the product: it is the only place
+   the person writes into a conversation, and on a paper-coloured page the
+   thing you are about to fill has to read as empty rather than as another
+   panel. It keeps a rule so it is a field and not a hole. */
+.app .msg-page .composer .inp{
+  background-color:var(--pure-white);
+  border:1px solid var(--border-strong-01);border-bottom:1px solid var(--border-strong-01);
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .msg-page .composer .inp::placeholder{color:var(--text-helper)}
+
+/* a message is set on the same spine as the heading above it */
+.app .msg-page .msg{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.app .msg-page .msg .bub{padding-left:0;padding-right:0}
+
+/* ==========================================================================
+   THE PROGRESS BAR WAS A DIVIDER
+   `.pb` is used two ways: as a bar on its own, and as the wrapper around a
+   label row and a track. The bar styling applied to both, so the wrapper
+   drew a 3px filled strip of its own above the rows beneath it — the stray
+   rule above the Video row — and squashed the label line to 4px in the
+   process. When it wraps a track, it is a wrapper.
+   ========================================================================== */
+.app .pb:has(> .pb-track){
+  height:auto;background:none;overflow:visible;border-radius:0}
+.app .pb-top{
+  height:auto;display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s04);margin-bottom:var(--s04)}
+.app .pb-top .l{color:var(--text-secondary);font-size:12.5px;line-height:17px}
+.app .pb-top .v{font-size:12.5px;line-height:17px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   A BLED GRID STOPS AT THE RULES
+   The four-fact band pulls itself out to the vertical rules on both sides,
+   which is right — but the section it sits in also drew its own rule, and a
+   section rule runs to the frame. Two lines at the same height, one of them
+   longer than the column. The band keeps its own; the section's goes.
+   ========================================================================== */
+.app .page > .sec:has(> .facts)::after,
+.app .page > .sec:has(> .facts)::before,
+.app .page > .sec:has(> .stats)::after,
+.app .page > .sec:has(> .prog-figs)::after{display:none}
+.app .sec > .facts:only-child{border-top:1px solid var(--rule)}
+
+/* ==========================================================================
+   A CHART IS NOT PURPLE, AND IT IS NOT STRETCHED
+   Purple is the brand's one signal colour: when the data is also purple, a
+   reading and an action look alike. The series take a green ramp that shares
+   nothing with either the accent or the link blue, and the marked point
+   takes terracotta, which no control in the product uses.
+
+   The plot was stretched because a 320x104 viewBox was drawn into a box of
+   whatever width the column happened to be, with `preserveAspectRatio:none`.
+   Giving the box the viewBox's own ratio makes that projection uniform
+   again, so a marker is a circle rather than an ellipse.
+   ========================================================================== */
+.app .chart-line path.line,.app .chart-line path{stroke:var(--dv-4)}
+.app .chart-line circle{fill:var(--dv-4)}
+.app .chart-line circle.on{fill:var(--dv-hi)}
+.app .chart-bar.sel i,.app .chart-bar.on i{outline-color:var(--dv-hi)}
+.app .sc-col.on i,.app .sc-col.sel i{background-color:var(--dv-hi)}
+
+.app .chart-line{height:auto;aspect-ratio:320 / 104}
+.app .chart-line svg{width:100%;height:100%}
+
+/* ==========================================================================
+   AT DESKTOP THE READING AND THE PICTURE SIT TOGETHER
+   On a phone the table is an alternative to the chart and you toggle between
+   them. A desktop row is wide enough to hold both, and they answer different
+   questions — the table gives you the number for a chapter, the chart gives
+   you the shape across chapters. Table on the left, plot on the right, and
+   the toggle that chose between them is no longer needed.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .chart{
+    max-width:none;
+    display:grid;column-gap:var(--s08);row-gap:0;
+    grid-template-columns:minmax(0,320px) minmax(0,1fr);
+    grid-template-areas:
+      'head head'
+      'table plot'
+      'table x'
+      'table read';
+    align-items:start}
+  .app .chart > .chart-head{grid-area:head}
+  .app .chart > .chart-line,.app .chart > .chart-plot,.app .chart > .sc-plot{
+    grid-area:plot}
+  .app .chart > .chart-x{grid-area:x}
+  .app .chart > .chart-read{grid-area:read;justify-self:start}
+  .app .chart > .chart-table{
+    grid-area:table;display:block;margin-top:0;align-self:start}
+  .app .chart > .mt4:has(> [data-tbl]){display:none}
+  /* the toggle is gone, so the table is shown in both states */
+  .app .chart.tbl > .chart-line,.app .chart.tbl > .chart-plot,
+  .app .chart.tbl > .sc-plot,.app .chart.tbl > .chart-x,
+  .app .chart.tbl > .chart-read,.app .chart.tbl > .legend{display:block}
+  .app .chart.tbl > .chart-read{display:flex}
+  .app .chart.tbl > .chart-plot,.app .chart.tbl > .sc-plot{display:flex}
+  .app .chart.tbl > .chart-x{display:flex}
+}
+
+/* the reading beside the plot is a two-column table, not a label column with
+   a paragraph wrapped into it: the name takes the space it needs and the
+   figure sits against the right edge on one line */
+@container app (min-width:900px){
+  .app .chart{grid-template-columns:minmax(0,400px) minmax(0,1fr)}
+  .app .chart-table .kv{
+    grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:var(--s05)}
+  .app .chart-table .kv .v{text-align:right;white-space:normal}
+  /* the plot column is shorter than the table beside it, so the slack goes
+     into an empty fifth row rather than stretching the reading away from
+     the axis it belongs to */
+  .app .chart{grid-template-areas:
+      'head head'
+      'table plot'
+      'table x'
+      'table read'
+      'table .'}
+  .app .chart > .chart-read{align-self:start;margin-top:var(--s05)}
+}
+
+/* the conversation holds the height of the view, so the field sits at the
+   bottom of the frame rather than under the last message */
+.app .main:has(> .msg-page){display:flex;flex-direction:column;flex:1;min-height:0}
+.app .msg-page{flex:1 1 auto}
+
+/* on a phone there is no room for a message and its attribution side by
+   side: the line wraps to four words a row and the column of dates reads as
+   a second message. The attribution goes under the message it belongs to. */
+@container app (max-width:599px){
+  .app .msg-page .msg{flex-direction:column;gap:var(--s02)}
+  .app .msg-page .msg .mt{margin-left:0;text-align:left;white-space:nowrap}
+  .app .msg-page .msg.me{align-items:flex-start}
+}
+.app .msg-page > .msg-foot > .composer{padding-bottom:var(--s05)}
+
+/* ==========================================================================
+   THE SCORE CARD IS NOT A LINK
+   Wrapping the card in `.score-link` gave it a link's ink and a link's
+   underline — a blue rule the width of the section, under a card that is a
+   readout. It stays clickable; it stops looking like a sentence.
+   ========================================================================== */
+.app .score-link{
+  display:block;width:100%;text-align:left;
+  border-bottom:0;color:inherit;background:none;padding:0}
+.app .score-link .score-pts .n{color:var(--text-primary)}
+/* the card sits inside a section that already pays the gutter and already
+   draws the closing rule, so it does neither */
+.app .sec .score{padding-left:0;padding-right:0;padding-bottom:0;border-bottom:0}
+.app .sec .score::after,.app .sec .score::before{display:none}
+
+/* ==========================================================================
+   THE WEEKLY CALL IS AN APPOINTMENT
+   One thing in the week happens at a fixed time with a named person in the
+   room. It reads as that: the day as a mark on the left, what it is and who
+   is running it on the right.
+   ========================================================================== */
+.app .wcall{align-items:center;gap:var(--s05)}
+.app .wcall-d{
+  flex:none;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1px;
+  min-width:64px;padding:var(--s04) var(--s04);
+  border:1px solid var(--rule);background:var(--background)}
+.app .sec.tint .wcall-d{border-color:var(--rule-on-2)}
+.app .wcall-d b{
+  font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.4px;
+  text-transform:uppercase}
+.app .wcall-d > span{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.app .wcall-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.app .wcall-t{font-size:14px;line-height:19px;font-weight:600}
+.app .wcall-who{
+  display:flex;align-items:center;gap:var(--s03);margin-top:var(--s03);
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .wcall-who .av,.app .wcall-who .av-ph{flex:none}
+
+/* ==========================================================================
+   THE LEVEL BLOCK IS A ROW
+   The black band held four stacked things — when it was confirmed, the
+   level, the rung, and the fifteen-rung ladder — in a single column, so the
+   ladder sat a long way under the name it belongs to and the band grew to
+   the height of a small page. At desktop width the two halves sit side by
+   side: who you are on the left, where that is on the track on the right.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .lvl-hero:not(:has(.path)){
+    display:grid;grid-template-columns:minmax(0,auto) minmax(320px,1fr);
+    column-gap:var(--s10);align-items:center;
+    padding-top:var(--s08);padding-bottom:var(--s08)}
+  .app .lvl-hero > .eb,.app .lvl-hero > .eyebrow{grid-column:1;align-self:end}
+  .app .lvl-hero > .big,.app .lvl-hero > .nm{grid-column:1}
+  .app .lvl-hero > .sub{grid-column:1;align-self:start}
+  .app .lvl-hero > .ladder{grid-column:2;grid-row:1 / span 2;
+    align-self:end;margin-top:0}
+  .app .lvl-hero > .ladder-lab{grid-column:2;grid-row:3;align-self:start}
+  .app .lvl-hero .ladder{height:40px}
+}
+/* the ladder reads as a scale rather than a row of tiles: the rungs behind
+   you are quiet, the one you are on is the only solid mark */
+.app .ladder i{background-color:var(--on-dark-fill)}
+.app .ladder i.done{background-color:var(--accent);opacity:.42}
+.app .ladder i.on{background-color:var(--accent);opacity:1}
+.app .ladder-lab{color:var(--on-dark-2)}
+
+/* ==========================================================================
+   A LINK IS UNDERLINED ONCE
+   `.lk` predates the underline: it drew its own rule under the whole box, on
+   the assumption the text itself carried none. `a[data-go]` then added a
+   real underline, and every link that is both — which is most of them —
+   ended up with two lines, one under the words and one under the box.
+   The text underline is the one that belongs to the words.
+   ========================================================================== */
+.app .lk,.app .lnk{
+  border-bottom:0;
+  text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.app .lk:focus-visible,.app .lnk:focus-visible{text-decoration-thickness:2px}
+.app .score-link,.app .score-link:focus-visible{text-decoration:none}
+
+/* `.tile.clk.arrow` is a two-column grid — everything but the arrow stacks
+   in column 1. The appointment wants three cells across, so it states its
+   own grid rather than inheriting that one. */
+.app .tile.clk.arrow.wcall{
+  grid-template-columns:auto minmax(0,1fr) auto;
+  column-gap:var(--s05)}
+.app .tile.clk.arrow.wcall > .wcall-d{grid-column:1;grid-row:1}
+.app .tile.clk.arrow.wcall > .wcall-b{grid-column:2;grid-row:1}
+.app .tile.clk.arrow.wcall > .tile-arrow{grid-column:3;grid-row:1}
+.app .wcall{flex-direction:row}
+
+/* ==========================================================================
+   THE CHAPTER LIST
+   A list of thirteen rows is the whole page, so the rules between them are
+   the page's own structure: they run to the vertical rules rather than
+   stopping inside the gutter, and the rows breathe enough that a title and
+   its meta read as one block rather than as two rows.
+   ========================================================================== */
+/* The section stops paying the gutter and each row pays it instead, so the
+   rule under a row runs the full width of the column whatever the section
+   around it does — and it cannot double up with a stack that was already
+   pulled out, because nothing is pulled out any more. */
+.app .sec:has(> .tile-stack > .ch){padding-left:0;padding-right:0}
+.app .sec:has(> .tile-stack > .ch) > *:not(.tile-stack),
+.app .page:not(.form-page) .sec:has(> .tile-stack > .ch) > *:not(.tile-stack){
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.app .sec:has(> .tile-stack > .ch) > .tile-stack{margin-left:0;margin-right:0}
+.app .sec:has(> .tile-stack > .ch) > .tile-stack > .ch{
+  margin-left:0;margin-right:0;width:auto;
+  padding-left:var(--pad-x);padding-right:var(--pad-x);
+  padding-top:var(--s05);padding-bottom:var(--s05);
+  min-height:72px;gap:var(--s05);align-items:center}
+.app .sec .ch .ch-b{display:flex;flex-direction:column;gap:var(--s02)}
+
+/* the number is a number. It was a filled purple tile on the done and open
+   chapters, which spent the one signal colour on a label — the row already
+   says what state it is in, in the tick and in the action at its end.
+   Stated at the same reach as the four rules in §12 that set it. */
+.app .ch.open .ch-num,.app .ch.done .ch-num,
+.app .sec.tint .ch.done .ch-num,.app .sec.tint .ch.open .ch-num,
+.app .sec:has(> .tile-stack) .ch.done .ch-num,
+.app .sec:has(> .tile-stack) .ch.open .ch-num,
+.app .sec.flat.bleed .ch.done .ch-num,.app .sec.flat.bleed .ch.open .ch-num{
+  background-color:transparent;color:var(--text-secondary);
+  border:1px solid var(--rule);font-weight:600}
+.app .ch.open::before{display:none}
+.app .ch.open .ch-m::after{content:none}
+.app .ch.open .ch-n{font-weight:600}
+
+/* a finished chapter carries its tick beside its name, where you read it */
+.app .ch-n{display:inline-flex;align-items:center;gap:var(--s03)}
+.app .ch-tick{display:inline-flex;flex:none}
+.app .ch-tick svg{
+  display:block;width:15px;height:15px;fill:var(--support-success)}
+
+/* and one named action closes the row */
+.app .ch-act{
+  flex:none;white-space:nowrap;
+  font-size:12.5px;line-height:17px;font-weight:600;
+  color:var(--text-primary);
+  text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.app .ch-act.resume{color:var(--support-attention)}
+
+/* ==========================================================================
+   THE ASSESSMENT LINE IS GOLD
+   Two charts sit on the same page. The stacked bars are a green ramp because
+   they are four parts of one quantity; the assessment line is a single
+   series and takes gold, so at a glance you know which reading you are
+   looking at before you have read either title.
+   ========================================================================== */
+.app .chart-line path{stroke:var(--dv-gold)}
+.app .chart-line circle{fill:var(--dv-gold)}
+.app .chart-line circle.on{fill:var(--dv-4)}
+
+/* and the reading is set well clear of the picture */
+@container app (min-width:900px){
+  .app .chart{column-gap:clamp(var(--s08), 6cqw, 96px)}
+}
+
+/* ==========================================================================
+   THE CERTIFICATE
+   A record, not a splash screen. It runs the full width of the column —
+   rule to rule, no gutter — with the mark large on the left, the record set
+   against it, and the two actions in the bottom right corner.
+   ========================================================================== */
+.app .cert{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'mark body' 'mark act';
+  column-gap:var(--s07);row-gap:var(--s06);
+  align-items:start;
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s07) var(--pad-x);
+  text-align:left;border-top:0}
+.app .cert-mark{
+  grid-area:mark;display:grid;place-items:center;
+  width:auto;height:auto;margin:0;align-self:center}
+.app .cert-mark svg{width:88px;height:88px;fill:var(--accent)}
+.app .cert-b{grid-area:body;min-width:0}
+.app .cert-eb{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark-2);margin-bottom:var(--s03)}
+.app .cert .n{font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px}
+.app .cert .m{margin-top:var(--s02);font-size:13.5px;line-height:19px;color:var(--on-dark-2)}
+.app .cert-act{
+  grid-area:act;display:flex;gap:var(--s04);flex-wrap:wrap;
+  justify-content:flex-start;align-self:end}
+.app .cert-btn{
+  background-color:transparent;color:var(--on-dark);
+  border:1px solid var(--on-dark-border)}
+.app .cert-btn svg{fill:var(--on-dark)}
+
+@container app (min-width:672px){
+  .app .cert{
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:'mark body act';
+    align-items:center;
+    padding-top:var(--s08);padding-bottom:var(--s08)}
+  .app .cert-act{justify-content:flex-end;align-self:end}
+  .app .cert-mark svg{width:104px;height:104px}
+}
+
+/* ==========================================================================
+   THE COHORT CALL BAND
+   One fixed appointment a week. It is the only thing on the cohort page with
+   a time attached, so it is the only thing there with a fill: a band across
+   the column, the day on the left, the detail against it, the action at the
+   right-hand end.
+   ========================================================================== */
+.app .callband{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'day body' 'act act';
+  gap:var(--s05);
+  align-items:center;
+  background-color:var(--surface-2);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s06) var(--pad-x)}
+.app .callband-d{
+  grid-area:day;flex:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1px;min-width:88px;padding:var(--s05) var(--s05);
+  background-color:var(--background);border:1px solid var(--rule-on-2)}
+.app .callband-d b{
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:.4px;
+  text-transform:uppercase}
+.app .callband-d > span{
+  font-size:13.5px;line-height:18px;font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.app .callband-tz{
+  font-size:11px;line-height:15px;letter-spacing:.6px;
+  color:var(--text-secondary);text-transform:uppercase}
+.app .callband-b{grid-area:body;min-width:0}
+.app .callband-t{
+  margin-top:var(--s02);
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+.app .callband-who{
+  display:flex;align-items:center;gap:var(--s03);margin-top:var(--s04);
+  font-size:13.5px;line-height:18px;color:var(--text-secondary)}
+.app .callband-who .av,.app .callband-who .av-ph{flex:none}
+.app .callband-act{grid-area:act;display:flex;align-items:center}
+@container app (min-width:672px){
+  .app .callband{
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:'day body act';
+    column-gap:var(--s07)}
+  .app .callband-act{justify-self:end}
+}
+
+/* ==========================================================================
+   NO LEFT BORDER, ANYWHERE
+   A rule down the left of a block is the one decoration this design does not
+   use. It was left over from the Carbon build, where a coloured left edge
+   carried a block's kind — here the kind is carried by the words, the tone
+   and the tick, and a stray vertical rule inside a page already made of
+   rules reads as a second, competing structure. Stated once, at the reach
+   the §10 rules were stated at, so it cannot come back a block at a time.
+   ========================================================================== */
+.app .tile.bordered,.app .ai-aura,.app .note,.app .ai-stream,.app .signed,
+.app .note.warn,.app .note.err,.app .note.succ,.app .note.acc,
+.app .signed.clk{border-left:0!important}
+.app .tile.bordered:not(.band),.app .ai-aura:not(.band),
+.app .note:not(.band),.app .ai-stream:not(.band),.app .signed:not(.band){
+  padding-left:0!important}
+
+/* ==========================================================================
+   THE TRACK BAND IS TWO ROWS OF THREE
+   The hero puts its identity on the left and its measure on the right, which
+   is right for the fifteen-rung ladder — one long horizontal thing. The
+   track band is not that: it is a 3x2 grid, three buckets over three facts,
+   and it needs the whole width of the band. So a hero that holds one goes
+   back to stacking, and the two grids run rule to rule beneath the name.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .lvl-hero:has(.path){display:block}
+}
+.app .path-facts{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* §37 makes the last of an odd number of cells span the row — right for a
+   two-column grid, wrong for a three-column one, where three is a full row */
+.app .path-facts > div:last-child:nth-child(odd){grid-column:auto}
+.app .path-step{gap:var(--s02);padding-top:var(--s06);padding-bottom:var(--s06)}
+.app .path-mark{display:block}
+.app .path-mark svg{
+  display:block;width:22px;height:22px;
+  fill:var(--on-dark-dim);margin-bottom:var(--s04)}
+.app .path-step.on .path-mark svg{fill:var(--accent)}
+.app .path-step.past .path-mark svg{fill:var(--on-dark-2);opacity:.6}
+.app .path-n{font-size:14px;line-height:19px}
+.app .path-w{
+  font-size:11.5px;line-height:16px;color:var(--on-dark-2);
+  overflow-wrap:anywhere}
+.app .path-you{margin-top:var(--s03)}
+@container app (min-width:900px){
+  .app .path-step{padding-top:var(--s07);padding-bottom:var(--s07)}
+  .app .path-facts > div{padding-top:var(--s05);padding-bottom:var(--s05)}
+}
+
+/* ==========================================================================
+   AN ACCORDION IS RULED BETWEEN, NOT AROUND
+   The list opened with a rule and closed with one, so a three-question
+   accordion drew four lines for three questions and read as a boxed block
+   on a page that has no boxes. The rules that separate one question from
+   the next stay; the two that wrap the set go.
+   ========================================================================== */
+.app .acc{border-top:0}
+.app .acc > .acc-i:last-child{border-bottom:0}
+
+/* ==========================================================================
+   THE NOTIFICATION PANEL
+   Three things.
+
+   Its header rule sits on the app bar's rule. The panel opens over the whole
+   app, so its first horizontal line lands beside the app bar's — and two
+   rules nine pixels apart across one screen is a misalignment you see before
+   you read anything. The header takes the app bar's height, exactly.
+
+   Mark all read moves to the right, beside the close. It is an action on the
+   panel, like closing it; against the heading it read as a subtitle.
+
+   And read and unread stop being told apart by a 6px square. Unread carries
+   a filled mark and full-strength ink; read keeps the outlined mark it has
+   and steps its text back. The difference is the whole row, not a dot.
+   ========================================================================== */
+.app .notif-h{
+  height:60px;padding-top:0;padding-bottom:0;
+  padding-right:var(--s04)}
+@container app (min-width:900px){
+  .app .notif-h{height:68px}
+}
+.app .notif-h h2{margin-right:auto}
+.app .notif-all{
+  margin-left:0;flex:none;
+  text-underline-offset:3px;text-decoration-thickness:1px}
+.app .notif-h .x{margin-left:0}
+
+/* the mark carries the state */
+.app .nrow .nrow-ic{
+  border:1px solid var(--rule);background-color:transparent}
+.app .nrow .nrow-ic svg{fill:var(--icon-secondary)}
+.app .nrow.un .nrow-ic{
+  border-color:transparent;background-color:var(--accent)}
+.app .nrow.un .nrow-ic svg{fill:var(--on-accent)}
+/* and a read row steps back rather than being marked absent */
+.app .nrow:not(.un) .nrow-t{color:var(--text-secondary);font-weight:500}
+.app .nrow:not(.un) .nrow-d,.app .nrow:not(.un) .nrow-w{color:var(--text-helper)}
+.app .nrow.un .nrow-t{color:var(--text-primary);font-weight:600}
+/* the dot is redundant now */
+.app .nrow.un::after{display:none}
+
+/* ==========================================================================
+   AN ACTION IN THE PAGE HEADER
+   The heading and its sentence take the measure they need; the one action
+   the page is for sits against the right edge of the column, on the same
+   band, so it is the first thing in reach rather than the last.
+   ========================================================================== */
+.app .ph-main{min-width:0}
+.app .ph-has-act{display:flex;flex-direction:column;gap:var(--s05)}
+.app .ph-act{display:flex;flex-wrap:wrap;gap:var(--s04)}
+@container app (min-width:672px){
+  .app .ph-has-act{
+    flex-direction:row;align-items:flex-end;justify-content:space-between;
+    gap:var(--s07)}
+  .app .ph-act{flex:none;justify-content:flex-end;padding-bottom:2px}
+}
+
+/* ==========================================================================
+   HOW IT WORKS IS A LIST, NOT A SIDEBAR
+   The desktop label column is right for a section whose heading names a set
+   of rows you scan. It is wrong for four numbered steps you read in order:
+   it strands the heading in an empty column and squeezes the prose it
+   introduces. The heading goes back above its list, and the rule between one
+   step and the next runs the full width of the column.
+   ========================================================================== */
+.app .sec:has(> .steps) > .sec-h{
+  padding-left:0;padding-right:0;margin-bottom:var(--s05)}
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .steps){display:block}
+  .app .page:not(.form-page) .sec:has(> .steps) > .sec-h{
+    padding-left:0;padding-right:0;margin-bottom:var(--s05)}
+  .app .page:not(.form-page) .sec:has(> .steps) > :not(.sec-h){padding-left:0}
+}
+.app .steps{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .steps > li{
+  padding-left:var(--pad-x);padding-right:var(--pad-x);
+  padding-top:var(--s06);padding-bottom:var(--s06)}
+
+/* the number is the number, in the accent — a box around a single digit adds
+   an edge and says nothing the digit does not */
+.app .s-n{
+  border:0;background:transparent;width:auto;min-width:18px;
+  justify-items:start;
+  color:var(--accent-text);font-size:13.5px;line-height:19px;font-weight:600;
+  margin-top:1px}
+
+/* ==========================================================================
+   THE SHORTLIST BAND
+   Two corrections to the three-across comparison.
+
+   Its rules run the width of the column. The band is the page's own band —
+   it holds three cells of one comparison — so the lines that open and close
+   it belong to the column, not to a block inset inside it.
+
+   And the identity is one line, not three. A face, then the name and the
+   rating beside it, is how you recognise a person; stacking the photograph
+   above the name and the rating below that spends three rows saying who
+   somebody is before the card says anything about them.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .rail-wrap{padding-left:0;padding-right:0}
+  .app .rail .agh:first-child{padding-left:var(--pad-x)}
+  .app .rail .agh:last-child{padding-right:var(--pad-x)}
+
+  .app .rail .agh{
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:
+      'av   name name'
+      'av   rate rate'
+      'meta meta meta'
+      'foot foot go';
+    column-gap:var(--s05);row-gap:0}
+  .app .rail .agh > .av,.app .rail .agh > .av-ph{
+    grid-area:av;width:52px;height:52px;margin-bottom:0;align-self:start}
+  .app .rail .agh > .agh-n{grid-area:name;align-self:end}
+  .app .rail .agh > .agh-r{grid-area:rate;align-self:start;margin-top:var(--s02)}
+  .app .rail .agh > .agh-m{grid-area:meta;margin-top:var(--s06)}
+  .app .rail .agh-f{grid-area:foot;margin-top:var(--s06)}
+  .app .rail .card-go{grid-area:go;align-self:center;margin-top:var(--s06)}
+}
+/* the number sits on the stars' own line, not a pixel under it */
+.app .agh-r{align-items:baseline}
+.app .agh-r .stars{align-self:center}
+.app .agh-r .num{
+  font-size:12.5px;line-height:17px;font-weight:600;
+  color:var(--text-secondary);font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   WHEN A HEADING IS A ROW, NOT A LABEL
+   The label column is right for a heading that names a region you scan: it
+   sits in the margin and the content runs beside it. Two cases are not that.
+
+   A heading that carries a link — "Decided so far / My Level", "Points /
+   Badges and rank" — is a row with two ends. Stacked in a narrow margin
+   column the link reads as a subtitle of the heading rather than as the way
+   out of the section. It spans the column instead, heading at the spine and
+   link hard against the right gutter.
+
+   A stepper is the second case. It is a progress readout the width of the
+   page, and it has its own internal left edge; putting it beside a margin
+   label gives the region two competing left edges. Heading above, stepper
+   beneath it.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .sec-h > a),
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk),
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk),
+  .app .page:not(.form-page) .sec:has(.stp){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+
+  .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h,
+  .app .page:not(.form-page) .sec:has(.stp) > .sec-h{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:var(--s05);flex-wrap:wrap;
+    grid-column:auto;grid-row:auto;
+    border-right:0;min-height:0;
+    margin:0 0 var(--s05);padding:0}
+
+  .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(.stp) > .sec-h h2{
+    font-size:15px;line-height:20px;letter-spacing:-.05px}
+
+  .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h a,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h .lk,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h .lnk{
+    margin:0;display:inline-flex}
+
+  .app .page:not(.form-page) .sec:has(> .sec-h > a) > :not(.sec-h),
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > :not(.sec-h),
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > :not(.sec-h),
+  .app .page:not(.form-page) .sec:has(.stp) > :not(.sec-h){
+    grid-column:auto;padding-left:0;padding-right:0}
+}
+
+/* the band ends where its last row ends: the vertical rules between the
+   cells reach the base of the block rather than stopping in a field of
+   black, and a cell is as tall as what is in it */
+.app .lvl-hero:has(.path){padding-bottom:0}
+.app .path-step{padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .path-facts > div{padding-top:var(--s05);padding-bottom:var(--s05)}
+@container app (min-width:900px){
+  .app .path-step{padding-top:var(--s06);padding-bottom:var(--s06)}
+  .app .path-facts > div{padding-top:var(--s05);padding-bottom:var(--s05)}
+}
+/* you are here is a stamp on the cell, not a third line of its text */
+.app .path-step{position:relative}
+.app .path-you{
+  margin-top:auto;align-self:flex-end;text-align:right;padding-top:var(--s05)}
+
+/* an explainer block is the page's own content, not an aside: it takes the
+   width of the column rather than a 62-character measure meant for a
+   paragraph sitting beside something else */
+.app .tile.bordered > p,.app .tile.bordered p,
+.app .tile.bordered .ai-body,.app .tile.bordered .ai-body p{max-width:none}
+
+/* ==========================================================================
+   AND THE SAME FOR AN ACCORDION
+   A set of questions is read in order like a set of steps, not scanned like
+   a list of rows, so it takes the same treatment: the heading above it and
+   the rule between one question and the next running the width of the
+   column.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .acc){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec:has(> .acc) > .sec-h{
+    border-right:0;min-height:0;margin:0 0 var(--s05);
+    padding:0}
+  .app .page:not(.form-page) .sec:has(> .acc) > :not(.sec-h){padding-left:0}
+}
+.app .sec:has(> .acc) > .sec-h{padding-left:0;padding-right:0}
+.app .sec > .acc{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .sec > .acc > .acc-i > .acc-h,
+.app .sec > .acc > .acc-i > .acc-b{
+  padding-left:0;padding-right:0}
+
+/* ==========================================================================
+   THE AGENT'S IDENTITY
+   You decide who to talk to from a face and three facts. The photograph is
+   big enough to be a person rather than a thumbnail, and the three lines sit
+   against it: who they are, how they are rated, and what they assess.
+
+   The last line used to be two bordered tags. A tag is for something you can
+   filter or remove; "Assesses E1–E3" is neither. The border goes and the
+   verification takes green, which is the one thing on the line that is a
+   status rather than a description.
+   ========================================================================== */
+.app .agid{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  column-gap:var(--s06);align-items:center}
+.app .agid > .av,.app .agid > .av-ph{
+  width:96px;height:96px;flex:none;align-self:start}
+.app .agid-b{min-width:0;display:flex;flex-direction:column;gap:var(--s03)}
+.app .agid-n{font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px}
+.app .agid-r{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.app .agid-r .num{
+  font-size:13.5px;line-height:19px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+.app .agid-iv{font-size:13.5px;line-height:19px;color:var(--text-secondary)}
+.app .agid-c{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap;
+  font-size:13.5px;line-height:19px;color:var(--text-secondary)}
+.app .agid-v{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  color:var(--support-success-ink);font-weight:600}
+.app .agid-v svg{width:15px;height:15px;fill:var(--support-success-ink);display:block}
+/* the agent speaks for a whole column, not a 62-character aside */
+.app .agid-bio,.app .sec > p.agid-bio{
+  margin-top:var(--s06);max-width:none;
+  font-size:13.5px;line-height:22px;color:var(--text-secondary)}
+
+/* the three interview facts are bands, like every other run of facts */
+.app .kv-bands{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .kv-bands > .kv{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+@container app (min-width:900px){
+  .app .agid{column-gap:var(--s07)}
+  .app .agid > .av,.app .agid > .av-ph{width:112px;height:112px}
+}
+
+/* ==========================================================================
+   A STAR IS GOLD, A VERIFICATION IS GREEN
+   Ratings were drawn in the same black as body text, which made five stars
+   read as five glyphs. Gold is what a star means. Green is what a check
+   means. Neither is the accent, so neither competes with it.
+   ========================================================================== */
+.app .stars svg.f,.app .stars svg[class*="f"]{fill:var(--star)}
+.app .tag.green,.app .tag.green svg{color:var(--support-success-ink)}
+.app .tag.green svg{fill:var(--support-success-ink)}
+
+/* Tal's own paragraph takes the column too */
+.app .ai-aura .ai-body,.app .ai-aura .ai-body p{max-width:none}
+
+/* ==========================================================================
+   THE SLOT PICKER
+   Days and times are one choice made twice, so they line up on one left
+   edge and take the width of the column. The heading goes above them for
+   the same reason the steps' heading does: this is a thing you work through,
+   not a set of rows you scan.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .daystrip){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h{
+    display:flex;align-items:baseline;justify-content:space-between;
+    gap:var(--s05);border-right:0;min-height:0;
+    margin:0 0 var(--s05);padding:0}
+  .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2{
+    font-size:15px;line-height:20px;letter-spacing:-.05px}
+  .app .page:not(.form-page) .sec:has(> .daystrip) > :not(.sec-h){
+    padding-left:0;padding-right:0}
+}
+.app .sec > .daystrip{padding-left:0;padding-right:0}
+.app .sec > .slots{
+  margin-left:0;margin-right:0;padding-left:0;padding-right:0;
+  margin-top:var(--s04)}
+.app .slots-note{
+  margin-top:var(--s05);
+  font-size:12.5px;line-height:17px;color:var(--text-secondary);max-width:none}
+
+/* ==========================================================================
+   THE ACTION BAR IS ONE ROW
+   What you are booking, what it costs, and the button — left, left, right.
+   A full-width button under a caption reads as a banner; a button at the
+   width of its own label reads as the end of the form.
+   ========================================================================== */
+.app .stickybar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s06);flex-wrap:wrap}
+.app .stickybar > .sb-b{
+  display:flex;align-items:baseline;gap:var(--s06);
+  min-width:0;margin-bottom:0!important}
+.app .sb-when{font-size:13.5px;line-height:19px;color:var(--text-secondary)}
+.app .sb-price{
+  font-size:22px;line-height:28px;font-weight:600;letter-spacing:-.4px;
+  font-variant-numeric:tabular-nums}
+.app .stickybar .btn.sb-go{width:auto;max-width:none;flex:none}
+@container app (max-width:599px){
+  .app .stickybar{flex-direction:column;align-items:stretch;gap:var(--s05)}
+  .app .stickybar > .sb-b{justify-content:space-between}
+  .app .stickybar .btn.sb-go{width:100%}
+}
+
+/* a heading whose section already pays the gutter must not pay it again.
+   `.stats` joins `.tile-stack` here for the same reason and by the same
+   route: §10 puts both in the list of grids that escape the desktop label
+   column, that list hands the heading `0 var(--pad-x)` because most of its
+   members sit flush, §14 then charges a 24px right gutter to every `.sec-h`
+   — and this is where it comes back off for the two that are not flush.
+   Without it the action in the heading stopped 24px short of the right edge
+   of the figures it belongs to, which on a four-cell row is visible. */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .tile-stack) > .sec-h,
+  .app .page:not(.form-page) .sec:has(> .stats) > .sec-h{
+    padding-left:0;padding-right:0}
+}
+
+/* the price is on the scale */
+.app .sb-price{font-size:24px;line-height:30px}
+
+/* ==========================================================================
+   THE ARTWORK IS THE TOP LAYER OF ITS OWN HALF
+   Section rules are full-bleed by design — they run past the content column
+   to the frame — and on the sign-up screens the frame includes the graphic.
+   A hairline drawn across the logo is a hairline drawn across the brand.
+   The artwork sits above them; the rules stop being visible where it starts.
+   ========================================================================== */
+.app > .auth-art{position:relative;z-index:6}
+
+/* the verify screen's two actions are a pair on one line */
+.app .otp-act{display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap}
+.app .otp-act > .btn{flex:none;width:auto;max-width:none}
+.app .otp-act > .btn-p{margin-left:auto}
+@container app (max-width:479px){
+  .app .otp-act{flex-direction:column-reverse;align-items:stretch}
+  .app .otp-act > .btn{width:100%}
+  .app .otp-act > .btn-p{margin-left:0}
+}
+
+/* ==========================================================================
+   ON THE SIGN-UP SCREENS A BAND IS A RULED ROW
+   In the app a suggested question is a tinted band between two rails. The
+   sign-up column has no rails and a much narrower measure, so three tinted
+   plates stacked in it read as a block of grey rather than as three things
+   you can tap. Here the same rows are separated by rules and nothing else.
+   ========================================================================== */
+.app .auth-col .band{
+  background-color:transparent;
+  border-top:1px solid var(--rule);
+  padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .auth-col .band + .band{border-top:1px solid var(--rule)}
+.app .auth-col .band:last-of-type{border-bottom:1px solid var(--rule)}
+
+/* ==========================================================================
+   A SECTION PAYS THE GUTTER ONCE
+   Two rules were both true of the enrolment page's chapter list: it is a
+   section whose heading carries a link, and it is a section of chapter rows.
+   The first gave the section the gutter; the second gave the heading the
+   gutter as well, and the heading landed one gutter right of the spine.
+   The chapter-row rule is stated at the same reach as the link rule, so the
+   section pays nothing and every child pays once.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .tile-stack > .ch){
+    padding-left:0;padding-right:0}
+}
+
+/* ==========================================================================
+   ALL AGENTS
+   The list is a comparison, so it takes the same three-across band the
+   shortlist uses, and the search sits under the heading that names it.
+   ========================================================================== */
+.app .all-desc{
+  margin-bottom:var(--s05);max-width:none;
+  font-size:13.5px;line-height:19px;color:var(--text-secondary)}
+.app .srch.all-srch{margin-bottom:0}
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .all-desc) > .all-desc,
+  .app .page:not(.form-page) .sec:has(> .all-desc) > .all-srch{padding-left:0}
+  .app .rail.rail-all{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    border-top:1px solid var(--rule)}
+  .app .rail.rail-all .agh{
+    border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
+  .app .rail.rail-all .agh:nth-child(3n){border-right:0}
+  .app .rail.rail-all .agh:nth-child(3n+1){padding-left:var(--pad-x)}
+  .app .rail.rail-all .agh:nth-child(3n){padding-right:var(--pad-x)}
+}
+
+/* ==========================================================================
+   DEFAULT IS A STATE, NOT A TAG
+   A square black chip against a card number reads as a second piece of data.
+   The marker that says which card gets charged is a small purple pill, set
+   off from the number it belongs to.
+   ========================================================================== */
+.app .pill-def{
+  display:inline-flex;align-items:center;
+  margin-left:var(--s04);padding:2px var(--s04);
+  border-radius:999px;
+  background-color:var(--accent);color:var(--on-accent);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.4px;
+  text-transform:uppercase;vertical-align:middle}
+
+/* ==========================================================================
+   TAL OPENS BESIDE THE PAGE, NOT OVER IT
+   On a phone the panel is the screen — there is nowhere else for it to go.
+   On a desktop there is: covering the page you asked about is the one thing
+   an assistant should not do, because half of what you want to ask is on it.
+   The panel takes a column at the right and the app gives up that width.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app{--tal-w:min(460px, 34cqw)}
+  .app .tal-panel{
+    inset:0 0 0 auto;width:var(--tal-w);
+    border-left:1px solid var(--rule);
+    transform:translateX(100%)}
+  .app .tal-panel.on{transform:translateX(0)}
+  .app:has(> .tal-panel.on) > .shell,
+  .app:has(> .tal-panel.on) > .shell-body{
+    margin-right:var(--tal-w);
+    transition:margin-right var(--dur-long) var(--ease-decelerate)}
+  .app > .shell,.app > .shell-body{
+    transition:margin-right var(--dur-long) var(--ease-decelerate)}
+}
+/* the close is the last thing in the header row */
+.app .tal-h{padding-right:var(--s04)}
+.app .tal-h > .nm{flex:1;min-width:0}
+.app .tal-h > .tal-x{margin-left:auto;flex:none}
+
+/* ==========================================================================
+   THE PAYMENT LEDGER
+   Five columns, one rule between rows, the amount on the right in tabular
+   figures so the column reads down. On a phone the columns fold into two:
+   what and when on the left, the amount and the receipt on the right.
+   ========================================================================== */
+.app .paytbl{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .payrow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--s02) var(--s05);align-items:baseline;
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid var(--rule)}
+.app .payrow:last-child{border-bottom:0}
+.app .payhead{display:none}
+.app .pay-n{font-size:14px;line-height:19px;font-weight:600;grid-column:1}
+.app .pay-a{
+  grid-column:2;grid-row:1;text-align:right;
+  font-size:14px;line-height:19px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.app .pay-d,.app .pay-c{
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .pay-c{display:inline-flex;align-items:center;gap:var(--s03);white-space:nowrap}
+.app .pay-c .bmk{flex:none}
+.app .pay-r{grid-column:2;text-align:right}
+.app .pay-r .lnk{min-height:0;padding:0}
+
+@container app (min-width:900px){
+  .app .payrow{
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto auto;
+    align-items:center;gap:var(--s06)}
+  .app .payhead{
+    display:grid;border-bottom:1px solid var(--rule);
+    padding-top:var(--s04);padding-bottom:var(--s04)}
+  .app .payhead > span{
+    font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+    text-transform:uppercase;color:var(--text-helper)}
+  .app .payhead > .num{text-align:right}
+  .app .pay-n,.app .pay-d,.app .pay-c,.app .pay-a,.app .pay-r{grid-row:auto}
+  .app .pay-n{grid-column:1}
+  .app .pay-d{grid-column:2}
+  .app .pay-c{grid-column:3}
+  .app .pay-a{grid-column:4;min-width:72px}
+  .app .pay-r{grid-column:5;min-width:64px}
+}
+
+/* ==========================================================================
+   THE CONVERSATION
+   Two people, two sides, a face on every line. The day is a centred marker
+   and the unread rule names what you have not read. Nothing here is a card:
+   a bubble is a shape the message takes, and it is the one place in the
+   product where a corner is not square, because a spoken line is not a row
+   in a table.
+   ========================================================================== */
+.app .msgs{display:flex;flex-direction:column;gap:var(--s05);padding:var(--s06) var(--pad-x)}
+.app .m{display:flex;align-items:flex-end;gap:var(--s04);max-width:100%}
+.app .m-av{flex:none}
+.app .m-av .av-ph{width:32px;height:32px}
+.app .m-c{min-width:0;max-width:min(560px, 74%);display:flex;flex-direction:column;gap:var(--s02)}
+.app .m-b{
+  padding:var(--s05);background-color:var(--surface-2);
+  font-size:13.5px;line-height:20px;color:var(--text-primary)}
+.app .m-w{font-size:11.5px;line-height:16px;color:var(--text-helper)}
+
+.app .m.me{flex-direction:row-reverse}
+.app .m.me .m-c{align-items:flex-end}
+.app .m.me .m-b{
+  background-color:var(--accent-tint);color:var(--accent-on-2)}
+.app .m.me .m-w{text-align:right}
+
+/* the day, and the line you have read up to */
+.app .m-day,.app .m-unread{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  margin:var(--s05) 0 var(--s03)}
+.app .m-day::before,.app .m-unread::before{
+  content:'';position:absolute;left:0;right:0;top:50%;height:1px;
+  background-color:var(--rule)}
+.app .m-day > span,.app .m-unread > span{
+  position:relative;padding:0 var(--s05);background-color:var(--background);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .m-unread::before{background-color:var(--accent)}
+.app .m-unread > span{color:var(--accent-text)}
+
+/* a voice note */
+.app .vn{display:flex;align-items:center;gap:var(--s04);min-width:180px}
+.app .vn-play{flex:none;display:grid;place-items:center;
+  width:28px;height:28px;background-color:var(--accent)}
+.app .vn-play svg{width:15px;height:15px;fill:var(--on-accent);display:block}
+.app .vn-wave{display:flex;align-items:center;gap:2px;flex:1;min-width:0}
+.app .vn-wave i{display:block;width:2px;background-color:var(--accent);opacity:.5}
+.app .vn-len{
+  flex:none;font-size:11.5px;line-height:16px;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums}
+
+/* an attachment */
+.app .fa{
+  display:flex;align-items:center;gap:var(--s04);margin-top:var(--s04);
+  padding:var(--s04);border:1px solid var(--rule);background-color:var(--background)}
+.app .fa-ic svg,.app .fa-dl svg{width:18px;height:18px;fill:var(--icon-secondary);display:block}
+.app .fa-b{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.app .fa-b b{font-size:12.5px;line-height:17px;font-weight:600}
+.app .fa-b > span{font-size:11px;line-height:15px;color:var(--text-secondary)}
+
+/* the composer carries a sentence, a file or a voice note */
+.app .msg-page > .msg-foot > .composer{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s06) var(--pad-x) var(--s07)}
+.app .composer-star{flex:none;display:grid;place-items:center}
+.app .composer-star svg{width:18px;height:18px;fill:var(--accent);display:block}
+.app .msg-page .composer .inp{
+  flex:1;min-width:0;min-height:44px;
+  background-color:var(--pure-white);
+  border:1px solid var(--border-strong-01);
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .composer-act{
+  flex:none;display:grid;place-items:center;width:40px;height:40px;
+  background:none;border:0;cursor:pointer}
+.app .composer-act svg{width:20px;height:20px;fill:var(--icon-secondary);display:block}
+.app .composer-send{
+  flex:none;display:grid;place-items:center;width:44px;height:44px;
+  background-color:var(--accent);border:0;cursor:pointer}
+.app .composer-send svg{width:20px;height:20px;fill:var(--on-accent);display:block}
+
+/* ==========================================================================
+   A PAST INTERVIEW
+   Three bands to a row: what it decided, who ran it, and what it left
+   behind. No fill and no card — rules between the rows, the same as every
+   other list on the page, and the three artefacts sit as a run of three
+   cells so you can see that all three are there.
+   ========================================================================== */
+.app .ivlist{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule)}
+.app .ivrow{
+  padding:var(--s06) var(--pad-x);
+  border-bottom:1px solid var(--rule);cursor:pointer}
+.app .ivrow-h{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s05);flex-wrap:wrap}
+.app .ivrow-eb{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .ivrow-out{
+  font-size:13.5px;line-height:19px;font-weight:600;color:var(--accent-text)}
+.app .ivrow-who{
+  display:flex;align-items:center;gap:var(--s05);margin-top:var(--s05)}
+.app .ivrow-who .av-ph{flex:none;width:40px;height:40px}
+.app .ivrow-wb{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.app .ivrow-wb b{font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.1px}
+.app .ivrow-wb > span{font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .ivrow-who .tile-arrow{flex:none;width:18px;height:18px;fill:var(--icon-secondary)}
+
+.app .ivrow-kit{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:1px;
+  margin-top:var(--s06);background-color:var(--rule);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.app .ivrow-kit .kit{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s05);background-color:var(--background);min-width:0}
+.app .kit-ic{flex:none;display:grid;place-items:center;width:26px;height:26px;
+  border:1px solid var(--rule)}
+.app .kit-ic svg{width:14px;height:14px;fill:var(--icon-secondary);display:block}
+.app .kit-b{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .kit-b b{font-size:12.5px;line-height:17px;font-weight:600}
+.app .kit-b > span{font-size:11px;line-height:15px;color:var(--text-secondary)}
+@container app (min-width:672px){
+  .app .ivrow-kit{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@container app (min-width:900px){
+  .app .ivrow-kit .kit:first-child{padding-left:var(--pad-x)}
+  .app .ivrow-kit .kit:last-child{padding-right:var(--pad-x)}
+  .app .ivrow-kit{
+    margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+}
+
+/* ==========================================================================
+   THE AWARD MARKS
+   The artwork is the award. It sits where the glyph did, at the size a row
+   can carry, and an award you have not earned shows the same mark drained of
+   colour and held back — so the list reads as one ladder with your place on
+   it, rather than as earned things and padlocks.
+   ========================================================================== */
+/* THE MARK IS SIZED TO THE ROW, AND IT DOES NOT GROW WITH THE FRAME.
+   This was 44 rising to 52 at desktop, against a text block that measures 38
+   — a 14/19 name over a 12.5/17 note. So the artwork was taller than
+   everything it sat beside and read as the subject of the row rather than its
+   mark, and the desktop step made it worse on exactly the width where the row
+   is widest and the coin stack has least work to do.
+
+   32 is the same judgement §29.14 already made for `.stand-mk` on the
+   dashboard, in those words: "the same artwork read as a mark: still
+   unmistakably the bronze shield, no longer the subject." That cell took 28
+   because it is a label and a figure on ONE line; a row with two lines of
+   text can carry a little more, and 32 sits inside the 38 rather than over
+   it. Points, badges and rank all draw through `.aw-art`, so one number
+   settles all three lists.
+
+   And the container step goes. `.aw-n` and `.aw-d` are the same size at every
+   width, so a mark that grows at 900 stops matching the only thing it is
+   supposed to match. */
+.app .aw-art{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;background:none;border:0}
+.app .aw-art img{
+  display:block;width:100%;height:100%;object-fit:contain}
+.app .aw.not .aw-art img{filter:grayscale(1) opacity(.38)}
+.app .aw.has-art{gap:var(--s05);align-items:center}
+/* the rank on the score card carries its medallion */
+.app .rank-mk{
+  display:inline-block;width:24px;height:24px;object-fit:contain;
+  margin-right:var(--s03);vertical-align:-5px}
+
+/* ==========================================================================
+   ONE TAB STRIP
+   `.cs` was an underline-style strip left over from before the segmented
+   tabs landed, so the cohort page had a different tab from every other page.
+   It takes the same cells, the same rules and the same purple underline on
+   the selected one.
+   ========================================================================== */
+.app .cs{
+  position:relative;display:flex;padding:0;overflow-x:auto;
+  background-color:transparent;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.app .cs button{
+  flex:none;min-height:48px;padding:0 var(--s06);
+  background-color:var(--surface-2);
+  border:0;border-right:1px solid var(--rule);border-radius:0;
+  color:var(--text-secondary);font-weight:400;white-space:nowrap}
+.app .cs button.on{
+  position:relative;z-index:1;
+  margin-bottom:-1px;padding-bottom:1px;
+  background-color:var(--background);
+  color:var(--text-primary);font-weight:600;
+  box-shadow:inset 0 -2px 0 var(--accent)}
+.app .page .cs{padding-left:0;padding-right:0}
+@container app (min-width:900px){
+  .app .page:not(.form-page) > .cs{padding-left:0;padding-right:0}
+  .app .page:not(.form-page) .sec > .cs{
+    margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+}
+.app .sec > .cs{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+
+/* the conversation holds its own width on a phone */
+.app .msg-page,.app .msg-page > .msgs,.app .msg-page > .msg-foot{min-width:0}
+.app .m-c{max-width:calc(100% - 48px)}
+.app .m-b{overflow-wrap:anywhere}
+@container app (min-width:672px){
+  .app .m-c{max-width:min(560px, calc(100% - 48px))}
+}
+.app .msg-page .composer .inp{min-width:0}
+
+/* back on the scale */
+.app .ivrow-wb b{font-size:14px;line-height:19px}
+.app .m-b{font-size:13.5px;line-height:19px}
+
+/* the conversation column never exceeds its frame */
+.app .main:has(> .msg-page){align-items:stretch}
+.app .msg-page{width:100%;max-width:100%;box-sizing:border-box}
+
+/* ==========================================================================
+   THE COHORT ROOM
+   The same conversation shape as Messages, with everybody on the left,
+   because in a room of ten nobody is "the other side".
+   ========================================================================== */
+.app .msgs.room{padding-left:0;padding-right:0}
+.app .composer.room-composer{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s06) 0 0;border-top:1px solid var(--rule)}
+.app .composer.room-composer .inp{
+  flex:1;min-width:0;min-height:44px;
+  background-color:var(--pure-white);
+  border:1px solid var(--border-strong-01);
+  padding-left:var(--s05);padding-right:var(--s05)}
+
+/* a member is a face */
+.app .mem-av.mem-ph{
+  background:none;width:auto;height:auto;padding:0;border:0}
+.app .mem-av.mem-ph .av-ph{width:36px;height:36px}
+
+/* ==========================================================================
+   THE COHORT STANDING
+   Ten people at one level, ordered by what they have done. Every row shows
+   the marks that got them there, so the number is explicable rather than
+   just a score, and your own row is the one the accent points at.
+   ========================================================================== */
+.app .board{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.app .brow{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) auto;
+  gap:var(--s02) var(--s05);align-items:center;
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid var(--rule)}
+.app .brow:last-child{border-bottom:0}
+.app .bhead{display:none}
+.app .b-n{
+  font-size:12.5px;line-height:17px;font-weight:600;color:var(--text-helper);
+  font-variant-numeric:tabular-nums}
+.app .b-who{display:flex;align-items:center;gap:var(--s04);min-width:0}
+.app .b-who .av-ph{flex:none;width:32px;height:32px}
+.app .b-nm{font-size:13.5px;line-height:19px;font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .b-earn{
+  grid-column:2;display:flex;align-items:center;gap:var(--s03);min-width:0}
+.app .b-mk{flex:none;display:block;width:20px;height:20px}
+.app .b-mk img{display:block;width:100%;height:100%;object-fit:contain}
+.app .b-earn-t{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .b-pts{
+  grid-column:3;grid-row:1;text-align:right;
+  font-size:14px;line-height:19px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+/* your own standing */
+.app .brow.mine{background-color:var(--accent-tint)}
+.app .brow.mine .b-nm,.app .brow.mine .b-pts{color:var(--accent-on-2)}
+.app .brow.mine .b-n{color:var(--accent-on-2)}
+
+@container app (min-width:672px){
+  .app .brow{
+    grid-template-columns:36px minmax(0,1.2fr) minmax(0,1fr) auto;
+    align-items:center}
+  .app .b-earn{grid-column:3;justify-content:flex-start}
+  .app .b-pts{grid-column:4;min-width:80px}
+  .app .bhead{
+    display:grid;border-bottom:1px solid var(--rule);
+    padding-top:var(--s04);padding-bottom:var(--s04)}
+  .app .bhead > span{
+    font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+    text-transform:uppercase;color:var(--text-helper)}
+  .app .bhead > .num{text-align:right}
+}
+
+/* ==========================================================================
+   THE TAL BUTTON SAYS TAL
+   A floating circle with a mark in it is a guess. At desktop, where there is
+   room, the button carries its name beside the mark; on a phone it stays a
+   single tap target and the label is dropped.
+   ========================================================================== */
+.app .tal-fab-t{display:none}
+@container app (min-width:900px){
+  .app .tal-fab{
+    width:auto;height:auto;padding:var(--s04) var(--s06);
+    display:inline-flex;align-items:center;gap:var(--s04);border-radius:0}
+  .app .tal-fab-t{
+    display:inline;font-size:14px;line-height:19px;font-weight:600;
+    letter-spacing:.1px;color:var(--on-accent)}
+  .app .tal-fab svg{width:20px;height:20px}
+}
+
+/* the appointment band: the day mark takes the accent, because the date is
+   the one fact on the row you scan for */
+.app .callband-d{
+  background-color:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.app .callband-d .callband-tz{color:var(--on-accent);opacity:.82}
+.app .callband-t{font-size:17px;line-height:23px}
+.app .callband-b > .t-label-01{color:var(--text-secondary)}
+
+/* ==========================================================================
+   THE READING BESIDE THE PLOT
+   Thirteen rows of "Chapter n — 88%" is a column of digits: correct, and
+   almost unreadable. Two columns halve the height, and a hairline bar in
+   each row turns the number into a length, so the table says the same thing
+   the plot says and you can check one against the other.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .chart > .chart-table.ct-bars{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:var(--s07);row-gap:0;align-content:start}
+}
+.app .ct-bars .kv{
+  display:grid;grid-template-columns:minmax(0,auto) minmax(40px,1fr) auto;
+  align-items:center;gap:var(--s04);
+  padding-top:var(--s03);padding-bottom:var(--s03)}
+.app .ct-bar{display:block;height:3px;background-color:var(--rule);min-width:32px}
+.app .ct-bar i{
+  display:block;height:100%;width:var(--p,0%);
+  background:linear-gradient(90deg, var(--dv-grad-a), var(--dv-grad-b))}
+.app .ct-bars .kv .k{white-space:nowrap}
+.app .ct-bars .kv .v{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   THE CERTIFICATE JOINS THE RECORD ABOVE IT
+   The certificate is the record's conclusion, not a separate region, so the
+   band of canvas between the two closes and the plate sits directly under
+   the last row it certifies.
+   ========================================================================== */
+.app .page > .sec:has(> .cert){padding-top:0;padding-bottom:0}
+.app .page > .sec:has(+ .sec > .cert){padding-bottom:0}
+.app .page > .sec:has(+ .sec > .cert)::after{display:none}
+
+/* ==========================================================================
+   THE STACKED CHART IS A COLUMN
+   Its reading has five columns of its own, so it cannot live in a side
+   column. Plot on top, table beneath it, full width.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .chart.chart-stacked{
+    display:block;max-width:none}
+  .app .chart.chart-stacked > .chart-table{margin-top:var(--s07)}
+}
+.app .sc-table{display:block}
+.app .sc-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) repeat(4,minmax(0,1fr)) minmax(0,1.2fr);
+  gap:var(--s04);align-items:baseline;
+  padding:var(--s03) 0;border-bottom:1px solid var(--rule);
+  font-size:12.5px;line-height:17px}
+.app .sc-row:last-child{border-bottom:0}
+.app .sc-row .num{text-align:right;font-variant-numeric:tabular-nums;
+  overflow:hidden;text-overflow:ellipsis}
+@container app (min-width:600px){
+  .app .sc-row .num{white-space:nowrap}
+  .app .sc-row{grid-template-columns:minmax(0,1fr) repeat(4,minmax(64px,84px)) minmax(72px,96px)}
+}
+.app .sc-head{border-bottom:1px solid var(--rule)}
+.app .sc-head > span{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .sc-w{color:var(--text-secondary);white-space:nowrap}
+.app .sc-t{font-weight:600}
+
+/* ==========================================================================
+   A PLATE
+   The one dark call to action on a page. Its fill is a band of the column —
+   rule to rule — and it pays the gutter back as padding, so its first word
+   sits on the same spine as everything above it.
+
+   ITS DENSITY IS ITS OWN, AND TIGHTER THAN A TILE'S. The card was drawn at
+   the page's own rhythm — 32/40 of padding, 24 between blocks — and at that
+   spacing four short lines and a face were rendering 264px tall on desktop,
+   most of it air. The card is a black wall in the middle of a white page:
+   it does not need distance from its own edge to be legible the way a white
+   tile among white tiles does, and the contrast is already doing the work
+   the padding was being asked to do. So the steps come down one notch each
+   — s07 → s06 of frame on the phone, s08 → s07 on desktop, s04 → s03
+   between the title and its detail, s06 → s05 before the person and the
+   actions. Nothing is flush and nothing touches; the block is the same
+   composition read closer together.
+   ========================================================================== */
+.app .plate{
+  background-color:var(--gray-100);color:var(--on-dark);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding:var(--s06) var(--pad-x)}
+/* THE HEAD ROW: WHAT KIND OF THING THIS IS, AND WHEN.
+   The label sits on the spine, the distance in time holds the opposite
+   corner. `baseline` rather than `center` so the two read as one line even
+   though the timer is a taller object — it is the LABEL's baseline the row
+   is set on, because the label is the text and the timer is a figure beside
+   it. `ai5.js`'s `placePlates` is what splits the two apart; the note there
+   is where that decision is written down. */
+.app .plate-h{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s05)}
+.app .plate-eb{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark-2)}
+/* THE TIMER IS THE ONE FIGURE ON THIS CARD THAT MOVES ON ITS OWN, so it is
+   drawn as an object rather than as more eyebrow: an outlined chip, the same
+   outline the second action wears (below), with the clock the rest of the
+   build uses for elapsed time. Full-strength ink against the label's
+   `--on-dark-2` — same scale, so the row stays one row, and the difference
+   between them is which one you are meant to read. `flex:none` because a
+   time is never the thing that should wrap. */
+.app .plate-when{
+  flex:none;display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:28px;padding:0 var(--s04);
+  border:1px solid var(--on-dark-border);color:var(--on-dark);
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;white-space:nowrap}
+.app .plate-when svg{
+  flex:none;width:14px;height:14px;fill:var(--on-dark-2);display:block}
+.app .plate-when b{font-weight:600}
+.app .plate-t{
+  margin-top:var(--s03);
+  font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px}
+/* A HEAD ROW THAT LOST ITS LABEL HOLDS THE TITLE INSTEAD — `placePlates`
+   seats it there and the note in ai5.js is where that is written down. The
+   only thing the title has to give up is the gap it pays as a block, because
+   inside the row it is not under anything. `min-width:0` so a long title
+   wraps in its own half rather than pushing the timer off the right edge. */
+.app .plate-h-bare > .plate-t{margin-top:0;min-width:0}
+.app .plate-b{
+  margin-top:var(--s03);max-width:64ch;
+  font-size:13.5px;line-height:22px;color:var(--on-dark-2)}
+.app .plate-a{
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  margin-top:var(--s05)}
+/* THE PERSON, LAST. It was the first thing on the card and read as the
+   card's subject; it is the card's context. `margin-top` where the old rule
+   had `margin-bottom`, because it now follows the block it belongs to
+   instead of leading it. */
+.app .plate-who{
+  display:flex;align-items:center;gap:var(--s05);margin-top:var(--s05)}
+.app .plate-who .av-ph{flex:none;width:56px;height:56px}
+.app .plate-wb{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .plate-wb b{font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.1px}
+.app .plate-wb > span{font-size:12.5px;line-height:17px;color:var(--on-dark-2)}
+/* the second action on a dark plate is an outline, not a grey fill */
+.app .plate .btn.plate-b2{
+  background-color:transparent;color:var(--on-dark);
+  border:1px solid var(--on-dark-border)}
+
+/* --------------------------------------------------------------------------
+   WHAT TO EXPECT, INSIDE THE CARD
+   The consultant call's reassurance was a `.note` in a tinted band under the
+   plate, joined flush to it by §25/§29 so the two already read as one block
+   — which is the tell that they WERE one block being drawn as two. It is
+   inside now, under a hairline.
+
+   A HAIRLINE AND NOT A SECOND FILL. The plate is the darkest surface in the
+   product; a panel inside it would be a third tone in one object, which is
+   the mistake §12's two-tone rule exists to prevent and the reason the note
+   was a tint band outside the card in the first place.
+
+   `--on-dark-rule` AND NOT `--on-dark-border`. The border token is white at
+   42% and it is tuned for an OUTLINE — the second action, the timer chip —
+   where the line has to hold a shape against the fill and read as the edge
+   of a control. This line holds nothing; it divides two halves of one card,
+   and at 42% it was the brightest thing on a black surface, louder than the
+   heading beneath it. `--on-dark-rule` is white at 16%, which is the token
+   this build already uses for a rule ON dark rather than an edge (§01, and
+   §10 puts the level hero's ladder track on it). Visible, and quiet.
+
+   AND IT PAYS AIR ON BOTH SIDES. 16 above and below read as the note being
+   crowded up against the actions: a divider inside a card needs to belong to
+   neither half, and at s05 it clearly belonged to the top one. s06 each side
+   — the same 24 the card puts between the detail and the person — makes the
+   line the middle of three even intervals rather than a lid on the first.
+
+   The heading takes §11's `h3` role and the paragraph its `body` role, in
+   the dark card's own two inks: full strength for the four words that say
+   what this is, `--on-dark-2` for the sentences, exactly as `.plate-t` and
+   `.plate-b` are set above.
+
+   NO MEASURE ON THE PARAGRAPH. `.plate-b` above it is capped at 64ch because
+   it is one line of detail sitting beside the actions column, and a long
+   line there would run under them. This one is below everything and has the
+   card's whole width to itself; capped, it stopped two thirds of the way
+   across a card whose divider runs the full span, which reads as a column
+   that lost its neighbour.
+   -------------------------------------------------------------------------- */
+.app .plate-x{
+  margin-top:var(--s06);padding-top:var(--s06);
+  border-top:1px solid var(--on-dark-rule)}
+.app .plate-x b{
+  display:block;margin-bottom:var(--s02);
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.app .plate-x p{
+  margin:0;max-width:none;
+  font-size:13.5px;line-height:22px;font-weight:400;letter-spacing:.1px;
+  color:var(--on-dark-2)}
+
+/* --------------------------------------------------------------------------
+   THE PHONE PUTS THE ACTIONS AT THE END OF THE CALL
+   In one column the card reads top to bottom, and the actions belong at the
+   foot of the thing they act on: title, when, who, THEN join — not wedged
+   between the time and the person's face. And before the hairline, because
+   what is under it is not part of the call, it is a note about it.
+
+   Source order cannot say that, because the desktop grid wants the actions
+   as the second child (§ the grid block below places them by name). `order`
+   on a flex column says it for this width only and moves nothing else.
+
+   FULL WIDTH, ONE ROW. Two buttons sized to their labels left a third of the
+   card's width empty beside them and read as a pair of chips rather than as
+   the card's actions. `flex:1 1 0` splits the row between them — one row,
+   because at 356 the two together are still comfortably wider than their
+   text, and stacking a two-button row that fits is a phone pattern applied
+   where the phone does not need it.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .plate{display:flex;flex-direction:column}
+  .app .plate-h{order:1}
+  .app .plate-t{order:2}
+  .app .plate-b{order:3}
+  .app .plate-who{order:4}
+  .app .plate-a{order:5;flex-wrap:nowrap}
+  .app .plate-a > .btn{flex:1 1 0;min-width:0}
+  .app .plate-x{order:6}
+}
+@container app (min-width:900px){
+  .app .plate{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    column-gap:var(--s08);align-items:center;
+    padding-top:var(--s07);padding-bottom:var(--s07);
+    /* THE SIDES STOP GROWING WITH THE GUTTER. `--pad-x` steps to 32 past
+       1200 and the card's frame went with it, which is where the desktop
+       card looked most inset — the widest column is the one that least
+       needs its content pushed in from the edge. A constant s06 at every
+       desktop width; below 1200 this is what `--pad-x` already resolved to,
+       so only the widest case changes. */
+    padding-left:var(--s06);padding-right:var(--s06)}
+  /* THE HEAD ROW SPANS BOTH COLUMNS, which is the only way the timer reaches
+     the CARD's right edge. Column one stops where the actions begin, so a
+     head row confined to it would put the timer somewhere in the middle of
+     the card with the buttons to its right. */
+  .app .plate-h{grid-column:1 / -1}
+  .app .plate-t,.app .plate-b,.app .plate-who{grid-column:1}
+  /* the actions hold the bottom right of the text block. `span 3` covers
+     title, detail and person; where a plate has no person the third row is
+     implicit, sizes to nothing, and — because this grid sets `column-gap`
+     only, never `row-gap` — costs no height, so `align-self:end` still lands
+     on the last real row. */
+  .app .plate-a{grid-column:2;grid-row:2 / span 3;margin-top:0;
+    justify-self:end;align-self:end}
+  .app .plate-who{margin-top:var(--s05)}
+  /* the closing note runs the whole card — a hairline that stops short of
+     the actions column would be a rule under half a card */
+  .app .plate-x{grid-column:1 / -1}
+  /* AND THE ACTIONS STOP ABOVE IT. `span 3` was written for a card whose
+     last row is the person, and `align-self:end` puts the buttons on the
+     bottom edge of whatever the span reaches — with a fourth row under the
+     hairline that is beside the note, not beside the call. One row shorter
+     wherever the note exists, which is the only place the fourth row does. */
+  .app .plate:has(> .plate-x) > .plate-a{grid-row:2 / span 2}
+}
+
+/* the plate is dark, so its primary action cannot be black */
+.app .plate .btn-p{
+  background-color:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.app .plate .btn-p svg{fill:var(--on-accent)}
+
+/* ==========================================================================
+   WHERE YOU STAND
+   Points, badges and rank are three different measures and they were being
+   read off one bar. Three blocks, each with its own mark, its own number
+   and the one line that says what moves it.
+   ========================================================================== */
+.app .stand{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:1px;
+  background-color:var(--rule);
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.app .stand-c{
+  display:flex;align-items:center;gap:var(--s05);text-align:left;
+  padding:var(--s05) var(--pad-x);
+  background-color:var(--background);border:0;cursor:pointer;min-width:0}
+.app .stand-mk{flex:none;display:grid;place-items:center;width:44px;height:44px}
+.app .stand-mk img{display:block;width:100%;height:100%;object-fit:contain}
+.app .stand-mk.none img{filter:grayscale(1) opacity(.38)}
+.app .stand-b{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.app .stand-l{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .stand-v{
+  font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px;
+  font-variant-numeric:tabular-nums}
+.app .stand-v small{font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
+.app .stand-d{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary);
+  overflow:hidden;text-overflow:ellipsis}
+.app .stand-bar{
+  display:block;height:3px;margin-top:var(--s03);background-color:var(--rule)}
+.app .stand-bar i{
+  display:block;height:100%;
+  background:linear-gradient(90deg, var(--dv-grad-a), var(--dv-grad-b))}
+@container app (min-width:672px){
+  .app .stand{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .app .stand-c{padding-left:var(--s06);padding-right:var(--s06)}
+  .app .stand-c:first-child{padding-left:var(--pad-x)}
+  .app .stand-c:last-child{padding-right:var(--pad-x)}
+}

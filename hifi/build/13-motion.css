@@ -1,0 +1,195 @@
+/* ==========================================================================
+   13. MOTION
+   The prototype cut between states with no transition at all, which reads as
+   a slideshow rather than a product. This layer gives it continuity.
+
+   Three rules govern everything here:
+
+   1. MOTION EXPLAINS, IT DOES NOT DECORATE. A page rises because it arrived
+      from below the fold. A drawer slides from the left because that is the
+      edge it lives on. A sheet comes up from the bottom because that is
+      where a thumb reaches. Nothing spins, bounces or scales for effect.
+
+   2. IT FIRES ON EVENTS, NOT ON RENDERS. render() rewrites the whole frame,
+      so an unconditional mount animation would replay every time a switch is
+      flipped or a character is typed. Every entrance below is gated on
+      `[data-enter]` (the view or stage genuinely changed) or on
+      `[data-open~="x"]` (an overlay that was shut is now open).
+
+   3. IT IS SHORT. 180ms for a state change, 240ms for something arriving,
+      320ms for a full-height overlay. The cascade between sections is 26ms a
+      step and stops after eight, so the bottom of a long page is never
+      waiting on the top.
+
+   Everything is opacity and transform — the two properties a compositor can
+   animate without touching layout — so none of it costs a reflow.
+   ========================================================================== */
+
+:root{
+  --mo-quick:150ms;
+  --mo-base:240ms;
+  --mo-slow:320ms;
+  /* Material's emphasised-decelerate: leaves fast, settles slowly, which is
+     what makes an entrance feel placed rather than thrown. */
+  --mo-enter:cubic-bezier(.05,.7,.1,1);
+  --mo-exit:cubic-bezier(.3,0,.8,.15);
+  --mo-standard:cubic-bezier(.2,0,0,1);
+}
+
+@keyframes mo-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes mo-fade{from{opacity:0}to{opacity:1}}
+@keyframes mo-left{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+@keyframes mo-right{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes mo-up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes mo-drawer{from{transform:translateX(-100%)}to{transform:none}}
+@keyframes mo-grow-x{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes mo-grow-y{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes mo-pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+/* --------------------------------------------------------------------------
+   1. THE PAGE
+   The header leads, the sections follow it in order. `--i` is stamped by
+   render(); a section with no index still animates, it just does not wait.
+   -------------------------------------------------------------------------- */
+.app[data-enter] .page > .ph,
+.app[data-enter] .page > .sec,
+.app[data-enter] .page > .lvl-hero,
+.app[data-enter] .page > .acc,
+.app[data-enter] .page > .tabs{
+  animation:mo-rise var(--mo-base) var(--mo-enter) both;
+  animation-delay:calc(var(--i,0) * 26ms)}
+
+/* the app bar and the permanent drawer are the frame, not the page: they
+   fade once on a stage change and hold still between views */
+.app[data-enter] .shell{animation:mo-fade var(--mo-quick) var(--mo-standard) both}
+
+/* --------------------------------------------------------------------------
+   2. THE DRAWER
+   Slides from its own edge. Its rows follow it in, because a full-screen
+   menu that arrives all at once reads as a page replacing a page rather than
+   as a layer over it.
+   -------------------------------------------------------------------------- */
+.app[data-open~="nav"] .sidenav{
+  animation:mo-drawer var(--mo-slow) var(--mo-enter) both}
+.app[data-open~="nav"] .scrim{animation:mo-fade var(--mo-slow) var(--mo-standard) both}
+.app[data-open~="nav"] .sn-item{
+  animation:mo-left var(--mo-base) var(--mo-enter) both}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(1){animation-delay:60ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(2){animation-delay:84ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(3){animation-delay:108ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(4){animation-delay:132ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(5){animation-delay:156ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(6){animation-delay:180ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(7){animation-delay:204ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(8){animation-delay:228ms}
+.app[data-open~="nav"] .sn-main .sn-item:nth-child(n+9){animation-delay:252ms}
+.app[data-open~="nav"] .sn-foot{animation:mo-fade var(--mo-base) var(--mo-standard) both;
+  animation-delay:220ms}
+
+/* --------------------------------------------------------------------------
+   3. OVERLAYS
+   Notifications and Tal hang off the right edge on a wide frame and rise
+   from the bottom on a phone, which is where each of them is anchored.
+   -------------------------------------------------------------------------- */
+.app[data-open~="notif"] .notif,
+.app[data-open~="tal"] .tal-panel{
+  animation:mo-up var(--mo-slow) var(--mo-enter) both}
+@container app (min-width:900px){
+  .app[data-open~="notif"] .notif,
+  .app[data-open~="tal"] .tal-panel{
+    animation-name:mo-right;animation-duration:var(--mo-base)}
+}
+.app[data-open~="notif"] .scrim,
+.app[data-open~="tal"] .scrim{animation:mo-fade var(--mo-base) var(--mo-standard) both}
+
+/* the sheets — edit profile, change photo, add a card */
+.app[data-open~="editProfile"] .sheet,
+.app[data-open~="editPhoto"] .sheet,
+.app[data-open~="addCard"] .sheet{
+  animation:mo-up var(--mo-slow) var(--mo-enter) both}
+.app[data-open~="editProfile"] .modal,
+.app[data-open~="editPhoto"] .modal,
+.app[data-open~="addCard"] .modal{
+  animation:mo-fade var(--mo-base) var(--mo-standard) both}
+
+/* --------------------------------------------------------------------------
+   4. TAL SPEAKING
+   Only the newest bubble moves. The thread above it must not twitch every
+   time a word arrives, or reading it becomes impossible.
+   -------------------------------------------------------------------------- */
+.app[data-said] .tal-msg:last-of-type{
+  animation:mo-rise var(--mo-base) var(--mo-enter) both}
+.tal-typing i,.typing i{animation:mo-blink 1.2s var(--mo-standard) infinite}
+.tal-typing i:nth-child(2),.typing i:nth-child(2){animation-delay:.15s}
+.tal-typing i:nth-child(3),.typing i:nth-child(3){animation-delay:.3s}
+@keyframes mo-blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* --------------------------------------------------------------------------
+   5. FIGURES
+   A progress bar that is already full when the page arrives has not told you
+   anything. These grow from their own origin, once, on entry — and they are
+   the last thing to move, so the eye lands on them after the text.
+   -------------------------------------------------------------------------- */
+.app[data-enter] .prog-seg i,
+.app[data-enter] .pb-fill,
+.app[data-enter] .pb > i,
+.app[data-enter] .stp-b i{
+  transform-origin:left center;
+  animation:mo-grow-x var(--mo-slow) var(--mo-enter) both;
+  animation-delay:180ms}
+.app[data-enter] .sc-col i,
+.app[data-enter] .bar i{
+  transform-origin:bottom center;
+  animation:mo-grow-y var(--mo-slow) var(--mo-enter) both;
+  animation-delay:200ms}
+.app[data-enter] .ladder i{
+  animation:mo-fade var(--mo-base) var(--mo-standard) both;
+  animation-delay:200ms}
+
+/* the Tal chips are an offer, so they arrive after the sentence that made it */
+.app[data-enter] .ai-asks .chip-tal,
+.app[data-enter] .ai-foot .chip-tal{
+  animation:mo-pop var(--mo-base) var(--mo-enter) both;animation-delay:200ms}
+
+/* --------------------------------------------------------------------------
+   6. THINGS YOU TOUCH
+   Interaction feedback is faster than arrival — a control that takes 240ms to
+   acknowledge a tap feels broken. Press is 90ms and scales by 1%: enough to
+   register in the hand, not enough to see as movement.
+   -------------------------------------------------------------------------- */
+.app .btn,.app .tile.clk,.app .gcard,.app .ag,.app .ch,.app .cardrow,
+.app .sn-item,.app .chip-tal,.app .slot,.app .day,.app .shell-act,
+.app .tal-fab,.app .acc-h,.app .tabs button,.app .cbx,.app .tg,.app .lk{
+  transition:background-color var(--mo-quick) var(--mo-standard),
+             color var(--mo-quick) var(--mo-standard),
+             border-color var(--mo-quick) var(--mo-standard),
+             transform 90ms var(--mo-standard)}
+.app .btn:active,.app .tile.clk:active,.app .gcard:active,.app .chip-tal:active,
+.app .slot:active,.app .day:active,.app .tal-fab:active{transform:scale(.99)}
+.app .shell-act:active{transform:scale(.92)}
+
+/* the accordion opens rather than jumping open */
+.app .acc-b{transition:opacity var(--mo-base) var(--mo-standard)}
+.app .acc-i.on .acc-b{animation:mo-rise var(--mo-base) var(--mo-enter) both}
+.app .acc-h .chev{transition:transform var(--mo-base) var(--mo-standard)}
+.app .acc-i.on .acc-h .chev{transform:rotate(180deg)}
+
+/* the notification count and the badge land rather than appear */
+.app[data-enter] .shell-badge{animation:mo-pop var(--mo-base) var(--mo-enter) both;
+  animation-delay:120ms}
+
+/* --------------------------------------------------------------------------
+   7. THE OPT-OUT
+   Vestibular disorders are not an edge case. Everything above collapses to a
+   plain cross-fade, which still carries the "something changed" signal
+   without any movement at all.
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion:reduce){
+  .app *,.app *::before,.app *::after{
+    animation-duration:1ms!important;animation-delay:0ms!important;
+    transition-duration:1ms!important}
+  .app[data-enter] .page > .ph,
+  .app[data-enter] .page > .sec,
+  .app[data-enter] .page > .lvl-hero{
+    animation:mo-fade 120ms linear both!important}
+}

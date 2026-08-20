@@ -1,0 +1,346 @@
+/* ==========================================================================
+   THE TYPE SCALE — authoritative
+   An audit across all 117 views found 81 distinct size / line-height /
+   weight combinations, many of them accidental: elements that were never
+   styled fell through to the browser default of 16px with `line-height:
+   normal`, which is where the oversized, tight-looking lines came from
+   ("Explorer track · Aug 12", "Not booked yet · 45 minutes").
+
+   This layer is the single source of truth. It first neutralises every HTML
+   default so nothing can fall through again, then assigns each element to
+   one of nine roles. `verify.mjs` fails the build if any text in any view
+   computes to a size outside this set.
+
+     display  34/40/600   hero numerals, the level name
+     h1       24/30/600   page title
+     h2       17/23/600   section title, large value
+     h3       14/19/600   row title, callout title, button
+     body     13.5/22/400 prose
+     compact  13.5/19/400 row meta, secondary lines, list values
+     label    12.5/17/500 field labels, chips, small values
+     caption  11.5/16/400 helper, legal, timestamps
+     overline 11/15/600   uppercase eyebrows and cell labels
+   ========================================================================== */
+
+.app{font-size:13.5px;line-height:22px;font-weight:400;letter-spacing:.1px}
+
+/* --- 1. neutralise the defaults ------------------------------------------ */
+.app h1,.app h2,.app h3,.app h4,.app h5,.app h6,
+.app p,.app li,.app b,.app strong,.app small,.app i,.app em,
+.app span,.app div,.app a,.app label,.app button,.app input,
+.app select,.app textarea,.app td,.app th{
+  font-size:inherit;line-height:inherit;font-weight:inherit;letter-spacing:inherit}
+.app b,.app strong{font-weight:600}
+.app small{font-size:.82em;line-height:inherit}
+
+/* --- 2. the roles -------------------------------------------------------- */
+.app .u-display,.app .big,.app .score-pts .n,.app .prog-pct,.app .lg{
+  font-size:34px;line-height:40px;font-weight:600;letter-spacing:-1px;
+  font-variant-numeric:tabular-nums}
+.app .ph h1,.app .t-heading-01{
+  font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.5px}
+.app .t-heading-02,.app .stats .n,.app .facts .v,.app .path-facts .v,
+.app .stickybar .t-heading-02,.app .ag-price,.app .prog-figs > span b,
+.app .u-h2{
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+.app .sec-h h2,.app h2.t-heading-02,.app .t-heading-03,.app .ai-head h3,
+.app .gcard-b h3,.app .cardrow-t,.app .nrow-t,.app .mem-n,.app .aw-n,
+.app .ach-t,.app .ag-n,.app .ch-n,.app .agh-n,.app .path-n,.app .signed-b b,
+.app .t-heading-04,.app .t-heading-compact-01,.app .pi-lab,.app .stp-t,
+.app .s-b b,.app .empty .t,.app .empty h3,.app .tb b,.app .ttl,
+.app .sheet-h h2,.app .notif-h h2,.app .tal-h .nm b,.app .u-h3{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.app .btn,.app .slot,.app .tabs button,.app .cs button,.app .acc-h,
+.app .sn-item,.app .day .n{
+  font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px}
+.app .t-body-01,.app .lead,.app .ph .lead,.app .tile > p,.app .ai-body,
+.app .ai-body p,.app .acc-b,.app .acc-b p,.app .note .nb,.app .post-b,
+.app .s-b,.app .tw-quote,.app .why,.app .bub,.app .tal-msg .bb,
+.app .sec > p,.app .u-body{
+  font-size:13.5px;line-height:22px;font-weight:400;letter-spacing:.1px}
+.app .t-body-02,.app .t-body-compact-01,.app .kv,.app .kv .k,.app .kv .v,
+.app .tbl,.app .tbl td,.app .chart-table,.app .msg .nm,.app .inp,
+.app select.inp,.app textarea.inp,.app .u-compact{
+  font-size:13.5px;line-height:19px;font-weight:400;letter-spacing:.1px}
+.app .kv .v,.app .msg .nm,.app .signed-b b{font-weight:600}
+.app .t-label-01,.app .tag,.app .chip-tal,.app .badge,.app .sub,
+.app .gcard-b .sub,.app .cardrow-d,.app .nrow-d,.app .mem-m,.app .aw-d,
+.app .ach-d,.app .ag-m,.app .ch-m,.app .agh-m,.app .chev-d,.app .pi-sec,
+.app .stp-all .pi-sec,.app .score-meta,.app .chart-read,.app .agh-slot,
+.app .ag-foot,.app .aw-s,.app .legend span,.app .num,.app .stars .num,
+.app .msg .p,.app .post-who,.app .signed-b span,.app .u-label{
+  font-size:12.5px;line-height:17px;font-weight:500;letter-spacing:.15px}
+.app .sub,.app .gcard-b .sub,.app .cardrow-d,.app .nrow-d,.app .mem-m,
+.app .aw-d,.app .ach-d,.app .ag-m,.app .ch-m,.app .agh-m,.app .chev-d,
+.app .pi-sec,.app .msg .p{font-weight:400}
+.app .t-helper-01,.app .help,.app .t-legal-01,.app .legal,.app .caption,
+.app .crumb,.app .crumb .sep,.app .msg .d,.app .post-t,.app .cq,
+.app .chart-x span,.app .ladder-lab,.app .tal-legal,.app .pw-rules li,
+.app .bmk-row .lab,.app .u-caption{
+  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+.app .eyebrow,.app .t-heading-05,.app .stats .l,.app .facts .l,
+.app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
+.app .sn-cap,.app .stp-c,.app .path-you,.app .s-n,.app .aw-v,
+.app .signed .ai-body .t-label-01,.app .lvl-hero .eb,.app .u-overline{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase}
+.app .aw-v,.app .s-n,.app .stp-c{text-transform:none;letter-spacing:.1px;
+  font-variant-numeric:tabular-nums}
+
+/* --- 3. the few that legitimately sit outside a role --------------------- */
+.app .lvl-hero .big{font-size:34px;line-height:40px;letter-spacing:-1px}
+@container app (min-width:900px){
+  .app .ph h1{font-size:28px;line-height:34px;letter-spacing:-.7px}
+  .app .lvl-hero .big{font-size:40px;line-height:46px;letter-spacing:-1.2px}
+}
+.app .av,.app .av-ph,.app .mem-av,.app .shell-avatar,.app .ch-num{
+  font-size:11.5px;line-height:1;font-weight:600;letter-spacing:.3px}
+.app .av.lg,.app .agh-f{font-size:14px}
+.app .otp input{font-size:18px;line-height:24px;font-weight:600}
+.app .shell-badge,.app .sn-item .badge{font-size:9.5px;line-height:1}
+.app .thumb .t{font-size:9.5px;line-height:1}
+.app .tw-rungs i{font-size:9.5px;line-height:1;font-style:normal}
+.app .ios-time{font-size:13.5px;line-height:1;font-weight:600}
+
+/* --- 4. numerals are tabular wherever they can change -------------------- */
+.app .num,.app .mono,.app .aw-v,.app .ag-price,.app .kv .v,.app .stats .n,
+.app .facts .v,.app .path-facts .v,.app .prog-figs > span b,.app .day .n,
+.app .score-pts .n,.app .prog-pct,.app .big,.app .slot,.app .chart-read .v,
+.app .tbl .num{font-variant-numeric:tabular-nums}
+
+/* --- 5. the sub-figures inside a numeral keep its baseline --------------- */
+.app .stats .n small,.app .prog-pct small,.app .score-pts .n small{
+  font-size:13px;line-height:inherit;font-weight:500;letter-spacing:0;
+  color:var(--text-secondary)}
+
+/* ==========================================================================
+   FRAME HEIGHT
+   The tablet and desktop frames were taller than a typical preview pane, so
+   switching to them scrolled the frame out of view and looked like nothing
+   had rendered. Every frame now fits the viewport it is previewed in.
+   ========================================================================== */
+.device{height:min(844px,86vh);min-height:520px}
+.device[data-vp="tablet"]{height:min(1133px,86vh)}
+.device[data-vp="fluid"]{height:min(900px,86vh)}
+.pt-stage{padding-top:var(--s05)}
+
+/* ==========================================================================
+   AVATAR FALLBACK
+   The initials sat on top of the photograph. They belong underneath it, so
+   they only appear if the image fails to load.
+   ========================================================================== */
+.shell-avatar,.av,.av-ph,.mem-av{position:relative;overflow:hidden;display:grid;
+  place-items:center}
+.shell-avatar i,.av i,.av-ph i,.mem-av i{
+  position:absolute;inset:0;display:grid;place-items:center;
+  z-index:0;font-style:normal}
+.shell-avatar img,.av img,.av-ph img,.mem-av img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+
+/* --- 6. the last selectors that were outside the scale ------------------- */
+.app .chart-head .t,.app .score-rank .n,.app .ag-n{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.app .u-h2,.app h1.u-h2{
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+.app .chart-head .s,.app .score-rank .l,.app .lab,.app .score-pts .l,
+.app .signed-b span,.app .tal-h .nm span{
+  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+.app .prog-pct small,.app .score-pts .n small{line-height:1}
+.app .ch.open .ch-n{font-weight:600}
+.app .tile h3,.app .tile.bordered h3,.app .signed h3{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.app .stats .d,.app .facts .d{
+  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px;
+  text-transform:none}
+.app small{font-size:13px;line-height:inherit;font-weight:500}
+
+:root{--thumb-shadow:rgba(17,17,17,.28)}
+
+/* ==========================================================================
+   MUI SWITCH
+   The toggle was a square block with a square knob, which read as a broken
+   control. This is Material's actual geometry: a 34x14 pill track with a
+   20px circular thumb that overhangs it, and the thumb tinted rather than
+   the track when on.
+   ========================================================================== */
+.tg{position:relative;gap:var(--s05)}
+.sw{
+  position:relative;flex:none;width:58px;height:38px;background:transparent;
+  display:grid;place-items:center}
+.sw::before{
+  content:'';position:absolute;left:12px;top:12px;width:34px;height:14px;
+  border-radius:7px;background:var(--gray-40);opacity:.5;
+  transition:background var(--dur-short) var(--ease-standard),
+             opacity var(--dur-short) var(--ease-standard)}
+.sw::after{
+  content:'';position:absolute;left:9px;top:9px;width:20px;height:20px;
+  border-radius:50%;background:var(--background);
+  box-shadow:0 1px 3px var(--thumb-shadow);border:1px solid var(--rule);
+  transition:transform var(--dur-short) var(--ease-standard),
+             background var(--dur-short) var(--ease-standard)}
+.tg input:checked ~ .sw::before{background:var(--accent);opacity:.5}
+.tg input:checked ~ .sw::after{
+  transform:translateX(20px);background:var(--accent)}
+.tg:hover .sw::after{box-shadow:0 1px 3px var(--thumb-shadow),0 0 0 8px var(--overlay-hover)}
+.tg input:focus-visible ~ .sw::after{
+  box-shadow:0 1px 3px var(--thumb-shadow),0 0 0 8px var(--brand-tint-2);outline:none}
+.tg{padding-right:0}
+.tg .tb{padding-right:var(--s04)}
+
+/* ==========================================================================
+   PROFILE
+   ========================================================================== */
+.idhead{display:flex;align-items:center;gap:var(--s05);margin-bottom:var(--s06)}
+.idphoto{position:relative;flex:none;display:block;border-radius:0}
+.idphoto .av-ph{border-radius:0}
+/* the badge sits in the photograph's corner, not hanging off it: a square
+   photo with a square tab reads as one object. z-index because the <img> is
+   itself absolutely positioned and would otherwise paint over it. */
+.idphoto-edit{
+  position:absolute;right:0;bottom:0;z-index:2;width:26px;height:26px;
+  display:grid;place-items:center;background:var(--brand-primary)}
+.idphoto-edit svg{width:14px;height:14px;fill:var(--on-brand)}
+.idphoto:hover .idphoto-edit{background:var(--accent)}
+.idhead-b{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:flex-start}
+.app .idname{font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+.app .idmeta{font-size:12.5px;line-height:17px;font-weight:400;
+  letter-spacing:.15px;color:var(--text-secondary)}
+.idhead-b .tag{margin-top:var(--s02)}
+
+.photogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
+  gap:var(--s04)}
+.photopick{
+  position:relative;aspect-ratio:1;overflow:hidden;
+  border:1px solid var(--rule);padding:0;cursor:pointer}
+.photopick .av-ph{width:100%;height:100%}
+.photopick:hover{border-color:var(--text-primary)}
+.photopick.on{outline:2px solid var(--accent);outline-offset:-2px;border-color:var(--accent)}
+.photopick.on::after{
+  content:'';position:absolute;right:4px;bottom:4px;width:14px;height:14px;
+  background:var(--accent)}
+
+/* the two remaining off-scale strings */
+.app .ch-num{line-height:15px}
+
+/* ==========================================================================
+   TYPEFACE — Söhne Buch
+   Söhne is a commercial face from Klim Type Foundry. It cannot be fetched or
+   embedded here without TalentNext's licence, so the stack below names it
+   first and falls back to an embedded stand-in. To ship the real thing:
+   drop soehne-buch.woff2 next to this file, uncomment the @font-face below,
+   and the stack picks it up with no other change.
+
+   Note for the record: the client's own Vision + Values PDF is set in Inter,
+   which is what §3 of the handover evidences. Söhne overrides that on
+   Maryam's instruction — worth one confirming line to the client.
+
+   @font-face{ font-family:'Söhne'; font-style:normal; font-weight:400;
+               src:url(soehne-buch.woff2) format('woff2'); font-display:block; }
+   ========================================================================== */
+/* Söhne Buch, from the trial files Maryam supplied.
+   IMPORTANT: these are Klim's *Test* fonts. Two consequences.
+   1. Licence — trial fonts are for evaluation and mockups only. A web
+      licence from Klim is required before this ships anywhere public.
+   2. Coverage — the trial file carries 68 glyphs: A-Z, a-z, 0-9, comma,
+      hyphen, full stop and O-umlaut. Everything else the interface uses
+      (· – $ % ? : ; parentheses) is absent, so those characters fall
+      through to the stand-in below. Swap in the full licensed file and the
+      fallback stops being reached. */
+@font-face{
+  font-family:'Söhne';
+  font-style:normal;
+  font-weight:400;
+  font-display:block;
+  src:url(__SOEHNE__) format('woff2');
+}
+@font-face{
+  font-family:'Söhne Mono';
+  font-style:normal;
+  font-weight:400;
+  font-display:block;
+  src:url(__SOEHNEMONO__) format('woff2');
+}
+@font-face{
+  font-family:'Grotesk Stand-in';
+  font-style:normal;
+  font-weight:100 900;
+  font-display:block;
+  src:url(__STANDIN__) format('woff2');
+}
+/* KRÄFTIG IS THE SECOND STYLE, AND THE ONLY OTHER ONE.
+   Everything at 600 in this product is Söhne Kräftig. The build embeds it
+   if `soehne-kraftig.woff2` is present in build/ and says so on the console
+   when it is not — see the note at the foot of this block. */
+@font-face{
+  font-family:'Söhne';
+  font-style:normal;
+  font-weight:600;
+  font-display:block;
+  src:url(__SOEHNEKRAFTIG__) format('woff2');
+}
+:root{
+  /* TWO STYLES OF ONE FACE. Inter is gone from the stack: it was the
+     fallback, which meant every character Söhne's trial file does not
+     carry was silently set in a different typeface. The stand-in is still
+     here and still reached for those characters, but it is now the ONLY
+     thing behind Söhne rather than one of four. */
+  --font-sans:'Söhne','Soehne','Söhne Buch','Grotesk Stand-in',
+              system-ui,-apple-system,sans-serif;
+}
+body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sans)}
+
+/* ==========================================================================
+   ONE WEIGHT
+   Söhne Buch is the book weight, and Maryam asked for the regular style
+   throughout. So hierarchy is carried by size, colour, case and position —
+   not by weight. The single exception is the tabular figure, which keeps a
+   very slight optical bump so numbers do not disappear next to their labels.
+   ========================================================================== */
+.app,.app *,.app b,.app strong,.app h1,.app h2,.app h3,.app h4,.app h5,.app h6,
+.app .btn,.app .sn-item,.app .tabs button,.app .cs button,.app .acc-h,
+.app .ch-n,.app .ag-n,.app .agh-n,.app .aw-n,.app .mem-n,.app .gcard-b h3,
+.app .cardrow-t,.app .nrow-t,.app .ach-t,.app .path-n,.app .signed-b b,
+.app .idname,.app .s-b b,.app .tb b,.app .ttl,.app .kv .v,.app .msg .nm,
+.app .eyebrow,.app .t-heading-05,.app .stats .l,.app .facts .l,
+.app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
+.app .sn-cap,.app .stp-c,.app .path-you,.app .s-n,.app .aw-v,
+.app .lvl-hero .eb,.app .big,.app .prog-pct,.app .score-pts .n,
+.app .stats .n,.app .facts .v,.app .path-facts .v,.app .ag-price,
+.app .ph h1,.app .t-heading-01,.app .t-heading-02,.app .t-heading-03,
+.app .sec-h h2,.app .ai-head h3,.app .tile h3,.app .u-h2,.app .u-h3,
+.app .t-label-01,.app .tag,.app .chip-tal,.app .badge,.app .slot,
+.app .shell-badge,.app .sn-item .badge,.app .ch.open .ch-n,
+.app .ch.open .ch-num,.app .day .n,.app .otp input{
+  font-weight:400}
+
+/* hierarchy without weight: the eyebrow keeps its case and tracking, titles
+   keep their size and full-strength ink, secondary text steps back in colour */
+.app .ch-n,.app .ag-n,.app .agh-n,.app .aw-n,.app .mem-n,.app .gcard-b h3,
+.app .cardrow-t,.app .nrow-t,.app .ach-t,.app .path-n,.app .signed-b b,
+.app .idname,.app .s-b b,.app .tb b,.app .ttl,.app .sec-h h2,.app .ai-head h3,
+.app .tile h3,.app .kv .v{color:var(--text-primary)}
+.app .sub,.app .cardrow-d,.app .nrow-d,.app .mem-m,.app .aw-d,.app .ach-d,
+.app .ag-m,.app .ch-m,.app .agh-m,.app .chev-d,.app .pi-sec,.app .s-b,
+.app .idmeta{color:var(--text-secondary)}
+/* the current row is marked by the accent rule and its number, not by bold */
+.app .ch.open .ch-n{letter-spacing:0}
+
+/* the ink rules above must not reach into the inverted panel */
+.app .lvl-hero .path-n,.app .lvl-hero .chev-n,.app .lvl-hero .idname,
+.app .sec.on-dark .path-n,.app .cert h3,.app .score.on-dark .n{color:var(--on-dark)}
+.app .lvl-hero .sub,.app .lvl-hero .chev-d,.app .lvl-hero .bands-note,
+.app .sec.on-dark .sub,.app .cert .sub,.app .score.on-dark .l{color:var(--on-dark-2)}
+.app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
+.app .path-step.on .path-n{color:var(--on-dark)}
+
+/* NUMERALS ARE THE SAME FACE, SET TABULAR. They were Söhne Mono, which is
+   a third style in a system that has two — and it read as a third voice on
+   every screen that shows a figure. `tabular-nums` is what actually makes a
+   column of numbers line up; a monospaced face was never required for it. */
+.app .num,.app .mono,.app .aw-v,.app .ag-price,.app .kv .v,.app .stats .n,
+.app .facts .v,.app .path-facts .v,.app .prog-figs > span b,.app .day .n,
+.app .score-pts .n,.app .prog-pct,.app .big,.app .slot,.app .chart-read .v,
+.app .tbl .num,.app .ios-time,.app .ch-num,.app .s-n,.app .stp-c{
+  font-family:var(--font-sans);
+  font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+.app .big,.app .score-pts .n,.app .prog-pct{letter-spacing:-.5px}

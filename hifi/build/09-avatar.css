@@ -1,0 +1,57 @@
+/* ==========================================================================
+   57. AVATAR
+   The avatar's own class is .av-ph — it is the container, with the initials
+   underneath and the photograph laid over them, so a failed image falls back
+   to initials rather than a hole. (.av is the small variant used by Tal.)
+   ========================================================================== */
+.av-ph{
+  position:relative;display:grid;place-items:center;flex:none;
+  width:40px;height:40px;overflow:hidden;
+  background:var(--gray-80);color:var(--on-dark);
+  font-weight:600;letter-spacing:.3px;line-height:1}
+.av-ph i{font-style:normal;display:block}
+.av-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.av,.mem-av{
+  position:relative;display:grid;place-items:center;flex:none;
+  width:32px;height:32px;overflow:hidden;
+  background:var(--gray-80);color:var(--on-dark);
+  font-size:11px;font-weight:600;letter-spacing:.3px}
+
+/* the agent row grid addresses the avatar by its real class */
+.agh > .av-ph{grid-area:av;align-self:start}
+.ag > .av-ph{align-self:flex-start;margin-top:2px}
+
+/* "Ask Tal" on an agent row is a trailing affordance, not an overlay */
+.agh .tal-star,.ag .tal-star{
+  position:static;order:99;margin-left:auto;align-self:center;flex:none}
+.agh .tal-star{grid-area:go;justify-self:end;align-self:start;margin-left:0}
+.agh > .card-go{grid-area:go;align-self:end;justify-self:end}
+.tal-star .lbl{white-space:nowrap}
+.ag{flex-wrap:wrap}
+.ag .tal-star{order:0;margin-left:auto}
+
+@container app (max-width:599px){
+  .agh .tal-star .lbl,.ag .tal-star .lbl{position:absolute;width:1px;height:1px;
+    overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+
+/* ==========================================================================
+   58. THE SECOND TAB STRIP
+   Cohort uses `.cs` rather than `.tabs`; same component, same treatment.
+   ========================================================================== */
+.cs{
+  display:flex;gap:0;margin-bottom:var(--s05);
+  border-bottom:1px solid var(--border-subtle-01);overflow-x:auto;scrollbar-width:none}
+.cs::-webkit-scrollbar{display:none}
+.cs button{
+  flex:none;min-height:48px;padding:0 var(--s05);
+  font-size:14px;font-weight:500;letter-spacing:.2px;color:var(--text-secondary);
+  border-bottom:2px solid transparent;white-space:nowrap;
+  transition:color var(--dur-short) var(--ease-standard),
+             background var(--dur-short) var(--ease-standard)}
+.cs button:first-child{padding-left:0}
+.cs button:hover{color:var(--text-primary);background:var(--overlay-hover)}
+.cs button.on{color:var(--text-primary);font-weight:600;border-bottom-color:var(--brand-primary)}
+
+/* the floating button must not sit on top of a row's trailing content */
+.tal-fab{box-shadow:0 0 0 8px var(--background)}

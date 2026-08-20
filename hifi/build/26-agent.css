@@ -1,0 +1,226 @@
+/* ==========================================================================
+   26. THE AGENT CARD, AT THE FILE'S PROPORTIONS
+   Figma 292:276.
+
+   The frame is a screenshot of this card cut into pieces and re-laid, so
+   there is no type in it to read — but each piece carries the scale its own
+   crop was taken at, and that is the spec. Every slice renders the source
+   image at `box_width x scale%`; slices at the same zoom agree on that
+   product, and the ones that do not have been deliberately enlarged:
+
+     date, stars, meta, actions   852   the baseline
+     name                        1033   x1.21
+     headshot                    1057   x1.24
+     fee                         1600   x1.88
+
+   So: name x1.21, headshot x1.24, fee x1.88, nothing else moved. Against the
+   card as built that is
+
+     name       14/19  ->  17/23   (x1.21 lands on 17.0, a role that exists)
+     fee        17/23  ->  34/40   (x1.88 lands on 31.9; 34 is the nearer
+                                    role and gives the fee exactly twice the
+                                    name, which is what the crops measure)
+     headshot   56     ->  72      (x1.24 lands on 69.5; 72 is the avatar
+                                    step the product already has)
+
+   The alignments the frame is precise about, all four of them: the name and
+   the fee start on the same line, the fee's right edge is the Book button's
+   right edge, the headshot's left edge is the slot line's left edge, and the
+   name, the rating and the meta line share one left edge beside the photo.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE PHOTOGRAPH SPANS THE IDENTITY
+   At 56 the photo ended level with the rating and the meta line ran back
+   under it. At 72 it is taller than the two rows it sat in, so it takes
+   both — stated in the template rather than left to overflow, which would
+   have let the card close above the bottom of its own photograph.
+   -------------------------------------------------------------------------- */
+/* The name and the rating used to share one grid area, the rating pushed
+   down into it by a padding the size of the name's line box. That was a
+   two-line stack drawn as one cell, and it only held while the name's line
+   box was the only thing setting the row's height. It is not any more — the
+   photograph spans the identity now — so the three lines beside the photo
+   are three rows, which is what they look like. */
+.app .page .agh.agh-book{
+  grid-template-areas:'av name' 'av rate' 'av meta' 'foot foot';
+  row-gap:0}
+.app .page .agh.agh-book > .av,
+.app .page .agh.agh-book > .av-ph{grid-area:av;align-self:start}
+.app .page .agh.agh-book > .agh-n{grid-area:name}
+.app .page .agh.agh-book > .agh-r{grid-area:rate;align-self:start;padding-top:0}
+.app .page .agh.agh-book > .agh-m{grid-area:meta;padding-top:var(--s02)}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE BIG NAME
+   -------------------------------------------------------------------------- */
+.app .agh-book .agh-n{
+  position:relative;
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.1px;
+  color:var(--text-primary)}
+/* --------------------------------------------------------------------- 3 ---
+   THE BIG FEE
+   It is taken OUT OF FLOW rather than made a tall grid item. The fee is a
+   40px line box next to a 23px one; as a grid item it would set the height
+   of the name's row and push the rating and the meta line down a third of
+   the card to make room for a number that has nothing under it. Out of
+   flow, the identity column keeps the rhythm it had and the fee simply
+   overhangs into the space beside the rating — which is what the frame
+   draws, and why the rating is on the left.
+
+   `right:0` is the card's right edge, and the foot's `justify-content` puts
+   the Book button on the same one. That is the frame's vertical.
+   -------------------------------------------------------------------------- */
+.app .agh-book .agh-n .ag-price{
+  position:absolute;right:0;top:0;
+  font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px;
+  color:var(--text-primary);white-space:nowrap}
+
+/* the fee is now the tallest thing on the row and nothing may reflow around
+   it, so the identity column has to clear it on its own account: 40 of fee
+   against 23 of name plus 29 of rating is already past it, and the meta
+   line lands below both. Stated so a shorter name cannot pull the card up
+   under the number. */
+.app .page .agh.agh-book > .agh-m{min-height:17px}
+.app .agh-book .agh-n{min-height:23px}
+
+/* on a phone the fee cannot overhang a column that is barely wider than the
+   name — it goes back in flow, on the name's line, at a size the row can
+   carry */
+@container app (max-width:479.98px){
+  .app .agh-book .agh-n .ag-price{
+    position:static;grid-column:2;grid-row:1;justify-self:end;
+    font-size:24px;line-height:30px;letter-spacing:-.4px}
+  .app .agh-book .agh-n{display:grid;
+    grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
+}
+
+/* --------------------------------------------------------------------- 4 ---
+   A CARD GROUP DOES NOT TOUCH WHAT IS ABOVE OR BELOW IT
+   The three cards are one bordered block, and it was sitting flush against
+   the rule that closes the section above and against the ground of the one
+   below — so its own top and bottom edges read as those boundaries rather
+   than as the edge of the block. A bordered object needs to be seen to
+   float on the page it is on; the moment it is flush it stops being an
+   object and becomes a band. 24 above and below, which is the same air the
+   sections either side of it already pay internally.
+   -------------------------------------------------------------------------- */
+.app .page > .rail-wrap{
+  padding-top:var(--s06);padding-bottom:var(--s06)}
+/* and nothing draws a closing rule onto the top of it */
+.app .page > .sec:has(+ .rail-wrap)::after{display:none}
+
+/* ==========================================================================
+   THE BLACK LEVEL CARD IS A WALL, NOT A CARD ON A PAGE
+   A block with its own ground owns its edge — §18's fill-edge rule — and
+   this one was paying the page gutter, so it sat as a black rectangle with
+   a white margin round it while the band above it and the stepper below it
+   both ran wall to wall. It joins them: the section it lives in pays
+   nothing on any side, so the card's own padding is the only gutter and its
+   top edge lands on the rule that closes the band.
+
+   And no rule under it. The card ends in a black edge against white, which
+   is a stronger boundary than a hairline; drawing one as well says the
+   section ended twice.
+   ========================================================================== */
+.app .page > .sec:has(> .lvl-hero){padding:0}
+.app .page > .sec:has(> .lvl-hero)::after{display:none}
+.app .page > .sec:has(+ .sec > .lvl-hero)::after{display:none}
+
+/* --------------------------------------------------------------------------
+   THE FOOT ROW
+   Full width under the ladder: who signed it on the left, both actions on
+   the right, side by side. `auto` on the action column and `width:auto` on
+   the buttons means each one is as wide as the words in it — "Enroll on
+   Explorer Track – E3" needs the room and "Read my report" does not, and
+   forcing them to match would make the second one a button with a hole in
+   it.
+   -------------------------------------------------------------------------- */
+.app .lvl-hero .lvl-foot{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--s05);margin-top:var(--s08)}
+.app .lvl-hero .lvl-foot .eb{
+  display:flex;align-items:center;gap:var(--s03);margin:0;flex:1 1 auto}
+.app .lvl-hero .lvl-foot .eb-ok{display:inline-flex;flex:none}
+.app .lvl-hero .lvl-foot .eb-ok svg{width:16px;height:16px;fill:var(--support-success)}
+.app .lvl-hero .lvl-foot-a{display:flex;align-items:center;gap:var(--s04);flex:none}
+.app .lvl-hero .lvl-foot-a .btn{width:auto;flex:none}
+
+@container app (min-width:900px){
+  /* the card is the My Level grid, so the foot has to be told it spans it —
+     otherwise it auto-places into column one under the level's name and the
+     ladder keeps a column to itself for no reason */
+  .app .lvl-hero.lvl-foot-card > .lvl-foot{grid-column:1 / -1;grid-row:4}
+}
+
+/* below the label column the actions stack, because two buttons of that width
+   side by side in a phone's gutter is two buttons neither of which fits */
+@container app (max-width:599.98px){
+  .app .lvl-hero .lvl-foot{align-items:stretch;flex-direction:column}
+  .app .lvl-hero .lvl-foot-a{flex-direction:column;align-items:stretch}
+  .app .lvl-hero .lvl-foot-a .btn{width:100%}
+}
+
+/* the plate is a wall too — same rule as the black level card */
+.app .page > .sec:has(> .plate){padding:0}
+.app .page > .sec:has(> .plate)::after{display:none}
+.app .page > .sec:has(+ .sec > .plate)::after{display:none}
+
+/* ==========================================================================
+   THIRTEEN CHAPTERS IN TWO COLUMNS
+   A list you are reading to decide with, not a list you are working through.
+   Nothing in it is unlocked, so nothing in it is a control: the rows carry
+   no arrow, no hover and no target. Two columns because thirteen rows in
+   one is most of a screen for a list whose job is to be scanned — and no
+   headers over them, because two columns of the same thing do not have two
+   names.
+   ========================================================================== */
+.app .page .ch-two{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  column-gap:var(--s08);margin-top:var(--s05)}
+@container app (min-width:720px){
+  .app .page .ch-two{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.app .page .ch-two > .ch.ch-flat{
+  display:flex;align-items:center;gap:var(--s05);
+  padding:var(--s04) 0;background:transparent;
+  border:0;width:100%;text-align:left;cursor:default;pointer-events:none}
+/* the divider belongs to the column it is in, not to the page */
+.app .view-col .main .page .ch-two > .ch.ch-flat::after{
+  left:0;right:0;top:auto;bottom:-1px}
+.app .page .ch-two > .ch.ch-flat:last-child::after{display:block}
+.app .page .ch-two > .ch.ch-flat .ch-b{
+  display:flex;align-items:baseline;gap:var(--s04);min-width:0;flex:1 1 auto}
+.app .page .ch-two > .ch.ch-flat .ch-t{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:13.5px;line-height:19px;color:var(--text-primary)}
+.app .page .ch-two > .ch.ch-flat .ch-s{
+  margin-left:auto;flex:none;
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+
+/* AND THE BLEED IS PAID ONCE. Both walls carried their own negative margin
+   to escape the section's gutter; with the section now paying nothing they
+   were escaping a gutter that is not there and hanging past the rail. */
+.app .page > .sec:has(> .plate) > .plate,
+.app .page > .sec:has(> .lvl-hero) > .lvl-hero{margin-left:0;margin-right:0}
+
+/* the title and the minutes are one line: `.ch-b` is a column elsewhere,
+   because a chapter row you can open has a state line under its name */
+.app .page .ch-two > .ch.ch-flat > .ch-b{
+  display:flex;flex-direction:row;align-items:baseline;
+  gap:var(--s04);width:100%}
+
+/* ==========================================================================
+   A BUTTON ON A BLACK CARD IS A BUTTON ON BLACK
+   The actions were drawn for the white page and then moved onto the wall,
+   which left the secondary one setting black text inside a black outline on
+   a black ground — 1:1, invisible, and a contrast failure rather than a
+   subtle one. On the card the primary inverts to white-on-black-card (so it
+   is a white block, the strongest mark available) and the secondary keeps
+   the card's own hairline with the card's own ink.
+   ========================================================================== */
+.app .lvl-hero .lvl-foot-a .btn{color:var(--on-dark);border-color:var(--on-dark-rule)}
+.app .lvl-hero .lvl-foot-a .btn svg{fill:var(--on-dark)}
+.app .lvl-hero .lvl-foot-a .btn.btn-p{
+  background:var(--on-dark);color:var(--surface-dark);border-color:transparent}
+.app .lvl-hero .lvl-foot-a .btn.btn-p svg{fill:var(--surface-dark)}

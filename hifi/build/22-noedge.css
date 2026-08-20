@@ -1,0 +1,120 @@
+
+/* ==========================================================================
+   23. A FILL DOES NOT NEED AN EDGE
+   Every control in this product is drawn from the same anatomy, and that
+   anatomy includes a hairline: it is what makes a bordered button, a chip
+   and a tag read as the same family when they are empty. The moment one of
+   them is FILLED, that hairline stops describing the control and starts
+   drawing a box around a colour — one darker ring a pixel inside the shape,
+   which is the single most reliable way to make a brand fill look cheap.
+
+   So: filled variants keep the border in the box model — nothing moves by a
+   pixel, and an outlined button next to a filled one is still the same
+   height — and simply stop painting it.
+
+   The list is GENERATED from the stylesheet: every selector that both names
+   a control and sets a solid or gradient fill. A filled variant added later
+   is picked up by the next build rather than remembered by someone.
+   ========================================================================== */
+
+.shell-badge,
+.sn-item .badge,
+.btn-p,
+.btn-d,
+.cbx input:checked + .box,
+.rad input:checked + .box,
+.tag.brand,
+.tag.acc,
+.badge.on,
+.badge.acc,
+.stp .done .stp-c,
+.stp .on .stp-c,
+.stp-now .stp-c,
+.slot.sel,
+.slot.on,
+.day.sel,
+.ch.done .ch-num,
+.ch.open .ch-num,
+.aw-r.got .aw-ic,
+.ach-ic,
+.u-acc-fill,
+.chip-tal .sk-mark,
+.aw.got .aw-ic,
+.day.on,
+.btn.btn-p:active,
+button.btn-p:active,
+.app .sec:has(> .tile-stack) .ch.done .ch-num,
+.app .sec.flat.bleed .ch.done .ch-num,
+.app .sec:has(> .aw-list) .aw.got .aw-ic,
+.app .sec:has(> .pointsList) .aw.got .aw-ic,
+.app .sec:has(> .tile-stack) .ch.open .ch-num,
+.app .sec.flat.bleed .ch.open .ch-num,
+.app .sec.tint .tag.brand,
+.app .sec:has(> .tile-stack) .tag.brand,
+.app .sec.tint .tag.acc,
+.app .sec:has(> .tile-stack) .tag.acc,
+.app .chip-tal .sk-mark,
+.app .sec.nofill .aw.got .aw-ic,
+.app .pill-def,
+.app .vn-play,
+.app .composer-send,
+.app .callband-d,
+.app .plate .btn-p,
+.app .ivt-f.on,
+.app .btn.btn-p.danger,
+.auth-card .btn-p,
+.app .askfield-send{border-color:transparent}
+
+/* ==========================================================================
+   AND THE STATES CARRY IT
+   Three rules across two layers sent hover and pressed back to a flat
+   `--accent`. There is no flat accent any more, so they take the gradient
+   stepped one stop deeper instead. `background-image` rather than the
+   shorthand, so the solid underneath stays as the fallback and as what a
+   contrast reading is taken against.
+   ========================================================================== */
+/* A BLACK BUTTON HOVERS TO THE BRAND GRADIENT ITSELF — the same two stops
+   as the Create Account button, not a darkened version of them. The point
+   of the state is that the action lights up in the brand's colour; a deeper
+   orange says "pressed" before you have pressed it. */
+.btn.btn-p:hover,button.btn-p:hover,.btn-p:hover,
+.on-dark .btn-p:hover,.sec.on-dark .btn-p:hover,
+.app .tal-fab:hover,.app .tal-fab:focus-visible{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+
+/* the sign-up button already WEARS the gradient at rest, so its hover has
+   to go somewhere: one stop deeper, which is where pressed used to be. */
+.auth-card .btn-p:hover{
+  background-color:var(--accent-2);
+  background-image:var(--accent-grad-hover);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+
+.btn.btn-p:active,button.btn-p:active,.btn-p:active,
+.auth-card .btn-p:active,
+.app .tal-fab:active{
+  background-color:var(--accent-2);
+  background-image:var(--accent-grad-hover);
+  border-color:transparent;--on-brand-fill:1}
+
+/* ==========================================================================
+   THE TAL CHIP IS FILLED
+   Figma 284:179. Every suggested question in the product — in the panel, in
+   an answer, under the ask field, beside a Tal card — takes the same two
+   layers, so a chip is recognisably a chip wherever it turns up.
+
+   The border stays. This is a TINT, not a brand fill: it is light enough
+   that the chip would lose its edge entirely without one, which is exactly
+   the opposite of the problem §23 is about.
+   ========================================================================== */
+.app .chip-tal,.app .tal-sugg .chip-tal,
+.app .ask-sugg .chip-tal,.app .tw-chips .chip-tal{
+  background-color:var(--tal-chip-1);
+  background-image:radial-gradient(346px 217px at calc(100% - 8px) 274%,
+    var(--tal-chip-2) 0%, transparent 100%)}
+/* EXCEPT INSIDE A TAL CARD, where §12 already decided these are a LIST and
+   not pills: full width, separated by a rule, no box. A fill turns each row
+   back into the box that decision removed. */
+.app .ai-asks .chip-tal,.app .bub .chip-tal{
+  background-color:transparent;background-image:none}

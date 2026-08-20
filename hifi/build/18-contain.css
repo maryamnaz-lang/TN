@@ -1,0 +1,196 @@
+/* ==========================================================================
+   18. A RULE STOPS WHERE THE COLUMN STOPS
+   The lattice was designed at 390, where the content column IS the frame: a
+   section rule that bleeds to the frame edge and one that stops at the
+   column edge are the same line, so bleeding cost nothing and saved a
+   measurement. Layer 10 states it that way — `left:-50vw; right:-50vw`.
+
+   At desktop that assumption is gone. The column sits inside a rail on each
+   side with a wide margin beyond it, and a rule that keeps bleeding crosses
+   the rail, runs under the navigation and out into the empty margin. The
+   page then reads as ruled paper with a column drawn on it, rather than as a
+   column. Three vertical lines and a horizontal one crossing all of them is
+   a grid, and the product does not have a grid — it has a column.
+
+   So: above 900 every horizontal rule is bounded by the box it belongs to.
+   The rails stay, because they are what says where the column is. The app
+   bar's own border stays, because a bar spans the frame by definition — it
+   is chrome, not content.
+
+   This is one rule restated at one breakpoint, not forty rules deleted. The
+   bleeding version is still correct at phone width and still what ships
+   there.
+   ========================================================================== */
+
+@container app (min-width:900px){
+
+  /* the section rule, the page-header rule, the score rule, the breadcrumb
+     rule — each ends at its own left and right edge */
+  .app .sec::after,
+  .app .ph::after,
+  .app .score::after,
+  .app .crumb::after{left:0;right:0}
+
+  /* `left:0` on an absolutely positioned pseudo resolves against its
+     positioned ancestor's PADDING box, and a section has no border — so
+     zero is the section's own outer edge, which is the column edge, which
+     is where the rail is. The rule reaches the rails and stops. */
+
+  /* everything else that draws a hairline across a block: the same edge */
+  .app .lvl-hero::after,
+  .app .ach::after,
+  .app .agh::after,
+  .app .post::after,
+  .app .msg::after,
+  .app .aw::after,
+  .app .tabs::after,
+  .app .cs::after{left:0;right:0}
+}
+
+/* ==========================================================================
+   THE MARGINS ARE THE SECOND TONE
+   The content column is bounded by a rail on each side, and beyond those
+   rails there is space — between the navigation and the column on the left,
+   and out to the frame on the right. Painting it white made the rails the
+   only thing separating the column from nothing in particular; painting it
+   the panel tone makes the column a sheet lying on a surface, which is what
+   it is.
+
+   Only above 900. Below it the page IS the frame and there are no margins
+   to fill.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app .view-col > .main{background-color:var(--surface-2)}
+  .app .view-col > .main > .page{background-color:var(--background)}
+}
+
+/* ==========================================================================
+   A SEPARATOR SITS ON THE CONTENT, NOT ON THE WALL
+   Two kinds of horizontal line exist in this product and they were being
+   drawn the same way, which is why the page reads as ruled paper rather
+   than as a set of blocks:
+
+     a SECTION SEPARATOR says one group of content has ended and another has
+     begun. It belongs to the content, so it starts and stops where the
+     content does — inset by the gutter, clear of the rails.
+
+     a FILL EDGE is the boundary of a block that has a ground of its own: a
+     tinted panel, a dark card, a grouped list. That edge is the shape of
+     the block, and a block that pays no gutter cannot have an edge that
+     does. It stays full width.
+
+   So: every closing rule is inset by `--pad-x`, and the two cases where the
+   rule is really the top or bottom of a filled block are put back. The
+   `:has()` list below is the same set of filled blocks §12 gives the panel
+   tone to — if one changes, both have to.
+   ========================================================================== */
+
+.app .sec::after,.app .ph::after,.app .score::after,.app .crumb::after,
+.app .lvl-hero::after,.app .ach::after,.app .agh::after,.app .post::after,
+.app .msg::after,.app .aw::after{
+  left:var(--pad-x);right:var(--pad-x)}
+
+@container app (min-width:900px){
+  .app .sec::after,.app .ph::after,.app .score::after,.app .crumb::after,
+  .app .lvl-hero::after,.app .ach::after,.app .agh::after,.app .post::after,
+  .app .msg::after,.app .aw::after{
+    left:var(--pad-x);right:var(--pad-x)}
+}
+
+/* --- and the fill edges come back ----------------------------------------
+   A FILL EDGE NEEDS A FILL. Three entries have been removed from this list,
+   and all three for the same reason: the block was named here as filled, and
+   a later layer had taken its ground away.
+
+     .sec.flat.bleed        the chapter list. §12's chapter-list section sets
+                            it back to transparent — "the rows keep the rules
+                            and lose the ground" — so it had a full-width edge
+                            with nothing behind it, and so did the section
+                            above it via the `+` case below.
+     :has(> .aw-list)       the rewards lists. §15 strips the panel from them
+                            explicitly (`.sec.nofill`, "the page's own
+                            content — there is nothing for a panel tone to
+                            separate them from"), and `.aw-list` has exactly
+                            one user, which is that section.
+
+   The rest of the list is unchanged: each of those blocks still paints a
+   ground of its own, and its boundary is still the shape of the block.
+   `:has(> .pointsList | .badgeList | .rankList)` are kept although nothing
+   matches them today — those three are rendered INSIDE `.aw-list`, and the
+   entries record which blocks would be panels if they were ever hoisted. */
+.app .sec.tint::after,
+.app .sec.flat.tint::after,
+.app .sec.warm::after,
+.app .sec.on-dark::after,
+.app .score.on-dark::after,
+.app .sec:has(> .pointsList)::after,
+.app .sec:has(> .badgeList)::after,
+.app .sec:has(> .rankList)::after,
+.app .sec:has(> .msgs)::after,
+/* the rule under the block ABOVE a filled one is that block's top edge */
+.app .sec:has(+ .sec.tint)::after,
+.app .sec:has(+ .sec.warm)::after,
+.app .sec:has(+ .sec.on-dark)::after,
+.app .sec:has(+ .lvl-hero)::after,
+.app .ph:has(+ .sec.tint)::after,
+.app .ph:has(+ .sec.on-dark)::after,
+.app .ph:has(+ .lvl-hero)::after{
+  left:0;right:0}
+
+/* --------------------------------------------------------------------------
+   AND THE SAME FOR A ROW INSIDE A LIST
+   A list row draws its own hairline as a border, and a border cannot be
+   inset — so on every list that bleeds to the rails the divider went with
+   it. The border stays in the box model, unpainted, so nothing moves by a
+   pixel, and the line is drawn instead as a rule that pays the same gutter
+   the row's content pays.
+
+   The reach is deliberate. `.app .sec:has(> .tile-stack) .tile.clk` in §12
+   is what these rows resolve to today, so anything shorter loses the
+   cascade and the border stays where it was.
+
+   NOTE: this reverses the earlier decision that chapter dividers run edge
+   to edge. That was right when a full-bleed rule was just how a rule looked;
+   it is not right now that full-bleed means "this is the edge of a filled
+   block".
+   -------------------------------------------------------------------------- */
+.app .view-col .main .page .tile.clk,
+.app .view-col .main .page .gcard,
+.app .view-col .main .page .cardrow,
+.app .view-col .main .page .ch,
+.app .view-col .main .page .aw,
+.app .view-col .main .page .mem,
+.app .view-col .main .page .nrow,
+.app .view-col .main .page .ag,
+.app .view-col .main .page .acc-i,
+.app .view-col .main .page .kv,
+.app .view-col .main .page .payrow{
+  position:relative;border-bottom-color:transparent}
+.app .view-col .main .page .tile.clk::after,
+.app .view-col .main .page .gcard::after,
+.app .view-col .main .page .cardrow::after,
+.app .view-col .main .page .ch::after,
+.app .view-col .main .page .aw::after,
+.app .view-col .main .page .mem::after,
+.app .view-col .main .page .nrow::after,
+.app .view-col .main .page .ag::after,
+.app .view-col .main .page .acc-i::after,
+.app .view-col .main .page .kv::after,
+.app .view-col .main .page .payrow::after{
+  content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
+  /* `top:auto` is load-bearing: something upstream sets `top:0` on these
+     pseudos, and an absolutely positioned box with BOTH offsets set is
+     over-constrained — `top` wins, and the divider drew itself across the
+     top of the row instead of under it. */
+  top:auto;bottom:-1px;height:1px;background:var(--rule);pointer-events:none}
+.app .view-col .main .page .tile.clk:last-child::after,
+.app .view-col .main .page .gcard:last-child::after,
+.app .view-col .main .page .cardrow:last-child::after,
+.app .view-col .main .page .ch:last-child::after,
+.app .view-col .main .page .aw:last-child::after,
+.app .view-col .main .page .mem:last-child::after,
+.app .view-col .main .page .nrow:last-child::after,
+.app .view-col .main .page .ag:last-child::after,
+.app .view-col .main .page .acc-i:last-child::after,
+.app .view-col .main .page .kv:last-child::after,
+.app .view-col .main .page .payrow:last-child::after{display:none}

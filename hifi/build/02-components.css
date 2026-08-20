@@ -1,0 +1,482 @@
+/* ==========================================================================
+   7. THE LINEAR SECTION SYSTEM
+   This replaces every card in the build. A section is a band of content
+   with a hairline rule above it. No border box, no fill, no shadow, no
+   radius. Depth is expressed as rhythm and rule weight, nothing else.
+   ========================================================================== */
+.sec{
+  padding:var(--s06) var(--gutter);
+  border-top:1px solid var(--border-subtle-01);
+  background:transparent}
+.sec:first-child{border-top:0}
+.sec.flush{padding-left:0;padding-right:0}
+.sec.flush > .sec-h,
+.sec.flush > .eyebrow,
+.sec.flush > h2,
+.sec.flush > .lead,
+.sec.flush > .help{padding-left:var(--gutter);padding-right:var(--gutter)}
+.sec.tight{padding-top:var(--s05);padding-bottom:var(--s05)}
+.sec.none{border-top:0}
+/* the one permitted ground change: an inset band for reference material.
+   It is a background, not a card — full bleed, no border, no radius. */
+.sec.tint{background:var(--layer-02)}
+.sec.warm{background:var(--layer-01)}
+.sec.on-dark{background:var(--surface-dark);color:var(--on-dark);border-top-color:var(--surface-dark)}
+.sec.on-dark .eyebrow,.sec.on-dark .help,.sec.on-dark .sub{color:var(--on-dark-2)}
+.sec.on-dark .t-heading-02,.sec.on-dark h2,.sec.on-dark h3{color:var(--on-dark)}
+
+.sec-h{
+  display:flex;align-items:baseline;gap:var(--s04);
+  margin-bottom:var(--s05)}
+.sec-h h2{font-size:16px;line-height:22px;font-weight:600;letter-spacing:-.1px}
+.sec-h .lk,.sec-h .lnk{margin-left:auto;flex:none}
+.eyebrow{display:block;margin-bottom:var(--s03)}
+.lead{font-size:14px;line-height:20px;letter-spacing:.1px;color:var(--text-secondary)}
+.sub{font-size:12.5px;line-height:18px;letter-spacing:.2px;color:var(--text-secondary);display:block}
+.help,.t-helper-01{font-size:12.5px;line-height:16px;letter-spacing:.2px;color:var(--text-helper)}
+.quiet{color:var(--text-secondary)}
+.divider,.sep{height:1px;background:var(--border-subtle-01);border:0;margin:var(--s05) 0}
+.hr-full{height:1px;background:var(--border-subtle-01)}
+.center{text-align:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* page header */
+.ph{padding:var(--s06) var(--gutter) var(--s05);background:transparent}
+.ph-top{display:flex;align-items:center;gap:var(--s03);margin-bottom:var(--s03)}
+.ph-back{
+  width:40px;height:40px;margin-left:calc(var(--s04) * -1);
+  display:grid;place-items:center;border-radius:var(--radius)}
+.ph-back svg{width:22px;height:22px;fill:var(--icon-primary)}
+.ph-back:hover{background:var(--overlay-hover)}
+.ph h1{font-size:26px;line-height:32px;font-weight:600;letter-spacing:-.6px}
+.ph .lead{margin-top:var(--s03);max-width:60ch}
+.crumb{
+  display:flex;align-items:center;gap:var(--s02);flex-wrap:wrap;
+  font-size:12.5px;letter-spacing:.2px;color:var(--text-helper);margin-bottom:var(--s03)}
+.crumb a{color:var(--text-helper);text-decoration:none;border-bottom:1px solid transparent}
+.crumb a:hover{color:var(--text-primary);border-bottom-color:var(--text-primary)}
+.crumb svg{width:14px;height:14px;fill:var(--text-placeholder);flex:none}
+.crumb .last{color:var(--text-primary)}
+
+@container app (min-width:900px){
+  .ph{padding:var(--s08) var(--gutter) var(--s06)}
+  .ph h1{font-size:32px;line-height:40px;letter-spacing:-.8px}
+  .sec{padding:var(--s07) var(--gutter)}
+}
+
+/* ==========================================================================
+   8. MUI BUTTON
+   Material anatomy — contained / outlined / text — at MUI's sizes, with
+   radius 0 and no elevation. Icon sits right per the existing markup.
+   ========================================================================== */
+.btn,.btn-like{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:48px;padding:0 var(--s05);
+  font-size:14px;font-weight:600;letter-spacing:.2px;
+  border:1px solid transparent;border-radius:var(--radius);
+  position:relative;text-decoration:none;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.btn svg{width:20px;height:20px;flex:none;fill:currentColor}
+.btn:not(.noic){justify-content:space-between;padding-right:var(--s04)}
+.btn.noic{justify-content:center}
+/* contained */
+.btn-p{background:var(--brand-primary);color:var(--on-brand)}
+.btn-p:hover{background:var(--brand-primary-hover)}
+.btn-p:active{background:var(--brand-primary-active)}
+/* outlined */
+.btn-s,.btn-t,.btn-g{background:transparent;color:var(--text-primary);
+  border-color:var(--border-strong-01)}
+.btn-s:hover,.btn-t:hover,.btn-g:hover{background:var(--overlay-hover);border-color:var(--text-primary)}
+.btn-s:active,.btn-t:active,.btn-g:active{background:var(--overlay-pressed)}
+/* text */
+.btn.ghost{border-color:transparent;padding-left:var(--s04);padding-right:var(--s04)}
+.btn.ghost:hover{background:var(--overlay-hover);border-color:transparent}
+/* danger */
+.btn-d{background:var(--support-error);color:var(--pure-white)}
+.btn-d:hover{background:var(--error-hover)}
+/* on dark */
+.on-dark .btn-s,.sec.on-dark .btn-s{color:var(--on-dark);border-color:var(--on-dark-border)}
+.on-dark .btn-s:hover{background:var(--overlay-hover-dark);border-color:var(--on-dark)}
+.on-dark .btn-p{background:var(--on-dark);color:var(--text-primary)}
+.on-dark .btn-p:hover{background:var(--on-dark-2)}
+/* small */
+.btn-sm{min-height:36px;padding:0 var(--s04);font-size:13px;gap:var(--s02)}
+.btn-sm svg{width:18px;height:18px}
+.btn-sm:not(.noic){padding-right:var(--s03)}
+.btn[disabled],.btn.locked{
+  background:var(--layer-02);color:var(--text-disabled);
+  border-color:transparent;cursor:not-allowed;pointer-events:none}
+.btn-row,.btn-set{display:flex;flex-wrap:wrap;gap:var(--s04)}
+.btn-row > .btn,.btn-set > .btn{flex:1 1 auto;min-width:180px}
+@container app (min-width:600px){
+  .btn-row > .btn,.btn-set > .btn{flex:0 1 auto;min-width:0}
+  .btn:not(.noic){padding-right:var(--s05)}
+}
+
+/* text link */
+.lk,.lnk,.score-link{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  min-height:32px;padding:var(--s02) 0;
+  font-size:13px;font-weight:500;letter-spacing:.2px;
+  color:var(--text-primary);text-decoration:none;
+  border-bottom:1px solid var(--border-subtle-02);cursor:pointer}
+.lk:hover,.lnk:hover,.score-link:hover{border-bottom-color:var(--text-primary)}
+.lk svg,.lnk svg{width:16px;height:16px;fill:currentColor}
+a[data-go]{color:var(--text-primary);text-decoration:underline;
+  text-underline-offset:2px;text-decoration-thickness:1px;cursor:pointer}
+a[data-go]:hover{background:var(--brand-tint)}
+
+/* ==========================================================================
+   9. MUI TEXT FIELD — filled variant
+   Material's filled field is already a bottom-rule field on a tinted
+   ground, which is what v14 specified independently. Kept.
+   ========================================================================== */
+.f{margin-bottom:var(--s05);display:block}
+.f > label,.lbl{
+  display:block;margin-bottom:var(--s02);
+  font-size:12.5px;font-weight:500;letter-spacing:.2px;color:var(--text-secondary)}
+.inp,select.inp,textarea.inp{
+  display:block;width:100%;min-height:48px;padding:0 var(--s05);
+  background:var(--layer-02);color:var(--text-primary);
+  border:0;border-bottom:1px solid var(--border-strong-01);border-radius:var(--radius);
+  font-size:14px;letter-spacing:.1px;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard)}
+.inp:hover{background:var(--brand-tint)}
+.inp:focus{border-bottom:2px solid var(--brand-primary);padding-bottom:1px;
+  outline:none;background:var(--brand-tint)}
+.inp::placeholder{color:var(--text-placeholder)}
+.inp[readonly]{background:var(--layer-02);color:var(--text-secondary);
+  border-bottom-style:dashed;cursor:default}
+textarea.inp,.f textarea{min-height:96px;padding:var(--s04) var(--s05);
+  resize:vertical;line-height:20px;font-family:inherit}
+select.inp{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 49%,var(--icon-primary) 50%),
+                   linear-gradient(-45deg,transparent 49%,var(--icon-primary) 50%);
+  background-size:6px 6px,6px 6px;
+  background-position:calc(100% - 20px) 21px,calc(100% - 14px) 21px;
+  background-repeat:no-repeat;padding-right:var(--s08)}
+.inp.invalid,.inp.err{border-bottom-color:var(--support-error);border-bottom-width:2px}
+.f .help{margin-top:var(--s02);display:block}
+.f .err,.err{color:var(--support-error)}
+.pw-wrap{position:relative}
+.pw-wrap .inp{padding-right:52px}
+.pw-eye{position:absolute;right:0;top:0;width:48px;height:48px;display:grid;place-items:center}
+.pw-eye svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.pw-eye:hover{background:var(--overlay-hover)}
+.pw-rules{margin-top:var(--s03);display:flex;flex-direction:column;gap:var(--s02)}
+.pw-rules li{display:flex;align-items:center;gap:var(--s03);
+  font-size:12.5px;letter-spacing:.2px;color:var(--text-helper)}
+.pw-rules li svg{width:16px;height:16px;fill:var(--text-placeholder);flex:none}
+.pw-rules li.ok{color:var(--text-secondary)}
+.pw-rules li.ok svg{fill:var(--support-success)}
+.inp-mk{position:relative}
+.inp-mk .inp{padding-right:64px}
+.inp-mk .bmk{position:absolute;right:var(--s04);top:11px}
+
+/* OTP. <input> carries an intrinsic min-width from its size attribute, so
+   flex:1 and 1fr both overflow at 320. minmax(0,1fr) + min-width:0 is the fix. */
+.otp{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s03)}
+.otp input{
+  min-width:0;width:100%;height:56px;padding:0;text-align:center;
+  font-size:20px;font-weight:600;
+  background:var(--layer-02);border:0;border-bottom:1px solid var(--border-strong-01);
+  border-radius:var(--radius)}
+.otp input:focus{border-bottom:2px solid var(--brand-primary);background:var(--brand-tint)}
+
+/* checkbox / radio */
+.cbx,.rad{display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s03) 0;cursor:pointer;font-size:13px;line-height:19px;letter-spacing:.1px}
+.cbx input,.rad input{position:absolute;opacity:0;width:0;height:0}
+.cbx .box,.rad .box{
+  width:20px;height:20px;flex:none;margin-top:0;
+  border:1.5px solid var(--border-strong-01);background:var(--layer-01);
+  display:grid;place-items:center;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard)}
+.rad .box{border-radius:50%}
+.cbx .box svg,.rad .box svg{width:16px;height:16px;fill:var(--on-brand);opacity:0}
+.cbx input:checked + .box,.rad input:checked + .box{
+  background:var(--brand-primary);border-color:var(--brand-primary)}
+.cbx input:checked + .box svg{opacity:1}
+.rad input:checked + .box::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--on-brand)}
+.cbx:hover .box,.rad:hover .box{border-color:var(--text-primary)}
+.cbx input:focus-visible + .box,.rad input:focus-visible + .box{outline:2px solid var(--brand-primary);outline-offset:2px}
+.cbx .txt{flex:1}
+.legal,.t-legal-01{font-size:11.5px;line-height:16px;letter-spacing:.2px;color:var(--text-helper)}
+
+/* switch */
+.sw{position:relative;width:40px;height:22px;flex:none;background:var(--gray-40);
+  transition:background var(--dur-short) var(--ease-standard)}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:var(--pure-white);
+  transition:transform var(--dur-short) var(--ease-standard)}
+.sw.on::before{background:var(--brand-primary)}
+.sw.on::after{transform:translateX(18px)}
+
+/* search */
+.srch{position:relative}
+.srch .inp{padding-left:48px}
+.srch > svg{position:absolute;left:var(--s05);top:14px;width:20px;height:20px;
+  fill:var(--icon-secondary);pointer-events:none}
+
+/* ==========================================================================
+   10. MUI LIST — the replacement for every card in the build
+   Full-bleed rows, 1px rule between, state layer on hover, chevron right.
+   .tile .gcard .ag .ch .cardrow .nrow .mem .aw-r .slot .post all resolve here.
+   ========================================================================== */
+.row-lead,.tile,.gcard,.ag,.ch,.cardrow,.nrow,.mem,.aw-r,.slot,.clip,.pi-step{
+  display:flex;align-items:center;gap:var(--s05);
+  width:100%;min-height:64px;padding:var(--s04) var(--gutter);
+  position:relative;text-align:left;background:transparent;
+  border:0;border-bottom:1px solid var(--border-subtle-01);
+  border-radius:var(--radius);color:var(--text-primary);
+  transition:background var(--dur-short) var(--ease-standard)}
+.clk:hover,.tile:hover,.gcard:hover,.ag:hover,.ch:hover,.cardrow:hover,
+.aw-r.clk:hover,.slot:hover,.nrow.clk:hover{background:var(--overlay-hover);cursor:pointer}
+.clk:active,.tile:active,.gcard:active,.ag:active,.ch:active{background:var(--overlay-pressed)}
+.sec.flush .tile:last-child,.sec.flush .gcard:last-child,.sec.flush .ag:last-child,
+.sec.flush .ch:last-child,.sec.flush .cardrow:last-child,.sec.flush .mem:last-child,
+.sec.flush .nrow:last-child,.sec.flush .aw-r:last-child{border-bottom:0}
+/* :where() keeps this at zero specificity so the spine rule in the lattice
+   layer can override it — otherwise rows silently lose their side padding
+   and their trailing chevrons end up welded to the rail. */
+:where(.sec:not(.flush)) :where(.tile,.gcard,.ag,.ch,.cardrow,.mem,.slot,.clip){
+  padding-left:0;padding-right:0;margin-left:0;margin-right:0}
+
+/* leading icon slot — MUI ListItemIcon */
+.ch-ic,.nrow-ic,.cardrow-ic,.ach-ic,.aw-ic,.pi-ic{
+  width:40px;height:40px;flex:none;display:grid;place-items:center;
+  background:var(--layer-02)}
+.ch-ic svg,.nrow-ic svg,.cardrow-ic svg,.ach-ic svg,.aw-ic svg,.pi-ic svg{
+  width:22px;height:22px;fill:var(--icon-primary)}
+
+/* body — MUI ListItemText */
+.gcard-b,.ag-b,.ch-b,.cardrow-b,.nrow-b,.mem-b,.aw-b,.ach-b,.sheet-b > .f{min-width:0;flex:1}
+.gcard-b h3,.cardrow-t,.nrow-t,.mem-n,.aw-n,.ach-t,.ag-n,.ch-n{
+  display:block;font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary);
+  overflow-wrap:anywhere}
+.gcard-b .sub,.cardrow-d,.nrow-d,.mem-m,.aw-d,.ach-d,.ag-m,.ch-m{
+  display:block;margin-top:2px;
+  font-size:12.5px;line-height:17px;letter-spacing:.2px;color:var(--text-secondary)}
+
+/* trailing chevron — MUI's list navigation affordance */
+/* `.arrow` here is the ICON. `.tile.clk.arrow` is a different thing —
+   a row that has a trailing arrow — and it was inheriting an 18px width,
+   which collapsed the whole row to the size of the glyph inside it.
+
+   `.ach-go` is NOT in this family and never was: it is a `<button>` with the
+   word "View" in it, and being sized 20x20 with a placeholder-grey fill is
+   what made it read as underlined text rather than as a control. It is a
+   real button now — §29.11 draws it — so it comes out of all three of the
+   groups that treated it as a glyph (here, and twice in §10). */
+svg.arrow,.tile-arrow,.card-go{
+  width:20px;height:20px;flex:none;fill:var(--text-placeholder);
+  transition:fill var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard)}
+.tile:hover .tile-arrow,.gcard:hover .tile-arrow,.ag:hover .card-go,
+.cardrow:hover .arrow{fill:var(--text-primary);transform:translateX(2px)}
+.tile-stack{display:flex;flex-direction:column}
+.cardrow-a{margin-left:auto;flex:none;display:flex;align-items:center;gap:var(--s04)}
+
+/* the illustration block is gone in v15: with no cards there is no card
+   header to carry it, and Material lists lead with an icon, not a banner. */
+.gfx,.gfx-lead,.gfx-tag,.pict,.bands{display:none!important}
+
+/* ==========================================================================
+   11. MUI TABS
+   ========================================================================== */
+.tabs{
+  display:flex;gap:0;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid var(--border-subtle-01);
+  background:transparent;padding:0 var(--gutter)}
+.tabs::-webkit-scrollbar{display:none}
+/* `.tb` is the toggle row's text block, not a tab. Section 53 owns it. */
+.tabs button{
+  flex:none;min-height:48px;padding:0 var(--s05);
+  font-size:14px;font-weight:500;letter-spacing:.2px;color:var(--text-secondary);
+  border-bottom:2px solid transparent;white-space:nowrap;
+  transition:color var(--dur-short) var(--ease-standard),
+             background var(--dur-short) var(--ease-standard)}
+.tabs button:first-child{padding-left:0}
+.tabs button:hover{color:var(--text-primary);background:var(--overlay-hover)}
+.tabs button.on,.tb.on{color:var(--text-primary);font-weight:600;
+  border-bottom-color:var(--brand-primary)}
+/* segmented control */
+.tg{display:inline-flex;border:1px solid var(--border-strong-01)}
+.tg button{min-height:40px;padding:0 var(--s05);font-size:13px;font-weight:500;
+  border-right:1px solid var(--border-strong-01)}
+.tg button:last-child{border-right:0}
+.tg button.on{background:var(--brand-primary);color:var(--on-brand)}
+.tg button:not(.on):hover{background:var(--overlay-hover)}
+
+/* ==========================================================================
+   12. MUI CHIP
+   ========================================================================== */
+.tag,.chip-tal,.tw-chips button,.tag-row span{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  height:32px;padding:0 var(--s04);
+  background:var(--layer-02);color:var(--text-secondary);
+  border:0;border-radius:var(--radius);
+  font-size:12.5px;font-weight:500;letter-spacing:.2px;white-space:nowrap}
+.tag svg{width:16px;height:16px;fill:currentColor}
+.tag.sm{height:24px;padding:0 var(--s03);font-size:11.5px}
+.tag.brand{background:var(--brand-primary);color:var(--on-brand)}
+.tag.acc{background:var(--accent);color:var(--on-accent)}
+.tag.green,.tag.succ{background:var(--support-success-bg);color:var(--on-success-bg)}
+.tag.red{background:var(--support-error-bg);color:var(--on-error-bg)}
+.tag.warn,.tag.org{background:var(--support-warning-bg);color:var(--on-warning-bg)}
+.tag.bordered,.tag.ghost{background:transparent;border:1px solid var(--border-subtle-02)}
+.tag-row{display:flex;flex-wrap:wrap;gap:var(--s03)}
+/* clickable chip */
+.chip-tal,.tw-chips button{
+  border:1px solid var(--border-subtle-02);background:transparent;
+  color:var(--text-primary);cursor:pointer;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard)}
+.chip-tal:hover,.tw-chips button:hover{background:var(--brand-tint);border-color:var(--text-primary)}
+.chip-tal svg{width:16px;height:16px;fill:var(--accent-text)}
+
+/* status badge */
+.badge,.badges span{
+  display:inline-flex;align-items:center;height:20px;padding:0 var(--s03);
+  font-size:11px;font-weight:600;letter-spacing:.3px;
+  background:var(--layer-02);color:var(--text-secondary)}
+.badge.on,.badge.acc{background:var(--accent);color:var(--on-accent)}
+.badge.done{background:var(--support-success-bg);color:var(--on-success-bg)}
+.dot{width:6px;height:6px;flex:none;background:var(--text-placeholder)}
+.dot.on{background:var(--accent)}
+.mdot{width:3px;height:3px;background:var(--text-placeholder);flex:none;
+  display:inline-block;vertical-align:middle;margin:0 var(--s02)}
+
+/* ==========================================================================
+   13. MUI LINEAR PROGRESS
+   The accent marks progress: progress is a thing the candidate owns.
+   ========================================================================== */
+.pb,.pb-track,.tw-bar,.aw-s{
+  position:relative;height:4px;width:100%;background:var(--layer-accent-01);overflow:hidden}
+.pb-fill,.pb > i,.tw-bar > i,.aw-s > i{
+  display:block;height:100%;background:var(--accent);
+  transition:width var(--dur-long) var(--ease-standard)}
+.pb.lg,.pb-top{height:6px}
+.pb-top{margin-bottom:var(--s05)}
+.pb.dark{background:var(--on-dark-track)}
+.prog{display:flex;flex-direction:column;gap:var(--s03)}
+.prog-top{display:flex;align-items:baseline;gap:var(--s04)}
+.prog-l{font-size:12.5px;letter-spacing:.2px;color:var(--text-secondary)}
+.prog-pct{margin-left:auto;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.prog-figs{display:flex;gap:var(--s06);margin-top:var(--s04);flex-wrap:wrap}
+.prog-figs > div{min-width:0}
+.prog-dn{font-size:12.5px;color:var(--text-secondary);letter-spacing:.2px}
+.prog-day{font-size:12.5px;color:var(--text-helper);letter-spacing:.2px}
+/* segmented course progress — completed segments carry the accent */
+.prog-seg{display:flex;gap:2px;height:6px;width:100%}
+.prog-seg i{flex:1;background:var(--layer-accent-01);min-width:0}
+.prog-seg i.done{background:var(--accent)}
+.prog-seg i.now{background:var(--accent);opacity:.55}
+
+/* stat block — linear, not a tile */
+.stats{display:flex;flex-wrap:wrap;gap:var(--s06) var(--s08)}
+.stat{min-width:0}
+.stat .k,.stat .v{display:block}
+.stat .v{font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px;
+  font-variant-numeric:tabular-nums}
+.stat .k{margin-top:2px;font-size:11.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.kv{display:flex;align-items:baseline;gap:var(--s04);
+  padding:var(--s03) 0;border-bottom:1px solid var(--border-subtle-01);
+  font-size:13px;letter-spacing:.1px}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--text-secondary);flex:none}
+.kv .v{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+
+/* ==========================================================================
+   14. MUI DIALOG / BOTTOM SHEET
+   ========================================================================== */
+.modal{
+  position:absolute;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;
+  background:var(--overlay);opacity:0;visibility:hidden;
+  transition:opacity var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
+.modal.on{opacity:1;visibility:visible}
+.sheet{
+  width:100%;max-width:520px;max-height:88%;display:flex;flex-direction:column;
+  background:var(--layer-01);border-radius:var(--radius);
+  transform:translateY(16px);
+  transition:transform var(--dur-standard) var(--ease-decelerate)}
+.modal.on .sheet{transform:translateY(0)}
+.sheet-h{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s05) var(--s05) var(--s06);
+  border-bottom:1px solid var(--border-subtle-01)}
+.sheet-h h2{font-size:18px;line-height:24px;font-weight:600;letter-spacing:-.2px}
+.sheet-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;flex:none}
+.sheet-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.sheet-h .x:hover{background:var(--overlay-hover)}
+.sheet-b{flex:1;overflow-y:auto;padding:var(--s06)}
+.sheet-f{flex:none;display:flex;gap:var(--s04);padding:var(--s05) var(--s06);
+  border-top:1px solid var(--border-subtle-01)}
+.sheet-f .btn{flex:1}
+@container app (min-width:600px){
+  .modal{align-items:center}
+  .sheet{max-height:80%}
+}
+
+/* ==========================================================================
+   15. NOTES / ALERTS — MUI Alert, square, hairline, no fill flood
+   ========================================================================== */
+.note{
+  display:flex;gap:var(--s04);padding:var(--s04) var(--s05);
+  background:var(--layer-02);border-left:3px solid var(--border-strong-01);
+  font-size:13px;line-height:19px;letter-spacing:.1px}
+.note > span:first-child{flex:none;display:grid;place-items:start}
+.note svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.note .nb{flex:1;min-width:0}
+.note.warn{background:var(--support-warning-bg);border-left-color:var(--support-warning-ic)}
+.note.warn svg{fill:var(--support-warning-ic)}
+.note.err{background:var(--support-error-bg);border-left-color:var(--support-error)}
+.note.err svg{fill:var(--support-error)}
+.note.succ{background:var(--support-success-bg);border-left-color:var(--support-success)}
+.note.succ svg{fill:var(--support-success)}
+.note.acc{background:var(--brand-tint-2);border-left-color:var(--accent)}
+.note.acc svg{fill:var(--accent-text)}
+/* quote block — straight from the client's own document */
+.tw-quote,.why{
+  display:block;padding-left:var(--s05);border-left:3px solid var(--brand-primary);
+  font-size:14px;line-height:21px;color:var(--text-primary)}
+.empty{
+  padding:var(--s08) var(--gutter);text-align:center;color:var(--text-secondary)}
+.empty svg{width:32px;height:32px;fill:var(--text-placeholder);margin:0 auto var(--s04)}
+.empty .t{display:block;font-size:15px;font-weight:600;color:var(--text-primary);margin-bottom:var(--s02)}
+
+/* ==========================================================================
+   16. MUI TABLE
+   ========================================================================== */
+.tbl,.chart-table{width:100%;font-size:13px;letter-spacing:.1px}
+.tbl th,.chart-table th{
+  text-align:left;padding:var(--s04) var(--s04) var(--s04) 0;
+  font-size:11.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text-helper);border-bottom:1px solid var(--border-strong-01);white-space:nowrap}
+.tbl td,.chart-table td{
+  padding:var(--s04) var(--s04) var(--s04) 0;
+  border-bottom:1px solid var(--border-subtle-01);vertical-align:top}
+.tbl th:last-child,.tbl td:last-child,
+.chart-table th:last-child,.chart-table td:last-child{padding-right:0;text-align:right}
+.tbl tr:last-child td{border-bottom:0}
+.tbl .num,.chart-table .num{font-variant-numeric:tabular-nums;text-align:right}
+.tbl-wrap{overflow-x:auto}
+
+/* ==========================================================================
+   17. AVATARS — MUI Avatar, square (radius 0 travels everywhere)
+   ========================================================================== */
+.av,.mem-av,.agh-f{
+  width:40px;height:40px;flex:none;position:relative;overflow:hidden;
+  background:var(--gray-80);color:var(--on-dark);
+  display:grid;place-items:center;
+  font-size:13px;font-weight:600;letter-spacing:.3px}
+.av img,.agh-f img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.av.sm,.mem-av{width:32px;height:32px;font-size:11px}
+.av.lg{width:56px;height:56px;font-size:17px}
+.av.xs{width:24px;height:24px;font-size:10px}
+.av-ph{position:absolute;inset:0;display:grid;place-items:center}

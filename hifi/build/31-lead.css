@@ -1,0 +1,478 @@
+/* ==========================================================================
+   31. THE PORTAL SWITCH, AND THE COHORT LEADER'S PAGES
+
+   The switch is two tabs in the app bar, next to the mark. Everything else in
+   this layer is a correction the leader's pages need and the candidate's do
+   not, so every rule is scoped to `[data-portal="leader"]` — stamped on `.app`
+   by lead.js — rather than to the leader's own class names. That way a
+   component the two portals share keeps ONE set of rules and this layer only
+   ever says "and on the leader's side, this much differs".
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE SWITCH
+
+   IT IS A SEGMENTED CONTROL, NOT TWO BUTTONS. The two portals are exclusive
+   and exhaustive — you are one or the other, always — and that is exactly what
+   a segment says and what two adjacent buttons do not. One border around the
+   pair, one hairline between them, and the live half filled solid.
+
+   THE FILL IS `--brand-primary`, WHICH IS BLACK. It has to be the strongest
+   fill in the bar, because the thing it marks is the biggest fact on screen:
+   which product you are looking at. `--overlay-selected` — what `.shell-act.on`
+   uses for the bell — is an 8% wash, right for "this panel is open" and far
+   too quiet for "you are signed in as somebody else".
+   -------------------------------------------------------------------------- */
+.app .pswitch{
+  flex:none;display:inline-flex;align-items:stretch;
+  height:32px;
+  border:1px solid var(--border-subtle-02);
+  background-color:var(--layer-01)}
+.app .psw-t{
+  display:flex;align-items:center;
+  padding:0 var(--s04);
+  font-size:12.5px;line-height:16px;font-weight:500;letter-spacing:.1px;
+  color:var(--text-secondary);
+  white-space:nowrap;
+  transition:background-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .psw-t + .psw-t{border-left:1px solid var(--border-subtle-02)}
+.app .psw-t:hover{background-color:var(--overlay-hover);cursor:pointer}
+.app .psw-t.on{
+  background-color:var(--brand-primary);
+  color:var(--on-brand);
+  font-weight:600}
+/* The live half owns the hairline on both of its sides, or the black block
+   sits a pixel inside a grey line and reads as misprinted. */
+.app .psw-t.on,.app .psw-t.on + .psw-t{border-color:var(--brand-primary)}
+
+/* AT 390 THE BAR CANNOT HOLD IT. Hamburger, mark, two tabs, bell and face come
+   to more than the phone has, and the first thing to lose would be the tabs —
+   the one control that must never be the thing that got dropped. So on the
+   phone the switch takes the row under the bar: full width, one segment each,
+   flush to both edges. It is the same control in the same reading position,
+   directly beneath the mark rather than beside it.
+
+   `order` and the wrap, rather than a second copy of the markup in `shell()`:
+   one element, one state, and nothing to keep in sync. */
+@container app (max-width:599.98px){
+  /* The bar's right padding was on the HEADER, so once the header wraps that
+     padding lands at the end of the second row and the switch stops 8px short
+     of the edge — a segmented control with a gap after it reads as a control
+     that failed to fill. The padding moves onto the row that wanted it. */
+  .app .shell{flex-wrap:wrap;height:auto;padding-right:0;padding-bottom:0}
+  /* the bar's own row keeps the height it had, so nothing above the switch moves */
+  .app .shell > .shell-act,.app .shell > .shell-logo{height:var(--appbar-h)}
+  .app .shell > .shell-right{height:var(--appbar-h);padding-right:var(--s03)}
+  .app .pswitch{
+    order:9;width:100%;height:44px;
+    border-left:0;border-right:0;border-bottom:0;
+    margin-top:0}
+  .app .psw-t{flex:1;justify-content:center;font-size:13px}
+  .app .psw-t + .psw-t{border-left-color:var(--border-subtle-02)}
+  .app .psw-t.on + .psw-t{border-left-color:var(--brand-primary)}
+}
+
+/* On the tablet and up the switch sits in the bar, and at 900 the mark takes
+   the drawer column (§01/§14) — so the switch lands exactly at the content
+   column's left edge, which is where the page it frames begins. */
+@container app (min-width:900px){
+  .app .pswitch{height:36px;margin-left:calc(var(--s02) * -1)}
+  .app .psw-t{padding:0 var(--s05);font-size:13px}
+}
+
+/* --------------------------------------------------------------------------
+   2. THE LEADER'S DATA TABLE
+
+   `.tbl` was written for the candidate's transcript — a handful of rows about
+   ONE person. The attention queue is several people against the same columns,
+   read by scanning down, and it needs two things that table did not:
+
+   a) it must not be able to widen the page. `.tbl-wrap` already scrolls, but
+      the table inside it collapses its columns before it agrees to overflow,
+      so the flag column wraps mid-word at 390. A min-width forces the scroll
+      the wrapper is there to provide.
+   b) the name column carries the row. Everything else on the row is a number
+      or a tag, so the name is the only cell you look for.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .tbl{min-width:520px}
+.app[data-portal="leader"] .tbl td:first-child{font-weight:600}
+
+/* THE RULES STEP DOWN ONTO THE PANEL. `.tbl` was written for the transcript,
+   which sits on the white canvas, so its row rule is `--border-subtle-01` and
+   its header rule is `--border-strong-01`. Put that table on `--surface-2` and
+   both are darker than every other hairline on the panel — §12 steps `.kv`,
+   `.ch`, `.mem` and the rest down to `--rule-on-2` for exactly this reason and
+   never met a table. Seven rows of a rule that is too dark reads as a grid
+   drawn over the data rather than as separators under it.
+
+   ONE rule stays strong-ish: the one under the column headers, because it is
+   the only line in the block doing structural work — it says where the labels
+   stop and the data starts. It takes `--rule`, a step lighter than
+   `--border-strong-01` and still clearly the heaviest line in the table. */
+.app[data-portal="leader"] .sec.tint .tbl th{border-bottom-color:var(--rule)}
+.app[data-portal="leader"] .sec.tint .tbl td{border-bottom-color:var(--rule-on-2)}
+
+/* --------------------------------------------------------------------------
+   SEVERITY IS RED AND ORANGE, AS INK
+
+   The flag was a `.tag` — a filled pill — in a block whose problem was already
+   too many boxes: a plate per row, inside a bordered panel, over a ruled grid.
+   §12 also strips a tag's fill on a panel, so restoring it meant arguing with
+   that rule for the sake of drawing another container.
+
+   It is ink instead. Two hues carry the whole reading — red for severe (never
+   signed in, inactive a week, fifteen points behind), orange for moderate
+   (slowing, struggling, five points behind) — with a 7px square in the same
+   hue leading the phrase so the distinction survives for anyone who does not
+   separate the two colours. Fewer boxes AND a stronger signal, which is the
+   trade the tag was getting backwards.
+
+   THE INKS ARE THE ONES TUNED AS INK. `--support-error` and
+   `--support-warning` are fills and fail as text on this ground; foundation
+   provides `--danger-ink` (5.5:1 on both grounds) and `--support-attention`
+   (4.9:1 on the panel) for precisely this, and says so where they are declared.
+   -------------------------------------------------------------------------- */
+/* THE MARK IS THE CAUSE, DRAWN IN THE SEVERITY'S HUE. It was an abstract
+   square, which carried the colour and nothing else — a second copy of what the
+   word next to it already said. Each flag now names its own icon in `lflag()`:
+   a struck circle for never signed in, a clock for gone quiet, a chart for
+   struggling, a trend for behind pace. The glyph says WHY, the hue says HOW
+   BAD, and the phrase confirms both.
+
+   THE NAME STAYS BLACK. Colouring it as well put the row's hue on the one cell
+   that is not a reading — a person is not severe, their progress is — and a
+   column of red names turns a queue into a list of people in trouble rather
+   than a list of things to look at. Severity belongs to the flag column only.
+   Names are `--text-primary` like every other name in the product. */
+.app[data-portal="leader"] .tbl-flag .flag-t{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  font-weight:600;letter-spacing:.1px;white-space:nowrap}
+.app[data-portal="leader"] .tbl-flag .flag-t svg{
+  width:16px;height:16px;flex:none;fill:currentColor}
+.app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink)}
+.app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention)}
+
+/* every row keeps its rule, including the last: with rows hidden by the filter
+   there is no way to say "the last VISIBLE row" in CSS, and a table whose
+   bottom rule appears and disappears as you type reads as a rendering fault */
+.app[data-portal="leader"] .tbl-flag tr td{border-bottom:1px solid var(--rule-on-2)}
+.app[data-portal="leader"] .tbl-flag tr.is-off{display:none}
+
+/* --------------------------------------------------------------------------
+   THE QUEUE'S TWO CONTROLS
+   Search and severity, on one line above the table: the field takes the space
+   because a name is what you usually arrive knowing, and the three chips sit at
+   the end where a tab strip sits everywhere else in this product. Under 700 the
+   two stack — a 200px search field and three chips on one phone row is neither.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .lead-tools{
+  display:flex;flex-direction:column;gap:var(--s04);
+  padding:0 var(--pad-x) var(--s05)}
+.app[data-portal="leader"] .lead-srch{flex:1;min-width:0;max-width:420px}
+.app[data-portal="leader"] .lead-filter{margin:0;flex:none}
+/* `.cs button:first-child` zeroes its left padding to sit a heading's strip on
+   the spine. This strip is not on the spine — it is at the end of a row — so
+   the first chip pays the same padding as the other two or it reads as clipped. */
+.app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s04)}
+.app[data-portal="leader"] .lead-filter .lf-n{
+  margin-left:var(--s03);font-variant-numeric:tabular-nums;
+  color:var(--text-helper);font-weight:400}
+.app[data-portal="leader"] .lead-filter button.on .lf-n{color:var(--text-secondary)}
+.app[data-portal="leader"] .lead-none{padding:var(--s08) 0}
+@container app (min-width:700px){
+  .app[data-portal="leader"] .lead-tools{
+    flex-direction:row;align-items:flex-end;justify-content:space-between;
+    gap:var(--s06)}
+}
+
+/* --------------------------------------------------------------------------
+   THE FIGURE CELLS SAY WHAT KIND OF NUMBER THEY ARE
+
+   §29 gives the four cells four hues BY POSITION, which says "these are
+   different measurements" and nothing more — right for the candidate's
+   transcript, where all four are neutral facts about their own course. Two of
+   the leader's four are not neutral: Attention and Waiting on you are demands
+   on them, and a leader glancing at this band needs to know which two those
+   are before reading a word.
+
+   So the hue carries MEANING here, not position: neutral for the two that are
+   just counts, red for the queue of people falling behind, orange for the work
+   waiting on a signature. `--mk` is the variable §29 reads for both the wash
+   and the glyph, so setting it is the whole change; the figure takes the same
+   hue on the two that are demands, and stays ink on the two that are not.
+
+   COUPLED TO THE CALL ORDER in `V.leadDash`, by `nth-child`, exactly as §29's
+   own four hues are. The four `statCell` calls are adjacent in one place and
+   commented there; if a fifth is added, this block is the other half of it.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(1){--mk:var(--gray-70)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(2){--mk:var(--danger-ink)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3){--mk:var(--support-attention)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(4){--mk:var(--gray-70)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(2) .n,
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3) .n{color:var(--mk)}
+
+/* --------------------------------------------------------------------------
+   YOUR STANDING IS A FACT BAND
+   It was five `.kv` rows inside a tile, which put a two-column list inside the
+   desktop label column: the heading floated in a 184px gutter, the labels took
+   a third of what was left, and the values sat against a half-empty row. Five
+   figures side by side is what `.facts` is — the same bordered band the
+   interview page uses — and §10's opt-out below lets it own the full width.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .stand-rate{display:flex;align-items:center;gap:var(--s03)}
+.app[data-portal="leader"] .stand-rate .stars svg{width:13px;height:13px}
+
+/* --------------------------------------------------------------------------
+   THE FACE IN A ROW'S LEADING SLOT
+   `.gcard` sizes its leading slot as `.cardrow-ic`, a 40px plate. `mem()`'s
+   slot is a 36px photo with no plate at all, and `faceRow` uses that one — so
+   the row needs to be told not to expect the plate's box.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .face-row > .mem-av{
+  width:36px;height:36px;flex:none;position:relative;overflow:hidden;
+  background-color:var(--gray-80)}
+
+/* --------------------------------------------------------------------------
+   3. THE STANDING CARD'S STARS
+   `stars()` draws for a page where a rating is the headline — an agent's
+   profile card. In a `.kv` row it is one value among five, so it comes down to
+   the size of the text it shares the line with.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .kv .stars{margin-right:var(--s02)}
+.app[data-portal="leader"] .kv .stars svg{width:14px;height:14px}
+.app[data-portal="leader"] .kv .v{display:flex;align-items:center}
+
+/* --------------------------------------------------------------------------
+   AND THE TWO BANDS THIS PORTAL ADDS OWN THEIR FULL WIDTH
+
+   §10.15 lists the sections that opt out of the desktop label column, and says
+   there rather than here that the list is where it is decided — but that block
+   sits inside a container query, and per the §25 trap a container-query rule
+   outranks an unconditional one of equal weight whatever the layer number. So
+   the two members added for this portal are added THERE, in §10, not restated
+   here. This note exists so the next reader looking for them in this file
+   knows where they went: `.sec:has(> .tbl-wrap)` and `.sec:has(> .facts)`.
+   -------------------------------------------------------------------------- */
+
+/* ==========================================================================
+   4. THE FIGURE BAND IS ALSO THE PAGE'S POSITION INDICATOR
+
+   Four cards, four sections, one bar that sticks to the top of the scroller
+   while you read past them. lead.js has the reasoning for the mechanism and
+   for why the sticky element is the section rather than the grid inside it;
+   this layer draws the three states.
+
+     resting   a band in the page's measure, like any other
+     stuck     chrome: full width to the frame edge, a shadow under it, and
+               the card whose section you are in marked
+     gone      once "Your standing" reaches it, lifted out by transform —
+               never by `display`, which would take its flow box with it
+   ========================================================================== */
+/* THE BAND DOES NOT MAKE AN ENTRANCE — TRAP 2, EXACTLY AS WRITTEN.
+   §13.1 animates every `.page > .sec` with `mo-rise` at `fill-mode:both`, so a
+   played animation's last keyframe keeps applying: the band was left holding
+   `translateY(10px)` for good. A sticky element is offset by its own transform,
+   so `top:0` pinned it ten pixels below the scroller's edge — a visible gap
+   above it, and `leadStick()`'s "has it reached the top" test could never come
+   out true, which is why the bar looked stuck and never behaved as if it were.
+
+   It is also the right call on its own terms. §13.1's own note says the app bar
+   and the drawer "are the frame, not the page: they fade once and hold still" —
+   this band is frame the moment it sticks, and a position indicator that slides
+   up into place is claiming to be something you read rather than something you
+   steer with. The selector carries `[data-enter]` so it outweighs §13.1's. */
+.app[data-enter][data-portal="leader"] .page > .lead-bar{animation:none}
+
+.app[data-portal="leader"] .lead-bar{
+  position:sticky;top:0;z-index:20;
+  background-color:var(--background);
+  /* the resting band has no shadow, so the transition has something to run
+     from — a shadow that appears from nothing on the first scroll pixel reads
+     as the bar being drawn, not as it lifting */
+  box-shadow:0 0 0 0 rgba(17,17,17,0);
+  transition:box-shadow var(--dur-short) var(--ease-standard),
+             margin var(--dur-short) var(--ease-standard),
+             transform var(--dur-standard) var(--ease-standard),
+             visibility var(--dur-standard)}
+
+/* --------------------------------------------------------------------------
+   STUCK, IT IS A TAB STRIP — THE ONE THIS PRODUCT ALREADY HAS
+
+   The first attempt kept the figure cells and squeezed them. It could not work,
+   and the reason is worth writing down: `.stats` is a four-column grid of
+   `minmax(0,1fr)`, and paying the bleed back as padding on the outer cells
+   charged that grid 360px of padding it had to find inside its own width. The
+   cells collapsed to nothing and the figures set one character per line, over
+   the `--rule` ground the grid uses for its own gaps. A resting card and a
+   40px-tall bar are not the same object at two sizes.
+
+   They are two objects, and the second one already exists. §15's `.cs` is the
+   product's tab strip — segmented cells on the panel tone, hairline separators,
+   the live one lifted onto the canvas with the accent inset under it — and a
+   stuck bar naming four sections of the page IS a tab strip. So the bar carries
+   both renderings and swaps them: the cards while it sits in the page, the tabs
+   once it becomes chrome. Reused verbatim, class for class, so the leader's
+   sections and the candidate's cohort tabs are selected the same way.
+
+   FULL WIDTH MEANS FULL WIDTH OF THE CONTENT COLUMN, NOT OF THE FRAME. An
+   earlier version measured `.main`'s side padding and pulled the bar out over
+   it by that much, so the strip ran under the rail and past the right edge of
+   everything it was labelling — chrome floating over the page rather than the
+   top of it. The bar belongs in the column: it spans exactly what the resting
+   card row spans, which `.cs` already does for itself (§15 pulls `--pad-x` on
+   a strip inside a section, the same bleed §10.16 gives the figure grid).
+   Nothing here has to say so, which is why nothing here does.
+
+   AND IT IS TIGHT WHEN IT STICKS. `.sec` carries `var(--s06)` top and bottom —
+   right for a band of cards with page above and below it, and it was the white
+   strip hanging under the stuck strip. Stuck, the bar IS the strip.
+   -------------------------------------------------------------------------- */
+/* THE STRIP IS ITS OWN ROW, AND THAT IS NOT A COMPROMISE — IT IS THE ONLY WAY.
+
+   The first three versions had one sticky section that swapped the cards for the
+   strip. Every one of them jumped the page, and the reason is structural: a
+   sticky element still occupies its flow box, so shrinking that box from a
+   four-card band to a one-line strip pulls every section below it up by the
+   difference — seventy-three pixels, at the exact moment of sticking, which is
+   the moment you are reading. Compensating for it by nudging `scrollTop` means
+   fighting the scroll you are responding to.
+
+   So the cards and the strip are two rows. The cards are a normal band and never
+   move; the strip below them is 50px in every state, sticks at the top, and
+   because its height never changes there is nothing to jump. It also means the
+   tabs are usable before you have scrolled at all, which the swap could not do.
+
+   `padding:0` here is not a state change — it is this row's only height, held in
+   both states, so it costs nothing. */
+.app[data-portal="leader"] .lead-bar{
+  padding-top:0;padding-bottom:0;
+  border-top:0}
+.app[data-portal="leader"] .lead-bar.is-stuck{
+  box-shadow:0 6px 16px -12px rgba(17,17,17,.3)}
+.app[data-portal="leader"] .lead-bar > .lead-tabs{margin-bottom:0}
+
+/* --------------------------------------------------------------------------
+   THE FOUR TABS SHARE THE WIDTH, AND THE ROW IS CLOSED ON BOTH SIDES
+
+   `.cs` is built for a strip of two or three labels sitting left in a section,
+   so its buttons are `flex:none` and it ends wherever the last one does. Here
+   the strip is standing in for a band of four equal cells — it is the same four
+   things at the same four widths, and a reader glancing up from the page should
+   find each tab where its card was. So the tabs share the row in quarters.
+
+   AND THE ROW GETS ITS SIDE EDGES. §15 draws a strip closed top and bottom with
+   a `border-right` on each cell as the separator, which leaves the run open at
+   both ends — right for a strip that trails off into the page, wrong for a bar
+   that is a band. The left edge comes from the strip, the right edge takes the
+   last cell's separator, and the four cells are boxed like the cards they stand
+   in for.
+
+   ONLY FROM 700, which is where §10 takes the figure grid from two columns to
+   four. Below it "Waiting on you" cannot hold a quarter of a phone, and the
+   strip goes back to being what `.cs` is — auto-width cells that scroll. */
+@container app (min-width:700px){
+  .app[data-portal="leader"] .lead-tabs{
+    border-left:1px solid var(--rule);border-right:1px solid var(--rule);
+    overflow-x:hidden}
+  .app[data-portal="leader"] .lead-tabs button{
+    flex:1 1 0;min-width:0;
+    display:flex;align-items:center;justify-content:center;
+    padding-left:var(--s04);padding-right:var(--s04)}
+  .app[data-portal="leader"] .lead-tabs button:last-child{border-right:0}
+}
+
+/* WHERE A JUMP STOPS. A sticky strip covers the top of whatever you scroll to,
+   and `scroll-margin-top` is the one thing in CSS that knows it: the four
+   sections keep the strip's height clear plus a line of air, and
+   `scrollIntoView` in lead.js does the rest.
+
+   It could only ever work once the strip stopped changing height. While the bar
+   swapped between a card band and a strip, the flow moved underneath the scroll
+   as it landed, so no fixed margin could be right — the two fixes are the same
+   fix, and this is the half of it that CSS owns.
+
+   The value is the strip's own height stated in its parts — §15 gives the tab
+   buttons a 48px minimum and the strip a rule top and bottom — so if the tab
+   grows, this follows it. `--s04` is the air, so the heading you jumped to is
+   not welded to the strip that took you there. */
+.app[data-portal="leader"] .page > .sec[id^="lead-"]{
+  scroll-margin-top:calc(48px + 2px + var(--s05))}
+/* the count rides the label, in the tone the filter chips use for theirs —
+   one way of putting a number in a tab, not two */
+.app[data-portal="leader"] .lead-tabs .lf-n{
+  margin-left:var(--s03);font-variant-numeric:tabular-nums;
+  color:var(--text-helper);font-weight:400}
+.app[data-portal="leader"] .lead-tabs button.on .lf-n{color:var(--text-secondary)}
+
+/* GONE */
+.app[data-portal="leader"] .lead-bar.is-gone{
+  transform:translateY(-100%);visibility:hidden;pointer-events:none;
+  box-shadow:none}
+
+/* --------------------------------------------------------------------------
+   A FIGURE CELL YOU CAN PRESS — AND IT LOOKS EXACTLY LIKE ONE YOU CANNOT
+
+   `statCell` emits a `<button>` when it is given a jump target, so the cell
+   needs a button's own defaults undone: a browser's alignment, background and
+   font would each fight §29's grid, and its border would put a fifth edge on a
+   cell that already sits inside three.
+
+   NOTHING ELSE CHANGES. An earlier version marked the live section here too —
+   a 2px bar along the cell's top edge and a tint on its ground — which made the
+   resting band a different object from the figure bands on every other page in
+   the product, for information that is only useful once the band has stuck and
+   become the tab strip. Selection belongs to the tabs. These are cards.
+
+   The pointer state stays, and it is the one difference the cell earns: these
+   four are the only figure cells in the product that do something, and without
+   it nothing on the resting card says so. It is `build.py`'s `HOVER_KEEP` that
+   lets it survive, and the note there says the same. */
+/* `background:none` HERE IS WHAT TURNED THE CARDS TAUPE. `.stats` is a grid
+   whose 1px gaps are drawn by giving the CONTAINER `--rule` as a background and
+   every cell `--background` on top of it (§10.16) — so a cell with no
+   background of its own is a hole, and what shows through it is the rule
+   colour, four cells wide. The button reset has to name the cell's own ground
+   rather than clear it. Same value §10 gives the `<div>` version, so a pressable
+   cell and a read-only one are the same white. */
+.app[data-portal="leader"] .stat-jump{
+  -webkit-appearance:none;appearance:none;border:0;
+  background-color:var(--background);
+  font:inherit;color:inherit;text-align:left;width:100%;
+  position:relative;cursor:pointer;
+  transition:background-color var(--dur-short) var(--ease-standard)}
+/* WEIGHT, NOT OPACITY — §13.2. The band's entrance animation runs with
+   fill-mode:both, so a played keyframe keeps applying and an opacity set here
+   would be overwritten by it. `color-mix` on the ground survives. */
+.app[data-portal="leader"] .stat-jump:hover{
+  background-color:color-mix(in srgb, var(--mk, var(--text-primary)) 4%, var(--background))}
+.app[data-portal="leader"] .stat-jump:focus-visible{
+  outline:2px solid var(--text-primary);outline-offset:-2px}
+
+/* --------------------------------------------------------------------------
+   5. THE BOOKED LIST
+   A row is a date, who you are meeting, what it is, and the one thing you do.
+   The date chip is `.day` — the same chip the candidate's slot picker uses —
+   so the leader's diary and the candidate's booking flow draw a date the same
+   way. It is not a control here, so it loses the pointer and keeps the box.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .bk-day{
+  align-self:flex-start;min-width:82px;cursor:default;
+  border-color:var(--rule-on-2)}
+.app[data-portal="leader"] .bk-day .n{font-size:15px;line-height:21px}
+.app[data-portal="leader"] .bk-row{gap:var(--s05)}
+.app[data-portal="leader"] .bk-row > .mem-av{
+  width:36px;height:36px;flex:none;position:relative;overflow:hidden;
+  background-color:var(--gray-80)}
+/* the group mark on a cohort call sits in the same 36px the face does, or the
+   two kinds of row disagree about where their text starts */
+.app[data-portal="leader"] .bk-row > .cardrow-ic{width:36px;height:36px}
+.app[data-portal="leader"] .bk-row > .cardrow-ic svg{width:20px;height:20px}
+@container app (max-width:599.98px){
+  /* the phone drops the mark rather than the date: which day it is is the
+     thing you scan a diary for, and the face is a nicety next to it */
+  .app[data-portal="leader"] .bk-row > .mem-av,
+  .app[data-portal="leader"] .bk-row > .cardrow-ic{display:none}
+  .app[data-portal="leader"] .bk-day{min-width:74px}
+}

@@ -1,0 +1,116 @@
+/* ==========================================================================
+   39. MEASURE
+   A linear layout with no cards has nothing to stop a line of prose running
+   the full width of a desktop screen. The column is capped instead.
+   ========================================================================== */
+:root{--content-max:880px;--measure:68ch}
+.ph .lead,.tile > p,.ai-body,.acc-b,.note .nb,.lead,.sec > p{max-width:var(--measure)}
+
+/* ==========================================================================
+   40. LEVEL HERO
+   The markup names are .eb (eyebrow), .big (level name) and .sub.
+   ========================================================================== */
+.lvl-hero .eb{
+  display:block;font-size:11.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark-2)}
+.lvl-hero .big{
+  display:block;margin-top:var(--s03);
+  font-size:36px;line-height:42px;font-weight:600;letter-spacing:-1px;color:var(--on-dark)}
+.lvl-hero .sub{margin-top:var(--s02);color:var(--on-dark-2)}
+.lvl-hero .chev-track{margin-top:var(--s06)}
+.lvl-hero .chev-row{border-bottom-color:var(--on-dark-rule)}
+.lvl-hero .chev-n{color:var(--on-dark)}
+.lvl-hero .chev-d{color:var(--on-dark-2)}
+.lvl-hero .chev-mark svg{fill:var(--on-dark-dim)}
+.lvl-hero .chev-row.on .chev-mark svg,.lvl-hero .chev-row.past .chev-mark svg{fill:var(--accent)}
+.lvl-hero .chev-row.past .chev-mark svg{opacity:.5}
+.lvl-hero .bands-note{color:var(--on-dark-2)}
+@container app (min-width:900px){.lvl-hero .big{font-size:48px;line-height:54px;letter-spacing:-1.4px}}
+
+/* the ladder: 15 rungs, filled to the candidate's own rung */
+.ladder{display:flex;align-items:stretch;gap:3px;height:44px;margin-top:var(--s06)}
+.ladder i{flex:1;min-width:0;height:100%;background:var(--on-dark-rule)}
+.ladder i.done{background:var(--accent);opacity:.55}
+.ladder i.on{background:var(--accent);opacity:1}
+.lvl-hero .ladder-lab{color:var(--on-dark-2)}
+.ladder-lab{display:flex;justify-content:space-between;margin-top:var(--s03);
+  font-size:11.5px;letter-spacing:.2px;color:var(--text-helper)}
+
+/* ==========================================================================
+   41. NO CARDS — the last box in the build
+   `.tile.bordered` was a full-outline card. A single left rule does the same
+   grouping work without drawing a container.
+   ========================================================================== */
+.tile.bordered{
+  border:0;border-left:3px solid var(--border-subtle-02);
+  padding:var(--s04) 0 var(--s04) var(--s05);background:transparent}
+.tile.bordered .ai-head h3{font-size:16px;line-height:22px}
+
+/* ==========================================================================
+   42. CHAPTER ROWS
+   ========================================================================== */
+.ch.done .ch-num{background:var(--accent);color:var(--on-accent)}
+.ch.open .ch-num{background:var(--brand-primary);color:var(--on-brand)}
+.ch-ic{background:transparent;width:24px;height:24px;margin-left:var(--s04)}
+.ch-ic span{display:grid;place-items:center}
+.ch-ic svg{width:22px;height:22px}
+.ch-m{display:flex!important;align-items:center;flex-wrap:wrap;gap:var(--s02) var(--s03)}
+/* .sep is a rule elsewhere; inside a meta line it is a middot */
+.ch-m .sep,.ag-m .sep,.nrow-d .sep{
+  height:auto;width:auto;background:transparent;margin:0;color:var(--text-placeholder)}
+.ai-inline .sk{width:8px;height:8px;background:var(--accent);animation:none;display:block}
+.ai-inline{height:auto;padding:0;gap:var(--s02)}
+
+/* ==========================================================================
+   43. CHARTS — header, readout, reference label, table toggle
+   ========================================================================== */
+.chart{margin-top:var(--s05);max-width:720px}
+.chart-head{display:block;margin-bottom:var(--s05)}
+.chart-head .t{display:block;font-size:16px;line-height:22px;font-weight:600;letter-spacing:-.1px}
+.chart-head .s{display:block;margin-top:2px;font-size:12.5px;letter-spacing:.2px;
+  color:var(--text-secondary)}
+.chart-read{
+  display:flex;align-items:baseline;gap:var(--s03);margin:var(--s04) 0 0;
+  font-size:12.5px;color:var(--text-secondary)}
+.chart-read .k{color:var(--text-helper)}
+.chart-read .v{font-weight:600;color:var(--text-primary);font-variant-numeric:tabular-nums}
+.chart-ref{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--gray-50);
+  pointer-events:none;z-index:2}
+.chart-ref > span{
+  position:absolute;right:0;top:-9px;padding:0 var(--s02);
+  background:var(--background);
+  font-size:10.5px;letter-spacing:.2px;color:var(--text-helper);white-space:nowrap}
+.sec.tint .chart-ref > span,.sec.warm .chart-ref > span{background:var(--layer-02)}
+.chart-x span{font-size:10.5px}
+/* table view is a toggle, not a permanent second copy of the data */
+.chart-table{display:none;margin-top:var(--s05)}
+.chart.tbl .chart-table{display:block}
+.chart.tbl .sc-plot,.chart.tbl .chart-plot,.chart.tbl .chart-line,
+.chart.tbl .chart-x,.chart.tbl .legend,.chart.tbl .chart-read{display:none}
+.chart-table .kv{font-size:12.5px}
+.chart-table .kv .v{font-weight:400;color:var(--text-secondary);text-align:right}
+
+/* ==========================================================================
+   44. SPACING AND OVERFLOW
+   ========================================================================== */
+.pb-top{margin-bottom:var(--s06)}
+.page{padding-bottom:var(--s12)}          /* clears the floating Tal button */
+.main{scrollbar-gutter:stable}
+/* nothing may exceed the frame */
+.app,.main,.page,.sec{max-width:100%}
+.tbl-wrap,.sec{overflow-wrap:break-word}
+.sc-plot,.chart-plot{overflow:visible}
+
+/* ==========================================================================
+   45. DESKTOP DENSITY
+   Material's list rows tighten one step at desktop, where the pointer is
+   precise and the vertical budget is smaller.
+   ========================================================================== */
+@container app (min-width:900px){
+  .tile.clk,.gcard,.ag,.ch,.cardrow,.mem,.nrow{min-height:60px}
+  .ch{padding-top:var(--s03);padding-bottom:var(--s03)}
+  .btn{min-height:44px}
+  .tal-panel{left:auto;width:min(480px,100%);border-left:1px solid var(--border-subtle-01)}
+  .notif{max-width:400px}
+  .sec-h h2{font-size:18px;line-height:24px}
+}

@@ -1,0 +1,534 @@
+/* ==========================================================================
+   24. THE DASHBOARD, AND THE CONTROLS ON IT
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   A QUESTION LOOKS LIKE A QUESTION
+   §12 made the suggestions inside a Tal card a LIST — full width, a rule
+   between each, no box — on the argument that three stacked pills were
+   three boxes doing the work of one list. That held while a chip was an
+   outlined pill. It does not hold now that a chip has a fill of its own:
+   the fill is what says "this is a thing you can ask", and a full-width
+   ruled row says the opposite. They are chips again, and they size to their
+   own words.
+   ------------------------------------------------------------------------ */
+.app .ai-asks,.app .bub .sugg{
+  flex-direction:row;flex-wrap:wrap;align-items:center;
+  gap:var(--s03);margin-top:var(--s05)}
+.app .ai-asks .chip-tal,.app .bub .chip-tal{
+  border:1px solid var(--rule);border-radius:0;
+  width:auto;min-height:34px;padding:0 var(--s04);
+  justify-content:flex-start;
+  background-color:var(--tal-chip-1);
+  background-image:radial-gradient(346px 217px at calc(100% - 8px) 274%,
+    var(--tal-chip-2) 0%, transparent 100%);
+  font-size:13.5px;line-height:19px;font-weight:400}
+
+/* the Tal card's footer rule went with the link it was separating */
+.app .ai-foot.noline{border-top:0;padding-top:0;margin-top:var(--s04)}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE ASK NEEDS NO RULE UNDER IT
+   It is one control, not a section. The block below introduces itself.
+   ------------------------------------------------------------------------ */
+.app .page > .sec.ask-sec::after{display:none}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE AGENT CARD
+   Fee beside the name, because it is a fact about the agent. The foot holds
+   the two things you can do with one: ask about them, or book them.
+   ------------------------------------------------------------------------ */
+.app .agh-book{cursor:default}
+.app .agh-book .agh-n{
+  display:flex;align-items:baseline;gap:var(--s04);justify-content:space-between}
+.app .agh-book .agh-n .ag-price{
+  margin-left:auto;font-size:14px;line-height:19px;font-weight:600;
+  letter-spacing:-.02px;color:var(--text-primary);white-space:nowrap}
+.app .agh-book .agh-f{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s04);flex-wrap:wrap}
+.app .agh-book .agh-act{display:flex;align-items:center;gap:var(--s03);flex:none}
+.app .agh-book .btn-sm{min-height:36px;padding:0 var(--s05)}
+
+/* ASK TAL OPENS ON HOVER. Collapsed it is the mark and nothing else, which
+   is all the room a card of this width has. The label is not hidden with
+   `display` — it animates from zero width, so the button grows into the
+   words rather than jumping to a new size. */
+.app .agh-book .tal-star{
+  position:static;display:inline-flex;align-items:center;gap:0;
+  height:36px;padding:0 var(--s03);flex:none;
+  border:1px solid var(--rule);background:transparent;
+  opacity:1;transform:none;
+  transition:gap var(--dur-short) var(--ease-standard),
+             padding var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard)}
+.app .agh-book .tal-star .sk-mark{
+  width:14px;height:14px;flex:none;order:-1;background-color:var(--accent)}
+.app .agh-book .tal-star .lbl{
+  display:block;overflow:hidden;white-space:nowrap;max-width:0;
+  font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px;
+  color:var(--text-primary);
+  transition:max-width var(--dur-standard) var(--ease-standard)}
+.app .agh-book .tal-star:hover,
+.app .agh-book .tal-star:focus-visible{
+  gap:var(--s02);padding:0 var(--s04)}
+.app .agh-book .tal-star:hover .lbl,
+.app .agh-book .tal-star:focus-visible .lbl{max-width:80px}
+
+/* ------------------------------------------------------------------ 4 ---
+   THE STEPPER IS A GLANCE
+   Heading, meter and toggle on one line. The meter takes the width four
+   segments need to read as four segments and not a pixel more — a
+   full-width bar gave a four-step indicator the weight of a chart.
+   ------------------------------------------------------------------------ */
+.app .sec-stp{padding-top:var(--s06)}
+.app .stp-top{
+  display:flex;align-items:center;gap:var(--s05);
+  margin-bottom:var(--s05)}
+.app .stp-top h2{margin:0;flex:none}
+.app .stp-top .stp-t{margin-left:auto;flex:none}
+.app .stp-meter{display:flex;align-items:center;gap:var(--s04);flex:none}
+.app .stp-titled .stp-rail{
+  display:flex;gap:3px;width:120px;flex:none;margin:0}
+.app .stp-titled .stp-rail i{flex:1 1 0;height:4px;min-width:0}
+.app .stp-titled .stp-c{white-space:nowrap;margin:0}
+.app .stp-titled .stp-now{margin-top:0}
+
+@container app (max-width:599px){
+  .app .stp-top{flex-wrap:wrap;gap:var(--s03)}
+  .app .stp-top .stp-t{margin-left:auto}
+  .app .stp-meter{order:3;width:100%}
+  .app .stp-titled .stp-rail{width:96px}
+}
+
+/* ------------------------------------------------------------------ 5 ---
+   DECIDED SO FAR
+   No rule under the heading — the rows underneath are the section, not a
+   second one. And the icon sits at the top of the row it belongs to, beside
+   the label rather than floating against the middle of three lines.
+   ------------------------------------------------------------------------ */
+.app .page .sec:has(> .tile-stack) > .sec-h{border-bottom:0}
+.app .page .sec:has(> .tile-stack) > .sec-h::after{display:none}
+.app .page .tile-stack > .tile.clk:first-child::before,
+.app .page .tile-stack::before{display:none;content:none}
+
+.app .cardrow-ic,.app .gcard .cardrow-ic{
+  align-self:flex-start;margin-top:2px;
+  /* Figma 287:186 — the same two layers the Tal chip carries: a warm ground
+     and a cool pool in from the corner. */
+  background-color:var(--tal-chip-1);
+  background-image:radial-gradient(120px 90px at calc(100% - 4px) 190%,
+    var(--tal-chip-2) 0%, transparent 100%);
+  border:1px solid var(--rule)}
+
+/* ------------------------------------------------------------------ 6 ---
+   A HEADING ROW HOLDS ITS CONTROL
+   `.sec-h` was built for a heading and a text link, and a button in it
+   wrapped to its own line. It is a row: title left, control right, and
+   whatever the section says about itself underneath.
+   ------------------------------------------------------------------------ */
+.app .page .sec-h{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:nowrap}
+.app .page .sec-h > h2{flex:1 1 auto;min-width:0;margin:0}
+.app .page .sec-h > .btn,.app .page .sec-h > a{flex:none;margin-left:auto}
+.app .page .sec-h > .btn.btn-sm{min-height:36px;padding:0 var(--s05)}
+
+/* ------------------------------------------------------------------ 7 ---
+   ASK COMES BEFORE BOOK
+   You ask about a person before you commit to them, and the order of the
+   two controls should say so.
+   ------------------------------------------------------------------------ */
+.app .agh-book .agh-act .tal-star{order:0}
+.app .agh-book .agh-act .btn{order:1}
+
+/* ------------------------------------------------------------------ 8 ---
+   NO RULE UNDER A SECTION HEADING
+   A list under a heading is that heading's list. The rule between the
+   heading and its first row said they were two things.
+   ------------------------------------------------------------------------ */
+.app .page .tile-stack > .tile:first-child,
+.app .page .tile-stack > .gcard:first-child,
+.app .page .tile-stack > .ch:first-child,
+.app .page .tile-stack > .cardrow:first-child,
+.app .page .sec > .tile-stack{border-top:0}
+.app .page .tile-stack > :first-child::before{content:none;display:none}
+
+/* ------------------------------------------------------------------ 9 ---
+   THE TAL CARD IS A COLUMN BESIDE ITS MARK
+   The chip was sitting on the same left edge as the paragraph under it,
+   which made the mark look like a stray tag rather than the thing speaking.
+   It behaves like an avatar: it holds column one, and everything Tal says —
+   the heading, the sentence, the questions, the action — lines up in column
+   two under the heading. `display:contents` on the head lets its two
+   children join the card's grid without a wrapper deciding for them.
+   ------------------------------------------------------------------------ */
+.app .ai-aura{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  column-gap:var(--s04);align-items:start}
+.app .ai-aura > .ai-head{display:contents}
+.app .ai-aura > .ai-head > .ai-label{grid-column:1;grid-row:1;align-self:center}
+.app .ai-aura > .ai-head > h3{grid-column:2;grid-row:1;align-self:center;margin:0}
+.app .ai-aura > .ai-body,
+.app .ai-aura > .ai-asks,
+.app .ai-aura > .ai-foot,
+.app .ai-aura > .ai-src{grid-column:2}
+.app .ai-aura > .ai-body{margin-top:var(--s04)}
+/* WHAT TAL SAYS, THEN WHAT YOU DO, THEN WHAT YOU MIGHT ASK. The suggestions
+   are injected after the fact by the Tal pass, so source order puts them
+   last; the reading order is the one stated here. */
+.app .ai-aura > .ai-head > .ai-label,
+.app .ai-aura > .ai-head > h3{order:0}
+.app .ai-aura > .ai-body{order:1}
+.app .ai-aura > .ai-foot{order:2}
+.app .ai-aura > .ai-asks{order:3}
+
+/* IF TAL SUGGESTS SOMETHING, TAL OFFERS THE BUTTON FOR IT. A card that says
+   "book your interview" and then leaves you to find the way is a card that
+   has told you about your own to-do list. */
+.app .ai-foot{display:flex;align-items:center;gap:var(--s04)}
+.app .ai-foot .ai-do{
+  flex:none;min-height:36px;padding:0 var(--s05);
+  /* Tal's own action wears the brand at rest. The black primary is the
+     page's action; this one is the assistant's, and the difference is the
+     point of having both. */
+  background-color:var(--accent);background-image:var(--accent-grad);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+.app .ai-foot .sp{margin-left:auto}
+
+/* ----------------------------------------------------------------- 10 ---
+   THE QUESTIONS BELONG TO THE FIELD
+   A suggested question and the field you would type one into are the same
+   offer made twice. They close the gap between them, and the rule that
+   ends the block stands off the field rather than sitting on it.
+   ------------------------------------------------------------------------ */
+.app .page > .sec:has(> .ai-aura){padding-bottom:var(--s03)}
+.app .page > .sec.ask-sec{padding-top:var(--s03);padding-bottom:var(--s06)}
+.app .page > .sec.ask-sec::after{display:block}
+
+/* ----------------------------------------------------------------- 11 ---
+   THE AGENT CARD, FINISHED
+   Everything about the person is one column beside the photograph — name,
+   rating, and what they assess. The fee is a fact about them too, so it
+   sits on the name's line, at a size that says it is a number you are
+   deciding on. The foot is the two actions, ending on the same right edge
+   the fee does.
+   ------------------------------------------------------------------------ */
+/* The card already carries a five-area grid from §15 — `av name rate meta
+   foot` across three columns — and that third column is what held the foot
+   16px short of the fee. This restates the grid at a reach that wins, in
+   two columns, with the whole identity block in the second. */
+.app .page .agh.agh-book{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'av id' '.  meta' 'foot foot';
+  column-gap:var(--s05);row-gap:var(--s03);align-items:start}
+.app .page .agh.agh-book > .av,.app .page .agh.agh-book > .av-ph{grid-area:av}
+.app .page .agh.agh-book > .agh-n{grid-area:id;margin:0}
+.app .page .agh.agh-book > .agh-r{grid-area:id;align-self:end;margin:0;padding-top:22px}
+.app .page .agh.agh-book > .agh-m{grid-area:meta;margin:0}
+.app .page .agh.agh-book > .agh-f{grid-area:foot;margin-top:var(--s05)}
+
+/* name and rating stack; the fee holds the right edge of the row */
+.app .agh-book .agh-n{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
+.app .agh-book .agh-n .ag-price{
+  grid-column:2;grid-row:1;
+  font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px;
+  color:var(--text-primary);white-space:nowrap}
+.app .page .agh.agh-book > .agh-n > .agh-r{grid-column:1}
+
+/* ASK TAL OPENS ON HOVER, IN THE BRAND'S COLOUR. The label is orange
+   because the mark is: together they are one object appearing, not a grey
+   word turning up next to a coloured icon. */
+/* THE WORD IS THE MARK'S COLOUR. "Ask Tal" was set in `--accent-text`, the
+   darkened cut that exists so orange can carry body copy at AA. Next to a
+   mark painted in the accent itself the two read as two different oranges
+   rather than as one object. Maryam asked for them to match, so they match.
+   THE COST, STATED: `--accent` on white is 2.8:1, under AA for a 13.5px
+   label. It is the second stated exception in the product, alongside white
+   on the brand gradient, and it is encoded in verify.mjs rather than left
+   to be discovered. `--accent-text` at 5.2:1 is one word away if the
+   ratio matters more than the match.
+   AND THEY SIT ON ONE LINE. A 14px mask centred in an 18px line box lands
+   on the box's centre; the word's optical centre is its cap height, about
+   a pixel higher. The mark takes that pixel back. */
+.app .agh-book .tal-star .lbl{color:var(--accent);--on-brand-ink:1}
+.app .agh-book .tal-star{align-items:center}
+
+/* ----------------------------------------------------------------- 12 ---
+   THE THREE CARDS PAY THE GUTTER
+   They were bleeding to the rails, which made them the only block on the
+   page that did. Inside the gutter they need their own left and right
+   edges — the outer rails are too far away to bound them — and they stay
+   joined to each other, because they are one choice offered three ways.
+   ------------------------------------------------------------------------ */
+.app .page > .rail-wrap{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.app .page > .rail-wrap > .rail{
+  border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
+
+/* ----------------------------------------------------------------- 13 ---
+   A ROW NEEDS ROOM
+   Two rows and a rule at 16 apiece read as one crowded block. 24 above and
+   below the rule gives each row its own space without either drifting away
+   from the heading they belong to.
+   ------------------------------------------------------------------------ */
+.app .page .tile-stack > .tile.clk,
+.app .page .tile-stack > .gcard{
+  padding-top:var(--s06);padding-bottom:var(--s06)}
+
+/* the foot spans the card and ends where the fee does */
+.app .agh-book .agh-f{
+  justify-self:stretch;width:auto;
+  margin-left:0;margin-right:0;padding-left:0;padding-right:0;
+  display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
+.app .agh-book .agh-act{margin-left:auto;flex:none}
+
+/* THE CORNER TICKS ARE NOT A COLUMN. `.bd` draws the four draw-in marks and
+   was auto-placed as a third grid track — zero wide, but with a 16px gap in
+   front of it, which is exactly the amount the foot was falling short of the
+   fee. It overlays the card instead of taking a place in it. */
+.app .agh-book > .bd{position:absolute;inset:0;pointer-events:none}
+.app .agh-book{position:relative}
+
+/* ==========================================================================
+   THE MARK LEADS THE VERB
+   `.btn:not(.noic)` throws the icon to the far right, which is right for a
+   button whose mark is a direction — a chevron on a row that navigates. It
+   is wrong for a button whose mark is the SUBJECT: a calendar on "Book your
+   interview" is not pointing anywhere, it is saying what kind of thing you
+   are about to do. Those read as one phrase, so they sit together at the
+   start of the box and the box ends where the words end.
+   ========================================================================== */
+.app .btn.ic-l{justify-content:flex-start;gap:var(--s03);
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .btn.btn-sm.ic-l{gap:var(--s02);padding-left:var(--s04);padding-right:var(--s04)}
+.app .btn.ic-l svg{flex:none;order:-1}
+
+/* ==========================================================================
+   A NOTE THAT ASKS FOR SOMETHING CARRIES THE CONTROL
+   The quiz note said "an interview sets your level" and the button that
+   books one sat in a separate block underneath, separated by a margin — so
+   the sentence and its answer read as two unrelated pieces of the page. The
+   control moves into the note. It is the same row as the claim, centred
+   against it, because it is what the claim is for.
+   ========================================================================== */
+.app .note.note-act{display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap}
+/* the note's own mark is semantic and stays blue; the mark inside a control
+   belongs to the control and takes its ink */
+.app .note.note-act .btn svg{fill:currentColor}
+.app .note.note-act > span:first-child{align-self:start;padding-top:1px}
+.app .note.note-act .nb{flex:1 1 260px}
+.app .note.note-act .note-cta{flex:none;align-self:center;margin-left:auto}
+
+/* ==========================================================================
+   AN ACCORDION HEAD PAYS THE PAGE'S GUTTER, NOT TWO
+   §33 gives `.acc-h` a `--gutter` of its own so the accordion works as a
+   standalone card, and §10 takes it back once the accordion is inside a
+   section that already pays the gutter. But §33's `.sec.flat .acc-h` — a
+   later, more specific restatement — put it straight back, so every
+   accordion title on a flat section sat one gutter in from the heading
+   above it. There is one gutter on this page and `.acc-i` already pays it.
+   ========================================================================== */
+.app .sec.flat .acc-h,.app .sec.flat .acc-b{padding-left:0;padding-right:0}
+
+/* ==========================================================================
+   A FILTER BELONGS TO THE HEADING IT FILTERS
+   Full width and stacked, the search field read as the next step in a form.
+   It is not a step. It sits on the heading row, at the width of a name —
+   which is what you type into it — and the list it filters starts directly
+   underneath. Below 900 there is no room for two things on a line, so it
+   goes back under the description, where stacked is the only option.
+   ========================================================================== */
+.app .hd-srch{display:flex;flex-direction:column;gap:var(--s05)}
+.app .hd-srch > .hd-srch-t{min-width:0}
+.app .hd-srch > .hd-srch-t > .all-desc{margin-bottom:0}
+.app .hd-srch > .srch.all-srch{margin-bottom:0;padding-left:0;padding-right:0}
+
+@container app (min-width:900px){
+  .app .hd-srch{flex-direction:row;align-items:flex-end;
+    justify-content:space-between;gap:var(--s07)}
+  .app .hd-srch > .hd-srch-t{flex:1 1 auto}
+  .app .hd-srch > .srch.all-srch{flex:0 0 auto;width:min(320px,38%)}
+}
+
+/* ==========================================================================
+   THE CONFIRMED LEVEL, ON THE CARD IT DESERVES
+   Left: the fact — an eyebrow that says who signed it and when, the level at
+   display size, the rung, the ladder. Right: the two things you can do about
+   it. Below 900 there is one column and the actions fall under the ladder,
+   full width, in the order they matter.
+
+   The ladder and the buttons sit on the same baseline at desktop, so the
+   card closes on one line rather than trailing off on the taller side.
+   ========================================================================== */
+.app .lvl-hero.lvl-split{display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s07);align-items:end}
+.app .lvl-split .eb{display:flex;align-items:center;gap:var(--s03)}
+.app .lvl-split .eb-ok{display:inline-flex;flex:none}
+.app .lvl-split .eb-ok svg{width:16px;height:16px;fill:var(--support-success)}
+.app .lvl-split .lvl-split-a{display:flex;flex-direction:column;gap:var(--s04)}
+.app .lvl-split .lvl-split-a .btn{width:100%}
+
+@container app (min-width:720px){
+  .app .lvl-hero.lvl-split{grid-template-columns:minmax(0,1fr) auto;
+    column-gap:var(--s08)}
+  .app .lvl-split .lvl-split-a{align-items:stretch;min-width:260px}
+  .app .lvl-split .lvl-split-a .btn{width:auto}
+}
+
+/* the due line is the one you act on, so it carries the weight of a total */
+.app .kv.kv-due .k{color:var(--text-primary);font-weight:600}
+.app .kv.kv-due .v{font-weight:600}
+
+/* the button leads, the question follows it on the same line where there is
+   room — the decision first, the hesitation second */
+.app .pay-act{display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap}
+
+/* ==========================================================================
+   AND AN ACCORDION THAT IS NOT INSIDE A SECTION
+   The data-use page hangs its accordion straight off the page, where the
+   spine rule pays the gutter for it — and then `.acc-i` paid it a second
+   time, so those titles sat one gutter in from the heading above them. The
+   accordion behaves the same way here as it does inside a section: the
+   block spans the column, and the ROW pays the gutter, which is what keeps
+   the row's divider and the row's title on the same left edge.
+   ========================================================================== */
+.app .view-col .main .page > .acc{padding-left:0;padding-right:0}
+
+/* ==========================================================================
+   ONE FILL FOR EVERY MARK IN A BOX
+   Figma 287:186. The product has one shape for "a mark that identifies a
+   row": a square, a hairline, an icon centred in it. It had three different
+   grounds — transparent here, the panel tone there, the warm pair on the
+   cards Tal writes — so the same shape read as three components. It is one,
+   and it carries the two layers the Tal chip carries: a warm ground and a
+   cool pool rising from the bottom right.
+
+   State markers are NOT in this family and stay bare: `.ch-ic` and `.pi-ic`
+   are a ring or a tick saying done / not done / now, and a box around them
+   would make a status look like an object.
+   ========================================================================== */
+.app .cardrow-ic,.app .gcard .cardrow-ic,
+.app .nrow-ic,.app .aw-ic,.app .ach-ic,
+.app .kit-ic,.app .stat-ic,.app .ch-num{
+  background-color:var(--tal-chip-1);
+  background-image:radial-gradient(120px 90px at calc(100% - 4px) 190%,
+    var(--tal-chip-2) 0%, transparent 100%);
+  border:1px solid var(--rule)}
+
+/* on a black card the warm pair disappears — the mark keeps the dark ground
+   and the rule that belongs to it */
+.app .on-dark .cardrow-ic,.app .on-dark .nrow-ic,.app .on-dark .aw-ic,
+.app .on-dark .ach-ic,.app .on-dark .kit-ic,.app .on-dark .stat-ic,
+.app .on-dark .ch-num,.app .lvl-hero .aw-ic,.app .lvl-hero .ch-num,
+.app .plate .cardrow-ic,.app .plate .ch-num{
+  background-color:transparent;background-image:none;
+  border-color:var(--on-dark-rule)}
+
+/* ==========================================================================
+   THE FIGURE CELL, WITH ITS MARK ON THE LEFT
+   Three lines beside one square: the label, the figure, the note. The mark
+   holds the top line's height so the four cells across the band line up on
+   the label rather than on whatever their figures happen to be.
+   ========================================================================== */
+.app .stats > .stat{display:grid;grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'ic l' 'ic n' 'ic d';
+  column-gap:var(--s04);align-content:start}
+.app .stats > .stat > .stat-ic{grid-area:ic;align-self:start;
+  flex:none;display:grid;place-items:center;width:32px;height:32px;
+  margin-top:1px}
+.app .stats > .stat > .stat-ic svg{width:17px;height:17px;
+  fill:var(--icon-secondary);display:block}
+.app .stats > .stat > .l{grid-area:l}
+.app .stats > .stat > .n{grid-area:n}
+.app .stats > .stat > .d{grid-area:d}
+
+/* the level is the loudest thing on the page it appears on */
+.app .lvl-split .big{font-size:34px;line-height:40px;letter-spacing:-1px}
+@container app (min-width:900px){
+  .app .lvl-split .big{font-size:52px;line-height:58px;letter-spacing:-1.5px}
+}
+
+/* ==========================================================================
+   THE FOOT OF THE CONVERSATION IS WARM
+   Figma 291:202. The thread runs on white and ends in a bar that was also
+   white, separated only by a hairline — so the place you type into looked
+   like more thread. A wash rising from the bottom edge in the brand orange
+   gives the composer a floor: the conversation is above it, the thing you
+   act with is on it.
+
+   It is a BACKDROP, so it goes behind everything the foot contains: the
+   pseudo takes z-index:-1 inside an isolated stacking context, which keeps
+   the chips and the field above it without giving every child a z-index of
+   its own. The chips keep the fill they already have, and the field is
+   opaque white — a field you type into cannot be tinted, or the caret and
+   the placeholder go swimming.
+   ========================================================================== */
+.app .ask-foot{position:relative;isolation:isolate}
+/* REPLACED, from Figma 292:709. The three-layer construction above it was
+   built before the file had a value for this; the file draws ONE shape —
+   Ellipse 42, 2132 x 377.5, centred 72 above the bottom of the page and
+   blurred at sigma 100 (Figma pads the export by 300 on both axes, and
+   300 = 3 sigma). It is the same ellipse the front door carries, in the
+   same colour, at a different height: the warm edge of a TalentNext page.
+
+   The radii are stated in PIXELS, not percentages, because sigma is a pixel
+   quantity — a percentage would make the blur soften on a short page and
+   harden on a tall one. The centre hangs off the bottom, so the pseudo has
+   to reach ABOVE the foot it belongs to: the ellipse's top is 417 over the
+   composer, which is where the file starts fading it in, well up into the
+   white of the thread. */
+.app .ask-foot::before{
+  content:'';position:absolute;left:0;right:0;bottom:0;top:-417px;
+  z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1366px 489px at 48.1% calc(100% - 72px),
+      var(--auth-wash-1) 0%, var(--auth-wash-1) 28%, transparent 100%);
+  /* 10%, down from the 32 the note above argued for. That reasoning was
+     about matching the file's own render; what it produced on a live page
+     was a peach band with a visible top edge sitting behind the chips. The
+     wash is meant to be the warm edge of a TalentNext page, not a shape on
+     it. Moved with the panel's wash in 27-tal.css §6 — the two Tal
+     surfaces carry the same warmth and are changed together. */
+  opacity:.1}
+
+/* the field sits ON the wash, not in it */
+.app .ask-foot .askfield{background-color:var(--background)}
+/* and its prompt is legible against that white rather than only just there */
+.app .ask-foot .askfield .inp::placeholder{color:var(--text-helper);opacity:1}
+/* the closing line reads over a tint, so it takes the darker helper too */
+.app .ask-foot .tal-legal{color:var(--text-helper)}
+
+/* ==========================================================================
+   WHAT CHANGES AT E4 — TWO ROWS, NOT SIX
+   Each half of this block was a heading, a line of explanation and a button
+   on a line of its own beneath them. Two of those stacked is six rows for
+   two offers, in a section whose whole point is that there are exactly two
+   things — and each button left a column and a half of empty tile to its
+   right while the sentence above it stopped well short of the same edge.
+
+   One row each: what changes on the left, what to do about it at the far
+   right. `align-items:center` because the button is a 32px object against
+   two short lines of roughly its own height, and centring the two makes one
+   row rather than two things that start together and end apart — the same
+   argument §32.2 makes for the week card's ring, for the same reason.
+
+   `flex:none` on the button and `min-width:0` on the text, so a long label
+   ("Become a Cohort Leader") is never what wraps: the sentence has a whole
+   column to wrap in and the button has a fixed amount of text in it.
+
+   IT STAYS A STACK ON THE PHONE. At 356 the sentence and the button do not
+   fit side by side, and a 130px button beside a 180px paragraph is two
+   narrow columns rather than one row. Below 600 it is the original stack,
+   which is what that width was drawn for.
+   ========================================================================== */
+.app .page .tile-stack > .tile.chgrow{
+  display:flex;flex-direction:column;align-items:stretch;gap:var(--s05)}
+.app .page .tile.chgrow > .chgrow-b{min-width:0}
+.app .page .tile.chgrow > .btn{flex:none;align-self:start}
+@container app (min-width:600px){
+  .app .page .tile-stack > .tile.chgrow{
+    flex-direction:row;align-items:center;gap:var(--s06)}
+  .app .page .tile.chgrow > .chgrow-b{flex:1 1 auto}
+  .app .page .tile.chgrow > .btn{align-self:center;margin-left:auto}
+}

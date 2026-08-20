@@ -1,0 +1,1172 @@
+/* ==========================================================================
+   THE LATTICE — v15.1
+   Border-led, structured, content-first. Containers used sparingly.
+
+   The organising idea: the border IS the layout. Instead of objects floating
+   in whitespace, the page is a ruled sheet — two full-height vertical rails
+   bound the content column, horizontal rules run full-bleed through them,
+   and their intersections make the structure legible. Anything that needs
+   grouping becomes a cell in that grid rather than a container drawn on top
+   of it. Adjacent cells share one hairline; nothing is ever double-ruled.
+
+   Material UI is untouched underneath. This layer changes where lines go,
+   not what the components are.
+   ========================================================================== */
+
+:root{
+  --rule:#d7d5cd;              /* the hairline. one weight, used everywhere. */
+  --rule-ink:#111111;
+  --rail-w:1px;
+  --label-col:184px;           /* the narrow left column at desktop */
+  --content-max:1040px;
+  --cell-pad:20px;
+}
+
+/* the scroll region is the full-bleed surface the rules run across */
+.main{overflow-x:hidden}
+
+/* --------------------------------------------------------------------------
+   1. THE RAILS
+   Two hairlines bounding the content column, running the full height of the
+   page rather than stopping at the last section — so the column reads as a
+   drawn thing, not as an accident of where the content ended.
+   -------------------------------------------------------------------------- */
+.page{
+  position:relative;
+  max-width:var(--content-max);
+  margin:0 auto;
+  min-height:100%;
+  padding-bottom:var(--s12);
+  border-left:0;border-right:0}
+
+@container app (min-width:760px){
+  .page{
+    border-left:var(--rail-w) solid var(--rule);
+    border-right:var(--rail-w) solid var(--rule)}
+  /* the rails must outrank the rules they cross, or the lattice looks broken
+     where a section happens to end */
+  .page::before,.page::after{
+    content:'';position:absolute;top:0;bottom:0;width:var(--rail-w);
+    background:var(--rule);z-index:1;pointer-events:none}
+  .page::before{left:calc(var(--rail-w) * -1)}
+  .page::after{right:calc(var(--rail-w) * -1)}
+}
+
+/* --------------------------------------------------------------------------
+   2. THE RULES
+   Every section closes with one hairline that runs past the rails to the
+   edge of the frame. Bottom-only, so two adjacent sections never double up.
+   -------------------------------------------------------------------------- */
+.sec,.ph,.lvl-hero,.score,.ach,.agh,.post,.msg,.aw,.crumb,.tabs,.cs{
+  border-top:0}
+.sec,.ph,.score,.crumb{position:relative;border-bottom:0}
+.sec::after,.ph::after,.score::after,.crumb::after{
+  content:'';position:absolute;left:-50vw;right:-50vw;bottom:0;height:1px;
+  background:var(--rule);pointer-events:none}
+.sec:last-child::after{background:var(--rule)}
+.page > :last-child::after{opacity:1}
+
+/* the tick marks where a rule crosses a rail. small, and desktop only —
+   at phone width the rails sit on the frame edge and there is nothing to mark. */
+@container app (min-width:760px){
+  .sec::before,.ph::before,.score::before{
+    content:'';position:absolute;left:-5px;right:-5px;bottom:-4px;height:9px;
+    pointer-events:none;z-index:2;
+    background:
+      linear-gradient(var(--rule),var(--rule)) left 4px top 0/1px 9px no-repeat,
+      linear-gradient(var(--rule),var(--rule)) right 4px top 0/1px 9px no-repeat}
+}
+
+/* --------------------------------------------------------------------------
+   3. SECTION RHYTHM
+   Even padding, one measure. The grid does the separating, so sections no
+   longer need to shout with extra space.
+   -------------------------------------------------------------------------- */
+.sec{padding:var(--s06) var(--gutter);background:transparent}
+.sec.tight{padding:var(--s05) var(--gutter)}
+/* content-first: tonal bands are gone. Structure comes from the rules. */
+.sec.tint,.sec.warm,.cool{background:transparent}
+.ph{padding:var(--s07) var(--gutter) var(--s06)}
+.crumb{padding:var(--s04) var(--gutter);margin:0}
+
+@container app (min-width:900px){
+  .sec{padding:var(--s07) var(--s07)}
+  .sec.tight{padding:var(--s05) var(--s07)}
+  .ph{padding:var(--s09) var(--s07) var(--s07)}
+  .crumb{padding:var(--s04) var(--s07)}
+  .main{padding:0}
+}
+
+/* --------------------------------------------------------------------------
+   4. THE LABEL COLUMN
+   A section that has a heading splits into two columns at desktop: the
+   heading sits in a narrow left column, its content in the wide right one,
+   divided by a vertical rule that meets the horizontal ones. This is the
+   structural reading pattern — you scan the left edge for what a region is.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .sec:has(> .sec-h),
+  .sec:has(> .eyebrow){
+    display:grid;
+    grid-template-columns:var(--label-col) minmax(0,1fr);
+    column-gap:0;padding-left:0;padding-right:var(--s07)}
+  .sec:has(> .sec-h) > .sec-h,
+  .sec:has(> .eyebrow) > .eyebrow{
+    grid-column:1;grid-row:1 / span 99;align-self:start;
+    margin:0;padding:0 var(--s06) 0 var(--s07);
+    border-right:1px solid var(--rule);min-height:100%;
+    display:block}
+  .sec:has(> .sec-h) > .sec-h h2{
+    font-size:13px;line-height:18px;font-weight:600;letter-spacing:.2px}
+  .sec:has(> .sec-h) > .sec-h .lk,
+  .sec:has(> .sec-h) > .sec-h .lnk{margin:var(--s03) 0 0;display:flex}
+  .sec:has(> .sec-h) > :not(.sec-h),
+  .sec:has(> .eyebrow) > :not(.eyebrow){
+    grid-column:2;padding-left:var(--s06)}
+  /* the vertical rule has to reach both horizontal ones */
+  .sec:has(> .sec-h)::before,.sec:has(> .eyebrow)::before{z-index:3}
+}
+
+/* --------------------------------------------------------------------------
+   5. CELLS
+   Where several figures belong together they become cells of one grid,
+   sharing single hairlines. No gaps, no radius, no fill — the opposite of
+   a row of cards.
+   -------------------------------------------------------------------------- */
+.prog-figs,.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:0;margin-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.prog-figs > span,.stats > .stat{
+  display:flex;flex-direction:column;gap:2px;
+  padding:var(--s04) var(--s05);min-width:0;
+  border-left:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.prog-figs > span:first-child,.stats > .stat:first-child{border-left:0}
+.prog-figs > span b,.stats .v{
+  font-size:19px;line-height:24px;font-weight:600;letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums}
+.prog-figs > span,.stats .k{
+  font-size:11px;line-height:15px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-helper);font-weight:600}
+
+/* key/value pairs read as a two-column table, ruled, not spaced */
+.kv{
+  display:grid;grid-template-columns:minmax(0,10rem) minmax(0,1fr);
+  align-items:baseline;gap:var(--s05);
+  padding:var(--s04) 0;border-bottom:1px solid var(--rule);font-size:13px}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--text-secondary);flex:none}
+.kv .v{margin-left:0;text-align:left;font-weight:500}
+@container app (min-width:900px){
+  .kv{grid-template-columns:var(--label-col) minmax(0,1fr);gap:0}
+  .kv .k{padding-right:var(--s06)}
+}
+
+/* --------------------------------------------------------------------------
+   6. LIST ROWS INSIDE THE GRID
+   Rows already end in a hairline. Inside a flush section they run the full
+   width of the column so their rule meets the rails.
+   -------------------------------------------------------------------------- */
+.sec.flush{padding-left:0;padding-right:0}
+.sec.flush > .sec-h,.sec.flush > .eyebrow{padding-left:var(--gutter);padding-right:var(--gutter)}
+.tile.clk,.gcard,.ag,.ch,.cardrow,.mem,.aw,.slot,.clip,.nrow{
+  border-bottom:1px solid var(--rule)}
+.tile.clk:last-child,.gcard:last-child,.ag:last-child,.ch:last-child,
+.cardrow:last-child,.mem:last-child,.aw:last-child{border-bottom:0}
+.divider,.sep,.hr-full,.line{background:var(--rule)}
+.border-subtle,.note{border-color:var(--rule)}
+
+/* --------------------------------------------------------------------------
+   7. CONTAINERS, USED SPARINGLY
+   Three things earn a box: the inverted level panel (the client's own
+   device), the Tal callout, and a dialog. Everything else sits on the ground.
+   -------------------------------------------------------------------------- */
+.tile.bordered{
+  border:0;border-left:2px solid var(--rule-ink);
+  padding:var(--s02) 0 var(--s02) var(--s05);background:transparent}
+.ai-aura{
+  background:transparent;border:0;border-left:2px solid var(--accent);
+  padding:var(--s02) 0 var(--s02) var(--s05)}
+.note{
+  background:transparent;border:0;border-left:2px solid var(--rule-ink);
+  padding:var(--s02) 0 var(--s02) var(--s05);gap:var(--s04)}
+.note.warn{border-left-color:var(--support-warning-ic)}
+.note.err{border-left-color:var(--support-error)}
+.note.succ{border-left-color:var(--support-success)}
+.note.acc{border-left-color:var(--accent)}
+.note svg{width:18px;height:18px}
+.lvl-hero{padding:var(--s08) var(--gutter)}
+@container app (min-width:900px){.lvl-hero{padding:var(--s09) var(--s07)}}
+
+/* --------------------------------------------------------------------------
+   8. TYPE — denser, more structural
+   Content-first means the type carries the hierarchy, so it gets tighter and
+   the small labels get more deliberate.
+   -------------------------------------------------------------------------- */
+.ph h1{font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.5px}
+@container app (min-width:900px){.ph h1{font-size:28px;line-height:34px;letter-spacing:-.7px}}
+.ph .lead{margin-top:var(--s03);font-size:14px;line-height:21px;color:var(--text-secondary)}
+.eyebrow,.t-heading-05{
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.9px;
+  text-transform:uppercase;color:var(--text-helper)}
+.sec-h{margin-bottom:var(--s05)}
+.sec-h h2{font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+.gcard-b h3,.cardrow-t,.nrow-t,.mem-n,.aw-n,.ach-t,.ag-n,.ch-n,.agh-n{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.gcard-b .sub,.cardrow-d,.nrow-d,.mem-m,.aw-d,.ach-d,.ag-m,.ch-m,.agh-m{
+  font-size:12px;line-height:16px;letter-spacing:.15px}
+.tile.clk,.gcard,.ag,.ch,.cardrow,.mem,.aw,.nrow{min-height:56px}
+@container app (min-width:900px){
+  .tile.clk,.gcard,.ag,.ch,.cardrow,.mem,.nrow{min-height:52px}
+}
+/* every figure that can change is tabular, and reads as data */
+.num,.mono,.aw-v,.ag-price,.score-pts .n,.prog-pct,.chart-head .v,.stat .v,
+.tbl .num,.kv .v{font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+
+/* --------------------------------------------------------------------------
+   9. QUIETER CHROME
+   The shell recedes so the content is the loudest thing on screen.
+   -------------------------------------------------------------------------- */
+.shell{border-bottom:1px solid var(--rule);background:var(--layer-01)}
+/* The drawer is an overlay at mobile, so it has to be opaque — a transparent
+   surface lets the scrimmed page read straight through it. */
+.sidenav{border-right:1px solid var(--rule);background:var(--layer-01)}
+.sn-item{min-height:40px;font-size:13px;letter-spacing:.1px;gap:var(--s04)}
+.sn-item svg{width:18px;height:18px}
+.sn-item.on{background:transparent;font-weight:600}
+.sn-item.on::before{width:2px}
+.sn-div{background:var(--rule)}
+.sn-cap{font-size:11px;letter-spacing:.9px}
+.tabs,.cs{border-bottom:1px solid var(--rule)}
+.tabs button,.cs button{min-height:42px;font-size:13px}
+.tbl th{border-bottom-color:var(--rule-ink)}
+.tbl td,.chart-table td{border-bottom-color:var(--rule)}
+
+/* --------------------------------------------------------------------------
+   10. FIELDS — bordered, not filled
+   A filled field is a container. A ruled one is a line in the grid.
+   -------------------------------------------------------------------------- */
+.inp,select.inp,textarea.inp,.otp input{
+  background:transparent;border:1px solid var(--rule);border-radius:0;
+  min-height:40px;font-size:13.5px}
+.inp:hover{background:transparent;border-color:var(--border-strong-01)}
+.inp:focus{background:transparent;border:1px solid var(--rule-ink);
+  border-bottom-width:1px;padding-bottom:0}
+textarea.inp{min-height:88px}
+.otp input{height:48px;font-size:18px}
+.f > label,.lbl{font-size:11px;font-weight:600;letter-spacing:.7px;
+  text-transform:uppercase;color:var(--text-helper);margin-bottom:var(--s03)}
+.btn{min-height:40px;font-size:13px;letter-spacing:.1px}
+.btn-sm{min-height:32px;font-size:12.5px}
+.btn-s,.btn-t,.btn-g{border-color:var(--rule)}
+.btn-s:hover,.btn-t:hover,.btn-g:hover{border-color:var(--rule-ink)}
+.tag,.chip-tal{height:26px;font-size:11.5px;border:1px solid var(--rule);
+  background:transparent}
+.tag.brand{background:var(--brand-primary);border-color:var(--brand-primary)}
+.tag.acc{background:var(--accent);border-color:var(--accent)}
+.tag.green,.tag.succ,.tag.red,.tag.warn,.tag.org{background:transparent}
+.composer{border-top:1px solid var(--rule)}
+.ch-num,.cardrow-ic,.nrow-ic,.aw-ic,.ch-ic{background:transparent;
+  border:1px solid var(--rule)}
+.ch.done .ch-num,.ch.open .ch-num,.aw.got .aw-ic{border-color:transparent}
+.ch-ic{border:0}
+
+/* --------------------------------------------------------------------------
+   11. CORRECTIONS
+   -------------------------------------------------------------------------- */
+/* the rails need real margin outside them or they read as the frame edge */
+@container app (min-width:760px){
+  .main{padding:0 var(--s06)}
+}
+@container app (min-width:1200px){
+  .main{padding:0 var(--s09)}
+}
+/* the figure keeps its case; only its label is uppercased */
+.prog-figs > span b,.stats .v{text-transform:none;letter-spacing:-.3px}
+
+/* --------------------------------------------------------------------------
+   12. THE INVERTED PANEL
+   The client's document runs exactly one full-black panel per spread, so it
+   stays — but as a band in the sheet rather than a block sitting on it. It
+   runs edge to edge, straight through the rails.
+   -------------------------------------------------------------------------- */
+.lvl-hero{position:relative}
+.lvl-hero::before{
+  content:'';position:absolute;left:-50vw;right:-50vw;top:0;bottom:0;
+  background:var(--surface-dark);z-index:0}
+.lvl-hero > *{position:relative;z-index:1}
+
+/* the ladder is data, not decoration: thin bars, hairline gaps */
+.ladder{height:28px;gap:2px;margin-top:var(--s05)}
+.ladder i{background:var(--on-dark-rule)}
+.ladder-lab{font-size:11px;letter-spacing:.7px;text-transform:uppercase}
+
+/* --------------------------------------------------------------------------
+   13. LEFT-RULED BLOCKS
+   The three things that still earn a container are marked by one rule, and
+   the rule needs air between it and the type.
+   -------------------------------------------------------------------------- */
+.tile.bordered,.ai-aura,.note{padding-left:var(--s05)!important}
+.tile.bordered > *:first-child,.ai-aura > *:first-child,.note > *:first-child{margin-top:0}
+.ai-head h3{font-size:14px;line-height:19px}
+.ai-body{margin-top:var(--s03);font-size:13.5px;line-height:20px}
+.ai-foot{margin-top:var(--s04)}
+
+/* --------------------------------------------------------------------------
+   14. DENSITY
+   -------------------------------------------------------------------------- */
+.score{padding:var(--s06) var(--gutter)}
+@container app (min-width:900px){.score{padding:var(--s06) var(--s07)}}
+.score-pts .n{font-size:34px;line-height:40px;letter-spacing:-1px}
+.score-pts .l{font-size:11px;letter-spacing:.9px}
+.aw{padding-top:var(--s04);padding-bottom:var(--s04)}
+.aw-ic{width:28px;height:28px}
+.aw-ic svg{width:16px;height:16px}
+.aw-n{font-size:13.5px;line-height:18px}
+.aw-d{font-size:12px;line-height:16px}
+.tabs{padding-left:var(--gutter)}
+@container app (min-width:900px){.tabs{padding-left:var(--s07)}}
+/* an empty section leaves a stray band between two rules */
+.sec:empty,.sec:has(> :only-child:empty){display:none}
+
+/* --------------------------------------------------------------------------
+   15. ONE VERTICAL ALIGNMENT
+   A grid only reads as a grid if everything shares its left edge. Section
+   padding, page headers, list rows and cells all resolve to --pad-x, so the
+   column has a single spine no matter which component is drawn in it.
+   -------------------------------------------------------------------------- */
+:root{--pad-x:16px}
+@container app (min-width:600px){:root{--pad-x:24px}}
+@container app (min-width:1200px){:root{--pad-x:32px}}
+
+.sec,.sec.tight{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.ph{padding:var(--s07) var(--pad-x) var(--s06)}
+.crumb{padding:var(--s04) var(--pad-x)}
+.score{padding:var(--s06) var(--pad-x)}
+.lvl-hero{padding:var(--s08) var(--pad-x)}
+.tabs,.cs{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.composer{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.notif-h,.tal-h,.sheet-h{padding-left:var(--pad-x)}
+.tal-body,.tal-sugg,.tal-legal{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+@container app (min-width:900px){
+  .sec,.sec.tight{padding-top:var(--s06);padding-bottom:var(--s06)}
+  .ph{padding:var(--s08) var(--pad-x) var(--s07)}
+}
+
+/* rows carry the spine themselves, so a section that holds them sits flush
+   and the two never double up */
+.post,.msg{padding-left:var(--pad-x);padding-right:var(--pad-x)}
+/* superseded by section 28 — the :has() guessing zeroed the spine on any
+   section that merely contained a row, including ones using a row as a header */
+/* …but their headings still need it */
+.sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
+.sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,.sec:has(.cardrow) > .sec-h,
+.sec.flat > .sec-h,.sec.flush > .sec-h,
+/* `.stats` is deliberately NOT in this list. Every other member sits FLUSH —
+   §28 zeroes the section's own gutter for a section of rows, so the heading
+   has to pay it back. A section holding `.stats` keeps its gutter (§29 pulls
+   the grid's bleed in rather than pushing the section's out), so adding it
+   here would charge the heading twice and set it 16px in from its own figures
+   on a phone. The desktop block below restates the padding because THERE the
+   label-column rule has zeroed it. */
+/* `.tbl-wrap` is deliberately NOT in this list either, for the same reason as
+   `.stats` above: a section holding a table keeps its own gutter, so the
+   heading is already on the spine and paying it a second time would set it
+   16px in from the column headers it labels. It IS in the desktop opt-out
+   below, where the label-column rule has zeroed that gutter. */
+.sec.flat > .eyebrow,.sec.flush > .eyebrow,
+.sec:has(> .tile-stack) > .sec-h{
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.slots{padding:0 var(--pad-x)}
+.slot{padding-left:var(--s04);padding-right:var(--s04)}
+
+/* the label column keeps the same spine */
+@container app (min-width:900px){
+  .sec:has(> .sec-h),.sec:has(> .eyebrow){padding-right:var(--pad-x)}
+  .sec:has(> .sec-h) > .sec-h,.sec:has(> .eyebrow) > .eyebrow{
+    padding:0 var(--s06) 0 var(--pad-x)}
+  .sec:has(> .sec-h) > :not(.sec-h),.sec:has(> .eyebrow) > :not(.eyebrow){
+    padding-left:var(--s06)}
+  /* a section of rows must not also take the label treatment, or its rows
+     lose the spine */
+  /* `.stats` IS ONE OF THEM, and it was the one case the list had never met:
+     until the consultant-call dashboard, every `.stats` on the product was
+     drawn in a section with no heading at all (the enrolment page), so the
+     label column never applied and nothing showed.
+
+     Put a heading on it and two rules collide. §16 below sets the figure
+     cells flush and puts the first cell's content on the spine, and §29
+     keys their edge padding to a column count of two and then four — all of
+     which assumes the grid owns the full width. The label column takes 184
+     of it. Worse, §24 makes `.sec-h` a flex row so a heading with an action
+     in it puts an unshrinkable button next to an `h2` that may shrink: in
+     184px the button took the lot and "Quiz results" rendered ONE LETTER PER
+     LINE, 198px tall. Not a squeeze — a collapse to zero width.
+
+     Same argument as every other member of this list, and the list is the
+     single place it is decided, so it is decided here rather than fought in
+     a later layer. It cannot be fought from a later layer anyway: this block
+     is inside a container query, and per the §25 trap that outranks an
+     unconditional rule of equal weight whatever its layer number. */
+  /* `.tbl-wrap` JOINS THEM, and for the `.stats` reason exactly. A data table
+     is a set of columns whose widths are negotiated against each other; hand
+     184px of the row to a label column and the negotiation happens in what is
+     left, so the flag column wraps and the figures stop lining up under their
+     own heading. It also brings the horizontal scroll the wrapper exists to
+     provide forward by 184px, on the one component that is allowed to scroll
+     sideways. The table owns the full width; its heading sits above it. */
+  /* `.facts` JOINS THEM TOO, for the `.stats` reason word for word: it is the
+     same bordered band of figures, its cells are keyed to the full column
+     width, and it had never been drawn under a heading before — every existing
+     `.facts` is in a section with no `.sec-h` at all, so the label column
+     never applied and nothing showed. The Cohort Leader's standing band is
+     the first one with a heading over it. */
+  .sec:has(.ch),.sec:has(.ag),.sec:has(.aw),.sec:has(.mem),
+  .sec:has(.gcard),.sec:has(.cardrow),.sec:has(> .tile-stack),
+  .sec:has(> .stats),.sec:has(> .tbl-wrap),.sec:has(> .facts){display:block}
+  .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
+  .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
+  .sec:has(.cardrow) > .sec-h,.sec:has(> .tile-stack) > .sec-h,
+  .sec:has(> .stats) > .sec-h,.sec:has(> .tbl-wrap) > .sec-h,
+  .sec:has(> .facts) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}
+
+/* breathing room between a bar and whatever it sits above */
+.pb + .note,.pb + *{margin-top:var(--s05)}
+
+/* --------------------------------------------------------------------------
+   16. FIGURE CELLS
+   The cells are part of the grid, not a widget inside it: they run the full
+   width of the column and the first cell's content sits on the spine. A 1px
+   gap over a rule-coloured ground gives exact single dividers however the
+   grid wraps — no ragged borders on a short last row.
+   -------------------------------------------------------------------------- */
+.prog-figs,.stats{
+  display:grid;gap:1px;background:var(--rule);
+  margin:var(--s05) calc(var(--pad-x) * -1) 0;
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.prog-figs{grid-template-columns:repeat(3,minmax(0,1fr))}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+@container app (min-width:700px){.stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.prog-figs > span,.stats > .stat{
+  display:flex;flex-direction:column;gap:3px;min-width:0;border:0;
+  padding:var(--s04) var(--s05);background:var(--background)}
+.prog-figs > span:first-child,.stats > .stat:first-child{padding-left:var(--pad-x)}
+/* a section that is flush already sits on the spine */
+.sec.flat .prog-figs,.sec.flush .prog-figs,
+.sec.flat .stats,.sec.flush .stats{margin-left:0;margin-right:0}
+
+/* .stat's parts are .l (label) .n (figure) .d (note) */
+.stats .l{order:1;font-size:10.5px;line-height:14px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper)}
+.stats .n{order:2;font-size:22px;line-height:27px;font-weight:600;
+  letter-spacing:-.5px;font-variant-numeric:tabular-nums;color:var(--text-primary)}
+.stats .n small{font-size:13px;font-weight:500;letter-spacing:0;color:var(--text-secondary)}
+.stats .d{order:3;font-size:11.5px;line-height:15px;color:var(--text-secondary);
+  text-transform:none;letter-spacing:.1px;font-weight:400}
+.prog-figs > span{font-size:10.5px;line-height:14px;letter-spacing:.8px}
+.prog-figs > span b{font-size:20px;line-height:25px;letter-spacing:-.4px}
+
+/* --------------------------------------------------------------------------
+   17. ACCENT DISCIPLINE
+   In a border-led design the accent is the only saturated thing on screen,
+   so it has to be small. It still marks exactly what it marked before —
+   what belongs to the candidate — just at a weight that does not dominate
+   a page made of hairlines.
+   -------------------------------------------------------------------------- */
+.ch-num{width:28px;height:28px;font-size:11px;letter-spacing:.2px}
+.ch{gap:var(--s04)}
+.ch-ic svg{width:18px;height:18px}
+.aw-ic{width:24px;height:24px}
+.aw-ic svg{width:14px;height:14px}
+.shell-badge{min-width:15px;height:15px;font-size:9.5px}
+.sn-item .badge{min-width:18px;height:18px;font-size:10px}
+.chev-you{height:20px;font-size:10px;letter-spacing:.6px;text-transform:uppercase}
+.tag.acc,.tag.brand{height:22px;font-size:10.5px;letter-spacing:.5px;
+  text-transform:uppercase;font-weight:600}
+.pb,.pb-track,.prog-seg{height:3px}
+.pb.lg,.pb-top{height:4px}
+.shell-avatar{width:28px;height:28px;font-size:11px}
+.shell-act{width:44px;height:44px}
+.shell-act svg{width:20px;height:20px}
+.tal-fab{width:48px;height:48px;box-shadow:0 0 0 10px var(--background)}
+.tal-fab svg{width:20px;height:20px}
+
+/* --------------------------------------------------------------------------
+   18. THE FIRST RULE
+   The page opens on a rule as well as closing on one, so the sheet reads as
+   bounded top and bottom rather than trailing off into the app bar.
+   -------------------------------------------------------------------------- */
+.page > :first-child{border-top:0}
+.crumb:first-child,.ph:first-child{padding-top:var(--s05)}
+@container app (min-width:900px){
+  .crumb:first-child{padding-top:var(--s06)}
+  .ph:first-child{padding-top:var(--s07)}
+}
+
+/* --------------------------------------------------------------------------
+   19. THE DRAWER
+   Material's two Drawer variants, properly separated. Below md it is a modal
+   drawer: an opaque surface over a scrim, at touch density, covering the
+   full height beneath the app bar. At md and above it is permanent, part of
+   the page frame, and can afford to be quieter and tighter.
+   -------------------------------------------------------------------------- */
+.sidenav{
+  background:var(--layer-01);
+  border-right:1px solid var(--rule);
+  padding:var(--s03) 0;
+  z-index:40}
+.sn-item{
+  min-height:48px;padding:0 var(--pad-x);gap:var(--s05);
+  font-size:14px;letter-spacing:.1px;color:var(--text-primary)}
+.sn-item svg{width:20px;height:20px;flex:none;fill:var(--icon-secondary)}
+.sn-item > span{flex:1;min-width:0}
+.sn-item:hover{background:var(--overlay-hover)}
+.sn-item.on{background:transparent;font-weight:600}
+.sn-item.on svg{fill:var(--icon-primary)}
+.sn-item.on::before{content:'';position:absolute;left:0;top:0;bottom:0;
+  width:2px;background:var(--accent)}
+.sn-item .badge{
+  margin-left:auto;min-width:18px;height:18px;padding:0 5px;
+  display:grid;place-items:center;background:var(--accent);color:var(--on-accent);
+  font-size:10px;font-weight:600;letter-spacing:.2px}
+.sn-div{height:1px;background:var(--rule);margin:var(--s03) 0;border:0}
+.scrim{z-index:35;background:var(--overlay)}
+
+@container app (min-width:900px){
+  .sidenav{padding:var(--s04) 0}
+  .sn-item{min-height:40px;font-size:13px;gap:var(--s04)}
+  .sn-item svg{width:18px;height:18px}
+}
+
+/* --------------------------------------------------------------------------
+   20. DRAWER CORRECTIONS
+   -------------------------------------------------------------------------- */
+/* the label span grows to fill the row; the badge is also a span and must not */
+.sn-item > span{flex:1 1 auto;min-width:0}
+.sn-item > span.badge{flex:0 0 auto;width:auto}
+
+/* the floating button belongs under the scrim, not over it — and there is no
+   sense offering "ask Tal" while a modal surface is covering the page */
+.tal-fab{z-index:30}
+.app:has(.sidenav.on) .tal-fab,
+.app:has(.notif.on) .tal-fab,
+.app:has(.tal-panel.on) .tal-fab{opacity:0;visibility:hidden;
+  transition:opacity var(--dur-short) var(--ease-standard),visibility var(--dur-short)}
+
+/* --------------------------------------------------------------------------
+   21. ONE GROUND
+   No white in the chrome. The app bar, the drawer and the content sit on the
+   same warm canvas, and only hairlines separate them — a white panel next to
+   a bone one reads as two surfaces stuck together, which is the opposite of
+   a single ruled sheet.
+   -------------------------------------------------------------------------- */
+.shell{background:var(--background);border-bottom:1px solid var(--rule)}
+.sidenav{background:var(--background);border-right:1px solid var(--rule)}
+.main{background:var(--background)}
+.app{background:var(--background)}
+
+/* overlay surfaces keep the same ground; they are separated by a rule and,
+   for the modal ones, by the scrim behind them — not by being a lighter colour */
+.notif,.tal-panel,.sheet{background:var(--background)}
+.notif{border-left:1px solid var(--rule)}
+.sheet{border:1px solid var(--rule)}
+.composer{background:var(--background)}
+.tw{background:transparent;border:1px solid var(--rule)}
+.ai-pop{background:var(--background)}
+
+/* a checkbox on a single ground is a ruled box, not a white one */
+.cbx .box,.rad .box{background:transparent;border:1px solid var(--border-strong-01)}
+.cbx input:checked + .box,.rad input:checked + .box{
+  background:var(--brand-primary);border-color:var(--brand-primary)}
+.slot{background:transparent}
+.stp-c{background:transparent}
+.ch-num,.cardrow-ic,.nrow-ic,.aw-ic{background:transparent}
+.ch.done .ch-num,.aw.got .aw-ic{background:var(--accent)}
+.ch.open .ch-num{background:var(--brand-primary)}
+
+/* the figure cells sit on the ground, with the 1px gaps showing the rule */
+.prog-figs > span,.stats > .stat{background:var(--background)}
+
+/* --------------------------------------------------------------------------
+   22. HOVER ONLY WHERE THERE IS SOMETHING TO CLICK
+   `.tile` is a block container as well as a row, so putting it in the row
+   hover list gave every static region — the charts, the chapter record,
+   Priya's summary — a hover fill and a pointer cursor. A state layer is a
+   promise that something will happen; static data must not make it.
+   -------------------------------------------------------------------------- */
+.tile:hover,.tile:active,
+.gcard:hover,.ag:hover,.agh:hover,.ch:hover,.cardrow:hover,.mem:hover,
+.aw:hover,.nrow:hover,.slot:hover,.clip:hover,.post:hover,.msg:hover,
+.kv:hover,.chart:hover,.stat:hover,.prog-figs > span:hover,
+.sec:hover,.stp:hover,.ai-aura:hover,.note:hover{
+  background:transparent;cursor:default}
+
+/* …then put it back on the things that are genuinely actionable */
+.tile.clk:hover,
+.gcard:hover,
+[role="button"]:hover,
+button[data-go]:hover,
+button[data-chart]:hover,
+button[data-tbl]:hover,
+button[data-stp]:hover,
+button[data-ctab]:hover,
+button[data-rtab]:hover,
+button[data-toggle]:hover,
+button[data-addcard]:hover,
+button[data-hideach]:hover,
+button[data-readall]:hover,
+.sc-col:hover,.chart-bar:hover,.slot:hover,.day:hover{
+  background:var(--overlay-hover);cursor:pointer}
+.tile.clk:active,.gcard:active,[role="button"]:active,button[data-go]:active{
+  background:var(--overlay-pressed)}
+
+/* components with their own hover treatment keep it, and only it */
+.btn:hover,.btn-p:hover,.btn-s:hover,.btn-t:hover,.btn-g:hover,.btn-d:hover,
+.lk:hover,.lnk:hover,.chip-tal:hover,.tag:hover,.sn-item:hover,
+.tabs button:hover,.cs button:hover,.acc-h:hover,.shell-act:hover,
+.shell-logo:hover,.tal-star:hover,.pw-eye:hover,.tg:hover{cursor:pointer}
+.btn-p:hover{background:var(--brand-primary-hover)}
+.btn-s:hover,.btn-t:hover,.btn-g:hover{background:var(--overlay-hover)}
+.tag:not(.chip-tal):hover{background:transparent;cursor:default}
+.chip-tal:hover{background:var(--brand-tint);cursor:pointer}
+/* a bare tag is a label, not a control */
+.tag,.badge,.stars,.bmk,.av,.av-ph,.mem-av,.chev-you{cursor:default}
+
+/* --------------------------------------------------------------------------
+   23. ONE BACKGROUND, EVERYWHERE
+   The app is #F3F2EE end to end. No white surfaces, no grey insets. Every
+   remaining tonal patch — field fills, tag fills, icon plates, chat bubbles,
+   the unread message tint — resolves to the canvas, and the rules do all the
+   separating. Colour is left with exactly two jobs: the inverted panel and
+   the accent.
+   -------------------------------------------------------------------------- */
+body{background:var(--background)}
+.device{background:var(--background)}
+.app,.main,.page,.shell,.sidenav,.notif,.tal-panel,.sheet,.modal > .sheet,
+.composer,.ai-pop,.tw,.bub,.tal-msg .bb,.msg.un,.sec,.sec.tint,.sec.warm,
+.cool,.tint,.tile,.ai-aura,.note,.stp-c,.slot,.day,.tg,
+.prog-figs > span,.stats > .stat,.chart,.chart-ref > span,
+.aw-ic,.ch-num,.cardrow-ic,.nrow-ic,.ch-ic,.pi-ic,.thumb,
+.inp,select.inp,textarea.inp,.otp input,.inp[readonly],.inp:hover,.inp:focus,
+.tag,.badge,.chip-tal,.tw-rungs i,.empty{
+  background-color:var(--background)}
+
+/* the exceptions, and the complete list of them */
+.lvl-hero,.lvl-hero::before,.cert,.sec.on-dark,.score.on-dark{background-color:var(--surface-dark)}
+.btn-p,.tal-fab,.shell-avatar,.mem-av.you,.tag.brand,.slot.sel,.slot.on,
+.day.sel,.cbx input:checked + .box,.rad input:checked + .box,
+.stp .done .stp-c,.ch.open .ch-num,.tal-msg.me .bb{background-color:var(--brand-primary)}
+.tag.acc,.badge.on,.badge.acc,.shell-badge,.sn-item .badge,.chev-you,
+.ach-ic,.aw.got .aw-ic,.ch.done .ch-num,.pb-fill,.pb > i,.ladder i.on,
+.ladder i.done,.prog-seg i.done,.prog-seg i.now,.stp .on .stp-c,
+.ai-inline .sk,.chip-tal .sk-mark,.sk-mark,.dot.on{background-color:var(--accent)}
+.pb-track,.pb,.tw-bar,.bar,.ladder i,.prog-seg i{background-color:var(--layer-accent-01)}
+.lvl-hero .ladder i,.score.on-dark .pb-track{background-color:var(--on-dark-rule)}
+.av,.av-ph,.mem-av,.agh-f,.thumb{background-color:var(--gray-80)}
+.btn-d{background-color:var(--support-error)}
+.scrim{background-color:var(--overlay)}
+.chart-bar i.s1{background-color:var(--dv-1)}
+.chart-bar i.s2{background-color:var(--dv-2)}
+.chart-bar i.s3{background-color:var(--dv-3)}
+.chart-bar i.s4{background-color:var(--dv-4)}
+.sc-col.none i{background-color:var(--gray-30)}
+.thumb .t{background-color:var(--thumb-scrim)}
+
+/* state layers still read, because they are translucent ink over the canvas */
+.tile.clk:hover,.gcard:hover,[role="button"]:hover,button[data-go]:hover,
+.sn-item:hover,.tabs button:hover,.cs button:hover,.acc-h:hover,
+.shell-act:hover,.shell-logo:hover,.sc-col:hover,.chart-bar:hover,
+.slot:hover,.day:hover,.btn-s:hover,.btn-t:hover,.btn-g:hover,.pw-eye:hover{
+  background-color:var(--overlay-hover)}
+.sn-item.on{background-color:transparent}
+.chip-tal:hover{background-color:var(--brand-tint-2)}
+.shell-act.on{background-color:var(--overlay-selected)}
+
+/* an unread message is marked by its dot and its weight, not by a tint */
+.msg.un .nm{font-weight:700}
+.msg.un::before{content:'';position:absolute;left:6px;top:24px;
+  width:5px;height:5px;background:var(--accent)}
+.msg{position:relative}
+
+/* fields and plates are outlined instead of filled */
+.inp,select.inp,textarea.inp,.otp input{border:1px solid var(--rule)}
+.inp[readonly]{border-style:dashed;color:var(--text-secondary)}
+.tag:not(.brand):not(.acc){border:1px solid var(--rule);color:var(--text-secondary)}
+.aw-ic,.ch-num,.cardrow-ic,.nrow-ic{border:1px solid var(--rule)}
+.aw.got .aw-ic,.ch.done .ch-num,.ch.open .ch-num{border-color:transparent}
+.tw-rungs i{border:1px solid var(--rule)}
+.tw-rungs i.on{border-color:transparent}
+.tal-msg .bb{border:1px solid var(--rule)}
+.tal-msg.me .bb{border-color:var(--brand-primary);color:var(--on-brand)}
+.thumb{border:0}
+
+/* --------------------------------------------------------------------------
+   24. THREE CORRECTIONS
+   -------------------------------------------------------------------------- */
+/* .agh-f is the agent's slot-and-price line, not an avatar. It slipped back
+   into the avatar group in the background sweep and took a dark plate under
+   dark text with it. */
+.agh-f{background-color:transparent;color:inherit;width:auto;height:auto}
+.agh-slot{color:var(--text-secondary)}
+.ag-price{color:var(--text-primary)}
+
+/* the breadcrumb separator is a slash glyph. `.sep` elsewhere is a 1px rule,
+   so it was being given a height, a fill and vertical margins — which is why
+   it sat low and looked broken. */
+.crumb .sep{
+  display:inline;height:auto;width:auto;background:none;border:0;margin:0;
+  padding:0 var(--s02);
+  font-size:13px;line-height:inherit;color:var(--text-placeholder)}
+.crumb{align-items:baseline;gap:0;font-size:13px}
+.crumb a{border-bottom:0;text-decoration:underline;text-underline-offset:3px;
+  text-decoration-thickness:1px;text-decoration-color:var(--border-subtle-02)}
+.crumb a:hover{text-decoration-color:var(--text-primary);color:var(--text-primary)}
+.crumb > span:last-child{color:var(--text-secondary)}
+
+/* the wordmark was set small enough to read as a favicon */
+.shell-logo img{height:24px}
+@container app (min-width:900px){.shell-logo img{height:26px}}
+.shell{height:60px}
+@container app (min-width:900px){.shell{height:68px}}
+
+/* --------------------------------------------------------------------------
+   25. AGENT ROWS, PROSE, AND THE LAST OF THE CONTRAST
+   -------------------------------------------------------------------------- */
+/* the bare accent square at the head of every agent row was an "Ask Tal"
+   button with its label hidden at narrow widths — a coloured block with no
+   meaning. The affordance lives on the agent's own page instead. */
+.ag .tal-star,.agh .tal-star{display:none}
+
+/* the fee is the number a candidate actually compares on */
+.ag-price,.agh-f .ag-price{
+  font-size:17px;line-height:22px;font-weight:600;letter-spacing:-.3px;
+  color:var(--text-primary);font-variant-numeric:tabular-nums}
+.ag-foot,.agh-f{align-items:baseline}
+
+/* nothing touches the rail: every row keeps the page margin on both sides */
+/* superseded by section 28 */
+.card-go,.tile-arrow,svg.arrow{margin-right:0}
+
+/* the breadcrumb slash is text, so it has to clear AA like any other text */
+.crumb .sep{color:var(--text-secondary)}
+
+/* --------------------------------------------------------------------------
+   26. PROSE
+   The descriptions were set too large and too tight, so paragraphs closed up.
+   One step down in size, a genuine 1.55–1.6 leading, and a measure that stops
+   lines running long.
+   -------------------------------------------------------------------------- */
+.ph .lead{
+  font-size:14px;line-height:23px;letter-spacing:.1px;
+  color:var(--text-secondary);max-width:62ch;margin-top:var(--s04)}
+@container app (min-width:900px){
+  .ph .lead{font-size:15px;line-height:25px}
+}
+.lead,.tile > p,.ai-body,.ai-body p,.acc-b,.acc-b p,.note .nb,.post-b,
+.sec > p,.empty p,.tw-quote,.why{
+  font-size:13.5px;line-height:22px;letter-spacing:.1px}
+.ai-body p + p,.acc-b p + p,.tile > p + p{margin-top:var(--s05)}
+.t-body-01{font-size:15px;line-height:25px}
+.t-body-02{font-size:13.5px;line-height:22px}
+.t-body-compact-01{font-size:13.5px;line-height:20px}
+.sub,.gcard-b .sub,.cardrow-d,.nrow-d,.mem-m,.aw-d,.ach-d,.ag-m,.ch-m,.agh-m,
+.chev-d{line-height:18px}
+.help,.t-helper-01,.t-legal-01,.legal{line-height:18px}
+.tal-msg .bb,.bub{font-size:13.5px;line-height:22px}
+.kv{line-height:21px}
+
+/* --------------------------------------------------------------------------
+   27. TAL CARDS ARE TARGETS
+   The whole callout opens Tal with the question it is about, and each one
+   carries one or two ready-made questions underneath.
+   -------------------------------------------------------------------------- */
+.ai-clickable{cursor:pointer}
+.ai-clickable:hover{background-color:var(--overlay-hover)}
+.ai-clickable:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+.ai-foot{display:flex;flex-wrap:wrap;gap:var(--s03);margin-top:var(--s05)}
+.ai-foot .chip-tal{
+  height:auto;min-height:30px;padding:var(--s02) var(--s04);
+  white-space:normal;text-align:left;max-width:100%;
+  font-size:12.5px;line-height:17px}
+
+/* ==========================================================================
+   28. THE MARGIN MECHANISM, DONE PROPERLY
+   The previous approach used :has() to guess which sections held rows and
+   zeroed their padding. It guessed wrong wherever a row was used as a header
+   rather than as a list item, which is why avatars, key/value pairs and
+   sticky bars kept ending up welded to the rail.
+
+   The rule is now single and predictable:
+     · every section carries the spine;
+     · a list that is meant to bleed to the rails pulls itself out by exactly
+       the spine, and its rows put it back;
+     · everything else just sits inside the section.
+   ========================================================================== */
+.sec,.sec.tight,.sec.flat,.sec.flush{
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+
+/* lists that bleed */
+.sec > .tile-stack,.sec > .aw-list,.sec > .msgs,.sec > .pointsList,
+.sec > .badgeList,.sec > .rankList,.sec > .slots,.sec > .acc{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.tile-stack > *,.aw-list > *,.msgs > *,.pointsList > *,.badgeList > *,
+.rankList > *,.notif-b .nrow,.acc > .acc-i{
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.acc-h,.acc-b{padding-left:0;padding-right:0}
+/* a section that has already been flattened inline must not pull out twice */
+.sec[style*="padding:0"] > .tile-stack,.sec[style*="padding: 0"] > .tile-stack{
+  margin-left:0;margin-right:0}
+
+/* a row used on its own — an agent header, a single tile — sits on the
+   section's padding and adds none of its own */
+.sec > .ag,.sec > .agh,.sec > .ch,.sec > .gcard,.sec > .cardrow,
+.sec > .mem,.sec > .aw,.sec > .tile,.sec > .clip,.sec > .kv,
+.sec > p,.sec > .note,.sec > .ai-aura,.sec > .prog,.sec > .chart{
+  padding-left:0;padding-right:0;margin-left:0;margin-right:0}
+.sec > .ag,.sec > .agh{border-bottom:0}
+
+/* the figure cells still bleed, because they are cells of the grid */
+.sec > .prog-figs,.sec > .stats,.sec .prog-figs,.sec .stats{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+
+/* the sticky action bar is part of the page, not stuck to its edge */
+.stickybar{
+  flex:none;background:var(--background);
+  border-top:1px solid var(--rule);
+  padding:var(--s05) var(--pad-x) var(--s06)}
+.stickybar > div{margin-bottom:var(--s05)!important}
+.stickybar .t-heading-02{font-size:22px;line-height:28px;font-weight:600;
+  letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.stickybar .btn{width:100%}
+
+/* ==========================================================================
+   29. SLOT PICKER
+   The chosen day and the chosen time are the candidate's own selection, so
+   they take the accent — the one thing the accent is for. Black is left for
+   actions.
+   ========================================================================== */
+.daystrip{display:flex;gap:var(--s03);overflow-x:auto;scrollbar-width:none;
+  padding-bottom:var(--s02)}
+.day{
+  flex:none;min-width:64px;padding:var(--s03) var(--s04);text-align:center;
+  border:1px solid var(--rule);background:transparent;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.day .d{font-size:11px;line-height:15px;letter-spacing:.7px;text-transform:uppercase;
+  color:var(--text-helper)}
+.day .n{font-size:18px;line-height:24px;font-weight:600;letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.day:hover{border-color:var(--text-primary)}
+.day.on,.day.sel{
+  background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.day.on .d,.day.sel .d{color:var(--on-accent);opacity:.85}
+.day.on .n,.day.sel .n{color:var(--on-accent)}
+
+.slots{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:var(--s03);margin-top:var(--s05);padding:0}
+.slot{
+  min-height:48px;padding:0 var(--s04);display:flex;align-items:center;
+  justify-content:center;text-align:center;
+  border:1px solid var(--rule);background:transparent;
+  font-size:14px;font-weight:500;letter-spacing:.1px;
+  font-variant-numeric:tabular-nums}
+.slot:hover:not([disabled]){border-color:var(--text-primary);
+  background:var(--overlay-hover)}
+.slot.on,.slot.sel{
+  background:var(--accent);border-color:var(--accent);color:var(--on-accent);
+  font-weight:600}
+.slot[disabled]{opacity:.4;cursor:not-allowed;pointer-events:none;
+  text-decoration:line-through;text-decoration-thickness:1px}
+.sec > .slots{margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+
+/* ==========================================================================
+   30. iOS FRAME — prototype chrome, mobile viewport only
+   ========================================================================== */
+.ios-top,.ios-home{display:none}
+.device[data-vp="mobile"] .ios-top{
+  display:flex;align-items:center;justify-content:space-between;
+  position:absolute;top:0;left:0;right:0;height:44px;z-index:50;
+  padding:0 26px 0 30px;background:var(--background);
+  font-size:14px;font-weight:600;letter-spacing:.1px;color:var(--text-primary)}
+.device[data-vp="mobile"] .ios-time{font-variant-numeric:tabular-nums}
+.ios-ind{display:flex;align-items:center;gap:5px}
+.ios-ind svg{height:11px;width:auto;fill:var(--text-primary)}
+.ios-ind svg:nth-child(3){height:12px}
+.device[data-vp="mobile"] .ios-home{
+  display:flex;align-items:center;justify-content:center;
+  position:absolute;left:0;right:0;bottom:0;height:26px;z-index:50;
+  background:var(--background)}
+.ios-home i{display:block;width:134px;height:5px;border-radius:3px;
+  background:var(--text-primary);opacity:.85}
+.device[data-vp="mobile"] .app{top:44px;bottom:26px}
+.device[data-vp="mobile"]{border-radius:0}
+
+/* ==========================================================================
+   31. ARROWS, NOT CHEVRONS, FOR NAVIGATION
+   The chevron is the brand's track mark and the disclosure caret. It does
+   not also get to mean "go".
+   ========================================================================== */
+.tile-arrow,.card-go,svg.arrow{width:18px;height:18px}
+.chev{width:22px;height:22px}   /* accordion / "all steps" disclosure only */
+
+/* ==========================================================================
+   32. THE TRACK AS A PATH
+   Left to right, because it is movement. Three steps carrying one, two and
+   three chevrons — the client's own signature — with the candidate's step
+   filled. The descriptions are gone; the space goes to the facts they are
+   actually on this screen to find.
+   ========================================================================== */
+.path{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1px;background:var(--on-dark-rule);
+  border-top:1px solid var(--on-dark-rule);border-bottom:1px solid var(--on-dark-rule);
+  margin-top:var(--s06)}
+.path-step{
+  display:flex;flex-direction:column;gap:var(--s03);min-width:0;
+  padding:var(--s05) var(--s04);background:var(--surface-dark);position:relative}
+.path-mark{display:flex;gap:2px}
+.path-mark svg{width:14px;height:17px;fill:var(--on-dark-dim)}
+.path-step.on .path-mark svg{fill:var(--accent)}
+.path-step.past .path-mark svg{fill:var(--on-dark-2);opacity:.6}
+.path-n{
+  font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px;
+  color:var(--on-dark-2);overflow-wrap:anywhere}
+.path-step.on .path-n{color:var(--on-dark)}
+.path-you{
+  font-size:9.5px;line-height:13px;font-weight:600;letter-spacing:.7px;
+  text-transform:uppercase;color:var(--accent-text)}
+.path-step.on{box-shadow:inset 0 -2px 0 var(--accent)}
+
+.path-facts{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--on-dark-rule);
+  border-bottom:1px solid var(--on-dark-rule)}
+.path-facts > div{
+  display:flex;flex-direction:column;gap:3px;min-width:0;
+  padding:var(--s04);background:var(--surface-dark)}
+.path-facts .l{
+  font-size:10px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark-2)}
+.path-facts .v{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.1px;
+  color:var(--on-dark)}
+/* the panel bleeds to the frame, so its inner grid does too */
+.lvl-hero .path,.lvl-hero .path-facts{
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+.lvl-hero .path-step:first-child,.lvl-hero .path-facts > div:first-child{
+  padding-left:var(--pad-x)}
+.lvl-hero .path-step:last-child,.lvl-hero .path-facts > div:last-child{
+  padding-right:var(--pad-x)}
+.bands-note{margin-top:var(--s05)}
+
+/* the accordion bleeds cleanly now that its section carries the spine */
+.sec.flat.bleed{padding-left:0;padding-right:0}
+.sec.flat.bleed > .tile-stack{margin-left:0;margin-right:0}
+
+/* ==========================================================================
+   33. FOUR REGRESSIONS FROM THE SWEEPS ABOVE
+   ========================================================================== */
+/* a. The generic `button[data-go]:hover` rule outranked `.btn-p:hover`, so the
+   primary button went pale grey under white text and vanished. Buttons and
+   links carry their own hover and are excluded from the row rule.
+   The primary's hover is now the accent, per Maryam. */
+button[data-go]:hover,button[data-chart]:hover,button[data-tbl]:hover,
+button[data-stp]:hover,button[data-ctab]:hover,button[data-rtab]:hover,
+button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparent}
+:where(button,a)[data-go]:not(.btn):not(.lk):not(.lnk):not(.chip-tal):hover,
+:where(button)[data-chart]:hover,:where(button)[data-tbl]:hover,
+:where(button)[data-stp]:hover,:where(button)[data-ctab]:hover,
+:where(button)[data-rtab]:hover,:where(button)[data-toggle]:hover{
+  background-color:var(--overlay-hover)}
+.btn.btn-p:hover,button.btn-p:hover,.btn-p:hover{
+  background-color:var(--accent);color:var(--on-accent)}
+.btn.btn-p:active,button.btn-p:active{background-color:var(--accent-hover)}
+.on-dark .btn-p:hover,.sec.on-dark .btn-p:hover{
+  background-color:var(--accent);color:var(--on-accent)}
+
+/* b. `.lvl-hero .ladder i` outranked `.ladder i.done`, so every rung went
+   grey and the candidate's own progress disappeared. */
+.lvl-hero .ladder i{background-color:var(--on-dark-rule)}
+.lvl-hero .ladder i.done{background-color:var(--accent);opacity:.55}
+.lvl-hero .ladder i.on{background-color:var(--accent);opacity:1}
+
+/* c. The accent is 4.15:1 on the inverted panel — under AA. Accent-coloured
+   text on dark needs its own lighter value, the same way --accent-text
+   exists for the bone ground. */
+:root{--accent-on-dark:#f68441}
+.path-you,.lvl-hero .acc-h,.on-dark .accent-text{color:var(--accent-on-dark)}
+
+/* d. Facts and step lists for the rewritten Interviews page */
+.facts{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:1px;background:var(--rule);
+  margin:0 calc(var(--pad-x) * -1);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.facts > div{
+  display:flex;flex-direction:column;gap:3px;min-width:0;
+  padding:var(--s04) var(--s05);background:var(--background)}
+.facts > div:first-child{padding-left:var(--pad-x)}
+.facts .l{font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.facts .v{font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.1px}
+
+.steps{display:flex;flex-direction:column}
+.steps > li{
+  display:flex;gap:var(--s05);align-items:flex-start;
+  padding:var(--s05) 0;border-bottom:1px solid var(--rule)}
+.steps > li:last-child{border-bottom:0}
+.s-n{
+  flex:none;width:24px;height:24px;display:grid;place-items:center;
+  border:1px solid var(--rule);
+  font-size:11.5px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-secondary);margin-top:1px}
+.s-b{flex:1;min-width:0;font-size:13.5px;line-height:22px;
+  letter-spacing:.1px;color:var(--text-secondary)}
+.s-b b{display:block;font-size:14px;line-height:20px;font-weight:600;
+  color:var(--text-primary);margin-bottom:2px}
+
+/* ==========================================================================
+   34. AVATARS AND THE COUNT
+   ========================================================================== */
+/* the notification count is the one round thing in the product: a count is a
+   token, not a panel, and the circle separates it from the square marks */
+.shell-badge,.sn-item .badge{
+  border-radius:999px;min-width:16px;height:16px;padding:0 4px;
+  display:grid;place-items:center;font-size:9.5px;line-height:1}
+.shell-badge{top:6px;right:6px}
+.sn-item .badge{min-width:18px;height:18px;font-size:10px}
+
+/* the signed-in candidate has a face like everyone else */
+.shell-avatar{
+  position:relative;overflow:hidden;width:30px;height:30px;
+  background:var(--gray-80)}
+.shell-avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.shell-avatar i{font-style:normal;position:relative;z-index:0}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.av{position:relative;overflow:hidden}
+.av i{font-style:normal}
+
+/* ==========================================================================
+   35. THE SIGNED REPORT SUMMARY
+   The most consequential thing on My Level, so it behaves like the object it
+   is: signed by a named person, and a way into the full document.
+   ========================================================================== */
+.signed{
+  display:block;width:100%;text-align:left;
+  border-left:2px solid var(--rule-ink);
+  padding:var(--s02) 0 var(--s02) var(--s05);
+  transition:background var(--dur-short) var(--ease-standard),
+             border-left-color var(--dur-short) var(--ease-standard)}
+.signed.clk{cursor:pointer}
+.signed.clk:hover{background:var(--overlay-hover);border-left-color:var(--accent)}
+.signed.clk:hover .tile-arrow{fill:var(--text-primary);transform:translateX(2px)}
+.signed.clk:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+.signed-h{
+  display:flex;align-items:center;gap:var(--s04);
+  padding-bottom:var(--s04);margin-bottom:var(--s04);
+  border-bottom:1px solid var(--rule)}
+.signed-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.signed-b b{font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.02px}
+.signed-b span{font-size:12px;line-height:16px;color:var(--text-secondary);
+  letter-spacing:.15px}
+.signed .ai-body{margin-top:0}
+.signed .ai-body .t-label-01{
+  display:block;font-size:10.5px;line-height:14px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper);
+  margin:var(--s05) 0 var(--s02)}
+.signed .ai-body > .t-label-01:first-child{margin-top:0}
+.signed .ai-foot{margin-top:var(--s05);padding-top:var(--s04);
+  border-top:1px solid var(--rule)}
+
+/* ==========================================================================
+   36. GROWTH AREA, AND THE CHAPTER YOU ARE ON
+   ========================================================================== */
+/* the little accent square before "Your growth area" implied Tal. The growth
+   area comes from Priya's report, so the mark is wrong twice over — as noise
+   and as attribution. */
+.ai-inline .sk,.ai-inline .sk-mark{display:none}
+.ai-inline{color:var(--accent-text);font-weight:500;padding:0;gap:0}
+
+/* the current chapter is the one thing on this screen the candidate is meant
+   to act on, so it is marked as theirs and says what to do */
+.ch.open{position:relative;background:transparent}
+.ch.open::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--accent)}
+.ch.open .ch-num{
+  background:var(--accent);color:var(--on-accent);border-color:transparent;font-weight:700}
+.ch.open .ch-n{font-weight:700}
+.ch.open .ch-m{color:var(--text-primary)}
+.ch.open .ch-m::after{
+  content:'Continue →';margin-left:var(--s03);font-weight:600;color:var(--accent-text);
+  white-space:nowrap}
+.ch.open:hover{background:var(--overlay-hover)}
+.ch.open:hover .ch-m::after{text-decoration:underline;text-underline-offset:2px}
+
+/* completed chapters step back: the number outlines, the tick carries the accent */
+.ch.done .ch-num{
+  background:transparent;color:var(--text-secondary);border:1px solid var(--rule);
+  font-weight:600}
+.ch.done .ch-ic svg{fill:var(--accent)}
+
+/* ==========================================================================
+   37. NO HOLES, NO STRAY BANDS
+   A wrapped cell grid leaves an empty cell showing the rule ground, and a
+   section holding only a bled grid leaves a thin empty strip above and below
+   it. Both read as mistakes in a design made of rules.
+   ========================================================================== */
+.path-facts > div:last-child:nth-child(odd){grid-column:1 / -1}
+.facts > div:last-child:nth-child(odd){grid-column:1 / -1}
+.stats > .stat:last-child:nth-child(odd){grid-column:1 / -1}
+@container app (min-width:700px){
+  .stats > .stat:last-child:nth-child(odd){grid-column:auto}
+}
+/* a section whose only content is a bled grid has no need of its own padding */
+.sec:has(> .facts:only-child),.sec:has(> .prog-figs:only-child),
+.sec:has(> .stats:only-child),.sec:has(> .path-facts:only-child){
+  padding-top:0;padding-bottom:0}
+.sec > .facts:only-child,.sec > .prog-figs:only-child,.sec > .stats:only-child{
+  margin-top:0;border-top:0}
+.lvl-hero{padding-bottom:0}
+.lvl-hero .path-facts{border-bottom:0}
+.lvl-hero .path{margin-top:var(--s07)}
+
+/* ==========================================================================
+   38. THE SPINE IS AN INVARIANT
+   Rows inside a bleeding list must re-pay the padding the list pulled out.
+   Earlier layers style some of those rows with two classes (`.tile.clk`),
+   which outranks a `.tile-stack > *` rule — so the selectors here are
+   written at matching specificity rather than relying on source order.
+   `verify.mjs` now asserts this on every view at 390 and 1280, so it fails
+   the build instead of being found by eye.
+   ========================================================================== */
+.tile-stack > .tile,.tile-stack > .tile.clk,.tile-stack > .tile.gcard,
+.tile-stack > .gcard,.tile-stack > .ag,.tile-stack > .agh,.tile-stack > .ch,
+.tile-stack > .cardrow,.tile-stack > .mem,.tile-stack > .aw,.tile-stack > .nrow,
+.tile-stack > .clip,.tile-stack > .post,.tile-stack > .msg,
+.aw-list > .aw,.pointsList > .aw,.badgeList > .aw,.rankList > .aw,
+.msgs > .msg,.msgs > .post{
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+
+/* --------------------------------------------------------------------------
+   38b. THE STICKY BAR SITS ON THE SPINE TOO
+   It is a sibling of <main>, not a child of .page, so it has to reproduce
+   the page's box: the same outer inset, the same max width, centred the same
+   way. One token drives both so they cannot drift apart.
+   -------------------------------------------------------------------------- */
+:root{--main-pad:0px}
+@container app (min-width:760px){:root{--main-pad:var(--s06)}}
+@container app (min-width:1200px){:root{--main-pad:var(--s09)}}
+.main{padding-left:var(--main-pad);padding-right:var(--main-pad)}
+.stickybar{
+  display:flex;flex-direction:column;align-items:center;
+  padding:var(--s05) var(--main-pad) var(--s06)}
+.stickybar > *{
+  width:100%;max-width:var(--content-max);
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+.stickybar > div{margin-bottom:var(--s05)!important}

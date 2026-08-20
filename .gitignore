@@ -4,3 +4,9 @@ node_modules/
 *.log
 .env
 .env.local
+
+# Playwright MCP scratch
+.playwright-mcp/
+
+# Verification screenshots dropped at repo root
+/*.png

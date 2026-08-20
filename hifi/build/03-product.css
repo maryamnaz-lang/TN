@@ -1,0 +1,476 @@
+/* ==========================================================================
+   18. THE CHEVRON TRACK MARK
+   New in v15. The client's website spec makes this their own decision:
+   "one chevron for Explorer, two for Builder, three for Trailblazer …
+   the three-chevron mark is the only progress iconography allowed."
+   It replaces the three-band graphic and finally gives the brand's mark
+   a job inside the product.
+   ========================================================================== */
+.bands,.trackband{display:block!important}
+.chev-track{display:flex;flex-direction:column;gap:0}
+.chev-row{
+  display:flex;align-items:center;gap:var(--s05);
+  padding:var(--s05) 0;border-bottom:1px solid var(--border-subtle-01);
+  position:relative}
+.chev-row:last-child{border-bottom:0}
+.chev-mark{display:flex;gap:2px;flex:none;width:64px}
+.chev-mark svg{width:18px;height:22px;fill:var(--gray-30)}
+.chev-row.on .chev-mark svg{fill:var(--accent)}
+.chev-row.past .chev-mark svg{fill:var(--gray-40)}
+.chev-b{flex:1;min-width:0}
+.chev-n{display:block;font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+.chev-row.on .chev-n{font-weight:700}
+.chev-d{display:block;margin-top:2px;font-size:12.5px;line-height:17px;
+  letter-spacing:.2px;color:var(--text-secondary)}
+.chev-you{
+  flex:none;height:24px;padding:0 var(--s03);display:grid;place-items:center;
+  background:var(--accent);color:var(--on-accent);
+  font-size:11px;font-weight:600;letter-spacing:.3px}
+.bands-note{display:block;margin-top:var(--s04);font-size:12.5px;
+  line-height:17px;color:var(--text-helper)}
+/* inline chevron, used as a section device and beside the level name */
+.chev{display:inline-flex;gap:1px;vertical-align:middle}
+.chev svg{width:12px;height:15px;fill:var(--accent)}
+.chev.k svg{fill:var(--text-primary)}
+.chev.q svg{fill:var(--text-placeholder)}
+
+/* ==========================================================================
+   19. LEVEL HERO — an inverted band, not a card.
+   The client's document runs exactly one full-black panel per spread.
+   ========================================================================== */
+.lvl-hero{
+  padding:var(--s07) var(--gutter);
+  background:var(--surface-dark);color:var(--on-dark);
+  position:relative;overflow:hidden}
+.lvl-hero .eyebrow{color:var(--on-dark-2)}
+.lvl-hero .nm{font-size:32px;line-height:40px;font-weight:600;letter-spacing:-.8px;
+  color:var(--on-dark);display:block}
+.lvl-hero .sub{color:var(--on-dark-2);margin-top:var(--s03)}
+.lvl-hero .chev svg{fill:var(--accent)}
+.lvl-hero .kv{border-bottom-color:var(--on-dark-rule)}
+.lvl-hero .kv .k{color:var(--on-dark-2)}
+.lvl-hero .kv .v{color:var(--on-dark)}
+@container app (min-width:900px){
+  .lvl-hero{padding:var(--s09) var(--gutter)}
+  .lvl-hero .nm{font-size:44px;line-height:52px;letter-spacing:-1.2px}
+}
+
+/* ==========================================================================
+   20. THE LADDER — 15 rungs. Completed and current carry the accent.
+   ========================================================================== */
+.ladder{display:flex;align-items:flex-end;gap:3px;height:56px;margin-top:var(--s04)}
+.ladder i{
+  flex:1;min-width:0;background:var(--layer-accent-01);
+  transition:background var(--dur-standard) var(--ease-standard)}
+.ladder i.done{background:var(--accent);opacity:.55}
+.ladder i.on{background:var(--accent)}
+.ladder-lab{display:flex;justify-content:space-between;margin-top:var(--s03);
+  font-size:11.5px;letter-spacing:.2px;color:var(--text-helper)}
+.rail,.rail-wrap{display:block}
+
+/* ==========================================================================
+   21. STEPPER — MUI Stepper, vertical, square nodes
+   ========================================================================== */
+.stp{display:flex;flex-direction:column}
+.stp-h{display:flex;align-items:center;gap:var(--s04);width:100%;
+  padding:var(--s04) 0;text-align:left}
+.stp-rail{display:flex;flex-direction:column;gap:0}
+.stp-c{
+  width:24px;height:24px;flex:none;display:grid;place-items:center;
+  border:1.5px solid var(--border-strong-01);background:var(--layer-01);
+  font-size:11.5px;font-weight:600;color:var(--text-secondary)}
+.stp-c svg{width:14px;height:14px;fill:var(--on-brand)}
+.stp .done .stp-c{background:var(--brand-primary);border-color:var(--brand-primary);color:var(--on-brand)}
+.stp .on .stp-c,.stp-now .stp-c{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.stp-t{flex:1;min-width:0}
+.stp-t b{display:block;font-size:14px;font-weight:600;line-height:20px;letter-spacing:.1px}
+.stp-t span{display:block;font-size:12.5px;line-height:17px;color:var(--text-secondary);letter-spacing:.2px}
+.stp-all{display:flex;flex-direction:column;border-top:1px solid var(--border-subtle-01);
+  margin-top:var(--s04);padding-top:var(--s04)}
+.stp-all > div{display:flex;gap:var(--s04);padding:var(--s03) 0;align-items:flex-start}
+.pi,.pi-sec{display:flex;flex-direction:column;gap:var(--s02)}
+.pi-step{min-height:52px}
+.pi-lab{font-size:13px;letter-spacing:.1px}
+
+/* ==========================================================================
+   22. AGENTS
+   ========================================================================== */
+.ag{gap:var(--s05);align-items:flex-start;padding-top:var(--s05);padding-bottom:var(--s05)}
+.ag .av{margin-top:2px}
+.ag-r{display:flex!important;align-items:center;gap:var(--s02);margin-top:3px}
+.ag-r .num{font-size:12.5px;font-weight:600;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums}
+.stars{display:inline-flex;gap:1px}
+.stars svg{width:13px;height:13px;fill:var(--gray-30)}
+.stars svg.f{fill:var(--text-primary)}
+.ag-foot{display:flex!important;align-items:baseline;gap:var(--s04);margin-top:var(--s03);
+  font-size:12.5px;letter-spacing:.2px;flex-wrap:wrap}
+.ag-price{margin-left:auto;font-weight:600;color:var(--text-primary);
+  font-variant-numeric:tabular-nums}
+.ag .bd{display:none}
+/* agent header (profile) */
+.agh{display:flex;gap:var(--s05);align-items:flex-start;
+  padding:var(--s06) var(--gutter);border-bottom:1px solid var(--border-subtle-01)}
+.agh-f{width:64px;height:64px;font-size:19px}
+.agh-n{display:block;font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.3px}
+.agh-r{display:flex;align-items:center;gap:var(--s02);margin-top:var(--s02)}
+.agh-m{display:block;margin-top:var(--s02);font-size:12.5px;color:var(--text-secondary)}
+.agh-slot{margin-top:var(--s04)}
+/* slot picker */
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:var(--s03)}
+.slot{
+  min-height:48px;padding:0 var(--s04);justify-content:center;
+  border:1px solid var(--border-subtle-02);border-bottom:1px solid var(--border-subtle-02);
+  font-size:13px;font-weight:500;text-align:center}
+.slot:hover{border-color:var(--text-primary);background:var(--overlay-hover)}
+.slot.sel,.slot.on{background:var(--brand-primary);color:var(--on-brand);border-color:var(--brand-primary)}
+.daystrip{display:flex;gap:var(--s03);overflow-x:auto;scrollbar-width:none;padding-bottom:var(--s02)}
+.daystrip::-webkit-scrollbar{display:none}
+.day{
+  flex:none;min-width:56px;padding:var(--s03) var(--s04);text-align:center;
+  border:1px solid var(--border-subtle-02);font-size:12px;line-height:16px}
+.day b{display:block;font-size:16px;font-weight:600;margin-top:2px}
+.day.sel{background:var(--brand-primary);color:var(--on-brand);border-color:var(--brand-primary)}
+.day.on{border-color:var(--text-primary)}
+
+/* ==========================================================================
+   23. CHAPTERS / COURSEWORK
+   ========================================================================== */
+.ch-num{
+  width:32px;height:32px;flex:none;display:grid;place-items:center;
+  background:var(--layer-02);font-size:12.5px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+.ch.done .ch-num{background:var(--accent);color:var(--on-accent)}
+.ch.open .ch-num{background:var(--brand-primary);color:var(--on-brand)}
+.ch.locked{opacity:.55}
+.ch.locked .ch-n{color:var(--text-secondary)}
+.ch-b{flex:1;min-width:0}
+.ch .ic,.ch-ic{margin-left:auto}
+.ch .tag{flex:none}
+.cert{padding:var(--s06) var(--gutter);border-top:1px solid var(--border-subtle-01)}
+
+/* ==========================================================================
+   24. CHARTS
+   Both single-series with a dashed reference line rather than a second
+   colour. Time-on-course stacks the muted accent family.
+   ========================================================================== */
+.chart{margin-top:var(--s05)}
+.chart-head{display:flex;align-items:baseline;gap:var(--s04);margin-bottom:var(--s05)}
+.chart-head .v{font-size:24px;font-weight:600;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.chart-head .k{font-size:12.5px;color:var(--text-helper)}
+.chart-read{margin-left:auto;font-size:12.5px;color:var(--text-secondary)}
+.chart-plot{position:relative;display:flex;align-items:flex-end;gap:var(--s03);
+  height:160px;border-bottom:1px solid var(--border-strong-01)}
+.chart-bar{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;
+  height:100%;cursor:pointer;position:relative;gap:1px}
+.chart-bar i{display:block;width:100%;background:var(--dv-3);
+  transition:opacity var(--dur-short) var(--ease-standard)}
+.chart-bar i.s1{background:var(--dv-1)}
+.chart-bar i.s2{background:var(--dv-2)}
+.chart-bar i.s3{background:var(--dv-3)}
+.chart-bar i.s4{background:var(--dv-4)}
+.chart-bar:hover i{opacity:.75}
+.chart-bar.sel i,.chart-bar.on i{outline:2px solid var(--brand-primary);outline-offset:-2px}
+.chart-ref{position:absolute;left:0;right:0;height:0;
+  border-top:1px dashed var(--gray-50);pointer-events:none}
+.chart-reflab{position:absolute;right:0;top:-16px;font-size:11px;
+  letter-spacing:.2px;color:var(--text-helper);background:var(--background);padding:0 3px}
+.chart-x{display:flex;gap:var(--s03);margin-top:var(--s03)}
+.chart-x span{flex:1;min-width:0;text-align:center;font-size:10.5px;
+  letter-spacing:.2px;color:var(--text-helper);overflow:hidden;text-overflow:ellipsis}
+.chart-line{position:relative;height:160px}
+.chart-line svg{width:100%;height:100%;overflow:visible}
+.chart-line path.line{fill:none;stroke:var(--chart-ink);stroke-width:1.5}
+.chart-line circle{fill:var(--chart-ink)}
+.chart-line circle.on{fill:var(--accent);r:4}
+.chart-line .ref{stroke:var(--gray-50);stroke-width:1;stroke-dasharray:3 3}
+.legend{display:flex;flex-wrap:wrap;gap:var(--s04);margin-top:var(--s05)}
+.legend span{display:inline-flex;align-items:center;gap:var(--s03);
+  font-size:12px;letter-spacing:.2px;color:var(--text-secondary)}
+.legend i{width:10px;height:10px;flex:none}
+.sc-plot,.sc-col{position:relative}
+.bars{display:flex;align-items:flex-end;gap:2px;height:32px}
+.bars i{flex:1;background:var(--dv-2);min-width:0}
+.bar{height:4px;background:var(--layer-accent-01)}
+.bar > i{display:block;height:100%;background:var(--accent)}
+
+/* ==========================================================================
+   25. POINTS, BADGES, RANK
+   ========================================================================== */
+.score{padding:var(--s06) var(--gutter);border-bottom:1px solid var(--border-subtle-01)}
+.score-top{display:flex;align-items:baseline;gap:var(--s04);flex-wrap:wrap}
+.score-pts{font-size:40px;line-height:44px;font-weight:600;letter-spacing:-1.2px;
+  font-variant-numeric:tabular-nums}
+.score-rank{display:inline-flex;align-items:center;gap:var(--s02);
+  font-size:13px;font-weight:600;color:var(--text-secondary)}
+.score-rank svg{width:16px;height:16px;fill:var(--accent)}
+.score-meta{display:block;margin-top:var(--s02);font-size:12.5px;color:var(--text-secondary)}
+.score-next{margin-top:var(--s05)}
+.score.on-dark{background:var(--surface-dark);color:var(--on-dark)}
+.score.on-dark .score-meta,.score.on-dark .score-rank{color:var(--on-dark-2)}
+.aw-list,.pointsList{display:flex;flex-direction:column}
+.aw-r{gap:var(--s05);align-items:center}
+.aw-ic{background:var(--layer-02)}
+.aw-r.got .aw-ic{background:var(--accent)}
+.aw-r.got .aw-ic svg{fill:var(--on-accent)}
+.aw-v{margin-left:auto;flex:none;font-size:14px;font-weight:600;
+  font-variant-numeric:tabular-nums;text-align:right}
+.aw-v.neg{color:var(--support-error)}
+.aw-r:not(.got){opacity:.72}
+.badges{display:flex;flex-wrap:wrap;gap:var(--s03)}
+.pt-cap{}
+
+/* achievement banner — a band, not a card */
+.ach{
+  display:flex;align-items:center;gap:var(--s05);
+  padding:var(--s05) var(--gutter);
+  background:var(--brand-tint-2);border-bottom:1px solid var(--border-subtle-01)}
+.ach-ic{background:var(--accent)}
+.ach-ic svg{fill:var(--on-accent)}
+.ach-x{flex:none;width:40px;height:40px;display:grid;place-items:center;margin-left:auto}
+.ach-x svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.ach-x:hover{background:var(--overlay-hover)}
+
+/* ==========================================================================
+   26. COHORT, MESSAGES, POSTS
+   ========================================================================== */
+.mem{min-height:56px;gap:var(--s04)}
+.mem-av{background:var(--gray-70)}
+.post{
+  display:block;padding:var(--s05) var(--gutter);
+  border-bottom:1px solid var(--border-subtle-01)}
+.post-h{display:flex;align-items:center;gap:var(--s04);margin-bottom:var(--s03)}
+.post-who{font-size:13px;font-weight:600;letter-spacing:.1px}
+.post-t{margin-left:auto;font-size:11.5px;color:var(--text-helper)}
+.post-b{font-size:14px;line-height:21px;letter-spacing:.1px}
+.post-f,.post-act{display:flex;align-items:center;gap:var(--s05);margin-top:var(--s04)}
+.post-act button{display:inline-flex;align-items:center;gap:var(--s02);
+  min-height:32px;padding:0 var(--s03);margin-left:-8px;
+  font-size:12.5px;color:var(--text-secondary)}
+.post-act button svg{width:16px;height:16px;fill:currentColor}
+.post-act button:hover{background:var(--overlay-hover);color:var(--text-primary)}
+.post-tal{margin-left:auto}
+.msgs{display:flex;flex-direction:column}
+.msg{display:flex;gap:var(--s04);padding:var(--s05) var(--gutter);
+  border-bottom:1px solid var(--border-subtle-01);align-items:flex-start}
+.msg.un{background:var(--layer-01)}
+.msg .mtxt{flex:1;min-width:0}
+.msg .nm{display:block;font-size:14px;font-weight:600;letter-spacing:.1px}
+.msg .p{display:block;margin-top:2px;font-size:12.5px;line-height:17px;
+  color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msg .d{flex:none;font-size:11.5px;color:var(--text-helper)}
+.composer{
+  display:flex;gap:var(--s03);align-items:flex-end;
+  padding:var(--s04) var(--gutter);border-top:1px solid var(--border-subtle-01);
+  background:var(--layer-01)}
+.composer textarea,.composer .inp{flex:1;min-height:48px}
+.composer .btn{min-width:48px;min-height:48px;padding:0;justify-content:center;flex:none}
+
+/* ==========================================================================
+   27. NOTIFICATION PANEL
+   ========================================================================== */
+.notif{
+  position:absolute;top:0;right:0;bottom:0;width:100%;max-width:380px;z-index:50;
+  background:var(--layer-01);border-left:1px solid var(--border-subtle-01);
+  display:flex;flex-direction:column;
+  transform:translateX(100%);visibility:hidden;
+  transition:transform var(--dur-standard) var(--ease-standard),visibility var(--dur-standard)}
+.notif.on{transform:translateX(0);visibility:visible}
+.notif-h{flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s04) var(--s05) var(--s06);
+  border-bottom:1px solid var(--border-subtle-01)}
+.notif-h h2{font-size:16px;font-weight:600;letter-spacing:-.1px}
+.notif-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center}
+.notif-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.notif-b{flex:1;overflow-y:auto}
+.notif-g{padding:var(--s05) var(--s06) var(--s03);font-size:11.5px;font-weight:600;
+  letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper)}
+.notif-all{padding:var(--s04) var(--s06);border-top:1px solid var(--border-subtle-01)}
+.nrow{padding-left:var(--s06);padding-right:var(--s05);align-items:flex-start}
+.nrow-w{position:relative}
+.nrow.un::after{content:'';position:absolute;left:8px;top:26px;
+  width:6px;height:6px;background:var(--accent)}
+
+/* ==========================================================================
+   28. TAL — the coach. Nothing black animates: the aura, the draw border,
+   the skeleton and the gradient all carry the accent.
+   ========================================================================== */
+.tal-fab{
+  position:absolute;right:var(--s05);bottom:var(--s05);z-index:45;
+  width:56px;height:56px;display:grid;place-items:center;
+  background:var(--brand-primary);color:var(--on-brand);border-radius:var(--radius);
+  transition:background var(--dur-short) var(--ease-standard)}
+.tal-fab svg{width:24px;height:24px;fill:var(--on-brand)}
+.tal-fab:hover{background:var(--brand-primary-hover)}
+.tal-fab::before{
+  content:'';position:absolute;inset:-3px;border:1px solid var(--accent);
+  opacity:.6;animation:aura 3.2s linear infinite}
+@keyframes aura{0%{transform:rotate(0deg) scale(1);opacity:.6}
+  50%{transform:rotate(180deg) scale(1.04);opacity:.25}
+  100%{transform:rotate(360deg) scale(1);opacity:.6}}
+@media (prefers-reduced-motion:reduce){
+  .tal-fab::before{animation:none}
+  *{transition-duration:.01ms!important}
+}
+.tal-panel{
+  position:absolute;inset:0;z-index:65;display:flex;flex-direction:column;
+  background:var(--layer-01);
+  transform:translateY(100%);visibility:hidden;
+  transition:transform var(--dur-long) var(--ease-decelerate),visibility var(--dur-long)}
+.tal-panel.on{transform:translateY(0);visibility:visible}
+.tal-h{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s04) var(--s05) var(--s06);
+  border-bottom:1px solid var(--border-subtle-01)}
+.tal-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center}
+.tal-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
+.ai-label{
+  display:inline-flex;align-items:center;gap:var(--s02);height:24px;padding:0 var(--s03);
+  border:1px solid var(--accent);color:var(--accent-text);
+  font-size:11.5px;font-weight:600;letter-spacing:.3px}
+.tal-body{flex:1;overflow-y:auto;padding:var(--s06) var(--gutter);
+  display:flex;flex-direction:column;gap:var(--s05)}
+.tal-msg{display:flex;gap:var(--s04);align-items:flex-start}
+.tal-msg.me{flex-direction:row-reverse}
+.tal-msg .bb,.bub{
+  max-width:min(85%,540px);padding:var(--s04) var(--s05);
+  background:var(--layer-02);font-size:14px;line-height:21px;letter-spacing:.1px}
+.tal-msg.me .bb{background:var(--brand-primary);color:var(--on-brand)}
+.sk{display:flex;gap:var(--s03);align-items:center}
+.sk-mark,.sk i{
+  display:block;height:10px;width:64px;
+  background:linear-gradient(90deg,var(--brand-tint-2),var(--accent),var(--brand-tint-2));
+  background-size:200% 100%;animation:sk 1.3s linear infinite}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.tal-sugg{display:flex;flex-wrap:wrap;gap:var(--s03);
+  padding:var(--s04) var(--gutter);border-top:1px solid var(--border-subtle-01)}
+.tal-legal{padding:var(--s03) var(--gutter) var(--s04);
+  font-size:11px;line-height:15px;color:var(--text-helper);
+  border-top:1px solid var(--border-subtle-01)}
+.tal-star,.ai-inline{
+  display:inline-flex;align-items:center;gap:var(--s02);height:28px;padding:0 var(--s03);
+  font-size:11.5px;color:var(--accent-text);flex:none}
+.tal-star svg,.ai-inline svg{width:14px;height:14px;fill:var(--accent-text)}
+.tal-star:hover{background:var(--brand-tint-2)}
+/* Tal's in-chat widgets */
+.tw{display:flex;flex-direction:column;gap:var(--s03);
+  margin-top:var(--s04);padding:var(--s04);
+  background:var(--layer-01);border:1px solid var(--border-subtle-02)}
+.tw-h{font-size:11.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--text-helper)}
+.tw-row{display:flex;align-items:baseline;gap:var(--s04);font-size:12.5px}
+.tw-k{color:var(--text-secondary)}
+.tw-a,.tw-def{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums}
+.tw-rungs{display:flex;gap:2px}
+.tw-rungs i{
+  flex:1;min-width:0;height:20px;display:grid;place-items:center;
+  background:var(--layer-02);font-size:10px;color:var(--text-secondary);font-style:normal}
+.tw-rungs i.on{background:var(--accent);color:var(--on-accent);font-weight:600}
+.tw-list,.tw-check,.tw-lines{display:flex!important;flex-direction:column;gap:var(--s03)}
+.tw-list>span,.tw-check>span{position:relative;padding-left:var(--s05);
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.tw-list>span::before{content:'';position:absolute;left:0;top:6px;width:5px;height:5px;
+  background:var(--dv-3)}
+.tw-check>span::before{content:'';position:absolute;left:0;top:3px;width:10px;height:10px;
+  border:1px solid var(--border-strong-01)}
+.tw-lines>span{display:flex;gap:var(--s04);font-size:12.5px;line-height:17px;
+  color:var(--text-secondary)}
+.tw-lines b{min-width:58px;font-size:13px;color:var(--text-primary);
+  font-variant-numeric:tabular-nums}
+.tw-ag{display:flex!important;align-items:center;gap:var(--s04)}
+.tw-ag b{display:block;font-size:13px;line-height:18px}
+.tw-chips{display:flex;flex-wrap:wrap;gap:var(--s03);margin-top:var(--s04)}
+/* THE WIDGET'S BUTTON HAD NO RULE AT ALL — `twBtn` prints a label and
+   `I.arrowRight`, and an <svg> with no width, no height and nothing sizing it
+   falls back to the replaced-element default of 300 x 150. Constrained by the
+   widget it sat in, that drew an arrow 95px square: the "Open chapter 4" mark
+   was taller than the three rows of figures above it. It is as old as the
+   component and it looked the same in the side panel, which is where these
+   widgets used to be read; it is stated here, beside its siblings, because
+   nothing anywhere was overriding it — this is the missing declaration rather
+   than a patch on one.
+   The shape is the chips' shape (§02.318), because that is what it sits in a
+   row with, and the mark is sized to the type rather than to the viewport. */
+.tw-btn{display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:32px;padding:0 var(--s04);
+  background:transparent;border:1px solid var(--rule);
+  font-size:12.5px;line-height:17px;font-weight:500;letter-spacing:.15px;
+  color:var(--text-primary);cursor:pointer;text-align:left}
+.tw-btn svg{flex:none;display:block;width:16px;height:16px;fill:currentColor}
+/* the second of a pair is the quiet one — same row, no box round it */
+.tw-btn.ghost{border-color:transparent;padding-left:0;padding-right:0}
+.tal-msg.me .bb .tw{background:var(--on-dark-fill);border-color:var(--on-dark-fill-2)}
+.tal-msg.me .bb .tw *{color:var(--on-dark)!important}
+/* AI presence surfaces */
+.ai-pop{
+  position:absolute;z-index:55;max-width:300px;padding:var(--s05);
+  background:var(--layer-01);border:1px solid var(--accent);
+  box-shadow:0 2px 12px var(--accent-shadow)}
+.ai-head,.ai-foot{display:flex;align-items:center;gap:var(--s03)}
+.ai-body{font-size:12.5px;line-height:18px;color:var(--text-secondary);margin-top:var(--s03)}
+.ai-field{border-bottom-color:var(--accent)}
+.ai-stream{border-left:2px solid var(--accent);padding-left:var(--s04)}
+.ai-aura{position:relative}
+.draw{position:relative}
+.draw:hover::after{
+  content:'';position:absolute;inset:0;border:1px solid var(--accent);pointer-events:none;
+  animation:draw var(--dur-standard) var(--ease-standard)}
+@keyframes draw{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+/* ==========================================================================
+   29. PAYMENTS
+   Card marks keep their real brand colours. Monochroming another party's
+   mark misrepresents it and breaches the card networks' guidelines.
+   ========================================================================== */
+.bmk{display:inline-flex;flex:none;width:40px}
+.bmk svg{width:40px;height:26px}
+.bmk.lg{width:40px}
+.bmk-row{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.bmk-row .lab{font-size:11.5px;color:var(--text-helper);letter-spacing:.2px}
+.paymeta{display:flex;gap:var(--s04);font-size:12.5px;color:var(--text-secondary)}
+.cardrow{gap:var(--s05)}
+.cardrow-d{font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   30. MISC UTILITIES — carried over so existing markup keeps working
+   ========================================================================== */
+.mt0{margin-top:0}.mt3{margin-top:var(--s03)}.mt4{margin-top:var(--s04)}
+.mt5{margin-top:var(--s05)}.mt6{margin-top:var(--s06)}.mt{margin-top:var(--s05)}
+.mb0{margin-bottom:0}.mb4{margin-bottom:var(--s04)}.mb5{margin-bottom:var(--s05)}
+.mb6{margin-bottom:var(--s06)}
+.flat{padding-left:0;padding-right:0}
+.spaced{display:flex;align-items:center;gap:var(--s04)}
+.spaced .sp{margin-left:auto}
+.xs{font-size:11.5px}.sm{font-size:12.5px}
+.num,.mono{font-variant-numeric:tabular-nums}
+.b{font-weight:600}
+.high{background:var(--brand-tint-2)}
+.hit{position:absolute;inset:0}
+.locked{opacity:.55}
+.thumb{
+  width:56px;height:40px;flex:none;position:relative;display:grid;place-items:center;
+  background:var(--gray-80);color:var(--on-dark)}
+.thumb svg{width:18px;height:18px;fill:var(--on-dark)}
+.thumb .t{position:absolute;right:2px;bottom:2px;font-size:9.5px;
+  background:var(--thumb-scrim);color:var(--pure-white);padding:0 3px;font-variant-numeric:tabular-nums}
+.clip{gap:var(--s04)}
+.cb{flex:1;min-width:0}
+.ct{display:block;font-size:14px;font-weight:600;line-height:19px}
+.cq{display:block;margin-top:2px;font-size:12px;color:var(--text-secondary)}
+.conf{padding:var(--s07) var(--gutter);text-align:center}
+.conf svg{width:40px;height:40px;fill:var(--support-success);margin:0 auto var(--s05)}
+.box{}
+.w3{min-width:3ch}
+.eb{display:block}
+.line{height:1px;background:var(--border-subtle-01)}
+.cool,.tint{background:var(--layer-02)}
+.cs,.ct,.rt2{}
+.wide{width:100%}
+.stand{display:block}
+.not{display:none}
+.mag{}
+.l,.r,.m,.n,.s,.t,.v,.k,.p,.d,.c,.g,.x{}
+/* NB: .acc-b / .acc-h / .acc-i belong to the accordion (section 33), not to
+   an accent utility. Naming them here collided and tinted every accordion. */
+.u-acc-fill{background:var(--accent);color:var(--on-accent)}
+.u-acc-text{color:var(--accent-text)}

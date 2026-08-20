@@ -1,0 +1,107 @@
+/* ==========================================================================
+   23. INK IS BLACK. COLOUR MEANS SOMETHING.
+   The accent went orange and about twenty pieces of text went with it,
+   because they had been written as "accent-coloured" rather than as
+   anything in particular. Purple could carry that — it was far enough from
+   black to read as a deliberate second ink. Orange cannot: pushed dark
+   enough to pass contrast on white it stops being orange and becomes a
+   muddy brown, which is what a note heading, a chip label and a step number
+   all turned into.
+
+   So the rule, stated once and applied through:
+
+     TEXT IS BLACK unless it is a link, in which case it is the link blue,
+     or unless it is genuinely carrying a status, in which case it takes
+     that status's ink.
+
+     COLOUR LIVES ON MARKS — an icon, a fill, a rule, a dot. A mark only
+     needs 3:1, so it can be the real brand orange rather than a darkened
+     approximation of it, and it reads as a signal rather than as text
+     someone forgot to style.
+
+   And the statuses stop all being orange. A note about what a quiz cannot
+   do is INFORMATION and its mark is blue; a confirmed level is a SUCCESS
+   and its mark is green; a deadline is ATTENTION and stays amber. They were
+   one colour because the accent was standing in for all three.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE NOTE
+   Its heading is a heading, not a status message — the status is the mark
+   beside it, and the mark is now the thing that differs between variants.
+   ------------------------------------------------------------------------ */
+.app .note .nb b{color:var(--text-primary)}
+
+/* information is blue. It is the default note, and the most common one. */
+.app .note svg{fill:var(--support-info-ic)}
+.app .note.succ svg{fill:var(--support-success-ink)}
+.app .note.warn svg{fill:var(--support-attention)}
+.app .note.err svg{fill:var(--danger-ink)}
+.app .note.acc svg{fill:var(--accent)}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE CHIP
+   The sparkle says whose question this is. The question itself is text.
+   ------------------------------------------------------------------------ */
+.app .chip-tal,.app .tal-sugg .chip-tal,.app .ask-sugg .chip-tal,
+.app .tw-chips .chip-tal,.app .ai-asks .chip-tal,.app .bub .chip-tal{
+  color:var(--text-primary)}
+.app .ai-asks .chip-tal:hover,.app .bub .chip-tal:hover{color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 3 ---
+   VALUES, LABELS AND NUMERALS
+   None of these were ever a status. They were accent-coloured because the
+   accent was the only second ink the sheet had.
+   ------------------------------------------------------------------------ */
+/* The reach on each of these is set by whatever is colouring it today —
+   §10 and §12 both hand out `--accent-text` from four selectors deep — so
+   these are written to win rather than to be tidy. */
+.app .s-n,                              /* a numbered step                 */
+.app .acc-i.on .acc-h .ttl,             /* an open accordion's title       */
+.app .page .tq.me .tq-w,                /* who is speaking, in a transcript */
+.app .m-unread > span,                  /* how many are unread             */
+.app .page .ai-inline,
+.app .page .sec.flat.bleed .ai-inline,
+.app .page .sec.tint .ai-inline,
+.app .page .sec:has(> .tile-stack) .ai-inline,
+.app .auth-card .sec-id .inp-static{color:var(--text-primary)}
+
+/* YOUR OWN MESSAGE IS STILL YOURS WITHOUT BEING ORANGE. It sits on the
+   accent tint, which is what marks it; colouring the words as well made
+   every sentence you have ever sent read as a warning. */
+.app .page .m.me .m-b{color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 4 ---
+   AND THE ONES THAT DO MEAN SOMETHING
+   ------------------------------------------------------------------------ */
+/* a source you can open is a link, and links are blue everywhere else */
+.app .memo-src{color:var(--link)}
+.app .memo-src svg{fill:var(--link)}
+/* an outcome that went your way is a success */
+.app .ivrow-out{color:var(--support-success-ink)}
+/* something in flight is attention, and stays amber */
+.app .ch-act.resume{color:var(--support-attention)}
+
+/* ------------------------------------------------------------------ 5 ---
+   WHERE THE ORANGE STAYS
+   On a mark, where 3:1 is the bar and the real brand colour clears it; and
+   on a dark ground, where it can be bright. Nothing here is text on white.
+   ------------------------------------------------------------------------ */
+.app .ai-inline .sk,.app .ai-inline .sk-mark{background-color:var(--accent)}
+.app .chip-tal .sk-mark,.app .ask-sugg .chip-tal .sk-mark,
+.app .tal-sugg .chip-tal .sk-mark{background-color:var(--accent)}
+.app .tq-scene{color:var(--text-secondary)}
+.app .tq-scene svg{fill:var(--accent)}
+
+/* ------------------------------------------------------------------ 6 ---
+   THE ONE PIECE OF ORANGE TEXT
+   "Let's begin." closes the welcome copy on the sign-up card, and the Figma
+   file sets it in the brand orange. Every other coloured word in the
+   product went black rather than accept a muddied version of that orange —
+   this one keeps the real value, because it is the brand signing off on its
+   own front door and there is exactly one of it. It reads 2.8:1, the same
+   stated exception the button carries, and it carries the same flag so the
+   contrast sweep counts it rather than passing it silently.
+   ------------------------------------------------------------------------ */
+.app .auth-brand .auth-intro p.auth-begin{
+  color:var(--accent);--on-brand-fill:1}

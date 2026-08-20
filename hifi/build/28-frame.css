@@ -1,0 +1,105 @@
+/* ==========================================================================
+   28. THE PHONE FRAME IS THE PRODUCT, NOT THE PHONE
+   The mobile viewport drew a simulated iOS status bar at the top and a home
+   indicator at the foot. They were there to make the frame read as a phone,
+   and they cost 70px of a 844px preview to say something the viewport
+   switcher already says. Worse, they are chrome the client can mistake for
+   OUR chrome: a warm wash that stops dead under a fake battery icon reads
+   as a bug in the design rather than as a mock sitting on top of it.
+
+   Both go. The app takes the whole frame, which is what it does on a real
+   phone once the system bars are accounted for by the OS.
+   ========================================================================== */
+.device[data-vp="mobile"] .ios-top,
+.device[data-vp="mobile"] .ios-home{display:none}
+.device[data-vp="mobile"] .app{top:0;bottom:0}
+
+/* the front door's column measured itself against the 44 and 26 those bars
+   used to occupy — see §17 — so it takes the whole frame with them */
+.device[data-vp="mobile"] .app:has(> .auth-card){top:0;bottom:0}
+
+/* ==========================================================================
+   SETTINGS STACKS
+   The label column — a narrow heading on the left, the rows on the right —
+   is right for a page you read. It is wrong for a page you operate: the
+   heading is a caption floating beside a list of switches, the switches get
+   two thirds of the width, and the group's name is the smallest thing in
+   it. Every group on the account page puts its heading above its content
+   and gives the content the full column.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app[data-view="account"] .page > .sec:has(> .sec-h),
+  .app[data-view="account"] .page > .sec:has(> .eyebrow),
+  .app[data-view="terms"] .page > .sec:has(> .sec-h){
+    display:block}
+  .app[data-view="account"] .page > .sec:has(> .sec-h) > .sec-h,
+  .app[data-view="account"] .page > .sec:has(> .eyebrow) > .eyebrow{
+    margin:0 0 var(--s05);padding:0;width:auto;max-width:none}
+}
+
+/* ==========================================================================
+   NOTIFICATIONS IS THE WHOLE PHONE
+   At mobile the panel is not a panel — it covers the frame — so the hairline
+   down its left edge is an edge against nothing. It goes, and the panel
+   takes the full width. The rules between one notification and the next are
+   separators inside a list, not the edges of a filled block, so they pay the
+   gutter like every other separator in the product (§18).
+   ========================================================================== */
+@container app (max-width:899.98px){
+  .app .notif{border-left:0;max-width:none;width:100%;left:0;right:0}
+}
+.app .notif .nrow::after{left:var(--pad-x);right:var(--pad-x)}
+
+/* ==========================================================================
+   BECOMING A COHORT LEADER IS AN OFFER, AND OFFERS ARE BLACK
+   It was a grey panel with the action floated to the top right, level with
+   an eyebrow — so the button arrived before the sentence that explains what
+   you would be agreeing to. It takes the wall the product already uses for
+   "here is a thing you could do next", and the action moves to the closing
+   line, after the tags, where the reading ends.
+   ========================================================================== */
+.app .page > .sec:has(> .lead-b){padding:0}
+/* THE OTHER HALF OF THIS IS IN §14, and it has to be. The line below holds
+   below 900. Above it, §14 re-enables the rule for any section followed by a
+   heading — which this one is, "Closing your account" sits under it — and
+   that selector is (0,5,0) because `:has(+ .sec > .sec-h)` counts both of
+   its own classes. One class inside a `:has()` cannot outweigh two from a
+   later layer, so the exclusion is written into §14's list rather than
+   fought from here. Do not "fix" this by restating it in a container query:
+   that was tried, and the tier does not buy the specificity. */
+.app .page > .sec:has(> .lead-b)::after{display:none}
+.app .lead-b{
+  position:relative;display:block;
+  background:var(--surface-dark);color:var(--on-dark);
+  padding:var(--s08) var(--pad-x);margin:0;border:0}
+.app .lead-b .lead-eb{color:var(--on-dark-2)}
+.app .lead-b .lead-t{color:var(--on-dark)}
+.app .lead-b .lead-x{color:var(--on-dark-2);max-width:72ch}
+.app .lead-b .lead-tags{margin-top:var(--s06)}
+.app .lead-b .lead-tags span{
+  border-color:var(--on-dark-rule);color:var(--on-dark)}
+.app .lead-b .lead-a{
+  position:static;display:flex;justify-content:flex-end;
+  margin-top:var(--s07)}
+.app .lead-b .lead-a .btn{
+  background:var(--on-dark);color:var(--surface-dark);border-color:transparent}
+.app .lead-b .lead-a .btn svg{fill:var(--surface-dark)}
+@container app (max-width:599.98px){
+  .app .lead-b .lead-a{justify-content:stretch}
+  .app .lead-b .lead-a .btn{width:100%}
+}
+
+/* ==========================================================================
+   TAL TAKES THE MARGIN
+   The page is a sheet centred in the column with the panel tone either
+   side. With Tal open there is no room for that: the sheet runs from the
+   collapsed rail to the panel's edge.
+
+   Keyed on `data-shown` — the state — and not on `data-open`, which is the
+   one-render transition marker the entrance animations use. Same correction as
+   §25's margin rule, for the same reason: opened from a chip, the panel
+   outlives the marker and the padding came back under it.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app[data-shown~="tal"] .view-col > .main{padding-left:0;padding-right:0}
+}

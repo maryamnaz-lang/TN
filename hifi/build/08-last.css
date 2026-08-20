@@ -1,0 +1,60 @@
+/* ==========================================================================
+   53. TOGGLE ROW
+   `.tg` is a settings row — label block plus a switch — not a segmented
+   control. (Section 11 guessed wrong; it is never used as one.)
+   ========================================================================== */
+.tg{
+  display:flex;align-items:center;gap:var(--s05);
+  width:100%;min-width:0;min-height:64px;padding:var(--s04) 0;
+  border:0;border-bottom:1px solid var(--border-subtle-01);
+  cursor:pointer;overflow:visible;
+  transition:background var(--dur-short) var(--ease-standard)}
+.tg:last-child{border-bottom:0}
+.tg input{position:absolute;opacity:0;width:0;height:0}
+.tb{flex:1 1 auto;min-width:0;padding:0;min-height:0;white-space:normal;
+  border-bottom:0}
+.tb b{display:block;font-size:14px;line-height:20px;font-weight:600;letter-spacing:.1px}
+.tb span{display:block;margin-top:2px;font-size:12.5px;line-height:17px;
+  letter-spacing:.2px;color:var(--text-secondary)}
+.sw{
+  position:relative;width:40px;height:22px;flex:none;background:var(--gray-40);
+  transition:background var(--dur-short) var(--ease-standard)}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;
+  background:var(--pure-white);transition:transform var(--dur-short) var(--ease-standard)}
+/* the track and thumb are drawn on ::before/::after in 11-type; .sw itself
+   is the 58x38 hit area and stays transparent */
+.tg input:checked ~ .sw::after{transform:translateX(18px)}
+.tg input:focus-visible ~ .sw{outline:2px solid var(--brand-primary);outline-offset:2px}
+
+/* ==========================================================================
+   54. COMPOSER
+   An <input> carries an intrinsic minimum width from its size attribute, so
+   flex:1 alone overflows at 320. Same trap as the OTP grid.
+   ========================================================================== */
+.composer{min-width:0}
+/* width:100% on a flex child measures the container, not the space left
+   beside its sibling, so it pushes the send button out of the frame. */
+.composer .inp,.composer input,.composer textarea{flex:1 1 0;min-width:0;width:auto}
+.composer button{
+  flex:none;width:48px;height:48px;display:grid;place-items:center;
+  background:var(--brand-primary);color:var(--on-brand)}
+.composer button svg{width:22px;height:22px;fill:var(--on-brand)}
+.composer button:hover{background:var(--brand-primary-hover)}
+
+/* ==========================================================================
+   55. SEPARATOR CONTRAST
+   The middot is a text node, so it has to clear AA on the darkest ground it
+   ever sits on (--layer-accent-01).
+   ========================================================================== */
+.sep,.mdot,.ch-m .sep,.ag-m .sep,.nrow-d .sep{color:var(--text-secondary)}
+
+/* ==========================================================================
+   56. VIEW COLUMN
+   The drawer and the view are the two children of the flex row. Anything a
+   view returns beside its <main> — the Messages composer, for one — stacks
+   inside this column rather than becoming a third column of its own.
+   ========================================================================== */
+.shell-body{display:flex;min-height:0}
+.view-col{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.view-col > .main{flex:1;min-height:0}
+.view-col > .composer{flex:none}

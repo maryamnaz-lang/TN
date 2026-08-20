@@ -1,0 +1,613 @@
+/* ==========================================================================
+   27. TAL
+   Figma 291:202 (the panel with nothing said yet) and 292:737 (the panel
+   with a thread in it).
+
+   Two things happen here. Tal's mark stops being a four-pointed star and
+   becomes the gradient circle Maryam supplied, everywhere it appears; and
+   the panel is rebuilt to the two frames — a header that is the mark and a
+   name, a thread where the speaker is named ABOVE what they said rather
+   than beside it, an empty state that introduces Tal, and a composer that
+   closes on a black send.
+
+   All geometry below is the file's, read off a 556-wide panel with a 20
+   gutter. Where the panel is narrower than 556 the gutter holds and the
+   content column gives, which is the only thing in here that is not
+   literally stated in the frame.
+   ========================================================================== */
+
+:root{--tal-mark:url(__TALCIRCLE__)}
+
+/* --------------------------------------------------------------------- 1 ---
+   THE MARK
+   One file at three sizes. The PNG is mostly falloff: its solid core is
+   about 52% of the canvas, so a 24px box draws a ~12px disc inside a halo
+   that reaches the box edge — which is exactly how the mark reads in both
+   frames. That is why the sizes below are the file's ellipse sizes and not
+   the disc sizes, and why nothing here crops or insets the image.
+
+   `.sk-mark` ships as a masked shimmer bar tinted with `background-color`,
+   and six layers hand out that colour from four and five selectors deep.
+   Rather than hunt them, the mark is restated once at a reach that wins,
+   with the mask switched off — the same approach §22 and §23 take.
+   -------------------------------------------------------------------------- */
+.app .sk-mark,
+.app .chip-tal .sk-mark,
+.app .tal-star .sk-mark,
+.app .av .sk-mark,
+.app .askline-mark .sk-mark,
+
+.app .tal-h .av .sk-mark,
+.app .tal-msg .av .sk-mark,
+.app .ask-sugg .chip-tal .sk-mark,
+.app .tal-sugg .chip-tal .sk-mark,
+.app .tal-sugg > button .sk-mark,
+.app .askfield .askline-mark .sk-mark{
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  border-radius:0;animation:none}
+
+/* the mark as an element in its own right, for the places the frames draw
+   it without a chip or a bubble around it */
+.app .tal-mk{
+  display:block;flex:none;width:24px;height:24px;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat}
+.app .tal-mk.sm{width:15px;height:15px}   /* a thread label, 292:737 */
+.app .tal-mk.lg{width:132px;height:132px}   /* the empty state, 291:202 */
+
+/* --------------------------------------------------------------------- 2 ---
+   THE HEADER
+   Mark 24, twelve across to the name, close on the right gutter, and a
+   hairline at 76. The name is the whole header — the file drops the
+   "dashboard, Explorer E3 day 34 of 90" line the panel used to carry under
+   it, because a panel that is open on the page you are reading does not
+   need to tell you which page that is.
+   -------------------------------------------------------------------------- */
+.app .tal-panel .tal-h{
+  display:flex;align-items:center;gap:12px;
+  /* the app bar is 68 and the two sit side by side: a header that is 76
+     puts Tal's rule eight pixels below the dashboard's, which is the kind
+     of miss you cannot unsee once the panel is open next to the page */
+  height:68px;min-height:68px;padding:0 20px;
+  border-bottom:1px solid var(--rule)}
+.app .tal-panel .tal-h .nm{display:block;min-width:0}
+.app .tal-panel .tal-h .nm b{
+  display:block;font-size:17px;line-height:23px;font-weight:600;
+  letter-spacing:-.1px;color:var(--text-primary)}
+.app .tal-panel .tal-h .tal-x{margin-left:auto;flex:none}
+.app .tal-panel .tal-h .tal-x svg{width:24px;height:24px}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE THREAD
+   The speaker is named above what they said, not beside it. Beside it, the
+   name is a column the bubble has to make room for at every width; above
+   it, the bubble gets the whole column and the label costs one line. The
+   file draws both sides that way — mark then name on Tal's side, name then
+   face on yours — and the two rows are mirror images, which is what makes
+   the thread read as a conversation rather than as two lists.
+
+     Tal   mark 15, 8 across to the name, 16 down to the card
+     You   name, 8 across to the face 35 x 37, 8 down to the bubble
+     20 between one block and the next, 27 under the header rule
+   -------------------------------------------------------------------------- */
+.app .tal-panel .tal-body{padding:27px 20px 24px;display:flex;flex-direction:column;gap:20px}
+.app .tal-panel .tal-msg{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:16px;margin:0;max-width:100%}
+.app .tal-panel .tal-msg.me{align-items:flex-end;gap:8px}
+.app .tal-panel .tal-msg > .tal-who{
+  display:flex;align-items:center;gap:8px;flex:none}
+.app .tal-panel .tal-msg .tal-who-n{
+  font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
+.app .tal-panel .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
+.app .tal-panel .tal-msg.me .av img{width:100%;height:100%;object-fit:cover;border-radius:0}
+
+/* WHAT TAL SAYS IS A CARD, WHAT YOU SAID IS A BUBBLE. The file gives Tal a
+   white panel with a hairline round it and 17 of padding — it holds answers
+   that have things inside them, an agent, a list, a figure — and gives you a
+   black block that hugs its own sentence. One is a container, the other is
+   a quotation. */
+.app .tal-panel .tal-msg > .bb{
+  max-width:305px;margin:0;
+  padding:17px;background:var(--layer-01);
+  border:1px solid var(--rule);color:var(--text-primary)}
+.app .tal-panel .tal-msg.me > .bb{
+  max-width:min(80%,340px);padding:11px 14px;
+  background:var(--text-primary);border:0;color:var(--on-brand)}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE EMPTY STATE
+   291:202. Mark at 81 on the panel's centre line, the greeting under it,
+   and one line saying what Tal is for. It replaces the opener bubble the
+   panel used to print: a bubble that arrives before you have said anything
+   is Tal talking to itself, and the file introduces Tal instead.
+   -------------------------------------------------------------------------- */
+.app .tal-panel .tal-body:has(> .tal-hero),
+.app .ask-thread:has(> .tal-hero){justify-content:center}
+.app :is(.tal-panel, .ask-thread) .tal-hero{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  padding:0 20px;margin:auto 0;position:relative;isolation:isolate}
+/* THE GAP ABOVE THE GREETING EQUALS THE GAP BELOW IT, AND THAT IS WHY THIS
+   NUMBER IS NEGATIVE.
+   Figma puts the greeting 40 under the mark and taken literally that is what
+   this was. But the frame measures a mark whose box IS the mark, and ours is
+   a PNG that is mostly falloff — so the drawn number and the seen number are
+   not the same number, and the seen one is what the composition is judged on.
+
+   The three quantities, all measured on the rendered page rather than
+   guessed. The mark is composited over white and the column through the core
+   sampled row by row; the text is measured with canvas `actualBoundingBox`
+   metrics, so these are INK positions, not box edges:
+
+     the tail    the orange is down to about a fifth of its peak 22px above
+                 the bottom of the 132 box, and everything under that is a
+                 fade the eye does not read as the mark any more.
+     the leading the greeting's own box starts 7.1px above its cap line —
+                 20px type on a 28px line, so 4 of half-leading plus the
+                 gap between the cap and the ascent.
+     the target  the greeting's descender to the top of the line under it is
+                 23.6px. That is the gap the mark has to match, and it is
+                 NOT the 16 in the rule below it: `p` draws its 16 box to
+                 box, and both boxes carry leading inside them.
+
+   So: 23.6 wanted, minus 22 of tail and 7.1 of leading that are already
+   there = -5.5, drawn as -6. Verified back on the page — the top gap then
+   measures 22.1 to 26.1 depending on where you put the perceptual edge of a
+   soft fade, which brackets the 23.6 it is matching.
+
+   All three numbers belong to this PNG at this size. If the mark changes,
+   or `.tal-mk.lg` stops being 132, re-measure — do not scale this. */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk{margin-bottom:-6px}
+.app :is(.tal-panel, .ask-thread) .tal-hero h2{
+  margin:0;font-size:20px;line-height:28px;font-weight:400;
+  letter-spacing:.16px;color:var(--text-primary)}
+.app :is(.tal-panel, .ask-thread) .tal-hero h2 b{font-weight:600}
+.app :is(.tal-panel, .ask-thread) .tal-hero p{
+  margin:16px 0 0;max-width:299px;
+  font-size:13.5px;line-height:19px;color:var(--text-secondary)}
+
+/* THE LATTICE BEHIND THE MARK. `Group 3` in the file is thirteen hairlines
+   at two opposing angles, forming a rhombus grid that fades out before it
+   reaches the text. Two repeating gradients draw the same grid; a radial
+   mask does the fading, so the lines stop rather than run into the edge of
+   a box. */
+.app :is(.tal-panel, .ask-thread) .tal-hero::before{
+  content:'';position:absolute;z-index:-1;pointer-events:none;
+  left:50%;top:40px;width:432px;height:309px;transform:translateX(-50%);
+  background-image:
+    repeating-linear-gradient(30.2deg,  var(--rule) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(-42.1deg, var(--rule) 0 1px, transparent 1px 34px);
+  -webkit-mask:radial-gradient(closest-side, currentColor 6%, transparent 62%);
+          mask:radial-gradient(closest-side, currentColor 6%, transparent 62%);
+  opacity:.35}
+
+/* --------------------------------------------------------------------- 5 ---
+   THE SUGGESTIONS AND THE COMPOSER
+   Chips 38 tall, 8 apart, sitting 15 above a composer that is one 53-tall
+   box from gutter to gutter: the mark, the field, and a 51-wide black send
+   on the end. Black and not the accent — the accent is Tal's own colour and
+   it is already on the mark two inches to the left; a second orange on the
+   same row makes the send look like part of the mark.
+   -------------------------------------------------------------------------- */
+.app .tal-panel .tal-sugg{
+  display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 15px;border-top:0}
+.app .tal-panel .tal-sugg .chip-tal{min-height:38px}
+.app .tal-panel .composer{
+  display:flex;align-items:stretch;gap:0;
+  margin:0 20px 20px;padding:0;
+  height:53px;border:1px solid var(--rule);background:var(--layer-01)}
+.app .tal-panel .composer .composer-mk{margin:auto 0 auto 16px}
+.app .tal-panel .composer .inp{
+  flex:1 1 auto;min-width:0;height:auto;min-height:0;
+  padding:0 12px;border:0;background:transparent}
+/* THE SEND IS AS TALL AS THE FIELD, AND `height:auto` IS WHY.
+   `align-self:stretch` was already here and was doing nothing: 08-last.css
+   §? sets `.composer button{width:48px;height:48px}`, and this rule
+   restated the width and the alignment but not the height — so a definite
+   48 survived, stretch had nothing to do (it only applies when the height
+   is auto), and the send sat 3px short of the field's 51 inner height. One
+   pixel of it showed at the top and four at the bottom, which is what read
+   as the button being off.
+
+   `height:auto` rather than `height:51px` on purpose: the composer's 53 is
+   stated once, at the top of this rule set, and the send should follow it
+   rather than carry a second copy of it minus the borders. */
+.app .tal-panel .composer > button{
+  flex:none;width:51px;height:auto;align-self:stretch;
+  display:grid;place-items:center;
+  background:var(--text-primary);color:var(--on-brand);border:0}
+.app .tal-panel .composer > button svg{width:20px;height:20px;fill:var(--on-brand)}
+
+/* --------------------------------------------------------------------- 6 ---
+   THE WASH
+   Ellipse 42 again — 2132 x 377.5, centred 72 above the panel's bottom
+   edge, sigma 100 — the same shape the ask page and the front door carry.
+   The panel is 556 wide against the page's 1396, so the ellipse hangs a
+   long way off both sides: that is the file's, and it is what keeps the
+   warmth flat across the composer instead of pooling under the middle of it.
+   -------------------------------------------------------------------------- */
+/* NOT `position:relative`. The panel is an absolutely positioned overlay on
+   its own edge of the app; setting relative here dropped it back into the
+   app's flex column as a 600px block, which squashed the whole page column
+   to the height of its own content — the desktop frame became a window at
+   the top of a white sheet. It only needs the stacking context. */
+.app .tal-panel{isolation:isolate}
+.app .tal-panel::after{
+  content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
+  /* THE BOX IS THE WHOLE PANEL AND THE ELLIPSE IS WHAT STOPS. Capping the
+     box at half the panel put its top edge inside the gradient's own
+     falloff, which drew a hard horizontal line across the thread — the
+     shape has to end before its container does. The vertical radius is a
+     percentage for the same reason the horizontal one is not: the panel is
+     as tall as the window and the file's 489 is half of its 974, so half is
+     what holds. */
+  background-image:radial-gradient(1366px 52% at 45.3% calc(100% - 72px),
+    var(--auth-wash-1) 0%, var(--auth-wash-1) 28%, transparent 100%);
+  /* 10%, down from 32. At a third the wash was a visible peach BAND across
+     the bottom third of the panel — you could see where it started, which
+     is the one thing a wash must not do. At a tenth it is a temperature
+     rather than a colour. The ask page's own wash is moved with it, in
+     24-dash.css, so the two Tal surfaces stay the same warmth. */
+  opacity:.1}
+/* the thread scrolls over the wash, so it must not paint its own ground */
+.app .tal-panel .tal-body,
+.app .tal-panel .tal-sugg{background:transparent}
+
+/* ==========================================================================
+   8. THE ASK PAGE IS THE PANEL, ON A PAGE
+   Tal has two surfaces — a panel beside the page and the page itself turned
+   into the conversation — and they were drawing the thread two different
+   ways: the panel with the speaker named above the bubble, the page with an
+   avatar beside it. Whichever one you were last in taught you the wrong
+   thing about the other.
+
+   Everything below is the panel's rules restated for `.ask-thread`. It is
+   the same selector list with a second scope rather than a second design;
+   if one changes, both do.
+   ========================================================================== */
+.app .ask-thread .tal-msg{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:16px;margin:0;max-width:100%}
+.app .ask-thread .tal-msg.me{align-items:flex-end;gap:8px}
+.app .ask-thread .tal-msg > .tal-who{
+  display:flex;align-items:center;gap:8px;flex:none}
+.app .ask-thread .tal-msg .tal-who-n{
+  font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
+.app .ask-thread .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
+.app .ask-thread .tal-msg.me .av img{
+  width:100%;height:100%;object-fit:cover;border-radius:0}
+
+/* Tal answers in a card, you speak in a block. On a page the column is
+   wider than the panel's 556, so the two widths are stated as a share of
+   the measure rather than in pixels — the same 55 / 80 the panel lands on
+   — and the thread itself is capped at a measure you can read. A
+   conversation that runs 1400px wide is a log file. */
+.app .ask-thread{align-items:stretch}
+.app .ask-thread .tal-msg > .bb{
+  max-width:min(55%, 620px);margin:0;
+  padding:17px;background:var(--layer-01);
+  border:1px solid var(--rule);color:var(--text-primary)}
+.app .ask-thread .tal-msg.me > .bb{
+  max-width:min(80%, 520px);padding:11px 14px;
+  background:var(--text-primary);border:0;color:var(--on-brand)}
+.app .ask-thread{gap:20px}
+
+/* AND THE SEND IS BLACK. The panel closes on a black square; this one
+   closed on the brand gradient, which put the loudest colour on the screen
+   two inches from Tal's own mark and made the two read as one control. */
+.app .askfield-send{
+  background-image:none;background-color:var(--text-primary);
+  --on-brand-fill:0}
+.app .askfield-send svg{fill:var(--on-brand)}
+
+/* --------------------------------------------------------------------------
+   THE AGENT CARD KEEPS THE STAR
+   Dropping the card out of the list at the head of this layer was not
+   enough: `.app .tal-star .sk-mark` still reaches it at three selectors, so
+   the circle went on anyway. The star is restated here at four, with the
+   mask switched back on and the image switched off — both, because the two
+   are different mechanisms and clearing one leaves the other painting.
+
+   It stays a star on this one control because "Ask Tal" on an agent card is
+   an ACTION you take, sitting in a row of buttons; the circle is Tal's
+   IDENTITY, and it belongs where Tal is speaking. Same reason the FAB and
+   the chips read differently from a bubble.
+   -------------------------------------------------------------------------- */
+.app .agh-book .tal-star .sk-mark,
+.app .agh .tal-star .sk-mark,
+.app .ag .tal-star .sk-mark{
+  background-image:none;
+  background-color:var(--accent);
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+
+/* AND THE PAIR IS CENTRED IN THE BOX. `.lbl` animates from `max-width:0`,
+   so it is a clipping window rather than a snug box — its width settles a
+   few pixels past the words, and with the row packed to the start all of
+   that slack fell on the right. Centring the group puts half of it either
+   side, which is what makes the mark and the word read as one thing sitting
+   in the middle of a button rather than as a pair leaning on its left edge. */
+.app .agh-book .tal-star,
+.app .agh .tal-star,
+.app .ag .tal-star{justify-content:center}
+.app .agh-book .tal-star .lbl{text-align:center;flex:none}
+
+/* --------------------------------------------------------------------- 8 ---
+   THE FLOATING BUTTON IS THE MARK
+   §1 made every OTHER appearance of Tal the gradient circle and left the
+   one control that is only ever Tal — the FAB — as a black square with the
+   sparkle in it. That is the inconsistency this section closes: the button
+   you press to talk to Tal now wears Tal's face, with the chat mark on top
+   of it. The circle is the identity, the icon is the action.
+
+   THE BUTTON ITSELF PAINTS NOTHING. Everything visible is two pseudo-
+   elements — ::before is the halo, ::after is the mark — and the icon is
+   the one real child. Note the explicit z-index on the svg: positioned
+   pseudo-elements paint ABOVE non-positioned in-flow content, so without
+   it the orb covers the icon.
+
+   THE MARK'S CORE IS NOT IN THE MIDDLE OF ITS OWN FILE, AND THAT IS THE
+   WHOLE REASON THE THREE LAYERS MOVE THE WAY THEY DO.
+   tal-circle.png is 176 square, but the orange is not concentric with the
+   canvas — it is a stack of discs, each denser one sitting further up and
+   to the right. Measured as bounding-box midpoints off the alpha channel:
+
+     alpha>250  (the solid core, 66 across)   offset  +4.5  -4.5
+     alpha>220                                offset  +3.0  -3.5
+     alpha>180                                offset  +2.0  -3.0
+     alpha>128                                offset  +1.5  -1.5
+     alpha> 80  (the outer falloff)           offset  +0.5  -0.5
+
+   So an icon centred in the box does NOT sit on the middle of the orange —
+   it sits low and left of it by about 2.5 rendered pixels, which is what
+   read as "the alignment looks off". Worse, `rotate()` turns the mark about
+   the BOX centre, so the core travels a 6.4-unit circle while a centred
+   icon stays put: the longer you watch, the further apart they drift.
+
+   The fix is not to re-centre the file. Re-centred, the core would rotate
+   about itself and the mark would barely appear to move at all — that
+   travelling core IS what makes the rotation legible on a soft blob. So
+   the icon and the halo TRANSLATE around the same circle the core is
+   rotated around, at the same period and the same starting phase, and the
+   three read as one object that drifts rather than as a glyph pinned to a
+   moving disc.
+
+   THE NUMBERS ARE THE FILE'S, CONVERTED ONCE. The core is +4.5,-4.5 of 176
+   canvas units, drawn into a 96 box: x 96/176 = 2.45 rendered px on each
+   axis, so the orbit radius is sqrt(2.45^2+2.45^2) = 3.47px and the phase
+   starts at -45deg (up and to the right). Every keyframe in
+   `tal-orb-track` is one of those two numbers. If the box size changes,
+   rescale them — 2.45 and 3.47 are 96-box values, not constants.
+
+   The track is eight keyframes because `translate` interpolates in
+   straight lines: two would swing it flat across the middle, four would
+   walk it round a diamond. Eight is a circle to the eye (it cuts the
+   corners to 92.4% of the radius, which is a quarter of a pixel).
+
+   THE GEOMETRY IS THE PNG'S FALLOFF, AND THE FRAME'S CLIP.
+   Sampled off tal-circle.png (176 square): alpha holds at 255 out to r=40
+   and is under 10/255 past r=75, so the SOLID disc is ~50% of the canvas
+   and the outer ~15% is nothing. A 96 box therefore draws a 48 disc — the
+   same weight the old black square had — inside a halo that reaches the
+   box edge.
+
+   That 96 is not a taste call. `.app` is `overflow:hidden` and the button
+   sits at `right/bottom:var(--s05)`, so a 56 button can only spread 16
+   before the frame cuts it: 56 + 2x20 = 96 puts the clip 4px inside the
+   glow, where the file is already down to ~5/255. Any bigger and you can
+   see the frame slice the halo. Do not raise the inset without moving the
+   button off the corner first — and note that three rules in 16-ai.css
+   compute `bottom` from `var(--s05)`, so moving it is four edits, not one.
+
+   WHAT "FEELS LIKE AI" IS THREE SPEEDS AT ONCE, NONE OF THEM FAST.
+     14s  the whole thing drifts. The mark gets there by `transform`
+          (rotate, which also spins the grain), the icon and the halo by
+          `translate` (the track above). 22s was the first try and it was
+          too slow to read as motion at a 3.5px radius — you saw a
+          misaligned icon rather than a moving one.
+     6.4s the mark and the icon breathe together, in phase, while the halo
+          pulses against them. Breath is the independent `scale` property
+          so it rides ON TOP of the rotation instead of fighting it inside
+          the same `transform` — that is why these are separate animations
+          and not one keyframe set.
+     260ms it answers you. Hover grows it 7% and lights the halo; press
+          drops it to 94%. The ambient loops never change speed on hover —
+          re-timing a running animation recomputes its progress from the
+          elapsed time and the mark visibly JUMPS to a new angle.
+
+   THREE PROPERTIES, THREE ANIMATIONS, NO COLLISIONS. `transform` (spin,
+   mark only), `scale` (breath and pulse) and `translate` (the track) are
+   separate CSS properties, so they compose. Written as three `transform`
+   keyframe sets they would overwrite one another and only the last would
+   survive.
+   -------------------------------------------------------------------------- */
+.app .tal-fab{
+  width:56px;height:56px;padding:0;
+  display:grid;place-items:center;
+  /* the black plate, the brand fill 10-lattice §21 hands out, and the white
+     knockout ring 09-avatar/10-lattice put round it all come off: the mark's
+     own falloff is the separation now, and a hard white ring cut through it */
+  background-color:transparent;background-image:none;
+  border:0;border-radius:50%;box-shadow:none;
+  color:var(--on-accent);
+  /* white mark on the brand disc — the flag the contrast sweep reads */
+  --on-brand-fill:1;
+  /* the resting drop-shadow is transparent rather than absent so the hover
+     glow has something to interpolate FROM; `none` to a shadow snaps */
+  filter:drop-shadow(0 0 0 rgb(0 0 0 / 0));
+  /* replaces 13-motion §6's transition for this one control. `scale` and
+     `transform` are separate properties here: 13-motion still owns the
+     90ms press on `transform`, this owns the slower hover on `scale`. */
+  transition:scale var(--mo-base) var(--mo-standard),
+             filter var(--mo-base) var(--mo-standard),
+             transform 90ms var(--mo-standard)}
+
+/* THE HALO — a wash of accent under the mark, wider than the mark's own
+   falloff, that pulses against the breath. On its own the PNG breathes
+   almost invisibly; the halo is what makes the movement legible without
+   making the mark itself grow enough to look like it is being inflated.
+   It rides the track too, so the glow stays under the core rather than
+   under the box the core happens to be drawn in. */
+.app .tal-fab::before{
+  content:'';position:absolute;inset:-20px;z-index:0;
+  border:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,
+    color-mix(in srgb,var(--accent) 38%,transparent) 0%,
+    color-mix(in srgb,var(--accent) 14%,transparent) 46%,
+    transparent 72%);
+  animation:tal-orb-pulse 6.4s ease-in-out infinite,
+            tal-orb-track 14s linear infinite}
+
+/* THE MARK — §1's circle, at the size the falloff dictates. This is the one
+   layer that ROTATES rather than translating: the off-centre core is what
+   travels the circle, and everything else is following it. */
+.app .tal-fab::after{
+  content:'';position:absolute;inset:-20px;z-index:1;
+  pointer-events:none;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  animation:tal-orb-spin 14s linear infinite,
+            tal-orb-breathe 6.4s ease-in-out infinite}
+
+/* THE ICON SITS ON THE CORE AND STAYS ON IT.
+   It takes the track and the breath and refuses the spin:
+
+     the track   the same 14s clock and the same starting phase as the
+                 mark's rotation, so the icon is on the middle of the
+                 orange at every instant — including at rest, where it now
+                 starts 2.45px up and right of the box centre rather than
+                 in the middle of a box whose contents are not centred.
+     the breath  the SAME animation as the mark, same duration, no delay,
+                 so the two scale together.
+     not the spin — a chat bubble that turns over is a chat bubble you
+                 cannot read, and at 22px it reads as a rendering fault.
+                 `translate` moves it round the circle while it stays
+                 upright, which is the point of using the track rather than
+                 a rotation.
+
+   z-index because of the paint order noted above; the drop-shadow because
+   white on #f57414 is about 2.7:1 and the mark needs an edge to sit on —
+   that shadow is legibility work, not decoration, which is why it is tight
+   and dark rather than soft. */
+.app .tal-fab svg{
+  position:relative;z-index:2;
+  width:22px;height:22px;fill:var(--on-accent);
+  filter:drop-shadow(0 1px 2px rgb(0 0 0 / .32));
+  animation:tal-orb-breathe 6.4s ease-in-out infinite,
+            tal-orb-track 14s linear infinite}
+
+/* THE LABEL COMES OFF. 15-course.css §? gives the FAB the word "Tal" beside
+   the mark at desktop, on the argument that "a floating circle with a mark
+   in it is a guess". That argument was written when the mark was a generic
+   sparkle. It is not a guess any more — the circle IS Tal, it is the same
+   face the panel header, the chips and every bubble in the thread wear, and
+   a control that says its own name next to its own portrait is saying it
+   twice. The span stays in the markup so putting the label back is one
+   `display:inline` if the client disagrees. */
+.app .tal-fab .tal-fab-t{display:none}
+
+/* HOVER AND PRESS. 12-tone §, 19-accent § and 22-noedge § all repaint this
+   button's background on hover, focus and press — a flat accent, then the
+   brand gradient. All three are square plates behind a round mark now, so
+   they are cleared here and the state goes into size and light instead. */
+.app .tal-fab:hover,
+.app .tal-fab:focus-visible{
+  background-color:transparent;background-image:none;
+  scale:1.07;
+  filter:drop-shadow(0 0 16px color-mix(in srgb,var(--accent) 45%,transparent))}
+.app .tal-fab:active{
+  background-color:transparent;background-image:none;
+  scale:.94}
+/* and the keyboard gets a ring, because losing the background state lost
+   the only thing focus used to change */
+.app .tal-fab:focus-visible{
+  outline:2px solid var(--accent);outline-offset:5px}
+
+@keyframes tal-orb-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes tal-orb-breathe{0%,100%{scale:1}50%{scale:1.06}}
+@keyframes tal-orb-pulse{0%,100%{opacity:.5;scale:.93}50%{opacity:1;scale:1.09}}
+/* THE TRACK — the path the mark's core takes when the mark is rotated about
+   the box centre, written out for the layers that follow it by translating.
+   Starts at -45deg (up and right, where the core actually is) and runs
+   clockwise, same as `rotate()`. 2.45 is the core's per-axis offset in a 96
+   box, 3.47 is sqrt(2) of it — the two numbers derived at the head of §8. */
+@keyframes tal-orb-track{
+  0%{translate:2.45px -2.45px}     12.5%{translate:3.47px 0}
+  25%{translate:2.45px 2.45px}     37.5%{translate:0 3.47px}
+  50%{translate:-2.45px 2.45px}    62.5%{translate:-3.47px 0}
+  75%{translate:-2.45px -2.45px}   87.5%{translate:0 -3.47px}
+  100%{translate:2.45px -2.45px}}
+
+/* RESTATED INSIDE THE CONTAINER TIER — 15-course.css sets width/height to
+   auto and the radius to 0 inside `@container app (min-width:900px)`, and a
+   conditional rule of equal weight is not something a later layer can
+   outrank from outside it. Same move 25-modhead.css §7 makes twice. */
+@container app (min-width:900px){
+  .app .tal-fab{
+    width:56px;height:56px;padding:0;
+    display:grid;place-items:center;border-radius:50%}
+  .app .tal-fab .tal-fab-t{display:none}
+  .app .tal-fab svg{width:22px;height:22px}
+}
+
+/* 03-product.css switches the old aura off under reduced motion at one
+   class of reach, which no longer touches either of the two pseudos above.
+   Restated: the mark holds still and the halo settles at its bright end,
+   so the button still reads as lit rather than as switched off.
+
+   Stopping the track is NOT `translate:none` — that would put the icon and
+   the halo back in the middle of the box, which is the misalignment §8 is
+   about. They park at the first keyframe, on the core, and simply stay
+   there. */
+@media (prefers-reduced-motion:reduce){
+  .app .tal-fab::before{animation:none;opacity:.85;scale:1;translate:2.45px -2.45px}
+  .app .tal-fab::after{animation:none;scale:1}
+  .app .tal-fab svg{animation:none;scale:1;translate:2.45px -2.45px}
+}
+
+/* ==========================================================================
+   9. ONE TAL SURFACE, AND IT IS THE FIELD AT THE BOTTOM OF THE PAGE
+   The panel and the button are off.
+
+   There were three ways into Tal and they were three DIFFERENT Tal: a side
+   panel that covered what you were reading, a floating circle that hid the
+   panel behind a button, and the field §21 now docks at the bottom of every
+   page. The third one is the one that works — it is on every screen of both
+   portals, it invites typing instead of hiding a surface behind a control,
+   and asking from it turns the page you are on into the conversation rather
+   than sliding a second column over it. Two of the three were the reason the
+   dock had to be half width and dodge a circle at the bottom right; with
+   them gone the field takes the whole bottom row, which is §21.1b.
+
+   HIDDEN, NOT DELETED. This layer and §03.28 are ~90 rules describing the
+   panel and the mark on that button — the orb's three animation layers, the
+   thread, the composer, the hero. Deleting the markup would leave all of it
+   attached to nothing, and every one of those rules records a decision. One
+   declaration turns the pair off and one deletion turns them back on, which
+   is the honest shape of a change this reversible.
+
+   `display:none` rather than `visibility` or an opacity: both of these hold
+   focusable controls — the panel's composer, the button itself — and a
+   surface a person can still tab into but cannot see is worse than either
+   one being on screen.
+
+   THE TRIGGERS ARE REDIRECTED, NOT ORPHANED. Everything that used to open
+   the panel — `[data-tal-ask]` on the chips, the stars, the clickable Tal
+   cards and the rail suggestions, plus the transcript's own ask field in
+   ai.js — now opens the dock's thread instead (`askOpen(q)`). Hiding a
+   surface without moving what pointed at it would have left a page full of
+   buttons that do nothing.
+
+   Restated inside the container query for §8's reason: §8 sets the button's
+   `display:grid` in one, and a conditional rule of equal weight cannot be
+   outranked from outside it.
+   ========================================================================== */
+.app .tal-fab,
+.app .tal-panel{display:none}
+@container app (min-width:900px){
+  .app .tal-fab,
+  .app .tal-panel{display:none}
+}
