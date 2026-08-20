@@ -88,7 +88,10 @@ const lco     = () => lcoOf(S.ldrCo);
 const lmemOf  = (c,name) => (c.members.filter(m => m.name === name)[0] || c.members[0]);
 const lchDone = m => Math.round(m.pc / 100 * 13);
 const lmins   = m => Math.round(CH.slice(0, lchDone(m)).reduce((s,ch) => s + ch[1], 0) * Math.max(1, m.att || 1));
-const lhrs    = n => n ? Math.floor(n/60) + 'h ' + (n%60) + 'm' : '&mdash;';
+/* Under an hour reads as minutes. "0h 45m" is a figure with a zero in front
+   of it, and the stat cell it lands in is 90px wide — the leading "0h " wrapped
+   the whole value onto a second line to say nothing. */
+const lhrs    = n => !n ? '&mdash;' : n < 60 ? n + 'm' : Math.floor(n/60) + 'h ' + (n%60) + 'm';
 const lidle   = m => /(\d+)d ago/.test(m.last) ? +m.last.match(/(\d+)d/)[1] : 0;
 
 /* THE WEEK'S TASK, DERIVED FROM PACE — because the course platform is the
@@ -123,6 +126,18 @@ const ldrMark = (label,size) => `<span class="av-ph" style="width:${size}px;heig
 /* A cohort's own headline number, said the way the leader asks for it: not
    "46%" but "46% against 38% expected", because a percentage on its own
    cannot tell them whether to act. */
+/* THE ASSESSMENT AVERAGE COUNTS ONLY WHO HAS BEEN ASSESSED.
+   `lavg(c,'avg')` divides by every member, so a cohort four days old — half of
+   whom have not opened a chapter, and carry `avg:0` for "nothing yet" — reported
+   26%. That is not a low score, it is an absent one, and a leader reading 26%
+   against a 75% pass mark would act on a cohort that has done nothing wrong.
+   `lavg` stays as it is: the dashboard uses it for PROGRESS, where 0 genuinely
+   means zero progress. Assessment is the field where 0 means "no data". */
+const lassess = c => {
+  const on = c.members.filter(m => m.avg > 0);
+  return on.length ? Math.round(on.reduce((s,m) => s + m.avg, 0) / on.length) : 0;
+};
+
 const lpaceLine = c => `${lavg(c,'pc')}% against ${lpace(c)}% expected`;
 const lpaceGap  = c => lavg(c,'pc') - lpace(c);
 
@@ -180,11 +195,11 @@ V.leadCohorts = () => {
           const wa  = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
           const gap = lpaceGap(c);
           return `<tr class="ldr-tr" data-ldrco="${c.id}" data-go="leadCohort" tabindex="0" role="button">
-            <td><b>${lname(c)}</b> <span class="t-helper-01">${llevel(c)}</span></td>
+            <td>${lname(c)} <span class="t-helper-01">${llevel(c)}</span></td>
             <td>${c.week} <span class="t-helper-01">of 13</span></td>
             <td class="num">${lavg(c,'pc')}% <span class="t-helper-01">of ${lpace(c)}%</span></td>
-            <td class="num">${lavg(c,'avg')}%</td>
-            <td class="num">${bad ? `<span class="tag red sm">${bad}</span> ` : ''}${wa ? `<span class="tag org sm">${wa}</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
+            <td class="num">${lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>'}</td>
+            <td class="num">${bad ? `<span class="tag red sm">${bad} at risk</span> ` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
             <td>${c.callDay} <span class="t-helper-01">${c.callTime.toLowerCase()}</span></td>
             <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
           </tr>`;
@@ -263,7 +278,7 @@ V.leadCohort = () => {
     <div class="stats">
       ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', `${gap >= 0 ? '+' + gap : gap} against pace`)}
       ${statCell(I.time,   'Expected pace',    lpace(c) + '<small>%</small>', `day ${c.day} of 90`)}
-      ${statCell(I.chart,  'Assessment average', lavg(c,'avg') + '<small>%</small>', weakest ? `lowest ${weakest.avg}%` : 'nothing assessed yet')}
+      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `lowest ${weakest.avg}% &middot; ${c.members.filter(m => m.avg > 0).length} of ${c.members.length} assessed` : 'nothing assessed yet')}
       ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
     </div>
   </div>
@@ -277,7 +292,7 @@ V.leadCohort = () => {
           const [tk,tl] = ltask(m,c);
           const d = m.pc - lpace(c);
           return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td><b>${m.name}</b></td>
+            <td>${m.name}</td>
             <td class="num">${m.pc}% <span class="t-helper-01">${d >= 0 ? '+' + d : d}</span></td>
             <td class="num">${m.avg ? m.avg + '%' : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
@@ -301,13 +316,57 @@ V.leadCohort = () => {
 };
 
 /* ==========================================================================
-   ONE CANDIDATE
+   TAL'S READING OF A CANDIDATE
 
-   THIS IS THE PAGE THE PORTAL EXISTS FOR, so it is the one page on the
-   leader's side that spends an `.ai-aura` card. Tal's reading of a candidate
-   is a judgement about a person — "trying, not absorbing" is not a figure on
-   the band above it, and it is the sentence that decides whether the leader
-   writes to them tonight or waits for Thursday.
+   THE PAGE DOES NOT DRAW THIS. It is `PAGESUM.leadMember`, and that is not a
+   compromise — it is where this product keeps a page's Tal copy, learnt the
+   hard way and written down here so the next pass does not spend an afternoon
+   on it.
+
+   `talFirst()` in views.js hoists ANY section containing an `.ai-aura` to
+   immediately after the page header: "the card is authored where it reads
+   best in source order; this moves it." `placeBand` (ai5) then finds it
+   adjacent to the header and pulls it into the module head band. And ai6
+   strips `.ai-foot`, `.ai-asks` and any action out of whatever is in that
+   band, then replaces the card's heading and body with `pageSummary()`.
+
+   Three consequences, and every one of them is a rule for this file:
+   1. A hand-authored Tal card cannot sit lower down a page. It will be moved.
+   2. It cannot carry a button or an ask chip. They will be removed — ai6's
+      note explains why, and requires the route to exist on the page instead.
+   3. Its words will be replaced by the `PAGESUM` entry for the view — and if
+      there is NO entry, the card is left in a shape §33 does not style, which
+      renders a 1786px-wide head band on a 1068px page.
+
+   So the reading lives here as a function, `PAGESUM.leadMember` calls it, and
+   the page below is figures and record. One Tal card per page, at the top,
+   with its copy in the one place the rest of the product keeps it.
+
+   IT IS ONE PARAGRAPH, NOT A HEADING AND A PARAGRAPH. The band has no heading
+   — ai6 removes it — so the judgement has to be the first sentence instead.
+   Which is better anyway: "Yuki has never signed in" is the finding, and a
+   summary whose first six words are the finding is one a leader can act on
+   without reading the rest.
+   ========================================================================== */
+function ldrRead(m,c){
+  const d = m.pc - lpace(c);
+  const first = m.name.split(' ')[0];
+  const done = lchDone(m);
+  if(m.last === 'Never')
+    return `${first} has never signed in &mdash; no chapter opened, no assessment, no time on the course at all. This is the one to act on before any of the behind-pace names: they are moving slowly, ${first} has not started, and a cohort place is being held open. ${lname(c)} is on day ${c.day} of 90.`;
+  if(lidle(m) >= 7)
+    return `${first} stopped ${lidle(m)} days ago at ${m.pc}% &mdash; ${done} of 13 chapters, then nothing. Someone who stops mid-course rarely restarts without being asked directly, and week ${c.week} is early enough that ${done} chapter${done === 1 ? '' : 's'} is still recoverable. Worth a message rather than a mention on the call.`;
+  if(m.att >= 2.0 && m.avg < 75)
+    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. High effort with a low result means the material is landing badly rather than the effort being missing &mdash; and it is the one pattern that gets worse if you push harder instead of slower.`;
+  if(d <= -15)
+    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments are holding up at ${m.avg}%, so this is time rather than comprehension &mdash; direct outreach before the next call tends to work while the gap is still this size.`;
+  if(d <= -5)
+    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own; watching it rather than intervening keeps the intervention available for when it is needed.`;
+  return `Nothing alarming in ${first}&rsquo;s numbers &mdash; ${m.pc}% against ${lpace(c)}% expected and assessments at ${m.avg}%. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some chapters, which at this score is thoroughness rather than struggle.'} ${done} of 13 chapters done in ${lname(c).toLowerCase()}.`;
+}
+
+/* ==========================================================================
+   ONE CANDIDATE
 
    THE IDENTITY ROW IS `.idhead`, THE CANDIDATE PORTAL'S OWN. It carries a
    face, a name, a meta line, a tag and an action held at the right end, which
@@ -327,7 +386,7 @@ V.leadCohort = () => {
    so the scenes here are drawn by `ldrScene`, which is `clip()` with the
    control taken out rather than a second drawing of a video row.
    ========================================================================== */
-const ldrScene = (title,note,stamp,len) => `<div class="clip ldr-clip">
+const ldrScene = (title,note,stamp,len) => `<div class="clip">
     <span class="thumb">${I.play}<span class="t">${len}</span></span>
     <span class="cb"><span class="ct">${title}</span><span class="cq">${note} &middot; from ${stamp}</span></span>
   </div>`;
@@ -353,28 +412,6 @@ V.leadMember = () => {
   const first = m.name.split(' ')[0];
   const [tk,tl] = ltask(m,c);
 
-  /* TAL'S READING IS THE FLAG'S CAUSE, SAID AS A JUDGEMENT. The flag names
-     what happened; this names what it means and what to do about it. Order
-     matches `lflag`'s — hardest first — so the reading and the mark can never
-     disagree about which fact is the governing one. */
-  const read = m.last === 'Never'
-    ? {h:`${first} has never signed in`,
-       p:`Nothing has come back from the course platform at all &mdash; no chapter opened, no assessment, no time on the course. This is the one to act on before any of the behind-pace names: they are moving slowly, ${first} has not started. A cohort place is being held open.`}
-    : lidle(m) >= 7
-    ? {h:`${first} stopped ${lidle(m)} days ago`,
-       p:`${m.pc}% of the chapters and then nothing for ${lidle(m)} days. Someone who stops mid-course rarely restarts without being asked directly, and week ${c.week} is early enough that ${done} chapters is still recoverable. Worth a message rather than a mention on the call.`}
-    : m.att >= 2.0 && m.avg < 75
-    ? {h:`${first} is trying, not absorbing`,
-       p:`${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. High effort with a low result is the material landing badly, not the effort missing &mdash; and it is the one pattern that gets worse if you push harder rather than slower.`}
-    : d <= -15
-    ? {h:`${first} is well behind pace`,
-       p:`${m.pc}% against ${lpace(c)}% expected at day ${c.day}. Assessments are holding up at ${m.avg}%, so this is time rather than comprehension. Direct outreach before the next call tends to work while the gap is still this size.`}
-    : d <= -5
-    ? {h:`${first} is a few points behind`,
-       p:`${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own. Worth watching rather than intervening &mdash; an intervention here costs you the one you need later.`}
-    : {h:`Nothing alarming in ${first}&rsquo;s numbers`,
-       p:`${m.pc}% against ${lpace(c)}% expected and assessments at ${m.avg}%. On or ahead of pace with the scores holding. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some chapters, which at this score is thoroughness rather than struggle.'}`};
-
   /* Three scenes, chosen by the name so they are stable, in the wireframe's
      own arithmetic. */
   let seed = 0; for(let i = 0; i < m.name.length; i++) seed += m.name.charCodeAt(i);
@@ -396,16 +433,6 @@ V.leadMember = () => {
     </div>
   </div>
   <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>${read.h}</h3></div>
-      <div class="ai-body"><p>${read.p}</p></div>
-      <div class="ai-asks">
-        ${askChip('What should I say to ' + m.name + '?','What should I say?')}
-        ${askChip('Full report on ' + m.name,'Full report')}
-      </div>
-    </div>
-  </div>
-  <div class="sec">
     <div class="stats">
       ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', `${d >= 0 ? '+' + d : d} against pace`)}
       ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? (m.avg < 75 ? 'below the 75% pass mark' : 'above the pass mark') : 'nothing assessed yet')}
@@ -420,7 +447,11 @@ V.leadMember = () => {
         <tr><th>#</th><th>Chapter</th><th>Status</th><th class="num">Score</th><th class="num">Attempts</th></tr>
         ${CH.slice(0, Math.min(13, done + 1)).map((ch,i) => {
           const complete = i < done;
-          const sc = complete ? Math.max(60, Math.min(100, m.avg + ((i % 3) - 1) * 7)) : null;
+          /* NO SCORE WITHOUT AN ASSESSMENT AVERAGE. `m.avg` of 0 means the
+             course platform has sent nothing back, so a per-chapter score
+             derived from it invented a 60% for a candidate the band above
+             this table describes as "nothing assessed yet". */
+          const sc = (complete && m.avg > 0) ? Math.max(60, Math.min(100, m.avg + ((i % 3) - 1) * 7)) : null;
           const at = complete ? (m.att >= 2 ? (i % 2 ? 3 : 2) : 1) : 1;
           return `<tr>
             <td class="num">${i+1}</td>
@@ -441,14 +472,18 @@ V.leadMember = () => {
     </div>
   </div>`}
   <div class="sec">
-    <div class="sec-h"><h2>Where the level came from</h2><span class="t-helper-01">Set at the interview, not by the quiz</span></div>
+    ${/* SHORT HEADINGS IN THIS COLUMN. At desktop §10 gives a section with a
+          `.sec-h` a 184px label column, and "Where the level came from" set
+          three words to a line in it while the helper under it took four more.
+          Two words, and the sentence it needed moves under the tile. */''}
+    <div class="sec-h"><h2>Their level</h2></div>
     <div class="tile">
       <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
       <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
       <div class="kv"><span class="k">Assigned</span><span class="v">${llevel(c)} <span class="tag org sm">reviewer went lower</span></span></div>
       <div class="kv"><span class="k">Next rung</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
     </div>
-    <p class="t-helper-01 mt4">The reviewer placed ${first} a rung below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
+    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} a rung below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
@@ -542,7 +577,7 @@ V.leadReports = () => {
         ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
           const m = x.m, d = m.pc - lpace(x.c);
           return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${x.c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td><b>${m.name}</b>${d <= -5 ? ` <span class="tag org sm">${Math.abs(d)} behind</span>` : ''}</td>
+            <td>${m.name}${d <= -5 ? ` <span class="tag org sm">${Math.abs(d)} behind</span>` : ''}</td>
             ${sel === 'all' ? `<td>${x.c.id} <span class="t-helper-01">${x.c.level}</span></td>` : ''}
             <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
             <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
@@ -587,7 +622,7 @@ function ldrBriefSheet(){
   const behind = c.members.filter(m => m.pc < lpace(c) - 5).length;
 
   return `<div class="modal on" data-ldrclose="brief">
-    <div class="sheet ldr-sheet">
+    <div class="sheet">
       <div class="sheet-h"><h2>Week ${c.week} brief</h2>
         <button class="x" data-ldrclose="brief" aria-label="Close">${I.close}</button></div>
       <div class="sheet-b">
@@ -605,11 +640,16 @@ function ldrBriefSheet(){
           <li><span class="s-n">4</span><span class="s-b"><b>Raise ${severe.length ? 'the ' + severe.length + ' at risk privately' : 'nothing privately this week'}</b>
             ${severe.length ? 'Never in the group. ' + severe.slice(0,2).map(m => m.name).join(' and ') + (severe.length > 2 ? ' and others' : '') + '.' : 'Nobody in this cohort is flagged severely.'}</span></li>
         </ol>
-        <div class="facts mb6">
-          <div><span class="l">Average progress</span><span class="v">${lavg(c,'pc')}%</span></div>
-          <div><span class="l">Expected by now</span><span class="v">${lpace(c)}%</span></div>
-          <div><span class="l">Assessment average</span><span class="v">${lavg(c,'avg')}%</span></div>
-          <div><span class="l">Behind pace</span><span class="v">${behind} of ${c.members.length}</span></div>
+        ${/* `.kv` ROWS, NOT A `.facts` BAND. `.facts` is an auto-fit grid sized
+              for a page; inside a 520px sheet it fits three across and the
+              fourth cell lands alone on a second row, where §10 stretches it
+              the full width with its own fill. Four rows in a tile are four
+              rows at any width, which is what a sheet needs. */''}
+        <div class="tile mb6">
+          <div class="kv"><span class="k">Average progress</span><span class="v">${lavg(c,'pc')}%</span></div>
+          <div class="kv"><span class="k">Expected by now</span><span class="v n">${lpace(c)}%</span></div>
+          <div class="kv"><span class="k">Assessment average</span><span class="v n">${lassess(c) ? lassess(c) + '%' : 'nothing assessed yet'}</span></div>
+          <div class="kv"><span class="k">Behind pace</span><span class="v n">${behind} of ${c.members.length}</span></div>
         </div>
         ${att.length ? `<h3 class="ldr-sh">Bring these ${att.length} up privately</h3>
         <div class="tile-stack">

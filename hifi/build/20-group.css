@@ -99,7 +99,14 @@
      `.sec-out` and `.lead-b` are named in this same list. One level of
      `:has()`, valid, and the marker says what the section IS rather than
      asking what it happens to contain. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(:has(> .lead-b)){
+  /* `.lead-bar` is excluded for the reason `.cap-sec` is: it is not a block,
+     it is a zero-height sticky hook with the leader's tab strip hanging out
+     of it (§37.6). 16px of padding is 16px of height, and the whole point of
+     that row is that its height never changes and is nothing — with the
+     padding on, the stuck strip hung under the header on a white band. It
+     has to be excluded HERE rather than corrected later: this selector runs
+     to nine classes and cannot be outweighed from a later layer. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(:has(> .lead-b)){
     padding-top:var(--s05)}
   .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
   /* the capture strip is a zero-padding pass-through: it sits between two

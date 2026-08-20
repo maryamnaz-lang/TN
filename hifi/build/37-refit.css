@@ -1,0 +1,217 @@
+/* ==========================================================================
+   37 — REFIT: BLOCKS WHOSE PLACEMENT CHANGED
+
+   Last layer. Everything in it patches a rule by name from §26, §12/§19,
+   §32 or §10/§16, which is the only reason it sits after them rather than
+   inside them:
+
+     §1  `.page > .rail-wrap` — §26 removes the rule ABOVE the rail and never
+         gave it one below, so the rail had no closing edge at all.
+     §2  `.ai-label.bare` — §12 and §19 both style `.ai-label` unconditionally
+         and §19 is the later of the two. A variant has to outrank both.
+     §3  `.wkc-go` — a new class §32 does not mention.
+     §4  `.stickybar` — §10 sizes it to the frame and §16 re-pads it to line
+         its CONTENT up with the column. Putting the bar itself in the
+         column has to answer both.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. A RAIL OF CARDS CLOSES ITSELF
+   §26.11 turns off the rule on the section ABOVE the rail, and it is right
+   to: a bordered block sitting directly under a hairline reads as though the
+   line were its own top edge. But the rail is not a `.sec`, so it never had
+   a `::after` of its own — which meant that at the foot of the rail the page
+   simply stopped ruling. On the `new` dashboard that put the agent cards and
+   the Quiz results block in one undivided run, and Quiz results is a change
+   of subject as complete as any on the page.
+
+   Same geometry as §10's section rule and the same gutter §18 gives it, so
+   the line is indistinguishable from every other divider on the page — the
+   INSET one, not the wall-to-wall edge a filled block gets. The rail's own
+   `padding-bottom` (§26, 24px) is what the line sits under, so the cards are
+   not touching it.
+
+   `:has(+ .sec)` because a rail that ENDS a page needs no closing rule —
+   §10 gives the last child of a page the frame's own edge, and the all-agents
+   view is exactly that case. `.page >` keeps it off the rails inside Tal's
+   booking bubble (§35), where the wrapper is not a page-level block and the
+   bubble draws its own boundaries.
+   -------------------------------------------------------------------------- */
+.app .page > .rail-wrap:has(+ .sec){position:relative}
+.app .page > .rail-wrap:has(+ .sec)::after{
+  content:'';position:absolute;bottom:0;
+  left:var(--pad-x);right:var(--pad-x);
+  height:1px;background:var(--rule);pointer-events:none}
+
+/* --------------------------------------------------------------------------
+   2. TAL'S NAME WITHOUT THE CHIP
+   The page-summary band (§33.2) already drops the fill: at the head of a
+   page the mark and the name in accent ink are enough, and a solid orange
+   pill with a sheen sweeping through it would be the loudest thing above
+   the fold. The same argument holds anywhere Tal is ATTRIBUTING a line
+   rather than offering one — the week card's "what is expected of me"
+   paragraph is a sentence with a byline, and the byline was outweighing the
+   black button the card is built around.
+
+   §33's rules cannot be reused: every one of them is keyed on
+   `.modhead .ai-aura.talsum > .ai-head > .ai-label`, which is that band and
+   nothing else. This is the same treatment stated as a variant class.
+
+   THREE THINGS HAVE TO BE ANSWERED, NOT ONE. §12 sets `background-color`,
+   a sheen `background-image` and the `animation` that moves it; §19 then
+   restates the image as two stacked layers and the animation as a second
+   keyframe set. Clearing only the colour leaves the sheen painting a pale
+   bar behind the letters, and clearing only the image leaves an animation
+   running on nothing. All three go, and the border with them.
+
+   THE MARK IS THE ARTWORK, NOT THE MASKED STAR. §12 draws `::before` as a
+   star-shaped mask over a flat fill so it takes the chip's white ink. With
+   no chip there is no white ink to take, so the mark becomes the embedded
+   PNG (§27) at 16px — the same swap, for the same reason, that §33 makes.
+   -------------------------------------------------------------------------- */
+.app .ai-label.bare{
+  height:auto;min-height:0;padding:0;border:0;gap:var(--s03);
+  background:none;background-color:transparent;background-image:none;
+  animation:none;
+  color:var(--accent-text)}
+.app .ai-label.bare::before{
+  width:16px;height:16px;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none}
+
+/* --------------------------------------------------------------------------
+   3. THE CHAPTER BUTTON IN THE TOP BAND
+   It sits under the "0 of 45 minutes" line inside the text half of §32.2's
+   top row, so the band still reads as one object with the ring: title,
+   figure, and the way in, against the percentage.
+
+   `--s05` matches the gap §32 puts between the other lines of that stack
+   rather than the larger step a button usually pays, because this button is
+   the fourth line of the block and not a separate action row. `align-items`
+   on the parent is `center`, so nothing else has to move — the taller text
+   half re-centres the ring against it on its own.
+   -------------------------------------------------------------------------- */
+.app .wkc-go{margin-top:var(--s05)}
+.app .wkc-go > .btn{max-width:100%}
+
+/* --------------------------------------------------------------------------
+   4. THE ACTION BAR IS PART OF THE COLUMN, NOT OF THE WINDOW
+   §16 lined the bar's CONTENTS up with the content column by padding —
+   `--main-pad + --pad-x` on each side — and left the bar itself spanning the
+   frame. So the price and the button sat where the page's words sit, but the
+   bar's ground and its top rule ran out past both rails and stopped at the
+   window. The two rails are the one line in this product that runs the whole
+   height of the page (§10.1: "so the column reads as a drawn thing"), and
+   the last row of the page was crossing them.
+
+   THE BOX IS `.page`'S BOX, STATED THE SAME WAY. `.page` is centred inside a
+   `.main` that pays `--main-pad`, capped at `--content-max`, with a rail for
+   a border on each side. The bar is a sibling of `.main` and so pays that
+   padding itself: `width: 100% - 2 * --main-pad` is the same available width
+   `.page` is centred in, and the cap and the auto margins then put it in the
+   same place to the pixel. `--pad-x` becomes ordinary padding again, because
+   it no longer has the main-pad folded into it.
+
+   THE RAILS ARE GATED, THE WIDTH IS NOT. Below 760 `.page` has no borders and
+   `--main-pad` is 0 — the calc collapses to 100% on its own, and drawing
+   rails there would give the bar two edges the page above it does not have.
+   -------------------------------------------------------------------------- */
+.app .stickybar{
+  width:calc(100% - 2 * var(--main-pad));
+  max-width:var(--content-max);
+  margin-left:auto;margin-right:auto;
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+@container app (min-width:760px){
+  .app .stickybar{
+    border-left:var(--rail-w) solid var(--rule);
+    border-right:var(--rail-w) solid var(--rule)}
+}
+
+/* --------------------------------------------------------------------------
+   5. THE WAY OUT GOES UNDER THE ACTION, NOT BESIDE IT
+   §14 puts the closing row's two halves on one line and pushes them apart —
+   the button at the left of the column, "Already have an account? Log in"
+   hard right against the column's other edge. At 461 wide that is a long
+   reach between two things that are about the same decision, and the link
+   ends up further from the button than from the fields above it. §17.9
+   already stacks them at phone width for exactly this reason ("side by side
+   is a card composition"); this makes the stack the answer at every width on
+   the two screens where the second half is a sentence rather than a control.
+
+   NOT on `.foot-row` itself: Verify's closing row pairs the action with
+   RESEND, which is a real second control and belongs on its own line the way
+   §17.9 already orders it. `foot-stack` marks the two rows where the second
+   half is prose.
+
+   `stretch`, NOT `flex-start`. §17.9's phone block gives the button
+   `width:100%` and relies on the row stretching its children to get it; a
+   `flex-start` here would win on specificity and quietly shrink the phone
+   button to its label. Stretched, the desktop button still sits at its own
+   217 (§17: `width:auto;min-width:217px`) and left-aligns inside a
+   full-width child, which is the same pixel either way.
+   -------------------------------------------------------------------------- */
+.app .foot-row.foot-stack{
+  flex-direction:column;align-items:stretch;justify-content:flex-start}
+.app .foot-row.foot-stack > p{text-align:left}
+
+/* --------------------------------------------------------------------------
+   6. THE LEADER'S TAB STRIP IS CHROME, SO IT IS NOT IN THE PAGE
+   §31 made the strip a permanent second row under the figure cards, and gave
+   the reason: the earlier attempts SWAPPED one row for the other, and a
+   sticky element keeps its flow box, so the swap shortened the flow by 73px
+   at the exact moment of sticking and jumped the page. That reasoning is
+   still correct. What it does not force is that the row be VISIBLE at rest —
+   it only forces that the row's height never change.
+
+   So the row's height is zero, in both states, and the strip inside it
+   overflows. Nothing in the page moves when the strip appears, because the
+   strip was never taking any space; and the resting dashboard goes back to
+   what it reads as — four cards, then the interview plate — with no spare
+   band of tabs under the cards labelling sections the reader can still see.
+
+   It appears at exactly the moment §31 already computes. A zero-height
+   sticky box reaches `top:0` when its flow position does, which is when the
+   card band above it has finished passing under the header — "when the cards
+   touch the header", which is when a strip naming the sections below is
+   worth having.
+
+   HIDDEN BY `visibility`, NOT BY `opacity`. The trap in the handover: §13
+   runs the entrance animations with `fill-mode:both`, so a played
+   animation's last keyframe keeps applying and an `opacity` resting state
+   loses to it. `visibility` is not in those keyframes.
+
+   AND `is-gone` HAS TO BE RESTATED ON THE CHILD. §31 hides the departed bar
+   with `visibility:hidden` on the section, which a `visibility:visible` on
+   the child would undo — a child can turn its parent's hidden back on. The
+   third rule is that restatement; it is last so it wins the tie with the
+   `is-stuck` rule above it, and both carry the same weight.
+
+   THE GROUND IS ITS OWN. §12 makes `.cs` transparent, which was right when
+   the strip sat on the page. Floating, it has page under it.
+
+   THE 16px ABOVE IT WAS §20's, AND IT IS ANSWERED IN §20. §31 already says
+   `padding-top:0` here, and §20's "the block under a split pair pays half at
+   the top" was overruling it at desktop — nine classes deep and inside a
+   container query, so neither a later layer nor the same query could reach
+   it. Per the trap, the fix for that rule is to extend its `:not()` list,
+   which is where `.lead-bar` now appears.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .lead-bar{
+  height:0;min-height:0;padding-top:0;padding-bottom:0;overflow:visible}
+.app[data-portal="leader"] .lead-bar::after{display:none}
+.app[data-portal="leader"] .lead-bar > .lead-tabs{
+  visibility:hidden;background-color:var(--background)}
+.app[data-portal="leader"] .lead-bar.is-stuck > .lead-tabs{visibility:visible}
+.app[data-portal="leader"] .lead-bar.is-gone > .lead-tabs{visibility:hidden}
+
+/* AND THE CARD BAND CLOSES ON THE CARDS, NOT ON A RULE.
+   The four figure cells are a bordered block — they draw their own bottom
+   edge — and with the tab row gone from the flow the section's own hairline
+   landed 24px under it, so the band read as a box with a second line ruled
+   beneath it. §26.11 makes exactly this argument for the agent rail: nothing
+   draws a closing rule onto a block that already has an edge. Here the rule
+   is the section's own `::after` rather than the one above it, and it goes
+   for the same reason. */
+.app[data-portal="leader"] .page > .sec:has(> .stats-lead)::after{display:none}

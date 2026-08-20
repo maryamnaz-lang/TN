@@ -190,8 +190,10 @@ const lnext = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming')[0];
    So the count is both, and the section lists both, interleaved in time rather
    than grouped by kind: the question the list answers is "what is next", and
    two separate groups make you read two lists and do the merge yourself.
-   `kind` survives on each row so the mark, the detail line and the action can
-   differ — an interview offers Join, a call offers its brief.
+   `kind` survives on each row so the mark and the detail line can differ, and
+   `go` so the two kinds open different pages — an interview goes to Sessions,
+   a call to Cohorts, where its brief is. There is no per-row VERB any more;
+   `bookedRow` says why.
    -------------------------------------------------------------------------- */
 const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s => ({
     kind:'iv', ord:s.ord, day:s.day, time:s.time, i:s.i, img:s.img,
@@ -199,12 +201,12 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
     d:s.mins + ' minutes, recorded &middot; ' + (s.re
         ? 'they have ninety days behind them, so you read the summary first'
         : 'you sign the rung afterwards'),
-    cta:'Join', go:'leadSessions'
+    go:'leadSessions'
   })).concat(LEAD_COHORTS.map(c => ({
     kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
     t:'Cohort call &middot; ' + lname(c),
     d:'60 minutes &middot; week ' + c.week + ' of 13 &middot; ' + c.members.length + ' candidates at ' + llevel(c),
-    cta:'Brief', go:'leadCohorts'
+    go:'leadCohorts'
   }))).sort((a,b) => a.ord - b.ord);
 
 /* --------------------------------------------------------------------------
@@ -302,22 +304,34 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    I meeting", and for one person that is their face and for ten it is not any
    one of them. Same slot, two answers, and it means the two kinds are
    distinguishable at a glance without a tag saying which is which.
+
+   THE CHIP IS ONE WIDTH FOR EVERY ROW, set in §31.5 — not sized to its own
+   words. "TODAY", "TOMORROW" and "NOV 21" are three different lengths, so a
+   chip that hugged its text started each row's face and title at a different
+   x and the column read as ragged. A diary is scanned down the date and across
+   the detail, and both of those need a straight edge.
+
+   AN ARROW, NOT A VERB — the same argument `faceRow` above makes, and it
+   applies here for one extra reason. The two words in this slot were "Join"
+   and "Brief", which named the KIND of appointment as much as the action, and
+   neither happened here: both opened another page. So the row is the target,
+   it carries the arrow every openable row in this product wears, and `kind` is
+   still legible from the mark and the detail line. `go` survives on the row
+   data; `cta` does not, because nothing prints it any more.
    -------------------------------------------------------------------------- */
 function bookedRow(b){
   const mark = b.kind === 'iv'
     ? `<span class="mem-av mem-ph">${avatar({i:b.i, img:AV[b.img]}, 36)}</span>`
     : `<span class="cardrow-ic">${I.group}</span>`;
-  return `<div class="cardrow bk-row">
+  return `<button class="cardrow bk-row" data-go="${b.go}">
     <span class="day bk-day"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
     ${mark}
     <span class="cardrow-b">
       <span class="cardrow-t">${b.t}</span>
       <span class="cardrow-d">${b.d}</span>
     </span>
-    <span class="cardrow-a">
-      <button class="btn btn-sm noic" data-go="${b.go}">${b.cta}</button>
-    </span>
-  </div>`;
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
 }
 
 function faceRow(p, detail, go){
@@ -544,40 +558,31 @@ V.leadDash = () => {
 };
 
 /* ==========================================================================
-   THE SIX MODULES STILL TO BUILD
-   The rail offers all seven from the first paint, because a rail that grows a
-   module at a time would read as the leader unlocking things — and a leader
-   unlocks nothing (see NAVSETS.leader). So the six that are not drawn yet say
-   so, in the product's own empty state, and each one names what will be in it.
-   Nothing here pretends to hold data.
+   ALL SEVEN MODULES ARE DRAWN, AND NOT IN THIS FILE
 
-   Replace one of these with a real `V.lead*` and nothing else has to change.
+   This is where `LEAD_SOON` used to be: seven "coming in the next pass" empty
+   states, one per module, so that a rail offering seven modules from the first
+   paint was not offering seven dead ends. All seven are now real pages, and
+   four more sit under them:
+
+     lead2.js   Cohorts, one cohort's roster, one candidate, Course Reports
+     lead3.js   Sessions, Evaluations, one level decision, one 90-day summary
+     lead4.js   Messages, Certifications, the leader's own profile
+
+   Two things a reader of this file needs from those three, both of which cost
+   an afternoon to find out:
+
+   1. A LEADER PAGE MUST HAVE A `PAGESUM` ENTRY (ai6.js). `talFirst` in
+      views.js hoists any section holding an `.ai-aura` to the top of the page,
+      `placeBand` pulls it into the module head band, and ai6 then replaces its
+      words with `pageSummary()` — so a page's Tal copy is a `PAGESUM` row, not
+      markup in the view. With no row, the card is left in a shape §33 does not
+      style and the band renders 700px wider than the page.
+
+   2. A DARK CARD MOVES. `.plate` and `.cert` are in ai5's `DARK_CARD` list,
+      and `placeDark` lifts whichever page child contains one into the band.
+      One per page; a second is a slab.
    ========================================================================== */
-const LEAD_SOON = {
-  leadSessions: ['Sessions','Every interview you have run and every one booked, and the run-a-session flow: join, end, write the evaluation, pick the rung, publish the summary.'],
-  leadEvals:    ['Evaluations','The level decisions waiting on your signature, each with the transcript reading, the competency breakdown and the evidence behind the proposed rung.'],
-  leadCohorts:  ['Cohorts','All three cohorts, their rosters, the weekly call brief, and one page per candidate with their progress and your notes.'],
-  leadReports:  ['Course Reports','What the course platform sends back: chapter progress, assessment scores and attendance, per candidate and per cohort.'],
-  leadMessages: ['Messages','The cohort discussion boards — shared with the candidate side, so a post here shows up there — and your one-to-one threads.'],
-  leadCerts:    ['Certifications','What leading earns you. Cohorts closed, candidates promoted, and the certification each one counts towards.'],
-  leadProfile:  ['Your profile','The public profile candidates read when they choose an agent, your assessing range, and your availability calendar.']
-};
-Object.keys(LEAD_SOON).forEach(k => {
-  const [title, what] = LEAD_SOON[k];
-  V[k] = () => `<main class="main"><div class="page">
-  ${crumb(['Dashboard','leadDash'], title)}
-  ${ph(title,'Not built yet in the high-fidelity portal.')}
-  <div class="sec">
-    <div class="empty" style="border:0">${I.time}
-      <h3>Coming in the next pass</h3>
-      <p>${what}</p>
-    </div>
-    <div class="btn-set mt5" style="justify-content:center">
-      <button class="btn btn-p" data-go="leadDash">Back to the dashboard ${I.arrowLeft}</button>
-    </div>
-  </div>
-</div></main>`;
-});
 
 /* ==========================================================================
    THE FIGURE BAND BECOMES A POSITION INDICATOR

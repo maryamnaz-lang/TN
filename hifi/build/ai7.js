@@ -5,9 +5,10 @@
    — and then had to hand you off: a chip, a page, a rail, four screens. The
    one thing a candidate comes here to do was the one thing the assistant
    could not finish. This pass finishes it. Ask Tal to book an interview and
-   the whole flow happens inside the thread: the shortlist, a profile, the
-   day and the time, the payment, the confirmation. When you press back, the
-   product behind the conversation has an interview booked.
+   the whole flow happens inside the thread: the shortlist, a profile, the day
+   and the time, the confirmation. The fee is Stripe's, on Stripe's own page,
+   so there is no payment screen here — see the note over `BKW`. When you
+   press back, the product behind the conversation has an interview booked.
 
    FOUR RULES THIS FILE IS BUILT ON, each of them learnt the hard way from
    the surface it is building on.
@@ -78,7 +79,7 @@ S.bk = null;
 S.booking = null;
 
 function bkStart(){
-  S.bk = {open:null, agent:null, day:BK_DAY0, slot:BK_SLOT0, newCard:false};
+  S.bk = {open:null, agent:null, day:BK_DAY0, slot:BK_SLOT0};
 }
 
 /* the three readings of one booking. Literal '·' rather than `&middot;`
@@ -94,12 +95,12 @@ const bkDate = (r) => { r = r || bkRec(); const d = BK_DAYS[r.day] || BK_DAYS[BK
   return `${d[0]}, ${BK_MONTH[1]} ${d[2]}`; };
 
 /* --------------------------------------------------------------------------
-   2. THE FOUR WIDGETS
+   2. THE WIDGETS
 
    One entry per step, each a function of `S.bk` and nothing else. A widget
-   whose step has been paid for goes read-only rather than disappearing: the
-   thread is a record of what you did, and a live "Pay" button under a booking
-   that is already paid is an invitation to pay twice.
+   whose step is settled goes read-only rather than disappearing: the thread is
+   a record of what you did, and a live "Continue" under a booking that already
+   exists is an invitation to make a second one.
    -------------------------------------------------------------------------- */
 
 /* THE SHORTLIST, AND THE PROFILE, ARE ONE WIDGET IN TWO STATES.
@@ -108,10 +109,18 @@ const bkDate = (r) => { r = r || bkRec(); const d = BK_DAYS[r.day] || BK_DAYS[BK
    going back to the list would then mean printing the list a second time. It
    is one card that turns over — which is also what "and go back to all
    agents" asks for. `S.bk.open` is which side is up. */
+/* THERE IS NO PAYMENT WIDGET, AND THAT IS A PRODUCT DECISION RATHER THAN AN
+   OMISSION. The fee is taken by Stripe, on Stripe's own hosted page, so a card
+   form drawn here would be a screen the product does not have — and a
+   convincing fake of a payment form is the one thing a prototype should never
+   put in front of a candidate. `Continue to payment` is the handoff: in the
+   product it opens Stripe, and what comes back is the booking. The flow
+   therefore has three steps, not four, and the button's reply is the
+   confirmation. `bkBooked` records the saved card because that is what the
+   product's own receipt row and Payments module already say. */
 const BKW = {
   agents: () => S.bk ? (S.bk.open ? bkProfile(S.bk.open) : bkList()) : '',
-  sched:  () => S.bk ? bkSched() : '',
-  pay:    () => S.bk ? bkPay()   : ''
+  sched:  () => S.bk ? bkSched() : ''
 };
 
 const bkHost = (k) => `<div class="bkw" data-bkw="${k}"></div>`;
@@ -127,10 +136,22 @@ const bkHost = (k) => `<div class="bkw" data-bkw="${k}"></div>`;
    `data-bkw` still gets §35's width; `placeBook` has nothing to fill. */
 const bkFrozen = (html) => `<div class="bkw">${html}</div>`;
 
+/* `.rail-wrap > .rail` VERBATIM, because that is where "three across at
+   desktop" already lives. §14 turns `.app .rail` into a three-column grid
+   inside a container query and restates each card's internal grid to match;
+   §07 leaves it a stack below that. Writing my own breakpoint would be a
+   second copy of that decision, and the two would drift the first time the
+   dashboard's rail changed. Borrowing the container means the cards in the
+   chat break to three-up at exactly the width the dashboard's do, and look
+   the same when they get there. §35.1 pays the wrapper's page indent. */
+/* NO CAPTION UNDER THE CARDS. It read "open a card to read the full profile,
+   or book straight from it" — an instruction for two affordances that are
+   already on the card, under three cards that are the only thing in the
+   bubble. Tal's line above says what these are; the cards say what you can do
+   with them. */
 function bkList(){
   return `<div class="bk">
-    <div class="bk-list">${BK_SHORTLIST.map(bkCard).join('')}</div>
-    <p class="bk-note">Open a card to read the full profile, or book straight from it.</p>
+    <div class="rail-wrap bk-list"><div class="rail">${BK_SHORTLIST.map(bkCard).join('')}</div></div>
   </div>`;
 }
 
@@ -156,6 +177,12 @@ function bkCard(key){
   </div>`;
 }
 
+/* ONE WAY BACK, NOT TWO. The profile used to close on an "All agents" button
+   beside Book, as well as opening with the back link. Same destination twice
+   in one card, and the pair at the foot read as a CHOICE — book this agent, or
+   go and look at the others — which put a second option next to the one action
+   the card exists to offer. Going back is navigation and it belongs at the top
+   with the rest of the navigation; the foot is for the step forward. */
 function bkProfile(key){
   const a = AGENTS[key];
   const done = S.booking && S.booking.agent === key;
@@ -180,7 +207,6 @@ function bkProfile(key){
       ${done
         ? `<span class="bk-flag">${I.checkFilled}Booked for ${bkDate()}</span>`
         : `<button class="btn btn-p btn-sm" data-bkbook="${key}">Book ${a.n.split(' ')[0]} ${I.arrowRight}</button>`}
-      <button class="btn btn-t btn-sm noic" data-bkall="1">All agents</button>
     </div>
   </div>`;
 }
@@ -216,69 +242,9 @@ function bkSched(){
   </div>`;
 }
 
-/* THE PAYMENT STEP LEADS WITH THE CARD THAT IS ALREADY THERE.
-   `V.payment` opens straight onto an empty card form, which is correct on a
-   page reached from Enroll — but the candidate has a saved Visa (`S.cards`,
-   views.js) and the whole product elsewhere offers it rather than asking
-   again. So: the saved card selected, the form one press away, and the same
-   fields, the same checkbox and the same processor note as that page when it
-   opens. Whichever you use is recorded, so "Visa ending 4242" downstream is
-   a fact about this booking rather than a fixed string. */
-function bkPay(){
-  const a = AGENTS[S.bk.agent] || bkAgent();
-  const saved = (S.cards || []).find(c => c.def) || (S.cards || [])[0];
-  const paid = !!S.booking;
-  return `<div class="bk bk-pay">
-    <div class="tile">
-      <div class="kv"><span class="k">Level interview · ${a.n}</span><span class="v n">${a.price}</span></div>
-      <div class="kv"><span class="k">${bkShort(S.bk)}</span><span class="v n">45 min</span></div>
-      <div class="kv kv-due"><span class="k">Due now</span><span class="v">${a.price}</span></div>
-    </div>
-    <div class="bk-h">Pay with</div>
-    <div class="bk-cards">
-      ${saved ? `<button class="cardrow bk-pick ${S.bk.newCard?'':'on'}" data-bkcard="saved"${paid?' disabled':''}>
-        <span class="cardrow-ic">${BMK[saved.brand] || BMK.card}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${saved.brand} ending ${saved.last}</span>
-          <span class="cardrow-d">Expires ${saved.exp}</span>
-        </span>
-        <span class="bk-tick">${I.checkFilled}</span>
-      </button>` : ''}
-      <button class="cardrow bk-pick ${S.bk.newCard?'on':''}" data-bkcard="new"${paid?' disabled':''}>
-        <span class="cardrow-ic">${I.creditCard}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">Use another card</span>
-          <span class="cardrow-d">Enter the details below</span>
-        </span>
-        <span class="bk-tick">${I.checkFilled}</span>
-      </button>
-    </div>
-    ${S.bk.newCard ? `<div class="bk-form">
-      <div class="f"><label for="bkcn">Card number</label>
-        <input class="inp" id="bkcn" inputmode="numeric" placeholder="1234 5678 9012 3456"${paid?' disabled':''}></div>
-      <div class="f"><label for="bkcnm">Name on card</label>
-        <input class="inp" id="bkcnm" placeholder="Maryam Naz"${paid?' disabled':''}></div>
-      <div class="bk-2up">
-        <div class="f"><label for="bkcx">Expiry</label>
-          <input class="inp" id="bkcx" placeholder="MM/YY"${paid?' disabled':''}></div>
-        <div class="f"><label for="bkcv">Security code</label>
-          <input class="inp" id="bkcv" placeholder="123"${paid?' disabled':''}></div>
-      </div>
-      <label class="cbx"><input type="checkbox" checked${paid?' disabled':''}><span class="box">${I.check}</span><span class="txt">Save this card for future bookings</span></label>
-    </div>` : ''}
-    <div class="note band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
-    <div class="bk-a">
-      ${paid
-        ? `<span class="bk-flag">${I.checkFilled}Paid ${a.price}</span>`
-        : `<button class="btn btn-p btn-sm" data-bkpay="1">Pay ${a.price} and book ${I.arrowRight}</button>`}
-    </div>
-    <p class="bk-note">Free to reschedule up to 24 hours before. Inside 24 hours the fee is not refundable.</p>
-  </div>`;
-}
-
 /* `V.booking`'s confirmation, in a bubble: the success note, the four facts,
    and the two things there are to do next. The dashboard button is the one
-   that matters — it closes the conversation onto the stage the payment just
+   that matters — it closes the conversation onto the stage the booking just
    moved you to, which is the whole point of having done this here. */
 function bkDone(){
   const a = AGENTS[S.booking.agent];
@@ -319,7 +285,7 @@ function bkTurn(mine, reply){
     S.thread.push({who:'tal', html:reply});
     S.typing = talQueue.length > 0;
     render();
-  }, 620);
+  }, TAL_BEAT);
 }
 
 /* WHAT COUNTS AS ASKING TO BOOK. Broad on the verb and the noun, because
@@ -347,12 +313,35 @@ const BK_ASK = /\b(book|booking|reserve|arrange|schedule)\b[^.?!]{0,40}\b(interv
    the moment you pay, `bkStamp` puts the new one everywhere. The confirmation
    already in the thread is frozen (see `bkFrozen`), so it keeps saying what
    it said. */
+/* ONE LINE, THEN THE WIDGET. The first draft of these four opened with a
+   paragraph — what the twenty-four agents are, how the shortlist is ordered,
+   what the 45 minutes contain — and every word of it was true and in the way.
+   The widget IS the answer here: the shortlist says who, the picker says when,
+   the card says how much. A paragraph above it is Tal explaining the thing you
+   can already see, and it pushes the thing you can see off the screen. So each
+   turn is one short sentence whose only job is to say what the widget is.
+   Everything the paragraph used to carry is still one question away — the
+   agents page summary, and Tal's own answer to "what happens in the 45
+   minutes". */
 TAL_ROUTES.unshift([BK_ASK, () => {
   S.booking = null;
   bkStart();
-  return `We can do the whole thing here. Three of the twenty-four talent agents assess at your level and have a slot inside seven days &mdash; these three, ordered by how their past candidates went on to progress. Whoever you pick it is the same 45 minutes, recorded, with your report inside 24 hours.`
+  return `Here are the top profile agents you should consider.`
     + bkHost('agents');
 }]);
+
+/* AND IT IS OFFERED, NOT ONLY ANSWERED. `TALCTX` is the per-view suggestion
+   set: the chips the open thread shows before you have said anything, and the
+   rotating example on the docked line. Interviews and Choosing an agent are
+   the two pages whose whole purpose is this, so on those two the first thing
+   Tal offers is the thing the page is for. Nowhere else — the suggestion is
+   only honest where booking is what you came to do, and `TALCTX` is keyed by
+   view rather than by stage, so a third entry would put it in front of
+   somebody on day 34 as well. */
+const BK_CHIP = 'Book an interview with a top agent';
+for(const v of ['interviews','agents']){
+  if(TALCTX[v] && TALCTX[v][0] !== BK_CHIP) TALCTX[v].unshift(BK_CHIP);
+}
 
 /* --------------------------------------------------------------------------
    THE HANDLERS
@@ -377,7 +366,7 @@ device.addEventListener('click', e => {
     S.agent = k;                                 /* the agent pages agree with the chat */
     const a = AGENTS[k];
     bkTurn(`Book an interview with ${a.n}`,
-      `${a.n.split(' ')[0]} has these times in the next week, and every one of them is 45 minutes. Pick a day and a time and I will hold it while you pay.`
+      `Pick a day and a time that suits you.`
       + bkHost('sched'));
     return;
   }
@@ -394,28 +383,18 @@ device.addEventListener('click', e => {
   const bs = t.closest('[data-bkslot]');
   if(bs && !bs.disabled){ if(!S.bk) bkStart(); S.bk.slot = +bs.dataset.bkslot; render(); return; }
 
-  const bc = t.closest('[data-bkcard]');
-  if(bc && !bc.disabled){ if(!S.bk) bkStart(); S.bk.newCard = bc.dataset.bkcard === 'new'; render(); return; }
-
+  /* THE HANDOFF IS THE LAST STEP. In the product this is where Stripe takes
+     over; the prototype has nothing to draw for that, so pressing it books
+     the interview and Tal says so. */
   const bn = t.closest('[data-bknext]');
   if(bn){
     if(!S.bk || S.booking) return;
-    const a = AGENTS[S.bk.agent] || bkAgent();
-    bkTurn(bkLong(S.bk),
-      `Held for ten minutes. ${a.price} for the interview, charged once &mdash; and it comes off the course fee if you enroll afterwards.`
-      + bkHost('pay'));
-    return;
-  }
-
-  const bp = t.closest('[data-bkpay]');
-  if(bp){
-    if(!S.bk || S.booking) return;
-    bkPaid();
+    bkBooked();
     return;
   }
 
   /* the two ways out of the confirmation. `askClose` puts you back on the
-     page the conversation was opened from, and `bkPaid` has already changed
+     page the conversation was opened from, and `bkBooked` has already changed
      which page that is — so this only has to name a destination. */
   const bg = t.closest('[data-bkgo]');
   if(bg){
@@ -427,12 +406,12 @@ device.addEventListener('click', e => {
   }
 });
 
-/* PAYING IS THE MOMENT THE PROTOTYPE MOVES, and it does four things.
+/* CONFIRMING IS THE MOMENT THE PROTOTYPE MOVES, and it does four things.
 
-   It records the booking, including WHICH CARD, so nothing downstream has to
-   guess. A typed card is read off the field and reduced to its brand and last
-   four, the way a processor would hand it back; an empty field falls back to
-   the saved card rather than inventing a number.
+   It records the booking, including which card the fee lands on, so nothing
+   downstream has to guess. Stripe takes the payment, so there is no card to
+   read off a field here — it is the candidate's default saved card, which is
+   what the Payments module and the receipt row already name.
 
    It advances the stage — but only from the stages where the interview is
    genuinely not booked yet. Booking a RE-interview on day 90 is the same
@@ -446,24 +425,21 @@ device.addEventListener('click', e => {
    press it.
 
    And it answers. The turn goes last so the render it triggers already sees
-   the new stage. */
+   the new stage. What YOU said is the slot, in full: the button was pressed,
+   and the thing you committed to is the day and the time rather than the
+   press. */
 const BK_PRE = ['nil','signup','consult','new'];
-function bkPaid(){
-  const a = AGENTS[S.bk.agent] || bkAgent();
+function bkBooked(){
   const saved = (S.cards || []).find(c => c.def) || (S.cards || [])[0]
              || {brand:'Visa', last:'4242'};
-  let card = {brand:saved.brand, last:saved.last};
-  if(S.bk.newCard){
-    const dig = (((device.querySelector('#bkcn') || {}).value) || '').replace(/\D/g,'');
-    if(dig.length >= 4) card = {brand: brandOf(dig) || 'Visa', last: dig.slice(-4)};
-  }
-  S.booking = {agent:S.bk.agent, day:S.bk.day, slot:S.bk.slot, card};
+  S.booking = {agent:S.bk.agent, day:S.bk.day, slot:S.bk.slot,
+               card:{brand:saved.brand, last:saved.last}};
   if(BK_PRE.includes(S.stage)) S.stage = 'booked';
   S.askFrom = 'dashboard';
   S.view = 'dashboard';
   S.hist = [];
-  bkTurn(`Pay ${a.price}`,
-    `Booked. ${a.n}, ${bkLong()}, 45 minutes and recorded. The calendar invite and the joining link are already in your email, and nothing is expected of you before the day.`
+  bkTurn(bkLong(),
+    `Done &mdash; your interview is booked.`
     + bkFrozen(bkDone()));
 }
 
@@ -471,7 +447,7 @@ function bkPaid(){
    thrown away — leaving the module, switching portal, closing the panel — and
    a half-finished booking that outlived its own thread would reappear in the
    next one at whatever step it had reached. The RESULT is not touched: an
-   interview you paid for is not part of a conversation. */
+   interview in the diary is not part of a conversation. */
 const _bkReset = talReset;
 talReset = function(){ _bkReset(); S.bk = null; };
 
@@ -587,12 +563,19 @@ function bkStamp(){
 PAGESUM.dashboard.booked = () => {
   const a = AGENTS[(S.booking || {}).agent || 'priya'];
   const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `You are booked with ${a.n} for ${bkLong()} &mdash; 45 minutes, recorded, ${a.price} already paid on a ${c.brand} ending ${c.last}. ${a.n.split(' ')[0]} has run ${a.ivs} interviews, assesses ${a.range} and rates ${a.r.toFixed(1)}. Nothing else is outstanding between now and then; your level and your report both come out of that conversation, within 48 hours of it.`;
+  /* TWO SENTENCES, IN AI6'S VOICE. These two overrides exist for the FACTS —
+     the agent and card actually chosen, rather than the hard-coded Priya and
+     Visa the stage was written around — and they have to read like the other
+     twenty-odd summaries or the one page you reached through the booking
+     flow is the one page written by somebody else. The rule they follow is
+     in the note over `PAGESUM` in ai6.js: say the thing and stop, no framing,
+     no closing line about what the page is for. */
+  return `You&rsquo;re booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded, ${a.price} already paid on a ${c.brand} ending ${c.last} &mdash; nothing to do before the day.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
   const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `Booked. ${a.n}, ${bkLong()}, 45 minutes, recorded, ${a.price} paid on a ${c.brand} ending ${c.last}. The calendar invite and the joining link are already in your email. Nothing is expected of you before the day &mdash; and if it stops working, rescheduling and cancelling are both on this page rather than in an email thread.`;
+  return `Booked &mdash; ${a.n}, ${bkLong()}, ${a.price} on a ${c.brand} ending ${c.last}. The invite and joining link are already in your email, and you can move it from here.`;
 };
 
 const _bkSum = pageSummary;

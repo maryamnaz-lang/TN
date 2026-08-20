@@ -666,7 +666,15 @@ function ring(pct, label){
    a Tal chip, and a control inside a control is a click whose destination
    depends on where in the block you land. Same conclusion §29.16 reached for
    the report card on My Level, and the same fix — the way in becomes a real
-   button where the reading ends.
+   button.
+
+   THAT BUTTON SITS IN THE TOP BAND, NOT AT THE FOOT. It closed the card for
+   one release, on the argument that a way in belongs where the reading ends.
+   The reading is two blocks long and the button was grey, which made the
+   only required action on the page the last and faintest thing in it. It is
+   primary weight now and sits under the chapter it opens; the foot keeps
+   Tal's question, which is the thing you do when you are NOT ready to open
+   the chapter.
 
    Used at both stages that draw the section (week1, day34). Day 90 does not:
    `f.finished` hides the section entirely, which is why the old markup's
@@ -682,6 +690,15 @@ function weekCard(f){
         <div class="wkc-eb t-label-01">Chapter ${i + 1} &middot; ${S.stage === 'week1' ? 'unlocked today' : 'in progress'}</div>
         <h3 class="u-h3">${CH[i][0]}</h3>
         <div class="wkc-min sub">${did} of ${mins} minutes</div>
+        <!-- THE WAY IN, AT THE TOP AND IN THE PRIMARY WEIGHT. It was a grey
+             secondary button on the last row of the card, below two blocks
+             of reading — so the one thing this section exists to make happen
+             was the last thing offered and the quietest. It belongs to the
+             chapter named directly above it, and a person who already knows
+             what they are opening should not have to read the week's report
+             to reach it. The reading below is now what you do INSTEAD of
+             opening it, which is the honest order. -->
+        <div class="wkc-go"><button class="btn btn-p btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button></div>
       </div>
       ${ring(pct, `${pct}% of chapter ${i + 1} done`)}
     </div>
@@ -696,12 +713,21 @@ function weekCard(f){
     <div class="wkc-blk">
       <!-- THE ROLE CLASS GOES ON THE SPAN, NOT THE ROW. u-overline is
            uppercase and text-transform inherits, so on the wrapper it
-           renders Tal's chip as "TAL". The chip is a name. -->
-      <div class="wkc-h">${talLabel()}<span class="u-overline">What is expected of me this week</span></div>
+           renders Tal's chip as "TAL". The chip is a name.
+
+           AND THE CHIP IS THE BARE MARK HERE — the "bare" variant, styled
+           in §37 the way the page-summary band styles its own. §33 is where
+           the argument is: at the head of a page the mark and the name in
+           accent ink are enough. A solid orange chip with a
+           sheen running through it is the loudest object in a card whose
+           actual point is the black button at the top of it, and it was
+           announcing a one-line attribution. Same name, same mark, no
+           fill: it says who wrote the sentence without competing with the
+           thing the sentence is asking you to do. -->
+      <div class="wkc-h">${talLabel('bare')}<span class="u-overline">What is expected of me this week</span></div>
       <p class="wkc-p u-body">${w.tal}</p>
       <div class="wkc-a">
         ${askChip(w.ask[0], w.ask[1])}
-        <button class="btn btn-g btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -932,11 +958,25 @@ const railRoots = () => {
   const set = NAVSETS[isLead() ? 'leader' : cfg(S.stage).nav] || [];
   return set.map(([k]) => k).concat(isLead() ? ['leadProfile'] : ['account']);
 };
-const bk = () => (S.hist.length && !railRoots().includes(S.view))
-  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>` : '';
-function ph(title,sub,act){
+/* AND A PAGE MAY NAME ITS OWN PARENT.
+   The rule above answers "is there somewhere to go back TO" with the history
+   stack, which is right for a page you can only have reached by navigating.
+   Two pages are not like that: the agent page and the booking confirmation
+   are reachable from the stage picker and from a link, and on a page whose
+   whole job is one transaction, arriving with an empty stack meant arriving
+   with no way out at all — the crumb is a location, not a control, and at
+   desktop the band hides it.
+
+   `backTo` is the parent to fall back on, used ONLY when history is empty.
+   With history the arrow still means "back", because that is the more
+   useful answer when it is available and it is what the arrow means
+   everywhere else in the product. */
+const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
+  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>`
+  : to ? `<button class="ph-back" data-go="${to}" aria-label="Back">${I.arrowLeft}</button>` : '';
+function ph(title,sub,act,backTo){
   return `<div class="ph${act?' ph-has-act':''}">
-    <div class="ph-main"><div class="ph-top">${bk()}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
+    <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
     ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
 }
 /* BEFORE THE INTERVIEW, THE SAME BAR — SEE §29.4
@@ -1027,7 +1067,7 @@ login: () => `${authShell()}
     <p class="t-body-02 aux"><a data-go="forgot">Forgotten your password?</a></p>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
   </div>
 </div></main>`,
 
@@ -1084,10 +1124,9 @@ create: () => `${authShell()}
   ${ph('Create your account','You&rsquo;re one step away. Create your password to continue.')}
   <div class="sec sec-id">
     <div class="f last"><label for="em">Your Email Address</label>
-      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div><div class="help">From your NIL profile. <a data-go="terms">Not you?</a></div></div></div>
+      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div></div></div>
   </div>
   <div class="sec sec-rule">
-    <div class="sec-h"><h2 class="u-h2">Set a Password</h2></div>
     <div class="f-row"><div class="f"><label for="pw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="pw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
         <button class="pw-eye" data-eye="pw" aria-label="Show password">${I.view}</button></div>
@@ -1110,7 +1149,7 @@ create: () => `${authShell()}
         <span class="txt">Send me occasional product and course emails.</span></label>
     </div>
     </div>
-  <div class="sec sec-act"><div class="foot-row"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
+  <div class="sec sec-act"><div class="foot-row foot-stack"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
   </div>
 </div></main>`,
 
@@ -1287,16 +1326,12 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
-      <div class="stats">
-        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
-        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
-        ${statCell(I.calendar, `Taken`, `3 Aug`, `2026 &middot; one attempt`)}
-        ${statCell(I.growth, `Level`, `Not set`, `the interview decides it`)}
-      </div>
-    </div>
-    <div class="sec tint sec-stp">
+    ${''/* AND THE SAME ORDER ON THIS STAGE — see the note on `new`.
+          Where you are, then what the quiz decided. The stepper is white for
+          the reason it is white there, and losing the tint is also what puts
+          its closing rule back inside the page gutter (§18 gives a FILLED
+          block a wall-to-wall edge). One change, both effects. */}
+    <div class="sec sec-stp">
       ${stepper('whereConsult',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 3'},
         {st:'done',lab:'Account created',sec:'Aug 12'},
@@ -1306,6 +1341,7 @@ V.dashboard = (f) => {
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
     </div>
+    ${quizResults('3 Aug', 'the interview decides it')}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -1329,14 +1365,21 @@ V.dashboard = (f) => {
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
-      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
-    </div>
-    <div class="rail-wrap">
-      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
-    </div>
-    <div class="sec tint sec-stp">
+    ${''/* WHERE YOU ARE COMES BEFORE THE AGENTS ON THIS STAGE.
+          Everywhere else the stepper is a footnote under the thing you were
+          asked to do, so it sits last and takes the tint that marks supporting
+          material. Here it is doing the opposite job: nothing is booked yet, so
+          the reader's first question is where they are in the journey, and the
+          three agent cards are the answer to the second. Orientation first,
+          then the choice.
+
+          It carries no `tint` for the same reason. Filled, it read as an aside
+          to the block above it — and there is no block above it now but the
+          page head, which is not a thing this annotates. On the base ground it
+          reads as the page's own first statement, which is what it now is.
+          The other dashboard stages keep the tint: there the stepper still
+          follows a plate or a card and is still a footnote to it. */}
+    <div class="sec sec-stp">
       ${stepper('whereNew',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 12'},
         {st:'on',  lab:'Interview with an agent',sec:'Not booked yet · 45 minutes'},
@@ -1344,6 +1387,15 @@ V.dashboard = (f) => {
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
     </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
+      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
+    </div>
+    <div class="rail-wrap">
+      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
+    </div>
+    ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
+    ${quizResults('12 Aug', 'the interview decides it')}
     <div class="sec">
       <div class="sec-h"><h2>Decided so far</h2><button class="btn btn-g btn-sm noic" data-go="level">View My Level</button></div>
       <div class="tile-stack spaced">
@@ -1359,7 +1411,11 @@ V.dashboard = (f) => {
         <div class="plate-who">${avatar(AGENTS.priya,56)}
           <span class="plate-wb"><b>Priya Nair</b><span>Talent agent &middot; assesses Explorer</span></span>
         </div>
-        <div class="plate-eb">Next up</div>
+        ${''/* NO "NEXT UP" EYEBROW — the same argument the weekly-call plate
+              already carries a few lines up. This is the only appointment on
+              the page, and the card names it on the very next line; a label
+              saying it is the next one is a category over a set of one. The
+              time it used to be paired with is in the card's own body. */}
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
         <div class="plate-a">
@@ -1376,14 +1432,23 @@ V.dashboard = (f) => {
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    <div class="sec tint sec-stp">
+    ${''/* WHITE HERE TOO, FOR THE REASON THE `new` STEPPER IS WHITE — and
+          taking the tint off is also what fixes the rule under it. §18 gives
+          a FILLED block a wall-to-wall bottom edge, on the argument that a
+          block with its own ground owns its own boundary; unfilled, the same
+          section falls back to §18's inset rule, which pays the page gutter
+          like every other divider on the page. So the two asks here are one
+          change: the tone was what was making the line run edge to edge. */}
+    <div class="sec sec-stp">
       ${stepper('whereBooked',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
         {st:'done',lab:'Interview booked',sec:'Priya Nair · Thu, Aug 20'},
         {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
-    </div>`;
+    </div>
+    ${''/* on this stage the "what sets it" answer has a name and a date on it */}
+    ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
     ${ph('Welcome Back, Maryam!','Your level is confirmed. One step left before the 90 days start.')}
@@ -1416,6 +1481,21 @@ V.dashboard = (f) => {
           <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
           <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
         </div>`).join('')}</div>
+    </div>
+    ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
+          The interview is the only thing that has happened to this candidate,
+          and the page was showing its RESULT — a rung, a black hero, a course
+          — without a word of what was actually said in it. The digest goes
+          here rather than higher up because its growth-areas line ends on
+          "chapters 4 and 12", and the thirteen chapters are the block directly
+          above: read in this order the course stops being a catalogue and
+          becomes the answer to what Priya wrote down. Higher up, between the
+          hero and the course, it would have been a third block about the
+          level before the reader had been told what the level buys. */}
+    <div class="sec">
+      <div class="sec-h"><h2>What the interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. The 45-minute recording, the transcript and six marked scenes sit behind it.</p>
+      ${signedSummary(true)}
     </div>`;
 
   else if(f.complete) body = `
@@ -1439,15 +1519,45 @@ V.dashboard = (f) => {
       <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E4 ${I.arrowRight}</button>
       <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
     </div></div>
-    <div class="sec tint">
-      <div class="sec-h"><h2>Cohort 41, in the end</h2><a data-go="transcript">Course Progress</a></div>
-      <button class="score-link" data-go="rewards">${scoreCard(GAME.promoted)}</button>
+    ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE RUNG UP.
+          Both stages are the same moment — a level has just been confirmed
+          and a course has not been started — so they were answering the same
+          two questions, and only one of them was answering them. `assessed`
+          says what the ninety days hold and what the agent actually wrote;
+          `promoted` said neither, and went straight from the rung to a
+          points card. The two blocks below are that page's, with the
+          re-interview's report rather than the first one's. */}
+    <div class="sec">
+      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
+      <p class="all-desc">Thirteen chapters at E4, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
+      <div class="ch-two">${CH.map((c,i)=>`
+        <div class="ch ch-flat">
+          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
+        </div>`).join('')}</div>
     </div>
     <div class="sec">
-      <div class="tile" style="padding-top:var(--s04)">
-        ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:GAME.promoted.weeks,
-          target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
+      <div class="sec-h"><h2>What the re-interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the ninety days you had just finished.</p>
+      ${signedSummary(true, true)}
+    </div>
+    ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
+          The weekly-minutes chart lived here — thirteen stacked bars of how
+          long you spent, week by week, on a course that is over. That is a
+          chart you read WHILE you are behind on it; once the ninety days are
+          closed the only questions left are what you finished, how well, and
+          what it earned, and all four of those are one number each. The
+          chart is still on Course Progress, which is where the week-by-week
+          record belongs and which the heading links to. */}
+    <div class="sec tint">
+      <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
+      <div class="stats">
+        ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
+        ${statCell(I.chart, `Assessment average`, `${f.avg}<small>%</small>`, `across the thirteen`)}
+        ${statCell(I.trophy, `Points`, GAME.promoted.pts.toLocaleString(), `${GAME.promoted.badges} of 4 badges`)}
+        ${statCell(I.growth, `Rung`, `E3 &rarr; E4`, `up one, on 21 November`)}
       </div>
+      <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
     </div>
     <div class="sec tint">
       <div class="sec-h"><h2>What changes at E4</h2></div>
@@ -1529,12 +1639,22 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>`}
-  ${g?`<div class="sec">
-    <div class="sec-h"><h2>Where you stand</h2><a data-go="rewards">View more</a></div>
-    ${standRow(g)}
-  </div>`:''}
-    ${f.finished?'':`<div class="sec tint">
-      <div class="sec-h"><h2>This week</h2><a data-go="coursework">Coursework</a></div>
+    ${''/* THIS WEEK IS WHITE NOW, AND IT IS THE FIRST BLOCK UNDER THE CALL.
+          `tint` is §12's mark for supporting material — the tone says "this
+          is a note about the page, not the page". That was the wrong claim
+          for the one block on this dashboard that holds the week's actual
+          work and the way into the chapter, and it was reading as one:
+          filled, it sat back while the points row above it sat forward.
+          The hairlines either side already separate it, so nothing is lost
+          by taking the ground away.
+
+          Two rules in §32 are keyed on `.sec.tint` for this card — the block
+          dividers and the ring track. They are left in place rather than
+          deleted: they are the correct values IF this card is ever put back
+          on a panel, and on white the base values they were stepping down
+          from are what applies. */}
+    ${f.finished?'':`<div class="sec">
+      <div class="sec-h"><h2>This week</h2><button class="btn btn-g btn-sm noic" data-go="coursework">Coursework</button></div>
       ${weekCard(f)}
     </div>`}
     <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
@@ -1544,6 +1664,18 @@ V.dashboard = (f) => {
           target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
       </div>
     </div>
+    ${''/* POINTS, BADGES AND RANK GO LAST.
+          This row sat third on the page, directly under the cohort call —
+          which put the standing before the work, and pushed the week's own
+          chapter below it. None of it is due, none of it moves your level
+          (§ai6's rewards summary says so in as many words), and it is the
+          one block here a person reads out of interest rather than need. So
+          it closes the page instead of interrupting it, under the record of
+          the ninety days that earned the number. */}
+  ${g?`<div class="sec">
+    <div class="sec-h"><h2>Where you stand</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View more</button></div>
+    ${standRow(g)}
+  </div>`:''}
 `;
   }
   return `<main class="main"><div class="page">${body}</div></main>`;
@@ -1576,21 +1708,13 @@ V.level = (f) => {
          click target inside a click target, and the arrow was the only thing
          announcing the outer one. The button says it better, and says it
          where the reading ends. -->
-    <div class="${confirmed?'signed':'tile bordered'}">
-      ${confirmed?`<div class="signed-h">
-        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
-        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>Level interview · 20 August 2026</span></span>
-      </div>`:'<div class="ai-head"><h3>What the Explorer track means</h3></div>'}
+    ${confirmed?signedSummary(false):`<div class="tile bordered">
+      <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
-        ${confirmed?`<p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
-        <p>You reason from consequence to people, not policy. Three examples, each with a date and a name attached.</p>
-        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
-        <p>Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.</p>`
-        :`<p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
-        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>`}
+        <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
+        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>
       </div>
-      ${confirmed?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
-    </div>
+    </div>`}
   </div>
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
@@ -1784,6 +1908,24 @@ V.agent = (f) => {
   const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
+  ${''/* THIS PAGE HAD NO HEADER AND THEREFORE NO WAY BACK.
+        It opened straight onto the agent's face, with a breadcrumb above it
+        as the only route out — and a crumb is a location, not a control you
+        reach for. Every other page under a module carries `ph`, and `ph`
+        draws the back arrow itself (`bk`, above: history exists and this is
+        not a rail root, so the arrow is drawn). Adding the header is what
+        adds the way back; it is not a second thing.
+
+        "Book <name>", not the name alone, because the crumb directly above
+        already says the name and the page is not a profile — you arrive on
+        it having chosen, and everything on it is in service of picking a
+        time. The heading is the verb the page is for.
+
+        It also gives the page a module head: `placeBand` in ai5 keys on the
+        presence of a `.ph`, so with one here Tal's summary lands in the band
+        against the title, the way it does on every other page, instead of
+        being built as a loose card in the body. */}
+  ${ph('Book ' + a.n, 'Everything about this agent, and the times they have open.', null, 'agents')}
   <div class="sec" style="padding-top:var(--s05)">
     <div class="agid">
       ${avatar(a,96)}
@@ -1800,13 +1942,20 @@ V.agent = (f) => {
       <div class="kv"><span class="k">Report turnaround</span><span class="v n">Within 24 hours</span></div>
     </div>
   </div>
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>What to expect with ${a.n.split(' ')[0]}</h3></div>
-      <div class="ai-body"><p>She opens with a situation from your own answers, then asks what you decided. Have a delegation example ready.</p></div>
-      <div class="ai-foot">${askChip('Run a practice interview with me for '+a.n.split(' ')[0],'Practice with Tal')}</div>
-    </div>
-  </div>
+  ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
+        This page carried a hand-written "What to expect with <name>" card
+        from before ai6 existed. ai6 then gave the page a summary of its own
+        — and that summary already opens with what this agent is like to be
+        interviewed by, in the agent's own words, because §ai6's `agent`
+        entry quotes the bio. So the page said "Tal" twice above the fold,
+        in two different chip styles, before it had said the agent's name
+        once. The summary is the one that stays: it is the treatment every
+        other page uses and it sits in the header rather than in the body.
+
+        The practice-interview chip went with the card. It is not lost — the
+        composer at the foot of the page carries this page's suggestions
+        (§ai4 keys them off the view), and "Run a mock interview with me" is
+        one of them. */}
   <div class="sec">
     <div class="sec-h"><h2>Pick a slot</h2><span class="t-helper-01">Times in ET</span></div>
     <div class="daystrip">
@@ -1827,35 +1976,54 @@ V.agent = (f) => {
 </div>`;
 };
 
-V.booking = (f) => `<main class="main"><div class="page">
+/* THE CONFIRMATION IS A RECEIPT, AND A RECEIPT IS SHORT.
+   Four changes, all the same argument — this page is read once, immediately
+   after paying, to check that what happened is what was meant to happen:
+
+   1. IT HAS A HEADER AND A WAY BACK. It opened on a green note with no title
+      and no control, which is a page you can only leave by the rail. The
+      parent is Interviews, named explicitly, because you can land here from
+      the stage picker with an empty history (see `bk`).
+   2. TAL'S PREPARE CARD IS GONE. Two mock-interview offers and a paragraph
+      about growth areas, thirty seconds after paying — the thing to do next
+      is nothing, and §ai6's summary for this page says exactly that
+      ("Nothing is expected of you before the day"). Preparation belongs on
+      the `booked` dashboard, which is where the same offer already lives and
+      where a person actually is when they come back to prepare.
+   3. THE AGENT GETS A FACE. She was the value of the row labelled "Agent" in
+      a list of four facts, between the date and the card number. You have
+      just paid $95 to spend 45 minutes with a specific person; her name and
+      picture lead the card, in the same `row-lead` the report uses to say
+      who signed it, and the fact row goes because the card now says it.
+   4. ADD TO CALENDAR AND RESCHEDULE ARE GONE. Both the note above and the
+      page summary say the invite is already in the reader's email, so the
+      calendar button offers what has happened. Rescheduling is a real thing
+      to want and it has a real home — Interviews — which the back arrow now
+      goes to; offering it here puts "change this" beside "this is done". */
+V.booking = (f) => {
+  const a = AGENTS[S.agent||'priya'];
+  return `<main class="main"><div class="page">
+  ${ph('Booking Details','Your interview is confirmed. Everything about it is on this page.', null, 'interviews')}
   <div class="sec" style="padding-top:var(--s06)">
-    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${(AGENTS[S.agent||'priya']).n}. A calendar invite and joining link are in your email.</div></div>
+    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${a.n}. A calendar invite and joining link are in your email.</div></div>
   </div>
   <div class="sec">
     <div class="tile">
-      <div class="kv"><span class="k">Agent</span><span class="v">${(AGENTS[S.agent||'priya']).n}</span></div>
-      <div class="kv"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
-      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
-      <div class="kv"><span class="k">Paid</span><span class="v n">${(AGENTS[S.agent||'priya']).price} · Visa ending 4242</span></div>
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-t">Add to calendar ${I.calendar}</button>
-      <button class="btn btn-t" data-go="interviews">Reschedule or cancel ${I.time}</button>
-    </div>
-  </div>
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>Time to prepare</h3></div>
-      <div class="ai-body"><p>Your quiz flagged delegation and hard conversations. Ten minutes of practice on either, with feedback.</p></div>
-      <div class="mt5" style="display:flex;flex-direction:column;gap:1px">
-        <button class="tile clk band" data-tal-ask="Run a mock interview on delegation"><span class="t-body-compact-01">Run a mock on delegation</span></button>
-        <button class="tile clk band" data-tal-ask="Help me find a real delegation example from my own work"><span class="t-body-compact-01">Help me find a real example</span></button>
+      <div class="row-lead">
+        ${avatar(a,40)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">${a.n}</div>
+          <div class="t-helper-01 mt3">Talent agent &middot; assesses ${a.range}</div>
+        </div>
       </div>
-      
+      <div class="kv mt5"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
+      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
+      <div class="kv"><span class="k">Paid</span><span class="v n">${a.price} · Visa ending 4242</span></div>
     </div>
   </div>
   <div class="sec"><button class="btn btn-p" data-go="stage:booked">Back to my dashboard ${I.arrowRight}</button></div>
 </div></main>`;
+};
 
 V.enrol = (f) => {
   const next = f.complete;
@@ -1897,7 +2065,7 @@ V.enrol = (f) => {
     </div>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>What the 90 days cover</h2><a data-go="coursework">All 13</a></div>
+    <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="coursework">All 13</button></div>
     <div class="tile-stack">${[0,1,2,3].map(i=>chRow(i,{done:0,open:-1,week:99,enrolled:false})).join('')}</div>
   </div>
 </div></main>`;
@@ -2390,6 +2558,28 @@ function cardSheet(){
   </div>`;
 }
 
+/* WHAT YOU HAVE EARNED, ON THE PAGE THAT IS ABOUT YOU — AND ONLY IF ANY
+   Profile held your name, your level and your switches, and nothing you had
+   won. Points, badges and rank are the one part of the record that is
+   yours rather than the course's, and Profile is where a person goes to look
+   at their own record; making them navigate to Points to see whether they
+   have a badge is making them ask a question the page they are on should
+   already have answered.
+
+   AND IT IS NOT DRAWN AT ZERO. Points do not start until you are on a course,
+   so on five of the eight stages this block would be three cells reading 0,
+   0 of 4 and 1-Star — an empty trophy case, which says "you have nothing"
+   far louder than not asking says anything at all. `GAME[stage]` is
+   undefined before a course and `pts` is the first thing to move once one
+   starts, so the two together are the test. */
+function standSec(){
+  const g = GAME[S.stage];
+  if(!g || !g.pts) return '';
+  return `<div class="sec">
+    <div class="sec-h"><h2>What you have earned</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View Points</button></div>
+    ${standRow(g)}
+  </div>`;
+}
 V.account = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Profile')}
   ${ph('Profile','Your details, your preferences, and what Tal is allowed to do.')}
@@ -2418,6 +2608,7 @@ V.account = (f) => `<main class="main"><div class="page">
       <div class="kv"><span class="k">Level</span><span class="v n">${f.pred?f.track+' track · set at the interview':lvlName(f.level)+' · confirmed'}</span></div>
     </div>
   </div>
+  ${standSec()}
 
   <div class="sec tint">
     <div class="sec-h"><h2>Notifications</h2></div>
@@ -2570,6 +2761,17 @@ function go(target, fresh){
 
 /* Ask Tal something: the question lands, Tal thinks, then answers with widgets.
    Questions queue, so asking three things in a row gets three answers in order. */
+/* HOW LONG TAL TAKES, AND WHY IT IS NOT AS FAST AS POSSIBLE.
+   This was 650ms, which is long enough to run the animation and too short to
+   see it: the three dots appeared and were replaced inside half a blink, so
+   the answer read as having been sitting there all along — canned, not
+   composed. An assistant that answers instantly is not impressive, it is
+   obviously not thinking, and the one thing the dots exist to say is that it
+   is. 1.4 seconds is long enough to read as a pause and short enough not to
+   read as a wait. It is one constant so that every surface Tal answers on —
+   the panel, the ask page, a pressed widget button in ai7 — takes the same
+   beat; two different speeds would be two different assistants. */
+const TAL_BEAT = 1400;
 let talTimer = null;
 let talQueue = [];
 function ask(q){
@@ -2593,7 +2795,7 @@ function talPump(){
     S.typing = talQueue.length > 0;
     render();
     talPump();
-  }, 650);
+  }, TAL_BEAT);
 }
 function talReset(){ talQueue = []; clearTimeout(talTimer); talTimer = null; S.thread = []; S.typing = false; }
 function back(){
@@ -3091,6 +3293,79 @@ function boardList(){
    The local is `body`, not `inner` — `inner()` is the global that returns an
    icon's paths, and shadowing it inside the one helper every figure band goes
    through is a trap set for whoever adds an icon to this cell next. */
+/* THE SIGNED SUMMARY OF THE INTERVIEW, WHEREVER THE REPORT ITSELF IS NOT
+   My Level has carried this card since §29.16: who signed it, the two
+   paragraphs the agent actually wrote, and one button into the full report.
+   The `assessed` dashboard needs the same thing for the same reason — the
+   interview is the only thing that has happened to this candidate and the
+   dashboard was showing the RESULT of it (a rung, a black hero) without a
+   word of what was said. So it is a function now rather than a second copy
+   drifting away from the first.
+
+   `withNote` is the one difference, and it is deliberate. On My Level the
+   card sits under a hero that already declares the level and a page whose
+   subject is the ladder, so the quote would be a third voice on a page about
+   a number. On the dashboard this card is the ONLY place the interview
+   speaks, so Priya's own sentence — the one that names why E3 and not E2 —
+   goes in. Same card, one extra line where there is room for it.
+
+   AND `re` IS THE RE-INTERVIEW'S. Same card, the other interview: after the
+   ninety days Priya writes a second report, and on the `promoted` dashboard
+   that is the one the reader has just been given. The two must not be mixed
+   up — the August report argued E3 off a reorganization the candidate had
+   just started, the November one is written off thirteen finished chapters —
+   so the whole of the text switches, not just the date. */
+function signedSummary(withNote, re){
+  return `<div class="signed">
+      <div class="signed-h">
+        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
+        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>${re?'Re-interview &middot; 21 November 2026':'Level interview &middot; 20 August 2026'}</span></span>
+      </div>
+      <div class="ai-body">
+        <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p>${re
+          ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the ninety days, each with a name and a date on it.'
+          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
+        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p>${re
+          ?'Delegation still, and coaching rather than fixing. Chapters 3 and 9 on the E4 course are built on exactly this.'
+          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.'}</p>
+      </div>
+      ${withNote?`<div class="note band">
+        <span style="fill:var(--icon-secondary)">${I.user}</span>
+        <div class="nb"><b>Priya&rsquo;s note</b>${re
+          ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
+          :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;'}</div>
+      </div>`:''}
+      <div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>
+    </div>`;
+}
+
+/* THE QUIZ RESULT, ON EVERY DASHBOARD STAGE THAT STILL HAS NO LEVEL
+   `consult`, `new` and `booked` are all the same sentence — the quiz has
+   happened and nothing has replaced it yet — so all three now print the same
+   four figures rather than the reader losing sight of their score the moment
+   they finish signing up. One function, not three copies, because only two
+   things vary and both are worth varying:
+
+   `taken`      each stage's own stepper prints a quiz date, and the block
+                cannot contradict a line three inches above it. consult was
+                sat on 3 Aug; from `new` on, the stepper says 12 Aug.
+   `levelNote`  the fourth cell's job is to say what WILL set the level, and
+                by `booked` that is a named agent on a known date rather than
+                an interview nobody has arranged. Same "Not set" value, more
+                specific answer to the question the value provokes. */
+function quizResults(taken, levelNote){
+  return `<div class="sec">
+      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
+      <div class="stats">
+        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
+        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
+        ${statCell(I.calendar, `Taken`, taken, `2026 &middot; one attempt`)}
+        ${statCell(I.growth, `Level`, `Not set`, levelNote)}
+      </div>
+    </div>`;
+}
 function statCell(ic, label, value, note, jump){
   const body = `<span class="stat-ic">${ic}</span>
       <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>

@@ -211,22 +211,46 @@ V.leadCerts = () => {
   <div class="sec">
     <div class="note"><span>${I.info}</span><div class="nb"><b>Leading is a volunteer role</b>There are no fees and no settlements on this side of TalentNext. What the time earns is recognised in certifications and in the training that leads to them &mdash; and a certification is what lets you assess a wider band.</div></div>
   </div>
+  ${/* THE NEWEST ONE IS THE HERO, AND IT HAS NO HEADING.
+        `.cert` is in ai5's `DARK_CARD` list, so `placeDark` moves whichever
+        page child contains one up into the module head band — every dark card
+        in this product lives at the head of its page. Three of them therefore
+        arrived in the band as one unbroken black slab, and the `.sec-h` above
+        them was left in the band's 184px label column, clipped to "Earn / ed".
+
+        So exactly one goes in the band, which is what the band is for: the
+        most recent certification, as the page's hero, with no heading of its
+        own because the page title is directly above it. The rest are rows.
+        Do not add a second `.cert` here without re-reading this. */''}
   <div class="sec">
-    <div class="sec-h"><h2>Earned</h2><span class="t-helper-01">Yours to keep and to share</span></div>
-    ${LDR_CERTS.map(c => `
     <div class="cert">
       <span class="cert-mark">${I.certificate}</span>
       <div class="cert-b">
-        <div class="cert-eb">${c.track} track</div>
-        <div class="n">${c.n}</div>
-        <div class="m">Awarded ${c.on} &middot; ${LEADER.n}</div>
-        <div class="m">Issued by ${c.by}</div>
+        <div class="cert-eb">Most recent &middot; ${LDR_CERTS[LDR_CERTS.length-1].track} track</div>
+        <div class="n">${LDR_CERTS[LDR_CERTS.length-1].n}</div>
+        <div class="m">Awarded ${LDR_CERTS[LDR_CERTS.length-1].on} &middot; ${LEADER.n}</div>
+        <div class="m">Issued by ${LDR_CERTS[LDR_CERTS.length-1].by}</div>
       </div>
       <div class="cert-act">
         <button class="btn btn-sm noic cert-btn">Download</button>
         <button class="btn btn-sm noic cert-btn">Share link</button>
       </div>
-    </div>`).join('')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Earned</h2><span class="t-helper-01">Yours to keep and to share</span></div>
+    <div class="tile-stack">
+      ${LDR_CERTS.slice().reverse().map(c => `<div class="cardrow">
+        <span class="cardrow-ic">${I.certificate}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${c.n} <span class="tag green sm">Active</span></span>
+          <span class="cardrow-d">${c.track} track &middot; awarded ${c.on}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic">Certificate</button>
+        </span>
+      </div>`).join('')}
+    </div>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>In progress</h2><span class="t-helper-01">Candidate Mentoring &middot; Advanced track</span></div>

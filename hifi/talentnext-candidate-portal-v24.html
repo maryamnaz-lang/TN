@@ -5017,7 +5017,7 @@ button.btn-p:active,
   .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)){
     padding-bottom:var(--s05)}
   
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(:has(> .lead-b)){
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(:has(> .lead-b)){
     padding-top:var(--s05)}
   .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
   .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
@@ -5737,6 +5737,14 @@ button.btn-p:active,
     font-size:24px;line-height:30px;letter-spacing:-.4px}
   .app .agh-book .agh-n{display:grid;
     grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
+}
+@container app (min-width:900px){
+  .app .rail .agh-book .agh-n{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    align-items:baseline;column-gap:var(--s04)}
+  .app .rail .agh-book .agh-n .ag-price{
+    position:static;grid-column:2;grid-row:1;justify-self:end;
+    font-size:17px;line-height:23px;letter-spacing:-.2px}
 }
 .app .page > .rail-wrap{
   padding-top:var(--s06);padding-bottom:var(--s06)}
@@ -6687,10 +6695,14 @@ button.btn-p:active,
 .app[data-portal="leader"] .stat-jump:focus-visible{
   outline:2px solid var(--text-primary);outline-offset:-2px}
 .app[data-portal="leader"] .bk-day{
-  align-self:flex-start;min-width:82px;cursor:default;
-  border-color:var(--rule-on-2)}
+  align-self:flex-start;width:104px;min-width:0;cursor:default;
+  white-space:nowrap;border-color:var(--rule-on-2)}
 .app[data-portal="leader"] .bk-day .n{font-size:15px;line-height:21px}
 .app[data-portal="leader"] .bk-row{gap:var(--s05)}
+.app[data-portal="leader"] button.bk-row{
+  -webkit-appearance:none;appearance:none;width:100%;
+  font:inherit;color:inherit;text-align:left}
+.app[data-portal="leader"] .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
 .app[data-portal="leader"] .bk-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
@@ -6699,7 +6711,6 @@ button.btn-p:active,
 @container app (max-width:599.98px){
   .app[data-portal="leader"] .bk-row > .mem-av,
   .app[data-portal="leader"] .bk-row > .cardrow-ic{display:none}
-  .app[data-portal="leader"] .bk-day{min-width:74px}
 }
 .app .wkc{display:flex;flex-direction:column}
 .app .wkc-top{
@@ -6812,15 +6823,13 @@ button.btn-p:active,
 @media (prefers-reduced-motion:reduce){
   .app .nav-t-mark,.app .nav-t-menu{transition:none}
 }
-.app .bkw{display:block;margin-top:var(--s05)}
+.app .bkw{display:block;margin-top:var(--s05);--pad-x:0px}
 .app .bkw .bk{display:flex;flex-direction:column;gap:var(--s05)}
-.app .bkw .bk-list{display:flex;flex-direction:column}
-.app .bkw .agh{padding-left:0;padding-right:0}
-.app .bkw .agh:first-child{padding-top:0}
-.app .bkw .agh:last-child{border-bottom:0;padding-bottom:0}
+.app .bkw .rail-wrap{padding-left:0;padding-right:0}
+.app .bkw .rail{border:1px solid var(--rule)}
+.app .bkw .agh{padding-left:var(--s05);padding-right:var(--s05)}
+.app .bkw .agh:last-child{border-bottom:0}
 .app .bkw .agh.bk-ag{cursor:pointer}
-.app .bkw .slots{padding-left:0;padding-right:0}
-.app .bkw .kv-bands > .kv{padding-left:0;padding-right:0}
 .app .bkw .agid-bio{margin:0}
 .app .bkw .tile{margin:0}
 .app .ask-thread .tal-msg > .bb:has(.bkw),
@@ -6861,26 +6870,116 @@ button.btn-p:active,
   width:18px;height:18px;flex:none;fill:var(--support-success-ink);display:block}
 .app .bkw .bk-note{
   margin:0;font-size:11.5px;line-height:16px;color:var(--text-helper)}
-.app .bkw .bk-cards{display:flex;flex-direction:column;gap:1px}
-.app .bkw .cardrow.bk-pick{
-  width:100%;text-align:left;cursor:pointer;
-  border:1px solid var(--rule);background:var(--layer-01)}
-.app .bkw .cardrow.bk-pick:hover:where(.__nh){background:var(--overlay-hover)}
-.app .bkw .cardrow.bk-pick.on{border-color:var(--text-primary)}
-.app .bkw .cardrow.bk-pick .bk-tick{
-  margin-left:auto;flex:none;display:grid;place-items:center;
-  width:20px;height:20px;opacity:0}
-.app .bkw .cardrow.bk-pick.on .bk-tick{opacity:1}
-.app .bkw .cardrow.bk-pick .bk-tick svg{
-  width:20px;height:20px;display:block;fill:var(--text-primary)}
-.app .bkw .cardrow.bk-pick[disabled]{cursor:default;opacity:.75}
-.app .bkw .bk-form{display:flex;flex-direction:column;gap:var(--s04)}
-.app .bkw .bk-form .f{margin:0}
-.app .bkw .bk-2up{display:flex;gap:var(--s04)}
-.app .bkw .bk-2up > .f{flex:1 1 0;min-width:0}
 @container app (min-width:900px){
   .app .ask-thread .tal-msg > .bb:has(.bkw){max-width:min(100%, 560px)}
+  .app .ask-thread .tal-msg > .bb:has(.bk-list){max-width:100%}
+  .app .bkw .rail-wrap{padding-left:0;padding-right:0}
+  
+  .app .bkw .rail .agh{padding:var(--s06)}
+  .app .bkw .rail .agh:first-child{padding-left:var(--s06)}
+  .app .bkw .rail .agh:last-child{padding-right:var(--s06)}
 }
+.app .ldr-sheets{display:contents}
+.app .ldr-sh{
+  margin:var(--s06) 0 var(--s04);
+  font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px;
+  color:var(--text-primary)}
+.app .ldr-tr{cursor:pointer}
+.app .ldr-tr .ldr-go{width:24px;vertical-align:middle}
+.app .ldr-tr .ldr-go svg{
+  width:18px;height:18px;display:inline-block;fill:var(--icon-secondary)}
+.app .ldr-tr:focus-visible{
+  outline:2px solid var(--accent);outline-offset:-2px}
+.app[data-portal="leader"] .ldr-tbl .flag-t{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  font-weight:600;letter-spacing:.1px;white-space:nowrap}
+.app[data-portal="leader"] .ldr-tbl .flag-t svg{
+  width:16px;height:16px;flex:none;fill:currentColor}
+.app[data-portal="leader"] .ldr-tbl tr.sev .flag-t{color:var(--danger-ink)}
+.app[data-portal="leader"] .ldr-tbl tr.mod .flag-t{color:var(--support-attention)}
+.app[data-portal="leader"] .ldr-tbl td.num .t-helper-01{white-space:nowrap}
+.app .ldr-pos,.app .ldr-neg{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  letter-spacing:.6px}
+.app .ldr-pos svg,.app .ldr-neg svg{
+  width:13px;height:13px;display:block;fill:currentColor}
+.app .ldr-pos{color:var(--support-success)}
+.app .ldr-neg{color:var(--support-attention)}
+.app .tq-x + .tq-x{margin-top:var(--s03)}
+.app .ldr-rungs,.app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
+.app .ldr-rungs .btn{min-width:64px;justify-content:center}
+.app .ldr-n{
+  margin-left:var(--s03);
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}
+.app .btn-p .ldr-n{color:inherit;opacity:.75}
+.app .ldr-on{
+  background-color:color-mix(in srgb, var(--accent) 8%, transparent)}
+.app .ldr-on .tile-arrow{fill:var(--accent)}
+.app .ldr-note .cardrow-t{
+  font-size:13.5px;line-height:20px;font-weight:400;letter-spacing:.1px;
+  white-space:normal}
+.app .ldr-note .cardrow-d{margin-top:var(--s03)}
+.app .ldr-note-x{
+  width:36px;height:36px;display:grid;place-items:center;flex:none;
+  border-radius:var(--radius-sm)}
+.app .ldr-note-x svg{width:18px;height:18px;fill:var(--icon-secondary)}
+.app .ldr-note-x:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.app .ldr-note-x:focus-visible svg{fill:var(--danger-ink)}
+.app .steps .s-n svg{
+  width:18px;height:18px;display:block;fill:var(--support-success)}
+@container app (min-width:900px){
+  .app .sec:has(> .msgs),.app .sec:has(> .ivt-lines){display:block}
+  .app .sec:has(> .msgs) > .sec-h,
+  .app .sec:has(> .ivt-lines) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}
+.app .cs button > .lf-n{
+  margin-left:var(--s03);
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}
+.app .cs button.on > .lf-n{color:inherit;opacity:.7}
+.app .tbl td.ldr-prose{text-align:left}
+.app .page > .rail-wrap:has(+ .sec){position:relative}
+.app .page > .rail-wrap:has(+ .sec)::after{
+  content:'';position:absolute;bottom:0;
+  left:var(--pad-x);right:var(--pad-x);
+  height:1px;background:var(--rule);pointer-events:none}
+.app .ai-label.bare{
+  height:auto;min-height:0;padding:0;border:0;gap:var(--s03);
+  background:none;background-color:transparent;background-image:none;
+  animation:none;
+  color:var(--accent-text)}
+.app .ai-label.bare::before{
+  width:16px;height:16px;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none}
+.app .wkc-go{margin-top:var(--s05)}
+.app .wkc-go > .btn{max-width:100%}
+.app .stickybar{
+  width:calc(100% - 2 * var(--main-pad));
+  max-width:var(--content-max);
+  margin-left:auto;margin-right:auto;
+  padding-left:var(--pad-x);padding-right:var(--pad-x)}
+@container app (min-width:760px){
+  .app .stickybar{
+    border-left:var(--rail-w) solid var(--rule);
+    border-right:var(--rail-w) solid var(--rule)}
+}
+.app .foot-row.foot-stack{
+  flex-direction:column;align-items:stretch;justify-content:flex-start}
+.app .foot-row.foot-stack > p{text-align:left}
+.app[data-portal="leader"] .lead-bar{
+  height:0;min-height:0;padding-top:0;padding-bottom:0;overflow:visible}
+.app[data-portal="leader"] .lead-bar::after{display:none}
+.app[data-portal="leader"] .lead-bar > .lead-tabs{
+  visibility:hidden;background-color:var(--background)}
+.app[data-portal="leader"] .lead-bar.is-stuck > .lead-tabs{visibility:visible}
+.app[data-portal="leader"] .lead-bar.is-gone > .lead-tabs{visibility:hidden}
+.app[data-portal="leader"] .page > .sec:has(> .stats-lead)::after{display:none}
 
 </style>
 </head>
@@ -7731,6 +7830,15 @@ function weekCard(f){
         <div class="wkc-eb t-label-01">Chapter ${i + 1} &middot; ${S.stage === 'week1' ? 'unlocked today' : 'in progress'}</div>
         <h3 class="u-h3">${CH[i][0]}</h3>
         <div class="wkc-min sub">${did} of ${mins} minutes</div>
+        <!-- THE WAY IN, AT THE TOP AND IN THE PRIMARY WEIGHT. It was a grey
+             secondary button on the last row of the card, below two blocks
+             of reading — so the one thing this section exists to make happen
+             was the last thing offered and the quietest. It belongs to the
+             chapter named directly above it, and a person who already knows
+             what they are opening should not have to read the week's report
+             to reach it. The reading below is now what you do INSTEAD of
+             opening it, which is the honest order. -->
+        <div class="wkc-go"><button class="btn btn-p btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button></div>
       </div>
       ${ring(pct, `${pct}% of chapter ${i + 1} done`)}
     </div>
@@ -7745,12 +7853,21 @@ function weekCard(f){
     <div class="wkc-blk">
       <!-- THE ROLE CLASS GOES ON THE SPAN, NOT THE ROW. u-overline is
            uppercase and text-transform inherits, so on the wrapper it
-           renders Tal's chip as "TAL". The chip is a name. -->
-      <div class="wkc-h">${talLabel()}<span class="u-overline">What is expected of me this week</span></div>
+           renders Tal's chip as "TAL". The chip is a name.
+
+           AND THE CHIP IS THE BARE MARK HERE — the "bare" variant, styled
+           in §37 the way the page-summary band styles its own. §33 is where
+           the argument is: at the head of a page the mark and the name in
+           accent ink are enough. A solid orange chip with a
+           sheen running through it is the loudest object in a card whose
+           actual point is the black button at the top of it, and it was
+           announcing a one-line attribution. Same name, same mark, no
+           fill: it says who wrote the sentence without competing with the
+           thing the sentence is asking you to do. -->
+      <div class="wkc-h">${talLabel('bare')}<span class="u-overline">What is expected of me this week</span></div>
       <p class="wkc-p u-body">${w.tal}</p>
       <div class="wkc-a">
         ${askChip(w.ask[0], w.ask[1])}
-        <button class="btn btn-g btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -7950,11 +8067,12 @@ const railRoots = () => {
   const set = NAVSETS[isLead() ? 'leader' : cfg(S.stage).nav] || [];
   return set.map(([k]) => k).concat(isLead() ? ['leadProfile'] : ['account']);
 };
-const bk = () => (S.hist.length && !railRoots().includes(S.view))
-  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>` : '';
-function ph(title,sub,act){
+const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
+  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>`
+  : to ? `<button class="ph-back" data-go="${to}" aria-label="Back">${I.arrowLeft}</button>` : '';
+function ph(title,sub,act,backTo){
   return `<div class="ph${act?' ph-has-act':''}">
-    <div class="ph-main"><div class="ph-top">${bk()}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
+    <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
     ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
 }
 function trackBand(track){
@@ -8026,7 +8144,7 @@ login: () => `${authShell()}
     <p class="t-body-02 aux"><a data-go="forgot">Forgotten your password?</a></p>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
   </div>
 </div></main>`,
 
@@ -8083,10 +8201,9 @@ create: () => `${authShell()}
   ${ph('Create your account','You&rsquo;re one step away. Create your password to continue.')}
   <div class="sec sec-id">
     <div class="f last"><label for="em">Your Email Address</label>
-      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div><div class="help">From your NIL profile. <a data-go="terms">Not you?</a></div></div></div>
+      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div></div></div>
   </div>
   <div class="sec sec-rule">
-    <div class="sec-h"><h2 class="u-h2">Set a Password</h2></div>
     <div class="f-row"><div class="f"><label for="pw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="pw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
         <button class="pw-eye" data-eye="pw" aria-label="Show password">${I.view}</button></div>
@@ -8109,7 +8226,7 @@ create: () => `${authShell()}
         <span class="txt">Send me occasional product and course emails.</span></label>
     </div>
     </div>
-  <div class="sec sec-act"><div class="foot-row"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
+  <div class="sec sec-act"><div class="foot-row foot-stack"><div class="mt6"><button class="btn btn-p btn-full" data-go="verify">Create Account ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Already have an account? <a data-go="login">Log in</a></p></div>
   </div>
 </div></main>`,
 
@@ -8242,16 +8359,12 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
-      <div class="stats">
-        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
-        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
-        ${statCell(I.calendar, `Taken`, `3 Aug`, `2026 &middot; one attempt`)}
-        ${statCell(I.growth, `Level`, `Not set`, `the interview decides it`)}
-      </div>
-    </div>
-    <div class="sec tint sec-stp">
+    ${''/* AND THE SAME ORDER ON THIS STAGE — see the note on `new`.
+          Where you are, then what the quiz decided. The stepper is white for
+          the reason it is white there, and losing the tint is also what puts
+          its closing rule back inside the page gutter (§18 gives a FILLED
+          block a wall-to-wall edge). One change, both effects. */}
+    <div class="sec sec-stp">
       ${stepper('whereConsult',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 3'},
         {st:'done',lab:'Account created',sec:'Aug 12'},
@@ -8261,6 +8374,7 @@ V.dashboard = (f) => {
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
     </div>
+    ${quizResults('3 Aug', 'the interview decides it')}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -8284,14 +8398,21 @@ V.dashboard = (f) => {
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
-      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
-    </div>
-    <div class="rail-wrap">
-      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
-    </div>
-    <div class="sec tint sec-stp">
+    ${''/* WHERE YOU ARE COMES BEFORE THE AGENTS ON THIS STAGE.
+          Everywhere else the stepper is a footnote under the thing you were
+          asked to do, so it sits last and takes the tint that marks supporting
+          material. Here it is doing the opposite job: nothing is booked yet, so
+          the reader's first question is where they are in the journey, and the
+          three agent cards are the answer to the second. Orientation first,
+          then the choice.
+
+          It carries no `tint` for the same reason. Filled, it read as an aside
+          to the block above it — and there is no block above it now but the
+          page head, which is not a thing this annotates. On the base ground it
+          reads as the page's own first statement, which is what it now is.
+          The other dashboard stages keep the tint: there the stepper still
+          follows a plate or a card and is still a footnote to it. */}
+    <div class="sec sec-stp">
       ${stepper('whereNew',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 12'},
         {st:'on',  lab:'Interview with an agent',sec:'Not booked yet · 45 minutes'},
@@ -8299,6 +8420,15 @@ V.dashboard = (f) => {
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
     </div>
+    <div class="sec">
+      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
+      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
+    </div>
+    <div class="rail-wrap">
+      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
+    </div>
+    ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
+    ${quizResults('12 Aug', 'the interview decides it')}
     <div class="sec">
       <div class="sec-h"><h2>Decided so far</h2><button class="btn btn-g btn-sm noic" data-go="level">View My Level</button></div>
       <div class="tile-stack spaced">
@@ -8314,7 +8444,11 @@ V.dashboard = (f) => {
         <div class="plate-who">${avatar(AGENTS.priya,56)}
           <span class="plate-wb"><b>Priya Nair</b><span>Talent agent &middot; assesses Explorer</span></span>
         </div>
-        <div class="plate-eb">Next up</div>
+        ${''/* NO "NEXT UP" EYEBROW — the same argument the weekly-call plate
+              already carries a few lines up. This is the only appointment on
+              the page, and the card names it on the very next line; a label
+              saying it is the next one is a category over a set of one. The
+              time it used to be paired with is in the card's own body. */}
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
         <div class="plate-a">
@@ -8331,14 +8465,23 @@ V.dashboard = (f) => {
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    <div class="sec tint sec-stp">
+    ${''/* WHITE HERE TOO, FOR THE REASON THE `new` STEPPER IS WHITE — and
+          taking the tint off is also what fixes the rule under it. §18 gives
+          a FILLED block a wall-to-wall bottom edge, on the argument that a
+          block with its own ground owns its own boundary; unfilled, the same
+          section falls back to §18's inset rule, which pays the page gutter
+          like every other divider on the page. So the two asks here are one
+          change: the tone was what was making the line run edge to edge. */}
+    <div class="sec sec-stp">
       ${stepper('whereBooked',[
         {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
         {st:'done',lab:'Interview booked',sec:'Priya Nair · Thu, Aug 20'},
         {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
         {st:'',    lab:'Enroll and start your 90 days'}
       ],1,'Where you are')}
-    </div>`;
+    </div>
+    ${''/* on this stage the "what sets it" answer has a name and a date on it */}
+    ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
     ${ph('Welcome Back, Maryam!','Your level is confirmed. One step left before the 90 days start.')}
@@ -8371,6 +8514,21 @@ V.dashboard = (f) => {
           <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
           <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
         </div>`).join('')}</div>
+    </div>
+    ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
+          The interview is the only thing that has happened to this candidate,
+          and the page was showing its RESULT — a rung, a black hero, a course
+          — without a word of what was actually said in it. The digest goes
+          here rather than higher up because its growth-areas line ends on
+          "chapters 4 and 12", and the thirteen chapters are the block directly
+          above: read in this order the course stops being a catalogue and
+          becomes the answer to what Priya wrote down. Higher up, between the
+          hero and the course, it would have been a third block about the
+          level before the reader had been told what the level buys. */}
+    <div class="sec">
+      <div class="sec-h"><h2>What the interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. The 45-minute recording, the transcript and six marked scenes sit behind it.</p>
+      ${signedSummary(true)}
     </div>`;
 
   else if(f.complete) body = `
@@ -8394,15 +8552,45 @@ V.dashboard = (f) => {
       <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E4 ${I.arrowRight}</button>
       <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
     </div></div>
-    <div class="sec tint">
-      <div class="sec-h"><h2>Cohort 41, in the end</h2><a data-go="transcript">Course Progress</a></div>
-      <button class="score-link" data-go="rewards">${scoreCard(GAME.promoted)}</button>
+    ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE RUNG UP.
+          Both stages are the same moment — a level has just been confirmed
+          and a course has not been started — so they were answering the same
+          two questions, and only one of them was answering them. `assessed`
+          says what the ninety days hold and what the agent actually wrote;
+          `promoted` said neither, and went straight from the rung to a
+          points card. The two blocks below are that page's, with the
+          re-interview's report rather than the first one's. */}
+    <div class="sec">
+      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
+      <p class="all-desc">Thirteen chapters at E4, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
+      <div class="ch-two">${CH.map((c,i)=>`
+        <div class="ch ch-flat">
+          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
+          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
+        </div>`).join('')}</div>
     </div>
     <div class="sec">
-      <div class="tile" style="padding-top:var(--s04)">
-        ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:GAME.promoted.weeks,
-          target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
+      <div class="sec-h"><h2>What the re-interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the ninety days you had just finished.</p>
+      ${signedSummary(true, true)}
+    </div>
+    ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
+          The weekly-minutes chart lived here — thirteen stacked bars of how
+          long you spent, week by week, on a course that is over. That is a
+          chart you read WHILE you are behind on it; once the ninety days are
+          closed the only questions left are what you finished, how well, and
+          what it earned, and all four of those are one number each. The
+          chart is still on Course Progress, which is where the week-by-week
+          record belongs and which the heading links to. */}
+    <div class="sec tint">
+      <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
+      <div class="stats">
+        ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
+        ${statCell(I.chart, `Assessment average`, `${f.avg}<small>%</small>`, `across the thirteen`)}
+        ${statCell(I.trophy, `Points`, GAME.promoted.pts.toLocaleString(), `${GAME.promoted.badges} of 4 badges`)}
+        ${statCell(I.growth, `Rung`, `E3 &rarr; E4`, `up one, on 21 November`)}
       </div>
+      <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
     </div>
     <div class="sec tint">
       <div class="sec-h"><h2>What changes at E4</h2></div>
@@ -8471,12 +8659,22 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>`}
-  ${g?`<div class="sec">
-    <div class="sec-h"><h2>Where you stand</h2><a data-go="rewards">View more</a></div>
-    ${standRow(g)}
-  </div>`:''}
-    ${f.finished?'':`<div class="sec tint">
-      <div class="sec-h"><h2>This week</h2><a data-go="coursework">Coursework</a></div>
+    ${''/* THIS WEEK IS WHITE NOW, AND IT IS THE FIRST BLOCK UNDER THE CALL.
+          `tint` is §12's mark for supporting material — the tone says "this
+          is a note about the page, not the page". That was the wrong claim
+          for the one block on this dashboard that holds the week's actual
+          work and the way into the chapter, and it was reading as one:
+          filled, it sat back while the points row above it sat forward.
+          The hairlines either side already separate it, so nothing is lost
+          by taking the ground away.
+
+          Two rules in §32 are keyed on `.sec.tint` for this card — the block
+          dividers and the ring track. They are left in place rather than
+          deleted: they are the correct values IF this card is ever put back
+          on a panel, and on white the base values they were stepping down
+          from are what applies. */}
+    ${f.finished?'':`<div class="sec">
+      <div class="sec-h"><h2>This week</h2><button class="btn btn-g btn-sm noic" data-go="coursework">Coursework</button></div>
       ${weekCard(f)}
     </div>`}
     <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
@@ -8486,6 +8684,18 @@ V.dashboard = (f) => {
           target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
       </div>
     </div>
+    ${''/* POINTS, BADGES AND RANK GO LAST.
+          This row sat third on the page, directly under the cohort call —
+          which put the standing before the work, and pushed the week's own
+          chapter below it. None of it is due, none of it moves your level
+          (§ai6's rewards summary says so in as many words), and it is the
+          one block here a person reads out of interest rather than need. So
+          it closes the page instead of interrupting it, under the record of
+          the ninety days that earned the number. */}
+  ${g?`<div class="sec">
+    <div class="sec-h"><h2>Where you stand</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View more</button></div>
+    ${standRow(g)}
+  </div>`:''}
 `;
   }
   return `<main class="main"><div class="page">${body}</div></main>`;
@@ -8518,21 +8728,13 @@ V.level = (f) => {
          click target inside a click target, and the arrow was the only thing
          announcing the outer one. The button says it better, and says it
          where the reading ends. -->
-    <div class="${confirmed?'signed':'tile bordered'}">
-      ${confirmed?`<div class="signed-h">
-        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
-        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>Level interview · 20 August 2026</span></span>
-      </div>`:'<div class="ai-head"><h3>What the Explorer track means</h3></div>'}
+    ${confirmed?signedSummary(false):`<div class="tile bordered">
+      <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
-        ${confirmed?`<p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
-        <p>You reason from consequence to people, not policy. Three examples, each with a date and a name attached.</p>
-        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
-        <p>Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.</p>`
-        :`<p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
-        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>`}
+        <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
+        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>
       </div>
-      ${confirmed?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
-    </div>
+    </div>`}
   </div>
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
@@ -8726,6 +8928,24 @@ V.agent = (f) => {
   const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
+  ${''/* THIS PAGE HAD NO HEADER AND THEREFORE NO WAY BACK.
+        It opened straight onto the agent's face, with a breadcrumb above it
+        as the only route out — and a crumb is a location, not a control you
+        reach for. Every other page under a module carries `ph`, and `ph`
+        draws the back arrow itself (`bk`, above: history exists and this is
+        not a rail root, so the arrow is drawn). Adding the header is what
+        adds the way back; it is not a second thing.
+
+        "Book <name>", not the name alone, because the crumb directly above
+        already says the name and the page is not a profile — you arrive on
+        it having chosen, and everything on it is in service of picking a
+        time. The heading is the verb the page is for.
+
+        It also gives the page a module head: `placeBand` in ai5 keys on the
+        presence of a `.ph`, so with one here Tal's summary lands in the band
+        against the title, the way it does on every other page, instead of
+        being built as a loose card in the body. */}
+  ${ph('Book ' + a.n, 'Everything about this agent, and the times they have open.', null, 'agents')}
   <div class="sec" style="padding-top:var(--s05)">
     <div class="agid">
       ${avatar(a,96)}
@@ -8742,13 +8962,20 @@ V.agent = (f) => {
       <div class="kv"><span class="k">Report turnaround</span><span class="v n">Within 24 hours</span></div>
     </div>
   </div>
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>What to expect with ${a.n.split(' ')[0]}</h3></div>
-      <div class="ai-body"><p>She opens with a situation from your own answers, then asks what you decided. Have a delegation example ready.</p></div>
-      <div class="ai-foot">${askChip('Run a practice interview with me for '+a.n.split(' ')[0],'Practice with Tal')}</div>
-    </div>
-  </div>
+  ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
+        This page carried a hand-written "What to expect with <name>" card
+        from before ai6 existed. ai6 then gave the page a summary of its own
+        — and that summary already opens with what this agent is like to be
+        interviewed by, in the agent's own words, because §ai6's `agent`
+        entry quotes the bio. So the page said "Tal" twice above the fold,
+        in two different chip styles, before it had said the agent's name
+        once. The summary is the one that stays: it is the treatment every
+        other page uses and it sits in the header rather than in the body.
+
+        The practice-interview chip went with the card. It is not lost — the
+        composer at the foot of the page carries this page's suggestions
+        (§ai4 keys them off the view), and "Run a mock interview with me" is
+        one of them. */}
   <div class="sec">
     <div class="sec-h"><h2>Pick a slot</h2><span class="t-helper-01">Times in ET</span></div>
     <div class="daystrip">
@@ -8769,35 +8996,30 @@ V.agent = (f) => {
 </div>`;
 };
 
-V.booking = (f) => `<main class="main"><div class="page">
+V.booking = (f) => {
+  const a = AGENTS[S.agent||'priya'];
+  return `<main class="main"><div class="page">
+  ${ph('Booking Details','Your interview is confirmed. Everything about it is on this page.', null, 'interviews')}
   <div class="sec" style="padding-top:var(--s06)">
-    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${(AGENTS[S.agent||'priya']).n}. A calendar invite and joining link are in your email.</div></div>
+    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${a.n}. A calendar invite and joining link are in your email.</div></div>
   </div>
   <div class="sec">
     <div class="tile">
-      <div class="kv"><span class="k">Agent</span><span class="v">${(AGENTS[S.agent||'priya']).n}</span></div>
-      <div class="kv"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
-      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
-      <div class="kv"><span class="k">Paid</span><span class="v n">${(AGENTS[S.agent||'priya']).price} · Visa ending 4242</span></div>
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-t">Add to calendar ${I.calendar}</button>
-      <button class="btn btn-t" data-go="interviews">Reschedule or cancel ${I.time}</button>
-    </div>
-  </div>
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>Time to prepare</h3></div>
-      <div class="ai-body"><p>Your quiz flagged delegation and hard conversations. Ten minutes of practice on either, with feedback.</p></div>
-      <div class="mt5" style="display:flex;flex-direction:column;gap:1px">
-        <button class="tile clk band" data-tal-ask="Run a mock interview on delegation"><span class="t-body-compact-01">Run a mock on delegation</span></button>
-        <button class="tile clk band" data-tal-ask="Help me find a real delegation example from my own work"><span class="t-body-compact-01">Help me find a real example</span></button>
+      <div class="row-lead">
+        ${avatar(a,40)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">${a.n}</div>
+          <div class="t-helper-01 mt3">Talent agent &middot; assesses ${a.range}</div>
+        </div>
       </div>
-      
+      <div class="kv mt5"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
+      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
+      <div class="kv"><span class="k">Paid</span><span class="v n">${a.price} · Visa ending 4242</span></div>
     </div>
   </div>
   <div class="sec"><button class="btn btn-p" data-go="stage:booked">Back to my dashboard ${I.arrowRight}</button></div>
 </div></main>`;
+};
 
 V.enrol = (f) => {
   const next = f.complete;
@@ -8839,7 +9061,7 @@ V.enrol = (f) => {
     </div>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>What the 90 days cover</h2><a data-go="coursework">All 13</a></div>
+    <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="coursework">All 13</button></div>
     <div class="tile-stack">${[0,1,2,3].map(i=>chRow(i,{done:0,open:-1,week:99,enrolled:false})).join('')}</div>
   </div>
 </div></main>`;
@@ -9297,6 +9519,14 @@ function cardSheet(){
   </div>`;
 }
 
+function standSec(){
+  const g = GAME[S.stage];
+  if(!g || !g.pts) return '';
+  return `<div class="sec">
+    <div class="sec-h"><h2>What you have earned</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View Points</button></div>
+    ${standRow(g)}
+  </div>`;
+}
 V.account = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Profile')}
   ${ph('Profile','Your details, your preferences, and what Tal is allowed to do.')}
@@ -9325,6 +9555,7 @@ V.account = (f) => `<main class="main"><div class="page">
       <div class="kv"><span class="k">Level</span><span class="v n">${f.pred?f.track+' track · set at the interview':lvlName(f.level)+' · confirmed'}</span></div>
     </div>
   </div>
+  ${standSec()}
 
   <div class="sec tint">
     <div class="sec-h"><h2>Notifications</h2></div>
@@ -9431,6 +9662,7 @@ function go(target, fresh){
   render();
 }
 
+const TAL_BEAT = 1400;
 let talTimer = null;
 let talQueue = [];
 function ask(q){
@@ -9454,7 +9686,7 @@ function talPump(){
     S.typing = talQueue.length > 0;
     render();
     talPump();
-  }, 650);
+  }, TAL_BEAT);
 }
 function talReset(){ talQueue = []; clearTimeout(talTimer); talTimer = null; S.thread = []; S.typing = false; }
 function back(){
@@ -9868,6 +10100,43 @@ function boardList(){
   </div>`;
 }
 
+function signedSummary(withNote, re){
+  return `<div class="signed">
+      <div class="signed-h">
+        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
+        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>${re?'Re-interview &middot; 21 November 2026':'Level interview &middot; 20 August 2026'}</span></span>
+      </div>
+      <div class="ai-body">
+        <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p>${re
+          ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the ninety days, each with a name and a date on it.'
+          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
+        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p>${re
+          ?'Delegation still, and coaching rather than fixing. Chapters 3 and 9 on the E4 course are built on exactly this.'
+          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.'}</p>
+      </div>
+      ${withNote?`<div class="note band">
+        <span style="fill:var(--icon-secondary)">${I.user}</span>
+        <div class="nb"><b>Priya&rsquo;s note</b>${re
+          ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
+          :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;'}</div>
+      </div>`:''}
+      <div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>
+    </div>`;
+}
+
+function quizResults(taken, levelNote){
+  return `<div class="sec">
+      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
+      <div class="stats">
+        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
+        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
+        ${statCell(I.calendar, `Taken`, taken, `2026 &middot; one attempt`)}
+        ${statCell(I.growth, `Level`, `Not set`, levelNote)}
+      </div>
+    </div>`;
+}
 function statCell(ic, label, value, note, jump){
   const body = `<span class="stat-ic">${ic}</span>
       <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
@@ -11768,12 +12037,12 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
     d:s.mins + ' minutes, recorded &middot; ' + (s.re
         ? 'they have ninety days behind them, so you read the summary first'
         : 'you sign the rung afterwards'),
-    cta:'Join', go:'leadSessions'
+    go:'leadSessions'
   })).concat(LEAD_COHORTS.map(c => ({
     kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
     t:'Cohort call &middot; ' + lname(c),
     d:'60 minutes &middot; week ' + c.week + ' of 13 &middot; ' + c.members.length + ' candidates at ' + llevel(c),
-    cta:'Brief', go:'leadCohorts'
+    go:'leadCohorts'
   }))).sort((a,b) => a.ord - b.ord);
 
 const LEAD_JUMPS = [
@@ -11813,17 +12082,15 @@ function bookedRow(b){
   const mark = b.kind === 'iv'
     ? `<span class="mem-av mem-ph">${avatar({i:b.i, img:AV[b.img]}, 36)}</span>`
     : `<span class="cardrow-ic">${I.group}</span>`;
-  return `<div class="cardrow bk-row">
+  return `<button class="cardrow bk-row" data-go="${b.go}">
     <span class="day bk-day"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
     ${mark}
     <span class="cardrow-b">
       <span class="cardrow-t">${b.t}</span>
       <span class="cardrow-d">${b.d}</span>
     </span>
-    <span class="cardrow-a">
-      <button class="btn btn-sm noic" data-go="${b.go}">${b.cta}</button>
-    </span>
-  </div>`;
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
 }
 
 function faceRow(p, detail, go){
@@ -11984,31 +12251,6 @@ V.leadDash = () => {
 </div></main>`;
 };
 
-const LEAD_SOON = {
-  leadSessions: ['Sessions','Every interview you have run and every one booked, and the run-a-session flow: join, end, write the evaluation, pick the rung, publish the summary.'],
-  leadEvals:    ['Evaluations','The level decisions waiting on your signature, each with the transcript reading, the competency breakdown and the evidence behind the proposed rung.'],
-  leadCohorts:  ['Cohorts','All three cohorts, their rosters, the weekly call brief, and one page per candidate with their progress and your notes.'],
-  leadReports:  ['Course Reports','What the course platform sends back: chapter progress, assessment scores and attendance, per candidate and per cohort.'],
-  leadMessages: ['Messages','The cohort discussion boards — shared with the candidate side, so a post here shows up there — and your one-to-one threads.'],
-  leadCerts:    ['Certifications','What leading earns you. Cohorts closed, candidates promoted, and the certification each one counts towards.'],
-  leadProfile:  ['Your profile','The public profile candidates read when they choose an agent, your assessing range, and your availability calendar.']
-};
-Object.keys(LEAD_SOON).forEach(k => {
-  const [title, what] = LEAD_SOON[k];
-  V[k] = () => `<main class="main"><div class="page">
-  ${crumb(['Dashboard','leadDash'], title)}
-  ${ph(title,'Not built yet in the high-fidelity portal.')}
-  <div class="sec">
-    <div class="empty" style="border:0">${I.time}
-      <h3>Coming in the next pass</h3>
-      <p>${what}</p>
-    </div>
-    <div class="btn-set mt5" style="justify-content:center">
-      <button class="btn btn-p" data-go="leadDash">Back to the dashboard ${I.arrowLeft}</button>
-    </div>
-  </div>
-</div></main>`;
-});
 
 function leadStick(){
   const app = device.querySelector('.app');
@@ -12108,6 +12350,1428 @@ render();
 
 
 
+S.ldrCo = LEAD_COHORTS[0].id;
+S.ldrMem = null;
+S.ldrRep = 'all';
+S.ldrBrief = null;
+S.ldrNote = null;
+
+S.ldrNotes = {
+  'Yuki Tanaka':[{t:'Twelve days without a sign-in. Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', w:'2 days ago'}],
+  'James Whitby':[{t:'Re-taking assessments three and four rather than moving on. Told him on the call to leave them at 65 and come back after chapter 6 — the material builds, the score does not.', w:'Last week'},
+                  {t:'Asked for the handover framework twice. Sent it. Worth checking he used it.', w:'Earlier'}]
+};
+
+const lcoOf   = id => LEAD_COHORTS.filter(c => c.id === +id)[0] || LEAD_COHORTS[0];
+const lco     = () => lcoOf(S.ldrCo);
+const lmemOf  = (c,name) => (c.members.filter(m => m.name === name)[0] || c.members[0]);
+const lchDone = m => Math.round(m.pc / 100 * 13);
+const lmins   = m => Math.round(CH.slice(0, lchDone(m)).reduce((s,ch) => s + ch[1], 0) * Math.max(1, m.att || 1));
+const lhrs    = n => !n ? '&mdash;' : n < 60 ? n + 'm' : Math.floor(n/60) + 'h ' + (n%60) + 'm';
+const lidle   = m => /(\d+)d ago/.test(m.last) ? +m.last.match(/(\d+)d/)[1] : 0;
+
+const ltask = (m,c) => m.last === 'Never' ? ['none','Not started']
+  : m.pc >= lpace(c) ? ['done','Done']
+  : m.pc >= lpace(c) - 8 ? ['open','In progress'] : ['late','Late'];
+
+const lnotes = name => S.ldrNotes[name] || [];
+
+const lflagTag = f => !f ? '' :
+  `<span class="tag ${f.k === 'bad' ? 'red' : 'org'} sm">${f.t}</span>`;
+
+const ldrMark = (label,size) => `<span class="av-ph" style="width:${size}px;height:${size}px"><i>${label}</i></span>`;
+
+const lassess = c => {
+  const on = c.members.filter(m => m.avg > 0);
+  return on.length ? Math.round(on.reduce((s,m) => s + m.avg, 0) / on.length) : 0;
+};
+
+const lpaceLine = c => `${lavg(c,'pc')}% against ${lpace(c)}% expected`;
+const lpaceGap  = c => lavg(c,'pc') - lpace(c);
+
+V.leadCohorts = () => {
+  const flagged = lmembers().filter(x => x.m.flag);
+  const severe = flagged.filter(x => x.m.flag.k === 'bad');
+  const next = LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd)[0];
+  const worst = LEAD_COHORTS.slice().sort((a,b) => lpaceGap(a) - lpaceGap(b))[0];
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Cohorts')}
+  ${ph('Cohorts','Three cohorts, twenty-eight candidates, and the weekly call for each of them.')}
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.group,  'Cohorts',   LEAD_COHORTS.length, `${lmembers().length} candidates`)}
+      ${statCell(I.growth, 'On pace',   LEAD_COHORTS.filter(c => lpaceGap(c) >= 0).length + ` <small>of ${LEAD_COHORTS.length}</small>`, 'against expected progress')}
+      ${statCell(I.warningAlt, 'Flagged', flagged.length, `${severe.length} severe`)}
+      ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`)}
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of ninety, evenly spread</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl ldr-tbl">
+        <tr><th>Cohort</th><th>Week</th><th class="num">Progress</th><th class="num">Assessment</th>
+            <th class="num">Flagged</th><th>Next call</th><th></th></tr>
+        ${LEAD_COHORTS.map(c => {
+          const bad = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
+          const wa  = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
+          const gap = lpaceGap(c);
+          return `<tr class="ldr-tr" data-ldrco="${c.id}" data-go="leadCohort" tabindex="0" role="button">
+            <td>${lname(c)} <span class="t-helper-01">${llevel(c)}</span></td>
+            <td>${c.week} <span class="t-helper-01">of 13</span></td>
+            <td class="num">${lavg(c,'pc')}% <span class="t-helper-01">of ${lpace(c)}%</span></td>
+            <td class="num">${lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>'}</td>
+            <td class="num">${bad ? `<span class="tag red sm">${bad} at risk</span> ` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
+            <td>${c.callDay} <span class="t-helper-01">${c.callTime.toLowerCase()}</span></td>
+            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+    <p class="t-helper-01 mt4">Progress is the cohort average against where ninety days evenly spread would put them. ${lname(worst)} is ${Math.abs(lpaceGap(worst))} points behind, which is the widest gap of the three.</p>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>This week&rsquo;s calls</h2><span class="t-helper-01">Sixty minutes each</span></div>
+    <div class="tile-stack">
+      ${LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd).map(c => `
+      <div class="cardrow bk-row">
+        <span class="day bk-day"><div class="d">${c.callDay}</div><div class="n">${c.callTime}</div></span>
+        <span class="cardrow-ic">${I.group}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${lname(c)} &middot; week ${c.week} of 13</span>
+          <span class="cardrow-d">${c.members.length} candidates at ${llevel(c)} &middot; ${CH[Math.min(12, c.week - 1)][0]}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic" data-ldrbrief="${c.id}">Brief</button>
+        </span>
+      </div>`).join('')}
+    </div>
+    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
+  </div>
+</div></main>`;
+};
+
+V.leadCohort = () => {
+  const c = lco();
+  const gap = lpaceGap(c);
+  const flagged = c.members.filter(m => m.flag);
+  const severe = flagged.filter(m => m.flag.k === 'bad');
+  const weakest = c.members.filter(m => m.avg > 0).slice().sort((a,b) => a.avg - b.avg)[0];
+  const chapter = CH[Math.min(12, c.week - 1)];
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Cohorts','leadCohorts'], lname(c))}
+  ${ph(lname(c), `${c.members.length} candidates at ${llevel(c)} &middot; week ${c.week} of 13 &middot; day ${c.day} of 90`,
+    `<button class="btn btn-p" data-ldrbrief="${c.id}">Generate the brief ${I.arrowRight}</button>`)}
+  <div class="sec">
+    <div class="plate">
+      <div class="plate-who">${ldrMark(String(c.id), 56)}
+        <span class="plate-wb"><b>${c.members.length} candidates</b><span>${llevel(c)} &middot; led by you</span></span>
+      </div>
+      <div class="plate-eb">Weekly call &middot; ${c.callDay.toLowerCase()}</div>
+      <div class="plate-t">Week ${c.week} &middot; ${chapter[0]}</div>
+      <div class="plate-b">${c.call} &middot; 60 minutes &middot; ${severe.length ? severe.length + ' to raise privately, not in the group' : 'nobody flagged severely this week'}</div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2" data-ldrbrief="${c.id}">Read the brief</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', `${gap >= 0 ? '+' + gap : gap} against pace`)}
+      ${statCell(I.time,   'Expected pace',    lpace(c) + '<small>%</small>', `day ${c.day} of 90`)}
+      ${statCell(I.chart,  'Assessment average', lassess(c) ? lassess(c) + '<small>%</small>' : '<small>Not yet</small>', weakest ? `lowest ${weakest.avg}% &middot; ${c.members.filter(m => m.avg > 0).length} of ${c.members.length} assessed` : 'nothing assessed yet')}
+      ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Roster</h2><span class="t-helper-01">From the course platform &middot; ordered by progress</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl ldr-tbl">
+        <tr><th>Candidate</th><th class="num">Progress</th><th class="num">Assessment</th>
+            <th class="num">Attempts</th><th>Week ${c.week} task</th><th>Last active</th><th>Flag</th><th></th></tr>
+        ${c.members.slice().sort((a,b) => b.pc - a.pc).map(m => {
+          const [tk,tl] = ltask(m,c);
+          const d = m.pc - lpace(c);
+          return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
+            <td>${m.name}</td>
+            <td class="num">${m.pc}% <span class="t-helper-01">${d >= 0 ? '+' + d : d}</span></td>
+            <td class="num">${m.avg ? m.avg + '%' : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td><span class="tag ${tk === 'done' ? 'green' : tk === 'late' ? 'org' : tk === 'none' ? 'red' : ''} sm">${tl}</span></td>
+            <td>${m.last.toLowerCase()}</td>
+            <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Attempts</b>How many times a candidate went back through the same content. Above 2.0 alongside an assessment average under 75% is the clearest struggle signal the course platform can give you &mdash; it says the material is landing badly rather than that the effort is missing.</div></div>
+    <div class="btn-set mt5">
+      <button class="btn btn-g" data-go="leadMessages">Post to the cohort board ${I.chat}</button>
+      <button class="btn btn-t" data-go="leadReports">Course reports ${I.chart}</button>
+    </div>
+  </div>
+</div></main>`;
+};
+
+function ldrRead(m,c){
+  const d = m.pc - lpace(c);
+  const first = m.name.split(' ')[0];
+  const done = lchDone(m);
+  if(m.last === 'Never')
+    return `${first} has never signed in &mdash; no chapter opened, no assessment, no time on the course at all. This is the one to act on before any of the behind-pace names: they are moving slowly, ${first} has not started, and a cohort place is being held open. ${lname(c)} is on day ${c.day} of 90.`;
+  if(lidle(m) >= 7)
+    return `${first} stopped ${lidle(m)} days ago at ${m.pc}% &mdash; ${done} of 13 chapters, then nothing. Someone who stops mid-course rarely restarts without being asked directly, and week ${c.week} is early enough that ${done} chapter${done === 1 ? '' : 's'} is still recoverable. Worth a message rather than a mention on the call.`;
+  if(m.att >= 2.0 && m.avg < 75)
+    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. High effort with a low result means the material is landing badly rather than the effort being missing &mdash; and it is the one pattern that gets worse if you push harder instead of slower.`;
+  if(d <= -15)
+    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments are holding up at ${m.avg}%, so this is time rather than comprehension &mdash; direct outreach before the next call tends to work while the gap is still this size.`;
+  if(d <= -5)
+    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own; watching it rather than intervening keeps the intervention available for when it is needed.`;
+  return `Nothing alarming in ${first}&rsquo;s numbers &mdash; ${m.pc}% against ${lpace(c)}% expected and assessments at ${m.avg}%. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some chapters, which at this score is thoroughness rather than struggle.'} ${done} of 13 chapters done in ${lname(c).toLowerCase()}.`;
+}
+
+const ldrScene = (title,note,stamp,len) => `<div class="clip">
+    <span class="thumb">${I.play}<span class="t">${len}</span></span>
+    <span class="cb"><span class="ct">${title}</span><span class="cq">${note} &middot; from ${stamp}</span></span>
+  </div>`;
+
+const LDR_SCENES = [
+  ['Handing over a project that was going wrong','Delegation','minute 14','1:12'],
+  ['Holding a line under pressure from a peer','Composure','minute 22','0:48'],
+  ['Explaining a decision they later regretted','Decisiveness','minute 31','1:35'],
+  ['Coaching a struggling team member','Coaching','minute 38','1:04'],
+  ['Naming a problem before it became visible','Directness','minute 44','0:52'],
+  ['Re-planning the week after a setback','Composure','minute 51','1:18']
+];
+
+V.leadMember = () => {
+  const c = lco();
+  const m = lmemOf(c, S.ldrMem);
+  const d = m.pc - lpace(c);
+  const done = lchDone(m);
+  const notes = lnotes(m.name);
+  const first = m.name.split(' ')[0];
+  const [tk,tl] = ltask(m,c);
+
+  let seed = 0; for(let i = 0; i < m.name.length; i++) seed += m.name.charCodeAt(i);
+  const pick = [seed % 6, (seed + 2) % 6, (seed + 4) % 6];
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Cohorts','leadCohorts'],[lname(c),'leadCohort'], m.name)}
+  ${ph(m.name, `${lname(c)} &middot; ${llevel(c)} &middot; week ${c.week} &middot; last active ${m.last.toLowerCase()}`,
+    `<button class="btn btn-p" data-ldrnote="${m.name}">Add a note ${I.edit}</button>`)}
+  <div class="sec">
+    <div class="idhead">
+      <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
+      <div class="idhead-b">
+        <span class="idname">${m.name}</span>
+        <span class="idmeta">${llevel(c)} &middot; ${lname(c)}</span>
+        ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
+      </div>
+      <div class="idhead-a"><button class="btn btn-g" data-go="leadMessages">Message ${I.chat}</button></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', `${d >= 0 ? '+' + d : d} against pace`)}
+      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? (m.avg < 75 ? 'below the 75% pass mark' : 'above the pass mark') : 'nothing assessed yet')}
+      ${statCell(I.renew,  'Attempts',   m.att ? m.att.toFixed(1) : '<small>&mdash;</small>', m.att >= 2 ? 'going round twice' : 'first time through')}
+      ${statCell(I.time,   'Time on the course', lhrs(lmins(m)), done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
+    </div>
+  </div>
+  ${done ? `<div class="sec tint">
+    <div class="sec-h"><h2>Chapter record</h2><span class="t-helper-01">From the course platform</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl ldr-tbl">
+        <tr><th>#</th><th>Chapter</th><th>Status</th><th class="num">Score</th><th class="num">Attempts</th></tr>
+        ${CH.slice(0, Math.min(13, done + 1)).map((ch,i) => {
+          const complete = i < done;
+          const sc = (complete && m.avg > 0) ? Math.max(60, Math.min(100, m.avg + ((i % 3) - 1) * 7)) : null;
+          const at = complete ? (m.att >= 2 ? (i % 2 ? 3 : 2) : 1) : 1;
+          return `<tr>
+            <td class="num">${i+1}</td>
+            <td><b>${ch[0]}</b></td>
+            <td><span class="tag ${complete ? 'green' : ''} sm">${complete ? 'Complete' : 'In progress'}</span></td>
+            <td class="num">${sc ? `<span class="tag ${sc >= 85 ? 'green' : sc >= 75 ? '' : 'org'} sm">${sc}%</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td class="num">${at}</td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+    ${done < 12 ? `<p class="t-helper-01 mt4">Chapters ${done+2}&ndash;13 not reached yet.</p>` : ''}
+  </div>` : `<div class="sec tint">
+    <div class="sec-h"><h2>Chapter record</h2></div>
+    <div class="empty" style="border:0">${I.book}
+      <h3>Nothing on the record</h3>
+      <p>${first} has not opened a chapter, so the course platform has sent nothing back. The record fills in the moment they start.</p>
+    </div>
+  </div>`}
+  <div class="sec">
+    ${/* SHORT HEADINGS IN THIS COLUMN. At desktop §10 gives a section with a
+          `.sec-h` a 184px label column, and "Where the level came from" set
+          three words to a line in it while the helper under it took four more.
+          Two words, and the sentence it needed moves under the tile. */''}
+    <div class="sec-h"><h2>Their level</h2></div>
+    <div class="tile">
+      <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
+      <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
+      <div class="kv"><span class="k">Assigned</span><span class="v">${llevel(c)} <span class="tag org sm">reviewer went lower</span></span></div>
+      <div class="kv"><span class="k">Next rung</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
+    </div>
+    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} a rung below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
+    ${notes.length ? `<div class="tile-stack">
+      ${notes.map((n,i) => `<div class="cardrow ldr-note">
+        <span class="cardrow-ic">${I.edit}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${n.t}</span>
+          <span class="cardrow-d">${n.w}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="ic ldr-note-x" data-ldrnotedel="${m.name}:${i}" aria-label="Delete this note">${I.close}</button>
+        </span>
+      </div>`).join('')}
+    </div>` : `<div class="empty" style="border:0">${I.edit}
+      <h3>No notes yet</h3>
+      <p>What you write here is private to you, and it is what the 90-day summary is drafted from at the end of the ninety days.</p>
+    </div>`}
+    <div class="btn-set mt5">
+      <button class="btn btn-g" data-ldrnote="${m.name}">Add a note ${I.add}</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Attendance and this week</h2></div>
+    <div class="facts">
+      <div><span class="l">Calls attended</span><span class="v">${Math.max(0, c.week - (m.flag && m.flag.k === 'bad' ? 3 : 1))} of ${c.week}</span></div>
+      <div><span class="l">Passed first time</span><span class="v">${Math.max(0, done - (m.att > 1 ? 1 : 0))} of ${done}</span></div>
+      <div><span class="l">Week ${c.week} task</span><span class="v">${tl}</span></div>
+      <div><span class="l">Last active</span><span class="v">${m.last}</span></div>
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Interview scenes</h2><span class="t-helper-01">The three ${first} chose to show</span></div>
+    <div class="tile-stack">
+      ${pick.map(i => ldrScene(...LDR_SCENES[i])).join('')}
+    </div>
+    <p class="t-helper-01 mt4">These are the clips ${first} kept from their interview and published on their profile &mdash; the same three visible in their own portal. The full recording is never shared with you.</p>
+  </div>
+</div></main>`;
+};
+
+V.leadReports = () => {
+  const sel = S.ldrRep;
+  const all = lmembers();
+  const rows = (sel === 'all' ? all : all.filter(x => x.c.id === +sel));
+  const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
+  const weak = rows.filter(x => x.m.avg > 0 && x.m.avg < 75);
+  const never = rows.filter(x => x.m.last === 'Never');
+  const avg = rows.length ? Math.round(rows.reduce((s,x) => s + x.m.pc, 0) / rows.length) : 0;
+  const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Course Reports')}
+  ${ph('Course Reports','What the course platform sends back: chapters, assessment scores, attempts and attendance.')}
+  <div class="sec sec-cs">
+    <div class="cs">
+      <button class="${sel === 'all' ? 'on' : ''}" data-ldrrep="all">All cohorts<span class="lf-n">${all.length}</span></button>
+      ${LEAD_COHORTS.map(c => `<button class="${sel === String(c.id) ? 'on' : ''}" data-ldrrep="${c.id}">${lname(c)}<span class="lf-n">${c.members.length}</span></button>`).join('')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.growth, 'Average progress', avg + '<small>%</small>', sel === 'all' ? 'across all three cohorts' : 'in this cohort')}
+      ${statCell(I.warningAlt, 'Behind pace', behind.length, 'five points or more')}
+      ${statCell(I.chart, 'Below pass mark', weak.length, 'assessments under 75%')}
+      ${statCell(I.misuse, 'Never signed in', never.length, never.length ? 'no activity at all' : 'everyone has started')}
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Course progress</h2><span class="t-helper-01">Ordered by the gap to expected pace</span></div>
+    <div class="tbl-wrap">
+      <table class="tbl ldr-tbl">
+        <tr><th>Candidate</th>${sel === 'all' ? '<th>Cohort</th>' : ''}<th class="num">Chapters</th>
+            <th class="num">Assessment</th><th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th></th></tr>
+        ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
+          const m = x.m, d = m.pc - lpace(x.c);
+          return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${x.c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
+            <td>${m.name}${d <= -5 ? ` <span class="tag org sm">${Math.abs(d)} behind</span>` : ''}</td>
+            ${sel === 'all' ? `<td>${x.c.id} <span class="t-helper-01">${x.c.level}</span></td>` : ''}
+            <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
+            <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
+            <td>${m.last.toLowerCase()}</td>
+            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+          </tr>`;
+        }).join('')}
+      </table>
+    </div>
+    ${worst ? `<p class="t-helper-01 mt4">${worst.m.name} is furthest behind &mdash; ${worst.m.pc}% against ${lpace(worst.c)}% expected in ${lname(worst.c).toLowerCase()}.</p>` : ''}
+  </div>
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>These are activity metrics, not quality</b>Chapters, scores, attempts and timing are everything the course platform can tell you. None of it says how well somebody is actually thinking &mdash; that is in their written answers, and it is what the weekly call is for.</div></div>
+  </div>
+</div></main>`;
+};
+
+function ldrBriefSheet(){
+  const c = S.ldrBrief ? lcoOf(S.ldrBrief) : null;
+  if(!c) return `<div class="modal" data-ldrclose="brief"></div>`;
+  const att = c.members.filter(m => m.flag);
+  const severe = att.filter(m => m.flag.k === 'bad');
+  const weakest = c.members.filter(m => m.avg > 0).slice().sort((a,b) => a.avg - b.avg)[0];
+  const chapter = CH[Math.min(12, c.week - 1)];
+  const behind = c.members.filter(m => m.pc < lpace(c) - 5).length;
+
+  return `<div class="modal on" data-ldrclose="brief">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Week ${c.week} brief</h2>
+        <button class="x" data-ldrclose="brief" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="ai-aura tile mb6">
+          <div class="ai-head">${talLabel()}<h3>Run the call like this</h3></div>
+          <div class="ai-body"><p>${lname(c)} is ${lpaceGap(c) >= 0 ? 'on pace' : Math.abs(lpaceGap(c)) + ' points behind'} at week ${c.week} of 13, and this is drawn from where they actually are rather than from the syllabus.</p></div>
+        </div>
+        <ol class="steps mb6">
+          <li><span class="s-n">1</span><span class="s-b"><b>Open on ${chapter[0]}</b>
+            It is this week's chapter and the one carrying the cohort's lowest scores${weakest ? ` &mdash; ${weakest.name.split(' ')[0]} is at ${weakest.avg}%` : ''}.</span></li>
+          <li><span class="s-n">2</span><span class="s-b"><b>Skip what is already landing</b>
+            Anything with near-universal completion and scores above 85% does not need the hour. ${lavg(c,'avg')}% is the cohort average.</span></li>
+          <li><span class="s-n">3</span><span class="s-b"><b>Ask for a real example, not a hypothetical</b>
+            ${behind} of ${c.members.length} are behind pace, which is usually time rather than comprehension. A concrete example from their own week gets further than more material.</span></li>
+          <li><span class="s-n">4</span><span class="s-b"><b>Raise ${severe.length ? 'the ' + severe.length + ' at risk privately' : 'nothing privately this week'}</b>
+            ${severe.length ? 'Never in the group. ' + severe.slice(0,2).map(m => m.name).join(' and ') + (severe.length > 2 ? ' and others' : '') + '.' : 'Nobody in this cohort is flagged severely.'}</span></li>
+        </ol>
+        ${/* `.kv` ROWS, NOT A `.facts` BAND. `.facts` is an auto-fit grid sized
+              for a page; inside a 520px sheet it fits three across and the
+              fourth cell lands alone on a second row, where §10 stretches it
+              the full width with its own fill. Four rows in a tile are four
+              rows at any width, which is what a sheet needs. */''}
+        <div class="tile mb6">
+          <div class="kv"><span class="k">Average progress</span><span class="v">${lavg(c,'pc')}%</span></div>
+          <div class="kv"><span class="k">Expected by now</span><span class="v n">${lpace(c)}%</span></div>
+          <div class="kv"><span class="k">Assessment average</span><span class="v n">${lassess(c) ? lassess(c) + '%' : 'nothing assessed yet'}</span></div>
+          <div class="kv"><span class="k">Behind pace</span><span class="v n">${behind} of ${c.members.length}</span></div>
+        </div>
+        ${att.length ? `<h3 class="ldr-sh">Bring these ${att.length} up privately</h3>
+        <div class="tile-stack">
+          ${att.slice(0,4).map(m => `<div class="cardrow">
+            <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 36)}</span>
+            <span class="cardrow-b">
+              <span class="cardrow-t">${m.name} ${lflagTag(m.flag)}</span>
+              <span class="cardrow-d">${m.pc}% at day ${c.day} &middot; last active ${m.last.toLowerCase()}</span>
+            </span>
+          </div>`).join('')}
+        </div>` : ''}
+        <p class="t-helper-01 mt5">Everything above is computed from course activity &mdash; progress, scores, attempts and timing. Nothing in it reads their written answers, so it cannot tell you how well they are thinking.</p>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-ldrclose="brief">Close</button>
+        <button class="btn btn-p noic" data-ldrclose="brief">Print for the call</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function ldrNoteSheet(){
+  const name = S.ldrNote;
+  return `<div class="modal ${name ? 'on' : ''}" data-ldrclose="note">
+    <div class="sheet">
+      <div class="sheet-h"><h2>${name ? 'A note on ' + name.split(' ')[0] : 'Add a note'}</h2>
+        <button class="x" data-ldrclose="note" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="f"><label for="ldrNoteT">What you want to remember</label>
+          <textarea class="inp" id="ldrNoteT" rows="4" placeholder="What you saw, what you asked them to try, what to check next."></textarea></div>
+        <p class="t-helper-01">Private to you. ${name ? name.split(' ')[0] : 'The candidate'} never sees it, and it is what the 90-day summary is drafted from at the end of the ninety days.</p>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-ldrclose="note">Cancel</button>
+        <button class="btn btn-p noic" data-ldrnotesave="1">Save the note</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+const LDR_SHEETS = [ldrBriefSheet, ldrNoteSheet];
+
+function placeLdrSheets(){
+  const app = device.querySelector('.app');
+  if(!app) return;
+  let host = app.querySelector(':scope > .ldr-sheets');
+  if(!isLead()){ if(host) host.remove(); return; }
+  if(!host){
+    host = document.createElement('div');
+    host.className = 'ldr-sheets';
+    app.appendChild(host);
+  }
+  host.innerHTML = LDR_SHEETS.map(f => { try { return f(); } catch(e){ return ''; } }).join('');
+}
+
+device.addEventListener('click', e => {
+  const co = e.target.closest('[data-ldrco]');
+  if(co) S.ldrCo = +co.dataset.ldrco;
+  const mem = e.target.closest('[data-ldrmem]');
+  if(mem) S.ldrMem = mem.dataset.ldrmem;
+}, true);
+
+device.addEventListener('keydown', e => {
+  if(e.key !== 'Enter' && e.key !== ' ') return;
+  const row = e.target.closest && e.target.closest('tr.ldr-tr[data-go]');
+  if(!row) return;
+  e.preventDefault();
+  row.click();
+});
+
+device.addEventListener('click', e => {
+  const rep = e.target.closest('[data-ldrrep]');
+  if(rep){ S.ldrRep = rep.dataset.ldrrep; render(); return; }
+
+  const br = e.target.closest('[data-ldrbrief]');
+  if(br){ S.ldrBrief = +br.dataset.ldrbrief; render(); return; }
+
+  const nt = e.target.closest('[data-ldrnote]');
+  if(nt){ S.ldrNote = nt.dataset.ldrnote; render(); return; }
+
+  if(e.target.closest('[data-ldrnotesave]')){
+    const box = device.querySelector('#ldrNoteT');
+    const text = box ? box.value.trim() : '';
+    if(!text){ if(box) box.focus(); return; }
+    const name = S.ldrNote;
+    if(name){
+      S.ldrNotes[name] = S.ldrNotes[name] || [];
+      S.ldrNotes[name].unshift({t:text, w:'Just now'});
+    }
+    S.ldrNote = null;
+    render();
+    return;
+  }
+
+  const del = e.target.closest('[data-ldrnotedel]');
+  if(del){
+    const raw = del.dataset.ldrnotedel;
+    const cut = raw.lastIndexOf(':');
+    const name = raw.slice(0, cut), i = +raw.slice(cut + 1);
+    if(S.ldrNotes[name]) S.ldrNotes[name].splice(i, 1);
+    render();
+    return;
+  }
+
+  const cl = e.target.closest('[data-ldrclose]');
+  if(cl){
+    if(cl.classList.contains('modal') && e.target !== cl) return;
+    if(cl.dataset.ldrclose === 'brief') S.ldrBrief = null;
+    if(cl.dataset.ldrclose === 'note') S.ldrNote = null;
+    render();
+    return;
+  }
+});
+
+const _baseLdr = render;
+render = function(){
+  _baseLdr();
+  try { placeLdrSheets(); } catch(e){ console.warn('ldr sheets', e); }
+};
+
+render();
+
+
+
+const LDR_AN = {
+  e1: {
+    conf:'High',
+    sum:'The quiz and the interview agree on the Explorer band, and the interview places them at the entry rung. Clear intent and sound scoping, but two moments of keeping the work rather than handing it over cap the number at 1.',
+    quiz:'64 out of 100 sits inside the Explorer band. The foundational questions carried the score; the multi-step delegation items are where the points went, which is the same gap the interview surfaced.',
+    comps:[
+      ['Task delegation','E1','Completed the steps personally. Handed work over only when asked to directly.'],
+      ['Handling ambiguity','E2','Asked scoping questions before acting &mdash; a notch above the entry rung.'],
+      ['Quality checking','E1','Accepted the first output without a verification pass on two of three tasks.'],
+      ['Communication','E2','Narrated intent clearly. Left some of the detail unexplained.']
+    ],
+    ev:[
+      ['pos','14:20','Let me confirm the date range before I pull anything.','Scoped the task before acting. A genuine strength and the reason this is not below E1.'],
+      ['neg','31:05','I&rsquo;d rather write that part myself than explain it to someone else.','Handover avoidance, said twice. This is the entry-rung tell.']
+    ],
+    watch:'The two handover moments are what hold this at E1 rather than E2. Worth re-checking delegation at the ninety-day mark.'
+  },
+  e2: {
+    conf:'Medium',
+    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a rung above everything else, and a weak conflict-repair answer is what pulls the blend back to 3.',
+    quiz:'71 out of 100 is the top of the Explorer band. The structural questions drove the score and the interpersonal ones pulled it back, which is exactly what the interview then showed.',
+    comps:[
+      ['Handling ambiguity','E4','Reframed an under-specified brief into three testable options, unprompted.'],
+      ['Stakeholder reading','E4','Named the real decision-makers and the incentives pulling against each other.'],
+      ['Conflict repair','E2','Took the disagreement to escalation rather than working it through.'],
+      ['Delegation','E3','Comfortable splitting work up. Lighter on checking what came back.']
+    ],
+    ev:[
+      ['pos','18:44','There are really three readings of this ask &mdash; here is how I would test which one they mean.','Reframing at the E4 level, and the strongest single moment in the interview.'],
+      ['neg','36:12','If they pushed back I would probably just escalate it to the lead.','Avoids repairing the conflict directly. The E2 signal, and the one thing holding this at 3.']
+    ],
+    watch:'Ambiguity and stakeholder reading sit at E4; conflict repair at E2 is what averages this to E3. Confidence is medium &mdash; one more interpersonal scenario would firm it up.'
+  }
+};
+
+const ldrConf = k => `<span class="tag ${k === 'High' ? 'green' : k === 'Low' ? 'red' : 'org'} sm">${k} confidence</span>`;
+
+const ldrEvOf  = id => LEAD_EVALS.filter(e => e.id === id)[0] || LEAD_EVALS[0];
+const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMARIES[0];
+const ldrEvFor = name => LEAD_EVALS.filter(e => e.name === name)[0];
+
+const LDR_RUNGS = [1,2,3,4,5];
+
+S.ldrEv = null;
+S.ldrSum = null;
+S.ldrPick = null;
+S.ldrRec = null;
+S.ldrErr = false;
+
+V.leadSessions = () => {
+  const up = LEAD_SESSIONS.filter(s => s.state === 'upcoming');
+  const done = LEAD_SESSIONS.filter(s => s.state === 'done');
+  const next = up[0];
+  const waiting = done.filter(s => { const e = ldrEvFor(s.name); return e && e.status === 'pending'; }).length;
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Sessions')}
+  ${ph('Sessions','Every interview you have run and every one booked. Forty-five minutes, recorded, and you sign the rung afterwards.',
+    `<button class="btn btn-g" data-go="leadProfile">Your availability ${I.calendar}</button>`)}
+  ${next ? `
+  <div class="sec">
+    <div class="plate" data-when="${next.when.toLowerCase()}">
+      <div class="plate-who">${avatar({i:next.i, img:AV[next.img]},56)}
+        <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; ${next.re ? 'ninety days behind them' : 'no level yet'}</span></span>
+      </div>
+      ${''/* NO EYEBROW. A card starts at its heading — "Next up" is a
+            category over a set of one, and this is the only appointment on
+            the page. The time it carried moves to `data-when`, which is
+            where the leader dashboard's own copy of this plate already puts
+            it: `placePlates` in ai5 reads the attribute, draws the chip in
+            the opposite corner, and finding no label seats the TITLE in the
+            head row beside it. Same card, one row shorter. */}
+      <div class="plate-t">${next.re ? 'Re-interview' : 'Level interview'}</div>
+      <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the rung afterwards'}</div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic">Join the interview ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2">Reschedule ${I.time}</button>
+      </div>
+    </div>
+  </div>` : ''}
+  <div class="sec">
+    <div class="facts">
+      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
+      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
+      <div><span class="l">Evaluation due</span><span class="v">Within 48 hours</span></div>
+      <div><span class="l">Recording kept</span><span class="v">24 months</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Booked</h2><span class="t-helper-01">${up.length} interview${up.length === 1 ? '' : 's'}</span></div>
+    ${up.length ? `<div class="tile-stack">
+      ${up.map(s => `<div class="cardrow bk-row">
+        <span class="day bk-day"><div class="d">${s.day}</div><div class="n">${s.time}</div></span>
+        <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${s.name}${s.re ? ' <span class="tag sm">Re-interview</span>' : ''}</span>
+          <span class="cardrow-d">${s.mins} minutes &middot; quiz ${s.quiz} of 100, ${s.bucket} band &middot; ${s.re ? 'assessed against their ninety days' : 'no level yet'}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-p btn-sm noic">Join</button>
+        </span>
+      </div>`).join('')}
+    </div>` : `<div class="empty" style="border:0">${I.calendar}
+      <h3>Nothing booked</h3><p>Candidates book you from the times you open on your profile.</p></div>`}
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Finished</h2><span class="t-helper-01">${waiting ? waiting + ' still need an evaluation' : 'all written up'}</span></div>
+    <div class="tile-stack">
+      ${done.map(s => {
+        const e = ldrEvFor(s.name);
+        const pend = e && e.status === 'pending';
+        return `<div class="cardrow">
+          <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+          <span class="cardrow-b">
+            <span class="cardrow-t">${s.name} ${pend ? '<span class="tag org sm">Evaluation due</span>' : e ? `<span class="tag green sm">Signed ${e.assigned ? 'Explorer &ndash; ' + e.assigned : ''}</span>` : '<span class="tag green sm">Written up</span>'}</span>
+            <span class="cardrow-d">${s.when.toLowerCase()} &middot; ${s.mins} minutes &middot; recording and transcript available</span>
+          </span>
+          <span class="cardrow-a">
+            ${pend
+              ? `<button class="btn btn-p btn-sm noic" data-ldrev="${e.id}" data-go="leadEval">Write it up</button>`
+              : `<button class="btn btn-sm noic">Recording</button>`}
+          </span>
+        </div>`;
+      }).join('')}
+    </div>
+    <p class="t-helper-01 mt4">A candidate cannot enroll until the rung is signed, so the evaluation is the thing holding up their ninety days &mdash; not the interview.</p>
+  </div>
+</div></main>`;
+};
+
+V.leadEvals = () => {
+  const pe = LEAD_EVALS.filter(e => e.status === 'pending');
+  const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
+  const signed = LEAD_EVALS.filter(e => e.status === 'done');
+  const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
+  const e0 = pe[0];
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Evaluations')}
+  ${ph('Evaluations','The level decisions and the ninety-day summaries waiting on your signature.')}
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.edit, 'Level decisions', pe.length, pe.length ? 'nobody can enroll until signed' : 'all signed')}
+      ${statCell(I.document, 'Summaries', ps.length, ps.length ? 'closing a cohort' : 'all published')}
+      ${statCell(I.checkFilled, 'Signed by you', signed.length + published.length, 'this session')}
+      ${statCell(I.time, 'Due within', '48<small>h</small>', 'of the interview')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Level decisions</h2><span class="t-helper-01">${pe.length ? pe.length + ' waiting' : 'nothing waiting'}</span></div>
+    ${LEAD_EVALS.length ? `<div class="tile-stack">
+      ${LEAD_EVALS.map(e => e.status === 'pending'
+        ? `<button class="tile clk gcard face-row" data-ldrev="${e.id}" data-go="leadEval">
+            <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
+            <span class="gcard-b"><h3>${e.name}</h3>
+              <span class="sub">Interviewed ${e.when.toLowerCase()} &middot; quiz ${e.quiz} of 100 &middot; I proposed Explorer &ndash; ${e.ai}</span></span>
+            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+          </button>`
+        : `<div class="cardrow">
+            <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
+            <span class="cardrow-b">
+              <span class="cardrow-t">${e.name} <span class="tag green sm">Signed Explorer &ndash; ${e.assigned}</span>${e.override ? ' <span class="tag org sm">override</span>' : ''}</span>
+              <span class="cardrow-d">${e.override ? 'You signed ' + e.assigned + ' against my ' + e.ai + ' &middot; your reason is on the decision' : 'You signed the rung I proposed'}</span>
+            </span>
+          </div>`).join('')}
+    </div>` : ''}
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Ninety-day summaries</h2><span class="t-helper-01">${ps.length ? ps.length + ' waiting' : 'nothing waiting'}</span></div>
+    <div class="tile-stack">
+      ${LEAD_SUMMARIES.map(s => {
+        const c = lcoOf(s.cohort);
+        const m = lmemOf(c, s.name);
+        return s.status === 'pending'
+        ? `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
+            <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+            <span class="gcard-b"><h3>${s.name}</h3>
+              <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their ninety days</span></span>
+            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+          </button>`
+        : `<div class="cardrow">
+            <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+            <span class="cardrow-b">
+              <span class="cardrow-t">${s.name} <span class="tag green sm">Published</span></span>
+              <span class="cardrow-d">${lname(c)} &middot; you recommended: ${s.rec}</span>
+            </span>
+          </div>`;
+      }).join('')}
+    </div>
+    <p class="t-helper-01 mt4">A summary is what the next agent reads before a re-interview, so it is the document a candidate&rsquo;s next rung is argued from.</p>
+  </div>
+</div></main>`;
+};
+
+V.leadEval = () => {
+  const e = ldrEvOf(S.ldrEv);
+  const an = LDR_AN[e.id];
+  const pick = S.ldrPick || e.ai;
+  const over = pick !== e.ai;
+  const band = e.ai[0];
+  const signed = e.status === 'done';
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Evaluations','leadEvals'], e.name)}
+  ${ph(`Level decision &middot; ${e.name}`, `Interviewed ${e.when.toLowerCase()} &middot; 45 minutes, recorded &middot; ${signed ? 'signed Explorer &ndash; ' + e.assigned : 'waiting on your signature'}`)}
+  ${/* Tal's reading of the interview is the band at the top of this page —
+        `PAGESUM.leadEval` — for the reason lead2.js records above `ldrRead`.
+        What stays on the page is the EVIDENCE for it, which is the part a
+        leader argues with: the quiz reading, the four competencies, the two
+        quoted moments, and how confident Tal is about the blend. The
+        confidence rides the competency heading rather than a card of its own,
+        because it is a statement about those four readings. */''}
+  <div class="sec">
+    <div class="facts">
+      <div><span class="l">Quiz</span><span class="v">${e.quiz} of 100</span></div>
+      <div><span class="l">Band</span><span class="v">${e.bucket || 'Explorer'}</span></div>
+      <div><span class="l">I propose</span><span class="v">Explorer &ndash; ${e.ai}</span></div>
+      <div><span class="l">Recorded</span><span class="v">45 minutes</span></div>
+    </div>
+  </div>
+  ${an ? `
+  ${/* The quiz reading is an aside about a number in the band above it, which
+        is what `.note` is: a bold lead and a sentence. A `.tile` with a bare
+        paragraph in it has no rule for the paragraph — `.tile` styles rows and
+        headings, not prose. */''}
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>How the quiz reads</b>${an.quiz}</div></div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Competency read</h2>${ldrConf(an.conf)}</div>
+    <div class="tbl-wrap">
+      <table class="tbl ldr-tbl">
+        <tr><th>Competency</th><th>Reads at</th><th>What I heard</th></tr>
+        ${an.comps.map(([n,r,read]) => `<tr>
+          <td>${n}</td>
+          <td><span class="tag ${r === e.ai ? 'brand' : +r[1] > +e.ai[1] ? 'green' : 'org'} sm">${r}</span></td>
+          <td class="ldr-prose">${read}</td>
+        </tr>`).join('')}
+      </table>
+    </div>
+    <p class="t-helper-01 mt4">${an.watch}</p>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>From the interview</h2><span class="t-helper-01">Quoted from the transcript</span></div>
+    <div class="ivt-lines">
+      ${an.ev.map(([k,t,q,note]) => `
+      <div class="tq them">
+        <span class="tq-t">${t}</span>
+        <span class="tq-b">
+          <span class="tq-w">${e.name}
+            <span class="ldr-${k}">${k === 'pos' ? I.checkFilled : I.warningAlt}${k === 'pos' ? 'Strength' : 'Concern'}</span></span>
+          <span class="tq-x">&ldquo;${q}&rdquo;</span>
+          <span class="tq-x t-helper-01">${note}</span>
+        </span>
+      </div>`).join('')}
+    </div>
+  </div>` : ''}
+  ${signed ? `
+  <div class="sec">
+    <div class="sec-h"><h2>Your decision</h2></div>
+    <div class="tile">
+      <div class="kv"><span class="k">Signed at</span><span class="v">Explorer &ndash; ${e.assigned}</span></div>
+      <div class="kv"><span class="k">My proposal</span><span class="v n">Explorer &ndash; ${e.ai}${e.override ? ' &middot; you overrode it' : ' &middot; you agreed'}</span></div>
+      ${e.reason ? `<div class="kv"><span class="k">Your reason</span><span class="v n">${e.reason}</span></div>` : ''}
+      ${e.notes ? `<div class="kv"><span class="k">For their report</span><span class="v n">${e.notes}</span></div>` : ''}
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-p" data-go="leadEvals">Back to evaluations ${I.arrowLeft}</button>
+    </div>
+  </div>` : `
+  <div class="sec">
+    <div class="sec-h"><h2>Your decision</h2><span class="t-helper-01">The rung is yours, not mine</span></div>
+    <div class="tile">
+      <div class="f"><label>Explorer, rung 1 to 5</label>
+        <div class="btn-set ldr-rungs">
+          ${LDR_RUNGS.map(n => `<button class="btn ${band + n === pick ? 'btn-p' : 'btn-g'} noic" data-ldrpick="${band + n}">${band + n}</button>`).join('')}
+        </div>
+      </div>
+      ${over ? `
+      <div class="f mt5"><label for="ldrWhy">Why ${pick} instead of ${e.ai}?</label>
+        <textarea class="inp" id="ldrWhy" rows="3" placeholder="Recorded on the decision. The human call wins, and the record says why."></textarea></div>
+      ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>An override needs a reason</b>You are signing ${pick} against my ${e.ai}. Say why in a sentence and it goes on the record with the decision.</div></div>` : ''}
+      ` : ''}
+      <div class="f mt5"><label for="ldrNotes">Notes for their report</label>
+        <textarea class="inp" id="ldrNotes" rows="3" placeholder="Strengths, growth areas, and what to work on during the ninety days."></textarea></div>
+      <p class="t-helper-01">The quiz fixes the band and you set the rung. ${over ? 'Overrides are logged with your reason.' : 'Agreeing with me is still your signature, not mine.'}</p>
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-p" data-ldrsign="${e.id}">${over ? 'Sign as ' + pick + ' &middot; override' : 'Sign as ' + e.ai} ${I.checkFilled}</button>
+      <button class="btn btn-t" data-go="leadEvals">Decide later ${I.time}</button>
+    </div>
+  </div>`}
+</div></main>`;
+};
+
+const LDR_RECS = [['promote','Ready to promote'],['hold','Hold at this level'],
+                  ['down','Move down a rung'],['notready','Not ready to re-interview']];
+
+V.leadSum = () => {
+  const s = ldrSumOf(S.ldrSum);
+  const c = lcoOf(s.cohort);
+  const m = lmemOf(c, s.name);
+  const rec = S.ldrRec || 'promote';
+  const needsWhy = rec !== 'promote';
+  const done = s.status === 'done';
+  const first = s.name.split(' ')[0];
+  const retakes = m.att > 1.4 ? 3 : m.att > 1.1 ? 2 : 1;
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Evaluations','leadEvals'], s.name)}
+  ${ph(`Ninety-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; ${done ? 'published' : 'waiting on your signature'}`)}
+  <div class="sec">
+    <div class="idhead">
+      <span class="av-ph" style="width:72px;height:72px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
+      <div class="idhead-b">
+        <span class="idname">${s.name}</span>
+        <span class="idmeta">${lname(c)} &middot; ninety days complete</span>
+        <span class="tag sm">${llevel(c)}</span>
+      </div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">Their full record ${I.arrowRight}</button></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>What the ninety days produced</h2><span class="t-helper-01">From the course platform &middot; read-only</span></div>
+    <div class="stats">
+      ${statCell(I.book,  'Chapters', lchDone(m) + '<small> of 13</small>', m.pc + '% complete')}
+      ${statCell(I.chart, 'Assessment average', m.avg + '<small>%</small>', m.avg >= 85 ? 'well above the pass mark' : 'above the pass mark')}
+      ${statCell(I.time,  'Time on the course', lhrs(lmins(m)), Math.round(lmins(m)/lchDone(m)) + ' min a chapter')}
+      ${statCell(I.renew, 'Chapters retaken', retakes, m.att.toFixed(1) + ' attempts on average')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="facts">
+      <div><span class="l">Calls attended</span><span class="v">${Math.max(0, c.week - 1)} of ${c.week}</span></div>
+      <div><span class="l">Tasks on time</span><span class="v">${Math.max(0, lchDone(m) - retakes + 1)} of ${lchDone(m)}</span></div>
+      <div><span class="l">Last active</span><span class="v">${m.last}</span></div>
+      <div><span class="l">Your notes</span><span class="v">${lnotes(s.name).length}</span></div>
+    </div>
+  </div>
+  ${done ? `
+  <div class="sec tint">
+    <div class="sec-h"><h2>What you published</h2></div>
+    <div class="tile">
+      <div class="kv"><span class="k">Recommendation</span><span class="v">${s.rec}</span></div>
+      ${s.growth ? `<div class="kv"><span class="k">Where they grew</span><span class="v n">${s.growth}</span></div>` : ''}
+      ${s.develop ? `<div class="kv"><span class="k">Still to develop</span><span class="v n">${s.develop}</span></div>` : ''}
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-p" data-go="leadEvals">Back to evaluations ${I.arrowLeft}</button>
+    </div>
+  </div>` : `
+  <div class="sec tint">
+    <div class="sec-h"><h2>Your recommendation</h2><span class="t-helper-01">This is what the next agent reads</span></div>
+    <div class="tile">
+      <div class="f">
+        <label>Where ${first} stands after ninety days</label>
+        <div class="btn-set ldr-recs">
+          ${LDR_RECS.map(([k,l]) => `<button class="btn ${rec === k ? 'btn-p' : 'btn-g'} noic" data-ldrrec="${k}">${l}</button>`).join('')}
+        </div>
+      </div>
+      ${needsWhy ? `
+      <div class="f mt5"><label for="ldrSumWhy">Why not a promotion?</label>
+        <textarea class="inp" id="ldrSumWhy" rows="3" placeholder="Ninety days that did not end in a promotion needs a reason on the record."></textarea></div>
+      ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>This one needs a reason</b>Anything other than a promotion is you saying the ninety days did not do what they were meant to. Say why, and it goes on the summary.</div></div>` : ''}
+      ` : ''}
+      <div class="f mt5"><label for="ldrGrowth">Where they grew</label>
+        <textarea class="inp" id="ldrGrowth" rows="3" placeholder="What changed over the ninety days that the numbers above do not show."></textarea></div>
+      <div class="f mt5"><label for="ldrDev">Still to develop</label>
+        <textarea class="inp" id="ldrDev" rows="3" placeholder="What the next ninety days, or the re-interview, should look at."></textarea></div>
+      <p class="t-helper-01">Published to ${first} and to whichever agent runs their re-interview. Your private notes stay private.</p>
+    </div>
+    <div class="btn-set mt5">
+      <button class="btn btn-p" data-ldrpub="${s.id}">Publish the summary ${I.checkFilled}</button>
+      <button class="btn btn-t" data-go="leadEvals">Finish later ${I.time}</button>
+    </div>
+  </div>`}
+</div></main>`;
+};
+
+device.addEventListener('click', e => {
+  const ev = e.target.closest('[data-ldrev]');
+  if(ev){ S.ldrEv = ev.dataset.ldrev; S.ldrPick = ldrEvOf(S.ldrEv).ai; S.ldrErr = false; }
+  const su = e.target.closest('[data-ldrsum]');
+  if(su){ S.ldrSum = su.dataset.ldrsum; S.ldrRec = 'promote'; S.ldrErr = false; }
+}, true);
+
+function ldrDraftRead(){
+  const why = device.querySelector('#ldrWhy');
+  if(why) S.ldrWhy = why.value;
+  const notes = device.querySelector('#ldrNotes');
+  if(notes) S.ldrEvNotes = notes.value;
+  const sw = device.querySelector('#ldrSumWhy');
+  if(sw) S.ldrSumWhy = sw.value;
+  const g = device.querySelector('#ldrGrowth');
+  if(g) S.ldrGrowth = g.value;
+  const d = device.querySelector('#ldrDev');
+  if(d) S.ldrDev = d.value;
+}
+
+device.addEventListener('click', e => {
+  const pk = e.target.closest('[data-ldrpick]');
+  if(pk){ ldrDraftRead(); S.ldrPick = pk.dataset.ldrpick; S.ldrErr = false; render(); return; }
+
+  const rc = e.target.closest('[data-ldrrec]');
+  if(rc){ ldrDraftRead(); S.ldrRec = rc.dataset.ldrrec; S.ldrErr = false; render(); return; }
+
+  const sg = e.target.closest('[data-ldrsign]');
+  if(sg){
+    ldrDraftRead();
+    const ev = ldrEvOf(sg.dataset.ldrsign);
+    const pick = S.ldrPick || ev.ai;
+    const over = pick !== ev.ai;
+    if(over && !(S.ldrWhy || '').trim()){
+      S.ldrErr = true; render();
+      const box = device.querySelector('#ldrWhy'); if(box) box.focus();
+      return;
+    }
+    ev.status = 'done';
+    ev.assigned = pick;
+    ev.override = over;
+    ev.reason = (S.ldrWhy || '').trim();
+    ev.notes = (S.ldrEvNotes || '').trim();
+    S.ldrWhy = ''; S.ldrEvNotes = ''; S.ldrErr = false;
+    render();
+    return;
+  }
+
+  const pb = e.target.closest('[data-ldrpub]');
+  if(pb){
+    ldrDraftRead();
+    const s = ldrSumOf(pb.dataset.ldrpub);
+    const rec = S.ldrRec || 'promote';
+    if(rec !== 'promote' && !(S.ldrSumWhy || '').trim()){
+      S.ldrErr = true; render();
+      const box = device.querySelector('#ldrSumWhy'); if(box) box.focus();
+      return;
+    }
+    s.status = 'done';
+    s.rec = (LDR_RECS.filter(r => r[0] === rec)[0] || LDR_RECS[0])[1];
+    s.why = (S.ldrSumWhy || '').trim();
+    s.growth = (S.ldrGrowth || '').trim();
+    s.develop = (S.ldrDev || '').trim();
+    S.ldrSumWhy = ''; S.ldrGrowth = ''; S.ldrDev = ''; S.ldrErr = false;
+    render();
+    return;
+  }
+});
+
+function ldrDraftWrite(){
+  const put = (id,v) => { const el = device.querySelector('#' + id); if(el && v) el.value = v; };
+  put('ldrWhy', S.ldrWhy);
+  put('ldrNotes', S.ldrEvNotes);
+  put('ldrSumWhy', S.ldrSumWhy);
+  put('ldrGrowth', S.ldrGrowth);
+  put('ldrDev', S.ldrDev);
+}
+
+const _baseLdr3 = render;
+render = function(){
+  _baseLdr3();
+  try { ldrDraftWrite(); } catch(e){ console.warn('ldr draft', e); }
+};
+
+render();
+
+
+
+const LDR_BOARDS = {
+  33: [
+    ['day','Yesterday'],
+    ['Owen Clarke','owen','OC','Two chapters left and I have started re-reading my own notes from week 1. The delegation stuff reads completely differently now.','5:20 PM'],
+    ['Lena Fischer','lena','LF','Same. I went back to chapter 4 last night and it was almost annoying how obvious it seemed.','6:02 PM'],
+    ['day','Today'],
+    ['Priya Nair','priya','PN','That is exactly what week 11 is supposed to feel like. Bring one thing you would do differently now to Friday and we will spend the hour on those rather than on chapter 12.','8:15 AM',true],
+    ['Zoe Bennett','lena','ZB','I am behind the rest of you — is it worth catching up before Friday or just coming as I am?','9:47 AM']
+  ],
+  47: [
+    ['day','Monday'],
+    ['Priya Nair','priya','PN','Welcome to Cohort 47. First call is Monday at 6. Before then: open chapter 1, and post one sentence here about what you are hoping to get out of the ninety days.','9:00 AM',true],
+    ['Ahmed Farouk','owen','AF','Hoping to stop being the bottleneck on my own team. That is the honest version.','11:34 AM'],
+    ['Beatriz Lima','lena','BL','Mine is hard conversations. I avoid them until they are twice as hard.','2:12 PM']
+  ]
+};
+
+const ldrBoard = id => +id === LEAD_COHORTS[0].id ? ROOM : (LDR_BOARDS[id] || []);
+const ldrPosts = id => ldrBoard(id).filter(r => r[0] !== 'day').length;
+
+const LDR_THREADS = [
+  {who:'Yuki Tanaka', i:'YT', img:'hana', co:41, msgs:[
+    {me:1, t:'Yuki — you have not been in since week 1 and I would rather ask than assume. Is the course the problem, or is it everything else?', w:'Mon 9:12 AM'},
+    {me:0, t:'Sorry. Work went sideways and I kept telling myself I would catch up at the weekend, and then I did not.', w:'Mon 10:40 PM'},
+    {me:1, t:'That is the normal version of this, not the shameful one. Do not try to catch up — start at chapter 2 and come to Thursday even if you have done nothing. Turning up is the part that restarts it.', w:'Tue 8:05 AM'}
+  ]},
+  {who:'James Whitby', i:'JW', img:'owen', co:41, msgs:[
+    {me:0, t:'I have re-taken the chapter 4 assessment three times and I am still at 65. Should I keep going at it?', w:'Yesterday 7:15 PM'},
+    {me:1, t:'No. Leave it at 65 and move to 5. Four is the one that only makes sense after you have tried the thing at work and it has gone badly once. Come back to it in week 8 and it will score itself.', w:'Yesterday 8:02 PM'}
+  ]},
+  {who:'Tobias Mensah', i:'TM', img:'samuel', co:41, msgs:[
+    {me:1, t:'Tobias — eight days quiet and 18% at week 5. Not chasing you, just checking the course is still something you want.', w:'2 days ago'}
+  ]}
+];
+
+S.ldrMsg = 'boards';
+S.ldrBoardCo = LEAD_COHORTS[0].id;
+S.ldrTh = 0;
+S.ldrEditProfile = false;
+S.ldrAvail = false;
+
+V.leadMessages = () => {
+  const tab = S.ldrMsg;
+  const co = lcoOf(S.ldrBoardCo);
+  const board = ldrBoard(co.id);
+  const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
+  const unread = LDR_THREADS.filter(t => t.msgs[t.msgs.length-1].me === 0).length;
+
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Messages')}
+  ${ph('Messages','The cohort boards, which your candidates read too, and your one-to-one threads.')}
+  <div class="sec sec-cs">
+    <div class="cs">
+      <button class="${tab === 'boards' ? 'on' : ''}" data-ldrmsg="boards">Cohort boards<span class="lf-n">${LEAD_COHORTS.length}</span></button>
+      <button class="${tab === 'direct' ? 'on' : ''}" data-ldrmsg="direct">Direct${unread ? `<span class="lf-n">${unread}</span>` : ''}</button>
+    </div>
+  </div>
+  ${tab === 'boards' ? `
+  <div class="sec">
+    <div class="sec-h"><h2>${lname(co)}</h2><span class="t-helper-01">${co.members.length} members &middot; week ${co.week} of 13</span></div>
+    <div class="btn-set ldr-picker">
+      ${LEAD_COHORTS.map(c => `<button class="btn ${c.id === co.id ? 'btn-p' : 'btn-g'} noic" data-ldrboard="${c.id}">${lname(c)} <span class="ldr-n">${ldrPosts(c.id)}</span></button>`).join('')}
+    </div>
+    <p class="t-helper-01 mt4">This is the same board your candidates see on their own Cohort page. Anything you post here, the whole group reads.</p>
+  </div>
+  <div class="sec tint">
+    ${board.length ? `<div class="msgs room">
+      ${board.map(r => r[0] === 'day'
+        ? `<div class="m-day"><span>${r[1]}</span></div>`
+        : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
+    </div>` : `<div class="empty" style="border:0">${I.chat}
+      <h3>Nothing posted yet</h3><p>${lname(co)} started ${co.day} day${co.day === 1 ? '' : 's'} ago. Opening the board yourself is usually what starts it.</p></div>`}
+    <div class="composer room-composer">
+      <span class="composer-star">${I.ai}</span>
+      <input class="inp" id="ldrPost" placeholder="Post to ${lname(co)}" aria-label="Post to the cohort">
+      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
+      <button class="composer-send" data-ldrpost="1" aria-label="Post">${I.send}</button>
+    </div>
+  </div>` : `
+  <div class="sec">
+    <div class="sec-h"><h2>Your threads</h2><span class="t-helper-01">${unread ? unread + ' waiting on a reply from you' : 'nothing waiting'}</span></div>
+    <div class="tile-stack">
+      ${LDR_THREADS.map((t,i) => {
+        const last = t.msgs[t.msgs.length-1];
+        return `<button class="tile clk gcard face-row${i === S.ldrTh ? ' ldr-on' : ''}" data-ldrth="${i}">
+          <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
+          <span class="gcard-b"><h3>${t.who} ${last.me === 0 ? '<span class="tag org sm">Your reply</span>' : ''}</h3>
+            <span class="sub">Cohort ${t.co} &middot; ${t.msgs.length} message${t.msgs.length === 1 ? '' : 's'} &middot; ${last.w.toLowerCase()}</span></span>
+          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('chevRight')}</svg>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>${th.who}</h2><span class="t-helper-01">Private &middot; Cohort ${th.co}</span></div>
+    <div class="msgs">
+      ${th.msgs.map(msg => `<div class="m ${msg.me ? 'me' : 'them'}">
+        <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
+        <div class="m-c">
+          <div class="m-b">${msg.t}</div>
+          <div class="m-w">${msg.me ? 'You' : th.who} &middot; ${msg.w}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="composer">
+      <span class="composer-star">${I.ai}</span>
+      <input class="inp" id="ldrReply" placeholder="Reply to ${th.who.split(' ')[0]}" aria-label="Reply">
+      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
+      <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
+    </div>
+    <p class="t-helper-01 mt4">You can see ${th.who.split(' ')[0]}&rsquo;s chapter progress, scores and attendance, so a thread never has to open by asking where they have got to.</p>
+  </div>`}
+</div></main>`;
+};
+
+const LDR_CERTS = [
+  {n:'Certified Cohort Leader', track:'Foundation', on:'February 12, 2026', by:'TalentNext'},
+  {n:'Assessment &amp; Levelling', track:'Core', on:'March 3, 2026', by:'TalentNext'},
+  {n:'90-Day Programme Facilitation', track:'Core', on:'April 21, 2026', by:'TalentNext'}
+];
+
+V.leadCerts = () => {
+  const led = 8, hours = 42;
+  const promoted = 34;
+  return `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Certifications')}
+  ${ph('Certifications','What leading earns you. Cohorts closed, candidates promoted, and the certification each one counts towards.')}
+  <div class="sec">
+    <div class="stats">
+      ${statCell(I.certificate, 'Certifications', LDR_CERTS.length, 'one more in progress')}
+      ${statCell(I.group, 'Cohorts led', led, 'as a volunteer')}
+      ${statCell(I.trophy, 'Candidates promoted', promoted, 'across those eight cohorts')}
+      ${statCell(I.time, 'Training hours', hours, 'this year')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Leading is a volunteer role</b>There are no fees and no settlements on this side of TalentNext. What the time earns is recognised in certifications and in the training that leads to them &mdash; and a certification is what lets you assess a wider band.</div></div>
+  </div>
+  ${/* THE NEWEST ONE IS THE HERO, AND IT HAS NO HEADING.
+        `.cert` is in ai5's `DARK_CARD` list, so `placeDark` moves whichever
+        page child contains one up into the module head band — every dark card
+        in this product lives at the head of its page. Three of them therefore
+        arrived in the band as one unbroken black slab, and the `.sec-h` above
+        them was left in the band's 184px label column, clipped to "Earn / ed".
+
+        So exactly one goes in the band, which is what the band is for: the
+        most recent certification, as the page's hero, with no heading of its
+        own because the page title is directly above it. The rest are rows.
+        Do not add a second `.cert` here without re-reading this. */''}
+  <div class="sec">
+    <div class="cert">
+      <span class="cert-mark">${I.certificate}</span>
+      <div class="cert-b">
+        <div class="cert-eb">Most recent &middot; ${LDR_CERTS[LDR_CERTS.length-1].track} track</div>
+        <div class="n">${LDR_CERTS[LDR_CERTS.length-1].n}</div>
+        <div class="m">Awarded ${LDR_CERTS[LDR_CERTS.length-1].on} &middot; ${LEADER.n}</div>
+        <div class="m">Issued by ${LDR_CERTS[LDR_CERTS.length-1].by}</div>
+      </div>
+      <div class="cert-act">
+        <button class="btn btn-sm noic cert-btn">Download</button>
+        <button class="btn btn-sm noic cert-btn">Share link</button>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Earned</h2><span class="t-helper-01">Yours to keep and to share</span></div>
+    <div class="tile-stack">
+      ${LDR_CERTS.slice().reverse().map(c => `<div class="cardrow">
+        <span class="cardrow-ic">${I.certificate}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${c.n} <span class="tag green sm">Active</span></span>
+          <span class="cardrow-d">${c.track} track &middot; awarded ${c.on}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic">Certificate</button>
+        </span>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>In progress</h2><span class="t-helper-01">Candidate Mentoring &middot; Advanced track</span></div>
+    <div class="tile">
+      <div class="kv"><span class="k">What it opens</span><span class="v n">Assessing the Builder band, B1 to B3</span></div>
+      <div class="kv"><span class="k">Awarded when</span><span class="v n">All three below are complete</span></div>
+    </div>
+    <ol class="steps mt5">
+      <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Lead six cohorts to completion</b>
+        Eight closed, so this one is done. Completion means the cohort finished the ninety days, not that every candidate was promoted.</span></li>
+      <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Forty hours of leader training</b>
+        ${hours} hours this year. The Advanced track adds twelve more, which is the part still open.</span></li>
+      <li><span class="s-n">3</span><span class="s-b"><b>Twelve signed level decisions reviewed</b>
+        Nine of twelve reviewed by the manager of cohort leaders. The three waiting are from the cohorts you closed in June.</span></li>
+    </ol>
+    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your decision against the transcript and agreed with the rung. It is the one requirement you cannot finish on your own.</p>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>The record behind them</h2></div>
+    <div class="facts">
+      <div><span class="l">Leading since</span><span class="v">${LEADER.since}</span></div>
+      <div><span class="l">Cohorts closed</span><span class="v">${led}</span></div>
+      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Assessing range</span><span class="v">${LEADER.range}</span></div>
+    </div>
+  </div>
+</div></main>`;
+};
+
+V.leadProfile = () => `<main class="main"><div class="page">
+  ${crumb(['Dashboard','leadDash'],'Your profile')}
+  ${ph('Your profile','What candidates read when they choose you, the band you assess, and the times you are open.')}
+  <div class="sec">
+    <div class="idhead">
+      <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
+      <div class="idhead-b">
+        <span class="idname">${LEADER.n}</span>
+        <span class="idmeta">Volunteer cohort leader &middot; leading since ${LEADER.since}</span>
+        <span class="tag sm">Assesses ${LEADER.range}</span>
+      </div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrprof="1">Edit details ${I.edit}</button></div>
+    </div>
+    <div class="tile">
+      <div class="kv"><span class="k">Display name</span><span class="v">${LEADER.n}</span></div>
+      <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
+      <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
+      <div class="kv"><span class="k">Session length</span><span class="v n">45 minutes</span></div>
+      <div class="kv"><span class="k">Role</span><span class="v n">Volunteer cohort leader &middot; unpaid</span></div>
+    </div>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span></div>
+    <div class="tile">
+      <div class="idhead" style="padding-top:0">
+        <span class="av-ph" style="width:56px;height:56px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
+        <div class="idhead-b">
+          <span class="idname">${LEADER.n}</span>
+          <span class="idmeta">${stars(4.9)} 4.9 &middot; 62 interviews &middot; ${LEADER.range}</span>
+        </div>
+      </div>
+      <p class="t-helper-01">&ldquo;Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback &mdash; if something is not working I will say so in the first ten minutes.&rdquo;</p>
+    </div>
+    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interview fees, where they apply, are set on your agent listing and not here &mdash; leading a cohort is unpaid.</p>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Availability</h2><span class="t-helper-01">Candidates can only book what you open</span></div>
+    <div class="tile-stack">
+      <div class="cardrow">
+        <span class="cardrow-ic">${I.calendar}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">Weekly calendar</span>
+          <span class="cardrow-d">Tuesday and Thursday afternoons, Friday morning &middot; 6 slots open next week</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic" data-ldravail="1">Manage</button>
+        </span>
+      </div>
+      <div class="cardrow">
+        <span class="cardrow-ic">${I.group}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">Cohort calls</span>
+          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.callDay + ' ' + c.callTime.toLowerCase()).join(' &middot; ')}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic" data-go="leadCohorts">Cohorts</button>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Your standing</h2><span class="t-helper-01">Read-only &middot; across every cohort you have closed</span></div>
+    <div class="facts">
+      <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
+      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Completion rate</span><span class="v">84%</span></div>
+      <div><span class="l">Level movement</span><span class="v">+0.8 rungs</span></div>
+    </div>
+    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; levelling somebody too high comes back later as a candidate who does not finish.</p>
+  </div>
+  <div class="sec tint">
+    <div class="sec-h"><h2>Who reviews you</h2></div>
+    <div class="tile">
+      <div class="kv"><span class="k">You</span><span class="v">Cohort leader</span></div>
+      <div class="kv"><span class="k">Reviewed by</span><span class="v n">Manager of cohort leaders, then supervisor</span></div>
+      <div class="kv"><span class="k">Your own level</span><span class="v n">Adjustable by a super-admin</span></div>
+      <div class="kv"><span class="k">Decisions reviewed</span><span class="v n">9 of 12 signed this year</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Notifications</h2></div>
+    <label class="tg"><div class="tb"><b>A candidate goes quiet</b><span>After four days without a sign-in</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>An interview is booked with you</b><span>As soon as a candidate takes a slot</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Posts on a cohort board</b><span>A daily digest rather than each one</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Evaluation reminders</b><span>24 hours before the 48-hour deadline</span></div><input type="checkbox"><span class="sw"></span></label>
+  </div>
+</div></main>`;
+
+function ldrProfileSheet(){
+  return `<div class="modal ${S.ldrEditProfile ? 'on' : ''}" data-ldrclose="prof">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Edit your details</h2>
+        <button class="x" data-ldrclose="prof" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="idhead mb6">
+          <span class="av-ph" style="width:64px;height:64px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
+          <div class="idhead-b">
+            <span class="idname">Your photo</span>
+            <span class="idmeta">Shown on your card and to every cohort you lead.</span>
+            <button class="lk">Change photo</button>
+          </div>
+        </div>
+        <div class="f"><label for="ldrPn">Display name</label>
+          <input class="inp" id="ldrPn" value="${LEADER.n}"></div>
+        <div class="f"><label for="ldrPs">Specialism</label>
+          <input class="inp" id="ldrPs" value="Operations teams, first-line leadership"></div>
+        <div class="f"><label for="ldrPb">Bio shown on your card</label>
+          <textarea class="inp" id="ldrPb" rows="3">Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.</textarea></div>
+        <div class="f"><label for="ldrPl">Session length</label>
+          <select class="inp" id="ldrPl"><option>45 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>
+        <p class="t-helper-01">Your assessing range comes from your certifications and cannot be set here.</p>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-ldrclose="prof">Cancel</button>
+        <button class="btn btn-p noic" data-ldrclose="prof">Save changes</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+const LDR_DAYS = [['Monday','Cohort 47 call at 6:00 PM',0],['Tuesday','2:00 – 5:00 PM',1],
+                  ['Wednesday','Nothing open',0],['Thursday','2:00 – 5:00 PM &middot; Cohort 41 call at 6:00 PM',1],
+                  ['Friday','9:00 AM – 12:00 PM &middot; Cohort 33 call at 5:00 PM',1],
+                  ['Saturday','Nothing open',0],['Sunday','Nothing open',0]];
+
+function ldrAvailSheet(){
+  return `<div class="modal ${S.ldrAvail ? 'on' : ''}" data-ldrclose="avail">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Your weekly availability</h2>
+        <button class="x" data-ldrclose="avail" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <p class="t-helper-01 mb6">Candidates can only book the hours you open here. Your three cohort calls are fixed and shown for context &mdash; they are not bookable.</p>
+        ${LDR_DAYS.map(([d,detail,on],i) => `
+        <label class="tg"><div class="tb"><b>${d}</b><span>${detail}</span></div>
+          <input type="checkbox" id="ldrDay${i}" ${on ? 'checked' : ''}><span class="sw"></span></label>`).join('')}
+        <p class="t-helper-01 mt5">Six slots open next week. A candidate booking one of them is the interview appearing on your Sessions page.</p>
+      </div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-ldrclose="avail">Cancel</button>
+        <button class="btn btn-p noic" data-ldrclose="avail">Save availability</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+LDR_SHEETS.push(ldrProfileSheet, ldrAvailSheet);
+
+device.addEventListener('click', e => {
+  const t = e.target;
+
+  const ms = t.closest('[data-ldrmsg]');
+  if(ms){ S.ldrMsg = ms.dataset.ldrmsg; render(); return; }
+
+  const bd = t.closest('[data-ldrboard]');
+  if(bd){ S.ldrBoardCo = +bd.dataset.ldrboard; render(); return; }
+
+  const th = t.closest('[data-ldrth]');
+  if(th){ S.ldrTh = +th.dataset.ldrth; render(); return; }
+
+  if(t.closest('[data-ldrpost]')){
+    const box = device.querySelector('#ldrPost');
+    const text = box ? box.value.trim() : '';
+    if(!text){ if(box) box.focus(); return; }
+    ldrBoard(S.ldrBoardCo).push([LEADER.n, 'priya', LEADER.i, text, 'Just now', true]);
+    render();
+    return;
+  }
+
+  if(t.closest('[data-ldrreply]')){
+    const box = device.querySelector('#ldrReply');
+    const text = box ? box.value.trim() : '';
+    if(!text){ if(box) box.focus(); return; }
+    (LDR_THREADS[S.ldrTh] || LDR_THREADS[0]).msgs.push({me:1, t:text, w:'Just now'});
+    render();
+    return;
+  }
+
+  const pf = t.closest('[data-ldrprof]');
+  if(pf){ S.ldrEditProfile = true; render(); return; }
+
+  const av = t.closest('[data-ldravail]');
+  if(av){ S.ldrAvail = true; render(); return; }
+
+  const cl = t.closest('[data-ldrclose]');
+  if(cl && (cl.dataset.ldrclose === 'prof' || cl.dataset.ldrclose === 'avail')){
+    if(cl.classList.contains('modal') && t !== cl) return;
+    if(cl.dataset.ldrclose === 'prof') S.ldrEditProfile = false;
+    if(cl.dataset.ldrclose === 'avail') S.ldrAvail = false;
+    render();
+    return;
+  }
+});
+
+device.addEventListener('keydown', e => {
+  if(e.key !== 'Enter' || e.shiftKey) return;
+  if(e.target.id === 'ldrPost'){ e.preventDefault(); device.querySelector('[data-ldrpost]').click(); }
+  if(e.target.id === 'ldrReply'){ e.preventDefault(); device.querySelector('[data-ldrreply]').click(); }
+});
+
+Object.assign(LEAD_TAL.where, {
+  leadCohort:'a cohort', leadMember:'a candidate',
+  leadEval:'a level decision', leadSum:'a 90-day summary'
+});
+Object.assign(LEAD_TAL.ctx, {
+  leadCohort: ['Where is this cohort stuck?','Brief me for this call','Who here needs me most?'],
+  leadMember: ['What should I say to them?','Is this recoverable?','Draft a check-in'],
+  leadEval:   ['Why did you propose this rung?','What evidence supports it?','What would change your mind?'],
+  leadSum:    ['Are they ready to be promoted?','What should I write here?']
+});
+Object.assign(ASK_WHERE, LEAD_TAL.where);
+
+render();
+
+
+
 
 const _hrs = m => Math.round(m / 60);
 const _n = x => x.toLocaleString('en-US');
@@ -12116,112 +13780,172 @@ const _an = n => /^(8|11|18)/.test(String(n)) ? 'an' : 'a';
 const PAGESUM = {
 
   dashboard: {
-    consult: 'The whole state of your account on one screen, while it is still new. Your quiz result carried over &mdash; Explorer track, 64 out of 100, taken on 3 August &mdash; and the one thing live is fifteen minutes with Jordan Blake on Thursday at 2:00 PM ET. Nothing on this page is waiting on you today; it is here so you can see where things stand before anything is asked of you.',
+    consult: 'You&rsquo;re all set up. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
 
-    new: 'Where you stand today, gathered in one view: on the Explorer track from a quiz score of 64, with no level, nothing booked and nothing paid. The page holds what the quiz decided, what it explicitly did not, and the agents open to you at this level, so the whole picture is in front of you before you commit to any of it.',
+    new: 'You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
 
-    booked: 'Your account with one thing live in it. Priya Nair, Thursday 20 August at 6:30 PM ET &mdash; 45 minutes, recorded, already paid &mdash; and she has run 210 interviews at E1 to E3 with a 4.8 rating. Everything decided about you so far sits underneath it. Nothing here needs you before the day itself.',
+    booked: 'You&rsquo;re booked with Priya Nair, Thursday 20 August at 6:30 PM ET. Forty-five minutes, recorded, already paid &mdash; nothing to do before the day.',
 
-    assessed: 'Where you stand now that you have been assessed, in one view. Explorer &ndash; E3, rung 3 of 15, signed by Priya Nair on 21 August, with delegation and hard conversations named as your growth areas. The page gathers your result, the report behind it and the course built for that rung, so the whole of what was decided is on one screen.',
+    assessed: 'You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
 
-    week1: f => `Your first week in Cohort 41, gathered in one place: day ${f.day} of 90, ten of you at E3 with Priya Nair leading. Chapter 1, Why We Exist, unlocks today and runs 45 minutes, and the call is Thursday at 6:00 PM ET. Four of the ten have finished chapter 1 already. Nothing is assessed this week, so the page is here to get you oriented rather than to chase you.`,
+    week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 unlocks today and your first call is Thursday at 6:00 PM ET &mdash; nothing&rsquo;s assessed this week.`,
 
-    day34: f => `Everything about where you actually are, on one screen. Day ${f.day} of 90, ${f.done} of 13 chapters at ${_an(f.avg)} ${f.avg}% average, ${_n(GAME.day34.pts)} points &mdash; ${_n(2500 - GAME.day34.pts)} short of Bronze. Two things are genuinely open and both are visible below: chapter 4, Delegation Without Drop-Off, which you have started four times without finishing and which your report names as a growth area, and the week 4 reflection, which was due Monday and shows on Priya&rsquo;s roster. Thursday&rsquo;s call is week 5, on hard conversations.`,
+    day34: f => `Day ${f.day} of 90, ${f.done} of 13 chapters at ${f.avg}%, ${_n(GAME.day34.pts)} points. Chapter 4 is still unfinished after four goes and your week 4 reflection is overdue. Thursday&rsquo;s call is on hard conversations.`,
 
-    day90: f => `The ninety days, closed out and gathered here. Thirteen chapters at ${_an(f.avg)} ${f.avg}% average off about ${_hrs(f.mins)} hours of work, ${_n(GAME.day90.pts)} points, the Bronze badge and a 1-Star rank &mdash; and the 90-day summary written from all of it. This is the page that holds the evidence of what you did, in the form it gets read in.`,
+    day90: f => `All 13 chapters done at ${f.avg}%, and you&rsquo;re on ${_n(GAME.day90.pts)} points with the Bronze badge. Your 90-day summary is written &mdash; Priya signs it once you book the re-interview.`,
 
-    promoted: f => `Where you landed. Explorer &ndash; E4, signed by Priya Nair on 21 November off thirteen chapters at ${_an(f.avg)} ${f.avg}% average and ${_n(GAME.promoted.pts)} points, with Cohort 41 now closed. The page keeps the whole record of those ninety days together with what changes at your new rung, and there is nothing on it waiting for you.`,
+    promoted: f => `You&rsquo;re Explorer &ndash; E4 now, signed by Priya on 21 November, and Cohort 41 is closed. At E4 you can volunteer to lead a cohort below your level.`,
 
-    _: 'Where you stand right now, in one view: what has been decided about you, what is live, and anything that is waiting on you today.'
+    _: 'Where you stand right now, and anything waiting on you today.'
   },
 
   level: {
-    consult: 'No level yet. The quiz gave you a track, not a rung &mdash; Explorer is the first of three and holds rungs 1 to 5 of 15. It is the band for people already leading work but not a whole function, and it covers rhythm, delegation, hard conversations and feedback. Only a 45-minute agent interview can put you on one of those five rungs, and the report follows within 48 hours of it.',
-    new: 'No level yet. The quiz gave you a track, not a rung &mdash; Explorer is the first of three and holds rungs 1 to 5 of 15. It is the band for people already leading work but not a whole function, and it covers rhythm, delegation, hard conversations and feedback. Only a 45-minute agent interview can put you on one of those five rungs, and the report follows within 48 hours of it.',
-    booked: 'Still no confirmed rung &mdash; the interview you have booked is what sets it. Explorer covers rungs 1 to 5 of 15 and your quiz predicted somewhere inside that band, which is a prediction and not a placement. Priya will confirm the actual rung on 20 August, and it is that number, not the quiz score, that decides which course you take.',
-    promoted: 'Explorer &ndash; E4, rung 4 of 15, signed by Priya Nair on 21 November after your re-interview. You came up from E3 on thirteen chapters at an 87% average. E4 is the top half of the Explorer band and the first rung at which you can volunteer to lead a cohort below your own level; from here the ladder runs on into Builder at rung 6.',
-    _: 'Explorer &ndash; E3, rung 3 of 15, confirmed by Priya Nair on 21 August off a 45-minute interview rather than off the quiz. That puts you in the middle of the Explorer band. There is exactly one way to move: finish a 90-day course and re-interview at the end of it, which takes you up a rung, holds you, or drops you one. Activity on its own does not move it and neither does the quiz.'
+    consult: 'No level yet &mdash; the quiz gives you a track, not a rung. Explorer is rungs 1 to 5 of 15, and a 45-minute interview decides which one.',
+    new: 'No level yet &mdash; the quiz gives you a track, not a rung. Explorer is rungs 1 to 5 of 15, and a 45-minute interview decides which one.',
+    booked: 'Still no rung &mdash; the interview on 20 August is what sets it. Explorer covers rungs 1 to 5 of 15, and the quiz only predicted the band.',
+    promoted: 'You&rsquo;re at E4, rung 4 of 15, signed on 21 November after your re-interview. At E4 you can volunteer to lead a cohort below your level.',
+    _: 'You&rsquo;re at E3, rung 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a 90-day course moves it.'
   },
 
-  report: 'Priya Nair&rsquo;s write-up of the 45 minutes you spent with her on 20 August, signed the following day, confirming Explorer &ndash; E3. It sets out what she actually heard: that you rewrote a reorganization plan after sitting with two engineers rather than after reading the document, and that you play down your own answers as you give them. Delegation and hard conversations are the two growth areas she names, and both are chapters on the course you take next. The full transcript sits behind it, and the report stays yours whatever happens to your level later.',
+  report: 'Priya&rsquo;s write-up of your 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas she named, and both are chapters on your course.',
 
-  interviews: 'Every interview on your record and every one still to come. A level interview is 45 minutes with a talent agent, recorded, and it is the only thing in TalentNext that can set or change your rung &mdash; not the quiz, not your course average, not your points. Booking, rescheduling and cancelling all happen here, and each finished one links through to the report it produced.',
+  interviews: 'Every interview you&rsquo;ve had and every one booked. This is the only thing that sets or changes your rung, and each finished one links to its report.',
 
-  agents: 'Three of the twenty-four talent agents assess at your level and have a slot inside seven days: Priya Nair at $95, rating 4.8 over 210 interviews; Owen Clarke at $85 and 4.6; Lena Fischer at $80 and 4.5. Price tracks how booked an agent is rather than how good they are, and the order here is how their past candidates went on to progress. Whoever you choose it is the same 45 minutes, recorded, with the report inside 48 hours.',
+  agents: 'Three agents assess at your level and have a slot this week &mdash; Priya at $95, Owen at $85, Lena at $80. Same 45 minutes whoever you pick.',
 
   agent: () => {
     const a = AGENTS[S.agent || 'priya'];
-    return `${a.n} assesses ${a.range}, has run ${a.ivs} interviews and rates ${a.r.toFixed(1)} out of five. It is ${a.price} for 45 minutes, recorded, with your report inside 48 hours of the call.${a.bio ? ' In their own words: &ldquo;' + a.bio.split('.')[1].trim() + '.&rdquo;' : ''} The next free slot is ${a.slot} &mdash; pick a time at the foot of this page and that is the booking made.`;
+    return `${a.n} assesses ${a.range}, has run ${a.ivs} interviews and rates ${a.r.toFixed(1)}. ${a.price} for 45 minutes, and the next free slot is ${a.slot}.`;
   },
 
   booking: () => {
     const a = AGENTS[S.agent || 'priya'];
-    return `Booked. ${a.n}, Thursday 20 August at 6:30 PM ET, 45 minutes, recorded, ${a.price} paid on a Visa ending 4242. The calendar invite and the joining link are already in your email. Nothing is expected of you before the day &mdash; and if it stops working, rescheduling and cancelling are both on this page rather than in an email thread.`;
+    return `Booked &mdash; ${a.n}, Thursday 20 August at 6:30 PM ET. The invite and joining link are already in your email, and you can move it from here.`;
   },
 
-  enrol: 'The Explorer Track at E3: 90 days, 13 chapters and a cohort of ten with a live cohort leader, for $595 paid once. It works out at about an hour a week plus the 60-minute call, and the people who keep to that finish averaging above 85%. Enrolling puts you in the next cohort to open, usually inside two weeks, and the ninety days end with the re-interview that can move your rung.',
+  enrol: '90 days, 13 chapters and a cohort of ten with a live leader, for $595 paid once. About an hour a week plus the call, and you start with the next cohort.',
 
-  payment: '$595 for the Explorer Track &ndash; E3, charged once. There is no subscription, nothing renews, and your card is not kept on file after this. Your cohort starts within two weeks of the payment clearing, and this is the last step before you are enrolled &mdash; everything after it happens inside the course.',
+  payment: '$595, charged once &mdash; no subscription and nothing renews. Your cohort starts within two weeks of the payment clearing.',
 
   coursework: f => {
     const cur = CH[f.open];
-    return `Thirteen chapters, 45 to 70 minutes each, in the order they unlock &mdash; one a week, and you cannot jump ahead of the schedule. ${f.done ? `${f.done} are finished${f.avg ? ` at ${_an(f.avg)} ${f.avg}% average` : ''}` : 'None are finished yet'}${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is the one you have open` : ''}. They play in LightSpeed VT rather than here; your progress and your assessment score come back the moment you close one.`;
+    return `${f.done ? `${f.done} of 13 chapters done${f.avg ? ` at ${f.avg}%` : ''}` : 'None of the 13 chapters finished yet'}${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
   },
 
   chapter: () => {
-    const cur = CH[cfg(S.stage).open];
-    return `${cur ? `Chapter ${cfg(S.stage).open + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You are inside a chapter.'} It runs in LightSpeed VT and it is four things in sequence: video, reading, a roleplay and an assessment at the end. Only the assessment score counts towards your average. You can stop part-way and come back to the same place, and whatever you have finished counts the moment you leave.`;
+    const i = cfg(S.stage).open, cur = CH[i];
+    return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment; only the assessment counts towards your average. Stop any time and come back.`;
   },
 
-  transcript: f => {
-    if(!f.done) return 'Nothing on the record yet &mdash; the ninety days started this week and the first chapter has not been assessed. Once they are, this is the page an agent reads before your re-interview: chapters finished, assessment scores, time on the course week by week, and the 90-day summary your cohort leader signs at the end of it.';
-    return `${f.done} of 13 chapters, ${_an(f.avg)} ${f.avg}% assessment average and about ${_hrs(f.mins)} hours on the course, set out week by week against a ${WEEK_TARGET}-minute target. This is the page an agent reads before a re-interview &mdash; it is the evidence your next rung is argued from, which is why it shows the weeks you missed as well as the ones you made. The 90-day summary at the foot is written from it, and Priya signs that.`;
-  },
+  transcript: f => f.done
+    ? `${f.done} of 13 chapters, ${f.avg}% average, about ${_hrs(f.mins)} hours in. This is what an agent reads before your re-interview.`
+    : 'Nothing on the record yet &mdash; the ninety days only started this week.',
 
   rewards: () => {
     const g = GAME[S.stage];
-    if(!g) return 'Points do not start until you are on a course, so there is nothing on your total yet. When they do: 10 for signing in, 25 for finishing a chapter, 250 for finishing a course, and 10 to 20 for taking part in the cohort discussion. Bronze is at 2,500 points, Silver at 5,000, Gold at 10,000. None of it touches your level, which only an interview can move.';
+    if(!g) return 'Points start when you enroll on a course &mdash; 10 for signing in, 25 a chapter, Bronze at 2,500. None of it affects your level.';
     const toB = 2500 - g.pts;
-    return `${_n(g.pts)} points, ${g.badges} of 4 badges, and a ${RANKS[g.rank - 1].n} rank. ${toB > 0
-      ? `Bronze is at 2,500, so you are ${_n(toB)} away from your first badge.`
-      : `Bronze is yours; Silver is at 5,000, so it is ${_n(5000 - g.pts)} further on.`} They come from signing in (10 a day), finishing chapters (25 each) and taking part in the cohort (10 to post, 20 when someone reacts) &mdash; and going quiet costs you: a week away is &minus;50 and a month is &minus;250. None of it affects your level.`;
+    return `${_n(g.pts)} points, ${g.badges} of 4 badges, ${RANKS[g.rank - 1].n}. ${toB > 0
+      ? `Bronze is at 2,500, so you&rsquo;re ${_n(toB)} off it.`
+      : `Bronze is yours and Silver is at 5,000.`} Points come from signing in, chapters and cohort posts &mdash; none of it touches your level.`;
   },
 
-  cohort: f => `Ten people at Explorer &ndash; E3, led by Priya Nair, in week ${f.week} of 13. The call is Thursday at 6:00 PM ET for 60 minutes; week 5 is hard conversations and Priya has asked everyone to bring a real one rather than a hypothetical. Between calls the discussion board is where the cohort actually talks &mdash; the live thread is Aisha asking where you draw the line between checking in and hovering, which is chapter 4&rsquo;s problem exactly.`,
+  cohort: f => `Ten of you at E3 with Priya leading, week ${f.week} of 13. Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and she&rsquo;s asked everyone to bring a real one.`,
 
-  messages: 'Your one-to-one thread with Priya Nair, who leads Cohort 41. She can already see your chapter progress, your assessment scores and your attendance, so you never have to open by explaining where you have got to. Her last message asked you to bring the vendor review example to Thursday&rsquo;s call. Voice notes work here as well as text, and this thread is private &mdash; the cohort board is the other one.',
+  messages: 'Your private thread with Priya. She can already see your chapters, scores and attendance, so you never have to explain where you are. Her last message asked for the vendor review example.',
 
-  billing: 'Every payment you have made to TalentNext, newest first, with the card each one went to. They are all one-off charges &mdash; $95 for a 45-minute agent interview, $595 for a 90-day course &mdash; so nothing on this page is a subscription, nothing renews, and no card is kept on file between purchases. Each row downloads its own receipt.',
+  billing: 'Everything you&rsquo;ve paid, newest first &mdash; all one-off charges. Nothing renews, no card is kept on file, and each row downloads its receipt.',
 
-  account: 'Your name, your email and how you want to be contacted &mdash; and the part most people come here for, which is what Tal is allowed to do. Tal keeps a list of things it has worked out about you from your interviews, your report and your course activity; you can read that list, mark anything on it wrong, or switch Tal off completely. Closing your account is at the foot, and it asks twice.',
+  account: 'Your details, how you want to be contacted, and what Tal is allowed to do. Changes save as you go; closing your account is at the foot.',
 
   mem: () => {
     const live = MEMO.length - ((S.memDrop || []).length);
-    return `${live} things Tal is holding about you, and every one of them traced to where it came from &mdash; a timestamp in an interview, a line in your report, or a note you wrote yourself. Most of it is from the 45 minutes with Priya: that you treat handing work over as a risk you are still carrying, that you change your mind in the room rather than on paper, that you play down your own answers as you give them. Mark any of it wrong and Tal stops using it. Delete it and it is gone.`;
+    return `${live} things I&rsquo;ve learned about you, each traced back to where it came from. Mark anything wrong and I&rsquo;ll stop using it.`;
   },
 
-  rp: 'A rehearsal room for a conversation you are dreading. Tal plays the other person, briefed from what you actually said in your interview &mdash; Sam, the direct report you took the vendor review back from without telling him why, is one of three scenarios drawn straight off your own record. You choose what to say from three options at each turn and see how it lands. Nothing here is recorded, scored, or visible to your cohort leader.',
+  rp: 'Rehearse a hard conversation before you have it for real. I play the other person, briefed from your interview &mdash; nothing here is recorded or scored.',
 
   ivt: () => {
     const iv = IVT[S.iv === 're' ? 're' : 'level'];
-    return `The full ${iv.len} of your ${iv.label.toLowerCase()} with Priya Nair on ${iv.date}, written out and searchable, ending in ${iv.outcome.replace(/^Confirmed /, 'a confirmed ')}. Six moments are marked as scenes and every line is tagged, so you can filter down to just the delegation exchanges, the decisions, or the places you hedged. This is the source for everything in your report and everything Tal remembers about you &mdash; if something there looks wrong, it is quotable from here.`;
+    return `The full ${iv.len} of your ${iv.label.toLowerCase()} with Priya on ${iv.date}, searchable and tagged by topic. Everything in your report came from here.`;
   },
 
   leadDash: () => {
     const att = lattention(), pend = lpending(), next = lnext();
     const bad = att.filter(x => x.m.flag.k === 'bad').length;
-    return `${LEAD_COHORTS.length} cohorts and ${lmembers().length} candidates. ${pend === 1
-      ? 'One decision is'
-      : _n(pend) + ' decisions are'} waiting on your signature, and nobody in that queue can enroll until you sign a level. ${att.length} people need a look, ${bad} of them seriously &mdash; mostly candidates who have not opened a chapter in over a week, and four of those are in Cohort 47, which is only on day 4.${next ? ` Your next session is ${next.name}, ${next.when.toLowerCase()}.` : ''} Cohort 41 meets Thursday at 6:00 PM, week 5 of 13.`;
+    return `${pend === 1 ? 'One decision is' : _n(pend) + ' decisions are'} waiting on your signature, and nobody in that queue can enroll until you sign. ${att.length} candidates need a look, ${bad} of them seriously.${next ? ` Next session is ${next.name}, ${next.when.toLowerCase()}.` : ''}`;
   },
 
-  leadSessions:  'Not built yet. When it is: every interview you have run and every one booked, plus the run-a-session flow &mdash; join, end, write the evaluation, pick the rung, publish the summary.',
-  leadEvals:     'Not built yet. When it is: the level decisions waiting on your signature, each one with the transcript reading, the competency breakdown and the evidence behind the rung being proposed.',
-  leadCohorts:   'Not built yet. When it is: all three cohorts with their rosters, the weekly call brief, and a page per candidate carrying their progress and your notes.',
-  leadReports:   'Not built yet. When it is: what the course platform sends back &mdash; chapter progress, assessment scores and attendance, per candidate and per cohort.',
-  leadMessages:  'Not built yet. When it is: the cohort discussion boards, shared with the candidate side so a post here shows up there, and your one-to-one threads.',
-  leadCerts:     'Not built yet. When it is: what leading earns you &mdash; cohorts closed, candidates promoted, and the certification each one counts towards.',
-  leadProfile:   'Not built yet. When it is: the public profile candidates read when they are choosing an agent, the range you assess, and your availability calendar.'
+  leadSessions: () => {
+    const up = LEAD_SESSIONS.filter(s => s.state === 'upcoming');
+    const done = LEAD_SESSIONS.filter(s => s.state === 'done');
+    const due = done.filter(s => { const e = LEAD_EVALS.filter(x => x.name === s.name)[0]; return e && e.status === 'pending'; }).length;
+    const nx = up[0];
+    return `${up.length} interview${up.length === 1 ? '' : 's'} booked, ${done.length} already run.${nx ? ` Next is ${nx.name}, ${nx.when.toLowerCase()}.` : ''}${due ? ` ${due === 1 ? 'One' : _n(due)} still ${due === 1 ? 'needs' : 'need'} an evaluation before those candidates can enroll.` : ''}`;
+  },
+
+  leadEvals: () => {
+    const pe = LEAD_EVALS.filter(e => e.status === 'pending');
+    const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
+    const e0 = pe[0];
+    if(!pe.length && !ps.length) return 'Nothing is waiting on your signature &mdash; every level and every summary is signed.';
+    return `${pe.length ? `${pe.length === 1 ? 'One level decision' : _n(pe.length) + ' level decisions'}` : 'No level decisions'} and ${ps.length ? `${ps.length === 1 ? 'one ninety-day summary' : _n(ps.length) + ' summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the rung is yours to set.` : ''}`;
+  },
+
+  leadEval: () => {
+    const e = LEAD_EVALS.filter(x => x.id === S.ldrEv)[0] || LEAD_EVALS[0];
+    const an = typeof LDR_AN !== 'undefined' ? LDR_AN[e.id] : null;
+    if(e.status === 'done')
+      return `Signed at Explorer &ndash; ${e.assigned}${e.override ? `, against my proposal of ${e.ai}` : ''}. ${e.name} can enroll now.`;
+    return `${an ? an.sum : e.why} Their quiz was ${e.quiz} of 100.`;
+  },
+
+  leadSum: () => {
+    const s = LEAD_SUMMARIES.filter(x => x.id === S.ldrSum)[0] || LEAD_SUMMARIES[0];
+    const c = lcoOf(s.cohort);
+    const m = lmemOf(c, s.name);
+    if(s.status === 'done') return `Published. You recommended: ${s.rec}.`;
+    return `${s.name} finished the ninety days at ${m.pc}% with ${m.avg}% on assessments and ${lchDone(m)} of 13 chapters. The recommendation is the part only you can write.`;
+  },
+
+  leadCohorts: () => {
+    const flagged = lmembers().filter(x => x.m.flag);
+    const worst = LEAD_COHORTS.slice().sort((a,b) => (lavg(a,'pc') - lpace(a)) - (lavg(b,'pc') - lpace(b)))[0];
+    const next = LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd)[0];
+    return `Three cohorts, ${lmembers().length} candidates, all Explorer. Cohort ${worst.id} is ${Math.abs(lavg(worst,'pc') - lpace(worst))} points behind pace &mdash; the widest of the three &mdash; and ${flagged.length} candidates are flagged. Next call is ${lname(next).toLowerCase()}, ${next.callDay.toLowerCase()} at ${next.callTime.toLowerCase()}.`;
+  },
+
+  leadCohort: () => {
+    const c = lcoOf(S.ldrCo);
+    const gap = lavg(c,'pc') - lpace(c);
+    const bad = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
+    return `${c.members.length} candidates at ${llevel(c)}, week ${c.week} of 13. Averaging ${lavg(c,'pc')}% against ${lpace(c)}% expected &mdash; ${gap >= 0 ? `${gap} ahead` : `${Math.abs(gap)} behind`} &mdash; with assessments at ${lavg(c,'avg')}%. ${bad ? `${bad === 1 ? 'One candidate is' : _n(bad) + ' candidates are'} at risk.` : 'Nobody is at risk this week.'}`;
+  },
+
+  leadMember: () => {
+    const c = lcoOf(S.ldrCo);
+    const m = lmemOf(c, S.ldrMem);
+    return ldrRead(m, c);
+  },
+
+  leadReports: () => {
+    const sel = S.ldrRep;
+    const all = lmembers();
+    const rows = sel === 'all' ? all : all.filter(x => x.c.id === +sel);
+    const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
+    const never = rows.filter(x => x.m.last === 'Never');
+    const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
+    return `${sel === 'all' ? `All ${rows.length} candidates` : `The ${rows.length} in cohort ${sel}`}, ordered by distance from expected pace. ${behind.length ? `${behind.length} ${behind.length === 1 ? 'is' : 'are'} five points or more behind` : 'None is behind pace'}${never.length ? ` and ${never.length} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.${worst ? ` ${worst.m.name} is furthest back at ${worst.m.pc}%.` : ''}`;
+  },
+
+  leadMessages: () => {
+    const co = lcoOf(S.ldrBoardCo);
+    return `${lname(co)}&rsquo;s board is the same thread its members read on their own Cohort page, so anything you post there the whole group sees. The direct threads are private, one candidate each.`;
+  },
+
+  leadCerts: 'Three certifications earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it is what would let you assess into the Builder band.',
+
+  leadProfile: 'Your listing, your availability and the four numbers you&rsquo;re measured on. The bio and photo are yours to write; the assessing range comes from your certifications.'
 };
 
 function pageSummary(){
@@ -12317,7 +14041,7 @@ S.bk = null;
 S.booking = null;
 
 function bkStart(){
-  S.bk = {open:null, agent:null, day:BK_DAY0, slot:BK_SLOT0, newCard:false};
+  S.bk = {open:null, agent:null, day:BK_DAY0, slot:BK_SLOT0};
 }
 
 const bkRec = () => S.booking || S.bk || {day:BK_DAY0, slot:BK_SLOT0};
@@ -12332,8 +14056,7 @@ const bkDate = (r) => { r = r || bkRec(); const d = BK_DAYS[r.day] || BK_DAYS[BK
 
 const BKW = {
   agents: () => S.bk ? (S.bk.open ? bkProfile(S.bk.open) : bkList()) : '',
-  sched:  () => S.bk ? bkSched() : '',
-  pay:    () => S.bk ? bkPay()   : ''
+  sched:  () => S.bk ? bkSched() : ''
 };
 
 const bkHost = (k) => `<div class="bkw" data-bkw="${k}"></div>`;
@@ -12342,8 +14065,7 @@ const bkFrozen = (html) => `<div class="bkw">${html}</div>`;
 
 function bkList(){
   return `<div class="bk">
-    <div class="bk-list">${BK_SHORTLIST.map(bkCard).join('')}</div>
-    <p class="bk-note">Open a card to read the full profile, or book straight from it.</p>
+    <div class="rail-wrap bk-list"><div class="rail">${BK_SHORTLIST.map(bkCard).join('')}</div></div>
   </div>`;
 }
 
@@ -12388,7 +14110,6 @@ function bkProfile(key){
       ${done
         ? `<span class="bk-flag">${I.checkFilled}Booked for ${bkDate()}</span>`
         : `<button class="btn btn-p btn-sm" data-bkbook="${key}">Book ${a.n.split(' ')[0]} ${I.arrowRight}</button>`}
-      <button class="btn btn-t btn-sm noic" data-bkall="1">All agents</button>
     </div>
   </div>`;
 }
@@ -12419,58 +14140,6 @@ function bkSched(){
   </div>`;
 }
 
-function bkPay(){
-  const a = AGENTS[S.bk.agent] || bkAgent();
-  const saved = (S.cards || []).find(c => c.def) || (S.cards || [])[0];
-  const paid = !!S.booking;
-  return `<div class="bk bk-pay">
-    <div class="tile">
-      <div class="kv"><span class="k">Level interview · ${a.n}</span><span class="v n">${a.price}</span></div>
-      <div class="kv"><span class="k">${bkShort(S.bk)}</span><span class="v n">45 min</span></div>
-      <div class="kv kv-due"><span class="k">Due now</span><span class="v">${a.price}</span></div>
-    </div>
-    <div class="bk-h">Pay with</div>
-    <div class="bk-cards">
-      ${saved ? `<button class="cardrow bk-pick ${S.bk.newCard?'':'on'}" data-bkcard="saved"${paid?' disabled':''}>
-        <span class="cardrow-ic">${BMK[saved.brand] || BMK.card}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${saved.brand} ending ${saved.last}</span>
-          <span class="cardrow-d">Expires ${saved.exp}</span>
-        </span>
-        <span class="bk-tick">${I.checkFilled}</span>
-      </button>` : ''}
-      <button class="cardrow bk-pick ${S.bk.newCard?'on':''}" data-bkcard="new"${paid?' disabled':''}>
-        <span class="cardrow-ic">${I.creditCard}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">Use another card</span>
-          <span class="cardrow-d">Enter the details below</span>
-        </span>
-        <span class="bk-tick">${I.checkFilled}</span>
-      </button>
-    </div>
-    ${S.bk.newCard ? `<div class="bk-form">
-      <div class="f"><label for="bkcn">Card number</label>
-        <input class="inp" id="bkcn" inputmode="numeric" placeholder="1234 5678 9012 3456"${paid?' disabled':''}></div>
-      <div class="f"><label for="bkcnm">Name on card</label>
-        <input class="inp" id="bkcnm" placeholder="Maryam Naz"${paid?' disabled':''}></div>
-      <div class="bk-2up">
-        <div class="f"><label for="bkcx">Expiry</label>
-          <input class="inp" id="bkcx" placeholder="MM/YY"${paid?' disabled':''}></div>
-        <div class="f"><label for="bkcv">Security code</label>
-          <input class="inp" id="bkcv" placeholder="123"${paid?' disabled':''}></div>
-      </div>
-      <label class="cbx"><input type="checkbox" checked${paid?' disabled':''}><span class="box">${I.check}</span><span class="txt">Save this card for future bookings</span></label>
-    </div>` : ''}
-    <div class="note band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
-    <div class="bk-a">
-      ${paid
-        ? `<span class="bk-flag">${I.checkFilled}Paid ${a.price}</span>`
-        : `<button class="btn btn-p btn-sm" data-bkpay="1">Pay ${a.price} and book ${I.arrowRight}</button>`}
-    </div>
-    <p class="bk-note">Free to reschedule up to 24 hours before. Inside 24 hours the fee is not refundable.</p>
-  </div>`;
-}
-
 function bkDone(){
   const a = AGENTS[S.booking.agent];
   const c = S.booking.card;
@@ -12497,16 +14166,22 @@ function bkTurn(mine, reply){
     S.thread.push({who:'tal', html:reply});
     S.typing = talQueue.length > 0;
     render();
-  }, 620);
+  }, TAL_BEAT);
 }
 
 const BK_ASK = /\b(book|booking|reserve|arrange|schedule)\b[^.?!]{0,40}\b(interview|agent|slot|session|call with)\b|\b(interview|slot)\b[^.?!]{0,30}\b(book|booking)\b|\b(top|best|good|suggested|recommend\w*)\b[^.?!]{0,25}\bagents?\b|\b(suggest|show|list|find|compare|pick|choose|which)\b[^.?!]{0,30}\bagents?\b|\bagents?\b[^.?!]{0,25}\b(suggest|available|free|recommend\w*)\b|\bi want to (be interviewed|get interviewed)\b/i;
 
 TAL_ROUTES.unshift([BK_ASK, () => {
+  S.booking = null;
   bkStart();
-  return `We can do the whole thing here. Three of the twenty-four talent agents assess at your level and have a slot inside seven days &mdash; these three, ordered by how their past candidates went on to progress. Whoever you pick it is the same 45 minutes, recorded, with your report inside 24 hours.`
+  return `Here are the top profile agents you should consider.`
     + bkHost('agents');
 }]);
+
+const BK_CHIP = 'Book an interview with a top agent';
+for(const v of ['interviews','agents']){
+  if(TALCTX[v] && TALCTX[v][0] !== BK_CHIP) TALCTX[v].unshift(BK_CHIP);
+}
 
 device.addEventListener('click', e => {
   const t = e.target;
@@ -12520,7 +14195,7 @@ device.addEventListener('click', e => {
     S.agent = k;                                 /* the agent pages agree with the chat */
     const a = AGENTS[k];
     bkTurn(`Book an interview with ${a.n}`,
-      `${a.n.split(' ')[0]} has these times in the next week, and every one of them is 45 minutes. Pick a day and a time and I will hold it while you pay.`
+      `Pick a day and a time that suits you.`
       + bkHost('sched'));
     return;
   }
@@ -12537,23 +14212,10 @@ device.addEventListener('click', e => {
   const bs = t.closest('[data-bkslot]');
   if(bs && !bs.disabled){ if(!S.bk) bkStart(); S.bk.slot = +bs.dataset.bkslot; render(); return; }
 
-  const bc = t.closest('[data-bkcard]');
-  if(bc && !bc.disabled){ if(!S.bk) bkStart(); S.bk.newCard = bc.dataset.bkcard === 'new'; render(); return; }
-
   const bn = t.closest('[data-bknext]');
   if(bn){
     if(!S.bk || S.booking) return;
-    const a = AGENTS[S.bk.agent] || bkAgent();
-    bkTurn(bkLong(S.bk),
-      `Held for ten minutes. ${a.price} for the interview, charged once &mdash; and it comes off the course fee if you enroll afterwards.`
-      + bkHost('pay'));
-    return;
-  }
-
-  const bp = t.closest('[data-bkpay]');
-  if(bp){
-    if(!S.bk || S.booking) return;
-    bkPaid();
+    bkBooked();
     return;
   }
 
@@ -12568,22 +14230,17 @@ device.addEventListener('click', e => {
 });
 
 const BK_PRE = ['nil','signup','consult','new'];
-function bkPaid(){
-  const a = AGENTS[S.bk.agent] || bkAgent();
+function bkBooked(){
   const saved = (S.cards || []).find(c => c.def) || (S.cards || [])[0]
              || {brand:'Visa', last:'4242'};
-  let card = {brand:saved.brand, last:saved.last};
-  if(S.bk.newCard){
-    const dig = (((device.querySelector('#bkcn') || {}).value) || '').replace(/\D/g,'');
-    if(dig.length >= 4) card = {brand: brandOf(dig) || 'Visa', last: dig.slice(-4)};
-  }
-  S.booking = {agent:S.bk.agent, day:S.bk.day, slot:S.bk.slot, card};
+  S.booking = {agent:S.bk.agent, day:S.bk.day, slot:S.bk.slot,
+               card:{brand:saved.brand, last:saved.last}};
   if(BK_PRE.includes(S.stage)) S.stage = 'booked';
   S.askFrom = 'dashboard';
   S.view = 'dashboard';
   S.hist = [];
-  bkTurn(`Pay ${a.price}`,
-    `Booked. ${a.n}, ${bkLong()}, 45 minutes and recorded. The calendar invite and the joining link are already in your email, and nothing is expected of you before the day.`
+  bkTurn(bkLong(),
+    `Done &mdash; your interview is booked.`
     + bkFrozen(bkDone()));
 }
 
@@ -12660,12 +14317,12 @@ function bkStamp(){
 PAGESUM.dashboard.booked = () => {
   const a = AGENTS[(S.booking || {}).agent || 'priya'];
   const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `You are booked with ${a.n} for ${bkLong()} &mdash; 45 minutes, recorded, ${a.price} already paid on a ${c.brand} ending ${c.last}. ${a.n.split(' ')[0]} has run ${a.ivs} interviews, assesses ${a.range} and rates ${a.r.toFixed(1)}. Nothing else is outstanding between now and then; your level and your report both come out of that conversation, within 48 hours of it.`;
+  return `You&rsquo;re booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded, ${a.price} already paid on a ${c.brand} ending ${c.last} &mdash; nothing to do before the day.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
   const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `Booked. ${a.n}, ${bkLong()}, 45 minutes, recorded, ${a.price} paid on a ${c.brand} ending ${c.last}. The calendar invite and the joining link are already in your email. Nothing is expected of you before the day &mdash; and if it stops working, rescheduling and cancelling are both on this page rather than in an email thread.`;
+  return `Booked &mdash; ${a.n}, ${bkLong()}, ${a.price} on a ${c.brand} ending ${c.last}. The invite and joining link are already in your email, and you can move it from here.`;
 };
 
 const _bkSum = pageSummary;

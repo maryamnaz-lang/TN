@@ -136,11 +136,17 @@ V.leadSessions = () => {
     `<button class="btn btn-g" data-go="leadProfile">Your availability ${I.calendar}</button>`)}
   ${next ? `
   <div class="sec">
-    <div class="plate">
+    <div class="plate" data-when="${next.when.toLowerCase()}">
       <div class="plate-who">${avatar({i:next.i, img:AV[next.img]},56)}
         <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; ${next.re ? 'ninety days behind them' : 'no level yet'}</span></span>
       </div>
-      <div class="plate-eb">Next up &middot; ${next.when.toLowerCase()}</div>
+      ${''/* NO EYEBROW. A card starts at its heading — "Next up" is a
+            category over a set of one, and this is the only appointment on
+            the page. The time it carried moves to `data-when`, which is
+            where the leader dashboard's own copy of this plate already puts
+            it: `placePlates` in ai5 reads the attribute, draws the chip in
+            the opposite corner, and finding no label seats the TITLE in the
+            head row beside it. Same card, one row shorter. */}
       <div class="plate-t">${next.re ? 'Re-interview' : 'Level interview'}</div>
       <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the rung afterwards'}</div>
       <div class="plate-a">
@@ -210,9 +216,13 @@ V.leadSessions = () => {
    answer different questions: a level decision shows the rung being proposed,
    a summary shows the record it is drawn from.
 
-   THIS PAGE SPENDS THE `.ai-aura` CARD. Tal has proposed a rung and the whole
-   page exists to accept or overturn it, so the proposal and its reasoning
-   belong at the top in Tal's own surface rather than in a row's sub-line.
+   NEITHER PAGE DRAWS A TAL CARD, and the long note above `ldrRead` in lead2.js
+   is why: `talFirst` hoists one, `placeBand` claims it, ai6 strips its action
+   and overwrites its words with `PAGESUM`. Tal's proposal is therefore a
+   `PAGESUM.leadEvals` / `PAGESUM.leadEval` entry — the band at the top of each
+   page — and the ROUTE the card would have offered is on the page instead,
+   which is the condition ai6's own note sets for removing it: every pending
+   decision is a row you press.
    ========================================================================== */
 V.leadEvals = () => {
   const pe = LEAD_EVALS.filter(e => e.status === 'pending');
@@ -224,21 +234,6 @@ V.leadEvals = () => {
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
   ${ph('Evaluations','The level decisions and the ninety-day summaries waiting on your signature.')}
-  ${e0 ? `
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>I have proposed Explorer &ndash; ${e0.ai} for ${e0.name}</h3></div>
-      <div class="ai-body"><p>${e0.why}</p></div>
-      <div class="ai-foot noline">
-        <button class="btn btn-p btn-sm ic-l ai-do" data-ldrev="${e0.id}" data-go="leadEval">${I.arrowRight}Read it and decide</button>
-        <span class="sp">${ldrConf(LDR_AN[e0.id] ? LDR_AN[e0.id].conf : 'Medium')}</span>
-      </div>
-      <div class="ai-asks">
-        ${askChip('Why did you propose ' + e0.ai + ' for ' + e0.name + '?','Why this rung?')}
-        ${askChip('What evidence supports this rung?','What is the evidence?')}
-      </div>
-    </div>
-  </div>` : ''}
   <div class="sec">
     <div class="stats">
       ${statCell(I.edit, 'Level decisions', pe.length, pe.length ? 'nobody can enroll until signed' : 'all signed')}
@@ -324,15 +319,13 @@ V.leadEval = () => {
   return `<main class="main"><div class="page">
   ${crumb(['Evaluations','leadEvals'], e.name)}
   ${ph(`Level decision &middot; ${e.name}`, `Interviewed ${e.when.toLowerCase()} &middot; 45 minutes, recorded &middot; ${signed ? 'signed Explorer &ndash; ' + e.assigned : 'waiting on your signature'}`)}
-  <div class="sec">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>I read the transcript and propose Explorer &ndash; ${e.ai}</h3></div>
-      <div class="ai-body"><p>${an ? an.sum : e.why}</p></div>
-      <div class="ai-foot noline">
-        <span class="sp">${ldrConf(an ? an.conf : 'Medium')}</span>
-      </div>
-    </div>
-  </div>
+  ${/* Tal's reading of the interview is the band at the top of this page —
+        `PAGESUM.leadEval` — for the reason lead2.js records above `ldrRead`.
+        What stays on the page is the EVIDENCE for it, which is the part a
+        leader argues with: the quiz reading, the four competencies, the two
+        quoted moments, and how confident Tal is about the blend. The
+        confidence rides the competency heading rather than a card of its own,
+        because it is a statement about those four readings. */''}
   <div class="sec">
     <div class="facts">
       <div><span class="l">Quiz</span><span class="v">${e.quiz} of 100</span></div>
@@ -350,14 +343,14 @@ V.leadEval = () => {
     <div class="note"><span>${I.info}</span><div class="nb"><b>How the quiz reads</b>${an.quiz}</div></div>
   </div>
   <div class="sec tint">
-    <div class="sec-h"><h2>Competency read</h2><span class="t-helper-01">Four readings, blended into one rung</span></div>
+    <div class="sec-h"><h2>Competency read</h2>${ldrConf(an.conf)}</div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl">
         <tr><th>Competency</th><th>Reads at</th><th>What I heard</th></tr>
         ${an.comps.map(([n,r,read]) => `<tr>
-          <td><b>${n}</b></td>
+          <td>${n}</td>
           <td><span class="tag ${r === e.ai ? 'brand' : +r[1] > +e.ai[1] ? 'green' : 'org'} sm">${r}</span></td>
-          <td>${read}</td>
+          <td class="ldr-prose">${read}</td>
         </tr>`).join('')}
       </table>
     </div>

@@ -51,7 +51,35 @@ css = '\n'.join((here / f).read_text() for f in
                  # that is §27's cap, so it too can only be answered from
                  # later. Everything else is `.bkw` / `.bk-*`, which nothing
                  # earlier mentions.
-                 '35-book.css'])
+                 '35-book.css',
+                 # The Cohort Leader's other seven modules — Cohorts, one
+                 # cohort, one candidate, Course Reports, Sessions,
+                 # Evaluations, one decision, one summary, Messages,
+                 # Certifications and the leader's own profile. Last for §31's
+                 # reason and only that one: every rule in it is either a new
+                 # `.ldr-*` class no earlier layer mentions, or a correction
+                 # to a shared component (`.tq`, `.cardrow`, `.steps`) that
+                 # has to land after that component's own layer to be a
+                 # correction at all. It does not compete with §35 — nothing
+                 # in either file names a selector the other does.
+                 #
+                 # ELEVEN VIEWS AND NO ADDITIONS TO §10.15's OPT-OUT LIST,
+                 # which is the test of whether a pass reused the design
+                 # system or forked it: every section on those pages is built
+                 # from `.stats`, `.facts`, `.tbl-wrap`, `.tile-stack`,
+                 # `.cardrow` or `.gcard`, so the desktop label column comes
+                 # out right without being argued with from inside a container
+                 # query.
+                 '36-lead2.css',
+                 # Three corrections that can only be corrections from the
+                 # end of the list: the card rail's own closing rule (§26
+                 # takes the rule ABOVE the rail off and never gave it one
+                 # below), Tal's chip without its fill (§12 states the fill
+                 # and the sheen, §19 restates both — a variant has to be
+                 # later than the later of the two), and the week card's
+                 # promoted chapter button, which is a class no earlier layer
+                 # mentions. Nothing in it competes with §35 or §36.
+                 '37-refit.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -203,6 +231,19 @@ print(f'award artwork embedded: {len(AWARDS)} marks, {len(award_js)/1024:.0f} KB
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
 js = award_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+                                                        # The leader's seven module pages, plus the four pages under
+                                                        # them. After lead.js because they read its data
+                                                        # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)
+                                                        # and because each one REPLACES a `LEAD_SOON` stub that file
+                                                        # assigns into `V` — the later assignment is the whole
+                                                        # mechanism, so being after it is load-bearing. Before ai6
+                                                        # so the note above it stays true: it has to see these views
+                                                        # to summarise them.
+                                                        #
+                                                        # Order among the three is not load-bearing except in one
+                                                        # place: lead4 pushes onto lead2's `LDR_SHEETS` registry, so
+                                                        # it cannot be parsed first.
+                                                        'lead2.js', 'lead3.js', 'lead4.js',
                                                         # LAST, and that is load-bearing twice: `placeBand` (ai5)
                                                         # has to have assembled the head band before this pass can
                                                         # find it, and `enhanceTalCards` (views.js) has to have
@@ -217,7 +258,7 @@ js = award_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js'
                                                         # the chain — which means being parsed last. And it REPLACES
                                                         # two of ai6's page summaries and wraps `pageSummary` itself,
                                                         # so ai6 has to have declared them before this can.
-                                                        # It reads `AGENTS`, `S.cards`, `BMK` and `brandOf` from
+                                                        # It reads `AGENTS`, `S.cards` and `BMK` from
                                                         # data.js and views.js, and reassigns `talReset` — all of
                                                         # them function declarations or consts that have long since
                                                         # run by the time this file is parsed.

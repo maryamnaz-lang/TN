@@ -1,0 +1,279 @@
+/* ==========================================================================
+   §36. THE COHORT LEADER'S OTHER SEVEN PAGES
+
+   lead2.js, lead3.js and lead4.js draw Cohorts, one cohort, one candidate,
+   Course Reports, Sessions, Evaluations, one decision, one summary, Messages,
+   Certifications and the leader's own profile — eleven views, and this is all
+   the CSS they need. That is the point of it: every section on those pages is
+   built out of a component §01–§34 already draws, and the only rules here are
+   for the four things that genuinely had no drawing.
+
+   WHY IT IS LAST, AND WHY THAT IS NOT AN ARGUMENT.
+   Same reasoning §31 records for itself: everything below is either a new
+   class no earlier layer mentions (`.ldr-*`) or a correction that has to land
+   after the component it corrects to be a correction at all. Nothing here is
+   competing with an earlier layer for the same selector.
+
+   THE ONE THING TO KNOW BEFORE ADDING TO THIS FILE.
+   §10.15 opts sections out of the desktop label column BY CONTENTS —
+   `.sec:has(.gcard)`, `:has(.cardrow)`, `:has(> .tile-stack)`, `:has(> .stats)`,
+   `:has(> .tbl-wrap)`, `:has(> .facts)` — and that list is inside a container
+   query, which per §25's trap outranks an unconditional rule of equal weight
+   however late its layer. So a new page must be assembled from THOSE
+   components: invent a wrapper and its heading keeps a 184px label column
+   that cannot be corrected from here. Eleven views and no additions to that
+   list is the measure of whether this pass reused the design system or
+   quietly forked it.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   §36.1 THE SHEET HOST
+
+   One host element for every leader-side sheet, appended to `.app` by
+   `placeLdrSheets`. `display:contents` so the box itself is not in the layout
+   at all: `.modal` is `position:absolute;inset:0` and takes its containing
+   block from the nearest positioned ancestor either way, but a static div
+   sitting in `.app`'s flow is one more thing that can be given a height by
+   accident.
+   -------------------------------------------------------------------------- */
+.app .ldr-sheets{display:contents}
+
+/* A heading inside a sheet body. `.sheet-b` holds `.f` fields and `.kv` rows
+   and had never had to caption a list before the brief's attention list. It
+   takes the `.sec-h h2` treatment one step down, because a sheet is a smaller
+   surface than a page and a page-sized heading in it reads as a second title
+   competing with the one in `.sheet-h`. */
+.app .ldr-sh{
+  margin:var(--s06) 0 var(--s04);
+  font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px;
+  color:var(--text-primary)}
+
+/* --------------------------------------------------------------------------
+   §36.2 A TABLE ROW THAT OPENS SOMETHING
+
+   Four of these pages end a row in a chevron rather than a button, which is
+   the rule this product already follows everywhere else a row opens a page:
+   `.gcard` takes `.tile-arrow`, the chapter list takes one, the settings rows
+   take one. lead.js records the argument in full above `faceRow` — a 60px
+   verb on a 700px row that is otherwise dead, and a label that promises the
+   work happens here when it happens on the page it opens.
+
+   `td:last-child` IS ALREADY RIGHT-ALIGNED with no right padding (§02), so
+   the cell needs nothing but the mark's size and colour and a width that
+   stops the chevron column stealing space from the data. `vertical-align`
+   is stated because §02 gives every `td` `top` and a chevron aligned to the
+   top of a two-line cell points at nothing.
+   -------------------------------------------------------------------------- */
+.app .ldr-tr{cursor:pointer}
+.app .ldr-tr .ldr-go{width:24px;vertical-align:middle}
+.app .ldr-tr .ldr-go svg{
+  width:18px;height:18px;display:inline-block;fill:var(--icon-secondary)}
+
+/* The keyboard gets the same affordance as the mouse. A `tr` cannot be a
+   `button`, so it carries `role` and `tabindex` in the markup and its focus
+   ring has to be drawn here — `:focus-visible` on a table row has no default
+   outline worth keeping in this product's palette. */
+.app .ldr-tr:focus-visible{
+  outline:2px solid var(--accent);outline-offset:-2px}
+
+/* --------------------------------------------------------------------------
+   §36.3 SEVERITY, ON THE TABLES THIS PASS ADDS
+
+   §31 states this treatment for `.tbl-flag`, the dashboard's attention queue.
+   The roster and the course-report list want exactly the same reading, and
+   they are not that table: `.tbl-flag` is also what `leadFilterApply()` finds
+   and filters, so borrowing the class would hand another file's search box a
+   table it knows nothing about. Four rules restated against `.ldr-tbl` is
+   cheaper than that coupling, and the values are the same ones §31 tuned.
+
+   THE NAME STAYS BLACK, which is §31's rule and worth repeating because it is
+   the one that is tempting to break: a person is not severe, their progress
+   is, and a column of red names turns a roster into a list of people in
+   trouble.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .ldr-tbl .flag-t{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  font-weight:600;letter-spacing:.1px;white-space:nowrap}
+.app[data-portal="leader"] .ldr-tbl .flag-t svg{
+  width:16px;height:16px;flex:none;fill:currentColor}
+.app[data-portal="leader"] .ldr-tbl tr.sev .flag-t{color:var(--danger-ink)}
+.app[data-portal="leader"] .ldr-tbl tr.mod .flag-t{color:var(--support-attention)}
+
+/* A cell of two figures — "46% of 38%" — is one reading, so the helper half
+   must not wrap onto its own line and make it look like two. */
+.app[data-portal="leader"] .ldr-tbl td.num .t-helper-01{white-space:nowrap}
+
+/* --------------------------------------------------------------------------
+   §36.4 A QUOTED MOMENT, MARKED AS A STRENGTH OR A CONCERN
+
+   The evidence on a level decision is lines from the transcript, so it is
+   drawn by `.tq` — the component the candidate's own transcript page uses,
+   timestamp column and all. What `.tq` has no drawing for is the READING of a
+   line, which is the whole reason it is quoted here: one moment is why the
+   rung is not lower and the other is why it is not higher.
+
+   It goes in the `.tq-w` slot beside the speaker, which already holds exactly
+   this kind of mark — `.tq-scene` is an icon and a word in `--support-attention`
+   — so these two are that same shape in the two inks §12 tuned for a verdict.
+   Nothing else about the line changes: same grid, same quote, same measure.
+   -------------------------------------------------------------------------- */
+.app .ldr-pos,.app .ldr-neg{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  letter-spacing:.6px}
+.app .ldr-pos svg,.app .ldr-neg svg{
+  width:13px;height:13px;display:block;fill:currentColor}
+.app .ldr-pos{color:var(--support-success)}
+.app .ldr-neg{color:var(--support-attention)}
+
+/* The reading under the quote is a second `.tq-x`, and two of them stacked
+   need the gap `.tq-b` gives its children to open up a little — otherwise the
+   note reads as the next sentence of the quotation rather than as a comment
+   on it. */
+.app .tq-x + .tq-x{margin-top:var(--s03)}
+
+/* --------------------------------------------------------------------------
+   §36.5 THREE PICKERS MADE OF BUTTONS
+
+   A rung, a recommendation and a cohort board are all "choose one of a few",
+   and none of them is a tab strip: `.cs` is full-bleed chrome that changes
+   what is rendered, and these change a value inside a form or a panel. So
+   they are `.btn`s in a `.btn-set`, with the chosen one taking `.btn-p` — the
+   same way the wireframe drew its level picker and the same way every toggle
+   in this product looks.
+
+   `.btn-set` is a flex row and these have to WRAP: five rungs fit on one line
+   at 900px and not at 360px, and four recommendations do not fit on one line
+   anywhere. Wrapping is all these three rules do.
+   -------------------------------------------------------------------------- */
+.app .ldr-rungs,.app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
+/* a rung is one character, so the button should not be as wide as a word */
+.app .ldr-rungs .btn{min-width:64px;justify-content:center}
+
+/* the count on a board picker: the same treatment §31 gives `.lf-n` on the
+   dashboard's filter chips, which is where a count-inside-a-control was first
+   drawn in this portal. */
+.app .ldr-n{
+  margin-left:var(--s03);
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}
+.app .btn-p .ldr-n{color:inherit;opacity:.75}
+
+/* --------------------------------------------------------------------------
+   §36.6 THE THREAD YOU ARE READING
+
+   The direct-messages list shows which of the three threads is open below it.
+   THE WEIGHT IS IN THE BACKGROUND, NOT IN `opacity` — trap 2: §13 runs the
+   entrance animations at `fill-mode:both`, so a played animation's final
+   keyframe keeps applying and a resting state described with `opacity` is a
+   state the animation can overwrite. `color-mix` against the accent gives a
+   tint that reads as "this one" at both themes without touching the row's
+   own colours.
+   -------------------------------------------------------------------------- */
+.app .ldr-on{
+  background-color:color-mix(in srgb, var(--accent) 8%, transparent)}
+.app .ldr-on .tile-arrow{fill:var(--accent)}
+
+/* --------------------------------------------------------------------------
+   §36.7 A NOTE, AND THE ONE CONTROL THAT DELETES SOMETHING
+
+   A private note is a `.cardrow`, so it already has the plate, the two lines
+   and the action slot. Two corrections.
+
+   ONE, THE NOTE IS PROSE AND `.cardrow-t` IS A TITLE. §02 gives it 15px/20px
+   at 600 and clamps nothing, which is right for "Cohort 41 · week 5" and
+   wrong for three sentences about a candidate — a paragraph at title weight
+   is the loudest thing on the page. It steps down to the body size and
+   regular weight, and the timestamp underneath keeps `.cardrow-d`.
+
+   TWO, THE DELETE IS THE SMALL DESTRUCTIVE CONTROL, so it is quiet until it
+   is wanted: an `.ic` button at the row's end, the mark in
+   `--icon-secondary`, going red on focus rather than announcing itself in red
+   from the start. There is no hover state to lean on — the build disarms
+   hover on everything not in `HOVER_KEEP` — so focus is the only interactive
+   state this control can have, and it has to be visible.
+   -------------------------------------------------------------------------- */
+.app .ldr-note .cardrow-t{
+  font-size:13.5px;line-height:20px;font-weight:400;letter-spacing:.1px;
+  white-space:normal}
+.app .ldr-note .cardrow-d{margin-top:var(--s03)}
+.app .ldr-note-x{
+  width:36px;height:36px;display:grid;place-items:center;flex:none;
+  border-radius:var(--radius-sm)}
+.app .ldr-note-x svg{width:18px;height:18px;fill:var(--icon-secondary)}
+.app .ldr-note-x:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.app .ldr-note-x:focus-visible svg{fill:var(--danger-ink)}
+
+/* --------------------------------------------------------------------------
+   §36.8 THE STEPS LIST TAKES A TICK
+
+   Certifications lists what the next one takes, and two of the three are
+   done. `.steps` numbers its items with `.s-n` — a circled figure — and a
+   requirement that is finished should say so rather than keep its number.
+   The slot takes an icon instead, and the icon needs the size and the ink;
+   everything else about the row is `.steps`.
+   -------------------------------------------------------------------------- */
+.app .steps .s-n svg{
+  width:18px;height:18px;display:block;fill:var(--support-success)}
+
+/* --------------------------------------------------------------------------
+   §36.9 TWO MORE WRAPPERS JOIN §10.15's OPT-OUT LIST
+
+   §10.15 hands a section with a `.sec-h` a 184px label column at desktop, and
+   opts out the wrappers whose contents need the full width — `.tile-stack`,
+   `.stats`, `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard`. Two wrappers this
+   pass uses were never in a section with a heading before, so they were never
+   on that list:
+
+     `.msgs`      the message column, on Messages. It sets its own left gutter
+                  for the avatars, and inside 184px less it collided with the
+                  heading and pushed every bubble right.
+     `.ivt-lines` the transcript rows, on a level decision. Same story: the
+                  component bleeds to the page edge by negative margin, so
+                  taking 184px off its start indented the quotes past their own
+                  timestamps.
+
+   RESTATED INSIDE THE SAME CONTAINER QUERY, NOT AFTER IT. §10.15's block is
+   inside `@container app (min-width:900px)`, and per §25's trap a rule inside
+   a container query beats an unconditional rule of equal weight whatever its
+   layer number. So this cannot be fixed from the top level of a later file —
+   it has to be the same query, which is what this is. `.app` on the front also
+   gives it the specificity to win outright rather than by document order.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .msgs),.app .sec:has(> .ivt-lines){display:block}
+  .app .sec:has(> .msgs) > .sec-h,
+  .app .sec:has(> .ivt-lines) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}
+
+/* --------------------------------------------------------------------------
+   §36.10 A COUNT INSIDE A TAB
+
+   §31 draws `.lf-n` for the dashboard's own filter chips and scopes it to
+   `.lead-tabs` / `.lead-filter`. Messages and Course Reports both put a count
+   in a plain `.cs` tab, where it inherited nothing and printed hard against
+   the label: "Cohort boards3".
+
+   Same treatment, on any `.cs` — a count in a tab is a count in a tab, and
+   scoping this to the two new pages would be the third copy of one rule.
+   -------------------------------------------------------------------------- */
+.app .cs button > .lf-n{
+  margin-left:var(--s03);
+  font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}
+.app .cs button.on > .lf-n{color:inherit;opacity:.7}
+
+/* --------------------------------------------------------------------------
+   §36.11 A TABLE CELL THAT IS A SENTENCE
+
+   §02 right-aligns the last cell of every `.tbl` row, which is right when it
+   holds a figure or a control and wrong when it holds prose — the competency
+   table's "what I heard" is a clause per row, and ragged-left prose in the
+   widest column of the table is the hardest thing on the page to read.
+
+   The class goes on the cell rather than on the table, because the same table
+   also ends rows in a chevron, which §36.2 wants right-aligned. Naming the
+   prose is the only way to tell those two apart.
+   -------------------------------------------------------------------------- */
+.app .tbl td.ldr-prose{text-align:left}

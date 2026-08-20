@@ -95,6 +95,32 @@
     grid-template-columns:minmax(0,1fr) auto;align-items:baseline}
 }
 
+/* AND IN A THREE-ACROSS RAIL, WHICH IS THE PHONE'S PROBLEM AT A DESKTOP WIDTH.
+   The overhang above is paid for by a card the width of the column. §14 and
+   §15 turn the rail into three equal columns at 900px, and a third of a column
+   is about 265px — inside the card's own padding the identity row is roughly
+   130px wide, which is not enough for a 24px fee to overhang a 15px name. It
+   landed on the name's last letter: "Lena Fischer$80", "Owen Clarke$85".
+
+   Same escape hatch, stated for the same reason a second time, and keyed on
+   `.rail` so it reaches only the three-across case — the full-width list rows
+   still have a whole card for the fee to overhang and keep the overhang. In
+   flow the fee also drops to 17px, which is §24's size for it: 24px beside a
+   15px name on a shared line is the number shouting over the person.
+
+   This is the shortlist everywhere it appears — the `new` dashboard, the
+   agents page, and Tal's own booking flow (`ai7.js`), which borrows `.rail`
+   precisely so that it inherits decisions like this one instead of copying
+   them. */
+@container app (min-width:900px){
+  .app .rail .agh-book .agh-n{
+    display:grid;grid-template-columns:minmax(0,1fr) auto;
+    align-items:baseline;column-gap:var(--s04)}
+  .app .rail .agh-book .agh-n .ag-price{
+    position:static;grid-column:2;grid-row:1;justify-self:end;
+    font-size:17px;line-height:23px;letter-spacing:-.2px}
+}
+
 /* --------------------------------------------------------------------- 4 ---
    A CARD GROUP DOES NOT TOUCH WHAT IS ABOVE OR BELOW IT
    The three cards are one bordered block, and it was sitting flush against

@@ -456,12 +456,32 @@
    The date chip is `.day` — the same chip the candidate's slot picker uses —
    so the leader's diary and the candidate's booking flow draw a date the same
    way. It is not a control here, so it loses the pointer and keeps the box.
+
+   ONE WIDTH, NOT A MINIMUM. This was `min-width:82px`, which is a floor and not
+   a size: "TODAY" sat at the floor, "TOMORROW" pushed past it to about 94px,
+   and every row therefore started its face and its title at a different x. A
+   diary is read down the date column, so the column has to have an edge —
+   `width` fixed at the widest label the set can hold, with `flex:none` (already
+   on `.day`) so it neither grows into the row nor shrinks under a long title,
+   and `nowrap` so a two-word day cannot wrap inside the fixed box instead.
+   104px is "TOMORROW" at 11px/.7px tracking plus the chip's two 12px gutters.
    -------------------------------------------------------------------------- */
 .app[data-portal="leader"] .bk-day{
-  align-self:flex-start;min-width:82px;cursor:default;
-  border-color:var(--rule-on-2)}
+  align-self:flex-start;width:104px;min-width:0;cursor:default;
+  white-space:nowrap;border-color:var(--rule-on-2)}
 .app[data-portal="leader"] .bk-day .n{font-size:15px;line-height:21px}
 .app[data-portal="leader"] .bk-row{gap:var(--s05)}
+/* THE ROW IS THE TARGET. `bookedRow` renders a <button>, so the arrow at the
+   end is a glyph and not a control — it inherits `.cardrow:hover .tile-arrow`
+   from §12 with nothing added. What is needed is the button reset the element
+   selector in §01 does not carry through a class-styled row — the appearance,
+   the width and the left-aligned text — and an arrow centred on the row rather
+   than on the flex line, which `align-items:center` would already give it but
+   the chip's `align-self:flex-start` makes worth saying out loud. */
+.app[data-portal="leader"] button.bk-row{
+  -webkit-appearance:none;appearance:none;width:100%;
+  font:inherit;color:inherit;text-align:left}
+.app[data-portal="leader"] .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
 .app[data-portal="leader"] .bk-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
@@ -474,5 +494,7 @@
      thing you scan a diary for, and the face is a nicety next to it */
   .app[data-portal="leader"] .bk-row > .mem-av,
   .app[data-portal="leader"] .bk-row > .cardrow-ic{display:none}
-  .app[data-portal="leader"] .bk-day{min-width:74px}
+  /* the chip keeps its 104px here too. This used to narrow to 74px, which the
+     longest label never fit, so the phone was where the ragged column was
+     worst — and with the mark dropped there is room for the full box. */
 }
