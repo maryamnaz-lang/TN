@@ -79,7 +79,16 @@ css = '\n'.join((here / f).read_text() for f in
                  # later than the later of the two), and the week card's
                  # promoted chapter button, which is a class no earlier layer
                  # mentions. Nothing in it competes with §35 or §36.
-                 '37-refit.css'])
+                 '37-refit.css',
+                 # THE SCENES. A new component and the only layer in the file
+                 # that patches nothing at all: every selector in it is
+                 # `.scene*`, a prefix no earlier layer mentions, so it could
+                 # sit anywhere and is put last because that is where a new
+                 # thing goes. It DOES reach into two shared components — the
+                 # interview row's kit strip and `.ivlist`'s label column —
+                 # and both of those have to be later than §10.15 and §15 to
+                 # be corrections, which the end of the list gives for free.
+                 '38-scene.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

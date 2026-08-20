@@ -126,7 +126,6 @@
 .app .sec:has(> .pointsList)::after,
 .app .sec:has(> .badgeList)::after,
 .app .sec:has(> .rankList)::after,
-.app .sec:has(> .msgs)::after,
 /* the rule under the block ABOVE a filled one is that block's top edge */
 .app .sec:has(+ .sec.tint)::after,
 .app .sec:has(+ .sec.warm)::after,

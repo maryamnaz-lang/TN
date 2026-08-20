@@ -575,15 +575,24 @@
    rather than a value. The chrome is shared; what each field carries is not.
    Messages keeps its attachment and its microphone, the cohort room keeps
    the attachment, the transcript keeps neither.
+
+   THREE SURFACES ARE NAMED HERE AND THE THIRD IS THE LEADER'S. `.ldr-dm-thread`
+   is the conversation column of the leader's Direct inbox (§36.17), and it is
+   the candidate's Messages page rebuilt out of these same components — so it
+   is named on the field's own rule rather than restated in the leader layer.
+   Two statements of one field is how the two halves of one conversation start
+   to look like two products.
    ========================================================================== */
 /* the message field is not an ask: it takes the page's own hairline on all
    four sides, the same rule that closes the thread above it. The accent
    border is reserved for the one field that puts a question to the record. */
-.app .msg-page .composer,.app .composer.room-composer{
+.app .msg-page .composer,.app .composer.room-composer,
+.app .ldr-dm-thread > .composer{
   display:flex;align-items:center;gap:0;
   border:1px solid var(--rule);background-color:var(--background);
   padding:0}
-.app .msg-page .composer .inp,.app .composer.room-composer .inp{
+.app .msg-page .composer .inp,.app .composer.room-composer .inp,
+.app .ldr-dm-thread > .composer .inp{
   flex:1;min-width:0;min-height:48px;
   border:0;background:transparent;
   padding-left:var(--s05);padding-right:var(--s05)}

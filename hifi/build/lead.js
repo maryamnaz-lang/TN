@@ -157,12 +157,12 @@ const LEAD_SESSIONS = [
 ];
 
 /* A LEVEL DECISION IS THE LEADER'S SIGNATURE, NOT THE MODEL'S. Tal reads the
-   transcript and proposes a rung with its reasoning; the rung is not set until
+   transcript and proposes a level with its reasoning; the level is not set until
    a person signs it. `ai` is the proposal and `status` is whether anybody has
    agreed yet — the wireframe kept those two facts apart and so does this. */
 const LEAD_EVALS = [
   {id:'e1', name:'Thomas Beck',   i:'TB', img:'samuel', when:'Today 10:00 AM',    quiz:64, ai:'E1', status:'pending',
-   why:'The quiz put them in the Explorer band and the interview places them at the entry rung. Clear intent and good scoping, but they described keeping work rather than handing it over — twice.'},
+   why:'The quiz put them in the Explorer band and the interview places them at the entry level. Clear intent and good scoping, but they described keeping work rather than handing it over — twice.'},
   {id:'e2', name:'Rachel Okonjo', i:'RO', img:'lena',   when:'Yesterday 3:30 PM', quiz:71, ai:'E3', status:'pending',
    why:'Top of the Explorer band. Reframed an under-specified brief into three testable options unprompted; a weak conflict-repair answer is what holds this at 3 rather than 4.'}
 ];
@@ -200,7 +200,7 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
     t:(s.re ? 'Re-interview' : 'Level interview') + ' &middot; ' + s.name,
     d:s.mins + ' minutes, recorded &middot; ' + (s.re
         ? 'they have ninety days behind them, so you read the summary first'
-        : 'you sign the rung afterwards'),
+        : 'you sign the level afterwards'),
     go:'leadSessions'
   })).concat(LEAD_COHORTS.map(c => ({
     kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
@@ -264,7 +264,7 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
   ctx: {
     leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','Summarise the two evaluations waiting'],
     leadSessions: ['What should I ask Femi Adebayo?','Who is booked this week?'],
-    leadEvals: ['Why did you propose E1 for Thomas?','What evidence supports this rung?'],
+    leadEvals: ['Why did you propose E1 for Thomas?','What evidence supports this level?'],
     leadCohorts: ['Where is Cohort 41 stuck?','Which cohort needs me most?'],
     leadReports: ['Who has stopped in the last week?','Which chapter is losing people?'],
     leadMessages: ['Draft a check-in to Yuki Tanaka','What came up on the board this week?'],
@@ -323,8 +323,12 @@ function bookedRow(b){
   const mark = b.kind === 'iv'
     ? `<span class="mem-av mem-ph">${avatar({i:b.i, img:AV[b.img]}, 36)}</span>`
     : `<span class="cardrow-ic">${I.group}</span>`;
+  /* `bk-now` is the whole of "this one is today": §31.5 gives its label full
+     ink and leaves every other day in helper grey. A date column read down
+     needs one mark saying where NOW is, and a weight is the cheapest one. */
+  const now = /^today$/i.test(b.day) ? ' bk-now' : '';
   return `<button class="cardrow bk-row" data-go="${b.go}">
-    <span class="day bk-day"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
+    <span class="day bk-day${now}"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
     ${mark}
     <span class="cardrow-b">
       <span class="cardrow-t">${b.t}</span>
@@ -437,7 +441,12 @@ V.leadDash = () => {
        a:'leadCohorts', ab:'Open Cohort 41'};
 
   return `<main class="main"><div class="page">
-  ${ph('Hi Priya','Your cohorts, the decisions waiting on you, and who has stopped moving.')}
+  ${/* THE SAME GREETING THE CANDIDATE GETS. The candidate's dashboard opens
+        "Welcome Back, Maryam!" and this one opened "Hi Priya" — two different
+        greetings for the same moment, in a product where the two portals are
+        the same person's two roles and the switch between them is one click in
+        the app bar. Whichever wording wins, it has to be one wording. */''}
+  ${ph('Welcome Back, Priya!','Your cohorts, the decisions waiting on you, and who has stopped moving.')}
   <div class="sec">
     <div class="ai-aura tile">
       <div class="ai-head">${talLabel()}<h3>${talRead.h}</h3></div>
@@ -476,7 +485,7 @@ V.leadDash = () => {
             consultant call plates take, and the note in ai5.js is where it is
             written down. */''}
       <div class="plate-t">Level interview</div>
-      <div class="plate-b">${next.mins} minutes, recorded &middot; you sign the rung afterwards</div>
+      <div class="plate-b">${next.mins} minutes, recorded &middot; you sign the level afterwards</div>
       <div class="plate-a">
         <button class="btn btn-p btn-sm noic">Join the interview ${I.video}</button>
         <button class="btn btn-sm noic plate-b2" data-go="leadSessions">All sessions</button>
@@ -548,7 +557,7 @@ V.leadDash = () => {
       <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
       <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
       <div><span class="l">Completion rate</span><span class="v">84%</span></div>
-      <div><span class="l">Level movement</span><span class="v">+0.8 rungs</span></div>
+      <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
     </div>
     <div class="btn-set mt5">
       <button class="btn btn-g" data-go="leadProfile">Edit public profile ${I.arrowRight}</button>

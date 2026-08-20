@@ -241,13 +241,35 @@
 .app .chart-line svg{width:100%;height:100%}
 
 /* ==========================================================================
-   AT DESKTOP THE READING AND THE PICTURE SIT TOGETHER
-   On a phone the table is an alternative to the chart and you toggle between
-   them. A desktop row is wide enough to hold both, and they answer different
-   questions — the table gives you the number for a chapter, the chart gives
-   you the shape across chapters. Table on the left, plot on the right, and
-   the toggle that chose between them is no longer needed.
+   THE READING AND THE PICTURE SIT TOGETHER, AT EVERY WIDTH
+   §5 made the table an ALTERNATIVE to the chart on a phone: hidden, with a
+   "View as a table" button that swapped one for the other. This block used to
+   undo that at desktop only, on the argument that a desktop row is wide
+   enough to hold both and that they answer different questions — the table
+   gives you the number for a chapter, the chart gives you the shape across
+   chapters.
+
+   Both halves of that argument are about the QUESTIONS, not the width, and a
+   phone can hold both perfectly well stacked: the plot is 114px tall in a
+   phone column and the rows under it are the same rows. What the toggle
+   actually did was hide half the answer behind a control, and make a person
+   who wanted chapter 4's score press a button to stop seeing the shape.
+
+   So the display rules come out of the container query and apply everywhere,
+   and the toggle goes with them. What stays inside the query is only the
+   LAYOUT: side by side at desktop, stacked below it.
    ========================================================================== */
+.app .chart > .chart-table{display:block;margin-top:var(--s05)}
+.app .chart > .mt4:has(> [data-tbl]){display:none}
+/* the toggle is gone, so `.tbl` — the class it set — must not hide anything.
+   Stated at the same reach as §5's rules that hide these, so a `.chart.tbl`
+   left over from a click before this landed still draws the plot. */
+.app .chart.tbl > .chart-line,.app .chart.tbl > .sc-plot,
+.app .chart.tbl > .legend{display:block}
+.app .chart.tbl > .chart-plot{display:flex}
+.app .chart.tbl > .chart-x{display:flex}
+.app .chart.tbl > .chart-read{display:flex}
+
 @container app (min-width:900px){
   .app .chart{
     max-width:none;
@@ -355,7 +377,7 @@
 /* ==========================================================================
    THE LEVEL BLOCK IS A ROW
    The black band held four stacked things — when it was confirmed, the
-   level, the rung, and the fifteen-rung ladder — in a single column, so the
+   level, the level, and the fifteen-level ladder — in a single column, so the
    ladder sat a long way under the name it belongs to and the band grew to
    the height of a small page. At desktop width the two halves sit side by
    side: who you are on the left, where that is on the track on the right.
@@ -373,7 +395,7 @@
   .app .lvl-hero > .ladder-lab{grid-column:2;grid-row:3;align-self:start}
   .app .lvl-hero .ladder{height:40px}
 }
-/* the ladder reads as a scale rather than a row of tiles: the rungs behind
+/* the ladder reads as a scale rather than a row of tiles: the levels behind
    you are quiet, the one you are on is the only solid mark */
 .app .ladder i{background-color:var(--on-dark-fill)}
 .app .ladder i.done{background-color:var(--accent);opacity:.42}
@@ -458,15 +480,27 @@
 .app .ch-act.resume{color:var(--support-attention)}
 
 /* ==========================================================================
-   THE ASSESSMENT LINE IS GOLD
-   Two charts sit on the same page. The stacked bars are a green ramp because
-   they are four parts of one quantity; the assessment line is a single
-   series and takes gold, so at a glance you know which reading you are
-   looking at before you have read either title.
+   THE ASSESSMENT LINE TAKES THE DATA GREEN, NOT GOLD
+   It was gold on the argument that two charts sat on the same page — the
+   stacked bars in a green ramp for the four parts of one quantity, gold for
+   the single series, so a glance told you which reading you were looking at.
+   That page no longer exists: `stackChart` moved to the dashboard and Course
+   Progress draws ONE chart, so the distinction has nothing left to
+   distinguish and what remains is a colour the product uses nowhere else.
+   #a8791b against white is also the muddiest ink in the file — dark enough to
+   read as brown, warm enough to read as a dimmed accent.
+
+   §15.3's green ramp is this product's data colour and every other line chart
+   in it already uses `--dv-4`. The line takes `--dv-3` rather than `--dv-4`:
+   one step up the same ramp, because a 2px stroke and a 4px marker at
+   #1e5546 read as black at this size, and the point of a ramp is that the
+   series has a hue. The marked point keeps terracotta, which no control uses,
+   and the bar in each table row takes the same green so the reading beside
+   the plot and the plot itself are one series in one colour.
    ========================================================================== */
-.app .chart-line path{stroke:var(--dv-gold)}
-.app .chart-line circle{fill:var(--dv-gold)}
-.app .chart-line circle.on{fill:var(--dv-4)}
+.app .chart-line path{stroke:var(--dv-3)}
+.app .chart-line circle{fill:var(--dv-3)}
+.app .chart-line circle.on{fill:var(--dv-hi)}
 
 /* and the reading is set well clear of the picture */
 @container app (min-width:900px){
@@ -582,7 +616,7 @@
 /* ==========================================================================
    THE TRACK BAND IS TWO ROWS OF THREE
    The hero puts its identity on the left and its measure on the right, which
-   is right for the fifteen-rung ladder — one long horizontal thing. The
+   is right for the fifteen-level ladder — one long horizontal thing. The
    track band is not that: it is a 3x2 grid, three buckets over three facts,
    and it needs the whole width of the band. So a hero that holds one goes
    back to stacking, and the two grids run rule to rule beneath the name.
@@ -1455,9 +1489,16 @@
   align-items:center;gap:var(--s04);
   padding-top:var(--s03);padding-bottom:var(--s03)}
 .app .ct-bar{display:block;height:3px;background-color:var(--rule);min-width:32px}
+/* THE BAR IS THE LINE'S OWN COLOUR, NOT THE BRAND GRADIENT. It was
+   `--dv-grad-a → --dv-grad-b`, the accent-to-blue pair the Create Account
+   button wears, which made five readings of one series look like five
+   progress bars of five different things — and put the product's action
+   colour on a measurement. The bar and the plot are the same five numbers
+   read two ways (§15.9), so they are one flat hue: the ramp step the line
+   takes. */
 .app .ct-bar i{
   display:block;height:100%;width:var(--p,0%);
-  background:linear-gradient(90deg, var(--dv-grad-a), var(--dv-grad-b))}
+  background:var(--dv-3)}
 .app .ct-bars .kv .k{white-space:nowrap}
 .app .ct-bars .kv .v{text-align:right;font-variant-numeric:tabular-nums}
 
@@ -1651,15 +1692,26 @@
    text, and stacking a two-button row that fits is a phone pattern applied
    where the phone does not need it.
    -------------------------------------------------------------------------- */
+/* EVERY ONE OF THESE IS `.plate >`, AND THAT IS NOT TIDINESS.
+   These six numbers order the CARD's children. Written unqualified, `order:2`
+   also reached the title `placePlates` seats INSIDE the head row (ai5) — and
+   in that row the timer has no order at all, so 2 beat 0 and the two swapped:
+   the clock took the spine and "Level interview" was pushed to the right-hand
+   corner. It looked like a deliberate composition and it was a rule leaking
+   one level down. Desktop never showed it, because there the order list does
+   not exist and the row is `space-between` in DOM order — which is why the
+   phone and the desktop disagreed about which corner the title holds.
+   The child combinator says what was always meant: order the card, and leave
+   the head row's own two children to source order. */
 @container app (max-width:899.98px){
   .app .plate{display:flex;flex-direction:column}
-  .app .plate-h{order:1}
-  .app .plate-t{order:2}
-  .app .plate-b{order:3}
-  .app .plate-who{order:4}
-  .app .plate-a{order:5;flex-wrap:nowrap}
-  .app .plate-a > .btn{flex:1 1 0;min-width:0}
-  .app .plate-x{order:6}
+  .app .plate > .plate-h{order:1}
+  .app .plate > .plate-t{order:2}
+  .app .plate > .plate-b{order:3}
+  .app .plate > .plate-who{order:4}
+  .app .plate > .plate-a{order:5;flex-wrap:nowrap}
+  .app .plate > .plate-a > .btn{flex:1 1 0;min-width:0}
+  .app .plate > .plate-x{order:6}
 }
 @container app (min-width:900px){
   .app .plate{

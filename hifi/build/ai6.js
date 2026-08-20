@@ -105,7 +105,7 @@ const PAGESUM = {
 
     booked: 'You&rsquo;re booked with Priya Nair, Thursday 20 August at 6:30 PM ET. Forty-five minutes, recorded, already paid &mdash; nothing to do before the day.',
 
-    assessed: 'You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
+    assessed: 'You&rsquo;re Explorer &ndash; E3, level 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
 
     week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 unlocks today and your first call is Thursday at 6:00 PM ET &mdash; nothing&rsquo;s assessed this week.`,
 
@@ -119,16 +119,16 @@ const PAGESUM = {
   },
 
   level: {
-    consult: 'No level yet &mdash; the quiz gives you a track, not a rung. Explorer is rungs 1 to 5 of 15, and a 45-minute interview decides which one.',
-    new: 'No level yet &mdash; the quiz gives you a track, not a rung. Explorer is rungs 1 to 5 of 15, and a 45-minute interview decides which one.',
-    booked: 'Still no rung &mdash; the interview on 20 August is what sets it. Explorer covers rungs 1 to 5 of 15, and the quiz only predicted the band.',
-    promoted: 'You&rsquo;re at E4, rung 4 of 15, signed on 21 November after your re-interview. At E4 you can volunteer to lead a cohort below your level.',
-    _: 'You&rsquo;re at E3, rung 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a 90-day course moves it.'
+    consult: 'No level yet &mdash; the quiz gives you a track, not a level. Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which one.',
+    new: 'No level yet &mdash; the quiz gives you a track, not a level. Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which one.',
+    booked: 'Still no level &mdash; the interview on 20 August is what sets it. Explorer covers levels 1 to 5 of 15, and the quiz only predicted the band.',
+    promoted: 'You&rsquo;re at E4, level 4 of 15, signed on 21 November after your re-interview. At E4 you can volunteer to lead a cohort below your level.',
+    _: 'You&rsquo;re at E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a 90-day course moves it.'
   },
 
   report: 'Priya&rsquo;s write-up of your 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas she named, and both are chapters on your course.',
 
-  interviews: 'Every interview you&rsquo;ve had and every one booked. This is the only thing that sets or changes your rung, and each finished one links to its report.',
+  interviews: 'Every interview you&rsquo;ve had and every one booked. This is the only thing that sets or changes your level, and each finished one links to its report.',
 
   agents: 'Three agents assess at your level and have a slot this week &mdash; Priya at $95, Owen at $85, Lena at $80. Same 45 minutes whoever you pick.',
 
@@ -219,7 +219,7 @@ const PAGESUM = {
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
     const e0 = pe[0];
     if(!pe.length && !ps.length) return 'Nothing is waiting on your signature &mdash; every level and every summary is signed.';
-    return `${pe.length ? `${pe.length === 1 ? 'One level decision' : _n(pe.length) + ' level decisions'}` : 'No level decisions'} and ${ps.length ? `${ps.length === 1 ? 'one ninety-day summary' : _n(ps.length) + ' summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the rung is yours to set.` : ''}`;
+    return `${pe.length ? `${pe.length === 1 ? 'One level decision' : _n(pe.length) + ' level decisions'}` : 'No level decisions'} and ${ps.length ? `${ps.length === 1 ? 'one ninety-day summary' : _n(ps.length) + ' summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the level is yours to set.` : ''}`;
   },
 
   leadEval: () => {
@@ -301,6 +301,53 @@ function placePageSummary(){
   if(page.classList.contains('ask-page')) return;
   if(page.closest('.auth-card')) return;
 
+  /* AND NEITHER IS THE COURSEWARE. `coursework` and `chapter` render one empty
+     slot for the LightspeedVT iframe and nothing else — see the note over
+     `lsvtFrame` in views.js: the whole module is somebody else's interface, so
+     anything we draw here is a second set of chrome around a screen that has
+     its own. That note lists `placeBand` (ai5) and `placeAI` (ai2) as bailing
+     of their own accord because both need a `.ph` to hang off; this pass does
+     NOT need one — the branch below BUILDS a `.modhead` when there is no band —
+     so it put a Tal card above the frame that nothing else in the module would
+     have. It is the one pass that has to be told.
+
+     Tested on the slot rather than on the two view names, for the reason the
+     composer exclusion in ai4 gives: the condition is "this page is a frame we
+     do not own", and a third view that embeds one would want the same answer
+     without having to be added to a list. `PAGESUM.coursework` and
+     `PAGESUM.chapter` stay where they are, unreached, alongside `PARKED` in
+     views.js — they are the copy for whatever turns out to live outside the
+     frame once the LightspeedVT screens are confirmed. */
+  if(page.querySelector(':scope > .lsvt-slot')) return;
+
+  /* AND NEITHER IS THE CONVERSATION WITH PRIYA. Every other page in the product
+     is a set of blocks that a reader has to be told the shape of; this one is a
+     thread, and the last message in it — visible, two inches below — IS the
+     summary. Tal's `messages` entry said Priya can see your chapters and that
+     her last message asked for the vendor review example: the first half is a
+     policy statement that belongs on the account page, and the second is a
+     paraphrase of a bubble already on screen.
+
+     It also cost the thread real height, on the one page in the product whose
+     footer has to be reachable without scrolling (§37.7): the band took ~116px
+     off a box that the composer sits at the bottom of.
+
+     `.msg-page` is the candidate's Messages and nothing else — the leader's
+     Messages is a list of threads, not a thread — so the class is the whole
+     test. `PAGESUM.messages` stays where it is, unreached, for the same reason
+     the courseware's entries do. */
+  if(page.classList.contains('msg-page')) return;
+
+  /* AND NEITHER IS THE LEADER'S MESSAGES MODULE, `msg-mod`, for the argument
+     above plus one of its own. Both of its tabs are a conversation — a cohort
+     board or a one-to-one — so the last thing said is the summary either way;
+     and the Direct tab is a two-column inbox whose right-hand column has to
+     fit the frame with its composer at the foot, which is the height the band
+     was taking. A separate class rather than reusing `.msg-page` because that
+     class also carries the candidate page's own flex layout (§16, §37.7), and
+     this page is a tab strip over two surfaces, not one thread. */
+  if(page.classList.contains('msg-mod')) return;
+
   const band = page.querySelector(':scope > .modhead');
 
   /* 1. THE QUESTIONS LEAVE THE TOP OF THE PAGE.
@@ -313,6 +360,30 @@ function placePageSummary(){
   const top = band || page;
   top.querySelectorAll(':scope > .sec.ask-chips').forEach(el => el.remove());
   if(band) band.querySelectorAll('.ai-asks, .ai-foot').forEach(el => el.remove());
+
+  /* 1b. AND A CHIP WITH NO CARD AROUND IT LEAVES THE PAGE ENTIRELY.
+     `askChip` was used two ways. Inside a Tal card it is Tal's own suggested
+     next question and it belongs there — the card says who is asking. Dropped
+     straight into page flow (`<div class="mt5">${askChip(…)}</div>` on the
+     report, the clip list, the cohort card) it is a lone pill in the middle of
+     a column of prose: nothing says it is Tal's, nothing says why it is there,
+     and the ask bar at the foot of the frame is the standing answer to
+     "anything else?" on every page in the product. Two invitations to ask,
+     the floating one quieter and less explicable than the docked one.
+
+     THE TEST IS "IS IT IN SOMETHING THAT IS TAL'S" — the aura card, the panel,
+     the thread, a sheet, or the band this pass has just built. Anything else
+     is page flow. The empty wrapper goes with it, because `.mt5` on a div with
+     nothing left in it is 24px of space nobody can see the reason for.
+     `.chip-tal` is also what the Tal panel's suggestions and the thread's
+     follow-ups are made of, which is why the closest() list is the guard
+     rather than a blanket removal. */
+  page.querySelectorAll('.chip-tal').forEach(chip => {
+    if(chip.closest('.ai-aura, .tal-panel, .ask-page, .sheet, .modhead, .ai-asks, .ai-foot')) return;
+    const host = chip.parentElement;
+    chip.remove();
+    if(host && host !== page && !host.children.length && !host.textContent.trim()) host.remove();
+  });
 
   /* AND SO DOES THE ACTION THAT RODE TAL'S HEAD ROW.
      `placeBand` promotes each Tal card's one next step onto the row Tal's

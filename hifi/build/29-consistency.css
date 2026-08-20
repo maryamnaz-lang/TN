@@ -103,25 +103,25 @@
 }
 
 /* --------------------------------------------------------------------- 4 ---
-   BEFORE THE INTERVIEW, THE LADDER STILL SHOWS FIFTEEN RUNGS
+   BEFORE THE INTERVIEW, THE LADDER STILL SHOWS FIFTEEN LEVELS
 
    The pre-interview level card drew the three tracks as a three-column grid
    with "YOU ARE HERE" under one of them, and the confirmed card drew the
    same ladder every other level surface draws. Two drawings of one idea, and
    the grid was the one that could not answer the question the page is about:
-   how far is it from here to the top. Fifteen rungs at a glance answers it;
+   how far is it from here to the top. Fifteen levels at a glance answers it;
    three named boxes do not.
 
    So the unconfirmed state takes the ladder too. What it must NOT do is
-   claim a rung — that is exactly what the interview decides, and a filled
-   segment would be a promise the product has not made. The five rungs of
-   your own track are marked instead, at a weight between an empty rung and a
+   claim a level — that is exactly what the interview decides, and a filled
+   segment would be a promise the product has not made. The five levels of
+   your own track are marked instead, at a weight between an empty level and a
    confirmed one: enough to say "you are somewhere in here", not enough to
    read as a position.
    -------------------------------------------------------------------------- */
 /* AND IT IS THE FULL BRAND FILL, NOT A DIMMED ONE.
    This went through two wrong versions before the right one, and both were
-   wrong in the same direction — trying to say "less than a confirmed rung"
+   wrong in the same direction — trying to say "less than a confirmed level"
    by draining the colour.
 
    `opacity:.28` was the first, and it does not survive at all: §13's entrance
@@ -134,9 +134,9 @@
    nothing animates `background-color` here — but 34% of orange over near
    black is a muddy brown, and on the page it read as five DISABLED cells
    rather than five quiet ones. The client's word for it was "light blocks",
-   and the answer is that this band does not need to be quieter than a rung
+   and the answer is that this band does not need to be quieter than a level
    at all: it is the only marked run on its own bar, there is no confirmed
-   rung beside it to be outranked by, and the caption under it already says
+   level beside it to be outranked by, and the caption under it already says
    YOUR TRACK, FROM THE QUIZ.
 
    So it takes `--accent-grad`, the same fill §19 gives every other marked
@@ -149,24 +149,24 @@
   background-image:var(--accent-grad);
   --on-brand-fill:1}
 
-/* A RUNG YOU HAVE CLIMBED IS NOT A RUNG YOU HAVE HALF CLIMBED.
+/* A LEVEL YOU HAVE CLIMBED IS NOT A LEVEL YOU HAVE HALF CLIMBED.
    `.done` had the same `opacity` treatment as `.mine` above — §15 sets .42
    — and it is the same bug with a worse symptom, because `.done` and
-   `.mine` do not mean the same thing. `.mine` is a PREDICTION: five rungs
+   `.mine` do not mean the same thing. `.mine` is a PREDICTION: five levels
    you might be on, deliberately quieter than a fact. `.done` is a fact —
-   four rungs you actually climbed, signed off in a report — and drawn at
-   42% it read as the disabled state of the rung beside it.
+   four levels you actually climbed, signed off in a report — and drawn at
+   42% it read as the disabled state of the level beside it.
 
    IT ALSO FLICKERED. §13's entrance animations carry `fill-mode:both`, so
    the played keyframe's `opacity:1` keeps applying and beats any normal
-   declaration: the rungs were full strength after any navigation and 42%
+   declaration: the levels were full strength after any navigation and 42%
    on the first paint of a reload, where no animation has run. The same
    signature the note above records, on the neighbouring selector.
 
    No opacity at all, so §19's accent gradient — which `.done` is already in
    the generated list for — is what shows, exactly as it does on `.on`. The
-   run of orange ends at the rung you are on and the boundary with the grey
-   is what says how far up you are; the hero's own line ("rung 4 of 15")
+   run of orange ends at the level you are on and the boundary with the grey
+   is what says how far up you are; the hero's own line ("level 4 of 15")
    says it in words directly beside it. */
 .app .ladder i.done,
 .app .lvl-hero .ladder i.done{opacity:1}
@@ -378,7 +378,7 @@
   display:flex;flex-direction:column;min-height:0}
 
 /* no `.ladder-note` here on purpose — see the note in `trackBand`. The bar
-   draws the track's five rungs, the sub says where the rung comes from, and
+   draws the track's five levels, the sub says where the level comes from, and
    the heading is the track's name; a line repeating all three was the grid's
    redundancy in new clothes. */
 

@@ -100,9 +100,26 @@
    declaration here had nothing to do but mislead the next reader — and §18
    was reading this list to decide which blocks keep a full-width edge, which
    is how an unfilled block ended up with a fill edge. */
+/* `:has(> .msgs)` IS OUT, AND IT WAS THE ONE ENTRY IN THIS LIST THAT MADE ITS
+   CONTENTS INVISIBLE. Every other member holds ROWS — an award, a chapter, a
+   card — objects that are transparent by the rule below and read against the
+   panel by their rules and their type. `.msgs` holds BUBBLES, and a bubble's
+   whole construction is a fill: `.m-b` is `--surface-2` too, so a thread on a
+   `--surface-2` panel was grey type on grey with nothing to say where one
+   message ended and the next began. The cohort's Discussion tab is where it
+   showed worst — ten posts from ten different people, each one apparently
+   floating loose with a name under it.
+
+   The rule dates from when `.msgs` meant the leader's list of THREADS, whose
+   members carried `.msg` — a row, not a bubble — and the companion rule below
+   still names `.msg` for that reason. There is no `.msg` in the build any more
+   (four `.msgs` in views.js and lead4.js, all of them bubbles), so this is not
+   a case being carved out, it is a component that changed shape underneath the
+   selector. §18's fill-edge list and the hover rule further down both read
+   this list to decide what has a ground; both lose the entry with it. */
 .app .sec:has(> .aw-list),
 .app .sec:has(> .pointsList),.app .sec:has(> .badgeList),
-.app .sec:has(> .rankList),.app .sec:has(> .msgs){
+.app .sec:has(> .rankList){
   background-color:var(--surface-2)}
 
 /* and a row inside a panel takes the panel's tone rather than the canvas —
@@ -112,7 +129,7 @@
 .app .sec.tint .cardrow,.app .sec.tint .mem,.app .sec.tint .nrow,
 .app .sec:has(> .aw-list) .aw,.app .sec:has(> .pointsList) .aw,
 .app .sec:has(> .badgeList) .aw,.app .sec:has(> .rankList) .aw,
-.app .sec:has(> .msgs) .msg,.app .sec.flat.bleed .ch{
+.app .sec.flat.bleed .ch{
   background-color:transparent}
 .app .sec:has(> .tile-stack) .tile.clk,.app .sec:has(> .tile-stack) .gcard,
 .app .sec:has(> .tile-stack) .ag,.app .sec:has(> .tile-stack) .ch,
@@ -503,7 +520,7 @@
 .app .ai-clickable:hover,.app .signed.clk:hover,.app .tabs button:hover,
 .app .cs button:hover,.app .tg:hover,.app .sc-col:hover,
 .app .sec.tint .tile.clk:hover,.app .sec.tint .gcard:hover,
-.app .sec:has(> .aw-list) .aw:hover,.app .sec:has(> .msgs) .msg:hover,
+.app .sec:has(> .aw-list) .aw:hover,
 .app .sec.flat.bleed .ch:hover,.app a[data-go]:hover{
   background-color:transparent}
 

@@ -20,7 +20,7 @@
    has `.sheet` and lead2.js uses it for the brief and the note — but those are
    a thing you read and a thing you jot. A level decision is the most
    consequential act on this portal: it reads a transcript, four competency
-   readings, two quoted moments, then takes a rung and a reason. That is a
+   readings, two quoted moments, then takes a level and a reason. That is a
    page's worth of reading, it wants the page's measure, and it wants a URL of
    its own in the history so the back arrow works. `.sheet` maxes at 520px and
    88% height, which is where the wireframe's sheet had to scroll its own
@@ -37,7 +37,7 @@
    readings move into the Explorer band, which is what lead.js already did to
    the proposal itself.
 
-   A COMPETENCY MAY READ ABOVE THE ASSIGNED RUNG, and two of Rachel's do.
+   A COMPETENCY MAY READ ABOVE THE ASSIGNED LEVEL, and two of Rachel's do.
    That is the whole point of showing the breakdown rather than the average:
    the number being signed is a blend, and the leader is entitled to see which
    parts of it disagree with each other. It is also the argument the summary
@@ -51,23 +51,23 @@
 const LDR_AN = {
   e1: {
     conf:'High',
-    sum:'The quiz and the interview agree on the Explorer band, and the interview places them at the entry rung. Clear intent and sound scoping, but two moments of keeping the work rather than handing it over cap the number at 1.',
+    sum:'The quiz and the interview agree on the Explorer band, and the interview places them at the entry level. Clear intent and sound scoping, but two moments of keeping the work rather than handing it over cap the number at 1.',
     quiz:'64 out of 100 sits inside the Explorer band. The foundational questions carried the score; the multi-step delegation items are where the points went, which is the same gap the interview surfaced.',
     comps:[
       ['Task delegation','E1','Completed the steps personally. Handed work over only when asked to directly.'],
-      ['Handling ambiguity','E2','Asked scoping questions before acting &mdash; a notch above the entry rung.'],
+      ['Handling ambiguity','E2','Asked scoping questions before acting &mdash; a notch above the entry level.'],
       ['Quality checking','E1','Accepted the first output without a verification pass on two of three tasks.'],
       ['Communication','E2','Narrated intent clearly. Left some of the detail unexplained.']
     ],
     ev:[
       ['pos','14:20','Let me confirm the date range before I pull anything.','Scoped the task before acting. A genuine strength and the reason this is not below E1.'],
-      ['neg','31:05','I&rsquo;d rather write that part myself than explain it to someone else.','Handover avoidance, said twice. This is the entry-rung tell.']
+      ['neg','31:05','I&rsquo;d rather write that part myself than explain it to someone else.','Handover avoidance, said twice. This is the entry-level tell.']
     ],
     watch:'The two handover moments are what hold this at E1 rather than E2. Worth re-checking delegation at the ninety-day mark.'
   },
   e2: {
     conf:'Medium',
-    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a rung above everything else, and a weak conflict-repair answer is what pulls the blend back to 3.',
+    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a level above everything else, and a weak conflict-repair answer is what pulls the blend back to 3.',
     quiz:'71 out of 100 is the top of the Explorer band. The structural questions drove the score and the interpersonal ones pulled it back, which is exactly what the interview then showed.',
     comps:[
       ['Handling ambiguity','E4','Reframed an under-specified brief into three testable options, unprompted.'],
@@ -91,13 +91,21 @@ const ldrEvOf  = id => LEAD_EVALS.filter(e => e.id === id)[0] || LEAD_EVALS[0];
 const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMARIES[0];
 const ldrEvFor = name => LEAD_EVALS.filter(e => e.name === name)[0];
 
-/* The five rungs Priya may sign. `AGENTS.priya.range` is E1–E3 as an
-   ASSESSING range — the band she is certified to interview in — and the band
-   itself holds five rungs. The picker offers all five of the candidate's band
-   because the interview can land anywhere in it; what her range constrains is
-   whose interviews reach her queue, which has already happened by the time
-   this page is open. */
-const LDR_RUNGS = [1,2,3,4,5];
+/* THE WHOLE LADDER, NOT ONE BAND OF IT. This was `[1,2,3,4,5]` — the five
+   levels inside the band the quiz proposed — on the argument that the quiz
+   fixes the band and the interview only picks the level inside it. That is the
+   rule for the QUIZ, and this page is the one place it can be departed from:
+   the leader has just spent forty-five minutes with the person, and a reading
+   that lands them outside the proposed band is exactly the case the override
+   box exists to record. A picker that cannot express it forces the leader to
+   sign a level they do not mean and say so in prose.
+
+   So it is all fifteen, in the one line the product draws everywhere else:
+   Explorer E1–E5, Builder B1–B5, Trailblazer T1–T5 — the same order and the
+   same labels as `ladder()` in views.js and the accordion on the interviews
+   page ("Fifteen levels in one line"). Anything away from my proposal still
+   costs a reason, and now that includes a band. */
+const LDR_RUNGS = ['E','B','T'].flatMap(b => [1,2,3,4,5].map(n => b + n));
 
 S.ldrEv = null;
 S.ldrSum = null;
@@ -132,7 +140,7 @@ V.leadSessions = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Sessions')}
-  ${ph('Sessions','Every interview you have run and every one booked. Forty-five minutes, recorded, and you sign the rung afterwards.',
+  ${ph('Sessions','Every interview you have run and every one booked. Forty-five minutes, recorded, and you sign the level afterwards.',
     `<button class="btn btn-g" data-go="leadProfile">Your availability ${I.calendar}</button>`)}
   ${next ? `
   <div class="sec">
@@ -148,7 +156,7 @@ V.leadSessions = () => {
             the opposite corner, and finding no label seats the TITLE in the
             head row beside it. Same card, one row shorter. */}
       <div class="plate-t">${next.re ? 'Re-interview' : 'Level interview'}</div>
-      <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the rung afterwards'}</div>
+      <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the level afterwards'}</div>
       <div class="plate-a">
         <button class="btn btn-p btn-sm noic">Join the interview ${I.video}</button>
         <button class="btn btn-sm noic plate-b2">Reschedule ${I.time}</button>
@@ -200,7 +208,7 @@ V.leadSessions = () => {
         </div>`;
       }).join('')}
     </div>
-    <p class="t-helper-01 mt4">A candidate cannot enroll until the rung is signed, so the evaluation is the thing holding up their ninety days &mdash; not the interview.</p>
+    <p class="t-helper-01 mt4">A candidate cannot enroll until the level is signed, so the evaluation is the thing holding up their ninety days &mdash; not the interview.</p>
   </div>
 </div></main>`;
 };
@@ -213,7 +221,7 @@ V.leadSessions = () => {
    "a signature you owe somebody", which is why the dashboard counts them
    together in one figure — and both are listed here for the same reason. They
    are separate SECTIONS rather than one merged list because the two rows
-   answer different questions: a level decision shows the rung being proposed,
+   answer different questions: a level decision shows the level being proposed,
    a summary shows the record it is drawn from.
 
    NEITHER PAGE DRAWS A TAL CARD, and the long note above `ldrRead` in lead2.js
@@ -256,7 +264,7 @@ V.leadEvals = () => {
             <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
             <span class="cardrow-b">
               <span class="cardrow-t">${e.name} <span class="tag green sm">Signed Explorer &ndash; ${e.assigned}</span>${e.override ? ' <span class="tag org sm">override</span>' : ''}</span>
-              <span class="cardrow-d">${e.override ? 'You signed ' + e.assigned + ' against my ' + e.ai + ' &middot; your reason is on the decision' : 'You signed the rung I proposed'}</span>
+              <span class="cardrow-d">${e.override ? 'You signed ' + e.assigned + ' against my ' + e.ai + ' &middot; your reason is on the decision' : 'You signed the level I proposed'}</span>
             </span>
           </div>`).join('')}
     </div>` : ''}
@@ -283,7 +291,12 @@ V.leadEvals = () => {
           </div>`;
       }).join('')}
     </div>
-    <p class="t-helper-01 mt4">A summary is what the next agent reads before a re-interview, so it is the document a candidate&rsquo;s next rung is argued from.</p>
+    ${/* THE FOOTNOTE IS GONE. It explained what a summary is FOR — "the
+          document a candidate's next level is argued from" — to the one person
+          who already knows, at the foot of a list of two rows that each say
+          "sign to close their ninety days". A closing line earns its place
+          when it tells you something the rows do not; this one restated the
+          page's own subject. */''}
   </div>
 </div></main>`;
 };
@@ -295,7 +308,7 @@ V.leadEvals = () => {
    because a leader who has already chosen does not need to scroll past the
    evidence and a leader who has not needs to read it first.
 
-   AN OVERRIDE COSTS A SENTENCE. Picking a rung other than the proposal opens
+   AN OVERRIDE COSTS A SENTENCE. Picking a level other than the proposal opens
    a required field, and the button will not submit without it. That is the
    wireframe's rule and it is the one piece of validation on either portal:
    the human decision wins, and the record has to say why it disagreed. The
@@ -326,6 +339,45 @@ V.leadEval = () => {
         quoted moments, and how confident Tal is about the blend. The
         confidence rides the competency heading rather than a card of its own,
         because it is a statement about those four readings. */''}
+  ${/* THE COMPETENCY READ IS TAL'S, SO IT GOES WHERE TAL'S CARD GOES.
+        The four readings and the confidence on them are the body of the
+        paragraph `PAGESUM.leadEval` states in one sentence at the top of the
+        page — the same claim, itemised. Drawn as a light section three blocks
+        down, it read as the page's own record; a leader scrolling past it had
+        no way to tell Tal's inference from the platform's facts, which is the
+        one distinction this page exists to make.
+
+        So it takes the DARK CARD, the object this product uses for exactly
+        that — the dashboard's due-now plate, the level card, the certificate —
+        and `placeDark` (ai5) lifts it into the module head band with them, one
+        block under the sentence it expands. It comes FIRST in the source for
+        the case where there is no band to join: `placeDark`'s fallback seats
+        dark cards straight after the crumb, and a page whose Tal card has been
+        hoisted still reads Tal-first that way.
+
+        `.ldr-read` IS THE HOOK, NOT `.sec.on-dark`. Both are DARK_CARD
+        members, but a `.sec` that matches gets WRAPPED in a second `.sec` by
+        `placeDark` — the branch that exists for `.lvl-hero`, which has no
+        section of its own — and two nested sections pay the gutter twice. A
+        card class inside the section means the section is the host and moves
+        as it stands, which is what every other dark card does. */''}
+  ${an ? `
+  <div class="sec">
+    <div class="ldr-read on-dark">
+      <div class="ldr-read-h"><h2>Competency read</h2>${ldrConf(an.conf)}</div>
+      <div class="tbl-wrap">
+        <table class="tbl ldr-tbl">
+          <tr><th>Competency</th><th>Reads at</th><th>What I heard</th></tr>
+          ${an.comps.map(([n,r,read]) => `<tr>
+            <td>${n}</td>
+            <td><span class="tag ${r === e.ai ? 'brand' : +r[1] > +e.ai[1] ? 'green' : 'org'} sm">${r}</span></td>
+            <td class="ldr-prose">${read}</td>
+          </tr>`).join('')}
+        </table>
+      </div>
+      <p class="ldr-read-x">${an.watch}</p>
+    </div>
+  </div>` : ''}
   <div class="sec">
     <div class="facts">
       <div><span class="l">Quiz</span><span class="v">${e.quiz} of 100</span></div>
@@ -335,27 +387,6 @@ V.leadEval = () => {
     </div>
   </div>
   ${an ? `
-  ${/* The quiz reading is an aside about a number in the band above it, which
-        is what `.note` is: a bold lead and a sentence. A `.tile` with a bare
-        paragraph in it has no rule for the paragraph — `.tile` styles rows and
-        headings, not prose. */''}
-  <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>How the quiz reads</b>${an.quiz}</div></div>
-  </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>Competency read</h2>${ldrConf(an.conf)}</div>
-    <div class="tbl-wrap">
-      <table class="tbl ldr-tbl">
-        <tr><th>Competency</th><th>Reads at</th><th>What I heard</th></tr>
-        ${an.comps.map(([n,r,read]) => `<tr>
-          <td>${n}</td>
-          <td><span class="tag ${r === e.ai ? 'brand' : +r[1] > +e.ai[1] ? 'green' : 'org'} sm">${r}</span></td>
-          <td class="ldr-prose">${read}</td>
-        </tr>`).join('')}
-      </table>
-    </div>
-    <p class="t-helper-01 mt4">${an.watch}</p>
-  </div>
   <div class="sec">
     <div class="sec-h"><h2>From the interview</h2><span class="t-helper-01">Quoted from the transcript</span></div>
     <div class="ivt-lines">
@@ -370,6 +401,17 @@ V.leadEval = () => {
         </span>
       </div>`).join('')}
     </div>
+  </div>
+  ${/* THE QUIZ READING FOLLOWS THE EVIDENCE, NOT THE FACTS BAND.
+        It is a footnote on one number — "64 of 100" — and it sat directly
+        under the band that prints it, which put the smallest claim on the page
+        above the two things the decision actually turns on: the competency
+        read and what the candidate said. A leader reads the inference, then
+        the quotes, and only then wants to know how the score was made up.
+        It is a `.note` and not a `.tile` for the reason it always was: `.tile`
+        styles rows and headings, not prose. */''}
+  <div class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>How the quiz reads</b>${an.quiz}</div></div>
   </div>` : ''}
   ${signed ? `
   <div class="sec">
@@ -385,11 +427,24 @@ V.leadEval = () => {
     </div>
   </div>` : `
   <div class="sec">
-    <div class="sec-h"><h2>Your decision</h2><span class="t-helper-01">The rung is yours, not mine</span></div>
+    ${/* NO HELPER OPPOSITE THE HEADING. "The level is yours, not mine" is the
+          page's whole argument and it is already made twice where it counts —
+          the closing line under the fields says it in full ("Agreeing with me
+          is still your signature, not mine"), and Tal's own card says the
+          proposal is a proposal. Beside the heading it was a third copy, set
+          hard against the far edge of a 1500px column, which is where a COUNT
+          or a state belongs and not a sentence: the heading and its own words
+          ended up a metre apart with nothing between them. */''}
+    <div class="sec-h"><h2>Your decision</h2></div>
     <div class="tile">
-      <div class="f"><label>Explorer, rung 1 to 5</label>
+      ${/* THE LABEL NAMES THE LADDER AND WHERE THE QUIZ PUT THEM, because with
+            all fifteen levels offered the picker no longer says which band was
+            proposed — the five buttons used to say it by being the only five
+            there. `data-band` marks the proposed band's five so §36.5 can
+            group them; it is a mark on the SET, not a lock on the others. */''}
+      <div class="f"><label>Level, E1 to T5 &middot; the quiz puts ${e.name.split(' ')[0]} in ${e.bucket || 'Explorer'}</label>
         <div class="btn-set ldr-rungs">
-          ${LDR_RUNGS.map(n => `<button class="btn ${band + n === pick ? 'btn-p' : 'btn-g'} noic" data-ldrpick="${band + n}">${band + n}</button>`).join('')}
+          ${LDR_RUNGS.map(r => `<button class="btn ${r === pick ? 'btn-p' : 'btn-g'} noic" data-ldrpick="${r}"${r[0] === band ? ' data-band="1"' : ''}>${r}</button>`).join('')}
         </div>
       </div>
       ${over ? `
@@ -399,7 +454,12 @@ V.leadEval = () => {
       ` : ''}
       <div class="f mt5"><label for="ldrNotes">Notes for their report</label>
         <textarea class="inp" id="ldrNotes" rows="3" placeholder="Strengths, growth areas, and what to work on during the ninety days."></textarea></div>
-      <p class="t-helper-01">The quiz fixes the band and you set the rung. ${over ? 'Overrides are logged with your reason.' : 'Agreeing with me is still your signature, not mine.'}</p>
+      ${/* THE CLOSING LINE HAD TO CHANGE WITH THE PICKER. It said "the quiz
+            fixes the band and you set the level", which was true of five
+            buttons and is not true of fifteen: the band is now yours to
+            depart from as well, and the sentence that describes the control
+            has to describe the control. */''}
+      <p class="t-helper-01">You can sign any level on the ladder, including outside the band the quiz proposed. ${over ? 'Overrides are logged with your reason.' : 'Agreeing with me is still your signature, not mine.'}</p>
     </div>
     <div class="btn-set mt5">
       <button class="btn btn-p" data-ldrsign="${e.id}">${over ? 'Sign as ' + pick + ' &middot; override' : 'Sign as ' + e.ai} ${I.checkFilled}</button>
@@ -421,13 +481,30 @@ V.leadEval = () => {
    both read, so a summary cannot disagree with the page the leader was just
    looking at.
 
-   FOUR RECOMMENDATIONS, AND THREE OF THEM COST A SENTENCE. Promotion is the
-   expected end of ninety days that went well; anything else is the leader
-   saying the ninety days did not do what they were meant to, and that has to
-   carry a reason for the same reason an override does.
+   FIVE RECOMMENDATIONS, AND FOUR OF THEM COST A SENTENCE. One level after
+   ninety days that went well is the expected end, and it is the only one that
+   costs nothing: it is what the course is for and the numbers above it are the
+   argument. Every other answer is the leader departing from that, in one
+   direction or the other, and a departure carries a reason for exactly the
+   reason an override does on a level decision — the human call wins, and the
+   record says why.
+
+   TWO LEVELS IS A DEPARTURE UPWARDS, and it was the case the four could not
+   say. A leader who thinks ninety days moved somebody two levels had no way to
+   write it down: they could recommend the promotion the platform expected, or
+   they could hold, and the extra level went in prose that nothing acts on. It
+   is the same shape as "hold" — an exception the next agent has to know about
+   before the re-interview — so it is offered as an option and gated by the
+   same box, and the question above the box changes direction with it.
+
+   WHY THE COPY BRANCHES ON `up` RATHER THAN ON THE KEY. There are two kinds of
+   exception here and one field: asking "why not a promotion?" of a leader who
+   has just chosen a DOUBLE promotion is asking the opposite of what happened,
+   and asking "why two levels?" of a hold is worse. One boolean, three strings.
    ========================================================================== */
-const LDR_RECS = [['promote','Ready to promote'],['hold','Hold at this level'],
-                  ['down','Move down a rung'],['notready','Not ready to re-interview']];
+const LDR_RECS = [['promote','Ready to promote'],['promote2','Promote two levels'],
+                  ['hold','Hold at this level'],
+                  ['down','Move down a level'],['notready','Not ready to re-interview']];
 
 V.leadSum = () => {
   const s = ldrSumOf(S.ldrSum);
@@ -435,6 +512,12 @@ V.leadSum = () => {
   const m = lmemOf(c, s.name);
   const rec = S.ldrRec || 'promote';
   const needsWhy = rec !== 'promote';
+  /* the one exception that goes UP. `next` is the level two above where they
+     are, printed so the question names the thing being asked for rather than
+     asking about "two levels" in the abstract. */
+  const up = rec === 'promote2';
+  const rung = +llevel(c).replace(/\D/g,'') || 1;
+  const twoUp = llevel(c).replace(/\d+/, Math.min(5, rung + 2));
   const done = s.status === 'done';
   const first = s.name.split(' ')[0];
   const retakes = m.att > 1.4 ? 3 : m.att > 1.1 ? 2 : 1;
@@ -462,19 +545,32 @@ V.leadSum = () => {
       ${statCell(I.renew, 'Chapters retaken', retakes, m.att.toFixed(1) + ' attempts on average')}
     </div>
   </div>
-  <div class="sec">
-    <div class="facts">
-      <div><span class="l">Calls attended</span><span class="v">${Math.max(0, c.week - 1)} of ${c.week}</span></div>
-      <div><span class="l">Tasks on time</span><span class="v">${Math.max(0, lchDone(m) - retakes + 1)} of ${lchDone(m)}</span></div>
-      <div><span class="l">Last active</span><span class="v">${m.last}</span></div>
-      <div><span class="l">Your notes</span><span class="v">${lnotes(s.name).length}</span></div>
-    </div>
-  </div>
+  ${/* ONE BAND OF FIGURES, NOT TWO. A `.facts` row of four sat directly under
+        the `.stats` row of four — the same object twice, one with an icon and
+        a sub-line and one without, and nothing said why "calls attended"
+        belonged in the plain row while "chapters retaken" belonged in the
+        marked one. Two identical grids stacked also read as one eight-cell
+        table that had wrapped, which put a border between rows four and five
+        for no reason a reader could name.
+
+        The four that stayed are the four the recommendation turns on: how much
+        of the course is done, how well it was assessed, how long it took, how
+        much was retaken. Calls attended, tasks on time and last-active are the
+        roster's numbers and they are one click away on "Their full record",
+        which is the button this page already puts beside the person's name.
+        The leader's own note count is not a fact about the candidate at all. */''}
   ${done ? `
   <div class="sec tint">
     <div class="sec-h"><h2>What you published</h2></div>
     <div class="tile">
       <div class="kv"><span class="k">Recommendation</span><span class="v">${s.rec}</span></div>
+      ${/* THE REASON IS PART OF THE RECORD, so the record prints it. The
+            publish handler has always stored `s.why` and this block never
+            showed it, which made the gate look like a formality: the leader
+            was made to justify an exception into a box whose contents then
+            appeared nowhere. It sits directly under the recommendation it
+            qualifies, because that pair is the whole exception. */''}
+      ${s.why ? `<div class="kv"><span class="k">Why</span><span class="v n">${s.why}</span></div>` : ''}
       ${s.growth ? `<div class="kv"><span class="k">Where they grew</span><span class="v n">${s.growth}</span></div>` : ''}
       ${s.develop ? `<div class="kv"><span class="k">Still to develop</span><span class="v n">${s.develop}</span></div>` : ''}
     </div>
@@ -492,9 +588,15 @@ V.leadSum = () => {
         </div>
       </div>
       ${needsWhy ? `
-      <div class="f mt5"><label for="ldrSumWhy">Why not a promotion?</label>
-        <textarea class="inp" id="ldrSumWhy" rows="3" placeholder="Ninety days that did not end in a promotion needs a reason on the record."></textarea></div>
-      ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>This one needs a reason</b>Anything other than a promotion is you saying the ninety days did not do what they were meant to. Say why, and it goes on the summary.</div></div>` : ''}
+      <div class="f mt5"><label for="ldrSumWhy">${up
+          ? `Why two levels, to ${twoUp}?`
+          : 'Why not a promotion?'}</label>
+        <textarea class="inp" id="ldrSumWhy" rows="3" placeholder="${up
+          ? 'Two levels is more than ninety days is built to move. Say what they did that the numbers above do not show.'
+          : 'Ninety days that did not end in a promotion needs a reason on the record.'}"></textarea></div>
+      ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>This one needs a reason</b>${up
+          ? 'A double promotion is you saying ninety days did more than they are built to. Say why, and it goes on the summary the next agent reads.'
+          : 'Anything other than a promotion is you saying the ninety days did not do what they were meant to. Say why, and it goes on the summary.'}</div></div>` : ''}
       ` : ''}
       <div class="f mt5"><label for="ldrGrowth">Where they grew</label>
         <textarea class="inp" id="ldrGrowth" rows="3" placeholder="What changed over the ninety days that the numbers above do not show."></textarea></div>
@@ -516,7 +618,7 @@ V.leadSum = () => {
    Same capture-phase trick lead2.js records: the parameter travels in its own
    attribute so `data-go` stays a plain view name and `go()` needs no branch.
    Opening a decision also RESETS the draft — `S.ldrPick` from the last
-   candidate signed would otherwise be the rung offered for the next one.
+   candidate signed would otherwise be the level offered for the next one.
    ========================================================================== */
 device.addEventListener('click', e => {
   const ev = e.target.closest('[data-ldrev]');
@@ -525,7 +627,7 @@ device.addEventListener('click', e => {
   if(su){ S.ldrSum = su.dataset.ldrsum; S.ldrRec = 'promote'; S.ldrErr = false; }
 }, true);
 
-/* WHAT IS TYPED SURVIVES A PICK. Choosing a different rung re-renders the
+/* WHAT IS TYPED SURVIVES A PICK. Choosing a different level re-renders the
    page, and the render rebuilds the form — so both boxes are read into `S`
    BEFORE anything that renders, and printed back as the textarea's content.
    The same trap ai4.js records for the ask thread and lead.js for the queue's
@@ -610,10 +712,27 @@ function ldrDraftWrite(){
   put('ldrDev', S.ldrDev);
 }
 
+/* THE CHOSEN LEVEL HAS TO BE IN VIEW, and below 900px the picker is a scroller
+   (§36.5) fifteen levels long — so a leader who signs B3 on a phone is looking
+   at a row that starts at E1 and shows five, with the one thing they just
+   chose two screens to the right. The picker is rebuilt on every render (trap
+   9), so this is a post-render pass like the draft above rather than state on
+   the element: find the pressed level, and if the row scrolls, centre it.
+   `scrollLeft` directly rather than `scrollIntoView`, which would also scroll
+   the PAGE to reach a row that is already on screen. */
+function ldrRungView(){
+  const set = device.querySelector('.ldr-rungs');
+  if(!set || set.scrollWidth <= set.clientWidth + 1) return;
+  const on = set.querySelector('.btn-p');
+  if(!on) return;
+  set.scrollLeft = on.offsetLeft - (set.clientWidth - on.offsetWidth) / 2;
+}
+
 const _baseLdr3 = render;
 render = function(){
   _baseLdr3();
   try { ldrDraftWrite(); } catch(e){ console.warn('ldr draft', e); }
+  try { ldrRungView(); } catch(e){ console.warn('ldr rung', e); }
 };
 
 render();

@@ -65,7 +65,18 @@
      restatement never lands — plate-then-stepper works because of the
      exclusion below, not because of §29. The same 16px was appearing under
      the cohort page's call plate, between it and the Discussion strip. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)){
+  /* `:not(:has(+ .sec.ldr-dm-sec))` — THE TAB STRIP ABOVE THE LEADER'S INBOX
+     IS NOT HALF OF A PAIR, it is the top edge of the thing below it. The panel
+     is attached to the strip on purpose (§36.17), so 16px under the strip is
+     16px of white between a tab and the surface it switches, and the panel
+     reads as having come loose. Excluded HERE for the reason `.lead-bar` is
+     excluded from the rule below and the reason the trap in CLAUDE.md gives:
+     this selector runs to thirteen classes inside a container query and cannot
+     be outweighed from a later layer — §36 states the same intent at four
+     classes and loses. The `:not()` list is where "which pairs are joined" is
+     decided, so that is where an unjoining goes.
+     -------------------------------------------------------------------- */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)){
     padding-bottom:var(--s05)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
@@ -105,8 +116,16 @@
      that row is that its height never changes and is nothing — with the
      padding on, the stuck strip hung under the header on a white band. It
      has to be excluded HERE rather than corrected later: this selector runs
-     to nine classes and cannot be outweighed from a later layer. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(:has(> .lead-b)){
+     to nine classes and cannot be outweighed from a later layer.
+
+     `.ldr-dm-sec` JOINS IT, and for the same shape of reason. It holds the
+     leader's Direct inbox, which is not a block in a column of blocks — it is
+     the module's whole surface for the tab that is open, attached to the tab
+     strip above it on purpose (§36.17). 16px above it is 16px of white between
+     a strip and the thing it switches, which reads as the panel having come
+     loose. The section states `padding:0` and this is the rule that was
+     putting it back, from nine classes deep. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){
     padding-top:var(--s05)}
   .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
   /* the capture strip is a zero-padding pass-through: it sits between two

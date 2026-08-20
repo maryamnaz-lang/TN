@@ -13,6 +13,28 @@
      §4  `.stickybar` — §10 sizes it to the frame and §16 re-pads it to line
          its CONTENT up with the column. Putting the bar itself in the
          column has to answer both.
+     §5  `.foot-row.foot-stack` — §14 lays the closing row out on one line.
+     §6  `.lead-bar` — §31 states the leader's tab row as a band in the page.
+     §7  `.msg-page` — §16 says twice, in two blocks 160 lines apart, that a
+         page may not shrink and that the conversation must. One page is both.
+     §8  `.paytbl` — §16 dissolves the payment rows into the table's own grid,
+         which leaves the divider to the cells; cells are not rows.
+     §9  `.lvl-hero` — §12 zeroed its bottom padding when the card ended in a
+         ladder. §26 then put a row of content at the bottom of it.
+     §10 `.cert` — §15 states the card as mark-beside-body from 0 up, and the
+         narrowest column it has to survive is 40% of the mark's own width.
+     §11 `.stat-top` — §29 pushes the figure to the far end of the cell. Below
+         the four-column breakpoint there is no far end to push it to.
+     §12 `.chart` — §15 gives the plot the remaining width of the row, and the
+         box holds an aspect ratio, so the width sets the height.
+     §13 the dark cards' type — §15 sizes the plate for the column it was
+         drawn in. The phone's column is 40% narrower.
+     §14 `.msgs.room .m-w` — §15 states the attribution as a footnote under a
+         bubble, which is right for a two-person thread and not for a board.
+     §15 `.composer-lead` — a new class §15/§16 do not mention, and §16 pads
+         the field for a leading element that was decoration.
+     §16 `.facts + .steps` — §10 draws each of them for a section it is the
+         only thing in. On Interviews they are now the two halves of one.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -215,3 +237,384 @@
    is the section's own `::after` rather than the one above it, and it goes
    for the same reason. */
 .app[data-portal="leader"] .page > .sec:has(> .stats-lead)::after{display:none}
+
+/* --------------------------------------------------------------------------
+   7. THE CONVERSATION IS THE ONE PAGE THAT MAY SHRINK
+
+   §16 makes two statements about height and they contradict each other on
+   exactly one page:
+
+     §16 (line ~397, desktop tier)  `.view-col > .main > .page{flex:1 0 auto}`
+        — a page must never shrink, or the column rails stop in mid-air
+          halfway down a long page.
+     §16 ("the conversation scrolls, the field does not")  `.msg-page` takes
+        the frame's height and `.msgs` scrolls inside it.
+
+   The second needs the page to shrink to the frame; the first forbids it. The
+   first is the more specific selector AND at desktop it is in a container
+   tier, so on Messages it won: `.msg-page` grew to its content — 1175px in an
+   830px frame — `.msgs` never became a scroller, `.main` scrolled the whole
+   thing instead, and the composer sat 300px below the fold. Below 900px none
+   of this applies and Messages has always been right, which is why this only
+   ever showed up on desktop.
+
+   `.msg-page` is the exception and there is no other: it is the one page whose
+   footer has to be reachable without scrolling to it, and it cannot orphan a
+   rail because a page that exactly fills the frame rules its full height
+   anyway. Stated at five classes and inside the same container tier so it
+   beats §16's four on both counts, per the note in §29.11 — a container query
+   is not a tier of its own, so this has to out-specify AND out-order it.
+
+   `min-height:0` is the other half: a flex item's implicit `min-height:auto`
+   floors it at its content, which would make `flex-shrink` a no-op however
+   the shorthand is written. §15's `min-height:100%` on the page is what fills
+   a SHORT frame and it stays — 100% of a definite frame height is the frame,
+   so it agrees with this rather than fighting it.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .view-col > .main > .page.msg-page{flex:1 1 auto;min-height:0}
+}
+
+/* --------------------------------------------------------------------------
+   8. A ROW'S DIVIDER HAS TO BE ONE LINE
+   §16 dissolves each payment row into the table's own grid — `display:contents`
+   on `.payrow`, so the five cells become grid items and every column sizes to
+   the whole table rather than to one row. That is right, and it takes the row's
+   box away with it: there is no longer an element under a row to draw a rule,
+   so §16 hands the rule to the CELLS as a `border-bottom` each.
+
+   Five borders are only one line if all five boxes end at the same y, and they
+   did not. `align-self:center` sizes each cell to its own content and centres
+   it in the row, so the tall cell (the card, which carries a brand mark) ended
+   lower than the short ones and the divider came out as five steps at four
+   different heights — one per column, visibly staggered across the table.
+
+   `stretch` is the fix: every cell fills the row, so every border lands on the
+   row's own bottom edge and the five segments meet. The cells then have to
+   centre their CONTENT themselves, which is what they were using `align-self`
+   to get — flex does it without touching the box. `text-align` still decides
+   which end the text sits at, so §16's left/right column rules are untouched
+   for the four cells whose content is one run of text; the amount and the
+   receipt are pushed to the far end explicitly, because a flex line ignores
+   `text-align` on a child that is a box (the receipt is a button) and the
+   money column has to hold the right edge to read down.
+
+   `.pay-c` keeps its own `inline-flex` from §15 — mark and digits on one line —
+   and that is a child of the cell, not the cell itself, so nothing there moves.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .paytbl > .payrow > *{
+    align-self:stretch;
+    display:flex;align-items:center}
+  .app .paytbl > .payrow > .pay-a,
+  .app .paytbl > .payrow > .pay-r,
+  .app .paytbl > .payhead > .num{justify-content:flex-end}
+}
+
+/* --------------------------------------------------------------------------
+   9. THE BLACK LEVEL CARD ENDS IN CONTENT NOW, SO IT PAYS A BOTTOM EDGE
+   §12.9 set `padding-bottom:0` on `.lvl-hero`, and at the time that was free:
+   the card was a stack of figures over a ladder, and a ladder's last row is
+   a set of 13 bars with the track names under them — a block whose own line
+   height reads as space. Nothing was against the edge because nothing ended
+   there.
+
+   §26.6 then built `.lvl-foot`: `placeLevelCards` (ai5) moves the eyebrow and
+   every action to the BOTTOM of the card, so the last thing in it became a
+   line of type — "Confirmed August 21 · signed by Priya Nair" — sitting hard
+   on a black edge against white, with its descenders in the boundary. On a
+   phone that line is the whole foot, because §26 stacks the actions under it,
+   which is why it shows worst there.
+
+   The value matches the card's own top step rather than the frame's gutter:
+   §12 pays `--s06` at the top and §12's desktop tier `--s07`, so the block is
+   symmetrical at both widths. Stated at two classes, the same reach as §12's
+   own rule, and later — no container query, because a bottom edge is not a
+   width question and the desktop tier below only re-steps the value.
+   -------------------------------------------------------------------------- */
+.app .lvl-hero{padding-bottom:var(--s06)}
+@container app (min-width:900px){
+  .app .lvl-hero{padding-bottom:var(--s07)}
+}
+/* the one card that keeps zero: §15.14's `.path` variant ends in a bled grid
+   whose cells pay their own bottom padding and whose vertical rules have to
+   reach the base of the block. It restates zero AFTER this for that reason. */
+.app .lvl-hero:has(.path){padding-bottom:0}
+
+/* --------------------------------------------------------------------------
+   10. THE CERTIFICATE STACKS ON A PHONE
+   §15.10 draws the card as `auto minmax(0,1fr)` — a 88px mark in column one,
+   the record and the actions in column two — and only reshuffles the AREAS at
+   672px, never the column count. So on a phone the mark keeps its own column
+   out of a 343px card: 88px of rosette plus a `--s07` gutter is 112px, a
+   third of the width, and "Completed May 4, 2026 · Cohort 12" wraps after
+   "Cohort" in the 231px that are left. The mark is decoration on a record
+   whose content is four lines of text, and it was outranking all four.
+
+   It goes on top and comes down to 48px — the size §4 drew it at before §15
+   made it a hero, and the size every other mark in a box in the product is
+   drawn at (§24). Left-aligned rather than centred, because the record under
+   it is left-aligned and a centred mark over ragged-right text reads as two
+   blocks. One column, four rows, nothing indented against anything.
+   -------------------------------------------------------------------------- */
+@container app (max-width:671.98px){
+  .app .cert{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:'mark' 'body' 'act';
+    row-gap:var(--s05)}
+  .app .cert-mark{place-items:start;align-self:start}
+  .app .cert-mark svg{width:48px;height:48px}
+  /* and the two actions divide the row rather than each holding its own words:
+     "Download" and "Share link" are 5 and 7 characters, so equal halves are
+     within a few pixels of what they would take anyway, and the pair reads as
+     one control row instead of two buttons and a gap. */
+  .app .cert-act > .cert-btn{flex:1 1 0;min-width:0}
+}
+
+/* --------------------------------------------------------------------------
+   11. A FIGURE SITS UNDER ITS OWN LABEL WHEN THE PAIR WILL NOT FIT
+   §29.17 puts the label and the figure on one line — `.stat-top` is a wrapping
+   flex row, the figure pushed to the far end with `margin-left:auto` — and
+   says that when the two cannot fit, the PAIR wraps. It does. What the note
+   does not say is where the figure lands when it wraps: `margin-left:auto`
+   still applies to it on its own flex line, so it goes to the RIGHT edge of a
+   line whose only other member is nothing.
+
+   Above 700px that never happens — §10 gives the band four columns and each
+   holds "CHAPTERS DONE  5 of 13" on one line. Below it there are two columns
+   of ~145px, every one of the four pairs wraps, and the cell came out as a
+   label on the left, a figure on the right one line down, and a note back on
+   the left again: three lines, three different alignments, four times over.
+
+   So below the four-column breakpoint the pair is a column: label, figure,
+   note, all on the cell's own left edge, which is where the mark beside them
+   already sets the reading. `flex-direction` rather than dropping the flex,
+   because the baseline alignment and the gap are still what the row wants at
+   the moment it fits on one line — this is the same component, turned.
+   -------------------------------------------------------------------------- */
+@container app (max-width:699.98px){
+  .app .page .stats .stat-top{
+    flex-direction:column;align-items:flex-start;gap:2px}
+  .app .page .stats .stat-top > .n{margin-left:0;text-align:left}
+}
+
+/* --------------------------------------------------------------------------
+   12. THE PLOT IS AS TALL AS IT IS WIDE, SO ITS WIDTH IS CAPPED
+   §15.3 gave `.chart-line` `aspect-ratio:320/104` to stop the SVG's
+   `preserveAspectRatio:none` from projecting the markers into ellipses — the
+   right fix, and it makes the box's HEIGHT a function of its width. §15.11
+   then handed the plot `minmax(0,1fr)` of a desktop row. On a wide window
+   that is 1200px of column, so the plot rendered 390px tall: five points
+   drawn across the left third of a field of white, with the axis so far under
+   them that the reading at its foot read as a separate block.
+
+   Capping the column at 560px puts the plot back at 182px — the height it was
+   designed at — and the axis and the reading come with it, because all three
+   share the column. The grid simply does not use the width beyond it; nothing
+   stretches, because both tracks are `minmax` with a maximum.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .chart{grid-template-columns:minmax(0,400px) minmax(0,560px)}
+}
+
+/* --------------------------------------------------------------------------
+   13. THE DARK CARDS COME DOWN A STEP ON A PHONE
+   §15.16 sizes the plate's type for the column it was drawn in — a 24px title
+   over a 13.5px detail line, with a 15px name under it — and never re-steps
+   it. In a 343px phone column "Cohort 41, week 5" at 24px is most of the
+   card's width, and the eyebrow and the timer chip beside it are on one row
+   at full uppercase tracking, so the head row wraps before the title does.
+
+   One notch down, the same notch §12.9 already takes for `.lvl-hero`'s
+   display figure on a phone (34px → 24px there, so this is the smaller move
+   on the smaller type). The proportions inside the card are unchanged: title
+   to detail stays a fifth apart, and the person's name keeps the half-step it
+   has over the role under it.
+
+   The certificate takes the same step for the same reason — §37.10 has
+   already given it the full width of the card to set its record in, and this
+   is what makes four lines fit in it without wrapping.
+   -------------------------------------------------------------------------- */
+@container app (max-width:599.98px){
+  .app .plate-t{font-size:20px;line-height:26px;letter-spacing:-.3px}
+  .app .plate-b{font-size:13px;line-height:20px}
+  .app .plate-wb b{font-size:14px;line-height:19px}
+  .app .plate-wb > span{font-size:12px;line-height:16px}
+  .app .plate-who .av-ph{width:44px;height:44px}
+  .app .cert .n{font-size:20px;line-height:26px;letter-spacing:-.3px}
+  .app .cert .m{font-size:13px;line-height:18px}
+}
+
+/* --------------------------------------------------------------------------
+   14. ON A BOARD, WHO SAID IT COMES FIRST
+   §15.12 draws the attribution as a footnote — 11.5px helper ink under the
+   bubble — and for the one-to-one thread that is correct: there are two
+   people in it, the sides say which is which, and the line is a timestamp you
+   consult rather than read.
+
+   The cohort board is the same component with a different cast. Ten
+   consecutive posts are ten different people, so the name is not a detail
+   about the message, it is the first thing you need in order to read it — and
+   underneath, in helper grey, at the same size as the time it was joined to
+   by a middot, it was neither findable nor legible. `roomLine` (views.js) now
+   emits the name and the time as separate elements in that order, and this is
+   what they look like: the name at body size in primary ink, the time beside
+   it in helper, a gap where the middot was.
+
+   `order` is not used and the DOM order is the real order, because §13 runs
+   the thread's entrance animation on `.m` and a reordered flex child animates
+   from the position it does not occupy.
+
+   THE TOP OF THE BLOCK COMES IN. §15's `--s06` of padding above the first
+   post was measured for a `.msgs` that opens a page; on the Discussion tab it
+   sits under a tab strip that is already a boundary, and the first `.m-day`
+   pays its own `--s05` on top of it — 40px of nothing between the tab you
+   pressed and the first thing it revealed.
+   -------------------------------------------------------------------------- */
+.app .msgs.room{padding-top:var(--s04)}
+.app .msgs.room .m-w{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:0 var(--s04)}
+.app .msgs.room .m-w > b{
+  font-size:13px;line-height:18px;font-weight:600;
+  letter-spacing:-.05px;color:var(--text-primary)}
+.app .msgs.room .m-w > span{font-size:11.5px;line-height:16px;color:var(--text-helper)}
+/* and the name sits closer to the sentence it introduces than the sentence
+   sits to the next post — otherwise the header reads as belonging to the
+   message above it */
+.app .msgs.room .m-c{gap:var(--s03)}
+.app .msgs.room > .m + .m{margin-top:var(--s03)}
+
+/* --------------------------------------------------------------------------
+   15. THE FIELD'S LEADING SLOT HOLDS A CONTROL NOW
+   §16.12 laid the message field out as `star | input | acts | send` and gave
+   the input `--s05` of padding on both ends. The leading slot held
+   `.composer-star` — Tal's mark, doing nothing, on a field that sends a
+   message to a person — so the padding was buying distance from a decoration:
+   44px of slot plus 16px of padding put the placeholder 60px inside a field
+   whose own left border was the thing it should have been aligned to.
+
+   The attachment moved into that slot (views.js, lead4.js), and a control
+   changes the spacing question. `--s02` of padding, because the gap now
+   separates two things a person can press rather than a glyph from a
+   sentence, and the icon's own centring inside a 44px box is already most of
+   the distance. `.composer-lead` is a marker class only — it takes every
+   dimension from `.composer-act`, which §16 sizes — so the two attachment
+   buttons in the build cannot drift apart.
+
+   AND THE TRAILING CONTROLS STOP TOUCHING. The microphone was a 44px box
+   against a 48px send with no gap at all: two adjacent squares, one of them
+   solid orange, read as one control with a lighter half. A hairline between
+   them says they are two, and costs no width — the send keeps the field's own
+   right edge, which is §16's construction and the thing that makes this field
+   the same object as the ask bar.
+   -------------------------------------------------------------------------- */
+.app .msg-page .composer .inp,.app .composer.room-composer .inp,
+.app .ldr-dm-thread > .composer .inp{
+  padding-left:var(--s02)}
+.app .composer-lead{margin-left:0}
+.app .composer-act + .composer-send,
+.app .composer-act + .composer-act{border-left:1px solid var(--rule)}
+
+/* --------------------------------------------------------------------------
+   8. A TEXTAREA IS A BOX AGAIN
+
+   §12 rules every field on the baseline only, and the comment there says why:
+   "the box was reading as a container". For a one-line field that is right and
+   it is the standard MUI pattern — the label, the value, one rule under it,
+   and the eye has nothing to lose.
+
+   A TEXTAREA IS THE CASE THAT ARGUMENT DOES NOT COVER. It is 96px tall, so the
+   rule ends up three lines BELOW the label with nothing joining the two, and
+   the placeholder — grey text on the page's own ground — reads as a caption
+   under the label rather than as the prompt inside an empty box. On the level
+   decision that meant the one thing the leader has to WRITE ("Notes for their
+   report") looked like a sentence about what they should have written
+   somewhere else. Nothing on the page said "type here".
+
+   So the four sides come back, on the textarea only:
+
+     the border is `--border-strong-01`, the same ink the baseline rule was,
+       so nothing gets darker — the line just goes round;
+     the ground is white, which is §15's argument for the message composer
+       word for word: the one place you write into is the one white surface,
+       and on a tinted section that is what separates a field from a panel;
+     the focus ring is the 2px brand border on all four sides, because a 2px
+       bottom under a box that already has an edge reads as a broken frame;
+     and the left padding comes back — §12 zeroes it so a baseline-ruled
+       field starts on the spine, which inside a box would set the text hard
+       against its own edge.
+
+   `.f textarea` is in §02's sizing rule and is left alone: this is about the
+   frame, and every textarea in the build carries `.inp`.
+   -------------------------------------------------------------------------- */
+.app textarea.inp{
+  border:1px solid var(--border-strong-01);
+  background-color:var(--pure-white);
+  padding:var(--s04) var(--s05)}
+.app textarea.inp:hover{border-color:var(--text-primary);background-color:var(--pure-white)}
+.app textarea.inp:focus{
+  border:2px solid var(--brand-primary);
+  padding:calc(var(--s04) - 1px) calc(var(--s05) - 1px);
+  background-color:var(--pure-white)}
+.app .sec.tint textarea.inp{border-color:var(--border-strong-01)}
+
+/* --------------------------------------------------------------------------
+   16. THE FACTS AND THE STEPS ARE ONE SECTION NOW
+   Interviews used to draw them as two: a headingless `.facts` band, then a
+   "How it works" section holding the steps. They are one block — the band is
+   the summary of what the steps walk through — and `V.interviews` now puts
+   both under the one heading. The note there is the argument.
+
+   §10 sizes each of them for a section it is the ONLY thing in, so joining
+   them needs the two joints stated:
+
+   THE BAND CLEARS THE HEADING. `.facts` carries `margin:0` on all four sides
+   (§10 sets it to hang the block out to the rails; §29 pulls the sides back
+   in and leaves the zero on top). Under a `.sec-h` that put a bordered strip
+   directly against the heading's own bottom margin, which reads as a rule
+   belonging to the heading rather than the top edge of the band.
+
+   AND THE STEPS CLEAR THE BAND. `.steps` is a borderless flex column whose
+   rows draw their own dividers, so its first row's rule landed a pixel under
+   the band's bottom rule: two hairlines with nothing between them, which is
+   the one thing a page made of hairlines must not do.
+
+   Both are keyed on the ADJACENCY rather than on the section, so nothing
+   reaches a `.facts` or a `.steps` anywhere else — the enrolment page's band
+   and the leader's standing band are both still `:only-child` and untouched.
+   -------------------------------------------------------------------------- */
+.app .sec > .sec-h + .facts{margin-top:var(--s02)}
+.app .facts + .steps{margin-top:var(--s07)}
+
+/* --------------------------------------------------------------------------
+   9. EVERY COLUMN READS FROM THE SAME EDGE
+
+   §02 right-aligns two things in a `.tbl`: any cell marked `.num`, and the
+   last cell of every row. Both are the standard newspaper treatment and both
+   are wrong in these tables, for the same reason.
+
+   A `.num` column here is not a column of figures to be added up — it is
+   "7 of 13", "66%", "2.3", "15h 31m", each a reading with a unit or a
+   denominator attached. Right-aligned, the digits line up on their last
+   character, which for mixed-length readings puts "7 of 13" and "10 of 13"
+   on two different starts and the eye has nothing to run down. Worse, the
+   header sits at the far end of its own column, so the label and the data it
+   labels are as far apart as the column allows: on Course Reports "TIME" was
+   ranged right against "15h 31m" while "LAST ACTIVE" beside it was ranged
+   left, and nothing said why the two behaved differently.
+
+   So every heading and every cell reads from the left, which is the edge the
+   heading is already on, and a column becomes a column: label at the top,
+   values under it, one stem. `font-variant-numeric:tabular-nums` stays exactly
+   where it was — that is what keeps the digits themselves in step, and it is
+   the half of the old treatment that was doing the work.
+
+   THE CHEVRON KEEPS ITS EDGE. `.ldr-go` is not data and has no heading: it is
+   the row's affordance, and it belongs at the end of the row it opens. It is
+   the last child, so the `:last-child` rule was what was aligning it; with
+   that gone it has to say so itself.
+   -------------------------------------------------------------------------- */
+.app .tbl th,.app .tbl td,
+.app .tbl th.num,.app .tbl td.num,
+.app .tbl th:last-child,.app .tbl td:last-child{text-align:left}
+.app .tbl td.ldr-go,.app .tbl th:empty{text-align:right}

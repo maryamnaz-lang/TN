@@ -44,6 +44,12 @@ const LDR_BOARDS = {
 };
 
 const ldrBoard = id => +id === LEAD_COHORTS[0].id ? ROOM : (LDR_BOARDS[id] || []);
+/* THE POST COUNT IS NO LONGER DRAWN. It rode inside each cohort tab as an
+   `.lf-n` — "Cohort 41  5" — and a tab is a place you go, not a figure you
+   read: three counts in a three-tab strip is three numbers competing with the
+   three names you are actually choosing between, and the count of posts on a
+   board you are about to open is on the board. The helper stays because the
+   board's own head is where a count belongs if one is ever wanted. */
 const ldrPosts = id => ldrBoard(id).filter(r => r[0] !== 'day').length;
 
 /* --------------------------------------------------------------------------
@@ -74,6 +80,13 @@ const LDR_THREADS = [
 S.ldrMsg = 'boards';
 S.ldrBoardCo = LEAD_COHORTS[0].id;
 S.ldrTh = 0;
+/* NARROW WIDTHS SHOW ONE OF THE TWO COLUMNS AT A TIME, and this is which.
+   Both columns are always rendered — the class on `.ldr-dm` is what §36.17
+   reads to decide, so at 900px and up the pair is a two-pane inbox whatever
+   this says, and below it the same markup is a list you tap into and come
+   back out of. State rather than a DOM class because `render()` rebuilds the
+   panel from scratch (trap 9). */
+S.ldrThOpen = false;
 S.ldrEditProfile = false;
 S.ldrAvail = false;
 
@@ -100,7 +113,12 @@ V.leadMessages = () => {
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
   const unread = LDR_THREADS.filter(t => t.msgs[t.msgs.length-1].me === 0).length;
 
-  return `<main class="main"><div class="page">
+  /* `msg-mod` is read by ai6: this module carries no Tal summary. The note
+     there makes the argument for the candidate's thread and it holds twice
+     over here — a page whose two tabs are both a conversation does not need a
+     paragraph telling you what it is, and the band was taking ~116px off the
+     one surface on the page that has to fit the frame. */
+  return `<main class="main"><div class="page msg-mod">
   ${crumb(['Dashboard','leadDash'],'Messages')}
   ${ph('Messages','The cohort boards, which your candidates read too, and your one-to-one threads.')}
   <div class="sec sec-cs">
@@ -110,59 +128,132 @@ V.leadMessages = () => {
     </div>
   </div>
   ${tab === 'boards' ? `
-  <div class="sec">
-    <div class="sec-h"><h2>${lname(co)}</h2><span class="t-helper-01">${co.members.length} members &middot; week ${co.week} of 13</span></div>
-    <div class="btn-set ldr-picker">
-      ${LEAD_COHORTS.map(c => `<button class="btn ${c.id === co.id ? 'btn-p' : 'btn-g'} noic" data-ldrboard="${c.id}">${lname(c)} <span class="ldr-n">${ldrPosts(c.id)}</span></button>`).join('')}
+  ${/* THE COHORT PICKER IS IN THE SECTION'S OWN HEAD ROW, and it took two
+        goes to land there. It began as three `.btn`s, which was wrong for the
+        reason the paragraph above this function gives: `.cs` is for a control
+        that CHANGES WHAT IS RENDERED, and choosing Cohort 33 swaps the whole
+        thread underneath — that is a tab, not a value in a form.
+
+        So it became a second `.cs` strip under the module's own, and that was
+        worse in a way only the page shows: `.cs` is full-bleed chrome that
+        takes a section to itself, so two of them stacked drew two full-width
+        bars with an empty band above and below each, and the eye had no way to
+        tell which of the two rows was the page's structure. The paragraph
+        above warned about exactly this ("two strips stacked is two decisions
+        before you have read anything") and the warning was right.
+
+        A SEGMENTED CONTROL IN THE HEADING ROW answers both. It is still a
+        tab — linked cells, one filled, `role=tablist` — but it is the size of
+        a control and it sits where `.sec-h` already puts one (the dashboard's
+        "View all 3", the roster's search). One strip on the page, and the
+        cohort choice reads as belonging to the board it is above rather than
+        as a second navigation. §36.16 draws it.
+
+        THE META MOVES INTO THE SENTENCE UNDER IT, because the head row now
+        holds the picker where the meta was. It reads better there anyway: the
+        members and the week are context for the board, and the sentence they
+        now open is about what the board IS. */''}
+  ${/* WHITE, NOT TINT. `.sec.tint` is the product's quiet ground for a block
+        you read past — a table of figures, a queue. A board is the page's
+        subject here, and it is the SAME board the candidate reads on their own
+        Cohort page, where the Discussion tab sits on white. Two grounds for one
+        thread is the tell that the leader is looking at a copy of it rather
+        than at it. */''}
+  <div class="sec ldr-board">
+    <div class="sec-h"><h2>${lname(co)}</h2>
+      <div class="ldr-copick" role="tablist" aria-label="Which cohort's board">
+        ${LEAD_COHORTS.map(c => `<button class="${c.id === co.id ? 'on' : ''}" data-ldrboard="${c.id}" role="tab" aria-selected="${c.id === co.id}">${lname(c)}</button>`).join('')}
+      </div>
     </div>
-    <p class="t-helper-01 mt4">This is the same board your candidates see on their own Cohort page. Anything you post here, the whole group reads.</p>
-  </div>
-  <div class="sec tint">
+    <p class="t-helper-01 mb5">${co.members.length} members, week ${co.week} of 13 at ${llevel(co)}. This is the same board they see on their own Cohort page &mdash; anything you post here, the whole group reads.</p>
     ${board.length ? `<div class="msgs room">
       ${board.map(r => r[0] === 'day'
         ? `<div class="m-day"><span>${r[1]}</span></div>`
         : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
     </div>` : `<div class="empty" style="border:0">${I.chat}
       <h3>Nothing posted yet</h3><p>${lname(co)} started ${co.day} day${co.day === 1 ? '' : 's'} ago. Opening the board yourself is usually what starts it.</p></div>`}
+    ${/* THE FIELD IS THE DISCUSSION TAB'S FIELD, slot for slot. §37.15 moved
+          the attachment into the leading slot on the candidate side and took
+          Tal's mark out of it — the mark was a decoration on a field that
+          posts to nine other people, and it was buying 60px of indent for a
+          glyph. The leader's board is the same surface, so it takes the same
+          three slots in the same order: attach, the line, send. */''}
     <div class="composer room-composer">
-      <span class="composer-star">${I.ai}</span>
+      <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
       <input class="inp" id="ldrPost" placeholder="Post to ${lname(co)}" aria-label="Post to the cohort">
-      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
       <button class="composer-send" data-ldrpost="1" aria-label="Post">${I.send}</button>
     </div>
   </div>` : `
-  <div class="sec">
-    <div class="sec-h"><h2>Your threads</h2><span class="t-helper-01">${unread ? unread + ' waiting on a reply from you' : 'nothing waiting'}</span></div>
-    <div class="tile-stack">
-      ${LDR_THREADS.map((t,i) => {
-        const last = t.msgs[t.msgs.length-1];
-        return `<button class="tile clk gcard face-row${i === S.ldrTh ? ' ldr-on' : ''}" data-ldrth="${i}">
-          <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
-          <span class="gcard-b"><h3>${t.who} ${last.me === 0 ? '<span class="tag org sm">Your reply</span>' : ''}</h3>
-            <span class="sub">Cohort ${t.co} &middot; ${t.msgs.length} message${t.msgs.length === 1 ? '' : 's'} &middot; ${last.w.toLowerCase()}</span></span>
-          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('chevRight')}</svg>
-        </button>`;
-      }).join('')}
-    </div>
-  </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>${th.who}</h2><span class="t-helper-01">Private &middot; Cohort ${th.co}</span></div>
-    <div class="msgs">
-      ${th.msgs.map(msg => `<div class="m ${msg.me ? 'me' : 'them'}">
-        <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
-        <div class="m-c">
-          <div class="m-b">${msg.t}</div>
-          <div class="m-w">${msg.me ? 'You' : th.who} &middot; ${msg.w}</div>
+  ${/* DIRECT IS AN INBOX, NOT A LIST AND THEN A THREAD.
+        It was a full-width list of the three threads with the open one drawn
+        underneath it, so reading a conversation meant scrolling past the list
+        that got you there, and switching person meant scrolling back up. Every
+        one-to-one interface in the world answers this the same way and so does
+        this product on the candidate side: the people on the left, the
+        conversation on the right, and the conversation is where the height
+        goes. A quarter and three quarters, per the brief.
+
+        THE RIGHT-HAND SIDE IS THE CANDIDATE'S OWN MESSAGES PAGE, component for
+        component: `.msgs` for the thread, `.composer` for the field, the thread
+        scrolling inside its own box with the field pinned under it (§36.17).
+        That is the point of borrowing it — the leader and the candidate are
+        reading the same conversation, so they should be looking at the same
+        object.
+
+        BELOW 900 THE TWO COLUMNS BECOME TWO SCREENS' worth of one column: the
+        list first, then the thread, which is the shape it had. A 25% rail at
+        390px is 97px, and a name does not fit in it. */''}
+  <div class="sec ldr-dm-sec">
+    <div class="ldr-dm${S.ldrThOpen ? ' show-thread' : ''}">
+      <div class="ldr-dm-list" role="tablist" aria-label="Your one-to-one threads">
+        <div class="ldr-dm-lh">Threads<span class="t-helper-01">${unread ? unread + ' waiting on you' : 'nothing waiting'}</span></div>
+        ${LDR_THREADS.map((t,i) => {
+          const last = t.msgs[t.msgs.length-1];
+          return `<button class="ldr-dm-t${i === S.ldrTh ? ' on' : ''}" data-ldrth="${i}" role="tab" aria-selected="${i === S.ldrTh}">
+            <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
+            <span class="ldr-dm-tb">
+              <span class="ldr-dm-tn">${t.who}${last.me === 0 ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
+              <span class="ldr-dm-tx">${last.me ? 'You: ' : ''}${last.t}</span>
+            </span>
+            <span class="ldr-dm-tw">${last.w.replace(/ \d?\d:\d\d [AP]M/,'')}</span>
+          </button>`;
+        }).join('')}
+      </div>
+      <div class="ldr-dm-thread">
+        <div class="ldr-dm-h">
+          ${/* THE WAY BACK, and it exists only where there is somewhere to go
+                back TO: at 900px and up the list is beside this column, so
+                §36.17 hides the button rather than the view branching on a
+                width it cannot measure. `.ph-back` is the page header's own
+                back control, reused — one arrow, one shape, everywhere. */''}
+          <button class="ph-back ldr-dm-back" data-ldrthback="1" aria-label="Back to your threads">${I.arrowLeft}</button>
+          <span class="mem-av mem-ph">${avatar({i:th.i, img:AV[th.img]}, 36)}</span>
+          <span class="ldr-dm-hb"><b>${th.who}</b><span>Private &middot; Cohort ${th.co} &middot; you can see their chapters, scores and attendance</span></span>
         </div>
-      </div>`).join('')}
+        <div class="msgs">
+          ${th.msgs.map(msg => `<div class="m ${msg.me ? 'me' : 'them'}">
+            <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
+            <div class="m-c">
+              <div class="m-b">${msg.t}</div>
+              <div class="m-w">${msg.me ? 'You' : th.who} &middot; ${msg.w}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+        ${/* THE FIELD IS THE CANDIDATE'S MESSAGE FIELD, slot for slot: attach
+              inside the box on the left, the line, the microphone, and the send
+              holding the box's own right edge (§16.12). It carries the mic
+              because the other end of this conversation has one — Priya's voice
+              note is the second-to-last thing in the candidate's own thread —
+              and a reply field that cannot answer in kind is the two halves of
+              one conversation disagreeing about what a message is. */''}
+        <div class="composer">
+          <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
+          <input class="inp" id="ldrReply" placeholder="Reply to ${th.who.split(' ')[0]}" aria-label="Reply">
+          <button class="composer-act" aria-label="Record a voice message">${I.microphone}</button>
+          <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
+        </div>
+      </div>
     </div>
-    <div class="composer">
-      <span class="composer-star">${I.ai}</span>
-      <input class="inp" id="ldrReply" placeholder="Reply to ${th.who.split(' ')[0]}" aria-label="Reply">
-      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
-      <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
-    </div>
-    <p class="t-helper-01 mt4">You can see ${th.who.split(' ')[0]}&rsquo;s chapter progress, scores and attendance, so a thread never has to open by asking where they have got to.</p>
   </div>`}
 </div></main>`;
 };
@@ -266,7 +357,7 @@ V.leadCerts = () => {
       <li><span class="s-n">3</span><span class="s-b"><b>Twelve signed level decisions reviewed</b>
         Nine of twelve reviewed by the manager of cohort leaders. The three waiting are from the cohorts you closed in June.</span></li>
     </ol>
-    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your decision against the transcript and agreed with the rung. It is the one requirement you cannot finish on your own.</p>
+    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your decision against the transcript and agreed with the level. It is the one requirement you cannot finish on your own.</p>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>The record behind them</h2></div>
@@ -367,7 +458,7 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
       <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
       <div><span class="l">Completion rate</span><span class="v">84%</span></div>
-      <div><span class="l">Level movement</span><span class="v">+0.8 rungs</span></div>
+      <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
     </div>
     <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; levelling somebody too high comes back later as a candidate who does not finish.</p>
   </div>
@@ -465,13 +556,16 @@ device.addEventListener('click', e => {
   const t = e.target;
 
   const ms = t.closest('[data-ldrmsg]');
-  if(ms){ S.ldrMsg = ms.dataset.ldrmsg; render(); return; }
+  /* pressing the tab always lands on the list, never back inside whichever
+     thread was open last time — the tab is "Direct", not "Yuki Tanaka" */
+  if(ms){ S.ldrMsg = ms.dataset.ldrmsg; S.ldrThOpen = false; render(); return; }
 
   const bd = t.closest('[data-ldrboard]');
   if(bd){ S.ldrBoardCo = +bd.dataset.ldrboard; render(); return; }
 
   const th = t.closest('[data-ldrth]');
-  if(th){ S.ldrTh = +th.dataset.ldrth; render(); return; }
+  if(th){ S.ldrTh = +th.dataset.ldrth; S.ldrThOpen = true; render(); return; }
+  if(t.closest('[data-ldrthback]')){ S.ldrThOpen = false; render(); return; }
 
   /* POSTING PUTS IT ON THE SHARED ARRAY. Cohort 41's board IS `ROOM`, so a
      post here is on the candidate's Cohort page the moment the switcher
@@ -542,7 +636,7 @@ Object.assign(LEAD_TAL.where, {
 Object.assign(LEAD_TAL.ctx, {
   leadCohort: ['Where is this cohort stuck?','Brief me for this call','Who here needs me most?'],
   leadMember: ['What should I say to them?','Is this recoverable?','Draft a check-in'],
-  leadEval:   ['Why did you propose this rung?','What evidence supports it?','What would change your mind?'],
+  leadEval:   ['Why did you propose this level?','What evidence supports it?','What would change your mind?'],
   leadSum:    ['Are they ready to be promoted?','What should I write here?']
 });
 Object.assign(ASK_WHERE, LEAD_TAL.where);

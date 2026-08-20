@@ -56,7 +56,7 @@
 }
 
 /* ==========================================================================
-   20. THE LADDER — 15 rungs. Completed and current carry the accent.
+   20. THE LADDER — 15 levels. Completed and current carry the accent.
    ========================================================================== */
 .ladder{display:flex;align-items:flex-end;gap:3px;height:56px;margin-top:var(--s04)}
 .ladder i{

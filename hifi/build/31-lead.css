@@ -180,10 +180,39 @@
   color:var(--text-helper);font-weight:400}
 .app[data-portal="leader"] .lead-filter button.on .lf-n{color:var(--text-secondary)}
 .app[data-portal="leader"] .lead-none{padding:var(--s08) 0}
+/* ON A PHONE THE THREE FILTERS SPAN THE ROW, END TO END.
+   Stacked under the search field the strip is a full-width row with three
+   content-width tabs in it, so it ended a third of the way short — and the
+   empty third still carried the strip's own bottom rule, which reads as a
+   fourth tab that failed to load. Below 700 the strip is where the row's width
+   comes from, so it divides it: three equal columns, each tab centred in its
+   own, and the whole strip is one control the width of the table it filters.
+   `overflow:visible` because a grid of three fractions cannot overflow, and
+   the `auto` inherited from `.cs` would otherwise leave a scroll box that
+   scrolls nowhere. */
+.app[data-portal="leader"] .lead-filter{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
+.app[data-portal="leader"] .lead-filter button{
+  min-width:0;padding-left:var(--s03);padding-right:var(--s03);
+  justify-content:center;text-align:center}
+.app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s03)}
 @container app (min-width:700px){
   .app[data-portal="leader"] .lead-tools{
     flex-direction:row;align-items:flex-end;justify-content:space-between;
     gap:var(--s06)}
+  /* back to a strip at the end of the row, sized to its words — and CLOSED ON
+     THE LEFT. `.cs` rules its own top and bottom and gives every tab a right
+     border, which is exactly right for a strip that starts at the page's spine:
+     there is nothing to its left to be separated from. This one floats at the
+     end of a row, so the same set of borders left it open on one side — three
+     cells in a box with a missing wall. One declaration on the strip rather
+     than a border on the first tab, so the line is the strip's edge and lines
+     up with its own top and bottom. */
+  .app[data-portal="leader"] .lead-filter{
+    display:flex;overflow-x:auto;border-left:1px solid var(--rule)}
+  .app[data-portal="leader"] .lead-filter button{
+    padding-left:var(--s04);padding-right:var(--s04)}
+  .app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s04)}
 }
 
 /* --------------------------------------------------------------------------
@@ -453,9 +482,31 @@
 /* --------------------------------------------------------------------------
    5. THE BOOKED LIST
    A row is a date, who you are meeting, what it is, and the one thing you do.
-   The date chip is `.day` — the same chip the candidate's slot picker uses —
-   so the leader's diary and the candidate's booking flow draw a date the same
-   way. It is not a control here, so it loses the pointer and keeps the box.
+
+   IT IS A TIME COLUMN, NOT A CHIP. The date started as `.day` — the bordered
+   box the candidate's slot picker uses — on the argument that a date should be
+   drawn the same way everywhere. It is the same MARKUP and it is not the same
+   OBJECT: in the picker the box is a control you press to choose a day, and
+   its border is what says "pressable". Here nothing is pressable but the row,
+   so six bordered boxes down the left of six rows drew six empty tiles around
+   the one thing on the row that needs no container — and being empty, they
+   read as the loudest thing in the block.
+
+   What a diary wants there is a TIME COLUMN: the pair set against a single
+   vertical hairline, which is the line every timetable in print draws between
+   when and what. So the box goes and the rule stays, full row height. No fill
+   and no colour — the separation is one 1px line and the type does the rest.
+
+   THE PAIR IS LEFT-ALIGNED, AND THE FIRST CUT OF THIS WAS NOT. Right-aligning
+   them against the rule lines the figures up on their own tabular stem, which
+   is the classic timetable argument — and it is the wrong one here, because the
+   labels are words of very different lengths ("MON" against "TOMORROW"). Set
+   ragged-left, every row's day starts at a different x and the column has no
+   edge on the side the eye actually reads from: you scan a list down its LEFT
+   margin, and the page's spine is that margin. Left-aligned, the day and the
+   time share one stem with the section heading above them and every other
+   block on the page; the rule on the right is what keeps the fixed width
+   legible as a column rather than as an indent.
 
    ONE WIDTH, NOT A MINIMUM. This was `min-width:82px`, which is a floor and not
    a size: "TODAY" sat at the floor, "TOMORROW" pushed past it to about 94px,
@@ -464,12 +515,31 @@
    `width` fixed at the widest label the set can hold, with `flex:none` (already
    on `.day`) so it neither grows into the row nor shrinks under a long title,
    and `nowrap` so a two-word day cannot wrap inside the fixed box instead.
-   104px is "TOMORROW" at 11px/.7px tracking plus the chip's two 12px gutters.
+
+   TODAY IS THE ONE ROW THAT IS DIFFERENT, and it says so in WEIGHT, not in a
+   colour: `.bk-now`'s label takes full-strength ink where every other day
+   stays helper grey. It is the cheapest possible mark for "this is happening
+   in the hours you are looking at", and it survives §13 — the entrance
+   animations end at their own final keyframe, so weight and ink hold where an
+   opacity would not (trap 2).
    -------------------------------------------------------------------------- */
 .app[data-portal="leader"] .bk-day{
-  align-self:flex-start;width:104px;min-width:0;cursor:default;
-  white-space:nowrap;border-color:var(--rule-on-2)}
-.app[data-portal="leader"] .bk-day .n{font-size:15px;line-height:21px}
+  align-self:stretch;width:104px;min-width:0;cursor:default;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+  gap:1px;white-space:nowrap;text-align:left;
+  padding:var(--s02) var(--s05) var(--s02) 0;
+  background:none;border:0;border-right:1px solid var(--rule)}
+.app[data-portal="leader"] .bk-day .d{
+  font-size:10.5px;line-height:14px;letter-spacing:.8px;color:var(--text-helper)}
+.app[data-portal="leader"] .bk-day .n{
+  margin-top:0;font-size:16px;line-height:22px;letter-spacing:-.2px;
+  color:var(--text-primary)}
+.app[data-portal="leader"] .bk-day.bk-now .d{color:var(--text-primary)}
+/* the tinted section paints its own hairline one step darker, and §12 hands
+   that to `.day` as a BORDER-COLOR on all four sides. With one border left
+   the same declaration reaches it and the rule sits at the same weight as the
+   dividers between the rows — which is what it is. */
+.app[data-portal="leader"] .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
 .app[data-portal="leader"] .bk-row{gap:var(--s05)}
 /* THE ROW IS THE TARGET. `bookedRow` renders a <button>, so the arrow at the
    end is a glyph and not a control — it inherits `.cardrow:hover .tile-arrow`

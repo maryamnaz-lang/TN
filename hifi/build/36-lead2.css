@@ -110,7 +110,7 @@
    drawn by `.tq` — the component the candidate's own transcript page uses,
    timestamp column and all. What `.tq` has no drawing for is the READING of a
    line, which is the whole reason it is quoted here: one moment is why the
-   rung is not lower and the other is why it is not higher.
+   level is not lower and the other is why it is not higher.
 
    It goes in the `.tq-w` slot beside the speaker, which already holds exactly
    this kind of mark — `.tq-scene` is an icon and a word in `--support-attention`
@@ -134,20 +134,70 @@
 /* --------------------------------------------------------------------------
    §36.5 THREE PICKERS MADE OF BUTTONS
 
-   A rung, a recommendation and a cohort board are all "choose one of a few",
+   A level, a recommendation and a cohort board are all "choose one of a few",
    and none of them is a tab strip: `.cs` is full-bleed chrome that changes
    what is rendered, and these change a value inside a form or a panel. So
    they are `.btn`s in a `.btn-set`, with the chosen one taking `.btn-p` — the
    same way the wireframe drew its level picker and the same way every toggle
    in this product looks.
 
-   `.btn-set` is a flex row and these have to WRAP: five rungs fit on one line
-   at 900px and not at 360px, and four recommendations do not fit on one line
-   anywhere. Wrapping is all these three rules do.
+   `.btn-set` is a flex row and two of these have to WRAP: four
+   recommendations do not fit on one line anywhere near a phone, and a board
+   picker names its cohorts. Wrapping is all those two rules do.
    -------------------------------------------------------------------------- */
-.app .ldr-rungs,.app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
-/* a rung is one character, so the button should not be as wide as a word */
+.app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
+/* a level is one character, so the button should not be as wide as a word */
 .app .ldr-rungs .btn{min-width:64px;justify-content:center}
+
+/* THE FIFTEEN LEVELS ARE ONE LINE, AND THE LINE NEVER WRAPS.
+   The ladder is the product's one picture of "how far from here to the top",
+   and it is always drawn as a single run of fifteen — `ladder()` in views.js,
+   the track band, the accordion that says "fifteen levels in one line". A
+   picker that wraps it into 8 + 7 is not that picture any more: the level you
+   are choosing is a POSITION, and a position needs an axis to be read against.
+   Wrapping also produced the specific ugliness the five-level version had, a
+   last row of one button stretched to the full width of the form and reading
+   as the recommended answer.
+
+   TWO LAYOUTS, ONE AXIS.
+
+   DESKTOP — fifteen equal columns. `minmax(0,1fr)` overrides the `min-width`
+   above so each level takes a fifteenth of the column: at 1400px that is 88px
+   for a two-character label, comfortable, and every level the same width, which
+   is what makes the row read as a scale rather than as a toolbar.
+
+   TABLET AND PHONE — the same single line, scrolled. Fifteen buttons cannot
+   fit 390px at a legible size, and the answer is not to wrap it but to let it
+   run: `overflow-x:auto` with `flex:none` buttons, which is exactly what
+   `.daystrip` (§29) does for the slot picker's days. `scrollbar-width:none`
+   for the same reason it does — the row is short and the scrollbar would be
+   half the height of the control. The 6px of bottom padding is the focus
+   ring's room, or a keyboard user's outline gets clipped by the scroll box.
+
+   THE BAND BREAK IS A GAP, NOT A LABEL. Five levels, gap, five, gap, five —
+   `nth-child(5n+1)` from the second group on. It is the only thing separating
+   Explorer from Builder in the row, and it is enough because the labels carry
+   their band letter; a legend under fifteen buttons would be a second row of
+   type saying what the buttons already say.
+   -------------------------------------------------------------------------- */
+.app .ldr-rungs{
+  display:flex;flex-wrap:nowrap;gap:var(--s03);
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scrollbar-width:none;padding-bottom:6px}
+.app .ldr-rungs::-webkit-scrollbar{display:none}
+.app .ldr-rungs .btn{
+  flex:none;min-width:56px;
+  padding-left:var(--s04);padding-right:var(--s04)}
+.app .ldr-rungs .btn:nth-child(5n+1):not(:first-child){margin-left:var(--s05)}
+@container app (min-width:900px){
+  /* the whole ladder fits, so it stops being a scroller and becomes a scale:
+     equal columns, no scroll, and the band gaps carried over as grid gaps */
+  .app .ldr-rungs{
+    display:grid;grid-template-columns:repeat(15,minmax(0,1fr));
+    overflow:visible;padding-bottom:0}
+  .app .ldr-rungs .btn{
+    min-width:0;padding-left:var(--s02);padding-right:var(--s02)}
+}
 
 /* the count on a board picker: the same treatment §31 gives `.lf-n` on the
    dashboard's filter chips, which is where a count-inside-a-control was first
@@ -277,3 +327,377 @@
    prose is the only way to tell those two apart.
    -------------------------------------------------------------------------- */
 .app .tbl td.ldr-prose{text-align:left}
+
+/* --------------------------------------------------------------------------
+   §36.12 THE COMPETENCY READ IS A DARK CARD
+
+   It is Tal's inference, not the platform's record, and this product says that
+   with a black card — the dashboard's due-now plate, the level card, the
+   certificate. `placeDark` (ai5) lifts it into the module head band with them,
+   one block under the sentence it itemises; the note above `V.leadEval` in
+   lead3.js is where the argument is written down.
+
+   WHAT A TABLE NEEDS ON BLACK, and it is only ink and rules — the geometry is
+   §02's and stays. Four things had no contrast at all against `--surface-dark`
+   and each is answered against a token that was made for this ground:
+
+     the column heads   `--on-dark-2`, and their closing rule the border token
+     the row rules      `--on-dark-rule`, the same hairline `.plate-x` uses
+     the prose          `--on-dark-2`; the competency name keeps full strength
+     the level chips     see below — the light-ground tag palette is unusable
+                        here, and this is the part worth being careful about.
+
+   THE CHIPS INVERT RATHER THAN RE-TINT. `.tag.brand` is a solid black pill
+   with white ink: on a black card it disappears entirely. `.tag.green` and
+   `.tag.org` are dark green and dark amber ink on a transparent ground, which
+   on black is 1.5:1 — unreadable rather than merely quiet. Re-tinting to
+   lighter greens and ambers would need two new tokens and would still put
+   three colours in a four-row table. So the chips say the one thing the column
+   is for: THE LEVEL TAL PROPOSES is a filled white chip, every other reading is
+   the outlined chip the plate's timer already uses. Direction is what the
+   sentence under the table is for, and it says it in words.
+   -------------------------------------------------------------------------- */
+.app .ldr-read{
+  background-color:var(--surface-dark);color:var(--on-dark);
+  padding:var(--s06)}
+.app .ldr-read-h{
+  display:flex;align-items:baseline;justify-content:space-between;
+  gap:var(--s05);margin-bottom:var(--s05)}
+.app .ldr-read-h > h2{
+  font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.05px;
+  color:var(--on-dark)}
+.app .ldr-read .tbl th{
+  color:var(--on-dark-2);border-bottom-color:var(--on-dark-border)}
+.app .ldr-read .tbl td{
+  color:var(--on-dark-2);border-bottom-color:var(--on-dark-rule)}
+.app .ldr-read .tbl td:first-child{color:var(--on-dark);font-weight:600}
+.app .ldr-read .ldr-read-x{
+  margin-top:var(--s05);max-width:64ch;
+  font-size:13px;line-height:21px;color:var(--on-dark-2)}
+/* the outlined chip, for every chip on this card… */
+.app .ldr-read .tag{
+  background-color:transparent;border-color:var(--on-dark-border);
+  color:var(--on-dark)}
+/* …and the filled one, for the single reading that is Tal's answer */
+.app .ldr-read .tag.brand{
+  background-color:var(--on-dark);border-color:var(--on-dark);
+  color:var(--surface-dark)}
+.app .ldr-read .tag svg{fill:currentColor}
+
+/* --------------------------------------------------------------------------
+   §36.13 THE QUOTED EVIDENCE IS NOT A TRANSCRIPT
+
+   `.ivt-lines` is the candidate's own transcript page: hundreds of lines that
+   ARE the page, so §16 bleeds the block to the column edge by negative margin
+   and rules every row wall to wall. The leader's level decision borrows the
+   same component for two quoted moments inside a section that has a heading,
+   a helper line and other sections above and below it — and there the bleed
+   is wrong twice over. The rules ran past the text on both sides, so they read
+   as section dividers rather than as the lines between two quotes; and the
+   last one landed 24px above the section's own rule, which is the same line
+   drawn twice.
+
+   So on this portal the block sits inside the gutter and the rows pay none of
+   their own: the hairlines then start and stop where the words do, and the
+   last row leaves the closing edge to the section — the argument §26.11 and
+   §37.1 both make, that nothing draws a rule onto a block that already has an
+   edge. Portal-scoped because `.ivt-lines` on the candidate side is the
+   transcript, where every one of §16's choices is right.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .ivt-lines{margin-left:0;margin-right:0}
+.app[data-portal="leader"] .ivt-lines > .tq{padding-left:0;padding-right:0}
+.app[data-portal="leader"] .ivt-lines > .tq:last-child{border-bottom:0}
+
+/* --------------------------------------------------------------------------
+   §36.14 A RECORD, A FORM AND A LIST OF SWITCHES ALL PUT THEIR HEADING ON TOP
+
+   §10.15 gives a section with a `.sec-h` a 184px label column at desktop and
+   opts out the wrappers whose contents need the full width — rows, tables,
+   figure bands, and (§36.9) the message and transcript columns. What was never
+   on that list is everything built out of a `.tile` or a `.tg`, because until
+   this pass nothing of that shape had a heading over it. Three kinds of block
+   on the leader's pages are exactly that shape, and every one of them reads
+   worse in a label column:
+
+     A FORM — the level decision, the ninety-day recommendation. Its fields are
+       sized against the column: a fifteen-rung picker and two textareas, all
+       of which lose 184px of the width they are drawn to. And a form's heading
+       is a heading FOR the fields, not a label beside them — you read it, then
+       you fill them in, downwards.
+     A RECORD — "Who reviews you", "What you published", the signed decision.
+       Four `.kv` rows whose own left column is already a label column, so the
+       page drew two of them side by side: a 184px label, then a 33% label,
+       then the value.
+     A LIST OF SWITCHES — Notifications. `.tg` puts the switch hard right of
+       whatever width it is given, so the label column moved four switches
+       184px in from the edge every other row on the page ends at.
+
+   And the heading was the part that broke first: at 184px "Your recommendation"
+   hyphenated to "recomme / ndation".
+
+   THE HEADING PAYS NO GUTTER HERE, which is the one thing to get right and the
+   opposite of what §10.15's own opt-outs do. Every member of that list pays
+   `--pad-x` on its `.sec-h` because §28 has ZEROED the section's gutter under
+   it — a section of rows lets its rows reach the column edge, so the heading
+   has to put itself back on the spine. None of these three shapes is a section
+   of rows: they keep the base `--gutter`, so the content is already on the
+   spine and a heading paying `--pad-x` on top of it lands 32px to the RIGHT of
+   the first label it heads. §10.15 says exactly this about `.stats` and
+   `.tbl-wrap`. Zero, for the same reason.
+
+   THE FORM CASE IS NOT PORTAL-SCOPED and the other two are. A form wants the
+   column wherever it is — the candidate's account page and enrolment have the
+   same fields — but a `.tile` of `.kv` rows on the candidate side is a
+   different object in a different place (the payment summary, the booking
+   record), and those read well beside a label. Restated inside the same
+   container query as §10.15 rather than after it, per §36.9.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .tile .f),
+  .app[data-portal="leader"] .sec:has(> .tile),
+  .app[data-portal="leader"] .sec:has(> .tg){display:block}
+  .app .sec:has(> .tile .f) > .sec-h,
+  .app[data-portal="leader"] .sec:has(> .tile) > .sec-h,
+  .app[data-portal="leader"] .sec:has(> .tg) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding-left:0;padding-right:0}
+  .app .sec:has(> .tile .f) > :not(.sec-h),
+  .app[data-portal="leader"] .sec:has(> .tile) > :not(.sec-h),
+  .app[data-portal="leader"] .sec:has(> .tg) > :not(.sec-h){padding-left:0}
+}
+
+/* --------------------------------------------------------------------------
+   §36.16 THE COHORT PICKER IS A SEGMENTED CONTROL
+
+   Messages picks a section with a `.cs` strip and then, inside Cohort boards,
+   picks WHICH board. The second choice was drawn as a second `.cs` — and `.cs`
+   is full-bleed chrome that owns a section, so the page came out as two
+   full-width bars separated by empty bands, with nothing to say which of them
+   was the page's structure. lead4.js's own note warns about it; the note in
+   `V.leadMessages` records how it got here.
+
+   SO IT IS A CONTROL, IN THE HEAD ROW, and it keeps the one thing that made
+   the strip right: it still reads as a tab. Linked cells sharing one border,
+   one of them filled — which is this product's "chosen" mark everywhere from
+   the level picker to the recommendation set (`.btn-p`, black fill, white ink).
+   What it loses is the full width and the section of its own.
+
+   BLACK FILL AND NOT THE ACCENT UNDERLINE. The underline is `.cs`'s mark and
+   there is exactly one `.cs` on this page now; borrowing its mark for a
+   control inside a section would put the module strip and a section's picker
+   at the same weight again, which is the thing being fixed.
+
+   IT WRAPS ONTO ITS OWN LINE ON A PHONE, and takes the full width when it
+   does — three equal cells, the `.lead-filter` treatment in §31. A 300px
+   segmented control squeezed beside an h2 at 390px is three truncated
+   cohort names.
+   -------------------------------------------------------------------------- */
+.app .ldr-copick{
+  display:flex;flex:none;
+  border:1px solid var(--rule);background-color:var(--background)}
+/* --s05 rather than --s04: with the count gone (`ldrPosts`, lead4.js) the
+   label is the whole of a tab's content, and 12px each side put "Cohort 41"
+   close enough to its own dividing rule to read as a table cell. 16px is the
+   inset every other named control in the product pays, and it is what makes
+   the three read as tabs. */
+.app .ldr-copick button{
+  min-height:32px;padding:0 var(--s05);
+  border:0;border-left:1px solid var(--rule);border-radius:0;
+  background-color:transparent;
+  font-size:12.5px;line-height:17px;letter-spacing:.1px;
+  color:var(--text-secondary);white-space:nowrap;cursor:pointer;
+  transition:background-color var(--dur-short) var(--ease-standard)}
+.app .ldr-copick button:first-child{border-left:0}
+.app .ldr-copick button.on{
+  background-color:var(--text-primary);color:var(--background);font-weight:600}
+/* the count these two style is not drawn any more — see the note over
+   `ldrPosts` in lead4.js. Kept, unmatched: `.lf-n` is §31's count-inside-a-
+   control and this is the treatment it takes on a dark active tab, which is
+   not written down anywhere else. */
+.app .ldr-copick .lf-n{
+  margin-left:var(--s03);font-size:11px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--text-helper)}
+.app .ldr-copick button.on .lf-n{color:inherit;opacity:.7}
+/* the head row has to be allowed to break for it */
+.app .sec.ldr-board > .sec-h{flex-wrap:wrap;row-gap:var(--s04)}
+@container app (max-width:599.98px){
+  .app .ldr-copick{width:100%}
+  .app .ldr-copick button{
+    flex:1 1 0;min-width:0;justify-content:center;
+    padding-left:var(--s02);padding-right:var(--s02)}
+}
+
+/* --------------------------------------------------------------------------
+   §36.17 DIRECT IS AN INBOX
+
+   People on the left, conversation on the right, a quarter and three quarters.
+   The right-hand column is the candidate's Messages page rebuilt out of the
+   same three pieces — a head row, `.msgs`, `.composer` — and it behaves the
+   same way: §37.7's argument, one panel down. The thread takes the slack and
+   scrolls inside itself; the field is pinned under it and does not move.
+
+   THE PANEL HAS A DEFINITE HEIGHT AND IT HAS TO. `overflow-y:auto` on a box
+   with no height is not a scroller — it is a box that grows — so without this
+   the thread would push the composer down the page and the whole point of the
+   layout would be gone. `62cqh` is measured against the app frame rather than
+   the window (`vh` would be the browser's, and this product runs inside a
+   device frame), clamped so it neither collapses on a short window nor turns
+   into a 900px void on a tall one.
+
+   BELOW 900 IT IS ONE COLUMN AGAIN. A quarter of 390px is 97px and a name
+   does not fit in it, so the grid, the fixed height and the internal scroll
+   all go: the list stacks above the thread and the PAGE scrolls, which is the
+   shape every other block on a phone has.
+   -------------------------------------------------------------------------- */
+.app .ldr-dm{display:flex;flex-direction:column;gap:var(--s06)}
+.app .ldr-dm-thread{display:flex;flex-direction:column;min-width:0}
+.app .ldr-dm-list{display:flex;flex-direction:column;min-width:0}
+
+/* the list's own caption. It is not a `.sec-h` — it is inside a panel — so it
+   takes the sheet heading's step down, the same one §36.1 gives `.ldr-sh`. */
+.app .ldr-dm-lh{
+  display:flex;align-items:baseline;justify-content:space-between;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  border-bottom:1px solid var(--rule);
+  font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px}
+
+/* A THREAD ROW. `.mem`'s shape without `.mem`'s classes, because this one is a
+   tab: it is `aria-selected`, it lives in a `role=tablist`, and the selected
+   state has to be visible at a glance from the other column. The 2px inset bar
+   is that state — a filled ground alone reads as hover, and hover on this
+   portal is disarmed anyway (`build.py`, `HOVER_KEEP`). */
+.app .ldr-dm-t{
+  display:flex;align-items:center;gap:var(--s04);width:100%;
+  padding:var(--s04) var(--s05);
+  border:0;border-bottom:1px solid var(--border-subtle-01);
+  background-color:transparent;text-align:left;cursor:pointer;
+  transition:background-color var(--dur-short) var(--ease-standard)}
+.app .ldr-dm-t:last-child{border-bottom:0}
+.app .ldr-dm-t.on{
+  background-color:var(--surface-2);
+  box-shadow:inset 2px 0 0 var(--text-primary)}
+.app .ldr-dm-t > .mem-av{
+  width:36px;height:36px;flex:none;position:relative;overflow:hidden;
+  background-color:var(--gray-80)}
+.app .ldr-dm-tb{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.app .ldr-dm-tn{
+  display:flex;align-items:center;gap:var(--s03);
+  font-size:13.5px;line-height:19px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary)}
+/* one message deep, one line high: the snippet says WHICH conversation this is,
+   and a second line of it would make the row a preview pane */
+.app .ldr-dm-tx{
+  font-size:12px;line-height:17px;color:var(--text-secondary);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .ldr-dm-tw{
+  flex:none;align-self:flex-start;
+  font-size:11px;line-height:15px;letter-spacing:.2px;color:var(--text-helper);
+  font-variant-numeric:tabular-nums}
+/* WAITING ON YOU IS A DOT, not a tag. `.tag org` beside a 13.5px name is a
+   26px object on a 19px line and it pushed the name out of its own row; the
+   dot is the state at the size the state deserves. Accent, because this is the
+   one thing on the page that is asking the leader for something. */
+.app .ldr-dm-dot{
+  width:7px;height:7px;flex:none;border-radius:50%;
+  background-color:var(--accent)}
+
+/* the head of the conversation column: who, and what this thread is */
+.app .ldr-dm-h{
+  display:flex;align-items:center;gap:var(--s04);flex:none;
+  padding:var(--s04) var(--s05);border-bottom:1px solid var(--rule)}
+.app .ldr-dm-h > .mem-av{
+  width:36px;height:36px;flex:none;position:relative;overflow:hidden;
+  background-color:var(--gray-80)}
+.app .ldr-dm-hb{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .ldr-dm-hb b{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.05px}
+.app .ldr-dm-hb > span{
+  font-size:12px;line-height:17px;color:var(--text-secondary)}
+
+.app .ldr-dm-thread > .msgs{padding:var(--s05)}
+/* THE FIELD FLOATS INSIDE THE PANEL, and it is the candidate's field — §16.12
+   draws the box and names this surface on the same rule. What belongs here is
+   only where it sits: a margin rather than a padded row, because the panel's
+   own foot is the boundary and the field is an object inside it. */
+.app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05) var(--s05)}
+
+/* --------------------------------------------------------------------------
+   THE INBOX HAS NO GUTTER OF ITS OWN
+
+   A `.sec` pays `--s06` on top and `--gutter` at the sides, which is right for
+   a block of prose or a table sitting in a column of them. The inbox is not
+   one of those: it is the module's whole surface for the tab that is open, so
+   the section's padding was drawing a white margin around a panel whose own
+   border then drew a second boundary 24px inside the page's rails — a box in
+   a box, with the tab strip it belongs to floating above the pair.
+
+   Flush instead: no section padding, no border on the panel's outer edges,
+   and no rule along its top. The page's own rails become the panel's sides and
+   the tab strip's bottom border becomes its top, which is what "attached to
+   the tabs" means — the strip and the surface it switches are one object.
+   What stays is the divide between the two columns and the panel's own bottom
+   rule, which is the section's `::after` and closes the block.
+   -------------------------------------------------------------------------- */
+.app .sec.ldr-dm-sec{padding:0}
+/* AND IT HAS TO BE SAID TWICE, at four classes and inside the desktop tier.
+   §18's spine rule — `.app .page:not(.form-page) > .sec{padding-left:--s07}` —
+   is four classes deep and lives in `@container app (min-width:900px)`, so the
+   three-class version above holds on a phone and loses at desktop: the panel
+   came out flush below 900 and inset 32px on each side above it. Same weight
+   and later, in the same query, per §29.11.
+
+   THE TAB STRIP'S OWN BOTTOM GOES WITH IT. The strip is a `.sec.sec-cs` and
+   §16 already zeroes its TOP; what was left was 32px under it, which is the
+   white band between the tabs and the panel they switch. `:has(+ …)` so it is
+   only ever zeroed where something is attached beneath it. */
+.app .page > .sec.sec-cs:has(+ .sec.ldr-dm-sec){padding-bottom:0}
+@container app (min-width:900px){
+  .app .page > .sec.ldr-dm-sec{padding:0}
+  .app .page > .sec.sec-cs:has(+ .sec.ldr-dm-sec){padding-bottom:0}
+}
+
+/* --------------------------------------------------------------------------
+   AND BELOW 900 IT IS TWO SCREENS, NOT TWO COLUMNS
+
+   A quarter of a 390px frame is 97px, so the pair cannot be a pair on a
+   phone — and the answer is not to stack them, which is what it did first:
+   the list and then the open thread underneath meant scrolling past the list
+   to read, and scrolling back up to switch person. The phone pattern for an
+   inbox is two screens and one tap between them, and that is what this is.
+
+   THE MARKUP DOES NOT BRANCH. Both columns are rendered at every width and
+   the class on the wrapper says which one is showing, so the two-pane inbox
+   at desktop and the drill-down on a phone are the same view — no width is
+   measured in JS, and nothing has to be re-rendered when the frame is
+   resized. `display:flex` on the shown column rather than `block`, because
+   `.ldr-dm-thread` is a flex column and that is what makes its thread take
+   the slack and its field sit at the foot.
+
+   THE LIST RUNS EDGE TO EDGE here: with the section's gutter already gone
+   (above) the rows reach both rails, which is what every other list on a
+   phone in this product does.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .ldr-dm > .ldr-dm-thread{display:none}
+  .app .ldr-dm.show-thread > .ldr-dm-list{display:none}
+  .app .ldr-dm.show-thread > .ldr-dm-thread{display:flex}
+}
+/* the way back belongs to the drill-down only: at 900px and up the list it
+   returns to is already on screen, and an arrow that goes nowhere is worse
+   than no arrow */
+@container app (min-width:900px){
+  .app .ldr-dm-back{display:none}
+}
+.app .ldr-dm-back{flex:none;margin-right:var(--s02)}
+
+@container app (min-width:900px){
+  .app .ldr-dm{
+    display:grid;grid-template-columns:25% 75%;gap:0;
+    height:clamp(400px, 62cqh, 680px)}
+  .app .ldr-dm-list{
+    border-right:1px solid var(--rule);
+    overflow-y:auto;overscroll-behavior:contain;min-height:0}
+  .app .ldr-dm-thread{min-height:0}
+  .app .ldr-dm-thread > .msgs{
+    flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+}

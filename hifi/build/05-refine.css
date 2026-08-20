@@ -27,7 +27,7 @@
 .lvl-hero .bands-note{color:var(--on-dark-2)}
 @container app (min-width:900px){.lvl-hero .big{font-size:48px;line-height:54px;letter-spacing:-1.4px}}
 
-/* the ladder: 15 rungs, filled to the candidate's own rung */
+/* the ladder: 15 levels, filled to the candidate's own level */
 .ladder{display:flex;align-items:stretch;gap:3px;height:44px;margin-top:var(--s06)}
 .ladder i{flex:1;min-width:0;height:100%;background:var(--on-dark-rule)}
 .ladder i.done{background:var(--accent);opacity:.55}

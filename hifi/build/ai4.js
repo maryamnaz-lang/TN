@@ -503,18 +503,27 @@ render();
    `.lvl-hero` — the level card — is OUT, and it is the one dark surface in
    the product that should be. Every other card on this list is a black
    ground with type on it, and the haze is the only thing giving that ground
-   a direction. The level card is not: it carries the fifteen-rung ladder,
-   whose first rungs are painted in the same brand orange the glow is made
-   of. Two orange gradients on one black card, one of them meaning "rung 4 of
+   a direction. The level card is not: it carries the fifteen-level ladder,
+   whose first levels are painted in the same brand orange the glow is made
+   of. Two orange gradients on one black card, one of them meaning "level 4 of
    15" and the other meaning nothing, and they meet in the top right corner
-   where the ladder's unearned rungs are — so the haze read as though the
-   rungs under it were lit, which is exactly the thing the ladder exists to
+   where the ladder's unearned levels are — so the haze read as though the
+   levels under it were lit, which is exactly the thing the ladder exists to
    say they are not. The card keeps its ground and loses the light.
 
    This is a removal from the LIST, not a deletion of the mechanism: `.cert`
    and `.plate` sit next to a level card on the same pages and still carry
    the haze, which is what keeps the level card's flat black readable as a
    deliberate difference rather than as a card that failed to load. */
+/* `.ldr-read` IS NOT ON THE LIST, and it fails the test above for a second
+   reason the level card did not have. The haze reaches in from the top right
+   and dies out two thirds of the way across — over a plate that is a title and
+   a sentence, that is light on an empty ground. The competency read is a TABLE
+   in that corner: the haze crossed the "what I heard" column, so four rows of
+   prose were each set on a slightly different brown, and the confidence chip
+   sat in the brightest part of it. A gradient behind data is a gradient you
+   read as data. Flat black, and the card keeps §21's clip either way — see the
+   note there about what escapes without it. */
 const GLOW_ON = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b';
 
 function placeGlow(){

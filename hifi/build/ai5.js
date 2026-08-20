@@ -177,7 +177,7 @@ render = function(){
    They are one component stating one fact, so this normalises them in the
    DOM rather than in five separate edits to five views:
 
-     row 1   the level, the rung, and the ladder — the My Level layout
+     row 1   the level, the level, and the ladder — the My Level layout
      row 2   who signed it and when on the left, every action on the right
 
    The actions come from wherever that view happened to put them: a
@@ -282,7 +282,12 @@ function placeLevelCards(){
    to do, so the pass survives running on a page it has already arranged —
    which it does, on every render.
    ========================================================================== */
-const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero';
+/* `.ldr-read` — the competency read on a level decision — is a card class
+   INSIDE its section rather than a `.sec` variant, and that is what keeps it
+   out of the wrapping branch below: a host that matches this list is wrapped
+   in a fresh `.sec` (the branch `.lvl-hero` needs, having no section of its
+   own), and a `.sec` wrapped in a `.sec` pays the gutter twice. */
+const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero, .ldr-read';
 
 function placeDark(){
   const main = device.querySelector('.view-col > .main') || device.querySelector('.main');

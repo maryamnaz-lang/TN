@@ -24,11 +24,19 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], hideAch:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, piOpen:{}, stg:0, notes:false, iv:'level',
+  /* the three scenes kept from each interview. `null` means "not chosen yet",
+     which is what puts the chooser on the Interviews module — see the note
+     over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
+     which no interview has happened, so both start empty. */
+  scenes:{level:null, re:null}, scPick:{level:[], re:[]},
   cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true}]};
 const isLead = () => S.portal === 'leader';
 ;
 const lvlName = c => 'Explorer – ' + c;
 const who = f => f.pred ? f.track + ' track' : lvlName(f.level);
+/* the POSITION on the ladder, 1-15, as against `f.level`'s code. Both are
+   spoken as "level" in the product; the note over `RUNG` in data.js is why
+   only one of them is spelt that way in the code. */
 const rungOf  = c => RUNG[c] || 2;
 ;
 ;
@@ -133,7 +141,7 @@ function pswitch(){
 function shell(){
   const f = cfg(S.stage);
   /* The leader's own line is their ROLE, not a level. `who(f)` prints the
-     candidate's track or rung, which a leader does not have — they are not on
+     candidate's track or level, which a leader does not have — they are not on
      the ladder they assess against.
 
      THE LEADER SIGNED IN IS PRIYA NAIR, on purpose. She is already the person
@@ -248,11 +256,163 @@ function mem(name,ini,meta,you,img){
     ${you?'<span class="tag brand sm">You</span>':''}
   </div>`;
 }
+/* `clip` is the old row form of a scene — a 48px thumbnail, a title, a
+   checkbox. It is unreferenced now: the chooser is `scenePick` and the kept
+   set is `sceneRow`, both below. Kept because it is the only compact form of
+   a scene in the file and a list of six inside a Tal bubble would want it. */
 function clip(title,note,stamp,len,kept){
   return `<div class="clip">
     <span class="thumb">${I.play}<span class="t">${len}</span></span>
     <span class="cb"><span class="ct">${title}</span><span class="cq">${note} · from ${stamp}</span></span>
     <label class="cbx clip-pick" style="padding:0;margin-top:2px"><input type="checkbox" ${kept?'checked':''}><span class="box">${I.check}</span></label>
+  </div>`;
+}
+
+/* ==========================================================================
+   SCENES
+
+   WHAT A CANDIDATE SEES OF THEIR OWN INTERVIEW. The interview is recorded and
+   transcribed, and neither of those is theirs to watch: the recording is
+   evidence the agent assessed against and the transcript is what Tal reads.
+   What the candidate gets is SCENES — short cuts from the conversation, six
+   offered and three kept — and they are the only video surface in the module.
+
+   THE SIX ARE OFFERED, NOT ATTRIBUTED. Nothing here says who chose them. The
+   copy asks the candidate to choose, and that is the whole of what they are
+   told, because a line naming the agent or the platform as the sender turns a
+   choice into a review of somebody else's shortlist.
+
+   THREE IS THE CAP AND IT IS A CAP, NOT A TARGET. `sceneToggle` refuses the
+   fourth rather than dropping the oldest — a silent swap is the one behaviour
+   a person cannot undo, because they never saw it happen.
+
+   `stamp` is where the scene starts in the interview and it is real: the level
+   interview's six are the six timestamps `SCENE_AT` (ai.js) marks in the
+   transcript, so a scene and the lines it is cut from cannot disagree.
+   ========================================================================== */
+const SCENES = {
+  level: [
+    ['The reorganization call',      'Where you changed your mind after listening', '02:14', '1:48'],
+    ['Handing over the vendor review','You explain why you took it back',           '11:02', '2:10'],
+    ['The Friday rhythm',            'How your weekly meeting actually runs',       '19:37', '1:22'],
+    ['Managing up',                  'What you do when a decision comes down',      '24:50', '2:41'],
+    ['Conflict with a peer',         'Strong opening, thin resolution',             '31:15', '1:56'],
+    ['Closing reflection',           'Summary of your own gaps',                    '41:03', '1:11']
+  ],
+  re: [
+    ['Finishing the reorganization', 'The same story, ninety days later',           '03:40', '2:22'],
+    ['The handover that held',       'You left it with Sam and it landed',          '09:18', '1:51'],
+    ['A hard conversation',          'Where you said the difficult part first',     '16:05', '2:04'],
+    ['Running the Thursday call',    'You took the group through your own example', '22:31', '1:39'],
+    ['What you would do again',      'Answer is specific and dated',                '29:47', '1:28'],
+    ['Where you are still short',    'Named it before Priya did',                   '38:12', '1:33']
+  ]
+};
+
+/* THE KEPT SET LIVES IN `S`, NOT IN THE DOM (trap 9). The old chooser held it
+   in six `<input type=checkbox>` and counted them on click, which worked only
+   because the report page happened not to be rebuilt by a pass. It has to
+   outlive a render now — the row of three is drawn on a different page from
+   the chooser — so it is state, and `null` is the meaningful third value:
+   nothing chosen yet, which is what makes the chooser appear. */
+/* TWO SETS, AND THE SECOND ONE IS THE REASON THE SAVE BUTTON EXISTS.
+   `S.scPick` is what is selected right now, in the chooser. `S.scenes` is what
+   was COMMITTED, and it is the one the rest of the product reads. Collapsing
+   them into one array is the obvious simplification and it breaks the flow:
+   the chooser is drawn while nothing is committed, so the moment a third card
+   went in, the chooser would vanish out from under the finger that pressed it
+   — before the person had seen the third selection land, and with no way back
+   if the third one was a misfire. `null` on the committed set means "still
+   choosing", and Save is what ends it. */
+const sceneKeep = (kind) => (S.scenes && S.scenes[kind]) || null;
+const scenePicked = (kind) => (S.scPick && S.scPick[kind]) || [];
+const sceneDone = (kind) => { const k = sceneKeep(kind); return !!k && k.length === 3; };
+
+/* ONE BIG CARD. Horizontal, a 16:9 still with the play mark over it, the
+   scene's own length in the corner of the still, and the title and the line
+   about it underneath. Three of these in a row is the whole of what the
+   detail page shows of the interview.
+
+   THE STILL IS THE CANDIDATE'S OWN PHOTOGRAPH, dimmed. There is no video in a
+   prototype, and the alternatives are both worse than this: a flat grey plate
+   reads as a broken image, and a stock frame reads as somebody else's
+   interview. A dimmed portrait behind a play mark is what a cut from a video
+   call actually looks like, and it is a photograph the product already
+   carries for this person. */
+/* SIX CUTS FROM ONE CONVERSATION SHOULD NOT LOOK LIKE SIX COPIES OF ONE
+   FRAME. There is one photograph, so the frame is varied by moving it: each
+   scene sets its own vertical crop through `--still-y`, which §38.1 reads.
+   Six positions down one portrait is six different compositions of the same
+   person, which is exactly what six moments of a video call are. */
+const STILL_Y = ['14%','24%','34%','19%','29%','39%'];
+function sceneCard(kind, i, n){
+  const s = SCENES[kind][i];
+  return `<button class="scene" data-scene-play="${kind}:${i}" aria-label="Play ${s[0]}, ${s[3]}">
+    <span class="scene-still" style="background-image:url('${AV.hana}');--still-y:${STILL_Y[i%6]}">
+      <span class="scene-play">${I.play}</span>
+      <span class="scene-len">${s[3]}</span>
+    </span>
+    <span class="scene-b">
+      <span class="scene-eb">Scene ${n} &middot; from ${s[2]}</span>
+      <span class="scene-t">${s[0]}</span>
+      <span class="scene-q">${s[1]}</span>
+    </span>
+  </button>`;
+}
+
+/* the three kept scenes, across. Falls back to the first three if a stage
+   arrives with nothing chosen, so a detail page is never empty — the chooser
+   is what handles "nothing chosen yet", and it is a different page. */
+function sceneRow(kind){
+  const keep = sceneKeep(kind) || [0,1,2];
+  return `<div class="scene-row">${keep.map((i,n)=>sceneCard(kind,i,n+1)).join('')}</div>`;
+}
+
+/* THE CHOOSER. Six of the same card, each one selectable, with the count and
+   the save in a bar underneath. A selected card carries `.on` — and it is
+   drawn from `S`, so pressing one re-renders and the mark is a fact about the
+   state rather than a class a handler left behind. */
+function scenePick(kind){
+  const keep = scenePicked(kind);
+  const n = keep.length;
+  return `<div class="scene-pick">
+    ${SCENES[kind].map((s,i)=>{
+      const on = keep.indexOf(i);
+      const full = n >= 3 && on < 0;
+      return `<button class="scene scene-sel${on>=0?' on':''}${full?' scene-full':''}"
+        data-scene="${kind}:${i}" aria-pressed="${on>=0}">
+        <span class="scene-still" style="background-image:url('${AV.hana}');--still-y:${STILL_Y[i%6]}">
+          <span class="scene-play">${I.play}</span>
+          <span class="scene-len">${s[3]}</span>
+          ${''/* THE BOX IS THE PRODUCT'S CHECKBOX, DRAWN RATHER THAN WIRED.
+                §2's `.cbx` is a `<label>` around a real `<input type=checkbox>`
+                and neither can go here: the card is a `<button>`, and a label
+                or an input inside a button is interactive content nested in
+                interactive content — invalid, and in practice a click target
+                that fights the one around it.
+
+                So this is a span carrying the same geometry and the same two
+                states (§38.3 mirrors §2's values), and the ONE control is the
+                card. `aria-pressed` on the button is what says selected to a
+                screen reader; the box is the picture of it, which is why it
+                takes no aria of its own and no tabindex. */}
+          <span class="scene-box">${I.check}</span>
+        </span>
+        <span class="scene-b">
+          <span class="scene-eb">From ${s[2]}</span>
+          <span class="scene-t">${s[0]}</span>
+          <span class="scene-q">${s[1]}</span>
+        </span>
+      </button>`;
+    }).join('')}
+  </div>
+  <div class="scene-bar">
+    <span class="scene-count">${n === 0 ? 'Nothing chosen yet' : n === 3 ? 'Three chosen' : n + ' of 3 chosen'}</span>
+    ${''/* §2 already styles `.btn[disabled]`, so the attribute is the whole of
+          the treatment — no companion class, and the button cannot be pressed
+          rather than being pressable and refused. */}
+    <button class="btn btn-p btn-sm" data-scenesave="${kind}"
+      ${n === 3 ? '' : 'disabled'}>Save these three ${I.arrowRight}</button>
   </div>`;
 }
 function chRow(i,f){
@@ -306,15 +466,15 @@ function wTerms(){
 }
 function wLadder(){
   const f = cfg(S.stage);
-  /* NO RUNG IS MARKED BEFORE THE INTERVIEW.
+  /* NO LEVEL IS MARKED BEFORE THE INTERVIEW.
      `cfg()` merges CFG_BASE, which carries `level:'E3'` so that nothing
      downstream renders undefined — but on `consult`, `new` and `booked` that
      E3 is a DEFAULT, not a fact, and this widget was drawing it as the
-     current rung. On the consultant-call dashboard that is the one claim the
+     current level. On the consultant-call dashboard that is the one claim the
      whole screen exists to deny, and Tal is one chip away from saying it.
 
      `trackBand()` already settled this for the My Level page, in those words:
-     no segment is filled, because the rung is what the interview decides and
+     no segment is filled, because the level is what the interview decides and
      a solid one would be a claim the product has not made. `f.pred` is the
      flag that says the level is still a prediction, and it is what both
      drawings now read. The list changes with it — "finish the chapters" is
@@ -324,7 +484,7 @@ function wLadder(){
     `<span class="tw-rungs">${['E1','E2','E3','E4','E5'].map(r=>`<i class="${r===cur?'on':''}">${r}</i>`).join('')}</span>
      <span class="tw-list">
        ${f.pred
-         ? `<span>An interview with a talent agent confirms which rung you are on</span>
+         ? `<span>An interview with a talent agent confirms which level you are on</span>
             <span>Your level opens the 90-day course built for it</span>
             <span>Re-interview at day 91: move up, hold, or drop back</span>`
          : `<span>Finish the 13 chapters and keep your weekly tasks on time</span>
@@ -690,15 +850,26 @@ function weekCard(f){
         <div class="wkc-eb t-label-01">Chapter ${i + 1} &middot; ${S.stage === 'week1' ? 'unlocked today' : 'in progress'}</div>
         <h3 class="u-h3">${CH[i][0]}</h3>
         <div class="wkc-min sub">${did} of ${mins} minutes</div>
-        <!-- THE WAY IN, AT THE TOP AND IN THE PRIMARY WEIGHT. It was a grey
-             secondary button on the last row of the card, below two blocks
-             of reading — so the one thing this section exists to make happen
-             was the last thing offered and the quietest. It belongs to the
-             chapter named directly above it, and a person who already knows
-             what they are opening should not have to read the week's report
-             to reach it. The reading below is now what you do INSTEAD of
-             opening it, which is the honest order. -->
-        <div class="wkc-go"><button class="btn btn-p btn-sm" data-go="chapter:${i}">Open chapter ${i + 1} ${I.arrowRight}</button></div>
+        <!-- THE WAY IN IS NOT IN THE CARD ANY MORE — it is the section's head
+             row action, next to "This week", where it replaced a "Coursework"
+             button that pointed at the module rather than the work. The
+             argument for hoisting it out of the card's foot still holds and
+             this is the same argument one step further: the one thing this
+             section exists to make happen is now the first thing on it and in
+             the position every other section on the dashboard uses for its
+             own action. The reading below is what you do INSTEAD of opening
+             the chapter, which is the honest order.
+
+             NO BACKTICKS IN THIS COMMENT. It is an HTML comment inside a
+             template literal, so a backtick here closes the string and the
+             prose after it is parsed as JavaScript — which is exactly what
+             happened on the first attempt at this edit: the class name below
+             was quoted the way every other note in this file quotes one, and
+             week1 and day34 both threw out of weekCard on first render.
+
+             The wkc-go rule is §37.3 and is left there: it is the correct
+             treatment IF the button ever comes back inside the top band, and
+             on a card that no longer draws the element it matches nothing. -->
       </div>
       ${ring(pct, `${pct}% of chapter ${i + 1} done`)}
     </div>
@@ -981,23 +1152,23 @@ function ph(title,sub,act,backTo){
 }
 /* BEFORE THE INTERVIEW, THE SAME BAR — SEE §29.4
    This drew a three-column grid of the three tracks with "You are here" under
-   one of them. The confirmed card next door drew the fifteen-rung ladder, so
+   one of them. The confirmed card next door drew the fifteen-level ladder, so
    one page had two drawings of one idea, and the grid was the one that could
    not show how far it is from here to the top.
 
-   It draws the ladder now. The five rungs of your own track are marked; NO
-   rung is filled, because the rung is what the interview decides and a solid
+   It draws the ladder now. The five levels of your own track are marked; NO
+   level is filled, because the level is what the interview decides and a solid
    segment would be a claim the product has not made yet.
 
-   Nothing replaces the grid's fact row. "Rungs in this track" is what the five
-   marked segments are showing, "your rung" is what the sub already says, and
+   Nothing replaces the grid's fact row. "Levels in this track" is what the five
+   marked segments are showing, "your level" is what the sub already says, and
    "your track" is the card's own heading — a line restating all three under a
    bar that draws them is the grid's redundancy carried across in text. */
 function trackBand(track){
   const T = ['Explorer','Builder','Trailblazer'];
   const ti = Math.max(0, T.indexOf(track));
   const lo = ti * 5;
-  return `<div class="ladder ladder-track" role="img" aria-label="${track} track, rungs ${lo+1} to ${lo+5} of 15. Your rung is set at the interview.">
+  return `<div class="ladder ladder-track" role="img" aria-label="${track} track, levels ${lo+1} to ${lo+5} of 15. Your level is set at the interview.">
     ${Array.from({length:15},(_,i)=>`<i class="${i>=lo&&i<lo+5?'mine':''}"></i>`).join('')}
   </div>
   <div class="ladder-lab">${T.map(n=>`<span${n===track?' class="on"':''}>${n}</span>`).join('')}</div>`;
@@ -1046,7 +1217,7 @@ const AUTH_ART = `
   <span class="auth-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
   <div class="auth-intro">
     <h2 class="t-heading-01">Welcome to TALENTnext</h2>
-    <p class="t-body-02">TalentNext is the AI-native leadership platform that assesses you in real conversation, compounds every interview, chapter and call into a live picture of where you stand, then moves you up the ladder a rung at a time.</p>
+    <p class="t-body-02">TalentNext is the AI-native leadership platform that assesses you in real conversation, compounds every interview, chapter and call into a live picture of where you stand, then moves you up the ladder a level at a time.</p>
     <p class="t-body-02">From here, growth stops being guesswork.</p>
     <p class="t-body-02 auth-begin">Let&rsquo;s begin.</p>
   </div>
@@ -1348,9 +1519,9 @@ V.dashboard = (f) => {
         <div class="acc-i"><button class="acc-h"><span class="ttl">The quiz gives you a title</span><span class="chev">${I.chevDown}</span></button>
           <div class="acc-b"><p>Explorer, Builder or Trailblazer. It is the band you start in, and it came across with your account &mdash; you do not retake it.</p></div></div>
         <div class="acc-i"><button class="acc-h"><span class="ttl">The interview sets your level</span><span class="chev">${I.chevDown}</span></button>
-          <div class="acc-b"><p>Each title has five rungs, E1 to E5. A talent agent talks to you for forty-five minutes, confirms the rung and signs a report. A quiz cannot do this and the consultant call does not either.</p></div></div>
+          <div class="acc-b"><p>Each title has five levels, E1 to E5. A talent agent talks to you for forty-five minutes, confirms the level and signs a report. A quiz cannot do this and the consultant call does not either.</p></div></div>
         <div class="acc-i"><button class="acc-h"><span class="ttl">Every 90 days you can move up</span><span class="chev">${I.chevDown}</span></button>
-          <div class="acc-b"><p>Your level opens the course built for it. Ninety days later you re-interview, and you move up a rung, hold where you are, or drop back one.</p></div></div>
+          <div class="acc-b"><p>Your level opens the course built for it. Ninety days later you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
       </div>
     </div>`;
 
@@ -1455,7 +1626,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="lvl-hero on-dark lvl-foot-card" style="margin:0">
         <div class="big">Explorer &ndash; E3</div>
-        <div class="sub">Rung 3 of 15 on the Explorer track</div>
+        <div class="sub">Level 3 of 15 on the Explorer track</div>
         ${ladder('E3')}
         <div class="lvl-foot">
           <div class="eb"><span class="eb-ok">${I.checkFilled}</span>Confirmed &middot; signed by Priya Nair, 21 August</div>
@@ -1484,7 +1655,7 @@ V.dashboard = (f) => {
     </div>
     ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
           The interview is the only thing that has happened to this candidate,
-          and the page was showing its RESULT — a rung, a black hero, a course
+          and the page was showing its RESULT — a level, a black hero, a course
           — without a word of what was actually said in it. The digest goes
           here rather than higher up because its growth-areas line ends on
           "chapters 4 and 12", and the thirteen chapters are the block directly
@@ -1494,18 +1665,18 @@ V.dashboard = (f) => {
           level before the reader had been told what the level buys. */}
     <div class="sec">
       <div class="sec-h"><h2>What the interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
-      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. The 45-minute recording, the transcript and six marked scenes sit behind it.</p>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. Your strengths, your growth areas and the scenes you kept sit behind it.</p>
       ${signedSummary(true)}
     </div>`;
 
   else if(f.complete) body = `
-    ${ph('Welcome Back, Maryam!','Cohort 41 is complete. You moved up a rung.')}
+    ${ph('Welcome Back, Maryam!','Cohort 41 is complete. You moved up a level.')}
     ${achBanner()}
     <div class="sec">
       <div class="lvl-hero" style="margin:0">
         <div class="eb">Re-interview · 21 November · signed by Priya Nair</div>
         <div class="big">Explorer &ndash; E4</div>
-        <div class="sub">Promoted from E3 · rung 4 of 15</div>
+        <div class="sub">Promoted from E3 · level 4 of 15</div>
         ${ladder('E4')}
       </div>
     </div>
@@ -1519,12 +1690,12 @@ V.dashboard = (f) => {
       <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E4 ${I.arrowRight}</button>
       <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
     </div></div>
-    ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE RUNG UP.
+    ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE LEVEL UP.
           Both stages are the same moment — a level has just been confirmed
           and a course has not been started — so they were answering the same
           two questions, and only one of them was answering them. `assessed`
           says what the ninety days hold and what the agent actually wrote;
-          `promoted` said neither, and went straight from the rung to a
+          `promoted` said neither, and went straight from the level to a
           points card. The two blocks below are that page's, with the
           re-interview's report rather than the first one's. */}
     <div class="sec">
@@ -1553,9 +1724,9 @@ V.dashboard = (f) => {
       <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
       <div class="stats">
         ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
-        ${statCell(I.chart, `Assessment average`, `${f.avg}<small>%</small>`, `across the thirteen`)}
+        ${statCell(I.chart, `Average`, `${f.avg}<small>%</small>`, `assessments, all thirteen`)}
         ${statCell(I.trophy, `Points`, GAME.promoted.pts.toLocaleString(), `${GAME.promoted.badges} of 4 badges`)}
-        ${statCell(I.growth, `Rung`, `E3 &rarr; E4`, `up one, on 21 November`)}
+        ${statCell(I.growth, `Level`, `E3 &rarr; E4`, `up one, on 21 November`)}
       </div>
       <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
     </div>
@@ -1653,8 +1824,21 @@ V.dashboard = (f) => {
           deleted: they are the correct values IF this card is ever put back
           on a panel, and on white the base values they were stepping down
           from are what applies. */}
+    ${''/* AND THE WAY IN IS THE SECTION'S OWN ACTION.
+          The head row held "Coursework" — the module, not the work — while the
+          chapter button sat inside the card four lines below it. Two routes
+          into the same module, one general and one specific, with the general
+          one given the more prominent position: a person on this dashboard
+          wants chapter 4, and the rail already carries Coursework on every
+          screen, so the generic route was a duplicate of the rail spending the
+          section's action slot.
+
+          One button, in the slot every other section on this page uses for
+          "the thing this section is for" (`Where you stand` → View more), and
+          it is the specific route. `weekCard` therefore no longer draws its
+          own — see the note over `.wkc-go` there. */}
     ${f.finished?'':`<div class="sec">
-      <div class="sec-h"><h2>This week</h2><button class="btn btn-g btn-sm noic" data-go="coursework">Coursework</button></div>
+      <div class="sec-h"><h2>This week</h2><button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button></div>
       ${weekCard(f)}
     </div>`}
     <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
@@ -1689,7 +1873,7 @@ V.level = (f) => {
   <div class="lvl-hero">
     <div class="eb">${confirmed?(f.complete?'Promoted November 21 · signed by Priya Nair':'Confirmed August 21 · signed by Priya Nair'):'Your track, from the quiz'}</div>
     <div class="big">${confirmed?lvlName(f.level):f.track}</div>
-    <div class="sub">${confirmed?'Rung '+rungOf(f.level)+' of 15':'Your level is set at the interview'}</div>
+    <div class="sub">${confirmed?'Level '+rungOf(f.level)+' of 15':'Your level is set at the interview'}</div>
     ${confirmed?ladder(f.level):trackBand(f.track)}
   </div>
   <!-- ONE WAY INTO THE REPORT, NOT THREE. A black primary button sat here
@@ -1712,7 +1896,7 @@ V.level = (f) => {
       <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
         <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
-        <p>Your interview places you on one of five rungs inside it, and that decides which course you take.</p>
+        <p>Your interview places you on one of five levels inside it, and that decides which course you take.</p>
       </div>
     </div>`}
   </div>
@@ -1729,9 +1913,9 @@ V.level = (f) => {
     <div class="sec-h"><h2>How the ladder works</h2></div>
     <div class="acc">
       <div class="acc-i"><button class="acc-h"><span class="ttl">The three tracks</span><span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b"><p>Explorer (E1&ndash;E5), Builder (B1&ndash;B5), Trailblazer (T1&ndash;T5). Fifteen rungs in one line. You do not jump tracks, you move up one rung at a time.</p></div></div>
+        <div class="acc-b"><p>Explorer (E1&ndash;E5), Builder (B1&ndash;B5), Trailblazer (T1&ndash;T5). Fifteen levels in one line. You do not jump tracks, you move up one level at a time.</p></div></div>
       <div class="acc-i"><button class="acc-h"><span class="ttl">Moving up</span><span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b"><p>Every course is 90 days. Once the ninety days are up you re-interview, and you move up a rung, hold where you are, or drop back one.</p></div></div>
+        <div class="acc-b"><p>Every course is 90 days. Once the ninety days are up you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
       <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
     </div>
@@ -1744,8 +1928,21 @@ V.report = (f) => `<main class="main"><div class="page">
   <div class="lvl-hero">
     <div class="eb">${S.iv==='re'?'Re-interview · confirmed November 22':'Level interview · confirmed August 21'}</div>
     <div class="big">${lvlName(f.level)}</div>
-    <div class="sub">Rung ${rungOf(f.level)} of 15 on the Explorer track</div>
+    <div class="sub">Level ${rungOf(f.level)} of 15 on the Explorer track</div>
     ${ladder(f.level)}
+  </div>
+  ${''/* THE SCENES ARE THE SECOND BLOCK ON THE PAGE.
+        First is the level card, which `placeDark` lifts into the module head
+        band (trap 12) — so this is the first thing in the page proper, above
+        the signature, the write-up and the actions. That order is the point:
+        the page used to open on prose about the interview and put anything
+        you could actually watch at the foot, under a recording block. There
+        is no recording block any more (see `ivRow`), and the three scenes are
+        the only thing here that shows the interview rather than describing
+        it, so they go where the eye lands. */}
+  <div class="sec sec-scene">
+    <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
+    ${sceneRow(S.iv === 're' ? 're' : 'level')}
   </div>
   <div class="sec mt6">
     <div class="tile">
@@ -1775,52 +1972,108 @@ V.report = (f) => `<main class="main"><div class="page">
       <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">Written by Priya Nair from your interview</span></div>
     </div>
   </div>
+  ${''/* WHAT WAS HERE: a "From this interview" block — a 45:12 recording plate
+        with Watch, Read the transcript and Download — and, under it, the
+        six-scene chooser with its checkboxes. Both are gone.
+
+        The recording and the transcript are not screens in the candidate's
+        flow any more; the note over `ivRow` is where that is written down.
+        The chooser moved to the Interviews module, where it is the first
+        thing you meet and it happens once, rather than being re-offered every
+        time you open a report you have already settled. What this page shows
+        of the interview is the three kept scenes, at the top.
+
+        Tal's question stays, because it is about the LEVEL rather than about
+        the recording, and it is now the last thing on the page rather than
+        the caption on a block that no longer exists. */}
   <div class="sec">
-    <div class="sec-h"><h2>From this interview</h2><span class="t-helper-01">Kept for 24 months</span></div>
-    <div class="rec">
-      <div class="rec-plate"><span class="rec-play">${I.play}</span><span class="rec-len">45:12</span></div>
-      <div class="rec-b">
-        <div class="t-heading-compact-01">${S.iv==='re'?'Re-interview':'Level interview'} recording</div>
-        <div class="t-helper-01 mt3">${S.iv==='re'?'November 21, 2026':'August 20, 2026'} &middot; video and audio &middot; Priya Nair</div>
-        <div class="btn-set mt5">
-          <button class="btn btn-g btn-sm">Watch the recording ${I.play}</button>
-          <button class="btn btn-t btn-sm" data-go="ivt" data-iv="${S.iv}">Read the transcript ${I.document}</button>
-          <button class="btn btn-t btn-sm">Download ${I.download}</button>
-        </div>
-      </div>
-    </div>
-    <p class="t-legal-01 mt5" style="color:var(--text-helper)">You can ask for this recording to be deleted at any time. Deleting it does not reverse the level it confirmed.</p>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>Scenes from this interview</h2></div>
-    <p class="t-body-01 mb5" style="color:var(--text-secondary)">Priya marked six moments from your interview. Keep the three you would be happy to show an employer. The rest are removed from the shared version.</p>
-    <div class="tile-stack">
-      ${clip('The reorganization call','Where you changed your mind after listening','02:14','1:48',true)}
-      ${clip('Handing over the vendor review','You explain why you took it back','11:02','2:10',true)}
-      ${clip('The Friday rhythm','How your weekly meeting actually runs','19:37','1:22',true)}
-      ${clip('Managing up','Answer trails off at the end','24:50','2:41',false)}
-      ${clip('Conflict with a peer','Strong opening, thin resolution','31:15','1:56',false)}
-      ${clip('Closing reflection','Summary of your own gaps','41:03','1:11',false)}
-    </div>
-    <p class="t-helper-01 mt4" id="clipCount">3 of 3 kept. Deselect one to swap.</p>
-    <div class="mt5">${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}</div>
+    ${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}
   </div>
   <div class="sec"><div class="btn-set">
     ${f.enrolled||f.complete?'':`<button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>`}
     <button class="btn btn-t">Download report as PDF ${I.download}</button>
-    <button class="btn btn-t">Watch the full interview ${I.video}</button>
   </div></div>
 </div></main>`;
 
+/* --------------------------------------------------------------------------
+   INTERVIEWS: THE HEADER STATES, IT DOES NOT ASK
+
+   THE HEADER BUTTON IS GONE AND IT IS NOT COMING BACK. `ph()`'s third slot
+   put "Choose an agent" beside the h1 on every stage but `booked`, which was
+   wrong twice over:
+
+   1. IT WAS OFFERED WHEN THERE IS NOTHING TO CHOOSE. On `assessed`, `week1`
+      and `day34` the level interview has already happened and its report is
+      the first thing further down the page — the row that says "Confirmed
+      Explorer – E3". Asking someone thirty-four days into a course to choose
+      an agent is offering them the step they finished last month. On
+      `promoted` it is worse: the page is a two-row history and nothing is due
+      at all.
+   2. WHERE IT IS DUE, A BUTTON IS THE WRONG SIZE FOR IT. On `day90` booking
+      the re-interview is the one thing with a deadline, and the dashboard
+      already draws that: `reBook`, the black `.plate` — eyebrow, title, the
+      sentence about E4/E3/E2, one accent action. A 40px button in the corner
+      of a header was carrying the weight of a whole block.
+
+   So the header takes copy only, and a stage that has something due says so
+   in the plate. `placeDark` (ai5) then lifts it into the module head band,
+   which is what makes this page's top read exactly like the dashboard's — the
+   plate is a page child, and the band is where a dark card lands.
+
+   THE TWO STAGES THAT HAVE SOMETHING DUE are the two ends of the arc: no
+   interview yet (`pred`, and not already booked), where the level interview
+   is the way in; and ninety days done (`reinterview`), where the re-interview
+   is. Everything between them has a level and a report, and the way to book
+   another conversation from those stages is Tal — "Book an interview with a
+   top agent" is in the ask bar on every one of them.
+   -------------------------------------------------------------------------- */
 V.interviews = (f) => {
   const booked = S.stage==='booked';
+  const dueRe = !!f.reinterview;
+  const dueFirst = !!f.pred && !booked;
+  const due = dueRe || dueFirst;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Interviews')}
   ${ph('Interviews', f.complete?'Your interview history, and the re-interview that set your current level.'
-    : f.reinterview?'Your ninety days are complete. Book a re-interview to have them assessed, and whoever you pick reads your summary first.'
+    : dueRe?'Your ninety days are complete. Book a re-interview to have them assessed, and whoever you pick reads your summary first.'
     : booked?'Your booked interview, and what happens after it.'
-    : 'A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.',
-    booked ? '' : `<button class="btn btn-p" data-go="agents">${f.reinterview?'Book your re-interview':'Choose an agent'} ${I.arrowRight}</button>`)}
+    : 'A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.')}
+  ${due?`
+  <div class="sec">
+    <div class="plate">
+      <div class="plate-eb">${dueRe?'Due now':'Next step'}</div>
+      <div class="plate-t">${dueRe?'Book your re-interview':'Book your level interview'}</div>
+      <div class="plate-b">${dueRe
+        ?'Your ninety days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.'
+        :'Forty-five minutes by video with the agent you pick. It sets the level you enroll at, and the report is yours to keep.'}</div>
+      <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
+    </div>
+  </div>`:''}
+  ${''/* CHOOSING THE SCENES IS THE FIRST THING IN THE MODULE, AND ONLY ONCE.
+        The level interview is done, six scenes are cut from it, and the
+        candidate keeps three. It opens the module rather than sitting below
+        the history because it is the one thing on this page that is waiting
+        on them — and it disappears the moment they save, which is why
+        `sceneDone` and not the stage is the condition. Everything else on the
+        module is still underneath it; nothing is hidden while choosing.
+
+        NOTHING HERE SAYS WHERE THE SIX CAME FROM. Not the agent, not the
+        platform. The moment the copy names a sender, the choice reads as
+        approving somebody else's shortlist rather than picking your own
+        three, and the sentence a person needs is the one about what happens
+        to the three — see the note over `SCENES`. */}
+  ${(f.enrolled||f.complete||!f.pred) && !sceneDone('level')?`
+  <div class="sec">
+    <div class="sec-h"><h2>Choose your scenes</h2></div>
+    <p class="t-body-01 mb5" style="color:var(--text-secondary)">Six moments were cut from your interview. Keep the three you would be happy for someone to watch &mdash; they are what shows on your interview from now on, and you can play any of them first.</p>
+    ${scenePick('level')}
+  </div>`:''}
+  ${''/* PAST INTERVIEWS IS A VERTICAL BLOCK. §10.15 gives a `.sec` with a
+        `.sec-h` a 184px label column at desktop, which put "Past interviews /
+        Kept for 24 months" in a narrow gutter beside the rows and set the
+        heading three words to a line. The section's contents decide the
+        opt-out (trap 13) and `.ivlist` is now in §10.15's list, so the
+        heading sits above the rows and the rows take the column. */}
   ${(f.enrolled||f.complete||!f.pred)?`
   <div class="sec">
     <div class="sec-h"><h2>Past interviews</h2><span class="t-helper-01">Kept for 24 months</span></div>
@@ -1845,16 +2098,32 @@ V.interviews = (f) => {
     </div>
     <p class="t-helper-01 mt4">Free to reschedule up to 24 hours before. Inside 24 hours the fee is not refundable.</p>
   </div>`:`
+  ${''/* THE FOUR FACTS ARE THE HEAD OF "HOW IT WORKS", NOT A BAND ABOVE IT.
+        They were their own headingless section — a bordered strip of Length,
+        Format, Your report, Fee sitting between the past interviews and the
+        four steps, belonging to neither. Every one of the four is answered
+        again in the steps underneath it: "Forty-five minutes by video" is
+        step 2, "Within 24 hours, signed by" is step 3, and the fee is the
+        thing step 1 sends you to the agent list to compare. So the band was
+        the same four answers stated twice, once without a heading.
+
+        Under the heading it becomes the summary of the thing the steps then
+        walk through — the shape every other module on this product uses for a
+        figure band, and the shape §10.15's opt-out list already expects: a
+        `.sec` holding `.facts` keeps the full column and puts its heading
+        above, so nothing had to be added for this to sit right.
+
+        §37.16 is the spacing between the two halves; §10's `.facts` keeps its
+        own top and bottom rule, which it only gives up as an `:only-child`
+        and is not one any more. */}
   <div class="sec">
+    <div class="sec-h"><h2>How it works</h2></div>
     <div class="facts">
       <div><span class="l">Length</span><span class="v">45 minutes</span></div>
       <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
       <div><span class="l">Your report</span><span class="v">Within 24 hours</span></div>
       <div><span class="l">Fee</span><span class="v">From $80</span></div>
     </div>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>How it works</h2></div>
     <ol class="steps">
       <li><span class="s-n">1</span><span class="s-b"><b>You choose the agent</b>
         Every agent who assesses your track is listed with their next free slot. You pick who you talk to.</span></li>
@@ -2283,14 +2552,28 @@ V.transcript = (f) => {
       ${statCell(I.flag, `Tasks on time`, `${S.stage==='day34'?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
     </div>
   </div>
-  <div class="sec">
+  ${''/* THE 90-DAY SUMMARY APPEARS WHEN THERE IS ONE.
+        This block used to draw at every stage, with an unsigned variant that
+        said, in three places at once, that nothing in it was final: a heading
+        reading "in progress", a "Not signed yet" warning tag, and a paragraph
+        explaining that Priya signs it at the end. A candidate still inside
+        their ninety days is not waiting on this and cannot act on it — it is
+        the one block on the page that reports on a date rather than on them,
+        and it sat second, above their own scores.
+
+        Nothing is deleted: at `complete` the summary is a signed artefact the
+        candidate can read and share, and that is exactly when the page should
+        lead with it. So the block keeps its position and loses its unsigned
+        state — which also takes the `.tag.warm` / `.tag.cool` pair and the
+        second `.lk` off the page while the course is running. */}
+  ${f.complete?`<div class="sec">
     <div class="tile">
-      <div class="ai-head"><h3>90-day summary · ${f.complete?'signed':'in progress'}</h3></div>
-      <div class="ai-body"><p>${f.complete?'Priya signed this on November 21. It is what your re-interview was assessed against, and it is yours to share.':'Priya adds to this after each weekly call and signs it at the end of the ninety days. Until then nothing in it is final.'}</p></div>
-      <div class="tag-row mt5">${f.complete?`<span class="tag green">${I.checkFilled}Signed by Priya Nair</span>`:`<span class="tag warm">${I.warningAlt}Not signed yet</span><span class="tag cool">Updated today</span>`}</div>
-      <div class="ai-foot"><a class="lk">${f.complete?'Read the summary':'Read what Priya has written'}</a></div>
+      <div class="ai-head"><h3>90-day summary · signed</h3></div>
+      <div class="ai-body"><p>Priya signed this on November 21. It is what your re-interview was assessed against, and it is yours to share.</p></div>
+      <div class="tag-row mt5"><span class="tag green">${I.checkFilled}Signed by Priya Nair</span></div>
+      <div class="ai-foot"><a class="lk">Read the summary</a></div>
     </div>
-  </div>
+  </div>`:''}
   ${f.done?`<div class="sec">
     <div class="tile" style="padding-top:var(--s04)">
       ${lineChart('sc',{title:'Assessment scores',sub:'70 to 100%',
@@ -2299,10 +2582,23 @@ V.transcript = (f) => {
     </div>
   </div>
 `:''}
+  ${''/* SHOW ALL 13 OPENS THE REST OF THE LIST, IT DOES NOT LEAVE THE PAGE.
+        It was `data-go="coursework"` — a button whose words promise more of
+        the block you are looking at and whose behaviour was a navigation to
+        another module, which since the LightspeedVT frame landed means the
+        list it promised is not even there to see. This is the record of the
+        ninety days and the record is what the page is; the remaining eight
+        rows belong under the five already on it.
+
+        `S.chAll` is the whole of the state, read here and toggled by the
+        `data-chall` branch in the click handler. It is deliberately NOT reset
+        per view: a person who opened the list and went to look at a chapter
+        comes back to it open. The label and the chevron both follow it, so
+        the control says which way it goes rather than only what it did. */}
   <div class="sec tint">
     <div class="sec-h"><h2>Chapter record</h2></div>
-    <div class="tile-stack">${CH.slice(0,5).map((_,i)=>chRow(i,f)).join('')}</div>
-    <div class="mt4"><button class="btn btn-g" data-go="coursework">Show all 13 ${I.chevDown}</button></div>
+    <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
+    <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
   </div>
   ${f.done>0?`<div class="sec">
     <div class="cert">
@@ -2417,10 +2713,26 @@ V.messages = (f) => {
     ${m('them','Priya Nair','Listen to that before Thursday. The one-pager below is the frame I want you to use for the handover.<br>' + file('Handover one-pager.pdf','PDF &middot; 240 KB'),'Wed 8:17 AM')}
   </div>
   <div class="msg-foot">
+    ${''/* THE LEADING MARK IS THE ATTACHMENT, NOT TAL'S STAR.
+          `.composer-star` put Tal's mark at the head of this field, which is a
+          claim the field cannot honour: this is a message to Priya Nair, a
+          person, and nothing Tal does is involved in sending it. §16.12 calls
+          the construction "one field, everywhere" and lists what each one
+          carries — Messages the attachment and the microphone, the room the
+          attachment — and the star was the one thing in the row that carried
+          no function at all. Every field in the product that DOES reach Tal
+          has its own component (`.askfield`, the panel composer with
+          `.composer-mk`), so the mark is not lost, it is back where it means
+          something.
+
+          The attachment takes the vacated slot rather than a fourth control
+          being invented for it: the leading position is where a mail client
+          and every chat app in the product's reference set put "add a thing to
+          this message", and the right end of the row is then send plus the one
+          control that RECORDS a message rather than decorating it. */}
     <div class="composer">
-      <span class="composer-star">${I.ai}</span>
+      <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
       <input class="inp" placeholder="Message Priya" aria-label="Message">
-      <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
       <button class="composer-act" aria-label="Record a voice message">${I.microphone}</button>
       <button class="composer-send" aria-label="Send">${I.send}</button>
     </div>
@@ -2453,7 +2765,12 @@ V.billing = (f) => {
     </div>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Saved cards</h2><span class="t-helper-01">${S.cards.length} of 3</span>${S.cards.length<3?`<button class="btn btn-p btn-sm noic sec-h-act" data-addcard="1">Add a card ${I.add}</button>`:''}</div>
+    ${/* NO "1 OF 3". The three-card cap is a rule the cards themselves
+          already enforce — "Add a card" disappears at the third one, which is
+          the only moment the number would have told you anything, and by then
+          it is not on the page either. Until then it is a count of a list you
+          can see in full, set against a ceiling nobody is near. */''}
+    <div class="sec-h"><h2>Saved cards</h2>${S.cards.length<3?`<button class="btn btn-p btn-sm noic sec-h-act" data-addcard="1">Add a card ${I.add}</button>`:''}</div>
     <div class="tile-stack">
       ${S.cards.map((c,i)=>`<div class="cardrow">
         <span class="cardrow-ic">${BMK[c.brand]||BMK.card}</span>
@@ -2709,6 +3026,24 @@ function setStage(k,keepView){
   const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem','rp']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
+  /* THE SCENES A STAGE ARRIVES WITH.
+     `assessed` is the stage the choice happens at — the level interview is
+     done, its six scenes are waiting, and nothing is enrolled yet — so it
+     starts with `level:null` and the Interviews module opens on the chooser.
+     Every stage after it starts with the three already chosen, because those
+     stages are AFTER the choosing: a prototype of day 34 that asked you to
+     pick your scenes would be showing you a step you took two months ago.
+     The first three are the default set; a person who picks a different three
+     at `assessed` keeps them until they change stage.
+
+     `re` only exists at `promoted`, which is the only stage with a second
+     interview behind it — two past interviews, three scenes each. Stages
+     before it get `null` and never ask for it. */
+  S.scenes = {
+    level: k === 'assessed' ? null : [0,1,2],
+    re: k === 'promoted' ? [0,1,2] : null
+  };
+  S.scPick = {level:[], re:[]};
   S.hist = [];
   render();
 }
@@ -3171,6 +3506,26 @@ function talFirst(){
 }
 
 /* One past interview: who set what, and the three things it left behind. */
+/* THE ROW IS A ROW AGAIN — THE KIT STRIP IS GONE.
+   It carried three tiles: the 45-minute recording, the full transcript, and
+   the scenes. The first two went first, because neither is a screen in the
+   candidate's flow — the recording is what the agent assessed against and the
+   transcript is what Tal reads, and the report page no longer links to either.
+
+   The remaining two went with them. "3 scenes" and "Your report" named the
+   two things on the page this row opens, which is not information: the row is
+   already one click target with an arrow at its end, so a strip of tiles
+   underneath was a table of contents for a page one press away, and it made a
+   two-line row four lines tall. What the row has to say is which interview,
+   when, who ran it and what it decided, and all four are above.
+
+   `.ivrow-kit`, `.kit`, `.kit-ic` and `.kit-b` are still styled in §15 and
+   are now drawn nowhere. Left in place: `.kit` is the product's only compact
+   "an artefact and what it is" mark, and it is what the recording will come
+   back as if it is ever the candidate's to open.
+
+   `len` is still taken as an argument and no longer drawn, for the same
+   reason — the callers pass the recording length. */
 function ivRow(kind, label, date, outcome, len){
   const a = AGENTS.priya;
   return `<div class="ivrow" role="button" tabindex="0" data-go="report" data-iv="${kind}">
@@ -3182,11 +3537,6 @@ function ivRow(kind, label, date, outcome, len){
       ${avatar(a,40)}
       <span class="ivrow-wb"><b>${a.n}</b><span>45 minutes &middot; report signed</span></span>
       <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
-    </div>
-    <div class="ivrow-kit">
-      <span class="kit"><span class="kit-ic">${I.play}</span><span class="kit-b"><b>Recording</b><span>${len} &middot; video and audio</span></span></span>
-      <button class="kit kit-go" data-ivt="${kind}"><span class="kit-ic">${I.document}</span><span class="kit-b"><b>Transcript</b><span>Searchable, full text</span></span></button>
-      <span class="kit"><span class="kit-ic">${I.video}</span><span class="kit-b"><b>6 scenes</b><span>Marked by ${a.n.split(' ')[0]}</span></span></span>
     </div>
   </div>`;
 }
@@ -3215,12 +3565,24 @@ const ROOM = [
   ['Ravi Chandran','samuel','RC','Priya said on the call that the handover is where it fails, not the work. That helped me.','8:40 AM'],
   ['Sofia Marchetti','lena','SM','Bringing my example on Thursday. Mine is a vendor review that went badly and I still think I was right to take it back.','9:15 AM']];
 
+/* THE ATTRIBUTION IS A HEADER ON A BOARD POST, NOT A FOOTNOTE.
+   In the one-to-one thread there are two people and the sides say which is
+   which, so "Priya Nair · 11:04 AM" under a bubble is a timestamp you look at
+   only if you want it. On a board every consecutive post is a different
+   person, and the name is the first thing you need — reading it after the
+   sentence means re-reading the sentence knowing who said it.
+
+   So the name and the time are separate elements rather than one string
+   joined by a middot: §37.14 sets them above the bubble and gives them
+   different weights, which a single text node cannot carry. The middot goes
+   with the join — two elements a gap apart do not need a separator to be two
+   things. */
 function roomLine(name, img, ini, body, when, mine){
   return `<div class="m them">
     <span class="m-av">${avatar({i:ini, img:AV[img]}, 32)}</span>
     <div class="m-c">
+      <div class="m-w"><b>${mine ? 'You' : name}</b><span>${when}</span></div>
       <div class="m-b">${body}</div>
-      <div class="m-w">${mine ? 'You' : name} &middot; ${when}</div>
     </div>
   </div>`;
 }
@@ -3232,9 +3594,8 @@ function discussionRoom(){
       : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
   </div>
   <div class="composer room-composer">
-    <span class="composer-star">${I.ai}</span>
+    <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
     <input class="inp" placeholder="Say something to Cohort 41" aria-label="Message the cohort">
-    <button class="composer-act" aria-label="Attach a file">${I.attachment}</button>
     <button class="composer-send" aria-label="Send">${I.send}</button>
   </div>`;
 }
@@ -3298,7 +3659,7 @@ function boardList(){
    paragraphs the agent actually wrote, and one button into the full report.
    The `assessed` dashboard needs the same thing for the same reason — the
    interview is the only thing that has happened to this candidate and the
-   dashboard was showing the RESULT of it (a rung, a black hero) without a
+   dashboard was showing the RESULT of it (a level, a black hero) without a
    word of what was said. So it is a function now rather than a second copy
    drifting away from the first.
 
@@ -3436,8 +3797,24 @@ function render(){
   } else {
     /* THE FALLBACK HAS TO KNOW WHICH PORTAL IT IS FALLING BACK INTO. `V.dashboard`
        is the candidate's, and landing a leader on it after a bad deep link would
-       show them somebody else's ninety days behind their own rail. */
-    const view = V[S.view] || (isLead() ? V.leadDash : V.dashboard);
+       show them somebody else's ninety days behind their own rail.
+
+       AND IT HAS TO END SOMEWHERE THAT EXISTS. `V.leadDash` is registered by
+       lead.js, which is parsed nine files after this one — so at the boot
+       render (the last statement in this file, per trap 8) the leader branch
+       resolved to `undefined` and `view(f)` threw. Uncaught, at the top level:
+       it took the rest of the bundle with it, so lead.js through ai7.js never
+       ran and the frame stayed empty. That was reachable the moment a reload
+       could restore `S.portal === 'leader'`, which is what the hash reader at
+       the foot of this file now does.
+
+       `&&` rather than `?:` for exactly that: the leader's fallback applies
+       when there IS one, and the candidate's dashboard — defined above, in
+       this file, unconditionally — is the floor. The boot paint of a restored
+       leader page is therefore the candidate dashboard for one frame, and
+       lead4.js's own `render()` at its foot redraws it as the leader's page
+       with `S.view` already correct. */
+    const view = V[S.view] || (isLead() && V.leadDash) || V.dashboard;
     /* NO FLOATING TAL OVER THE COURSEWARE. The button is bottom-right of the
        view column, and bottom-right of a LightspeedVT chapter is its Continue
        — the two land on each other, and ours is on top. We do not get to put a
@@ -3480,7 +3857,20 @@ function render(){
   device.innerHTML = IOS_TOP + `<div class="app"${at}>${html}</div>` + IOS_BOTTOM;
   pick.value = S.stage;
   const st = STAGES.find(s=>s[0]===S.stage);
-  histWrite('replaceState',null,'','#'+(isLead()?'leader':S.stage)+'/'+S.view);
+  /* THE LEADER'S HASH CARRIES THE STAGE TOO, and that third segment is the
+     whole of what makes a reload land where you were. `#leader/<view>` was
+     already being written, but the boot reader at the foot of this file only
+     knew how to restore a hash whose first segment is a STAGE — `leader` is
+     not one, so it fell through to `setStage('new')` and a reload on the
+     leader portal dropped you on the candidate's dashboard.
+
+     The stage is written even though no leader page reads it, because the
+     portal switch does not change the stage: flip to the leader, reload, flip
+     back, and without this you would return to `new` rather than to the
+     candidate you left. Two segments still restore correctly — the reader
+     defaults the third — so a bookmarked `#leader/leadEvals` keeps working. */
+  histWrite('replaceState',null,'',
+    isLead() ? '#leader/'+S.view+'/'+S.stage : '#'+S.stage+'/'+S.view);
   for(const pass of [talFirst, enhanceTalCards, mountLsvt]){
     try { pass(); } catch(e) { console.warn('pass failed:', e); }
   }
@@ -3666,6 +4056,51 @@ device.addEventListener('click', e => {
   if(cs){ cs.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); cs.classList.add('on'); return; }
   const rt2 = t.closest('[data-rtab]');
   if(rt2){ S.rtab = rt2.dataset.rtab; render(); return; }
+  /* the chapter record's own "show all" — a re-render, not a navigation, and it
+     goes through `S` for trap 9's reason: the list is rebuilt from scratch on
+     every render, so a class toggled on the button here would not survive the
+     next pass */
+  if(t.closest('[data-chall]')){ S.chAll = !S.chAll; render(); return; }
+
+  /* --- CHOOSING THE SCENES ------------------------------------------------
+     Selection is state and the mark is drawn from it, for trap 9's reason and
+     for a second one this control makes obvious: the count, the save button's
+     enabled-ness and the "three already, this one is unavailable" treatment
+     on the other three cards are all functions of the same set, so a handler
+     that toggled a class would have to reproduce three derivations by hand
+     and keep them in step. Set the array, re-render, and every one of them
+     falls out of `scenePick`.
+
+     THE FOURTH PRESS IS REFUSED, NOT ABSORBED. Dropping the oldest to make
+     room is the behaviour a person cannot see happen and cannot undo. A card
+     that is already chosen still deselects — that is how you change your
+     mind, and it is the only way to. */
+  const sc = t.closest('[data-scene]');
+  if(sc){
+    const [kind, i] = sc.dataset.scene.split(':');
+    const n = +i;
+    const keep = scenePicked(kind).slice();
+    const at = keep.indexOf(n);
+    if(at >= 0) keep.splice(at, 1);
+    else if(keep.length < 3) keep.push(n);
+    S.scPick[kind] = keep;
+    render(); return;
+  }
+  /* SAVING COMMITS THE SELECTION. It copies `S.scPick` into `S.scenes`, which
+     is what every other surface reads and what makes the chooser stop being
+     drawn — see the note over `sceneKeep` for why those are two sets and not
+     one. `.slice()` because the two must not share an array: the chooser
+     would otherwise keep writing into the committed set. */
+  const ss = t.closest('[data-scenesave]');
+  if(ss){
+    const kind = ss.dataset.scenesave;
+    if(scenePicked(kind).length === 3) S.scenes[kind] = scenePicked(kind).slice();
+    render(); return;
+  }
+  /* playing one is a prototype no-op: there is no video behind a scene, and a
+     button that silently does nothing is better than one that opens an empty
+     player. The card is still a button so that it reads and focuses as one. */
+  if(t.closest('[data-scene-play]')) return;
   const ct = t.closest('[data-ctab]');
   if(ct){ S.ctab = ct.dataset.ctab; render(); return; }
   const tb = t.closest('.tabs button'); if(tb){ tb.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); tb.classList.add('on'); return; }
@@ -3723,14 +4158,12 @@ device.addEventListener('click', e => {
   }
 });
 
-/* keep the clip counter honest on the report screen */
-device.addEventListener('change', e => {
-  if(e.target.closest('.clip-pick')){
-    const n = device.querySelectorAll('.clip-pick input:checked').length;
-    const el = device.querySelector('#clipCount');
-    if(el) el.textContent = n===3 ? '3 of 3 kept. Deselect one to swap.' : `${n} of 3 kept. Pick ${3-n} more.`;
-  }
-});
+/* THE OLD CLIP COUNTER IS GONE WITH THE BLOCK IT COUNTED. It read six
+   checkboxes out of the DOM and wrote a sentence into `#clipCount` — trap 9's
+   shape exactly, and it survived only because the report page happened not to
+   be rebuilt by a pass. The chooser is `scenePick` now, its selection is in
+   `S`, and every derived thing on it — the count, the save button, the
+   unavailable state on the other three — falls out of a re-render. */
 
 device.addEventListener('keydown', e => {
   const card = e.target.closest('.ai-clickable');
@@ -3748,6 +4181,38 @@ document.addEventListener('keydown', e => {
   if(e.key==='ArrowLeft')  setStage(STAGES[(i-1+STAGES.length)%STAGES.length][0]);
 });
 
+/* WHERE A RELOAD PUTS YOU.
+   `render` writes the hash on every paint, so the address bar is always a
+   description of the screen. This reads it back, and it has two forms because
+   the product has two signed-in users:
+
+     #<stage>/<view>          the candidate
+     #leader/<view>/<stage>   the cohort leader
+
+   THE LEADER'S FORM IS THE FIX. The hash was already being written, but this
+   reader only understood the first form: it tested `CFG[hash[0]]`, `leader`
+   is not a stage, the test failed, and every reload on any of the leader's
+   seven pages fell through to `setStage('new')` — the candidate's dashboard,
+   in the candidate's portal, in a portal switch that had silently flipped.
+
+   `setStage` is NOT the way back in for the leader: its first statement is
+   `S.portal = 'candidate'`, deliberately, and its reachability check only
+   knows candidate views (both documented over it). So the leader's branch
+   sets the three fields itself. The stage is restored before the view so the
+   candidate half is correct the moment you switch back to it, and it is
+   guarded rather than trusted — a hand-edited hash must not put `CFG[S.stage]`
+   at undefined, which every view helper dereferences on the first line.
+
+   An unknown view is left to `V` and the renderer's own fallback rather than
+   being validated here: `render` already answers a missing view, and a second
+   opinion in the boot path is a second place to keep the list of views. */
 const hash = location.hash.slice(1).split('/');
-if(hash[0] && CFG[hash[0]]){ S.stage=hash[0]; S.view = hash[1] || (DEFAULT_VIEW[hash[0]]||'dashboard'); S.ch=CFG[hash[0]].open; render(); }
+if(hash[0] === 'leader'){
+  S.portal = 'leader';
+  S.view = hash[1] || 'leadDash';
+  S.stage = CFG[hash[2]] ? hash[2] : 'new';
+  S.ch = CFG[S.stage].open;
+  render();
+}
+else if(hash[0] && CFG[hash[0]]){ S.stage=hash[0]; S.view = hash[1] || (DEFAULT_VIEW[hash[0]]||'dashboard'); S.ch=CFG[hash[0]].open; render(); }
 else setStage('new');

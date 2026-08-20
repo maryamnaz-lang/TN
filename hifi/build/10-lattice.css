@@ -421,14 +421,24 @@ textarea.inp{min-height:88px}
      `.facts` is in a section with no `.sec-h` at all, so the label column
      never applied and nothing showed. The Cohort Leader's standing band is
      the first one with a heading over it. */
+  /* `.stand` JOINS THEM, and it is the third band to arrive by the same route
+     as `.stats` and `.facts`: it is the same bordered row of figures with its
+     cells keyed to the full column width, and every `.stand` in the product
+     until the dashboard's closing block was drawn with no heading over it, so
+     the label column never applied and nothing showed. Put "Where you stand"
+     and a "View more" button over it and §24's flex `.sec-h` gets 184px to
+     divide between an `h2` that may shrink and a button that may not — the
+     heading came out as "Where / you / stand" in three lines beside a band
+     that had lost 184px of the width its three cells are sized against. */
   .sec:has(.ch),.sec:has(.ag),.sec:has(.aw),.sec:has(.mem),
   .sec:has(.gcard),.sec:has(.cardrow),.sec:has(> .tile-stack),
-  .sec:has(> .stats),.sec:has(> .tbl-wrap),.sec:has(> .facts){display:block}
+  .sec:has(> .stats),.sec:has(> .tbl-wrap),.sec:has(> .facts),
+  .sec:has(> .stand){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
   .sec:has(.cardrow) > .sec-h,.sec:has(> .tile-stack) > .sec-h,
   .sec:has(> .stats) > .sec-h,.sec:has(> .tbl-wrap) > .sec-h,
-  .sec:has(> .facts) > .sec-h{
+  .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--s05);
     padding:0 var(--pad-x)}
 }
@@ -990,7 +1000,7 @@ button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparen
 .on-dark .btn-p:hover,.sec.on-dark .btn-p:hover{
   background-color:var(--accent);color:var(--on-accent)}
 
-/* b. `.lvl-hero .ladder i` outranked `.ladder i.done`, so every rung went
+/* b. `.lvl-hero .ladder i` outranked `.ladder i.done`, so every level went
    grey and the candidate's own progress disappeared. */
 .lvl-hero .ladder i{background-color:var(--on-dark-rule)}
 .lvl-hero .ladder i.done{background-color:var(--accent);opacity:.55}

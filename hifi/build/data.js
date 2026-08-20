@@ -28,7 +28,7 @@ const STAGES = [
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
-  ['promoted','Promoted to E4',        'Cohort closed, level moved up a rung, next course offered.']
+  ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.']
 ];
 
 
@@ -56,6 +56,30 @@ const CFG = {
 const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0, open:0, avg:null, mins:0};
 
 
+/* ==========================================================================
+   "LEVEL", NOT "RUNG" — AND WHY THIS CONSTANT STILL SAYS RUNG
+
+   The product used to call a position on the ladder a RUNG: "rung 3 of 15",
+   "you move up a rung", "sign the rung". Every one of those strings now says
+   LEVEL, on the client's instruction, across the hi-fi portal and the two
+   earlier prototypes — one word for the thing, everywhere a person can read
+   it, including the leader's evaluation form and Tal's answers.
+
+   THE CODE KEEPS THE OLD SPELLING, DELIBERATELY, in four places: `RUNG` and
+   `rungOf` here and in views.js, `LDR_RUNGS` / `ldrRungView` in lead3.js, and
+   the class names `.tw-rungs` and `.ldr-rungs`. Two reasons, and the second
+   is the real one:
+
+   1. A class name and a variable are not product language. Renaming them
+      changes nothing a person sees and touches six files, four of which are
+      stylesheets that would then have to be kept in step with the JS.
+   2. "Level" is now doing two jobs — `f.level` is the CODE ("E3") and
+      `rungOf(f.level)` is the POSITION (3). Calling both `level` in the same
+      expression is how a reader ends up passing one where the other was
+      meant. The old word survives in code precisely because it still
+      distinguishes them, and this note is what stops the next reader
+      "finishing" the rename.
+   ========================================================================== */
 const RUNG = {E1:1,E2:2,E3:3,E4:4,E5:5};
 
 
@@ -169,7 +193,7 @@ const AGENTS = {
    chat, charges nothing, and decides nothing at all.
 
    So this record is its own rather than a sixth entry in AGENTS. Everything
-   AGENTS carries — a rating, a rung range, an interview count, a price —
+   AGENTS carries — a rating, a level range, an interview count, a price —
    would be a claim about the consultant that is not true, and a record
    shaped like an agent's is a record that will be rendered like one the
    first time somebody reuses a card. Three fields, which is what the
@@ -224,14 +248,14 @@ const TALCTX = {
 const TAL_ROUTES = [
   [/consultant|screening|jordan/i, () => 'Fifteen minutes with Jordan Blake, and nothing in it is assessed. He asks where you are now and what you want next, then points you at the agents whose range fits. There is nothing to prepare and it sets no level.'
     + twChips(['How is that different from the agent interview?','What happens in the interview?'])],
-  [/quiz result|my quiz|quiz score|title given|which track am i/i, () => 'You scored 64 out of 100, which puts you on the Explorer track &mdash; the first of three. That is a TITLE, not a level: the five rungs inside it are set by an interview with a talent agent, and the quiz cannot do it.'
+  [/quiz result|my quiz|quiz score|title given|which track am i/i, () => 'You scored 64 out of 100, which puts you on the Explorer track &mdash; the first of three. That is a TITLE, not a level: the five levels inside it are set by an interview with a talent agent, and the quiz cannot do it.'
     + wLadder() + twChips(['What is the Explorer track?','How do I get my level?'])],
   [/key terms|two terms/i, () => 'Chapter 4 turns on two ideas.' + wTerms() + twChips(['Explain the chapter in 60 seconds','What does the roleplay ask for?'])],
   [/chapter 4|walk me through|stuck|60 seconds|explain this chapter|roleplay/i,
     () => 'The whole chapter is one question: what has to be true before you hand something over. Most people read it as trust when it is really clarity.' + wChapter(3) + twChips(['Give me the two key terms','How are chapters assessed?'])],
   [/chapter 1|what is chapter/i, () => 'Chapter 1 sets up why the operator role exists and how your week ladders up to the outcome your team owns.' + wChapter(0) + twChips(['What happens on the call?','How are chapters assessed?'])],
   [/points|earn more|bronze|badge|rank/i, () => 'Points come from finishing chapters, turning up to calls and being useful on the board.' + wPoints() + twChips(['Does rank affect my level?','What is the Get Involved badge?'])],
-  [/level|move up|ladder|e3|e4|explorer track|assessed/i, () => 'Your level is a rung on the Explorer track, set by an interview and reviewed at the end of each course.' + wLadder() + twChips(['What would move me to E4?','What is on my report?'])],
+  [/level|move up|ladder|e3|e4|explorer track|assessed/i, () => 'Your level is where you sit on the Explorer track, set by an interview and reviewed at the end of each course.' + wLadder() + twChips(['What would move me to E4?','What is on my report?'])],
   [/mock|practice|practise|prepare|freeze|questions in advance/i, () => 'We can run it now. I ask, you answer out loud, and I tell you where the answer went thin.' + wPrep() + twChips(['What should I not do in the interview?','How long is the interview?'])],
   [/priya|owen|lena|interviewed by|what is .* like/i, () => 'Here is what past candidates say about her.' + wAgent() + twChips(['What should I prepare?','How soon do I get my level?'])],
   [/call|thursday|cohort|say on|behind the others/i, () => 'Your next call is Thursday. Here is what it covers and what to bring.' + wCall() + twChips(['Am I behind the others?','Can I message the whole cohort?'])],

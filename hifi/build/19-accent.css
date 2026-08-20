@@ -3,7 +3,7 @@
    Not an orange — the gradient. The one on the Create Account button, at the
    angle the Figma file states for it, running across every fill in the
    product that used to be purple: Tal's chip, the send control, progress
-   bars and rungs, a selected day, an open chapter's number, an earned
+   bars and levels, a selected day, an open chapter's number, an earned
    badge, a counter, the rail marker on the page you are on.
 
    The list below is GENERATED from the stylesheet, not hand-written. Every
@@ -38,7 +38,6 @@
 .ladder i.on,
 .stp .on .stp-c,
 .stp-now .stp-c,
-.ch.done .ch-num,
 .bar > i,
 .aw-r.got .aw-ic,
 .ach-ic,
@@ -58,16 +57,11 @@ button.btn-p:active,
 .lvl-hero .ladder i.done,
 .lvl-hero .ladder i.on,
 .ch.open::before,
-.ch.open .ch-num,
 .tg input:checked ~ .sw::before,
 .tg input:checked ~ .sw::after,
 .photopick.on::after,
-.app .sec:has(> .tile-stack) .ch.done .ch-num,
-.app .sec.flat.bleed .ch.done .ch-num,
 .app .sec:has(> .aw-list) .aw.got .aw-ic,
 .app .sec:has(> .pointsList) .aw.got .aw-ic,
-.app .sec:has(> .tile-stack) .ch.open .ch-num,
-.app .sec.flat.bleed .ch.open .ch-num,
 .app .sec.tint .tag.acc,
 .app .sec:has(> .tile-stack) .tag.acc,
 .app .tg input:checked ~ .sw::after,

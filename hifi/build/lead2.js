@@ -14,7 +14,7 @@
    the top of every page in both portals. So the wireframe's per-page Tal read
    crosses as a `PAGESUM` entry (written at the foot of ai6.js), and an
    `.ai-aura` card is spent only where Tal is doing something a paragraph
-   cannot: proposing a rung, or briefing a call. Same argument lead.js used for
+   cannot: proposing a level, or briefing a call. Same argument lead.js used for
    the dashboard banner, applied to the other seven pages.
 
    AND THE WIREFRAME'S ANNOTATIONS DO NOT CROSS AT ALL.
@@ -184,6 +184,24 @@ V.leadCohorts = () => {
       ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`)}
     </div>
   </div>
+  <div class="sec">
+    <div class="sec-h"><h2>This week&rsquo;s calls</h2><span class="t-helper-01">Sixty minutes each</span></div>
+    <div class="tile-stack">
+      ${LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd).map(c => `
+      <div class="cardrow bk-row">
+        <span class="day bk-day"><div class="d">${c.callDay}</div><div class="n">${c.callTime}</div></span>
+        <span class="cardrow-ic">${I.group}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${lname(c)} &middot; week ${c.week} of 13</span>
+          <span class="cardrow-d">${c.members.length} candidates at ${llevel(c)} &middot; ${CH[Math.min(12, c.week - 1)][0]}</span>
+        </span>
+        <span class="cardrow-a">
+          <button class="btn btn-sm noic" data-ldrbrief="${c.id}">Brief</button>
+        </span>
+      </div>`).join('')}
+    </div>
+    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
+  </div>
   <div class="sec tint">
     <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of ninety, evenly spread</span></div>
     <div class="tbl-wrap">
@@ -206,25 +224,12 @@ V.leadCohorts = () => {
         }).join('')}
       </table>
     </div>
-    <p class="t-helper-01 mt4">Progress is the cohort average against where ninety days evenly spread would put them. ${lname(worst)} is ${Math.abs(lpaceGap(worst))} points behind, which is the widest gap of the three.</p>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>This week&rsquo;s calls</h2><span class="t-helper-01">Sixty minutes each</span></div>
-    <div class="tile-stack">
-      ${LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd).map(c => `
-      <div class="cardrow bk-row">
-        <span class="day bk-day"><div class="d">${c.callDay}</div><div class="n">${c.callTime}</div></span>
-        <span class="cardrow-ic">${I.group}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${lname(c)} &middot; week ${c.week} of 13</span>
-          <span class="cardrow-d">${c.members.length} candidates at ${llevel(c)} &middot; ${CH[Math.min(12, c.week - 1)][0]}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-ldrbrief="${c.id}">Brief</button>
-        </span>
-      </div>`).join('')}
-    </div>
-    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
+    ${/* THE PACE FOOTNOTE IS GONE. Two sentences: one defining "expected
+          pace", which the heading's own helper line already defines — "day of
+          ninety, evenly spread" — and one naming the worst cohort, which the
+          Tal card at the top of this page states in the same words and the
+          PROGRESS column shows on the row it belongs to. Three copies of one
+          fact, the quietest of them last. */''}
   </div>
 </div></main>`;
 };
@@ -419,8 +424,15 @@ V.leadMember = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Cohorts','leadCohorts'],[lname(c),'leadCohort'], m.name)}
-  ${ph(m.name, `${lname(c)} &middot; ${llevel(c)} &middot; week ${c.week} &middot; last active ${m.last.toLowerCase()}`,
-    `<button class="btn btn-p" data-ldrnote="${m.name}">Add a note ${I.edit}</button>`)}
+  ${/* THE HEADER TAKES NO ACTION, and the two actions sit together instead.
+        "Add a note" was in `ph()`'s action slot, hard right of the h1, while
+        "Message" sat in the identity row 80px below it — two things you can do
+        about one person, drawn as far apart as the page allows, and the one in
+        the header was the loudest object above the fold on a page whose subject
+        is a record. They are one group: the person, then what you can do about
+        them, in the row that names them. Same argument the interviews page
+        makes for emptying its own header slot (views.js `V.interviews`). */''}
+  ${ph(m.name, `${lname(c)} &middot; ${llevel(c)} &middot; week ${c.week} &middot; last active ${m.last.toLowerCase()}`)}
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
@@ -429,7 +441,14 @@ V.leadMember = () => {
         <span class="idmeta">${llevel(c)} &middot; ${lname(c)}</span>
         ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
       </div>
-      <div class="idhead-a"><button class="btn btn-g" data-go="leadMessages">Message ${I.chat}</button></div>
+      ${/* MESSAGE FIRST, NOTE SECOND. A message goes TO them and a note is
+            for the leader's own record, so the outward-facing one leads; and
+            the note keeps the pencil it carried in the header. Both are
+            `.btn-g` — neither is the page's primary action, the record is. */''}
+      <div class="idhead-a">
+        <button class="btn btn-g" data-go="leadMessages">Message ${I.chat}</button>
+        <button class="btn btn-g" data-ldrnote="${m.name}">Add a note ${I.edit}</button>
+      </div>
     </div>
   </div>
   <div class="sec">
@@ -481,9 +500,9 @@ V.leadMember = () => {
       <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
       <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
       <div class="kv"><span class="k">Assigned</span><span class="v">${llevel(c)} <span class="tag org sm">reviewer went lower</span></span></div>
-      <div class="kv"><span class="k">Next rung</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
+      <div class="kv"><span class="k">Next level</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
     </div>
-    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} a rung below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
+    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} one below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
@@ -577,7 +596,17 @@ V.leadReports = () => {
         ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
           const m = x.m, d = m.pc - lpace(x.c);
           return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${x.c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td>${m.name}${d <= -5 ? ` <span class="tag org sm">${Math.abs(d)} behind</span>` : ''}</td>
+            ${/* A FACE IN THE FIRST CELL, the same argument `faceRow` makes in
+                  lead.js: every row on this portal is a PERSON, and twenty-eight
+                  rows of name-and-figures is the page where that is hardest to
+                  hold. The mark is `mem-av mem-ph` at 24px — the roster's own
+                  slot, one step down for a table row — so the reports table and
+                  the roster draw the same candidate the same way. */''}
+            <td><span class="ldr-who">
+              <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
+              <span class="ldr-who-n">${m.name}</span>
+              ${d <= -5 ? `<span class="tag org sm">${Math.abs(d)} behind</span>` : ''}
+            </span></td>
             ${sel === 'all' ? `<td>${x.c.id} <span class="t-helper-01">${x.c.level}</span></td>` : ''}
             <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
             <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>

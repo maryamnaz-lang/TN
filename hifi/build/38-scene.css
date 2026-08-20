@@ -1,0 +1,249 @@
+/* ==========================================================================
+   38 — SCENES
+
+   The candidate's only video surface. Six are offered on the Interviews
+   module and three are kept; the kept three are what the interview's detail
+   page shows of it. Both are the same card at two sizes, which is the whole
+   design: choosing three of six and looking at the three you chose are the
+   same act a week apart, so they had better not be two components.
+
+   Everything here is prefixed `.scene`, a name no earlier layer mentions, so
+   this layer's position in the cascade cannot cause an argument. §4 is the one
+   block that reaches outside that prefix — it extends §10.15's label-column
+   opt-out — and it has to land after §10 to be a correction at all, which the
+   end of the file gives for free.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE CARD
+   A 16:9 still, the play mark centred on it, the length in the corner, and
+   three lines underneath. `button` all the way down, because every one of
+   these is pressable in both of its uses — play, on the detail page; select,
+   in the chooser — and a div with a click handler is a control a keyboard
+   cannot reach.
+
+   `text-align:left` and the reset of the button's own inherited type are the
+   price of using a real button for a block of content; §2 sizes `.btn` and
+   nothing else, so a bare `button` arrives with the UA's centred 13px.
+   -------------------------------------------------------------------------- */
+.app .scene{
+  display:flex;flex-direction:column;gap:var(--s04);
+  padding:0;border:0;background:none;text-align:left;
+  font:inherit;color:inherit;cursor:pointer;min-width:0}
+
+/* THE STILL IS A BOX WITH A RATIO, NOT A BOX WITH A HEIGHT. `aspect-ratio`
+   rather than a padding-top hack, for the reason §15.3 gives for the plot: a
+   ratio survives the column changing width, and every one of these is in a
+   grid track whose width is a fraction of something. The photograph is set
+   inline by `sceneCard` — it is a data URI and it belongs to the person, not
+   to the stylesheet — so this side owns everything except which image. */
+.app .scene-still{
+  position:relative;display:block;width:100%;aspect-ratio:16 / 9;
+  background-color:var(--surface-dark);
+  background-size:cover;background-position:center var(--still-y, 22%);
+  overflow:hidden}
+/* THE SCRIM, AND IT IS A PSEUDO BECAUSE THE IMAGE IS INLINE. Trap 1: an
+   inline `background-image` beats any stylesheet declaration on the same
+   property, so the dim cannot be a second layer on `background`. It is an
+   overlay instead — darker at the bottom, where the length sits, and even
+   enough at the middle for a white play mark to hold its edge over any
+   photograph. */
+.app .scene-still::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,.28) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,.62) 100%)}
+
+.app .scene-play{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:grid;place-items:center;width:44px;height:44px;
+  background-color:rgba(255,255,255,.92)}
+.app .scene-play svg{
+  width:20px;height:20px;fill:var(--gray-100);display:block;
+  /* the glyph is a triangle and a triangle centred on its bounding box reads
+     left of centre, because its mass is not where its box is */
+  margin-left:2px}
+
+.app .scene-len{
+  position:absolute;right:var(--s03);bottom:var(--s03);
+  padding:2px var(--s03);
+  background-color:rgba(0,0,0,.62);color:#fff;
+  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.4px;
+  font-variant-numeric:tabular-nums}
+
+.app .scene-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .scene-eb{
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .scene-t{
+  font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.1px;
+  color:var(--text-primary)}
+.app .scene-q{
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+
+/* --------------------------------------------------------------------------
+   2. THREE ACROSS, AND ONE ACROSS ON A PHONE
+   The kept set is three cards in a row at any width that can hold three
+   16:9 stills side by side and still leave the title a line to itself. Below
+   that they stack full width rather than shrinking to a filmstrip: a 100px
+   still is not a picture of anything, and the whole point of these being big
+   cards is that you can see what the scene is before you press it.
+
+   672px is where §15 already turns the interview row's kit strip from one
+   column into three, so the two blocks on this page change shape together.
+   -------------------------------------------------------------------------- */
+.app .scene-row{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s06)}
+@container app (min-width:672px){
+  .app .scene-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s05)}
+}
+
+/* --------------------------------------------------------------------------
+   3. THE CHOOSER IS ONE ROW OF SIX, AND THE KEPT SET IS THREE BIG CARDS
+
+   THE SPACE FOLLOWS THE DECISION. Six cards at the size of the kept three is
+   two rows of large video that fill a screen with a job that is a comparison:
+   choosing needs all six in the eye at once, and each one only has to be
+   legible enough to be told from the other five. So the chooser is a
+   filmstrip — six in a single row — and the three that survive it inherit the
+   full width the page was spending on six.
+
+   Six across needs the desktop column; below it the strip wraps rather than
+   shrinking to thumbnails nobody can read: three at tablet, two on a phone.
+   The strip is deliberately NOT a horizontal scroller — six is a set you have
+   to see all of to choose from, and a scroller hides some of it.
+
+   THE COMPACT TYPE IS PART OF THE VARIANT. §38.1 sizes the card for a third
+   of a column; at a sixth the title has to come down a step or "Handing over
+   the vendor review" is four lines under a 79px still.
+   -------------------------------------------------------------------------- */
+.app .scene-pick{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--s06) var(--s04)}
+@container app (min-width:672px){
+  .app .scene-pick{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@container app (min-width:900px){
+  .app .scene-pick{grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s04)}
+  .app .scene-sel{gap:var(--s03)}
+  .app .scene-sel .scene-eb{font-size:10px;line-height:13px;letter-spacing:.6px}
+  .app .scene-sel .scene-t{font-size:12.5px;line-height:17px}
+  .app .scene-sel .scene-q{font-size:11.5px;line-height:15px}
+  /* the play mark is a proportion of the still, not a fixed 44px: at a sixth
+     of the column the still is ~79px tall and a 44px button is most of it */
+  .app .scene-sel .scene-play{width:32px;height:32px}
+  .app .scene-sel .scene-play svg{width:14px;height:14px}
+  .app .scene-sel .scene-len{font-size:10px;line-height:14px;padding:1px var(--s02)}
+}
+
+/* --- THE CHECKBOX -------------------------------------------------------- */
+/* It is §2's checkbox, restated. §2 draws that box as `.cbx input:checked +
+   .box` — a real input, hidden, with the box as its sibling — and neither the
+   input nor its `<label>` can exist here: the card is a `<button>` and both
+   are interactive content, which may not nest inside it. So the box is a span
+   with §2's geometry (20px, 1.5px, `--layer-01`) and §19's checked treatment
+   (the accent gradient, no border), and the BUTTON is the control. The note in
+   `scenePick` (views.js) is where that is written down.
+
+   IT SITS ON THE STILL, TOP-LEFT, because that is the corner the eye starts a
+   card in and the only corner of this card with nothing in it — the length
+   holds bottom-right and the play mark holds the middle. A white-grounded box
+   on a dimmed photograph reads at any size in the strip. */
+.app .scene-box{
+  position:absolute;top:var(--s03);left:var(--s03);
+  width:20px;height:20px;
+  display:grid;place-items:center;
+  border:1.5px solid var(--border-strong-01);
+  background-color:var(--layer-01)}
+.app .scene-box svg{width:16px;height:16px;fill:var(--on-brand);opacity:0;display:block}
+.app .scene-sel.on .scene-box{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  border-color:transparent}
+.app .scene-sel.on .scene-box svg{opacity:1}
+@container app (min-width:900px){
+  /* one step down with the rest of the strip, and still a 40px-plus target
+     because the whole card is what you press */
+  .app .scene-sel .scene-box{width:18px;height:18px;top:var(--s02);left:var(--s02)}
+  .app .scene-sel .scene-box svg{width:14px;height:14px}
+}
+
+/* and the card itself says chosen, so the state reads from across the strip
+   rather than only from a 20px corner */
+.app .scene-sel.on .scene-still{outline:3px solid var(--accent);outline-offset:-3px}
+.app .scene-sel.on .scene-t{color:var(--accent-text)}
+
+/* AND THE THREE YOU CANNOT ADD SAY SO IN THE PICTURE. When three are chosen
+   the other three are refused rather than swapped (the note over the
+   `data-scene` branch in views.js), so they have to look unavailable before
+   they are pressed. A heavier scrim is the whole treatment: it is a property
+   nothing animates — per trap 2, a resting state written in `opacity` is one
+   an entrance animation can hold at the wrong value — it reads instantly at
+   strip scale, and the title underneath stays at full contrast because the
+   card is still a thing you are allowed to read. The box goes with it: an
+   empty checkbox at full strength on a washed-out card is the one part of it
+   that would still look pressable. */
+.app .scene-full .scene-still::before{
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.62) 0%, rgba(255,255,255,.62) 100%)}
+.app .scene-full .scene-play{background-color:rgba(255,255,255,.72)}
+.app .scene-full .scene-box{border-color:var(--rule);background-color:transparent}
+
+/* the count and the save, on one line under the grid */
+.app .scene-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:var(--s05);flex-wrap:wrap;
+  margin-top:var(--s06);padding-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.app .scene-count{
+  font-size:13px;line-height:18px;font-weight:600;color:var(--text-secondary);
+  font-variant-numeric:tabular-nums}
+
+/* --------------------------------------------------------------------------
+   4. TWO SECTIONS THAT MUST NOT TAKE THE LABEL COLUMN
+   §10.15 gives any `.sec` with a `.sec-h` a 184px label column at desktop
+   unless its contents are on the opt-out list, and trap 13 is that the list
+   is keyed by CONTENTS. Two blocks here need to be on it and neither could be
+   added at §10, because neither existed then:
+
+     `.scene-row`   three 16:9 stills sized against the full column. Hand 184
+                    of it to a heading and each still loses a third of its
+                    width — and "Scenes / The three you kept" is a two-word
+                    heading that does not need a column of its own.
+     `.scene-pick`  the same argument with six of them, and one more: the
+                    section also carries the sentence explaining the choice,
+                    and a paragraph indented 184px from a heading that is
+                    beside it rather than above it reads as a caption on the
+                    grid instead of the instruction for it.
+     `.ivlist`      the interview rows. Same argument, and it is the block the
+                    request named: "Past interviews / Kept for 24 months" was
+                    set three words to a line in a gutter beside rows that had
+                    lost 184px they are laid out against.
+
+   Restated INSIDE the same container query per trap 3 — a rule in
+   `@container` is its own cascade tier and beats an unconditional rule of
+   equal weight whatever its layer number, so §10's version can only be
+   answered from inside one. Both halves of §10's pair are restated: the
+   `display:block` on the section and the padding on its heading, because the
+   heading's own gutter is zeroed by the rule being undone.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .scene-row),
+  .app .sec:has(> .scene-pick),
+  .app .sec:has(> .ivlist){display:block}
+  .app .sec:has(> .scene-row) > .sec-h,
+  .app .sec:has(> .scene-pick) > .sec-h,
+  .app .sec:has(> .ivlist) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}
+
+/* --------------------------------------------------------------------------
+   5. NOTHING HERE FOR `.ivrow-kit` ANY MORE
+   This section held a rule dropping §15's kit strip from three columns to two,
+   for the release where the row still carried the scenes and the report. The
+   row carries neither now — `ivRow` (views.js) draws no kit at all, and the
+   note there is where the argument is — so a rule sizing it would be a rule
+   about an element the build does not render. §15's own rules are left alone
+   for the same reason `.kit` itself is: they are the correct treatment if the
+   strip comes back.
+   -------------------------------------------------------------------------- */

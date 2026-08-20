@@ -31,6 +31,11 @@ arrowLeft:'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
    from here to there" rather than "you go there". */
 arrowUp:'m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z',
 chevDown:'M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z',
+/* The pair to `chevDown`, for a control that both opens and closes a list —
+   Material's filled `expand_less` to `chevDown`'s `expand_more`, so the two
+   states of one button are the same glyph reflected rather than two glyphs
+   that happen to point opposite ways. */
+chevUp:'M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z',
 chevRight:'M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z',
 check:'M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
 checkFilled:'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
@@ -133,7 +138,7 @@ const CHEV = 'M5.6 3h4.7l7.9 9-7.9 9H5.6l7.9-9-7.9-9Z';
 
    It is the same three chevrons as `CHEV`, which is the section
    device. That is not duplication: CHEV is one repeatable arrow
-   the product draws rungs and headings with, and this is the
+   the product draws levels and headings with, and this is the
    logo's own lockup of three at the logo's own proportions.
    ============================================================ */
 const TN_MARK = '<svg viewBox="0 0 194.28 194.28" aria-hidden="true">' +

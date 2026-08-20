@@ -3299,7 +3299,7 @@ function dashRePromoted(){
   )}
   <div class="card mt">
     <h2 class="lvl-title up">${esc(to)} <small class="up">promoted from ${esc(from)} · ${esc(S.reinterview.on)}</small></h2>
-    <div class="sub hd-desc" style="margin-top:6px">You're on rung ${LADDER.indexOf(S.level)+1} of 15. Every level from here is one 90-day cohort and one re-interview away.</div>
+    <div class="sub hd-desc" style="margin-top:6px">You're on level ${LADDER.indexOf(S.level)+1} of 15. Every level from here is one 90-day cohort and one re-interview away.</div>
     <div class="mt">${climbStrip(S.level)}</div>
   </div>
   ${stepper()}
@@ -3968,7 +3968,7 @@ VIEWS.report = ()=>{
     </div>
     <div>
       <div class="card"><h3>What ${lvlLabel(S.level)} means</h3>
-        <p class="sub" style="margin:0">First rung of the ladder. You can run the work, but you are still absorbing what should be delegated and avoiding conflict until it costs something.</p>
+        <p class="sub" style="margin:0">First level of the ladder. You can run the work, but you are still absorbing what should be delegated and avoiding conflict until it costs something.</p>
         <hr class="d">
         <div class="kv"><span>Title</span><b>${titleOf(S.level)}</b></div>
         <div class="kv"><span>Level</span><b>${S.level[1]} of 5 within ${titleOf(S.level)}</b></div>
@@ -6804,27 +6804,27 @@ function flagOf(m,c){
 COHORTS.forEach(c=>c.members.forEach(m=>m.flag=flagOf(m,c)));
 
 const EVALS=[
- {id:'e1',name:'Thomas Beck',when:'Today 10:00',bucket:'Explorer',quiz:64,ai:'E1',aiwhy:'Quiz put them as an Explorer. The transcript supports the entry rung — they described avoiding a handover twice.',status:'pending',
+ {id:'e1',name:'Thomas Beck',when:'Today 10:00',bucket:'Explorer',quiz:64,ai:'E1',aiwhy:'Quiz put them as an Explorer. The transcript supports the entry level — they described avoiding a handover twice.',status:'pending',
   an:{
    confidence:'High',
-   summary:'Quiz and interview agree on the Explorer band, and the interview places them at the entry rung. Solid foundations and clear intent, but two moments of doing the work themselves rather than handing it to an agent cap the number at 1.',
+   summary:'Quiz and interview agree on the Explorer band, and the interview places them at the entry level. Solid foundations and clear intent, but two moments of doing the work themselves rather than handing it to an agent cap the number at 1.',
    quizRead:'64/100 sits inside the Explorer band (55–74). Foundational tool-use questions carried the score; the multi-step delegation items were where points were lost — the same gap the interview surfaced.',
    comps:[
     {name:'Task delegation',rung:'E1',pct:34,read:'Preferred to complete steps personally; handed work to an agent only when explicitly prompted.'},
-    {name:'Handling ambiguity',rung:'E2',pct:54,read:'Asked scoping questions before acting — a notch above the entry rung.'},
+    {name:'Handling ambiguity',rung:'E2',pct:54,read:'Asked scoping questions before acting — a notch above the entry level.'},
     {name:'Quality checking',rung:'E1',pct:40,read:'Accepted the first output without a verification pass on two of three tasks.'},
     {name:'Communication',rung:'E2',pct:58,read:'Narrated intent clearly; left some tool jargon unexplained.'}
    ],
    evidence:[
     {t:'positive',q:'Let me confirm the date range before I pull anything.',n:'Scoped the task before acting — a genuine strength.'},
-    {t:'concern',q:'I’d rather just write that part myself than explain it to the agent.',n:'Handover avoidance, said twice. This is the entry-rung tell.'}
+    {t:'concern',q:'I’d rather just write that part myself than explain it to the agent.',n:'Handover avoidance, said twice. This is the entry-level tell.'}
    ],
    watch:'The two handover-avoidance moments are what hold this at E1 rather than E2. Worth re-checking delegation at the 90-day mark.'
   }},
  {id:'e2',name:'Rachel Okonjo',when:'Yesterday 15:30',bucket:'Builder',quiz:71,ai:'B3',aiwhy:'Strong on ambiguity and stakeholder mapping. Weaker on conflict repair.',status:'pending',
   an:{
    confidence:'Medium',
-   summary:'Clearly a Builder, with standout systems thinking. Ambiguity handling and stakeholder mapping read a rung above the rest, but a weak conflict-repair scenario pulls the blend down to 3.',
+   summary:'Clearly a Builder, with standout systems thinking. Ambiguity handling and stakeholder mapping read a level above the rest, but a weak conflict-repair scenario pulls the blend down to 3.',
    quizRead:'71/100 sits at the top of the Builder band (55–79). Systems-design questions drove the score; the interpersonal items pulled it back — consistent with the interview.',
    comps:[
     {name:'Handling ambiguity',rung:'B4',pct:80,read:'Reframed an under-specified brief into three testable options unprompted.'},
@@ -7645,7 +7645,7 @@ function agEvalCapture(){
 }
 /* The AI's read of the interview — a proper analysis, not a one-liner:
    overall verdict + confidence, how the quiz maps, a competency breakdown
-   with evidence from the transcript, and why it landed on this rung. */
+   with evidence from the transcript, and why it landed on this level. */
 var AI_SPARK='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2.6l1.85 4.98L18.9 9.4l-5.05 1.82L12 16.2l-1.85-4.98L5.1 9.4l5.05-1.82z"/><path d="M18.6 14.4l.9 2.42 2.45.88-2.45.88-.9 2.42-.9-2.42-2.45-.88 2.45-.88z" opacity=".65"/></svg>';
 function agEvalAnalysis(e){
   var a=e.an;
@@ -7873,7 +7873,7 @@ A.join=function(id){
   +'<div><span>Transcript</span><b>Generating live</b></div>'
   +'</div><p class="sub" style="margin:12px 0 0">The recording and transcript are what your write-up is built from. Nothing here is shared with an employer.</p></div>'
   +'<div class="ses-panel mt"><div class="l-eyebrow">What you are here to set</div>'
-  +'<p class="sub" style="margin:0">You have their quiz title but not their level — that number is what you set. Ask for one real situation from the last three months; that single example decides the rung.</p></div>'
+  +'<p class="sub" style="margin:0">You have their quiz title but not their level — that number is what you set. Ask for one real situation from the last three months; that single example decides the level.</p></div>'
   +'</aside></div>'
   +'<div class="ses-foot">'
   +'<button class="ses-ctl" title="Microphone">'+ic('messages')+'<span>Mute</span></button>'

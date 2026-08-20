@@ -410,8 +410,16 @@
    its own `::before` ground, which needs to stay behind its content whether
    or not there is a light above it.
    ========================================================================== */
+/* EVERY CARD ON THE LIST IS NAMED HERE OR ITS GLOW ESCAPES. The glow is
+   `position:absolute;inset:0` — so with no positioned ancestor of its own it
+   resolves against whatever IS positioned further up, which on a page whose
+   dark card has been hoisted is the module head band. `.ldr-read` was added to
+   `GLOW_ON` (ai4) and not to this line, and the haze duly painted a 700px
+   orange rectangle across the band's own gradient, over the card and past it
+   on both sides. `overflow:hidden` is what clips it to the card; `relative` is
+   what makes the card the box it is clipped to. */
 .app .plate,.app .lvl-hero,.app .cert,
-.app .sec.on-dark,.app .score.on-dark{position:relative;overflow:hidden}
+.app .sec.on-dark,.app .score.on-dark,.app .ldr-read{position:relative;overflow:hidden}
 .app .dark-glow{
   /* A BROAD WARM HAZE OFF THE TOP RIGHT, not a lamp with an edge. The
      earlier version was a small blurred ellipse and it read as a discrete
@@ -433,6 +441,7 @@
 .app .lvl-hero > :not(.dark-glow),
 .app .cert > :not(.dark-glow),
 .app .sec.on-dark > :not(.dark-glow),
+.app .ldr-read > :not(.dark-glow),
 .app .score.on-dark > :not(.dark-glow){position:relative;z-index:2}
 
 /* ==========================================================================
