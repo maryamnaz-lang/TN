@@ -244,11 +244,41 @@
    progress on the right. The card IS the merge — one visual block, one warm
    wash, one rule under it.
 
-   THE POPUP. "All steps" used to expand `.stp-all` inline, pushing content
-   down. Now `.stp-all` is position:absolute on its parent, dropping down as
-   a white panel with a shadow. Click "Hide steps" or anywhere outside and
-   it re-renders closed (the handler in views.js already toggles `S.piOpen`
-   and calls `render()`).
+   THE POPUP IS A DROPDOWN, AND IT WAS A MODAL BY ACCIDENT.
+
+   This block's own note said what it wanted — "`.stp-all` is position:absolute
+   on its parent, dropping down as a white panel" — and then declared
+   `position:fixed; top:50%; left:50%; translate(-50%,-50%)` behind a
+   `rgba(0,0,0,.18)` scrim, with a post-render pass in views.js lifting both
+   nodes out of `.app` into `.device`. Comment and code disagreed, and the code
+   won: pressing "All steps" dimmed the whole portal and put a rounded card in
+   the middle of the screen. That is the treatment for a decision you must
+   answer. Five steps with four ticks against them is a reference list you
+   glance at and dismiss, and a scrim makes glancing feel like an interruption.
+
+   WHY THE MODAL WAS REACHED FOR, AND WHY IT WAS NOT NEEDED. The lift pass
+   exists because `position:fixed` inside `.device` is measured against `.device`
+   — `container-type:inline-size` makes it a containing block — so a fixed popup
+   declared in the band was clipped by it. All true, and all downstream of
+   choosing `fixed`. NOTHING BETWEEN `.stp` AND `.main` CLIPS: `.modhead` and
+   `.ai-aura` are both `overflow:visible`, and `.main` is the page's own vertical
+   scroller. So an absolutely-positioned panel anchored on `.stp` drops into the
+   page and is not clipped by anything — which is what the note asked for in the
+   first place. The lift pass and the scrim both go.
+
+   IT HANGS FROM THE TOGGLE'S CORNER. `right:0` on the anchor puts the panel's
+   right edge on the chevron's right edge — the toggle is `margin-left:auto` in
+   `.stp-top`, so those are the same edge at every width — and `top:100%` drops
+   it clear of the wing rather than over the step it is describing. The width is
+   `min(340px, 100%)`: 100% of the anchor, so on a phone, where the wing is the
+   full card, the panel cannot reach past the edge `.main` would clip it at.
+
+   AND IT IS SQUARE. `.stp-pop` carried `border-radius:12px` in a system whose
+   `--radius` is 0 and whose only curves are marks (50%) and pills (999px) — the
+   one rounded panel in the product, which is what a component looks like when
+   it is drawn as a modal from another design language. A 1px rule is what says
+   "surface" here; the shadow is what says it floats above the page, so both
+   stay and the corners go.
    -------------------------------------------------------------------------- */
 
 .app .modhead .ai-aura.talsum > .stp-wing{
@@ -257,36 +287,56 @@
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{
   position:relative;padding:0}
 
-.stp-overlay{
-  position:fixed;inset:0;z-index:99;
-  background:rgba(0,0,0,.18)}
-
+/* The base `.stp-all` (§03) is an inline block with a rule above it and its own
+   top margin and padding — the shape from when "All steps" expanded in place.
+   As a dropdown the panel owns its frame, so all three are zeroed here. */
 .app .modhead .ai-aura.talsum > .stp-wing .stp-all{
-  display:none;position:fixed;z-index:100;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  min-width:320px;max-width:420px;width:90vw}
+  display:none;position:absolute;z-index:60;
+  top:calc(100% + var(--s03));right:0;
+  width:min(340px, 100%);
+  margin:0;padding:0;border-top:0}
 
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{
   display:flex}
 
-/* LIFTED STATE. The post-render pass in views.js moves .stp-overlay and
-   .stp-all out of .app into .device to escape the overflow:hidden chain
-   (.app → .view-col → .main). Once lifted the .app-scoped show rule above
-   no longer matches, so this standalone rule keeps the panel visible. */
-.device > .stp-all{
-  display:flex;position:fixed;z-index:100;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  min-width:320px;max-width:420px;width:90vw}
+/* AND THE BAND HAS TO OUTRANK THE PAGE WHILE THE PANEL IS OPEN, which is the
+   one thing `absolute` costs that `fixed` did not. §25 gives `.modhead`
+   `isolation:isolate` — load-bearing, because the wash sits at `z-index:-1` and
+   without a stacking context that -1 escapes to the page and paints under the
+   canvas. It also means the panel's `z-index:60` is a rank INSIDE the band, not
+   on the page. The band itself is `z-index:auto`, so it paints in DOM order with
+   the `.sec`s that follow it, and those are `position:relative` — so the
+   dropdown came out sheared off level with the bottom of the band, with "This
+   month" drawn over its last row. It reads exactly like clipping and is not:
+   nothing in the chain has `overflow:hidden` until the page's own scroller.
+
+   Raising the band lifts the whole stacking context, and only while a panel is
+   open — `:has()` is what keeps it from changing any other paint order, and §33
+   already reaches for `:has()` two blocks down for the greeting. */
+.app .modhead:has(.stp.open){z-index:3}
+
+/* AND THE PANEL IS A BLOCK, WHICH HAS TO BE SAID OUT LOUD. §03/§04 carry
+   `.stp-all > div{display:flex;align-items:flex-start}` from the shape this
+   thing had when `.stp-all` held the step rows directly. §33 then wrapped them
+   in `.stp-pop` — a div, and a direct child — so that rule lands on the WRAPPER
+   and lays the panel's own heading out as a flex item BESIDE the list, half
+   outside the white card. `.stp-all > div` is (0,1,1); `.stp-pop` alone is
+   (0,1,0) and loses, which is why naming the class in the child position is the
+   fix rather than adding `display:block` to the rule below. `tn-agent-portal`
+   was stepping around this by emitting a `<section>` so the type selector
+   missed; its note said the real fix belonged in the build, and this is it. */
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
 
 .stp-pop{
-  width:100%;padding:var(--s06);
+  width:100%;padding:var(--s05);
   background:var(--layer-01);
-  border-radius:12px;
-  box-shadow:0 16px 48px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.08)}
+  border:1px solid var(--rule);
+  box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
 
 .stp-pop-h{
-  font-size:16px;font-weight:600;line-height:22px;letter-spacing:-.1px;
-  margin:0 0 var(--s05);color:var(--text-primary)}
+  font-size:13px;font-weight:600;line-height:18px;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-helper);
+  margin:0 0 var(--s04)}
 
 /* --------------------------------------------------------------------------
    9. THE GREETING — TAL OWNS THE WELCOME

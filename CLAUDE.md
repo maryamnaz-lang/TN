@@ -48,7 +48,7 @@ first recorded. Read them freely; just do not edit them without being asked.
 
 Both are **build output** of `design-system/build-ds.py`, which walks the same 40 layers in
 the same order as `hifi/build/build.py` and keeps everything except eight render-pass-bound or
-separate-surface families — 3,100 rules kept, 503 dropped. Every rule in the output is a real
+separate-surface families — 3,282 rules kept, 318 dropped. Every rule in the output is a real
 rule from the real portal in its real cascade position — nothing is re-typed, and the build
 refuses to write if any output rule cannot be traced back to a source layer.
 
@@ -83,6 +83,20 @@ assembled by `placePlates` (`ai5.js`) rather than by CSS, so a page with no rend
 emit the `.plate-h` / `.plate-when` row itself; and **`.tal-panel` and `.tal-fab` are switched
 off** by §27 — the thread moved to the ask dock, which `build-ds.py` excludes — so Tal's
 questions belong in a component the system still ships.
+
+It now opens with the **head band** too, one page at a time: `.modhead` wrapping the `.ph`,
+Tal's card and the hero, with the greeting and a `.stp-wing` stepper on the dashboard. Two
+more render-pass jobs a hand-authored page has to do itself: the steps popup is
+`position:fixed` inside a container, so it is clipped unless it is moved out to `.device`
+(`views.js` ends on exactly those two lines), and the entrance cascade stamps `--i` on the
+section list rather than on every child.
+
+**A live defect in the popup, in both portals.** `.stp-all > div` (§03.90 / §04.120, written
+when `.stp-all` held the step rows directly) now lands on §33's `.stp-pop` wrapper and makes
+it a flex row — so "Where you are" is laid out beside the list and half outside the white
+card. Open the steps popup in the candidate portal and it is there. The fix is one
+declaration in `33-talsum.css` (`.stp-all > .stp-pop{display:block}`, which outweighs it);
+`tn-agent-portal.html` steps around it with `<section class="stp-pop">` until then.
 
 Excluded now, and only these: `ask*` `bk*` `scene*` (their behaviour *is* a render pass over
 portal state), `auth*` `lsvt*` `ios-*` `nil*` (separate surfaces). `build-ds.py` prints the
@@ -232,23 +246,37 @@ two buttons touched), and gives the quiet action `--accent-on-2` — the accent 
 uses on Tal's own surfaces. Links here are **not** an option: they are blue by §12's explicit
 decision, and blue inside Tal's answer would be the only blue on the screen.
 
-**Tal's mark is a moving object, and it is the same object at three sizes.** §27.8 built it for
-the floating button — a halo that pulses, the PNG turning on its off-centre core, and the
-chevron riding the same circle so it stays on the orange — and §21.4 took a cut-down copy
-(halo + spin + breath, no track, no chevron) to the ask dock's 32px mark. §40 now puts the full
-three-layer version on the 132px empty state at the head of an unstarted conversation, which is
-the largest mark in the product and was the only one still static.
+**Tal has THREE marks, and knowing which is which saves an hour.** They are different
+implementations, not sizes of one thing:
 
-Two things bite here. **The orbit is per-box-size, not a constant** — §27.8's `2.45` / `3.47`
-are 96-box values (the core is `+4.5,-4.5` of a 176-unit canvas, so the offset is `B/176 × 4.5`
-and the radius is `√2` of it); at 132 that is `3.375` / `4.77`, which is why §40 declares its own
-`tal-orb-track-lg` rather than reusing the button's. **And reduced motion needs its own block**
-— §13.187 clamps every duration to 1ms, and 1ms on an *infinite* animation is not "off", it is a
-strobe. §21.4, §27.8 and §40 each state their own.
+| Where | What it is | Keyframes |
+|---|---|---|
+| `33-talsum.css` §6 — the head band, 32px | a CSS-only **sphere**: gradient body, inlined SVG chevron, specular highlight, breathing glow, a conic band of light turning across it | `tal-sphere-glow` / `-spin` |
+| `40-talorb.css` — the chat empty state, 132px | the **same sphere**, ported up | `tal-sphere-glow-lg` / reuses `-spin` |
+| `27-tal.css` §8 and `21-ask.css` §4 — the floating button and the ask line | the `tal-circle.png` blob (`--tal-mark`) plus a halo | `tal-orb-*` |
 
-Note `.tal-fab` and `.tal-panel` are **`display:none`** (§27, end) — the thread moved to the ask
-dock. So the empty state is currently the only place in the live portal that draws the full orb,
-and the `.orb` class on `.tal-mk` is what opts a mark into it.
+**The sphere's backgrounds scale themselves; its shadows do not.** All four background layers are
+proportional (`60% 60%` chevron, percentage-positioned radials, a `155deg` linear), so they copy
+across untouched. `box-shadow` blur and spread are pixel lengths — §40 multiplies them by
+`132/32 = 4.125`, and that is also why `tal-sphere-glow` cannot be reused: it *animates* those
+same 32px shadows, so borrowing it snaps the glow to a hairline on the first frame. `-spin` is a
+bare rotation and is shared.
+
+**§27.4's `-6px` bottom margin is measured, not chosen, and the sphere inverts it.** That number
+assumes the PNG's soft tail — "the orange is down to about a fifth of its peak 22px above the
+bottom of the 132 box". A sphere is a hard-edged disc filling the box, so the 22px term is zero
+and the same arithmetic gives **+16px**. §40 restates it. Read the note over that rule before
+changing any mark's size or file.
+
+**Reduced motion needs its own block.** §13.187 clamps every duration to 1ms, and 1ms on an
+*infinite* animation is a strobe, not "off". §21.4, §27.8, §33.6 and §40 each state their own.
+
+`.tal-fab` and `.tal-panel` are **`display:none`** (§27, end) — the thread moved to the ask dock.
+`.orb` on `.tal-mk` is what opts the empty state into the sphere.
+
+**Pre-existing, unfixed:** `.tal-hero::before` (§27.4) is the lattice behind the mark, at a fixed
+`width:432px` with `translateX(-50%)`, so it scrolls the thread horizontally by 37px at 360 and
+22px at 390. Measured with and without the sphere — it is the lattice, not the mark.
 
 Three shapes to reuse rather than reinvent: **`.tw-lines`** is a 58px label column, and it
 earns that on a *figure* (`$690`, `88%`, `Day 34`) — never on a one-character label, which

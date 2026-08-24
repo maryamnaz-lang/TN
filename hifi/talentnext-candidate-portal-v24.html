@@ -6654,7 +6654,7 @@ button.btn-p:active,
 .app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3) .n{color:var(--mk)}
 .app[data-portal="leader"] .stand-rate{display:flex;align-items:center;gap:var(--s03)}
 .app[data-portal="leader"] .stand-rate .stars svg{width:13px;height:13px}
-.app[data-portal="leader"] .face-row > .mem-av{
+.app .face-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
 .app[data-portal="leader"] .kv .stars{margin-right:var(--s02)}
@@ -6704,32 +6704,32 @@ button.btn-p:active,
   background-color:color-mix(in srgb, var(--mk, var(--text-primary)) 4%, var(--background))}
 .app[data-portal="leader"] .stat-jump:focus-visible{
   outline:2px solid var(--text-primary);outline-offset:-2px}
-.app[data-portal="leader"] .bk-day{
+.app .bk-day{
   align-self:stretch;width:104px;min-width:0;cursor:default;
   display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
   gap:1px;white-space:nowrap;text-align:left;
   padding:var(--s02) var(--s05) var(--s02) 0;
   background:none;border:0;border-right:1px solid var(--rule)}
-.app[data-portal="leader"] .bk-day .d{
+.app .bk-day .d{
   font-size:10.5px;line-height:14px;letter-spacing:.8px;color:var(--text-helper)}
-.app[data-portal="leader"] .bk-day .n{
+.app .bk-day .n{
   margin-top:0;font-size:16px;line-height:22px;letter-spacing:-.2px;
   color:var(--text-primary)}
-.app[data-portal="leader"] .bk-day.bk-now .d{color:var(--text-primary)}
-.app[data-portal="leader"] .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
-.app[data-portal="leader"] .bk-row{gap:var(--s05)}
-.app[data-portal="leader"] button.bk-row{
+.app .bk-day.bk-now .d{color:var(--text-primary)}
+.app .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
+.app .bk-row{gap:var(--s05)}
+.app button.bk-row{
   -webkit-appearance:none;appearance:none;width:100%;
   font:inherit;color:inherit;text-align:left}
-.app[data-portal="leader"] .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
-.app[data-portal="leader"] .bk-row > .mem-av{
+.app .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
+.app .bk-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
-.app[data-portal="leader"] .bk-row > .cardrow-ic{width:36px;height:36px}
-.app[data-portal="leader"] .bk-row > .cardrow-ic svg{width:20px;height:20px}
+.app .bk-row > .cardrow-ic{width:36px;height:36px}
+.app .bk-row > .cardrow-ic svg{width:20px;height:20px}
 @container app (max-width:599.98px){
-  .app[data-portal="leader"] .bk-row > .mem-av,
-  .app[data-portal="leader"] .bk-row > .cardrow-ic{display:none}
+  .app .bk-row > .mem-av,
+  .app .bk-row > .cardrow-ic{display:none}
 }
 .app .wkc{display:flex;flex-direction:column}
 .app .wkc-top{
@@ -6872,27 +6872,24 @@ button.btn-p:active,
   grid-area:stp;padding:0}
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{
   position:relative;padding:0}
-.stp-overlay{
-  position:fixed;inset:0;z-index:99;
-  background:rgba(0,0,0,.18)}
 .app .modhead .ai-aura.talsum > .stp-wing .stp-all{
-  display:none;position:fixed;z-index:100;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  min-width:320px;max-width:420px;width:90vw}
+  display:none;position:absolute;z-index:60;
+  top:calc(100% + var(--s03));right:0;
+  width:min(340px, 100%);
+  margin:0;padding:0;border-top:0}
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{
   display:flex}
-.device > .stp-all{
-  display:flex;position:fixed;z-index:100;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  min-width:320px;max-width:420px;width:90vw}
+.app .modhead:has(.stp.open){z-index:3}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
 .stp-pop{
-  width:100%;padding:var(--s06);
+  width:100%;padding:var(--s05);
   background:var(--layer-01);
-  border-radius:12px;
-  box-shadow:0 16px 48px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.08)}
+  border:1px solid var(--rule);
+  box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
 .stp-pop-h{
-  font-size:16px;font-weight:600;line-height:22px;letter-spacing:-.1px;
-  margin:0 0 var(--s05);color:var(--text-primary)}
+  font-size:13px;font-weight:600;line-height:18px;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--text-helper);
+  margin:0 0 var(--s04)}
 .app .modhead:has(.tal-greet) > .ph{display:none}
 .tal-greet{
   display:block;
@@ -7341,6 +7338,10 @@ button.btn-p:active,
 .app .tbl th.num,.app .tbl td.num,
 .app .tbl th:last-child,.app .tbl td:last-child{text-align:left}
 .app .tbl td.ldr-go,.app .tbl th:empty{text-align:right}
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h:not(:has(a)):not(:has(.lk)):not(:has(.lnk)):not(:has(.btn)):not(:has(.sec-h-act)){
+    align-items:flex-start}
+}
 .app .scene{
   display:flex;flex-direction:column;gap:var(--s04);
   padding:0;border:0;background:none;text-align:left;
@@ -7470,44 +7471,70 @@ button.btn-p:active,
 .app .tal-msg > .bb .tw + .tw-chips,
 .app .tal-msg > .bb .tw-k + .tw-chips{margin-top:var(--s05)}
 .app .tal-msg > .bb .tw > .tw-k{max-width:62ch;line-height:19px}
-@keyframes tal-orb-track-lg{
-  0%{translate:3.375px -3.375px}     12.5%{translate:4.77px 0}
-  25%{translate:3.375px 3.375px}     37.5%{translate:0 4.77px}
-  50%{translate:-3.375px 3.375px}    62.5%{translate:-4.77px 0}
-  75%{translate:-3.375px -3.375px}   87.5%{translate:0 -4.77px}
-  100%{translate:3.375px -3.375px}}
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
-  position:relative;display:grid;place-items:center;isolation:isolate;
-  background-image:none}
+  position:relative;isolation:isolate;
+  width:112px;height:112px;
+  background-image:none;
+  margin-bottom:16px}
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
   content:'';position:absolute;inset:0;z-index:0;
   border-radius:50%;pointer-events:none;
-  background:radial-gradient(closest-side,
-    color-mix(in srgb,var(--accent) 38%,transparent) 0%,
-    color-mix(in srgb,var(--accent) 14%,transparent) 46%,
-    transparent 72%);
-  animation:tal-orb-pulse 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
+  background-color:transparent;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  box-shadow:
+    0 0 28px 3.5px rgba(244,113,19,0.35),
+    0 0 56px 10.5px rgba(244,113,19,0.15),
+    inset 0 -7px 17.5px rgba(0,0,0,0.12),
+    inset 0 7px 17.5px rgba(246,220,146,0.25);
+  animation:tal-sphere-glow-lg 4s ease-in-out infinite}
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
-  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background-image:var(--tal-mark);
-  background-size:contain;background-position:center;background-repeat:no-repeat;
-  animation:tal-orb-spin 14s linear infinite,
-            tal-orb-breathe 6.4s ease-in-out infinite}
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
-  position:relative;z-index:2;
-  width:30px;height:30px;fill:var(--on-accent);
-  filter:drop-shadow(0 1px 2px rgb(0 0 0 / .28));
-  animation:tal-orb-breathe 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{--on-brand-fill:1}
+  content:'';position:absolute;z-index:1;
+  left:50%;top:50%;width:126px;height:126px;
+  margin:-63px 0 0 -63px;
+  border-radius:50%;pointer-events:none;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%);
+  animation:tal-sphere-spin 5s linear infinite;
+  filter:blur(1.75px)}
+@keyframes tal-sphere-glow-lg{
+  0%,100%{
+    box-shadow:
+      0 0 28px 3.5px rgba(244,113,19,0.35),
+      0 0 56px 10.5px rgba(244,113,19,0.15),
+      inset 0 -7px 17.5px rgba(0,0,0,0.12),
+      inset 0 7px 17.5px rgba(246,220,146,0.25)}
+  50%{
+    box-shadow:
+      0 0 42px 7px rgba(244,113,19,0.5),
+      0 0 84px 17.5px rgba(244,113,19,0.25),
+      inset 0 -7px 17.5px rgba(0,0,0,0.12),
+      inset 0 7px 17.5px rgba(246,220,146,0.25)}}
 @media (prefers-reduced-motion:reduce){
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
-    animation:none;opacity:1;scale:1;translate:3.375px -3.375px}
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
-    animation:none;scale:1}
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
-    animation:none;scale:1;translate:3.375px -3.375px}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none;opacity:.3}
 }
 
 </style>
@@ -8301,7 +8328,7 @@ function talPanel(f){
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
     : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb">${talChev()}</span>
+      <span class="tal-mk lg orb"></span>
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;
@@ -8327,9 +8354,7 @@ function talPanel(f){
 }
 
 const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span class="sk-mark xs"></span>${label||'Ask Tal'}</button>`;
-const talChev = () => `<svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg>`;
-
-const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal">${talChev()}<span class="tal-fab-t">Tal</span></button>`;
+const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal"><svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg><span class="tal-fab-t">Tal</span></button>`;
 
 ;
 
@@ -8743,8 +8768,16 @@ function stepper(id, steps, flush, title){
     <div class="stp-now">
       <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
     </div>
-    ${open?`<div class="stp-overlay" data-stp="${id}"></div>`:''}
-    <div class="stp-all"><div class="stp-pop"><h3 class="stp-pop-h">${title||'Where you are'}</h3><div class="pi" style="padding:0">
+    ${/* NO SCRIM. The panel is a dropdown off the toggle now, not a modal in
+          the middle of the screen — §33.7 has the argument. Clicking away
+          closes it through the outside-click branch in the router, which is
+          what the overlay used to be for.
+
+          AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines
+          above the panel, so printing it again inside a box that hangs off that
+          very heading was the same words twice, 40px apart. The untitled
+          variant has no h2, so there it is the panel's only label and stays. */''}
+    <div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi" style="padding:0">
       ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
         <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
     </div></div></div>
@@ -11004,9 +11037,6 @@ function render(){
     kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
   }
   const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
-  device.querySelectorAll('.stp-overlay, .stp.open > .stp-all').forEach(el => {
-    device.appendChild(el);
-  });
 }
 
 pick.onchange = e => setStage(e.target.value);
@@ -11024,6 +11054,12 @@ device.addEventListener('input', e => {
   el.value = out;
   const mk = document.getElementById('ncb'), b = brandOf(dig);
   if(mk){ mk.innerHTML = BMK[b] || BMK.card; mk.classList.toggle('on', !!b); }
+});
+
+device.addEventListener('click', e => {
+  if(!Object.values(S.piOpen).some(Boolean)) return;
+  if(e.target.closest('.stp')) return;
+  S.piOpen = {}; render();
 });
 
 device.addEventListener('click', e => {
@@ -12123,7 +12159,7 @@ function askView(f){
 
   const opened = S.thread.length > 0;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb">${talChev()}</span>
+      <span class="tal-mk lg orb"></span>
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;

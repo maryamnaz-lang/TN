@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css">
+<link rel="stylesheet" href="talentnext-ds.css?b=a5330404">
 
 <style>
 /* ==========================================================================
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js"></script>
+<script src="talentnext-ds.js?b=a5330404"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -244,6 +244,19 @@ function sec(id, heading, body, cls){
 
 const swatch = (name, val, note) => `<div class="sw-c">
   <i style="background:${val}"></i><b>${name}</b><span>${note || val}</span></div>`;
+
+/* A FIGURE CELL, and all three parts are required. `.stat` is a named grid —
+   `.stat-ic` sits in `grid-area:ic` — so a cell written without the icon does
+   not merely lack a mark, it loses the area and the figures stop lining up.
+   The mark colour is NOT chosen here: §29 cycles `--mk` over
+   `nth-child(4n+1…4)`, the svg takes `fill:var(--mk)` and the box a
+   `color-mix` of it, so the fourth cell is magenta because it is fourth.
+   Markup read off the running portal, not written from the CSS. */
+const statCell = (icon, label, fig, note) => `<div class="stat">
+      <span class="stat-ic">${I[icon] || ''}</span>
+      <div class="stat-top"><div class="l">${label}</div><div class="n">${fig}</div></div>
+      ${note ? `<div class="d">${note}</div>` : ''}
+    </div>`;
 
 const SECTIONS = [];
 
@@ -410,6 +423,68 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       </ul>
     </div>
   `)}
+  ${ex('The floating Tal bar', 'The dock at the foot of every page — <code>.askdock > .askline</code>. It is <b>page chrome, not page content</b>: it goes inside <code>.app</code> beside <code>.shell-body</code>, because <code>.app .askdock</code> is <code>position:absolute; bottom:var(--s05)</code> and needs <code>.app</code> as its containing block. Put it in the <code>.page</code> and it scrolls away with the content. The send glyph is <code>arrowUp</code>, deliberately not <code>arrowRight</code> — right is this product’s GO, up is “this text goes from here to there”. This whole family was excluded from the first two builds, which is why it was missing.', `
+    <div class="askdock" style="position:relative;bottom:auto;width:100%">
+      <button class="askline" aria-label="Ask Tal anything">
+        <span class="askline-mark"><span class="tal-mk"></span></span>
+        <span class="askline-t">Ask Tal anything</span>
+        <span class="askline-q" aria-hidden="true">&ldquo;How do I compare with my cohort?&rdquo;</span>
+        <span class="askline-send" aria-hidden="true">{{arrowUp}}</span>
+      </button>
+    </div>
+  `)}
+  ${ex('The full-height chat — what the floating bar opens', 'Clicking <code>.askline</code> does <b>not</b> open a modal. It swaps the whole page for <code>.page.ask-page</code>, a full-height column: a back row, a scrolling thread, and a pinned foot holding the suggestion chips and the field. This is the piece that was missing — the CSS shipped once <code>ask*</code> came off the exclusions, but with no recipe a portal reaches for <code>.modal</code> instead, which is a different component and the wrong one.<br><br><b>It replaces the page, it does not overlay it.</b> <code>.ask-page</code> carries <code>.page</code>, so it lives where a page lives — inside <code>.main</code> — and the app bar and rail stay put. <code>.ask-in</code> is the entry animation class; <code>data-n</code> on the thread is the message count, which is what the empty state keys on.', `
+    <div class="page ask-page ask-in" style="height:520px">
+      <div class="ask-top">
+        <button class="ph-back" aria-label="Back to Dashboard">{{arrowLeft}}</button>
+        <span class="ask-top-t">Back to Dashboard</span>
+        <span class="ask-top-s">Explorer – E3, day 34 of 90</span>
+      </div>
+      <div class="ask-thread" data-n="0">
+        <div class="tal-hero">
+          <span class="tal-mk lg orb"></span>
+          <h2>Hello <b>Maryam</b>, I am Tal 👋</h2>
+          <p>I am here to assist you with anything you need help with. What’s going on?</p>
+        </div>
+      </div>
+      <div class="ask-foot">
+        <div class="ask-sugg">
+          <button class="chip-tal"><span class="sk-mark xs"></span>What should I do next?</button>
+          <button class="chip-tal"><span class="sk-mark xs"></span>How am I doing overall?</button>
+          <button class="chip-tal"><span class="sk-mark xs"></span>Explain the 90-day cycle</button>
+        </div>
+        <div class="askfield">
+          <span class="askline-mark"><span class="tal-mk sm"></span></span>
+          <input class="inp" placeholder="Ask anything" autocomplete="off">
+          <button class="askfield-send" aria-label="Send">{{arrowUp}}</button>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('The thread, once it has messages', 'Set <code>data-n</code> to the message count and drop the hero. A message is <code>.tal-msg</code> with a <code>.tal-who</code> byline and a <code>.bb</code> bubble; <b><code>.me</code> marks the candidate’s own turn</b> and flips the byline to name-then-avatar. Tal’s side leads with the mark. Anything richer than a sentence goes in the bubble as a <code>.tw</code> widget — heading, lede, body, actions — which is why <code>.tw-btn</code> exists.', `
+    <div class="ask-thread" data-n="2">
+      <div class="tal-msg me">
+        <span class="tal-who"><span class="tal-who-n">You</span><span class="av"><i>MN</i></span></span>
+        <div class="bb">What should I do next?</div>
+      </div>
+      <div class="tal-msg">
+        <span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span>
+        <div class="bb">
+          <span class="tw tw-top">
+            <span class="tw-h">Next</span>
+            <span class="tw-lede">Book the interview that sets your level</span>
+            <span class="tw-k">Your quiz put you on the Explorer track, and that is a
+              title rather than a level. Forty-five minutes with an agent is what turns
+              it into E1 to E5.</span>
+            <span class="tw-a">
+              <button class="tw-btn">See the agents{{arrowRight}}</button>
+              <button class="tw-btn ghost">Book an interview with a top agent</button>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+  `)}
   ${ex('Tal’s chips', '<code>.sk-mark</code> is the standalone mark; the cool green pool is a radial gradient on the chip itself.', `
     <span class="tal-sugg">
       <button class="chip-tal"><span class="sk-mark xs"></span>How am I doing overall?</button>
@@ -481,12 +556,12 @@ SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
       <p class="t-legal-01">Legal — 11.5/16.</p>
     </div>
   `)}
-  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face.', `
+  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face. The cell’s own anatomy is under <b>Figures</b> — it is a named grid and needs all three parts.', `
     <div class="stats">
-      <div class="stat"><span class="v">1,284</span><span class="k">Points</span></div>
-      <div class="stat"><span class="v">92%</span><span class="k">Average</span></div>
-      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
-      <div class="stat"><span class="v">12/13</span><span class="k">Calls</span></div>
+      ${statCell('book',  'Chapters',  '13<small>/13</small>', 'one a week')}
+      ${statCell('chart', 'Average',   '92<small>%</small>',   'cohort average 79%')}
+      ${statCell('calendar','Day',     '47<small>/90</small>', 'week 5 of 13')}
+      ${statCell('video', 'Calls',     '12<small>/13</small>', '60 min, weekly')}
     </div>
   `)}
 `});
@@ -691,12 +766,12 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
 
 /* ------------------------------------------------------------------ figures */
 SECTIONS.push({id:'figures', nav:'Figures', icon:'chart', build: () => `
-  ${ex('Figure cells', 'Where several figures belong together they become cells of one grid sharing single hairlines — the opposite of a row of cards. Put <code>.stats</code> straight in the section: it is one of the six containers that opt a heading out of the label column. <b>Give it exactly four.</b> The hairlines <i>are</i> the 1px grid gap, with the rule colour showing through from the container’s own background, and the grid is <i>fixed</i> — 2 columns on a phone, 4 from 700px. An incomplete row therefore paints grey rather than collapsing. An odd count is handled: <code>:last-child:nth-child(odd)</code> spans the last cell across the row — but the row above it still has to be full.', `
+  ${ex('Figure cells', 'Where several figures belong together they become cells of one grid sharing single hairlines — the opposite of a row of cards. <b>Each cell is a named grid and needs all three parts:</b> <code>.stat-ic</code> (<code>grid-area:ic</code>), <code>.stat-top</code> holding <code>.l</code> + <code>.n</code>, and <code>.d</code> underneath. Leave the icon out and the cell loses its grid area — the figures stop lining up, which is the misalignment you get from the older <code>.k</code>/<code>.v</code> spelling. <b>The mark is coloured and it cycles:</b> §29 sets <code>--mk</code> per <code>nth-child(4n+1…4)</code> to <code>--mk-1</code>…<code>--mk-4</code> (blue, green, purple, magenta), the icon takes <code>fill:var(--mk)</code> and its box a <code>color-mix</code> of it. You do not pick the colour — position does. <b>Keep <code>.l</code> short.</b> §37.11 puts the label and the figure on one line and drops the figure underneath when the pair will not fit — so one long label staggers its own cell 15px below its neighbours. The portal shows both: its four-short-label row lines up exactly, and its <i>Assessment average</i> cell sits low for this reason. One or two words per label. Put <code>.stats</code> straight in the section: it is one of the six containers that opt a heading out of the label column. <b>Give it exactly four.</b> The hairlines <i>are</i> the 1px grid gap, with the rule colour showing through from the container’s own background, and the grid is <i>fixed</i> — 2 columns on a phone, 4 from 700px. An incomplete row therefore paints grey rather than collapsing. An odd count is handled: <code>:last-child:nth-child(odd)</code> spans the last cell across the row — but the row above it still has to be full.', `
     <div class="stats">
-      <div class="stat"><span class="v">13<small>/13</small></span><span class="k">Chapters</span></div>
-      <div class="stat"><span class="v">92<small>%</small></span><span class="k">Average</span></div>
-      <div class="stat"><span class="v">1,284</span><span class="k">Points</span></div>
-      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
+      ${statCell('book',   'Chapters',  '5 <small>of 13</small>', '38% done')}
+      ${statCell('chart',  'Average',   '88<small>%</small>',     'cohort 79%')}
+      ${statCell('time',   'Invested',  '4h<small> 20m</small>',  '52 min a chapter')}
+      ${statCell('check',  'On time',   '4 <small>of 5</small>',  'one overdue')}
     </div>
   `)}
   ${ex('Facts', 'A label above its value, in a bordered band — for reference material rather than achievement. Same hairline-as-gap construction as <code>.stats</code>, but the columns are <code>auto-fit</code> at <code>minmax(140px,1fr)</code>, so the count that fits is <code>floor(width / 140)</code>. Spare tracks collapse, so a band whose cells all fit on one row always fills. Cells that <i>wrap</i> do not: the second row keeps the full column count and its empty slots paint the rule colour. Four cells are right for a full-width band and wrap to 3 + 1 in a band of roughly 420–560px — which is what you are looking at here at 900px, and what the portal does on its own interview page at that width. <b>For three items, or for a band that must hold at every width, use <code>.kv</code> instead.</b>', `

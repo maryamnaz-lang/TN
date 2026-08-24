@@ -103,18 +103,25 @@ css = '\n'.join((here / f).read_text() for f in
                  # only be a correction from after all three. It names no
                  # selector §36, §37 or §38 mentions.
                  '39-talwidget.css',
-                 # THE EMPTY STATE'S ORB. §27.8 made Tal's mark a moving object
-                 # for the floating button and §21.4 took a cut-down copy to the
-                 # ask dock; the 132px mark at the head of an unstarted
-                 # conversation — the largest one in the product — was the only
-                 # one still static. Same three layers, same three clocks, with
-                 # the orbit rescaled: §27.8's 2.45/3.47 are 96-box values and
-                 # this box is 132.
+                 # THE EMPTY STATE WEARS §33's SPHERE. §33.6 replaced the
+                 # head band's flat Tal mark with a CSS-only gradient sphere —
+                 # chevron, specular highlight, breathing glow, a conic band
+                 # of light turning across it — at 32px. The 132px mark at the
+                 # head of an unstarted conversation was still the flat PNG
+                 # blob, so Tal had two faces on two screens a person sees in
+                 # the same minute. This puts the sphere on the larger one.
                  #
-                 # LAST: it takes §27.1's `.tal-mk` background OFF the element so
-                 # the halo can sit under it, sits inside §27.4's `.tal-hero`,
-                 # and runs §27.8's keyframes. All three have to exist first.
-                 # Nothing in §28-§39 names any of its selectors.
+                 # The four backgrounds are all proportional and copy across
+                 # untouched; the box-shadow glow is PIXEL lengths and is
+                 # x4.125, which also means `tal-sphere-glow` cannot be reused
+                 # (it animates those same 32px shadows) — hence a scaled
+                 # `-lg` pair. `tal-sphere-spin` is a bare rotation and is.
+                 #
+                 # LAST: it takes §27.1's `.tal-mk` background OFF, CORRECTS
+                 # §27.4's -6px bottom margin (that number is measured against
+                 # the PNG's soft tail; a hard-edged disc has none, so it goes
+                 # positive), and runs §33.6's spin. All three have to exist
+                 # first. Nothing in §34-§39 names its selectors.
                  '40-talorb.css'])
 # ==========================================================================
 # NO HOVER

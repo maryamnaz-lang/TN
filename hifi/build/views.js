@@ -582,7 +582,7 @@ function talPanel(f){
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
     : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb">${talChev()}</span>
+      <span class="tal-mk lg orb"></span>
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;
@@ -620,15 +620,7 @@ const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span
    `I.talChat` and not `I.chat`: the mark is Maryam's, traced — the note in
    icons.js says why the two are different icons and why the rail keeps the
    Material one. */
-/* THE CHEVRON, ONCE. It was written inline in `talFab` and is now on two
-   surfaces — the floating button and the empty state at the head of a
-   conversation that has not started — so it is a function rather than a
-   string typed twice. Three paths, `aria-hidden` on both because in each
-   place the thing beside it already says the name: the button has its
-   `aria-label`, the hero has its own greeting in text. */
-const talChev = () => `<svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg>`;
-
-const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal">${talChev()}<span class="tal-fab-t">Tal</span></button>`;
+const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal"><svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg><span class="tal-fab-t">Tal</span></button>`;
 
 /* ============================================================
    PICTOGRAMS — IBM Design Language line art. Carbon ships icons,
@@ -1247,8 +1239,16 @@ function stepper(id, steps, flush, title){
     <div class="stp-now">
       <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
     </div>
-    ${open?`<div class="stp-overlay" data-stp="${id}"></div>`:''}
-    <div class="stp-all"><div class="stp-pop"><h3 class="stp-pop-h">${title||'Where you are'}</h3><div class="pi" style="padding:0">
+    ${/* NO SCRIM. The panel is a dropdown off the toggle now, not a modal in
+          the middle of the screen — §33.7 has the argument. Clicking away
+          closes it through the outside-click branch in the router, which is
+          what the overlay used to be for.
+
+          AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines
+          above the panel, so printing it again inside a box that hangs off that
+          very heading was the same words twice, 40px apart. The untitled
+          variant has no h2, so there it is the panel's only label and stays. */''}
+    <div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi" style="padding:0">
       ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
         <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
     </div></div></div>
@@ -3975,9 +3975,13 @@ function render(){
     kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
   }
   const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
-  device.querySelectorAll('.stp-overlay, .stp.open > .stp-all').forEach(el => {
-    device.appendChild(el);
-  });
+  /* THE STEPS PANEL IS NO LONGER LIFTED OUT OF `.app`. It used to be moved here
+     — panel and scrim both — because it was `position:fixed`, and `.device`'s
+     `container-type:inline-size` makes it the containing block for a fixed
+     descendant, so a fixed popup declared in the band was measured against the
+     band and clipped by it. §33.7 turned it into an absolutely-positioned
+     dropdown on `.stp`, and nothing between `.stp` and the page's scroller
+     clips, so there is nothing left to escape. */
 }
 
 pick.onchange = e => setStage(e.target.value);
@@ -3997,6 +4001,21 @@ device.addEventListener('input', e => {
   el.value = out;
   const mk = document.getElementById('ncb'), b = brandOf(dig);
   if(mk){ mk.innerHTML = BMK[b] || BMK.card; mk.classList.toggle('on', !!b); }
+});
+
+/* CLICKING AWAY CLOSES THE STEPS DROPDOWN — a listener of its own, which is
+   what the scrim used to do. The overlay carried `data-stp`, so pressing it ran
+   the router's toggle branch; with no overlay the close has to come from the
+   ABSENCE of a hit inside `.stp`, and that is not a branch the router can hold:
+   every branch there is "this element was clicked", and this one is "no element
+   was". Guarding on `.stp` covers the toggle too, so the two never both fire,
+   and the state check means a click anywhere on a portal with no panel open
+   costs one `closest` and nothing else. Registered before the router only
+   because that is where it reads; the guard makes the order immaterial. */
+device.addEventListener('click', e => {
+  if(!Object.values(S.piOpen).some(Boolean)) return;
+  if(e.target.closest('.stp')) return;
+  S.piOpen = {}; render();
 });
 
 /* one delegated listener runs the whole product */

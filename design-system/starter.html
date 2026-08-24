@@ -11,7 +11,7 @@
      stylesheet on file://, which is the same rule the hi-fi portal follows:
          python3 -m http.server 8799 --bind 127.0.0.1
      ========================================================================== -->
-<link rel="stylesheet" href="talentnext-ds.css">
+<link rel="stylesheet" href="talentnext-ds.css?b=a5330404">
 
 <style>
 /* ==========================================================================
@@ -34,7 +34,7 @@
   container-type:inline-size;container-name:app;
   overflow:hidden;background:var(--background)}
 
-/* Nothing. The wordmark is a real asset now — `LOGO_K` in talentnext-ds.js —
+/* Nothing. The wordmark is a real asset now — `LOGO_K` in talentnext-ds.js?b=8f52743f —
    and §01 already sizes it: `.shell-logo img{height:17px}`, 19px at desktop. */
 </style>
 </head>
@@ -44,7 +44,7 @@
   <div class="app" id="app"></div>
 </div>
 
-<script src="talentnext-ds.js"></script>
+<script src="talentnext-ds.js?b=a5330404"></script>
 <script>
 /* ==========================================================================
    A NEW PORTAL, IN THE SHAPE THE HI-FI ONE USES
@@ -134,10 +134,10 @@ V.home = () => `
          (".stats > .stat:last-child:nth-child(odd)") and the two slots beside
          the first pair stay grey. -->
     <div class="stats">
-      <div class="stat"><span class="v">13<small>/13</small></span><span class="k">Chapters</span></div>
-      <div class="stat"><span class="v">92<small>%</small></span><span class="k">Average</span></div>
-      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
-      <div class="stat"><span class="v">12<small>/13</small></span><span class="k">Calls</span></div>
+      ${statCell('book',    'Chapters', '13<small>/13</small>', 'one a week')}
+      ${statCell('chart',   'Average',  '92<small>%</small>',   'cohort average 79%')}
+      ${statCell('calendar','Day',      '47<small>/90</small>', 'week 5 of 13')}
+      ${statCell('video',   'Calls',    '12<small>/13</small>', '60 min, weekly')}
     </div>
   </section>
 
@@ -243,6 +243,19 @@ const NAV = [
 /* ------------------------------------------------------------ a component -- */
 /* One row, the design system's navigation row. `.clk` is what makes it a
    target; the trailing `.tile-arrow` is this product's GO. */
+/* A FIGURE CELL. All three parts are required: ".stat" is a named grid and
+   ".stat-ic" sits in "grid-area:ic", so a cell written without the icon does
+   not just lose the mark, it loses the area and the figures stop lining up.
+   The colour is not yours to pick — the design system cycles "--mk" over
+   nth-child(4n+1..4), so the fourth cell is magenta because it is fourth. */
+function statCell(icon, label, fig, note){
+  return `<div class="stat">
+      <span class="stat-ic">${I[icon] || ''}</span>
+      <div class="stat-top"><div class="l">${label}</div><div class="n">${fig}</div></div>
+      ${note ? `<div class="d">${note}</div>` : ''}
+    </div>`;
+}
+
 function row(icon, eyebrow, title, sub, go){
   return `<button class="tile clk gcard" data-go="${go}">
     <span class="cardrow-ic">${I[icon]}</span>
@@ -273,7 +286,7 @@ function render(){
         <span class="nav-t-menu">${I.menu}</span>
       </button>
       <!-- THE REAL WORDMARK. "LOGO_K" is the black lockup the portal uses in
-           its own app bar, embedded in talentnext-ds.js. "LOGO_W" is the white
+           its own app bar, embedded in talentnext-ds.js?b=8f52743f. "LOGO_W" is the white
            one for a dark ground. Do not set the brand as text. -->
       <a class="shell-logo" data-go="home"><img src="${LOGO_K}" alt="TalentNext"></a>
       <div class="shell-right">

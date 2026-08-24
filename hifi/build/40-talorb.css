@@ -1,160 +1,185 @@
 /* ==========================================================================
-   40. THE EMPTY STATE WEARS THE LIVE ORB
+   40. THE EMPTY STATE WEARS §33's ANIMATED SPHERE
 
-   §27.8 built Tal's mark as a moving object for the floating button: a halo
-   that pulses, the PNG turning on its off-centre core, and the chevron riding
-   the same circle so it stays on the orange. §21.4 then took a cut-down copy
-   of it to the ask dock. The one place the mark is LARGEST — the empty state
-   at the head of a conversation nobody has started, 132px on the centre line
-   — was the one place it did not move at all. A still 132px blob above
-   "Hello Maryam, I am Tal" reads as an illustration; the same object breathing
-   reads as something waiting for you.
+   §33.6 replaced the head band's flat Tal mark with a CSS-only sphere: a
+   gradient body with the brand chevron in it, a specular highlight, an inset
+   rim, a glow that breathes, and a conic band of light turning across it like
+   light on glass. It is 32px there, beside the word "Tal".
 
-   THIS IS THE BUTTON'S GEOMETRY, NOT A NEW ONE. Same three layers, same three
-   clocks (14s turn, 6.4s breath, 6.4s pulse against it), same stacking order.
-   §27.8's own note is the specification and this follows it rather than
-   restating it:
+   The empty state at the head of a conversation nobody has started drew the
+   `tal-circle.png` blob instead, at §27.1's 132px. Two marks for one
+   assistant, on two screens a person sees in the same minute. This puts §33's
+   sphere on the larger one, so Tal has one face.
 
-     ::before   the halo      tal-orb-pulse + the track
-     ::after    the mark PNG  tal-orb-spin  + tal-orb-breathe
-     svg        the chevron   tal-orb-breathe + the track, never the spin
+   AT 112px, NOT 132. The blob it replaces was mostly falloff, so its 132 box
+   drew a disc of about half that with a long fade around it. A sphere fills
+   its box to the pixel, which is a much heavier object at the same number —
+   112 is the box that reads as the same weight on the page. §1 states it.
 
-   WHY THE ELEMENT'S OWN BACKGROUND COMES OFF. `.tal-mk` (§27.1) paints the
-   PNG as its own `background-image`, which is right everywhere it is a static
-   mark. An element's background paints UNDER its pseudo-elements, so a halo
-   drawn in `::before` would sit on top of the mark rather than beneath it —
-   which is why §21.4 needed a wrapper element to get the order right. Moving
-   the PNG into `::after` gets the same three-layer stack out of one element
-   and no wrapper: the button does exactly this, for exactly this reason.
+   WHAT IS COPIED AND WHAT IS RESCALED. The sphere is four stacked backgrounds
+   and they are ALL proportional — the chevron is sized `60% 60%`, both
+   radials are positioned in percentages, the body is a `155deg` linear — so
+   they come across untouched and look identical at any size. Three things do
+   not scale themselves and are the whole of the work here:
 
-   `.orb` IS ON THE MARKUP because this treatment belongs to the hero and not
-   to every `.tal-mk.lg` anyone might draw later. It is stamped in both places
-   the hero is printed — `talPanel` (views.js) and `askView` (ai4.js) — which
-   are deliberately the same markup on two surfaces.
+     the glow      `box-shadow` blur and spread are PIXEL lengths. Copied at
+                   32px values onto a 112px sphere they read as a hairline
+                   rather than a glow. Everything is x3.5 (112/32).
+     the keyframes `tal-sphere-glow` animates those same pixel shadows, so
+                   reusing it would snap the shadow back to 32px values on
+                   the first frame. §2 declares the scaled pair.
+                   `tal-sphere-spin` is a pure rotation and is reused as-is.
+     the blur      the gloss carries `blur(0.5px)`, which at three and a half
+                   times the size is invisible. 1.75px.
+
+   THE PNG IS GONE FROM THIS SURFACE. Not hidden — not drawn. `.tal-mk` paints
+   `--tal-mark` as its own `background-image` (§27.1) and §1 takes it off, so
+   the sphere is not sitting on top of a blob it happens to cover.
+
+   `.orb` IS ON THE MARKUP, stamped in both places the hero is printed —
+   `talPanel` (views.js) and `askView` (ai4.js), which are deliberately the
+   same markup on two surfaces.
 
    LAST. It needs §27.1's `.tal-mk` background to exist before it can take it
-   off, §27.4's `.tal-hero` to sit in, and §27.8's keyframes to run. Nothing
-   in §28-§39 names any of these selectors.
+   off, §27.4's `.tal-hero` to sit in and its bottom margin to correct, and
+   §33.6's `tal-sphere-spin` to run. Nothing in §34-§39 names these selectors.
    ========================================================================== */
 
 /* ------------------------------------------------------------------ 1 ---
-   THE TRACK, RESCALED — AND IT HAD TO BE
-
-   §27.8 is explicit: "2.45 and 3.47 are 96-box values, not constants. If the
-   box size changes, rescale them." This box is 132, so they are wrong here by
-   38% and the chevron would have sat off the core and drifted round it.
-
-   The derivation is the button's, run again with one number changed. The core
-   sits +4.5,-4.5 off centre in a 176-unit canvas; drawn into a box of B the
-   per-axis offset is B/176 x 4.5, and the orbit radius is sqrt(2) of that:
-
-     B = 96   (the button)   96/176 x 4.5 = 2.45    sqrt(2) x 2.45 = 3.47
-     B = 132  (this)        132/176 x 4.5 = 3.375   sqrt(2) x 3.375 = 4.77
-
-   Eight keyframes for the same reason §27.8 gives: `translate` interpolates
-   in straight lines, so four would walk the mark round a diamond and two
-   would swing it flat across the middle.
-
-   A SECOND KEYFRAME SET RATHER THAN A VARIABLE IN THE FIRST. `tal-orb-track`
-   could take its two numbers from custom properties and serve both sizes, and
-   that is the tidier shape — but it would put the button's animation on a
-   variable this layer defines, so a mistake here would stop the button
-   working. The button is untouched. Two sizes, two tracks, one derivation
-   written down in both places.
-   ------------------------------------------------------------------------ */
-@keyframes tal-orb-track-lg{
-  0%{translate:3.375px -3.375px}     12.5%{translate:4.77px 0}
-  25%{translate:3.375px 3.375px}     37.5%{translate:0 4.77px}
-  50%{translate:-3.375px 3.375px}    62.5%{translate:-4.77px 0}
-  75%{translate:-3.375px -3.375px}   87.5%{translate:0 -4.77px}
-  100%{translate:3.375px -3.375px}}
-
-/* ------------------------------------------------------------------ 2 ---
    THE HOST
 
-   `isolation:isolate` so the three z-indexes below are ordered against each
-   other and not against the hero — `.tal-hero` already isolates for the
-   lattice it draws at `z-index:-1` (§27.4), and two stacking contexts that
-   do not know about each other is how the lattice ends up in front of a halo.
+   `isolation:isolate` so the two pseudo-elements stack against each other and
+   not against the hero — `.tal-hero` already isolates for the lattice it
+   draws at `z-index:-1` (§27.4), and two stacking contexts that do not know
+   about each other is how the lattice ends up in front of a glow.
 
-   `place-items:center` centres the chevron; the two pseudo-elements position
-   themselves. The 132px box and the `-6px` bottom margin are §27.1's and
-   §27.4's and are NOT touched — that margin is measured against where this
-   PNG's tail fades at this size, and the note over it says so.
+   THE BOTTOM MARGIN IS NOW POSITIVE, AND THAT IS THE POINT OF §27.4's NOTE.
+   That rule is `-6px` and the note over it explains why: the PNG is mostly
+   falloff, its orange is "down to about a fifth of its peak 22px above the
+   bottom of the 132 box", and the composition wants 23.6px from the mark's
+   ink to the greeting's cap. 23.6 wanted, minus 22px of tail and 7.1px of
+   leading already in the type = -5.5, drawn as -6.
+
+   A SPHERE HAS NO TAIL. It is a hard-edged disc that fills the box to the
+   pixel, so the 22px term is now zero and the same arithmetic gives
+   23.6 - 0 - 7.1 = 16.5, drawn as 16. Keeping -6 would have put the greeting
+   about 22px too close — which is precisely the failure §27.4's closing line
+   warns about: "If the mark changes, or `.tal-mk.lg` stops being 132,
+   re-measure — do not scale this."
+
+   The glow spills outside the box, but `box-shadow` does not affect layout
+   and it is soft by design; the disc edge is what the eye sets the gap from.
+
+   AND 16 SURVIVES THE RESIZE. The sphere is 112 rather than §27.1's 132, but
+   none of the three terms above is a function of the diameter: the tail is
+   zero for a disc of any size, the leading belongs to the type, and 23.6 is
+   the gap the composition wants. The box bottom is the disc bottom either
+   way, so the margin does not move with the width.
+
+   THE BOX IS RESTATED HERE rather than in §27.1, which sets `.tal-mk.lg` to
+   132 and is also what the FLAT mark uses — the ask dock's and the thread
+   labels' sizes come off that same rule. 112 is this treatment's size, so it
+   belongs to this treatment's selector.
    ------------------------------------------------------------------------ */
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
-  position:relative;display:grid;place-items:center;isolation:isolate;
-  background-image:none}
+  position:relative;isolation:isolate;
+  width:112px;height:112px;
+  background-image:none;
+  margin-bottom:16px}
 
-/* THE HALO. §27.8's stops, unchanged — they are proportions of the box, so
-   they scale with it and the wash reads the same at 132 as at 96. It rides
-   the track so the glow stays under the core rather than under the box the
-   core happens to be drawn in.
+/* THE SPHERE. §33.6's four backgrounds verbatim — the chevron as an inline
+   SVG data URI, the specular highlight at 30%/28%, the contact shadow at
+   70%/75%, and the body gradient — with the shadows multiplied by 3.5.
 
-   `inset:0` because on the button the halo and the mark share one box
-   (both `inset:-20px` on a 56px control); here that box IS the element. */
+   `content` and `position` are declared here because §33 inherits both from
+   §12.660's `.ai-label::before`, where the mark is an in-flow flex item
+   sitting beside the word "Tal". Here it is the whole object, so it fills
+   the box instead. */
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
   content:'';position:absolute;inset:0;z-index:0;
   border-radius:50%;pointer-events:none;
-  background:radial-gradient(closest-side,
-    color-mix(in srgb,var(--accent) 38%,transparent) 0%,
-    color-mix(in srgb,var(--accent) 14%,transparent) 46%,
-    transparent 72%);
-  animation:tal-orb-pulse 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
+  background-color:transparent;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  box-shadow:
+    0 0 28px 3.5px rgba(244,113,19,0.35),
+    0 0 56px 10.5px rgba(244,113,19,0.15),
+    inset 0 -7px 17.5px rgba(0,0,0,0.12),
+    inset 0 7px 17.5px rgba(246,220,146,0.25);
+  animation:tal-sphere-glow-lg 4s ease-in-out infinite}
 
-/* THE MARK. The background this layer took off the element, put back one
-   layer up so the halo can sit under it. This is the only layer that ROTATES:
-   the off-centre core is what travels the circle and everything else follows
-   it, which is what makes a soft blob legibly in motion. */
+/* THE MOVING GLOSS. §33.6's conic gradient unchanged — it is all percentage
+   stops — at 1.125x the sphere, which is the ratio it has there (36 on 32).
+   §33 writes that overhang as `left:-2px` with a `margin-top` half its own
+   height; this centres it on both axes, which is the same placement said
+   plainly. `tal-sphere-spin` is reused: it is a bare rotation with nothing
+   size-dependent in it. */
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
-  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
-  background-image:var(--tal-mark);
-  background-size:contain;background-position:center;background-repeat:no-repeat;
-  animation:tal-orb-spin 14s linear infinite,
-            tal-orb-breathe 6.4s ease-in-out infinite}
+  content:'';position:absolute;z-index:1;
+  left:50%;top:50%;width:126px;height:126px;
+  margin:-63px 0 0 -63px;
+  border-radius:50%;pointer-events:none;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%);
+  animation:tal-sphere-spin 5s linear infinite;
+  filter:blur(1.75px)}
 
-/* THE CHEVRON. Sized off the DISC rather than off the box: §27.1 measures the
-   PNG's solid core at about 52% of the canvas, so the button's 22px mark in a
-   96 box is 44% of a ~50px disc. At 132 the disc is ~69px and 44% of it is
-   30px.
+/* ------------------------------------------------------------------ 2 ---
+   THE GLOW, AT THIS SIZE
 
-   It takes the breath and the track and refuses the spin, for §27.8's reason
-   — a brand mark that turns over is a brand mark upside down, and here it is
-   30px rather than 22px, where a rotation would be unmissable.
-
-   The drop-shadow is legibility, not decoration: white on the accent is about
-   2.7:1, so the mark needs an edge to sit on. Tightened one step from the
-   button's because the shadow scales with the glyph and at 30px the button's
-   value reads as a smudge. */
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
-  position:relative;z-index:2;
-  width:30px;height:30px;fill:var(--on-accent);
-  filter:drop-shadow(0 1px 2px rgb(0 0 0 / .28));
-  animation:tal-orb-breathe 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
-/* the flag the contrast sweep reads, same as the button declares */
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{--on-brand-fill:1}
+   `tal-sphere-glow` (§33.6) interpolates four pixel-valued shadows and every
+   one of them is a 32px number, so it cannot be borrowed — the first frame
+   would drop the glow to a hairline and it would stay there. Same two stops,
+   same 4s, every length x3.5. The two inset stops do not change between
+   the stops there and do not change here.
+   ------------------------------------------------------------------------ */
+@keyframes tal-sphere-glow-lg{
+  0%,100%{
+    box-shadow:
+      0 0 28px 3.5px rgba(244,113,19,0.35),
+      0 0 56px 10.5px rgba(244,113,19,0.15),
+      inset 0 -7px 17.5px rgba(0,0,0,0.12),
+      inset 0 7px 17.5px rgba(246,220,146,0.25)}
+  50%{
+    box-shadow:
+      0 0 42px 7px rgba(244,113,19,0.5),
+      0 0 84px 17.5px rgba(244,113,19,0.25),
+      inset 0 -7px 17.5px rgba(0,0,0,0.12),
+      inset 0 7px 17.5px rgba(246,220,146,0.25)}}
 
 /* ------------------------------------------------------------------ 3 ---
    REDUCED MOTION GETS ITS OWN BLOCK
 
-   Not §13's blanket clamp, for the reason §21.4 states in full: §13.187 takes
-   every duration to 1ms, and 1ms on an INFINITE animation is not "off" — it
-   is the same movement a thousand times faster, which is a strobe, and this
-   one is 132px in the middle of the screen.
-
-   So everything holds still and the halo settles at its bright end. The mark
-   still reads as lit rather than as switched off, and the chevron parks on
-   the core rather than in the middle of a box whose contents are not centred
-   — which is what the track's own 0% keyframe says, restated as a static
-   `translate`.
+   Not §13's blanket clamp: §13.187 takes every duration to 1ms, and 1ms on an
+   INFINITE animation is not "off" — it is the same movement a thousand times
+   faster, which is a strobe, and this one is 132px in the middle of the
+   screen. §33.6 makes the same call for its own copy and settles the gloss at
+   `opacity:.3`; this follows it, so the sphere still reads as lit rather than
+   as switched off.
    ------------------------------------------------------------------------ */
 @media (prefers-reduced-motion:reduce){
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
-    animation:none;opacity:1;scale:1;translate:3.375px -3.375px}
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
-    animation:none;scale:1}
-  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
-    animation:none;scale:1;translate:3.375px -3.375px}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none;opacity:.3}
 }

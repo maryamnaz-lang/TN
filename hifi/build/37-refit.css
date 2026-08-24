@@ -618,3 +618,37 @@
 .app .tbl th.num,.app .tbl td.num,
 .app .tbl th:last-child,.app .tbl td:last-child{text-align:left}
 .app .tbl td.ldr-go,.app .tbl th:empty{text-align:right}
+
+/* --------------------------------------------------------------------------
+   12. THE LABEL COLUMN'S HEADING SITS AT THE TOP
+   Maryam, Aug 24 2026: top-left, not floating halfway down its own rule.
+
+   §10.4 gives the heading `min-height:100%` so the vertical rule down its
+   right edge reaches both horizontal ones — that is what makes the label
+   column read as a column. §24 then makes every `.sec-h` a flex row with
+   `align-items:center`. Together, a lone heading in a box as tall as the
+   section lands in the middle of it: 507px down a 1050px section on the
+   leader's member page.
+
+   TWO PLACEMENTS WERE TRIED FIRST AND BOTH WERE WRONG, so the selector is
+   written the long way on purpose.
+
+   Stating it in §10.4's own rule LOST: that selector is
+   `.sec:has(> .sec-h) > .sec-h` — three classes — and §24's
+   `.app .page .sec-h` is also three, so equal specificity falls to document
+   order and §24 is fourteen layers later. Being inside a container query does
+   NOT rescue it; a query is not a cascade tier and adds no specificity.
+
+   Stating it loosely from HERE won on specificity but over-reached: it also
+   beat §15's `baseline` and §16's `center` for a heading with a link or a
+   `.sec-h-act` button beside it, and quietly re-aligned every one of those
+   rows. A heading paired with a control should sit WITH the control.
+
+   So the selector excludes those rows by hand rather than by cascade luck.
+   It is verbose and it is deterministic, which is the trade worth making:
+   the next person can read what it does not apply to.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h:not(:has(a)):not(:has(.lk)):not(:has(.lnk)):not(:has(.btn)):not(:has(.sec-h-act)){
+    align-items:flex-start}
+}

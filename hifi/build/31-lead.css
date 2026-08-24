@@ -258,8 +258,15 @@
    `.gcard` sizes its leading slot as `.cardrow-ic`, a 40px plate. `mem()`'s
    slot is a 36px photo with no plate at all, and `faceRow` uses that one — so
    the row needs to be told not to expect the plate's box.
+
+   NOT SCOPED TO THE LEADER, for the reason §31.5 gives at length: `.face-row`
+   is a name no other markup in the portal uses, so the scope protected nothing
+   and made the row unreachable from a third portal. A talent agent's "On you"
+   is the same queue as a leader's "Waiting on you" — a list of people something
+   is owed about — and it was drawing a pencil glyph per row because the only
+   copy of this rule in the design system began with `[data-portal="leader"]`.
    -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .face-row > .mem-av{
+.app .face-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
 
@@ -483,6 +490,26 @@
    5. THE BOOKED LIST
    A row is a date, who you are meeting, what it is, and the one thing you do.
 
+   AND IT IS THE ONLY BLOCK IN THIS FILE THAT IS NOT SCOPED TO THE LEADER.
+   Everything else here is `.app[data-portal="leader"] …` because it restyles
+   something the candidate also has — a `.sec`, a `.stat`, a `.tile` — and the
+   two portals want it drawn differently. The booked row is not that: `.bk-row`
+   and `.bk-day` are names no other markup in the portal uses, so the scope was
+   never doing any protecting, and being scoped had one real cost. It made the
+   row unreachable from a THIRD portal. A talent agent's diary is the same
+   object as a leader's — a date column, who you are meeting, what it is — and
+   `tn-agent-portal.html` had to draw it as a generic list row because the only
+   copy of the component in the design system began with `[data-portal="leader"]`
+   and nothing outside `hifi/` sets that attribute.
+
+   So the scope comes off, and the price is one class-level of specificity:
+   `.app .bk-day .n` was (0,4,0) and `.app .bk-day .n` is
+   (0,3,0), which is exactly the weight of §11's `.app .day .n`. That ties, and
+   §31 is the later layer, so the tie falls this way — and it stays safe only
+   because NO `.day` rule anywhere in the 40 layers sits inside a container
+   query (trap 3 is the one thing that would beat a later unconditional rule at
+   equal weight). Check that before adding one.
+
    IT IS A TIME COLUMN, NOT A CHIP. The date started as `.day` — the bordered
    box the candidate's slot picker uses — on the argument that a date should be
    drawn the same way everywhere. It is the same MARKUP and it is not the same
@@ -523,24 +550,24 @@
    animations end at their own final keyframe, so weight and ink hold where an
    opacity would not (trap 2).
    -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .bk-day{
+.app .bk-day{
   align-self:stretch;width:104px;min-width:0;cursor:default;
   display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
   gap:1px;white-space:nowrap;text-align:left;
   padding:var(--s02) var(--s05) var(--s02) 0;
   background:none;border:0;border-right:1px solid var(--rule)}
-.app[data-portal="leader"] .bk-day .d{
+.app .bk-day .d{
   font-size:10.5px;line-height:14px;letter-spacing:.8px;color:var(--text-helper)}
-.app[data-portal="leader"] .bk-day .n{
+.app .bk-day .n{
   margin-top:0;font-size:16px;line-height:22px;letter-spacing:-.2px;
   color:var(--text-primary)}
-.app[data-portal="leader"] .bk-day.bk-now .d{color:var(--text-primary)}
+.app .bk-day.bk-now .d{color:var(--text-primary)}
 /* the tinted section paints its own hairline one step darker, and §12 hands
    that to `.day` as a BORDER-COLOR on all four sides. With one border left
    the same declaration reaches it and the rule sits at the same weight as the
    dividers between the rows — which is what it is. */
-.app[data-portal="leader"] .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
-.app[data-portal="leader"] .bk-row{gap:var(--s05)}
+.app .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
+.app .bk-row{gap:var(--s05)}
 /* THE ROW IS THE TARGET. `bookedRow` renders a <button>, so the arrow at the
    end is a glyph and not a control — it inherits `.cardrow:hover .tile-arrow`
    from §12 with nothing added. What is needed is the button reset the element
@@ -548,22 +575,22 @@
    the width and the left-aligned text — and an arrow centred on the row rather
    than on the flex line, which `align-items:center` would already give it but
    the chip's `align-self:flex-start` makes worth saying out loud. */
-.app[data-portal="leader"] button.bk-row{
+.app button.bk-row{
   -webkit-appearance:none;appearance:none;width:100%;
   font:inherit;color:inherit;text-align:left}
-.app[data-portal="leader"] .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
-.app[data-portal="leader"] .bk-row > .mem-av{
+.app .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
+.app .bk-row > .mem-av{
   width:36px;height:36px;flex:none;position:relative;overflow:hidden;
   background-color:var(--gray-80)}
 /* the group mark on a cohort call sits in the same 36px the face does, or the
    two kinds of row disagree about where their text starts */
-.app[data-portal="leader"] .bk-row > .cardrow-ic{width:36px;height:36px}
-.app[data-portal="leader"] .bk-row > .cardrow-ic svg{width:20px;height:20px}
+.app .bk-row > .cardrow-ic{width:36px;height:36px}
+.app .bk-row > .cardrow-ic svg{width:20px;height:20px}
 @container app (max-width:599.98px){
   /* the phone drops the mark rather than the date: which day it is is the
      thing you scan a diary for, and the face is a nicety next to it */
-  .app[data-portal="leader"] .bk-row > .mem-av,
-  .app[data-portal="leader"] .bk-row > .cardrow-ic{display:none}
+  .app .bk-row > .mem-av,
+  .app .bk-row > .cardrow-ic{display:none}
   /* the chip keeps its 104px here too. This used to narrow to 74px, which the
      longest label never fit, so the phone was where the ragged column was
      worst — and with the mark dropped there is room for the full box. */

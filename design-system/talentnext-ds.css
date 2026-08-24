@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 3100.  Rules dropped as product-specific: 503.
+   Rules kept: 3283.  Rules dropped as product-specific: 318.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3701,13 +3701,20 @@ button{font-family:var(--font-sans)}
 .app .sec > .slots{margin-left:0; margin-right:0; padding-left:0; padding-right:0; margin-top:var(--s04)}
 .app .slots-note{margin-top:var(--s05); font-size:12.5px; line-height:17px; color:var(--text-secondary); max-width:none}
 .app .stickybar{display:flex; align-items:center; justify-content:space-between; gap:var(--s06); flex-wrap:wrap}
+.app .stickybar > .sb-b{display:flex; align-items:baseline; gap:var(--s06); min-width:0; margin-bottom:0!important}
+.app .sb-when{font-size:13.5px; line-height:19px; color:var(--text-secondary)}
+.app .sb-price{font-size:22px; line-height:28px; font-weight:600; letter-spacing:-.4px; font-variant-numeric:tabular-nums}
+.app .stickybar .btn.sb-go{width:auto; max-width:none; flex:none}
 @container app (max-width:599px){
   .app .stickybar{flex-direction:column; align-items:stretch; gap:var(--s05)}
+  .app .stickybar > .sb-b{justify-content:space-between}
+  .app .stickybar .btn.sb-go{width:100%}
 }
 @container app (min-width:900px){
   .app .page:not(.form-page) .sec:has(> .tile-stack) > .sec-h,
   .app .page:not(.form-page) .sec:has(> .stats) > .sec-h{padding-left:0; padding-right:0}
 }
+.app .sb-price{font-size:24px; line-height:30px}
 .app .otp-act{display:flex; align-items:center; gap:var(--s05); flex-wrap:wrap}
 .app .otp-act > .btn{flex:none; width:auto; max-width:none}
 .app .otp-act > .btn-p{margin-left:auto}
@@ -4011,6 +4018,13 @@ button{font-family:var(--font-sans)}
 @container app (min-width:672px){
   .app .ivt-cmp{grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06)}
 }
+.app .askbar{display:flex; align-items:center; gap:0; border:1px solid var(--accent); background-color:var(--background)}
+.app .askbar-mk{flex:none; display:grid; place-items:center; width:44px; height:48px}
+.app .askbar-mk svg{width:18px; height:18px; fill:var(--accent); display:block}
+.app .askbar .inp{flex:1; min-width:0; height:48px; border:0; background:transparent; padding-left:0; padding-right:var(--s05)}
+.app .askbar .composer-send{width:48px; height:48px}
+.app .askbar-sugg{display:flex; gap:var(--s04); flex-wrap:wrap; margin-top:var(--s05)}
+.app .askbar-sugg .chip-tal{max-width:100%; white-space:normal; height:auto; min-height:32px; padding-top:var(--s02); padding-bottom:var(--s02); text-align:left}
 .app .ivt-srch{margin-bottom:var(--s05)}
 .app .ivt-filters{display:flex; gap:var(--s03); flex-wrap:wrap; margin-bottom:var(--s05)}
 .app .ivt-f{min-height:32px; padding:0 var(--s05); border:1px solid var(--rule); background-color:transparent; font-size:12.5px; line-height:17px; color:var(--text-secondary); cursor:pointer}
@@ -4094,6 +4108,8 @@ button{font-family:var(--font-sans)}
 .app .cap-sec{padding-top:0; padding-bottom:0}
 .app .cap{background-color:transparent; padding-left:var(--pad-x); padding-right:var(--pad-x)}
 .app .cap .cap-t{color:var(--text-primary)}
+.app .cap .askbar{margin-top:var(--s04)}
+.app .cap .askbar .inp{background:transparent}
 .app .cap.done{background-color:var(--accent-tint); padding-left:var(--pad-x); padding-right:var(--pad-x)}
 .app .cap.done .cap-t{color:var(--accent-on-2)}
 .app .plate-wb b{font-size:14px; line-height:19px}
@@ -4131,8 +4147,10 @@ button{font-family:var(--font-sans)}
 }
 .app .stickybar{flex-direction:row; align-items:center; justify-content:space-between; gap:var(--s06); padding-left:calc(var(--main-pad) + var(--pad-x)); padding-right:calc(var(--main-pad) + var(--pad-x))}
 .app .stickybar > *{width:auto; max-width:none; padding-left:0; padding-right:0}
+.app .stickybar > .sb-b{justify-content:flex-start; margin-bottom:0!important}
 @container app (max-width:599px){
   .app .stickybar{flex-direction:column; align-items:stretch}
+  .app .stickybar > .sb-b{justify-content:space-between}
 }
 @container app (min-width:900px){
   .app .paytbl{display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(72px,auto) minmax(64px,auto); column-gap:0}
@@ -4398,8 +4416,78 @@ button.btn-p:active,
 }
 
 /* ---- 21-ask.css ---- */
+.app .ask-sec{padding-top:var(--s05); padding-bottom:var(--s05)}
+.app .askline{display:flex; align-items:center; gap:var(--s04); width:100%; min-height:48px; padding:0 var(--s05); background:transparent; border:1px solid var(--rule); color:var(--text-helper); font-size:13.5px; line-height:19px; font-weight:400; letter-spacing:.1px; text-align:left; cursor:text; transition:border-color var(--dur-short) var(--ease-standard)}
+.app .askline:focus-visible{outline:2px solid var(--brand-primary); outline-offset:2px}
+.app .askline-mark{flex:none; display:grid; place-items:center; width:18px; height:18px}
+.app .askline-mark .sk-mark{width:16px; height:16px; flex:none}
+.app .askline-t{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .app .view-col{position:relative}
+.app .askdock{position:absolute; left:0; right:0; margin:0 auto; bottom:var(--s05); z-index:30; width:calc(min(100%, var(--content-max)) - 2 * var(--pad-x))}
+@container app (min-width:900px){
+  .app .askdock{--pad-x:var(--s07)}
+}
 :root{--dock-shadow-1:rgba(17,17,17,.06); --dock-shadow-2:rgba(17,17,17,.08); --dock-shadow-3:rgba(17,17,17,.16)}
+.app .askdock > .askline{background-color:var(--background); border-color:var(--border-subtle-01); min-height:56px; padding:0 var(--s04) 0 var(--s05); gap:var(--s05); box-shadow:
+    0 1px 2px var(--dock-shadow-1),
+    0 8px 18px -2px var(--dock-shadow-2),
+    0 26px 54px -12px var(--dock-shadow-3)}
+.app .askdock > .askline:active{border-color:var(--text-primary)}
+.app .askdock .askline-t{flex:none; color:var(--text-primary)}
+.app .askdock .askline-q{flex:1 1 auto; min-width:0; color:var(--text-helper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:opacity 180ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .askdock .askline-q.going{opacity:0}
+@container app (max-width:599px){
+  .app .askdock .askline-q{display:none}
+}
+.app .askdock .askline-send{flex:none; display:grid; place-items:center; width:32px; height:32px; margin-left:auto; background-color:var(--layer-accent-01)}
+.app .askdock .askline-send svg{width:18px; height:18px; fill:var(--text-placeholder); display:block}
+.app .askdock .askline-mark{position:relative; flex:none; width:32px; height:32px; display:grid; place-items:center; isolation:isolate}
+.app .askdock .askline-mark::before{content:''; position:absolute; inset:-6px; z-index:0; border-radius:50%; pointer-events:none; background:radial-gradient(closest-side,
+    color-mix(in srgb,var(--accent) 34%,transparent) 0%,
+    color-mix(in srgb,var(--accent) 12%,transparent) 48%,
+    transparent 72%); animation:tal-orb-pulse 6.4s ease-in-out infinite}
+.app .askdock .askline-mark .tal-mk{position:relative; z-index:1; width:32px; height:32px; animation:tal-orb-spin 14s linear infinite,
+            tal-orb-breathe 6.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  .app .askdock .askline-mark::before{animation:none; opacity:1; scale:1}
+  .app .askdock .askline-mark .tal-mk{animation:none; scale:1}
+}
+.app:has(.notif.on) .askdock,
+.app:has(.ask-page) .askdock{opacity:0; visibility:hidden; pointer-events:none}
+@container app (max-width:899px){
+  .app:has(.sidenav.on) .askdock{opacity:0; visibility:hidden; pointer-events:none}
+}
+.app:has(.stickybar) .askdock{bottom:calc(var(--s05) + 84px)}
+.app[data-enter] .askdock{animation:mo-rise var(--mo-base) var(--mo-enter) both}
+.app .ask-page{display:flex; flex-direction:column; height:100%; min-height:0; padding-bottom:0; overflow:hidden}
+.app:has(.ask-page) .tal-fab{display:none}
+.app .ask-top{flex:none; display:flex; align-items:center; gap:var(--s03); padding:var(--s05) var(--pad-x); border-bottom:1px solid var(--rule)}
+.app .ask-top .ph-back{display:grid; place-items:center; width:32px; height:32px; flex:none; margin-left:calc(var(--s03) * -1); background:transparent}
+.app .ask-top .ph-back svg{width:20px; height:20px; fill:var(--icon-primary)}
+.app .ask-top-t{font-size:13.5px; line-height:18px; font-weight:600; letter-spacing:.05px}
+.app .ask-top-s{margin-left:auto; color:var(--text-secondary); font-size:11.5px; line-height:16px; font-weight:400; letter-spacing:.15px}
+.app .ask-thread{flex:1 1 auto; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:var(--s05); padding:var(--s06) var(--pad-x)}
+.app .ask-thread .tal-msg{max-width:100%}
+.app .ask-thread .tal-msg .bb{max-width:60ch}
+.app .askline-mark .sk-mark,
+.app .askfield .askline-mark .sk-mark{animation:none; background-color:var(--accent); -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat}
+.app .ask-foot{flex:none; padding:var(--s05) var(--pad-x) var(--s05); border-top:1px solid var(--rule); background:var(--background)}
+.app .ask-sugg{display:flex; flex-wrap:wrap; gap:var(--s03); margin-bottom:var(--s05)}
+.app .askfield{display:flex; align-items:center; gap:var(--s04); min-height:48px; padding:0 0 0 var(--s05); background:var(--layer-01); border:1px solid var(--rule)}
+.app .askfield:focus-within{border-color:var(--text-primary)}
+.app .askfield .inp{flex:1 1 auto; min-width:0; border:0; background:transparent; padding:0; height:46px; min-height:0}
+.app .askfield .inp:focus,
+.app .askfield .inp:focus-visible{outline:0; box-shadow:none}
+.app .askfield-send{flex:none; width:46px; height:46px; display:grid; place-items:center; background-image:var(--accent-grad); background-color:var(--accent); border:0; --on-brand-fill:1}
+.app .askfield-send svg{width:20px; height:20px; fill:var(--on-accent); display:block}
+.app .ask-foot .tal-legal{margin:var(--s04) 0 0}
+@container app (min-width:900px){
+  .app .ask-top,
+  .app .ask-thread,
+  .app .ask-foot{padding-left:var(--s07); padding-right:var(--s07)}
+  .app .ask-page{--pad-x:var(--s07)}
+  .app .ask-thread{padding-top:var(--s07); padding-bottom:var(--s07)}
+}
 .app .plate,
 .app .lvl-hero,
 .app .cert,
@@ -4423,15 +4511,37 @@ button.btn-p:active,
 @keyframes ask-down-out{from{opacity:1;transform:none}to{opacity:0;transform:translateY(14px)}}
 @keyframes ask-shrink{from{opacity:1;transform:none}to{opacity:0;transform:scale(.985)}}
 .app .page.page-to-ask{animation:ask-shrink 170ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both; transform-origin:50% 30%; pointer-events:none}
+.app .page.page-to-ask .ask-sec{animation:none; opacity:1; transform:none}
 .app .page.page-from-ask{animation:ask-fade 260ms var(--mo-standard, cubic-bezier(.4,0,.2,1)) both}
 .app .page.page-from-ask > *{animation:ask-rise 300ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
 .app .page.page-from-ask > :nth-child(2){animation-delay:40ms}
 .app .page.page-from-ask > :nth-child(3){animation-delay:80ms}
 .app .page.page-from-ask > :nth-child(n+4){animation-delay:120ms}
+.app .ask-page.ask-in .ask-top{animation:ask-drop 240ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-page.ask-in .ask-thread{animation:ask-rise 300ms 70ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-page.ask-in .ask-foot{animation:ask-lift 340ms 40ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-page.ask-out{pointer-events:none}
+.app .ask-page.ask-out .ask-top{animation:ask-up-out 180ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+.app .ask-page.ask-out .ask-thread{animation:ask-shrink 160ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+.app .ask-page.ask-out .ask-foot{animation:ask-down-out 190ms var(--mo-accel, cubic-bezier(.4,0,1,1)) both}
+.app .ask-thread .tal-msg.msg-in{animation:ask-rise 260ms var(--mo-decel, cubic-bezier(0,0,.2,1)) both}
+.app .ask-sugg{transition:opacity 160ms var(--mo-standard, cubic-bezier(.4,0,.2,1)),
+                          transform 160ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .ask-sugg.going{opacity:0; transform:translateY(6px)}
+.app .askline{transition:border-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1)),
+                         background-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .askline:active{border-color:var(--text-primary)}
 @media (prefers-reduced-motion:reduce){
   .app .page.page-to-ask,
   .app .page.page-from-ask,
-  .app .page.page-from-ask > *{animation:none}
+  .app .page.page-from-ask > *,
+  .app .ask-page.ask-in .ask-top,
+  .app .ask-page.ask-in .ask-thread,
+  .app .ask-page.ask-in .ask-foot,
+  .app .ask-page.ask-out .ask-top,
+  .app .ask-page.ask-out .ask-thread,
+  .app .ask-page.ask-out .ask-foot,
+  .app .ask-thread .tal-msg.msg-in{animation:none}
 }
 .app .path,
 .app .path-facts{background:transparent; gap:0}
@@ -4479,7 +4589,8 @@ button.btn-p:active,
 .app .callband-d,
 .app .plate .btn-p,
 .app .ivt-f.on,
-.app .btn.btn-p.danger{border-color:transparent}
+.app .btn.btn-p.danger,
+.app .askfield-send{border-color:transparent}
 .btn.btn-p:hover,
 button.btn-p:hover,
 .btn-p:hover,
@@ -4493,6 +4604,7 @@ button.btn-p:active,
 .app .tal-fab:active{background-color:var(--accent-2); background-image:var(--accent-grad-hover); border-color:transparent; --on-brand-fill:1}
 .app .chip-tal,
 .app .tal-sugg .chip-tal,
+.app .ask-sugg .chip-tal,
 .app .tw-chips .chip-tal{background-color:var(--tal-chip-1); background-image:radial-gradient(346px 217px at calc(100% - 8px) 274%,
     var(--tal-chip-2) 0%, transparent 100%)}
 .app .ai-asks .chip-tal,
@@ -4507,6 +4619,7 @@ button.btn-p:active,
 .app .note.acc svg{fill:var(--accent)}
 .app .chip-tal,
 .app .tal-sugg .chip-tal,
+.app .ask-sugg .chip-tal,
 .app .tw-chips .chip-tal,
 .app .ai-asks .chip-tal,
 .app .bub .chip-tal{color:var(--text-primary)}
@@ -4528,6 +4641,7 @@ button.btn-p:active,
 .app .ai-inline .sk,
 .app .ai-inline .sk-mark{background-color:var(--accent)}
 .app .chip-tal .sk-mark,
+.app .ask-sugg .chip-tal .sk-mark,
 .app .tal-sugg .chip-tal .sk-mark{background-color:var(--accent)}
 .app .tq-scene{color:var(--text-secondary)}
 .app .tq-scene svg{fill:var(--accent)}
@@ -4539,6 +4653,7 @@ button.btn-p:active,
 .app .bub .chip-tal{border:1px solid var(--rule); border-radius:0; width:auto; min-height:34px; padding:0 var(--s04); justify-content:flex-start; background-color:var(--tal-chip-1); background-image:radial-gradient(346px 217px at calc(100% - 8px) 274%,
     var(--tal-chip-2) 0%, transparent 100%); font-size:13.5px; line-height:19px; font-weight:400}
 .app .ai-foot.noline{border-top:0; padding-top:0; margin-top:var(--s04)}
+.app .page > .sec.ask-sec::after{display:none}
 .app .agh-book{cursor:default}
 .app .agh-book .agh-n{display:flex; align-items:baseline; gap:var(--s04); justify-content:space-between}
 .app .agh-book .agh-n .ag-price{margin-left:auto; font-size:14px; line-height:19px; font-weight:600; letter-spacing:-.02px; color:var(--text-primary); white-space:nowrap}
@@ -4607,6 +4722,8 @@ button.btn-p:active,
 .app .ai-foot .ai-do{flex:none; min-height:36px; padding:0 var(--s05); background-color:var(--accent); background-image:var(--accent-grad); color:var(--on-accent); border-color:transparent; --on-brand-fill:1}
 .app .ai-foot .sp{margin-left:auto}
 .app .page > .sec:has(> .ai-aura){padding-bottom:var(--s03)}
+.app .page > .sec.ask-sec{padding-top:var(--s03); padding-bottom:var(--s06)}
+.app .page > .sec.ask-sec::after{display:block}
 .app .page .agh.agh-book{display:grid; grid-template-columns:auto minmax(0,1fr); grid-template-areas:'av id' '.  meta' 'foot foot'; column-gap:var(--s05); row-gap:var(--s03); align-items:start}
 .app .page .agh.agh-book > .av,
 .app .page .agh.agh-book > .av-ph{grid-area:av}
@@ -4691,6 +4808,13 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .lvl-split .big{font-size:52px; line-height:58px; letter-spacing:-1.5px}
 }
+.app .ask-foot{position:relative; isolation:isolate}
+.app .ask-foot::before{content:''; position:absolute; left:0; right:0; bottom:0; top:-417px; z-index:-1; pointer-events:none; background:
+    radial-gradient(1366px 489px at 48.1% calc(100% - 72px),
+      var(--auth-wash-1) 0%, var(--auth-wash-1) 28%, transparent 100%); opacity:.1}
+.app .ask-foot .askfield{background-color:var(--background)}
+.app .ask-foot .askfield .inp::placeholder{color:var(--text-helper); opacity:1}
+.app .ask-foot .tal-legal{color:var(--text-helper)}
 .app .page .tile-stack > .tile.chgrow{display:flex; flex-direction:column; align-items:stretch; gap:var(--s05)}
 .app .page .tile.chgrow > .chgrow-b{min-width:0}
 .app .page .tile.chgrow > .btn{flex:none; align-self:start}
@@ -4712,6 +4836,7 @@ button.btn-p:active,
 .app .modhead > .sec::after,
 .app .modhead > .crumb::after{display:none}
 .app .modhead > .sec:has(> .ai-aura){padding-bottom:var(--s03)}
+.app .modhead > .sec.ask-sec{padding-top:var(--s03); padding-bottom:var(--s06)}
 .app[data-enter] .page > .modhead{animation:mo-rise var(--mo-base) var(--mo-enter) both}
 .app[data-enter] .modhead > .ph,
 .app[data-enter] .modhead > .sec,
@@ -4740,16 +4865,19 @@ button.btn-p:active,
 .app .ai-asks:has(> .sp){display:flex; align-items:center; gap:var(--s03)}
 .app .ai-asks > .sp{margin-left:auto; flex:none; display:flex; gap:var(--s02)}
 .app .modhead > .sec,
+.app .modhead > .sec.ask-sec,
 .app .modhead > .ph,
 .app .modhead > .crumb,
 .app .modhead .ai-aura,
 .app .modhead .ai-aura.tile{background:transparent}
+.app .modhead .askline{background:var(--layer-01)}
 .app .ai-aura > *:not(.ai-head){grid-column:2}
 .app .modhead > .ph{padding-top:34px; padding-bottom:0}
 .app .modhead > .sec:has(> .ai-aura){padding-top:28px; padding-bottom:0}
 .app .modhead .ai-aura{row-gap:0}
 .app .modhead .ai-aura > .ai-body{margin-top:-4px}
 .app .modhead .ai-aura > .ai-asks{margin-top:12px}
+.app .modhead > .sec.ask-sec{padding-top:8px; padding-bottom:30px}
 .app .modhead .ai-aura > .ai-asks{grid-column:1 / -1}
 .app .ai-aura.ai-act-top{position:relative}
 .app .ai-aura.ai-act-top > .ai-head > .ai-do,
@@ -4778,8 +4906,18 @@ button.btn-p:active,
   .app[data-shown~="tal"] .view-col > .main > .page{max-width:none; margin-left:0; margin-right:0; width:100%}
 }
 .app .modhead:not(:has(.ai-aura)) > .ph{padding-bottom:var(--s06)}
-.app .modhead:not(:has(.ai-aura)) > .ph{padding-bottom:var(--s07)}
+.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph{padding-bottom:var(--s07)}
+.app .modhead > .sec.ask-chips{padding-top:0; padding-bottom:var(--s03)}
+.app .modhead > .sec.ask-chips > .ai-asks{margin-top:0}
+@container app (min-width:900px){
+  .app .modhead:has(.ask-chips) > .ph{padding-bottom:0}
+  .app .modhead > .sec.ask-chips{padding-top:28px; padding-bottom:0}
+}
 .app .modhead > .sec:has(> .ai-aura):last-child{padding-bottom:28px}
+.app .modhead > .sec.ask-chips:last-child{padding-bottom:28px}
+@container app (min-width:900px){
+  .app .modhead > .sec.ask-chips:last-child{padding-bottom:28px}
+}
 .app .modhead .ai-aura,
 .app .modhead .ai-aura.ai-act-top{display:grid; position:relative; grid-template-columns:minmax(0,1fr); grid-template-areas:'mark' 'title' 'body' 'act' 'asks'; align-items:start; justify-items:stretch; column-gap:var(--s04); row-gap:0}
 .app .modhead .ai-aura > .ai-head{display:contents}
@@ -4875,10 +5013,13 @@ button.btn-p:active,
 .app .chip-tal .sk-mark,
 .app .tal-star .sk-mark,
 .app .av .sk-mark,
+.app .askline-mark .sk-mark,
 .app .tal-h .av .sk-mark,
 .app .tal-msg .av .sk-mark,
+.app .ask-sugg .chip-tal .sk-mark,
 .app .tal-sugg .chip-tal .sk-mark,
-.app .tal-sugg > button .sk-mark{background-color:transparent; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; -webkit-mask:none; mask:none; border-radius:0; animation:none}
+.app .tal-sugg > button .sk-mark,
+.app .askfield .askline-mark .sk-mark{background-color:transparent; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; -webkit-mask:none; mask:none; border-radius:0; animation:none}
 .app .tal-mk{display:block; flex:none; width:24px; height:24px; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat}
 .app .tal-mk.sm{width:15px; height:15px}
 .app .tal-mk.lg{width:132px; height:132px}
@@ -4896,13 +5037,14 @@ button.btn-p:active,
 .app .tal-panel .tal-msg.me .av img{width:100%; height:100%; object-fit:cover; border-radius:0}
 .app .tal-panel .tal-msg > .bb{max-width:305px; margin:0; padding:17px; background:var(--layer-01); border:1px solid var(--rule); color:var(--text-primary)}
 .app .tal-panel .tal-msg.me > .bb{max-width:min(80%,340px); padding:11px 14px; background:var(--text-primary); border:0; color:var(--on-brand)}
-.app .tal-panel .tal-body:has(> .tal-hero){justify-content:center}
-.app :is(.tal-panel) .tal-hero{display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 20px; margin:auto 0; position:relative; isolation:isolate}
-.app :is(.tal-panel) .tal-hero .tal-mk{margin-bottom:-6px}
-.app :is(.tal-panel) .tal-hero h2{margin:0; font-size:20px; line-height:28px; font-weight:400; letter-spacing:.16px; color:var(--text-primary)}
-.app :is(.tal-panel) .tal-hero h2 b{font-weight:600}
-.app :is(.tal-panel) .tal-hero p{margin:16px 0 0; max-width:299px; font-size:13.5px; line-height:19px; color:var(--text-secondary)}
-.app :is(.tal-panel) .tal-hero::before{content:''; position:absolute; z-index:-1; pointer-events:none; left:50%; top:40px; width:432px; height:309px; transform:translateX(-50%); background-image:
+.app .tal-panel .tal-body:has(> .tal-hero),
+.app .ask-thread:has(> .tal-hero){justify-content:center}
+.app :is(.tal-panel, .ask-thread) .tal-hero{display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 20px; margin:auto 0; position:relative; isolation:isolate}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk{margin-bottom:-6px}
+.app :is(.tal-panel, .ask-thread) .tal-hero h2{margin:0; font-size:20px; line-height:28px; font-weight:400; letter-spacing:.16px; color:var(--text-primary)}
+.app :is(.tal-panel, .ask-thread) .tal-hero h2 b{font-weight:600}
+.app :is(.tal-panel, .ask-thread) .tal-hero p{margin:16px 0 0; max-width:299px; font-size:13.5px; line-height:19px; color:var(--text-secondary)}
+.app :is(.tal-panel, .ask-thread) .tal-hero::before{content:''; position:absolute; z-index:-1; pointer-events:none; left:50%; top:40px; width:432px; height:309px; transform:translateX(-50%); background-image:
     repeating-linear-gradient(30.2deg,  var(--rule) 0 1px, transparent 1px 34px),
     repeating-linear-gradient(-42.1deg, var(--rule) 0 1px, transparent 1px 34px); -webkit-mask:radial-gradient(closest-side, currentColor 6%, transparent 62%); mask:radial-gradient(closest-side, currentColor 6%, transparent 62%); opacity:.35}
 .app .tal-panel .tal-sugg{display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 15px; border-top:0}
@@ -4917,6 +5059,18 @@ button.btn-p:active,
     var(--auth-wash-1) 0%, var(--auth-wash-1) 28%, transparent 100%); opacity:.1}
 .app .tal-panel .tal-body,
 .app .tal-panel .tal-sugg{background:transparent}
+.app .ask-thread .tal-msg{display:flex; flex-direction:column; align-items:flex-start; gap:16px; margin:0; max-width:100%}
+.app .ask-thread .tal-msg.me{align-items:flex-end; gap:8px}
+.app .ask-thread .tal-msg > .tal-who{display:flex; align-items:center; gap:8px; flex:none}
+.app .ask-thread .tal-msg .tal-who-n{font-size:13.5px; line-height:19px; font-weight:400; color:var(--text-secondary)}
+.app .ask-thread .tal-msg.me .av{width:35px; height:37px; flex:none; border-radius:0}
+.app .ask-thread .tal-msg.me .av img{width:100%; height:100%; object-fit:cover; border-radius:0}
+.app .ask-thread{align-items:stretch}
+.app .ask-thread .tal-msg > .bb{max-width:min(55%, 620px); margin:0; padding:17px; background:var(--layer-01); border:1px solid var(--rule); color:var(--text-primary)}
+.app .ask-thread .tal-msg.me > .bb{max-width:min(80%, 520px); padding:11px 14px; background:var(--text-primary); border:0; color:var(--on-brand)}
+.app .ask-thread{gap:20px}
+.app .askfield-send{background-image:none; background-color:var(--text-primary); --on-brand-fill:0}
+.app .askfield-send svg{fill:var(--on-brand)}
 .app .agh-book .tal-star .sk-mark,
 .app .agh .tal-star .sk-mark,
 .app .ag .tal-star .sk-mark{background-image:none; background-color:var(--accent); -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat}
@@ -5045,6 +5199,7 @@ button.btn-p:active,
 .app .lvl-hero .lvl-foot-a .btn{justify-content:space-between}
 .app .idhead{flex-wrap:wrap}
 .app .idhead .idhead-a{margin-left:auto; flex:none; align-self:flex-start}
+.app .ask-thread:has(> .tal-hero){display:flex; flex-direction:column; min-height:0}
 .app .ach{display:grid; align-items:center; grid-template-columns:auto minmax(0,1fr) auto; grid-template-areas:
     'mk b  x'
     '.  go go'; column-gap:var(--s05); row-gap:var(--s05); padding:var(--s06) var(--pad-x); background-color:var(--surface-ach)}
@@ -5179,7 +5334,7 @@ button.btn-p:active,
 .app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3) .n{color:var(--mk)}
 .app[data-portal="leader"] .stand-rate{display:flex; align-items:center; gap:var(--s03)}
 .app[data-portal="leader"] .stand-rate .stars svg{width:13px; height:13px}
-.app[data-portal="leader"] .face-row > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
+.app .face-row > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
 .app[data-portal="leader"] .kv .stars{margin-right:var(--s02)}
 .app[data-portal="leader"] .kv .stars svg{width:14px; height:14px}
 .app[data-portal="leader"] .kv .v{display:flex; align-items:center}
@@ -5203,6 +5358,21 @@ button.btn-p:active,
 .app[data-portal="leader"] .stat-jump{-webkit-appearance:none; appearance:none; border:0; background-color:var(--background); font:inherit; color:inherit; text-align:left; width:100%; position:relative; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
 .app[data-portal="leader"] .stat-jump:hover{background-color:color-mix(in srgb, var(--mk, var(--text-primary)) 4%, var(--background))}
 .app[data-portal="leader"] .stat-jump:focus-visible{outline:2px solid var(--text-primary); outline-offset:-2px}
+.app .bk-day{align-self:stretch; width:104px; min-width:0; cursor:default; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:1px; white-space:nowrap; text-align:left; padding:var(--s02) var(--s05) var(--s02) 0; background:none; border:0; border-right:1px solid var(--rule)}
+.app .bk-day .d{font-size:10.5px; line-height:14px; letter-spacing:.8px; color:var(--text-helper)}
+.app .bk-day .n{margin-top:0; font-size:16px; line-height:22px; letter-spacing:-.2px; color:var(--text-primary)}
+.app .bk-day.bk-now .d{color:var(--text-primary)}
+.app .sec.tint .bk-day{border-right-color:var(--rule-on-2)}
+.app .bk-row{gap:var(--s05)}
+.app button.bk-row{-webkit-appearance:none; appearance:none; width:100%; font:inherit; color:inherit; text-align:left}
+.app .bk-row > .tile-arrow{align-self:center; margin-left:var(--s04)}
+.app .bk-row > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
+.app .bk-row > .cardrow-ic{width:36px; height:36px}
+.app .bk-row > .cardrow-ic svg{width:20px; height:20px}
+@container app (max-width:599.98px){
+  .app .bk-row > .mem-av,
+  .app .bk-row > .cardrow-ic{display:none}
+}
 
 /* ---- 32-week.css ---- */
 .app .wkc{display:flex; flex-direction:column}
@@ -5284,12 +5454,12 @@ button.btn-p:active,
 }
 .app .modhead .ai-aura.talsum > .stp-wing{grid-area:stp; padding:0}
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{position:relative; padding:0}
-.stp-overlay{position:fixed; inset:0; z-index:99; background:rgba(0,0,0,.18)}
-.app .modhead .ai-aura.talsum > .stp-wing .stp-all{display:none; position:fixed; z-index:100; top:50%; left:50%; transform:translate(-50%,-50%); min-width:320px; max-width:420px; width:90vw}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all{display:none; position:absolute; z-index:60; top:calc(100% + var(--s03)); right:0; width:min(340px, 100%); margin:0; padding:0; border-top:0}
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{display:flex}
-.device > .stp-all{display:flex; position:fixed; z-index:100; top:50%; left:50%; transform:translate(-50%,-50%); min-width:320px; max-width:420px; width:90vw}
-.stp-pop{width:100%; padding:var(--s06); background:var(--layer-01); border-radius:12px; box-shadow:0 16px 48px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.08)}
-.stp-pop-h{font-size:16px; font-weight:600; line-height:22px; letter-spacing:-.1px; margin:0 0 var(--s05); color:var(--text-primary)}
+.app .modhead:has(.stp.open){z-index:3}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
+.stp-pop{width:100%; padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+.stp-pop-h{font-size:13px; font-weight:600; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:var(--text-helper); margin:0 0 var(--s04)}
 .app .modhead:has(.tal-greet) > .ph{display:none}
 .tal-greet{display:block; font-size:22px; line-height:30px; font-weight:600; letter-spacing:-.3px; color:var(--text-primary); margin-bottom:var(--s04)}
 @container app (min-width:900px){
@@ -5332,7 +5502,40 @@ button.btn-p:active,
 }
 
 /* ---- 35-book.css ---- */
+.app .bkw{display:block; margin-top:var(--s05); --pad-x:0px}
+.app .bkw .bk{display:flex; flex-direction:column; gap:var(--s05)}
+.app .bkw .rail-wrap{padding-left:0; padding-right:0}
+.app .bkw .rail{border:1px solid var(--rule)}
+.app .bkw .agh{padding-left:var(--s05); padding-right:var(--s05)}
+.app .bkw .agh:last-child{border-bottom:0}
+.app .bkw .agh.bk-ag{cursor:pointer}
+.app .bkw .agid-bio{margin:0}
+.app .bkw .tile{margin:0}
+.app .ask-thread .tal-msg > .bb:has(.bkw),
+.app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%; width:100%}
+.app .ask-thread .tal-msg > .bb:has(.tw),
 .app .tal-panel .tal-msg > .bb:has(.tw){max-width:min(100%,620px); width:100%}
+.app .bkw .bk-h{display:flex; align-items:baseline; gap:var(--s04); margin-bottom:calc(var(--s05) * -1 + var(--s03)); font-size:11.5px; line-height:16px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .bkw .bk-h-x{margin-left:auto; font-size:11px; font-weight:400; letter-spacing:.15px; text-transform:none; color:var(--text-secondary)}
+.app .bkw .bk-when{display:flex; align-items:baseline; gap:var(--s04); flex-wrap:wrap; padding:var(--s04) 0; border-top:1px solid var(--rule)}
+.app .bkw .bk-when-t{font-size:13.5px; line-height:19px; font-weight:600; letter-spacing:.05px; color:var(--text-primary)}
+.app .bkw .bk-when-p{margin-left:auto; font-size:17px; line-height:23px; font-weight:600; letter-spacing:-.2px; font-variant-numeric:tabular-nums; color:var(--text-primary)}
+.app .bkw .bk-back{display:inline-flex; align-items:center; gap:var(--s02); align-self:flex-start; min-height:28px; padding:0 var(--s03) 0 0; background:transparent; border:0; font-size:12.5px; line-height:17px; font-weight:600; letter-spacing:.15px; color:var(--text-secondary); cursor:pointer}
+.app .bkw .bk-back svg{width:16px; height:16px; flex:none; fill:currentColor}
+.app .bkw .bk-back:hover:where(.__nh){color:var(--text-primary)}
+.app .bkw .bk-a{display:flex; flex-wrap:wrap; gap:var(--s04); align-items:center}
+.app .bkw .bk-a > .btn{flex:0 1 auto; min-width:0}
+.app .bkw .bk-flag{display:inline-flex; align-items:center; gap:var(--s03); font-size:13px; line-height:18px; font-weight:600; letter-spacing:.15px; color:var(--support-success-ink)}
+.app .bkw .bk-flag svg{width:18px; height:18px; flex:none; fill:var(--support-success-ink); display:block}
+.app .bkw .bk-note{margin:0; font-size:11.5px; line-height:16px; color:var(--text-helper)}
+@container app (min-width:900px){
+  .app .ask-thread .tal-msg > .bb:has(.bkw){max-width:min(100%, 560px)}
+  .app .ask-thread .tal-msg > .bb:has(.bk-list){max-width:100%}
+  .app .bkw .rail-wrap{padding-left:0; padding-right:0}
+  .app .bkw .rail .agh{padding:var(--s06)}
+  .app .bkw .rail .agh:first-child{padding-left:var(--s06)}
+  .app .bkw .rail .agh:last-child{padding-right:var(--s06)}
+}
 
 /* ---- 36-lead2.css ---- */
 .app .ldr-sheets{display:contents}
@@ -5542,10 +5745,62 @@ button.btn-p:active,
 .app .tbl td:last-child{text-align:left}
 .app .tbl td.ldr-go,
 .app .tbl th:empty{text-align:right}
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h:not(:has(a)):not(:has(.lk)):not(:has(.lnk)):not(:has(.btn)):not(:has(.sec-h-act)){align-items:flex-start}
+}
 
 /* ---- 38-scene.css ---- */
+.app .scene{display:flex; flex-direction:column; gap:var(--s04); padding:0; border:0; background:none; text-align:left; font:inherit; color:inherit; cursor:pointer; min-width:0}
+.app .scene-still{position:relative; display:block; width:100%; aspect-ratio:16 / 9; background-color:var(--surface-dark); background-size:cover; background-position:center var(--still-y, 22%); overflow:hidden}
+.app .scene-still::before{content:''; position:absolute; inset:0; background:linear-gradient(180deg,
+    rgba(0,0,0,.28) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,.62) 100%)}
+.app .scene-play{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:grid; place-items:center; width:44px; height:44px; background-color:rgba(255,255,255,.92)}
+.app .scene-play svg{width:20px; height:20px; fill:var(--gray-100); display:block; margin-left:2px}
+.app .scene-len{position:absolute; right:var(--s03); bottom:var(--s03); padding:2px var(--s03); background-color:rgba(0,0,0,.62); color:#fff; font-size:11px; line-height:15px; font-weight:600; letter-spacing:.4px; font-variant-numeric:tabular-nums}
+.app .scene-b{display:flex; flex-direction:column; gap:2px; min-width:0}
+.app .scene-eb{font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .scene-t{font-size:14px; line-height:19px; font-weight:600; letter-spacing:-.1px; color:var(--text-primary)}
+.app .scene-q{font-size:12.5px; line-height:17px; color:var(--text-secondary)}
+.app .scene-row{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
+@container app (min-width:672px){
+  .app .scene-row{grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s05)}
+}
+.app .scene-pick{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06) var(--s04)}
+@container app (min-width:672px){
+  .app .scene-pick{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 @container app (min-width:900px){
+  .app .scene-pick{grid-template-columns:repeat(6,minmax(0,1fr)); gap:var(--s04)}
+  .app .scene-sel{gap:var(--s03)}
+  .app .scene-sel .scene-eb{font-size:10px; line-height:13px; letter-spacing:.6px}
+  .app .scene-sel .scene-t{font-size:12.5px; line-height:17px}
+  .app .scene-sel .scene-q{font-size:11.5px; line-height:15px}
+  .app .scene-sel .scene-play{width:32px; height:32px}
+  .app .scene-sel .scene-play svg{width:14px; height:14px}
+  .app .scene-sel .scene-len{font-size:10px; line-height:14px; padding:1px var(--s02)}
+}
+.app .scene-box{position:absolute; top:var(--s03); left:var(--s03); width:20px; height:20px; display:grid; place-items:center; border:1.5px solid var(--border-strong-01); background-color:var(--layer-01)}
+.app .scene-box svg{width:16px; height:16px; fill:var(--on-brand); opacity:0; display:block}
+.app .scene-sel.on .scene-box{background-color:var(--accent); background-image:var(--accent-grad); border-color:transparent}
+.app .scene-sel.on .scene-box svg{opacity:1}
+@container app (min-width:900px){
+  .app .scene-sel .scene-box{width:18px; height:18px; top:var(--s02); left:var(--s02)}
+  .app .scene-sel .scene-box svg{width:14px; height:14px}
+}
+.app .scene-sel.on .scene-still{outline:3px solid var(--accent); outline-offset:-3px}
+.app .scene-sel.on .scene-t{color:var(--accent-text)}
+.app .scene-full .scene-still::before{background:linear-gradient(180deg,
+    rgba(255,255,255,.62) 0%, rgba(255,255,255,.62) 100%)}
+.app .scene-full .scene-play{background-color:rgba(255,255,255,.72)}
+.app .scene-full .scene-box{border-color:var(--rule); background-color:transparent}
+.app .scene-bar{display:flex; align-items:center; justify-content:space-between; gap:var(--s05); flex-wrap:wrap; margin-top:var(--s06); padding-top:var(--s05); border-top:1px solid var(--rule)}
+.app .scene-count{font-size:13px; line-height:18px; font-weight:600; color:var(--text-secondary); font-variant-numeric:tabular-nums}
+@container app (min-width:900px){
+  .app .sec:has(> .scene-row),
+  .app .sec:has(> .scene-pick),
   .app .sec:has(> .ivlist){display:block}
+  .app .sec:has(> .scene-row) > .sec-h,
+  .app .sec:has(> .scene-pick) > .sec-h,
   .app .sec:has(> .ivlist) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05); padding:0 var(--pad-x)}
 }
 
@@ -5574,20 +5829,35 @@ about forty-five words — so it carries a measure. Everything
 .app .tal-msg > .bb .tw > .tw-k{max-width:62ch; line-height:19px}
 
 /* ---- 40-talorb.css ---- */
-@keyframes tal-orb-track-lg{0%{translate:3.375px -3.375px}     12.5%{translate:4.77px 0} 25%{translate:3.375px 3.375px}     37.5%{translate:0 4.77px} 50%{translate:-3.375px 3.375px}    62.5%{translate:-4.77px 0} 75%{translate:-3.375px -3.375px}   87.5%{translate:0 -4.77px} 100%{translate:3.375px -3.375px}}
-.app :is(.tal-panel) .tal-hero .tal-mk.orb{position:relative; display:grid; place-items:center; isolation:isolate; background-image:none}
-.app :is(.tal-panel) .tal-hero .tal-mk.orb::before{content:''; position:absolute; inset:0; z-index:0; border-radius:50%; pointer-events:none; background:radial-gradient(closest-side,
-    color-mix(in srgb,var(--accent) 38%,transparent) 0%,
-    color-mix(in srgb,var(--accent) 14%,transparent) 46%,
-    transparent 72%); animation:tal-orb-pulse 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
-.app :is(.tal-panel) .tal-hero .tal-mk.orb::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; animation:tal-orb-spin 14s linear infinite,
-            tal-orb-breathe 6.4s ease-in-out infinite}
-.app :is(.tal-panel) .tal-hero .tal-mk.orb svg{position:relative; z-index:2; width:30px; height:30px; fill:var(--on-accent); filter:drop-shadow(0 1px 2px rgb(0 0 0 / .28)); animation:tal-orb-breathe 6.4s ease-in-out infinite,
-            tal-orb-track-lg 14s linear infinite}
-.app :is(.tal-panel) .tal-hero .tal-mk.orb{--on-brand-fill:1}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{position:relative; isolation:isolate; width:112px; height:112px; background-image:none; margin-bottom:16px}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{content:''; position:absolute; inset:0; z-index:0; border-radius:50%; pointer-events:none; background-color:transparent; background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%); background-size:60% 60%,100% 100%,100% 100%,100% 100%; background-position:center,center,center,center; background-repeat:no-repeat; -webkit-mask:none; mask:none; box-shadow:
+    0 0 28px 3.5px rgba(244,113,19,0.35),
+    0 0 56px 10.5px rgba(244,113,19,0.15),
+    inset 0 -7px 17.5px rgba(0,0,0,0.12),
+    inset 0 7px 17.5px rgba(246,220,146,0.25); animation:tal-sphere-glow-lg 4s ease-in-out infinite}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{content:''; position:absolute; z-index:1; left:50%; top:50%; width:126px; height:126px; margin:-63px 0 0 -63px; border-radius:50%; pointer-events:none; background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%); animation:tal-sphere-spin 5s linear infinite; filter:blur(1.75px)}
+@keyframes tal-sphere-glow-lg{0%,100%{ box-shadow: 0 0 28px 3.5px rgba(244,113,19,0.35), 0 0 56px 10.5px rgba(244,113,19,0.15), inset 0 -7px 17.5px rgba(0,0,0,0.12), inset 0 7px 17.5px rgba(246,220,146,0.25)} 50%{ box-shadow: 0 0 42px 7px rgba(244,113,19,0.5), 0 0 84px 17.5px rgba(244,113,19,0.25), inset 0 -7px 17.5px rgba(0,0,0,0.12), inset 0 7px 17.5px rgba(246,220,146,0.25)}}
 @media (prefers-reduced-motion:reduce){
-  .app :is(.tal-panel) .tal-hero .tal-mk.orb::before{animation:none; opacity:1; scale:1; translate:3.375px -3.375px}
-  .app :is(.tal-panel) .tal-hero .tal-mk.orb::after{animation:none; scale:1}
-  .app :is(.tal-panel) .tal-hero .tal-mk.orb svg{animation:none; scale:1; translate:3.375px -3.375px}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none; opacity:.3}
 }

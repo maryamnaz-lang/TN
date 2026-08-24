@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The dashboard head, rebuilt from the design system</title>
-<link rel="stylesheet" href="talentnext-ds.css">
+<link rel="stylesheet" href="talentnext-ds.css?b=a5330404">
 <style>
 /* WHAT THIS PAGE IS FOR.
    The candidate portal's dashboard head, hand-authored, with NO portal JS in
@@ -155,9 +155,25 @@
 </div>
 
   </div></main></div>
+
+  <!-- THE FLOATING TAL BAR. `.askdock > .askline`, real DOM off the portal.
+       It is page chrome, so it sits inside `.app` beside `.shell-body`, not in
+       the page. `.tal-mk` inside `.askline-mark` is the mark; `.askline-q` is
+       the rotating sample question; `.askline-send` is the up-arrow — Material
+       `arrow_upward`, deliberately NOT `arrowRight`, because right is this
+       product's GO and up is "this text goes from here to there".
+       This whole family was excluded until Maryam asked where it was. -->
+  <div class="askdock">
+    <button class="askline" aria-label="Ask Tal anything">
+      <span class="askline-mark"><span class="tal-mk"></span></span>
+      <span class="askline-t">Ask Tal anything</span>
+      <span class="askline-q" aria-hidden="true">&ldquo;How do I compare with my cohort?&rdquo;</span>
+      <span class="askline-send" aria-hidden="true" data-ic="arrowUp"></span>
+    </button>
+  </div>
 </div></div>
 
-<script src="talentnext-ds.js"></script>
+<script src="talentnext-ds.js?b=a5330404"></script>
 <script>
 /* the only JS: dropping icons into the placeholders above. */
 document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = I[el.dataset.ic] || '');

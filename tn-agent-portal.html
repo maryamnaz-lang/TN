@@ -11,9 +11,9 @@
      on file://:
          python3 -m http.server 8799 --bind 127.0.0.1
      Every class used below is a real class from design-system/gallery.html.
-     This file writes NO product CSS: the only rules in the <style> block are
-     the three the design system deliberately does not carry (the wordmark's
-     size, and two prototype-chrome colours on the black bar).
+     This file writes NO product CSS. The <style> block is prototype chrome
+     only: the wordmark's size, and the stage's foot padding, which the design
+     system sizes for a caption row this file does not print.
      ========================================================================== -->
 <link rel="stylesheet" href="design-system/talentnext-ds.css">
 
@@ -32,6 +32,19 @@
    black bar, what colour.
    ========================================================================== */
 .pt-bar img{height:18px;width:auto;flex:none}
+
+/* AND THE CAPTION'S ROOM GOES WITH THE CAPTION. `.pt-stage` is
+   `padding:var(--s06) var(--s05) var(--s10)` in the design system — 64px at the
+   foot, which was the band the caption row sat in, plus a 16px flex `gap` to
+   separate the two. This file has no caption any more (see the note where
+   `.pt-cap` used to be), so both were reserving space for an element that is
+   not there: the phone and tablet frames floated 64px above the bottom of an
+   empty white strip. It is overridden HERE rather than in the stylesheet
+   because `gallery.html` and `starter.html` still print a caption and still
+   want the room — this is one file's chrome, which is what this block is for.
+   The foot matches the head (§ line 2418 already takes the top to `--s05`), so
+   the frame sits in an even margin rather than against the window edge. */
+.pt-stage{padding-bottom:var(--s05);gap:0}
 </style>
 </head>
 <body>
@@ -60,7 +73,14 @@
   <div class="pt-fit" id="fit">
     <div class="device" id="device" data-vp="fluid"></div>
   </div>
-  <p class="pt-cap" id="cap"></p>
+  <!-- NO CAPTION UNDER THE DEVICE. `.pt-cap` used to print the stage's own
+       sentence here — "A working week. Stage 4. Two interviews ahead, one report
+       due tonight…" — which is the same job Tal's card does at the head of every
+       page, in the product, where the reader is looking. Two summaries of one
+       screen, and the outer one was the only thing at the foot of the frame, so
+       it read as the portal's own bottom bar. The stage prose is still written:
+       it is the `title` on each option in the stage picker above, which is where
+       somebody choosing a stage would want it. -->
 </div>
 
 <script src="design-system/talentnext-ds.js"></script>
@@ -134,13 +154,57 @@
      `.lvl-hero`  the agent's level. `.cert` for the certificate.
 
    Tal answers with `tw()` — the portal's own reply widget — and offers with
-   `.chip-tal`. **`.tal-panel` and `.tal-fab` are NOT used**: §27 hides both
-   (`display:none`, restated inside the container query), because the thread
-   moved to the ask dock, and the dock is one of the eight families
-   `build-ds.py` excludes by name since its behaviour *is* a render pass. A
-   surface the design system switches off is not a surface to build on. Tal's
-   questions therefore open a `.sheet`, which is a component the system does
-   ship, and everything inside it is Tal's own vocabulary.
+   `.chip-tal`. **`.tal-panel` and `.tal-fab` are still NOT used**: §27 hides
+   both (`display:none`, restated inside the container query), because the
+   thread moved to the ask dock, and a surface the design system switches off
+   is not a surface to build on.
+
+   THE WHOLE ASK SURFACE IS USED NOW, AND NONE OF IT USED TO BE. This note said
+   the dock was excluded from the design system by name; that was true of the
+   stylesheet as it stood and is not true now — `build-ds.py` took `ask*` off the
+   exclusion list, on the ground that the exclusion was the original allowlist's
+   mistake made one level down. So the floating "Ask Tal anything" line is at the
+   foot of every page, and pressing it opens the FULL-HEIGHT ASK PAGE the other
+   two portals have: `.ask-top`, a `.ask-thread` that scrolls, a `.ask-foot` that
+   does not. It was a `.sheet`, on the reasoning that a table of answers has no
+   thread to scroll — but a sheet can only hold the LAST answer, and a product
+   whose assistant changes shape with who is signed in has three assistants.
+   `askView` is where that is written up, and `S.thread` is the conversation.
+
+   --------------------------------------------------------------------------
+   AND THEN THE HEAD BAND ARRIVED, which is the second rebuild of this file.
+
+   The design system gained `.modhead` — the warm-to-green wash that opens
+   every module page — plus the greeting and the stepper merged into Tal's
+   card. `gallery.html` → **Signature** now leads with "the dashboard head,
+   whole", read off the running portal, and calls it the thing a new portal
+   most needs to match. Before this, every page here opened with a bare `.ph`
+   and a Tal card sitting on white: correct components, none of the opening.
+
+   FOUR THINGS THAT ONLY SHOW ONCE THE BAND EXISTS, all of them decided by the
+   stylesheet rather than by preference:
+
+     - `.ai-label` DROPS `.bare` inside a band. The card takes `tile tight
+       talsum` and the plain label draws the 32px gradient disc (§33); `.bare`
+       is the 16px fallback for a page with no band, and using it inside one
+       puts a small dot where the disc belongs. Tal's report draft further
+       down `V.interview` is the one place `.bare` is still right.
+     - THE GREETING HIDES THE PAGE HEADER — `.modhead:has(.tal-greet) > .ph`
+       is `display:none`. So `greet` is passed on the dashboard, where Tal's
+       card becomes the head, and nowhere else.
+     - A PLATE INSIDE THE BAND SITS INSET; outside it bleeds to the column
+       edge. Both are deliberate, so the choice is made per page: every hero
+       here is in the band, because on every page it is what the page is about.
+     - THE STEPS POPUP HAS TO ESCAPE. It is `position:fixed`, and `.device`
+       is a container, so it is clipped unless it is moved out — which is what
+       `render()`'s last two lines do, the same two `views.js` ends on.
+
+   ONE DEFECT FOUND AND NOT PAPERED OVER: `.stp-all > div` (§03/§04, from the
+   popup's older shape) lands on §33's `.stp-pop` wrapper and lays its heading
+   out beside the list. It is in the candidate portal too — "Where you are"
+   sits half outside the white card. `stepper()` here uses `<section
+   class="stp-pop">` so the div selector misses it, which costs nothing and
+   changes no class; the real fix is one declaration in `33-talsum.css`.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -207,7 +271,13 @@ const CFG = {
              rank:9, follow:4.6, ivs:171, month:7}
 };
 
-const S = {stage:'working', view:'dashboard', nav:false, tal:false, talQ:null,
+/* `tal` IS THE ASK PAGE BEING OPEN, and `talQ` is gone with the sheet it served
+   — one chosen question was all a sheet could hold. What replaces it is a
+   thread: `thread` is the conversation, `typing` is Tal's turn in flight, and
+   `askFrom` is the page the dock was pressed on, which is what "Back to …"
+   names and which set of chips is offered. */
+const S = {stage:'working', view:'dashboard', nav:false, tal:false,
+           thread:[], typing:false, askFrom:'dashboard',
            iv:'rafael', tab:'next', confirm:false, sheet:false, stp:false,
            perms:{draft:true, brief:true, live:false}};
 
@@ -253,14 +323,25 @@ const parentOf = (view, nav) =>
    into escrow at booking, so an interview that has not happened is already
    paid for. Three of these are what makes escrow $204 — Rafael (booked),
    Sofia (held, report not delivered) and Tom (delivered, releasing Thursday).
+
+   `chip` AND `ord` ARE THE DIARY'S TWO FIELDS, AND ONLY THE UPCOMING ROWS HAVE
+   THEM. `day` is the full date a page prints — "Thursday 20 August" — and the
+   booked row's date column is 104px, so it needs the short form the way a
+   timetable writes it. It is hand-written rather than derived because today is
+   Wednesday 19 August by fiat here (Sofia's report is due tonight, Rafael is
+   tomorrow) and there is no clock in this prototype to derive it from. `ord` is
+   the diary's sort key across two kinds of row — an interview and an open slot
+   are the same object to somebody reading down a week — counted in days from
+   today, which is what `OPEN`'s row below shares it with. `LEAD_SESSIONS` keeps
+   the same two fields for the same reason.
    -------------------------------------------------------------------------- */
 const IVS = [
-  {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next',
+  {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next', ord:2, chip:'Tomorrow',
    day:'Thursday 20 August', time:'3:00 PM ET', kind:'First interview',
    band:'Explorer, predicted by the quiz', asked:'Delegation, and being new to managing former peers',
    paid:'Paid at booking, 19 August'},
 
-  {id:'amara', n:'Amara Osei', i:'AO', st:'next',
+  {id:'amara', n:'Amara Osei', i:'AO', st:'next', ord:4, chip:'Mon',
    day:'Monday 24 August', time:'6:00 PM ET', kind:'Re-interview',
    band:'Builder – B1, set 4 March', asked:'Hard conversations, and holding a line under pressure',
    paid:'Paid at booking, 18 August', summary:true},
@@ -307,6 +388,13 @@ const SLOTS = [
     ['Mon 24', '6:00 PM', 1], ['Tue 25', '5:00 PM', 0], ['Wed 26', '7:00 PM', 0],
     ['Thu 27', '3:00 PM', 0], ['Fri 28', '5:00 PM', 0]]]
 ];
+
+/* THE ONE OPEN SLOT THE DASHBOARD SHOWS. `SLOTS` has six open and a dashboard
+   that listed all six would be the Availability page; this is the one the
+   dashboard has always named, kept as its own record so the diary row and the
+   picker cannot disagree about which day it is. `ord` is the diary's key on the
+   same count as `IVS` — Friday sits between Rafael (2) and Amara (4). */
+const OPEN = {ord:3, chip:'Fri', time:'5:00 PM', day:'Friday 21 August'};
 
 /* ==========================================================================
    TAL
@@ -559,11 +647,48 @@ function head({title, sub, back, greet, wing, plate}){
   </div>`;
 }
 
-/* FOUR CELLS, ALWAYS. `.stats` is a fixed 2/4-column grid and its hairlines
-   are the 1px gap, so a row it does not fill paints grey rather than closing
-   up. Three is the count to avoid. */
-const stats = cells => `<div class="stats">${cells.map(([v, k]) =>
-  `<div class="stat"><span class="v">${v}</span><span class="k">${k}</span></div>`).join('')}</div>`;
+/* --------------------------------------------------------------------------
+   THE FIGURE CELL — and this is a corrected component.
+
+   IT HAD THE WRONG MARKUP, AND WRONG MARKUP HERE LOOKS BROKEN RATHER THAN
+   ABSENT. This read `<span class="v">9</span><span class="k">Interviews</span>`,
+   which is the pair the design system's EARLY layers style and its late ones do
+   not. §24 makes `.stats > .stat` a three-row grid — `'ic l' 'ic n' 'ic d'` —
+   and §29.17 folds the label and the figure onto one line through a `.stat-top`
+   wrapper: `'ic top' 'ic d'`. Neither `.v` nor `.k` is assigned a grid area, so
+   they fell into the implicit flow: the figure landed in the MARK's column and
+   the label in the one beside it, which is why "9  INTERVIEWS" read as a number
+   with a caption stuck to its right, with no mark and no note line. Every rule
+   was loading; nothing was being told where to go.
+
+   THE REAL CELL IS FOUR PARTS AND THREE LINES: a mark, then the label and the
+   figure sharing the top line (label left, figure pushed to the right edge and
+   never breaking), then a note under both. `statCell` is the same signature
+   `views.js` uses so the two cannot drift.
+
+   THE MARK TAKES ITS OWN HUE, BY POSITION. §29.17 gives cell 1–4 `--mk-1` to
+   `--mk-4` and mixes the 28px wash out of the same token, on the argument that
+   four readings drawn in one colour look like four instances of one thing. It
+   is automatic — `:nth-child(4n+1)` — so the only thing a call site owes is
+   four cells in a deliberate order.
+
+   FOUR CELLS, ALWAYS. `.stats` is a fixed 2/4-column grid and its hairlines are
+   the 1px gap, so a row it does not fill paints grey rather than closing up.
+   Three is the count to avoid.
+
+   AND EVERY CELL OWES A NOTE. The third line is not decoration: it is what
+   answers the question the figure provokes — `$204` wants "three interviews,
+   held", `4.4` wants "up from 4.2 in July". A cell with an empty `.d` is the
+   old two-line cell wearing the new markup, so the notes below are read off the
+   pages and Tal's answers that already state them rather than invented here.
+   -------------------------------------------------------------------------- */
+const statCell = (ic, label, value, note) => `
+  <div class="stat">
+    <span class="stat-ic">${I[ic]}</span>
+    <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
+    <div class="d">${note}</div>
+  </div>`;
+const stats = cells => `<div class="stats">${cells.map(c => statCell(...c)).join('')}</div>`;
 
 /* A HAIRLINE LIST, AND IT IS WHY `.facts` IS NOT USED ANYWHERE BELOW.
 
@@ -686,10 +811,14 @@ const ring = pct => `
    of it are one thought, and the portal merged them for that reason.
 
    A STEPPER ON A PHONE EATS A SCREEN, so only the rail, the count and the step
-   you are on are drawn; the rest is one press away in `.stp-all`, which the
-   band promotes to a centred popup over an overlay. `S.stp` is that flag, on
-   the state object rather than in the DOM, because `render()` reprints the
-   frame and a class a handler added would be gone by the next paint.
+   you are on are drawn; the rest is one press away in `.stp-all`, which §33.7
+   hangs off the toggle as a DROPDOWN — absolutely positioned on `.stp`, right
+   edge on the chevron's, no scrim behind it. It used to be a centred popup over
+   a 18% black overlay, which is the treatment for a decision you have to
+   answer; five steps with four ticks against them is a reference list you glance
+   at and dismiss. `S.stp` is the flag, on the state object rather than in the
+   DOM, because `render()` reprints the frame and a class a handler added would
+   be gone by the next paint.
    -------------------------------------------------------------------------- */
 function stepper(steps, title){
   let i = steps.findIndex(x => x.st === 'on');
@@ -713,8 +842,25 @@ function stepper(steps, title){
       <div class="stp-now">
         <div class="pi-lab">${cur.lab}</div>${cur.sec ? `<div class="pi-sec">${cur.sec}</div>` : ''}
       </div>
-      ${open ? '<div class="stp-overlay" data-stp="0"></div>' : ''}
-      <div class="stp-all"><div class="stp-pop"><h3 class="stp-pop-h">${title}</h3>
+      <!-- NO SCRIM, AND NO SECOND HEADING. NOTE FOR ANYONE EDITING THIS BLOCK:
+           it is inside a template literal, so a backtick here ends the string —
+           that is why this comment quotes class names with "" and not with the
+           backticks the rest of the file uses.
+
+           There was a ".stp-overlay" here and a ".stp-pop-h" repeating the title
+           inside the panel. §33.7 turned the popup into a dropdown hanging off
+           the toggle, so the scrim is gone; and the panel's heading was the h2
+           three lines above it, printed again. The untitled variant of this
+           component in views.js keeps its heading, because there it is the only
+           label the panel has.
+
+           AND IT IS A PLAIN DIV AGAIN. It was a "section" to dodge §03/§04's
+           ".stp-all > div{display:flex}", which was landing on ".stp-pop" and
+           setting its heading beside the list — a type selector at (0,1,1)
+           beating the class at (0,1,0). That is now answered in 33-talsum.css
+           by naming the class in the child position, which is where the note
+           here said the fix belonged, so the element name carries no weight. -->
+      <div class="stp-all"><div class="stp-pop">
         <div class="pi" style="padding:0">
           ${steps.map(x => `<div class="pi-step ${x.st}">${ic(x.st)}
             <div><div class="pi-lab">${x.lab}</div>${x.sec ? `<div class="pi-sec">${x.sec}</div>` : ''}</div></div>`).join('')}
@@ -746,7 +892,15 @@ const JOURNEY = v => {
    inside one. Tal replies with a card rather than a paragraph wherever the
    answer has fields in it; that is a decision the wireframes made and the
    portal kept. */
-const tw = (title, body, action) => `<span class="tw">
+/* `.tw-top` IS NOT OPTIONAL HERE, AND THERE IS NO SELECTOR FOR IT. §39 gives a
+   widget 16px above it so it clears a sentence; when the widget OPENS the bubble
+   there is no sentence and that 16px puts the label 34px down against 17px at
+   the sides. `:first-child` cannot tell the two apart — a bubble is built by
+   assigning a string, so leading prose is a TEXT node and counts for nothing
+   (trap 16). `hifi/` stamps the class from a prefix test in the one wrapper
+   every reply passes through; every reply in this portal IS a widget with
+   nothing above it, so it is simply always on. */
+const tw = (title, body, action) => `<span class="tw tw-top">
   ${title ? `<span class="tw-h">${title}</span>` : ''}${body}
   ${action ? `<span class="tw-a">${action}</span>` : ''}</span>`;
 const twBtn = (label, go) => `<button class="tw-btn"${go ? ` data-go="${go}"` : ''}>${label}${I.arrowRight}</button>`;
@@ -754,9 +908,112 @@ const twLines = rows => `<span class="tw-lines">${rows.map(([k, v]) =>
   `<span><b>${k}</b>${v}</span>`).join('')}</span>`;
 
 /* TAL'S CHIP — an offer, not navigation. `.sk-mark` is the standalone mark and
-   the cool pool behind it is a radial gradient on the chip itself. */
+   the cool pool behind it is a radial gradient on the chip itself.
+
+   IT APPEARS INSIDE THE SHEET ONLY, and it used to appear on four pages as
+   well: a lone `.tal-sugg` chip under the dashboard's "On you", under
+   Calibration, under an interview brief, under My level. That made sense when
+   the only way to reach Tal was the app bar's icon — the chip was the page
+   saying "you can ask about THIS". The ask dock changed that: there is now a
+   full-width invitation at the foot of every page which already suggests that
+   page's own questions, off the same `TALQ` list the chips were drawn from. So
+   the chip on the page was a second, smaller copy of the bar four inches below
+   it, offering the same question, and one page-level orange chip floating under
+   a list read as an unfinished row. The dock is the offer; the chips are how
+   you move between answers once you are inside. */
 const askChip = (q, label) => `<button class="chip-tal" data-ask="${q}">
   <span class="sk-mark xs"></span>${label || q}</button>`;
+
+/* --------------------------------------------------------------------------
+   THE ASK DOCK — the floating bar at the foot of every page.
+
+   IT IS THE PRODUCT'S ONE STANDING INVITATION, and this file did not have it.
+   The header note above still said the dock was excluded from the design
+   system; it is not any more — `build-ds.py` took `ask*` off the exclusion list
+   on exactly the argument that applies here. The THREAD is a render pass over
+   `S.thread` and cannot be hand-authored. `.askdock > .askline` is a bar with a
+   mark, a label, a sample question and a send glyph, it is one of the most
+   recognisable things in the product, and dropping the prefix took it out
+   wholesale. So the bar ships, and what it opens is this file's business.
+
+   WHAT IT OPENS IS THE FULL-HEIGHT ASK PAGE — `askView`, which is `hifi/`'s
+   surface out of the same stylesheet. It opened a `.sheet` first, on the
+   reasoning that this portal answers from a table and so has no thread to
+   scroll; the answer to that is that a conversation is not the same object as
+   an answer, and the sheet could only ever show the last one. `data-askopen="1"`
+   rather than `data-toggle="tal"`, because opening has to record `S.askFrom` —
+   the page you pressed it on, which is what "Back to …" names and which set of
+   chips is offered — and a raw toggle knows nothing about where it was pressed.
+
+   IT IS NOT RENDERED WHILE THE ASK PAGE OR A SHEET IS OPEN. The design system
+   states the first half (`.app:has(.ask-page) .askdock`), because `hifi/`'s pass
+   appends the dock after the fact and has to switch it off again; here the render
+   owns the whole frame, so not printing it is the truer statement — the dock is
+   the invitation to the surface that is now open.
+
+   THE SAMPLE QUESTION IS THE PAGE'S OWN, rotating every three seconds, and it
+   is quoted and grey because it is an example of what you could type rather than
+   a label. It comes off `TALQ[S.view]` — the same list the page prints as chips
+   and the sheet offers — so the bar can never suggest something Tal does not
+   answer. The phone hides it (§21) and keeps the label.
+   -------------------------------------------------------------------------- */
+const ASK_ROT_MS = 3000;
+let ASK_KEY = null, ASK_I = 0, ASK_ON = false;
+
+const askList = () => (TALQ[S.view] || TALQ.dashboard).map(q => q[0]);
+
+/* THE INDEX LIVES OUTSIDE THE DOM, and it has to. Every interaction re-renders
+   and the render rebuilds this bar, so reading 0 at build time would snap the
+   suggestion back to the first one every time anybody clicked anything. Keyed
+   to the VIEW: landing on a page shows the suggestion its author put first, and
+   the count only advances while you stay there. */
+function askQ(){
+  const list = askList();
+  if(S.view !== ASK_KEY){ ASK_KEY = S.view; ASK_I = 0; }
+  return list.length ? list[ASK_I % list.length] : '';
+}
+
+/* IT EDITS ONE SPAN AND DOES NOT CALL `render()`. A re-render every three
+   seconds would rebuild the frame and replay whatever entrance was mid-flight,
+   for a two-word change. It also holds no reference to the node — the frame is
+   replaced constantly, so it looks the span up and does nothing when there is
+   none. Out, swap, in: the text changes while nothing can be read of it. */
+function askRotate(){
+  const el = device.querySelector('.askdock .askline-q');
+  if(!el) return;
+  const list = askList();
+  /* arriving on a new view is not a tick — the build already showed its first
+     suggestion, and advancing here would skip it */
+  if(S.view !== ASK_KEY){ ASK_KEY = S.view; ASK_I = 0; return; }
+  if(list.length < 2) return;
+  ASK_I = (ASK_I + 1) % list.length;
+  el.classList.add('going');
+  setTimeout(() => {
+    const still = device.querySelector('.askdock .askline-q');
+    if(!still) return;
+    still.innerHTML = '&ldquo;' + list[ASK_I % list.length] + '&rdquo;';
+    still.classList.remove('going');
+  }, 200);
+}
+
+/* THE QUESTION IS A `<span>` INSIDE THE BUTTON, not a control of its own: a
+   button inside a button is a click whose destination depends on where in the
+   row you land. `aria-hidden` for the same reason — the row has one accessible
+   name and a rotating example must not make that name change under the reader.
+   The send glyph is drawn OFF because there is nothing to send yet; §21 argues
+   that a control which is visibly disabled tells the truth where an empty row
+   said nothing at all. */
+function askDock(){
+  const q = askQ();
+  return `<div class="askdock">
+    <button class="askline" data-askopen="1" aria-label="Ask Tal anything">
+      <span class="askline-mark"><span class="tal-mk"></span></span>
+      <span class="askline-t">Ask Tal anything</span>
+      <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + q + '&rdquo;' : ''}</span>
+      <span class="askline-send" aria-hidden="true">${I.arrowUp}</span>
+    </button>
+  </div>`;
+}
 
 /* A person, with the design system's square avatar. */
 const memRow = (v, tag, go) => `
@@ -765,6 +1022,105 @@ const memRow = (v, tag, go) => `
     <span class="mem-b"><span class="mem-n">${v.n}</span>
       <span class="mem-m">${v.day}<span class="mdot"></span>${v.time}</span></span>
     ${tag}</div>`;
+
+/* --------------------------------------------------------------------------
+   A ROW ABOUT A PERSON — `.face-row`, and it is the cohort leader's row too.
+
+   A FACE, NOT A GLYPH. This is the leader's own argument for "Waiting on you"
+   and it applies here word for word. The queue was `goRow('edit', …)`: a 40px
+   plate holding a pencil, an eyebrow reading DUE 6:00 PM TODAY, then the title.
+   One row of that is fine; two rows of it — which is what the Interviews page
+   has — say nothing except "these are the same kind of task", which the heading
+   above them already said. Every row in this queue is a PERSON, and recognising
+   whose report is owed is the actual work, so the face is the one mark that
+   tells the rows apart. It reuses `mem()`'s 36px slot verbatim, and §31's
+   one rule is what tells `.gcard` not to expect the plate's box.
+
+   THE NAME IS THE TITLE, AND THE EYEBROW GOES. "Sofia Marek's report" put the
+   person inside a possessive and then spent the line above it on a deadline;
+   the leader writes the name plain and hangs the rest on one `&middot;` row —
+   kind, substance, when. Same three facts, one fewer line, and the column now
+   reads down the names.
+
+   AN ARROW, NOT A VERB. The whole row is the target and what you do is on the
+   page it opens — `.tile.clk` and `.tile-arrow` are what every other openable
+   row in this system wears.
+   -------------------------------------------------------------------------- */
+const faceRow = (x, detail, go) => `
+  <button class="tile clk gcard face-row" data-go="${go}" data-iv="${x.id}">
+    <span class="mem-av mem-ph">${avatar(x.i, PHOTOS[x.id], 36)}</span>
+    <span class="gcard-b"><h3>${x.n}</h3><span class="sub">${detail}</span></span>
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
+
+/* --------------------------------------------------------------------------
+   A ROW IN THE DIARY — `.bk-row`, and it is the cohort leader's row exactly.
+
+   WHY IT IS NOT A `memRow` OR A `goRow` ANY MORE. Both of those are lists of
+   THINGS, and a diary is a list of TIMES. The agent's upcoming calls were drawn
+   two different ways on two pages — a `.mem` with a `Re-interview` tag on the
+   dashboard, a `goRow` with the date as its eyebrow on Interviews — and neither
+   gave the week a spine: the date was either inside the row's second line or
+   set as a caption above the name, so a column of appointments had to be read
+   word by word to find out what is next. The leader's booked list solved this
+   and §31.5 is the write-up: the date is a fixed-width TIME COLUMN against a
+   full-height hairline, which is the line every printed timetable draws between
+   when and what, and every row's face and title therefore start at the same x.
+
+   The rules were `[data-portal="leader"]`-scoped and are not any more — see
+   §31.5, which records why the scope came off and what it cost. So this is not
+   a copy of that component, it IS it, out of the same stylesheet.
+
+   THE MARK ANSWERS "WHO AM I MEETING", which is the leader's own argument for
+   drawing a face on an interview and a group on a cohort call. An agent never
+   meets ten people, so the second kind here is the other thing in their week:
+   a slot nobody has taken, which is a time with no person in it and takes the
+   clock. Same 36px box either way, or the two kinds disagree about where their
+   text starts. The phone drops the mark and keeps the date (§31.5).
+
+   THE TIME LOSES ITS `ET`. Everywhere else this file writes "6:00 PM ET",
+   because a candidate booking across timezones needs it. The column is 104px
+   with `nowrap`, so "11:00 AM ET" would run out over the hairline — and the
+   zone is on every page the row opens. The chip is the diary, not the record.
+
+   AN ARROW, NOT A VERB, and the whole row is the target — `.bk-row` carries the
+   button reset for it. The old rows ended in a `Re-interview` tag or an `Open`
+   button, which named the KIND of appointment rather than an action, and the
+   kind is already legible from the mark and the detail line.
+   -------------------------------------------------------------------------- */
+const bookedRow = b => `<button class="cardrow bk-row" data-go="${b.go}"${
+    b.iv ? ` data-iv="${b.iv}"` : ''}>
+  <span class="day bk-day${b.now ? ' bk-now' : ''}">
+    <div class="d">${b.chip}</div><div class="n">${b.time.replace(' ET', '')}</div></span>
+  ${b.id ? `<span class="mem-av mem-ph">${avatar(b.i, PHOTOS[b.id], 36)}</span>`
+         : `<span class="cardrow-ic">${I.time}</span>`}
+  <span class="cardrow-b">
+    <span class="cardrow-t">${b.t}</span>
+    <span class="cardrow-d">${b.d}</span>
+  </span>
+  <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+</button>`;
+
+/* THE DIARY, IN THE ORDER IT HAPPENS. One list, sorted on `ord`, so the two
+   kinds interleave rather than sitting in two groups the reader has to merge —
+   the leader's `lbooked` makes the same argument about interviews and cohort
+   calls. `open` is what the dashboard adds and the Interviews page does not:
+   that page's section is headed "Booked", and this file's own note says booked
+   means PAID, so an unsold slot in it would contradict the heading. `not` is
+   the dashboard's other difference: the next interview is the black plate at
+   the head of that page, and a diary that repeats it is the page saying the
+   same appointment twice. */
+const diary = (v, open, not) => IVS.filter(x => x.st === 'next' && x.id !== not).map(x => ({
+    ord: x.ord, chip: x.chip, time: x.time, id: x.id, i: x.i, iv: x.id,
+    now: x.chip === 'Today', go: 'interview',
+    t: `${x.kind} &middot; ${x.n}`,
+    d: `45 minutes, recorded &middot; ` + (x.summary
+        ? 'their 90-day summary is attached, so you read that first'
+        : `${money(v.fee)} already in escrow`)
+  })).concat(open ? [{
+    ord: OPEN.ord, chip: OPEN.chip, time: OPEN.time, now: false, go: 'availability',
+    t: 'Open slot', d: `45 minutes at ${money(v.fee)} &middot; nobody has taken it`
+  }] : []).sort((a, b) => a.ord - b.ord);
 
 const money = n => '$' + n.toLocaleString('en-US');
 
@@ -836,7 +1192,11 @@ V.dashboard = v => {
   if(!v.busy) return band() + `
     <section class="sec">
       <div class="sec-h"><h2>Your listing</h2></div>
-      ${stats([['Live', 'In browse'], [money(v.fee), 'Your rate'], ['6', 'Slots open'], ['0', 'Booked']])}
+      ${stats([
+        ['search',   'In browse',  'Live',        'since 24 June'],
+        ['wallet',   'Your rate',  money(v.fee),  `${money(v.share)} of it yours`],
+        ['calendar', 'Slots open', '6',           'over the next fortnight'],
+        ['video',    'Booked',     '0',           'nobody has taken one yet']])}
     </section>
     <section class="sec">
       <div class="sec-h"><h2>Nothing booked</h2></div>
@@ -869,27 +1229,24 @@ V.dashboard = v => {
     <section class="sec">
       <div class="sec-h"><h2>This month</h2></div>
       ${stats([
-        [String(v.month), 'Interviews'],
-        [String(v.follow), 'Follow-up'],
-        [money(v.earned), 'Earned'],
-        [money(v.escrow), 'In escrow']])}
+        ['video',      'Interviews', String(v.month),   `${v.ivs} in total`],
+        ['growth',     'Follow-up',  String(v.follow),  'up from 4.2 in July'],
+        ['wallet',     'Earned',     money(v.earned),   `${money(v.share)} an interview`],
+        ['creditCard', 'In escrow',  money(v.escrow),   'three interviews, held']])}
     </section>
 
     <section class="sec">
       <div class="sec-h"><h2>On you</h2></div>
       <div class="tile-stack">
-        ${goRow('edit', 'Due 6:00 PM today', `${due.n}’s report`, 'Tal has a draft off the transcript', 'interview', ` data-iv="${due.id}"`)}
+        ${faceRow(due, `Report &middot; Tal has a draft off the transcript &middot; due ${due.due}`, 'interview')}
       </div>
-      <div class="tal-sugg">${askChip('How is the report written?', 'Ask Tal how the write-up works')}</div>
     </section>
 
     <section class="sec">
-      <div class="sec-h"><h2>After that</h2></div>
+      <div class="sec-h"><h2>After that</h2>
+        <span class="t-helper-01">Interviews and open slots, in the order they happen</span></div>
       <div class="tile-stack">
-        ${IVS.filter(x => x.st === 'next' && x.id !== next.id).map(x =>
-          memRow(x, `<span class="tag sm">${x.kind}</span>`, 'interview')).join('')}
-        ${factRow('time', 'Friday 21 August, 5:00 PM ET', 'Open &mdash; nobody has taken it',
-          '<span class="tag sm">Open</span>')}
+        ${diary(v, true, next.id).map(bookedRow).join('')}
       </div>
     </section>
 
@@ -980,9 +1337,16 @@ V.listing = v => head({
 
   <section class="sec">
     <div class="sec-h"><h2>On your card</h2></div>
+    ${/* THE NOTES HAVE TO HOLD AT `live` TOO, where nothing has happened yet:
+          `ivs`, `month` and `rating` are all zero or null the day the listing
+          goes up, and a note reading "9 this month" under a nought is the cell
+          contradicting itself. Both of those cells say what is true instead. */''}
     ${stats([
-      [money(v.fee), 'Your fee'], [v.rangeShort, 'Assesses'],
-      [String(v.ivs || 0), 'Interviews'], [v.rating || '&mdash;', 'Rating']])}
+      ['wallet', 'Your fee',   money(v.fee),        `${money(v.share)} of it yours`],
+      ['skill',  'Assesses',   v.rangeShort,        'Explorer to Builder'],
+      ['video',  'Interviews', String(v.ivs || 0),  v.month ? `${v.month} this month` : 'none yet'],
+      ['star',   'Rating',     v.rating || '&mdash;',
+       v.rating ? `across ${v.ivs} interviews` : 'nothing rated yet']])}
   </section>
 
   <section class="sec">
@@ -1109,7 +1473,6 @@ V.training = v => {
       : `<div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your listing waits on this</b>
           Nothing goes into browse until the calibration is passed.</div></div>
          <div class="btn-row mt5"><button class="btn btn-p">Open module ${(v.mods || 0) + 1} ${I.arrowRight}</button></div>`}
-    <div class="tal-sugg">${askChip('What is calibration?')}</div>
   </section>`;
 };
 
@@ -1127,7 +1490,7 @@ V.interviews = v => {
       <div class="btn-row"><button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button></div>
     </section>`;
 
-  const next = IVS.filter(x => x.st === 'next'), done = IVS.filter(x => x.st === 'done');
+  const done = IVS.filter(x => x.st === 'done');
   const owed = IVS.filter(x => x.st === 'report');
 
   return head({title: 'Interviews',
@@ -1141,16 +1504,17 @@ V.interviews = v => {
   <section class="sec">
     <div class="sec-h"><h2>Waiting on you</h2></div>
     <div class="tile-stack">
-      ${owed.map(x => goRow('edit', `Due ${x.due}`, `${x.n}’s report`,
-        `Interviewed ${x.day.replace(/^\w+ /, '')} &middot; ${x.level}`, 'interview', ` data-iv="${x.id}"`)).join('')}
+      ${owed.map(x => faceRow(x,
+        `Report &middot; interviewed ${x.day.replace(/^\w+ /, '')} at ${x.level} &middot; due ${x.due}`,
+        'interview')).join('')}
     </div>
   </section>
 
   <section class="sec">
-    <div class="sec-h"><h2>Booked</h2></div>
+    <div class="sec-h"><h2>Booked</h2>
+      <span class="t-helper-01">In the order they happen</span></div>
     <div class="tile-stack">
-      ${next.map(x => goRow('video', x.day, x.n,
-        `${x.time} &middot; ${x.kind} &middot; ${money(v.fee)} paid`, 'interview', ` data-iv="${x.id}"`)).join('')}
+      ${diary(v).map(bookedRow).join('')}
     </div>
   </section>
 
@@ -1236,7 +1600,6 @@ V.interview = v => {
       <div class="btn-row">
         <button class="btn btn-g noic" data-sheet="brief">Add a note to the brief</button>
       </div>
-      <div class="tal-sugg">${askChip('What do I read beforehand?')}</div>
     </section>`;
 
   if(x.st === 'report') return band() + `
@@ -1363,8 +1726,11 @@ V.earnings = v => {
   ${connected && v.busy ? `
   <section class="sec">
     <div class="sec-h"><h2>This month</h2></div>
-    ${stats([[money(v.earned), 'Earned'], [money(v.escrow), 'In escrow'],
-             [String(v.month), 'Interviews'], [money(v.share), 'Each']])}
+    ${stats([
+      ['wallet',     'Earned',     money(v.earned),  'released to your account'],
+      ['creditCard', 'In escrow',  money(v.escrow),  'three interviews, held'],
+      ['video',      'Interviews', String(v.month),  `${v.ivs} in total`],
+      ['receipt',    'Each',       money(v.share),   `80% of ${money(v.fee)}`]])}
   </section>` : ''}
 
   <section class="sec">
@@ -1435,8 +1801,16 @@ V.standing = v => head({
 
   <section class="sec">
     <div class="sec-h"><h2>Where you are</h2></div>
-    ${stats([[v.level, `Of A${v.levels}`], [`${v.rank}<small>/${v.pool}</small>`, 'In browse'],
-             [String(v.follow), 'Follow-up'], [String(v.depth), 'Depth']])}
+    ${/* THE LABEL AND THE VALUE SWAP ROUND ON THE FIRST CELL. This was value
+          "A2" under label "Of A4", which put the scale in the label column and
+          left the cell without a name — the label is what the four cells are
+          scanned by, so it has to say WHICH reading this is. "Level / A2 / A1 to
+          A4" says all three things in the order they are asked for. */''}
+    ${stats([
+      ['trophy', 'Level',      v.level,                            `A1 to A${v.levels}`],
+      ['search', 'In browse',  `${v.rank}<small>/${v.pool}</small>`, 'by follow-up and depth'],
+      ['growth', 'Follow-up',  String(v.follow),                   'up from 4.2 in July'],
+      ['chart',  'Depth',      String(v.depth),                    'unchanged since May']])}
   </section>
 
   <section class="sec">
@@ -1485,7 +1859,6 @@ V.standing = v => head({
       ${v.reviewed
         ? 'A3 is E1 to B2, which is why Explorer’s first two levels appeared in your queue this month.'
         : 'A2 is E2 to B1. A3 would add Explorer’s first two levels and Builder’s second.'}</div></div>
-    <div class="tal-sugg">${askChip('What moves me to A3?')}</div>
   </section>`;
 
 /* --------------------------------------------------------------------------
@@ -1583,46 +1956,181 @@ function sidenav(v){
   </nav>`;
 }
 
-/* TAL'S PANEL, as a sheet.
+/* ==========================================================================
+   TAL, FULL HEIGHT — THE ASK PAGE
 
-   NOTHING IN IT KEEPS STATE IN THE DOM. `device.innerHTML` is replaced on
-   every render, so the chosen question is `S.talQ` and the answer is drawn
-   from the table — a class a click handler added would be gone by the next
-   paint. That is `hifi/`'s rule for anything inside Tal and it is the reason
-   its whole thread is a pure function of `S`.
+   THIS WAS A SHEET, AND A SHEET IS THE WRONG SURFACE FOR A CONVERSATION. Tal
+   opened as a `.modal` > `.sheet`: a bottom sheet holding one answer, one set
+   of chips, and a close cross. Two things were wrong with it and both get worse
+   the more you ask. A sheet is a place you go to do ONE thing and dismiss —
+   which is why the portal uses it for editing a fee and confirming a signature
+   — so it can only ever show the last answer, and the question you asked two
+   turns ago is gone. And it is a different Tal from the one the other two
+   portals have: the candidate and the leader share one surface, a full-height
+   page with a thread in it, and a product whose assistant changes shape
+   depending on who is signed in has three assistants.
 
-   THE QUESTIONS ARE BUTTONS, NOT PAGE ROWS. A `.tile`/`.gcard` borrowed into a
-   sheet brings the page's `--pad-x` indent with it and hangs off both sides —
-   the trap `35-book.css` answers with one declaration. A `.btn-row` of small
-   outlined buttons has no gutter to bring. */
-/* THE CHIPS ARE THE PAGE'S, THE ANSWERS ARE TAL'S. The chips offered are the
-   ones for the page you are on; the answer is looked up across the whole
-   table, because a chip printed on a page can name a question that lives in
-   another page's list — the dashboard offers "how is the report written",
-   which is an Interview question. Looking it up in the current page's list
-   only is what made Tal open empty when asked from the dashboard. */
+   SO IT IS `hifi/`'s SURFACE, out of the same stylesheet. `.ask-page` is a
+   `height:100%` flex column inside `.main`: a `.ask-top` bar that says where
+   you came back to, a `.ask-thread` that scrolls, and a `.ask-foot` that does
+   not — the field is always where you left it. §21 ships all of it, and the
+   floating dock at the foot of every page is the thing that opens it (the
+   design system already hides the dock while an ask page is present).
+
+   NOTHING IN HERE KEEPS STATE IN THE DOM, which is `hifi/`'s rule for anything
+   inside Tal and the reason this file can render the whole frame every time.
+   The conversation is `S.thread`, the pending answer is `S.typing`, and the
+   page you opened from is `S.askFrom`. The one thing that is DOM state is the
+   caret, and `ASK_FOCUS` is how it survives a render — see the note there.
+
+   THE THREE PIECES OF hifi's DESIGN THAT ARE KEPT VERBATIM, because they are
+   decisions that file argues for at length and re-deciding them would give this
+   portal a fourth Tal:
+
+     the empty state is a HERO, not a bubble. A bubble is a TURN, and nothing
+     has been said yet — so a greeting in one opens the thread already one
+     message deep and makes the first thing you do reading rather than typing.
+     `.tal-hero` with `.tal-mk.lg.orb` is the largest mark in the product and
+     §40 is what animates it.
+
+     the suggestions live in the FOOT and go the moment you ask. They are an
+     offer while the thread is empty; over a conversation they are a second
+     conversation running alongside the first.
+
+     the bubble names its speaker ABOVE what they said, and the two speakers
+     use one component. `askBubble` here is `askBubble` there.
+   ========================================================================== */
+
+/* THE ANSWERS ARE LOOKED UP ACROSS THE WHOLE TABLE, not in the current page's
+   list. A chip printed on one page can name a question that lives in another
+   page's set — the dashboard offers "how is the report written", which is an
+   Interviews question — and searching only the current list is what made Tal
+   open empty when asked from the dashboard. */
 const talAnswer = q => Object.values(TALQ).flat().find(e => e[0] === q);
 
-function talSheet(){
-  const qs = TALQ[S.view] || TALQ.dashboard;
-  const a = talAnswer(S.talQ);
-  return `<div class="modal ${S.tal ? 'on' : ''}" data-close="tal">
-    <div class="sheet">
-      <div class="sheet-h"><h2>Ask Tal</h2>
-        <button class="x" data-close="tal" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">
-        ${a ? tw(a[0], a[2] ? `<p class="t-body-02">${a[1]}</p>${twLines(a[2])}` : `<p class="t-body-02">${a[1]}</p>`,
-                 a[3] ? twBtn(a[3][0], a[3][1]) : '') : `
-          <div class="ai-aura">
-            <div class="ai-head"><span class="ai-label bare">Tal</span></div>
-            <div class="ai-body"><p>I can read your listing, your interviews, your scores and the money. What do you need?</p></div>
-          </div>`}
-        <span class="tal-sugg">
-          ${qs.filter(q => q[0] !== S.talQ).map(q => askChip(q[0])).join('')}
-        </span>
+/* WHAT TAL SAYS BACK, as the widget the portal already answers in. `tw()` is a
+   titled block with a body and an optional action, and `.tw-top` is what tells
+   §39 the widget OPENS the bubble rather than following a sentence — without it
+   the label sits 34px down against 17px at the sides (trap 16 in CLAUDE.md; in
+   `hifi/` a wrapper stamps it from a prefix test, and here every reply is a
+   widget so it is simply always true).
+
+   AND AN UNKNOWN QUESTION GETS THE HONEST ANSWER. `TALQ` is a table, so most of
+   what somebody types is not in it. Tal says what it can see — the six subjects
+   this portal's Tal has — and offers the page's own questions again. Inventing
+   an answer and printing a helpdesk number are the same failure. */
+const talReply = q => {
+  const a = talAnswer(q);
+  if(!a) return tw('I do not have that one',
+    `<p class="t-body-02">I can read your listing, your interviews, your scores and the money.
+      Ask me about one of those and I will answer off the pages you are looking at.</p>`);
+  return tw(a[0],
+    a[2] ? `<p class="t-body-02">${a[1]}</p>${twLines(a[2])}` : `<p class="t-body-02">${a[1]}</p>`,
+    a[3] ? twBtn(a[3][0], a[3][1]) : '');
+};
+
+/* ONE BUBBLE COMPONENT, TWO SPEAKERS — `hifi/`'s `askBubble`, unchanged except
+   for whose face it is. The speaker is named above what they said rather than
+   beside it, so a long answer does not indent under a label. */
+const askBubble = (who, html) => who === 'me'
+  ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span>
+      <span class="av"><img src="${AV.owen}" alt=""><i>${A.i}</i></span></span>
+      <div class="bb">${html}</div></div>`
+  : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span>
+      <span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
+
+/* "BACK TO …" NAMES THE PAGE, AND THE RAIL ALREADY NAMES EVERY PAGE. Reading it
+   out of `NAVSETS` rather than keeping a second map means a page cannot be
+   renamed in the rail and stay wrong here. Sub-pages answer with their parent's
+   label, which is what the rail marks while you are on them. */
+const askWhere = view => {
+  const nav = f().nav;
+  const key = NAVSETS[nav].some(([k]) => k === view) ? view : parentOf(view, nav);
+  const row = (NAVSETS[nav].find(([k]) => k === key) || [])[1];
+  return row || 'TalentNext';
+};
+
+/* THE LINE IN THE TOP-RIGHT IS THE STAGE, IN ONE PHRASE. `hifi/` prints where
+   the candidate is in their 90 days; the agent's equivalent is where they are in
+   being enabled, which is the same fact the stepper draws. */
+const askState = v => v.busy ? `Agent – ${v.level} · ${v.month} interviews this month`
+  : v.certified ? `Agent – ${v.level} · listed, nothing booked`
+  : v.approved ? 'Approved, not yet certified'
+  : v.sent ? 'Application in review' : 'Application not sent';
+
+function askView(v){
+  const opened = S.thread.length > 0;
+  const qs = (TALQ[S.askFrom] || TALQ.dashboard).map(q => q[0]);
+  const hero = `<div class="tal-hero">
+      <span class="tal-mk lg orb"></span>
+      <h2>Hello <b>${A.n.split(' ')[0]}</b>, I am Tal &#128075;</h2>
+      <p>I can read your listing, your interviews, your scores and the money. What do you need?</p>
+    </div>`;
+  const thread = (opened ? '' : hero)
+    + S.thread.map(m => askBubble(m.who, m.html)).join('')
+    + (S.typing ? askBubble('tal', '<div class="ai-stream"><i></i><i></i><i></i></div>') : '');
+
+  return `<div class="page ask-page">
+    <div class="ask-top">
+      <button class="ph-back" data-askback="1" aria-label="Back to ${askWhere(S.askFrom)}">${I.arrowLeft}</button>
+      <span class="ask-top-t">Back to ${askWhere(S.askFrom)}</span>
+      <span class="ask-top-s">${askState(v)}</span>
+    </div>
+    <div class="ask-thread" id="askThread">${thread}</div>
+    <div class="ask-foot">
+      ${opened ? '' : `<div class="ask-sugg">${qs.map(q => askChip(q)).join('')}</div>`}
+      <div class="askfield">
+        <span class="askline-mark"><span class="tal-mk sm"></span></span>
+        <input class="inp" id="askIn" placeholder="Ask anything" autocomplete="off">
+        <button class="askfield-send" data-asksend="1" aria-label="Send">${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
+}
+
+/* --------------------------------------------------------------------------
+   ASKING, AND THE TWO FLAGS THAT MAKE IT FEEL LIKE A CONVERSATION
+
+   THE ANSWER ARRIVES AFTER THE QUESTION, not with it. Pushing both turns in one
+   render draws Tal replying before you have seen your own message land, which
+   reads as a canned response rather than an answer. So: push the question, set
+   `S.typing`, render — that paints the three-dot stream `hifi/` uses — then push
+   the answer and render again. The timer holds no DOM reference, so a close or
+   another question mid-flight cannot leave it writing into a page that is gone;
+   `S.thread` is the only thing it touches.
+
+   `ASK_FOCUS` IS THE CARET, AND IT IS THE ONE PIECE OF DOM STATE HERE. Every
+   render reprints the frame, so the field is a new element and the caret is
+   lost. `hifi/` avoids this by building the ask page once and patching bubbles
+   into it; this portal has no render passes and rebuilds the frame, so instead
+   it re-focuses after the paint — but ONLY when a render was caused by asking or
+   opening, never when it was caused by the answer arriving. Stealing the caret
+   back on Tal's turn is what makes a page scroll under you while you read.
+   -------------------------------------------------------------------------- */
+let ASK_FOCUS = false;
+const ASK_WAIT = 520;
+
+function askOpen(q){
+  if(!S.tal){ S.askFrom = S.view; S.tal = true; S.nav = false; }
+  if(q) return ask(q);
+  ASK_FOCUS = true; render();
+}
+
+function askClose(){
+  S.tal = false; S.typing = false; render();
+}
+
+function ask(q){
+  S.thread.push({who: 'me', html: `<p>${q}</p>`});
+  S.typing = true;
+  ASK_FOCUS = true;
+  render();
+  setTimeout(() => {
+    if(!S.typing) return;          /* closed, or another question overtook it */
+    S.typing = false;
+    S.thread.push({who: 'tal', html: talReply(q)});
+    render();                      /* no ASK_FOCUS — see the note above */
+  }, ASK_WAIT);
 }
 
 /* CONFIRMATION BEFORE ANYTHING THAT CANNOT BE TAKEN BACK — signing a report,
@@ -1722,7 +2230,11 @@ function render(){
   const entered = key !== MO.key;
   MO.key = key;
 
-  const OVER = ['nav', 'tal', 'confirm', 'sheet'];
+  /* `tal` IS NO LONGER AN OVERLAY, so it comes off this list. It used to name a
+     `.modal`, and `data-shown~="tal"` is what §27 keys the panel-open layout on;
+     the ask page is a PAGE, and leaving `tal` in here handed the normal page
+     those rules while the ask page was the thing on screen. */
+  const OVER = ['nav', 'confirm', 'sheet'];
   const opened = OVER.filter(k => S[k] && !MO.open[k]);
   const shown  = OVER.filter(k => S[k]);
   for(const k of OVER) MO.open[k] = !!S[k];
@@ -1737,17 +2249,60 @@ function render(){
     ${shell(v)}
     <div class="shell-body">
       ${sidenav(v)}
+      ${/* THE ASK PAGE REPLACES THE PAGE, and it is the direct child of `.main`
+            rather than a wrapper inside one: §21 gives `.ask-page` `height:100%`
+            and makes it the flex column that owns its own scroller, so an extra
+            `.page` around it would be a second box between it and the height it
+            measures against. `hifi/` assigns `main.innerHTML` for exactly this.
+
+            AND NO DOCK OVER IT. The design system already hides the dock when an
+            ask page is present (`.app:has(.ask-page) .askdock`), but not
+            rendering it is the truer statement: the dock is the invitation to the
+            surface that is now open. */''}
       <div class="view-col">
-        <main class="main"><div class="page">${view(v)}</div></main>
+        <main class="main">${S.tal ? askView(v) : `<div class="page">${view(v)}</div>`}</main>
+        ${S.tal || S.sheet || S.confirm ? '' : askDock()}
       </div>
     </div>
-    ${talSheet()}${confirmSheet()}${editSheet()}
+    ${confirmSheet()}${editSheet()}
   </div>`;
 
-  dsStagger(device.querySelector('.page'));
+  /* THE STEPS PANEL STAYS WHERE IT IS RENDERED. Two lines used to live here —
+     the same two `views.js` ended on — moving `.stp-all` and `.stp-overlay` out
+     into `.device`, because the panel was `position:fixed` and `.device` carries
+     `container-type:inline-size`, which makes it the containing block for a
+     fixed descendant: a popup declared in the band was measured against the
+     band and clipped by it, three of five steps cut off mid-row. All of that
+     followed from `fixed`. §33.7 makes it an absolutely-positioned dropdown on
+     `.stp`, and nothing between `.stp` and the page's scroller clips —
+     `.modhead` and `.ai-aura` are both `overflow:visible` — so there is nothing
+     left to escape and nothing left to move. */
+
+  /* THE CASCADE IS STAMPED ON THE SECTIONS, not on every child, which is the
+     portal's own list. With the head band now one element, stamping blindly
+     would give the whole band a single step and then start the count again. */
+  const app = device.querySelector('.app');
+  if(app.hasAttribute('data-enter')){
+    device.querySelectorAll('.page > .modhead, .page > .sec, .page > .ph, .page > .tabs')
+      .forEach((el, i) => el.style.setProperty('--i', Math.min(i, 7)));
+  }
+  /* THE THREAD ENDS AT THE BOTTOM, ALWAYS. `.ask-thread` is its own scroller, so
+     a rebuilt frame opens it at the top and the newest message — the one you are
+     waiting for — is the one off screen. Set without smoothing: this is not the
+     thread scrolling, it is the thread being drawn where it already was. */
+  const th = device.querySelector('#askThread');
+  if(th) th.scrollTop = th.scrollHeight;
+
+  /* AND THE CARET GOES BACK, but only when this render was caused by you — see
+     the note above `ASK_FOCUS`. The flag is consumed here so the next render,
+     which is Tal's answer arriving, does not take it back off what you are
+     reading. */
+  if(ASK_FOCUS){
+    ASK_FOCUS = false;
+    const el = device.querySelector('#askIn');
+    if(el) el.focus();
+  }
   document.getElementById('pick').value = S.stage;
-  const st = STAGES.find(s => s[0] === S.stage);
-  document.getElementById('cap').innerHTML = st ? `<b>${st[1]}.</b> ${st[2]}` : '';
 }
 
 /* --------------------------------------------------------------------------
@@ -1763,8 +2318,49 @@ device.addEventListener('click', e => {
   if(t) S.iv = t.dataset.iv;
 }, true);
 
+/* CLICKING AWAY CLOSES THE STEPS DROPDOWN — a listener of its own, which is
+   what the scrim used to do. The overlay carried `data-stp`, so pressing it ran
+   the router's toggle branch; with no overlay the close has to come from the
+   ABSENCE of a hit inside `.stp`, and that is not something the router can hold:
+   every branch there begins `if(d.something)`, and this one is "nothing was
+   clicked". Guarding on `.stp` covers the toggle too, so the two can never both
+   fire, and the state check means a click on a page with no panel open costs one
+   `closest` and nothing else. */
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-ask],[data-tab],[data-confirm],[data-sheet],[data-stp]');
+  if(!S.stp || e.target.closest('.stp')) return;
+  S.stp = false; render();
+});
+
+/* TAL'S OWN CONTROLS, IN A LISTENER OF THEIR OWN. Three of the four are on a
+   surface the router never sees anything else from, and the fourth — the chip —
+   appears both there and on the dock's own line; keeping them together means the
+   ask page reads in one place rather than as four branches spread through the
+   page router. `data-ask` carries the question, so a chip is "ask this", which
+   opens the page first when it is not open yet. */
+device.addEventListener('click', e => {
+  if(e.target.closest('[data-askopen]')){ return askOpen(); }
+  if(e.target.closest('[data-askback]')){ return askClose(); }
+  const chip = e.target.closest('[data-ask]');
+  if(chip){ return askOpen(chip.dataset.ask); }
+  if(e.target.closest('[data-asksend]')){
+    const el = device.querySelector('#askIn');
+    const q = el && el.value.trim();
+    if(q){ el.value = ''; ask(q); }
+    return;
+  }
+});
+
+/* ENTER SENDS, which is the only keyboard the field needs. The value is read off
+   the event's own target rather than looked up, because this fires before the
+   render that replaces it. */
+device.addEventListener('keydown', e => {
+  if(e.target.id !== 'askIn' || e.key !== 'Enter') return;
+  const q = e.target.value.trim();
+  if(q){ e.target.value = ''; ask(q); }
+});
+
+device.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp]');
   if(!t) return;
   const d = t.dataset;
 
@@ -1775,22 +2371,28 @@ device.addEventListener('click', e => {
      backdrop itself counts; a real control matches as itself and closes. */
   if(d.close){
     if(t.classList.contains('modal') && e.target !== t) return;
-    S[d.close] = false; if(d.close === 'tal') S.talQ = null;
+    S[d.close] = false;
     return render();
   }
-  if(d.toggle){ S[d.toggle] = !S[d.toggle]; if(d.toggle === 'tal') S.talQ = null; return render(); }
+  /* `data-toggle="tal"` IS THE APP BAR'S TAL BUTTON, and it opens the ask page
+     rather than flipping a flag. It has to go through `askOpen` for the same
+     reason the dock does: `S.askFrom` is what "Back to …" names, and a raw
+     toggle would leave it on whichever page Tal was last opened from. */
+  if(d.toggle === 'tal'){ return S.tal ? askClose() : askOpen(); }
+  if(d.toggle){ S[d.toggle] = !S[d.toggle]; return render(); }
   if(d.confirm){ S.confirm = d.confirm; return render(); }
   if(d.sheet){ S.sheet = d.sheet; return render(); }
-  /* A CHIP ON A PAGE AND A CHIP IN THE SHEET ARE THE SAME CONTROL. Both carry
-     `data-ask`, and asking opens Tal if Tal is not already open — which is
-     what makes an `askChip` on a page an offer rather than a dead end. */
-  if(d.ask){ S.talQ = d.ask; S.tal = true; return render(); }
   if(d.tab){ S.tab = d.tab; return render(); }
-  /* THE STEPS POPUP. `.stp-all` is promoted to a centred overlay inside the
-     head band, so the toggle and the scrim behind it are one flag on `S`. */
+  /* THE STEPS DROPDOWN — one flag, and §33.7 hangs the panel off the toggle. */
   if(d.stp !== undefined){ S.stp = d.stp === '1'; return render(); }
   if(d.go){
-    S.view = d.go; S.nav = false; S.tal = false; S.talQ = null;
+    /* GOING SOMEWHERE LEAVES TAL, AND THE THREAD SURVIVES IT. `S.tal` is the
+       surface, `S.thread` is the conversation — a widget's action button
+       ("Open Standing", "Open the report") is a `data-go` inside a bubble, so
+       clearing the thread here would delete the answer that sent you. Coming
+       back to Tal picks the conversation up where it was, which is what the
+       other two portals do. */
+    S.view = d.go; S.nav = false; S.tal = false; S.typing = false;
     if(d.go === 'interviews') S.tab = 'next';
     render();
     device.querySelector('.main').scrollTop = 0;
@@ -1808,16 +2410,25 @@ device.addEventListener('change', e => {
    PROTOTYPE CHROME
    -------------------------------------------------------------------------- */
 document.getElementById('ptLogo').innerHTML = `<img src="${LOGO_W}" alt="TalentNext">`;
+/* The stage's sentence is the option's `title` — see the note where `.pt-cap`
+   used to be. Nothing in the product reads it; it is the picker explaining what
+   choosing a stage will do. */
 document.getElementById('pick').innerHTML =
-  STAGES.map(s => `<option value="${s[0]}">${s[1]}</option>`).join('');
+  STAGES.map(s => `<option value="${s[0]}" title="${s[2].replace(/"/g, '&quot;')}">${s[1]}</option>`).join('');
 
 document.getElementById('pick').onchange = e => {
+  /* AND THE THREAD GOES WITH THE STAGE. Changing stage is changing WHO is signed
+     in — a different month, a different level, different figures — and Tal's
+     answers are read off those. A conversation carried across would be quoting
+     numbers the portal no longer shows. */
   S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
+  S.thread = []; S.typing = false; S.askFrom = 'dashboard'; S.stp = false;
   render();
 };
 document.getElementById('reset').onclick = () => {
-  S.view = 'dashboard'; S.nav = false; S.tal = false; S.talQ = null;
-  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael';
+  S.view = 'dashboard'; S.nav = false; S.tal = false;
+  S.thread = []; S.typing = false; S.askFrom = 'dashboard';
+  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael'; S.stp = false;
   render();
 };
 
@@ -1833,9 +2444,15 @@ function fitFrame(){
   const stage = fitBox.parentElement;
   const pct = document.getElementById('vpscale');
   if(vp === 'fluid'){
+    /* NOTHING IS SUBTRACTED FROM THE HEIGHT. This read `- 64`, which was the
+       room the caption row needed under the frame. Deleting the caption without
+       deleting its 64px left the desktop preview ending short of the window
+       with an empty white band below it — the row was gone and the gap it sat
+       in was not. Desktop is not a device: it has no bezel and takes the whole
+       stage, so it ends where the window does. */
     device.style.transform = 'none';
     device.style.width = '100%';
-    device.style.height = Math.max(520, window.innerHeight - stage.getBoundingClientRect().top - 64) + 'px';
+    device.style.height = Math.max(520, window.innerHeight - stage.getBoundingClientRect().top) + 'px';
     fitBox.style.width = '100%';
     fitBox.style.height = device.style.height;
     if(pct) pct.textContent = Math.round(stage.clientWidth) + 'px';
@@ -1865,6 +2482,11 @@ window.addEventListener('resize', fitFrame);
 
 render();
 fitFrame();
+
+/* ONE INTERVAL FOR THE LIFE OF THE PAGE, started after the first render so
+   there is something for it to edit. It looks the span up every tick and does
+   nothing when an overlay has taken the dock away — see `askRotate`. */
+if(!ASK_ON){ ASK_ON = true; setInterval(askRotate, ASK_ROT_MS); }
 </script>
 </body>
 </html>

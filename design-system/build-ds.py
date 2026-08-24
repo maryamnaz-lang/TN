@@ -58,10 +58,11 @@ LAYERS = [
     # hold is that it IS build.py's list: a layer missing from here is not
     # visibly missing, it is quietly never considered.
     '39-talwidget.css',
-    # The empty-state orb. `.tal-hero .tal-mk.orb` — `tal` is a PRODUCT prefix,
-    # so under the include-by-default policy it comes across; the keyframes it
-    # declares are `tal-orb-track-lg`, beside §27's. Listed for the same reason
-    # as the layer above: this list's whole job is to BE build.py's list.
+    # The empty state's sphere. `.tal-hero .tal-mk.orb` — `tal` is a PRODUCT
+    # prefix, so under include-by-default it comes across, along with the one
+    # keyframe set it declares (`tal-sphere-glow-lg`, beside §33's 32px pair).
+    # Listed for the same reason as the layer above: this list's whole job is
+    # to BE build.py's list.
     '40-talorb.css',
 ]
 
@@ -237,17 +238,28 @@ b-earn b-earn-t b-mk b-n b-nm b-pts b-who fa-b fa-dl fa-ic
 # because the thing it draws is assembled by a render pass over portal state.
 # "Belongs to one screen" is NOT a reason any more; unused CSS costs a rule.
 # ==========================================================================
+# ==========================================================================
+# `ask*`, `bk*` AND `scene*` CAME OFF THIS LIST, and the reason they were on it
+# was the same mistake as the original allowlist, made one level down.
+#
+# The argument was "Tal's thread is rebuilt from `S.thread` by a render pass,
+# so a second portal cannot hand-author it". True of the THREAD. Not true of
+# the family: `.askdock > .askline` is the floating "Ask Tal anything" bar at
+# the foot of every page — a static bar with a mark, a label, a sample
+# question and a send glyph. It works standalone, it is one of the most
+# recognisable things on the product, and excluding its whole prefix took it
+# out of the design system entirely. Maryam asked where it was; it was in the
+# exclusion list.
+#
+# Same for `bk*` (the booking card's own chrome) and `scene*` (the picker's
+# stills). Some of what ships now needs JS to DO anything. That is fine and it
+# is not the test. The test is whether excluding it can cost a portal the look,
+# and for anything that draws something on screen the answer is yes.
+#
+# So the list is down to four families, and each is genuinely a different
+# product rather than a component of this one.
+# ==========================================================================
 EXCLUDE_PREFIXES = (
-    # Tal's full-page thread. `placeAsk` (ai4) rebuilds the entire `.ask-page`
-    # from `S.thread` on every render and nothing in it may hold DOM state, so
-    # the markup is not something a second portal can hand-author.
-    'ask', 'askdock', 'askbar', 'askfield', 'askline',
-    # Booking an interview inside that thread — the same argument, one layer
-    # further in: `ai7` fills empty `.bkw` hosts that `placeAsk` printed.
-    'bk', 'bkw', 'sb-',
-    # The scene picker: `38-scene.css` draws stills that `nil.js`-style JS
-    # swaps, and every selector is `.scene*`.
-    'scene',
     # The sign-up front door. Namespaced by an explicit product decision —
     # orange is the front door only, and nothing past login may reach for it —
     # and it carries two large artwork files this stylesheet should not ship.
@@ -835,6 +847,46 @@ function dsStagger(page){
     jsout.write_text(body)
     print(f'brand assets embedded: {n_img} images')
     print(f'{jsout.name}  {len(body)/1024:.0f} KB')
+
+    # ======================================================================
+    # CACHE-BUST THIS FOLDER'S OWN PAGES
+    # The stylesheet's URL never changes, so a browser that has seen it once
+    # keeps serving the old copy after a rebuild — and the failure is silent
+    # and very convincing: the reference page renders a component unstyled and
+    # it looks like the design system is missing it. That happened with the
+    # floating Tal bar: 2774 rules loaded against a 3285-rule build, and the
+    # dock came out as raw text and a giant arrow.
+    #
+    # So the build stamps a content hash onto the links in its own three
+    # pages. A portal of your own should do the same, or hard-reload after a
+    # rebuild — `?b=` is not magic, it is just a URL the browser has not
+    # cached yet.
+    # ======================================================================
+    import hashlib
+    stamp = hashlib.sha1(css.encode() + body.encode()).hexdigest()[:8]
+    stamped = 0
+    # EVERY HTML FILE IN THIS FOLDER, discovered rather than listed. The first
+    # version named three files, and `proof-tal.html` was written afterwards —
+    # so the one page whose whole job is to show Tal was the one page left
+    # serving a cached stylesheet after a rebuild. A hardcoded list of pages
+    # has the same failure mode as a hardcoded list of layers: what is missing
+    # from it is not visibly missing.
+    for f in sorted(HERE.glob('*.html')):
+        txt = f.read_text()
+        # ONLY THE REAL LINKS, NOT THE PROSE. The first version of this matched
+        # the bare filename anywhere in the file, so it rewrote the copy-paste
+        # snippet in the gallery's own "Two files" example too — the page then
+        # told the reader to type `?b=8f52743f`, which is an internal build
+        # detail and wrong in their portal. The documented paths carry the
+        # `design-system/` prefix and the live links do not, so requiring the
+        # attribute form and excluding that prefix separates them exactly.
+        new_txt = re.sub(
+            r'((?:href|src)=")(?!design-system/)(talentnext-ds\.(?:css|js))(?:\?b=[0-9a-f]+)?"',
+            lambda m: f'{m.group(1)}{m.group(2)}?b={stamp}"', txt)
+        if new_txt != txt:
+            f.write_text(new_txt)
+            stamped += 1
+    print(f'cache-bust stamp {stamp} written into {stamped} page(s)')
 
     # ======================================================================
     # WHAT WAS LEFT OUT

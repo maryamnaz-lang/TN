@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tal, complete — the bar and what it opens</title>
+<link rel="stylesheet" href="talentnext-ds.css?b=a5330404">
+<style>
+/* WHAT THIS PAGE IS FOR.
+   Tal's full component, both states, hand-authored with NO portal JS beyond
+   a click handler that swaps which state is shown. The floating bar and the
+   full-height chat are ONE component with two states, and the gallery can
+   only show the bar inline — a full-height page has to be proven as a page.
+
+   Every block is the real DOM, read off the running portal with
+   `document.querySelector('.ask-page').outerHTML`. Do not hand-edit it;
+   re-read the DOM.
+
+   THE CLICK STATE IS NOT A MODAL. `.askline` does not open `.modal` — it
+   replaces the page with `.page.ask-page`. A portal that reaches for a modal
+   here has the wrong component, which is what happened before this was
+   written down. */
+.host{position:relative;width:100%;height:100dvh;
+  container-type:inline-size;container-name:app;
+  overflow:hidden;background:var(--background)}
+</style>
+</head>
+<body>
+<div class="host"><div class="app" id="app" data-view="dashboard">
+
+  <header class="shell">
+    <button class="shell-act nav-t" aria-label="Menu">
+      <span class="nav-t-mark"></span><span class="nav-t-menu"></span>
+    </button>
+    <a class="shell-logo"><img src="" id="logo" alt="TalentNext"></a>
+    <div class="shell-right"><span class="shell-name">Explorer – E3, day 34 of 90</span></div>
+  </header>
+
+  <div class="shell-body">
+    <main class="main">
+
+      <!-- ============ STATE 1: the page, with the floating bar ============ -->
+      <div class="page" id="restState">
+        <div class="modhead">
+          <div class="ph">
+            <div class="ph-main">
+              <div class="ph-top"><h1>Welcome Back, Maryam!</h1></div>
+              <p>Explorer Track – E3 &middot; Cohort 41 &middot; week 5 of 13</p>
+            </div>
+          </div>
+          <div class="sec">
+            <div class="ai-aura tile tight talsum">
+              <div class="ai-head"><span class="ai-label">Tal</span></div>
+              <div class="ai-body"><p>Day 34 of 90, week 5. 5 of 13 chapters at 88%.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sec-h"><h2>This week</h2></div>
+          <p class="t-body-02">Click the bar at the foot of the frame.</p>
+        </div>
+      </div>
+
+      <!-- ============ STATE 2: what the bar opens ============
+           `.page.ask-page` — a full-height column: a back row, a scrolling
+           thread, and a pinned foot. `.ask-in` is the entry animation.
+           `data-n` on the thread is the message count; the hero shows at 0. -->
+      <div class="page ask-page ask-in" id="chatState" hidden>
+        <div class="ask-top">
+          <button class="ph-back" id="back" aria-label="Back to Dashboard"></button>
+          <span class="ask-top-t">Back to Dashboard</span>
+          <span class="ask-top-s">Explorer – E3, day 34 of 90</span>
+        </div>
+
+        <div class="ask-thread" id="thread" data-n="0">
+          <!-- the empty state. `.tal-mk.lg.orb` draws the sphere with its own
+               ::before (an SVG) and a ::after ring — the element's own
+               background-image is deliberately `none`, and the whole thing only
+               paints inside `.tal-panel` or `.ask-thread`. -->
+          <div class="tal-hero">
+            <span class="tal-mk lg orb"></span>
+            <h2>Hello <b>Maryam</b>, I am Tal &#128075;</h2>
+            <p>I am here to assist you with anything you need help with. What&rsquo;s going on?</p>
+          </div>
+        </div>
+
+        <div class="ask-foot">
+          <div class="ask-sugg" id="sugg">
+            <button class="chip-tal"><span class="sk-mark xs"></span>What should I do next?</button>
+            <button class="chip-tal"><span class="sk-mark xs"></span>How am I doing overall?</button>
+            <button class="chip-tal"><span class="sk-mark xs"></span>Explain the 90-day cycle</button>
+          </div>
+          <div class="askfield">
+            <span class="askline-mark"><span class="tal-mk sm"></span></span>
+            <input class="inp" id="askIn" placeholder="Ask anything" autocomplete="off">
+            <button class="askfield-send" id="send" aria-label="Send"></button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- the floating bar. Page chrome, so it sits inside `.app` beside
+       `.shell-body` — `.app .askdock` is absolute against `.app`. -->
+  <div class="askdock" id="dock">
+    <button class="askline" id="openChat" aria-label="Ask Tal anything">
+      <span class="askline-mark"><span class="tal-mk"></span></span>
+      <span class="askline-t">Ask Tal anything</span>
+      <span class="askline-q" aria-hidden="true">&ldquo;How do I compare with my cohort?&rdquo;</span>
+      <span class="askline-send" id="dockSend" aria-hidden="true"></span>
+    </button>
+  </div>
+
+</div></div>
+
+<script src="talentnext-ds.js?b=a5330404"></script>
+<script>
+document.getElementById('logo').src = LOGO_K;
+document.getElementById('back').innerHTML = I.arrowLeft;
+document.getElementById('send').innerHTML = I.arrowUp;
+document.getElementById('dockSend').innerHTML = I.arrowUp;
+document.querySelector('.nav-t-mark').innerHTML = TN_MARK;
+document.querySelector('.nav-t-menu').innerHTML = I.menu;
+
+const rest = document.getElementById('restState');
+const chat = document.getElementById('chatState');
+const dock = document.getElementById('dock');
+const thread = document.getElementById('thread');
+
+/* THE ONE BEHAVIOUR THE COMPONENT NEEDS: the bar swaps the page for the chat,
+   and the dock hides while the chat is open — the chat has its own field, so
+   two would be two. This is the whole state machine; everything else about
+   Tal's flow is the portal's own render pass and not part of the system. */
+function setChat(open){
+  rest.hidden = open;
+  chat.hidden = !open;
+  dock.hidden = open;
+  if(open) chat.classList.add('ask-in');
+}
+document.getElementById('openChat').onclick = () => setChat(true);
+document.getElementById('back').onclick = () => setChat(false);
+
+/* A message pair, so the thread's populated state is provable too. `.me` is
+   the candidate's own turn — it flips the byline to name-then-avatar. */
+function say(q){
+  thread.innerHTML = `
+    <div class="tal-msg me">
+      <span class="tal-who"><span class="tal-who-n">You</span>
+        <span class="av av-ph"><img src="${AV.hana}" alt=""><i>MN</i></span></span>
+      <div class="bb">${q}</div>
+    </div>
+    <div class="tal-msg">
+      <span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span>
+      <div class="bb">
+        <span class="tw tw-top">
+          <span class="tw-h">Next</span>
+          <span class="tw-lede">Finish chapter 4 before Thursday</span>
+          <span class="tw-k">You are 58 minutes and one assessment behind the three
+            furthest ahead in Cohort 41, and chapter 4 is the growth area in your
+            report — so it is the one worth the extra time.</span>
+          <span class="tw-a">
+            <button class="tw-btn">Open chapter 4 ${I.arrowRight}</button>
+            <button class="tw-btn ghost">Show me the cohort</button>
+          </span>
+        </span>
+      </div>
+    </div>`;
+  thread.setAttribute('data-n', '2');
+}
+document.getElementById('sugg').onclick = e => {
+  const b = e.target.closest('.chip-tal');
+  if(b) say(b.textContent.trim());
+};
+document.getElementById('send').onclick = () => {
+  const v = document.getElementById('askIn').value.trim();
+  if(v){ say(v); document.getElementById('askIn').value = ''; }
+};
+</script>
+</body>
+</html>
