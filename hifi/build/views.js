@@ -620,7 +620,7 @@ const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span
    `I.talChat` and not `I.chat`: the mark is Maryam's, traced — the note in
    icons.js says why the two are different icons and why the rail keeps the
    Material one. */
-const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal">${I.talChat}<span class="tal-fab-t">Tal</span></button>`;
+const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal"><svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg><span class="tal-fab-t">Tal</span></button>`;
 
 /* ============================================================
    PICTOGRAMS — IBM Design Language line art. Carbon ships icons,
@@ -1239,10 +1239,11 @@ function stepper(id, steps, flush, title){
     <div class="stp-now">
       <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
     </div>
-    <div class="stp-all"><div class="pi" style="padding:0">
+    ${open?`<div class="stp-overlay" data-stp="${id}"></div>`:''}
+    <div class="stp-all"><div class="stp-pop"><h3 class="stp-pop-h">${title||'Where you are'}</h3><div class="pi" style="padding:0">
       ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
         <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
-    </div></div>
+    </div></div></div>
   </div>`;
 }
 
@@ -1493,7 +1494,17 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
-        <div class="ai-body"><p>You are all set up. A talent consultant, <b>Jordan</b>, will call for a quick fifteen-minute chat to get to know you and point you in the right direction. Nothing to prepare, and it does not set your level.</p></div>
+        <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in &mdash; peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
+        <div class="stp-wing">
+          ${stepper('whereConsult',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 3'},
+            {st:'done',lab:'Account created',sec:'Aug 12'},
+            {st:'on',  lab:'Consultant call',sec:'Jordan Blake &middot; Thu, Aug 13 &middot; 15 minutes'},
+            {st:'',    lab:'Interview with an agent',sec:'Sets your level &middot; 45 minutes'},
+            {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
+            {st:'',    lab:'Enroll and start your 90 days'}
+          ],1,'Where you are')}
+        </div>
         <div class="ai-foot">
           ${askChip('What happens on the consultant call?','What happens on the call?')}
           ${askChip('Show me my quiz results','Show my quiz results')}
@@ -1534,21 +1545,6 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${''/* AND THE SAME ORDER ON THIS STAGE — see the note on `new`.
-          Where you are, then what the quiz decided. The stepper is white for
-          the reason it is white there, and losing the tint is also what puts
-          its closing rule back inside the page gutter (§18 gives a FILLED
-          block a wall-to-wall edge). One change, both effects. */}
-    <div class="sec sec-stp">
-      ${stepper('whereConsult',[
-        {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 3'},
-        {st:'done',lab:'Account created',sec:'Aug 12'},
-        {st:'on',  lab:'Consultant call',sec:'Jordan Blake · Thu, Aug 13 · 15 minutes'},
-        {st:'',    lab:'Interview with an agent',sec:'Sets your level · 45 minutes'},
-        {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
-        {st:'',    lab:'Enroll and start your 90 days'}
-      ],1,'Where you are')}
-    </div>
     ${quizResults('3 Aug', 'the interview decides it')}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
@@ -1567,33 +1563,19 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p><b>Book your interview.</b> Three agents have slots this week. Booking early usually means starting in 10 days rather than 4 weeks.</p></div>
+        <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
+        <div class="stp-wing">
+          ${stepper('whereNew',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 12'},
+            {st:'on',  lab:'Interview with an agent',sec:'Not booked yet &middot; 45 minutes'},
+            {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
+            {st:'',    lab:'Enroll and start your 90 days'}
+          ],1,'Where you are')}
+        </div>
         <div class="ai-foot noline">
           <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
-    </div>
-    ${''/* WHERE YOU ARE COMES BEFORE THE AGENTS ON THIS STAGE.
-          Everywhere else the stepper is a footnote under the thing you were
-          asked to do, so it sits last and takes the tint that marks supporting
-          material. Here it is doing the opposite job: nothing is booked yet, so
-          the reader's first question is where they are in the journey, and the
-          three agent cards are the answer to the second. Orientation first,
-          then the choice.
-
-          It carries no `tint` for the same reason. Filled, it read as an aside
-          to the block above it — and there is no block above it now but the
-          page head, which is not a thing this annotates. On the base ground it
-          reads as the page's own first statement, which is what it now is.
-          The other dashboard stages keep the tint: there the stepper still
-          follows a plate or a card and is still a footnote to it. */}
-    <div class="sec sec-stp">
-      ${stepper('whereNew',[
-        {st:'done',lab:'Leadership quiz',sec:'Explorer track · Aug 12'},
-        {st:'on',  lab:'Interview with an agent',sec:'Not booked yet · 45 minutes'},
-        {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
-        {st:'',    lab:'Enroll and start your 90 days'}
-      ],1,'Where you are')}
     </div>
     <div class="sec">
       <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
@@ -1615,15 +1597,26 @@ V.dashboard = (f) => {
   else if(S.stage==='booked') body = `
     ${ph('Welcome back, Maryam','Explorer track &middot; interview 20 August &middot; no level yet')}
     <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
+        <div class="stp-wing">
+          ${stepper('whereBooked',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
+            {st:'done',lab:'Interview booked',sec:'Priya Nair &middot; Thu, Aug 20'},
+            {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
+            {st:'',    lab:'Enroll and start your 90 days'}
+          ],1,'Where you are')}
+        </div>
+        <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
+          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      </div>
+    </div>
+    <div class="sec">
       <div class="plate">
         <div class="plate-who">${avatar(AGENTS.priya,56)}
           <span class="plate-wb"><b>Priya Nair</b><span>Talent agent &middot; assesses Explorer</span></span>
         </div>
-        ${''/* NO "NEXT UP" EYEBROW — the same argument the weekly-call plate
-              already carries a few lines up. This is the only appointment on
-              the page, and the card names it on the very next line; a label
-              saying it is the next one is a category over a set of one. The
-              time it used to be paired with is in the card's own body. */}
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
         <div class="plate-a">
@@ -1632,34 +1625,26 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    <div class="sec">
-      <div class="ai-aura tile">
-        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p><b>Prepare one delegation story.</b> It is the question this agent asks most often. Ten minutes of practice is usually enough.</p></div>
-        <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
-          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
-      </div>
-    </div>
-    ${''/* WHITE HERE TOO, FOR THE REASON THE `new` STEPPER IS WHITE — and
-          taking the tint off is also what fixes the rule under it. §18 gives
-          a FILLED block a wall-to-wall bottom edge, on the argument that a
-          block with its own ground owns its own boundary; unfilled, the same
-          section falls back to §18's inset rule, which pays the page gutter
-          like every other divider on the page. So the two asks here are one
-          change: the tone was what was making the line run edge to edge. */}
-    <div class="sec sec-stp">
-      ${stepper('whereBooked',[
-        {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
-        {st:'done',lab:'Interview booked',sec:'Priya Nair · Thu, Aug 20'},
-        {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
-        {st:'',    lab:'Enroll and start your 90 days'}
-      ],1,'Where you are')}
-    </div>
     ${''/* on this stage the "what sets it" answer has a name and a date on it */}
     ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
     ${ph('Welcome back, Maryam','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
+    <div class="sec">
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
+        <div class="stp-wing">
+          ${stepper('whereAssessed',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 12'},
+            {st:'done',lab:'Interview with an agent',sec:'Priya Nair &middot; Aug 20'},
+            {st:'done',lab:'Level confirmed',sec:'Explorer &ndash; E3 &middot; rung 3 of 15'},
+            {st:'on',  lab:'Enroll and start your 90 days',sec:'Next cohort starts within two weeks'}
+          ],1,'Where you are')}
+        </div>
+        <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
+      </div>
+    </div>
     <div class="sec">
       <div class="lvl-hero on-dark lvl-foot-card" style="margin:0">
         <div class="big">Explorer &ndash; E3</div>
@@ -1672,13 +1657,6 @@ V.dashboard = (f) => {
             <button class="btn btn-s" data-go="report">Read my report ${I.document}</button>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="ai-aura tile">
-        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p><b>Enroll on Explorer Track &ndash; E3.</b> The next cohort starts within two weeks, and you keep it for all 90 days.</p></div>
-        <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
       </div>
     </div>
     <div class="sec">
@@ -1710,17 +1688,26 @@ V.dashboard = (f) => {
     ${ph('Welcome back, Maryam','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
     ${achBanner()}
     <div class="sec">
-      <div class="lvl-hero" style="margin:0">
-        <div class="eb">Re-interview · 21 November · signed by Priya Nair</div>
-        <div class="big">Explorer &ndash; E4</div>
-        <div class="sub">Promoted from E3 · level 4 of 15</div>
-        ${ladder('E4')}
+      <div class="ai-aura tile">
+        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
+        <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
+        <div class="stp-wing">
+          ${stepper('wherePromoted',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
+            {st:'done',lab:'Interview and level',sec:'E3 &middot; confirmed Aug 21'},
+            {st:'done',lab:'90-day course',sec:'Cohort 41 &middot; 13 chapters &middot; 87% average'},
+            {st:'done',lab:'Re-interview',sec:'Promoted to E4 &middot; Nov 21'},
+            {st:'on',  lab:'Next course &mdash; E4',sec:'Opens December 1'}
+          ],1,'Where you are')}
+        </div>
       </div>
     </div>
     <div class="sec">
-      <div class="ai-aura tile">
-        <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p><b>Explorer Track &ndash; E4 opens on December 1.</b> Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
+      <div class="lvl-hero" style="margin:0">
+        <div class="eb">Re-interview &middot; 21 November &middot; signed by Priya Nair</div>
+        <div class="big">Explorer &ndash; E4</div>
+        <div class="sub">Promoted from E3 &middot; rung 4 of 15</div>
+        ${ladder('E4')}
       </div>
     </div>
     <div class="sec"><div class="btn-set">
@@ -1812,16 +1799,25 @@ V.dashboard = (f) => {
         <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
       </div></div>`:'';
     body = `
-    ${ph('Welcome back, Maryam', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; 90 days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
+    ${ph('Welcome Back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
     ${achBanner()}
     ${reBook}
     <div class="sec">
       <div class="ai-aura tile tight">
         <div class="ai-head">${talLabel()}<h3>${stalling?'Where you are stuck':dueRe?'Before your re-interview':'Getting started'}</h3></div>
         <div class="ai-body"><p>${stalling
-          ?'You have opened chapter 4 four times without finishing it, and it is the growth area in your report. Worth the extra time.'
-          :dueRe?'All thirteen chapters are done and your average is 87%. Book the re-interview and Priya will assess the 90 days against your summary.'
-          :'Chapter 1 unlocks today and your first call is Thursday. Nothing is assessed this week.'}</p></div>
+          ?`Day ${f.day} of 90, week ${f.week}. You&rsquo;ve finished ${f.done} of 13 chapters, averaging ${f.avg}% &mdash; ${f.mins.toLocaleString()} minutes so far. But chapter 4 has been opened four times without finishing. The three furthest ahead in Cohort 41 had it done by now.`
+          :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
+          :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
+        <div class="stp-wing">
+          ${stepper('whereEnrolled',[
+            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
+            {st:'done',lab:'Interview and level',sec:'E3 &middot; confirmed Aug 21'},
+            {st:'done',lab:'Enrolled',sec:'Cohort 41 &middot; started Aug 25'},
+            {st:dueRe?'done':'on', lab:'90-day course',sec:f.finished?`All 13 chapters &middot; ${f.avg}% average`:`Week ${f.week} of 13 &middot; ${f.done} of 13 chapters done`},
+            {st:dueRe?'on':'',     lab:'Re-interview',sec:dueRe?'Due now &mdash; book to have your 90 days assessed':'Sets your next rung'}
+          ],1,'Where you are')}
+        </div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
       </div>
@@ -3971,6 +3967,9 @@ function render(){
     kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
   }
   const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
+  device.querySelectorAll('.stp-overlay, .stp.open > .stp-all').forEach(el => {
+    device.appendChild(el);
+  });
 }
 
 pick.onchange = e => setStage(e.target.value);

@@ -169,32 +169,21 @@ const PAGESUM = {
 
   /* --- the journey ----------------------------------------------------- */
   dashboard: {
-    consult: 'Jordan Blake calls Thursday at 2:00 PM ET &mdash; fifteen minutes, nothing to prepare. Your level comes later, from a 45-minute interview with an agent.',
+    consult: '<span class="tal-greet">Hi Maryam</span>Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
 
-    new: 'Your next step is one 45-minute interview &mdash; it is what turns a track into a level. Three agents have a slot this week, $80 to $95.',
+    new: '<span class="tal-greet">Welcome back, Maryam!</span>You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
 
-    booked: 'Booked with Priya Nair, Thursday 20 August at 6:30 PM ET. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.',
+    booked: '<span class="tal-greet">Welcome back, Maryam!</span>Your interview with Priya is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often; ten minutes of practice is usually enough.',
 
-    assessed: 'Explorer &ndash; E3, level 3 of 15, signed by Priya on 21 August. Delegation and hard conversations are your growth areas; enrolling is the only step left.',
+    assessed: '<span class="tal-greet">Welcome back, Maryam!</span>You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
 
-    week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 unlocks today and your first call is Thursday at 6:00 PM ET &mdash; nothing&rsquo;s assessed this week.`,
+    week1: f => `<span class="tal-greet">Welcome back, Maryam!</span>Day ${f.day} of 90 in Cohort 41. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocks today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it; nothing&rsquo;s assessed this week.`,
 
-    /* THE POINTS FIGURE LEFT THIS LINE. It was the third fact in a
-       three-fact sentence on the one page that has real ones — and points
-       are the only number in the product that changes nothing. Two things
-       are genuinely on this candidate on day 34, and now the sentence is
-       both of them. The chapter is `f.open + 1` rather than a literal so it
-       cannot drift from the stage it is describing. */
-    day34: f => `Day ${f.day} of 90, ${f.done} of 13 chapters at ${f.avg}%. Chapter ${f.open + 1} is unfinished after four attempts, and your week ${f.week - 1} reflection is overdue.`,
+    day34: f => `<span class="tal-greet">Welcome back, Maryam!</span>Day ${f.day} of 90, week ${f.week}. ${f.done} of 13 chapters at ${f.avg}%, ${_n(f.mins)} minutes so far. Chapter 4 has been opened four times without finishing &mdash; the three furthest ahead in Cohort 41 had it done by now.`,
 
-    day90: f => `All 13 chapters done at ${f.avg}%, and Bronze is earned. Your 90-day summary is written &mdash; Priya signs it once you book the re-interview.`,
+    day90: f => `<span class="tal-greet">Welcome back, Maryam!</span>All 13 chapters done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book the re-interview to have Priya assess whether you move up.`,
 
-    /* WHAT REPLACED "AT E4 YOU CAN VOLUNTEER TO LEAD A COHORT". The next
-       track's start date, which is the actual answer to "what now" and was
-       sitting in a hand-written Tal card further down this page — a card
-       whose words `placePageSummary` overwrites, so it had never once been
-       read. See the rule above about the other portal. */
-    promoted: 'Signed by Priya on 21 November &mdash; one level up from where you started. The E4 track opens 1 December, with your growth areas as chapters 3 and 9.',
+    promoted: f => `<span class="tal-greet">Welcome back, Maryam!</span>You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. E4 opens December 1, and at this level you can volunteer to lead a cohort.`,
 
     _: 'Where you stand right now, and anything waiting on you today.'
   },

@@ -48,7 +48,7 @@
 .app .modhead .ai-aura.talsum,
 .app .modhead .ai-aura.talsum.ai-act-top{
   grid-template-columns:minmax(0,1fr);
-  grid-template-areas:'mark' 'title' 'body' 'act' 'asks';
+  grid-template-areas:'mark' 'title' 'body' 'stp' 'act' 'asks';
   row-gap:0}
 
 /* --------------------------------------------------------------------------
@@ -147,11 +147,188 @@
    the two-column template inside one and an unconditional rule cannot
    outrank it however late the layer. See the trap in the handover.
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   6. THE ANIMATED SPHERE
+   The mark becomes a living, breathing orb — a CSS-only gradient sphere
+   with the brand logo in its centre and a spinning glossy highlight on top.
+   The PNG is replaced by layered gradients and an SVG data URI of the
+   three-path brand icon, and two animations give it energy: a pulsing glow
+   on the sphere and a rotating conic highlight that reads as light moving
+   across glass.
+
+   ::before  the sphere itself (gradient + logo, breathing glow)
+   ::after   the spinning highlight (conic gradient, rotates 5s)
+   .sk-mark  hidden — the sphere replaces it
+   -------------------------------------------------------------------------- */
+
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label{
+  position:relative;overflow:visible}
+
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label > .sk-mark{
+  display:none}
+
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  width:32px;height:32px;
+  border-radius:50%;
+  background-color:transparent;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  box-shadow:
+    0 0 8px 1px rgba(244,113,19,0.35),
+    0 0 16px 3px rgba(244,113,19,0.15),
+    inset 0 -2px 5px rgba(0,0,0,0.12),
+    inset 0 2px 5px rgba(246,220,146,0.25);
+  animation:tal-sphere-glow 4s ease-in-out infinite}
+
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{
+  content:'';
+  position:absolute;left:-2px;top:50%;
+  width:36px;height:36px;
+  margin-top:-18px;
+  border-radius:50%;
+  pointer-events:none;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%);
+  animation:tal-sphere-spin 5s linear infinite;
+  filter:blur(0.5px)}
+
+@keyframes tal-sphere-spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}}
+
+@keyframes tal-sphere-glow{
+  0%,100%{
+    box-shadow:
+      0 0 8px 1px rgba(244,113,19,0.35),
+      0 0 16px 3px rgba(244,113,19,0.15),
+      inset 0 -2px 5px rgba(0,0,0,0.12),
+      inset 0 2px 5px rgba(246,220,146,0.25)}
+  50%{
+    box-shadow:
+      0 0 12px 2px rgba(244,113,19,0.5),
+      0 0 24px 5px rgba(244,113,19,0.25),
+      inset 0 -2px 5px rgba(0,0,0,0.12),
+      inset 0 2px 5px rgba(246,220,146,0.25)}}
+
+@media (prefers-reduced-motion:reduce){
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{animation:none}
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{animation:none;opacity:.3}}
+
+/* --------------------------------------------------------------------------
+   7. THE STEPPER WING — MERGED INTO THE TAL CARD
+   The stepper no longer lives as a standalone section in the band. It is
+   inside the `.ai-aura.talsum` card as a `.stp-wing` child, and at desktop
+   the card becomes a two-column grid: summary text on the left, step
+   progress on the right. The card IS the merge — one visual block, one warm
+   wash, one rule under it.
+
+   THE POPUP. "All steps" used to expand `.stp-all` inline, pushing content
+   down. Now `.stp-all` is position:absolute on its parent, dropping down as
+   a white panel with a shadow. Click "Hide steps" or anywhere outside and
+   it re-renders closed (the handler in views.js already toggles `S.piOpen`
+   and calls `render()`).
+   -------------------------------------------------------------------------- */
+
+.app .modhead .ai-aura.talsum > .stp-wing{
+  grid-area:stp;padding:0}
+
+.app .modhead .ai-aura.talsum > .stp-wing > .stp{
+  position:relative;padding:0}
+
+.stp-overlay{
+  position:fixed;inset:0;z-index:99;
+  background:rgba(0,0,0,.18)}
+
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all{
+  display:none;position:fixed;z-index:100;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  min-width:320px;max-width:420px;width:90vw}
+
+.app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{
+  display:flex}
+
+/* LIFTED STATE. The post-render pass in views.js moves .stp-overlay and
+   .stp-all out of .app into .device to escape the overflow:hidden chain
+   (.app → .view-col → .main). Once lifted the .app-scoped show rule above
+   no longer matches, so this standalone rule keeps the panel visible. */
+.device > .stp-all{
+  display:flex;position:fixed;z-index:100;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  min-width:320px;max-width:420px;width:90vw}
+
+.stp-pop{
+  width:100%;padding:var(--s06);
+  background:var(--layer-01);
+  border-radius:12px;
+  box-shadow:0 16px 48px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.08)}
+
+.stp-pop-h{
+  font-size:16px;font-weight:600;line-height:22px;letter-spacing:-.1px;
+  margin:0 0 var(--s05);color:var(--text-primary)}
+
+/* --------------------------------------------------------------------------
+   9. THE GREETING — TAL OWNS THE WELCOME
+   The page header is redundant on dashboard pages: the welcome message is
+   Tal's greeting, placed inside the summary paragraph as a block-level
+   span. The `.ph` stays in the DOM for `placeBand()` to find, but CSS
+   hides it when the greeting is present.
+   -------------------------------------------------------------------------- */
+.app .modhead:has(.tal-greet) > .ph{display:none}
+
+.tal-greet{
+  display:block;
+  font-size:22px;line-height:30px;font-weight:600;letter-spacing:-.3px;
+  color:var(--text-primary);
+  margin-bottom:var(--s04)}
+
+/* --------------------------------------------------------------------------
+   8. DESKTOP — THE TWO-COLUMN CARD
+   At 900px the talsum card splits: text areas on the left, stepper wing on
+   the right. The stepper aligns to the bottom of the card so the progress
+   rail sits level with the summary text. `act` and `asks` (stripped by
+   placePageSummary, but named for safety) span both columns.
+   -------------------------------------------------------------------------- */
 @container app (min-width:900px){
   .app .modhead .ai-aura.talsum,
   .app .modhead .ai-aura.talsum.ai-act-top{
+    grid-template-columns:minmax(0,1fr) minmax(220px,auto);
+    grid-template-areas:'mark stp' 'title stp' 'body stp' 'act act' 'asks asks';
+    column-gap:var(--s06)}
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label{
+    align-self:center;position:relative;overflow:visible}
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label > .sk-mark{display:none}
+  .app .modhead .ai-aura.talsum > .ai-body{margin:var(--s03) 0 0}
+  .app .modhead .ai-aura.talsum > .stp-wing{
+    align-self:center;border-left:1px solid var(--border-subtle-01);padding-left:var(--s06)}
+  .app .modhead .ai-aura.talsum > .stp-wing .stp-top{
+    flex-wrap:wrap;gap:var(--s03)}
+  .app .modhead .ai-aura.talsum > .stp-wing .stp-meter{
+    order:3;width:100%}
+
+  .app .modhead .ai-aura.talsum:not(:has(.stp-wing)),
+  .app .modhead .ai-aura.talsum.ai-act-top:not(:has(.stp-wing)){
     grid-template-columns:minmax(0,1fr);
     grid-template-areas:'mark' 'title' 'body' 'act' 'asks'}
-  .app .modhead .ai-aura.talsum > .ai-head > .ai-label{align-self:center}
-  .app .modhead .ai-aura.talsum > .ai-body{margin:var(--s03) 0 0}
 }

@@ -571,15 +571,13 @@ PAGESUM.dashboard.booked = () => {
      summaries or the one page you reached through the booking flow is the one
      page written by somebody else. The rule they follow is in the note over
      `PAGESUM` in ai6.js: say the thing and stop, no framing, no closing line
-     about what the page is for.
-
-     AND THE CARD IS NOT A FACT A SUMMARY NEEDS. Both of these named the
-     brand and last four — "$95 already paid on a Visa ending 4242" — which
-     is a receipt line, not a catch-up: the instrument matters when you are
-     choosing it or checking a charge, and both of those have their own page.
-     It also contradicted `PAGESUM.billing`, which said no card was kept on
-     file. Paid is the fact; what it was paid with is on Payments. */
-  return `Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
+     about what the page is for. */
+  return `<span class="tal-greet">Welcome back, Maryam!</span>Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
+};
+PAGESUM.booking = () => {
+  const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
+  const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
+  return `Booked &mdash; ${a.n}, ${bkLong()}, ${a.price} on a ${c.brand} ending ${c.last}. The invite and joining link are already in your email, and you can move it from here.`;
 };
 /* AND THIS PAGE IS THE ONE PLACE TAL DOES NOT STATE THE BOOKING.
    The confirmation banner is the first thing under the title and it already
