@@ -90,9 +90,44 @@
    Both surfaces, because a thread that changes shape when it changes surface
    is two threads, which is the argument §27.8 makes for every other rule
    about these bubbles.
+
+   AND `.tw` IS ON THIS LIST, which it should have been from the start — §1
+   above already calls it "the widgets Tal already had" and then left it
+   capped. `.tw` is the same object as `.bkw` for the purpose of this rule: a
+   figure table, not a paragraph. Measured, every widget Tal has ever printed
+   was 160px wide on a 390px phone — `wPoints`' four amounts, `wLadder`'s five
+   rungs, `wAgent`'s 40px portrait and the three lines beside it — because
+   `.tw-lines` is a two-column flex whose left cell is a fixed 58px, so at 55%
+   of the column the right cell gets 76px and a four-word value sets one word
+   to a line. It is not a wrapping bug in any one widget, it is this cap
+   applied to the wrong kind of content, and it is one selector.
+
+   The paragraph half of a turn goes full measure with it. That is the same
+   trade §2 already took for `.bkw`, whose replies are also one sentence and
+   then the widget: at the ask page's measure the sentence is still a
+   comfortable line, and a widget the person cannot read is the worse of the
+   two prices.
+
+   BUT `.tw` KEEPS A CEILING, WHICH `.bkw` DOES NOT NEED. The two widgets fail
+   in opposite directions. `.bkw` is a shortlist of cards and a slot picker —
+   objects with an intrinsic size, which simply stop getting wider once they
+   have what they need, so 100% costs it nothing. `.tw` is a LABEL GRID: a
+   58px cell and then a sentence, and the sentence takes every pixel it is
+   given. Measured at an 823px ask page the widget went 723px, which put "free
+   to move or cancel up to 24 hours before, inside 24 hours the fee is not
+   refundable" on one 660px line — legible, and about twice the measure the
+   rest of the product sets prose at.
+
+   `min(100%, 620px)` is the whole answer, and 620px is not a new number: it
+   is the ceiling §27.8 already put on a Tal bubble, reused rather than
+   guessed. At 390px it resolves to 100% and the widget gets the column, which
+   is the squeeze this rule exists to fix; at desktop it holds the grid at a
+   measure a person reads in one pass.
    ------------------------------------------------------------------------ */
 .app .ask-thread .tal-msg > .bb:has(.bkw),
 .app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%;width:100%}
+.app .ask-thread .tal-msg > .bb:has(.tw),
+.app .tal-panel .tal-msg > .bb:has(.tw){max-width:min(100%,620px);width:100%}
 
 /* ------------------------------------------------------------------ 3 ---
    WHAT IS ACTUALLY NEW

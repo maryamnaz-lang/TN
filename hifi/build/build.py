@@ -88,7 +88,34 @@ css = '\n'.join((here / f).read_text() for f in
                  # interview row's kit strip and `.ivlist`'s label column —
                  # and both of those have to be later than §10.15 and §15 to
                  # be corrections, which the end of the list gives for free.
-                 '38-scene.css'])
+                 '38-scene.css',
+                 # TAL'S WIDGETS, UNBOXED. `.tw` carried a background (§03)
+                 # and a border (§10) from when these were read in the side
+                 # panel, where the bubble had no frame. On the ask page the
+                 # bubble has one, so every widget was a box inside a box with
+                 # 31px of gutter. This takes the inner frame off and puts the
+                 # spacing back — plus the action row's missing gap, the
+                 # headline that was a bulleted list of one, and the figure
+                 # rows set closer together than their own line leading.
+                 #
+                 # LAST, and load-bearing: it corrects §10 (the border and the
+                 # ground), §27 (the bubble) and §03 (every gap), so it can
+                 # only be a correction from after all three. It names no
+                 # selector §36, §37 or §38 mentions.
+                 '39-talwidget.css',
+                 # THE EMPTY STATE'S ORB. §27.8 made Tal's mark a moving object
+                 # for the floating button and §21.4 took a cut-down copy to the
+                 # ask dock; the 132px mark at the head of an unstarted
+                 # conversation — the largest one in the product — was the only
+                 # one still static. Same three layers, same three clocks, with
+                 # the orbit rescaled: §27.8's 2.45/3.47 are 96-box values and
+                 # this box is 132.
+                 #
+                 # LAST: it takes §27.1's `.tal-mk` background OFF the element so
+                 # the halo can sit under it, sits inside §27.4's `.tal-hero`,
+                 # and runs §27.8's keyframes. All three have to exist first.
+                 # Nothing in §28-§39 names any of its selectors.
+                 '40-talorb.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -271,7 +298,27 @@ js = award_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js'
                                                         # data.js and views.js, and reassigns `talReset` — all of
                                                         # them function declarations or consts that have long since
                                                         # run by the time this file is parsed.
-                                                        'ai7.js'])
+                                                        'ai7.js',
+                                                        # TAL'S SCOPE. Adds no capability and no view — it states the
+                                                        # narrow routes that have to be tried BEFORE the broad ones in
+                                                        # data.js, and it wraps `talReply` so an unmatched question
+                                                        # gets a support handoff instead of a capability list.
+                                                        #
+                                                        # LAST, and that is load-bearing for the only reason that ever
+                                                        # matters in this list: `talReply` walks TAL_ROUTES first match
+                                                        # wins, every pass unshifts, so the file parsed last is tried
+                                                        # first. A correction has to be in front of the thing it
+                                                        # corrects, which means being parsed after it — including
+                                                        # after ai7, whose booking route this deliberately sits in
+                                                        # front of.
+                                                        #
+                                                        # It reads `NEVER` and `MEMO` from ai2.js, `ivtAnswer` and
+                                                        # `ivtFind` from ai.js, `LEAD_TAL` from lead.js, and `tw` /
+                                                        # `twBtn` / `twChips` / `cfg` / `avatar` from views.js — all
+                                                        # of them declared long before this parses, and the two ai.js
+                                                        # ones guarded by typeof because the leader portal never
+                                                        # reaches that route.
+                                                        'ai8.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.

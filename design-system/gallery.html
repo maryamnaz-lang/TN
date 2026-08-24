@@ -50,7 +50,13 @@
 .doc-ex > .doc-t small{
   display:block;margin-top:2px;font-weight:400;color:var(--text-helper);
   font-size:11.5px;letter-spacing:.2px}
-.doc-live{display:block}
+.doc-live{display:block;--pad-x:0px}
+/* WHY --pad-x:0 ABOVE. `.plate`, `.lvl-hero` and `.band` reach the column edge
+   with a negative margin of `--pad-x`. Inside this page's own wrapper there is
+   no column to reach, so they hung off both sides — the plate was rendering
+   straight out of the content area, which is worse than not showing it at all.
+   One declaration answers all of them; §35.1 does the same thing for a
+   component borrowed into a Tal bubble. Do not chase the selectors. */
 
 /* 3. SWATCHES. A token table, not a decoration: value and contrast in text,
    because the point is to be able to read the number. */
@@ -264,6 +270,154 @@ SECTIONS.push({id:'use', nav:'Using it', icon:'document', build: () => `
   `)}
 `});
 
+/* ---------------------------------------------------------------- signature */
+/* THE COMPONENTS THAT CARRY THE LOOK, and the section that should have been
+   here from the start. The first extraction dropped every one of these as
+   "one product surface's own", which left a page that was correct and did not
+   look like TalentNext. Their markup is FIXED — taken from views.js, not
+   invented — because each has internal structure the CSS keys on, and getting
+   it slightly wrong is what makes a component look broken rather than absent. */
+SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
+  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks.', `
+    <div class="modhead">
+      <div class="ph">
+        <div class="ph-main">
+          <div class="ph-top"><h1>Welcome Back, Maryam!</h1></div>
+          <p>Explorer Track – E3 &middot; Cohort 41 &middot; week 5 of 13</p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="ai-aura tile tight talsum">
+          <div class="ai-head"><span class="ai-label">Tal</span></div>
+          <div class="ai-body"><p><span class="tal-greet">Welcome back, Maryam!</span>Day
+            34 of 90, week 5. 5 of 13 chapters at 88%, 260 minutes so far.</p></div>
+          <div class="stp-wing">
+            <div class="stp flush stp-titled">
+              <div class="stp-top">
+                <h2 class="u-h3">Where you are</h2>
+                <span class="stp-meter">
+                  <span class="stp-rail" role="img" aria-label="Step 4 of 5">
+                    <i class="done"></i><i class="done"></i><i class="done"></i><i class="on"></i><i></i>
+                  </span>
+                  <span class="stp-c">Step 4 of 5</span>
+                </span>
+                <button class="stp-t" aria-expanded="false">All steps{{chevDown}}</button>
+              </div>
+              <div class="stp-now">
+                <div class="pi-lab">90-day course</div>
+                <div class="pi-sec">Week 5 of 13 &middot; 5 of 13 chapters done</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sec sec-dark">
+        <div class="plate" data-when="in 2 days">
+          <i class="dark-glow" aria-hidden="true"></i>
+          <div class="plate-h plate-h-bare">
+            <div class="plate-t">Cohort Week 36 Session</div>
+            <span class="plate-when">{{time}}<b>in 2 days</b></span>
+          </div>
+          <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
+          <div class="plate-a">
+            <button class="btn btn-p btn-sm noic">Join Call {{video}}</button>
+          </div>
+          <div class="plate-who">
+            <span class="av-ph" style="width:56px;height:56px"><i>PN</i></span>
+            <span class="plate-wb"><b>Priya Nair</b>
+              <span>Cohort leader &middot; leads Cohort 41</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('Tal’s mark — two forms, and picking the wrong one shows', 'Inside a <code>.modhead</code>, <code>.ai-aura</code> takes <code>tile tight talsum</code> and <code>.ai-label</code> stays <b>plain</b>: §33 keys the 32px gradient disc on <code>.modhead .ai-aura.talsum > .ai-head > .ai-label::before</code>. <code>.bare</code> (§37) is the <b>16px fallback</b> for a page with no head band at all. Use <code>.bare</code> inside a band and you get a small dot where the disc belongs; use neither and you get the accent chip, which is what a portal built without this note came out with.', `
+    <div class="tile-stack">
+      <div class="modhead">
+        <div class="sec"><div class="ai-aura tile tight talsum">
+          <div class="ai-head"><span class="ai-label">Tal</span></div>
+          <div class="ai-body"><p>In a head band: <code>talsum</code>, label plain. The 32px disc.</p></div>
+        </div></div>
+      </div>
+      <section class="sec">
+        <div class="ai-aura">
+          <div class="ai-head"><span class="ai-label bare">Tal</span></div>
+          <div class="ai-body"><p>No head band: <code>.bare</code>. The 16px mark.</p></div>
+        </div>
+      </section>
+      <section class="sec">
+        <div class="ai-aura">
+          <div class="ai-head"><span class="ai-label">Tal</span></div>
+          <div class="ai-body"><p>Neither — the accent chip. Correct inline, wrong as a page head.</p></div>
+        </div>
+      </section>
+    </div>
+  `)}
+  ${ex('The plate belongs in the band', 'A plate reaches the column edge with a <b>negative margin</b> of <code>--pad-x</code>, and <code>.app .modhead .plate</code> zeroes it. So a plate inside a <code>.modhead</code> sits inset; a plate anywhere else bleeds full-bleed on purpose. Both are right — pick deliberately. Child order is fixed and <code>.plate-who</code> comes <b>last</b>: the avatar sits under the actions, not above them.', `
+    <div class="sec sec-dark">
+      <div class="plate" data-when="Thursday">
+        <i class="dark-glow" aria-hidden="true"></i>
+        <div class="plate-h plate-h-bare">
+          <div class="plate-t">Your consultant call</div>
+          <span class="plate-when">{{time}}<b>Thursday</b></span>
+        </div>
+        <div class="plate-b">2:00 PM ET &middot; 15 minutes, online</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic">Join call {{video}}</button>
+          <button class="btn btn-sm noic plate-b2">Add to calendar</button>
+        </div>
+        <div class="plate-who">
+          <span class="av-ph" style="width:56px;height:56px"><i>JD</i></span>
+          <span class="plate-wb"><b>Jordan Diaz</b>
+            <span>Talent consultant &middot; screens Explorer candidates</span></span>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('The accent is not for section actions', 'The gradient CTA is <code>.plate .btn-p</code> only — a primary action standing on a dark card. A section’s own action goes in the <code>.sec-h</code> beside the heading and is <code>.btn.btn-p</code>, which is <b>black</b>. Reaching for orange outside a plate is how a page starts looking like a different product.', `
+    <div class="sec">
+      <div class="sec-h">
+        <h2>This week</h2>
+        <button class="btn btn-p btn-sm">Open chapter 4 {{arrowRight}}</button>
+      </div>
+      <p class="t-body-02">Black, in the head row. Not orange.</p>
+    </div>
+  `)}
+  ${ex('The week card and its ring', 'The ring is <b>two SVG circles</b>, not a conic gradient, and <code>--arc</code> is a stroke-dasharray <b>length</b>: r=26, so <code>arc = 163.36 × pct/100</code>. 17% is 27.8.', `
+    <div class="wkc">
+      <div class="wkc-top">
+        <div class="wkc-tb">
+          <div class="wkc-eb t-label-01">Chapter 4 &middot; in progress</div>
+          <h3 class="u-h3">Delegation Without Drop-Off</h3>
+          <div class="wkc-min sub">12 of 70 minutes</div>
+        </div>
+        <div class="ring" role="img" aria-label="17% done">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle class="ring-t" cx="32" cy="32" r="26"></circle>
+            <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:27.8"></circle>
+          </svg>
+          <span class="ring-n u-h2">17<small>%</small></span>
+        </div>
+      </div>
+      <span class="eyebrow">What I have done this week</span>
+      <ul class="wkc-did">
+        <li class="u-compact"><span class="wkc-tick">{{checkFilled}}</span>
+          <span class="wkc-db"><b>Chapter 5 finished</b>
+            <span class="sub">Assessed 86%</span></span></li>
+        <li class="u-compact"><span class="wkc-tick">{{checkFilled}}</span>
+          <span class="wkc-db"><b>Posted in the cohort discussion</b>
+            <span class="sub">Yesterday &middot; earned Get Involved</span></span></li>
+      </ul>
+    </div>
+  `)}
+  ${ex('Tal’s chips', '<code>.sk-mark</code> is the standalone mark; the cool green pool is a radial gradient on the chip itself.', `
+    <span class="tal-sugg">
+      <button class="chip-tal"><span class="sk-mark xs"></span>How am I doing overall?</button>
+      <button class="chip-tal"><span class="sk-mark xs"></span>What is due this week?</button>
+    </span>
+  `)}
+`});
+
 /* ------------------------------------------------------------------- colour */
 SECTIONS.push({id:'colour', nav:'Colour', icon:'view', build: () => `
   ${ex('Brand and accent', 'Black is the primary action. The accent is a GRADIENT, not a solid — <code>--accent-grad</code> — and it is the one signal colour: it marks progress, the current item and what the candidate owns.', `
@@ -346,7 +500,16 @@ SECTIONS.push({id:'space', nav:'Spacing', icon:'chart', build: () => `
         .map(([n,v]) => `<div class="sp-row"><code>${n}</code><i style="width:${v}px"></i>${v}px</div>`).join('')}
     </div>
   `, true)}
-  ${ex('The spine', '<code>--pad-x</code> is the one horizontal indent: 16 / 24 / 32 by tier. Section padding, page headers, list rows and cells all resolve to it, so the column has a single left edge whatever is drawn in it. Never hard-code a gutter.', `
+  ${ex('The rules, not just the scale', 'Five statements that decide every measurement on a page. Follow these and a new portal lines up with the others without anyone eyeballing it.', `
+    <div>
+      <div class="kv"><span class="k">Horizontal</span><span class="v">Only <code>--pad-x</code> — 16 / 24 / 32 by tier</span></div>
+      <div class="kv"><span class="k">Vertical</span><span class="v"><code>.sec</code> pays it: <code>--s06</code>, <code>--s07</code> at 900</span></div>
+      <div class="kv"><span class="k">Gaps inside</span><span class="v">Only <code>--s01</code>…<code>--s12</code>, never a raw px</span></div>
+      <div class="kv"><span class="k">Column width</span><span class="v"><code>--content-max</code>, centred by <code>.page</code></span></div>
+      <div class="kv"><span class="k">Radius</span><span class="v"><code>--radius</code> = 0, everywhere</span></div>
+    </div>
+  `)}
+  ${ex('The spine', 'The one rule worth memorising. <code>--pad-x</code> is the single horizontal indent — 16 / 24 / 32 by tier — and section padding, page headers, list rows, cells, tabs and the head band <b>all</b> resolve to it, so the column has one left edge whatever is drawn in it. <b>Never hard-code a gutter</b>: a page that writes <code>padding-left:20px</code> is a page whose rows no longer line up with its headings, and that mismatch is the most visible way a new portal stops looking like the others. <code>.sec</code> already pays it — do not pay it twice.', `
     <div>
       <div class="kv"><span class="k">Radius</span><span class="v">0 — the brand is square</span></div>
       <div class="kv"><span class="k">Elevation</span><span class="v">None. Depth is rule weight</span></div>

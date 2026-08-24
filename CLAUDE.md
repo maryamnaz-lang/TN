@@ -8,6 +8,7 @@ check this table before editing anything.
 |---|---|---|
 | `hifi/` | High-fidelity candidate portal, **compiled** from `hifi/build/` | **ACTIVE — work here** |
 | `design-system/` | The portal's design language as two linkable files, **extracted** from `hifi/build/` | **ACTIVE — for new pages** |
+| `tn-agent-portal.html` | **Talent Agent portal**, hand-written on `design-system/` | **ACTIVE** |
 | `tn-portals.html` | Candidate + Cohort Leader portals, hand-written | Prototype, still live |
 | `tn-admin.html` | Super Admin panel, hand-written | Prototype, still live |
 | `tn-portals.css` | Stylesheet extracted from `tn-portals.html` | Supports the above |
@@ -22,6 +23,13 @@ initial commit) and `hifi/talentnext-candidate-portal-v24.html` (1.1 MB, current
 "the candidate portal". When the request says candidate portal it means the **hifi/** one
 unless it explicitly says wireframe, flow, or early prototype. If it is genuinely ambiguous,
 ask — do not guess, because the two look similar enough that a wrong edit is not obvious.
+
+**And "agent" means two different people.** In `hifi/` an *agent* is somebody the candidate
+books — the `agents` / `agent` views are the candidate's view of a marketplace. In
+`tn-agent-portal.html` the agent is the **signed-in user**, and that file is where their own
+journey lives. It links `design-system/` rather than living in `hifi/`, because an agent
+never sees the 90 days and there is nothing for a portal switch to walk between; the file's
+own header records the four flow-diagram questions it decides and why.
 
 Same trap for "the wireframes": that is `talentnext-wireframes.html`, a frozen reference. It
 is not a thing to update when the hi-fi design changes; the two are not kept in sync.
@@ -38,11 +46,11 @@ first recorded. Read them freely; just do not edit them without being asked.
 <script src="design-system/talentnext-ds.js"></script>
 ```
 
-Both are **build output** of `design-system/build-ds.py`, which walks the same 38 layers in
-the same order as `hifi/build/build.py` and keeps the rules whose selectors belong to the
-shared vocabulary, dropping the ~2,240 that belong to one product surface. Every rule in the
-output is a real rule from the real portal in its real cascade position — nothing is re-typed,
-and the build refuses to write if any output rule cannot be traced back to a source layer.
+Both are **build output** of `design-system/build-ds.py`, which walks the same 40 layers in
+the same order as `hifi/build/build.py` and keeps everything except eight render-pass-bound or
+separate-surface families — 3,100 rules kept, 503 dropped. Every rule in the output is a real
+rule from the real portal in its real cascade position — nothing is re-typed, and the build
+refuses to write if any output rule cannot be traced back to a source layer.
 
 So there are two generated artefacts from one source, and the same rule applies to both:
 **never hand-edit `talentnext-ds.css`.** Change the layer in `hifi/build/` that states the
@@ -54,18 +62,39 @@ cd hifi/build && python3 build.py
 cd design-system && python3 build-ds.py
 ```
 
-**A new component becomes shared by one deliberate step, and the build asks for it.** Build it
-as a layer in `hifi/build/` with a fresh class prefix, then add that prefix to `SYSTEM` in
-`build-ds.py` and rebuild. Everything not in `SYSTEM` is dropped, so `build-ds.py` ends with an
-**unclassified report** — every class in neither `SYSTEM` nor `PRODUCT_PREFIXES`, with the
-layer it came from. The baseline is zero, so a new name is visible immediately; clear it by
-adding the name to `SYSTEM` (shared) or its prefix to `PRODUCT_PREFIXES` (one surface's own).
-Never leave it unclassified: that is the silent path where a component never reaches the
-design system and the next portal re-implements it.
+**It is INCLUDE-BY-DEFAULT, and that was a correction.** A new component needs no step at all:
+build it as a layer in `hifi/build/`, rebuild, it is in the design system.
 
-Note the limit: the DS is CSS + icons. A widget whose behaviour lives in a render pass (Tal's
-thread) does not port by widening the allowlist — its shell does, its flow needs a third
-generated file with a documented render/state contract.
+The first version kept a `SYSTEM` allowlist and asked "does a *second* portal need this word?".
+`tn-agent-portal.html` was built on that output — 127 classes, only two unstyled — and still
+did not look like TalentNext, because the allowlist had dropped every component carrying the
+brand: `.plate*` (and with it §19's `.plate .btn-p`, the only reason the CTA inside a plate is
+the accent gradient), `.wkc*`/`.ring*`, `.ai-aura`/`.ai-head`/`.ai-label`, `.tw-btn`, `.cert*`,
+`.lvl-hero`, `.score*`, `.aw*` — plus `__TALCIRCLE__`, Tal's own mark, dropped as "product
+artwork", which is why Tal came out a hard orange square. **Excluding a class costs a portal
+that looks generic; including an unused one costs one rule.** Default to include.
+
+That portal has since been **rebuilt on the include-by-default output** and is no longer the
+example of the problem — it is the example of the fix. Tal speaks from `.ai-aura`, the next
+interview and the calibration slot are `.plate`s with the orange CTA, the training modules are
+a `.wkc` with its `.ring`, the agent's level is a `.lvl-hero` and the certificate a `.cert`.
+Two things it had to solve that any second portal will hit: `.plate`'s countdown chip is
+assembled by `placePlates` (`ai5.js`) rather than by CSS, so a page with no render passes must
+emit the `.plate-h` / `.plate-when` row itself; and **`.tal-panel` and `.tal-fab` are switched
+off** by §27 — the thread moved to the ask dock, which `build-ds.py` excludes — so Tal's
+questions belong in a component the system still ships.
+
+Excluded now, and only these: `ask*` `bk*` `scene*` (their behaviour *is* a render pass over
+portal state), `auth*` `lsvt*` `ios-*` `nil*` (separate surfaces). `build-ds.py` prints the
+list every build. `SYSTEM` survives but gates nothing — it names the JS-free core.
+
+**The CSS is only half a component; the markup is the other half.** These have internal
+structure the CSS keys on, and a guessed structure looks *broken* rather than absent — the
+first `proof.html` invented it and got four of six wrong. Recipes are in `gallery.html` under
+**Signature**. Three that bite: `.ai-label` needs **`.bare`** outside the JS-assembled band
+(§33 keys the mark on `.modhead .ai-aura.talsum`); `.plate` takes **`data-when` as an
+attribute**, not a child; `.ring` is **two SVG circles** and `--arc` is a dasharray *length*
+(`163.36 × pct/100`), not a percentage.
 
 - `design-system/gallery.html` — the reference: every component, live, with its markup. The
   place to look before inventing a class.
@@ -95,15 +124,15 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **36 numbered CSS layers**, `01-foundation.css` → `36-lead2.css`, concatenated in
+- **40 numbered CSS layers**, `01-foundation.css` → `40-talorb.css`, concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
   is either a class no earlier layer mentions or a correction that has to land after the
   layer it corrects; `build.py` records the argument for each one, in place. Read that
   comment before inserting a layer.
-- **15 JS layers**, in this order: `icons.js` → `data.js` → `views.js` → `ai.js` … `ai5.js`
-  → `nil.js` → `lead.js` → `lead2.js` → `lead3.js` → `lead4.js` → `ai6.js` → `ai7.js`.
-  Order matters, and `build.py` says why for each of the late ones.
+- **16 JS layers**, in this order: `icons.js` → `data.js` → `views.js` → `ai.js` … `ai5.js`
+  → `nil.js` → `lead.js` → `lead2.js` → `lead3.js` → `lead4.js` → `ai6.js` → `ai7.js` →
+  `ai8.js`. Order matters, and `build.py` says why for each of the late ones.
 - Fonts, the Tal mark, auth artwork and 8 award WebPs, all base64-embedded at build time.
 
 The loop:
@@ -158,6 +187,75 @@ result and outlives the conversation. `bkStamp` is what makes the booked stage's
 hand-written mentions of "Priya Nair, Thursday 20 August, 6:30 PM, $95" read the actual
 choice instead — if you add a seventh surface that names the booking, add it there. Traps 9
 and 10 below are both about this file.
+
+### What Tal answers, and what it hands to a person — `ai8.js`
+
+`TAL_ROUTES` (data.js) is a `[regex, fn]` list and **first match wins**; every pass
+`unshift`s, so the file parsed LAST is tried FIRST. `ai8.js` is last, adds no view and no
+capability, and does three things: it states the narrow routes that have to land in front of
+data.js's broad ones, it wraps `talReply`, and it pushes a catch-all route so no question
+reaches a placeholder.
+
+**Tal's scope is six subjects**: the course, your level, your interviews, your cohort, the
+money, and Tal itself. Anything else gets one of three answers, and the difference between
+them is the point — "I cannot help" is three sentences, not one:
+
+| Kind | Answer | Support details? |
+|---|---|---|
+| A human decision — refund, disputed charge, closed account, a date that must move | Tal states the *rule*, then hands over | yes, `wSupport` |
+| Something Tal cannot see — the billing ledger, the Priya thread, a cohort call | Tal declines in the product's own words and points at the page that *is* allowed to hold it | sometimes |
+| Not the product — a salary, a job, an opinion, the assessment answers | one honest sentence and the way back | **no** — a helpdesk number for "tell me a joke" is the same failure as inventing an answer |
+
+**The rule that will bite you: Tal never reads the ledger.** `NEVER` (ai2.js) and clause 4 of
+the Data use notice both say Tal has never seen billing. So "What have I paid so far?" is
+answered by `wLedger`, which *declines* and links Payments — where every row already carries a
+Receipt button. Producing a table there would make two other screens into lies. `TALCTX.billing`
+used to offer that question as a chip; the chips were changed with the routes, because a chip is
+a promise the product makes on Tal's behalf.
+
+Every figure in these answers is read off a page — the fee and credit from `V.enrol` / `V.payment`,
+the two refund windows from the legal lines on `V.booking` / `V.payment`, prices and ratings from
+`AGENTS`, chapters from `CH` / `SCORE` / `GROWTH` / `OPEN_DATES`. **Do not restate a number here
+that a page owns**; read it, or the two drift.
+
+`cand(re, fn, what)` wraps a candidate-only route so the cohort leader gets `leadNA` instead —
+the router is shared and a leader has no fee, no level and no chapter of their own.
+
+`SUPPORT` holds the contact details, once.
+
+**The widgets are drawn by `39-talwidget.css`, and the rule is one frame.** `.tw` used to
+carry its own background and border — right when these were read in the side panel, wrong on
+the ask page, where §27.8 already gives the bubble a frame and 17px of padding. Two frames
+around one thing, 31px of gutter. §39 takes the inner frame off and puts the spacing back
+(every gap one step up), fixes the action row (`.tw-a` had `margin-left:auto` and no gap, so
+two buttons touched), and gives the quiet action `--accent-on-2` — the accent ink §16 already
+uses on Tal's own surfaces. Links here are **not** an option: they are blue by §12's explicit
+decision, and blue inside Tal's answer would be the only blue on the screen.
+
+**Tal's mark is a moving object, and it is the same object at three sizes.** §27.8 built it for
+the floating button — a halo that pulses, the PNG turning on its off-centre core, and the
+chevron riding the same circle so it stays on the orange — and §21.4 took a cut-down copy
+(halo + spin + breath, no track, no chevron) to the ask dock's 32px mark. §40 now puts the full
+three-layer version on the 132px empty state at the head of an unstarted conversation, which is
+the largest mark in the product and was the only one still static.
+
+Two things bite here. **The orbit is per-box-size, not a constant** — §27.8's `2.45` / `3.47`
+are 96-box values (the core is `+4.5,-4.5` of a 176-unit canvas, so the offset is `B/176 × 4.5`
+and the radius is `√2` of it); at 132 that is `3.375` / `4.77`, which is why §40 declares its own
+`tal-orb-track-lg` rather than reusing the button's. **And reduced motion needs its own block**
+— §13.187 clamps every duration to 1ms, and 1ms on an *infinite* animation is not "off", it is a
+strobe. §21.4, §27.8 and §40 each state their own.
+
+Note `.tal-fab` and `.tal-panel` are **`display:none`** (§27, end) — the thread moved to the ask
+dock. So the empty state is currently the only place in the live portal that draws the full orb,
+and the `.orb` class on `.tal-mk` is what opts a mark into it.
+
+Three shapes to reuse rather than reinvent: **`.tw-lines`** is a 58px label column, and it
+earns that on a *figure* (`$690`, `88%`, `Day 34`) — never on a one-character label, which
+leaves 50px of white and wraps the value into what is left. **`.tw-list`** is the bulleted row
+for a sentence, and a `<b>` lead-in with a `<br>` is how a row gets a title. **`.tw-lede`** is
+the one-line answer at the head of a widget — a one-item `.tw-list` reads as a list that lost
+the rest of itself.
 
 ### The Cohort Leader portal — `lead*.js` + `31-lead.css`, `36-lead2.css`
 
@@ -253,6 +351,31 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     (min-width:900px)`, so per trap 3 it can only be extended by restating it inside the same
     query — `36-lead2.css` §36.9 does that twice. Also keep those headings SHORT: three words
     is two lines in 184px.
+14. **A `TAL_ROUTES` handler is called with NO ARGUMENT.** `talReply` is
+    `for(const [m,fn] of TAL_ROUTES) if(m.test(q)) return fn()` — the regex is the whole of
+    the parsing, and every route before `ai8.js` is a closure over `S` that never needed the
+    words, so nobody had hit it. Write `(q) => q.match(…)` and you get `undefined.match`,
+    which `ai8.js`'s wrapper then swallows into a support card — a route that looks like it
+    declined. Read `TAL_Q` instead; the wrapper sets it one statement before the router runs.
+15. **A widget in a Tal bubble is capped at the bubble's measure, and `.tw` was capped at the
+    wrong one.** §27.8 gives a Tal bubble `max-width:min(55%, 620px)` because a 1400px
+    paragraph is a log file. 55% of a 390px phone is 190px, and `.tw-lines` is a two-column
+    flex with a fixed 58px label — so the value cell got **76px** and a four-word value set
+    one word to a line. Every widget Tal ever printed was 160px wide on a phone. `35-book.css`
+    §2 is where this is answered: `.bb:has(.bkw)` takes the whole measure, and `.bb:has(.tw)`
+    now takes `min(100%, 620px)` — full column on mobile, a readable line on desktop. The two
+    differ because `.bkw` is cards with an intrinsic size and `.tw` is a grid that takes every
+    pixel it is given. **Also: measure with `offsetWidth`, not `getBoundingClientRect`** —
+    `#device` carries the harness's fit-to-pane scale (~0.02), so a rect-measured 320px widget
+    reports 7px, which reads exactly like the animation trap in the next section and is not it.
+16. **`:first-child` cannot tell you whether a bubble opens with prose.** A bubble is built by
+    assigning a string to `innerHTML`, so leading prose is a TEXT NODE and `:first-child`
+    counts elements only — a widget is `:first-child` whether or not a sentence sits above it.
+    That matters because the two need opposite spacing: after a sentence the widget needs its
+    16px, opening the bubble it must not have it or the label sits 34px down against 17px at
+    the sides. There is no selector for this. `twTop` (ai8.js) stamps `.tw-top` from an
+    anchored prefix test on the reply string, in the one wrapper every reply passes through —
+    which is also why it fixes data.js's and ai2's answers and a per-widget marker would not.
 
 ### Verifying a change
 

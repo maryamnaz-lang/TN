@@ -1,0 +1,160 @@
+/* ==========================================================================
+   40. THE EMPTY STATE WEARS THE LIVE ORB
+
+   §27.8 built Tal's mark as a moving object for the floating button: a halo
+   that pulses, the PNG turning on its off-centre core, and the chevron riding
+   the same circle so it stays on the orange. §21.4 then took a cut-down copy
+   of it to the ask dock. The one place the mark is LARGEST — the empty state
+   at the head of a conversation nobody has started, 132px on the centre line
+   — was the one place it did not move at all. A still 132px blob above
+   "Hello Maryam, I am Tal" reads as an illustration; the same object breathing
+   reads as something waiting for you.
+
+   THIS IS THE BUTTON'S GEOMETRY, NOT A NEW ONE. Same three layers, same three
+   clocks (14s turn, 6.4s breath, 6.4s pulse against it), same stacking order.
+   §27.8's own note is the specification and this follows it rather than
+   restating it:
+
+     ::before   the halo      tal-orb-pulse + the track
+     ::after    the mark PNG  tal-orb-spin  + tal-orb-breathe
+     svg        the chevron   tal-orb-breathe + the track, never the spin
+
+   WHY THE ELEMENT'S OWN BACKGROUND COMES OFF. `.tal-mk` (§27.1) paints the
+   PNG as its own `background-image`, which is right everywhere it is a static
+   mark. An element's background paints UNDER its pseudo-elements, so a halo
+   drawn in `::before` would sit on top of the mark rather than beneath it —
+   which is why §21.4 needed a wrapper element to get the order right. Moving
+   the PNG into `::after` gets the same three-layer stack out of one element
+   and no wrapper: the button does exactly this, for exactly this reason.
+
+   `.orb` IS ON THE MARKUP because this treatment belongs to the hero and not
+   to every `.tal-mk.lg` anyone might draw later. It is stamped in both places
+   the hero is printed — `talPanel` (views.js) and `askView` (ai4.js) — which
+   are deliberately the same markup on two surfaces.
+
+   LAST. It needs §27.1's `.tal-mk` background to exist before it can take it
+   off, §27.4's `.tal-hero` to sit in, and §27.8's keyframes to run. Nothing
+   in §28-§39 names any of these selectors.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE TRACK, RESCALED — AND IT HAD TO BE
+
+   §27.8 is explicit: "2.45 and 3.47 are 96-box values, not constants. If the
+   box size changes, rescale them." This box is 132, so they are wrong here by
+   38% and the chevron would have sat off the core and drifted round it.
+
+   The derivation is the button's, run again with one number changed. The core
+   sits +4.5,-4.5 off centre in a 176-unit canvas; drawn into a box of B the
+   per-axis offset is B/176 x 4.5, and the orbit radius is sqrt(2) of that:
+
+     B = 96   (the button)   96/176 x 4.5 = 2.45    sqrt(2) x 2.45 = 3.47
+     B = 132  (this)        132/176 x 4.5 = 3.375   sqrt(2) x 3.375 = 4.77
+
+   Eight keyframes for the same reason §27.8 gives: `translate` interpolates
+   in straight lines, so four would walk the mark round a diamond and two
+   would swing it flat across the middle.
+
+   A SECOND KEYFRAME SET RATHER THAN A VARIABLE IN THE FIRST. `tal-orb-track`
+   could take its two numbers from custom properties and serve both sizes, and
+   that is the tidier shape — but it would put the button's animation on a
+   variable this layer defines, so a mistake here would stop the button
+   working. The button is untouched. Two sizes, two tracks, one derivation
+   written down in both places.
+   ------------------------------------------------------------------------ */
+@keyframes tal-orb-track-lg{
+  0%{translate:3.375px -3.375px}     12.5%{translate:4.77px 0}
+  25%{translate:3.375px 3.375px}     37.5%{translate:0 4.77px}
+  50%{translate:-3.375px 3.375px}    62.5%{translate:-4.77px 0}
+  75%{translate:-3.375px -3.375px}   87.5%{translate:0 -4.77px}
+  100%{translate:3.375px -3.375px}}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE HOST
+
+   `isolation:isolate` so the three z-indexes below are ordered against each
+   other and not against the hero — `.tal-hero` already isolates for the
+   lattice it draws at `z-index:-1` (§27.4), and two stacking contexts that
+   do not know about each other is how the lattice ends up in front of a halo.
+
+   `place-items:center` centres the chevron; the two pseudo-elements position
+   themselves. The 132px box and the `-6px` bottom margin are §27.1's and
+   §27.4's and are NOT touched — that margin is measured against where this
+   PNG's tail fades at this size, and the note over it says so.
+   ------------------------------------------------------------------------ */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
+  position:relative;display:grid;place-items:center;isolation:isolate;
+  background-image:none}
+
+/* THE HALO. §27.8's stops, unchanged — they are proportions of the box, so
+   they scale with it and the wash reads the same at 132 as at 96. It rides
+   the track so the glow stays under the core rather than under the box the
+   core happens to be drawn in.
+
+   `inset:0` because on the button the halo and the mark share one box
+   (both `inset:-20px` on a 56px control); here that box IS the element. */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,
+    color-mix(in srgb,var(--accent) 38%,transparent) 0%,
+    color-mix(in srgb,var(--accent) 14%,transparent) 46%,
+    transparent 72%);
+  animation:tal-orb-pulse 6.4s ease-in-out infinite,
+            tal-orb-track-lg 14s linear infinite}
+
+/* THE MARK. The background this layer took off the element, put back one
+   layer up so the halo can sit under it. This is the only layer that ROTATES:
+   the off-centre core is what travels the circle and everything else follows
+   it, which is what makes a soft blob legibly in motion. */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
+  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  animation:tal-orb-spin 14s linear infinite,
+            tal-orb-breathe 6.4s ease-in-out infinite}
+
+/* THE CHEVRON. Sized off the DISC rather than off the box: §27.1 measures the
+   PNG's solid core at about 52% of the canvas, so the button's 22px mark in a
+   96 box is 44% of a ~50px disc. At 132 the disc is ~69px and 44% of it is
+   30px.
+
+   It takes the breath and the track and refuses the spin, for §27.8's reason
+   — a brand mark that turns over is a brand mark upside down, and here it is
+   30px rather than 22px, where a rotation would be unmissable.
+
+   The drop-shadow is legibility, not decoration: white on the accent is about
+   2.7:1, so the mark needs an edge to sit on. Tightened one step from the
+   button's because the shadow scales with the glyph and at 30px the button's
+   value reads as a smudge. */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
+  position:relative;z-index:2;
+  width:30px;height:30px;fill:var(--on-accent);
+  filter:drop-shadow(0 1px 2px rgb(0 0 0 / .28));
+  animation:tal-orb-breathe 6.4s ease-in-out infinite,
+            tal-orb-track-lg 14s linear infinite}
+/* the flag the contrast sweep reads, same as the button declares */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{--on-brand-fill:1}
+
+/* ------------------------------------------------------------------ 3 ---
+   REDUCED MOTION GETS ITS OWN BLOCK
+
+   Not §13's blanket clamp, for the reason §21.4 states in full: §13.187 takes
+   every duration to 1ms, and 1ms on an INFINITE animation is not "off" — it
+   is the same movement a thousand times faster, which is a strobe, and this
+   one is 132px in the middle of the screen.
+
+   So everything holds still and the halo settles at its bright end. The mark
+   still reads as lit rather than as switched off, and the chevron parks on
+   the core rather than in the middle of a box whose contents are not centred
+   — which is what the track's own 0% keyframe says, restated as a static
+   `translate`.
+   ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion:reduce){
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
+    animation:none;opacity:1;scale:1;translate:3.375px -3.375px}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{
+    animation:none;scale:1}
+  .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb svg{
+    animation:none;scale:1;translate:3.375px -3.375px}
+}

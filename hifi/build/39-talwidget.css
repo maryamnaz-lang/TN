@@ -1,0 +1,228 @@
+/* ==========================================================================
+   39. TAL'S WIDGETS ARE NOT BOXES INSIDE A BOX
+
+   `.tw` was drawn as a framed card: `background` and `border` in §03.356, and
+   §10.587 restates the border as the lattice hairline. That was right when
+   these widgets were read in the side panel, where the bubble had no frame of
+   its own. It is wrong now. §27.8 gives every Tal bubble a border and 17px of
+   padding, and ai4's `.ask-page` is the surface these are read on — so what
+   a person sees is a bordered box, 17px of nothing, a second bordered box,
+   14px of nothing, and then the answer. Two frames around one thing, and 31px
+   of gutter between the words and the edge.
+
+   THE OUTER FRAME IS THE ONE THAT MEANS SOMETHING. It says "Tal said this".
+   The inner frame says "this part of what Tal said is a widget", which is a
+   distinction the content already makes — an uppercase label over a figure
+   table does not need a box drawn round it to be legible as a block. So the
+   inner frame comes off, and what separates the widget from the sentence
+   above it is space, which is what separates everything else in this product.
+
+   AND THE SPACE HAS TO GO BACK IN. Deleting a border without touching the
+   gaps is how a card becomes a paragraph: §03.356 sets one 8px gap between
+   every child, which was fine when a frame was doing the grouping and is not
+   fine now. Every gap in here is one step up.
+
+   THE FOUR THINGS THIS LAYER FIXES, all visible in one screenshot of the
+   "What should I do next?" answer:
+
+     1. the double frame                            §1
+     2. two action buttons with no gap between them §2
+     3. a bulleted list of one item as the headline §3
+     4. rows of a figure table set 8px apart, so a
+        two-line row runs into the next one         §4
+
+   LAST, and it has to be: §10 states the border and the background, §27
+   states the bubble, §35 states the widget bubble's measure. This is a
+   correction to all three and can only land after them. Nothing in it names
+   a selector §36, §37 or §38 mentions.
+
+   SCOPED TO THE BUBBLE, not written as a bare `.tw`. Every `.tw` in the
+   product today is printed by `talReply` into a `.tal-msg > .bb`, so the
+   scope changes nothing now — but a widget dropped on a PAGE has no frame
+   around it and would need its own, and this way it keeps one.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE INNER FRAME COMES OFF
+
+   `padding:0` with it. The bubble's 17px is the widget's padding now — that
+   is the whole point of not drawing a second box — and leaving §03's 12px on
+   as well is how you get a widget that is inset from a frame that is no
+   longer there.
+
+   `gap` goes 8px → 16px. With the border gone, the gap between the label,
+   the table and the action row IS the grouping, and at 8px the three read as
+   one undifferentiated stack.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw{
+  background:transparent;border:0;padding:0;
+  margin-top:var(--s05);gap:var(--s05)}
+
+/* AND NO GAP WHEN THE WIDGET IS THE WHOLE ANSWER. The 16px above is there to
+   separate the widget from a sentence; when there is no sentence it lands on
+   the bubble's own 17px padding and puts 34px over the label against 17px at
+   the sides. `.tw-top` is stamped by `twTop` in ai8.js — the note there
+   explains why this cannot be `:first-child`: leading prose is a text node,
+   so the widget is the first ELEMENT either way. */
+.app .tal-msg > .bb .tw.tw-top{margin-top:0}
+
+/* TWO WIDGETS IN ONE TURN NEED A LINE BETWEEN THEM, and several answers are
+   built that way: `wRefund` and `wPause` both end by appending `wSupport`, so
+   the bubble holds a table and then a contact block with nothing between them
+   but 16px. A hairline is what this product separates blocks with everywhere
+   else, and it is only correct BETWEEN two — a rule above the first one would
+   be a line drawn a few pixels under the bubble's own top edge.
+
+   `--rule-on-2` rather than `--rule`: §12.14 tunes it one step darker for the
+   panel ground, and the bubble is `--layer-01`, which is that ground. */
+.app .tal-msg > .bb .tw + .tw{
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule-on-2)}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE ACTION ROW IS A ROW, WITH A GAP IN IT
+
+   `.tw-a` inherited `margin-left:auto` from §03.363, where it shares a
+   declaration with `.tw-def` — two things that are not the same thing. On
+   `.tw-def` the auto margin pushes a definition's value to the right of its
+   term. On `.tw-a` it pushed the whole action row to the right edge of the
+   widget, which is not where this product puts actions: `.gen-f` and
+   `.ai-foot` both sit hard left under a rule.
+
+   Worse, `.tw-a` was never a flex container, so `twBtn(…) + twBtn(…).ghost`
+   printed two inline-flex buttons as adjacent siblings with no gap at all —
+   "Open chapter 4 →" and "How do I catch up?" touching, reading as one
+   control with a box round half of it.
+
+   So: left aligned, a real row, 12px between. `font-weight` back to normal —
+   §03.363's 600 was for `.tw-def`'s value, and on a button it made the quiet
+   action as loud as the primary one.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-a{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s04);margin-left:0;font-weight:400}
+
+/* BOTH ACTIONS ARE BUTTONS, AND THE COLOUR IS WHAT SEPARATES THEM.
+
+   §03.401 made the second action borderless — `border-color:transparent`,
+   `padding-left:0`, `padding-right:0`: "the second of a pair is the quiet
+   one — same row, no box round it". Those three declarations are one idea and
+   they only work together.
+
+   THE FIRST VERSION OF THIS SECTION BROKE THAT, and it is worth writing down
+   because the mechanism is the ordinary one. It set `border-color` on
+   `.tw-btn` to give the primary its hairline — and `.app .tal-msg > .bb
+   .tw-btn` is (0,4,1) against `.tw-btn.ghost`'s (0,2,0), so it re-armed the
+   ghost's border too while leaving its zero horizontal padding untouched. The
+   result was a box with the words wedged against both sides of it. Setting a
+   property on a base class does not stop at the base class: `.ghost` is a
+   `.tw-btn`, and any rule that names only `.tw-btn` from further down the
+   sheet is a rule about the variant as well.
+
+   Given the choice between taking the border back off and giving it the
+   padding it now needs, the padding is the better product. Two controls in a
+   row read as two controls; a box beside a bare string reads as a button and
+   a caption, which is what the quiet half was being mistaken for. So both
+   get §03.394's `0 var(--s04)`, and the hierarchy is carried by the colour
+   and the arrow instead of by the presence of a frame.
+
+   Accent ink is what this product uses for a quiet control on exactly this
+   surface — §16.217 and §16.320 give it to the `.lnk` in Tal's own `did` bar
+   and capture bar. `--accent-on-2`, not `--accent-text`: §12.28 is explicit
+   that the first is tuned for the panel ground and the second for the page.
+
+   NOT a `.lnk`. Links in this product are BLUE, deliberately — §12 says so at
+   length — and a blue link inside Tal's answer would be the one blue thing on
+   the screen. This is a button that is coloured, not a link. */
+.app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
+.app .tal-msg > .bb .tw-btn.ghost{
+  color:var(--accent-on-2);border-color:var(--rule-on-2);
+  padding-left:var(--s04);padding-right:var(--s04)}
+.app .tal-msg > .bb .tw-btn.ghost svg{fill:currentColor}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE HEADLINE IS A LINE, NOT A LIST OF ONE
+
+   `wNext` and `wPace` open with the answer in one sentence — "Finish chapter
+   4" — and both were printing it as a `.tw-list` with a single item, so the
+   most important line in the widget arrived with a 5px square beside it and
+   a 16px indent, formatted as though the other bullets had gone missing. It
+   is the same shape `wSupport` had before its four rows became one grid.
+
+   `.tw-lede` is that line: one step up from the widget's 12.5px body, one
+   step down from the bubble's 13.5px prose, and no mark. It reads as the
+   answer, and the `.tw-k` under it reads as the reason.
+   ------------------------------------------------------------------------ */
+   `wPace`'s lede is the longest of them — the week card's whole comparison
+   sentence, about forty-five words — so it carries a measure. Everything
+   above it in the widget is a grid and grids do not need one; a sentence set
+   across 584px does. */
+.app .tal-msg > .bb .tw-lede{
+  font-size:14px;line-height:21px;font-weight:500;max-width:56ch;
+  letter-spacing:.05px;color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 4 ---
+   ROWS THAT WRAP NEED MORE THAN 8px BETWEEN THEM
+
+   §03.369 gives `.tw-list`, `.tw-check` and `.tw-lines` an 8px gap, which was
+   measured against the widgets that existed then — `wPoints`' four amounts,
+   `wWorkload`' three durations — where every row is one line. The rows in
+   these answers are sentences: at 236px of value column a refund window runs
+   to two lines and the scope table to four, and at 8px the gap between two
+   rows is smaller than the gap between two lines inside one row, so the block
+   reads as a paragraph with bold words scattered through it.
+
+   12px is the smallest gap that is bigger than the 17px line box's own
+   leading gap, which is the only thing that has to be true.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-list,
+.app .tal-msg > .bb .tw-check,
+.app .tal-msg > .bb .tw-lines{gap:var(--s04)}
+
+/* THE BULLET IS TAL'S COLOUR NOW. It was `--dv-3`, one of the four data-viz
+   hues, which is the palette the charts allocate from — a series colour on a
+   list of three statements is a colour that means "series 3" being used to
+   mean nothing. Accent is what marks Tal everywhere else in the product: the
+   sparkle on a chip, the mark beside the name above the bubble. */
+.app .tal-msg > .bb .tw-list > span::before{background:var(--accent-on-2)}
+
+/* the label column sits on the same baseline as the first line of its value.
+   §03.378's `min-width:58px` stays — it is what makes a column out of the
+   labels — but a wrapped value used to leave the label floating against a
+   block of text with no alignment to anything. */
+.app .tal-msg > .bb .tw-lines > span{align-items:baseline}
+
+/* ------------------------------------------------------------------ 5 ---
+   TWO PEOPLE IN ONE WIDGET ARE TWO ROWS, NOT ONE BLOCK
+
+   `wAgentPair` stacks two `.tw-ag` — a 40px portrait, a name, a meta line —
+   and at §03's 8px the second portrait sits closer to the first agent's meta
+   line than that line sits to its own name. The hairline is the same one §1
+   puts between two widgets, for the same reason.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-ag + .tw-ag{
+  padding-top:var(--s04);border-top:1px solid var(--rule-on-2)}
+
+/* ------------------------------------------------------------------ 6 ---
+   THE CHIPS UNDER AN ANSWER ARE A NEW THOUGHT
+
+   `.tw-chips` is 12px off whatever precedes it (§03.382). Following a
+   paragraph that is about right; following a widget it is not, because the
+   widget's own last row is only 12px above it too and the chips end up
+   looking like another row of it. They are the next question, not part of
+   the answer.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw + .tw-chips,
+.app .tal-msg > .bb .tw-k + .tw-chips{margin-top:var(--s05)}
+
+/* ------------------------------------------------------------------ 7 ---
+   THE QUIET CLOSING LINE
+
+   `.tw-k` is the note every one of these widgets ends on — what the figures
+   mean, or what is still on you. It is `--text-secondary` and 12.5px like the
+   rows above it, so at the old 8px gap it was simply the last row of the
+   table. It is not: it is Tal talking about the table. The extra room comes
+   from §1's 16px gap; this states the measure so the sentence does not run
+   the full width of a 584px widget when the rows above it are a grid.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw > .tw-k{max-width:62ch;line-height:19px}

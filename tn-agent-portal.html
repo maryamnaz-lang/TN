@@ -31,19 +31,14 @@
    do not have, so the bar and the app bar each say how big it is and, on the
    black bar, what colour.
    ========================================================================== */
-.pt-bar .mk{display:flex;align-items:center;gap:8px;flex:none}
-.pt-bar .mk svg{width:16px;height:16px;fill:var(--on-dark)}
-.pt-bar .mk b{font-size:13px;font-weight:400;letter-spacing:-.1px;white-space:nowrap}
-.shell-logo{gap:var(--s03)}
-.shell-logo svg{width:18px;height:18px;fill:var(--icon-primary);flex:none}
-.shell-logo b{font-size:15px;font-weight:400;letter-spacing:-.2px;white-space:nowrap}
+.pt-bar img{height:18px;width:auto;flex:none}
 </style>
 </head>
 <body>
 
 <!-- prototype chrome — not part of the product -->
 <div class="pt-bar">
-  <span class="mk" id="ptLogo"></span>
+  <span id="ptLogo"></span>
   <span class="dot"></span>
   <span class="pt-meta">Talent Agent portal &middot; v1 &middot; built on the TalentNext design system</span>
   <span class="pt-lab">Stage</span>
@@ -117,6 +112,35 @@
    line of copy anywhere below — cohorts, chapters, weeks and the 90 days do
    not appear in this portal at all, which is a stronger way to say it than a
    note explaining what the reader cannot do.
+
+   --------------------------------------------------------------------------
+   WHICH COMPONENTS THIS PAGE IS MADE OF, AND WHY THAT LIST CHANGED
+
+   The first build of this file was correct and did not look like TalentNext.
+   It was written against a design system whose build used an allowlist, and
+   the allowlist had dropped every component carrying the brand — so a page
+   built honestly out of what was in the box came out as hairline sections,
+   figure cells and list rows, which is a well-made admin table.
+
+   `build-ds.py` is include-by-default now, and this file is rebuilt on what
+   that ships. The four that do the work, all from **Signature** in
+   `gallery.html`, all with fixed internal markup:
+
+     `.ai-aura`   Tal's band. Every page's summary, and Tal's report draft.
+     `.plate`     the black hero: the next interview, the calibration slot.
+                  Its CTA is a plain `.btn.btn-p` and comes out ORANGE.
+     `.wkc`+`.ring` the four training modules, drawn the way the candidate's
+                  chapters are drawn.
+     `.lvl-hero`  the agent's level. `.cert` for the certificate.
+
+   Tal answers with `tw()` — the portal's own reply widget — and offers with
+   `.chip-tal`. **`.tal-panel` and `.tal-fab` are NOT used**: §27 hides both
+   (`display:none`, restated inside the container query), because the thread
+   moved to the ask dock, and the dock is one of the eight families
+   `build-ds.py` excludes by name since its behaviour *is* a render pass. A
+   surface the design system switches off is not a surface to build on. Tal's
+   questions therefore open a `.sheet`, which is a component the system does
+   ship, and everything inside it is Tal's own vocabulary.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -184,7 +208,7 @@ const CFG = {
 };
 
 const S = {stage:'working', view:'dashboard', nav:false, tal:false, talQ:null,
-           iv:'rafael', tab:'next', confirm:false, sheet:false,
+           iv:'rafael', tab:'next', confirm:false, sheet:false, stp:false,
            perms:{draft:true, brief:true, live:false}};
 
 const f = () => ({...A, ...CFG[S.stage]});
@@ -207,8 +231,19 @@ const NAVSETS = {
 };
 
 /* A sub-page's rail item is its parent's — `interview` is reached from
-   `interviews` and must not un-mark it. */
-const PARENT = {interview:'interviews'};
+   `interviews` and must not un-mark it.
+
+   AND TRAINING CHANGES PARENT WITH THE STAGE, because it changes job. While an
+   agent is being enabled it is a module they are working through and it has a
+   rail item of its own; once they are certified it is the certificate and the
+   date of the next re-check, which is reference material read twice a year —
+   so it moves under Standing and the rail keeps the six things a working agent
+   opens weekly. A stage-blind map would have marked a rail item that is not in
+   the set, and the render guard would have bounced the page. */
+const parentOf = (view, nav) =>
+  view === 'interview' ? 'interviews'
+  : (view === 'training' && nav === 'full') ? 'standing'
+  : null;
 
 /* --------------------------------------------------------------------------
    THE INTERVIEWS
@@ -246,6 +281,21 @@ const IVS = [
    follow:4.3, depth:4.7}
 ];
 const iv = id => IVS.find(x => x.id === id) || IVS[0];
+
+/* FIVE PORTRAITS ACROSS MORE THAN FIVE PEOPLE. The design system's JS carries
+   the portal's own five, and this is the same fidelity choice `hifi/` states
+   for its ten cohort members rather than a claim that these are one person. */
+const PHOTOS = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya,
+                tom: AV.samuel, nina: AV.hana};
+
+/* The four training modules, in the order they are taken. `f.mods` is how many
+   of them are finished, so this list and the ring cannot drift apart. */
+const MODULES = [
+  ['How the interview runs', '45 minutes, and what each part is for'],
+  ['Drawing out a story', 'Getting past the answer somebody rehearsed'],
+  ['Evidence, not impression', 'What a level has to be able to point at'],
+  ['Writing the report', 'The 24 hours after the call']
+];
 
 /* Availability. `on` is a taken slot — `.slot.sel` draws it filled, which is
    the design system's own "this one is chosen" and reads correctly for "this
@@ -340,8 +390,8 @@ const PAGESUM = {
   },
 
   standing: {
-    reviewed:'A3 since 1 October, ranked 9 of 38, and the range you may assess is E1 to B2 now. Follow-up came up to 4.6.',
-    _:       'You’re A2, ranked 12 of 38, scoring 4.4 on follow-up and 4.7 on depth. Nadia Rahman reviews you again on 1 October.'
+    reviewed:'The review moved you up a level on 1 October, so you may assess E1 to B2 now. Follow-up came up to 4.6 over the quarter.',
+    _:       'Follow-up came up to 4.4 in August and depth has held at 4.7 since May. Nadia Rahman reads the quarter on 1 October.'
   },
 
   profile: 'Your agent role sits on the account you already had, so nothing else about you changed. Two of Tal’s three permissions are on.'
@@ -358,11 +408,17 @@ const PAGESUM = {
 const TALQ = {
   dashboard: [
     ['What’s on me today?',
-     'Sofia Marek’s report, due at 6:00 PM. Nothing else is owed — Rafael is Thursday and Amara is Monday, and both are paid for already.'],
+     'Sofia Marek’s report, due at 6:00 PM. Nothing else is owed — Rafael is Thursday and Amara is Monday, and both are paid for already.',
+     null, ['Open the report', 'interviews']],
     ['How are my scores moving?',
-     'Follow-up is 4.4, up from 4.2 in July. Depth has sat at 4.7 since May. Both are read off your transcripts, not off candidate ratings.'],
+     'Follow-up is 4.4, up from 4.2 in July. Depth has sat at 4.7 since May. Both are read off your transcripts, not off candidate ratings.',
+     [['Follow-up', '4.4 &middot; was 4.2'], ['Depth', '4.7 &middot; unchanged'], ['Rank', '12 of 38']],
+     ['Open Standing', 'standing']],
     ['When does the escrow release?',
-     'Three working days after a report is delivered. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you send hers tonight.']
+     'Three working days after a report is delivered. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you send hers tonight.',
+     [['Rafael Ortiz', '$68 &middot; held to the interview'], ['Sofia Marek', '$68 &middot; report due tonight'],
+      ['Tom Whelan', '$68 &middot; releases Thursday']],
+     ['Open Earnings', 'earnings']]
   ],
   application: [
     ['What’s the background check for?',
@@ -398,7 +454,9 @@ const TALQ = {
   ],
   interview: [
     ['How is the report written?',
-     'Tal drafts it off the transcript within the hour, you edit it, and it’s yours the moment you sign. The candidate reads what you sent.'],
+     'Tal drafts it off the transcript within the hour, you edit it, and it’s yours the moment you sign. The candidate reads what you sent.',
+     [['Draft ready', 'Within an hour of the call'], ['Yours to change', 'Every word of it'],
+      ['Due', '24 hours from the end']]],
     ['Can I change a level afterwards?',
      'Not once you’ve signed. The interview is what sets it; a change after that is a review decision and sits above you.'],
     ['How long do I have?',
@@ -412,7 +470,8 @@ const TALQ = {
   ],
   earnings: [
     ['How does the split work?',
-     'The candidate pays $85. TalentNext keeps 20%, which is $17, and $68 comes to you three working days after the report is delivered.'],
+     'The candidate pays $85. TalentNext keeps 20%, which is $17, and $68 comes to you three working days after the report is delivered.',
+     [['The candidate pays', '$85'], ['TalentNext keeps', '$17 &middot; 20%'], ['You are paid', '$68 &middot; 80%']]],
     ['Where do payouts land?',
      'Stripe, on the account ending 4417. TalentNext never holds your bank details — Stripe does, and Stripe is where you change them.'],
     ['What about tax?',
@@ -449,27 +508,55 @@ function ph(title, sub, backTo){
   </div>`;
 }
 
-/* TAL'S CARD. Looked up rather than written at the call site, which is the
-   whole point of the pass: the summaries are one voice and belong in one
-   table, so a new page needs a row here and nothing else. A value is a string,
-   a function, or an object keyed by stage with `_` as the fallback. */
-function talCard(){
+/* Tal's summary for the current page. Looked up rather than written at the
+   call site, which is the whole point: the summaries are one voice and belong
+   in one table, so a new page needs a row there and nothing else. A value is a
+   string, a function, or an object keyed by stage with `_` as the fallback. */
+function pageSummary(){
   let e = PAGESUM[S.view];
   if(typeof e === 'function') e = e();
   if(e && typeof e === 'object') e = e[S.stage] || e._;
-  if(!e) return '';
-  /* `.sec.tint` IS THE GROUND, and it is the one permitted ground change in
-     this system — a background, never a card. It is doing the job `hifi/`'s
-     head band does: putting Tal's sentence on its own surface directly under
-     the page head, so the summary reads as a different kind of thing from the
-     page rather than as the page's first paragraph. Inside `.app` a `.note`
-     has no rule and no fill of its own (§22 strips both, because a wash on a
-     borderless row is one more edge than a page of hairlines has), so without
-     this the card would be a bold word and a sentence. */
-  return `<section class="sec tint">
-    <div class="note acc"><span>${I.talChat}</span>
-      <div class="nb"><b>Tal</b>${e}</div></div>
-  </section>`;
+  return e || '';
+}
+
+/* ==========================================================================
+   THE HEAD BAND — `.modhead`, and it is the opening move of every page
+
+   THE WASH IS THE WRAPPER, NOT A RENDER PASS. `.app .modhead::before` paints
+   two radial gradients in `--tal-chip-2`, and it covers whatever the wrapper
+   contains — so the page header, Tal's card and the plate read as ONE band
+   rather than three stacked blocks. The portal builds this wrapper with
+   `placeBand` (`ai5.js`), which is what made it look like something only the
+   portal could have. It is not: the paint needs nothing but the element. It
+   draws its own closing hairline (`::after`) too, so nothing here adds one.
+
+   TAL'S MARK HAS TWO FORMS AND PICKING THE WRONG ONE SHOWS. Inside a band the
+   card takes `tile tight talsum` and the label stays PLAIN — §33 keys the 32px
+   gradient disc on `.modhead .ai-aura.talsum > .ai-head > .ai-label::before`.
+   `.bare` (§37) is the 16px fallback for a page with no band at all, and using
+   it inside one puts a small dot where the disc belongs. This file had `.bare`
+   everywhere before the band existed; the only place it is still right is
+   Tal's draft further down the report page.
+
+   AND THE GREETING SWALLOWS THE PAGE HEADER. `.app .modhead:has(.tal-greet) >
+   .ph{display:none}` — so a card carrying a `.tal-greet` becomes the head, and
+   the title and fact row under it would be a second heading nobody reads. That
+   is why `greet` is passed on the dashboard and nowhere else: every other page
+   needs its title, so it must not carry one.
+   ========================================================================== */
+function head({title, sub, back, greet, wing, plate}){
+  const text = pageSummary();
+  return `<div class="modhead">
+    ${ph(title, sub, back)}
+    ${text ? `<div class="sec">
+      <div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Tal</span></div>
+        <div class="ai-body"><p>${greet ? `<span class="tal-greet">${greet}</span>` : ''}${text}</p></div>
+        ${wing || ''}
+      </div>
+    </div>` : ''}
+    ${plate ? `<div class="sec sec-dark">${plate}</div>` : ''}
+  </div>`;
 }
 
 /* FOUR CELLS, ALWAYS. `.stats` is a fixed 2/4-column grid and its hairlines
@@ -526,10 +613,155 @@ const checkRow = (st, title, detail, go) => {
     : factRow(ic, title, detail, tag);
 };
 
+/* --------------------------------------------------------------------------
+   THE SIGNATURE COMPONENTS
+
+   These four are what make a page read as TalentNext rather than as a correct
+   admin table, and every one of them has internal structure the CSS keys on —
+   a guessed structure looks BROKEN rather than absent. The recipes are
+   `gallery.html` under **Signature**, taken from `views.js`; these wrappers
+   exist so the structure is stated once here and cannot drift page to page.
+   -------------------------------------------------------------------------- */
+
+/* THE BLACK PLATE — the hero, and the one place the accent appears as a fill.
+
+   THE CTA INSIDE IS A PLAIN `.btn.btn-p` AND COMES OUT ORANGE. §19 gives
+   `.plate .btn-p` the brand gradient; the same class is black everywhere else
+   on the page. Do not reach for another class to get the colour — the pairing
+   is the component, and it is the single thing the first extraction lost.
+
+   THE COUNTDOWN IS ASSEMBLED HERE, NOT DECLARED. `data-when` is documented as
+   an attribute that "draws the chip in the corner", and it does — in the
+   portal, where `placePlates` (`ai5.js`) reads it on every render, builds a
+   `.plate-h` row, and seats the title in it beside a `.plate-when` chip
+   because a plate with no eyebrow has nothing else for that row to hold
+   (`.plate-h-bare` is the flag §15 keys the title's zeroed margin on). No CSS
+   anywhere reads the attribute. This file has no render passes, so it emits
+   the arranged shape directly and keeps `data-when` as the record of where
+   the value came from. Child order then follows the portal's own, because
+   that is the order the desktop grid was tuned against: head, meta, who,
+   actions — `.plate-a` is explicitly placed in column 2 either way. */
+const plate = ({when, av, photo, who, whoSub, title, meta, actions}) => `
+  <div class="plate"${when ? ` data-when="${when}"` : ''}>
+    <i class="dark-glow" aria-hidden="true"></i>
+    <div class="plate-h${when ? ' plate-h-bare' : ''}">
+      <div class="plate-t">${title}</div>
+      ${when ? `<span class="plate-when">${I.time}<b>${when}</b></span>` : ''}
+    </div>
+    <div class="plate-b">${meta}</div>
+    ${actions ? `<div class="plate-a">${actions}</div>` : ''}
+    ${who ? `<div class="plate-who">
+      ${avatar(av, photo, 56)}
+      <span class="plate-wb"><b>${who}</b><span>${whoSub}</span></span>
+    </div>` : ''}
+  </div>`;
+
+/* A FACE, WITH THE INITIALS BEHIND IT. `.av-ph` holds the letters and the
+   photograph in the same box, so a missing asset degrades to "OC" rather than
+   to a hole. The five portraits in the design system's JS are shared across
+   more people than that — the same fidelity choice the portal states for its
+   own ten cohort members, not a claim that these are one person. */
+const avatar = (initials, photo, size) => `
+  <span class="av-ph"${size ? ` style="width:${size}px;height:${size}px"` : ''}><i>${initials}</i>${
+    photo ? `<img src="${photo}" alt="">` : ''}</span>`;
+
+/* THE RING — two SVG circles, not a conic gradient. `--arc` is a
+   stroke-dasharray LENGTH rather than a percentage: r=26, so the
+   circumference is 163.36 and arc = 163.36 × pct/100. */
+const ring = pct => `
+  <div class="ring" role="img" aria-label="${pct}% done">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <circle class="ring-t" cx="32" cy="32" r="26"></circle>
+      <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:${(163.36 * pct / 100).toFixed(1)}"></circle>
+    </svg>
+    <span class="ring-n u-h2">${pct}<small>%</small></span>
+  </div>`;
+
+/* --------------------------------------------------------------------------
+   THE STEPPER, AND IT LIVES INSIDE TAL'S CARD
+
+   `.stp-wing` is a grid area of `.ai-aura.talsum`: at desktop it sits to the
+   right of Tal's sentence behind a hairline, and on a phone it drops under it.
+   That pairing is the point — where you are in the journey and what Tal makes
+   of it are one thought, and the portal merged them for that reason.
+
+   A STEPPER ON A PHONE EATS A SCREEN, so only the rail, the count and the step
+   you are on are drawn; the rest is one press away in `.stp-all`, which the
+   band promotes to a centred popup over an overlay. `S.stp` is that flag, on
+   the state object rather than in the DOM, because `render()` reprints the
+   frame and a class a handler added would be gone by the next paint.
+   -------------------------------------------------------------------------- */
+function stepper(steps, title){
+  let i = steps.findIndex(x => x.st === 'on');
+  if(i < 0) i = steps.filter(x => x.st === 'done').length ? steps.length - 1 : 0;
+  const cur = steps[i], open = !!S.stp;
+  const ic = st => st === 'done' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.checkFilled}</span>`
+    : st === 'on' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.circleDash}</span>`
+    : `<span class="pi-ic" style="fill:var(--gray-50)">${I.circle}</span>`;
+  return `<div class="stp-wing">
+    <div class="stp flush stp-titled${open ? ' open' : ''}">
+      <div class="stp-top">
+        <h2 class="u-h3">${title}</h2>
+        <span class="stp-meter">
+          <span class="stp-rail" role="img" aria-label="Step ${i + 1} of ${steps.length}">
+            ${steps.map(x => `<i class="${x.st}"></i>`).join('')}
+          </span>
+          <span class="stp-c">Step ${i + 1} of ${steps.length}</span>
+        </span>
+        <button class="stp-t" data-stp="${open ? '0' : '1'}" aria-expanded="${open}">${open ? 'Hide steps' : 'All steps'}${I.chevDown}</button>
+      </div>
+      <div class="stp-now">
+        <div class="pi-lab">${cur.lab}</div>${cur.sec ? `<div class="pi-sec">${cur.sec}</div>` : ''}
+      </div>
+      ${open ? '<div class="stp-overlay" data-stp="0"></div>' : ''}
+      <div class="stp-all"><div class="stp-pop"><h3 class="stp-pop-h">${title}</h3>
+        <div class="pi" style="padding:0">
+          ${steps.map(x => `<div class="pi-step ${x.st}">${ic(x.st)}
+            <div><div class="pi-lab">${x.lab}</div>${x.sec ? `<div class="pi-sec">${x.sec}</div>` : ''}</div></div>`).join('')}
+        </div></div></div>
+    </div>
+  </div>`;
+}
+
+/* THE JOURNEY, WHICH IS THE FLOW DIAGRAM'S FOUR STAGES PLUS THE WORK ITSELF.
+   Each stage marks one step `on`, everything before it `done`, and the rest
+   blank — so the same five rows read correctly at every point in the file. */
+const JOURNEY = v => {
+  const at = {apply:0, vetting:1, setup:2, training:3}[S.stage] ?? 4;
+  const rows = [
+    ['Your application', v.sent ? 'Sent 3 June, with two referees' : 'Three of five parts filled in'],
+    ['Vetting', 'Identity, a background check and two references'],
+    ['Listing and payouts', `${money(v.fee)} an interview &middot; 80% of it yours`],
+    ['Training and calibration', 'Four modules, then 45 minutes with Derek Hale'],
+    ['Interviewing', v.busy ? `${v.ivs} on record &middot; ${v.month} this month`
+      : v.certified ? 'Listed since 24 June &middot; nothing booked yet'
+      : 'Bookable the day you are certified']
+  ];
+  return stepper(rows.map(([lab, sec], n) =>
+    ({st: n < at ? 'done' : n === at ? 'on' : '', lab, sec})), 'Where you are');
+};
+
+/* HOW TAL ANSWERS. `tw()` is the portal's own reply widget — a titled block,
+   a body, and an optional action — and `.tw-lines` is the key/value grid
+   inside one. Tal replies with a card rather than a paragraph wherever the
+   answer has fields in it; that is a decision the wireframes made and the
+   portal kept. */
+const tw = (title, body, action) => `<span class="tw">
+  ${title ? `<span class="tw-h">${title}</span>` : ''}${body}
+  ${action ? `<span class="tw-a">${action}</span>` : ''}</span>`;
+const twBtn = (label, go) => `<button class="tw-btn"${go ? ` data-go="${go}"` : ''}>${label}${I.arrowRight}</button>`;
+const twLines = rows => `<span class="tw-lines">${rows.map(([k, v]) =>
+  `<span><b>${k}</b>${v}</span>`).join('')}</span>`;
+
+/* TAL'S CHIP — an offer, not navigation. `.sk-mark` is the standalone mark and
+   the cool pool behind it is a radial gradient on the chip itself. */
+const askChip = (q, label) => `<button class="chip-tal" data-ask="${q}">
+  <span class="sk-mark xs"></span>${label || q}</button>`;
+
 /* A person, with the design system's square avatar. */
 const memRow = (v, tag, go) => `
   <div class="mem"${go ? ` data-go="${go}" data-iv="${v.id}"` : ''}>
-    <span class="av mem-av">${v.i}</span>
+    ${avatar(v.i, PHOTOS[v.id])}
     <span class="mem-b"><span class="mem-n">${v.n}</span>
       <span class="mem-m">${v.day}<span class="mdot"></span>${v.time}</span></span>
     ${tag}</div>`;
@@ -547,13 +779,23 @@ const V = {};
    four view keys keeps one `PAGESUM.dashboard` table, keyed by stage.
    -------------------------------------------------------------------------- */
 V.dashboard = v => {
-  const head = ph(`Good afternoon, ${A.n.split(' ')[0]}`, v.certified
-    ? `Talent agent &middot; assesses ${v.range} &middot; ${money(v.fee)} an interview`
-    : v.approved ? 'Talent agent &middot; not yet certified'
-    : 'Application in progress');
+  /* THE DASHBOARD IS THE ONE PAGE THAT GREETS YOU, and the greeting hides the
+     page header by design (§33). So the title and the fact row are still
+     written — they are what a reader gets if the band ever fails — but what is
+     read is Tal's line and the stepper beside it. Both carry the same facts
+     the fact row would have. */
+  const band = extra => head({
+    title: `Welcome back, ${A.n.split(' ')[0]}!`,
+    sub: v.certified ? `Talent agent &middot; assesses ${v.range} &middot; ${money(v.fee)} an interview`
+       : v.approved ? 'Talent agent &middot; not yet certified'
+       : 'Application in progress',
+    greet: `Welcome back, ${A.n.split(' ')[0]}!`,
+    wing: JOURNEY(v),
+    plate: extra
+  });
 
   /* --- stage 1: before approval ---------------------------------------- */
-  if(!v.approved) return head + talCard() + `
+  if(!v.approved) return band() + `
     <section class="sec">
       <div class="sec-h"><h2>Where it is</h2></div>
       <ol class="steps">
@@ -574,7 +816,7 @@ V.dashboard = v => {
     </section>`;
 
   /* --- stage 2 and 3: approved, not yet bookable ------------------------ */
-  if(!v.certified) return head + talCard() + `
+  if(!v.certified) return band() + `
     <section class="sec">
       <div class="sec-h"><h2>Before you list</h2></div>
       <div class="tile-stack">
@@ -591,7 +833,7 @@ V.dashboard = v => {
     </section>`;
 
   /* --- stage 4, day one: listed, empty ---------------------------------- */
-  if(!v.busy) return head + talCard() + `
+  if(!v.busy) return band() + `
     <section class="sec">
       <div class="sec-h"><h2>Your listing</h2></div>
       ${stats([['Live', 'In browse'], [money(v.fee), 'Your rate'], ['6', 'Slots open'], ['0', 'Booked']])}
@@ -609,8 +851,21 @@ V.dashboard = v => {
     </section>`;
 
   /* --- stage 4: a working week ------------------------------------------ */
+  /* THE NEXT INTERVIEW IS THE PLATE, AND THE PLATE IS IN THE BAND. It is the
+     same object the candidate's dashboard puts there — an appointment with a
+     person, a time, and the one action worth a hero. Inside a `.modhead` it
+     sits inset rather than bleeding to the column edge (§33 zeroes the
+     negative margin), which is what makes the greeting, the sentence, the
+     stepper and the appointment read as one opening block. */
   const due = iv('sofia'), next = iv('rafael');
-  return head + talCard() + `
+  return band(plate({
+      when: 'tomorrow', av: next.i, photo: AV.lena, who: next.n,
+      whoSub: `${next.kind} &middot; ${next.band}`,
+      title: 'Interview with ' + next.n,
+      meta: `${next.day} at ${next.time} &middot; 45 minutes &middot; ${money(v.fee)} paid`,
+      actions: `<button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2" data-go="interview" data-iv="${next.id}">Read the brief</button>`
+    })) + `
     <section class="sec">
       <div class="sec-h"><h2>This month</h2></div>
       ${stats([
@@ -624,15 +879,17 @@ V.dashboard = v => {
       <div class="sec-h"><h2>On you</h2></div>
       <div class="tile-stack">
         ${goRow('edit', 'Due 6:00 PM today', `${due.n}’s report`, 'Tal has a draft off the transcript', 'interview', ` data-iv="${due.id}"`)}
-        ${goRow('video', next.day, `Interview with ${next.n}`, `${next.time} &middot; 45 minutes &middot; paid`, 'interview', ` data-iv="${next.id}"`)}
       </div>
+      <div class="tal-sugg">${askChip('How is the report written?', 'Ask Tal how the write-up works')}</div>
     </section>
 
     <section class="sec">
-      <div class="sec-h"><h2>Coming up</h2></div>
+      <div class="sec-h"><h2>After that</h2></div>
       <div class="tile-stack">
-        ${IVS.filter(x => x.st === 'next').map(x =>
+        ${IVS.filter(x => x.st === 'next' && x.id !== next.id).map(x =>
           memRow(x, `<span class="tag sm">${x.kind}</span>`, 'interview')).join('')}
+        ${factRow('time', 'Friday 21 August, 5:00 PM ET', 'Open &mdash; nobody has taken it',
+          '<span class="tag sm">Open</span>')}
       </div>
     </section>
 
@@ -652,10 +909,11 @@ V.dashboard = v => {
    the voice the reader needs, because "everyone you interview is 18 to 24" is
    the reason and it is not obvious.
    -------------------------------------------------------------------------- */
-V.application = v => ph('Your application',
-    v.sent ? 'Submitted 3 June &middot; two of three checks back &middot; decision within five working days'
-           : 'Draft &middot; three of five parts &middot; nothing is reviewed until all five are in')
-  + talCard() + `
+V.application = v => head({
+    title: 'Your application',
+    sub: v.sent ? 'Submitted 3 June &middot; one of three checks back &middot; decision within five working days'
+                : 'Draft &middot; three of five parts &middot; nothing is reviewed until all five are in'
+  }) + `
 
   <section class="sec">
     <div class="sec-h"><h2>What you sent</h2></div>
@@ -701,16 +959,17 @@ V.application = v => ph('Your application',
 /* --------------------------------------------------------------------------
    LISTING — steps 4 and 5. How the agent appears in browse, and their fee.
    -------------------------------------------------------------------------- */
-V.listing = v => ph('Your listing', v.listed
-    ? `Live in browse &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
-    : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`)
-  + talCard() + `
+V.listing = v => head({
+    title: 'Your listing',
+    sub: v.listed ? `Live in browse &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
+                  : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
+  }) + `
 
   <section class="sec">
     <div class="sec-h"><h2>How you appear</h2></div>
     <div class="tile-stack">
       <div class="cardrow">
-        <span class="av mem-av">${A.i}</span>
+        <span class="cardrow-ic">${avatar(A.i, AV.owen, 40)}</span>
         <span class="cardrow-b"><span class="cardrow-t">${A.n}
           ${v.listed ? '<span class="pill-def">Listed</span>' : ''}</span>
           <span class="cardrow-d">Talent agent &middot; assesses ${v.range}</span></span>
@@ -763,23 +1022,68 @@ V.listing = v => ph('Your listing', v.listed
    -------------------------------------------------------------------------- */
 V.training = v => {
   const done = v.mods === 4;
-  return ph('Training and calibration', done
-      ? 'Four modules &middot; calibrated 20 June &middot; re-checked each June'
-      : `${v.mods || 0} of four modules &middot; calibration Thursday 20 June`)
-    + talCard() + `
+  /* A `&middot;` ROW IS FIGURES, so the count is set rather than spelt — the
+     house rule is that a small number is spelt only when it opens a sentence.
+     Tal's summary below says "Three modules done" for the same reason. */
+  /* THE BACK BUTTON APPEARS ONLY WHERE THE PAGE IS A SUB-PAGE. In the enabling
+     stages Training is a rail item and a back arrow would point at nothing;
+     once certified it is reached from Standing, and it needs one. */
+  /* THE HERO CHANGES WITH THE STATE AND STAYS IN THE BAND. Before certification
+     the head carries the appointment that is in the way; after it, the thing
+     that came out of it. Both are dark cards, and only one is ever drawn. */
+  return head({
+    title: 'Training and calibration',
+    sub: done ? '4 of 4 modules &middot; calibrated 20 June &middot; re-checked each June'
+              : `${v.mods || 0} of 4 modules &middot; calibration Thursday 20 June`,
+    back: v.nav === 'full' ? 'standing' : '',
+    plate: done
+      ? `<div class="cert">
+          <h3>Certified to interview</h3>
+          <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
+        </div>`
+      : plate({
+          when: 'in 2 days', av: 'DH', photo: AV.samuel, who: 'Derek Hale',
+          whoSub: 'Head of agent standards',
+          title: 'Calibration interview',
+          meta: 'Thursday 20 June at 4:00 PM ET &middot; 45 minutes &middot; recorded',
+          actions: `<button class="btn btn-p btn-sm noic">Confirm the slot ${I.video}</button>
+            <button class="btn btn-sm noic plate-b2">Ask to move it</button>`
+        })
+  }) + `
 
   <section class="sec">
     <div class="sec-h"><h2>The method</h2></div>
-    <div class="tile-stack">
-      ${[['How the interview runs', '45 minutes, and what each part is for', 1],
-         ['Drawing out a story', 'Getting past the answer somebody rehearsed', 2],
-         ['Evidence, not impression', 'What a level has to be able to point at', 3],
-         ['Writing the report', 'The 24 hours after the call', 4]]
-        .map(([t, d, n]) => factRow(n <= (v.mods || 0) ? 'checkFilled' : 'book', t, d,
-          n <= (v.mods || 0) ? '<span class="tag sm green">Done</span>'
-          : n === (v.mods || 0) + 1 ? '<span class="tag sm warn">Next</span>' : '<span class="tag sm">Locked</span>')).join('')}
+    <!-- THE WEEK CARD AND ITS RING. Four modules run in sequence and each one
+         is either finished or not, which is exactly the shape the candidate's
+         chapter card draws — so it is drawn with the same component rather
+         than with a second progress idea invented here. -->
+    <div class="wkc">
+      <div class="wkc-top">
+        <div class="wkc-tb">
+          <div class="wkc-eb t-label-01">Module ${Math.min((v.mods || 0) + 1, 4)} &middot; ${done ? 'all finished' : 'in progress'}</div>
+          <h3 class="u-h3">${done ? 'The interview method' : MODULES[Math.min(v.mods || 0, 3)][0]}</h3>
+          <div class="wkc-min sub">${v.mods || 0} of 4 modules</div>
+        </div>
+        ${ring(Math.round((v.mods || 0) / 4 * 100))}
+      </div>
+      <span class="eyebrow">${done ? 'What you were taken through' : 'What you have finished'}</span>
+      <ul class="wkc-did">
+        ${MODULES.filter((m, n) => n < (v.mods || 0)).map(m =>
+          `<li class="u-compact"><span class="wkc-tick">${I.checkFilled}</span>
+            <span class="wkc-db"><b>${m[0]}</b><span class="sub">${m[1]}</span></span></li>`).join('')
+          || '<li class="u-compact"><span class="wkc-db"><span class="sub">Nothing finished yet.</span></span></li>'}
+      </ul>
     </div>
   </section>
+
+  ${done ? '' : `
+  <section class="sec">
+    <div class="sec-h"><h2>Still to do</h2></div>
+    <div class="tile-stack">
+      ${MODULES.map((m, n) => n < (v.mods || 0) ? '' : factRow('book', m[0], m[1],
+        n === (v.mods || 0) ? '<span class="tag sm warn">Next</span>' : '<span class="tag sm">Locked</span>')).join('')}
+    </div>
+  </section>`}
 
   <section class="sec">
     <div class="sec-h"><h2>Calibration</h2></div>
@@ -801,11 +1105,11 @@ V.training = v => {
 
   <section class="sec">
     ${done
-      ? `<div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Certified 20 June</b>
-          Signed by Derek Hale. The method is re-checked each June, and that is two modules rather than four.</div></div>`
+      ? `<p class="help">The method is re-checked each June, and that is two modules rather than four.</p>`
       : `<div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your listing waits on this</b>
           Nothing goes into browse until the calibration is passed.</div></div>
          <div class="btn-row mt5"><button class="btn btn-p">Open module ${(v.mods || 0) + 1} ${I.arrowRight}</button></div>`}
+    <div class="tal-sugg">${askChip('What is calibration?')}</div>
   </section>`;
 };
 
@@ -815,8 +1119,8 @@ V.training = v => {
    makes the reader do the filtering.
    -------------------------------------------------------------------------- */
 V.interviews = v => {
-  if(!v.busy) return ph('Interviews', 'Nothing booked &middot; six slots open &middot; 45 minutes each')
-    + talCard() + `
+  if(!v.busy) return head({title: 'Interviews',
+    sub: 'Nothing booked &middot; six slots open &middot; 45 minutes each'}) + `
     <section class="sec">
       <div class="empty">${I.calendar}<span class="t">Nothing booked yet</span>
         <span class="help">A booking arrives already paid for, with the candidate’s brief attached. There is nothing to accept.</span></div>
@@ -826,8 +1130,8 @@ V.interviews = v => {
   const next = IVS.filter(x => x.st === 'next'), done = IVS.filter(x => x.st === 'done');
   const owed = IVS.filter(x => x.st === 'report');
 
-  return ph('Interviews', `${v.month} this month &middot; ${v.ivs} in total &middot; next Thursday 20 August`)
-    + talCard() + `
+  return head({title: 'Interviews',
+    sub: `${v.month} this month &middot; ${v.ivs} in total &middot; next Thursday 20 August`}) + `
   <div class="tabs">
     <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Coming up</button>
     <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Finished</button>
@@ -886,24 +1190,33 @@ V.interviews = v => {
    -------------------------------------------------------------------------- */
 V.interview = v => {
   const x = iv(S.iv);
-  const head = ph(x.n, `${x.kind} &middot; ${x.day} &middot; ${x.time}`, 'interviews');
+  /* NO GREY LINE WHERE THE PLATE CARRIES THE SPINE. An upcoming interview
+     states its kind, day and time on the hero directly under the head, so a
+     fact row saying the same three things is the page telling you twice
+     before Tal has said anything. The two finished states have no plate, so
+     they keep it. */
+  const PHOTO = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya, tom: AV.samuel, nina: AV.hana};
+  const band = extra => head({
+    title: x.n,
+    sub: x.st === 'next' ? '' : `${x.kind} &middot; ${x.day} &middot; ${x.time}`,
+    back: 'interviews',
+    plate: extra
+  });
 
-  if(x.st === 'next') return head + talCard() + `
-    <section class="sec">
-      <div class="sec-h"><h2>The call</h2></div>
-      ${kv([
-        ['When', `${x.day} &middot; ${x.time}`],
-        ['Length', '45 minutes'],
-        ['Format', 'Video, recorded'],
-        ['Fee', `${money(v.fee)}, paid at booking`]])}
-    </section>
-
+  if(x.st === 'next') return band(plate({
+      when: x.id === 'rafael' ? 'tomorrow' : 'in 5 days',
+      av: x.i, photo: PHOTO[x.id], who: x.n, whoSub: x.band,
+      title: x.kind, meta: `${x.day} at ${x.time} &middot; 45 minutes &middot; video, recorded`,
+      actions: `<button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2">Add to calendar</button>`
+    })) + `
     <section class="sec">
       <div class="sec-h"><h2>Their brief</h2></div>
       ${kv([
         ['Where they are', x.band],
         ['Asked to be assessed on', x.asked],
         ['Booked', x.paid],
+        ['Fee', `${money(v.fee)}, ${money(v.share)} of it yours`],
         ...(x.summary ? [['Attached', 'Their 90-day summary']] : [])])}
     </section>
 
@@ -921,12 +1234,12 @@ V.interview = v => {
 
     <section class="sec">
       <div class="btn-row">
-        <button class="btn btn-p">Open the interview room ${I.arrowRight}</button>
         <button class="btn btn-g noic" data-sheet="brief">Add a note to the brief</button>
       </div>
+      <div class="tal-sugg">${askChip('What do I read beforehand?')}</div>
     </section>`;
 
-  if(x.st === 'report') return head + talCard() + `
+  if(x.st === 'report') return band() + `
     <section class="sec">
       <div class="note warn"><span>${I.warning}</span><div class="nb"><b>Due at ${x.due}</b>
         Twenty-four hours from the end of the call is the promise the candidate paid against.</div></div>
@@ -943,8 +1256,15 @@ V.interview = v => {
 
     <section class="sec">
       <div class="sec-h"><h2>Tal’s draft</h2></div>
-      <div class="note acc"><span>${I.talChat}</span><div class="nb"><b>Tal</b>
-        She talks about her team of four in specifics and about herself in generalities, which is where the evidence thins. Two clear examples of delegation, none of a hard conversation she started.</div></div>
+      <!-- THE SAME BAND AS THE PAGE SUMMARY, because it is the same speaker.
+           Tal has one voice and one surface in this product; a second styling
+           for "Tal, but further down the page" would be a second Tal. -->
+      <div class="ai-aura">
+        <div class="ai-head"><span class="ai-label bare">Tal</span></div>
+        <div class="ai-body"><p>She talks about her team of four in specifics and
+          about herself in generalities, which is where the evidence thins. Two
+          clear examples of delegation, none of a hard conversation she started.</p></div>
+      </div>
       <label class="f mt5"><span class="lbl">Your write-up</span>
         <textarea class="inp" rows="4">Sofia runs a team of four and described handing over the vendor review in enough detail to show she plans a handover rather than announces one. Less evidence on conversations she has had to open herself.</textarea></label>
       ${kv([['Level you are setting', x.level], ['Growth areas', 'Hard conversations, and asking for what she needs']])}
@@ -959,7 +1279,7 @@ V.interview = v => {
       </div>
     </section>`;
 
-  return head + talCard() + `
+  return band() + `
     <section class="sec">
       <div class="sec-h"><h2>What you set</h2></div>
       ${kv([
@@ -994,8 +1314,10 @@ V.interview = v => {
    the grid expects. These sections use an `.eyebrow` as their heading instead,
    which is the cheap fix and the one the design system's own README names.
    -------------------------------------------------------------------------- */
-V.availability = () => ph('Availability', 'Six slots open &middot; 45 minutes each &middot; Eastern time')
-  + talCard() + `
+V.availability = () => head({
+    title: 'Availability',
+    sub: 'Six slots open &middot; 45 minutes each &middot; Eastern time'
+  }) + `
 
   ${SLOTS.map(([week, slots]) => `
   <section class="sec">
@@ -1034,10 +1356,9 @@ V.availability = () => ph('Availability', 'Six slots open &middot; 45 minutes ea
    -------------------------------------------------------------------------- */
 V.earnings = v => {
   const connected = v.paid;
-  return ph('Earnings', connected
-      ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} in escrow`
-      : '80/20 split &middot; no destination connected')
-    + talCard() + `
+  return head({title: 'Earnings',
+    sub: connected ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} in escrow`
+                   : '80/20 split &middot; no destination connected'}) + `
 
   ${connected && v.busy ? `
   <section class="sec">
@@ -1092,9 +1413,25 @@ V.earnings = v => {
    conversation went, which is a different question from what the candidate is
    worth — that answer is the report, and the report is written by a person.
    -------------------------------------------------------------------------- */
-V.standing = v => ph('Your standing',
-    `Agent level ${v.level} of A${v.levels} &middot; ranked ${v.rank} of ${v.pool} &middot; reviewed by ${v.manager}`)
-  + talCard() + `
+/* THREE SLOTS, THREE JOBS, AND THE HERO IS NOW ONE OF THEM. The grey line is
+   the spine, the hero card states the level and what it entitles you to, and
+   Tal reads what moved. The first draft of this page had all three saying "A2,
+   ranked 12 of 38, reviewed by Nadia" — which is the duplication the two-slot
+   rule exists to stop, arriving through a third surface. */
+V.standing = v => head({
+    title: 'Your standing',
+    sub: `Agent level ${v.level} of A${v.levels} &middot; ranked ${v.rank} of ${v.pool} &middot; reviewed quarterly`,
+    /* .lvl-hero IS THE LEVEL, on both sides of the product. The candidate's own
+       level is drawn with this card; an agent's level is the same kind of fact
+       about the same kind of person, so it is drawn the same way rather than as
+       a fifth figure cell — and it belongs in the band for the same reason the
+       plate does: it is what the page is about. */
+    plate: `<div class="lvl-hero">
+      <span class="eyebrow">Your agent level</span>
+      <div class="big">Agent &ndash; ${v.level}</div>
+      <p class="sub">You may assess ${v.range}.</p>
+    </div>`
+  }) + `
 
   <section class="sec">
     <div class="sec-h"><h2>Where you are</h2></div>
@@ -1136,10 +1473,19 @@ V.standing = v => ph('Your standing',
   </section>
 
   <section class="sec">
+    <div class="sec-h"><h2>Also held</h2></div>
+    <div class="tile-stack">
+      ${goRow('certificate', 'Certified 20 June 2024', 'Training and calibration',
+        'Four modules, and the method re-checked each June', 'training')}
+    </div>
+  </section>
+
+  <section class="sec">
     <div class="note"><span>${I.info}</span><div class="nb"><b>A level change moves your range</b>
       ${v.reviewed
         ? 'A3 is E1 to B2, which is why Explorer’s first two levels appeared in your queue this month.'
         : 'A2 is E2 to B1. A3 would add Explorer’s first two levels and Builder’s second.'}</div></div>
+    <div class="tal-sugg">${askChip('What moves me to A3?')}</div>
   </section>`;
 
 /* --------------------------------------------------------------------------
@@ -1150,13 +1496,13 @@ V.standing = v => ph('Your standing',
    Inventing a line to fill the slot is what produces two summaries six
    millimetres apart, which is the duplication the rule exists to stop.
    -------------------------------------------------------------------------- */
-V.profile = v => ph('Profile') + talCard() + `
+V.profile = v => head({title: 'Profile'}) + `
 
   <section class="sec">
     <div class="sec-h"><h2>You</h2></div>
     <div class="tile-stack">
       <div class="cardrow">
-        <span class="av mem-av">${A.i}</span>
+        <span class="cardrow-ic">${avatar(A.i, AV.owen, 40)}</span>
         <span class="cardrow-b"><span class="cardrow-t">${A.n}</span>
           <span class="cardrow-d">${A.email}</span></span>
         <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="profile">Edit</button></span>
@@ -1203,17 +1549,27 @@ function shell(v){
     <button class="shell-act nav-t ${S.nav ? 'on' : ''}" data-toggle="nav"
       aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation">${S.nav ? I.close
       : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
-    <a class="shell-logo" data-go="dashboard" aria-label="TalentNext home">${TN_MARK}<b>TalentNext</b></a>
+    <!-- THE REAL LOCKUP, not the mark plus the word set in type. The design
+         system's JS now carries the portal's own PNGs — LOGO_K black, LOGO_W
+         white — so the app bar can hold the same image the candidate portal
+         holds instead of an approximation of it, and this file needs no CSS to
+         size a wordmark it is no longer drawing.
+
+         A BUTTON, NOT AN ANCHOR: an anchor with no href picks up the prose-link
+         styling below 900px, and going home is an action here rather than a
+         document reference. (No backticks in a comment inside a template
+         literal, either — they end the string.) -->
+    <button class="shell-logo" data-go="dashboard" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
     <div class="shell-right">
       <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
       <button class="shell-act ${S.tal ? 'on' : ''}" data-toggle="tal" aria-label="Ask Tal">${I.talChat}</button>
-      <span class="av sm shell-avatar">${A.i}</span>
+      <span class="av-ph sm shell-avatar"><i>${A.i}</i><img src="${AV.owen}" alt=""></span>
     </div>
   </header>`;
 }
 
 function sidenav(v){
-  const active = PARENT[S.view] || S.view;
+  const active = parentOf(S.view, v.nav) || S.view;
   const items = NAVSETS[v.nav].map(([k, l, ic]) =>
     `<button class="sn-item ${k === active ? 'on' : ''}" title="${l}" data-go="${k}"${k === active ? ' aria-current="page"' : ''}>${I[ic]}<span>${l}</span></button>`).join('');
   return `
@@ -1239,21 +1595,31 @@ function sidenav(v){
    sheet brings the page's `--pad-x` indent with it and hangs off both sides —
    the trap `35-book.css` answers with one declaration. A `.btn-row` of small
    outlined buttons has no gutter to bring. */
+/* THE CHIPS ARE THE PAGE'S, THE ANSWERS ARE TAL'S. The chips offered are the
+   ones for the page you are on; the answer is looked up across the whole
+   table, because a chip printed on a page can name a question that lives in
+   another page's list — the dashboard offers "how is the report written",
+   which is an Interview question. Looking it up in the current page's list
+   only is what made Tal open empty when asked from the dashboard. */
+const talAnswer = q => Object.values(TALQ).flat().find(e => e[0] === q);
+
 function talSheet(){
   const qs = TALQ[S.view] || TALQ.dashboard;
-  const a = qs.find(q => q[0] === S.talQ);
+  const a = talAnswer(S.talQ);
   return `<div class="modal ${S.tal ? 'on' : ''}" data-close="tal">
     <div class="sheet">
       <div class="sheet-h"><h2>Ask Tal</h2>
         <button class="x" data-close="tal" aria-label="Close">${I.close}</button></div>
       <div class="sheet-b">
-        ${a ? `<div class="note acc"><span>${I.talChat}</span>
-          <div class="nb"><b>${a[0]}</b>${a[1]}</div></div>` : ''}
-        <p class="help${a ? ' mt5' : ''}">${a ? 'Anything else' : 'On this page'}</p>
-        <div class="btn-row">
-          ${qs.filter(q => q[0] !== S.talQ).map(q =>
-            `<button class="btn btn-g btn-sm noic" data-ask="${q[0]}">${q[0]}</button>`).join('')}
-        </div>
+        ${a ? tw(a[0], a[2] ? `<p class="t-body-02">${a[1]}</p>${twLines(a[2])}` : `<p class="t-body-02">${a[1]}</p>`,
+                 a[3] ? twBtn(a[3][0], a[3][1]) : '') : `
+          <div class="ai-aura">
+            <div class="ai-head"><span class="ai-label bare">Tal</span></div>
+            <div class="ai-body"><p>I can read your listing, your interviews, your scores and the money. What do you need?</p></div>
+          </div>`}
+        <span class="tal-sugg">
+          ${qs.filter(q => q[0] !== S.talQ).map(q => askChip(q[0])).join('')}
+        </span>
       </div>
     </div>
   </div>`;
@@ -1339,10 +1705,17 @@ const MO = {key:'', open:{}};
 
 function render(){
   const v = f();
+  const parent = parentOf(S.view, v.nav);
   if(!NAVSETS[v.nav].some(([k]) => k === S.view) && S.view !== 'profile'
-     && !(PARENT[S.view] && NAVSETS[v.nav].some(([k]) => k === PARENT[S.view]))){
+     && !(parent && NAVSETS[v.nav].some(([k]) => k === parent))){
     S.view = 'dashboard';           /* a stage that lost the page you were on */
   }
+  /* AND NO INTERVIEW PAGE IN A STAGE WITH NO INTERVIEWS. `live` is the day the
+     listing went up: the Interviews page correctly says nothing is booked, so
+     a detail page for a booking that does not exist yet is the one screen that
+     could contradict its own stage. Nothing links to it there; this is for the
+     stage picker, which can leave you on a view the new stage does not have. */
+  if(S.view === 'interview' && !v.busy) S.view = 'interviews';
   const view = V[S.view] || V.dashboard;
 
   const key = S.stage + '/' + S.view + '/' + (S.view === 'interview' ? S.iv : '') + '/' + S.tab;
@@ -1391,20 +1764,31 @@ device.addEventListener('click', e => {
 }, true);
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-ask],[data-tab],[data-confirm],[data-sheet]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-ask],[data-tab],[data-confirm],[data-sheet],[data-stp]');
   if(!t) return;
   const d = t.dataset;
 
+  /* THE BACKDROP CLOSES, THE SHEET DOES NOT. `data-close` sits on the modal
+     root as well as on the cancel controls, so a click anywhere inside the
+     sheet still finds it by `closest()` — which shut the sheet the moment
+     anybody put the cursor in a field. When the match IS the modal, only the
+     backdrop itself counts; a real control matches as itself and closes. */
   if(d.close){
-    if(e.target.closest('.sheet') && !e.target.closest('[data-close]')) return;
+    if(t.classList.contains('modal') && e.target !== t) return;
     S[d.close] = false; if(d.close === 'tal') S.talQ = null;
     return render();
   }
   if(d.toggle){ S[d.toggle] = !S[d.toggle]; if(d.toggle === 'tal') S.talQ = null; return render(); }
   if(d.confirm){ S.confirm = d.confirm; return render(); }
   if(d.sheet){ S.sheet = d.sheet; return render(); }
-  if(d.ask){ S.talQ = d.ask; return render(); }
+  /* A CHIP ON A PAGE AND A CHIP IN THE SHEET ARE THE SAME CONTROL. Both carry
+     `data-ask`, and asking opens Tal if Tal is not already open — which is
+     what makes an `askChip` on a page an offer rather than a dead end. */
+  if(d.ask){ S.talQ = d.ask; S.tal = true; return render(); }
   if(d.tab){ S.tab = d.tab; return render(); }
+  /* THE STEPS POPUP. `.stp-all` is promoted to a centred overlay inside the
+     head band, so the toggle and the scrim behind it are one flag on `S`. */
+  if(d.stp !== undefined){ S.stp = d.stp === '1'; return render(); }
   if(d.go){
     S.view = d.go; S.nav = false; S.tal = false; S.talQ = null;
     if(d.go === 'interviews') S.tab = 'next';
@@ -1423,7 +1807,7 @@ device.addEventListener('change', e => {
 /* --------------------------------------------------------------------------
    PROTOTYPE CHROME
    -------------------------------------------------------------------------- */
-document.getElementById('ptLogo').innerHTML = `${TN_MARK}<b>TalentNext</b>`;
+document.getElementById('ptLogo').innerHTML = `<img src="${LOGO_W}" alt="TalentNext">`;
 document.getElementById('pick').innerHTML =
   STAGES.map(s => `<option value="${s[0]}">${s[1]}</option>`).join('');
 

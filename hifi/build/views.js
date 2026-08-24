@@ -582,7 +582,7 @@ function talPanel(f){
     ? `<div class="tal-msg me"><span class="tal-who"><span class="tal-who-n">You</span><span class="av"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></span><div class="bb">${html}</div></div>`
     : `<div class="tal-msg"><span class="tal-who"><span class="tal-mk sm"></span><span class="tal-who-n">Tal</span></span><div class="bb">${html}</div></div>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg"></span>
+      <span class="tal-mk lg orb">${talChev()}</span>
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;
@@ -620,7 +620,15 @@ const askChip = (q,label) => `<button class="chip-tal" data-tal-ask="${q}"><span
    `I.talChat` and not `I.chat`: the mark is Maryam's, traced — the note in
    icons.js says why the two are different icons and why the rail keeps the
    Material one. */
-const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal"><svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg><span class="tal-fab-t">Tal</span></button>`;
+/* THE CHEVRON, ONCE. It was written inline in `talFab` and is now on two
+   surfaces — the floating button and the empty state at the head of a
+   conversation that has not started — so it is a function rather than a
+   string typed twice. Three paths, `aria-hidden` on both because in each
+   place the thing beside it already says the name: the button has its
+   `aria-label`, the hero has its own greeting in text. */
+const talChev = () => `<svg viewBox="0 0 559 559" aria-hidden="true"><path d="M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z"/><path d="M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z"/><path d="M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z"/></svg>`;
+
+const talFab = () => `<button class="tal-fab" data-toggle="tal" aria-label="Ask Tal">${talChev()}<span class="tal-fab-t">Tal</span></button>`;
 
 /* ============================================================
    PICTOGRAMS — IBM Design Language line art. Carbon ships icons,

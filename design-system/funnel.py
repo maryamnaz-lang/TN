@@ -14,17 +14,20 @@ WHAT IT LOOKS FOR, in order of how much it costs to miss:
      warning anywhere, because from `build-ds.py`'s point of view the file
      does not exist.
 
-  2. UNCLASSIFIED CLASS NAMES — in neither `SYSTEM` nor the product lists, so
-     dropped by default. This is the new-component case.
+  2. CLASS NAMES NEW SINCE THE LAST REVIEW. Under include-by-default these
+     are already IN the design system — nothing is lost by not answering. The
+     reason to look is narrower and still worth it: to decide whether one
+     deserves a markup recipe in gallery.html. A component whose internal
+     structure nobody wrote down is one the next portal will guess at, and a
+     guessed `.plate` or `.ring` looks broken rather than absent.
 
   3. A LAYER WHOSE CONTENT CHANGED since the last review, when git can tell
      us. A rule edited inside an existing class will not show up as a new
      name, but it can still change a shared component.
 
 It keeps a small state file, `.funnel-state.json`, holding the names already
-shown and dismissed, so a "no thanks, that one is product" answer is not
-re-asked every two hours. That is the whole point: silence unless something
-actually changed.
+seen, so the same list is not re-offered every two hours. That is the whole
+point: silence unless something actually changed.
 
     python3 funnel.py              # the digest
     python3 funnel.py --accept-all # record everything current as reviewed
@@ -64,21 +67,27 @@ def save_state(state):
 
 
 def scan():
-    """-> (unclassified {cls: {'layers': [...], 'rules': n}}, missing_layers)"""
+    """-> ({cls: {'layers': [...], 'rules': n}} for every non-core class,
+    missing_layers)"""
     found = collections.defaultdict(lambda: {'layers': [], 'rules': 0})
     on_disk = sorted(p.name for p in SRC.glob('*.css'))
     missing = [n for n in on_disk if n not in bds.LAYERS]
 
     # read every layer on disk, INCLUDING ones build-ds.py does not list —
     # those are exactly the ones whose components are invisible today
+    # SINCE THE POLICY BECAME INCLUDE-BY-DEFAULT, "unclassified" no longer
+    # exists — a new component is in the design system the moment it is built.
+    # So this collects every class name that is NOT part of the documented core
+    # and not excluded: the things that shipped without anyone looking at them.
+    # The digest is now FYI plus a nudge to document, not a gate.
     for name in on_disk:
         text = re.sub(r'/\*[\s\S]*?\*/', '', (SRC / name).read_text())
         for sel in re.findall(r'([^{}]+)\{', text):
             if sel.strip().startswith('@'):
                 continue
             for cls in set(CLASS_RE.findall(sel)):
-                if bds.classify(cls) != 'unclassified':
-                    continue
+                if bds.classify(cls) != 'included':
+                    continue          # 'core' is documented, 'excluded' is out
                 rec = found[cls]
                 rec['rules'] += 1
                 if name not in rec['layers']:
@@ -159,9 +168,11 @@ def main():
         by_layer = collections.defaultdict(list)
         for cls, rec in fresh.items():
             by_layer[rec['layers'][0]].append((cls, rec))
-        print(f'\n{len(fresh)} unclassified class name(s) — dropped by default.')
-        print('For each: SHARED (add to SYSTEM in build-ds.py) or')
-        print('          PRODUCT (add its prefix to PRODUCT_PREFIXES/PRODUCT_EXACT).\n')
+        print(f'\n{len(fresh)} class name(s) new since the last review. These are')
+        print('ALREADY in the design system — include-by-default means nothing is')
+        print('lost. Worth a look only to decide whether any deserves a markup')
+        print('recipe in gallery.html, which is what stops the next portal from')
+        print('guessing its structure and getting it wrong.\n')
         all_names = set(unclassified)
         for layer in sorted(by_layer):
             print(f'  {layer}')
@@ -177,9 +188,9 @@ def main():
             print(f'     {n}')
 
     print('\n' + '-' * 72)
-    print('Nothing here is urgent. When you have decided, record the baseline:')
+    print('Nothing here is urgent, and nothing is lost. Record the baseline:')
     print('    cd design-system && python3 funnel.py --accept-all')
-    print('and rebuild if you moved anything into SYSTEM:')
+    print('and rebuild so the new layers are picked up:')
     print('    python3 build-ds.py')
     print('-' * 72)
     return 1

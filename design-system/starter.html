@@ -34,10 +34,8 @@
   container-type:inline-size;container-name:app;
   overflow:hidden;background:var(--background)}
 
-/* the wordmark. The portal ships an image asset; this sets it as text. */
-.shell-logo{gap:var(--s03)}
-.shell-logo svg{width:18px;height:18px;fill:var(--icon-primary);flex:none}
-.shell-logo b{font-size:15px;font-weight:400;letter-spacing:-.2px;white-space:nowrap}
+/* Nothing. The wordmark is a real asset now — `LOGO_K` in talentnext-ds.js —
+   and §01 already sizes it: `.shell-logo img{height:17px}`, 19px at desktop. */
 </style>
 </head>
 <body>
@@ -67,12 +65,63 @@ const S = { view: 'home', nav: false };
 const V = {};
 
 V.home = () => `
-  <div class="ph">
-    <span class="eyebrow">Cohort 41</span>
-    <h1>Good morning, Maryam</h1>
-    <p class="lead">This is a page header. One per page, and it carries the
-      only h1. Everything under it is a section.</p>
+  <!-- THE HEAD BAND IS WHERE THE GRADIENT LIVES, and the wrapper is the whole
+       trick: ".app .modhead::before" paints a pair of radial gradients in
+       "--tal-chip-2", so any page that wraps its head in "modhead" gets the
+       warm-to-green wash the candidate portal opens with. The portal builds
+       this wrapper with a JS pass, which made it look JS-only. It is not.
+       It draws its own closing hairline too, so do not add one. -->
+  <div class="modhead">
+    <div class="ph">
+      <span class="eyebrow">Cohort 41</span>
+      <h1>Good morning, Maryam</h1>
+      <p class="lead">This is a page header. One per page, and it carries the
+        only h1. Everything under it is a section.</p>
+    </div>
+
+  <!-- TAL'S BAND, AND NOTE ".bare" — it is not optional and it is the single
+       easiest thing to get wrong. Plain ".ai-label" is deliberately an
+       accent-filled CHIP (§12/§19 give it the gradient and a star mask). The
+       soft round mark you see at the head of every page in the candidate
+       portal is the BARE form, which §33 applies inside the JS-assembled head
+       band and §37 exposes as ".bare" for pages that build their own.
+       Without ".bare" Tal renders as a hard orange pill, which is exactly how
+       the first portal built on this design system came out. -->
+  <section class="sec">
+    <div class="ai-aura">
+      <div class="ai-head"><span class="ai-label bare">Tal</span></div>
+      <div class="ai-body"><p>Day 34 of 90, 5 of 13 chapters at 88%. Chapter 4
+        is unfinished after four attempts, and your week 4 reflection is
+        overdue.</p></div>
+    </div>
+    </section>
   </div>
+
+  <!-- THE BLACK PLATE. In the starter on purpose: a page with no dark card and
+       no accent fill reads as a generic admin table, however correct its
+       hairlines are. "data-when" is an ATTRIBUTE, not a child. The CTA inside
+       is a plain ".btn.btn-p" and comes out ORANGE, because §19 gives
+       ".plate .btn-p" the brand gradient — outside a plate the same class is
+       black. That pair is where most of the brand lives. -->
+  <section class="sec">
+    <div class="plate" data-when="in 2 days">
+      <div class="plate-who">
+        <!-- A REAL FACE. "AV.priya" is the photo the portal uses. ".av-ph"
+             holds initials behind the image, so it degrades to "PN" if the
+             asset is ever missing. -->
+        <span class="av-ph" style="width:56px;height:56px"><i>PN</i>
+          <img src="${AV.priya}" alt=""></span>
+        <span class="plate-wb"><b>Priya Nair</b>
+          <span>Cohort leader &middot; leads Cohort 41</span></span>
+      </div>
+      <div class="plate-t">Cohort Week 36 Session</div>
+      <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic" data-go="course">Join call ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2" data-go="course">Add to calendar</button>
+      </div>
+    </div>
+  </section>
 
   <section class="sec">
     <div class="sec-h"><h2>Where you are</h2></div>
@@ -223,12 +272,16 @@ function render(){
         <span class="nav-t-mark">${TN_MARK}</span>
         <span class="nav-t-menu">${I.menu}</span>
       </button>
-      <a class="shell-logo" data-go="home">${TN_MARK}<b>TalentNext</b></a>
+      <!-- THE REAL WORDMARK. "LOGO_K" is the black lockup the portal uses in
+           its own app bar, embedded in talentnext-ds.js. "LOGO_W" is the white
+           one for a dark ground. Do not set the brand as text. -->
+      <a class="shell-logo" data-go="home"><img src="${LOGO_K}" alt="TalentNext"></a>
       <div class="shell-right">
         <span class="shell-name">Maryam Naz</span>
         <button class="shell-act" aria-label="Notifications">
           ${I.notification}<span class="shell-badge">2</span></button>
-        <span class="av sm shell-avatar">MN</span>
+        <span class="av sm shell-avatar av-ph"><i>MN</i>
+          <img src="${AV.hana}" alt=""></span>
       </div>
     </header>
 

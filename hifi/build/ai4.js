@@ -237,7 +237,7 @@ function askView(f){
      thread is the thread, exactly as the panel behaves. */
   const opened = S.thread.length > 0;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg"></span>
+      <span class="tal-mk lg orb">${talChev()}</span>
       <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
     </div>`;

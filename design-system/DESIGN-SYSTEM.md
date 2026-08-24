@@ -6,9 +6,10 @@ desktop behaviour — with no design work to redo.
 
 ## Which file *is* the design system?
 
-**`design-system/talentnext-ds.css`.** One file, 254 KB: every token, the reset,
-the type scale, the app shell, all components, motion and the responsive tiers.
-Linking it is what makes a page look like the portal.
+**`design-system/talentnext-ds.css`.** One file, 504 KB: every token, the reset,
+the type scale, the app shell, every component the portal draws — including the
+black plate, the progress ring, Tal's band and Tal's mark — motion, and the
+responsive tiers. Linking it is what makes a page look like the portal.
 
 ```html
 <link rel="stylesheet" href="design-system/talentnext-ds.css">
@@ -46,7 +47,8 @@ None of these are the design system; they are how you use and rebuild it.
 
 | File | What it is |
 |---|---|
-| `gallery.html` | The reference: every component, live, with the markup that made it. **Start here** — it is the place to find a class rather than invent one. |
+| `gallery.html` | The reference: every component, live, with the markup that made it. **Start here** — and read **Signature** first, since those carry the look and their markup is fixed. |
+| `proof.html` | Every signature component, hand-authored, with no portal JS — the check that the look really does travel. |
 | `starter.html` | A working three-page portal skeleton to copy. |
 | `build-ds.py` | The build. Regenerates the two generated files from `hifi/build/`. |
 | `DESIGN-SYSTEM.md` | This file — the prose. The system itself is the CSS; this explains it. |
@@ -61,33 +63,103 @@ Then `http://127.0.0.1:8799/design-system/gallery.html`.
 
 ## Adding a new component so every portal can use it
 
-Build it as a layer in `hifi/build/` as usual, with a class prefix no earlier
-layer mentions. Then add that prefix to the `SYSTEM` set in `build-ds.py` and
-rebuild. It is now in the design system and available to every portal.
+**Nothing to do.** Build it as a layer in `hifi/build/` and rebuild — it is in
+the design system. The policy is include-by-default: everything the portal
+draws ships, except the short `EXCLUDE_PREFIXES` list.
 
-**Nothing is shared by accident, and nothing is dropped silently.** Anything not
-in `SYSTEM` is excluded — correct for one screen's own vocabulary, wrong for a
-component another portal will want — so the build ends with an **unclassified
-report**: every class name that is in neither `SYSTEM` nor `PRODUCT_PREFIXES`,
-listed with the layer it came from.
+### Why it works that way, because it used to work the other way
 
+v1 of this script kept an allowlist and asked "does a *second* portal need this
+word?". That test sounds right and produced the wrong artefact. The Talent Agent
+portal is the proof: built entirely on the output, 127 classes used, only two
+the stylesheet did not cover — and it still did not look like TalentNext, because
+the allowlist had dropped every component that carries the brand:
+
+| Dropped as "one surface's own" | What it actually is |
+|---|---|
+| `.plate*` | the black hero card — and with it §19's `.plate .btn-p`, the only reason the primary action inside it is the brand gradient instead of black |
+| `.wkc*` `.ring*` | the week card, its progress ring, its tick list |
+| `.ai-aura` `.ai-head` `.ai-body` `.ai-label` | the band Tal speaks from at the head of every page |
+| `__TALCIRCLE__` | Tal's actual mark, dropped as "product artwork" — which is why Tal rendered as a hard orange square |
+| `.tw-btn` | the other accent-filled CTA |
+| `.cert*` `.lvl-hero` `.score*` `.aw*` | every remaining dark card and earned mark |
+
+A page built from hairline sections, figure cells and list rows can be perfectly
+correct and still read as a generic admin table, because none of the components
+carrying the brand were in the box.
+
+So the test is inverted. **Excluding a class costs a portal that does not look
+like the product; including one nobody uses costs a single unused rule.** Those
+are not the same size, and v1 priced them as though they were.
+
+Excluded now, and only these — flows whose behaviour *is* a render pass over
+portal state, plus three surfaces that are their own thing:
+
+`ask*` `askdock` `askbar` `askfield` `askline` (Tal's full-page thread) ·
+`bk*` `bkw` `sb-*` (booking inside it) · `scene*` (the scene picker) ·
+`auth*` (the sign-up front door, plus 250 KB of artwork) ·
+`lsvt*` `ios-*` (pictures of someone else's UI) · `nil*` (a separate microsite)
+
+The build prints that list every time, so it is re-read rather than remembered.
+`SYSTEM` still exists but no longer gates anything: it names the **core** — the
+vocabulary guaranteed to work with no JS at all.
+
+### The head-band gradient — one wrapper
+
+The warm-to-green wash at the top of every module page is
+`.app .modhead::before`: two radial gradients in `--tal-chip-2` (#f4fef6). It
+looked JS-only because the portal *builds* the wrapper with a render pass
+(`placeBand`), but the paint needs nothing but the wrapper:
+
+```html
+<div class="modhead">
+  <div class="ph"> … </div>
+  <section class="sec"> … Tal's band, a plate, whatever belongs with the head … </section>
+</div>
 ```
-UNCLASSIFIED — 2 class name(s) are in neither SYSTEM nor PRODUCT_PREFIXES,
-so they were DROPPED by default. Decide each: shared (add to SYSTEM) or
-product (add its prefix to PRODUCT_PREFIXES).
 
-  39-gauge.css             .gauge .gauge-track
-```
+It draws its own closing hairline (`::after`), so do not add one. `starter.html`
+and `proof.html` both open with it, so the page you copy already has it.
 
-Two ways to clear an entry, and both record the decision in the file rather than
-in someone's memory of a conversation:
+### Spacing and padding — five rules
 
-- **shared** → add the name to `SYSTEM`, rebuild, it ships in the design system
-- **product** → add its prefix to `PRODUCT_PREFIXES` and it stops asking
+The tokens were always in the stylesheet; what was missing was them being
+stated as rules to follow. All of these are in `gallery.html` → **Spacing**.
 
-The baseline is **zero**, which is what makes a new name visible. Short or
-ambiguous names are matched exactly rather than by prefix, so a new `.bandroll`
-is not silently classified as product just because a legacy `.b` exists.
+| | |
+|---|---|
+| Horizontal | Only `--pad-x` — 16 / 24 / 32 by tier |
+| Vertical | `.sec` pays it for you: `--s06`, `--s07` from 900px |
+| Gaps inside a component | Only `--s01` … `--s12` (2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96) |
+| Column width | `--content-max`, centred by `.page` |
+| Radius | `--radius` = 0, everywhere |
+
+**`--pad-x` is the one to memorise.** Section padding, page headers, list rows,
+cells, tabs and the head band all resolve to it, so the column has a single left
+edge whatever is drawn in it. A page that hard-codes `padding-left:20px` is a
+page whose rows no longer line up with their own headings — and that mismatch is
+the most visible way a new portal stops looking like the others. `.sec` already
+pays it; do not pay it twice.
+
+### The markup is part of the component
+
+Including the CSS is not sufficient, and this is the trap worth knowing. The
+signature components have internal structure the CSS keys on, so guessing it
+makes them look broken rather than absent. The first version of `proof.html`
+invented the markup and got four of six wrong. The recipes are now in
+`gallery.html` under **Signature**, taken from `views.js`:
+
+- `.ai-label` **needs `.bare`** on a hand-authored page. Plain `.ai-label` only
+  gets the mark inside the JS-assembled head band (§33 keys it on
+  `.modhead .ai-aura.talsum`), so without it Tal is a hard orange square.
+- `.plate` takes `data-when` as an **attribute**, not a child, and its children
+  are ordered: `.plate-who`, `.plate-t`, `.plate-b`, `.plate-a`.
+- `.ring` is **two SVG circles**, not a conic gradient, and `--arc` is a
+  dasharray *length*: r=26, so `arc = 163.36 × pct/100`.
+
+`proof.html` is the check: every signature component, hand-written, with no
+portal JS in the document at all. If it looks like the candidate portal, the
+components really are in the stylesheet.
 
 ### The funnel — `funnel.py`
 
@@ -142,14 +214,12 @@ that make the thing sit correctly at 900px live in §10, §14, §18, §20, §29 
 §37 — not in §01 and §02.
 
 So `build-ds.py` walks the same layers in the same order as `hifi/build/build.py`
-and keeps the rules belonging to the shared vocabulary, dropping the rules
-belonging to one product surface. **Every rule in the output is a real rule from
+and keeps everything except the eight excluded families. **Every rule in the output is a real rule from
 the real portal, in its real cascade position.** Nothing is re-typed.
 
 The build enforces that: before it writes anything it checks that every
 `(selector, declarations)` pair in the output appears identically in some source
-layer, and fails the build if one does not. 1313 rules kept, 2243 dropped as
-product-specific.
+layer, and fails the build if one does not. 3,053 rules kept; 503 dropped, all of them from the eight excluded families.
 
 ### To change the design system
 

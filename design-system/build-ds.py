@@ -52,15 +52,58 @@ LAYERS = [
     '29-consistency.css', '30-nil.css', '31-lead.css', '32-week.css',
     '33-talsum.css', '34-rail.css', '35-book.css', '36-lead2.css',
     '37-refit.css', '38-scene.css',
+    # Tal's chat widgets, unboxed. Every rule in it is `.tal-msg > .bb .tw*`,
+    # and both `tal` and `tw` are in PRODUCT_PREFIXES — so the whole layer is
+    # dropped. It is listed anyway, because the invariant this list exists to
+    # hold is that it IS build.py's list: a layer missing from here is not
+    # visibly missing, it is quietly never considered.
+    '39-talwidget.css',
+    # The empty-state orb. `.tal-hero .tal-mk.orb` — `tal` is a PRODUCT prefix,
+    # so under the include-by-default policy it comes across; the keyframes it
+    # declares are `tal-orb-track-lg`, beside §27's. Listed for the same reason
+    # as the layer above: this list's whole job is to BE build.py's list.
+    '40-talorb.css',
 ]
 
 # ==========================================================================
-# THE VOCABULARY
-# Every class the 38 layers mention was read and put in one of two places.
-# The test applied was not "is this pretty" but "does a SECOND portal, with
-# different content, need this word" — which is why the list rows, the figure
-# cells and the label column are here and the course player, Tal's thread and
-# the leader's evaluation queue are not.
+# THE POLICY IS INCLUDE BY DEFAULT, AND THE FIRST VERSION HAD IT BACKWARDS.
+#
+# v1 of this script kept an allowlist: "does a SECOND portal, with different
+# content, need this word?" Everything else was dropped. That test sounds
+# right and produced the wrong artefact, and the Talent Agent portal is the
+# proof — it was built entirely on the output, used 127 classes, had only two
+# that the stylesheet did not cover, and still did not look like TalentNext.
+#
+# Because what the allowlist threw away was precisely the look:
+#   .plate*          the black hero card — and with it §19's `.plate .btn-p`,
+#                    which is the only reason the primary action inside it is
+#                    the brand gradient rather than black
+#   .wkc* .ring*     the "this week" card, its progress ring and its tick list
+#   .ai-aura .ai-head .ai-body .ai-label
+#                    the band Tal speaks from at the head of every page
+#   __TALCIRCLE__    Tal's actual mark, dropped as "product artwork", which is
+#                    why Tal came out as a hard orange square
+#   .tw-btn          the promoted chapter button, the other accent-filled CTA
+#   .cert* .lvl-hero .score* .aw*
+#                    every remaining dark card and every earned mark
+# A page can be built out of hairline sections, figure cells and list rows and
+# be perfectly correct — and read as a generic admin table, because none of
+# the components carrying the brand were in the box.
+#
+# So the test is now the other way round: EVERYTHING is in the design system
+# unless it physically cannot work outside the portal. `EXCLUDE_PREFIXES`
+# below is that list and it is deliberately short — flows whose behaviour is a
+# render pass over portal state (Tal's thread, the booking wizard, the scene
+# picker), plus three surfaces that are their own thing (the sign-up front
+# door, the LightspeedVT frame, the Next in Leadership run-up).
+#
+# The cost of including a class nobody uses is one unused rule. The cost of
+# excluding one is a portal that does not look like the product. Those are not
+# the same size, and v1 priced them as though they were.
+#
+# SYSTEM survives as the CORE — the names guaranteed to work with no JS at
+# all, which is what `gallery.html` documents and what a new page should reach
+# for first. It no longer gates the build.
 # ==========================================================================
 SYSTEM = set("""
 app device
@@ -188,17 +231,50 @@ b-earn b-earn-t b-mk b-n b-nm b-pts b-who fa-b fa-dl fa-ic
 """.split())
 
 
+# ==========================================================================
+# THE EXCLUSIONS — the whole gate, and it is short on purpose.
+# A family belongs here only if its CSS cannot do its job outside the portal,
+# because the thing it draws is assembled by a render pass over portal state.
+# "Belongs to one screen" is NOT a reason any more; unused CSS costs a rule.
+# ==========================================================================
+EXCLUDE_PREFIXES = (
+    # Tal's full-page thread. `placeAsk` (ai4) rebuilds the entire `.ask-page`
+    # from `S.thread` on every render and nothing in it may hold DOM state, so
+    # the markup is not something a second portal can hand-author.
+    'ask', 'askdock', 'askbar', 'askfield', 'askline',
+    # Booking an interview inside that thread — the same argument, one layer
+    # further in: `ai7` fills empty `.bkw` hosts that `placeAsk` printed.
+    'bk', 'bkw', 'sb-',
+    # The scene picker: `38-scene.css` draws stills that `nil.js`-style JS
+    # swaps, and every selector is `.scene*`.
+    'scene',
+    # The sign-up front door. Namespaced by an explicit product decision —
+    # orange is the front door only, and nothing past login may reach for it —
+    # and it carries two large artwork files this stylesheet should not ship.
+    'auth',
+    # The LightspeedVT iframe frame and the phone status-bar chrome: both are
+    # pictures of somebody else's UI, not components.
+    'lsvt', 'ios-',
+    # TEMPORARY, and marked so in build.py: the Next in Leadership run-up is a
+    # separate microsite with its own visual language (boxed cards, filled navy
+    # buttons, live hovers). Mixing it in would contradict the system.
+    'nil',
+)
+
+
+def excluded(name):
+    return any(name.startswith(p) for p in EXCLUDE_PREFIXES)
+
+
 def classify(name):
-    """-> 'system' | 'product' | 'unclassified'
-    SYSTEM wins over both, so a shared name is never shadowed by a product
-    prefix that happens to be a substring of it."""
+    """-> 'core' | 'included' | 'excluded'
+    `core` is the documented, JS-free vocabulary; `included` is everything else
+    the portal draws, which now ships too. Only `excluded` is dropped."""
     if name in SYSTEM:
-        return 'system'
-    if name in PRODUCT_EXACT:
-        return 'product'
-    if any(name.startswith(p) for p in PRODUCT_PREFIXES):
-        return 'product'
-    return 'unclassified'
+        return 'core'
+    if excluded(name):
+        return 'excluded'
+    return 'included'
 
 # Hover, as build.py leaves it. Same rewrite, same keep-list: a design system
 # that felt different from the portal it came out of would be the wrong
@@ -217,10 +293,17 @@ FONTS = {
     '__SOEHNEKRAFTIG__': 'soehne-kraftig.woff2',
     '__STANDIN__': 'stand-in.woff2',
 }
-# Artwork placeholders. These are product images (Tal's mark, the sign-up
-# art), not system assets, so any declaration still holding one is dropped
-# rather than embedded — see `_drop_artwork`.
-ARTWORK = ('__TALCIRCLE__', '__AUTHART__', '__AUTHMARK__')
+# TAL'S MARK SHIPS. It was in the dropped-artwork list, on the reasoning that
+# a raster is product art and not a system asset — and the consequence was that
+# `--tal-mark` resolved to nothing, so every Tal label in a portal built on
+# this stylesheet fell back to a hard orange square. Tal appears at the head of
+# every page in the product; the mark is as much a part of the look as the
+# accent gradient. 61 KB of PNG, embedded like the fonts.
+IMAGES = {'__TALCIRCLE__': ('tal-circle.png', 'image/png')}
+
+# Still dropped: the sign-up artwork, because `auth*` is excluded wholesale and
+# the two files are 250 KB of front-door-only illustration.
+ARTWORK = ('__AUTHART__', '__AUTHMARK__')
 
 
 # ==========================================================================
@@ -318,7 +401,7 @@ def filter_functional(sel):
         sub = filter_functional(arg)
         if sub is None:
             continue
-        if all(c in SYSTEM for c in CLASS_RE.findall(sub)):
+        if not any(excluded(c) for c in CLASS_RE.findall(sub)):
             kept.append(sub)
     head, tail = sel[:start], sel[j:]
     tail = filter_functional(tail)
@@ -340,7 +423,7 @@ def keep_selector(sel):
     sel = filter_functional(sel.strip())
     if sel is None or not sel.strip():
         return None
-    if not all(c in SYSTEM for c in CLASS_RE.findall(sel)):
+    if any(excluded(c) for c in CLASS_RE.findall(sel)):
         return None
     return sel.strip()
 
@@ -535,7 +618,7 @@ def main():
 
     stats = {'kept': 0, 'dropped': 0}
     parts = []
-    unclassified = {}          # class name -> the layer it first appeared in
+    dropped_families = {}      # exclude prefix -> the class names it caught
     for name in LAYERS:
         path = SRC / name
         if not path.exists():
@@ -546,8 +629,12 @@ def main():
             if sel_text.strip().startswith('@'):
                 continue
             for cls in CLASS_RE.findall(sel_text):
-                if classify(cls) == 'unclassified':
-                    unclassified.setdefault(cls, name)
+                if cls in SYSTEM:
+                    continue
+                for prefix in EXCLUDE_PREFIXES:
+                    if cls.startswith(prefix):
+                        dropped_families.setdefault(prefix, set()).add(cls)
+                        break
         nodes = filter_nodes(parse(raw), stats)
         body = emit(nodes)
         if not body.strip():
@@ -570,6 +657,14 @@ def main():
             print(f'embedded {filename} ({f.stat().st_size/1024:.0f} KB)')
         else:
             print(f'  ! {filename} missing — its @font-face is dropped')
+    for token, (filename, mime) in IMAGES.items():
+        f = SRC / filename
+        if f.exists():
+            b64 = base64.b64encode(f.read_bytes()).decode()
+            css = css.replace(token, f'data:{mime};base64,{b64}')
+            print(f'embedded {filename} ({f.stat().st_size/1024:.0f} KB)')
+        else:
+            print(f'  ! {filename} missing — Tal\'s mark will not render')
     css = drop_orphan_fontface(css)
 
     # the invariant. Checked before the file is written, so a build that would
@@ -662,35 +757,108 @@ function dsStagger(page){
   [...page.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, 8)));
 }
 """
+    # ======================================================================
+    # THE IMAGES SHIP TOO
+    # A portal cannot draw the brand out of CSS alone: the wordmark in the app
+    # bar, the award marks and the cohort faces are raster assets, and until
+    # now a page built on this design system had to invent substitutes — which
+    # is why `starter.html` was setting the wordmark as TEXT. Everything the
+    # portal itself embeds is embedded here, under the SAME names the portal
+    # uses (`LOGO_K`, `AV`, `AWARD`), so a call site copied out of `views.js`
+    # keeps working.
+    #
+    # The logos and the faces are lifted from data.js as already-encoded data
+    # URIs; the award marks are read off disk and encoded here, exactly as
+    # build.py does it. Nothing is re-cut or re-compressed.
+    #
+    # NOT included: the sign-up artwork (`auth-art`, `auth-mark`) — 250 KB of
+    # front-door-only illustration, and `auth*` is excluded wholesale.
+    # ======================================================================
+    assets = ['\n/* ---- brand assets, embedded ---- */']
+    data_js = (SRC / 'data.js').read_text()
+    n_img = 0
+
+    for const in ('LOGO_K', 'LOGO_W', 'LOGO_D'):
+        m = re.search(r'const\s+' + const + r"\s*=\s*'(data:image/[^']+)'", data_js)
+        if m:
+            assets.append(f"const {const} = '{m.group(1)}';")
+            n_img += 1
+        else:
+            print(f'  ! {const} not found in data.js')
+
+    m = re.search(r'const\s+AV\s*=\s*\{([\s\S]*?)\n\};', data_js)
+    if m:
+        assets.append('const AV = {' + m.group(1) + '\n};')
+        n_img += len(re.findall(r'data:image', m.group(1)))
+    else:
+        print('  ! AV (faces) not found in data.js')
+
+    AWARDS = ['points', 'bronze', 'silver', 'gold',
+              'involved', 'rank1', 'rank2', 'rank3']
+    aw_pairs = []
+    for k in AWARDS:
+        f = SRC / 'awards' / (k + '.webp')
+        if f.exists():
+            aw_pairs.append("%s:'data:image/webp;base64,%s'"
+                            % (k, base64.b64encode(f.read_bytes()).decode()))
+            n_img += 1
+    if aw_pairs:
+        assets.append('const AWARD = {\n  ' + ',\n  '.join(aw_pairs) + '\n};')
+
+    tal = SRC / 'tal-circle.png'
+    if tal.exists():
+        assets.append("const TAL_MARK = 'data:image/png;base64,"
+                      + base64.b64encode(tal.read_bytes()).decode() + "';")
+        n_img += 1
+
+    assets.append("""
+/* ==========================================================================
+   USING THEM
+
+     <img src="${LOGO_K}" alt="TalentNext" style="height:19px">   the wordmark
+     AV.priya                                                     a face
+     AWARD.bronze                                                 an award mark
+     TAL_MARK                                                     Tal's mark
+
+   LOGO_K is the black wordmark, LOGO_W the white one for a dark ground, and
+   LOGO_D the dark-background lockup. In the app bar the portal uses LOGO_K at
+   19px, which is what `.shell-logo img{height:19px}` is sized for.
+
+   Tal's mark is also in the stylesheet as `--tal-mark`, and inside a head band
+   §33 draws it for you — so reach for `TAL_MARK` only when you need the raster
+   somewhere the CSS does not already put it.
+   ========================================================================== */""")
+
+    assets_js = '\n\n'.join(assets) + '\n'
     jsout = HERE / 'talentnext-ds.js'
-    jsout.write_text(js_header + icons + js_tail)
-    print(f'{jsout.name}  {(len(js_header)+len(icons)+len(js_tail))/1024:.0f} KB')
+    body = js_header + icons + assets_js + js_tail
+    jsout.write_text(body)
+    print(f'brand assets embedded: {n_img} images')
+    print(f'{jsout.name}  {len(body)/1024:.0f} KB')
 
     # ======================================================================
-    # THE UNCLASSIFIED REPORT
-    # The last thing the build says, because it is the only thing that needs
-    # a decision from a person. A class here has been DROPPED — silently, by
-    # the default — and that is right for a one-screen detail and wrong for a
-    # component another portal will want. Two ways to clear it:
-    #   shared  -> add the name to SYSTEM, rebuild, it is in the design system
-    #   product -> add its prefix to PRODUCT_PREFIXES, and it stops asking
-    # Either way the choice is recorded in this file instead of in someone's
-    # memory of a conversation.
+    # WHAT WAS LEFT OUT
+    # Under include-by-default there is nothing for a person to decide per
+    # class — a new component is in the design system the moment it is built.
+    # So the closing report is the inverse of v1's: not "what did I drop and
+    # what should I do about it", but "here is the short list of families that
+    # are NOT in the box", which is the thing worth re-reading when a portal
+    # looks wrong. Anything unexpected on this list is a bug in the exclusions.
     # ======================================================================
-    if unclassified:
-        by_layer = {}
-        for cls, layer in unclassified.items():
-            by_layer.setdefault(layer, []).append(cls)
-        print(f'\n{"="*70}\nUNCLASSIFIED — {len(unclassified)} class name(s) are in neither '
-              f'SYSTEM nor PRODUCT_PREFIXES,\nso they were DROPPED by default. Decide each: '
-              f'shared (add to SYSTEM) or\nproduct (add its prefix to PRODUCT_PREFIXES).\n')
-        for layer in LAYERS:
-            if layer in by_layer:
-                print(f'  {layer:24s} {" ".join("." + c for c in sorted(by_layer[layer]))}')
+    if dropped_families:
+        print(f'\n{"=" * 70}')
+        print('NOT IN THE DESIGN SYSTEM — excluded because their CSS cannot work')
+        print('outside the portal (a render pass assembles what they draw), or')
+        print('because they are a separate surface with their own language:')
+        for prefix in sorted(dropped_families):
+            names = sorted(dropped_families[prefix])
+            shown = ' '.join('.' + n for n in names[:6])
+            more = f'  (+{len(names) - 6} more)' if len(names) > 6 else ''
+            print(f'  {prefix + "*":<12s} {shown}{more}')
+        print('\nEverything else the portal draws is in. To pull one of these in,')
+        print('remove its prefix from EXCLUDE_PREFIXES and rebuild — but read the')
+        print('note beside it first: most need JS to be more than decoration.')
         print('=' * 70)
-    else:
-        print('\nno unclassified classes — every name in the layers is either '
-              'in the\ndesign system or deliberately excluded')
 
 
 if __name__ == '__main__':
