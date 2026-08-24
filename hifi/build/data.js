@@ -135,7 +135,7 @@ const NOTIF = {
     {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
   ],
   day90:[
-    {ic:'calendar', t:'Your re-interview is available',b:'The ninety days are complete. Book it to have them assessed.', w:'Today', go:'agents',      unread:1},
+    {ic:'calendar', t:'Your re-interview is available',b:'The 90 days are complete. Book it to have them assessed.', w:'Today', go:'agents',      unread:1},
     {ic:'document', t:'Your 90-day summary is ready to read',b:'Priya signs it once the re-interview is booked.',       w:'Today', go:'transcript',  unread:1},
     {ic:'checkFilled',t:'Course complete',           b:'All 13 chapters done, 87% average.',                           w:'Yesterday', go:'transcript', unread:1}
   ],
@@ -333,7 +333,7 @@ const WEEK_TARGET = 55;
 
    Keyed by stage, and only the two enrolled stages that draw the card have an
    entry: day 90 is finished, and a week's pace is not a thing you can be
-   behind on when the ninety days are over. */
+   behind on when the 90 days are over. */
 const WEEKLY = {
   week1: {
     did: [],

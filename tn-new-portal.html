@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — new portal</title>
+
+<!-- 1. CALL THE DESIGN SYSTEM. Path is relative to THIS file: it sits at the
+        repo root, so `design-system/…`. Fonts are embedded in the stylesheet,
+        so these two lines are the whole dependency. -->
+<link rel="stylesheet" href="design-system/talentnext-ds.css">
+
+<style>
+/* 2. THE HOST. The only CSS this page needs, and it is geometry, not design.
+      `.app` is `position:absolute; inset:0`, so it needs a positioned parent
+      with a height — and `container-type` has to be here because nothing in
+      this system responds to the browser window: every breakpoint is
+      `@container app (min-width:…)` and resolves against this box. Leave it
+      off and the page renders its phone layout at every width. */
+.host{
+  position:relative;width:100%;height:100dvh;
+  container-type:inline-size;container-name:app;
+  overflow:hidden;background:var(--background)}
+</style>
+</head>
+<body>
+
+<!-- 3. THE FRAME, then normal design-system markup inside it. -->
+<div class="host">
+  <div class="app">
+    <header class="shell">
+      <a class="shell-logo" href="#"></a>
+      <div class="shell-right"><span class="shell-name">Maryam Naz</span></div>
+    </header>
+
+    <div class="shell-body">
+      <main class="main">
+        <div class="page">
+
+          <div class="ph">
+            <span class="eyebrow">Cohort 41</span>
+            <h1>A new portal page</h1>
+            <p class="lead">Linked the design system, added a host, wrote
+              ordinary sections. No design work, no build step.</p>
+          </div>
+
+          <section class="sec">
+            <div class="sec-h"><h2>Where you are</h2></div>
+            <!-- four cells: .stats is a fixed 2/4-column grid -->
+            <div class="stats">
+              <div class="stat"><span class="v">13<small>/13</small></span><span class="k">Chapters</span></div>
+              <div class="stat"><span class="v">92<small>%</small></span><span class="k">Average</span></div>
+              <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
+              <div class="stat"><span class="v">12<small>/13</small></span><span class="k">Calls</span></div>
+            </div>
+          </section>
+
+          <section class="sec">
+            <div class="sec-h"><h2>This week</h2></div>
+            <div class="tile-stack">
+              <button class="tile clk gcard">
+                <span class="cardrow-ic" data-ic="book"></span>
+                <span class="gcard-b"><span class="eyebrow">Week 6</span>
+                  <h3>Coaching conversations</h3>
+                  <span class="sub">Four chapters, 45 minutes</span></span>
+                <svg class="tile-arrow" viewBox="0 0 24 24" data-path="arrowRight"></svg>
+              </button>
+            </div>
+          </section>
+
+          <section class="sec">
+            <button class="btn btn-p">Continue <span data-ic="arrowRight"></span></button>
+          </section>
+
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- 4. THE ICONS. Optional — only needed if you want `I.name` / `inner()`.
+        Loading it after the markup lets these two loops fill the placeholders
+        above, which is the no-framework way to use the set. -->
+<script src="design-system/talentnext-ds.js"></script>
+<script>
+document.querySelector('.shell-logo').innerHTML = TN_MARK;
+document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = I[el.dataset.ic]);
+document.querySelectorAll('[data-path]').forEach(el => el.innerHTML = inner(el.dataset.path));
+</script>
+</body>
+</html>

@@ -2,7 +2,7 @@
    THE INTERVIEW PIPELINE — SESSIONS, EVALUATIONS, AND THE TWO SIGNATURES
 
    The three remaining pages of the leader's actual job: the interviews she
-   runs, the level decisions those interviews produce, and the ninety-day
+   runs, the level decisions those interviews produce, and the 90-day
    summaries that close a cohort. lead2.js drew the cohort side; this is the
    assessment side.
 
@@ -51,7 +51,7 @@
 const LDR_AN = {
   e1: {
     conf:'High',
-    sum:'The quiz and the interview agree on the Explorer band, and the interview places them at the entry level. Clear intent and sound scoping, but two moments of keeping the work rather than handing it over cap the number at 1.',
+    sum:'Quiz and interview both land in the Explorer band, at entry level. Clear intent and sound scoping, but two refusals to hand work over cap this at 1.',
     quiz:'64 out of 100 sits inside the Explorer band. The foundational questions carried the score; the multi-step delegation items are where the points went, which is the same gap the interview surfaced.',
     comps:[
       ['Task delegation','E1','Completed the steps personally. Handed work over only when asked to directly.'],
@@ -63,11 +63,11 @@ const LDR_AN = {
       ['pos','14:20','Let me confirm the date range before I pull anything.','Scoped the task before acting. A genuine strength and the reason this is not below E1.'],
       ['neg','31:05','I&rsquo;d rather write that part myself than explain it to someone else.','Handover avoidance, said twice. This is the entry-level tell.']
     ],
-    watch:'The two handover moments are what hold this at E1 rather than E2. Worth re-checking delegation at the ninety-day mark.'
+    watch:'The two handover moments are what hold this at E1 rather than E2. Worth re-checking delegation at the 90-day mark.'
   },
   e2: {
     conf:'Medium',
-    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a level above everything else, and a weak conflict-repair answer is what pulls the blend back to 3.',
+    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a level above the rest; a weak conflict-repair answer pulls the blend back to 3.',
     quiz:'71 out of 100 is the top of the Explorer band. The structural questions drove the score and the interpersonal ones pulled it back, which is exactly what the interview then showed.',
     comps:[
       ['Handling ambiguity','E4','Reframed an under-specified brief into three testable options, unprompted.'],
@@ -140,13 +140,13 @@ V.leadSessions = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Sessions')}
-  ${ph('Sessions','Every interview you have run and every one booked. Forty-five minutes, recorded, and you sign the level afterwards.',
+  ${ph('Sessions','45 minutes each, recorded &middot; you sign the level afterwards',
     `<button class="btn btn-g" data-go="leadProfile">Your availability ${I.calendar}</button>`)}
   ${next ? `
   <div class="sec">
     <div class="plate" data-when="${next.when.toLowerCase()}">
       <div class="plate-who">${avatar({i:next.i, img:AV[next.img]},56)}
-        <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; ${next.re ? 'ninety days behind them' : 'no level yet'}</span></span>
+        <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; ${next.re ? '90 days behind them' : 'no level yet'}</span></span>
       </div>
       ${''/* NO EYEBROW. A card starts at its heading — "Next up" is a
             category over a set of one, and this is the only appointment on
@@ -179,7 +179,7 @@ V.leadSessions = () => {
         <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
         <span class="cardrow-b">
           <span class="cardrow-t">${s.name}${s.re ? ' <span class="tag sm">Re-interview</span>' : ''}</span>
-          <span class="cardrow-d">${s.mins} minutes &middot; quiz ${s.quiz} of 100, ${s.bucket} band &middot; ${s.re ? 'assessed against their ninety days' : 'no level yet'}</span>
+          <span class="cardrow-d">${s.mins} minutes &middot; quiz ${s.quiz} of 100, ${s.bucket} band &middot; ${s.re ? 'assessed against their 90 days' : 'no level yet'}</span>
         </span>
         <span class="cardrow-a">
           <button class="btn btn-p btn-sm noic">Join</button>
@@ -208,7 +208,7 @@ V.leadSessions = () => {
         </div>`;
       }).join('')}
     </div>
-    <p class="t-helper-01 mt4">A candidate cannot enroll until the level is signed, so the evaluation is the thing holding up their ninety days &mdash; not the interview.</p>
+    <p class="t-helper-01 mt4">A candidate cannot enroll until the level is signed, so the evaluation is the thing holding up their 90 days &mdash; not the interview.</p>
   </div>
 </div></main>`;
 };
@@ -217,7 +217,7 @@ V.leadSessions = () => {
    EVALUATIONS
 
    TWO QUEUES, ONE PAGE, AND THEY ARE NOT THE SAME OBJECT. A level decision
-   opens a candidate's ninety days; a ninety-day summary closes them. Both are
+   opens a candidate's 90 days; a 90-day summary closes them. Both are
    "a signature you owe somebody", which is why the dashboard counts them
    together in one figure — and both are listed here for the same reason. They
    are separate SECTIONS rather than one merged list because the two rows
@@ -241,7 +241,10 @@ V.leadEvals = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
-  ${ph('Evaluations','The level decisions and the ninety-day summaries waiting on your signature.')}
+  ${''/* Tal states the two counts and names the first candidate, so a line
+        saying that there are level decisions and summaries waiting is the
+        same sentence without the numbers in it. */}
+  ${ph('Evaluations',`${lpending()} waiting on your signature`)}
   <div class="sec">
     <div class="stats">
       ${statCell(I.edit, 'Level decisions', pe.length, pe.length ? 'nobody can enroll until signed' : 'all signed')}
@@ -270,7 +273,7 @@ V.leadEvals = () => {
     </div>` : ''}
   </div>
   <div class="sec tint">
-    <div class="sec-h"><h2>Ninety-day summaries</h2><span class="t-helper-01">${ps.length ? ps.length + ' waiting' : 'nothing waiting'}</span></div>
+    <div class="sec-h"><h2>90-day summaries</h2><span class="t-helper-01">${ps.length ? ps.length + ' waiting' : 'nothing waiting'}</span></div>
     <div class="tile-stack">
       ${LEAD_SUMMARIES.map(s => {
         const c = lcoOf(s.cohort);
@@ -279,7 +282,7 @@ V.leadEvals = () => {
         ? `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
             <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
             <span class="gcard-b"><h3>${s.name}</h3>
-              <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their ninety days</span></span>
+              <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days</span></span>
             <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
           </button>`
         : `<div class="cardrow">
@@ -294,7 +297,7 @@ V.leadEvals = () => {
     ${/* THE FOOTNOTE IS GONE. It explained what a summary is FOR — "the
           document a candidate's next level is argued from" — to the one person
           who already knows, at the foot of a list of two rows that each say
-          "sign to close their ninety days". A closing line earns its place
+          "sign to close their 90 days". A closing line earns its place
           when it tells you something the rows do not; this one restated the
           page's own subject. */''}
   </div>
@@ -453,7 +456,7 @@ V.leadEval = () => {
       ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>An override needs a reason</b>You are signing ${pick} against my ${e.ai}. Say why in a sentence and it goes on the record with the decision.</div></div>` : ''}
       ` : ''}
       <div class="f mt5"><label for="ldrNotes">Notes for their report</label>
-        <textarea class="inp" id="ldrNotes" rows="3" placeholder="Strengths, growth areas, and what to work on during the ninety days."></textarea></div>
+        <textarea class="inp" id="ldrNotes" rows="3" placeholder="Strengths, growth areas, and what to work on during the 90 days."></textarea></div>
       ${/* THE CLOSING LINE HAD TO CHANGE WITH THE PICKER. It said "the quiz
             fixes the band and you set the level", which was true of five
             buttons and is not true of fifteen: the band is now yours to
@@ -482,7 +485,7 @@ V.leadEval = () => {
    looking at.
 
    FIVE RECOMMENDATIONS, AND FOUR OF THEM COST A SENTENCE. One level after
-   ninety days that went well is the expected end, and it is the only one that
+   90 days that went well is the expected end, and it is the only one that
    costs nothing: it is what the course is for and the numbers above it are the
    argument. Every other answer is the leader departing from that, in one
    direction or the other, and a departure carries a reason for exactly the
@@ -490,7 +493,7 @@ V.leadEval = () => {
    record says why.
 
    TWO LEVELS IS A DEPARTURE UPWARDS, and it was the case the four could not
-   say. A leader who thinks ninety days moved somebody two levels had no way to
+   say. A leader who thinks 90 days moved somebody two levels had no way to
    write it down: they could recommend the promotion the platform expected, or
    they could hold, and the extra level went in prose that nothing acts on. It
    is the same shape as "hold" — an exception the next agent has to know about
@@ -524,20 +527,20 @@ V.leadSum = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Evaluations','leadEvals'], s.name)}
-  ${ph(`Ninety-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; ${done ? 'published' : 'waiting on your signature'}`)}
+  ${ph(`90-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; ${done ? 'published' : 'waiting on your signature'}`)}
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
       <div class="idhead-b">
         <span class="idname">${s.name}</span>
-        <span class="idmeta">${lname(c)} &middot; ninety days complete</span>
+        <span class="idmeta">${lname(c)} &middot; 90 days complete</span>
         <span class="tag sm">${llevel(c)}</span>
       </div>
       <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">Their full record ${I.arrowRight}</button></div>
     </div>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>What the ninety days produced</h2><span class="t-helper-01">From the course platform &middot; read-only</span></div>
+    <div class="sec-h"><h2>What the 90 days produced</h2><span class="t-helper-01">From the course platform &middot; read-only</span></div>
     <div class="stats">
       ${statCell(I.book,  'Chapters', lchDone(m) + '<small> of 13</small>', m.pc + '% complete')}
       ${statCell(I.chart, 'Assessment average', m.avg + '<small>%</small>', m.avg >= 85 ? 'well above the pass mark' : 'above the pass mark')}
@@ -582,7 +585,7 @@ V.leadSum = () => {
     <div class="sec-h"><h2>Your recommendation</h2><span class="t-helper-01">This is what the next agent reads</span></div>
     <div class="tile">
       <div class="f">
-        <label>Where ${first} stands after ninety days</label>
+        <label>Where ${first} stands after 90 days</label>
         <div class="btn-set ldr-recs">
           ${LDR_RECS.map(([k,l]) => `<button class="btn ${rec === k ? 'btn-p' : 'btn-g'} noic" data-ldrrec="${k}">${l}</button>`).join('')}
         </div>
@@ -592,16 +595,16 @@ V.leadSum = () => {
           ? `Why two levels, to ${twoUp}?`
           : 'Why not a promotion?'}</label>
         <textarea class="inp" id="ldrSumWhy" rows="3" placeholder="${up
-          ? 'Two levels is more than ninety days is built to move. Say what they did that the numbers above do not show.'
-          : 'Ninety days that did not end in a promotion needs a reason on the record.'}"></textarea></div>
+          ? 'Two levels is more than 90 days is built to move. Say what they did that the numbers above do not show.'
+          : '90 days that did not end in a promotion needs a reason on the record.'}"></textarea></div>
       ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>This one needs a reason</b>${up
-          ? 'A double promotion is you saying ninety days did more than they are built to. Say why, and it goes on the summary the next agent reads.'
-          : 'Anything other than a promotion is you saying the ninety days did not do what they were meant to. Say why, and it goes on the summary.'}</div></div>` : ''}
+          ? 'A double promotion is you saying 90 days did more than they are built to. Say why, and it goes on the summary the next agent reads.'
+          : 'Anything other than a promotion is you saying the 90 days did not do what they were meant to. Say why, and it goes on the summary.'}</div></div>` : ''}
       ` : ''}
       <div class="f mt5"><label for="ldrGrowth">Where they grew</label>
-        <textarea class="inp" id="ldrGrowth" rows="3" placeholder="What changed over the ninety days that the numbers above do not show."></textarea></div>
+        <textarea class="inp" id="ldrGrowth" rows="3" placeholder="What changed over the 90 days that the numbers above do not show."></textarea></div>
       <div class="f mt5"><label for="ldrDev">Still to develop</label>
-        <textarea class="inp" id="ldrDev" rows="3" placeholder="What the next ninety days, or the re-interview, should look at."></textarea></div>
+        <textarea class="inp" id="ldrDev" rows="3" placeholder="What the next 90 days, or the re-interview, should look at."></textarea></div>
       <p class="t-helper-01">Published to ${first} and to whichever agent runs their re-interview. Your private notes stay private.</p>
     </div>
     <div class="btn-set mt5">

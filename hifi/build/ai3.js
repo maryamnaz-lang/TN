@@ -125,8 +125,11 @@ V.rp = (f) => {
   const key = S.rpk;
   if(!key) return `<main class="main"><div class="page">
     ${crumb(['Dashboard','dashboard'],'Practice')}
-    ${ph('Practice a conversation',
-      'Tal plays the other person, briefed on what you actually said in your interview. Nothing here is recorded or shared &mdash; it is a rehearsal room.')}
+    ${''/* NO DESCRIPTION, for the reason ai2.js gives on What Tal knows:
+          this line and `PAGESUM.rp` were the same three facts — Tal plays the
+          other person, briefed from the interview, nothing recorded — written
+          out twice, once about Tal and once by Tal. */}
+    ${ph('Practice a conversation')}
     <div class="sec">
       <div class="sec-h"><h2>Drawn from your record</h2><span class="t-helper-01">3 scenarios</span></div>
       <div class="rp-list">
@@ -143,7 +146,7 @@ V.rp = (f) => {
       </div>
     </div>
     <div class="sec">
-      <div class="note band"><span>${I.info}</span><div class="nb"><b>Why these three</b>They are the three conversations you described going wrong, in your own words, at the interview. Practising something you did not struggle with would be a waste of your Thursday.</div></div>
+      <div class="note band"><span>${I.info}</span><div class="nb"><b>Why these three</b>They are the three conversations you described going wrong, in your own words, at the interview.</div></div>
     </div>
   </div></main>`;
 

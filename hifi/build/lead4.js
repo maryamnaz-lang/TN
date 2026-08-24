@@ -17,7 +17,7 @@
    THE OTHER TWO BOARDS
 
    Cohort 33 is in week 11 and its board sounds like it: people comparing
-   notes on the end of the ninety days. Cohort 47 is four days old, so its
+   notes on the end of the 90 days. Cohort 47 is four days old, so its
    board is the leader's own opening post and one reply — a thin board is the
    honest drawing of a cohort that has barely started, and it is what makes
    the picker worth having.
@@ -37,7 +37,7 @@ const LDR_BOARDS = {
   ],
   47: [
     ['day','Monday'],
-    ['Priya Nair','priya','PN','Welcome to Cohort 47. First call is Monday at 6. Before then: open chapter 1, and post one sentence here about what you are hoping to get out of the ninety days.','9:00 AM',true],
+    ['Priya Nair','priya','PN','Welcome to Cohort 47. First call is Monday at 6. Before then: open chapter 1, and post one sentence here about what you are hoping to get out of the 90 days.','9:00 AM',true],
     ['Ahmed Farouk','owen','AF','Hoping to stop being the bottleneck on my own team. That is the honest version.','11:34 AM'],
     ['Beatriz Lima','lena','BL','Mine is hard conversations. I avoid them until they are twice as hard.','2:12 PM']
   ]
@@ -120,7 +120,12 @@ V.leadMessages = () => {
      one surface on the page that has to fit the frame. */
   return `<main class="main"><div class="page msg-mod">
   ${crumb(['Dashboard','leadDash'],'Messages')}
-  ${ph('Messages','The cohort boards, which your candidates read too, and your one-to-one threads.')}
+  ${''/* This was the tab strip's two labels written out as a sentence, with
+        a clause about the candidate portal attached — and Tal's summary
+        underneath explained the candidate portal at greater length. Both are
+        gone; the tabs say which surface you are on and Tal says who is
+        waiting. */}
+  ${ph('Messages')}
   <div class="sec sec-cs">
     <div class="cs">
       <button class="${tab === 'boards' ? 'on' : ''}" data-ldrmsg="boards">Cohort boards<span class="lf-n">${LEAD_COHORTS.length}</span></button>
@@ -290,7 +295,11 @@ V.leadCerts = () => {
   const promoted = 34;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Certifications')}
-  ${ph('Certifications','What leading earns you. Cohorts closed, candidates promoted, and the certification each one counts towards.')}
+  ${''/* Three blocks in a row were explaining this page: this line, Tal's
+        summary, and a 44-word `.note` about the volunteer role. The stat
+        cells below state the four figures, Tal reads them, and the note
+        makes the one point neither can. This line was the redundant third. */}
+  ${ph('Certifications')}
   <div class="sec">
     <div class="stats">
       ${statCell(I.certificate, 'Certifications', LDR_CERTS.length, 'one more in progress')}
@@ -300,7 +309,7 @@ V.leadCerts = () => {
     </div>
   </div>
   <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Leading is a volunteer role</b>There are no fees and no settlements on this side of TalentNext. What the time earns is recognised in certifications and in the training that leads to them &mdash; and a certification is what lets you assess a wider band.</div></div>
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Leading is a volunteer role</b>There are no fees and no settlements on this side of TalentNext. What the time earns is recognised in certifications, and in the training that leads to them.</div></div>
   </div>
   ${/* THE NEWEST ONE IS THE HERO, AND IT HAS NO HEADING.
         `.cert` is in ai5's `DARK_CARD` list, so `placeDark` moves whichever
@@ -351,7 +360,7 @@ V.leadCerts = () => {
     </div>
     <ol class="steps mt5">
       <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Lead six cohorts to completion</b>
-        Eight closed, so this one is done. Completion means the cohort finished the ninety days, not that every candidate was promoted.</span></li>
+        Eight closed, so this one is done. Completion means the cohort finished the 90 days, not that every candidate was promoted.</span></li>
       <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Forty hours of leader training</b>
         ${hours} hours this year. The Advanced track adds twelve more, which is the part still open.</span></li>
       <li><span class="s-n">3</span><span class="s-b"><b>Twelve signed level decisions reviewed</b>
@@ -394,7 +403,10 @@ V.leadCerts = () => {
    ========================================================================== */
 V.leadProfile = () => `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Your profile')}
-  ${ph('Your profile','What candidates read when they choose you, the band you assess, and the times you are open.')}
+  ${''/* Tal's summary is now this sentence done properly — "your listing is
+        what candidates read when they choose you" — so the line above it
+        went rather than the line below. */}
+  ${ph('Your profile',`${LEADER.range} &middot; leading since ${LEADER.since}`)}
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>

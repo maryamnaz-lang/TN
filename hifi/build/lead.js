@@ -90,7 +90,7 @@ const LEAD_COHORTS = [
     lmem('Jonas Weber','JW','hana',0,0,0,'Never')]}
 ];
 
-/* Expected progress is linear across the ninety days. It is deliberately the
+/* Expected progress is linear across the 90 days. It is deliberately the
    crudest possible model: the leader is not being asked to beat a forecast,
    they are being shown who has stopped. */
 const lpace = c => Math.round(c.day / 90 * 100);
@@ -199,7 +199,7 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
     kind:'iv', ord:s.ord, day:s.day, time:s.time, i:s.i, img:s.img,
     t:(s.re ? 'Re-interview' : 'Level interview') + ' &middot; ' + s.name,
     d:s.mins + ' minutes, recorded &middot; ' + (s.re
-        ? 'they have ninety days behind them, so you read the summary first'
+        ? 'they have 90 days behind them, so you read the summary first'
         : 'you sign the level afterwards'),
     go:'leadSessions'
   })).concat(LEAD_COHORTS.map(c => ({
@@ -446,7 +446,7 @@ V.leadDash = () => {
         greetings for the same moment, in a product where the two portals are
         the same person's two roles and the switch between them is one click in
         the app bar. Whichever wording wins, it has to be one wording. */''}
-  ${ph('Welcome Back, Priya!','Your cohorts, the decisions waiting on you, and who has stopped moving.')}
+  ${ph('Welcome back, Priya',`Cohort leader &middot; ${LEAD_COHORTS.length} cohorts &middot; ${lmembers().length} candidates, all Explorer`)}
   <div class="sec">
     <div class="ai-aura tile">
       <div class="ai-head">${talLabel()}<h3>${talRead.h}</h3></div>
@@ -538,7 +538,7 @@ V.leadDash = () => {
       ${LEAD_EVALS.filter(e=>e.status==='pending').map(e=>
         faceRow(e, `Level decision &middot; I proposed Explorer &ndash; ${e.ai} &middot; ${e.when.toLowerCase()}`, 'leadEvals')).join('')}
       ${LEAD_SUMMARIES.filter(s=>s.status==='pending').map(s=>
-        faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their ninety days`, 'leadEvals')).join('')}
+        faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their 90 days`, 'leadEvals')).join('')}
     </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every level decision and summary is signed.</p></div>`}
   </div>
   <div class="sec tint" id="lead-booked">

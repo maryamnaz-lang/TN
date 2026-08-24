@@ -3,7 +3,7 @@
    Two things an assistant needs before it is part of a product rather than a
    feature bolted to one.
 
-   1. MEMORY YOU CAN SEE AND CORRECT. Ninety days of data is only worth
+   1. MEMORY YOU CAN SEE AND CORRECT. 90 days of data is only worth
       anything if something carries the thread through it. But a system that
       remembers you and will not show you what it remembers is worse than one
       that forgets. So: every claim Tal holds, the exact thing it was drawn
@@ -60,8 +60,14 @@ V.mem = (f) => {
   const live = MEMO.filter((m,i) => !dropped.includes(i));
   return `<main class="main"><div class="page">
   ${crumb(['Profile','account'],'What Tal knows')}
-  ${ph('What Tal knows about you',
-    `${live.length} things, each drawn from something you can open. Correct anything that is wrong &mdash; I will stop using it.`)}
+  ${''/* NO DESCRIPTION. This said "N things, each drawn from something you
+        can open. Correct anything that is wrong — I will stop using it" and
+        `PAGESUM.mem` said "N things I've learned about you, each traced back
+        to where it came from. Mark anything wrong and I'll stop using it" —
+        the same two clauses in the same order, in the third person and then
+        the first. On Tal's own page the voice should be Tal's, so the
+        description went and the summary stayed. See the note over `ph()`. */}
+  ${ph('What Tal knows about you')}
 
   <div class="sec">
     <div class="sec-h"><h2>Held about you</h2><span class="t-helper-01">Newest first</span></div>

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext Design System — reference</title>
+
+<!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
+<link rel="stylesheet" href="talentnext-ds.css">
+
+<style>
+/* ==========================================================================
+   THIS PAGE'S OWN CHROME — not part of the design system.
+   Three things the DS deliberately does not carry: a host for the app frame,
+   a code block, and a colour swatch. Everything else on this page is drawn
+   with DS classes and nothing here overrides one.
+   ========================================================================== */
+
+/* 1. THE HOST.
+   `.app` is `position:absolute; inset:0`, so it needs a positioned, sized
+   parent — and that parent is also where `container-type` goes, because in
+   this system NOTHING responds to the browser window. The breakpoints are
+   `@container app (min-width:…)`, so they resolve against this box. Give the
+   host the window's height and the app scrolls internally, which is the
+   portal's own architecture. */
+.ds-host{
+  position:relative;width:100%;height:100vh;max-width:none;
+  container-type:inline-size;container-name:app;
+  overflow:hidden;background:var(--background);border:0}
+
+/* 2. CODE. Scrolls inside its own box so a long line never widens the column. */
+.doc-src{margin-top:var(--s04);border-top:1px solid var(--border-subtle-01)}
+.doc-src summary{
+  padding:var(--s03) 0;font-size:11.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper);cursor:pointer;list-style:none}
+.doc-src summary::-webkit-details-marker{display:none}
+.doc-src summary::before{content:'+ ';font-weight:400}
+.doc-src[open] summary::before{content:'– '}
+.doc-src pre{
+  margin:0 0 var(--s04);padding:var(--s04);overflow-x:auto;
+  background:var(--layer-02);border-left:3px solid var(--border-strong-01);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11.5px;line-height:17px;color:var(--text-secondary);
+  white-space:pre;tab-size:2}
+.doc-ex{padding:var(--s05) 0;border-top:1px solid var(--border-subtle-01)}
+.doc-ex:first-child{border-top:0;padding-top:0}
+.doc-ex > .doc-t{
+  display:block;margin-bottom:var(--s04);
+  font-size:12.5px;font-weight:600;letter-spacing:.2px;color:var(--text-primary)}
+.doc-ex > .doc-t small{
+  display:block;margin-top:2px;font-weight:400;color:var(--text-helper);
+  font-size:11.5px;letter-spacing:.2px}
+.doc-live{display:block}
+
+/* 3. SWATCHES. A token table, not a decoration: value and contrast in text,
+   because the point is to be able to read the number. */
+.sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+  gap:1px;background:var(--border-subtle-01);border:1px solid var(--border-subtle-01)}
+.sw-c{background:var(--layer-01);padding:0}
+.sw-c i{display:block;height:52px}
+.sw-c b,.sw-c span{display:block;padding:0 var(--s03)}
+.sw-c b{margin-top:var(--s03);font-size:11.5px;font-weight:600;letter-spacing:.2px}
+.sw-c span{padding-bottom:var(--s03);font-size:11px;color:var(--text-helper);
+  font-family:ui-monospace,Menlo,monospace}
+
+/* the icon sheet */
+.ic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));
+  gap:1px;background:var(--border-subtle-01);border:1px solid var(--border-subtle-01)}
+.ic-c{background:var(--layer-01);padding:var(--s04) var(--s02);text-align:center}
+.ic-c svg{width:22px;height:22px;fill:var(--icon-primary);margin:0 auto var(--s02)}
+.ic-c span{font-size:10.5px;color:var(--text-helper);word-break:break-all;
+  font-family:ui-monospace,Menlo,monospace}
+
+/* THE MARK NEEDS A SIZE. `TN_MARK` carries a viewBox and no width/height —
+   deliberately, so a call site can scale it — and §01's reset makes every svg
+   `display:block; max-width:100%`. Given no size at all it collapses, so the
+   host says how big it is. In the portal the logo is an <img>, which is why
+   this does not come up there. */
+.shell-logo{gap:var(--s03)}
+.shell-logo svg{width:18px;height:18px;fill:var(--icon-primary);flex:none}
+.shell-logo .wordmark{
+  font-size:15px;font-weight:400;letter-spacing:-.2px;color:var(--text-primary);
+  white-space:nowrap}
+
+/* the spacing ruler */
+.sp-row{display:flex;align-items:center;gap:var(--s04);padding:var(--s02) 0;
+  font-size:12px;letter-spacing:.2px}
+.sp-row i{display:block;height:12px;background:var(--brand-primary);flex:none}
+.sp-row code{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;
+  color:var(--text-helper);min-width:44px}
+
+/* 4. THE LABEL COLUMN, OPTED OUT — and this is worth reading, because it is
+   the one piece of the system a new page is most likely to fight.
+
+   §10.15 gives any `.sec` that has a `.sec-h` a 184px label column at desktop,
+   with the heading in it and a vertical rule down its right. That is the
+   product's reading pattern and it is correct there, because a section on a
+   real page is short. A reference section is not: it holds six examples and
+   runs 900px, and the heading — which is `display:flex; align-items:center`
+   with `min-height:100%`, so it centres itself in whatever height the section
+   turns out to be — ends up floating halfway down a rule with nothing beside
+   it. Verified against the portal, which centres it the same way.
+
+   So these sections opt out, and the opt-out has to be RESTATED INSIDE THE
+   SAME CONTAINER QUERY. A container query is its own cascade tier: a rule
+   inside `@container app` beats an unconditional rule of equal weight no
+   matter which stylesheet came later, so writing this outside the query would
+   simply lose. §36.9 does exactly this twice for the same reason.
+
+   The six containers that get the opt-out for free — `.tile-stack`, `.stats`,
+   `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard` — are the reason a page built
+   out of the system's own components never has to write this block. Build from
+   those and the spine is free. `.doc-body` is a wrapper this page invented,
+   which is precisely the case §10.15's list does not cover. */
+@container app (min-width:900px){
+  .sec:has(> .doc-body){
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .sec:has(> .doc-body) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);padding:0}
+  .sec:has(> .doc-body) > .doc-body{padding-left:0}
+}
+</style>
+</head>
+<body>
+
+<!-- The frame. `data-vp="fluid"` is the portal's own desktop frame marker. -->
+<div class="device ds-host" id="host" data-vp="fluid">
+  <div class="app" id="app">
+
+    <!-- THE MARK IS THE MENU (§34). The toggle comes FIRST in the DOM,
+         because that is the order a phone wants and the order a screen reader
+         should hear — the control, then the link home. Open at desktop, §34
+         gives `.shell-logo` `order:-1` so the wordmark holds the left end
+         without the source order changing. Both glyphs are printed at every
+         width; the container query decides which one shows. -->
+    <header class="shell">
+      <button class="shell-act nav-t" id="navBtn" data-toggle="nav" aria-label="Sections">
+        <span class="nav-t-mark"></span>
+        <span class="nav-t-menu"></span>
+      </button>
+      <a class="shell-logo" href="#top" id="logo" aria-label="TalentNext"></a>
+      <div class="shell-right">
+        <span class="shell-name">Design system</span>
+      </div>
+    </header>
+
+    <div class="shell-body">
+      <!-- no `.sn-cap` here on purpose: at desktop this is a 72px icon rail,
+           and a caption has nowhere to go in 72px. The labels live in the
+           `.sn-item`s and §14 reveals them when the rail expands. -->
+      <nav class="sidenav" id="rail">
+        <div class="sn-main" id="railItems"></div>
+      </nav>
+      <div class="scrim" id="scrim"></div>
+      <main class="main" id="main">
+        <div class="page" id="page"></div>
+      </main>
+    </div>
+
+    <!-- the one overlay, so the sheet can be demonstrated for real -->
+    <div class="modal" id="sheetModal">
+      <div class="sheet">
+        <div class="sheet-h">
+          <h2>A bottom sheet</h2>
+          <button class="x" id="sheetX" aria-label="Close"></button>
+        </div>
+        <div class="sheet-b">
+          <label class="f">
+            <span class="lbl">Full name</span>
+            <input class="inp" value="Maryam Naz">
+          </label>
+          <p class="help">On a phone this rises from the bottom edge. At 600px
+            and up it centres — one component, two anchors, stated once in §14.</p>
+        </div>
+        <div class="sheet-f">
+          <button class="btn btn-s noic" data-close>Cancel</button>
+          <button class="btn btn-p noic" data-close>Save</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="talentnext-ds.js"></script>
+<script>
+/* ==========================================================================
+   THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
+   up twice: rendered, and as the markup that rendered it. A gallery whose
+   snippets are re-typed beside the demo goes stale the first time one of
+   them is corrected.
+   ========================================================================== */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* trim the shared indent so the snippet reads as it would in a file */
+function dedent(s){
+  const lines = s.replace(/^\n/,'').replace(/\s+$/,'').split('\n');
+  const pad = Math.min(...lines.filter(l => l.trim()).map(l => l.match(/^ */)[0].length));
+  return lines.map(l => l.slice(pad)).join('\n');
+}
+
+/* ICONS ARE WRITTEN AS PLACEHOLDERS, and that is the whole reason this
+   indirection exists. `${I.info}` inside the template would be expanded
+   before `ex()` ever saw it, so the "markup" panel would show a 300-character
+   SVG path where the reader needs to see the call they would type. So the
+   examples say `{{info}}`, the live copy gets the real mark, and the snippet
+   gets the call back. `{{name|class}}` is the path-only form, which is what
+   the portal uses wherever the svg needs a class of its own. */
+const fillLive = s => s
+  .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
+    (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">${inner(n)}</svg>`)
+  .replace(/\{\{(\w+)\}\}/g, (_, n) => I[n] || '');
+const fillSrc = s => s
+  .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
+    (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">\${inner('${n}')}</svg>`)
+  .replace(/\{\{(\w+)\}\}/g, (_, n) => '${I.' + n + '}');
+
+/* one example: a title, the live thing, and its source. `noSrc` is for the
+   generated sheets — a swatch grid's markup is a for-loop, not a component,
+   and printing it would only bury the ones worth copying. */
+function ex(title, note, html, noSrc){
+  const src = dedent(html);
+  return `<div class="doc-ex">
+    <span class="doc-t">${title}${note ? `<small>${note}</small>` : ''}</span>
+    <span class="doc-live">${fillLive(src)}</span>
+    ${noSrc ? '' : `<details class="doc-src"><summary>markup</summary>
+      <pre>${esc(fillSrc(src))}</pre></details>`}
+  </div>`;
+}
+
+/* a section of the reference. Headings stay SHORT: at desktop a `.sec` with a
+   `.sec-h` puts it in a 184px label column, and three words is two lines. */
+function sec(id, heading, body, cls){
+  return `<section class="sec${cls ? ' ' + cls : ''}" id="${id}">
+    <div class="sec-h"><h2>${heading}</h2></div>
+    <div class="doc-body">${body}</div></section>`;
+}
+
+const swatch = (name, val, note) => `<div class="sw-c">
+  <i style="background:${val}"></i><b>${name}</b><span>${note || val}</span></div>`;
+
+const SECTIONS = [];
+
+/* ---------------------------------------------------------------- how to use */
+SECTIONS.push({id:'use', nav:'Using it', icon:'document', build: () => `
+  ${ex('Two files', 'Fonts are embedded in the stylesheet, so there is nothing else to copy.', `
+    <div class="note"><span>{{info}}</span><div class="nb"><b>In your &lt;head&gt;</b>
+      &lt;link rel="stylesheet" href="design-system/talentnext-ds.css"&gt;<br>
+      &lt;script src="design-system/talentnext-ds.js"&gt;&lt;/script&gt;</div></div>
+  `)}
+  ${ex('The host is required', 'Nothing in this system responds to the browser window — every breakpoint is a container query named <code>app</code>. Give the frame <code>container-type:inline-size</code> and <code>container-name:app</code> or the desktop layout never arrives.', `
+    <div class="note warn"><span>{{warning}}</span><div class="nb"><b>The frame</b>
+      &lt;div class="device" style="container-type:inline-size;container-name:app"&gt;<br>
+      &nbsp;&nbsp;&lt;div class="app"&gt; … &lt;/div&gt;<br>
+      &lt;/div&gt;<br>
+      Or call <code>dsFrame(el)</code>. See starter.html for the whole skeleton.</div></div>
+  `)}
+  ${ex('Breakpoints', 'The three tiers the layers actually use.', `
+    <div>
+      <div class="kv"><span class="k">600px</span><span class="v">Gutter 24, sheets centre</span></div>
+      <div class="kv"><span class="k">900px</span><span class="v">Permanent rail, label column</span></div>
+      <div class="kv"><span class="k">1200px</span><span class="v">Rail 280, gutter 32</span></div>
+    </div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------- colour */
+SECTIONS.push({id:'colour', nav:'Colour', icon:'view', build: () => `
+  ${ex('Brand and accent', 'Black is the primary action. The accent is a GRADIENT, not a solid — <code>--accent-grad</code> — and it is the one signal colour: it marks progress, the current item and what the candidate owns.', `
+    <div class="sw-grid">
+      ${swatch('--brand-primary','#000000')}
+      ${swatch('--accent','#f57414')}
+      ${swatch('--accent-2','#f0530c')}
+      ${swatch('--accent-grad','linear-gradient(104.86deg,#f57414 10.02%,#f0530c 115.55%)','the fill')}
+      ${swatch('--accent-text','#b94a09','accent as INK, 4.63:1')}
+      ${swatch('--brand-tint-2','#fcdbc7')}
+    </div>
+  `, true)}
+  ${ex('Surfaces', 'Two tones and the base is white. The canvas, the app bar and the rail are all #FFFFFF — one sheet separated by hairlines, which is what the lattice is for. <code>--layer-02</code> is what a supporting block sits on. There is no third.', `
+    <div class="sw-grid">
+      ${swatch('--background','#ffffff')}
+      ${swatch('--layer-02','#f7f7f7')}
+      ${swatch('--surface-dark','#111111')}
+      ${swatch('--border-subtle-01','#dcdad3')}
+      ${swatch('--border-strong-01','#8e8d8a')}
+    </div>
+  `, true)}
+  ${ex('Ink', 'Four values, and they are ordered by how much attention the text is asking for.', `
+    <div class="sw-grid">
+      ${swatch('--text-primary','#111111')}
+      ${swatch('--text-secondary','#525250')}
+      ${swatch('--text-helper','#666563')}
+      ${swatch('--text-placeholder','#a9a8a5')}
+    </div>
+  `, true)}
+  ${ex('Status', 'Each status has a FILL and an INK value, and they are different numbers: the fill is tuned to sit under text, the ink to pass AA on the canvas. Never use a fill as a text colour.', `
+    <div class="sw-grid">
+      ${swatch('--support-success','#24a148')}
+      ${swatch('--support-success-ink','#1a7f37','green as ink')}
+      ${swatch('--support-error','#da1e28')}
+      ${swatch('--danger-ink','#c21520','red as ink, 5.5:1')}
+      ${swatch('--support-attention','#96540a')}
+      ${swatch('--support-info-ic','#0371a4')}
+    </div>
+  `, true)}
+  ${ex('Data viz', 'A green ramp, monotonic in L*, sharing nothing with the accent — when a bar is also the signal colour a reading looks like a control.', `
+    <div class="sw-grid">
+      ${swatch('--dv-1','#cfded4')}${swatch('--dv-2','#8fbca6')}
+      ${swatch('--dv-3','#3d8a6e')}${swatch('--dv-4','#1e5546')}
+      ${swatch('--dv-hi','#c2703d','the marked point')}
+    </div>
+  `, true)}
+`});
+
+/* --------------------------------------------------------------------- type */
+SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
+  ${ex('The scale', 'Söhne, two styles. Hierarchy is carried by size, colour, case and position — not by weight, which is why §11 sets almost everything to 400.', `
+    <div>
+      <p class="t-heading-01">Heading 01 — 26/32</p>
+      <p class="t-heading-02">Heading 02 — 20/28</p>
+      <p class="t-heading-03">Heading 03 — 16/22</p>
+      <p class="t-heading-04">Heading 04 — 14/20</p>
+      <p class="eyebrow">Eyebrow / heading 05</p>
+      <p class="t-body-01">Body 01 — 16/24. The measure is capped so a line never runs past what the eye can track back.</p>
+      <p class="t-body-02">Body 02 — 14/20, the workhorse.</p>
+      <p class="t-helper-01">Helper — 12.5/16, for the line under a field.</p>
+      <p class="t-legal-01">Legal — 11.5/16.</p>
+    </div>
+  `)}
+  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face.', `
+    <div class="stats">
+      <div class="stat"><span class="v">1,284</span><span class="k">Points</span></div>
+      <div class="stat"><span class="v">92%</span><span class="k">Average</span></div>
+      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
+      <div class="stat"><span class="v">12/13</span><span class="k">Calls</span></div>
+    </div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------ spacing */
+SECTIONS.push({id:'space', nav:'Spacing', icon:'chart', build: () => `
+  ${ex('The scale', 'MUI’s spacing(n) = 8n, with the half-steps the design needs.', `
+    <div>
+      ${[['--s01',2],['--s02',4],['--s03',8],['--s04',12],['--s05',16],['--s06',24],
+         ['--s07',32],['--s08',40],['--s09',48],['--s10',64],['--s11',80],['--s12',96]]
+        .map(([n,v]) => `<div class="sp-row"><code>${n}</code><i style="width:${v}px"></i>${v}px</div>`).join('')}
+    </div>
+  `, true)}
+  ${ex('The spine', '<code>--pad-x</code> is the one horizontal indent: 16 / 24 / 32 by tier. Section padding, page headers, list rows and cells all resolve to it, so the column has a single left edge whatever is drawn in it. Never hard-code a gutter.', `
+    <div>
+      <div class="kv"><span class="k">Radius</span><span class="v">0 — the brand is square</span></div>
+      <div class="kv"><span class="k">Elevation</span><span class="v">None. Depth is rule weight</span></div>
+      <div class="kv"><span class="k">Column</span><span class="v">--content-max, centred</span></div>
+    </div>
+  `)}
+`});
+
+/* ---------------------------------------------------------------- structure */
+SECTIONS.push({id:'page', nav:'Page', icon:'document', build: () => `
+  ${ex('Page header', 'One <code>.ph</code> per page, and it carries the only h1.', `
+    <div class="ph">
+      <div class="crumb"><a href="#">Portal</a>{{chevRight}}<span class="last">This page</span></div>
+      <h1>Where a page starts</h1>
+      <p class="lead">A section is a band of content with a hairline above it. No border box, no fill, no shadow, no radius — depth is rhythm and rule weight, nothing else.</p>
+    </div>
+  `)}
+  ${ex('The label column', 'This is the system’s desktop reading pattern, and it is automatic: at 900px a <code>.sec</code> with a <code>.sec-h</code> splits into a 184px heading column and a content column, divided by a vertical rule that meets the horizontal ones. You scan the left edge for what a region is. Keep those headings to <b>three words</b> — 184px is two lines. Sections holding <code>.stats</code>, <code>.facts</code>, <code>.tbl-wrap</code>, <code>.cardrow</code>, <code>.gcard</code> or <code>.tile-stack</code> opt out automatically, because those components are sized against the full column.', `
+    <div style="border:1px solid var(--border-subtle-01)">
+      <div class="sec">
+        <div class="sec-h"><h2>Your level</h2></div>
+        <p class="t-body-02">Explorer, reviewed at day 91. The heading sits in
+          the label column; this paragraph is the content column.</p>
+      </div>
+      <div class="sec">
+        <div class="sec-h"><h2>Next call</h2></div>
+        <p class="t-body-02">Thursday, 6:30 PM, sixty minutes.</p>
+      </div>
+    </div>
+  `)}
+  ${ex('Section variants', 'Grounds, not cards. There are exactly two tones plus the inverted band.', `
+    <div>
+      <div class="sec tint" style="border-top:1px solid var(--border-subtle-01)">
+        <span class="eyebrow">.sec.tint</span>
+        <p class="t-body-02">The one permitted ground change — a background, not a card.</p>
+      </div>
+      <div class="sec on-dark">
+        <span class="eyebrow">.sec.on-dark</span>
+        <p class="t-body-02">The inverted band. Buttons and helper text invert with it.</p>
+      </div>
+    </div>
+  `)}
+  ${ex('Notes', 'A left rule and a tinted ground — never a filled box with a radius.', `
+    <div class="tile-stack">
+      <div class="note"><span>{{info}}</span><div class="nb"><b>Information</b>The default. Black rule, panel ground.</div></div>
+      <div class="note succ"><span>{{checkFilled}}</span><div class="nb"><b>Success</b>Something finished.</div></div>
+      <div class="note warn"><span>{{warning}}</span><div class="nb"><b>Attention</b>Something needs a decision.</div></div>
+      <div class="note err"><span>{{error}}</span><div class="nb"><b>Error</b>Something failed.</div></div>
+      <div class="note acc"><span>{{star}}</span><div class="nb"><b>Accent</b>Something the candidate owns.</div></div>
+    </div>
+  `)}
+  ${ex('Empty state', '', `
+    <div class="empty">{{search}}<span class="t">Nothing here yet</span>
+      <span class="help">When a list can be empty, say what would fill it.</span></div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------ buttons */
+SECTIONS.push({id:'buttons', nav:'Buttons', icon:'launch', build: () => `
+  ${ex('Variants', 'A button that takes you somewhere ends with <code>arrowRight</code>; that is this product’s GO and it is why the icon sits right. <code>.noic</code> centres a button that has no icon.', `
+    <div class="btn-row">
+      <button class="btn btn-p">Primary {{arrowRight}}</button>
+      <button class="btn btn-s">Secondary {{arrowRight}}</button>
+      <button class="btn btn-g noic">Outlined, no icon</button>
+      <button class="btn ghost noic">Ghost</button>
+      <button class="btn btn-d noic">Danger</button>
+      <button class="btn btn-p noic" disabled>Disabled</button>
+    </div>
+  `)}
+  ${ex('Small', '36px. Use it inside a row or a section heading, not as a page action.', `
+    <div class="btn-row">
+      <button class="btn btn-p btn-sm">Book {{arrowRight}}</button>
+      <button class="btn btn-g btn-sm noic">View as a table</button>
+    </div>
+  `)}
+  ${ex('Full width', 'The phone default for a page’s one action.', `
+    <button class="btn btn-p btn-full">Continue {{arrowRight}}</button>
+  `)}
+  ${ex('Links', 'A text link is a 32px target with a hairline under it, so it is a control rather than a coloured word.', `
+    <div>
+      <a class="lk" href="#">A text link {{arrowRight}}</a>
+      <p class="t-body-02" style="margin-top:var(--s04)">Inside prose, a
+        <a href="#" data-go="x">link like this</a> underlines instead.</p>
+    </div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------- fields */
+SECTIONS.push({id:'fields', nav:'Fields', icon:'edit', build: () => `
+  ${ex('Text', 'Material’s filled field: a bottom rule on a tinted ground, which is what the design specified independently. Focus doubles the rule rather than drawing a box.', `
+    <div>
+      <label class="f"><span class="lbl">Full name</span>
+        <input class="inp" placeholder="As it appears on your ID"></label>
+      <label class="f"><span class="lbl">Track</span>
+        <select class="inp"><option>Leadership</option><option>Delivery</option></select></label>
+      <label class="f"><span class="lbl">Why this track</span>
+        <textarea class="inp" placeholder="A few sentences"></textarea></label>
+      <label class="f"><span class="lbl">Email</span>
+        <input class="inp invalid" value="not-an-address">
+        <span class="help err">That address is not complete.</span></label>
+    </div>
+  `)}
+  ${ex('Search', '', `
+    <div class="srch">{{search}}<input class="inp" placeholder="Search"></div>
+  `)}
+  ${ex('Choice', 'The box is 20px and square, like everything else. The tick only appears when checked.', `
+    <div>
+      <label class="cbx"><input type="checkbox" checked><span class="box">{{check}}</span>
+        <span class="txt">I agree to the assessment terms</span></label>
+      <label class="rad"><input type="radio" name="d" checked><span class="box"></span>
+        <span class="txt">Morning</span></label>
+      <label class="rad"><input type="radio" name="d"><span class="box"></span>
+        <span class="txt">Afternoon</span></label>
+      <div class="kv"><span class="k">Email me about my cohort</span>
+        <span class="v"><span class="sw on"></span></span></div>
+    </div>
+  `)}
+  ${ex('One-time code', 'Six cells on a <code>minmax(0,1fr)</code> grid — an input carries an intrinsic width from its size attribute and <code>flex:1</code> overflows at 320.', `
+    <div class="otp">
+      ${[4,7,2,9,'',''].map(v => `<input value="${v}" inputmode="numeric" maxlength="1">`).join('')}
+    </div>
+  `)}
+`});
+
+/* --------------------------------------------------------------------- rows */
+SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
+  ${ex('Navigation row', 'This replaces every card. Full-bleed, a hairline between, a leading icon slot and a trailing chevron. <code>.clk</code> is what makes it a target.', `
+    <div class="tile-stack">
+      <button class="tile clk gcard">
+        <span class="cardrow-ic">{{book}}</span>
+        <span class="gcard-b"><span class="eyebrow">Week 6</span>
+          <h3>Coaching conversations</h3><span class="sub">Four chapters, 45 minutes</span></span>
+        {{arrowRight|tile-arrow}}
+      </button>
+      <button class="tile clk gcard">
+        <span class="cardrow-ic">{{chart}}</span>
+        <span class="gcard-b"><h3>Your assessment</h3>
+          <span class="sub">Average 92% across thirteen</span></span>
+        {{arrowRight|tile-arrow}}
+      </button>
+    </div>
+  `)}
+  ${ex('Detail row', 'Same family, two lines and a trailing action instead of a chevron.', `
+    <div class="tile-stack">
+      <div class="cardrow">
+        <span class="cardrow-ic">{{creditCard}}</span>
+        <span class="cardrow-b"><span class="cardrow-t">Visa ending 4242
+          <span class="pill-def">Default</span></span>
+          <span class="cardrow-d">Expires 07/28</span></span>
+        <span class="cardrow-a"><button class="btn btn-g btn-sm noic">Remove</button></span>
+      </div>
+      <div class="cardrow">
+        <span class="cardrow-ic">{{receipt}}</span>
+        <span class="cardrow-b"><span class="cardrow-t">Assessment fee</span>
+          <span class="cardrow-d">20 August</span></span>
+        <span class="cardrow-a"><span class="tag sm">Paid</span></span>
+      </div>
+    </div>
+  `)}
+  ${ex('People', 'The avatar is square, because radius 0 travels everywhere.', `
+    <div class="tile-stack">
+      <div class="mem"><span class="av mem-av">MN</span>
+        <span class="mem-b"><span class="mem-n">Maryam Naz</span>
+          <span class="mem-m">Cohort 41 · week 6</span></span>
+        <span class="tag sm green">On track</span></div>
+      <div class="mem"><span class="av mem-av">PN</span>
+        <span class="mem-b"><span class="mem-n">Priya Nair</span>
+          <span class="mem-m">Cohort 41 · week 6</span></span>
+        <span class="tag sm warn">Behind</span></div>
+    </div>
+  `)}
+  ${ex('Avatars', '', `
+    <div style="display:flex;align-items:center;gap:var(--s05)">
+      <span class="av xs">XS</span><span class="av sm">SM</span>
+      <span class="av">MD</span><span class="av lg">LG</span>
+    </div>
+  `)}
+`});
+
+/* ------------------------------------------------------------------ figures */
+SECTIONS.push({id:'figures', nav:'Figures', icon:'chart', build: () => `
+  ${ex('Figure cells', 'Where several figures belong together they become cells of one grid sharing single hairlines — the opposite of a row of cards. Put <code>.stats</code> straight in the section: it is one of the six containers that opt a heading out of the label column. <b>Give it exactly four.</b> The hairlines <i>are</i> the 1px grid gap, with the rule colour showing through from the container’s own background, and the grid is <i>fixed</i> — 2 columns on a phone, 4 from 700px. An incomplete row therefore paints grey rather than collapsing. An odd count is handled: <code>:last-child:nth-child(odd)</code> spans the last cell across the row — but the row above it still has to be full.', `
+    <div class="stats">
+      <div class="stat"><span class="v">13<small>/13</small></span><span class="k">Chapters</span></div>
+      <div class="stat"><span class="v">92<small>%</small></span><span class="k">Average</span></div>
+      <div class="stat"><span class="v">1,284</span><span class="k">Points</span></div>
+      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
+    </div>
+  `)}
+  ${ex('Facts', 'A label above its value, in a bordered band — for reference material rather than achievement. Same hairline-as-gap construction as <code>.stats</code>, but the columns are <code>auto-fit</code> at <code>minmax(140px,1fr)</code>, so the count that fits is <code>floor(width / 140)</code>. Spare tracks collapse, so a band whose cells all fit on one row always fills. Cells that <i>wrap</i> do not: the second row keeps the full column count and its empty slots paint the rule colour. Four cells are right for a full-width band and wrap to 3 + 1 in a band of roughly 420–560px — which is what you are looking at here at 900px, and what the portal does on its own interview page at that width. <b>For three items, or for a band that must hold at every width, use <code>.kv</code> instead.</b>', `
+    <div class="facts">
+      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
+      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
+      <div><span class="l">Your report</span><span class="v">Within 24 hours</span></div>
+      <div><span class="l">Fee</span><span class="v">$95</span></div>
+    </div>
+  `)}
+  ${ex('Key and value', 'A hairline list. The value is tabular and right-aligned, so a column of them reads down.', `
+    <div>
+      <div class="kv"><span class="k">Chapters finished</span><span class="v n">13 of 13</span></div>
+      <div class="kv"><span class="k">Live calls attended</span><span class="v n">12 of 13</span></div>
+      <div class="kv"><span class="k">Assessment average</span><span class="v n">92%</span></div>
+    </div>
+  `)}
+  ${ex('Progress', 'The accent marks progress, because progress is a thing the candidate owns. A segmented bar is one segment per chapter.', `
+    <div>
+      <div class="prog">
+        <div class="prog-top">
+          <div><div class="prog-pct">72<small>%</small></div>
+            <div class="prog-l">of the course done</div></div>
+          <div class="prog-day"><div class="prog-dn">Day 47</div>
+            <div class="prog-l">of 90</div></div>
+        </div>
+        <div class="prog-seg">${Array.from({length:13},(_,i)=>
+          `<i class="${i<9?'done':i===9?'now':''}"></i>`).join('')}</div>
+      </div>
+      <div class="pb mt5"><i style="width:72%"></i></div>
+    </div>
+  `)}
+  ${ex('Steps', 'A numbered list for a process, not a stepper widget.', `
+    <ol class="steps">
+      <li><span class="s-n">1</span><span class="s-b"><b>You choose the agent</b>
+        Everyone who assesses your track is listed with their next free slot.</span></li>
+      <li><span class="s-n">2</span><span class="s-b"><b>You have the conversation</b>
+        Forty-five minutes, recorded, so your report can be written from it.</span></li>
+      <li><span class="s-n">3</span><span class="s-b"><b>Your report arrives</b>
+        Within a day, with your level and what moved it.</span></li>
+    </ol>
+  `)}
+`});
+
+/* ------------------------------------------------------------------- tables */
+SECTIONS.push({id:'tables', nav:'Tables', icon:'document', build: () => `
+  ${ex('Data table', 'Uppercase headers on a strong rule, hairlines between rows, and the last column right-aligned. Always wrap it in <code>.tbl-wrap</code> — that is the one component allowed to scroll sideways, and it is what keeps a wide table from widening the page.', `
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th>Chapter</th><th class="num">Score</th><th class="num">Attempts</th><th>Finished</th></tr>
+        <tr><td>Coaching conversations</td><td class="num">94%</td><td class="num">1</td><td>18 Aug</td></tr>
+        <tr><td>Difficult feedback</td><td class="num">88%</td><td class="num">2</td><td>11 Aug</td></tr>
+        <tr><td>Delegation</td><td class="num">92%</td><td class="num">1</td><td>4 Aug</td></tr>
+      </table>
+    </div>
+  `)}
+`});
+
+/* -------------------------------------------------------------------- chips */
+SECTIONS.push({id:'chips', nav:'Chips', icon:'ticket', build: () => `
+  ${ex('Tags', 'A status word, 32px, square. <code>.sm</code> is 24px for inside a row.', `
+    <div class="tag-row">
+      <span class="tag">Default</span><span class="tag brand">Brand</span>
+      <span class="tag acc">Accent</span><span class="tag green">On track</span>
+      <span class="tag warn">Behind</span><span class="tag red">Blocked</span>
+      <span class="tag bordered">Outlined</span><span class="tag sm">Small</span>
+    </div>
+  `)}
+  ${ex('Badges and dots', 'A badge is 20px and rides a row or an icon. A dot is a 6px mark for "there is something here".', `
+    <div style="display:flex;align-items:center;gap:var(--s05)">
+      <span class="badge">3</span><span class="badge acc">New</span>
+      <span class="badge done">Done</span>
+      <span class="dot"></span><span class="dot on"></span>
+      <span class="t-body-02">Week 6<span class="mdot"></span>Thursday</span>
+    </div>
+  `)}
+`});
+
+/* --------------------------------------------------------------- navigation */
+SECTIONS.push({id:'nav', nav:'Navigation', icon:'view', build: () => `
+  ${ex('Tabs', 'Scrolls sideways with no visible scrollbar; the current tab is marked by a 2px rule, not a fill.', `
+    <div class="tabs" id="demoTabs">
+      <button class="on">Overview</button><button>Chapters</button>
+      <button>Assessment</button><button>Cohort</button>
+    </div>
+  `)}
+  ${ex('Segmented', 'For two or three exclusive choices in a row.', `
+    <div class="tg" id="demoSeg">
+      <button class="on">Week</button><button>Month</button><button>All</button>
+    </div>
+  `)}
+  ${ex('Accordion', 'One open at a time is not enforced — that is the page’s decision, not the component’s.', `
+    <div class="acc" id="demoAcc">
+      <div class="acc-i on"><button class="acc-h">Is the interview recorded?
+        {{chevDown|chev}}</button>
+        <div class="acc-b"><p class="t-body-02">Yes, so your agent can write your
+          report from it. You can ask for a review, and you can delete a
+          recording at any time.</p></div></div>
+      <div class="acc-i"><button class="acc-h">What happens at day 91?
+        {{chevDown|chev}}</button>
+        <div class="acc-b"><p class="t-body-02">You re-interview, and your level
+          moves with the result.</p></div></div>
+    </div>
+  `)}
+  ${ex('Sheet', 'Rises from the bottom on a phone, centres at 600px and up.', `
+    <button class="btn btn-s noic" id="openSheet">Open the sheet</button>
+  `)}
+`});
+
+/* -------------------------------------------------------------------- icons */
+SECTIONS.push({id:'icons', nav:'Icons', icon:'star', build: () => `
+  ${ex('The set', 'Material Icons, the FILLED cut, one tone and one path each — checked against <code>@material-design-icons/svg/filled</code>. Several look linear and are correct: Material’s filled cut is intrinsically hollow for a ring or a tick, so do not blanket-fill them. Call one as <code>I.name</code> for a whole &lt;svg&gt;, or <code>inner(\'name\')</code> for the path alone.', `
+    <div class="ic-grid">${Object.keys(IP).sort().map(k =>
+      `<div class="ic-c">${I[k]}<span>${k}</span></div>`).join('')}</div>
+  `, true)}
+  ${ex('The brand marks', '<code>TN_MARK</code> is the logo lockup at the logo’s own proportions — it is deliberately not redrawn on the 24 grid, because that is how a logo drifts. <code>CHEV</code> is the single chevron the product draws headings and levels with.', `
+    <div style="display:flex;align-items:center;gap:var(--s07)">
+      <span style="width:44px;fill:var(--icon-primary)">${TN_MARK}</span>
+      <svg viewBox="0 0 24 24" style="width:22px;fill:var(--accent-text)"><path d="${CHEV}"/></svg>
+    </div>
+  `, true)}
+`});
+
+/* ------------------------------------------------------------------- motion */
+SECTIONS.push({id:'motion', nav:'Motion', icon:'play', build: () => `
+  ${ex('The rules', 'Motion explains, it does not decorate: a page rises because it arrived from below the fold, a drawer slides from the edge it lives on. It fires on events, never on renders — every entrance is gated on <code>[data-enter]</code>, which is a ONE-RENDER marker.', `
+    <div>
+      <div class="kv"><span class="k">State change</span><span class="v">--mo-quick, 150ms</span></div>
+      <div class="kv"><span class="k">Arriving</span><span class="v">--mo-base, 240ms</span></div>
+      <div class="kv"><span class="k">Full overlay</span><span class="v">--mo-slow, 320ms</span></div>
+      <div class="kv"><span class="k">Cascade</span><span class="v">26ms a step, stops at 8</span></div>
+    </div>
+  `)}
+  ${ex('Replay the entrance', 'The sections stagger off <code>--i</code>, which the page stamps. <code>prefers-reduced-motion</code> collapses all of it to a 120ms cross-fade.', `
+    <button class="btn btn-s noic" id="replay">Play it again</button>
+  `)}
+  ${ex('Two traps', '', `
+    <div class="tile-stack">
+      <div class="note warn"><span>{{warning}}</span><div class="nb">
+        <b>Never state a resting style with opacity</b>
+        Entrance animations run with <code>fill-mode:both</code>, so a played
+        animation’s last keyframe keeps applying and wins. Put the weight in
+        <code>background-color</code> instead.</div></div>
+      <div class="note warn"><span>{{warning}}</span><div class="nb">
+        <b>Do not measure geometry in the same tick as a render</b>
+        The entrance translates and scales, so a width read straight after can
+        be off by orders of magnitude. Kill the animation or wait for it.</div></div>
+    </div>
+  `)}
+`});
+
+/* ==========================================================================
+   RENDER
+   ========================================================================== */
+const page = document.getElementById('page');
+const rail = document.getElementById('railItems');
+const app  = document.getElementById('app');
+
+/* The portal's wordmark is an image asset that is not part of the design
+   system, so this sets the mark plus the name as text. §34 sizes the mark
+   inside `.nav-t-mark` to 21px — deliberately smaller than the 24px
+   hamburger it swaps with, because three thin chevrons read heavier than a
+   Material glyph at the same size. */
+document.getElementById('logo').innerHTML =
+  `${TN_MARK}<b class="wordmark">TalentNext</b>`;
+document.querySelector('#navBtn .nav-t-mark').innerHTML = TN_MARK;
+document.querySelector('#navBtn .nav-t-menu').innerHTML = I.menu;
+document.getElementById('sheetX').innerHTML = I.close;
+
+page.innerHTML = `
+  <div class="ph" id="top">
+    <span class="eyebrow">TalentNext</span>
+    <h1>The design system</h1>
+    <p class="lead">Every class below is a real rule from the hi-fi candidate
+      portal, extracted in its own cascade position — so a page built on these
+      names comes out looking like that portal rather than like an
+      approximation of it. Two files, no build step, nothing to re-draw.</p>
+  </div>
+  ${SECTIONS.map(s => sec(s.id, s.nav, s.build())).join('')}
+  <div class="sec">
+    <p class="help">Generated from <code>hifi/build/*.css</code> by
+      <code>design-system/build-ds.py</code>. To change the system, change the
+      layer that states the rule — the reasoning for it is the comment above
+      it — then re-run the build.</p>
+  </div>`;
+
+rail.innerHTML = SECTIONS.map((s,i) =>
+  `<a class="sn-item${i === 0 ? ' on' : ''}" href="#${s.id}" data-sec="${s.id}">
+     ${I[s.icon]}<span>${s.nav}</span></a>`).join('');
+
+dsStagger(page);
+dsEnter(app);
+
+/* --- the rail, and the phone drawer ------------------------------------- */
+const railEl = document.getElementById('rail');
+const scrim  = document.getElementById('scrim');
+
+/* ONE FLAG, TWO BEHAVIOURS, and both have to be set — which is what the
+   portal's own render does (`views.js` stamps `data-rail` and `.on` from the
+   same `S.nav`). Below 900 the rail is a temporary drawer over a scrim, so it
+   needs `.on`; at 900 and up it is a permanent 72px icon rail that widens to
+   `--drawer-w` on `data-rail="open"`, revealing the `.sn-item` labels §14
+   otherwise clips to 1px. The stylesheet decides which one applies at this
+   width; the page just tells it the state. */
+function setNav(open){
+  railEl.classList.toggle('on', open);
+  scrim.classList.toggle('on', open);
+  app.setAttribute('data-rail', open ? 'open' : 'shut');
+  /* `data-open` is a ONE-RENDER marker and only motion may read it (trap 5).
+     Left set, `mo-drawer` runs with `fill-mode:both` and its final keyframe
+     keeps applying to the rail's transform for as long as the flag is there —
+     which is the same class of bug as styling a resting state with opacity.
+     The persistent state is `data-rail` and `.on`; this is just the cue.
+
+     It is cleared when the entrance has finished rather than on the next
+     frame — `mo-drawer` is 320ms (--mo-slow) and pulling the flag two frames
+     in would cancel the slide it exists to start. */
+  clearTimeout(setNav.t);
+  if(open){
+    app.setAttribute('data-open', 'nav');
+    setNav.t = setTimeout(() => app.removeAttribute('data-open'), 380);
+  } else {
+    app.removeAttribute('data-open');
+  }
+}
+setNav(false);
+document.getElementById('navBtn').onclick = () => setNav(!railEl.classList.contains('on'));
+scrim.onclick = () => setNav(false);
+rail.onclick = e => {
+  const a = e.target.closest('.sn-item');
+  if(!a) return;
+  rail.querySelectorAll('.sn-item').forEach(x => x.classList.toggle('on', x === a));
+  setNav(false);
+};
+
+/* mark the section you are in — the rail is the one place that says where you
+   are, so it has to keep up with the scroller rather than only with clicks */
+const main = document.getElementById('main');
+const io = new IntersectionObserver(entries => {
+  entries.filter(e => e.isIntersecting).slice(0,1).forEach(e => {
+    rail.querySelectorAll('.sn-item').forEach(x =>
+      x.classList.toggle('on', x.dataset.sec === e.target.id));
+  });
+}, {root: main, rootMargin: '-20% 0px -70% 0px'});
+SECTIONS.forEach(s => { const el = document.getElementById(s.id); if(el) io.observe(el); });
+
+/* --- the demos ---------------------------------------------------------- */
+document.querySelectorAll('#demoTabs, #demoSeg').forEach(g => g.onclick = e => {
+  const b = e.target.closest('button');
+  if(b) g.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+});
+document.getElementById('demoAcc').onclick = e => {
+  const h = e.target.closest('.acc-h');
+  if(h) h.parentElement.classList.toggle('on');
+};
+const modal = document.getElementById('sheetModal');
+function sheet(open){
+  modal.classList.toggle('on', open);
+  app.setAttribute('data-open', open ? 'editProfile' : '');
+}
+document.getElementById('openSheet').onclick = () => sheet(true);
+modal.onclick = e => { if(e.target === modal || e.target.closest('[data-close],.x')) sheet(false); };
+document.getElementById('replay').onclick = () => { dsStagger(page); dsEnter(app); };
+</script>
+</body>
+</html>

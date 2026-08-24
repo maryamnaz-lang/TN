@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — Talent Agent portal</title>
+
+<!-- ==========================================================================
+     THE DESIGN SYSTEM. Two files, fonts embedded in the first, so this is the
+     whole dependency. Serve over http — a browser blocks a linked stylesheet
+     on file://:
+         python3 -m http.server 8799 --bind 127.0.0.1
+     Every class used below is a real class from design-system/gallery.html.
+     This file writes NO product CSS: the only rules in the <style> block are
+     the three the design system deliberately does not carry (the wordmark's
+     size, and two prototype-chrome colours on the black bar).
+     ========================================================================== -->
+<link rel="stylesheet" href="design-system/talentnext-ds.css">
+
+<style>
+/* ==========================================================================
+   PROTOTYPE CHROME ONLY — not product design.
+
+   `.pt-bar`, `.pt-stage`, `.pt-fit` and `.device` all come from the design
+   system, including `container-type:inline-size; container-name:app` on
+   `.device`, which is the host requirement — nothing in this system responds
+   to the browser window, every breakpoint is `@container app (min-width:…)`.
+
+   What is left here is the mark. `TN_MARK` carries a viewBox and no size — on
+   purpose, so a call site can scale it — and the portal ships a PNG lockup we
+   do not have, so the bar and the app bar each say how big it is and, on the
+   black bar, what colour.
+   ========================================================================== */
+.pt-bar .mk{display:flex;align-items:center;gap:8px;flex:none}
+.pt-bar .mk svg{width:16px;height:16px;fill:var(--on-dark)}
+.pt-bar .mk b{font-size:13px;font-weight:400;letter-spacing:-.1px;white-space:nowrap}
+.shell-logo{gap:var(--s03)}
+.shell-logo svg{width:18px;height:18px;fill:var(--icon-primary);flex:none}
+.shell-logo b{font-size:15px;font-weight:400;letter-spacing:-.2px;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- prototype chrome — not part of the product -->
+<div class="pt-bar">
+  <span class="mk" id="ptLogo"></span>
+  <span class="dot"></span>
+  <span class="pt-meta">Talent Agent portal &middot; v1 &middot; built on the TalentNext design system</span>
+  <span class="pt-lab">Stage</span>
+  <select class="pt-sel" id="pick" aria-label="Agent stage"></select>
+  <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+    <button data-vp="mobile">Mobile</button>
+    <button data-vp="tablet">Tablet</button>
+    <button data-vp="fluid" class="on">Desktop</button>
+    <span class="pt-scale" id="vpscale">100%</span>
+  </div>
+  <div class="pt-nav">
+    <button id="reset" title="Reset this stage" aria-label="Reset this stage">
+      <svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="pt-stage">
+  <div class="pt-fit" id="fit">
+    <div class="device" id="device" data-vp="fluid"></div>
+  </div>
+  <p class="pt-cap" id="cap"></p>
+</div>
+
+<script src="design-system/talentnext-ds.js"></script>
+<script>
+/* ==========================================================================
+   THE TALENT AGENT PORTAL
+
+   A THIRD SIGNED-IN USER, IN A FILE OF ITS OWN. The candidate and the cohort
+   leader share `hifi/` because a demo has to walk from one side of a cohort to
+   the other without a reload — they are two views of the same fortnight. An
+   agent is not: they meet a candidate for forty-five minutes, once, and never
+   see the 90 days. Nothing is gained by putting a switch between them, so this
+   is a separate file linking the same design system, which is what
+   design-system/ exists for.
+
+   THE JOURNEY IS THE FLOW DIAGRAM. Its four stages and thirteen steps are the
+   stage picker on the black bar:
+
+     Stage 1  Recruitment and vetting   → `apply`, `vetting`   (steps 1, 2 + gate)
+     Stage 2  Account, listing, money   → `setup`              (steps 3, 4, 5, 6)
+     Stage 3  Enablement and go-live    → `training`           (step 7 + gate)
+     Stage 4  Operating as an agent     → `live`, `working`,
+                                          `reviewed`           (steps 8–13)
+
+   The diagram's left column — the open questions — does NOT cross into a
+   hi-fi screen, the same rule `hifi/` keeps against the wireframe's
+   client-facing annotations. An undecided thing is decided here and the
+   decision is written down in the handoff, not drawn on the page as a
+   question. The four that were genuinely undecided, and what this file does:
+
+     - AN AGENT ROLE IS ADDED TO AN ACCOUNT, it is not a second account. The
+       diagram's own rule says roles stack, so Profile says so and the
+       candidate record is left alone.
+     - THE 20/80 SPLIT IS THE MODEL, and the $100 monthly listing fee is not
+       in force. Two revenue models were never reconciled; the split is the
+       later of the two and the one that was confirmed. An agent who is also
+       charged a subscription would need a card on file, and a portal that
+       takes money FROM an agent is a different product.
+     - MONEY NEVER TOUCHES THIS PORTAL. Payouts are a handoff to Stripe, the
+       same shape as the candidate's booking: TalentNext holds no bank
+       details and this file draws no bank form. `hifi/`'s `ai7.js` makes the
+       same call for the same reason.
+     - THE INTERVIEW SETS THE LEVEL AND THE AGENT SIGNS IT; a change after the
+       signature is a review decision above them. That is what reconciles the
+       diagram's "the agent cannot change candidate levels" with the candidate
+       portal, where every level is signed by the agent who set it.
+
+   AND THE BOUNDARY IS KEPT BY OMISSION. "Agents do not lead cohorts" is not a
+   line of copy anywhere below — cohorts, chapters, weeks and the 90 days do
+   not appear in this portal at all, which is a stronger way to say it than a
+   note explaining what the reader cannot do.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   WHO IS SIGNED IN
+
+   OWEN CLARKE, on purpose, and not a new name. He is already one of the three
+   agents the candidate portal offers Maryam — $85, assesses E2 to B1, 164
+   interviews, rated 4.6 — so the demo can book him on one side and see the
+   booking arrive on the other. Priya Nair was the obvious pick and is the
+   wrong one: she is already the cohort leader AND the agent who signed
+   Maryam's report, and a third role on the same person makes the roles-stack
+   rule impossible to read.
+
+   The figures below are the marketplace's, unchanged. `f()` merges the stage
+   over them, because an agent on their first day has none of them yet.
+   -------------------------------------------------------------------------- */
+const A = {
+  n:'Owen Clarke', i:'OC', email:'owen.clarke@fieldstone.co',
+  since:'June 2024',
+  range:'Explorer E2 – Builder B1', rangeShort:'E2 – B1',
+  fee:85, share:68, cut:17,          /* $85, split 80/20 → $68 and $17 */
+  rating:4.6, ivs:164, month:9,
+  level:'A2', levels:4, rank:12, pool:38,
+  follow:4.4, depth:4.7,
+  manager:'Nadia Rahman',
+  escrow:204, earned:612,
+  payout:'Stripe · account ending 4417'
+};
+
+/* --------------------------------------------------------------------------
+   THE STAGES
+
+   `[key, label, caption]`, the shape `hifi/`'s own STAGES uses, and the
+   caption prints under the frame. Seven snapshots, in the order the diagram
+   runs. Each is internally consistent and they are not one continuous week:
+   the onboarding four are June 2024, when Owen joined, and the operating three
+   are now. A stage that had to hold both would have to claim 164 interviews on
+   an agent who has not been certified yet.
+   -------------------------------------------------------------------------- */
+const STAGES = [
+  ['apply',    'Applying',              'Stage 1. The application is open and unsent. Two of the five parts are missing, and nothing is reviewed until all five are in.'],
+  ['vetting',  'In vetting',            'Stage 1. Submitted 3 June. Identity has cleared, the background check is running and one of the two references is back. The approval gate is ahead.'],
+  ['setup',    'Approved, setting up',  'Stage 2. Approved 12 June, and the agent role is on the account Owen already had. Listing, fee and payout destination are what is left.'],
+  ['training', 'Training',              'Stage 3. Listing and money are done. Three of four modules are finished and the calibration interview is the last thing before the certification gate.'],
+  ['live',     'Listed, nothing booked','Stage 4, day one. Certified 20 June and visible in the marketplace since Monday. Six slots are open and no one has taken one yet.'],
+  ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 in escrow. This is the portal as an agent actually uses it.'],
+  ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review moved Owen to A3 and widened the range he may assess to E1 – B2.']
+];
+
+/* Stage config. Anything absent falls back to `A`. */
+const CFG = {
+  apply:    {nav:'early', sent:false, ivs:0, month:0, rating:null, escrow:0, earned:0},
+  vetting:  {nav:'early', sent:true,  ivs:0, month:0, rating:null, escrow:0, earned:0},
+  setup:    {nav:'setup', approved:true, ivs:0, month:0, rating:null, escrow:0, earned:0},
+  training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, mods:3,
+             ivs:0, month:0, rating:null, escrow:0, earned:0},
+  live:     {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+             ivs:0, month:0, rating:null, escrow:0, earned:0},
+  working:  {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+             busy:true},
+  reviewed: {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+             busy:true, reviewed:true,
+             level:'A3', range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
+             rank:9, follow:4.6, ivs:171, month:7}
+};
+
+const S = {stage:'working', view:'dashboard', nav:false, tal:false, talQ:null,
+           iv:'rafael', tab:'next', confirm:false, sheet:false,
+           perms:{draft:true, brief:true, live:false}};
+
+const f = () => ({...A, ...CFG[S.stage]});
+
+/* --------------------------------------------------------------------------
+   THE RAIL
+
+   THREE SETS, BECAUSE THE NAV IS THE RECORD OF WHAT IS UNLOCKED — the same
+   reason the candidate's grows from four items to nine. An agent who has not
+   been approved has one page and a form; an agent who cannot be booked has no
+   Interviews page to look at; the full set arrives with the listing.
+   -------------------------------------------------------------------------- */
+const NAVSETS = {
+  early: [['dashboard','Home','dashboard'], ['application','Application','document']],
+  setup: [['dashboard','Home','dashboard'], ['listing','Listing','view'],
+          ['training','Training','book'], ['earnings','Earnings','wallet']],
+  full:  [['dashboard','Home','dashboard'], ['interviews','Interviews','calendar'],
+          ['availability','Availability','time'], ['listing','Listing','view'],
+          ['earnings','Earnings','wallet'], ['standing','Standing','chart']]
+};
+
+/* A sub-page's rail item is its parent's — `interview` is reached from
+   `interviews` and must not un-mark it. */
+const PARENT = {interview:'interviews'};
+
+/* --------------------------------------------------------------------------
+   THE INTERVIEWS
+
+   Five, and the working week is built out of them. The fee is the same $85 on
+   every row because it is Owen's rate, not a negotiation: the candidate pays
+   into escrow at booking, so an interview that has not happened is already
+   paid for. Three of these are what makes escrow $204 — Rafael (booked),
+   Sofia (held, report not delivered) and Tom (delivered, releasing Thursday).
+   -------------------------------------------------------------------------- */
+const IVS = [
+  {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next',
+   day:'Thursday 20 August', time:'3:00 PM ET', kind:'First interview',
+   band:'Explorer, predicted by the quiz', asked:'Delegation, and being new to managing former peers',
+   paid:'Paid at booking, 19 August'},
+
+  {id:'amara', n:'Amara Osei', i:'AO', st:'next',
+   day:'Monday 24 August', time:'6:00 PM ET', kind:'Re-interview',
+   band:'Builder – B1, set 4 March', asked:'Hard conversations, and holding a line under pressure',
+   paid:'Paid at booking, 18 August', summary:true},
+
+  {id:'sofia', n:'Sofia Marek', i:'SM', st:'report',
+   day:'Tuesday 18 August', time:'5:00 PM ET', kind:'First interview',
+   band:'Explorer, predicted by the quiz', level:'Explorer – E2',
+   due:'6:00 PM today', asked:'Running her first team of four'},
+
+  {id:'tom', n:'Tom Whelan', i:'TW', st:'done',
+   day:'Monday 17 August', time:'6:30 PM ET', kind:'Re-interview',
+   level:'Builder – B1', signed:'17 August', money:'Releases Thursday 20 August',
+   follow:4.6, depth:4.8},
+
+  {id:'nina', n:'Nina Haddad', i:'NH', st:'done',
+   day:'Friday 14 August', time:'4:00 PM ET', kind:'First interview',
+   level:'Explorer – E4', signed:'15 August', money:'Paid 19 August',
+   follow:4.3, depth:4.7}
+];
+const iv = id => IVS.find(x => x.id === id) || IVS[0];
+
+/* Availability. `on` is a taken slot — `.slot.sel` draws it filled, which is
+   the design system's own "this one is chosen" and reads correctly for "this
+   one is spoken for" too. */
+const SLOTS = [
+  ['This week', [
+    ['Wed 19', '7:00 PM', 0], ['Thu 20', '3:00 PM', 1], ['Fri 21', '5:00 PM', 0]]],
+  ['Week of 24 August', [
+    ['Mon 24', '6:00 PM', 1], ['Tue 25', '5:00 PM', 0], ['Wed 26', '7:00 PM', 0],
+    ['Thu 27', '3:00 PM', 0], ['Fri 28', '5:00 PM', 0]]]
+];
+
+/* ==========================================================================
+   TAL
+
+   THE CONCEPT CARRIED ACROSS IS THE PAGE SUMMARY, not the thread. In `hifi/`
+   every page opens with Tal saying, in two sentences, what has moved — and
+   that pass (`ai6.js`) exists because a page whose top is a caption of itself
+   is a page nobody reads. The rules travel with it exactly:
+
+     - TWO SENTENCES, 18 TO 28 WORDS. Say the thing and stop.
+     - THE FACTS, IN THE ORDER A PERSON WOULD ASK FOR THEM. Where you are,
+       what is open, what is on you. The numbers ARE the content.
+     - A CATCH-UP, NOT A DESCRIPTION. If the line would read the same next
+       week, it is a caption. The reader is looking at the page already.
+     - NO FRAMING, NO POLICY, NO POINTING AT THE UI, and nothing from another
+       portal — an agent is not told what a candidate's Cohort page looks like.
+     - CONTRACTIONS, PLAIN WORDS. Tal talking to one person.
+
+   AND THE SPLIT WITH THE GREY LINE IS A RULE, not a preference. `ph(title,
+   sub)`'s second argument carries the page's FACTUAL SPINE as a `·` row — no
+   verb, no claim — and Tal carries the READING. Where a page has no spine it
+   gets no `sub` and the title stands alone over Tal's sentence, which is why
+   Profile passes a title only. Writing a sentence into both slots is what
+   produced the duplication `ai6.js` was mostly written to remove.
+
+   THE CARD IS A `.note acc`. `hifi/`'s aura and its head band are one product
+   surface's own vocabulary and `build-ds.py` drops them by name, so the
+   summary is drawn with the component the design system does carry: the
+   accent note, which is the one tone reserved for "something that is yours".
+   The mark is `talChat`, the same glyph the candidate portal uses for Tal.
+   ========================================================================== */
+const PAGESUM = {
+
+  dashboard: {
+    apply:   'Nothing’s sent yet — three of the five parts are filled in. Your two referees are the piece that needs someone else’s time.',
+    vetting: 'Submitted 3 June. Identity cleared the same day, the background check is with the provider, and one of your two references is back.',
+    setup:   'Approved on 12 June, and the agent role sits on the account you already had. Listing and fee are done; payouts aren’t.',
+    training:'Three of four modules done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
+    live:    'Listed since Monday and nothing booked yet. Six slots are open over the next fortnight, and Friday at 5:00 PM is the first.',
+    working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is sitting in escrow.',
+    reviewed:'Nadia moved you to A3 on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
+  },
+
+  application: {
+    apply:   'Experience and motivation are written, your two referees aren’t. Nothing is looked at until all five parts are in — usually five working days after that.',
+    _:       'Submitted 3 June with two referees. Identity cleared, the background check is with the provider, and Marisa Vance decides once both are back.'
+  },
+
+  listing: {
+    setup:   'Your card is written and your fee is $85, which leaves you $68 after the split. Payouts are the one thing still stopping a booking.',
+    training:'Your card and fee are set, and nothing is visible yet — a listing goes live the day you’re certified. Delegation is your first specialism.',
+    live:    'You’ve been in browse since Monday at $85, assessing E2 to B1. No rating yet: the first three interviews are what make one.',
+    _:       'You’re visible at $85 assessing E2 to B1, with 164 interviews and 4.6 behind you. Delegation is the specialism candidates search for most.'
+  },
+
+  training: {
+    training:'Three modules done, one to go, and calibration is Thursday with Derek Hale. He watches for tenacity, energy, and whether you notice what isn’t said.',
+    _:       'All four modules done and calibrated on 20 June by Derek Hale. The method is re-checked once a year, so nothing’s due until June.'
+  },
+
+  interviews: {
+    live:    'Nothing booked yet. Six slots are open over the next fortnight, and a booking arrives already paid for — there’s nothing to accept.',
+    _:       'Two ahead — Rafael on Thursday, Amara on Monday — and Sofia’s report is due at 6:00 PM. 164 finished in total.'
+  },
+
+  /* A FUNCTION, BECAUSE THE PAGE IS FIVE DIFFERENT PAGES. Reads `S.iv` and the
+     record itself, so the figures cannot drift from the interview being read. */
+  interview: () => {
+    const v = iv(S.iv);
+    if(v.st === 'next')   return `${v.n} is ${v.day.split(' ')[0]} at ${v.time}, paid and confirmed. ${v.summary ? 'It’s a re-interview, so their 90-day summary is on the brief.' : 'They’re straight off the quiz, so no level exists yet.'}`;
+    if(v.st === 'report') return `You interviewed ${v.n} yesterday and the write-up is due at ${v.due}. Tal has a draft off the transcript waiting for your edit.`;
+    return `${v.n}, ${v.day.replace(/^\w+ /,'')}, confirmed at ${v.level} and signed the same evening. Follow-up scored ${v.follow} and depth ${v.depth}.`;
+  },
+
+  availability: 'Six slots are open over the next fortnight and two are taken. Friday at 5:00 PM is the first one nobody has claimed.',
+
+  earnings: {
+    setup:   'Nothing can be booked until a payout destination exists. It’s a Stripe handoff — TalentNext never sees an account number, and it takes a minute.',
+    live:    'Nothing earned yet. Your $85 splits to $68 once a report is delivered, and it sits in escrow for three working days first.',
+    _:       '$612 earned this month across nine interviews, and $204 is still in escrow. Tom’s $68 releases Thursday, three days after his report went out.'
+  },
+
+  standing: {
+    reviewed:'A3 since 1 October, ranked 9 of 38, and the range you may assess is E1 to B2 now. Follow-up came up to 4.6.',
+    _:       'You’re A2, ranked 12 of 38, scoring 4.4 on follow-up and 4.7 on depth. Nadia Rahman reviews you again on 1 October.'
+  },
+
+  profile: 'Your agent role sits on the account you already had, so nothing else about you changed. Two of Tal’s three permissions are on.'
+};
+
+/* --------------------------------------------------------------------------
+   THE QUESTIONS TAL OFFERS
+
+   `hifi/`'s TALCTX, one row per page. THREE, and they are the questions a
+   person actually arrives with — "can I decline this", "when do I get paid" —
+   not three ways of asking what the page is. A question whose answer is on
+   screen is furniture.
+   -------------------------------------------------------------------------- */
+const TALQ = {
+  dashboard: [
+    ['What’s on me today?',
+     'Sofia Marek’s report, due at 6:00 PM. Nothing else is owed — Rafael is Thursday and Amara is Monday, and both are paid for already.'],
+    ['How are my scores moving?',
+     'Follow-up is 4.4, up from 4.2 in July. Depth has sat at 4.7 since May. Both are read off your transcripts, not off candidate ratings.'],
+    ['When does the escrow release?',
+     'Three working days after a report is delivered. Tom’s $68 releases Thursday; Sofia’s starts counting the moment you send hers tonight.']
+  ],
+  application: [
+    ['What’s the background check for?',
+     'Everyone you interview is 18 to 24. The check runs before a first interview, not before approval, and it is the platform’s requirement rather than a formality.'],
+    ['How long does vetting take?',
+     'Five working days from the last piece arriving. Yours is waiting on the second reference, which was requested from Ana Duarte on 3 June.'],
+    ['Who decides?',
+     'Marisa Vance, on the agent-approval side. If it’s a no you’re told why and you can send it again after ninety days.']
+  ],
+  listing: [
+    ['Can I change my fee?',
+     'Yes, and it applies to new bookings only. Anything already in escrow settles at the rate it was booked at, including Thursday’s.'],
+    ['What does pausing do?',
+     'It takes you out of browse. Interviews already booked still stand, and the listing comes back exactly as it was — nothing is re-approved.'],
+    ['Why can’t I assess above B1?',
+     'The range comes off your agent level, and A2 is E2 to B1. A review is what moves it; Nadia looks at yours on 1 October.']
+  ],
+  training: [
+    ['What is calibration?',
+     'A 45-minute mock, recorded, with Derek watching how you follow up. He’s looking for tenacity, energy, and whether you notice what a candidate didn’t say.'],
+    ['Can I fail it?',
+     'You can be asked to sit it again — about one in six are. Nothing else about your application is reopened by it.'],
+    ['Does training come back?',
+     'Once a year the method is re-checked, and it’s two modules rather than four. Yours is due next June.']
+  ],
+  interviews: [
+    ['Can I decline a booking?',
+     'No — a booking arrives paid for. What you control is the slot: close it and nobody can take it. Availability is the whole of your workload.'],
+    ['What if they don’t show?',
+     'Wait fifteen minutes, then mark it. The fee stays with the candidate, the slot comes back to you, and it doesn’t touch your scores.'],
+    ['What do I read beforehand?',
+     'The brief on the interview page: their quiz result, what they asked to be assessed on, and, for a re-interview, their 90-day summary.']
+  ],
+  interview: [
+    ['How is the report written?',
+     'Tal drafts it off the transcript within the hour, you edit it, and it’s yours the moment you sign. The candidate reads what you sent.'],
+    ['Can I change a level afterwards?',
+     'Not once you’ve signed. The interview is what sets it; a change after that is a review decision and sits above you.'],
+    ['How long do I have?',
+     'Twenty-four hours from the end of the call. It’s the one promise made to the candidate before they pay.']
+  ],
+  availability: [
+    ['How far ahead can I open?',
+     'Eight weeks. Candidates browse by the next free slot, so an agent with nothing in the next fortnight drops down the list.'],
+    ['Can I take a slot back?',
+     'Until it’s booked, yes. After that it’s a cancellation — the candidate is refunded in full and it shows on your record for ninety days.']
+  ],
+  earnings: [
+    ['How does the split work?',
+     'The candidate pays $85. TalentNext keeps 20%, which is $17, and $68 comes to you three working days after the report is delivered.'],
+    ['Where do payouts land?',
+     'Stripe, on the account ending 4417. TalentNext never holds your bank details — Stripe does, and Stripe is where you change them.'],
+    ['What about tax?',
+     'You’re paid as a contractor and the paperwork sits with Stripe. Your statements are there too, not here.']
+  ],
+  standing: [
+    ['What’s actually being scored?',
+     'Your half of the conversation — how well you followed up, and how deep you got. Tal reads the transcript. The candidate’s rating is counted separately.'],
+    ['What moves me to A3?',
+     'The last quarter’s volume and both scores, read by Nadia on 1 October. Follow-up at 4.5 is the usual bar; you’re at 4.4.'],
+    ['Does my rank change my fee?',
+     'No — you set your fee. Rank changes where you sit in browse, which is a different thing, and it is recalculated weekly.']
+  ],
+  profile: [
+    ['What can Tal see?',
+     'Your transcripts and your briefs, and nothing outside this portal. Turn drafting off and Tal stops reading transcripts the same day.'],
+    ['Does this affect my candidate account?',
+     'No. The agent role was added to the account you already had — same login, same details, and nothing on the other side changed.']
+  ]
+};
+
+/* ==========================================================================
+   HELPERS — every one of these returns design-system markup and nothing else
+   ========================================================================== */
+
+/* THE PAGE HEAD, in `hifi/`'s own shape: one `.ph` per page, carrying the only
+   h1, and `sub` is the FACT ROW — never a sentence. */
+function ph(title, sub, backTo){
+  return `<div class="ph">
+    <div class="ph-main">
+      <div class="ph-top">${backTo ? `<button class="ph-back" data-go="${backTo}" aria-label="Back">${I.arrowLeft}</button>` : ''}<h1>${title}</h1></div>
+      ${sub ? `<p>${sub}</p>` : ''}
+    </div>
+  </div>`;
+}
+
+/* TAL'S CARD. Looked up rather than written at the call site, which is the
+   whole point of the pass: the summaries are one voice and belong in one
+   table, so a new page needs a row here and nothing else. A value is a string,
+   a function, or an object keyed by stage with `_` as the fallback. */
+function talCard(){
+  let e = PAGESUM[S.view];
+  if(typeof e === 'function') e = e();
+  if(e && typeof e === 'object') e = e[S.stage] || e._;
+  if(!e) return '';
+  /* `.sec.tint` IS THE GROUND, and it is the one permitted ground change in
+     this system — a background, never a card. It is doing the job `hifi/`'s
+     head band does: putting Tal's sentence on its own surface directly under
+     the page head, so the summary reads as a different kind of thing from the
+     page rather than as the page's first paragraph. Inside `.app` a `.note`
+     has no rule and no fill of its own (§22 strips both, because a wash on a
+     borderless row is one more edge than a page of hairlines has), so without
+     this the card would be a bold word and a sentence. */
+  return `<section class="sec tint">
+    <div class="note acc"><span>${I.talChat}</span>
+      <div class="nb"><b>Tal</b>${e}</div></div>
+  </section>`;
+}
+
+/* FOUR CELLS, ALWAYS. `.stats` is a fixed 2/4-column grid and its hairlines
+   are the 1px gap, so a row it does not fill paints grey rather than closing
+   up. Three is the count to avoid. */
+const stats = cells => `<div class="stats">${cells.map(([v, k]) =>
+  `<div class="stat"><span class="v">${v}</span><span class="k">${k}</span></div>`).join('')}</div>`;
+
+/* A HAIRLINE LIST, AND IT IS WHY `.facts` IS NOT USED ANYWHERE BELOW.
+
+   `.facts` is the prettier band for reference material and it is measurably
+   wrong at one width. Its columns are `auto-fit` at `minmax(140px,1fr)`, so
+   the count is `floor(width / 140)`: spare tracks collapse, but cells that
+   WRAP do not — row two keeps the full column count and its empty slots paint
+   the rule colour, because the hairlines ARE the 1px gap. A four-cell band
+   therefore paints two grey slots wherever it is 420–560px wide, which on
+   these pages is a container width of about 900. The design system's README
+   names the case and prescribes the fix: for a band that has to hold at every
+   width, use `.kv`. `.stats` is the other safe one — a FIXED 2/4-column grid,
+   so exactly four cells fill both tiers and can never leave a spare track. */
+const kv = rows => `<div>${rows.map(([k, v]) =>
+  `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('')}</div>`;
+
+/* The navigation row — the design system's replacement for every card. */
+const goRow = (icon, eyebrow, title, sub, go, attr) => `
+  <button class="tile clk gcard" data-go="${go}"${attr || ''}>
+    <span class="cardrow-ic">${I[icon]}</span>
+    <span class="gcard-b">${eyebrow ? `<span class="eyebrow">${eyebrow}</span>` : ''}
+      <h3>${title}</h3><span class="sub">${sub}</span></span>
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
+
+/* A detail row: two lines and a trailing tag instead of a chevron. */
+const factRow = (icon, title, detail, tag) => `
+  <div class="cardrow">
+    <span class="cardrow-ic">${I[icon]}</span>
+    <span class="cardrow-b"><span class="cardrow-t">${title}</span>
+      <span class="cardrow-d">${detail}</span></span>
+    ${tag ? `<span class="cardrow-a">${tag}</span>` : ''}
+  </div>`;
+
+/* A checklist row. `checkFilled` / `circleDash` / `circle` is the same three-
+   state vocabulary `hifi/`'s stepper uses. */
+const checkRow = (st, title, detail, go) => {
+  const ic = st === 'done' ? 'checkFilled' : st === 'now' ? 'circleDash' : 'circle';
+  const tag = st === 'done' ? '<span class="tag sm green">Done</span>'
+            : st === 'now'  ? '<span class="tag sm warn">On you</span>'
+            : '<span class="tag sm">Waiting</span>';
+  return go && st !== 'done'
+    ? `<button class="tile clk gcard" data-go="${go}">
+         <span class="cardrow-ic">${I[ic]}</span>
+         <span class="gcard-b"><h3>${title}</h3><span class="sub">${detail}</span></span>
+         <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`
+    : factRow(ic, title, detail, tag);
+};
+
+/* A person, with the design system's square avatar. */
+const memRow = (v, tag, go) => `
+  <div class="mem"${go ? ` data-go="${go}" data-iv="${v.id}"` : ''}>
+    <span class="av mem-av">${v.i}</span>
+    <span class="mem-b"><span class="mem-n">${v.n}</span>
+      <span class="mem-m">${v.day}<span class="mdot"></span>${v.time}</span></span>
+    ${tag}</div>`;
+
+const money = n => '$' + n.toLocaleString('en-US');
+
+/* ==========================================================================
+   THE PAGES
+   ========================================================================== */
+const V = {};
+
+/* --------------------------------------------------------------------------
+   HOME — four different pages, because an agent in vetting and an agent with a
+   report due tonight do not share a single fact. Branching here rather than in
+   four view keys keeps one `PAGESUM.dashboard` table, keyed by stage.
+   -------------------------------------------------------------------------- */
+V.dashboard = v => {
+  const head = ph(`Good afternoon, ${A.n.split(' ')[0]}`, v.certified
+    ? `Talent agent &middot; assesses ${v.range} &middot; ${money(v.fee)} an interview`
+    : v.approved ? 'Talent agent &middot; not yet certified'
+    : 'Application in progress');
+
+  /* --- stage 1: before approval ---------------------------------------- */
+  if(!v.approved) return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>Where it is</h2></div>
+      <ol class="steps">
+        <li><span class="s-n">1</span><span class="s-b"><b>Your application</b>
+          ${v.sent ? 'Sent 3 June, with two referees.' : 'Three of the five parts are filled in.'}</span></li>
+        <li><span class="s-n">2</span><span class="s-b"><b>Identity and background</b>
+          ${v.sent ? 'Identity cleared 3 June. The background check is with the provider.' : 'Runs once the form is in. Everyone you interview is 18 to 24.'}</span></li>
+        <li><span class="s-n">3</span><span class="s-b"><b>References</b>
+          ${v.sent ? 'Kofi Mensah has replied. Ana Duarte was asked on 3 June.' : 'Two people who have seen you interview or coach.'}</span></li>
+        <li><span class="s-n">4</span><span class="s-b"><b>Approval</b>
+          ${v.sent ? 'Marisa Vance decides once both checks are back.' : 'Five working days from the last piece arriving.'}</span></li>
+      </ol>
+    </section>
+    <section class="sec">
+      <div class="btn-row">
+        <button class="btn btn-p" data-go="application">${v.sent ? 'Open your application' : 'Finish your application'} ${I.arrowRight}</button>
+      </div>
+    </section>`;
+
+  /* --- stage 2 and 3: approved, not yet bookable ------------------------ */
+  if(!v.certified) return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>Before you list</h2></div>
+      <div class="tile-stack">
+        ${checkRow('done', 'Agent role added', 'On the account you already had, 12 June')}
+        ${checkRow(v.listing ? 'done' : 'now', 'Your listing', v.listing ? 'Written, with four specialisms' : 'Photo, bio, specialisms and the range you assess', 'listing')}
+        ${checkRow(v.paid ? 'done' : 'now', 'Your fee and payouts', v.paid ? `${money(v.fee)} an interview &middot; Stripe connected` : `${money(v.fee)} set. A payout destination is still needed`, 'earnings')}
+        ${checkRow(v.mods === 4 ? 'done' : v.listing ? 'now' : '', 'Training and calibration',
+          v.mods === 4 ? 'Four modules and the calibration interview' : `${v.mods || 0} of four modules done &middot; calibration Thursday 20 June`, 'training')}
+      </div>
+    </section>
+    <section class="sec">
+      <div class="note"><span>${I.info}</span><div class="nb"><b>Nothing is bookable yet</b>
+        A listing goes into browse the day you are certified, and not before. Candidates cannot see a half-built one.</div></div>
+    </section>`;
+
+  /* --- stage 4, day one: listed, empty ---------------------------------- */
+  if(!v.busy) return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>Your listing</h2></div>
+      ${stats([['Live', 'In browse'], [money(v.fee), 'Your rate'], ['6', 'Slots open'], ['0', 'Booked']])}
+    </section>
+    <section class="sec">
+      <div class="sec-h"><h2>Nothing booked</h2></div>
+      <div class="empty">${I.calendar}<span class="t">No interviews yet</span>
+        <span class="help">A candidate browsing your track sees your next free slot first. Friday at 5:00 PM is the one they will be offered.</span></div>
+    </section>
+    <section class="sec">
+      <div class="btn-row">
+        <button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button>
+        <button class="btn btn-g noic" data-go="listing">See how you appear</button>
+      </div>
+    </section>`;
+
+  /* --- stage 4: a working week ------------------------------------------ */
+  const due = iv('sofia'), next = iv('rafael');
+  return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>This month</h2></div>
+      ${stats([
+        [String(v.month), 'Interviews'],
+        [String(v.follow), 'Follow-up'],
+        [money(v.earned), 'Earned'],
+        [money(v.escrow), 'In escrow']])}
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>On you</h2></div>
+      <div class="tile-stack">
+        ${goRow('edit', 'Due 6:00 PM today', `${due.n}’s report`, 'Tal has a draft off the transcript', 'interview', ` data-iv="${due.id}"`)}
+        ${goRow('video', next.day, `Interview with ${next.n}`, `${next.time} &middot; 45 minutes &middot; paid`, 'interview', ` data-iv="${next.id}"`)}
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>Coming up</h2></div>
+      <div class="tile-stack">
+        ${IVS.filter(x => x.st === 'next').map(x =>
+          memRow(x, `<span class="tag sm">${x.kind}</span>`, 'interview')).join('')}
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="note"><span>${I.info}</span><div class="nb"><b>There is nothing to accept</b>
+        A booking arrives paid for. Your availability is the control &mdash; a slot you leave open can be taken without asking you first.</div></div>
+      <div class="btn-row mt5">
+        <button class="btn btn-p" data-go="interviews">All interviews ${I.arrowRight}</button>
+        <button class="btn btn-g noic" data-go="availability">Availability</button>
+      </div>
+    </section>`;
+};
+
+/* --------------------------------------------------------------------------
+   APPLICATION — steps 1 and 2, and the gate. The safeguarding note is product
+   copy, not the diagram's risk annotation: it says what the check is for, in
+   the voice the reader needs, because "everyone you interview is 18 to 24" is
+   the reason and it is not obvious.
+   -------------------------------------------------------------------------- */
+V.application = v => ph('Your application',
+    v.sent ? 'Submitted 3 June &middot; two of three checks back &middot; decision within five working days'
+           : 'Draft &middot; three of five parts &middot; nothing is reviewed until all five are in')
+  + talCard() + `
+
+  <section class="sec">
+    <div class="sec-h"><h2>What you sent</h2></div>
+    ${kv([
+      ['Route', 'Invited by Derek Hale, 28 May'],
+      ['Experience', 'Eleven years, six of them managing managers'],
+      ['You would assess', 'Explorer and Builder'],
+      ['Why you want to', '240 words, written 1 June'],
+      ['Referees', v.sent ? 'Kofi Mensah, Ana Duarte' : 'Not given yet']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>The checks</h2></div>
+    <div class="tile-stack">
+      ${factRow('shield', 'Identity', v.sent ? 'Cleared 3 June' : 'Runs when you send the form',
+        v.sent ? '<span class="tag sm green">Cleared</span>' : '<span class="tag sm">Waiting</span>')}
+      ${factRow('locked', 'Background check', v.sent ? 'With the provider since 4 June' : 'Required before a first interview',
+        v.sent ? '<span class="tag sm warn">Running</span>' : '<span class="tag sm">Waiting</span>')}
+      ${factRow('email', 'References', v.sent ? 'Kofi Mensah replied 5 June. Ana Duarte asked 3 June' : 'Two people who have seen you interview',
+        v.sent ? '<span class="tag sm warn">1 of 2</span>' : '<span class="tag sm">Waiting</span>')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="note"><span>${I.shield}</span><div class="nb"><b>Why the background check</b>
+      Everyone you will interview is between 18 and 24, and the conversation is one-to-one and recorded. The check runs before your first interview, not before approval.</div></div>
+  </section>
+
+  ${v.sent ? '' : `
+  <section class="sec">
+    <div class="sec-h"><h2>Still to add</h2></div>
+    <div>
+      <label class="f"><span class="lbl">First referee</span>
+        <input class="inp" placeholder="Name and email"></label>
+      <label class="f"><span class="lbl">Second referee</span>
+        <input class="inp" placeholder="Name and email"></label>
+      <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span>
+        <span class="txt">I agree to a background check before my first interview</span></label>
+    </div>
+    <div class="btn-row mt5"><button class="btn btn-p">Send the application ${I.arrowRight}</button></div>
+  </section>`}`;
+
+/* --------------------------------------------------------------------------
+   LISTING — steps 4 and 5. How the agent appears in browse, and their fee.
+   -------------------------------------------------------------------------- */
+V.listing = v => ph('Your listing', v.listed
+    ? `Live in browse &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
+    : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`)
+  + talCard() + `
+
+  <section class="sec">
+    <div class="sec-h"><h2>How you appear</h2></div>
+    <div class="tile-stack">
+      <div class="cardrow">
+        <span class="av mem-av">${A.i}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${A.n}
+          ${v.listed ? '<span class="pill-def">Listed</span>' : ''}</span>
+          <span class="cardrow-d">Talent agent &middot; assesses ${v.range}</span></span>
+        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="listing">Edit</button></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>On your card</h2></div>
+    ${stats([
+      [money(v.fee), 'Your fee'], [v.rangeShort, 'Assesses'],
+      [String(v.ivs || 0), 'Interviews'], [v.rating || '&mdash;', 'Rating']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Specialisms</h2></div>
+    <div class="tag-row">
+      <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
+      <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
+      <span class="tag bordered">${I.add}Add</span>
+    </div>
+    <p class="help mt4">Four is the most a card shows. A candidate searching for one of these sees you before an agent who has not claimed it.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your fee</h2></div>
+    ${kv([
+      ['You charge', money(v.fee)],
+      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
+      ['You are paid', `${money(v.share)} &middot; 80%`]])}
+    <div class="btn-row mt5"><button class="btn btn-g btn-sm noic" data-sheet="fee">Change your fee</button></div>
+    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>A new fee applies to new bookings</b>
+      Anything already in escrow settles at the rate it was booked at.</div></div>
+  </section>
+
+  ${v.listed ? `
+  <section class="sec">
+    <div class="sec-h"><h2>Visibility</h2></div>
+    <label class="tg"><div class="tb"><b>Listed in the marketplace</b>
+      <span>Candidates on your track can find and book you</span></div>
+      <input type="checkbox" checked><span class="sw"></span></label>
+    <p class="help mt4">Pausing takes you out of browse. Interviews already booked still stand, and nothing is re-approved when you come back.</p>
+  </section>` : ''}`;
+
+/* --------------------------------------------------------------------------
+   TRAINING — step 7 and the certification gate. Derek's rubric is three
+   things, so it is a `.kv` rather than a `.facts` band: three cells in an
+   auto-fit grid leaves one paying grey.
+   -------------------------------------------------------------------------- */
+V.training = v => {
+  const done = v.mods === 4;
+  return ph('Training and calibration', done
+      ? 'Four modules &middot; calibrated 20 June &middot; re-checked each June'
+      : `${v.mods || 0} of four modules &middot; calibration Thursday 20 June`)
+    + talCard() + `
+
+  <section class="sec">
+    <div class="sec-h"><h2>The method</h2></div>
+    <div class="tile-stack">
+      ${[['How the interview runs', '45 minutes, and what each part is for', 1],
+         ['Drawing out a story', 'Getting past the answer somebody rehearsed', 2],
+         ['Evidence, not impression', 'What a level has to be able to point at', 3],
+         ['Writing the report', 'The 24 hours after the call', 4]]
+        .map(([t, d, n]) => factRow(n <= (v.mods || 0) ? 'checkFilled' : 'book', t, d,
+          n <= (v.mods || 0) ? '<span class="tag sm green">Done</span>'
+          : n === (v.mods || 0) + 1 ? '<span class="tag sm warn">Next</span>' : '<span class="tag sm">Locked</span>')).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Calibration</h2></div>
+    ${kv([
+      ['With', 'Derek Hale'],
+      ['When', done ? 'Thursday 20 June' : 'Thursday 20 June, 4:00 PM ET'],
+      ['Length', '45 minutes'],
+      ['Result', done ? 'Certified' : 'Not sat yet']])}
+    <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it. Derek watches your half of the conversation.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>The rubric</h2></div>
+    ${kv([
+      ['Tenacity', 'Do you stay with a thread that is going somewhere'],
+      ['Energy', 'Does the candidate do more talking by the end than the start'],
+      ['Noticing', 'Do you hear what was left out']])}
+  </section>
+
+  <section class="sec">
+    ${done
+      ? `<div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Certified 20 June</b>
+          Signed by Derek Hale. The method is re-checked each June, and that is two modules rather than four.</div></div>`
+      : `<div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your listing waits on this</b>
+          Nothing goes into browse until the calibration is passed.</div></div>
+         <div class="btn-row mt5"><button class="btn btn-p">Open module ${(v.mods || 0) + 1} ${I.arrowRight}</button></div>`}
+  </section>`;
+};
+
+/* --------------------------------------------------------------------------
+   INTERVIEWS — steps 9, 10 and 11. Two tabs, because "what is coming" and
+   "what is finished" are two questions and a page that answers both at once
+   makes the reader do the filtering.
+   -------------------------------------------------------------------------- */
+V.interviews = v => {
+  if(!v.busy) return ph('Interviews', 'Nothing booked &middot; six slots open &middot; 45 minutes each')
+    + talCard() + `
+    <section class="sec">
+      <div class="empty">${I.calendar}<span class="t">Nothing booked yet</span>
+        <span class="help">A booking arrives already paid for, with the candidate’s brief attached. There is nothing to accept.</span></div>
+      <div class="btn-row"><button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button></div>
+    </section>`;
+
+  const next = IVS.filter(x => x.st === 'next'), done = IVS.filter(x => x.st === 'done');
+  const owed = IVS.filter(x => x.st === 'report');
+
+  return ph('Interviews', `${v.month} this month &middot; ${v.ivs} in total &middot; next Thursday 20 August`)
+    + talCard() + `
+  <div class="tabs">
+    <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Coming up</button>
+    <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Finished</button>
+  </div>
+
+  ${S.tab === 'next' ? `
+  <section class="sec">
+    <div class="sec-h"><h2>Waiting on you</h2></div>
+    <div class="tile-stack">
+      ${owed.map(x => goRow('edit', `Due ${x.due}`, `${x.n}’s report`,
+        `Interviewed ${x.day.replace(/^\w+ /, '')} &middot; ${x.level}`, 'interview', ` data-iv="${x.id}"`)).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Booked</h2></div>
+    <div class="tile-stack">
+      ${next.map(x => goRow('video', x.day, x.n,
+        `${x.time} &middot; ${x.kind} &middot; ${money(v.fee)} paid`, 'interview', ` data-iv="${x.id}"`)).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Booked means paid</b>
+      The fee is taken when the slot is chosen and held in escrow, so an interview reaches you already settled. If a candidate does not appear, wait fifteen minutes and mark it.</div></div>
+  </section>`
+  : `
+  <section class="sec">
+    <div class="sec-h"><h2>Last five</h2></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th>Candidate</th><th>Interviewed</th><th>Level set</th><th class="num">Follow-up</th><th class="num">Depth</th></tr>
+        ${done.concat(owed).map(x => `<tr>
+          <td>${x.n}</td><td>${x.day.replace(/^\w+ /, '')}</td>
+          <td>${x.level || '&mdash;'}</td>
+          <td class="num">${x.follow || '&mdash;'}</td>
+          <td class="num">${x.depth || '&mdash;'}</td></tr>`).join('')}
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Open one</h2></div>
+    <div class="tile-stack">
+      ${done.map(x => goRow('document', x.level, x.n,
+        `${x.day.replace(/^\w+ /, '')} &middot; signed ${x.signed}`, 'interview', ` data-iv="${x.id}"`)).join('')}
+    </div>
+  </section>`}`;
+};
+
+/* --------------------------------------------------------------------------
+   ONE INTERVIEW — the brief before, the report after. Three pages in one,
+   keyed off the record's own state, because they are the same interview at
+   three moments and splitting them would put the brief out of reach the
+   moment the call ended.
+   -------------------------------------------------------------------------- */
+V.interview = v => {
+  const x = iv(S.iv);
+  const head = ph(x.n, `${x.kind} &middot; ${x.day} &middot; ${x.time}`, 'interviews');
+
+  if(x.st === 'next') return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>The call</h2></div>
+      ${kv([
+        ['When', `${x.day} &middot; ${x.time}`],
+        ['Length', '45 minutes'],
+        ['Format', 'Video, recorded'],
+        ['Fee', `${money(v.fee)}, paid at booking`]])}
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>Their brief</h2></div>
+      ${kv([
+        ['Where they are', x.band],
+        ['Asked to be assessed on', x.asked],
+        ['Booked', x.paid],
+        ...(x.summary ? [['Attached', 'Their 90-day summary']] : [])])}
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>Before it</h2></div>
+      <ol class="steps">
+        <li><span class="s-n">1</span><span class="s-b"><b>Read the brief</b>
+          Two minutes. It is what they asked for, in their words.</span></li>
+        <li><span class="s-n">2</span><span class="s-b"><b>Open the room early</b>
+          The recording starts when you both join, and they are told that.</span></li>
+        <li><span class="s-n">3</span><span class="s-b"><b>Send the report within a day</b>
+          Tal drafts it off the transcript. The level is set by you and signed by you.</span></li>
+      </ol>
+    </section>
+
+    <section class="sec">
+      <div class="btn-row">
+        <button class="btn btn-p">Open the interview room ${I.arrowRight}</button>
+        <button class="btn btn-g noic" data-sheet="brief">Add a note to the brief</button>
+      </div>
+    </section>`;
+
+  if(x.st === 'report') return head + talCard() + `
+    <section class="sec">
+      <div class="note warn"><span>${I.warning}</span><div class="nb"><b>Due at ${x.due}</b>
+        Twenty-four hours from the end of the call is the promise the candidate paid against.</div></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>The call</h2></div>
+      ${kv([
+        ['Held', `${x.day} &middot; ${x.time}`],
+        ['Ran', '48 minutes'],
+        ['Transcript', 'Ready'],
+        ['Your share', `${money(v.share)}, held until the report goes out`]])}
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>Tal’s draft</h2></div>
+      <div class="note acc"><span>${I.talChat}</span><div class="nb"><b>Tal</b>
+        She talks about her team of four in specifics and about herself in generalities, which is where the evidence thins. Two clear examples of delegation, none of a hard conversation she started.</div></div>
+      <label class="f mt5"><span class="lbl">Your write-up</span>
+        <textarea class="inp" rows="4">Sofia runs a team of four and described handing over the vendor review in enough detail to show she plans a handover rather than announces one. Less evidence on conversations she has had to open herself.</textarea></label>
+      ${kv([['Level you are setting', x.level], ['Growth areas', 'Hard conversations, and asking for what she needs']])}
+    </section>
+
+    <section class="sec">
+      <div class="note"><span>${I.info}</span><div class="nb"><b>Signing is what sets the level</b>
+        After it is signed, a change to a level is a review decision rather than yours.</div></div>
+      <div class="btn-row mt5">
+        <button class="btn btn-p noic" data-confirm="sign">Sign and send the report</button>
+        <button class="btn btn-g noic">Save the draft</button>
+      </div>
+    </section>`;
+
+  return head + talCard() + `
+    <section class="sec">
+      <div class="sec-h"><h2>What you set</h2></div>
+      ${kv([
+        ['Level', x.level],
+        ['Signed', x.signed],
+        ['Follow-up scored', x.follow],
+        ['Depth scored', x.depth]])}
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>Your report</h2></div>
+      <p class="t-body-02">${x.n} came in at ${x.level} on the evidence of two projects rather than on how they described themselves. The growth areas are written against the same two examples, so the candidate can see where they came from.</p>
+      <div class="btn-row mt5">
+        <button class="btn btn-g btn-sm noic">Read the report</button>
+        <button class="btn btn-g btn-sm noic">${I.download}Transcript</button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-h"><h2>The fee</h2></div>
+      ${kv([['Candidate paid', money(v.fee)], ['TalentNext kept', money(v.cut)],
+            ['Your share', money(v.share)], ['Status', x.money]])}
+    </section>`;
+};
+
+/* --------------------------------------------------------------------------
+   AVAILABILITY — the agent's only control over their workload.
+
+   `.slots` IS NOT ONE OF THE SIX CONTAINERS that opt a section out of the
+   184px label column, and it bleeds to the page edge with a negative margin,
+   so a `.sec-h` beside it would be laid against a column 184px narrower than
+   the grid expects. These sections use an `.eyebrow` as their heading instead,
+   which is the cheap fix and the one the design system's own README names.
+   -------------------------------------------------------------------------- */
+V.availability = () => ph('Availability', 'Six slots open &middot; 45 minutes each &middot; Eastern time')
+  + talCard() + `
+
+  ${SLOTS.map(([week, slots]) => `
+  <section class="sec">
+    <span class="eyebrow">${week}</span>
+    <div class="slots">
+      ${slots.map(([d, t, taken]) =>
+        `<button class="slot${taken ? ' sel' : ''}">${d}<br>${t}</button>`).join('')}
+    </div>
+    <p class="help mt4">${slots.filter(s => s[2]).length
+      ? `${slots.filter(s => s[2]).length} taken, ${slots.filter(s => !s[2]).length} open.`
+      : 'All open.'}</p>
+  </section>`).join('')}
+
+  <section class="sec">
+    <div class="sec-h"><h2>How slots work</h2></div>
+    ${kv([
+      ['Length', '45 minutes, fixed'],
+      ['Timezone', 'Eastern, and shown to candidates in theirs'],
+      ['How far ahead', 'Eight weeks'],
+      ['Taking one back', 'Any time before it is booked']])}
+  </section>
+
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>This is the whole of your workload</b>
+      A slot you leave open can be booked and paid for without asking you first. Closing one is how you say no.</div></div>
+    <div class="btn-row mt5"><button class="btn btn-p" data-sheet="slot">Add a slot ${I.arrowRight}</button></div>
+  </section>`;
+
+/* --------------------------------------------------------------------------
+   EARNINGS — steps 6 and 12.
+
+   NO BANK FORM ANYWHERE, and that is deliberate: a payout destination is a
+   handoff to Stripe on Stripe's own hosted page, which is the same call
+   `hifi/`'s booking flow makes about taking the candidate's money. What comes
+   back is a confirmation, and this page draws the confirmation.
+   -------------------------------------------------------------------------- */
+V.earnings = v => {
+  const connected = v.paid;
+  return ph('Earnings', connected
+      ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} in escrow`
+      : '80/20 split &middot; no destination connected')
+    + talCard() + `
+
+  ${connected && v.busy ? `
+  <section class="sec">
+    <div class="sec-h"><h2>This month</h2></div>
+    ${stats([[money(v.earned), 'Earned'], [money(v.escrow), 'In escrow'],
+             [String(v.month), 'Interviews'], [money(v.share), 'Each']])}
+  </section>` : ''}
+
+  <section class="sec">
+    <div class="sec-h"><h2>How a fee splits</h2></div>
+    ${kv([
+      ['The candidate pays', money(v.fee)],
+      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
+      ['You are paid', `${money(v.share)} &middot; 80%`],
+      ['Released', 'Three working days after the report is delivered']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Where it goes</h2></div>
+    ${connected ? `
+    <div class="tile-stack">
+      ${factRow('wallet', v.payout, 'Connected 12 June', '<span class="tag sm green">Connected</span>')}
+    </div>
+    <p class="help mt4">TalentNext never holds your bank details. Stripe does, and Stripe is where you change them.</p>`
+    : `
+    <div class="empty">${I.wallet}<span class="t">No destination yet</span>
+      <span class="help">Nothing can be booked until there is somewhere to pay you. TalentNext hands you to Stripe and never sees an account number.</span></div>
+    <div class="btn-row"><button class="btn btn-p">Continue to Stripe ${I.launch}</button></div>`}
+  </section>
+
+  ${connected && v.busy ? `
+  <section class="sec">
+    <div class="sec-h"><h2>Payments</h2></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th>Interview</th><th>Date</th><th class="num">Fee</th><th class="num">Yours</th><th>Status</th></tr>
+        <tr><td>Rafael Ortiz</td><td>19 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>In escrow</td></tr>
+        <tr><td>Sofia Marek</td><td>18 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Report due</td></tr>
+        <tr><td>Tom Whelan</td><td>17 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Releases 20 Aug</td></tr>
+        <tr><td>Nina Haddad</td><td>14 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Paid 19 Aug</td></tr>
+        <tr><td>Marcus Bell</td><td>12 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Paid 17 Aug</td></tr>
+      </table>
+    </div>
+  </section>` : ''}`;
+};
+
+/* --------------------------------------------------------------------------
+   STANDING — steps 11 and 13. What the AI scores, and who reviews it.
+
+   THE SCORE IS ABOUT THE AGENT, NEVER THE CANDIDATE, and the page says so once
+   rather than hedging in three places. It reads the transcript for how the
+   conversation went, which is a different question from what the candidate is
+   worth — that answer is the report, and the report is written by a person.
+   -------------------------------------------------------------------------- */
+V.standing = v => ph('Your standing',
+    `Agent level ${v.level} of A${v.levels} &middot; ranked ${v.rank} of ${v.pool} &middot; reviewed by ${v.manager}`)
+  + talCard() + `
+
+  <section class="sec">
+    <div class="sec-h"><h2>Where you are</h2></div>
+    ${stats([[v.level, `Of A${v.levels}`], [`${v.rank}<small>/${v.pool}</small>`, 'In browse'],
+             [String(v.follow), 'Follow-up'], [String(v.depth), 'Depth']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>What is scored</h2></div>
+    ${kv([
+      ['Follow-up', 'Whether you stayed with a thread that was going somewhere'],
+      ['Depth', 'How far past the rehearsed answer the conversation got'],
+      ['Read from', 'The transcript, within an hour of the call'],
+      ['Not scored', 'The candidate. That is your report, and you write it']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Last five</h2></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th>Candidate</th><th>Date</th><th class="num">Follow-up</th><th class="num">Depth</th><th class="num">Their rating</th></tr>
+        <tr><td>Tom Whelan</td><td>17 Aug</td><td class="num">4.6</td><td class="num">4.8</td><td class="num">5.0</td></tr>
+        <tr><td>Nina Haddad</td><td>14 Aug</td><td class="num">4.3</td><td class="num">4.7</td><td class="num">4.5</td></tr>
+        <tr><td>Marcus Bell</td><td>12 Aug</td><td class="num">4.5</td><td class="num">4.6</td><td class="num">4.5</td></tr>
+        <tr><td>Iris Novak</td><td>8 Aug</td><td class="num">4.2</td><td class="num">4.7</td><td class="num">4.0</td></tr>
+        <tr><td>Jonah Petit</td><td>5 Aug</td><td class="num">4.4</td><td class="num">4.8</td><td class="num">5.0</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your review</h2></div>
+    ${kv([
+      ['Reviewed by', `${v.manager} &middot; manager of agents`],
+      ['How often', 'Every quarter'],
+      ['Last one', v.reviewed ? '1 October &middot; moved to A3' : '1 July &middot; held at A2'],
+      ['Next', v.reviewed ? '1 January' : '1 October'],
+      ['What it can move', 'Your level, and the range you may assess']])}
+  </section>
+
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>A level change moves your range</b>
+      ${v.reviewed
+        ? 'A3 is E1 to B2, which is why Explorer’s first two levels appeared in your queue this month.'
+        : 'A2 is E2 to B1. A3 would add Explorer’s first two levels and Builder’s second.'}</div></div>
+  </section>`;
+
+/* --------------------------------------------------------------------------
+   PROFILE — the roles-stack rule, and what Tal may do.
+
+   NO `sub` ON THIS PAGE. Profile has no factual spine — there is no `·` row of
+   figures that is true of it — so the title stands alone over Tal's sentence.
+   Inventing a line to fill the slot is what produces two summaries six
+   millimetres apart, which is the duplication the rule exists to stop.
+   -------------------------------------------------------------------------- */
+V.profile = v => ph('Profile') + talCard() + `
+
+  <section class="sec">
+    <div class="sec-h"><h2>You</h2></div>
+    <div class="tile-stack">
+      <div class="cardrow">
+        <span class="av mem-av">${A.i}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${A.n}</span>
+          <span class="cardrow-d">${A.email}</span></span>
+        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="profile">Edit</button></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your roles</h2></div>
+    ${kv([
+      ['Talent agent', v.certified ? `Since ${A.since}` : 'Added 12 June'],
+      ['Candidate', 'Explorer – E4, finished March 2024'],
+      ['Sign-in', 'One account, one password']])}
+    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>Roles stack</b>
+      Becoming an agent added a role to the account you already had. Your own record as a candidate is untouched by anything you do here.</div></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>What Tal does</h2></div>
+    <label class="tg"><div class="tb"><b>Draft my reports</b>
+      <span>From the transcript, within an hour of the call</span></div>
+      <input type="checkbox" data-perm="draft"${S.perms.draft ? ' checked' : ''}><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Summarise a candidate before a call</b>
+      <span>Their quiz result, what they asked for, and their summary if there is one</span></div>
+      <input type="checkbox" data-perm="brief"${S.perms.brief ? ' checked' : ''}><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Suggest follow-ups during the interview</b>
+      <span>On your screen only, and never in the recording</span></div>
+      <input type="checkbox" data-perm="live"${S.perms.live ? ' checked' : ''}><span class="sw"></span></label>
+    <p class="help mt4">Turn drafting off and Tal stops reading your transcripts the same day.</p>
+  </section>
+
+  <section class="sec">
+    <div class="btn-row">
+      <button class="btn btn-g noic" data-confirm="logout">Log out</button>
+    </div>
+  </section>`;
+
+/* ==========================================================================
+   THE FRAME
+   ========================================================================== */
+function shell(v){
+  return `
+  <header class="shell">
+    <button class="shell-act nav-t ${S.nav ? 'on' : ''}" data-toggle="nav"
+      aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation">${S.nav ? I.close
+      : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
+    <a class="shell-logo" data-go="dashboard" aria-label="TalentNext home">${TN_MARK}<b>TalentNext</b></a>
+    <div class="shell-right">
+      <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
+      <button class="shell-act ${S.tal ? 'on' : ''}" data-toggle="tal" aria-label="Ask Tal">${I.talChat}</button>
+      <span class="av sm shell-avatar">${A.i}</span>
+    </div>
+  </header>`;
+}
+
+function sidenav(v){
+  const active = PARENT[S.view] || S.view;
+  const items = NAVSETS[v.nav].map(([k, l, ic]) =>
+    `<button class="sn-item ${k === active ? 'on' : ''}" title="${l}" data-go="${k}"${k === active ? ' aria-current="page"' : ''}>${I[ic]}<span>${l}</span></button>`).join('');
+  return `
+  <div class="scrim ${S.nav ? 'on' : ''}" data-close="nav"></div>
+  <nav class="sidenav ${S.nav ? 'on' : ''}" aria-label="Portal">
+    <div class="sn-main">${items}</div>
+    <div class="sn-foot">
+      <button class="sn-item ${active === 'profile' ? 'on' : ''}" title="Profile" data-go="profile">${I.user}<span>Profile</span></button>
+      <button class="sn-item" title="Log out" data-confirm="logout">${I.logout}<span>Log out</span></button>
+    </div>
+  </nav>`;
+}
+
+/* TAL'S PANEL, as a sheet.
+
+   NOTHING IN IT KEEPS STATE IN THE DOM. `device.innerHTML` is replaced on
+   every render, so the chosen question is `S.talQ` and the answer is drawn
+   from the table — a class a click handler added would be gone by the next
+   paint. That is `hifi/`'s rule for anything inside Tal and it is the reason
+   its whole thread is a pure function of `S`.
+
+   THE QUESTIONS ARE BUTTONS, NOT PAGE ROWS. A `.tile`/`.gcard` borrowed into a
+   sheet brings the page's `--pad-x` indent with it and hangs off both sides —
+   the trap `35-book.css` answers with one declaration. A `.btn-row` of small
+   outlined buttons has no gutter to bring. */
+function talSheet(){
+  const qs = TALQ[S.view] || TALQ.dashboard;
+  const a = qs.find(q => q[0] === S.talQ);
+  return `<div class="modal ${S.tal ? 'on' : ''}" data-close="tal">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Ask Tal</h2>
+        <button class="x" data-close="tal" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        ${a ? `<div class="note acc"><span>${I.talChat}</span>
+          <div class="nb"><b>${a[0]}</b>${a[1]}</div></div>` : ''}
+        <p class="help${a ? ' mt5' : ''}">${a ? 'Anything else' : 'On this page'}</p>
+        <div class="btn-row">
+          ${qs.filter(q => q[0] !== S.talQ).map(q =>
+            `<button class="btn btn-g btn-sm noic" data-ask="${q[0]}">${q[0]}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* CONFIRMATION BEFORE ANYTHING THAT CANNOT BE TAKEN BACK — signing a report,
+   and logging out. Both are one press away from the edge of the product. */
+const CONFIRMS = {
+  logout: ['Log out?', 'You will need your password to come back in.', 'Log out'],
+  sign:   ['Sign and send?', 'The level goes to the candidate as soon as this is signed, and a change afterwards is a review decision.', 'Sign and send']
+};
+function confirmSheet(){
+  const c = CONFIRMS[S.confirm];
+  return `<div class="modal ${S.confirm ? 'on' : ''}" data-close="confirm">
+    <div class="sheet">
+      <div class="sheet-h"><h2>${c ? c[0] : ''}</h2>
+        <button class="x" data-close="confirm" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b"><p class="t-body-02">${c ? c[1] : ''}</p></div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-close="confirm">Cancel</button>
+        <button class="btn btn-p noic" data-close="confirm">${c ? c[2] : ''}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* The editing sheets. One component, four titles — the fields differ, the
+   frame does not. */
+const SHEETS = {
+  listing: ['Your listing', `
+    <label class="f"><span class="lbl">Headline</span>
+      <input class="inp" value="Eleven years in delivery, six of them managing managers"></label>
+    <label class="f"><span class="lbl">Bio</span>
+      <textarea class="inp" rows="3">I interview for how somebody actually ran a week, not for how they describe themselves.</textarea></label>
+    <p class="help">Your name, photo and the range you assess come from your account and your level.</p>`],
+  fee: ['Your fee', `
+    <label class="f"><span class="lbl">What a candidate pays</span>
+      <input class="inp" value="$85"></label>
+    <div class="kv"><span class="k">You would be paid</span><span class="v">$68</span></div>
+    <p class="help">A new fee applies to new bookings. Anything in escrow settles at the rate it was booked at.</p>`],
+  slot: ['Add a slot', `
+    <label class="f"><span class="lbl">Day</span>
+      <select class="inp"><option>Monday 31 August</option><option>Tuesday 1 September</option></select></label>
+    <label class="f"><span class="lbl">Time</span>
+      <select class="inp"><option>3:00 PM ET</option><option>5:00 PM ET</option><option>7:00 PM ET</option></select></label>
+    <p class="help">45 minutes, and it can be taken back any time before it is booked.</p>`],
+  brief: ['A note to yourself', `
+    <label class="f"><span class="lbl">Note</span>
+      <textarea class="inp" rows="3" placeholder="Only you and Tal can see this"></textarea></label>
+    <p class="help">Kept with the brief and never sent to the candidate.</p>`],
+  profile: ['Your details', `
+    <label class="f"><span class="lbl">Full name</span><input class="inp" value="Owen Clarke"></label>
+    <label class="f"><span class="lbl">Email</span><input class="inp" value="owen.clarke@fieldstone.co"></label>`]
+};
+function editSheet(){
+  const s = SHEETS[S.sheet];
+  return `<div class="modal ${S.sheet ? 'on' : ''}" data-close="sheet">
+    <div class="sheet">
+      <div class="sheet-h"><h2>${s ? s[0] : ''}</h2>
+        <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">${s ? s[1] : ''}</div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-close="sheet">Cancel</button>
+        <button class="btn btn-p noic" data-close="sheet">Save</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
+   RENDER
+
+   THE WHOLE FRAME IS REPRINTED, which is `hifi/`'s model and the reason it is
+   worth inheriting: no component may keep state in the DOM, so anything
+   interactive has to be a pure function of `S`.
+
+   `data-enter` is a ONE-RENDER motion cue and is stamped only when the page
+   actually changed — flipping a switch or opening Tal must not replay the
+   entrance. `data-shown` is the state and is what layout may read.
+   ========================================================================== */
+const device = document.getElementById('device');
+const MO = {key:'', open:{}};
+
+function render(){
+  const v = f();
+  if(!NAVSETS[v.nav].some(([k]) => k === S.view) && S.view !== 'profile'
+     && !(PARENT[S.view] && NAVSETS[v.nav].some(([k]) => k === PARENT[S.view]))){
+    S.view = 'dashboard';           /* a stage that lost the page you were on */
+  }
+  const view = V[S.view] || V.dashboard;
+
+  const key = S.stage + '/' + S.view + '/' + (S.view === 'interview' ? S.iv : '') + '/' + S.tab;
+  const entered = key !== MO.key;
+  MO.key = key;
+
+  const OVER = ['nav', 'tal', 'confirm', 'sheet'];
+  const opened = OVER.filter(k => S[k] && !MO.open[k]);
+  const shown  = OVER.filter(k => S[k]);
+  for(const k of OVER) MO.open[k] = !!S[k];
+
+  const at = ` data-rail="${S.nav ? 'open' : 'shut'}"`
+           + ` data-view="${S.view}"`
+           + (entered ? ' data-enter' : '')
+           + (opened.length ? ` data-open="${opened.join(' ')}"` : '')
+           + (shown.length ? ` data-shown="${shown.join(' ')}"` : '');
+
+  device.innerHTML = `<div class="app"${at}>
+    ${shell(v)}
+    <div class="shell-body">
+      ${sidenav(v)}
+      <div class="view-col">
+        <main class="main"><div class="page">${view(v)}</div></main>
+      </div>
+    </div>
+    ${talSheet()}${confirmSheet()}${editSheet()}
+  </div>`;
+
+  dsStagger(device.querySelector('.page'));
+  document.getElementById('pick').value = S.stage;
+  const st = STAGES.find(s => s[0] === S.stage);
+  document.getElementById('cap').innerHTML = st ? `<b>${st[1]}.</b> ${st[2]}` : '';
+}
+
+/* --------------------------------------------------------------------------
+   NAVIGATION — one delegated listener on a container that outlives the render.
+
+   `data-iv` IS READ IN THE CAPTURE PHASE, before the click reaches the router,
+   which is what keeps `data-go` a plain view name. The alternative is a
+   `data-go="interview:sofia"` that the router has to split, and the wireframe's
+   `data-ag="member:41:Maryam Naz"` is what that turns into.
+   -------------------------------------------------------------------------- */
+device.addEventListener('click', e => {
+  const t = e.target.closest('[data-iv]');
+  if(t) S.iv = t.dataset.iv;
+}, true);
+
+device.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-ask],[data-tab],[data-confirm],[data-sheet]');
+  if(!t) return;
+  const d = t.dataset;
+
+  if(d.close){
+    if(e.target.closest('.sheet') && !e.target.closest('[data-close]')) return;
+    S[d.close] = false; if(d.close === 'tal') S.talQ = null;
+    return render();
+  }
+  if(d.toggle){ S[d.toggle] = !S[d.toggle]; if(d.toggle === 'tal') S.talQ = null; return render(); }
+  if(d.confirm){ S.confirm = d.confirm; return render(); }
+  if(d.sheet){ S.sheet = d.sheet; return render(); }
+  if(d.ask){ S.talQ = d.ask; return render(); }
+  if(d.tab){ S.tab = d.tab; return render(); }
+  if(d.go){
+    S.view = d.go; S.nav = false; S.tal = false; S.talQ = null;
+    if(d.go === 'interviews') S.tab = 'next';
+    render();
+    device.querySelector('.main').scrollTop = 0;
+  }
+});
+
+/* The switches keep their state on `S`, not in the DOM, for the same reason
+   everything else does: the next render would print the markup's default. */
+device.addEventListener('change', e => {
+  const p = e.target.closest('[data-perm]');
+  if(p){ S.perms[p.dataset.perm] = p.checked; }
+});
+
+/* --------------------------------------------------------------------------
+   PROTOTYPE CHROME
+   -------------------------------------------------------------------------- */
+document.getElementById('ptLogo').innerHTML = `${TN_MARK}<b>TalentNext</b>`;
+document.getElementById('pick').innerHTML =
+  STAGES.map(s => `<option value="${s[0]}">${s[1]}</option>`).join('');
+
+document.getElementById('pick').onchange = e => {
+  S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
+  render();
+};
+document.getElementById('reset').onclick = () => {
+  S.view = 'dashboard'; S.nav = false; S.tal = false; S.talQ = null;
+  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael';
+  render();
+};
+
+/* ONE DOCUMENT, THREE SIZES. Each frame keeps its true pixel width so the
+   container queries inside it resolve honestly, and is scaled down to fit
+   rather than squashed. Desktop is not a device: it has no bezel and takes the
+   whole stage, which is also the honest preview. */
+const VP_SIZE = {mobile:[390, 844], tablet:[744, 1133], fluid:[1440, 900]};
+const fitBox = document.getElementById('fit');
+
+function fitFrame(){
+  const vp = device.dataset.vp;
+  const stage = fitBox.parentElement;
+  const pct = document.getElementById('vpscale');
+  if(vp === 'fluid'){
+    device.style.transform = 'none';
+    device.style.width = '100%';
+    device.style.height = Math.max(520, window.innerHeight - stage.getBoundingClientRect().top - 64) + 'px';
+    fitBox.style.width = '100%';
+    fitBox.style.height = device.style.height;
+    if(pct) pct.textContent = Math.round(stage.clientWidth) + 'px';
+    return;
+  }
+  const [w, h] = VP_SIZE[vp] || VP_SIZE.mobile;
+  device.style.width = w + 'px';
+  device.style.height = Math.min(h, Math.round(window.innerHeight * 0.8)) + 'px';
+  const avail = stage.clientWidth - 8;
+  const scale = Math.min(1, avail / w);
+  device.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  fitBox.style.width = Math.round(w * scale) + 'px';
+  fitBox.style.height = Math.round(parseFloat(device.style.height) * scale) + 'px';
+  if(pct) pct.textContent = scale < 1 ? Math.round(scale * 100) + '%' : '100%';
+}
+
+document.getElementById('vp').addEventListener('click', e => {
+  const b = e.target.closest('button[data-vp]');
+  if(!b) return;
+  document.querySelectorAll('#vp button').forEach(x => x.classList.toggle('on', x === b));
+  device.dataset.vp = b.dataset.vp;
+  S.nav = false;
+  render();
+  fitFrame();
+});
+window.addEventListener('resize', fitFrame);
+
+render();
+fitFrame();
+</script>
+</body>
+</html>

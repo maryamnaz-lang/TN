@@ -48,8 +48,8 @@
    THE SUMMARIES
 
    SHORT. CONVERSATIONAL. THE FEW THINGS THAT MATTER. This table has been
-   rewritten twice and both earlier versions failed in a way worth recording,
-   because the pull is towards both of them.
+   rewritten three times and every earlier version failed in a way worth
+   recording, because the pull is towards all of them.
 
    The first version NAMED THE SECTIONS: "Points, badges and rank, and what
    moves each one." That is a caption, and a caption under a page the reader
@@ -57,26 +57,62 @@
    been written without reading the page?
 
    The second version over-corrected into PROSE. It had the right facts and
-   the wrong register — "The ninety days, closed out and gathered here",
+   the wrong register — "The 90 days, closed out and gathered here",
    "This is the page that holds the evidence of what you did". Openers that
    set a scene, closers that explain what the page is for, five sentences
    where two would do. Nobody reads a summary for the writing. The client's
    word for it was "a story", and it is: a paragraph performing rather than
    telling you the two things you needed.
 
-   What is left is the rule:
+   The third version — the one this replaces — got the register right and
+   still lost, on two counts that only show up once you look at the page
+   rather than at the table.
 
-     - TWO SENTENCES. Three only when the page genuinely has three things on
-       it that matter. Say the thing and stop.
+   IT SAID WHAT THE GREY LINE ABOVE IT HAD JUST SAID. `ph()`'s second
+   argument is a page description, and on nineteen pages it was a SENTENCE
+   explaining the page — so the reader met the same fact twice, six
+   millimetres apart, in two voices. Profile: "Your details, your
+   preferences, and what Tal is allowed to do", then Tal saying "Your
+   details, how you want to be contacted, and what Tal is allowed to do."
+   Cohort: "Ten people at Explorer – E3, led by Priya Nair · week 5 of 13",
+   then Tal saying "Ten of you at E3 with Priya leading, week 5 of 13". On
+   Interviews the plate below it made it three times. That is fixed on BOTH
+   sides and the split is now a rule: THE DESCRIPTION CARRIES FACTS, TAL
+   CARRIES THE READING. Where a page has a factual spine it goes in the
+   description as a `·` row — the shape Course Progress and one-candidate
+   already used — and where it has none the description is dropped and the
+   title stands alone over Tal's sentence. Before adding a summary here,
+   read the page's `ph()` and make sure they are not the same sentence.
+
+   IT EXPLAINED THE PRODUCT INSTEAD OF READING THE PAGE. A third of the
+   table was policy and mechanism — "each row downloads its receipt",
+   "closing your account is at the foot", "this is the only thing that sets
+   or changes your level", "the same thread its members read on their own
+   Cohort page". None of it is what a person came to catch up on, two of
+   them pointed at controls the reader can see, and the last one explains
+   the OTHER PORTAL to a leader who does not use it. An AI-native product
+   does not get to spend its one paragraph describing itself.
+
+   So the rule, and it is now five things:
+
+     - TWO SENTENCES, 18 TO 28 WORDS. Not three. Say the thing and stop.
      - THE FACTS, IN THE ORDER A PERSON WOULD ASK FOR THEM. Where you are,
        what is open, what is on you. Numbers are the content: "day 34 of 90,
        5 of 13 chapters at 88%" is the whole first sentence.
-     - NO FRAMING. Nothing that describes the page rather than what is on it
-       — no "gathered here", no "this is the page that", no "in one view".
-       The reader is looking at the page.
+     - IT MUST BE A CATCH-UP, NOT A DESCRIPTION. The reader is someone
+       returning to a page they have seen before and wanting to know what
+       moved. If the sentence would read the same next week, it is a caption.
+     - NO FRAMING, NO POLICY, NO POINTING AT THE UI. Nothing that describes
+       the page rather than what is on it, nothing about how the product
+       works in general, and nothing about where a control is. The reader is
+       looking at the page.
+     - AND NOTHING FROM THE OTHER PORTAL. A candidate is not told they could
+       lead a cohort; a leader is not told what their candidates' Cohort page
+       looks like. Both were in the last version, twice each, and both are
+       the reason a reader stops trusting the paragraph.
      - CONTRACTIONS, PLAIN WORDS. It is Tal talking to one person, not a
        report being filed.
-     - Never repeat the page title. It is directly above.
+     - Never repeat the page title or its description. Both are directly above.
 
    A value is a string, a function of the stage's config, or an object keyed
    by stage with `_` as the fallback. Functions get `f` — `cfg(S.stage)` —
@@ -94,109 +130,238 @@ const _n = x => x.toLocaleString('en-US');
    SPOKEN, not how it is spelt: eighty, eleven and eighteen all open on a
    vowel, so 8x, 11 and 18x take "an" and everything else takes "a". */
 const _an = n => /^(8|11|18)/.test(String(n)) ? 'an' : 'a';
+/* SMALL COUNTS ARE SPELT AT THE START OF A SENTENCE, and this is not
+   fussiness — it is the single change that did most for the leader side's
+   voice. "4 decisions are waiting on your signature" opens on a glyph and
+   reads as a figure lifted off a dashboard; "Four decisions are waiting"
+   reads as somebody telling you. Twelve is the ceiling: past it the numeral
+   IS how a person says the number, and a spelt "twenty-eight" beside a
+   numeric 28 elsewhere on the same page is worse than either choice made
+   consistently. MID-SENTENCE, ALWAYS THE NUMERAL — "5 of 13 chapters" is
+   the figure being read, and spelling it there would be the opposite
+   mistake. `_W` capitalises for sentence-start, `_w` does not, for the
+   clause-subject case ("and four have never signed in").
+
+   THIS IS NOT A NEW CONVENTION, it is one the product already kept without
+   writing down: every "Forty-five minutes" in the build opens a sentence and
+   every "45 minutes" sits inside one — eight against twenty-seven, and not a
+   single exception either way. The leader side was the half that had drifted
+   off it, because those summaries are assembled from counts rather than
+   written out, and a template that starts `${n} decisions` has no way to
+   know it is starting a sentence. That is what these two exist for. */
+const _WORDS = ['no','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+/* AND `a.slot` IS A CARD LABEL, NOT A CLAUSE. It is stored as "Thu, Aug 20
+   &middot; 6:30 PM", which is correct on the agent card and wrong inside a
+   sentence twice over: a middot mid-prose reads as the sentence breaking, and
+   three-letter days and months are an abbreviation a person does not speak.
+   Spoken out here only — the card keeps its own compact drawing. */
+const _DAYW = {Mon:'Monday',Tue:'Tuesday',Wed:'Wednesday',Thu:'Thursday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};
+const _MONW = {Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May',Jun:'June',
+               Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December'};
+const _slot = s => {
+  const m = /^(\w{3}), (\w{3}) (\d+)\s*(?:&middot;|\u00b7)\s*(.+)$/.exec(String(s || ''));
+  return m ? `${_DAYW[m[1]] || m[1]} ${m[3]} ${_MONW[m[2]] || m[2]} at ${m[4]}` : s;
+};
+const _w = n => n >= 0 && n <= 12 ? _WORDS[n] : _n(n);
+const _W = n => { const s = _w(n); return s.charAt(0).toUpperCase() + s.slice(1); };
 
 const PAGESUM = {
 
   /* --- the journey ----------------------------------------------------- */
   dashboard: {
-    consult: 'You&rsquo;re all set up. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
+    consult: 'Jordan Blake calls Thursday at 2:00 PM ET &mdash; fifteen minutes, nothing to prepare. Your level comes later, from a 45-minute interview with an agent.',
 
-    new: 'You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
+    new: 'Your next step is one 45-minute interview &mdash; it is what turns a track into a level. Three agents have a slot this week, $80 to $95.',
 
-    booked: 'You&rsquo;re booked with Priya Nair, Thursday 20 August at 6:30 PM ET. Forty-five minutes, recorded, already paid &mdash; nothing to do before the day.',
+    booked: 'Booked with Priya Nair, Thursday 20 August at 6:30 PM ET. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.',
 
-    assessed: 'You&rsquo;re Explorer &ndash; E3, level 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
+    assessed: 'Explorer &ndash; E3, level 3 of 15, signed by Priya on 21 August. Delegation and hard conversations are your growth areas; enrolling is the only step left.',
 
     week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 unlocks today and your first call is Thursday at 6:00 PM ET &mdash; nothing&rsquo;s assessed this week.`,
 
-    day34: f => `Day ${f.day} of 90, ${f.done} of 13 chapters at ${f.avg}%, ${_n(GAME.day34.pts)} points. Chapter 4 is still unfinished after four goes and your week 4 reflection is overdue. Thursday&rsquo;s call is on hard conversations.`,
+    /* THE POINTS FIGURE LEFT THIS LINE. It was the third fact in a
+       three-fact sentence on the one page that has real ones — and points
+       are the only number in the product that changes nothing. Two things
+       are genuinely on this candidate on day 34, and now the sentence is
+       both of them. The chapter is `f.open + 1` rather than a literal so it
+       cannot drift from the stage it is describing. */
+    day34: f => `Day ${f.day} of 90, ${f.done} of 13 chapters at ${f.avg}%. Chapter ${f.open + 1} is unfinished after four attempts, and your week ${f.week - 1} reflection is overdue.`,
 
-    day90: f => `All 13 chapters done at ${f.avg}%, and you&rsquo;re on ${_n(GAME.day90.pts)} points with the Bronze badge. Your 90-day summary is written &mdash; Priya signs it once you book the re-interview.`,
+    day90: f => `All 13 chapters done at ${f.avg}%, and Bronze is earned. Your 90-day summary is written &mdash; Priya signs it once you book the re-interview.`,
 
-    promoted: f => `You&rsquo;re Explorer &ndash; E4 now, signed by Priya on 21 November, and Cohort 41 is closed. At E4 you can volunteer to lead a cohort below your level.`,
+    /* WHAT REPLACED "AT E4 YOU CAN VOLUNTEER TO LEAD A COHORT". The next
+       track's start date, which is the actual answer to "what now" and was
+       sitting in a hand-written Tal card further down this page — a card
+       whose words `placePageSummary` overwrites, so it had never once been
+       read. See the rule above about the other portal. */
+    promoted: 'Signed by Priya on 21 November &mdash; one level up from where you started. The E4 track opens 1 December, with your growth areas as chapters 3 and 9.',
 
     _: 'Where you stand right now, and anything waiting on you today.'
   },
 
-  level: {
-    consult: 'No level yet &mdash; the quiz gives you a track, not a level. Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which one.',
-    new: 'No level yet &mdash; the quiz gives you a track, not a level. Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which one.',
-    booked: 'Still no level &mdash; the interview on 20 August is what sets it. Explorer covers levels 1 to 5 of 15, and the quiz only predicted the band.',
-    promoted: 'You&rsquo;re at E4, level 4 of 15, signed on 21 November after your re-interview. At E4 you can volunteer to lead a cohort below your level.',
-    _: 'You&rsquo;re at E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a 90-day course moves it.'
+  /* ONE STRING, NOT TWO IDENTICAL ONES. `consult` and `new` were separate
+     keys holding the same sentence, which is a thing that stays in step for
+     exactly as long as nobody edits one of them. */
+  level: (() => {
+    const pre = 'No level yet. The quiz gives you a track, not a level &mdash; Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which.';
+    return {
+      consult: pre,
+      new: pre,
+      booked: 'Still no level &mdash; the interview on 20 August sets it. Explorer covers levels 1 to 5 of 15; the quiz only predicted the band.',
+      promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview &mdash; one up from where the 90 days started. Another course and re-interview moves it again.',
+      _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
+    };
+  })(),
+
+  report: 'Priya&rsquo;s write-up of the 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas &mdash; both are chapters on your course.',
+
+  /* THIS ONE HAD NO FACTS IN IT AT ALL. "Every interview you've had and
+     every one booked. This is the only thing that sets or changes your
+     level, and each finished one links to its report." — a caption, a
+     policy statement and a pointer at a link, on a page whose description
+     and whose plate both already said the policy. What a person wants off
+     this page is how many interviews there have been, when, and whether one
+     is owed. Staged, because the answer is different five times. */
+  interviews: f => {
+    if(f.complete) return 'Two interviews on record: 20 August set Explorer &ndash; E3, and 21 November moved you to E4. Both reports are yours to keep.';
+    if(f.reinterview) return 'One interview on record, and the re-interview still to book. Whoever you pick reads your 90-day summary before the call.';
+    if(f.booked) return 'One interview booked, 20 August with Priya Nair. Nothing to do before it &mdash; the level and the report both come out of those 45 minutes.';
+    if(f.pred) return 'Nothing on record yet. One 45-minute conversation is what sets your level, and three agents have a slot this week.';
+    return 'One on record: 20 August with Priya, which set Explorer &ndash; E3. A re-interview at the end of the 90 days is what moves the level.';
   },
 
-  report: 'Priya&rsquo;s write-up of your 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas she named, and both are chapters on your course.',
+  agents: 'Three agents assess at your level and have a slot this week &mdash; Priya $95, Owen $85, Lena $80. Same 45 minutes whoever you pick.',
 
-  interviews: 'Every interview you&rsquo;ve had and every one booked. This is the only thing that sets or changes your level, and each finished one links to its report.',
-
-  agents: 'Three agents assess at your level and have a slot this week &mdash; Priya at $95, Owen at $85, Lena at $80. Same 45 minutes whoever you pick.',
-
+  /* `a.slot` IS A DATA STRING, NOT A CLAUSE. It is drawn on the agent card
+     as "Thu, Aug 20 · 6:30 PM", which is right in a card and wrong inside a
+     sentence — a middot mid-prose reads as a break in the sentence. The
+     separator becomes "at" here and nowhere else, so the card keeps its own
+     drawing. Same reason `a.r` gains its denominator: "rates 4.8" is a
+     figure read out, "4.8 out of 5" is a figure a person can use. */
   agent: () => {
     const a = AGENTS[S.agent || 'priya'];
-    return `${a.n} assesses ${a.range}, has run ${a.ivs} interviews and rates ${a.r.toFixed(1)}. ${a.price} for 45 minutes, and the next free slot is ${a.slot}.`;
+    return `${a.n} assesses ${a.range} and has run ${a.ivs} interviews, rated ${a.r.toFixed(1)} out of 5. ${a.price} for 45 minutes, next free ${_slot(a.slot)}.`;
   },
 
-  booking: () => {
-    const a = AGENTS[S.agent || 'priya'];
-    return `Booked &mdash; ${a.n}, Thursday 20 August at 6:30 PM ET. The invite and joining link are already in your email, and you can move it from here.`;
-  },
+  /* ai7.js replaces this one — see the note there for why it says nothing
+     about the booking itself. Kept in step so the two cannot read as two
+     different writers if the override ever goes. */
+  booking: 'Nothing to prepare and nothing to bring &mdash; Thursday is a conversation, not a test. It is recorded, and your report follows within 48 hours.',
 
-  enrol: '90 days, 13 chapters and a cohort of ten with a live leader, for $595 paid once. About an hour a week plus the call, and you start with the next cohort.',
+  /* THE COURSE'S SHAPE MOVED TO THE PAGE DESCRIPTION — "90 days · 13
+     chapters · a cohort of ten" — because it is a factual spine and this
+     summary was saying it word for word underneath. What is left is the
+     part a description cannot carry: the commitment. */
+  enrol: '$595 once, no subscription. About an hour a week plus the weekly call, and you start with the next cohort &mdash; within two weeks of paying.',
 
-  payment: '$595, charged once &mdash; no subscription and nothing renews. Your cohort starts within two weeks of the payment clearing.',
+  payment: 'One charge of $595 and the 90 days are yours &mdash; nothing renews and there is nothing to cancel. Your cohort is assigned as soon as it clears.',
 
-  /* --- the ninety days --------------------------------------------------- */
+  /* --- the 90 days --------------------------------------------------- */
+
+  /* PARKED, BOTH OF THEM — `placePageSummary` bails on the LightspeedVT
+     frame, so nothing below is on screen today. Kept correct anyway, because
+     the moment a chapter shell renders outside the iframe these are the
+     copy, and the old pair had a bug that would have shipped with it: at day
+     90 they said "13 of 13 chapters done, and chapter 13 is open", and at
+     `promoted` "13 of 13 done, and chapter 1, Why We Exist, is open". A page
+     cannot have everything finished and something open. The trailing "45 to
+     70 minutes each and one unlocks a week" went for its own reason — the
+     same clause on all four stages, still being explained on day 90. */
   coursework: f => {
     const cur = CH[f.open];
-    return `${f.done ? `${f.done} of 13 chapters done${f.avg ? ` at ${f.avg}%` : ''}` : 'None of the 13 chapters finished yet'}${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
+    if(f.done >= 13) return `All 13 chapters finished at ${f.avg}%. Nothing left to unlock &mdash; the re-interview is what turns the record into a level.`;
+    if(!f.done) return `None of the 13 finished yet${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
+    return `${f.done} of 13 chapters done at ${f.avg}%${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open &mdash; ${cur[1]} minutes` : ''}. One more unlocks each week.`;
   },
 
   chapter: () => {
     const i = cfg(S.stage).open, cur = CH[i];
-    return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment; only the assessment counts towards your average. Stop any time and come back.`;
+    return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment &mdash; only the assessment counts towards your average.`;
   },
 
   transcript: f => f.done
-    ? `${f.done} of 13 chapters, ${f.avg}% average, about ${_hrs(f.mins)} hours in. This is what an agent reads before your re-interview.`
-    : 'Nothing on the record yet &mdash; the ninety days only started this week.',
+    ? `${f.done} of 13 chapters at ${f.avg}%, about ${_hrs(f.mins)} hours in. This is the record an agent reads before your re-interview.`
+    : 'Nothing on the record yet &mdash; the 90 days only started this week.',
 
+  /* THE PAGE DESCRIPTION HELD THE SAME SENTENCE ("Points, badges and rank
+     come from your activity across the course and the community") and is now
+     the figure row, so this opens on the figures and closes on the one thing
+     a person actually wants to know about points, which is whether they
+     count for anything. That last clause repeats across all four stages on
+     purpose: it is the answer to the only question this page raises. */
   rewards: () => {
     const g = GAME[S.stage];
-    if(!g) return 'Points start when you enroll on a course &mdash; 10 for signing in, 25 a chapter, Bronze at 2,500. None of it affects your level.';
+    if(!g) return 'Points start when you enroll &mdash; 10 for signing in, 25 a chapter, Bronze at 2,500. None of it affects your level.';
     const toB = 2500 - g.pts;
-    return `${_n(g.pts)} points, ${g.badges} of 4 badges, ${RANKS[g.rank - 1].n}. ${toB > 0
-      ? `Bronze is at 2,500, so you&rsquo;re ${_n(toB)} off it.`
-      : `Bronze is yours and Silver is at 5,000.`} Points come from signing in, chapters and cohort posts &mdash; none of it touches your level.`;
+    return `${_n(g.pts)} points at ${RANKS[g.rank - 1].n}, ${toB > 0
+      ? `${_n(toB)} short of the Bronze badge at 2,500`
+      : `with Bronze earned and Silver at 5,000`}. Points come from signing in, chapters and cohort posts &mdash; none of it touches your level.`;
   },
 
-  cohort: f => `Ten of you at E3 with Priya leading, week ${f.week} of 13. Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and she&rsquo;s asked everyone to bring a real one.`,
+  /* "Ten of you at E3 with Priya leading, week 5 of 13" was the page
+     description verbatim. The description keeps it; this keeps the call,
+     which is the thing on the page that has a date on it. */
+  cohort: 'Thursday&rsquo;s call is at 6:00 PM ET on hard conversations, and Priya has asked everyone to bring a real one to talk through.',
 
-  messages: 'Your private thread with Priya. She can already see your chapters, scores and attendance, so you never have to explain where you are. Her last message asked for the vendor review example.',
+  /* PARKED — `.msg-page` is excluded, for the reason written at the pass
+     below. Trimmed to match the rule anyway: the policy sentence about what
+     Priya can see belongs on Profile, and paraphrasing the last bubble is
+     summarising something two inches away. */
+  messages: 'Priya can see your chapters, scores and attendance already, so you never have to explain where you are.',
 
   /* --- account and money ------------------------------------------------- */
-  billing: 'Everything you&rsquo;ve paid, newest first &mdash; all one-off charges. Nothing renews, no card is kept on file, and each row downloads its receipt.',
 
-  account: 'Your details, how you want to be contacted, and what Tal is allowed to do. Changes save as you go; closing your account is at the foot.',
+  /* WHAT THE OLD LINE GOT WRONG, TWICE. "No card is kept on file" — `S.cards`
+     holds a Visa and this page draws it under a heading that says so, three
+     sections down. And "each row downloads its receipt" is a caption for a
+     button. A total and a count is what a person opens Payments for; the
+     rows are the itemisation. Counted from the same conditions `V.billing`
+     pushes them on, so the two cannot disagree. */
+  billing: f => {
+    const paid = [];
+    if(f.enrolled || f.complete) paid.push(595);
+    if(!f.pred) paid.push(95);
+    if(f.booked) paid.push(95);
+    paid.push(490);
+    const t = `$${_n(paid.reduce((a, b) => a + b, 0))}`;
+    return paid.length === 1
+      ? `One payment, ${t}, and it was a single charge &mdash; nothing here renews.`
+      : `${_W(paid.length)} payments, ${t} in total, every one of them a single charge. Nothing here renews.`;
+  },
+
+  /* The page description said "Your details, your preferences, and what Tal
+     is allowed to do" and this said the same three nouns back. The
+     description is gone and this says the one thing worth opening the page
+     for, which on an AI-native product is the permissions. */
+  account: 'Everything here saves as you go. The block worth a look is the last one &mdash; what I&rsquo;m allowed to remember, and what I can do without asking.',
 
   /* --- Tal's own pages --------------------------------------------------- */
   mem: () => {
     const live = MEMO.length - ((S.memDrop || []).length);
-    return `${live} things I&rsquo;ve learned about you, each traced back to where it came from. Mark anything wrong and I&rsquo;ll stop using it.`;
+    return `${_W(live)} things I&rsquo;ve learned about you, each traced back to where it came from. Mark anything wrong and I&rsquo;ll stop using it.`;
   },
 
-  rp: 'Rehearse a hard conversation before you have it for real. I play the other person, briefed from your interview &mdash; nothing here is recorded or scored.',
+  rp: 'Rehearse a hard conversation before you have it for real. I play the other person, briefed from your interview &mdash; nothing is recorded or scored.',
 
+  /* The date, the length and the outcome are the page description's `·` row
+     directly above, so naming them again was the duplication this rewrite
+     is about. What is left is the two things the row cannot say. */
   ivt: () => {
     const iv = IVT[S.iv === 're' ? 're' : 'level'];
-    return `The full ${iv.len} of your ${iv.label.toLowerCase()} with Priya on ${iv.date}, searchable and tagged by topic. Everything in your report came from here.`;
+    return `Searchable and tagged by topic, all ${iv.len} of it. Everything in your report was drawn from here, and the quotes link back to the minute.`;
   },
 
   /* --- the cohort leader ------------------------------------------------- */
   leadDash: () => {
-    const att = lattention(), pend = lpending(), next = lnext();
+    const att = lattention(), pend = lpending();
     const bad = att.filter(x => x.m.flag.k === 'bad').length;
-    return `${pend === 1 ? 'One decision is' : _n(pend) + ' decisions are'} waiting on your signature, and nobody in that queue can enroll until you sign. ${att.length} candidates need a look, ${bad} of them seriously.${next ? ` Next session is ${next.name}, ${next.when.toLowerCase()}.` : ''}`;
+    /* THE NEXT SESSION LEFT THIS SENTENCE. It was the third clause of three
+       and it is the one fact on the page that has its own card with its own
+       time on it — so the summary was spending a third of itself on the
+       thing hardest to miss. What is left is the two things that are only
+       findable by reading, and the first is first because it blocks other
+       people: an unsigned decision is a candidate who cannot enroll. */
+    return `${_W(pend)} decision${pend === 1 ? '' : 's'} ${pend === 1 ? 'is' : 'are'} waiting on your signature, and nobody in that queue can enroll until you sign. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
   },
 
   /* THE SEVEN MODULES, AND THE FOUR PAGES UNDER THEM.
@@ -211,7 +376,7 @@ const PAGESUM = {
     const done = LEAD_SESSIONS.filter(s => s.state === 'done');
     const due = done.filter(s => { const e = LEAD_EVALS.filter(x => x.name === s.name)[0]; return e && e.status === 'pending'; }).length;
     const nx = up[0];
-    return `${up.length} interview${up.length === 1 ? '' : 's'} booked, ${done.length} already run.${nx ? ` Next is ${nx.name}, ${nx.when.toLowerCase()}.` : ''}${due ? ` ${due === 1 ? 'One' : _n(due)} still ${due === 1 ? 'needs' : 'need'} an evaluation before those candidates can enroll.` : ''}`;
+    return `${_W(up.length)} booked and ${_w(done.length)} already run${nx ? `, ${nx.name} next at ${nx.when.toLowerCase().replace(/^today /, '')} today` : ''}.${due ? ` ${_W(due)} of the finished ones still ${due === 1 ? 'needs' : 'need'} your evaluation before ${due === 1 ? 'that candidate' : 'those candidates'} can enroll.` : ''}`;
   },
 
   leadEvals: () => {
@@ -219,15 +384,20 @@ const PAGESUM = {
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
     const e0 = pe[0];
     if(!pe.length && !ps.length) return 'Nothing is waiting on your signature &mdash; every level and every summary is signed.';
-    return `${pe.length ? `${pe.length === 1 ? 'One level decision' : _n(pe.length) + ' level decisions'}` : 'No level decisions'} and ${ps.length ? `${ps.length === 1 ? 'one ninety-day summary' : _n(ps.length) + ' summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the level is yours to set.` : ''}`;
+    return `${pe.length ? `${_W(pe.length)} level decision${pe.length === 1 ? '' : 's'}` : 'No level decisions'} and ${ps.length ? `${_w(ps.length)} 90-day ${ps.length === 1 ? 'summary' : 'summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the level is yours to set.` : ''}`;
   },
 
+  /* THE QUIZ SCORE LEFT THIS ONE. It arrived as a bare third sentence —
+     "Their quiz was 64 of 100." — under an analysis that had already said
+     the quiz and the interview agree, and above a `.note` on the same page
+     whose whole subject is how to read that 64. Three statements of one
+     number, and this was the one with nothing to add. */
   leadEval: () => {
     const e = LEAD_EVALS.filter(x => x.id === S.ldrEv)[0] || LEAD_EVALS[0];
     const an = typeof LDR_AN !== 'undefined' ? LDR_AN[e.id] : null;
     if(e.status === 'done')
       return `Signed at Explorer &ndash; ${e.assigned}${e.override ? `, against my proposal of ${e.ai}` : ''}. ${e.name} can enroll now.`;
-    return `${an ? an.sum : e.why} Their quiz was ${e.quiz} of 100.`;
+    return an ? an.sum : e.why;
   },
 
   leadSum: () => {
@@ -235,21 +405,28 @@ const PAGESUM = {
     const c = lcoOf(s.cohort);
     const m = lmemOf(c, s.name);
     if(s.status === 'done') return `Published. You recommended: ${s.rec}.`;
-    return `${s.name} finished the ninety days at ${m.pc}% with ${m.avg}% on assessments and ${lchDone(m)} of 13 chapters. The recommendation is the part only you can write.`;
+    return `${s.name} finished the 90 days at ${m.pc}% with ${m.avg}% on assessments and ${lchDone(m)} of 13 chapters. The recommendation is the part only you can write.`;
   },
 
+  /* The next call was the third sentence and it is a card on the page with
+     its own time on it, the same trade as `leadDash`. What is left is the
+     roll-up and the one cohort that needs attention. */
   leadCohorts: () => {
     const flagged = lmembers().filter(x => x.m.flag);
     const worst = LEAD_COHORTS.slice().sort((a,b) => (lavg(a,'pc') - lpace(a)) - (lavg(b,'pc') - lpace(b)))[0];
-    const next = LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd)[0];
-    return `Three cohorts, ${lmembers().length} candidates, all Explorer. Cohort ${worst.id} is ${Math.abs(lavg(worst,'pc') - lpace(worst))} points behind pace &mdash; the widest of the three &mdash; and ${flagged.length} candidates are flagged. Next call is ${lname(next).toLowerCase()}, ${next.callDay.toLowerCase()} at ${next.callTime.toLowerCase()}.`;
+    return `Cohort ${worst.id} is ${lpace(worst) - lavg(worst,'pc')} points behind pace, the widest gap of the ${_w(LEAD_COHORTS.length)}. ${flagged.length} of the ${lmembers().length} candidates are flagged, and every cohort has its call this week.`;
   },
 
+  /* "10 candidates at Explorer – E3, week 5 of 13" was the page description
+     word for word, and dropping it took a three-sentence paragraph down to
+     two without losing a fact. THE GAP ALSO READ WRONG: `gap >= 0` printed
+     "0 ahead" when a cohort was exactly on pace, which is not a thing
+     anybody says. */
   leadCohort: () => {
     const c = lcoOf(S.ldrCo);
     const gap = lavg(c,'pc') - lpace(c);
     const bad = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
-    return `${c.members.length} candidates at ${llevel(c)}, week ${c.week} of 13. Averaging ${lavg(c,'pc')}% against ${lpace(c)}% expected &mdash; ${gap >= 0 ? `${gap} ahead` : `${Math.abs(gap)} behind`} &mdash; with assessments at ${lavg(c,'avg')}%. ${bad ? `${bad === 1 ? 'One candidate is' : _n(bad) + ' candidates are'} at risk.` : 'Nobody is at risk this week.'}`;
+    return `Averaging ${lavg(c,'pc')}% against ${lpace(c)}% expected &mdash; ${gap === 0 ? 'exactly on pace' : gap > 0 ? `${gap} points ahead` : `${Math.abs(gap)} points behind`} &mdash; with assessments at ${lavg(c,'avg')}%. ${bad ? `${_W(bad)} candidate${bad === 1 ? '' : 's'} ${bad === 1 ? 'is' : 'are'} at risk.` : 'Nobody is at risk this week.'}`;
   },
 
   leadMember: () => {
@@ -258,6 +435,8 @@ const PAGESUM = {
     return ldrRead(m, c);
   },
 
+  /* "Ordered by distance from expected pace" was a caption for a sort order
+     the column headings state, so the finding is the first sentence now. */
   leadReports: () => {
     const sel = S.ldrRep;
     const all = lmembers();
@@ -265,17 +444,26 @@ const PAGESUM = {
     const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
     const never = rows.filter(x => x.m.last === 'Never');
     const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
-    return `${sel === 'all' ? `All ${rows.length} candidates` : `The ${rows.length} in cohort ${sel}`}, ordered by distance from expected pace. ${behind.length ? `${behind.length} ${behind.length === 1 ? 'is' : 'are'} five points or more behind` : 'None is behind pace'}${never.length ? ` and ${never.length} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.${worst ? ` ${worst.m.name} is furthest back at ${worst.m.pc}%.` : ''}`;
+    const where = sel === 'all' ? `of the ${rows.length}` : `of the ${rows.length} in cohort ${sel}`;
+    if(!behind.length) return `None ${where} is more than five points behind pace${never.length ? `, though ${_w(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.`;
+    return `${_W(behind.length)} ${where} are five points or more behind pace${never.length ? `, and ${_w(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.${worst ? ` ${worst.m.name} is furthest back at ${worst.m.pc}%.` : ''}`;
   },
 
+  /* THIS WAS THE CLEAREST CASE OF THE RULE ABOUT THE OTHER PORTAL. It spent
+     its first sentence explaining the CANDIDATE'S Cohort page to a leader
+     who never sees it, and its second defining what "direct" means. Neither
+     is a catch-up and the second is a tab label. What a leader wants off
+     Messages is who is waiting, and the one consequence worth a reminder is
+     that a board post is public to the cohort. */
   leadMessages: () => {
+    const waiting = LDR_THREADS.filter(t => t.msgs[t.msgs.length - 1].me === 0).length;
     const co = lcoOf(S.ldrBoardCo);
-    return `${lname(co)}&rsquo;s board is the same thread its members read on their own Cohort page, so anything you post there the whole group sees. The direct threads are private, one candidate each.`;
+    return `${waiting ? `${_W(waiting)} direct thread${waiting === 1 ? '' : 's'} ${waiting === 1 ? 'is' : 'are'} waiting on a reply` : 'Nothing is waiting on a reply'}. Anything you post to ${lname(co)}&rsquo;s board, all ${_w(co.members.length)} of them see.`;
   },
 
-  leadCerts: 'Three certifications earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it is what would let you assess into the Builder band.',
+  leadCerts: () => `${_W(LDR_CERTS.length)} earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it opens the Builder band.`,
 
-  leadProfile: 'Your listing, your availability and the four numbers you&rsquo;re measured on. The bio and photo are yours to write; the assessing range comes from your certifications.'
+  leadProfile: 'Your listing is what candidates read when they choose you. The bio and photo are yours to write; the assessing range comes from your certifications.'
 };
 
 function pageSummary(){

@@ -7,6 +7,7 @@ check this table before editing anything.
 | File | What it is | Status |
 |---|---|---|
 | `hifi/` | High-fidelity candidate portal, **compiled** from `hifi/build/` | **ACTIVE — work here** |
+| `design-system/` | The portal's design language as two linkable files, **extracted** from `hifi/build/` | **ACTIVE — for new pages** |
 | `tn-portals.html` | Candidate + Cohort Leader portals, hand-written | Prototype, still live |
 | `tn-admin.html` | Super Admin panel, hand-written | Prototype, still live |
 | `tn-portals.css` | Stylesheet extracted from `tn-portals.html` | Supports the above |
@@ -27,6 +28,60 @@ is not a thing to update when the hi-fi design changes; the two are not kept in 
 
 The frozen files are still worth *reading* — they are where an intent or a flow decision was
 first recorded. Read them freely; just do not edit them without being asked.
+
+## A NEW page or portal starts from `design-system/` — IT IS ALSO GENERATED
+
+`design-system/talentnext-ds.css` and `.js` are the portal's design language, linkable:
+
+```html
+<link rel="stylesheet" href="design-system/talentnext-ds.css">
+<script src="design-system/talentnext-ds.js"></script>
+```
+
+Both are **build output** of `design-system/build-ds.py`, which walks the same 38 layers in
+the same order as `hifi/build/build.py` and keeps the rules whose selectors belong to the
+shared vocabulary, dropping the ~2,240 that belong to one product surface. Every rule in the
+output is a real rule from the real portal in its real cascade position — nothing is re-typed,
+and the build refuses to write if any output rule cannot be traced back to a source layer.
+
+So there are two generated artefacts from one source, and the same rule applies to both:
+**never hand-edit `talentnext-ds.css`.** Change the layer in `hifi/build/` that states the
+rule, then re-run both builds. Changing the design system changes the portal, by design —
+one design language, one source.
+
+```bash
+cd hifi/build && python3 build.py
+cd design-system && python3 build-ds.py
+```
+
+**A new component becomes shared by one deliberate step, and the build asks for it.** Build it
+as a layer in `hifi/build/` with a fresh class prefix, then add that prefix to `SYSTEM` in
+`build-ds.py` and rebuild. Everything not in `SYSTEM` is dropped, so `build-ds.py` ends with an
+**unclassified report** — every class in neither `SYSTEM` nor `PRODUCT_PREFIXES`, with the
+layer it came from. The baseline is zero, so a new name is visible immediately; clear it by
+adding the name to `SYSTEM` (shared) or its prefix to `PRODUCT_PREFIXES` (one surface's own).
+Never leave it unclassified: that is the silent path where a component never reaches the
+design system and the next portal re-implements it.
+
+Note the limit: the DS is CSS + icons. A widget whose behaviour lives in a render pass (Tal's
+thread) does not port by widening the allowlist — its shell does, its flow needs a third
+generated file with a documented render/state contract.
+
+- `design-system/gallery.html` — the reference: every component, live, with its markup. The
+  place to look before inventing a class.
+- `design-system/starter.html` — a working three-page skeleton to copy for a new portal.
+- `design-system/DESIGN-SYSTEM.md` — what came across, what did not, and the five things
+  that bite (the host requirement, the label column's opt-out list, the `.stats` / `.facts`
+  cell counts, the disarmed hover, and the two motion traps).
+
+Two constraints that are easy to miss and are written up in full in that README: a new page
+needs a **host** with `container-type:inline-size; container-name:app` or no breakpoint ever
+fires; and `.stats` / `.facts` draw their hairlines as the 1px grid **gap**, so a row they do
+not fill paints grey rather than closing up. `.stats` is a fixed 2/4-column grid — give it
+exactly four. `.facts` is `auto-fit` at `minmax(140px,1fr)`, so it fills any row it does not
+wrap; for three items, or a band that must hold at every width, use `.kv`. The portal itself
+hits this at a container width near 900px, where its four-cell `.facts` wraps to 3 + 1 — one
+candidate page and six leader pages, pre-existing.
 
 ## Hand-written prototypes — `tn-portals.html`, `tn-admin.html`
 
@@ -60,6 +115,36 @@ cd hifi/build && python3 build.py
 **Every rule carries its reasoning in the source.** That is this project's convention: read
 the comment above a rule before changing it — several of them record a decision that looks
 like a bug and isn't. Keep writing them that way.
+
+### The head of a page has TWO copy slots and they do different jobs
+
+A module page opens with an `<h1>`, a grey line under it, and Tal's summary about six
+millimetres below that. The grey line and the summary are read as one block whether or not
+they were written as one, so the split is a rule:
+
+| Slot | Written in | Carries |
+|---|---|---|
+| `ph(title, sub)` — the grey line | the view | the page's **factual spine**, as a `&middot;` row. `Explorer Track – E3 · Cohort 41 · week 5 of 13`. No verb, no claim, no explanation. |
+| Tal's summary — `PAGESUM` | `ai6.js` | the **reading**: what moved, what's open, what's on you. Two sentences, 18–28 words, and the only prose at the head of the page. |
+
+**Where a page has no spine, it has no `sub`** — Profile, Payments, Points, What Tal knows,
+Practice, one agent, Booking Details, My Level all pass `title` alone and let Tal's sentence
+be the opening line. Inventing a sentence to fill the slot is what produced the duplication
+this rule exists to stop: Profile once said "Your details, your preferences, and what Tal is
+allowed to do" over a summary saying "Your details, how you want to be contacted, and what
+Tal is allowed to do." Before adding either half, read the other and check they are not the
+same sentence. The auth screens are the exception and stay prose — they have no Tal card.
+
+`PAGESUM`'s own note in `ai6.js` is the long version, and it also holds the four content
+bans that the last rewrite was mostly made of: **no framing** ("this is the page that"), **no
+policy** ("nothing renews, no card is kept on file"), **no pointing at the UI** ("each row
+downloads its receipt"), and **nothing from the other portal** — a candidate is not told they
+could lead a cohort, a leader is not told what their candidates' Cohort page looks like.
+
+House style for the two numbers that appear everywhere: the course length is **`90 days`**
+numeric (and the document is the **`90-day summary`**), and a **small count is spelt when it
+opens a sentence, set when it does not** — "Four decisions are waiting", "5 of 13 chapters".
+`_W` / `_w` in `ai6.js` are what hold the second one for the leader's assembled summaries.
 
 ### Booking an interview happens inside Tal — `ai7.js` + `35-book.css`
 

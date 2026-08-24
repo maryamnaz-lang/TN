@@ -72,7 +72,7 @@ const IVT = {
     len: '44:06',
     outcome: 'Promoted to Explorer &ndash; E4',
     lines: [
-      ['01:05','P','Ninety days. Start with the thing you said your gap was.',['gap','delegation']],
+      ['01:05','P','90 days. Start with the thing you said your gap was.',['gap','delegation']],
       ['01:22','M','Letting go of work. It is better. Not fixed.',['gap','delegation']],
       ['02:40','M','The change is that I say the quiet part now. When I hand something over I tell the person what I am worried about, instead of taking it back later and pretending it was capacity.',['delegation','listening']],
       ['05:12','P','Give me the case where it worked.',['delegation']],
@@ -152,7 +152,7 @@ TAL_ROUTES.unshift(
     const a = ivtFind('level','gap'), b = ivtFind('re','gap');
     return `<div class="gen">
       <div class="gen-h">${talLabel()}<span class="gen-src">Both interviews, side by side</span></div>
-      <p>You were asked the same question twice, ninety days apart. In August the gap was letting go of work. In November it is speed. That is the shape of the promotion.</p>
+      <p>You were asked the same question twice, 90 days apart. In August the gap was letting go of work. In November it is speed. That is the shape of the promotion.</p>
       <div class="ivt-cmp">
         <div class="ivt-col"><span class="ivt-col-h">August</span>${a.slice(0,2).map(([t,s,txt])=>
           `<button class="quote" data-ivt="level" data-at="${t}"><span class="q-t">${t}</span><span class="q-b"><span class="q-w">${ivtSpeaker(s)}</span><span class="q-x">&ldquo;${txt}&rdquo;</span></span></button>`).join('')}</div>

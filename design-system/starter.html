@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — new portal (starter)</title>
+
+<!-- ==========================================================================
+     THE DESIGN SYSTEM. Two files, and the fonts are inside the first, so this
+     is the whole dependency. Serve over http — a browser blocks a linked
+     stylesheet on file://, which is the same rule the hi-fi portal follows:
+         python3 -m http.server 8799 --bind 127.0.0.1
+     ========================================================================== -->
+<link rel="stylesheet" href="talentnext-ds.css">
+
+<style>
+/* ==========================================================================
+   THIS PAGE'S ONLY CSS, and it is four declarations of host geometry rather
+   than design. If you find yourself adding a colour, a size or a spacing
+   here, the token for it already exists — see gallery.html.
+
+   THE HOST IS NOT OPTIONAL. `.app` is `position:absolute; inset:0`, so it
+   needs a positioned parent with a height. And `container-type` has to be
+   here because NOTHING in this system responds to the browser window: every
+   breakpoint is `@container app (min-width:…)` and resolves against this box.
+   Leave it off and the page renders at its phone layout at every width.
+
+   `height:100dvh` makes `.main` the scroller rather than the document, which
+   is what keeps the app bar and the rail still while the page moves — the
+   portal's own architecture.
+   ========================================================================== */
+.host{
+  position:relative;width:100%;height:100dvh;
+  container-type:inline-size;container-name:app;
+  overflow:hidden;background:var(--background)}
+
+/* the wordmark. The portal ships an image asset; this sets it as text. */
+.shell-logo{gap:var(--s03)}
+.shell-logo svg{width:18px;height:18px;fill:var(--icon-primary);flex:none}
+.shell-logo b{font-size:15px;font-weight:400;letter-spacing:-.2px;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<div class="host" id="host">
+  <div class="app" id="app"></div>
+</div>
+
+<script src="talentnext-ds.js"></script>
+<script>
+/* ==========================================================================
+   A NEW PORTAL, IN THE SHAPE THE HI-FI ONE USES
+   One state object, one view registry, one render. That is the whole engine —
+   the portal's own is the same three things with fifteen files of views on top
+   of it. Adding a page is: write a function that returns the page's HTML, put
+   it in `V`, add a line to `NAV`. Nothing else.
+
+   Every class named below is in the design system. Look them up in
+   gallery.html rather than inventing a new one: a wrapper this system has not
+   met is the one thing that reliably breaks the desktop layout (see the
+   label-column note at the foot of this file).
+   ========================================================================== */
+
+const S = { view: 'home', nav: false };
+
+/* ---------------------------------------------------------------- the pages */
+const V = {};
+
+V.home = () => `
+  <div class="ph">
+    <span class="eyebrow">Cohort 41</span>
+    <h1>Good morning, Maryam</h1>
+    <p class="lead">This is a page header. One per page, and it carries the
+      only h1. Everything under it is a section.</p>
+  </div>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Where you are</h2></div>
+    <!-- FOUR CELLS. ".stats" is a FIXED grid — 2 columns on a phone, 4 from
+         700px — and its hairlines ARE the 1px gap, with the rule colour
+         showing through from the container's own background. Because the
+         column count is fixed, an incomplete row cannot collapse: it paints
+         grey. Four fills both tiers (4 across, or 2 + 2). Three is the one
+         to avoid — the last cell spans the row
+         (".stats > .stat:last-child:nth-child(odd)") and the two slots beside
+         the first pair stay grey. -->
+    <div class="stats">
+      <div class="stat"><span class="v">13<small>/13</small></span><span class="k">Chapters</span></div>
+      <div class="stat"><span class="v">92<small>%</small></span><span class="k">Average</span></div>
+      <div class="stat"><span class="v">Day 47</span><span class="k">Of ninety</span></div>
+      <div class="stat"><span class="v">12<small>/13</small></span><span class="k">Calls</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>This week</h2></div>
+    <div class="tile-stack">
+      ${row('book', 'Week 6', 'Coaching conversations', 'Four chapters, 45 minutes', 'course')}
+      ${row('chart', '', 'Your assessment', 'Average 92% across thirteen', 'report')}
+      ${row('calendar', '', 'Live call', 'Thursday, 6:30 PM', 'course')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>A note</b>A left
+      rule and a tinted ground. Never a filled box with a radius.</div></div>
+    <div class="mt5"><button class="btn btn-p" data-go="course">Open this week
+      ${I.arrowRight}</button></div>
+  </section>`;
+
+V.course = () => `
+  <div class="ph">
+    <!-- NO BREADCRUMB. ".app .crumb{display:none}" (§12) — deliberately, and
+         it is worth knowing why before you reach for one: no module is a child
+         of another, they are siblings in the rail, and the rail already shows
+         which one you are on. A trail with one hop above it is a row of chrome
+         asserting a hierarchy the product does not have. The component is
+         still in the system if a genuinely nested page ever needs it. -->
+    <div class="ph-top">
+      <button class="ph-back" data-go="home" aria-label="Back">${I.arrowLeft}</button>
+    </div>
+    <h1>Coaching conversations</h1>
+    <p class="lead">A second page, to show that navigation is one attribute.</p>
+  </div>
+
+  <section class="sec">
+    <div class="sec-h"><h2>The chapter</h2></div>
+    <!-- AN EVEN COUNT. Same construction as ".stats": the hairlines are the
+         1px gap over the rule colour. ".facts" columns are "auto-fit", so an
+         even count collapses the spare tracks and fills the width — but an
+         ODD count makes the last cell span the row
+         (".facts > div:last-child:nth-child(odd)"), which stops the collapse
+         and leaves the row above it painting grey. -->
+    <div class="facts">
+      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
+      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
+      <div><span class="l">Due</span><span class="v">Thursday</span></div>
+      <div><span class="l">Attempts</span><span class="v">1 of 2</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your progress</h2></div>
+    <div class="prog">
+      <div class="prog-top">
+        <div><div class="prog-pct">72<small>%</small></div>
+          <div class="prog-l">of the course done</div></div>
+        <div class="prog-day"><div class="prog-dn">Day 47</div>
+          <div class="prog-l">of 90</div></div>
+      </div>
+      <div class="prog-seg">${Array.from({length: 13}, (_, i) =>
+        `<i class="${i < 9 ? 'done' : i === 9 ? 'now' : ''}"></i>`).join('')}</div>
+    </div>
+  </section>`;
+
+V.report = () => `
+  <div class="ph">
+    <div class="ph-top">
+      <button class="ph-back" data-go="home" aria-label="Back">${I.arrowLeft}</button>
+    </div>
+    <h1>Your assessment</h1>
+  </div>
+
+  <section class="sec">
+    <div class="sec-h"><h2>By chapter</h2></div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th>Chapter</th><th class="num">Score</th><th class="num">Attempts</th><th>Finished</th></tr>
+        <tr><td>Coaching conversations</td><td class="num">94%</td><td class="num">1</td><td>18 Aug</td></tr>
+        <tr><td>Difficult feedback</td><td class="num">88%</td><td class="num">2</td><td>11 Aug</td></tr>
+        <tr><td>Delegation</td><td class="num">92%</td><td class="num">1</td><td>4 Aug</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Held about you</h2></div>
+    <div>
+      <div class="kv"><span class="k">Chapters finished</span><span class="v n">13 of 13</span></div>
+      <div class="kv"><span class="k">Live calls attended</span><span class="v n">12 of 13</span></div>
+      <div class="kv"><span class="k">Assessment average</span><span class="v n">92%</span></div>
+    </div>
+  </section>`;
+
+/* ------------------------------------------------------------- the rail ---- */
+/* Icon names come from the design system's set — `Object.keys(IP)` lists all
+   75, and gallery.html draws them. */
+const NAV = [
+  {view: 'home',   icon: 'dashboard', label: 'Home'},
+  {view: 'course', icon: 'book',      label: 'Coursework'},
+  {view: 'report', icon: 'chart',     label: 'Assessment'},
+];
+
+/* ------------------------------------------------------------ a component -- */
+/* One row, the design system's navigation row. `.clk` is what makes it a
+   target; the trailing `.tile-arrow` is this product's GO. */
+function row(icon, eyebrow, title, sub, go){
+  return `<button class="tile clk gcard" data-go="${go}">
+    <span class="cardrow-ic">${I[icon]}</span>
+    <span class="gcard-b">
+      ${eyebrow ? `<span class="eyebrow">${eyebrow}</span>` : ''}
+      <h3>${title}</h3><span class="sub">${sub}</span>
+    </span>
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
+}
+
+/* -------------------------------------------------------------- the render - */
+/* THE WHOLE FRAME IS REPRINTED EVERY TIME, which is the portal's model too.
+   It means no component may keep state in the DOM — a class a click handler
+   adds is gone on the next render — so anything interactive has to be a pure
+   function of `S`. That constraint is what keeps a growing prototype honest.
+
+   `data-rail` and `.on` are the persistent nav state; `data-enter` and
+   `data-open` are ONE-RENDER motion cues, and nothing about layout may read
+   them. */
+function render(){
+  const app = document.getElementById('app');
+
+  app.innerHTML = `
+    <header class="shell">
+      <button class="shell-act nav-t" data-toggle="nav" aria-label="Menu">
+        <span class="nav-t-mark">${TN_MARK}</span>
+        <span class="nav-t-menu">${I.menu}</span>
+      </button>
+      <a class="shell-logo" data-go="home">${TN_MARK}<b>TalentNext</b></a>
+      <div class="shell-right">
+        <span class="shell-name">Maryam Naz</span>
+        <button class="shell-act" aria-label="Notifications">
+          ${I.notification}<span class="shell-badge">2</span></button>
+        <span class="av sm shell-avatar">MN</span>
+      </div>
+    </header>
+
+    <div class="shell-body">
+      <nav class="sidenav${S.nav ? ' on' : ''}">
+        <div class="sn-main">
+          ${NAV.map(n => `<a class="sn-item${n.view === S.view ? ' on' : ''}"
+             data-go="${n.view}">${I[n.icon]}<span>${n.label}</span></a>`).join('')}
+        </div>
+      </nav>
+      <div class="scrim${S.nav ? ' on' : ''}" data-toggle="nav"></div>
+      <main class="main">
+        <div class="page">${(V[S.view] || V.home)()}</div>
+      </main>
+    </div>`;
+
+  app.setAttribute('data-view', S.view);
+  app.setAttribute('data-rail', S.nav ? 'open' : 'shut');
+  dsStagger(app.querySelector('.page'));
+  dsEnter(app);
+}
+
+/* ------------------------------------------------------------- navigation -- */
+/* One delegated listener on a container that outlives the render, because
+   `app.innerHTML = …` throws away every element a handler was bound to.
+   `data-go` is a plain view name and `data-toggle` is a flag — no colons to
+   split, no branching in the router. */
+document.getElementById('host').addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-toggle]');
+  if(!t) return;
+  if(t.dataset.toggle === 'nav'){ S.nav = !S.nav; return render(); }
+  if(t.dataset.go){
+    S.view = t.dataset.go;
+    S.nav = false;                 /* picking a module shuts the rail */
+    render();
+    document.querySelector('.main').scrollTop = 0;
+  }
+});
+
+render();
+
+/* ==========================================================================
+   THE ONE THING TO KNOW BEFORE YOU ADD A PAGE
+
+   At 900px and up, a `.sec` that has a `.sec-h` splits into a 184px label
+   column and a content column. That is the system's desktop reading pattern
+   and you get it for free — but it is keyed on WHAT THE SECTION CONTAINS.
+   A section holding `.stats`, `.facts`, `.tbl-wrap`, `.cardrow`, `.gcard` or
+   `.tile-stack` opts out automatically, because those components are sized
+   against the full column width.
+
+   Invent a wrapper of your own — `<div class="my-list">` — and the heading
+   keeps its 184px column while your content is laid out against a width that
+   is 184px narrower than it expects. The two collide.
+
+   So: build sections out of those six, and the spine is free. If you genuinely
+   need a new wrapper, restate the opt-out INSIDE the same container query,
+   because a container query is its own cascade tier and cannot be beaten from
+   outside one:
+
+       @container app (min-width:900px){
+         .sec:has(> .my-list){display:block;
+           padding-left:var(--pad-x);padding-right:var(--pad-x)}
+         .sec:has(> .my-list) > .sec-h{
+           border-right:0;min-height:0;margin-bottom:var(--s05);padding:0}
+       }
+
+   And keep `.sec-h` headings to three words. 184px is two lines.
+   ========================================================================== */
+</script>
+</body>
+</html>

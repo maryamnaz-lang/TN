@@ -175,7 +175,11 @@ V.leadCohorts = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Cohorts')}
-  ${ph('Cohorts','Three cohorts, twenty-eight candidates, and the weekly call for each of them.')}
+  ${''/* Tal's summary opened with "Three cohorts, 28 candidates" — this
+        line with the numbers spelt instead of set, which also meant the page
+        showed the same count in two notations. The spine keeps the figures in
+        one notation and Tal keeps the finding. */}
+  ${ph('Cohorts',`${LEAD_COHORTS.length} cohorts &middot; ${lmembers().length} candidates &middot; all Explorer`)}
   <div class="sec">
     <div class="stats">
       ${statCell(I.group,  'Cohorts',   LEAD_COHORTS.length, `${lmembers().length} candidates`)}
@@ -203,7 +207,7 @@ V.leadCohorts = () => {
     <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
   </div>
   <div class="sec tint">
-    <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of ninety, evenly spread</span></div>
+    <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of 90, evenly spread</span></div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl">
         <tr><th>Cohort</th><th>Week</th><th class="num">Progress</th><th class="num">Assessment</th>
@@ -226,7 +230,7 @@ V.leadCohorts = () => {
     </div>
     ${/* THE PACE FOOTNOTE IS GONE. Two sentences: one defining "expected
           pace", which the heading's own helper line already defines — "day of
-          ninety, evenly spread" — and one naming the worst cohort, which the
+          90, evenly spread" — and one naming the worst cohort, which the
           Tal card at the top of this page states in the same words and the
           PROGRESS column shows on the row it belongs to. Three copies of one
           fact, the quietest of them last. */''}
@@ -311,7 +315,7 @@ V.leadCohort = () => {
     </div>
   </div>
   <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Attempts</b>How many times a candidate went back through the same content. Above 2.0 alongside an assessment average under 75% is the clearest struggle signal the course platform can give you &mdash; it says the material is landing badly rather than that the effort is missing.</div></div>
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Attempts</b>How many times a candidate went back through the same content. Above 2.0 with assessments under 75% is the clearest struggle signal this data can give you.</div></div>
     <div class="btn-set mt5">
       <button class="btn btn-g" data-go="leadMessages">Post to the cohort board ${I.chat}</button>
       <button class="btn btn-t" data-go="leadReports">Course reports ${I.chart}</button>
@@ -352,22 +356,32 @@ V.leadCohort = () => {
    Which is better anyway: "Yuki has never signed in" is the finding, and a
    summary whose first six words are the finding is one a leader can act on
    without reading the rest.
+
+   AND IT IS TWO SENTENCES, WHICH IT WAS NOT. Every branch below used to run
+   to three, 40 to 55 words, and the third was always the same kind of thing:
+   the reasoning read back out. "They are moving slowly, Yuki has not started,
+   and a cohort place is being held open. Cohort 41 is on day 34 of 90." —
+   two clauses of argument and a fact the page header states. On the longest
+   branch that was 55 words in the block a leader reads first on a page whose
+   whole job is to be scanned. The finding stays first, the action follows it
+   in the same breath, and the working-out is gone. Which is also the rule the
+   rest of `PAGESUM` now holds to: 18 to 28 words, two sentences, no framing.
    ========================================================================== */
 function ldrRead(m,c){
   const d = m.pc - lpace(c);
   const first = m.name.split(' ')[0];
   const done = lchDone(m);
   if(m.last === 'Never')
-    return `${first} has never signed in &mdash; no chapter opened, no assessment, no time on the course at all. This is the one to act on before any of the behind-pace names: they are moving slowly, ${first} has not started, and a cohort place is being held open. ${lname(c)} is on day ${c.day} of 90.`;
+    return `${first} has never signed in &mdash; no chapter opened, no assessment, no time on the course at all. Act on this before any of the behind-pace names: a cohort place is being held open.`;
   if(lidle(m) >= 7)
-    return `${first} stopped ${lidle(m)} days ago at ${m.pc}% &mdash; ${done} of 13 chapters, then nothing. Someone who stops mid-course rarely restarts without being asked directly, and week ${c.week} is early enough that ${done} chapter${done === 1 ? '' : 's'} is still recoverable. Worth a message rather than a mention on the call.`;
+    return `${first} stopped ${lidle(m)} days ago at ${m.pc}% &mdash; ${done} of 13 chapters, then nothing. Worth a direct message rather than a mention on the call; people who stop mid-course rarely restart unasked.`;
   if(m.att >= 2.0 && m.avg < 75)
-    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. High effort with a low result means the material is landing badly rather than the effort being missing &mdash; and it is the one pattern that gets worse if you push harder instead of slower.`;
+    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. The material is landing badly rather than the effort being missing &mdash; this is the pattern that gets worse if you push harder.`;
   if(d <= -15)
-    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments are holding up at ${m.avg}%, so this is time rather than comprehension &mdash; direct outreach before the next call tends to work while the gap is still this size.`;
+    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments hold up at ${m.avg}%, so this is time rather than comprehension &mdash; worth direct outreach before the next call.`;
   if(d <= -5)
-    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own; watching it rather than intervening keeps the intervention available for when it is needed.`;
-  return `Nothing alarming in ${first}&rsquo;s numbers &mdash; ${m.pc}% against ${lpace(c)}% expected and assessments at ${m.avg}%. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some chapters, which at this score is thoroughness rather than struggle.'} ${done} of 13 chapters done in ${lname(c).toLowerCase()}.`;
+    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own &mdash; worth watching rather than intervening.`;
+  return `Nothing alarming in ${first}&rsquo;s numbers &mdash; ${m.pc}% against ${lpace(c)}% expected, assessments at ${m.avg}%, ${done} of 13 chapters. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some, which at this score is thoroughness.'}`;
 }
 
 /* ==========================================================================
@@ -519,7 +533,7 @@ V.leadMember = () => {
       </div>`).join('')}
     </div>` : `<div class="empty" style="border:0">${I.edit}
       <h3>No notes yet</h3>
-      <p>What you write here is private to you, and it is what the 90-day summary is drafted from at the end of the ninety days.</p>
+      <p>What you write here is private to you, and it is what the 90-day summary is drafted from at the end of the 90 days.</p>
     </div>`}
     <div class="btn-set mt5">
       <button class="btn btn-g" data-ldrnote="${m.name}">Add a note ${I.add}</button>
@@ -572,7 +586,11 @@ V.leadReports = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Course Reports')}
-  ${ph('Course Reports','What the course platform sends back: chapters, assessment scores, attempts and attendance.')}
+  ${''/* Shortened, not dropped: WHERE this data comes from is the one fact
+        about this page that is not visible on it, and the `.note` below makes
+        the argument at length. Tal now opens on the finding instead of on a
+        description of the sort order. */}
+  ${ph('Course Reports','From the course platform &middot; chapters, scores, attempts, attendance')}
   <div class="sec sec-cs">
     <div class="cs">
       <button class="${sel === 'all' ? 'on' : ''}" data-ldrrep="all">All cohorts<span class="lf-n">${all.length}</span></button>
@@ -621,7 +639,7 @@ V.leadReports = () => {
     ${worst ? `<p class="t-helper-01 mt4">${worst.m.name} is furthest behind &mdash; ${worst.m.pc}% against ${lpace(worst.c)}% expected in ${lname(worst.c).toLowerCase()}.</p>` : ''}
   </div>
   <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>These are activity metrics, not quality</b>Chapters, scores, attempts and timing are everything the course platform can tell you. None of it says how well somebody is actually thinking &mdash; that is in their written answers, and it is what the weekly call is for.</div></div>
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Activity, not quality</b>Chapters, scores, attempts and timing are everything the course platform can tell you. None of it says how well somebody is thinking &mdash; that is in their written answers.</div></div>
   </div>
 </div></main>`;
 };
@@ -709,7 +727,7 @@ function ldrNoteSheet(){
       <div class="sheet-b">
         <div class="f"><label for="ldrNoteT">What you want to remember</label>
           <textarea class="inp" id="ldrNoteT" rows="4" placeholder="What you saw, what you asked them to try, what to check next."></textarea></div>
-        <p class="t-helper-01">Private to you. ${name ? name.split(' ')[0] : 'The candidate'} never sees it, and it is what the 90-day summary is drafted from at the end of the ninety days.</p>
+        <p class="t-helper-01">Private to you. ${name ? name.split(' ')[0] : 'The candidate'} never sees it, and it is what the 90-day summary is drafted from at the end of the 90 days.</p>
       </div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-ldrclose="note">Cancel</button>

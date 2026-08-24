@@ -16,7 +16,7 @@
 const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
 
 /* `portal` IS NOT A STAGE. Every other axis of this state object describes one
-   candidate moving through ninety days; `portal` describes WHICH PERSON is
+   candidate moving through 90 days; `portal` describes WHICH PERSON is
    signed in — the candidate, or the cohort leader who runs their calls. The two
    are separate accounts in the real product and a leader has no stage at all,
    so the stage picker and `portal` are deliberately independent: switching
@@ -49,7 +49,7 @@ const rungOf  = c => RUNG[c] || 2;
 ;
 /* THE BELL BELONGS TO WHOEVER IS SIGNED IN. A candidate's notifications are
    keyed by stage because everything that happens to them is a consequence of
-   where they are in the ninety days. A leader has no stage: what reaches them
+   where they are in the 90 days. A leader has no stage: what reaches them
    is other people's work arriving — an interview finished, a candidate going
    quiet — so their list is one list. `LEAD_NOTIF` is declared in lead.js,
    which is parsed after this file, hence the guard rather than a direct read. */
@@ -300,7 +300,7 @@ const SCENES = {
     ['Closing reflection',           'Summary of your own gaps',                    '41:03', '1:11']
   ],
   re: [
-    ['Finishing the reorganization', 'The same story, ninety days later',           '03:40', '2:22'],
+    ['Finishing the reorganization', 'The same story, 90 days later',           '03:40', '2:22'],
     ['The handover that held',       'You left it with Sam and it landed',          '09:18', '1:51'],
     ['A hard conversation',          'Where you said the difficult part first',     '16:05', '2:04'],
     ['Running the Thursday call',    'You took the group through your own example', '22:31', '1:39'],
@@ -1145,6 +1145,43 @@ const railRoots = () => {
 const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
   ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>`
   : to ? `<button class="ph-back" data-go="${to}" aria-label="Back">${I.arrowLeft}</button>` : '';
+/* ==========================================================================
+   `sub` IS FACTS, NOT A SENTENCE ABOUT THE PAGE — AND THAT IS A RULE NOW
+
+   Tal's summary sits about six millimetres under this line (ai6.js builds it
+   into the module head band), so these two are read as one block whether or
+   not they were written as one. For a long time nineteen of them were a
+   SENTENCE explaining the page, and the summary underneath explained the
+   same page again, in a second voice. Profile said "Your details, your
+   preferences, and what Tal is allowed to do" and Tal said "Your details,
+   how you want to be contacted, and what Tal is allowed to do." Cohort said
+   "Ten people at Explorer – E3, led by Priya Nair · week 5 of 13" and Tal
+   said "Ten of you at E3 with Priya leading, week 5 of 13". Interviews
+   managed it three times, because the plate below it carried the sentence as
+   well. That is not two components each doing its job badly; it is one job
+   done twice.
+
+   THE SPLIT, and it holds both ways:
+
+     `sub`  the page's factual spine, as a `&middot;` row — where this page
+            sits in the product and in time. "Explorer Track – E3 · Cohort 41
+            · week 5 of 13". Never a claim, never an explanation, no verb.
+     Tal    the reading — what moved, what is open, what is on you. Prose,
+            two sentences, and the only prose at the head of the page.
+
+   AND WHERE THERE IS NO SPINE, THERE IS NO `sub`. Profile, Payments, Points
+   before enrolment, What Tal knows, Practice — none of them has a location
+   or a date to state, and inventing a sentence to fill the slot is what
+   produced the duplication in the first place. `sub` is optional in the
+   template on purpose: the title stands alone over Tal's sentence, which is
+   the shape a person already reads everywhere else that a machine summarises
+   something. Adding a description to a page that has a Tal summary means
+   answering "what fact does this state that Tal does not" first.
+
+   The auth screens are the exception and stay prose: they have no Tal card —
+   `placePageSummary` bails on `.auth-card` — so there the description is the
+   only thing that can say what the screen wants.
+   ========================================================================== */
 function ph(title,sub,act,backTo){
   return `<div class="ph${act?' ph-has-act':''}">
     <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
@@ -1452,7 +1489,7 @@ V.dashboard = (f) => {
      half of the call block, which is what the wireframe was drawing.
      ============================================================ */
   if(S.stage==='consult') body = `
-    ${ph('Hi Maryam','Your next step, and everything decided so far.')}
+    ${ph('Hi Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
@@ -1521,12 +1558,12 @@ V.dashboard = (f) => {
         <div class="acc-i"><button class="acc-h"><span class="ttl">The interview sets your level</span><span class="chev">${I.chevDown}</span></button>
           <div class="acc-b"><p>Each title has five levels, E1 to E5. A talent agent talks to you for forty-five minutes, confirms the level and signs a report. A quiz cannot do this and the consultant call does not either.</p></div></div>
         <div class="acc-i"><button class="acc-h"><span class="ttl">Every 90 days you can move up</span><span class="chev">${I.chevDown}</span></button>
-          <div class="acc-b"><p>Your level opens the course built for it. Ninety days later you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
+          <div class="acc-b"><p>Your level opens the course built for it. 90 days later you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
       </div>
     </div>`;
 
   else if(S.stage==='new') body = `
-    ${ph('Welcome Back, Maryam!','Your next step, and everything decided so far.')}
+    ${ph('Welcome back, Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -1576,7 +1613,7 @@ V.dashboard = (f) => {
     </div>`;
 
   else if(S.stage==='booked') body = `
-    ${ph('Welcome Back, Maryam!','Interview in 6 days. Everything decided so far is below.')}
+    ${ph('Welcome back, Maryam','Explorer track &middot; interview 20 August &middot; no level yet')}
     <div class="sec">
       <div class="plate">
         <div class="plate-who">${avatar(AGENTS.priya,56)}
@@ -1622,7 +1659,7 @@ V.dashboard = (f) => {
     ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
-    ${ph('Welcome Back, Maryam!','Your level is confirmed. One step left before the 90 days start.')}
+    ${ph('Welcome back, Maryam','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
     <div class="sec">
       <div class="lvl-hero on-dark lvl-foot-card" style="margin:0">
         <div class="big">Explorer &ndash; E3</div>
@@ -1670,7 +1707,7 @@ V.dashboard = (f) => {
     </div>`;
 
   else if(f.complete) body = `
-    ${ph('Welcome Back, Maryam!','Cohort 41 is complete. You moved up a level.')}
+    ${ph('Welcome back, Maryam','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
     ${achBanner()}
     <div class="sec">
       <div class="lvl-hero" style="margin:0">
@@ -1694,7 +1731,7 @@ V.dashboard = (f) => {
           Both stages are the same moment — a level has just been confirmed
           and a course has not been started — so they were answering the same
           two questions, and only one of them was answering them. `assessed`
-          says what the ninety days hold and what the agent actually wrote;
+          says what the 90 days hold and what the agent actually wrote;
           `promoted` said neither, and went straight from the level to a
           points card. The two blocks below are that page's, with the
           re-interview's report rather than the first one's. */}
@@ -1709,13 +1746,13 @@ V.dashboard = (f) => {
     </div>
     <div class="sec">
       <div class="sec-h"><h2>What the re-interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
-      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the ninety days you had just finished.</p>
+      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the 90 days you had just finished.</p>
       ${signedSummary(true, true)}
     </div>
     ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
           The weekly-minutes chart lived here — thirteen stacked bars of how
           long you spent, week by week, on a course that is over. That is a
-          chart you read WHILE you are behind on it; once the ninety days are
+          chart you read WHILE you are behind on it; once the 90 days are
           closed the only questions left are what you finished, how well, and
           what it earned, and all four of those are one number each. The
           chart is still on Course Progress, which is where the week-by-week
@@ -1757,7 +1794,7 @@ V.dashboard = (f) => {
     /* THE ONE REQUIRED ACTION GOES ABOVE THE READING.
        On day 90 the re-interview is the only thing on this page that has a
        deadline: everything else — where you stand, the progress strip, the
-       weekly chart — is a record of ninety days that are already over. It
+       weekly chart — is a record of 90 days that are already over. It
        sat at the FOOT of that record, four blocks and a chart below the
        fold, which is the one place a due action cannot be. It sits directly
        under the achievement band instead, so the top of the page reads:
@@ -1771,11 +1808,11 @@ V.dashboard = (f) => {
       <div class="plate">
         <div class="plate-eb">Due now</div>
         <div class="plate-t">Book your re-interview</div>
-        <div class="plate-b">Your ninety days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.</div>
+        <div class="plate-b">Your 90 days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.</div>
         <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
       </div></div>`:'';
     body = `
-    ${ph('Welcome Back, Maryam!', f.finished?'Explorer Track &ndash; E3 · Cohort 41 · ninety days complete':`Explorer Track &ndash; E3 · Cohort 41 · week ${f.week} of 13`)}
+    ${ph('Welcome back, Maryam', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; 90 days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
     ${achBanner()}
     ${reBook}
     <div class="sec">
@@ -1783,7 +1820,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>${stalling?'Where you are stuck':dueRe?'Before your re-interview':'Getting started'}</h3></div>
         <div class="ai-body"><p>${stalling
           ?'You have opened chapter 4 four times without finishing it, and it is the growth area in your report. Worth the extra time.'
-          :dueRe?'All thirteen chapters are done and your average is 87%. Book the re-interview and Priya will assess the ninety days against your summary.'
+          :dueRe?'All thirteen chapters are done and your average is 87%. Book the re-interview and Priya will assess the 90 days against your summary.'
           :'Chapter 1 unlocks today and your first call is Thursday. Nothing is assessed this week.'}</p></div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
@@ -1855,7 +1892,7 @@ V.dashboard = (f) => {
           (§ai6's rewards summary says so in as many words), and it is the
           one block here a person reads out of interest rather than need. So
           it closes the page instead of interrupting it, under the record of
-          the ninety days that earned the number. */}
+          the 90 days that earned the number. */}
   ${g?`<div class="sec">
     <div class="sec-h"><h2>Where you stand</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View more</button></div>
     ${standRow(g)}
@@ -1869,7 +1906,13 @@ V.level = (f) => {
   const confirmed = !f.pred;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'My Level')}
-  ${ph('My Level', confirmed?'Your level, what it is based on, and how you move up.':'Your track, and how your level gets set.')}
+  ${''/* NO DESCRIPTION. The old pair named the page's three sections, which
+        is the caption failure ai6's note opens with — and a `&middot;` spine
+        of track and position, which is what replaced them first, turned out
+        to be two thirds of Tal's own first sentence. This page's spine is
+        DRAWN: the fifteen-rung ladder below is the position, and Tal says
+        which rung and what moves it. See the note over `ph()`. */}
+  ${ph('My Level')}
   <div class="lvl-hero">
     <div class="eb">${confirmed?(f.complete?'Promoted November 21 · signed by Priya Nair':'Confirmed August 21 · signed by Priya Nair'):'Your track, from the quiz'}</div>
     <div class="big">${confirmed?lvlName(f.level):f.track}</div>
@@ -1915,7 +1958,7 @@ V.level = (f) => {
       <div class="acc-i"><button class="acc-h"><span class="ttl">The three tracks</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>Explorer (E1&ndash;E5), Builder (B1&ndash;B5), Trailblazer (T1&ndash;T5). Fifteen levels in one line. You do not jump tracks, you move up one level at a time.</p></div></div>
       <div class="acc-i"><button class="acc-h"><span class="ttl">Moving up</span><span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b"><p>Every course is 90 days. Once the ninety days are up you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
+        <div class="acc-b"><p>Every course is 90 days. Once the 90 days are up you re-interview, and you move up a level, hold where you are, or drop back one.</p></div></div>
       <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
     </div>
@@ -2022,7 +2065,7 @@ V.report = (f) => `<main class="main"><div class="page">
 
    THE TWO STAGES THAT HAVE SOMETHING DUE are the two ends of the arc: no
    interview yet (`pred`, and not already booked), where the level interview
-   is the way in; and ninety days done (`reinterview`), where the re-interview
+   is the way in; and 90 days done (`reinterview`), where the re-interview
    is. Everything between them has a level and a report, and the way to book
    another conversation from those stages is Tal — "Book an interview with a
    top agent" is in the ask bar on every one of them.
@@ -2034,17 +2077,19 @@ V.interviews = (f) => {
   const due = dueRe || dueFirst;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Interviews')}
-  ${ph('Interviews', f.complete?'Your interview history, and the re-interview that set your current level.'
-    : dueRe?'Your ninety days are complete. Book a re-interview to have them assessed, and whoever you pick reads your summary first.'
-    : booked?'Your booked interview, and what happens after it.'
-    : 'A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.')}
+  ${''/* THE SPINE, NOT THE SENTENCE — see the note over `ph()`. All four of
+        these were descriptions of the page, and the last one was the plate's
+        own paragraph forty pixels below said in different words. What is
+        left states where the candidate is in the one sequence this module is
+        about, and Tal's summary does the counting. */}
+  ${ph('Interviews','45 minutes, by video &middot; recorded &middot; sets your level')}
   ${due?`
   <div class="sec">
     <div class="plate">
       <div class="plate-eb">${dueRe?'Due now':'Next step'}</div>
       <div class="plate-t">${dueRe?'Book your re-interview':'Book your level interview'}</div>
       <div class="plate-b">${dueRe
-        ?'Your ninety days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.'
+        ?'Your 90 days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.'
         :'Forty-five minutes by video with the agent you pick. It sets the level you enroll at, and the report is yours to keep.'}</div>
       <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
     </div>
@@ -2141,7 +2186,7 @@ V.interviews = (f) => {
 
 V.agents = (f) => `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],'All agents')}
-  ${ph(f.reinterview?'Choose an agent for your re-interview':'Choose an agent','A 45-minute conversation with a talent agent. It sets your level and gives you a report that is yours to keep.')}
+  ${ph(f.reinterview?'Choose an agent for your re-interview':'Choose an agent','3 agents at your level &middot; 45 minutes, by video &middot; recorded')}
 
   <div class="sec" style="padding-bottom:var(--s05)">
     <div class="ai-aura tile">
@@ -2194,7 +2239,13 @@ V.agent = (f) => {
         presence of a `.ph`, so with one here Tal's summary lands in the band
         against the title, the way it does on every other page, instead of
         being built as a loose card in the body. */}
-  ${ph('Book ' + a.n, 'Everything about this agent, and the times they have open.', null, 'agents')}
+  ${''/* NO DESCRIPTION. Tal's summary on this page IS the agent's figures —
+        band, interviews run, rating, price, next slot — so a `&middot;` row
+        of the same numbers would be the duplication the note over `ph()` is
+        about, and "Everything about this agent, and the times they have
+        open" was a caption for the page. The title names the person and Tal
+        states the facts. */}
+  ${ph('Book ' + a.n, null, null, 'agents')}
   <div class="sec" style="padding-top:var(--s05)">
     <div class="agid">
       ${avatar(a,96)}
@@ -2272,7 +2323,12 @@ V.agent = (f) => {
 V.booking = (f) => {
   const a = AGENTS[S.agent||'priya'];
   return `<main class="main"><div class="page">
-  ${ph('Booking Details','Your interview is confirmed. Everything about it is on this page.', null, 'interviews')}
+  ${''/* "Everything about it is on this page" is the page describing itself,
+        and the `.note` directly below already announced the booking, and Tal
+        above it announced the booking a third time. The note is the one that
+        keeps it — it is the confirmation banner — so the title carries the
+        rest. */}
+  ${ph('Booking Details', null, null, 'interviews')}
   <div class="sec" style="padding-top:var(--s06)">
     <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${a.n}. A calendar invite and joining link are in your email.</div></div>
   </div>
@@ -2301,7 +2357,12 @@ V.enrol = (f) => {
   ${crumb(['Dashboard','dashboard'],next?'Next course':'Enroll')}
   <div class="ph">
     <div class="ph-top">${bk()}<h1>Explorer Track &ndash; ${lvl}</h1></div>
-    <p>90 days, 13 chapters, and a cohort of ten with a live cohort leader.</p>
+    ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
+          days, 13 chapters and a cohort of ten with a live leader" — this
+          line with two commas moved. The facts stay here where a description
+          belongs and Tal keeps the commitment, which is the money and the
+          hours. See the note over `ph()`. */}
+    <p>90 days &middot; 13 chapters &middot; a cohort of ten with a live leader</p>
   </div>
   <div class="sec">
     <div class="ai-aura tile tight">
@@ -2319,7 +2380,7 @@ V.enrol = (f) => {
     </div>
   </div>
   <div class="sec">
-    <div class="note"><span>${I.group}</span><div class="nb"><b>Your cohort is assigned for you</b>You join a group of up to ten people at your level, led by a cohort leader. Your cohort and its weekly call time appear on your dashboard as soon as you enroll.</div></div>
+    <div class="note"><span>${I.group}</span><div class="nb"><b>Your cohort is assigned for you</b>You join up to ten people at your level, led by a volunteer cohort leader, with one live call a week.</div></div>
   </div>
   <div class="sec">
     <div class="tile">
@@ -2342,7 +2403,10 @@ V.enrol = (f) => {
 
 V.payment = (f) => `<main class="main"><div class="page">
   ${crumb(['Enroll','enrol'],'Payment')}
-  ${ph('Payment','Explorer Track &ndash; E3 · 90 days · your cohort starts within two weeks.')}
+  ${''/* The last clause was a sentence spliced onto a `&middot;` row, and Tal
+        below said it as one — "your cohort is assigned as soon as it clears".
+        A spine states, it does not promise. */}
+  ${ph('Payment','Explorer Track &ndash; E3 &middot; 90 days &middot; 13 chapters')}
   <div class="sec">
     <div class="f"><label for="cn">Card number</label><input class="inp" id="cn" inputmode="numeric" placeholder="1234 5678 9012 3456"></div>
     <div class="f"><label for="cnm">Name on card</label><input class="inp" id="cnm" placeholder="Maryam Naz"></div>
@@ -2487,14 +2551,25 @@ PARKED.chapter = (f) => {
 
 V.rewards = (f) => {
   const g = GAME[S.stage];
-  if(!g) return `<main class="main"><div class="page">${ph('Points','Points start once you enroll on a course.')}
+  /* NO DESCRIPTION BEFORE ENROLMENT. It said "Points start once you enroll
+     on a course" and Tal, directly below, opened with "Points start when you
+     enroll" — the same clause twice with a synonym between them. There is no
+     spine to state on a page that has no points on it yet, and the empty
+     state below says the rest. */
+  if(!g) return `<main class="main"><div class="page">${ph('Points')}
     <div class="sec"><div class="empty" style="padding:0 0 var(--s07)">${I.trophy}<h3 style="margin-top:var(--s06)">Nothing to show yet</h3>
       <p>Points, badges and rank begin when your cohort starts.</p></div></div></div></main>`;
   const tab = S.rtab || 'points';
   const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`};
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Points')}
-  ${ph('Points','Points, badges and rank come from your activity across the course and the community.')}
+  ${''/* NO DESCRIPTION HERE EITHER. "Points, badges and rank come from your
+        activity across the course and the community" is the page's three
+        section names plus a claim, and Tal's summary states the three
+        figures. A `&middot;` spine of the same three would have made it
+        three statements of one thing on the one page in the product where
+        the numbers change nothing. */}
+  ${ph('Points')}
   ${/* THE QUESTION BELONGS AT THE TOP OF THE MODULE, NOT AT THE BOTTOM OF IT.
         This chip sat at the very foot of the last section, under the points
         table and the "updates within a few minutes" line — so the one thing
@@ -2543,7 +2618,7 @@ V.transcript = (f) => {
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Course Progress')}
-  ${ph('Course Progress', (f.complete||f.finished)?'Explorer Track &ndash; E3 · Cohort 41 · ninety days complete':`Explorer Track &ndash; E3 · Cohort 41 · day ${f.day} of 90`)}
+  ${ph('Course Progress', (f.complete||f.finished)?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; 90 days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; day ${f.day} of 90`)}
   <div class="sec">
     <div class="stats">
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
@@ -2557,7 +2632,7 @@ V.transcript = (f) => {
         said, in three places at once, that nothing in it was final: a heading
         reading "in progress", a "Not signed yet" warning tag, and a paragraph
         explaining that Priya signs it at the end. A candidate still inside
-        their ninety days is not waiting on this and cannot act on it — it is
+        their 90 days is not waiting on this and cannot act on it — it is
         the one block on the page that reports on a date rather than on them,
         and it sat second, above their own scores.
 
@@ -2587,7 +2662,7 @@ V.transcript = (f) => {
         the block you are looking at and whose behaviour was a navigation to
         another module, which since the LightspeedVT frame landed means the
         list it promised is not even there to see. This is the record of the
-        ninety days and the record is what the page is; the remaining eight
+        90 days and the record is what the page is; the remaining eight
         rows belong under the five already on it.
 
         `S.chAll` is the whole of the state, read here and toggled by the
@@ -2620,7 +2695,12 @@ V.transcript = (f) => {
 
 V.cohort = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Cohort 41')}
-  ${ph('Cohort 41',`Ten people at Explorer &ndash; E3, led by Priya Nair &middot; week ${f.week} of 13`)}
+  ${''/* THIS ONE WAS THE DUPLICATION AT ITS PLAINEST — Tal's summary used to
+        open "Ten of you at E3 with Priya leading, week 5 of 13", which is
+        this line with the pronouns changed. The description keeps the facts
+        because that is what a `&middot;` row is for; Tal now carries the
+        call, which is the thing on this page with a date on it. */}
+  ${ph('Cohort 41',`Ten people at Explorer &ndash; E3 &middot; led by Priya Nair &middot; week ${f.week} of 13`)}
   ${/* THE FOURTH CALL IS THE SAME CARD AS THE OTHER THREE.
         This drew `.callband` — an orange date tile, the detail beside it, one
         button at the right — and it was the only appointment in the product
@@ -2748,7 +2828,11 @@ V.billing = (f) => {
   rows.push(['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210']);
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Payments')}
-  ${ph('Payments','One-off payments only. Nothing here recurs.')}
+  ${''/* "One-off payments only. Nothing here recurs." is two statements of
+        one fact, and Tal's summary closes on the same one. Tal keeps it,
+        because on this page it is the answer to the question the page
+        raises; there is no spine to state above it. */}
+  ${ph('Payments')}
   <div class="sec pay-sec">
     <div class="paytbl">
       <div class="payrow payhead">
@@ -2899,7 +2983,13 @@ function standSec(){
 }
 V.account = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Profile')}
-  ${ph('Profile','Your details, your preferences, and what Tal is allowed to do.')}
+  ${''/* THE VERBATIM ONE. This said "Your details, your preferences, and what
+        Tal is allowed to do" and Tal's summary said "Your details, how you
+        want to be contacted, and what Tal is allowed to do" — the same three
+        nouns, in the same order, twice, six millimetres apart. Both were
+        naming the page's sections, which the section headings do. Tal's is
+        rewritten to point at the permissions and this one is gone. */}
+  ${ph('Profile')}
   <div class="sec">
     <div class="idhead">
       <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
@@ -2937,7 +3027,7 @@ V.account = (f) => `<main class="main"><div class="page">
     <div class="lead-b">
       <div class="lead-eb">Give back &amp; grow</div>
       <div class="lead-t">Become a cohort leader</div>
-      <div class="lead-x">Volunteer to guide a cohort through the ninety days. It is unpaid &mdash; what you get back is a recognised cohort-leader certification, and the growth that comes from teaching what you have already learned. You can only lead cohorts at a level below your own, so you are always a step ahead of the people you are mentoring.</div>
+      <div class="lead-x">Volunteer to guide a cohort through the 90 days. It is unpaid &mdash; what you get back is a recognised cohort-leader certification, and the growth that comes from teaching what you have already learned. You can only lead cohorts at a level below your own, so you are always a step ahead of the people you are mentoring.</div>
       <div class="lead-tags"><span>Volunteer role</span><span>Earns a certification</span><span>Teaches below ${lvlName(f.level)}</span></div>
       <div class="lead-a">${S.ledApplied
         ? `<button class="btn btn-p btn-sm noic" disabled>Request sent ${I.checkFilled}</button>`
@@ -3671,7 +3761,7 @@ function boardList(){
    goes in. Same card, one extra line where there is room for it.
 
    AND `re` IS THE RE-INTERVIEW'S. Same card, the other interview: after the
-   ninety days Priya writes a second report, and on the `promoted` dashboard
+   90 days Priya writes a second report, and on the `promoted` dashboard
    that is the one the reader has just been given. The two must not be mixed
    up — the August report argued E3 off a reorganization the candidate had
    just started, the November one is written off thirteen finished chapters —
@@ -3685,7 +3775,7 @@ function signedSummary(withNote, re){
       <div class="ai-body">
         <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
         <p>${re
-          ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the ninety days, each with a name and a date on it.'
+          ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the 90 days, each with a name and a date on it.'
           :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
         <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
         <p>${re
@@ -3797,7 +3887,7 @@ function render(){
   } else {
     /* THE FALLBACK HAS TO KNOW WHICH PORTAL IT IS FALLING BACK INTO. `V.dashboard`
        is the candidate's, and landing a leader on it after a bad deep link would
-       show them somebody else's ninety days behind their own rail.
+       show them somebody else's 90 days behind their own rail.
 
        AND IT HAS TO END SOMEWHERE THAT EXISTS. `V.leadDash` is registered by
        lead.js, which is parsed nine files after this one — so at the boot

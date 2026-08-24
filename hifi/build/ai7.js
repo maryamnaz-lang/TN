@@ -93,6 +93,9 @@ const bkShort = (r) => { r = r || bkRec(); const d = BK_DAYS[r.day] || BK_DAYS[B
   return `${d[0]}, ${BK_MONTH[1]} ${d[2]} · ${BK_SLOTS[r.slot] || BK_SLOTS[BK_SLOT0]} ET`; };
 const bkDate = (r) => { r = r || bkRec(); const d = BK_DAYS[r.day] || BK_DAYS[BK_DAY0];
   return `${d[0]}, ${BK_MONTH[1]} ${d[2]}`; };
+/* the weekday alone, spelt in full — for prose that has to name the day
+   without restating a date the reader is already looking at */
+const bkWeekday = (r) => { r = r || bkRec(); return (BK_DAYS[r.day] || BK_DAYS[BK_DAY0])[1]; };
 
 /* --------------------------------------------------------------------------
    2. THE WIDGETS
@@ -562,21 +565,31 @@ function bkStamp(){
    person's sentence. */
 PAGESUM.dashboard.booked = () => {
   const a = AGENTS[(S.booking || {}).agent || 'priya'];
-  const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
   /* TWO SENTENCES, IN AI6'S VOICE. These two overrides exist for the FACTS —
-     the agent and card actually chosen, rather than the hard-coded Priya and
-     Visa the stage was written around — and they have to read like the other
-     twenty-odd summaries or the one page you reached through the booking
-     flow is the one page written by somebody else. The rule they follow is
-     in the note over `PAGESUM` in ai6.js: say the thing and stop, no framing,
-     no closing line about what the page is for. */
-  return `You&rsquo;re booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded, ${a.price} already paid on a ${c.brand} ending ${c.last} &mdash; nothing to do before the day.`;
+     the agent actually chosen, rather than the hard-coded Priya the stage was
+     written around — and they have to read like the other twenty-odd
+     summaries or the one page you reached through the booking flow is the one
+     page written by somebody else. The rule they follow is in the note over
+     `PAGESUM` in ai6.js: say the thing and stop, no framing, no closing line
+     about what the page is for.
+
+     AND THE CARD IS NOT A FACT A SUMMARY NEEDS. Both of these named the
+     brand and last four — "$95 already paid on a Visa ending 4242" — which
+     is a receipt line, not a catch-up: the instrument matters when you are
+     choosing it or checking a charge, and both of those have their own page.
+     It also contradicted `PAGESUM.billing`, which said no card was kept on
+     file. Paid is the fact; what it was paid with is on Payments. */
+  return `Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
 };
-PAGESUM.booking = () => {
-  const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
-  const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `Booked &mdash; ${a.n}, ${bkLong()}, ${a.price} on a ${c.brand} ending ${c.last}. The invite and joining link are already in your email, and you can move it from here.`;
-};
+/* AND THIS PAGE IS THE ONE PLACE TAL DOES NOT STATE THE BOOKING.
+   The confirmation banner is the first thing under the title and it already
+   says the agent, the day and the time, and that the invite is in the email
+   — so restating any of it here is the duplication ai6's note is about, just
+   with a `.note` in the middle instead of a page description. What Tal is
+   left with is the part the banner cannot answer, which is what happens
+   next. "and you can move it from here" went too: that was a caption for the
+   two buttons directly below. */
+PAGESUM.booking = () => `Nothing to prepare and nothing to bring &mdash; ${bkWeekday()} is a conversation, not a test. It is recorded, and your report follows within 48 hours.`;
 
 const _bkSum = pageSummary;
 pageSummary = function(){
