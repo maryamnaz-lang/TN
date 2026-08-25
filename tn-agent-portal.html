@@ -154,7 +154,7 @@
      `.ai-aura`   Tal's band. Every page's summary, and Tal's report draft.
      `.plate`     the black hero: the next interview, the calibration slot.
                   Its CTA is a plain `.btn.btn-p` and comes out ORANGE.
-     `.wkc`+`.ring` the four training modules, drawn the way the candidate's
+     `.wkc`+`.ring` the four training lessons, drawn the way the candidate's
                   chapters are drawn.
      `.lvl-hero`  the agent's level. `.cert` for the certificate.
 
@@ -262,8 +262,8 @@ const A = {
    how you got here and the reader is entitled to see it.
    -------------------------------------------------------------------------- */
 const STAGES = [
-  ['setup',    'Approved, setting up',  'Stage 2. Approved 12 June, and the agent role is on the account Owen already had. Listing, fee and payout destination are what is left.'],
-  ['training', 'Training',              'Stage 3. Listing and money are done. Three of four modules are finished and the calibration interview is the last thing before the certification gate.'],
+  ['setup',    'Approved, setting up',  'Stage 2. Approved 12 June, and the agent role is on the account Owen already had. Your public profile, your fee and a payout destination are what is left.'],
+  ['training', 'Training',              'Stage 3. Your public profile and your money are done. Three of four lessons are finished and the calibration interview is the last thing before the certification gate.'],
   ['live',     'Listed, nothing booked','Stage 4, day one. Certified 20 June and visible in the marketplace since Monday. Six slots are open and no one has taken one yet.'],
   ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 in escrow. This is the portal as an agent actually uses it.'],
   ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review moved Owen to A3 and widened the range he may assess to E1 – B2.']
@@ -272,13 +272,13 @@ const STAGES = [
 /* Stage config. Anything absent falls back to `A`. */
 const CFG = {
   setup:    {nav:'setup', approved:true, ivs:0, month:0, rating:null, escrow:0, earned:0},
-  training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, mods:3,
+  training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, lessonsDone:3,
              ivs:0, month:0, rating:null, escrow:0, earned:0},
-  live:     {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+  live:     {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
              ivs:0, month:0, rating:null, escrow:0, earned:0},
-  working:  {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+  working:  {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
              busy:true},
-  reviewed: {nav:'full',  approved:true, listing:true, paid:true, mods:4, certified:true, listed:true,
+  reviewed: {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
              busy:true, reviewed:true,
              level:'A3', range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
              rank:9, follow:4.6, ivs:171, month:7}
@@ -299,6 +299,10 @@ const S = {stage:'working', view:'dashboard', nav:false, tal:false, notif:false,
               reads the same value to draw itself `.on` — one fact, two readers,
               which is what keeps them from disagreeing. */
            cal:0, slot:null,
+           /* `peek` is the public-profile preview docked on the right. A flag
+              rather than a name, because there is one thing to preview: how a
+              candidate sees this agent. */
+           peek:false,
            perms:{draft:true, brief:true, live:false}};
 
 const f = () => ({...A, ...CFG[S.stage]});
@@ -316,10 +320,10 @@ const f = () => ({...A, ...CFG[S.stage]});
    approval. A rail set no stage names is a set the render guard can never test.
    -------------------------------------------------------------------------- */
 const NAVSETS = {
-  setup: [['dashboard','Home','dashboard'], ['listing','Listing','view'],
+  setup: [['dashboard','Home','dashboard'],
           ['training','Training','book'], ['earnings','Earnings','wallet']],
   full:  [['dashboard','Home','dashboard'], ['interviews','Interviews','calendar'],
-          ['availability','Availability','time'], ['listing','Listing','view'],
+          ['availability','Availability','time'],
           ['earnings','Earnings','wallet'], ['standing','Standing','chart']]
 };
 
@@ -327,7 +331,7 @@ const NAVSETS = {
    `interviews` and must not un-mark it.
 
    AND TRAINING CHANGES PARENT WITH THE STAGE, because it changes job. While an
-   agent is being enabled it is a module they are working through and it has a
+   agent is being enabled it is the lessons they are working through and it has a
    rail item of its own; once they are certified it is the certificate and the
    date of the next re-check, which is reference material read twice a year —
    so it moves under Standing and the rail keeps the six things a working agent
@@ -431,9 +435,42 @@ const PAYMENTS = [
 const PHOTOS = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya,
                 tom: AV.samuel, nina: AV.hana};
 
-/* The four training modules, in the order they are taken. `f.mods` is how many
-   of them are finished, so this list and the ring cannot drift apart. */
-const MODULES = [
+/* THE FOUR TRAINING LESSONS, in the order they are taken.
+
+   THEY WERE "MODULES" AND THE WORD WAS DOING TWO JOBS. A module is what the
+   WIREFRAMES call a chapter of the candidate's LightspeedVT courseware — "90
+   days · 12 modules", "Modules done 6/13", read from the LSVT record. Using the
+   same word for an agent's pre-certification training meant one product had two
+   unrelated things called modules, on two portals, owned by two different
+   systems. It also read as courseware you dip into rather than a qualification
+   you finish: "3 of 4 modules" is a progress bar, and what this actually is, is
+   four lessons and a live assessed mock standing between an agent and their
+   first booking.
+
+   `LESSONS` and `lessonsDone` are named for the same reason the copy is — one
+   name for one thing, so the code and the screen cannot drift.
+ `f.lessonsDone` is how many
+   of them are finished, so this list, the ring and the row states cannot drift
+   apart — and `lessonsDone === 4` is the certification gate, which is what turns "not
+   yet bookable" into a listing in browse.
+
+   AND THE TITLES ARE INVENTED. Worth knowing before anyone quotes them to a
+   client: nothing outside this file names them. The flow diagram's Stage 3 is
+   "Enablement and go-live — step 7 plus a gate" and stops there; the wireframes,
+   the admin panel and the other prototypes have no agent curriculum in them at
+   all. What the WIREFRAMES call modules is a different thing with the same word
+   — the candidate's LightspeedVT courseware ("90 days · 12 modules", "Modules
+   done 6/13"), read from the LSVT record, which is chapters of a course somebody
+   else wrote.
+
+   So these four are a plausible curriculum standing in for one nobody has
+   specified: how the interview is structured, how to get past a rehearsed
+   answer, what evidence a level has to rest on, and how the report is written.
+   They are shaped from what the rest of the portal already asserts — the 45
+   minutes, Derek's three rubric lines, the 24-hour report window — so they are
+   at least consistent with it. They are not a decision. Replace them the day
+   there is real onboarding content, and only `LESSONS` changes. */
+const LESSONS = [
   ['How the interview runs', '45 minutes, and what each part is for'],
   ['Drawing out a story', 'Getting past the answer somebody rehearsed'],
   ['Evidence, not impression', 'What a level has to be able to point at'],
@@ -529,7 +566,7 @@ const nextCall = () => SLOTS.filter(s => s.iv)
    open slot visible, naming the third one while the first sits two rows above it
    was the dashboard disagreeing with the page it links to. `openSlots()[0]` is
    the soonest, which is also the one a candidate browsing Owen is offered
-   first — the same slot the Listing page's empty state names. */
+   first — the same slot the Public profile page's empty state names. */
 const OPEN = () => openSlots()[0];
 
 /* ==========================================================================
@@ -578,23 +615,35 @@ const firstOpenPhrase = () => {
 const PAGESUM = {
 
   dashboard: {
-    setup:   'Approved on 12 June, and the agent role sits on the account you already had. Listing and fee are done; payouts aren’t.',
-    training:'Three of four modules done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
+    /* THIS LINE USED TO CONTRADICT THE PAGE UNDER IT. It read "your public
+       profile and fee are done; payouts aren't" — and `CFG.setup` sets neither
+       `listing` nor `paid`, so the checklist beside it had steps 2 and 3 both
+       open and the black card now names step 2 as the thing to do. Three
+       surfaces, one fact, and Tal was the one that was wrong.
+
+       AND A COMMENT IN HERE IS A PLAIN BLOCK COMMENT. PAGESUM is an object
+       literal, not a template — the dollar-brace comment form this file uses
+       everywhere else only works inside a template string, and putting one
+       here is a syntax error that takes the whole file with it. (Nor can this
+       comment quote either form: the closing delimiter would end it early,
+       which is the second way the same paragraph broke this file.) */
+    setup:   'Approved on 12 June, and the agent role sits on the account you already had. Your public profile, your fee and payouts are all still open.',
+    training:'Three of four lessons done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
     live:    'Listed since Monday and nothing booked yet. Six slots are open over the next fortnight, and Friday at 5:00 PM is the first.',
     working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is sitting in escrow.',
     reviewed:'Nadia moved you to A3 on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
   },
 
-  listing: {
-    setup:   'Your card is written and your fee is $85, which leaves you $68 after the split. Payouts are the one thing still stopping a booking.',
-    training:'Your card and fee are set, and nothing is visible yet — a listing goes live the day you’re certified. Delegation is your first specialism.',
-    live:    'You’ve been in browse since Monday at $85, assessing E2 to B1. No rating yet: the first three interviews are what make one.',
-    _:       'You’re visible at $85 assessing E2 to B1, with 164 interviews and 4.6 behind you. Delegation is the specialism candidates search for most.'
-  },
 
   training: {
-    training:'Three modules done, one to go, and calibration is Thursday with Derek Hale. He watches for tenacity, energy, and whether you notice what isn’t said.',
-    _:       'All four modules done and calibrated on 20 June by Derek Hale. The method is re-checked once a year, so nothing’s due until June.'
+    /* THERE WAS NO `setup` KEY AND THE FALLBACK WAS THE CERTIFIED COPY, so at
+       the stage where nothing has been started Tal said "all four modules done
+       and calibrated on 20 June" over a page header reading "0 of 4 lessons".
+       A `_` default is only safe where every stage it catches is the same
+       story; this table had two stories and three stages. */
+    setup:   'None of the four lessons are started, and calibration is booked once they are. Nothing you write goes into browse until Derek has signed you off.',
+    training:'Three lessons done, one to go, and calibration is Thursday with Derek Hale. He watches for tenacity, energy, and whether you notice what isn’t said.',
+    _:       'All four lessons done and calibrated on 20 June by Derek Hale. The method is re-checked once a year, so nothing’s due until June.'
   },
 
   interviews: {
@@ -625,7 +674,17 @@ const PAGESUM = {
     _:       'Follow-up came up to 4.4 in August and depth has held at 4.7 since May. Nadia Rahman reads the quarter on 1 October.'
   },
 
-  profile: 'Your agent role sits on the account you already had, so nothing else about you changed. Two of Tal’s three permissions are on.'
+  /* PROFILE IS A TABLE NOW, because the page became two things: who you are,
+     and how a candidate sees you. The old one-liner only spoke to the first.
+     The stage-keyed copy is the Public profile page's own, moved with the
+     sections it describes and with the account line folded back into the
+     default — see the note where that view used to be. */
+  profile: {
+    setup:   'Your card and fee are written, and a payout destination is the one thing still stopping a booking. The agent role sits on the account you already had.',
+    training:'Your card and fee are set, and nothing is visible yet — your public profile goes live the day you’re certified. Delegation is your first specialism.',
+    live:    'You’ve been in browse since Monday at $85, assessing E2 to B1. No rating yet: the first three interviews are what make one.',
+    _:       'You’re visible at $85 assessing E2 to B1, with 164 interviews and 4.6 behind you. Two of Tal’s three permissions are on.'
+  }
 };
 
 /* --------------------------------------------------------------------------
@@ -651,11 +710,11 @@ const TALQ = {
       ['Tom Whelan', '$68 &middot; releases Thursday']],
      ['Open Earnings', 'earnings']]
   ],
-  listing: [
+  profile: [
     ['Can I change my fee?',
      'Yes, and it applies to new bookings only. Anything already in escrow settles at the rate it was booked at, including Thursday’s.'],
     ['What does pausing do?',
-     'It takes you out of browse. Interviews already booked still stand, and the listing comes back exactly as it was — nothing is re-approved.'],
+     'It takes you out of browse. Interviews already booked still stand, and your public profile comes back exactly as it was — nothing is re-approved.'],
     ['Why can’t I assess above B1?',
      'The range comes off your agent level, and A2 is E2 to B1. A review is what moves it; Nadia looks at yours on 1 October.']
   ],
@@ -665,7 +724,7 @@ const TALQ = {
     ['Can I fail it?',
      'You can be asked to sit it again — about one in six are. Nothing else about your application is reopened by it.'],
     ['Does training come back?',
-     'Once a year the method is re-checked, and it’s two modules rather than four. Yours is due next June.']
+     'Once a year the method is re-checked, and it’s two lessons rather than four. Yours is due next June.']
   ],
   interviews: [
     ['Can I decline a booking?',
@@ -872,47 +931,31 @@ const factRow = (icon, title, detail, tag) => `
    the title where it is read, and the trailing slot is the arrow or nothing.
 
    THE SUBJECT ICON IS THE RAIL'S OWN, READ OUT OF `NAVSETS`. A row that opens
-   Listing takes Listing's icon; a row that opens Earnings takes Earnings'. Two
+   Public profile takes that page's icon; a row that opens Earnings takes Earnings'. Two
    places naming the same page with two different glyphs is the kind of drift
    nobody notices and everybody feels, and the rail already holds the answer.
    A row with no `go` — "Agent role added" goes nowhere, it is a fact — names
    its own icon, which is what the fourth argument is for. */
-const navIcon = go => {
-  for(const set of Object.values(NAVSETS)){
-    const row = set.find(([k]) => k === go);
-    if(row) return row[2];
-  }
-  return 'circle';
-};
+/* THE MARK IS THE STEP'S NUMBER, and it went through the whole argument to get
+   there. It was the stepper's tick/ring/dot, which said the state and left the
+   subject unsaid; then it was the page's own icon in its own colour, which said
+   the subject — and four coloured tiles down the left of four rows turned out to
+   be four different signals competing in a list whose whole point is that it is
+   ORDERED. These are not four unrelated things you might do, they are steps one
+   to four before you can be listed, and the one fact the mark was never carrying
+   is the one the reader needs first: which number this is.
 
-/* AND EACH MARK HAS ITS OWN COLOUR, WHICH IS THE SUBJECT'S AND NOT THE STATE'S.
-   The first version tinted these by status — accent for the row you are on, grey
-   for what is ahead — and that put the status on the row twice, at 40px and at
-   15px, while the subject went uncoloured. So four rows were three colours out
-   of a set of three again, which is the thing this component was rewritten to
-   stop. A wallet is gold whether or not you are finished with it.
+   `.ch-num` IS THAT COMPONENT AND IT IS NOT NEW. §03.139 draws it — a 32px tile,
+   tabular numerals, secondary ink — and §15.453 already had this exact argument
+   about it in the chapter list: "the number is a number", no state colour on the
+   tile, because the row says its state in the tick beside its title. Which is
+   precisely the arrangement §42 gives these rows. So the mark is a number, the
+   status is the glyph by the heading, and the trailing slot is the arrow. Three
+   slots, three jobs, nothing said twice.
 
-   THE FOUR ARE THE PRODUCT'S OWN TOKENS, not new hexes. `--dv-4` and `--dv-hi`
-   are two ends of §01's data-viz ramp, `--dv-gold` is its gold, and
-   `--support-info-ic` is the blue §01 tuned as an ICON fill for the note mark —
-   so every one of them is already a colour this product draws marks in, and all
-   four clear the 3:1 a mark needs on the canvas. None of them is the accent:
-   the accent means "yours, now" everywhere else in the portal, and a listing is
-   not more urgent than a fee.
-
-   It arrives as `--rsi` in an inline style, and §42's note is the argument for
-   why a custom property rather than an inline `fill` — the property feeds the
-   rule, a `fill` would beat every rule forever (trap 1). */
-const ROW_INK = {
-  user:    'var(--dv-4)',            /* the account — the ramp's deepest green */
-  view:    'var(--support-info-ic)', /* the listing — how you are seen */
-  wallet:  'var(--dv-gold)',         /* money */
-  book:    'var(--dv-hi)',           /* the course — the ramp's terracotta */
-  calendar:'var(--dv-3)'
-};
-const checkRow = (st, title, detail, go, icon) => {
-  const ic = icon || (go ? navIcon(go) : 'circle');
-  const ink = ROW_INK[ic] ? ` style="--rsi:${ROW_INK[ic]}"` : '';
+   The subject-ink machinery in §42 stays — a checklist row that wants an icon
+   still gets one, and the next portal may — but this list does not use it. */
+const checkRow = (st, title, detail, go, n) => {
   /* `wait` is a class rather than the absence of one so the three states read
      as three states in the markup. */
   const k = st === 'done' ? 'done' : st === 'now' ? 'now' : 'wait';
@@ -924,17 +967,156 @@ const checkRow = (st, title, detail, go, icon) => {
   const stg = k === 'done' ? I.checkFilled : k === 'now' ? I.hourglass : I.circle;
   const status = `<span class="row-st ${k}" role="img" aria-label="${
     k === 'done' ? 'Done' : k === 'now' ? 'In progress' : 'Not started'}">${stg}</span>`;
+  const num = `<span class="ch-num">${n}</span>`;
+  /* `ckrow` IS ON BOTH BRANCHES AND IT IS NOT DECORATION. A step you can open is
+     a `.tile.clk.gcard` and a step you cannot is a `.cardrow`, and the two are
+     not the same height: §24.275 gives a clickable row in a `.tile-stack` 24px of
+     vertical padding, §02 gives a `.cardrow` 12px. So the SAME four steps drew
+     104px apart at `setup`, where two of them are still open, and 76px apart at
+     `training`, where they are done — one list with two rhythms, changing under
+     the reader as they made progress. The class is the hook §42 needs to give
+     both the same box; the compact one wins, because it is the one the list has
+     when it is finished and the one a reader is comparing four short rows in. */
   return go && st !== 'done'
-    ? `<button class="tile clk gcard rst-${k}" data-go="${go}"${ink}>
-         <span class="cardrow-ic">${I[ic]}</span>
+    ? `<button class="tile clk gcard ckrow rst-${k}" data-go="${go}">
+         ${num}
          <span class="gcard-b"><h3>${title}${status}</h3><span class="sub">${detail}</span></span>
          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`
-    : `<div class="cardrow rst-${k}"${ink}>
-         <span class="cardrow-ic">${I[ic]}</span>
+    : `<div class="cardrow ckrow rst-${k}">
+         ${num}
          <span class="cardrow-b"><span class="cardrow-t">${title}${status}</span>
            <span class="cardrow-d">${detail}</span></span>
        </div>`;
 };
+
+/* --------------------------------------------------------------------------
+   THE PEEK — HOW A CANDIDATE SEES YOU, BESIDE THE PAGE WHERE YOU EDIT IT
+
+   The Public profile page is the editable version of a card somebody else reads, and
+   "See how you appear" is a question only a drawing can answer. So this panel
+   draws the card — with the CANDIDATE portal's own components, out of the same
+   stylesheet, because a facsimile built from different parts is a mock-up of a
+   mock-up.
+
+   `.ag` IS THE MARKETPLACE CARD AND ITS MARKUP IS FIXED. Taken from `views.js`'s
+   `agentCard`, not invented: `.bd` is the four-corner draw frame, then the face,
+   then `.ag-b` holding the name, the rating row, the meta line and a foot that
+   pairs the next slot with the price, then the trailing `.card-go`. Guess that
+   structure and the card looks broken rather than absent — `gallery.html` under
+   **Signature** is the reference. Two things are deliberately NOT here: the
+   `talStar` chip, because "what is Owen like to be interviewed by?" is a
+   question a candidate asks Tal and not something the agent previews, and the
+   `data-go`, because nothing in this panel is a destination. It is a picture.
+
+   WHAT A CANDIDATE ACTUALLY SEES, IN THE ORDER THEY SEE IT: the card in a list
+   of agents, then the four specialisms they can search on, then the price and
+   what it buys, then the soonest slot. Every figure is read off the same place
+   the Public profile page reads it — `A`, `CFG`, `SLOTS` — so the preview cannot drift
+   from the page it is previewing, which is the one failure that would make it
+   worse than nothing.
+
+   AND IT SAYS `$85`, NOT `$68`. The split is the agent's business and the
+   candidate never sees it: a preview that showed the net fee would be showing
+   the agent a number the marketplace does not print. `.peek-lede` is where that
+   is said in words, once.
+   -------------------------------------------------------------------------- */
+/* `views.js`'s `stars`, verbatim in shape: five `<svg>` children of `.stars`,
+   and the filled ones carry `class="f"`. §03.104 keys the two fills on exactly
+   that — `.stars svg` is grey, `.stars svg.f` is ink — so wrapping the glyphs in
+   anything, or marking the filled ones any other way, gives five grey stars. */
+function stars(n){
+  let out = '';
+  for(let i = 1; i <= 5; i++)
+    out += `<svg class="${i <= Math.round(n) ? 'f' : ''}" viewBox="0 0 24 24">${inner('star')}</svg>`;
+  return `<span class="stars" role="img" aria-label="${(n || 0).toFixed(1)} out of 5">${out}</span>`;
+}
+
+function peekPanel(v){
+  const o = OPEN();
+  const next = o ? `${chipOf(o)} at ${o.t}` : 'nothing open';
+  return `<aside class="peek" aria-label="How you appear to candidates">
+    <div class="peek-h">
+      <span class="peek-t">How you appear<small>What a candidate sees in browse</small></span>
+      <button class="peek-x" data-peek="" aria-label="Close the preview">${I.close}</button>
+    </div>
+    <div class="peek-b">
+      <p class="peek-lede">${v.listed
+        ? 'This is your card as it is drawn on a candidate&rsquo;s agent list. They see your fee, never the split.'
+        : 'A preview. Your card is not in browse yet &mdash; it goes live the day you are certified.'}</p>
+
+      ${/* NO `.card-go`, AND THE PRICE TAKES ITS PLACE. On a candidate's agent
+            list the arrow means "open this agent"; here there is nothing to
+            open — the panel IS the card — so an arrow was a control that could
+            not be pressed, in the one corner of the row a reader checks first.
+            The fee goes there instead, on the name's own line, which is where
+            the taller `.agh` variant of this card already puts it (§03.115's
+            `.agh-n` holds `.ag-price` as a child). `.ag-foot` keeps the slot.
+
+            The price is `${money(v.fee)}` and never `v.share`: §44's note and
+            the lede above both say it — the candidate sees the fee, never the
+            split. */''}
+      <div class="ag">
+        <span class="bd"><i></i><i></i><i></i><i></i></span>
+        ${avatar(A.i, AV.owen, 48)}
+        <span class="ag-b">
+          <span class="ag-n">${A.n}<span class="ag-price">${money(v.fee)}</span></span>
+          ${/* FIVE STARS IS THE DEFAULT, AND NO NUMBER WITH THEM. An agent
+                who has not been rated yet drew five GREY stars and an em-dash,
+                which is the emptiest a card can look on the day its listing goes
+                live — and the one thing that card has to do is make a candidate
+                click it. So the unrated state shows the row filled.
+
+                What it does NOT show is a figure: five gold stars beside "4.6"
+                would be wrong, and beside a made-up "5.0" would be a rating
+                nobody has given. The numeral is printed only when there is a
+                real one to print. Worth knowing when you read this stage: at
+                `live` the card carries five stars and "0 interviews" on the line
+                under them, which is the honest version of the same tension —
+                the stars are the default treatment, the interview count is the
+                fact. */''}
+          <span class="ag-r">${stars(v.rating || 5)}${
+            v.rating ? `<span class="num">${v.rating.toFixed(1)}</span>` : ''}</span>
+          <span class="ag-m">${v.range} &middot; ${v.ivs || 0} interviews</span>
+          <span class="ag-foot"><span style="color:var(--text-secondary)">Next: ${next}</span></span>
+        </span>
+      </div>
+
+      <section class="sec">
+        <div class="sec-h"><h2>What they can search you by</h2></div>
+        <div class="tag-row">
+          <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
+          <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
+        </div>
+      </section>
+
+      <section class="sec">
+        <div class="sec-h"><h2>What it costs them</h2></div>
+        ${kv([
+          ['They pay', `${money(v.fee)} at booking`],
+          ['They get', '45 minutes, recorded'],
+          ['Their level', 'Set by you, within 48 hours'],
+          ['Soonest slot', next]])}
+      </section>
+    </div>
+    ${/* THE WAY OUT IS THE WAY TO CHANGE IT. A preview whose answer is "not like
+          that" needs the edit within reach, and it belongs at the foot of the
+          panel rather than in the header, where the close cross is: those are
+          opposite intentions and putting them in the same 32px row is how a
+          person dismisses the panel while meaning to edit it. `data-sheet` is
+          the Public profile page's own editor, so this is the same control that row
+          carries, reached from the preview instead of from the form. */''}
+    <div class="peek-f">
+      ${/* `I.edit` LEADS, so `noic` comes off. That class is what §02 uses to
+            say "this button has no icon"; a button that carries one and keeps
+            `noic` gets the label's padding wrong on the leading side. The pencil
+            goes BEFORE the words — this is not a `.ic-l` case in reverse:
+            `I.arrowRight` trails on the forty buttons that take you to another
+            page, and an action performed on what is already on screen leads with
+            its verb's mark instead. */''}
+      <button class="btn btn-g btn-sm ic-l" data-sheet="listing">${I.edit}Edit public profile</button>
+    </div>
+  </aside>`;
+}
 
 /* --------------------------------------------------------------------------
    THE SIGNATURE COMPONENTS
@@ -1043,7 +1225,7 @@ const STEP_IC = [
   [/level|report|rung|promot|certif/i,              'certificate'],
   [/enrol|cohort/i,                                 'group'],
   [/listing|payout|\bpay\b|fee|price|earn/i,        'wallet'],
-  [/training|calibration|module|chapter|course|90/i,'book'],
+  [/training|calibration|lesson|module|chapter|course|90/i,'book'],
   [/account|application|apply|profile|details/i,    'document'],
   [/book|slot|date|session/i,                       'calendar']
 ];
@@ -1124,14 +1306,14 @@ function stepper(steps, title){
    sent, cleared version rather than a `v.sent` branch, because `sent` was a
    field on the two removed stages and every stage that is left is approved.
    The rows stay because a five-row journey with its first two missing would
-   start at "Listing and payouts" and read as though that were step one. */
+   start at "Public profile and payouts" and read as though that were step one. */
 const JOURNEY = v => {
   const at = {setup:2, training:3}[S.stage] ?? 4;
   const rows = [
     ['Your application', 'Sent 3 June, with two referees'],
     ['Vetting', 'Identity, background check and two references cleared'],
-    ['Listing and payouts', `${money(v.fee)} an interview &middot; 80% of it yours`],
-    ['Training and calibration', 'Four modules, then 45 minutes with Derek Hale'],
+    ['Public profile and payouts', `${money(v.fee)} an interview &middot; 80% of it yours`],
+    ['Training and calibration', 'Four lessons, then 45 minutes with Derek Hale'],
     ['Interviewing', v.busy ? `${v.ivs} on record &middot; ${v.month} this month`
       : v.certified ? 'Listed since 24 June &middot; nothing booked yet'
       : 'Bookable the day you are certified']
@@ -1438,18 +1620,78 @@ V.dashboard = v => {
   });
 
   /* --- stage 2 and 3: approved, not yet bookable ------------------------ */
-  if(!v.certified) return band() + `
+  /* THE ONE THING TO DO NEXT, AS THE BLACK CARD.
+
+     `working` opens with a `.plate` because an agent with a week ahead has one
+     appointment that matters more than the page around it. An agent being
+     enabled has the same shape of problem and had no answer to it: the dashboard
+     opened with Tal's sentence, then a four-row checklist, and the reader had to
+     find which of the four rows was theirs today. Two of them are `now` at
+     `setup`, which is the case that makes it worst — a list with two live rows
+     does not say which one to start.
+
+     SO THE PLATE IS THE FIRST UNFINISHED STEP, AND IT IS DERIVED FROM THE SAME
+     ORDER THE LIST USES. `checkRow` marks step 2 `done` on `v.listing`, step 3
+     on `v.paid`, step 4 on `v.lessonsDone === 4`; this reads those three flags in the
+     same sequence and stops at the first that is false. So the card and the row
+     it duplicates can never disagree — there is no second table of "what is
+     next" to keep in step, which is the failure mode a hand-written hero card
+     has. Change a flag in `CFG` and both move together.
+
+     EACH ONE CARRIES WHAT THAT STEP ACTUALLY HAS. The public profile has no date
+     and no person, so it gets neither — `plate()` omits the countdown chip and
+     the face when they are not passed, and a chip reading "soon" over a task
+     with no deadline is the kind of furniture this file keeps out. Calibration
+     has both, so step 4 gets Derek and the Thursday. The action is always the
+     page that step lives on, which is where the row underneath goes too.
+
+     AND IT IS NOT THE TRAINING PAGE'S PLATE. That one is the calibration
+     interview — an appointment, with a confirm and a move-it. This one is the
+     LESSON, because that is what is on the agent before the call: one of four
+     left, self-paced, no date. Two plates about the same stage saying two
+     different things is correct here; they are two different steps. */
+  const NEXT_STEP = [
+    [v => !v.listing, v => ({
+      title: 'Write your public profile',
+      meta: `Photo, bio, four specialisms and the range you assess &middot; nothing is visible until you are certified`,
+      actions: `<button class="btn btn-p btn-sm noic" data-go="profile">Open your public profile ${I.arrowRight}</button>
+        <button class="btn btn-sm noic plate-b2" data-peek="1">See how you will appear</button>`
+    })],
+    [v => !v.paid, v => ({
+      title: 'Connect a payout destination',
+      meta: `${money(v.fee)} an interview, ${money(v.share)} of it yours &middot; a Stripe handoff, so TalentNext never sees an account number`,
+      actions: `<button class="btn btn-p btn-sm noic" data-go="earnings">Continue to Stripe ${I.launch}</button>`
+    })],
+    [v => v.lessonsDone !== 4, v => ({
+      when: 'in 2 days', av: 'DH', photo: AV.samuel, who: 'Derek Hale',
+      whoSub: 'Head of agent standards',
+      title: `Finish ${LESSONS[v.lessonsDone || 0][0].toLowerCase()}`,
+      meta: `${(v.lessonsDone || 0)} of four lessons done &middot; then 45 minutes with Derek on Thursday 20 June`,
+      actions: `<button class="btn btn-p btn-sm noic" data-go="training">Open Training ${I.arrowRight}</button>`
+    })]
+  ];
+  const nextStep = v => {
+    const hit = NEXT_STEP.find(([test]) => test(v));
+    return hit ? plate(hit[1](v)) : '';
+  };
+
+  if(!v.certified) return band(nextStep(v)) + `
     <section class="sec">
       <div class="sec-h"><h2>Before you list</h2></div>
       <div class="tile-stack">
         ${/* `user`, and it is the one row here that names its own icon: this
               row opens nothing — the agent role is a fact about the account,
               not a page — so there is no rail item for `navIcon` to read. */''}
-        ${checkRow('done', 'Agent role added', 'On the account you already had, 12 June', null, 'user')}
-        ${checkRow(v.listing ? 'done' : 'now', 'Your listing', v.listing ? 'Written, with four specialisms' : 'Photo, bio, specialisms and the range you assess', 'listing')}
-        ${checkRow(v.paid ? 'done' : 'now', 'Your fee and payouts', v.paid ? `${money(v.fee)} an interview &middot; Stripe connected` : `${money(v.fee)} set. A payout destination is still needed`, 'earnings')}
-        ${checkRow(v.mods === 4 ? 'done' : v.listing ? 'now' : '', 'Training and calibration',
-          v.mods === 4 ? 'Four modules and the calibration interview' : `${v.mods || 0} of four modules done &middot; calibration Thursday 20 June`, 'training')}
+        ${/* THE NUMBERS ARE WRITTEN, NOT COUNTED. Four steps in a fixed order,
+              and the order is the product's rather than the array's — a step
+              that stops applying is removed from the page, not renumbered by a
+              loop, so "3" always means the fee and payouts. `checkRow`'s last
+              argument is the one it prints. */''}
+        ${checkRow('done', 'Agent role added', 'On the account you already had, 12 June', null, 1)}
+        ${checkRow(v.listing ? 'done' : 'now', 'Your public profile', v.listing ? 'Written, with four specialisms' : 'Photo, bio, specialisms and the range you assess', 'profile', 2)}
+        ${checkRow(v.paid ? 'done' : 'now', 'Your fee and payouts', v.paid ? `${money(v.fee)} an interview &middot; Stripe connected` : `${money(v.fee)} set. A payout destination is still needed`, 'earnings', 3)}
+        ${checkRow(v.lessonsDone === 4 ? 'done' : v.listing ? 'now' : '', 'Training and calibration',
+          v.lessonsDone === 4 ? 'All four lessons and the calibration interview' : `${v.lessonsDone || 0} of four lessons done &middot; calibration Thursday 20 June`, 'training', 4)}
       </div>
     </section>
     <section class="sec">
@@ -1467,7 +1709,7 @@ V.dashboard = v => {
             already correct — the agent is the object of the sentence in every
             one of them, which is the test. */''}
       <div class="note"><span>${I.info}</span><div class="nb"><b>Candidates cannot book you yet</b>
-        Your listing goes into browse the day you are certified, and not before &mdash; a half-built one is never shown.</div></div>
+        Your public profile goes into browse the day you are certified, and not before &mdash; a half-built one is never shown.</div></div>
     </section>`;
 
   /* --- stage 4, day one: listed, empty ---------------------------------- */
@@ -1487,13 +1729,19 @@ V.dashboard = v => {
           has happened, here is what to do about it. §43 centres them with the
           rest of the block and gives the section the height left on the page, so
           the whole thing sits in the middle of the space it is describing. */''}
-    <section class="sec">
+    <section class="sec sec-fill">
       <div class="sec-h"><h2>Nobody has booked you yet</h2></div>
       <div class="empty">${I.calendar}<span class="t">No interviews yet</span>
         <span class="help">A candidate browsing your track sees your next free slot first. Friday at 5:00 PM is the one they will be offered.</span>
         <div class="btn-row">
           <button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button>
-          <button class="btn btn-g noic" data-go="listing">See how you appear</button>
+          ${/* `data-peek`, NOT A DESTINATION. There is no page to send this to
+                any more — the module it used to open was removed and its
+                sections live on Profile — and even when there was one, sending
+                somebody to a form to answer "how do I appear" was answering a
+                different question. The peek draws the card beside whatever you
+                were reading. */''}
+          <button class="btn btn-g noic" data-peek="1">See how you appear</button>
         </div></div>
     </section>`;
 
@@ -1520,8 +1768,8 @@ V.dashboard = v => {
           held". A heading of "This month" over four cells where only one of
           them is a monthly figure was a fifth label that did not match its
           own row, set at h2 weight above cells that are already headed.
-          The dashboard's other figure row lost its "Your listing" for the
-          same reason. On the pages that keep theirs — Earnings, Listing,
+          The dashboard's other figure row lost its "Your public profile" for the
+          same reason. On the pages that keep theirs — Earnings, Public profile,
           Standing — the row sits among other sections and the heading is what
           separates them; here it is the first thing under the head band. */''}
     <section class="sec">
@@ -1576,68 +1824,29 @@ V.dashboard = v => {
 /* --------------------------------------------------------------------------
    LISTING — steps 4 and 5. How the agent appears in browse, and their fee.
    -------------------------------------------------------------------------- */
-V.listing = v => head({
-    title: 'Your listing',
-    sub: v.listed ? `Live in browse &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
-                  : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
-  }) + `
+/* --------------------------------------------------------------------------
+   THERE WAS A PUBLIC PROFILE MODULE HERE, AND IT WAS ONE PAGE TOO MANY
 
-  <section class="sec">
-    <div class="sec-h"><h2>How you appear</h2></div>
-    <div class="tile-stack">
-      <div class="cardrow">
-        <span class="cardrow-ic">${avatar(A.i, AV.owen, 40)}</span>
-        <span class="cardrow-b"><span class="cardrow-t">${A.n}
-          ${v.listed ? '<span class="pill-def">Listed</span>' : ''}</span>
-          <span class="cardrow-d">Talent agent &middot; assesses ${v.range}</span></span>
-        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="listing">Edit</button></span>
-      </div>
-    </div>
-  </section>
+   It held five sections: the card as a row with Preview and Edit, the four
+   figure cells, the specialisms, the fee, and the visibility toggle. Every one
+   of them is a thing an agent edits ABOUT THEMSELVES, which is what Profile is,
+   and the one thing the page did that Profile could not — show the card as a
+   candidate sees it — is what the peek was built for. So a rail item, a view, a
+   `PAGESUM` table and a `TALQ` row were all being spent on a second profile
+   page whose answer was "open the preview".
 
-  <section class="sec">
-    <div class="sec-h"><h2>On your card</h2></div>
-    ${/* THE NOTES HAVE TO HOLD AT `live` TOO, where nothing has happened yet:
-          `ivs`, `month` and `rating` are all zero or null the day the listing
-          goes up, and a note reading "9 this month" under a nought is the cell
-          contradicting itself. Both of those cells say what is true instead. */''}
-    ${stats([
-      ['wallet', 'Your fee',   money(v.fee),        `${money(v.share)} of it yours`],
-      ['skill',  'Assesses',   v.rangeShort,        'Explorer to Builder'],
-      ['video',  'Interviews', String(v.ivs || 0),  v.month ? `${v.month} this month` : 'none yet'],
-      ['star',   'Rating',     v.rating || '&mdash;',
-       v.rating ? `across ${v.ivs} interviews` : 'nothing rated yet']])}
-  </section>
+   The sections moved to `V.profile` unchanged, under one heading that says what
+   they are. Nothing was dropped: the fee sheet, the specialism chips and the
+   visibility switch are all still there, and `data-sheet="listing"` is still the
+   editor behind them — the SHEET keeps its key, because a sheet is not a page
+   and renaming it would be a rename for its own sake.
 
-  <section class="sec">
-    <div class="sec-h"><h2>Specialisms</h2></div>
-    <div class="tag-row">
-      <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
-      <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
-      <span class="tag bordered">${I.add}Add</span>
-    </div>
-    <p class="help mt4">Four is the most a card shows. A candidate searching for one of these sees you before an agent who has not claimed it.</p>
-  </section>
-
-  <section class="sec">
-    <div class="sec-h"><h2>Your fee</h2></div>
-    ${kv([
-      ['You charge', money(v.fee)],
-      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
-      ['You are paid', `${money(v.share)} &middot; 80%`]])}
-    <div class="btn-row mt5"><button class="btn btn-g btn-sm noic" data-sheet="fee">Change your fee</button></div>
-    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>A new fee applies to new bookings</b>
-      Anything already in escrow settles at the rate it was booked at.</div></div>
-  </section>
-
-  ${v.listed ? `
-  <section class="sec">
-    <div class="sec-h"><h2>Visibility</h2></div>
-    <label class="tg"><div class="tb"><b>Listed in the marketplace</b>
-      <span>Candidates on your track can find and book you</span></div>
-      <input type="checkbox" checked><span class="sw"></span></label>
-    <p class="help mt4">Pausing takes you out of browse. Interviews already booked still stand, and nothing is re-approved when you come back.</p>
-  </section>` : ''}`;
+   THE ENTRY POINT IS A BUTTON, NOT A DESTINATION. "Public profile" on the
+   Profile page opens the peek beside whatever you are reading, which is the
+   whole argument §44 makes: the card and the form belong on screen together, and
+   sending someone to a page to look at a preview of another page is the shape
+   this removal exists to undo.
+   -------------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
    TRAINING — step 7 and the certification gate. Derek's rubric is three
@@ -1645,94 +1854,180 @@ V.listing = v => head({
    auto-fit grid leaves one paying grey.
    -------------------------------------------------------------------------- */
 V.training = v => {
-  const done = v.mods === 4;
-  /* A `&middot;` ROW IS FIGURES, so the count is set rather than spelt — the
-     house rule is that a small number is spelt only when it opens a sentence.
-     Tal's summary below says "Three modules done" for the same reason. */
-  /* THE BACK BUTTON APPEARS ONLY WHERE THE PAGE IS A SUB-PAGE. In the enabling
-     stages Training is a rail item and a back arrow would point at nothing;
-     once certified it is reached from Standing, and it needs one. */
-  /* THE HERO CHANGES WITH THE STATE AND STAYS IN THE BAND. Before certification
-     the head carries the appointment that is in the way; after it, the thing
-     that came out of it. Both are dark cards, and only one is ever drawn. */
-  return head({
-    title: 'Training and calibration',
-    sub: done ? '4 of 4 modules &middot; calibrated 20 June &middot; re-checked each June'
-              : `${v.mods || 0} of 4 modules &middot; calibration Thursday 20 June`,
-    back: v.nav === 'full' ? 'standing' : '',
-    plate: done
-      ? `<div class="cert">
-          <h3>Certified to interview</h3>
-          <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
-        </div>`
+  /* THREE STATES, AND THE PAGE USED TO DRAW TWO. `done` was the only branch, so
+     an agent who had started nothing got the same page as one with three modules
+     behind them — and four things on it were wrong at once:
+
+       - Tal said the modules were finished (a missing `PAGESUM` key, fixed above)
+       - the black card offered "Confirm the slot" for a calibration interview,
+         before a single module had been opened
+       - the progress card said "Module 1 · in progress" over a 0% ring and
+         "Nothing finished yet"
+       - the one thing to actually do, "Open module 1", was a button at the very
+         bottom of the page, under the rubric and a warning note
+
+     `at` is the state, read off the same `lessonsDone` count the rest of the page uses:
+     0 is nothing started, 1–3 is under way, 4 is certified. Every branch below
+     names it rather than testing `lessonsDone` again, so the page cannot disagree with
+     itself the way it just did. */
+  const lessonsDone = v.lessonsDone || 0;
+  const at = lessonsDone === 4 ? 'certified' : lessonsDone === 0 ? 'unstarted' : 'underway';
+  const next = LESSONS[Math.min(lessonsDone, 3)];
+
+  /* AND CALIBRATION IS NOT BOOKED UNTIL THE LESSONS ARE. That is the fact the
+     old page was missing, and it is what made the plate absurd: a date and a
+     "confirm" for an appointment that cannot be scheduled yet. It is stated once
+     here and read in three places — the fact row, the hero, and the kv band. */
+  const calWhen = at === 'unstarted'
+    ? 'Booked once the four lessons are done'
+    : 'Thursday 20 June, 4:00 PM ET';
+
+  /* THE HERO IS THE NEXT THING TO DO, and which thing that is depends on the
+     state. Nothing started: the first lesson, with the button that opens it —
+     the page's primary action, at the top, where the candidate portal puts every
+     other one. Under way: the calibration, because the appointment is the thing
+     in the way and the remaining lesson has its own row below. Certified: the
+     certificate, because there is nothing left to do. */
+  const hero = at === 'certified'
+    ? `<div class="cert">
+        <h3>Certified to interview</h3>
+        <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
+      </div>`
+    : at === 'unstarted'
+      ? plate({
+          title: `Start with ${next[0].toLowerCase()}`,
+          meta: `${next[1]} &middot; lesson 1 of 4, then a 45-minute calibration with Derek Hale`,
+          actions: `<button class="btn btn-p btn-sm noic">Open lesson 1 ${I.arrowRight}</button>`
+        })
       : plate({
           when: 'in 2 days', av: 'DH', photo: AV.samuel, who: 'Derek Hale',
           whoSub: 'Head of agent standards',
           title: 'Calibration interview',
-          meta: 'Thursday 20 June at 4:00 PM ET &middot; 45 minutes &middot; recorded',
+          meta: `${calWhen} &middot; 45 minutes &middot; recorded`,
           actions: `<button class="btn btn-p btn-sm noic">Confirm the slot ${I.video}</button>
             <button class="btn btn-sm noic plate-b2">Ask to move it</button>`
-        })
+        });
+
+  /* THE BACK BUTTON APPEARS ONLY WHERE THE PAGE IS A SUB-PAGE. In the enabling
+     stages Training is a rail item and a back arrow would point at nothing;
+     once certified it is reached from Standing, and it needs one. */
+  return head({
+    title: 'Training and calibration',
+    /* A `&middot;` ROW IS FIGURES, so the count is set rather than spelt — the
+       house rule is that a small number is spelt only when it opens a
+       sentence. */
+    sub: at === 'certified'
+      ? '4 of 4 lessons &middot; calibrated 20 June &middot; re-checked each June'
+      : `${lessonsDone} of 4 lessons &middot; ${at === 'unstarted' ? 'calibration once the four are done' : 'calibration Thursday 20 June'}`,
+    back: v.nav === 'full' ? 'standing' : '',
+    plate: hero
   }) + `
 
   <section class="sec">
-    <div class="sec-h"><h2>The method</h2></div>
-    <!-- THE WEEK CARD AND ITS RING. Four modules run in sequence and each one
-         is either finished or not, which is exactly the shape the candidate's
-         chapter card draws — so it is drawn with the same component rather
-         than with a second progress idea invented here. -->
+    <div class="sec-h"><h2>Your progress</h2></div>
+    ${/* THE WEEK CARD AND ITS RING. Four lessons run in sequence and each one is
+          either finished or not, which is exactly the shape the candidate's
+          chapter card draws — so it is drawn with the same component rather than
+          with a second progress idea invented here.
+
+          THE EYEBROW SAYS WHICH STATE, and "in progress" was wrong in the one it
+          was hard-coded for: nothing is in progress when nothing is started, and
+          the ring beside it read 0%. The heading is the lesson the eyebrow is
+          about, so at `unstarted` both name lesson 1 and agree.
+
+          The section is headed "Your progress" and not "The method" — the method
+          is what the four lessons TEACH, and it was the heading over a card
+          about how far through them you are. */''}
     <div class="wkc">
       <div class="wkc-top">
         <div class="wkc-tb">
-          <div class="wkc-eb t-label-01">Module ${Math.min((v.mods || 0) + 1, 4)} &middot; ${done ? 'all finished' : 'in progress'}</div>
-          <h3 class="u-h3">${done ? 'The interview method' : MODULES[Math.min(v.mods || 0, 3)][0]}</h3>
-          <div class="wkc-min sub">${v.mods || 0} of 4 modules</div>
+          <div class="wkc-eb t-label-01">${at === 'certified'
+            ? 'All four lessons &middot; finished'
+            : `Lesson ${lessonsDone + 1} of 4 &middot; ${at === 'unstarted' ? 'not started' : 'next'}`}</div>
+          <h3 class="u-h3">${at === 'certified' ? 'The interview method' : next[0]}</h3>
+          <div class="wkc-min sub">${lessonsDone} of 4 lessons done</div>
         </div>
-        ${ring(Math.round((v.mods || 0) / 4 * 100))}
+        ${ring(Math.round(lessonsDone / 4 * 100))}
       </div>
-      <span class="eyebrow">${done ? 'What you were taken through' : 'What you have finished'}</span>
+      <span class="eyebrow">${at === 'certified' ? 'What you were taken through' : 'What you have finished'}</span>
       <ul class="wkc-did">
-        ${MODULES.filter((m, n) => n < (v.mods || 0)).map(m =>
+        ${LESSONS.filter((m, n) => n < lessonsDone).map(m =>
           `<li class="u-compact"><span class="wkc-tick">${I.checkFilled}</span>
             <span class="wkc-db"><b>${m[0]}</b><span class="sub">${m[1]}</span></span></li>`).join('')
-          || '<li class="u-compact"><span class="wkc-db"><span class="sub">Nothing finished yet.</span></span></li>'}
+          || '<li class="u-compact"><span class="wkc-db"><span class="sub">Nothing yet &mdash; lesson 1 is where it starts.</span></span></li>'}
       </ul>
     </div>
   </section>
 
-  ${done ? '' : `
+  ${at === 'certified' ? '' : `
   <section class="sec">
-    <div class="sec-h"><h2>Still to do</h2></div>
+    <div class="sec-h"><h2>The four lessons</h2></div>
+    ${/* A `Next` TAG IS NOT AN ACTION. The row that is yours to do carried a
+          pill saying so and nothing to press, while the button that opened it sat
+          at the foot of the page under the rubric. The pill was the label for a
+          control that was somewhere else. It is a button on the row now, and the
+          rows that are not yours keep the tag, because "Locked" IS a status and
+          there is nothing to press on it. Heading is "The four lessons" rather
+          than "Still to do", because the finished ones are listed here too — with
+          their tick, so the section is the whole set in order rather than a
+          remainder. */''}
+    ${/* NUMBERED, NOT FOUR IDENTICAL BOOKS. `factRow`'s mark is an icon, and the
+          icon was `book` on every row — so the left of the list was the same
+          glyph four times, saying "this is a lesson" to a reader who had just
+          read the heading "The four lessons". What the mark has to say here is
+          WHICH lesson, because these run in a fixed sequence and the row you can
+          open is the next number: `.ch-num` is that component (§03.139), and the
+          "Before you list" checklist reached the same conclusion for the same
+          reason — §42's note is the long version.
+
+          So the row is written out rather than passed through `factRow`. It is
+          `checkRow`'s static shape exactly: number, then title with its status
+          beside it, then the detail line, then the trailing slot. `Locked` stays
+          a tag because it IS a status with nothing to press; the next lesson
+          gets the button. */''}
     <div class="tile-stack">
-      ${MODULES.map((m, n) => n < (v.mods || 0) ? '' : factRow('book', m[0], m[1],
-        n === (v.mods || 0) ? '<span class="tag sm warn">Next</span>' : '<span class="tag sm">Locked</span>')).join('')}
+      ${LESSONS.map((m, n) => `<div class="cardrow ckrow">
+        <span class="ch-num">${n + 1}</span>
+        <span class="cardrow-b">
+          <span class="cardrow-t">${m[0]}${n < lessonsDone
+            ? `<span class="row-st done" role="img" aria-label="Finished">${I.checkFilled}</span>` : ''}</span>
+          <span class="cardrow-d">${m[1]}</span></span>
+        ${n < lessonsDone ? ''
+          : n === lessonsDone ? `<span class="cardrow-a"><button class="btn btn-g btn-sm noic">Open lesson ${n + 1}</button></span>`
+          : '<span class="cardrow-a"><span class="tag sm">Locked</span></span>'}
+      </div>`).join('')}
     </div>
   </section>`}
 
   <section class="sec">
     <div class="sec-h"><h2>Calibration</h2></div>
     ${kv([
-      ['With', 'Derek Hale'],
-      ['When', done ? 'Thursday 20 June' : 'Thursday 20 June, 4:00 PM ET'],
-      ['Length', '45 minutes'],
-      ['Result', done ? 'Certified' : 'Not sat yet']])}
+      ['With', 'Derek Hale &middot; head of agent standards'],
+      ['When', at === 'certified' ? 'Thursday 20 June' : calWhen],
+      ['Length', '45 minutes, recorded'],
+      ['Result', at === 'certified' ? 'Passed &mdash; certified 20 June' : at === 'unstarted' ? 'Not scheduled yet' : 'Not sat yet']])}
     <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it. Derek watches your half of the conversation.</p>
+    ${at === 'certified' ? '' : `
+    ${/* THE NOTE MOVED HERE, TO THE THING IT IS ABOUT. It was the last block on
+          the page, under the rubric, where it read as a warning about the rubric.
+          What it is actually about is the gate: the calibration is what the
+          public profile waits on. */''}
+    <div class="note warn mt5"><span>${I.warning}</span><div class="nb"><b>Your public profile waits on this</b>
+      Nothing goes into browse until the calibration is passed &mdash; and it cannot be booked until the four lessons are done.</div></div>`}
   </section>
 
   <section class="sec">
-    <div class="sec-h"><h2>The rubric</h2></div>
+    <div class="sec-h"><h2>What Derek watches for</h2></div>
+    ${/* "THE RUBRIC" IS THE WORD FOR IT INSIDE THE COMPANY. The heading is what
+          the reader wants to know — the three rows are questions Derek is asking
+          himself about you, and the heading should say that. */''}
     ${kv([
       ['Tenacity', 'Do you stay with a thread that is going somewhere'],
       ['Energy', 'Does the candidate do more talking by the end than the start'],
       ['Noticing', 'Do you hear what was left out']])}
-  </section>
-
-  <section class="sec">
-    ${done
-      ? `<p class="help">The method is re-checked each June, and that is two modules rather than four.</p>`
-      : `<div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your listing waits on this</b>
-          Nothing goes into browse until the calibration is passed.</div></div>
-         <div class="btn-row mt5"><button class="btn btn-p">Open module ${(v.mods || 0) + 1} ${I.arrowRight}</button></div>`}
+    ${at === 'certified'
+      ? `<p class="help mt4">The method is re-checked each June, and that is two lessons rather than four.</p>`
+      : ''}
   </section>`;
 };
 
@@ -1744,7 +2039,12 @@ V.training = v => {
 V.interviews = v => {
   if(!v.busy) return head({title: 'Interviews',
     sub: 'Nothing booked &middot; six slots open &middot; 45 minutes each'}) + `
-    <section class="sec">
+    ${/* `sec-fill` — §43's opt-in. This section IS the page, so it takes the
+          height that is left and centres the block in it. Not applied to a
+          section that merely CONTAINS an empty state among others: the leader's
+          candidate page has one of those and stretching it would push the six
+          sections under it apart. */''}
+    <section class="sec sec-fill">
       <div class="empty">${I.calendar}<span class="t">Nothing booked yet</span>
         <span class="help">A booking arrives already paid for, with the candidate’s brief attached. There is nothing to accept.</span>
         <div class="btn-row"><button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button></div></div>
@@ -2208,7 +2508,23 @@ V.earnings = v => {
     <div class="sec-h"><h2>Where it goes</h2></div>
     ${connected ? `
     <div class="tile-stack">
-      ${factRow('wallet', v.payout, 'Connected 12 June', '<span class="tag sm green">Connected</span>')}
+      ${/* THE STATUS RIDES THE TITLE; THE RIGHT-HAND SLOT HOLDS AN ACTION.
+            A green "Connected" pill at the far end of the row was the row's own
+            state printed 700px away from the words it described, in the slot
+            every other `.cardrow` in this portal uses for something you can
+            press. §42 is the arrangement — the status is a 15px mark beside the
+            title, where it is read, and the trailing slot is the action — and
+            this is the same fix that list of steps got.
+
+            "Go to Stripe" and not "Change": TalentNext holds no bank details, so
+            there is nothing here to change. The button is a handoff, which is
+            what `I.launch` says and what the note under this row says in words.
+            It is also the only honest label for a control whose entire job is to
+            leave. */''}
+      ${factRow('wallet',
+        `${v.payout}<span class="row-st done" role="img" aria-label="Connected">${I.checkFilled}</span>`,
+        'Connected 12 June',
+        `<button class="btn btn-g btn-sm ic-l">${I.launch}Go to Stripe</button>`)}
     </div>
     <p class="help mt4">TalentNext never holds your bank details. Stripe does, and Stripe is where you change them.</p>`
     : `
@@ -2312,7 +2628,7 @@ V.standing = v => head({
     <div class="sec-h"><h2>Also held</h2></div>
     <div class="tile-stack">
       ${goRow('certificate', 'Certified 20 June 2024', 'Training and calibration',
-        'Four modules, and the method re-checked each June', 'training')}
+        'All four lessons, and the method re-checked each June', 'training')}
     </div>
   </section>
 
@@ -2340,12 +2656,88 @@ V.profile = v => head({title: 'Profile'}) + `
         <span class="cardrow-ic">${avatar(A.i, AV.owen, 40)}</span>
         <span class="cardrow-b"><span class="cardrow-t">${A.n}</span>
           <span class="cardrow-d">${A.email}</span></span>
-        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="profile">Edit</button></span>
+        <span class="cardrow-a"><button class="btn btn-g btn-sm ic-l" data-peek="1">${I.search}Public profile</button><button class="btn btn-g btn-sm noic" data-sheet="profile">Edit</button></span>
       </div>
     </div>
   </section>
 
+  ${/* THE PUBLIC HALF OF THE SAME PERSON. Everything from here to the
+        visibility switch was its own module until it was not — the note where
+        `V.listing` used to be is the argument. It sits directly under "You"
+        because that is the order the two halves are asked about: this is me,
+        and this is the me a candidate sees. `I.search` on the button is the
+        icon that rail item carried, so the one control that replaced a page
+        keeps the page's mark. */''}
   <section class="sec">
+    <div class="sec-h"><h2>Your public profile</h2></div>
+    <p class="help">${v.listed
+      ? `Live in browse since 24 June &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
+      : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`}</p>
+    <div class="btn-row mt4">
+      <button class="btn btn-p btn-sm ic-l" data-peek="1">${I.search}See how you appear</button>
+      <button class="btn btn-g btn-sm noic" data-sheet="listing">Edit your card</button>
+    </div>
+  </section>
+
+  ${/* THE OLD "HOW YOU APPEAR" ROW IS NOT HERE, and that is the one section of
+        the removed module that did not come across. It was the face, the name,
+        a Listed pill and two buttons — and Profile already opens with a row
+        carrying the same face, the same name and the same two intentions
+        (preview, edit). Moving it in would have put Owen Clarke on this page
+        twice, forty pixels apart, with a different pair of buttons under each.
+        The pill is what it cost: "Listed" now lives in the line under the
+        heading above, which says the same thing in words and says the fee and
+        the range with it. */''}
+  ${/* `tint info` — §45. Four read-only figures and nothing to press: this is
+        the card described back to you, which is reading matter. */''}
+  <section class="sec tint info">
+    <div class="sec-h"><h2>On your card</h2></div>
+    ${/* THE NOTES HAVE TO HOLD AT `live` TOO, where nothing has happened yet:
+          `ivs`, `month` and `rating` are all zero or null the day the listing
+          goes up, and a note reading "9 this month" under a nought is the cell
+          contradicting itself. Both of those cells say what is true instead. */''}
+    ${stats([
+      ['wallet', 'Your fee',   money(v.fee),        `${money(v.share)} of it yours`],
+      ['skill',  'Assesses',   v.rangeShort,        'Explorer to Builder'],
+      ['video',  'Interviews', String(v.ivs || 0),  v.month ? `${v.month} this month` : 'none yet'],
+      ['star',   'Rating',     v.rating || '&mdash;',
+       v.rating ? `across ${v.ivs} interviews` : 'nothing rated yet']])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Specialisms</h2></div>
+    <div class="tag-row">
+      <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
+      <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
+      <span class="tag bordered">${I.add}Add</span>
+    </div>
+    <p class="help mt4">Four is the most a card shows. A candidate searching for one of these sees you before an agent who has not claimed it.</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your fee</h2></div>
+    ${kv([
+      ['You charge', money(v.fee)],
+      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
+      ['You are paid', `${money(v.share)} &middot; 80%`]])}
+    <div class="btn-row mt5"><button class="btn btn-g btn-sm noic" data-sheet="fee">Change your fee</button></div>
+    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>A new fee applies to new bookings</b>
+      Anything already in escrow settles at the rate it was booked at.</div></div>
+  </section>
+
+  ${v.listed ? `
+  <section class="sec">
+    <div class="sec-h"><h2>Visibility</h2></div>
+    <label class="tg"><div class="tb"><b>Listed in the marketplace</b>
+      <span>Candidates on your track can find and book you</span></div>
+      <input type="checkbox" checked><span class="sw"></span></label>
+    <p class="help mt4">Pausing takes you out of browse. Interviews already booked still stand, and nothing is re-approved when you come back.</p>
+  </section>` : ''}
+
+  ${/* `tint info` — §45. A kv band and a note explaining what stacking a role
+        means. There is no control in it and there should not be: which roles an
+        account carries is not something an agent edits here. */''}
+  <section class="sec tint info">
     <div class="sec-h"><h2>Your roles</h2></div>
     ${kv([
       ['Talent agent', v.certified ? `Since ${A.since}` : 'Added 12 June'],
@@ -2400,23 +2792,23 @@ V.profile = v => head({title: 'Profile'}) + `
    Same argument as the wireframe's `data-ag="member:41:Maryam Naz"`, avoided.
 
    EVERY FIGURE IS READ OFF A PAGE. The dates, the fee split, the escrow days,
-   the module count and the two ratings are the same ones `PAGESUM` and the views
+   the lesson count and the two ratings are the same ones `PAGESUM` and the views
    print — a bell that rounds a number is a fourth place for it to drift.
    ========================================================================== */
 const AGENT_NOTIF = {
   setup:[
     {ic:'trophy',     t:'You are approved',                b:'Approved on 12 June. The agent role sits on the account you already had.',               w:'1h ago',     go:'dashboard',   unread:1},
     {ic:'wallet',     t:'Payouts are not set up',          b:'Nothing can be booked until a payout destination exists. It is a Stripe handoff.',        w:'1h ago',     go:'earnings',    unread:1},
-    {ic:'view',       t:'Your listing card is written',    b:'Your fee is $85, which leaves you $68 after the split. Nothing is visible yet.',          w:'Yesterday',  go:'listing',     unread:0}
+    {ic:'view',       t:'Your public profile is written',    b:'Your fee is $85, which leaves you $68 after the split. Nothing is visible yet.',          w:'Yesterday',  go:'profile',     unread:0}
   ],
   training:[
     {ic:'calendar',   t:'Calibration is Thursday 20 June', b:'45 minutes with Derek Hale. It is the last thing before you can be booked.',              w:'2h ago',     go:'training',    unread:1},
-    {ic:'book',       t:'Three of four modules done',      b:'Writing the report is the one left — the 24 hours after the call.',                      w:'Today',      go:'training',    unread:1},
+    {ic:'book',       t:'Three of four lessons done',      b:'Writing the report is the one left — the 24 hours after the call.',                      w:'Today',      go:'training',    unread:1},
     {ic:'wallet',     t:'Payout destination confirmed',    b:'Stripe, account ending 4417. Your fee and your money are both set.',                     w:'Yesterday',  go:'earnings',    unread:0}
   ],
   live:[
     {ic:'certificate',t:'You are certified',               b:'Calibrated on 20 June by Derek Hale. You may assess Explorer E2 to Builder B1.',          w:'Today',      go:'training',    unread:1},
-    {ic:'view',       t:'You are in browse',               b:'Listed since Monday at $85. No rating yet — the first three interviews are what make one.', w:'Today',    go:'listing',     unread:1},
+    {ic:'view',       t:'You are in browse',               b:'Listed since Monday at $85. No rating yet — the first three interviews are what make one.', w:'Today',    go:'profile',     unread:1},
     {ic:'time',       t:'Six slots are open',              b:'Over the next fortnight. Wednesday at 7:00 PM is the first one nobody has claimed.',       w:'Yesterday',  go:'availability',unread:0}
   ],
   working:[
@@ -2429,8 +2821,8 @@ const AGENT_NOTIF = {
   reviewed:[
     {ic:'trophy',     t:'Nadia moved you to A3',           b:'The quarterly review landed on 1 October. You may assess E1 to B2 now.',                  w:'Today',      go:'standing',    unread:1},
     {ic:'chart',      t:'Follow-up came up to 4.6',        b:'Over the quarter, across 171 interviews. Depth has held at 4.7 since May.',               w:'Today',      go:'standing',    unread:1},
-    {ic:'view',       t:'Your range widened in browse',    b:'Candidates at Builder B2 can find you now.',                                              w:'Yesterday',  go:'listing',     unread:0},
-    {ic:'certificate',t:'Nothing is due until June',       b:'The method is re-checked once a year, and the re-check is two modules rather than four.',  w:'3 days ago', go:'training',    unread:0}
+    {ic:'view',       t:'Your range widened in browse',    b:'Candidates at Builder B2 can find you now.',                                              w:'Yesterday',  go:'profile',     unread:0},
+    {ic:'certificate',t:'Nothing is due until June',       b:'The method is re-checked once a year, and the re-check is two lessons rather than four.',  w:'3 days ago', go:'training',    unread:0}
   ]
 };
 
@@ -2607,7 +2999,7 @@ const talAnswer = q => Object.values(TALQ).flat().find(e => e[0] === q);
 const talReply = q => {
   const a = talAnswer(q);
   if(!a) return tw('I do not have that one',
-    `<p class="t-body-02">I can read your listing, your interviews, your scores and the money.
+    `<p class="t-body-02">I can read your public profile, your interviews, your scores and the money.
       Ask me about one of those and I will answer off the pages you are looking at.</p>`);
   return tw(a[0],
     a[2] ? `<p class="t-body-02">${a[1]}</p>${twLines(a[2])}` : `<p class="t-body-02">${a[1]}</p>`,
@@ -2648,7 +3040,7 @@ function askView(v){
   const hero = `<div class="tal-hero">
       <span class="tal-mk lg orb"></span>
       <h2>Hello <b>${A.n.split(' ')[0]}</b>, I am Tal &#128075;</h2>
-      <p>I can read your listing, your interviews, your scores and the money. What do you need?</p>
+      <p>I can read your public profile, your interviews, your scores and the money. What do you need?</p>
     </div>`;
   const thread = (opened ? '' : hero)
     + S.thread.map(m => askBubble(m.who, m.html)).join('')
@@ -2746,7 +3138,7 @@ function confirmSheet(){
 /* The editing sheets. One component, four titles — the fields differ, the
    frame does not. */
 const SHEETS = {
-  listing: ['Your listing', `
+  listing: ['Your public profile', `
     <label class="f"><span class="lbl">Headline</span>
       <input class="inp" value="Eleven years in delivery, six of them managing managers"></label>
     <label class="f"><span class="lbl">Bio</span>
@@ -2842,7 +3234,14 @@ function render(){
      transform of its own) but with no entrance, which is the one difference
      between it and the candidate's. Per trap 5, `data-open` lasts one render and
      is motion's; `data-shown` is the state and is what a layout rule may read. */
-  const OVER = ['nav', 'notif', 'confirm', 'sheet'];
+  /* `peek` IS ON THIS LIST FOR `data-shown` AND NOT FOR MOTION. §44 keys the
+     page's `--pad-x:0` on `data-shown~="peek"` — layout, so per trap 5 it may
+     only ever read the persistent attribute, never `data-open`. It is in `OVER`
+     because that is the one place either attribute is written; nothing in the
+     design system animates a `.peek`, and it does not want an entrance: it
+     changes the width of the column beside it, so sliding it in would drag the
+     page's reflow along behind it for 240ms. */
+  const OVER = ['nav', 'notif', 'confirm', 'sheet', 'peek'];
   const opened = OVER.filter(k => S[k] && !MO.open[k]);
   const shown  = OVER.filter(k => S[k]);
   for(const k of OVER) MO.open[k] = !!S[k];
@@ -2871,6 +3270,14 @@ function render(){
         <main class="main">${S.tal ? askView(v) : `<div class="page">${view(v)}</div>`}</main>
         ${S.tal || S.sheet || S.confirm ? '' : askDock()}
       </div>
+      ${/* THE PEEK IS A SIBLING OF THE VIEW COLUMN, which is the whole design.
+            §27's notification panel is `position:absolute` against `.app` and
+            arrives with a scrim over the page; this one is a third flex child of
+            `.shell-body`, so the rail, the page and the preview are three
+            columns edge to edge and the page genuinely narrows instead of being
+            covered and dimmed. A preview you cannot read the original beside is
+            not doing its job. §44 has the argument and the phone fallback. */''}
+      ${S.peek ? peekPanel(v) : ''}
     </div>
     ${/* THE PANEL IS A CHILD OF `.app`, NOT OF THE VIEW COLUMN. §27 makes
           `.notif` `position:absolute` against the four edges, so it needs the
@@ -2927,7 +3334,7 @@ function render(){
 
    `S` is the whole of this portal's state and it started at
    `{stage:'working', view:'dashboard'}` every time the file was opened. So
-   reading the Listing page in "Approved, setting up", pressing reload, and
+   reading the Public profile page in "Approved, setting up", pressing reload, and
    landing on the dashboard of "A working week" was the prototype throwing away
    two choices at once — and reload is not an unusual thing to do to a page you
    are reviewing. `hifi/` has answered this since its first version; this is the
@@ -2986,7 +3393,7 @@ function readHash(){
 window.addEventListener('hashchange', () => {
   if(!readHash()) return;
   S.nav = false; S.tal = false; S.notif = false;
-  S.confirm = false; S.sheet = false; S.stp = false;
+  S.confirm = false; S.sheet = false; S.stp = false; S.peek = false;
   render();
 });
 
@@ -3054,7 +3461,12 @@ device.addEventListener('keydown', e => {
 });
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-readall],[data-cal],[data-cal-m]');
+  /* EVERY ATTRIBUTE THE BRANCHES BELOW READ HAS TO BE IN THIS LIST. It is the
+     one place a new control can be added and silently do nothing: the branch
+     for it is written, the markup carries the attribute, and the click never
+     reaches either because `closest` was not looking for it. `data-peek` cost
+     exactly that. */
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-peek],[data-readall],[data-cal],[data-cal-m]');
   if(!t) return;
   const d = t.dataset;
 
@@ -3089,6 +3501,14 @@ device.addEventListener('click', e => {
   if(d.tab){ S.tab = d.tab; return render(); }
   /* THE STEPS DROPDOWN — one flag, and §33.7 hangs the panel off the toggle. */
   if(d.stp !== undefined){ S.stp = d.stp === '1'; return render(); }
+  /* THE PEEK. `!== undefined` rather than truthiness, for the same reason as
+     `data-cal` below: the close cross carries `data-peek=""` and the empty
+     string is a real value. It is not `data-toggle`, because the toggle branch
+     flips a flag and both controls here are one-way — the button opens it, the
+     cross closes it, and a second press of "See how you appear" while the panel
+     is already open should leave it open rather than dismiss the thing you just
+     asked for. */
+  if(d.peek !== undefined){ S.peek = d.peek === '1'; return render(); }
   /* THE CALENDAR. `data-cal-m` changes the month and closes any open card, since
      a card about a day in August has nothing to say on the September grid.
      `data-cal` carries a slot id and toggles — pressing the block whose card is
@@ -3145,13 +3565,13 @@ document.getElementById('pick').onchange = e => {
      `S.read` populated would clear an unread dot on a different notification
      that happens to share a title. */
   S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
-  S.notif = false; S.read = [];
+  S.notif = false; S.read = []; S.peek = false;
   S.thread = []; S.typing = false; S.askFrom = 'dashboard'; S.stp = false;
   render();
 };
 document.getElementById('reset').onclick = () => {
   S.view = 'dashboard'; S.nav = false; S.tal = false;
-  S.notif = false; S.read = [];
+  S.notif = false; S.read = []; S.peek = false;
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
   S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael'; S.stp = false;
   render();

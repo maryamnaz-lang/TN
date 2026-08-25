@@ -150,7 +150,23 @@ css = '\n'.join((here / f).read_text() for f in
                  # so it reaches only a page that carries one. Nothing in §41 or
                  # §42 names `.empty`, and §02 is the only layer that lays it
                  # out, so this has to land after §02 and is otherwise free.
-                 '43-empty.css'])
+                 '43-empty.css',
+                 # THE PEEK — the agent's "see how you appear" preview as a
+                 # third column in `.shell-body`, in flow beside the page rather
+                 # than over it (§27's notification panel is absolute and comes
+                 # with a scrim, and a thing you are comparing against must not
+                 # be dimmed). `.peek*` is a prefix no other layer mentions; the
+                 # only thing it reaches outside itself is `--pad-x` on `.page`,
+                 # a variable rather than a rule, so its position is free.
+                 '44-peek.css',
+                 # AN INFORMATION SECTION ON A QUIETER GROUND. `.sec.tint.info`
+                 # redeclares `--surface-2` on the element so §12's whole tone
+                 # system resolves against #fbfbfb with nothing restated — the
+                 # same move §37.11c makes for `.tint-2`. `.info` is a name no
+                 # earlier layer mentions and the one thing it touches is a
+                 # token, so its position is free; it is last because that is
+                 # where a new thing goes.
+                 '45-info.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

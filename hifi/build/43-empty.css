@@ -30,11 +30,20 @@
    takes what is left. Then the block centres in the space rather than in the
    first 200px of it.
 
-   IT IS SCOPED WITH `:has()` AND THAT IS THE WHOLE SAFETY ARGUMENT. `.page` is
-   every page in two portals; making it a flex column unconditionally would
-   change how forty of them distribute their sections. `:has(> .sec > .empty)`
-   only ever matches a page that actually carries one, and `min-height` rather
-   than `height` means a page that grows past the viewport still just scrolls.
+   AND THE FILL IS OPT-IN, WHICH `:has()` ALONE COULD NOT GIVE. The first
+   version keyed the whole thing on `.page:has(> .sec > .empty)` — any page
+   carrying an empty state. That is right for the three pages where the empty
+   state IS the page, and wrong for `leadMember`, where an empty "no flags
+   raised" block sits among six other sections: there `flex:1` on that one
+   section would stretch a 175px block to fill whatever the viewport had left,
+   pushing the sections under it apart. No selector can ask "is this the only
+   section", so the page says so instead: `.sec-fill` is the opt-in, and it means
+   "this section is what the page is for". `min-height` rather than `height`
+   keeps a page that outgrows the viewport scrolling normally.
+
+   THE HEADING RULE IS NOT GATED, because it is right everywhere. An empty state
+   has no rows and no left edge, so the 184px label column has nothing to line up
+   with whether or not the section is the whole page.
 
    THIRD, THE BUTTONS BELONG TO THE SENTENCE. They are inside `.empty` now
    (`checkRow`'s section markup is where that changed), so they inherit the
@@ -50,10 +59,10 @@
    ========================================================================== */
 
 /* the page becomes a column, only when an empty state is the thing on it */
-.app .page:has(> .sec > .empty){
+.app .page:has(> .sec-fill){
   display:flex;flex-direction:column;min-height:100%}
 
-.app .page:has(> .sec > .empty) > .sec:has(> .empty){
+.app .page > .sec-fill{
   flex:1 1 auto;display:flex;flex-direction:column}
 
 /* AND THE HEADING HAS TO BE TOLD TO TAKE THE WIDTH. §10 gives `.sec-h`
@@ -64,11 +73,11 @@
    "Nobody has booked you yet" onto two lines with 570px of empty row beside it,
    which looks exactly like the label column it had just been taken out of. The
    trailing gutter goes with it — that was the gap to the second track. */
-.app .page:has(> .sec > .empty) > .sec > .sec-h{
+.app .page > .sec-fill > .sec-h{
   align-self:stretch;padding-right:0}
 
 /* and the block centres in what it was given, both ways */
-.app .page:has(> .sec > .empty) > .sec > .empty{
+.app .page > .sec-fill > .empty{
   flex:1 1 auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding-top:var(--s07);padding-bottom:var(--s07)}
@@ -77,18 +86,46 @@
    how you centre a block in a block — in a flex column it fights `align-items`
    and, worse, `margin-bottom` is the only part of it that was ever doing work
    here. Stated as the gap it is. */
-.app .page:has(> .sec > .empty) > .sec > .empty > svg{
+.app .page > .sec-fill > .empty > svg{
   margin:0 0 var(--s04)}
 
 /* the sentence keeps a readable measure while it is centred */
-.app .page:has(> .sec > .empty) > .sec > .empty > .help,
-.app .page:has(> .sec > .empty) > .sec > .empty > p{
+.app .page > .sec-fill > .empty > .help,
+.app .page > .sec-fill > .empty > p{
   max-width:52ch}
 
-/* the actions are part of the block, under the sentence */
+/* THE ACTIONS ARE PART OF THE BLOCK, UNDER THE SENTENCE — and `flex`, not
+   `inline-flex`, which is a distinction one page paid for. An `.empty` comes in
+   two shapes: a flex column when its section is `.sec-fill`, and §02's plain
+   centred BLOCK everywhere else (Earnings' payout state, the leader's member
+   page). `inline-flex` shrink-wraps correctly in the first and is an inline box
+   in the second — so on Earnings the button set itself on the same line as the
+   sentence it follows, hard right, with the text running into it.
+
+   `flex` is right in both. In the block shape it is a block-level row and
+   `justify-content:center` centres the buttons in it; in the flex column the
+   parent's `align-items:center` shrink-wraps it to its content and centres that,
+   and `justify-content` has nothing left to do. One declaration, both shapes. */
 .app .empty > .btn-row{
-  display:inline-flex;justify-content:center;flex-wrap:wrap;
+  display:flex;justify-content:center;flex-wrap:wrap;
   margin-top:var(--s06)}
+
+/* AND A BUTTON INSIDE AN EMPTY STATE KEEPS ITS OWN ICON, which is the one thing
+   moving the actions in here broke. §02 sizes the empty state's mark with
+   `.empty svg{width:32px;height:32px;fill:var(--text-placeholder);margin:0 auto
+   var(--s04)}` — a DESCENDANT selector, written when the only svg inside an
+   `.empty` was that mark. With the buttons in the block it reached them too, so
+   "Continue to Stripe" came out with a 32px placeholder-grey launch glyph, half
+   the height of the button, with 12px of margin under it pushing the label off
+   centre. §02's own `.btn svg` (0,1,1) loses to `.empty svg` (0,1,1) on source
+   order, so it has to be said again from here.
+
+   Restated rather than narrowed: `.empty > svg` would be the tidier fix at
+   source, but §02 is an early layer that four other components read for their
+   own marks, and this is a correction, which is what a late layer is for. */
+.app .empty .btn svg{
+  width:20px;height:20px;flex:none;fill:currentColor;margin:0}
+.app .empty .btn-sm svg{width:18px;height:18px}
 
 @container app (min-width:900px){
   /* §10.15's opt-out list, extended. Restated here rather than edited there

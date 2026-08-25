@@ -86,3 +86,29 @@
    `.cardrow-a` still holds a tag wherever a tag is the row's own content: the
    payout destination's "Connected", a check's "1 of 2". */
 
+
+/* --------------------------------------------------------------------------
+   ONE CHECKLIST, ONE ROW HEIGHT
+
+   A checklist row is two different elements depending on whether the step can
+   be opened — a `.tile.clk.gcard` with an arrow, or a plain `.cardrow` — and
+   those two carry different boxes. §24.275 pays a clickable row in a
+   `.tile-stack` `var(--s06)` top and bottom, which is right for the card rows it
+   was written for: a `.gcard` there is a title, a sub and a chevron, and it is
+   the whole content of its row. §02 pays a `.cardrow` `var(--s04)`.
+
+   Which means the same four steps changed rhythm as the agent finished them.
+   At `setup` two were open, so the list drew 104px per row; at `training` those
+   two were done and it drew 76px. Nothing about the list had changed except
+   which branch each row took, and a list that re-spaces itself as you make
+   progress reads as two different components on two screens.
+
+   `ckrow` is on both branches, so this is the one declaration that settles it.
+   The compact box wins: it is what the list looks like once it is finished, and
+   four rows of two short lines do not need 48px of air between them. The arrow
+   still has room — §02's `min-height:56px` is untouched and a two-line row is
+   taller than that anyway.
+   -------------------------------------------------------------------------- */
+.app .page .tile-stack > .gcard.ckrow,
+.app .page .tile-stack > .tile.clk.ckrow{
+  padding-top:var(--s04);padding-bottom:var(--s04)}

@@ -1,0 +1,254 @@
+/* ==========================================================================
+   44. THE PEEK — A RIGHT-HAND COLUMN THAT TAKES SPACE RATHER THAN COVERING IT
+
+   WHAT IT IS FOR. An agent's Listing page is the editable version of a card
+   somebody else reads. "See how you appear" has to answer that in the only way
+   that settles it — by drawing the card, with the candidate's own components,
+   beside the page you were editing. So this is a PREVIEW, and a preview you
+   cannot see next to the thing it previews is worth much less.
+
+   WHICH IS WHY IT IS NOT `.notif`. §27's notification panel is the product's
+   existing right-hand surface and it is the wrong shape here twice over: it is
+   `position:absolute` against `.app`'s four edges, so it floats OVER the page,
+   and it comes with a scrim, so the page under it is dimmed and unreadable. A
+   thing you are comparing against must not be greyed out. The peek is IN FLOW —
+   a third column in `.shell-body`, after `.view-col` — so the page it sits
+   beside genuinely narrows and both are legible at full contrast. Rail, page,
+   peek, three panels edge to edge.
+
+   AND THE PAGE GIVES UP ITS DESKTOP MARGIN WHILE IT IS OPEN — the blank sides,
+   not the sections' own gutter. §14.125 sets the page in from both edges with
+   `clamp(var(--s06), 12cqw, 200px)` of padding on `.main`, and the note there is
+   why: "a desktop page needs a margin, not a gutter — the column is set in from
+   both sides so the layout reads as placed on the screen rather than poured into
+   it." True of a full-width page, and the wrong trade the moment 420px of that
+   screen belongs to something else. At a 1728px frame the margin was still
+   taking 400px while the peek took 420, so the page was drawing in 836px of a
+   1236px column and every grid in it tightened for no reason a reader could see.
+
+   It goes to 0, and the sections keep `--pad-x`. That distinction is the whole
+   fix: 32px of gutter is what holds the text off the rail and off the peek's
+   hairline, and the first version of this rule zeroed THAT instead — the
+   sections went edge to edge and every heading, row and figure cell moved,
+   which is the one thing opening a preview must not do to the page you are
+   previewing. `--pad-x` is not mentioned here any more.
+
+   The rule reads `data-shown`, never `data-open` — trap 5: `data-open` lasts one
+   render and belongs to motion, layout may only read the persistent one.
+
+   IT IS A PANEL AND NOT A PAGE, so it keeps its own scroller. `.peek-b` is the
+   only thing that scrolls; the header holding the title and the close control
+   stays put, because a preview you have scrolled 400px into still needs the way
+   out to be where you last saw it.
+
+   THE WIDTH IS A CLAMP, NOT A FRACTION. `min(420px, 42%)` — 420px is what the
+   card and its four fact cells need to draw at their real size (a preview drawn
+   smaller than the real thing is not a preview), and 42% is what stops it from
+   taking the page's own measure below about a thousand pixels.
+
+   ON A PHONE IT COVERS, because there is no second column to be beside. Under
+   860px it goes `position:absolute` over the whole frame — same markup, same
+   state, and the comparison is lost, which is the honest trade at that width.
+
+   LAST, AND IT HAS TO BE, for one rule out of the file. `.peek*` is a prefix no
+   other layer mentions and could sit anywhere — but zeroing `.main`'s side
+   padding is a correction to §14.125, which states it inside `@container app
+   (min-width:900px)`. Per trap 3 a container query is its own tier, so the only
+   thing that outranks it at equal weight is a later rule; this one wins on
+   specificity as well (`.app[data-shown]` plus `.main` against `.app .main`),
+   and being last means it does not have to rely on that.
+   ========================================================================== */
+
+.app .peek{
+  flex:0 0 auto;width:min(420px, 42%);
+  display:flex;flex-direction:column;min-width:0;
+  background:var(--layer-01);
+  border-left:1px solid var(--rule);
+  /* AND `--label-col` IS RETUNED RATHER THAN OVERRIDDEN, which is the cheapest
+     correction in this layer. §10.5 gives `.kv` `grid-template-columns:
+     var(--label-col) minmax(0,1fr)` — 184px — and the panel's content box is
+     372px, so a kv band left 147px for its value and "Set by you, within 48
+     hours" came out four words tall. Redefining the variable on the panel moves
+     every rule that reads it, in one declaration, instead of restating a grid
+     inside the container query that states it (trap 3) and then restating it
+     again for the next component that borrows the token. 130px holds "Soonest
+     slot" on one line, which is the longest key the panel prints. */
+  --label-col:130px}
+
+.app .peek-h{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s06);
+  border-bottom:1px solid var(--rule)}
+
+.app .peek-h > .peek-t{
+  flex:1;min-width:0;
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary)}
+
+.app .peek-h > .peek-t > small{
+  display:block;
+  font-size:12.5px;line-height:17px;font-weight:400;letter-spacing:.2px;
+  color:var(--text-secondary)}
+
+.app .peek-x{
+  flex:none;width:32px;height:32px;display:grid;place-items:center;
+  background:transparent;border:0;cursor:pointer}
+.app .peek-x svg{width:20px;height:20px;fill:var(--icon-secondary)}
+
+.app .peek-b{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:var(--s06)}
+
+/* THE FOOTER, and it holds the one action a preview needs. `border-top` rather
+   than a gap: the panel already has a rule under its header, and a surface whose
+   top is framed and whose bottom is not reads as unfinished at the fold. It is
+   `flex:none` for the reason `.peek-h` is — `.peek-b` between them is the only
+   thing that scrolls, so both ends stay where they were put. */
+.app .peek-f{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s06);
+  border-top:1px solid var(--rule)}
+
+/* THE NAME'S LINE CARRIES THE FEE, which the arrow used to occupy. §11.141
+   states `.ag-n`'s type and nothing states its display, so it is an inline span
+   — a flex row with the price pushed to the end is all this needs, and
+   `align-items:baseline` is what keeps a 15px name and a 15px figure sitting on
+   one line rather than centred against each other. `.ag-price` already carries
+   `margin-left:auto` from §03.108, so the push comes free. */
+.app .peek .ag .ag-n{
+  display:flex;align-items:baseline;gap:var(--s04)}
+
+/* AND THE CARD SHARES THE PANEL'S LEFT EDGE. `.ag` carries 16px of its own
+   horizontal padding — right on a marketplace list, where the card is a row in a
+   rail and the padding is what holds it off the rail's edge. In the panel the
+   rail is the panel, so that 16px was a second inset: the face started at 1121
+   while every heading and hairline under it started at 1105, and the one element
+   a reader looks at first was the one out of line. The padding comes off and the
+   panel's own 24px is the card's inset, same as everything else in here. */
+.app .peek .ag{padding-left:0;padding-right:0}
+
+/* --------------------------------------------------------------------------
+   A FILLED STAR IS GOLD, AND THIS RULE IS NOT PEEK-SCOPED
+
+   §03.104 fills `.stars svg.f` with `--text-primary` — ink. §01 has a `--star`
+   token, #c9971a, and its own note says what it is for: "a star is gold; as a
+   mark it only needs 3:1, and this holds 3.4:1". Nothing was reading it. So the
+   product had a colour defined for exactly this mark and drew the mark in
+   something else, which is how a token quietly stops being true.
+
+   IT IS DELIBERATELY EVERY STAR IN BOTH PORTALS, not just the ones in this
+   panel. The peek's whole job is to show an agent the card a CANDIDATE sees, so
+   a gold star here and an ink star on the candidate's own agent list would make
+   the preview lie about the one thing it exists to be accurate about. One
+   design language, one source — and the candidate portal's `.ag`, `.agh` and
+   `.agid-r` rows take the same gold, which is the intended consequence.
+
+   HERE ONLY BECAUSE IT HAS TO BE LATE. §11.106 and §11.340 both restate the
+   star row's type, and §12 tunes marks per ground; a correction to §03 has to
+   land after all of them, and this is the last layer. It belongs with `.stars`
+   the day `.stars` gets a layer of its own.
+   -------------------------------------------------------------------------- */
+.app .stars svg.f{fill:var(--star)}
+
+/* AND THE LAST SECTION DRAWS NO CLOSING RULE. The separator between sections is
+   a `::after` hairline on each one, which is right BETWEEN two and wrong under
+   the final one: there is nothing below it to be separated from, so the line
+   reads as an underline on the last value and then 400px of empty panel. The
+   panel's own footer rule is what closes the surface. */
+.app .peek-b > .sec:last-child::after{content:none}
+
+/* THE PREVIEW'S OWN LABEL. Not a `.note`: a note is the product telling you a
+   rule, and this is a caption on a facsimile. It is the one place in either
+   portal where a component is shown standing in for itself, and saying so is
+   what stops it being read as another editable row. */
+.app .peek-lede{
+  margin:0 0 var(--s05);
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;
+  color:var(--text-secondary)}
+
+/* the page hands over its outer margin, and keeps its gutter */
+.app[data-shown~="peek"] .main{padding-left:0;padding-right:0}
+
+/* --------------------------------------------------------------------------
+   AND THE PAGE'S BREAKPOINTS DO NOT KNOW IT GOT NARROWER
+
+   This is the cost of taking space instead of covering it, and it is worth
+   writing down because it will catch the next in-flow panel too. Every
+   breakpoint in this product is a CONTAINER query on `app`, and the container is
+   `.device` — the frame. Opening the peek takes 420px off the PAGE and changes
+   the container not at all, so a page at a 1200px frame keeps every rule it had
+   at 1200px while being drawn in 708px.
+
+   ONE RULE FEELS IT, AND ONLY IN A BAND. `.stats` is `repeat(4, …)` above a
+   700px container (§10.502), and four cells need about 200px each before a
+   `.stat` — a mark, a label and a figure on one line — starts truncating
+   ("ASSESSES" came out as "ASSESSE…"). With the outer margin gone the page keeps
+   `frame − 72 − min(420, 42%)`, so the four cells are comfortable again from
+   about a 1360px frame up and it is only BELOW that, where the peek is still
+   taking its full 420px out of a narrow frame, that they are not. Hence the
+   band: `min-width:700px` is where §10 turns four columns on, `max-width:1359px`
+   is where this stops needing to turn them off. Above it the rule does not
+   apply and §10's own layout stands, which is the point — a correction that
+   fires when it is not needed is a second layout to keep in step.
+
+   `.sec`'s 184px label column (§10.15) is left alone on the page: it is a fixed
+   184px out of the whole column, and the column is now most of the frame. It IS
+   turned off inside the peek, where the panel is 420px and 184px of it is not a
+   spine beside the content, it is half the panel.
+   -------------------------------------------------------------------------- */
+@container app (min-width:700px) and (max-width:1359px){
+  .app[data-shown~="peek"] .page .stats{
+    grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* THE PANEL'S OWN SECTIONS NEVER GET THE LABEL COLUMN. `.peek` is 420px and its
+   content box is 372px; 184px of that is not a spine beside the content, it is
+   half the panel, and a `.tag-row` in the 188px that is left wraps to one tag a
+   line. Restated inside the container query for trap 3's reason — §10.15's list
+   lives in one and cannot be outranked from outside it.
+
+   AND TURNING THE GRID OFF IS NOT THE SAME AS TURNING THE COLUMN OFF, which is
+   what the first version of this block missed. §10.15 is three rules, not one:
+   `display:grid`, then `.sec:has(> .sec-h){padding-right:var(--pad-x)}`, then
+   `.sec:has(> .sec-h) > :not(.sec-h){padding-left:var(--s06)}` — that last 24px
+   is the gap between the label track and the content track. Setting
+   `display:block` left both paddings behind, so the panel's headings sat at the
+   content edge and everything UNDER them — the tag row, the kv band — sat 24px
+   in, with the right edge 16px short. Two left margins in a 372px panel, and the
+   heading was the odd one out in a column of its own content.
+
+   All three go. The panel's own 24px is the gutter here; nothing inside it needs
+   a second one. */
+@container app (min-width:900px){
+  .app .peek .sec{display:block;padding-left:0;padding-right:0}
+  .app .peek .sec > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s04);
+    padding:0;align-self:stretch}
+  .app .peek .sec > :not(.sec-h){padding-left:0;padding-right:0}
+}
+
+/* --------------------------------------------------------------------------
+   THE KV BAND'S HAIRLINES SIT INSIDE THE PADDING, WITH THE CONTENT
+
+   `.kv` draws its divider as its own `border-bottom` (§10.153), so the line is
+   exactly as wide as the row's box — and once §10.388's 24px left padding is off
+   (see the block above), that box is the panel's content box: the same left and
+   right edges as the heading over it and the tag row above that. Which is where
+   the line belongs. Every hairline in the panel then starts and stops on one
+   pair of edges, and the panel's 24px is the margin the whole surface is set in
+   by rather than something some rules cross and others do not.
+
+   THE FIRST VERSION BLED IT TO THE PANEL'S EDGE — `-24px` of margin with the
+   padding put back — on the reading that "full width" meant edge to edge. It is
+   the wrong reading and it looks it: a rule running out past the text at both
+   ends turns a four-row band into four framed strips, and it was the only thing
+   in the panel drawn to a different measure than everything else. There is no
+   rule here now, deliberately: `.kv`'s own border is already correct, and the
+   note exists so the next person does not add one back.
+   -------------------------------------------------------------------------- */
+
+@container app (max-width:859px){
+  .app .peek{
+    position:absolute;inset:0;z-index:70;
+    width:auto;border-left:0}
+}

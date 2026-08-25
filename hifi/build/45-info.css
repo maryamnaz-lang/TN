@@ -1,0 +1,47 @@
+/* ==========================================================================
+   45. AN INFORMATION SECTION SITS ON A QUIETER GROUND
+
+   WHAT IT IS FOR. A long page mixes two kinds of section and draws them
+   identically. Some are things you DO — a row with a button, a switch, a chip
+   you can add. Some are things you READ: your roles and what stacking them
+   means, the four figures on your card, the split. The agent's Profile page now
+   holds seven of them in one white column, and nothing about the column says
+   which are which, so a reader scanning for the control has to read every
+   heading to find out that two of the sections have no control in them at all.
+
+   `.sec.info` is the quiet ground for the second kind. It is one step off white
+   — far enough to group the reading matter, not far enough to look like a panel
+   the page is showing you on purpose.
+
+   IT IS `.tint` WITH THE GROUND REDEFINED, WHICH IS §37.11c's MOVE. §12 hangs a
+   whole tone system off `.sec.tint`: hairlines step to `--rule-on-2`, a `.tag`
+   loses its fill, `.stats` cells repaint in the panel's own colour so their 1px
+   grid gaps still read as rules, `.ch-num` and `.cardrow-ic` take a matching
+   ground. Twenty-odd selectors, every one of them reading `--surface-2` rather
+   than a literal. A second tinted section written as its own class would have to
+   restate all of them and would drift the moment §12 gained a twenty-first. So
+   this declares the TOKEN on the element and every one of those rules resolves
+   against the new value with nothing restated. The markup is
+   `class="sec tint info"` — both, deliberately, so the relationship is visible
+   at the call site, exactly as `.tint-2` states it.
+
+   #FBFBFB, AND IT IS LIGHTER THAN THE PANEL ON PURPOSE. `--surface-2` is
+   #f7f7f7, which is the ground for "a section the reader is meant to treat as
+   one object" — a form, a summary block. This is not that: it is background
+   reading, and it should recede rather than group. Half a step is enough, and it
+   is a real token rather than a hex at the call site so the next page that wants
+   it does not guess.
+
+   IT DOES NOT REACH FOR `:has()`. "A section with no control in it" would find
+   these two automatically and it would be wrong the first time somebody adds a
+   button to one — the section would silently change colour, which is a layout
+   decision making itself. Whether a section is reading matter is an editorial
+   call, so it is a class the page applies.
+
+   LAST, and free: `.info` is a name no earlier layer mentions, and the one thing
+   it touches is a token §12 declares, which is a variable and not a rule.
+   ========================================================================== */
+
+:root{--surface-info:#fbfbfb}
+
+.app .sec.tint.info{--surface-2:var(--surface-info)}

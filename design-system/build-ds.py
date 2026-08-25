@@ -82,6 +82,14 @@ LAYERS = [
     # the same reason as the two layers above — the page that showed the problem
     # is the agent's, and the component is `.empty`, which every portal has.
     '43-empty.css',
+    # The peek: a right-hand column that takes space instead of covering it.
+    # Written here for the same reason as §41-§43 — the surface belongs to the
+    # Talent Agent's Listing preview, and a component built in one portal is one
+    # the next portal re-implements.
+    '44-peek.css',
+    # The quiet ground for a section you read rather than act on. One token and
+    # one rule; every portal has pages that mix the two kinds of section.
+    '45-info.css',
 ]
 
 # ==========================================================================

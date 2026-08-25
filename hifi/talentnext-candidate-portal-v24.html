@@ -7844,30 +7844,93 @@ button.btn-p:active,
 .app .rst-done .cardrow-ic svg,
 .app .rst-now  .cardrow-ic svg,
 .app .rst-wait .cardrow-ic svg{fill:var(--rsi, var(--icon-primary))}
-.app .page:has(> .sec > .empty){
+.app .page .tile-stack > .gcard.ckrow,
+.app .page .tile-stack > .tile.clk.ckrow{
+  padding-top:var(--s04);padding-bottom:var(--s04)}
+.app .page:has(> .sec-fill){
   display:flex;flex-direction:column;min-height:100%}
-.app .page:has(> .sec > .empty) > .sec:has(> .empty){
+.app .page > .sec-fill{
   flex:1 1 auto;display:flex;flex-direction:column}
-.app .page:has(> .sec > .empty) > .sec > .sec-h{
+.app .page > .sec-fill > .sec-h{
   align-self:stretch;padding-right:0}
-.app .page:has(> .sec > .empty) > .sec > .empty{
+.app .page > .sec-fill > .empty{
   flex:1 1 auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding-top:var(--s07);padding-bottom:var(--s07)}
-.app .page:has(> .sec > .empty) > .sec > .empty > svg{
+.app .page > .sec-fill > .empty > svg{
   margin:0 0 var(--s04)}
-.app .page:has(> .sec > .empty) > .sec > .empty > .help,
-.app .page:has(> .sec > .empty) > .sec > .empty > p{
+.app .page > .sec-fill > .empty > .help,
+.app .page > .sec-fill > .empty > p{
   max-width:52ch}
 .app .empty > .btn-row{
-  display:inline-flex;justify-content:center;flex-wrap:wrap;
+  display:flex;justify-content:center;flex-wrap:wrap;
   margin-top:var(--s06)}
+.app .empty .btn svg{
+  width:20px;height:20px;flex:none;fill:currentColor;margin:0}
+.app .empty .btn-sm svg{width:18px;height:18px}
 @container app (min-width:900px){
   .sec:has(> .empty){display:block}
   .sec:has(> .empty) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--s05);
     padding:0 var(--pad-x)}
 }
+.app .peek{
+  flex:0 0 auto;width:min(420px, 42%);
+  display:flex;flex-direction:column;min-width:0;
+  background:var(--layer-01);
+  border-left:1px solid var(--rule);
+  --label-col:130px}
+.app .peek-h{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s06);
+  border-bottom:1px solid var(--rule)}
+.app .peek-h > .peek-t{
+  flex:1;min-width:0;
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary)}
+.app .peek-h > .peek-t > small{
+  display:block;
+  font-size:12.5px;line-height:17px;font-weight:400;letter-spacing:.2px;
+  color:var(--text-secondary)}
+.app .peek-x{
+  flex:none;width:32px;height:32px;display:grid;place-items:center;
+  background:transparent;border:0;cursor:pointer}
+.app .peek-x svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.app .peek-b{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:var(--s06)}
+.app .peek-f{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s06);
+  border-top:1px solid var(--rule)}
+.app .peek .ag .ag-n{
+  display:flex;align-items:baseline;gap:var(--s04)}
+.app .peek .ag{padding-left:0;padding-right:0}
+.app .stars svg.f{fill:var(--star)}
+.app .peek-b > .sec:last-child::after{content:none}
+.app .peek-lede{
+  margin:0 0 var(--s05);
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;
+  color:var(--text-secondary)}
+.app[data-shown~="peek"] .main{padding-left:0;padding-right:0}
+@container app (min-width:700px) and (max-width:1359px){
+  .app[data-shown~="peek"] .page .stats{
+    grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@container app (min-width:900px){
+  .app .peek .sec{display:block;padding-left:0;padding-right:0}
+  .app .peek .sec > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s04);
+    padding:0;align-self:stretch}
+  .app .peek .sec > :not(.sec-h){padding-left:0;padding-right:0}
+}
+@container app (max-width:859px){
+  .app .peek{
+    position:absolute;inset:0;z-index:70;
+    width:auto;border-left:0}
+}
+:root{--surface-info:#fbfbfb}
+.app .sec.tint.info{--surface-2:var(--surface-info)}
 
 </style>
 </head>
