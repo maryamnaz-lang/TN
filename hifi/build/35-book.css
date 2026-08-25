@@ -123,11 +123,23 @@
    guessed. At 390px it resolves to 100% and the widget gets the column, which
    is the squeeze this rule exists to fix; at desktop it holds the grid at a
    measure a person reads in one pass.
+
+   `.gen` IS ON THE SAME LINE, and it was hiding behind a bug. It is the
+   generated-answer shell ai.js, ai2.js and ai3.js reply with — a header strip,
+   a source line, prose and a footer button — and it is a structured block, not
+   a paragraph, so it wants the measure for the same reason `.tw` does. It
+   never looked squeezed only because §16.20 made it bleed sideways by
+   `--pad-x`: the block hung off both edges of the bubble and read as wide
+   while the BUBBLE stayed at 55%. §39.9 takes that bleed off — correctly, it
+   was painting over the bubble's own border — and doing so exposed the width
+   that was always there. Both halves belong to one fix.
    ------------------------------------------------------------------------ */
 .app .ask-thread .tal-msg > .bb:has(.bkw),
 .app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%;width:100%}
 .app .ask-thread .tal-msg > .bb:has(.tw),
-.app .tal-panel .tal-msg > .bb:has(.tw){max-width:min(100%,620px);width:100%}
+.app .tal-panel .tal-msg > .bb:has(.tw),
+.app .ask-thread .tal-msg > .bb:has(.gen),
+.app .tal-panel .tal-msg > .bb:has(.gen){max-width:min(100%,620px);width:100%}
 
 /* ------------------------------------------------------------------ 3 ---
    WHAT IS ACTUALLY NEW

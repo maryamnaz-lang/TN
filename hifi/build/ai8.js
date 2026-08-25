@@ -110,6 +110,26 @@ const SUPPORT = {
    -------------------------------------------------------------------------- */
 let TAL_Q = '';
 
+/* --------------------------------------------------------------------------
+   THE ONE THING TO COME AWAY WITH
+
+   Every answer here is even in weight — a table, a note, two buttons — and an
+   even answer is one a person skims. `hl` marks the single item in a reply
+   that decides what they do next: a deadline, an amount, a refusal, the thing
+   that is on them rather than on us.
+
+   THE RULE IS ONE PER REPLY AND NEVER A CLAUSE. Two highlights in one answer
+   is two answers; a highlighted sentence is a highlighted paragraph with
+   extra steps, and both land back where they started — nothing standing out
+   because everything does. One to three words.
+
+   AND IT GOES IN PROSE, NOT IN A FIGURE TABLE. `.tw-lines b` is already the
+   emphasis in a grid, and the accent inside a column of numbers reads as a
+   data-series colour. See §39.12, which is where the type is drawn and where
+   the contrast trade is written down.
+   -------------------------------------------------------------------------- */
+const hl = (s) => `<b class="tw-hl">${s}</b>`;
+
 /* THE HANDOVER, AND IT NAMES WHAT TO SAY. A support card that gives an
    address and stops has moved the work rather than done it: the candidate
    still has to work out what their question even is. So `wSupport` takes the
@@ -146,7 +166,7 @@ function wSupport(askFor){
 function talNoAnswer(){
   const ctx = (isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL.ctx : TALCTX);
   const set = ctx[S.view] || ctx[isLead() ? 'leadDash' : 'dashboard'];
-  return `I do not have an answer for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
+  return `I ${hl('do not have an answer')} for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
     + wSupport('this question, worded exactly as you asked me &mdash; they will have your account open')
     + `<span class="tw-k">Here is what I can answer from where you are.</span>`
     + twChips(set);
@@ -194,7 +214,7 @@ function wScope(){
        <span><b>Cohort</b>the Thursday call, who leads it, and the board</span>
        <span><b>Me</b>everything I hold about you, where each line came from, and how to correct it or switch me off</span>
      </span>
-     <span class="tw-k">What I will not do is guess. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call &mdash; and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
+     <span class="tw-k">What I will not do is ${hl('guess')}. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call &mdash; and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
     `${twBtn('See what I hold about you','mem')}<button class="tw-btn ghost" data-ask="1">What should I do next?</button>`);
 }
 
@@ -233,7 +253,7 @@ function wCost(){
        <span><b>&minus;$95</b>your interview, credited against it</span>
        <span><b>$595</b>due when you enroll</span>
      </span>
-     <span class="tw-k">One payment. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies &mdash; $80 to $110 across the twenty-four.</span>`,
+     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies &mdash; $80 to $110 across the twenty-four.</span>`,
     twBtn('Open Enroll','enrol'));
 }
 
@@ -241,7 +261,7 @@ function wCost(){
    was. Its own route, because folding it into `wCost` buried the answer in
    the fourth line of a table. */
 function wReCost(){
-  return `The re-interview is included. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
+  return `The re-interview is ${hl('included')}. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
     + twChips(['What happens at the re-interview?','What would move me to E4?']);
 }
 
@@ -256,7 +276,7 @@ function wRefund(){
        <span><b>Interview</b>free to move or cancel up to 24 hours before. Inside 24 hours the fee is not refundable.</span>
        <span><b>Course</b>full refund up to 7 days after your cohort starts, as long as you have not finished more than one chapter.</span>
      </span>
-     <span class="tw-k">Both are decided by the support desk, not by me &mdash; I can tell you which window you are in, and they are the ones who action it.</span>`)
+     <span class="tw-k">Both are decided by ${hl('the support desk')}, not by me &mdash; I can tell you which window you are in, and they are the ones who action it.</span>`)
     + wSupport('a refund, and say which of the two windows it falls in');
 }
 
@@ -273,7 +293,7 @@ function wCard(){
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
        <span>Three saved cards is the maximum, and you can remove any of them from Payments.</span>
      </span>
-     <span class="tw-k">I cannot see any of it. Card details are on the list of things I have never been shown.</span>`,
+     <span class="tw-k">I ${hl('cannot see')} any of it. Card details are on the list of things I have never been shown.</span>`,
     twBtn('Open Payments','billing'));
 }
 
@@ -297,7 +317,7 @@ function wLedger(){
        <span>Payments has every charge with its date, the card it went to, and a Receipt button on each row.</span>
        <span>Billing is on the short list of things I have never been shown, along with your messages with Priya and anything said on a cohort call.</span>
      </span>
-     <span class="tw-k">So I cannot tell you the figure. The page can, and it is the same tap as asking me.</span>`,
+     <span class="tw-k">So I ${hl('cannot tell you the figure')}. The page can, and it is the same tap as asking me.</span>`,
     `${twBtn('Open Payments','billing')}<button class="tw-btn ghost" data-go="mem">See what I do hold</button>`);
 }
 
@@ -306,7 +326,7 @@ function wLedger(){
    things they will ask for named up front, because a second email asking for
    the date and the last four digits costs another day. */
 function wBillingProblem(){
-  return `That one needs a person, and quickly. I cannot see charges and I cannot reverse one, so there is nothing I can check first that would save you the message.`
+  return `That one ${hl('needs a person')}, and quickly. I cannot see charges and I cannot reverse one, so there is nothing I can check first that would save you the message.`
     + wSupport('a charge to be checked &mdash; give them the amount, the date and the last four digits, and attach the receipt from Payments')
     + twChips(['What is the refund window?','Is my card stored?']);
 }
@@ -326,7 +346,7 @@ function wCycle(){
        <span><b>Day 90</b>13 chapters done, and your 90-day summary written</span>
        <span><b>Day 91</b>the re-interview: you move up, hold, or drop back</span>
      </span>
-     <span class="tw-k">About two hours a week. The cohort is fixed for the whole 90 days and your leader is a volunteer who has already done the level above yours.</span>`,
+     <span class="tw-k">About ${hl('two hours a week')}. The cohort is fixed for the whole 90 days and your leader is a volunteer who has already done the level above yours.</span>`,
     twBtn('See the 13 chapters','coursework'));
 }
 
@@ -342,7 +362,7 @@ function wEnd(){
        <span>Your 90-day summary &mdash; the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
        <span>Everything you earned along the way: your points, your badges and your rank stay on the account.</span>
      </span>
-     <span class="tw-k">Deleting your account later does not take a signed summary off you.</span>`,
+     <span class="tw-k">Deleting your account later ${hl('does not')} take a signed summary off you.</span>`,
     twBtn('Open Course Progress','transcript'));
 }
 
@@ -508,7 +528,7 @@ function wMoveUp(){
        <span>Your cohort leader&rsquo;s recommendation at day 90, which is written from your weekly tasks and the calls, not from your average.</span>
        <span>The re-interview at day 91. It is the same 45 minutes and the same questions, and what is assessed is whether the answers changed.</span>
      </span>
-     <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched holds you at ${f.level}.</span>`,
+     <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched ${hl('holds you at ' + f.level)}.</span>`,
     `${twBtn('Open My Level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
 }
 
@@ -546,7 +566,7 @@ function wPause(){
        <span>Your cohort leader can carry you through a bad fortnight &mdash; that is what the flag on their dashboard is for, and it clears itself when you come back.</span>
        <span>Anything longer than that is a transfer to a later cohort, and the support desk decides those case by case.</span>
      </span>
-     <span class="tw-k">Tell your leader first. Most of what people ask a pause for, a leader can just absorb.</span>`,
+     <span class="tw-k">${hl('Tell your leader')} first. Most of what people ask a pause for, a leader can just absorb.</span>`,
     twBtn('Message your leader','messages'))
     + wSupport('a transfer to a later cohort, and say which weeks you would miss');
 }
@@ -565,7 +585,7 @@ function wMove(){
        <span><b>Inside 24h</b>you can still move it, but the fee is not refundable</span>
        <span><b>No-show</b>treated as inside 24 hours</span>
      </span>
-     <span class="tw-k">Rescheduling is on the booking itself &mdash; it does not need a person, and it does not go back to the start of the queue.</span>`,
+     <span class="tw-k">Rescheduling is on the booking itself &mdash; it ${hl('does not need a person')}, and it does not go back to the start of the queue.</span>`,
     twBtn('Open Interviews','interviews'));
 }
 
@@ -575,7 +595,7 @@ function wMove(){
    sounds like a policy; answering it with the reason sounds like the truth,
    and it also happens to tell the person how to prepare. */
 function wNoQuestions(){
-  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; nobody has the questions in advance, including them.`
+  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; ${hl('nobody')} has the questions in advance, including them.`
     + tw('So preparation is three things, not revision',
       `<span class="tw-check">
          <span>One story where you handed work over and it went wrong</span>
@@ -598,7 +618,7 @@ function wNotDo(){
        <span>Do not answer in the abstract. &ldquo;I would usually&rdquo; cannot be assessed; &ldquo;in March I&rdquo; can.</span>
        <span>Do not negotiate the level in the room. The report comes 24 hours later and there is a proper route to a review.</span>
      </span>
-     <span class="tw-k">None of this is about polish. Priya assesses judgement under pressure rather than vocabulary, and she says so on her profile.</span>`,
+     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`,
     twBtn('Practise one','rp'));
 }
 
@@ -606,7 +626,7 @@ function wNotDo(){
    a list item; the question deserves the sentence rather than the bullet,
    and it was matching the ladder route instead. */
 function wWhenLevel(){
-  return `Inside 24 hours. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it &mdash; there is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
+  return `${hl('Inside 24 hours')}. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it &mdash; there is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
     + twChips(['What is on my report?','How do I ask for a review?']);
 }
 
@@ -624,7 +644,7 @@ function wRank(){
        <span><b>E1&ndash;E3</b>the levels she is certified to assess, not the levels she tends to give</span>
        <span><b>210</b>interviews conducted</span>
      </span>
-     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. Neither one predicts the level you will get &mdash; that comes out of your own 45 minutes.</span>`,
+     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. ${hl('Neither one predicts')} the level you will get &mdash; that comes out of your own 45 minutes.</span>`,
     twBtn('See the agents','agents'));
 }
 
@@ -640,7 +660,7 @@ function wPrice(){
        <span><b>$95</b>Priya Nair &middot; 4.8 &middot; E1&ndash;E3</span>
        <span><b>$110</b>Hana Kim &middot; 4.3 &middot; B1&ndash;B4</span>
      </span>
-     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking &mdash; it is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, never a different level. The level comes out of the 45 minutes.</span>`,
+     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking &mdash; it is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, ${hl('never a different level')}. The level comes out of the 45 minutes.</span>`,
     twBtn('Compare the agents','agents'));
 }
 
@@ -683,7 +703,7 @@ function wLeader(){
      <span class="tw-list">
        <span>She runs the Thursday call, reads your weekly tasks and writes the recommendation at day 90.</span>
        <span>She is also the agent who interviewed you and set your level at E3 &mdash; the same person in two roles, which is common but not required.</span>
-       <span>It is a volunteer role. Cohort leaders are unpaid; what they earn is the cohort-leader certification.</span>
+       <span>It is a ${hl('volunteer role')}. Cohort leaders are unpaid; what they earn is the cohort-leader certification.</span>
      </span>
      <span class="tw-k">She can only lead cohorts below her own level, so she is always a step ahead of the ten of you.</span>`,
     `${twBtn('Open Cohort 41','cohort')}<button class="tw-btn ghost" data-go="messages">Message her</button>`);
@@ -711,7 +731,7 @@ function wCallLogistics(){
    Kept separate so the pre-enrolment version does not open with advice about
    telling a leader you do not have yet. */
 function wSwitch(){
-  return `Not once it has started. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for &mdash; so it is assigned for you and it is fixed for the 90 days.`
+  return `${hl('Not once it has started')}. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for &mdash; so it is assigned for you and it is fixed for the 90 days.`
     + tw('What can change',
       `<span class="tw-list">
          <span>Before your cohort starts, the support desk can move you to a later intake.</span>
@@ -739,7 +759,7 @@ function wSeen(){
        <span>You can ask for a specific recording to be deleted at any time. Deleting the recording behind a confirmed level does not reverse the level.</span>
        <span>Your weekly cohort calls are not recorded at all.</span>
      </span>
-     <span class="tw-k">TalentNext does not sell your data and does not share your individual progress with an employer without your written instruction.</span>`,
+     <span class="tw-k">TalentNext ${hl('does not sell')} your data and does not share your individual progress with an employer without your written instruction.</span>`,
     twBtn('Read the data use notice','terms'));
 }
 
@@ -770,7 +790,7 @@ function wClose(){
        <span>Certificates and signed summaries you have already earned stay valid and stay downloadable.</span>
        <span>Profile also holds &ldquo;download everything we hold&rdquo;, which is worth doing first.</span>
      </span>
-     <span class="tw-k">The control is on Profile, under Closing your account, and it asks you to confirm. I cannot do it for you and I would not want to be the one that could.</span>`,
+     <span class="tw-k">The control is on Profile, under Closing your account, and it asks you to confirm. I ${hl('cannot do it for you')} and I would not want to be the one that could.</span>`,
     twBtn('Open Profile','account'));
 }
 
@@ -793,7 +813,7 @@ function wBroken(){
   return `That is not something I can see from in here &mdash; I have your course and your interviews, not your browser or the video player.`
     + tw('Worth trying once',
       `<span class="tw-list">
-         <span>Reload the page. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
+         <span>${hl('Reload the page')}. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
          <span>If it is the same on a second browser, it is our end, not yours.</span>
        </span>`)
     + wSupport('the page you were on, what you were doing and which browser. A screenshot saves a round trip');
@@ -804,7 +824,7 @@ function wBroken(){
    reply declines in one clause and then offers the thing they actually
    needed. */
 function wNoAnswers(){
-  return talOff(`I will not do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false &mdash; it comes out of your level at the re-interview, not out of a mark.`
+  return talOff(`I ${hl('will not')} do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false &mdash; it comes out of your level at the re-interview, not out of a mark.`
     + `<span class="tw-k">If it is the time rather than the material, say so and I will tell you the shortest honest route through this week.</span>`,
     ['How do I catch up?', 'Explain this chapter in 60 seconds', 'I am stuck, ask me a question instead']);
 }

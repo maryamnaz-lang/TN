@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 3283.  Rules dropped as product-specific: 318.
+   Rules kept: 3362.  Rules dropped as product-specific: 318.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -1553,7 +1553,10 @@ textarea.inp{min-height:88px}
   .sec:has(> .stats),
   .sec:has(> .tbl-wrap),
   .sec:has(> .facts),
-  .sec:has(> .stand){display:block}
+  .sec:has(> .stand),
+  .sec:has(> .paytbl),
+  .sec:has(> .cal),
+  .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,
   .sec:has(.ag) > .sec-h,
   .sec:has(.aw) > .sec-h,
@@ -1564,7 +1567,10 @@ textarea.inp{min-height:88px}
   .sec:has(> .stats) > .sec-h,
   .sec:has(> .tbl-wrap) > .sec-h,
   .sec:has(> .facts) > .sec-h,
-  .sec:has(> .stand) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05); padding:0 var(--pad-x)}
+  .sec:has(> .stand) > .sec-h,
+  .sec:has(> .paytbl) > .sec-h,
+  .sec:has(> .cal) > .sec-h,
+  .sec:has(.kv):not(:has(.chart-table)) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05); padding:0 var(--pad-x)}
 }
 .pb + .note,
 .pb + *{margin-top:var(--s05)}
@@ -2636,7 +2642,7 @@ button{font-family:var(--font-sans)}
 .app .prog-pct{letter-spacing:-.5px}
 
 /* ---- 12-tone.css ---- */
-:root{--surface-2:#f7f7f7; --rule-on-2:#ede9e2; --link:#0371a4; --link-hover:#025c86; --tal-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14.4 9.6 22.5 12 14.4 14.4 12 22.5 9.6 14.4 1.5 12 9.6 9.6 12 1.5Z'/%3E%3C/svg%3E"); --sheen:rgba(255,255,255,.42); --sheen-0:rgba(255,255,255,0); --in-progress:#b34d00; --accent-tint:#fde3d4; --accent-on-2:#ae4508; --mk-1:#0f6ba8; --mk-2:#1c7a5e; --mk-3:#7c4bb0; --mk-4:#a83a6b; --surface-ach:#f4fef6}
+:root{--surface-2:#f7f7f7; --surface-3:#fbfbfb; --rule-on-2:#ede9e2; --link:#0371a4; --link-hover:#025c86; --tal-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14.4 9.6 22.5 12 14.4 14.4 12 22.5 9.6 14.4 1.5 12 9.6 9.6 12 1.5Z'/%3E%3C/svg%3E"); --sheen:rgba(255,255,255,.42); --sheen-0:rgba(255,255,255,0); --in-progress:#b34d00; --accent-tint:#fde3d4; --accent-on-2:#ae4508; --mk-1:#0f6ba8; --mk-2:#1c7a5e; --mk-3:#7c4bb0; --mk-4:#a83a6b; --surface-ach:#f4fef6}
 .app .sec.tint,
 .app .sec.flat.tint,
 .app .sec.warm,
@@ -3689,6 +3695,12 @@ button{font-family:var(--font-sans)}
 .app .tag.green,
 .app .tag.green svg{color:var(--support-success-ink)}
 .app .tag.green svg{fill:var(--support-success-ink)}
+.app .tag.warn,
+.app .tag.org,
+.app .tag.warn svg,
+.app .tag.org svg{color:var(--support-attention)}
+.app .tag.warn svg,
+.app .tag.org svg{fill:var(--support-attention)}
 .app .ai-aura .ai-body,
 .app .ai-aura .ai-body p{max-width:none}
 @container app (min-width:900px){
@@ -3750,8 +3762,7 @@ button{font-family:var(--font-sans)}
 .app .tal-h{padding-right:var(--s04)}
 .app .tal-h > .nm{flex:1; min-width:0}
 .app .tal-h > .tal-x{margin-left:auto; flex:none}
-.app .paytbl{margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1)}
-.app .payrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--s02) var(--s05); align-items:baseline; padding:var(--s05) var(--pad-x); border-bottom:1px solid var(--rule)}
+.app .payrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--s02) var(--s05); align-items:baseline; padding:var(--s05) 0; border-bottom:1px solid var(--rule)}
 .app .payrow:last-child{border-bottom:0}
 .app .payhead{display:none}
 .app .pay-n{font-size:14px; line-height:19px; font-weight:600; grid-column:1}
@@ -4153,20 +4164,13 @@ button{font-family:var(--font-sans)}
   .app .stickybar > .sb-b{justify-content:space-between}
 }
 @container app (min-width:900px){
-  .app .paytbl{display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(72px,auto) minmax(64px,auto); column-gap:0}
+  .app .paytbl{display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(80px,auto) minmax(168px,auto); column-gap:0}
   .app .paytbl > .payrow{display:contents}
   .app .paytbl > .payrow > *{padding:var(--s05) var(--s06) var(--s05) 0; border-bottom:1px solid var(--rule); align-self:center}
   .app .paytbl > .payrow:last-child > *{border-bottom:0}
-  .app .paytbl > .payrow > *:first-child{padding-left:var(--pad-x)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
   .app .paytbl > .payhead > span{padding-top:var(--s04); padding-bottom:var(--s04)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
-  .app .paytbl .pay-d,
-  .app .paytbl .pay-c,
+  .app .paytbl > .payrow > *,
   .app .paytbl > .payhead > span{text-align:left}
-  .app .paytbl .pay-a,
-  .app .paytbl > .payhead > .num,
-  .app .paytbl .pay-r{text-align:right}
 }
 .app:has(.stickybar) .tal-fab{bottom:calc(var(--s05) + 84px)}
 @container app (min-width:900px){
@@ -5304,8 +5308,11 @@ button.btn-p:active,
 .app[data-portal="leader"] .tbl td:first-child{font-weight:600}
 .app[data-portal="leader"] .sec.tint .tbl th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .sec.tint .tbl td{border-bottom-color:var(--rule-on-2)}
-.app[data-portal="leader"] .tbl-flag .flag-t{display:inline-flex; align-items:center; gap:var(--s03); font-weight:600; letter-spacing:.1px; white-space:nowrap}
-.app[data-portal="leader"] .tbl-flag .flag-t svg{width:16px; height:16px; flex:none; fill:currentColor}
+.app .flag-t{display:inline-flex; align-items:center; gap:var(--s03); font-weight:600; letter-spacing:.1px; white-space:nowrap}
+.app .flag-t svg{width:16px; height:16px; flex:none; fill:currentColor}
+.app .flag-t.quiet{color:var(--text-secondary); font-weight:400}
+.app .flag-t.warn{color:var(--support-attention)}
+.app .flag-t.green{color:var(--support-success-ink)}
 .app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention)}
 .app[data-portal="leader"] .tbl-flag tr td{border-bottom:1px solid var(--rule-on-2)}
@@ -5514,7 +5521,9 @@ button.btn-p:active,
 .app .ask-thread .tal-msg > .bb:has(.bkw),
 .app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%; width:100%}
 .app .ask-thread .tal-msg > .bb:has(.tw),
-.app .tal-panel .tal-msg > .bb:has(.tw){max-width:min(100%,620px); width:100%}
+.app .tal-panel .tal-msg > .bb:has(.tw),
+.app .ask-thread .tal-msg > .bb:has(.gen),
+.app .tal-panel .tal-msg > .bb:has(.gen){max-width:min(100%,620px); width:100%}
 .app .bkw .bk-h{display:flex; align-items:baseline; gap:var(--s04); margin-bottom:calc(var(--s05) * -1 + var(--s03)); font-size:11.5px; line-height:16px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
 .app .bkw .bk-h-x{margin-left:auto; font-size:11px; font-weight:400; letter-spacing:.15px; text-transform:none; color:var(--text-secondary)}
 .app .bkw .bk-when{display:flex; align-items:baseline; gap:var(--s04); flex-wrap:wrap; padding:var(--s04) 0; border-top:1px solid var(--rule)}
@@ -5690,7 +5699,7 @@ button.btn-p:active,
   .app .paytbl > .payrow > *{align-self:stretch; display:flex; align-items:center}
   .app .paytbl > .payrow > .pay-a,
   .app .paytbl > .payrow > .pay-r,
-  .app .paytbl > .payhead > .num{justify-content:flex-end}
+  .app .paytbl > .payhead > .num{justify-content:flex-start}
 }
 .app .lvl-hero{padding-bottom:var(--s06)}
 @container app (min-width:900px){
@@ -5707,6 +5716,9 @@ button.btn-p:active,
   .app .page .stats .stat-top{flex-direction:column; align-items:flex-start; gap:2px}
   .app .page .stats .stat-top > .n{margin-left:0; text-align:left}
 }
+.app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
+.app .sec.tint.tint-2{--surface-2:var(--surface-3)}
+.app .view-col .main .page .sec.tint-2 .kv::after{left:0; right:0}
 @container app (min-width:900px){
   .app .chart{grid-template-columns:minmax(0,400px) minmax(0,560px)}
 }
@@ -5810,6 +5822,8 @@ button.btn-p:active,
 .app .tal-msg > .bb .tw + .tw{margin-top:var(--s05); padding-top:var(--s05); border-top:1px solid var(--rule-on-2)}
 .app .tal-msg > .bb .tw-a{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04); margin-left:0; font-weight:400}
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
+.app .tal-msg > .bb .tw-btn:not(.ghost){background-color:var(--brand-primary); border-color:var(--brand-primary); color:var(--on-brand)}
+.app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{color:var(--accent-on-2); border-color:var(--rule-on-2); padding-left:var(--s04); padding-right:var(--s04)}
 .app .tal-msg > .bb .tw-btn.ghost svg{fill:currentColor}
 `wPace`'s lede is the longest of them — the week card's whole comparison
@@ -5827,6 +5841,18 @@ about forty-five words — so it carries a measure. Everything
 .app .tal-msg > .bb .tw + .tw-chips,
 .app .tal-msg > .bb .tw-k + .tw-chips{margin-top:var(--s05)}
 .app .tal-msg > .bb .tw > .tw-k{max-width:62ch; line-height:19px}
+.app .tal-msg > .bb .tw-def{margin-left:0; font-weight:400; font-size:12.5px; line-height:17px; color:var(--text-secondary)}
+.app .tal-msg > .bb .tw-def b{display:block; font-weight:600; color:var(--text-primary)}
+.app .tal-msg > .bb .gen{--pad-x:0px; background-color:transparent; margin-left:0; margin-right:0; padding:0}
+.app .ask-thread .tal-msg:not(.me) > .bb,
+.app .tal-panel .tal-msg:not(.me) > .bb{background-color:#fff5ee; background-image:none}
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{background-color:var(--accent); background-image:none; border-color:transparent; color:var(--on-accent); --on-brand-fill:1}
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{background-color:var(--on-accent); background-image:none; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat}
+.app .tal-msg > .bb .tw-hl{font-weight:600; color:var(--accent-on-2)}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .app .tal-msg > .bb .tw-hl{background-image:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; --on-brand-fill:1}
+}
+.app .tal-msg.me > .bb .tw-hl{background-image:none; color:var(--on-brand); -webkit-text-fill-color:var(--on-brand)}
 
 /* ---- 40-talorb.css ---- */
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{position:relative; isolation:isolate; width:112px; height:112px; background-image:none; margin-bottom:16px}
@@ -5860,4 +5886,79 @@ about forty-five words — so it carries a measure. Everything
 @media (prefers-reduced-motion:reduce){
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none; opacity:.3}
+}
+
+/* ---- 41-cal.css ---- */
+.app .cal{position:relative; border:1px solid var(--rule); background:var(--layer-01)}
+.app .cal-top{display:flex; align-items:center; gap:var(--s04); padding:var(--s05) var(--s05); border-bottom:1px solid var(--rule)}
+.app .cal-m{margin:0; flex:1 1 auto; min-width:0; font-size:14px; line-height:20px; font-weight:600; letter-spacing:-.05px}
+.app .cal-tz{flex:none; font-size:11.5px; line-height:16px; color:var(--text-helper); letter-spacing:.15px}
+.app .cal-nav{flex:none; display:flex; gap:var(--s01)}
+.app .cal-b{display:grid; place-items:center; width:32px; height:32px; background:transparent; border:1px solid var(--rule); transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-b svg{width:18px; height:18px; fill:var(--icon-primary); display:block}
+.app .cal-b:hover:where(.__nh){border-color:var(--text-primary); cursor:pointer}
+.app .cal-b[disabled]{opacity:var(--state-disabled); pointer-events:none}
+.app .cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:1px; background:var(--rule)}
+.app .cal-wd{padding:var(--s03) var(--s04); background:var(--layer-02); font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .cal-d{position:relative; min-height:84px; padding:var(--s03); display:flex; flex-direction:column; gap:var(--s03); background:var(--background)}
+.app .cal-n{flex:none; font-size:12.5px; line-height:17px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
+.app .cal-we .cal-n{color:var(--text-placeholder)}
+.app .cal-out{background:var(--layer-02)}
+.app .cal-out .cal-n{color:var(--text-placeholder)}
+.app .cal-today .cal-n{display:grid; place-items:center; width:22px; height:22px; margin:-2px 0 0 -3px; border:1.5px solid var(--text-primary); border-radius:50%; color:var(--text-primary)}
+.app .cal-slot{display:flex; flex-direction:column; gap:1px; width:100%; text-align:left; padding:var(--s02) var(--s03); background:transparent; border:1px solid var(--border-subtle-01); transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-slot:hover:where(.__nh){border-color:var(--text-primary); cursor:pointer}
+.app .cal-t{font-size:12px; line-height:16px; font-weight:600; letter-spacing:.1px; font-variant-numeric:tabular-nums; color:var(--text-primary); white-space:nowrap}
+.app .cal-s{font-size:10.5px; line-height:14px; letter-spacing:.2px; color:var(--text-helper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.app .cal-slot.taken{border-color:var(--accent-tint); background-image:repeating-linear-gradient(45deg,
+    color-mix(in srgb, var(--accent) 16%, transparent) 0 2px,
+    transparent 2px 6px)}
+.app .cal-slot.taken .cal-s{color:var(--accent-text)}
+.app .cal-slot.taken:hover:where(.__nh){border-color:var(--accent-text)}
+.app .cal-slot.next{--on-brand-fill:1; background-image:var(--accent-grad); background-color:var(--accent); border-color:transparent; box-shadow:0 1px 3px var(--accent-shadow)}
+.app .cal-slot.next .cal-t,
+.app .cal-slot.next .cal-s{color:var(--on-accent)}
+.app .cal-slot.next .cal-s{opacity:.88}
+.app .cal-slot.next:hover:where(.__nh){border-color:var(--accent-text)}
+.app .cal-join{margin-top:var(--s02); display:flex; align-items:center; justify-content:center; gap:var(--s02); padding:2px 0; background:var(--pure-white); font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.3px; color:var(--accent-text)}
+.app .cal-join svg{width:12px; height:12px; fill:var(--accent-text); display:block}
+.app .cal-slot.on{border-color:var(--text-primary); box-shadow:inset 0 0 0 1px var(--text-primary)}
+.app .cal-slot.next.on{box-shadow:0 1px 3px var(--accent-shadow),inset 0 0 0 2px var(--on-accent)}
+.app .cal-pop{position:absolute; z-index:40; width:264px; padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+.app .cal-pop::before,
+.app .cal-pop::after{content:''; position:absolute; top:var(--s06); width:8px; height:8px; transform:rotate(45deg)}
+.app .cal-pop::before{background:var(--rule)}
+.app .cal-pop::after{background:var(--layer-01)}
+.app .cal-pop[data-side="right"]::before{left:-5px}
+.app .cal-pop[data-side="right"]::after{left:-4px}
+.app .cal-pop[data-side="left"]::before{right:-5px}
+.app .cal-pop[data-side="left"]::after{right:-4px}
+.app .cal-pop-h{display:flex; align-items:baseline; gap:var(--s04); margin:0 0 var(--s02)}
+.app .cal-pop-d{flex:1 1 auto; min-width:0; font-size:14px; line-height:20px; font-weight:600; letter-spacing:-.05px; color:var(--text-primary)}
+.app .cal-pop-x{flex:none; display:grid; place-items:center; width:24px; height:24px; margin:-4px -6px 0 0; background:transparent}
+.app .cal-pop-x svg{width:16px; height:16px; fill:var(--icon-secondary); display:block}
+.app .cal-pop-x:hover:where(.__nh){cursor:pointer}
+.app .cal-pop-t{margin:0 0 var(--s05); font-size:12.5px; line-height:17px; letter-spacing:.15px; color:var(--text-helper)}
+.app .cal-row + .cal-row{margin-top:var(--s04)}
+.app .cal-row > .l{display:block; font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .cal-row > .v{display:block; margin-top:1px; font-size:13px; line-height:18px; color:var(--text-primary)}
+.app .cal-pop-who{display:flex; align-items:center; gap:var(--s04); margin:0 0 var(--s05); padding-bottom:var(--s05); border-bottom:1px solid var(--rule)}
+.app .cal-pop-who .av-ph{flex:none}
+.app .cal-pop-nb{display:flex; flex-direction:column; min-width:0}
+.app .cal-pop-nb > b{font-size:13.5px; line-height:19px; font-weight:600; letter-spacing:.05px}
+.app .cal-pop-nb > span{font-size:11.5px; line-height:16px; color:var(--text-secondary)}
+.app .cal-pop-a{display:flex; flex-direction:column; gap:var(--s03); margin-top:var(--s05); padding-top:var(--s05); border-top:1px solid var(--rule)}
+.app .cal-pop-a > .btn{width:100%}
+@container app (max-width:599.98px){
+  .app .cal-d{min-height:60px; padding:var(--s02); gap:var(--s02)}
+  .app .cal-wd{padding:var(--s02) var(--s03); font-size:9.5px; letter-spacing:.5px}
+  .app .cal-n{font-size:11px; line-height:15px}
+  .app .cal-today .cal-n{width:20px; height:20px; margin:-1px 0 0 -2px}
+  .app .cal-slot{padding:1px var(--s02); gap:0}
+  .app .cal-t{font-size:10px; line-height:14px}
+  .app .cal-s,
+  .app .cal-join{display:none}
+  .app .cal-pop{position:static; width:auto; margin-top:var(--s05); box-shadow:none}
+  .app .cal-pop::before,
+  .app .cal-pop::after{display:none}
 }

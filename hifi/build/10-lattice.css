@@ -430,17 +430,63 @@ textarea.inp{min-height:88px}
      divide between an `h2` that may shrink and a button that may not — the
      heading came out as "Where / you / stand" in three lines beside a band
      that had lost 184px of the width its three cells are sized against. */
+  /* `.kv` JOINS THEM, and it is the one member that opts out for a reason
+     none of the others has: it ALREADY IS a label column. §5 above gives
+     `.kv` `grid-template-columns:var(--label-col) minmax(0,1fr)` at this
+     same breakpoint — the identical 184px token the section column uses —
+     so a kv band under a heading draws the same spine twice and sets the
+     value 184 + 24 + 184 + 24 = 416px in from the page edge. "What you
+     sent" on the agent's application is the case that showed it: five rows
+     of one short line each, floating in the right-hand third of the page
+     with two rules running down the left of them. One spine per region is
+     the whole point of the pattern, so the section gives its up and the kv
+     band keeps the one it owns — heading on top, keys and values below.
+     Descendant, not `> .kv`: the band is wrapped (a `.tile` in the portal,
+     a bare `div` from the agent portal's `kv()` helper), so `> .kv` would
+     never match. `:not(:has(.chart-table))` is what keeps that descendant
+     reach honest — §05/§15 borrow `.kv` for a chart's data table, where it
+     is 12.5px, right-aligned and sometimes bar-backed. That is a chart, not
+     a kv band, and a headed chart section keeps its label column. */
   .sec:has(.ch),.sec:has(.ag),.sec:has(.aw),.sec:has(.mem),
   .sec:has(.gcard),.sec:has(.cardrow),.sec:has(> .tile-stack),
   .sec:has(> .stats),.sec:has(> .tbl-wrap),.sec:has(> .facts),
-  .sec:has(> .stand){display:block}
+  /* `.paytbl` JOINS THEM, and it arrives by the same route as almost every
+     entry above it. It is `.tbl-wrap`'s argument word for word — five columns
+     whose widths are negotiated against each other, so 184px taken off the row
+     is taken out of that negotiation — plus one thing only this component has:
+     it BLEEDS. §15 gives it `margin-left:calc(var(--pad-x) * -1)` on both sides
+     and its first and last cells restore the gutter themselves; measured from
+     the second grid track that negative margin pulled the table 32px INTO the
+     divider, with its heading in the track beside it. It had never been drawn
+     under a heading before — `V.billing` gives the page a `.ph` and a `.sec`
+     with no `.sec-h` at all, so the label column never applied and nothing
+     showed. The agent's Earnings ledger is the first one with a heading over
+     it. `> .paytbl`, not a descendant: a `.paytbl` nested inside something else
+     is that thing's problem, not the section's. */
+  /* `.cal` JOINS THEM, and on this list it is the least arguable member. A month
+     is seven columns of equal width; hand 184px of the row to a label column and
+     every day loses 26px, which on a phone-adjacent container is the difference
+     between a block that holds "3:00 PM" and one that holds "3:0…". It also owns
+     a POPOVER positioned against its own box (§41), so shrinking the box moves
+     the card — the one component here where the label column would change
+     behaviour and not just measurements. The heading goes above, where a
+     calendar's month label goes in every calendar. */
+  .sec:has(> .stand),.sec:has(> .paytbl),.sec:has(> .cal),
+  .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
   .sec:has(.cardrow) > .sec-h,.sec:has(> .tile-stack) > .sec-h,
   .sec:has(> .stats) > .sec-h,.sec:has(> .tbl-wrap) > .sec-h,
-  .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h{
+  .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h,
+  .sec:has(> .paytbl) > .sec-h,.sec:has(> .cal) > .sec-h,
+  .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--s05);
     padding:0 var(--pad-x)}
+  /* No companion rule for the band's own indent, and that is deliberate:
+     §14.2 already states `padding-left:0` for BOTH halves of any headed
+     section on a railed page, once, for the whole product. Restating a
+     `--pad-x` here would either lose to it or — worse — win on one page and
+     put the band 24px off the rail its heading sits on. */
 }
 
 /* breathing room between a bar and whatever it sits above */

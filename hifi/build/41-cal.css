@@ -1,0 +1,289 @@
+/* ==========================================================================
+   41. THE CALENDAR, AND THE CARD THAT OPENS BESIDE A DAY
+
+   WHY A MONTH GRID AND NOT A ROW OF CHIPS. Availability was two `.slots` rows —
+   eight `.slot` chips grouped under "THIS WEEK" and "WEEK OF 24 AUGUST" — and a
+   chip row answers "which of these do you want" perfectly, which is the
+   candidate's question in the booking flow and is where `.slot` belongs. It is
+   not the agent's question. An agent is looking at their own next eight weeks
+   and asking "where are the gaps": a shape question, about a month, and a row of
+   chips has no shape. You cannot see from it that the second week is empty on
+   Wednesday, or that everything you have opened is an afternoon. A calendar
+   answers that by being the thing it is — days in their real positions, so an
+   empty Thursday is a visible hole rather than a chip that is not there.
+
+   SEVEN COLUMNS, INCLUDING THE WEEKEND. A five-column Mon–Fri grid would fit the
+   data — every slot in the product is a weekday — and it would stop being a
+   calendar. The weekend is where you look to check you have not opened one, and
+   a grid that silently omits two days cannot answer that. They are drawn quiet
+   (`.cal-we`), not absent.
+
+   THREE STATES, AND ONLY ONE OF THEM IS FILLED
+   The old chip used `.slot.sel` for a taken slot, which is a solid black fill —
+   `.sel` means "this is the one you picked" in the picker it came from, and
+   borrowed here it made a booking look like a selection, in the loudest ink on
+   the page. Worse, on this page it was drawn in the accent, so two slots taken
+   out of eight made the calendar read as mostly orange.
+
+     open        a plain bordered block. The default, and the most common, so it
+                 is the one that gets no decoration at all.
+     taken       DIAGONAL HATCH in the accent at low opacity. A fill says "this
+                 is the important one"; a hatch says "this is spoken for", which
+                 is what the mark means in every printed timetable and Gantt
+                 chart there has ever been. It reads as texture at a glance and
+                 resolves into a booking when you look at it, which is the right
+                 order for something you cannot act on.
+     next        the ONE upcoming call takes the accent gradient — the same
+                 `--accent-grad` the primary button carries, and the only fill on
+                 the grid. There is exactly one of these by definition, so the
+                 gradient marks a singular thing rather than a category, and it
+                 carries the one action a calendar can offer: Join.
+
+   THE CARD IS A POPOVER, NOT A MODAL, AND THERE IS NO SCRIM. Pressing a day is
+   asking "what is this one" about a block you can see; a scrim would take the
+   calendar away to answer a question about the calendar. It is positioned beside
+   the block — right if there is room, left if there is not — by a pass that
+   measures, because which side has room is a fact about where in the week the
+   day sits and CSS cannot ask it. See `placeCal` in the portal for the measure;
+   this layer states both placements and the arrow that points back at the day.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE FRAME
+   `position:relative` is load-bearing: it is what the popover is positioned
+   against, and it is why the popover can never be clipped by the page — §18's
+   scroller is the page, and this box is inside it.
+   -------------------------------------------------------------------------- */
+.app .cal{
+  position:relative;
+  border:1px solid var(--rule);
+  background:var(--layer-01)}
+
+.app .cal-top{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .cal-m{
+  margin:0;flex:1 1 auto;min-width:0;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+.app .cal-tz{
+  flex:none;font-size:11.5px;line-height:16px;color:var(--text-helper);
+  letter-spacing:.15px}
+.app .cal-nav{flex:none;display:flex;gap:var(--s01)}
+.app .cal-b{
+  display:grid;place-items:center;width:32px;height:32px;
+  background:transparent;border:1px solid var(--rule);
+  transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-b svg{width:18px;height:18px;fill:var(--icon-primary);display:block}
+.app .cal-b:hover{border-color:var(--text-primary);cursor:pointer}
+.app .cal-b[disabled]{opacity:var(--state-disabled);pointer-events:none}
+
+/* --------------------------------------------------------------------------
+   2. THE GRID
+   ONE PIXEL OF GAP OVER A RULE-COLOURED GROUND, which is the same construction
+   §16 uses for the figure cells and for the same reason: a grid of 35 cells
+   drawn with borders is 35 borders that double up on every shared edge. The gap
+   IS the rule, so every divider is exactly 1px however the cells fall.
+   -------------------------------------------------------------------------- */
+.app .cal-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:1px;background:var(--rule)}
+.app .cal-wd{
+  padding:var(--s03) var(--s04);
+  background:var(--layer-02);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+/* the day cell. `min-height` rather than `aspect-ratio`: a month has 5 or 6
+   rows depending on where the 1st falls, and square cells would make the
+   calendar's height jump by a fifth between two adjacent months. */
+.app .cal-d{
+  position:relative;
+  min-height:84px;padding:var(--s03);
+  display:flex;flex-direction:column;gap:var(--s03);
+  background:var(--background)}
+.app .cal-n{
+  flex:none;
+  font-size:12.5px;line-height:17px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+/* the weekend and the days that belong to the month either side are the same
+   statement — "this is here so the week is a week" — so they are the same tone */
+.app .cal-we .cal-n{color:var(--text-placeholder)}
+.app .cal-out{background:var(--layer-02)}
+.app .cal-out .cal-n{color:var(--text-placeholder)}
+/* TODAY IS A RING ON THE FIGURE, NOT A FILL ON THE CELL. A filled cell competes
+   with the one filled BLOCK the grid is allowed to have (`.next`), and today is
+   a reference point rather than a thing to act on. */
+.app .cal-today .cal-n{
+  display:grid;place-items:center;
+  width:22px;height:22px;margin:-2px 0 0 -3px;
+  border:1.5px solid var(--text-primary);border-radius:50%;
+  color:var(--text-primary)}
+
+/* --------------------------------------------------------------------------
+   3. A BLOCK IN A DAY
+   -------------------------------------------------------------------------- */
+.app .cal-slot{
+  display:flex;flex-direction:column;gap:1px;
+  width:100%;text-align:left;
+  padding:var(--s02) var(--s03);
+  background:transparent;border:1px solid var(--border-subtle-01);
+  transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-slot:hover{border-color:var(--text-primary);cursor:pointer}
+.app .cal-t{
+  font-size:12px;line-height:16px;font-weight:600;letter-spacing:.1px;
+  font-variant-numeric:tabular-nums;color:var(--text-primary);
+  white-space:nowrap}
+.app .cal-s{
+  font-size:10.5px;line-height:14px;letter-spacing:.2px;
+  color:var(--text-helper);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* TAKEN — THE HATCH.
+   `repeating-linear-gradient` rather than an SVG or a border pattern: it is one
+   declaration, it scales with the box, and the angle and pitch are stated here
+   where they can be read. 45°, a 2px stripe every 6px, the accent at 16% — dense
+   enough to read as texture on a 40px block and light enough that the time on
+   top of it holds AA. The block keeps the accent's own rule colour so the hatch
+   has an edge; without it the stripes fade out against the cell.
+   ON A DARK OR TINTED GROUND NOTHING CHANGES, because the stripe is a colour-mix
+   against `transparent` rather than against the cell's background. */
+.app .cal-slot.taken{
+  border-color:var(--accent-tint);
+  background-image:repeating-linear-gradient(45deg,
+    color-mix(in srgb, var(--accent) 16%, transparent) 0 2px,
+    transparent 2px 6px)}
+.app .cal-slot.taken .cal-s{color:var(--accent-text)}
+.app .cal-slot.taken:hover{border-color:var(--accent-text)}
+
+/* THE NEXT CALL — THE ONE FILL.
+   `--on-brand-fill:1` is the flag §19 keys a button's on-accent ink on, set here
+   so a `.btn` inside the block inherits the right ink without being told. */
+.app .cal-slot.next{
+  --on-brand-fill:1;
+  background-image:var(--accent-grad);
+  background-color:var(--accent);
+  border-color:transparent;
+  box-shadow:0 1px 3px var(--accent-shadow)}
+.app .cal-slot.next .cal-t,
+.app .cal-slot.next .cal-s{color:var(--on-accent)}
+.app .cal-slot.next .cal-s{opacity:.88}
+.app .cal-slot.next:hover{border-color:var(--accent-text)}
+/* the Join control on the block is a chip, not a `.btn`: a 28px button inside a
+   40px block would be the block. It says the word and takes the whole width. */
+.app .cal-join{
+  margin-top:var(--s02);
+  display:flex;align-items:center;justify-content:center;gap:var(--s02);
+  padding:2px 0;
+  background:var(--pure-white);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.3px;
+  color:var(--accent-text)}
+.app .cal-join svg{width:12px;height:12px;fill:var(--accent-text);display:block}
+
+/* the pressed block is the one the card is about, and it says so with the ink
+   §12 gives a chosen row — NOT with a fill, which is `.next`'s alone */
+.app .cal-slot.on{border-color:var(--text-primary);box-shadow:inset 0 0 0 1px var(--text-primary)}
+.app .cal-slot.next.on{box-shadow:0 1px 3px var(--accent-shadow),inset 0 0 0 2px var(--on-accent)}
+
+/* --------------------------------------------------------------------------
+   4. THE CARD THAT OPENS BESIDE IT
+   `left` and `top` are written by the pass; this states everything else. The
+   two sides are one rule plus a translate, so the card cannot be two different
+   cards depending on which way it opened.
+   -------------------------------------------------------------------------- */
+.app .cal-pop{
+  position:absolute;z-index:40;
+  width:264px;
+  padding:var(--s05);
+  background:var(--layer-01);
+  border:1px solid var(--rule);
+  box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+/* the arrow. Two stacked squares rotated 45°: the back one is the border, the
+   front one the ground, offset by 1px so it covers the border's inner edge and
+   the card's own rule appears to run behind it. */
+.app .cal-pop::before,
+.app .cal-pop::after{
+  content:'';position:absolute;top:var(--s06);
+  width:8px;height:8px;transform:rotate(45deg)}
+.app .cal-pop::before{background:var(--rule)}
+.app .cal-pop::after{background:var(--layer-01)}
+.app .cal-pop[data-side="right"]::before{left:-5px}
+.app .cal-pop[data-side="right"]::after{left:-4px}
+.app .cal-pop[data-side="left"]::before{right:-5px}
+.app .cal-pop[data-side="left"]::after{right:-4px}
+
+.app .cal-pop-h{
+  display:flex;align-items:baseline;gap:var(--s04);
+  margin:0 0 var(--s02)}
+.app .cal-pop-d{
+  flex:1 1 auto;min-width:0;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary)}
+.app .cal-pop-x{
+  flex:none;display:grid;place-items:center;width:24px;height:24px;
+  margin:-4px -6px 0 0;background:transparent}
+.app .cal-pop-x svg{width:16px;height:16px;fill:var(--icon-secondary);display:block}
+.app .cal-pop-x:hover{cursor:pointer}
+.app .cal-pop-t{
+  margin:0 0 var(--s05);
+  font-size:12.5px;line-height:17px;letter-spacing:.15px;color:var(--text-helper)}
+/* the detail rows. `.kv` was the obvious reuse and it is wrong at 264px: §10
+   gives it a 184px label column at this breakpoint, which leaves 80px for the
+   value. Two lines, label over value, is what a card this narrow can hold. */
+.app .cal-row + .cal-row{margin-top:var(--s04)}
+.app .cal-row > .l{
+  display:block;
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .cal-row > .v{
+  display:block;margin-top:1px;
+  font-size:13px;line-height:18px;color:var(--text-primary)}
+.app .cal-pop-who{
+  display:flex;align-items:center;gap:var(--s04);
+  margin:0 0 var(--s05);
+  padding-bottom:var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .cal-pop-who .av-ph{flex:none}
+.app .cal-pop-nb{display:flex;flex-direction:column;min-width:0}
+.app .cal-pop-nb > b{
+  font-size:13.5px;line-height:19px;font-weight:600;letter-spacing:.05px}
+.app .cal-pop-nb > span{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary)}
+/* the action sits on its own line with the card's own padding above it, so the
+   button never reads as part of the last detail row */
+.app .cal-pop-a{
+  display:flex;flex-direction:column;gap:var(--s03);
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.app .cal-pop-a > .btn{width:100%}
+
+/* --------------------------------------------------------------------------
+   5. THE PHONE
+   A 7-column month at 390px gives each day 48px, which holds the date and
+   nothing else — so the block loses its second line and keeps the time, and the
+   card stops being a popover. There is no room beside a 48px cell for a 264px
+   card at any offset, so it becomes a sheet-width panel under the grid, still
+   with no scrim: `left`/`top` from the pass are overridden here rather than
+   being made conditional in JS, because this is a layout fact and CSS is where
+   layout facts belong.
+   -------------------------------------------------------------------------- */
+@container app (max-width:599.98px){
+  .app .cal-d{min-height:60px;padding:var(--s02);gap:var(--s02)}
+  .app .cal-wd{padding:var(--s02) var(--s03);font-size:9.5px;letter-spacing:.5px}
+  .app .cal-n{font-size:11px;line-height:15px}
+  .app .cal-today .cal-n{width:20px;height:20px;margin:-1px 0 0 -2px}
+  .app .cal-slot{padding:1px var(--s02);gap:0}
+  .app .cal-t{font-size:10px;line-height:14px}
+  .app .cal-s,.app .cal-join{display:none}
+  .app .cal-pop{
+    position:static;width:auto;margin-top:var(--s05);
+    box-shadow:none}
+  .app .cal-pop::before,.app .cal-pop::after{display:none}
+}
+
+/* --------------------------------------------------------------------------
+   6. REDUCED MOTION
+   §13.187 clamps every duration to 1ms, which is right for the two transitions
+   in this layer and wrong for nothing else here — there is no infinite
+   animation in this component, so it needs no block of its own. Stated so the
+   next person does not have to check.
+   -------------------------------------------------------------------------- */

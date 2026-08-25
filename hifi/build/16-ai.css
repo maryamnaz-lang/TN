@@ -418,9 +418,14 @@
    content and the header lined up with nothing. The table owns the columns
    and the rows dissolve into it. Headers then sit over what they name. */
 @container app (min-width:900px){
+  /* THE LAST COLUMN IS THE WIDE ONE NOW. It was `minmax(64px,auto)` because it
+     held a "Receipt" link; the agent's ledger puts a STATE there — an icon and a
+     phrase like "Releases 20 Aug" — and 64px made it the most congested cell in
+     the table while the name column had slack to spare. 168px is the longest of
+     those phrases at 13.5px plus its 16px mark and gap. */
   .app .paytbl{
     display:grid;
-    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(72px,auto) minmax(64px,auto);
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(80px,auto) minmax(168px,auto);
     column-gap:0}
   .app .paytbl > .payrow{display:contents}
   /* the rule between rows is carried by the cells, since the row is gone */
@@ -430,16 +435,21 @@
     padding:var(--s05) var(--s06) var(--s05) 0;
     border-bottom:1px solid var(--rule);align-self:center}
   .app .paytbl > .payrow:last-child > *{border-bottom:0}
-  .app .paytbl > .payrow > *:first-child{padding-left:var(--pad-x)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
   .app .paytbl > .payhead > span{
     padding-top:var(--s04);padding-bottom:var(--s04)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
-  /* left over what they name; the money and its header share the right edge */
-  .app .paytbl .pay-d,.app .paytbl .pay-c,
+  /* EVERY COLUMN STARTS ON ITS OWN HEADER, and two of them used not to.
+     The money and the last column were right-aligned — the classic ledger move,
+     so a column of amounts reads down its own last digit — and it works when the
+     amounts VARY. Here they do not: every row is the same $85 and the same $68,
+     because the fee is one agent's one rate. So the right edge bought nothing
+     and cost the thing a table is actually scanned by, which is a straight left
+     edge under the word naming the column: "YOURS" began 23px left of "$68", and
+     "STATUS" sat hard against the table's edge with its values crowded under it.
+     One rule for all five, so a column cannot start anywhere but under its name.
+     `font-variant-numeric:tabular-nums` (§15) is what keeps the figures aligned
+     with each other now that the edge is on the left. */
+  .app .paytbl > .payrow > *,
   .app .paytbl > .payhead > span{text-align:left}
-  .app .paytbl .pay-a,.app .paytbl > .payhead > .num,
-  .app .paytbl .pay-r{text-align:right}
 }
 
 /* the Tal button never sits on top of the page's own action: where a view

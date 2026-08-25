@@ -64,6 +64,12 @@ LAYERS = [
     # Listed for the same reason as the layer above: this list's whole job is
     # to BE build.py's list.
     '40-talorb.css',
+    # The month calendar and the card that opens beside a day. The first layer
+    # written FOR the design system rather than for the candidate portal — the
+    # component it draws belongs to the Talent Agent's Availability page, and it
+    # is stated here as a layer for the reason this file's header gives: a
+    # component built anywhere else is one the next portal re-implements.
+    '41-cal.css',
 ]
 
 # ==========================================================================
@@ -201,6 +207,13 @@ PRODUCT_PREFIXES = (
     'photo', 'draft', 'gen-', 'did-',         # media pickers, generated answers
     'rp-', 'q-', 'tq', 'quiz',                # the review panel and quizzes
     'tw', 'wcall', 'callband',                # the weekly task, the call bands
+    'cal-',                                   # the month calendar (§41). The
+                                              # hyphen is the namespace: a bare
+                                              # `cal` prefix would swallow a
+                                              # future `.calibration` and hide
+                                              # it from the unclassified report,
+                                              # which is the one thing that
+                                              # report exists to catch.
     'cap', 'kit', 'flag-t',                   # captions, the interview kit
     'bub', 'bmk', 'bhead',                    # bubbles and bookmarks
     'gfx', 'pict', 'bands',                   # retired illustration blocks
@@ -221,6 +234,7 @@ PRODUCT_PREFIXES = (
 # have to be named rather than prefixed so a new `.gauge` or `.stepper` still
 # reports as unclassified.
 PRODUCT_EXACT = set("""
+cal
 ag ch chip-tal aw card caption fill vn cap ct cb rt2 dsp bx
 b c g p q r s s1 s2 s3 s4 nm pi at aux eb cool ic lab line mod neg panel pct
 sev sp trk conf cq draw grp hit high live mine never noline not now past

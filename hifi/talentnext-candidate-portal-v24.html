@@ -1721,15 +1721,20 @@ textarea.inp{min-height:88px}
     padding-left:var(--s06)}
   
   
+  
   .sec:has(.ch),.sec:has(.ag),.sec:has(.aw),.sec:has(.mem),
   .sec:has(.gcard),.sec:has(.cardrow),.sec:has(> .tile-stack),
   .sec:has(> .stats),.sec:has(> .tbl-wrap),.sec:has(> .facts),
-  .sec:has(> .stand){display:block}
+  
+  .sec:has(> .stand),.sec:has(> .paytbl),.sec:has(> .cal),
+  .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
   .sec:has(.cardrow) > .sec-h,.sec:has(> .tile-stack) > .sec-h,
   .sec:has(> .stats) > .sec-h,.sec:has(> .tbl-wrap) > .sec-h,
-  .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h{
+  .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h,
+  .sec:has(> .paytbl) > .sec-h,.sec:has(> .cal) > .sec-h,
+  .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--s05);
     padding:0 var(--pad-x)}
 }
@@ -2446,6 +2451,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .big,.app .score-pts .n,.app .prog-pct{letter-spacing:-.5px}
 :root{
   --surface-2:#f7f7f7;      
+  --surface-3:#fbfbfb;      
   --rule-on-2:#ede9e2;      
   --link:#0371a4;           
   --link-hover:#025c86;
@@ -3670,6 +3676,9 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .stars svg.f,.app .stars svg[class*="f"]{fill:var(--star)}
 .app .tag.green,.app .tag.green svg{color:var(--support-success-ink)}
 .app .tag.green svg{fill:var(--support-success-ink)}
+.app .tag.warn,.app .tag.org,
+.app .tag.warn svg,.app .tag.org svg{color:var(--support-attention)}
+.app .tag.warn svg,.app .tag.org svg{fill:var(--support-attention)}
 .app .ai-aura .ai-body,.app .ai-aura .ai-body p{max-width:none}
 @container app (min-width:900px){
   .app .page:not(.form-page) .sec:has(> .daystrip){
@@ -3771,13 +3780,11 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .tal-h{padding-right:var(--s04)}
 .app .tal-h > .nm{flex:1;min-width:0}
 .app .tal-h > .tal-x{margin-left:auto;flex:none}
-.app .paytbl{
-  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
 .app .payrow{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   gap:var(--s02) var(--s05);align-items:baseline;
-  padding:var(--s05) var(--pad-x);
+  padding:var(--s05) 0;
   border-bottom:1px solid var(--rule)}
 .app .payrow:last-child{border-bottom:0}
 .app .payhead{display:none}
@@ -4476,7 +4483,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 @container app (min-width:900px){
   .app .paytbl{
     display:grid;
-    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(72px,auto) minmax(64px,auto);
+    grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) minmax(80px,auto) minmax(168px,auto);
     column-gap:0}
   .app .paytbl > .payrow{display:contents}
   
@@ -4484,15 +4491,10 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
     padding:var(--s05) var(--s06) var(--s05) 0;
     border-bottom:1px solid var(--rule);align-self:center}
   .app .paytbl > .payrow:last-child > *{border-bottom:0}
-  .app .paytbl > .payrow > *:first-child{padding-left:var(--pad-x)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
   .app .paytbl > .payhead > span{
     padding-top:var(--s04);padding-bottom:var(--s04)}
-  .app .paytbl > .payrow > *:last-child{padding-right:var(--pad-x)}
-  .app .paytbl .pay-d,.app .paytbl .pay-c,
+  .app .paytbl > .payrow > *,
   .app .paytbl > .payhead > span{text-align:left}
-  .app .paytbl .pay-a,.app .paytbl > .payhead > .num,
-  .app .paytbl .pay-r{text-align:right}
 }
 .app:has(.stickybar) .tal-fab{bottom:calc(var(--s05) + 84px)}
 @container app (min-width:900px){
@@ -6610,11 +6612,14 @@ button.btn-p:active,
 .app[data-portal="leader"] .tbl td:first-child{font-weight:600}
 .app[data-portal="leader"] .sec.tint .tbl th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .sec.tint .tbl td{border-bottom-color:var(--rule-on-2)}
-.app[data-portal="leader"] .tbl-flag .flag-t{
+.app .flag-t{
   display:inline-flex;align-items:center;gap:var(--s03);
   font-weight:600;letter-spacing:.1px;white-space:nowrap}
-.app[data-portal="leader"] .tbl-flag .flag-t svg{
+.app .flag-t svg{
   width:16px;height:16px;flex:none;fill:currentColor}
+.app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
+.app .flag-t.warn{color:var(--support-attention)}
+.app .flag-t.green{color:var(--support-success-ink)}
 .app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention)}
 .app[data-portal="leader"] .tbl-flag tr td{border-bottom:1px solid var(--rule-on-2)}
@@ -6963,7 +6968,9 @@ button.btn-p:active,
 .app .ask-thread .tal-msg > .bb:has(.bkw),
 .app .tal-panel .tal-msg > .bb:has(.bkw){max-width:100%;width:100%}
 .app .ask-thread .tal-msg > .bb:has(.tw),
-.app .tal-panel .tal-msg > .bb:has(.tw){max-width:min(100%,620px);width:100%}
+.app .tal-panel .tal-msg > .bb:has(.tw),
+.app .ask-thread .tal-msg > .bb:has(.gen),
+.app .tal-panel .tal-msg > .bb:has(.gen){max-width:min(100%,620px);width:100%}
 .app .bkw .bk-h{
   display:flex;align-items:baseline;gap:var(--s04);
   margin-bottom:calc(var(--s05) * -1 + var(--s03));
@@ -7274,7 +7281,7 @@ button.btn-p:active,
     display:flex;align-items:center}
   .app .paytbl > .payrow > .pay-a,
   .app .paytbl > .payrow > .pay-r,
-  .app .paytbl > .payhead > .num{justify-content:flex-end}
+  .app .paytbl > .payhead > .num{justify-content:flex-start}
 }
 .app .lvl-hero{padding-bottom:var(--s06)}
 @container app (min-width:900px){
@@ -7295,6 +7302,9 @@ button.btn-p:active,
     flex-direction:column;align-items:flex-start;gap:2px}
   .app .page .stats .stat-top > .n{margin-left:0;text-align:left}
 }
+.app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
+.app .sec.tint.tint-2{--surface-2:var(--surface-3)}
+.app .view-col .main .page .sec.tint-2 .kv::after{left:0;right:0}
 @container app (min-width:900px){
   .app .chart{grid-template-columns:minmax(0,400px) minmax(0,560px)}
 }
@@ -7450,6 +7460,11 @@ button.btn-p:active,
   display:flex;align-items:center;flex-wrap:wrap;
   gap:var(--s04);margin-left:0;font-weight:400}
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
+.app .tal-msg > .bb .tw-btn:not(.ghost){
+  background-color:var(--brand-primary);
+  border-color:var(--brand-primary);
+  color:var(--on-brand)}
+.app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{
   color:var(--accent-on-2);border-color:var(--rule-on-2);
   padding-left:var(--s04);padding-right:var(--s04)}
@@ -7471,6 +7486,44 @@ button.btn-p:active,
 .app .tal-msg > .bb .tw + .tw-chips,
 .app .tal-msg > .bb .tw-k + .tw-chips{margin-top:var(--s05)}
 .app .tal-msg > .bb .tw > .tw-k{max-width:62ch;line-height:19px}
+.app .tal-msg > .bb .tw-def{
+  margin-left:0;font-weight:400;
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .tal-msg > .bb .tw-def b{
+  display:block;font-weight:600;color:var(--text-primary)}
+.app .tal-msg > .bb .gen{
+  --pad-x:0px;
+  background-color:transparent;
+  margin-left:0;margin-right:0;padding:0}
+.app .ask-thread .tal-msg:not(.me) > .bb,
+.app .tal-panel .tal-msg:not(.me) > .bb{
+  background-color:#fff5ee;
+  background-image:none}
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{
+  background-color:var(--accent);
+  background-image:none;
+  border-color:transparent;
+  color:var(--on-accent);
+  --on-brand-fill:1}
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{
+  background-color:var(--on-accent);
+  background-image:none;
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+.app .tal-msg > .bb .tw-hl{
+  font-weight:600;
+  color:var(--accent-on-2)}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .app .tal-msg > .bb .tw-hl{
+    background-image:var(--accent-grad);
+    -webkit-background-clip:text;background-clip:text;
+    color:transparent;
+    -webkit-text-fill-color:transparent;
+    --on-brand-fill:1}
+}
+.app .tal-msg.me > .bb .tw-hl{
+  background-image:none;color:var(--on-brand);
+  -webkit-text-fill-color:var(--on-brand)}
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
   position:relative;isolation:isolate;
   width:112px;height:112px;
@@ -7535,6 +7588,164 @@ button.btn-p:active,
 @media (prefers-reduced-motion:reduce){
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none;opacity:.3}
+}
+.app .cal{
+  position:relative;
+  border:1px solid var(--rule);
+  background:var(--layer-01)}
+.app .cal-top{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s05) var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .cal-m{
+  margin:0;flex:1 1 auto;min-width:0;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+.app .cal-tz{
+  flex:none;font-size:11.5px;line-height:16px;color:var(--text-helper);
+  letter-spacing:.15px}
+.app .cal-nav{flex:none;display:flex;gap:var(--s01)}
+.app .cal-b{
+  display:grid;place-items:center;width:32px;height:32px;
+  background:transparent;border:1px solid var(--rule);
+  transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-b svg{width:18px;height:18px;fill:var(--icon-primary);display:block}
+.app .cal-b:hover:where(.__nh){border-color:var(--text-primary);cursor:pointer}
+.app .cal-b[disabled]{opacity:var(--state-disabled);pointer-events:none}
+.app .cal-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:1px;background:var(--rule)}
+.app .cal-wd{
+  padding:var(--s03) var(--s04);
+  background:var(--layer-02);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .cal-d{
+  position:relative;
+  min-height:84px;padding:var(--s03);
+  display:flex;flex-direction:column;gap:var(--s03);
+  background:var(--background)}
+.app .cal-n{
+  flex:none;
+  font-size:12.5px;line-height:17px;font-weight:600;
+  font-variant-numeric:tabular-nums;color:var(--text-secondary)}
+.app .cal-we .cal-n{color:var(--text-placeholder)}
+.app .cal-out{background:var(--layer-02)}
+.app .cal-out .cal-n{color:var(--text-placeholder)}
+.app .cal-today .cal-n{
+  display:grid;place-items:center;
+  width:22px;height:22px;margin:-2px 0 0 -3px;
+  border:1.5px solid var(--text-primary);border-radius:50%;
+  color:var(--text-primary)}
+.app .cal-slot{
+  display:flex;flex-direction:column;gap:1px;
+  width:100%;text-align:left;
+  padding:var(--s02) var(--s03);
+  background:transparent;border:1px solid var(--border-subtle-01);
+  transition:border-color var(--dur-short) var(--ease-standard)}
+.app .cal-slot:hover:where(.__nh){border-color:var(--text-primary);cursor:pointer}
+.app .cal-t{
+  font-size:12px;line-height:16px;font-weight:600;letter-spacing:.1px;
+  font-variant-numeric:tabular-nums;color:var(--text-primary);
+  white-space:nowrap}
+.app .cal-s{
+  font-size:10.5px;line-height:14px;letter-spacing:.2px;
+  color:var(--text-helper);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .cal-slot.taken{
+  border-color:var(--accent-tint);
+  background-image:repeating-linear-gradient(45deg,
+    color-mix(in srgb, var(--accent) 16%, transparent) 0 2px,
+    transparent 2px 6px)}
+.app .cal-slot.taken .cal-s{color:var(--accent-text)}
+.app .cal-slot.taken:hover:where(.__nh){border-color:var(--accent-text)}
+.app .cal-slot.next{
+  --on-brand-fill:1;
+  background-image:var(--accent-grad);
+  background-color:var(--accent);
+  border-color:transparent;
+  box-shadow:0 1px 3px var(--accent-shadow)}
+.app .cal-slot.next .cal-t,
+.app .cal-slot.next .cal-s{color:var(--on-accent)}
+.app .cal-slot.next .cal-s{opacity:.88}
+.app .cal-slot.next:hover:where(.__nh){border-color:var(--accent-text)}
+.app .cal-join{
+  margin-top:var(--s02);
+  display:flex;align-items:center;justify-content:center;gap:var(--s02);
+  padding:2px 0;
+  background:var(--pure-white);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.3px;
+  color:var(--accent-text)}
+.app .cal-join svg{width:12px;height:12px;fill:var(--accent-text);display:block}
+.app .cal-slot.on{border-color:var(--text-primary);box-shadow:inset 0 0 0 1px var(--text-primary)}
+.app .cal-slot.next.on{box-shadow:0 1px 3px var(--accent-shadow),inset 0 0 0 2px var(--on-accent)}
+.app .cal-pop{
+  position:absolute;z-index:40;
+  width:264px;
+  padding:var(--s05);
+  background:var(--layer-01);
+  border:1px solid var(--rule);
+  box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
+.app .cal-pop::before,
+.app .cal-pop::after{
+  content:'';position:absolute;top:var(--s06);
+  width:8px;height:8px;transform:rotate(45deg)}
+.app .cal-pop::before{background:var(--rule)}
+.app .cal-pop::after{background:var(--layer-01)}
+.app .cal-pop[data-side="right"]::before{left:-5px}
+.app .cal-pop[data-side="right"]::after{left:-4px}
+.app .cal-pop[data-side="left"]::before{right:-5px}
+.app .cal-pop[data-side="left"]::after{right:-4px}
+.app .cal-pop-h{
+  display:flex;align-items:baseline;gap:var(--s04);
+  margin:0 0 var(--s02)}
+.app .cal-pop-d{
+  flex:1 1 auto;min-width:0;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  color:var(--text-primary)}
+.app .cal-pop-x{
+  flex:none;display:grid;place-items:center;width:24px;height:24px;
+  margin:-4px -6px 0 0;background:transparent}
+.app .cal-pop-x svg{width:16px;height:16px;fill:var(--icon-secondary);display:block}
+.app .cal-pop-x:hover:where(.__nh){cursor:pointer}
+.app .cal-pop-t{
+  margin:0 0 var(--s05);
+  font-size:12.5px;line-height:17px;letter-spacing:.15px;color:var(--text-helper)}
+.app .cal-row + .cal-row{margin-top:var(--s04)}
+.app .cal-row > .l{
+  display:block;
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--text-helper)}
+.app .cal-row > .v{
+  display:block;margin-top:1px;
+  font-size:13px;line-height:18px;color:var(--text-primary)}
+.app .cal-pop-who{
+  display:flex;align-items:center;gap:var(--s04);
+  margin:0 0 var(--s05);
+  padding-bottom:var(--s05);
+  border-bottom:1px solid var(--rule)}
+.app .cal-pop-who .av-ph{flex:none}
+.app .cal-pop-nb{display:flex;flex-direction:column;min-width:0}
+.app .cal-pop-nb > b{
+  font-size:13.5px;line-height:19px;font-weight:600;letter-spacing:.05px}
+.app .cal-pop-nb > span{
+  font-size:11.5px;line-height:16px;color:var(--text-secondary)}
+.app .cal-pop-a{
+  display:flex;flex-direction:column;gap:var(--s03);
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.app .cal-pop-a > .btn{width:100%}
+@container app (max-width:599.98px){
+  .app .cal-d{min-height:60px;padding:var(--s02);gap:var(--s02)}
+  .app .cal-wd{padding:var(--s02) var(--s03);font-size:9.5px;letter-spacing:.5px}
+  .app .cal-n{font-size:11px;line-height:15px}
+  .app .cal-today .cal-n{width:20px;height:20px;margin:-1px 0 0 -2px}
+  .app .cal-slot{padding:1px var(--s02);gap:0}
+  .app .cal-t{font-size:10px;line-height:14px}
+  .app .cal-s,.app .cal-join{display:none}
+  .app .cal-pop{
+    position:static;width:auto;margin-top:var(--s05);
+    box-shadow:none}
+  .app .cal-pop::before,.app .cal-pop::after{display:none}
 }
 
 </style>
@@ -15502,6 +15713,8 @@ const SUPPORT = {
 
 let TAL_Q = '';
 
+const hl = (s) => `<b class="tw-hl">${s}</b>`;
+
 function wSupport(askFor){
   return tw('TalentNext support',
     `<span class="tw-lines">
@@ -15516,7 +15729,7 @@ function wSupport(askFor){
 function talNoAnswer(){
   const ctx = (isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL.ctx : TALCTX);
   const set = ctx[S.view] || ctx[isLead() ? 'leadDash' : 'dashboard'];
-  return `I do not have an answer for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
+  return `I ${hl('do not have an answer')} for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
     + wSupport('this question, worded exactly as you asked me &mdash; they will have your account open')
     + `<span class="tw-k">Here is what I can answer from where you are.</span>`
     + twChips(set);
@@ -15541,7 +15754,7 @@ function wScope(){
        <span><b>Cohort</b>the Thursday call, who leads it, and the board</span>
        <span><b>Me</b>everything I hold about you, where each line came from, and how to correct it or switch me off</span>
      </span>
-     <span class="tw-k">What I will not do is guess. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call &mdash; and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
+     <span class="tw-k">What I will not do is ${hl('guess')}. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call &mdash; and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
     `${twBtn('See what I hold about you','mem')}<button class="tw-btn ghost" data-ask="1">What should I do next?</button>`);
 }
 
@@ -15558,12 +15771,12 @@ function wCost(){
        <span><b>&minus;$95</b>your interview, credited against it</span>
        <span><b>$595</b>due when you enroll</span>
      </span>
-     <span class="tw-k">One payment. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies &mdash; $80 to $110 across the twenty-four.</span>`,
+     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies &mdash; $80 to $110 across the twenty-four.</span>`,
     twBtn('Open Enroll','enrol'));
 }
 
 function wReCost(){
-  return `The re-interview is included. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
+  return `The re-interview is ${hl('included')}. You paid an agent $95 to set your level at the start; the one at day 91 that decides whether you move up is part of the $690 course fee, and there is nothing further to pay for it.`
     + twChips(['What happens at the re-interview?','What would move me to E4?']);
 }
 
@@ -15573,7 +15786,7 @@ function wRefund(){
        <span><b>Interview</b>free to move or cancel up to 24 hours before. Inside 24 hours the fee is not refundable.</span>
        <span><b>Course</b>full refund up to 7 days after your cohort starts, as long as you have not finished more than one chapter.</span>
      </span>
-     <span class="tw-k">Both are decided by the support desk, not by me &mdash; I can tell you which window you are in, and they are the ones who action it.</span>`)
+     <span class="tw-k">Both are decided by ${hl('the support desk')}, not by me &mdash; I can tell you which window you are in, and they are the ones who action it.</span>`)
     + wSupport('a refund, and say which of the two windows it falls in');
 }
 
@@ -15584,7 +15797,7 @@ function wCard(){
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
        <span>Three saved cards is the maximum, and you can remove any of them from Payments.</span>
      </span>
-     <span class="tw-k">I cannot see any of it. Card details are on the list of things I have never been shown.</span>`,
+     <span class="tw-k">I ${hl('cannot see')} any of it. Card details are on the list of things I have never been shown.</span>`,
     twBtn('Open Payments','billing'));
 }
 
@@ -15594,12 +15807,12 @@ function wLedger(){
        <span>Payments has every charge with its date, the card it went to, and a Receipt button on each row.</span>
        <span>Billing is on the short list of things I have never been shown, along with your messages with Priya and anything said on a cohort call.</span>
      </span>
-     <span class="tw-k">So I cannot tell you the figure. The page can, and it is the same tap as asking me.</span>`,
+     <span class="tw-k">So I ${hl('cannot tell you the figure')}. The page can, and it is the same tap as asking me.</span>`,
     `${twBtn('Open Payments','billing')}<button class="tw-btn ghost" data-go="mem">See what I do hold</button>`);
 }
 
 function wBillingProblem(){
-  return `That one needs a person, and quickly. I cannot see charges and I cannot reverse one, so there is nothing I can check first that would save you the message.`
+  return `That one ${hl('needs a person')}, and quickly. I cannot see charges and I cannot reverse one, so there is nothing I can check first that would save you the message.`
     + wSupport('a charge to be checked &mdash; give them the amount, the date and the last four digits, and attach the receipt from Payments')
     + twChips(['What is the refund window?','Is my card stored?']);
 }
@@ -15613,7 +15826,7 @@ function wCycle(){
        <span><b>Day 90</b>13 chapters done, and your 90-day summary written</span>
        <span><b>Day 91</b>the re-interview: you move up, hold, or drop back</span>
      </span>
-     <span class="tw-k">About two hours a week. The cohort is fixed for the whole 90 days and your leader is a volunteer who has already done the level above yours.</span>`,
+     <span class="tw-k">About ${hl('two hours a week')}. The cohort is fixed for the whole 90 days and your leader is a volunteer who has already done the level above yours.</span>`,
     twBtn('See the 13 chapters','coursework'));
 }
 
@@ -15624,7 +15837,7 @@ function wEnd(){
        <span>Your 90-day summary &mdash; the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
        <span>Everything you earned along the way: your points, your badges and your rank stay on the account.</span>
      </span>
-     <span class="tw-k">Deleting your account later does not take a signed summary off you.</span>`,
+     <span class="tw-k">Deleting your account later ${hl('does not')} take a signed summary off you.</span>`,
     twBtn('Open Course Progress','transcript'));
 }
 
@@ -15748,7 +15961,7 @@ function wMoveUp(){
        <span>Your cohort leader&rsquo;s recommendation at day 90, which is written from your weekly tasks and the calls, not from your average.</span>
        <span>The re-interview at day 91. It is the same 45 minutes and the same questions, and what is assessed is whether the answers changed.</span>
      </span>
-     <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched holds you at ${f.level}.</span>`,
+     <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched ${hl('holds you at ' + f.level)}.</span>`,
     `${twBtn('Open My Level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
 }
 
@@ -15775,7 +15988,7 @@ function wPause(){
        <span>Your cohort leader can carry you through a bad fortnight &mdash; that is what the flag on their dashboard is for, and it clears itself when you come back.</span>
        <span>Anything longer than that is a transfer to a later cohort, and the support desk decides those case by case.</span>
      </span>
-     <span class="tw-k">Tell your leader first. Most of what people ask a pause for, a leader can just absorb.</span>`,
+     <span class="tw-k">${hl('Tell your leader')} first. Most of what people ask a pause for, a leader can just absorb.</span>`,
     twBtn('Message your leader','messages'))
     + wSupport('a transfer to a later cohort, and say which weeks you would miss');
 }
@@ -15788,12 +16001,12 @@ function wMove(){
        <span><b>Inside 24h</b>you can still move it, but the fee is not refundable</span>
        <span><b>No-show</b>treated as inside 24 hours</span>
      </span>
-     <span class="tw-k">Rescheduling is on the booking itself &mdash; it does not need a person, and it does not go back to the start of the queue.</span>`,
+     <span class="tw-k">Rescheduling is on the booking itself &mdash; it ${hl('does not need a person')}, and it does not go back to the start of the queue.</span>`,
     twBtn('Open Interviews','interviews'));
 }
 
 function wNoQuestions(){
-  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; nobody has the questions in advance, including them.`
+  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; ${hl('nobody')} has the questions in advance, including them.`
     + tw('So preparation is three things, not revision',
       `<span class="tw-check">
          <span>One story where you handed work over and it went wrong</span>
@@ -15811,12 +16024,12 @@ function wNotDo(){
        <span>Do not answer in the abstract. &ldquo;I would usually&rdquo; cannot be assessed; &ldquo;in March I&rdquo; can.</span>
        <span>Do not negotiate the level in the room. The report comes 24 hours later and there is a proper route to a review.</span>
      </span>
-     <span class="tw-k">None of this is about polish. Priya assesses judgement under pressure rather than vocabulary, and she says so on her profile.</span>`,
+     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`,
     twBtn('Practise one','rp'));
 }
 
 function wWhenLevel(){
-  return `Inside 24 hours. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it &mdash; there is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
+  return `${hl('Inside 24 hours')}. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it &mdash; there is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
     + twChips(['What is on my report?','How do I ask for a review?']);
 }
 
@@ -15827,7 +16040,7 @@ function wRank(){
        <span><b>E1&ndash;E3</b>the levels she is certified to assess, not the levels she tends to give</span>
        <span><b>210</b>interviews conducted</span>
      </span>
-     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. Neither one predicts the level you will get &mdash; that comes out of your own 45 minutes.</span>`,
+     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. ${hl('Neither one predicts')} the level you will get &mdash; that comes out of your own 45 minutes.</span>`,
     twBtn('See the agents','agents'));
 }
 
@@ -15838,7 +16051,7 @@ function wPrice(){
        <span><b>$95</b>Priya Nair &middot; 4.8 &middot; E1&ndash;E3</span>
        <span><b>$110</b>Hana Kim &middot; 4.3 &middot; B1&ndash;B4</span>
      </span>
-     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking &mdash; it is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, never a different level. The level comes out of the 45 minutes.</span>`,
+     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking &mdash; it is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, ${hl('never a different level')}. The level comes out of the 45 minutes.</span>`,
     twBtn('Compare the agents','agents'));
 }
 
@@ -15866,7 +16079,7 @@ function wLeader(){
      <span class="tw-list">
        <span>She runs the Thursday call, reads your weekly tasks and writes the recommendation at day 90.</span>
        <span>She is also the agent who interviewed you and set your level at E3 &mdash; the same person in two roles, which is common but not required.</span>
-       <span>It is a volunteer role. Cohort leaders are unpaid; what they earn is the cohort-leader certification.</span>
+       <span>It is a ${hl('volunteer role')}. Cohort leaders are unpaid; what they earn is the cohort-leader certification.</span>
      </span>
      <span class="tw-k">She can only lead cohorts below her own level, so she is always a step ahead of the ten of you.</span>`,
     `${twBtn('Open Cohort 41','cohort')}<button class="tw-btn ghost" data-go="messages">Message her</button>`);
@@ -15884,7 +16097,7 @@ function wCallLogistics(){
 }
 
 function wSwitch(){
-  return `Not once it has started. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for &mdash; so it is assigned for you and it is fixed for the 90 days.`
+  return `${hl('Not once it has started')}. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for &mdash; so it is assigned for you and it is fixed for the 90 days.`
     + tw('What can change',
       `<span class="tw-list">
          <span>Before your cohort starts, the support desk can move you to a later intake.</span>
@@ -15902,7 +16115,7 @@ function wSeen(){
        <span>You can ask for a specific recording to be deleted at any time. Deleting the recording behind a confirmed level does not reverse the level.</span>
        <span>Your weekly cohort calls are not recorded at all.</span>
      </span>
-     <span class="tw-k">TalentNext does not sell your data and does not share your individual progress with an employer without your written instruction.</span>`,
+     <span class="tw-k">TalentNext ${hl('does not sell')} your data and does not share your individual progress with an employer without your written instruction.</span>`,
     twBtn('Read the data use notice','terms'));
 }
 
@@ -15925,7 +16138,7 @@ function wClose(){
        <span>Certificates and signed summaries you have already earned stay valid and stay downloadable.</span>
        <span>Profile also holds &ldquo;download everything we hold&rdquo;, which is worth doing first.</span>
      </span>
-     <span class="tw-k">The control is on Profile, under Closing your account, and it asks you to confirm. I cannot do it for you and I would not want to be the one that could.</span>`,
+     <span class="tw-k">The control is on Profile, under Closing your account, and it asks you to confirm. I ${hl('cannot do it for you')} and I would not want to be the one that could.</span>`,
     twBtn('Open Profile','account'));
 }
 
@@ -15941,14 +16154,14 @@ function wBroken(){
   return `That is not something I can see from in here &mdash; I have your course and your interviews, not your browser or the video player.`
     + tw('Worth trying once',
       `<span class="tw-list">
-         <span>Reload the page. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
+         <span>${hl('Reload the page')}. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
          <span>If it is the same on a second browser, it is our end, not yours.</span>
        </span>`)
     + wSupport('the page you were on, what you were doing and which browser. A screenshot saves a round trip');
 }
 
 function wNoAnswers(){
-  return talOff(`I will not do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false &mdash; it comes out of your level at the re-interview, not out of a mark.`
+  return talOff(`I ${hl('will not')} do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false &mdash; it comes out of your level at the re-interview, not out of a mark.`
     + `<span class="tw-k">If it is the time rather than the material, say so and I will tell you the shortest honest route through this week.</span>`,
     ['How do I catch up?', 'Explain this chapter in 60 seconds', 'I am stuck, ask me a question instead']);
 }

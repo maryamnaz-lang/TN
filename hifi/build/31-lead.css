@@ -145,11 +145,32 @@
    column of red names turns a queue into a list of people in trouble rather
    than a list of things to look at. Severity belongs to the flag column only.
    Names are `--text-primary` like every other name in the product. */
-.app[data-portal="leader"] .tbl-flag .flag-t{
+/* NOT SCOPED, AND NOT KEYED TO ONE TABLE — the third component in this file to
+   come out from behind `[data-portal="leader"]`, and the same argument §31.5
+   makes for the booked row. `.flag-t` is "a mark and a phrase in one hue", which
+   is a general answer to a general question: what a cell says when its value is
+   a STATE rather than a number. Being written as `.tbl-flag .flag-t` also tied
+   it to the attention queue's own table, so the only way to have it anywhere
+   else was to claim to be that table.
+
+   The agent's payment ledger is where that bit. Its Status column was a `.tag`
+   per row — five outlined pills down the right-hand edge of a table whose other
+   four columns are plain text, which drew five boxes to say five words. This is
+   the same information in the same shape as the leader's flags: an icon that
+   says WHICH state, the phrase, and the hue carrying how much it matters.
+
+   THE HUE COMES FROM A MODIFIER NOW, not only from the row. `tr.sev` / `tr.mod`
+   are facts about the leader's table and stay there; a caller outside a table
+   has no row to be severe, so the three inks it can ask for are named. Default
+   is body ink — a state that is simply true and needs no colour. */
+.app .flag-t{
   display:inline-flex;align-items:center;gap:var(--s03);
   font-weight:600;letter-spacing:.1px;white-space:nowrap}
-.app[data-portal="leader"] .tbl-flag .flag-t svg{
+.app .flag-t svg{
   width:16px;height:16px;flex:none;fill:currentColor}
+.app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
+.app .flag-t.warn{color:var(--support-attention)}
+.app .flag-t.green{color:var(--support-success-ink)}
 .app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention)}
 

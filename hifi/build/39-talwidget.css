@@ -83,11 +83,11 @@
    THE ACTION ROW IS A ROW, WITH A GAP IN IT
 
    `.tw-a` inherited `margin-left:auto` from §03.363, where it shares a
-   declaration with `.tw-def` — two things that are not the same thing. On
-   `.tw-def` the auto margin pushes a definition's value to the right of its
-   term. On `.tw-a` it pushed the whole action row to the right edge of the
-   widget, which is not where this product puts actions: `.gen-f` and
-   `.ai-foot` both sit hard left under a rule.
+   declaration with `.tw-def` — two things that are not the same thing, and
+   the auto margin is wrong on BOTH of them (see §8 for the other). Here it
+   pushed the whole action row to the right edge of the widget, which is not
+   where this product puts actions: `.gen-f` and `.ai-foot` both sit hard
+   left under a rule.
 
    Worse, `.tw-a` was never a flex container, so `twBtn(…) + twBtn(…).ghost`
    printed two inline-flex buttons as adjacent siblings with no gap at all —
@@ -133,8 +133,27 @@
 
    NOT a `.lnk`. Links in this product are BLUE, deliberately — §12 says so at
    length — and a blue link inside Tal's answer would be the one blue thing on
-   the screen. This is a button that is coloured, not a link. */
+   the screen. This is a button that is coloured, not a link.
+
+   AND THE PRIMARY IS FILLED BLACK, which §10 above is what made necessary.
+   An outlined button with ink text is legible on `--layer-01`; on the wash it
+   is a hairline box on a tinted ground, and beside an accent-ink second
+   action it stopped reading as the primary of the pair at all. Filled, it is
+   `.btn-p`'s own treatment — `--brand-primary` on `--on-brand` — which is
+   what every other primary action in the product looks like, so the widget's
+   main action now matches the page's.
+
+   `:not(.ghost)` IS LOAD-BEARING AND THE NOTE ABOVE IS WHY. Naming `.tw-btn`
+   alone from this depth already broke the quiet variant once, by re-arming a
+   border its own rule had switched off. A fill would be a worse version of
+   the same mistake, so the selector excludes the variant rather than relying
+   on a later rule to undo it. */
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
+.app .tal-msg > .bb .tw-btn:not(.ghost){
+  background-color:var(--brand-primary);
+  border-color:var(--brand-primary);
+  color:var(--on-brand)}
+.app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{
   color:var(--accent-on-2);border-color:var(--rule-on-2);
   padding-left:var(--s04);padding-right:var(--s04)}
@@ -226,3 +245,199 @@
    the full width of a 584px widget when the rows above it are a grid.
    ------------------------------------------------------------------------ */
 .app .tal-msg > .bb .tw > .tw-k{max-width:62ch;line-height:19px}
+
+
+/* ------------------------------------------------------------------ 8 ---
+   A DEFINITION IS TWO LINES, LEFT ALIGNED
+
+   `.tw-def` is the shape `wTerms` uses for chapter 4's two ideas, and it was
+   wrong in two ways at once. Both come from the markup being `<b>term</b>`
+   immediately followed by the definition text, with §03.363 as the only rule.
+
+   THE AUTO MARGIN RIGHT-ALIGNED IT, INTERMITTENTLY, WHICH IS WHY IT LOOKED
+   LIKE A RENDERING FAULT RATHER THAN A LAYOUT. §03.363 gives `.tw-def`
+   `margin-left:auto`, shared with `.tw-a`. On a flex item an auto cross-axis
+   margin cancels `stretch`, so the item becomes shrink-to-fit and the margin
+   pushes it to the end. The FIRST term's text is long enough to fill the
+   line, so shrink-to-fit is the full width and the margin resolves to zero —
+   it looks fine. The second is shorter: measured at a 584px widget it sat
+   **100px to the right** of the first. One of two rows indented, and only
+   sometimes, depending on how the text happened to wrap.
+
+   AND THE TERM RAN INTO ITS DEFINITION. `<b>` is inline, so it read
+   "Operating rhythmThe regular cadence of check-ins" as one string. The term
+   is a title; it gets its own line, which is the same `<b>` + `<br>` shape
+   `wChapterAny` uses for a titled row.
+
+   Typed to match `.tw-list`, because that is what it sits beside in the same
+   widget: 12.5/17, the term in primary ink and the definition in secondary.
+   §03.363's `font-weight:600` applied to the whole block — it was meant for
+   the term, and on the definition it made the entire widget bold.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-def{
+  margin-left:0;font-weight:400;
+  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+.app .tal-msg > .bb .tw-def b{
+  display:block;font-weight:600;color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 9 ---
+   `.gen` IN A BUBBLE IS TRAP 10, AND IT IS THE SAME ONE DECLARATION
+
+   ai.js, ai2.js and ai3.js answer with a `.gen` block — the generated-answer
+   shell, with Tal's label, a source line and a footer. On a PAGE it bleeds to
+   the column edge on purpose: §16.20 gives it `margin-left/right:
+   calc(var(--pad-x) * -1)` and repays the same value as padding, so the grey
+   ground runs full width behind text that stays in the measure.
+
+   In a Tal bubble that is exactly wrong, and for the reason CLAUDE.md's trap
+   10 states: `.ask-page` carries `.page`, so `--pad-x` is the ask page's
+   gutter and the block bleeds by it. Measured at a 289px bubble with 17px of
+   padding, the grey ran to within 1px of the border on both sides; at a wider
+   gutter it crosses it and paints over the bubble's own edge. That is the
+   "odd fill" — a slab of `--surface-2` hanging off both sides of a bordered
+   white card.
+
+   §35.1 already answered this for the booking widget and the answer is a
+   variable, not a selector hunt: a bubble is not a page, so the page's
+   horizontal inset inside one is zero. Setting it once at the top of the
+   block fixes the bleed, the padding and any rule in the sheet that reads
+   `--pad-x` — including the ones nobody has found yet.
+
+   THE FILL GOES WITH IT, on §1's argument. `.gen`'s grey ground says "this
+   was generated". Inside Tal's own bubble everything was generated, so it is
+   a second frame around a thing that already has one — the same box-in-a-box
+   this layer exists to remove. What still marks it as generated is what §16
+   says marks it: the header strip and the source line, in words.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .gen{
+  --pad-x:0px;
+  background-color:transparent;
+  margin-left:0;margin-right:0;padding:0}
+
+/* ------------------------------------------------------------------ 10 ---
+   TAL'S BUBBLE HAS ITS OWN GROUND
+
+   A Tal turn used to be `--layer-01` inside a hairline — the same flat white
+   card any other block on the page gets, so nothing about the surface said
+   who was speaking. It now carries a warm ground of its own.
+
+   ONE FLAT COLOUR, NOT §25.1's TWO GRADIENTS. The first version of this rule
+   copied the module head band's wash across: two radial gradients on
+   `--tal-chip-1` and `--tal-chip-2`, redrawn from the Figma ellipses. That is
+   the right ground for a band 1394px wide, where the two pools have room to
+   read as light falling across a surface. In a 356px bubble they are two
+   tints stacked in a small box, and the pair reads as a mottle rather than as
+   a wash. `#fff5ee` is the single tone that replaces them.
+
+   THE LITERAL IS DELIBERATE. It is not `--tal-chip-1` (`#f6efe5`) nor any
+   other token in §01 — it is warmer and lighter than both, chosen for this
+   surface. §33.6 sets the same precedent for the sphere's three oranges: a
+   value that belongs to one component and is stated where that component is.
+
+   `background-image:none` matters as much as the colour: it is what takes the
+   two gradients off, and without it §27.8's `background-color` would simply
+   be repainted underneath them.
+
+   `:not(.me)` because the candidate's own bubble is `--brand-primary` with
+   white ink (§27.8), and a cream ground under white text is unreadable.
+   Tal's side only.
+   ------------------------------------------------------------------------ */
+.app .ask-thread .tal-msg:not(.me) > .bb,
+.app .tal-panel .tal-msg:not(.me) > .bb{
+  background-color:#fff5ee;
+  background-image:none}
+
+/* ------------------------------------------------------------------ 11 ---
+   AND THE CHIPS ON IT ARE THE ACCENT, BECAUSE THEY WERE THE SAME TWO COLOURS
+
+   This is not a taste change, it is a collision. §22's chip is
+   `background-color:var(--tal-chip-1)` with a radial of `--tal-chip-2` over
+   it — and §10 above just painted the bubble with those same two tokens. A
+   chip made of the ground it sits on is a chip you cannot see: the suggested
+   questions dissolved into the wash the moment it arrived.
+
+   `--accent` IS `#f57414` — the flat accent §01.50 declares and the one the
+   whole product fills with. So the chips take the fill they already own
+   everywhere else rather than a new colour invented for this surface.
+
+   `--on-brand-fill:1` is the flag §19 explains: white on this orange is about
+   2.7:1, under AA, and it is the brand's decision rather than an oversight —
+   declared so `verify.mjs` counts and reports it instead of it passing
+   silently.
+
+   THE SPARKLE HAS TO CHANGE WITH THE FILL. §27.1 swaps `.chip-tal .sk-mark`
+   from a masked star to the `tal-circle.png` blob, which is orange — on an
+   orange chip it disappears. The mark goes back to §12's construction, the
+   `--tal-star` mask, painted in `--on-accent`: a shape tinted by
+   `background-color` recolours, an image does not.
+   ------------------------------------------------------------------------ */
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{
+  background-color:var(--accent);
+  background-image:none;
+  border-color:transparent;
+  color:var(--on-accent);
+  --on-brand-fill:1}
+.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{
+  background-color:var(--on-accent);
+  background-image:none;
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat}
+
+/* ------------------------------------------------------------------ 12 ---
+   ONE OR TWO WORDS IN THE BRAND GRADIENT
+
+   Tal's answers are dense — a figure table, a closing note, two actions — and
+   every word in them is the same weight. `.tw-hl` marks the ONE thing in a
+   reply that the person has to come away with: the deadline, the amount, the
+   refusal, the thing that is on them. `hl()` in ai8.js is what applies it,
+   and the rule there is one per reply and never a whole sentence.
+
+   IN PROSE ONLY, NEVER IN THE LABEL GRID. `.tw-lines b` is already the
+   emphasis in a table — a gradient in a column of figures reads as a data
+   series colour, which is a meaning this product gives to `--dv-1..4` and not
+   to the accent. So the highlight lives in the opening sentence, the
+   `.tw-lede` or the `.tw-k`, where there is running text for it to stand out
+   from.
+
+   THE CONTRAST IS A STATED EXCEPTION, NOT AN OVERSIGHT. §01.33 is explicit
+   that the gradient is "fills only, never text", and it is right: measured on
+   this section's `#fff5ee` ground the gradient runs 2.64:1 at `--accent` and
+   3.29:1 at `--accent-2`, both under AA for 13.5px type. `--accent-text` and
+   `--accent-on-2` are the AA-safe inks and clear it at 4.83:1 and 5.35:1.
+
+   This is the brand's own trade, taken the way the product already takes it:
+   §01.40 accepts 2.8:1 for white on the gradient because it is the sign-up
+   button's decision applied everywhere, and it declares `--on-brand-fill:1`
+   so `verify.mjs` COUNTS the pair and reports it rather than letting it pass
+   silently. The same flag is declared here. To make these AA instead, delete
+   the `@supports` block below and the fallback becomes the whole rule — the
+   words keep their weight and lose the gradient.
+
+   THE FALLBACK IS THE POINT OF THE `@supports`. Clipping a background to text
+   needs `color:transparent`, so a browser that does not support
+   `background-clip:text` renders invisible words rather than unstyled ones.
+   The base rule is therefore solid AA-safe ink, and the gradient is layered
+   on only where it can actually be clipped.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-hl{
+  font-weight:600;
+  color:var(--accent-on-2)}
+
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+  .app .tal-msg > .bb .tw-hl{
+    background-image:var(--accent-grad);
+    -webkit-background-clip:text;background-clip:text;
+    color:transparent;
+    -webkit-text-fill-color:transparent;
+    /* the flag §19 and §01.40 explain — the contrast sweep reads it */
+    --on-brand-fill:1}
+}
+
+/* A HIGHLIGHT INSIDE THE DARK BUBBLE IS NOT A HIGHLIGHT. §27.8 fills the
+   candidate's own turn with `--brand-primary` and white ink; the accent on
+   black is the one place this gradient genuinely cannot be read. Tal never
+   writes into that bubble today, but `hl()` is a string helper and a string
+   can be echoed — so the case is closed here rather than left to luck. */
+.app .tal-msg.me > .bb .tw-hl{
+  background-image:none;color:var(--on-brand);
+  -webkit-text-fill-color:var(--on-brand)}

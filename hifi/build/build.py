@@ -122,7 +122,16 @@ css = '\n'.join((here / f).read_text() for f in
                  # the PNG's soft tail; a hard-edged disc has none, so it goes
                  # positive), and runs §33.6's spin. All three have to exist
                  # first. Nothing in §34-§39 names its selectors.
-                 '40-talorb.css'])
+                 '40-talorb.css',
+                 # THE MONTH CALENDAR AND ITS POPOVER. A new component rather
+                 # than a correction, so its position in the order is almost
+                 # free — it names `.cal*` and nothing else in the product does.
+                 # It is LAST for the two places it does touch something older:
+                 # it hands `.cal-slot.next` §19's `--on-brand-fill` flag so a
+                 # control inside a gradient block inherits on-accent ink, and
+                 # its phone block restates the grid from §10's own breakpoint.
+                 # Both have to land after the layers that state them.
+                 '41-cal.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

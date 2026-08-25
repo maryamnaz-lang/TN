@@ -373,12 +373,21 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     hero and `.cardrow`s for the rest.
 13. **§10.15's label-column opt-out is keyed by CONTENTS, and it is the cheapest thing to
     get right.** At desktop a `.sec` with a `.sec-h` gets a 184px label column unless it
-    contains `.tile-stack`, `.stats`, `.tbl-wrap`, `.facts`, `.cardrow` or `.gcard`. Build
-    pages from those and the spine is free; introduce a wrapper (`.msgs`, `.ivt-lines`) and
-    its heading collides with its own content. The list lives inside `@container app
+    contains `.tile-stack`, `.stats`, `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard` or `.kv`.
+    Build pages from those and the spine is free; introduce a wrapper (`.msgs`, `.ivt-lines`)
+    and its heading collides with its own content. The list lives inside `@container app
     (min-width:900px)`, so per trap 3 it can only be extended by restating it inside the same
     query — `36-lead2.css` §36.9 does that twice. Also keep those headings SHORT: three words
     is two lines in 184px.
+    **`.kv` is the newest member and the odd one out: it opts out because it ALREADY IS a
+    label column.** §10.5 gives `.kv` `var(--label-col)` — the same 184px — at the same
+    breakpoint, so a kv band under a heading drew the spine twice and set the value 416px in
+    ("What you sent" on the agent's application is the case that showed it). A headed kv
+    section therefore stacks: heading on top, keys and values below. It is the one entry
+    reached by descendant rather than `> `, because the band is always wrapped (a `.tile` in
+    the portal, a bare `div` from the agent portal's `kv()` helper) — and the one with an
+    exclusion, `:not(:has(.chart-table))`, because §05/§15 borrow `.kv` for a chart's data
+    table and a headed chart section keeps its column.
 14. **A `TAL_ROUTES` handler is called with NO ARGUMENT.** `talReply` is
     `for(const [m,fn] of TAL_ROUTES) if(m.test(q)) return fn()` — the regex is the whole of
     the parsing, and every route before `ai8.js` is a closure over `S` that never needed the

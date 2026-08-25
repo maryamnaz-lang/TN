@@ -276,9 +276,16 @@ const CFG = {
    thread: `thread` is the conversation, `typing` is Tal's turn in flight, and
    `askFrom` is the page the dock was pressed on, which is what "Back to …"
    names and which set of chips is offered. */
-const S = {stage:'working', view:'dashboard', nav:false, tal:false,
+const S = {stage:'working', view:'dashboard', nav:false, tal:false, notif:false,
+           read:[],
            thread:[], typing:false, askFrom:'dashboard',
            iv:'rafael', tab:'next', confirm:false, sheet:false, stp:false,
+           /* `cal` is which of `CAL_MONTHS` the calendar shows and `slot` is
+              which block's card is open. `slot` holds a slot ID rather than a
+              boolean because the card IS about one slot, and the pressed block
+              reads the same value to draw itself `.on` — one fact, two readers,
+              which is what keeps them from disagreeing. */
+           cal:0, slot:null,
            perms:{draft:true, brief:true, live:false}};
 
 const f = () => ({...A, ...CFG[S.stage]});
@@ -336,12 +343,12 @@ const parentOf = (view, nav) =>
    the same two fields for the same reason.
    -------------------------------------------------------------------------- */
 const IVS = [
-  {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next', ord:2, chip:'Tomorrow',
+  {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next',
    day:'Thursday 20 August', time:'3:00 PM ET', kind:'First interview',
    band:'Explorer, predicted by the quiz', asked:'Delegation, and being new to managing former peers',
    paid:'Paid at booking, 19 August'},
 
-  {id:'amara', n:'Amara Osei', i:'AO', st:'next', ord:4, chip:'Mon',
+  {id:'amara', n:'Amara Osei', i:'AO', st:'next',
    day:'Monday 24 August', time:'6:00 PM ET', kind:'Re-interview',
    band:'Builder – B1, set 4 March', asked:'Hard conversations, and holding a line under pressure',
    paid:'Paid at booking, 18 August', summary:true},
@@ -363,6 +370,45 @@ const IVS = [
 ];
 const iv = id => IVS.find(x => x.id === id) || IVS[0];
 
+/* --------------------------------------------------------------------------
+   THE LEDGER
+
+   IT IS A PAYMENT RECORD, NOT AN INTERVIEW LIST, which is why it is its own
+   table and not derived from `IVS`. Four of the five names are interviews above;
+   Marcus Bell is not, because a ledger keeps rows after the interview has left
+   the working week and `IVS` only holds the five that are live. The fee and the
+   share are read off the stage (`v.fee`, `v.share`) rather than stored here —
+   Owen's rate is one number and a ledger that restated it five times could
+   disagree with the page above it.
+
+   `ic` AND `st` ARE A MARK AND A HUE, AND THIS WAS A `.tag` UNTIL IT WAS FIVE OF
+   THEM. A status is a state, and the product's first answer for a state is a
+   `.tag` — the "Connected" tag two sections up is that object doing its job,
+   once, beside four rows of plain text. Five of them down the edge of a table
+   whose other four columns are unboxed drew five outlines to say five words, and
+   the outline was the loudest thing in each.
+
+   THE COHORT LEADER ALREADY SOLVED THIS. Its attention queue has a Flag column —
+   the same kind of value, a state rather than a number — and draws it as
+   `.flag-t`: a 16px mark, the phrase, both in one hue, nothing boxed. The mark
+   says WHICH state before you have read the words and the hue says how much it
+   matters. §31 is where that is written up, and its rules came out from behind
+   `[data-portal="leader"]` so this column could be that column.
+
+   THE MARK IS THE VERB, not decoration keyed to the colour: `locked` for money
+   held, `edit` for a report you have to write, `time` for a date being waited on,
+   `checkFilled` for done. Three hues only — `warn` is the one row that is ON YOU,
+   `green` is settled, `quiet` is held or in transit and asks nothing of you.
+   Four neutral greys would have made "Report due" just another row.
+   -------------------------------------------------------------------------- */
+const PAYMENTS = [
+  {n:'Rafael Ortiz', d:'19 Aug', s:'In escrow',       ic:'locked',      st:'quiet'},
+  {n:'Sofia Marek',  d:'18 Aug', s:'Report due',      ic:'edit',        st:'warn'},
+  {n:'Tom Whelan',   d:'17 Aug', s:'Releases 20 Aug', ic:'time',        st:'quiet'},
+  {n:'Nina Haddad',  d:'14 Aug', s:'Paid 19 Aug',     ic:'checkFilled', st:'green'},
+  {n:'Marcus Bell',  d:'12 Aug', s:'Paid 17 Aug',     ic:'checkFilled', st:'green'}
+];
+
 /* FIVE PORTRAITS ACROSS MORE THAN FIVE PEOPLE. The design system's JS carries
    the portal's own five, and this is the same fidelity choice `hifi/` states
    for its ten cohort members rather than a claim that these are one person. */
@@ -378,23 +424,97 @@ const MODULES = [
   ['Writing the report', 'The 24 hours after the call']
 ];
 
-/* Availability. `on` is a taken slot — `.slot.sel` draws it filled, which is
-   the design system's own "this one is chosen" and reads correctly for "this
-   one is spoken for" too. */
-const SLOTS = [
-  ['This week', [
-    ['Wed 19', '7:00 PM', 0], ['Thu 20', '3:00 PM', 1], ['Fri 21', '5:00 PM', 0]]],
-  ['Week of 24 August', [
-    ['Mon 24', '6:00 PM', 1], ['Tue 25', '5:00 PM', 0], ['Wed 26', '7:00 PM', 0],
-    ['Thu 27', '3:00 PM', 0], ['Fri 28', '5:00 PM', 0]]]
-];
+/* --------------------------------------------------------------------------
+   AVAILABILITY, AS DATES RATHER THAN AS WEEK LABELS
 
-/* THE ONE OPEN SLOT THE DASHBOARD SHOWS. `SLOTS` has six open and a dashboard
-   that listed all six would be the Availability page; this is the one the
-   dashboard has always named, kept as its own record so the diary row and the
-   picker cannot disagree about which day it is. `ord` is the diary's key on the
-   same count as `IVS` — Friday sits between Rafael (2) and Amara (4). */
-const OPEN = {ord:3, chip:'Fri', time:'5:00 PM', day:'Friday 21 August'};
+   This was two labelled groups of `[dayLabel, time, taken]` because it was drawn
+   as two rows of chips. §41 draws it as a month, so a slot needs the one thing a
+   chip row let it get away with not having: a DATE. `d` is the day of the month
+   and everything else — which weekday it lands on, which row of the grid it is
+   in, whether it is in the past — is arithmetic from `CAL_TODAY` rather than a
+   second hand-written fact that can disagree with the first.
+
+   `iv` IS THE JOIN BACK TO `IVS`, and it is why a taken slot needs no name,
+   level or fee stored here. The card that opens beside a booked block reads the
+   interview; two of these slots are Rafael and Amara above, and the day and time
+   below have to match what those records say (Thursday 20 August at 3:00 PM,
+   Monday 24 August at 6:00 PM) because both are printed elsewhere.
+
+   THE FICTION IS ANCHORED ONCE. `CAL_TODAY` is Wednesday 19 August 2026 — a real
+   Wednesday, which is what makes the grid land correctly — and it is stated here
+   rather than read off a clock, because every other date in this portal is
+   hand-written against it. `new Date(y, m, d)` with explicit arguments is only
+   ever used for weekday arithmetic, never for "now".
+   -------------------------------------------------------------------------- */
+const CAL_TODAY = {y: 2026, m: 7, d: 19};        /* month is 0-based: 7 = August */
+
+/* Eight weeks ahead is the rule the page states, and three months is what holds
+   it. September and October are empty on purpose: every slot Owen has opened is
+   in the next fortnight, which is what the head line says. */
+const CAL_MONTHS = [[2026, 7], [2026, 8], [2026, 9]];
+
+const SLOTS = [
+  {id:'s19', y:2026, m:7, d:19, t:'7:00 PM'},
+  {id:'s20', y:2026, m:7, d:20, t:'3:00 PM', iv:'rafael'},
+  {id:'s21', y:2026, m:7, d:21, t:'5:00 PM'},
+  {id:'s24', y:2026, m:7, d:24, t:'6:00 PM', iv:'amara'},
+  {id:'s25', y:2026, m:7, d:25, t:'5:00 PM'},
+  {id:'s26', y:2026, m:7, d:26, t:'7:00 PM'},
+  {id:'s27', y:2026, m:7, d:27, t:'3:00 PM'},
+  {id:'s28', y:2026, m:7, d:28, t:'5:00 PM'}
+];
+const slotAt = (y, m, d) => SLOTS.find(s => s.y === y && s.m === m && s.d === d);
+const slotBy = id => SLOTS.find(s => s.id === id);
+const slotForIv = id => SLOTS.find(s => s.iv === id);
+const openSlots = () => SLOTS.filter(s => !s.iv);
+
+/* --------------------------------------------------------------------------
+   THE DATE HELPERS, AND THEY ARE WHY THE DIARY NO LONGER STORES ITS OWN LABELS
+
+   `IVS` used to carry a hand-written `chip` ("Tomorrow", "Mon") and `ord` for the
+   dashboard's diary column, which was two facts about one date: the row said
+   Thursday 20 August and also said "Tomorrow", and nothing made them agree.
+   Both now come off the slot the interview is booked into. `daysOut` is the sort
+   key AND the label's input, so a diary row and a calendar cell cannot disagree
+   about which day is which.
+
+   `Date.UTC(y, m, d)` and `new Date(y, m, d)` are used for weekday and interval
+   arithmetic only — never for "now", which is `CAL_TODAY`. Both are pure
+   functions of their arguments, so nothing here changes when the clock does.
+   -------------------------------------------------------------------------- */
+const MON_L = ['January','February','March','April','May','June','July','August',
+               'September','October','November','December'];
+const WD_S = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const WD_L = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+/* Monday-first, because the grid is: JS gives Sunday 0, so shift by six. */
+const wdOf = (y, m, d) => (new Date(y, m, d).getDay() + 6) % 7;
+const dayNo = (y, m, d) => Math.round(Date.UTC(y, m, d) / 86400000);
+const daysOut = s => dayNo(s.y, s.m, s.d) - dayNo(CAL_TODAY.y, CAL_TODAY.m, CAL_TODAY.d);
+/* the diary chip: the two days that have names, then the weekday, then the date
+   once "Thu" would be ambiguous — a weekday more than a week out could be any of
+   two, and a diary that says "Mon" about something eleven days away is lying. */
+const chipOf = s => {
+  const n = daysOut(s);
+  return n === 0 ? 'Today' : n === 1 ? 'Tomorrow'
+       : n < 7 ? WD_S[wdOf(s.y, s.m, s.d)]
+       : `${WD_S[wdOf(s.y, s.m, s.d)]} ${s.d}`;
+};
+const longDate = s => `${WD_L[wdOf(s.y, s.m, s.d)]} ${s.d} ${MON_L[s.m]}`;
+/* THE NEXT CALL IS THE FIRST BOOKED ONE, not a flag on the row. A flag would be
+   a second place the answer lives, and it is the one fact on this page that
+   moves on its own — the moment Rafael's Thursday passes, Amara's Monday is the
+   next call and nothing should have to be edited for the gradient to move. */
+const nextCall = () => SLOTS.filter(s => s.iv)
+  .sort((a, b) => (a.m - b.m) || (a.d - b.d))[0];
+
+/* THE ONE OPEN SLOT THE DASHBOARD SHOWS, AND IT IS THE SOONEST ONE. `SLOTS` has
+   six open and a dashboard that listed all six would be the Availability page.
+   It was a hand-written record naming Friday; now that the calendar makes every
+   open slot visible, naming the third one while the first sits two rows above it
+   was the dashboard disagreeing with the page it links to. `openSlots()[0]` is
+   the soonest, which is also the one a candidate browsing Owen is offered
+   first — the same slot the Listing page's empty state names. */
+const OPEN = () => openSlots()[0];
 
 /* ==========================================================================
    TAL
@@ -426,6 +546,19 @@ const OPEN = {ord:3, chip:'Fri', time:'5:00 PM', day:'Friday 21 August'};
    accent note, which is the one tone reserved for "something that is yours".
    The mark is `talChat`, the same glyph the candidate portal uses for Tal.
    ========================================================================== */
+/* THE FIRST OPEN SLOT, IN WORDS, AND IT IS READ NOT WRITTEN. Four lines of copy
+   named "Friday at 5:00 PM" as the first free slot; the calendar now draws every
+   slot, so a sentence naming the third one while the first sits two rows above it
+   is the page arguing with itself on one screen. `openSlots()[0]` is the answer
+   and `chipOf` gives it the same words the diary uses — "today", "tomorrow", or
+   the weekday. */
+const firstOpenPhrase = () => {
+  const o = OPEN();
+  if(!o) return 'nothing is open';
+  const c = chipOf(o), n = daysOut(o);
+  return `${n < 2 ? c.toLowerCase() : c === 'Fri' ? 'Friday' : c} at ${o.t}`;
+};
+
 const PAGESUM = {
 
   dashboard: {
@@ -469,7 +602,8 @@ const PAGESUM = {
     return `${v.n}, ${v.day.replace(/^\w+ /,'')}, confirmed at ${v.level} and signed the same evening. Follow-up scored ${v.follow} and depth ${v.depth}.`;
   },
 
-  availability: 'Six slots are open over the next fortnight and two are taken. Friday at 5:00 PM is the first one nobody has claimed.',
+  availability: () => `${openSlots().length} slots are open over the next fortnight and ${SLOTS.filter(s => s.iv).length} are taken. ${
+     firstOpenPhrase().replace(/^./, c => c.toUpperCase())} is the first one nobody has claimed.`,
 
   earnings: {
     setup:   'Nothing can be booked until a payout destination exists. It’s a Stripe handoff — TalentNext never sees an account number, and it takes a minute.',
@@ -1101,26 +1235,35 @@ const bookedRow = b => `<button class="cardrow bk-row" data-go="${b.go}"${
   <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
 </button>`;
 
-/* THE DIARY, IN THE ORDER IT HAPPENS. One list, sorted on `ord`, so the two
-   kinds interleave rather than sitting in two groups the reader has to merge —
-   the leader's `lbooked` makes the same argument about interviews and cohort
+/* THE DIARY, IN THE ORDER IT HAPPENS. One list sorted on days-from-today, so the
+   two kinds interleave rather than sitting in two groups the reader has to merge
+   — the leader's `lbooked` makes the same argument about interviews and cohort
    calls. `open` is what the dashboard adds and the Interviews page does not:
    that page's section is headed "Booked", and this file's own note says booked
    means PAID, so an unsold slot in it would contradict the heading. `not` is
    the dashboard's other difference: the next interview is the black plate at
    the head of that page, and a diary that repeats it is the page saying the
-   same appointment twice. */
-const diary = (v, open, not) => IVS.filter(x => x.st === 'next' && x.id !== not).map(x => ({
-    ord: x.ord, chip: x.chip, time: x.time, id: x.id, i: x.i, iv: x.id,
-    now: x.chip === 'Today', go: 'interview',
+   same appointment twice.
+
+   EVERY DATE HERE IS THE SLOT'S. `ord` and `chip` used to be written on the `IVS`
+   row beside a `day` that said the same thing in words; both are now `daysOut`
+   and `chipOf` over the slot the interview is booked into, so the diary column,
+   the calendar cell and the page's own prose cannot drift. An interview with no
+   slot cannot appear — which is correct, because a booking IS a slot. */
+const diary = (v, open, not) => IVS.filter(x => x.st === 'next' && x.id !== not)
+  .map(x => ({x, s: slotForIv(x.id)})).filter(r => r.s)
+  .map(({x, s}) => ({
+    ord: daysOut(s), chip: chipOf(s), time: x.time, id: x.id, i: x.i, iv: x.id,
+    now: daysOut(s) === 0, go: 'interview',
     t: `${x.kind} &middot; ${x.n}`,
     d: `45 minutes, recorded &middot; ` + (x.summary
         ? 'their 90-day summary is attached, so you read that first'
         : `${money(v.fee)} already in escrow`)
-  })).concat(open ? [{
-    ord: OPEN.ord, chip: OPEN.chip, time: OPEN.time, now: false, go: 'availability',
+  })).concat(open && OPEN() ? [(o => ({
+    ord: daysOut(o), chip: chipOf(o), time: o.t, now: daysOut(o) === 0,
+    go: 'availability',
     t: 'Open slot', d: `45 minutes at ${money(v.fee)} &middot; nobody has taken it`
-  }] : []).sort((a, b) => a.ord - b.ord);
+  }))(OPEN())] : []).sort((a, b) => a.ord - b.ord);
 
 const money = n => '$' + n.toLocaleString('en-US');
 
@@ -1153,7 +1296,7 @@ V.dashboard = v => {
   /* --- stage 1: before approval ---------------------------------------- */
   if(!v.approved) return band() + `
     <section class="sec">
-      <div class="sec-h"><h2>Where it is</h2></div>
+      <div class="sec-h"><h2>How it works</h2></div>
       <ol class="steps">
         <li><span class="s-n">1</span><span class="s-b"><b>Your application</b>
           ${v.sent ? 'Sent 3 June, with two referees.' : 'Three of the five parts are filled in.'}</span></li>
@@ -1677,22 +1820,181 @@ V.interview = v => {
    the grid expects. These sections use an `.eyebrow` as their heading instead,
    which is the cheap fix and the one the design system's own README names.
    -------------------------------------------------------------------------- */
-V.availability = () => head({
+/* --------------------------------------------------------------------------
+   THE CALENDAR — §41's component, and the markup it keys on
+
+   ONE BLOCK PER DAY, AND THE DAY CELL IS NOT THE TARGET. It is tempting to make
+   the whole cell pressable — it is bigger, and Fitts' law is real — and it would
+   be wrong twice: 24 of the 31 cells have nothing to open, and a cell that
+   responds to a press on an empty Tuesday promises a slot you could add there,
+   which is what the "Add a slot" sheet is for. Only the block is a button.
+
+   THE THREE STATES ARE DERIVED, NOT STORED. `taken` is "this slot has an `iv`",
+   and `next` is "this slot is `nextCall()`" — so the gradient moves on its own
+   as days pass and there is no flag anywhere to forget to move. §41 has the
+   argument for why only one of the three is filled.
+
+   THE LEADING AND TRAILING DAYS ARE REAL DATES, not blanks. A grid that pads
+   with empty cells makes the week the month starts in look like a broken week;
+   showing 27–31 July greyed says "this is a Monday-to-Sunday grid" without
+   claiming anything is bookable there. `.cal-out` is the tone, and those cells
+   never carry a block because `slotAt` is asked for the cell's OWN month.
+   -------------------------------------------------------------------------- */
+function calGrid(v){
+  const [y, m] = CAL_MONTHS[S.cal] || CAL_MONTHS[0];
+  const first = wdOf(y, m, 1);                       /* Mon = 0 */
+  const len = new Date(y, m + 1, 0).getDate();       /* day 0 of next month */
+  const prevLen = new Date(y, m, 0).getDate();
+  const cells = [];
+  /* six rows always, so the calendar's height does not jump between months */
+  for(let i = 0; i < 42; i++){
+    const n = i - first + 1;
+    if(n < 1) cells.push({d: prevLen + n, out: true, wd: i % 7});
+    else if(n > len) cells.push({d: n - len, out: true, wd: i % 7});
+    else cells.push({d: n, wd: i % 7, y, m});
+  }
+  const nx = nextCall();
+  return `<div class="cal">
+    <div class="cal-top">
+      <h3 class="cal-m">${MON_L[m]} ${y}</h3>
+      <span class="cal-tz">Eastern time</span>
+      <div class="cal-nav">
+        <button class="cal-b" data-cal-m="${S.cal - 1}" aria-label="Previous month"
+          ${S.cal === 0 ? 'disabled' : ''}>${I.arrowLeft}</button>
+        <button class="cal-b" data-cal-m="${S.cal + 1}" aria-label="Next month"
+          ${S.cal === CAL_MONTHS.length - 1 ? 'disabled' : ''}>${I.arrowRight}</button>
+      </div>
+    </div>
+    <div class="cal-grid">
+      ${WD_S.map(w => `<span class="cal-wd">${w}</span>`).join('')}
+      ${cells.map(c => {
+        const s = c.out ? null : slotAt(c.y, c.m, c.d);
+        const today = !c.out && c.y === CAL_TODAY.y && c.m === CAL_TODAY.m && c.d === CAL_TODAY.d;
+        const cls = ['cal-d', c.out ? 'cal-out' : '', c.wd > 4 ? 'cal-we' : '',
+                     today ? 'cal-today' : ''].filter(Boolean).join(' ');
+        return `<div class="${cls}"><span class="cal-n">${c.d}</span>${
+          s ? calBlock(s, nx, v) : ''}</div>`;
+      }).join('')}
+    </div>
+    ${S.slot && slotBy(S.slot) ? calPop(slotBy(S.slot), v) : ''}
+  </div>`;
+}
+
+/* THE JOIN CONTROL IS ON THE BLOCK ONLY WHEN THE BLOCK IS THE NEXT CALL, which
+   is the whole reason that one block is allowed a fill: the gradient is not
+   decoration for "booked", it is the surface an action sits on. Every other
+   booked block says who and nothing else, and offers Join in the card. */
+const calBlock = (s, nx, v) => {
+  const booked = !!s.iv, isNext = nx && s.id === nx.id;
+  const x = booked ? iv(s.iv) : null;
+  const cls = ['cal-slot', booked ? 'taken' : '', isNext ? 'next' : '',
+               S.slot === s.id ? 'on' : ''].filter(Boolean).join(' ');
+  return `<button class="${cls}" data-cal="${s.id}"
+    aria-label="${s.t}, ${booked ? 'booked with ' + x.n : 'open'}">
+    <span class="cal-t">${s.t}</span>
+    <span class="cal-s">${booked ? x.n : 'Open'}</span>
+    ${isNext ? `<span class="cal-join">${I.video}Join</span>` : ''}
+  </button>`;
+};
+
+/* THE CARD. Two shapes, one component: a booked slot leads with the person,
+   because who you are meeting is the answer to "what is this"; an open slot has
+   no person, so it leads with what the slot is worth. Both end in one action,
+   and neither offers the other's — a "Join the call" on an empty slot would be a
+   button with nothing behind it. */
+const calPop = (s, v) => {
+  const booked = !!s.iv, x = booked ? iv(s.iv) : null;
+  return `<div class="cal-pop" data-side="right">
+    <div class="cal-pop-h">
+      <span class="cal-pop-d">${longDate(s)}</span>
+      <button class="cal-pop-x" data-cal="" aria-label="Close">${I.close}</button>
+    </div>
+    <p class="cal-pop-t">${s.t} ET &middot; 45 minutes${booked ? ' &middot; recorded' : ''}</p>
+    ${booked ? `
+    <div class="cal-pop-who">
+      ${avatar(x.i, PHOTOS[x.id], 36)}
+      <span class="cal-pop-nb"><b>${x.n}</b><span>${x.band}</span></span>
+    </div>
+    <div class="cal-row"><span class="l">What it is</span><span class="v">${x.kind}</span></div>
+    <div class="cal-row"><span class="l">Asked to be assessed on</span>
+      <span class="v">${x.asked}</span></div>
+    <div class="cal-row"><span class="l">Fee</span>
+      <span class="v">${money(v.fee)}, ${money(v.share)} of it yours &middot; paid</span></div>
+    <div class="cal-pop-a">
+      <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
+      <button class="btn btn-g btn-sm noic" data-go="interview" data-iv="${x.id}">Read the brief</button>
+    </div>`
+    : `
+    <div class="cal-row"><span class="l">Status</span>
+      <span class="v">Open &mdash; nobody has taken it</span></div>
+    <div class="cal-row"><span class="l">If it is booked</span>
+      <span class="v">${money(v.fee)} into escrow, ${money(v.share)} of it yours</span></div>
+    <div class="cal-row"><span class="l">Taking it back</span>
+      <span class="v">Any time before it is booked</span></div>
+    <div class="cal-pop-a">
+      <button class="btn btn-g btn-sm noic" data-confirm="closeSlot">Close this slot</button>
+    </div>`}
+  </div>`;
+};
+
+/* --------------------------------------------------------------------------
+   WHICH SIDE THE CARD OPENS ON — the one thing about this component that CSS
+   cannot decide, so it is a pass and not a rule.
+
+   RIGHT IF THERE IS ROOM, LEFT IF THERE IS NOT, and "room" is a fact about which
+   column of the week the day sits in: a Monday has five columns of space to its
+   right and a Friday has none. §41 states both placements and the arrow for each;
+   all this does is measure and choose.
+
+   MEASURED WITH `offsetLeft`, NOT `getBoundingClientRect`. `#device` carries the
+   harness's fit-to-pane transform, so a rect-measured 264px card reports 6px and
+   every comparison below silently succeeds — the trap CLAUDE.md records as №15,
+   and it costs an hour because the numbers look like a layout bug rather than a
+   measuring one. Offsets are layout values and are not scaled. Walking up to
+   `.cal` rather than reading one offset, because `.cal-d` is `position:relative`
+   and is therefore its own offset parent.
+
+   IT DOES NOT RUN ON A PHONE, and it does not need to check: §41 makes the card
+   `position:static` under 600px, where `left` and `top` are simply ignored. The
+   inline values are written anyway and harmlessly, which is one branch fewer
+   here and one fact fewer to keep in two places.
+   -------------------------------------------------------------------------- */
+/* the arrow's own offset from the top of the card, §41's `top:var(--s06)` */
+const CAL_ARROW = 18;
+function placeCal(){
+  const pop = device.querySelector('.cal-pop');
+  if(!pop) return;
+  const cal = pop.closest('.cal');
+  const slot = cal && cal.querySelector('.cal-slot.on');
+  if(!slot) return;
+
+  let x = 0, y = 0, n = slot;
+  while(n && n !== cal){ x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+
+  const GAP = 8, EDGE = 8;
+  const popW = pop.offsetWidth, popH = pop.offsetHeight;
+  const right = x + slot.offsetWidth + GAP;
+  const side = right + popW <= cal.offsetWidth - EDGE ? 'right' : 'left';
+  pop.dataset.side = side;
+  pop.style.left = Math.max(EDGE, side === 'right' ? right : x - GAP - popW) + 'px';
+  /* the arrow sits 24px down the card (§41), so the card is lifted by that much
+     to put the arrow on the block rather than below it — then clamped inside the
+     calendar, because a card hanging off the bottom would be the one thing a
+     popover must never do: sit outside the thing it belongs to. */
+  const top = y - CAL_ARROW;
+  pop.style.top = Math.max(EDGE, Math.min(top, cal.offsetHeight - popH - EDGE)) + 'px';
+}
+
+V.availability = v => head({
     title: 'Availability',
-    sub: 'Six slots open &middot; 45 minutes each &middot; Eastern time'
+    sub: `${openSlots().length} slots open &middot; 45 minutes each &middot; Eastern time`
   }) + `
 
-  ${SLOTS.map(([week, slots]) => `
   <section class="sec">
-    <span class="eyebrow">${week}</span>
-    <div class="slots">
-      ${slots.map(([d, t, taken]) =>
-        `<button class="slot${taken ? ' sel' : ''}">${d}<br>${t}</button>`).join('')}
-    </div>
-    <p class="help mt4">${slots.filter(s => s[2]).length
-      ? `${slots.filter(s => s[2]).length} taken, ${slots.filter(s => !s[2]).length} open.`
-      : 'All open.'}</p>
-  </section>`).join('')}
+    <div class="sec-h"><h2>Your calendar</h2>
+      <span class="t-helper-01">${SLOTS.filter(s => s.iv).length} taken, ${openSlots().length} open</span></div>
+    ${calGrid(v)}
+  </section>
 
   <section class="sec">
     <div class="sec-h"><h2>How slots work</h2></div>
@@ -1733,14 +2035,57 @@ V.earnings = v => {
       ['receipt',    'Each',       money(v.share),   `80% of ${money(v.fee)}`]])}
   </section>` : ''}
 
+  ${/* THE ORDER IS WHAT AN AGENT OPENS THE PAGE FOR, and it used to be the
+        order the facts were written in. "How a fee splits" is the RULE — 80/20,
+        three working days — and a rule does not change between visits, so it was
+        sitting second, above the only two things on the page that do change.
+        What you came for is the money: the month's figures, then the ledger row
+        by row, then where it lands. The rule closes the page as the reference it
+        is, which is also why it is the one section on a tinted ground. */''}
+
+  ${connected && v.busy ? `
   <section class="sec">
-    <div class="sec-h"><h2>How a fee splits</h2></div>
-    ${kv([
-      ['The candidate pays', money(v.fee)],
-      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
-      ['You are paid', `${money(v.share)} &middot; 80%`],
-      ['Released', 'Three working days after the report is delivered']])}
-  </section>
+    <div class="sec-h"><h2>Payments</h2></div>
+    ${/* THE PRODUCT'S OWN PAYMENT LEDGER, not a `.tbl`. §15 and §16 already draw
+          this: five columns owned by the TABLE rather than by each row
+          (`display:contents` on `.payrow`, so a header actually lines up with
+          what it names), the amount in tabular figures holding the right edge so
+          the column reads down, and one continuous rule between rows. A `.tbl`
+          gave none of that — and on a phone it could only scroll sideways, where
+          `.paytbl` folds into two columns: what and when on the left, the money
+          and its state on the right.
+
+          THE FIVE COLUMNS MAP, and the mapping is the point. `.pay-n` is the
+          candidate — bold, because whose payment this is, is how you find the
+          row. `.pay-c` is the candidate's fee, in the secondary tone the card
+          column used, because it is context. `.pay-a` is YOURS, and it takes the
+          bold right-aligned money slot because that is the figure this page is
+          about — the head line says "$68 an interview" and this is the column
+          that proves it. `.pay-r` is the state, drawn as the leader's `.flag-t`
+          — a mark, a phrase, one hue, no box.
+
+          AND EVERY COLUMN STARTS ON ITS OWN HEADER. §16 used to push the two
+          money columns and the last one to the right edge, which is the ledger
+          move that earns its keep when the amounts vary. Owen has one rate, so
+          every row is the same $85 and the same $68: the right edge bought
+          nothing while "YOURS" began 23px left of its own values and "STATUS"
+          crowded its phrases against the table's edge. §16 states the one left
+          rule and the wider last column; §15 stops the table bleeding, so its
+          dividers pay the same gutter as every other divider on the page. */''}
+    <div class="paytbl">
+      <div class="payrow payhead">
+        <span>Interview</span><span>When</span><span>Fee</span>
+        <span class="num">Yours</span><span class="num">Status</span>
+      </div>
+      ${PAYMENTS.map(p => `<div class="payrow">
+        <span class="pay-n">${p.n}</span>
+        <span class="pay-d">${p.d}</span>
+        <span class="pay-c">${money(v.fee)}</span>
+        <span class="pay-a num">${money(v.share)}</span>
+        <span class="pay-r"><span class="flag-t ${p.st}">${I[p.ic]}${p.s}</span></span>
+      </div>`).join('')}
+    </div>
+  </section>` : ''}
 
   <section class="sec">
     <div class="sec-h"><h2>Where it goes</h2></div>
@@ -1755,20 +2100,20 @@ V.earnings = v => {
     <div class="btn-row"><button class="btn btn-p">Continue to Stripe ${I.launch}</button></div>`}
   </section>
 
-  ${connected && v.busy ? `
-  <section class="sec">
-    <div class="sec-h"><h2>Payments</h2></div>
-    <div class="tbl-wrap">
-      <table class="tbl">
-        <tr><th>Interview</th><th>Date</th><th class="num">Fee</th><th class="num">Yours</th><th>Status</th></tr>
-        <tr><td>Rafael Ortiz</td><td>19 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>In escrow</td></tr>
-        <tr><td>Sofia Marek</td><td>18 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Report due</td></tr>
-        <tr><td>Tom Whelan</td><td>17 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Releases 20 Aug</td></tr>
-        <tr><td>Nina Haddad</td><td>14 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Paid 19 Aug</td></tr>
-        <tr><td>Marcus Bell</td><td>12 Aug</td><td class="num">${money(v.fee)}</td><td class="num">${money(v.share)}</td><td>Paid 17 Aug</td></tr>
-      </table>
-    </div>
-  </section>` : ''}`;
+  ${/* `tint tint-2` — BOTH, and the second one only moves the ground. §12 hangs
+        a whole tone system off `.sec.tint`: the hairlines step to `--rule-on-2`,
+        a `.tag` loses its fill, `.stats` cells repaint in the panel's own colour.
+        `.tint-2` redefines `--surface-2` on this element alone, so every one of
+        those rules resolves against the lighter ground without a single one of
+        them being restated. §37.11c is the two declarations. */''}
+  <section class="sec tint tint-2">
+    <div class="sec-h"><h2>How a fee splits</h2></div>
+    ${kv([
+      ['The candidate pays', money(v.fee)],
+      ['TalentNext keeps', `${money(v.cut)} &middot; 20%`],
+      ['You are paid', `${money(v.share)} &middot; 80%`],
+      ['Released', 'Three working days after the report is delivered']])}
+  </section>`;
 };
 
 /* --------------------------------------------------------------------------
@@ -1914,6 +2259,112 @@ V.profile = v => head({title: 'Profile'}) + `
   </section>`;
 
 /* ==========================================================================
+   NOTIFICATIONS
+
+   THE BELL BELONGS TO WHOEVER IS SIGNED IN, and this is the third list in the
+   product: the candidate's is keyed by stage because everything that reaches
+   them is a consequence of where they are in the 90 days, the cohort leader's
+   is one list because what reaches them is other people's work arriving. An
+   agent is the candidate's shape — keyed by stage — because an agent's stage is
+   a gate they are waiting on, and what the bell reports before certification is
+   somebody else deciding: a reference replying, a check clearing, an approval.
+   After it, it is bookings and money.
+
+   ROW SHAPE IS `hifi/`'s, FIELD FOR FIELD (`ic t b w go unread`), so
+   `notifPanel` below is that file's function rather than a new one. `w` is read
+   by the grouping test — anything matching `ago` or `Today` is today, the rest
+   is earlier — which is why "Yesterday" and "3 days ago" have to be spelt that
+   way and not as dates.
+
+   `iv` IS THE ONE FIELD ADDED, and it is here rather than in `go` for trap-free
+   routing: the interview page takes its subject from `S.iv`, set by the
+   capture-phase `[data-iv]` listener, so a row that lands on Sofia's report is
+   `go:'interview'` plus `iv:'sofia'` and needs no colon-splitting in the router.
+   Same argument as the wireframe's `data-ag="member:41:Maryam Naz"`, avoided.
+
+   EVERY FIGURE IS READ OFF A PAGE. The dates, the fee split, the escrow days,
+   the module count and the two ratings are the same ones `PAGESUM` and the views
+   print — a bell that rounds a number is a fourth place for it to drift.
+   ========================================================================== */
+const AGENT_NOTIF = {
+  apply:[
+    {ic:'email',      t:'Derek Hale invited you',          b:'Your invitation is open. Three of the five parts are filled in.',                        w:'3h ago',     go:'application', unread:1},
+    {ic:'user',       t:'Your referees are still blank',   b:'Two people who have seen you interview. Nothing is reviewed until all five parts are in.', w:'Today',    go:'application', unread:1},
+    {ic:'document',   t:'Your application saves as you go',b:'You can leave it and come back. Only sending it starts the checks.',                      w:'Yesterday',  go:'application', unread:0}
+  ],
+  vetting:[
+    {ic:'shield',     t:'Identity cleared',                b:'Checked on 3 June, the same day you sent the form.',                                     w:'2h ago',     go:'application', unread:1},
+    {ic:'email',      t:'Kofi Mensah replied',             b:'One of your two references is back. Ana Duarte was asked on 3 June.',                    w:'5h ago',     go:'application', unread:1},
+    {ic:'locked',     t:'Background check running',        b:'With the provider since 4 June. It has to clear before a first interview, not before approval.', w:'Yesterday', go:'application', unread:0},
+    {ic:'checkFilled',t:'Application sent',                b:'All five parts are in. Marisa Vance decides once both references are back.',              w:'3 days ago', go:'application', unread:0}
+  ],
+  setup:[
+    {ic:'trophy',     t:'You are approved',                b:'Approved on 12 June. The agent role sits on the account you already had.',               w:'1h ago',     go:'dashboard',   unread:1},
+    {ic:'wallet',     t:'Payouts are not set up',          b:'Nothing can be booked until a payout destination exists. It is a Stripe handoff.',        w:'1h ago',     go:'earnings',    unread:1},
+    {ic:'view',       t:'Your listing card is written',    b:'Your fee is $85, which leaves you $68 after the split. Nothing is visible yet.',          w:'Yesterday',  go:'listing',     unread:0}
+  ],
+  training:[
+    {ic:'calendar',   t:'Calibration is Thursday 20 June', b:'45 minutes with Derek Hale. It is the last thing before you can be booked.',              w:'2h ago',     go:'training',    unread:1},
+    {ic:'book',       t:'Three of four modules done',      b:'Writing the report is the one left — the 24 hours after the call.',                      w:'Today',      go:'training',    unread:1},
+    {ic:'wallet',     t:'Payout destination confirmed',    b:'Stripe, account ending 4417. Your fee and your money are both set.',                     w:'Yesterday',  go:'earnings',    unread:0}
+  ],
+  live:[
+    {ic:'certificate',t:'You are certified',               b:'Calibrated on 20 June by Derek Hale. You may assess Explorer E2 to Builder B1.',          w:'Today',      go:'training',    unread:1},
+    {ic:'view',       t:'You are in browse',               b:'Listed since Monday at $85. No rating yet — the first three interviews are what make one.', w:'Today',    go:'listing',     unread:1},
+    {ic:'time',       t:'Six slots are open',              b:'Over the next fortnight. Wednesday at 7:00 PM is the first one nobody has claimed.',       w:'Yesterday',  go:'availability',unread:0}
+  ],
+  working:[
+    {ic:'warning',    t:'Sofia Marek’s report is due',     b:'6:00 PM today. Tal has a draft off the transcript waiting for your edit.',                w:'2h ago',     go:'interview', iv:'sofia',  unread:1},
+    {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM ET, paid at booking. There is nothing to accept.',           w:'5h ago',     go:'interview', iv:'rafael', unread:1},
+    {ic:'calendar',   t:'Amara Osei booked a re-interview',b:'Monday 24 August at 6:00 PM ET. Her 90-day summary is on the brief.',                     w:'Yesterday',  go:'interview', iv:'amara',  unread:1},
+    {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after his report went out. $204 is in escrow in total.',             w:'Yesterday',  go:'earnings',    unread:0},
+    {ic:'star',       t:'Nina Haddad rated the interview', b:'4.3 on follow-up and 4.7 on depth. Signed at Explorer – E4 on 15 August.',                w:'3 days ago', go:'standing',    unread:0}
+  ],
+  reviewed:[
+    {ic:'trophy',     t:'Nadia moved you to A3',           b:'The quarterly review landed on 1 October. You may assess E1 to B2 now.',                  w:'Today',      go:'standing',    unread:1},
+    {ic:'chart',      t:'Follow-up came up to 4.6',        b:'Over the quarter, across 171 interviews. Depth has held at 4.7 since May.',               w:'Today',      go:'standing',    unread:1},
+    {ic:'view',       t:'Your range widened in browse',    b:'Candidates at Builder B2 can find you now.',                                              w:'Yesterday',  go:'listing',     unread:0},
+    {ic:'certificate',t:'Nothing is due until June',       b:'The method is re-checked once a year, and the re-check is two modules rather than four.',  w:'3 days ago', go:'training',    unread:0}
+  ]
+};
+
+const notifList  = () => AGENT_NOTIF[S.stage] || [];
+const unreadCount = () => notifList().filter(n => n.unread && !S.read.includes(n.t)).length;
+
+/* `hifi/`'s `notifPanel`, with the empty state written for this portal and
+   `data-iv` emitted for the rows that name an interview. Nothing keeps state in
+   the DOM: `un` is derived from `S.read` on every render, which is why marking
+   one read is a push onto `S.read` and not a class. */
+function notifPanel(){
+  const list = notifList();
+  const rows = group => list
+    .filter(n => group === 'today' ? /ago|Today/.test(n.w) : !/ago|Today/.test(n.w))
+    .map(n => {
+      const un = n.unread && !S.read.includes(n.t);
+      return `<button class="nrow ${un ? 'un' : ''}" data-go="${n.go}" data-read="${n.t}"${n.iv ? ` data-iv="${n.iv}"` : ''}>
+        <span class="nrow-ic">${I[n.ic]}</span>
+        <span class="nrow-b"><span class="nrow-t">${n.t}</span><span class="nrow-d">${n.b}</span></span>
+        <span class="nrow-w">${n.w}</span>
+      </button>`;
+    }).join('');
+  const today = rows('today'), earlier = rows('earlier');
+  return `<div class="notif ${S.notif ? 'on' : ''}">
+    <div class="notif-h">
+      <h2>Notifications</h2>
+      ${unreadCount() ? `<button class="notif-all" data-readall="1">Mark all read</button>` : ''}
+      <button class="x" data-toggle="notif" aria-label="Close">${I.close}</button>
+    </div>
+    <div class="notif-b">
+      ${list.length ? `
+        ${today ? `<div class="notif-g">Today</div>${today}` : ''}
+        ${earlier ? `<div class="notif-g">Earlier</div>${earlier}` : ''}`
+      : `<div class="empty" style="border:0">${I.time}
+        <h3>Nothing yet</h3><p>Bookings, reports going out and money releasing will show up here.</p></div>`}
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
    THE FRAME
    ========================================================================== */
 function shell(v){
@@ -1933,10 +2384,38 @@ function shell(v){
          document reference. (No backticks in a comment inside a template
          literal, either — they end the string.) -->
     <button class="shell-logo" data-go="dashboard" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+    ${/* THE RIGHT-HAND END OF THE BAR IS THE ROW OF THINGS ABOUT YOU: your
+          name, your bell, your face. It used to hold a Tal button, and that was
+          wrong twice over.
+
+          It was the WRONG CONTROL IN THE RIGHT PLACE. Tal is already on every
+          page — `.askdock` is the invitation, and pressing it records
+          `S.askFrom`, which is what "Back to …" names. A second door to the same
+          surface, in the one slot the other two portals reserve for the bell,
+          meant the glyph a person reads as "messages" opened a conversation
+          instead of the list of what had happened to them.
+
+          And it left the agent with NO NOTIFICATIONS AT ALL, which is not a
+          missing nicety: a bell is how an agent finds out that a candidate
+          booked them, that a reference came back, that escrow released. Those
+          are the events this portal is made of and there was nowhere they
+          landed.
+
+          So the bell is here — `hifi/`'s own component, `hifi/`'s own count
+          badge — and its pressed state is the `on` class the design system
+          already draws on `.shell-act`.
+
+          A `${}` COMMENT RATHER THAN AN HTML ONE, and that is not a style
+          choice: this is inside a template literal, so a backtick in an HTML
+          comment ends the string. The note above `.shell-logo` says the same
+          thing and stays prose for it. */''}
     <div class="shell-right">
       <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
-      <button class="shell-act ${S.tal ? 'on' : ''}" data-toggle="tal" aria-label="Ask Tal">${I.talChat}</button>
-      <span class="av-ph sm shell-avatar"><i>${A.i}</i><img src="${AV.owen}" alt=""></span>
+      <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
+        aria-label="Notifications" aria-expanded="${S.notif}"
+        title="Notifications">${I.notification}${unreadCount()
+          ? `<span class="shell-badge">${unreadCount()}</span>` : ''}</button>
+      <button class="shell-act" data-go="profile" aria-label="Profile" title="Profile"><span class="av-ph sm shell-avatar"><i>${A.i}</i><img src="${AV.owen}" alt=""></span></button>
     </div>
   </header>`;
 }
@@ -2137,7 +2616,12 @@ function ask(q){
    and logging out. Both are one press away from the edge of the product. */
 const CONFIRMS = {
   logout: ['Log out?', 'You will need your password to come back in.', 'Log out'],
-  sign:   ['Sign and send?', 'The level goes to the candidate as soon as this is signed, and a change afterwards is a review decision.', 'Sign and send']
+  sign:   ['Sign and send?', 'The level goes to the candidate as soon as this is signed, and a change afterwards is a review decision.', 'Sign and send'],
+  /* CLOSING A SLOT IS CONFIRMED, because it is the one thing on the Availability
+     page that takes away something a candidate may be looking at right now. It
+     is reversible — you can open the same time again — but not by undo, so it
+     takes the same gate as signing. */
+  closeSlot: ['Close this slot?', 'It comes out of browse straight away. Nobody can book it, and you can open the same time again whenever you like.', 'Close it']
 };
 function confirmSheet(){
   const c = CONFIRMS[S.confirm];
@@ -2234,7 +2718,13 @@ function render(){
      `.modal`, and `data-shown~="tal"` is what §27 keys the panel-open layout on;
      the ask page is a PAGE, and leaving `tal` in here handed the normal page
      those rules while the ask page was the thing on screen. */
-  const OVER = ['nav', 'confirm', 'sheet'];
+  /* `notif` IS AN OVERLAY AND HAS TO BE ON THIS LIST, because §13.3 gates the
+     panel's slide on `data-open~="notif"` — from the bottom on a phone, from the
+     right at desktop. Left off, the panel would still open (`.notif.on` is a
+     transform of its own) but with no entrance, which is the one difference
+     between it and the candidate's. Per trap 5, `data-open` lasts one render and
+     is motion's; `data-shown` is the state and is what a layout rule may read. */
+  const OVER = ['nav', 'notif', 'confirm', 'sheet'];
   const opened = OVER.filter(k => S[k] && !MO.open[k]);
   const shown  = OVER.filter(k => S[k]);
   for(const k of OVER) MO.open[k] = !!S[k];
@@ -2264,6 +2754,13 @@ function render(){
         ${S.tal || S.sheet || S.confirm ? '' : askDock()}
       </div>
     </div>
+    ${/* THE PANEL IS A CHILD OF `.app`, NOT OF THE VIEW COLUMN. §27 makes
+          `.notif` `position:absolute` against the four edges, so it needs the
+          frame as its containing block: inside `.view-col` it would be inset by
+          the rail and stop short of the app bar. It is printed on every render,
+          open or shut, because the closed state is a transform off screen — a
+          panel that only exists while open has nothing to slide from. */''}
+    ${notifPanel()}
     ${confirmSheet()}${editSheet()}
   </div>`;
 
@@ -2302,6 +2799,7 @@ function render(){
     const el = device.querySelector('#askIn');
     if(el) el.focus();
   }
+  try { placeCal(); } catch(e){ console.warn('cal', e); }
   document.getElementById('pick').value = S.stage;
 }
 
@@ -2329,6 +2827,15 @@ device.addEventListener('click', e => {
 device.addEventListener('click', e => {
   if(!S.stp || e.target.closest('.stp')) return;
   S.stp = false; render();
+});
+
+/* AND THE SAME FOR THE CALENDAR CARD, for the same reason and with the same
+   shape: no scrim means the close has to come from the absence of a hit inside
+   `.cal`. Guarding on `.cal` covers the block, the month arrows and everything
+   in the card, so this and the router can never both fire on one click. */
+device.addEventListener('click', e => {
+  if(!S.slot || e.target.closest('.cal')) return;
+  S.slot = null; render();
 });
 
 /* TAL'S OWN CONTROLS, IN A LISTENER OF THEIR OWN. Three of the four are on a
@@ -2360,7 +2867,7 @@ device.addEventListener('keydown', e => {
 });
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-readall],[data-cal],[data-cal-m]');
   if(!t) return;
   const d = t.dataset;
 
@@ -2374,10 +2881,20 @@ device.addEventListener('click', e => {
     S[d.close] = false;
     return render();
   }
-  /* `data-toggle="tal"` IS THE APP BAR'S TAL BUTTON, and it opens the ask page
-     rather than flipping a flag. It has to go through `askOpen` for the same
-     reason the dock does: `S.askFrom` is what "Back to …" names, and a raw
-     toggle would leave it on whichever page Tal was last opened from. */
+  /* MARK ALL READ IS NOT A TOGGLE, so it is answered before the toggle branch:
+     `S.read` is a list of titles rather than a flag per row, which is what keeps
+     the unread dot a pure function of `S` (trap 9) — a class put on a row by a
+     handler is gone at the next paint. */
+  if(d.readall){
+    notifList().forEach(n => { if(!S.read.includes(n.t)) S.read.push(n.t); });
+    return render();
+  }
+  /* `data-toggle="tal"` WAS THE APP BAR'S TAL BUTTON and the bar no longer has
+     one — the bell took that slot and Tal is the dock, on every page. The branch
+     stays because it is the correct handling for the attribute wherever it
+     appears: opening Tal has to go through `askOpen` so `S.askFrom` records the
+     page "Back to …" names, which a raw flag flip would leave on whichever page
+     Tal was last opened from. */
   if(d.toggle === 'tal'){ return S.tal ? askClose() : askOpen(); }
   if(d.toggle){ S[d.toggle] = !S[d.toggle]; return render(); }
   if(d.confirm){ S.confirm = d.confirm; return render(); }
@@ -2385,6 +2902,14 @@ device.addEventListener('click', e => {
   if(d.tab){ S.tab = d.tab; return render(); }
   /* THE STEPS DROPDOWN — one flag, and §33.7 hangs the panel off the toggle. */
   if(d.stp !== undefined){ S.stp = d.stp === '1'; return render(); }
+  /* THE CALENDAR. `data-cal-m` changes the month and closes any open card, since
+     a card about a day in August has nothing to say on the September grid.
+     `data-cal` carries a slot id and toggles — pressing the block whose card is
+     already open closes it, which is what a popover does everywhere else. The
+     close cross carries `data-cal=""`, so the empty string is a real value here
+     and `!== undefined` is the test, not truthiness. */
+  if(d.calM !== undefined){ S.cal = +d.calM; S.slot = null; return render(); }
+  if(d.cal !== undefined){ S.slot = (d.cal && d.cal !== S.slot) ? d.cal : null; return render(); }
   if(d.go){
     /* GOING SOMEWHERE LEAVES TAL, AND THE THREAD SURVIVES IT. `S.tal` is the
        surface, `S.thread` is the conversation — a widget's action button
@@ -2392,7 +2917,14 @@ device.addEventListener('click', e => {
        clearing the thread here would delete the answer that sent you. Coming
        back to Tal picks the conversation up where it was, which is what the
        other two portals do. */
-    S.view = d.go; S.nav = false; S.tal = false; S.typing = false;
+    /* A NOTIFICATION IS READ BY BEING FOLLOWED, and the panel shuts behind you.
+       `data-read` rides on the same button as `data-go` rather than on a second
+       control, so opening the thing the bell told you about is the act that
+       clears it — which is `hifi/`'s behaviour and the only one that leaves the
+       count honest. Marking before the navigation, because `render()` below
+       reprints the badge. */
+    if(d.read && !S.read.includes(d.read)) S.read.push(d.read);
+    S.view = d.go; S.nav = false; S.notif = false; S.tal = false; S.typing = false;
     if(d.go === 'interviews') S.tab = 'next';
     render();
     device.querySelector('.main').scrollTop = 0;
@@ -2421,12 +2953,18 @@ document.getElementById('pick').onchange = e => {
      in — a different month, a different level, different figures — and Tal's
      answers are read off those. A conversation carried across would be quoting
      numbers the portal no longer shows. */
+  /* AND THE BELL GOES WITH IT, for the same reason: the list is keyed by stage,
+     so what was read in one stage is not a row that exists in the next. Leaving
+     `S.read` populated would clear an unread dot on a different notification
+     that happens to share a title. */
   S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
+  S.notif = false; S.read = [];
   S.thread = []; S.typing = false; S.askFrom = 'dashboard'; S.stp = false;
   render();
 };
 document.getElementById('reset').onclick = () => {
   S.view = 'dashboard'; S.nav = false; S.tal = false;
+  S.notif = false; S.read = [];
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
   S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael'; S.stp = false;
   render();

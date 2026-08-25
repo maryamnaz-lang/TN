@@ -286,6 +286,16 @@ It opts **out** automatically when the section holds `.stats`, `.facts`,
 against the full column width. Build sections out of those six and the spine is
 free.
 
+`.kv` opts out too, and for a different reason: **a `.kv` list already *is* a
+label column.** At this same 900px breakpoint `.kv` takes
+`grid-template-columns:var(--label-col) minmax(0,1fr)` — the identical 184px
+token — so a kv band under a heading drew the spine twice and pushed the value
+416px in from the page edge. So a headed kv section stacks: heading on top, keys
+and values below, one spine. The reach is by descendant (`.sec:has(.kv)`) because
+the band is always wrapped — a `.tile`, or a bare `div` — and it excludes
+`:has(.chart-table)`, where `.kv` is borrowed for a chart's data table and the
+section keeps its column.
+
 Invent your own wrapper and the heading keeps its 184px while your content is
 laid out against a width 184px narrower than it expects. The two collide. If you
 genuinely need a new wrapper, restate the opt-out **inside the same container

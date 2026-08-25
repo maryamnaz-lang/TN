@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=a5330404">
+<link rel="stylesheet" href="talentnext-ds.css?b=b33d1ab1">
 
 <style>
 /* ==========================================================================
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=a5330404"></script>
+<script src="talentnext-ds.js?b=b33d1ab1"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -490,6 +490,94 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       <button class="chip-tal"><span class="sk-mark xs"></span>How am I doing overall?</button>
       <button class="chip-tal"><span class="sk-mark xs"></span>What is due this week?</button>
     </span>
+  `)}
+
+  ${ex('The month calendar', 'The whole of <code>.cal</code> (§41), cut down to three weeks so the page stays readable — a real one prints 42 cells, six rows, always, so its height does not jump between months. <b>Three things it will not forgive.</b> The grid is <code>gap:1px</code> over a rule-coloured ground, so the dividers are the gap and a <code>column-gap</code> anywhere would cut them into pieces. Only <b>one</b> block on a grid may be <code>.next</code> — that is the accent gradient and the one fill the calendar is allowed, so it marks a singular thing and carries the only action; <code>.taken</code> is the hatch, and it is what every other booking wears. And <code>.cal-out</code> cells are <b>real dates</b> from the months either side, never blanks: a padded week reads as a broken week.', `
+    <div class="cal">
+      <div class="cal-top">
+        <h3 class="cal-m">August 2026</h3>
+        <span class="cal-tz">Eastern time</span>
+        <div class="cal-nav">
+          <button class="cal-b" aria-label="Previous month" disabled>{{arrowLeft}}</button>
+          <button class="cal-b" aria-label="Next month">{{arrowRight}}</button>
+        </div>
+      </div>
+      <div class="cal-grid">
+        <span class="cal-wd">Mon</span><span class="cal-wd">Tue</span>
+        <span class="cal-wd">Wed</span><span class="cal-wd">Thu</span>
+        <span class="cal-wd">Fri</span><span class="cal-wd">Sat</span>
+        <span class="cal-wd">Sun</span>
+        <div class="cal-d cal-out"><span class="cal-n">27</span></div>
+        <div class="cal-d cal-out"><span class="cal-n">28</span></div>
+        <div class="cal-d cal-out"><span class="cal-n">29</span></div>
+        <div class="cal-d cal-out"><span class="cal-n">30</span></div>
+        <div class="cal-d cal-out"><span class="cal-n">31</span></div>
+        <div class="cal-d cal-out cal-we"><span class="cal-n">1</span></div>
+        <div class="cal-d cal-out cal-we"><span class="cal-n">2</span></div>
+        <div class="cal-d"><span class="cal-n">17</span></div>
+        <div class="cal-d"><span class="cal-n">18</span></div>
+        <div class="cal-d cal-today"><span class="cal-n">19</span>
+          <button class="cal-slot">
+            <span class="cal-t">7:00 PM</span><span class="cal-s">Open</span>
+          </button>
+        </div>
+        <div class="cal-d"><span class="cal-n">20</span>
+          <button class="cal-slot taken next">
+            <span class="cal-t">3:00 PM</span><span class="cal-s">Rafael Ortiz</span>
+            <span class="cal-join">{{video}}Join</span>
+          </button>
+        </div>
+        <div class="cal-d"><span class="cal-n">21</span>
+          <button class="cal-slot">
+            <span class="cal-t">5:00 PM</span><span class="cal-s">Open</span>
+          </button>
+        </div>
+        <div class="cal-d cal-we"><span class="cal-n">22</span></div>
+        <div class="cal-d cal-we"><span class="cal-n">23</span></div>
+        <div class="cal-d"><span class="cal-n">24</span>
+          <button class="cal-slot taken">
+            <span class="cal-t">6:00 PM</span><span class="cal-s">Amara Osei</span>
+          </button>
+        </div>
+        <div class="cal-d"><span class="cal-n">25</span></div>
+        <div class="cal-d"><span class="cal-n">26</span></div>
+        <div class="cal-d"><span class="cal-n">27</span></div>
+        <div class="cal-d"><span class="cal-n">28</span></div>
+        <div class="cal-d cal-we"><span class="cal-n">29</span></div>
+        <div class="cal-d cal-we"><span class="cal-n">30</span></div>
+      </div>
+    </div>
+  `)}
+
+  ${ex('The card beside a day', 'A popover, not a modal — <b>no scrim</b>, because pressing a day asks a question about the calendar and a scrim would take the calendar away to answer it. It lives <b>inside</b> <code>.cal</code> (which is <code>position:relative</code>), and <code>left</code>/<code>top</code> are written by a pass: right of the block if there is room, left if there is not, since which side has room is a fact about which column of the week the day sits in. <code>data-side</code> is what puts the arrow on the correct edge — set it even when you place the card by hand, or the arrow points away from the thing it belongs to. Measure with <code>offsetLeft</code>, never <code>getBoundingClientRect</code>: a scaled preview frame reports a 264px card as 6px and every comparison silently passes. Below 600px §41 makes it <code>position:static</code> and the written offsets are simply ignored.', `
+    <div style="position:relative;min-height:280px">
+      <div class="cal-pop" data-side="right" style="position:absolute;left:0;top:0">
+        <div class="cal-pop-h">
+          <span class="cal-pop-d">Thursday 20 August</span>
+          <button class="cal-pop-x" aria-label="Close">{{close}}</button>
+        </div>
+        <p class="cal-pop-t">3:00 PM ET &middot; 45 minutes &middot; recorded</p>
+        <div class="cal-pop-who">
+          <span class="av-ph" style="width:36px;height:36px"><i>RO</i></span>
+          <span class="cal-pop-nb"><b>Rafael Ortiz</b><span>Explorer, predicted by the quiz</span></span>
+        </div>
+        <div class="cal-row"><span class="l">What it is</span><span class="v">First interview</span></div>
+        <div class="cal-row"><span class="l">Fee</span><span class="v">$85, $68 of it yours &middot; paid</span></div>
+        <div class="cal-pop-a">
+          <button class="btn btn-p btn-sm noic">Join the call {{video}}</button>
+          <button class="btn btn-g btn-sm noic">Read the brief</button>
+        </div>
+      </div>
+    </div>
+  `)}
+
+  ${ex('A state, not a number', 'Where a cell’s value is a <b>state</b> rather than a figure, <code>.flag-t</code> is the answer: a 16px mark at <code>currentColor</code>, the phrase, one hue, nothing boxed. It began as the cohort leader’s Flag column and came out from behind <code>[data-portal="leader"]</code> so the Talent Agent’s payment ledger could use it — five outlined <code>.tag</code> pills down the edge of a table whose other columns are plain text draw five boxes to say five words. The mark carries WHICH state and the hue how much it matters, so pick the icon for the verb, not for the colour. Three hues, and the default is body ink for a state that is simply true.', `
+    <div class="tile-stack">
+      <div class="cardrow"><span class="cardrow-b"><span class="flag-t quiet">{{locked}}In escrow</span></span></div>
+      <div class="cardrow"><span class="cardrow-b"><span class="flag-t warn">{{edit}}Report due</span></span></div>
+      <div class="cardrow"><span class="cardrow-b"><span class="flag-t green">{{checkFilled}}Paid 19 Aug</span></span></div>
+      <div class="cardrow"><span class="cardrow-b"><span class="flag-t">{{flag}}No modifier — body ink</span></span></div>
+    </div>
   `)}
 `});
 

@@ -932,6 +932,26 @@
 .app .tag.green,.app .tag.green svg{color:var(--support-success-ink)}
 .app .tag.green svg{fill:var(--support-success-ink)}
 
+/* AND THE WARNING TAG WAS LEFT BEHIND WHEN THE GREEN ONE WAS FIXED. §02 gave
+   `.tag.warn` / `.tag.org` an amber FILL with `--on-warning-bg` ink; §12 then
+   took every tag's fill away — a filled pill was one box too many on these
+   pages — which left the ink stranded on a transparent chip, and §23's
+   `--text-secondary` for tag text outranks §02's colour. So `.tag.warn`
+   rendered as a plain grey tag: identical to no modifier at all. Nobody had
+   noticed because the places it appears are low-stakes ("Next" on a locked
+   training module), and the green tag two lines above got its ink restated
+   while this one did not.
+
+   The agent's payment ledger is where it stops being harmless: "Report due" is
+   the one row in five that is ON YOU, and drawn grey it is just another row.
+   `--support-attention` rather than `--on-warning-bg`, because the latter was
+   tuned to sit on the amber fill that no longer exists — foundation declares
+   the former for exactly this, at 4.9:1 on the panel, and §31 already uses it
+   as the moderate-severity ink in the leader's attention queue. */
+.app .tag.warn,.app .tag.org,
+.app .tag.warn svg,.app .tag.org svg{color:var(--support-attention)}
+.app .tag.warn svg,.app .tag.org svg{fill:var(--support-attention)}
+
 /* Tal's own paragraph takes the column too */
 .app .ai-aura .ai-body,.app .ai-aura .ai-body p{max-width:none}
 
@@ -1117,13 +1137,21 @@
    figures so the column reads down. On a phone the columns fold into two:
    what and when on the left, the amount and the receipt on the right.
    ========================================================================== */
-.app .paytbl{
-  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+/* IT DOES NOT BLEED ANY MORE, and that was a deliberate choice reversed.
+   The table used to pull itself out to the section's edge with a negative
+   `--pad-x` on both sides and hand the gutter back as padding on the first and
+   last cells (§16). Full-bleed is the right treatment for a FILLED block — §18's
+   note says exactly that — and this is not one: it is five rows of text on the
+   white canvas, so the rule between them ran wall to wall while every other
+   divider on the page stopped where the words stop. One table's rules being
+   36px longer than the rest of the page's is not a table that reads as separate,
+   it is a table that reads as misaligned. The margins go, and with them §16's
+   two cell-padding rules that existed only to undo them. */
 .app .payrow{
   display:grid;
   grid-template-columns:minmax(0,1fr) auto;
   gap:var(--s02) var(--s05);align-items:baseline;
-  padding:var(--s05) var(--pad-x);
+  padding:var(--s05) 0;
   border-bottom:1px solid var(--rule)}
 .app .payrow:last-child{border-bottom:0}
 .app .payhead{display:none}

@@ -306,9 +306,15 @@
   .app .paytbl > .payrow > *{
     align-self:stretch;
     display:flex;align-items:center}
+  /* AND THE FLEX LINE FOLLOWS THE TEXT. These three were `flex-end`, because
+     `text-align` is ignored by a flex line whose child is a box (the receipt was
+     a button, the state is now an icon-and-phrase span) — so the property had to
+     be restated for the two columns §16 pushed right. §16 no longer pushes any
+     column right, and a `flex-end` left behind here would have overridden it for
+     exactly the two cells the change was about. */
   .app .paytbl > .payrow > .pay-a,
   .app .paytbl > .payrow > .pay-r,
-  .app .paytbl > .payhead > .num{justify-content:flex-end}
+  .app .paytbl > .payhead > .num{justify-content:flex-start}
 }
 
 /* --------------------------------------------------------------------------
@@ -397,6 +403,85 @@
     flex-direction:column;align-items:flex-start;gap:2px}
   .app .page .stats .stat-top > .n{margin-left:0;text-align:left}
 }
+
+/* --------------------------------------------------------------------------
+   11b. A LABEL COLUMN'S HEADING SITS AT THE TOP OF IT
+   §10.4 puts a section's heading in a 184px left column at desktop and gives
+   it `min-height:100%` — necessary, because the column's identity is the
+   `border-right` and a content-height box would draw a 18px stub of rule
+   instead of a divider meeting both horizontal ones. §24.6 then makes every
+   `.sec-h` a flex ROW with `align-items:center`, for the full-width case where
+   the heading holds a control on its right.
+
+   Put those together and the heading is centred against the whole section's
+   height: "What is scored" landed 103px down a 175px column beside four `.kv`
+   rows, and "Your review" 125px down. You scan the left edge to find out what a
+   region IS, and the label has to be level with the first row of the thing it
+   labels — a heading floating at the vertical middle of a tall block reads as
+   belonging to the row it happens to sit next to.
+
+   §10.4 CANNOT WIN THIS FROM WHERE IT IS, and the reason is worth writing down
+   because trap 3 in CLAUDE.md reads as though it could. `.sec:has(> .sec-h) >
+   .sec-h` is (0,3,0) — `:has()` takes its argument's specificity — and §24's
+   `.app .page .sec-h` is also (0,3,0). A container query does NOT add
+   specificity or a cascade tier; at equal weight the LATER rule wins, and §24 is
+   the later layer. That is why the trap's advice is to restate *inside* the
+   tier: what makes the restatement win is being later, not being conditional.
+
+   SO IT IS SET ON THE CHILDREN, NOT THE CONTAINER, and that is what keeps this
+   to one rule with no list in it. `align-self` overrides `align-items` per item,
+   and it is INERT wherever the box is not stretched — a full-width heading row
+   is exactly its own content's height, so there is no free space to move into.
+   The label column is the only place in the product where a `.sec-h` is taller
+   than what it holds, so this reaches that case and nothing else, without
+   naming any of the component families §10.15 opts out of the label column (and
+   without needing the four later layers that restate that opt-out to know about
+   it). Left unconditional for the same reason: below 900px there is nothing to
+   align.
+
+   THE ONE EXCEPTION IS A ROW HOLDING A CONTROL. There the box IS taller than the
+   heading — a `.btn.btn-sm` is 36px against an 18px `h2` — and §24 centres the
+   two against each other on purpose. Top-aligning the heading there would put it
+   9px above the label of the button beside it, so those rows are excluded.
+   -------------------------------------------------------------------------- */
+.app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
+
+/* --------------------------------------------------------------------------
+   11c. THE QUIET PANEL, AND ITS RULES REACH THE EDGE OF IT
+
+   ONE DECLARATION INHERITS THE WHOLE TONE SYSTEM. §12 hangs a large amount off
+   `.sec.tint`: the row hairlines step to `--rule-on-2`, a `.tag` inside loses its
+   fill and takes a border, `.stats` / `.facts` / `.prog-figs` repaint their cells
+   in the panel's own colour so their 1px grid gaps still read as rules, the chart
+   reference labels get a matching knockout. A second tinted section written as
+   its own class would have to restate every one of those — twenty-odd selectors
+   that would then drift the moment §12 gained a twenty-first.
+
+   So `.tint-2` is not a second panel. It is `.tint` with the GROUND REDEFINED:
+   `--surface-2` is re-declared on the element, and because every one of §12's
+   rules reads the token rather than the literal, all of them resolve against the
+   lighter value with nothing restated. The markup is `class="sec tint tint-2"` —
+   both, deliberately, so the relationship is visible at the call site.
+
+   AND THE ROW RULES RUN THE FULL WIDTH OF THE CONTENT. §18's list-row divider is
+   a `::after` inset by `--pad-x` on each side, and that is right for the rows it
+   was written for: `.cardrow`, `.ch`, `.mem` and the rest BLEED to the section's
+   edge and indent their own content, so the rule pays the same gutter the text
+   pays. A `.kv` in a section does not bleed — the section's padding has already
+   placed it — so the inset applied a second time, and a four-row definition
+   block came out with hairlines 32px short at both ends, floating inside a
+   column of text that started further left than they did. §29 already answers
+   the identical case for a `.kv` inside a `.tile` with `left:0;right:0`; a filled
+   block is the same situation, and §18's own note is the argument for it — "full
+   bleed means this is the edge of a filled block", and here the block's padding
+   IS the gutter, so the rule must not pay it twice.
+
+   Scoped to `.tint-2` rather than to `.tint`, because `.tint` sections in the
+   candidate and leader portals hold `.kv` rows today and this is not a change
+   anybody asked for there.
+   -------------------------------------------------------------------------- */
+.app .sec.tint.tint-2{--surface-2:var(--surface-3)}
+.app .view-col .main .page .sec.tint-2 .kv::after{left:0;right:0}
 
 /* --------------------------------------------------------------------------
    12. THE PLOT IS AS TALL AS IT IS WIDE, SO ITS WIDTH IS CAPPED

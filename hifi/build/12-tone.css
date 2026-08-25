@@ -11,7 +11,23 @@
    ========================================================================== */
 :root{
   --surface-2:#f7f7f7;      /* the panel. One step off white, same warm hue. */
-  --rule-on-2:#ede9e2;      /* the hairline, one step darker on the panel */
+  --surface-3:#fbfbfb;      /* the QUIET panel, and the reason it is a third
+                               value in a block whose note says "two values
+                               only": `--surface-2` marks a section the reader is
+                               meant to act on — the attention queue, the week's
+                               work. A section that is REFERENCE wants to be set
+                               apart from the page without also being the loudest
+                               thing on it, and #f7f7f7 under a ledger read as a
+                               second, competing panel. Half the step down: still
+                               a tone rather than a colour, still legible on a
+                               laptop, and it recedes instead of arriving.
+                               Reached through `.sec.tint.tint-2` (§37.11c),
+                               never named directly by a component. */
+  --rule-on-2:#ede9e2;      /* the hairline, one step darker on the panel. It is
+                               shared by both panels on purpose: it was tuned to
+                               sit just off #f7f7f7, so on the lighter ground it
+                               reads a touch stronger, which is what a reference
+                               block's rules want. */
   --link:#0371a4;           /* the stated #0488C5, darkened just enough to
                                hold AA: the original is 3.5:1 on the canvas
                                and 3.3:1 on the panel, under the 4.5:1 body
