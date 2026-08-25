@@ -609,8 +609,26 @@
 .app .tile.bordered,.app .ai-aura,.app .note,.app .ai-stream,.app .signed,
 .app .note.warn,.app .note.err,.app .note.succ,.app .note.acc,
 .app .signed.clk{border-left:0!important}
+/* AND THE INDENT GOES WITH IT — EXCEPT WHERE A FILL NEEDS IT. This second
+   declaration is the companion to the one above: with the 3px bar gone, the 16px
+   that held the text off it is paying for nothing, so it goes too.
+
+   `.warn`, `.err` and `.succ` are excluded, and the reason is that they are the
+   three notes with a GROUND. §46 puts the fill back on them (§12.510 had taken
+   it off as collateral, for the same reason this rule took the padding off), and
+   on a filled card the left padding is not the bar's indent — it is what stops
+   the words touching the edge of the colour. Zeroed, the amber card read as text
+   with its first character welded to the fill.
+
+   Excluded HERE rather than answered from a later layer, because this rule is
+   `!important` and the only thing that beats it is another `!important`. The
+   project's own instruction is to fix at source rather than escalate, and the
+   source is one `:not()` list. Nothing else in the product relies on a status
+   note having no left padding — it has had a fill for as long as §02 has
+   existed, and this rule is what was quietly cancelling it. */
 .app .tile.bordered:not(.band),.app .ai-aura:not(.band),
-.app .note:not(.band),.app .ai-stream:not(.band),.app .signed:not(.band){
+.app .note:not(.band):not(.warn):not(.err):not(.succ),
+.app .ai-stream:not(.band),.app .signed:not(.band){
   padding-left:0!important}
 
 /* ==========================================================================

@@ -1,0 +1,35 @@
+/* ==========================================================================
+   47. A PLATE WITH NO FACE PACKS ITS TEXT TO THE TOP
+
+   `.plate` is a four-slot grid — heading, body, actions, and the person the
+   appointment is with — and §15.1592 gives it `align-items:center`. That is
+   right for the card it was written for: the candidate's cohort session and the
+   agent's next interview both carry a `.plate-who`, so the left column is three
+   deep, the actions column is one button, and centring the shorter of the two
+   against the taller is what makes the card read as one block.
+
+   The plates added for the agent's enabling stages have no face — there is no
+   person in "Write your public profile" or "Start with how the interview runs".
+   So the left column is two slots against an actions column that can be two
+   buttons wide and wrap to two rows, and it is now the SHORTER one. `centre`
+   then pushes the title down: the card drew ~50px of space above the heading and
+   ~15px below the body, which reads as a card whose content has slipped, and on
+   the dashboard plate — two buttons, a body that wraps — it was the most visible
+   thing on the page.
+
+   `align-self:start` on the two text slots packs them to the top of the content
+   box. The actions keep §15's `align-self:end`, so they stay bottom-right and
+   the card still has a diagonal to read along.
+
+   SCOPED BY `:not(:has(.plate-who))`, which is the honest test rather than a
+   list of the two call sites. A plate with a face is the card §15 balanced and
+   is untouched; a plate without one is this shape, whoever writes the next one.
+   The rule cannot fire on a card where the left column is already the taller,
+   because `start` and `center` are the same thing when the item fills its track.
+
+   LAST, and it only has to be after §15. Nothing between them names `.plate-h`
+   or `.plate-b`.
+   ========================================================================== */
+
+.app .plate:not(:has(.plate-who)) > .plate-h,
+.app .plate:not(:has(.plate-who)) > .plate-b{align-self:start}

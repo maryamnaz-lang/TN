@@ -166,7 +166,21 @@ css = '\n'.join((here / f).read_text() for f in
                  # earlier layer mentions and the one thing it touches is a
                  # token, so its position is free; it is last because that is
                  # where a new thing goes.
-                 '45-info.css'])
+                 '45-info.css',
+                 # A STATUS NOTE IS A CARD AGAIN. §12.510 takes the fill off
+                 # every `.note` — right for the plain summary note it was
+                 # written about, collateral for `.warn` / `.err` / `.succ`,
+                 # which are statuses and were left as coloured text with a
+                 # padding-left for a ground that was no longer there. LAST,
+                 # because it corrects §12, which corrects §02.
+                 '46-statusnote.css',
+                 # A PLATE WITH NO FACE PACKS ITS TEXT TO THE TOP. §15 centres
+                 # `.plate`'s columns against each other, which is right for a
+                 # card carrying a `.plate-who` and wrong for the faceless ones
+                 # the agent's enabling stages draw — there the text column is
+                 # the shorter and centring pushed the heading 50px down. After
+                 # §15, which is all it needs.
+                 '47-plate.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

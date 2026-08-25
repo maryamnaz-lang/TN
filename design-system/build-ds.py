@@ -90,6 +90,11 @@ LAYERS = [
     # The quiet ground for a section you read rather than act on. One token and
     # one rule; every portal has pages that mix the two kinds of section.
     '45-info.css',
+    # The status note's fill, put back. Every portal draws `.note.warn`.
+    '46-statusnote.css',
+    # The faceless plate's text, packed to the top. `.plate` is in the system
+    # and so is the shape that needs this.
+    '47-plate.css',
 ]
 
 # ==========================================================================
@@ -293,11 +298,35 @@ b-earn b-earn-t b-mk b-n b-nm b-pts b-who fa-b fa-dl fa-ic
 # So the list is down to four families, and each is genuinely a different
 # product rather than a component of this one.
 # ==========================================================================
+# ==========================================================================
+# `auth*` CAME OFF THIS LIST TOO, and it is the third time the same mistake was
+# corrected — the allowlist, then `ask*`/`bk*`/`scene*`, now the front door.
+#
+# The old entry read: "Namespaced by an explicit product decision — orange is
+# the front door only, and nothing past login may reach for it — and it carries
+# two large artwork files this stylesheet should not ship." Both halves were
+# true and neither was a reason.
+#
+# ORANGE BEING THE FRONT DOOR'S ALONE IS A REASON TO SHIP THE FRONT DOOR, not to
+# withhold it. The decision says where the accent may appear; it does not say
+# the screens that may use it belong to one file. Excluding the family did not
+# stop a second portal needing a login — it stopped a second portal HAVING one,
+# so `tn-agent-portal.html` built its sign-in out of `.form-page` and got a
+# correct form on white where the product has a split card with a brand column.
+# That is the allowlist's failure exactly: a page built honestly out of what was
+# in the box, that does not look like TalentNext.
+#
+# AND THE 250 KB IS THE POINT OF EMBEDDING, not an argument against it. The
+# stylesheet already carries five faces and Tal's mark for the same reason —
+# one <link> is the whole dependency, and a portal that has to source its own
+# artwork sources something else. `auth-art.webp` is 240 KB and `auth-mark.webp`
+# is 11 KB; they move to IMAGES below and ARTWORK is now empty.
+#
+# `.sec-id`, `.sec-rule`, `.sec-act` and `.sec-cbx` arrive with it, and they had
+# to: every rule for them in `17-auth.css` is nested inside `.auth-card`, so
+# they were inert classes in any page that used them without it.
+# ==========================================================================
 EXCLUDE_PREFIXES = (
-    # The sign-up front door. Namespaced by an explicit product decision —
-    # orange is the front door only, and nothing past login may reach for it —
-    # and it carries two large artwork files this stylesheet should not ship.
-    'auth',
     # The LightspeedVT iframe frame and the phone status-bar chrome: both are
     # pictures of somebody else's UI, not components.
     'lsvt', 'ios-',
@@ -345,11 +374,24 @@ FONTS = {
 # this stylesheet fell back to a hard orange square. Tal appears at the head of
 # every page in the product; the mark is as much a part of the look as the
 # accent gradient. 61 KB of PNG, embedded like the fonts.
-IMAGES = {'__TALCIRCLE__': ('tal-circle.png', 'image/png')}
+# AND THE SIGN-UP ARTWORK SHIPS NOW, for the reason written over
+# EXCLUDE_PREFIXES: the front door is a screen every portal needs and the
+# illustration is what makes it the front door rather than a form. Same
+# mechanism as the fonts and Tal's mark — read off disk, encoded here, embedded
+# under the token `17-auth.css` already writes.
+IMAGES = {
+    '__TALCIRCLE__': ('tal-circle.png', 'image/png'),
+    '__AUTHART__':   ('auth-art.webp',  'image/webp'),
+    '__AUTHMARK__':  ('auth-mark.webp', 'image/webp'),
+}
 
-# Still dropped: the sign-up artwork, because `auth*` is excluded wholesale and
-# the two files are 250 KB of front-door-only illustration.
-ARTWORK = ('__AUTHART__', '__AUTHMARK__')
+# NOTHING IS DROPPED FOR ARTWORK ANY MORE. The tuple stays because `clean_decls`
+# is the right place for the check and a future product raster may want it: a
+# declaration still holding an unreplaced `__NAME__` placeholder points the
+# browser at a literal string, so dropping it at the declaration level is what
+# keeps `drop_orphan_fontface` from having to reason about anything but a whole
+# at-rule. Empty means every placeholder in the output now has a file behind it.
+ARTWORK = ()
 
 
 # ==========================================================================
@@ -694,6 +736,36 @@ def main():
     print(f'hover selectors disarmed: {n_hover}'
           if n_hover else 'hover left ARMED (DS_ARM_HOVER=1)')
 
+    # ======================================================================
+    # THE INVARIANT IS CHECKED BEFORE THE ASSETS GO IN, and it has to be.
+    # The check is textual: every (selector, declarations) pair in the output
+    # must appear identically in a source layer. A source layer says
+    # `background-image:url('__AUTHART__')`; once the token is replaced, the
+    # output says `url('data:image/webp;base64,UklGR…')` and matches nothing.
+    #
+    # This did not bite while the only embedded image was Tal's mark, because
+    # `__TALCIRCLE__` is named in `:root` and `:root` is in SKIP_VERIFY. The
+    # sign-up artwork is named in two ordinary class rules — `.app .auth-img`
+    # and `.auth-card > .auth-mark` — so the first build that shipped it failed
+    # the invariant on exactly those two, correctly: the rules in the output were
+    # not the rules in the source.
+    #
+    # Verifying the PRE-SUBSTITUTION text is the honest fix rather than teaching
+    # the verifier to ignore data URIs. What it is checking is this script's own
+    # selector filtering and block handling, and that is all finished by here;
+    # substitution is a literal token swap with no CSS structure in it. Widening
+    # SKIP_VERIFY, or letting the comparison skip anything holding a `data:`,
+    # would have blinded it to a whole class of real mistakes in rules that
+    # happen to carry an asset.
+    # ======================================================================
+    problems = verify_subset(css, LAYERS)
+    if problems:
+        print(f'\n!! {len(problems)} rule(s) in the output do not appear in the '
+              f'source. NOTHING WRITTEN.')
+        for p in problems[:12]:
+            print('   ' + p)
+        raise SystemExit(1)
+
     # fonts, embedded, so the stylesheet is the whole dependency
     for token, filename in FONTS.items():
         f = SRC / filename
@@ -710,18 +782,8 @@ def main():
             css = css.replace(token, f'data:{mime};base64,{b64}')
             print(f'embedded {filename} ({f.stat().st_size/1024:.0f} KB)')
         else:
-            print(f'  ! {filename} missing — Tal\'s mark will not render')
+            print(f'  ! {filename} missing — its placeholder is dropped')
     css = drop_orphan_fontface(css)
-
-    # the invariant. Checked before the file is written, so a build that would
-    # have shipped an invented rule fails instead.
-    problems = verify_subset(css, LAYERS)
-    if problems:
-        print(f'\n!! {len(problems)} rule(s) in the output do not appear in the '
-              f'source. NOTHING WRITTEN.')
-        for p in problems[:12]:
-            print('   ' + p)
-        sys.exit(1)
     print('verified: every rule traces to a source layer')
 
     header = f"""/* ==========================================================================
@@ -817,8 +879,9 @@ function dsStagger(page){
     # URIs; the award marks are read off disk and encoded here, exactly as
     # build.py does it. Nothing is re-cut or re-compressed.
     #
-    # NOT included: the sign-up artwork (`auth-art`, `auth-mark`) — 250 KB of
-    # front-door-only illustration, and `auth*` is excluded wholesale.
+    # The sign-up artwork is included now — it rides in the STYLESHEET rather
+    # than here, because `17-auth.css` names it in a `background-image` and no
+    # call site ever refers to it by a JS constant.
     # ======================================================================
     assets = ['\n/* ---- brand assets, embedded ---- */']
     data_js = (SRC / 'data.js').read_text()

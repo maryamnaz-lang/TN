@@ -114,16 +114,31 @@
    hi-fi screen, the same rule `hifi/` keeps against the wireframe's
    client-facing annotations. An undecided thing is decided here and the
    decision is written down in the handoff, not drawn on the page as a
-   question. The four that were genuinely undecided, and what this file does:
+   question. The five that were genuinely undecided, and what this file does:
 
      - AN AGENT ROLE IS ADDED TO AN ACCOUNT, it is not a second account. The
        diagram's own rule says roles stack, so Profile says so and the
        candidate record is left alone.
      - THE 20/80 SPLIT IS THE MODEL, and the $100 monthly listing fee is not
-       in force. Two revenue models were never reconciled; the split is the
-       later of the two and the one that was confirmed. An agent who is also
+       drawn. Two revenue models are still on the record and NEITHER has been
+       withdrawn — the money-and-settlement flow says so in as many words, and
+       calls reconciling them the highest-value five minutes of the next client
+       call. So this is an ASSUMPTION the file draws, not a decision it
+       reports: the split is the later of the two, it is the one every figure
+       here is built on, and it stands until that call says otherwise. It is
+       also the more likely of the two to survive, because an agent who is
        charged a subscription would need a card on file, and a portal that
        takes money FROM an agent is a different product.
+     - THE RELEASE IS THREE WORKING DAYS AFTER THE REPORT, and that is the same
+       kind of assumption, load-bearing in the same way. Settlement mechanics —
+       who is paid what, and when — were explicitly PARKED as a black box, and
+       nothing has filled it in. But a payment ledger with no timing in it is
+       not a screen: every row of `PAYMENTS`, the escrow chip, Tal's summary and
+       the "How a fee splits" band all need a rule to state. Three working days
+       is that rule, written here so the next person to read it back knows it
+       came from this file and not from the client. Hedging it across eight
+       surfaces to protect one deferred decision would cost five screens and
+       buy nothing.
      - MONEY NEVER TOUCHES THIS PORTAL. Payouts are a handoff to Stripe, the
        same shape as the candidate's booking: TalentNext holds no bank
        details and this file draws no bank form. `hifi/`'s `ai7.js` makes the
@@ -262,15 +277,29 @@ const A = {
    how you got here and the reader is entitled to see it.
    -------------------------------------------------------------------------- */
 const STAGES = [
+  /* BEFORE THE PORTAL, AND OUTSIDE THE FOUR STAGES. Signing in is not a step in
+     the diagram — it happens at every stage and belongs to no one of them — so
+     it is first in the picker and last in the argument. It is a stage rather
+     than an overlay because the picker is how a reviewer reaches every other
+     screen in this file, and because logging out has to land somewhere. */
+  ['signin',   'Signing in',            'Before the portal. One account, one password — and Owen’s carries two roles, so the password is followed by a choice of which one to open.'],
   ['setup',    'Approved, setting up',  'Stage 2. Approved 12 June, and the agent role is on the account Owen already had. Your public profile, your fee and a payout destination are what is left.'],
   ['training', 'Training',              'Stage 3. Your public profile and your money are done. Three of four lessons are finished and the calibration interview is the last thing before the certification gate.'],
   ['live',     'Listed, nothing booked','Stage 4, day one. Certified 20 June and visible in the marketplace since Monday. Six slots are open and no one has taken one yet.'],
-  ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 in escrow. This is the portal as an agent actually uses it.'],
+  ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 held for you in escrow. This is the portal as an agent actually uses it.'],
   ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review moved Owen to A3 and widened the range he may assess to E1 – B2.']
 ];
 
 /* Stage config. Anything absent falls back to `A`. */
 const CFG = {
+  /* `signin` NEEDS A REAL ENTRY EVEN THOUGH IT DRAWS NO PORTAL. `f()` spreads
+     `CFG[S.stage]` on the first line of every render and `readHash` rejects any
+     stage this object does not have, so a missing key would make the hash
+     unreadable and `v` undefined. It mirrors `working` because the role screen
+     reads the agent's range and fee off `v`, and the agent Owen chooses on that
+     screen is the established one. */
+  signin:   {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
+             busy:true},
   setup:    {nav:'setup', approved:true, ivs:0, month:0, rating:null, escrow:0, earned:0},
   training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, lessonsDone:3,
              ivs:0, month:0, rating:null, escrow:0, earned:0},
@@ -348,8 +377,10 @@ const parentOf = (view, nav) =>
    Five, and the working week is built out of them. The fee is the same $85 on
    every row because it is Owen's rate, not a negotiation: the candidate pays
    into escrow at booking, so an interview that has not happened is already
-   paid for. Three of these are what makes escrow $204 — Rafael (booked),
-   Sofia (held, report not delivered) and Tom (delivered, releasing Thursday).
+   paid for. Three of these are what fills escrow — Rafael (booked), Sofia
+   (held, report not delivered) and Tom (delivered, releasing Thursday) — which
+   is $255 in escrow and $204 of it Owen's. See `held` for why the portal
+   reports the second number and names the first beside it.
 
    `chip` AND `ord` ARE THE DIARY'S TWO FIELDS, AND ONLY THE UPCOMING ROWS HAVE
    THEM. `day` is the full date a page prints — "Thursday 20 August" — and the
@@ -630,7 +661,7 @@ const PAGESUM = {
     setup:   'Approved on 12 June, and the agent role sits on the account you already had. Your public profile, your fee and payouts are all still open.',
     training:'Three of four lessons done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
     live:    'Listed since Monday and nothing booked yet. Six slots are open over the next fortnight, and Friday at 5:00 PM is the first.',
-    working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is sitting in escrow.',
+    working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is held for you in escrow.',
     reviewed:'Nadia moved you to A3 on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
   },
 
@@ -666,7 +697,7 @@ const PAGESUM = {
   earnings: {
     setup:   'Nothing can be booked until a payout destination exists. It’s a Stripe handoff — TalentNext never sees an account number, and it takes a minute.',
     live:    'Nothing earned yet. Your $85 splits to $68 once a report is delivered, and it sits in escrow for three working days first.',
-    _:       '$612 earned this month across nine interviews, and $204 is still in escrow. Tom’s $68 releases Thursday, three days after his report went out.'
+    _:       '$612 earned this month across nine interviews, and $204 is still held for you in escrow. Tom’s $68 releases Thursday, three days after his report went out.'
   },
 
   standing: {
@@ -1570,6 +1601,30 @@ const diary = (v, not) => IVS.filter(x => x.st === 'next' && x.id !== not)
 
 const money = n => '$' + n.toLocaleString('en-US');
 
+/* WHAT IS IN ESCROW IS THE WHOLE PAYMENT; WHAT THIS PORTAL REPORTS IS THE
+   AGENT'S SHARE OF IT. The two are different numbers and the file used to
+   print both under one word. `A.escrow` is 204 — three interviews at Owen's
+   $68 — and the figure cell called it "In escrow", while the interview brief,
+   the calendar card and the diary row all said the candidate's $85 is what
+   goes in. So one page said $204 was held and another said $85 × 3, and 3 ×
+   $85 is $255. Anyone adding up the ledger in a demo finds it.
+
+   The money-and-settlement flow settles which of the two is wrong: every
+   payment lands in escrow whole and settles out from there, so the balance is
+   gross and $204 is Owen's slice of it. `A.escrow` STAYS the slice, because an
+   agent's Earnings page is about the agent's money and TalentNext's $51 is
+   noise on it — what changed is that every surface printing the slice now says
+   whose it is ("held for you"), and the figure cells name the gross beside it
+   so the two can never read as the same number again.
+
+   DERIVED, NOT STORED, so a stage that zeroes `escrow` zeroes this too and a
+   change to the fee or the split cannot leave a stale total behind. The
+   division recovers the interview count — 204/68 — which is exact for every
+   stage in `CFG`; `Math.round` is there because a future rate that does not
+   divide cleanly should still yield a whole number of interviews rather than
+   a fractional one silently multiplied back up. */
+const held = v => v.escrow ? Math.round(v.escrow / v.share) * v.fee : 0;
+
 /* ==========================================================================
    THE PAGES
    ========================================================================== */
@@ -1777,7 +1832,7 @@ V.dashboard = v => {
         ['video',      'Interviews', String(v.month),   `${v.ivs} in total`],
         ['growth',     'Follow-up',  String(v.follow),  'up from 4.2 in July'],
         ['wallet',     'Earned',     money(v.earned),   `${money(v.share)} an interview`],
-        ['creditCard', 'In escrow',  money(v.escrow),   'three interviews, held']])}
+        ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`]])}
     </section>
 
     <section class="sec">
@@ -1960,7 +2015,11 @@ V.training = v => {
   </section>
 
   ${at === 'certified' ? '' : `
-  <section class="sec">
+  ${/* `tint info` — §45. The syllabus: what the four lessons are, in order, with
+        one of them open to you. It is reference material with an action in it
+        rather than an action with reference around it, so it takes the quiet
+        ground and the black card at the head of the page keeps the emphasis. */''}
+  <section class="sec tint info">
     <div class="sec-h"><h2>The four lessons</h2></div>
     ${/* A `Next` TAG IS NOT AN ACTION. The row that is yours to do carried a
           pill saying so and nothing to press, while the button that opened it sat
@@ -2001,11 +2060,34 @@ V.training = v => {
 
   <section class="sec">
     <div class="sec-h"><h2>Calibration</h2></div>
-    ${kv([
-      ['With', 'Derek Hale &middot; head of agent standards'],
-      ['When', at === 'certified' ? 'Thursday 20 June' : calWhen],
-      ['Length', '45 minutes, recorded'],
-      ['Result', at === 'certified' ? 'Passed &mdash; certified 20 June' : at === 'unstarted' ? 'Not scheduled yet' : 'Not sat yet']])}
+    ${/* FOUR CELLS, NOT FOUR ROWS. A `.kv` is the right shape for a definition
+          list of any length — but these four are all short, they are all facts
+          about one appointment, and read as rows they were four lines of text
+          each 900px wide with 700px of nothing after the words. `.stats` is the
+          band for exactly this: a mark, a label, a figure and a note, four
+          across, and CLAUDE.md's own rule for it is "give it exactly four",
+          which is what there is. `.facts` would have been the mistake — its
+          `auto-fit` columns leave a spare track painting the rule colour at the
+          widths where a cell wraps; §10's note on `.facts` is that argument.
+
+          THE FIGURE IS SHORT AND THE NOTE CARRIES THE REST, because `.stat` puts
+          the label and the figure on ONE line with the figure `nowrap` at the
+          right edge. "Thursday 20 June, 4:00 PM ET" as a figure truncates to
+          "Thursday 20 J…" the moment the page narrows — so the date is the
+          figure, the time is the note, and every cell holds at the width four
+          columns leaves it. `.stats` also opts the section out of §10.15's label
+          column, so the heading takes the full width for free. */''}
+    ${stats([
+      ['user', 'With', 'Derek Hale', 'Head of agent standards'],
+      ['calendar', 'When',
+        at === 'unstarted' ? '&mdash;' : '20 June',
+        at === 'unstarted' ? 'Once the four lessons are done'
+        : at === 'certified' ? 'Thursday, and it is behind you' : 'Thursday, 4:00 PM ET'],
+      ['time', 'Length', '45 min', 'Recorded, and kept'],
+      ['certificate', 'Result',
+        at === 'certified' ? 'Passed' : 'Not sat',
+        at === 'certified' ? 'Certified 20 June'
+        : at === 'unstarted' ? 'Not scheduled yet' : 'Waiting on the call']])}
     <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it. Derek watches your half of the conversation.</p>
     ${at === 'certified' ? '' : `
     ${/* THE NOTE MOVED HERE, TO THE THING IT IS ABOUT. It was the last block on
@@ -2016,7 +2098,10 @@ V.training = v => {
       Nothing goes into browse until the calibration is passed &mdash; and it cannot be booked until the four lessons are done.</div></div>`}
   </section>
 
-  <section class="sec">
+  ${/* `tint info` — §45. Three questions Derek asks himself about you. Nothing
+        here is yours to do; it is the standard you are being read against, which
+        is exactly the kind of section this ground was written for. */''}
+  <section class="sec tint info">
     <div class="sec-h"><h2>What Derek watches for</h2></div>
     ${/* "THE RUBRIC" IS THE WORD FOR IT INSIDE THE COMPANY. The heading is what
           the reader wants to know — the three rows are questions Derek is asking
@@ -2439,7 +2524,7 @@ V.availability = v => head({
 V.earnings = v => {
   const connected = v.paid;
   return head({title: 'Earnings',
-    sub: connected ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} in escrow`
+    sub: connected ? `80/20 split &middot; ${money(v.share)} an interview &middot; ${money(v.escrow)} held for you`
                    : '80/20 split &middot; no destination connected'}) + `
 
   ${connected && v.busy ? `
@@ -2447,7 +2532,7 @@ V.earnings = v => {
     <div class="sec-h"><h2>This month</h2></div>
     ${stats([
       ['wallet',     'Earned',     money(v.earned),  'released to your account'],
-      ['creditCard', 'In escrow',  money(v.escrow),  'three interviews, held'],
+      ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`],
       ['video',      'Interviews', String(v.month),  `${v.ivs} in total`],
       ['receipt',    'Each',       money(v.share),   `80% of ${money(v.fee)}`]])}
   </section>` : ''}
@@ -2661,23 +2746,20 @@ V.profile = v => head({title: 'Profile'}) + `
     </div>
   </section>
 
-  ${/* THE PUBLIC HALF OF THE SAME PERSON. Everything from here to the
-        visibility switch was its own module until it was not — the note where
-        `V.listing` used to be is the argument. It sits directly under "You"
-        because that is the order the two halves are asked about: this is me,
-        and this is the me a candidate sees. `I.search` on the button is the
-        icon that rail item carried, so the one control that replaced a page
-        keeps the page's mark. */''}
-  <section class="sec">
-    <div class="sec-h"><h2>Your public profile</h2></div>
-    <p class="help">${v.listed
-      ? `Live in browse since 24 June &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`
-      : `Not visible yet &middot; ${money(v.fee)} &middot; assesses ${v.rangeShort}`}</p>
-    <div class="btn-row mt4">
-      <button class="btn btn-p btn-sm ic-l" data-peek="1">${I.search}See how you appear</button>
-      <button class="btn btn-g btn-sm noic" data-sheet="listing">Edit your card</button>
-    </div>
-  </section>
+  ${/* THERE WAS A "YOUR PUBLIC PROFILE" SECTION HERE, and it was a third way to
+        reach two things that already had one: a `&middot;` line — "Not visible
+        yet &middot; $85 &middot; assesses E2 – B1" — over a See-how-you-appear
+        and an Edit-your-card button, sitting immediately under a "You" row that
+        already carries a Public profile button and an Edit. Two headings, four
+        controls, one subject.
+
+        WHAT IT HELD IS STILL HELD. The preview is the `data-peek` button on the
+        You row above. The card's editor is the peek's own footer — "Edit public
+        profile", which opens the same `SHEETS.listing` this section's button did,
+        and opens it from beside the card it edits rather than from a line of text
+        about it. The visibility line is said twice over already: Tal's summary at
+        the head of this page reads off the same three figures, and the peek's own
+        lede says whether the card is in browse yet. */''}
 
   ${/* THE OLD "HOW YOU APPEAR" ROW IS NOT HERE, and that is the one section of
         the removed module that did not come across. It was the face, the name,
@@ -2815,7 +2897,7 @@ const AGENT_NOTIF = {
     {ic:'warning',    t:'Sofia Marek’s report is due',     b:'6:00 PM today. Tal has a draft off the transcript waiting for your edit.',                w:'2h ago',     go:'interview', iv:'sofia',  unread:1},
     {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM ET, paid at booking. There is nothing to accept.',           w:'5h ago',     go:'interview', iv:'rafael', unread:1},
     {ic:'calendar',   t:'Amara Osei booked a re-interview',b:'Monday 24 August at 6:00 PM ET. Her 90-day summary is on the brief.',                     w:'Yesterday',  go:'interview', iv:'amara',  unread:1},
-    {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after his report went out. $204 is in escrow in total.',             w:'Yesterday',  go:'earnings',    unread:0},
+    {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after his report went out. $204 is held for you in total.',             w:'Yesterday',  go:'earnings',    unread:0},
     {ic:'star',       t:'Nina Haddad rated the interview', b:'4.3 on follow-up and 4.7 on depth. Signed at Explorer – E4 on 15 August.',                w:'3 days ago', go:'standing',    unread:0}
   ],
   reviewed:[
@@ -3111,8 +3193,14 @@ function ask(q){
 
 /* CONFIRMATION BEFORE ANYTHING THAT CANNOT BE TAKEN BACK — signing a report,
    and logging out. Both are one press away from the edge of the product. */
+/* A FOURTH FIELD, AND ONLY LOGOUT HAS ONE: the stage the confirmation lands on.
+   "Log out" used to close the sheet and leave you on the page you had just left
+   — the one control in the portal whose whole purpose is to take you somewhere
+   and the only one that did nothing. Now there is somewhere for it to go, and
+   the sentence in the sheet is finally true: coming back does need the password,
+   because the screen behind it is the one that asks for it. */
 const CONFIRMS = {
-  logout: ['Log out?', 'You will need your password to come back in.', 'Log out'],
+  logout: ['Log out?', 'You will need your password to come back in.', 'Log out', 'signin'],
   sign:   ['Sign and send?', 'The level goes to the candidate as soon as this is signed, and a change afterwards is a review decision.', 'Sign and send'],
   /* CLOSING A SLOT IS CONFIRMED, because it is the one thing on the Availability
      page that takes away something a candidate may be looking at right now. It
@@ -3129,7 +3217,12 @@ function confirmSheet(){
       <div class="sheet-b"><p class="t-body-02">${c ? c[1] : ''}</p></div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="confirm">Cancel</button>
-        <button class="btn btn-p noic" data-close="confirm">${c ? c[2] : ''}</button>
+        ${/* `data-stage` RIDES THE SAME BUTTON as `data-close`, and the router's
+              stage branch clears `S.confirm` itself, so one press both confirms
+              and leaves. The stage branch is written above the close branch for
+              exactly this — a second control would be a second thing to keep in
+              step with the first. */''}
+        <button class="btn btn-p noic" data-close="confirm"${c && c[3] ? ` data-stage="${c[3]}"` : ''}>${c ? c[2] : ''}</button>
       </div>
     </div>
   </div>`;
@@ -3179,6 +3272,262 @@ function editSheet(){
 }
 
 /* ==========================================================================
+   SIGNING IN — stage: `signin`
+
+   THERE IS ONE FRONT DOOR AND THIS IS IT. Profile has said so since this file
+   was written — "Sign-in: one account, one password" sits in the roles band
+   under a note headed "Roles stack" — so an agent does not have an agent
+   login. They have a TalentNext login, and Owen's carries two roles because
+   becoming an agent added one to the account he already had.
+
+   THAT IS WHY THE INTERESTING SCREEN HERE IS THE SECOND ONE. `login` is the
+   product's own front door and nothing about it is an agent's; `role` is the
+   screen this portal genuinely did not have, and it is the roles-stack
+   decision made visible. Every fact on it is read off Profile rather than
+   invented — the agent row's range and fee are `v.rangeShort` and `v.fee`, the
+   candidate row is the "Explorer – E4, finished March 2024" that band already
+   prints. Two surfaces, one set of numbers, so they cannot drift.
+
+   WHAT IS DELIBERATELY ABSENT, and each omission is the same argument as the
+   one the stage list makes about Stage 1:
+
+     - NO SIGN-UP. The portal begins where an agent exists, and signing up
+       here would create a candidate account this file cannot open. The foot of
+       `login` says where an approved agent comes from instead.
+     - NO EMAIL VERIFICATION AND NO ACCOUNT CREATION. Owen verified an address
+       and chose a password as a candidate in 2024. A role was added; a person
+       was not. `hifi/`'s `create`, `verify` and `created` screens are that
+       file's because that is where a TalentNext account is born.
+     - NO TERMS GATE. Approval is where the agent agreement was signed, and
+       this portal starts after approval. A consent step at sign-in would be a
+       screen the flow diagram does not have, drawn in this one's language —
+       which is exactly what the two Stage 1 snapshots were.
+
+   ONE STATE ON THE ROLE SCREEN, NOT TWO. The first sign-in after approval is a
+   real moment — the second row was not there last time — but `signin` is a
+   stage of its own rather than a step inside the other five, so it has no
+   approval date to be near. The `setup` stage's bell carries that moment
+   already ("You are approved — the agent role sits on the account you already
+   had"), and a "New" tag here would be the same sentence in a place that
+   cannot say when. The returning state is also the one a reader sees every
+   time after the first.
+
+   IT IS THE CANDIDATE PORTAL'S OWN FRONT DOOR, AND GETTING THERE MEANT CHANGING
+   THE DESIGN SYSTEM. `hifi/` draws its login as `.auth-card`: a split card, the
+   brand column with the wordmark and the welcome on the left, the form on the
+   right, an orange wash behind it and the illustration bled off the corner. The
+   first version of this file could not use any of it — `build-ds.py` excluded
+   `auth*` wholesale — so it drew the form on `.form-page` instead and produced a
+   correct login on plain white. Which is the allowlist's failure a third time,
+   and the note over `EXCLUDE_PREFIXES` is now the long version of it.
+
+   `auth*` ships. So do `auth-art.webp` and `auth-mark.webp`, embedded like the
+   fonts and Tal's mark, and so do `.sec-id`, `.sec-rule`, `.sec-act` and
+   `.sec-cbx` — the card's internal spacing, every rule for which is nested
+   inside `.auth-card` in `17-auth.css`, which is why using them without it (as
+   the `.form-page` version did) styled nothing at all.
+
+   THE FRAME IS `views.js`'s, ASSEMBLED IN `render()`: `.auth-card` holding
+   `AUTH_ART` and an `.auth-col`, and each view printing its own shell and page
+   inside that column. Below 900px `.auth-card` is `display:contents` and
+   `.auth-brand` is hidden, so the card dissolves and the phone gets the shell
+   and the form — one markup, two layouts, neither of them written here.
+
+   NOTHING IN THIS FILE WRITES CSS, which is still true and is the test that
+   matters: every rule these five screens use is a rule the portal uses, in the
+   cascade position the portal puts it in.
+   ========================================================================== */
+
+/* THE SHELL IS THE LOGO AND, WHERE THERE IS SOMEWHERE BACK TO, ONE ARROW.
+   `shell()` proper carries the rail toggle, the bell and the avatar, and not
+   one of the three means anything before you are signed in — a notification
+   count for an account nobody has opened yet is the clearest case. Same
+   two-branch shape as `hifi/`'s `authShell`, including the inline padding: with
+   no toggle to its left the lockup has to pay the bar's own gutter, and with
+   one it must not pay it twice. */
+/* `views.js`'s `authShell`, unchanged — the logo, and one back arrow where there
+   is somewhere to go back to. It is a bare header rather than `shell()` because
+   the rail toggle, the bell and the avatar are all controls over an account and
+   there is no account open yet; at desktop §17 hides this header outright
+   (`.auth-card > .auth-col > .shell{display:none}`), because the brand column
+   beside it is already carrying the lockup. So it is the mobile head. The inline
+   padding is measured, not chosen: with no toggle to its left the lockup pays
+   the bar's own gutter, and with one it must not pay it twice. */
+function signinShell(back){
+  return `
+  <header class="shell">
+    ${back
+      ? `<button class="shell-act" data-signin="${back}" aria-label="Back">${I.arrowLeft}</button>
+         <span class="shell-logo" style="padding-left:var(--s02)"><img src="${LOGO_K}" alt="TalentNext"></span>`
+      : `<span class="shell-logo" style="padding-left:var(--s05)"><img src="${LOGO_K}" alt="TalentNext"></span>`}
+  </header>`;
+}
+
+/* THE BRAND COLUMN, PORTED WORD FOR WORD FROM `views.js`. It is the left half of
+   the split card at desktop and `display:none` below 900px, and every class in
+   it — `.auth-brand`, `.auth-logo`, `.auth-intro`, `.auth-begin`, `.auth-foot`,
+   `.auth-mark` — now ships in the design system.
+
+   THE WORDS ARE NOT RE-WRITTEN FOR AN AGENT, and that is the decision rather
+   than laziness. "assesses you in real conversation … moves you up the ladder a
+   level at a time" reads as candidate copy, and the first instinct was to
+   rewrite it for somebody who does the assessing. But this is ONE front door:
+   at the moment these words are on screen the product does not yet know which
+   of Owen's two roles is about to open, because that is the next screen's
+   question. Copy that picked a side here would be wrong for whoever it did not
+   pick. It is also not untrue of him — Owen has a level, a ladder and a
+   finished Explorer course of his own.
+
+   If it should say something role-neutral instead, that is a change to the
+   PRODUCT's front door and belongs in `views.js`, where the same paragraph is
+   stated once for both portals. Rewriting it here would give TalentNext two
+   different welcome screens depending on which file you opened. */
+const AUTH_ART = `
+<div class="auth-brand">
+  <span class="auth-logo"><img src="${LOGO_K}" alt="TalentNext"></span>
+  <div class="auth-intro">
+    <h2 class="t-heading-01">Welcome to TALENTnext</h2>
+    <p class="t-body-02">TalentNext is the AI-native leadership platform that assesses you in real conversation, compounds every interview, chapter and call into a live picture of where you stand, then moves you up the ladder a level at a time.</p>
+    <p class="t-body-02">From here, growth stops being guesswork.</p>
+    <p class="t-body-02 auth-begin">Let&rsquo;s begin.</p>
+  </div>
+  <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
+</div>
+<i class="auth-mark" aria-hidden="true"></i>`;
+
+/* A ROLE ROW. `goRow` is the shape — mark, eyebrow, title, sub, chevron — and it
+   is not reused because it hardcodes `data-go`, which sets a VIEW. Choosing a
+   role leaves the sign-in stage altogether, and the candidate row leaves the
+   FILE, so the row takes its trailing attribute whole.
+
+   A BUTTON ON BOTH ROWS, INCLUDING THE ONE THAT NAVIGATES TO ANOTHER DOCUMENT —
+   which is the note over `.shell-logo` proved a second time. The candidate row
+   was written as an `<a href>` on the reasoning that a cross-document link is
+   what an anchor is for; the anchor took `text-decoration:underline` from the
+   prose-link styling and drew all three of its lines underlined, eyebrow and
+   sub included, beside an identical row that was not. That styling is §12's
+   explicit decision and it is right for a link inside a paragraph; this is a
+   440px row with a chevron on it. So both rows are buttons, and the navigation
+   is the router's job — `data-portal` below. */
+const roleRow = (icon, eyebrow, title, sub, attr) => `
+  <button class="tile clk gcard" ${attr}>
+    <span class="cardrow-ic">${I[icon]}</span>
+    <span class="gcard-b"><span class="eyebrow">${eyebrow}</span>
+      <h3>${title}</h3><span class="sub">${sub}</span></span>
+    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  </button>`;
+
+const SIGNIN = {
+
+login: v => `${signinShell()}
+<main class="main"><div class="page form-page">
+  ${ph('Log in', 'Enter the email address and password on your TalentNext account.')}
+  <section class="sec">
+    <div class="f"><label for="sem">Email address</label>
+      <input class="inp fill" id="sem" type="email" value="${A.email}"></div>
+    <div class="f last"><label for="spw">Password</label>
+      <div class="pw-wrap"><input class="inp fill" id="spw" type="password" value="••••••••••••">
+        <button class="pw-eye" aria-label="Show password">${I.view}</button></div></div>
+    <p class="t-body-02 aux"><a class="lk" data-signin="forgot">Forgotten your password?</a></p>
+  </section>
+  <section class="sec">
+    <button class="btn btn-p btn-full" data-signin="role">Log in ${I.arrowRight}</button>
+    ${/* NO "SIGN UP" UNDER THIS BUTTON, and this line is what stands in its
+          place — see the omissions above. It names the one route into this
+          portal that exists: an approval, and the address it was sent to. */''}
+    <p class="help mt5">An agent account is created by approval, not here. Sign in with the
+      address your approval email was sent to.</p>
+  </section>
+</div></main>`,
+
+/* THE SCREEN THE ROLES-STACK RULE ASKS FOR. Two rows, and they are deliberately
+   different elements: the agent row is a `<button>` that changes stage inside
+   this file, the candidate row is an `<a>` to `hifi/`, because in the product
+   that IS a different application and in this repo it is a different document.
+   Drawing it as a dead row with an apology on it would be an annotation about
+   the prototype printed on a product screen; drawing it as a link means the
+   choice actually works when the file is served, which is the honest version of
+   what this screen does.
+
+   The sub is the factual spine per slot — name and address, no verb — because
+   there is no Tal card on an auth screen to carry a reading. */
+role: v => `${signinShell('login')}
+<main class="main"><div class="page form-page">
+  ${ph('Choose a portal', `${A.n} &middot; ${A.email}`)}
+  <section class="sec">
+    <div class="tile-stack">
+      ${roleRow('certificate', 'Talent agent',
+        'Interview and assess candidates',
+        `Assesses ${v.rangeShort} &middot; ${money(v.fee)} an interview`,
+        'data-stage="working"')}
+      ${roleRow('book', 'Candidate',
+        'Your own course',
+        'Explorer &ndash; E4 &middot; finished March 2024',
+        'data-portal="hifi/talentnext-candidate-portal-v24.html"')}
+    </div>
+  </section>
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Roles stack</b>
+      One account, one password. Becoming an agent added a role to the account you
+      already had, and either one opens from here.</div></div>
+  </section>
+</div></main>`,
+
+forgot: v => `${signinShell('login')}
+<main class="main"><div class="page form-page">
+  ${ph('Reset your password', 'Give us the email address on your account and we will send you a link to set a new password.')}
+  <section class="sec">
+    <div class="f last"><label for="fem">Email address</label>
+      <input class="inp fill" id="fem" type="email" value="${A.email}"></div>
+  </section>
+  <section class="sec">
+    <button class="btn btn-p btn-full" data-signin="sent">Send the reset link ${I.arrowRight}</button>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Remembered it? <a class="lk" data-signin="login">Back to log in</a></p>
+  </section>
+</div></main>`,
+
+sent: v => `${signinShell('forgot')}
+<main class="main"><div class="page form-page">
+  ${ph('Check your email', `A reset link is on its way to ${A.email}. It expires in 30 minutes and can be used once.`)}
+  <section class="sec">
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Nothing yet?</b>Give it a minute, then look in spam. The sender is hello@talentnext.com.</div></div>
+  </section>
+  <section class="sec">
+    <button class="btn btn-p btn-full" data-signin="reset">Open the link ${I.arrowRight}</button>
+    <div class="mt4"><button class="btn btn-g btn-full" data-signin="sent">Send it again ${I.restart}</button></div>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Wrong address? <a class="lk" data-signin="forgot">Change it</a> and try again.</p>
+  </section>
+</div></main>`,
+
+/* AND IT LANDS ON `role`, NOT ON A PORTAL. Saving a password signs you in, and
+   what an account with two roles on it does next is ask which one — the same
+   place `login` goes, for the same reason. Sending this straight to the agent
+   dashboard would be the one path that quietly decides for you. */
+reset: v => `${signinShell('login')}
+<main class="main"><div class="page form-page">
+  ${ph('Set a new password', 'Choose something you have not used here before. You will be signed in once it is saved.')}
+  <section class="sec">
+    <div class="f"><label for="rpw">New password</label>
+      <div class="pw-wrap"><input class="inp fill" id="rpw" type="password" value="••••••••••••">
+        <button class="pw-eye" aria-label="Show password">${I.view}</button></div>
+      <ul class="pw-rules">
+        <li class="ok">${I.checkFilled}At least 12 characters</li>
+        <li class="ok">${I.checkFilled}Upper and lower case</li>
+        <li>${I.circle}One number or symbol</li>
+      </ul></div>
+    <div class="f last"><label for="rpw2">Confirm new password</label>
+      <div class="pw-wrap"><input class="inp fill" id="rpw2" type="password" placeholder="Re-enter password">
+        <button class="pw-eye" aria-label="Show password">${I.view}</button></div></div>
+  </section>
+  <section class="sec">
+    <button class="btn btn-p btn-full" data-signin="role">Save and sign in ${I.arrowRight}</button>
+    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Changed your mind? <a class="lk" data-signin="login">Back to log in</a></p>
+  </section>
+</div></main>`
+
+};
+
+/* ==========================================================================
    RENDER
 
    THE WHOLE FRAME IS REPRINTED, which is `hifi/`'s model and the reason it is
@@ -3194,18 +3543,30 @@ const MO = {key:'', open:{}};
 
 function render(){
   const v = f();
-  const parent = parentOf(S.view, v.nav);
-  if(!NAVSETS[v.nav].some(([k]) => k === S.view) && S.view !== 'profile'
-     && !(parent && NAVSETS[v.nav].some(([k]) => k === parent))){
-    S.view = 'dashboard';           /* a stage that lost the page you were on */
+  /* SIGN-IN HAS ITS OWN VIEW REGISTRY, so it gets its own guard and skips the
+     rail's. `V` and `SIGNIN` share the `S.view` slot deliberately — one state
+     shape, one hash, one `render` — which means the two guards have to be
+     mutually exclusive: every name in `SIGNIN` is a view no `NAVSETS` set
+     contains, so the rail guard below would bounce all five of them to the
+     dashboard. Both the stage picker and the Reset button set
+     `S.view = 'dashboard'`, so this is the branch that catches them. */
+  const signing = S.stage === 'signin';
+  if(signing){
+    if(!SIGNIN[S.view]) S.view = 'login';
+  } else {
+    const parent = parentOf(S.view, v.nav);
+    if(!NAVSETS[v.nav].some(([k]) => k === S.view) && S.view !== 'profile'
+       && !(parent && NAVSETS[v.nav].some(([k]) => k === parent))){
+      S.view = 'dashboard';         /* a stage that lost the page you were on */
+    }
+    /* AND NO INTERVIEW PAGE IN A STAGE WITH NO INTERVIEWS. `live` is the day the
+       listing went up: the Interviews page correctly says nothing is booked, so
+       a detail page for a booking that does not exist yet is the one screen that
+       could contradict its own stage. Nothing links to it there; this is for the
+       stage picker, which can leave you on a view the new stage does not have. */
+    if(S.view === 'interview' && !v.busy) S.view = 'interviews';
   }
-  /* AND NO INTERVIEW PAGE IN A STAGE WITH NO INTERVIEWS. `live` is the day the
-     listing went up: the Interviews page correctly says nothing is booked, so
-     a detail page for a booking that does not exist yet is the one screen that
-     could contradict its own stage. Nothing links to it there; this is for the
-     stage picker, which can leave you on a view the new stage does not have. */
-  if(S.view === 'interview' && !v.busy) S.view = 'interviews';
-  const view = V[S.view] || V.dashboard;
+  const view = signing ? SIGNIN[S.view] : (V[S.view] || V.dashboard);
 
   const key = S.stage + '/' + S.view + '/' + (S.view === 'interview' ? S.iv : '') + '/' + S.tab;
   /* THE FIRST RENDER DOES NOT ANIMATE. `data-enter` is what §13 and §25 gate the
@@ -3246,12 +3607,39 @@ function render(){
   const shown  = OVER.filter(k => S[k]);
   for(const k of OVER) MO.open[k] = !!S[k];
 
-  const at = ` data-rail="${S.nav ? 'open' : 'shut'}"`
+  /* NO `data-rail` ON THE SIGN-IN FRAME, and it is not a tidy-up — the lockup
+     disappears without this. §34's desktop rule is
+     `.app[data-rail="shut"] .shell-logo{display:none}`, because when the rail is
+     collapsed the mark moves onto the rail toggle and the bar must not carry it
+     twice. The sign-in frame has no rail and no toggle, so `shut` was a state it
+     was reporting rather than in: the header rendered 68px tall and empty, the
+     one thing on it measured 0×0, and nothing warned. A frame with no rail
+     states no rail state. */
+  const at = (signing ? '' : ` data-rail="${S.nav ? 'open' : 'shut'}"`)
            + ` data-view="${S.view}"`
            + (entered ? ' data-enter' : '')
            + (opened.length ? ` data-open="${opened.join(' ')}"` : '')
            + (shown.length ? ` data-shown="${shown.join(' ')}"` : '');
 
+  /* THE SIGN-IN FRAME IS `.auth-card` AND NOTHING ELSE IN IT. No rail, no bell,
+     no ask dock, no notification panel and no sheets — every one of them is a
+     control over an account, and there is no account open yet. Each `SIGNIN`
+     view prints its own shell and its own `.main` inside `.auth-col`, which is
+     the shape `hifi/`'s `AUTH` views use for the same reason: the back arrow
+     differs per screen, so the header belongs to the screen rather than to the
+     frame. §17 wants exactly this nesting — `.app > .auth-card > .auth-col` is
+     what a dozen of its selectors are anchored on, and it is also what the
+     desktop wash and the shadow are drawn against.
+
+     IT SHARES THE TAIL BELOW, and that is the whole reason this is a branch
+     inside `render()` rather than a second render function — the entrance
+     cascade, the stage picker's value and the hash all have to happen here too,
+     and a copy of them is a copy that falls behind. */
+  if(signing){
+    device.innerHTML = `<div class="app"${at}>
+      <div class="auth-card">${AUTH_ART}<div class="auth-col">${view(v)}</div></div>
+    </div>`;
+  } else {
   device.innerHTML = `<div class="app"${at}>
     ${shell(v)}
     <div class="shell-body">
@@ -3288,6 +3676,7 @@ function render(){
     ${notifPanel()}
     ${confirmSheet()}${editSheet()}
   </div>`;
+  }
 
   /* THE STEPS PANEL STAYS WHERE IT IS RENDERED. Two lines used to live here —
      the same two `views.js` ended on — moving `.stp-all` and `.stp-overlay` out
@@ -3466,9 +3855,53 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-peek],[data-readall],[data-cal],[data-cal-m]');
+  const t = e.target.closest('[data-go],[data-signin],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-peek],[data-readall],[data-cal],[data-cal-m]');
   if(!t) return;
   const d = t.dataset;
+
+  /* MOVING AROUND THE FRONT DOOR IS `data-signin`, NOT `data-go`. Both set
+     `S.view` and the two registries share that slot, so one attribute would
+     have worked — and would have been the one thing in this file that reads a
+     view name without telling you which registry it comes from. Two attributes
+     mean a stale `data-go="role"` inside the portal bounces off the rail guard
+     instead of drawing a sign-in screen over a signed-in session.
+
+     IT ALSO CANNOT SCROLL A COLUMN THAT IS NOT THERE. The `data-go` branch ends
+     on `device.querySelector('.main').scrollTop = 0`, and on these screens
+     `.main` is inside the view rather than the frame — it exists, but the whole
+     page is short enough that there is nothing to reset, and reaching for it
+     before the render that creates it is how that line throws. */
+  /* AND EVERY `<a data-signin>` CARRIES `.lk`, which is not decoration. §12's
+     link treatment — the blue, the underline, the tint on hover — is attached to
+     `a[data-go]` by attribute, so an anchor routed by any other attribute is
+     unstyled prose: "Forgotten your password?" came out as dark body text beside
+     a candidate portal where the same words are a link. `.lk` is the design
+     system's own class for exactly this (it sits in §12's selector list next to
+     `a[data-go]`), so the fix is a class rather than a rule. */
+  if(d.signin){ S.stage = 'signin'; S.view = d.signin; return render(); }
+
+  /* AND THE OTHER ROLE IS ANOTHER DOCUMENT. `data-portal` carries a path in this
+     repo, and following it is a plain page navigation — the candidate portal is
+     `hifi/`, a separate file, because in the product it is a separate
+     application and this portal is a separate signed-in user. Written as an
+     `<a>` it drew underlined; written here it is one line and the row matches
+     the row above it. The path is a relative one from a fixed list in this file,
+     never anything read off the page. */
+  if(d.portal){ location.href = d.portal; return; }
+
+  /* AND CHOOSING A ROLE CHANGES STAGE, which is a different thing from changing
+     page — so it clears what the picker's own handler clears, for the reasons
+     written there: a thread quoting the other stage's figures, a read-list keyed
+     to the other stage's bell. `data-stage` rather than `data-go="stage:working"`
+     on purpose: the `data-iv` note is the argument, and a colon inside a
+     `data-go` is the shape this file exists to avoid. */
+  if(d.stage){
+    S.stage = d.stage; S.view = 'dashboard';
+    S.nav = false; S.tal = false; S.notif = false; S.read = []; S.peek = false;
+    S.thread = []; S.typing = false; S.askFrom = 'dashboard';
+    S.confirm = false; S.sheet = false; S.stp = false;
+    return render();
+  }
 
   /* THE BACKDROP CLOSES, THE SHEET DOES NOT. `data-close` sits on the modal
      root as well as on the cancel controls, so a click anywhere inside the

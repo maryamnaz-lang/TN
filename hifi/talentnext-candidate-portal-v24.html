@@ -3490,7 +3490,8 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .note.warn,.app .note.err,.app .note.succ,.app .note.acc,
 .app .signed.clk{border-left:0!important}
 .app .tile.bordered:not(.band),.app .ai-aura:not(.band),
-.app .note:not(.band),.app .ai-stream:not(.band),.app .signed:not(.band){
+.app .note:not(.band):not(.warn):not(.err):not(.succ),
+.app .ai-stream:not(.band),.app .signed:not(.band){
   padding-left:0!important}
 @container app (min-width:900px){
   .app .lvl-hero:has(.path){display:block}
@@ -7931,6 +7932,23 @@ button.btn-p:active,
 }
 :root{--surface-info:#fbfbfb}
 .app .sec.tint.info{--surface-2:var(--surface-info)}
+.app .note.warn,
+.app .note.err,
+.app .note.succ{
+  padding:var(--s04) var(--s05);
+  border-left:0}
+.app .note.warn{background-color:var(--support-orange-bg)}
+.app .note.err{background-color:var(--support-error-bg)}
+.app .note.succ{background-color:var(--support-success-bg)}
+.app .note.warn svg{fill:var(--support-attention)}
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.warn,
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.err,
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.succ{
+    padding-left:var(--s05);padding-right:var(--s05)}
+}
+.app .plate:not(:has(.plate-who)) > .plate-h,
+.app .plate:not(:has(.plate-who)) > .plate-b{align-self:start}
 
 </style>
 </head>

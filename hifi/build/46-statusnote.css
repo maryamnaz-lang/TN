@@ -1,0 +1,97 @@
+/* ==========================================================================
+   46. A STATUS NOTE IS A CARD AGAIN
+
+   WHAT HAPPENED. §02.436 draws `.note.warn` as a filled block — a pale ground,
+   a 3px bar, a mustard mark — and §12.510 takes the ground off every `.note` in
+   the product:
+
+     .app .note{border-left:0;padding-left:0;padding-right:0;
+       background-color:transparent}
+
+   That rule is right, and its note says exactly what it is right about: "a left
+   rule plus an indent made the SUMMARY note read as a quotation pulled out of
+   the document. It is the document's own opening paragraph, so it takes the full
+   measure like everything else." True of a plain `.note`. But the selector is
+   every note, and `.warn`, `.err` and `.succ` are not the document's opening
+   paragraph — they are a status, and a status with no ground is a paragraph of
+   coloured text. §12 half-noticed: the line under it restores `padding-left` for
+   those three, which is padding for a fill that is no longer there.
+
+   So "Your public profile waits on this" drew as two lines of brown text on the
+   page's own white, indented 16px from nothing, with a warning triangle beside
+   it. It read as a sentence somebody had coloured in.
+
+   THE GROUND IS `--support-orange-bg`, WHICH IS THE WARMER OF THE TWO §01 HAS.
+   `--support-warning-bg` (#fcf4d6) is a cream — at 13px over a white page it is
+   nearly invisible, which is part of how this went unnoticed. #ffd9be is the
+   yellow-orange, and both inks hold on it: `--on-warning-bg` (#684e00) is 5.9:1
+   as text, and `--support-attention` (#96540a) is 4.4:1 as the mark against the
+   3:1 a mark needs. Neither is the accent — the accent means "this is yours",
+   and a gate you are waiting on is the opposite of that.
+
+   AND THE PADDING IS THE PAGE'S OWN, NOT A SECOND INSET. The note lives inside
+   a `.sec`, which has already paid `--pad-x`, so the card's left and right edges
+   land on the same x as every heading and row on the page with nothing further
+   stated. What it needs is INTERNAL padding — §02's `var(--s04) var(--s05)`,
+   restored on both axes — so the text is not against the fill. No negative
+   margins: this is a card sitting in the column, not a band bleeding out of it.
+
+   THE 3px BAR DOES NOT COME BACK. A bar plus a fill is two ways of saying one
+   thing, and §12's objection to the bar was the half of that rule worth keeping.
+   The fill is the signal.
+
+   IT IS EVERY STATUS NOTE IN BOTH PORTALS, deliberately — `.warn` on the
+   agent's Training and dashboard pages, `.err` and `.succ` wherever they appear.
+   One design language: a status that is a card here and coloured text there is
+   the same drift §12 was written to stop, pointing the other way.
+
+   LAST, because it corrects §12, which corrects §02. Nothing between them names
+   `.note`.
+   ========================================================================== */
+
+.app .note.warn,
+.app .note.err,
+.app .note.succ{
+  padding:var(--s04) var(--s05);
+  border-left:0}
+
+.app .note.warn{background-color:var(--support-orange-bg)}
+.app .note.err{background-color:var(--support-error-bg)}
+.app .note.succ{background-color:var(--support-success-bg)}
+
+/* the mark takes the ink that was tuned to sit on this ground */
+.app .note.warn svg{fill:var(--support-attention)}
+
+/* --------------------------------------------------------------------------
+   AND THE LEFT PADDING HAS TO BE SAID AGAIN, INSIDE THE QUERY
+
+   The rules above give the card `var(--s04) var(--s05)` and it came out with
+   `padding-left:0`. §14.346 is why:
+
+     @container app (min-width:900px){
+       .app .page:not(.form-page) .sec:has(> .sec-h) > :not(.sec-h){
+         padding-left:0} }
+
+   which is the desktop label column's companion — §14.2's argument is that a
+   headed section pays the gutter ONCE, on the section, so both halves zero their
+   own. Correct for a `.kv` or a row list, and it reaches the note because the
+   note is just another child of a headed section. At five classes it also
+   outweighs `.app .note.warn` at three, and it is inside a container query,
+   which per trap 3 is its own tier — so this cannot be answered from outside
+   one. Restated at equal weight inside the same query, later in source order.
+
+   AND THE SELECTOR IS §14's OWN, WITH THE CHILD NAMED. Counting that rule
+   honestly: `.app`, `.page`, `.form-page` inside `:not()`, `.sec`, `.sec-h`
+   inside `:has()`, and `.sec-h` AGAIN inside the child's `:not()` — six classes,
+   because both `:not()` and `:has()` contribute their argument's specificity.
+   A first attempt at `.app .page .sec .note.warn` is five and lost. Rather than
+   pad it with a repeated class, this restates §14's selector and names the child
+   it was matching by `:not()`, which lands at seven and — more usefully — makes
+   the pair legible as one correction to one rule.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.warn,
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.err,
+  .app .page:not(.form-page) .sec:has(> .sec-h) > .note.succ{
+    padding-left:var(--s05);padding-right:var(--s05)}
+}
