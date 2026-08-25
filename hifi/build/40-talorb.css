@@ -1,5 +1,5 @@
 /* ==========================================================================
-   40. THE EMPTY STATE WEARS §33's ANIMATED SPHERE
+   40. THE SPHERE, EVERYWHERE THE FLAT MARK USED TO BE
 
    §33.6 replaced the head band's flat Tal mark with a CSS-only sphere: a
    gradient body with the brand chevron in it, a specular highlight, an inset
@@ -40,9 +40,15 @@
    `talPanel` (views.js) and `askView` (ai4.js), which are deliberately the
    same markup on two surfaces.
 
+   §4 TAKES IT TO THE ASK LINE TOO, and that one needs no rescaling at all:
+   the docked line's mark is 32px and §33.6's sphere is drawn at 32px, so it
+   is the same object at its own native size. It reuses `tal-sphere-glow`
+   rather than the `-lg` pair below.
+
    LAST. It needs §27.1's `.tal-mk` background to exist before it can take it
-   off, §27.4's `.tal-hero` to sit in and its bottom margin to correct, and
-   §33.6's `tal-sphere-spin` to run. Nothing in §34-§39 names these selectors.
+   off, §27.4's `.tal-hero` to sit in and its bottom margin to correct, §21.4's
+   dock mark to replace, and §33.6's keyframes to run. Nothing in §34-§39 names
+   these selectors.
    ========================================================================== */
 
 /* ------------------------------------------------------------------ 1 ---
@@ -182,4 +188,83 @@
 @media (prefers-reduced-motion:reduce){
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none;opacity:.3}
+}
+
+
+/* ------------------------------------------------------------------ 4 ---
+   THE DOCKED ASK LINE GETS IT AT ITS NATIVE SIZE
+
+   §21.4 gave the line's 32px mark the PNG blob plus a pulsing halo. It is the
+   Tal a candidate sees most — the dock sits under every page — and it was the
+   last flat one left, so the product had a sphere at the head of the page, a
+   sphere in an unstarted conversation, and a blob on the line between them.
+
+   NOTHING IS RESCALED HERE. §33.6 draws the sphere at 32px and this mark is
+   32px, so the shadows, the gloss and `tal-sphere-glow` all come across at
+   their stated values — this is the one place the component is used at the
+   size it was designed for. §1-§3 above exist only because the empty state is
+   112 and the pixel lengths had to be multiplied.
+
+   §21.4's HALO COMES OFF. It was a wash of accent UNDER the PNG, there
+   because "the mark's own falloff is subtle and the halo is what makes the
+   movement read from across the row". The sphere has its own glow in
+   `box-shadow` and breathes it on the same clock, so a second one underneath
+   is two glows on one object.
+   ------------------------------------------------------------------------ */
+.app .askdock .askline-mark::before{content:none}
+
+.app .askdock .askline-mark .tal-mk{
+  position:relative;background-image:none;animation:none}
+
+.app .askdock .askline-mark .tal-mk::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background-color:transparent;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  box-shadow:
+    0 0 8px 1px rgba(244,113,19,0.35),
+    0 0 16px 3px rgba(244,113,19,0.15),
+    inset 0 -2px 5px rgba(0,0,0,0.12),
+    inset 0 2px 5px rgba(246,220,146,0.25);
+  animation:tal-sphere-glow 4s ease-in-out infinite}
+
+.app .askdock .askline-mark .tal-mk::after{
+  content:'';position:absolute;z-index:1;
+  left:50%;top:50%;width:36px;height:36px;
+  margin:-18px 0 0 -18px;
+  border-radius:50%;pointer-events:none;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%);
+  animation:tal-sphere-spin 5s linear infinite;
+  filter:blur(0.5px)}
+
+/* §21.4's reduced-motion block names the halo and the PNG; both are gone, so
+   the two layers that replaced them state their own. Same resting position
+   §33.6 chooses: the sphere holds still and the gloss settles at .3. */
+@media (prefers-reduced-motion:reduce){
+  .app .askdock .askline-mark .tal-mk::before{animation:none}
+  .app .askdock .askline-mark .tal-mk::after{animation:none;opacity:.3}
 }

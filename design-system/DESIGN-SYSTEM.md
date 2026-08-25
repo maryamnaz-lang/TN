@@ -296,6 +296,18 @@ the band is always wrapped — a `.tile`, or a bare `div` — and it excludes
 `:has(.chart-table)`, where `.kv` is borrowed for a chart's data table and the
 section keeps its column.
 
+**A `.kv` row's divider is its own `border-bottom`, and it must stay that way.**
+§18 draws every *list* row's hairline as an inset `::after` instead, because
+those rows (`.ch`, `.cardrow`, `.mem`, `.nrow`, `.ag`, …) bleed to the rails and
+take the gutter back as their own padding, so the line has to pay the same
+gutter the words pay. `.kv` is the one row type that never bleeds — whatever
+holds it has already paid the gutter and its own padding is `12px 0` — so it is
+deliberately **off** that list. Put it back, or add a `.kv::after` inset in a
+later layer, and the hairline comes out 32px short at both ends, indented from
+the label above it. The single exception is `.kv-bands`, which does bleed
+(§15.34 pulls the wrapper out by `--pad-x` and gives each row it back), and that
+is the selector §18 carries.
+
 Invent your own wrapper and the heading keeps its 184px while your content is
 laid out against a width 184px narrower than it expects. The two collide. If you
 genuinely need a new wrapper, restate the opt-out **inside the same container

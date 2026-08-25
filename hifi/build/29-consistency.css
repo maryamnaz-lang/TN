@@ -573,30 +573,29 @@
 .app .tabs,.app .cs{background-color:var(--surface-2)}
 
 /* -------------------------------------------------------------------- 13 ---
-   A DIVIDER INSIDE A TILE PAYS THE GUTTER ONCE
+   A DIVIDER INSIDE A TILE PAYS THE GUTTER ONCE — AND SO DOES EVERY OTHER `.kv`
 
-   §18 draws every list row's divider as a rule inset by `--pad-x`, and that
-   is right for the rows it was written for: they bleed to the rails and pay
-   the gutter back as their own padding, so the divider has to pay it too or
-   it runs out past the content.
+   THE RULE THAT WAS HERE IS GONE, AND THE READING THAT PUT IT HERE WAS RIGHT.
+   It was `.app .view-col .main .page .tile .kv::after{left:0;right:0}`, undoing
+   §18's `--pad-x` inset for a `.kv` inside a `.tile`, because a `.kv` does not
+   bleed: the tile sits inside a section that has already paid the gutter, so
+   the row's content starts ON the spine and the divider was paying a second
+   gutter on top of the first. At 1200 that was a hairline starting 64px in
+   while the word beside it started at 32 — a line that looks indented from the
+   list it belongs to.
 
-   `.kv` does not bleed. It sits inside a `.tile`, and the tile sits inside a
-   section that has already paid the gutter — so the row's content starts ON
-   the spine and the divider was paying a second gutter on top of the first.
-   At 1200 that is a hairline starting 64px in while the word next to it
-   starts at 32: the line looks indented from the list it belongs to, which
-   is the one thing a divider must never look like.
+   What was wrong was the SCOPE, not the finding. `.tile` is not what makes a
+   `.kv` not bleed; nothing does, because a `.kv` never bleeds. Scoping the fix
+   to the container somebody had measured meant the same defect stayed live
+   wherever a `.kv` sits directly in a section — the agent portal's `kv()`
+   helper wraps its rows in a bare `div`, so every band it draws had it — and
+   §37.11 then arrived to say the same thing a second time for a filled block.
 
-   Measured, not guessed — the identity tile on the account page, the fee
-   rows on Enroll and the two tiles on the transcript are every instance in
-   the build, and all four report the same 32px of double-count.
-
-   The reach matches §18's on purpose: that rule carries `.app .view-col
-   .main .page .kv`, and the note there says anything shorter loses the
-   cascade. This adds `.tile` to the same chain rather than trying to
-   outweigh it from a shorter selector.
+   §18 now states it once by leaving `.kv` off its list altogether, so the row
+   keeps its own `border-bottom`, which already spans exactly the box that the
+   gutter has placed. Read that note before putting a `.kv::after` override
+   anywhere: the reason there is nothing to override any more is the point.
    -------------------------------------------------------------------------- */
-.app .view-col .main .page .tile .kv::after{left:0;right:0}
 
 /* -------------------------------------------------------------------- 14 ---
    CLOSING YOUR ACCOUNT IS ONE ROW: WHAT IT DOES, AND THE CONTROL THAT DOES IT

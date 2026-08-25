@@ -152,6 +152,35 @@
    to edge. That was right when a full-bleed rule was just how a rule looked;
    it is not right now that full-bleed means "this is the edge of a filled
    block".
+
+   `.kv` IS NOT ON THIS LIST, AND THAT IS THE CORRECTION. It was, and it was
+   the one member that does not bleed. Every other row here spans rail to rail
+   and takes the gutter back as its own padding, so the divider has to pay that
+   gutter or it runs out past the words. A `.kv` is placed by whatever holds it
+   — a `.sec`, a `.tile`, a `.lvl-hero`, a `.chart` — all of which have already
+   paid the gutter, and its own padding is `12px 0`. So its box starts exactly
+   where its first word starts, the inset was a second gutter on top of the
+   first, and the hairline came out 32px short at BOTH ends: a divider that
+   looks indented from the list it belongs to, which is the one thing a divider
+   must never look like. "Your roles" on the agent's profile is where it shows
+   worst — three rows whose lines start right of the label above them.
+
+   So `.kv` keeps its own `border-bottom` (§10.5), which spans its box, which
+   is the content width plus the section's padding — exactly what is wanted —
+   and `:last-child` closes it there (§10.157) rather than here.
+
+   TWO SPECIAL CASES USED TO SAY THIS, ONE AT A TIME: §29.13 for a `.kv` in a
+   `.tile` and §37.11 for one in a filled `.tint-2` block, each measured, each
+   correct, neither general. §37's note even says it was scoped narrowly because
+   the candidate and leader portals' `.tint` sections were "not a change anybody
+   asked for". They are now, and the statement belongs where the rule that
+   caused it lives, once, rather than as a growing list of the places somebody
+   happened to look. Both of those rules are gone.
+
+   `.kv-bands` TAKES ITS PLACE, because that IS the bleeding case and the only
+   one: §15.34 pulls the wrapper out by `--pad-x` on both sides and gives each
+   row the gutter back as padding, which is this section's argument word for
+   word. It is the agent identity block's three interview facts.
    -------------------------------------------------------------------------- */
 .app .view-col .main .page .tile.clk,
 .app .view-col .main .page .gcard,
@@ -162,7 +191,7 @@
 .app .view-col .main .page .nrow,
 .app .view-col .main .page .ag,
 .app .view-col .main .page .acc-i,
-.app .view-col .main .page .kv,
+.app .view-col .main .page .kv-bands > .kv,
 .app .view-col .main .page .payrow{
   position:relative;border-bottom-color:transparent}
 .app .view-col .main .page .tile.clk::after,
@@ -174,7 +203,7 @@
 .app .view-col .main .page .nrow::after,
 .app .view-col .main .page .ag::after,
 .app .view-col .main .page .acc-i::after,
-.app .view-col .main .page .kv::after,
+.app .view-col .main .page .kv-bands > .kv::after,
 .app .view-col .main .page .payrow::after{
   content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
   /* `top:auto` is load-bearing: something upstream sets `top:0` on these
@@ -191,5 +220,5 @@
 .app .view-col .main .page .nrow:last-child::after,
 .app .view-col .main .page .ag:last-child::after,
 .app .view-col .main .page .acc-i:last-child::after,
-.app .view-col .main .page .kv:last-child::after,
+.app .view-col .main .page .kv-bands > .kv:last-child::after,
 .app .view-col .main .page .payrow:last-child::after{display:none}

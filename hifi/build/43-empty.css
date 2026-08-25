@@ -1,0 +1,100 @@
+/* ==========================================================================
+   43. AN EMPTY STATE OWNS THE PAGE IT IS ON
+
+   WHAT THIS LOOKED LIKE. The agent's dashboard on the day the listing goes up
+   is one heading, one empty state and two buttons, and it drew as three things
+   scattered across a screen with 500px of nothing under them: the heading
+   "Nobody has booked you yet" squeezed into a 184px label column and wrapped
+   onto two lines, the centred block floating in the right-hand two thirds well
+   above the middle of the space, and the buttons sitting hard left below it —
+   nearer the heading than the sentence they act on. Three left edges, three
+   vertical positions, and every one of them was correct on its own.
+
+   THREE RULES, AND THE FIRST IS §10.15's LIST AGAIN. At desktop a `.sec` with a
+   `.sec-h` gets a 184px label column unless the section holds one of nine named
+   things. That column is right for a heading over a list of rows: the spine
+   runs down beside the content and every row starts at the same x. An empty
+   state has no rows and no left edge to align to — it is a centred block — so
+   the column has nothing to line up with and the heading pays 184px to say six
+   words in. It joins the list. Per trap 3 that list can only be extended from
+   INSIDE `@container app (min-width:900px)`, because a rule in a container
+   query is its own cascade tier and outranks an unconditional rule of equal
+   weight whatever the layer order; §36.9 does the same thing twice.
+
+   SECOND, THE SECTION TAKES THE HEIGHT THAT IS LEFT. `.main` is the page's
+   scroller and `.page` was a plain block inside it, so a short page ended
+   wherever its content ended and the empty state sat wherever that put it —
+   which on this page was the top third. A page whose ONLY content is an empty
+   state is a page whose subject is the emptiness, so `.page` becomes a flex
+   column at the height of its scroller and the section holding the `.empty`
+   takes what is left. Then the block centres in the space rather than in the
+   first 200px of it.
+
+   IT IS SCOPED WITH `:has()` AND THAT IS THE WHOLE SAFETY ARGUMENT. `.page` is
+   every page in two portals; making it a flex column unconditionally would
+   change how forty of them distribute their sections. `:has(> .sec > .empty)`
+   only ever matches a page that actually carries one, and `min-height` rather
+   than `height` means a page that grows past the viewport still just scrolls.
+
+   THIRD, THE BUTTONS BELONG TO THE SENTENCE. They are inside `.empty` now
+   (`checkRow`'s section markup is where that changed), so they inherit the
+   centring instead of being a separate left-aligned row that happens to follow.
+   `.empty > .btn-row` gets `justify-content:center` and the gap above that a
+   `.mt5` used to pay for, and `display:inline-flex` is what keeps the pair from
+   stretching across the whole centred column.
+
+   LAST, AND IT NAMES ONE NEW SELECTOR. Everything here is either `.empty` — a
+   class §02 states and no layer between here and there re-lays-out — or a
+   restatement inside the container query it has to be in. Nothing in §41 or §42
+   touches either.
+   ========================================================================== */
+
+/* the page becomes a column, only when an empty state is the thing on it */
+.app .page:has(> .sec > .empty){
+  display:flex;flex-direction:column;min-height:100%}
+
+.app .page:has(> .sec > .empty) > .sec:has(> .empty){
+  flex:1 1 auto;display:flex;flex-direction:column}
+
+/* AND THE HEADING HAS TO BE TOLD TO TAKE THE WIDTH. §10 gives `.sec-h`
+   `align-self:start` — correct in the grid it was written for, where the label
+   column is a track and `start` keeps the heading at the top of it rather than
+   centred down 300px of rows. In a flex COLUMN `align-self` is the cross axis,
+   so `start` shrink-wraps it: the heading came out 189px wide and wrapped
+   "Nobody has booked you yet" onto two lines with 570px of empty row beside it,
+   which looks exactly like the label column it had just been taken out of. The
+   trailing gutter goes with it — that was the gap to the second track. */
+.app .page:has(> .sec > .empty) > .sec > .sec-h{
+  align-self:stretch;padding-right:0}
+
+/* and the block centres in what it was given, both ways */
+.app .page:has(> .sec > .empty) > .sec > .empty{
+  flex:1 1 auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-top:var(--s07);padding-bottom:var(--s07)}
+
+/* THE ICON'S `margin:0 auto` GOES. §02 centres it with auto margins, which is
+   how you centre a block in a block — in a flex column it fights `align-items`
+   and, worse, `margin-bottom` is the only part of it that was ever doing work
+   here. Stated as the gap it is. */
+.app .page:has(> .sec > .empty) > .sec > .empty > svg{
+  margin:0 0 var(--s04)}
+
+/* the sentence keeps a readable measure while it is centred */
+.app .page:has(> .sec > .empty) > .sec > .empty > .help,
+.app .page:has(> .sec > .empty) > .sec > .empty > p{
+  max-width:52ch}
+
+/* the actions are part of the block, under the sentence */
+.app .empty > .btn-row{
+  display:inline-flex;justify-content:center;flex-wrap:wrap;
+  margin-top:var(--s06)}
+
+@container app (min-width:900px){
+  /* §10.15's opt-out list, extended. Restated here rather than edited there
+     because a container query is its own tier — see the note above. */
+  .sec:has(> .empty){display:block}
+  .sec:has(> .empty) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}

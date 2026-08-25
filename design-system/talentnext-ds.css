@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 3362.  Rules dropped as product-specific: 318.
+   Rules kept: 3399.  Rules dropped as product-specific: 318.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -4314,7 +4314,7 @@ button{font-family:var(--font-sans)}
 .app .view-col .main .page .nrow,
 .app .view-col .main .page .ag,
 .app .view-col .main .page .acc-i,
-.app .view-col .main .page .kv,
+.app .view-col .main .page .kv-bands > .kv,
 .app .view-col .main .page .payrow{position:relative; border-bottom-color:transparent}
 .app .view-col .main .page .tile.clk::after,
 .app .view-col .main .page .gcard::after,
@@ -4325,7 +4325,7 @@ button{font-family:var(--font-sans)}
 .app .view-col .main .page .nrow::after,
 .app .view-col .main .page .ag::after,
 .app .view-col .main .page .acc-i::after,
-.app .view-col .main .page .kv::after,
+.app .view-col .main .page .kv-bands > .kv::after,
 .app .view-col .main .page .payrow::after{content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); top:auto; bottom:-1px; height:1px; background:var(--rule); pointer-events:none}
 .app .view-col .main .page .tile.clk:last-child::after,
 .app .view-col .main .page .gcard:last-child::after,
@@ -4336,7 +4336,7 @@ button{font-family:var(--font-sans)}
 .app .view-col .main .page .nrow:last-child::after,
 .app .view-col .main .page .ag:last-child::after,
 .app .view-col .main .page .acc-i:last-child::after,
-.app .view-col .main .page .kv:last-child::after,
+.app .view-col .main .page .kv-bands > .kv:last-child::after,
 .app .view-col .main .page .payrow:last-child::after{display:none}
 
 /* ---- 19-accent.css ---- */
@@ -5234,7 +5234,6 @@ button.btn-p:active,
 .app .msg-page > .msg-foot{margin-left:var(--pad-x); margin-right:var(--pad-x); padding-left:0; padding-right:0}
 .app .tabs,
 .app .cs{background-color:var(--surface-2)}
-.app .view-col .main .page .tile .kv::after{left:0; right:0}
 .app .close-b{display:flex; align-items:flex-start; flex-wrap:wrap; gap:var(--s05) var(--s06)}
 .app .close-x{flex:1 1 34ch; min-width:0; max-width:68ch; color:var(--text-secondary)}
 .app .close-a{flex:none; margin-left:auto}
@@ -5461,12 +5460,28 @@ button.btn-p:active,
 }
 .app .modhead .ai-aura.talsum > .stp-wing{grid-area:stp; padding:0}
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{position:relative; padding:0}
-.app .modhead .ai-aura.talsum > .stp-wing .stp-all{display:none; position:absolute; z-index:60; top:calc(100% + var(--s03)); right:0; width:min(340px, 100%); margin:0; padding:0; border-top:0}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-tw{position:relative; margin-left:auto; flex:none; display:flex}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all{display:none; position:absolute; z-index:60; top:calc(100% + var(--s02)); right:0; width:min(340px, calc(100cqw - var(--s06) * 2)); margin:0; padding:0; border-top:0}
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{display:flex}
+.app .stp-t > .stp-t-l{display:inline-block; min-width:68px; text-align:right}
 .app .modhead:has(.stp.open){z-index:3}
-.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block; padding:var(--s04) var(--s05)}
 .stp-pop{width:100%; padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
 .stp-pop-h{font-size:13px; font-weight:600; line-height:18px; letter-spacing:.6px; text-transform:uppercase; color:var(--text-helper); margin:0 0 var(--s04)}
+.app .stp .stp-pop .pi{--pi-mark:28px; --pi-gap:var(--s03); gap:0; padding:0}
+.app .stp .stp-pop .pi-step{position:relative; display:flex; align-items:flex-start; gap:var(--s04); min-height:0; padding:var(--pi-gap) 0; border:0}
+.app .stp .stp-pop .pi-step::before{content:''; position:absolute; z-index:0; left:calc(var(--pi-mark) / 2 - .5px); top:0; bottom:0; width:1px; background:var(--rule)}
+.app .stp .stp-pop .pi-step.done::before{background:var(--brand-primary)}
+.app .stp .stp-pop .pi-step:first-child::before{top:calc(var(--pi-gap) + var(--pi-mark) / 2)}
+.app .stp .stp-pop .pi-step:last-child::before{bottom:calc(100% - var(--pi-gap) - var(--pi-mark) / 2)}
+.app .stp .stp-pop .pi-ic{position:relative; z-index:1; width:var(--pi-mark); height:var(--pi-mark); flex:none; display:grid; place-items:center; background-color:var(--layer-01); border:0}
+.app .stp .stp-pop .pi-ic svg{width:19px; height:19px; fill:var(--gray-40)}
+.app .stp .stp-pop .pi-step.done .pi-ic svg{fill:var(--support-success)}
+.app .stp .stp-pop .pi-step.on   .pi-ic svg{fill:var(--support-attention)}
+.app .stp .stp-pop .pi-b{min-width:0; flex:1; padding-top:1px}
+.app .stp .stp-pop .pi-lab{color:var(--text-secondary)}
+.app .stp .stp-pop .pi-step.on .pi-lab{color:var(--text-primary)}
+.app .stp .stp-pop .pi-sec{margin-top:2px}
 .app .modhead:has(.tal-greet) > .ph{display:none}
 .tal-greet{display:block; font-size:22px; line-height:30px; font-weight:600; letter-spacing:-.3px; color:var(--text-primary); margin-bottom:var(--s04)}
 @container app (min-width:900px){
@@ -5718,7 +5733,6 @@ button.btn-p:active,
 }
 .app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
 .app .sec.tint.tint-2{--surface-2:var(--surface-3)}
-.app .view-col .main .page .sec.tint-2 .kv::after{left:0; right:0}
 @container app (min-width:900px){
   .app .chart{grid-template-columns:minmax(0,400px) minmax(0,560px)}
 }
@@ -5822,15 +5836,10 @@ button.btn-p:active,
 .app .tal-msg > .bb .tw + .tw{margin-top:var(--s05); padding-top:var(--s05); border-top:1px solid var(--rule-on-2)}
 .app .tal-msg > .bb .tw-a{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04); margin-left:0; font-weight:400}
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
-.app .tal-msg > .bb .tw-btn:not(.ghost){background-color:var(--brand-primary); border-color:var(--brand-primary); color:var(--on-brand)}
+.app .tal-msg > .bb .tw-btn:not(.ghost){background-color:var(--accent); border-color:var(--accent); color:var(--on-accent); --on-brand-fill:1}
 .app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{color:var(--accent-on-2); border-color:var(--rule-on-2); padding-left:var(--s04); padding-right:var(--s04)}
 .app .tal-msg > .bb .tw-btn.ghost svg{fill:currentColor}
-`wPace`'s lede is the longest of them — the week card's whole comparison
-   sentence,
-about forty-five words — so it carries a measure. Everything
-   above it in the widget is a grid and grids do not need one; a sentence set
-   across 584px does. */
 .app .tal-msg > .bb .tw-lede{font-size:14px; line-height:21px; font-weight:500; max-width:56ch; letter-spacing:.05px; color:var(--text-primary)}
 .app .tal-msg > .bb .tw-list,
 .app .tal-msg > .bb .tw-check,
@@ -5845,14 +5854,19 @@ about forty-five words — so it carries a measure. Everything
 .app .tal-msg > .bb .tw-def b{display:block; font-weight:600; color:var(--text-primary)}
 .app .tal-msg > .bb .gen{--pad-x:0px; background-color:transparent; margin-left:0; margin-right:0; padding:0}
 .app .ask-thread .tal-msg:not(.me) > .bb,
-.app .tal-panel .tal-msg:not(.me) > .bb{background-color:#fff5ee; background-image:none}
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{background-color:var(--accent); background-image:none; border-color:transparent; color:var(--on-accent); --on-brand-fill:1}
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{background-color:var(--on-accent); background-image:none; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat}
+.app .tal-panel .tal-msg:not(.me) > .bb{background-color:#ffffff; background-image:none; border:1px solid #f47113; border-image:linear-gradient(135deg,
+    #f47113 0%, #ffdabf 50%, #cb8dd7 100%) 1; box-shadow:0 0 10px rgba(255,192,146,.15)}
+.app .ask-thread .tal-msg.me > .bb,
+.app .tal-panel .tal-msg.me > .bb{background-color:#ffffff; background-image:linear-gradient(to right,
+    rgba(255,232,215,.5) 0%, rgba(244,254,246,.5) 100%); border:1px solid var(--rule); color:var(--text-primary); min-height:32px; padding:4px 16px}
 .app .tal-msg > .bb .tw-hl{font-weight:600; color:var(--accent-on-2)}
 @supports ((background-clip:text) or (-webkit-background-clip:text)){
   .app .tal-msg > .bb .tw-hl{background-image:var(--accent-grad); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent; --on-brand-fill:1}
 }
-.app .tal-msg.me > .bb .tw-hl{background-image:none; color:var(--on-brand); -webkit-text-fill-color:var(--on-brand)}
+.app .tal-msg > .bb .tw-h{display:flex; align-items:center; gap:var(--s03)}
+.app .tal-msg > .bb .tw-ic{display:inline-flex; flex:none; line-height:0}
+.app .tal-msg > .bb .tw-ic svg{width:16px; height:16px; display:block; fill:var(--icon-secondary)}
+.app .tal-msg > .bb .tw-ic.acc svg{fill:var(--accent-text)}
 
 /* ---- 40-talorb.css ---- */
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{position:relative; isolation:isolate; width:112px; height:112px; background-image:none; margin-bottom:16px}
@@ -5886,6 +5900,38 @@ about forty-five words — so it carries a measure. Everything
 @media (prefers-reduced-motion:reduce){
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none; opacity:.3}
+}
+.app .askdock .askline-mark::before{content:none}
+.app .askdock .askline-mark .tal-mk{position:relative; background-image:none; animation:none}
+.app .askdock .askline-mark .tal-mk::before{content:''; position:absolute; inset:0; z-index:0; border-radius:50%; pointer-events:none; background-color:transparent; background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%); background-size:60% 60%,100% 100%,100% 100%,100% 100%; background-position:center,center,center,center; background-repeat:no-repeat; -webkit-mask:none; mask:none; box-shadow:
+    0 0 8px 1px rgba(244,113,19,0.35),
+    0 0 16px 3px rgba(244,113,19,0.15),
+    inset 0 -2px 5px rgba(0,0,0,0.12),
+    inset 0 2px 5px rgba(246,220,146,0.25); animation:tal-sphere-glow 4s ease-in-out infinite}
+.app .askdock .askline-mark .tal-mk::after{content:''; position:absolute; z-index:1; left:50%; top:50%; width:36px; height:36px; margin:-18px 0 0 -18px; border-radius:50%; pointer-events:none; background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%); animation:tal-sphere-spin 5s linear infinite; filter:blur(0.5px)}
+@media (prefers-reduced-motion:reduce){
+  .app .askdock .askline-mark .tal-mk::before{animation:none}
+  .app .askdock .askline-mark .tal-mk::after{animation:none; opacity:.3}
 }
 
 /* ---- 41-cal.css ---- */
@@ -5961,4 +6007,29 @@ about forty-five words — so it carries a measure. Everything
   .app .cal-pop{position:static; width:auto; margin-top:var(--s05); box-shadow:none}
   .app .cal-pop::before,
   .app .cal-pop::after{display:none}
+}
+
+/* ---- 42-rowstatus.css ---- */
+.app .cardrow-t:has(> .row-st),
+.app .gcard-b > h3:has(> .row-st){display:inline-flex; align-items:center; gap:var(--s03)}
+.app .row-st{display:inline-flex; flex:none}
+.app .row-st svg{display:block; width:15px; height:15px; fill:var(--gray-40)}
+.app .row-st.done svg{fill:var(--support-success)}
+.app .row-st.now  svg{fill:var(--support-attention)}
+.app .rst-done .cardrow-ic svg,
+.app .rst-now  .cardrow-ic svg,
+.app .rst-wait .cardrow-ic svg{fill:var(--rsi, var(--icon-primary))}
+
+/* ---- 43-empty.css ---- */
+.app .page:has(> .sec > .empty){display:flex; flex-direction:column; min-height:100%}
+.app .page:has(> .sec > .empty) > .sec:has(> .empty){flex:1 1 auto; display:flex; flex-direction:column}
+.app .page:has(> .sec > .empty) > .sec > .sec-h{align-self:stretch; padding-right:0}
+.app .page:has(> .sec > .empty) > .sec > .empty{flex:1 1 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; padding-top:var(--s07); padding-bottom:var(--s07)}
+.app .page:has(> .sec > .empty) > .sec > .empty > svg{margin:0 0 var(--s04)}
+.app .page:has(> .sec > .empty) > .sec > .empty > .help,
+.app .page:has(> .sec > .empty) > .sec > .empty > p{max-width:52ch}
+.app .empty > .btn-row{display:inline-flex; justify-content:center; flex-wrap:wrap; margin-top:var(--s06)}
+@container app (min-width:900px){
+  .sec:has(> .empty){display:block}
+  .sec:has(> .empty) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05); padding:0 var(--pad-x)}
 }

@@ -445,6 +445,22 @@ function chRow(i,f){
    TAL'S REPLIES: a keyword router that answers with widgets, the
    way the wireframes had Tal reply with cards rather than prose
    ============================================================ */
+/* THE MARK ON A WIDGET'S LABEL.
+   `tw()` takes a title string, not a title and an icon, and it is not given a
+   fourth parameter because every one of its ~25 call sites would have to pass
+   `null` for it. The mark goes IN the title instead — `.tw-h` is a flex row
+   (§39.13) so an svg and a word sit on one line without either knowing about
+   the other.
+
+   `acc` IS THE EXCEPTION, NOT THE DEFAULT. Ink is the resting state: a card
+   about what a chapter contains, or where the calls are, is reference and its
+   mark should be as quiet as the label it sits beside. The accent is for the
+   cards a person has to DO something about — what is next, what they are
+   behind on, what costs money, where a human takes over. If everything is
+   accent then nothing is, which is the same failure the highlight rule in
+   ai8.js is written to avoid. */
+const twIc = (name, tone) => `<span class="tw-ic${tone ? ' ' + tone : ''}">${I[name] || ''}</span>`;
+
 const tw = (title,body,action) => `<span class="tw">
   ${title?`<span class="tw-h">${title}</span>`:''}${body}
   ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
@@ -454,13 +470,13 @@ const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip
 function wChapter(i){
   const g = GAME[S.stage];
   const done = g && i < g.done, inprog = S.stage==='day34' && i===3;
-  return tw(`Chapter ${i+1} · ${CH[i][0]}`,
+  return tw(twIc('book') + `Chapter ${i+1} · ${CH[i][0]}`,
     `<span class="tw-row"><span class="tw-bar"><i style="width:${inprog?17:done?100:0}%"></i></span>
      <span class="tw-k">${inprog?'12 of 70':done?CH[i][1]+' of '+CH[i][1]:'0 of '+CH[i][1]} min</span></span>`,
     twBtn('Open chapter '+(i+1),'chapter:'+i));
 }
 function wTerms(){
-  return tw('Two terms this chapter turns on',
+  return tw(twIc('idea') + 'Two terms this chapter turns on',
     `<span class="tw-def"><b>Operating rhythm</b>The regular cadence of check-ins that lets you follow work without hovering over it.</span>
      <span class="tw-def"><b>Drop-off point</b>The moment work stops moving and nobody has said so out loud.</span>`);
 }
@@ -480,7 +496,7 @@ function wLadder(){
      drawings now read. The list changes with it — "finish the chapters" is
      advice for somebody enrolled, not for somebody four days in. */
   const cur = f.pred ? null : f.level;
-  return tw('The Explorer track',
+  return tw(twIc('growth') + 'The Explorer track',
     `<span class="tw-rungs">${['E1','E2','E3','E4','E5'].map(r=>`<i class="${r===cur?'on':''}">${r}</i>`).join('')}</span>
      <span class="tw-list">
        ${f.pred
@@ -495,8 +511,8 @@ function wLadder(){
 }
 function wPoints(){
   const g = GAME[S.stage];
-  if(!g) return tw('Points','<span class="tw-k">Points start when your cohort does.</span>');
-  return tw('Fastest points from here',
+  if(!g) return tw(twIc('trophy','acc') + 'Points','<span class="tw-k">Points start when your cohort does.</span>');
+  return tw(twIc('trophy') + 'Fastest points from here',
     `<span class="tw-lines">
       <span><b>+25</b>each chapter you finish</span>
       <span><b>+50</b>each cohort call you attend</span>
@@ -507,7 +523,7 @@ function wPoints(){
     twBtn('Open Points','rewards'));
 }
 function wPrep(){
-  return tw('A 10-minute run-through',
+  return tw(twIc('checkOutline') + 'A 10-minute run-through',
     `<span class="tw-check">
       <span>One story where you handed work over and it went wrong</span>
       <span>What you would do differently, in one sentence</span>
@@ -527,7 +543,7 @@ function wAgent(){
     twBtn('See '+a.n.split(' ')[0]+'&rsquo;s slots','agents'));
 }
 function wCall(){
-  return tw('Thursday 6:00 PM ET · 60 minutes',
+  return tw(twIc('video') + 'Thursday 6:00 PM ET · 60 minutes',
     `<span class="tw-list">
        <span>Week ${cfg(S.stage).week} is on hard conversations</span>
        <span>Bring the Sam handover from your notes</span>
@@ -536,12 +552,12 @@ function wCall(){
     twBtn('Open Cohort 41','cohort'));
 }
 function wDraft(){
-  return tw('A reply you could send',
+  return tw(twIc('edit') + 'A reply you could send',
     `<span class="tw-quote">Thanks Priya. I will bring the vendor review to Thursday. The part I am stuck on is telling someone I am taking work back without it reading as a lack of trust.</span>`,
     `${twBtn('Use this','messages')}<button class="tw-btn ghost" data-ask="1">Try another wording</button>`);
 }
 function wWorkload(){
-  return tw('What the weeks look like',
+  return tw(twIc('time') + 'What the weeks look like',
     `<span class="tw-lines">
       <span><b>~55 min</b>chapters and assessment</span>
       <span><b>60 min</b>the live cohort call</span>
@@ -1216,42 +1232,96 @@ function ladder(cur,confirmed){
   <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
 }
 
+/* THE STEP'S OWN ICON, READ OFF ITS LABEL. The panel drew five identical rings
+   down its left edge, which told the reader nothing about the five steps: the
+   mark was carrying done / now / next, and the rail and the "Step 1 of 5"
+   caption two lines above it were already carrying that twice. So the mark
+   carries the SUBJECT of a step you have not reached — a quiz is a score, an
+   interview is a call, vetting is a check — and a step you have FINISHED keeps
+   its tick, because "done" is the one thing a person reads a list like this
+   for and a tick is the shortest way to say it. §33.7 carries the rest of the
+   state in the mark's ground: brand behind the tick, accent behind the step you
+   are on, a hairline in front of everything ahead.
+
+   IT IS DERIVED, NOT DECLARED, and that is the whole reason it is affordable.
+   Six `stepper()` calls in this file and one in `tn-agent-portal.html` list
+   thirty-odd steps between them; an `ic:` field on each is thirty edits now and
+   a thirty-first that gets forgotten later. FIRST MATCH WINS, so the order
+   below is the argument: `/interview/` leads because it is the word in the most
+   labels, `enrol` beats `90` because "Enroll and start your 90 days" is an
+   enrolment rather than the course, and `report` sits with `level` because
+   "Your level and report" is the level arriving. An unmatched label gets the
+   plain dot — a confidently wrong icon is worse than a neutral one. */
+const STEP_IC = [
+  [/re-?interview|interview/i,                     'video'],
+  [/vetting|background|reference|identity|verif/i,  'shield'],
+  [/quiz/i,                                         'chart'],
+  [/consultant|call/i,                              'chat'],
+  [/level|report|rung|promot|certif/i,              'certificate'],
+  [/enrol|cohort/i,                                 'group'],
+  [/listing|payout|\bpay\b|fee|price|earn/i,        'wallet'],
+  [/training|calibration|module|chapter|course|90/i,'book'],
+  [/account|application|apply|profile|details/i,    'document'],
+  [/book|slot|date|session/i,                       'calendar']
+];
+/* Entities first — labels here are written as HTML (`&middot;`, `&mdash;`) and
+   `&d` inside `90-day` is not a word this test should see. */
+function stepIcon(lab){
+  const t = String(lab||'').replace(/&[a-z]+;|&#\d+;/gi,' ');
+  for(const [re,k] of STEP_IC) if(re.test(t)) return I[k];
+  return I.circle;
+}
+
 /* A stepper on a phone eats a screen. Show the rail, the step you are on,
    and keep the rest one tap away. */
 function stepper(id, steps, flush, title){
   let i = steps.findIndex(x=>x.st==='on');
   if(i<0) i = steps.filter(x=>x.st==='done').length ? steps.length-1 : 0;
   const open = !!S.piOpen[id], cur = steps[i];
-  const ic = st => st==='done' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.checkFilled}</span>`
-    : st==='on' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.circleDash}</span>`
-    : `<span class="pi-ic" style="fill:var(--gray-50)">${I.circle}</span>`;
+  /* NO INLINE `fill` HERE ANY MORE — trap 1. The three states used to set it on
+     the span, which beat every stylesheet at every specificity, so the panel's
+     ink could only ever be changed here. §33.7 owns it now. */
+  const ic = x => `<span class="pi-ic">${x.st==='done'?I.checkFilled:stepIcon(x.lab)}</span>`;
   const meter = `<span class="stp-meter">
       <span class="stp-rail" role="img" aria-label="Step ${i+1} of ${steps.length}">
         ${steps.map(x=>`<i class="${x.st}"></i>`).join('')}
       </span>
       <span class="stp-c">Step ${i+1} of ${steps.length}</span>
     </span>`;
-  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}">${open?'Hide steps':'All steps'}${I.chevDown}</button>`;
+  /* THE LABEL SITS IN A FIXED-WIDTH SLOT, and that is a layout fix rather than
+     typography. At desktop the wing is a grid track sized `auto` (§33.8), so the
+     track takes the header row's max-content — and "Hide steps" is 13px wider
+     than "All steps" at 600/14px. Pressing the toggle therefore moved the whole
+     card: the wing went 391px → 404px and Tal's sentence beside it lost 13px and
+     reflowed. The slot is 68px, which is "Hide steps" measured (66.9px) rounded
+     up, and it is right-aligned so the shorter word stays welded to the chevron;
+     the button has no ground, so the reserved 13px is invisible either way. */
+  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}"><span class="stp-t-l">${open?'Hide steps':'All steps'}</span>${I.chevDown}</button>`;
+  /* NO SCRIM, AND THE PANEL HANGS OFF THE BUTTON. §33.7 turned this from a
+     centred modal into a dropdown, and then moved the anchor twice: `.stp` is
+     the whole stepper, so the panel opened 117px below the toggle; `.stp-top` is
+     the toggle's row, which at desktop is two lines because the meter wraps into
+     it, so it still opened clear of the progress rail. `.stp-tw` exists to be
+     the anchor and nothing else — the panel is inside it, `position:absolute`,
+     8px under the chevron and right-aligned to it at every width. §33.7 carries
+     the width guard that `100%` used to be.
+
+     AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines above
+     the panel, so printing it again inside a box that hangs off that very
+     heading was the same words twice, 40px apart. The untitled variant has no
+     h2, so there it is the panel's only label and stays. */
+  const panel = `<div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi">
+      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x)}
+        <div class="pi-b"><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
+    </div></div></div>`;
+  const tw = `<div class="stp-tw">${toggle}${panel}</div>`;
   return `<div class="stp${flush?' flush':''}${open?' open':''}${title?' stp-titled':''}">
     ${title
-      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${toggle}</div>`
-      : `${meter}<div class="stp-h">${toggle}</div>`}
+      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${tw}</div>`
+      : `${meter}<div class="stp-h">${tw}</div>`}
     <div class="stp-now">
       <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
     </div>
-    ${/* NO SCRIM. The panel is a dropdown off the toggle now, not a modal in
-          the middle of the screen — §33.7 has the argument. Clicking away
-          closes it through the outside-click branch in the router, which is
-          what the overlay used to be for.
-
-          AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines
-          above the panel, so printing it again inside a box that hangs off that
-          very heading was the same words twice, 40px apart. The untitled
-          variant has no h2, so there it is the panel's only label and stays. */''}
-    <div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi" style="padding:0">
-      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
-        <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
-    </div></div></div>
   </div>`;
 }
 

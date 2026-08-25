@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=b33d1ab1">
+<link rel="stylesheet" href="talentnext-ds.css?b=14110227">
 
 <style>
 /* ==========================================================================
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=b33d1ab1"></script>
+<script src="talentnext-ds.js?b=14110227"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -291,7 +291,7 @@ SECTIONS.push({id:'use', nav:'Using it', icon:'document', build: () => `
    invented — because each has internal structure the CSS keys on, and getting
    it slightly wrong is what makes a component look broken rather than absent. */
 SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
-  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks.', `
+  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks. <b>Three things in the stepper are easy to get wrong.</b> The toggle and the all-steps panel go together inside a <code>.stp-tw</code> wrapper &mdash; that box exists only to be what the panel hangs from, and without it the panel anchors on the row (two lines at desktop, because the meter wraps into it) or on the whole stepper, opening 27px or 117px below the button instead of 4px. The toggle&rsquo;s words go in a <code>.stp-t-l</code> span, which reserves the width of the longer label so pressing it cannot resize the card. And a panel row is <code>.pi-ic</code> + <code>.pi-b</code>: a tick for a step that is done, the step&rsquo;s own subject icon for one that is not, no box around either, and the state on the row rather than on the mark. It is hidden here because <code>.stp</code> has no <code>.open</code> &mdash; add that class to see it.', `
     <div class="modhead">
       <div class="ph">
         <div class="ph-main">
@@ -314,7 +314,28 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
                   </span>
                   <span class="stp-c">Step 4 of 5</span>
                 </span>
-                <button class="stp-t" aria-expanded="false">All steps{{chevDown}}</button>
+                <div class="stp-tw">
+                <button class="stp-t" aria-expanded="false"><span class="stp-t-l">All steps</span>{{chevDown}}</button>
+                <div class="stp-all"><div class="stp-pop">
+                  <div class="pi">
+                    <div class="pi-step done"><span class="pi-ic">{{checkFilled}}</span><div class="pi-b">
+                      <div class="pi-lab">Leadership quiz</div>
+                      <div class="pi-sec">Explorer track &middot; Aug 12</div></div></div>
+                    <div class="pi-step done"><span class="pi-ic">{{checkFilled}}</span><div class="pi-b">
+                      <div class="pi-lab">Interview and level</div>
+                      <div class="pi-sec">E3 &middot; confirmed Aug 21</div></div></div>
+                    <div class="pi-step done"><span class="pi-ic">{{checkFilled}}</span><div class="pi-b">
+                      <div class="pi-lab">Enrolled</div>
+                      <div class="pi-sec">Cohort 41 &middot; started Aug 25</div></div></div>
+                    <div class="pi-step on"><span class="pi-ic">{{book}}</span><div class="pi-b">
+                      <div class="pi-lab">90-day course</div>
+                      <div class="pi-sec">Week 5 of 13 &middot; 5 of 13 chapters done</div></div></div>
+                    <div class="pi-step"><span class="pi-ic">{{video}}</span><div class="pi-b">
+                      <div class="pi-lab">Re-interview</div>
+                      <div class="pi-sec">Sets your next rung</div></div></div>
+                  </div>
+                </div></div>
+                </div>
               </div>
               <div class="stp-now">
                 <div class="pi-lab">90-day course</div>

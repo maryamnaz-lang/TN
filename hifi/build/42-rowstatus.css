@@ -1,0 +1,88 @@
+/* ==========================================================================
+   42. A ROW'S STATUS BELONGS BESIDE ITS TITLE, AND ITS MARK BELONGS TO ITS SUBJECT
+
+   THE COMPONENT THIS FIXES had the two jobs the wrong way round. A checklist
+   row — the agent portal's "Before you list", and anything else that draws a
+   sequence of things to finish — put a tick, a dotted ring or an empty ring in
+   the 40px mark box on the left, and then said the same thing again as a `.tag`
+   pill at the right-hand end of the row. So the left mark, which is the one
+   piece of a row a person's eye lands on first, carried NO information about
+   what the row is: four rows about an account, a listing, money and a course
+   all opened with the same three glyphs from the same set of three, and the
+   only way to tell them apart was to read the title.
+
+   §15 already had the answer, in the chapter list. `.ch-num` on the left says
+   WHICH chapter, `.ch-tick` sits inline right after the chapter's name and says
+   it is finished, and the row's trailing slot holds an ACTION ("Resume"). Three
+   slots, three different jobs, and the status is where the title is because
+   that is where it is read. This layer states that arrangement as a component
+   any row can opt into:
+
+     left mark      the subject — the icon of the thing, or of the page it opens
+     `.row-st`      the status, inline after the title, 15px, coloured
+     trailing slot  the action, or the arrow, or nothing
+
+   IT IS OPT-IN THROUGH `:has()`, WHICH IS THE POINT. `.cardrow-t` and
+   `.gcard-b h3` are `display:block` from §02 and are the title of a dozen
+   components; a row that carries no `.row-st` is untouched, so nothing in the
+   candidate portal moves. `:has()` is also what makes the gap conditional —
+   `gap` on a flex box with one child is nothing, but stating the display
+   unconditionally would change how every one of those titles wraps.
+
+   THE STATUS HAS THREE COLOURS AND THEY ARE THE PRODUCT'S OWN.
+   `--support-success` is the green §15 already gives `.ch-tick`, so a finished
+   row here and a finished chapter there are the same mark in the same colour —
+   that is the whole reason to reuse the idea rather than invent a second one.
+   The step you are on takes `--support-attention`, and NOT `--accent`: the
+   accent is #f57414, which is 2.6:1 on the canvas and under the 3:1 a mark
+   needs, and §01 wrote `--support-attention` for exactly this — "an orange dark
+   enough to be ink". What is not reached yet takes `--gray-40`: present,
+   legible, and plainly not lit.
+
+   THE SUBJECT'S COLOUR IS THE SUBJECT'S, NOT THE STATE'S. The first version of
+   this layer tinted the 40px mark by state as well — accent for the row you are
+   on, grey for what is ahead — and it was wrong twice over. It said the same
+   thing the 15px glyph beside the title had just said, in a bigger mark, so the
+   row carried its status at two sizes and its subject at none; and it meant the
+   four marks in a column were three colours drawn from a set of three again,
+   which is the problem this component was written to fix. A wallet is gold
+   whether or not you have finished with it.
+
+   SO THE COLOUR COMES IN AS `--rsi`, SET ON THE ROW. One rule reads it, and the
+   value is chosen where the row is written, because "which colour is a listing"
+   is a content decision and not a cascade one. It is a CUSTOM PROPERTY in an
+   inline style rather than an inline `fill`, which matters: an inline `fill`
+   beats every stylesheet at every specificity and would make this component's
+   ink unchangeable from CSS ever again (trap 1). A custom property does the
+   opposite — it feeds the rule below and leaves the rule in charge, so the
+   fallback still holds for any row that names no colour.
+
+   LAST, AND ALMOST FREE. `.row-st` and the `.rst-*` row classes are names no
+   earlier layer mentions. The one correction here is §02's `display:block` on
+   two titles, which is why it cannot land before §02 — and §11 restates those
+   titles' typography without touching display, so nothing between here and
+   there is being overridden.
+   ========================================================================== */
+
+/* the title becomes a row, but only when it has a status to hold */
+.app .cardrow-t:has(> .row-st),
+.app .gcard-b > h3:has(> .row-st){
+  display:inline-flex;align-items:center;gap:var(--s03)}
+
+.app .row-st{display:inline-flex;flex:none}
+.app .row-st svg{display:block;width:15px;height:15px;fill:var(--gray-40)}
+.app .row-st.done svg{fill:var(--support-success)}
+.app .row-st.now  svg{fill:var(--support-attention)}
+
+/* the subject mark takes the row's own colour, and keeps the family's box */
+.app .rst-done .cardrow-ic svg,
+.app .rst-now  .cardrow-ic svg,
+.app .rst-wait .cardrow-ic svg{fill:var(--rsi, var(--icon-primary))}
+
+/* NOTHING HERE HIDES THE TRAILING `.tag`. The pill was the old home of this
+   status, and a row carrying both had "Done" at the right edge and a green tick
+   400px to its left — but that is a decision about what a row EMITS, not about
+   how it is drawn, so it is answered in `checkRow` by not printing the pill.
+   `.cardrow-a` still holds a tag wherever a tag is the row's own content: the
+   payout destination's "Connected", a check's "1 of 2". */
+

@@ -4906,7 +4906,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .view-col .main .page .nrow,
 .app .view-col .main .page .ag,
 .app .view-col .main .page .acc-i,
-.app .view-col .main .page .kv,
+.app .view-col .main .page .kv-bands > .kv,
 .app .view-col .main .page .payrow{
   position:relative;border-bottom-color:transparent}
 .app .view-col .main .page .tile.clk::after,
@@ -4918,7 +4918,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .view-col .main .page .nrow::after,
 .app .view-col .main .page .ag::after,
 .app .view-col .main .page .acc-i::after,
-.app .view-col .main .page .kv::after,
+.app .view-col .main .page .kv-bands > .kv::after,
 .app .view-col .main .page .payrow::after{
   content:'';position:absolute;left:var(--pad-x);right:var(--pad-x);
   top:auto;bottom:-1px;height:1px;background:var(--rule);pointer-events:none}
@@ -4931,7 +4931,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .view-col .main .page .nrow:last-child::after,
 .app .view-col .main .page .ag:last-child::after,
 .app .view-col .main .page .acc-i:last-child::after,
-.app .view-col .main .page .kv:last-child::after,
+.app .view-col .main .page .kv-bands > .kv:last-child::after,
 .app .view-col .main .page .payrow:last-child::after{display:none}
 .shell-badge,
 .sn-item.on::before,
@@ -6165,7 +6165,6 @@ button.btn-p:active,
   margin-left:var(--pad-x);margin-right:var(--pad-x);
   padding-left:0;padding-right:0}
 .app .tabs,.app .cs{background-color:var(--surface-2)}
-.app .view-col .main .page .tile .kv::after{left:0;right:0}
 .app .close-b{
   display:flex;align-items:flex-start;flex-wrap:wrap;
   gap:var(--s05) var(--s06)}
@@ -6877,15 +6876,20 @@ button.btn-p:active,
   grid-area:stp;padding:0}
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{
   position:relative;padding:0}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-tw{
+  position:relative;margin-left:auto;flex:none;display:flex}
 .app .modhead .ai-aura.talsum > .stp-wing .stp-all{
   display:none;position:absolute;z-index:60;
-  top:calc(100% + var(--s03));right:0;
-  width:min(340px, 100%);
+  top:calc(100% + var(--s02));right:0;
+  width:min(340px, calc(100cqw - var(--s06) * 2));
   margin:0;padding:0;border-top:0}
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{
   display:flex}
+.app .stp-t > .stp-t-l{
+  display:inline-block;min-width:68px;text-align:right}
 .app .modhead:has(.stp.open){z-index:3}
-.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{
+  display:block;padding:var(--s04) var(--s05)}
 .stp-pop{
   width:100%;padding:var(--s05);
   background:var(--layer-01);
@@ -6895,6 +6899,36 @@ button.btn-p:active,
   font-size:13px;font-weight:600;line-height:18px;letter-spacing:.6px;
   text-transform:uppercase;color:var(--text-helper);
   margin:0 0 var(--s04)}
+.app .stp .stp-pop .pi{
+  --pi-mark:28px;--pi-gap:var(--s03);
+  gap:0;padding:0}
+.app .stp .stp-pop .pi-step{
+  position:relative;
+  display:flex;align-items:flex-start;gap:var(--s04);
+  min-height:0;padding:var(--pi-gap) 0;
+  border:0}
+.app .stp .stp-pop .pi-step::before{
+  content:'';position:absolute;z-index:0;
+  left:calc(var(--pi-mark) / 2 - .5px);top:0;bottom:0;width:1px;
+  background:var(--rule)}
+.app .stp .stp-pop .pi-step.done::before{background:var(--brand-primary)}
+.app .stp .stp-pop .pi-step:first-child::before{
+  top:calc(var(--pi-gap) + var(--pi-mark) / 2)}
+.app .stp .stp-pop .pi-step:last-child::before{
+  bottom:calc(100% - var(--pi-gap) - var(--pi-mark) / 2)}
+.app .stp .stp-pop .pi-ic{
+  position:relative;z-index:1;
+  width:var(--pi-mark);height:var(--pi-mark);flex:none;
+  display:grid;place-items:center;
+  background-color:var(--layer-01);
+  border:0}
+.app .stp .stp-pop .pi-ic svg{width:19px;height:19px;fill:var(--gray-40)}
+.app .stp .stp-pop .pi-step.done .pi-ic svg{fill:var(--support-success)}
+.app .stp .stp-pop .pi-step.on   .pi-ic svg{fill:var(--support-attention)}
+.app .stp .stp-pop .pi-b{min-width:0;flex:1;padding-top:1px}
+.app .stp .stp-pop .pi-lab{color:var(--text-secondary)}
+.app .stp .stp-pop .pi-step.on .pi-lab{color:var(--text-primary)}
+.app .stp .stp-pop .pi-sec{margin-top:2px}
 .app .modhead:has(.tal-greet) > .ph{display:none}
 .tal-greet{
   display:block;
@@ -7304,7 +7338,6 @@ button.btn-p:active,
 }
 .app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
 .app .sec.tint.tint-2{--surface-2:var(--surface-3)}
-.app .view-col .main .page .sec.tint-2 .kv::after{left:0;right:0}
 @container app (min-width:900px){
   .app .chart{grid-template-columns:minmax(0,400px) minmax(0,560px)}
 }
@@ -7461,18 +7494,15 @@ button.btn-p:active,
   gap:var(--s04);margin-left:0;font-weight:400}
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
 .app .tal-msg > .bb .tw-btn:not(.ghost){
-  background-color:var(--brand-primary);
-  border-color:var(--brand-primary);
-  color:var(--on-brand)}
+  background-color:var(--accent);
+  border-color:var(--accent);
+  color:var(--on-accent);
+  --on-brand-fill:1}
 .app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{
   color:var(--accent-on-2);border-color:var(--rule-on-2);
   padding-left:var(--s04);padding-right:var(--s04)}
 .app .tal-msg > .bb .tw-btn.ghost svg{fill:currentColor}
-   `wPace`'s lede is the longest of them — the week card's whole comparison
-   sentence, about forty-five words — so it carries a measure. Everything
-   above it in the widget is a grid and grids do not need one; a sentence set
-   across 584px does. */
 .app .tal-msg > .bb .tw-lede{
   font-size:14px;line-height:21px;font-weight:500;max-width:56ch;
   letter-spacing:.05px;color:var(--text-primary)}
@@ -7497,19 +7527,21 @@ button.btn-p:active,
   margin-left:0;margin-right:0;padding:0}
 .app .ask-thread .tal-msg:not(.me) > .bb,
 .app .tal-panel .tal-msg:not(.me) > .bb{
-  background-color:#fff5ee;
-  background-image:none}
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{
-  background-color:var(--accent);
+  background-color:#ffffff;
   background-image:none;
-  border-color:transparent;
-  color:var(--on-accent);
-  --on-brand-fill:1}
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{
-  background-color:var(--on-accent);
-  background-image:none;
-  -webkit-mask:var(--tal-star) center/contain no-repeat;
-          mask:var(--tal-star) center/contain no-repeat}
+  border:1px solid #f47113;
+  border-image:linear-gradient(135deg,
+    #f47113 0%, #ffdabf 50%, #cb8dd7 100%) 1;
+  box-shadow:0 0 10px rgba(255,192,146,.15)}
+.app .ask-thread .tal-msg.me > .bb,
+.app .tal-panel .tal-msg.me > .bb{
+  background-color:#ffffff;
+  background-image:linear-gradient(to right,
+    rgba(255,232,215,.5) 0%, rgba(244,254,246,.5) 100%);
+  border:1px solid var(--rule);
+  color:var(--text-primary);
+  min-height:32px;
+  padding:4px 16px}
 .app .tal-msg > .bb .tw-hl{
   font-weight:600;
   color:var(--accent-on-2)}
@@ -7521,9 +7553,14 @@ button.btn-p:active,
     -webkit-text-fill-color:transparent;
     --on-brand-fill:1}
 }
-.app .tal-msg.me > .bb .tw-hl{
-  background-image:none;color:var(--on-brand);
-  -webkit-text-fill-color:var(--on-brand)}
+.app .tal-msg > .bb .tw-h{
+  display:flex;align-items:center;gap:var(--s03)}
+.app .tal-msg > .bb .tw-ic{
+  display:inline-flex;flex:none;line-height:0}
+.app .tal-msg > .bb .tw-ic svg{
+  width:16px;height:16px;display:block;
+  fill:var(--icon-secondary)}
+.app .tal-msg > .bb .tw-ic.acc svg{fill:var(--accent-text)}
 .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
   position:relative;isolation:isolate;
   width:112px;height:112px;
@@ -7588,6 +7625,56 @@ button.btn-p:active,
 @media (prefers-reduced-motion:reduce){
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{animation:none}
   .app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{animation:none;opacity:.3}
+}
+.app .askdock .askline-mark::before{content:none}
+.app .askdock .askline-mark .tal-mk{
+  position:relative;background-image:none;animation:none}
+.app .askdock .askline-mark .tal-mk::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background-color:transparent;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
+  background-position:center,center,center,center;
+  background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
+  box-shadow:
+    0 0 8px 1px rgba(244,113,19,0.35),
+    0 0 16px 3px rgba(244,113,19,0.15),
+    inset 0 -2px 5px rgba(0,0,0,0.12),
+    inset 0 2px 5px rgba(246,220,146,0.25);
+  animation:tal-sphere-glow 4s ease-in-out infinite}
+.app .askdock .askline-mark .tal-mk::after{
+  content:'';position:absolute;z-index:1;
+  left:50%;top:50%;width:36px;height:36px;
+  margin:-18px 0 0 -18px;
+  border-radius:50%;pointer-events:none;
+  background:conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 4%,
+    rgba(255,255,255,0.15) 10%,
+    transparent 17%,
+    transparent 30%,
+    rgba(246,220,146,0.12) 34%,
+    transparent 40%,
+    transparent 48%,
+    rgba(255,255,255,0.2) 52%,
+    rgba(255,255,255,0.05) 58%,
+    transparent 64%,
+    transparent 80%,
+    rgba(246,220,146,0.08) 84%,
+    transparent 90%,
+    transparent 100%);
+  animation:tal-sphere-spin 5s linear infinite;
+  filter:blur(0.5px)}
+@media (prefers-reduced-motion:reduce){
+  .app .askdock .askline-mark .tal-mk::before{animation:none}
+  .app .askdock .askline-mark .tal-mk::after{animation:none;opacity:.3}
 }
 .app .cal{
   position:relative;
@@ -7747,6 +7834,40 @@ button.btn-p:active,
     box-shadow:none}
   .app .cal-pop::before,.app .cal-pop::after{display:none}
 }
+.app .cardrow-t:has(> .row-st),
+.app .gcard-b > h3:has(> .row-st){
+  display:inline-flex;align-items:center;gap:var(--s03)}
+.app .row-st{display:inline-flex;flex:none}
+.app .row-st svg{display:block;width:15px;height:15px;fill:var(--gray-40)}
+.app .row-st.done svg{fill:var(--support-success)}
+.app .row-st.now  svg{fill:var(--support-attention)}
+.app .rst-done .cardrow-ic svg,
+.app .rst-now  .cardrow-ic svg,
+.app .rst-wait .cardrow-ic svg{fill:var(--rsi, var(--icon-primary))}
+.app .page:has(> .sec > .empty){
+  display:flex;flex-direction:column;min-height:100%}
+.app .page:has(> .sec > .empty) > .sec:has(> .empty){
+  flex:1 1 auto;display:flex;flex-direction:column}
+.app .page:has(> .sec > .empty) > .sec > .sec-h{
+  align-self:stretch;padding-right:0}
+.app .page:has(> .sec > .empty) > .sec > .empty{
+  flex:1 1 auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding-top:var(--s07);padding-bottom:var(--s07)}
+.app .page:has(> .sec > .empty) > .sec > .empty > svg{
+  margin:0 0 var(--s04)}
+.app .page:has(> .sec > .empty) > .sec > .empty > .help,
+.app .page:has(> .sec > .empty) > .sec > .empty > p{
+  max-width:52ch}
+.app .empty > .btn-row{
+  display:inline-flex;justify-content:center;flex-wrap:wrap;
+  margin-top:var(--s06)}
+@container app (min-width:900px){
+  .sec:has(> .empty){display:block}
+  .sec:has(> .empty) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05);
+    padding:0 var(--pad-x)}
+}
 
 </style>
 </head>
@@ -7811,6 +7932,7 @@ view:'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73
 viewOff:'M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z',
 star:'M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
 time:'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.71L11 12.41V7h2v4.59l3.71 3.71-1.42 1.41z',
+hourglass:'m6 2 .01 6L10 12l-3.99 4.01L6 22h12v-6l-4-4 4-3.99V2H6zm10 14.5V20H8v-3.5l4-4 4 4z',
 calendar:'M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z',
 video:'M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z',
 book:'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z',
@@ -8421,6 +8543,8 @@ function chRow(i,f){
 
 ;
 
+const twIc = (name, tone) => `<span class="tw-ic${tone ? ' ' + tone : ''}">${I[name] || ''}</span>`;
+
 const tw = (title,body,action) => `<span class="tw">
   ${title?`<span class="tw-h">${title}</span>`:''}${body}
   ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
@@ -8430,20 +8554,20 @@ const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip
 function wChapter(i){
   const g = GAME[S.stage];
   const done = g && i < g.done, inprog = S.stage==='day34' && i===3;
-  return tw(`Chapter ${i+1} · ${CH[i][0]}`,
+  return tw(twIc('book') + `Chapter ${i+1} · ${CH[i][0]}`,
     `<span class="tw-row"><span class="tw-bar"><i style="width:${inprog?17:done?100:0}%"></i></span>
      <span class="tw-k">${inprog?'12 of 70':done?CH[i][1]+' of '+CH[i][1]:'0 of '+CH[i][1]} min</span></span>`,
     twBtn('Open chapter '+(i+1),'chapter:'+i));
 }
 function wTerms(){
-  return tw('Two terms this chapter turns on',
+  return tw(twIc('idea') + 'Two terms this chapter turns on',
     `<span class="tw-def"><b>Operating rhythm</b>The regular cadence of check-ins that lets you follow work without hovering over it.</span>
      <span class="tw-def"><b>Drop-off point</b>The moment work stops moving and nobody has said so out loud.</span>`);
 }
 function wLadder(){
   const f = cfg(S.stage);
   const cur = f.pred ? null : f.level;
-  return tw('The Explorer track',
+  return tw(twIc('growth') + 'The Explorer track',
     `<span class="tw-rungs">${['E1','E2','E3','E4','E5'].map(r=>`<i class="${r===cur?'on':''}">${r}</i>`).join('')}</span>
      <span class="tw-list">
        ${f.pred
@@ -8458,8 +8582,8 @@ function wLadder(){
 }
 function wPoints(){
   const g = GAME[S.stage];
-  if(!g) return tw('Points','<span class="tw-k">Points start when your cohort does.</span>');
-  return tw('Fastest points from here',
+  if(!g) return tw(twIc('trophy','acc') + 'Points','<span class="tw-k">Points start when your cohort does.</span>');
+  return tw(twIc('trophy') + 'Fastest points from here',
     `<span class="tw-lines">
       <span><b>+25</b>each chapter you finish</span>
       <span><b>+50</b>each cohort call you attend</span>
@@ -8470,7 +8594,7 @@ function wPoints(){
     twBtn('Open Points','rewards'));
 }
 function wPrep(){
-  return tw('A 10-minute run-through',
+  return tw(twIc('checkOutline') + 'A 10-minute run-through',
     `<span class="tw-check">
       <span>One story where you handed work over and it went wrong</span>
       <span>What you would do differently, in one sentence</span>
@@ -8490,7 +8614,7 @@ function wAgent(){
     twBtn('See '+a.n.split(' ')[0]+'&rsquo;s slots','agents'));
 }
 function wCall(){
-  return tw('Thursday 6:00 PM ET · 60 minutes',
+  return tw(twIc('video') + 'Thursday 6:00 PM ET · 60 minutes',
     `<span class="tw-list">
        <span>Week ${cfg(S.stage).week} is on hard conversations</span>
        <span>Bring the Sam handover from your notes</span>
@@ -8499,12 +8623,12 @@ function wCall(){
     twBtn('Open Cohort 41','cohort'));
 }
 function wDraft(){
-  return tw('A reply you could send',
+  return tw(twIc('edit') + 'A reply you could send',
     `<span class="tw-quote">Thanks Priya. I will bring the vendor review to Thursday. The part I am stuck on is telling someone I am taking work back without it reading as a lack of trust.</span>`,
     `${twBtn('Use this','messages')}<button class="tw-btn ghost" data-ask="1">Try another wording</button>`);
 }
 function wWorkload(){
-  return tw('What the weeks look like',
+  return tw(twIc('time') + 'What the weeks look like',
     `<span class="tw-lines">
       <span><b>~55 min</b>chapters and assessment</span>
       <span><b>60 min</b>the live cohort call</span>
@@ -8958,40 +9082,48 @@ function ladder(cur,confirmed){
   <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
 }
 
+const STEP_IC = [
+  [/re-?interview|interview/i,                     'video'],
+  [/vetting|background|reference|identity|verif/i,  'shield'],
+  [/quiz/i,                                         'chart'],
+  [/consultant|call/i,                              'chat'],
+  [/level|report|rung|promot|certif/i,              'certificate'],
+  [/enrol|cohort/i,                                 'group'],
+  [/listing|payout|\bpay\b|fee|price|earn/i,        'wallet'],
+  [/training|calibration|module|chapter|course|90/i,'book'],
+  [/account|application|apply|profile|details/i,    'document'],
+  [/book|slot|date|session/i,                       'calendar']
+];
+function stepIcon(lab){
+  const t = String(lab||'').replace(/&[a-z]+;|&#\d+;/gi,' ');
+  for(const [re,k] of STEP_IC) if(re.test(t)) return I[k];
+  return I.circle;
+}
+
 function stepper(id, steps, flush, title){
   let i = steps.findIndex(x=>x.st==='on');
   if(i<0) i = steps.filter(x=>x.st==='done').length ? steps.length-1 : 0;
   const open = !!S.piOpen[id], cur = steps[i];
-  const ic = st => st==='done' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.checkFilled}</span>`
-    : st==='on' ? `<span class="pi-ic" style="fill:var(--text-primary)">${I.circleDash}</span>`
-    : `<span class="pi-ic" style="fill:var(--gray-50)">${I.circle}</span>`;
+  const ic = x => `<span class="pi-ic">${x.st==='done'?I.checkFilled:stepIcon(x.lab)}</span>`;
   const meter = `<span class="stp-meter">
       <span class="stp-rail" role="img" aria-label="Step ${i+1} of ${steps.length}">
         ${steps.map(x=>`<i class="${x.st}"></i>`).join('')}
       </span>
       <span class="stp-c">Step ${i+1} of ${steps.length}</span>
     </span>`;
-  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}">${open?'Hide steps':'All steps'}${I.chevDown}</button>`;
+  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}"><span class="stp-t-l">${open?'Hide steps':'All steps'}</span>${I.chevDown}</button>`;
+  const panel = `<div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi">
+      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x)}
+        <div class="pi-b"><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
+    </div></div></div>`;
+  const tw = `<div class="stp-tw">${toggle}${panel}</div>`;
   return `<div class="stp${flush?' flush':''}${open?' open':''}${title?' stp-titled':''}">
     ${title
-      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${toggle}</div>`
-      : `${meter}<div class="stp-h">${toggle}</div>`}
+      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${tw}</div>`
+      : `${meter}<div class="stp-h">${tw}</div>`}
     <div class="stp-now">
       <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
     </div>
-    ${/* NO SCRIM. The panel is a dropdown off the toggle now, not a modal in
-          the middle of the screen — §33.7 has the argument. Clicking away
-          closes it through the outside-click branch in the router, which is
-          what the overlay used to be for.
-
-          AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines
-          above the panel, so printing it again inside a box that hangs off that
-          very heading was the same words twice, 40px apart. The untitled
-          variant has no h2, so there it is the panel's only label and stays. */''}
-    <div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi" style="padding:0">
-      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x.st)}
-        <div><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
-    </div></div></div>
   </div>`;
 }
 
@@ -15716,7 +15848,7 @@ let TAL_Q = '';
 const hl = (s) => `<b class="tw-hl">${s}</b>`;
 
 function wSupport(askFor){
-  return tw('TalentNext support',
+  return tw(twIc('helpDesk','acc') + 'TalentNext support',
     `<span class="tw-lines">
        <span><b>Ask for</b>${askFor}</span>
        <span><b>Email</b>${SUPPORT.email}</span>
@@ -15744,7 +15876,7 @@ function wScope(){
     + twChips((typeof LEAD_TAL !== 'undefined' && LEAD_TAL.ctx.leadDash) || ['How are my cohorts doing?']);
   const f = cfg(S.stage);
   const on = f.enrolled || f.complete;
-  return tw('What I can do',
+  return tw(twIc('ai') + 'What I can do',
     `<span class="tw-lines">
        <span><b>Course</b>${on
          ? 'what is in a chapter, what your assessments measured, where you are against the other nine, and what to do this week'
@@ -15764,7 +15896,7 @@ const cand = (re, fn, what) => [re, () => isLead() ? leadNA(what) : fn()];
 
 
 function wCost(){
-  return tw('What the 90 days cost',
+  return tw(twIc('wallet','acc') + 'What the 90 days cost',
     `<span class="tw-lines">
        <span><b>$95</b>the interview that sets your level, paid to the agent</span>
        <span><b>$690</b>the Explorer &ndash; E3 course</span>
@@ -15781,7 +15913,7 @@ function wReCost(){
 }
 
 function wRefund(){
-  return tw('The two refund windows',
+  return tw(twIc('time','acc') + 'The two refund windows',
     `<span class="tw-lines">
        <span><b>Interview</b>free to move or cancel up to 24 hours before. Inside 24 hours the fee is not refundable.</span>
        <span><b>Course</b>full refund up to 7 days after your cohort starts, as long as you have not finished more than one chapter.</span>
@@ -15791,7 +15923,7 @@ function wRefund(){
 }
 
 function wCard(){
-  return tw('Where your card actually is',
+  return tw(twIc('shield') + 'Where your card actually is',
     `<span class="tw-list">
        <span>The number goes straight to our payment processor. It never reaches a TalentNext server.</span>
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
@@ -15802,7 +15934,7 @@ function wCard(){
 }
 
 function wLedger(){
-  return tw('Your payments, and why I am not reading them',
+  return tw(twIc('receipt') + 'Your payments, and why I am not reading them',
     `<span class="tw-list">
        <span>Payments has every charge with its date, the card it went to, and a Receipt button on each row.</span>
        <span>Billing is on the short list of things I have never been shown, along with your messages with Priya and anything said on a cohort call.</span>
@@ -15819,7 +15951,7 @@ function wBillingProblem(){
 
 
 function wCycle(){
-  return tw('How the 90 days run',
+  return tw(twIc('calendar') + 'How the 90 days run',
     `<span class="tw-lines">
        <span><b>Day 1</b>your cohort of ten starts together, all at the same level</span>
        <span><b>Weekly</b>one chapter, its assessment, and a 60-minute call on Thursday</span>
@@ -15831,7 +15963,7 @@ function wCycle(){
 }
 
 function wEnd(){
-  return tw('What you have at the end',
+  return tw(twIc('certificate') + 'What you have at the end',
     `<span class="tw-list">
        <span>A confirmed level, decided at the re-interview and signed by an agent.</span>
        <span>Your 90-day summary &mdash; the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
@@ -15843,7 +15975,7 @@ function wEnd(){
 
 function wSummary(){
   const f = cfg(S.stage);
-  return tw('What is in the 90-day summary',
+  return tw(twIc('document') + 'What is in the 90-day summary',
     `<span class="tw-list">
        <span>Every chapter you finished and what it was assessed at.</span>
        <span>The growth areas from your level interview, and whether the 90 days moved them.</span>
@@ -15870,7 +16002,7 @@ function wChapterAny(nums){
     return `<span><b>Chapter ${n} &middot; ${name}</b><br>${mins} min &middot; ${state}${GROWTH.includes(i) ? ' &middot; your growth area' : ''}</span>`;
   }).join('');
   const growth = list.filter(n => GROWTH.includes(n - 1));
-  return tw(list.length > 1 ? 'The chapters you asked about' : 'Chapter ' + list[0],
+  return tw(twIc('book') + (list.length > 1 ? 'The chapters you asked about' : 'Chapter ' + list[0]),
     `<span class="tw-list">${rows}</span>
      ${growth.length ? `<span class="tw-k">${growth.length === list.length && list.length > 1
         ? 'Both are growth areas from your report, which is why they are named together.'
@@ -15885,7 +16017,7 @@ function wLowest(){
     + twChips(['What should I do next?','How are chapters assessed?']);
   const done = SCORE.slice(0, f.done);
   const lo = Math.min(...done), i = done.indexOf(lo);
-  return tw('Your lowest assessment',
+  return tw(twIc('chart') + 'Your lowest assessment',
     `<span class="tw-lines">
        <span><b>${lo}%</b>chapter ${i + 1}, ${CH[i][0]}</span>
        <span><b>${f.avg}%</b>your average across ${f.done} assessed</span>
@@ -15899,7 +16031,7 @@ function wStanding(){
   const f = cfg(S.stage);
   if(!f.enrolled && !f.complete) return `You are not on a course yet, so there is nothing to be doing well or badly at. What is decided so far is your track &mdash; Explorer, from the quiz &mdash; and the next thing that moves is your level.`
     + twChips(['What should I do next?','How does the ladder work?']);
-  return tw('Where you are',
+  return tw(twIc('growth') + 'Where you are',
     `<span class="tw-lines">
        <span><b>${f.done} of 13</b>chapters finished</span>
        <span><b>${f.avg ? f.avg + '%' : '&mdash;'}</b>${f.avg ? 'your average, against a cohort average of 79%' : 'nothing assessed yet'}</span>
@@ -15923,7 +16055,7 @@ function wPace(){
   if(f.finished || f.complete) return `You are not behind &mdash; all 13 chapters are done and the 90 days are finished. What is outstanding is the re-interview, and that is a booking rather than a backlog.`
     + twChips(['What happens at the re-interview?','What is in the 90-day summary?']);
   if(!w) return '';
-  return tw('Against your cohort',
+  return tw(twIc('time','acc') + 'Against your cohort',
     `<span class="tw-lede">${w.tal}</span>`,
     `${twBtn('Open Coursework','coursework')}<button class="tw-btn ghost" data-ask="1">${w.ask[0]}</button>`);
 }
@@ -15943,7 +16075,7 @@ function wNext(){
   const n = NEXT[S.stage];
   if(!n) return '';
   const [title, body, chip, go] = n;
-  return tw('Next',
+  return tw(twIc('flag','acc') + 'Next',
     `<span class="tw-lede">${title}</span>
      <span class="tw-k">${body}</span>`,
     `${twBtn(go === 'enrol' ? 'Open Enroll' : go === 'agents' ? 'See the agents' : go === 'coursework' ? 'Open Coursework' : go === 'interviews' ? 'Open Interviews' : 'Open chapter 4', go)}<button class="tw-btn ghost" data-ask="1">${chip}</button>`);
@@ -15955,7 +16087,7 @@ function wMoveUp(){
     + twChips(['What happens in the 45 minutes?', 'How does the ladder work?']);
   if(f.complete) return `You moved on November 21. E5 is the top of the Explorer track and the next 90 days are what decide it; the shape is the same &mdash; the chapters, the leader&rsquo;s recommendation, the re-interview.`
     + twChips(['What is different about E4?', 'What is in the 90-day summary?']);
-  return tw('What moves you from ' + f.level + ' to E4',
+  return tw(twIc('growth','acc') + 'What moves you from ' + f.level + ' to E4',
     `<span class="tw-list">
        <span>The two growth areas Priya named in your report: <b>chapter 4, Delegation Without Drop-Off</b> and <b>chapter 5, Hard Conversations</b>. Those are what she will re-test.</span>
        <span>Your cohort leader&rsquo;s recommendation at day 90, which is written from your weekly tasks and the calls, not from your average.</span>
@@ -15971,7 +16103,7 @@ function wFinish(){
     + twChips(['Explain the 90-day cycle', 'What should I do next?']);
   if(f.complete) return `It is finished. All 13 chapters, the summary signed on November 21, and the re-interview decided &mdash; you moved to E4. What is open now is the next course, not this one.`
     + twChips(['What is different about E4?', 'What do I have at the end?']);
-  return tw('What is left',
+  return tw(twIc('calendar') + 'What is left',
     `<span class="tw-lines">
        <span><b>Day ${f.day}</b>of 90 &mdash; ${90 - f.day} days to go</span>
        <span><b>Week ${f.week}</b>of 13 &mdash; ${13 - f.week} chapters still to open</span>
@@ -15982,7 +16114,7 @@ function wFinish(){
 }
 
 function wPause(){
-  return tw('Pausing, or moving cohort',
+  return tw(twIc('pause') + 'Pausing, or moving cohort',
     `<span class="tw-list">
        <span>A cohort is a fixed ten moving together for 90 days, with one live call a week. There is no self-service pause, because pausing means leaving the group you are in.</span>
        <span>Your cohort leader can carry you through a bad fortnight &mdash; that is what the flag on their dashboard is for, and it clears itself when you come back.</span>
@@ -15995,7 +16127,7 @@ function wPause(){
 
 
 function wMove(){
-  return tw('Moving or cancelling an interview',
+  return tw(twIc('renew') + 'Moving or cancelling an interview',
     `<span class="tw-lines">
        <span><b>Up to 24h</b>free to move to any of the agent&rsquo;s other slots, or to cancel for a full refund</span>
        <span><b>Inside 24h</b>you can still move it, but the fee is not refundable</span>
@@ -16007,7 +16139,7 @@ function wMove(){
 
 function wNoQuestions(){
   return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; ${hl('nobody')} has the questions in advance, including them.`
-    + tw('So preparation is three things, not revision',
+    + tw(twIc('checkOutline') + 'So preparation is three things, not revision',
       `<span class="tw-check">
          <span>One story where you handed work over and it went wrong</span>
          <span>What you would do differently, in one sentence</span>
@@ -16017,7 +16149,7 @@ function wNoQuestions(){
 }
 
 function wNotDo(){
-  return tw('The four that cost people most',
+  return tw(twIc('warningAlt','acc') + 'The four that cost people most',
     `<span class="tw-list">
        <span>Do not qualify your answer while you are giving it. Say the thing, then say what you would change.</span>
        <span>Do not bring the story where you were right. Bring the one that went wrong &mdash; the judgement is in what you did next.</span>
@@ -16034,7 +16166,7 @@ function wWhenLevel(){
 }
 
 function wRank(){
-  return tw('The number on an agent card',
+  return tw(twIc('star') + 'The number on an agent card',
     `<span class="tw-lines">
        <span><b>4.8</b>the average score past candidates gave Priya after their interview, out of 5, across 210 of them</span>
        <span><b>E1&ndash;E3</b>the levels she is certified to assess, not the levels she tends to give</span>
@@ -16045,7 +16177,7 @@ function wRank(){
 }
 
 function wPrice(){
-  return tw('What the price is and is not',
+  return tw(twIc('wallet') + 'What the price is and is not',
     `<span class="tw-lines">
        <span><b>$80</b>Lena Fischer &middot; 4.5 &middot; E1&ndash;E4</span>
        <span><b>$95</b>Priya Nair &middot; 4.8 &middot; E1&ndash;E3</span>
@@ -16086,7 +16218,7 @@ function wLeader(){
 }
 
 function wCallLogistics(){
-  return tw('The weekly call',
+  return tw(twIc('video') + 'The weekly call',
     `<span class="tw-lines">
        <span><b>When</b>Thursday, 6:00 PM ET, every week for 13 weeks</span>
        <span><b>Long</b>60 minutes, video, you and the other nine</span>
@@ -16108,7 +16240,7 @@ function wSwitch(){
 
 
 function wSeen(){
-  return tw('Who sees your interview',
+  return tw(twIc('group') + 'Who sees your interview',
     `<span class="tw-list">
        <span>The agent who interviewed you, and the cohort leader who runs your course. Nobody else, unless you share your report yourself.</span>
        <span>Recordings are video and audio, transcribed so the agent can write the report, kept for 24 months and then deleted.</span>
@@ -16122,7 +16254,7 @@ function wSeen(){
 function wTalScope(){
   const live = (typeof MEMO !== 'undefined')
     ? MEMO.filter((m, i) => !(S.memDrop || []).includes(i)).length : 0;
-  return tw('What I can and cannot see',
+  return tw(twIc('view') + 'What I can and cannot see',
     `<span class="tw-lines">
        <span><b>I see</b>your course progress, your chapter notes, your points, your interview transcripts and your report</span>
        <span><b>I never</b>${(typeof NEVER !== 'undefined' ? NEVER : []).map(n => n.replace(/\.$/, '')).join('; ') || 'see your messages, your calls or your card'}</span>
@@ -16132,7 +16264,7 @@ function wTalScope(){
 }
 
 function wClose(){
-  return tw('Closing your account',
+  return tw(twIc('warning') + 'Closing your account',
     `<span class="tw-list">
        <span>It removes your profile, your notes and your interview recordings.</span>
        <span>Certificates and signed summaries you have already earned stay valid and stay downloadable.</span>
@@ -16152,7 +16284,7 @@ function wBroken(){
     return `I cannot see anything to do with signing in &mdash; I only exist once you are already inside. Reset the password from the log-in screen first; that clears most of these, and it does not touch your course record.`
     + wSupport('a password reset by hand, if the reset email does not arrive either. Give them the address you signed up with');
   return `That is not something I can see from in here &mdash; I have your course and your interviews, not your browser or the video player.`
-    + tw('Worth trying once',
+    + tw(twIc('renew') + 'Worth trying once',
       `<span class="tw-list">
          <span>${hl('Reload the page')}. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
          <span>If it is the same on a second browser, it is our end, not yours.</span>

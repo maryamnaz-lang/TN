@@ -135,13 +135,19 @@
    length — and a blue link inside Tal's answer would be the one blue thing on
    the screen. This is a button that is coloured, not a link.
 
-   AND THE PRIMARY IS FILLED BLACK, which §10 above is what made necessary.
-   An outlined button with ink text is legible on `--layer-01`; on the wash it
-   is a hairline box on a tinted ground, and beside an accent-ink second
-   action it stopped reading as the primary of the pair at all. Filled, it is
-   `.btn-p`'s own treatment — `--brand-primary` on `--on-brand` — which is
-   what every other primary action in the product looks like, so the widget's
-   main action now matches the page's.
+   AND THE PRIMARY IS FILLED ACCENT. It was outlined with ink text, which is
+   legible on `--layer-01` and became a hairline box on a tinted ground the
+   moment §10 gave the bubble one; beside an accent-ink second action it
+   stopped reading as the primary of the pair at all. It was then filled BLACK
+   for a while, which solved that and made the widget's loudest object the one
+   colour the card has nothing else of. `--accent` is `#f57414`, the fill this
+   product already uses for every accent surface, and it puts the button in
+   the same family as the gradient rule around the card.
+
+   `--on-brand-fill:1` is the flag §19 and §01.40 explain: white on this
+   orange is about 2.7:1, under AA, and it is the brand's own trade rather
+   than an oversight — declared so `verify.mjs` counts and reports the pair
+   instead of it passing silently.
 
    `:not(.ghost)` IS LOAD-BEARING AND THE NOTE ABOVE IS WHY. Naming `.tw-btn`
    alone from this depth already broke the quiet variant once, by re-arming a
@@ -150,9 +156,10 @@
    on a later rule to undo it. */
 .app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
 .app .tal-msg > .bb .tw-btn:not(.ghost){
-  background-color:var(--brand-primary);
-  border-color:var(--brand-primary);
-  color:var(--on-brand)}
+  background-color:var(--accent);
+  border-color:var(--accent);
+  color:var(--on-accent);
+  --on-brand-fill:1}
 .app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
 .app .tal-msg > .bb .tw-btn.ghost{
   color:var(--accent-on-2);border-color:var(--rule-on-2);
@@ -171,7 +178,7 @@
    `.tw-lede` is that line: one step up from the widget's 12.5px body, one
    step down from the bubble's 13.5px prose, and no mark. It reads as the
    answer, and the `.tw-k` under it reads as the reason.
-   ------------------------------------------------------------------------ */
+
    `wPace`'s lede is the longest of them — the week card's whole comparison
    sentence, about forty-five words — so it carries a measure. Everything
    above it in the widget is a grid and grids do not need one; a sentence set
@@ -315,73 +322,116 @@
   margin-left:0;margin-right:0;padding:0}
 
 /* ------------------------------------------------------------------ 10 ---
-   TAL'S BUBBLE HAS ITS OWN GROUND
+   THE TWO BUBBLES, FROM THE FIGMA FRAME
 
-   A Tal turn used to be `--layer-01` inside a hairline — the same flat white
-   card any other block on the page gets, so nothing about the surface said
-   who was speaking. It now carries a warm ground of its own.
+   Node 391:251. Both bubbles are stated there and neither matched what the
+   thread was drawing, so both are restated here from the file's own values
+   rather than approximated.
 
-   ONE FLAT COLOUR, NOT §25.1's TWO GRADIENTS. The first version of this rule
-   copied the module head band's wash across: two radial gradients on
-   `--tal-chip-1` and `--tal-chip-2`, redrawn from the Figma ellipses. That is
-   the right ground for a band 1394px wide, where the two pools have room to
-   read as light falling across a surface. In a 356px bubble they are two
-   tints stacked in a small box, and the pair reads as a mottle rather than as
-   a wash. `#fff5ee` is the single tone that replaces them.
+     TAL      white, a soft warm glow `0 0 10px rgba(255,192,146,.15)`, and a
+              1px rule that is a THREE-STOP GRADIENT running diagonally:
+              `#F47113` at the top left, through `#FFDABF`, to `#CB8DD7` at
+              the bottom right. §27.8 gave it `--layer-01` inside the grey
+              lattice hairline — the same flat card every other block gets, so
+              nothing about the surface said who was speaking. The gradient
+              rule is what says it now, and the ground stays plain white
+              because the rule is doing that work.
 
-   THE LITERAL IS DELIBERATE. It is not `--tal-chip-1` (`#f6efe5`) nor any
-   other token in §01 — it is warmer and lighter than both, chosen for this
-   surface. §33.6 sets the same precedent for the sphere's three oranges: a
-   value that belongs to one component and is stated where that component is.
+     YOU      a left-to-right gradient, `rgba(255,232,215,.5)` to
+              `rgba(244,254,246,.5)`, inside the same `#d7d5cc` hairline the
+              rest of the product uses, with BLACK text. §27.8 had it solid
+              `--text-primary` with white ink. That is the larger of the two
+              changes: the candidate's own turn stops being the heaviest
+              object in the thread and becomes the lighter of the pair.
 
-   `background-image:none` matters as much as the colour: it is what takes the
-   two gradients off, and without it §27.8's `background-color` would simply
-   be repainted underneath them.
+   THE FILE'S TWO ODD NUMBERS ARE NOT COPIED. Figma reports the Tal border as
+   `1.104px` and its padding as `17.668px`: the frame was pasted and scaled,
+   so those are 1px and ~17px with the scale factor still in them. A 1.104px
+   border renders as a blurred 1px on most displays and as 2px on some. The
+   hairline is 1px and the padding stays §27.8's 17px, which is what the
+   number was before it was multiplied.
 
-   `:not(.me)` because the candidate's own bubble is `--brand-primary` with
-   white ink (§27.8), and a cream ground under white text is unreadable.
-   Tal's side only.
+   `#d7d5cc` IS `--rule`. The token is `#d7d5cd` — one value off in the last
+   digit, which is the same colour to the eye and to any sampler. The token
+   is used rather than the literal so this hairline keeps moving with every
+   other hairline in the product.
+
+   `#f47113` IS NOT `--accent` (`#f57414`) and is not made into one. It is the
+   sphere's mid-orange, already stated as a literal in §33.6 for the same
+   reason: a value that belongs to one component, written where that component
+   is. The other two stops are this component's alone.
+
+   THE GRADIENT IS DRAWN WITH `border-image`, AND THAT IS ONLY SAFE BECAUSE
+   THE CORNERS ARE SQUARE. `border-image` ignores `border-radius` — an element
+   with both gets a rounded background inside a square gradient frame. §10.250
+   sets `border-radius:0` across this product and nothing gives `.bb` a radius,
+   so there is no corner to lose. If a radius is ever added to these bubbles
+   this rule has to become the two-background `padding-box` / `border-box`
+   construction instead; it cannot simply be given a radius.
+
+   `border-color` IS SET AS WELL AS `border-image`, deliberately. It is the
+   fallback: `border-image` needs `border-style` and a width to paint into, and
+   anywhere it does not resolve the declared colour is what shows. Setting it
+   to `transparent` — the usual shorthand for this trick — would mean an
+   invisible border rather than a flat orange one.
    ------------------------------------------------------------------------ */
 .app .ask-thread .tal-msg:not(.me) > .bb,
 .app .tal-panel .tal-msg:not(.me) > .bb{
-  background-color:#fff5ee;
-  background-image:none}
+  background-color:#ffffff;
+  background-image:none;
+  border:1px solid #f47113;
+  border-image:linear-gradient(135deg,
+    #f47113 0%, #ffdabf 50%, #cb8dd7 100%) 1;
+  box-shadow:0 0 10px rgba(255,192,146,.15)}
+
+/* THE CANDIDATE'S OWN TURN. `background-image` carries the gradient and
+   `background-color` is the white it sits on — both halves are 50% alpha in
+   the file, so without a ground under them the page shows through and the
+   pair reads darker over the thread's own wash. */
+.app .ask-thread .tal-msg.me > .bb,
+.app .tal-panel .tal-msg.me > .bb{
+  background-color:#ffffff;
+  background-image:linear-gradient(to right,
+    rgba(255,232,215,.5) 0%, rgba(244,254,246,.5) 100%);
+  border:1px solid var(--rule);
+  color:var(--text-primary);
+  min-height:32px;
+  padding:4px 16px}
+
+/* THE HEIGHT IS THE PRIMARY BUTTON'S, AND THE 4px IS DERIVED FROM IT.
+   §03.394 gives `.tw-btn` `min-height:32px`, and a one-line question in this
+   bubble was 56 — the Figma frame's 16px of padding on all four sides, which
+   is right for the mockup's 14px/18px type and too much for the 13.5px/22px
+   the thread actually sets.
+
+   32 is the target, so: 32 minus the 22px line box minus the 2px of border,
+   halved, is 4. `min-height` carries the rest — a one-line message lands on
+   exactly 32 and a two-line one grows from there rather than being clamped,
+   which is what a fixed `height` would have done to every long question.
+
+   Only the VERTICAL padding moves. 16px at the sides is the file's value and
+   the ask was about height. */
 
 /* ------------------------------------------------------------------ 11 ---
-   AND THE CHIPS ON IT ARE THE ACCENT, BECAUSE THEY WERE THE SAME TWO COLOURS
+   THE CHIPS KEEP §22's OWN FILL — THE COLLISION THAT TOOK IT AWAY IS GONE
 
-   This is not a taste change, it is a collision. §22's chip is
-   `background-color:var(--tal-chip-1)` with a radial of `--tal-chip-2` over
-   it — and §10 above just painted the bubble with those same two tokens. A
-   chip made of the ground it sits on is a chip you cannot see: the suggested
-   questions dissolved into the wash the moment it arrived.
+   For a while this section repainted `.tw-chips .chip-tal` solid `--accent`
+   with a white sparkle, and the reason was real: §10 had painted the bubble
+   with `--tal-chip-1` and `--tal-chip-2`, which are the exact two tokens §22
+   builds the chip out of. A chip made of the ground it sits on is a chip you
+   cannot see, and the suggested questions dissolved into the wash.
 
-   `--accent` IS `#f57414` — the flat accent §01.50 declares and the one the
-   whole product fills with. So the chips take the fill they already own
-   everywhere else rather than a new colour invented for this surface.
+   §10 no longer paints that wash. The bubble is white with a gradient rule,
+   from the Figma frame, so §22's cream fill and its `--tal-chip-2` radial read
+   against it exactly as they do everywhere else in the product — and the
+   sparkle can go back to being the mark rather than a white mask cut for one
+   surface.
 
-   `--on-brand-fill:1` is the flag §19 explains: white on this orange is about
-   2.7:1, under AA, and it is the brand's decision rather than an oversight —
-   declared so `verify.mjs` counts and reports it instead of it passing
-   silently.
-
-   THE SPARKLE HAS TO CHANGE WITH THE FILL. §27.1 swaps `.chip-tal .sk-mark`
-   from a masked star to the `tal-circle.png` blob, which is orange — on an
-   orange chip it disappears. The mark goes back to §12's construction, the
-   `--tal-star` mask, painted in `--on-accent`: a shape tinted by
-   `background-color` recolours, an image does not.
+   So this section states nothing. It is left as a note instead of deleted
+   because "why are these chips not the accent" is a question the two previous
+   versions of this file both answered differently, and the answer is that the
+   condition that justified it was temporary.
    ------------------------------------------------------------------------ */
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal{
-  background-color:var(--accent);
-  background-image:none;
-  border-color:transparent;
-  color:var(--on-accent);
-  --on-brand-fill:1}
-.app .tal-msg:not(.me) > .bb .tw-chips .chip-tal .sk-mark{
-  background-color:var(--on-accent);
-  background-image:none;
-  -webkit-mask:var(--tal-star) center/contain no-repeat;
-          mask:var(--tal-star) center/contain no-repeat}
 
 /* ------------------------------------------------------------------ 12 ---
    ONE OR TWO WORDS IN THE BRAND GRADIENT
@@ -433,11 +483,50 @@
     --on-brand-fill:1}
 }
 
-/* A HIGHLIGHT INSIDE THE DARK BUBBLE IS NOT A HIGHLIGHT. §27.8 fills the
-   candidate's own turn with `--brand-primary` and white ink; the accent on
-   black is the one place this gradient genuinely cannot be read. Tal never
-   writes into that bubble today, but `hl()` is a string helper and a string
-   can be echoed — so the case is closed here rather than left to luck. */
-.app .tal-msg.me > .bb .tw-hl{
-  background-image:none;color:var(--on-brand);
-  -webkit-text-fill-color:var(--on-brand)}
+/* THE DARK-BUBBLE GUARD IS GONE WITH THE DARK BUBBLE. This used to paint a
+   highlight white inside the candidate's turn, because §27.8 filled it with
+   `--brand-primary` and the accent on black is unreadable. §10 above now
+   draws that bubble as a light gradient from the Figma frame, so the ordinary
+   rule reads correctly on it and a second one would only be a way for the two
+   to drift apart. */
+
+/* ------------------------------------------------------------------ 13 ---
+   A MARK ON THE LABEL, AND A RULE FOR WHEN IT IS COLOURED
+
+   Every card opened with the same 11.5px uppercase grey label, so a thread of
+   six answers was six identical grey lines and the eye had nothing to sort
+   them by. A 16px mark on that line gives each card a shape you can recognise
+   before you read it — the wallet, the calendar, the clock — which is the
+   cheapest legibility there is in a list of similar blocks.
+
+   THE COLOUR IS THE WHOLE POINT AND IT IS RATIONED. Ink (`--icon-secondary`)
+   is the resting state and most cards keep it: what a chapter contains, when
+   the calls are, who sees your interview — that is reference, and its mark
+   should be as quiet as the label beside it. The accent is reserved for the
+   cards a person has to ACT on: what is next, what they are behind on, what
+   costs money, what they will get wrong in the interview, and the handover to
+   a human. Roughly a third of them. If every mark were accent the colour
+   would stop meaning "look here", which is the same argument the highlight
+   helper in ai8.js is built on.
+
+   `--accent-text`, NOT `--accent`. §01.33 is explicit that the flat accent is
+   for fills and `--accent-text` is the AA-safe variant for anything drawn as
+   ink — and a 16px glyph is ink. It measures 4.83:1 on this card's white
+   ground where `--accent` would be 2.84:1. This is the same distinction §39.12
+   documents for the text highlight, applied where it costs nothing to respect.
+
+   THE LABEL BECOMES A ROW, which is the only structural change: `.tw-h` was a
+   plain span, and `twIc` (views.js) puts the svg inside the title string
+   rather than adding a parameter to `tw()` that all ~25 call sites would have
+   to pass. `flex:none` on the mark so a long label wraps its words and not the
+   icon; `align-items:center` because the label is uppercase and its optical
+   centre sits above its baseline.
+   ------------------------------------------------------------------------ */
+.app .tal-msg > .bb .tw-h{
+  display:flex;align-items:center;gap:var(--s03)}
+.app .tal-msg > .bb .tw-ic{
+  display:inline-flex;flex:none;line-height:0}
+.app .tal-msg > .bb .tw-ic svg{
+  width:16px;height:16px;display:block;
+  fill:var(--icon-secondary)}
+.app .tal-msg > .bb .tw-ic.acc svg{fill:var(--accent-text)}

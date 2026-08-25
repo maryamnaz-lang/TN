@@ -148,7 +148,7 @@ const hl = (s) => `<b class="tw-hl">${s}</b>`;
    send it. One primitive, one grid, and the row that matters is at the top of
    it rather than beside a dot. */
 function wSupport(askFor){
-  return tw('TalentNext support',
+  return tw(twIc('helpDesk','acc') + 'TalentNext support',
     `<span class="tw-lines">
        <span><b>Ask for</b>${askFor}</span>
        <span><b>Email</b>${SUPPORT.email}</span>
@@ -204,7 +204,7 @@ function wScope(){
     + twChips((typeof LEAD_TAL !== 'undefined' && LEAD_TAL.ctx.leadDash) || ['How are my cohorts doing?']);
   const f = cfg(S.stage);
   const on = f.enrolled || f.complete;
-  return tw('What I can do',
+  return tw(twIc('ai') + 'What I can do',
     `<span class="tw-lines">
        <span><b>Course</b>${on
          ? 'what is in a chapter, what your assessments measured, where you are against the other nine, and what to do this week'
@@ -246,7 +246,7 @@ const cand = (re, fn, what) => [re, () => isLead() ? leadNA(what) : fn()];
    Stating the three lines in the order the money moves is what makes $95 plus
    $595 read as $690 rather than as a surprise. */
 function wCost(){
-  return tw('What the 90 days cost',
+  return tw(twIc('wallet','acc') + 'What the 90 days cost',
     `<span class="tw-lines">
        <span><b>$95</b>the interview that sets your level, paid to the agent</span>
        <span><b>$690</b>the Explorer &ndash; E3 course</span>
@@ -271,7 +271,7 @@ function wReCost(){
    first as covering the second finds out on day 12. Both are quoted from the
    pages that carry them, so this cannot drift from the legal line. */
 function wRefund(){
-  return tw('The two refund windows',
+  return tw(twIc('time','acc') + 'The two refund windows',
     `<span class="tw-lines">
        <span><b>Interview</b>free to move or cancel up to 24 hours before. Inside 24 hours the fee is not refundable.</span>
        <span><b>Course</b>full refund up to 7 days after your cohort starts, as long as you have not finished more than one chapter.</span>
@@ -287,7 +287,7 @@ function wRefund(){
    card, we hold the four digits that let you point at it again. Saying only
    the first half is what makes the Payments page look like a lie. */
 function wCard(){
-  return tw('Where your card actually is',
+  return tw(twIc('shield') + 'Where your card actually is',
     `<span class="tw-list">
        <span>The number goes straight to our payment processor. It never reaches a TalentNext server.</span>
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
@@ -312,7 +312,7 @@ function wCard(){
    row. That is not a worse answer than a table. It is the same information,
    one tap away, from the surface that is allowed to hold it. */
 function wLedger(){
-  return tw('Your payments, and why I am not reading them',
+  return tw(twIc('receipt') + 'Your payments, and why I am not reading them',
     `<span class="tw-list">
        <span>Payments has every charge with its date, the card it went to, and a Receipt button on each row.</span>
        <span>Billing is on the short list of things I have never been shown, along with your messages with Priya and anything said on a cohort call.</span>
@@ -339,7 +339,7 @@ function wBillingProblem(){
    with the thing that happens on each. It is the single most-asked question
    on the dashboard and it had no route at all. */
 function wCycle(){
-  return tw('How the 90 days run',
+  return tw(twIc('calendar') + 'How the 90 days run',
     `<span class="tw-lines">
        <span><b>Day 1</b>your cohort of ten starts together, all at the same level</span>
        <span><b>Weekly</b>one chapter, its assessment, and a 60-minute call on Thursday</span>
@@ -356,7 +356,7 @@ function wCycle(){
    named, because the candidate side of the product does not issue one; the
    cohort-leader certification is a different thing, earned by leading. */
 function wEnd(){
-  return tw('What you have at the end',
+  return tw(twIc('certificate') + 'What you have at the end',
     `<span class="tw-list">
        <span>A confirmed level, decided at the re-interview and signed by an agent.</span>
        <span>Your 90-day summary &mdash; the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
@@ -370,7 +370,7 @@ function wEnd(){
    signed artefact and nothing anywhere says what is in it. */
 function wSummary(){
   const f = cfg(S.stage);
-  return tw('What is in the 90-day summary',
+  return tw(twIc('document') + 'What is in the 90-day summary',
     `<span class="tw-list">
        <span>Every chapter you finished and what it was assessed at.</span>
        <span>The growth areas from your level interview, and whether the 90 days moved them.</span>
@@ -412,7 +412,7 @@ function wChapterAny(nums){
     return `<span><b>Chapter ${n} &middot; ${name}</b><br>${mins} min &middot; ${state}${GROWTH.includes(i) ? ' &middot; your growth area' : ''}</span>`;
   }).join('');
   const growth = list.filter(n => GROWTH.includes(n - 1));
-  return tw(list.length > 1 ? 'The chapters you asked about' : 'Chapter ' + list[0],
+  return tw(twIc('book') + (list.length > 1 ? 'The chapters you asked about' : 'Chapter ' + list[0]),
     `<span class="tw-list">${rows}</span>
      ${growth.length ? `<span class="tw-k">${growth.length === list.length && list.length > 1
         ? 'Both are growth areas from your report, which is why they are named together.'
@@ -431,7 +431,7 @@ function wLowest(){
     + twChips(['What should I do next?','How are chapters assessed?']);
   const done = SCORE.slice(0, f.done);
   const lo = Math.min(...done), i = done.indexOf(lo);
-  return tw('Your lowest assessment',
+  return tw(twIc('chart') + 'Your lowest assessment',
     `<span class="tw-lines">
        <span><b>${lo}%</b>chapter ${i + 1}, ${CH[i][0]}</span>
        <span><b>${f.avg}%</b>your average across ${f.done} assessed</span>
@@ -447,7 +447,7 @@ function wStanding(){
   const f = cfg(S.stage);
   if(!f.enrolled && !f.complete) return `You are not on a course yet, so there is nothing to be doing well or badly at. What is decided so far is your track &mdash; Explorer, from the quiz &mdash; and the next thing that moves is your level.`
     + twChips(['What should I do next?','How does the ladder work?']);
-  return tw('Where you are',
+  return tw(twIc('growth') + 'Where you are',
     `<span class="tw-lines">
        <span><b>${f.done} of 13</b>chapters finished</span>
        <span><b>${f.avg ? f.avg + '%' : '&mdash;'}</b>${f.avg ? 'your average, against a cohort average of 79%' : 'nothing assessed yet'}</span>
@@ -476,7 +476,7 @@ function wPace(){
   if(f.finished || f.complete) return `You are not behind &mdash; all 13 chapters are done and the 90 days are finished. What is outstanding is the re-interview, and that is a booking rather than a backlog.`
     + twChips(['What happens at the re-interview?','What is in the 90-day summary?']);
   if(!w) return '';
-  return tw('Against your cohort',
+  return tw(twIc('time','acc') + 'Against your cohort',
     `<span class="tw-lede">${w.tal}</span>`,
     `${twBtn('Open Coursework','coursework')}<button class="tw-btn ghost" data-ask="1">${w.ask[0]}</button>`);
 }
@@ -503,7 +503,7 @@ function wNext(){
   const [title, body, chip, go] = n;
   /* `.tw-lede`, not a one-item `.tw-list` — see §39.3. The headline is the
      answer; a bullet beside it reads as a list whose other items are missing. */
-  return tw('Next',
+  return tw(twIc('flag','acc') + 'Next',
     `<span class="tw-lede">${title}</span>
      <span class="tw-k">${body}</span>`,
     `${twBtn(go === 'enrol' ? 'Open Enroll' : go === 'agents' ? 'See the agents' : go === 'coursework' ? 'Open Coursework' : go === 'interviews' ? 'Open Interviews' : 'Open chapter 4', go)}<button class="tw-btn ghost" data-ask="1">${chip}</button>`);
@@ -522,7 +522,7 @@ function wMoveUp(){
     + twChips(['What happens in the 45 minutes?', 'How does the ladder work?']);
   if(f.complete) return `You moved on November 21. E5 is the top of the Explorer track and the next 90 days are what decide it; the shape is the same &mdash; the chapters, the leader&rsquo;s recommendation, the re-interview.`
     + twChips(['What is different about E4?', 'What is in the 90-day summary?']);
-  return tw('What moves you from ' + f.level + ' to E4',
+  return tw(twIc('growth','acc') + 'What moves you from ' + f.level + ' to E4',
     `<span class="tw-list">
        <span>The two growth areas Priya named in your report: <b>chapter 4, Delegation Without Drop-Off</b> and <b>chapter 5, Hard Conversations</b>. Those are what she will re-test.</span>
        <span>Your cohort leader&rsquo;s recommendation at day 90, which is written from your weekly tasks and the calls, not from your average.</span>
@@ -544,7 +544,7 @@ function wFinish(){
     + twChips(['Explain the 90-day cycle', 'What should I do next?']);
   if(f.complete) return `It is finished. All 13 chapters, the summary signed on November 21, and the re-interview decided &mdash; you moved to E4. What is open now is the next course, not this one.`
     + twChips(['What is different about E4?', 'What do I have at the end?']);
-  return tw('What is left',
+  return tw(twIc('calendar') + 'What is left',
     `<span class="tw-lines">
        <span><b>Day ${f.day}</b>of 90 &mdash; ${90 - f.day} days to go</span>
        <span><b>Week ${f.week}</b>of 13 &mdash; ${13 - f.week} chapters still to open</span>
@@ -560,7 +560,7 @@ function wFinish(){
    of it. Tal says what the constraint IS — which is the part nobody explains
    — and then hands the exception to the two people who can grant one. */
 function wPause(){
-  return tw('Pausing, or moving cohort',
+  return tw(twIc('pause') + 'Pausing, or moving cohort',
     `<span class="tw-list">
        <span>A cohort is a fixed ten moving together for 90 days, with one live call a week. There is no self-service pause, because pausing means leaving the group you are in.</span>
        <span>Your cohort leader can carry you through a bad fortnight &mdash; that is what the flag on their dashboard is for, and it clears itself when you come back.</span>
@@ -579,7 +579,7 @@ function wPause(){
    "Can I reschedule my interview?" matched data.js's broad interview route
    and came back with what an interview IS. */
 function wMove(){
-  return tw('Moving or cancelling an interview',
+  return tw(twIc('renew') + 'Moving or cancelling an interview',
     `<span class="tw-lines">
        <span><b>Up to 24h</b>free to move to any of the agent&rsquo;s other slots, or to cancel for a full refund</span>
        <span><b>Inside 24h</b>you can still move it, but the fee is not refundable</span>
@@ -596,7 +596,7 @@ function wMove(){
    and it also happens to tell the person how to prepare. */
 function wNoQuestions(){
   return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; ${hl('nobody')} has the questions in advance, including them.`
-    + tw('So preparation is three things, not revision',
+    + tw(twIc('checkOutline') + 'So preparation is three things, not revision',
       `<span class="tw-check">
          <span>One story where you handed work over and it went wrong</span>
          <span>What you would do differently, in one sentence</span>
@@ -611,7 +611,7 @@ function wNoQuestions(){
    than as advice, because "be confident" is not actionable and "do not
    qualify the answer while you are giving it" is. */
 function wNotDo(){
-  return tw('The four that cost people most',
+  return tw(twIc('warningAlt','acc') + 'The four that cost people most',
     `<span class="tw-list">
        <span>Do not qualify your answer while you are giving it. Say the thing, then say what you would change.</span>
        <span>Do not bring the story where you were right. Bring the one that went wrong &mdash; the judgement is in what you did next.</span>
@@ -638,7 +638,7 @@ function wWhenLevel(){
    halves matter, because the useful conclusion is that neither number is a
    prediction about you. */
 function wRank(){
-  return tw('The number on an agent card',
+  return tw(twIc('star') + 'The number on an agent card',
     `<span class="tw-lines">
        <span><b>4.8</b>the average score past candidates gave Priya after their interview, out of 5, across 210 of them</span>
        <span><b>E1&ndash;E3</b>the levels she is certified to assess, not the levels she tends to give</span>
@@ -654,7 +654,7 @@ function wRank(){
    because "does paying more get me a better level" is the question underneath
    it, and the answer to THAT one has to be an unambiguous no. */
 function wPrice(){
-  return tw('What the price is and is not',
+  return tw(twIc('wallet') + 'What the price is and is not',
     `<span class="tw-lines">
        <span><b>$80</b>Lena Fischer &middot; 4.5 &middot; E1&ndash;E4</span>
        <span><b>$95</b>Priya Nair &middot; 4.8 &middot; E1&ndash;E3</span>
@@ -715,7 +715,7 @@ function wLeader(){
    the calls are NOT recorded, which is on Tal's own `NEVER` list and is the
    reason missing one cannot be fixed by watching it later. */
 function wCallLogistics(){
-  return tw('The weekly call',
+  return tw(twIc('video') + 'The weekly call',
     `<span class="tw-lines">
        <span><b>When</b>Thursday, 6:00 PM ET, every week for 13 weeks</span>
        <span><b>Long</b>60 minutes, video, you and the other nine</span>
@@ -752,7 +752,7 @@ function wSwitch(){
    chips landed on the transcript-search route, which offered to look things
    up in the recording rather than saying who else can. */
 function wSeen(){
-  return tw('Who sees your interview',
+  return tw(twIc('group') + 'Who sees your interview',
     `<span class="tw-list">
        <span>The agent who interviewed you, and the cohort leader who runs your course. Nobody else, unless you share your report yourself.</span>
        <span>Recordings are video and audio, transcribed so the agent can write the report, kept for 24 months and then deleted.</span>
@@ -770,7 +770,7 @@ function wSeen(){
 function wTalScope(){
   const live = (typeof MEMO !== 'undefined')
     ? MEMO.filter((m, i) => !(S.memDrop || []).includes(i)).length : 0;
-  return tw('What I can and cannot see',
+  return tw(twIc('view') + 'What I can and cannot see',
     `<span class="tw-lines">
        <span><b>I see</b>your course progress, your chapter notes, your points, your interview transcripts and your report</span>
        <span><b>I never</b>${(typeof NEVER !== 'undefined' ? NEVER : []).map(n => n.replace(/\.$/, '')).join('; ') || 'see your messages, your calls or your card'}</span>
@@ -784,7 +784,7 @@ function wTalScope(){
    destructive action belongs. Tal's job is to say exactly what goes and what
    survives, because that is the part people get wrong. */
 function wClose(){
-  return tw('Closing your account',
+  return tw(twIc('warning') + 'Closing your account',
     `<span class="tw-list">
        <span>It removes your profile, your notes and your interview recordings.</span>
        <span>Certificates and signed summaries you have already earned stay valid and stay downloadable.</span>
@@ -811,7 +811,7 @@ function wBroken(){
     return `I cannot see anything to do with signing in &mdash; I only exist once you are already inside. Reset the password from the log-in screen first; that clears most of these, and it does not touch your course record.`
     + wSupport('a password reset by hand, if the reset email does not arrive either. Give them the address you signed up with');
   return `That is not something I can see from in here &mdash; I have your course and your interviews, not your browser or the video player.`
-    + tw('Worth trying once',
+    + tw(twIc('renew') + 'Worth trying once',
       `<span class="tw-list">
          <span>${hl('Reload the page')}. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
          <span>If it is the same on a second browser, it is our end, not yours.</span>

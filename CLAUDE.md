@@ -91,12 +91,26 @@ more render-pass jobs a hand-authored page has to do itself: the steps popup is
 (`views.js` ends on exactly those two lines), and the entrance cascade stamps `--i` on the
 section list rather than on every child.
 
-**A live defect in the popup, in both portals.** `.stp-all > div` (§03.90 / §04.120, written
-when `.stp-all` held the step rows directly) now lands on §33's `.stp-pop` wrapper and makes
-it a flex row — so "Where you are" is laid out beside the list and half outside the white
-card. Open the steps popup in the candidate portal and it is there. The fix is one
-declaration in `33-talsum.css` (`.stp-all > .stp-pop{display:block}`, which outweighs it);
-`tn-agent-portal.html` steps around it with `<section class="stp-pop">` until then.
+**The steps popup is a dropdown, and three of its rules are markup, not CSS.** §33.7 owns it
+and the whole argument is written there; what a hand-authored page has to do:
+
+- **`.stp-all` goes INSIDE `.stp-top`** (or `.stp-h` on the untitled variant), because the row
+  the toggle is in is what the panel is anchored on. Written as a sibling of that row it
+  anchors on `.stp` — the whole stepper — and opens 117px below the button, clear of the
+  current-step block, reading as a loose card rather than that button's menu.
+- **The toggle's words go in `<span class="stp-t-l">`.** At desktop the wing is an `auto` grid
+  track, so the header row's max-content sizes it, and "Hide steps" is 13px wider than "All
+  steps" — pressing it moved the card and reflowed Tal's sentence. The span reserves 68px.
+- **A row is `.pi-ic` + `.pi-b`.** A tick (`I.checkFilled`) when the step is done, the step's
+  own subject icon when it is not — `stepIcon` derives that from the label, and both portals
+  carry the same table so "Vetting" cannot be a shield on one page and a ring on the other.
+  State goes on the row (`.pi-step.done` / `.on`); the mark's ground is drawn from it.
+
+Two specificity traps live here and both are answered on one selector. §03/§04's `.stp-all >
+div` (0,1,1) was written when `.stp-all` held the step rows directly and now lands on §33's
+`.stp-pop` wrapper, so it beat `.stp-pop`'s own `display` *and* its `padding` — the first laid
+the panel's heading out beside the list, the second gave the panel 8px top and bottom and
+**none at the sides**. `.stp-all > .stp-pop` in `33-talsum.css` states both.
 
 Excluded now, and only these: `ask*` `bk*` `scene*` (their behaviour *is* a render pass over
 portal state), `auth*` `lsvt*` `ios-*` `nil*` (separate surfaces). `build-ds.py` prints the
@@ -158,6 +172,14 @@ cd hifi/build && python3 build.py
 **Every rule carries its reasoning in the source.** That is this project's convention: read
 the comment above a rule before changing it — several of them record a decision that looks
 like a bug and isn't. Keep writing them that way.
+
+**And the comments are load-bearing enough that the build checks them.** The common edit is
+"add a paragraph to the note above this rule", and a paragraph that lands *after* the closing
+`*/` is read by CSS as the start of a selector — it silently eats the rule underneath it.
+Nothing throws, the page renders, one declaration is just absent. It happened twice (§39.3's
+`.tw-lede` sizing had shipped dead for as long as that layer existed; §33.7's panel padding
+went the same way, found the same afternoon), so `build.py` now refuses to write if any
+unmatched `/*` or `*/` survives the comment strip, and prints the line.
 
 ### The head of a page has TWO copy slots and they do different jobs
 

@@ -479,9 +479,19 @@
    Scoped to `.tint-2` rather than to `.tint`, because `.tint` sections in the
    candidate and leader portals hold `.kv` rows today and this is not a change
    anybody asked for there.
+
+   THAT LAST PARAGRAPH IS NOW HISTORY, AND SO IS THE DECLARATION IT DEFENDED.
+   It IS a change somebody asked for: the reading above is general — a `.kv`
+   never bleeds, whatever holds it — and scoping it to the one block that had
+   been looked at is what left the defect live in a filled `.tint` section, in
+   a `.lvl-hero`, in a `.chart`, and in every band the agent portal's `kv()`
+   helper draws. §18 states it once now by leaving `.kv` off its list, so the
+   row keeps its own `border-bottom` — which already spans the box the gutter
+   placed — and the `left:0;right:0` that was on this line, along with §29.13's
+   `.tile` twin, has nothing left to undo. Only the ground stays here, which is
+   all this section was ever about.
    -------------------------------------------------------------------------- */
 .app .sec.tint.tint-2{--surface-2:var(--surface-3)}
-.app .view-col .main .page .sec.tint-2 .kv::after{left:0;right:0}
 
 /* --------------------------------------------------------------------------
    12. THE PLOT IS AS TALL AS IT IS WIDE, SO ITS WIDTH IS CAPPED

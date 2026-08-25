@@ -131,7 +131,26 @@ css = '\n'.join((here / f).read_text() for f in
                  # control inside a gradient block inherits on-accent ink, and
                  # its phone block restates the grid from §10's own breakpoint.
                  # Both have to land after the layers that state them.
-                 '41-cal.css'])
+                 '41-cal.css',
+                 # A ROW'S STATUS BESIDE ITS TITLE, its subject in its mark.
+                 # `.row-st` and the `.rst-*` row classes are names no earlier
+                 # layer mentions, so the position is nearly free — it is last
+                 # for the one correction it makes, §02's `display:block` on
+                 # `.cardrow-t` and `.gcard-b h3`, which it takes off ONLY for a
+                 # title that contains a status (`:has()`). §11 restates those
+                 # titles' type without touching display, so nothing between
+                 # §02 and here is in the way.
+                 '42-rowstatus.css',
+                 # AN EMPTY STATE OWNS THE PAGE IT IS ON. Three things: §10.15's
+                 # label-column opt-out list extended (restated inside the same
+                 # container query, per trap 3 — it cannot be outranked from
+                 # outside one), the page made a flex column so the section can
+                 # take the height that is left, and the actions folded into the
+                 # centred block. Scoped with `:has(> .sec > .empty)` throughout,
+                 # so it reaches only a page that carries one. Nothing in §41 or
+                 # §42 names `.empty`, and §02 is the only layer that lays it
+                 # out, so this has to land after §02 and is otherwise free.
+                 '43-empty.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -208,6 +227,37 @@ _css_before = len(css)
 css = re.sub(r'/\*[\s\S]*?\*/', '', css)
 css = re.sub(r'\n[ \t]*\n+', '\n', css)
 print(f'css comments stripped: {(_css_before - len(css))/1024:.0f} KB')
+
+# ==========================================================================
+# AND A STRAY `*/` IS THE ONE TYPO THIS BUILD USED TO SWALLOW
+# Layers here open with a long comment and the rules follow it, so the common
+# edit is "add a paragraph to the note above the rule" — and if the paragraph
+# lands after the `*/` instead of before it, CSS reads the prose as the start
+# of a selector and eats the rule underneath it. Nothing throws: the file
+# builds, the page renders, and one declaration is silently absent. It has
+# happened twice — §39.3's `.tw-lede` sizing (the widget's headline shipped at
+# the body size for as long as that layer has existed) and §33.7's panel
+# padding, found the same afternoon while fixing the first.
+#
+# After the strip above, an unmatched delimiter is all that is left of it, and
+# it costs one regex to refuse. The check runs on the CONCATENATION rather than
+# per file, and reports the layer by counting newlines, because a comment could
+# in principle be opened in one layer and closed in the next — it never is, and
+# saying so here is cheaper than a rule that assumes it.
+# ==========================================================================
+_stray = [m.start() for m in re.finditer(r'/\*|\*/', css)]
+if _stray:
+    _at = _stray[0]
+    raise SystemExit(
+        'STRAY COMMENT DELIMITER — nothing written.\n'
+        f'  {len(_stray)} unmatched `/*` or `*/` survived the comment strip, '
+        f'the first around line {css.count(chr(10), 0, _at) + 1} of the '
+        'concatenated CSS:\n'
+        f'    …{css[max(0, _at - 120):_at + 60]}…\n'
+        '  Almost always a paragraph written AFTER the closing `*/` of the note '
+        'above a rule.\n'
+        '  The rule that follows it is being eaten. Move the prose inside the '
+        'comment.')
 
 inter = base64.b64encode((here / 'inter.woff2').read_bytes()).decode()
 css = css.replace('__INTER__', f'data:font/woff2;base64,{inter}')

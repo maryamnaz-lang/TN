@@ -268,10 +268,30 @@
 
    IT HANGS FROM THE TOGGLE'S CORNER. `right:0` on the anchor puts the panel's
    right edge on the chevron's right edge — the toggle is `margin-left:auto` in
-   `.stp-top`, so those are the same edge at every width — and `top:100%` drops
-   it clear of the wing rather than over the step it is describing. The width is
+   `.stp-top`, so those are the same edge at every width. The width is
    `min(340px, 100%)`: 100% of the anchor, so on a phone, where the wing is the
    full card, the panel cannot reach past the edge `.main` would clip it at.
+
+   AND THE ANCHOR IS THE HEADER ROW, NOT THE WHOLE STEPPER — which is the one
+   thing this block got wrong. `.stp` is the heading, the meter, the toggle AND
+   the current-step block, so `top:100%` on it dropped the panel below all four:
+   117px under a button 55px from the top of the component, with the wing's own
+   summary in the gap. A dropdown that far from what opened it reads as a card
+   that happens to be there, and the note above says it in as many words —
+   "hangs from the toggle's corner" — while measuring from the wrong box.
+
+   `stepper()` emits the panel INSIDE the row the toggle is in (`.stp-top` when
+   there is a heading, `.stp-h` when there is not) and that row is what is
+   `position:relative` now, so `top:calc(100% + var(--s02))` is 8px under the
+   button. It covers the current-step block while open, which is correct: the
+   panel lists that step as its `on` row, so nothing is hidden that the panel
+   is not already saying, and closing it is one press on the same button.
+
+   THE PANEL'S OWN PADDING HAD TO BE SAID IN THE WINNING SELECTOR. `.stp-pop`
+   asked for `var(--s05)` and got `8px 0` — §03/§04's `.stp-all > div` again, one
+   specificity step above it (see the block below), so the list ran into the
+   panel's left and right edges. It is declared on the same `> .stp-pop` selector
+   that fixes the `display`, because that is the only one that outranks it.
 
    AND IT IS SQUARE. `.stp-pop` carried `border-radius:12px` in a system whose
    `--radius` is 0 and whose only curves are marks (50%) and pills (999px) — the
@@ -287,17 +307,51 @@
 .app .modhead .ai-aura.talsum > .stp-wing > .stp{
   position:relative;padding:0}
 
+/* THE ANCHOR IS THE BUTTON, AND IT TOOK TWO GOES TO GET THERE. It was `.stp`,
+   the whole stepper, which dropped the panel 117px below the toggle. Then it was
+   `.stp-top`, the toggle's row — better, and still not it: at desktop §33.8 puts
+   `.stp-meter` on `order:3; width:100%`, so that row is TWO lines and `top:100%`
+   of it clears the progress rail as well. The panel opened 27px under the
+   chevron with the rail and the count in the gap, which still reads as a card
+   that happens to be below rather than as that button's menu.
+
+   `.stp-tw` is a wrapper `stepper()` puts around the toggle for no other reason
+   than to be the thing this hangs from. It takes the `margin-left:auto` the
+   button had — §24 puts it on `.stp-t`, which is now the wrapper's only child,
+   so the auto margin has to move up one level or the button pushes itself to the
+   right of a box that is already shrink-wrapped to it.
+
+   AND THE WIDTH CANNOT BE `100%` ANY MORE. It was `min(340px, 100%)` — 100% of
+   the anchor, which was the full wing and was the guard that kept the panel
+   inside the page on a phone. 100% of the wrapper is the button, about 90px. The
+   guard is a CONTAINER unit instead: `100cqw` is the app container's own width
+   (`.device` carries `container-name:app`), and 32px off it is the page gutter.
+   So the panel is 340px wherever 340px fits and the column's width minus its
+   gutter where it does not. */
+.app .modhead .ai-aura.talsum > .stp-wing .stp-tw{
+  position:relative;margin-left:auto;flex:none;display:flex}
+
 /* The base `.stp-all` (§03) is an inline block with a rule above it and its own
    top margin and padding — the shape from when "All steps" expanded in place.
    As a dropdown the panel owns its frame, so all three are zeroed here. */
 .app .modhead .ai-aura.talsum > .stp-wing .stp-all{
   display:none;position:absolute;z-index:60;
-  top:calc(100% + var(--s03));right:0;
-  width:min(340px, 100%);
+  top:calc(100% + var(--s02));right:0;
+  width:min(340px, calc(100cqw - var(--s06) * 2));
   margin:0;padding:0;border-top:0}
 
 .app .modhead .ai-aura.talsum > .stp-wing .stp.open .stp-all{
   display:flex}
+
+/* AND PRESSING IT MUST NOT MOVE THE CARD. The wing is an `auto` grid track at
+   desktop (§33.8), so the track is sized on the header row's max-content and
+   "Hide steps" is 13px wider than "All steps" — the wing went 391px → 404px on
+   open and Tal's sentence beside it lost 13px and reflowed mid-press. 68px is
+   the longer label measured (66.9px at 600/14px) rounded up, right-aligned so
+   the shorter one stays against the chevron. The button has no ground, so the
+   reserved sliver is invisible in either state. */
+.app .stp-t > .stp-t-l{
+  display:inline-block;min-width:68px;text-align:right}
 
 /* AND THE BAND HAS TO OUTRANK THE PAGE WHILE THE PANEL IS OPEN, which is the
    one thing `absolute` costs that `fixed` did not. §25 gives `.modhead`
@@ -324,8 +378,17 @@
    (0,1,0) and loses, which is why naming the class in the child position is the
    fix rather than adding `display:block` to the rule below. `tn-agent-portal`
    was stepping around this by emitting a `<section>` so the type selector
-   missed; its note said the real fix belonged in the build, and this is it. */
-.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{display:block}
+   missed; its note said the real fix belonged in the build, and this is it.
+
+   The same rule is where the panel's PADDING has to be stated, for the same
+   arithmetic: `.stp-pop{padding:var(--s05)}` below is (0,1,0) and lost to
+   `.stp-all > div{padding:var(--s03) 0}`, so the panel had 8px of padding top
+   and bottom and NONE at the sides — the reason the list sat hard against the
+   white card's left edge. `var(--s04) var(--s05)` is the box's own measure:
+   16px at the sides, 12px top and bottom, because the rows below already pay
+   8px of their own above the first mark and under the last. */
+.app .modhead .ai-aura.talsum > .stp-wing .stp-all > .stp-pop{
+  display:block;padding:var(--s04) var(--s05)}
 
 .stp-pop{
   width:100%;padding:var(--s05);
@@ -337,6 +400,89 @@
   font-size:13px;font-weight:600;line-height:18px;letter-spacing:.6px;
   text-transform:uppercase;color:var(--text-helper);
   margin:0 0 var(--s04)}
+
+/* --------------------------------------------------------------------------
+   7b. THE PANEL'S LIST — A RAIL, NOT FIVE LOOSE ROWS
+
+   What the panel drew was five 20px rings in a column, one of them dashed, and
+   nothing joining them: a list of five ticks at three greys, where the only
+   thing the marks said was already said by the rail and the "Step 1 of 5"
+   caption in the header row directly above. So the marks say something else
+   now (`STEP_IC` in views.js is the argument for WHICH icon) and this block
+   draws them as a journey — one hairline running down the column, each mark
+   sitting on it, and the ground of the mark carrying the state:
+
+     done  brand ground, tick in `--on-brand`, and the rail above it is brand
+     on    accent ground, the step's own icon in `--on-accent`
+     next  the canvas, a hairline, the step's own icon in `--icon-secondary`
+
+   AND THE MARK IS A COLOURED GLYPH, NOT A TILE. The first version of this block
+   gave it the product's 28px mark box — a ground, a hairline, brand black behind
+   a finished step and accent behind the one you are on. In a 340px dropdown at
+   28px that is five heavy tiles down the left edge, and the two black ones read
+   as buttons: the box was carrying the state, so the state was the loudest thing
+   in a panel whose job is to list five names. The box comes off. What is left is
+   the icon at its own colour, which is the same trade §16 already made for every
+   other state marker in the product — "a box around them would make a status
+   look like an object".
+
+   THE GROUND STAYS, INVISIBLY, and only because of the rail. `--layer-01` is the
+   panel's own white, so the mark masks the hairline running behind it instead of
+   sitting on top of a line through its middle. Nothing is drawn; it is a gap in
+   the rail with an icon in it.
+
+   Everything is `.stp-pop`-scoped. `.pi-ic` is shared with nothing else that
+   ships — but `.app .stp .pi-ic` (§16) is (0,3,0) and strips ground and border
+   from every state marker in the product, so the mark rules below carry `.app
+   .stp .stp-pop` to outrank it rather than to reach further than they need.
+
+   THE GEOMETRY IS THREE NUMBERS AND THEY ARE DECLARED ONCE. `--pi-mark` is the
+   box, `--pi-gap` the padding above and below each row; the rail's `left` is
+   half a box less half a pixel, and the first and last rows stop the rail at
+   their own mark's centre — `--pi-gap + --pi-mark/2` from the row's top edge.
+   Change the box and the rail follows. `.pi`'s own `gap` goes to 0 because a
+   flex gap is space the rows do not own, and the rail is drawn per row.
+   -------------------------------------------------------------------------- */
+.app .stp .stp-pop .pi{
+  --pi-mark:28px;--pi-gap:var(--s03);
+  gap:0;padding:0}
+
+.app .stp .stp-pop .pi-step{
+  position:relative;
+  display:flex;align-items:flex-start;gap:var(--s04);
+  min-height:0;padding:var(--pi-gap) 0;
+  border:0}
+
+/* the rail: full-height behind the row, clipped at the end marks */
+.app .stp .stp-pop .pi-step::before{
+  content:'';position:absolute;z-index:0;
+  left:calc(var(--pi-mark) / 2 - .5px);top:0;bottom:0;width:1px;
+  background:var(--rule)}
+.app .stp .stp-pop .pi-step.done::before{background:var(--brand-primary)}
+.app .stp .stp-pop .pi-step:first-child::before{
+  top:calc(var(--pi-gap) + var(--pi-mark) / 2)}
+.app .stp .stp-pop .pi-step:last-child::before{
+  bottom:calc(100% - var(--pi-gap) - var(--pi-mark) / 2)}
+
+.app .stp .stp-pop .pi-ic{
+  position:relative;z-index:1;
+  width:var(--pi-mark);height:var(--pi-mark);flex:none;
+  display:grid;place-items:center;
+  background-color:var(--layer-01);
+  border:0}
+.app .stp .stp-pop .pi-ic svg{width:19px;height:19px;fill:var(--gray-40)}
+.app .stp .stp-pop .pi-step.done .pi-ic svg{fill:var(--support-success)}
+.app .stp .stp-pop .pi-step.on   .pi-ic svg{fill:var(--support-attention)}
+
+/* THE TEXT COLUMN, AND THE ONE ROW THAT IS SET IN FULL INK. A panel where
+   every label is `--text-primary` is five equal rows and the reader has to
+   find the accent mark to know which one is now. The step you are on keeps
+   full ink; what is done and what is ahead are both secondary, because neither
+   is the answer to "where am I". */
+.app .stp .stp-pop .pi-b{min-width:0;flex:1;padding-top:1px}
+.app .stp .stp-pop .pi-lab{color:var(--text-secondary)}
+.app .stp .stp-pop .pi-step.on .pi-lab{color:var(--text-primary)}
+.app .stp .stp-pop .pi-sec{margin-top:2px}
 
 /* --------------------------------------------------------------------------
    9. THE GREETING — TAL OWNS THE WELCOME

@@ -70,6 +70,18 @@ LAYERS = [
     # is stated here as a layer for the reason this file's header gives: a
     # component built anywhere else is one the next portal re-implements.
     '41-cal.css',
+    # A row's status beside its title (`.row-st`), its subject in its mark. The
+    # second layer written for the design system rather than for the candidate
+    # portal: the component it corrects is the agent portal's checklist row, and
+    # the arrangement it states — subject on the left, status by the title,
+    # action at the end — is §15's chapter row generalised. Same reason as the
+    # layer above for stating it here: a component built in one portal is one
+    # the next portal re-implements.
+    '42-rowstatus.css',
+    # An empty state owning the page it is on. Written for the design system for
+    # the same reason as the two layers above — the page that showed the problem
+    # is the agent's, and the component is `.empty`, which every portal has.
+    '43-empty.css',
 ]
 
 # ==========================================================================
