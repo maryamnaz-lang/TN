@@ -1,0 +1,384 @@
+/* ==========================================================================
+   51. THE TAL CHAT VIEW
+
+   Figma 433:276 (nothing asked yet) and 439:481 (in conversation). One screen
+   in two states, and the two states are the same drawing with the middle
+   swapped — so this layer is written as the screen, not as two screens.
+
+   WHAT CHANGED, AND WHY EACH ONE IS A SUBTRACTION
+
+   The chat used to be white: a white thread, a white foot, a hairline between
+   them, and a bubble around everything Tal said. The file replaces all four:
+
+     the ground   `#f9f6f0`, a warm ivory, with ONE blurred peach ellipse over
+                  it. The screen has a temperature now instead of being the
+                  absence of one.
+     Tal's turn   no bubble. The mark at the left, the words beside it, on the
+                  page. §27 gave it `background`, `border` and `padding` for a
+                  white thread where a turn needed an edge to be a turn; on a
+                  tinted ground the ground IS the edge.
+     your turn    a black block, right-aligned, no radius. §27 already made it
+                  black — this restates the box (48 tall, 8/20 padding) and
+                  drops the "You" label and the avatar above it.
+     the foot     the coral mesh, and a white field standing on it.
+
+   Every one of those is a plain declaration in an earlier layer at three or
+   four classes deep, which is the whole reason this file is last.
+
+   SCOPED TO `.ask-page` THROUGHOUT. The side panel (`.tal-panel`) draws the
+   same conversation and is `display:none` from the end of §27 — the thread
+   moved here — so it is deliberately NOT dragged along. If it ever comes
+   back it comes back to its own design, not to half of this one.
+   ========================================================================== */
+
+:root{
+  /* THE GROUND AND THE WASH, both read off the file rather than guessed.
+     `#f9f6f0` is the container's stated fill. The wash is `Ellipse 44`:
+     #FEDBD2 at fill-opacity .7, rx 819.6 ry 269.4, blurred at stdDeviation
+     268.25 — and it is stated below as a radial-gradient rather than a
+     blurred element for the reason §24 states its own ellipse that way. What
+     matters is that the two agree: sampled off the file's own render, the
+     wash peaks at #fce8e1 over #f9f6f0, which is #FEDBD2 at .52. A Gaussian
+     at that sigma spreads .7 to about .5, so .52 is the file's number after
+     its own blur, not a second opinion about it. */
+  --askv-ground:#f9f6f0;
+  --askv-wash:254,219,210;
+  /* the file's hairline, and it is not `--rule`. #d7d5cc is warm and #e0e0e0
+     is not; on ivory the cool one reads as a grey line drawn on a cream page.
+     Used on the foot, the field and the chips — every edge on this screen. */
+  --askv-rule:#d7d5cc;
+  --askv-ink:#363636;      /* Tal's prose */
+  --askv-ink-2:#474747;    /* the placeholder and the chip labels */
+  --askv-sub:#535353;      /* the one line under the greeting */
+  --askv-mesh:url(__ASKMESH__);
+}
+
+/* ------------------------------------------------------------------ 1 ---
+   THE GROUND
+
+   On `.ask-page` and not on `.ask-thread`, so the head band and the space
+   behind the foot are the same colour as the middle — the file draws one
+   surface with three things on it, not three surfaces.
+
+   THE WASH IS A GRADIENT SIZED IN PERCENTAGES, unlike §24's, and the two are
+   not in disagreement. §24 pins its radii in pixels because sigma is a pixel
+   quantity and that ellipse has to hold its physical size against a page of
+   any height. This one is the page's own temperature: 1620 x 1070 (rx + 3
+   sigma on both axes) against the file's 1396 x 974 frame IS 116% x 110%, so
+   the percentages ARE the file's numbers at the size the file states them —
+   and they go on scaling sensibly down to a phone, where 1620 pixels of
+   ellipse would be a flat tint over the whole screen.
+   ------------------------------------------------------------------------ */
+.app .ask-page{
+  background-color:var(--askv-ground);
+  background-image:radial-gradient(116% 110% at 67% 2%,
+    rgba(var(--askv-wash),.52) 0%,
+    rgba(var(--askv-wash),.3) 30%,
+    rgba(var(--askv-wash),0) 52%);
+  background-repeat:no-repeat}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE HEAD BAND
+
+   `← ◍ Tal`, and the rule under it at 10% black rather than `--rule`, which
+   is the file's value and is softer than the sheet's hairline — right here,
+   because the band has no fill of its own and a full-strength rule on a tint
+   reads as a seam.
+
+   THE STATE LINE STAYS. The file puts a second arrow-right in the top right
+   corner, at 20px, in the same grey as everything else on the band. It has no
+   destination — it is the same component instance as the back arrow, left in
+   the frame — and `.ask-top-s` is real: "Explorer – E3, day 34 of 90" is the
+   one place the chat says which conversation this is. Trading a sentence that
+   informs for a control that does nothing is not a thing this layer will do
+   quietly, so it is written down instead.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-top{
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid rgba(0,0,0,.1);
+  background:transparent;
+  gap:var(--s04)}
+.app .ask-page .ask-top .ph-back{
+  width:20px;height:20px;color:var(--text-primary)}
+/* the back arrow is the file's arrow-right, mirrored. One drawing, two
+   directions — which is also why `icons.js` gains one icon and not two. */
+.app .ask-page .ask-top .ph-back svg{
+  width:20px;height:20px;transform:scaleX(-1)}
+.app .ask-page .ask-top-id{
+  display:flex;align-items:center;gap:var(--s03)}
+.app .ask-page .ask-top-id .tal-mk{width:28px;height:28px}
+.app .ask-page .ask-top-t{
+  font-size:20px;line-height:normal;font-weight:600;letter-spacing:.16px;
+  color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE MARK'S SHADOW IS ALREADY DRAWN, AND THIS IS WHY THERE IS NO RULE HERE
+
+   The file hangs a warm drop shadow under every sphere on this screen —
+   `0 7px 14px rgba(255,192,146,.3)` at 28px, `0 26px 24.7px` at 120. Neither
+   is stated, deliberately, and it is the same reason in both places.
+
+   The small marks (28 in the band, 20 in the field) are `--tal-mark`, a PNG
+   whose edge IS falloff — build.py's note on it says so. A `box-shadow` needs
+   a box, so it would draw a hard-edged disc behind a soft blob: a ring of
+   peach appearing out past where the mark visibly ends. The blob's own
+   falloff is the shadow the file is asking for, already in the artwork.
+
+   The 120 is §40's CSS sphere, which carries `0 0 28px rgba(244,113,19,.35)`
+   plus a second at 56px and breathes both on a 4s clock. That is a warmer and
+   larger version of the file's shadow, and it is the mark's own light rather
+   than a shadow under it — adding the file's on top is two glows on one
+   object, which is the exact argument §40.4 makes when it takes §21.4's halo
+   off for the same reason.
+   ------------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ 4 ---
+   NOTHING ASKED YET
+
+   Mark at 120, greeting 32 under it, the one line 12 under that. The mark's
+   own `margin-bottom` is what §27.4 and §40 argue about — both are answering
+   "how much of the box is ink", and here the answer is simply 32, because the
+   sphere is a disc that fills its box and the file measures 32 between them.
+   So the two of them are overridden with the number rather than corrected.
+
+   THE LATTICE GOES. §27.4's `.tal-hero::before` is a fixed 432px wide with
+   `translateX(-50%)`, which scrolls this page horizontally by 37px at 360 and
+   22 at 390 — a known, pre-existing overflow. The file draws nothing behind
+   the sphere, so the fix here is a subtraction rather than a repair.
+
+   32px IS A DESKTOP SIZE. "Hey, Maryam! What's going on?" at 32px needs about
+   470px of line; a 390px phone has 342 inside the gutters, so the file's own
+   size would break the greeting across three lines and put "on?" alone on
+   the last. 26px is the same sentence in two lines, and the file's 32 comes
+   back at the same 900px breakpoint the rest of the layout uses.
+   ------------------------------------------------------------------------ */
+.app .ask-page .tal-hero::before{content:none}
+.app .ask-page .tal-hero .tal-mk.lg{
+  width:120px;height:120px;margin-bottom:var(--s07)}
+.app .ask-page .tal-hero h2{
+  margin:0 0 var(--s04);
+  font-size:26px;line-height:1.15;font-weight:400;letter-spacing:.16px;
+  color:var(--text-primary)}
+/* THE SECOND HALF OF THE GREETING IS A GRADIENT, not the accent colour:
+   `linear-gradient(to right, #000 0%, #f0530c 82.212%)`, clipped to the
+   glyphs, so the phrase turns from the sentence's own black into the brand
+   orange as it reads. `--accent-2` is that hex, and the gradient is stated
+   with the token so this stays one colour with the rest of the product.
+
+   `background-clip:text` on an INLINE box takes its gradient from that box,
+   which is what makes this work at any width without a stated size — and it
+   is why the span must not be a block: given the h2's full width the ramp
+   would finish before the words did. */
+.app .ask-page .tal-hero h2 .askv-q{
+  font-weight:600;
+  background-image:linear-gradient(to right, #000 0%, var(--accent-2) 82.212%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent}
+.app .ask-page .tal-hero p{
+  margin:0;max-width:246px;
+  font-size:14px;line-height:20px;letter-spacing:.16px;
+  color:var(--askv-sub)}
+
+@container app (min-width:900px){
+  .app .ask-page .tal-hero h2{font-size:32px}
+}
+
+/* ------------------------------------------------------------------ 5 ---
+   TAL'S TURN HAS NO BUBBLE
+
+   A GRID, AND THE MARKUP IS UNTOUCHED. `askBubble` (ai4.js) prints the
+   speaker's name above what they said, and this layer does not rewrite it —
+   ai4's own note says that shape is kept identical to the panel's on purpose,
+   and a two-column grid gets the file's layout out of the same three
+   elements: the mark to column 1, the words to column 2, the name hidden.
+   Nothing is re-authored, so nothing drifts.
+
+   `align-items:start` matters: the mark sits on the first line of the answer,
+   not centred against a nine-line one.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-thread .tal-msg{
+  display:grid;grid-template-columns:28px minmax(0,1fr);
+  column-gap:var(--s05);align-items:start}
+.app .ask-page .ask-thread .tal-msg .tal-who{
+  grid-column:1;grid-row:1;display:block;margin:0;padding:0}
+.app .ask-page .ask-thread .tal-msg .tal-who-n{display:none}
+.app .ask-page .ask-thread .tal-msg .tal-mk.sm{width:28px;height:28px}
+.app .ask-page .ask-thread .tal-msg > .bb{
+  grid-column:2;grid-row:1;
+  background:transparent;border:0;padding:0;
+  font-size:14px;line-height:20px;letter-spacing:.16px;
+  color:var(--askv-ink)}
+/* the file sets 20 between the parts of an answer — the opening line, the
+   label, the figure list, the closing line — where §39 sets 12 for a widget
+   read inside a frame. Without the frame the parts need the larger step. */
+.app .ask-page .ask-thread .tal-msg > .bb > * + *{margin-top:var(--s06)}
+/* AND THE WIDGET NEEDS ITS OWN RULE, because the sentence above it is a TEXT
+   NODE — the reply is a string assigned to `innerHTML`, so `* + *` never sees
+   the prose and the widget is `:first-child` whether or not anything precedes
+   it. That is trap 16, and `twTop` (ai8.js) is the answer to it already: it
+   stamps `.tw-top` from an anchored prefix test on the reply string. So the
+   margin is stated for every widget and taken back for the one that opens its
+   bubble, which is the only case `:first-child` cannot distinguish. */
+.app .ask-page .ask-thread .tal-msg > .bb .tw{margin-top:var(--s06)}
+.app .ask-page .ask-thread .tal-msg > .bb .tw.tw-top{margin-top:0}
+
+/* THE LABEL COLUMN IS 50 + 20, which is the file's, and it is stated here
+   rather than in §39 because §39's 58px is the width of a figure read inside
+   a bordered widget and CLAUDE.md records the argument for it. This is the
+   same column on an unframed answer at a different type size; restating it
+   here leaves that argument where it was made. */
+.app .ask-page .ask-thread .tal-msg > .bb .tw-lines > span{
+  gap:var(--s06)}
+.app .ask-page .ask-thread .tal-msg > .bb .tw-lines > span > :first-child{
+  width:50px;flex:none}
+
+/* ------------------------------------------------------------------ 6 ---
+   YOUR TURN IS A BLACK BLOCK
+
+   §27 already makes it black. What is left is the box — 48 tall is 18px of
+   line in 8/20 padding — and the row above it: the file has no "You", no
+   avatar, and nothing to identify a turn you just typed.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-thread .tal-msg.me{
+  grid-template-columns:minmax(0,1fr);justify-items:end}
+.app .ask-page .ask-thread .tal-msg.me .tal-who{display:none}
+.app .ask-page .ask-thread .tal-msg.me > .bb{
+  grid-column:1;
+  padding:var(--s03) 20px;
+  max-width:min(80%, 520px);
+  font-size:14px;line-height:18px;letter-spacing:.16px;
+  background:var(--brand-primary);color:var(--on-brand)}
+
+/* ------------------------------------------------------------------ 7 ---
+   THE COMPOSER STANDS ON THE MESH
+
+   THE PICTURE IS PAINTED AT `100% 100%` because the crop is already done —
+   build.py cuts the band the Figma node shows out of the source, and the note
+   there has the arithmetic. So there is nothing to position: the block shows
+   the whole of what it was given.
+
+   IT IS SQUEEZED ON A PHONE, deliberately. The band is 1400 wide against a
+   foot that is 1396 at desktop and 388 on a phone, so `100%` compresses it
+   3.6x there. The alternative — `auto 100%`, keeping the aspect and cropping
+   the sides — shows the leftmost quarter of the picture, which is its palest
+   quarter and reads as a pink smear rather than as the composition. The
+   picture is soft brushwork with no edge in it that squeezing can break, so
+   the whole composition at the wrong aspect beats a quarter of it at the
+   right one.
+
+   §24's ELLIPSE COMES OFF. It is a wash in --auth-wash-1 at 10% rising from
+   the bottom edge — the right answer when the foot was white and needed a
+   floor, and now a peach tint over a coral painting. `content:none` rather
+   than `display:none` because §24 states `content:''`; killing the content is
+   the smaller statement and leaves its `isolation:isolate` alone.
+
+   AND §21.4's HAIRLINE GOES BACK ON, at the file's warm value. It is the one
+   edge on this screen that is doing work: above it the ground is ivory, below
+   it a picture starts.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-foot{
+  display:flex;flex-direction:column;gap:var(--s05);
+  padding:var(--s06) var(--pad-x);
+  border-top:1px solid var(--askv-rule);
+  background-color:#fff;
+  background-image:var(--askv-mesh);
+  background-size:100% 100%;
+  background-position:center;
+  background-repeat:no-repeat}
+.app .ask-page .ask-foot::before{content:none}
+
+/* ------------------------------------------------------------------ 8 ---
+   THE FIELD
+
+   64 tall, 24 across, the mark 12 from the words, and the send is the same
+   line-arrow the band uses. §27's "AND THE SEND IS BLACK" — a black square
+   at the end of the field, so the brand gradient was not the loudest thing
+   two inches from Tal's own mark — is overridden, and the argument survives
+   the change: on the mesh a black square IS the loudest thing on the screen.
+   The file's answer is a bare 20px arrow in black ink, which is quieter than
+   either and still the only control in the row.
+   ------------------------------------------------------------------------ */
+.app .ask-page .askfield{
+  gap:var(--s04);min-height:64px;height:64px;
+  padding:0 var(--s06);
+  background:#fff;border:1px solid var(--askv-rule)}
+.app .ask-page .askfield:focus-within{border-color:var(--text-primary)}
+.app .ask-page .askfield .askline-mark{width:20px;height:20px}
+.app .ask-page .askfield .askline-mark .tal-mk{width:20px;height:20px}
+.app .ask-page .askfield .inp{
+  height:62px;
+  font-size:14px;line-height:18px;letter-spacing:.16px;
+  color:var(--text-primary)}
+.app .ask-page .askfield .inp::placeholder{
+  color:var(--askv-ink-2);opacity:1}
+.app .ask-page .askfield-send{
+  width:20px;height:20px;flex:none;
+  background:none;background-image:none;border:0;
+  color:var(--text-primary);--on-brand-fill:0}
+.app .ask-page .askfield-send svg{
+  width:20px;height:20px;fill:none;display:block}
+
+/* ------------------------------------------------------------------ 9 ---
+   THE SUGGESTIONS
+
+   A card, not a pill: the star above the words rather than beside them, which
+   is what lets the label be two words wide instead of a line. The row is a
+   flex that WRAPS, which the file's does not need at 1348px and a phone does.
+
+   THE GLOW IN THE FILE IS NOT COPIED. Each chip carries a blurred orange
+   ellipse 74px above itself — and the chip is `overflow-clip`, so the file
+   clips its own glow and draws nothing. Reproducing a shape that is invisible
+   in the source would be copying the mistake rather than the design.
+
+   THE STAR TAKES §49's GRADIENT. §49 states pink #FBB2D4 falling to orange
+   #E98B46 for the agent card's rating stars, given as a spec; the file uses
+   the same two stops on this star. One gradient, named once — so this reads
+   §49's stops rather than restating them, and `.sk-mark` is already a masked
+   background, which is exactly what a gradient needs to be paintable.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-sugg{
+  display:flex;flex-wrap:wrap;gap:var(--s03);margin:0}
+.app .ask-page .ask-sugg .chip-tal{
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--s03);
+  height:auto;padding:var(--s03) var(--s05);
+  background:#fff;border:1px solid var(--askv-rule);
+  font-size:12px;line-height:18px;letter-spacing:.16px;
+  color:var(--askv-ink-2);white-space:nowrap}
+.app .ask-page .ask-sugg .chip-tal .sk-mark{
+  width:16px;height:16px;flex:none;
+  background-color:transparent;
+  background-image:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%);
+  background-size:100% 100%;
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat;
+  border-radius:0;animation:none}
+
+/* ------------------------------------------------------------------ 10 ---
+   ON A PHONE THE SUGGESTIONS ARE ONE ROW THAT SCROLLS
+
+   MEASURED, not assumed. The file's foot is 185 tall because it holds ONE row
+   of chips, and `TALCTX` writes three per page rather than the frame's two —
+   at 388 those three wrap to two rows, the foot goes to 257, and the thread
+   loses the 72px to it. The empty state is 264 tall, so it stopped fitting:
+   the sphere was clipped at the top of a thread that had quietly become
+   scrollable, which is a worse failure than it sounds because nothing on
+   screen says there is anything above.
+
+   So the row keeps the file's height and gives up its wrap instead. A strip
+   that scrolls sideways is legible about having more in it — the third chip
+   is half-visible at the right edge — where a wrapped row just gets taller
+   and a truncated one lies. The chips keep `nowrap`, which is the file's, so
+   each one stays the width of its own sentence.
+
+   `-webkit-overflow-scrolling` and the hidden scrollbar: this is a strip of
+   controls, not a document, and a scrollbar across the bottom of it would sit
+   4px above the field.
+   ------------------------------------------------------------------------ */
+@container app (max-width:899px){
+  .app .ask-page .ask-sugg{
+    flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none}
+  .app .ask-page .ask-sugg::-webkit-scrollbar{display:none}
+  .app .ask-page .ask-sugg .chip-tal{flex:none}
+}

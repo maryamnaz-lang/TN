@@ -338,35 +338,24 @@ css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
 # pointing at nothing — the browser then synthesises 600 from Buch, which is
 # worse than Kräftig and better than a second typeface.
 # ==========================================================================
-# TAL'S MARK IS AN IRIDESCENT SPHERE
-# It was a soft orange circle, blurred at the edge (`tal-circle.png`), which
-# in turn replaced the four-pointed star the product had drawn for "AI".
-# Maryam supplied the sphere and asked for it EVERYWHERE, so the swap is done
-# here, at the token, rather than surface by surface: `__TALCIRCLE__` is what
-# `--tal-mark` resolves to (27-tal.css §1) and every one of the sixty-odd
-# call sites reads that variable. Not one selector changes. The token keeps
-# its name for the reason icons.js keeps its keys — the name is an address,
-# and renaming it would touch every layer that spells it.
+# TAL'S MARK IS A GRADIENT CIRCLE
+# The four-pointed star was the product's own drawing of "AI". Maryam
+# supplied the real mark: a soft orange sphere, blurred at the edge. It is a
+# RASTER — the falloff is a gradient with noise in it and an SVG of it would
+# either band or be larger than the PNG — so it is embedded as a data URI and
+# placed with `background-size:contain`, which lets one file serve the 15px
+# mark on a thread label and the 81px one on the panel's empty state.
 #
-# Still a RASTER, for the reason the circle was one: the sphere is a
-# photograph of refraction, and an SVG of it would either band or be larger.
-# WEBP NOW, NOT PNG, and that is a saving rather than a compromise — the
-# sphere has an alpha channel and photographic content, which PNG stores at
-# 152 KB and WebP q92 at 20 KB. That is smaller than the 61 KB circle it
-# replaces, at 384 square: 2.9x the largest place it is drawn (§40's 132px
-# empty state), so the mark is sharp everywhere from there down to 15px.
-#
-# The source is the file's `image 128`, a 2034 x 1520 reference sheet. The
-# node's own placement — w:563.45% h:418.62% left:-418.42% top:-115.12% of a
-# 20px box — is the arithmetic that says WHERE on that sheet the sphere is:
-# source (1510, 418), about 362 square. It is cut to its own alpha bounds,
-# squared, and given a feathered circular alpha so it sits on any ground
-# rather than on the grey disc the reference sheet had behind it.
+# THE ONE THING IT DOES NOT CARRY IS THE LOGO, and that is now a rule rather
+# than an accident of the artwork: Figma 433:318 puts the three chevrons on
+# the sphere in exactly ONE place — the chat's empty state, before anything
+# has been asked — and leaves every other mark in the platform a plain
+# sphere. §50 is where that split is stated.
 # ==========================================================================
-_circ = here / 'tal-sphere.webp'
+_circ = here / 'tal-circle.png'
 css = css.replace('__TALCIRCLE__',
-    'data:image/webp;base64,' + base64.b64encode(_circ.read_bytes()).decode())
-print(f'Tal sphere embedded: {_circ.stat().st_size/1024:.0f} KB')
+    'data:image/png;base64,' + base64.b64encode(_circ.read_bytes()).decode())
+print(f'Tal circle embedded: {_circ.stat().st_size/1024:.0f} KB')
 
 # ==========================================================================
 # THE COMPOSER'S GROUND

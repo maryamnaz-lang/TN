@@ -155,6 +155,67 @@ const TN_MARK = '<svg viewBox="0 0 194.28 194.28" aria-hidden="true">' +
   '<polygon points="125.96 145.39 147.61 145.39 189.37 97.38 111.66 8.76 90.42 8.76 168.13 97.38 125.96 145.39"/>' +
   '</svg>';
 
+/* ============================================================
+   THE TAL CHAT'S ARROW IS A LINE, NOT A WEDGE
+
+   Its own const rather than an `IP` entry, and that is forced
+   rather than chosen: `IP` holds ONE FILLED PATH each and the
+   proxy below wraps whatever it finds in a 24-box with no
+   `fill` or `stroke` of its own. This mark is two STROKED
+   paths on a 20-box — a shaft and a chevron — so there is no
+   shape of it that the proxy can print.
+
+   IT DOES NOT REPLACE `arrowRight`. Everything else in the
+   product goes forward on the Material filled wedge, and the
+   set is one optical family on purpose (the note at the head of
+   this file, and CLAUDE.md's trap 7). This is the drawing Figma
+   433:276 / 439:481 use in three places on ONE screen — the
+   back control, the field's send, and the band — so it is an
+   addition scoped to that screen, not a change to the set.
+
+   `currentColor`, so the two places that draw it can each say
+   what colour it is; and 1.5 rather than the file's default 1,
+   because these render at exactly 20px, where a 1px stroke is
+   one device pixel and half-disappears against the composer's
+   mesh. Same drawing, at a weight that survives it.
+   ============================================================ */
+/* ============================================================
+   THE LOGO AS THREE SEPARATE CHEVRONS
+
+   `TN_MARK` above is the same lockup in one <svg>, and it stays
+   — it is what the product draws the logo with anywhere the
+   logo is a logo. This is the lockup taken apart, because the
+   chat's empty state animates the three arriving one at a time
+   (§50.4) and a path inside a shared <svg> cannot be moved
+   independently of its siblings without a transform on the
+   path, which then has to be composed with the animation's own.
+   Three boxes, one path each, is the version with nothing to
+   compose.
+
+   THE VIEWBOX IS THE SAME 50 IN ALL THREE, and that is the
+   trick that makes this cheap: each chevron keeps the x it has
+   in the lockup, so the three stacked on top of each other ARE
+   the logo, with no positioning to work out. Only the animation
+   moves them.
+
+   Paths are Maryam's `Tn Icon-white for sphere.svg` verbatim.
+   `fill` is left to §50, which paints them white.
+   ============================================================ */
+const TN_CHEVRONS = [
+  'M9.30424 11.4785H14.8761L26.8073 25.0157L6.72806 47.7483H1.26172L21.341 25.0157L9.30424 11.4785Z',
+  'M31.3073 17.6807L37.7722 25.0154L17.6929 47.7481H12.2266L32.3058 25.0154L25.7843 17.6807H31.3073Z',
+  'M32.4161 37.418H37.988L48.7354 25.0622L28.7359 2.25488H23.2695L43.269 25.0622L32.4161 37.418Z'
+].map((d, i) =>
+  `<i class="tnc tnc-${i + 1}"><svg viewBox="0 0 50 50" aria-hidden="true">` +
+  `<path d="${d}"/></svg></i>`).join('');
+
+const ARROW_LINE = '<svg viewBox="0 0 20 20" aria-hidden="true" fill="none">' +
+  '<path d="M12.025 4.94167 17.0833 10l-5.0583 5.0583" stroke="currentColor" ' +
+  'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '<path d="M2.91667 10h14.025" stroke="currentColor" ' +
+  'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '</svg>';
+
 const I = new Proxy({}, {
   get: (_, k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${IP[k] ? `<path d="${IP[k]}"/>` : ''}</svg>`
 });

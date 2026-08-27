@@ -95,6 +95,20 @@ LAYERS = [
     # The faceless plate's text, packed to the top. `.plate` is in the system
     # and so is the shape that needs this.
     '47-plate.css',
+    # Tal's mark carries the logo in ONE place — the chat's empty state, where
+    # the three chevrons fly in and out — and is a plain sphere everywhere
+    # else. That split is the brand's rather than the chat's, and the chevron
+    # animation is the most characteristic motion the product has, so both
+    # come across whole. `.tnc` and `tn-chev-*` are names nothing else uses.
+    '50-talsphere.css',
+    # The Tal chat view: the ivory ground and its peach wash, an unframed
+    # answer beside its mark, the user's turn as a black block, and a composer
+    # standing on the coral mesh. `ask*` is NOT on EXCLUDE_PREFIXES any more,
+    # so this arrives intact — which is right for a second portal: the chat is
+    # the one screen every portal will want and the least like a plain page.
+    # The one thing it brings that needs the portal is `--askm-mesh`'s data
+    # URI, and that is embedded, not fetched.
+    '51-askview.css',
 ]
 
 # ==========================================================================
@@ -383,6 +397,12 @@ IMAGES = {
     '__TALCIRCLE__': ('tal-circle.png', 'image/png'),
     '__AUTHART__':   ('auth-art.webp',  'image/webp'),
     '__AUTHMARK__':  ('auth-mark.webp', 'image/webp'),
+    # the chat composer's coral ground (§51.7). Cut to the band the Figma node
+    # actually shows before it ever reaches either build — hifi/build/build.py
+    # has the arithmetic — so this is 9 KB, and it has to be here for the same
+    # reason Tal's mark does: without it the declaration points the browser at
+    # the literal string `__ASKMESH__` and the composer loses its picture.
+    '__ASKMESH__':   ('ask-mesh.webp',  'image/webp'),
 }
 
 # NOTHING IS DROPPED FOR ARTWORK ANY MORE. The tuple stays because `clean_decls`

@@ -235,20 +235,47 @@ function askView(f){
      panel builds, so there is one composition to keep, not two. Only the
      empty state changes: the moment you ask something the hero goes and the
      thread is the thread, exactly as the panel behaves. */
+  /* THE GREETING IS A QUESTION NOW, and it is written in two halves because
+     the file colours them differently: Figma 433:276 sets "Hey, Derek! " in
+     the sentence's own black and "What's going on?" in a black-to-orange
+     gradient, which §51.4 paints by clipping that gradient to the glyphs of
+     `.askv-q`. Two spans, one sentence.
+
+     "What's going on?" MOVED UP OUT OF THE PARAGRAPH. It used to end the line
+     below — "…anything you need help with. What's going on?" — and the file
+     makes it the second half of the heading, which leaves the paragraph as
+     the one flat statement of what Tal is for. Asking the question twice on
+     one screen is what the move avoids, so the paragraph loses it here.
+
+     The leader's own greeting keeps its shape: their question is "what do you
+     need?" and it is a different question from the candidate's, so the split
+     is applied to their sentence rather than the candidate's borrowed. */
   const opened = S.thread.length > 0;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb"></span>
-      <h2>Hello <b>${isLead()?'Priya':'Maryam'}</b>, I am Tal &#128075;</h2>
-      <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck. What do you need?':'I am here to assist you with anything you need help with. What&rsquo;s going on?'}</p>
+      <span class="tal-mk lg orb tnlogo">${TN_CHEVRONS}</span>
+      <h2>Hey, ${isLead()?'Priya':'Maryam'}! <span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
+      <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck.':'I am here to assist you with anything you need help with.'}</p>
     </div>`;
   const thread = (opened ? '' : hero)
     + S.thread.map(m => askBubble(m.who, m.html)).join('')
     + (S.typing ? askBubble('tal', `<div class="ai-stream"><i></i><i></i><i></i></div>`) : '');
 
+  /* THE BAND IS `← ◍ Tal`, from Figma 439:512, and the back control keeps its
+     destination in `aria-label` rather than on screen. The words "Back to
+     Dashboard" were the band's whole left side; the file replaces them with
+     Tal's own name and mark, which is what the band is for — you can see
+     which page you came from the moment you leave. A screen reader cannot, so
+     the sentence stays where it was already being said.
+
+     `.ask-top-s` stays on the right. The file puts a second arrow-right there
+     with nowhere to go; §51.2 has the argument. */
   return `<div class="page ask-page">
     <div class="ask-top">
-      <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${I.arrowLeft}</button>
-      <span class="ask-top-t">Back to ${where}</span>
+      <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${ARROW_LINE}</button>
+      <span class="ask-top-id">
+        <span class="tal-mk"></span>
+        <span class="ask-top-t">Tal</span>
+      </span>
       <span class="ask-top-s">${state}</span>
     </div>
     <div class="ask-thread" id="askThread">${thread}</div>
@@ -257,8 +284,8 @@ function askView(f){
         `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
       <div class="askfield">
         <span class="askline-mark"><span class="tal-mk sm"></span></span>
-        <input class="inp" id="askIn" placeholder="Ask anything" autocomplete="off">
-        <button class="askfield-send" data-asksend="1" aria-label="Send">${I.arrowRight}</button>
+        <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
+        <button class="askfield-send" data-asksend="1" aria-label="Send">${ARROW_LINE}</button>
       </div>
     </div>
   </div>`;
