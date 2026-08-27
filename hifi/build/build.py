@@ -246,7 +246,20 @@ css = '\n'.join((here / f).read_text() for f in
                  # deep, and three of these live inside `@container app
                  # (min-width:900px)` because per trap 3 that tier can only be
                  # answered from inside itself.
-                 '53-talground.css'])
+                 '53-talground.css',
+                 # A TINTED BLOCK IS ITS OWN TOP EDGE. One declaration, and it
+                 # subtracts from §37.1: the agent rail's closing hairline is
+                 # right where the next section is white and wrong where the
+                 # next section is filled, because a change of ground is
+                 # already a boundary and both together is two boundaries four
+                 # pixels apart. §18 makes the same argument for the `.sec`
+                 # case and answers it by giving that rule the full bleed;
+                 # §37.1's rail hairline is inset by `--pad-x`, so it cannot be
+                 # the fill's edge and comes off instead. Scoped to
+                 # `+ .sec.tint`, so every rail followed by white keeps its
+                 # rule. After §37 by necessity, last because that is where a
+                 # new thing goes.
+                 '54-tintedge.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -363,6 +376,20 @@ soehne = base64.b64encode((here / 'soehne-buch.woff2').read_bytes()).decode()
 css = css.replace('__SOEHNE__', f'data:font/woff2;base64,{soehne}')
 soehnemono = base64.b64encode((here / 'soehne-mono-buch.woff2').read_bytes()).decode()
 css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
+
+# THE CHAT GREETING'S SERIF, AND IT IS THE ONE FACE HERE THAT IS NOT SÖHNE.
+# Figma 446:402 sets "Hey, Derek! / What's going on?" in Abhaya Libre SemiBold
+# at 40px — a serif, against a product that is otherwise two styles of one
+# grotesque. That is the point of it: the greeting is the only line in the
+# build that is Tal speaking as itself rather than the interface labelling
+# something, and the file gives it a different voice to say so. §53.13 has the
+# type spec and why the gradient span has to stay inline.
+#
+# Abhaya Libre is SIL OFL. This is Google Fonts' own latin subset, 12.6 KB, so
+# the one embedded face covers the two sentences it is used for and nothing
+# else — the sinhala and latin-ext cuts the family also ships are not fetched.
+abhaya = base64.b64encode((here / 'abhaya-libre-semibold.woff2').read_bytes()).decode()
+css = css.replace('__ABHAYA__', f'data:font/woff2;base64,{abhaya}')
 
 # SÖHNE KRÄFTIG. The system is two styles of one face, and this is the
 # second. If the file is not here the @font-face is dropped rather than left
@@ -490,6 +517,51 @@ _aw = ',\n  '.join(
 award_js = 'const AWARD = {\n  ' + _aw + '\n};\n'
 print(f'award artwork embedded: {len(AWARDS)} marks, {len(award_js)/1024:.0f} KB')
 
+# ==========================================================================
+# THE 120px MARK IS A VIDEO, AND THE OTHER SEVEN SIZES ARE NOT
+#
+# `tal-blob.webp` — the animated WebP `--tal-mark` resolves to — serves every
+# mark in the platform at 96 square, and that is the right size for all but
+# one of them: the largest live consumer is 32px (the head band, the ask
+# dock), so 96 is 3x on the densest screen anybody reads this on.
+#
+# THE CHAT'S EMPTY STATE IS THE EXCEPTION AND IT IS WHY THIS BLOCK EXISTS.
+# §51.4 draws that mark at 120 CSS px, which is 240 device pixels at 2x — so
+# the same asset that is 3x oversampled everywhere else is upscaled 1.5x
+# THERE, and a soft-edged blob upscaled is the one thing that reads as a
+# mistake rather than as a texture. It shipped that way once; this is the fix.
+#
+# AND THE FIX CANNOT BE A BIGGER WEBP. Animated WebP has no real inter-frame
+# prediction — every frame carries its own detail — so the file scales with
+# area: 96 square is 242 KB, 160 was 421 KB, and the 320 this mark actually
+# wants would be about 2 MB. H.264 does the same 15 seconds at 320 square, 30
+# fps, for 189 KB, because it predicts. So the one place that needs the
+# resolution gets the codec that can afford it.
+#
+# WHICH MEANS AN ELEMENT, AND THAT IS THE WHOLE COST. A video cannot be a
+# `background-image`, so it can only reach a surface a view prints — which is
+# exactly the one surface that needs it (`askView`, ai4.js), and no help at
+# all to the seven pseudo-element marks. Hence two assets rather than one, and
+# the token still carries the general case: `build-ds.py` embeds only the
+# WebP, so a portal built on the design system gets moving marks everywhere
+# without needing this half at all.
+#
+# THE POSTER IS NOT DECORATION. It is frame 0 at the video's own 320, with the
+# same circular alpha, 7 KB — what the box shows before the clip has decoded,
+# and the whole of what reduced motion gets, since `autoplay` is the only
+# thing `askView` withholds there and a paused `<video>` with no poster paints
+# nothing at all.
+# ==========================================================================
+_blob = here / 'tal-blob.mp4'
+_blobp = here / 'tal-blob-poster.webp'
+blob_js = (
+    "const TAL_BLOB = 'data:video/mp4;base64,"
+    + base64.b64encode(_blob.read_bytes()).decode() + "';\n"
+    "const TAL_BLOB_POSTER = 'data:image/webp;base64,"
+    + base64.b64encode(_blobp.read_bytes()).decode() + "';\n")
+print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
+      f' + {_blobp.stat().st_size/1024:.0f} KB poster')
+
 # TEMPORARY — nil.js is LAST, and that is load-bearing. It declares `const
 # NIL`, which render() reads inside the `S.stage==='nil'` branch; a const is
 # in its temporal dead zone until its own statement runs, so the boot render
@@ -503,7 +575,7 @@ print(f'award artwork embedded: {len(AWARDS)} marks, {len(award_js)/1024:.0f} KB
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)
@@ -555,7 +627,21 @@ js = award_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js'
                                                         # of them declared long before this parses, and the two ai.js
                                                         # ones guarded by typeof because the leader portal never
                                                         # reaches that route.
-                                                        'ai8.js'])
+                                                        'ai8.js',
+                                                        # ONLY THE LAST ANSWER KEEPS ITS CHIPS. `twChips`
+                                                        # puts follow-up questions at the foot of a reply
+                                                        # and they stayed pressable forever — ten exchanges
+                                                        # deep the thread was five sets of chips, four of
+                                                        # them about questions already answered. This
+                                                        # strips them from every Tal turn but the last.
+                                                        # LAST, and it has to be: ai4's `placeAsk` builds
+                                                        # the thread, ai7's `placeBook` fills the booking
+                                                        # hosts and ai8's wrapper stamps `.tw-top`, so this
+                                                        # reads what all three produced. It adds no view and
+                                                        # no route, and per trap 9 it keeps nothing — which
+                                                        # answer is last is recomputed after every render
+                                                        # rather than remembered.
+                                                        'ai9.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.

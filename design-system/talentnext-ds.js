@@ -32,6 +32,15 @@ menu:'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z',
 close:'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
 notification:'M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z',
 arrowRight:'m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z',
+/* THE COMPOSER'S ATTACHMENT, AND IT IS MUI's RATHER THAN THE FILE'S.
+   Figma 451:923 draws it as `vuesax/linear/paperclip` — a 1.5px open stroke,
+   which is the one thing the note at the head of this file rules out: the set
+   is Material's FILLED cut, one tone and one path each, and a stroked glyph
+   beside `arrowUpward` in the same 20px row reads as a different weight of the
+   same idea. This is Material's `attach_file`, filled, byte-identical to
+   @material-design-icons/svg/filled — the same shape, drawn the way the other
+   86 marks in this table are drawn. Maryam asked for the MUI one by name. */
+attachFile:'M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z',
 arrowLeft:'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
 /* SEND, AND IT IS A DIFFERENT ARROW ON PURPOSE. Material's filled
    `arrow_upward`. `arrowRight` is this product's GO — it ends every button

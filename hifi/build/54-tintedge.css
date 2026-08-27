@@ -1,0 +1,36 @@
+/* ==========================================================================
+   54 — A TINTED BLOCK IS ITS OWN TOP EDGE
+
+   ONE DECLARATION, AND IT IS A SUBTRACTION FROM §37.1.
+
+   §37.1 gives the agent card rail a closing hairline: §26 had removed the rule
+   ABOVE the rail (`.sec:has(+ .rail-wrap)::after{display:none}`) and never gave
+   it one below, so the rail ended in nothing. That rule is right wherever the
+   next section is white — the hairline is the only thing saying the rail has
+   finished.
+
+   IT IS WRONG WHERE THE NEXT SECTION IS TINTED, which is now the case on the
+   `new` dashboard: `quizResults()` takes `sec tint info` (§45's #FBFBFB), and a
+   change of ground is already a boundary. Both together is TWO boundaries for
+   one join, four pixels apart — a hairline, then a colour step — and it reads
+   as a divider that has been left behind rather than as the top of the block
+   under it. §18 makes exactly this argument for the `.sec` case: "the rule
+   under the block ABOVE a filled one is that block's top edge", and it hands
+   that rule the full bleed so it belongs to the fill instead of to the section
+   above. §37.1's rail hairline is inset by `--pad-x` and cannot be that edge —
+   it stops short of the ground it would have to be the edge of — so the honest
+   answer is to take it off rather than to widen it.
+
+   SCOPED TO `+ .sec.tint`, NOT REMOVED. Every other rail on every other page
+   is followed by white and keeps its closing rule; §37.1's whole reason still
+   holds there. This says only "when the fill provides the boundary, do not draw
+   a second one", which is the same sentence §26.137 writes for the rule above
+   the rail. Both are `display:none` on a `::after` for that reason.
+
+   SPECIFICITY MAKES THE POSITION FREE, and it is stated late anyway. `:has()`
+   takes the weight of its most specific argument, so `:has(+ .sec.tint)` is
+   (0,2,0) against §37.1's `:has(+ .sec)` at (0,1,0) — this outranks it from
+   anywhere. It is last because a correction belongs after the layer it
+   corrects, and because that is where a new thing goes.
+   ========================================================================== */
+.app .page > .rail-wrap:has(+ .sec.tint)::after{display:none}

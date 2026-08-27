@@ -250,10 +250,31 @@ function askView(f){
      The leader's own greeting keeps its shape: their question is "what do you
      need?" and it is a different question from the candidate's, so the split
      is applied to their sentence rather than the candidate's borrowed. */
+  /* THE 120px MARK IS THE CLIP ITSELF, NOT THE SHARED ARTWORK.
+     `--tal-mark` is a 96-square animated WebP and that is 3x oversampled for
+     every OTHER mark in the platform — the largest is 32px. Here it would be
+     upscaled 1.5x on a 2x screen, and a soft blob upscaled reads as a mistake
+     rather than as a texture. build.py's note over `TAL_BLOB` has the whole
+     argument, including why the fix cannot just be a bigger WebP; the short
+     version is that this is the one Tal mark a VIEW prints, so it is the one
+     that can be an element and therefore the one that can be a video.
+
+     `muted` is what makes `autoplay` legal, and the file carries no audio
+     track anyway. `playsinline` stops iOS taking it fullscreen. AND AUTOPLAY
+     IS THE ONE THING REDUCED MOTION WITHHOLDS: a paused `<video>` shows its
+     `poster`, which is frame 0 at the same 320 with the same circular alpha,
+     so that reader gets the mark standing still rather than an empty box —
+     the same call §50.5 makes about the chevrons, for the same reason.
+
+     `aria-hidden` because the greeting under it is what says Tal is here; a
+     decorative loop with no accessible name is one more thing to skip past. */
   const opened = S.thread.length > 0;
+  const blob = `<video class="tal-blobv" src="${TAL_BLOB}"`
+    + ` poster="${TAL_BLOB_POSTER}"${reduce() ? '' : ' autoplay'}`
+    + ` loop muted playsinline preload="auto" aria-hidden="true"></video>`;
   const hero = `<div class="tal-hero">
-      <span class="tal-mk lg orb tnlogo">${TN_CHEVRONS}</span>
-      <h2>Hey, ${isLead()?'Priya':'Maryam'}! <span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
+      <span class="tal-mk lg orb tnlogo">${blob}${TN_CHEVRONS}</span>
+      <h2>Hey, ${isLead()?'Priya':'Maryam'}!<br><span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck.':'I am here to assist you with anything you need help with.'}</p>
     </div>`;
   const thread = (opened ? '' : hero)
@@ -268,10 +289,20 @@ function askView(f){
      the sentence stays where it was already being said.
 
      `.ask-top-s` stays on the right. The file puts a second arrow-right there
-     with nowhere to go; §51.2 has the argument. */
+     with nowhere to go; §51.2 has the argument.
+
+     THE BACK ARROW IS MUI's `arrow_back`, NOT THE FILE'S MIRRORED LINE ARROW.
+     §51.2 built it by taking the file's `arrow-right` and flipping it with
+     `scaleX(-1)` — one drawing, two directions, which was the cheap answer
+     while the band was the only place it appeared. It is a 1.5px open stroke,
+     and icons.js's header is explicit that this set is Material's FILLED cut:
+     `IP.arrowLeft` is already `arrow_back` from
+     @material-design-icons/svg/filled and is what the other forty back
+     controls in the build use. Maryam asked for MUI's, which is the same
+     answer, and it also retires the mirror. */
   return `<div class="page ask-page">
     <div class="ask-top">
-      <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${ARROW_LINE}</button>
+      <button class="ph-back" data-askback="1" aria-label="Back to ${where}">${I.arrowLeft}</button>
       <span class="ask-top-id">
         <span class="tal-mk"></span>
         <span class="ask-top-t">Tal</span>
@@ -283,7 +314,7 @@ function askView(f){
       ${opened ? '' : `<div class="ask-sugg">${ctx.map(s =>
         `<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${s}</button>`).join('')}</div>`}
       <div class="askfield">
-        <span class="askline-mark"><span class="tal-mk sm"></span></span>
+        <span class="askv-clip">${I.attachFile}</span>
         <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
         <button class="askfield-send" data-asksend="1" aria-label="Send">${ARROW_LINE}</button>
       </div>

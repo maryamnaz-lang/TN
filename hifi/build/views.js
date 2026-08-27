@@ -1664,7 +1664,18 @@ V.dashboard = (f) => {
     </div>
     ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
     ${quizResults('12 Aug', 'the interview decides it')}
-    <div class="sec">
+    ${''/* ON THE SAME QUIET GROUND AS THE BLOCK ABOVE IT, and the two are one
+          area rather than two tinted cards. Consecutive `.sec`s carry no
+          margin — their spacing is their own padding — so two tinted sections
+          abut and the ground runs straight through, with §12's hairline
+          between them as the internal division. That is the shape this pair
+          wants: "what the quiz gave you" and "what has been decided" are the
+          same answer read twice, and the white page resumes underneath them.
+
+          IT IS READING MATTER BY §45's TEST. Two statements of fact with no
+          control but a jump — the track you are on, and what the 90 days are.
+          Nothing here is a thing you do; the doing is the agent rail above. */}
+    <div class="sec tint info">
       <div class="sec-h"><h2>Decided so far</h2><button class="btn btn-g btn-sm noic" data-go="level">View My Level</button></div>
       <div class="tile-stack spaced">
         ${gcard('track','Your track','Explorer','From your quiz. Your level is set at the interview.','level')}
@@ -3880,8 +3891,27 @@ function signedSummary(withNote, re){
                 by `booked` that is a named agent on a known date rather than
                 an interview nobody has arranged. Same "Not set" value, more
                 specific answer to the question the value provokes. */
+/* AND IT SITS ON THE QUIET GROUND, `sec tint info` — #FBFBFB, §45. It is the
+   definition of what that class is for: four figures you READ. Nothing in the
+   block is a control except the jump to the full breakdown, and the page
+   around it is things you do — book an agent, open a chapter. The tint is
+   what says which is which without the reader having to read every heading.
+
+   `tint` AND `info` BOTH, and that is §45's rule rather than a redundancy:
+   §12 hangs twenty-odd selectors off `.sec.tint` (the hairlines step to
+   `--rule-on-2`, and `.stats` repaints its cells so its 1px grid gaps still
+   read as rules against the new ground), and `.info` only moves the token
+   those rules already resolve against. Written as `.info` alone it would be a
+   colour with none of the tone system behind it — the `.stats` gaps would
+   vanish into the ground and the four cells would run together.
+
+   ALL THREE STAGES, because this is one function and the block is the same
+   block. `consult`, `new` and `booked` print the same four figures — the
+   note above says why — so tinting the function rather than a call site is
+   what stops the quiz block being background reading on one stage and a
+   plain section on the next. */
 function quizResults(taken, levelNote){
-  return `<div class="sec">
+  return `<div class="sec tint info">
       <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
       <div class="stats">
         ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}

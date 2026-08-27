@@ -56,12 +56,20 @@
   /* ---------------------------------------------------------------------
      THE TWO WASHES, READ OFF THE FILE.
 
-     446:347 has THREE ellipses at frame level. Two of them draw:
+     446:347 has THREE ellipses at frame level. Two of them draw, and they
+     are now the SAME COLOUR — which was Maryam's edit to the file, not a
+     simplification made here:
 
-       Ellipse 43  #F1BDD5 at fill-opacity .5, rx 693.45 ry 310.61, centred
-                   (1946.47, -1.39) — off the top-right corner.
+       Ellipse 43  #FFF3DB at fill-opacity .5, rx 693.45 ry 310.61, centred
+                   (1946.47, -1.39) — off the top-right corner. It was
+                   #F1BDD5, a pink; the file now gives it the cream the
+                   bottom-left corner already had.
        Ellipse 45  #FFF3DB at .5, the same rx/ry, centred (191.47, 949.6) —
                    off the bottom-left corner.
+
+     SO ONE COLOUR AND TWO PLACEMENTS, and it is stated that way: `--askv-wash`
+     is named once and both gradients read it. Two tokens holding the same hex
+     is how they drift back apart.
 
      Ellipse 44 is the third and it is NOT stated here. It is a 2073 x 381
      band across the middle of the frame and its export is an empty `<g>`:
@@ -96,42 +104,70 @@
      1840 x 974 — because that rail is opaque white artwork sitting ON the
      ellipses (`446:348`), not a thing they reach.
      --------------------------------------------------------------------- */
-  --askv-wash-pink:241,189,213;   /* #F1BDD5, Ellipse 43 */
-  --askv-wash-cream:255,243,219;  /* #FFF3DB, Ellipse 45 */
+  --askv-wash:255,243,219;        /* #FFF3DB, Ellipse 43 AND Ellipse 45 */
   --askv-wash-rx:55.4%;           /* 1020 of 1840 */
   --askv-wash-ry:73.9%;           /*  720 of  974 */
   /* the centres, as percentages of the same box. Both sit OUTSIDE it — that
      is the file's placement, and it is why only a quadrant of each is ever
      on screen. */
-  --askv-wash-pink-at:101.4% -0.1%;
-  --askv-wash-cream-at:6.1% 97.5%;
+  --askv-wash-tr-at:101.4% -0.1%;
+  --askv-wash-bl-at:6.1% 97.5%;
 
-  /* ONE GRADIENT, NAMED ONCE. Everything on this screen that carries the wash
-     reads this token: the surface in §1/§3, and — as the same colours on a
-     conic — the composer's stroke in §5. A second copy of these stops
-     somewhere else is how the margins and the column drifted apart in the
-     first place. */
+  /* ONE GRADIENT, NAMED ONCE, and §1/§3 both read it — which is the whole of
+     what makes the margins and the column one surface rather than two that
+     agree for a while. */
   --askv-ground-wash:
-    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-pink-at),
-      rgba(var(--askv-wash-pink),.22)  0%,
-      rgba(var(--askv-wash-pink),.183) 26%,
-      rgba(var(--askv-wash-pink),.132) 50%,
-      rgba(var(--askv-wash-pink),.077) 68%,
-      rgba(var(--askv-wash-pink),.031) 85%,
-      rgba(var(--askv-wash-pink),0)    100%),
-    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-cream-at),
-      rgba(var(--askv-wash-cream),.22)  0%,
-      rgba(var(--askv-wash-cream),.183) 26%,
-      rgba(var(--askv-wash-cream),.132) 50%,
-      rgba(var(--askv-wash-cream),.077) 68%,
-      rgba(var(--askv-wash-cream),.031) 85%,
-      rgba(var(--askv-wash-cream),0)    100%);
+    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-tr-at),
+      rgba(var(--askv-wash),.22)  0%,
+      rgba(var(--askv-wash),.183) 26%,
+      rgba(var(--askv-wash),.132) 50%,
+      rgba(var(--askv-wash),.077) 68%,
+      rgba(var(--askv-wash),.031) 85%,
+      rgba(var(--askv-wash),0)    100%),
+    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-bl-at),
+      rgba(var(--askv-wash),.22)  0%,
+      rgba(var(--askv-wash),.183) 26%,
+      rgba(var(--askv-wash),.132) 50%,
+      rgba(var(--askv-wash),.077) 68%,
+      rgba(var(--askv-wash),.031) 85%,
+      rgba(var(--askv-wash),0)    100%);
 
-  /* the file's stroke on the composer, `#FFC092`. The render disagrees with
-     the file about it — sampled along that 1px line, the bottom-centre
-     unblends to #F04F05 and the sides to about #FED2AE — so the border is
-     already a gradient there, and `--accent-2` is the hot end of it. */
+  /* THE COMPOSER'S STROKE, MEASURED AT 1:1 rather than read off the codegen.
+     `get_design_context` flattens 451:904's stroke to `border-[#ffc092]`,
+     which is only its cold end — a 1348x64 export of that node at its own
+     pixel size shows the 1px line running
+
+       #FFC092 flat to 33%, ramping to #F0530C at 49.9%, back to flat by 61%
+
+     so it is a HORIZONTAL gradient with one hot spot at the centre and about
+     16% of ramp either side. Those are the two colours and that is the shape;
+     §5 animates it by walking the hot spot along the line.
+
+     `--accent-2` is #f0530c and this is the same orange, so the hot end is
+     the token rather than a second copy of the brand colour. */
   --askv-stroke:#FFC092;
+  --askv-stroke-hot:var(--accent-2);
+  --askv-stroke-ramp:16%;
+
+  /* the chips' stroke (446:408), which is a THIRD orange and stated flat in
+     the file at every one of them. Not `--accent-2` and not the composer's
+     cold end: it is one step in from the brand orange, which is what lets a
+     row of five pills sit under the composer without competing with it. */
+  --askv-chip-line:#F57414;
+
+  /* THE GLOW'S DIMMER, and it is a token because the file's own value is too
+     strong here. §15b's five stops are the ellipse's measured falloff at its
+     stated `.8` fill-opacity, and at full strength the wash is a visible
+     orange smear across the right half of a 34px pill — which is what a 12%
+     peak looks like on a shape that small, three or five to a row, when the
+     file drew two of them at 1348px wide. Halved, the peak is 9% and it reads
+     as light on the pill rather than as a tint applied to it.
+
+     ONE MULTIPLIER RATHER THAN FIVE NEW NUMBERS. The stops stay as measured
+     and this scales them, so the curve the file draws is preserved whatever
+     the intensity — and re-tuning is one character rather than five, with no
+     chance of the shape drifting while the loudness changes. */
+  --askv-chip-glow:.5;
 }
 
 /* ------------------------------------------------------------------ 1 ---
@@ -210,17 +246,32 @@
 /* ------------------------------------------------------------------ 5 ---
    THE COMPOSER'S STROKE TRAVELS
 
-   A CONIC FROM AN ANIMATED ANGLE. The four stops are the file's own colours —
-   the composer's stated stroke, the brand orange its render measures on that
-   stroke, and the two washes §1 paints the page with — so this is the SAME
-   set of values the ground is made of, on a different geometry. `@property`
-   is what makes the angle animatable at all: a bare custom property
-   interpolates as a string, and the gradient would jump 0deg to 360deg in one
-   step rather than turning.
+   THE ANIMATION IS THE FILE'S OWN GRADIENT, WALKING. The stroke measured off
+   451:904 at 1:1 is horizontal, flat `#FFC092` with one `#F0530C` hot spot at
+   the centre and ~16% of ramp either side. So the honest animation of it is
+   that hot spot travelling along the line rather than a conic turning around
+   the box: the shape stays exactly what the file draws and only its position
+   is on a clock. (An earlier version rotated a conic through four colours.
+   Prettier, and not this design.)
+
+   IT IS DONE BY MOVING THE STOPS, NOT THE BOX. `--askv-hot` is a percentage
+   the three middle stops are written against, and it runs -20% to 120% — so
+   the hot spot enters off the left edge and leaves off the right, and because
+   both ends of the travel are past the edge the loop has no seam to hide.
+
+   PERCENTAGES ARE WHY THIS IS WIDTH-INDEPENDENT, and that matters more than
+   it sounds: the field is 1348px in the file, about 840 at desktop here and
+   340 on a phone. Animating `background-position` in pixels would need the
+   width; animating the stops needs nothing, and the ramp stays 16% of
+   whatever the field is.
+
+   `@property` is not decoration here either — a bare custom property
+   interpolates as a string, so the hot spot would jump from one end to the
+   other in a single step rather than travel.
 
    THE RING IS A MASKED PSEUDO-ELEMENT, NOT A BORDER. `border-image` cannot
-   take a gradient that has to rotate under it, so the ring is a filled box
-   with its own middle cut out: `padding:1px` is the ring's width, and the
+   take a gradient whose stops are animating under it, so the ring is a filled
+   box with its own middle cut out: `padding:1px` is the ring's width, and the
    two-layer mask keeps what is inside the border box and drops what is inside
    the content box.
 
@@ -232,16 +283,29 @@
                   ink comes off. Removing the border instead would hand the
                   content box 2px more under `box-sizing:border-box` and shift
                   the placeholder.
+
+   AND `:focus-within` HAS TO BE NAMED ON THAT SAME RULE, not just left to the
+   resting one. §51.8 states `border-color:var(--text-primary)` on focus, which
+   is more specific than nothing and put a BLACK border back under the ring —
+   covered along the four edges, where the ring is opaque, and leaking at the
+   four corners, where a 1px mask antialiases. Two selectors, one declaration.
+
+   THE SIDES TAKE THE COLOUR AT THEIR OWN x, which is what the file does too:
+   the gradient is painted across the whole ring, so the left and right edges
+   are the flat end of it except in the instant the hot spot passes them. That
+   is why the export reads `#FFC091` down both sides.
    ------------------------------------------------------------------------ */
-@property --askv-ang{
-  syntax:'<angle>';
-  initial-value:0deg;
+@property --askv-hot{
+  syntax:'<percentage>';
+  initial-value:50%;
   inherits:false}
 
-@keyframes askv-stroke-turn{
-  to{--askv-ang:360deg}}
+@keyframes askv-stroke-walk{
+  from{--askv-hot:-20%}
+  to{--askv-hot:120%}}
 
-.app .ask-page .askfield{
+.app .ask-page .askfield,
+.app .ask-page .askfield:focus-within{
   position:relative;
   border-color:transparent}
 
@@ -249,26 +313,35 @@
   content:'';position:absolute;inset:-1px;z-index:0;
   pointer-events:none;
   padding:1px;
-  background:conic-gradient(from var(--askv-ang),
-    var(--askv-stroke)            0deg,
-    var(--accent-2)              70deg,
-    rgb(var(--askv-wash-pink))  140deg,
-    rgb(var(--askv-wash-cream)) 200deg,
-    var(--accent-2)             280deg,
-    var(--askv-stroke)          360deg);
+  background:linear-gradient(90deg,
+    var(--askv-stroke) 0%,
+    var(--askv-stroke) calc(var(--askv-hot) - var(--askv-stroke-ramp)),
+    var(--askv-stroke-hot) var(--askv-hot),
+    var(--askv-stroke) calc(var(--askv-hot) + var(--askv-stroke-ramp)),
+    var(--askv-stroke) 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
           mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
           mask-composite:exclude;
-  animation:askv-stroke-turn 6s linear infinite}
+  animation:askv-stroke-walk 5s linear infinite}
 
-/* THE FOCUSED FIELD STOPS TURNING. A moving stroke is the resting state's
-   invitation; under a caret it is the loudest thing on a screen you are
-   trying to write on. §51.8 answered focus by taking the border to
-   `--text-primary`, and that is what this says — stated as the ring, since
-   the border itself no longer carries ink. */
+/* THE FOCUSED FIELD IS SOLID #F0530C AND STILL.
+   Not a stop of the gradient and not a slower version of it: the whole ring
+   goes to the one colour and the clock stops. A moving stroke is the resting
+   state's invitation — it says "you can type here"; once you are typing it is
+   the loudest thing on a screen you are trying to write on, and a border that
+   also has to say "this is the field you are in" cannot be doing both.
+
+   §51.8 answered focus with `--text-primary`, black, which was right when the
+   resting border was a flat hairline. Against a stroke this warm, black reads
+   as the field being disabled rather than active, so it is the accent — the
+   same orange the hot spot was already made of, held still across the whole
+   ring instead of passing through it.
+
+   `background` as a flat colour, so nothing is left of the gradient to
+   interpolate; `animation:none` so §13's clamp has nothing to clamp. */
 .app .ask-page .askfield:focus-within::before{
-  background:var(--text-primary);
+  background:var(--askv-stroke-hot);
   animation:none}
 
 /* ------------------------------------------------------------------ 6 ---
@@ -276,10 +349,13 @@
 
    §13.187 clamps every duration to 1ms, and 1ms on an INFINITE animation is a
    strobe rather than "off" — §21.4, §27.8, §33.6, §40 and §50 each state
-   their own for exactly this. Here the resting state is the gradient standing
-   still at 0deg, which is a static multicolour stroke: closer to what the
-   file draws than a flat `#FFC092`, and it is also what a browser with no
-   `@property` support gets anyway.
+   their own for exactly this.
+
+   AND THE RESTING STATE HERE IS EXACTLY THE FILE. `--askv-hot`'s
+   `initial-value` is 50%, so with the animation off the hot spot sits at the
+   centre of the line — which is where 451:904 draws it. This is the one
+   reduced-motion block in the build that needs no second declaration to look
+   right, and it is also what a browser with no `@property` support gets.
    ------------------------------------------------------------------------ */
 @media (prefers-reduced-motion:reduce){
   .app .ask-page .askfield::before{animation:none}
@@ -321,6 +397,13 @@
    IT ALSO LOOPS ALREADY. Mean absolute difference across the seam is 0.81/255
    against 1.12 for a typical adjacent pair — the last frame is closer to the
    first than two neighbours are to each other. No palindrome, no fade.
+
+   96 SQUARE, AND THAT IS SIZED FOR THE MARKS THAT PAINT IT. Every live
+   consumer of `--tal-mark` is 32px or less, so 96 is 3x on the densest screen
+   this is read on. The ONE surface that wants more is the chat's empty state
+   at 120 CSS px, and §10 is where that is answered — with the clip itself,
+   because animated WebP has no inter-frame prediction and the 320 that mark
+   wants would be about 2 MB of it.
    ------------------------------------------------------------------------ */
 
 /* ------------------------------------------------------------------ 8 ---
@@ -410,3 +493,407 @@
   animation:tal-orb-breathe 6.4s ease-in-out infinite}
 .app .tal-fab::after{
   animation:tal-orb-breathe 6.4s ease-in-out infinite}
+
+/* ----------------------------------------------------------------- 10 ---
+   AND THE 120px MARK IS THE CLIP, AT THE CLIP'S OWN RESOLUTION
+
+   §7's WebP is 96 square, which is 3x for every mark that paints it and 0.8x
+   for this one — 120 CSS px is 240 device pixels at 2x, and a soft-edged blob
+   upscaled 1.5x reads as a mistake rather than as a texture. It shipped that
+   way once and this is the fix.
+
+   So the empty state gets an ELEMENT instead: `askView` (ai4.js) prints a
+   `<video>` inside the mark, H.264 at 320 square — 189 KB for the same
+   fifteen seconds the WebP needs 2 MB for at that size, because H.264
+   predicts between frames and animated WebP does not. This is the only Tal
+   mark a view prints rather than a stylesheet paints, which is exactly why it
+   is the only one that can be a video.
+
+   THE HOST'S OWN BACKGROUND COMES OFF. §8b put `--tal-mark` on this mark's
+   `::before` when it was the only artwork available; with the clip over it
+   that is a 96px copy of the same blob sitting a pixel behind a 320px one,
+   showing at the rim where the two disagree. `content:none` rather than
+   `background-image:none` because the pseudo-element has nothing else to do.
+
+   `object-fit:cover` on a square clip in a square box crops nothing — it is
+   there so a future non-square box cannot letterbox the blob — and the radius
+   is stated even though the clip's own alpha is already a circle, because
+   `object-fit` is applied before the element's own clipping and a hairline of
+   the video's edge would otherwise square off the corners.
+
+   THE STACK IS EXPLICIT. §40.1 made this box `isolation:isolate` to stack its
+   sphere at 0 and its gloss at 1; both are gone, so the video simply takes 0
+   and the isolation is left alone — unlike the earlier draft, nothing here
+   needs to blend with the page, because the alpha channel is doing the work
+   the blend mode was doing.
+   ------------------------------------------------------------------------ */
+.app .ask-page .tal-hero .tal-mk.orb::before{content:none}
+.app .ask-page .tal-hero .tal-blobv{
+  position:absolute;inset:0;z-index:0;
+  display:block;width:100%;height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  pointer-events:none}
+
+/* ----------------------------------------------------------------- 11 ---
+   THE SUGGESTIONS ARE PILLS
+
+   446:408, and it is a different component from the one §51.9 built. That
+   layer read an older frame and made a CARD — the star ABOVE the words, so
+   the label could be two words wide instead of a line — and the file now
+   draws a ROW: star beside the label, 34 tall, fully rounded, one orange
+   hairline.
+
+     white ground, 1px `#F57414`, `border-radius:30px`
+     8px between the star and the words, 8/16 padding
+     the label 12/18, `#474747`, tracking .16, `nowrap`
+
+   30px ON A 34px BOX IS A STADIUM, not a rounded rectangle — 17 would be the
+   exact half — and it is stated as 30 because that is the file's number and
+   the two are visually identical at this height. Copying the number keeps the
+   next person from wondering which of us rounded it.
+
+   THE STAR KEEPS ITS GRADIENT AND IT IS ALREADY RIGHT. 446:409 is `#FBB2D4`
+   falling to `#E98B46` on a vertical axis, which is exactly what §51.9 states
+   from §49 — so the mark needs nothing here beyond going back to 16px in a
+   row rather than 16px on its own line. One less thing to keep in sync.
+
+   `flex-direction:row` and `align-items:center` are the actual subtraction:
+   §51.9's `column` / `flex-start` are what made it a card, and the gap and
+   padding it set for that arrangement are restated for this one.
+
+   THE DECLARATIONS ARE IN §15, NOT HERE. This note is the shape of the chip
+   and §15's is the gradient on its edge, and they were written a round apart —
+   but
+   a chip is one component and it turned out to have a second home (the foot of
+   a Tal answer), so the selector had to grow a second half. Two rules setting
+   the same eight properties on overlapping selectors is how one of them ends
+   up stale, so §15 states all of it once and this stays as the reasoning.
+   ------------------------------------------------------------------------ */
+
+/* ----------------------------------------------------------------- 12 ---
+   THE ATTACHMENT, NOT TAL'S MARK
+
+   451:923 puts an attachment icon at the head of the composer where §51.8 had
+   Tal's own 20px blob. `askView` prints `I.attachFile` in a `.askv-clip`, and
+   the class is new rather than reusing `.askline-mark` on purpose: that class
+   carries §21.3, §27.45 and §51.8's rules for a Tal mark — a background
+   image, a halo, a size — and none of them is about an icon.
+
+   THE ICON IS MUI's `attach_file`, FILLED, not the file's `vuesax/linear`
+   paperclip. icons.js's own note has the argument: the set is Material's
+   filled cut, and a 1.5px stroked glyph beside a filled `arrowUpward` in the
+   same 20px row reads as two weights of one idea. Maryam asked for MUI's by
+   name, which is the same answer.
+
+   `currentColor` INTO A 24-VIEWBOX AT 20px. Every mark in `IP` is a 24px
+   canvas and `I` prints it with no `fill` of its own, so the colour comes off
+   the span — `--askv-ink-2`, which is the placeholder's own `#474747`, so the
+   icon and the words it sits beside are one tone rather than an icon in ink
+   next to prose in grey.
+   ------------------------------------------------------------------------ */
+.app .ask-page .askfield .askv-clip{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;
+  color:var(--askv-ink-2)}
+.app .ask-page .askfield .askv-clip svg{
+  display:block;width:20px;height:20px;
+  fill:currentColor}
+
+/* ----------------------------------------------------------------- 13 ---
+   THE GREETING IS A SERIF, AND THAT IS THE WHOLE CHANGE IN THE MIDDLE
+
+   446:402 sets it in **Abhaya Libre SemiBold at 40px**, `line-height:normal`,
+   centred, over the file's own two lines. §51.4 had it in the product's sans
+   at 26/32 on one line, so this is a typeface change, a size change and a
+   line break — and the line break is markup (`askView` prints the `<br>`),
+   because the file states two paragraphs rather than one that wraps.
+
+   THE FONT IS EMBEDDED, like every other face in this build. Abhaya Libre is
+   SIL OFL, from Google Fonts, latin subset — 12.6 KB of woff2 under the
+   `__ABHAYA__` token. `--tal-greet-face` names it once so the fallback stack
+   is stated in one place: a serif, because falling back to the UI sans would
+   put the greeting back exactly where this rule is taking it from.
+
+   `.askv-q` STAYS INLINE, and §51.4's note is why: `background-clip:text` on
+   an INLINE box takes its gradient from that box, so the black-to-`#f0530c`
+   ramp finishes on the last glyph of "What's going on?". Given `display:block`
+   it would take the h2's full width and the ramp would be over before the
+   words were. The `<br>` is what puts it on its own line without making it a
+   block — which is the one thing that could not be done from CSS.
+
+   40px IS THE FILE'S DESKTOP SIZE and it survives a phone here only because
+   of that break: "What's going on?" in Abhaya at 40px is about 300px and a
+   390 frame has 342 inside the gutters. It is still stepped down below 900,
+   for the reason §51.4 states — the greeting is the one line on this screen
+   with no measure to protect it, and 34 leaves room for the longer of the two
+   portals' sentences ("What do you need?").
+
+   `letter-spacing` COMES OFF. §51.4 sets .16px, which is the file's tracking
+   on 14px UI text carried up to a display size where it is nothing; Abhaya's
+   own fit at 40px is what the file shows, so the h2 says `normal` rather than
+   inheriting a number that was measured for a different face at a third the
+   size.
+   ------------------------------------------------------------------------ */
+@font-face{
+  font-family:'Abhaya Libre';
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+  src:url(__ABHAYA__) format('woff2');
+}
+
+:root{
+  --tal-greet-face:'Abhaya Libre','Abhaya Libre SemiBold',
+    'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+}
+
+.app .ask-page .tal-hero h2{
+  font-family:var(--tal-greet-face);
+  font-size:34px;
+  font-weight:600;
+  line-height:normal;
+  letter-spacing:normal;
+  margin:0 0 var(--s04)}
+.app .ask-page .tal-hero h2 .askv-q{
+  font-family:inherit;
+  font-weight:600}
+
+@container app (min-width:900px){
+  .app .ask-page .tal-hero h2{font-size:40px}
+}
+
+/* ----------------------------------------------------------------- 14 ---
+   TAL'S TURN HAS NO SURFACE OF ITS OWN — NO FILL, NO SHADOW
+
+   §51.5 already took the bubble's background, border and padding off, so the
+   answer sits on the page. What it did not take is §27.8's SHADOW: `.bb`
+   carries `0 0 … rgba(255,192,146,.15)`, a warm glow that was drawing the
+   bubble's shape back in after the border had been removed — a soft box around
+   something that is meant to have no box.
+
+   THE SHADOW COMES OFF EVERYTHING IN THE TURN, not just the bubble. A widget
+   borrowed into a reply brings its page shadow with it (trap 10 is the same
+   problem with gutters), and the rule for this screen is one line: nothing
+   inside Tal's answer casts.
+
+   AND THE FILLED PANELS GO TRANSPARENT. These are the page's own components
+   read inside a bubble — the status note, the tile, the tinted section, the
+   figure cells — and each of them is a SHEET where the page has one. On the
+   chat there is no sheet: the answer is text and rules on the ground, so the
+   fills come off and the hairlines stay. A `.kv` row still reads as a row
+   because of its rule, not because of a ground.
+
+   THE GREEN BAND IS IN THAT LIST AND IT IS THE ONE WORTH SAYING OUT LOUD.
+   `.note.ok` is a filled green band, and taking its fill leaves the green ink
+   and the tick — which is the whole of what it was saying. A band that is
+   green because the news is good is a page pattern; inside an answer the good
+   news is a sentence Tal just said, and it does not need a second voice.
+
+   WHAT KEEPS ITS FILL IS CONTROLS, and that is deliberate rather than an
+   omission: the black `.btn-p`, the accent `.slot.on` and `.day.on`, the
+   avatar's placeholder. Those are things you press or things that show a
+   choice, they are filled in the file too, and "no background on the
+   response" is about the response's surface, not about disarming its buttons.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb,
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb *{
+  box-shadow:none}
+
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb :is(
+  .note, .tile, .gcard, .cardrow, .sec, .sec.tint, .tbl, .tbl-wrap,
+  .kv, .kv > div, .facts, .facts > div, .stats, .stats > div,
+  .bkw, .bk-card, .tw){
+  background-color:transparent;
+  background-image:none}
+
+/* ----------------------------------------------------------------- 15 ---
+   THE CHIP'S GRADIENT IS ON ITS BORDER
+
+   AND GETTING HERE TOOK TWO WRONG ANSWERS, both worth writing down because the
+   evidence for each looked good.
+
+   FIRST: the codegen says `border-[#f57414] border-solid`, flat, on both chips
+   (446:408 and 446:413, identical). That is not on its own trustworthy —
+   `get_design_context` FLATTENS a gradient stroke to one of its stops, which is
+   exactly what it did to the composer at 451:904, where the real line runs
+   #FFC092 to #F0530C and back. So the codegen was checked against a 1:1 export
+   of the node, and the export says flat too: #FFC498 on all four sides, every
+   sample, which is #F57414 antialiased at about 42% coverage over white. The
+   clincher is that the SAME export path resolved the composer's gradient
+   stroke correctly — so a gradient here would have shown.
+
+   SECOND — AND THIS IS THE ONE THAT WENT WRONG TWICE: `Ellipse 42`, a child of
+   every chip. It is a gradient (#F57414 to #F0530C at `fill-opacity .8`),
+   blurred at stdDeviation 50, sitting at `top:-73.76px` on a 34px box under
+   `overflow-clip`. Pass one called it invisible, because the ellipse's own
+   bounds are entirely above the pill. Pass two worked out that a σ=50 blur
+   carries light about 2σ past those bounds and therefore into the pill, stated
+   it, and then DELETED it again on the strength of the 1:1 export, which
+   reports the interior as #FFFFFF at every pixel that is not a glyph.
+
+   THE EXPORT IS THE THING THAT IS WRONG. Maryam can see the glow on the
+   canvas, the SVG's own filter region is 418 x 230 around a 218 x 30 ellipse —
+   Figma sizing the blur's reach itself — and the arithmetic agrees with both.
+   Three sources against one, and the odd one out is a PNG of a node whose
+   blurred child is `overflow-clip`ped, which is a known soft spot in that
+   export path. So the rule here is: for a BLURRED child inside a clip, believe
+   the filter region and the designer, not the render.
+
+   SO THE COMPONENT HAS TWO GRADIENTS AND BOTH ARE THAT ELLIPSE'S STOPS:
+   §15a puts them on the border, where Maryam asked for them, and §15b puts the
+   glow back inside on the right, which is what the file draws.
+
+   THE AXIS IS THE ELLIPSE'S OWN. `paint0_linear` runs (79.39, 94.05) to
+   (324.92, 198.58) — 23.1deg below horizontal — and the wrapper rotates the
+   whole thing 8.16deg, giving 31.3deg. In CSS's convention (0deg is to top,
+   90deg is to right) a direction going right and down by 31.3deg is 121deg. So
+   `linear-gradient(121deg, #F57414, #F0530C)`: the file's two stops, on the
+   file's angle, from #F57414 at the top-left of the pill to #F0530C at the
+   bottom-right.
+
+   IT IS THE SAME MASKED RING §5 USES, and for the same reason: `border-image`
+   and `border-radius` do not compose, so a gradient border on a 30px stadium
+   has to be a filled box with its middle cut out. `padding:1px` is the width,
+   the two-layer mask keeps the border box and drops the content box, and the
+   ring carries the radius so the cut follows the stadium.
+
+   `overflow` STAYS VISIBLE, AND THE GLOW IS A BACKGROUND RATHER THAN A CHILD
+   BECAUSE OF IT. The ring sits at `inset:-1px`, so `overflow:hidden` — the
+   obvious way to clip a glow to a pill, and what the file does with
+   `overflow-clip` — would cut the ring's outer edge off. A `background-image`
+   needs no clip: it is painted inside the border box and rounded by
+   `border-radius` for free. So the two gradients never compete for the same
+   mechanism.
+
+   THE GLOW'S GEOMETRY, from the same node. The wrapper puts the ellipse at
+   `left:48.44px top:-73.76px` in a 220.24 x 60.74 box and rotates it 8.16deg,
+   which centres it at (158.56, -43.39) in the pill's own 181 x 34 — above it
+   and to the RIGHT, and the offset is per-chip (chip 2 has `left:18.44`).
+   With rx 109.09, ry 15.04 and σ 50, the light reaches rx + 2σ = 209 across
+   and ry + 2σ = 115 down, so as a fraction of the pill that is 115% x 338% of
+   its box, centred at 88% x / -128% y.
+
+   THE FALLOFF IS COMPUTED, NOT EYEBALLED. Convolving a slab of half-width h
+   with a Gaussian gives .5[erf((h-d)/σ√2) + erf((h+d)/σ√2)]; evaluating that
+   on both axes and multiplying by the .8 fill-opacity gives, at the pill's
+   four corners and its centre-line,
+
+     top-left .021   top-centre .103   top-right .124
+     bottom-left .009  bottom-centre .046  bottom-right .056
+
+   — which is a SIX-fold rise from left to right against a two-fold fall from
+   top to bottom. That is why it reads as a right-side glow rather than a top
+   one, and why 88% is the horizontal centre rather than something nearer the
+   middle. Converting those corners to the gradient's own normalised radius
+   (r = 0 at the ellipse centre, 1 at rx+2σ) puts them at r .39, .68, .85 and
+   1.01, and extrapolating in to r = 0 gives the ellipse's own peak of .183 —
+   which is the five stops below, in order.
+
+   ONE OFFSET FOR EVERY CHIP. The file gives its two chips different `left`
+   values, 48.44 and 18.44, so the glow sits at 88% of the first and 72% of the
+   second. 80% is stated for all of them: a row here is two to five chips
+   rather than the frame's two, per-chip offsets would need an `nth-child`
+   ladder, and the difference between 72% and 88% of a 181px pill is 29px of
+   position on a wash whose peak is 12% of one orange.
+
+   `--accent-2` AND NOT `#F57414` FOR THE GLOW. The ellipse's fill ramps from
+   #F57414 at its upper-left to #F0530C at its lower-right, and the part of it
+   the pill actually sees is the lower-right end — so the hot stop is the one
+   in the visible region. The border in §15a carries the full ramp because it
+   crosses the whole shape.
+
+   NOT ANIMATED. §5's stroke moves because it is an invitation to type into an
+   empty field; a row of five chips with five travelling highlights is a
+   fairground. The file draws these still and they stay still.
+
+   AND THE SAME CHIPS APPEAR IN TAL'S ANSWERS. `twChips` (views.js) prints
+   `.chip-tal` at the foot of a reply, and there it was picking up §12.715's
+   tinted `.tal-sugg` box and §27.1's blob for its mark — a grey rectangle with
+   Tal's own face on it, which is a third chip design on one screen. The
+   selectors below cover both places, so there is one chip.
+
+   THE STAR HAS TO BE RESTATED FOR THE ANSWER, because §51.9 scoped it to
+   `.ask-sugg` and a chip in a bubble is not in that row. Same two stops, same
+   mask — §49's, read rather than re-typed.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-sugg .chip-tal,
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal{
+  position:relative;
+  flex-direction:row;align-items:center;
+  gap:var(--s03);
+  height:34px;padding:var(--s03) var(--s05);
+  min-height:0;
+  border-radius:30px;
+  border:1px solid transparent;
+  overflow:visible;
+  background-color:#fff;
+  /* 15b — the glow, on the right, inside. The five alphas are the MEASURED
+     curve and they are left as measured; `--askv-chip-glow` is the dimmer in
+     front of them, so the shape the file draws survives every change of mind
+     about how loud it should be. At .5 the peak is 9% of one orange over
+     white, which is about as far down as it can go and still be a glow rather
+     than a rendering artefact. */
+  background-image:radial-gradient(115% 338% at 80% -128%,
+    rgb(240 83 12 / calc(.183 * var(--askv-chip-glow))) 0%,
+    rgb(240 83 12 / calc(.124 * var(--askv-chip-glow))) 39%,
+    rgb(240 83 12 / calc(.056 * var(--askv-chip-glow))) 68%,
+    rgb(240 83 12 / calc(.021 * var(--askv-chip-glow))) 85%,
+    rgb(240 83 12 / calc(.006 * var(--askv-chip-glow))) 100%,
+    rgb(240 83 12 / 0) 115%);
+  background-repeat:no-repeat;
+  font-size:12px;line-height:18px;letter-spacing:.16px;
+  color:var(--askv-ink-2);white-space:nowrap}
+
+.app .ask-page .ask-sugg .chip-tal::before,
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal::before{
+  content:'';position:absolute;inset:-1px;z-index:0;
+  pointer-events:none;
+  padding:1px;
+  border-radius:inherit;
+  background:linear-gradient(121deg,
+    var(--askv-chip-line) 0%,
+    var(--accent-2) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude}
+
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
+  width:16px;height:16px;flex:none;
+  background-color:transparent;
+  background-image:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%);
+  background-size:100% 100%;
+  -webkit-mask:var(--tal-star) center/contain no-repeat;
+          mask:var(--tal-star) center/contain no-repeat;
+  border-radius:0;animation:none}
+
+/* the row they sit in. §12.714 gives `.tw-chips`' parent a wrap and a gap
+   already; what it does not do is stop the answer's own `* + *` step from
+   landing on top of that — 20px above a 34px row reads as a paragraph break
+   before a control. 12 is the gap the file puts between a sentence and the
+   chips under it. */
+.app .ask-page .ask-thread .tal-msg > .bb .tw-chips{
+  display:flex;flex-wrap:wrap;gap:var(--s03);
+  margin-top:var(--s04)}
+
+/* ----------------------------------------------------------------- 16 ---
+   THE BAND'S NAME IS A LINE SMALLER, AND ITS ARROW IS FILLED
+
+   `Tal` at 20px (§51.2) is the file's size and it is too big here for a reason
+   the file cannot show: 446:347 sets it beside a 28px mark in a 71px band, and
+   this build's band is 61 — so the same 20px reads as a page title rather than
+   as the name of the thing you are talking to. 18 is one step down §11's
+   scale and it sits on the mark's centre line.
+
+   THE ARROW IS `I.arrowLeft` NOW — Material's filled `arrow_back` — which
+   `askView` prints in place of the file's mirrored line arrow. So §51.2's
+   `transform:scaleX(-1)` has nothing left to flip and would point this one the
+   wrong way; it comes off, and the glyph takes the 24-viewBox `fill` every
+   other mark in `IP` takes.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-top-t{font-size:18px}
+.app .ask-page .ask-top .ph-back svg{
+  width:20px;height:20px;
+  transform:none;
+  fill:currentColor}

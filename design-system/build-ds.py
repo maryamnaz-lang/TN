@@ -123,6 +123,30 @@ LAYERS = [
     # they could not have matched even if a page had written its own typer.
     # Both halves are here now and the gate is `.tsum` alone.
     '52-talsumtype.css',
+    # The chat as ONE surface, and Tal's mark as footage. Both halves belong
+    # here and for different reasons.
+    #
+    # The surface half is the chat's, and `ask*` ships, so it comes across
+    # with the rest of §51 — including the composer's stroke, which is the
+    # only continuously-moving gradient border in the system and the kind of
+    # thing a second portal would otherwise re-invent from a screenshot.
+    #
+    # THE MARK HALF IS WHY THIS LAYER CANNOT BE LEFT OUT. §53.8 turns the
+    # three CSS-drawn spheres back into `--tal-mark`, and one of those three
+    # is §33.6's — the head band's, which is the mark a page built on this
+    # stylesheet actually draws. Without this layer the token points at the
+    # animated blob and that one surface goes on painting a gradient sphere,
+    # so the agent's portal would have Tal's old face at the head of every
+    # page and the new one everywhere else.
+    '53-talground.css',
+    # A tinted block is its own top edge. One declaration, and it has to be
+    # here because the rule it subtracts from is: §37.1 gives the card rail a
+    # closing hairline, §37 is in this list, and `.rail-wrap`, `.sec` and
+    # `.tint` are all system names — so a page built on this stylesheet that
+    # puts a `.sec.tint` under a rail draws the same two-boundary join the
+    # candidate portal did, four pixels apart. Shipping §37.1 without this is
+    # shipping the bug.
+    '54-tintedge.css',
 ]
 
 # ==========================================================================
@@ -395,6 +419,12 @@ FONTS = {
     '__SOEHNEMONO__': 'soehne-mono-buch.woff2',
     '__SOEHNEKRAFTIG__': 'soehne-kraftig.woff2',
     '__STANDIN__': 'stand-in.woff2',
+    # The chat greeting's serif (§53.13). Abhaya Libre SemiBold, latin subset,
+    # 12.6 KB — SIL OFL, from Google Fonts. It ships for the same reason the
+    # other four do: §53 declares the @font-face and the greeting reads it, so
+    # without the file here `drop_orphan_fontface` takes the rule out and a
+    # portal on this stylesheet falls to the serif stack instead of the face.
+    '__ABHAYA__': 'abhaya-libre-semibold.woff2',
 }
 # TAL'S MARK SHIPS. It was in the dropped-artwork list, on the reasoning that
 # a raster is product art and not a system asset — and the consequence was that
