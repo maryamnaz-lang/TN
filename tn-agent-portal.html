@@ -11,9 +11,11 @@
      on file://:
          python3 -m http.server 8799 --bind 127.0.0.1
      Every class used below is a real class from design-system/gallery.html.
-     This file writes NO product CSS. The <style> block is prototype chrome
-     only: the wordmark's size, and the stage's foot padding, which the design
-     system sizes for a caption row this file does not print.
+     The <style> block is prototype chrome — the wordmark's size, and the
+     stage's foot padding, which the design system sizes for a caption row this
+     file does not print — plus ONE product rule, `.shell-name`, kept local
+     because the app bar's role label is styled for this portal only. Its own
+     note says why. Nothing else here restyles a component.
      ========================================================================== -->
 <link rel="stylesheet" href="design-system/talentnext-ds.css">
 
@@ -45,6 +47,40 @@
    The foot matches the head (§ line 2418 already takes the top to `--s05`), so
    the frame sits in an even margin rather than against the window edge. */
 .pt-stage{padding-bottom:var(--s05);gap:0}
+
+/* ==========================================================================
+   THE ONE PRODUCT RULE IN THIS FILE — the app bar's role label.
+
+   Everything above is prototype chrome. This is not: it restyles a design
+   system component, in this portal only, and it is written here rather than in
+   `talentnext-ds.css` for exactly that reason — the candidate and cohort
+   leader bars keep the label the system gives them. Never hand-edit
+   `talentnext-ds.css`; it is build output of `design-system/build-ds.py`.
+
+   The span itself is untouched — same `.shell-name`, same string, still
+   `display:none` below 900px, so the mobile bar is unaffected. Three
+   declarations, all of them asked for:
+
+   PADDING FROM THE LEFT. The label moved to the left of the bar (see the note
+   at `shell()`), which put it hard against the nav toggle's right edge — the
+   shell's own `gap` is `var(--s02)`, 4px, which is a gap between controls and
+   not a gutter for type. `var(--s05)` takes it to 20px off the divider.
+
+   #000000, NOT `--text-primary`. The system's primary ink is #111111 and the
+   label was `--text-secondary`, two steps lighter again. Pure black was asked
+   for, so it is written literally: a token would be a lie about which value
+   this is.
+
+   600, WHICH IS THE KRÄFTIG FACE. `talentnext-ds.css` embeds Söhne at 400 and
+   at 600 and nothing between, so the label's inherited `font-weight:500` was
+   being synthesised off the 400 file — a faux-bold of Buch, not Kräftig. 600
+   is the weight the real semibold face is registered at.
+   ========================================================================== */
+.shell .shell-name{
+  padding-left:var(--s05);
+  color:#000000;
+  font-weight:600;
+}
 </style>
 </head>
 <body>
@@ -2964,6 +3000,24 @@ function shell(v){
          document reference. (No backticks in a comment inside a template
          literal, either — they end the string.) -->
     <button class="shell-logo" data-go="dashboard" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+    ${/* THE ROLE LABEL SITS ON THE LEFT, and it is here rather than in
+          `.shell-right` because at desktop this bar has nothing else on its
+          left: `.shell-logo` is `display:none` at that width, so the row was
+          a 72px nav toggle and then 1130px of white before the bell. Read at
+          1440 the whole bar looked right-aligned by accident.
+
+          THE COMPONENT IS UNTOUCHED — same `.shell-name` span, same string,
+          same rules out of the design system (`display:none` below 900px,
+          `display:block` at 13px/500 above it). This is a DOM move, not a
+          restyle, so nothing has to be overridden locally and the mobile bar
+          is bit-for-bit what it was.
+
+          It lands after the logo rather than before it on purpose: at widths
+          where `.shell-logo` DOES paint, the lockup still reads first and the
+          label follows it, which is the order the other two portals use.
+
+          A `${}` comment, not an HTML one — see the note below. */''}
+    <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
     ${/* THE RIGHT-HAND END OF THE BAR IS THE ROW OF THINGS ABOUT YOU: your
           name, your bell, your face. It used to hold a Tal button, and that was
           wrong twice over.
@@ -2990,7 +3044,6 @@ function shell(v){
           comment ends the string. The note above `.shell-logo` says the same
           thing and stays prose for it. */''}
     <div class="shell-right">
-      <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
       <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
         aria-label="Notifications" aria-expanded="${S.notif}"
         title="Notifications">${I.notification}${unreadCount()

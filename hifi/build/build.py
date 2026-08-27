@@ -180,7 +180,42 @@ css = '\n'.join((here / f).read_text() for f in
                  # the agent's enabling stages draw — there the text column is
                  # the shorter and centring pushed the heading 50px down. After
                  # §15, which is all it needs.
-                 '47-plate.css'])
+                 '47-plate.css',
+                 # THE AGENT CARD'S STARS ARE A GRADIENT, given as a spec:
+                 # 16px, pink #FBB2D4 falling to orange #E98B46. A gradient
+                 # cannot be an SVG `fill`, so the star is a masked background
+                 # instead — which is what keeps it scoped to the candidate's
+                 # three agent-card rating rows rather than every star in both
+                 # portals. Late because it restates §03.104's 13px and
+                 # §15.949's fill; the layer's own note carries the argument
+                 # and the one cost (a second copy of icons.js's star path).
+                 '49-agentstar.css',
+                 # TAL'S MARK IS THE IRIDESCENT SPHERE, EVERYWHERE. The asset
+                 # swap is done above, at `__TALCIRCLE__`, so every one of the
+                 # sixty-odd places that reads `--tal-mark` picks it up with no
+                 # rule changed. What this layer is for is the two places that
+                 # do NOT read the token: §33.6's 32px CSS sphere in the head
+                 # band and §40's 132px port of it on the chat empty state,
+                 # both of which draw a sphere out of gradients and keyframes
+                 # and would otherwise sit next to the real one. It turns both
+                 # off — pseudo-elements, animations and the reduced-motion
+                 # blocks with them — and corrects the two MEASURED margins
+                 # (§27.4's -6px, §40's +16px) that were derived from the old
+                 # PNG's soft tail. LAST of the two sphere layers: it can only
+                 # subtract §33 and §40 from after them.
+                 '50-talsphere.css',
+                 # THE TAL CHAT VIEW, from Figma 433:276 (empty) and 439:481
+                 # (in conversation). A warm ivory ground with one blurred
+                 # peach ellipse, an unframed Tal turn beside its mark, the
+                 # user's turn as a black block, and a composer standing on the
+                 # coral mesh with a white field on it. LAST, and every part of
+                 # it needs to be: it subtracts §21.4's hairline and §24's
+                 # ellipse from the foot, §27's frame from Tal's bubble and its
+                 # black square from the send, §40's sphere sizing from the
+                 # hero, and §13's lattice from behind the mark. All of those
+                 # are plain declarations, so after is the only place they can
+                 # be answered from. Scoped to `.ask-page` throughout.
+                 '51-askview.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -303,18 +338,50 @@ css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
 # pointing at nothing — the browser then synthesises 600 from Buch, which is
 # worse than Kräftig and better than a second typeface.
 # ==========================================================================
-# TAL'S MARK IS A GRADIENT CIRCLE
-# The four-pointed star was the product's own drawing of "AI". Maryam
-# supplied the real mark: a soft orange sphere, blurred at the edge. It is a
-# RASTER — the falloff is a gradient with noise in it and an SVG of it would
-# either band or be larger than the PNG — so it is embedded as a data URI and
-# placed with `background-size:contain`, which lets one file serve the 15px
-# mark on a thread label and the 81px one on the panel's empty state.
+# TAL'S MARK IS AN IRIDESCENT SPHERE
+# It was a soft orange circle, blurred at the edge (`tal-circle.png`), which
+# in turn replaced the four-pointed star the product had drawn for "AI".
+# Maryam supplied the sphere and asked for it EVERYWHERE, so the swap is done
+# here, at the token, rather than surface by surface: `__TALCIRCLE__` is what
+# `--tal-mark` resolves to (27-tal.css §1) and every one of the sixty-odd
+# call sites reads that variable. Not one selector changes. The token keeps
+# its name for the reason icons.js keeps its keys — the name is an address,
+# and renaming it would touch every layer that spells it.
+#
+# Still a RASTER, for the reason the circle was one: the sphere is a
+# photograph of refraction, and an SVG of it would either band or be larger.
+# WEBP NOW, NOT PNG, and that is a saving rather than a compromise — the
+# sphere has an alpha channel and photographic content, which PNG stores at
+# 152 KB and WebP q92 at 20 KB. That is smaller than the 61 KB circle it
+# replaces, at 384 square: 2.9x the largest place it is drawn (§40's 132px
+# empty state), so the mark is sharp everywhere from there down to 15px.
+#
+# The source is the file's `image 128`, a 2034 x 1520 reference sheet. The
+# node's own placement — w:563.45% h:418.62% left:-418.42% top:-115.12% of a
+# 20px box — is the arithmetic that says WHERE on that sheet the sphere is:
+# source (1510, 418), about 362 square. It is cut to its own alpha bounds,
+# squared, and given a feathered circular alpha so it sits on any ground
+# rather than on the grey disc the reference sheet had behind it.
 # ==========================================================================
-_circ = here / 'tal-circle.png'
+_circ = here / 'tal-sphere.webp'
 css = css.replace('__TALCIRCLE__',
-    'data:image/png;base64,' + base64.b64encode(_circ.read_bytes()).decode())
-print(f'Tal circle embedded: {_circ.stat().st_size/1024:.0f} KB')
+    'data:image/webp;base64,' + base64.b64encode(_circ.read_bytes()).decode())
+print(f'Tal sphere embedded: {_circ.stat().st_size/1024:.0f} KB')
+
+# ==========================================================================
+# THE COMPOSER'S GROUND
+# `image 134` in Figma 433:276 / 439:481: a painterly coral gradient, 1672 x
+# 941. The node shows it at h:424.86% top:-243.24% of the block, which is the
+# band from 57.26% to 80.83% of its height — and that band is the SAME band
+# whatever the block's height, because both numbers are percentages OF that
+# block. So the crop is a constant, it is cut once here rather than at render
+# time, and the CSS paints what is left at `100% 100%` with no crop of its
+# own. 222 source rows instead of 941 is 9 KB instead of 1.5 MB.
+# ==========================================================================
+_mesh = here / 'ask-mesh.webp'
+css = css.replace('__ASKMESH__',
+    'data:image/webp;base64,' + base64.b64encode(_mesh.read_bytes()).decode())
+print(f'ask mesh embedded: {_mesh.stat().st_size/1024:.0f} KB')
 
 _kr = here / 'soehne-kraftig.woff2'
 if _kr.exists():

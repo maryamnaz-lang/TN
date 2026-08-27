@@ -1,0 +1,121 @@
+/* ==========================================================================
+   50. TAL'S MARK IS THE IRIDESCENT SPHERE, AND IT IS ONE THING AGAIN
+
+   Maryam supplied the sphere — a soap-bubble refraction, pale, with the whole
+   spectrum in its rim — and asked for it everywhere in the platform. The swap
+   itself is not in this layer and could not be: `--tal-mark` (§27.1) is what
+   the sixty-odd call sites read, so changing the ASSET behind it in build.py
+   changes every one of them with no rule touched. The chip, the avatar, the
+   thread label, the ask line, the head band, the empty state — all of them
+   were already asking the token for the mark.
+
+   WHAT THIS LAYER IS FOR is the three places that do NOT ask the token,
+   because they draw a sphere out of gradients instead:
+
+     §33.6   the head band's 32px mark — the mark `.sk-mark` is hidden and an
+             `::before` carries four background layers, a breathing box-shadow
+             and a conic gloss on a 5s rotation
+     §40.1   the same construction ported to 112px for the chat empty state,
+             every pixel length multiplied by 3.5
+     §40.4   and again at 32px for the docked ask line
+
+   Those three were the RIGHT answer to "the mark is a flat blob in some
+   places and a sphere in others" — they made it a sphere everywhere. The new
+   mark is a sphere already, so the same three rules now cause the problem
+   they were written to solve: a CSS orange sphere beside an iridescent
+   photographic one, on surfaces a person sees within one screen of each other.
+
+   So the construction comes off and the box goes back to the token. What is
+   kept in each case is the BOX — 32, 112, 32 — because those sizes were
+   chosen against the composition around them, not against the old artwork.
+
+   THE GLOWS GO WITH IT, and that is the part worth saying out loud. Every one
+   of them is `rgba(244,113,19,…)` — the brand orange — because the thing they
+   were lighting was orange. The sphere is pale and iridescent; an orange halo
+   under it does not read as its own light, it reads as a second object behind
+   it. `tal-sphere-glow`, `-glow-lg` and `-spin` are left declared and unused:
+   they are three keyframe blocks, the layers that state them are unchanged,
+   and deleting them is a separate edit from this one.
+
+   §27.4's -6px AND §40's +16px BOTTOM MARGINS ARE STILL RIGHT and are
+   deliberately not touched. Both numbers answer one question — how much of
+   the mark's box is actually ink — and the arithmetic is in §40's note: a PNG
+   that is mostly falloff needs -6, a hard-edged disc filling its box needs
+   +16. The sphere is cut to its own alpha bounds and squared, so it IS a
+   hard-edged disc filling its box, and +16 is the number that assumed exactly
+   that.
+
+   LAST, and it can only be last: §33 and §40 state these rules as plain
+   declarations at four and five classes deep, so subtracting them is only
+   possible from a later layer.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE HEAD BAND, 32px (§33.6)
+   The `::before` is kept as the mark's box rather than un-hiding `.sk-mark`
+   beside it: §12.660 already establishes that pseudo as an in-flow flex item
+   in the label, and re-showing the span would put two marks in the row for
+   one render while the cascade sorted out which one was hidden.
+   ------------------------------------------------------------------------ */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:none;
+  animation:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE CHAT EMPTY STATE, 112px (§40.1)
+   §40 sets `background-image:none` on the element and paints the sphere in
+   the pseudo, so the element gets the mark back and the pseudo goes. `.orb`
+   stays a meaningful class — it is still what opts this mark into being the
+   whole object rather than a label's mark — it just no longer names a
+   treatment of its own.
+   ------------------------------------------------------------------------ */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb{
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before,
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{content:none}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE DOCKED ASK LINE, 32px (§40.4)
+   §40 also took §21.4's accent halo off this mark (`.askline-mark::before`)
+   on the argument that the sphere carries its own glow. That subtraction is
+   KEPT, not reverted — the reason holds twice over now, since the light in
+   this sphere is in the artwork and an accent wash under a pale iridescent
+   disc is the loudest thing in the dock.
+   ------------------------------------------------------------------------ */
+.app .askdock .askline-mark .tal-mk{
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat}
+.app .askdock .askline-mark .tal-mk::before,
+.app .askdock .askline-mark .tal-mk::after{content:none}
+
+/* ------------------------------------------------------------------ 4 ---
+   THE MARK ON A DARK GROUND
+
+   The old mark was opaque orange and read against anything. This one is pale
+   and mostly translucent, so on the product's black surfaces it loses its
+   edge — the rim is where the colour is and the rim is what disappears.
+   `.plate`, `.cert` and `.lvl-hero` are those surfaces, and each of them can
+   carry a Tal mark in a label.
+
+   A DISC BEHIND IT, not a filter: `drop-shadow` on a translucent sphere
+   outlines the shape and darkens the spectrum with it. A white disc at .14
+   under the mark gives the rim something to be seen against and leaves the
+   artwork alone. It is drawn with `box-shadow` spread on the element itself
+   rather than another pseudo, because §33 and §40's pseudos are exactly what
+   this layer just finished taking away.
+   ------------------------------------------------------------------------ */
+.app :is(.plate, .cert, .lvl-hero) .sk-mark,
+.app :is(.plate, .cert, .lvl-hero) .tal-mk{
+  border-radius:50%;
+  box-shadow:0 0 0 2px rgba(255,255,255,.14)}

@@ -7949,6 +7949,58 @@ button.btn-p:active,
 }
 .app .plate:not(:has(.plate-who)) > .plate-h,
 .app .plate:not(:has(.plate-who)) > .plate-b{align-self:start}
+:root{
+  --askm-base:#f9f2ec;
+  --askm-hot:#e8410f;
+  --askm-peach:#f9b57f;
+  --askm-cream:#fdeadb;
+  --askm-grey:#9b98a4;
+  --askm-slate:#8b8e9b;
+  --askm-floor:#fffdfb;
+}
+.app .ask-foot{
+  --askm-b1:46%;
+  --askm-b2:58%;
+  --askm-b3:72%;
+  border-top:0;
+  background-color:var(--askm-base);
+  background-image:
+    linear-gradient(180deg,
+      rgba(255,253,251,0) 42%, rgba(255,253,251,.44) 74%,
+      rgba(255,253,251,.78) 100%),
+    radial-gradient(var(--askm-b1) 155% at 33% -8%,
+      var(--askm-hot) 0%, rgba(239,74,27,.7) 30%, rgba(240,83,12,0) 78%),
+    radial-gradient(var(--askm-b2) 190% at 55% -16%,
+      var(--askm-peach) 0%, rgba(249,181,127,0) 78%),
+    radial-gradient(var(--askm-b3) 205% at 93% -20%,
+      var(--askm-cream) 0%, rgba(253,234,219,0) 80%),
+    radial-gradient(var(--askm-b2) 200% at 0% -24%,
+      var(--askm-grey) 0%, rgba(155,152,164,.5) 36%, rgba(155,152,164,0) 80%),
+    radial-gradient(var(--askm-b1) 160% at -8% 82%,
+      var(--askm-slate) 0%, rgba(139,142,155,0) 78%),
+    radial-gradient(var(--askm-b3) 210% at 97% 124%,
+      var(--askm-floor) 0%, rgba(255,250,246,0) 74%)}
+.app .ask-foot::before{content:none}
+@container app (min-width:900px){
+  .app .ask-foot{--askm-b1:300px;--askm-b2:380px;--askm-b3:470px}
+}
+.app .ask-foot .chip-tal{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(255,255,255,.9)}
+.app .page .ag-r .stars svg.f,
+.app .page .agh-r .stars svg.f,
+.app .page .agid-r .stars svg.f{
+  width:16px; height:16px;
+  fill:transparent;
+  background:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%);
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>") center/16px 16px no-repeat;
+          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>") center/16px 16px no-repeat;
+}
+.app .page .ag-r .stars svg,
+.app .page .agh-r .stars svg,
+.app .page .agid-r .stars svg{
+  width:16px; height:16px;
+}
 
 </style>
 </head>
