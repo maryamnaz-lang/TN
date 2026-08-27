@@ -1,0 +1,110 @@
+/* ==========================================================================
+   52 — THE PAGE SUMMARY TYPES ITSELF
+
+   Three rules and a caret. `typeSummary` (ai6.js) rewrites the summary
+   paragraph as two copies of the same markup and this layer is what makes
+   the pair behave as one line of text; the argument for typing it at all is
+   in that function's note, not here.
+
+   WHY TWO COPIES. Appending characters to a paragraph grows the paragraph,
+   and this paragraph is at the top of the page with the whole page under
+   it — a second line arriving mid-read pushes everything down 26px, and on
+   the dashboard the `.stp-wing` beside it re-centres as it goes. `.tsum-g`
+   is the finished line with `visibility:hidden`: it takes part in layout, so
+   the box is its final size before the first character, and it is
+   `aria-hidden` because the visible copy is the one a screen reader should
+   read. `.tsum-t` is that visible copy, taken out of flow and laid over the
+   ghost.
+
+   `top/left/right` AND NOT `inset:0`. The overlay has to be the ghost's
+   width — that is what makes the two wrap the same, which is the whole
+   trick — but it must NOT be stretched to the ghost's height: an absolutely
+   positioned box with `bottom:0` as well would have its own height imposed
+   on it, and while the text is short that stretches the block the greeting
+   sits in. Height stays `auto`.
+
+   `.tsum` IS THE WHOLE GATE, AND IT USED TO BE THREE. The first version wrote
+   `.app .modhead .ai-aura.talsum > .ai-body p.tsum` — scoped, on the reasoning
+   §33 gives for its own block: `.ai-body p` is Tal's paragraph on nine other
+   cards further down pages, and those are not summaries. That reasoning is
+   right about `.ai-body p` and irrelevant here, because `.tsum` is not a class
+   anybody writes. It is stamped by the typer, on the one paragraph the typer
+   is animating, one statement before the ghost is built — so the class is
+   already exact and everything in front of it was describing where the portal
+   happens to keep its summary rather than what these rules are for.
+
+   AND THE SCOPE WAS ACTIVELY WRONG, which is how it was found. A page built on
+   `design-system/` — `tn-agent-portal.html`, `starter.html` — assembles its own
+   head band, and `.talsum` on a hand-built card pulls in §33's whole named-area
+   grid, which is `placeBand`'s shape and not a hand-authored page's. So the
+   only pages that could satisfy the old selector were the two the render passes
+   build, and the component shipped into `talentnext-ds.css` as three rules that
+   could never match. Keyed on `.tsum` alone it works wherever the typer runs,
+   which is the point of it being in the design system at all.
+
+   `.app` STAYS, and it is the one piece of scope that earns its place: it is
+   what every other layer in this build writes, so a rule here sits at the same
+   specificity as the rules it has to cooperate with rather than under them.
+   ========================================================================== */
+.app p.tsum{position:relative}
+
+.app p.tsum > .tsum-g{
+  display:block;
+  visibility:hidden}
+
+.app p.tsum > .tsum-t{
+  position:absolute;
+  top:0;left:0;right:0}
+
+/* --------------------------------------------------------------------------
+   52.1 THE CARET
+
+   IT CONTRIBUTES NO WIDTH, and that is a correctness rule rather than a
+   nicety. 2px of bar plus 1px of left margin against -3px on the right is
+   an inline advance of zero, so the caret can never be the thing that wraps
+   a line — if it were, the visible copy would run one line taller than the
+   box the ghost is holding open and paint over the section under it for the
+   frame or two before the next character arrives. The typer also removes the
+   element the moment the line is whole, so the finished paragraph is the
+   ghost's shape exactly.
+
+   `--accent-text` is the ink §33.2 sets Tal's own name in, three
+   millimetres above. The caret is Tal writing, so it is Tal's colour; ink
+   would read as a stray character in the sentence. It is a TOKEN and not a
+   literal for the portability reason above: a second portal that redefines
+   the accent gets a caret in its own accent with nothing restated.
+
+   `-.1em` OF `vertical-align`, not `1em` of height on the baseline. A bar
+   the full height of the line box sits high against lowercase text — the
+   descender space is under it and nothing is in it. Dropping it a tenth of
+   an em puts the bar across the x-height and just below the baseline, which
+   is where a text cursor sits.
+
+   STEPS(1), NOT A FADE. A caret is on or off; a caret that eases between
+   the two is a pulse, and a pulse next to a sentence being written reads as
+   a loading state.
+   -------------------------------------------------------------------------- */
+.app p.tsum .tsum-c{
+  display:inline-block;
+  width:2px;height:1em;
+  margin:0 -3px 0 1px;
+  vertical-align:-.1em;
+  border-radius:1px;
+  background-color:var(--accent-text);
+  animation:tsum-caret 1.06s steps(1, end) infinite}
+
+@keyframes tsum-caret{
+  0%,   49.99%{opacity:1}
+  50%, 100%   {opacity:0}}
+
+/* REDUCED MOTION NEEDS ITS OWN LINE HERE, for the reason §21.4, §27.8, §33.6
+   and §40 each state their own: §13.187 clamps every duration to 1ms, and
+   1ms on an INFINITE animation is a strobe rather than "off". The typer also
+   prints the whole line instantly under this setting, so in practice the
+   caret is never built — this is the belt to that brace, and it is one
+   declaration. It matters more OUTSIDE the portal: a page that ships this
+   stylesheet and drives it with its own clock may not have made the same
+   check, and this rule holds either way. */
+@media (prefers-reduced-motion:reduce){
+  .app p.tsum .tsum-c{animation:none}
+}

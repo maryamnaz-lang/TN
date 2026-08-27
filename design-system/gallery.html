@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=09025138">
+<link rel="stylesheet" href="talentnext-ds.css?b=b6381e68">
 
 <style>
 /* ==========================================================================
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=09025138"></script>
+<script src="talentnext-ds.js?b=b6381e68"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -386,6 +386,15 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
         </div>
       </section>
     </div>
+  `)}
+  ${ex('The summary types itself', 'The summary is the one line on a page that is <b>written rather than stored</b> — assembled from state at the moment you arrive — so it is said rather than already there. Nothing else at the head of a page does this: the <code>&lt;h1&gt;</code> is a label and was true before you got here. <b>You write the paragraph and hand it to <code>dsTypeSummary(p, key)</code> at the end of your render</b>; the helper does the rest. Two things it does that are worth knowing about. The paragraph is drawn <b>twice</b> — <code>.tsum-g</code> is the finished line at <code>visibility:hidden</code>, holding the final box open, and <code>.tsum-t</code> is the visible copy laid over it — because a typewriter that grows its own box shoves the whole page down mid-read. And <code>&lt;span class="tal-greet"&gt;</code> <b>does not type</b>: §33.9 hides the page&rsquo;s <code>.ph</code> when a greeting is present, so the greeting <i>is</i> that page&rsquo;s title, and a title that types itself in is a louder effect than a sentence that does. The <code>key</code> is &ldquo;which page am I on&rdquo; — the helper appends the words to it, so the line re-types when the page changes <i>or</i> when the reading does, and prints instantly on every other re-render. Pass <code>null</code> for the paragraph on a page that has no summary; that is how the next arrival is recognised as one.', `
+    <div class="modhead">
+      <div class="sec"><div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Tal</span></div>
+        <div class="ai-body"><p id="tsumDemo"><span class="tal-greet">Welcome back, Maryam!</span>Day 34 of 90, week 5. 5 of 13 chapters at 88%, 260 minutes so far. Chapter 4 has been opened four times without finishing.</p></div>
+      </div></div>
+    </div>
+    <button class="btn btn-s noic" id="tsumReplay">Type it again</button>
   `)}
   ${ex('The plate belongs in the band', 'A plate reaches the column edge with a <b>negative margin</b> of <code>--pad-x</code>, and <code>.app .modhead .plate</code> zeroes it. So a plate inside a <code>.modhead</code> sits inset; a plate anywhere else bleeds full-bleed on purpose. Both are right — pick deliberately. Child order is fixed and <code>.plate-who</code> comes <b>last</b>: the avatar sits under the actions, not above them.', `
     <div class="sec sec-dark">
@@ -1144,6 +1153,22 @@ function sheet(open){
 document.getElementById('openSheet').onclick = () => sheet(true);
 modal.onclick = e => { if(e.target === modal || e.target.closest('[data-close],.x')) sheet(false); };
 document.getElementById('replay').onclick = () => { dsStagger(page); dsEnter(app); };
+
+/* THE SUMMARY, TYPED — the one demo on this page that has to be RE-armed to be
+   seen twice. `dsTypeSummary` runs once per arrival by design, and its key is
+   "which page am I on" plus the words; on a single-page reference neither ever
+   changes, so a second call is correctly a no-op. Clearing `DS_SUM.key` is
+   what tells it this is a new arrival — the same thing a real portal gets for
+   free by navigating.
+
+   It is deliberately NOT wired to the section scroll: a line that re-types
+   every time it comes back into view is a page that will not sit still. */
+const tsumDemo = document.getElementById('tsumDemo');
+if(tsumDemo){
+  const typeDemo = () => { DS_SUM.key = null; dsTypeSummary(tsumDemo, 'gallery'); };
+  typeDemo();
+  document.getElementById('tsumReplay').onclick = typeDemo;
+}
 </script>
 </body>
 </html>

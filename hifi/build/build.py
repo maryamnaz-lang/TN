@@ -181,14 +181,16 @@ css = '\n'.join((here / f).read_text() for f in
                  # the shorter and centring pushed the heading 50px down. After
                  # §15, which is all it needs.
                  '47-plate.css',
-                 # THE AGENT CARD'S STARS ARE A GRADIENT, given as a spec:
-                 # 16px, pink #FBB2D4 falling to orange #E98B46. A gradient
-                 # cannot be an SVG `fill`, so the star is a masked background
-                 # instead — which is what keeps it scoped to the candidate's
-                 # three agent-card rating rows rather than every star in both
-                 # portals. Late because it restates §03.104's 13px and
-                 # §15.949's fill; the layer's own note carries the argument
-                 # and the one cost (a second copy of icons.js's star path).
+                 # THE AGENT CARD'S STARS ARE 16px, on the candidate's three
+                 # agent-card rating rows and nowhere else. It WAS a gradient
+                 # too — pink #FBB2D4 to orange #E98B46, given as a spec — and
+                 # that is reverted: it drew salmon on a card that already has
+                 # an orange CTA, and it left the two portals rating on
+                 # different-coloured stars. The colour is §15.949's
+                 # `var(--star)` again, restored by DELETING the mask rather
+                 # than by restating anything, which also retires the build's
+                 # one duplicated icon path. Late because it restates §03.104's
+                 # 13px; the layer's own note carries the whole argument.
                  '49-agentstar.css',
                  # TAL'S MARK IS THE IRIDESCENT SPHERE, EVERYWHERE. The asset
                  # swap is done above, at `__TALCIRCLE__`, so every one of the
@@ -215,7 +217,36 @@ css = '\n'.join((here / f).read_text() for f in
                  # hero, and §13's lattice from behind the mark. All of those
                  # are plain declarations, so after is the only place they can
                  # be answered from. Scoped to `.ask-page` throughout.
-                 '51-askview.css'])
+                 '51-askview.css',
+                 # THE PAGE SUMMARY TYPES ITSELF. The summary is the one line
+                 # on a page that is written rather than stored — Tal's
+                 # reading of `S` at the moment you arrive — so it is said to
+                 # you rather than already sitting there. Three rules and a
+                 # caret; the layer holds the layout half of the effect (a
+                 # hidden ghost copy reserving the final box, the visible
+                 # copy laid over it) and `typeSummary` in ai6.js holds the
+                 # clock. LAST, and it only needs to be after §33: every
+                 # selector is gated on `.talsum` and on the `.tsum` class
+                 # ai6 stamps, so it adds to that block rather than
+                 # correcting it, and a paragraph that is not being typed
+                 # matches nothing here.
+                 '52-talsumtype.css',
+                 # THE CHAT IS ONE SURFACE. Figma 446:347 redraws 433:276 with
+                 # the wash running across the FULL frame — under the margins
+                 # and under the column alike — so the sheet-on-a-ground the
+                 # rest of the product is built on has to come apart here:
+                 # §18's panel-toned margin goes white, §51's ground comes off
+                 # `.ask-page` entirely, and the one gradient is stated once
+                 # and painted on the surface both of them share. Takes §51.7's
+                 # coral mesh off the foot with it (446:347 has no picture
+                 # there), turns the composer's stroke into a moving conic of
+                 # the same four colours, and swaps §40's CSS sphere for the
+                 # supplied footage, round-cropped. LAST: §18's rule and §51's
+                 # ground are plain declarations, §40's sphere is five classes
+                 # deep, and three of these live inside `@container app
+                 # (min-width:900px)` because per trap 3 that tier can only be
+                 # answered from inside itself.
+                 '53-talground.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -352,10 +383,64 @@ css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
 # has been asked — and leaves every other mark in the platform a plain
 # sphere. §50 is where that split is stated.
 # ==========================================================================
-_circ = here / 'tal-circle.png'
+#
+# AND IT IS FOOTAGE NOW, NOT A STILL. Maryam supplied the blob as a 15s
+# 1600x1200 clip and asked for it wherever the orange sphere was — this build,
+# the leader's portal, and the agent's, which is built on the design system.
+# That is one token, so it is one edit: `tal-blob.webp` is the clip as an
+# ANIMATED WEBP and everything reading `--tal-mark` moves without a selector.
+# `build-ds.py` maps the same token to the same file, which is what carries it
+# across; §53.7 has the crop, the round-crop proof and the loop measurement,
+# and §53.8 has the three CSS-drawn spheres that had to be turned back into
+# the artwork by hand because they never painted this token at all.
+#
+# THE ALPHA IS A CIRCLE, cut into the asset rather than left to a
+# `border-radius` on a dozen selectors and two hand-written portals. It costs
+# nothing: no lit pixel in any frame reaches past 391.3 of the 400 the
+# inscribed circle allows, so the round crop removes none of the animation.
+#
+# CROPPED, SCALED AND ENCODED OUT OF BUILD. `tal-blob.webp` is committed at
+# its final size because ffmpeg is not a build dependency and re-deriving it
+# every build would make it one. `tal-blob.mp4` beside it is the cropped
+# master the WebP was encoded from — kept for the next size change, embedded
+# by nothing. `tal-circle.png` is kept for the same reason: it is what the
+# mark was, and §27.1's note about its falloff is written against it.
+# ==========================================================================
+# AND IT FALLS BACK TO THE STILL, LOUDLY, BECAUSE THE ENCODE IS NOT A BUILD
+# STEP. `tal-blob.webp` is committed rather than derived — the note above says
+# why: ffmpeg is not a build dependency. The consequence is that the file can
+# be ABSENT on a machine that has the source (`tal-blob.mp4` is committed, the
+# WebP was not), and this line read it unguarded: the whole build died on a
+# FileNotFoundError, which means the portal cannot be regenerated at all — and
+# `hifi/talentnext-candidate-portal-v24.html` has to stay buildable, because
+# Vercel serves the committed output and there is no build step in front of it.
+#
+# `tal-circle.png` is the honest fallback and it is already kept: the note
+# above says it is "what the mark was", and §27.1's falloff measurement is
+# written against it. So a machine without the clip builds the portal it built
+# before §53, and says so in one line rather than looking finished. Drop the
+# WebP in and it takes over with nothing else changed.
+#
+# NOT SILENT, and that distinction is the whole of this block. `build-ds.py`
+# had the same substitution with a silent skip, and it shipped the literal
+# string `__TALCIRCLE__` into `talentnext-ds.css` as Tal's mark — a broken URL
+# in the design system, in three hand-written pages, with a successful build
+# log above it. A missing asset must either be replaced by a named predecessor
+# or stop the build; it must never quietly become nothing.
+_blob = here / 'tal-blob.webp'
+_circ = _blob if _blob.exists() else (here / 'tal-circle.png')
+_mime = 'image/webp' if _circ.suffix == '.webp' else 'image/png'
+if not _circ.exists():
+    raise SystemExit(f'MISSING TAL MARK — neither {_blob.name} nor tal-circle.png '
+                     f'is in {here}. Nothing written.')
 css = css.replace('__TALCIRCLE__',
-    'data:image/png;base64,' + base64.b64encode(_circ.read_bytes()).decode())
-print(f'Tal circle embedded: {_circ.stat().st_size/1024:.0f} KB')
+    f'data:{_mime};base64,' + base64.b64encode(_circ.read_bytes()).decode())
+if _circ is _blob:
+    print(f'Tal blob embedded: {_circ.stat().st_size/1024:.0f} KB')
+else:
+    print(f'!! tal-blob.webp NOT FOUND — fell back to {_circ.name} '
+          f'({_circ.stat().st_size/1024:.0f} KB). Tal\'s mark is the STILL, not '
+          f'the footage. Encode the WebP from tal-blob.mp4 to finish §53.')
 
 # ==========================================================================
 # THE COMPOSER'S GROUND
@@ -556,17 +641,61 @@ function fitFrame(){{
   if(pct) pct.textContent = scale < 1 ? Math.round(scale * 100) + '%' : '100%';
 }}
 
+/* ============================================================
+   AND THE FRAME YOU CHOSE SURVIVES A RELOAD.
+
+   The hash already restores the app: `#day34/cohort`, `#leader/leadEvals`
+   — portal, stage and view, written by the renderer and read by views.js at
+   boot. The frame was the one thing it did not carry, so reloading while
+   reading a desktop screen dropped you back into the 390px phone and you
+   had to press Desktop again. Reviewing this prototype is mostly reload,
+   look, edit, reload.
+
+   `localStorage` AND NOT THE HASH, and the line is between the two kinds of
+   state that are on this page. The hash is the APP: it is what you send
+   somebody when you want them to see the screen you are looking at, and the
+   renderer writes it on every render. The frame is not the app — it is
+   prototype chrome, this reader's preference for how to look at it, and it
+   has no business in a link or in a function that runs 200 times a sweep.
+   Keeping it out also keeps `histWrite`'s contract intact: the URL stays
+   three fields the boot reader already knows how to parse.
+
+   IN A TRY/CATCH, for the reason `histWrite` is: `localStorage` THROWS
+   rather than returning null when storage is denied — a sandboxed iframe or
+   a browser set to block site data — and an unguarded read here is the last
+   statement in the file, so it would take `fitFrame()` with it and leave the
+   frame unsized. A refused write costs the preference and nothing else.
+
+   NO `render()` ON THE RESTORE, though the click handler has one. Nothing in
+   the JS reads `data-vp` — the app answers its CONTAINER, which is the whole
+   design of this preview — so the attribute plus `fitFrame()` is the entire
+   layout change. The click handler's render is there for `S.nav = false`,
+   closing the drawer you may have left open on the phone, and at boot the
+   drawer is already closed. Calling it anyway would mean a fourth boot
+   render for nothing.
+   ============================================================ */
+const VP_KEY = 'tn-vp';
+
+function vpSet(v, boot){{
+  if(!VP_SIZE[v]) v = 'mobile';
+  document.querySelectorAll('#vp button').forEach(x => x.classList.toggle('on', x.dataset.vp === v));
+  device.dataset.vp = v;
+  try {{ localStorage.setItem(VP_KEY, v); }} catch(e){{ /* storage denied: the
+    choice stops surviving a reload, the switcher keeps working */ }}
+  if(!boot){{ S.nav = false; render(); }}
+  fitFrame();
+}}
+
 document.getElementById('vp').addEventListener('click', e => {{
   const b = e.target.closest('button[data-vp]');
   if(!b) return;
-  document.querySelectorAll('#vp button').forEach(x => x.classList.toggle('on', x === b));
-  device.dataset.vp = b.dataset.vp;
-  S.nav = false;
-  render();
-  fitFrame();
+  vpSet(b.dataset.vp);
 }});
 window.addEventListener('resize', fitFrame);
-fitFrame();
+
+let vpFirst = null;
+try {{ vpFirst = localStorage.getItem(VP_KEY); }} catch(e){{}}
+vpSet(vpFirst || 'mobile', true);
 </script>
 </body>
 </html>

@@ -3767,6 +3767,31 @@ function render(){
     if(el) el.focus();
   }
   try { placeCal(); } catch(e){ console.warn('cal', e); }
+
+  /* TAL'S SUMMARY WRITES ITSELF — `dsTypeSummary`, from the design system.
+     LAST, after `placeCal`, and it has to be after anything that rebuilds part
+     of the page: the helper splits the paragraph into a hidden ghost holding
+     the final box open and a visible copy filling in over it, and a pass that
+     replaces the head band afterwards would throw both away. Nothing here
+     touches the band, but "last" is the rule that keeps that true.
+
+     THE KEY IS THE ONE `data-enter` ALREADY USES, plus the words. `key` above
+     is `stage/view/interview/tab` — exactly "which page am I on", including the
+     two things whose identity is not in the view name — and the helper appends
+     the paragraph's own text, so the line also re-types when the reading has
+     genuinely changed under the reader. Every other interaction on the page
+     prints it instantly.
+
+     WRAPPED, because this is the third portal to learn CLAUDE.md's lesson about
+     passes: a throw in a presentational nicety must not take the render with
+     it. If the design system is a version behind and the helper is not there,
+     `typeof` catches it and the summary is simply a paragraph. */
+  try {
+    if(typeof dsTypeSummary === 'function'){
+      dsTypeSummary(device.querySelector('.modhead .ai-aura.talsum > .ai-body > p'), key);
+    }
+  } catch(e){ console.warn('talsum type', e); }
+
   document.getElementById('pick').value = S.stage;
   writeHash();
 }

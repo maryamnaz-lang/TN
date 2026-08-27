@@ -204,6 +204,19 @@ chips, the mark: pure CSS, cheap to add); its *flow* needs the render loop, so
 sharing it means shipping a third generated file with a documented contract —
 a render hook and a state shape. Worth deciding before building, not after.
 
+**The typing summary is the small case of this, and it was got wrong first.** §52
+came into the box on the include-by-default policy and its clock stayed behind in
+`ai6.js`, on the reasoning that a render loop does not port. True of a render
+loop; false of this — the behaviour is twelve lines of clock over a paragraph the
+calling page already owns, with no state shape and no hook, so it ports as a
+plain function. The test is not "is there JS" but **"does the behaviour need the
+portal's state, or only the element you hand it"**. `dsTypeSummary(p, key)` needs
+only the element. Tal's thread needs `S.thread`, and still does not port.
+
+The tell that something has fallen into this gap: a family of rules in the output
+whose gate is a class **nothing in the box ever writes**. Grep the two files for
+the class name — if only the stylesheet mentions it, the component is decoration.
+
 ## Why this is an extraction, not a rewrite
 
 The portal's look is not a set of values you can restate. It is 38 CSS layers in
@@ -401,12 +414,57 @@ Object.keys(IP)   // all 75 icon names
 dsFrame(el)       // stamp the container the layout queries
 dsEnter(app)      // fire the entrance once, then clear the marker
 dsStagger(page)   // stamp --i on each child for the 26ms cascade
+dsTypeSummary(p, key)   // Tal's summary writes itself — see below
 ```
 
 The icon set is the official Material **filled** cut, checked against
 `@material-design-icons/svg/filled`. Several marks look linear and are correct:
 the filled cut is intrinsically hollow for a ring or a tick. Do not blanket-fill
 them.
+
+### Tal's summary types itself — `dsTypeSummary(p, key)`
+
+The summary is the one line on a page that is **written rather than stored** —
+assembled from state at the moment you arrive. Printed whole it reads as a caption
+that was always there; typed, it reads as something being said to you now. Call it
+once, last, at the end of your render:
+
+```js
+dsTypeSummary(app.querySelector('.modhead .ai-body p'), S.view);
+```
+
+Both halves ship — §52 is the layout, `dsTypeSummary` is the clock. **This is the
+worked example of "Stateful widgets need more than a prefix" above**: for one build
+only the CSS was here, and three rules gated on a class that only a clock ever
+stamps are three rules nothing in the box can switch on.
+
+Five things about it, and none is guessable from the CSS:
+
+- **The paragraph is drawn twice.** `.tsum-g` is the finished line at
+  `visibility:hidden`, holding the final box open; `.tsum-t` is the visible copy
+  laid over it. A typewriter that grows its own box shoves the whole page down
+  mid-read — this is the part worth copying rather than reinventing.
+- **`<span class="tal-greet">` does not type.** §33.9 hides the page's `.ph` when a
+  greeting is present, so the greeting *is* that page's title, and a title that
+  types itself in is a louder effect than a sentence that does.
+- **The key is "which page, and which words".** You pass the page — a view name,
+  plus whatever identifies the subject on a detail page. The helper appends the
+  paragraph's text, so the line re-types when the page changes *or* when the
+  reading does, and prints instantly on every other re-render.
+- **Pass `null` on a page with no summary.** That is not a no-op: it is how the
+  next arrival is recognised as one. Without it, leaving a page and coming back
+  returns to an unchanged key and nothing types.
+- **The pace is one number.** `DS_SUM_MS` is a budget for the whole line, not a
+  rate, so a long summary and a short one finish together. Under
+  `prefers-reduced-motion` the line prints whole, immediately.
+
+It uses `setTimeout` rather than `requestAnimationFrame` on purpose: **a hidden
+document gets no frames at all**, so an rAF version leaves the summary blank
+indefinitely in any tab that was not at the front when the page loaded. Each tick
+derives what to show from elapsed time, so a throttled tick just arrives with more
+to reveal.
+
+`gallery.html` has it live under **Signature**, with a button to replay it.
 
 ## Rendering
 

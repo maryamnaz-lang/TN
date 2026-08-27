@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 3632.  Rules dropped as product-specific: 173.
+   Rules kept: 3638.  Rules dropped as product-specific: 173.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6372,4 +6372,14 @@ button.btn-p:active,
   .app .ask-page .ask-sugg{flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none}
   .app .ask-page .ask-sugg::-webkit-scrollbar{display:none}
   .app .ask-page .ask-sugg .chip-tal{flex:none}
+}
+
+/* ---- 52-talsumtype.css ---- */
+.app p.tsum{position:relative}
+.app p.tsum > .tsum-g{display:block; visibility:hidden}
+.app p.tsum > .tsum-t{position:absolute; top:0; left:0; right:0}
+.app p.tsum .tsum-c{display:inline-block; width:2px; height:1em; margin:0 -3px 0 1px; vertical-align:-.1em; border-radius:1px; background-color:var(--accent-text); animation:tsum-caret 1.06s steps(1, end) infinite}
+@keyframes tsum-caret{0%,   49.99%{opacity:1} 50%, 100%   {opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .app p.tsum .tsum-c{animation:none}
 }

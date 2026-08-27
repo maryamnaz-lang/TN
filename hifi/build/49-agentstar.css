@@ -1,72 +1,60 @@
 /* ==========================================================================
-   §49 — THE AGENT CARD'S RATING STARS ARE A GRADIENT
+   §49 — THE AGENT CARD'S RATING STARS ARE 16px
 
-   16px, `linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%)` — pink at the top
-   falling to orange at the bottom. Given as a spec, so the two stops are
-   written here literally rather than as tokens; §49.1 is the only place in the
-   build that names them.
+   That is all this layer does now, and the rest of this note is why, because
+   it did something else first.
 
-   WHY THIS IS A MASK AND NOT A `fill`. `stars()` (views.js) prints five inline
-   `<svg>`s and marks the filled ones `.f`; §15.949 fills those with
-   `var(--star)`. A CSS gradient cannot be an SVG paint — `fill` takes a colour
-   or a paint server, never a `linear-gradient()` — so the two honest routes are
-   an SVG `<linearGradient>` def referenced as `fill:url(#…)`, which means
-   changing the shared `stars()` markup and therefore every star in both
-   portals, or this: paint the gradient as the element's BACKGROUND and mask it
-   with the star outline. The mask keeps the change in CSS, which is what lets
-   it be scoped to three selectors instead of applying everywhere.
+   IT WAS A GRADIENT, AND THE GRADIENT IS GONE. The spec was 16px with
+   `linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%)` — pink at the top falling
+   to orange at the bottom. Drawn, it read as salmon: five warm marks in a
+   product whose accent is already orange, on a card that already carries an
+   orange CTA, and the one thing a rating has to be is legible as a rating at
+   a glance. The stars go back to `--star` (#c9971a, §01), the amber they were
+   before, which is also the colour every OTHER star in both portals still
+   is — the leader's `.stand-rate` and `.idmeta` were deliberately never in
+   this layer's scope, so for as long as the gradient shipped the two portals
+   rated on different-coloured stars.
 
-   THE COST, STATED PLAINLY: the path in §49.1 is a second copy of `icons.js`'s
-   `star` — the official Material filled star, byte-identical to it today. It is
-   the one duplicated path in the build. Change the icon and change it here too.
+   NOTHING IS RESTATED TO GET THAT BACK. §15.949's `.app .stars svg.f{fill:
+   var(--star)}` was never overridden — §49.1 painted the gradient as a
+   BACKGROUND and masked it with the star outline, precisely because a CSS
+   gradient cannot be an SVG `fill`, and it set `fill:transparent` so the real
+   amber star underneath would not print through the mask. Deleting the
+   background, the mask and that one `fill:transparent` is the whole revert,
+   and §15's rule comes back into effect on its own. There is no yellow
+   written in this file, and there should not be: the amber has one definition
+   and it is the token.
+
+   IT ALSO TAKES THE BUILD'S ONE DUPLICATED PATH WITH IT. The mask carried a
+   second copy of `icons.js`'s `star` — the official Material filled star,
+   inline in two `url("data:image/svg+xml…")` values — which was the stated
+   cost of doing this in CSS at all. That cost is now paid off rather than
+   carried.
+
+   THE SIZE STAYS, on the filled and the empty alike. §03.104 sizes every star
+   in the build at 13px; 16px is the agent card's, and both selectors are here
+   because a 4.4 rating prints four filled and one not, and 16px beside 13px
+   reads as a rendering fault rather than as a rating. One rule now does both
+   — with no gradient to scope, `.f` needs nothing the empty star does not.
 
    SCOPE — THE CANDIDATE'S AGENT CARDS, AND ALL THREE OF THEM:
      `.ag-r`    the card in the agents list
      `.agh-r`   the horizontal card — the shortlist rail, and the same card
                 inside Tal's booking thread (`agentCardH`, ai7.js)
      `.agid-r`  the identity row on one agent, page and thread both
-   The leader's stars are deliberately NOT here. `.stand-rate` (lead.js,
-   lead4.js) and `.idmeta` (lead4.js) are a different portal's rating of a
-   different thing — a candidate, not an agent — and the request was the
-   candidate portal's agent cards.
 
-   LATE BECAUSE IT CORRECTS. §03.104 sizes every star 13px and §15.949 fills
-   `.f`; both are outweighed here on specificity alone, but the layer belongs
-   after the rules it restates either way.
+   LATE BECAUSE IT CORRECTS §03.104's 13px — outweighed on specificity alone,
+   but the layer belongs after the rule it restates either way.
 
-   AND IT IS DELIBERATELY NOT IN `build-ds.py`'s `LAYERS`, which is the one
-   place this build breaks CLAUDE.md's "change a layer, re-run both builds"
-   rule. The design system is include-by-default and that default is right —
-   excluding a component costs a portal that looks generic. This is not a
-   component. It is a colour decision for ONE portal's agent cards, and
-   `tn-agent-portal.html` line 1144 prints `.ag-r` with `stars()` in it: ship
-   §49 into `talentnext-ds.css` and the talent agent's own rating turns pink
-   without anyone asking for it. The include-by-default argument is about
-   classes a second portal needs; this is a repaint of a class a second portal
-   already has and already draws correctly.
-
-   So: adding §49 to `build-ds.py` is a decision, not an oversight. If the
-   gradient is meant to be the system's star everywhere, the honest change is
-   to §15.949's `--star` fill, not to this layer's scope.
+   AND IT IS STILL DELIBERATELY NOT IN `build-ds.py`'s `LAYERS`, which is the
+   one place this build breaks CLAUDE.md's "change a layer, re-run both
+   builds" rule. The design system is include-by-default and that default is
+   right — excluding a component costs a portal that looks generic. This is
+   not a component; it is one portal's sizing of a class a second portal
+   already has and already draws correctly (`tn-agent-portal.html` line 1144
+   prints `.ag-r` with `stars()` in it). The argument mattered more when this
+   layer was a repaint; it holds for a resize too.
    ========================================================================== */
-
-/* §49.1 — the filled star. `fill:transparent` first: without it the path still
-   paints var(--star) INSIDE the mask, over the gradient, and the whole thing
-   reads as the old flat star at a new size. */
-.app .page .ag-r .stars svg.f,
-.app .page .agh-r .stars svg.f,
-.app .page .agid-r .stars svg.f{
-  width:16px; height:16px;
-  fill:transparent;
-  background:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%);
-  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>") center/16px 16px no-repeat;
-          mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/></svg>") center/16px 16px no-repeat;
-}
-
-/* §49.2 — the EMPTY stars have to grow with them. Only `.f` carries the
-   gradient, but a 4.4 rating prints four filled and one not, and 16px beside
-   13px reads as a rendering fault rather than as a rating. Same size, same
-   grey (§03.104) — the fill is untouched here. */
 .app .page .ag-r .stars svg,
 .app .page .agh-r .stars svg,
 .app .page .agid-r .stars svg{

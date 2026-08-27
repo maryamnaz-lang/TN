@@ -330,11 +330,17 @@
    clips its own glow and draws nothing. Reproducing a shape that is invisible
    in the source would be copying the mistake rather than the design.
 
-   THE STAR TAKES §49's GRADIENT. §49 states pink #FBB2D4 falling to orange
-   #E98B46 for the agent card's rating stars, given as a spec; the file uses
-   the same two stops on this star. One gradient, named once — so this reads
-   §49's stops rather than restating them, and `.sk-mark` is already a masked
-   background, which is exactly what a gradient needs to be paintable.
+   THE STAR IS A GRADIENT, AND THIS LAYER NOW OWNS THE TWO STOPS. Pink #FBB2D4
+   falling to orange #E98B46, read off the file (439:481). §49 briefly stated
+   the same pair for the agent card's RATING stars and this note pointed at it
+   for them; that gradient is reverted — it drew salmon on a card that already
+   has an orange CTA, and a rating has to be legible as a rating — so the
+   stops are written here, which is the only place in the build that has them
+   now. THE TWO WERE NEVER THE SAME DECISION: a rating is data and reads in
+   `--star` amber like every other rating in both portals, and this is a mark
+   on a suggestion chip in Tal's own chat, where the accent belongs. Do not
+   "restore consistency" by taking one to the other. `.sk-mark` is already a
+   masked background, which is what a gradient needs to be paintable at all.
    ------------------------------------------------------------------------ */
 .app .ask-page .ask-sugg{
   display:flex;flex-wrap:wrap;gap:var(--s03);margin:0}

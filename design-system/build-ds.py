@@ -109,6 +109,20 @@ LAYERS = [
     # The one thing it brings that needs the portal is `--askm-mesh`'s data
     # URI, and that is embedded, not fetched.
     '51-askview.css',
+    # The page summary typing itself. Two of these three rules are pure layout
+    # — a hidden copy of the finished line reserving its box, the visible copy
+    # laid over it — and they are the part that is hard to get right, because
+    # a typewriter that grows its own box shoves the page down mid-read.
+    #
+    # AND THE CLOCK SHIPS WITH IT, as `dsTypeSummary` in the JS half. It did
+    # not at first, and that was the whole of the bug: three rules gated on a
+    # class that only a clock ever stamps went into the box with no clock, so
+    # the component was present and could not be switched on by anything that
+    # had it. §52's selectors were also scoped to `.modhead .ai-aura.talsum`
+    # then — a shape `placeBand` builds and a hand-authored page does not — so
+    # they could not have matched even if a page had written its own typer.
+    # Both halves are here now and the gate is `.tsum` alone.
+    '52-talsumtype.css',
 ]
 
 # ==========================================================================
@@ -393,8 +407,15 @@ FONTS = {
 # illustration is what makes it the front door rather than a form. Same
 # mechanism as the fonts and Tal's mark — read off disk, encoded here, embedded
 # under the token `17-auth.css` already writes.
+# AND THE MARK MOVES NOW. Maryam supplied the blob as footage and asked for it
+# wherever the orange sphere was — which includes every portal built on this
+# stylesheet, so the swap belongs at the token rather than in a rule. Same
+# token, same declaration, an ANIMATED WEBP behind it instead of a PNG, and
+# `.ai-label.bare::before` (§37.2) — the mark this file actually ships — moves
+# without a selector changing. hifi/build/build.py maps the identical token to
+# the identical file; §53.7 has the crop and why its alpha is a circle.
 IMAGES = {
-    '__TALCIRCLE__': ('tal-circle.png', 'image/png'),
+    '__TALCIRCLE__': ('tal-blob.webp', 'image/webp'),
     '__AUTHART__':   ('auth-art.webp',  'image/webp'),
     '__AUTHMARK__':  ('auth-mark.webp', 'image/webp'),
     # the chat composer's coral ground (§51.7). Cut to the band the Figma node
@@ -403,6 +424,33 @@ IMAGES = {
     # reason Tal's mark does: without it the declaration points the browser at
     # the literal string `__ASKMESH__` and the composer loses its picture.
     '__ASKMESH__':   ('ask-mesh.webp',  'image/webp'),
+}
+
+# ==========================================================================
+# A REPLACEMENT ASSET NEEDS A NAMED PREDECESSOR, AND THIS IS WHY.
+# `tal-blob.webp` is COMMITTED rather than derived — ffmpeg is not a build
+# dependency of either build — so it can simply be absent on a machine that
+# has everything else, and it was: `tal-blob.mp4` is committed, the encoded
+# WebP never was. The loop below skipped it and printed "its placeholder is
+# dropped", which was not true — `ARTWORK` is empty now, so nothing drops it.
+# The literal string `__TALCIRCLE__` went into `talentnext-ds.css` as Tal's
+# mark, under a build log that said `embedded` for everything else and looked
+# clean. Three hand-written pages and `tn-agent-portal.html` lost the mark.
+#
+# So: a token whose file is missing either falls back to a PREVIOUS asset that
+# is still on disk — loudly, once, naming what the reader is now looking at —
+# or stops the build. It may not become nothing. `tal-circle.png` is the right
+# predecessor and is deliberately kept: build.py's note calls it "what the mark
+# was", and §27.1's falloff measurement is written against it.
+#
+# hifi/build/build.py has the identical pair of rules at `__TALCIRCLE__`, for
+# the identical reason. The two builds have to agree about the mark or the
+# portal and the design system draw different Tals.
+# ==========================================================================
+IMAGE_FALLBACK = {
+    'tal-blob.webp': ('tal-circle.png', 'image/png',
+                      "Tal's mark is the STILL, not the footage. "
+                      'Encode the WebP from tal-blob.mp4 to finish §53.'),
 }
 
 # NOTHING IS DROPPED FOR ARTWORK ANY MORE. The tuple stays because `clean_decls`
@@ -797,12 +845,29 @@ def main():
             print(f'  ! {filename} missing — its @font-face is dropped')
     for token, (filename, mime) in IMAGES.items():
         f = SRC / filename
-        if f.exists():
-            b64 = base64.b64encode(f.read_bytes()).decode()
-            css = css.replace(token, f'data:{mime};base64,{b64}')
-            print(f'embedded {filename} ({f.stat().st_size/1024:.0f} KB)')
+        note = None
+        if not f.exists():
+            # see IMAGE_FALLBACK's note: a missing asset falls back to a named
+            # predecessor or stops the build, and never becomes nothing
+            alt = IMAGE_FALLBACK.get(filename)
+            if not alt:
+                raise SystemExit(
+                    f'MISSING ASSET — {filename} is not in {SRC} and has no fallback.\n'
+                    f'{token} would ship as a literal string and the declaration that '
+                    f'reads it would point the browser at it. Nothing written.')
+            filename, mime, note = alt
+            f = SRC / filename
+            if not f.exists():
+                raise SystemExit(
+                    f'MISSING ASSET — neither {IMAGES[token][0]} nor its fallback '
+                    f'{filename} is in {SRC}. Nothing written.')
+        b64 = base64.b64encode(f.read_bytes()).decode()
+        css = css.replace(token, f'data:{mime};base64,{b64}')
+        if note:
+            print(f'  !! {IMAGES[token][0]} NOT FOUND — fell back to {filename} '
+                  f'({f.stat().st_size/1024:.0f} KB). {note}')
         else:
-            print(f'  ! {filename} missing — its placeholder is dropped')
+            print(f'embedded {filename} ({f.stat().st_size/1024:.0f} KB)')
     css = drop_orphan_fontface(css)
     print('verified: every rule traces to a source layer')
 
@@ -851,13 +916,15 @@ def main():
     js_tail = """
 
 /* ==========================================================================
-   TWO HELPERS, AND ONLY TWO
+   THE HELPERS — THE FRAME'S BEHAVIOUR, NOT THE PORTAL'S
    The portal's own render loop is 15 files of view functions and is not part
-   of the design system — a second portal will have its own. What it does
-   need is the frame's two behaviours: `dsFrame` stamps the container the
-   layout queries (nothing responds to the window in this system — see the
-   `container-type` note in §01), and `dsEnter` sets the one-render marker the
-   entrance animations gate on.
+   of the design system — a second portal will have its own. What it does need
+   is the handful of behaviours that are the FRAME rather than the product:
+   `dsFrame` stamps the container the layout queries (nothing responds to the
+   window in this system — see the `container-type` note in §01), `dsEnter`
+   sets the one-render marker the entrance animations gate on, `dsStagger`
+   feeds the section cascade, and `dsTypeSummary` is Tal's summary writing
+   itself.
 
    `data-enter` is a ONE-RENDER marker, which is CLAUDE.md's trap 5: layout
    must read persistent state, only motion may read this. It is removed on the
@@ -883,6 +950,175 @@ function dsEnter(app){
    it; this does the same for any page. */
 function dsStagger(page){
   [...page.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, 8)));
+}
+
+/* ==========================================================================
+   TAL'S SUMMARY WRITES ITSELF — `dsTypeSummary`
+
+       dsTypeSummary(app.querySelector('.modhead .ai-body p'), S.view)
+
+   Call it at the END of your render, with the summary paragraph and a key for
+   "which page am I on". §52 draws it. Both halves have to be here: the
+   stylesheet alone is three rules gated on a class only a clock ever stamps,
+   which is what this file shipped for one build — the CSS was in the box and
+   nothing in the box could turn it on.
+
+   WHY TYPE IT AT ALL. The summary is the one line on a page that is written
+   rather than stored — it is assembled from state at the moment you arrive,
+   not authored ahead of time. Printed whole it reads as a caption that was
+   always there; typed, it reads as something being said to you now, which is
+   what it is. Nothing else at the head of a page should do this: the `<h1>` is
+   a label and was already true before you got there.
+
+   THE HEIGHT IS RESERVED BEFORE THE FIRST CHARACTER, and this is the part
+   worth copying rather than reinventing. A typewriter that appends text grows
+   its own box, and this box is at the top of the page with the whole page
+   under it — a second line arriving mid-read shoves everything down about
+   26px. So the paragraph is drawn TWICE: `.tsum-g` is the finished line,
+   `visibility:hidden`, holding the final box open, and `.tsum-t` is the
+   visible copy laid over it, absolutely positioned, filling in. Both are built
+   from the same `innerHTML`, which is what makes them wrap identically and the
+   typed text land exactly where the finished text will be.
+
+   `.tal-greet` DOES NOT TYPE. §33.9 hides the page's `.ph` when a greeting is
+   present, so the greeting IS that page's title — and a title that types
+   itself in is a different, louder effect than a sentence that does. Its text
+   is filled before the clock starts. The test is `closest()`, so any block
+   inside the paragraph marked that way gets the same answer.
+
+   THE KEY IS "WHICH PAGE, AND WHICH WORDS". The page part is yours to pass —
+   a view name, or a view plus whatever identifies the subject on a detail
+   page. The words are appended here, because a summary that has genuinely
+   changed under the reader is a new reading and reads better re-typed than
+   silently swapped. Pass nothing and the words are the whole key, which is
+   the right default for a page whose summary only changes when the page does.
+   An ordinary re-render on the same page prints instantly: the paragraph is
+   left exactly as you built it, with no `.tsum`, no ghost and no overlay,
+   which is the state every other rule in the stylesheet already styles.
+
+   IT SURVIVES A RE-RENDER MID-RUN. Anything that replaces the page's HTML
+   throws away the nodes this is writing into, so the run resumes from the
+   character count rather than restarting — otherwise a render loop that fires
+   twice at boot (a pass appending to the page, a second frame settling) shows
+   the line from zero each time. `DS_SUM.gen` is what stops the abandoned
+   timers from writing into detached nodes.
+
+   `setTimeout` AND NOT `requestAnimationFrame`. A hidden document does not get
+   frames AT ALL — not throttled, stopped — so an rAF version of this leaves
+   the summary blank, indefinitely, in any tab that was not at the front when
+   the page loaded. `setTimeout` is throttled in the background rather than
+   stopped, and because each tick derives what to show from the ELAPSED TIME
+   rather than from a counter, a throttled tick simply arrives with more
+   characters to reveal.
+
+   THE PACE IS ONE NUMBER. `DS_SUM_MS` is a budget for the WHOLE line, not a
+   rate, so a 28-word summary and an 18-word one finish together and the effect
+   reads as one habit rather than as a per-page delay. The floor and the
+   ceiling only guard the division. Under `prefers-reduced-motion` the line
+   prints whole, immediately.
+   ========================================================================== */
+const DS_SUM_MS = 3400;      /* the longest a whole line may take */
+const DS_SUM_MIN = 14;       /* ms per character, floor */
+const DS_SUM_MAX = 34;       /* ms per character, ceiling */
+const DS_SUM_STEP = 16;      /* ms between ticks */
+const DS_SUM_LEAVE = '.tal-greet';   /* filled before the clock starts */
+
+/* OUTSIDE THE DOM ON PURPOSE. The paragraph is a new element on every render,
+   so a marker set on it is always absent and the line would re-type forever.
+   One summary per page is the assumption, which is the same one the portal
+   makes. */
+const DS_SUM = {gen: 0, key: null, at: 0, done: false};
+
+function dsTypeSummary(p, key){
+  /* A PAGE WITH NO SUMMARY CLEARS THE KEY, and this is a bug rather than a
+     tidiness point: with the key left standing, going from a page that has a
+     summary to one that does not and back again returned to an unchanged key
+     and printed the line instantly — you left and came back, which is an
+     arrival by any reading, and it was the one case where nothing typed. So
+     calling this with `null` is not a no-op: it is how a page says "no
+     summary here", and it is why the call site can be one unconditional line
+     at the end of render rather than a branch per view. */
+  if(!p){ DS_SUM.key = null; DS_SUM.at = 0; DS_SUM.done = false; return; }
+
+  /* CALLING THIS TWICE ON THE SAME PARAGRAPH MUST NOT NEST IT. After a run the
+     paragraph's `innerHTML` is no longer the sentence — it is the ghost and the
+     overlay — so reading it back as the source would wrap the pair in a second
+     pair, and the third call in a third. A portal never hits this because its
+     render rebuilds the paragraph from its own copy first; anything that types
+     the SAME element again (gallery.html's replay, a page that re-arms the
+     effect without re-rendering) hits it immediately. The ghost is the
+     unmodified original by construction, so when there is one it is the source
+     of truth. */
+  const prior = p.querySelector(':scope > .tsum-g');
+  const full = prior ? prior.innerHTML : p.innerHTML;
+  const k = (key == null ? '' : String(key)) + '\\u0000' + full;
+  if(k !== DS_SUM.key){ DS_SUM.key = k; DS_SUM.at = 0; DS_SUM.done = false; }
+
+  const reduce = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(DS_SUM.done || reduce){ DS_SUM.done = true; return; }
+
+  const gen = ++DS_SUM.gen;
+
+  const ghost = document.createElement('span');
+  ghost.className = 'tsum-g';
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.innerHTML = full;
+
+  const live = document.createElement('span');
+  live.className = 'tsum-t';
+  live.innerHTML = full;
+
+  p.innerHTML = '';
+  p.classList.add('tsum');
+  p.appendChild(ghost);
+  p.appendChild(live);
+
+  /* every text node in reading order, minus the ones the greeting owns */
+  const runs = [];
+  const w = document.createTreeWalker(live, NodeFilter.SHOW_TEXT);
+  for(let n = w.nextNode(); n; n = w.nextNode()){
+    if(!n.nodeValue) continue;
+    if(n.parentElement && n.parentElement.closest(DS_SUM_LEAVE)) continue;
+    runs.push([n, n.nodeValue]);
+  }
+  const total = runs.reduce((a, r) => a + r[1].length, 0);
+  if(!total){ DS_SUM.done = true; return; }
+
+  /* THE CARET CONTRIBUTES NO WIDTH — 2px with a -3px right margin, so its
+     inline advance is zero and it can never be the character that wraps a
+     line, which would put the visible copy one line taller than the box the
+     ghost is holding open. §52.1 states the geometry. */
+  const caret = document.createElement('span');
+  caret.className = 'tsum-c';
+  caret.setAttribute('aria-hidden', 'true');
+
+  const per = Math.max(DS_SUM_MIN, Math.min(DS_SUM_MAX, DS_SUM_MS / total));
+  const t0 = performance.now() - DS_SUM.at * per;
+
+  (function tick(now){
+    if(gen !== DS_SUM.gen || !live.isConnected) return;
+    const shown = Math.max(0, Math.min(total, Math.round((now - t0) / per)));
+    DS_SUM.at = shown;
+
+    /* `host` is the first run not yet finished — the run the caret sits in.
+       Null means the line is whole. */
+    let left = shown, host = null;
+    for(const [n, s] of runs){
+      const c = Math.min(left, s.length);
+      n.nodeValue = s.slice(0, c);
+      left -= c;
+      if(host === null && c < s.length) host = n;
+    }
+
+    if(host){
+      if(host.nextSibling !== caret) host.parentNode.insertBefore(caret, host.nextSibling);
+      setTimeout(() => tick(performance.now()), DS_SUM_STEP);
+    } else {
+      caret.remove();
+      DS_SUM.done = true;
+    }
+  })(performance.now());
 }
 """
     # ======================================================================

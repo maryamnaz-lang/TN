@@ -465,9 +465,221 @@ function pageSummary(){
 }
 
 /* --------------------------------------------------------------------------
+   AND IT TYPES ITSELF
+
+   The summary is the one line on the page that is WRITTEN RATHER THAN
+   STORED — it is Tal's reading of where you are, assembled from `S` at the
+   moment you arrive. Printed whole it looks like a caption that was always
+   there; typed, it reads as something being said to you now, which is what
+   it is. That is the whole of the argument, and it is why this animates the
+   summary and nothing else at the head of a page.
+
+   THE HEIGHT IS RESERVED BEFORE THE FIRST CHARACTER. A typewriter that
+   simply appends text grows its own box, and this box is at the top of the
+   page with the whole page under it — two lines arriving one at a time
+   would shove the page down 26px mid-read, and on the dashboard the
+   `.stp-wing` beside it re-centres as it goes. So the paragraph is drawn
+   TWICE: `.tsum-g` is the finished line, `visibility:hidden`, holding the
+   final box open, and `.tsum-t` is the visible copy laid over it,
+   absolutely positioned, filling in. §52 owns those two rules. Both are
+   built from the same `innerHTML`, so they wrap identically and the typed
+   text lands exactly where the finished text will be.
+
+   THE GREETING DOES NOT TYPE. `<span class="tal-greet">` is not part of the
+   sentence — §33.9 sets it at 22px and hides the page's own `.ph` when it is
+   present, so it IS the dashboard's title, and no other page's `<h1>`
+   types itself in. Its text nodes are filled before the clock starts; the
+   sentence under it is what animates. The test is `closest()` rather than a
+   node count, so a second block-level span in the same paragraph gets the
+   same answer without an edit here.
+
+   ONE RUN PER ARRIVAL, and `sumKey` is what decides what an arrival is —
+   the portal, the view, the stage, AND THE TEXT. The first three are the
+   page; the text is there because a detail page keeps its view name while
+   its subject changes (`S.ldrMem`, `S.ldrCo`), and because a summary that
+   has genuinely changed under you — a booking made, a stage advanced — is a
+   new reading and reads better re-typed than silently swapped. A re-render
+   that leaves the sentence alone does not re-type: it prints instantly,
+   which is why every other interaction on the page is unaffected.
+
+   AND IT SURVIVES A RE-RENDER MID-RUN. `render()` replaces
+   `device.innerHTML`, so the nodes this is writing into are thrown away by
+   any interaction — and at boot by the two passes after this one, each of
+   which ends with its own `render()` (trap 8). Resuming from `_sumAt`
+   rather than restarting is what stops those three synchronous boot renders
+   from showing the line three times from zero; the generation counter is
+   what stops the abandoned rAF loops from writing into detached nodes.
+
+   `setTimeout` AND NOT `requestAnimationFrame`, WHICH IS THE ONE THING HERE
+   THAT WAS FOUND RATHER THAN CHOSEN. rAF is the right scheduler for anything
+   that has to agree with the compositor, and it is the wrong one for this:
+   a hidden document does not get frames AT ALL, so the first version left
+   the summary showing nothing but the greeting — indefinitely — in any tab
+   that was not at the front when the page booted, which includes the preview
+   pane this was verified in. `setTimeout` is throttled in the background
+   rather than stopped, and because every tick derives what to show from the
+   ELAPSED TIME rather than from a counter, a throttled tick simply arrives
+   with more characters to reveal. Worst case in a background tab the line
+   lands whole in one step, which is the correct answer for a page nobody is
+   looking at. `SUM_STEP` at 16ms is a frame's worth, so on screen it is
+   indistinguishable from the rAF version.
+
+   `reduce()` (ai4) is the same helper the ask transitions use. Under it the
+   line prints whole, immediately — a two-second reveal is exactly the kind
+   of motion that setting is asking us not to make.
+   -------------------------------------------------------------------------- */
+/* THE PACE, AND IT IS A BUDGET RATHER THAN A RATE. `SUM_MS` is what a whole
+   line may take and the per-character interval is derived from it, so a
+   28-word summary and an 18-word one both finish in about the same time —
+   which is what makes the effect read as one consistent habit of Tal's
+   rather than as a page-by-page delay.
+
+   3400ms, AND IT GOT THERE IN TWO STEPS FROM 1500 — BY EYE, WHICH IS THE
+   ONLY WAY TO SET THIS. The first version divided 1500ms across the line: at
+   the ~150 characters these summaries run to that is 10ms each, and 10ms
+   reads as the sentence APPEARING rather than as being written, which is the
+   whole point of doing it at all. 2300 was better and still hurried. At 3400
+   the interval lands near 22ms and the line reads as somebody typing it,
+   which is what was asked for both times.
+
+   THE NUMBER TO CHANGE IS THIS ONE, and the floor and the ceiling only guard
+   the division. Measured across all 128 summaries the build actually draws:
+   the longest is 192 characters and prices at 17.7ms, so `SUM_MS` alone sets
+   the pace for the body of the table; the shortest is 63 (`transcript`) and
+   would crawl at 54ms a character, so the 34ms ceiling catches it and it
+   lands in 2.1s instead of 3.4. `SUM_MIN` is never reached today — it is
+   there for a summary longer than about 240 characters, which the 18-28 word
+   rule in `PAGESUM`'s own note is supposed to prevent. */
+const SUM_LEAVE = '.tal-greet';   /* filled before the clock starts */
+const SUM_MS    = 3400;           /* the longest a whole line may take */
+const SUM_MIN   = 14;             /* ms per character, floor */
+const SUM_MAX   = 34;             /* ms per character, ceiling */
+const SUM_STEP  = 16;             /* ms between ticks — see below */
+
+let SUM_GEN  = 0;      /* invalidates the rAF loop of every earlier run */
+let SUM_KEY  = null;   /* the arrival the current run belongs to */
+let SUM_AT   = 0;      /* characters revealed, so a re-render can resume */
+let SUM_DONE = false;
+
+const sumKey = (text) =>
+  (S.portal || 'candidate') + '/' + S.view + '/' + S.stage + '/' + text;
+
+/* every text node under `root`, in reading order */
+function sumRuns(root){
+  const out = [];
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for(let n = w.nextNode(); n; n = w.nextNode()){
+    if(!n.nodeValue) continue;
+    if(n.parentElement && n.parentElement.closest(SUM_LEAVE)) continue;
+    out.push([n, n.nodeValue]);
+  }
+  return out;
+}
+
+/* A PAGE WITH NO SUMMARY CLEARS THE KEY, and forgetting this was a real bug
+   rather than a tidiness point. Eight pages get no summary at all — Messages,
+   the courseware frame, the ask thread, the auth screens — and on those the
+   pass returns before it ever reaches the typer. With the key left standing,
+   `dashboard → messages → dashboard` came back to a key that had not changed
+   and printed the line instantly: you left the page and returned, which is an
+   arrival by any reading, and the one case where nothing typed. Clearing here
+   makes the next summary that appears a new arrival whatever you did in
+   between. It is also what makes `starter.html`'s three-page skeleton behave,
+   where two of the three pages have no head band at all. */
+function sumIdle(){ SUM_KEY = null; SUM_AT = 0; SUM_DONE = false; }
+
+function typeSummary(p){
+  /* THE SOURCE IS THE GHOST WHEN THERE IS ONE. After a run the paragraph's
+     `innerHTML` is no longer the sentence — it is the ghost and the overlay —
+     so reading it back would wrap the pair in a second pair, and it would also
+     make the key a function of the previous run's markup rather than of the
+     words. `placeSummaryPass` rebuilds the paragraph from `PAGESUM` one
+     statement before calling this, so the portal cannot reach that state; the
+     design system's port of this can, and does (`gallery.html`'s replay types
+     the same element again with no render in between). Both are written the
+     same way so the two stay one component. */
+  const prior = p.querySelector(':scope > .tsum-g');
+  const html  = prior ? prior.innerHTML : p.innerHTML;
+
+  const key = sumKey(html);
+  if(key !== SUM_KEY){ SUM_KEY = key; SUM_AT = 0; SUM_DONE = false; }
+  if(SUM_DONE || reduce()){ SUM_DONE = true; return; }
+
+  const gen = ++SUM_GEN;
+
+  const ghost = document.createElement('span');
+  ghost.className = 'tsum-g';
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.innerHTML = html;
+
+  const live = document.createElement('span');
+  live.className = 'tsum-t';
+  live.innerHTML = html;
+
+  p.innerHTML = '';
+  p.classList.add('tsum');
+  p.appendChild(ghost);
+  p.appendChild(live);
+
+  const runs  = sumRuns(live);
+  const total = runs.reduce((a, r) => a + r[1].length, 0);
+  if(!total){ SUM_DONE = true; return; }
+
+  /* THE CARET CONTRIBUTES NO WIDTH. It is 2px with a -3px right margin, so
+     its inline advance is zero and it can never be the character that wraps
+     a line — which would put the visible copy one line taller than the box
+     the ghost is holding open. §52 states the geometry; this is only why. */
+  const caret = document.createElement('span');
+  caret.className = 'tsum-c';
+  caret.setAttribute('aria-hidden', 'true');
+
+  const per = Math.max(SUM_MIN, Math.min(SUM_MAX, SUM_MS / total));
+  const t0  = performance.now() - SUM_AT * per;
+
+  (function tick(now){
+    if(gen !== SUM_GEN || !live.isConnected) return;
+    const shown = Math.max(0, Math.min(total, Math.round((now - t0) / per)));
+    SUM_AT = shown;
+
+    /* `host` is the first run that is not finished — the run the caret is
+       sitting in. Null means the line is whole. */
+    let left = shown, host = null;
+    for(const [n, s] of runs){
+      const k = Math.min(left, s.length);
+      n.nodeValue = s.slice(0, k);
+      left -= k;
+      if(host === null && k < s.length) host = n;
+    }
+
+    if(host){
+      if(host.nextSibling !== caret) host.parentNode.insertBefore(caret, host.nextSibling);
+      setTimeout(() => tick(performance.now()), SUM_STEP);
+    } else {
+      caret.remove();
+      SUM_DONE = true;
+    }
+  })(performance.now());
+}
+
+/* --------------------------------------------------------------------------
    THE PASS
+
+   TWO FUNCTIONS RATHER THAN ONE, AND ONLY TO GET THE BAIL PATH RIGHT. The pass
+   below has eight early returns — the ask thread, the auth screens, the
+   courseware frame, both Messages surfaces, a page with no `.main`, a view
+   with no `PAGESUM` row — and every one of them means "this page has no
+   summary", which is exactly when the typer's key has to be cleared. Doing
+   that at eight `return` sites is eight places to forget it, and the one that
+   was forgotten is the one that would go unnoticed. So the pass keeps its
+   plain returns and says so by returning nothing; the wrapper reads that as
+   idle. The successful path ends `return true`, which is the only signal
+   either function needs.
    -------------------------------------------------------------------------- */
 function placePageSummary(){
+  if(placeSummaryPass() !== true) sumIdle();
+}
+
+function placeSummaryPass(){
   const main = device.querySelector('.view-col > .main') || device.querySelector('.main');
   if(!main) return;
   const page = main.querySelector('.page');
@@ -641,6 +853,18 @@ function placePageSummary(){
   /* the flag §33 styles against, so nothing here reaches a Tal card that is
      further down a page doing its old job */
   aura.classList.add('talsum');
+
+  /* 5. AND TAL SAYS IT RATHER THAN HAVING SAID IT.
+     Last, after the flag: `typeSummary` splits the paragraph into a hidden
+     ghost and a visible copy, and §52's rules are all gated on `.talsum`
+     being there. It is also after the class removals above because those
+     read the card, not the paragraph, and this is the only step that leaves
+     the paragraph in a shape nothing else in the build expects — so it is
+     the last thing that happens to this card. */
+  const para = body.querySelector(':scope > p');
+  if(!para) return;
+  typeSummary(para);
+  return true;   /* read by placePageSummary — see the note above it */
 }
 
 const _baseSum = render;

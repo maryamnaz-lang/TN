@@ -1,0 +1,412 @@
+/* ==========================================================================
+   53. THE CHAT IS ONE SURFACE, AND THE MARK IS FOOTAGE
+
+   Figma 446:347, plus one instruction the file does not carry: Tal's mark is
+   the supplied blob everywhere the orange sphere used to be — in this build,
+   in the leader's portal, and in the design system the agent's portal is
+   built on.
+
+   PART ONE — ONE SURFACE (§1-§6).
+   446:347 redraws 433:276 with a single idea behind it: THE MARGINS AND THE
+   COLUMN ARE THE SAME PIECE OF PAPER. §18 ("THE MARGINS ARE THE SECOND TONE")
+   gives `.view-col > .main` the panel tone above 900 and puts the page back
+   to white on top of it, so the column reads as a sheet lying on a surface.
+   Right for every other page in the product, wrong for this one: the file
+   paints its wash across the FULL 1920 frame, under the margins and under
+   the column alike, and the column has no fill of its own for the wash to
+   stop at. Two surfaces became one, so:
+
+     the margins   `--surface-2` (#f7f7f7) off, #ffffff on.
+     the column    `.ask-page`'s own white AND its own wash off — it is
+                   transparent, and what shows through it is the wash on the
+                   margin it stands in. One gradient, stated once, seen
+                   everywhere. (§51.1 could not do this: its ground was ON
+                   `.ask-page`, so it ended at the column edge.)
+     the foot      the coral mesh and its hairline off. §51.7 painted a
+                   picture under the composer because the foot was a separate
+                   surface needing a floor; there is no second surface to
+                   floor any more, and sampled across the file's own render
+                   every pixel of that band is #ffffff or the wash.
+     the field     its 1px stroke turns, continuously, through the same four
+                   colours the ground is made of.
+
+   PART TWO — THE MARK (§7-§9).
+   `--tal-mark` (§27.1) is what nearly every mark in the platform paints, at
+   sizes from 15px to 132px, and it is now the blob as an ANIMATED WEBP rather
+   than a still PNG. That swap happens in `build.py` / `build-ds.py` at the
+   `__TALCIRCLE__` token, so it needs no selector at all and it reaches the
+   design system in the same edit — which is the whole reason it is an image
+   and not a `<video>`. §7 has the crop and the round-crop proof.
+
+   What DOES need selectors is the three places that draw a sphere out of
+   gradients instead of painting that token: §33.6's 32px in the head band,
+   §40.1's 112 on the chat's empty state and §40.4's 32 in the ask dock, each
+   restated once more by §50 without its chevron. §8 turns all three back into
+   the mark. §9 takes off the two movements that were written FOR a still
+   image and now fight the one inside it.
+
+   LAST, and every part of it has to be: §18's margin rule and §51's ground
+   are plain declarations, §40's spheres are five classes deep, §50 is the
+   layer that most recently restated them, and three rules here live inside
+   `@container app (min-width:900px)` because per trap 3 that tier can only be
+   answered from inside itself.
+   ========================================================================== */
+
+:root{
+  /* ---------------------------------------------------------------------
+     THE TWO WASHES, READ OFF THE FILE.
+
+     446:347 has THREE ellipses at frame level. Two of them draw:
+
+       Ellipse 43  #F1BDD5 at fill-opacity .5, rx 693.45 ry 310.61, centred
+                   (1946.47, -1.39) — off the top-right corner.
+       Ellipse 45  #FFF3DB at .5, the same rx/ry, centred (191.47, 949.6) —
+                   off the bottom-left corner.
+
+     Ellipse 44 is the third and it is NOT stated here. It is a 2073 x 381
+     band across the middle of the frame and its export is an empty `<g>`:
+     the file draws nothing for it. §51.9 makes the same call about the chip
+     glow, for the same reason — reproducing a shape that is invisible in the
+     source is copying the mistake rather than the design.
+
+     BOTH ARE HEAVILY BLURRED, and the blur is what the numbers below are.
+     The export puts a Gaussian at stdDeviation 340.55 on each, then stretches
+     the filter region non-uniformly into the node's box — 1.033x across and
+     1.726x down — so what lands on the page is anisotropic: about 352
+     sideways and 588 down. Modelling that from first principles gives a peak
+     alpha of .164; the file's own render says .215 (the pink) and .225 (the
+     cream), measured by solving `px = 255 + (colour - 255) * a` along both
+     axes out from each centre. The render is what the design looks like, so
+     the render is what is stated: **.22**.
+
+     AND THE STOPS ARE THAT MEASURED CURVE, normalised. Alpha reaches zero at
+     about 1020 frame-units sideways and 720 down — which is what the two
+     radii below are — and between the centre and there the readings run
+
+       r      0     .26    .50    .68    .85    1.00
+       a/peak 1.00  .83    .60    .35    .14    0
+
+     which is exactly the five stops. CSS interpolates linearly between stops,
+     so a piecewise-linear fit of a measured curve IS the curve.
+
+     PERCENTAGES, not pixels, for §51.1's reason: this is the page's own
+     temperature and it has to go on scaling down to a phone, where 1020px of
+     ellipse would be a flat tint over the whole screen. They are percentages
+     of `.view-col > .main`, which is the file's frame minus its 80px rail —
+     1840 x 974 — because that rail is opaque white artwork sitting ON the
+     ellipses (`446:348`), not a thing they reach.
+     --------------------------------------------------------------------- */
+  --askv-wash-pink:241,189,213;   /* #F1BDD5, Ellipse 43 */
+  --askv-wash-cream:255,243,219;  /* #FFF3DB, Ellipse 45 */
+  --askv-wash-rx:55.4%;           /* 1020 of 1840 */
+  --askv-wash-ry:73.9%;           /*  720 of  974 */
+  /* the centres, as percentages of the same box. Both sit OUTSIDE it — that
+     is the file's placement, and it is why only a quadrant of each is ever
+     on screen. */
+  --askv-wash-pink-at:101.4% -0.1%;
+  --askv-wash-cream-at:6.1% 97.5%;
+
+  /* ONE GRADIENT, NAMED ONCE. Everything on this screen that carries the wash
+     reads this token: the surface in §1/§3, and — as the same colours on a
+     conic — the composer's stroke in §5. A second copy of these stops
+     somewhere else is how the margins and the column drifted apart in the
+     first place. */
+  --askv-ground-wash:
+    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-pink-at),
+      rgba(var(--askv-wash-pink),.22)  0%,
+      rgba(var(--askv-wash-pink),.183) 26%,
+      rgba(var(--askv-wash-pink),.132) 50%,
+      rgba(var(--askv-wash-pink),.077) 68%,
+      rgba(var(--askv-wash-pink),.031) 85%,
+      rgba(var(--askv-wash-pink),0)    100%),
+    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-cream-at),
+      rgba(var(--askv-wash-cream),.22)  0%,
+      rgba(var(--askv-wash-cream),.183) 26%,
+      rgba(var(--askv-wash-cream),.132) 50%,
+      rgba(var(--askv-wash-cream),.077) 68%,
+      rgba(var(--askv-wash-cream),.031) 85%,
+      rgba(var(--askv-wash-cream),0)    100%);
+
+  /* the file's stroke on the composer, `#FFC092`. The render disagrees with
+     the file about it — sampled along that 1px line, the bottom-centre
+     unblends to #F04F05 and the sides to about #FED2AE — so the border is
+     already a gradient there, and `--accent-2` is the hot end of it. */
+  --askv-stroke:#FFC092;
+}
+
+/* ------------------------------------------------------------------ 1 ---
+   THE GROUND IS WHITE AND THE WASH IS ON THE MARGIN
+
+   `#f9f6f0` — §51.1's warm ivory, from 433:276 — is gone: 446:347's ground is
+   plain white, and the render agrees at every point clear of the two washes.
+   Overwriting the token rather than the rule keeps §51.1 readable and leaves
+   the two files' grounds one edit apart.
+
+   THE PAINT GOES ON `.view-col > .main`, WHICH IS THE WHOLE SURFACE. Below
+   900 that is the entire frame and there are no margins; above 900 it is the
+   margins AND the column, which is the piece of paper the file draws.
+   `.app:has(.ask-page)` scopes it: this is the chat's ground and no other
+   page's, and keying on the page rather than on `S.view` means it arrives and
+   leaves with the thing it belongs to.
+   ------------------------------------------------------------------------ */
+:root{--askv-ground:#ffffff}
+
+.app:has(.ask-page) .view-col > .main{
+  background-color:var(--askv-ground);
+  background-image:var(--askv-ground-wash);
+  background-repeat:no-repeat}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE COLUMN HAS NO FILL
+
+   Two things to take off and both are §51.1's: the ground colour and the
+   wash. Stated as `background:transparent` rather than as two `initial`s
+   because what is being said is "this box has no surface", not "these two
+   properties are unset" — the next thing to reach for a fill here should have
+   to argue with a word rather than notice an omission.
+   ------------------------------------------------------------------------ */
+.app .ask-page{background:transparent}
+
+/* ------------------------------------------------------------------ 3 ---
+   AND AGAIN INSIDE THE QUERY, WHICH IS TRAP 3
+
+   §18.63/64 are both inside `@container app (min-width:900px)`, and a rule in
+   a container query beats an unconditional rule of equal weight whatever the
+   layer order. §1 and §2 are unconditional, so at desktop — the only width
+   where §18 fires, and the only width where there ARE margins — they would
+   both lose. Restated here, in the same tier, where they can win.
+
+   `.app:has(.ask-page) .view-col > .main` is (0,3,1) against §18's (0,2,1) and
+   would win on weight alone; `.ask-page` at (0,2,0) against §18's `.page` at
+   (0,3,0) would not, which is why it is written out with the same
+   `.view-col > .main >` run.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app:has(.ask-page) .view-col > .main{
+    background-color:var(--askv-ground);
+    background-image:var(--askv-ground-wash);
+    background-repeat:no-repeat}
+  .app .view-col > .main > .page.ask-page{background:transparent}
+}
+
+/* ------------------------------------------------------------------ 4 ---
+   THE COMPOSER STANDS ON THE PAGE, NOT ON A PICTURE
+
+   §51.7 gave the foot the coral mesh, a white fill under it and §21.4's
+   hairline back on top — three declarations that all say "this is a second
+   surface". 446:347 has no second surface: the wash runs to the bottom edge
+   of the frame and the field stands on it directly. `background:transparent`
+   takes the fill and the picture together and `border-top:0` takes the edge.
+
+   `--askv-mesh` stays declared in §51 and the crop stays cut at build time:
+   removing an asset from the build to satisfy a stylesheet is a bigger change
+   than this layer is making, and the token still resolves for anything that
+   wants it back.
+   ------------------------------------------------------------------------ */
+.app .ask-page .ask-foot{
+  background:transparent;
+  border-top:0}
+
+/* ------------------------------------------------------------------ 5 ---
+   THE COMPOSER'S STROKE TRAVELS
+
+   A CONIC FROM AN ANIMATED ANGLE. The four stops are the file's own colours —
+   the composer's stated stroke, the brand orange its render measures on that
+   stroke, and the two washes §1 paints the page with — so this is the SAME
+   set of values the ground is made of, on a different geometry. `@property`
+   is what makes the angle animatable at all: a bare custom property
+   interpolates as a string, and the gradient would jump 0deg to 360deg in one
+   step rather than turning.
+
+   THE RING IS A MASKED PSEUDO-ELEMENT, NOT A BORDER. `border-image` cannot
+   take a gradient that has to rotate under it, so the ring is a filled box
+   with its own middle cut out: `padding:1px` is the ring's width, and the
+   two-layer mask keeps what is inside the border box and drops what is inside
+   the content box.
+
+     inset:-1px   a pseudo-element's containing block is the PADDING box, so
+                  -1px on every side is exactly the border box — the ring
+                  lands ON the 1px §51.8 already reserved rather than beside
+                  it, and the field's 64px height does not move.
+     transparent  §51.8's border stays declared and keeps its space; only its
+                  ink comes off. Removing the border instead would hand the
+                  content box 2px more under `box-sizing:border-box` and shift
+                  the placeholder.
+   ------------------------------------------------------------------------ */
+@property --askv-ang{
+  syntax:'<angle>';
+  initial-value:0deg;
+  inherits:false}
+
+@keyframes askv-stroke-turn{
+  to{--askv-ang:360deg}}
+
+.app .ask-page .askfield{
+  position:relative;
+  border-color:transparent}
+
+.app .ask-page .askfield::before{
+  content:'';position:absolute;inset:-1px;z-index:0;
+  pointer-events:none;
+  padding:1px;
+  background:conic-gradient(from var(--askv-ang),
+    var(--askv-stroke)            0deg,
+    var(--accent-2)              70deg,
+    rgb(var(--askv-wash-pink))  140deg,
+    rgb(var(--askv-wash-cream)) 200deg,
+    var(--accent-2)             280deg,
+    var(--askv-stroke)          360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+          mask-composite:exclude;
+  animation:askv-stroke-turn 6s linear infinite}
+
+/* THE FOCUSED FIELD STOPS TURNING. A moving stroke is the resting state's
+   invitation; under a caret it is the loudest thing on a screen you are
+   trying to write on. §51.8 answered focus by taking the border to
+   `--text-primary`, and that is what this says — stated as the ring, since
+   the border itself no longer carries ink. */
+.app .ask-page .askfield:focus-within::before{
+  background:var(--text-primary);
+  animation:none}
+
+/* ------------------------------------------------------------------ 6 ---
+   REDUCED MOTION GETS ITS OWN BLOCK
+
+   §13.187 clamps every duration to 1ms, and 1ms on an INFINITE animation is a
+   strobe rather than "off" — §21.4, §27.8, §33.6, §40 and §50 each state
+   their own for exactly this. Here the resting state is the gradient standing
+   still at 0deg, which is a static multicolour stroke: closer to what the
+   file draws than a flat `#FFC092`, and it is also what a browser with no
+   `@property` support gets anyway.
+   ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion:reduce){
+  .app .ask-page .askfield::before{animation:none}
+}
+
+/* ------------------------------------------------------------------ 7 ---
+   THE MARK IS THE SUPPLIED FOOTAGE, AND IT IS AN IMAGE ON PURPOSE
+
+   Maryam supplied the blob as a 15s 1600x1200 clip. There is no rule for it
+   in this layer, and that is the point: it is swapped in at `__TALCIRCLE__`,
+   the token `--tal-mark` (§27.1) already reads, as an ANIMATED WEBP. So every
+   mark in the platform moves without a selector — the 15px thread label, the
+   16px in the head band and on `.ai-label.bare` (§37.2, which is the one the
+   design system ships), the 20px in the composer, the 24px default, the 28px
+   in the chat's band, the 32px in the ask dock — and the design system's
+   build performs the same swap on the same token, which is what carries this
+   to the agent's portal without a second edit.
+
+   A `<video>` WOULD NOT HAVE DONE THAT. It is an element: it can only be
+   printed by a view, and the marks above are drawn by `background-image`,
+   several of them on pseudo-elements. One token against a dozen selectors and
+   two hand-written portals, for about 4x the bytes at the one size where it
+   would have mattered.
+
+   THE CROP IS MEASURED, AND THE MEASURING IS THE POINT. The blob DEFORMS —
+   it bulges and slumps through the clip — so the box that holds it is the
+   union over all 450 frames, not the bounding box of any one of them. At a
+   threshold of 4/255 against the flat #FDFDFD field, that union is x 408..1192
+   and y 208..988, so `crop=800:800:400:198` is that box with 8px of margin
+   across and 10 down, centred on it.
+
+   AND IT SURVIVES BEING ROUND. The furthest any lit pixel gets from the crop's
+   centre, in any frame, is 391.3 of the 400 the inscribed circle allows:
+   **zero pixels of the animation fall outside a circular crop**. That is a
+   counted number, not a hope, and it is why the alpha channel is a circle —
+   the round crop is baked into the asset rather than left to a
+   `border-radius` every consumer would have to remember.
+
+   IT ALSO LOOPS ALREADY. Mean absolute difference across the seam is 0.81/255
+   against 1.12 for a typical adjacent pair — the last frame is closer to the
+   first than two neighbours are to each other. No palindrome, no fade.
+   ------------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ 8 ---
+   THE THREE CSS SPHERES BECOME THE MARK
+
+   These are the only places that draw Tal out of gradients rather than
+   painting `--tal-mark`, so they are the only places §7's swap cannot reach
+   on its own. Each is restated here as the artwork: the four background
+   layers go, the glow and its 4s clock go, and what is left is the file.
+
+   RESTATED, NOT SUBTRACTED, and §50.1 says why: `background-image` is one
+   property, so there is no way to drop a layer of a list without writing the
+   list. Writing it as `var(--tal-mark)` is writing the shortest possible one.
+
+   `background-size:contain` matches §27.1 — one file, every size, nothing
+   cropped or inset. `box-shadow:none` is the glow, `animation:none` is the
+   breathing it rode on, and the gloss (`::after`) is a separate turning layer
+   that had a sphere to turn on and no longer does.
+
+   THE SELECTORS ARE §50'S AND §40'S VERBATIM. Each of these is 5 or 6 classes
+   deep and both of those layers restate it at that depth; matching it exactly
+   and arriving later is the only thing that wins, and it is also the clearest
+   record of what is being answered.
+   ------------------------------------------------------------------------ */
+
+/* a — the head band, 32px (§33.6, restated §50.1) */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:none;
+  animation:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
+
+/* b — the chat's empty state, 112/120 (§40.1, restated §50.3) */
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:none;
+  animation:none}
+.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{content:none}
+
+/* c — the ask dock, 32px (§40.4, restated §50.2) */
+.app .askdock .askline-mark .tal-mk::before{
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:none;
+  animation:none}
+.app .askdock .askline-mark .tal-mk::after{content:none}
+
+/* AND §50.3'S CHEVRONS COME OFF WITH THEM. The build's note on `__TALCIRCLE__`
+   says the lockup goes on the mark in exactly one place — the chat's empty
+   state — and §50 is the layer that states it. 446:347 draws that mark bare,
+   and three white chevrons flying across moving footage would be a second
+   mark rather than a mark on the first. */
+.app .ask-thread .tal-hero .tal-mk.orb .tnc{display:none}
+
+/* ------------------------------------------------------------------ 9 ---
+   THE MOVEMENTS WRITTEN FOR A STILL IMAGE COME OFF
+
+   §21.4 spins the ask dock's mark on a 14s clock and breathes it on a 6.4s
+   one, and §27.8 does the same for the floating button's copy. Both were
+   written for a PNG: the file's orange core is OFF CENTRE, so a rotation is
+   what makes the core travel the circle, and the breath is what makes a still
+   object read as lit. The blob moves on its own now — it deforms, and its own
+   rim light travels — so the spin is a second, slower motion underneath a
+   first one, which reads as the whole mark wobbling rather than as anything
+   being alive.
+
+   THE BREATH STAYS. It is a scale, it is on the same 6.4s clock as the halo
+   pulsing behind it, and taking it off would leave a mark growing out of
+   phase with its own glow. Only the rotation goes.
+
+   `.tal-fab` is `display:none` from the end of §27, so its copy is stated
+   here for the same reason §51 states things about the panel: if it comes
+   back it comes back to this, not to half of it.
+   ------------------------------------------------------------------------ */
+.app .askdock .askline-mark .tal-mk{
+  animation:tal-orb-breathe 6.4s ease-in-out infinite}
+.app .tal-fab::after{
+  animation:tal-orb-breathe 6.4s ease-in-out infinite}

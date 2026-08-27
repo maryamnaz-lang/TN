@@ -112,9 +112,12 @@ div` (0,1,1) was written when `.stp-all` held the step rows directly and now lan
 the panel's heading out beside the list, the second gave the panel 8px top and bottom and
 **none at the sides**. `.stp-all > .stp-pop` in `33-talsum.css` states both.
 
-Excluded now, and only these: `ask*` `bk*` `scene*` (their behaviour *is* a render pass over
-portal state), `auth*` `lsvt*` `ios-*` `nil*` (separate surfaces). `build-ds.py` prints the
-list every build. `SYSTEM` survives but gates nothing — it names the JS-free core.
+Excluded now, and only these three prefixes: `lsvt*` `ios-*` (pictures of somebody else's
+UI) and `nil*` (the Next in Leadership microsite, its own visual language, marked temporary
+in `build.py` too). `ask*`, `bk*`, `scene*` and `auth*` were on this list and are **not** any
+more — the chat is the one screen every portal wants and the least like a plain page.
+`build-ds.py` prints the surviving list every build; read that rather than this sentence.
+`SYSTEM` survives but gates nothing — it names the JS-free core.
 
 **The CSS is only half a component; the markup is the other half.** These have internal
 structure the CSS keys on, and a guessed structure looks *broken* rather than absent — the
@@ -124,8 +127,25 @@ first `proof.html` invented it and got four of six wrong. Recipes are in `galler
 attribute**, not a child; `.ring` is **two SVG circles** and `--arc` is a dasharray *length*
 (`163.36 × pct/100`), not a percentage.
 
+**And for a component whose point is BEHAVIOUR, the JS is the other half — shipping the
+rules alone is worse than leaving it out.** §52's typing summary went in on
+include-by-default with its clock left behind in `ai6.js`, on the reasoning that a render
+loop does not port. True of a render loop, false of this: it is twelve lines of clock over a
+paragraph the calling page already owns. The result was three rules gated on `.tsum`, a class
+only a clock ever stamps, so nothing that had the stylesheet could switch it on — and §52's
+selectors were scoped to `.modhead .ai-aura.talsum`, a shape `placeBand` builds and a
+hand-authored page does not, so they could not have matched anyway. Both halves ship now,
+`dsTypeSummary(p, key)`, and the gate is `.tsum` alone.
+
+The test is not "is there JS" but **does the behaviour need the portal's STATE, or only the
+element you hand it**. `dsTypeSummary` needs only the element. Tal's thread needs
+`S.thread`, and still does not port. The tell that something has fallen in this gap: a family
+in the output whose gate is a class **nothing in the box ever writes** — grep both files for
+the class, and if only the stylesheet says it, the component is decoration.
+
 - `design-system/gallery.html` — the reference: every component, live, with its markup. The
-  place to look before inventing a class.
+  place to look before inventing a class. The typing summary is under **Signature** with a
+  replay button, because it is the one component you cannot see twice without re-arming.
 - `design-system/starter.html` — a working three-page skeleton to copy for a new portal.
 - `design-system/DESIGN-SYSTEM.md` — what came across, what did not, and the five things
   that bite (the host requirement, the label column's opt-out list, the `.stats` / `.facts`
@@ -152,7 +172,8 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **40 numbered CSS layers**, `01-foundation.css` → `40-talorb.css`, concatenated in
+- **The numbered CSS layers**, `01-foundation.css` → `52-talsumtype.css` (there is no 48),
+  concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
   is either a class no earlier layer mentions or a correction that has to land after the
@@ -210,6 +231,37 @@ House style for the two numbers that appear everywhere: the course length is **`
 numeric (and the document is the **`90-day summary`**), and a **small count is spelt when it
 opens a sentence, set when it does not** — "Four decisions are waiting", "5 of 13 chapters".
 `_W` / `_w` in `ai6.js` are what hold the second one for the leader's assembled summaries.
+
+**And the summary TYPES ITSELF on arrival** — `typeSummary` (ai6.js) + `52-talsumtype.css`.
+It is the one line on a page that is written rather than stored, so it is said rather than
+already there. Four things about it that are not guessable:
+
+- **The paragraph is drawn twice.** `.tsum-g` is the finished line, `visibility:hidden`,
+  holding the final box open; `.tsum-t` is the visible copy laid over it, absolute. Without
+  the ghost a second line arriving mid-read shoves the whole page down. Both are built from
+  the same `innerHTML`, which is what makes them wrap identically.
+- **`<span class="tal-greet">` does not type.** §33.9 hides the page's `.ph` when it is
+  present, so the greeting *is* the dashboard's title, and no other page's `<h1>` types.
+- **One run per arrival**, keyed on portal + view + stage + *the text* — so a detail page
+  whose subject changed re-types, and an ordinary interaction prints instantly (a re-render
+  that does not re-type leaves a plain `<p>` with no `.tsum`, which is the state every other
+  layer already styles).
+- **The pace is one number**, `SUM_MS` — a budget for the whole line, not a rate — so every
+  summary finishes in about the same time whatever its length.
+- **A page with no summary CLEARS the key.** Eight pages get none, and with the key left
+  standing `dashboard → messages → dashboard` came back to an unchanged key and printed
+  instantly — the one case where returning to a page did not type. `placePageSummary` is a
+  two-line wrapper over `placeSummaryPass` for exactly this: the pass keeps its eight plain
+  `return`s and only the success path returns `true`, so the bail path cannot be forgotten at
+  one of eight sites.
+
+**All three portals type it, and the third one is not in `hifi/`.** The candidate and the
+cohort leader share `render()`, so `ai6.js` covers both. `tn-agent-portal.html` is
+hand-written on `design-system/` and calls `dsTypeSummary` at the end of its own render,
+keyed on the `stage/view/interview/tab` string it already builds for `data-enter`. The two
+implementations are deliberately the same shape — including reading the source back off the
+ghost rather than off `p.innerHTML`, which is what stops a second call nesting the pair
+inside itself (the portal cannot reach that state; `gallery.html`'s replay does).
 
 ### Booking an interview happens inside Tal — `ai7.js` + `35-book.css`
 
@@ -435,6 +487,15 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     the sides. There is no selector for this. `twTop` (ai8.js) stamps `.tw-top` from an
     anchored prefix test on the reply string, in the one wrapper every reply passes through —
     which is also why it fixes data.js's and ai2's answers and a per-widget marker would not.
+17. **`requestAnimationFrame` NEVER FIRES in a hidden document, and this prototype is
+    usually read in a pane that reports itself hidden.** Not throttled — stopped: no frame
+    ever arrives, so an rAF loop scheduled at boot runs its first synchronous call and then
+    nothing, forever. `typeSummary`'s first version left the page summary showing only its
+    greeting in every tab that was not at the front when the page loaded, which reads exactly
+    like a broken pass except that nothing warns. Anything paced over time here uses
+    `setTimeout` and derives what to show from the ELAPSED TIME rather than from a counter, so
+    a background-throttled tick simply arrives with more work to do. `document.hidden` is
+    worth checking first when a timed effect appears not to run at all.
 
 ### Verifying a change
 
@@ -461,6 +522,14 @@ which does not exist on macOS — patch that before running them.
 
 `hifi/build/patch.py`, `hifi/build/extract.py` and `hifi/build/views-orig.js` are historical
 one-shot migration artefacts. Not part of the build; `extract.py` can no longer run.
+
+**The prototype chrome remembers two different things in two different places, deliberately.**
+The app — portal, stage, view — is in the **hash** (`#day34/cohort`, `#leader/leadEvals/new`),
+written by the renderer and read by views.js at boot, because that is what you send somebody
+when you want them to see the screen you are looking at. The **frame** (Mobile / Tablet /
+Desktop) is in `localStorage` under `tn-vp`, because it is this reader's preference for how to
+look at the thing and has no business in a link or in a function that runs 200 times a sweep.
+Both live in `build.py`'s HTML template, not in a layer.
 
 ## Deploying
 

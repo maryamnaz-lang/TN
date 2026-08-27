@@ -280,13 +280,15 @@ const TAL_MARK = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALAAAACwCAYAAACv
 
 
 /* ==========================================================================
-   TWO HELPERS, AND ONLY TWO
+   THE HELPERS — THE FRAME'S BEHAVIOUR, NOT THE PORTAL'S
    The portal's own render loop is 15 files of view functions and is not part
-   of the design system — a second portal will have its own. What it does
-   need is the frame's two behaviours: `dsFrame` stamps the container the
-   layout queries (nothing responds to the window in this system — see the
-   `container-type` note in §01), and `dsEnter` sets the one-render marker the
-   entrance animations gate on.
+   of the design system — a second portal will have its own. What it does need
+   is the handful of behaviours that are the FRAME rather than the product:
+   `dsFrame` stamps the container the layout queries (nothing responds to the
+   window in this system — see the `container-type` note in §01), `dsEnter`
+   sets the one-render marker the entrance animations gate on, `dsStagger`
+   feeds the section cascade, and `dsTypeSummary` is Tal's summary writing
+   itself.
 
    `data-enter` is a ONE-RENDER marker, which is CLAUDE.md's trap 5: layout
    must read persistent state, only motion may read this. It is removed on the
@@ -312,4 +314,173 @@ function dsEnter(app){
    it; this does the same for any page. */
 function dsStagger(page){
   [...page.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, 8)));
+}
+
+/* ==========================================================================
+   TAL'S SUMMARY WRITES ITSELF — `dsTypeSummary`
+
+       dsTypeSummary(app.querySelector('.modhead .ai-body p'), S.view)
+
+   Call it at the END of your render, with the summary paragraph and a key for
+   "which page am I on". §52 draws it. Both halves have to be here: the
+   stylesheet alone is three rules gated on a class only a clock ever stamps,
+   which is what this file shipped for one build — the CSS was in the box and
+   nothing in the box could turn it on.
+
+   WHY TYPE IT AT ALL. The summary is the one line on a page that is written
+   rather than stored — it is assembled from state at the moment you arrive,
+   not authored ahead of time. Printed whole it reads as a caption that was
+   always there; typed, it reads as something being said to you now, which is
+   what it is. Nothing else at the head of a page should do this: the `<h1>` is
+   a label and was already true before you got there.
+
+   THE HEIGHT IS RESERVED BEFORE THE FIRST CHARACTER, and this is the part
+   worth copying rather than reinventing. A typewriter that appends text grows
+   its own box, and this box is at the top of the page with the whole page
+   under it — a second line arriving mid-read shoves everything down about
+   26px. So the paragraph is drawn TWICE: `.tsum-g` is the finished line,
+   `visibility:hidden`, holding the final box open, and `.tsum-t` is the
+   visible copy laid over it, absolutely positioned, filling in. Both are built
+   from the same `innerHTML`, which is what makes them wrap identically and the
+   typed text land exactly where the finished text will be.
+
+   `.tal-greet` DOES NOT TYPE. §33.9 hides the page's `.ph` when a greeting is
+   present, so the greeting IS that page's title — and a title that types
+   itself in is a different, louder effect than a sentence that does. Its text
+   is filled before the clock starts. The test is `closest()`, so any block
+   inside the paragraph marked that way gets the same answer.
+
+   THE KEY IS "WHICH PAGE, AND WHICH WORDS". The page part is yours to pass —
+   a view name, or a view plus whatever identifies the subject on a detail
+   page. The words are appended here, because a summary that has genuinely
+   changed under the reader is a new reading and reads better re-typed than
+   silently swapped. Pass nothing and the words are the whole key, which is
+   the right default for a page whose summary only changes when the page does.
+   An ordinary re-render on the same page prints instantly: the paragraph is
+   left exactly as you built it, with no `.tsum`, no ghost and no overlay,
+   which is the state every other rule in the stylesheet already styles.
+
+   IT SURVIVES A RE-RENDER MID-RUN. Anything that replaces the page's HTML
+   throws away the nodes this is writing into, so the run resumes from the
+   character count rather than restarting — otherwise a render loop that fires
+   twice at boot (a pass appending to the page, a second frame settling) shows
+   the line from zero each time. `DS_SUM.gen` is what stops the abandoned
+   timers from writing into detached nodes.
+
+   `setTimeout` AND NOT `requestAnimationFrame`. A hidden document does not get
+   frames AT ALL — not throttled, stopped — so an rAF version of this leaves
+   the summary blank, indefinitely, in any tab that was not at the front when
+   the page loaded. `setTimeout` is throttled in the background rather than
+   stopped, and because each tick derives what to show from the ELAPSED TIME
+   rather than from a counter, a throttled tick simply arrives with more
+   characters to reveal.
+
+   THE PACE IS ONE NUMBER. `DS_SUM_MS` is a budget for the WHOLE line, not a
+   rate, so a 28-word summary and an 18-word one finish together and the effect
+   reads as one habit rather than as a per-page delay. The floor and the
+   ceiling only guard the division. Under `prefers-reduced-motion` the line
+   prints whole, immediately.
+   ========================================================================== */
+const DS_SUM_MS = 3400;      /* the longest a whole line may take */
+const DS_SUM_MIN = 14;       /* ms per character, floor */
+const DS_SUM_MAX = 34;       /* ms per character, ceiling */
+const DS_SUM_STEP = 16;      /* ms between ticks */
+const DS_SUM_LEAVE = '.tal-greet';   /* filled before the clock starts */
+
+/* OUTSIDE THE DOM ON PURPOSE. The paragraph is a new element on every render,
+   so a marker set on it is always absent and the line would re-type forever.
+   One summary per page is the assumption, which is the same one the portal
+   makes. */
+const DS_SUM = {gen: 0, key: null, at: 0, done: false};
+
+function dsTypeSummary(p, key){
+  /* A PAGE WITH NO SUMMARY CLEARS THE KEY, and this is a bug rather than a
+     tidiness point: with the key left standing, going from a page that has a
+     summary to one that does not and back again returned to an unchanged key
+     and printed the line instantly — you left and came back, which is an
+     arrival by any reading, and it was the one case where nothing typed. So
+     calling this with `null` is not a no-op: it is how a page says "no
+     summary here", and it is why the call site can be one unconditional line
+     at the end of render rather than a branch per view. */
+  if(!p){ DS_SUM.key = null; DS_SUM.at = 0; DS_SUM.done = false; return; }
+
+  /* CALLING THIS TWICE ON THE SAME PARAGRAPH MUST NOT NEST IT. After a run the
+     paragraph's `innerHTML` is no longer the sentence — it is the ghost and the
+     overlay — so reading it back as the source would wrap the pair in a second
+     pair, and the third call in a third. A portal never hits this because its
+     render rebuilds the paragraph from its own copy first; anything that types
+     the SAME element again (gallery.html's replay, a page that re-arms the
+     effect without re-rendering) hits it immediately. The ghost is the
+     unmodified original by construction, so when there is one it is the source
+     of truth. */
+  const prior = p.querySelector(':scope > .tsum-g');
+  const full = prior ? prior.innerHTML : p.innerHTML;
+  const k = (key == null ? '' : String(key)) + '\u0000' + full;
+  if(k !== DS_SUM.key){ DS_SUM.key = k; DS_SUM.at = 0; DS_SUM.done = false; }
+
+  const reduce = window.matchMedia
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(DS_SUM.done || reduce){ DS_SUM.done = true; return; }
+
+  const gen = ++DS_SUM.gen;
+
+  const ghost = document.createElement('span');
+  ghost.className = 'tsum-g';
+  ghost.setAttribute('aria-hidden', 'true');
+  ghost.innerHTML = full;
+
+  const live = document.createElement('span');
+  live.className = 'tsum-t';
+  live.innerHTML = full;
+
+  p.innerHTML = '';
+  p.classList.add('tsum');
+  p.appendChild(ghost);
+  p.appendChild(live);
+
+  /* every text node in reading order, minus the ones the greeting owns */
+  const runs = [];
+  const w = document.createTreeWalker(live, NodeFilter.SHOW_TEXT);
+  for(let n = w.nextNode(); n; n = w.nextNode()){
+    if(!n.nodeValue) continue;
+    if(n.parentElement && n.parentElement.closest(DS_SUM_LEAVE)) continue;
+    runs.push([n, n.nodeValue]);
+  }
+  const total = runs.reduce((a, r) => a + r[1].length, 0);
+  if(!total){ DS_SUM.done = true; return; }
+
+  /* THE CARET CONTRIBUTES NO WIDTH — 2px with a -3px right margin, so its
+     inline advance is zero and it can never be the character that wraps a
+     line, which would put the visible copy one line taller than the box the
+     ghost is holding open. §52.1 states the geometry. */
+  const caret = document.createElement('span');
+  caret.className = 'tsum-c';
+  caret.setAttribute('aria-hidden', 'true');
+
+  const per = Math.max(DS_SUM_MIN, Math.min(DS_SUM_MAX, DS_SUM_MS / total));
+  const t0 = performance.now() - DS_SUM.at * per;
+
+  (function tick(now){
+    if(gen !== DS_SUM.gen || !live.isConnected) return;
+    const shown = Math.max(0, Math.min(total, Math.round((now - t0) / per)));
+    DS_SUM.at = shown;
+
+    /* `host` is the first run not yet finished — the run the caret sits in.
+       Null means the line is whole. */
+    let left = shown, host = null;
+    for(const [n, s] of runs){
+      const c = Math.min(left, s.length);
+      n.nodeValue = s.slice(0, c);
+      left -= c;
+      if(host === null && c < s.length) host = n;
+    }
+
+    if(host){
+      if(host.nextSibling !== caret) host.parentNode.insertBefore(caret, host.nextSibling);
+      setTimeout(() => tick(performance.now()), DS_SUM_STEP);
+    } else {
+      caret.remove();
+      DS_SUM.done = true;
+    }
+  })(performance.now());
 }
