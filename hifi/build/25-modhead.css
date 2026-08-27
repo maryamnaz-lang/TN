@@ -46,13 +46,38 @@
    boxes carry, at the scale of a page. No `background-color`: the band has
    no fill of its own, which is what keeps the canvas one of two tones.
    -------------------------------------------------------------------------- */
+/* AND THE WARM LAYER IS SOFTENED TO 70%, WHICH IS THE ONE PLACE THIS BLOCK
+   LEAVES THE FILE'S VALUES. `--tal-chip-1` is a chip colour: it was picked to
+   read at 24px behind two words, and Ellipse 43 spreads it across the full
+   width of the band at 60% x 99% radii. The same tint that is a tint on a chip
+   is a CREAM PANEL at that size — the band stopped reading as white paper with
+   a warmth on it and started reading as a coloured block, which also flattened
+   the black session plate sitting on top of it.
+
+   70% OF THE WARM ONLY, AND THE COOL POOL IS UNTOUCHED. `--tal-chip-2` is
+   centred off the right edge at 107.7%, so only its tail is ever on screen and
+   it is already the fainter of the two; taking both down together — or putting
+   `opacity` on the pseudo-element — would have lost it entirely. The flat core
+   goes #F6EFE5 -> about #F9F4ED over white, which is a step and not a
+   different colour.
+
+   STATED AS A LOCAL CUSTOM PROPERTY so the two stops cannot drift: they are
+   the same colour twice, and the 26% stop exists for the reason written below,
+   not because the value differs. One number to tune, in one place.
+
+   NOT THE TOKEN, because §01's `--tal-chip-1` is shared with the chip itself
+   and with the icon boxes, and both of those are still right at their own
+   scale. The note above says the band carries "the same pair of layers the
+   chip and the icon boxes carry, at the scale of a page" — this is the one
+   concession that scale asks for. */
 .app .modhead::before{
+  --wash-warm:color-mix(in srgb, var(--tal-chip-1) 70%, transparent);
   content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
   background-image:
     radial-gradient(47.1% 117.8% at 107.7% 80.9%,
       var(--tal-chip-2) 0%, var(--tal-chip-2) 26%, transparent 100%),
     radial-gradient(60.6% 99.0% at 43.4% 63.8%,
-      var(--tal-chip-1) 0%, var(--tal-chip-1) 26%, transparent 100%)}
+      var(--wash-warm) 0%, var(--wash-warm) 26%, transparent 100%)}
 /* the 26% stop is the flat core of the blur, not a taste decision: a
    Gaussian of sigma 66.7 over a 1289-wide ellipse still reads at full
    strength for (a - 3sigma) / (a + 3sigma) of its radius, and a plain

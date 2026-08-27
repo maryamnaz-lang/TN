@@ -1,0 +1,430 @@
+/* ==========================================================================
+   57 — THE FRONT DOOR, REDRAWN AS A SPLIT
+
+   Figma 483:976, "Create your account". This is the SAME SCREEN §17 built and
+   a different composition of it, so this layer is a restatement rather than a
+   new component — and §17's note is still the one to read for what is IN the
+   form column, because that half barely moved.
+
+   WHAT CHANGED, AT THE FILE'S OWN NUMBERS (frame 1920 x 1200):
+
+     the split      1010 / 910. The artwork is a panel bleeding to the frame
+                    edge on the left — 52.6% — and the right half is white.
+                    §17 had one 1196px card floating on `--surface-2` with the
+                    brand inside it; there is no floating card any more and no
+                    panel ground behind it.
+     the artwork    full bleed, `cover`, its own 1010 x 1200 asset. §17's
+                    composition drew the brand column on the card's white with
+                    two blurred ellipses and a clipped chevron for colour; the
+                    new one has no washes and no chevron because the artwork IS
+                    the colour.
+     the logo       88 from the left, 133 from the top, 291 wide.
+     the copy       88 from the left, 821 from the top, 719 wide — bottom-left,
+                    which is where §17 already put it.
+     the form       a bordered card, 608 x 808, centred in the right half
+                    (151 either side of 910), 41 of padding, so the content
+                    column is 526. §17's was 461 inside the big card.
+
+   PROPORTIONS, NOT THE PIXELS, for everything that has to survive a window
+   that is not 1920 wide. The split is a percentage; the card is a max-width
+   the column centres; the logo and copy insets are the file's numbers because
+   they are insets from an edge and do not scale. The one number stated as a
+   ratio rather than a length is the 52.6% — 1010/1920 — and it is what makes
+   the artwork's own aspect ratio (1010:1200) sit correctly at 1200 tall.
+
+   BELOW 900 NOTHING HERE APPLIES, exactly as with §17: `.auth-card` is
+   `display:contents` there and the phone keeps its single column. Everything
+   in this layer that is not the identity panel or the action is inside the
+   same `@container app (min-width:900px)` query §17 uses — per trap 3 a
+   container query is its own cascade tier and §17's card rules can only be
+   restated from inside it.
+   ========================================================================== */
+
+@container app (min-width:900px){
+
+  /* ------------------------------------------------------------------ 1 ---
+     THE FRAME IS THE SPLIT, AND THE GROUND IS WHITE
+     §17 stood the card on `--surface-2` and said why: "a white card on a
+     white ground is not a card". That was true of a card floating in the
+     middle of a page. This card is not floating — it is the right half of a
+     split, and the thing that separates it from the left is the artwork's
+     own edge, which is the strongest boundary on the screen. So the ground
+     goes back to the canvas and the card is told apart by its hairline.
+     ------------------------------------------------------------------------ */
+  /* A FLEX COLUMN THAT FILLS, AND THE `min-height` IS THE WHOLE REASON.
+     §17.42 sets `.app:has(> .auth-card){position:relative}` — ungated, and
+     right for its own composition, where the card had `min-height:715px` and
+     auto margins and the app simply grew around it. But relative with no
+     height means the auth app is CONTENT-HEIGHT, so `min-height:100%` on the
+     split resolved against `auto` and did nothing: on `create` the panel
+     looked full-height because the form is tall, and on `login` and `verify`
+     it stopped two-thirds up the frame with white underneath. A split whose
+     halves are different heights is not a split.
+
+     So the height is claimed here instead. `.device` carries an explicit
+     pixel height (the prototype chrome sets it), which is what makes this
+     percentage resolve at all — against `position:relative` and a definite
+     containing block, `min-height:100%` is the frame. `.auth-card` then takes
+     `flex:1 1 auto` below and both halves stretch to it.
+
+     `min-height` AND NOT `height`, because the card is allowed to be taller
+     than the frame: at 900 x 700 with the browser zoomed, create's 808 does
+     not fit, and `height` would clip it with `overflow:auto` scrolling a box
+     that cannot grow. */
+  .app:has(> .auth-card){
+    display:flex;flex-direction:column;
+    min-height:100%;overflow:auto;
+    background-color:var(--background)}
+
+  /* AND BOTH OF §17's WASHES GO. They were the file's Ellipse 43 and its
+     header band — colour for a composition that had none of its own. The new
+     one is half artwork. A blurred peach ellipse behind a painterly gradient
+     is two soft things fighting, and the one at the top of the frame now
+     lands on the white half, where it reads as a smudge. */
+  .app:has(> .auth-card)::before{display:none;content:none}
+
+  .auth-card{
+    display:flex;align-items:stretch;gap:0;
+    position:relative;z-index:1;
+    box-sizing:border-box;
+    flex:1 1 auto;
+    width:100%;max-width:none;min-height:0;
+    margin:0;padding:0;
+    background:none;box-shadow:none;
+    overflow:hidden}
+  .auth-card::before{display:none;content:none}
+
+  /* the chevron mark was a crop of the OLD artwork against the card's left
+     edge. There is no card edge there any more and the artwork is not that
+     artwork, so it stays off — §17 already has it at `display:none` and this
+     restates it so a later change to §17 cannot switch it back on into a
+     composition that has no room for it. */
+  .auth-card > .auth-mark{display:none}
+
+  /* ------------------------------------------------------------------ 2 ---
+     THE ARTWORK PANEL
+     `.auth-brand` was a text column with a hairline down its right edge. It
+     is now the picture, with the text on top of it.
+
+     `cover` AND `center`, so the panel is never letterboxed and never
+     stretched: the asset is 1010 x 1200 and the panel is 52.6% of the frame
+     by 100% of its height, which is the asset's own ratio at 1920 x 1200 and
+     drifts from it at any other size. Cover is what makes that drift a crop
+     instead of a distortion — and the artwork is a soft gradient with no
+     subject, so a crop costs nothing.
+     ------------------------------------------------------------------------ */
+  .auth-card > .auth-brand{
+    display:flex;flex-direction:column;position:relative;z-index:3;
+    flex:0 0 52.6%;min-width:0;box-sizing:border-box;
+    padding:133px 88px 79px;
+    border-right:0;
+    background-color:var(--auth-wash-1);
+    background-image:url('__AUTHART__');
+    background-size:cover;background-position:center;
+    background-repeat:no-repeat}
+
+  /* `--auth-wash-1` UNDER THE IMAGE, not as decoration — it is the asset's own
+     top-left pink and it is there for the frame or two before an 11 KB image
+     decodes, and for the case where it never does. A white panel that becomes
+     a gradient is a flash; a pink panel that sharpens is not. */
+
+  .auth-brand .auth-logo img{display:block;width:291px;height:auto}
+
+  /* THE COPY GOES TO THE BOTTOM, and `margin-top:auto` is what puts it there
+     rather than a second set of insets. The file's 821 from the top is a
+     consequence of the copy being bottom-aligned in a 1200 frame, not a
+     position anybody would want to hold at another height. */
+  .auth-brand .auth-intro{
+    margin-top:auto;padding:0;max-width:719px}
+  .auth-brand .auth-intro h2{margin:0 0 8px}
+  .auth-brand .auth-intro p{margin:0 0 19px;color:var(--text-primary)}
+  .auth-brand .auth-intro p:last-child{margin-bottom:0}
+
+  /* ON THE ARTWORK THE COPY IS INK, NOT SECONDARY. §17 set these paragraphs
+     `--text-secondary` because they sat on white next to the thing you were
+     meant to be doing. Here they are the only words on their half of the
+     screen and they sit on a mid-tone gradient, where #767676 goes soft.
+     Measured on the panel's own lightest and darkest points: `--text-primary`
+     holds; secondary does not. The orange line keeps its own ink. */
+  .auth-brand .auth-intro p.auth-begin{
+    font-weight:600;color:var(--auth-o-ink)}
+  .auth-brand .auth-foot{
+    margin:24px 0 0;color:var(--text-secondary)}
+
+  /* ------------------------------------------------------------------ 3 ---
+     THE FORM SIDE, AND THE CARD IN IT
+     The column is the other 47.4% and it does one thing: centre the card.
+     `place-items:center` on a grid rather than flex centring, because the
+     card has to be centred on BOTH axes and a grid says that in one
+     declaration — the file puts it 196 from the top of 1200 with 196 left
+     under it, which is centred, not offset.
+
+     `align-content` is what handles the case the file does not draw: a card
+     TALLER than the frame. Centred with no fallback it would be clipped at
+     both ends with no way to scroll to either; `safe center` keeps it
+     centred until it overflows and then pins it to the start.
+     ------------------------------------------------------------------------ */
+  .auth-card > .auth-col{
+    flex:1 1 auto;width:auto;min-width:0;margin:0;
+    display:grid;grid-template-columns:minmax(0,1fr);
+    justify-items:center;align-content:safe center;
+    padding:48px 24px;
+    border-left:0;border-right:0}
+
+  /* THE PAGE IS THE CARD. §17 flattened `.page` to a bare column inside its
+     big card; here that same `.page` IS the object, so it takes the frame the
+     file draws on it. Everything else about it — the sections paying no side
+     padding, the rails and section rules off — §17 already states, and those
+     rules are what make a `.page` behave as card contents at all. */
+  .auth-card > .auth-col > .main{
+    flex:none;width:100%;display:block;min-height:0}
+  .auth-card > .auth-col .page{
+    box-sizing:border-box;
+    width:100%;max-width:608px;margin:0 auto;
+    padding:33px 41px 41px;
+    background-color:var(--auth-card-bg);
+    border:1px solid var(--auth-card-line);
+    border-radius:var(--auth-r)}
+
+  /* THE FOOT STOPS BEING PUSHED DOWN. §17 pinned the last section to the
+     bottom of a fixed-height card (`margin-top:auto`) so that verify, a
+     third of create's height, still closed on create's line. The card is not
+     fixed-height any more — it is 808 on create because its contents are —
+     so the same rule would stretch every shorter screen to nothing and leave
+     the action floating. Each screen is now as tall as what is on it. */
+  .auth-card .form-page > .sec:last-child{margin-top:0}
+
+  /* ------------------------------------------------------------------ 3b --
+     AND THE TILES' HAIRLINES STOP AT THE CARD
+
+     §10.2 draws every closing rule as a BLEED — `left:-50vw; right:-50vw` —
+     because at 390 the content column is the frame and a bleeding rule and a
+     bounded one are the same line. §18 answers that at 900 for `.sec`, `.ph`,
+     `.score` and `.crumb`, and §17 switches off the ones it knows about
+     inside the card. What neither list covers is `.tile::after`, and `.tile`
+     is what `.ai-aura` and `.band` are — so on `created`, the one auth screen
+     built from those, four pseudo-elements were 2024px wide starting at
+     -750px inside a 608px card.
+
+     IT WAS NEVER VISIBLE and it is still worth fixing. `.auth-card` has
+     `overflow:hidden` — §17 set it and this layer keeps it — so the bleed was
+     clipped and looked correct. What it cost was 673px of scrollWidth on the
+     card, which is the number an overflow sweep reads, so the one screen that
+     actually had a layout fault to report would have been lost in it. Bounded
+     the way §18 bounds the others: to the box the rule belongs to. */
+  .app .auth-card .page .tile::after,
+  .app .auth-card .page .ai-aura::after{left:0;right:0;width:auto}
+}
+
+/* ==========================================================================
+   57.4 — THE IDENTITY PANEL, AT EVERY WIDTH
+
+   `.auth-id` — the orange block that says which account you are operating on.
+   The file draws it on "Create your account" holding the address the previous
+   step collected, with "Not you?" beside it.
+
+   IT IS NOT DECORATION AND THAT IS WHY IT IS ORANGE. Every other field on
+   these screens is something you fill in; this one is the single fact you
+   cannot change here without going back, and it is the fact that makes the
+   rest of the form make sense — you are setting a password FOR THIS ADDRESS.
+   §17's note says auth is the one place the product wears the brand orange
+   because it is the front door. This is now the one place on the front door
+   that wears it, since the action went black (§57.5).
+
+   `--auth-o-1` AND NOT A NEW VALUE. The file's panel samples #F47113 and the
+   token is #f57414 — the same colour, and the token is the file's own value
+   from the previous frame. A second orange in the token block for a
+   one-per-channel difference is how a palette stops being a palette.
+
+   WHITE ON IT IS 2.9:1, WHICH IS UNDER AA, and §01's own note about this
+   gradient already says so for the label it was carrying. Here it is stated
+   again because the panel now carries the ADDRESS, and an address is
+   information: the label is `rgba(255,255,255,.9)` and the value is full
+   white at 16px/600, which is large-text AA (3:1) with a hair to spare. The
+   value is also in the page's `<h1>`-adjacent copy above it on every screen
+   that shows the panel, so nothing here is the only statement of it.
+
+   UNGATED, because it is a component rather than a composition: the phone
+   gets the same panel, and §17's own note explains why the column contents
+   are stated once for both.
+   ========================================================================== */
+.app .form-page .auth-id{
+  box-sizing:border-box;
+  padding:20px;
+  background-color:var(--auth-o-1);
+  border-radius:var(--auth-r);
+  color:#fff}
+
+.app .form-page .auth-id-l{
+  display:block;
+  font-size:13.5px;line-height:20px;letter-spacing:.16px;
+  color:rgba(255,255,255,.9)}
+
+/* THE VALUE AND THE WAY OUT ON ONE BASELINE. `align-items:baseline` and not
+   `center`: the two are different sizes, and centring them on the box puts the
+   smaller one visibly high — the file sets the link 2px down from the value's
+   top, which is what a shared baseline gives for free. */
+.app .form-page .auth-id-v{
+  display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;
+  margin-top:4px;
+  font-size:16px;line-height:24px;font-weight:600;letter-spacing:0}
+
+/* THE LINK IS WHITE AND UNDERLINED, and it is the one link in the product
+   that is not `--link` blue. §12's decision is that links are blue because
+   blue is the only blue on the screen; on an orange panel it is the only blue
+   AND unreadable — 1.9:1. Underlined white is how a link says it is a link
+   with no colour available, which is the oldest answer there is. */
+.app .form-page .auth-id-v a{
+  font-size:13.5px;line-height:20px;font-weight:400;
+  color:#fff;text-decoration:underline;text-underline-offset:2px}
+
+/* the section holding it pays the vertical only — the sides belong to the
+   card's padding at desktop and to `--pad-x` on the phone, which is §17's
+   split and this follows it */
+.app .form-page .sec.sec-id{padding-top:12px;padding-bottom:20px}
+
+/* --------------------------------------------------------------------------
+   57.4b NOTHING IS DRAWN UNDER THE PANEL
+
+   A FILLED BLOCK IS ITS OWN BOTTOM EDGE, which is the same sentence §54 makes
+   about the tinted section and §18 makes about every fill in the product: "a
+   block that has a ground of its own — its edge is the shape of the block".
+   The panel has a ground, a radius and 20px of padding; a hairline four pixels
+   under it is a second boundary for one join, and because the panel's corners
+   are round and the rule is straight it reads as a line that missed.
+
+   TWO SOURCES, AND THEY ARE NOT THE SAME ONE ON THE TWO SCREENS — which is why
+   this is two declarations rather than one, and why removing only the obvious
+   one left the OTP screen still ruled:
+
+     `.sec-rule`'s BORDER-TOP is §17.6, "THE ONE RULE IN THE COLUMN — above
+     'Set a Password' and above 'Verification Code'". That was the 2025 file's
+     rule and the 2026 file (483:976) does not draw it: the panel is what
+     separates the address from the password now. It is zeroed only where the
+     panel is the thing above it, so `login` — where the same `.sec-rule`
+     follows the page header and the rule is the only thing separating them —
+     keeps it. Its 24px of padding stays; only the line goes.
+
+     `.sec-id`'s OWN `::after` is §10's closing hairline for any section. At
+     desktop §18 and §14 have already switched it off, which is why `create`
+     looked like it had one line and `verify` had two — on the OTP screen the
+     pseudo was still `display:block`, so the panel was carrying a rule at its
+     own foot AND the block below was carrying one at its head.
+
+   UNGATED, both, because the panel is the same component on the phone and the
+   file draws no rule under it at either width.
+   -------------------------------------------------------------------------- */
+.app .form-page .sec.sec-id::after{display:none;content:none}
+.app .auth-card .page > .sec.sec-id + .sec,
+.app .form-page > .sec.sec-id + .sec{border-top:0}
+
+/* AND THE PSEUDO IS RESTATED INSIDE THE QUERY, WHICH IS TRAP 3 AND IT BIT.
+   The rule above took the panel's own hairline off `create` and left it on
+   `verify`, and the two differ for a reason worth writing down: §20's desktop
+   rule is what suppresses a section's closing hairline, and its `:not()` list
+   excludes any section whose NEXT sibling carries a `.sec-h`. On `create` the
+   block under the panel has no heading, so §20 suppressed it; on `verify` the
+   next block is headed "Verification Code", so §20 skipped it and §10's
+   default `display:block` stood.
+
+   The declaration that stood is INSIDE `@container app (min-width:900px)`, and
+   a container query is its own cascade tier — it beats an unconditional rule
+   of equal weight however late the layer and however many classes it carries.
+   So the same suppression has to be said twice: once for the phone, above, and
+   once from inside the tier, here. `25-modhead.css` §7 does this twice for the
+   same reason. */
+@container app (min-width:900px){
+  .app .form-page .sec.sec-id::after{display:none;content:none}
+}
+
+/* ==========================================================================
+   57.5 — THE ACTION IS BLACK AGAIN, AND IT HUGS
+
+   TWO CHANGES AND ONE ARGUMENT. §17 gave `.auth-card .btn-p` the file's
+   orange gradient under the heading "THE ORANGE — auth is the one place the
+   product wears the brand orange: it is the front door, and the door is
+   branded." The new file keeps that sentence and moves the orange: the panel
+   above is the brand, and the action is `#000`, which is what `.btn-p` is
+   everywhere else in the product. So this is not a reversal of §17's
+   reasoning — it is the same reasoning with the brand somewhere else, and the
+   result is that the primary action looks the same on both sides of the door.
+
+   AND IT IS 217 WIDE, NOT FULL. The file sizes it to its own label — 16 of
+   padding, the words, the gap, a 20px arrow, 16 again. A full-width primary
+   on a 526 column is a bar, and a bar is what you draw when the form is the
+   whole screen; inside a card the action is one object among several. The
+   width is `fit-content` rather than 217px so a longer label on another
+   screen ("Send the reset link", "Verify & Continue") sizes itself instead of
+   wrapping inside a fixed box.
+
+   `.btn-full` IS OVERRIDDEN RATHER THAN REMOVED FROM THE VIEWS, because the
+   same class is what makes these buttons full width on a PHONE, which the
+   file also draws and §17's note calls out explicitly ("the 217px action,
+   which is a fixed width inside a 461 column and full width on a phone"). One
+   markup, two widths, decided by the container — so the override is inside
+   the desktop query and the phone keeps the bar.
+   ========================================================================== */
+/* IT IS THE PRODUCT'S BUTTON, NOT A BLACK ONE THAT LOOKS LIKE IT — every state
+   restated from the tokens the standard `.btn-p` uses, so the front door's
+   action behaves identically to the action on every page behind it.
+
+   §22 IS WHERE THE HOVER ARGUMENT LIVES and it is worth reading rather than
+   restating: "A BLACK BUTTON HOVERS TO THE BRAND GRADIENT ITSELF — the same two
+   stops as the Create Account button, not a darkened version of them. The point
+   of the state is that the action lights up in the brand's colour; a deeper
+   orange says 'pressed' before you have pressed it."
+
+   AND §22's AUTH EXCEPTION DISSOLVES, which is the real change here. §22.83
+   gave `.auth-card .btn-p:hover` one stop DEEPER than the standard, with the
+   reason stated: "the sign-up button already WEARS the gradient at rest, so its
+   hover has to go somewhere". That premise is gone — §57.5 makes the rest state
+   black — so the exception has nothing left to be an exception to, and keeping
+   it would mean the one black button in the product that hovers to a pressed
+   colour. Restated to the standard rather than deleted, because §22's rule is
+   earlier in the cascade and a later layer cannot un-set it back to §22.74's
+   value; the tokens are the same ones §22.74 names, so there is no second
+   definition of the gradient anywhere.
+
+   `--on-brand-fill:1` COMES WITH IT. §22 sets it on every element that takes
+   the gradient — it is what tells the icon inside to paint on a brand fill
+   rather than on black. Omitted, the arrow keeps its black-button ink and
+   disappears into the orange for exactly as long as the pointer is there.
+
+   THE HOVER IS LIVE, and that is not automatic: `build.py` rewrites every
+   `:hover` in the build to `:hover:where(.__nh)` and only compounds ending in
+   one of `HOVER_KEEP` survive (trap 6). `btn-p` is on that list and the test is
+   `endswith`, so a selector ending `.btn-p:hover` is kept — which is why these
+   read as `… .btn-p:hover` rather than `… .btn-p.something:hover`. Reorder the
+   compound and the state silently stops existing. */
+.app .auth-card .btn-p{
+  background-color:var(--brand-primary);
+  background-image:none;
+  color:var(--on-brand);
+  border:0}
+.app .auth-card .btn-p:hover{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+.app .auth-card .btn-p:active{
+  background-color:var(--accent-2);
+  background-image:var(--accent-grad-hover);
+  color:var(--on-accent);border-color:transparent;--on-brand-fill:1}
+.app .auth-card .btn-p:focus-visible{outline-color:var(--accent)}
+
+@container app (min-width:900px){
+  /* AND IT IS WIDER THAN ITS WORDS. `fit-content` sized it to label + gap +
+     arrow + 2 x 16 of padding, which came out at 159px for "Create Account"
+     against the file's 217 — the file leaves 65px between the words and the
+     arrow, and that gap is most of what makes the button look like a
+     deliberate object rather than a tag around some text.
+
+     THE GAP AND THE PADDING RATHER THAN A WIDTH, because the seven auth
+     screens carry seven different labels — "Log in", "Send the reset link",
+     "Verify & Continue", "Save and log in" — and a fixed 217 would crop the
+     long ones and leave the short ones swimming. 24 of padding a side and a
+     32px gap puts "Create Account" at about 200 and lets every other label
+     size itself on the same rules. */
+  .app .auth-card .form-page .btn.btn-full{
+    width:fit-content;min-width:0;display:inline-flex;
+    gap:32px;padding-left:24px;padding-right:24px}
+}

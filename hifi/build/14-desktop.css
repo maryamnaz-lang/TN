@@ -89,7 +89,25 @@
      A hairline on top of a tone change is the same statement made twice, and
      the card it would close has had its own two internal rules taken out
      (§29.16) precisely so it stops reading as a ruled table. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed))::after,
+  /* AND `+ .sec.tint.cards` JOINS IT FOR THE SAME REASON, FROM THE OTHER SIDE.
+     The paragraph above is about a section that CONTAINS `.signed`; this is
+     about a section that is FOLLOWED BY a tinted block — the interview digest
+     on the assessed and promoted dashboards, which takes `sec tint cards`
+     (§55). The tone change from white to #F7F7F7 is the boundary, and the
+     hairline drew on top of it: one join stated twice, four pixels apart.
+
+     IT HAS TO BE ON THIS LINE, which is CLAUDE.md's trap 4 and the reason the
+     two notes above are here rather than in a later layer. This selector is
+     (0,7,0) inside a container query, so `:has(+ .sec > .sec-h)` alone beats
+     anything a §55 can say about the same pair — §55.2 states the same intent
+     at four classes and loses at desktop. The `:not()` list is where "which
+     pairs are joined" is decided, so an unjoining goes in the list.
+
+     §55.2 IS STILL NEEDED and is not a duplicate: below 900 none of this block
+     applies — §10's rules bleed and are shown — so the phone case is answered
+     there and the desktop case is answered here. Two widths, two statements,
+     one intent, which is the same shape §18 and §36.9 already use. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards))::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

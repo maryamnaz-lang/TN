@@ -91,6 +91,16 @@ more render-pass jobs a hand-authored page has to do itself: the steps popup is
 (`views.js` ends on exactly those two lines), and the entrance cascade stamps `--i` on the
 section list rather than on every child.
 
+**THE CANDIDATE PORTAL NO LONGER DRAWS THE STEPS POPUP — §56 opened it.** The steps are a row
+in the head band now (`.stps`, `stepper()` in views.js), so nothing in `hifi/` emits `.stp-all`,
+`.stp-tw`, `.stp-pop`, `.stp-t` or `.stp-now`, and `S.piOpen` is gone with the router branch and
+the click-away listener that closed it. §33.7's rules all still ship — `tn-agent-portal.html`
+hand-writes that markup and the design system carries it — so the four notes below are still
+live for a hand-authored page that wants the dropdown. A page that wants the OPEN row copies
+`.stps` out of `gallery.html`'s Signature section instead; it is markup plus §56 and no JS at
+all, and `stepIcon`'s table is the one thing that does not cross (both portals keep a copy so a
+step's subject icon cannot differ between them).
+
 **The steps popup is a dropdown, and three of its rules are markup, not CSS.** §33.7 owns it
 and the whole argument is written there; what a hand-authored page has to do:
 
@@ -172,7 +182,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `52-talsumtype.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `56-headband.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -202,11 +212,42 @@ Nothing throws, the page renders, one declaration is just absent. It happened tw
 went the same way, found the same afternoon), so `build.py` now refuses to write if any
 unmatched `/*` or `*/` survives the comment strip, and prints the line.
 
+### The head band is TWO COLUMNS — §56, `56-headband.css`
+
+Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a
+hairline, **Your journey so far** (five steps, open, in a row), a second hairline, then what
+Tal says. The right column is the page's one dark card — `placeDark` still moves it into the
+band, §56 gives it column two, and it stretches to the left column's height with its content
+packed to the top and its actions on an `auto` margin at the foot.
+
+Six things worth knowing before touching it:
+
+- **The gate is `.modhead:has(> .sec-dark .plate)` at 900 and up.** A plate is a vertical card
+  and gains from the column; `.lvl-hero`, `.cert` and `.score` are wide objects (a 15-rung
+  ladder, an award, a table) and keep §25.12's full-width place under the head. A SECOND dark
+  card in the band spans both columns and lands under them.
+- **The journey is always five steps** — `journey()` in views.js is the single list and the
+  six dashboards call `stepper(journey())`. The labels are the spine, the `sec` lines are the
+  stage. Four-step and six-step variants are what it replaced.
+- **The row is left-aligned and each item is a three-row grid**, with `.stps-b` at
+  `display:contents` so the five state words stay on one line when one label wraps and another
+  does not. Each `.stps-i` paints the rail segment to its own right; there is no rail element.
+- **The mark's ground carries the state**: flat `--accent` for done, `--brand-tint-2` for the
+  step you are on, `--layer-02` for what is ahead, with the subject icon at full ink on all
+  three. Discs, not squares — a mark is one of the two things this system lets curve.
+- **The dashboard's greeting moved to the `.ph`.** No `PAGESUM` entry carries
+  `<span class="tal-greet">` any more, so §33.9's `.ph`-hiding rule matches nothing in `hifi/`
+  — it still ships, and `tn-agent-portal.html` still uses it.
+- **`ph()`'s fact row draws its own marks.** `phSub` splits the `&middot;` row into a `.ph-f`
+  per fact, capitalises each one and puts a 15px icon in front of it (`PH_IC` / `factIcon`,
+  same first-match-wins shape as `stepIcon`). A `sub` with no middot in it — the auth screens —
+  is left as a plain `<p>`.
+
 ### The head of a page has TWO copy slots and they do different jobs
 
-A module page opens with an `<h1>`, a grey line under it, and Tal's summary about six
-millimetres below that. The grey line and the summary are read as one block whether or not
-they were written as one, so the split is a rule:
+A module page opens with an `<h1>`, a fact row under it, and Tal's summary below that. The
+fact row and the summary are read as one block whether or not they were written as one, so
+the split is a rule:
 
 | Slot | Written in | Carries |
 |---|---|---|

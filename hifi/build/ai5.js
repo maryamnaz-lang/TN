@@ -381,9 +381,69 @@ function placeDark(){
    and the composition is one component's business. This also picks up any
    plate a later page adds without that page having to know the order.
    ========================================================================== */
+/* THE DETAIL LINE IS A LIST, AND EACH ITEM WEARS ITS OWN MARK.
+   `.plate-b` is written as one `&middot;` run — "Thursday at 6:00 PM ET · 9
+   others · 60 minutes" — which is three different facts (a date, a headcount, a
+   duration) told as one sentence. It held together while the card ran the width
+   of the page; in §56's column the run wraps to two and three lines and the
+   middots land mid-line, so the one thing on the card you actually need to act
+   on is the hardest part of it to read.
+
+   Split at the middots, one row each, a 16px mark in front. Same table shape
+   and the same first-match-wins order as `stepIcon` and `factIcon` in views.js,
+   and the same argument for deriving it: six plates across two portals and a
+   seventh whenever a page adds an appointment.
+
+   ON EVERY PLATE, NOT ONLY THE ONE IN THE COLUMN. Every plate in the product is
+   moved into the head band by `placeDark` below, so "the narrow one" is all of
+   them at desktop; and below 900, where the card is full width, the column it
+   sits in is a phone's. A list is the better drawing at both.
+
+   ONE PART IS LEFT AS PROSE. A `.plate-b` with no middot in it is a sentence
+   rather than a row of facts, and a sentence with a mark in front of it is a
+   callout. */
+/* FIRST MATCH WINS, so the order is the argument — and three of these are only
+   in the right place because of a row that got the wrong mark first:
+
+   MONEY LEADS. "$595 due today" was matching the date rule on the word `today`
+   and came out as a calendar. A figure with a currency sign in it is money
+   whatever else the row says.
+   ASSESSMENTS BEFORE CHAPTERS, because "13 assessments, one per chapter" says
+   both words and is about the assessments.
+   CALLS BEFORE THE COHORT, so "13 live cohort calls" is a camera rather than a
+   group of people — and "9 others" still has no call in it, so it keeps its. */
+const PLATE_IC = [
+  [/\$|\bfee\b|paid|price/i,                        'wallet'],
+  [/assessment|average|\bscore/i,                   'chart'],
+  [/chapter|module|course|curriculum/i,             'book'],
+  [/\d{1,2}:\d{2}|[ap]\.?m\.?|\bET\b|\bPT\b/i,     'time'],
+  [/minute|hour|\bmin\b|long/i,                     'hourglass'],
+  [/monday|tuesday|wednesday|thursday|friday|saturday|sunday|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|today|tomorrow/i, 'calendar'],
+  [/\bcalls?\b|recorded|video/i,                    'video'],
+  [/situation|conversation|question|asks|hypothetical/i,'chat'],
+  [/others|people|cohort|candidates|members|one to one|1:1/i,'group'],
+  [/online|link|remote/i,                           'launch'],
+  [/report|signed|level/i,                          'certificate']
+];
+function plateIcon(t){
+  const s = String(t || '').replace(/<[^>]*>/g, ' ');
+  for(const [re,k] of PLATE_IC) if(re.test(s)) return I[k];
+  return I.circle;
+}
+function splitPlateBody(plate){
+  const b = plate.querySelector(':scope > .plate-b');
+  if(!b || b.querySelector(':scope > .plate-bi')) return;
+  const parts = b.innerHTML.split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return;
+  b.classList.add('plate-lines');
+  b.innerHTML = parts.map(t =>
+    `<span class="plate-bi">${plateIcon(t)}<span>${t}</span></span>`).join('');
+}
+
 function placePlates(){
   device.querySelectorAll('.plate').forEach(plate => {
     if(plate.querySelector(':scope > .plate-h')) return;   /* already arranged */
+    splitPlateBody(plate);
 
     const eb   = plate.querySelector(':scope > .plate-eb');
     const t    = plate.querySelector(':scope > .plate-t');
@@ -427,7 +487,18 @@ function placePlates(){
        own `margin-top` inside the row); the title is otherwise untouched, so
        everything that styles `.plate-t` still applies. */
     const bare = !head.childElementCount && !!t;
-    if(bare){ head.classList.add('plate-h-bare'); head.appendChild(t); }
+    if(bare) head.classList.add('plate-h-bare');
+
+    /* NO MARK AT THE HEAD OF THIS CARD, AND THAT IS A DECISION THAT WAS TRIED.
+       486:1084 opens the call card on a 40px calendar tile, left of the title,
+       and it was built that way: the tile said what KIND of object the card is
+       before you read which one. Two things were wrong with it here. Every plate
+       in this build is an appointment, so the tile said the same word on all
+       four of them — and in a 268px card it took 52px off the one row the title
+       has, which is what pushed "Cohort Week 36 Session" onto two lines and then
+       onto its own line. The countdown chip already says the card is dated, in
+       the corner the file puts it in. Removed on Maryam's read of the built
+       card; the note stays because the file still draws it. */
 
     if(when){
       const w = document.createElement('span');
@@ -437,6 +508,16 @@ function placePlates(){
       w.innerHTML = I.time + '<b>' + when + '</b>';
       head.appendChild(w);
     }
+
+    /* AND THE SEATED TITLE GOES IN LAST, AFTER THE COUNTDOWN. It used to be
+       appended the moment `bare` was decided, which put it BETWEEN the mark and
+       the clock — and §56 wraps that row, giving the title a row of its own (the
+       note there is where our column's arithmetic is written down). A title in
+       the middle of the source order takes its row in the middle: mark, then
+       title, then the clock on a third line under it. Source order is the row
+       order, so the two things that share the first line have to be the first
+       two children. */
+    if(bare) head.appendChild(t);
 
     /* the glow is absolutely positioned and painted from the card's own box,
        so it stays where `placeGlow` put it — first — and is not reordered */

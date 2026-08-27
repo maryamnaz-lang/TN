@@ -147,6 +147,47 @@ LAYERS = [
     # candidate portal did, four pixels apart. Shipping §37.1 without this is
     # shipping the bug.
     '54-tintedge.css',
+    # Cells on a panel as cards rather than divisions. `.sec.tint.cards` takes
+    # the figure fills and the head action white, replacing §12's "same colour
+    # as the panel, hairlines drawn by the grid gaps". Every name it touches is
+    # a system name — `.sec.tint`, `.stats`, `.facts`, `.prog-figs`, `.sec-h`,
+    # `.btn-g` — and `.cards` is an opt-in a second portal applies or does not,
+    # so it costs one rule unused and saves the next portal rediscovering which
+    # of §12's twenty fills has to move.
+    '55-panelcards.css',
+    # The head of a page as two columns, and the steps open. Every name in it
+    # is a system name — `.modhead`, `.ai-aura.talsum`, `.stp-wing`, `.stp-top`,
+    # `.pi-lab`, `.plate`, `.sec-dark` — and the arrangement is the band a
+    # second portal copies: title, the `·` fact row, where you are, a divider,
+    # then what Tal says, with the one loud card beside it.
+    #
+    # AND `.stps` IS THE HALF A HAND-AUTHORED PAGE HAS TO WRITE ITSELF. The row
+    # is markup plus these rules and no render pass — `.stps` > `.stps-i.done`
+    # / `.on` > `.stps-m` (the mark) and `.stps-b` (the label and its detail
+    # line) — so unlike §33.7's dropdown it needs no JS at all. `stepIcon`'s
+    # table in views.js is the one thing that does not cross: both portals
+    # already carry their own copy so a step's subject icon cannot differ
+    # between them, which is the note in views.js over `STEP_IC`.
+    #
+    # WHAT DOES NOT CROSS IS §33.9's HIDE, and it is not in this layer to
+    # begin with: `.tal-greet` still hides a page's `.ph`, and the agent's
+    # portal still opens its dashboard on a greeting. This layer is the
+    # candidate portal choosing the other shape — a title with a fact row
+    # under it — and a page on this stylesheet can take either.
+    '56-headband.css',
+    # The front door as a split (Figma 483:976). In for the same reason §54 is:
+    # `17-auth.css` is in this list, so the composition it states already ships
+    # here, and shipping that without the layer that restates it would give a
+    # second portal the 2026 sign-up markup and the 2025 frame. It also brings
+    # `.auth-id`, the orange identity panel, which is the one part of it that is
+    # a component rather than a correction — every portal with a front door has
+    # a screen that has to say which account it is about.
+    '57-authsplit.css',
+    # The two findings as headings. `.sig-l` is a new name and the rules are
+    # ordinary type and spacing, so it costs one rule unused in a portal that
+    # has no interview write-up — and saves the next one rediscovering that the
+    # inline style had to come out of the markup first.
+    '58-finding.css',
 ]
 
 # ==========================================================================
@@ -446,7 +487,14 @@ FONTS = {
 # the identical file; §53.7 has the crop and why its alpha is a circle.
 IMAGES = {
     '__TALCIRCLE__': ('tal-blob.webp', 'image/webp'),
-    '__AUTHART__':   ('auth-art.webp',  'image/webp'),
+    # THE NEW PANEL, AND THE OLD ONE WAS 235 KB OF NOTHING. `__AUTHART__` used
+    # to map to `auth-art.webp`, embedded here and in the portal build for a
+    # rule (§14's `.auth-img`) that nothing has ever emitted. §57 makes the
+    # token live for the first time, painting the full-bleed panel from Figma
+    # 483:976 — and that asset is 11 KB, because it is a smooth gradient rather
+    # than a logo. Both builds have to name the same file or the portal and the
+    # design system draw different front doors.
+    '__AUTHART__':   ('auth-split.webp', 'image/webp'),
     '__AUTHMARK__':  ('auth-mark.webp', 'image/webp'),
     # the chat composer's coral ground (§51.7). Cut to the band the Figma node
     # actually shows before it ever reaches either build — hifi/build/build.py

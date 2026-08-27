@@ -1,0 +1,693 @@
+/* ==========================================================================
+   56. THE HEAD OF A PAGE IS TWO COLUMNS, AND THE STEPS ARE OPEN
+
+   Maryam's arrangement of the band, in the order it reads:
+
+     column one    the title
+                   the fact row under it — the page's quick stats
+                   WHERE YOU ARE, every step, in a row
+                   a divider
+                   what Tal says
+     column two    the black card, its content centred, as tall as column one
+
+   FOUR THINGS MOVE AND ONE THING GOES.
+
+   1. THE TITLE IS THE `<h1>` AGAIN. The eight dashboards opened with
+      `<span class="tal-greet">Welcome back, Maryam!</span>` inside Tal's
+      paragraph, and §33.9 hid the page's own `.ph` to let it be the title.
+      With the steps and the fact row above Tal that greeting would have been
+      the fourth thing in the column and the second heading in it. The note over
+      `PAGESUM.dashboard` in ai6.js is the long version; nothing here hides a
+      `.ph` any more, so §33.9's rule simply stops matching — it is kept because
+      `.tal-greet` is still a component the design system ships and the agent's
+      portal still opens on one.
+
+   2. THE FACT ROW IS THE QUICK STATS, AND IT WAS ALREADY WRITTEN. `ph(title,
+      sub)`'s second argument is the page's factual spine as a `&middot;` row —
+      "Explorer Track – E3 · Cohort 41 · week 5 of 13" — and the rule over `ph`
+      in views.js is that a page with no spine passes no `sub` at all. That is
+      exactly "the quick stats, if the page has any", so this layer adds no
+      component for it: eleven pages have no row and want none.
+
+   3. THE STEPS ARE OPEN. They were behind an "All steps" toggle that dropped a
+      340px panel (§33.7), with a meter, a caption and the current step printed
+      beside it because the other four were hidden. The whole of §33.7's
+      dropdown argument — where it hangs from, what anchors it, what closes it
+      — was the cost of hiding a five-item list at the top of a page that has
+      room for it. The list is the component now: one row, one mark per step,
+      the mark carrying the state. What that leaves of §24.4's header row is the
+      heading and the count, which is the one thing the row does not say.
+
+   4. TAL GOES LAST, UNDER A LINE. The summary is the reading of everything
+      above it — where you are on the ladder, what the row of marks just showed
+      — so it belongs after the facts rather than over them. The divider is what
+      says the voice changed: above the line the page states itself, below it
+      Tal talks. It is the wing's own `border-bottom`, because a divider between
+      two members of a grid is a property of the join, not an element.
+
+   5. AND THE BLACK CARD TAKES THE SECOND COLUMN. §25.12 made it the band's last
+      member — full width, under everything, "the last thing the head of the
+      page has to say". Beside the head instead: the required action and the
+      reading of it are one glance, and the band stops being 414px tall on a
+      page whose first section is 700px down. It STRETCHES to column one's
+      height and centres its own content, which is what makes two columns of
+      unequal content read as one block.
+
+   ONLY WHERE THE CARD IS A `.plate`, and that is the one gate in this layer.
+   `DARK_CARD` (ai5.js) covers six components and three of them are WIDE
+   objects: `.lvl-hero` draws a fifteen-rung ladder, `.cert` an award, `.score`
+   a table of figures. A 320px column would break all three. A plate is a
+   person, a time and up to two buttons — a vertical card already, which is why
+   it is the one that gains from the move. Every other dark card keeps §25.12's
+   full-width place at the foot of the band.
+
+   LAST IN THE CASCADE, and it has to be: it restates §25.11's named-area grid,
+   §33.1's and §33.8's talsum templates, §33.7's wing and §15's desktop plate.
+   Four of those live inside `@container app (min-width:900px)`, so per trap 3
+   every one of them is restated INSIDE the same query rather than above it —
+   a rule in a container query beats an unconditional rule of equal weight
+   whatever the layer order.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE LEFT COLUMN'S ORDER — STEPS, LINE, TAL
+   §33.1 states `'mark' 'title' 'body' 'stp' 'act' 'asks'` and §33.8 splits it
+   into two columns at 900 with the wing on the right. Both become one column
+   with the wing FIRST. `title`, `act` and `asks` stay named for the reason
+   §33.1 gives: an area nothing claims costs nothing, and a card that somehow
+   keeps a heading degrades into a stack rather than into an auto-placement.
+   -------------------------------------------------------------------------- */
+.app .modhead .ai-aura.talsum,
+.app .modhead .ai-aura.talsum.ai-act-top{
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:'stp' 'mark' 'title' 'body' 'act' 'asks';
+  column-gap:0;row-gap:0}
+
+/* THE DIVIDER IS THE WING'S BOTTOM EDGE. `--rule` is §12's hairline against
+   the band's wash — the same value every internal rule in the band used before
+   §25.2 turned them off. This one is not a section boundary, it is the join
+   between what the page states and what Tal says about it, so it is drawn on
+   the member above rather than on the `.sec`.
+
+   §33.8 gives the wing a `border-left` and 24px of `padding-left` for the
+   two-column card; both come off. */
+.app .modhead .ai-aura.talsum > .stp-wing{
+  grid-area:stp;
+  margin:0;padding:0 0 var(--s05);
+  border-left:0;border-bottom:1px solid var(--rule)}
+
+/* AND TAL STANDS OFF THE LINE. The mark leads the block below the divider, so
+   the air belongs above the mark — 16 under the line, which is the same step
+   the wing pays above it. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label{margin-top:var(--s05)}
+
+/* --------------------------------------------------------------------------
+   1b. THE FACT ROW — ONE MARK PER FACT, ON ONE LINE
+   `phSub` (views.js) splits the `&middot;` row into a `.ph-f` per fact with a
+   15px mark in front of it; the note there is where the table and the "two
+   parts or it is left alone" rule live. What this has to do is lay them out.
+
+   THE MARK IS 15px AGAINST A 13.5px LINE, which is the same relationship §33.2
+   sets for Tal's own mark beside its name: a glyph reads as the weight of a
+   capital rather than as a bullet in front of one. `--icon-secondary` and not
+   the accent — four accent marks in the second line of the page would compete
+   with the one accent thing in the band that means "now".
+
+   AND THE MIDDOT SURVIVES AS A DOT. With marks in the row the separator is no
+   longer doing the whole job of splitting the facts, but four facts with no
+   divider read as one phrase — so it is drawn, 3px, at `--gray-30`, on every
+   fact but the last. In markup it would wrap as a stray dot at the start of a
+   line; as a `::after` on the fact it wraps WITH the fact it follows.
+   -------------------------------------------------------------------------- */
+.app .ph .ph-facts{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--s02) var(--s03);
+  margin-top:var(--s03);max-width:none}
+.app .ph-f{display:inline-flex;align-items:center;gap:var(--s03);min-width:0}
+.app .ph-f > svg{
+  width:15px;height:15px;flex:none;display:block;
+  fill:var(--icon-secondary)}
+.app .ph-f:not(:last-child)::after{
+  content:'';width:3px;height:3px;flex:none;
+  margin-left:var(--s03);
+  background:var(--gray-30)}
+
+/* AND A HAIRLINE CLOSES THE HEADER, WHERE THERE ARE STEPS UNDER IT.
+   486:1084 draws one, and it is doing a job §25.6's rhythm cannot do here.
+   That block reads the header and Tal's card as ONE paragraph — "they are one
+   thing Tal is saying" — which is right on the twenty pages where the band is a
+   title and a sentence. This band has four members in it, and the first two are
+   the PAGE stating itself while the two below are the journey and Tal's reading
+   of it. One line between them is what makes that a two-part block rather than
+   a four-part list.
+
+   ONLY WHERE THERE IS A STEPPER, which is the shape the file draws and the only
+   band with anything between the header and Tal. Every other page keeps §25.6's
+   one paragraph, untouched.
+
+   INSET TO THE SPINE, NOT BLED. §25.2 gives the band ONE full-bleed rule, at the
+   bottom, on the argument that "a block with its own ground owns its edge". This
+   is not that edge — it is a division inside the block, so it stops at the
+   gutter the text starts at, like the wing's own line below it. `::after` and
+   not `border-bottom` for exactly that reason: a border would run the full width
+   of the column, past both spines. */
+.app .modhead:has(.stp-wing) > .ph{position:relative;padding-bottom:var(--s06)}
+.app .modhead:has(.stp-wing) > .ph::after{
+  display:block;content:'';
+  position:absolute;left:var(--pad-x);right:var(--pad-x);bottom:0;
+  height:1px;background:var(--rule)}
+
+/* --------------------------------------------------------------------------
+   2. THE HEADER ROW KEEPS THE HEADING AND THE COUNT
+   §24.4 draws `.stp-top` as heading | meter | toggle, and `margin-left:auto`
+   is on `.stp-t` — the toggle. With the toggle and the meter gone the caption
+   is the row's right-hand end, so the auto margin moves to it. "Step 4 of 5" is
+   a position and the row of marks is a picture: the two say different things,
+   which is why the caption survived the removal and the meter did not.
+   -------------------------------------------------------------------------- */
+.app .stp-open > .stp-top{margin-bottom:var(--s05)}
+.app .stp-open > .stp-top > .stp-c{margin-left:auto;flex:none;margin-top:0}
+
+/* --------------------------------------------------------------------------
+   3. THE STEPS — A ROW OF MARKS ON ONE RAIL
+
+   Equal columns, `grid-auto-flow:column`, so five steps and six steps both
+   divide the width they are given rather than sizing to their labels — a row
+   whose columns are as wide as their words puts the marks at five unequal
+   distances and stops reading as a rail.
+
+   THE RAIL IS DRAWN PER STEP, BETWEEN THE MARKS. Each item paints the segment
+   to its right: from its own mark's right edge to the next mark's left edge, 4px
+   clear at both ends, at the mark's own vertical centre. With the marks packed
+   to the left of their columns (see below) the next mark's left edge IS this
+   item's right edge, so the whole geometry is `mark + 4` on one side and 4 on
+   the other — no wrapper, no absolute rail behind the row, and nothing to keep
+   in step when a step is added.
+
+   IT IS NOT DRAWN BEHIND THE MARKS, which is the difference from §33.7b's
+   panel. There the rail runs the full height of the column and each mark masks
+   it with the panel's own white; here the band has a gradient wash under it and
+   a white square behind every glyph would be five holes in it. Stopping the
+   line short needs no ground at all.
+
+   `.pi-lab` AND `.pi-sec` ARE THE STEP'S TYPE ROLES (§11) and are reused as
+   they are. `.pi-sec` is in the markup and hidden in the row: 98px of column
+   holds a label and not a sentence, and "Within 48 hours of the interview"
+   under every mark would be the row's whole height. It comes back below 900,
+   where the row is a column and there is a line's width for it.
+   -------------------------------------------------------------------------- */
+.app .stps{
+  --stps-m:40px;
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  gap:0;margin:0;padding:0;list-style:none}
+
+/* THE THREE LINES OF A STEP ARE THREE GRID ROWS, AND THAT IS THE WHOLE OF THE
+   ALIGNMENT. As a flex column each item stacked mark / label / state and every
+   label wrapped to its own number of lines — "Enrolled" one, "Interview and
+   level" two — so the state words sat at five different heights and the row
+   read as five loose captions rather than one row. Three rows with the LABEL's
+   row at `1fr` puts the marks on one line, the labels on one line, and the
+   states on one line whatever any label does in between: the item's height is
+   the tallest item's (grid items stretch), and the middle row absorbs the
+   difference.
+
+   `.stps-b` IS `display:contents` FOR THAT REASON — the label and the state have
+   to be items of THIS grid to take rows in it. The wrapper still exists because
+   below 900 the two are a block beside the mark, where a box is what they need.
+   Row gaps are margins rather than `row-gap`: 12 under the mark, 2 under the
+   label, and one `row-gap` cannot be both. */
+/* LEFT-ALIGNED IN THE COLUMN, WHICH IS WHAT 486:1084 DRAWS AND WHAT PUTS THE
+   ROW ON THE PAGE'S SPINE. Centred in its column, the first mark sat 30px in
+   from the left edge and every label was centred on its own mark — so the row
+   started nowhere in particular, and nothing in it lined up with the heading
+   above it or the sentence below. Left-aligned, the first mark and the first
+   label share the spine with "Your journey so far", Tal's mark and the page
+   title: four things on one edge. It also gives each label the whole of its
+   column to wrap in rather than half of it either side of a centre. */
+.app .stps-i{
+  position:relative;min-width:0;text-align:left;
+  display:grid;grid-template-rows:auto 1fr auto;
+  justify-items:start;align-items:start;row-gap:0}
+.app .stps-b{display:contents}
+.app .stps .pi-lab{grid-row:2;margin-top:var(--s04)}
+.app .stps-st{grid-row:3;margin-top:2px}
+
+/* THE SEGMENT IS 2px AND IT CARRIES THREE COLOURS, WHICH IS 486:1084's OWN
+   READING OF THE ROW: what is behind you is settled, the leg you are ON is
+   live, and what is ahead is not drawn yet.
+
+     between two finished steps   `--support-success`
+     into the step you are on     `--accent`
+     everything after it          `--rule`
+
+   THE GREEN IS THE PRODUCT'S OWN SUCCESS FILL, not a new colour: §01 tunes
+   `--support-success` as a FILL (and `--support-success-ink` for type, which is
+   what the word under the label takes). It is the same green the file draws.
+
+   `:has(+ .stps-i.on)` IS WHAT MAKES THE LIVE LEG LIVE — the last finished step
+   is the one whose segment reaches the current mark, and that is a fact about
+   its NEXT sibling, so it cannot be stated on the step itself. Two pixels
+   rather than one because a 1px line across a column reads as a rule between
+   two things rather than as a rail joining them; four (the old meter's height)
+   reads as a bar. */
+.app .stps-i:not(:last-child)::before{
+  content:'';position:absolute;z-index:0;
+  top:calc(var(--stps-m) / 2 - 1px);height:2px;
+  left:calc(var(--stps-m) + var(--s02));
+  right:var(--s02);
+  background:var(--rule)}
+.app .stps-i.done::before{background:var(--support-success)}
+.app .stps-i.done:has(+ .stps-i.on)::before{background:var(--accent)}
+
+/* THE MARK IS A DISC, AND THAT IS INSIDE THE RULE RATHER THAN AN EXCEPTION TO
+   IT. `--radius` is 0 in this system and the only curves in it are MARKS (50%)
+   and pills (999px) — Tal's own mark, every avatar, the ring on the week card.
+   A step's mark is a mark, 486:1084 draws it as one, and a disc is also what
+   makes a node on a rail read as a node rather than as a tile that happens to
+   have a line beside it.
+
+   THIS IS THE ONE PLACE THE ROW DISAGREES WITH §33.7b, which took the box OFF
+   its five marks on the stated ground that "in a 340px dropdown at 28px, five
+   heavy tiles down the left edge read as buttons" — true of a list inside a
+   panel whose job is to name five things. This row IS the drawing: it is the
+   only thing at the head of the page that says how far along you are.
+
+   THE STATE IS THE GROUND, in three fills, and 486:1084's second cut is where
+   the order of them comes from:
+
+     done  `--accent`, flat, subject in `--on-accent` — the strongest fill in
+           the row goes to what is finished
+     on    `--brand-tint-2`, the accent at tint strength, subject in
+           `--accent-text` — 4.9:1 on it
+     ahead black at 5%, subject in `--icon-primary` — the FULL
+           ink, which is 486:1084's own drawing of an untouched step and is the
+           one thing in this row that is not carrying state twice. The disc is
+           already saying "not yet" and the word under it says it again; a
+           greyed glyph inside a grey disc said it a third time and read as
+           disabled, which an upcoming step is not
+
+   THE FIRST CUT HAD THE TWO ORANGES THE OTHER WAY ROUND — tint for done, an
+   open accent ring for the step you are on, at 48px against the others' 40 —
+   on the reasoning that the current step should be the loudest object in the
+   row. Maryam's file says the opposite and it is the better read: what is DONE
+   is settled and can be stated flatly, and the step you are on is the one
+   still in the tint because it is not finished. It also makes the row one
+   size, which is what lets five discs sit on one line without the rail having
+   to dodge one of them.
+
+   NO GRADIENT AND NO RING. `--accent-grad` behind a white glyph is this
+   product's fill for a CONTROL — the plate's Join button, the sign-up CTA — so
+   a status marker takes the flat accent instead. `--on-brand-fill:1` is the
+   flag verify.mjs reads: white on accent is a stated exception (§01's note).
+
+   AND THE GREY IS A TINT OF THE GROUND, NOT A COLOUR — `rgba(0,0,0,.05)`,
+   Maryam's value, taken down from a first pass at .10. It is one of the few
+   places in this build that does not resolve to a token, and it cannot: the
+   band's ground is a two-radial WASH (§25.1), so a flat grey is a different
+   colour at each end of it. A percentage of black is the same STEP DOWN wherever
+   the disc lands, which is what makes five untouched marks read as one set, and
+   five per cent is the step that shows the disc without the row looking like
+   three marks and two holes. `--layer-02` was tried first and is the near-miss
+   worth recording: #f7f7f7 against the wash's warm #f6efe5 is a difference you
+   have to look for, so the marks came out as bare glyphs.
+   -------------------------------------------------------------------------- */
+.app .stps-m{
+  position:relative;z-index:1;
+  width:var(--stps-m);height:var(--stps-m);flex:none;
+  display:grid;place-items:center;border-radius:50%;
+  background-color:rgba(0,0,0,.05);border:0}
+.app .stps-m > svg{width:20px;height:20px;fill:var(--icon-primary);display:block}
+
+.app .stps-i.done > .stps-m{
+  background-color:var(--accent);--on-brand-fill:1}
+.app .stps-i.done > .stps-m > svg{fill:var(--on-accent)}
+
+.app .stps-i.on > .stps-m{background-color:var(--brand-tint-2)}
+.app .stps-i.on > .stps-m > svg{fill:var(--accent-text)}
+
+/* EVERY LABEL IS IN FULL INK, INCLUDING THE ONES AHEAD. §33.7b keeps only the
+   current step at `--text-primary`, which is right in a dropdown where the
+   question is "which one is now". In the row the state is already said twice —
+   the disc's fill and the word under the label — and setting three of five
+   labels back to secondary said it a third time, with the side effect that the
+   three FINISHED steps read as the ones that had not happened. 486:1084 sets
+   all five the same and lets the colour under them do the work. */
+/* AND THE LABEL STEPS BACK TO 13/17, WHICH IS §03's OWN VALUE FOR IT. §11
+   raises `.pi-lab` to 14/19 for a list where the label is a row's heading; in a
+   99px column that wraps every one of them to two lines and breaks
+   "Re-interview" across the hyphen. 13/17 fits "Enrolled", "90-day course" and
+   "Leadership quiz" on one and two lines respectively, and the grid above keeps
+   the state words level whichever way a label falls. */
+.app .stps .pi-lab{
+  font-size:13px;line-height:17px;letter-spacing:.1px;
+  color:var(--text-primary)}
+.app .stps-i:not(.done):not(.on) .pi-lab{color:var(--text-secondary)}
+
+/* THE STATE IN WORDS, IN THE SAME THREE COLOURS AS THE RAIL — so the row can be
+   read off the words or off the line and both say the same thing. §11's helper
+   role by value (11.5/16/400), stated here rather than added to §11's group
+   because the three variants have to sit beside it.
+
+   `--support-success-ink` AND NOT `--support-success`, which is the one thing
+   here that is not free choice: §01's note says in as many words that the green
+   is "tuned as a fill and fails as text", and hands `#1a7f37` over for exactly
+   this. The rail two lines up takes the fill; this takes the ink. */
+.app .stps-st{
+  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px;
+  color:var(--text-helper)}
+.app .stps-i.done .stps-st{color:var(--support-success-ink)}
+.app .stps-i.on .stps-st{color:var(--accent-text);font-weight:600}
+.app .stps .pi-sec{display:none}
+
+/* --------------------------------------------------------------------------
+   3b. BELOW THE LABEL COLUMN THE ROW IS A COLUMN
+   At 390 a row of six marks gives each label 55px, which sets "Interview with
+   an agent" in four lines of two words. The same markup turns 90 degrees: the
+   marks stack, the rail runs down between them, the label sits beside its mark
+   and the detail line comes back — which is the shape §33.7b's panel drew, on
+   the page instead of in a dropdown.
+
+   AND THE SECOND LINE CHANGES WITH IT. In the row the second line is the state
+   in a word ("Completed"), because a column 99px wide holds a label and because
+   the row needs every column to be the same shape. Down the page there is a
+   line's width, so the step's OWN detail takes it back — "Priya Nair · Thu, Aug
+   20", "Week 5 of 13 · 5 of 13 chapters done" — which is the more useful of the
+   two and the one §33.7b's panel always showed. The state is still in the mark.
+
+   THE RAIL'S ARITHMETIC TURNS WITH IT, AND THE ROW'S PADDING IS PART OF IT.
+   Each row pays `--s04` above and below, so the mark's bottom is `12 + 40` from
+   the row's top and the next mark's top is 12px into the row after: the segment
+   between them is 24px less 4 of clearance at each end, which is a segment. At
+   `--s04`'s predecessor — 8px — it was an EIGHT PIXEL stub between two 40px
+   discs, and a rail you cannot see joining is five loose rows again. `bottom` is
+   `s02 - s04` for that reason: the clearance minus the padding the next row
+   pays, because the gap between two rows is their padding and not a grid gap.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .stps{grid-auto-flow:row;grid-auto-columns:auto}
+  /* the three-row grid comes apart: the mark and a block beside it. `.stps-b`
+     stops being `display:contents` and is that block again, so the label and
+     the detail line are ITS children rather than the item's. */
+  .app .stps-i{
+    display:flex;flex-direction:row;align-items:flex-start;text-align:left;
+    justify-items:stretch;
+    gap:var(--s04);padding:var(--s04) 0}
+  .app .stps-b{display:flex;flex-direction:column}
+  .app .stps .pi-lab{margin-top:0}
+  .app .stps-st{margin-top:0}
+  .app .stps-i:not(:last-child)::before{
+    top:calc(var(--stps-m) + var(--s04) + var(--s02));
+    bottom:calc(var(--s02) - var(--s04));height:auto;
+    left:calc(var(--stps-m) / 2 - 1px);right:auto;width:2px}
+  .app .stps-b{padding-top:var(--s02);gap:2px}
+  .app .stps .stps-st{display:none}
+  .app .stps .pi-sec{display:block}
+}
+
+/* --------------------------------------------------------------------------
+   4. THE BAND IS TWO COLUMNS
+   Everything that is not the dark card is column one; the card is column two
+   and spans every row of it.
+
+   `span 20` RATHER THAN `1 / -1`, and that is not a hedge. `-1` counts back
+   from the last line of the EXPLICIT grid, and this grid declares no rows at
+   all — every row here is implicit, created by whichever members the page has
+   (a crumb, a header, Tal's card, an ask line). Against no explicit rows both
+   ends of `1 / -1` resolve to line 1 and the card spans nothing. A generous
+   span reaches past the tallest band the product draws; the rows it overshoots
+   are empty, and an empty implicit row with `row-gap:0` is 0px tall.
+
+   THE COLUMN IS 300-330, AND THE UPPER NUMBER IS MEASURED RATHER THAN CHOSEN.
+   It was 340, then 300, and it is 330 because that is where the card's two
+   actions stop wrapping: 330 less the section's 32 of gutter and §15's 24 of
+   card padding each side leaves 250, which splits into two 121px buttons, and
+   "Add to calendar" measures 105 at 13.5/600. At 300 the halves were 104 and
+   that label took two lines. Below 280 nothing fits side by side at all; above
+   about 340 the card starts competing with the sentence beside it for which
+   column the page is about. `minmax` rather than a fraction so the card is the
+   same width on a 900 frame and a 1440 one — the left column takes the
+   difference, because that is where the words are.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  /* the left column's order, restated where §33.8 can be beaten */
+  .app .modhead .ai-aura.talsum,
+  .app .modhead .ai-aura.talsum.ai-act-top{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:'stp' 'mark' 'title' 'body' 'act' 'asks';
+    column-gap:0;row-gap:0}
+  .app .modhead .ai-aura.talsum > .stp-wing{
+    align-self:stretch;
+    margin:0;padding:0 0 var(--s05);
+    border-left:0;border-bottom:1px solid var(--rule)}
+  .app .modhead .ai-aura.talsum > .ai-head > .ai-label{margin-top:var(--s05)}
+  /* §33.8 wraps the wing's header row and drops the meter under it, both for
+     a 220px column. The row is the full width of the left column now. */
+  .app .modhead .ai-aura.talsum > .stp-wing .stp-top{flex-wrap:nowrap;gap:var(--s05)}
+
+  .app .modhead:has(> .sec-dark .plate){
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(300px,330px);
+    column-gap:0;row-gap:0;align-items:start}
+  .app .modhead:has(> .sec-dark .plate) > *{grid-column:1}
+  .app .modhead:has(> .sec-dark .plate) > .sec-dark{
+    grid-column:2;grid-row:1 / span 20;align-self:stretch;
+    display:flex;
+    /* the card's top edge is the title's top edge (§25.6 reads 34 off the
+       file) and its bottom is §25.12's own closing 28, so the wash shows
+       above, below and to both sides of it — which is what says the card is
+       INSIDE the band rather than butted against it. No left padding: the
+       32px the left column already pays on its right is the gutter, and
+       paying it twice put 64px between two columns of one block. */
+    padding:34px var(--pad-x) 28px 0}
+  /* A SECOND DARK CARD GOES BACK UNDER THE HEAD, and this is a guard rather
+     than a case that exists: no page in either portal puts two in the band
+     today, but `placeDark` appends every dark host it finds, and two members
+     both told to hold column two from row one would be drawn ON TOP of each
+     other — silently, because the band's height would still be right. The
+     sibling combinator says "the first one takes the column"; anything after it
+     spans BOTH columns and lands under them, which is §25.12's own full-width
+     place one row lower.
+
+     IT IS A REAL CASE NOW, not just a guard: `assessed` carries the enrolment
+     plate in the column AND the confirmed level card, whose fifteen-rung ladder
+     is exactly the object §56's gate keeps out of a 300px column. Auto-placement
+     does the rest — a `1 / -1` item cannot fit while the plate holds column two
+     from row one, so it takes the first row after the plate's span, and the rows
+     it skips have no height. Trap 12 in the handover is the same shape of
+     problem one pass earlier: three `.cert`s arriving in the band as one black
+     slab. */
+  .app .modhead:has(> .sec-dark .plate) > .sec-dark ~ .sec-dark{
+    grid-column:1 / -1;grid-row:auto;display:block;
+    padding:0 var(--pad-x) 28px}
+
+  /* AND THE CARD FILLS THE RECTANGLE — CONTENT AT THE TOP, ACTIONS AT THE FOOT.
+     The card stretches to column one's height, so on most stages it has spare
+     height to distribute, and where that space goes is the whole difference
+     between a card and a panel. Centred (which this was for one build) the
+     block floats: the title starts somewhere in the middle and the button stops
+     somewhere above the bottom edge, so neither edge of the card is doing
+     anything. Packed to the top with the actions on an `auto` margin, the card
+     has a top and a bottom — the title lines up with the page heading beside
+     it, and the button sits on the card's own foot, which is where the eye goes
+     last on a block it is being asked to act on.
+
+     `padding-top` UNDER THE AUTO MARGIN, so the actions keep a floor of 16 when
+     there is no spare height at all: `margin-top:auto` collapses to 0 on a card
+     whose content fills it, and the buttons would touch the person above them.
+     Two properties because one cannot be both a minimum and a remainder. */
+  .app .modhead:has(> .sec-dark .plate) > .sec-dark > .plate{
+    flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+  .app .modhead .sec-dark > .plate > .plate-a{
+    margin-top:auto;padding-top:var(--s05)}
+
+  /* AND THE SUMMARY PAYS THE BAND'S CLOSING AIR, because in two columns it is
+     the last thing in the LEFT one and nothing else can. §33.4 gives Tal's
+     section `padding-bottom:0` and hands the closing 24 to `:last-child` — a
+     test that was exactly right while the dark card sat underneath: the card
+     was last, and §25.12 gave it the 28. Beside the card, Tal's section is
+     still not `:last-child` and now has nothing under it, so the sentence came
+     to rest ON the band's closing rule — visible on `day90` and `assessed`,
+     where the summary runs to two lines. 28 to match the card's own bottom, so
+     both columns close on the same line. */
+  .app .modhead:has(> .sec-dark .plate) > .sec:has(> .ai-aura.talsum){
+    padding-bottom:28px}
+
+  /* THE PLATE IS A STACK AGAIN, INSIDE 320px. §15's desktop plate is a
+     two-column grid — text left, actions bottom-right, a 40px column gap —
+     which is right for a card that runs the width of the page and impossible
+     in a third of it. This is §15's own max-width:899.98 block restated
+     inside the desktop query for the one place the desktop card is narrow,
+     per trap 3. The two buttons share one row for the reason §15 gives at
+     356px: they fit, and stacking a row that fits is a phone pattern.
+     `padding` steps back to the phone's `--s06` on both axes. */
+  .app .modhead .sec-dark > .plate{
+    display:flex;flex-direction:column;align-items:stretch;
+    padding:var(--s06);row-gap:0;column-gap:0}
+  .app .modhead .sec-dark > .plate > .plate-h{order:1;grid-column:auto}
+  .app .modhead .sec-dark > .plate > .plate-t{order:2;grid-column:auto}
+  .app .modhead .sec-dark > .plate > .plate-b{order:3;grid-column:auto}
+  .app .modhead .sec-dark > .plate > .plate-who{order:4;grid-column:auto;
+    margin-top:var(--s05)}
+  /* no `margin-top` here: the actions' top margin is `auto` (see §4 above, "the
+     card fills the rectangle"), and this rule is later in the file at the same
+     specificity — stating the 16 again is what held the buttons up off the
+     card's foot for one build */
+  .app .modhead .sec-dark > .plate > .plate-a{order:5;grid-column:auto;
+    grid-row:auto;justify-self:stretch;align-self:auto;flex-wrap:nowrap}
+  /* THE TWO ACTIONS SHARE ONE ROW, which is §15's own rule for the card below
+     900 ("at 356 the two together are still comfortably wider than their text")
+     and Maryam's for this column. `flex:1 1 0` splits the 220 between them, so
+     each is 104 and the card's foot is one band rather than two stacked bars.
+
+     `1 1 auto` AND NOT `1 1 0`, WHICH IS THE WHOLE DIFFERENCE BETWEEN ONE LINE
+     AND TWO. `0` splits the row into equal halves — 121 each — and "Add to
+     calendar" needs 129 of them (105 of label at 13.5/600 plus §02's 12 of
+     padding on each side), so the secondary wrapped to two lines and dragged the
+     primary's height with it. `auto` sizes each button on its own content first
+     — 78 and 129, which is 215 of the 250 available — and then shares the 35 of
+     slack between them. Both on one line, the row full, and the two buttons
+     unequal, which is what they are.
+
+     A LONE BUTTON STILL TAKES THE WHOLE MEASURE: one flexible child with slack
+     to absorb fills the row, which is what the weekly call's Join Call does. */
+  .app .modhead .sec-dark > .plate > .plate-a{
+    flex-direction:row;align-items:stretch;flex-wrap:nowrap;gap:var(--s03)}
+  .app .modhead .sec-dark > .plate > .plate-a > .btn{
+    flex:1 1 auto;min-width:0;white-space:normal}
+  .app .modhead .sec-dark > .plate > .plate-x{order:6;grid-column:auto}
+
+  /* THE HEAD ROW CLOSES ON A HAIRLINE, which is where 486:1084 puts the card's
+     one internal division: the mark, the title and the countdown are what the
+     card IS, and everything under the line is its detail. `--on-dark-border` is
+     the rule the timer chip and the second action already wear, so the card uses
+     one line weight throughout. The person needs no second line — the file gives
+     it air instead, and two rules in a 300px card is a card drawn as a form. */
+  .app .modhead .sec-dark > .plate > .plate-h{
+    padding-bottom:var(--s05);
+    border-bottom:1px solid var(--on-dark-border)}
+  .app .modhead .sec-dark > .plate > .plate-b{margin-top:var(--s05)}
+}
+
+/* --------------------------------------------------------------------------
+   5b. THE CARD'S HEAD — THE TITLE, THEN THE COUNTDOWN UNDER IT, UNBOXED
+
+   TWO ROWS, AND THE TITLE TAKES THE FIRST. 486:1084 puts the countdown beside
+   the title because its card has 242px of content to spend; ours has 220 (§15's
+   own 24 of padding inside a 268 card) and 104 of that was the chip, which left
+   the title 100px and broke "Cohort Week 36 Session" across three lines. So they
+   are two rows — and the title leads, because it is what the card is.
+
+   AND THE CHIP LOSES ITS BOX. §15 draws the countdown as an outlined chip on the
+   stated ground that it is "the one figure on this card that moves on its own,
+   so it is drawn as an object rather than as more eyebrow" — right when it held
+   the opposite corner from a 24px title on a card the width of the page. Under
+   the title in a 300px column it is not holding a corner: it is the line under
+   the heading, and a box around it made it read as the card's own button. The
+   frame comes off, the clock and the type stay. `order` rather than a DOM change
+   because §15 still wants the chip in the corner on a full-width plate.
+
+   AND AT 17/23 THE TITLE IS ONE LINE, which is the point of the size: §11's
+   `.t-heading-02` role, not a new number. In 220px "Cohort Week 36 Session"
+   measures 176, "Your consultant call" 152, "Your level interview" 148 and
+   "Cohort 41, week 5" 130 — every plate title in either portal fits on one line,
+   which is what a headline in a narrow column has to do. §15's 24/30 was
+   measured for a card the width of the page and stays there.
+
+   `flex:1 0 100%` IS THE ROW BREAK — `flex-wrap` plus a 100% basis, so the title
+   cannot share a line with anything. Keyed on the card being in the band's dark
+   column rather than on a class, because that is the only place the card is
+   narrow; a full-width plate keeps §15's row exactly as it was.
+   -------------------------------------------------------------------------- */
+.app .modhead .sec-dark > .plate > .plate-h{
+  flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:var(--s02)}
+.app .modhead .sec-dark > .plate > .plate-h > .plate-t{
+  flex:1 0 100%;order:1;min-width:0;margin-top:0}
+.app .modhead .sec-dark > .plate > .plate-h > .plate-when{
+  order:2;margin-left:0;
+  min-height:0;padding:0;border:0}
+
+/* THE SIZE IS ON EVERY TITLE IN THE COLUMN, not only the one seated in the head
+   row. Two of the four plates carry an eyebrow ("DUE NOW", "WEEKLY CALL"), and
+   on those `placePlates` leaves the title in the card's body — so keying 17/23
+   to the head row alone drew the weekly call's title at 17 and the re-interview
+   card's at §15's 24, side by side in the same slot on two stages of the same
+   dashboard. One size for the card in this column, whichever shape it is. */
+.app .modhead .sec-dark > .plate .plate-t{
+  font-size:17px;line-height:23px;letter-spacing:-.2px}
+
+/* AND THE COUNTDOWN COMES DOWN A STEP WITH IT. §15 sets the chip at 11/15 with
+   .8px of tracking and a 28px box — measured on a card that ran the width of
+   the page, where it sat opposite a 24px title. Against a 17px title in a 220px
+   column it was the loudest thing on the card. 10/14 with .6 of tracking and a
+   24px box: the same chip, one step quieter, and 18px narrower. */
+.app .modhead .sec-dark > .plate .plate-when{
+  min-height:24px;padding:0 var(--s03);gap:var(--s02);
+  font-size:10px;line-height:14px;letter-spacing:.6px}
+.app .modhead .sec-dark > .plate .plate-when svg{width:12px;height:12px}
+
+/* --------------------------------------------------------------------------
+   6. THE CARD'S DETAIL LINE IS A LIST
+   `splitPlateBody` (ai5.js) turns the `&middot;` run into one `.plate-bi` per
+   fact with a 16px mark in front; the note there is where the table and the
+   "every plate, not only the narrow one" argument live.
+
+   AT EVERY WIDTH, and stated outside the query for that reason. The `.plate-b`
+   run was a single line only on a card the width of the page, which after §56
+   is nothing at desktop and a phone's column below it. `max-width` off: §15
+   caps the run at 64ch for prose, and these are three short facts in a column.
+   `--on-dark-2` on the marks, which is the ink the run itself is set in.
+   -------------------------------------------------------------------------- */
+.app .plate-b.plate-lines{
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:var(--s03);max-width:none}
+.app .plate-bi{
+  display:flex;align-items:center;gap:var(--s03);min-width:0}
+.app .plate-bi > svg{
+  width:16px;height:16px;flex:none;display:block;fill:var(--on-dark-2)}
+/* a figure inside a detail row takes the card's full ink — the row is set in
+   `--on-dark-2` like the rest of §15's detail line, and a price that is the
+   reason the row exists should not be the quietest thing in it */
+.app .plate-bi b{color:var(--on-dark);font-weight:600}
+
+/* --------------------------------------------------------------------------
+   7. TWO THINGS THE BAND'S NEIGHBOURS ASKED FOR
+   Neither is about the band itself; they are here because this is the layer the
+   section under it was built in.
+
+   A `.sec-notop` LIVED HERE FOR ONE BUILD and is worth a sentence rather than a
+   rule. It took a section's own `border-top` off AND the closing `::after` of
+   whatever was above it, for §54's reason: "a change of ground is already a
+   boundary and both together is TWO boundaries for one join". It was written
+   for the booked dashboard's interview panel under its white quiz block, and
+   when those two swapped the join was measured again — at 1280 and at 390,
+   both sections report `border-top:0` and `::after:none`, so the ground change
+   is already the only boundary and the class had nothing left to subtract. A
+   gate no page writes is the smell CLAUDE.md names; the argument is kept, the
+   two selectors are not.
+
+   A FIGURE CELL WITH NO MARK IS ONE COLUMN, not a column of nothing.
+   `statCell` (views.js) omits `.stat-ic` when it is passed no icon, and §24 and
+   §29 both size the cell as `auto minmax(0,1fr)` with the mark holding the
+   first track — with no mark in it that track is 0 wide and the `column-gap`
+   still indents all three lines by 12px against the section's own spine. Stated
+   as `:not(:has(> .stat-ic))` rather than as a class, because the condition
+   IS the markup: there is nothing to decide.
+
+   AND A NUMBERED LINE IS A NUMBER AND A SENTENCE. `.cardrow-n` is the slot,
+   20px and tabular so 1, 2 and 3 sit on one left edge, in `--text-helper` and at
+   the row's own body size. It is not `.ch-num` and not `.cardrow-ic`: both of
+   those are 40px boxes with the warm Tal-chip ground, and a box is what the
+   seven marks in this section were removed for. The rows keep §02.10's rule
+   under them — the dividers came back with the numbers, because a list that is
+   counted is a list of items rather than a paragraph in three parts.
+   -------------------------------------------------------------------------- */
+.app .page .stats > .stat:not(:has(> .stat-ic)){
+  grid-template-columns:minmax(0,1fr);
+  grid-template-areas:'top' 'd';
+  column-gap:0}
+
+.app .cardrow-n{
+  flex:none;width:20px;
+  font-size:13.5px;line-height:22px;font-weight:600;letter-spacing:.1px;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-helper)}

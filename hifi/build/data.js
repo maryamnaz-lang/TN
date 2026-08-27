@@ -21,6 +21,9 @@ const STAGES = [
      between them is not a waiting room, it is the step where the product
      explains itself. `new` becomes what it always described — quiz result
      carried over, consultant call done, interview still to book. */
+  /* HIDDEN FOR NOW — see `STAGES_HIDDEN` under this list. The row stays where
+     it is because it is where the journey is written down, and the stage still
+     works in full; it is simply not offered. */
   ['consult', 'Consultant call',       'Account created and a 15-minute screening call booked. Quiz result carried over; no level and no agent interview yet.'],
   ['new',     'Just joined',           'Quiz result carried over. Nothing booked. Navigation at its smallest, four items.'],
   ['booked',  'Interview booked',      'Waiting for the interview, with preparation offered.'],
@@ -30,6 +33,51 @@ const STAGES = [
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
   ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.']
 ];
+
+/* ==========================================================================
+   STAGES THAT ARE NOT OFFERED YET
+
+   `consult` — the talent-consultant call — is hidden for now. Every part of it
+   still exists and still works: `CFG.consult`, the dashboard branch in
+   views.js, `PAGESUM.consult`, its stepper and its quiz block. What it does not
+   have is a way in.
+
+   A SET RATHER THAN A DELETED ROW, and rather than a fourth column on the row.
+   The row is where the journey is documented — the note above `consult`'s own
+   entry is the argument for why the product opens with a conversation, and
+   deleting it would delete the reasoning along with the stage. A fourth column
+   would change the shape every consumer destructures (`STAGES.find`,
+   `.map(([k,l]) => …)`). One name in one set is the whole change, and taking it
+   out again is the whole revert.
+
+   IT IS ENFORCED IN `setStage`, NOT AT THE THREE CALL SITES. Three things
+   navigate to a stage — the picker, the arrow keys, and `data-go="stage:…"` on
+   a button (the OTP screen's "Verify & Continue" lands here) — plus the boot
+   reader, which will happily restore `#consult/dashboard` from someone's
+   bookmark. Filtering the picker alone would leave three ways in and a picker
+   showing a blank value when one of them was used. `setStage` is where every
+   one of those converges, so hiding it there is what makes it actually hidden.
+
+   RESOLVED FORWARD, not bounced to a default: a hidden stage hands you the next
+   VISIBLE stage in the list, which is the one the journey would have gone to
+   next anyway. So signing up still lands you at the start of the product
+   (`new`) rather than on a dashboard chosen by a fallback.
+   ========================================================================== */
+const STAGES_HIDDEN = new Set(['consult']);
+
+/* the list every stage control should be built from */
+const stagesShown = () => STAGES.filter(([k]) => !STAGES_HIDDEN.has(k));
+
+/* the next visible stage at or after `k` — and the last visible one if `k` is
+   hidden and everything after it is too, so this can never return undefined */
+function stageResolve(k){
+  if(!STAGES_HIDDEN.has(k)) return k;
+  const i = STAGES.findIndex(s => s[0] === k);
+  for(let j = i + 1; j < STAGES.length; j++)
+    if(!STAGES_HIDDEN.has(STAGES[j][0])) return STAGES[j][0];
+  const shown = stagesShown();
+  return shown.length ? shown[shown.length - 1][0] : k;
+}
 
 
 const CFG = {

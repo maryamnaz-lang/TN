@@ -214,7 +214,44 @@
 /* the divider belongs to the column it is in, not to the page */
 .app .view-col .main .page .ch-two > .ch.ch-flat::after{
   left:0;right:0;top:auto;bottom:-1px}
-.app .page .ch-two > .ch.ch-flat:last-child::after{display:block}
+
+/* --------------------------------------------------------------------------
+   AND NEITHER COLUMN DRAWS ONE UNDER ITS LAST ROW
+
+   A row's divider separates it from the row beneath it. The bottom row of a
+   column has nothing beneath it, so the line has nothing to separate — it
+   reads as the floor of a box that is not there, and with two columns of
+   unequal length it drew at two different heights, which makes the pair look
+   misaligned rather than finished.
+
+   THIS USED TO SAY `display:block`, and that is the line being replaced. It
+   was switching the last row's divider back ON against whatever hides it for
+   an ordinary list — reasonable-looking when the list was one column, and
+   wrong the moment there were two, because `:last-child` is the bottom of
+   column ONE and column two's bottom row is a different element entirely.
+   Chapter 13 got its line back and chapter 12 kept the one it already had.
+
+   `:nth-last-child(-n+2)` IS THE WHOLE TWO-COLUMN ANSWER, and it is exact
+   rather than approximate. The grid flows row-major — 01 left, 02 right, 03
+   left — so column one takes the odd items and column two the even ones. With
+   an odd count (13 today) the columns end on the last two items, 13 and 12;
+   with an even count they end on the last two as well. Either way "the bottom
+   row of each column" IS "the final two items", for any list length above one.
+   No count is hardcoded and adding a fourteenth chapter needs no edit here.
+
+   GATED, BECAUSE BELOW 720 THERE IS ONLY ONE COLUMN and the final two items
+   are two ordinary rows one above the other — stripping both would leave a gap
+   in the middle of the list. So the unconditional rule takes the line off the
+   true last row, and the two-item rule is stated inside the same query §26
+   states the second column in. Per trap 3 that is also what lets it win: a
+   rule inside a container query outranks an unconditional one of equal weight,
+   which is how the second declaration beats the first at desktop without
+   either needing extra specificity.
+   -------------------------------------------------------------------------- */
+.app .page .ch-two > .ch.ch-flat:last-child::after{display:none}
+@container app (min-width:720px){
+  .app .page .ch-two > .ch.ch-flat:nth-last-child(-n+2)::after{display:none}
+}
 .app .page .ch-two > .ch.ch-flat .ch-b{
   display:flex;align-items:baseline;gap:var(--s04);min-width:0;flex:1 1 auto}
 .app .page .ch-two > .ch.ch-flat .ch-t{

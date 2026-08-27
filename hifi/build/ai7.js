@@ -505,16 +505,37 @@ function bkStamp(){
     if(nm) nm.textContent = a.n;
     const sub = nm && nm.nextElementSibling;
     if(sub) sub.textContent = 'Talent agent · assesses ' + a.range;
+    /* AND THE DETAIL LINE IS RE-SPLIT INTO ITS ICON ROWS. `splitPlateBody`
+       (ai5) turns `.plate-b`'s `&middot;` run into one `.plate-bi` per fact,
+       and it runs BEFORE this pass on every render — so assigning
+       `textContent` here put the run back as one grey line, on the one stage
+       where a booking had actually been made. Same string, then split again.
+       `splitPlateBody` is a plain function declaration in the same bundle, so
+       it is in scope from here however much later this file is parsed. */
     const when = plate.querySelector('.plate-b');
-    if(when) when.textContent = bkLong() + ' · 45 minutes, recorded';
+    if(when){
+      when.textContent = bkLong() + ' · 45 minutes, recorded';
+      splitPlateBody(plate);
+    }
   }
 
-  /* 2. THE STEPPER's completed step, found by its label rather than by index
-        — the step list differs between stages and this one only exists here. */
-  page.querySelectorAll('.pi-step .pi-lab').forEach(lab => {
-    if(lab.textContent.trim() !== 'Interview booked') return;
-    const sec = lab.nextElementSibling;
-    if(sec && sec.classList.contains('pi-sec')) sec.textContent = a.n + ' · ' + bkDate();
+  /* 2. THE JOURNEY ROW's interview step, found by its label rather than by
+        index — §56 made the five steps one list (`journey()` in views.js) and
+        the label is the stable handle either way.
+
+        TWO SELECTORS AND TWO LABELS, because the step exists in two shapes: the
+        open row's `.stps-i` (this build) and §33.7's dropdown `.pi-step`, which
+        the design system still ships and the agent's portal still draws. The
+        label was "Interview booked" while each stage wrote its own step list;
+        the shared list calls it "Interview and level" at every stage.
+
+        AND THE DETAIL IS FOUND THROUGH THE PARENT, not `nextElementSibling`:
+        the row's second line is the state word (`.stps-st`) and `.pi-sec` is
+        third, so the sibling walk landed on "In progress". */
+  page.querySelectorAll('.stps-i .pi-lab, .pi-step .pi-lab').forEach(lab => {
+    if(!/^Interview (and level|booked)$/.test(lab.textContent.trim())) return;
+    const sec = lab.parentElement && lab.parentElement.querySelector('.pi-sec');
+    if(sec) sec.textContent = a.n + ' · ' + bkDate();
   });
 
   /* 3. THE FACT ROWS, wherever they are. Interviews prints Agent/When/Paid in
@@ -572,7 +593,7 @@ PAGESUM.dashboard.booked = () => {
      page written by somebody else. The rule they follow is in the note over
      `PAGESUM` in ai6.js: say the thing and stop, no framing, no closing line
      about what the page is for. */
-  return `<span class="tal-greet">Welcome back, Maryam!</span>Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
+  return `Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];

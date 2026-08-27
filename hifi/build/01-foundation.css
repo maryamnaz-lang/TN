@@ -86,6 +86,24 @@
   --auth-card-bg:#ffffff;
   --auth-shadow:rgba(149,149,149,.1);
   --auth-rule:rgba(17,17,17,.1);
+  /* THE 2026 FRAME (Figma 483:976). The front door was redrawn as a full-bleed
+     split — artwork to the frame edge on the left, the form in a bordered card
+     on white — and these are the two values that frame needs and §17's card
+     did not have. Measured off the render rather than taken from a variable:
+     the file exposes no variables for either.
+       --auth-card-line   the card's hairline. #f0f0f0, a neutral grey and NOT
+                          `--border-subtle-01` (#dcdad3): the product's rule
+                          colour is warm and one step darker, and on a card
+                          that is floating on white rather than dividing
+                          content it read as a drawn box. The file's own edge
+                          samples #f2f2f2-#f5f5f5.
+       --auth-r           8px, and it is the same 8 on the card and on the
+                          identity panel — the file rounds both by the same
+                          amount, which is what makes the panel read as a
+                          child of the card rather than a different material.
+                          Measured: fill reaches the edge by 6px on both. */
+  --auth-card-line:#f0f0f0;
+  --auth-r:8px;
   /* THE TWO BLURRED ELLIPSES.
      Geometry is the file's exactly: Ellipse 42 is 2132 x 128 at top -30,
      centred on the frame; Ellipse 43 is 431 x 138 rotated 11.08deg, centred
@@ -188,8 +206,21 @@
   /* red as INK: --support-error is tuned as a fill and lands at 4.47:1,
      which is under AA by a hair. This holds 5.5:1 on both grounds. */
   --danger-ink:#c21520;
-  /* a star is gold; as a mark it only needs 3:1, and this holds 3.4:1 */
-  --star:#c9971a;
+  /* A STAR IS GOLD, AND THIS IS THE BRAND'S GOLD, GIVEN AS A VALUE.
+     It was #c9971a, a darkened amber chosen so the mark alone cleared 3:1 on
+     both grounds (it held 3.4:1). #ffcb05 is the real colour and it does not:
+     1.5:1 on the canvas. That is a deliberate trade and it is safe HERE for a
+     reason specific to this mark — every star row in the product is followed
+     by its own numeral, `4.8`, `4.6`, `4.5`, set in `--text-primary`. The
+     rating is carried as TEXT and the stars are the redundant, decorative half
+     of it, which is the case non-text contrast does not apply to. Read the
+     stars as unreadable and the rating is still on the screen.
+
+     SO DO NOT REACH FOR THIS TOKEN FOR ANYTHING THAT IS THE ONLY WAY TO KNOW
+     SOMETHING. A `--star` gauge with no figure beside it, a status mark, a
+     chart series — any of those would be a real failure at 1.5:1, and the
+     honest move there is a darkened variant rather than this value. */
+  --star:#ffcb05;
   /* green as INK: --support-success is tuned as a fill and fails as text */
   --support-success-ink:#1a7f37;
   --support-warning:#f1c21b;  --support-warning-bg:#fcf4d6;  --support-warning-ic:#b28600;

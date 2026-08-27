@@ -493,6 +493,25 @@
 }
 .app .all-desc{margin-bottom:var(--s06)}
 
+/* AND IT PAYS THAT 24 ONLY WHEN SOMETHING FOLLOWS IT INSIDE THE SECTION.
+   The margin is the gap between the sentence and the CONTROL it introduces —
+   All Agents puts `.all-srch` directly under it, and that pair is what the
+   rule was written for. On the `new` dashboard the sentence is the last thing
+   in its section and the cards are a `.rail-wrap` outside it, so the 24 was
+   landing on top of two other spacings that were already doing the job:
+   `.sec`'s own 24 of bottom padding (§10) and the 24 §26 pays above the card
+   rail so the bordered group is seen to float. 72px between a one-line
+   introduction and the three cards it introduces — against 48 at every other
+   block boundary on the page, which is what the eye is calibrated to by the
+   time it gets there.
+
+   `:last-child` IS THE WHOLE TEST, and it is the right one rather than a
+   convenient one: the question is literally "is there anything under this for
+   the margin to separate it from". A section that later gains a field under
+   the sentence gets the 24 back with no edit here. Written as a page or
+   stage scope instead, All Agents and the dashboard would drift apart. */
+.app .all-desc:last-child{margin-bottom:0}
+
 /* a section heading can carry an action as well as a link: it goes to the
    end of the row, like the link does */
 .app .sec-h > .sec-h-act{margin-left:auto;flex:none}

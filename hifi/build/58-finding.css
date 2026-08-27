@@ -1,0 +1,65 @@
+/* ==========================================================================
+   58 — "STRENGTHS" AND "GROWTH AREAS" ARE HEADINGS, NOT A GREY LINE
+
+   `.sig-l` — the two labels inside Priya's write-up. They appear twice in the
+   product: in `signedSummary`'s card (the dashboard digest, both stages) and
+   again on `V.report`'s "Strengths and growth areas" tile. Same job, same
+   problem, so the class is on both and this layer reaches both.
+
+   WHAT WAS WRONG. They were `t-label-01` at 10.5px in `--text-helper`, with
+   16px above and 4px below. Every part of that is defensible on its own and
+   together they made the label DISAPPEAR into the paragraph flow: the lightest
+   ink in the system, the smallest size in the system, and a gap above only
+   four pixels bigger than the gap between two ordinary paragraphs. The reader
+   met four blocks of grey text and had to infer which two were titles. What
+   the label has to do here is the opposite — this card is two findings about a
+   person, and which finding you are reading is the first thing to know.
+
+   THREE CHANGES, AND THE SPACING IS THE ONE THAT MATTERS MOST.
+
+     THE GAP ABOVE GOES 16 -> 28. Grouping is proximity before it is anything
+     else: 4px below the label and 28 above it makes each label belong to the
+     paragraph under it rather than floating between two. The 4px stays exactly
+     as it was — it was already right, and it is what the 28 is measured
+     against. A rule or a divider would have done the same job louder, and the
+     whole direction of this block is fewer lines.
+
+     THE INK GOES TO `--text-primary`. `--text-helper` is for text that is
+     genuinely subordinate — a legal line, a hint under a field. A heading that
+     names half the content is not subordinate. Full ink at 11px uppercase is
+     still visibly a label and not a paragraph, because the case and the
+     tracking carry that, not the colour.
+
+     AND IT KEEPS ITS SIZE. 11px/600/.8px uppercase is what §11.84 already
+     states for this exact selector; §10.1135 was overriding it down to 10.5px
+     and this does not put that back — the size was never the problem, and
+     changing it would drift these two labels away from every other overline in
+     the product.
+
+   THE INLINE `style="color:…"` HAD TO COME OUT OF views.js, which is trap 1
+   and the reason this is not CSS alone. Both call sites wrote
+   `style="color:var(--text-secondary)"` on the label, and an inline
+   declaration beats every stylesheet rule at every specificity — so no rule
+   here could have changed the ink. The attribute is gone and `.sig-l` carries
+   it, which is the "fix at source" the trap asks for rather than an
+   `!important` chasing it.
+
+   LAST, AND IT ONLY NEEDS TO BE AFTER §10 AND §11. §10.1135 states the margins
+   and the helper ink, §11.84 states the type; both are plain class selectors
+   of lower weight than `.sig-l` paired with them, but a correction belongs
+   after the rules it corrects either way. `.sig-l` is a name no earlier layer
+   mentions.
+   ========================================================================== */
+.app .signed .ai-body .t-label-01.sig-l,
+.app .ai-body .t-label-01.sig-l{
+  color:var(--text-primary);
+  margin-top:var(--s07)}
+
+/* THE FIRST ONE PAYS NOTHING, because the card's own head is directly above it
+   and that boundary is already drawn — `.signed-h` closes with a hairline, and
+   on the report tile `.ai-head` sits above. 28px there would open a hole
+   between a heading and the first thing it introduces. §10.1139 already makes
+   this exception for `:first-child`; it is restated because the margin above
+   is being changed and the exception has to change with it. */
+.app .signed .ai-body > .t-label-01.sig-l:first-child,
+.app .ai-body > .t-label-01.sig-l:first-child{margin-top:0}

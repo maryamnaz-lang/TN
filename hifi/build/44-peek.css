@@ -131,10 +131,16 @@
    A FILLED STAR IS GOLD, AND THIS RULE IS NOT PEEK-SCOPED
 
    §03.104 fills `.stars svg.f` with `--text-primary` — ink. §01 has a `--star`
-   token, #c9971a, and its own note says what it is for: "a star is gold; as a
-   mark it only needs 3:1, and this holds 3.4:1". Nothing was reading it. So the
+   token whose own note says what it is for, and nothing was reading it. So the
    product had a colour defined for exactly this mark and drew the mark in
    something else, which is how a token quietly stops being true.
+
+   THE VALUE IS NOT NAMED HERE ANY MORE. It was written in as #c9971a with §01's
+   contrast figure quoted beside it, and both went stale the day the token moved
+   to the brand's #ffcb05 — a hex in a comment is a second copy of a token and
+   drifts exactly like a second copy of a rule. §01 carries the value and the
+   argument for it, including why this mark can afford it and what must not
+   borrow it.
 
    IT IS DELIBERATELY EVERY STAR IN BOTH PORTALS, not just the ones in this
    panel. The peek's whole job is to show an agent the card a CANDIDATE sees, so

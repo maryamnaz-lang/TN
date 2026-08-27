@@ -259,7 +259,69 @@ css = '\n'.join((here / f).read_text() for f in
                  # `+ .sec.tint`, so every rail followed by white keeps its
                  # rule. After §37 by necessity, last because that is where a
                  # new thing goes.
-                 '54-tintedge.css'])
+                 '54-tintedge.css',
+                 # CELLS ON A PANEL CAN BE CARDS INSTEAD OF DIVISIONS.
+                 # `.sec.tint.cards` takes the figure fills and the head action
+                 # WHITE. §12 makes a tinted panel's `.stats` cells the panel's
+                 # own colour and lets the grid's 1px gaps draw the hairlines —
+                 # right for a band that should read as one divided block, wrong
+                 # for the quiz results, which are four separate facts sitting
+                 # under three bordered agent cards. A class the page applies,
+                 # for §45's reason: whether a panel's cells are cards is an
+                 # editorial call and `:has(> .stats)` would get it wrong on the
+                 # first band that wanted the other reading. LAST because every
+                 # declaration replaces one of §12's `.sec.tint` fills at equal
+                 # weight.
+                 '55-panelcards.css',
+                 # THE HEAD OF A PAGE IS TWO COLUMNS, AND THE STEPS ARE OPEN.
+                 # Maryam's arrangement of the band: title, the `·` fact row,
+                 # every step of Where you are in a row, a divider, then what
+                 # Tal says — and the black card beside all of it, content
+                 # centred, as tall as the column it stands next to. Three
+                 # removals ride with it: the greeting inside Tal's paragraph
+                 # (the `.ph` is the title again, so §33.9's hide stops
+                 # matching), the "All steps" toggle with its dropdown, and the
+                 # meter and current-step block that only existed because the
+                 # other four steps were hidden. Gated on the dark card being a
+                 # `.plate`: `.lvl-hero`, `.cert` and `.score` are wide objects
+                 # and a 320px column would break all three.
+                 # LAST, and it has to be — it restates §25.11's named-area
+                 # grid, §33.1/§33.8's talsum templates, §33.7's wing and §15's
+                 # desktop plate, four of which live inside `@container app
+                 # (min-width:900px)` and per trap 3 can only be answered from
+                 # inside the same query.
+                 '56-headband.css',
+                 # THE FRONT DOOR, REDRAWN AS A SPLIT — Figma 483:976. Same
+                 # screen §17 built, different composition: the artwork bleeds
+                 # to the frame edge on the left (52.6%), the right half is
+                 # white, and the form is a bordered 608px card centred in it.
+                 # Takes §17's floating 1196px card, its two blurred ellipses
+                 # and its `--surface-2` ground off; adds the orange identity
+                 # panel and turns the primary action black, which is what
+                 # `.btn-p` is everywhere else in the product.
+                 #
+                 # LAST, and every part of it needs to be. §17 states the card
+                 # as a flex box with a width, a padding, a background and a
+                 # shadow INSIDE `@container app (min-width:900px)`, so per
+                 # trap 3 the only place those can be restated is a later
+                 # layer inside the same query; the orange action is §17's
+                 # plain declaration and can only be answered from after it.
+                 # The identity panel is the one part that is a new component
+                 # rather than a correction, and it is ungated for the reason
+                 # §17 gives about the column's contents.
+                 '57-authsplit.css',
+                 # "STRENGTHS" AND "GROWTH AREAS" AS HEADINGS. Priya's two
+                 # findings were 10.5px `--text-helper` with 16px above them —
+                 # the lightest ink and the smallest size in the system, with a
+                 # gap above only four pixels bigger than the one between two
+                 # ordinary paragraphs — so the reader met four blocks of grey
+                 # text and had to infer which two were titles. Full ink and
+                 # 28px above; the 4px below is unchanged, because the grouping
+                 # is the ratio between those two numbers. Also the layer that
+                 # made an inline `style="color:…"` come out of views.js: trap
+                 # 1, no rule could have won against it. After §10 (the margins
+                 # and the helper ink) and §11 (the type).
+                 '58-finding.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -493,11 +555,33 @@ else:
     css = re.sub(r'@font-face\{[^}]*__SOEHNEKRAFTIG__[^}]*\}', '', css)
     print('Söhne Kräftig MISSING — 600 falls to the stand-in')
 
-# the sign-up artwork, exported from the Figma file. Lossless WebP so the
-# embedded copy is pixel-identical to what came out of Figma — the graphic is
-# the logo and it does not get re-drawn, re-scaled or re-compressed.
-art = base64.b64encode((here / 'auth-art.webp').read_bytes()).decode()
+# ==========================================================================
+# THE SIGN-UP ARTWORK, AND IT IS A DIFFERENT FILE NOW — 11 KB INSTEAD OF 235.
+# `auth-split.webp` is the full-bleed painterly panel from Figma 483:976 (node
+# 484:1064), 1010 x 1200, the left half of the new front door. §57 paints it.
+#
+# WHAT IT REPLACES WAS DEAD, WHICH IS THE PART WORTH KNOWING. `auth-art.webp`
+# is 235 KB and was read by exactly one rule — §14's `.app .auth-img` — and
+# NOTHING IN THE BUILD EVER EMITS `.auth-img`: `AUTH_ART` (views.js) prints
+# `.auth-brand` and `.auth-mark`, and §17 supersedes §14's composition
+# entirely. So a quarter of a megabyte of base64 was being embedded into every
+# copy of the portal for a selector that could not match. It went unnoticed
+# because a missing background image looks like a design decision.
+#
+# LOSSY, DELIBERATELY, AND THE OLD NOTE'S ARGUMENT DOES NOT CARRY OVER. That
+# note said lossless "because the graphic is the logo". This graphic is not a
+# logo — it is a smooth painterly gradient with no text, no edges and no marks
+# in it, which is the content type WebP is best at. Encoded at q80: 45.4 dB
+# PSNR, max channel error 18, 11 KB against 902 KB of source PNG. The wordmark
+# on top of it is `LOGO_K`, a separate asset, still exact.
+#
+# `auth-art.webp` STAYS ON DISK, unreferenced, for the reason `tal-circle.png`
+# does: it is what the front door looked like, and §17's chevron-mark geometry
+# is written against it.
+# ==========================================================================
+art = base64.b64encode((here / 'auth-split.webp').read_bytes()).decode()
 css = css.replace('__AUTHART__', f'data:image/webp;base64,{art}')
+print(f'auth split artwork embedded: {(here / "auth-split.webp").stat().st_size/1024:.0f} KB')
 
 # the brand chevron that bleeds off the left edge of the sign-up card, as
 # exported from the Figma file at its placed size (112 x 294). Lossless WebP,

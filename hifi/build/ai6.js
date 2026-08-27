@@ -168,22 +168,47 @@ const _W = n => { const s = _w(n); return s.charAt(0).toUpperCase() + s.slice(1)
 const PAGESUM = {
 
   /* --- the journey ----------------------------------------------------- */
+  /* THE GREETING HAS LEFT THE SUMMARY, AND IT IS THE PAGE'S `<h1>` AGAIN.
+     Every entry in this block used to open with `<span class="tal-greet">
+     Welcome back, Maryam!</span>`, which §33.9 sizes at 22px and — the other
+     half of that decision — hides the page's own `.ph` for. It was the right
+     shape while Tal's card was the first thing in the band: one voice, saying
+     hello and then saying where you stand.
+
+     §56 gives the band two columns and puts the title, the fact row and the
+     steps ABOVE Tal in the left one, so the greeting would have been the
+     fourth thing on the page and the second heading in the same column. The
+     `.ph` is the heading again — `Welcome back, Maryam` over `Explorer Track
+     – E3 · Cohort 41 · week 5 of 13`, which is exactly the pair the leader's
+     dashboard has always drawn (`lead.js`, `ph('Welcome back, Priya', …)`) and
+     the shape the frame asks for.
+
+     NOTHING IS LOST FROM THE COPY: every `.ph` on the eight dashboard stages
+     already carried the same words, because the greeting was written from
+     them. What Tal says now starts at the reading, which is what the rest of
+     the table has always done — and it means the summary is the only prose in
+     the band on the dashboard too, not just on the other nineteen pages.
+
+     `.tal-greet` ITSELF STAYS, in §33.9 and in the design system. It is a real
+     component — a greeting line inside a summary — and `tn-agent-portal.html`
+     is built on it. This is the candidate portal choosing the other shape, not
+     the shape being withdrawn. */
   dashboard: {
-    consult: '<span class="tal-greet">Hi Maryam</span>Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
+    consult: 'Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
 
-    new: '<span class="tal-greet">Welcome back, Maryam!</span>You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
+    new: 'You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
 
-    booked: '<span class="tal-greet">Welcome back, Maryam!</span>Your interview with Priya is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often; ten minutes of practice is usually enough.',
+    booked: 'Your interview with Priya is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often; ten minutes of practice is usually enough.',
 
-    assessed: '<span class="tal-greet">Welcome back, Maryam!</span>You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
+    assessed: 'You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
 
-    week1: f => `<span class="tal-greet">Welcome back, Maryam!</span>Day ${f.day} of 90 in Cohort 41. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocks today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it; nothing&rsquo;s assessed this week.`,
+    week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocks today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it; nothing&rsquo;s assessed this week.`,
 
-    day34: f => `<span class="tal-greet">Welcome back, Maryam!</span>Day ${f.day} of 90, week ${f.week}. ${f.done} of 13 chapters at ${f.avg}%, ${_n(f.mins)} minutes so far. Chapter 4 has been opened four times without finishing &mdash; the three furthest ahead in Cohort 41 had it done by now.`,
+    day34: f => `Day ${f.day} of 90, week ${f.week}. ${f.done} of 13 chapters at ${f.avg}%, ${_n(f.mins)} minutes so far. Chapter 4 has been opened four times without finishing &mdash; the three furthest ahead in Cohort 41 had it done by now.`,
 
-    day90: f => `<span class="tal-greet">Welcome back, Maryam!</span>All 13 chapters done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book the re-interview to have Priya assess whether you move up.`,
+    day90: f => `All 13 chapters done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book the re-interview to have Priya assess whether you move up.`,
 
-    promoted: f => `<span class="tal-greet">Welcome back, Maryam!</span>You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. E4 opens December 1, and at this level you can volunteer to lead a cohort.`,
+    promoted: f => `You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. E4 opens December 1, and at this level you can volunteer to lead a cohort.`,
 
     _: 'Where you stand right now, and anything waiting on you today.'
   },
@@ -485,13 +510,20 @@ function pageSummary(){
    built from the same `innerHTML`, so they wrap identically and the typed
    text lands exactly where the finished text will be.
 
-   THE GREETING DOES NOT TYPE. `<span class="tal-greet">` is not part of the
-   sentence — §33.9 sets it at 22px and hides the page's own `.ph` when it is
-   present, so it IS the dashboard's title, and no other page's `<h1>`
-   types itself in. Its text nodes are filled before the clock starts; the
-   sentence under it is what animates. The test is `closest()` rather than a
+   THE GREETING DOES NOT TYPE, WHERE THERE IS ONE. `<span class="tal-greet">`
+   is not part of the sentence — §33.9 sets it at 22px and hides the page's own
+   `.ph` when it is present, so it IS the page's title, and no other page's
+   `<h1>` types itself in. Its text nodes are filled before the clock starts;
+   the sentence under it is what animates. The test is `closest()` rather than a
    node count, so a second block-level span in the same paragraph gets the
    same answer without an edit here.
+
+   NO SUMMARY IN THIS BUILD CARRIES ONE ANY MORE — the note over `PAGESUM`'s
+   `dashboard` block is where that is written down: §56's two-column band puts
+   the title and the fact row above Tal, so the eight dashboards greet you from
+   their `.ph` like every other page. `SUM_LEAVE` stays because the shape does:
+   `dsTypeSummary` is the same twelve lines in the design system, and
+   `tn-agent-portal.html` still opens its dashboard with a greeting.
 
    ONE RUN PER ARRIVAL, and `sumKey` is what decides what an arrival is —
    the portal, the view, the stage, AND THE TEXT. The first three are the

@@ -1,0 +1,116 @@
+/* ==========================================================================
+   55 — CELLS ON A PANEL CAN BE CARDS INSTEAD OF DIVISIONS
+
+   `.sec.tint.cards` — the figure cells and the head action go WHITE, so they
+   read as objects lying on the panel rather than as regions of it.
+
+   WHAT §12 DOES TODAY, AND WHY IT IS RIGHT MOST OF THE TIME. §12's note calls
+   it "a panel's own internal rules step down so they stay visible on it":
+   `.sec.tint .stats > .stat` takes `--surface-2`, the same value as the panel,
+   and `.stats` itself takes `--rule-on-2` — so the grid's 1px GAPS are what
+   draw the hairlines, showing the darker grid through between same-coloured
+   cells. It is an elegant trick and it makes the four figures read as one
+   divided block, which is what a summary band inside a panel should be.
+
+   WHY THE QUIZ BLOCK WANTS THE OTHER READING. That block is now the whole of
+   the `new` dashboard's foot and it sits directly under three bordered agent
+   cards. Cells the colour of their own panel read as an area; white cells read
+   as four things, which is what they are — a title, a score, a date and a
+   level, each a separate fact with its own icon. Matching the cards above it
+   also makes one page instead of two halves.
+
+   NOTHING ELSE ABOUT THE PANEL CHANGES. The grid keeps `--rule-on-2`, so the
+   hairlines between cells are still the gaps and are still visible — MORE
+   visible, against white on both sides rather than the panel on both sides.
+   The panel keeps #F7F7F7. Only the fills move.
+
+   `--layer-01` AND NOT `#fff`. It is the token §01 defines as the value a card
+   sits on, which is what these now are; `--background` is the same colour today
+   and is the PAGE's, and a cell is not the page.
+
+   ALL THREE FIGURE FAMILIES, because a page that opted in and then swapped
+   `.stats` for `.facts` would silently lose it. §12 states the three together
+   for the same reason and this mirrors it exactly.
+
+   AND THE HEAD ACTION WITH THEM. §02.89 gives `.btn-g` `background:transparent`
+   — correct on white, and on a panel it means the button shows the panel
+   through and reads as an outline drawn on the ground. With the cells white the
+   button was the only thing left in the block still the panel's colour, which
+   made it look disabled. Scoped to `.sec-h` so a button INSIDE a cell or a row
+   further down the panel is untouched.
+
+   IT IS A CLASS THE PAGE APPLIES, and that is §45's argument repeated: whether
+   a panel's cells are cards is an editorial call about that block, not
+   something a selector can infer. `:has(> .stats)` would find every tinted
+   figure band in both portals and be wrong the first time one wanted the
+   divided reading.
+
+   LAST, and it has to be after §12 — every declaration here replaces one of
+   §12's `.sec.tint` fills, and §12's are plain class selectors of equal weight.
+   Nothing in §13-§54 names `.cards`.
+   ========================================================================== */
+.app .sec.tint.cards .stats > .stat,
+.app .sec.tint.cards .facts > div,
+.app .sec.tint.cards .prog-figs > span{background:var(--layer-01)}
+
+.app .sec.tint.cards > .sec-h .btn,
+.app .sec.tint.cards > .sec-h .btn-g,
+.app .sec.tint.cards > .sec-h .btn-s,
+.app .sec.tint.cards > .sec-h .btn-t{background-color:var(--layer-01)}
+
+/* ==========================================================================
+   55.2 — AND NOTHING IS DRAWN ABOVE ONE
+
+   The section ABOVE a `.cards` block draws no closing rule: the ground changes
+   from white to #F7F7F7 at that line, and a change of ground is already a
+   boundary. §54 makes this exact argument about the card rail and §18 makes it
+   about every fill in the product — "a block that has a ground of its own, its
+   edge is the shape of the block".
+
+   §18's OWN ANSWER IS DIFFERENT HERE, AND ON PURPOSE. §18 keeps that rule and
+   gives it the full bleed instead, on the reasoning that "the rule under the
+   block ABOVE a filled one is that block's top edge". That works where the
+   fill runs the whole column, because a full-bleed hairline and the top of the
+   fill are then the same line. On the interview digest the section above is an
+   ordinary `.sec` whose rule is inset by the gutter, so the hairline stops
+   short of the ground it is meant to be the edge of — a line that ends before
+   the colour does reads as a leftover.
+
+   SCOPED TO `.cards` RATHER THAN TO EVERY `.sec.tint`, because §18's treatment
+   is right for the other tinted sections in the product and this is not a
+   quarrel with it. `.cards` is already the opt-in that says "this block is
+   objects on a panel"; a block that reads as objects wants its own edge to be
+   the panel, not a rule belonging to the section above.
+   ========================================================================== */
+.app .page > .sec:has(+ .sec.tint.cards)::after{display:none}
+.app .page > .ph:has(+ .sec.tint.cards)::after{display:none}
+
+/* ==========================================================================
+   55.3 — AND A BAND INSIDE ONE TAKES THE PANEL, NOT THE CANVAS
+
+   §15 states the opposite and states why: "on a panel the band takes the
+   canvas tone, or it disappears into its host". That is right for what `.band`
+   usually is — a strip the reader is meant to pick out of the page, and on a
+   tinted section white is the only way left to pick it out.
+
+   IT IS WRONG FOR PRIYA'S NOTE, which is the one `.band` inside this block.
+   That note is not a strip to be picked out; it is the last line of her
+   write-up — her own words, closing the two findings above it. And `.band`
+   bleeds: it cancels the gutter with a negative margin so its fill reaches the
+   rails. So on a #F7F7F7 panel it drew a white bar edge to edge across the
+   bottom of the card, which does not read as a highlighted quote — it reads as
+   a hole in the panel, or as the panel having ended early. The screenshot that
+   prompted this shows exactly that.
+
+   SO IT DISAPPEARS INTO ITS HOST, DELIBERATELY, and §15's warning is answered
+   rather than ignored: the note is still legible AS a note without a fill,
+   because it keeps its icon and its bold lead-in ("Priya's note") and those
+   are what marked it in the first place. The fill was never carrying that.
+
+   `var(--surface-2)` RATHER THAN A HEX, so it is the panel's own value — the
+   same variable §12 paints `.sec.tint` from. If the panel tone moves, or if a
+   block ever takes `.info` (#FBFBFB) as well as `.cards`, the band moves with
+   it instead of becoming a near-miss one step off its own ground.
+   ========================================================================== */
+.app .sec.tint.cards .band,
+.app .sec.tint.cards .note.band{background-color:var(--surface-2)}

@@ -9,7 +9,7 @@
    to orange at the bottom. Drawn, it read as salmon: five warm marks in a
    product whose accent is already orange, on a card that already carries an
    orange CTA, and the one thing a rating has to be is legible as a rating at
-   a glance. The stars go back to `--star` (#c9971a, §01), the amber they were
+   a glance. The stars go back to `--star` (§01), the gold they were
    before, which is also the colour every OTHER star in both portals still
    is — the leader's `.stand-rate` and `.idmeta` were deliberately never in
    this layer's scope, so for as long as the gradient shipped the two portals
@@ -19,10 +19,10 @@
    var(--star)}` was never overridden — §49.1 painted the gradient as a
    BACKGROUND and masked it with the star outline, precisely because a CSS
    gradient cannot be an SVG `fill`, and it set `fill:transparent` so the real
-   amber star underneath would not print through the mask. Deleting the
+   gold star underneath would not print through the mask. Deleting the
    background, the mask and that one `fill:transparent` is the whole revert,
    and §15's rule comes back into effect on its own. There is no yellow
-   written in this file, and there should not be: the amber has one definition
+   written in this file, and there should not be: the gold has one definition
    and it is the token.
 
    IT ALSO TAKES THE BUILD'S ONE DUPLICATED PATH WITH IT. The mask carried a

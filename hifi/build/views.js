@@ -23,7 +23,7 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    stage returns you to the candidate (see setStage), and switching portal
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], hideAch:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
-  addCard:false, editProfile:false, editPhoto:false, piOpen:{}, stg:0, notes:false, iv:'level',
+  addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
   /* the three scenes kept from each interview. `null` means "not chosen yet",
      which is what puts the chooser on the Interviews module — see the note
      over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
@@ -701,6 +701,18 @@ const gfxLine = tag => `<span class="gfx wide line lead">${GFXLINE}${tag?`<span 
 const gfxLead = (kind,tag) => `<span class="gfx wide lead" style="background:${PAL[kind].a}">${GFX[kind]}${tag?`<span class="gfx-tag">${tag}</span>`:''}</span>`;
 const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'group',
                points:'trophy', certificate:'certificate', time:'time', community:'chat'};
+/* NO CALL SITE IN THIS FILE TODAY, AND IT STAYS ANYWAY. Its two users were the
+   `new` dashboard's "Decided so far" section, removed for restating the quiz
+   block above it. `.gcard` itself is very much alive — 68 rules in
+   `talentnext-ds.css`, ten uses in `tn-agent-portal.html`, its own entry in
+   the gallery, and a place in §10.15's label-column opt-out list — so what is
+   unused is this portal's RECIPE for it, not the component.
+
+   Deleting the recipe is the expensive half of that trade. The markup here is
+   load-bearing in the way CLAUDE.md warns about: `.cardrow-ic`, `.gcard-b` and
+   the `.tile-arrow` svg are structure the CSS keys on, and a guessed version
+   looks broken rather than absent. Five lines of template against the next
+   page re-deriving them from the stylesheet. */
 const gcard = (kind,tag,title,sub,go) => `<button class="tile clk gcard" data-go="${go}">
   <span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>
   <span class="gcard-b">
@@ -1198,9 +1210,67 @@ const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
    `placePageSummary` bails on `.auth-card` — so there the description is the
    only thing that can say what the screen wants.
    ========================================================================== */
+/* AND THE FACT ROW WEARS ITS OWN MARKS — ONE PER FACT, READ OFF THE FACT.
+   `sub` is a `&middot;` row by the rule above: "Explorer Track – E3 · Cohort 41
+   · week 5 of 13". Set as one grey string it is three facts a reader has to
+   parse apart, and it was the weakest line in a band whose whole job is to be
+   read first — the middots do all the work of separating four different KINDS
+   of thing (a track, a level, a place, a date).
+
+   A 16px mark in front of each one is what makes the row scan: the eye finds
+   the calendar before it reads the week. Same argument, same table shape and
+   the same first-match-wins order as `stepIcon` below — and for the same
+   reason, DERIVED rather than declared: thirty-odd `ph()` calls across two
+   portals state about ninety facts between them, and an `ic:` field on each is
+   ninety edits now and the ninety-first forgotten later.
+
+   TWO OR MORE PARTS, OR IT IS LEFT ALONE. The auth screens' descriptions are
+   prose with no middot in them (see the note above), and a sentence with an
+   icon in front of it is a callout, not a fact row. `.ph-facts` is the class
+   §56 draws; a `sub` that does not split keeps the plain `<p>` every layer
+   already styles.
+
+   THE SEPARATOR STAYS AND MOVES TO CSS. With marks in the row the middots are
+   no longer carrying the split on their own, but four facts with no divider at
+   all read as one phrase — so §56 draws them as a `::after` on every fact but
+   the last, which also means the row can drop them at a width where it wraps
+   without the markup changing. */
+const PH_IC = [
+  [/re-?interview|interview/i,                        'video'],
+  [/track|explorer|builder|trailblazer/i,             'growth'],
+  [/cohort|candidates|members|others/i,               'group'],
+  [/level|rung|\bE\d\b|not enrolled|enrolled|signed/i,'certificate'],
+  [/quiz|score|of 100|average|%/i,                    'chart'],
+  [/week|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b/i,'calendar'],
+  [/minute|hour|\bmin\b/i,                            'time'],
+  [/\$|paid|fee|price|refund/i,                        'wallet'],
+  [/session|call|thread|message/i,                     'chat'],
+  [/chapter|course|module|training/i,                  'book'],
+  [/vetting|verif|identity|reference/i,                'shield'],
+  [/certificate|award|badge|star/i,                    'trophy']
+];
+function factIcon(t){
+  const s = String(t || '').replace(/&[a-z]+;|&#\d+;/gi, ' ');
+  for(const [re,k] of PH_IC) if(re.test(s)) return I[k];
+  return I.circle;
+}
+/* AND EACH FACT OPENS ON A CAPITAL, which 486:1084 draws and which is what a
+   fact wearing its own mark asks for: with an icon in front of it the part
+   stops being a clause in a sentence and becomes an item, and "explorer track"
+   under a mark reads as a sentence that lost its beginning. Done here rather
+   than in thirty `ph()` calls across two portals, for the reason the icon table
+   is: one rule, and a fact added next week gets it for free. Only a letter is
+   touched, so "$95 paid" and "&ndash; E3" are left exactly as written. */
+const _cap = t => t.replace(/^([a-z])/, (m,c) => c.toUpperCase());
+const phSub = sub => {
+  const parts = String(sub).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return `<p>${sub}</p>`;
+  return `<p class="ph-facts">${parts.map(t =>
+    `<span class="ph-f">${factIcon(t)}<span>${_cap(t)}</span></span>`).join('')}</p>`;
+};
 function ph(title,sub,act,backTo){
   return `<div class="ph${act?' ph-has-act':''}">
-    <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?`<p>${sub}</p>`:''}</div>
+    <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?phSub(sub):''}</div>
     ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
 }
 /* BEFORE THE INTERVIEW, THE SAME BAR — SEE §29.4
@@ -1272,57 +1342,159 @@ function stepIcon(lab){
   return I.circle;
 }
 
-/* A stepper on a phone eats a screen. Show the rail, the step you are on,
-   and keep the rest one tap away. */
-function stepper(id, steps, flush, title){
-  let i = steps.findIndex(x=>x.st==='on');
-  if(i<0) i = steps.filter(x=>x.st==='done').length ? steps.length-1 : 0;
-  const open = !!S.piOpen[id], cur = steps[i];
-  /* NO INLINE `fill` HERE ANY MORE — trap 1. The three states used to set it on
-     the span, which beat every stylesheet at every specificity, so the panel's
-     ink could only ever be changed here. §33.7 owns it now. */
-  const ic = x => `<span class="pi-ic">${x.st==='done'?I.checkFilled:stepIcon(x.lab)}</span>`;
-  const meter = `<span class="stp-meter">
-      <span class="stp-rail" role="img" aria-label="Step ${i+1} of ${steps.length}">
-        ${steps.map(x=>`<i class="${x.st}"></i>`).join('')}
-      </span>
-      <span class="stp-c">Step ${i+1} of ${steps.length}</span>
-    </span>`;
-  /* THE LABEL SITS IN A FIXED-WIDTH SLOT, and that is a layout fix rather than
-     typography. At desktop the wing is a grid track sized `auto` (§33.8), so the
-     track takes the header row's max-content — and "Hide steps" is 13px wider
-     than "All steps" at 600/14px. Pressing the toggle therefore moved the whole
-     card: the wing went 391px → 404px and Tal's sentence beside it lost 13px and
-     reflowed. The slot is 68px, which is "Hide steps" measured (66.9px) rounded
-     up, and it is right-aligned so the shorter word stays welded to the chevron;
-     the button has no ground, so the reserved 13px is invisible either way. */
-  const toggle = `<button class="stp-t" data-stp="${id}" aria-expanded="${open}"><span class="stp-t-l">${open?'Hide steps':'All steps'}</span>${I.chevDown}</button>`;
-  /* NO SCRIM, AND THE PANEL HANGS OFF THE BUTTON. §33.7 turned this from a
-     centred modal into a dropdown, and then moved the anchor twice: `.stp` is
-     the whole stepper, so the panel opened 117px below the toggle; `.stp-top` is
-     the toggle's row, which at desktop is two lines because the meter wraps into
-     it, so it still opened clear of the progress rail. `.stp-tw` exists to be
-     the anchor and nothing else — the panel is inside it, `position:absolute`,
-     8px under the chevron and right-aligned to it at every width. §33.7 carries
-     the width guard that `100%` used to be.
+/* THE STEPS ARE OPEN, AND THAT IS THE WHOLE OF THIS COMPONENT NOW.
+   §56 is where the argument is written down; what changes here is the markup.
 
-     AND NO HEADING WHEN THE WING HAS ONE. `title` IS the `<h2>` two lines above
-     the panel, so printing it again inside a box that hangs off that very
-     heading was the same words twice, 40px apart. The untitled variant has no
-     h2, so there it is the panel's only label and stays. */
-  const panel = `<div class="stp-all"><div class="stp-pop">${title?'':`<h3 class="stp-pop-h">Where you are</h3>`}<div class="pi">
-      ${steps.map(x=>`<div class="pi-step ${x.st}">${ic(x)}
-        <div class="pi-b"><div class="pi-lab">${x.lab}</div>${x.sec?`<div class="pi-sec">${x.sec}</div>`:''}</div></div>`).join('')}
-    </div></div></div>`;
-  const tw = `<div class="stp-tw">${toggle}${panel}</div>`;
-  return `<div class="stp${flush?' flush':''}${open?' open':''}${title?' stp-titled':''}">
-    ${title
-      ? `<div class="stp-top"><h2 class="u-h3">${title}</h2>${meter}${tw}</div>`
-      : `${meter}<div class="stp-h">${tw}</div>`}
-    <div class="stp-now">
-      <div class="pi-lab">${cur.lab}</div>${cur.sec?`<div class="pi-sec">${cur.sec}</div>`:''}
-    </div>
+   WHAT WENT. A meter (`.stp-rail`, four or five orange segments), a toggle
+   ("All steps"), the dropdown panel it opened (`.stp-tw` / `.stp-all` /
+   `.stp-pop` / `.pi`), and `.stp-now` — the one step you are on, printed under
+   the meter because the other five were behind the button. Five drawings of one
+   fact: the rail said "four of five", the caption said "Step 4 of 5",
+   `.stp-now` named the fourth, and the panel listed all five with a tick
+   against three of them. The head band has room to say it once, so it does:
+   every step, in a row, marked.
+
+   WHAT STAYED, AND WHY IT IS THE SAME NAMES. `.stp-top` is §24.4's header row
+   (heading left, figure right) and `.stp-c` is its "Step n of m" caption — the
+   count is the one thing a row of marks does not say, because "where am I in
+   this" is a position and the marks are a picture. `.pi-lab` and `.pi-sec` are
+   the step's own type roles from §11; a step's label is a step's label whether
+   it is in a row or in a list.
+
+   `id` AND `flush` ARE GONE FROM THE SIGNATURE. `id` was the key the open/shut
+   state was held under (`S.piOpen`) and there is no state left to hold; `flush`
+   set a class no layer has ever styled. Six call sites, all passing the same
+   two dead arguments.
+
+   NO INLINE `fill` — trap 1. The three states used to set it on the span, which
+   beat every stylesheet at every specificity. §56 owns the mark's ink. */
+/* THE STATE IN WORDS, UNDER THE LABEL. Three columns of one line each read as
+   a list of five names with some colour on it; the second line is what makes
+   the row a row — every column the same shape, every label on the same
+   baseline, and the state said rather than only drawn. The mark is the picture
+   and this is its caption, which is also the only version of the state a screen
+   reader gets. It is the ROW's line: below 900 the step's own detail (`sec` —
+   "Priya Nair · Thu, Aug 20") is the more useful second line and there is width
+   for it, so §56 swaps them over. */
+const STPS_W = {done:'Completed', on:'In progress'};
+
+/* AND THE COUNT IS GONE WITH THE METER. 486:1084 draws the header row as the
+   heading and nothing else, which is right for an open row: "Step 4 of 5" is a
+   position, and a row of five marks with four of them marked IS that position,
+   drawn. It was worth keeping while the steps were behind a button.
+   `aria-current="step"` is what says it to a reader who cannot see the row. */
+function stepper(steps, title){
+  /* THE MARK KEEPS THE STEP'S SUBJECT AT EVERY STATE, so a column means the
+     same thing whatever has happened to it and the row reads as five subjects
+     rather than as three ticks and two pictures. §33.7b's dropdown swaps the
+     icon for a tick, which is right in a list of five rows where "done" is what
+     the reader came for; here the state is on the mark's own ground and in the
+     word under the label, twice, so the icon is free to say what the step IS.
+     `stepIcon` above is where the subject table and its argument live. */
+  const mark = x => `<span class="stps-m">${stepIcon(x.lab)}</span>`;
+  return `<div class="stp stp-open stp-titled">
+    <div class="stp-top"><h2 class="u-h3">${title||'Your journey so far'}</h2></div>
+    <ol class="stps">
+      ${steps.map(x=>`<li class="stps-i ${x.st}"${x.st==='on'?' aria-current="step"':''}>${mark(x)}
+        <span class="stps-b"><span class="pi-lab">${x.lab}</span>
+          <span class="stps-st">${STPS_W[x.st]||'Upcoming'}</span>${
+          x.sec?`<span class="pi-sec">${x.sec}</span>`:''}</span></li>`).join('')}
+    </ol>
   </div>`;
+}
+
+/* ==========================================================================
+   ONE JOURNEY, FIVE STEPS, ON EVERY STAGE
+
+   The six dashboards used to state their own step list, and they disagreed
+   about how many steps the journey HAS: four on `new`, `booked` and
+   `assessed`, five on the enrolled three, six on `consult`. So the section
+   changed length as you moved through the product — five columns on Monday,
+   four on Tuesday — and the same milestone was called three different things
+   ("Your level and report", "Level confirmed", "Interview and level").
+   Maryam's rule: it is always these five.
+
+     Leadership quiz -> Interview and level -> Enrolled -> 90-day course
+     -> Re-interview
+
+   THE LABELS ARE THE SPINE AND THE `sec` LINES ARE THE STAGE. What changes
+   between stages is which step is `on` and what the detail line under each
+   one says — "Not booked yet · 45 minutes" becomes "Priya Nair · Thu, Aug 20"
+   becomes "E3 · confirmed Aug 21" as the same step is approached, held and
+   passed. That is what a journey looks like: the road is fixed, your position
+   on it moves.
+
+   TWO STEPS WERE LOST AND BOTH ARE STILL SAID. `consult` named "Account
+   created" and "Consultant call" as steps of their own; the account is not a
+   milestone of the LEADERSHIP journey (you cannot be on this page without
+   one), and Jordan's call is what the second step's detail line says on that
+   stage — plus the whole black card beside it. `promoted` named "Next course
+   — E4" as a sixth; the E4 course has not started, Tal's summary says when it
+   opens, and a step for it would be a promise on the section's part.
+
+   AND `promoted` HAS NO CURRENT STEP, which is correct rather than a gap:
+   every one of the five is done, the re-interview included. `stepper` falls
+   back to the last finished step for the count when nothing is `on`.
+   ========================================================================== */
+/* THE ENROLMENT CARD, AND ONE FUNCTION FOR THE TWO STAGES THAT DRAW IT.
+   `assessed` and `promoted` are the same moment one level apart — a level has
+   just been confirmed and no course has been started — so they get the same
+   card, which is the argument `quizResults` makes for itself two hundred lines
+   down and the reason those two pages did not drift before.
+
+   IT IS THE PAGE'S DARK CARD, so §56 puts it in the head band's second column:
+   the thing you would DO about everything above it, beside the reading of it.
+   Both stages used to put the black LEVEL card there instead — a fifteen-rung
+   ladder in a 300px column, which is the object §56's gate exists to keep out.
+
+   EVERY FIGURE IS READ OFF `V.enrol`, none of them restated here: the course fee
+   is its `Course fee` row, the chapter count and the cohort size are its `.stats`
+   cells, and the thirteen assessments are one per chapter (`chRow`'s own "SCORE%
+   assessment", and Course Progress's "assessments, all thirteen"). The credit
+   and what is due today stay on that page, which is where the arithmetic belongs
+   and where this button goes.
+
+   NO `data-when`. That attribute is the plate's live figure — the distance to an
+   APPOINTMENT — and enrolling has no clock. When the next cohort starts is Tal's
+   sentence on both stages, two inches to the left. */
+const enrolPlate = lvl => `<div class="sec">
+      <div class="plate">
+        <div class="plate-t">Enroll on Explorer &ndash; ${lvl}</div>
+        <div class="plate-b">Course price <b>$690</b> &middot; 13 chapters, one a week &middot; 13 assessments, one per chapter &middot; A cohort of ten with a live leader</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
+        </div>
+      </div>
+    </div>`;
+
+const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course','Re-interview'];
+function journey(){
+  const f = cfg(S.stage);
+  const row = (sts, secs) => JRN.map((lab,i) => ({st:sts[i], lab, sec:secs[i]}));
+  const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week','Sets your next rung'];
+  switch(S.stage){
+    case 'consult': return row(['done','on','','',''],
+      ['Explorer track &middot; Aug 3',
+       'Jordan calls Thu, Aug 13 &middot; an agent sets your level', ...AHEAD]);
+    case 'new': return row(['done','on','','',''],
+      ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
+    case 'booked': return row(['done','on','','',''],
+      ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
+    case 'assessed': return row(['done','done','on','',''],
+      ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
+       'Not enrolled yet', AHEAD[1], AHEAD[2]]);
+    case 'promoted': return row(['done','done','done','done','done'],
+      ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
+       `All 13 chapters &middot; ${f.avg}% average`, 'Promoted to E4 &middot; Nov 21']);
+    default: {                                  /* week1, day34, day90 */
+      const past = !!f.finished;
+      return row(['done','done','done', past?'done':'on', past?'on':''],
+        ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
+         past ? `All 13 chapters &middot; ${f.avg}% average`
+              : `Week ${f.week} of 13 &middot; ${f.done} of 13 chapters done`,
+         past ? 'Due now &mdash; book to have your 90 days assessed' : 'Sets your next rung']);
+    }
+  }
 }
 
 /* ============================================================
@@ -1340,6 +1512,33 @@ const AUTH_ART = `
   <p class="t-helper-01 auth-foot">&copy; 2026 TALENTnext Limited</p>
 </div>
 <i class="auth-mark" aria-hidden="true"></i>`;
+
+/* THE IDENTITY PANEL — the orange block that says which account this screen is
+   about. §57.4 draws it; Figma 483:976 puts it on "Create your account".
+
+   ONE HELPER FOR EVERY SCREEN THAT NAMES AN ADDRESS, which is the whole reason
+   it is a function. `create` and `verify` both had the same thing written out
+   as a `.sec.sec-id` with an `.inp-static` in it — a label over a value,
+   styled as a disabled field. That was the right shape when it was a field
+   with the input taken away; it is the wrong one now, because the panel is not
+   a field at all. Two copies of it would drift the first time one gained the
+   way out and the other did not, which is exactly what happened to the two
+   labels ("Your Email Address" on one, "Sent on" on the other).
+
+   `back` IS OPTIONAL AND IT IS A VIEW NAME. Given, the panel carries "Not
+   you?" pointing at it — on `create` that is `login`, because the way out of
+   "this is the address we have" is to sign in as somebody else. On `verify` it
+   is `create`, one step back to change the address before the code is spent.
+   Omitted, the panel is a statement with no exit, which is what a screen that
+   has already committed wants. */
+const authId = (label, email, back) => `
+  <div class="sec sec-id">
+    <div class="auth-id">
+      <span class="auth-id-l">${label}</span>
+      <span class="auth-id-v">${email}${
+        back ? `<a data-go="${back}">Not you?</a>` : ''}</span>
+    </div>
+  </div>`;
 
 const AUTH = {
 login: () => `${authShell()}
@@ -1373,14 +1572,26 @@ forgot: () => `${authShell('login')}
 
 sent: () => `${authShell('forgot')}
 <main class="main"><div class="page form-page">
-  ${ph('Check your email','A reset link is on its way to maryam.naz@tkxel.io. It expires in 30 minutes and can be used once.')}
+  ${ph('Check your email','The link expires in 30 minutes and can be used once.')}
+  ${''/* THE ADDRESS MOVES OUT OF THE SENTENCE AND INTO THE PANEL. It read "A
+        reset link is on its way to maryam.naz@tkxel.io" — an address set in
+        running prose, in the one line on the screen the reader skims, on the
+        one screen whose entire purpose is "did we send it to the right
+        place". The panel is where an address belongs on these screens now,
+        and the description keeps the two facts prose is good at: how long the
+        link lasts and that it works once.
+
+        AND THE FOOTER LINE GOES WITH IT. "Wrong address? Change it and try
+        again" was the same offer the panel's "Not you?" now makes, three
+        inches lower, next to a "Send it again" button that is the other half
+        of it. Two ways to say one thing is how a screen stops being read. */}
+  ${authId('Sent to', 'maryam.naz@tkxel.io', 'forgot')}
   <div class="sec">
     <div class="note"><span>${I.info}</span><div class="nb"><b>Nothing yet?</b>Give it a minute, then look in spam. The sender is hello@talentnext.com.</div></div>
   </div>
   <div class="sec">
     <button class="btn btn-p btn-full" data-go="reset">Open the link ${I.arrowRight}</button>
     <div class="mt4"><button class="btn btn-g btn-full" data-go="sent">Send it again ${I.restart}</button></div>
-    <p class="t-body-02 mt5" style="color:var(--text-secondary)">Wrong address? <a data-go="forgot">Change it</a> and try again.</p>
   </div>
 </div></main>`,
 
@@ -1409,10 +1620,7 @@ reset: () => `${authShell('login')}
 create: () => `${authShell()}
 <main class="main"><div class="page form-page">
   ${ph('Create your account','You&rsquo;re one step away. Create your password to continue.')}
-  <div class="sec sec-id">
-    <div class="f last"><label for="em">Your Email Address</label>
-      <div class="static-row"><div class="inp-static" id="em">maryam.naz@tkxel.io</div></div></div>
-  </div>
+  ${authId('Your Email Address', 'maryam.naz@tkxel.io', 'login')}
   <div class="sec sec-rule">
     <div class="f-row"><div class="f"><label for="pw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="pw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
@@ -1488,10 +1696,13 @@ verify: () => `${authShell('create')}
     <div class="ph-top"><button class="ph-back" data-go="create" aria-label="Back">${I.arrowLeft}</button><h1>Verify Your Email Address</h1></div>
     <p>Enter the 6 digits code sent to your email address.</p>
   </div></div>
-  <div class="sec sec-id">
-    <div class="f last"><label for="vem">Sent on</label>
-      <div class="static-row"><div class="inp-static" id="vem">maryam.naz@tkxel.io</div></div></div>
-  </div>
+  ${''/* THE SAME PANEL, AND THE LABEL CHANGES BECAUSE THE JOB DOES. On create
+        the address is what you are setting a password for; here it is where
+        the six digits went, and "Sent to" is the fact the reader needs to
+        check before they go looking in a mailbox. "Not you?" steps back to
+        create, which is the only place the address can still be changed
+        before the code is spent. */}
+  ${authId('Sent to', 'maryam.naz@tkxel.io', 'create')}
   <div class="sec sec-rule">
     <div class="sec-h"><h2 class="u-h2">Verification Code</h2></div>
     <div class="otp">${[7,5,2,8,9,1].map((d,i)=>`<input value="${d}" size="1" inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}">`).join('')}</div>
@@ -1574,14 +1785,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
         <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in &mdash; peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
         <div class="stp-wing">
-          ${stepper('whereConsult',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 3'},
-            {st:'done',lab:'Account created',sec:'Aug 12'},
-            {st:'on',  lab:'Consultant call',sec:'Jordan Blake &middot; Thu, Aug 13 &middot; 15 minutes'},
-            {st:'',    lab:'Interview with an agent',sec:'Sets your level &middot; 45 minutes'},
-            {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
-            {st:'',    lab:'Enroll and start your 90 days'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
         <div class="ai-foot">
           ${askChip('What happens on the consultant call?','What happens on the call?')}
@@ -1637,22 +1841,50 @@ V.dashboard = (f) => {
     </div>`;
 
   else if(S.stage==='new') body = `
-    ${ph('Welcome back, Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
+    ${ph('Welcome back, Maryam!','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
         <div class="stp-wing">
-          ${stepper('whereNew',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 12'},
-            {st:'on',  lab:'Interview with an agent',sec:'Not booked yet &middot; 45 minutes'},
-            {st:'',    lab:'Your level and report',sec:'Within 48 hours of the interview'},
-            {st:'',    lab:'Enroll and start your 90 days'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
         <div class="ai-foot noline">
           <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
+      </div>
+    </div>
+    ${''/* THE ONE STAGE WHOSE BAND HAD NO CARD IN IT. Every other dashboard puts
+          something in §56's second column — a call, an enrolment — and this one
+          had the agent rail instead, three sections down. So the page's own
+          next step was the only thing the head band did not say, on the stage
+          whose entire job is that step.
+
+          IT IS WHAT THE INTERVIEW IS, NOT WHEN IT IS. There is nothing booked
+          yet, so the card has no `data-when` and no person on it; what it can
+          carry is the four things a person wants before choosing an agent, and
+          three of them are said nowhere else on this page. The rail below
+          answers WHO and WHEN — faces, ratings, slots and prices — and this
+          answers WHAT, which is why the two are not the same block.
+
+          THE PRICE RANGE IS THE RAIL'S OWN, read off `AGENTS` (Lena $80,
+          Priya $95) rather than restated: the same pair Tal's sentence quotes
+          two inches to the left. If an agent's fee changes there, this line is
+          the one place that has to change with it — the note over `AGENTS` is
+          where that is written down.
+
+          "Book an Agent" AND NOT "Book an Interview", which is the wording
+          Maryam asked for and the more accurate of the two: the thing you do
+          next is choose a person, and the rail it jumps to is a list of three
+          people. Tal's own button above it keeps the other wording because it
+          is Tal offering the step rather than the card naming it. */}
+    <div class="sec">
+      <div class="plate">
+        <div class="plate-t">Your level interview</div>
+        <div class="plate-b">45 minutes, recorded &middot; Real situations, not hypotheticals &middot; Your agent sets your level, E1 to E5 &middot; $80 to $95</div>
+        <div class="plate-a">
+          <button class="btn btn-p btn-sm noic" data-go="agents">Book an Agent ${I.arrowRight}</button>
+        </div>
       </div>
     </div>
     <div class="sec">
@@ -1664,38 +1896,31 @@ V.dashboard = (f) => {
     </div>
     ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
     ${quizResults('12 Aug', 'the interview decides it')}
-    ${''/* ON THE SAME QUIET GROUND AS THE BLOCK ABOVE IT, and the two are one
-          area rather than two tinted cards. Consecutive `.sec`s carry no
-          margin — their spacing is their own padding — so two tinted sections
-          abut and the ground runs straight through, with §12's hairline
-          between them as the internal division. That is the shape this pair
-          wants: "what the quiz gave you" and "what has been decided" are the
-          same answer read twice, and the white page resumes underneath them.
+    ${''/* "DECIDED SO FAR" WAS HERE AND IS GONE, and it was the third telling of
+          one fact. Two `.gcard`s said the track is Explorer and that a 90-day
+          course follows — and the quiz block directly above already prints
+          "Title given / Explorer / first of three tracks" as one of its four
+          figures, while Tal's summary at the head of the page opens with "You're
+          on the Explorer track from a quiz score of 64". `patch.py`'s note at
+          line 3163 had already caught this section restating the card above it
+          once before; this is the same section doing it again to the block that
+          replaced that card.
 
-          IT IS READING MATTER BY §45's TEST. Two statements of fact with no
-          control but a jump — the track you are on, and what the 90 days are.
-          Nothing here is a thing you do; the doing is the agent rail above. */}
-    <div class="sec tint info">
-      <div class="sec-h"><h2>Decided so far</h2><button class="btn btn-g btn-sm noic" data-go="level">View My Level</button></div>
-      <div class="tile-stack spaced">
-        ${gcard('track','Your track','Explorer','From your quiz. Your level is set at the interview.','level')}
-        ${gcard('course','What comes next','A 90-day course','13 chapters, a cohort of ten and a live cohort leader. Course and price follow your level.','level')}
-      </div>
-    </div>`;
+          The two jumps it carried are not lost: both went to `level`, which is
+          where "See full breakdown" and the rail's My Level both go.
+
+          The page now ENDS on the quiz block, which is what `booked` already
+          does — §10 gives a page's last child the frame's own edge, so the
+          tinted block closes itself and needs no closing rule. */}`;
 
   else if(S.stage==='booked') body = `
-    ${ph('Welcome back, Maryam','Explorer track &middot; interview 20 August &middot; no level yet')}
+    ${ph('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
         <div class="stp-wing">
-          ${stepper('whereBooked',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
-            {st:'done',lab:'Interview booked',sec:'Priya Nair &middot; Thu, Aug 20'},
-            {st:'on',  lab:'Your level and report',sec:'Within 48 hours of the interview'},
-            {st:'',    lab:'Enroll and start your 90 days'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
         <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
@@ -1714,40 +1939,141 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
+    ${''/* WHAT THE 45 MINUTES ACTUALLY ARE — AND IT COMES BEFORE THE QUIZ.
+          The one thing this stage's page did not say. Everything on it was
+          about the booking — who, when, how long — and nothing about what
+          happens inside the call, which is the only question a person has
+          between booking one and taking it. The copy is Maryam's.
+
+          FIRST, BECAUSE IT IS THE ONLY THING AHEAD. The quiz is three months
+          behind this reader and settled; the interview is on Thursday. Read in
+          this order the page runs forwards — the card in the head band says
+          when, this section says what it is and what to bring, and the quiz
+          block closes on where the level came from. It was the other way round
+          for one build, which put a finished score above the open appointment.
+
+          ON THE CANVAS, WITH THE QUIZ BLOCK UNDER IT ON THE PANEL. Two sections
+          in a row cannot both be filled or the page reads as panels all the way
+          down, so one takes the ground and the other takes the canvas: a panel
+          is §12's ground for "a section the reader treats as one object", which
+          four figures under one heading are and a sentence-plus-strip-plus-list
+          is not. The note over `quizResults` carries the argument for the pair.
+
+          AND THE JOIN NEEDS NOTHING SAID ABOUT IT. While the panel was ABOVE
+          this section the pair drew its boundary twice — a hairline and a change
+          of ground — and a `.sec-notop` class in §56 subtracted the second.
+          Reversed, neither section draws a rule at all (measured at 1280 and
+          390: `border-top:0`, `::after:none` on both), because this one opens
+          under the head band's own closing rule and the panel below it is its
+          own top edge. The class went with the need for it.
+
+          THE FOUR FACTS ARE A `.stats` STRIP, which is the component Maryam's
+          card was drawing: `.stats` is a FIXED four-column grid, so Length,
+          Format, Your report and Fee is the shape, one line each. The two facts
+          a strip cannot hold — "real situations, not hypotheticals" and "their
+          judgement, not a score" — are the character of the interview rather
+          than figures about it, and they are the section's lede.
+
+          NO MARKS ON ANY OF THE SEVEN. The four cells are LABELLED figures, so
+          a chip in front of one is a third statement of the same thing; four of
+          them turn a quiet strip into a row of objects. What to bring is three
+          sentences, and they are counted rather than marked — `.cardrow-n` in
+          §56.7 is the 20px slot, and the rows keep §02.10's rule under them
+          because a list that is numbered is a list of items.
+
+          THE AGENT IS "YOUR AGENT", NOT PRIYA. `bkStamp` (ai7) rewrites the
+          hand-written mentions of the booked agent on this stage so a booking
+          made inside Tal reads back correctly, and its note says a new surface
+          naming the agent has to be added there. Written without a name, this
+          needs no entry and cannot go stale — and the fee is the RANGE the rail
+          shows ("from $80") for the same reason, since it is true of all three
+          agents. The exact fee is on the plate above and on Payments.
+
+          AND IT DOES NOT REPEAT THE BOOKING. Maryam's copy closes on "You are
+          booked in for Thu 3 Sep · 14:00 with Dana Whitfield"; on this page the
+          black card two inches up already states the agent, the day and the
+          time, the fact row states the date a third time, and Tal's summary a
+          fourth. The section says what the session IS and leaves when it is to
+          the card that exists to say so. */}
+    <div class="sec">
+      <div class="sec-h"><h2>Your session, step by step</h2><button class="btn btn-g btn-sm noic" data-go="interviews">Interview details</button></div>
+      <p class="all-desc">Your agent asks for real situations &mdash; what you actually did, not hypotheticals &mdash; and sets your level from what you describe. Their judgement, not a score.</p>
+      <div class="stats">
+        ${statCell('', `Length`, `45 minutes`, `one sitting`)}
+        ${statCell('', `Format`, `Video`, `recorded, with a transcript`)}
+        ${statCell('', `Your report`, `48 hours`, `your level, E1 to E5`)}
+        ${statCell('', `Fee`, `From $80`, `credited to the course`)}
+      </div>
+      <div class="u-overline mt6">What to bring</div>
+      <div class="tile-stack mt4">
+        ${['One situation from the last three months that did not go well',
+           'A decision you would make differently now',
+           'Somewhere quiet &mdash; the transcript is part of the assessment'
+          ].map((t,i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${t}</span></span></div>`).join('')}
+      </div>
+    </div>
     ${''/* on this stage the "what sets it" answer has a name and a date on it */}
     ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
-    ${ph('Welcome back, Maryam','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
+    ${ph('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
         <div class="stp-wing">
-          ${stepper('whereAssessed',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track &middot; Aug 12'},
-            {st:'done',lab:'Interview with an agent',sec:'Priya Nair &middot; Aug 20'},
-            {st:'done',lab:'Level confirmed',sec:'Explorer &ndash; E3 &middot; rung 3 of 15'},
-            {st:'on',  lab:'Enroll and start your 90 days',sec:'Next cohort starts within two weeks'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
         <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
       </div>
     </div>
-    <div class="sec">
-      <div class="lvl-hero on-dark lvl-foot-card" style="margin:0">
-        <div class="big">Explorer &ndash; E3</div>
-        <div class="sub">Level 3 of 15 on the Explorer track</div>
-        ${ladder('E3')}
-        <div class="lvl-foot">
-          <div class="eb"><span class="eb-ok">${I.checkFilled}</span>Confirmed &middot; signed by Priya Nair, 21 August</div>
-          <div class="lvl-foot-a">
-            <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>
-            <button class="btn btn-s" data-go="report">Read my report ${I.document}</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    ${''/* THE CARD IN THE HEAD BAND'S COLUMN IS THE ENROLMENT, NOT THE LEVEL.
+          §56 puts the page's one dark card beside the head, and on this stage
+          the level card was it — a 15-rung ladder in a 300px column, which is
+          the case §56's gate excludes by design. What belongs in that slot is
+          the thing you would DO about everything above it, and on `assessed`
+          that is enrolling: the level is confirmed, the report is signed, and
+          the only step left in the journey row is step three.
+
+          A `.plate`, because a plate is what this product draws for "the one
+          thing to do next" and `placeDark` moves it into the column for free.
+          It has no `.plate-who` — there is no person in an enrolment — so §47
+          packs its text to the top, which is what the note there is for.
+
+          EVERY FIGURE IS READ OFF `V.enrol`, none of them restated: the fee,
+          the interview credit and what is due today are that page's three `.kv`
+          rows, the chapter count and the cohort size are its `.stats` cells,
+          and the thirteen assessments are one per chapter (`chRow`'s own
+          "SCORE% assessment", and Course Progress's "assessments, all
+          thirteen"). If any of those change, they change there.
+
+          AND THE LEVEL CARD KEEPS ITS REPORT BUTTON AND LOSES ITS ENROL ONE.
+          Two Enroll buttons 200px apart is the page offering one action twice;
+          the card in the column is the louder of the two and the one the eye
+          reaches first. */}
+    ${''/* AND NO COUNTDOWN ON IT. `data-when` is the plate's live figure — the
+          distance to an APPOINTMENT, which is why §15 draws it as a chip with a
+          clock in it and why every other plate in the build has one. Enrolling
+          is not an appointment: it has no time, and "IN 2 WEEKS" over the price
+          read as a deadline on the offer. When the next cohort starts is Tal's
+          sentence on this stage, two inches to the left ("The next cohort starts
+          within two weeks"), where it is a fact rather than a clock. */}
+    ${enrolPlate('E3')}
+    ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
+          moved down: `placeDark` (ai5) hoists any dark card on the page into the
+          head band wherever the view puts it, so "further down" is not a place a
+          `.lvl-hero` can be. The band already carries the one dark card this
+          stage needs — the enrolment — and two of them stacked there made the
+          head 900px tall on a page whose next section is the course.
+
+          NOTHING IS LOST WITH IT. The fifteen-rung ladder is what `V.level`
+          draws, at full width, with the report and the breakdown beside it; the
+          fact it was stating here — "Explorer – E3, level 3 of 15, confirmed by
+          Priya on 21 August" — is in the page's own fact row under the title,
+          in the journey row's second step, and in Tal's summary. Its one jump,
+          Read my report, is the "What the interview found" section's own head
+          action two blocks below. */}
     <div class="sec">
       <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
       <p class="all-desc">Thirteen chapters, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
@@ -1767,40 +2093,49 @@ V.dashboard = (f) => {
           becomes the answer to what Priya wrote down. Higher up, between the
           hero and the course, it would have been a third block about the
           level before the reader had been told what the level buys. */}
-    <div class="sec">
+    ${''/* THE QUIET GROUND, `sec tint cards` — #F7F7F7 (§12) with §55's white
+          head action. This block is the one thing on the page you READ rather
+          than act on: it is Priya's write-up, and everything around it is a
+          course to enrol on and a level to look at, which is §45's test. §55
+          takes the head button white so it is not the only thing left in the
+          block still the panel's colour, and §55.2 takes the rule off the
+          block above — a change of ground is already the boundary. */}
+    <div class="sec tint cards">
       <div class="sec-h"><h2>What the interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
       <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. Your strengths, your growth areas and the scenes you kept sit behind it.</p>
       ${signedSummary(true)}
     </div>`;
 
   else if(f.complete) body = `
-    ${ph('Welcome back, Maryam','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
+    ${ph('Welcome back, Maryam!','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
     ${achBanner()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
         <div class="stp-wing">
-          ${stepper('wherePromoted',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
-            {st:'done',lab:'Interview and level',sec:'E3 &middot; confirmed Aug 21'},
-            {st:'done',lab:'90-day course',sec:'Cohort 41 &middot; 13 chapters &middot; 87% average'},
-            {st:'done',lab:'Re-interview',sec:'Promoted to E4 &middot; Nov 21'},
-            {st:'on',  lab:'Next course &mdash; E4',sec:'Opens December 1'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
       </div>
     </div>
-    <div class="sec">
-      <div class="lvl-hero" style="margin:0">
-        <div class="eb">Re-interview &middot; 21 November &middot; signed by Priya Nair</div>
-        <div class="big">Explorer &ndash; E4</div>
-        <div class="sub">Promoted from E3 &middot; rung 4 of 15</div>
-        ${ladder('E4')}
-      </div>
-    </div>
+    ${enrolPlate('E4')}
+    ${''/* THE SAME TWO CHANGES AS `assessed`, ONE LEVEL UP — see the note over
+          `enrolPlate`. The black level card and the ladder are gone from this
+          page: `placeDark` hoists any dark card into the head band, so with the
+          enrolment card already in the band's column the two were stacked there,
+          and the fact the hero stated — "Explorer – E4, promoted from E3, rung 4
+          of 15, signed 21 November" — is in the page's own fact row under the
+          title, in the achievement banner directly below it, in the journey
+          row's last step and in Tal's summary. `V.level` is where the ladder is
+          drawn at the width it needs.
+
+          THE CERTIFICATE KEEPS ITS BUTTON and the enrolment loses its second
+          one: the card in the column is the Enroll action now, and the same
+          action drawn twice 200px apart is the page offering one thing as two.
+          `.btn-set` stays a section of its own rather than being absorbed —
+          `placeLevelCards` (ai5) pulls a lone button row into the hero above it
+          when there is one, and now there is not. */}
     <div class="sec"><div class="btn-set">
-      <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E4 ${I.arrowRight}</button>
       <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
     </div></div>
     ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE LEVEL UP.
@@ -1820,7 +2155,14 @@ V.dashboard = (f) => {
           <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
         </div>`).join('')}</div>
     </div>
-    <div class="sec">
+    ${''/* THE QUIET GROUND, `sec tint cards` — #F7F7F7 (§12) with §55's white
+          head action. This block is the one thing on the page you READ rather
+          than act on: it is Priya's write-up, and everything around it is a
+          course to enrol on and a level to look at, which is §45's test. §55
+          takes the head button white so it is not the only thing left in the
+          block still the panel's colour, and §55.2 takes the rule off the
+          block above — a change of ground is already the boundary. */}
+    <div class="sec tint cards">
       <div class="sec-h"><h2>What the re-interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
       <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the 90 days you had just finished.</p>
       ${signedSummary(true, true)}
@@ -1888,7 +2230,11 @@ V.dashboard = (f) => {
         <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
       </div></div>`:'';
     body = `
-    ${ph('Welcome Back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
+    ${''/* `Welcome Back, Maryam!` until §56 made the header visible again on
+          every stage — capital B and an exclamation mark on one of eight
+          dashboards, which was invisible while the greeting inside Tal's
+          summary was drawing the title. Same words as the other seven now. */}
+    ${ph('Welcome back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
     ${achBanner()}
     ${reBook}
     <div class="sec">
@@ -1899,13 +2245,7 @@ V.dashboard = (f) => {
           :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
           :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
         <div class="stp-wing">
-          ${stepper('whereEnrolled',[
-            {st:'done',lab:'Leadership quiz',sec:'Explorer track'},
-            {st:'done',lab:'Interview and level',sec:'E3 &middot; confirmed Aug 21'},
-            {st:'done',lab:'Enrolled',sec:'Cohort 41 &middot; started Aug 25'},
-            {st:dueRe?'done':'on', lab:'90-day course',sec:f.finished?`All 13 chapters &middot; ${f.avg}% average`:`Week ${f.week} of 13 &middot; ${f.done} of 13 chapters done`},
-            {st:dueRe?'on':'',     lab:'Re-interview',sec:dueRe?'Due now &mdash; book to have your 90 days assessed':'Sets your next rung'}
-          ],1,'Where you are')}
+          ${stepper(journey())}
         </div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
@@ -2020,7 +2360,7 @@ V.level = (f) => {
          click target inside a click target, and the arrow was the only thing
          announcing the outer one. The button says it better, and says it
          where the reading ends. -->
-    ${confirmed?signedSummary(false):`<div class="tile bordered">
+    ${confirmed?signedSummary(false, false, true):`<div class="tile bordered">
       <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
         <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
@@ -2092,9 +2432,9 @@ V.report = (f) => `<main class="main"><div class="page">
     <div class="tile">
       <div class="ai-head"><h3>Strengths and growth areas</h3></div>
       <div class="ai-body">
-        <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p class="t-label-01 sig-l">Strengths</p>
         <p>You reason from consequence to people, not policy. You gave three examples where you changed a decision after listening, and each one had a date and a name attached.</p>
-        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p class="t-label-01 sig-l">Growth areas</p>
         <p>You describe delegation as risk. Twice you took work back rather than let it land badly. Chapters 4 and 12 are built on exactly this.</p>
       </div>
       <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">Written by Priya Nair from your interview</span></div>
@@ -3174,7 +3514,7 @@ const pick   = document.getElementById('pick');
 const cap    = document.getElementById('cap');
 
 document.getElementById('ptLogo').src = LOGO_W;
-pick.innerHTML = STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
+pick.innerHTML = stagesShown().map(([k,l])=>`<option value="${k}">${l}</option>`).join('');
 
 /* A STAGE WITH ITS OWN FRONT DOOR IS NOT REACHED THROUGH THE NAVIGATION.
    `signup` was the only one, so the two lines below said "signup" by name.
@@ -3185,6 +3525,11 @@ pick.innerHTML = STAGES.map(([k,l])=>`<option value="${k}">${l}</option>`).join(
    only knows about views the rail can get to, does not apply to it. */
 const DEFAULT_VIEW = {signup:'create', nil:'quiz'};
 function setStage(k,keepView){
+  /* A HIDDEN STAGE RESOLVES FORWARD, and this is the one place it has to
+     happen — every route to a stage comes through here: the picker, the arrow
+     keys, `data-go="stage:…"`, and the boot reader restoring a hash. See
+     `STAGES_HIDDEN` in data.js for why it is a set and not a deleted row. */
+  k = stageResolve(k);
   /* A STAGE IS A CANDIDATE FACT, so picking one puts you back in the candidate
      portal. Without this the picker silently changes a candidate who is not on
      screen: you would be looking at the leader's cohorts while the host bar
@@ -3851,18 +4196,33 @@ function boardList(){
    up — the August report argued E3 off a reorganization the candidate had
    just started, the November one is written off thirteen finished chapters —
    so the whole of the text switches, not just the date. */
-function signedSummary(withNote, re){
+/* `footAction` — THE "READ THE FULL REPORT" BUTTON AT THE FOOT, AND IT IS A
+   PARAMETER BECAUSE THE ANSWER DIFFERS BY CALL SITE.
+
+   On the two dashboards this card sits inside a section whose HEAD already
+   carries "Read the full report", so the foot button was the same words
+   pointing at the same view a hand's width lower: one destination offered
+   twice, which makes a reader stop to work out whether they differ.
+
+   On `V.level` it is the opposite, and that call site's own comment is
+   explicit — "ONE CONTROL, AT THE FOOT ... The button says it better, and says
+   it where the reading ends." There the card has no section head to carry a
+   route, so dropping the foot button would drop the route.
+
+   A FLAG RATHER THAN A DELETION, DEFAULTING TO OFF: a new call site that
+   forgets it gets the version with no duplicate, which is the safe failure. */
+function signedSummary(withNote, re, footAction){
   return `<div class="signed">
       <div class="signed-h">
         <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
         <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>${re?'Re-interview &middot; 21 November 2026':'Level interview &middot; 20 August 2026'}</span></span>
       </div>
       <div class="ai-body">
-        <p class="t-label-01" style="color:var(--text-secondary)">Strengths</p>
+        <p class="t-label-01 sig-l">Strengths</p>
         <p>${re
           ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the 90 days, each with a name and a date on it.'
           :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
-        <p class="t-label-01" style="color:var(--text-secondary)">Growth areas</p>
+        <p class="t-label-01 sig-l">Growth areas</p>
         <p>${re
           ?'Delegation still, and coaching rather than fixing. Chapters 3 and 9 on the E4 course are built on exactly this.'
           :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.'}</p>
@@ -3873,7 +4233,7 @@ function signedSummary(withNote, re){
           ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
           :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;'}</div>
       </div>`:''}
-      <div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>
+      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }
 
@@ -3891,27 +4251,61 @@ function signedSummary(withNote, re){
                 by `booked` that is a named agent on a known date rather than
                 an interview nobody has arranged. Same "Not set" value, more
                 specific answer to the question the value provokes. */
-/* AND IT SITS ON THE QUIET GROUND, `sec tint info` — #FBFBFB, §45. It is the
-   definition of what that class is for: four figures you READ. Nothing in the
-   block is a control except the jump to the full breakdown, and the page
-   around it is things you do — book an agent, open a chapter. The tint is
-   what says which is which without the reader having to read every heading.
+/* AND IT SITS ON THE PANEL TONE, `sec tint` — #F7F7F7, §12's `--surface-2`.
+   Plain `.tint` and nothing else: §12's note says `--surface-2` is the ground
+   for "a section the reader is meant to treat as one object", which is what
+   four figures under one heading are, on a page whose other sections are
+   things you DO — book an agent, open a chapter.
 
-   `tint` AND `info` BOTH, and that is §45's rule rather than a redundancy:
-   §12 hangs twenty-odd selectors off `.sec.tint` (the hairlines step to
-   `--rule-on-2`, and `.stats` repaints its cells so its 1px grid gaps still
-   read as rules against the new ground), and `.info` only moves the token
-   those rules already resolve against. Written as `.info` alone it would be a
-   colour with none of the tone system behind it — the `.stats` gaps would
-   vanish into the ground and the four cells would run together.
+   IT WAS `tint info` (#FBFBFB) FIRST, and the two are worth keeping straight
+   because both are one step off white. §45's lighter value is for a section
+   that should RECEDE — background reading nobody is being asked to act on,
+   which is what the agent portal's four `.tint.info` sections are. This block
+   is not receding: it is the answer to "where do I stand" and the first thing
+   under the agent rail.
+
+   NOTHING IS RESTATED TO CHANGE IT, which is the point of §45's mechanism.
+   §45 works by declaring `--surface-2` ON the element, so §12's twenty-odd
+   `.sec.tint` selectors — the hairlines stepping to `--rule-on-2`, `.stats`
+   repainting its cells so its 1px grid gaps still read as rules — resolve
+   against whichever value is in scope. Dropping one class moves the whole
+   tone system with it, and `.info` alone would have been a colour with none
+   of that behind it.
 
    ALL THREE STAGES, because this is one function and the block is the same
    block. `consult`, `new` and `booked` print the same four figures — the
    note above says why — so tinting the function rather than a call site is
-   what stops the quiz block being background reading on one stage and a
-   plain section on the next. */
+   what stops the quiz block being a panel on one stage and a plain section
+   on the next. */
+/* AND ITS FOUR CELLS ARE CARDS ON THE PANEL, `cards` — §55. White fills, so
+   the four figures read as four separate facts rather than as regions of one
+   divided area, which is what they are: a title, a score, a date and a level,
+   each with its own icon. It also matches the three bordered agent cards
+   directly above it, which is what makes the foot of the page read as one
+   page. The grid keeps `--rule-on-2`, so the hairlines between cells are still
+   the 1px gaps and are more visible against white than they were against the
+   panel. §55 carries the argument and the one thing that rides along with it
+   (the head button, which §02 leaves transparent and which was the only thing
+   in the block still the panel's colour). */
+/* THE PANEL IS BACK, AND THE PAIR IS WHAT DECIDES IT. This block has worn three
+   tones — `tint info` (#FBFBFB, §45's "background reading"), then `tint cards`
+   (#F7F7F7 with white cells, §55), then plain white for one build — and the
+   argument was always about the block on its own. It is not on its own: on the
+   booked dashboard it closes the page under "Your session, step by step", and
+   two sections in a row cannot both be filled or the page reads as panels all
+   the way down. One of the two takes the panel and the other takes the canvas.
+
+   THE QUIZ BLOCK IS THE FILLED ONE, on Maryam's call and on §12's own test: a
+   panel is for "a section the reader is meant to treat as one object", and four
+   figures under one heading are exactly that, while the interview section is a
+   sentence, a strip and a numbered list — three kinds of thing that are not one
+   object. `cards` with it, so §55 takes the four cells white against the panel
+   and the 1px grid gaps stay readable as rules.
+
+   ALL THREE STAGES, because this is one function and the block is the same
+   block. `consult`, `new` and `booked` print the same four figures. */
 function quizResults(taken, levelNote){
-  return `<div class="sec tint info">
+  return `<div class="sec tint cards">
       <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
       <div class="stats">
         ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
@@ -3921,8 +4315,15 @@ function quizResults(taken, levelNote){
       </div>
     </div>`;
 }
+/* AND `ic` IS OPTIONAL — pass nothing and the cell has no mark at all, which is
+   a different thing from passing an empty one. §29 draws the mark as a 28px chip
+   in one of four hues and §24 as the warm Tal-chip square; an empty `.stat-ic`
+   would keep the chip, the hue and the `auto` grid column it sits in, so the
+   cell would be three lines indented past a coloured blank. §56 states the
+   mark-less cell's template — one column, three rows — against the same
+   `:not(:has(> .stat-ic))` test this line creates. */
 function statCell(ic, label, value, note, jump){
-  const body = `<span class="stat-ic">${ic}</span>
+  const body = `${ic ? `<span class="stat-ic">${ic}</span>` : ''}
       <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
       <div class="d">${note}</div>`;
   return jump
@@ -4075,13 +4476,14 @@ function render(){
     kids.forEach((el,i) => el.style.setProperty('--i', Math.min(i,7)));
   }
   const tb = device.querySelector('#talBody'); if(tb) tb.scrollTop = tb.scrollHeight;
-  /* THE STEPS PANEL IS NO LONGER LIFTED OUT OF `.app`. It used to be moved here
-     — panel and scrim both — because it was `position:fixed`, and `.device`'s
-     `container-type:inline-size` makes it the containing block for a fixed
-     descendant, so a fixed popup declared in the band was measured against the
-     band and clipped by it. §33.7 turned it into an absolutely-positioned
-     dropdown on `.stp`, and nothing between `.stp` and the page's scroller
-     clips, so there is nothing left to escape. */
+  /* THERE IS NO STEPS PANEL TO LIFT OUT OF `.app` ANY MORE. Two removals, in
+     order: the panel was `position:fixed` and had to be moved here because
+     `.device`'s `container-type:inline-size` makes it the containing block for
+     a fixed descendant, so a fixed popup declared in the band was clipped by
+     it; §33.7 made it an absolutely-positioned dropdown, which needed no lift;
+     §56 opened the steps into the band, which needs no dropdown. The note is
+     kept because `position:fixed` inside `.device` is a trap the next popup
+     will walk into, and this is where it was found. */
 }
 
 pick.onchange = e => setStage(e.target.value);
@@ -4103,20 +4505,11 @@ device.addEventListener('input', e => {
   if(mk){ mk.innerHTML = BMK[b] || BMK.card; mk.classList.toggle('on', !!b); }
 });
 
-/* CLICKING AWAY CLOSES THE STEPS DROPDOWN — a listener of its own, which is
-   what the scrim used to do. The overlay carried `data-stp`, so pressing it ran
-   the router's toggle branch; with no overlay the close has to come from the
-   ABSENCE of a hit inside `.stp`, and that is not a branch the router can hold:
-   every branch there is "this element was clicked", and this one is "no element
-   was". Guarding on `.stp` covers the toggle too, so the two never both fire,
-   and the state check means a click anywhere on a portal with no panel open
-   costs one `closest` and nothing else. Registered before the router only
-   because that is where it reads; the guard makes the order immaterial. */
-device.addEventListener('click', e => {
-  if(!Object.values(S.piOpen).some(Boolean)) return;
-  if(e.target.closest('.stp')) return;
-  S.piOpen = {}; render();
-});
+/* THE "CLICK AWAY TO CLOSE THE STEPS PANEL" LISTENER IS GONE WITH THE PANEL.
+   It was here because the dropdown had no scrim to press: closing had to come
+   from the ABSENCE of a hit inside `.stp`, which is not a branch the router can
+   hold. §56 opens the steps for good, so there is nothing to close, no
+   `S.piOpen` to hold it in and no `data-stp` branch in the router either. */
 
 /* one delegated listener runs the whole product */
 device.addEventListener('click', e => {
@@ -4145,9 +4538,6 @@ device.addEventListener('click', e => {
 
   const bk = t.closest('[data-back]');
   if(bk){ back(); return; }
-
-  const stp = t.closest('[data-stp]');
-  if(stp){ const k=stp.dataset.stp; S.piOpen[k] = !S.piOpen[k]; render(); return; }
 
   const ep = t.closest('[data-editprofile]');
   if(ep){ S.editProfile = ep.dataset.editprofile==='1'; render(); return; }
@@ -4392,9 +4782,14 @@ device.addEventListener('keydown', e => {
 });
 document.addEventListener('keydown', e => {
   if(e.target.matches('input,textarea,select')) return;
-  const i = STAGES.findIndex(s=>s[0]===S.stage);
-  if(e.key==='ArrowRight') setStage(STAGES[(i+1)%STAGES.length][0]);
-  if(e.key==='ArrowLeft')  setStage(STAGES[(i-1+STAGES.length)%STAGES.length][0]);
+  /* WALKED OVER THE VISIBLE LIST, so a hidden stage is not a dead press. Off
+     the shown list `indexOf` is -1, and -1 + 1 is 0 — the first visible stage —
+     which is the right answer for "you are somewhere not on this list, go
+     right". See `STAGES_HIDDEN` in data.js. */
+  const shown = stagesShown();
+  const i = shown.findIndex(s=>s[0]===S.stage);
+  if(e.key==='ArrowRight') setStage(shown[(i+1)%shown.length][0]);
+  if(e.key==='ArrowLeft')  setStage(shown[(i-1+shown.length)%shown.length][0]);
 });
 
 /* WHERE A RELOAD PUTS YOU.
