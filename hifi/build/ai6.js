@@ -208,7 +208,15 @@ const PAGESUM = {
 
     day90: f => `All 13 chapters done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book the re-interview to have Priya assess whether you move up.`,
 
-    promoted: f => `You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. E4 opens December 1, and at this level you can volunteer to lead a cohort.`,
+    /* THE DATE CAME OFF THIS LINE, AND IT IS THE CARD THAT HAS IT NOW. The
+       sentence used to close on "E4 opens December 1, and at this level you can
+       volunteer to lead a cohort" — right while the enrolment card beside it
+       stated no date at all. `ENROL_OPENS` (views.js) puts the opening in a band
+       on the card, which is where a reader looks for it, and one date said twice
+       inside one head band is the duplication this whole table exists to stop.
+       Tal keeps the consequence of the level, which is the half the card cannot
+       say: 26 words, and the two figures are still `f`'s. */
+    promoted: f => `You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. At this level you can also volunteer to lead a cohort.`,
 
     _: 'Where you stand right now, and anything waiting on you today.'
   },

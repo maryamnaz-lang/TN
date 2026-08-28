@@ -250,6 +250,75 @@ LAYERS = [
     # hand-authored page has to know is that `.ph-rank` is a SIBLING of `.av-ph`
     # rather than a child, because §09 clips the avatar's box.
     '62-rankhead.css',
+    # TYPOGRAPHY — THE AUTHORITY, and the single most important layer in this
+    # list for a second portal.
+    #
+    # A design system whose type is "whatever the component happened to say"
+    # is not a design system, and that is what the previous output shipped:
+    # a computed sweep of the portal found 26 rendered sizes, five weights in
+    # a face that loads two, 1283 elements set in uppercase and two greys
+    # doing one job. A page built on that box could match the portal only by
+    # copying four numbers off whichever component it was nearest.
+    #
+    # §63 states the scale as `--t-*` TOKENS, which is what actually crosses
+    # the boundary. A hand-authored page does not have the portal's class
+    # names, so `.cardrow-t` being correct is worth nothing to it — but
+    # `font-size:var(--t-h3-size)` is, and so are the eleven `.t-*` role
+    # classes the tokens back. That is the difference between shipping a
+    # stylesheet and shipping a system.
+    #
+    # LAST, exactly as in build.py, and for the same reason: it supersedes
+    # every layer above it by position. Nothing may be appended after it that
+    # sets a font size.
+    '63-typography.css',
+    # THE OUTLINED BUTTON LOSES ITS BOX AND GAINS AN ARROW. `.btn-s` /
+    # `.btn-t` / `.btn-g` were a drawn rectangle; on a product made of
+    # hairlines that is one edge too many, and an arrow says "this goes
+    # somewhere" where a box only says "this is a control". The arrow is a
+    # mask taking `currentColor`, so it is correct on white, on the black
+    # card and under §19's accent without a variant for each — which is
+    # exactly what a second portal needs, since it will not have the
+    # portal's own call sites to edit.
+    '64-quietbtn.css',
+    # THE FOUND DISCLOSURE + THE FIGURE STRIP'S MARKS. The disclosure is the
+    # generic half — a section whose heading is a chevron and a title, with
+    # the panel below it — and it ships because a collapsible section is the
+    # one layout every portal reinvents. Its JS is four lines in the click
+    # delegate and it needs no `S`, only the element, so it passes the test
+    # in the include-by-default note: the class is the contract, and a
+    # hand-authored page toggles `.on` on the section itself.
+    # `.prog-ic` rides with it: `.stat`'s chip on a `.prog-figs` cell.
+    '65-founddisc.css',
+    # THE CARD THAT SELLS SOMETHING IS DRAWN AS AN OFFER — a sentence under
+    # the plate's title, the price in the accent on the row's right edge, a
+    # hairline under every fact row, and a tinted band for the date. It
+    # ships whole because every gate is a condition in the MARKUP rather
+    # than a call site in `hifi/`: `.plate-d`, `.plate-v` and `.note.acc`
+    # are three shapes a hand-authored page writes for itself, and none of
+    # them needs `S`. What does not cross is `splitPlateBody`'s lift of a
+    # trailing `<b>` into `.plate-v` — that is a render pass, and a page
+    # with none writes the `.plate-bi` / `.plate-v` row directly, exactly as
+    # it already writes `.plate-h` / `.plate-when`. The recipe is in
+    # `gallery.html` under Signature.
+    # It also carries `.note.acc`'s ground, which makes the accent note the
+    # system's tinted callout rather than two lines of orange text.
+    '66-enrolcard.css',
+    # TEMPORARY — the red accent trial. Its only selector is `.tmp-accent`,
+    # `tmp` is an EXCLUDE_PREFIX, and `keep_selector` drops a selector if ANY
+    # class in it is excluded, so the whole layer is dropped and no red
+    # reaches this stylesheet. It is LISTED ANYWAY, for exactly the reason
+    # §39 and §40 are: the invariant this list exists to hold is that it IS
+    # build.py's list. Leaving it out would keep the red out too, but by
+    # accident rather than by decision — and the next person to compare the
+    # two lists would find a layer in one and not the other with nothing
+    # saying why. Delete this entry when the trial is removed.
+    '67-tmpaccent.css',
+    # THE PLATE'S PERSON COMES FIRST. `.plate` is in the system and so is
+    # `.plate-who`, so the stack order crosses with them — a second portal
+    # drawing a card with a person on it should get the person above the
+    # logistics without having to rediscover that. Order only; it states none
+    # of the four properties §63 owns.
+    '68-platestack.css',
 ]
 
 # ==========================================================================
@@ -489,6 +558,13 @@ EXCLUDE_PREFIXES = (
     # separate microsite with its own visual language (boxed cards, filled navy
     # buttons, live hovers). Mixing it in would contradict the system.
     'nil',
+    # TEMPORARY, and marked so in build.py: `67-tmpaccent.css` re-points the
+    # accent tokens to red inside `.tmp-accent`, to look at two dashboards
+    # before deciding anything. It is a trial, not a decision, so it must not
+    # reach a second portal — and `keep_selector` drops a selector if ANY
+    # class in it is excluded, so this one prefix keeps the whole layer out.
+    # Drop this entry when the trial is removed.
+    'tmp',
 )
 
 

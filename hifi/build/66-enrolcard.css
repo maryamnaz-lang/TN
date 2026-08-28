@@ -1,0 +1,226 @@
+/* ==========================================================================
+   66. THE CARD THAT SELLS SOMETHING IS DRAWN AS AN OFFER
+
+   Figma 486:1084's enrolment card, read against ours. The content was already
+   the same four facts, the same title and the same button; what the file does
+   differently is spend the card's height on making the price findable and the
+   commitment legible. Four differences, and Maryam's list is the section list
+   below:
+
+     1. a sentence under the title, in the prose leading
+     2. the price in the accent, holding the row's right edge
+     3. a hairline under every fact row
+     4. the date the course opens, in a band of its own
+
+   ONE IS A STYLESHEET AND THREE ARE A STYLESHEET PLUS A SLOT. The words and
+   their order are `enrolPlate`'s (views.js) and the two new slots are placed by
+   `placePlates` (ai5.js) — both notes are worth reading before changing
+   anything here, because the ORDER of a plate's children is stated in three
+   places (the view, the pass, and the two `order` lists below) and they have to
+   agree.
+
+   NOTHING HERE IS SCOPED TO THE ENROLMENT CARD BY NAME, and that is the point
+   of doing it in a layer at all. Every rule keys on a condition that is in the
+   markup — a card with a description in it, a fact list with a labelled figure
+   in it, a note wearing `.acc` — so the next card that is an offer is drawn as
+   one without a call site being edited, and the six plates that are
+   appointments are untouched. There is no `.plate-enrol`.
+
+   AFTER §63 AND ALLOWED TO BE, on the same test §64 and §65 record: this layer
+   states grounds, borders, padding, `order` and one SVG fill, and it states no
+   font size, no font weight, no text-transform and no text colour. The two inks
+   it needs — the description's grey and the price's accent — are §63's, in that
+   file, where the note over `.plate-v` explains why the accent has to be
+   conditional. The ONE thing that looks like an exception and is not:
+   `fill` on a mark is not a text colour (§65 sets two).
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE SENTENCE UNDER THE TITLE
+
+   `.plate-d` sits between the head row and the facts. It takes §63's prose
+   leading against the facts' list leading at the same size — the note there is
+   why that is the whole separation and no second size is needed.
+
+   `--s05` UNDER THE HEAD ROW'S HAIRLINE, AND NOTHING BELOW IT. 16 reads as the
+   gap inside one block, which is what the title and its sentence are — §56 has
+   already closed the head row on a rule, so the sentence is under the line and
+   part of what the line divides.
+
+   AND THE FACTS NEED NOTHING STATED HERE, which was worth measuring before
+   writing a second rule. §56 gives `.plate-b` 16 of its own and §2 below gives
+   the first row 8 of top padding, so the description clears the list by 24 —
+   the step this card uses between its other blocks — with the two numbers
+   already in the file. A `.plate-d + .plate-b` rule was written, made it 32, and
+   came out as the loosest join on the card; it would also have had to be stated
+   twice more to outrank §56's 0,4,0 and §68's own margin inside the same
+   container tier, for a gap that was already right.
+   -------------------------------------------------------------------------- */
+.app .plate-d{margin-top:var(--s05)}
+
+/* --------------------------------------------------------------------- 2 ---
+   A FACT LIST WITH A FIGURE IN IT IS A SPEC, AND A SPEC IS RULED
+
+   §56 draws `.plate-b.plate-lines` as a flex column of rows with 8px between
+   them, which is right for what it was written for: three details of one
+   appointment ("Thursday at 6:00 PM ET / 9 others / 60 minutes") are three
+   readings of a single thing, and rules between them would make the card a
+   form. The enrolment card's four are not that. They are four independent
+   answers — a price, a length, a count of assessments, a cohort size — and read
+   as one loose block the price had nothing to separate it from the chapters.
+
+   SO THE GATE IS `:has(.plate-v)`, WHICH IS THE HONEST TEST rather than a class
+   the call site remembers to write. `.plate-v` is the value `splitPlateBody`
+   lifts out of a row written as `Label <b>figure</b>` (ai5.js), so the condition
+   reads: a list that answers a question with a figure is a specification. A list
+   of three appointment details has no labelled figure in it and cannot match.
+   Per trap 13's shape of argument — the condition IS the markup, so there is
+   nothing for a class to decide.
+
+   THE GAP GOES TO ZERO AND THE ROW PAYS ITS OWN AIR. A 12px pad above and below
+   each row puts the hairline exactly halfway between two lines of type; left as
+   a gap, the line would have to be drawn on one row's edge and would sit 8px off
+   centre. The first row gives its top pad back (`--s03`, matching what §56's
+   16 above the block was doing) so the list does not open on 12px of white under
+   a heading that has already paid, and the last row drops its bottom pad and its
+   rule together — a rule under the last of four is a rule under the block, which
+   is what the band under it already is.
+
+   `--on-dark-rule` AND NOT `--on-dark-border`, WHICH IS §15's DECISION REUSED.
+   These lines divide two halves of one card rather than holding the edge of a
+   control, and at 42% white they were the brightest thing on the black plate.
+   §59 points the token at `--rule` on a quiet card, so the same declaration is
+   a light hairline on the enrolment card and white-at-16% on any black plate
+   that ever writes a figure — one rule, correct on both grounds.
+
+   AND `align-items:stretch` IS WHAT MAKES BOTH OF THE ABOVE VISIBLE, which is
+   trap 19 one layer on. §56 gives the list `align-items:flex-start`, correct for
+   what it drew: three rows shrink-wrapped to their own words, each as wide as it
+   needs and no wider. A ruled row and a right-hand figure both need the row to
+   be as wide as the CARD — measured before this line went in, the row was 143px
+   of a 356px card, so the hairline ran a third of the way across and
+   `margin-left:auto` had no free space to push the price into and resolved to 0.
+   Two rules that each looked broken for one reason: the row was never full
+   width. `stretch` on the list rather than `align-self` on the row, because it
+   is a property of this list and not of one member of it.
+   -------------------------------------------------------------------------- */
+.app .plate-b.plate-lines:has(.plate-v){gap:0;align-items:stretch}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi{
+  padding:var(--s04) 0;
+  border-bottom:1px solid var(--on-dark-rule)}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:first-child{
+  padding-top:var(--s03)}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{
+  padding-bottom:0;border-bottom:0}
+
+/* AND THE FIGURE HOLDS THE ROW'S RIGHT EDGE. `margin-left:auto` in the row's
+   own flex, so the mark and the label stay on the spine and the answer lands on
+   the card's right margin however wide the column is — which is what makes the
+   four rows read down a single right edge with only one value in them. `flex:
+   none` because a price is never the thing that should wrap, and `tabular-nums`
+   so a second figure under it lines up digit for digit.
+
+   NO `text-align`: the value is a flex item, not a cell, and aligning text
+   inside a box that has already shrunk to its content does nothing. */
+.app .plate-v{
+  margin-left:auto;flex:none;
+  font-variant-numeric:tabular-nums}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE ACCENT NOTE IS A CARD AGAIN — §46's ARGUMENT, FOR THE FOURTH VARIANT
+
+   §46 is the whole of this note and it is worth reading first. Short version:
+   §02 draws every `.note` variant as a filled block, §12 takes the ground off
+   EVERY note for a reason that is true of the plain one only ("it is the
+   document's own opening paragraph, so it takes the full measure"), and §46
+   gives the ground back to `.warn`, `.err` and `.succ` because "a status with
+   no ground is a paragraph of coloured text". `.acc` was the fourth variant and
+   was left out — nothing in either portal drew one, so nothing showed it.
+
+   The enrolment card draws one now, and it is the same case: a band saying when
+   the course opens, with no ground, is two lines of orange text under four fact
+   rows, which reads as a fifth fact rather than as a thing set apart.
+
+   THE GROUND IS `--accent-tint` AND NOT `--brand-tint-2`, AND THAT IS A
+   CONTRAST DECISION rather than a preference between two warms. §02's original
+   rule named the brand tint (#fcdbc7) — and the ink this note's heading takes
+   is §12's `--accent-on-2` (#ae4508, and §12 chose it precisely because
+   `--accent-text` drops under AA on a tinted ground), which measures 4.40:1 on
+   #fcdbc7. Under the 4.5 a 13.5px heading needs. `--accent-tint` (#fde3d4, the
+   accent at 8%) gives 4.68:1 with the same ink, and the pairing is already in
+   the build: §12 draws `.chip-tal` as exactly this ground with exactly this
+   ink. So this is not a new colour combination, it is the chip's, at card size.
+
+   AND THE MARK TAKES THE INK, NOT `--accent`. §12 fills every note's glyph with
+   `--accent` (#f57414), which is 2.32:1 on this ground — below the 3:1 a mark
+   needs to be seen at all, never mind read. `--accent-on-2` is what the heading
+   beside it is already set in, so the calendar and the sentence are one object.
+
+   PADDING ON BOTH AXES, per §46: the note is a card sitting inside whatever has
+   already paid the gutter, so what it needs is internal air. No negative
+   margins and no bar — §12's objection to the 3px rule is the half of that
+   decision worth keeping, and a bar plus a fill is two ways of saying one thing.
+   -------------------------------------------------------------------------- */
+.app .note.acc{
+  padding:var(--s04) var(--s05);
+  border-left:0;
+  background-color:var(--accent-tint)}
+.app .note.acc svg{fill:var(--accent-on-2)}
+
+/* AND THE BAND STANDS OFF THE LIST ABOVE IT. The last fact row gives up its
+   bottom padding and its rule together (§2), which is right — a rule under the
+   last of four is a rule under the block — but it also means the tint starts
+   12px under the last line of type, and the band's own padding is INSIDE the
+   fill, so it buys no separation from the row. 16 on the slot, which is the step
+   §56 puts between the card's other blocks; the fill then reads as the next
+   thing on the card rather than as a fifth row that has been coloured in.
+
+   ON `.plate-n` AND NOT ON `.note.acc`, because this is the plate's spacing and
+   not the note's: an accent note anywhere else takes the margin of whatever
+   holds it, the same way every other `.note` in the build does. */
+.app .plate-n{margin-top:var(--s05)}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE TWO NEW SLOTS, IN BOTH OF THE CARD'S LAYOUTS
+
+   A plate's children are ordered by an explicit list at each width — §15's for
+   the phone, §56's for the band's column — and a child no list mentions takes
+   `order:0`, which is BEFORE all of them: an unplaced description renders above
+   the head row. So both slots have to be named twice.
+
+   THEY SHARE THEIR NEIGHBOUR'S NUMBER RATHER THAN RENUMBERING THE LIST.
+   `.plate-d` takes the title's number and `.plate-n` takes the facts'; equal
+   `order` resolves to document order, and the pass appends `t, d, b, n, …` in
+   exactly that sequence, so the pairs come out title-then-sentence and
+   facts-then-band. Renumbering would mean restating five selectors in two
+   layers to make room for two — and every one of those five is a rule this
+   layer would then own a copy of, which is how §11 lost the type scale.
+
+   SO `.plate-n`'s NUMBER IS COUPLED TO `.plate-b`'s AND HAS TO MOVE WITH IT.
+   That is not a theoretical warning: it happened. §68 swapped the person above
+   the facts and took `.plate-b` from 3 to 4 in all three tiers, and this file
+   still said 3 — so on both enrolment dashboards the "opens on" band jumped
+   from under the four facts to above them, which reads as a second description.
+   Nothing errored; the card just told the story in the wrong order. `4` here
+   is §68's value, and the pair is what to check first if the band ever moves.
+   A layer that renumbers the stack has to renumber these two with it.
+
+   `grid-column:1` IS FOR THE ONE LAYOUT NOTHING CURRENTLY DRAWS. §15's desktop
+   plate is a two-column grid — text left, actions bottom right — and §47's note
+   records that every plate in both portals now sits inside a `.modhead`, where
+   §56 makes it a column flex instead. In a flex container `grid-column` is
+   inert, so the declaration costs nothing and it is the difference between a
+   correct card and a description in the actions column on the day somebody
+   draws a plate outside a band.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .plate > .plate-d{order:2}
+  .app .plate > .plate-n{order:4}
+}
+@container app (min-width:900px){
+  .app .plate > .plate-d,.app .plate > .plate-n{grid-column:1}
+  .app .plate > .plate-d{order:2}
+  .app .plate > .plate-n{order:4}
+  .app .modhead .sec-dark > .plate > .plate-d{order:2;grid-column:auto}
+  .app .modhead .sec-dark > .plate > .plate-n{order:4;grid-column:auto}
+}

@@ -310,6 +310,15 @@ function placeDark(){
   const hosts = [];
   for(const k of page.children){
     if(k === anchor || k === band) continue;
+    /* `.keep-place` OPTS A DARK CARD OUT OF THE LIFT. Everything in
+       `DARK_CARD` is normally the page's one headline object, so moving it
+       into the band is right by default — but the promoted dashboard's
+       certificate is the opposite case: it is what you have already
+       finished, and the band is what you are being asked to do next (that
+       page's band already holds the enrolment plate). A card that says so
+       stays where the view wrote it. One class rather than a name list, so
+       the next card that wants this does not have to be added here. */
+    if(k.classList.contains('keep-place')) continue;
     if(k.matches(DARK_CARD) || k.querySelector(DARK_CARD)) hosts.push(k);
   }
   if(!hosts.length) return;
@@ -430,14 +439,44 @@ function plateIcon(t){
   for(const [re,k] of PLATE_IC) if(re.test(s)) return I[k];
   return I.circle;
 }
+/* AND A ROW THAT ENDS ON A FIGURE IS A LABEL AND A VALUE.
+   "Course price <b>$690</b>" is not the same shape as "60 minutes": it is a
+   question and its answer, and the answer is the reason the row is on the card.
+   Read as one run it sat mid-line with 90px of white after it, which on the
+   enrolment card put the one number the reader came for in the least prominent
+   place on the row.
+
+   THE TEST IS A `<b>` AT THE END OF THE PART, and it is deliberately that
+   narrow. Lifted out it becomes a flex sibling rather than a word inside the
+   label, which is the only way §66 can push it to the row's right edge — and
+   §66's rules for the list (a hairline under each row) key on `.plate-v` too,
+   so "does this list have a labelled figure in it" is what decides whether the
+   four facts are drawn as a spec or as a paragraph in four parts. A `<b>` in
+   the MIDDLE of a fact is emphasis inside a sentence and stays where it is.
+
+   ONE CALL SITE TODAY — `enrolPlate`'s price — and the rule generalises with no
+   further work: any plate that writes a fact as `Label <b>figure</b>` gets the
+   figure on the right in the accent. `.plate-v` is what §63 states the accent
+   ink for, so a plate that wants a figure without one does not write a `<b>`.
+
+   THE LABEL CAN BE EMPTY. A part that is nothing but `<b>$690</b>` is a figure
+   with no question in front of it, and an empty `<span>` before it would eat
+   the row's own gap; so the label span is written only when there are words. */
+const PLATE_FIG = /^([\s\S]*?)\s*<b>([\s\S]*?)<\/b>\s*$/;
+function plateRow(t){
+  const m = t.match(PLATE_FIG);
+  const lab = m ? m[1].trim() : t;
+  return `<span class="plate-bi">${plateIcon(t)}` +
+    (lab ? `<span>${lab}</span>` : '') +
+    (m ? `<b class="plate-v">${m[2]}</b>` : '') + `</span>`;
+}
 function splitPlateBody(plate){
   const b = plate.querySelector(':scope > .plate-b');
   if(!b || b.querySelector(':scope > .plate-bi')) return;
   const parts = b.innerHTML.split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
   if(parts.length < 2) return;
   b.classList.add('plate-lines');
-  b.innerHTML = parts.map(t =>
-    `<span class="plate-bi">${plateIcon(t)}<span>${t}</span></span>`).join('');
+  b.innerHTML = parts.map(plateRow).join('');
 }
 
 /* ==========================================================================
@@ -502,7 +541,15 @@ function placePlates(){
 
     const eb   = plate.querySelector(':scope > .plate-eb');
     const t    = plate.querySelector(':scope > .plate-t');
+    /* the sentence under the title and the band under the facts — an offer's
+       two slots (see `enrolPlate`). Both have to be NAMED here for the same
+       reason `.plate-x` does: the reorder below appends the children it knows
+       about in the order it wants them, and anything it does not know about
+       keeps the position the view printed it in, which after the reorder is
+       above the head row rather than inside the card. */
+    const d    = plate.querySelector(':scope > .plate-d');
     const b    = plate.querySelector(':scope > .plate-b');
+    const n    = plate.querySelector(':scope > .plate-n');
     const a    = plate.querySelector(':scope > .plate-a');
     const who  = plate.querySelector(':scope > .plate-who');
     /* the closing block under a hairline — what to expect from the thing the
@@ -590,8 +637,12 @@ function placePlates(){
     else plate.insertBefore(head, plate.firstChild);
 
     /* `parentElement !== head` so the reorder does not drag a title that has
-       just been seated in the head row back out to the foot of the card */
-    [t, b, a, who, x].forEach(el => {
+       just been seated in the head row back out to the foot of the card.
+       THE ORDER IS THE CARD READ TOP TO BOTTOM: what it is, what it does for
+       you, the facts, the date it opens, the action, who it is with, the note
+       under the hairline. `d` follows the title because it is the title's own
+       sentence; `n` follows the facts because it is the last of them. */
+    [t, d, b, n, a, who, x].forEach(el => {
       if(el && el.parentElement !== head) plate.appendChild(el);
     });
   });

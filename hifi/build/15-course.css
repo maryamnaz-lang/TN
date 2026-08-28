@@ -613,12 +613,23 @@
    declaration is the companion to the one above: with the 3px bar gone, the 16px
    that held the text off it is paying for nothing, so it goes too.
 
-   `.warn`, `.err` and `.succ` are excluded, and the reason is that they are the
-   three notes with a GROUND. §46 puts the fill back on them (§12.510 had taken
-   it off as collateral, for the same reason this rule took the padding off), and
+   `.warn`, `.err`, `.succ` and `.acc` are excluded, and the reason is that they
+   are the notes with a GROUND. §46 puts the fill back on the first three
+   (§12.510 had taken it off as collateral, for the same reason this rule took
+   the padding off) and §66 on the fourth, and
    on a filled card the left padding is not the bar's indent — it is what stops
    the words touching the edge of the colour. Zeroed, the amber card read as text
    with its first character welded to the fill.
+
+   `.acc` JOINED THE LIST WHEN SOMETHING FINALLY DREW ONE. It was the fourth
+   variant §02 defined and the one nothing in either portal used, so it sat here
+   with a ground it was never given and a padding it never needed. The enrolment
+   card's "when the course opens" band is the first, and it arrived with 12px
+   above and below, 16 on the right and its first character against the tint —
+   which is this rule, doing to the accent note exactly what the note above
+   describes it doing to the amber one. The test the list is really applying is
+   "does this note have a fill", so a fifth variant with a ground belongs here
+   too rather than in a later `!important`.
 
    Excluded HERE rather than answered from a later layer, because this rule is
    `!important` and the only thing that beats it is another `!important`. The
@@ -627,7 +638,7 @@
    note having no left padding — it has had a fill for as long as §02 has
    existed, and this rule is what was quietly cancelling it. */
 .app .tile.bordered:not(.band),.app .ai-aura:not(.band),
-.app .note:not(.band):not(.warn):not(.err):not(.succ),
+.app .note:not(.band):not(.warn):not(.err):not(.succ):not(.acc),
 .app .ai-stream:not(.band),.app .signed:not(.band){
   padding-left:0!important}
 

@@ -265,6 +265,165 @@ run-up, messaging, the payment pages, and the module head band. Those are one
 product surface's own vocabulary, and most of them depend on the portal's
 `views.js` DOM to work at all. `build-ds.py` lists them by name.
 
+## Typography — `63-typography.css`
+
+The scale is stated once, in the **last** layer of both builds, and nothing may
+be appended after it that sets a font size. It has to be last: §11 was written
+to be the type authority and lost, not by being wrong but by being in the
+middle — `.app .foo` in §15 beats `.app .foo` in §11 on order alone, so every
+later layer that wanted a size took one.
+
+A computed sweep of the portal before this layer went in — ten stages by 34
+views, both portals, ~30,000 text elements — found **26 rendered font sizes**
+against §11's stated nine, **160 distinct type signatures**, **five font
+weights in a face that ships two**, **1283 elements set in uppercase**, and
+**two greys used interchangeably** for the same job. The same sweep at 390,
+760, 1000 and 1280 now returns **zero** off-ladder elements.
+
+### The ladder — eight sizes, eleven roles
+
+| Role | Class | Size / line | Weight | Tracking | Ink |
+|---|---|---|---|---|---|
+| Display | `.t-display` | 34 / 40 | 600 | −1px | primary |
+| Heading 1 | `.t-h1` | 24 / 30 · **28 / 34 at ≥900** | 600 | −0.5px | primary |
+| Heading 2 | `.t-h2` | 20 / 26 | 600 | −0.3px | primary |
+| Heading 3 | `.t-h3` | 17 / 23 | 600 | −0.2px | primary |
+| Heading 4 | `.t-h4` | 14 / 19 | 600 | −0.02px | primary |
+| Body | `.t-body` | 13.5 / 22 | 400 | 0.1px | primary |
+| Body compact | `.t-compact` | 13.5 / 19 | 400 | 0.1px | primary |
+| Label | `.t-label` | 12.5 / 17 | 600 | 0.1px | primary |
+| **Description** | `.t-desc` | 12.5 / 17 | 400 | 0.1px | **secondary** |
+| Eyebrow | `.t-eyebrow` | 11.5 / 16 | 600 | 0.2px | **secondary** |
+| Caption | `.t-caption` | 11.5 / 16 | 400 | 0.1px | helper |
+
+**Display is for hero NUMERALS and nothing else.** A figure can be huge because
+it carries no reading — you take "38%" in at a glance and the size is the
+emphasis. A name is read as words, so it belongs in the heading ladder: set a
+section's subject at 34/40 and it comes out larger than the page's own title,
+which is the hierarchy inverted. The level name ("Explorer – E4") is **h2** for
+exactly this reason, and it is the one thing the ladder demoted rather than
+merely re-sized.
+
+Three pairs share a size, and each pair is separated by weight, by ink or by
+both: body/compact by line-height, label/description by weight **and** ink,
+eyebrow/caption by weight **and** ink. That is deliberate. A scale with 11px
+and 11.5px as separate steps is not a scale — it is two sizes nobody can tell
+apart, and that is what the sweep found. **Eight sizes that are each visibly
+different is worth more than eleven that are not.**
+
+`.t-heading-01`…`-05`, `.u-h1`…`.u-caption` and `.u-overline` are kept as
+aliases onto the same rules, because both portals and the gallery already use
+them. They are aliases, not a second scale — `-01` is h1, `-02` is h3, `-03`
+and `-04` are h4, `-05` is the eyebrow. That ambiguity (`-02` meant 17px in
+§11 and 20px in §01) is what the pinning ends.
+
+### Two weights, because the face has two
+
+Söhne is embedded at **400 (Buch)** and **600 (Kräftig)** and at nothing else.
+Measured: a 40px string is 280.9px wide at both 400 and 500, and 282.9px at
+600, 700 and 800. So `font-weight:500` renders as Buch and 700/800 render as
+Kräftig — they are not a hierarchy, they are three weights that never existed.
+
+- **400** — all prose, all descriptions
+- **600** — all headings, labels, eyebrows and buttons
+- **500 / 700 / 800** — write these and you get a declaration that does not do
+  what it says. Use `var(--t-w-book)` / `var(--t-w-strong)`.
+
+This reverses the earlier one-weight instruction, and deliberately. §11's note
+records the original rule: hierarchy carried by *size, colour, case and
+position — not weight*. Case is now gone (below), and size alone was never
+carrying it — 13.5px covers 13,451 elements across both prose roles.
+Confirmed with Maryam, 28 Aug 2026.
+
+### Nothing is set in capitals
+
+66 rules across 18 layers declared `text-transform:uppercase`. All of them are
+off. The eyebrow keeps its slot, its weight and its position and gives up its
+case and most of its tracking — 0.8px was there to open up capitals and reads
+as a gap at sentence case.
+
+Every string behind those rules was checked before the change: all of them were
+already written in sentence case in the view ("Quiz score", "Card number",
+"Wed", "Next step", "Scene 1 · from 02:14"), so this is presentational and
+needed no copy edit. **Write your strings in sentence case** — no stylesheet
+can un-shout a word that was typed shouting.
+
+The only capitals left in the product are the card wordmarks — VISA, AMEX,
+DISCOVER — which are registered marks drawn as artwork inside a card graphic.
+Setting those in sentence case does not make the payment row more readable; it
+makes the card look counterfeit.
+
+### Ink is decided by role, not per component
+
+This is the half that was least consistent before. `.sub` and `.ag-m` took
+secondary; `.chev-d` and `.aw-d` took helper; nothing said which was right.
+
+| Token | Value | Used for |
+|---|---|---|
+| `--text-primary` | `#111111` | headings, values, body prose |
+| `--text-secondary` | `#525250` | **every** description, supporting line and eyebrow |
+| `--text-helper` | `#666563` | the floor tier only — timestamps, legal, chart axes, captions |
+| `--on-dark` | `#ffffff` | primary, inverted |
+| `--on-dark-2` | `#c7c6c3` | secondary **and** helper, inverted |
+
+A dark ground has two inks, not three. Write against the `--on-dark*` tokens
+rather than against white, so §59's quiet plate — which re-points those three
+tokens rather than restating rules — keeps working.
+
+### Taking a role
+
+```html
+<p class="t-desc">Signed by Priya Nair</p>
+```
+
+```css
+.my-thing{
+  font-size:var(--t-h3-size); line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls);
+}
+```
+
+Both are the same numbers. Use the class on an element; use the tokens when you
+are styling a component of your own and want it to move with the system. Every
+role has `--t-<role>-size`, `-lh` and `-ls`.
+
+**The host requirement applies here too.** §63 scopes every rule to `.app`, so
+a page without an `.app` ancestor gets browser defaults and none of this.
+
+### What sits outside the ladder — a closed list
+
+Each is a glyph fitted to a box rather than a word in a column, so a ladder step
+would either overflow the box or leave it half empty:
+
+- **Avatar initials** — sized from JS. `avatar()` writes `font-size:size/3`
+  inline (trap 1), because the caller chooses the diameter.
+- **Badges and pips** — 10px, a count inside a dot.
+- **OTP digits** — 18px, one character per field.
+- **Card wordmarks** — artwork, above.
+- **The iOS status bar** — Apple's typography in a picture of Apple's UI.
+  `ios-*` is excluded from this box entirely.
+
+### Two traps this layer had to answer, and you will hit both
+
+1. **Specificity beats order.** §2 and §3 of the layer are written at
+   `.app .foo` (0,2,0). Twenty-odd rules in the build are 0,3,0 or 0,4,0 —
+   `.app .ach .ach-t`, `.app .nrow:not(.un) .nrow-t`, `.app .tal-sugg
+   .chip-tal` — and landing last does not reach them. §7b restates each at its
+   own weight. They were found by sweeping the rendered DOM and reading back
+   the winning selector; a grep cannot tell you which of four matching rules
+   won.
+2. **A container query is its own cascade tier** (trap 3). §3 cleaned the whole
+   product at 390 and 760 and left 1280 holding four sizes it does not have,
+   because the section heading, the page lead and two eyebrows are resized
+   inside `@container app (min-width:900px)`. §8b restates them at the same
+   width. **Sweep at more than one width, or you will call this finished when
+   it is not.**
+
+At ≥900 a `.sec` with a `.sec-h` becomes a 184px label column and its heading
+is a *spine*, so it takes the **label** role rather than h4 — and the four
+headings that carry an action, a link or a day strip stay at **h4**. Two tiers,
+both on the ladder, and the distinction survives.
+
 ## The five things to know before building a page
 
 ### 1. The host is not optional

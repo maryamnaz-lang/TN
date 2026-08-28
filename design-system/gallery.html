@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=4a28be0c">
+<link rel="stylesheet" href="talentnext-ds.css?b=306c79ac">
 
 <style>
 /* ==========================================================================
@@ -30,9 +30,14 @@
 
 /* 2. CODE. Scrolls inside its own box so a long line never widens the column. */
 .doc-src{margin-top:var(--s04);border-top:1px solid var(--border-subtle-01)}
+/* THE EYEBROW ROLE, TAKEN BY TOKEN. This page documents the system, so it has
+   to obey it — "+ MARKUP" in capitals on the page that says nothing is set in
+   capitals was the one thing here that could not be argued with. */
 .doc-src summary{
-  padding:var(--s03) 0;font-size:11.5px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--text-helper);cursor:pointer;list-style:none}
+  padding:var(--s03) 0;
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  color:var(--text-secondary);cursor:pointer;list-style:none}
 .doc-src summary::-webkit-details-marker{display:none}
 .doc-src summary::before{content:'+ ';font-weight:400}
 .doc-src[open] summary::before{content:'– '}
@@ -197,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=4a28be0c"></script>
+<script src="talentnext-ds.js?b=306c79ac"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -796,27 +801,82 @@ SECTIONS.push({id:'colour', nav:'Colour', icon:'view', build: () => `
   `, true)}
 `});
 
-/* --------------------------------------------------------------------- type */
+/* --------------------------------------------------------------------- type
+   THE LADDER IS §63 AND THIS SECTION IS ITS FACE. Every row below is set by
+   the role class it names, so the specimen cannot drift from the rule — if a
+   row here looks wrong, the layer is wrong, not the page. */
 SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
-  ${ex('The scale', 'Söhne, two styles. Hierarchy is carried by size, colour, case and position — not by weight, which is why §11 sets almost everything to 400.', `
+  ${ex('Eight sizes, eleven roles', 'Söhne in two styles. Each row is set by the class it names — nothing here is hand-sized. Three pairs share a size and are told apart by weight and ink: body/compact by line-height, label/description by both, eyebrow/caption by both.', `
     <div>
-      <p class="t-heading-01">Heading 01 — 26/32</p>
-      <p class="t-heading-02">Heading 02 — 20/28</p>
-      <p class="t-heading-03">Heading 03 — 16/22</p>
-      <p class="t-heading-04">Heading 04 — 14/20</p>
-      <p class="eyebrow">Eyebrow / heading 05</p>
-      <p class="t-body-01">Body 01 — 16/24. The measure is capped so a line never runs past what the eye can track back.</p>
-      <p class="t-body-02">Body 02 — 14/20, the workhorse.</p>
-      <p class="t-helper-01">Helper — 12.5/16, for the line under a field.</p>
-      <p class="t-legal-01">Legal — 11.5/16.</p>
+      <p class="t-display">Display &mdash; 34/40, 600</p>
+      <p class="t-h1">Heading 1 &mdash; 24/30, 600 &middot; 28/34 at 900 and up</p>
+      <p class="t-h2">Heading 2 &mdash; 20/26, 600</p>
+      <p class="t-h3">Heading 3 &mdash; 17/23, 600</p>
+      <p class="t-h4">Heading 4 &mdash; 14/19, 600</p>
+      <p class="t-body">Body &mdash; 13.5/22, 400. Prose you read in sentences, and the only role with a line-height built for a paragraph rather than a row.</p>
+      <p class="t-compact">Body compact &mdash; 13.5/19, 400. The same size in a list, a cell or a field, where 22 would open the rows up.</p>
+      <p class="t-label">Label &mdash; 12.5/17, 600. A chip, a tag, a field label, a small value.</p>
+      <p class="t-desc">Description &mdash; 12.5/17, 400, and always this grey.</p>
+      <p class="t-eyebrow">Eyebrow &mdash; 11.5/16, 600. The small strong line over a figure or a block.</p>
+      <p class="t-caption">Caption &mdash; 11.5/16, 400. Timestamps, legal, chart axes.</p>
     </div>
   `)}
-  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face. The cell’s own anatomy is under <b>Figures</b> — it is a named grid and needs all three parts.', `
+
+  ${ex('Nothing is set in capitals', 'The eyebrow used to be 11px uppercase with 0.8px of tracking, in 66 rules across 18 layers. It keeps its slot, its weight and its position and gives up its case — 0.8px was there to open up capitals and reads as a gap at sentence case. Write the words in sentence case; no stylesheet can un-shout a string that was typed shouting.', `
     <div class="stats">
       ${statCell('book',  'Chapters',  '13<small>/13</small>', 'one a week')}
       ${statCell('chart', 'Average',   '92<small>%</small>',   'cohort average 79%')}
       ${statCell('calendar','Day',     '47<small>/90</small>', 'week 5 of 13')}
       ${statCell('video', 'Calls',     '12<small>/13</small>', '60 min, weekly')}
+    </div>
+  `)}
+
+  ${ex('Two weights, because the face has two', 'Söhne is embedded at 400 (Buch) and 600 (Kräftig) and at nothing else. A 40px string measures 280.9px at both 400 and 500, and 282.9px at 600, 700 and 800 — so 500 renders as Buch and 700/800 render as Kräftig. Writing any of those three is a declaration that will not do what it says.', `
+    <div class="kv">
+      <div class="k">400 &mdash; Söhne Buch</div><div class="v" style="font-weight:400">Every prose role, and every description</div>
+      <div class="k">600 &mdash; Söhne Kräftig</div><div class="v" style="font-weight:600">Every heading, every label, every eyebrow, every button</div>
+      <div class="k">500 / 700 / 800</div><div class="v">Not available. They silently round to one of the two above</div>
+    </div>
+  `)}
+
+  ${ex('Ink is decided by role, not per component', 'Three inks on a light ground, two on a dark one. A description is grey — and it is the same grey in every place a description appears, which is what the helper tier is <em>not</em> for.', `
+    <div class="kv">
+      <div class="k">Primary &mdash; #111111</div><div class="v">Headings, values, body prose</div>
+      <div class="k">Secondary &mdash; #525250</div><div class="v">Every description, every supporting line, every eyebrow</div>
+      <div class="k">Helper &mdash; #666563</div><div class="v">The floor tier only: timestamps, legal, chart axes, captions</div>
+      <div class="k">On dark &mdash; #ffffff</div><div class="v">Primary, inverted</div>
+      <div class="k">On dark 2 &mdash; #c7c6c3</div><div class="v">Secondary <em>and</em> helper, inverted — the dark ground has two inks, not three</div>
+    </div>
+  `)}
+
+  ${ex('Taking a role', 'Two ways in, and they are the same numbers. Use the class when you are writing an element; use the tokens when you are styling a component of your own and want it to move with the system.', `
+    <div class="note"><span>{{info}}</span><div class="nb"><b>By class</b>
+      &lt;p class="t-desc"&gt;Signed by Priya Nair&lt;/p&gt;</div></div>
+    <div class="note"><span>{{info}}</span><div class="nb"><b>By token</b>
+      .my-thing&#123; font-size:var(--t-h3-size); line-height:var(--t-h3-lh);<br>
+      &nbsp;&nbsp;font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); &#125;</div></div>
+    <div class="note warn"><span>{{warning}}</span><div class="nb"><b>The host still applies</b>
+      §63 scopes every rule to <code>.app</code>, so a page without an
+      <code>.app</code> ancestor gets the browser defaults and none of this.
+      That is the same host requirement the container queries have.</div></div>
+  `)}
+
+  ${ex('What sits outside the ladder, and all of it', 'A closed list, not a habit. Every entry is a glyph fitted to a box rather than a word in a column, so a ladder step would either overflow the box or leave it half empty.', `
+    <div class="kv">
+      <div class="k">Avatar initials</div><div class="v">Sized from JS — <code>avatar()</code> writes <code>font-size:size/3</code> inline, because the caller chooses the diameter</div>
+      <div class="k">Badges and pips</div><div class="v">10px — a count inside a dot</div>
+      <div class="k">OTP digits</div><div class="v">18px — one character per field</div>
+      <div class="k">Card wordmarks</div><div class="v">VISA, AMEX, DISCOVER. Registered marks drawn as artwork, and the only capitals left in the product</div>
+      <div class="k">The iOS status bar</div><div class="v">Apple's typography, in a picture of Apple's UI. Not shipped in this box</div>
+    </div>
+  `)}
+
+  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face — Söhne Mono was a third style in a system that has two. The cell’s own anatomy is under <b>Figures</b>: it is a named grid and needs all three parts.', `
+    <div class="facts">
+      <div><div class="l">Fee</div><div class="v">$595</div></div>
+      <div><div class="l">Held for you</div><div class="v">$204</div></div>
+      <div><div class="l">Paid out</div><div class="v">$612</div></div>
+      <div><div class="l">Per interview</div><div class="v">$68</div></div>
     </div>
   `)}
 `});
@@ -902,11 +962,18 @@ SECTIONS.push({id:'buttons', nav:'Buttons', icon:'launch', build: () => `
   ${ex('Variants', 'A button that takes you somewhere ends with <code>arrowRight</code>; that is this product’s GO and it is why the icon sits right. <code>.noic</code> centres a button that has no icon.', `
     <div class="btn-row">
       <button class="btn btn-p">Primary {{arrowRight}}</button>
-      <button class="btn btn-s">Secondary {{arrowRight}}</button>
-      <button class="btn btn-g noic">Outlined, no icon</button>
+      <button class="btn btn-s">Secondary</button>
+      <button class="btn btn-g noic">Quiet</button>
       <button class="btn ghost noic">Ghost</button>
       <button class="btn btn-d noic">Danger</button>
       <button class="btn btn-p noic" disabled>Disabled</button>
+    </div>
+  `)}
+  ${ex('The quiet button draws no box', '<code>.btn-s</code>, <code>.btn-t</code> and <code>.btn-g</code> used to be outlined. On a product made of hairlines a drawn rectangle is one more edge than the page has, so the border is gone and §64 adds the arrow instead — a box says "this is a control", an arrow says "this goes somewhere", which is what these actually do. You write nothing: the arrow appears on any of the three that does not already contain an <code>&lt;svg&gt;</code>, as a mask taking <code>currentColor</code>, so it is correct on white, on the black card and under the accent without a variant for each.', `
+    <div class="btn-row">
+      <button class="btn btn-g noic">Read the full report</button>
+      <button class="btn btn-g btn-sm noic">See the full course</button>
+      <button class="btn btn-g noic">{{download}} Already has an icon</button>
     </div>
   `)}
   ${ex('Small', '36px. Use it inside a row or a section heading, not as a page action.', `

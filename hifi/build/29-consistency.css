@@ -428,6 +428,15 @@
 
    The dismiss holds the top right corner in both layouts, because it closes
    the band, not the line it happens to sit on.
+
+   NOTHING IN `hifi/` DRAWS THIS ANY MORE — §62. All three celebrations moved to
+   one line at the right-hand end of the page header, in `--link` with the last
+   word underlined, and `achBanner` went with the band along with `S.hideAch` and
+   the `data-hideach` handler. The rules stay for the reason §27's `.tal-panel`
+   and §33.7's `.stp-pop` stay: the design system ships them, and an announcement
+   band is a component a second portal may well want. If you are reading this
+   because you grepped `.ach` looking for the thing on the dashboard, the note
+   over `achLine` in views.js is where it went.
    -------------------------------------------------------------------------- */
 .app .ach{
   display:grid;align-items:center;

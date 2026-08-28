@@ -47,10 +47,14 @@
    while the other two sit 16px in — so it is restated at `--s05` and the three
    cells are one row of equal boxes.
    -------------------------------------------------------------------------- */
+/* BOTH WINGS, because a `.prog` in the head band pays no page gutter whichever
+   state it is in — but only the progress wing has figure cells to put back on
+   the spine. The ladder wing's three cells came out (the note over `ladderWing`
+   says why), so a `.wing-lvl .prog-figs` selector here would be a rule for a
+   thing nothing draws. */
 .app .wing-prog .prog,
 .app .wing-lvl .prog{--pad-x:0px}
-.app .wing-prog .prog-figs > span:first-child,
-.app .wing-lvl .prog-figs > span:first-child{padding-left:var(--s05)}
+.app .wing-prog .prog-figs > span:first-child{padding-left:var(--s05)}
 
 /* --------------------------------------------------------------------- 2 ---
    THE LADDER'S TRACK IS AN ON-DARK VALUE AND THE WING IS NOT DARK
@@ -65,12 +69,151 @@
    the other without the reader noticing a change of component.
    -------------------------------------------------------------------------- */
 .app .wing-lvl .ladder i{background:var(--layer-accent-01)}
-.app .wing-lvl .ladder i.done{background:var(--accent);opacity:.55}
-.app .wing-lvl .ladder i.on{background:var(--accent);opacity:1}
+/* `opacity:1`, AND STATING IT IS THE POINT. §03 and §05 both draw a finished
+   level as `--accent` at `.55`, and §29.171 corrects both — "the done blocks are
+   full strength" — from a later layer. Copying §05's pair into this block
+   brought the `.55` back with it and, being later still, quietly undid §29: the
+   three finished levels loaded as a wash instead of the solid orange the bar has
+   drawn since §29. The lesson is the one §29 is full of — when you lift a rule
+   out of an early layer, grep the class for the later layer that already
+   corrected it. */
+.app .wing-lvl .ladder i.done{background:var(--accent);opacity:1}
 /* `.ladder-lab` is `--on-dark-2` inside a level hero (§05.35) and the plain
    helper ink everywhere else; the wing is everywhere else, so this only has to
    make sure the three track names are not inheriting the card's white. */
 .app .wing-lvl .ladder-lab{color:var(--text-helper)}
+
+/* --------------------------------------------------------------------- 2b ---
+   EVERY BLOCK SAYS WHICH LEVEL IT IS
+
+   `ladder(cur, true)` puts E1..E5, B1..B5, T1..T5 in the fifteen blocks — the
+   note over it in views.js says why the hero does not get them. The bar is the
+   answer to "where am I on the ladder", and without names the reader counts
+   orange blocks to find out; with them the answer is the block you are standing
+   on. There is room for it here and nowhere else it is drawn: the wing gives
+   each block about 40px against a 28px height.
+
+   THE TYPE IS THE SMALLEST IN THE SYSTEM AND TABULAR. 10px/600 with .4 of
+   tracking is §11's helper floor; tabular figures so E1 and E4 are the same
+   width and the fifteen labels sit on one rhythm rather than jostling. Not
+   uppercase — the codes are already capitals and `text-transform` on them would
+   only cost the tracking.
+
+   THREE INKS, ONE PER STATE, because the ground under them is three different
+   colours: white on the solid accent behind a finished level, §01's
+   `--accent-text` on the tint behind the live one (4.9:1, the same pairing §56
+   uses for the step you are on), and the secondary ink on the grey ahead. */
+/* `font-style:normal` FIRST, because the block IS an `<i>`. The ladder has drawn
+   its fifteen levels as `<i>` elements since §03, when they were bars with no
+   text in them and the tag was just the shortest empty element to hand. Put a
+   word inside one and the browser's own `<i>{font-style:italic}` applies — the
+   whole ladder came out slanted, which is the same class of trap as §09's
+   `.av-ph i` rule, written for the same reason. */
+.app .wing-lvl .ladder i{
+  display:grid;place-items:center;
+  font-size:10px;line-height:1;font-weight:600;letter-spacing:.4px;
+  font-style:normal;
+  font-variant-numeric:tabular-nums;
+  color:var(--text-secondary)}
+.app .wing-lvl .ladder i > b{font-weight:600;font-style:normal;display:block}
+.app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-fill:1}
+.app .wing-lvl .ladder i.on{color:var(--accent-text)}
+
+/* --------------------------------------------------------------------- 2c ---
+   AND THE LEVEL YOU ARE ON IS LIT RATHER THAN FILLED
+
+   A promoted candidate is confirmed at E4 and has not enrolled in the E4 course
+   — so the block is not "done" and it is not "ahead" either, and a solid accent
+   said the first of those. `done` and `on` were the same colour at two opacities
+   (.55 and 1), which is the difference between a block you have finished and a
+   block you have finished slightly more.
+
+   A LIGHT ORANGE SHIMMER, LEFT TO RIGHT. Two tints of the accent — 18% and 62%
+   mixed into white — so the block reads as the accent family at low strength,
+   which is exactly what "confirmed but not started" is. Nothing about it is a
+   new colour, and both tones are lighter than the solid `--accent` next door so
+   the lit block can never be mistaken for a finished one.
+
+   IT IS A REPEATING TILE ON A PSEUDO-ELEMENT, AND THAT IS THE WHOLE FIX FOR THE
+   SNAP. The first two cuts animated `background-position` across a single band
+   on a 260%-wide image, and both of them stuttered: the band is off-screen for
+   the last 6% of the cycle and the first 6% of the next one, so the block went
+   flat, then a band appeared AT the left edge and set off — which reads as a
+   shove rather than as a sweep, and no amount of easing hides it because the
+   discontinuity is in the geometry, not the timing.
+
+   A repeating gradient has no beginning to arrive from. The tile is exactly one
+   block wide (33.333% of a pseudo-element three blocks wide), the animation
+   translates by exactly one tile, and the end state is therefore pixel-identical
+   to the start — so the loop point cannot be seen. `left:-100%` is what keeps
+   the block covered at both ends of the travel: the strip spans -1 to +2 blocks
+   at rest and 0 to +3 at the end, so there is never an uncovered edge.
+
+   `translateX` AND NOT `background-position`, now that it is a strip rather than
+   a fill: a transform is composited, so the motion is smooth at any refresh rate
+   and does not repaint the block sixty times a second.
+
+   THE PERCENTAGES ARE LOAD-BEARING AND THEY AGREE WITH EACH OTHER. 300% wide,
+   33.333% tile, 33.333% travel — one third of the strip is one block, so tile
+   and travel are the same distance. Change one and all three have to move.
+
+   `background-color` SEPARATELY, because §19 paints every accent fill in the
+   product from a generated list and `.ladder i.on` is on it. That rule sets the
+   COLOUR; this layer is later and equal weight, so the colour is answered here
+   and the strip above it has nothing to argue with. */
+.app .wing-lvl .ladder i.on{
+  --lvl-a:color-mix(in srgb, var(--accent) 18%, #fff);
+  --lvl-b:color-mix(in srgb, var(--accent) 62%, #fff);
+  position:relative;overflow:hidden;
+  opacity:1;
+  background-color:var(--lvl-a);
+  background-image:none}
+.app .wing-lvl .ladder i.on::before{
+  content:'';position:absolute;top:0;bottom:0;left:-100%;width:300%;
+  pointer-events:none;
+  background:repeating-linear-gradient(90deg,
+    var(--lvl-a) 0, var(--lvl-b) 16.667%, var(--lvl-a) 33.333%);
+  animation:lvl-live 1.6s linear infinite}
+/* the level's own name rides above the strip — §21 makes the same statement
+   about `.dark-glow` and every card that carries one */
+.app .wing-lvl .ladder i.on > b{position:relative;z-index:1}
+@keyframes lvl-live{
+  from{transform:translateX(0)}
+  to{transform:translateX(33.333%)}}
+
+/* REDUCED MOTION GETS ITS OWN BLOCK, which is not optional here: §13.187 clamps
+   every duration in the build to 1ms, and 1ms on an INFINITE animation is a
+   strobe rather than "off". §21.4, §27.8, §33.6 and §40 each state their own for
+   the same reason. What is left is the strip standing still, which is a single
+   light band across the block — the state still reads as lit, it simply holds. */
+@media (prefers-reduced-motion: reduce){
+  .app .wing-lvl .ladder i.on::before{animation:none;transform:none}
+}
+
+/* --------------------------------------------------------------------- 2d ---
+   AND A TRACK'S NAME SITS OVER ITS FIRST LEVEL
+
+   §03 lays the three names out with `justify-content:space-between`, which puts
+   Explorer hard left, Builder in the middle of the bar and Trailblazer hard
+   right. That reads as three labels for the whole bar rather than three names
+   for three fifths of it — Builder landed over B3 and Trailblazer's right edge
+   over T5, so both named a track from somewhere inside it.
+
+   FIFTEEN COLUMNS AND A SPAN OF FIVE, which is the alignment stated rather than
+   measured. `.ladder` is fifteen `flex:1` items with a 2px gap (§10.300), and a
+   fifteen-column grid at the same gap has its columns in exactly the same
+   places — so a label starting at column 1, 6 and 11 starts on the left edge of
+   E1, B1 and T1 whatever the wing is wide. No arithmetic to keep in step with
+   the bar, and adding a sixteenth level would move both together.
+
+   `justify-self:start` because a five-column track is wider than its name, and
+   `min-width:0` so "Trailblazer" can never push the last track wider than the
+   five blocks it belongs to. */
+.app .wing-lvl .ladder-lab{
+  display:grid;grid-template-columns:repeat(15,minmax(0,1fr));
+  gap:2px}
+.app .wing-lvl .ladder-lab > span{
+  grid-column:span 5;justify-self:start;min-width:0;text-align:left}
 
 /* AND THE LADDER'S HEADLINE IS A LEVEL CODE, NOT A PERCENTAGE. `.prog-pct` is
    34/38 and tabular, which is exactly right for "0%" and slightly wrong for
@@ -103,6 +246,19 @@
    drawing its internal lines in a different grey would be the one object in
    the band with its own line weight.
 
+   AND `--on-dark-rule` IS THE FOURTH TOKEN, WHICH WAS AN OMISSION RATHER THAN
+   A DECISION. The three above are the ones §15, §21 and §56 write against for
+   INK and for an outline; the build has a second line token for a rule ON dark
+   — white at 16% (§01) — and §15 chose it deliberately for `.plate-x`, the
+   hairline over the card's closing note, on the argument that
+   `--on-dark-border` at 42% "was the brightest thing on a black surface". Left
+   unpointed, white at 16% over the band's cream wash is nothing at all: the
+   consultant call's card is `data-when="in 2 days"`, therefore quiet, therefore
+   was drawing "What to expect" under an invisible divider. It is pointed at the
+   same `--rule` as the border token — on a light ground the two lines the card
+   draws are one line — and §66's fact-row rules read it for the same reason,
+   which is what makes them correct on a black card without a variant.
+
    NO GROUND, RATHER THAN A PALE ONE. A tint here would be a third tone inside
    a band that already has two (the wash, and the white the page sits on), and
    the thing that separates the card from the column is the rule in §59.4 —
@@ -116,6 +272,7 @@
   --on-dark:var(--text-primary);
   --on-dark-2:var(--text-secondary);
   --on-dark-border:var(--rule);
+  --on-dark-rule:var(--rule);
   /* verify.mjs reads this flag to allow white-on-accent as a stated
      exception; there is no accent ground on this card any more. */
   --on-brand-fill:0}

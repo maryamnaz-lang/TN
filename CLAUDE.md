@@ -183,13 +183,17 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `62-rankhead.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `63-typography.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
   is either a class no earlier layer mentions or a correction that has to land after the
   layer it corrects; `build.py` records the argument for each one, in place. Read that
   comment before inserting a layer.
+  **`63-typography.css` owns type, and no layer after it may set a font size, a
+  font weight, a text-transform or a text colour** — those four belong to §63
+  wherever they appear in the file list. Layers after it are free to do anything
+  else. See the typography section below.
 - **18 JS layers**, in this order: `icons.js` → `data.js` → `views.js` → `ai.js` … `ai5.js`
   → `nil.js` → `lead.js` → `lead2.js` → `lead3.js` → `lead4.js` → `ai6.js` → `ai7.js` →
   `ai8.js` → `ai9.js` → `ai10.js`. Order matters, and `build.py` says why for each of the
@@ -214,6 +218,155 @@ Nothing throws, the page renders, one declaration is just absent. It happened tw
 went the same way, found the same afternoon), so `build.py` now refuses to write if any
 unmatched `/*` or `*/` survives the comment strip, and prints the line.
 
+### TYPOGRAPHY IS §63 AND IT IS THE LAST LAYER IN BOTH BUILDS
+
+`63-typography.css` states the whole type system — scale, weight, case and ink.
+**No layer after it may set a font size, a font weight, a `text-transform` or a
+text colour.** Those four are §63's, wherever a later layer sits in the list; a
+layer that needs a size either takes a role that already exists or states its
+exception inside §63's §7. Everything else — layout, borders, grounds, motion —
+a later layer may do freely, which is why §64 can exist at all.
+
+§11 was written to be this layer and lost, and the reason is worth knowing before
+you touch either file: **a type scale cannot be stated in the middle of a
+cascade.** `.app .foo` in §15 beats `.app .foo` in §11 on order alone, so all 51
+layers after §11 that wanted a size simply took one. A computed sweep — ten
+stages by 34 views, both portals, ~30,000 text elements — found **26 rendered
+sizes** against §11's stated nine, **five weights in a face that ships two**,
+**1283 elements in uppercase** and **two greys doing one job**. §11 still says
+nine roles; it was never wrong, it was only overtaken.
+
+**Eight sizes, eleven roles, two weights, three inks.** The full table is in
+`design-system/DESIGN-SYSTEM.md` under **Typography**, live in `gallery.html`
+under **Type**, and the roles are `.t-display` `.t-h1` `.t-h2` `.t-h3` `.t-h4`
+`.t-body` `.t-compact` `.t-label` `.t-desc` `.t-eyebrow` `.t-caption`, each
+backed by `--t-<role>-size` / `-lh` / `-ls` tokens. Six things that bite:
+
+- **THERE ARE TWO WEIGHTS AND ONLY TWO.** Söhne is embedded at 400 (Buch) and
+  600 (Kräftig) and at nothing else. Measured: 40px of text is 280.9px wide at
+  both 400 and 500, and 282.9px at 600, 700 and 800. So `font-weight:500` was
+  already rendering as Buch on 979 elements and 700/800 as Kräftig on 325 — not
+  a hierarchy, three weights that never existed. Write `var(--t-w-book)` or
+  `var(--t-w-strong)`. **This reverses the one-weight instruction §11 records**
+  ("Maryam asked for the regular style throughout"); confirmed with Maryam on
+  28 Aug 2026, because removing uppercase removed one of the four carriers that
+  rule depended on.
+- **NOTHING IS SET IN CAPITALS.** 66 rules across 18 layers declared it; all are
+  off. Every string behind them was already written in sentence case in the
+  view, so this needed no copy edit — and that is the rule going forward: **the
+  words go in the markup in sentence case.** The only capitals left are the card
+  wordmarks (VISA / AMEX / DISCOVER), which are artwork, and they are excluded
+  by name so the exception is stated rather than accidental.
+- **A DESCRIPTION IS ONE GREY.** `--text-secondary` (#525250) for every
+  description, supporting line and eyebrow. `--text-helper` (#666563) is the
+  floor tier ONLY — timestamps, legal, chart axes, captions. Before this the two
+  were picked per component with nothing saying which was right. On a dark
+  ground there are two inks, not three: secondary *and* helper both become
+  `--on-dark-2`.
+- **SPECIFICITY BEATS ORDER, so landing last is not enough.** §63's assignments
+  are `.app .foo` (0,2,0); twenty-odd rules in the build are 0,3,0 or 0,4,0 and
+  are untouched by it. §7b restates each. They were found by sweeping the
+  rendered DOM and reading back the winning selector — a grep cannot tell you
+  which of four matching rules won. **The `.lf-n` case is the one to read**: §31
+  states it twice scoped to the leader and §36 then generalised it to
+  `.app .cs button > .lf-n`, so answering §31's pair fixes two pages and leaves
+  the two §36 added.
+- **SWEEP AT MORE THAN ONE WIDTH** (trap 3). §3 of the layer cleaned the product
+  at 390 and 760 and left 1280 holding four sizes it does not have, because the
+  section heading, the page lead and two eyebrows are resized inside
+  `@container app (min-width:900px)`. §8b restates them at the same width. A
+  one-width sweep will tell you this is finished when it is not.
+- **SVG `<text>` WAS NEVER IN THE SYSTEM.** §11 neutralises HTML elements by
+  name and `text` is not one, so the charts and the rose fell through to 6px,
+  7.5px, 9.5px, 10.5px, 12px and 26px. §5 brings them in, on `fill` rather than
+  `color`.
+
+**THE DISPLAY ROLE IS HERO NUMERALS AND NOTHING ELSE.** §11 described it as
+"hero numerals, the level name" and the second half was the mistake: a numeral
+can be huge because it carries no reading, but "Explorer – E4" is words, sits
+under a section heading, and at 34/40 came out larger than the page title above
+it. The level name is h2 in both places it is drawn — `.big` on `.lvl-hero`, and
+`.wing-lvl .prog-pct`, which is the same class that holds "38%" on the enrolled
+dashboards because `ladderWing` borrows `progressStrip`'s shape. `.lg` came off
+the role too: it is a size modifier on `.tal-mk` and `.bmk`, marks with no text
+in them at all.
+
+The sweep that proves it is worth keeping: walk `STAGES` × `NAVSETS` plus the
+sub-pages for both portals (set `S.portal` **after** `setStage`, which resets
+it), call `callOpen()` for the three call kinds, and collect
+`getComputedStyle` for every element that owns a text node. It should return
+zero elements outside the ladder at 390, 760, 1000 and 1280.
+
+**MEASURE WITH THE BROWSER PANE OPEN.** When the pane is hidden the frame
+reports `innerWidth: 0`, every element measures 0 and the page's scrollHeight
+comes back around 15,000px — which reads exactly like a broken layout and is
+not one. `window.innerWidth === 0` is the check; re-open the preview and
+measure again. This is trap 15's sibling and cost twenty minutes.
+
+### THE QUIET BUTTON — §64, `64-quietbtn.css`
+
+`.btn-s` / `.btn-t` / `.btn-g` — 88 of them — were outlined, and on a product
+made of hairlines a drawn rectangle is one more edge than the page has. The
+border is off and an arrow is on. Four things:
+
+- **The border is set TRANSPARENT, not removed.** `.btn` declares
+  `border:1px solid transparent` and every variant only re-points the colour,
+  so the 1px is in the contained button's box model too — `border:0` makes a
+  `.btn-g` 2px shorter than the `.btn-p` beside it in the same `.btn-row`.
+- **The arrow is a `mask-image`, not a glyph and not an `<svg>`.** It must take
+  `currentColor` (these are `--text-primary` on a page, `--on-dark` on the black
+  card, `--accent-text` under §19). A `content:'→'` would come from the stand-in
+  face — Söhne's trial file carries 68 glyphs and an arrow is not one — and an
+  inline `<svg>` would mean editing 88 call sites and would still not reach a
+  hand-authored page.
+- **It appears only where there is no icon already, and the test is
+  `:not(:has(svg))`, NOT `.noic`.** `.noic` means "do not push the icon to the
+  far edge", and 57 of these are written `.noic` *with* an icon in the label
+  (`${I.download} Download as PDF`). Keying on `.noic` puts a second arrow on
+  all 57.
+- **`.cert-btn` keeps its border** and is deliberate — it is a different variant
+  on the black card, and the certificate card is the shape this was modelled on.
+
+§55.2's white fill on a `.sec.tint.cards` head button is also off (§65): that
+fill existed to lift a *bordered* button off the panel, and with no border it
+was a pale rectangle floating in a grey band.
+
+### THE FOUND DISCLOSURE — §65, `65-founddisc.css` + `foundHead` (views.js)
+
+"What the interview found" is the longest block on the two dashboards that carry
+it and it is a re-read, so it starts closed with the chevron on the **left** of
+its heading — the row already ends in "Read the full report", and two controls at
+the same edge, one opening in place and one navigating away, is the ambiguity
+worth avoiding. Three things that cost a round trip each:
+
+- **The state is `S.found` AND a DOM class.** `render()` alone was wrong: it
+  replaces `device.innerHTML`, which resets the scroller, so opening a section
+  1200px down threw you back to the header and closing it threw you back again.
+  The class handles this interaction, `S.found` survives the next render.
+- **THE WRAPPER PUT THE SECTION BACK IN THE LABEL COLUMN — trap 13, exactly as
+  written.** The section's opt-out was §16's `.sec:has(> .all-desc)`, a DIRECT
+  child. Wrapping the panel in `.found-b` moved that sentence one level down,
+  the opt-out stopped matching, and at desktop the heading set on four lines at
+  57px wide with the button hanging 172px past the section's right edge.
+  Restated on `.found`, inside the same container query per trap 3.
+- **`.found-t` has to carry `flex:1 1 auto`.** §24.13 gives it to `.sec-h > h2`
+  — a direct child — and wrapping the `<h2>` in the toggle made it a grandchild.
+
+Riding with it: `.prog-ic`, `.stat`'s 28px tinted chip on the three
+`progressStrip` figures, with the hues **named** (`--mk-1/2/3`) rather than
+cycled by `nth-child` the way §29 does it, so a chapter is blue in both places.
+The mark is a left-hand COLUMN, not a row above the figure, which is why the
+figure and its label had to be wrapped in `.prog-fb` — the label was a bare text
+node and could not be given a column of its own.
+
+`certCard(f)` (views.js) is the certificate as a card rather than a lone
+"Download my certificate" button. One function, both candidate call sites
+(`V.transcript` and the promoted dashboard); the leader's stays its own because
+`LDR_CERTS` carries a track and an issuer per row and this takes neither. Per
+trap 12 it lands in the head band, and on `promoted` it is the *second* dark
+card there, so §56 spans it across both columns underneath — written down, not a
+surprise. Do not add a third.
+
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
 Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a
@@ -233,6 +386,13 @@ Seven things worth knowing before touching it:
   `progressStrip` and once promoted it carries the `ladder`. All three wear
   `.stp .stp-open .stp-titled` — §04's rhythm, §24.4's header row, §56.2's 16 under it — with
   `.wing-prog` / `.wing-lvl` as §59's hooks for the gutter (trap 10) and the ladder's track,
+  and the ladder wing is the one that carries **`ladder(cur, true)`** — a level code in every
+  one of the fifteen blocks (`LVL_CODES`, which `lead3.js`'s `LDR_RUNGS` is now an alias of),
+  the track names left-aligned to E1 / B1 / T1 by a fifteen-column grid on `.ladder-lab`, and
+  the level you are ON **lit rather than filled**: a repeating two-tint strip on a `::before`,
+  one tile wide, translated by exactly one tile so the loop has no seam. Two bugs worth not
+  repeating are written up over that rule — `<i>` is italic by default, and lifting §05's
+  `.done{opacity:.55}` into a later layer silently undid §29's correction of it.
   which is an on-dark value and has to be re-pointed on a light ground. The enrolled
   dashboards no longer draw `progressStrip` as a section of their own; it MOVED.
 - **The journey is always four steps** — `journey()` in views.js is the single list and only
@@ -259,23 +419,29 @@ Seven things worth knowing before touching it:
   Both are off the right-hand edge now (87.6% and 101.1%), the words are on white paper, and
   the warm layer is back at the file's own 50% because there is no panel left to knock down.
 
-### A RANK GOES IN THE HEADER, NOT IN A BANNER — §62, `62-rankhead.css`
+### A CELEBRATION IS ONE LINE IN THE HEADER — §62, `62-rankhead.css`
 
 Figma 486:1084 (498:1578). The dashboard's header row is the reader: their own face at
 75px with the rank medal hanging 4px off its top-right corner, the `<h1>` and the fact row
-beside it, and at the far right of the same line **"You have earned 1-star rank!"** — the
-medal again at 28, the sentence in `--link` with its last word underlined, jumping to
-Rewards. The green `.ach` band no longer draws for a rank. Five things:
+beside it, and at the far right of the same line the celebration — the award artwork at 28
+and a sentence in `--link` with its last word underlined. **The green `.ach` band is gone
+for all three of `ACH`'s entries**, and nothing on the dashboard is dismissible any more.
+Six things:
 
-- **A badge is news, a rank is what you now ARE**, and that is the whole reason for the
-  split. `ACH` holds three celebrations: `week1`'s `rank1` is a rank, `day90`'s `bronze` is
-  a badge and `promoted` is a decision. The last two keep the banner and stay dismissible;
-  a rank drawn as a green slab announced a permanent fact as an interruption and then let
-  you close it, after which nothing said what rank you hold.
+- **One shape, three sentences.** The first pass moved only the rank, on the argument that a
+  rank is a property of you while a badge and a promotion are news you dismiss. It did not
+  survive: a promotion is not news you want to close either, and a blue line at the top for
+  one kind with a green slab lower down for another is the product announcing in two
+  registers. `S.hideAch` and the `data-hideach` handler went with the band.
+- **The copy lives in `ACH.up` and must END on the thing it names** — "rank!", "badge!",
+  "E4!". `achLine` splits on the last space and underlines the tail, so a fourth
+  celebration needs a sentence of that shape and no code. `art` is the award artwork at 28;
+  the promotion has none (a decision is not an object) and falls back to `ic`, which §62
+  draws at 20 in `currentColor` so it reads as the first word of the link.
 - **The two halves have different lifetimes.** `.ph-you` — the mark — is on **every**
   dashboard, and the medal on it appears wherever `GAME[stage]` does (the four enrolled and
-  complete stages). `.ph-earned` appears only where the banner would have. The row has to
-  look right with the right-hand half missing, which is what it is on five of six.
+  complete stages). `.ph-earned` appears only on the three stages `ACH` names. The row has
+  to look right with the right-hand half missing, which is what it is on four of seven.
 - **`.ph-rank` is a SIBLING of `.av-ph`, not a child** — §09 gives the avatar
   `overflow:hidden` so the photograph cannot escape, and it clips a corner badge too.
 - **`youMark` does not call `avatar()`** — that helper writes the size inline, which is
@@ -711,6 +877,17 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     source that already says `:where(.__nh)` is not what it is looking for. The portal builds
     fine, the DS build stops dead with "2 rule(s) in the output do not appear in the source".
     State it plain and let both builds do the rewrite (`60-call.css` §7 records this).
+19. **`align-self` CHANGED AXIS UNDER §47 WHEN §56 TURNED THE PLATE INTO A COLUMN FLEX.** In a
+    grid it is the block axis, so `align-self:start` meant "pack the text to the top" — which
+    is what §47 was written to do for a plate with no `.plate-who`. In a COLUMN FLEX the same
+    property is the inline axis, so the identical declaration means "shrink to your content
+    width". Nothing errored and nothing warned; the tell was §56's hairline under the plate's
+    head row, which is `.plate-h`'s own `border-bottom` — 167px of a 265px column on the
+    enrolment card, and 56px on day 90's, where the head row holds only the "DUE NOW" eyebrow.
+    §47's rule is deleted and its note kept. **When a layer changes a component's `display`,
+    re-read every `align-*` / `justify-*` an earlier layer set on its children** — those are
+    the four properties whose meaning is defined by the parent's formatting context, and the
+    cascade will not tell you they flipped.
 
 ### Verifying a change
 

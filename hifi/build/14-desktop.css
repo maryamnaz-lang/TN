@@ -107,7 +107,14 @@
      applies — §10's rules bleed and are shown — so the phone case is answered
      there and the desktop case is answered here. Two widths, two statements,
      one intent, which is the same shape §18 and §36.9 already use. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards))::after,
+  /* `.found` JOINS THE EXCLUSION LIST, per trap 4 — this selector carries
+     ten classes and cannot be outweighed from a later layer, so an
+     unruling goes in here rather than being fought from §65. The disclosure
+     is a tinted panel whose ground already ends where the section ends (the
+     same argument §55.2 makes for the block above it), and when it is shut
+     it is a single heading with a hairline 12px under it, which reads as an
+     underline on the heading rather than as the end of a section. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(.found)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

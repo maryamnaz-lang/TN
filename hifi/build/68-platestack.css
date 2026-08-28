@@ -1,0 +1,74 @@
+/* ==========================================================================
+   §68  THE PLATE'S PERSON COMES FIRST
+   ==========================================================================
+   One change to the card's stack, on the weekly cohort call, inherited by
+   every other `.plate` that has both parts.
+
+   NOTHING HERE SETS TYPE. §63 owns size, weight, case and text colour; this
+   file states `order` and two margins and none of the four.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE PERSON GOES ABOVE THE FACTS
+
+   `.plate-who` was order 4 and `.plate-b` order 3, so the card read title →
+   time, others, length → who is running it. That puts the one thing on the
+   card that is a PERSON at the bottom, under three lines of logistics, and a
+   cohort call is a call WITH Priya rather than a 60-minute slot that happens
+   to have somebody in it. The two swap: who, then what.
+
+   STATED THREE TIMES BECAUSE THE ORDER IS. §15 sets it once for the phone
+   column and once for the desktop grid, and §56 sets it again for the card
+   inside the head band — three container-query tiers, and per trap 3 a rule
+   outside them reaches none of the three. Each restatement matches its
+   original's specificity; §56's is 0,5,0 and has to be.
+   ------------------------------------------------------------------------ */
+@container app (max-width:899.98px){
+  .app .plate > .plate-who{order:3}
+  .app .plate > .plate-b{order:4}
+}
+@container app (min-width:900px){
+  /* the desktop card is a GRID, and `order` still decides auto-placement in
+     one — the text rows share `grid-column:1` and flow in order, so naming
+     all four is what keeps the head row and the title where they are while
+     the bottom two swap. `.plate-a` is explicitly placed and is not in this
+     list. `.plate-d` and `.plate-n` are §66's and are not either. */
+  .app .plate > .plate-h{order:1}
+  .app .plate > .plate-t{order:2}
+  .app .plate > .plate-who{order:3}
+  .app .plate > .plate-b{order:4}
+  /* the top margin moves with the block it was holding down. §15 gives
+     `.plate-who` 16 to stand it off the facts above it; the facts are below
+     it now, so the gap belongs to them. */
+  .app .plate > .plate-who{margin-top:var(--s05)}
+  .app .plate > .plate-b{margin-top:var(--s05)}
+  .app .modhead .sec-dark > .plate > .plate-who{order:3}
+  .app .modhead .sec-dark > .plate > .plate-b{order:4}
+}
+
+/* ------------------------------------------------------------------ 2 ---
+   TWO THINGS THIS FILE DELIBERATELY DOES NOT DO
+
+   1. IT DOES NOT TOUCH `.note.acc`'s GROUND. A rule stripping the fill and
+      replacing it with a hairline was written here and taken out again:
+      §66.3 argues the opposite case at length and argues it on contrast —
+      a note with no ground is "two lines of orange text under four fact
+      rows, which reads as a fifth fact rather than as a thing set apart" —
+      and it moves the ground from `--brand-tint-2` to `--accent-tint`
+      precisely so the heading's `--accent-on-2` clears AA on it (4.68:1
+      against 4.40:1). Two layers pulling one declaration in opposite
+      directions is the exact failure §63's header is about. This one yields;
+      if that fill is to come off, it comes off in §66 where the reasoning
+      lives.
+
+   2. IT DOES NOT RULE BETWEEN THE FACTS. A first cut did, and it was wrong
+      twice. In principle: the facts are one list of one kind of thing —
+      price, length, shape — and ruling between them says they are three
+      separate blocks, which is the opposite of what a list is for. In fact:
+      `.plate-b.plate-lines` is `align-items:flex-start`, so each
+      `.plate-bi` is only as wide as its own text and the borders came out
+      as three ragged lines of three different lengths. §66.2 has since
+      given the enrolment card's rows `align-items:stretch` under
+      `:has(.plate-v)`, which is the shape a full-width rule would need — so
+      that is the hook if it is ever wanted, and it is that layer's.
+   ------------------------------------------------------------------------ */

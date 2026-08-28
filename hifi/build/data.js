@@ -407,10 +407,31 @@ const WEEKLY = {
    draw: you earned a specific shield, and a generic glyph of a shield is a
    picture of the category instead. `ic` stays as the fallback for the one
    achievement that is not an award — a promotion has no artwork to show. */
+/* `up` IS THE WHOLE OF IT NOW, AND `t` / `b` ARE THE BANNER THAT WENT.
+   These three were drawn as a green band across the page under the head — a
+   mark, a heading, a sentence, a View button and a dismiss. Maryam's call: none
+   of that is needed, and a one-line update in the page header is enough to tell
+   somebody what just happened. `achLine` (views.js) draws it, at the right-hand
+   end of the header row, in `--link`.
+
+   THE LAST WORD IS THE LINK, so every sentence here has to END on the thing it
+   is about — "rank!", "badge!", "E4!". `achLine` underlines it rather than the
+   whole line, which is 486:1084's own treatment and what stops a sentence of
+   blue text reading as a paragraph somebody made into a hyperlink. Write the
+   next one to that shape and it needs no code.
+
+   `t` AND `b` STAY, and are not dead weight: the Rewards page's own award list
+   is a different component that names the same three things, and this is where
+   the product's wording for each of them lives. A future surface that wants the
+   long form has it. `ic` is the fallback mark for the one achievement with no
+   artwork — a promotion is not an object you can photograph. */
 const ACH = {
-  week1:   {ic:'trophy',     art:'rank1',  t:'1-Star rank unlocked',       b:'Everyone who joins a cohort starts here. 250 points added.', go:'rewards'},
-  day90:   {ic:'certificate',art:'bronze', t:'Bronze badge earned',        b:'You passed 2,500 points. 200 points added.',                 go:'rewards'},
-  promoted:{ic:'trophy',                   t:'Promoted to Explorer &ndash; E4', b:'Priya signed your re-interview decision on November 21.', go:'level'}
+  week1:   {ic:'trophy',     art:'rank1',  t:'1-Star rank unlocked',       b:'Everyone who joins a cohort starts here. 250 points added.', go:'rewards',
+            up:'You have earned 1-star rank!'},
+  day90:   {ic:'certificate',art:'bronze', t:'Bronze badge earned',        b:'You passed 2,500 points. 200 points added.',                 go:'rewards',
+            up:'You have earned the Bronze badge!'},
+  promoted:{ic:'trophy',                   t:'Promoted to Explorer &ndash; E4', b:'Priya signed your re-interview decision on November 21.', go:'level',
+            up:'You have been promoted to E4!'}
 };
 
 const SPLIT = [0.44,0.19,0.26,0.11];

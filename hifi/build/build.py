@@ -379,7 +379,118 @@ css = '\n'.join((here / f).read_text() for f in
                  # from a later layer inside the same query; and the fact row's
                  # top margin is §56.1b's. Everything else is `.ph-you*` /
                  # `.ph-earned*`, names no earlier layer mentions.
-                 '62-rankhead.css'])
+                 '62-rankhead.css',
+                 # TYPOGRAPHY — THE AUTHORITY, AND IT HAS TO BE LAST FOREVER.
+                 # §11 was written to be this layer and lost, not by being
+                 # wrong but by being in the middle: `.app .foo` in §15 beats
+                 # `.app .foo` in §11 on order alone, so every later layer
+                 # that wanted a size simply took one. A computed sweep of
+                 # ten stages by 34 views found 26 rendered font sizes
+                 # against §11's nine, 160 distinct type signatures, five
+                 # weights in a face that ships two, 1283 elements set in
+                 # uppercase and two greys doing one job.
+                 # §63 states the scale as tokens, assigns every family in
+                 # both portals to one of eleven roles over eight sizes,
+                 # takes the case off all 66 uppercase rules across 18
+                 # layers, snaps weight to the two Söhne actually loads, and
+                 # brings SVG `<text>` inside — §11 neutralises HTML
+                 # elements by name and `text` is not one, which is why the
+                 # charts had 6px labels.
+                 # LAST, and unconditionally: it supersedes §01-§62 by
+                 # position exactly as §11 supersedes §01-§10, and three of
+                 # its rules have to be inside `@container app` per trap 3 —
+                 # §15's two uppercase heads and the h1's desktop step.
+                 # ANYTHING ADDED AFTER THIS POINT MUST NOT SET A FONT SIZE.
+                 # If a new layer needs one, it is either a role that belongs
+                 # in §63 or an exception that belongs in §63's §7 list.
+                 '63-typography.css',
+                 # THE OUTLINED BUTTON LOSES ITS BOX AND GAINS AN ARROW.
+                 # `.btn-s` / `.btn-t` / `.btn-g` — 88 of them — were drawn as
+                 # a rectangle, which on a product made of hairlines is one
+                 # more edge than the page has: "Read the full report" in a
+                 # drawn box inside a `.sec-h` that is already ruled off reads
+                 # as the box first and the words second. The border goes
+                 # transparent (not away — §02's 1px is in the contained
+                 # button's box model too, so `border:0` makes a `.btn-g` 2px
+                 # shorter than the `.btn-p` beside it) and an arrow goes on,
+                 # as a mask so it takes `currentColor` on white, on the black
+                 # card and under §19's accent alike.
+                 # AFTER §63 AND ALLOWED TO BE: it sets borders, padding and a
+                 # pseudo-element and states no font-size, no font-weight, no
+                 # text-transform and no colour, which are the four §63 owns.
+                 # It has to be this late because §02 states the outlined
+                 # colour and §10 re-points it to `--rule`, and both have a
+                 # hover pair — five rules across two layers, all answered
+                 # here.
+                 '64-quietbtn.css',
+                 # THE FOUND DISCLOSURE + THE FIGURE STRIP'S MARKS. Two small
+                 # dashboard components that arrived together.
+                 # "What the interview found" is the longest block on the two
+                 # dashboards that carry it and it is a re-read, so it starts
+                 # closed with the chevron on the LEFT of its heading — the
+                 # row already ends in "Read the full report", and two
+                 # controls at the same edge, one opening in place and one
+                 # navigating away, is the ambiguity worth avoiding. State is
+                 # `S.found` rather than a DOM class because this is a
+                 # dashboard and a dashboard re-renders under it (trap 9).
+                 # The strip's three figures get `.stat`'s chip — 28px, a 13%
+                 # wash, a 16px glyph — with the hues NAMED rather than
+                 # cycled, so chapters are blue here and blue in a `.stats`
+                 # grid.
+                 # After §63 and allowed to be, on the same test as §64: it
+                 # states layout, a rotation and two SVG fills, and none of
+                 # the four properties §63 owns.
+                 '65-founddisc.css',
+                 # THE CARD THAT SELLS SOMETHING IS DRAWN AS AN OFFER.
+                 # Maryam's read of 486:1084's enrolment card against ours,
+                 # which had the same four facts and none of the four things
+                 # the file does with them: a sentence under the title, the
+                 # price in the accent holding the row's right edge, a
+                 # hairline under every fact row, and the date the course
+                 # opens in a band of its own. The two dashboards that draw
+                 # `enrolPlate` — `assessed` at E3 and `promoted` at E4 —
+                 # are the two surfaces it lands on.
+                 # EVERY GATE IS A CONDITION IN THE MARKUP, never a call
+                 # site: a card with a `.plate-d` in it, a fact list with a
+                 # `.plate-v` in it, a note wearing `.acc`. So the six plates
+                 # that are appointments keep §56's card exactly as it was
+                 # and the next card that is an offer is drawn as one for
+                 # free. There is no `.plate-enrol`.
+                 # It also gives `.note.acc` its ground back, which is §46's
+                 # argument applied to the fourth variant §46 left out —
+                 # nothing drew one until now. The ground is `--accent-tint`
+                 # and not §02's `--brand-tint-2` for a measured reason; the
+                 # note in the layer has the two ratios.
+                 # AFTER §63 AND ALLOWED TO BE, on §64's and §65's test: it
+                 # states grounds, borders, padding, `order` and one SVG
+                 # fill. The two inks it needs are stated in §63 — the
+                 # description's grey beside `.plate-b`'s, and the price's
+                 # accent, which has to be conditional on the card being
+                 # quiet because #b94a09 on #111 is 1.6:1.
+                 '66-enrolcard.css',
+                 # TEMPORARY — the red accent trial, on `day34/dashboard` and
+                 # `promoted/dashboard` only. Delete this entry, the layer,
+                 # `tmpaccent.js` and its entry below, and `'tmp'` in
+                 # `build-ds.py`'s EXCLUDE_PREFIXES, and it is gone.
+                 # LAST, and it has to be: it re-points accent tokens inside
+                 # one scope class, so it must land after every layer that
+                 # states one. It modifies no component and no existing
+                 # token. Allowed after §63 on §64's and §65's test — it
+                 # declares no size, weight, transform or text colour, only
+                 # custom properties.
+                 '67-tmpaccent.css',
+                 # THE PLATE'S PERSON COMES FIRST. `.plate-who` was ordered
+                 # under `.plate-b`, so the weekly-call card read title ->
+                 # time, others, length -> who is running it, which puts the
+                 # only person on the card below three lines of logistics.
+                 # The two swap. LAST because the order is stated in three
+                 # container-query tiers (§15 twice, §56 once) and per trap 3
+                 # each can only be answered from inside its own query at its
+                 # own specificity — §56's is 0,5,0.
+                 # It deliberately does NOT touch `.note.acc`'s ground; §66.3
+                 # argues that on contrast and owns it. Sets no font-size,
+                 # weight, case or colour — §63 still owns all four.
+                 '68-platestack.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -826,7 +937,14 @@ js = award_js + '\n\n' + call_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here
                                                         # looks for, which is only reachable once a Join has
                                                         # been pressed. It reads `COHORT`, `CH`, `AV`, `cfg`
                                                         # and `who` from views.js and data.js.
-                                                        'ai10.js'])
+                                                        'ai10.js',
+                                                        # TEMPORARY — the red accent trial's page list.
+                                                        # Delete with §67; that layer's head has the
+                                                        # full removal note. LAST so its wrapper is the
+                                                        # outermost one and the class is decided after
+                                                        # every other pass has finished with `.app`. It
+                                                        # reads only `S.stage`, `S.view` and `S.call`.
+                                                        'tmpaccent.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.

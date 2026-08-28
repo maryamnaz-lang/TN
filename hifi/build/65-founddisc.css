@@ -1,0 +1,184 @@
+/* ==========================================================================
+   §65  THE FOUND DISCLOSURE, AND THE FIGURE STRIP'S MARKS
+   ==========================================================================
+   Two small components that arrived together, both on the dashboard.
+
+   NOTHING HERE SETS TYPE. §63 owns font-size, font-weight, text-transform
+   and text colour; this file states layout, a chevron rotation and two SVG
+   fills. The heading inside the disclosure button keeps the `.sec-h h2`
+   role it already had — which is the point of wrapping the `<h2>` in the
+   button rather than replacing it with one.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE DISCLOSURE
+
+   `foundHead` (views.js) wraps the chevron and the `<h2>` in one button and
+   leaves "Read the full report" outside it as a sibling. The `.sec-h` is
+   already a flex row with the action pushed right, so the button becomes the
+   row's first child and the layout is unchanged when it is closed.
+
+   THE BUTTON HAS TO BE UNSTYLED, and that is more work than it sounds:
+   §02 gives every `<button>` in the frame a min-height, a padding and a
+   border, and this one is a heading. It is reset to nothing so the row sits
+   exactly where it did before the heading became pressable — a disclosure
+   that moves the thing it is disclosing by 8px when you add it is a
+   regression you cannot see until you diff two screenshots.
+   ------------------------------------------------------------------------ */
+/* ---------------------------------------------------------------- 1a ---
+   THE WRAPPER PUT THE SECTION BACK IN THE LABEL COLUMN — TRAP 13, EXACTLY
+   AS IT IS WRITTEN DOWN
+
+   §10.15's opt-out is keyed on WHAT A SECTION CONTAINS, and half the list is
+   keyed on a DIRECT child. This section's opt-out was §16's
+   `.sec:has(> .all-desc)` — its one-sentence intro, a direct child. Putting
+   the panel's contents inside `.found-b` moved that sentence one level down,
+   `> .all-desc` stopped matching, and the section fell back into the 184px
+   label column at desktop with a 200px button inside it: the heading set on
+   four lines at 57px wide and "Read the full report" hanging 172px past the
+   section's own right edge.
+
+   CLAUDE.md's trap 13 says this in one line — "introduce a wrapper and its
+   heading collides with its own content" — and it is worth reading twice,
+   because nothing warns: the markup is valid, the section renders, it just
+   renders as a different component.
+
+   Restated on `.found` so the opt-out survives the wrapper, and INSIDE the
+   same query per trap 3, since §10's grid is declared there and an
+   unconditional rule cannot reach it. `.found` rather than `:has(.found-b)`
+   because the section already carries the class and a state hook is a
+   steadier thing to key on than a descendant.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .page .sec.found{
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page .sec.found > .sec-h{
+    border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
+  .app .page .sec.found > :not(.sec-h){padding-left:0;padding-right:0}
+  /* and the heading is a TITLE again, not a spine. §8b of §63 puts a headed
+     section's `h2` on the label role at this width because at 184px it is a
+     column label; this section has no column, so it keeps the h4 it has at
+     every other width. */
+  .app .page .sec.found > .sec-h h2{
+    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+    letter-spacing:var(--t-h4-ls)}
+}
+
+/* `.found-t` TAKES THE `<h2>`'S PLACE IN THE ROW, and this is the whole of
+   the layout. §24.13 is the contract:
+
+     .app .page .sec-h > h2 { flex:1 1 auto; min-width:0 }
+     .app .page .sec-h > .btn { flex:none; margin-left:auto }
+
+   Both key on a DIRECT child. Wrapping the heading in a button made the
+   `<h2>` a grandchild, so it lost `flex:1 1 auto` and collapsed to its
+   shrink width — which is what set "What the re-interview found" on three
+   lines with the action button sitting in the gap. The button that now
+   occupies that slot has to carry the growth the heading used to. */
+.app .page .sec-h.found-h{align-items:center}
+.app .page .sec-h.found-h > .found-t{
+  display:flex;align-items:center;gap:var(--s03);
+  flex:1 1 auto;min-width:0;
+  min-height:0;padding:0;margin:0;border:0;background:none;
+  text-align:left;cursor:pointer}
+.app .found-t h2{margin:0}
+
+/* and the action goes to the far end of the row. §24's `margin-left:auto`
+   already says so; it is restated because with `.found-t` growing there is
+   no free space left for an auto margin to absorb, so the flex line's own
+   order is what puts the button last and it must not shrink. */
+.app .page .sec-h.found-h > .btn{flex:none;margin-left:auto}
+
+/* the chevron points right when closed and down when open — the same
+   rotation §04 gives the accordion, so the two disclosures in the product
+   move the same way. It is `chevRight` rather than `chevDown` because the
+   resting state here is CLOSED, and a mark should be drawn in the state it
+   is usually seen in. */
+.app .found-chev{
+  display:grid;place-items:center;flex:none;width:20px;height:20px;
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .found-chev svg{width:20px;height:20px;fill:var(--text-secondary)}
+.app .found.on .found-chev{transform:rotate(90deg)}
+
+/* the panel. `display:none` rather than a height animation: the block
+   contains a signature row with a photograph in it and an `.ai-body`, so its
+   height is not knowable without measuring, and a transition to `auto` is
+   the one thing CSS still cannot do honestly. */
+.app .found > .found-b{display:none}
+.app .found.on > .found-b{display:block}
+
+/* CLOSED, THE SECTION IS A HEADING AND NOTHING ELSE, so the padding that
+   held a 400px panel off the next block is now holding a single line off it.
+   §12 gives `.sec.tint` its ground and its padding; this takes the bottom
+   half back while the panel is shut, so a closed disclosure reads as one row
+   rather than as a row floating in a tinted box. */
+.app .sec.tint.found:not(.on){padding-bottom:var(--s05)}
+
+/* THE HEAD BUTTON LOSES ITS WHITE GROUND.
+   §55.2 fills it with `--layer-01` — the note there is that a bordered
+   button left at the panel's own colour was "the only thing in the block
+   still the panel's colour". That was true of a BORDERED button: the fill
+   and the outline together made it read as a control lifted off the panel.
+   §64 took the outline off, and a white fill with no edge is just a pale
+   rectangle floating in a grey band, which is what it looked like. With no
+   border there is nothing to lift, so the ground goes back to the panel's
+   and the arrow does the work. */
+.app .sec.tint.cards > .sec-h .btn,
+.app .sec.tint.cards > .sec-h .btn-g,
+.app .sec.tint.cards > .sec-h .btn-s,
+.app .sec.tint.cards > .sec-h .btn-t{background-color:transparent}
+
+/* NO BOTTOM RULE UNDER THIS SECTION.
+   §10.6 draws every `.sec`'s closing hairline as an `::after`, and §12
+   re-colours it for a tinted panel. On a tinted block the hairline is
+   redundant twice over: the panel's own ground already ends where the
+   section ends — a change of ground IS the boundary, which is the argument
+   §55.2 makes for the block above this one — and when the disclosure is
+   shut, the rule sits 12px under a single heading and reads as an underline
+   on it rather than as the end of a section. */
+.app .sec.found::after{display:none}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE FIGURE STRIP'S MARKS
+
+   `.prog-figs > span` is a flex COLUMN — figure over label — so the mark goes
+   in as the column's first child rather than in a grid area the way §29.17
+   places `.stat-ic`. Same chip though: 28px, a 13% wash of the cell's hue,
+   a 16px glyph at full strength.
+
+   The hues are NAMED here, not cycled. §29 cycles `--mk-1…4` over
+   `nth-child(4n+1…4)` because a `.stats` grid holds four cells of whatever
+   the page happens to put in it. This strip is three FIXED subjects —
+   chapters, tasks, minutes — so they are assigned by position to the first
+   three of the same four, which is what makes a chapter blue here and blue
+   in every `.stats` grid that opens with one.
+   ------------------------------------------------------------------------ */
+/* THE CELL IS TWO COLUMNS: mark, then figure over label. §04 makes
+   `.prog-figs > span` a flex COLUMN, which stacked the chip on top of the
+   figure — a shape nothing else in the product uses. `.stat` puts its chip
+   to the left of the text and every card follows it, so this does too. The
+   mark is `align-self:start` so it sits on the figure's cap-height rather
+   than centring itself against a two-line cell. */
+.app .prog-figs > span{
+  flex-direction:row;align-items:flex-start;gap:var(--s04)}
+.app .prog-fb{display:flex;flex-direction:column;min-width:0}
+.app .prog-ic{align-self:flex-start}
+.app .prog-ic{
+  display:grid;place-items:center;flex:none;
+  width:28px;height:28px;
+  background-color:color-mix(in srgb, var(--mk) 13%, var(--background))}
+.app .prog-ic svg{width:16px;height:16px;fill:var(--mk)}
+.app .prog-figs > span:nth-child(1){--mk:var(--mk-1)}
+.app .prog-figs > span:nth-child(2){--mk:var(--mk-2)}
+.app .prog-figs > span:nth-child(3){--mk:var(--mk-3)}
+
+/* IN THE WING THE CHIP TAKES THE WING'S GROUND, not the page's.
+   `color-mix(… , var(--background))` resolves against white, and the head
+   band's wing sits on `--layer-01` — so on that one surface the chip was a
+   slightly-wrong white square inside a tinted block. `--surface-mix` is the
+   ground to blend into and it is re-pointed rather than the rule restated,
+   so anything else that borrows the chip gets it right for free. */
+.app .prog-ic{
+  background-color:color-mix(in srgb, var(--mk) 13%, var(--surface-mix, var(--background)))}
+.app .wing-prog{--surface-mix:var(--layer-01)}
+.app .sec.tint .prog-figs > span{--surface-mix:var(--layer-01)}

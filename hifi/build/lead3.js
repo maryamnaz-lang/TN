@@ -105,7 +105,13 @@ const ldrEvFor = name => LEAD_EVALS.filter(e => e.name === name)[0];
    same labels as `ladder()` in views.js and the accordion on the interviews
    page ("Fifteen levels in one line"). Anything away from my proposal still
    costs a reason, and now that includes a band. */
-const LDR_RUNGS = ['E','B','T'].flatMap(b => [1,2,3,4,5].map(n => b + n));
+/* AND IT IS `LVL_CODES` (views.js) UNDER ANOTHER NAME, not a second generator.
+   The same fifteen strings were written out here and there, which is one edit
+   away from a picker that offers a level the ladder does not draw. views.js
+   parses first, so that is where the list lives; this keeps its own name because
+   `LDR_RUNGS` is what the leader's picker and `ldrRungView` are written against,
+   and because two `const` of the same name in one script would not parse. */
+const LDR_RUNGS = LVL_CODES;
 
 S.ldrEv = null;
 S.ldrSum = null;

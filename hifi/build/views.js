@@ -22,8 +22,13 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    so the stage picker and `portal` are deliberately independent: switching
    stage returns you to the candidate (see setStage), and switching portal
    leaves the stage untouched so you come back to where you were. */
-const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], hideAch:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
+  /* "What the interview found" starts CLOSED. It is the longest block on the
+     two dashboards that carry it and it is a re-read — see the note over
+     `foundHead`. One flag, not one per stage: the two dashboards never appear
+     together, so a second key would only ever hold the first one's value. */
+  found:false,
   /* the three scenes kept from each interview. `null` means "not chosen yet",
      which is what puts the chooser on the Interviews module — see the note
      over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
@@ -749,58 +754,41 @@ const brandOf = n => { n=(n||'').replace(/\D/g,'');
 
 /* what to celebrate at the top of the dashboard, dismissible */
 ;
-/* THE MARK IS THE AWARD, AND VIEW IS A BUTTON.
-   Two things were wrong with the first drawing of this band, and they were
-   the same mistake twice: the one moment on the dashboard that exists to
-   say "you won something" was drawn out of the parts a list row is made of.
-
-   The mark took `.ach-ic`, the 40px glyph chip every list row leads with,
-   so a Bronze shield you can see on the rewards page arrived here as a
-   line drawing in a box. It takes the artwork instead — see the note on
-   ACH — and drops the box with it, because a photograph of an object does
-   not need a frame drawn around it.
-
-   And "View" was a `<button>` sitting inside `.ach-b`, the TEXT slot, where
-   §02's trailing-icon rule sized it 20x20 as though it were a chevron. It
-   reads as underlined text at the foot of a sentence: the same shape as the
-   two links either side of it on the page and none of the weight of the one
-   thing this band is asking you to do. It comes out of the text slot and
-   becomes a real control at the end of the row, next to the dismiss. */
 /* ==========================================================================
-   A RANK IS NOT A BANNER — Figma 486:1084, §62
+   A CELEBRATION IS ONE LINE IN THE HEADER — Figma 486:1084, §62
 
-   Maryam's cut, and the reason is what the two things ARE. `ACH` holds three
-   celebrations and they are not the same kind of event:
+   Maryam's cut, in two passes, and the second one settled it. `ACH` holds three
+   celebrations — a rank, a badge and a promotion — and all three were drawn as a
+   green band across the page under the head: a mark, a heading, a sentence, a
+   View button and a dismiss. THE BAND IS GONE FOR ALL THREE. What replaces it is
+   one line at the right-hand end of the page header, in `--link` with its last
+   word underlined, and that is enough — telling somebody what just happened does
+   not need a slab, a second heading and a control to make it go away.
 
-     week1     `rank1`   your rank went up. It is a property of YOU, and it is
-                         still true tomorrow and next month.
-     day90     `bronze`  a badge was earned. A thing you now own, one of four.
-     promoted            the level moved. A decision somebody signed.
+   THE FIRST PASS ONLY MOVED THE RANK, on the argument that a rank is a property
+   of you while a badge and a promotion are news you dismiss. The distinction is
+   real and it did not survive contact: a promotion is not news you want to close
+   either, and two announcement shapes on one dashboard — a blue line at the top
+   for one kind and a green slab lower down for another — is the product saying
+   the same thing in two registers. One shape, three sentences.
 
-   The banner is right for the last two: they are news, they have a date, and
-   dismissing one is the reader saying "read it". A rank is not news you dismiss
-   — it is what you now are. Drawn as a green slab across the page under the
-   head it announced a permanent fact as an interruption, and then let you close
-   it, after which nothing on the dashboard said what rank you hold at all.
-
-   So the rank moves INTO the header row, in two halves, and the file draws both
-   on one line:
+   SO THE HEADER ROW CARRIES BOTH HALVES, and they still have different
+   lifetimes:
 
      the mark   your own face at 75px with the rank medal on its corner, left of
-                the `<h1>`. It is not an announcement, so it is not conditional
-                on the achievement — it is there on every stage that HAS a rank
-                (`GAME`, which is the four enrolled and complete stages), and it
-                changes when the rank does.
-     the line   "You have earned 1-star rank!" at the right-hand end of the same
-                row, in `--link` with the last word underlined, linking to
-                Rewards. THIS is the announcement, and it is conditional: it
-                appears where the banner would have.
+                the `<h1>`. NOT an announcement — it is on every dashboard, and
+                the medal is there on every stage that HAS a rank (`GAME`, the
+                four enrolled and complete stages). It changes when the rank does.
+     the line   `achLine`, at the right-hand end of the same row. THIS is the
+                announcement, and it is conditional: it appears exactly where the
+                banner would have, on the three stages `ACH` names.
 
-   `achBanner` therefore skips a rank and is otherwise untouched — the badge and
-   the promotion still get the green band, still dismissible. If a second rank
-   is ever added to `ACH` it needs no work here; the test is the artwork's name.
+   AND NOTHING IS DISMISSIBLE ANY MORE. `S.hideAch` and the `data-hideach`
+   handler went with the band — a one-line update in a header is not something a
+   reader needs to clear, and a control for it would have been the largest thing
+   in the row. `.ach*` still ships in the design system, unreferenced by `hifi/`,
+   the same disposition §27 records for `.tal-panel` and §56 for `.stp-pop`.
    ========================================================================== */
-const isRankAch = a => !!a && /^rank\d$/.test(a.art || '');
 
 /* THE MEDAL IS A SIBLING OF THE AVATAR, NOT A CHILD, and that is the one thing
    about this markup that is not free choice: §09 gives `.av-ph` `overflow:hidden`
@@ -830,19 +818,35 @@ function youMark(){
    alignment, because the left half of this row is 75px tall rather than two
    lines of type.
 
-   IT IS A LINK, NOT A BUTTON, and the underline is on the last word only —
-   both are the file's. §12 makes every link `--link` (#0371a4, its own note
-   explains the darkening off the file's #0488C5), so the colour is the token
-   rather than the hex. The whole phrase is the target; the underline marks
-   where it goes. */
-function rankEarned(){
+   IT IS A LINK, NOT A BUTTON, and the underline is on the LAST WORD only — both
+   are the file's. §12 makes every link `--link` (#0371a4, its own note explains
+   the darkening off the file's #0488C5), so the colour is the token rather than
+   the hex. The whole phrase is the target; the underline marks where it goes,
+   and underlining the sentence instead would make a one-line update read as a
+   paragraph somebody turned into a hyperlink.
+
+   THE SPLIT IS ON THE LAST SPACE AND THE COPY IS WRITTEN TO IT. Every `up`
+   string in `ACH` ends on the thing it is about — "rank!", "badge!", "E4!" — so
+   one `lastIndexOf` does for all three and a fourth needs no code, only a
+   sentence of the same shape. The note over `ACH` says so where the strings are.
+
+   THE MARK IS THE AWARD WHERE THERE IS ONE. `art` is the client's own artwork
+   and it is preferred for the reason `ACH`'s note gives: you earned a specific
+   shield, and a generic glyph of a shield is a picture of the category. The
+   promotion has no artwork — it is a decision, not an object — so it falls back
+   to `ic`, and §62 sizes that glyph to the line's own ink rather than to the
+   28px box the artwork gets. */
+function achLine(){
   const a = ACH[S.stage];
-  if(!isRankAch(a) || S.hideAch.includes(S.stage)) return '';
-  const r = RANKS[+a.art.slice(4) - 1];
-  if(!r) return '';
+  if(!a || !a.up) return '';
+  const cut = a.up.lastIndexOf(' ');
+  const head = cut > -1 ? a.up.slice(0, cut) : '';
+  const tail = cut > -1 ? a.up.slice(cut + 1) : a.up;
   return `<a class="ph-earned" data-go="${a.go}">
-    <span class="ph-earned-mk"><img src="${AWARD[a.art]}" alt=""></span>
-    <span>You have earned ${r.n.toLowerCase()} <span class="ph-earned-u">rank!</span></span></a>`;
+    <span class="ph-earned-mk">${a.art
+      ? `<img src="${AWARD[a.art]}" alt="">`
+      : I[a.ic]}</span>
+    <span>${head} <span class="ph-earned-u">${tail}</span></span></a>`;
 }
 
 /* ONE WRAPPER FOR THE SIX DASHBOARDS rather than five extra arguments at six
@@ -850,20 +854,90 @@ function rankEarned(){
    this is the only header with a face in it, because it is the only page whose
    subject is the reader. */
 const dashPh = (title, sub) =>
-  ph(title, sub, rankEarned(), null, youMark());
+  ph(title, sub, achLine(), null, youMark());
 
-function achBanner(){
-  const a = ACH[S.stage];
-  if(!a || S.hideAch.includes(S.stage)) return '';
-  /* the header row says it — see `rankEarned` above */
-  if(isRankAch(a)) return '';
-  return `<div class="ach">
-    ${a.art
-      ? `<span class="ach-art"><img src="${AWARD[a.art]}" alt=""></span>`
-      : `<span class="ach-ic">${I[a.ic]}</span>`}
-    <span class="ach-b"><span class="ach-t">${a.t}</span><span class="ach-d">${a.b}</span></span>
-    <button class="btn btn-p btn-sm noic ach-go" data-go="${a.go}">View</button>
-    <button class="ach-x" data-hideach="1" aria-label="Dismiss">${I.close}</button>
+/* ==========================================================================
+   "WHAT THE INTERVIEW FOUND" IS A DISCLOSURE, CLOSED TO START
+   ==========================================================================
+   The block is the whole of Priya's write-up — strengths, growth areas, her
+   note, and a signature row with a face in it. On the two dashboards that
+   carry it that is the longest thing on the page, and it is a RE-READ: you
+   have seen it once when the report was signed, and after that it sits
+   between you and everything the dashboard is actually for.
+
+   So it starts closed and the heading opens it. Three decisions in here:
+
+   1. THE CHEVRON IS ON THE LEFT OF THE HEADING, not on the right of the row.
+      A chevron at the far right of a `.sec-h` is 700px from the words it
+      belongs to at desktop, and the row already ends in "Read the full
+      report" — two controls at the same edge, one of which opens in place
+      and one of which navigates away. On the left it reads as part of the
+      heading, which is what it is.
+
+   2. THE STATE IS IN `S`, NOT ON THE ELEMENT. The accordion at `.acc-h`
+      toggles a class in the DOM and gets away with it because nothing
+      re-renders those pages. This block is on a DASHBOARD, where Tal
+      answering a question or the stage picker moving both re-render in
+      place — and per trap 9 `render()` replaces `device.innerHTML`, so a
+      DOM class would take the panel shut again mid-read. `S.found` survives.
+      Re-rendering is cheap here: entrance animations gate on `data-open`,
+      a one-render marker (trap 5), and `typeSummary` keys on the summary's
+      text, so neither replays.
+
+   3. "READ THE FULL REPORT" STAYS OUTSIDE THE PANEL. It is the way to the
+      whole document and it is useful whether or not the summary is open —
+      putting it inside would mean opening the short version to find the
+      link to the long one.
+   ========================================================================== */
+const foundHead = (title, act) => `<div class="sec-h found-h">
+    <button class="found-t" data-found="1" aria-expanded="${S.found?'true':'false'}">
+      <span class="found-chev">${I.chevRight}</span><h2>${title}</h2></button>
+    ${act||''}
+  </div>`;
+
+/* ==========================================================================
+   THE CERTIFICATE IS A CARD, AND THERE IS ONE OF IT
+   ==========================================================================
+   The promoted dashboard used to close on a lone `<button>` reading "Download
+   my certificate" in an otherwise empty `.btn-set` — a download with nothing
+   to say what was being downloaded, on the one page whose whole subject is
+   that the 90 days are finished. The certificate itself is the thing worth
+   showing; the download is one of its two actions.
+
+   The component already existed twice over: `V.transcript` draws exactly this
+   card for the candidate, and `V.leadCerts` draws it for the cohort leader
+   (`lead4.js`). So this is a THIRD copy of four lines of markup and two
+   buttons, which is how the three of them start to disagree — the leader's
+   says "Awarded … / Issued by …" and the candidate's says "Completed … /
+   Signed by …", and nothing but attention was keeping the difference
+   deliberate. One function, both candidate call sites.
+
+   The leader's stays where it is: `LDR_CERTS` is a list with a track and an
+   issuer per row and this takes neither, so folding them together would mean
+   a parameter for every line. Same component, same CSS, two callers with
+   different data — which is what `.cert` is.
+
+   TRAP 12 APPLIES: `.cert` is in `DARK_CARD`, so `placeDark` lifts whichever
+   page child contains it into the head band. On `promoted` that band already
+   holds the enrolment `.plate`, so this arrives as the SECOND dark card and
+   §56 spans it across both columns underneath — which is the behaviour that
+   is written down, not a surprise. Do not add a third.
+   ========================================================================== */
+function certCard(f){
+  return `<div class="sec">
+    <div class="cert">
+      <span class="cert-mark">${I.certificate}</span>
+      <div class="cert-b">
+        <div class="cert-eb">Certificate of completion</div>
+        <div class="n">Explorer Track &ndash; ${f.complete?'E3':'E2'}</div>
+        <div class="m">${f.complete?'Completed November 21, 2026 &middot; Cohort 41':'Completed May 4, 2026 &middot; Cohort 12'}</div>
+        <div class="m">Signed by ${f.complete?'Priya Nair':'Daniel Kerr'}</div>
+      </div>
+      <div class="cert-act">
+        <button class="btn btn-sm noic cert-btn" data-go="transcript">Download</button>
+        <button class="btn btn-sm noic cert-btn">Share link</button>
+      </div>
+    </div>
   </div>`;
 }
 
@@ -879,10 +953,31 @@ function progressStrip(f){
     </div>
     <div class="prog-seg">${CH.map((c,i)=>
       `<i class="${i<f.done?'done':(i===f.open?'now':'')}" title="Chapter ${i+1}"></i>`).join('')}</div>
+    ${''/* EACH FIGURE GETS ITS SUBJECT'S MARK, AND THE MARKS ARE THE `.stat`
+          CELL'S — a 28px tinted chip with a 16px glyph in `--mk`, the same
+          component §29.17 draws for the four-cell figure grid. Three cells
+          with nothing but numbers in them read as one block of digits; the
+          mark is what lets you find "how long have I spent" without reading
+          all three labels.
+
+          The icons are chosen to say the SUBJECT, not the state: `book` is
+          chapters, `checkFilled` is tasks and `time` is minutes. And the
+          hues are §29's first three in §29's order, so a chapter is blue
+          here and blue in every `.stats` grid on the other pages — the cycle
+          is positional there and named here, which is the only way the two
+          can agree when this strip has three cells and that grid has four.
+          §65 states them. */}
+    ${''/* THE MARK IS A COLUMN, NOT A ROW ABOVE THE FIGURE. `.stat` puts its
+          chip to the LEFT of the label and the figure and every other card in
+          the product follows it, so a mark stacked on top read as a different
+          component that happened to share a colour. That needs the figure and
+          its label wrapped — `.prog-fb` — because the cell is now two columns
+          and the label was a bare text node, which cannot be given a column
+          of its own. */}
     <div class="prog-figs">
-      <span><b>${f.done} of 13</b>chapters</span>
-      <span><b>${tasks}</b>week ${f.week} tasks</span>
-      <span><b>${hrs}</b>invested</span>
+      <span><i class="prog-ic">${I.book}</i><span class="prog-fb"><b>${f.done} of 13</b><span class="prog-lab">chapters</span></span></span>
+      <span><i class="prog-ic">${I.checkFilled}</i><span class="prog-fb"><b>${tasks}</b><span class="prog-lab">week ${f.week} tasks</span></span></span>
+      <span><i class="prog-ic">${I.time}</i><span class="prog-fb"><b>${hrs}</b><span class="prog-lab">invested</span></span></span>
     </div>
   </div>`;
 }
@@ -1391,9 +1486,33 @@ function trackBand(track){
   </div>
   <div class="ladder-lab">${T.map(n=>`<span${n===track?' class="on"':''}>${n}</span>`).join('')}</div>`;
 }
-function ladder(cur,confirmed){
+/* THE FIFTEEN LEVELS, THREE TRACKS OF FIVE, IN ONE LIST. `RUNG` (data.js) maps
+   only the five Explorer codes to positions, because that is all the candidate
+   portal ever needed to look up; the full ladder was written out a second time
+   in lead3.js as `LDR_RUNGS` for the leader's level picker. Two generators for
+   one list is one edit away from a ladder that disagrees with itself, so this is
+   the list and `LDR_RUNGS` is now an alias of it. It has to live HERE rather
+   than there because views.js parses first — the note in `build.py` on lead3's
+   position is the long version. */
+const LVL_CODES = ['E','B','T'].flatMap(b => [1,2,3,4,5].map(n => b + n));
+
+/* `codes` PUTS THE LEVEL'S NAME IN EVERY BLOCK, and it is opt-in rather than
+   always-on. The head band's ladder (§59, `.wing-lvl`) is on white with 40-odd
+   pixels per block and reads better named — "you are at E4" is the whole point
+   of the bar, and counting orange blocks to find that out is work the bar can
+   do for you. The BLACK level hero draws the same fifteen blocks in a different
+   place at a different size, and it has the level printed at 34px directly
+   above it, so a second set of fifteen labels there is the page saying it
+   twice. One component, two states, the caller decides.
+
+   `confirmed` WAS THE SECOND ARGUMENT AND WAS NEVER READ — three callers, none
+   of them passing it, and no branch in the body. Replaced rather than kept
+   beside the new one: a parameter that does nothing is a parameter the next
+   reader has to check the body for. */
+function ladder(cur,codes){
   const r = rungOf(cur);
-  return `<div class="ladder">${Array.from({length:15},(_,i)=>`<i class="${i<r-1?'done':(i===r-1?'on':'')}"></i>`).join('')}</div>
+  return `<div class="ladder">${LVL_CODES.map((c,i)=>
+    `<i class="${i<r-1?'done':(i===r-1?'on':'')}">${codes?`<b>${c}</b>`:''}</i>`).join('')}</div>
   <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
 }
 
@@ -1561,12 +1680,98 @@ function stepper(steps, title){
    and where this button goes.
 
    NO `data-when`. That attribute is the plate's live figure — the distance to an
-   APPOINTMENT — and enrolling has no clock. When the next cohort starts is Tal's
-   sentence on both stages, two inches to the left. */
+   APPOINTMENT — and enrolling has no clock. Which is not the same as having no
+   DATE: see the note over `ENROL_OPENS` below, which is where that changed.
+
+   --------------------------------------------------------------------------
+   AND IT IS AN OFFER NOW, NOT A LIST — Maryam's read against 486:1084's own
+   enrolment card, which this had four differences from. All four are the same
+   argument: the reader is being asked to spend $690, and a card that answers
+   "what is this and what does it cost" in one glance is what an offer looks
+   like.
+
+     1. A SENTENCE UNDER THE TITLE. `ENROL_DESC` — what the 90 days DO for you,
+        which is the one thing neither the fact rows nor Tal's sentence said.
+     2. THE PRICE IS THE ACCENT AND IT HOLDS THE ROW'S RIGHT EDGE. Written as
+        `Label <b>figure</b>`, which `splitPlateBody` (ai5) lifts into a
+        `.plate-v` — the note there is where the general rule is stated.
+     3. A RULE UNDER EVERY FACT ROW, so the four read as a spec rather than as
+        a paragraph broken into four (§66).
+     4. WHEN IT OPENS, IN A BAND OF ITS OWN — `ENROL_OPENS`.
+
+   THREE OF THE FOUR ARE MARKUP AND ONE IS A STYLESHEET, which is why nothing
+   here says `border` or `orange`: §66 draws the rules and the ground, §63 owns
+   the two inks, and this function's job is the words and their order. */
+/* WHEN THE COURSE OPENS IS THE CARD'S OWN FACT NOW, AND THAT REVERSES A
+   DECISION RECORDED DIRECTLY ABOVE. The old note argued that a countdown chip
+   over the price "read as a deadline on the offer" and handed the date to Tal,
+   two inches to the left. The chip is still wrong for the reason it gives — a
+   clock is for an appointment — but a start date is not a clock, and on a card
+   whose whole subject is a course that has not opened it is the fact the reader
+   reaches for second, after the price. As a band under the facts rather than a
+   chip in the corner it is dated without being urgent.
+
+   ONE PAIR PER LEVEL, IN ONE TABLE, so the two stages cannot drift — the same
+   argument the function itself makes for being one function. Every string is
+   the product's own, read off a surface that already states it: E3's pair is
+   `PAGESUM.enrol`'s "you start with the next cohort — within two weeks of
+   paying" and the line the `assessed` card used to carry; E4's is the
+   notification in `data.js` ("Explorer Track – E4 opens December 1", "Cohort 58
+   has 7 places left"). Nothing here is a new number.
+
+   AND TAL GAVE THE DATE UP RATHER THAN SAYING IT TWICE. `PAGESUM.dashboard.
+   promoted` used to close on "E4 opens December 1, and at this level you can
+   volunteer to lead a cohort" — with the band on the card that is one date
+   said twice inside one head band, which is the duplication `ai6.js`'s own
+   note is mostly written to prevent. The clause came off there; the sentence
+   keeps the consequence, which is the half only Tal can say. */
+/* AND BOTH HEADINGS ARE "<LEVEL> OPENS <WHEN>", WHICH IS A MEASURE AGAIN. The
+   heading is 13.5/600 in the note's 233px of inside width — 30 characters to the
+   line — and E3's first cut, "The next cohort starts within two weeks", ran to
+   39 and broke with "weeks" alone on the second line, beside a calendar mark
+   floated against the first. E4's fits on one at 22. So the pair is written to
+   one shape: the level, the verb, the date. 25 and 22, both one line, and the
+   two stages now read as the same band with a different date in it. The cohort
+   is what the second line is for. */
+const ENROL_OPENS = {
+  E3: ['E3 opens within two weeks', 'You keep the same cohort for all 90 days.'],
+  E4: ['E4 opens on December 1', 'Cohort 58 has 7 places left.']
+};
+/* WHAT THE 90 DAYS DO, AND IT IS THE ONE SLOT ON THIS CARD THAT IS NOT A
+   FIGURE. Both read forward to the re-interview, because that is what the
+   money buys that the four fact rows do not mention — and because it is the
+   only thing on either page that says why a course you have already done once
+   is worth doing again at the next level.
+
+   NEITHER ONE REPEATS THE ROWS OR TAL. The price, the chapter count, the
+   assessments and the cohort are the rows directly under it; the 90 days you
+   have just finished, your average and your growth chapters are Tal's, on the
+   other side of the band.
+
+   TWO LINES IS A MEASURE, NOT A STYLE, AND IT IS 68 CHARACTERS. The card is 265
+   wide in the band's column with §15's 24 of padding on each side, so the
+   sentence has 217px at 13.5/22 — measured at 34 characters to the line. The
+   first cut of both of these ran to 95 and 100 and came out THREE lines, which
+   is a paragraph rather than a standfirst and pushed the band 22px taller than
+   the column beside it. 67 and 66. A third line is the tell that a rewrite has
+   drifted; measure it rather than counting words. */
+const ENROL_DESC = {
+  E3: '90 days at your own level, then a re-interview that can move you up.',
+  E4: 'Harder chapters at E4, then a re-interview that can move you again.'
+};
 const enrolPlate = lvl => `<div class="sec">
       <div class="plate">
         <div class="plate-t">Enroll on Explorer &ndash; ${lvl}</div>
+        <div class="plate-d">${ENROL_DESC[lvl]}</div>
         <div class="plate-b">Course price <b>$690</b> &middot; 13 chapters, one a week &middot; 13 assessments, one per chapter &middot; A cohort of ten with a live leader</div>
+        ${''/* `.note acc` IS THE COMPONENT AND `.plate-n` IS THE SLOT — one
+              element wearing both, because a wrapper round it would be a div
+              whose only job is to be found by `placePlates`. The accent note is
+              the product's own tinted callout (§02 assigned it the brand tint
+              and §66 gives it its ground back); the second line is a `.sub` so
+              it takes the description grey rather than the body ink, which is
+              the two-tier shape the file draws. */}
+        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b><span class="sub">${ENROL_OPENS[lvl][1]}</span></div></div>
         <div class="plate-a">
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
         </div>
@@ -1649,37 +1854,42 @@ const progressWing = f => `<div class="stp stp-open stp-titled wing-prog">
   </div>`;
 
 /* THE LADDER WING IS `progressStrip`'S OWN SHAPE WITH THE LADDER AS ITS RAIL —
-   `.prog-top`, a rail, `.prog-figs` — so the three wings read as one component
-   in three states rather than as three blocks that happen to share one slot.
-   `ladder()` draws the fifteen levels and the three track names under them.
+   `.prog-top` and a rail — so the three wings read as one component in three
+   states rather than as three blocks that happen to share one slot. `ladder()`
+   draws the fifteen levels and the three track names under them.
 
-   THE FIGURES ARE FORWARD-LOOKING, and that is the point of them. Everything
-   about the 90 days just finished is on this page already: the fact row says
-   E4 and level 4 of 15, the achievement banner says the promotion, and "Cohort
-   41, in the end" states the chapters, the average, the points and the level
-   move as four cells. What no block on the page says is when the next course
-   opens and what re-qualifying at E4 involves, which is the one open question
-   a promoted candidate has. December 1 is `PAGESUM.promoted`'s own date and
-   the chapter count is `CH`'s — neither is a new number. */
+   AND IT HAS NO `.prog-figs`, WHICH IS WHERE IT DIFFERS FROM THE OTHER TWO.
+   Three cells sat under the bar for one build — "Dec 1 next cohort opens", "13
+   chapters at E4", "90 days then you re-interview" — on the reasoning that the
+   forward-looking figures were the one thing this page did not already say.
+   Maryam's call to take them out, and the page agrees with her: the enrolment
+   card in the band's second column IS the next course, stating the price, the
+   thirteen chapters and the cohort three inches to the right, so two of the
+   three cells were that card said again in smaller type. What is left is a
+   level, a position and the ladder that puts one in the other, which is the
+   whole of what the wing is for.
+
+   The wing is shorter than the other two states because of it. That is correct
+   rather than something to pad: `.sec-dark` stretches to the left column and the
+   band closes on whichever is taller, so nothing has to be filled to keep the
+   two columns level. */
 const ladderWing = f => `<div class="stp stp-open stp-titled wing-lvl">
     ${wingHead('Where you are on the ladder')}
     <div class="prog">
+      ${''/* THE TRACK AND THE LEVEL, NOT THE LEVEL ALONE. "E4" is a code, and a
+            code is only half the answer to "where am I": the ladder under it has
+            three tracks on it and the reader has to know which one the four
+            filled blocks are in. `f.track` is the same word the first block of
+            the row below is labelled with, so the headline and the bar name the
+            same thing. The en dash matches every other place the pair is set —
+            the fact row's "Explorer Track &ndash; E4" and `enrolPlate`'s title. */}
       <div class="prog-top">
-        <div><div class="prog-pct">${f.level}</div>
+        <div><div class="prog-pct">${f.track} &ndash; ${f.level}</div>
           <div class="prog-l">confirmed at your re-interview</div></div>
         <div class="prog-day"><div class="prog-dn">${rungOf(f.level)}<small> of 15</small></div>
           <div class="prog-l">on the ladder</div></div>
       </div>
-      ${ladder(f.level)}
-      <div class="prog-figs">
-        <span><b>Dec 1</b>next cohort opens</span>
-        <span><b>${CH.length}</b>chapters at E4</span>
-        ${''/* "then you re-interview" and not "to your next re-interview":
-              §10.16 sets these labels at 10.5px uppercase in a third of the
-              wing, and the longer wording ran to three lines while the two
-              beside it took one, which stretched the whole row to fit it. */}
-        <span><b>90 days</b>then you re-interview</span>
-      </div>
+      ${ladder(f.level, true)}
     </div>
   </div>`;
 
@@ -2296,15 +2506,17 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards">
-      <div class="sec-h"><h2>What the interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
-      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. Your strengths, your growth areas and the scenes you kept sit behind it.</p>
-      ${signedSummary(true)}
+    <div class="sec tint cards found${S.found?' on':''}">
+      ${foundHead('What the interview found',
+        '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
+      <div class="found-b">
+        <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. Your strengths, your growth areas and the scenes you kept sit behind it.</p>
+        ${signedSummary(true)}
+      </div>
     </div>`;
 
   else if(f.complete) body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
-    ${achBanner()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -2331,9 +2543,6 @@ V.dashboard = (f) => {
           `.btn-set` stays a section of its own rather than being absorbed —
           `placeLevelCards` (ai5) pulls a lone button row into the hero above it
           when there is one, and now there is not. */}
-    <div class="sec"><div class="btn-set">
-      <button class="btn btn-t" data-go="transcript">Download my certificate ${I.download}</button>
-    </div></div>
     ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE LEVEL UP.
           Both stages are the same moment — a level has just been confirmed
           and a course has not been started — so they were answering the same
@@ -2358,10 +2567,13 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards">
-      <div class="sec-h"><h2>What the re-interview found</h2><button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button></div>
-      <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the 90 days you had just finished.</p>
-      ${signedSummary(true, true)}
+    <div class="sec tint cards found${S.found?' on':''}">
+      ${foundHead('What the re-interview found',
+        '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
+      <div class="found-b">
+        <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the 90 days you had just finished.</p>
+        ${signedSummary(true, true)}
+      </div>
     </div>
     ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
           The weekly-minutes chart lived here — thirteen stacked bars of how
@@ -2371,7 +2583,19 @@ V.dashboard = (f) => {
           what it earned, and all four of those are one number each. The
           chart is still on Course Progress, which is where the week-by-week
           record belongs and which the heading links to. */}
-    <div class="sec tint">
+    ${''/* AND THESE TWO ARE ON THE CANVAS, WHILE THE WRITE-UP ABOVE KEEPS ITS
+          PANEL. Maryam's call, and the pair rule is what it turns on: three
+          filled sections running to the foot of the page read as panels all the
+          way down, so the tone has to say which one is different rather than
+          which three are the same.
+
+          THE WRITE-UP IS THE ONE THAT IS DIFFERENT. §45's test is whether a
+          block is READ or acted on, and Priya's re-interview summary is the only
+          thing down here you read — a closing figure strip and two offers with
+          buttons on them are not. `sec tint cards` stays on it; these two lose
+          `tint` and their cells go white by §10 rather than by §55's override,
+          which is the same swap `quizResults` made. */}
+    <div class="sec">
       <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
       <div class="stats">
         ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
@@ -2381,7 +2605,7 @@ V.dashboard = (f) => {
       </div>
       <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
     </div>
-    <div class="sec tint">
+    <div class="sec">
       <div class="sec-h"><h2>What changes at E4</h2></div>
       ${/* THE ACTION GOES TO THE END OF THE ROW IT BELONGS TO.
             Both of these were a heading, a line, and a button on a line of
@@ -2399,7 +2623,23 @@ V.dashboard = (f) => {
           <div class="sub">Your level and certificates become a shareable page. Nothing else on your profile is published.</div></div>
           <button class="btn btn-g btn-sm" data-go="account">Manage what is shown ${I.arrowRight}</button></div>
       </div>
-    </div>`;
+    </div>
+    ${''/* THE CERTIFICATE CLOSES THE PAGE, AND IT HAS TO OPT OUT OF THE BAND
+          TO DO IT. `.cert` is in `DARK_CARD`, so `placeDark` (ai5) lifts
+          whichever page child contains one into the head band — trap 12 —
+          and on this page the band already holds the enrolment plate, so it
+          arrived as a second black slab directly under the fold.
+
+          That is the wrong place for it. The band is what you are being
+          asked to do next, and this level's enrolment is that; the
+          certificate is what you have already finished, which is where a
+          page ends rather than where it starts. `.keep-place` is the opt-out
+          and `placeDark` reads it — one class, so any other card that wants
+          to stay where it was written can say so the same way.
+
+          It is still the same `certCard` as `V.transcript`'s, so the two
+          cannot disagree about what the certificate says. */}
+    <div class="keep-place">${certCard(f)}</div>`;
 
   else { /* enrolled: week1, day34, day90 */
     const g = GAME[S.stage];
@@ -2431,7 +2671,6 @@ V.dashboard = (f) => {
           dashboards, which was invisible while the greeting inside Tal's
           summary was drawing the title. Same words as the other seven now. */}
     ${dashPh('Welcome back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
-    ${achBanner()}
     ${reBook}
     <div class="sec">
       <div class="ai-aura tile tight">
@@ -3271,7 +3510,19 @@ V.payment = (f) => `<main class="main"><div class="page">
   ${''/* The last clause was a sentence spliced onto a `&middot;` row, and Tal
         below said it as one — "your cohort is assigned as soon as it clears".
         A spine states, it does not promise. */}
-  ${ph('Payment','Explorer Track &ndash; E3 &middot; 90 days &middot; 13 chapters')}
+  ${''/* NO FACT ROW — THE DASHBOARD OWNS THESE THREE. Maryam's rule: the `·`
+        row under the dashboard's greeting ("Explorer Track – E4 · Level 4 of 15
+        · Cohort 41 closed") is the HOME page's, and no other page reprints it.
+        This one opened on "Explorer Track – E3" and named the 90 days and the
+        thirteen chapters — the track and the level said again on a page about
+        paying for a course, and the two counts said a third time by the `.stats`
+        strip forty pixels below.
+
+        The rule over `ph()` is unchanged and this is inside it, not an exception
+        to it: a page with no spine of its own passes `title` alone, and once the
+        borrowed facts come off this page has none left that the block under the
+        heading does not already carry. Tal's summary is the opening line. */}
+  ${ph('Payment')}
   <div class="sec">
     <div class="f"><label for="cn">Card number</label><input class="inp" id="cn" inputmode="numeric" placeholder="1234 5678 9012 3456"></div>
     <div class="f"><label for="cnm">Name on card</label><input class="inp" id="cnm" placeholder="Maryam Naz"></div>
@@ -3483,7 +3734,14 @@ V.transcript = (f) => {
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Course Progress')}
-  ${ph('Course Progress', (f.complete||f.finished)?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; 90 days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; day ${f.day} of 90`)}
+  ${''/* NO FACT ROW HERE EITHER — see the note over `V.payment`'s header. This
+        was the closest reprint of the dashboard's own three: "Explorer Track –
+        E3 · Cohort 41 · day 34 of 90" against the dashboard's "Explorer Track –
+        E3 · Cohort 41 · week 5 of 13", the same two facts and the same clock in
+        a different unit. The day, the week and the percentage are what the
+        progress strip on this page draws, at the size a figure should be read
+        at, and Tal's summary opens on where you stand. */}
+  ${ph('Course Progress')}
   <div class="sec">
     <div class="stats">
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
@@ -3540,21 +3798,7 @@ V.transcript = (f) => {
     <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
     <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
   </div>
-  ${f.done>0?`<div class="sec">
-    <div class="cert">
-      <span class="cert-mark">${I.certificate}</span>
-      <div class="cert-b">
-        <div class="cert-eb">Certificate of completion</div>
-        <div class="n">Explorer Track &ndash; ${f.complete?'E3':'E2'}</div>
-        <div class="m">${f.complete?'Completed November 21, 2026 · Cohort 41':'Completed May 4, 2026 · Cohort 12'}</div>
-        <div class="m">Signed by ${f.complete?'Priya Nair':'Daniel Kerr'}</div>
-      </div>
-      <div class="cert-act">
-        <button class="btn btn-sm noic cert-btn">Download</button>
-        <button class="btn btn-sm noic cert-btn">Share link</button>
-      </div>
-    </div>
-  </div>`:''}
+  ${f.done>0?certCard(f):''}
 </div></main>`;
 };
 
@@ -3935,7 +4179,16 @@ ${S.delAsk?`<div class="modal" data-del="0">
     <div class="sheet-h"><h2>Delete your account?</h2><button class="x" data-del="0" aria-label="Close">${I.close}</button></div>
     <div class="sheet-b">
       <div class="note err"><span>${I.warning}</span><div class="nb"><b>This cannot be undone</b>Your profile, your notes and every interview recording are deleted. Your certificates stay valid and downloadable from the link in your email.</div></div>
-      <div class="f mt5"><label for="delc">Type DELETE to confirm</label><input class="inp" id="delc" placeholder="DELETE" autocomplete="off"></div>
+      ${/* THE CONFIRM WORD IS SENTENCE CASE AND THE CHECK ALREADY ALLOWED IT.
+            This was the one string in the build that was typed in capitals
+            and rendered — §63 takes case off everything else, but no
+            stylesheet can un-shout a word that was written shouting. It is
+            safe to change because `ai3.js` tests
+            `v.trim().toUpperCase() === 'DELETE'`, so the field has always
+            accepted any casing; only the instruction was in capitals, and a
+            capitalised instruction beside a lowercase-accepting field was
+            telling the reader to do something the form did not require. */''}
+      <div class="f mt5"><label for="delc">Type Delete to confirm</label><input class="inp" id="delc" placeholder="Delete" autocomplete="off"></div>
     </div>
     <div class="sheet-f">
       <button class="btn btn-s noic" data-del="0">Keep my account</button>
@@ -5023,9 +5276,6 @@ device.addEventListener('click', e => {
   if(dc){ const i=+dc.dataset.delcard; const wasDef=S.cards[i].def;
     S.cards.splice(i,1); if(wasDef && S.cards[0]) S.cards[0].def=true; render(); return; }
 
-  const ha = t.closest('[data-hideach]');
-  if(ha){ if(!S.hideAch.includes(S.stage)) S.hideAch.push(S.stage); render(); return; }
-
   const ra = t.closest('[data-readall]');
   if(ra){ notifList().forEach(n=>{ if(!S.read.includes(n.t)) S.read.push(n.t); }); render(); return; }
 
@@ -5106,6 +5356,29 @@ device.addEventListener('click', e => {
     return;
   }
 
+  /* THE DISCLOSURE TOGGLES IN PLACE AND RECORDS ITSELF IN `S`, and it needs
+     both halves.
+
+     The first version called `render()`, on the reasoning in the note over
+     `foundHead` — the block is on a dashboard, dashboards re-render, and a
+     DOM class would not survive that. All true, and it made the control
+     unusable: `render()` replaces `device.innerHTML`, which resets the
+     scroller to the top, so opening a section 1200px down the page threw you
+     back to the header — and closing it threw you back again. A disclosure
+     that moves the page is worse than one that forgets.
+
+     So the class goes on the element for THIS interaction, and `S.found`
+     records it for the NEXT render. Nothing re-renders on the click, the
+     scroll position is never touched, and a later re-render still comes back
+     open because the views read `S.found`. */
+  const fd = t.closest('[data-found]');
+  if(fd){
+    S.found = !S.found;
+    const sec = fd.closest('.found');
+    if(sec) sec.classList.toggle('on', S.found);
+    fd.setAttribute('aria-expanded', S.found ? 'true' : 'false');
+    return;
+  }
   const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
   const sl = t.closest('.slot');        if(sl && !sl.disabled){ device.querySelectorAll('.slot').forEach(x=>x.classList.remove('on')); sl.classList.add('on'); return; }
   const dy = t.closest('.day');         if(dy){ device.querySelectorAll('.day').forEach(x=>x.classList.remove('on')); dy.classList.add('on'); return; }

@@ -1,0 +1,118 @@
+/* ==========================================================================
+   §64  THE OUTLINED BUTTON LOSES ITS BOX AND GAINS AN ARROW
+   ==========================================================================
+
+   Three variants were outlined — `.btn-s`, `.btn-t` and `.btn-g`, 88 of them
+   across the two portals — and the box was doing the whole job of saying
+   "this is pressable". On a product made of hairlines that is one edge too
+   many: a `.sec-h` with "Read the full report" in a drawn rectangle put a
+   second rule inside a section that is already ruled off, and the eye reads
+   the rectangle before it reads the words.
+
+   So the border comes off and an ARROW goes on. The arrow is the better
+   signal anyway — a box says "this is a control", an arrow says "this goes
+   somewhere", which is what all 88 of these actually do.
+
+   FOUR THINGS THAT ARE NOT OBVIOUS.
+
+   1. THE BORDER IS SET TRANSPARENT, NOT REMOVED. `.btn` declares
+      `border:1px solid transparent` and every variant only re-points the
+      colour, so the 1px is in the box model of the contained button too.
+      Take the border off `.btn-g` with `border:0` and it becomes 2px shorter
+      than the `.btn-p` beside it in the same `.btn-row` — which is exactly
+      the misalignment §02's transparent border was written to prevent.
+      `border-color:transparent` keeps the geometry and drops the line.
+
+   2. THE ARROW IS A MASK, NOT A CHARACTER AND NOT AN `<svg>`. It has to take
+      `currentColor`, because these buttons are `--text-primary` on a page,
+      `--on-dark` inside `.sec.on-dark`, and `--accent-text` where §19 tints
+      them. A `content:'→'` glyph would come from the stand-in face (Söhne's
+      trial file carries 68 glyphs and an arrow is not one of them — §11's
+      note), and an inline `<svg>` would mean editing 88 call sites in the
+      views and would still not reach a hand-authored page. A mask-image with
+      `background:currentColor` follows the ink for free, everywhere.
+
+   3. IT ONLY APPEARS WHERE THERE IS NO ICON ALREADY, and the test is
+      `:not(:has(svg))` rather than `.noic`. `.noic` looks like the right
+      hook and is not: it means "do not push the icon to the far edge", and
+      57 of these buttons are written `.noic` WITH an icon in the label —
+      `${I.download} Download as PDF`, `Send it again ${I.restart}`. Keying
+      on `.noic` puts an arrow on all 57 next to the icon they already have.
+      `:has()` asks the question that actually matters.
+
+   4. THE GAP IS THE BUTTON'S OWN. `.btn` is a flex row with `gap:var(--s03)`,
+      so the pseudo-element is a flex child and spaces itself. Nothing here
+      sets a margin.
+
+   NOTHING IN THIS LAYER SETS TYPE. §63 owns font-size, font-weight,
+   text-transform and colour, and this file states none of the four — the
+   arrow takes its ink from `currentColor`, which is §63's value arriving
+   through inheritance rather than a second opinion about it.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE BOX COMES OFF
+
+   §02 sets the outlined colour, §10 re-points it to `--rule`, and both have
+   a hover pair. All four are answered, plus the on-dark variant — a white
+   hairline on the black card is the same extra edge, and the card already
+   has one.
+   ------------------------------------------------------------------------ */
+.app .btn-s,.app .btn-t,.app .btn-g,
+.app .btn-s:hover,.app .btn-t:hover,.app .btn-g:hover,
+.app .on-dark .btn-s,.app .sec.on-dark .btn-s,
+.app .on-dark .btn-s:hover{
+  border-color:transparent}
+
+/* the wash is what a press has to land on now that there is no edge to
+   darken, so it stays — and on the black card it stays too */
+.app .btn-s:hover,.app .btn-t:hover,.app .btn-g:hover{
+  background:var(--overlay-hover)}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE ARROW
+
+   `I.arrowRight` from `icons.js`, verbatim — the same path the product draws
+   when it writes the icon inline, so a button that gained its arrow here and
+   one that always carried it are the same mark. Material filled, per trap 7.
+   20px to match `.btn svg`, 18px inside `.btn-sm` to match `.btn-sm svg`.
+   ------------------------------------------------------------------------ */
+.app :is(.btn-s,.btn-t,.btn-g):not(:has(svg))::after{
+  content:'';flex:none;width:20px;height:20px;
+  background:currentColor;
+  -webkit-mask:var(--btn-arrow) center/contain no-repeat;
+          mask:var(--btn-arrow) center/contain no-repeat}
+.app :is(.btn-s,.btn-t,.btn-g).btn-sm:not(:has(svg))::after{
+  width:18px;height:18px}
+
+:root{
+  --btn-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'/%3E%3C/svg%3E")}
+
+/* ------------------------------------------------------------------ 3 ---
+   THE LABEL AND THE ARROW ARE ONE OBJECT
+
+   `.btn:not(.noic)` is `justify-content:space-between`, which was written for
+   a bordered button: inside a box, pushing the icon to the far edge reads as
+   the box being filled. With the box gone the same rule strands the arrow
+   half an inch from its own words, and on a `.btn-full` it strands it across
+   the whole column.
+
+   So a borderless button that gained an arrow packs to the start, and the
+   right-hand padding comes down to match the left — the asymmetric padding
+   §02 gives an icon button was there to sit the icon off the edge, and there
+   is no edge. `.noic` buttons already centre and are left alone.
+   ------------------------------------------------------------------------ */
+.app :is(.btn-s,.btn-t,.btn-g):not(.noic):not(:has(svg)){
+  justify-content:flex-start;padding-right:var(--s05)}
+
+/* A BUTTON THAT IS A LINE IN A SECTION HEAD SITS FLUSH WITH ITS COLUMN.
+   `.sec-h` puts the button on the heading's own line, where §02's 24px of
+   left padding used to be the gap between the label and the border it sat
+   in. With no border it is 24px of white between the words and the edge of
+   the column, which reads as the button having drifted. Only the padding on
+   the side that meets the column edge is removed. */
+.app .sec-h .btn-s,.app .sec-h .btn-t,.app .sec-h .btn-g{
+  padding-right:0}
+.app .sec-h .btn-s:not(:has(svg)),.app .sec-h .btn-t:not(:has(svg)),
+.app .sec-h .btn-g:not(:has(svg)){
+  padding-right:0}

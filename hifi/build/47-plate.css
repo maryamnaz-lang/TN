@@ -29,7 +29,38 @@
 
    LAST, and it only has to be after §15. Nothing between them names `.plate-h`
    or `.plate-b`.
-   ========================================================================== */
 
-.app .plate:not(:has(.plate-who)) > .plate-h,
-.app .plate:not(:has(.plate-who)) > .plate-b{align-self:start}
+   --------------------------------------------------------------------------
+   AND THE RULE IS GONE, BECAUSE `align-self` CHANGED AXIS UNDERNEATH IT.
+
+   Everything above was true of the card this layer was written for: §15's
+   DESKTOP PLATE IS A GRID, and in a grid `align-self` is the block axis — so
+   `start` meant "pack the text to the top", which is what the heading says and
+   what the rule did.
+
+   §56 made every plate in the product a COLUMN FLEX. The band's second column
+   states `display:flex;flex-direction:column;align-items:stretch` for the card
+   at desktop, and §15's own max-width:899.98 block has always done the same
+   below 900. In a column flex `align-self` is the INLINE axis, so the identical
+   declaration stopped meaning "top" and started meaning "shrink to your content
+   width" — and it landed on the two slots that must not shrink. The visible
+   symptom is §56's hairline under the head row, which is `.plate-h`'s own
+   `border-bottom`: on the enrolment card it ran 167px of a 265px column, and on
+   day 90's re-interview card, where the head row holds nothing but the "DUE NOW"
+   eyebrow, it ran 56px. A divider as wide as the longest word in the row.
+
+   NOTHING REPLACES IT, and that is the point rather than an omission. A column
+   flex lays its items out from the start edge already, so "packed to the top" is
+   the default; what made the old grid centre them was §15's `align-items:center`
+   on the grid, which the flex rule overrides wholesale. The one thing that has
+   to hold the actions down is §56's `.plate-a{margin-top:auto}`, which is stated
+   there and does it for cards with and without a face alike.
+
+   MEASURED BEFORE DELETING, across both portals: every `.plate` in `hifi/` and
+   in `tn-agent-portal.html` reports `flex`/`column` and sits inside a `.modhead`
+   — `placeDark` puts it there — so there is no surviving caller for which the
+   grid reading is still correct. The argument is kept and the two selectors are
+   not, which is the same disposal §56.7 records for `.sec-notop`. If a page ever
+   draws a plate outside a band at desktop it will be §15's grid again, and this
+   note is what says the rule it needs is `align-self:start` in that context only.
+   ========================================================================== */

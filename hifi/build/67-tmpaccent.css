@@ -1,0 +1,116 @@
+/* ==========================================================================
+   §67 — THE RED ACCENT TRIAL. TEMPORARY, AND MEANT TO BE DELETED.
+
+   Maryam asked to see the two enrolled-end dashboards — `day34` and
+   `promoted` — with a red accent instead of the brand orange, to judge the
+   look before deciding anything. This is that, and it is deliberately the
+   smallest thing that can produce it:
+
+     - it modifies NO component and NO existing token. Every declaration
+       below is a re-POINT of an accent variable inside one scope class.
+     - the scope is `.tmp-accent`, which `tmpaccent.js` puts on `.app` and
+       takes off again on every render. Which pages are affected is one
+       array in that file, not a selector here.
+     - `tmp` is on `build-ds.py`'s EXCLUDE_PREFIXES, so none of this reaches
+       `design-system/talentnext-ds.css`. `keep_selector` drops a selector if
+       ANY class in it is excluded, so the single `.tmp-accent` class is
+       enough to keep the whole layer out of the design system.
+
+   TO REMOVE IT COMPLETELY: delete this file and `tmpaccent.js`, delete their
+   two entries in `build.py`, drop `'tmp'` from `build-ds.py`'s
+   EXCLUDE_PREFIXES, and rebuild. Nothing else was touched.
+
+   ---------------------------------------------------------------------
+   THE ONE THING THAT IS NOT OBVIOUS: `--accent-grad` HAS TO BE RESTATED.
+
+   §01 defines the gradient as `linear-gradient(..., var(--accent) ...)` on
+   `:root`. A custom property's computed value is its specified value WITH
+   `var()` ALREADY SUBSTITUTED, so `#f57414` is baked into `--accent-grad`
+   at `:root` and every descendant inherits the resolved string. Re-pointing
+   `--accent` alone therefore changes nothing at all — measured on the built
+   portal, a `.btn-p` under a scope setting only `--accent` and `--accent-2`
+   still painted `rgb(245,116,20) -> rgb(240,83,12)`. The gradient token
+   itself must be restated in the scope, which is what makes the same button
+   paint red. Same for the two state gradients under it.
+
+   AND THE FILL IS SOLID, WHICH IS A DEPARTURE. §01 says there is no solid
+   secondary colour in this product — hover and pressed cannot be one, so
+   each is the gradient stepped a stop deeper. Maryam asked for flat #ff0000
+   after seeing the gradient version, so this trial overrides that decision
+   on these two pages only. It is stated here rather than left to look
+   accidental, because it is the one thing in this layer that contradicts a
+   rule the system states explicitly.
+
+   The value is still written as a `linear-gradient` with both stops the same
+   colour, NOT as a bare hex. `--accent-grad` is consumed in `background` and
+   in `background-image` positions across the build, and a bare colour is
+   invalid in the second — a flat two-stop gradient is valid in both and
+   paints identically. `--accent-2` goes flat red too, so anything reading
+   that token directly does not come out a darker red than the fills beside
+   it.
+
+   The press state stays a shade down (#cc0000, solid). Flat #ff0000 for
+   pressed as well would leave the button with no press feedback at all,
+   which is a dead control rather than a colour trial. Hover is disarmed by
+   the build anyway (trap 6).
+
+   AFTER §63 AND ALLOWED TO BE. §63 owns font size, weight, transform and
+   text colour, and this layer declares none of the four — it sets custom
+   properties only. Which ink role applies where is still §63's; this only
+   changes what one role resolves to, on two pages.
+   ========================================================================== */
+
+.tmp-accent{
+  /* --- the fills. Every accent FILL in the product runs --accent-grad, so
+     flattening that one token is what makes the whole product solid. --- */
+  --accent:#ff0000;
+  --accent-2:#ff0000;
+  --accent-hover:#e60000;
+  /* flat: both stops the same colour. See the head note for why this is a
+     gradient function and not a bare hex. */
+  --accent-grad:linear-gradient(104.86deg,
+    var(--accent) 0%, var(--accent) 100%);
+  /* Without these two the button would revert to the ORANGE gradient on
+     press, which reads as a bug rather than a trial. Flat, one shade down
+     each, so the press still registers. */
+  --accent-grad-hover:linear-gradient(104.86deg,
+    var(--accent-hover) 0%, var(--accent-hover) 100%);
+  --accent-grad-active:linear-gradient(104.86deg,
+    #cc0000 0%, #cc0000 100%);
+  /* §01's is a hardcoded rgba, not derived from --accent, so it does not
+     follow on its own. Same alpha, red hue. */
+  --accent-shadow:rgba(204,0,0,.18);
+
+  /* --- the ink. Matched to the CONTRAST of the orange it replaces, not to
+     its hue, so nothing on these two pages gets less readable than it was.
+     Measured on #ffffff (--layer-01, the page) and #f7f7f7 (--layer-02):
+       --accent-text  #b94a09 = 5.19:1  ->  #dc0000 = 5.19:1  (4.85 on panel)
+       --accent-on-2  #ae4508 = 5.75:1  ->  #cf0000 = 5.75:1  (5.37 on panel)
+     Both clear AA for normal text. Note that pure #ff0000 is only 4.00:1 on
+     white and would FAIL as text, which is why the ink is not the fill —
+     exactly the split §01 already makes for the orange. --- */
+  --accent-text:#dc0000;
+  --accent-on-2:#cf0000;
+  /* the accent at 8% over white — a chip ground, not a surface (§12) */
+  --accent-tint:#ffebeb;
+
+  /* §10's accent ink on the black card. INCLUDED because both of these
+     dashboards draw a `.plate`, and leaving it out would strand one orange
+     element on an otherwise red page. It is the one value not matched on
+     ratio: #f68441 is 7.46:1 on #111 and the nearest red at that ratio is a
+     washed pink, so this takes 5.92:1 instead — still clear of AA, and
+     still legibly red. Delete this line to leave the dark card's ink
+     orange. */
+  --accent-on-dark:#ff5252;
+}
+
+/* WHAT DELIBERATELY DOES NOT TURN RED, so a look at these two pages is not
+   mistaken for a look at a red product:
+     - Tal's sphere and mark. #F6DC92 -> #F47113 -> #E85D0F is hardcoded in
+       §33, §40 and §50, and §39 says outright that #f47113 is NOT --accent.
+       Tal stays Tal, which is almost certainly right — the mark is a brand
+       object, not an accent fill.
+     - `--auth-o-*`, the sign-up namespace. Walled off by §01 and unreachable
+       outside `.auth-card`; no auth screen is in this trial anyway.
+     - `--askv-*` (§53) and the base64 artwork (the Tal PNG, the award WebPs).
+       Images cannot follow a token. */

@@ -1,0 +1,823 @@
+/* ==========================================================================
+   §63  TYPOGRAPHY — THE AUTHORITY
+   ==========================================================================
+
+   §11 was written to be this layer and could not stay it. It says so in its
+   own header: an audit found 81 distinct size/line-height/weight combinations
+   and it assigned every element to one of nine roles. Then fifty-one layers
+   landed after it, each one correcting a page rather than the system, and a
+   computed-style sweep of all ten stages by all 34 views now reports:
+
+       26 distinct rendered font sizes
+       160 distinct type signatures  (size + line-height + weight + tracking
+                                      + case + colour)
+       5 font weights                (400, 500, 600, 700, 800)
+       1283 elements set in uppercase
+       2 greys used interchangeably for the same job
+
+   None of that is drift in §11. §11 still says nine roles. It is drift PAST
+   §11, and the reason is position: `.app .foo` in §15 beats `.app .foo` in
+   §11 on order alone, so every later layer that wanted a size simply took
+   one. A type scale cannot be stated in the middle of a cascade.
+
+   So this layer is last, and it is last permanently. Anything after it that
+   needs a size is either wrong or has to say here why it is the exception —
+   §17's auth block is the worked example, and it has been folded in below
+   rather than left to fight from §17's position.
+
+   ------------------------------------------------------------------ 0 ---
+   WHAT THE SWEEP ACTUALLY FOUND, because three of the five are not drift
+   but dead declarations, and knowing which is which is what makes the fix
+   small:
+
+   1. FIVE WEIGHTS, TWO FACES. Söhne is embedded at 400 (Buch) and 600
+      (Kräftig) and at nothing else — `document.fonts` lists exactly those
+      two. Measured: a 40px string is 280.9px wide at both 400 and 500, and
+      282.9px at 600, 700 and 800. So the 979 elements set at 500 already
+      render as 400 and the 325 at 700/800 already render as 600. They are
+      not a hierarchy, they are three weights that never existed. The
+      product has two, and this layer writes two.
+
+   2. h1 IS TWO SIZES AND SO IS h2. `h1` computes 24px on 120 elements and
+      20px on 169; `h2` computes 20px on 139, 14px on 561 and 30px on 2.
+      The tag does not tell you the level, which is the whole of the "no
+      hierarchy of headings" complaint. 20px is real and used 325 times, so
+      it is promoted to a role — h2 — rather than deleted, and the tiers
+      below it shift down one to make room.
+
+   3. TWO GREYS, ONE JOB. `--text-secondary` (#525250, 2641 elements) and
+      `--text-helper` (#666563, 1606) are 1.4:1 apart — close enough to read
+      as one grey applied inconsistently rather than as two tiers. They stay
+      two tokens, but the job of each is now fixed by ROLE and not chosen per
+      component: every description takes secondary, and helper is the floor
+      tier only (timestamps, legal, chart axes, captions).
+
+   4. SVG `<text>` WAS NEVER IN THE SYSTEM. §11 neutralises HTML elements by
+      name and `text` is not among them, so the charts, the rose and the card
+      marks fell through to whatever each layer wrote: 6px, 7.5px, 9.5px,
+      10.5px, 12px and 26px. §5 below brings them in.
+
+   5. UPPERCASE, 66 RULES ACROSS 18 LAYERS. Removed — §4. The strings behind
+      them were checked first, all of them: every one is already written in
+      sentence case in the view ("Quiz score", "Card number", "Wed", "Next
+      step", "Scene 1 · from 02:14"), so taking the transform off is purely
+      presentational and needs no copy edit anywhere.
+
+   ------------------------------------------------------------------ 0b --
+   HIERARCHY HAD FOUR CARRIERS AND IS LOSING ONE, WHICH IS WHY WEIGHT IS BACK
+
+   §11's closing block states the rule it was built on: "Söhne Buch is the
+   book weight, and Maryam asked for the regular style throughout. So
+   hierarchy is carried by size, colour, case and position — not by weight."
+
+   Case is now gone by instruction. Three carriers left, and the sweep shows
+   size alone was already not carrying it — 13.5px does 4612 elements across
+   both prose roles, 14px does 1495 across every row title. Kräftig is
+   licensed, embedded and currently reached by accident from thirty-odd
+   `font-weight:600` declarations that §11's one-weight block was trying to
+   flatten and mostly failing to. Confirmed with Maryam, 28 Aug 2026: titles
+   and labels take 600, all prose stays 400, and that is the whole of it.
+
+   §11's one-weight block is left standing where it is. It is 0,2,0 on a
+   flat list of classes and every one of them is restated below, so it is
+   superseded by position rather than deleted — the same way §11 supersedes
+   §01 through §10. Deleting it would scatter this decision back across the
+   file it came from.
+
+   ------------------------------------------------------------------ 0c --
+   THE SCALE — eight sizes, eleven roles, two weights, three inks
+
+     role          size/lh    weight  tracking  ink
+     display       34/40      600     -1px      primary
+     h1            24/30      600     -.5px     primary   (28/34 at ≥900)
+     h2            20/26      600     -.3px     primary
+     h3            17/23      600     -.2px     primary
+     h4            14/19      600     -.02px    primary
+     body          13.5/22    400     .1px      primary
+     body-compact  13.5/19    400     .1px      primary
+     label         12.5/17    600     .1px      primary
+     desc          12.5/17    400     .1px      SECONDARY
+     eyebrow       11.5/16    600     .2px      SECONDARY
+     caption       11.5/16    400     .1px      helper
+
+   Three pairs share a size and each pair is separated by weight, by ink or
+   by both: body/body-compact by line-height, label/desc by weight AND ink,
+   eyebrow/caption by weight AND ink. That is deliberate — a scale with 11px
+   and 11.5px as separate steps is not a scale, it is two sizes nobody can
+   tell apart, and that is what the sweep found. Eight sizes that are each
+   visibly different is worth more than eleven that are not.
+
+   `desc` is its own role because it is the one the brief named: a
+   description is grey, and it is the SAME grey everywhere. It is not a
+   quiet label — it is 400 where the label is 600, which is what stops a
+   card's subtitle competing with the card's own small print.
+
+   On a dark ground the three inks collapse to two, which is all `--on-dark`
+   and `--on-dark-2` have ever offered: primary → --on-dark, secondary and
+   helper → --on-dark-2. §6.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   THE SCALE AS TOKENS
+
+   Stated as custom properties first so the scale is one readable block that
+   can be inspected in devtools and quoted in the design system, and so a new
+   component can take a role by name instead of copying four numbers off a
+   neighbour. The assignments in §2 and §3 resolve to these and to nothing
+   else — grep this file for a bare `font-size:` outside §1 and §7 and there
+   should be none.
+   ------------------------------------------------------------------------ */
+:root{
+  --t-display-size:34px;      --t-display-lh:40px;      --t-display-ls:-1px;
+  --t-h1-size:24px;           --t-h1-lh:30px;           --t-h1-ls:-.5px;
+  --t-h1-size-lg:28px;        --t-h1-lh-lg:34px;        --t-h1-ls-lg:-.7px;
+  --t-h2-size:20px;           --t-h2-lh:26px;           --t-h2-ls:-.3px;
+  --t-h3-size:17px;           --t-h3-lh:23px;           --t-h3-ls:-.2px;
+  --t-h4-size:14px;           --t-h4-lh:19px;           --t-h4-ls:-.02px;
+  --t-body-size:13.5px;       --t-body-lh:22px;         --t-body-ls:.1px;
+  --t-compact-size:13.5px;    --t-compact-lh:19px;      --t-compact-ls:.1px;
+  --t-label-size:12.5px;      --t-label-lh:17px;        --t-label-ls:.1px;
+  --t-desc-size:12.5px;       --t-desc-lh:17px;         --t-desc-ls:.1px;
+  --t-eyebrow-size:11.5px;    --t-eyebrow-lh:16px;      --t-eyebrow-ls:.2px;
+  --t-caption-size:11.5px;    --t-caption-lh:16px;      --t-caption-ls:.1px;
+
+  /* TWO WEIGHTS, AND THEY ARE NAMED AFTER THE FACES THEY ACTUALLY LOAD.
+     Anything that is not one of these two is a lie about what will render —
+     see §0.1. `--t-w-book` is Söhne Buch, `--t-w-strong` is Söhne Kräftig. */
+  --t-w-book:400;
+  --t-w-strong:600;
+}
+
+/* ------------------------------------------------------------------ 2 ---
+   THE ROLE CLASSES
+
+   `.t-*` is the canonical name from here on and is what a new page should
+   write. The `.u-*` and `.t-heading-0*` aliases §11 introduced are kept
+   pointing at the same rules because both portals and the gallery already
+   use them; they are aliases, not a second scale.
+
+   `.t-heading-01` … `-05` were a Carbon-shaped naming that never mapped
+   cleanly onto this ladder — `-02` meant 17px in §11 and 20px in §01. They
+   are pinned here so the ambiguity ends: -01 is h1, -02 is h3, -03/-04 are
+   h4, -05 is the eyebrow. A page writing them gets the same thing on every
+   surface, which was not true before this layer.
+   ------------------------------------------------------------------------ */
+.app .t-display,.app .u-display{
+  font-size:var(--t-display-size);line-height:var(--t-display-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-display-ls);
+  font-variant-numeric:tabular-nums}
+.app .t-h1,.app .u-h1,.app .t-heading-01{
+  font-size:var(--t-h1-size);line-height:var(--t-h1-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h1-ls)}
+.app .t-h2,.app .u-h2{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls)}
+.app .t-h3,.app .u-h3,.app .t-heading-02{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls)}
+.app .t-h4,.app .u-h4,.app .t-heading-03,.app .t-heading-04,
+.app .t-heading-compact-01{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+.app .t-body,.app .u-body,.app .t-body-01{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
+.app .t-compact,.app .u-compact,.app .t-body-02,.app .t-body-compact-01{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls)}
+.app .t-label,.app .u-label,.app .t-label-01{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  color:var(--text-primary)}
+.app .t-desc,.app .u-desc{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--text-secondary)}
+.app .t-eyebrow,.app .u-overline,.app .t-heading-05{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .t-caption,.app .u-caption,.app .t-helper-01,.app .t-legal-01{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* ------------------------------------------------------------------ 3 ---
+   EVERY FAMILY IN BOTH PORTALS, ASSIGNED
+
+   This is §11's §2 re-stated from the end of the cascade, with the families
+   the sweep found off-scale added to whichever role they were nearest. It is
+   long because it is exhaustive; that is the point of it. Order below is the
+   ladder, top to bottom.
+   ------------------------------------------------------------------------ */
+
+/* --- display: HERO NUMERALS, and only numerals --------------------------
+   §11 described this role as "hero numerals, the level name" and that second
+   half was the mistake. A numeral can be huge because it carries no reading
+   — you take "38%" in at a glance and the size IS the emphasis. "Explorer –
+   E4" is a NAME: it is read as words, it sits under a section heading, it
+   has a description under it, and at 34/40 it came out larger than the page
+   title three inches above it. A section's subject outranking the page's
+   title is the hierarchy inverted, and it is the one thing a reader notices
+   without being able to say why.
+
+   So the level name is a heading and takes the h2 role below. What is left
+   here is the two true hero figures — the course percentage and the points
+   total — and `.big` is no longer in it.
+
+   `.lg` is gone too, and was never type: it is a size modifier on `.tal-mk`
+   and `.bmk` (`class="tal-mk lg"`, `class="bmk lg"`), so it was giving a
+   34px font to two marks that contain no text at all. Inherited from §11's
+   list unexamined. */
+.app .score-pts .n,.app .prog-pct{
+  font-size:var(--t-display-size);line-height:var(--t-display-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-display-ls);
+  font-variant-numeric:tabular-nums}
+
+/* --- h1: the page title, once per page ---------------------------------- */
+.app .ph h1,.app h1.ttl{
+  font-size:var(--t-h1-size);line-height:var(--t-h1-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h1-ls)}
+
+/* --- h2: a title that opens a surface of its own ------------------------
+   The auth card's title, Tal's greeting on the empty thread, the ask view's
+   header, the live call's title, the agent's name on their own page and the
+   marketplace card. All of these were 20px already and each was declaring
+   it locally; the size is the role now. */
+.app .auth-card .form-page .ph h1,.app .auth-brand .auth-intro h2,
+.app :is(.tal-panel,.ask-thread) .tal-hero h2,.app .ask-page .ask-top-t,
+.app .agh-n,.app .call-t,.app .cert .n,.app .plate-t,
+.app .big,.app .lvl-hero .big,.app .wing-lvl .prog-pct{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls)}
+
+/* `.wing-lvl .prog-pct` IS THE SAME ARGUMENT AS `.big`, ONE CLASS FURTHER ON.
+   `ladderWing` borrows `progressStrip`'s shape — CLAUDE.md's note says so —
+   and that means it borrows `.prog-pct`, the class that holds "38%" on the
+   enrolled dashboards. On the promoted one the same class holds "Explorer –
+   E4". A percentage at 34px is a hero figure; a track and a level at 34px is
+   a section's subject set larger than the page's own title, which is the
+   thing this pass was called in to stop. The display role keeps the figure,
+   this takes the name, and `.wing-lvl` is the hook §59 already added for
+   exactly this "same shape, different content" problem. */
+
+/* --- h3: a section title and the large value ---------------------------- */
+.app .stats .n,.app .facts .v,.app .path-facts .v,.app .ag-price,
+.app .prog-figs > span b,.app .idname,.app .ring-n,.app .auth-id-v,
+.app .stickybar .t-heading-02{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls)}
+
+/* --- h4: a row title, a card title, a button ---------------------------- */
+.app .sec-h h2,.app h2.t-heading-02,.app .ai-head h3,.app .gcard-b h3,
+.app .cardrow-t,.app .nrow-t,.app .mem-n,.app .aw-n,.app .ach-t,.app .ag-n,
+.app .ch-n,.app .path-n,.app .signed-b b,.app .pi-lab,.app .stp-t,
+.app .s-b b,.app .empty .t,.app .empty h3,.app .tb b,.app .ttl,
+.app .sheet-h h2,.app .notif-h h2,.app .tal-h .nm b,.app .chart-head .t,
+.app .score-rank .n,.app .tile h3,.app .tile.bordered h3,.app .signed h3,
+.app .auth-card .sec-h h2,.app .auth-card .u-h2,
+.app .auth-card .sec-id .inp-static{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+
+/* A BUTTON IS THE h4 TIER AT THE BODY SIZE, and that is not an inconsistency
+   — it is a control, so it takes the strong weight to separate it from the
+   prose around it but keeps the body size so it does not out-shout the row
+   title it usually sits under. Line-height is 18 rather than 19 because §02
+   centres the label in a fixed 48px box and 19 pushes it half a pixel low. */
+.app .btn,.app .slot,.app .tabs button,.app .cs button,.app .acc-h,
+.app .sn-item,.app .day .n,.app .nil-btn,.app .nil-cta{
+  font-size:var(--t-body-size);line-height:18px;
+  font-weight:var(--t-w-strong);letter-spacing:.05px}
+
+/* --- body: prose you read in sentences ----------------------------------
+   `.plate-d` IS THE ONE SENTENCE ON A PLATE AND IT TAKES THE PROSE ROLE, which
+   is the whole difference between it and `.plate-b` directly beneath it. Both
+   are 13.5px; body leads at 22 and compact at 19, so the description reads as
+   a paragraph and the fact rows read as a list, at one size. That distinction
+   is what the two roles are for, and it is why the card needs no second size
+   to separate its sentence from its spec. */
+.app .lead,.app .ph .lead,.app .tile > p,.app .ai-body,.app .ai-body p,
+.app .acc-b,.app .acc-b p,.app .note .nb,.app .post-b,.app .s-b,.app .plate-d,
+.app .tw-quote,.app .why,.app .bub,.app .tal-msg .bb,.app .sec > p,
+.app :is(.tal-panel,.ask-thread) .tal-hero p{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
+
+/* --- body-compact: a line in a list, a cell, a field --------------------- */
+.app .kv,.app .kv .k,.app .tbl,.app .tbl td,.app .chart-table,.app .msg .nm,
+.app .inp,.app select.inp,.app textarea.inp,.app .memo-w span,
+.app .plate-b,.app .psw-t,.app .pw-rules li,.app .ok{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls)}
+/* the value in a key/value pair is the strong weight — it is the answer, and
+   the key beside it is already the question */
+.app .kv .v,.app .msg .nm,.app .signed-b b{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls)}
+
+/* --- label: a chip, a tag, a small value, a field label ------------------ */
+.app .tag,.app .chip-tal,.app .badge,.app .num,.app .stars .num,
+.app .legend span,.app .agh-slot,.app .ag-foot,.app .aw-v,.app .s-n,
+.app .stp-c,.app .f > label,.app .lbl,.app .draft-l,.app .pill-def,
+.app .qz-vd,.app .stand-l,.app .score-pts .l,.app .path-you,.app .chev-you{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* --- desc: THE grey supporting line, and it is one grey ------------------
+   Named in the brief: a description is grey and it is the same grey in every
+   place a description appears. Every one of these was already a description;
+   what they did not share was the colour token — `.sub` and `.ag-m` took
+   secondary, `.chev-d` and `.aw-d` took helper, and nothing said which was
+   right. Secondary is right, here and everywhere. */
+.app .sub,.app .gcard-b .sub,.app .cardrow-d,.app .nrow-d,.app .mem-m,
+.app .aw-d,.app .ach-d,.app .ag-m,.app .ch-m,.app .agh-m,.app .chev-d,
+.app .pi-sec,.app .stp-all .pi-sec,.app .score-meta,.app .chart-read,
+.app .msg .p,.app .post-who,.app .signed-b span,.app .idmeta,
+.app .stats .d,.app .facts .d,.app .tal-h .nm span,.app .chart-head .s,
+.app .score-rank .l,.app .lab{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--text-secondary);text-transform:none}
+
+/* --- eyebrow: the small strong line that labels a figure or a block ------
+   This is the role that WAS uppercase. It keeps its slot, its weight and its
+   position and gives up its case and most of its tracking: .8px was there to
+   open up capitals and reads as a gap at sentence case. See §4. */
+.app .eyebrow,.app .stats .l,.app .stats .k,.app .stat .k,.app .facts .l,
+.app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
+.app .sn-cap,.app .pt-lab,.app .lvl-hero .eb,.app .ladder-lab,
+.app .tbl th,.app .chart-table th,.app .tw-h,.app .cert-eb,.app .plate-eb,
+.app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
+.app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
+.app .rp-src,.app .rp-opts-h,.app .lead-eb,.app .stp-pop-h,.app .bkw .bk-h,
+.app .scene-eb,.app .cal-wd,.app .cal-row > .l,.app .call-rec,.app .qz-lab,
+.app .signed .ai-body .t-label-01,.app .callband-tz,.app .wcall-d b,
+.app .callband-d b{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* --- caption: the floor tier — timestamps, legal, axes, helper text ------
+   The ONLY place `--text-helper` is now reached from. If a string is not one
+   of these five things it is a description and takes secondary. */
+.app .help,.app .legal,.app .caption,.app .crumb,.app .crumb .sep,
+.app .msg .d,.app .post-t,.app .cq,.app .chart-x span,.app .tal-legal,
+.app .bmk-row .lab,.app .auth-foot,.app .ag-price small{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* ------------------------------------------------------------------ 4 ---
+   NO UPPERCASE — the 66 rules, answered
+
+   §3 already restates most of these into the eyebrow and label roles, which
+   carries `text-transform:none` with it. What is left here is the families
+   that are NOT eyebrows — buttons, tags, display words, a table head — plus
+   the two that are trapped inside a container query and per trap 3 can only
+   be answered from inside the same query.
+
+   The strings were all checked before this went in. Every one of them is
+   already written in sentence case in the view, so this changes how they are
+   set and not what they say.
+   ------------------------------------------------------------------------ */
+.app .tag.acc,.app .tag.brand,.app .nil-pill,.app .nil-nav,.app .nil-res-tab,
+.app .nil-f label,.app .qz-mids,.app .nil-band{text-transform:none}
+
+/* TRAP 3 — both of these are declared inside a query in §15, so an
+   unconditional rule here loses to them however late it lands. Restated
+   inside the same query, at the same width, which is the only thing that
+   reaches them. */
+@container app (min-width:672px){
+  .app .bhead > span{
+    text-transform:none;letter-spacing:var(--t-eyebrow-ls)}
+}
+@container app (min-width:900px){
+  .app .payhead > span{
+    text-transform:none;letter-spacing:var(--t-eyebrow-ls)}
+  /* the page title steps up one at desktop and nothing else in the ladder
+     moves — the h1 is the only role with a second size, because it is the
+     only one that has a whole column to itself */
+  .app .ph h1,.app .t-h1,.app .u-h1,.app .t-heading-01{
+    font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
+    letter-spacing:var(--t-h1-ls-lg)}
+  /* THE LEVEL NAME DOES NOT GROW AT DESKTOP, and it is the only role that
+     used to. §11 stepped it 34 → 40 alongside the h1's 24 → 28, which meant
+     the gap between the page title and a section's subject widened the wrong
+     way as the frame got bigger: at 1280 the name was 12px larger than the
+     title of the page it was on. The h1 is the only role with a second size,
+     because it is the only one with a whole column to itself. */
+  .app .lvl-hero .big,.app .big{
+    font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+    letter-spacing:var(--t-h2-ls)}
+}
+
+/* THE MICROSITE KEEPS ITS FACE AND LOSES ITS CASE.
+   `nil*` is the Next in Leadership run-up — a different brand, its own
+   display face and its own navy, and `build-ds.py` excludes it from the
+   design system for exactly that reason. It is still a screen inside this
+   product, so the no-uppercase rule reaches it; what it does not do is
+   flatten the microsite into the portal's ladder. The face, the 800 weight
+   and the colour are all left alone — only the case and the capital-fitting
+   tracking come off. */
+.nil .dsp,.nil .nil-eyebrow,.nil .nil-you-hey,.nil .nil-you-type,
+.nil .nil-you-body h3,.nil .nil-side-box h2,.nil .nil-recv-grid p,
+.nil .nil-btn,.nil .nil-cta,.nil .nil-nav,.nil .nil-res-tab,.nil .nil-pill,
+.nil .nil-band,.nil .nil-f label{
+  text-transform:none;letter-spacing:normal}
+
+/* ------------------------------------------------------------------ 5 ---
+   SVG TEXT
+
+   §11 neutralises HTML defaults by naming the elements, and `text` is not
+   an HTML element, so every `<text>` in a chart fell through to whatever the
+   drawing layer wrote — the sweep found 6px, 7.5px, 9.5px, 10.5px, 12px and
+   26px, none of them on the scale and the smallest three well under any
+   legible floor.
+
+   The rose, the chart labels and the ladder are brought onto the two small
+   roles. `fill` rather than `color` because that is what paints an SVG glyph,
+   and the same two ink tokens so a chart label and a page label are the same
+   grey rather than nearly the same grey.
+   ------------------------------------------------------------------------ */
+.app svg text{
+  font-family:var(--font-sans);
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  text-transform:none;fill:var(--text-helper)}
+.app .qz-lab,.app .chart-lab,.app svg text.lab{
+  font-size:var(--t-eyebrow-size);font-weight:var(--t-w-strong);
+  letter-spacing:var(--t-eyebrow-ls);fill:var(--text-secondary)}
+.app svg text.v,.app svg text.n,.app .qz-val{
+  font-size:var(--t-label-size);font-weight:var(--t-w-strong);
+  letter-spacing:var(--t-label-ls);fill:var(--text-primary);
+  font-variant-numeric:tabular-nums}
+
+/* THE CARD BRAND MARKS ARE ARTWORK, NOT TYPE, and they are the one thing in
+   the build that stays in capitals. VISA, AMEX and DISCOVER are registered
+   wordmarks drawn as `<text>` inside a card graphic; setting them in
+   sentence case does not make the payment row more readable, it makes the
+   card look counterfeit. They are excluded by name so the exception is
+   stated rather than left as a rule that happens not to reach them. Their
+   sizes are the artwork's and are outside the scale on purpose — a wordmark
+   is fitted to the card, not to a ladder. */
+.app .cardmark text,.app text.cardmark{
+  font-size:inherit;font-weight:inherit;letter-spacing:inherit;
+  text-transform:none}
+
+/* ------------------------------------------------------------------ 6 ---
+   INK
+
+   Three inks on a light ground, two on a dark one. §3 sets each role's
+   default; this is the pair of rules that stops a role losing its ink when
+   it is borrowed onto the black card, and it is written against the
+   `--on-dark*` tokens rather than against white so §59's quiet plate — which
+   re-points those three tokens rather than restating rules — keeps working.
+   ------------------------------------------------------------------------ */
+.app .sec.on-dark .t-eyebrow,.app .sec.on-dark .eyebrow,
+.app .sec.on-dark .sub,.app .sec.on-dark .t-desc,
+.app .lvl-hero .sub,.app .lvl-hero .chev-d,.app .lvl-hero .bands-note,
+.app .lvl-hero .eb,.app .cert .sub,.app .cert-eb,.app .score.on-dark .l,
+.app .plate-eb,.app .plate-when,.app .plate-b,.app .plate-d,
+.app .callband-tz{
+  color:var(--on-dark-2)}
+.app .lvl-hero .path-n,.app .lvl-hero .chev-n,.app .lvl-hero .idname,
+.app .sec.on-dark .path-n,.app .cert h3,.app .cert .n,
+.app .score.on-dark .n,.app .plate-t,.app .lead-t{
+  color:var(--on-dark)}
+.app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
+.app .path-step.on .path-n{color:var(--on-dark)}
+
+/* AND THE FIGURE AT THE END OF A FACT ROW IS THE ACCENT, ON A QUIET CARD ONLY.
+   `.plate-v` is the value `splitPlateBody` lifts out of "Course price
+   <b>$690</b>" (ai5.js) and §66 puts on the row's right edge. The accent is the
+   product's "this is yours / this is the thing" ink and a price is exactly
+   that; `--accent-text` is the value tuned for the canvas, 5.2:1 on white and
+   still clear of AA on the band's wash.
+
+   IT CANNOT BE STATED UNCONDITIONALLY, and that is the reason for the
+   `.plate-quiet` in the selector rather than tidiness. §15's plate is
+   `--gray-100` — #111 — and #b94a09 on #111 is 1.6:1, which is not a colour, it
+   is a hole. On the black card §56's `.app .plate-bi b` already says what a
+   figure in a row does there (full-strength `--on-dark` against the row's
+   `--on-dark-2`), and that rule is the fallback this one overrides: 0,3,0
+   against 0,2,1, so the accent wins wherever the card has no ground and nothing
+   else changes. The enrolment card is quiet by construction — `plateUrgent`
+   returns false for a card with no clock — so the price is the accent on both
+   stages that draw it, and a future plate that IS urgent keeps the white. */
+.app .plate.plate-quiet .plate-v{color:var(--accent-text)}
+
+/* ------------------------------------------------------------------ 7 ---
+   THE FEW THAT SIT OUTSIDE THE LADDER, AND WHY EACH ONE DOES
+
+   Every entry here is a glyph fitted to a box rather than a word in a
+   column: initials inside a circle, a count inside a dot, a digit inside an
+   OTP field. A ladder step would either overflow the box or leave it half
+   empty, so these take the box's size and are listed here so that "outside
+   the scale" is a short, closed list rather than a habit.
+   ------------------------------------------------------------------------ */
+.app .av,.app .av-ph,.app .mem-av,.app .shell-avatar,.app .ch-num{
+  font-size:var(--t-caption-size);line-height:1;
+  font-weight:var(--t-w-strong);letter-spacing:.3px}
+.app .ch-num{line-height:15px}
+.app .av.lg,.app .agh-f{font-size:var(--t-h4-size)}
+.app .otp input{font-size:18px;line-height:24px;font-weight:var(--t-w-strong)}
+.app .shell-badge,.app .sn-item .badge,.app .thumb .t,.app .tw-rungs i{
+  font-size:10px;line-height:1;font-weight:var(--t-w-strong)}
+.app .tw-rungs i{font-style:normal}
+
+/* `ios-*` IS NOT IN THIS SYSTEM AND MUST NOT BE. It is the simulated iPhone
+   status bar — somebody else's UI, drawn to look like theirs, and
+   `build-ds.py` drops the whole prefix from the design system for that
+   reason. A first pass at this layer put `.ios-time` on the body size and it
+   was wrong twice over: the clock is Apple's typography, and §14 restates it
+   at 16px inside a container query anyway, so the rule lost at desktop and
+   only succeeded in making the two frames disagree. Left alone. */
+
+/* a sub-figure inside a numeral keeps the numeral's baseline and steps back
+   in ink — "$690" and "/100" are one object, not two */
+.app small,.app .stats .n small,.app .prog-pct small,.app .score-pts .n small{
+  font-size:var(--t-label-size);line-height:1;
+  font-weight:var(--t-w-book);letter-spacing:0;color:var(--text-secondary)}
+
+/* ----------------------------------------------------------------- 7b ---
+   THE HOLDOUTS — every family that outranked §2/§3 on specificity
+
+   §2 and §3 are written at `.app .foo`, which is 0,2,0. Twenty-odd rules
+   across the build are 0,3,0 or 0,4,0 — `.app .ach .ach-t`, `.app .nrow:not(
+   .un) .nrow-t`, `.app .tal-sugg .chip-tal` — and specificity beats order,
+   so landing last does not reach them. They are restated here at their own
+   weight. Found by sweeping the rendered DOM for anything computing off the
+   ladder and reading back the winning selector, not by grepping, because a
+   grep cannot tell you which of four matching rules actually won.
+
+   Nothing here introduces a size. Every one resolves to a §1 token; the
+   selector is long only because the thing it is correcting was. */
+
+/* 0,3,0 — a notification title, weighted by read state. The colour split is
+   §15's and is kept: read is grey, unread is full ink. Only the weight
+   changes, 500 → 400, because 500 is not a weight this face has (§0.1). */
+.app .nrow:not(.un) .nrow-t{font-weight:var(--t-w-book)}
+.app .nrow.un .nrow-t{font-weight:var(--t-w-strong)}
+
+/* 0,3,0 — Tal's suggestion chips were the label role at 500 */
+.app .tal-sugg > button,.app .tal-sugg .chip-tal{
+  font-size:var(--t-label-size);font-weight:var(--t-w-strong)}
+
+/* 0,3,0 / 0,2,0 — the journey step label is a row title, at three sizes
+   across three layers (13 in §03, 15 in §04's current step, 13 in §56's
+   head band). One role, and the current step is marked by its mark's
+   ground and by §56's rail, which is what already distinguishes it. */
+.app .pi-lab,.app .stp-now .pi-lab,.app .stps .pi-lab{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+
+/* 0,3,0 — the achievement band: a title and its description */
+.app .ach .ach-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+.app .ach .ach-d{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);color:var(--text-secondary)}
+.app .ach .ach-go{font-size:var(--t-body-size)}
+
+/* 0,3,0 / 0,4,0 — the auth screens. §17 states a second scale (20/16/14/12)
+   and argues for it as "a scale and not a scattering". It was neither once
+   §57 added a third size to it. Folded into the ladder: the card title is
+   h2, the block heading and the identity value are h4, the small print is
+   the caption. The front door now reads in the same voice as the product
+   behind it, which is the whole point of a front door. */
+.app .form-page .auth-id-v{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+.app .auth-brand .auth-foot,.app .auth-card .pw-rules li,
+.app .auth-card .cbx .txt,.app .auth-card .auth-foot a{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls)}
+
+/* 0,2,0 — the memo widget and the award's date line */
+.app .memo-w{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+.app .aw-s{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);color:var(--text-helper)}
+
+/* 0,2,0 / 0,3,0 — the scene picker's duration chip and its count */
+.app .scene-len{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong)}
+.app .scene-count{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong)}
+
+/* 0,2,0 — the widget's figure column and the agent row inside a Tal bubble.
+   §39's note on `.tw-lines` is why the label column is 58px; the size it
+   was set at was not part of that measurement. */
+.app .tw-lines b,.app .tw-ag b,.app .tw-lines > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+
+/* 0,3,0 — the certificate's meta line, on the dark ground. §37 shrinks it
+   again inside a max-width query, so per trap 3 that one needs the query. */
+.app .cert .m{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);color:var(--on-dark-2)}
+@container app (max-width:599.98px){
+  .app .cert .m{
+    font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
+}
+@container app (min-width:900px){
+  .app .scene-sel .scene-len{
+    font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
+}
+
+/* 0,2,0 — the quiz rose's centre. The score is the page's one focal figure
+   and keeps a display size; "of 100" beside it is a caption, not a smaller
+   version of the score. Both are SVG `<text>`, so they are `fill`. */
+.app .qz-mid{
+  font-size:var(--t-h1-size);font-weight:var(--t-w-strong);
+  letter-spacing:var(--t-h1-ls);fill:var(--text-primary)}
+.app .qz-mids{
+  font-size:var(--t-caption-size);font-weight:var(--t-w-book);
+  letter-spacing:var(--t-caption-ls);text-transform:none;
+  fill:var(--text-secondary)}
+
+/* 0,1,0 — a small button is still a button. §02 says 13, §10 says 12.5, and
+   both lose to §3's `.app .btn` — except where a third rule reaches it. */
+.app .btn-sm{font-size:var(--t-body-size)}
+.app .empty p{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  color:var(--text-secondary)}
+
+/* THE LAST FIVE, and they are all bare tags inside a classed parent — a
+   `<span>` or a `<b>` that no role class ever reaches, which is why the
+   sweep was the only way to find them. Each is named by its parent. */
+.app .never li{
+  font-size:var(--t-compact-size);line-height:23px;
+  color:var(--text-secondary)}
+.app .msgs.room .m-w > b{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls)}
+.app .plate-wb > span{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  color:var(--on-dark-2)}
+.app .plate-wb b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+.app .fa-b > span{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  color:var(--text-secondary)}
+.app .fa-b b{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong)}
+
+/* THE COHORT LEADER'S THREE. `lead*.js` is a second portal through the same
+   renderer, so it is swept the same way — set `S.portal='leader'` and walk
+   the twelve `lead*` views. It came back with three, and one of them is the
+   most-repeated string on that side of the product.
+
+   `.lf-n` is the count beside a filter or tab label ("Needs attention 3"),
+   and it was 11px — half a step below the caption, which is the smallest
+   thing the ladder has.
+
+   It is answered on §36's selector and NOT on §31's, and that is the whole
+   trap in this one. §31 states it twice, scoped `[data-portal="leader"]`
+   for the dashboard's filter and its tabs. §36 then generalised it to
+   `.app .cs button > .lf-n` for Messages and Course Reports, with a note
+   saying a count in a tab is a count in a tab. So §36's is the rule that
+   actually governs every instance — matching §31's leader-scoped pair here
+   would fix the two pages §31 named and leave the two §36 added, which is
+   what a first pass at this did. One rule, on the general selector. */
+.app .cs button > .lf-n,.app .ldr-copick .lf-n{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book)}
+
+/* the competency read is a dark card: its heading is the h4 tier and its
+   closing paragraph is body-compact, both on `--on-dark*` */
+.app .ldr-read-h > h2{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:var(--on-dark)}
+.app .ldr-read .ldr-read-x{
+  font-size:var(--t-compact-size);line-height:21px;
+  color:var(--on-dark-2)}
+
+/* THE LIVE CALL. §60 is a surface rather than a page, so it is not reached
+   by walking the view registry — the sweep only found these once it called
+   `callOpen()` at each kind. Three sizes, none of them on the ladder, and
+   the smallest (10.5px, the name on your own picture-in-picture) was under
+   any legible floor on a tile that is 96px wide. The name a participant is
+   known by is a label; the line under the call's title is a description. */
+.app .call-p-n{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
+.app .call-p-n em{font-weight:var(--t-w-book)}
+.app .call-sub{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--on-dark-2)}
+.app .call-self .call-selfn{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls)}
+
+/* THE AVATAR'S INITIALS ARE THE ONE THING SIZED FROM JAVASCRIPT, and they
+   stay that way. `avatar()` in views.js writes `font-size:${size/3}px`
+   inline, which per trap 1 beats every rule in this file — and it is right
+   to: the initials are fitted to a circle whose diameter the caller chooses,
+   so a fixed size would overflow the 24px mark or swim in the 75px one. It
+   is listed here so that "12px on a signature block" reads as the rule
+   working rather than as one more thing that escaped it. */
+
+/* ------------------------------------------------------------------ 8 ---
+   TWO WEIGHTS, ENFORCED
+
+   §0.1: Söhne loads at 400 and 600 and nothing else, so 500, 700 and 800
+   already render as one of those two. They are snapped here so the
+   stylesheet says what the renderer does — a `font-weight:500` that a
+   reader believes is a third step is worse than no declaration at all.
+
+   `:where()` contributes no specificity, so this cannot outrank anything in
+   §2, §3 or §7 — it only catches families those sections do not name, which
+   is what makes it safe to write this broadly.
+   ------------------------------------------------------------------------ */
+.app :where(b,strong,th,.notif-g,.psw-t.on){font-weight:var(--t-w-strong)}
+.app :where(em,i,small,p,li,td){font-weight:var(--t-w-book)}
+
+/* ------------------------------------------------------------------ 8b --
+   THE CONTAINER-QUERY TIER
+
+   TRAP 3, and it is the reason this section exists rather than being folded
+   into §3: a rule inside `@container app (…)` is its own cascade tier and
+   beats an unconditional rule of equal weight no matter how late that rule
+   lands. So §3 cleaned the whole product at 390 and 760 and left 1280
+   holding four sizes it does not have — the sweep at three widths is what
+   showed it, and a sweep at one width would have called this finished.
+
+   Everything here is a restatement, at the same width, of a size a layer
+   already changed at that width. No new breakpoint is introduced.
+
+   THE SECTION HEADING IS THE ONE WITH AN ARGUMENT IN IT. At ≥900 a `.sec`
+   with a `.sec-h` becomes a 184px label column (§10.15, trap 13) and the
+   heading stops being a title and starts being a spine — which is why §10
+   drops it to 13 rather than leaving it at 14. That is right, and it is
+   kept: the spine takes the LABEL role. §15 and §16 then push it back up to
+   15 for the four cases where the heading carries an action, a link or a
+   day strip, because those headings are read as controls; that is kept too,
+   at the h4 size it already has on mobile. Two tiers, both on the ladder,
+   and the distinction between them survives.
+   ------------------------------------------------------------------------ */
+@container app (min-width:672px){
+  .app .bhead > span{
+    font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+    font-weight:var(--t-w-strong)}
+}
+@container app (min-width:900px){
+  /* the spine */
+  .app .sec:has(> .sec-h) > .sec-h h2{
+    font-size:var(--t-label-size);line-height:var(--t-label-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
+  /* the four headings that carry something */
+  .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(.stp) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2,
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
+    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+  /* the page lead is prose at every width — §10 grew it to 15 at desktop,
+     which put a fourth size between the h1 and the body for one element */
+  .app .ph .lead{
+    font-size:var(--t-body-size);line-height:var(--t-body-lh);
+    letter-spacing:var(--t-body-ls)}
+  .app .payhead > span{
+    font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+    font-weight:var(--t-w-strong)}
+  .app[data-rail="open"] .sn-item .badge{font-size:10px;line-height:1}
+  .app .shell-name{
+    font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+  .app .psw-t{
+    font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+}
+@container app (max-width:599.98px){
+  .app .psw-t,.app .plate-b{
+    font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+  .app .cal-n{
+    font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
+}
+
+/* ------------------------------------------------------------------ 9 ---
+   NUMERALS
+
+   Tabular wherever a figure can change under the reader — a column that
+   re-flows when a 1 becomes a 7 reads as the page twitching. Unchanged from
+   §11 in intent; restated here because §11's list predates six of these
+   families and a figure that is not tabular is invisible until it moves.
+   ------------------------------------------------------------------------ */
+.app .num,.app .mono,.app .aw-v,.app .ag-price,.app .kv .v,.app .stats .n,
+.app .facts .v,.app .path-facts .v,.app .prog-figs > span b,.app .day .n,
+.app .score-pts .n,.app .prog-pct,.app .big,.app .slot,.app .chart-read .v,
+.app .tbl .num,.app .ios-time,.app .ch-num,.app .s-n,.app .stp-c,
+.app .call-clock,.app .qz-val,.app .stand-v,.app .ring-n{
+  font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
