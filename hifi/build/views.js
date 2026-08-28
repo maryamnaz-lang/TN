@@ -2272,7 +2272,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Your consultant call</div>
         <div class="plate-b">Thursday, August 13 at 2:00 PM ET &middot; 15 minutes, online</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic">Join call ${I.video}</button>
+          <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
           <button class="btn btn-sm noic plate-b2" data-go="interviews">Add to calendar</button>
         </div>
         <div class="plate-x">
@@ -2337,7 +2337,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">45 minutes, recorded &middot; Real situations, not hypotheticals &middot; Your agent sets your level, E1 to E5 &middot; $80 to $95</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-go="agents">Book an Agent ${I.arrowRight}</button>
+          <button class="btn btn-p btn-sm noic" data-go="agents">Book an agent ${I.arrowRight}</button>
         </div>
       </div>
     </div>
@@ -2754,7 +2754,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Cohort Week 36 Session</div>
         <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-call="cohort">Join Call ${I.video}</button>
+          <button class="btn btn-p btn-sm noic" data-call="cohort">Join call ${I.video}</button>
         </div>
       </div>
     </div>`}
@@ -4200,7 +4200,7 @@ V.cohort = (f) => `<main class="main"><div class="page">
       <div class="plate-t">Cohort 41, week ${f.week}</div>
       <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic" data-call="cohort">Join call ${I.video}</button>
+        <button class="btn btn-p btn-sm noic" data-call="cohort">Join ${I.video}</button>
         <button class="btn btn-sm noic plate-b2">Add to calendar</button>
       </div>
     </div>

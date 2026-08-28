@@ -501,8 +501,20 @@ V.leadDash = () => {
             written down. */''}
       <div class="plate-t">Level interview</div>
       <div class="plate-b">${next.mins} minutes, recorded &middot; you sign the level afterwards</div>
+      ${''/* A PLATE'S BUTTON IS ONE OR TWO SHORT WORDS, AND THE CARD IS WHY.
+            §56 gives the band's dark card `minmax(300px,330px)` and 32px of
+            padding, so a two-button row has about 250px to divide — and §56
+            sets `white-space:normal` on those buttons deliberately, as a safety
+            valve rather than a licence: a label that does not fit wraps to two
+            lines instead of overflowing the card. "Join the interview" beside
+            "All sessions" made BOTH of them two lines tall, which is a 38px row
+            of broken phrases where the card wants one 32px row of actions.
+            Measured: 147 + 95 in a 250 row.
+            The card has already said what the appointment is — its title, the
+            person and the time are three rows above — so the button only has to
+            say what you DO about it. `Join` is the whole label. */}
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join the interview ${I.video}</button>
+        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
         <button class="btn btn-sm noic plate-b2" data-go="leadSessions">All sessions</button>
       </div>
     </div>

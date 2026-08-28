@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4088.  Rules dropped as product-specific: 176.
+   Rules kept: 4094.  Rules dropped as product-specific: 176.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7288,3 +7288,9 @@ button.btn-p:active,
   .app .page .sec:has(> .tile > .row-lead){display:block}
   .app .page .sec:has(> .tile > .row-lead) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05)}
 }
+.app .modhead > .sec.head-sec{position:relative; padding-top:var(--s06); padding-left:var(--pad-x); padding-right:var(--pad-x); margin-top:var(--s05)}
+.app .modhead > .sec.head-sec > .tile{background:none; border:0; padding:0}
+.app .modhead > .sec.head-sec .row-lead{padding:0; border-bottom:0}
+.app .modhead > .sec.head-sec::before{display:block; content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); top:0; height:1px; background:var(--rule)}
+.app .modhead > .sec.head-sec::after{display:none}
+.app .modhead > .sec.head-sec > .sec-h{margin-bottom:var(--s04)}

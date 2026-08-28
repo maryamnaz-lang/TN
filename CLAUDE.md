@@ -406,29 +406,50 @@ putting. Seven things:
   "who you have paid to spend time with". **The E4 page does not draw it**:
   `COHORT_LEAD`'s range is E1–E3 and her three cohorts are E3/E1/E2, so naming
   her as an E4 leader would be false.
+- **THE LEADER IS INSIDE THE HEAD BAND, AS A THIRD MEMBER OF THE LEFT COLUMN**
+  (Maryam, 28 Aug 2026): the `<h1>`, the fact row, Tal's sentence, **a divider**,
+  then her. §56 reads that column as "title, facts, hairline, the wing, hairline,
+  Tal" — the Enroll page has no wing (the journey stops at `assessed`), so this
+  takes the slot the wing would have had, one row lower. Above the fold, because
+  on a page whose whole job is a $595 decision, *who* you spend thirteen
+  Thursdays with is part of the answer.
+  - **`.head-sec` is how a view declares it**, and `placeBand` (ai5) takes it.
+    Everything else that pass collects is recognised by what it *contains*
+    (`_mhIsTal` looks for Tal's mark); a third member is a judgement about one
+    page, so the view says so. **The loop is a run from the `.ph`**, so the
+    section must be written directly after `ph()` — and it still lands *third*,
+    because `placePageSummary` inserts Tal's card after the `.ph` two passes
+    later. That ordering is load-bearing.
+  - **The divider is on top and there is none underneath** — §56's wing rule
+    turned over. The wing draws a `border-bottom` because it comes first; this
+    member comes last, so the band's own full-bleed closing rule (§25.2) ends
+    the block. §69.4 also kills the section's `::after`, the `.tile`'s ground
+    and `.row-lead`'s inset and underline: inside the band every member is
+    transparent and on the spine, and a hairline 28px above the band's own rule
+    reads as a section that failed to close.
 - **The card is a face, a name and a role line, and nothing else.** It had two
-  fact rows about the call and a sentence in her own voice; both went (Maryam,
-  28 Aug 2026) when the block moved to the top of the page — the logistics are
-  said again in "How your cohort works" and in the confirmation's "What happens
-  next", and a paragraph of first-person copy in the first two inches of a page
-  whose job is to reach the payment screen is the block that stops you. The one
-  `.kv` left is `V.welcome`'s "Leads Cohort 41", which is the assignment itself.
+  fact rows about the call and a sentence in her own voice; both went with the
+  move — the logistics are said again in "How your cohort works" and in the
+  confirmation's "What happens next". The one `.kv` left is `V.welcome`'s
+  "Leads Cohort 41", which is the assignment itself.
   **THE SUBTRACTION TOOK THE LABEL-COLUMN OPT-OUT WITH IT — trap 13, the mirror
   of §65.1a.** The section was opting out through `.sec:has(.kv)` *because of
   those rows*; with them gone it fell into the 184px column and nothing warned.
   §69.3 restates it on `:has(> .tile > .row-lead)`. Adding a wrapper is not the
   only way to lose an opt-out — removing content does it too.
-- **§69.3 copies THREE of §10.15's four declarations.** The fourth,
-  `padding:0 var(--pad-x)` on the heading, is dead in §10: §14 zeroes every
-  headed section's `.sec-h` padding at this width ("a section pays the gutter
-  and its heading must not"). Restating it from §69 un-does §14 and set that one
-  heading 32px right of the three below it. **Copy what a rule does today, not
-  what its source says.**
+- **§69.3 copies THREE of §10.15's four declarations, and §69.4 restates the
+  gutter §10 took away.** The fourth declaration, `padding:0 var(--pad-x)` on
+  the heading, is dead in §10: §14 zeroes every headed section's `.sec-h`
+  padding at this width ("a section pays the gutter and its heading must not").
+  Restating it from §69 un-does §14 and set that one heading 32px right of the
+  three below it. **Copy what a rule does today, not what its source says.** The
+  other half of the same trap: §10's grid also sets the *section*'s
+  `padding-left:0`, and its own opted-out members get away with it because their
+  content indents itself (trap 10) — a `.tile` does not, so §69.4 states it.
 - **The order is the order of the questions** (Maryam, 28 Aug 2026): the band
-  answers what-and-how-much before anything scrolls, then WHO you would do it
-  with, WHAT you would learn, HOW the cohort runs, and last the four figures
-  that recap all three. The person leads because she is the only thing on the
-  page that is not a fact about a product.
+  answers what-and-how-much and *who* before anything scrolls, then WHAT you
+  would learn, HOW the cohort runs, and last the four figures that recap all
+  three.
 - **"How your cohort works" is the §65 disclosure with `key='cohort'`,** and its
   lede sits **outside** `.found-b` so the block still says what a cohort is
   while it is shut. §69 gives the section its full bottom padding back in that
@@ -461,6 +482,17 @@ with its content packed to the top and its actions on an `auto` margin at the fo
 
 Seven things worth knowing before touching it:
 
+- **A PLATE'S BUTTON IS ONE OR TWO SHORT WORDS.** The card is
+  `minmax(300px,330px)` with 32px of padding, so a two-button row divides about
+  250px — and §56 sets `white-space:normal` on those buttons deliberately, as a
+  safety valve rather than a licence: a label that does not fit wraps to two
+  lines instead of overflowing. "Join the interview" beside "All sessions" made
+  **both** of them two lines tall (147 + 95 in a 250 row), which is a 38px row of
+  broken phrases where the card wants one 32px row of actions. The card has
+  already said what the appointment is — its title, the person and the time are
+  three rows above — so the button only says what you DO: `Join`. Six labels were
+  cut across both portals on 28 Aug 2026; the check is that no `.plate-a > .btn`
+  measures taller than 34px on any of the 200 screens.
 - **The gate is `.modhead:has(> .sec-dark .plate)` at 900 and up.** A plate is a vertical card
   and gains from the column; `.lvl-hero`, `.cert` and `.score` are wide objects (a 15-rung
   ladder, an award, a table) and keep §25.12's full-width place under the head. A SECOND dark

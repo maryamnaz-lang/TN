@@ -164,7 +164,7 @@ V.leadSessions = () => {
       <div class="plate-t">${next.re ? 'Re-interview' : 'Level interview'}</div>
       <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the level afterwards'}</div>
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join the interview ${I.video}</button>
+        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
         <button class="btn btn-sm noic plate-b2">Reschedule ${I.time}</button>
       </div>
     </div>

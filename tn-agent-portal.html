@@ -245,22 +245,43 @@
        is the 16px fallback for a page with no band, and using it inside one
        puts a small dot where the disc belongs. Tal's report draft further
        down `V.interview` is the one place `.bare` is still right.
-     - THE GREETING HIDES THE PAGE HEADER — `.modhead:has(.tal-greet) > .ph`
-       is `display:none`. So `greet` is passed on the dashboard, where Tal's
-       card becomes the head, and nowhere else.
+     - THE GREETING IS THE `<h1>`, NOT A SPAN IN TAL'S CARD. It used to be
+       passed as `greet` and `.modhead:has(.tal-greet) > .ph{display:none}`
+       (§33.9) then hid the page header — correct while the band's left column
+       was only Tal's card, wrong once §56 made that column the whole left-hand
+       read. Nothing in this file carries `.tal-greet` any more, which is the
+       same state `hifi/` is in. The note over `head()` is the long version.
+     - THE READER'S FACE IS IN THE HEADER ON THE DASHBOARD — §62's `.ph-you`,
+       75px and stepping to 56 below 900. No medal: the rank artwork is not in
+       the design system. See the note over `youMark()`.
      - A PLATE INSIDE THE BAND SITS INSET; outside it bleeds to the column
        edge. Both are deliberate, so the choice is made per page: every hero
        here is in the band, because on every page it is what the page is about.
-     - THE STEPS POPUP HAS TO ESCAPE. It is `position:fixed`, and `.device`
-       is a container, so it is clipped unless it is moved out — which is what
-       `render()`'s last two lines do, the same two `views.js` ends on.
+     - THE JOURNEY IS AN OPEN ROW, `.stps` (§56). It was §33.7's collapsed
+       shape — a rail, "Step 4 of 5", and the other steps behind an "All steps"
+       toggle — which is the generation the candidate portal stopped drawing
+       when §56 opened the band. `S.stp`, the click-away listener and the
+       `data-stp` router branch went with it; an open row has no state. The note
+       over `stepper()` is the long version.
 
-   ONE DEFECT FOUND AND NOT PAPERED OVER: `.stp-all > div` (§03/§04, from the
-   popup's older shape) lands on §33's `.stp-pop` wrapper and lays its heading
-   out beside the list. It is in the candidate portal too — "Where you are"
-   sits half outside the white card. `stepper()` here uses `<section
-   class="stp-pop">` so the div selector misses it, which costs nothing and
-   changes no class; the real fix is one declaration in `33-talsum.css`.
+       AND NOTHING IN THIS FILE IS `position:fixed` OR MOVES A NODE. This bullet
+       used to say the popup had to be lifted out of `.device` — a container
+       clips a `fixed` descendant — "which is what `render()`'s last two lines
+       do, the same two `views.js` ends on". Neither half is true any more.
+       §33.7 made the panel `absolute` and this file's lines were dropped then;
+       there is no `appendChild` or `insertBefore` anywhere in it. And `views.js`
+       does not end on them either — it ends on the hash-boot branch, because
+       §56 took the dropdown out of the candidate portal too (its own note at
+       `views.js` §"All steps" records the removal). CLAUDE.md still says that
+       file "ends on exactly those two lines"; it does not.
+
+   THE `.stp-all > div` DEFECT THAT USED TO BE LISTED HERE NO LONGER REACHES
+   THIS FILE. §03/§04's `.stp-all > div` (0,1,1) landed on §33's `.stp-pop`
+   wrapper and laid its heading out beside the list; this file dodged it by
+   emitting `<section class="stp-pop">` so the type selector missed. With the
+   dropdown gone there is no `.stp-all` here to be hit. It is fixed properly in
+   `33-talsum.css` now — `.stp-all > .stp-pop` states both the `display` and the
+   padding — so the candidate portal's hand-authored callers are covered too.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -913,9 +934,13 @@ const phSub = sub => {
 
 /* THE PAGE HEAD, in `hifi/`'s own shape: one `.ph` per page, carrying the only
    h1, and `sub` is the FACT ROW — never a sentence. */
-function ph(title, sub, backTo){
-  return `<div class="ph">
-    <div class="ph-main">
+/* `mark` IS §62'S READER MARK and it brings `.ph-you` with it — the class is
+   what turns `.ph-main` into the two-column grid that seats the face beside the
+   title and the fact row, so the two always travel together. Every other page
+   passes three arguments and emits byte-identical markup to before. */
+function ph(title, sub, backTo, mark){
+  return `<div class="ph${mark ? ' ph-you' : ''}">
+    <div class="ph-main">${mark || ''}
       <div class="ph-top">${backTo ? `<button class="ph-back" data-go="${backTo}" aria-label="Back">${I.arrowLeft}</button>` : ''}<h1>${title}</h1></div>
       ${sub ? phSub(sub) : ''}
     </div>
@@ -966,10 +991,10 @@ function pageSummary(){
    The rule still ships and still matches on a page that opts in; nothing in
    this file carries the class any more, which is the same state `hifi/` is in.
    ========================================================================== */
-function head({title, sub, back, wing, plate}){
+function head({title, sub, back, mark, wing, plate}){
   const text = pageSummary();
   return `<div class="modhead">
-    ${ph(title, sub, back)}
+    ${ph(title, sub, back, mark)}
     ${text ? `<div class="sec">
       <div class="ai-aura tile tight talsum">
         <div class="ai-head"><span class="ai-label">Tal</span></div>
@@ -1286,6 +1311,67 @@ function peekPanel(v){
    the value came from. Child order then follows the portal's own, because
    that is the order the desktop grid was tuned against: head, meta, who,
    actions — `.plate-a` is explicitly placed in column 2 either way. */
+/* AND THE BODY IS ROWS, NOT A SENTENCE — `.plate-lines`, ported from
+   `splitPlateBody` / `plateRow` / `plateIcon` (`ai5.js`).
+
+   Same gap as the fact row, one card lower. A `.plate-b` is written as a
+   `&middot;` run, and in the portal `placePlates` splits it into one `.plate-bi`
+   per fact with a subject mark in front of each. This file has no render
+   passes, so its `&middot;` run stayed a single line of prose — "3 of four
+   lessons done &middot; then 45 minutes with Derek on Thursday 20 June" — where
+   the candidate's identical shape draws a clock row and an hourglass row.
+
+   A ROW ENDING ON `<b>` IS A LABEL AND A VALUE, and if EVERY row is that shape
+   the body is a table of amounts and takes no marks at all (`.plate-tab`). That
+   test has to run before the rows are built, because the mark is baked into
+   each row's HTML — hence `every` over the parts rather than a query on the
+   result. Kept from the original for exactly the reason its note gives: one
+   labelled figure among plain facts is a spec and keeps its spine.
+
+   `hourglass` and `launch` are real keys in the DS icon set — checked against
+   the empty-proxy fallback, per the note over `PH_IC`. */
+const PLATE_IC = [
+  [/\$|\bfee\b|paid|price/i,                        'wallet'],
+  [/assessment|average|\bscore/i,                   'chart'],
+  [/chapter|module|course|curriculum/i,             'book'],
+  [/\d{1,2}:\d{2}|[ap]\.?m\.?|\bET\b|\bPT\b/i,      'time'],
+  [/minute|hour|\bmin\b|long/i,                     'hourglass'],
+  [/monday|tuesday|wednesday|thursday|friday|saturday|sunday|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|today|tomorrow/i, 'calendar'],
+  [/\bcalls?\b|recorded|video/i,                    'video'],
+  [/situation|conversation|question|asks|hypothetical/i,'chat'],
+  [/others|people|cohort|candidates|members|one to one|1:1/i,'group'],
+  [/online|link|remote/i,                           'launch'],
+  [/report|signed|level/i,                          'certificate'],
+
+  /* AGENT-ONLY, APPENDED — same rule as `PH_IC`: the eleven rows above are
+     byte-identical to `ai5.js`'s and a row at the end cannot change a match
+     they already make. `lesson` is this portal's word for a training unit and
+     the candidate's `chapter|module|course` row does not carry it, so "3 of
+     four lessons done" fell through to the fallback ring. */
+  [/lessons?|calibration/i,                          'book']
+];
+function plateIcon(t){
+  const s = String(t || '').replace(/<[^>]*>/g, ' ');
+  for(const [re,k] of PLATE_IC) if(re.test(s)) return I[k];
+  return I.circle;
+}
+const PLATE_FIG = /^([\s\S]*?)\s*<b>([\s\S]*?)<\/b>\s*$/;
+function plateRow(t, bare){
+  const m = t.match(PLATE_FIG);
+  const lab = m ? m[1].trim() : t;
+  return `<span class="plate-bi">${bare ? '' : plateIcon(t)}` +
+    (lab ? `<span>${lab}</span>` : '') +
+    (m ? `<b class="plate-v">${m[2]}</b>` : '') + `</span>`;
+}
+/* A body with one fact in it is not a row list and is left exactly as written. */
+function plateBody(meta){
+  const parts = String(meta).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return `<div class="plate-b">${meta}</div>`;
+  const tab = parts.every(p => PLATE_FIG.test(p));
+  return `<div class="plate-b plate-lines${tab ? ' plate-tab' : ''}">` +
+    parts.map(p => plateRow(p, tab)).join('') + `</div>`;
+}
+
 const plate = ({when, av, photo, who, whoSub, title, meta, actions}) => `
   <div class="plate"${when ? ` data-when="${when}"` : ''}>
     <i class="dark-glow" aria-hidden="true"></i>
@@ -1293,7 +1379,7 @@ const plate = ({when, av, photo, who, whoSub, title, meta, actions}) => `
       <div class="plate-t">${title}</div>
       ${when ? `<span class="plate-when">${I.time}<b>${when}</b></span>` : ''}
     </div>
-    <div class="plate-b">${meta}</div>
+    ${plateBody(meta)}
     ${actions ? `<div class="plate-a">${actions}</div>` : ''}
     ${who ? `<div class="plate-who">
       ${avatar(av, photo, 56)}
@@ -1309,6 +1395,35 @@ const plate = ({when, av, photo, who, whoSub, title, meta, actions}) => `
 const avatar = (initials, photo, size) => `
   <span class="av-ph"${size ? ` style="width:${size}px;height:${size}px"` : ''}><i>${initials}</i>${
     photo ? `<img src="${photo}" alt="">` : ''}</span>`;
+
+/* THE READER'S OWN MARK IN THE HEADER — §62's `.ph-you`, and it is the one
+   header on this portal whose subject is the reader.
+
+   IT DOES NOT CALL `avatar()`, AND THAT IS TRAP 1 RATHER THAN A PREFERENCE.
+   The helper above writes the size as `style="width:56px;height:56px"`, and an
+   inline declaration beats every stylesheet rule at every specificity — so
+   §62's step from 75px down to 56px below 900 could only have been won with
+   `!important`. The size is §62's on both sides of that breakpoint, so the
+   markup states none.
+
+   AND THERE IS NO MEDAL, WHICH IS NOT AN OVERSIGHT. §62 hangs a rank medal off
+   the mark's top-right corner, and the candidate's `youMark` draws it from
+   `AWARD['rank'+g.rank]` — eight WebPs base64-embedded by `build.py`. Those do
+   NOT cross into the design system: `AWARD` in `talentnext-ds.js` carries one
+   key, `points`. So the artwork a medal needs is not reachable from a
+   hand-authored page, and a stand-in glyph is how Tal once came out as a hard
+   orange square.
+
+   The data does not ask for one either. `A.rank` is 12 of 38 — a position in
+   browse, not a tier — and `A.level` (A2 of A4) is a competency tier already
+   stated in Standing's own fact row, where §62's medal is specifically the
+   points rank. Drawing either as a medal would assert an equivalence this
+   product has not made. If the A-ladder ever gets artwork, `.ph-rank` is a
+   SIBLING of `.av-ph`, never a child — §09 gives `.av-ph` `overflow:hidden` so
+   the photograph cannot escape, and it clips a corner badge just as happily. */
+const youMark = () => `<span class="ph-you-av">
+  <span class="av-ph"><i>${A.i}</i><img src="${AV.owen}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+</span>`;
 
 /* THE RING — two SVG circles, not a conic gradient. `--arc` is a
    stroke-dasharray LENGTH rather than a percentage: r=26, so the
@@ -1330,25 +1445,37 @@ const ring = pct => `
    That pairing is the point — where you are in the journey and what Tal makes
    of it are one thought, and the portal merged them for that reason.
 
-   A STEPPER ON A PHONE EATS A SCREEN, so only the rail, the count and the step
-   you are on are drawn; the rest is one press away in `.stp-all`, which §33.7
-   hangs off the toggle as a DROPDOWN — no scrim behind it. It used to be a
-   centred popup over a 18% black overlay, which is the treatment for a decision
-   you have to answer; five steps with four ticks against them is a reference
-   list you glance at and dismiss. `S.stp` is the flag, on the state object
-   rather than in the DOM, because `render()` reprints the frame and a class a
-   handler added would be gone by the next paint.
+   IT IS THE OPEN ROW NOW — `.stps`, §56 — AND THE DROPDOWN IS GONE.
+   This drew §33.7's collapsed shape: a segmented rail, "Step 4 of 5", the
+   current step underneath, and the other four behind an "All steps ⌄" toggle
+   that opened `.stp-all` / `.stp-pop`. The candidate portal stopped drawing
+   that when §56 opened the head band — nothing in `hifi/` emits `.stp-all`,
+   `.stp-pop`, `.stp-t`, `.stp-tw` or `.stp-now` any more — so the two portals
+   were rendering two generations of one component out of one stylesheet, with
+   class sets that did not overlap at all.
 
-   THE PANEL IS EMITTED INSIDE `.stp-top`, and that is load-bearing rather than
-   tidy: §33.7 anchors it on the row the toggle is in, so a panel written as a
-   sibling of that row (which is where this file had it, and views.js too) is
-   positioned against `.stp` — the whole stepper — and opens 117px below the
-   button that owns it with the current-step block sitting in the gap. Inside
-   the row it opens 8px under the chevron. It is `position:absolute`, so being
-   the fourth child of a flex row costs the row nothing.
+   WHAT THE COUNT COST. "Step 4 of 5" and the rail are a summary of a list that
+   is now printed in full three inches wide, and a summary beside the thing it
+   summarises is the same duplication the `ph`/`PAGESUM` rule exists to stop. So
+   the count came off with the toggle rather than being kept "for the phone":
+   §56's row is a three-row grid per item and stacks, it does not need a
+   collapsed form.
 
-   THE MARKS CARRY THE SUBJECT NOW, not the state, and `stepIcon` is where the
-   argument for that lives. The state is the mark's ground, which §33.7 draws.
+   `S.stp` WENT WITH IT, and so did the click-away listener that closed the
+   panel and the `data-stp` router branch — the same three pieces `hifi/`
+   removed with `S.piOpen`. An open row has no state; it is markup plus §56 and
+   no JS, which is what `gallery.html`'s Signature section ships.
+
+   THE MARKS CARRY THE SUBJECT, not the state, and `stepIcon` is where the
+   argument for that lives. The state is the mark's ground, which §56 draws from
+   the class on the row — flat `--accent` for done, `--brand-tint-2` for the step
+   you are on, `--layer-02` for what is ahead. Discs, not squares.
+
+   THE STATE WORDS ARE `.stps-st` AND THEY ARE NOT DERIVED FROM `st` ALONE.
+   A blank `st` is "Upcoming" and `done` is "Completed", but the step you are ON
+   is "In progress" — three words for three states, matching the candidate's
+   journey row exactly, because these two rows sit in the same place in the same
+   band and a reader moving between the portals reads them as one component.
    -------------------------------------------------------------------------- */
 
 /* THE STEP'S OWN ICON, READ OFF ITS LABEL — the same table and the same
@@ -1375,63 +1502,30 @@ const stepIcon = lab => {
   return I.circle;
 };
 
+/* The three state words, keyed by `st`. `''` is the blank state `JOURNEY`
+   writes for a step that is still ahead. */
+const STP_ST = {done: 'Completed', on: 'In progress', '': 'Upcoming'};
+
 function stepper(steps, title){
-  let i = steps.findIndex(x => x.st === 'on');
-  if(i < 0) i = steps.filter(x => x.st === 'done').length ? steps.length - 1 : 0;
-  const cur = steps[i], open = !!S.stp;
   /* A FINISHED STEP KEEPS ITS TICK — it is the one thing a list like this is
      read for. Everything else shows what the step IS. No inline `fill` on the
-     span any more: an inline declaration beats every stylesheet at every
-     specificity, so while it was there §33.7 could not colour these at all. */
-  const ic = x => `<span class="pi-ic">${x.st === 'done' ? I.checkFilled : stepIcon(x.lab)}</span>`;
-  /* THE LABEL SITS IN A FIXED-WIDTH SLOT (§33.7 sizes it). At desktop the wing
-     is an `auto` grid track, so the header row's max-content sets it — and
-     "Hide steps" is 13px wider than "All steps", which moved the whole card
-     mid-press and reflowed Tal's sentence beside it. */
-  const toggle = `<button class="stp-t" data-stp="${open ? '0' : '1'}" aria-expanded="${open}"><span class="stp-t-l">${open ? 'Hide steps' : 'All steps'}</span>${I.chevDown}</button>`;
-  /* NO SCRIM, AND NO SECOND HEADING. NOTE FOR ANYONE EDITING THIS BLOCK: it is
-     inside a template literal, so a backtick here ends the string — that is why
-     this comment quotes class names with "" and not with the backticks the rest
-     of the file uses.
-
-     There was a ".stp-overlay" here and a ".stp-pop-h" repeating the title
-     inside the panel. §33.7 turned the popup into a dropdown hanging off the
-     toggle, so the scrim is gone; and the panel's heading was the h2 three lines
-     above it, printed again. The untitled variant of this component in views.js
-     keeps its heading, because there it is the only label the panel has.
-
-     AND IT IS A PLAIN DIV AGAIN. It was a "section" to dodge §03/§04's
-     ".stp-all > div{display:flex}", which was landing on ".stp-pop" and setting
-     its heading beside the list — a type selector at (0,1,1) beating the class
-     at (0,1,0). That is answered in 33-talsum.css by naming the class in the
-     child position, which is also where the panel's own padding had to be
-     stated, so the element name carries no weight. */
-  const panel = `<div class="stp-all"><div class="stp-pop">
-        <div class="pi">
-          ${steps.map(x => `<div class="pi-step ${x.st}">${ic(x)}
-            <div class="pi-b"><div class="pi-lab">${x.lab}</div>${x.sec ? `<div class="pi-sec">${x.sec}</div>` : ''}</div></div>`).join('')}
-        </div></div></div>`;
+     span: an inline declaration beats every stylesheet at every specificity,
+     so while one was there §33.7 could not colour these at all, and §56 could
+     not either. */
+  const ic = x => `<span class="stps-m">${x.st === 'done' ? I.checkFilled : stepIcon(x.lab)}</span>`;
+  /* `aria-current="step"` GOES ON THE STEP YOU ARE ON and nowhere else — it is
+     what the open row has instead of the count the toggle used to carry, and
+     it is the only thing telling a screen reader which of five is live now that
+     "Step 4 of 5" is gone. `gallery.html`'s recipe puts it here too. */
   return `<div class="stp-wing">
-    <div class="stp flush stp-titled${open ? ' open' : ''}">
-      <div class="stp-top">
-        <h2 class="u-h3">${title}</h2>
-        <span class="stp-meter">
-          <span class="stp-rail" role="img" aria-label="Step ${i + 1} of ${steps.length}">
-            ${steps.map(x => `<i class="${x.st}"></i>`).join('')}
-          </span>
-          <span class="stp-c">Step ${i + 1} of ${steps.length}</span>
-        </span>
-        ${/* `.stp-tw` IS THE ANCHOR AND NOTHING ELSE. §33.7 hangs the panel off
-              the button, not off this row: at desktop the meter wraps into
-              `.stp-top` as a second line, so a panel anchored on the row opened
-              below the progress rail rather than below the chevron. The wrapper
-              also takes the row's `margin-left:auto` — §24 puts it on `.stp-t`,
-              which is now this box's only child. */''}
-        <div class="stp-tw">${toggle}${panel}</div>
-      </div>
-      <div class="stp-now">
-        <div class="pi-lab">${cur.lab}</div>${cur.sec ? `<div class="pi-sec">${cur.sec}</div>` : ''}
-      </div>
+    <div class="stp stp-open stp-titled">
+      <div class="stp-top"><h2 class="u-h3">${title}</h2></div>
+      <ol class="stps">
+        ${steps.map(x => `<li class="stps-i ${x.st}"${x.st === 'on' ? ' aria-current="step"' : ''}>${ic(x)}
+          <span class="stps-b"><span class="pi-lab">${x.lab}</span>
+            <span class="stps-st">${STP_ST[x.st] ?? 'Upcoming'}</span>
+            ${x.sec ? `<span class="pi-sec">${x.sec}</span>` : ''}</span></li>`).join('')}
+      </ol>
     </div>
   </div>`;
 }
@@ -1450,7 +1544,22 @@ function stepper(steps, title){
 const JOURNEY = v => {
   const at = {setup:2, training:3}[S.stage] ?? 4;
   const rows = [
-    ['Your application', 'Sent 3 June, with two referees'],
+    /* "Application", NOT "Your application", AND THE REASON IS MEASURED.
+       §56's row is a five-track grid with `gap:0` — the gap has to be zero
+       because each `.stps-i` paints the rail segment to its own right, so a
+       column gap would put holes in the rail rather than air between the
+       labels. At the head band's 507px left column that gives each label a
+       101.4px track, and "Your application" renders 101.1px on one line: a
+       0.3px gutter, which is why it read as "Your applicationVetting". Every
+       other label here has 19–56px to spare, three of them by wrapping.
+
+       Dropping "Your" takes it to ~72px, and it is the right word to lose
+       anyway — this was the only possessive in a list that otherwise reads
+       "Vetting", "Public profile and payouts", "Training and calibration",
+       "Interviewing". CLAUDE.md's note that the journey "is always four steps"
+       is about `journey()` in views.js; this row has five and fits, but it has
+       no room for a sixth, and a label longer than ~95px needs to wrap. */
+    ['Application', 'Sent 3 June, with two referees'],
     ['Vetting', 'Identity, background check and two references cleared'],
     ['Public profile and payouts', `${money(v.fee)} an interview &middot; 80% of it yours`],
     ['Training and calibration', 'Four lessons, then 45 minutes with Derek Hale'],
@@ -1762,6 +1871,11 @@ V.dashboard = v => {
     title: `Welcome back, ${A.n.split(' ')[0]}!`,
     sub: v.certified ? `Talent agent &middot; assesses ${v.range} &middot; ${money(v.fee)} an interview`
                      : 'Talent agent &middot; not yet certified',
+    /* THE FACE IS ON THE DASHBOARD AND NOWHERE ELSE — §62's rule, and the
+       reason is the same one that gives this page the greeting: it is the only
+       page whose subject is the reader. Every other `head()` call omits `mark`
+       and emits exactly the markup it did before. */
+    mark: youMark(),
     /* THE JOURNEY STEPPER IS FOR AN AGENT WHO IS STILL BEING ENABLED, and it
        comes off the moment they are certified. From `live` on it read "Step 5 of
        5 · Interviewing · Listed since 24 June · nothing booked yet" — a progress
@@ -3932,7 +4046,7 @@ function readHash(){
 window.addEventListener('hashchange', () => {
   if(!readHash()) return;
   S.nav = false; S.tal = false; S.notif = false;
-  S.confirm = false; S.sheet = false; S.stp = false; S.peek = false;
+  S.confirm = false; S.sheet = false; S.peek = false;
   render();
 });
 
@@ -3949,18 +4063,12 @@ device.addEventListener('click', e => {
   if(t) S.iv = t.dataset.iv;
 }, true);
 
-/* CLICKING AWAY CLOSES THE STEPS DROPDOWN — a listener of its own, which is
-   what the scrim used to do. The overlay carried `data-stp`, so pressing it ran
-   the router's toggle branch; with no overlay the close has to come from the
-   ABSENCE of a hit inside `.stp`, and that is not something the router can hold:
-   every branch there begins `if(d.something)`, and this one is "nothing was
-   clicked". Guarding on `.stp` covers the toggle too, so the two can never both
-   fire, and the state check means a click on a page with no panel open costs one
-   `closest` and nothing else. */
-device.addEventListener('click', e => {
-  if(!S.stp || e.target.closest('.stp')) return;
-  S.stp = false; render();
-});
+/* THE STEPS DROPDOWN'S CLICK-AWAY LISTENER USED TO BE HERE, and it went with
+   the dropdown when §56's open row replaced it — see the note over `stepper()`.
+   It closed `.stp-all` on the absence of a hit inside `.stp`, which is what the
+   scrim did before §33.7 made the panel a dropdown. An open row has nothing to
+   close, so the listener, `S.stp` and the `data-stp` router branch all came out
+   together; `hifi/` removed the same three pieces with `S.piOpen`. */
 
 /* AND THE SAME FOR THE CALENDAR CARD, for the same reason and with the same
    shape: no scrim means the close has to come from the absence of a hit inside
@@ -4005,7 +4113,7 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-signin],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-stp],[data-peek],[data-readall],[data-cal],[data-cal-m]');
+  const t = e.target.closest('[data-go],[data-signin],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-cal-m]');
   if(!t) return;
   const d = t.dataset;
 
@@ -4049,7 +4157,7 @@ device.addEventListener('click', e => {
     S.stage = d.stage; S.view = 'dashboard';
     S.nav = false; S.tal = false; S.notif = false; S.read = []; S.peek = false;
     S.thread = []; S.typing = false; S.askFrom = 'dashboard';
-    S.confirm = false; S.sheet = false; S.stp = false;
+    S.confirm = false; S.sheet = false;
     return render();
   }
 
@@ -4083,7 +4191,6 @@ device.addEventListener('click', e => {
   if(d.sheet){ S.sheet = d.sheet; return render(); }
   if(d.tab){ S.tab = d.tab; return render(); }
   /* THE STEPS DROPDOWN — one flag, and §33.7 hangs the panel off the toggle. */
-  if(d.stp !== undefined){ S.stp = d.stp === '1'; return render(); }
   /* THE PEEK. `!== undefined` rather than truthiness, for the same reason as
      `data-cal` below: the close cross carries `data-peek=""` and the empty
      string is a real value. It is not `data-toggle`, because the toggle branch
@@ -4149,14 +4256,14 @@ document.getElementById('pick').onchange = e => {
      that happens to share a title. */
   S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
   S.notif = false; S.read = []; S.peek = false;
-  S.thread = []; S.typing = false; S.askFrom = 'dashboard'; S.stp = false;
+  S.thread = []; S.typing = false; S.askFrom = 'dashboard';
   render();
 };
 document.getElementById('reset').onclick = () => {
   S.view = 'dashboard'; S.nav = false; S.tal = false;
   S.notif = false; S.read = []; S.peek = false;
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
-  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael'; S.stp = false;
+  S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael';
   render();
 };
 

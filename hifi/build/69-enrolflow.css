@@ -179,10 +179,50 @@
    §25.2 gives the band one full-bleed rule and this is not it — it is a
    division inside the block, so it stops at the gutter the text starts at.
    ------------------------------------------------------------------------ */
+/* AND IT HAS TO STATE ITS OWN GUTTER, WHICH IS §69.3's BILL ARRIVING.
+   §10's desktop grid gives every `.sec:has(> .sec-h)` `padding-left:0` and puts
+   the gutter on the heading's own `padding` instead, since at that width the
+   heading is a 184px column with its own inset. §69.3 takes the column away and
+   §14 takes that heading padding off — so an opted-out section is left with no
+   left gutter at all, and every one of §10's own opted-out members gets away
+   with it because their content indents ITSELF (trap 10: `.stats`, `.ch`,
+   `.cardrow` all pay `--pad-x` from the inside). A `.tile` does not.
+
+   On the page that was invisible: `.page` is centred and the section's content
+   started exactly where the column did. In the band it is 32px out — the
+   heading and the card hang left of the `<h1>`, Tal's mark and the fact row,
+   all three of which are in `.sec`es that kept their padding. Stated here
+   rather than in §69.3 because it is the BAND's gutter that is missing, and a
+   `.row-lead` section anywhere else is still free to be padded by whatever
+   holds it. */
 .app .modhead > .sec.head-sec{
   position:relative;
   padding-top:var(--s06);
+  padding-left:var(--pad-x);padding-right:var(--pad-x);
   margin-top:var(--s05)}
+
+/* AND THE CARD INSIDE IT LOSES ITS GROUND. `.tile` is white with a hairline,
+   which is right on a page — it is what lifts a card off the canvas. The band
+   already IS a surface (§25's wash), and a white rectangle inside it reads as a
+   card sitting on the band rather than as a member of it; none of the other
+   members — the header, Tal's card, the wing on the pages that have one — paints
+   anything. Scoped to the band, so `V.welcome` draws the same component as a
+   real card on white, which is what it is there. */
+.app .modhead > .sec.head-sec > .tile{
+  background:none;border:0;padding:0}
+
+/* AND THE ROW LOSES ITS INSET AND ITS UNDERLINE, WHICH ARE THE CARD'S TWO
+   REMAINING TRACES. `.row-lead` is drawn as the head of a card: 16px in from
+   the card's own edge, with a hairline under it dividing the person from the
+   detail below. Both were true on the page — `V.booking` puts three `.kv` rows
+   under it — and both are wrong here. There is nothing under this row to be
+   divided from, so the hairline is a line 28px above the band's own closing
+   rule with nothing between them; and the inset put the face 16px right of the
+   `<h1>`, Tal's mark and the fact row, which is the one alignment in the band
+   the eye reads down. The row IS the block now, so it sits on the spine and
+   the band's rule is what closes it. */
+.app .modhead > .sec.head-sec .row-lead{
+  padding:0;border-bottom:0}
 .app .modhead > .sec.head-sec::before{
   display:block;content:'';
   position:absolute;left:var(--pad-x);right:var(--pad-x);top:0;

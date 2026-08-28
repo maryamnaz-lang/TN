@@ -278,8 +278,9 @@ V.leadCohort = () => {
       <div class="plate-t">Week ${c.week} &middot; ${chapter[0]}</div>
       <div class="plate-b">${c.call} &middot; 60 minutes &middot; ${severe.length ? severe.length + ' to raise privately, not in the group' : 'nobody flagged severely this week'}</div>
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>
-        <button class="btn btn-sm noic plate-b2" data-ldrbrief="${c.id}">Read the brief</button>
+        ${''/* one or two short words — the note over `leadDash`'s plate is why */}
+        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
+        <button class="btn btn-sm noic plate-b2" data-ldrbrief="${c.id}">Brief</button>
       </div>
     </div>
   </div>
