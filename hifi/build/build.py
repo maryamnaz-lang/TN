@@ -361,7 +361,25 @@ css = '\n'.join((here / f).read_text() for f in
                  # layer mentions; it is last because it is newest, and its one
                  # rule that needs the position is `.qz-vd`, a `.tag`, which
                  # §02 fills and §11 sizes.
-                 '61-quizrose.css'])
+                 '61-quizrose.css',
+                 # A RANK GOES IN THE HEADER, NOT IN A BANNER — Figma 486:1084.
+                 # The dashboard opens on the reader's own face at 75 with the
+                 # rank medal on its corner, and at the far right of that same
+                 # row "You have earned 1-star rank!" in the link blue with its
+                 # last word underlined. The green `.ach` band no longer draws
+                 # for a rank; `achBanner` in views.js is where the split is
+                 # argued, and it is that a badge is news you dismiss while a
+                 # rank is what you now ARE. The two halves have different
+                 # lifetimes — the mark is on every dashboard that has a rank,
+                 # the sentence only where the banner would have been — which
+                 # is why they are two rules rather than one component.
+                 # LAST, and two of its rules need to be: `align-items` on
+                 # `.ph-has-act` is §15's, declared inside `@container app
+                 # (min-width:672px)`, so per trap 3 it can only be answered
+                 # from a later layer inside the same query; and the fact row's
+                 # top margin is §56.1b's. Everything else is `.ph-you*` /
+                 # `.ph-earned*`, names no earlier layer mentions.
+                 '62-rankhead.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -634,6 +652,35 @@ css = css.replace('__AUTHMARK__', f'data:image/webp;base64,{mark}')
 # star medallions — embedded as one table so nothing on this page reaches the
 # network. Cropped to their own alpha bounds at build time so every mark fills
 # its box the same way.
+# ==========================================================================
+# THE CALL'S PHOTOGRAPHS — Figma 499:1617 and 499:2022, Maryam's own exports.
+#
+# THE FEED NEEDED A LANDSCAPE PHOTOGRAPH AND THE PORTAL HAD NONE. `AV`'s five
+# faces are 200px squares, cut for a 36px disc, and the first cut of the call
+# surface stretched one of them across a 1200px 16:9 feed — a 6x upscale, which
+# read as a video call with a very bad connection. `call-feed.webp` is 735x412
+# at its native size, 1.78:1, and it is NOT resized up: a bigger blur is still
+# a blur, and 735 across a 1200px feed is 1.6x rather than 6x.
+#
+# THE TWO FACES ARE 240px SQUARES, cropped on the face, because the cohort
+# call draws its members as 72px discs and 240 covers that on a 2x screen with
+# room to spare. They are two members' own photographs — `CALL_FACE` in ai10.js
+# says which two and why — and they do NOT go into `AV`: an avatar table the
+# whole product reads is the wrong place for a photograph two tiles on one
+# surface use, and changing a face in `AV` changes it on nine other pages.
+#
+# WebP at q78/q80 for the reason the sign-up artwork's note gives: these are
+# photographs, which is the content type WebP is best at, and 28 KB for all
+# three against 99 KB of source JPEG.
+# ==========================================================================
+CALL_ART = {'feed': 'call-feed.webp', 'faceW': 'call-face-w.webp', 'faceM': 'call-face-m.webp'}
+_ca = ',\n  '.join(
+    "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / f).read_bytes()).decode())
+    for k, f in CALL_ART.items())
+call_js = 'const CALL_ART = {\n  ' + _ca + '\n};\n'
+print(f'call photographs embedded: {len(CALL_ART)} files, '
+      f'{sum((here / f).stat().st_size for f in CALL_ART.values())/1024:.0f} KB')
+
 AWARDS = ['points', 'bronze', 'silver', 'gold', 'involved', 'rank1', 'rank2', 'rank3']
 _aw = ',\n  '.join(
     "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'awards' / (k + '.webp')).read_bytes()).decode())
@@ -699,7 +746,7 @@ print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + call_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)
@@ -769,7 +816,7 @@ js = award_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() f
                                                         # THE LIVE CALL. Join did nothing on any of the four
                                                         # appointments the candidate can be in; this is the
                                                         # surface it opens — the interview, the re-interview
-                                                        # and the weekly cohort call, drawn by §59.
+                                                        # and the weekly cohort call, drawn by §60.
                                                         # LAST, and three things in it need to be. It reads
                                                         # `bkAgent` / `bkShort` from ai7.js so a call names
                                                         # the agent Tal actually booked rather than keeping

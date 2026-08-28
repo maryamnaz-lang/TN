@@ -183,16 +183,17 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `59-priority.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `62-rankhead.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
   is either a class no earlier layer mentions or a correction that has to land after the
   layer it corrects; `build.py` records the argument for each one, in place. Read that
   comment before inserting a layer.
-- **16 JS layers**, in this order: `icons.js` → `data.js` → `views.js` → `ai.js` … `ai5.js`
+- **18 JS layers**, in this order: `icons.js` → `data.js` → `views.js` → `ai.js` … `ai5.js`
   → `nil.js` → `lead.js` → `lead2.js` → `lead3.js` → `lead4.js` → `ai6.js` → `ai7.js` →
-  `ai8.js`. Order matters, and `build.py` says why for each of the late ones.
+  `ai8.js` → `ai9.js` → `ai10.js`. Order matters, and `build.py` says why for each of the
+  late ones.
 - Fonts, the Tal mark, auth artwork and 8 award WebPs, all base64-embedded at build time.
 
 The loop:
@@ -257,6 +258,35 @@ Seven things worth knowing before touching it:
   at 43.4% across and low, so every page opened on a cream panel with the words printed on it.
   Both are off the right-hand edge now (87.6% and 101.1%), the words are on white paper, and
   the warm layer is back at the file's own 50% because there is no panel left to knock down.
+
+### A RANK GOES IN THE HEADER, NOT IN A BANNER — §62, `62-rankhead.css`
+
+Figma 486:1084 (498:1578). The dashboard's header row is the reader: their own face at
+75px with the rank medal hanging 4px off its top-right corner, the `<h1>` and the fact row
+beside it, and at the far right of the same line **"You have earned 1-star rank!"** — the
+medal again at 28, the sentence in `--link` with its last word underlined, jumping to
+Rewards. The green `.ach` band no longer draws for a rank. Five things:
+
+- **A badge is news, a rank is what you now ARE**, and that is the whole reason for the
+  split. `ACH` holds three celebrations: `week1`'s `rank1` is a rank, `day90`'s `bronze` is
+  a badge and `promoted` is a decision. The last two keep the banner and stay dismissible;
+  a rank drawn as a green slab announced a permanent fact as an interruption and then let
+  you close it, after which nothing said what rank you hold.
+- **The two halves have different lifetimes.** `.ph-you` — the mark — is on **every**
+  dashboard, and the medal on it appears wherever `GAME[stage]` does (the four enrolled and
+  complete stages). `.ph-earned` appears only where the banner would have. The row has to
+  look right with the right-hand half missing, which is what it is on five of six.
+- **`.ph-rank` is a SIBLING of `.av-ph`, not a child** — §09 gives the avatar
+  `overflow:hidden` so the photograph cannot escape, and it clips a corner badge too.
+- **`youMark` does not call `avatar()`** — that helper writes the size inline, which is
+  trap 1, and the mark steps to 56 below 900. The size is §62's on both sides.
+- **The row wraps rather than crushing the title.** `.ph` is the band's LEFT column, so it
+  is 507 wide at a 900 frame and 886 at 1280 while the sentence is 207 whatever the frame
+  does. `flex-wrap` plus a 360px floor on `.ph-main` is what turns "shrink the `<h1>`" into
+  "move the sentence to its own line"; there is no breakpoint in it.
+
+`ph()` takes a fifth argument, `mark`, and `dashPh(title, sub)` is the six dashboards'
+wrapper over it. Every other `ph()` call in either portal emits byte-identical markup.
 
 ### The black card has TWO priorities — §59, `59-priority.css` + `plateUrgent` (ai5.js)
 
@@ -363,6 +393,96 @@ result and outlives the conversation. `bkStamp` is what makes the booked stage's
 hand-written mentions of "Priya Nair, Thursday 20 August, 6:30 PM, $95" read the actual
 choice instead — if you add a seventh surface that names the booking, add it there. Traps 9
 and 10 below are both about this file.
+
+**A surface GENERATED from state needs no stamp, and the live call is the first one.** `bkStamp`
+exists because those six mentions are prose typed into views; `callScreen` (ai10) builds its
+title, its aside and its Scheduled row out of `bkAgent()` and `bkShort()` on every render, so
+it cannot disagree with the booking in the first place. Read those two helpers rather than
+adding a seventh site to the stamp.
+
+### Joining a call is a SURFACE, not a page — `ai10.js` + `60-call.css`
+
+Figma 499:2022 (the interview) and 499:1617 (the cohort call). Press Join and the frame becomes
+the call: no app bar, no rail, no Tal. `render()`'s FIRST branch draws it in place of
+`shell() + view()` — the same shape the `nil` and `signup` branches have, and `callScreen` is
+`typeof`-guarded there because ai10 is the last file in the bundle. Ending the call clears
+`S.call` and the page you pressed Join on comes back, because the call never changed `S.view`.
+
+**The photograph is the screen.** Full bleed, the far side's name written in white over the
+bottom-left corner, and nothing else on it. The first cut put a permanent 328px column of
+session details beside the feed — meeting ID, passcode, dial-in — which is a form beside a
+face; those facts are one press away now (the More control), and the default state of a call is
+the person you are talking to.
+
+- **Three kinds, two shapes.** `data-call="iv"` / `"re"` is two people: a `.call-self`
+  picture-in-picture inside the feed, no column. `data-call="cohort"` is ten: the nine others
+  in a column of **discs on a light ground** beside the feed, with YOU as the first tile rather
+  than in a picture-in-picture. Nine 16:9 thumbnails in a 300px column are nine letterbox
+  slits — that is why the column is discs. A fourth kind is one entry in `CALL` plus a
+  `data-call` on a button.
+- **Wired to five buttons**, all candidate-side: the booked dashboard plate, the Interviews
+  module's Scheduled tile, the dashboard's weekly-call plate (which used to `data-go="cohort"`
+  — a Join that opened a *page*) and the Cohort page's own plate. **The leader's four Joins and
+  the consultant call's are still dead** — the component takes them, nothing points at them yet.
+- **Every control on the bar does something, and that is what decided the list.** Mic, camera,
+  share, hand and captions are states of the call and are drawn everywhere they show — your
+  tile's marks, your picture-in-picture, the feed's banner. People and More decide what the one
+  right-hand column holds (`S.call.panel`, so they cannot both be open). Leave ends it. The
+  Google Meet bar Maryam attached also has a device-picker chevron and a reactions button;
+  neither has anything to open here, and a dead control on a live surface is worse than a
+  missing one.
+- **The bar is LIGHT and square**, against the dark floating discs of the reference:
+  `--layer-02` available, **black** for something you switched OFF, `--brand-tint-2` for
+  something you switched ON, the error tint on the way out. Same tint as the speaking
+  participant's tile, so "on" is one colour on this surface however it is drawn.
+- **Six icons were added to `icons.js`** — `micOff`, `videoOff`, `screenShare`, `raiseHand`,
+  `captions`, `callEnd` — all pasted from `@material-design-icons/svg/filled`, per trap 7.
+  `overflow` already IS `more_vert`, so More reuses it.
+- **Three photographs are embedded** (`CALL_ART` in build.py): a 735x412 landscape still for
+  the feed and two 240px faces. `AV`'s squares are cut for a 36px disc and the first cut
+  stretched one across a 1200px feed — a 6x upscale, which read as a very bad connection. The
+  two faces are keyed by member name in `CALL_FACE` and are deliberately NOT merged into `AV`,
+  which nine other pages read.
+- **The cohort call is NOT recorded.** The Data use notice on `V.account` says weekly cohort
+  calls are not; the older wireframe had a REC pill and "kept 90 days" on that screen, and the
+  notice won. 499:1617 draws no chip either. The interview has both.
+- **It does not move the stage.** No levelling, no report, no 48 hours skipped; the stage picker
+  still walks the journey. The last caption says the recording is with your agent.
+- **It is not in the hash.** Everything else about the screen is (`#<stage>/<view>`), because a
+  screen is a thing you send somebody. A call is a moment with a clock in it, and reloading into
+  one would restart the clock on an interview that had finished.
+- **One number drives the clock, the caption and the ring** — `CALL_MS`, a budget for the whole
+  session, so a 45-minute interview and a 60-minute call take the same 42 seconds to watch.
+  `setInterval` + `Date.now()`, per trap 17. The tick writes two text nodes and moves one class;
+  it never re-renders, because a repaint twice a second restarts every entrance animation.
+- **Every toggle is STATE** (`S.call.mic` …) and every button a pure function of it — trap 9. A
+  class on a button would be gone at the next paint.
+
+
+### The quiz breakdown is its own page — `V.result` + `61-quizrose.css`
+
+"See full breakdown", under the four Quiz results figures, went to `level` — the page about the
+**ladder**, which holds none of the quiz. It now opens `result`, the slot `PARENT` had reserved
+and never filled. Everything on it is the quiz's own working and nothing else has any of it:
+five bands as a rose (`quizRose`), the same five as `.kv` rows with a fill-matched swatch, three
+things the answers did well and three they did badly, and the two weakest bands against the
+chapters built on them.
+
+What it refuses to restate, and each refusal is written up over the view: the four figures
+(that is the block whose button brought you here), the title as a `.lvl-hero` (that is My Level,
+one click away) and "a quiz cannot set your level" (that is My Level's note, and the caption
+under the rose already says what the interview does with these numbers).
+
+- **`SCORES` is the only place the five numbers live.** `qzLow` derives the two weakest for the
+  page's closing section AND for `PAGESUM.result`, so Tal's sentence cannot name a different
+  pair from the chart above it.
+- **The chapter numbers are looked up in `CH`, never typed.** `QZ_CH` maps a band to a chapter
+  *title*; that is what makes this page say "Chapter 4" and "Chapter 12" and agree with
+  `signedSummary`'s "Chapters 4 and 12 are built on exactly this".
+- **The fill carries the verdict, not a hue** — solid ink from 70, a 45° hatch from 50, empty
+  below. `qzBand` decides the wedge and the swatch and the word, so they cannot disagree.
+- **`qzTaken()` is the quiz date, once.** All three `quizResults` call sites and this page read
+  it; the parameter stays for a caller that needs another date.
 
 ### What Tal answers, and what it hands to a person — `ai8.js`
 
@@ -584,6 +704,13 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     `setTimeout` and derives what to show from the ELAPSED TIME rather than from a counter, so
     a background-throttled tick simply arrives with more work to do. `document.hidden` is
     worth checking first when a timed effect appears not to run at all.
+18. **Write `:hover` PLAIN in a layer — never pre-disarmed.** Trap 6 says the build rewrites
+    every `:hover` to `:hover:where(.__nh)`, and the obvious conclusion — "so I will write the
+    disarmed form myself" — breaks the design system: `build-ds.py`'s `verify_subset` refuses
+    to write anything if an output selector cannot be traced back to a source layer, and a
+    source that already says `:where(.__nh)` is not what it is looking for. The portal builds
+    fine, the DS build stops dead with "2 rule(s) in the output do not appear in the source".
+    State it plain and let both builds do the rewrite (`60-call.css` §7 records this).
 
 ### Verifying a change
 
@@ -594,10 +721,11 @@ cd hifi && python3 -m http.server 8791 --bind 127.0.0.1
 ```
 
 Then, in the page, loop `STAGES` × `NAVSETS[CFG[stage].nav]` (plus the sub-pages: `report`,
-`agents`, `agent`, `booking`, `payment`, `chapter`, `ivt`, `mem`, `rp`, `account`) calling
-`setStage` / `render`, then the leader's seven — 200-odd combinations, all of which must
-render with no thrown error **and no `console.warn`**: every pass wraps itself in a try/catch
-that warns, so a broken pass is a silent warning rather than a blank page.
+`result`, `agents`, `agent`, `booking`, `payment`, `chapter`, `ivt`, `mem`, `rp`, `account`)
+calling `setStage` / `render`, then the leader's seven, then `callOpen('iv'|'re'|'cohort')` and
+`callLeave()` at each stage — 280-odd combinations, all of which must render with no thrown
+error **and no `console.warn`**: every pass wraps itself in a try/catch that warns, so a broken
+pass is a silent warning rather than a blank page.
 
 Disable motion (`animation:none!important`) before measuring geometry, or trap 2 will
 confuse the numbers — and note that this also applies to `getBoundingClientRect` read

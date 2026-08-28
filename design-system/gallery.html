@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=dd824f52">
+<link rel="stylesheet" href="talentnext-ds.css?b=4a28be0c">
 
 <style>
 /* ==========================================================================
@@ -125,6 +125,15 @@
     border-right:0;min-height:0;margin-bottom:var(--s05);padding:0}
   .sec:has(> .doc-body) > .doc-body{padding-left:0}
 }
+
+/* THE CALL DEMO'S FRAME. `.call` is `flex:1` inside `.app`, which is the whole
+   window in a real portal and cannot be that here — the reference is a page of
+   examples. A fixed-height flex column is the smallest thing that gives it
+   somewhere to grow into, and the hairline says where the surface stops.
+   Nothing in this rule is part of the component. */
+.doc-live .call-demo{
+  display:flex;flex-direction:column;height:440px;overflow:hidden;
+  border:1px solid var(--border-subtle-01)}
 </style>
 </head>
 <body>
@@ -188,7 +197,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=dd824f52"></script>
+<script src="talentnext-ds.js?b=4a28be0c"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -212,11 +221,33 @@ function dedent(s){
    examples say `{{info}}`, the live copy gets the real mark, and the snippet
    gets the call back. `{{name|class}}` is the path-only form, which is what
    the portal uses wherever the svg needs a class of its own. */
+/* `{{av:priya}}` IS THE SAME TRICK FOR A FACE. The embedded portraits are
+   base64 JPEGs a few hundred characters long, and a component that takes one
+   as an inline `background-image` — the call's feed does — would otherwise
+   print a wall of base64 where the reader needs to see `${AV.priya}`. Same
+   split as the icons: the live copy gets the data URI, the snippet gets the
+   call. It goes FIRST because its body contains a colon, which the bare
+   `\w+` form below would not match anyway, but the order is what makes that
+   independent of the next placeholder somebody adds. */
+/* `{{aw:rank1}}` IS THE THIRD OF THE SAME TRICK, for the award artwork — the
+   rank medals, the three badges and the points mark are embedded WebPs and a
+   rank in a page header carries one twice (on the face and beside the
+   sentence). Same split, same reason, and it sits beside the faces because the
+   two behave identically. */
 const fillLive = s => s
+  .replace(/\{\{av:(\w+)\}\}/g, (_, n) => (typeof AV === 'object' && AV[n]) || '')
+  .replace(/\{\{aw:(\w+)\}\}/g, (_, n) => (typeof AWARD === 'object' && AWARD[n]) || '')
+/* AND `{{art:feed}}` FOR THE CALL'S OWN THREE PICTURES — the landscape
+   still the feed is drawn on and the two faces beside it. Same split, same
+   reason as the two above; `CALL_ART` is the table build-ds.py embeds. */
+  .replace(/\{\{art:(\w+)\}\}/g, (_, n) => (typeof CALL_ART === 'object' && CALL_ART[n]) || '')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
     (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">${inner(n)}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => I[n] || '');
 const fillSrc = s => s
+  .replace(/\{\{av:(\w+)\}\}/g, (_, n) => '${AV.' + n + '}')
+  .replace(/\{\{aw:(\w+)\}\}/g, (_, n) => '${AWARD.' + n + '}')
+  .replace(/\{\{art:(\w+)\}\}/g, (_, n) => '${CALL_ART.' + n + '}')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
     (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">\${inner('${n}')}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => '${I.' + n + '}');
@@ -291,16 +322,25 @@ SECTIONS.push({id:'use', nav:'Using it', icon:'document', build: () => `
    invented — because each has internal structure the CSS keys on, and getting
    it slightly wrong is what makes a component look broken rather than absent. */
 SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
-  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks. <b>§56 arranges it as two columns</b> — the title, the <code>&middot;</code> fact row, a hairline, the steps, a second hairline and then what Tal says on the left; the plate beside all of it, content packed to the top and its actions on the foot, as tall as the column. The second column appears on its own: the gate is <code>.modhead:has(&gt; .sec-dark .plate)</code> at 900 and up, so a band whose dark card is a <code>.lvl-hero</code> or a <code>.cert</code> keeps the full-width place under the head. <b>The title is the <code>.ph</code>, not a greeting.</b> <code>.tal-greet</code> still works and still hides the <code>.ph</code> when you use it (§33.9) — the candidate portal chose the other shape, because with the fact row and the steps above Tal a greeting would be the fourth thing in the column. <b>Four things in the steps are easy to get wrong.</b> <code>.stps</code> is a column-flow grid and <b>each <code>.stps-i</code> paints the rail segment to its own right</b>, from its mark to the next one — there is no rail element to add, and adding a wrapper for one puts a line through the marks. The item is a <b>three-row grid</b> and <code>.stps-b</code> is <code>display:contents</code>, which is what keeps the state words on one line when a label wraps and another does not. A step is <code>.stps-m</code> + <code>.stps-b</code>: the step&rsquo;s own subject icon at every state, with the state on the <code>.stps-i</code> (<code>done</code> / <code>on</code> / neither) and the mark&rsquo;s <b>ground</b> carrying it — flat accent for done, the accent tint for the one you are on, the panel tone for what is ahead. That is the opposite of §33.7&rsquo;s dropdown, where the mark is a bare glyph because five filled tiles in a 340px panel read as buttons. And the <b>second divider is the wing&rsquo;s <code>border-bottom</code></b>, so it exists only where there are steps; below 900 the same markup turns 90 degrees into a column, the state word gives its line back to the step&rsquo;s own detail, and <code>.plate-b</code>&rsquo;s icon rows stay as they are.', `
+  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. <b>The header carries the reader</b> — <code>.ph-you</code> puts a 75px face left of the <code>&lt;h1&gt;</code>, spanning the title and the fact row, with the rank medal on its corner; <code>.ph-rank</code> is a <b>sibling</b> of <code>.av-ph</code> and not a child, because §09 gives the avatar <code>overflow:hidden</code> and would clip anything hanging past the edge. The award line rides <code>.ph-act</code>, the slot §15 already keeps at the right-hand end of that row, and §62 lets the row <b>wrap</b> — under 360px of title block the sentence drops to its own line instead of breaking &ldquo;Welcome back, Maryam!&rdquo; over three. A rank does not go in the green <code>.ach</code> band: a badge is news you dismiss, a rank is what you now are. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks. <b>§56 arranges it as two columns</b> — the title, the <code>&middot;</code> fact row, a hairline, the steps, a second hairline and then what Tal says on the left; the plate beside all of it, content packed to the top and its actions on the foot, as tall as the column. The second column appears on its own: the gate is <code>.modhead:has(&gt; .sec-dark .plate)</code> at 900 and up, so a band whose dark card is a <code>.lvl-hero</code> or a <code>.cert</code> keeps the full-width place under the head. <b>The title is the <code>.ph</code>, not a greeting.</b> <code>.tal-greet</code> still works and still hides the <code>.ph</code> when you use it (§33.9) — the candidate portal chose the other shape, because with the fact row and the steps above Tal a greeting would be the fourth thing in the column. <b>Four things in the steps are easy to get wrong.</b> <code>.stps</code> is a column-flow grid and <b>each <code>.stps-i</code> paints the rail segment to its own right</b>, from its mark to the next one — there is no rail element to add, and adding a wrapper for one puts a line through the marks. The item is a <b>three-row grid</b> and <code>.stps-b</code> is <code>display:contents</code>, which is what keeps the state words on one line when a label wraps and another does not. A step is <code>.stps-m</code> + <code>.stps-b</code>: the step&rsquo;s own subject icon at every state, with the state on the <code>.stps-i</code> (<code>done</code> / <code>on</code> / neither) and the mark&rsquo;s <b>ground</b> carrying it — flat accent for done, the accent tint for the one you are on, the panel tone for what is ahead. That is the opposite of §33.7&rsquo;s dropdown, where the mark is a bare glyph because five filled tiles in a 340px panel read as buttons. And the <b>second divider is the wing&rsquo;s <code>border-bottom</code></b>, so it exists only where there are steps; below 900 the same markup turns 90 degrees into a column, the state word gives its line back to the step&rsquo;s own detail, and <code>.plate-b</code>&rsquo;s icon rows stay as they are.', `
     <div class="modhead">
-      <div class="ph">
+      <div class="ph ph-has-act ph-you">
         <div class="ph-main">
+          <span class="ph-you-av">
+            <span class="av-ph"><i>MN</i><img src="{{av:hana}}" alt=""></span>
+            <span class="ph-rank"><img src="{{aw:rank1}}" alt="1-Star rank"></span>
+          </span>
           <div class="ph-top"><h1>Welcome back, Maryam!</h1></div>
           <p class="ph-facts">
             <span class="ph-f">{{growth}}<span>Explorer Track – E3</span></span>
             <span class="ph-f">{{group}}<span>Cohort 41</span></span>
             <span class="ph-f">{{calendar}}<span>Week 5 of 13</span></span>
           </p>
+        </div>
+        <div class="ph-act">
+          <a class="ph-earned">
+            <span class="ph-earned-mk"><img src="{{aw:rank1}}" alt=""></span>
+            <span>You have earned 1-star <span class="ph-earned-u">rank!</span></span></a>
         </div>
       </div>
       <div class="sec">
@@ -644,6 +684,67 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       <div class="cardrow"><span class="cardrow-b"><span class="flag-t green">{{checkFilled}}Paid 19 Aug</span></span></div>
       <div class="cardrow"><span class="cardrow-b"><span class="flag-t">{{flag}}No modifier — body ink</span></span></div>
     </div>
+  `)}
+
+  ${ex('The live call', 'The one surface here that is <b>not a page</b>: it replaces the shell and the view rather than sitting inside them, so draw it in place of your app’s body, not on top of it. <b>The photograph is the screen</b> — a full-bleed <code>.call-main</code> with the far side’s picture on it, their name in white over the bottom-left corner, and nothing else. Facts about the session are one press away, not permanently beside it. The picture is an inline <code>background-image</code>, so every scrim over it is a pseudo-element: an inline background beats any stylesheet rule on the same property. <b>Two arrangements from one markup shape.</b> Two people: a <code>.call-self</code> picture-in-picture inside the feed and no column. A group: a <code>.call-col</code> of participants beside the feed — <b>discs on a light ground, not little videos</b>, because nine 16:9 thumbnails in a 300px column are nine letterbox slits — and you are one of the tiles rather than a picture-in-picture. <code>.call-p.on</code> is whoever is speaking: the accent tint on the tile and a ring on the disc, drawn as two shadows so nothing moves by a pixel. <b>The bar is light and square</b>: <code>--layer-02</code> for a control that is available, <code>.off</code> (black) for one you switched off, <code>.on</code> (the accent tint) for one you switched on, and the error tint on the way out. <b>There is no JS in this box for it</b> — the portal fast-forwards a 45-minute session into 42 seconds so a prototype can be watched, which is scaffolding rather than a component; a real product takes its clock and its participants from a video SDK. Keep every state in your own model: a class a click handler adds does not survive the next render.', `
+    <div class="call-demo">
+      <div class="call">
+        <div class="call-bar">
+          <span class="call-id">
+            <span class="call-ttl">Cohort 41 &middot; week 5 call</span>
+            <span class="call-sub">Led by Priya Nair &middot; 60 minutes &middot; 9 of 10 here</span>
+          </span>
+          <span class="call-clock">20:00</span>
+        </div>
+        <div class="call-body">
+          <div class="call-main" style="background-image:url({{art:feed}})">
+            <div class="call-said">
+              <span class="call-cap">Priya opens week 5 &mdash; Hard Conversations</span>
+              <span class="call-nm">Priya Nair <em>&middot; host</em></span>
+            </div>
+          </div>
+          <aside class="call-col">
+            <div class="call-people">
+              <div class="call-p me">
+                <span class="call-p-mk">{{micOff}}</span>
+                <span class="call-p-av"><img src="{{av:hana}}" alt=""></span>
+                <span class="call-p-n">Maryam Naz <em>(you)</em></span>
+              </div>
+              <div class="call-p on">
+                <span class="call-p-av"><img src="{{av:priya}}" alt=""></span>
+                <span class="call-p-n">Aisha Bello</span>
+              </div>
+              <div class="call-p">
+                <span class="call-p-mk">{{micOff}}</span>
+                <span class="call-p-av"><img src="{{art:faceM}}" alt=""></span>
+                <span class="call-p-n">Daniel Kerr</span>
+              </div>
+              <div class="call-p">
+                <span class="call-p-mk">{{micOff}}</span>
+                <span class="call-p-av"><img src="{{art:faceW}}" alt=""></span>
+                <span class="call-p-n">Nora Lindqvist</span>
+              </div>
+            </div>
+          </aside>
+          <div class="call-foot">
+            <button class="call-ctl off" aria-label="Unmute">{{micOff}}</button>
+            <button class="call-ctl" aria-label="Turn the camera off">{{video}}</button>
+            <button class="call-ctl" aria-label="Share your screen">{{screenShare}}</button>
+            <button class="call-ctl" aria-label="Raise your hand">{{raiseHand}}</button>
+            <button class="call-ctl on" aria-label="Turn captions off">{{captions}}</button>
+            <button class="call-ctl on" aria-label="Who is here">{{group}}</button>
+            <button class="call-ctl" aria-label="Session details">{{overflow}}</button>
+            <button class="call-leave">{{callEnd}}<span>Leave call</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+
+  ${ex('Five scores as a rose', 'A bar chart bent into a circle, and the reason to bend it is that the categories have <b>no order</b> — a row of five bars implies a first and a last that a set of five traits does not have. Each wedge reaches out as far as its own score against rings at 25 / 50 / 75 / 100, and the hub holds the one figure that is not a band. <b>Call <code>dsQuizRose(dims, score)</code></b> with an array of <code>[name, 0–100]</code> pairs — three or more, any number — and it returns the chart, the legend rows and nothing else; the caption under it is yours to write, because what the two shortest wedges <i>mean</i> is your product’s claim and not the chart’s. <b>The fill carries the verdict, not a hue</b>: solid ink at 70 and over, a 45° hatch from 50, empty with a hairline below. Three greens or a traffic light would say the same in colour, and this system spends colour on one accent — a pattern also survives being printed and read by somebody who does not separate red from green. The legend swatch takes the same three fills from the same function, so a band cannot be drawn solid and labelled Weak. The whole component is <b>fluid</b>: the SVG has a viewBox and no width, and 420px is where more wedge stops being more information.', `
+    <div id="roseDemo"></div>
+    <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
+      the interview probes hardest, and what the course spends most of its time on.</p>
   `)}
 `});
 
@@ -1199,6 +1300,13 @@ document.getElementById('replay').onclick = () => { dsStagger(page); dsEnter(app
 
    It is deliberately NOT wired to the section scroll: a line that re-types
    every time it comes back into view is a page that will not sit still. */
+/* THE ROSE, DRAWN. `dsQuizRose` returns the whole component out of an array
+   and a number, so the example's markup is a host and one line — there is no
+   hand-written version of this to show. */
+const roseDemo = document.getElementById('roseDemo');
+if(roseDemo) roseDemo.innerHTML = dsQuizRose(
+  [['Decisiveness',78],['Delegation',41],['Directness',66],['Coaching',38],['Composure',84]], 64);
+
 const tsumDemo = document.getElementById('tsumDemo');
 if(tsumDemo){
   const typeDemo = () => { DS_SUM.key = null; dsTypeSummary(tsumDemo, 'gallery'); };

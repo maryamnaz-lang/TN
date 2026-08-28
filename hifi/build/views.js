@@ -766,9 +766,97 @@ const brandOf = n => { n=(n||'').replace(/\D/g,'');
    two links either side of it on the page and none of the weight of the one
    thing this band is asking you to do. It comes out of the text slot and
    becomes a real control at the end of the row, next to the dismiss. */
+/* ==========================================================================
+   A RANK IS NOT A BANNER — Figma 486:1084, §62
+
+   Maryam's cut, and the reason is what the two things ARE. `ACH` holds three
+   celebrations and they are not the same kind of event:
+
+     week1     `rank1`   your rank went up. It is a property of YOU, and it is
+                         still true tomorrow and next month.
+     day90     `bronze`  a badge was earned. A thing you now own, one of four.
+     promoted            the level moved. A decision somebody signed.
+
+   The banner is right for the last two: they are news, they have a date, and
+   dismissing one is the reader saying "read it". A rank is not news you dismiss
+   — it is what you now are. Drawn as a green slab across the page under the
+   head it announced a permanent fact as an interruption, and then let you close
+   it, after which nothing on the dashboard said what rank you hold at all.
+
+   So the rank moves INTO the header row, in two halves, and the file draws both
+   on one line:
+
+     the mark   your own face at 75px with the rank medal on its corner, left of
+                the `<h1>`. It is not an announcement, so it is not conditional
+                on the achievement — it is there on every stage that HAS a rank
+                (`GAME`, which is the four enrolled and complete stages), and it
+                changes when the rank does.
+     the line   "You have earned 1-star rank!" at the right-hand end of the same
+                row, in `--link` with the last word underlined, linking to
+                Rewards. THIS is the announcement, and it is conditional: it
+                appears where the banner would have.
+
+   `achBanner` therefore skips a rank and is otherwise untouched — the badge and
+   the promotion still get the green band, still dismissible. If a second rank
+   is ever added to `ACH` it needs no work here; the test is the artwork's name.
+   ========================================================================== */
+const isRankAch = a => !!a && /^rank\d$/.test(a.art || '');
+
+/* THE MEDAL IS A SIBLING OF THE AVATAR, NOT A CHILD, and that is the one thing
+   about this markup that is not free choice: §09 gives `.av-ph` `overflow:hidden`
+   so the photograph cannot escape its box, which clips anything else in there
+   too. The file hangs the medal 4px past the top-right corner, so it has to sit
+   in a positioned wrapper beside the avatar rather than inside it.
+
+   AND IT DOES NOT CALL `avatar()`, WHICH IS TRAP 1 AND NOT A STYLE PREFERENCE.
+   That helper writes the size as `style="width:75px;height:75px"`, and an inline
+   declaration beats every stylesheet rule at every specificity — so the 56 this
+   mark steps down to below 900 could only have been won with `!important`. The
+   size is §62's, on both sides of the breakpoint. Everything else about the
+   element is the helper's own markup, initials-behind-photograph included. */
+function youMark(){
+  const g = GAME[S.stage];
+  return `<span class="ph-you-av">
+    <span class="av-ph"><i>MN</i><img src="${AV.hana}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+    ${g ? `<span class="ph-rank"><img src="${AWARD['rank'+g.rank]}" alt="${RANKS[g.rank-1].n} rank"></span>` : ''}
+  </span>`;
+}
+
+/* AND THE ANNOUNCEMENT RIDES `.ph-act`, WHICH ALREADY EXISTS FOR THIS SHAPE.
+   §15 draws the page header as "the heading and its sentence take the measure
+   they need; the one action the page is for sits against the right edge of the
+   column, on the same band" — which is 498:1578's own arrangement, and it
+   already stacks under the title below 672. §62 only has to change the cross-axis
+   alignment, because the left half of this row is 75px tall rather than two
+   lines of type.
+
+   IT IS A LINK, NOT A BUTTON, and the underline is on the last word only —
+   both are the file's. §12 makes every link `--link` (#0371a4, its own note
+   explains the darkening off the file's #0488C5), so the colour is the token
+   rather than the hex. The whole phrase is the target; the underline marks
+   where it goes. */
+function rankEarned(){
+  const a = ACH[S.stage];
+  if(!isRankAch(a) || S.hideAch.includes(S.stage)) return '';
+  const r = RANKS[+a.art.slice(4) - 1];
+  if(!r) return '';
+  return `<a class="ph-earned" data-go="${a.go}">
+    <span class="ph-earned-mk"><img src="${AWARD[a.art]}" alt=""></span>
+    <span>You have earned ${r.n.toLowerCase()} <span class="ph-earned-u">rank!</span></span></a>`;
+}
+
+/* ONE WRAPPER FOR THE SIX DASHBOARDS rather than five extra arguments at six
+   call sites. Every other page in the product calls `ph()` exactly as before;
+   this is the only header with a face in it, because it is the only page whose
+   subject is the reader. */
+const dashPh = (title, sub) =>
+  ph(title, sub, rankEarned(), null, youMark());
+
 function achBanner(){
   const a = ACH[S.stage];
   if(!a || S.hideAch.includes(S.stage)) return '';
+  /* the header row says it — see `rankEarned` above */
+  if(isRankAch(a)) return '';
   return `<div class="ach">
     ${a.art
       ? `<span class="ach-art"><img src="${AWARD[a.art]}" alt=""></span>`
@@ -1268,9 +1356,16 @@ const phSub = sub => {
   return `<p class="ph-facts">${parts.map(t =>
     `<span class="ph-f">${factIcon(t)}<span>${_cap(t)}</span></span>`).join('')}</p>`;
 };
-function ph(title,sub,act,backTo){
-  return `<div class="ph${act?' ph-has-act':''}">
-    <div class="ph-main"><div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?phSub(sub):''}</div>
+/* `mark` IS A FIFTH ARGUMENT AND NOT A SIXTH SHAPE. One page in the product
+   opens with a face — the dashboard, whose subject is the reader — and 486:1084
+   puts it left of the `<h1>` spanning both the title and the fact row under it.
+   §62 does that with a two-column grid on `.ph-main` rather than a wrapper
+   around the two text rows, so the thirty-odd `ph()` calls that pass no mark
+   emit byte-identical markup to what they emitted before. `.ph-you` is the gate;
+   nothing without a mark ever sees the grid. */
+function ph(title,sub,act,backTo,mark){
+  return `<div class="ph${act?' ph-has-act':''}${mark?' ph-you':''}">
+    <div class="ph-main">${mark||''}<div class="ph-top">${bk(backTo)}<h1>${title}</h1></div>${sub?phSub(sub):''}</div>
     ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
 }
 /* BEFORE THE INTERVIEW, THE SAME BAR — SEE §29.4
@@ -1877,7 +1972,7 @@ V.dashboard = (f) => {
      half of the call block, which is what the wireframe was drawing.
      ============================================================ */
   if(S.stage==='consult') body = `
-    ${ph('Hi Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
+    ${dashPh('Hi Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
@@ -1939,7 +2034,7 @@ V.dashboard = (f) => {
     </div>`;
 
   else if(S.stage==='new') body = `
-    ${ph('Welcome back, Maryam!','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
+    ${dashPh('Welcome back, Maryam!','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -2012,7 +2107,7 @@ V.dashboard = (f) => {
           tinted block closes itself and needs no closing rule. */}`;
 
   else if(S.stage==='booked') body = `
-    ${ph('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
+    ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -2050,20 +2145,23 @@ V.dashboard = (f) => {
           block closes on where the level came from. It was the other way round
           for one build, which put a finished score above the open appointment.
 
-          ON THE CANVAS, WITH THE QUIZ BLOCK UNDER IT ON THE PANEL. Two sections
-          in a row cannot both be filled or the page reads as panels all the way
-          down, so one takes the ground and the other takes the canvas: a panel
-          is §12's ground for "a section the reader treats as one object", which
-          four figures under one heading are and a sentence-plus-strip-plus-list
-          is not. The note over `quizResults` carries the argument for the pair.
+          BOTH ON THE CANVAS NOW, AND THE JOIN IS A HAIRLINE AGAIN. These two
+          were a pair for three builds — "two sections in a row cannot both be
+          filled or the page reads as panels all the way down", so the quiz block
+          took §12's panel and this one took the canvas. The quiz block is white
+          from this build (Maryam's call; the note over `quizResults` is the long
+          version), which answers the pair rule the other way round: neither
+          filled rather than one filled.
 
-          AND THE JOIN NEEDS NOTHING SAID ABOUT IT. While the panel was ABOVE
-          this section the pair drew its boundary twice — a hairline and a change
-          of ground — and a `.sec-notop` class in §56 subtracted the second.
-          Reversed, neither section draws a rule at all (measured at 1280 and
-          390: `border-top:0`, `::after:none` on both), because this one opens
-          under the head band's own closing rule and the panel below it is its
-          own top edge. The class went with the need for it.
+          What that changes here is one line and it comes back on its own. While
+          the block below was a `.cards` panel, §55.2 took the closing rule off
+          THIS section on the ground that a change of ground is already a
+          boundary. There is no change of ground now, so that selector stops
+          matching and the hairline is the boundary — which is the ordinary
+          rhythm every other pair of sections on the page uses. Nothing is
+          restated to get it; §55.2 is keyed on `.cards` and the class went with
+          the panel. A `.sec-notop` class lived in §56 for one build to subtract
+          the same boundary from the other direction, and went the same way.
 
           THE FOUR FACTS ARE A `.stats` STRIP, which is the component Maryam's
           card was drawing: `.stats` is a FIXED four-column grid, so Length,
@@ -2115,7 +2213,7 @@ V.dashboard = (f) => {
     ${quizResults(qzTaken(), 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
-    ${ph('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
+    ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -2205,7 +2303,7 @@ V.dashboard = (f) => {
     </div>`;
 
   else if(f.complete) body = `
-    ${ph('Welcome back, Maryam!','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
+    ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
     ${achBanner()}
     <div class="sec">
       <div class="ai-aura tile">
@@ -2332,7 +2430,7 @@ V.dashboard = (f) => {
           every stage — capital B and an exclamation mark on one of eight
           dashboards, which was invisible while the greeting inside Tal's
           summary was drawing the title. Same words as the other seven now. */}
-    ${ph('Welcome back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
+    ${dashPh('Welcome back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
     ${achBanner()}
     ${reBook}
     <div class="sec">
@@ -4598,61 +4696,52 @@ function signedSummary(withNote, re, footAction){
                 by `booked` that is a named agent on a known date rather than
                 an interview nobody has arranged. Same "Not set" value, more
                 specific answer to the question the value provokes. */
-/* AND IT SITS ON THE PANEL TONE, `sec tint` — #F7F7F7, §12's `--surface-2`.
-   Plain `.tint` and nothing else: §12's note says `--surface-2` is the ground
-   for "a section the reader is meant to treat as one object", which is what
-   four figures under one heading are, on a page whose other sections are
-   things you DO — book an agent, open a chapter.
+/* THE TWO TINTS THIS BLOCK USED TO WEAR, kept in one sentence because both are
+   one step off white and mixing them up is easy: §12's `.tint` is #F7F7F7, the
+   ground for "a section the reader is meant to treat as one object", and §45's
+   `.tint.info` is #FBFBFB, for a section that should RECEDE. §45 works by
+   declaring `--surface-2` ON the element, so §12's twenty-odd `.sec.tint`
+   selectors follow whichever value is in scope — which is why `.info` is never
+   written without `.tint`. Neither is on this block any more; see below. */
+/* THE QUIZ BLOCK IS WHITE — Maryam's call, and it settles a tone that had
+   oscillated four times. The block has worn `tint info` (#FBFBFB, §45's
+   "background reading"), then `tint cards` (#F7F7F7 with white cells, §55),
+   then plain white for one build, then `tint cards` again. It is the canvas
+   now, and it stays there.
 
-   IT WAS `tint info` (#FBFBFB) FIRST, and the two are worth keeping straight
-   because both are one step off white. §45's lighter value is for a section
-   that should RECEDE — background reading nobody is being asked to act on,
-   which is what the agent portal's four `.tint.info` sections are. This block
-   is not receding: it is the answer to "where do I stand" and the first thing
-   under the agent rail.
+   WHAT THE PANEL ARGUMENT WAS, because it is the one that will be made again.
+   §12's test for a panel is "a section the reader is meant to treat as one
+   object", and four figures under one heading are exactly that; the pair
+   argument came with it — on the booked dashboard this block closes the page
+   under "Your session, step by step", and two sections in a row cannot both be
+   filled or the page reads as panels all the way down, so one takes the ground
+   and the other takes the canvas.
 
-   NOTHING IS RESTATED TO CHANGE IT, which is the point of §45's mechanism.
-   §45 works by declaring `--surface-2` ON the element, so §12's twenty-odd
-   `.sec.tint` selectors — the hairlines stepping to `--rule-on-2`, `.stats`
-   repainting its cells so its 1px grid gaps still read as rules — resolve
-   against whichever value is in scope. Dropping one class moves the whole
-   tone system with it, and `.info` alone would have been a colour with none
-   of that behind it.
+   WHAT IT MISSED. The pair rule only bites when both are filled, and the fix is
+   symmetrical: neither filled is as good an answer as one filled, and it is the
+   better one here. The cells were already WHITE — that is the whole of what
+   `cards` did — so the panel was a 16px frame of #F7F7F7 around four white
+   boxes, which is a ground doing nothing but outline a grid the 1px gaps
+   already draw. On white the same four cells read the same way and the block
+   stops claiming to be a summary you treat as one object, which is right: a
+   title, a score, a date and a level are four facts with four icons.
 
-   ALL THREE STAGES, because this is one function and the block is the same
-   block. `consult`, `new` and `booked` print the same four figures — the
-   note above says why — so tinting the function rather than a call site is
-   what stops the quiz block being a panel on one stage and a plain section
-   on the next. */
-/* AND ITS FOUR CELLS ARE CARDS ON THE PANEL, `cards` — §55. White fills, so
-   the four figures read as four separate facts rather than as regions of one
-   divided area, which is what they are: a title, a score, a date and a level,
-   each with its own icon. It also matches the three bordered agent cards
-   directly above it, which is what makes the foot of the page read as one
-   page. The grid keeps `--rule-on-2`, so the hairlines between cells are still
-   the 1px gaps and are more visible against white than they were against the
-   panel. §55 carries the argument and the one thing that rides along with it
-   (the head button, which §02 leaves transparent and which was the only thing
-   in the block still the panel's colour). */
-/* THE PANEL IS BACK, AND THE PAIR IS WHAT DECIDES IT. This block has worn three
-   tones — `tint info` (#FBFBFB, §45's "background reading"), then `tint cards`
-   (#F7F7F7 with white cells, §55), then plain white for one build — and the
-   argument was always about the block on its own. It is not on its own: on the
-   booked dashboard it closes the page under "Your session, step by step", and
-   two sections in a row cannot both be filled or the page reads as panels all
-   the way down. One of the two takes the panel and the other takes the canvas.
+   `cards` GOES WITH `tint` AND HAS TO. Every §55 selector is
+   `.sec.tint.cards` — the class is a correction TO the panel, so on the canvas
+   it is inert. §55 keeps two live users (the interview and re-interview digests
+   on `assessed` and `promoted`), so nothing there is orphaned.
 
-   THE QUIZ BLOCK IS THE FILLED ONE, on Maryam's call and on §12's own test: a
-   panel is for "a section the reader is meant to treat as one object", and four
-   figures under one heading are exactly that, while the interview section is a
-   sentence, a strip and a numbered list — three kinds of thing that are not one
-   object. `cards` with it, so §55 takes the four cells white against the panel
-   and the 1px grid gaps stay readable as rules.
+   AND THE SECTION ABOVE GETS ITS RULE BACK, which is the one visible knock-on.
+   §55.2 takes the closing hairline off whatever sits above a `.cards` block on
+   the stated ground that "the ground changes at that line, and a change of
+   ground is already a boundary". With no change of ground there is no boundary,
+   so the hairline is the boundary again — and it comes back on its own, because
+   that selector simply stops matching.
 
    ALL THREE STAGES, because this is one function and the block is the same
    block. `consult`, `new` and `booked` print the same four figures. */
 function quizResults(taken, levelNote){
-  return `<div class="sec tint cards">
+  return `<div class="sec">
       <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="result">See full breakdown</button></div>
       <div class="stats">
         ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}

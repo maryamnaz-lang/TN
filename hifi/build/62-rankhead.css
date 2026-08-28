@@ -1,0 +1,180 @@
+/* ==========================================================================
+   62. A RANK GOES IN THE HEADER, NOT IN A BANNER — Figma 486:1084 (498:1578)
+
+   The dashboard's header row, as the file draws it: your face on the left with
+   the rank medal on its corner, the `<h1>` and the fact row beside it, and at
+   the far right of the same line "You have earned 1-star rank!" — the medal
+   again at 32, then the sentence in the link blue with its last word
+   underlined. The green `.ach` band that used to carry this is gone from the
+   rank case; the note over `achBanner` in views.js is where the argument for
+   splitting the two lives, and it is short: a badge is news and a rank is what
+   you now ARE, so one is an announcement you dismiss and the other is a
+   property of the header.
+
+   THE TWO HALVES HAVE DIFFERENT LIFETIMES and the markup says so. `.ph-you` is
+   on every dashboard — the mark is the reader, and the medal on it is whatever
+   rank they currently hold (`GAME`, so the four enrolled and complete stages).
+   `.ph-earned` appears only where the banner would have. That is why they are
+   two rules here rather than one component: the row has to look right with the
+   right-hand half missing, which is what it is on five of the six dashboards.
+
+   NOTHING HERE IS A NEW LAYOUT. §15 already draws the page header as "the
+   heading and its sentence take the measure they need; the one action the page
+   is for sits against the right edge of the column, on the same band", which is
+   498:1578's arrangement exactly, and it already stacks below 672. This layer
+   adds the mark's column, moves the cross-axis alignment to centre because the
+   left half is now 75px tall rather than two lines of type, and states what the
+   two new objects look like.
+
+   LAST, and two of its rules need to be: `align-items` on `.ph-has-act` is
+   §15's, declared inside `@container app (min-width:672px)`, so per trap 3 it
+   can only be answered from a later layer inside the same query; and
+   `.ph-facts`'s top margin is §56.1b's. Everything else is `.ph-you*` /
+   `.ph-earned*`, names no earlier layer mentions.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE MARK TAKES A COLUMN, NOT A WRAPPER
+
+   A grid on `.ph-main` rather than a box around the two text rows, for one
+   reason: thirty-odd `ph()` calls pass no mark and none of their markup
+   changes. The mark spans both rows, the `<h1>` takes row 1 of column 2 and the
+   fact row takes row 2 by auto-placement, and a header with no `sub` simply has
+   an empty second row.
+
+   20px BETWEEN THEM AND 12px BETWEEN THE ROWS are the file's (95 - 75 = 20;
+   Frame 2's own `gap`). The two margins those replace are turned off rather
+   than left to add: §02 gives `.ph-top` 8 underneath and §56.1b gives
+   `.ph-facts` 8 above, and a grid gap plus both is 28 where the file draws 12.
+   -------------------------------------------------------------------------- */
+.app .ph-you > .ph-main{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr);
+  column-gap:20px;row-gap:var(--s04);
+  align-items:start}
+.app .ph-you > .ph-main > .ph-you-av{grid-row:1 / span 2}
+.app .ph-you > .ph-main > .ph-top{margin-bottom:0}
+.app .ph-you > .ph-main > .ph-facts{margin-top:0}
+
+/* THE MEDAL IS A SIBLING OF THE AVATAR AND THE WRAPPER IS WHY. §09 gives
+   `.av-ph` `overflow:hidden` so a photograph cannot escape its box — correct,
+   and it clips anything else in there too. The file hangs the medal 4px past
+   the top and 4px past the right edge, so it cannot be a child. `.ph-you-av` is
+   the positioned box the two share; it has no size of its own, because the
+   avatar inside it is what sets one.
+
+   NO RING BEHIND THE MEDAL. The artwork is a rendered object with its own
+   shadow and it is landing on the band's wash, not on a photograph — a white
+   disc under it would be a second edge around a mark that already has one. */
+.app .ph-you-av{position:relative;flex:none;line-height:0}
+/* 75 is the file's, and it is stated HERE rather than inline on the element —
+   trap 1. `youMark` deliberately does not go through `avatar()` for that
+   reason; the note there is the long version.
+
+   `isolation:isolate` IS WHAT PUTS THE MEDAL IN FRONT OF THE FACE, and it took
+   a look at the built page to find out why it was behind. §11's avatar-fallback
+   block layers the inside of an avatar so a failed image degrades to initials:
+   `.av-ph i` is `z-index:0` and `.av-ph img` is `z-index:1`. `.av-ph` itself is
+   `position:relative` with `z-index:auto`, so it does NOT contain those — the
+   photograph's 1 escapes into the same stacking context the medal sits in, and
+   beats a sibling at `auto` however late in the DOM it comes. The medal was
+   painting under the photograph with only the sliver past the corner showing.
+
+   ISOLATING THE AVATAR RATHER THAN OUTBIDDING IT. `z-index:2` on `.ph-rank`
+   would fix this one case and leave the next thing hung off this corner to
+   discover the same 1 again. The photograph's z-index means "in front of the
+   initials" and nothing else; `isolation` is what makes that true — it contains
+   both numbers inside the avatar, after which the medal is simply the later
+   positioned sibling and needs no number of its own. Same construction §25
+   uses to keep the band's wash under its own text. */
+.app .ph-you-av > .av-ph{width:75px;height:75px;isolation:isolate}
+.app .ph-rank{
+  position:absolute;top:-4px;right:-4px;
+  width:24px;height:24px;pointer-events:none}
+.app .ph-rank img{width:100%;height:100%;display:block;object-fit:contain}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE ANNOUNCEMENT AT THE RIGHT-HAND END OF THE SAME ROW
+
+   `flex-end` IS WRONG FOR THIS ROW AND RIGHT FOR EVERY OTHER ONE. §15 aligns
+   the header's action to the BOTTOM of the text block, which is what puts a
+   button on the same baseline as the last line of the description. Against a
+   75px mark the earned line then sat on the fact row's baseline with 50px of
+   air above it and read as a footnote to the facts rather than as the other end
+   of the title's line. Centred, it holds the row.
+
+   Restated inside §15's own query per trap 3, and gated on `.ph-you` so the
+   thirty headers that carry a real button keep the bottom alignment.
+   -------------------------------------------------------------------------- */
+/* AND THE ROW WRAPS RATHER THAN CRUSHING THE TITLE, which is the one thing
+   about this that the file cannot tell you: 486:1084 draws the header 966 wide,
+   and in the built portal `.ph` is the head band's LEFT column — `container -
+   330` less the gutter, so it is 507 at a 900 frame and 886 at 1280. The
+   sentence is 207 of that whatever the frame does. Dropped into `.ph-act` with
+   no wrap the flex row simply shrank `.ph-main` (§15 gives it `min-width:0`) and
+   "Welcome back, Maryam!" came apart over three lines at every width below
+   about 1000.
+
+   `flex-wrap` PLUS A FLOOR ON THE TEXT BLOCK, and no breakpoint. A flex line
+   breaks on the items' hypothetical sizes, which respect `min-width` — so the
+   floor is what turns "shrink the title" into "move the sentence to its own
+   line". 360 is 75 of mark, 20 of gap and 265 for the longest `<h1>` the
+   dashboard sets at 28/34, measured rather than chosen; under that the sentence
+   drops below the title block, left-aligned, and the header is the shape §15
+   already gives every other page below 672. Above it the row is the file's.
+
+   Stated inside §15's own query per trap 3, and gated on `.ph-you` so the
+   thirty headers that carry a real button keep the bottom alignment and the
+   single line they were tuned for. */
+@container app (min-width:672px){
+  .app .ph-has-act.ph-you{
+    align-items:center;flex-wrap:wrap;row-gap:var(--s05)}
+  .app .ph-has-act.ph-you > .ph-main{flex:1 1 auto;min-width:360px}
+  .app .ph-you > .ph-act{padding-bottom:0}
+}
+
+/* THE LINE ITSELF. 13.5/19 and not the file's 16: 486:1084 sets this at the
+   same size as the fact row under the title, and OUR fact row is 13.5 (§56.1b's
+   own decision, "a glyph reads as the weight of a capital rather than as a
+   bullet in front of one"). Same size as the facts is the relationship the file
+   is drawing, so the relationship is what crosses rather than the number.
+
+   THE MARK SCALES WITH IT. 32 against 16 in the file is 2:1, so 28 against 13.5
+   here — one step down from the file's absolute size and the same weight beside
+   the words. It is the same artwork the medal on the avatar wears, which is the
+   point: the sentence names the thing the corner of your face is now wearing.
+
+   `--link`, NOT #0488C5. §12 states the darkening and why (contrast), and the
+   whole phrase is the link — the underline on the last word is the file's way
+   of marking where it goes without underlining a sentence. */
+.app .ph-earned{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  min-width:0;text-decoration:none;cursor:pointer;
+  color:var(--link);
+  font-size:13.5px;line-height:19px;letter-spacing:.1px}
+.app .ph-earned-mk{
+  flex:none;width:28px;height:28px;display:block}
+.app .ph-earned-mk img{
+  width:100%;height:100%;display:block;object-fit:contain}
+.app .ph-earned-u{
+  text-decoration:underline;text-underline-position:from-font;
+  text-decoration-skip-ink:none}
+
+/* --------------------------------------------------------------------- 3 ---
+   BELOW 900 THE MARK STEPS DOWN WITH THE HEADING
+
+   §10 takes the `<h1>` from 28/34 to 24/30 under the label-column breakpoint,
+   and the file has no drawing at that width. 75px of face beside a 24px
+   heading is the mark leading the row rather than standing next to it, so it
+   takes the 56 the product already uses for a person on a card (`.plate-who`,
+   `avatar(…, 56)`), with the medal down to 20 in the same proportion.
+
+   The row does not need a rule at 672 as well: §15 has already turned the
+   header into a column by then, so the earned line is under the title block and
+   the mark is beside it either way.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .ph-you > .ph-main{column-gap:var(--s05)}
+  .app .ph-you-av > .av-ph{width:56px;height:56px}
+  .app .ph-rank{width:20px;height:20px;top:-3px;right:-3px}
+}

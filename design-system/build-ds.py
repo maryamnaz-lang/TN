@@ -203,12 +203,13 @@ LAYERS = [
     # ships (see `dsPlateQuiet` in talentnext-ds.js), because the decision needs
     # only the card's own eyebrow and countdown — not `S`.
     '59-priority.css',
-    # THE LIVE CALL. A surface rather than a page — a dark bar with a clock, a
-    # feed with the far side's photograph in it, a row of member tiles beneath
-    # for a group call, an aside of the facts you say out loud, and one row of
-    # controls. Every portal with an appointment in it has the other end of
-    # this call: the candidate joins an interview, the agent takes it, the
-    # cohort leader hosts the weekly hour.
+    # THE LIVE CALL — Figma 499:2022 and 499:1617. A surface rather than a
+    # page: a dark bar with a clock, a full-bleed feed with the far side's
+    # photograph on it and their name written over the corner, a column of
+    # participants beside it for a group call, and one light row of controls.
+    # Every portal with an appointment in it has the other end of this call —
+    # the candidate joins an interview, the agent takes it, the cohort leader
+    # hosts the weekly hour.
     #
     # IT IS MARKUP PLUS CSS AND NO JS, which is the `.stps` case rather than
     # the `.tsum` one. The portal's ai10.js holds three things the box does not
@@ -217,6 +218,12 @@ LAYERS = [
     # product's call surface gets its clock and its participants from a video
     # SDK; what it needs from a design system is the drawing. The recipe is in
     # gallery.html, and a page that copies it prints a fixed time.
+    #
+    # THE THREE PHOTOGRAPHS SHIP WITH IT, as `CALL_ART` beside `AV` in the JS
+    # half — the feed needs a LANDSCAPE picture and every face in `AV` is a
+    # 200px square cut for a 36px disc, which is a 6x upscale in a 1200px 16:9
+    # box. A component whose one asset the box does not have is a component the
+    # next portal draws badly.
     '60-call.css',
     # THE QUIZ ROSE — five bands as wedges from a common hub, each reaching out
     # as far as its score, the overall figure in the middle, and the legend as
@@ -229,6 +236,20 @@ LAYERS = [
     # function needs only its arguments — an array of pairs and a number — not
     # `S`, which is the test that decides it.
     '61-quizrose.css',
+    # A RANK IN THE HEADER INSTEAD OF A BANNER. The signed-in person's own face
+    # at the head of the page with their standing on its corner, and the
+    # announcement at the right-hand end of the same row — which is a shape any
+    # second portal wants the moment it has a header about the reader rather
+    # than about a record. It is also the layer that makes `.ph-act` work
+    # against a tall left half: `.ph-you` switches the row to `center` and lets
+    # it wrap, so the action drops below the title instead of crushing it.
+    #
+    # NO JS SHIPS WITH IT, and that is not the §52 mistake. There is no clock
+    # and no generator here: the markup is a mark, a medal and a link, and
+    # `gallery.html` carries it verbatim under Signature. The one thing a
+    # hand-authored page has to know is that `.ph-rank` is a SIBLING of `.av-ph`
+    # rather than a child, because §09 clips the avatar's box.
+    '62-rankhead.css',
 ]
 
 # ==========================================================================
@@ -1430,6 +1451,24 @@ function dsQuizRose(dims, score){
         assets.append("const TAL_MARK = 'data:image/png;base64,"
                       + base64.b64encode(tal.read_bytes()).decode() + "';")
         n_img += 1
+
+    # THE CALL'S PHOTOGRAPHS. `AV`'s faces are 200px squares cut for a 36px
+    # disc, and the call's feed is a full-bleed 16:9 box — the first cut of that
+    # surface stretched one of them across it at 6x and got a video call with a
+    # very bad connection. `CALL_ART.feed` is the landscape still the design
+    # brought; the two faces are 240px crops. Same keys and the same table
+    # `build.py` writes, so markup copied out of ai10.js keeps working.
+    CALL_ART = {'feed': 'call-feed.webp', 'faceW': 'call-face-w.webp',
+                'faceM': 'call-face-m.webp'}
+    ca_pairs = []
+    for k, fn in CALL_ART.items():
+        f = SRC / fn
+        if f.exists():
+            ca_pairs.append("%s:'data:image/webp;base64,%s'"
+                            % (k, base64.b64encode(f.read_bytes()).decode()))
+            n_img += 1
+    if ca_pairs:
+        assets.append('const CALL_ART = {\n  ' + ',\n  '.join(ca_pairs) + '\n};')
 
     assets.append("""
 /* ==========================================================================

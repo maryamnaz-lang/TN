@@ -1,327 +1,417 @@
 /* ==========================================================================
    60 — THE LIVE CALL
 
-   The one surface in the product that is not a page. Press Join on an
-   interview or on the weekly cohort call and the whole frame becomes the
-   call: no app bar, no rail, no Tal — a bar that says what this is and how
-   long it has run, the feed, a column of the facts you might need out loud,
-   and one row of controls with the way out at the end of it.
+   Figma 499:2022 (the interview) and 499:1617 (the cohort call). The one
+   surface in the product that is not a page: press Join and the whole frame
+   becomes the call — no app bar, no rail, no Tal. `ai10.js` renders it in
+   place of `shell() + view()`, which is why nothing here has to out-specify a
+   page rule: when `.call` is on screen there is no page.
 
-   IT TAKES THE WHOLE FRAME, AND THAT IS THE DESIGN. A live interview is the
-   highest-stakes forty-five minutes on the ladder and the weekly call is the
-   one hour a week the cohort is in the same room; neither is a dialog over a
-   dashboard. `ai10.js` renders it in place of `shell() + view()` for exactly
-   this reason, which is also why nothing here has to out-specify a page rule:
-   when `.call` is on screen there is no page.
+   THE PHOTOGRAPH IS THE SCREEN, and that is the whole composition. Both
+   frames give the feed everything: full bleed, edge to edge, the far side's
+   name in white over the bottom-left corner and nothing else on it. The first
+   cut of this layer put a 328px column of session details permanently beside
+   it — meeting ID, passcode, dial-in — which is a form beside a face. Those
+   facts are still here and are one press away (the More control opens them);
+   what changed is that the default state of a call is the person you are
+   talking to.
 
-   TWO KINDS, ONE COMPONENT. `data-callkind="iv"` (and `"re"`) is two people;
-   `data-callkind="cohort"` is a host and nine others. The difference is one
-   element — `.call-strip`, the row of member tiles — and two words of copy.
-   Everything else is shared, because a call is a call: the same bar, the same
-   feed, the same aside, the same footer.
+   TWO KINDS, AND THE DIFFERENCE IS THE RIGHT-HAND COLUMN. An interview is two
+   people, so the second face is a picture-in-picture inside the feed and there
+   is no column. A cohort call is ten, so the nine others stand in a column of
+   discs beside the feed — YOU among them, which is why that kind has no
+   picture-in-picture. One grid states both.
 
-   THE MEMBER STRIP IS BENEATH THE MAIN CARD, on Maryam's instruction and it
-   is the better arrangement: the host is who you are listening to, so the
-   host is the thing at the top of the screen, and the nine faces are the room
-   you glance down at. The wireframe had them above, which put a row of
-   thumbnails between the title and the person talking.
+   THE COLUMN IS DISCS ON A LIGHT GROUND, NOT NINE LITTLE VIDEOS. Nine 16:9
+   thumbnails in a 300px column are nine letterbox slits, and this system
+   curves exactly two things — a mark is one of them. So a participant is a
+   72px disc of their own photograph on the panel tone, their name under it,
+   and their state (muted, hand up) as a mark in the corner. It reads at a
+   glance, it survives the column being narrow, and it is the same object the
+   roster on the Cohort page already draws.
 
-   NOTHING HERE CURVES EXCEPT THE RECORDING DOT. §01 sets `--radius:0` and a
-   mark is one of the two things this system lets curve — so the name chips,
-   the tiles, the control buttons and the leave button are all square, where
-   every video product on the market draws them as pills. That is the point:
-   this reads as TalentNext with a call in it rather than as somebody else's
-   call product with our logo on the bar.
+   NOTHING ELSE CURVES. §01 sets `--radius:0`: the control bar's buttons, the
+   picture-in-picture, the participant tiles and the leave button are square,
+   where every video product on the market draws them as pills and discs. That
+   is the point — this reads as TalentNext with a call in it rather than as
+   somebody else's call product with our logo on the bar.
+
+   THE CONTROL BAR IS LIGHT, on Maryam's instruction and against the reference:
+   the Google Meet bar she attached is dark discs floating over the feed. Ours
+   is a light bar under it, its buttons square on the panel tone, its icons the
+   product's own Material filled set. Three states carry everything and none of
+   them is a colour this product does not already own: `--layer-02` for a
+   control that is simply available, BLACK for one you have switched off (the
+   product's own emphasis fill), `--brand-tint-2` for one you have switched on,
+   and the error tint on the way out.
 
    LAST, and it needs almost nothing from the cascade — `call*` is a name no
-   earlier layer mentions. It is here at the end because it is new, and
-   because the two rules that DO reach outside the prefix (`.call .btn` for
-   the leave button's height, and the `--pad-x` restatement) have to land
-   after §02 and §10 to be corrections at all.
+   earlier layer mentions. Two rules do reach outside the prefix and both have
+   to land after the layers they correct: the leave button's height, against
+   §02's 48px `.btn`, and the panel's `--pad-x`, against §10's page gutter.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
    1. THE SURFACE
-   `.app` is a flex column with `inset:0`, so one child that grows is the
-   whole layout. `min-height:0` on every scroller in the chain, because a
-   flex item's default `min-height:auto` refuses to shrink below its content
-   and the overflow then lands on the frame instead of on the column that
-   should hold it.
+   `.app` is a flex column with `inset:0`, so one child that grows is the whole
+   layout. `min-height:0` on every box in the chain, because a flex or grid
+   item's automatic minimum is its content and the overflow then lands on the
+   frame instead of on the column that should hold it.
    -------------------------------------------------------------------------- */
 .app .call{
-  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  flex:1 1 auto;min-height:0;
+  display:grid;grid-template-rows:auto minmax(0,1fr);
   background:var(--background)}
 
 /* --------------------------------------------------------------------------
    2. THE BAR
-   Dark, because it is chrome around a live thing rather than part of the
-   page, and because the recording state has to read at a glance from across
-   a desk. Same ground as `.plate` — `--surface-dark` — so the darkest thing
-   in the product is one colour.
+   Dark, because it is chrome around a live thing rather than part of a page,
+   and the same `--surface-dark` as `.plate` so the darkest thing in the
+   product is one colour. What it says is the head of a page in miniature: the
+   title, then its `&middot;` spine (the `ph()` note in views.js is the rule),
+   then the clock hard right.
 
-   THE TITLE AND THE FACT ROW STACK AT MOBILE AND SIT SIDE BY SIDE FROM 600.
-   They are the head of a page in miniature: what this is, then its `·` spine
-   (see the `ph()` note in views.js). On a phone the spine would push the
-   clock off the end of the row, so it goes under the title until there is
-   room for both.
+   THEY STACK AT MOBILE. On a phone the spine would push the clock off the end
+   of the row, so it goes under the title until there is room for both.
    -------------------------------------------------------------------------- */
 .app .call-bar{
-  flex:none;display:flex;align-items:center;gap:var(--s04);
-  padding:var(--s04) var(--pad-x);
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s03) var(--pad-x);min-height:44px;
   background:var(--surface-dark);color:var(--on-dark)}
-.app .call-id{
-  min-width:0;display:flex;flex-direction:column;gap:2px}
+.app .call-id{min-width:0;display:flex;flex-direction:column;gap:1px}
 .app .call-ttl{
-  font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.2px;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.1px;
   color:var(--on-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .app .call-sub{
-  font-size:12.5px;line-height:18px;letter-spacing:.2px;
-  color:var(--on-dark-2)}
+  font-size:12px;line-height:16px;letter-spacing:.2px;color:var(--on-dark-2)}
 @container app (min-width:600px){
   .app .call-id{flex-direction:row;align-items:baseline;gap:var(--s04);flex-wrap:wrap}
 }
 
-/* THE RECORDING MARK. A hollow square holding a filled disc and the word —
-   the disc is the mark, so the disc is what curves. It breathes rather than
-   blinks: a hard on/off at this size reads as a fault in the page. */
+/* THE RECORDING MARK IS LIGHT ON THE DARK BAR — Figma 499:2022 draws it as a
+   white chip rather than as an outline, which is the louder of the two and
+   right: whether this is being recorded is the one thing on the bar somebody
+   might need to check from across a desk. The dot is the mark, so the dot is
+   what curves; it breathes rather than blinks, because a hard on/off at 7px
+   reads as a fault in the page.
+
+   THE COHORT CALL HAS NO SUCH CHIP, and that is not a styling decision — the
+   Data use notice on `V.account` says weekly cohort calls are not recorded, so
+   `CALL.cohort` sets `rec:false` and this rule never matches there. */
 .app .call-rec{
-  flex:none;display:inline-flex;align-items:center;gap:var(--s03);
+  flex:none;display:inline-flex;align-items:center;gap:var(--s02);
   padding:3px var(--s03);
-  border:1px solid rgba(255,255,255,.34);
-  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--on-dark)}
+  background:var(--on-dark);color:var(--surface-dark);
+  font-size:10px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase}
 .app .call-rec i{
-  display:block;width:7px;height:7px;border-radius:50%;
-  background:var(--on-dark);
+  display:block;width:6px;height:6px;border-radius:50%;
+  background:var(--surface-dark);
   animation:call-rec 2s var(--ease-standard) infinite}
 @keyframes call-rec{
   0%,100%{opacity:1}
-  50%{opacity:.28}
+  50%{opacity:.24}
 }
 
 .app .call-clock{
   flex:none;margin-left:auto;
-  font-size:15px;line-height:20px;font-weight:600;letter-spacing:.4px;
+  font-size:14px;line-height:20px;font-weight:600;letter-spacing:.4px;
   font-variant-numeric:tabular-nums;color:var(--on-dark)}
 
 /* --------------------------------------------------------------------------
-   3. THE BODY
-   One column at mobile, stage and aside side by side from 900 — the same
-   breakpoint §14 gives the page its desktop shape, so the call changes when
-   everything else does.
+   3. THE BODY — one grid, two arrangements
 
-   THE SCROLLER MOVES WITH THE BREAKPOINT. Stacked, the whole body scrolls as
-   one document: the feed, then the facts under it. Side by side, the body
-   itself must NOT scroll — the stage is meant to fill the height, so each
-   column takes its own overflow and the footer stays where it is.
+   MOBILE IS A FLEX COLUMN and desktop is a named grid, which is not two
+   layouts written twice but the only way to get both of the things each width
+   needs. On a phone the feed keeps its ratio, the participant column scrolls
+   under it, and the control bar has to stay PINNED at the bottom — a flex
+   column with one scrolling child does that in three declarations. At desktop
+   the column is full height beside the feed and the bar sits under the feed
+   only (Figma 499:1617), which is a two-by-two named grid and cannot be
+   expressed as a column at all.
+
+   AN ABSENT COLUMN COSTS NOTHING IN EITHER. The interview has no `.call-col`,
+   and both the flex child and the `auto` grid track simply are not there —
+   which is why this is one markup shape and not two.
    -------------------------------------------------------------------------- */
 .app .call-body{
-  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
-  overflow-y:auto}
-.app .call-stage{
-  flex:none;display:flex;flex-direction:column;gap:var(--s04);
-  padding:var(--s05) var(--pad-x);min-width:0}
+  min-height:0;display:flex;flex-direction:column}
 @container app (min-width:900px){
-  .app .call-body{flex-direction:row;overflow:hidden}
-  .app .call-stage{flex:1 1 auto;min-height:0;overflow:hidden}
-  .app .call-side{
-    flex:0 0 328px;width:328px;
-    border-top:0;border-left:1px solid var(--border-subtle-01)}
+  .app .call-body{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:minmax(0,1fr) auto;
+    grid-template-areas:'main col' 'foot col'}
+  .app .call-main{grid-area:main}
+  .app .call-foot{grid-area:foot}
+  .app .call-col{grid-area:col}
 }
 
 /* --------------------------------------------------------------------------
    4. THE FEED
-   A dark box with the person's photograph laid over it. `background-image` is
-   set INLINE by `callTile` — the picture belongs to the person, not to the
-   stylesheet — which is trap 1, so everything that would otherwise be a
-   second background layer is a pseudo-element instead. §38 makes the same
-   split for the same reason and the note there is the long version.
+   A dark box with the far side's photograph laid over it. The photograph is
+   set INLINE by `callFeed` — it belongs to the person, not to the stylesheet —
+   which is trap 1, so everything that would otherwise be a second background
+   layer here is a pseudo-element. §38 makes the same split for the same
+   reason and its note is the long version.
 
-   16:9 AT MOBILE, THE REMAINING HEIGHT AT DESKTOP. `aspect-ratio` is what
-   keeps a phone's feed from taking the whole screen; from 900 the card is
-   supposed to fill its column, and a ratio would leave a band of white under
-   it. `flex:1` and `aspect-ratio:auto` swap the two.
+   16:9 AT MOBILE, THE REMAINING HEIGHT AT DESKTOP. A ratio is what keeps a
+   phone's feed from taking the whole screen; from 900 the feed is supposed to
+   fill its cell, and a ratio would leave a band of white under it.
    -------------------------------------------------------------------------- */
 .app .call-main{
   position:relative;flex:none;width:100%;aspect-ratio:16 / 9;
-  min-height:180px;overflow:hidden;
+  min-height:170px;overflow:hidden;
   background-color:var(--surface-dark);
-  background-size:cover;background-position:center 24%}
+  background-size:cover;background-position:center 28%}
 @container app (min-width:900px){
-  .app .call-main{flex:1 1 auto;aspect-ratio:auto;min-height:0}
+  .app .call-main{aspect-ratio:auto;min-height:0}
 }
-/* THE SCRIM. Even at the top, where the caption sits, and heavier at the
-   bottom, where the name is — both have to hold their edge over a photograph
-   this component does not choose. */
+/* THE SCRIM, weighted to the bottom because that is where the name and the
+   captions are. Even at the top, where a banner can appear. Both have to hold
+   their edge over a photograph this component does not choose. */
 .app .call-main::before{
   content:'';position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,
-    rgba(17,17,17,.42) 0%, rgba(17,17,17,.16) 34%,
-    rgba(17,17,17,.24) 66%, rgba(17,17,17,.62) 100%)}
+    rgba(17,17,17,.34) 0%, rgba(17,17,17,.10) 30%,
+    rgba(17,17,17,.16) 58%, rgba(17,17,17,.66) 100%)}
 
-/* THE NAME CHIP. Square, and on its own ground rather than on the scrim: the
-   scrim is a gradient over an unknown photograph, and 11.5px of white on it
-   is legible in most frames and not all of them. */
+/* WHAT THE FEED SAYS, ALL OF IT, IN ONE COLUMN AT THE BOTTOM LEFT. The name
+   and the caption cannot be two absolutely-positioned boxes with hand-picked
+   offsets — turning captions on would then move the name by a number written
+   somewhere else. One flow, `align-items:flex-start`, and each child sizes
+   itself. */
+.app .call-said{
+  position:absolute;left:var(--s05);right:var(--s05);bottom:var(--s05);z-index:2;
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--s03);
+  pointer-events:none}
+/* AND IT STOPS WHERE THE PICTURE-IN-PICTURE STARTS. Both live at the bottom of
+   the feed, so a caption long enough to fill the line ran under the tile and
+   was cut in half by it — on the interview only, which is the kind that has
+   one. The reservation is the tile's own measure restated (`min(34%, 180px)`
+   plus a gutter) rather than a number: change the tile's width in §60.5 and
+   this follows. `:has()` is what keeps it off the cohort call, where the
+   corner is empty and the caption may have the whole width. */
+.app .call-main:has(.call-self) .call-said{
+  right:calc(min(34%, 180px) + var(--s06))}
+
+/* THE NAME IS TYPE, NOT A CHIP — Figma 499:2022. A label on a chip is what
+   the small tiles need, because a 10px word on an unknown photograph has to
+   bring its own ground; at 24px over the heaviest part of the scrim a text
+   shadow is enough, and the chip would be a box around the one thing on this
+   screen that is allowed to be simply written on it. */
 .app .call-nm{
-  position:absolute;left:var(--s04);bottom:var(--s04);z-index:2;
-  max-width:calc(100% - var(--s07));
-  padding:3px var(--s03);
-  background:rgba(17,17,17,.76);color:var(--on-dark);
-  font-size:11.5px;line-height:16px;font-weight:600;letter-spacing:.2px;
+  max-width:100%;
+  font-size:20px;line-height:26px;font-weight:600;letter-spacing:-.2px;
+  color:var(--on-dark);text-shadow:0 1px 12px rgba(17,17,17,.55);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.app .call-nm em{font-style:normal;color:var(--on-dark-2);font-weight:400}
-
-/* WHAT IS HAPPENING, IN WORDS. The prototype cannot show a conversation, so
-   it says what stage the conversation is at — the one line on this surface
-   that changes while you watch it. Centred at the top, which is where a call
-   product puts its transient banners and where nothing else here lives. */
-.app .call-cap{
-  position:absolute;top:var(--s04);left:var(--s04);right:var(--s04);z-index:2;
-  margin:0 auto;width:max-content;max-width:calc(100% - var(--s05));
-  padding:4px var(--s04);
-  background:rgba(17,17,17,.76);color:var(--on-dark);
-  font-size:12.5px;line-height:18px;letter-spacing:.2px;text-align:center}
-
-/* THE SELF VIEW sits inside the feed, bottom right, in both kinds of call —
-   a self view is a self view whether there is one other person or nine. Its
-   own name chip is one step smaller and keeps the corner opposite. */
-.app .call-self{
-  position:absolute;right:var(--s04);bottom:var(--s04);z-index:2;
-  width:34%;max-width:184px;min-width:108px;aspect-ratio:16 / 9;
-  overflow:hidden;
-  background-color:var(--surface-dark-2);
-  background-size:cover;background-position:center 22%;
-  box-shadow:0 0 0 1px rgba(255,255,255,.28)}
-.app .call-self .call-nm{
-  left:6px;bottom:6px;padding:2px 6px;font-size:10.5px;line-height:14px;
-  max-width:calc(100% - 12px)}
-
-/* --------------------------------------------------------------------------
-   5. THE MEMBER STRIP — cohort calls only
-   One row, scrolling sideways when the cohort outgrows the width. A grid
-   would wrap ten faces into three rows on a phone and eat the feed; a row
-   that scrolls is what a call product does and what the frame can afford.
-
-   THE OVERFLOW CELL IS A COUNT, NOT A FACE. `+2` is the two members the row
-   has no room for, and it is drawn as a plain bordered cell so it cannot be
-   mistaken for somebody with their camera off.
-   -------------------------------------------------------------------------- */
-.app .call-strip{
-  flex:none;display:flex;gap:var(--s03);
-  overflow-x:auto;overflow-y:hidden;
-  scrollbar-width:thin;padding-bottom:2px}
-.app .call-mem{
-  position:relative;flex:0 0 116px;aspect-ratio:16 / 9;overflow:hidden;
-  background-color:var(--surface-dark);
-  background-size:cover;background-position:center 22%}
-.app .call-mem::before{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,
-    rgba(17,17,17,.10) 0%, rgba(17,17,17,.22) 58%, rgba(17,17,17,.66) 100%)}
-.app .call-mem .call-nm{
-  left:5px;right:5px;bottom:5px;padding:2px 5px;
-  font-size:10px;line-height:14px;max-width:none}
-.app .call-more{
-  flex:0 0 116px;aspect-ratio:16 / 9;
-  display:grid;place-items:center;
-  border:1px solid var(--border-subtle-02);
-  background:var(--layer-02);
-  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;
-  color:var(--text-secondary)}
-/* AT DESKTOP THE ROW DIVIDES THE WIDTH INSTEAD OF SCROLLING. Nine faces at a
-   fixed 148px is 1,330px of row inside a 912px column, so the last two
-   members were off the end of a strip nothing tells you scrolls — the one
-   thing this row exists to say is who is here. Flexible with a 116px basis
-   and a 172px cap, the whole room fits at any frame width the desktop shape
-   has, and a bigger cohort still shrinks to the basis and then scrolls.
-
-   THE CAP IS WHAT KEEPS TWO MEMBERS FROM BECOMING TWO POSTERS. Without a
-   maximum, a call with three others gives each tile 300px and the row reads
-   as a second feed rather than as the room under the feed. */
+.app .call-nm em{
+  font-style:normal;font-weight:400;color:var(--on-dark-2)}
 @container app (min-width:900px){
-  .app .call-mem,.app .call-more{flex:1 1 116px;max-width:172px}
+  .app .call-nm{font-size:24px;line-height:30px}
 }
 
-/* --------------------------------------------------------------------------
-   6. THE ASIDE
-   The facts you would otherwise be hunting for while somebody waits: the
-   room, the code, whether this is being recorded, and the one thing to have
-   ready. It sits on the panel tone with a hairline against the stage, which
-   is §12's own answer to "supporting material beside the thing itself" — the
-   same pair the page uses for a `.sec.tint`.
+/* THE CAPTION IS THE ONE LINE THAT CHANGES WHILE YOU WATCH. A prototype
+   cannot show a conversation, so it says what stage the conversation is at —
+   which is also what the Captions control turns off. It sits ABOVE the name,
+   in the same column, so neither has to know the other's height. */
+.app .call-cap{
+  max-width:min(100%, 52ch);
+  padding:5px var(--s04);
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:12.5px;line-height:18px;letter-spacing:.2px}
 
-   `.kv` AND `.eyebrow` RATHER THAN A LOCAL PAIR. Every row in here is a key
-   and a value, which is a component the product already has and which
-   already sets its hairlines, its tabular figures and its right-aligned
-   value. The only thing this layer says about them is which ground they are
-   on, so their rules step to `--rule-on-2` with everything else on a panel.
+/* A BANNER FOR A STATE THE FEED ITSELF CANNOT SHOW — sharing a screen, and
+   nothing else so far. Top of the feed, where a call product puts its
+   transient notices, and the accent is on the mark only: an orange band across
+   somebody's face is the loudest thing this product would ever have drawn. */
+.app .call-flag{
+  position:absolute;top:var(--s04);left:var(--s04);right:var(--s04);z-index:2;
+  margin:0 auto;width:max-content;max-width:calc(100% - var(--s05));
+  display:inline-flex;align-items:center;gap:var(--s03);
+  padding:5px var(--s04);
+  background:rgba(17,17,17,.82);color:var(--on-dark);
+  font-size:12.5px;line-height:18px;font-weight:600;letter-spacing:.2px}
+.app .call-flag svg{width:16px;height:16px;flex:none;fill:var(--accent)}
+
+/* --------------------------------------------------------------------------
+   5. THE PICTURE-IN-PICTURE — interviews only
+   Bottom right of the feed, its own name on a chip because it IS small.
+   `box-shadow` rather than `border`, so the 1px hairline does not come out of
+   the tile's own 16:9 box and change its ratio.
    -------------------------------------------------------------------------- */
-.app .call-side{
-  flex:none;min-width:0;
-  padding:var(--s05) var(--pad-x);
-  background:var(--surface-2);
-  border-top:1px solid var(--border-subtle-01);
-  overflow-y:auto;--pad-x:var(--s05)}
+.app .call-self{
+  position:absolute;right:var(--s05);bottom:var(--s05);z-index:3;
+  width:34%;max-width:180px;min-width:104px;aspect-ratio:16 / 9;
+  overflow:hidden;display:grid;place-items:center;
+  background-color:var(--surface-dark-2);
+  background-size:cover;background-position:center 26%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.32)}
+.app .call-self .call-selfn{
+  position:absolute;left:6px;bottom:6px;max-width:calc(100% - 12px);
+  padding:2px 6px;
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* CAMERA OFF IS A DISC ON THE DARK, NOT A DIMMED PHOTOGRAPH, and the reason is
+   trap 1 again: the photograph is an inline background and no rule here can
+   take it off. So `callFeed` does not set it — the state is decided in the
+   markup — and what is left is the ground, the person's own disc and the
+   crossed mark. */
+.app .call-self .call-selfav{
+  width:38px;height:38px;border-radius:50%;overflow:hidden;
+  background:var(--surface-dark);box-shadow:0 0 0 1px rgba(255,255,255,.24)}
+.app .call-self .call-selfav img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* THE STATE MARKS on your own picture — muted, hand up. Top right, opposite
+   the name, and the accent is the mark's own ink for the reason §19 gives:
+   this is the one thing on the tile that is a change rather than a fact. */
+.app .call-selfmk{
+  position:absolute;right:5px;top:5px;z-index:2;
+  display:flex;gap:4px}
+.app .call-selfmk svg{
+  width:17px;height:17px;display:block;fill:var(--accent);
+  filter:drop-shadow(0 1px 3px rgba(17,17,17,.6))}
+
+/* --------------------------------------------------------------------------
+   6. THE RIGHT-HAND COLUMN
+   One box, two contents: the participants on a cohort call, the session's own
+   facts when the More control opens them. Full height beside the feed at
+   desktop, a scrolling block under it at mobile.
+   -------------------------------------------------------------------------- */
+.app .call-col{
+  min-width:0;min-height:0;overflow-y:auto;
+  background:var(--layer-01);
+  border-top:1px solid var(--border-subtle-01)}
+@container app (min-width:900px){
+  .app .call-col{
+    width:304px;border-top:0;border-left:1px solid var(--border-subtle-01)}
+}
+@container app (min-width:1200px){
+  .app .call-col{width:344px}
+}
+
+/* THE PARTICIPANTS. Two across, and the 1px gaps ARE the hairlines between
+   tiles — the same trick §10 uses for `.stats`, so there is no border to
+   double up where two tiles meet. The grid's own ground shows through. */
+.app .call-people{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:var(--border-subtle-01)}
+.app .call-p{
+  position:relative;
+  display:grid;justify-items:center;align-content:start;gap:var(--s04);
+  padding:var(--s05) var(--s04) var(--s04);
+  background:var(--layer-01)}
+.app .call-p-av{
+  width:64px;height:64px;border-radius:50%;overflow:hidden;
+  background:var(--layer-02)}
+.app .call-p-av img{width:100%;height:100%;object-fit:cover;display:block}
+/* THE NAME IS BOTTOM LEFT OF THE TILE — Figma 499:1617. Centred under a
+   centred disc reads as a caption for a photograph; left, on the tile's own
+   baseline, it reads as a row in a list of people, which is what it is. */
+.app .call-p-n{
+  justify-self:start;max-width:100%;
+  font-size:12px;line-height:16px;font-weight:600;letter-spacing:.1px;
+  color:var(--text-primary);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .call-p-n em{font-style:normal;font-weight:400;color:var(--text-secondary)}
+.app .call-p-mk{
+  position:absolute;top:var(--s03);right:var(--s03);
+  display:flex;gap:3px}
+.app .call-p-mk svg{width:16px;height:16px;display:block;fill:var(--accent)}
+
+/* WHO IS TALKING. The tile takes the accent tint and the disc takes a ring of
+   the accent with a gap of the tile's own ground inside it — §56's construction
+   for the step you are on, which is the same claim: this is the one of these
+   that is happening now. A border on the tile would have moved the disc by a
+   pixel; a ring drawn as two shadows moves nothing. */
+.app .call-p.on{background:var(--brand-tint-2)}
+/* AND THE SPEAKER IS NOT MUTED, which has to be said in CSS rather than in the
+   markup: `callTick` moves the ring by toggling this one class between
+   renders, so a mic mark decided when the column was built would sit on the
+   person who has just started talking. Drawn always, hidden by the same class
+   that draws the ring — one state, one place. `<i class="call-p-mic">` is
+   everybody but you; your own mark is a fact about your own microphone and is
+   decided in `callPerson`. */
+.app .call-p.on .call-p-mic{display:none}
+.app .call-p.on .call-p-av{
+  box-shadow:0 0 0 2px var(--brand-tint-2), 0 0 0 4px var(--accent)}
+
+/* THE FACTS, when More opens them. `.kv` and `.eyebrow` rather than a local
+   pair: a key and a value is a component the product has, and it already sets
+   its hairline, its right-aligned value and its tabular figures. The only
+   thing this layer says about them is which ground they are on. */
+.app .call-panel{padding:var(--s05) var(--pad-x);--pad-x:var(--s05)}
 .app .call-panel + .call-panel{
-  margin-top:var(--s05);padding-top:var(--s05);
-  border-top:1px solid var(--rule-on-2)}
-.app .call-panel .kv{border-bottom-color:var(--rule-on-2)}
-.app .call-panel .call-legal{
-  margin:var(--s04) 0 0;color:var(--text-helper)}
+  border-top:1px solid var(--border-subtle-01)}
+.app .call-panel .call-legal{margin:var(--s04) 0 0;color:var(--text-helper)}
 .app .call-panel > p{margin:0}
 
 /* --------------------------------------------------------------------------
-   7. THE FOOTER
-   Four things you can do to your own microphone and camera, and the way out
-   held at the far end. The four are square bordered buttons rather than the
-   round icon buttons every call product uses, for the reason at the head of
-   this file — and they are real toggles: `ai10.js` keeps their state in `S`,
-   so an off microphone survives a re-render (trap 9).
-
-   THE LABELS GO AT MOBILE, NOT THE BUTTONS. Four labelled controls plus a
-   leave button is 470px of row; at 390 the labels are hidden and the
-   `aria-label` each button already carries is what is left. Hiding the
-   buttons instead would take away the only controls on the surface.
+   7. THE CONTROL BAR
+   Centred, light, square, and every button on it does something — which is
+   what decided the list. Mute, camera, share, hand and captions are states of
+   the call; People and More are what the right-hand column is showing; Leave
+   is the way out. There is no device-picker chevron beside the microphone and
+   no reactions button, because neither has anything to open here, and a
+   control that does nothing is worse on a live surface than a control that is
+   missing.
    -------------------------------------------------------------------------- */
 .app .call-foot{
-  flex:none;display:flex;align-items:center;gap:var(--s03);
-  padding:var(--s03) var(--pad-x);
+  display:flex;align-items:center;justify-content:center;
+  gap:var(--s03);flex-wrap:wrap;
+  padding:var(--s04) var(--pad-x);
   background:var(--layer-01);
   border-top:1px solid var(--border-subtle-01)}
+
 .app .call-ctl{
-  display:inline-flex;align-items:center;gap:var(--s03);
-  min-height:40px;padding:0 var(--s04);
-  border:1px solid var(--border-subtle-02);border-radius:var(--radius);
-  background:var(--layer-01);color:var(--text-primary);
-  font-size:13px;font-weight:600;letter-spacing:.2px;cursor:pointer;
+  display:inline-grid;place-items:center;
+  width:44px;height:44px;padding:0;
+  border:1px solid transparent;border-radius:var(--radius);
+  background:var(--layer-02);color:var(--text-primary);
+  cursor:pointer;
   transition:background var(--dur-short) var(--ease-standard),
-             border-color var(--dur-short) var(--ease-standard),
              color var(--dur-short) var(--ease-standard)}
-.app .call-ctl svg{width:16px;height:16px;flex:none;fill:currentColor}
-/* OFF IS FILLED, NOT GREYED. A muted microphone is a state you have chosen
-   and want to see; disabled ink would read as a control you cannot use. */
+.app .call-ctl svg{width:20px;height:20px;display:block;fill:currentColor}
+.app .call-ctl:hover{background:var(--overlay-hover)}
+
+/* OFF IS FILLED BLACK. A muted microphone is a state you chose and want to
+   see; disabled ink would read as a control you cannot use, and red would
+   collide with the one red on this bar, which is the way out. */
 .app .call-ctl.off{
   background:var(--brand-primary);border-color:var(--brand-primary);
   color:var(--on-brand)}
-/* PLAIN `:hover`, AND THE BUILD IS WHAT DISARMS IT. build.py rewrites every
-   `:hover` in every layer to `:hover:where(.__nh)` and prints the count —
-   hover is off product-wide unless a selector is in `HOVER_KEEP`. Written
-   pre-disarmed here (which it was, for one build) the rule is invisible to
-   that rewrite, and the design system's own build then refuses to write at
-   all: `verify_subset` cannot trace an output selector back to a source that
-   does not contain it. State it plain and let both builds do their job. */
-.app .call-ctl:hover{background:var(--overlay-hover)}
 .app .call-ctl.off:hover{background:var(--brand-primary-hover)}
-/* THE PEOPLE COUNT IS NOT A TOGGLE and says so by not being pressable. */
-.app .call-ctl.call-count{cursor:default;color:var(--text-secondary)}
+/* ON IS THE ACCENT TINT — §56's ground for the thing that is happening now,
+   and the same tint the speaking participant's tile takes, so "on" is one
+   colour on this surface however it is drawn. */
+.app .call-ctl.on{
+  background:var(--brand-tint-2);border-color:var(--brand-tint-2);
+  color:var(--text-primary)}
 
-.app .call-leave{margin-left:auto;flex:none}
-.app .call .btn.call-leave{min-height:40px;padding:0 var(--s05)}
+/* THE WAY OUT IS THE ONE THING WITH A WORD ON IT, and it is separated from the
+   five toggles by a wider gap rather than by a rule: it is not a state of the
+   call, it is the end of it. The error tint rather than a solid red — the bar
+   is light, and Maryam's instruction was light backgrounds throughout; the ink
+   is what carries the colour, which is how §12 uses every support hue. */
+.app .call-leave{
+  margin-left:var(--s04);
+  display:inline-flex;align-items:center;gap:var(--s03);
+  height:44px;padding:0 var(--s05);
+  border:1px solid transparent;border-radius:var(--radius);
+  background:var(--support-error-bg);color:var(--danger-ink);
+  font-size:13.5px;font-weight:600;letter-spacing:.2px;cursor:pointer}
+.app .call-leave svg{width:20px;height:20px;flex:none;fill:currentColor}
+.app .call-leave:hover{background:#ffc9cc}
 
+/* THE LABEL GOES AT MOBILE, NOT THE BUTTON. Seven controls plus a labelled
+   leave button is 430px of row; at 360 the word goes and the mark carries it,
+   which every one of these has (`aria-label` is on all eight either way). */
 @container app (max-width:599px){
-  .app .call-ctl{padding:0 var(--s04);gap:0}
-  .app .call-ctl span{display:none}
-  .app .call-ctl.call-count{display:none}
+  .app .call-foot{gap:var(--s02);padding:var(--s03) var(--s04)}
+  .app .call-ctl{width:40px;height:40px}
+  .app .call-leave{height:40px;padding:0 var(--s04);margin-left:var(--s03)}
+  .app .call-leave span{display:none}
 }
 
 /* --------------------------------------------------------------------------
@@ -341,7 +431,7 @@
 
 /* ITS OWN REDUCED-MOTION BLOCK, because §13.187 clamps every duration to 1ms
    and 1ms on the INFINITE recording pulse is a strobe rather than "off". The
-   dot holds at full ink and the entrance simply does not play. */
+   dot holds at full ink and the entrance does not play. */
 @media (prefers-reduced-motion:reduce){
   .app .call-rec i{animation:none;opacity:1}
   .app[data-enter] .call{animation:none}
