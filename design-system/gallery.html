@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=11f628d2">
+<link rel="stylesheet" href="talentnext-ds.css?b=bd421c2e">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=11f628d2"></script>
+<script src="talentnext-ds.js?b=bd421c2e"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -484,6 +484,51 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
             <button class="btn btn-p btn-sm noic">Enroll now {{arrowRight}}</button>
           </div>
         </div>
+      </div>
+    </div>
+  `)}
+  ${ex('And the same card as an invoice — every row a figure, so the marks come off', '§69. The offer card above has <b>one</b> labelled figure among three plain facts, and there the mark in front of each row earns its 20px: it says what <i>kind</i> of thing the row is about, and the four rows are about four different things. A checkout is not that. Fee, credit and total are all money, <code>plateIcon</code> leads on money, and the card came out with a column of <b>three identical wallets</b> saying the same word over a list whose every row is a number. <b>The test is “is there a row here that is not a figure”</b> — nothing but labelled figures is a table of amounts. Add <code>.plate-tab</code> to the <code>.plate-b</code> and write the rows <b>with no icon</b>; in the portal <code>splitPlateBody</code> works this out for you and stamps the class, and a page with no render pass writes both, exactly as it already writes <code>.plate-h</code>. <b>Two things follow and both are automatic.</b> The last row is ruled off and gets a little air, because that is where every invoice in the world puts the line and because it says “the rows above add up to this” in a way no amount of ink can — it is drawn as a <code>border-top</code> in <code>--on-dark-rule</code>, so it is a hairline on a quiet card and white-at-16% on a black one. And <b>the accent goes to the total only</b>: §63 keeps <code>--accent-text</code> for <code>:last-child</code> and puts the working in the body ink, since three figures in the accent is the card shouting a number, then a second, then a third. The labels are <code>nowrap</code> with an ellipsis, so a long one cannot make one row two lines tall in a list whose whole point is that they line up.', `
+    <div class="modhead">
+      <div class="sec sec-dark">
+        <div class="plate plate-quiet">
+          <i class="dark-glow" aria-hidden="true"></i>
+          <div class="plate-h plate-h-bare">
+            <div class="plate-t">Your enrolment</div>
+          </div>
+          <div class="plate-d">One payment, and the re-interview that can move you up is included.</div>
+          <div class="plate-b plate-lines plate-tab">
+            <span class="plate-bi"><span>Course fee</span><b class="plate-v">$690</b></span>
+            <span class="plate-bi"><span>Interview already paid</span><b class="plate-v">−$95</b></span>
+            <span class="plate-bi"><span>Due today</span><b class="plate-v">$595</b></span>
+          </div>
+          <div class="note acc plate-n"><span>{{calendar}}</span>
+            <div class="nb"><b>Cohort starts on 1st Dec, 2026</b></div></div>
+          <div class="plate-a">
+            <button class="btn btn-p btn-sm noic">Continue to payment {{arrowRight}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('A disclosure that still says something while it is shut', '§65 draws the disclosure and §69 adds one case to it. On the two dashboards that carry “What the interview found”, closed means <b>a heading and nothing else</b> — right there, because the heading <i>is</i> the summary of what is behind it. A block whose subject a reader may not know yet needs one line outside the panel: put an <code>.all-desc</code> between the head row and <code>.found-b</code> and it stays visible shut, so somebody who has read the detail once never has to open it again to be told what the block is. §69 gives the section its full bottom padding back in that case — §65 takes half of it away on the reasoning that a closed disclosure is one row, which stops being true the moment there are two. <b>The chevron is on the LEFT of the heading</b>, inside the button with the <code>&lt;h2&gt;</code>, and it points right when closed: a chevron at the far right of a <code>.sec-h</code> is 700px from its own words at desktop, and the row often already ends in an action. <b>Two things the CSS cannot do for you:</b> the toggle button must carry the growth the <code>&lt;h2&gt;</code> used to (<code>.found-t</code> does), and the state has to live outside the DOM if your page re-renders — a class on the section is gone at the next paint (trap 9).', `
+    <div class="sec tint cards found">
+      <div class="sec-h found-h">
+        <button class="found-t" aria-expanded="false"><span class="found-chev">{{chevRight}}</span><h2>How your cohort works</h2></button>
+      </div>
+      <p class="all-desc">Ten people at Explorer – E3, the same ten for all 90 days, with one live call a week.</p>
+      <div class="found-b">
+        <div class="kv mt5"><span class="k">Who is in it</span><span class="v">Up to ten candidates, all at your level</span></div>
+        <div class="kv"><span class="k">The weekly call</span><span class="v n">Thursdays, 6:00 PM ET · 60 minutes, not recorded</span></div>
+      </div>
+    </div>
+    <div class="sec tint cards found on">
+      <div class="sec-h found-h">
+        <button class="found-t" aria-expanded="true"><span class="found-chev">{{chevRight}}</span><h2>The same block, open</h2></button>
+      </div>
+      <p class="all-desc">Add <code>.on</code> to the section. §65 is <code>display:none</code> on the panel rather than a height transition, because a block with a photograph in it has no knowable height.</p>
+      <div class="found-b">
+        <div class="kv mt5"><span class="k">Between calls</span><span class="v">A discussion board the whole cohort can see</span></div>
+        <div class="kv"><span class="k">If you miss one</span><span class="v n">Nothing is marked — your leader posts what was covered</span></div>
       </div>
     </div>
   `)}

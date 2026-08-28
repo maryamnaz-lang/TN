@@ -156,6 +156,23 @@ invented the markup and got four of six wrong. The recipes are now in
   are ordered: `.plate-who`, `.plate-t`, `.plate-b`, `.plate-a`.
 - `.ring` is **two SVG circles**, not a conic gradient, and `--arc` is a
   dasharray *length*: r=26, so `arc = 163.36 × pct/100`.
+- A plate's fact list has **three forms and you pick one in the markup**. Plain
+  `.plate-b` is a sentence. `.plate-b.plate-lines` is a spine of rows, each with
+  a mark that says what kind of thing the row is about, and one of them may end
+  in `<b class="plate-v">` for a figure on the right in the accent. Add
+  **`.plate-tab`** when *every* row is a labelled figure — a price breakdown —
+  and **write the rows with no icon**: §69 then rules the last row off as the
+  total and §63 gives the accent to that row alone. In the portal
+  `splitPlateBody` works all of this out from a `&middot;` run; a page with no
+  render pass writes the class and the rows itself, the same way it already
+  writes `.plate-h` and `.plate-when`.
+- A **disclosure** (`.sec.tint.cards.found` + `.found-h` + `.found-b`) hides the
+  panel and nothing else, so an `.all-desc` between the head row and the panel
+  **stays visible while it is shut** — use it when the reader may not know what
+  the block is about yet. The toggle must be the `<button class="found-t">`
+  wrapping the chevron and the `<h2>`, because §65 moves `flex:1 1 auto` onto
+  it; and the open/closed state has to live outside the DOM if your page
+  re-renders (`.on` on the section is gone at the next paint).
 
 `proof.html` is the check: every signature component, hand-written, with no
 portal JS in the document at all. If it looks like the candidate portal, the
@@ -459,7 +476,19 @@ and you get it for free.
 It opts **out** automatically when the section holds `.stats`, `.facts`,
 `.tbl-wrap`, `.cardrow`, `.gcard` or `.tile-stack` — those components are sized
 against the full column width. Build sections out of those six and the spine is
-free.
+free. `.ch`, `.ag`, `.aw` and `.mem` are on the list too, and §69 adds one more:
+a `.tile` whose first child is a **`.row-lead`** — the face-plus-name row that
+says "this block is about a person". A card whose subject is one person is a
+single object, so 184px taken off it buys nothing; there is no second row for
+the spine to line up against.
+
+**The trap runs in both directions.** Adding a wrapper can move a section's
+opt-out out of reach (§65.1a: `.found-b` pushed an `.all-desc` one level down
+and `> .all-desc` stopped matching). *Removing content* can take the opt-out
+away with it — the cohort-leader card was opting out through `.sec:has(.kv)`
+because of two fact rows, and cutting those rows dropped the section into the
+label column with nothing to warn you. Whenever you add or remove a block inside
+a headed section, check what it still contains.
 
 `.kv` opts out too, and for a different reason: **a `.kv` list already *is* a
 label column.** At this same 900px breakpoint `.kv` takes

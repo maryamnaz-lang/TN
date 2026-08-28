@@ -296,10 +296,32 @@ const PAGESUM = {
   /* THE COURSE'S SHAPE MOVED TO THE PAGE DESCRIPTION — "90 days · 13
      chapters · a cohort of ten" — because it is a factual spine and this
      summary was saying it word for word underneath. What is left is the
-     part a description cannot carry: the commitment. */
-  enrol: '$595 once, no subscription. About an hour a week plus the weekly call, and you start with the next cohort &mdash; within two weeks of paying.',
+     part a description cannot carry: the commitment.
+
+     AND THE MONEY HAS MOVED TOO, WHICH TOOK THE FIRST HALF OF THIS SENTENCE
+     WITH IT. This opened "$595 once, no subscription" and closed on "within
+     two weeks of paying", both written when the fee was a `.kv` tile most of
+     a page below. The checkout card is in the head band now, eight inches to
+     the right of this line: it states $690, the credit, the $595 due and the
+     date the cohort opens, and "one payment, and the re-interview is
+     included" is printed on it in full. Tal saying any of that again is the
+     duplication this file's own note is mostly written to prevent.
+
+     WHAT IS LEFT IS THE HOURS, which is the one thing on the page no figure
+     states and the question somebody actually hesitates over. The second
+     sentence is the old hand-written Tal card's, which `placePageSummary`
+     had been silently replacing — see the note where it used to be in
+     `V.enrol`. */
+  enrol: 'About an hour a week on the chapter, plus the 60-minute call. People who keep to that finish all 13 and average above 85%.',
 
   payment: 'One charge of $595 and the 90 days are yours &mdash; nothing renews and there is nothing to cancel. Your cohort is assigned as soon as it clears.',
+
+  /* THE CONFIRMATION'S JOB IS TO SAY THAT NOTHING IS DUE FROM YOU.
+     The page's own blocks carry the receipt, the leader and the three things
+     that happen next; the title names the cohort and the fact row carries the
+     date, so neither is said here. What a person wants after paying $595 is
+     permission to close the tab, and that is the sentence. */
+  welcome: 'Your place is paid and the cohort is yours for the 90 days. Nothing is due from you until chapter 1 unlocks, and Priya posts to the board before then.',
 
   /* --- the 90 days --------------------------------------------------- */
 

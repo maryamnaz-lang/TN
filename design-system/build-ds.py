@@ -319,6 +319,22 @@ LAYERS = [
     # logistics without having to rediscover that. Order only; it states none
     # of the four properties §63 owns.
     '68-platestack.css',
+    # THE ENROLMENT FLOW. Two components, and both cross for the same reason
+    # §66 does: neither is scoped to a page by name and both key on something
+    # that is in the markup.
+    # `.plate-tab` is a plate whose fact rows are ALL labelled figures — an
+    # invoice rather than a spine of subjects — and it rules the last row off
+    # as the total. In the portal the class is stamped by `splitPlateBody`
+    # (ai5), a render pass, which does not port; a hand-authored page writes
+    # the class and the mark-less rows itself, which is exactly what §66's
+    # own note already says about `.plate-bi` / `.plate-v`. That makes it
+    # MARKUP rather than the decoration CLAUDE.md warns about — the tell it
+    # describes is a class nothing outside the stylesheet ever writes, and
+    # the gallery writes this one.
+    # The second is a disclosure with a lede visible while it is shut, which
+    # is `.found` plus an `.all-desc` outside the panel. `.found` is already
+    # in the system (§65) and this only restates its closed padding.
+    '69-enrolflow.css',
 ]
 
 # ==========================================================================

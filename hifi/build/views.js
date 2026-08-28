@@ -24,11 +24,19 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
-  /* "What the interview found" starts CLOSED. It is the longest block on the
-     two dashboards that carry it and it is a re-read — see the note over
-     `foundHead`. One flag, not one per stage: the two dashboards never appear
-     together, so a second key would only ever hold the first one's value. */
-  found:false,
+  /* EVERY DISCLOSURE IS CLOSED UNTIL IT IS OPENED, AND THEY ARE KEYED BY NAME.
+     "What the interview found" starts closed because it is the longest block
+     on the two dashboards that carry it and it is a re-read — see the note
+     over `foundHead`. That was a single `found:false` flag, on the reasoning
+     that the two dashboards never appear together so a second key would only
+     ever hold the first one's value. True of those two; false the moment a
+     THIRD disclosure exists on a different page, which "How your cohort
+     works" on the Enroll page now is — one flag would have meant opening the
+     report on the dashboard and finding the cohort block already open.
+
+     A map rather than a second boolean, so the next one costs a string. The
+     keys are the names the views pass to `foundHead`: `report`, `cohort`. */
+  disc:{},
   /* the three scenes kept from each interview. `null` means "not chosen yet",
      which is what puts the chooser on the Interviews module — see the note
      over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
@@ -588,7 +596,7 @@ function talPanel(f){
   const ctx = (lead ? (lead.ctx[S.view] || lead.ctx.leadDash) : (TALCTX[S.view] || TALCTX.dashboard));
   const where = (lead ? lead.where[S.view] : ({dashboard:'Dashboard',level:'My Level',report:'Your report',interviews:'Interviews',
     agents:'Choosing an agent',agent:'Agent profile',booking:'Interview booked',enrol:'Enrolling',
-    payment:'Payment',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
+    payment:'Payment',welcome:'Enrolled',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
     cohort:'Cohort 41',billing:'Payments',account:'Profile',messages:'Messages'})[S.view]) || 'TalentNext';
   const state = lead ? lead.state()
     : f.complete ? lvlName(f.level)+', cohort complete'
@@ -879,7 +887,7 @@ const dashPh = (title, sub) =>
       re-renders those pages. This block is on a DASHBOARD, where Tal
       answering a question or the stage picker moving both re-render in
       place — and per trap 9 `render()` replaces `device.innerHTML`, so a
-      DOM class would take the panel shut again mid-read. `S.found` survives.
+      DOM class would take the panel shut again mid-read. `S.disc` survives.
       Re-rendering is cheap here: entrance animations gate on `data-open`,
       a one-render marker (trap 5), and `typeSummary` keys on the summary's
       text, so neither replays.
@@ -889,8 +897,19 @@ const dashPh = (title, sub) =>
       putting it inside would mean opening the short version to find the
       link to the long one.
    ========================================================================== */
-const foundHead = (title, act) => `<div class="sec-h found-h">
-    <button class="found-t" data-found="1" aria-expanded="${S.found?'true':'false'}">
+/* AND IT IS KEYED, BECAUSE THERE IS MORE THAN ONE OF THEM NOW.
+   `data-found` carried the constant `1` while `S.found` was the only flag.
+   It carries the disclosure's NAME instead — the same string the section
+   reads through `discOpen` — so the handler needs no branch and a new
+   disclosure is a heading and a key. `report` is the default so the two
+   dashboards read as they did.
+
+   The section still wears `.found` / `.found.on`: §65's rules are about the
+   SHAPE of a disclosure, not about which one, and every one of them keys on
+   that class. Nothing in this change reaches the stylesheet. */
+const discOpen = (key) => !!S.disc[key || 'report'];
+const foundHead = (title, act, key) => `<div class="sec-h found-h">
+    <button class="found-t" data-found="${key||'report'}" aria-expanded="${discOpen(key)?'true':'false'}">
       <span class="found-chev">${I.chevRight}</span><h2>${title}</h2></button>
     ${act||''}
   </div>`;
@@ -1424,13 +1443,29 @@ const PH_IC = [
   [/cohort|candidates|members|others/i,               'group'],
   [/level|rung|\bE\d\b|not enrolled|enrolled|signed/i,'certificate'],
   [/quiz|score|of 100|average|%/i,                    'chart'],
-  [/week|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b/i,'calendar'],
+  /* `\b\d+ days?\b` IS THE GENERALISATION OF `week|month` THAT WAS MISSING,
+     and it is written that narrowly on purpose: the Enroll page's spine opens
+     on "90 days", which matched nothing and came out as the fallback ring —
+     a mark that says the fact has no subject. A bare `days?\b` would have
+     matched Thursday. `day \d` stays for "day 34 of 90", which is the other
+     shape the product writes. */
+  /* THE MONTH LIST IS SPELT OUT AS WELL AS ABBREVIATED. `\bDec\b` does not
+     match "December", so the enrolment confirmation's "starts 1 December"
+     fell past this row — and past every row after it until `star` inside
+     "Starts" caught it and drew a trophy. May is the one month left out on
+     purpose: the table is matched case-insensitively and "may" is a word. */
+  [/week|\b\d+ days?\b|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b|\b(january|february|march|april|june|july|august|september|october|november|december)\b/i,'calendar'],
   [/minute|hour|\bmin\b/i,                            'time'],
   [/\$|paid|fee|price|refund/i,                        'wallet'],
   [/session|call|thread|message/i,                     'chat'],
   [/chapter|course|module|training/i,                  'book'],
   [/vetting|verif|identity|reference/i,                'shield'],
-  [/certificate|award|badge|star/i,                    'trophy']
+  /* `\bstars?\b`, NOT `star`. Unanchored it matched "Starts", "started" and
+     "restart", and because this row is LAST it was the catch-all that got
+     them — a date fact drawn as a trophy, with nothing to say it had been
+     matched on the wrong word. Every other pattern here is anchored or is a
+     word that cannot be a prefix of another. */
+  [/certificate|award|badge|\bstars?\b/i,              'trophy']
 ];
 function factIcon(t){
   const s = String(t || '').replace(/&[a-z]+;|&#\d+;/gi, ' ');
@@ -2522,7 +2557,7 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${S.found?' on':''}">
+    <div class="sec tint cards found${discOpen('report')?' on':''}">
       ${foundHead('What the interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -2583,7 +2618,7 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${S.found?' on':''}">
+    <div class="sec tint cards found${discOpen('report')?' on':''}">
       ${foundHead('What the re-interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -3470,53 +3505,294 @@ V.booking = (f) => {
 </div></main>`;
 };
 
+/* ==========================================================================
+   WHO LEADS YOUR COHORT — ONE RECORD, READ FROM BOTH PORTALS
+   ==========================================================================
+   Priya Nair is a talent agent in `AGENTS` and a cohort leader in `LEADER`
+   (lead.js), and the candidate side needs the second of those before it has
+   ever seen the first file: the Enroll page and the enrolment confirmation
+   both introduce her, and either can be the boot render off a hash.
+
+   `LEADER` CANNOT BE READ FROM HERE. lead.js parses AFTER this file and after
+   the boot `render()` at the foot of it, so `#assessed/enrol` in the address
+   bar would reach it in the temporal dead zone — the same hazard `notifList`
+   guards `LEAD_NOTIF` against with a `typeof`. So the shared facts are stated
+   in the EARLIER file and lead.js reads them off this record; one place says
+   how long she has been leading, and the leader's own profile page and the
+   candidate's enrolment page cannot disagree about it.
+
+   IT IS NOT A SIXTH ENTRY IN `AGENTS`, for the reason `CONSULTANT`'s note in
+   data.js gives about the consultant: `AGENTS` carries a price, a rating and
+   an interview count, and every one of those is a claim about the AGENT she
+   also is. A cohort leader is unpaid, is not rated and interviews nobody.
+   ========================================================================== */
+const COHORT_LEAD = {
+  n:'Priya Nair', i:'PN', img:AV.priya,
+  since:'March 2024',
+  /* the literal en dash rather than `&ndash;`, which is what `AGENTS` writes
+     for the same field — every reader of it drops it into innerHTML, and one
+     of the two spellings would eventually be compared against the other */
+  range:'E1–E3',
+  /* AND THERE IS NO BIO FIELD, WHICH WAS A DECISION AND THEN A REVERSAL.
+     A sentence in her own voice about how she runs the call was written here
+     and cut on Maryam's read, 28 Aug 2026 — with the logistics rows gone too
+     (see `leaderCard`) the card is the person and nothing else, and on a page
+     whose job is to get somebody to the payment screen a paragraph of
+     first-person copy is the block that stops them.
+
+     `AGENTS.priya.bio` STAYS WHERE IT IS AND IS STILL NOT REUSED. It is the
+     agent's pitch — how she sets a level in a 45-minute interview — and it is
+     drawn on `V.agent`, which is a page for CHOOSING somebody. A cohort leader
+     is assigned, so there is nothing here to choose between and nothing for a
+     pitch to do. */
+};
+
+/* THE LEADER AS A CARD, ON THE TWO PAGES THAT INTRODUCE HER.
+   `row-lead` + `.kv` is the shape `V.booking` already uses to say who you have
+   just paid to spend time with, and this is the same moment one product step
+   later — so it is that component rather than a new one.
+
+   IT IS A LIGHT TILE AND NOT A `.plate`, WHICH IS TRAP 12 RATHER THAN TASTE.
+   `.plate` is in `DARK_CARD`, so `placeDark` would lift it into the head band;
+   the Enroll page already puts the checkout there and one dark card per page
+   is the rule that note states. It is also the wrong claim — a plate is "the
+   one thing to do next", and there is nothing to do about Priya until the 90
+   days start.
+
+   `co` NAMES THE COHORT AND IS ONLY PASSED ONCE. Before the payment clears
+   there is no cohort to name (`PAGESUM.payment`: "your cohort is assigned as
+   soon as it clears"), so the Enroll page calls this with nothing and the
+   confirmation calls it with 41. */
+function leaderCard(co){
+  const L = COHORT_LEAD;
+  return `<div class="tile">
+    <div class="row-lead">
+      ${avatar(L,48)}
+      <div style="flex:1">
+        <div class="t-heading-compact-01">${L.n}</div>
+        <div class="t-helper-01 mt3">Cohort leader &middot; leading cohorts since ${L.since}</div>
+      </div>
+    </div>
+    ${''/* NO FACT ROWS ABOUT THE CALL. The card carried "On the call" and
+          "Between calls", and both are LOGISTICS rather than facts about the
+          person: on the Enroll page they are two of the six rows in "How your
+          cohort works" a screen below, and on the confirmation they are steps
+          2 and 3 of "What happens next". Said in both places the card stopped
+          being an introduction and became a second timetable — and it is the
+          first block on the page now, where the reader is asking who this is
+          and not when the call is. Maryam's cut, 28 Aug 2026.
+
+          THE ONE ROW LEFT IS THE ONE THAT IS NOT LOGISTICS. "Leads Cohort 41"
+          is the assignment itself, it is the fact the confirmation page exists
+          to deliver, and it is true of nothing else on that screen. It is also
+          why this stays a `.kv` rather than becoming a third line under the
+          name: a key and a value is what the product draws for an assignment. */}
+    ${co?`<div class="kv mt5"><span class="k">Leads</span><span class="v">Cohort ${co} &middot; ten of you at Explorer &ndash; E3</span></div>`:''}
+  </div>`;
+}
+
+/* THE TWO CHAPTERS THE REPORT NAMES, LOOKED UP RATHER THAN NUMBERED.
+   `signedSummary` closes on "Chapters 4 and 12 are built on exactly this", and
+   `QZ_CH` (§61) is the precedent for how a number like that is arrived at: the
+   SUBJECT is what is written down and `CH.findIndex` supplies the number, so
+   renaming or reordering a chapter cannot leave two pages naming different
+   ones. `GROWTH` (data.js) is not this list — it holds three indices and is
+   what `chRow` stamps "Your growth area" on; the report names two of them. */
+const RPT_GROWTH = ['Delegation Without Drop-Off','Coaching vs Fixing']
+  .map(t => CH.findIndex(c => c[0] === t));
+
+/* ==========================================================================
+   THE PAGE THAT ASKS FOR $595 PUTS THE $595 IN THE HEAD BAND
+   ==========================================================================
+   The fee was a three-row `.kv` tile 860px down the page with the only button
+   on the screen under it, so on a desktop frame a reader arriving from "Enroll
+   now" saw a title, a Tal card, four figures and a grey note before anything
+   told them the price or gave them a way to pay. Everything above the fold was
+   context for a decision the page never got round to putting.
+
+   So the money is the page's DARK CARD and `placeDark` puts it in the band's
+   second column, beside the title — the same slot the `assessed` dashboard's
+   enrolment offer occupies, one step on. The offer card sells the course; this
+   one is the checkout, and it is the only place on the page the three figures
+   appear.
+
+   IT IS QUIET BY CONSTRUCTION AND THAT IS CORRECT (§59). `plateUrgent` returns
+   false for a card with no clock on it, so this takes the light ground and the
+   vertical rule rather than the black wall. Enrolling has no deadline: the
+   cohort's start date is a fact on the card, not a countdown, which is the
+   argument `ENROL_OPENS` was written to settle and this reuses verbatim rather
+   than restating.
+
+   THE THREE ROWS ARE AN INVOICE, NOT A SPINE OF SUBJECTS. Written as
+   `Label <b>figure</b>`, which `splitPlateBody` (ai5) lifts into `.plate-v`;
+   because EVERY row here ends in a figure the pass marks the list `.plate-tab`
+   and drops the subject marks, since three wallet glyphs in a column say the
+   same word three times. §69 rules the total off and §63 keeps the accent for
+   the figure that is actually due. The note over `splitPlateBody` is where
+   that rule is stated.
+   ========================================================================== */
+const ENROL_CREDIT = {E3:'Interview already paid', E4:'Returning candidate credit'};
+const checkoutPlate = lvl => `<div class="sec">
+    <div class="plate">
+      <div class="plate-t">Your enrolment</div>
+      <div class="plate-d">One payment, and the re-interview that can move you up is included.</div>
+      <div class="plate-b">Course fee <b>$690</b> &middot; ${ENROL_CREDIT[lvl]} <b>&minus;$95</b> &middot; Due today <b>$595</b></div>
+      <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic" data-go="payment">Continue to payment ${I.arrowRight}</button>
+      </div>
+    </div>
+  </div>`;
+
 V.enrol = (f) => {
   const next = f.complete;
   const lvl = next?'E4':'E3';
+  const [g1,g2] = RPT_GROWTH;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],next?'Next course':'Enroll')}
-  <div class="ph">
-    <div class="ph-top">${bk()}<h1>Explorer Track &ndash; ${lvl}</h1></div>
-    ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
-          days, 13 chapters and a cohort of ten with a live leader" — this
-          line with two commas moved. The facts stay here where a description
-          belongs and Tal keeps the commitment, which is the money and the
-          hours. See the note over `ph()`. */}
-    <p>90 days &middot; 13 chapters &middot; a cohort of ten with a live leader</p>
-  </div>
+  ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
+        days, 13 chapters and a cohort of ten with a live leader" — this line
+        with two commas moved. The facts stay here where a description belongs
+        and Tal keeps the commitment, which is the hours. See the note over
+        `ph()`.
+
+        AND IT GOES THROUGH `ph()` NOW. This page hand-wrote the `.ph` — a
+        `.ph-top` and a bare `<p>` — which predates `phSub`, so it was the one
+        `&middot;` row in the candidate portal with no marks on its facts while
+        every other page had them. Byte-identical markup otherwise. */}
+  ${ph(`Explorer Track &ndash; ${lvl}`,'90 days &middot; 13 chapters &middot; a cohort of ten with a live leader')}
+  ${''/* THE LEADER IS A PERSON, NOT A GREY NOTE.
+        This block was `.note` + `I.group` + "Your cohort is assigned for you",
+        which is the only thing on a $595 page that said anything about who you
+        would be doing it with — and it said it as a disclaimer. A candidate is
+        buying thirteen Thursdays with a named person; she gets the component
+        the product already uses for that (see `leaderCard`). The sentence the
+        note was carrying — that the cohort is assigned rather than chosen — is
+        a mechanic and moved into "How your cohort works", which is where the
+        mechanics now are.
+
+        IT IS A FACE, A NAME AND A ROLE LINE, AND THAT IS THE WHOLE CARD. It
+        opened with two fact rows about the call and a sentence in her own
+        voice, and both were cut when the block moved to the top of the page
+        (the notes in `leaderCard` and on `COHORT_LEAD` are the argument for
+        each). What is left is what a reader in the first two inches of the
+        page is actually asking, which is who.
+
+        AND THE SUBTRACTION TOOK THE LABEL-COLUMN OPT-OUT WITH IT — trap 13,
+        the mirror of §65.1a. The section was opting out through
+        `.sec:has(.kv)` because of those two rows; with them gone it fell into
+        the 184px column at desktop and nothing warned. §69.3 restates the
+        opt-out on `:has(> .tile > .row-lead)`, which is the honest condition —
+        a card whose subject is a person. Read that note before adding or
+        removing anything from this card.
+
+        THE E4 PAGE DOES NOT DRAW IT, AND THAT IS ABOUT PRIYA RATHER THAN ABOUT
+        THE BLOCK. `COHORT_LEAD` is one person and her range is E1–E3 — the
+        three cohorts `LEAD_COHORTS` gives her are E3, E1 and E2 — so naming
+        her as the leader of an E4 cohort is the one thing on this page that
+        would be false. There is no second leader in the prototype and
+        inventing one to fill a section is worse than the section being
+        absent; what a leader IS is the second row of "How your cohort works",
+        on both levels. */}
+  ${next?'':`<div class="sec head-sec">
+    <div class="sec-h"><h2>Your cohort leader</h2></div>
+    ${leaderCard()}
+  </div>`}
+  ${''/* THE HAND-WRITTEN TAL CARD IS GONE AND NOTHING IS LOST WITH IT.
+        Per trap 11 `placePageSummary` strips a page's Tal card back to its
+        label and replaces the heading and the body with `PAGESUM.enrol`, so
+        "What the 90 days ask of you" and its sentence were never on screen —
+        and the ask chip beside it was removed by the same pass's step 1b. The
+        pass BUILDS the card when a page has none, which is what `V.payment`
+        has always relied on. The words live in `PAGESUM.enrol`. */}
+  ${checkoutPlate(lvl)}
+  ${''/* THE ORDER OF THIS PAGE IS THE ORDER OF THE QUESTIONS, and it was
+        settled by reading it rather than by argument (Maryam, 28 Aug 2026).
+        The band answers "what is this and what does it cost" before anything
+        scrolls. Then, in the column: WHO you would be doing it with, WHAT you
+        would learn, HOW the cohort runs, and last the four figures that recap
+        all three. The person leads because she is the only thing on the page
+        that is not a fact about a product; the mechanics sit under the
+        curriculum because nobody asks how a cohort works before they know
+        what is in it, which is also why they are behind a disclosure. */}
+  ${''/* WHAT YOU LEARN IS THIRTEEN CHAPTERS, AND IT IS ALL THIRTEEN.
+        This was four `chRow`s and an "All 13" button. Both halves were wrong.
+        `chRow` draws a chapter's PROGRESS — "Not started &middot; 45 min" — on
+        a page for somebody who has not bought the course, so the one thing
+        every row said about itself was that nothing had happened yet; and the
+        button went to `coursework`, which is the LightspeedVT frame and is
+        empty until you are enrolled, so the way to see the other nine was a
+        blank screen.
+
+        `.ch-two` is the flat form the `assessed` dashboard already uses — a
+        number, a title, a length, no state — and all thirteen of them fit in
+        two columns. The dashboard's block ends on "See the full course" and
+        points here, so this page has to be the fuller one; it is, by the
+        section under it.
+
+        THE OPT-OUT IS `> .all-desc` (§16, trap 13). `.ch-two` is not in
+        §10.15's list, so the lede is what keeps this section out of the 184px
+        label column, and it has to stay a DIRECT child of the `.sec`. */}
   <div class="sec">
-    <div class="ai-aura tile tight">
-      <div class="ai-head">${talLabel()}<h3>What the 90 days ask of you</h3></div>
-      <div class="ai-body"><p>An hour a week, plus the 60-minute cohort call. People who keep to that average above 85%.</p></div>
-      <div class="ai-foot">${askChip('How much time does the course really take each week?','Ask Tal about the workload')}</div>
+    <div class="sec-h"><h2>What you&rsquo;ll learn</h2></div>
+    <p class="all-desc">Thirteen chapters, one a week, 45 to 70 minutes each. Every one closes with an assessment, and the average of the thirteen is what an agent reads at your re-interview.</p>
+    <div class="ch-two">${CH.map((c,i)=>`
+      <div class="ch ch-flat">
+        <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
+      </div>`).join('')}</div>
+    ${''/* AND TWO OF THE THIRTEEN ARE THIS READER'S, WHICH IS THE ONLY THING
+          ON THE PAGE THAT IS NOT TRUE OF EVERYBODY. It closes the section for
+          the reason the dashboard's report block closes its own: read after
+          the list, the thirteen stop being a catalogue and become the answer
+          to what Priya wrote down.
+
+          ONLY ON THE FIRST COURSE. At `promoted` the report is the
+          re-interview's and it names chapters 3 and 9 of the E4 curriculum —
+          a curriculum this page does not list, since `CH` is E3's. Naming a
+          number against the wrong list is worse than saying nothing. */}
+    ${next?'':`<div class="note mt5"><span>${I.certificate}</span><div class="nb"><b>Two of these are yours by name</b>Priya&rsquo;s report names delegation, and coaching rather than fixing. Chapter ${g1+1}, ${CH[g1][0]}, and chapter ${g2+1}, ${CH[g2][0]}, are built on exactly that.</div></div>`}
+  </div>
+  ${''/* AND THE MECHANICS ARE A DISCLOSURE, ON THE SAME COMPONENT AS "WHAT THE
+        INTERVIEW FOUND" — Maryam's ask, and the same argument holds: six rows
+        of how-it-works is the longest block on the page and it is the one part
+        a reader who has already decided does not need. `foundHead`'s note is
+        the long version; the key is `cohort` so the report's disclosure on the
+        dashboard keeps its own state.
+
+        THE LEDE STAYS OUTSIDE `.found-b`. §65 hides the panel and nothing
+        else, so a closed disclosure is normally a heading on its own; here the
+        one line that answers "what IS a cohort" is visible shut, and what
+        expands is the detail. Somebody who has read it once never opens it
+        again and still knows what the block says.
+
+        NO MEMBER LIST. Ten faces here would be a claim the product has not
+        made — the cohort is assigned when the payment clears, which is the
+        last row in the panel. `V.cohort` is where the ten people are. */}
+  <div class="sec tint cards found${discOpen('cohort')?' on':''}">
+    ${foundHead('How your cohort works','','cohort')}
+    <p class="all-desc">Ten people at Explorer &ndash; ${lvl}, the same ten for all 90 days, with one live call a week.</p>
+    <div class="found-b">
+      <div class="kv mt5"><span class="k">Who is in it</span><span class="v">Up to ten candidates, all at your level</span></div>
+      <div class="kv"><span class="k">Who leads it</span><span class="v n">A volunteer, certified by TalentNext and unpaid</span></div>
+      <div class="kv"><span class="k">The weekly call</span><span class="v n">Thursdays, 6:00 PM ET &middot; 60 minutes, not recorded</span></div>
+      <div class="kv"><span class="k">Between calls</span><span class="v n">A discussion board the whole cohort can see</span></div>
+      <div class="kv"><span class="k">If you miss one</span><span class="v n">Nothing is marked &mdash; your leader posts what was covered</span></div>
+      <div class="kv"><span class="k">Which cohort</span><span class="v n">Assigned by your level and start date, not chosen</span></div>
     </div>
   </div>
+  ${''/* THE STRIP KEEPS ITS FOUR CELLS AND GAINS A HEADING. `.stats` is a
+        fixed four-column grid (trap 13's opt-out list, so no label column) and
+        these are the four figures the fee buys that the card does not state.
+        Unheaded it was a row of numbers floating under a title. */}
   <div class="sec">
+    <div class="sec-h"><h2>What you get</h2></div>
     <div class="stats">
       ${statCell(I.book, `Chapters`, `13`, `one a week`)}
       ${statCell(I.video, `Live calls`, `13`, `60 min, weekly`)}
       ${statCell(I.group, `Cohort size`, `10`, `max, all at ${lvl}`)}
       ${statCell(I.calendar, `Re-interview`, `Day 91`, `then you move`)}
     </div>
-  </div>
-  <div class="sec">
-    <div class="note"><span>${I.group}</span><div class="nb"><b>Your cohort is assigned for you</b>You join up to ten people at your level, led by a volunteer cohort leader, with one live call a week.</div></div>
-  </div>
-  <div class="sec">
-    <div class="tile">
-      <div class="kv"><span class="k">Course fee</span><span class="v">$690</span></div>
-      <div class="kv"><span class="k">${next?'Returning candidate credit':'Interview already paid'}</span><span class="v n">&minus;$95</span></div>
-      <div class="kv kv-due"><span class="k">Due today</span><span class="v">$595</span></div>
-    </div>
-    <p class="t-helper-01 mt4">One payment. Nothing recurs, and the re-interview at the end is included.</p>
-    <div class="pay-act mt5">
-      <button class="btn btn-p" data-go="payment">Continue to payment ${I.arrowRight}</button>
-      ${askChip('What happens on the weekly cohort call?','Ask Tal about the calls')}
-    </div>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="coursework">All 13</button></div>
-    <div class="tile-stack">${[0,1,2,3].map(i=>chRow(i,{done:0,open:-1,week:99,enrolled:false})).join('')}</div>
   </div>
 </div></main>`;
 };
@@ -3556,9 +3832,78 @@ V.payment = (f) => `<main class="main"><div class="page">
       <div class="kv"><span class="k" style="color:var(--text-primary);font-weight:600">Total</span><span class="v">$595</span></div>
     </div>
     <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
-    <div class="mt5"><button class="btn btn-p" data-go="stage:week1">Pay $595 and start ${I.arrowRight}</button></div>
+    ${''/* PAYING LANDS ON THE CONFIRMATION, NOT ON DAY 4 OF THE COURSE.
+          This was `stage:week1` — the dashboard in the middle of the 90 days,
+          with a chapter already unlocked and a call in two days, which is a
+          strange place to be thirty seconds after paying and confirms nothing.
+          `V.welcome` is the receipt and it is what advances the stage. Same
+          shape as the interview's `data-go="booking"` two hundred lines up. */}
+    <div class="mt5"><button class="btn btn-p" data-go="welcome">Pay $595 and start ${I.arrowRight}</button></div>
     <p class="t-legal-01 mt5" style="color:var(--text-helper)">Full refund up to 7 days after your cohort starts, provided you have not completed more than one chapter.</p>
   </div>
+</div></main>`;
+
+/* ==========================================================================
+   PAYING IS NOT ARRIVING — THE CONFIRMATION IS ITS OWN SCREEN
+   ==========================================================================
+   "Pay $595 and start" went straight to `stage:week1`, which is the dashboard
+   on day 4 of the 90: "Welcome back, Maryam", a chapter open, a progress strip
+   and a cohort call in two days. Thirty seconds after paying that page is
+   wrong twice over — nothing on it says the payment went through, and it opens
+   in the middle of a course the reader has not started.
+
+   The pattern is `V.booking`'s and its note is the argument: a confirmation is
+   a RECEIPT, read once, immediately after paying, to check that what happened
+   is what was meant to happen. So this answers four things and stops — you
+   paid, you are in a cohort, here is who runs it, here is what happens next —
+   and the last control on it is the way to the dashboard.
+
+   IT DOES NOT MOVE THE STAGE, which is `V.booking`'s behaviour rather than an
+   omission: the confirmation renders in the stage you paid from and the button
+   at the foot is what advances it. So the rail still shows the `assessed` set
+   while this is open. That is correct — Coursework, Cohort and Messages open
+   when the 90 days do, not when the card clears.
+
+   AND IT IS THE FIRST PLACE THE COHORT HAS A NUMBER. Before the payment clears
+   there is nothing to name, which `PAGESUM.payment` says in as many words
+   ("your cohort is assigned as soon as it clears") and which is why the Enroll
+   page is careful not to name one. This page is the other side of that
+   sentence, and naming it is most of what makes it a welcome.
+
+   NO DARK CARD, so the head band is the title, the fact row and Tal. `.plate`
+   is "the one thing to do next" and there is nothing to do here: the chapter
+   does not open for weeks and the call is after that. `V.booking` has none
+   either, for the same reason its note gives about the calendar button.
+   ========================================================================== */
+V.welcome = () => `<main class="main"><div class="page">
+  ${ph('Welcome to Cohort 41','Explorer Track &ndash; E3 &middot; starts 1 December &middot; a cohort of ten at your level',null,'dashboard')}
+  <div class="sec">
+    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div></div>
+  </div>
+  ${''/* THE LEADER, SECOND, BECAUSE SHE IS THE THING THAT CHANGED. Everything
+        above this is a transaction; the cohort and the person running it are
+        what the transaction bought. Same card as the Enroll page's, with the
+        cohort named this time — see `leaderCard`. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Your cohort leader</h2></div>
+    ${leaderCard(41)}
+  </div>
+  ${''/* AND THE ANSWER TO "SO WHAT DO I DO NOW" IS NOTHING, IN THREE PARTS.
+        Counted rather than marked, which is the `.cardrow-n` shape the
+        `booked` dashboard's "What to bring" uses — these are in time order and
+        a number is what says so. None of them is a task: the point of the
+        block is that the next move is the product's, not the reader's. */}
+  <div class="sec">
+    <div class="sec-h"><h2>What happens next</h2></div>
+    <div class="tile-stack">
+      ${[['Nothing, until 1 December','Chapter 1, '+CH[0][0]+', unlocks that morning &middot; '+CH[0][1]+' min'],
+         ['Priya introduces the cohort on the board','Before the first call, so you know the ten of you by name'],
+         ['Your first live call is that Thursday','6:00 PM ET &middot; 60 minutes &middot; the invite is already in your email']
+        ].map(([t,d],i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${t}</span><span class="cardrow-d">${d}</span></span></div>`).join('')}
+    </div>
+  </div>
+  <div class="sec"><button class="btn btn-p" data-go="stage:week1">Go to my dashboard ${I.arrowRight}</button></div>
 </div></main>`;
 
 /* ==========================================================================
@@ -5383,16 +5728,17 @@ device.addEventListener('click', e => {
      back to the header — and closing it threw you back again. A disclosure
      that moves the page is worse than one that forgets.
 
-     So the class goes on the element for THIS interaction, and `S.found`
+     So the class goes on the element for THIS interaction, and `S.disc`
      records it for the NEXT render. Nothing re-renders on the click, the
      scroll position is never touched, and a later re-render still comes back
-     open because the views read `S.found`. */
+     open because the views read `S.disc`. */
   const fd = t.closest('[data-found]');
   if(fd){
-    S.found = !S.found;
+    const k = fd.dataset.found || 'report';
+    S.disc[k] = !S.disc[k];
     const sec = fd.closest('.found');
-    if(sec) sec.classList.toggle('on', S.found);
-    fd.setAttribute('aria-expanded', S.found ? 'true' : 'false');
+    if(sec) sec.classList.toggle('on', S.disc[k]);
+    fd.setAttribute('aria-expanded', S.disc[k] ? 'true' : 'false');
     return;
   }
   const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }

@@ -79,7 +79,7 @@ const ASK_WHERE = {dashboard:'Dashboard', level:'My Level', coursework:'Coursewo
   transcript:'Course Progress', rewards:'Points', cohort:'Cohort 41',
   interviews:'Interviews', enrol:'Enrolling', billing:'Payments',
   report:'Your report', agents:'Choosing an agent', agent:'Agent profile',
-  booking:'Interview booked', payment:'Payment', account:'Profile',
+  booking:'Interview booked', payment:'Payment', welcome:'Enrolled', account:'Profile',
   messages:'Messages', chapter:'A chapter', ivt:'An interview transcript',
   rp:'Practising with Tal', mem:'A cohort member'};
 

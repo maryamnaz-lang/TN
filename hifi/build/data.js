@@ -211,6 +211,11 @@ const NAVSETS = {
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',
                 booking:'interviews', chapter:'coursework', payment:'enrol', terms:'account',
+                /* the enrolment confirmation is the far end of Enroll → Payment
+                   and keeps the same rail entry lit; it does not move the stage
+                   (its own note says why), so the module it belongs to is still
+                   the one you paid from */
+                welcome:'enrol',
                 /* leader sub-pages, so the rail keeps the module lit while you are inside one */
                 leadCohort:'leadCohorts', leadMember:'leadCohorts', leadEval:'leadEvals'};
 
@@ -263,6 +268,10 @@ const TALCTX = {
   booking:['Run a mock on delegation','What if I freeze?','Can I see the questions first?'],
   enrol:['What happens on the weekly call?','Can I change cohort later?','Is the fee refundable?'],
   payment:['Is my card stored?','What is the refund window?'],
+  /* THE CONFIRMATION'S THREE ARE ABOUT THE 90 DAYS, NOT ABOUT THE PAYMENT.
+     The transaction is finished and the page says so; what a person wants
+     from Tal here is the thing they have just committed to. */
+  welcome:['What should I do before it starts?','What happens on the weekly call?','Can I change cohort later?'],
   coursework:['Which chapter should I do first?','How far behind am I?','What is next week about?'],
   chapter:['Explain this chapter in 60 seconds','Give me the two key terms','I am stuck, ask me a question instead'],
   transcript:['How do I compare with my cohort?','What is in the 90-day summary?','Which chapter dragged my average down?'],

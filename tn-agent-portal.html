@@ -846,13 +846,78 @@ const TALQ = {
    HELPERS — every one of these returns design-system markup and nothing else
    ========================================================================== */
 
+/* THE FACT ROW DRAWS ITS OWN MARKS — §56's `.ph-f`, ported from `views.js`.
+   The `&middot;` row is split into one `.ph-f` per fact, each opening on a
+   capital with a 15px subject icon in front of it, because with a mark in front
+   of it a fact stops being a clause in a sentence and becomes an item.
+
+   THE FIRST THIRTEEN ROWS ARE BYTE-IDENTICAL TO `hifi/`'s `PH_IC` AND MUST
+   STAY THAT WAY. This is the same argument `stepIcon` records: both portals
+   keep a copy, and the copies agree, so a fact the two products share cannot
+   wear one mark here and another there. The two agent rows are APPENDED rather
+   than merged in, and appending is what makes that safe — the table is
+   first-match-wins, so a row at the end cannot change any match the shared
+   rows already make. It is only reached by vocabulary that is this portal's
+   alone.
+
+   AND ONLY THESE THIRTEEN ICON KEYS ARE REAL. `I` is a Proxy in
+   `talentnext-ds.js` and an unknown key returns `<svg viewBox="0 0 24 24">`
+   with no path in it — not an error, an EMPTY mark, which renders as a 15px
+   hole rather than as anything you would notice was wrong. `person`, `badge`,
+   `verified`, `user` and `account` are all missing and all look present.
+   Check a new key against the empty one before using it. */
+const PH_IC = [
+  [/re-?interview|interview/i,                        'video'],
+  [/track|explorer|builder|trailblazer/i,             'growth'],
+  [/cohort|candidates|members|others/i,               'group'],
+  [/level|rung|\bE\d\b|not enrolled|enrolled|signed/i,'certificate'],
+  [/quiz|score|of 100|average|%/i,                    'chart'],
+  [/week|\b\d+ days?\b|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b|\b(january|february|march|april|june|july|august|september|october|november|december)\b/i,'calendar'],
+  [/minute|hour|\bmin\b/i,                            'time'],
+  [/\$|paid|fee|price|refund/i,                        'wallet'],
+  [/session|call|thread|message/i,                     'chat'],
+  [/chapter|course|module|training/i,                  'book'],
+  [/vetting|verif|identity|reference/i,                'shield'],
+  [/certificate|award|badge|\bstars?\b/i,              'trophy'],
+
+  /* AGENT-ONLY, APPENDED — see the note above. Both of these are spine facts
+     this portal writes and the candidate portal never does, and without them
+     two of the dashboard's four facts came out as the fallback ring, which is
+     the mark that says "this fact has no subject".
+
+     `certified` is not caught by `certificate` above — the pattern is the noun,
+     and "not yet certified" is the adjective. It takes `certificate` rather
+     than `trophy` because on this portal certification is the gate that makes
+     an agent bookable, not an award they display. */
+  [/\bcertified\b|certification/i,                     'certificate'],
+  /* The role label itself. `shield` is the vetting mark, which is what a
+     credentialed role is here — an agent is somebody the product has checked. */
+  [/talent agent|\bagents?\b/i,                        'shield']
+];
+function factIcon(t){
+  const s = String(t || '').replace(/&[a-z]+;|&#\d+;/gi, ' ');
+  for(const [re,k] of PH_IC) if(re.test(s)) return I[k];
+  return I.circle;
+}
+/* Only a letter is touched, so "$85 an interview" and "&ndash; B1" are left
+   exactly as written. */
+const _cap = t => t.replace(/^([a-z])/, (m,c) => c.toUpperCase());
+/* A `sub` with no middot in it is left as a plain `<p>` — one fact is not a
+   row, and the auth-style pages that pass a sentence must not grow a mark. */
+const phSub = sub => {
+  const parts = String(sub).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return `<p>${sub}</p>`;
+  return `<p class="ph-facts">${parts.map(t =>
+    `<span class="ph-f">${factIcon(t)}<span>${_cap(t)}</span></span>`).join('')}</p>`;
+};
+
 /* THE PAGE HEAD, in `hifi/`'s own shape: one `.ph` per page, carrying the only
    h1, and `sub` is the FACT ROW — never a sentence. */
 function ph(title, sub, backTo){
   return `<div class="ph">
     <div class="ph-main">
       <div class="ph-top">${backTo ? `<button class="ph-back" data-go="${backTo}" aria-label="Back">${I.arrowLeft}</button>` : ''}<h1>${title}</h1></div>
-      ${sub ? `<p>${sub}</p>` : ''}
+      ${sub ? phSub(sub) : ''}
     </div>
   </div>`;
 }
@@ -887,20 +952,28 @@ function pageSummary(){
    everywhere before the band existed; the only place it is still right is
    Tal's draft further down the report page.
 
-   AND THE GREETING SWALLOWS THE PAGE HEADER. `.app .modhead:has(.tal-greet) >
-   .ph{display:none}` — so a card carrying a `.tal-greet` becomes the head, and
-   the title and fact row under it would be a second heading nobody reads. That
-   is why `greet` is passed on the dashboard and nowhere else: every other page
-   needs its title, so it must not carry one.
+   THE GREETING IS THE `<h1>` NOW, AND `.tal-greet` IS GONE FROM THIS FILE.
+   It used to be passed into Tal's card, and `.app .modhead:has(.tal-greet) >
+   .ph{display:none}` (§33.9) then hid the page header — which was right while
+   the band's left column was only Tal's card. §56 made that column the page's
+   whole left-hand read: the `<h1>`, the `&middot;` fact row under it, a
+   hairline, the wing, a second hairline, then what Tal says. With the greeting
+   still inside the card, §33.9 fired and took ALL of that with it — including
+   the fact row, which was written, correct, and invisible, and the `<h1>`,
+   which the dashboard was passing as the same string twice.
+
+   So the greeting moved to the `.ph` as the title, exactly as `hifi/` did it.
+   The rule still ships and still matches on a page that opts in; nothing in
+   this file carries the class any more, which is the same state `hifi/` is in.
    ========================================================================== */
-function head({title, sub, back, greet, wing, plate}){
+function head({title, sub, back, wing, plate}){
   const text = pageSummary();
   return `<div class="modhead">
     ${ph(title, sub, back)}
     ${text ? `<div class="sec">
       <div class="ai-aura tile tight talsum">
         <div class="ai-head"><span class="ai-label">Tal</span></div>
-        <div class="ai-body"><p>${greet ? `<span class="tal-greet">${greet}</span>` : ''}${text}</p></div>
+        <div class="ai-body"><p>${text}</p></div>
         ${wing || ''}
       </div>
     </div>` : ''}
@@ -1680,16 +1753,15 @@ const V = {};
    fact hides longest.
    -------------------------------------------------------------------------- */
 V.dashboard = v => {
-  /* THE DASHBOARD IS THE ONE PAGE THAT GREETS YOU, and the greeting hides the
-     page header by design (§33). So the title and the fact row are still
-     written — they are what a reader gets if the band ever fails — but what is
-     read is Tal's line and the stepper beside it. Both carry the same facts
-     the fact row would have. */
+  /* THE DASHBOARD IS THE ONE PAGE THAT GREETS YOU, and the greeting is its
+     `<h1>` — see the note over `head()`. It used to be passed twice, once as
+     `title` and once as `greet`, and the second one hid the first along with
+     the fact row beneath it. One string, one slot: the title IS the greeting,
+     and the fact row under it carries the spine. */
   const band = extra => head({
     title: `Welcome back, ${A.n.split(' ')[0]}!`,
     sub: v.certified ? `Talent agent &middot; assesses ${v.range} &middot; ${money(v.fee)} an interview`
                      : 'Talent agent &middot; not yet certified',
-    greet: `Welcome back, ${A.n.split(' ')[0]}!`,
     /* THE JOURNEY STEPPER IS FOR AN AGENT WHO IS STILL BEING ENABLED, and it
        comes off the moment they are certified. From `live` on it read "Step 5 of
        5 · Interviewing · Listed since 24 June · nothing booked yet" — a progress

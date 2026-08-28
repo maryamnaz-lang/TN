@@ -508,6 +508,32 @@
    stages that draw it, and a future plate that IS urgent keeps the white. */
 .app .plate.plate-quiet .plate-v{color:var(--accent-text)}
 
+/* AND ON AN INVOICE THE ACCENT IS THE TOTAL, NOT EVERY LINE OF IT.
+   The rule above was written for a card with ONE figure on it — the enrolment
+   offer's price among three plain facts — where "the accent is the thing you
+   came for" is exactly right. The Enroll page's checkout writes three: the
+   fee, the credit and what is due today. All three in `--accent-text` is the
+   card shouting a number, then a second, then a third, and the reader has to
+   work out which one is the answer; the credit in the accent is the worst of
+   the three, since the one figure on the card the reader is NOT paying was
+   drawn as loudly as the one they are.
+
+   So the working takes the body ink and the last row keeps the accent. The
+   gate is `.plate-tab`, which `splitPlateBody` (ai5) stamps on a list whose
+   rows ALL end in a figure — the note there is the argument, and it is the
+   same one: a list of nothing but amounts is a table, and a table has a total.
+   `:last-child` rather than a class on the row, because the total of a list is
+   the last line of it and there is nothing for a call site to decide.
+
+   `--on-dark` IS THE BODY INK HERE, not white. §59 re-points that token on
+   `.plate-quiet` (to `--text-primary`), which is the whole reason it can be
+   written once: on a black plate this selector cannot match, because a black
+   plate is not quiet. It is the same value §56's `.plate-bi b` gives a figure
+   that has no accent claim on it, reached through the token rather than
+   restated. */
+.app .plate.plate-quiet .plate-tab > .plate-bi:not(:last-child) > .plate-v{
+  color:var(--on-dark)}
+
 /* ------------------------------------------------------------------ 7 ---
    THE FEW THAT SIT OUTSIDE THE LADDER, AND WHY EACH ONE DOES
 

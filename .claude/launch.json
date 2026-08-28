@@ -18,6 +18,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "8806", "--bind", "127.0.0.1"],
       "port": 8806
+    },
+    {
+      "name": "tn4",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "8811", "--bind", "127.0.0.1"],
+      "port": 8811
     }
   ]
 }

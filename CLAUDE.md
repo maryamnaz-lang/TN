@@ -183,7 +183,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `63-typography.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `69-enrolflow.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -339,10 +339,18 @@ its heading — the row already ends in "Read the full report", and two controls
 the same edge, one opening in place and one navigating away, is the ambiguity
 worth avoiding. Three things that cost a round trip each:
 
-- **The state is `S.found` AND a DOM class.** `render()` alone was wrong: it
+- **The state is `S.disc` AND a DOM class.** `render()` alone was wrong: it
   replaces `device.innerHTML`, which resets the scroller, so opening a section
   1200px down threw you back to the header and closing it threw you back again.
-  The class handles this interaction, `S.found` survives the next render.
+  The class handles this interaction, `S.disc` survives the next render.
+- **THE DISCLOSURES ARE KEYED BY NAME AND THERE ARE TWO.** It was one boolean,
+  `S.found`, on the reasoning that the two dashboards never appear together so a
+  second key would only hold the first one's value — true of those two, and
+  false the moment "How your cohort works" appeared on the Enroll page (§69).
+  `foundHead(title, act, key)` writes the key into `data-found` and the section
+  reads `discOpen(key)`; `report` is the default, so the two dashboards are
+  unchanged. **Nothing in this reached the stylesheet** — §65's rules are about
+  the SHAPE of a disclosure and all of them key on `.found` / `.found.on`.
 - **THE WRAPPER PUT THE SECTION BACK IN THE LABEL COLUMN — trap 13, exactly as
   written.** The section's opt-out was §16's `.sec:has(> .all-desc)`, a DIRECT
   child. Wrapping the panel in `.found-b` moved that sentence one level down,
@@ -366,6 +374,82 @@ node and could not be given a column of its own.
 trap 12 it lands in the head band, and on `promoted` it is the *second* dark
 card there, so §56 spans it across both columns underneath — written down, not a
 surprise. Do not add a third.
+
+### THE ENROLMENT FLOW — §69, `69-enrolflow.css` + `V.enrol` / `V.welcome`
+
+Enroll → Payment → **Welcome**. The page that asks for $595 had the fee as a
+three-row `.kv` tile 860px down with the only button on the screen under it, so
+everything above the fold was context for a decision the page never got round to
+putting. Seven things:
+
+- **THE MONEY IS THE PAGE'S DARK CARD**, so `placeDark` puts it in the head
+  band's second column beside the title — the same slot the `assessed`
+  dashboard's `enrolPlate` occupies, one step on. That card is the *offer*;
+  `checkoutPlate` is the *checkout*, and it is the only place on the page the
+  three figures appear. Quiet by construction (§59: no clock, no black wall),
+  and it reuses `ENROL_OPENS` verbatim so the start date cannot drift.
+- **A `.plate-b` WHOSE ROWS ALL END IN A FIGURE IS AN INVOICE.**
+  `splitPlateBody` (ai5) stamps `.plate-tab` and **drops the subject marks** —
+  `PLATE_IC` leads on money, so fee / credit / due all matched the wallet and
+  the card said one word three times. §69 rules the last row off as the total
+  and §63 keeps `--accent-text` for `:last-child` only, because three figures in
+  the accent is the card shouting a number, then a second, then a third.
+  `enrolPlate`'s four rows have three with no `<b>` and are untouched.
+- **`COHORT_LEAD` IS IN views.js AND `LEADER` (lead.js) READS IT.** Not the
+  other way round: lead.js parses after views.js *and after its boot
+  `render()`*, so `#assessed/enrol` off the hash would reach a `LEADER`
+  declared there in the temporal dead zone — the hazard `notifList` already
+  guards `LEAD_NOTIF` against. Name, range and "leading since" are stated once.
+- **The leader is a `.tile`, not a `.plate`** — trap 12, one dark card per page,
+  and a plate is "the one thing to do next" while there is nothing to do about
+  Priya until the 90 days start. `row-lead` is what `V.booking` already uses for
+  "who you have paid to spend time with". **The E4 page does not draw it**:
+  `COHORT_LEAD`'s range is E1–E3 and her three cohorts are E3/E1/E2, so naming
+  her as an E4 leader would be false.
+- **The card is a face, a name and a role line, and nothing else.** It had two
+  fact rows about the call and a sentence in her own voice; both went (Maryam,
+  28 Aug 2026) when the block moved to the top of the page — the logistics are
+  said again in "How your cohort works" and in the confirmation's "What happens
+  next", and a paragraph of first-person copy in the first two inches of a page
+  whose job is to reach the payment screen is the block that stops you. The one
+  `.kv` left is `V.welcome`'s "Leads Cohort 41", which is the assignment itself.
+  **THE SUBTRACTION TOOK THE LABEL-COLUMN OPT-OUT WITH IT — trap 13, the mirror
+  of §65.1a.** The section was opting out through `.sec:has(.kv)` *because of
+  those rows*; with them gone it fell into the 184px column and nothing warned.
+  §69.3 restates it on `:has(> .tile > .row-lead)`. Adding a wrapper is not the
+  only way to lose an opt-out — removing content does it too.
+- **§69.3 copies THREE of §10.15's four declarations.** The fourth,
+  `padding:0 var(--pad-x)` on the heading, is dead in §10: §14 zeroes every
+  headed section's `.sec-h` padding at this width ("a section pays the gutter
+  and its heading must not"). Restating it from §69 un-does §14 and set that one
+  heading 32px right of the three below it. **Copy what a rule does today, not
+  what its source says.**
+- **The order is the order of the questions** (Maryam, 28 Aug 2026): the band
+  answers what-and-how-much before anything scrolls, then WHO you would do it
+  with, WHAT you would learn, HOW the cohort runs, and last the four figures
+  that recap all three. The person leads because she is the only thing on the
+  page that is not a fact about a product.
+- **"How your cohort works" is the §65 disclosure with `key='cohort'`,** and its
+  lede sits **outside** `.found-b` so the block still says what a cohort is
+  while it is shut. §69 gives the section its full bottom padding back in that
+  case; §65 takes half of it away on the reasoning that a closed disclosure is
+  one row, which stops being true the moment there are two.
+- **`V.welcome` is the receipt, and `V.booking`'s note is its argument.** Paying
+  went to `stage:week1` — day 4 of the 90, "Welcome back", a chapter already
+  open — which confirms nothing and opens in the middle. It **does not move the
+  stage**; the button at its foot does, exactly as the interview's confirmation
+  works, so the rail still shows the `assessed` set while it is open. It is also
+  **the first place the cohort has a number**, which is the other side of
+  `PAGESUM.payment`'s "your cohort is assigned as soon as it clears".
+- **The hand-written Tal card came off `V.enrol` and nothing was lost.** Trap 11:
+  `placePageSummary` was already replacing its heading and body with
+  `PAGESUM.enrol` and step 1b was already removing its chip, so neither had been
+  on screen. The words are in `PAGESUM.enrol`, which lost the money with the
+  card gaining it and now carries the hours — the one thing no figure states.
+
+Two latent bugs in `PH_IC` (`factIcon`'s table) fell out of this and are fixed:
+`\bDec\b` does not match "December", and `star` — the LAST row, so the catch-all
+— matched **"Starts"**, which is how "starts 1 December" came out as a trophy.
 
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
@@ -898,7 +982,7 @@ cd hifi && python3 -m http.server 8791 --bind 127.0.0.1
 ```
 
 Then, in the page, loop `STAGES` × `NAVSETS[CFG[stage].nav]` (plus the sub-pages: `report`,
-`result`, `agents`, `agent`, `booking`, `payment`, `chapter`, `ivt`, `mem`, `rp`, `account`)
+`result`, `agents`, `agent`, `booking`, `payment`, `welcome`, `chapter`, `ivt`, `mem`, `rp`, `account`)
 calling `setStage` / `render`, then the leader's seven, then `callOpen('iv'|'re'|'cohort')` and
 `callLeave()` at each stage — 280-odd combinations, all of which must render with no thrown
 error **and no `console.warn`**: every pass wraps itself in a try/catch that warns, so a broken

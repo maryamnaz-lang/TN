@@ -9198,6 +9198,8 @@ button.btn-p:active,
 .app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
 .app .path-step.on .path-n{color:var(--on-dark)}
 .app .plate.plate-quiet .plate-v{color:var(--accent-text)}
+.app .plate.plate-quiet .plate-tab > .plate-bi:not(:last-child) > .plate-v{
+  color:var(--on-dark)}
 .app .av,.app .av-ph,.app .mem-av,.app .shell-avatar,.app .ch-num{
   font-size:var(--t-caption-size);line-height:1;
   font-weight:var(--t-w-strong);letter-spacing:.3px}
@@ -9497,6 +9499,29 @@ button.btn-p:active,
   padding-top:0}
 .app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{
   padding-bottom:var(--s04)}
+.app .plate-b.plate-tab > .plate-bi:last-child{
+  margin-top:var(--s03);
+  padding-top:var(--s04);
+  border-top:1px solid var(--on-dark-rule)}
+.app .plate-b.plate-tab > .plate-bi > span{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .sec.tint.found:not(.on):has(> .all-desc){padding-bottom:var(--s06)}
+.app .sec.found > .all-desc{margin-top:var(--s04)}
+@container app (min-width:900px){
+  .app .page .sec:has(> .tile > .row-lead){display:block}
+  .app .page .sec:has(> .tile > .row-lead) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05)}
+}
+.app .modhead > .sec.head-sec{
+  position:relative;
+  padding-top:var(--s06);
+  margin-top:var(--s05)}
+.app .modhead > .sec.head-sec::before{
+  display:block;content:'';
+  position:absolute;left:var(--pad-x);right:var(--pad-x);top:0;
+  height:1px;background:var(--rule)}
+.app .modhead > .sec.head-sec::after{display:none}
+.app .modhead > .sec.head-sec > .sec-h{margin-bottom:var(--s04)}
 
 </style>
 </head>
@@ -9786,6 +9811,7 @@ const NAVSETS = {
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',
                 booking:'interviews', chapter:'coursework', payment:'enrol', terms:'account',
+                welcome:'enrol',
                 leadCohort:'leadCohorts', leadMember:'leadCohorts', leadEval:'leadEvals'};
 
 const AV = {
@@ -9819,6 +9845,7 @@ const TALCTX = {
   booking:['Run a mock on delegation','What if I freeze?','Can I see the questions first?'],
   enrol:['What happens on the weekly call?','Can I change cohort later?','Is the fee refundable?'],
   payment:['Is my card stored?','What is the refund window?'],
+  welcome:['What should I do before it starts?','What happens on the weekly call?','Can I change cohort later?'],
   coursework:['Which chapter should I do first?','How far behind am I?','What is next week about?'],
   chapter:['Explain this chapter in 60 seconds','Give me the two key terms','I am stuck, ask me a question instead'],
   transcript:['How do I compare with my cohort?','What is in the 90-day summary?','Which chapter dragged my average down?'],
@@ -9951,7 +9978,7 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
 
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
-  found:false,
+  disc:{},
   scenes:{level:null, re:null}, scPick:{level:[], re:[]},
   cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true}]};
 const isLead = () => S.portal === 'leader';
@@ -10327,7 +10354,7 @@ function talPanel(f){
   const ctx = (lead ? (lead.ctx[S.view] || lead.ctx.leadDash) : (TALCTX[S.view] || TALCTX.dashboard));
   const where = (lead ? lead.where[S.view] : ({dashboard:'Dashboard',level:'My Level',report:'Your report',interviews:'Interviews',
     agents:'Choosing an agent',agent:'Agent profile',booking:'Interview booked',enrol:'Enrolling',
-    payment:'Payment',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
+    payment:'Payment',welcome:'Enrolled',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
     cohort:'Cohort 41',billing:'Payments',account:'Profile',messages:'Messages'})[S.view]) || 'TalentNext';
   const state = lead ? lead.state()
     : f.complete ? lvlName(f.level)+', cohort complete'
@@ -10461,8 +10488,9 @@ function achLine(){
 const dashPh = (title, sub) =>
   ph(title, sub, achLine(), null, youMark());
 
-const foundHead = (title, act) => `<div class="sec-h found-h">
-    <button class="found-t" data-found="1" aria-expanded="${S.found?'true':'false'}">
+const discOpen = (key) => !!S.disc[key || 'report'];
+const foundHead = (title, act, key) => `<div class="sec-h found-h">
+    <button class="found-t" data-found="${key||'report'}" aria-expanded="${discOpen(key)?'true':'false'}">
       <span class="found-chev">${I.chevRight}</span><h2>${title}</h2></button>
     ${act||''}
   </div>`;
@@ -10804,13 +10832,13 @@ const PH_IC = [
   [/cohort|candidates|members|others/i,               'group'],
   [/level|rung|\bE\d\b|not enrolled|enrolled|signed/i,'certificate'],
   [/quiz|score|of 100|average|%/i,                    'chart'],
-  [/week|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b/i,'calendar'],
+  [/week|\b\d+ days?\b|day \d|of 90|month|\bAug\b|\bNov\b|\bDec\b|\b(january|february|march|april|june|july|august|september|october|november|december)\b/i,'calendar'],
   [/minute|hour|\bmin\b/i,                            'time'],
   [/\$|paid|fee|price|refund/i,                        'wallet'],
   [/session|call|thread|message/i,                     'chat'],
   [/chapter|course|module|training/i,                  'book'],
   [/vetting|verif|identity|reference/i,                'shield'],
-  [/certificate|award|badge|star/i,                    'trophy']
+  [/certificate|award|badge|\bstars?\b/i,              'trophy']
 ];
 function factIcon(t){
   const s = String(t || '').replace(/&[a-z]+;|&#\d+;/gi, ' ');
@@ -11506,7 +11534,7 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${S.found?' on':''}">
+    <div class="sec tint cards found${discOpen('report')?' on':''}">
       ${foundHead('What the interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -11567,7 +11595,7 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${S.found?' on':''}">
+    <div class="sec tint cards found${discOpen('report')?' on':''}">
       ${foundHead('What the re-interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -12295,53 +12323,205 @@ V.booking = (f) => {
 </div></main>`;
 };
 
+const COHORT_LEAD = {
+  n:'Priya Nair', i:'PN', img:AV.priya,
+  since:'March 2024',
+  range:'E1–E3',
+};
+
+function leaderCard(co){
+  const L = COHORT_LEAD;
+  return `<div class="tile">
+    <div class="row-lead">
+      ${avatar(L,48)}
+      <div style="flex:1">
+        <div class="t-heading-compact-01">${L.n}</div>
+        <div class="t-helper-01 mt3">Cohort leader &middot; leading cohorts since ${L.since}</div>
+      </div>
+    </div>
+    ${''/* NO FACT ROWS ABOUT THE CALL. The card carried "On the call" and
+          "Between calls", and both are LOGISTICS rather than facts about the
+          person: on the Enroll page they are two of the six rows in "How your
+          cohort works" a screen below, and on the confirmation they are steps
+          2 and 3 of "What happens next". Said in both places the card stopped
+          being an introduction and became a second timetable — and it is the
+          first block on the page now, where the reader is asking who this is
+          and not when the call is. Maryam's cut, 28 Aug 2026.
+
+          THE ONE ROW LEFT IS THE ONE THAT IS NOT LOGISTICS. "Leads Cohort 41"
+          is the assignment itself, it is the fact the confirmation page exists
+          to deliver, and it is true of nothing else on that screen. It is also
+          why this stays a `.kv` rather than becoming a third line under the
+          name: a key and a value is what the product draws for an assignment. */}
+    ${co?`<div class="kv mt5"><span class="k">Leads</span><span class="v">Cohort ${co} &middot; ten of you at Explorer &ndash; E3</span></div>`:''}
+  </div>`;
+}
+
+const RPT_GROWTH = ['Delegation Without Drop-Off','Coaching vs Fixing']
+  .map(t => CH.findIndex(c => c[0] === t));
+
+const ENROL_CREDIT = {E3:'Interview already paid', E4:'Returning candidate credit'};
+const checkoutPlate = lvl => `<div class="sec">
+    <div class="plate">
+      <div class="plate-t">Your enrolment</div>
+      <div class="plate-d">One payment, and the re-interview that can move you up is included.</div>
+      <div class="plate-b">Course fee <b>$690</b> &middot; ${ENROL_CREDIT[lvl]} <b>&minus;$95</b> &middot; Due today <b>$595</b></div>
+      <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
+      <div class="plate-a">
+        <button class="btn btn-p btn-sm noic" data-go="payment">Continue to payment ${I.arrowRight}</button>
+      </div>
+    </div>
+  </div>`;
+
 V.enrol = (f) => {
   const next = f.complete;
   const lvl = next?'E4':'E3';
+  const [g1,g2] = RPT_GROWTH;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],next?'Next course':'Enroll')}
-  <div class="ph">
-    <div class="ph-top">${bk()}<h1>Explorer Track &ndash; ${lvl}</h1></div>
-    ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
-          days, 13 chapters and a cohort of ten with a live leader" — this
-          line with two commas moved. The facts stay here where a description
-          belongs and Tal keeps the commitment, which is the money and the
-          hours. See the note over `ph()`. */}
-    <p>90 days &middot; 13 chapters &middot; a cohort of ten with a live leader</p>
-  </div>
+  ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
+        days, 13 chapters and a cohort of ten with a live leader" — this line
+        with two commas moved. The facts stay here where a description belongs
+        and Tal keeps the commitment, which is the hours. See the note over
+        `ph()`.
+
+        AND IT GOES THROUGH `ph()` NOW. This page hand-wrote the `.ph` — a
+        `.ph-top` and a bare `<p>` — which predates `phSub`, so it was the one
+        `&middot;` row in the candidate portal with no marks on its facts while
+        every other page had them. Byte-identical markup otherwise. */}
+  ${ph(`Explorer Track &ndash; ${lvl}`,'90 days &middot; 13 chapters &middot; a cohort of ten with a live leader')}
+  ${''/* THE LEADER IS A PERSON, NOT A GREY NOTE.
+        This block was `.note` + `I.group` + "Your cohort is assigned for you",
+        which is the only thing on a $595 page that said anything about who you
+        would be doing it with — and it said it as a disclaimer. A candidate is
+        buying thirteen Thursdays with a named person; she gets the component
+        the product already uses for that (see `leaderCard`). The sentence the
+        note was carrying — that the cohort is assigned rather than chosen — is
+        a mechanic and moved into "How your cohort works", which is where the
+        mechanics now are.
+
+        IT IS A FACE, A NAME AND A ROLE LINE, AND THAT IS THE WHOLE CARD. It
+        opened with two fact rows about the call and a sentence in her own
+        voice, and both were cut when the block moved to the top of the page
+        (the notes in `leaderCard` and on `COHORT_LEAD` are the argument for
+        each). What is left is what a reader in the first two inches of the
+        page is actually asking, which is who.
+
+        AND THE SUBTRACTION TOOK THE LABEL-COLUMN OPT-OUT WITH IT — trap 13,
+        the mirror of §65.1a. The section was opting out through
+        `.sec:has(.kv)` because of those two rows; with them gone it fell into
+        the 184px column at desktop and nothing warned. §69.3 restates the
+        opt-out on `:has(> .tile > .row-lead)`, which is the honest condition —
+        a card whose subject is a person. Read that note before adding or
+        removing anything from this card.
+
+        THE E4 PAGE DOES NOT DRAW IT, AND THAT IS ABOUT PRIYA RATHER THAN ABOUT
+        THE BLOCK. `COHORT_LEAD` is one person and her range is E1–E3 — the
+        three cohorts `LEAD_COHORTS` gives her are E3, E1 and E2 — so naming
+        her as the leader of an E4 cohort is the one thing on this page that
+        would be false. There is no second leader in the prototype and
+        inventing one to fill a section is worse than the section being
+        absent; what a leader IS is the second row of "How your cohort works",
+        on both levels. */}
+  ${next?'':`<div class="sec head-sec">
+    <div class="sec-h"><h2>Your cohort leader</h2></div>
+    ${leaderCard()}
+  </div>`}
+  ${''/* THE HAND-WRITTEN TAL CARD IS GONE AND NOTHING IS LOST WITH IT.
+        Per trap 11 `placePageSummary` strips a page's Tal card back to its
+        label and replaces the heading and the body with `PAGESUM.enrol`, so
+        "What the 90 days ask of you" and its sentence were never on screen —
+        and the ask chip beside it was removed by the same pass's step 1b. The
+        pass BUILDS the card when a page has none, which is what `V.payment`
+        has always relied on. The words live in `PAGESUM.enrol`. */}
+  ${checkoutPlate(lvl)}
+  ${''/* THE ORDER OF THIS PAGE IS THE ORDER OF THE QUESTIONS, and it was
+        settled by reading it rather than by argument (Maryam, 28 Aug 2026).
+        The band answers "what is this and what does it cost" before anything
+        scrolls. Then, in the column: WHO you would be doing it with, WHAT you
+        would learn, HOW the cohort runs, and last the four figures that recap
+        all three. The person leads because she is the only thing on the page
+        that is not a fact about a product; the mechanics sit under the
+        curriculum because nobody asks how a cohort works before they know
+        what is in it, which is also why they are behind a disclosure. */}
+  ${''/* WHAT YOU LEARN IS THIRTEEN CHAPTERS, AND IT IS ALL THIRTEEN.
+        This was four `chRow`s and an "All 13" button. Both halves were wrong.
+        `chRow` draws a chapter's PROGRESS — "Not started &middot; 45 min" — on
+        a page for somebody who has not bought the course, so the one thing
+        every row said about itself was that nothing had happened yet; and the
+        button went to `coursework`, which is the LightspeedVT frame and is
+        empty until you are enrolled, so the way to see the other nine was a
+        blank screen.
+
+        `.ch-two` is the flat form the `assessed` dashboard already uses — a
+        number, a title, a length, no state — and all thirteen of them fit in
+        two columns. The dashboard's block ends on "See the full course" and
+        points here, so this page has to be the fuller one; it is, by the
+        section under it.
+
+        THE OPT-OUT IS `> .all-desc` (§16, trap 13). `.ch-two` is not in
+        §10.15's list, so the lede is what keeps this section out of the 184px
+        label column, and it has to stay a DIRECT child of the `.sec`. */}
   <div class="sec">
-    <div class="ai-aura tile tight">
-      <div class="ai-head">${talLabel()}<h3>What the 90 days ask of you</h3></div>
-      <div class="ai-body"><p>An hour a week, plus the 60-minute cohort call. People who keep to that average above 85%.</p></div>
-      <div class="ai-foot">${askChip('How much time does the course really take each week?','Ask Tal about the workload')}</div>
+    <div class="sec-h"><h2>What you&rsquo;ll learn</h2></div>
+    <p class="all-desc">Thirteen chapters, one a week, 45 to 70 minutes each. Every one closes with an assessment, and the average of the thirteen is what an agent reads at your re-interview.</p>
+    <div class="ch-two">${CH.map((c,i)=>`
+      <div class="ch ch-flat">
+        <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
+      </div>`).join('')}</div>
+    ${''/* AND TWO OF THE THIRTEEN ARE THIS READER'S, WHICH IS THE ONLY THING
+          ON THE PAGE THAT IS NOT TRUE OF EVERYBODY. It closes the section for
+          the reason the dashboard's report block closes its own: read after
+          the list, the thirteen stop being a catalogue and become the answer
+          to what Priya wrote down.
+
+          ONLY ON THE FIRST COURSE. At `promoted` the report is the
+          re-interview's and it names chapters 3 and 9 of the E4 curriculum —
+          a curriculum this page does not list, since `CH` is E3's. Naming a
+          number against the wrong list is worse than saying nothing. */}
+    ${next?'':`<div class="note mt5"><span>${I.certificate}</span><div class="nb"><b>Two of these are yours by name</b>Priya&rsquo;s report names delegation, and coaching rather than fixing. Chapter ${g1+1}, ${CH[g1][0]}, and chapter ${g2+1}, ${CH[g2][0]}, are built on exactly that.</div></div>`}
+  </div>
+  ${''/* AND THE MECHANICS ARE A DISCLOSURE, ON THE SAME COMPONENT AS "WHAT THE
+        INTERVIEW FOUND" — Maryam's ask, and the same argument holds: six rows
+        of how-it-works is the longest block on the page and it is the one part
+        a reader who has already decided does not need. `foundHead`'s note is
+        the long version; the key is `cohort` so the report's disclosure on the
+        dashboard keeps its own state.
+
+        THE LEDE STAYS OUTSIDE `.found-b`. §65 hides the panel and nothing
+        else, so a closed disclosure is normally a heading on its own; here the
+        one line that answers "what IS a cohort" is visible shut, and what
+        expands is the detail. Somebody who has read it once never opens it
+        again and still knows what the block says.
+
+        NO MEMBER LIST. Ten faces here would be a claim the product has not
+        made — the cohort is assigned when the payment clears, which is the
+        last row in the panel. `V.cohort` is where the ten people are. */}
+  <div class="sec tint cards found${discOpen('cohort')?' on':''}">
+    ${foundHead('How your cohort works','','cohort')}
+    <p class="all-desc">Ten people at Explorer &ndash; ${lvl}, the same ten for all 90 days, with one live call a week.</p>
+    <div class="found-b">
+      <div class="kv mt5"><span class="k">Who is in it</span><span class="v">Up to ten candidates, all at your level</span></div>
+      <div class="kv"><span class="k">Who leads it</span><span class="v n">A volunteer, certified by TalentNext and unpaid</span></div>
+      <div class="kv"><span class="k">The weekly call</span><span class="v n">Thursdays, 6:00 PM ET &middot; 60 minutes, not recorded</span></div>
+      <div class="kv"><span class="k">Between calls</span><span class="v n">A discussion board the whole cohort can see</span></div>
+      <div class="kv"><span class="k">If you miss one</span><span class="v n">Nothing is marked &mdash; your leader posts what was covered</span></div>
+      <div class="kv"><span class="k">Which cohort</span><span class="v n">Assigned by your level and start date, not chosen</span></div>
     </div>
   </div>
+  ${''/* THE STRIP KEEPS ITS FOUR CELLS AND GAINS A HEADING. `.stats` is a
+        fixed four-column grid (trap 13's opt-out list, so no label column) and
+        these are the four figures the fee buys that the card does not state.
+        Unheaded it was a row of numbers floating under a title. */}
   <div class="sec">
+    <div class="sec-h"><h2>What you get</h2></div>
     <div class="stats">
       ${statCell(I.book, `Chapters`, `13`, `one a week`)}
       ${statCell(I.video, `Live calls`, `13`, `60 min, weekly`)}
       ${statCell(I.group, `Cohort size`, `10`, `max, all at ${lvl}`)}
       ${statCell(I.calendar, `Re-interview`, `Day 91`, `then you move`)}
     </div>
-  </div>
-  <div class="sec">
-    <div class="note"><span>${I.group}</span><div class="nb"><b>Your cohort is assigned for you</b>You join up to ten people at your level, led by a volunteer cohort leader, with one live call a week.</div></div>
-  </div>
-  <div class="sec">
-    <div class="tile">
-      <div class="kv"><span class="k">Course fee</span><span class="v">$690</span></div>
-      <div class="kv"><span class="k">${next?'Returning candidate credit':'Interview already paid'}</span><span class="v n">&minus;$95</span></div>
-      <div class="kv kv-due"><span class="k">Due today</span><span class="v">$595</span></div>
-    </div>
-    <p class="t-helper-01 mt4">One payment. Nothing recurs, and the re-interview at the end is included.</p>
-    <div class="pay-act mt5">
-      <button class="btn btn-p" data-go="payment">Continue to payment ${I.arrowRight}</button>
-      ${askChip('What happens on the weekly cohort call?','Ask Tal about the calls')}
-    </div>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="coursework">All 13</button></div>
-    <div class="tile-stack">${[0,1,2,3].map(i=>chRow(i,{done:0,open:-1,week:99,enrolled:false})).join('')}</div>
   </div>
 </div></main>`;
 };
@@ -12381,9 +12561,46 @@ V.payment = (f) => `<main class="main"><div class="page">
       <div class="kv"><span class="k" style="color:var(--text-primary);font-weight:600">Total</span><span class="v">$595</span></div>
     </div>
     <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
-    <div class="mt5"><button class="btn btn-p" data-go="stage:week1">Pay $595 and start ${I.arrowRight}</button></div>
+    ${''/* PAYING LANDS ON THE CONFIRMATION, NOT ON DAY 4 OF THE COURSE.
+          This was `stage:week1` — the dashboard in the middle of the 90 days,
+          with a chapter already unlocked and a call in two days, which is a
+          strange place to be thirty seconds after paying and confirms nothing.
+          `V.welcome` is the receipt and it is what advances the stage. Same
+          shape as the interview's `data-go="booking"` two hundred lines up. */}
+    <div class="mt5"><button class="btn btn-p" data-go="welcome">Pay $595 and start ${I.arrowRight}</button></div>
     <p class="t-legal-01 mt5" style="color:var(--text-helper)">Full refund up to 7 days after your cohort starts, provided you have not completed more than one chapter.</p>
   </div>
+</div></main>`;
+
+V.welcome = () => `<main class="main"><div class="page">
+  ${ph('Welcome to Cohort 41','Explorer Track &ndash; E3 &middot; starts 1 December &middot; a cohort of ten at your level',null,'dashboard')}
+  <div class="sec">
+    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div></div>
+  </div>
+  ${''/* THE LEADER, SECOND, BECAUSE SHE IS THE THING THAT CHANGED. Everything
+        above this is a transaction; the cohort and the person running it are
+        what the transaction bought. Same card as the Enroll page's, with the
+        cohort named this time — see `leaderCard`. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Your cohort leader</h2></div>
+    ${leaderCard(41)}
+  </div>
+  ${''/* AND THE ANSWER TO "SO WHAT DO I DO NOW" IS NOTHING, IN THREE PARTS.
+        Counted rather than marked, which is the `.cardrow-n` shape the
+        `booked` dashboard's "What to bring" uses — these are in time order and
+        a number is what says so. None of them is a task: the point of the
+        block is that the next move is the product's, not the reader's. */}
+  <div class="sec">
+    <div class="sec-h"><h2>What happens next</h2></div>
+    <div class="tile-stack">
+      ${[['Nothing, until 1 December','Chapter 1, '+CH[0][0]+', unlocks that morning &middot; '+CH[0][1]+' min'],
+         ['Priya introduces the cohort on the board','Before the first call, so you know the ten of you by name'],
+         ['Your first live call is that Thursday','6:00 PM ET &middot; 60 minutes &middot; the invite is already in your email']
+        ].map(([t,d],i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${t}</span><span class="cardrow-d">${d}</span></span></div>`).join('')}
+    </div>
+  </div>
+  <div class="sec"><button class="btn btn-p" data-go="stage:week1">Go to my dashboard ${I.arrowRight}</button></div>
 </div></main>`;
 
 const lsvtFrame = () => `<main class="main lsvt-blank"><div class="page"><div class="lsvt-slot">
@@ -13710,10 +13927,11 @@ device.addEventListener('click', e => {
 
   const fd = t.closest('[data-found]');
   if(fd){
-    S.found = !S.found;
+    const k = fd.dataset.found || 'report';
+    S.disc[k] = !S.disc[k];
     const sec = fd.closest('.found');
-    if(sec) sec.classList.toggle('on', S.found);
-    fd.setAttribute('aria-expanded', S.found ? 'true' : 'false');
+    if(sec) sec.classList.toggle('on', S.disc[k]);
+    fd.setAttribute('aria-expanded', S.disc[k] ? 'true' : 'false');
     return;
   }
   const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
@@ -14633,7 +14851,7 @@ const ASK_WHERE = {dashboard:'Dashboard', level:'My Level', coursework:'Coursewo
   transcript:'Course Progress', rewards:'Points', cohort:'Cohort 41',
   interviews:'Interviews', enrol:'Enrolling', billing:'Payments',
   report:'Your report', agents:'Choosing an agent', agent:'Agent profile',
-  booking:'Interview booked', payment:'Payment', account:'Profile',
+  booking:'Interview booked', payment:'Payment', welcome:'Enrolled', account:'Profile',
   messages:'Messages', chapter:'A chapter', ivt:'An interview transcript',
   rp:'Practising with Tal', mem:'A cohort member'};
 
@@ -14908,7 +15126,7 @@ function placeBand(){
   if(crumb && crumb.nextElementSibling === ph) members.push(crumb);
   members.push(ph);
   let n = ph.nextElementSibling;
-  while(n && (n.classList.contains('ask-sec') || _mhIsTal(n))){
+  while(n && (n.classList.contains('ask-sec') || n.classList.contains('head-sec') || _mhIsTal(n))){
     members.push(n);
     n = n.nextElementSibling;
   }
@@ -15076,10 +15294,10 @@ function plateIcon(t){
   return I.circle;
 }
 const PLATE_FIG = /^([\s\S]*?)\s*<b>([\s\S]*?)<\/b>\s*$/;
-function plateRow(t){
+function plateRow(t, bare){
   const m = t.match(PLATE_FIG);
   const lab = m ? m[1].trim() : t;
-  return `<span class="plate-bi">${plateIcon(t)}` +
+  return `<span class="plate-bi">${bare ? '' : plateIcon(t)}` +
     (lab ? `<span>${lab}</span>` : '') +
     (m ? `<b class="plate-v">${m[2]}</b>` : '') + `</span>`;
 }
@@ -15088,8 +15306,10 @@ function splitPlateBody(plate){
   if(!b || b.querySelector(':scope > .plate-bi')) return;
   const parts = b.innerHTML.split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
   if(parts.length < 2) return;
+  const tab = parts.every(p => PLATE_FIG.test(p));
   b.classList.add('plate-lines');
-  b.innerHTML = parts.map(plateRow).join('');
+  if(tab) b.classList.add('plate-tab');
+  b.innerHTML = parts.map(p => plateRow(p, tab)).join('');
 }
 
 const PLATE_SOON = /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
@@ -15423,7 +15643,8 @@ render();
 
 
 
-const LEADER = {n:'Priya Nair', i:'PN', img:AV.priya, range:'E1–E3', since:'March 2024'};
+const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
+  range:COHORT_LEAD.range, since:COHORT_LEAD.since};
 
 S.leadQ = '';
 S.leadFilter = 'all';
@@ -17545,9 +17766,11 @@ const PAGESUM = {
 
   booking: 'Nothing to prepare and nothing to bring &mdash; Thursday is a conversation, not a test. It is recorded, and your report follows within 48 hours.',
 
-  enrol: '$595 once, no subscription. About an hour a week plus the weekly call, and you start with the next cohort &mdash; within two weeks of paying.',
+  enrol: 'About an hour a week on the chapter, plus the 60-minute call. People who keep to that finish all 13 and average above 85%.',
 
   payment: 'One charge of $595 and the 90 days are yours &mdash; nothing renews and there is nothing to cancel. Your cohort is assigned as soon as it clears.',
+
+  welcome: 'Your place is paid and the cohort is yours for the 90 days. Nothing is due from you until chapter 1 unlocks, and Priya posts to the board before then.',
 
 
   coursework: f => {

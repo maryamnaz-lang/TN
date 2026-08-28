@@ -38,7 +38,22 @@
    onto them so the two portals agree about the same ten people.
    ========================================================================== */
 
-const LEADER = {n:'Priya Nair', i:'PN', img:AV.priya, range:'E1–E3', since:'March 2024'};
+/* THE SAME PERSON THE CANDIDATE SEES, AND THE FACTS ARE STATED ONCE.
+   `COHORT_LEAD` (views.js) is Priya from the candidate's side — the Enroll
+   page and the enrolment confirmation both introduce her — and it has to live
+   in that file rather than this one: views.js parses first and runs a boot
+   `render()` at its foot, so a candidate page reached straight from the hash
+   would hit a `LEADER` declared here in the temporal dead zone. Read in this
+   direction it is safe, because lead.js parses after that file and nothing
+   here renders before it.
+
+   Three fields come across and two do not. The name, the range and how long
+   she has been leading are one truth and used to be written out twice, one
+   file apart. `i` stays local because the leader portal uses the initials as
+   its own avatar fallback in five places, and `img` because `AV` is the
+   dictionary both sides read anyway. */
+const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
+  range:COHORT_LEAD.range, since:COHORT_LEAD.since};
 
 /* The attention queue's own two controls. On `S` rather than in a closure so a
    re-render — a nav click, Tal opening — comes back to the same filtered view

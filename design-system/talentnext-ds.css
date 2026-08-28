@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4081.  Rules dropped as product-specific: 176.
+   Rules kept: 4088.  Rules dropped as product-specific: 176.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -7062,6 +7062,7 @@ button.btn-p:active,
 .app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
 .app .path-step.on .path-n{color:var(--on-dark)}
 .app .plate.plate-quiet .plate-v{color:var(--accent-text)}
+.app .plate.plate-quiet .plate-tab > .plate-bi:not(:last-child) > .plate-v{color:var(--on-dark)}
 .app .av,
 .app .av-ph,
 .app .mem-av,
@@ -7277,3 +7278,13 @@ button.btn-p:active,
 .app .plate-b.plate-lines:has(.plate-v) > .plate-bi{border-bottom:0; padding:var(--s02) 0}
 .app .plate-b.plate-lines:has(.plate-v) > .plate-bi:first-child{padding-top:0}
 .app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{padding-bottom:var(--s04)}
+
+/* ---- 69-enrolflow.css ---- */
+.app .plate-b.plate-tab > .plate-bi:last-child{margin-top:var(--s03); padding-top:var(--s04); border-top:1px solid var(--on-dark-rule)}
+.app .plate-b.plate-tab > .plate-bi > span{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.app .sec.tint.found:not(.on):has(> .all-desc){padding-bottom:var(--s06)}
+.app .sec.found > .all-desc{margin-top:var(--s04)}
+@container app (min-width:900px){
+  .app .page .sec:has(> .tile > .row-lead){display:block}
+  .app .page .sec:has(> .tile > .row-lead) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05)}
+}

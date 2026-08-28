@@ -1,0 +1,208 @@
+/* ==========================================================================
+   §69  THE ENROLMENT FLOW — THE INVOICE ROWS, AND A DISCLOSURE THAT SHOWS
+        SOMETHING WHILE IT IS SHUT
+   ==========================================================================
+   Two small components, both from the Enroll page.
+
+   NOTHING HERE SETS TYPE. §63 owns font-size, font-weight, text-transform and
+   text colour, and this layer states none of the four — it is borders, gaps
+   and one grid column. The one ink decision the invoice needed (the accent
+   belongs to the total and not to the working) is stated in §63 itself, next
+   to the `.plate-v` rule it corrects, which is where an ink decision goes
+   whatever layer needs it.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 1 ---
+   A LIST OF NOTHING BUT AMOUNTS IS AN INVOICE
+
+   `.plate-tab` is stamped by `splitPlateBody` (ai5.js) on a `.plate-b` whose
+   rows ALL end in a labelled figure — the note there is the argument, and the
+   short version is that a mark in front of a fact says what kind of thing the
+   row is about, which is worth 20px when the four rows are about four
+   different things and worth nothing when every one of them is money.
+
+   So the marks are gone (the pass does not emit them) and what is left is a
+   two-column list: label on the spine, amount on the right edge. Three things
+   follow from that.
+
+   THE ROW HAS NO LEADING SLOT TO PAY FOR. §56 sets the row's `gap` for a mark
+   plus words; with the mark gone the gap is between the label and an amount
+   that is already pushed to the far edge by §66's `margin-left:auto`, so it
+   only ever applies when a label is long enough to close the distance — which
+   is exactly when it is wanted. Nothing to state.
+
+   THE TOTAL IS RULED OFF, AND THAT IS THE WHOLE OF THE HIERARCHY. §68.2b
+   closed these rows up to `--s02` and moved the file's one hairline above the
+   date band; an invoice needs one more, in the place every invoice in the
+   world puts it. It is drawn as a border rather than as weight or size,
+   because those two belong to §63 and because the line is what says "the rows
+   above add up to this" — no amount of ink says that.
+
+   `--on-dark-rule`, WHICH IS §15's TOKEN AND §59 RE-POINTS. On the quiet card
+   this card always is, it resolves to `--rule`; on a black plate that ever
+   writes an invoice it is white at 16%. One declaration, correct on both.
+   ------------------------------------------------------------------------ */
+.app .plate-b.plate-tab > .plate-bi:last-child{
+  margin-top:var(--s03);
+  padding-top:var(--s04);
+  border-top:1px solid var(--on-dark-rule)}
+
+/* AND THE LABELS STAY ON ONE LINE. The amount is `flex:none` (§66) and the
+   label is the flex item that gives, so at the band column's 265px "Interview
+   already paid" wrapped to two lines while "Due today" sat on one — three rows
+   of different heights in a list whose point is that they line up. The label
+   keeps its own line and the row is as tall as one line of type; there is no
+   label in either variant long enough to need the ellipsis, and if one ever is
+   the truncation is a better failure than a ragged column. */
+.app .plate-b.plate-tab > .plate-bi > span{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ------------------------------------------------------------------ 2 ---
+   A DISCLOSURE MAY HAVE SOMETHING VISIBLE WHILE IT IS SHUT
+
+   §65 hides `.found-b` and nothing else, so on the two dashboards a closed
+   disclosure is a heading on its own — which is right for "What the interview
+   found", where the heading IS the summary of what is behind it.
+
+   "How your cohort works" on the Enroll page has one line outside the panel:
+   what a cohort actually is. Somebody who has read the detail once should not
+   have to open it again to be told there are ten of them; what expands is the
+   six mechanics, and the shape of the thing is visible shut.
+
+   THE ONE RULE THAT ASSUMED OTHERWISE IS §65's CLOSED PADDING.
+   `.sec.tint.found:not(.on){padding-bottom:var(--s05)}` takes half the panel's
+   bottom padding back while it is closed, on the reasoning that "a closed
+   disclosure reads as one row rather than as a row floating in a tinted box".
+   True of a row; with a sentence under it the block has two lines and 16px
+   beneath them, which crops the lede against the panel's edge. Restated to the
+   full padding when there is something between the head and the panel.
+
+   `:has(> .all-desc)` IS THE HONEST TEST rather than a class: the condition is
+   "this disclosure shows something while it is shut", and the lede is the
+   thing that shows. It is also the same selector §16 uses to keep a section
+   out of the label column, so the two conditions cannot drift apart — a lede
+   that stops being a direct child breaks both at once, which is trap 13 and is
+   better than breaking one silently. Specificity is 0,5,0 against §65's 0,4,0.
+   ------------------------------------------------------------------------ */
+.app .sec.tint.found:not(.on):has(> .all-desc){padding-bottom:var(--s06)}
+
+/* AND THE LEDE CLEARS THE HEADING THE SAME WAY IT DOES OPEN OR SHUT.
+   §65 gives `.sec.found > .sec-h` its bottom margin inside the desktop query
+   only, where the section is `display:block`; below 900 the head row is the
+   grid's own child and the sentence sat against it. One margin, both widths,
+   on the lede rather than on the head — the head is shared with the two
+   dashboards and this sentence is not. */
+.app .sec.found > .all-desc{margin-top:var(--s04)}
+
+/* ------------------------------------------------------------------ 3 ---
+   A SECTION WHOSE CONTENT IS A PERSON OPTS OUT OF THE LABEL COLUMN
+
+   TRAP 13, ARRIVED AT BY SUBTRACTION RATHER THAN BY A WRAPPER, which is the
+   variant worth writing down because it is the harder one to see coming. The
+   trap as CLAUDE.md states it is "introduce a wrapper and its heading collides
+   with its own content" — §65.1a is that case. This is the mirror: the leader
+   card was opting out through `.sec:has(.kv)` while it carried two fact rows,
+   and taking those rows out (they were logistics, said again two sections
+   below) took the opt-out with them. Nothing was added and nothing warned; the
+   section simply became a different component, with "Your cohort leader" set
+   in a 184px column beside a card that had lost 184px.
+
+   `:has(> .tile > .row-lead)` IS THE CONDITION AND IT IS THE HONEST ONE.
+   `.row-lead` is the face-plus-name row §15 draws for "the person this block is
+   about" — `V.booking` uses it for the agent you have just paid, `V.enrol` and
+   `V.welcome` for the cohort leader. A card whose subject is a person is a
+   single object, not a run of rows with a shared label, so 184px taken off it
+   buys nothing: there is no second row for the spine to line up against. Same
+   argument §10.15's own list makes for `.mem`, which is this component's
+   row-sized sibling and is already on it.
+
+   INSIDE THE CONTAINER QUERY per trap 3, since §10's grid is declared there
+   and an unconditional rule cannot reach it.
+
+   AND IT COPIES THREE OF §10.15's FOUR DECLARATIONS, NOT ALL FOUR. The fourth
+   is `padding:0 var(--pad-x)` on the heading, and copying it is what a careless
+   version of this rule did — the heading then sat 32px right of the three below
+   it, which is the one thing on the page a reader would actually notice. §10's
+   own copy of that declaration is DEAD: §14 states `.app .page:not(.form-page)
+   .sec > .sec-h{padding-left:0}` for every headed section at this width, with
+   the note that "a section pays the gutter and its heading must not — the §16
+   rules that gave `.sec-h` its own padding predate §28 and would charge it
+   twice". §69 lands after §14, so restating §10's line here un-does §14 for
+   this one section. **Copy what a rule DOES today, not what its source says**;
+   the two have been different since §14 was written.
+
+   The `h2` is left alone deliberately: §10 puts a headed section's heading on
+   the label role at this width whether or not it has a column, and this heading
+   sits above three others on the page that do the same.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .page .sec:has(> .tile > .row-lead){display:block}
+  .app .page .sec:has(> .tile > .row-lead) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05)}
+}
+
+/* ------------------------------------------------------------------ 4 ---
+   A THIRD MEMBER IN THE BAND'S LEFT COLUMN
+
+   §56 reads the left column as "the `<h1>`, the fact row, a hairline, the wing,
+   a second hairline, then what Tal says". The Enroll page has no wing — the
+   journey row stops at `assessed` and this is the page you reach FROM that
+   stage — so its column was a title, a fact row and one sentence, and the
+   cohort leader sat below the band as the page's first section.
+
+   She belongs above the fold. On a page whose whole job is a decision about
+   $595, WHO you would be spending thirteen Thursdays with is part of the
+   answer, not a detail underneath it. So the section is declared `.head-sec`
+   and `placeBand` (ai5) takes it into the band — the note there is why that is
+   an opt-in class rather than something inferred from the markup.
+
+   IT LANDS THIRD BECAUSE OF WHEN TAL'S CARD IS BUILT, not because of an
+   `order`. The view prints it directly after `ph()`; `placePageSummary` runs
+   two passes later and inserts Tal's card *after the `.ph`*, which pushes this
+   down one. Written after the summary in the view it would not be taken at all,
+   since the loop that collects the band's members is a run from the header.
+
+   THE DIVIDER IS ON TOP AND THERE IS NONE UNDERNEATH, which is §56's own rule
+   for the wing turned over. The wing draws its line as a `border-bottom`,
+   because the wing comes first and the line is the join between what the page
+   states and what Tal says. This member comes LAST, so its line is above it and
+   the band's own closing rule (§25.2, full-bleed) is what ends the block. A
+   second hairline 28px above that one would read as a section that failed to
+   close rather than as a divider.
+
+   AND THE `::after` HAS TO GO WITH IT. §10.6 draws every `.sec`'s closing
+   hairline as an `::after`; inside the band that is the line this note is about
+   not wanting. `display:none` rather than a colour, so nothing is left painting
+   at zero alpha.
+
+   `--rule` AND AN INSET, matching the wing and §56.1b's header line exactly:
+   §25.2 gives the band one full-bleed rule and this is not it — it is a
+   division inside the block, so it stops at the gutter the text starts at.
+   ------------------------------------------------------------------------ */
+.app .modhead > .sec.head-sec{
+  position:relative;
+  padding-top:var(--s06);
+  margin-top:var(--s05)}
+.app .modhead > .sec.head-sec::before{
+  display:block;content:'';
+  position:absolute;left:var(--pad-x);right:var(--pad-x);top:0;
+  height:1px;background:var(--rule)}
+.app .modhead > .sec.head-sec::after{display:none}
+
+/* AND THE HEADING IS A LABEL, NOT A SECTION TITLE. Inside the band the h4 role
+   §10 gives a `.sec-h h2` below 900 is louder than the `<h1>` two rows above it
+   is willing to share the column with — and at 900 and up §10 already puts it
+   on the label role for a different reason. §63 owns the four properties this
+   would otherwise reach for, so the size is NOT set here: what is set is the
+   space, which is the same 8 the wing's own header row pays. */
+.app .modhead > .sec.head-sec > .sec-h{margin-bottom:var(--s04)}
+
+/* ------------------------------------------------------------------ 5 ---
+   THE PANEL'S ROWS START WHERE THE LEDE ENDS
+
+   `.found-b` is `display:block` and its first child here is a `.kv` band
+   carrying `mt5`, which is the step the page uses between a sentence and the
+   block it introduces. Nothing to state — this note exists so the next reader
+   does not add a `.found-b` margin and find it doubled on the two dashboards,
+   where the panel opens on an `.all-desc` of its own that already pays it.
+   ------------------------------------------------------------------------ */

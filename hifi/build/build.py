@@ -490,7 +490,21 @@ css = '\n'.join((here / f).read_text() for f in
                  # It deliberately does NOT touch `.note.acc`'s ground; §66.3
                  # argues that on contrast and owns it. Sets no font-size,
                  # weight, case or colour — §63 still owns all four.
-                 '68-platestack.css'])
+                 '68-platestack.css',
+                 # THE ENROLMENT FLOW. Two components from the Enroll page:
+                 # the checkout card's invoice rows (a `.plate-b` whose rows
+                 # ALL end in a figure — `splitPlateBody` stamps `.plate-tab`
+                 # and drops the subject marks, since three wallets in a
+                 # column say one word three times), and a disclosure with a
+                 # lede visible while it is shut.
+                 # AFTER §68 because the invoice's closing rule has to land
+                 # after §68.2b's `border-bottom:0` on the same rows, and
+                 # after §65 because it restates that layer's closed-panel
+                 # padding at 0,5,0. Sets no font-size, weight, case or
+                 # colour — the one ink decision the invoice needed (the
+                 # accent is the total, not the working) is stated in §63
+                 # beside the `.plate-v` rule it corrects.
+                 '69-enrolflow.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

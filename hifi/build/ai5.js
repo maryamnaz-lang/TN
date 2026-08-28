@@ -66,10 +66,28 @@ function placeBand(){
   if(crumb && crumb.nextElementSibling === ph) members.push(crumb);
   members.push(ph);
   /* everything after the header that still belongs to the head of the page.
-     Stop at the first section that is neither Tal nor the ask line — that
-     one is the body of the page and the rule goes above it. */
+     Stop at the first section that is neither Tal, the ask line, nor a section
+     the view has DECLARED as head furniture — that one is the body of the page
+     and the rule goes above it.
+
+     `.head-sec` IS THAT DECLARATION, AND IT IS OPT-IN FOR A REASON. Everything
+     else this loop takes is recognised by what it contains (`_mhIsTal` looks
+     for Tal's mark), because Tal's card and the ask line are the same object on
+     every page that has one. A third member is not: the Enroll page puts the
+     cohort leader under Tal's sentence because on THAT page the person is part
+     of the answer to "what am I buying", and no rule about markup could work
+     that out. So the view says so, and the band takes it in the order the view
+     printed it.
+
+     IT STILL HAS TO SIT DIRECTLY AFTER THE HEADER. The loop is a run, not a
+     search — a `.head-sec` with the page body between it and the `.ph` is left
+     where it is, which is the right answer: it is not at the head of the page.
+     Tal's own card is inserted after the `.ph` later (`placePageSummary`), so a
+     `.head-sec` written second in the view comes out THIRD in the band, under
+     the sentence. That ordering is load-bearing and is why the view writes it
+     immediately after `ph()` rather than where it reads in the page. */
   let n = ph.nextElementSibling;
-  while(n && (n.classList.contains('ask-sec') || _mhIsTal(n))){
+  while(n && (n.classList.contains('ask-sec') || n.classList.contains('head-sec') || _mhIsTal(n))){
     members.push(n);
     n = n.nextElementSibling;
   }
@@ -462,11 +480,37 @@ function plateIcon(t){
    THE LABEL CAN BE EMPTY. A part that is nothing but `<b>$690</b>` is a figure
    with no question in front of it, and an empty `<span>` before it would eat
    the row's own gap; so the label span is written only when there are words. */
+/* AND WHEN *EVERY* ROW ENDS ON A FIGURE, THE LIST IS AN INVOICE AND THE MARKS
+   COME OFF. This is the same shape of argument as the one above and it is the
+   other half of it.
+
+   A mark in front of a fact says what KIND of thing the row is about — a
+   wallet for the price, a book for the chapters, a group for the cohort — and
+   it earns its 20px because the four rows are about four different things.
+   The enrolment checkout's three are the fee, the credit and what is due, and
+   `PLATE_IC` leads on money, so all three matched the same rule and the card
+   came out with a column of three identical wallets saying "this row is about
+   money" three times over a list whose every row is a number.
+
+   THE TEST IS "IS THERE A ROW HERE THAT IS NOT A FIGURE", which is the honest
+   condition and is why it is decided here rather than by a class the call site
+   remembers. One labelled figure among plain facts is a spec and keeps its
+   spine; nothing but labelled figures is a table of amounts, and a table does
+   not need an icon per line. `enrolPlate`'s four — price, chapters,
+   assessments, cohort — have three rows with no `<b>` in them and are
+   untouched.
+
+   IT HAS TO BE DECIDED BEFORE THE ROWS ARE BUILT, not after, because the mark
+   is baked into each row's HTML. Hence the `every` over the parts rather than
+   a `querySelectorAll` on the result. `.plate-tab` is what §69 rules the total
+   off with and what §63 reads to keep the accent for the figure that is
+   actually due; there is no CSS that can ask this question, since the
+   quantifier it needs is a nested `:has()` and that is invalid. */
 const PLATE_FIG = /^([\s\S]*?)\s*<b>([\s\S]*?)<\/b>\s*$/;
-function plateRow(t){
+function plateRow(t, bare){
   const m = t.match(PLATE_FIG);
   const lab = m ? m[1].trim() : t;
-  return `<span class="plate-bi">${plateIcon(t)}` +
+  return `<span class="plate-bi">${bare ? '' : plateIcon(t)}` +
     (lab ? `<span>${lab}</span>` : '') +
     (m ? `<b class="plate-v">${m[2]}</b>` : '') + `</span>`;
 }
@@ -475,8 +519,10 @@ function splitPlateBody(plate){
   if(!b || b.querySelector(':scope > .plate-bi')) return;
   const parts = b.innerHTML.split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
   if(parts.length < 2) return;
+  const tab = parts.every(p => PLATE_FIG.test(p));
   b.classList.add('plate-lines');
-  b.innerHTML = parts.map(plateRow).join('');
+  if(tab) b.classList.add('plate-tab');
+  b.innerHTML = parts.map(p => plateRow(p, tab)).join('');
 }
 
 /* ==========================================================================
