@@ -240,24 +240,37 @@
      into the step you are on     `--accent`
      everything after it          `--rule`
 
-   THE GREEN IS THE PRODUCT'S OWN SUCCESS FILL, not a new colour: §01 tunes
-   `--support-success` as a FILL (and `--support-success-ink` for type, which is
-   what the word under the label takes). It is the same green the file draws.
+   AND THE GREEN IS GONE — Maryam's call, and it takes the three colours down to
+   two:
 
-   `:has(+ .stps-i.on)` IS WHAT MAKES THE LIVE LEG LIVE — the last finished step
-   is the one whose segment reaches the current mark, and that is a fact about
-   its NEXT sibling, so it cannot be stated on the step itself. Two pixels
-   rather than one because a 1px line across a column reads as a rule between
-   two things rather than as a rail joining them; four (the old meter's height)
-   reads as a bar. */
+     everything behind you        `--accent`
+     everything after it          `--rule`
+
+   The green was the product's own success fill (§01 tunes `--support-success` as
+   a fill) and it was the file's reading of the row: settled, live, not yet. What
+   it looked like on the built page was a rail that changed colour halfway along
+   itself for a reason the reader has to be told — green to orange to grey across
+   four steps, three hues in one 500px line, on a row whose four marks are drawn
+   in two. The accent already means "this is yours / this is done" everywhere
+   else in the build, and a road behind you is one thing however many steps of it
+   there were.
+
+   `:has(+ .stps-i.on)` IS NO LONGER NEEDED AND THE NOTE IS KEPT, because the
+   condition is the one worth remembering if a live leg is ever wanted again: the
+   last finished step is the one whose segment reaches the current mark, and that
+   is a fact about its NEXT sibling, so it cannot be stated on the step itself.
+   With both legs on one colour the two rules collapse into the first.
+
+   Two pixels rather than one because a 1px line across a column reads as a rule
+   between two things rather than as a rail joining them; four (the old meter's
+   height) reads as a bar. */
 .app .stps-i:not(:last-child)::before{
   content:'';position:absolute;z-index:0;
   top:calc(var(--stps-m) / 2 - 1px);height:2px;
   left:calc(var(--stps-m) + var(--s02));
   right:var(--s02);
   background:var(--rule)}
-.app .stps-i.done::before{background:var(--support-success)}
-.app .stps-i.done:has(+ .stps-i.on)::before{background:var(--accent)}
+.app .stps-i.done::before{background:var(--accent)}
 
 /* THE MARK IS A DISC, AND THAT IS INSIDE THE RULE RATHER THAN AN EXCEPTION TO
    IT. `--radius` is 0 in this system and the only curves in it are MARKS (50%)
@@ -351,7 +364,19 @@
    `--support-success-ink` AND NOT `--support-success`, which is the one thing
    here that is not free choice: §01's note says in as many words that the green
    is "tuned as a fill and fails as text", and hands `#1a7f37` over for exactly
-   this. The rail two lines up takes the fill; this takes the ink. */
+   this.
+
+   AND THE WORD KEEPS ITS GREEN NOW THAT THE RAIL HAS LOST ITS OWN — Maryam's
+   call, and it is worth writing down because the obvious inference from the rail
+   change is the wrong one. When the rail went to the accent this word went with
+   it, on the reasoning that one green thing left in a row of accent marks reads
+   as something nobody updated. It does not: the rail is a LINE, drawn in the one
+   colour that means "this is yours", and "Completed" is a STATE, which the
+   product says in green wherever it says it — `.tag.green`, a done chapter's
+   tick, `.badge.done`. Turning the word accent made the state indistinguishable
+   from the live step below it, which the same colour at a heavier weight is a
+   thin way to tell apart. Two vocabularies, deliberately: the accent for the
+   road, the success ink for what is settled on it. */
 .app .stps-st{
   font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px;
   color:var(--text-helper)}

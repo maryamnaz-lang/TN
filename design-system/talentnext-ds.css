@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4077.  Rules dropped as product-specific: 175.
+   Rules kept: 4081.  Rules dropped as product-specific: 176.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6498,8 +6498,7 @@ button.btn-p:active,
 .app .stps .pi-lab{grid-row:2; margin-top:var(--s04)}
 .app .stps-st{grid-row:3; margin-top:2px}
 .app .stps-i:not(:last-child)::before{content:''; position:absolute; z-index:0; top:calc(var(--stps-m) / 2 - 1px); height:2px; left:calc(var(--stps-m) + var(--s02)); right:var(--s02); background:var(--rule)}
-.app .stps-i.done::before{background:var(--support-success)}
-.app .stps-i.done:has(+ .stps-i.on)::before{background:var(--accent)}
+.app .stps-i.done::before{background:var(--accent)}
 .app .stps-m{position:relative; z-index:1; width:var(--stps-m); height:var(--stps-m); flex:none; display:grid; place-items:center; border-radius:50%; background-color:rgba(0,0,0,.05); border:0}
 .app .stps-m > svg{width:20px; height:20px; fill:var(--icon-primary); display:block}
 .app .stps-i.done > .stps-m{background-color:var(--accent); --on-brand-fill:1}
@@ -6618,8 +6617,8 @@ button.btn-p:active,
 .app .wing-lvl .ladder i{display:grid; place-items:center; font-size:10px; line-height:1; font-weight:600; letter-spacing:.4px; font-style:normal; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
 .app .wing-lvl .ladder i > b{font-weight:600; font-style:normal; display:block}
 .app .wing-lvl .ladder i.done{color:var(--on-accent); --on-brand-fill:1}
-.app .wing-lvl .ladder i.on{color:var(--accent-text)}
-.app .wing-lvl .ladder i.on{--lvl-a:color-mix(in srgb, var(--accent) 18%, #fff); --lvl-b:color-mix(in srgb, var(--accent) 62%, #fff); position:relative; overflow:hidden; opacity:1; background-color:var(--lvl-a); background-image:none}
+.app .wing-lvl .ladder i.on{color:var(--text-primary)}
+.app .wing-lvl .ladder i.on{--lvl-a:color-mix(in srgb, var(--accent) 14%, #fff); --lvl-b:color-mix(in srgb, var(--accent) 38%, #fff); position:relative; overflow:hidden; opacity:1; background-color:var(--lvl-a); background-image:none}
 .app .wing-lvl .ladder i.on::before{content:''; position:absolute; top:0; bottom:0; left:-100%; width:300%; pointer-events:none; background:repeating-linear-gradient(90deg,
     var(--lvl-a) 0, var(--lvl-b) 16.667%, var(--lvl-a) 33.333%); animation:lvl-live 1.6s linear infinite}
 .app .wing-lvl .ladder i.on > b{position:relative; z-index:1}
@@ -7273,3 +7272,8 @@ button.btn-p:active,
   .app .modhead .sec-dark > .plate > .plate-who{order:3}
   .app .modhead .sec-dark > .plate > .plate-b{order:4}
 }
+.app .plate .note.acc{background:none; border-left:0; margin-top:0; padding:var(--s04) 0 0; border-top:1px solid var(--on-dark-rule)}
+.app .plate .note.acc{padding-left:0!important}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi{border-bottom:0; padding:var(--s02) 0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:first-child{padding-top:0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{padding-bottom:var(--s04)}

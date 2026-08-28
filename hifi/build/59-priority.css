@@ -100,9 +100,25 @@
    only cost the tracking.
 
    THREE INKS, ONE PER STATE, because the ground under them is three different
-   colours: white on the solid accent behind a finished level, §01's
-   `--accent-text` on the tint behind the live one (4.9:1, the same pairing §56
-   uses for the step you are on), and the secondary ink on the grey ahead. */
+   colours: white on the solid accent behind a finished level, full ink on the
+   tint behind the live one, and the secondary ink on the grey ahead.
+
+   THE LIVE ONE WAS `--accent-text` AND IT WAS NOT READABLE. Maryam read the
+   built card: "the text E4 is not visible". Measured, and the rule was never
+   going to hold — the label sits on `--lvl-b`, the DARK end of the sweep, and
+   #b94a09 on the accent at 62% is 2.70:1. It is worse under §67's red trial,
+   where the same pairing is #dc0000 on #ff6161: 1.76:1, which is not low
+   contrast, it is one colour. And it cannot be fixed by choosing a better orange
+   — swept across every stop, `--accent-text` peaks at 4.31:1 on this ground and
+   `--accent-on-2` at 5.19:1 only where the tint is so pale the sweep disappears.
+   An accent ink on an accent tint at 10px is the wrong pairing.
+
+   SO THE LABEL TAKES FULL INK, WHICH IS §56's OWN ANSWER FOR THIS EXACT STATE.
+   The step you are on in the journey row is a `--brand-tint-2` ground with its
+   subject icon "at full ink on all three" states — tint carries the state, ink
+   stays ink. `--text-primary` is 13.3:1 on the sweep's dark end in orange and
+   10.3:1 under the red trial, so the block reads at every frame of the animation
+   and in both palettes, and the state is still carried entirely by the ground. */
 /* `font-style:normal` FIRST, because the block IS an `<i>`. The ladder has drawn
    its fifteen levels as `<i>` elements since §03, when they were bars with no
    text in them and the tag was just the shortest empty element to hand. Put a
@@ -117,7 +133,7 @@
   color:var(--text-secondary)}
 .app .wing-lvl .ladder i > b{font-weight:600;font-style:normal;display:block}
 .app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-fill:1}
-.app .wing-lvl .ladder i.on{color:var(--accent-text)}
+.app .wing-lvl .ladder i.on{color:var(--text-primary)}
 
 /* --------------------------------------------------------------------- 2c ---
    AND THE LEVEL YOU ARE ON IS LIT RATHER THAN FILLED
@@ -128,11 +144,27 @@
    (.55 and 1), which is the difference between a block you have finished and a
    block you have finished slightly more.
 
-   A LIGHT ORANGE SHIMMER, LEFT TO RIGHT. Two tints of the accent — 18% and 62%
+   A LIGHT ORANGE SHIMMER, LEFT TO RIGHT. Two tints of the accent — 14% and 38%
    mixed into white — so the block reads as the accent family at low strength,
    which is exactly what "confirmed but not started" is. Nothing about it is a
    new colour, and both tones are lighter than the solid `--accent` next door so
    the lit block can never be mistaken for a finished one.
+
+   IT WAS 18% AND 62%, AND MARYAM ASKED FOR LIGHTER VALUES. 62% is not a tint:
+   in orange it is #f9a96d and under §67's red trial #ff6161, both of them strong
+   enough that the sweep read as a block flashing rather than as a light passing
+   over one — and it is the ground the level's own label sits on, which is the
+   other half of that note (see §2b above; the label went to full ink at the same
+   time). 14/38 keeps the same idea at half the strength: the travel is still
+   plainly visible because what the eye reads is the RATIO between the two stops,
+   not their absolute darkness, and the darker stop is now light enough to be a
+   tint in both palettes.
+
+   THE FLOOR IS `--layer-accent-01` AND THAT IS WHY 14% RATHER THAN LOWER. The
+   fifteen unearned blocks are #dcdad3 (§59.2), so a lit block paler than that
+   would read as EMPTIER than the levels ahead of it — the state inverted. At 14%
+   the light end is warm rather than dark, which is what separates it from a
+   neutral grey; below about 10% the hue stops carrying and the block goes white.
 
    IT IS A REPEATING TILE ON A PSEUDO-ELEMENT, AND THAT IS THE WHOLE FIX FOR THE
    SNAP. The first two cuts animated `background-position` across a single band
@@ -162,8 +194,8 @@
    COLOUR; this layer is later and equal weight, so the colour is answered here
    and the strip above it has nothing to argue with. */
 .app .wing-lvl .ladder i.on{
-  --lvl-a:color-mix(in srgb, var(--accent) 18%, #fff);
-  --lvl-b:color-mix(in srgb, var(--accent) 62%, #fff);
+  --lvl-a:color-mix(in srgb, var(--accent) 14%, #fff);
+  --lvl-b:color-mix(in srgb, var(--accent) 38%, #fff);
   position:relative;overflow:hidden;
   opacity:1;
   background-color:var(--lvl-a);

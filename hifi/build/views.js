@@ -1734,7 +1734,19 @@ function stepper(steps, title){
    two stages now read as the same band with a different date in it. The cohort
    is what the second line is for. */
 const ENROL_OPENS = {
-  E3: ['E3 opens within two weeks', 'You keep the same cohort for all 90 days.'],
+  /* E3 NAMES THE DATE AND DROPS ITS SECOND LINE, and both halves of that are
+     one decision. "opens within two weeks" is a DURATION, and a duration on a
+     card that might be read a fortnight from now is a fact with a shelf life
+     — it also said the same thing as `PAGESUM.enrol`'s "within two weeks of
+     paying", two inches to the left in the same head band. A date says it
+     once and stays true. "You keep the same cohort for all 90 days" was a
+     POLICY rather than a fact about this enrolment, which is the second of
+     `PAGESUM`'s four content bans.
+
+     THE SECOND ELEMENT IS OPTIONAL NOW, which is why the markup tests for it.
+     E4 keeps its sub: "Cohort 58 has 7 places left" is a live figure about
+     the thing being bought, not a rule about how cohorts work. */
+  E3: ['Cohort starts on 1st Dec, 2026'],
   E4: ['E4 opens on December 1', 'Cohort 58 has 7 places left.']
 };
 /* WHAT THE 90 DAYS DO, AND IT IS THE ONE SLOT ON THIS CARD THAT IS NOT A
@@ -1771,7 +1783,11 @@ const enrolPlate = lvl => `<div class="sec">
               and §66 gives it its ground back); the second line is a `.sub` so
               it takes the description grey rather than the body ink, which is
               the two-tier shape the file draws. */}
-        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b><span class="sub">${ENROL_OPENS[lvl][1]}</span></div></div>
+        ${''/* THE SUB IS EMITTED ONLY IF THERE IS ONE. `.nb` is a flex column
+              with a gap, so an empty `<span class="sub">` is not nothing — it
+              is a second row of zero height with the gap still above it, which
+              left 6px hanging under E3's single line. */}
+        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
         <div class="plate-a">
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
         </div>

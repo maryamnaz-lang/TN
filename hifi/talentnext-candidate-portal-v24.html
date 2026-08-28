@@ -8427,8 +8427,7 @@ button.btn-p:active,
   left:calc(var(--stps-m) + var(--s02));
   right:var(--s02);
   background:var(--rule)}
-.app .stps-i.done::before{background:var(--support-success)}
-.app .stps-i.done:has(+ .stps-i.on)::before{background:var(--accent)}
+.app .stps-i.done::before{background:var(--accent)}
 .app .stps-m{
   position:relative;z-index:1;
   width:var(--stps-m);height:var(--stps-m);flex:none;
@@ -8680,10 +8679,10 @@ button.btn-p:active,
   color:var(--text-secondary)}
 .app .wing-lvl .ladder i > b{font-weight:600;font-style:normal;display:block}
 .app .wing-lvl .ladder i.done{color:var(--on-accent);--on-brand-fill:1}
-.app .wing-lvl .ladder i.on{color:var(--accent-text)}
+.app .wing-lvl .ladder i.on{color:var(--text-primary)}
 .app .wing-lvl .ladder i.on{
-  --lvl-a:color-mix(in srgb, var(--accent) 18%, #fff);
-  --lvl-b:color-mix(in srgb, var(--accent) 62%, #fff);
+  --lvl-a:color-mix(in srgb, var(--accent) 14%, #fff);
+  --lvl-b:color-mix(in srgb, var(--accent) 38%, #fff);
   position:relative;overflow:hidden;
   opacity:1;
   background-color:var(--lvl-a);
@@ -9467,6 +9466,12 @@ button.btn-p:active,
   
   --accent-on-dark:#ff5252;
 }
+.app.tmp-accent .modhead::before{
+  --wash-a:3%;
+  --wash-red:color-mix(in srgb, var(--accent) var(--wash-a), transparent);
+  background-image:
+    radial-gradient(50.05% 141.53% at 81.25% 31.72%,
+      var(--wash-red) 0%, transparent 100%)}
 @container app (max-width:899.98px){
   .app .plate > .plate-who{order:3}
   .app .plate > .plate-b{order:4}
@@ -9481,6 +9486,17 @@ button.btn-p:active,
   .app .modhead .sec-dark > .plate > .plate-who{order:3}
   .app .modhead .sec-dark > .plate > .plate-b{order:4}
 }
+.app .plate .note.acc{
+  background:none;border-left:0;margin-top:0;
+  padding:var(--s04) 0 0;
+  border-top:1px solid var(--on-dark-rule)}
+.app .plate .note.acc{padding-left:0!important}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi{
+  border-bottom:0;padding:var(--s02) 0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:first-child{
+  padding-top:0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{
+  padding-bottom:var(--s04)}
 
 </style>
 </head>
@@ -10865,7 +10881,7 @@ function stepper(steps, title){
 }
 
 const ENROL_OPENS = {
-  E3: ['E3 opens within two weeks', 'You keep the same cohort for all 90 days.'],
+  E3: ['Cohort starts on 1st Dec, 2026'],
   E4: ['E4 opens on December 1', 'Cohort 58 has 7 places left.']
 };
 const ENROL_DESC = {
@@ -10884,7 +10900,11 @@ const enrolPlate = lvl => `<div class="sec">
               and §66 gives it its ground back); the second line is a `.sub` so
               it takes the description grey rather than the body ink, which is
               the two-tier shape the file draws. */}
-        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b><span class="sub">${ENROL_OPENS[lvl][1]}</span></div></div>
+        ${''/* THE SUB IS EMITTED ONLY IF THERE IS ONE. `.nb` is a flex column
+              with a gap, so an empty `<span class="sub">` is not nothing — it
+              is a second row of zero height with the gap still above it, which
+              left 6px hanging under E3's single line. */}
+        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
         <div class="plate-a">
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
         </div>

@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=306c79ac">
+<link rel="stylesheet" href="talentnext-ds.css?b=11f628d2">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=306c79ac"></script>
+<script src="talentnext-ds.js?b=11f628d2"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -441,6 +441,47 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
           <div class="plate-a">
             <button class="btn btn-p btn-sm noic">Join Call {{video}}</button>
             <button class="btn btn-sm noic plate-b2">Add to calendar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('The same card as an offer — three slots you have to write yourself', '§66. A plate that sells something rather than reminding you of an appointment, and all three additions are <b>markup</b> — there is no <code>.plate-enrol</code> and no flag, every rule gates on a condition in the DOM. <b><code>.plate-d</code> is the sentence under the title</b>: it takes the prose leading (22) against <code>.plate-b</code>&rsquo;s list leading (19) <i>at the same 13.5px</i>, which is the whole separation between a standfirst and a spec. Keep it to about <b>68 characters</b> — the card is 265 wide in a head band&rsquo;s column, so that is two lines, and a third reads as a paragraph. <b>A fact written as <code>Label &lt;b&gt;figure&lt;/b&gt;</code> becomes a label and a value</b>: write the <code>&lt;b&gt;</code> as <code>&lt;b class="plate-v"&gt;</code> and it holds the row&rsquo;s right edge in the accent. Two things follow from it and neither is optional — the list needs <code>align-items:stretch</code> to give the rows the card&rsquo;s full width, which is what <code>:has(.plate-v)</code> switches on and what any full-width rule between the rows would need, and the accent ink only applies on a <code>.plate-quiet</code> card, because <code>--accent-text</code> on §15&rsquo;s black ground is 1.6:1. <b>Where the hairlines go is an argument between two layers and §68 has the last word:</b> §66 rules under every fact row, §68 closes the four rows up and puts one rule above the date instead, on the ground that price, length, assessments and cohort shape are one list of one kind of thing and the date is the change of subject. What ships is §68&rsquo;s. A <code>&lt;b&gt;</code> in the <i>middle</i> of a fact is emphasis and stays inline. <b>The band is a <code>.note acc</code> wearing <code>.plate-n</code></b> — one element, component plus slot. In the portal <code>splitPlateBody</code> does the label/value lift for you from a <code>&middot;</code> run; a page with no render pass writes the rows out, exactly as it already writes <code>.plate-h</code> and <code>.plate-when</code>. <b>Watch the <code>order</code>:</b> a plate&rsquo;s children are ordered by an explicit list at each width, and a child no list names gets <code>order:0</code>, which is <i>above the head row</i>. These two share their neighbour&rsquo;s number and win on document order — so if you renumber the stack, renumber them with it. The <code>.acc</code> note is the system&rsquo;s tinted callout, <code>--accent-tint</code> with <code>--accent-on-2</code> as ink (4.68:1; the brand tint gives 4.40 and fails AA) — inside a plate §68 takes that ground off again, which is the one place the two disagree and the note there says why.', `
+    <div class="modhead">
+      <div class="ph">
+        <div class="ph-main">
+          <div class="ph-top"><h1>Welcome back, Maryam!</h1></div>
+          <p class="ph-facts">
+            <span class="ph-f">{{growth}}<span>Explorer Track – E4</span></span>
+            <span class="ph-f">{{group}}<span>Cohort 41 closed</span></span>
+          </p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="ai-aura tile tight talsum">
+          <div class="ai-head"><span class="ai-label">Tal</span></div>
+          <div class="ai-body"><p>You moved from E3 to E4 in 90 days &mdash; 13 chapters,
+            87% average, 700 minutes of coursework. At this level you can also
+            volunteer to lead a cohort.</p></div>
+        </div>
+      </div>
+      <div class="sec sec-dark">
+        <div class="plate plate-quiet">
+          <i class="dark-glow" aria-hidden="true"></i>
+          <div class="plate-h plate-h-bare">
+            <div class="plate-t">Enroll on Explorer – E4</div>
+          </div>
+          <div class="plate-d">Harder chapters at E4, then a re-interview that can move you again.</div>
+          <div class="plate-b plate-lines">
+            <span class="plate-bi">{{wallet}}<span>Course price</span><b class="plate-v">$690</b></span>
+            <span class="plate-bi">{{book}}<span>13 chapters, one a week</span></span>
+            <span class="plate-bi">{{chart}}<span>13 assessments, one per chapter</span></span>
+            <span class="plate-bi">{{group}}<span>A cohort of ten with a live leader</span></span>
+          </div>
+          <div class="note acc plate-n"><span>{{calendar}}</span>
+            <div class="nb"><b>E4 opens on December 1</b><span class="sub">Cohort 58 has 7 places left.</span></div></div>
+          <div class="plate-a">
+            <button class="btn btn-p btn-sm noic">Enroll now {{arrowRight}}</button>
           </div>
         </div>
       </div>

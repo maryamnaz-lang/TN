@@ -47,21 +47,95 @@
 }
 
 /* ------------------------------------------------------------------ 2 ---
-   TWO THINGS THIS FILE DELIBERATELY DOES NOT DO
+   THE ENROLMENT NOTE HAS NO GROUND, AND IT SITS ON THE COLUMN'S OWN MEASURE
 
-   1. IT DOES NOT TOUCH `.note.acc`'s GROUND. A rule stripping the fill and
-      replacing it with a hairline was written here and taken out again:
-      §66.3 argues the opposite case at length and argues it on contrast —
-      a note with no ground is "two lines of orange text under four fact
-      rows, which reads as a fifth fact rather than as a thing set apart" —
-      and it moves the ground from `--brand-tint-2` to `--accent-tint`
-      precisely so the heading's `--accent-on-2` clears AA on it (4.68:1
-      against 4.40:1). Two layers pulling one declaration in opposite
-      directions is the exact failure §63's header is about. This one yields;
-      if that fill is to come off, it comes off in §66 where the reasoning
-      lives.
+   THIS REVERSES §66.3, AND THE REVERSAL IS MARYAM'S CALL rather than an
+   argument won on the merits — so §66's reasoning is worth reading before
+   anything here is changed back. §66.3 makes the case that a note with no
+   ground is "two lines of orange text under four fact rows, which reads as a
+   fifth fact rather than as a thing set apart", and it moved the ground from
+   `--brand-tint-2` to `--accent-tint` specifically so the heading's
+   `--accent-on-2` clears AA on it (4.68:1 against 4.40:1). All of that is
+   sound. It was overruled on 28 Aug 2026, on the look: inside a card that is
+   already a panel, with the accent gradient's button 40px below it, a filled
+   band is a third warm ground stacked in 200px.
 
-   2. IT DOES NOT RULE BETWEEN THE FACTS. A first cut did, and it was wrong
+   WHAT REPLACES THE FILL IS NOT A HAIRLINE EITHER. An earlier cut here put a
+   rule above the note; that was written when the note had two lines and read
+   as a block. It has one line now, and a rule over a single line is a lot of
+   furniture for one fact. The separation the fill was doing is done by the
+   16px above it and by the calendar mark, which no other row in the card has.
+
+   AND THE CONTRAST DECISION SURVIVES THE GROUND GOING. `--accent-on-2` was
+   chosen for a tinted ground; on the card's own it is darker than it needs to
+   be but still correct, so the ink is left alone rather than re-picked — one
+   change at a time on a component two layers already argue about. The mark
+   keeps `--accent-on-2` too, which is §66's pairing and the reason the
+   calendar and the sentence read as one object.
+
+   `padding:0` IS WHAT "THE COLUMN'S OWN WIDTH" MEANS HERE. §66.3 gives the
+   note 12/16 of internal air because it was a card; with no ground there is
+   nothing to be inside, and the inset was the only thing setting this block
+   16px in from every other line in the column.
+   ------------------------------------------------------------------------ */
+.app .plate .note.acc{
+  background:none;border-left:0;margin-top:0;
+  padding:var(--s04) 0 0;
+  border-top:1px solid var(--on-dark-rule)}
+
+/* THE DATE ROW STANDS ON THE SAME SPINE AS THE FACTS ABOVE IT.
+   `.note` is `display:flex` with the mark in its own first child, and §46
+   gives that mark a 16px indent that a filled card wanted and a bare row does
+   not. Left at 16 the calendar sat one step right of the four icons directly
+   above it — measured, 845 against 829 — which is the one misalignment on
+   this card the eye actually catches, because five marks in a column is a
+   spine and a spine with a kink in it reads as a mistake before it reads as
+   anything else. The gap between mark and words is the fact rows' own
+   `--s03`, so the two columns line up on both edges rather than just the
+   left one.
+
+   THE `!important` IS ANSWERING AN `!important` AND IS NOT A NEW HABIT.
+   §10.309 states `.tile.bordered,.ai-aura,.note{padding-left:var(--s05)
+   !important}` — one declaration covering three unrelated components — so no
+   amount of specificity from a later layer reaches it and the shorthand
+   `padding` above loses the left edge silently. CLAUDE.md's trap 1 says fix
+   at source rather than reach for `!important`, and the source fix here would
+   be dropping that flag from §10, which also governs `.tile.bordered` and
+   `.ai-aura` on every page in both portals. One scoped `!important` against
+   one unscoped one is the smaller change; if §10's flag ever comes off, this
+   line should come off with it. */
+.app .plate .note.acc{padding-left:0!important}
+
+/* ------------------------------------------------------------------ 2b --
+   ONE RULE ABOVE THE DATE, NOT FOUR BETWEEN THE FACTS
+
+   §66.2 rules between each of the four fact rows. That says the four are
+   separate blocks, and they are not — price, length, assessments and cohort
+   shape are one list of one kind of thing, which is what a list is for. The
+   thing that IS a different kind of thing is the date: it is not a fact
+   about the course, it is when this particular cohort begins, and it is the
+   only line on the card with a deadline in it.
+
+   So the separation moves. The four rows close up and the single rule goes
+   above the date, which is where the change of subject actually happens. Two
+   fewer hairlines than §66 draws and one more than none — and the rule that
+   remains is doing a job rather than filling a gap.
+
+   Stated at §66's own specificity (`:has(.plate-v)` is 0,4,0) because that
+   is what it takes to reach those declarations, and `border-bottom:0` rather
+   than a colour change so nothing is left painting a line at 0 alpha.
+   ------------------------------------------------------------------------ */
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi{
+  border-bottom:0;padding:var(--s02) 0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:first-child{
+  padding-top:0}
+.app .plate-b.plate-lines:has(.plate-v) > .plate-bi:last-child{
+  padding-bottom:var(--s04)}
+
+/* ------------------------------------------------------------------ 3 ---
+   ONE THING THIS FILE DELIBERATELY DOES NOT DO
+
+   IT DOES NOT RULE BETWEEN THE FACTS. A first cut did, and it was wrong
       twice. In principle: the facts are one list of one kind of thing —
       price, length, shape — and ruling between them says they are three
       separate blocks, which is the opposite of what a list is for. In fact:

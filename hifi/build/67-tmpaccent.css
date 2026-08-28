@@ -104,6 +104,79 @@
   --accent-on-dark:#ff5252;
 }
 
+/* --------------------------------------------------------------------- 2 ---
+   THE HEAD BAND'S WASH — ONE ELLIPSE, NOT TWO. Figma 515:2295 -> 515:2299.
+
+   §25.1 paints the band with TWO radial gradients: the warm `--tal-chip-1`
+   ellipse in the top-right corner and the cool `--tal-chip-2` pool just past
+   the right edge. 515:2299 — "Frame 49", the band on the Verify Your Email
+   screen — holds exactly ONE child, Ellipse 43 (515:2300), and no cool pool.
+   Maryam asked for the Figma's single-gradient feel on the red pages, so this
+   states one gradient and the cool layer simply is not drawn here.
+
+   THE FILL IS THE FILE'S OWN, AND IT IS ALREADY THIS RED. The exported SVG is
+   not interpreted at all:
+
+     <ellipse cx="696.706" cy="434.5" rx="440.706" ry="178.5"
+              fill="#FF0000" fill-opacity="0.05"/>
+     <feGaussianBlur stdDeviation="128"/>
+
+   so the wash is pure #ff0000 at 5% — the same red this trial already uses for
+   the fills, which is why it is written as `--accent` rather than as a second
+   hardcoded hex. Change `--accent` above and the wash follows.
+
+   THE DERIVATION FOLLOWS §25.1's, because the two have to be comparable.
+   Figma pads a blurred export by 2 sigma on both axes, and here that is exact:
+   440.706 + 256 = 696.706 and 178.5 + 256 = 434.5, so the blurred half-extents
+   ARE the SVG's centre coordinates. The rotation is flattened to the
+   axis-aligned extent for §25.1's reason — the codegen gives -171.54deg, which
+   is 8.46deg off a straight flip, and 8.46deg under 128 sigma of blur is not a
+   shape anybody can see.
+
+   Placement, from the codegen's own numbers, in the 1392 x 307 band:
+
+     container  right:-201.2px  top:-144.02px  924.346 x 482.798
+     -> left 1392 - 924.346 + 201.2 = 668.854, centre x 1131.03 -> 81.25%
+     -> top -144.02, centre y 97.38                            -> 31.72%
+     radii = the blurred half-extents 696.706 x 434.5           -> 50.05% x 141.53%
+
+   Stated as percentages of the band, per §25.1, so it holds at any band
+   height — and `ry` is over 100% on purpose: the ellipse is half again as tall
+   as the band and only its middle is ever on screen.
+
+   THERE IS NO FLAT-CORE STOP, AND THAT IS THE ONE PLACE THIS DEPARTS FROM
+   §25.1 — measured, not assumed. §25.1 holds its wash flat to 26% because a
+   Gaussian over an ellipse WIDER THAN ITS OWN FALLOFF still reads at full
+   strength across the middle. That condition is false here: sigma is 128 and
+   `ry` is 178.5, so the ellipse is only 1.4 sigma tall and the blur eats the
+   middle completely. Carrying the idiom across anyway is what the first cut
+   did, at `ry / (ry + 2 sigma)` = 41%, and it was wrong in the direction that
+   matters — it painted the whole right-hand column at full strength.
+
+   The check: sample Figma's own render of this node on a 48 x 48 grid across
+   the band, read alpha off the green channel (the fill is pure red over white,
+   so `(255 - G) / 255` IS the alpha), and fit the two free numbers. Over 2304
+   points the best fit is a core of 0.00 at rms 0.0044 — a plain two-stop
+   radial. The measured peak is 0.047, against the file's stated 0.05.
+
+   THE PEAK IS 3%, NOT THE FILE'S 5%, and that is Maryam's call rather than the
+   file's: with the core removed the wash already sits lighter, and she asked
+   for it lighter again. It is one number — `--wash-a` — so it can be nudged
+   without touching the geometry. At 3% over white the deepest pixel in the
+   band is rgb(255,247,247).
+   -------------------------------------------------------------------------- */
+.app.tmp-accent .modhead::before{
+  /* Two local properties. The alpha is split out because it is the one number
+     here that is a taste decision rather than a measurement, and the colour is
+     named for the reason §25.1 gives — a stop colour used twice must not be
+     able to drift. `--accent` feeds it, so the wash cannot disagree with the
+     fills on the same page. */
+  --wash-a:3%;
+  --wash-red:color-mix(in srgb, var(--accent) var(--wash-a), transparent);
+  background-image:
+    radial-gradient(50.05% 141.53% at 81.25% 31.72%,
+      var(--wash-red) 0%, transparent 100%)}
+
 /* WHAT DELIBERATELY DOES NOT TURN RED, so a look at these two pages is not
    mistaken for a look at a red product:
      - Tal's sphere and mark. #F6DC92 -> #F47113 -> #E85D0F is hardcoded in
