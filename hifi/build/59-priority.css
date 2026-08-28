@@ -1,0 +1,190 @@
+/* ==========================================================================
+   59. TWO PRIORITIES FOR THE DARK CARD, AND TWO MORE THINGS FOR THE WING
+
+   Two changes that arrived together and share one layer because they are the
+   same edit to one block — the head of the page.
+
+   1. THE WING HAS THREE STATES NOW. The journey row stops at `assessed`; from
+      week 1 the wing carries the course progress strip, and once a candidate
+      is promoted it carries the ladder. `wingBlock` in views.js is where the
+      three are chosen and the argument is written down. Both new blocks are
+      built out of components that already exist, so what is left here is the
+      two places a component borrowed into the wing brings the wrong value
+      with it.
+
+   2. THE BLACK WALL IS FOR THE THING THAT CANNOT WAIT. `plateUrgent` (ai5.js)
+      decides; the note there is the argument and the vocabulary. This layer
+      says what the two outcomes look like. Inside twenty-four hours nothing
+      changes at all — the plate is §15's black card with §21's haze on it.
+      Outside it the card goes QUIET: no ground, no haze, the ink flipped, and
+      in the head band a vertical rule doing the job the card's own black edge
+      was doing.
+
+   LAST, AND EVERY PART OF IT HAS TO BE. The quiet card contradicts §15 (the
+   ground and the on-dark ink), §21 (the haze) and §56 (the column's padding,
+   which is asymmetric precisely BECAUSE there was no divider between the two
+   columns). Three of §56's rules live inside `@container app (min-width:900px)`
+   so per trap 3 the answers are restated inside the same query rather than
+   above it. §19's accent gradient on `.plate .btn-p` is deliberately NOT
+   touched: the action is still the action, whatever the ground under it.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE PROGRESS STRIP IN THE WING — TRAP 10, IN THE HEAD BAND
+
+   `.prog-figs` is §10.16's figure-cell grid and it bleeds: `margin` of
+   `calc(var(--pad-x) * -1)` on both sides, so the cells run to the edge of the
+   SECTION rather than to the edge of the text, and the first cell pays
+   `--pad-x` of its own to put its figure back on the spine. That is right for
+   a section of the page body. In the wing the strip is four levels deep inside
+   a `.sec` that has already paid the gutter, so the negative margins hung the
+   row off both sides of Tal's card.
+
+   `--pad-x:0px` ON THE STRIP is the whole fix, and it is the same declaration
+   §35.1 makes for a page component borrowed into a Tal bubble. The one thing
+   it takes with it is the first cell's own `padding-left`, which resolves to
+   the same variable and would leave that one figure flush against the spine
+   while the other two sit 16px in — so it is restated at `--s05` and the three
+   cells are one row of equal boxes.
+   -------------------------------------------------------------------------- */
+.app .wing-prog .prog,
+.app .wing-lvl .prog{--pad-x:0px}
+.app .wing-prog .prog-figs > span:first-child,
+.app .wing-lvl .prog-figs > span:first-child{padding-left:var(--s05)}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE LADDER'S TRACK IS AN ON-DARK VALUE AND THE WING IS NOT DARK
+
+   §05 draws `.ladder` for `.lvl-hero` — the black level card — so its unearned
+   levels take `--on-dark-rule`, white at 16%. On the band's wash that is white
+   on cream: the eleven levels above E4 disappeared and the ladder read as four
+   orange bars floating in space, which says "finished" rather than "four of
+   fifteen". `--layer-accent-01` is the track `.prog-seg` and `.pb-track` take
+   on a light ground, so the fifteen-rung ladder and the thirteen-chapter strip
+   are drawn in the same two tones — which is what lets the wing swap one for
+   the other without the reader noticing a change of component.
+   -------------------------------------------------------------------------- */
+.app .wing-lvl .ladder i{background:var(--layer-accent-01)}
+.app .wing-lvl .ladder i.done{background:var(--accent);opacity:.55}
+.app .wing-lvl .ladder i.on{background:var(--accent);opacity:1}
+/* `.ladder-lab` is `--on-dark-2` inside a level hero (§05.35) and the plain
+   helper ink everywhere else; the wing is everywhere else, so this only has to
+   make sure the three track names are not inheriting the card's white. */
+.app .wing-lvl .ladder-lab{color:var(--text-helper)}
+
+/* AND THE LADDER'S HEADLINE IS A LEVEL CODE, NOT A PERCENTAGE. `.prog-pct` is
+   34/38 and tabular, which is exactly right for "0%" and slightly wrong for
+   "E4" — the tabular figures set the E and the 4 on the same advance and the
+   pair reads loose. `normal` numerals, and nothing else changes: it is the
+   same size, the same weight and the same slot as the percentage it stands in
+   for. */
+.app .wing-lvl .prog-pct{font-variant-numeric:normal;font-feature-settings:normal}
+/* the "of 15" beside the rung takes the same step down the percentage's own
+   `small` takes (§04.81), so the two headline figures are one pair */
+.app .wing-lvl .prog-dn small{
+  font-size:12.5px;font-weight:400;letter-spacing:.2px;color:var(--text-secondary)}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE QUIET CARD — THE SAME CARD, ONE PRIORITY DOWN
+
+   THE INK FLIPS BY RE-POINTING THE TOKENS, not by restating the rules. §15,
+   §56 and §21 between them set eleven declarations off `--on-dark`,
+   `--on-dark-2` and `--on-dark-border` — the detail line, the person's role,
+   the countdown chip's border and ink, the second action's outline, the head
+   row's hairline, the marks in the detail list. Redeclaring all eleven for the
+   quiet state is eleven chances for one of them to be missed and eleven rules
+   to keep in step with §15 forever. Pointing the three variables at their
+   light-ground equivalents changes all eleven at once, and any rule a later
+   layer writes against those tokens is correct on both states for free.
+
+   `--on-dark-border` -> `--rule` AND NOT A TINT OF BLACK. The card is now
+   sitting on the band's own wash, and every other hairline in the band —
+   the header's closer, the divider under the wing — is `--rule`. A card
+   drawing its internal lines in a different grey would be the one object in
+   the band with its own line weight.
+
+   NO GROUND, RATHER THAN A PALE ONE. A tint here would be a third tone inside
+   a band that already has two (the wash, and the white the page sits on), and
+   the thing that separates the card from the column is the rule in §59.4 —
+   which is what Maryam's note asks for in as many words. `transparent` and not
+   `--background`, so the wash reads continuously through the corner the card
+   is standing in.
+   -------------------------------------------------------------------------- */
+.app .plate.plate-quiet{
+  background-color:transparent;
+  color:var(--text-primary);
+  --on-dark:var(--text-primary);
+  --on-dark-2:var(--text-secondary);
+  --on-dark-border:var(--rule);
+  /* verify.mjs reads this flag to allow white-on-accent as a stated
+     exception; there is no accent ground on this card any more. */
+  --on-brand-fill:0}
+
+/* THE HAZE GOES WITH THE GROUND. `.dark-glow` is the warm light off the
+   top-right corner and §21 gives it `opacity:.22` of `--accent` — over black
+   that is light, over a cream wash it is a second orange gradient inside the
+   first one. It is hidden rather than not built: `placeGlow` (ai4) prepends it
+   on a pass that runs BEFORE the pass that decides the priority, and a card
+   that has been rendered once must be able to change state without either pass
+   having to know about the other. */
+.app .plate.plate-quiet > .dark-glow{display:none}
+
+/* --------------------------------------------------------------------- 4 ---
+   AND IN THE HEAD BAND, A VERTICAL RULE BETWEEN THE TWO COLUMNS
+
+   §56 makes the band two columns and gives the dark card the second one with
+   `padding:34px var(--pad-x) 28px 0` — no left padding, on the stated ground
+   that "the 32px the left column already pays on its right is the gutter, and
+   paying it twice put 64px between two columns of one block". True while the
+   card was black: its own edge was the boundary, so the gutter only had to be
+   paid once and the card's internal padding did the rest.
+
+   With no black edge there is no boundary, and two columns of type 32px apart
+   read as one ragged column. The rule takes the black edge's job. It needs air
+   on BOTH sides to be a divider rather than a border on the right-hand column,
+   so the left padding comes back — 32 from the left column, the line, 32 to the
+   card — and the card's own padding comes off, because a card with no ground is
+   not a card and its text belongs on the column's spine like everything else in
+   the band.
+
+   IT IS THE COLUMN'S `border-left`, NOT AN ELEMENT. §56 gives `.sec-dark`
+   `align-self:stretch`, so the column is already exactly as tall as the left
+   one — which is the height a divider between them has to be, and the same
+   argument §56.1 makes for drawing the wing's own divider as a `border-bottom`
+   on the wing: a line between two members of a grid is a property of the join.
+
+   KEYED ON `:has(> .sec-dark .plate.plate-quiet)` — the same shape as §56's own
+   gate one class longer, so a band whose card is urgent is untouched and a band
+   whose second dark card is quiet (the guard §56 writes for a case that does
+   not exist yet) cannot claim the divider.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-dark .plate.plate-quiet) > .sec-dark{
+    padding-left:var(--pad-x);
+    border-left:1px solid var(--rule)}
+  /* the card's own frame comes off — see above. `padding:0` and not a smaller
+     step, because the column is now paying the gutter on the card's behalf. */
+  .app .modhead .sec-dark > .plate.plate-quiet{padding:0}
+}
+
+/* --------------------------------------------------------------------- 4b ---
+   BELOW 900 THERE IS NO SECOND COLUMN, SO THE DIVIDER IS HORIZONTAL
+
+   One column, and the card is the last member of the band under Tal's
+   sentence. A divider between two columns has nothing to divide, and a quiet
+   card with no ground and no line above it is four lines of type that read as
+   a continuation of the paragraph over them. So the join turns with the layout:
+   the same hairline, on the top edge, with the band's own `--s06` above and
+   below it.
+
+   `.plate` keeps its horizontal padding at this width — §25.12 has already
+   taken the full-bleed margins off inside the band, and the gutter the card
+   pays is the gutter every other member pays. Only the vertical padding is
+   restated, because the card's own top padding and the new rule's clearance
+   would otherwise be paid twice.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .modhead .plate.plate-quiet{
+    padding-top:var(--s06);
+    border-top:1px solid var(--rule)}
+}

@@ -493,3 +493,139 @@ function dsTypeSummary(p, key){
     }
   })(performance.now());
 }
+
+/* ==========================================================================
+   THE DARK CARD HAS TWO PRIORITIES — `dsPlateQuiet`
+
+       dsPlateQuiet(plate)                  // one card
+       app.querySelectorAll('.plate').forEach(dsPlateQuiet);
+
+   §59 draws them and the argument is written there: the black ground plus the
+   warm haze off the top-right corner is the loudest object this system draws,
+   and it is spent on an action that is time-sensitive — a call today, a thing
+   due now. Outside twenty-four hours the same card is QUIET: no ground, no
+   haze, the ink flipped, and inside a two-column head band a vertical rule
+   doing the job the card's black edge was doing.
+
+   BOTH HALVES SHIP, for the reason CLAUDE.md gives about §52's clock: the
+   stylesheet alone is a family gated on a class nothing in the box ever
+   writes, which is decoration. The test is not "is there JS" but does the
+   behaviour need the PORTAL'S STATE or only the element you hand it — and
+   this needs only the element. It reads the card's own countdown chip and its
+   own eyebrow and adds one class.
+
+   IT IS THE WORDS, BECAUSE THE WORDS ARE ALL THERE IS in a prototype whose
+   appointments are hand-written strings. Swap this one function for a date
+   difference in a real build and nothing else changes: the class is the
+   contract. `data-urgent="1"` / `="0"` on the card overrides the reading.
+
+   CALL IT AFTER the markup exists and before you read the layout — it is
+   idempotent, so an unconditional line at the end of render is right.
+   ========================================================================== */
+const DS_PLATE_SOON =
+  /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
+
+function dsPlateQuiet(plate){
+  if(!plate) return false;
+  const flag = plate.dataset.urgent;
+  let urgent;
+  if(flag === '1' || flag === 'true')       urgent = true;
+  else if(flag === '0' || flag === 'false') urgent = false;
+  else {
+    /* the countdown is `data-when` on the card or the tail of a
+       "label &middot; when" eyebrow; the label counts too, which is what makes
+       "Due now" — the most urgent thing either portal says, and a label rather
+       than a clock — come out urgent. */
+    const eb = plate.querySelector(':scope .plate-eb');
+    const wh = plate.querySelector(':scope .plate-when');
+    const txt = [plate.dataset.when || '',
+                 wh ? wh.textContent : '',
+                 eb ? eb.textContent : ''].join(' ');
+    urgent = DS_PLATE_SOON.test(txt);
+  }
+  plate.classList.toggle('plate-quiet', !urgent);
+  return urgent;
+}
+
+/* ==========================================================================
+   FIVE SCORES AS A ROSE — `dsQuizRose`
+
+       el.innerHTML = dsQuizRose([['Decisiveness',78],['Delegation',41],
+                                  ['Directness',66],['Coaching',38],
+                                  ['Composure',84]], 64)
+
+   Returns the whole component: the chart, the legend rows and the caption.
+   Any number of bands from three up; the wedges divide the circle evenly and
+   each reaches out as far as its own score, so it is a bar chart bent into a
+   circle. Bend it when the categories have no order — a row of five bars
+   implies a first and a last that a set of five traits does not have.
+
+   THE FILL CARRIES THE VERDICT AND NOT A HUE: solid ink at 70 and over, a 45°
+   hatch from 50, empty with a hairline below that. Three greens or a traffic
+   light would say the same thing in colour, and this system spends colour on
+   one accent; a pattern also survives being printed and read by somebody who
+   does not separate red from green. The legend swatch takes the same three
+   fills from the same function, so a band cannot be drawn solid and labelled
+   Weak.
+
+   THE VIEWBOX IS WIDER THAN THE DRAWING — 424 for a 360-wide chart. The band
+   names sit outside the outer ring anchored `start` or `end`, so the longest
+   of them runs past the plot and an SVG clips at the box edge. 32px each side
+   is the longest label at 10.5px plus a little.
+
+   WHY THE JS SHIPS AT ALL: every `qz*` class is written by this function and
+   by nothing else, so the stylesheet on its own would be a family the box
+   cannot switch on. It reads no state — an array and a number are the whole
+   input — which is the test that separates this from the portal's own passes.
+   ========================================================================== */
+function dsQuizBand(v){ return v >= 70 ? ['s','Strong'] : v >= 50 ? ['m','Mixed'] : ['w','Weak']; }
+
+function dsQuizRose(dims, score){
+  const CX = 180, CY = 158, R0 = 36, R = 108, GAP = 1.4;
+  const pol = (a,r) => [CX + r * Math.cos(a * Math.PI/180), CY + r * Math.sin(a * Math.PI/180)];
+  const seg = (a0,a1,r) => {
+    const [x0,y0] = pol(a0,R0), [x1,y1] = pol(a0,r), [x2,y2] = pol(a1,r), [x3,y3] = pol(a1,R0);
+    return 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) + 'L' + x1.toFixed(1) + ' ' + y1.toFixed(1)
+      + 'A' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 0 1 ' + x2.toFixed(1) + ' ' + y2.toFixed(1)
+      + 'L' + x3.toFixed(1) + ' ' + y3.toFixed(1)
+      + 'A' + R0 + ' ' + R0 + ' 0 0 0 ' + x0.toFixed(1) + ' ' + y0.toFixed(1) + 'Z';
+  };
+  const step = 360 / dims.length;
+  const fill = v => ({s:'var(--chart-ink)', m:'url(#qzHatch)', w:'var(--layer-01)'})[dsQuizBand(v)[0]];
+  const rings = [25,50,75,100].map(p =>
+    '<circle cx="' + CX + '" cy="' + CY + '" r="' + (R0 + (p/100)*(R-R0)).toFixed(1)
+    + '" fill="none" stroke="var(--border-subtle-01)" stroke-width="1" stroke-dasharray="2 4"/>').join('');
+  const wedges = dims.map(([k,v],i) => {
+    const a0 = -90 + i*step + GAP, a1 = -90 + (i+1)*step - GAP;
+    return '<path d="' + seg(a0,a1,R0 + (v/100)*(R-R0)) + '" fill="' + fill(v)
+      + '" stroke="var(--chart-ink)" stroke-width="1.2"/>';
+  }).join('');
+  const marks = dims.map(([k,v],i) => {
+    const mid = -90 + i*step + step/2;
+    const [lx,ly] = pol(mid, R + 21);
+    const anchor = Math.abs(lx - CX) < 14 ? 'middle' : (lx > CX ? 'start' : 'end');
+    const [vx,vy] = pol(mid, R0 + (v/100)*(R-R0) - 15);
+    return '<text x="' + lx.toFixed(1) + '" y="' + (ly+4).toFixed(1) + '" text-anchor="' + anchor
+      + '" class="qz-lab">' + k + '</text>'
+      + '<text x="' + vx.toFixed(1) + '" y="' + (vy+4).toFixed(1) + '" text-anchor="middle" class="qz-val'
+      + (dsQuizBand(v)[0] === 's' ? ' on' : '') + '">' + v + '</text>';
+  }).join('');
+  const rows = dims.map(([k,v]) => {
+    const b = dsQuizBand(v);
+    return '<div class="kv"><span class="k"><i class="qz-sw ' + b[0] + '"></i>' + k + '</span>'
+      + '<span class="v">' + v + '<span class="tag qz-vd">' + b[1] + '</span></span></div>';
+  }).join('');
+  return '<div class="qz-rose">'
+    + '<svg viewBox="-32 0 424 326" class="qz-svg" role="img" aria-label="Scores: '
+    + dims.map(([k,v]) => k + ' ' + v).join(', ') + '">'
+    + '<defs><pattern id="qzHatch" width="6" height="6" patternTransform="rotate(45)"'
+    + ' patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="var(--layer-01)"/>'
+    + '<line x1="0" y1="0" x2="0" y2="6" stroke="var(--chart-ink)" stroke-width="2"/></pattern></defs>'
+    + rings + wedges
+    + '<circle cx="' + CX + '" cy="' + CY + '" r="' + R0
+    + '" fill="var(--layer-01)" stroke="var(--chart-ink)" stroke-width="1.2"/>'
+    + '<text x="' + CX + '" y="' + (CY-2) + '" text-anchor="middle" class="qz-mid">' + score + '</text>'
+    + '<text x="' + CX + '" y="' + (CY+14) + '" text-anchor="middle" class="qz-mids">of 100</text>'
+    + marks + '</svg>'
+    + '<div class="qz-key">' + rows + '</div></div>';
+}

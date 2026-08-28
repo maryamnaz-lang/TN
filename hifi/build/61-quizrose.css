@@ -1,0 +1,134 @@
+/* ==========================================================================
+   61 — THE QUIZ ROSE, AND THE TWO LISTS UNDER IT
+
+   `V.result` — the page "See full breakdown" now opens. The chart is five
+   wedges from a common hub, each reaching out as far as its band's score,
+   with the quiz's own figure in the middle; under it the five bands as `.kv`
+   rows, and under that the three things the answers did well and the three
+   they did badly. The argument for the shape is over `quizRose` in views.js.
+
+   WHAT THIS LAYER OWNS is the type inside the SVG, the three swatches, the
+   verdict tag and the six list rows. It owns no geometry: every coordinate
+   is computed in the view, because the arithmetic has to agree with itself
+   and a stylesheet cannot hold half of it.
+
+   `qz*` IS A NAME NO EARLIER LAYER MENTIONS, so nothing here has to win an
+   argument with the cascade. It is last for the plainest reason — it is the
+   newest — with one exception that does need the position: `.qz-vd` is a
+   `.tag`, and §02 states the tag's fill and §11 its type, so a correction to
+   either can only land after both.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE PLOT
+   The SVG is fluid: it has a viewBox and no width, so it takes the column and
+   scales. `max-width` is what stops it becoming a 900px chart in a 900px
+   column — past about 380px the wedges stop carrying more information and
+   start carrying more white.
+   -------------------------------------------------------------------------- */
+.app .qz-rose{display:block}
+.app .qz-svg{
+  display:block;width:100%;max-width:420px;height:auto;margin:0 auto}
+
+/* THE BAND'S NAME, OUTSIDE THE OUTER RING. §01's overline, as SVG text —
+   `.eyebrow` cannot be borrowed because `text-transform` and `letter-spacing`
+   apply but the class also sets `display:block` and a margin, neither of
+   which means anything to an SVG text node. Stated rather than inherited, so
+   the two cannot drift apart when §11 moves. */
+.app .qz-lab{
+  font-size:10.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;fill:var(--text-secondary)}
+
+/* THE FIGURE, INSIDE ITS OWN WEDGE. Ink on the two lighter fills, white on
+   the solid one — `qzBand` stamps `.on` where the wedge under it is ink, so
+   the flip is decided by the same function that decided the fill. */
+.app .qz-val{
+  font-size:12px;font-weight:600;letter-spacing:.2px;
+  font-variant-numeric:tabular-nums;fill:var(--text-primary)}
+.app .qz-val.on{fill:var(--on-dark)}
+
+/* THE HUB. The quiz score is the one number here that is not a band, so it is
+   the largest thing in the chart and the only one at display weight. */
+.app .qz-mid{
+  font-size:26px;font-weight:600;letter-spacing:-.6px;
+  font-variant-numeric:tabular-nums;fill:var(--text-primary)}
+.app .qz-mids{
+  font-size:9.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;fill:var(--text-helper)}
+
+/* --------------------------------------------------------------------------
+   2. THE FIVE ROWS
+   `.kv` rather than a private grid: a band and its score IS a key and a
+   value, and §02 already gives that pair its hairline, its right-aligned
+   value and its tabular figures. This layer adds the swatch to the key and
+   the verdict to the value.
+   -------------------------------------------------------------------------- */
+.app .qz-key{margin-top:var(--s05)}
+.app .qz-key .kv .k{display:flex;align-items:center;gap:var(--s03)}
+.app .qz-key .kv .v{display:flex;align-items:center;gap:var(--s03)}
+
+/* THE SWATCH IS THE WEDGE, AT 12px. Solid ink for a strong band, the same
+   45° hatch for a mixed one, empty with a hairline for a weak one — the row
+   has to be readable as the chart's legend, which means the three fills are
+   the chart's three fills and not three greys.
+
+   THE HATCH IS A `repeating-linear-gradient` HERE AND AN SVG `<pattern>`
+   THERE, and that is not a duplication that can drift: both are 2px of ink
+   every 6px at 45°, and the two live in different languages. A CSS
+   background cannot reference an SVG pattern defined inside another element's
+   `<defs>`, and an SVG shape cannot take a CSS gradient as a fill. */
+.app .qz-sw{
+  flex:none;display:block;width:12px;height:12px;
+  border:1px solid var(--chart-ink);background:var(--layer-01)}
+.app .qz-sw.s{background:var(--chart-ink)}
+.app .qz-sw.m{
+  background:repeating-linear-gradient(45deg,
+    var(--chart-ink) 0 2px, var(--layer-01) 2px 6px)}
+
+/* THE VERDICT. §02's tag with nothing added but a fixed measure: Strong,
+   Mixed and Weak are three different widths, and five rows whose last element
+   starts at three different distances from the edge read as a ragged column
+   rather than as a table. 58px is the widest of the three plus its padding. */
+.app .qz-key .tag.qz-vd{
+  min-width:58px;justify-content:center;text-align:center}
+
+.app .qz-note{margin:var(--s05) 0 0}
+
+/* --------------------------------------------------------------------------
+   3. WHAT THE QUIZ SAW
+   Six phrases in two labelled groups. Each is a mark and a line, and the row
+   is a grid rather than a flex so a phrase that wraps stays out of the mark's
+   column instead of centring itself against it.
+   -------------------------------------------------------------------------- */
+.app .qz-row{
+  display:grid;grid-template-columns:auto 1fr;align-items:start;
+  gap:var(--s04);padding:var(--s03) 0;
+  border-bottom:1px solid var(--border-subtle-01)}
+.app .qz-row:last-child{border-bottom:0}
+.app .qz-t{
+  font-size:14px;line-height:20px;letter-spacing:.1px;color:var(--text-primary)}
+
+/* THE MARK IS A DISC, which is the one shape this system lets curve, and it
+   carries its meaning in its GROUND with the icon at full ink on both — the
+   same construction §56 gives the journey row's five step marks, for the same
+   reason: two marks that differ only in fill read as one set, and two that
+   differ in icon colour read as two components.
+
+   THE TWO GROUNDS ARE §56'S DONE AND CURRENT, and taking them from there is
+   the whole reason they work: flat `--accent` for a step that is finished,
+   `--brand-tint-2` for the step you are ON. A strength the quiz found is the
+   first claim and a growth area is the second — the part in progress — so the
+   pair is one scale rather than two decisions. Red would have made three
+   phrases into three faults, and `--layer-02`, which this tried first, is
+   #F7F7F7 on a white page: the disc vanished and the strengths' orange next
+   to it read as two different components.
+
+   THE ICON SAYS THE SAME. `I.growth` rather than `I.warningAlt`: §58 calls
+   this list "Growth areas" and the product never calls a quiz answer a fault.
+   -------------------------------------------------------------------------- */
+.app .qz-mk{
+  flex:none;display:grid;place-items:center;
+  width:24px;height:24px;border-radius:50%;margin-top:-1px}
+.app .qz-mk svg{width:15px;height:15px;fill:var(--text-primary)}
+.app .qz-mk.ok{background:var(--accent)}
+.app .qz-mk.wa{background:var(--brand-tint-2)}

@@ -1,0 +1,348 @@
+/* ==========================================================================
+   60 — THE LIVE CALL
+
+   The one surface in the product that is not a page. Press Join on an
+   interview or on the weekly cohort call and the whole frame becomes the
+   call: no app bar, no rail, no Tal — a bar that says what this is and how
+   long it has run, the feed, a column of the facts you might need out loud,
+   and one row of controls with the way out at the end of it.
+
+   IT TAKES THE WHOLE FRAME, AND THAT IS THE DESIGN. A live interview is the
+   highest-stakes forty-five minutes on the ladder and the weekly call is the
+   one hour a week the cohort is in the same room; neither is a dialog over a
+   dashboard. `ai10.js` renders it in place of `shell() + view()` for exactly
+   this reason, which is also why nothing here has to out-specify a page rule:
+   when `.call` is on screen there is no page.
+
+   TWO KINDS, ONE COMPONENT. `data-callkind="iv"` (and `"re"`) is two people;
+   `data-callkind="cohort"` is a host and nine others. The difference is one
+   element — `.call-strip`, the row of member tiles — and two words of copy.
+   Everything else is shared, because a call is a call: the same bar, the same
+   feed, the same aside, the same footer.
+
+   THE MEMBER STRIP IS BENEATH THE MAIN CARD, on Maryam's instruction and it
+   is the better arrangement: the host is who you are listening to, so the
+   host is the thing at the top of the screen, and the nine faces are the room
+   you glance down at. The wireframe had them above, which put a row of
+   thumbnails between the title and the person talking.
+
+   NOTHING HERE CURVES EXCEPT THE RECORDING DOT. §01 sets `--radius:0` and a
+   mark is one of the two things this system lets curve — so the name chips,
+   the tiles, the control buttons and the leave button are all square, where
+   every video product on the market draws them as pills. That is the point:
+   this reads as TalentNext with a call in it rather than as somebody else's
+   call product with our logo on the bar.
+
+   LAST, and it needs almost nothing from the cascade — `call*` is a name no
+   earlier layer mentions. It is here at the end because it is new, and
+   because the two rules that DO reach outside the prefix (`.call .btn` for
+   the leave button's height, and the `--pad-x` restatement) have to land
+   after §02 and §10 to be corrections at all.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. THE SURFACE
+   `.app` is a flex column with `inset:0`, so one child that grows is the
+   whole layout. `min-height:0` on every scroller in the chain, because a
+   flex item's default `min-height:auto` refuses to shrink below its content
+   and the overflow then lands on the frame instead of on the column that
+   should hold it.
+   -------------------------------------------------------------------------- */
+.app .call{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  background:var(--background)}
+
+/* --------------------------------------------------------------------------
+   2. THE BAR
+   Dark, because it is chrome around a live thing rather than part of the
+   page, and because the recording state has to read at a glance from across
+   a desk. Same ground as `.plate` — `--surface-dark` — so the darkest thing
+   in the product is one colour.
+
+   THE TITLE AND THE FACT ROW STACK AT MOBILE AND SIT SIDE BY SIDE FROM 600.
+   They are the head of a page in miniature: what this is, then its `·` spine
+   (see the `ph()` note in views.js). On a phone the spine would push the
+   clock off the end of the row, so it goes under the title until there is
+   room for both.
+   -------------------------------------------------------------------------- */
+.app .call-bar{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--pad-x);
+  background:var(--surface-dark);color:var(--on-dark)}
+.app .call-id{
+  min-width:0;display:flex;flex-direction:column;gap:2px}
+.app .call-ttl{
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.2px;
+  color:var(--on-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .call-sub{
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;
+  color:var(--on-dark-2)}
+@container app (min-width:600px){
+  .app .call-id{flex-direction:row;align-items:baseline;gap:var(--s04);flex-wrap:wrap}
+}
+
+/* THE RECORDING MARK. A hollow square holding a filled disc and the word —
+   the disc is the mark, so the disc is what curves. It breathes rather than
+   blinks: a hard on/off at this size reads as a fault in the page. */
+.app .call-rec{
+  flex:none;display:inline-flex;align-items:center;gap:var(--s03);
+  padding:3px var(--s03);
+  border:1px solid rgba(255,255,255,.34);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark)}
+.app .call-rec i{
+  display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--on-dark);
+  animation:call-rec 2s var(--ease-standard) infinite}
+@keyframes call-rec{
+  0%,100%{opacity:1}
+  50%{opacity:.28}
+}
+
+.app .call-clock{
+  flex:none;margin-left:auto;
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:.4px;
+  font-variant-numeric:tabular-nums;color:var(--on-dark)}
+
+/* --------------------------------------------------------------------------
+   3. THE BODY
+   One column at mobile, stage and aside side by side from 900 — the same
+   breakpoint §14 gives the page its desktop shape, so the call changes when
+   everything else does.
+
+   THE SCROLLER MOVES WITH THE BREAKPOINT. Stacked, the whole body scrolls as
+   one document: the feed, then the facts under it. Side by side, the body
+   itself must NOT scroll — the stage is meant to fill the height, so each
+   column takes its own overflow and the footer stays where it is.
+   -------------------------------------------------------------------------- */
+.app .call-body{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  overflow-y:auto}
+.app .call-stage{
+  flex:none;display:flex;flex-direction:column;gap:var(--s04);
+  padding:var(--s05) var(--pad-x);min-width:0}
+@container app (min-width:900px){
+  .app .call-body{flex-direction:row;overflow:hidden}
+  .app .call-stage{flex:1 1 auto;min-height:0;overflow:hidden}
+  .app .call-side{
+    flex:0 0 328px;width:328px;
+    border-top:0;border-left:1px solid var(--border-subtle-01)}
+}
+
+/* --------------------------------------------------------------------------
+   4. THE FEED
+   A dark box with the person's photograph laid over it. `background-image` is
+   set INLINE by `callTile` — the picture belongs to the person, not to the
+   stylesheet — which is trap 1, so everything that would otherwise be a
+   second background layer is a pseudo-element instead. §38 makes the same
+   split for the same reason and the note there is the long version.
+
+   16:9 AT MOBILE, THE REMAINING HEIGHT AT DESKTOP. `aspect-ratio` is what
+   keeps a phone's feed from taking the whole screen; from 900 the card is
+   supposed to fill its column, and a ratio would leave a band of white under
+   it. `flex:1` and `aspect-ratio:auto` swap the two.
+   -------------------------------------------------------------------------- */
+.app .call-main{
+  position:relative;flex:none;width:100%;aspect-ratio:16 / 9;
+  min-height:180px;overflow:hidden;
+  background-color:var(--surface-dark);
+  background-size:cover;background-position:center 24%}
+@container app (min-width:900px){
+  .app .call-main{flex:1 1 auto;aspect-ratio:auto;min-height:0}
+}
+/* THE SCRIM. Even at the top, where the caption sits, and heavier at the
+   bottom, where the name is — both have to hold their edge over a photograph
+   this component does not choose. */
+.app .call-main::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(17,17,17,.42) 0%, rgba(17,17,17,.16) 34%,
+    rgba(17,17,17,.24) 66%, rgba(17,17,17,.62) 100%)}
+
+/* THE NAME CHIP. Square, and on its own ground rather than on the scrim: the
+   scrim is a gradient over an unknown photograph, and 11.5px of white on it
+   is legible in most frames and not all of them. */
+.app .call-nm{
+  position:absolute;left:var(--s04);bottom:var(--s04);z-index:2;
+  max-width:calc(100% - var(--s07));
+  padding:3px var(--s03);
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:11.5px;line-height:16px;font-weight:600;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .call-nm em{font-style:normal;color:var(--on-dark-2);font-weight:400}
+
+/* WHAT IS HAPPENING, IN WORDS. The prototype cannot show a conversation, so
+   it says what stage the conversation is at — the one line on this surface
+   that changes while you watch it. Centred at the top, which is where a call
+   product puts its transient banners and where nothing else here lives. */
+.app .call-cap{
+  position:absolute;top:var(--s04);left:var(--s04);right:var(--s04);z-index:2;
+  margin:0 auto;width:max-content;max-width:calc(100% - var(--s05));
+  padding:4px var(--s04);
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;text-align:center}
+
+/* THE SELF VIEW sits inside the feed, bottom right, in both kinds of call —
+   a self view is a self view whether there is one other person or nine. Its
+   own name chip is one step smaller and keeps the corner opposite. */
+.app .call-self{
+  position:absolute;right:var(--s04);bottom:var(--s04);z-index:2;
+  width:34%;max-width:184px;min-width:108px;aspect-ratio:16 / 9;
+  overflow:hidden;
+  background-color:var(--surface-dark-2);
+  background-size:cover;background-position:center 22%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.28)}
+.app .call-self .call-nm{
+  left:6px;bottom:6px;padding:2px 6px;font-size:10.5px;line-height:14px;
+  max-width:calc(100% - 12px)}
+
+/* --------------------------------------------------------------------------
+   5. THE MEMBER STRIP — cohort calls only
+   One row, scrolling sideways when the cohort outgrows the width. A grid
+   would wrap ten faces into three rows on a phone and eat the feed; a row
+   that scrolls is what a call product does and what the frame can afford.
+
+   THE OVERFLOW CELL IS A COUNT, NOT A FACE. `+2` is the two members the row
+   has no room for, and it is drawn as a plain bordered cell so it cannot be
+   mistaken for somebody with their camera off.
+   -------------------------------------------------------------------------- */
+.app .call-strip{
+  flex:none;display:flex;gap:var(--s03);
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:thin;padding-bottom:2px}
+.app .call-mem{
+  position:relative;flex:0 0 116px;aspect-ratio:16 / 9;overflow:hidden;
+  background-color:var(--surface-dark);
+  background-size:cover;background-position:center 22%}
+.app .call-mem::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(17,17,17,.10) 0%, rgba(17,17,17,.22) 58%, rgba(17,17,17,.66) 100%)}
+.app .call-mem .call-nm{
+  left:5px;right:5px;bottom:5px;padding:2px 5px;
+  font-size:10px;line-height:14px;max-width:none}
+.app .call-more{
+  flex:0 0 116px;aspect-ratio:16 / 9;
+  display:grid;place-items:center;
+  border:1px solid var(--border-subtle-02);
+  background:var(--layer-02);
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-secondary)}
+/* AT DESKTOP THE ROW DIVIDES THE WIDTH INSTEAD OF SCROLLING. Nine faces at a
+   fixed 148px is 1,330px of row inside a 912px column, so the last two
+   members were off the end of a strip nothing tells you scrolls — the one
+   thing this row exists to say is who is here. Flexible with a 116px basis
+   and a 172px cap, the whole room fits at any frame width the desktop shape
+   has, and a bigger cohort still shrinks to the basis and then scrolls.
+
+   THE CAP IS WHAT KEEPS TWO MEMBERS FROM BECOMING TWO POSTERS. Without a
+   maximum, a call with three others gives each tile 300px and the row reads
+   as a second feed rather than as the room under the feed. */
+@container app (min-width:900px){
+  .app .call-mem,.app .call-more{flex:1 1 116px;max-width:172px}
+}
+
+/* --------------------------------------------------------------------------
+   6. THE ASIDE
+   The facts you would otherwise be hunting for while somebody waits: the
+   room, the code, whether this is being recorded, and the one thing to have
+   ready. It sits on the panel tone with a hairline against the stage, which
+   is §12's own answer to "supporting material beside the thing itself" — the
+   same pair the page uses for a `.sec.tint`.
+
+   `.kv` AND `.eyebrow` RATHER THAN A LOCAL PAIR. Every row in here is a key
+   and a value, which is a component the product already has and which
+   already sets its hairlines, its tabular figures and its right-aligned
+   value. The only thing this layer says about them is which ground they are
+   on, so their rules step to `--rule-on-2` with everything else on a panel.
+   -------------------------------------------------------------------------- */
+.app .call-side{
+  flex:none;min-width:0;
+  padding:var(--s05) var(--pad-x);
+  background:var(--surface-2);
+  border-top:1px solid var(--border-subtle-01);
+  overflow-y:auto;--pad-x:var(--s05)}
+.app .call-panel + .call-panel{
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule-on-2)}
+.app .call-panel .kv{border-bottom-color:var(--rule-on-2)}
+.app .call-panel .call-legal{
+  margin:var(--s04) 0 0;color:var(--text-helper)}
+.app .call-panel > p{margin:0}
+
+/* --------------------------------------------------------------------------
+   7. THE FOOTER
+   Four things you can do to your own microphone and camera, and the way out
+   held at the far end. The four are square bordered buttons rather than the
+   round icon buttons every call product uses, for the reason at the head of
+   this file — and they are real toggles: `ai10.js` keeps their state in `S`,
+   so an off microphone survives a re-render (trap 9).
+
+   THE LABELS GO AT MOBILE, NOT THE BUTTONS. Four labelled controls plus a
+   leave button is 470px of row; at 390 the labels are hidden and the
+   `aria-label` each button already carries is what is left. Hiding the
+   buttons instead would take away the only controls on the surface.
+   -------------------------------------------------------------------------- */
+.app .call-foot{
+  flex:none;display:flex;align-items:center;gap:var(--s03);
+  padding:var(--s03) var(--pad-x);
+  background:var(--layer-01);
+  border-top:1px solid var(--border-subtle-01)}
+.app .call-ctl{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:40px;padding:0 var(--s04);
+  border:1px solid var(--border-subtle-02);border-radius:var(--radius);
+  background:var(--layer-01);color:var(--text-primary);
+  font-size:13px;font-weight:600;letter-spacing:.2px;cursor:pointer;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .call-ctl svg{width:16px;height:16px;flex:none;fill:currentColor}
+/* OFF IS FILLED, NOT GREYED. A muted microphone is a state you have chosen
+   and want to see; disabled ink would read as a control you cannot use. */
+.app .call-ctl.off{
+  background:var(--brand-primary);border-color:var(--brand-primary);
+  color:var(--on-brand)}
+/* PLAIN `:hover`, AND THE BUILD IS WHAT DISARMS IT. build.py rewrites every
+   `:hover` in every layer to `:hover:where(.__nh)` and prints the count —
+   hover is off product-wide unless a selector is in `HOVER_KEEP`. Written
+   pre-disarmed here (which it was, for one build) the rule is invisible to
+   that rewrite, and the design system's own build then refuses to write at
+   all: `verify_subset` cannot trace an output selector back to a source that
+   does not contain it. State it plain and let both builds do their job. */
+.app .call-ctl:hover{background:var(--overlay-hover)}
+.app .call-ctl.off:hover{background:var(--brand-primary-hover)}
+/* THE PEOPLE COUNT IS NOT A TOGGLE and says so by not being pressable. */
+.app .call-ctl.call-count{cursor:default;color:var(--text-secondary)}
+
+.app .call-leave{margin-left:auto;flex:none}
+.app .call .btn.call-leave{min-height:40px;padding:0 var(--s05)}
+
+@container app (max-width:599px){
+  .app .call-ctl{padding:0 var(--s04);gap:0}
+  .app .call-ctl span{display:none}
+  .app .call-ctl.call-count{display:none}
+}
+
+/* --------------------------------------------------------------------------
+   8. ARRIVING
+   The surface fades up from just under its resting place. `data-enter` is the
+   one-render marker §13 gates every entrance on (trap 5), and the final
+   keyframe IS the resting state — trap 2: `fill-mode:both` keeps the last
+   frame applying, so an entrance that ends anywhere else is a permanent
+   restyle of the component.
+   -------------------------------------------------------------------------- */
+.app[data-enter] .call{
+  animation:call-in var(--dur-standard) var(--ease-decelerate) both}
+@keyframes call-in{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+
+/* ITS OWN REDUCED-MOTION BLOCK, because §13.187 clamps every duration to 1ms
+   and 1ms on the INFINITE recording pulse is a strobe rather than "off". The
+   dot holds at full ink and the entrance simply does not play. */
+@media (prefers-reduced-motion:reduce){
+  .app .call-rec i{animation:none;opacity:1}
+  .app[data-enter] .call{animation:none}
+}

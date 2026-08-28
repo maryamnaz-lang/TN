@@ -232,7 +232,10 @@ the real portal, in its real cascade position.** Nothing is re-typed.
 
 The build enforces that: before it writes anything it checks that every
 `(selector, declarations)` pair in the output appears identically in some source
-layer, and fails the build if one does not. 3,053 rules kept; 503 dropped, all of them from the eight excluded families.
+layer, and fails the build if one does not. Everything dropped comes from the excluded
+families — **the build prints the kept/dropped count and the surviving exclusion list every
+run**, so read that rather than a number written down here, which goes stale every time a
+layer is added.
 
 ### To change the design system
 

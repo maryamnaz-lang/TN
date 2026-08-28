@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=c1332bd6">
+<link rel="stylesheet" href="talentnext-ds.css?b=dd824f52">
 
 <style>
 /* ==========================================================================
@@ -188,7 +188,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=c1332bd6"></script>
+<script src="talentnext-ds.js?b=dd824f52"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -291,7 +291,7 @@ SECTIONS.push({id:'use', nav:'Using it', icon:'document', build: () => `
    invented — because each has internal structure the CSS keys on, and getting
    it slightly wrong is what makes a component look broken rather than absent. */
 SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
-  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks. <b>§56 arranges it as two columns</b> — the title, the <code>&middot;</code> fact row, a hairline, the steps, a second hairline and then what Tal says on the left; the plate beside all of it, content packed to the top and its actions on the foot, as tall as the column. The second column appears on its own: the gate is <code>.modhead:has(&gt; .sec-dark .plate)</code> at 900 and up, so a band whose dark card is a <code>.lvl-hero</code> or a <code>.cert</code> keeps the full-width place under the head. <b>The title is the <code>.ph</code>, not a greeting.</b> <code>.tal-greet</code> still works and still hides the <code>.ph</code> when you use it (§33.9) — the candidate portal chose the other shape, because with the fact row and the steps above Tal a greeting would be the fourth thing in the column. <b>Four things in the steps are easy to get wrong.</b> <code>.stps</code> is a column-flow grid and <b>each <code>.stps-i</code> paints the rail segment to its own right</b>, from its mark to the next one — there is no rail element to add, and adding a wrapper for one puts a line through the marks. The item is a <b>three-row grid</b> and <code>.stps-b</code> is <code>display:contents</code>, which is what keeps the five state words on one line when a label wraps and another does not. A step is <code>.stps-m</code> + <code>.stps-b</code>: the step&rsquo;s own subject icon at every state, with the state on the <code>.stps-i</code> (<code>done</code> / <code>on</code> / neither) and the mark&rsquo;s <b>ground</b> carrying it — flat accent for done, the accent tint for the one you are on, the panel tone for what is ahead. That is the opposite of §33.7&rsquo;s dropdown, where the mark is a bare glyph because five filled tiles in a 340px panel read as buttons. And the <b>second divider is the wing&rsquo;s <code>border-bottom</code></b>, so it exists only where there are steps; below 900 the same markup turns 90 degrees into a column, the state word gives its line back to the step&rsquo;s own detail, and <code>.plate-b</code>&rsquo;s icon rows stay as they are.', `
+  ${ex('The dashboard head, whole', 'This is the opening move of the candidate portal and the thing a new portal most needs to match. The markup below is the <b>real DOM</b>, read off the running portal — not written from the CSS. Three parts inside one <code>.modhead</code>: the page header, one section holding Tal, and a <code>.sec.sec-dark</code> holding the plate. The wash (<code>.app .modhead::before</code>) covers all three, which is what makes it read as one band instead of three stacked blocks. <b>§56 arranges it as two columns</b> — the title, the <code>&middot;</code> fact row, a hairline, the steps, a second hairline and then what Tal says on the left; the plate beside all of it, content packed to the top and its actions on the foot, as tall as the column. The second column appears on its own: the gate is <code>.modhead:has(&gt; .sec-dark .plate)</code> at 900 and up, so a band whose dark card is a <code>.lvl-hero</code> or a <code>.cert</code> keeps the full-width place under the head. <b>The title is the <code>.ph</code>, not a greeting.</b> <code>.tal-greet</code> still works and still hides the <code>.ph</code> when you use it (§33.9) — the candidate portal chose the other shape, because with the fact row and the steps above Tal a greeting would be the fourth thing in the column. <b>Four things in the steps are easy to get wrong.</b> <code>.stps</code> is a column-flow grid and <b>each <code>.stps-i</code> paints the rail segment to its own right</b>, from its mark to the next one — there is no rail element to add, and adding a wrapper for one puts a line through the marks. The item is a <b>three-row grid</b> and <code>.stps-b</code> is <code>display:contents</code>, which is what keeps the state words on one line when a label wraps and another does not. A step is <code>.stps-m</code> + <code>.stps-b</code>: the step&rsquo;s own subject icon at every state, with the state on the <code>.stps-i</code> (<code>done</code> / <code>on</code> / neither) and the mark&rsquo;s <b>ground</b> carrying it — flat accent for done, the accent tint for the one you are on, the panel tone for what is ahead. That is the opposite of §33.7&rsquo;s dropdown, where the mark is a bare glyph because five filled tiles in a 340px panel read as buttons. And the <b>second divider is the wing&rsquo;s <code>border-bottom</code></b>, so it exists only where there are steps; below 900 the same markup turns 90 degrees into a column, the state word gives its line back to the step&rsquo;s own detail, and <code>.plate-b</code>&rsquo;s icon rows stay as they are.', `
     <div class="modhead">
       <div class="ph">
         <div class="ph-main">
@@ -328,17 +328,56 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
                   <span class="stps-b"><span class="pi-lab">90-day course</span>
                     <span class="stps-st">In progress</span>
                     <span class="pi-sec">Week 5 of 13 &middot; 5 of 13 chapters done</span></span></li>
-                <li class="stps-i"><span class="stps-m">{{video}}</span>
-                  <span class="stps-b"><span class="pi-lab">Re-interview</span>
-                    <span class="stps-st">Upcoming</span>
-                    <span class="pi-sec">Sets your next rung</span></span></li>
               </ol>
             </div>
           </div>
         </div>
       </div>
       <div class="sec sec-dark">
-        <div class="plate" data-when="in 2 days">
+        <div class="plate" data-when="today 6:00 PM">
+          <i class="dark-glow" aria-hidden="true"></i>
+          <div class="plate-h plate-h-bare">
+            <div class="plate-t">Cohort Week 36 Session</div>
+            <span class="plate-when">{{time}}<b>today 6:00 PM</b></span>
+          </div>
+          <div class="plate-b plate-lines">
+            <span class="plate-bi">{{time}}<span>Thursday at 6:00 PM ET</span></span>
+            <span class="plate-bi">{{group}}<span>9 others</span></span>
+            <span class="plate-bi">{{hourglass}}<span>60 minutes</span></span>
+          </div>
+          <div class="plate-who">
+            <span class="av-ph" style="width:56px;height:56px"><i>PN</i></span>
+            <span class="plate-wb"><b>Priya Nair</b>
+              <span>Cohort leader &middot; leads Cohort 41</span></span>
+          </div>
+          <div class="plate-a">
+            <button class="btn btn-p btn-sm noic">Join Call {{video}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('The same band, one priority down', 'The card above is black because the call is <b>today</b>. §59 says that is what the black ground and the warm haze are <i>for</i> — an action that is time-sensitive or wants attention now. Every other appointment gets the same card <b>quiet</b>: add <code>.plate-quiet</code> and the ground goes, <code>.dark-glow</code> is hidden, and a <b>vertical rule between the two columns</b> takes over the job the card&rsquo;s black edge was doing of saying where column one stops. Nothing else moves — same facts, same buttons, same order. <b>The ink flips by re-pointing three variables</b>, not by restating rules: <code>--on-dark</code>, <code>--on-dark-2</code> and <code>--on-dark-border</code> are reassigned on the card, so the eleven declarations §15, §21 and §56 write against them all follow, and so will anything you write. <b>Call <code>dsPlateQuiet(plate)</code> at the end of your render</b> and it decides for you: it reads the card&rsquo;s own <code>data-when</code>, its <code>.plate-when</code> chip and its <code>.plate-eb</code> label and looks for the vocabulary of inside-the-day — <i>now, today, tonight, starting,</i> or a count of hours or minutes. &ldquo;Due now&rdquo; is a label rather than a clock, which is why the label is tested too. <code>data-urgent="1"</code> or <code>="0"</code> on the card overrides it, and a card with no time at all is quiet, because nothing on it expires. Below 900 there is no second column, so the divider turns with the layout and becomes a hairline on the card&rsquo;s top edge.', `
+    <div class="modhead">
+      <div class="ph">
+        <div class="ph-main">
+          <div class="ph-top"><h1>Welcome back, Maryam!</h1></div>
+          <p class="ph-facts">
+            <span class="ph-f">{{growth}}<span>Explorer Track – E3</span></span>
+            <span class="ph-f">{{group}}<span>Cohort 41</span></span>
+            <span class="ph-f">{{calendar}}<span>Week 5 of 13</span></span>
+          </p>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="ai-aura tile tight talsum">
+          <div class="ai-head"><span class="ai-label">Tal</span></div>
+          <div class="ai-body"><p>Day 34 of 90, week 5. 5 of 13 chapters at 88%,
+            260 minutes so far. Thursday&rsquo;s call is the one to keep.</p></div>
+        </div>
+      </div>
+      <div class="sec sec-dark">
+        <div class="plate plate-quiet" data-when="in 2 days">
           <i class="dark-glow" aria-hidden="true"></i>
           <div class="plate-h plate-h-bare">
             <div class="plate-t">Cohort Week 36 Session</div>
@@ -356,6 +395,7 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
           </div>
           <div class="plate-a">
             <button class="btn btn-p btn-sm noic">Join Call {{video}}</button>
+            <button class="btn btn-sm noic plate-b2">Add to calendar</button>
           </div>
         </div>
       </div>

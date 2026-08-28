@@ -440,6 +440,61 @@ function splitPlateBody(plate){
     `<span class="plate-bi">${plateIcon(t)}<span>${t}</span></span>`).join('');
 }
 
+/* ==========================================================================
+   THE BLACK WALL IS FOR THE THING THAT CANNOT WAIT
+
+   Maryam's rule, and it is a rule about MEANING rather than about a card:
+   black ground plus the warm haze off the top-right corner is the loudest
+   object this product draws, and it should be spent on an action that is
+   time-sensitive or wants attention now. A call today is that. A call on
+   Thursday is not, and drawing the two the same way makes the loud one mean
+   nothing — every dashboard in the build opened on a black wall, so the wall
+   stopped being a signal and became the shape a plate is.
+
+   TWENTY-FOUR HOURS IS THE LINE. Inside it the card is the black plate
+   unchanged; outside it the same card is QUIET — the ground goes, the haze
+   goes, the ink flips, and in the head band a vertical rule takes over the job
+   the black edge was doing of saying where column one stops (§59). The card
+   does not move, lose a fact or lose its buttons: the same content, one
+   priority down. As the appointment comes inside the day it goes black on its
+   own, because the only thing that decides is the distance in time.
+
+   DERIVED FROM THE WORDS, BECAUSE THE WORDS ARE ALL THERE IS. Every
+   appointment in this prototype is a hand-written string — `data-when="in 2
+   days"`, "Weekly call &middot; thursday", "Today 4:30 PM" off `LEAD_SESSIONS`
+   — and there is no clock behind any of them to subtract from. So the test is
+   the vocabulary of "inside the day": now, today, tonight, starting, and any
+   count of hours or minutes. Everything else — tomorrow, a weekday, a date, "in
+   2 days" — is outside it. A real build swaps this one function for a date
+   difference and nothing else in the file changes.
+
+   THE LABEL COUNTS AS WELL AS THE CLOCK, and that is what makes "Due now" work.
+   `placePlates` splits the eyebrow at the middot: "Weekly call · in 2 days"
+   leaves a label and a time, but "Due now" has no middot and stays a label
+   entirely. It is the most urgent thing either portal says and it would have
+   read as quiet if only the timer slot were tested.
+
+   AND A CARD WITH NO CLOCK AT ALL IS QUIET. Three plates carry no time because
+   there is no appointment in them — the enrolment offer, and the two cards that
+   explain what a level interview IS. None of them expires, which is the whole
+   test. `data-urgent="1"` / `="0"` on the card overrides the reading for
+   anything that needs to say so directly; nothing in the build does yet, which
+   is why it is an attribute rather than a list of call sites here.
+
+   ONLY `.plate`. `DARK_CARD` covers six components and the other five are not
+   actions: `.cert` is an award, `.lvl-hero` a level, `.score` a table,
+   `.ldr-read` a competency read. A quiet certificate would be a certificate
+   with the ceremony taken off it, and none of the five has a deadline to be
+   inside or outside. They keep their ground.
+   ========================================================================== */
+const PLATE_SOON = /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
+function plateUrgent(plate, when, label){
+  const flag = plate.dataset.urgent;
+  if(flag === '1' || flag === 'true')  return true;
+  if(flag === '0' || flag === 'false') return false;
+  return PLATE_SOON.test(when || '') || PLATE_SOON.test(label || '');
+}
+
 function placePlates(){
   device.querySelectorAll('.plate').forEach(plate => {
     if(plate.querySelector(':scope > .plate-h')) return;   /* already arranged */
@@ -473,6 +528,15 @@ function placePlates(){
       }
       if(eb.textContent) head.appendChild(eb);
     }
+
+    /* THE PRIORITY, READ OFF THE CLOCK AND THE LABEL — the note over
+       `plateUrgent` is the argument. It is stamped here rather than in a pass
+       of its own because this is the one place in the build where the two
+       halves of the eyebrow have already been told apart: before the split the
+       string is "Weekly call · in 2 days" and neither half can be tested on its
+       own; after it, `when` is the clock and `eb.textContent` is the label. */
+    if(!plateUrgent(plate, when, eb ? eb.textContent : ''))
+      plate.classList.add('plate-quiet');
 
     /* A HEAD ROW WITH NO LABEL TAKES THE TITLE INSTEAD.
        The head exists to hold the corner the timer sits in. With the label

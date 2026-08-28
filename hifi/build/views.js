@@ -1404,7 +1404,7 @@ function stepper(steps, title){
 }
 
 /* ==========================================================================
-   ONE JOURNEY, FIVE STEPS, ON EVERY STAGE
+   ONE JOURNEY, FOUR STEPS, AND IT ENDS WHERE THE COURSE BEGINS
 
    The six dashboards used to state their own step list, and they disagreed
    about how many steps the journey HAS: four on `new`, `booked` and
@@ -1412,10 +1412,9 @@ function stepper(steps, title){
    changed length as you moved through the product — five columns on Monday,
    four on Tuesday — and the same milestone was called three different things
    ("Your level and report", "Level confirmed", "Interview and level").
-   Maryam's rule: it is always these five.
+   Maryam's rule: it is always these four.
 
      Leadership quiz -> Interview and level -> Enrolled -> 90-day course
-     -> Re-interview
 
    THE LABELS ARE THE SPINE AND THE `sec` LINES ARE THE STAGE. What changes
    between stages is which step is `on` and what the detail line under each
@@ -1424,17 +1423,29 @@ function stepper(steps, title){
    passed. That is what a journey looks like: the road is fixed, your position
    on it moves.
 
-   TWO STEPS WERE LOST AND BOTH ARE STILL SAID. `consult` named "Account
-   created" and "Consultant call" as steps of their own; the account is not a
-   milestone of the LEADERSHIP journey (you cannot be on this page without
-   one), and Jordan's call is what the second step's detail line says on that
-   stage — plus the whole black card beside it. `promoted` named "Next course
-   — E4" as a sixth; the E4 course has not started, Tal's summary says when it
-   opens, and a step for it would be a promise on the section's part.
+   "RE-INTERVIEW" WAS A FIFTH STEP AND IS GONE — Maryam's cut, and the row is
+   better for it in a way that is worth writing down. Four of the five steps
+   are things that happen ONCE on the way in: you take the quiz, you are
+   interviewed, you enrol, you do the 90 days. The re-interview is not on that
+   road, it is the road turning back on itself — it is what the NEXT ninety
+   days start from, and drawing it as the end of this journey said the ladder
+   stops at E4. It also cost the row a fifth column, which is what broke
+   "Re-interview" across its own hyphen at 99px.
 
-   AND `promoted` HAS NO CURRENT STEP, which is correct rather than a gap:
-   every one of the five is done, the re-interview included. `stepper` falls
-   back to the last finished step for the count when nothing is `on`.
+   THREE STEPS WERE LOST BEFORE IT AND ALL THREE ARE STILL SAID. `consult`
+   named "Account created" and "Consultant call" as steps of their own; the
+   account is not a milestone of the LEADERSHIP journey (you cannot be on this
+   page without one), and Jordan's call is what the second step's detail line
+   says on that stage — plus the whole black card beside it. `promoted` named
+   "Next course — E4" as a sixth; the E4 course has not started, Tal's summary
+   says when it opens, and a step for it would be a promise on the section's
+   part.
+
+   AND ONLY FOUR STAGES REACH THIS FUNCTION NOW. The journey row stops at
+   `assessed` — see the note over `wingBlock` below for what stands in its
+   place once the course is running. `promoted`'s all-done row went with the
+   fifth step; the `default` here is `assessed`'s so this can never hand
+   `stepper` an undefined.
    ========================================================================== */
 /* THE ENROLMENT CARD, AND ONE FUNCTION FOR THE TWO STAGES THAT DRAW IT.
    `assessed` and `promoted` are the same moment one level apart — a level has
@@ -1467,34 +1478,121 @@ const enrolPlate = lvl => `<div class="sec">
       </div>
     </div>`;
 
-const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course','Re-interview'];
+const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course'];
 function journey(){
-  const f = cfg(S.stage);
   const row = (sts, secs) => JRN.map((lab,i) => ({st:sts[i], lab, sec:secs[i]}));
-  const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week','Sets your next rung'];
+  /* the two steps nobody on these four stages has reached yet */
+  const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week'];
+  const LEVELLED = row(['done','done','on',''],
+    ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
+     'Not enrolled yet', AHEAD[1]]);
   switch(S.stage){
-    case 'consult': return row(['done','on','','',''],
+    case 'consult': return row(['done','on','',''],
       ['Explorer track &middot; Aug 3',
        'Jordan calls Thu, Aug 13 &middot; an agent sets your level', ...AHEAD]);
-    case 'new': return row(['done','on','','',''],
+    case 'new': return row(['done','on','',''],
       ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
-    case 'booked': return row(['done','on','','',''],
+    case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
-    case 'assessed': return row(['done','done','on','',''],
-      ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
-       'Not enrolled yet', AHEAD[1], AHEAD[2]]);
-    case 'promoted': return row(['done','done','done','done','done'],
-      ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
-       `All 13 chapters &middot; ${f.avg}% average`, 'Promoted to E4 &middot; Nov 21']);
-    default: {                                  /* week1, day34, day90 */
-      const past = !!f.finished;
-      return row(['done','done','done', past?'done':'on', past?'on':''],
-        ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
-         past ? `All 13 chapters &middot; ${f.avg}% average`
-              : `Week ${f.week} of 13 &middot; ${f.done} of 13 chapters done`,
-         past ? 'Due now &mdash; book to have your 90 days assessed' : 'Sets your next rung']);
-    }
+    case 'assessed': return LEVELLED;
+    default: return LEVELLED;
   }
+}
+
+/* ==========================================================================
+   THE WING SAYS WHERE YOU ARE, AND "WHERE" MEANS THREE DIFFERENT THINGS
+
+   §56 gives the head band's left column one status block between the fact row
+   and Tal's sentence. For the first four stages that block is the journey: a
+   row of four marks saying how far along the way IN you are. It was the same
+   row on all eight dashboards, and on the last four it was answering a
+   question nobody on those pages has — a candidate in week 5 of Cohort 41 does
+   not need to be told that the quiz and the interview happened, and one who
+   has been promoted does not need four ticks to be told the way in is behind
+   them.
+
+   So the wing changes with what there is to be somewhere IN. Maryam's rule:
+
+     consult, new, booked, assessed   the journey        four steps, marked
+     week1, day34, day90              the 90 days        `progressStrip`
+     promoted                         the ladder         `ladder`, and next
+
+   THE MIDDLE ONE IS THE PAGE'S OWN PROGRESS SECTION, MOVED, NOT COPIED. The
+   enrolled dashboards drew `progressStrip` as a section of their own about two
+   thirds down the page — the percentage, the thirteen chapter blocks and three
+   figures. It is the exact shape the wing wants (a headline number, a rail, a
+   row of facts) and it is the one thing on those pages that answers "where am
+   I", so it moves up into the wing and the section it used to be is gone. Two
+   drawings of one strip on one page would be the mistake §56 records for the
+   meter and the current-step block.
+
+   AND `promoted` GETS THE LADDER, WHICH IS THE ONLY PROGRESS A CANDIDATE
+   BETWEEN COURSES HAS. There is no journey left to draw — every step of it is
+   done — and no 90 days running to measure, so both of the blocks above would
+   be full bars saying "finished", which is the least useful thing a status
+   block can say. What has actually moved for this reader is their position on
+   the fifteen-level ladder, and the RE-INTERVIEW is what moved it: the header
+   states the level and names the re-interview that confirmed it, the ladder is
+   the rail, and the three figures under it are the next climb rather than the
+   last one. The last one is already the "Cohort 41, in the end" strip further
+   down this same page, which is why none of these three repeats it.
+
+   ALL THREE WEAR `.stp .stp-open .stp-titled`. That is the WING's block rather
+   than the stepper's: §04 gives it the vertical rhythm, §24.4 gives `.stp-top`
+   the header row, and §56.2 gives that row its 16 underneath. A second wrapper
+   class for two blocks that want all four of those would be four rules
+   restated. `.wing-prog` and `.wing-lvl` are the hooks §59 needs for the two
+   things that genuinely differ — the strip's gutter and the ladder's track.
+   ========================================================================== */
+const wingHead = t => `<div class="stp-top"><h2 class="u-h3">${t}</h2></div>`;
+
+/* THE STRIP INSIDE THE WING IS `progressStrip` UNTOUCHED. Everything it needs
+   to change is a gutter, and a gutter is CSS — see §59.1. */
+const progressWing = f => `<div class="stp stp-open stp-titled wing-prog">
+    ${wingHead('Your 90 days so far')}
+    ${progressStrip(f)}
+  </div>`;
+
+/* THE LADDER WING IS `progressStrip`'S OWN SHAPE WITH THE LADDER AS ITS RAIL —
+   `.prog-top`, a rail, `.prog-figs` — so the three wings read as one component
+   in three states rather than as three blocks that happen to share one slot.
+   `ladder()` draws the fifteen levels and the three track names under them.
+
+   THE FIGURES ARE FORWARD-LOOKING, and that is the point of them. Everything
+   about the 90 days just finished is on this page already: the fact row says
+   E4 and level 4 of 15, the achievement banner says the promotion, and "Cohort
+   41, in the end" states the chapters, the average, the points and the level
+   move as four cells. What no block on the page says is when the next course
+   opens and what re-qualifying at E4 involves, which is the one open question
+   a promoted candidate has. December 1 is `PAGESUM.promoted`'s own date and
+   the chapter count is `CH`'s — neither is a new number. */
+const ladderWing = f => `<div class="stp stp-open stp-titled wing-lvl">
+    ${wingHead('Where you are on the ladder')}
+    <div class="prog">
+      <div class="prog-top">
+        <div><div class="prog-pct">${f.level}</div>
+          <div class="prog-l">confirmed at your re-interview</div></div>
+        <div class="prog-day"><div class="prog-dn">${rungOf(f.level)}<small> of 15</small></div>
+          <div class="prog-l">on the ladder</div></div>
+      </div>
+      ${ladder(f.level)}
+      <div class="prog-figs">
+        <span><b>Dec 1</b>next cohort opens</span>
+        <span><b>${CH.length}</b>chapters at E4</span>
+        ${''/* "then you re-interview" and not "to your next re-interview":
+              §10.16 sets these labels at 10.5px uppercase in a third of the
+              wing, and the longer wording ran to three lines while the two
+              beside it took one, which stretched the whole row to fit it. */}
+        <span><b>90 days</b>then you re-interview</span>
+      </div>
+    </div>
+  </div>`;
+
+function wingBlock(){
+  const f = cfg(S.stage);
+  if(f.complete) return ladderWing(f);
+  if(f.enrolled) return progressWing(f);
+  return stepper(journey());
 }
 
 /* ============================================================
@@ -1785,7 +1883,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
         <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in &mdash; peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">
           ${askChip('What happens on the consultant call?','What happens on the call?')}
@@ -1827,7 +1925,7 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${quizResults('3 Aug', 'the interview decides it')}
+    ${quizResults(qzTaken(), 'the interview decides it')}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -1847,7 +1945,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot noline">
           <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
@@ -1895,7 +1993,7 @@ V.dashboard = (f) => {
       <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
     </div>
     ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
-    ${quizResults('12 Aug', 'the interview decides it')}
+    ${quizResults(qzTaken(), 'the interview decides it')}
     ${''/* "DECIDED SO FAR" WAS HERE AND IS GONE, and it was the third telling of
           one fact. Two `.gcard`s said the track is Explorer and that a 90-day
           course follows — and the quiz block directly above already prints
@@ -1920,7 +2018,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
@@ -1934,7 +2032,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
+          <button class="btn btn-p btn-sm noic" data-call="iv">Join ${I.video}</button>
           <button class="btn btn-sm noic plate-b2" data-go="interviews">Reschedule</button>
         </div>
       </div>
@@ -2014,7 +2112,7 @@ V.dashboard = (f) => {
       </div>
     </div>
     ${''/* on this stage the "what sets it" answer has a name and a date on it */}
-    ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
+    ${quizResults(qzTaken(), 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
     ${ph('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
@@ -2023,7 +2121,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
       </div>
@@ -2114,7 +2212,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
       </div>
     </div>
@@ -2245,7 +2343,7 @@ V.dashboard = (f) => {
           :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
           :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
@@ -2268,7 +2366,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Cohort Week 36 Session</div>
         <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-go="cohort">Join Call ${I.video}</button>
+          <button class="btn btn-p btn-sm noic" data-call="cohort">Join Call ${I.video}</button>
         </div>
       </div>
     </div>`}
@@ -2303,7 +2401,19 @@ V.dashboard = (f) => {
       <div class="sec-h"><h2>This week</h2><button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button></div>
       ${weekCard(f)}
     </div>`}
-    <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
+    ${''/* THE PROGRESS STRIP WAS HERE AND IS NOW THE HEAD BAND'S WING.
+          It is the one block on this page that answers "where am I in the 90
+          days", which is exactly the question §56's wing exists to answer, and
+          it was doing it two thirds of the way down the page under the week
+          card. `wingBlock` (above `V.dashboard`) is where it is drawn now, in
+          the slot the journey row holds on the four stages before this one.
+          Drawn in both places it would be the same percentage, the same
+          thirteen blocks and the same three figures twice on one screen.
+
+          THE WEEKLY CHART STAYS DOWN HERE, and the difference is worth a line:
+          the strip is a POSITION (day 34 of 90) and belongs at the head with
+          the rest of the page's state, while the chart is a RECORD, thirteen
+          weeks of minutes, and is read after the work rather than before it. */}
     <div class="sec">
       <div class="tile" style="padding-top:var(--s05)">
         ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:g.weeks,
@@ -2387,6 +2497,238 @@ V.level = (f) => {
       <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
     </div>
+  </div>
+</div></main>`;
+};
+
+/* ==========================================================================
+   THE QUIZ RESULT — "See full breakdown" now goes somewhere of its own
+
+   The button under "Quiz results" went to `level`, which is the page about
+   the LADDER: a hero, fifteen rungs and how moving up works. None of the
+   quiz is on it. So the one control in the product offering a breakdown
+   landed on a page that does not contain one, and the four figures the
+   reader had just pressed past were the whole of what they got.
+
+   `PARENT` has had `result:'level'` in it since before this page existed —
+   the slot was reserved and never filled. This fills it.
+
+   WHAT THIS PAGE IS FOR, AND WHAT IT REFUSES TO SAY AGAIN. Everything on it
+   is the quiz's own working: five bands with a score each, the three things
+   the answers did well, the three they did badly, and which chapters address
+   the two weakest. None of that appears anywhere else in the product.
+
+   What it deliberately does NOT carry:
+
+     THE FOUR FIGURES. Title given, quiz score, taken, level — that is
+     `quizResults`, the block whose button brought you here, and restating it
+     as the first thing on the destination is the "See full breakdown" of a
+     breakdown you have already read. The `ph` fact row says the same three
+     facts in one line because a page has to say where it sits.
+
+     THE TITLE AS A HERO. `Explorer` set at 30px over "level to be confirmed"
+     is `.lvl-hero` on My Level, one click away, and this page's own crumb
+     starts there.
+
+     "A QUIZ CANNOT SET YOUR LEVEL". `V.level` carries that note with a Book
+     button, and the caption under the rose already says what the interview
+     does with these five numbers. Two pages one click apart do not both get
+     to make the point.
+   ========================================================================== */
+
+/* THE FIVE BANDS, AND THEY ARE THE ONLY PLACE THESE NUMBERS ARE WRITTEN.
+   Tal reads them for the "what did the quiz say" answers; the rose draws
+   them; the rows underneath list them; and `qzLow` derives the two the
+   interview pushes on rather than anybody naming them twice. */
+const SCORES = [['Decisiveness',78],['Delegation',41],['Directness',66],
+                ['Coaching',38],['Composure',84]];
+/* Two thresholds, one function, three words. Both the wedge's fill and the
+   row's tag come out of here, so a band cannot be drawn solid and labelled
+   Weak. */
+const qzBand = v => v >= 70 ? ['s','Strong'] : v >= 50 ? ['m','Mixed'] : ['w','Weak'];
+const qzLow  = (n) => SCORES.slice().sort((a,b) => a[1] - b[1]).slice(0, n || 2);
+
+/* WHAT THE ANSWERS SHOWED, IN WORDS. Six phrases, and they are the QUIZ's
+   reading — not Priya's. Priya's two paragraphs (`signedSummary`) come from
+   forty-five minutes of examples with names and dates in them; these come
+   from a hundred multiple-choice questions, and the page says so under its
+   own heading. Keeping them apart is the point: the product's whole argument
+   is that the second kind is worth paying for. */
+const QZ_STR = ['Execution under pressure','Comfortable with ambiguity',
+                'Holds a line under challenge'];
+const QZ_DEV = ['Delegates too late','Avoids conflict until it escalates',
+                'Coaches by telling'];
+
+/* THE EDITORIAL MAP: a band, and the chapter built on it. It is the bridge
+   from the quiz to the course and the one thing this page can say that no
+   other page does.
+
+   THE CHAPTER NUMBERS ARE DERIVED FROM `CH`, not written here, and that is
+   what makes this agree with Priya's report: `signedSummary` says "Delegation,
+   and coaching rather than fixing. Chapters 4 and 12 are built on exactly
+   this", and looking the two titles up in `CH` gives 4 and 12. Written as
+   numbers they would have been two more figures to keep in step; the earlier
+   prototype mapped Coaching to Feedback That Lands and would have said 9. */
+const QZ_CH = {
+  Decisiveness:'Decisions Under Incomplete Information',
+  Delegation:  'Delegation Without Drop-Off',
+  Directness:  'Hard Conversations',
+  Coaching:    'Coaching vs Fixing',
+  Composure:   'Building Trust at Speed'};
+function qzChapter(band){
+  const t = QZ_CH[band], i = CH.findIndex(c => c[0] === t);
+  return i < 0 ? null : {n:i + 1, t};
+}
+
+/* WHEN IT WAS TAKEN, ONCE. `quizResults` takes the date as an argument
+   because each dashboard's stepper prints its own and the block cannot
+   contradict the line above it — the note over that function is the long
+   version. This is the rule behind those arguments, so the three call sites
+   and this page read one function and cannot drift apart. */
+const qzTaken = (long) => S.stage === 'consult'
+  ? (long ? '3 August 2026'  : '3 Aug')
+  : (long ? '12 August 2026' : '12 Aug');
+
+/* --------------------------------------------------------------------------
+   THE ROSE
+
+   Five wedges from a common hub, each reaching out as far as its score. It is
+   a bar chart bent into a circle, and the reason to bend it is that these
+   five are not a sequence — there is no first band and no last one, and a row
+   of five bars implies an order the quiz does not have.
+
+   THE FILL CARRIES THE VERDICT, NOT A HUE. Solid ink for Strong, a hatch for
+   Mixed, empty with a hairline for Weak — `qzBand`'s three words, drawn.
+   Three greens or a traffic light would have said the same thing in colour,
+   and colour is what this product spends on one accent and nothing else; a
+   pattern also survives being printed, photocopied and read by somebody who
+   does not separate red from green.
+
+   THE RINGS ARE AT 25 / 50 / 75 / 100 so a wedge can be read against them
+   without a scale down the side, and the hub holds the one number that is not
+   a band: the quiz score itself.
+
+   THE GEOMETRY IS THE EARLIER PROTOTYPE'S, unchanged — `quizRose` in
+   tn-portals.html, where this chart was designed. What changed is every
+   colour, the type, and that the legend is `.kv` rows rather than a private
+   three-column grid.
+   -------------------------------------------------------------------------- */
+function quizRose(dims, score){
+  const CX = 180, CY = 158, R0 = 36, R = 108, GAP = 1.4;
+  const pol = (a,r) => [CX + r * Math.cos(a * Math.PI/180), CY + r * Math.sin(a * Math.PI/180)];
+  /* one wedge: out along its first edge, round at its own radius, back in,
+     and round the hub to close */
+  const seg = (a0,a1,r) => {
+    const [x0,y0] = pol(a0,R0), [x1,y1] = pol(a0,r), [x2,y2] = pol(a1,r), [x3,y3] = pol(a1,R0);
+    return `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`
+      + `A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`
+      + `L${x3.toFixed(1)} ${y3.toFixed(1)}`
+      + `A${R0} ${R0} 0 0 0 ${x0.toFixed(1)} ${y0.toFixed(1)}Z`;
+  };
+  const step = 360 / dims.length;
+  const fill = v => ({s:'var(--chart-ink)', m:'url(#qzHatch)', w:'var(--layer-01)'})[qzBand(v)[0]];
+  const rings = [25,50,75,100].map(p =>
+    `<circle cx="${CX}" cy="${CY}" r="${(R0 + (p/100)*(R-R0)).toFixed(1)}" fill="none"
+      stroke="var(--border-subtle-01)" stroke-width="1" stroke-dasharray="2 4"/>`).join('');
+  const wedges = dims.map(([k,v],i) => {
+    const a0 = -90 + i*step + GAP, a1 = -90 + (i+1)*step - GAP;
+    return `<path d="${seg(a0,a1,R0 + (v/100)*(R-R0))}" fill="${fill(v)}"
+      stroke="var(--chart-ink)" stroke-width="1.2"/>`;
+  }).join('');
+  /* the band's name outside the outer ring, its figure inside its own wedge —
+     and the figure flips to white where the wedge under it is solid ink */
+  const marks = dims.map(([k,v],i) => {
+    const mid = -90 + i*step + step/2;
+    const [lx,ly] = pol(mid, R + 21);
+    const anchor = Math.abs(lx - CX) < 14 ? 'middle' : (lx > CX ? 'start' : 'end');
+    const [vx,vy] = pol(mid, R0 + (v/100)*(R-R0) - 15);
+    return `<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="${anchor}" class="qz-lab">${k}</text>
+      <text x="${vx.toFixed(1)}" y="${(vy+4).toFixed(1)}" text-anchor="middle"
+        class="qz-val${qzBand(v)[0] === 's' ? ' on' : ''}">${v}</text>`;
+  }).join('');
+  return `<div class="qz-rose">
+    ${''/* THE VIEWBOX IS WIDER THAN THE CHART, and by a measured amount. The
+          five band names sit 21px outside the outer ring and are anchored
+          `start` or `end`, so the longest of them runs past the plot: at 162°
+          COACHING ends at x=57 and reaches back to about -5, which an SVG
+          clips at the viewBox edge. 32px of room each side is the longest
+          label at 10.5px plus a little, and it is why the box is 424 wide for
+          a 360-wide drawing. `CX` is unchanged, so no coordinate moves. */}
+    <svg viewBox="-32 0 424 326" class="qz-svg" role="img"
+      aria-label="Quiz bands: ${dims.map(([k,v]) => k + ' ' + v).join(', ')}">
+      <defs><pattern id="qzHatch" width="6" height="6" patternTransform="rotate(45)"
+        patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="var(--layer-01)"/>
+        <line x1="0" y1="0" x2="0" y2="6" stroke="var(--chart-ink)" stroke-width="2"/></pattern></defs>
+      ${rings}${wedges}
+      <circle cx="${CX}" cy="${CY}" r="${R0}" fill="var(--layer-01)"
+        stroke="var(--chart-ink)" stroke-width="1.2"/>
+      <text x="${CX}" y="${CY-2}" text-anchor="middle" class="qz-mid">${score}</text>
+      <text x="${CX}" y="${CY+14}" text-anchor="middle" class="qz-mids">of 100</text>
+      ${marks}
+    </svg>
+    <div class="qz-key">
+      ${dims.map(([k,v]) => { const [cls,word] = qzBand(v);
+        return `<div class="kv"><span class="k"><i class="qz-sw ${cls}"></i>${k}</span>
+          <span class="v">${v}<span class="tag qz-vd">${word}</span></span></div>`; }).join('')}
+    </div>
+    <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
+      the interview probes hardest, and what the course spends most of its time on.</p>
+  </div>`;
+}
+
+V.result = (f) => {
+  const low = qzLow(2).map(([k,v]) => ({k, v, ch:qzChapter(k)}));
+  const mark = (ic, kind, txt) =>
+    `<div class="qz-row"><span class="qz-mk ${kind}">${ic}</span><span class="qz-t">${txt}</span></div>`;
+  return `<main class="main"><div class="page">
+  ${crumb(['My Level','level'],'Quiz result')}
+  ${ph('Quiz result', `Explorer track &middot; 64 of 100 &middot; taken ${qzTaken(true)}`)}
+  <div class="sec">
+    <div class="sec-h"><h2>How you scored</h2></div>
+    ${quizRose(SCORES, 64)}
+  </div>
+  ${''/* TWO LISTS UNDER ONE HEADING, and the heading is what stops them being
+        read as Priya's. `.sig-l` is the label the report already uses for
+        exactly this pair — §58 gives it full ink and 28px of air — and it is
+        scoped to `.ai-body`, which is why the tile has one. */}
+  <div class="sec">
+    <div class="sec-h"><h2>What the quiz saw</h2></div>
+    ${''/* THE SOURCE LINE IS THE TILE'S FOOT, NOT THE SECTION'S HELPER. At
+          desktop §10.15 gives this section a 184px label column — it holds a
+          `.tile`, which is not on the opt-out list — and "What the quiz saw"
+          is already three lines in it. A second line of helper text under
+          that put five lines of grey in a gutter beside a two-item list.
+          `.ai-foot` is where `V.report` puts "Written by Priya Nair from your
+          interview", which is the same sentence doing the same job: it says
+          whose reading this is, at the end of the reading. */}
+    <div class="tile">
+      <div class="ai-body">
+        <p class="t-label-01 sig-l">What you do well</p>
+        ${QZ_STR.map(s => mark(I.checkFilled, 'ok', s)).join('')}
+        <p class="t-label-01 sig-l">Where you lose ground</p>
+        ${QZ_DEV.map(s => mark(I.growth, 'wa', s)).join('')}
+      </div>
+      <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">From a hundred
+        multiple-choice answers &mdash; not from an interview</span></div>
+    </div>
+  </div>
+  ${''/* THE BRIDGE TO THE COURSE, and it is the reason this page exists rather
+        than being two paragraphs on My Level. The two weakest bands are
+        derived, their chapters are looked up in `CH`, and the action depends
+        on whether anybody has interviewed you yet: unlevelled, the next step
+        is the interview these two bands will be pushed on; levelled, the
+        report is where they were pushed. */}
+  <div class="sec tint">
+    <div class="sec-h"><h2>Where the course picks this up</h2></div>
+    ${low.map(b => `<div class="kv"><span class="k">${b.k} &middot; ${b.v}</span>
+      <span class="v">${b.ch ? `Chapter ${b.ch.n} &middot; ${b.ch.t}` : 'Not on this course'}</span></div>`).join('')}
+    <p class="t-helper-01 mt4">Your course opens at your level, and these two chapters are where the 90
+      days spend the most time. The quiz cannot tell them apart from a bad afternoon &mdash;
+      ${f.pred ? 'the interview is what does.' : 'the interview is what did.'}</p>
+    <div class="mt5">${f.pred
+      ? `<button class="btn btn-p" data-go="agents">Book your interview ${I.calendar}</button>`
+      : `<button class="btn btn-g" data-go="report">Read your report ${I.arrowRight}</button>`}</div>
   </div>
 </div></main>`;
 };
@@ -2562,7 +2904,7 @@ V.interviews = (f) => {
       <div class="kv"><span class="k">Paid</span><span class="v n">$95 · Visa ending 4242</span></div>
     </div>
     <div class="btn-set mt5">
-      <button class="btn btn-p">Join the interview ${I.video}</button>
+      <button class="btn btn-p" data-call="iv">Join the interview ${I.video}</button>
       <button class="btn btn-t">Add to calendar ${I.calendar}</button>
       <button class="btn btn-t" data-go="agents">Reschedule or cancel ${I.time}</button>
     </div>
@@ -3155,7 +3497,7 @@ V.cohort = (f) => `<main class="main"><div class="page">
       <div class="plate-t">Cohort 41, week ${f.week}</div>
       <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join call ${I.video}</button>
+        <button class="btn btn-p btn-sm noic" data-call="cohort">Join call ${I.video}</button>
         <button class="btn btn-sm noic plate-b2">Add to calendar</button>
       </div>
     </div>
@@ -4247,6 +4589,11 @@ function signedSummary(withNote, re, footAction){
    `taken`      each stage's own stepper prints a quiz date, and the block
                 cannot contradict a line three inches above it. consult was
                 sat on 3 Aug; from `new` on, the stepper says 12 Aug.
+                ALL THREE CALL SITES NOW PASS `qzTaken()`, which is that rule
+                as a function — the Quiz result page has to say the same date
+                and two literals in two files is one edit away from
+                disagreeing. The parameter stays: a caller with a different
+                date is the whole reason it is a parameter.
    `levelNote`  the fourth cell's job is to say what WILL set the level, and
                 by `booked` that is a named agent on a known date rather than
                 an interview nobody has arranged. Same "Not set" value, more
@@ -4306,7 +4653,7 @@ function signedSummary(withNote, re, footAction){
    block. `consult`, `new` and `booked` print the same four figures. */
 function quizResults(taken, levelNote){
   return `<div class="sec tint cards">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
+      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="result">See full breakdown</button></div>
       <div class="stats">
         ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
         ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
@@ -4375,6 +4722,20 @@ function standRow(g){
 function render(){
   const f = cfg(S.stage);
   let html;
+  /* A LIVE CALL IS NOT A PAGE, so it takes the frame: no app bar, no rail, no
+     Tal. It is FIRST because it is on top of everything — whatever page you
+     pressed Join on is still what `S.view` says and is what comes back when
+     the call ends, so the branch cannot be keyed on the view.
+
+     `callScreen` LIVES IN ai10.js, the last file in the bundle, so it is
+     undefined at every render until that file is parsed — which is exactly
+     the shape the `nil` branch below has and is safe for the same reason:
+     `S.call` starts null and only ai10's own router can set it, so the guard
+     can never be the thing that decides whether a call is showing. §60 draws
+     it; ai10 holds the state, the copy and the clock. */
+  if(S.call && typeof callScreen === 'function'){
+    html = callScreen();
+  } else
   /* THE RUN-UP IS NOT THE PRODUCT, so it gets neither shell nor auth card:
      nil.js draws its own site bar and its own scroller, and the branch is
      first because `nil` is first in the journey. TEMPORARY — this branch, the
@@ -4421,7 +4782,12 @@ function render(){
          + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
          + (S.view==='account'?profileSheet()+photoSheet():'');
   }
-  const key = S.stage + '/' + S.view;
+  /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
+     leaving: without it, joining a call is a repaint of the same stage and
+     view, `entered` is false, and §60's entrance never plays — while every
+     mute press, which IS the same surface, would replay it if the key were
+     the kind alone. Opening and closing each change the key exactly once. */
+  const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
   const OVERLAYS = ['nav','notif','tal','editProfile','editPhoto','addCard','notes'];
   /* `data-open` is a TRANSITION MARKER and it is meant to be: §13.2 gates every

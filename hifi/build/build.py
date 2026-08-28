@@ -321,7 +321,47 @@ css = '\n'.join((here / f).read_text() for f in
                  # made an inline `style="color:…"` come out of views.js: trap
                  # 1, no rule could have won against it. After §10 (the margins
                  # and the helper ink) and §11 (the type).
-                 '58-finding.css'])
+                 '58-finding.css',
+                 # TWO PRIORITIES FOR THE DARK CARD, AND TWO MORE THINGS FOR
+                 # THE WING. Maryam's rule: the black wall plus the warm haze is
+                 # the loudest object the product draws and it is spent on an
+                 # action that is time-sensitive — a call today, something due
+                 # now. Outside twenty-four hours the same card goes QUIET: no
+                 # ground, no haze, the ink flipped by re-pointing the three
+                 # `--on-dark*` tokens, and in the head band a vertical rule
+                 # taking over the job the card's black edge was doing of saying
+                 # where column one stops. `plateUrgent` (ai5.js) is what
+                 # decides and the argument is written there. Riding with it:
+                 # the wing's two new blocks — the course progress strip from
+                 # week 1 and the ladder once promoted — which need a gutter and
+                 # a track colour each, because both are page components
+                 # borrowed into the band (trap 10) and one of them was drawn
+                 # for a black card.
+                 # LAST, and every part of it has to be: the quiet card
+                 # contradicts §15's ground and on-dark ink, §21's haze and
+                 # §56's asymmetric column padding, and three of §56's rules are
+                 # inside `@container app (min-width:900px)` so per trap 3 they
+                 # can only be answered from inside the same query.
+                 '59-priority.css',
+                 # THE LIVE CALL — the first surface in the build that is not a
+                 # page: Join on an interview or on the weekly cohort call now
+                 # opens it, and ai10.js holds its state, its copy and its
+                 # clock. `call*` is a name no earlier layer mentions, so its
+                 # position is nearly free; it is last because it is new, and
+                 # because the two rules that reach outside the prefix — the
+                 # leave button's height, correcting §02's 48px `.btn`, and the
+                 # aside's `--pad-x`, correcting §10's page gutter — have to
+                 # land after the layers they correct.
+                 '60-call.css',
+                 # THE QUIZ ROSE. "See full breakdown" went to My Level, which
+                 # is the page about the ladder and holds none of the quiz;
+                 # `V.result` is the breakdown itself — five bands as wedges
+                 # from a hub, the score in the middle, and what the answers
+                 # did well and badly under it. `qz*` is a name no earlier
+                 # layer mentions; it is last because it is newest, and its one
+                 # rule that needs the position is `.qz-vd`, a `.tag`, which
+                 # §02 fills and §11 sizes.
+                 '61-quizrose.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -725,7 +765,21 @@ js = award_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() f
                                                         # no route, and per trap 9 it keeps nothing — which
                                                         # answer is last is recomputed after every render
                                                         # rather than remembered.
-                                                        'ai9.js'])
+                                                        'ai9.js',
+                                                        # THE LIVE CALL. Join did nothing on any of the four
+                                                        # appointments the candidate can be in; this is the
+                                                        # surface it opens — the interview, the re-interview
+                                                        # and the weekly cohort call, drawn by §59.
+                                                        # LAST, and three things in it need to be. It reads
+                                                        # `bkAgent` / `bkShort` from ai7.js so a call names
+                                                        # the agent Tal actually booked rather than keeping
+                                                        # its own copy of the slot; it wraps `setStage` and
+                                                        # `go`, both of which every earlier pass calls; and
+                                                        # `callScreen` is what views.js's first render branch
+                                                        # looks for, which is only reachable once a Join has
+                                                        # been pressed. It reads `COHORT`, `CH`, `AV`, `cfg`
+                                                        # and `who` from views.js and data.js.
+                                                        'ai10.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.

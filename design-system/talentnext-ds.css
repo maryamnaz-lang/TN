@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 3792.  Rules dropped as product-specific: 173.
+   Rules kept: 3877.  Rules dropped as product-specific: 173.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -5037,10 +5037,10 @@ button.btn-p:active,
 
 /* ---- 25-modhead.css ---- */
 .modhead{position:relative; isolation:isolate}
-.app .modhead::before{--wash-warm:color-mix(in srgb, var(--tal-chip-1) 70%, transparent); content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background-image:
-    radial-gradient(47.1% 117.8% at 107.7% 80.9%,
+.app .modhead::before{--wash-warm:color-mix(in srgb, var(--tal-chip-1) 50%, transparent); content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background-image:
+    radial-gradient(48.1% 79.3% at 101.1% 85.9%,
       var(--tal-chip-2) 0%, var(--tal-chip-2) 26%, transparent 100%),
-    radial-gradient(60.6% 99.0% at 43.4% 63.8%,
+    radial-gradient(51.6% 102.5% at 87.6% 36.5%,
       var(--wash-warm) 0%, var(--wash-warm) 26%, transparent 100%)}
 .app .modhead::after{content:''; position:absolute; left:0; right:0; bottom:0; height:1px; background:var(--rule); pointer-events:none}
 .app .modhead > .ph::after,
@@ -6611,3 +6611,119 @@ button.btn-p:active,
 .app .ai-body .t-label-01.sig-l{color:var(--text-primary); margin-top:var(--s07)}
 .app .signed .ai-body > .t-label-01.sig-l:first-child,
 .app .ai-body > .t-label-01.sig-l:first-child{margin-top:0}
+
+/* ---- 59-priority.css ---- */
+.app .wing-prog .prog,
+.app .wing-lvl .prog{--pad-x:0px}
+.app .wing-prog .prog-figs > span:first-child,
+.app .wing-lvl .prog-figs > span:first-child{padding-left:var(--s05)}
+.app .wing-lvl .ladder i{background:var(--layer-accent-01)}
+.app .wing-lvl .ladder i.done{background:var(--accent); opacity:.55}
+.app .wing-lvl .ladder i.on{background:var(--accent); opacity:1}
+.app .wing-lvl .ladder-lab{color:var(--text-helper)}
+.app .wing-lvl .prog-pct{font-variant-numeric:normal; font-feature-settings:normal}
+.app .wing-lvl .prog-dn small{font-size:12.5px; font-weight:400; letter-spacing:.2px; color:var(--text-secondary)}
+.app .plate.plate-quiet{background-color:transparent; color:var(--text-primary); --on-dark:var(--text-primary); --on-dark-2:var(--text-secondary); --on-dark-border:var(--rule); --on-brand-fill:0}
+.app .plate.plate-quiet > .dark-glow{display:none}
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-dark .plate.plate-quiet) > .sec-dark{padding-left:var(--pad-x); border-left:1px solid var(--rule)}
+  .app .modhead .sec-dark > .plate.plate-quiet{padding:0}
+}
+@container app (max-width:899.98px){
+  .app .modhead .plate.plate-quiet{padding-top:var(--s06); border-top:1px solid var(--rule)}
+}
+
+/* ---- 60-call.css ---- */
+.app .call{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; background:var(--background)}
+.app .call-bar{flex:none; display:flex; align-items:center; gap:var(--s04); padding:var(--s04) var(--pad-x); background:var(--surface-dark); color:var(--on-dark)}
+.app .call-id{min-width:0; display:flex; flex-direction:column; gap:2px}
+.app .call-ttl{font-size:15px; line-height:20px; font-weight:600; letter-spacing:-.2px; color:var(--on-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.app .call-sub{font-size:12.5px; line-height:18px; letter-spacing:.2px; color:var(--on-dark-2)}
+@container app (min-width:600px){
+  .app .call-id{flex-direction:row; align-items:baseline; gap:var(--s04); flex-wrap:wrap}
+}
+.app .call-rec{flex:none; display:inline-flex; align-items:center; gap:var(--s03); padding:3px var(--s03); border:1px solid rgba(255,255,255,.34); font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--on-dark)}
+.app .call-rec i{display:block; width:7px; height:7px; border-radius:50%; background:var(--on-dark); animation:call-rec 2s var(--ease-standard) infinite}
+@keyframes call-rec{0%,100%{opacity:1} 50%{opacity:.28}}
+.app .call-clock{flex:none; margin-left:auto; font-size:15px; line-height:20px; font-weight:600; letter-spacing:.4px; font-variant-numeric:tabular-nums; color:var(--on-dark)}
+.app .call-body{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow-y:auto}
+.app .call-stage{flex:none; display:flex; flex-direction:column; gap:var(--s04); padding:var(--s05) var(--pad-x); min-width:0}
+@container app (min-width:900px){
+  .app .call-body{flex-direction:row; overflow:hidden}
+  .app .call-stage{flex:1 1 auto; min-height:0; overflow:hidden}
+  .app .call-side{flex:0 0 328px; width:328px; border-top:0; border-left:1px solid var(--border-subtle-01)}
+}
+.app .call-main{position:relative; flex:none; width:100%; aspect-ratio:16 / 9; min-height:180px; overflow:hidden; background-color:var(--surface-dark); background-size:cover; background-position:center 24%}
+@container app (min-width:900px){
+  .app .call-main{flex:1 1 auto; aspect-ratio:auto; min-height:0}
+}
+.app .call-main::before{content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,
+    rgba(17,17,17,.42) 0%, rgba(17,17,17,.16) 34%,
+    rgba(17,17,17,.24) 66%, rgba(17,17,17,.62) 100%)}
+.app .call-nm{position:absolute; left:var(--s04); bottom:var(--s04); z-index:2; max-width:calc(100% - var(--s07)); padding:3px var(--s03); background:rgba(17,17,17,.76); color:var(--on-dark); font-size:11.5px; line-height:16px; font-weight:600; letter-spacing:.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.app .call-nm em{font-style:normal; color:var(--on-dark-2); font-weight:400}
+.app .call-cap{position:absolute; top:var(--s04); left:var(--s04); right:var(--s04); z-index:2; margin:0 auto; width:max-content; max-width:calc(100% - var(--s05)); padding:4px var(--s04); background:rgba(17,17,17,.76); color:var(--on-dark); font-size:12.5px; line-height:18px; letter-spacing:.2px; text-align:center}
+.app .call-self{position:absolute; right:var(--s04); bottom:var(--s04); z-index:2; width:34%; max-width:184px; min-width:108px; aspect-ratio:16 / 9; overflow:hidden; background-color:var(--surface-dark-2); background-size:cover; background-position:center 22%; box-shadow:0 0 0 1px rgba(255,255,255,.28)}
+.app .call-self .call-nm{left:6px; bottom:6px; padding:2px 6px; font-size:10.5px; line-height:14px; max-width:calc(100% - 12px)}
+.app .call-strip{flex:none; display:flex; gap:var(--s03); overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; padding-bottom:2px}
+.app .call-mem{position:relative; flex:0 0 116px; aspect-ratio:16 / 9; overflow:hidden; background-color:var(--surface-dark); background-size:cover; background-position:center 22%}
+.app .call-mem::before{content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,
+    rgba(17,17,17,.10) 0%, rgba(17,17,17,.22) 58%, rgba(17,17,17,.66) 100%)}
+.app .call-mem .call-nm{left:5px; right:5px; bottom:5px; padding:2px 5px; font-size:10px; line-height:14px; max-width:none}
+.app .call-more{flex:0 0 116px; aspect-ratio:16 / 9; display:grid; place-items:center; border:1px solid var(--border-subtle-02); background:var(--layer-02); font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
+@container app (min-width:900px){
+  .app .call-mem,
+  .app .call-more{flex:1 1 116px; max-width:172px}
+}
+.app .call-side{flex:none; min-width:0; padding:var(--s05) var(--pad-x); background:var(--surface-2); border-top:1px solid var(--border-subtle-01); overflow-y:auto; --pad-x:var(--s05)}
+.app .call-panel + .call-panel{margin-top:var(--s05); padding-top:var(--s05); border-top:1px solid var(--rule-on-2)}
+.app .call-panel .kv{border-bottom-color:var(--rule-on-2)}
+.app .call-panel .call-legal{margin:var(--s04) 0 0; color:var(--text-helper)}
+.app .call-panel > p{margin:0}
+.app .call-foot{flex:none; display:flex; align-items:center; gap:var(--s03); padding:var(--s03) var(--pad-x); background:var(--layer-01); border-top:1px solid var(--border-subtle-01)}
+.app .call-ctl{display:inline-flex; align-items:center; gap:var(--s03); min-height:40px; padding:0 var(--s04); border:1px solid var(--border-subtle-02); border-radius:var(--radius); background:var(--layer-01); color:var(--text-primary); font-size:13px; font-weight:600; letter-spacing:.2px; cursor:pointer; transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .call-ctl svg{width:16px; height:16px; flex:none; fill:currentColor}
+.app .call-ctl.off{background:var(--brand-primary); border-color:var(--brand-primary); color:var(--on-brand)}
+.app .call-ctl:hover:where(.__nh){background:var(--overlay-hover)}
+.app .call-ctl.off:hover:where(.__nh){background:var(--brand-primary-hover)}
+.app .call-ctl.call-count{cursor:default; color:var(--text-secondary)}
+.app .call-leave{margin-left:auto; flex:none}
+.app .call .btn.call-leave{min-height:40px; padding:0 var(--s05)}
+@container app (max-width:599px){
+  .app .call-ctl{padding:0 var(--s04); gap:0}
+  .app .call-ctl span{display:none}
+  .app .call-ctl.call-count{display:none}
+}
+.app[data-enter] .call{animation:call-in var(--dur-standard) var(--ease-decelerate) both}
+@keyframes call-in{from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .app .call-rec i{animation:none; opacity:1}
+  .app[data-enter] .call{animation:none}
+}
+
+/* ---- 61-quizrose.css ---- */
+.app .qz-rose{display:block}
+.app .qz-svg{display:block; width:100%; max-width:420px; height:auto; margin:0 auto}
+.app .qz-lab{font-size:10.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; fill:var(--text-secondary)}
+.app .qz-val{font-size:12px; font-weight:600; letter-spacing:.2px; font-variant-numeric:tabular-nums; fill:var(--text-primary)}
+.app .qz-val.on{fill:var(--on-dark)}
+.app .qz-mid{font-size:26px; font-weight:600; letter-spacing:-.6px; font-variant-numeric:tabular-nums; fill:var(--text-primary)}
+.app .qz-mids{font-size:9.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; fill:var(--text-helper)}
+.app .qz-key{margin-top:var(--s05)}
+.app .qz-key .kv .k{display:flex; align-items:center; gap:var(--s03)}
+.app .qz-key .kv .v{display:flex; align-items:center; gap:var(--s03)}
+.app .qz-sw{flex:none; display:block; width:12px; height:12px; border:1px solid var(--chart-ink); background:var(--layer-01)}
+.app .qz-sw.s{background:var(--chart-ink)}
+.app .qz-sw.m{background:repeating-linear-gradient(45deg,
+    var(--chart-ink) 0 2px, var(--layer-01) 2px 6px)}
+.app .qz-key .tag.qz-vd{min-width:58px; justify-content:center; text-align:center}
+.app .qz-note{margin:var(--s05) 0 0}
+.app .qz-row{display:grid; grid-template-columns:auto 1fr; align-items:start; gap:var(--s04); padding:var(--s03) 0; border-bottom:1px solid var(--border-subtle-01)}
+.app .qz-row:last-child{border-bottom:0}
+.app .qz-t{font-size:14px; line-height:20px; letter-spacing:.1px; color:var(--text-primary)}
+.app .qz-mk{flex:none; display:grid; place-items:center; width:24px; height:24px; border-radius:50%; margin-top:-1px}
+.app .qz-mk svg{width:15px; height:15px; fill:var(--text-primary)}
+.app .qz-mk.ok{background:var(--accent)}
+.app .qz-mk.wa{background:var(--brand-tint-2)}

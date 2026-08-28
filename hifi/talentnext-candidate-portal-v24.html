@@ -5553,12 +5553,12 @@ button.btn-p:active,
   position:relative;
   isolation:isolate}
 .app .modhead::before{
-  --wash-warm:color-mix(in srgb, var(--tal-chip-1) 70%, transparent);
+  --wash-warm:color-mix(in srgb, var(--tal-chip-1) 50%, transparent);
   content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;
   background-image:
-    radial-gradient(47.1% 117.8% at 107.7% 80.9%,
+    radial-gradient(48.1% 79.3% at 101.1% 85.9%,
       var(--tal-chip-2) 0%, var(--tal-chip-2) 26%, transparent 100%),
-    radial-gradient(60.6% 99.0% at 43.4% 63.8%,
+    radial-gradient(51.6% 102.5% at 87.6% 36.5%,
       var(--wash-warm) 0%, var(--wash-warm) 26%, transparent 100%)}
 .app .modhead::after{
   content:'';position:absolute;left:0;right:0;bottom:0;height:1px;
@@ -8667,6 +8667,240 @@ button.btn-p:active,
   margin-top:var(--s07)}
 .app .signed .ai-body > .t-label-01.sig-l:first-child,
 .app .ai-body > .t-label-01.sig-l:first-child{margin-top:0}
+.app .wing-prog .prog,
+.app .wing-lvl .prog{--pad-x:0px}
+.app .wing-prog .prog-figs > span:first-child,
+.app .wing-lvl .prog-figs > span:first-child{padding-left:var(--s05)}
+.app .wing-lvl .ladder i{background:var(--layer-accent-01)}
+.app .wing-lvl .ladder i.done{background:var(--accent);opacity:.55}
+.app .wing-lvl .ladder i.on{background:var(--accent);opacity:1}
+.app .wing-lvl .ladder-lab{color:var(--text-helper)}
+.app .wing-lvl .prog-pct{font-variant-numeric:normal;font-feature-settings:normal}
+.app .wing-lvl .prog-dn small{
+  font-size:12.5px;font-weight:400;letter-spacing:.2px;color:var(--text-secondary)}
+.app .plate.plate-quiet{
+  background-color:transparent;
+  color:var(--text-primary);
+  --on-dark:var(--text-primary);
+  --on-dark-2:var(--text-secondary);
+  --on-dark-border:var(--rule);
+  --on-brand-fill:0}
+.app .plate.plate-quiet > .dark-glow{display:none}
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-dark .plate.plate-quiet) > .sec-dark{
+    padding-left:var(--pad-x);
+    border-left:1px solid var(--rule)}
+  .app .modhead .sec-dark > .plate.plate-quiet{padding:0}
+}
+@container app (max-width:899.98px){
+  .app .modhead .plate.plate-quiet{
+    padding-top:var(--s06);
+    border-top:1px solid var(--rule)}
+}
+.app .call{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  background:var(--background)}
+.app .call-bar{
+  flex:none;display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--pad-x);
+  background:var(--surface-dark);color:var(--on-dark)}
+.app .call-id{
+  min-width:0;display:flex;flex-direction:column;gap:2px}
+.app .call-ttl{
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:-.2px;
+  color:var(--on-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .call-sub{
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;
+  color:var(--on-dark-2)}
+@container app (min-width:600px){
+  .app .call-id{flex-direction:row;align-items:baseline;gap:var(--s04);flex-wrap:wrap}
+}
+.app .call-rec{
+  flex:none;display:inline-flex;align-items:center;gap:var(--s03);
+  padding:3px var(--s03);
+  border:1px solid rgba(255,255,255,.34);
+  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;color:var(--on-dark)}
+.app .call-rec i{
+  display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--on-dark);
+  animation:call-rec 2s var(--ease-standard) infinite}
+@keyframes call-rec{
+  0%,100%{opacity:1}
+  50%{opacity:.28}
+}
+.app .call-clock{
+  flex:none;margin-left:auto;
+  font-size:15px;line-height:20px;font-weight:600;letter-spacing:.4px;
+  font-variant-numeric:tabular-nums;color:var(--on-dark)}
+.app .call-body{
+  flex:1 1 auto;min-height:0;display:flex;flex-direction:column;
+  overflow-y:auto}
+.app .call-stage{
+  flex:none;display:flex;flex-direction:column;gap:var(--s04);
+  padding:var(--s05) var(--pad-x);min-width:0}
+@container app (min-width:900px){
+  .app .call-body{flex-direction:row;overflow:hidden}
+  .app .call-stage{flex:1 1 auto;min-height:0;overflow:hidden}
+  .app .call-side{
+    flex:0 0 328px;width:328px;
+    border-top:0;border-left:1px solid var(--border-subtle-01)}
+}
+.app .call-main{
+  position:relative;flex:none;width:100%;aspect-ratio:16 / 9;
+  min-height:180px;overflow:hidden;
+  background-color:var(--surface-dark);
+  background-size:cover;background-position:center 24%}
+@container app (min-width:900px){
+  .app .call-main{flex:1 1 auto;aspect-ratio:auto;min-height:0}
+}
+.app .call-main::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(17,17,17,.42) 0%, rgba(17,17,17,.16) 34%,
+    rgba(17,17,17,.24) 66%, rgba(17,17,17,.62) 100%)}
+.app .call-nm{
+  position:absolute;left:var(--s04);bottom:var(--s04);z-index:2;
+  max-width:calc(100% - var(--s07));
+  padding:3px var(--s03);
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:11.5px;line-height:16px;font-weight:600;letter-spacing:.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .call-nm em{font-style:normal;color:var(--on-dark-2);font-weight:400}
+.app .call-cap{
+  position:absolute;top:var(--s04);left:var(--s04);right:var(--s04);z-index:2;
+  margin:0 auto;width:max-content;max-width:calc(100% - var(--s05));
+  padding:4px var(--s04);
+  background:rgba(17,17,17,.76);color:var(--on-dark);
+  font-size:12.5px;line-height:18px;letter-spacing:.2px;text-align:center}
+.app .call-self{
+  position:absolute;right:var(--s04);bottom:var(--s04);z-index:2;
+  width:34%;max-width:184px;min-width:108px;aspect-ratio:16 / 9;
+  overflow:hidden;
+  background-color:var(--surface-dark-2);
+  background-size:cover;background-position:center 22%;
+  box-shadow:0 0 0 1px rgba(255,255,255,.28)}
+.app .call-self .call-nm{
+  left:6px;bottom:6px;padding:2px 6px;font-size:10.5px;line-height:14px;
+  max-width:calc(100% - 12px)}
+.app .call-strip{
+  flex:none;display:flex;gap:var(--s03);
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:thin;padding-bottom:2px}
+.app .call-mem{
+  position:relative;flex:0 0 116px;aspect-ratio:16 / 9;overflow:hidden;
+  background-color:var(--surface-dark);
+  background-size:cover;background-position:center 22%}
+.app .call-mem::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(17,17,17,.10) 0%, rgba(17,17,17,.22) 58%, rgba(17,17,17,.66) 100%)}
+.app .call-mem .call-nm{
+  left:5px;right:5px;bottom:5px;padding:2px 5px;
+  font-size:10px;line-height:14px;max-width:none}
+.app .call-more{
+  flex:0 0 116px;aspect-ratio:16 / 9;
+  display:grid;place-items:center;
+  border:1px solid var(--border-subtle-02);
+  background:var(--layer-02);
+  font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;
+  color:var(--text-secondary)}
+@container app (min-width:900px){
+  .app .call-mem,.app .call-more{flex:1 1 116px;max-width:172px}
+}
+.app .call-side{
+  flex:none;min-width:0;
+  padding:var(--s05) var(--pad-x);
+  background:var(--surface-2);
+  border-top:1px solid var(--border-subtle-01);
+  overflow-y:auto;--pad-x:var(--s05)}
+.app .call-panel + .call-panel{
+  margin-top:var(--s05);padding-top:var(--s05);
+  border-top:1px solid var(--rule-on-2)}
+.app .call-panel .kv{border-bottom-color:var(--rule-on-2)}
+.app .call-panel .call-legal{
+  margin:var(--s04) 0 0;color:var(--text-helper)}
+.app .call-panel > p{margin:0}
+.app .call-foot{
+  flex:none;display:flex;align-items:center;gap:var(--s03);
+  padding:var(--s03) var(--pad-x);
+  background:var(--layer-01);
+  border-top:1px solid var(--border-subtle-01)}
+.app .call-ctl{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  min-height:40px;padding:0 var(--s04);
+  border:1px solid var(--border-subtle-02);border-radius:var(--radius);
+  background:var(--layer-01);color:var(--text-primary);
+  font-size:13px;font-weight:600;letter-spacing:.2px;cursor:pointer;
+  transition:background var(--dur-short) var(--ease-standard),
+             border-color var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .call-ctl svg{width:16px;height:16px;flex:none;fill:currentColor}
+.app .call-ctl.off{
+  background:var(--brand-primary);border-color:var(--brand-primary);
+  color:var(--on-brand)}
+.app .call-ctl:hover:where(.__nh){background:var(--overlay-hover)}
+.app .call-ctl.off:hover:where(.__nh){background:var(--brand-primary-hover)}
+.app .call-ctl.call-count{cursor:default;color:var(--text-secondary)}
+.app .call-leave{margin-left:auto;flex:none}
+.app .call .btn.call-leave{min-height:40px;padding:0 var(--s05)}
+@container app (max-width:599px){
+  .app .call-ctl{padding:0 var(--s04);gap:0}
+  .app .call-ctl span{display:none}
+  .app .call-ctl.call-count{display:none}
+}
+.app[data-enter] .call{
+  animation:call-in var(--dur-standard) var(--ease-decelerate) both}
+@keyframes call-in{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .app .call-rec i{animation:none;opacity:1}
+  .app[data-enter] .call{animation:none}
+}
+.app .qz-rose{display:block}
+.app .qz-svg{
+  display:block;width:100%;max-width:420px;height:auto;margin:0 auto}
+.app .qz-lab{
+  font-size:10.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;fill:var(--text-secondary)}
+.app .qz-val{
+  font-size:12px;font-weight:600;letter-spacing:.2px;
+  font-variant-numeric:tabular-nums;fill:var(--text-primary)}
+.app .qz-val.on{fill:var(--on-dark)}
+.app .qz-mid{
+  font-size:26px;font-weight:600;letter-spacing:-.6px;
+  font-variant-numeric:tabular-nums;fill:var(--text-primary)}
+.app .qz-mids{
+  font-size:9.5px;font-weight:600;letter-spacing:.8px;
+  text-transform:uppercase;fill:var(--text-helper)}
+.app .qz-key{margin-top:var(--s05)}
+.app .qz-key .kv .k{display:flex;align-items:center;gap:var(--s03)}
+.app .qz-key .kv .v{display:flex;align-items:center;gap:var(--s03)}
+.app .qz-sw{
+  flex:none;display:block;width:12px;height:12px;
+  border:1px solid var(--chart-ink);background:var(--layer-01)}
+.app .qz-sw.s{background:var(--chart-ink)}
+.app .qz-sw.m{
+  background:repeating-linear-gradient(45deg,
+    var(--chart-ink) 0 2px, var(--layer-01) 2px 6px)}
+.app .qz-key .tag.qz-vd{
+  min-width:58px;justify-content:center;text-align:center}
+.app .qz-note{margin:var(--s05) 0 0}
+.app .qz-row{
+  display:grid;grid-template-columns:auto 1fr;align-items:start;
+  gap:var(--s04);padding:var(--s03) 0;
+  border-bottom:1px solid var(--border-subtle-01)}
+.app .qz-row:last-child{border-bottom:0}
+.app .qz-t{
+  font-size:14px;line-height:20px;letter-spacing:.1px;color:var(--text-primary)}
+.app .qz-mk{
+  flex:none;display:grid;place-items:center;
+  width:24px;height:24px;border-radius:50%;margin-top:-1px}
+.app .qz-mk svg{width:15px;height:15px;fill:var(--text-primary)}
+.app .qz-mk.ok{background:var(--accent)}
+.app .qz-mk.wa{background:var(--brand-tint-2)}
 
 </style>
 </head>
@@ -9983,34 +10217,60 @@ const enrolPlate = lvl => `<div class="sec">
       </div>
     </div>`;
 
-const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course','Re-interview'];
+const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course'];
 function journey(){
-  const f = cfg(S.stage);
   const row = (sts, secs) => JRN.map((lab,i) => ({st:sts[i], lab, sec:secs[i]}));
-  const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week','Sets your next rung'];
+  const AHEAD = ['Locks in your cohort and your price','13 chapters, one a week'];
+  const LEVELLED = row(['done','done','on',''],
+    ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
+     'Not enrolled yet', AHEAD[1]]);
   switch(S.stage){
-    case 'consult': return row(['done','on','','',''],
+    case 'consult': return row(['done','on','',''],
       ['Explorer track &middot; Aug 3',
        'Jordan calls Thu, Aug 13 &middot; an agent sets your level', ...AHEAD]);
-    case 'new': return row(['done','on','','',''],
+    case 'new': return row(['done','on','',''],
       ['Explorer track &middot; Aug 12', 'Not booked yet &middot; 45 minutes', ...AHEAD]);
-    case 'booked': return row(['done','on','','',''],
+    case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
-    case 'assessed': return row(['done','done','on','',''],
-      ['Explorer track &middot; Aug 12', 'E3 &middot; signed by Priya, Aug 21',
-       'Not enrolled yet', AHEAD[1], AHEAD[2]]);
-    case 'promoted': return row(['done','done','done','done','done'],
-      ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
-       `All 13 chapters &middot; ${f.avg}% average`, 'Promoted to E4 &middot; Nov 21']);
-    default: {                                  /* week1, day34, day90 */
-      const past = !!f.finished;
-      return row(['done','done','done', past?'done':'on', past?'on':''],
-        ['Explorer track', 'E3 &middot; confirmed Aug 21', 'Cohort 41 &middot; started Aug 25',
-         past ? `All 13 chapters &middot; ${f.avg}% average`
-              : `Week ${f.week} of 13 &middot; ${f.done} of 13 chapters done`,
-         past ? 'Due now &mdash; book to have your 90 days assessed' : 'Sets your next rung']);
-    }
+    case 'assessed': return LEVELLED;
+    default: return LEVELLED;
   }
+}
+
+const wingHead = t => `<div class="stp-top"><h2 class="u-h3">${t}</h2></div>`;
+
+const progressWing = f => `<div class="stp stp-open stp-titled wing-prog">
+    ${wingHead('Your 90 days so far')}
+    ${progressStrip(f)}
+  </div>`;
+
+const ladderWing = f => `<div class="stp stp-open stp-titled wing-lvl">
+    ${wingHead('Where you are on the ladder')}
+    <div class="prog">
+      <div class="prog-top">
+        <div><div class="prog-pct">${f.level}</div>
+          <div class="prog-l">confirmed at your re-interview</div></div>
+        <div class="prog-day"><div class="prog-dn">${rungOf(f.level)}<small> of 15</small></div>
+          <div class="prog-l">on the ladder</div></div>
+      </div>
+      ${ladder(f.level)}
+      <div class="prog-figs">
+        <span><b>Dec 1</b>next cohort opens</span>
+        <span><b>${CH.length}</b>chapters at E4</span>
+        ${''/* "then you re-interview" and not "to your next re-interview":
+              §10.16 sets these labels at 10.5px uppercase in a third of the
+              wing, and the longer wording ran to three lines while the two
+              beside it took one, which stretched the whole row to fit it. */}
+        <span><b>90 days</b>then you re-interview</span>
+      </div>
+    </div>
+  </div>`;
+
+function wingBlock(){
+  const f = cfg(S.stage);
+  if(f.complete) return ladderWing(f);
+  if(f.enrolled) return progressWing(f);
+  return stepper(journey());
 }
 
 const AUTH_ART = `
@@ -10236,7 +10496,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
         <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in &mdash; peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">
           ${askChip('What happens on the consultant call?','What happens on the call?')}
@@ -10278,7 +10538,7 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${quizResults('3 Aug', 'the interview decides it')}
+    ${quizResults(qzTaken(), 'the interview decides it')}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -10298,7 +10558,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot noline">
           <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
@@ -10346,7 +10606,7 @@ V.dashboard = (f) => {
       <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
     </div>
     ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
-    ${quizResults('12 Aug', 'the interview decides it')}
+    ${quizResults(qzTaken(), 'the interview decides it')}
     ${''/* "DECIDED SO FAR" WAS HERE AND IS GONE, and it was the third telling of
           one fact. Two `.gcard`s said the track is Explorer and that a 90-day
           course follows — and the quiz block directly above already prints
@@ -10371,7 +10631,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
           <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
@@ -10385,7 +10645,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Your level interview</div>
         <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
+          <button class="btn btn-p btn-sm noic" data-call="iv">Join ${I.video}</button>
           <button class="btn btn-sm noic plate-b2" data-go="interviews">Reschedule</button>
         </div>
       </div>
@@ -10465,7 +10725,7 @@ V.dashboard = (f) => {
       </div>
     </div>
     ${''/* on this stage the "what sets it" answer has a name and a date on it */}
-    ${quizResults('12 Aug', 'Priya sets it on 20 Aug')}`;
+    ${quizResults(qzTaken(), 'Priya sets it on 20 Aug')}`;
 
   else if(S.stage==='assessed') body = `
     ${ph('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
@@ -10474,7 +10734,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
       </div>
@@ -10565,7 +10825,7 @@ V.dashboard = (f) => {
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
       </div>
     </div>
@@ -10683,7 +10943,7 @@ V.dashboard = (f) => {
           :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
           :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
         <div class="stp-wing">
-          ${stepper(journey())}
+          ${wingBlock()}
         </div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
@@ -10706,7 +10966,7 @@ V.dashboard = (f) => {
         <div class="plate-t">Cohort Week 36 Session</div>
         <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
         <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-go="cohort">Join Call ${I.video}</button>
+          <button class="btn btn-p btn-sm noic" data-call="cohort">Join Call ${I.video}</button>
         </div>
       </div>
     </div>`}
@@ -10741,7 +11001,19 @@ V.dashboard = (f) => {
       <div class="sec-h"><h2>This week</h2><button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button></div>
       ${weekCard(f)}
     </div>`}
-    <div class="sec" style="padding-bottom:var(--s06)">${progressStrip(f)}</div>
+    ${''/* THE PROGRESS STRIP WAS HERE AND IS NOW THE HEAD BAND'S WING.
+          It is the one block on this page that answers "where am I in the 90
+          days", which is exactly the question §56's wing exists to answer, and
+          it was doing it two thirds of the way down the page under the week
+          card. `wingBlock` (above `V.dashboard`) is where it is drawn now, in
+          the slot the journey row holds on the four stages before this one.
+          Drawn in both places it would be the same percentage, the same
+          thirteen blocks and the same three figures twice on one screen.
+
+          THE WEEKLY CHART STAYS DOWN HERE, and the difference is worth a line:
+          the strip is a POSITION (day 34 of 90) and belongs at the head with
+          the rest of the page's state, while the chart is a RECORD, thirteen
+          weeks of minutes, and is read after the work rather than before it. */}
     <div class="sec">
       <div class="tile" style="padding-top:var(--s05)">
         ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:g.weeks,
@@ -10825,6 +11097,148 @@ V.level = (f) => {
       <div class="acc-i"><button class="acc-h"><span class="ttl">Who decides</span><span class="chev">${I.chevDown}</span></button>
         <div class="acc-b"><p>A talent agent decides your level from the interview and signs the report. At the end of a course, your cohort leader decides whether you move up, hold or drop back, and writes the reason.</p></div></div>
     </div>
+  </div>
+</div></main>`;
+};
+
+
+const SCORES = [['Decisiveness',78],['Delegation',41],['Directness',66],
+                ['Coaching',38],['Composure',84]];
+const qzBand = v => v >= 70 ? ['s','Strong'] : v >= 50 ? ['m','Mixed'] : ['w','Weak'];
+const qzLow  = (n) => SCORES.slice().sort((a,b) => a[1] - b[1]).slice(0, n || 2);
+
+const QZ_STR = ['Execution under pressure','Comfortable with ambiguity',
+                'Holds a line under challenge'];
+const QZ_DEV = ['Delegates too late','Avoids conflict until it escalates',
+                'Coaches by telling'];
+
+const QZ_CH = {
+  Decisiveness:'Decisions Under Incomplete Information',
+  Delegation:  'Delegation Without Drop-Off',
+  Directness:  'Hard Conversations',
+  Coaching:    'Coaching vs Fixing',
+  Composure:   'Building Trust at Speed'};
+function qzChapter(band){
+  const t = QZ_CH[band], i = CH.findIndex(c => c[0] === t);
+  return i < 0 ? null : {n:i + 1, t};
+}
+
+const qzTaken = (long) => S.stage === 'consult'
+  ? (long ? '3 August 2026'  : '3 Aug')
+  : (long ? '12 August 2026' : '12 Aug');
+
+function quizRose(dims, score){
+  const CX = 180, CY = 158, R0 = 36, R = 108, GAP = 1.4;
+  const pol = (a,r) => [CX + r * Math.cos(a * Math.PI/180), CY + r * Math.sin(a * Math.PI/180)];
+  const seg = (a0,a1,r) => {
+    const [x0,y0] = pol(a0,R0), [x1,y1] = pol(a0,r), [x2,y2] = pol(a1,r), [x3,y3] = pol(a1,R0);
+    return `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`
+      + `A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${x2.toFixed(1)} ${y2.toFixed(1)}`
+      + `L${x3.toFixed(1)} ${y3.toFixed(1)}`
+      + `A${R0} ${R0} 0 0 0 ${x0.toFixed(1)} ${y0.toFixed(1)}Z`;
+  };
+  const step = 360 / dims.length;
+  const fill = v => ({s:'var(--chart-ink)', m:'url(#qzHatch)', w:'var(--layer-01)'})[qzBand(v)[0]];
+  const rings = [25,50,75,100].map(p =>
+    `<circle cx="${CX}" cy="${CY}" r="${(R0 + (p/100)*(R-R0)).toFixed(1)}" fill="none"
+      stroke="var(--border-subtle-01)" stroke-width="1" stroke-dasharray="2 4"/>`).join('');
+  const wedges = dims.map(([k,v],i) => {
+    const a0 = -90 + i*step + GAP, a1 = -90 + (i+1)*step - GAP;
+    return `<path d="${seg(a0,a1,R0 + (v/100)*(R-R0))}" fill="${fill(v)}"
+      stroke="var(--chart-ink)" stroke-width="1.2"/>`;
+  }).join('');
+  const marks = dims.map(([k,v],i) => {
+    const mid = -90 + i*step + step/2;
+    const [lx,ly] = pol(mid, R + 21);
+    const anchor = Math.abs(lx - CX) < 14 ? 'middle' : (lx > CX ? 'start' : 'end');
+    const [vx,vy] = pol(mid, R0 + (v/100)*(R-R0) - 15);
+    return `<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="${anchor}" class="qz-lab">${k}</text>
+      <text x="${vx.toFixed(1)}" y="${(vy+4).toFixed(1)}" text-anchor="middle"
+        class="qz-val${qzBand(v)[0] === 's' ? ' on' : ''}">${v}</text>`;
+  }).join('');
+  return `<div class="qz-rose">
+    ${''/* THE VIEWBOX IS WIDER THAN THE CHART, and by a measured amount. The
+          five band names sit 21px outside the outer ring and are anchored
+          `start` or `end`, so the longest of them runs past the plot: at 162°
+          COACHING ends at x=57 and reaches back to about -5, which an SVG
+          clips at the viewBox edge. 32px of room each side is the longest
+          label at 10.5px plus a little, and it is why the box is 424 wide for
+          a 360-wide drawing. `CX` is unchanged, so no coordinate moves. */}
+    <svg viewBox="-32 0 424 326" class="qz-svg" role="img"
+      aria-label="Quiz bands: ${dims.map(([k,v]) => k + ' ' + v).join(', ')}">
+      <defs><pattern id="qzHatch" width="6" height="6" patternTransform="rotate(45)"
+        patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="var(--layer-01)"/>
+        <line x1="0" y1="0" x2="0" y2="6" stroke="var(--chart-ink)" stroke-width="2"/></pattern></defs>
+      ${rings}${wedges}
+      <circle cx="${CX}" cy="${CY}" r="${R0}" fill="var(--layer-01)"
+        stroke="var(--chart-ink)" stroke-width="1.2"/>
+      <text x="${CX}" y="${CY-2}" text-anchor="middle" class="qz-mid">${score}</text>
+      <text x="${CX}" y="${CY+14}" text-anchor="middle" class="qz-mids">of 100</text>
+      ${marks}
+    </svg>
+    <div class="qz-key">
+      ${dims.map(([k,v]) => { const [cls,word] = qzBand(v);
+        return `<div class="kv"><span class="k"><i class="qz-sw ${cls}"></i>${k}</span>
+          <span class="v">${v}<span class="tag qz-vd">${word}</span></span></div>`; }).join('')}
+    </div>
+    <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
+      the interview probes hardest, and what the course spends most of its time on.</p>
+  </div>`;
+}
+
+V.result = (f) => {
+  const low = qzLow(2).map(([k,v]) => ({k, v, ch:qzChapter(k)}));
+  const mark = (ic, kind, txt) =>
+    `<div class="qz-row"><span class="qz-mk ${kind}">${ic}</span><span class="qz-t">${txt}</span></div>`;
+  return `<main class="main"><div class="page">
+  ${crumb(['My Level','level'],'Quiz result')}
+  ${ph('Quiz result', `Explorer track &middot; 64 of 100 &middot; taken ${qzTaken(true)}`)}
+  <div class="sec">
+    <div class="sec-h"><h2>How you scored</h2></div>
+    ${quizRose(SCORES, 64)}
+  </div>
+  ${''/* TWO LISTS UNDER ONE HEADING, and the heading is what stops them being
+        read as Priya's. `.sig-l` is the label the report already uses for
+        exactly this pair — §58 gives it full ink and 28px of air — and it is
+        scoped to `.ai-body`, which is why the tile has one. */}
+  <div class="sec">
+    <div class="sec-h"><h2>What the quiz saw</h2></div>
+    ${''/* THE SOURCE LINE IS THE TILE'S FOOT, NOT THE SECTION'S HELPER. At
+          desktop §10.15 gives this section a 184px label column — it holds a
+          `.tile`, which is not on the opt-out list — and "What the quiz saw"
+          is already three lines in it. A second line of helper text under
+          that put five lines of grey in a gutter beside a two-item list.
+          `.ai-foot` is where `V.report` puts "Written by Priya Nair from your
+          interview", which is the same sentence doing the same job: it says
+          whose reading this is, at the end of the reading. */}
+    <div class="tile">
+      <div class="ai-body">
+        <p class="t-label-01 sig-l">What you do well</p>
+        ${QZ_STR.map(s => mark(I.checkFilled, 'ok', s)).join('')}
+        <p class="t-label-01 sig-l">Where you lose ground</p>
+        ${QZ_DEV.map(s => mark(I.growth, 'wa', s)).join('')}
+      </div>
+      <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">From a hundred
+        multiple-choice answers &mdash; not from an interview</span></div>
+    </div>
+  </div>
+  ${''/* THE BRIDGE TO THE COURSE, and it is the reason this page exists rather
+        than being two paragraphs on My Level. The two weakest bands are
+        derived, their chapters are looked up in `CH`, and the action depends
+        on whether anybody has interviewed you yet: unlevelled, the next step
+        is the interview these two bands will be pushed on; levelled, the
+        report is where they were pushed. */}
+  <div class="sec tint">
+    <div class="sec-h"><h2>Where the course picks this up</h2></div>
+    ${low.map(b => `<div class="kv"><span class="k">${b.k} &middot; ${b.v}</span>
+      <span class="v">${b.ch ? `Chapter ${b.ch.n} &middot; ${b.ch.t}` : 'Not on this course'}</span></div>`).join('')}
+    <p class="t-helper-01 mt4">Your course opens at your level, and these two chapters are where the 90
+      days spend the most time. The quiz cannot tell them apart from a bad afternoon &mdash;
+      ${f.pred ? 'the interview is what does.' : 'the interview is what did.'}</p>
+    <div class="mt5">${f.pred
+      ? `<button class="btn btn-p" data-go="agents">Book your interview ${I.calendar}</button>`
+      : `<button class="btn btn-g" data-go="report">Read your report ${I.arrowRight}</button>`}</div>
   </div>
 </div></main>`;
 };
@@ -10968,7 +11382,7 @@ V.interviews = (f) => {
       <div class="kv"><span class="k">Paid</span><span class="v n">$95 · Visa ending 4242</span></div>
     </div>
     <div class="btn-set mt5">
-      <button class="btn btn-p">Join the interview ${I.video}</button>
+      <button class="btn btn-p" data-call="iv">Join the interview ${I.video}</button>
       <button class="btn btn-t">Add to calendar ${I.calendar}</button>
       <button class="btn btn-t" data-go="agents">Reschedule or cancel ${I.time}</button>
     </div>
@@ -11498,7 +11912,7 @@ V.cohort = (f) => `<main class="main"><div class="page">
       <div class="plate-t">Cohort 41, week ${f.week}</div>
       <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
       <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join call ${I.video}</button>
+        <button class="btn btn-p btn-sm noic" data-call="cohort">Join call ${I.video}</button>
         <button class="btn btn-sm noic plate-b2">Add to calendar</button>
       </div>
     </div>
@@ -12341,7 +12755,7 @@ function signedSummary(withNote, re, footAction){
 
 function quizResults(taken, levelNote){
   return `<div class="sec tint cards">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="level">See full breakdown</button></div>
+      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="result">See full breakdown</button></div>
       <div class="stats">
         ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
         ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
@@ -12386,6 +12800,9 @@ function standRow(g){
 function render(){
   const f = cfg(S.stage);
   let html;
+  if(S.call && typeof callScreen === 'function'){
+    html = callScreen();
+  } else
   if(S.stage==='nil'){
     html = '<div class="nil">' + (NIL[S.view] || NIL.quiz)() + '</div>';
   } else if(S.stage==='signup'){
@@ -12400,7 +12817,7 @@ function render(){
          + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
          + (S.view==='account'?profileSheet()+photoSheet():'');
   }
-  const key = S.stage + '/' + S.view;
+  const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
   const OVERLAYS = ['nav','notif','tal','editProfile','editPhoto','addCard','notes'];
   const opened = OVERLAYS.filter(k => S[k] && !MO.open[k]);
@@ -13924,6 +14341,14 @@ function splitPlateBody(plate){
     `<span class="plate-bi">${plateIcon(t)}<span>${t}</span></span>`).join('');
 }
 
+const PLATE_SOON = /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
+function plateUrgent(plate, when, label){
+  const flag = plate.dataset.urgent;
+  if(flag === '1' || flag === 'true')  return true;
+  if(flag === '0' || flag === 'false') return false;
+  return PLATE_SOON.test(when || '') || PLATE_SOON.test(label || '');
+}
+
 function placePlates(){
   device.querySelectorAll('.plate').forEach(plate => {
     if(plate.querySelector(':scope > .plate-h')) return;   /* already arranged */
@@ -13949,6 +14374,9 @@ function placePlates(){
       }
       if(eb.textContent) head.appendChild(eb);
     }
+
+    if(!plateUrgent(plate, when, eb ? eb.textContent : ''))
+      plate.classList.add('plate-quiet');
 
     const bare = !head.childElementCount && !!t;
     if(bare) head.classList.add('plate-h-bare');
@@ -16339,6 +16767,14 @@ const PAGESUM = {
 
   report: 'Priya&rsquo;s write-up of the 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas &mdash; both are chapters on your course.',
 
+  result: () => {
+    const lo = qzLow(1)[0];
+    const hi = SCORES.slice().sort((a,b) => b[1] - a[1])[0];
+    return `${hi[0]} at ${hi[1]} is your strongest band, ${lo[0].toLowerCase()} at ${lo[1]} `
+      + `your weakest. An agent pushes hardest on the two lowest, and both have a chapter `
+      + `on the course.`;
+  },
+
   interviews: f => {
     if(f.complete) return 'Two interviews on record: 20 August set Explorer &ndash; E3, and 21 November moved you to E4. Both reports are yours to keep.';
     if(f.reinterview) return 'One interview on record, and the re-interview still to book. Whoever you pick reads your 90-day summary before the call.';
@@ -17615,6 +18051,218 @@ render = function(){
   try{ pruneStaleChips(); }
   catch(err){ console.warn('pruneStaleChips', err); }
 };
+
+render();
+
+
+
+S.call = null;
+
+const CALL_MS = 42000;
+
+let callTimer = null;
+
+const CALL_AWAY = 'Not active recently';
+const callHere  = () => COHORT.filter(m => m[3] !== CALL_AWAY);
+const callMe    = () => COHORT.find(m => m[4]) || COHORT[0];
+const callOthers= () => callHere().filter(m => !m[4]);
+
+const CALL_FACES = 6;
+
+const CALL = {
+  iv:  (f) => callIv(f, false),
+  re:  (f) => callIv(f, true),
+  cohort: (f) => {
+    const me = callMe(), others = callOthers(), here = callHere().length;
+    const chapter = (CH[Math.min(CH.length - 1, Math.max(0, f.week - 1))] || CH[0])[0];
+    return {
+      rec:   false,
+      title: `Cohort 41 &middot; week ${f.week} call`,
+      sub:   `Led by Priya Nair &middot; 60 minutes &middot; ${here} of ${COHORT.length} here`,
+      mins:  60,
+      main:  {img:AV.priya, name:'Priya Nair', role:'host'},
+      self:  {img:AV[me[2]], name:me[0]},
+      strip: others,
+      count: here,
+      leave: 'Leave call',
+      panel: [
+        ['This call', [
+          ['Platform',  'Video call'],
+          ['Room',      `cohort-41-w${f.week}`],
+          ['Week',      `${f.week} of 13`],
+          ['Attending', `${here} of ${COHORT.length}`],
+          ['Recording', 'Off &middot; cohort calls are not recorded'],
+          ['Notes',     'Priya posts them to the board']
+        ], 'Nothing said on this call reaches an employer, and no part of it is kept as video.']
+      ],
+      brief: ['What Priya already has',
+        `Your chapter scores and how many attempts each one took. Nobody else on this call sees any of it.`],
+      phase: [
+        'Connecting&hellip;',
+        `Priya opens week ${f.week} &mdash; ${chapter}`,
+        'Two members walk through their week',
+        'Working in pairs on the chapter task',
+        'Questions, and what week ' + (f.week + 1) + ' asks for',
+        'Call ended. Priya is writing up the notes for the board.'
+      ]
+    };
+  }
+};
+
+function callIv(f, re){
+  const a = bkAgent();
+  const me = callMe();
+  return {
+    rec:   true,
+    title: `${re ? 'Re-interview' : 'Level interview'} &middot; ${a.n}`,
+    sub:   `${who(f)} &middot; 45 minutes, recorded`,
+    mins:  45,
+    main:  {img:a.img, name:a.n},
+    self:  {img:AV[me[2]], name:me[0]},
+    strip: null,
+    count: 2,
+    leave: 'End session',
+    panel: [
+      ['Session details', [
+        ['Platform',   'Video call'],
+        ['Meeting ID', 'TN&nbsp;482&nbsp;119&nbsp;603'],
+        ['Passcode',   '4 8 2 1 1 9'],
+        ['Dial-in',    `+44 20 7946 0${400 + (a.ivs % 99)}`],
+        ['Recording',  'On, both sides'],
+        ['Transcript', 'Generating live'],
+        ['Scheduled',  bkShort()]
+      ], 'The recording and transcript are what your report is built from. Nothing here is shared with an employer.']
+    ],
+    brief: re
+      ? ['Bring what changed', 'One thing you do differently since the last report, and the situation that changed it. The 90 days are the evidence &mdash; this is you saying what they did.']
+      : ['Bring one example',  'A real leadership situation from the last three months. That single story moves your level more than anything else in the conversation.'],
+    phase: [
+      'Connecting&hellip;',
+      `${a.n.split(' ')[0]} asks what you have been leading lately`,
+      'Working through one real situation, end to end',
+      re ? 'Probing what the 90 days actually changed' : 'Probing delegation, and a decision you regret',
+      'Wrapping up &mdash; what happens next and when',
+      `Session complete. The recording and transcript are with ${a.n.split(' ')[0]}.`
+    ]
+  };
+}
+
+const callFrac = () => {
+  if(!S.call) return 0;
+  return Math.min(1, (Date.now() - S.call.t0) / CALL_MS);
+};
+const callClockText = (spec, frac) => {
+  const secs = Math.round(frac * spec.mins * 60);
+  return String(Math.floor(secs / 60)).padStart(2,'0') + ':' + String(secs % 60).padStart(2,'0');
+};
+const callPhaseText = (spec, frac) => {
+  const n = spec.phase.length;
+  if(frac >= 1) return spec.phase[n - 1];
+  return spec.phase[Math.min(n - 2, Math.floor(frac * (n - 1)))];
+};
+
+function callTick(){
+  if(!S.call) return callStop();
+  const spec = S.call.spec, frac = callFrac();
+  const clock = device.querySelector('.call-clock');
+  const cap   = device.querySelector('.call-cap');
+  if(!clock && !cap) return callStop();
+  if(clock) clock.textContent = callClockText(spec, frac);
+  if(cap)   cap.innerHTML     = callPhaseText(spec, frac);
+  if(frac >= 1) return callStop();
+}
+function callStop(){
+  if(callTimer){ clearInterval(callTimer); callTimer = null; }
+}
+
+function callOpen(kind){
+  const make = CALL[kind];
+  if(!make) return;
+  const f = cfg(S.stage);
+  S.call = {kind, t0:Date.now(), mic:true, cam:true, share:false, spec:make(f)};
+  S.nav = false; S.notif = false; S.tal = false;
+  callStop();
+  callTimer = setInterval(callTick, 500);
+  render();
+}
+function callLeave(){
+  callStop();
+  S.call = null;
+  render();
+}
+
+const _callStage = setStage;
+setStage = function(k, keepView){ callStop(); S.call = null; return _callStage(k, keepView); };
+const _callGo = go;
+go = function(target, fresh){ callStop(); S.call = null; return _callGo(target, fresh); };
+
+const callFeed = (cls, p, inner) =>
+  `<div class="${cls}" style="background-image:url(${p.img})">`
+  + (inner || '')
+  + `<span class="call-nm">${p.name}${p.role ? ` <em>&middot; ${p.role}</em>` : ''}</span></div>`;
+
+function callScreen(){
+  const c = S.call, spec = c.spec, frac = callFrac();
+  const kv = (rows) => rows.map(([k,v]) =>
+    `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+  const faces = spec.strip ? spec.strip.slice(0, CALL_FACES) : [];
+  const more  = spec.strip ? spec.strip.length - faces.length : 0;
+
+  return `<div class="call" data-callkind="${c.kind}" role="region" aria-label="${spec.leave === 'Leave call' ? 'Cohort call' : 'Interview'} in progress">
+  <div class="call-bar">
+    ${spec.rec ? `<span class="call-rec"><i></i>Rec</span>` : ''}
+    <span class="call-id">
+      <span class="call-ttl">${spec.title}</span>
+      <span class="call-sub">${spec.sub}</span>
+    </span>
+    <span class="call-clock">${callClockText(spec, frac)}</span>
+  </div>
+  <div class="call-body">
+    <div class="call-stage">
+      ${callFeed('call-main', spec.main,
+        `<span class="call-cap">${callPhaseText(spec, frac)}</span>`
+        + callFeed('call-self', {img:spec.self.img, name:spec.self.name + ' (you)'}))}
+      ${spec.strip ? `<div class="call-strip">
+        ${faces.map(m => callFeed('call-mem', {img:AV[m[2]], name:m[0]})).join('')}
+        ${more > 0 ? `<div class="call-more" aria-label="${more} more in the call">+${more}</div>` : ''}
+      </div>` : ''}
+    </div>
+    <aside class="call-side">
+      ${spec.panel.map(([head, rows, legal]) => `<div class="call-panel">
+        <span class="eyebrow">${head}</span>
+        ${kv(rows)}
+        ${legal ? `<p class="t-legal-01 call-legal">${legal}</p>` : ''}
+      </div>`).join('')}
+      <div class="call-panel">
+        <span class="eyebrow">${spec.brief[0]}</span>
+        <p class="t-body-02">${spec.brief[1]}</p>
+      </div>
+    </aside>
+  </div>
+  <div class="call-foot">
+    <button class="call-ctl${c.mic ? '' : ' off'}" data-callctl="mic"
+      aria-label="${c.mic ? 'Mute' : 'Unmute'}" aria-pressed="${!c.mic}">${I.microphone}<span>${c.mic ? 'Mute' : 'Unmute'}</span></button>
+    <button class="call-ctl${c.cam ? '' : ' off'}" data-callctl="cam"
+      aria-label="${c.cam ? 'Turn the camera off' : 'Turn the camera on'}" aria-pressed="${!c.cam}">${I.video}<span>Camera</span></button>
+    <button class="call-ctl${c.share ? ' off' : ''}" data-callctl="share"
+      aria-label="Share your screen" aria-pressed="${c.share}">${I.launch}<span>Share</span></button>
+    <span class="call-ctl call-count">${I.group}<span>People &middot; ${spec.count}</span></span>
+    <button class="btn btn-p noic call-leave" data-callend="1">${spec.leave}</button>
+  </div>
+</div>`;
+}
+
+device.addEventListener('click', e => {
+  const open = e.target.closest('[data-call]');
+  if(open){ callOpen(open.dataset.call); return; }
+  if(e.target.closest('[data-callend]')){ callLeave(); return; }
+  const ctl = e.target.closest('[data-callctl]');
+  if(ctl && S.call){
+    const k = ctl.dataset.callctl;
+    S.call[k] = !S.call[k];
+    render();
+  }
+});
 
 render();
 

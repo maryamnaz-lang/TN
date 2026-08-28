@@ -48,7 +48,8 @@ first recorded. Read them freely; just do not edit them without being asked.
 
 Both are **build output** of `design-system/build-ds.py`, which walks the same 40 layers in
 the same order as `hifi/build/build.py` and keeps everything except eight render-pass-bound or
-separate-surface families — 3,282 rules kept, 318 dropped. Every rule in the output is a real
+separate-surface families — the build prints the kept/dropped count, so read that rather than
+a number written down here. Every rule in the output is a real
 rule from the real portal in its real cascade position — nothing is re-typed, and the build
 refuses to write if any output rule cannot be traced back to a source layer.
 
@@ -182,7 +183,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `56-headband.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `59-priority.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -215,22 +216,30 @@ unmatched `/*` or `*/` survives the comment strip, and prints the line.
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
 Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a
-hairline, **Your journey so far** (five steps, open, in a row), a second hairline, then what
-Tal says. The right column is the page's one dark card — `placeDark` still moves it into the
-band, §56 gives it column two, and it stretches to the left column's height with its content
-packed to the top and its actions on an `auto` margin at the foot.
+hairline, **the wing** — the status block, which is the journey row on the way in — a second
+hairline, then what Tal says. The right column is the page's one dark card — `placeDark` still
+moves it into the band, §56 gives it column two, and it stretches to the left column's height
+with its content packed to the top and its actions on an `auto` margin at the foot.
 
-Six things worth knowing before touching it:
+Seven things worth knowing before touching it:
 
 - **The gate is `.modhead:has(> .sec-dark .plate)` at 900 and up.** A plate is a vertical card
   and gains from the column; `.lvl-hero`, `.cert` and `.score` are wide objects (a 15-rung
   ladder, an award, a table) and keep §25.12's full-width place under the head. A SECOND dark
   card in the band spans both columns and lands under them.
-- **The journey is always five steps** — `journey()` in views.js is the single list and the
-  six dashboards call `stepper(journey())`. The labels are the spine, the `sec` lines are the
-  stage. Four-step and six-step variants are what it replaced.
+- **The wing has THREE states and `wingBlock()` (views.js) picks one.** The journey row is
+  only the way IN, so it stops at `assessed`; from week 1 the wing carries the course
+  `progressStrip` and once promoted it carries the `ladder`. All three wear
+  `.stp .stp-open .stp-titled` — §04's rhythm, §24.4's header row, §56.2's 16 under it — with
+  `.wing-prog` / `.wing-lvl` as §59's hooks for the gutter (trap 10) and the ladder's track,
+  which is an on-dark value and has to be re-pointed on a light ground. The enrolled
+  dashboards no longer draw `progressStrip` as a section of their own; it MOVED.
+- **The journey is always four steps** — `journey()` in views.js is the single list and only
+  the four pre-course dashboards reach it. The labels are the spine, the `sec` lines are the
+  stage. Five- and six-step variants are what it replaced; "Re-interview" was the fifth and
+  came off because it is where the NEXT ninety days start, not where these ones end.
 - **The row is left-aligned and each item is a three-row grid**, with `.stps-b` at
-  `display:contents` so the five state words stay on one line when one label wraps and another
+  `display:contents` so the state words stay on one line when one label wraps and another
   does not. Each `.stps-i` paints the rail segment to its own right; there is no rail element.
 - **The mark's ground carries the state**: flat `--accent` for done, `--brand-tint-2` for the
   step you are on, `--layer-02` for what is ahead, with the subject icon at full ink on all
@@ -242,6 +251,44 @@ Six things worth knowing before touching it:
   per fact, capitalises each one and puts a 15px icon in front of it (`PH_IC` / `factIcon`,
   same first-match-wins shape as `stepIcon`). A `sub` with no middot in it — the auth screens —
   is left as a plain `<p>`.
+
+- **The wash is in the top-right corner** — Figma 494:1447, §25.1. Same two ellipses and the
+  same two colours as 292:288; what moved is where they sit. The warm one used to be centred
+  at 43.4% across and low, so every page opened on a cream panel with the words printed on it.
+  Both are off the right-hand edge now (87.6% and 101.1%), the words are on white paper, and
+  the warm layer is back at the file's own 50% because there is no panel left to knock down.
+
+### The black card has TWO priorities — §59, `59-priority.css` + `plateUrgent` (ai5.js)
+
+Black ground plus §21's warm haze is the loudest object this product draws, and it is spent
+on an action that is **time-sensitive**. Inside twenty-four hours a `.plate` is §15's black
+card, untouched. Outside it the same card is **quiet**: `.plate-quiet` takes the ground and
+the haze off, and in the head band a **vertical rule between the two columns** takes over the
+job the card's black edge was doing. Same content, same buttons, same order — one priority
+down. Four things to know:
+
+- **The ink flips by re-pointing three variables**, not by restating rules. `--on-dark`,
+  `--on-dark-2` and `--on-dark-border` are reassigned on `.plate-quiet`, so the eleven
+  declarations §15, §21 and §56 write against them all follow — and so does anything a later
+  layer writes. Do not add a `.plate-quiet` variant of a rule; write the rule against the
+  token and it is correct on both states for free.
+- **`plateUrgent` reads the WORDS, because the words are all there is.** Every appointment in
+  the build is a hand-written string, so the test is the vocabulary of inside-the-day — now,
+  today, tonight, starting, or a count of hours or minutes. It tests the countdown AND the
+  eyebrow label, which is what makes "Due now" — a label, not a clock — come out urgent.
+  `data-urgent="1"`/`="0"` on the card overrides it. A card with no time at all is quiet.
+  Swap the one function for a date difference in a real build; the class is the contract.
+- **Only `.plate`.** The other five members of `DARK_CARD` are not actions: `.cert` is an
+  award, `.lvl-hero` a level, `.score` a table, `.ldr-read` a competency read. None of them
+  has a deadline to be inside or outside, and a quiet certificate is a certificate with the
+  ceremony taken off it. They keep their ground.
+- **Below 900 the divider turns with the layout** — no second column to divide, so it is a
+  hairline on the card's top edge instead.
+
+Both halves ship in `design-system/` (`dsPlateQuiet`, and the gallery shows the pair under
+**Signature**) because the decision needs only the element, not `S`. **`tn-agent-portal.html`
+does not call it yet** — every plate on that page is a day or more out, so adopting it would
+leave that portal with no black card at all; that is a look decision, not a bug.
 
 ### The head of a page has TWO copy slots and they do different jobs
 

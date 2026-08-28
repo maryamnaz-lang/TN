@@ -229,6 +229,29 @@ const PAGESUM = {
 
   report: 'Priya&rsquo;s write-up of the 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas &mdash; both are chapters on your course.',
 
+  /* THE BREAKDOWN'S READING, AND IT IS TWO FIGURES THE PAGE DRAWS RATHER THAN
+     LISTS. The rose is five wedges and five numbers; what a person wants said
+     out loud is which is highest, which two are lowest, and what happens to
+     the low ones next — so the sentence names them and leaves the other two
+     to the chart.
+
+     BOTH FIGURES ARE READ OFF `SCORES` through `qzLow`, the same call the
+     page's own closing section makes. Written out as "Composure (84) and
+     Coaching (38)" this would be the fourth place those numbers appear and
+     the first one that could disagree with the chart above it.
+
+     ONLY THE LOWEST IS NAMED, not both of the two lowest: the closing section
+     names the pair with their chapters, and naming them here as well put
+     "coaching" in the same sentence twice and took the line to 37 words. 28
+     is the ceiling — see the head of this block. */
+  result: () => {
+    const lo = qzLow(1)[0];
+    const hi = SCORES.slice().sort((a,b) => b[1] - a[1])[0];
+    return `${hi[0]} at ${hi[1]} is your strongest band, ${lo[0].toLowerCase()} at ${lo[1]} `
+      + `your weakest. An agent pushes hardest on the two lowest, and both have a chapter `
+      + `on the course.`;
+  },
+
   /* THIS ONE HAD NO FACTS IN IT AT ALL. "Every interview you've had and
      every one booked. This is the only thing that sets or changes your
      level, and each finished one links to its report." — a caption, a
