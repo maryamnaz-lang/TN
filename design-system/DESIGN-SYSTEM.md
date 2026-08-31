@@ -490,6 +490,22 @@ width. `dsFrame(el)` does the same thing from JS.
 The tiers: **600px** (gutter 24, sheets centre), **900px** (permanent icon rail,
 label column), **1200px** (rail 280, gutter 32).
 
+**And a page is not finished until it has been read at more than one of them.**
+The standing rule for this project (Maryam, 31 Aug 2026) is that anything built at
+desktop has to work on mobile and tablet in the same task — see *Verifying a change*
+in the root `CLAUDE.md`. Two things worth knowing here specifically:
+
+- **The band just above 900 is where failures hide.** Both bugs found on the day
+  the rule was written lived between 900 and 1100 — a landscape tablet, or a
+  half-width desktop window — and were correct at 390 and at 1280. Sweep **390,
+  744, 900, 940, 1024 and 1280**, not two widths.
+- **`hifi/respcheck.mjs` measures the portal, not a page built on this folder.**
+  It drives the built portal's own view registry, so it cannot sweep your page.
+  What it checks is the list to check by hand: horizontal overflow, the label
+  column live below 900, a heading wrapping past three lines inside it, content
+  escaping its section, a button label on two lines, and a vertical divider still
+  drawn after the columns stacked.
+
 ### 2. The label column is keyed on what the section contains
 
 At 900px and up, a `.sec` with a `.sec-h` splits into a 184px heading column and
