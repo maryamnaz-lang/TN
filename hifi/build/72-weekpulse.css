@@ -1,0 +1,455 @@
+/* ==========================================================================
+   §72  THE WEEK PULSE — three panels become three columns
+
+   THE ENROLLED DASHBOARD ASKED ONE QUESTION THREE TIMES. Under §71's head band
+   it drew "This week", "Time on the course" and "Where you stand" as three
+   `.sec`s — three headings, three hairlines, 1230px of page — and all three
+   answer "how am I doing". Split that way the reading does not compose: the
+   chapter you are on is at the top, whether that is enough is 400px below it
+   behind a thirteen-bar chart, and what it earned is 600px below that.
+
+   ONE SECTION, THREE COLUMNS, LEFT TO RIGHT IN THE ORDER THE QUESTION IS ASKED:
+   what I am on, whether that is enough, what it has earned. The note over
+   `pulse` in views.js is the content argument and the two subtractions; this
+   file is the drawing.
+
+   NOTHING HERE IS A NEW COMPONENT, WHICH IS THE POINT. The ring is `ring()`,
+   the standing cells are `standRow`, the column marks are §65's `.stat` chip in
+   §65's three named hues, the segment bar is §71.1b's thirteen-block rail with
+   a different count, and the tick is `I.checkFilled`. What this layer states is
+   the GRID that holds them and the four places a component drawn for a
+   full-width section has to change to live in a 290px column.
+
+   WHAT IS IN HERE AND WHAT IS NOT. Layout, grounds, borders, spacing and one
+   gradient. NOT font size, weight, case or ink — those four are §63's wherever
+   this layer sits, and every one these families need is in §63 §12.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE GRID, AND IT COUNTS ITS OWN CHILDREN
+
+   `grid-auto-flow:column` WITH NO `grid-template-columns`, WHICH IS THE ONE
+   STRUCTURAL DECISION IN THE FILE. The row is three columns on week 1 and day
+   34 and TWO on day 90, where every chapter is finished and there is nothing to
+   be in the middle of — `pulse` simply does not emit the focus column there.
+   Written as `repeat(3,1fr)` that leaves an empty third track and the two
+   surviving columns sit in the left two thirds of the page with a hairline
+   hanging in space to their right. Auto-flow makes the track count the child
+   count, so both shapes are one rule and a fourth column would need none.
+
+   `minmax(0,1fr)` ON THE AUTO COLUMNS AND NOT `1fr`. A `1fr` track's floor is
+   `auto`, so a column whose content has a wide min-content — the standing
+   cells' figures are `white-space:nowrap` by §29 — refuses to shrink and pushes
+   the row past the page. This is the same floor §15 puts on `.stand` itself.
+
+   THERE IS NO BOX ROUND THE ROW — ONE RULE ABOVE IT, AND THAT IS ALL (Maryam,
+   31 Aug 2026). The first cut drew `border:1px solid var(--rule)` on all four
+   sides, which on a page made of hairlines is a card: it closed the three
+   columns off as an object sitting IN the section rather than as the section's
+   own content, and it put a second edge 16px under the lede's own. A single
+   `border-top` is the divider the lede needs and the top of the columns at the
+   same time — one line doing both jobs, which is how every other band in this
+   product is closed (§25.2 ends the head band the same way). */
+.app .pulse{
+  display:grid;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
+  border:0;border-top:1px solid var(--rule)}
+
+/* THE COLUMN DIVIDER IS AN INSET PSEUDO-ELEMENT, NOT A `border-left`, AND THE
+   INSET IS THE WHOLE POINT (Maryam, 31 Aug 2026).
+
+   A `border-left` runs the column's full height, so it MEETS the rule above it
+   and the two form a corner — which is what turns three columns back into the
+   table this section is trying not to be. Read as a drawing: a divider that
+   touches the rule is a cell wall, and a divider that stops short is a break
+   between two readings. The columns are three readings.
+
+   `top`/`bottom` AT THE COLUMN'S OWN VERTICAL PADDING, so the line spans
+   exactly the content box — it starts where the first mark starts and ends
+   where the last row ends, which is what "the height of the columns" means when
+   the columns are stretched to a common height by the grid. One value, used
+   twice, so the two ends cannot drift apart.
+
+   §71.1c REACHED THE SAME SHAPE FOR THE FIGURE STRIP and did it with grid
+   items in slack tracks, because that grid's dividers had to sit CENTRED in a
+   gap the tracks negotiated. Here the columns are equal `1fr`s and the divider
+   belongs to the column it precedes, so it is that column's own pseudo-element
+   and needs no track of its own. */
+.app .pulse > .pulse-c{
+  position:relative;
+  min-width:0;
+  padding:var(--s06)}
+.app .pulse > .pulse-c + .pulse-c::before{
+  content:'';position:absolute;
+  left:0;top:var(--s06);bottom:var(--s06);
+  width:1px;
+  background:var(--rule)}
+
+/* -------------------------------------------------------------------- 1a ---
+   THE SECTION HAS TO OPT OUT OF THE LABEL COLUMN — TRAP 13, AND IT IS THE
+   CHEAPEST THING IN THIS FILE TO GET WRONG.
+
+   At desktop §10.15 gives any `.sec` carrying a `.sec-h` a 184px label column
+   unless it contains one of seven named classes. All three sections this
+   replaces were on that list by a different route — "Where you stand" through
+   `:has(> .stand)`, the chart through its `.tile`, "This week" through §16 —
+   and `.pulse` is a NEW wrapper, so the merged section fell straight into the
+   column: the heading set on two lines at 184px with a three-column grid
+   squeezed into the 717 beside it, and every column lost 61px it does not have.
+
+   Restated INSIDE the same container query per trap 3 — a rule in the tier
+   cannot be answered from outside it — and it copies what §10 DOES rather than
+   what it says, which is §69's lesson: the `padding:0 var(--pad-x)` on that
+   rule's `.sec-h` is dead, because §14.2 zeroes every headed section's heading
+   padding at this width. Restating it here would un-do §14 and set this one
+   heading 32px right of everything else on the page. */
+@container app (min-width:900px){
+  .app .sec:has(> .pulse){display:block}
+  .app .sec:has(> .pulse) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--s05)}
+}
+
+/* -------------------------------------------------------------------- 1a2 --
+   THE HEADING IS TAL'S, AND THE MARK IS §70'S SPARKLE — 599:7418
+
+   The section opens with the sparkle and "Your learning pulse" where a plain
+   `<h2>` used to say "This week", and a derived sentence under it. That is a
+   claim about what the block IS: a reading of your numbers, not a table of
+   them — and the three columns below are what the sentence resolves to.
+
+   `.pulse-mk` IS ITS OWN CLASS AND MUST STAY ONE. The note over `pulse` in
+   views.js is the long version: `talFirst` hoists any `.sec` containing an
+   `.ai-aura`, and `placeBand`'s `_mhIsTal` claims any section containing
+   `.ai-aura` OR `.ai-label` as head furniture. Wearing either here would put
+   this section in the band. The MARK is identical — §70's `--ai-star` painted
+   with `--ai-grad`, the same object the band's own label carries — so the two
+   read as one voice while sharing no class a pass can match.
+
+   THE WORDS ARE NOT CLIPPED TO THE GRADIENT and the band's are. §70.2 runs the
+   ramp through "Summary by Tal" because that label is Tal SPEAKING; this is a
+   section heading over a grid of figures, and a gradient heading over a table
+   is the ramp used as decoration. Mark in the ramp, words in ink. */
+.app .pulse-head{align-items:center}
+.app .pulse-ttl{display:flex;align-items:center;gap:var(--s03);margin:0}
+.app .pulse-mk{
+  content:'';flex:none;
+  width:14px;height:14px;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* THE LEDE RUNS THE SECTION'S FULL WIDTH, ABOVE THE COLUMNS AND OUTSIDE THEM.
+   It is one line at every width this product has (901px of measure against a
+   ~150-character sentence), which is what lets it sit between the head row and
+   the grid without a rule under it — the grid's own top border closes it. */
+.app .pulse-lede{margin:0 0 var(--s05)}
+
+/* -------------------------------------------------------------------- 1b ---
+   THE COLUMN HEAD — the mark, then the name of the reading.
+
+   §65'S CHIP AT 28 WITH A 16px GLYPH, which is the product's figure-cell mark
+   everywhere it appears: the `.stats` grid, `progressStrip`'s three figures,
+   and now the three columns. The hue is `--mk`, set INLINE per column by
+   `pulseCol` rather than cycled by `nth-child` — §65 records the same decision
+   for the progress strip and the reason is the same one squared here. Day 90
+   drops the focus column, so a cycled hue would make "your pace" green on day
+   34 and blue on day 90: the same reading in two colours on two screens of one
+   journey. Named, a column keeps its hue wherever it lands.
+
+   NO GROUND UNDER THE MARK, AND IT IS A BARE GLYPH (Maryam, 31 Aug 2026). §65's
+   chip — a 28px tinted square around a 16px glyph — is the product's mark for a
+   FIGURE cell, where the chip is what separates one number from the three
+   beside it in a continuous band. These three are not in a band: each one opens
+   a column of its own with a rule between them, so the chip was drawing a box
+   inside a box inside a box, and three filled squares were the heaviest objects
+   in a section made of hairlines.
+
+   The hue survives, which is the half of §29.17 that was doing the work: the
+   glyph is `--mk` and the wash is gone, so a column is still identified by
+   colour and nothing is boxed. 20px rather than the chip's 16 — with no ground
+   to sit in, the mark has to hold the line beside a 14px label on its own. */
+.app .pulse-h{
+  display:flex;align-items:center;gap:var(--s03);
+  margin-bottom:var(--s05)}
+.app .pulse-ic{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;
+  color:var(--mk);
+  background:none}
+.app .pulse-ic svg{width:20px;height:20px;fill:currentColor}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE FOCUS COLUMN — the chapter, its ring, and what the week already holds
+   ------------------------------------------------------------------------ */
+/* TITLE FIRST, CHAPTER LINE UNDER IT — 599:7418, and `weekCard`'s order
+   inverted. The note in views.js is the argument; what it costs here is one
+   swap of the two margins. */
+.app .pulse-t{margin:0 0 var(--s02)}
+.app .pulse-eb{margin-bottom:var(--s06)}
+
+/* THE RING KEEPS ITS 64px AND THE FIGURE MOVES BESIDE IT — the reference's own
+   arrangement and `weekCard`'s inverted. That card put the ring at the far
+   right of a full-width band with the minutes under the title on the left, 600px
+   away; in a 290px column there is no far right, and the two facts are one
+   reading — how far into the chapter, in a percentage and in minutes. Paired,
+   the ring is what the number means rather than a second copy of it.
+
+   `align-items:center` AND NOT `baseline`. §71.1 argues the opposite for the
+   progress strip's percentage and its label, and the difference is that a ring
+   is a 64px OBJECT rather than a line of type: there is no baseline in it to
+   share, and bottom- or baseline-aligned it hangs above two lines of text that
+   are shorter than it is. */
+.app .pulse-ring{
+  display:flex;align-items:center;gap:var(--s05);
+  margin-bottom:var(--s06)}
+.app .pulse-rb{display:flex;flex-direction:column;gap:var(--s01);min-width:0}
+
+/* WHAT IS DONE — `weekCard`'s list, unchanged in structure. The tick is 18px
+   here against §32's 20 for the same reason §71 takes the strip's chip from 28
+   to 24: the column has a third of the width the band had, and the mark is what
+   gives it back. Green is the product's one done-colour and is the same
+   `#00a43c` §71.2 gives the leader's verified badge. */
+.app .pulse-did{list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:var(--s04)}
+.app .pulse-did > li{display:flex;align-items:flex-start;gap:var(--s03)}
+.app .pulse-tick{flex:none;display:inline-grid;place-items:center;
+  width:18px;height:18px;margin-top:1px}
+.app .pulse-tick svg{width:18px;height:18px;fill:#00a43c}
+.app .pulse-db{display:flex;flex-direction:column;gap:1px;min-width:0}
+
+/* THE COLUMN CLOSES ON ITS OWN WAY IN, AND THE BUTTON KEEPS ITS BORDER — the
+   same reversal of §64 §71.2 makes for `.crow-a`, for the same reason and with
+   the same technique. That layer took the outline off 88 quiet buttons because
+   "on a product made of hairlines a drawn rectangle is one more edge than the
+   page has"; inside a bordered column the button is not sitting on a page of
+   hairlines, and with no edge it reads as a caption that happens to be
+   clickable. 599:7418 draws the border.
+
+   `border-color` RATHER THAN `border`, which is §64.1's point: `.btn` declares
+   `border:1px solid transparent` and variants only re-point the colour, so
+   setting a width here would make this the one button in the product with a
+   2px box model. §64's own arrow does not arrive either way — that rule keys
+   on `:not(:has(svg))` and this button carries an explicit `I.arrowRight`.
+
+   `margin-top:auto` PINS IT TO THE FOOT. The column is a flex column (§72.1),
+   and day 34's two `.pulse-did` rows make this column taller than week 1's —
+   without the auto margin the button would sit directly under whatever the
+   last row happens to be and the three columns would end at three heights. */
+.app .pulse-c{display:flex;flex-direction:column}
+.app .pulse-go{margin-top:auto;padding-top:var(--s06)}
+.app .pulse-go > .btn{border-color:var(--rule)}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE PACE COLUMN — the figure, the bar, and the same figure three ways
+
+   THE BAR IS §71.1b'S RAIL WITH A DIFFERENT COUNT, AND THE COUNT IS THE POINT.
+   That layer draws thirteen 2px blocks 4px apart because one block per chapter
+   is why you draw blocks rather than a bar. The same holds here twice over:
+   while the course runs the blocks are FIVE MINUTES each, so eleven of them IS
+   the 55-minute target and four lit is twenty minutes rather than a decorative
+   36%; once it is over they are the thirteen WEEKS, lit where the week met its
+   target. Nothing in this file sets a count — `pacePart` derives both.
+
+   14px TALL AND NOT §71'S 2, AND THE DENSITY IS THE FILE'S — 599:7418 draws
+   this as a row of upright ticks rather than a rule. §71's rail is 2px because
+   it sits directly under a 32px figure and had to stop reading as one dashed
+   line; this one is the only horizontal object in its column, with a label
+   above it and the three figures below, and at 2px it was grey dust in a 278px
+   track. Upright it reads as a MEASURE — a thing being filled — which is what
+   a pace bar is and what a hairline rail is not.
+
+   ONE BLOCK PER TWO MINUTES, so the 55-minute target is 28 blocks and 20
+   minutes lights 10 of them. That is the file's density and it is also exactly
+   the 36% the third figure under it prints, which the file's own bar is not:
+   599:7418 draws 7 lit of 28 beside a "36% Of target" that wants 10. The count
+   is derived in `pacePart`, so the bar cannot disagree with the figure.
+
+   A LIT BLOCK TAKES THE COLUMN'S OWN HUE, AND THIS REVERSES §71.1b. That layer
+   lights its thirteen chapter blocks with the AI ramp because they are in
+   TAL'S BAND — the amber is what says whose block it is, and §70.0 argues it
+   at length. This bar is in a figure column with a green clock chip 100px
+   above it, and `--mk` ties the two into one object: the mark names the
+   reading, the bar is the reading. An orange bar under a green mark reads as
+   two components that happen to be adjacent. §19's rule is untouched — that
+   is about the brand gradient in a FILL, and `--mk` is the same named hue
+   system §29 and §65 already fill figure cells with. */
+.app .pulse-fig{margin-bottom:var(--s02)}
+.app .pulse-sub{margin-bottom:var(--s06)}
+.app .pulse-bar{
+  display:flex;flex-direction:column;align-items:flex-end;gap:var(--s03);
+  margin-bottom:var(--s06)}
+.app .pulse-seg{display:flex;gap:2px;width:100%;align-items:stretch}
+.app .pulse-seg > i{
+  flex:1 1 0;min-width:0;height:14px;
+  background-color:var(--layer-accent-01)}
+.app .pulse-seg > i.done{background-color:var(--mk)}
+/* a week that ran but missed its target — the finished bar's third state, the
+   same hue turned down, exactly as §71.1b draws the chapter you are on */
+.app .pulse-seg > i.now{background-color:color-mix(in srgb, var(--mk) 38%, transparent)}
+
+/* THE THREE FIGURES ARE A ROW WITH TWO HAIRLINES, and it is §71.1c's grid with
+   its argument intact: `auto` tracks with a `1fr` divider between them, because
+   three equal thirds of a 290px column leaves 96px a cell and "Remaining" does
+   not fit in it. The dividers are the grid's own pseudo-elements — no markup,
+   and `pulse` stays one `map` over three pairs.
+
+   32 RATHER THAN §71'S 42. The cell here is two lines of type and no mark, so
+   the rule is measured against the type rather than against a 24px chip and its
+   label; a hairline taller than the figures beside it reads as a table rule. */
+.app .pulse-3{
+  display:grid;
+  grid-template-columns:auto minmax(var(--s03),1fr) auto minmax(var(--s03),1fr) auto;
+  align-items:center;
+  padding-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.app .pulse-3 > span{
+  grid-row:1;
+  display:flex;flex-direction:column;gap:1px;
+  overflow-wrap:normal}
+.app .pulse-3 > span:nth-child(1){grid-column:1}
+.app .pulse-3 > span:nth-child(2){grid-column:3}
+.app .pulse-3 > span:nth-child(3){grid-column:5}
+.app .pulse-3::before,
+.app .pulse-3::after{
+  content:'';grid-row:1;
+  justify-self:center;align-self:center;
+  width:1px;height:32px;
+  background:var(--rule)}
+.app .pulse-3::before{grid-column:2}
+.app .pulse-3::after{grid-column:4}
+
+/* NO `.pulse-a` AND NO ASK CHIP — the note over `pulse` is the long version,
+   and the short one is that a chip here cannot survive: `placePageSummary`
+   (ai6) removes every `.chip-tal` that is not inside something of Tal's, which
+   a figure column is not. `weekCard`'s chip was stripped by the same rule on
+   every render it ever had. There is deliberately no rule in this file for it.
+
+   --------------------------------------------------------------------- 4 ---
+   THE STANDING COLUMN — `standRow` in a third of the width
+
+   FOUR DECLARATIONS AND NOT ONE OF THEM IS ON THE CELL. `standRow` is shared
+   with the rewards page and the two must not disagree about what a badge is
+   worth, so this section answers only the things the component does BECAUSE it
+   was drawn as a full-width band across a page:
+
+     the three-across    §15 goes to `repeat(3,1fr)` at 672 and up. Three cells
+                         across a 290px column is 96px each.
+     the full bleed      §15 pulls it out to the page gutter on both sides with
+                         negative margins and the end cells pay it back. Inside
+                         a padded column that hangs the row over both borders.
+     the outer box       §29.17 gives it `border:1px solid var(--rule)`, which
+                         is a box inside the box this file already drew.
+     the cell gutter     §15's end cells restore `--pad-x`, so cell one is
+                         indented against the column's own head row.
+
+   The 1px grid gap over a rule-coloured ground STAYS — that is §10's divider
+   technique and it is exactly right here, one hairline between each pair, and
+   the cells already name their ground for it.
+
+   IT IS A CARD ON 599:7418, so §29.17's border is kept rather than removed:
+   the three rows sit in their own box inside the column, which is the one
+   place in this section a nested edge is right — the rows are a LIST of three
+   like things, and the box is what says the list ended. SQUARE, though. The
+   file draws it with a ~10px radius and this product's `--radius` is `0px` by
+   token; every `border-radius` in the build resolves through it, and a single
+   rounded card would be the only curved rectangle in the portal. Stated as
+   `var(--radius)` rather than omitted, so a future decision to curve the
+   product curves this too. */
+.app .page .pulse .stand{
+  grid-template-columns:minmax(0,1fr);
+  margin-left:0;margin-right:0;
+  border:1px solid var(--rule);border-radius:var(--radius)}
+.app .page .pulse .stand > .stand-c{
+  padding-left:var(--s05);padding-right:var(--s05)}
+
+/* THE ROW IS A MARK, A STACKED PAIR, AND THE FIGURE — 599:7418, and it differs
+   from §29.14's arrangement on one point that matters. That layer puts the
+   label and the figure on ONE line, name hard left and number hard right, with
+   the note full-width beneath: "the three cells line up as a table you can read
+   across". True of three cells side by side in a full-width band, which is what
+   `.stand` was. Stacked in a 278px column they are not read across any more —
+   they are read DOWN — so the pairing that helps is label-over-note on the left
+   with the figure holding the right edge of the whole row.
+
+   `display:contents` ON `.stand-top` IS WHAT MAKES IT MARKUP-FREE. `standRow`
+   is shared with the rewards page and wraps the label and the value in that
+   element; dissolving it promotes both to items of `.stand-b`'s grid, where
+   the value can take a column of its own and span both rows. No change to
+   `standRow`, and §29.14's arrangement is untouched everywhere else.
+
+   THE NOTE RUNS UNDER BOTH COLUMNS AND THE FIGURE HOLDS ROW ONE, which is a
+   correction to the first cut of this rule and is §29.14's own arrangement
+   arrived at a second time. Written the file's way — figure spanning both rows,
+   note beside it in column one — the note gets what is left of a 229px card
+   after a 32px mark and a 60px figure, which is **80px**. 599:7418 gets away
+   with that because its rank note is "Earn the Silver badge"; the product's is
+   "Earn the Silver badge and the Get Involved badge", 47 characters, and it set
+   to FOUR lines and made that row 115px against the Points row's 67.
+
+   So the pair on row one is the label and the figure — which is the reading
+   §29.14 records, "name hard left, number hard right" — and the note takes the
+   full 168px underneath. Two lines at worst, three rows within 16px of each
+   other. The mock's arrangement is the better drawing for its copy and this is
+   the better drawing for ours; what is kept from the file is the stacked card,
+   the 32px artwork and the label being the row's title rather than its caption.
+
+   `align-items:start` ON THE PAIR, NOT `center`. The grid is two rows now and
+   centring the figure against a two-line block floats it half a line below the
+   label it belongs to. */
+.app .page .pulse .stand .stand-b{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:start;gap:2px var(--s04)}
+.app .page .pulse .stand .stand-top{display:contents}
+.app .page .pulse .stand .stand-l{grid-column:1;grid-row:1;align-self:center}
+.app .page .pulse .stand .stand-d{grid-column:1 / -1;grid-row:2;margin-top:0}
+.app .page .pulse .stand .stand-v{grid-column:2;grid-row:1;margin-left:0}
+/* THE ROW MARK IS A BARE GLYPH IN THE ROW'S OWN HUE, NOT THE AWARD ARTWORK
+   (Maryam, 31 Aug 2026). `standRow(g, true)` is what asks for it and the long
+   argument is over that function; what this rule does is give the glyph the
+   same treatment §72.1b gives the column heads — hue, no ground, no box — so
+   the six marks in this section are one family. 24px against the heads' 20:
+   these sit against a 14px label over an 11.5px note and a 24px figure, which
+   is a taller row than a column heading.
+
+   `.stand-mk` KEEPS ITS RULES AND IS SIMPLY NOT DRAWN HERE. The artwork mode
+   is still what `V.rewards` renders, so §29.14's 28px and §15's `.none`
+   greyscale are untouched — there is no `.stand-mk` override in this file. */
+.app .page .pulse .stand .stand-ic{
+  flex:none;display:grid;place-items:center;
+  width:24px;height:24px;
+  color:var(--mk);
+  background:none}
+.app .page .pulse .stand .stand-ic svg{width:24px;height:24px;fill:currentColor}
+
+/* --------------------------------------------------------------------- 5 ---
+   BELOW 900 THE THREE COLUMNS ARE THREE ROWS
+
+   Same `grid-auto-flow` trick turned: `row` puts each column on its own line
+   and the divider moves from the left edge to the top. Not a breakpoint on the
+   count — at any width narrow enough that three columns do not fit, none of
+   them do, and a two-across step would put the standing column alone on a
+   second row half the width of the pair above it.
+
+   THE COLUMNS PAY THE PAGE GUTTER HERE. `--pad-x` rather than §72.1's 24, so
+   the stacked rows sit on the same spine as every other section on the page.
+
+   AND THE INSET DIVIDER TURNS BACK INTO A PLAIN `border-top`. §72.1's
+   pseudo-element has to be switched OFF here, not just re-pointed: it is
+   absolutely positioned against `top`/`bottom`, so stacked it would draw a 1px
+   vertical line down the left edge of every row but the first. A stacked row's
+   divider runs the full measure deliberately — the argument for insetting the
+   column dividers is that a line touching the rule above it reads as a cell
+   wall, and stacked there is no rule for it to touch: `.pulse`'s own
+   `border-top` is the first row's top edge and each row after it draws its
+   own. */
+@container app (max-width:899.98px){
+  .app .pulse{grid-auto-flow:row;grid-auto-columns:auto}
+  .app .pulse > .pulse-c{
+    padding:var(--s06) var(--pad-x)}
+  .app .pulse > .pulse-c + .pulse-c::before{content:none}
+  .app .pulse > .pulse-c + .pulse-c{border-top:1px solid var(--rule)}
+}

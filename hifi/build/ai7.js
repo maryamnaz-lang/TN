@@ -593,7 +593,17 @@ PAGESUM.dashboard.booked = () => {
      page written by somebody else. The rule they follow is in the note over
      `PAGESUM` in ai6.js: say the thing and stop, no framing, no closing line
      about what the page is for. */
-  return `Booked with ${a.n}, ${bkLong()}. Forty-five minutes, recorded and paid &mdash; nothing to do before the day.`;
+  /* AND IT CARRIES THE GREETING AND THE THREE KEYS, because §70.3 takes the
+     `.ph` off the screen on every dashboard with a journey column — so this
+     sentence is the page's opening line, not its second one. The `data-sum`
+     phrases are ai6's `SUMDROP` mechanism; `track` is shared with `new` and
+     `interview`/`prep` are this stage's. This override still exists for the
+     FACTS, which is why the name and the date are still `a.n` and `bkLong()`
+     rather than the hard-coded pair the stage was written around. */
+  return `Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your `
+    + `<b data-sum="interview">interview with ${a.n}</b> is ${bkLong()} &mdash; forty-five minutes, `
+    + `recorded and paid. Delegation is the question ${a.n.split(' ')[0]} asks most often, so `
+    + `<b data-sum="prep">ten minutes of practice</b> is usually enough.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];

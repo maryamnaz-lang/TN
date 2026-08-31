@@ -183,7 +183,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `69-enrolflow.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `72-weekpulse.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -472,6 +472,194 @@ Two latent bugs in `PH_IC` (`factIcon`'s table) fell out of this and are fixed:
 `\bDec\b` does not match "December", and `star` — the LAST row, so the catch-all
 — matched **"Starts"**, which is how "starts 1 December" came out as a trophy.
 
+### THE AI-NATIVE HEAD — §70, `70-ainative.css` (Figma 578:5966)
+
+**The `new` dashboard only**, and it turns §56's band round: Tal's sentence is the whole of
+the left column on its own warm wash, the four steps are a numbered list in the right one,
+and the page's next step is ONE agent Tal picked rather than a rail of three. Four sections
+came off — the dark plate, the `agentCardH` rail, `quizResults`, and `wingBlock()` inside
+Tal's card — and all four are said once somewhere else now (`talRec`, `jrnList`, and a Quick
+Action pointing at `V.result`). Everything else on the page is `talRec` / `quickActions` /
+`jrnList`, all in views.js beside `journey()`.
+
+**The right column is a `.head-sec`, which is the documented opt-in** — `placeBand` only
+takes the ask line, anything containing Tal's mark, and a section the view has DECLARED as
+head furniture. §70 then gives it column two, gated on `.modhead:has(> .sec-jrn)` so no other
+page moves. Both columns are **top-aligned** (Maryam, 30 Aug 2026), which the file is not —
+581:6662 and 587:6742 are both centred — and §56.2's `margin-top` on Tal's label has to be
+zeroed inside the same container query or the two labels sit 16px apart.
+
+**`placeBand`'s run now takes AT MOST ONE Tal section, and that was a real bug.** `_mhIsTal`
+recognises a member by CONTENT — anything with `.ai-aura` or `.ai-label` — and there had only
+ever been one at the head of a page, so the cap never mattered. "Tal's recommends" wears an
+`.ai-label.bare`, so the run walked into it: the section went into the band, laid out in the
+left column at 576px instead of the page's 901, and the photograph, the facts and the actions
+each wrapped onto a line of their own. Nothing threw and nothing warned.
+
+**The travelling light is ON THE ASK FIELD ONLY, and it STOPS.** The file parks a 374×2
+blurred bar on two edges — the summary panel's bottom and the dock's top — and both were
+running for one build. The summary's is off (Maryam, 30 Aug 2026): that panel's sentence
+types itself in (§52), so a light going round it is a second animation competing for the same
+two seconds on the one block the reader is already reading. §25.2's `display:none` on
+`.modhead > .sec::after` takes it away on its own, so the selector is just gone from §70.1's
+list — nothing turns it off.
+
+The dock's **runs continuously, slowly, and never blinks** — `--ai-lap` is 9s, which on that
+field's ~2080px perimeter is about 230px a second. A build in between ran it twice and faded
+it out, on the reading that Google's field animates "for a little time"; the half worth taking
+from Google is that the motion is slow and smooth, not that it ends. Ending gave the block a
+break point, which is the one artefact a light like this cannot have — it dimmed out mid-edge
+and came back on the next render, so the field flickered on every navigation. **The loop is
+seamless because the conic is**: the angle runs 0→360deg on `linear`, and the gradient is
+transparent at both 0% and 100%, so the frame after the wrap is the frame before it.
+
+**The ramp is 581:6584's own five stops, mapped onto a 22% arc** — each of Maryam's
+percentages placed at `74 + p × 0.22`, which preserves the file's spacing between them. The
+two outermost stops are *transparent* white, which the file does not need and this does: on
+the file's bar the white ends sit on white paper, and on the ring they sit on the dock's
+orange border, where a hard white end reads as a bright gap chasing the light round.
+
+**It is a STROKED RECTANGLE WITH A DASH ON IT**, and the two techniques it is not are both
+worth knowing, because each looks correct while you write it and neither survives a 976×64
+field:
+
+- **`offset-path`** — a real 374×2 element on `offset-path:border-box`. Constant linear speed,
+  which is the right pace, and the element is *rigid*, so it cannot turn a corner. Its anchor
+  is its own centre, so near a corner half its length hangs off the edge and paints outside
+  the field; and `offset-rotate:auto` follows the path direction, which on a rectangle is a
+  step function, so it snaps 90° between frames. Overshoot and jerk.
+- **conic + mask** — a conic clipped to a 2px ring. Cannot leave the box and has no
+  orientation to snap, so it fixes both of those, and it **stretches**, which is worse. A
+  conic sweeps a fixed *angle*, and on a flat rectangle a fixed angle is a wildly variable
+  *length*: at the middle of this field's top edge one degree moves ~0.6px, at its corner
+  ~8.5px. The light stretches along the top, collapses through the corner, stretches again.
+  An earlier note here worked the error out per-edge, got 1.5×, and called it small — that
+  arithmetic is right and answers the wrong question. **The variation *within* one edge is
+  15×, and that is the one you see.**
+
+A dash is a *length of the perimeter*: same pixels wherever it is, one speed because
+`stroke-dashoffset` is measured along the path, and it bends round corners because the path
+does. Nothing about it is aspect-dependent. `pathLength="1000"` renumbers the perimeter
+whatever the field's real size, so `stroke-dasharray:180 820` is 18% of the border — 374px
+here, the file's own bar length — and the two sum to 1000, so the pattern tiles the path
+exactly once and the loop has no seam.
+
+**The markup is half of it** and lives in `AI_RUN` (ai4.js), because an SVG cannot be a
+pseudo-element. The rect carries no geometry attributes — §70 sets `x`/`y`/`width`/`height`
+as CSS geometry properties so the line insets itself by half its stroke without the markup
+knowing the dock's size. The gradient is the file's five stops laid corner to corner; a
+stroke samples its paint by position rather than carrying it along the dash, which is the one
+place this cannot do what the file does, and is not nameable on a 2px blurred line.
+
+**Reduced motion needs its own block** — §13.187 clamps every duration to 1ms, which on an
+infinite animation is a strobe rather than "off". It parks the dash on the top edge, where
+581:6584 draws the bar standing still.
+
+**§63 §10 owns every size, weight, case and ink these families use** — including the two that
+look like mechanism, the `color:transparent` under each clipped gradient and the three step
+states. The step states are the file's `#00a43c` / `#f47113` / `#515151` (Maryam's call over
+this build's AA rule; the first two read 2.8:1 and 3.1:1 and the note in §63 says so).
+**Priya's fee is the one place the file does not win**: 581:6479 says $120 and
+`AGENTS.priya.price` says $95, which is also what three other screens charge.
+
+`70-ainative.css` has to be in **both** build lists. Leaving it out of `design-system/
+build-ds.py` is worse than it sounds and is why that entry carries a long note: §63 IS in
+that list, so the design system shipped `.jrn-pill`'s ink with nothing to draw the pill and
+`.rec-alt`'s `color:transparent` with no gradient under it. Grep the output for a class §70
+introduces after either build.
+
+### THE WEEK PULSE — §72, `72-weekpulse.css` + `pulse()` (views.js)
+
+Figma 599:7418. **The three enrolled dashboards drew one question as three panels.** Under the
+head band, `week1` / `day34` / `day90` ran "This week", "Time on the course" and "Where you
+stand" as three `.sec`s — three headings, 1230px, all three answering "how am I doing". They
+are now **one section headed "Your learning pulse"**: Tal's sparkle, a derived opening
+sentence, and three columns — **Current focus** (the chapter, its ring, what the week already
+holds, and the way in), **Your pace** (the week's minutes against the 55-minute target),
+**Your standing** (`standRow`). Drawn in our own components throughout: the ring, `standRow`,
+§65's `.stat` chip, §70's sparkle, `I.checkFilled`, `I.book` / `I.time` / `I.star`.
+
+- **THE HEADING IS TAL'S AND IT MUST NOT WEAR `.ai-label` OR `.ai-aura`.** This is the one
+  thing in the file that would break the page. `talFirst` **hoists** any `.sec` containing an
+  `.ai-aura` to directly under the `.ph` (trap 11), and `placeBand`'s `_mhIsTal` claims a
+  section containing **either** class as head furniture. §70 records that exact bug — "Tal's
+  recommends" wore an `.ai-label.bare`, the band's run walked into it, and the section
+  rendered at 576px instead of 901 with nothing thrown and nothing warned. The one-Tal cap in
+  that run would save this section *today*, which is precisely the accident not to depend on.
+  `.pulse-mk` is its own class painted with §70's `--ai-star` and `--ai-grad`, so the mark is
+  the same object the band's label wears and **no pass can see it**. The words are in ink, not
+  clipped to the ramp: §70 clips the band's label because that label is Tal *speaking*; this
+  one heads a grid of figures, and a gradient heading over a table is the ramp as decoration.
+- **THE LEDE IS DERIVED, NOT WRITTEN, AND IS NOT A `PAGESUM` ENTRY.** Every figure in it is
+  read off the same `f` / `g` / `pacePart` the columns are drawn from, so it cannot disagree
+  with the block under it. That slot belongs to the head band, one per page, and
+  `placePageSummary` owns it; this is the section's own opening line. The overlap with the
+  band's summary is the chapter name and the 45 minutes — the band says what has *happened*
+  (unlocked today, four of ten ahead of you), this says where you *are* in it.
+  **One accent phrase, and it is the chapter name**, because it is the only thing in the
+  sentence not reprinted as a figure below. The `<b>` figures stay in primary ink: §70.2's
+  tinted ground belongs to the band, and lighting a number here that is printed 40px lower at
+  four times the size is the same figure shouted twice.
+  **The second clause collapses when the two figures are the same number** — day 34 has 12
+  minutes on chapter 4 and 12 on the course this week, and "12 of 70 … and have spent 12"
+  reads as two facts that happen to agree.
+- **THE GRID COUNTS ITS OWN CHILDREN.** `grid-auto-flow:column` with no
+  `grid-template-columns`, because **day 90 has two columns** — every chapter is finished and
+  `pulse` does not emit the focus one. `repeat(3,1fr)` leaves an empty third track with a
+  hairline hanging in space. `minmax(0,1fr)` on the auto columns, because the standing
+  figures are `white-space:nowrap` by §29 and a `1fr` floor is `auto`.
+- **THE COLUMN HUES ARE NAMED, NOT CYCLED** — `pulseCol` writes `--mk` inline. §65's decision
+  squared: with the focus column absent on day 90, an `nth-child` cycle would make "your pace"
+  green on day 34 and blue on day 90.
+- **THE PACE BAR IS UPRIGHT TICKS IN THE COLUMN'S OWN HUE, AND BOTH REVERSE §71.1b.** That
+  layer draws a 2px rail in the AI ramp because it is in *Tal's band* and the amber says whose
+  block it is. This is a figure column with a green clock chip 100px above it: `--mk` ties the
+  mark and the bar into one object, and 14px upright reads as a measure being filled rather
+  than as a rule. **One block per two minutes**, so 28 blocks *is* the 55-minute target and
+  ten lit is 20 minutes — which is also exactly the 36% the figure below prints. The file's
+  own bar draws 7 lit beside that 36%; the count is derived in `pacePart` so the two cannot
+  disagree. Once the 90 days are over the blocks become the thirteen **weeks**, lit where the
+  week met target — the stacked chart's one durable fact in §71's thirteen-block language.
+- **THE STANDING CARD KEEPS `standRow` UNTOUCHED.** The rewards page draws the same three
+  cells and the two must not disagree about what a badge is worth, so §72.4 works entirely
+  from outside: `display:contents` on `.stand-top` dissolves the wrapper and promotes the
+  label and the figure into `.stand-b`'s grid. **The note runs full width under the pair, and
+  that is a correction to the file.** 599:7418 puts the figure beside a note in column one,
+  which works for its "Earn the Silver badge"; the product's is "Earn the Silver badge and the
+  Get Involved badge", and in the 80px left after a 32px mark and a 60px figure it set to
+  **four lines** and made that row 115px against Points' 67. Full width it is two lines and
+  the three rows land within 16px of each other.
+- **SQUARE, NOT ROUNDED.** The file draws the standing card with a ~10px radius; `--radius` is
+  `0px` by token and every `border-radius` in the build resolves through it, so a curved card
+  would be the only one in the portal. Stated as `var(--radius)` rather than omitted.
+- **TRAP 13, AND IT IS THE CHEAPEST THING HERE TO GET WRONG.** All three sections this
+  replaces opted out of §10.15's 184px label column by a different route. `.pulse` is a new
+  wrapper, so the merged section fell straight into the column. §72.1a restates the opt-out
+  inside `@container app (min-width:900px)` per trap 3 — and copies what §10 *does*, not what
+  it says: the `padding:0 var(--pad-x)` on that rule is dead (§14.2 zeroes it) and restating
+  it would set this one heading 32px right of the page. That is §69's lesson.
+- **TWO ROUTES TO THE CHAPTER, DELIBERATELY** (Maryam, 31 Aug 2026). The head row's "Open
+  chapter N" belongs to the *section*; "Continue learning" closes the *column*, pinned to its
+  foot by `margin-top:auto` so the three columns end level whatever the did-list holds. It
+  keeps its border — the same reversal of §64 that §71.2 makes for `.crow-a`, stated as
+  `border-color` because `.btn` already carries a transparent 1px.
+- **THE EMPTY STATE WENT.** `weekCard` printed "Nothing finished yet…" where week 1's did-list
+  is empty; the ring beside it already shows 0% and the band says the rest. On week 1 the
+  focus column is now exactly the four rows the file draws; on day 34 the two real facts sit
+  above the button rather than being thrown away.
+- **THE 13-WEEK STACKED CHART MOVED TO COURSE PROGRESS**, under "Assessment scores" and gated
+  on `f.done`. It cannot be a third of a column, and the time data reads as week progress in
+  the pace column instead. This makes the promoted branch's long-standing claim that "the
+  chart is still on Course Progress" true — it was written before `stackChart` had any caller
+  but the dashboard.
+- **THE SECOND TAL PARAGRAPH WENT, AND `weekCard` WITH IT.** It duplicated the band's summary
+  almost verbatim. `WEEKLY[stage].tal` and `.ask` stay in data.js and nothing reads them. The
+  ask chip had already been invisible on every build — step 1b of `placePageSummary` removes
+  every `.chip-tal` not inside something of Tal's, and `.wkc-a` is page flow.
+
+**Pre-existing and NOT fixed here:** week 1 shows "0h 0m invested" in the head strip and
+"20 min" in the pace column, because `CFG.week1.mins` is 0 and `GAME.week1.weeks` is `[20]`.
+data.js records that disagreement; the merge only moves the two figures closer together.
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
 Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a

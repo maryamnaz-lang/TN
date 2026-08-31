@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=8cf0587f">
+<link rel="stylesheet" href="talentnext-ds.css?b=f91db0e5">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=8cf0587f"></script>
+<script src="talentnext-ds.js?b=f91db0e5"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -620,6 +620,74 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       </ul>
     </div>
   `)}
+  ${ex('Three answers to one question', 'What to copy when a page is asking <b>"how am I doing"</b> and answering it in three parts — what I am on, whether that is enough, what it has earned. Drawn as three sections it does not compose: the reader gets a heading, a hairline and a screenful between each part, and has to hold the first to make sense of the third. One <code>.pulse</code> row puts them side by side in the order the question is asked. <b>Nothing in here is a new component</b>, and that is the point of the entry — the ring is <code>.ring</code>, the standing cells are <code>.stand</code>, the marks are the same 28px <code>.stat</code> chip in the same three named hues, the bar is the chapter rail with a different count. What <code>.pulse</code> states is the <b>grid that holds them</b> and the handful of places a component drawn for a full-width section has to change to live in a 290px column, which is the rearrangement a second portal wants and cannot work out from the components alone. Five things to copy exactly. <b>The heading and the lede are siblings of <code>.pulse</code>, not children</b> — the section reads title row, sentence, grid, and the sentence is the one part of it written from the same figures the columns draw, so it can say what the three of them add up to. <b><code>.pulse-mk</code> is the assistant\'s sparkle and deliberately not <code>.ai-label</code></b>: it paints the same star in the same ramp, so the mark is identical to the one at the head of a band, but it carries no class any render pass looks for. That is what lets a hand-authored page use it without the section being hoisted into a head band. <b>The hue is an inline custom property</b> — <code>style="--mk:var(--mk-1)"</code> on each column — and that is the one inline style this system asks for: it is a token, not a layout value, so no stylesheet needs to answer it and a fourth column is a fourth hue rather than a fourth <code>nth-child</code> rule. It reaches further than the mark: the lit blocks of the pace bar take <code>var(--mk)</code> too, so a column is one colour throughout. <b>The track count counts the children</b>: <code>grid-auto-flow:column</code> and no <code>grid-template-columns</code>, so a page that emits two columns gets two — written as <code>repeat(3,1fr)</code> the survivors sit in the left two thirds with a hairline hanging in space. And the columns are <code>minmax(0,1fr)</code>, because a <code>1fr</code> floor is <code>auto</code> and the standing figures are <code>white-space:nowrap</code>, so they refuse to shrink and push the row wide. Two smaller ones: <code>.pulse-go</code> is pinned to the foot with <code>margin-top:auto</code> so the columns\' buttons line up whatever their content does, and if your page has a <code>.sec-h</code> above this, note the label column — <code>.pulse</code> is a wrapper and gets the 184px spine unless the opt-out is restated for it.', `
+    <div class="sec-h pulse-head">
+      <h2 class="pulse-ttl"><i class="pulse-mk"></i>Your learning pulse</h2>
+      <button class="btn btn-p btn-sm" type="button">Open chapter 4 {{arrowRight}}</button>
+    </div>
+    <p class="pulse-lede">You have completed <b>12 of 70 minutes</b> for <span class="pulse-hl">Delegation Without Drop-Off</span>, which is all the time you have spent learning this week. Complete chapter 4 to stay on the pace.</p>
+    <div class="pulse">
+      <div class="pulse-c" style="--mk:var(--mk-1)">
+        <div class="pulse-h"><i class="pulse-ic">{{book}}</i><span class="pulse-lab">Current focus</span></div>
+        <h3 class="pulse-t">Delegation Without Drop-Off</h3>
+        <div class="pulse-eb">Chapter 4 &middot; In progress</div>
+        <div class="pulse-ring">
+          <div class="ring" role="img" aria-label="17% of chapter 4 done">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <circle class="ring-t" cx="32" cy="32" r="26"></circle>
+              <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:27.8"></circle>
+            </svg>
+            <span class="ring-n u-h2">17<small>%</small></span>
+          </div>
+          <span class="pulse-rb"><b>12 / 70 min</b><span class="pulse-rl">completed</span></span>
+        </div>
+        <ul class="pulse-did">
+          <li><span class="pulse-tick">{{checkFilled}}</span>
+            <span class="pulse-db"><b>Chapter 5 finished</b><span class="pulse-dm">Assessed 86%</span></span></li>
+          <li><span class="pulse-tick">{{checkFilled}}</span>
+            <span class="pulse-db"><b>Posted in the cohort discussion</b><span class="pulse-dm">Yesterday &middot; earned Get Involved</span></span></li>
+        </ul>
+        <div class="pulse-go"><button class="btn btn-g btn-sm" type="button">Continue learning {{arrowRight}}</button></div>
+      </div>
+      <div class="pulse-c" style="--mk:var(--mk-2)">
+        <div class="pulse-h"><i class="pulse-ic">{{time}}</i><span class="pulse-lab">Your pace</span></div>
+        <div class="pulse-fig">12<small>min</small></div>
+        <div class="pulse-sub">of the 55 min weekly target</div>
+        <div class="pulse-bar">
+          <span class="pulse-bl">55 min target</span>
+          <span class="pulse-seg" role="img" aria-label="12 of the 55 min weekly target"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+        <div class="pulse-3">
+          <span><b>12 min</b><span class="pulse-3l">This week</span></span>
+          <span><b>43 min</b><span class="pulse-3l">Remaining</span></span>
+          <span><b>22%</b><span class="pulse-3l">Of target</span></span>
+        </div>
+      </div>
+      <div class="pulse-c" style="--mk:var(--mk-3)">
+        <div class="pulse-h"><i class="pulse-ic">{{trophy}}</i><span class="pulse-lab">Your standing</span></div>
+        <div class="stand">
+          <button class="stand-c" type="button">
+            <span class="stand-mk"><img src="{{aw:rank1}}" alt=""></span>
+            <span class="stand-b"><span class="stand-top">
+              <span class="stand-l">Points</span><span class="stand-v">1,095</span></span>
+              <span class="stand-d">1,405 to Bronze</span></span>
+          </button>
+          <button class="stand-c" type="button">
+            <span class="stand-mk none"><img src="{{aw:bronze}}" alt=""></span>
+            <span class="stand-b"><span class="stand-top">
+              <span class="stand-l">Badges</span><span class="stand-v">0 <small>of 4</small></span></span>
+              <span class="stand-d">Bronze at 2,500 points</span></span>
+          </button>
+          <button class="stand-c" type="button">
+            <span class="stand-mk"><img src="{{aw:rank1}}" alt=""></span>
+            <span class="stand-b"><span class="stand-top">
+              <span class="stand-l">Rank</span><span class="stand-v">1-Star</span></span>
+              <span class="stand-d">Earn the Silver badge and the Get Involved badge</span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `)}
   ${ex('The floating Tal bar', 'The dock at the foot of every page — <code>.askdock > .askline</code>. It is <b>page chrome, not page content</b>: it goes inside <code>.app</code> beside <code>.shell-body</code>, because <code>.app .askdock</code> is <code>position:absolute; bottom:var(--s05)</code> and needs <code>.app</code> as its containing block. Put it in the <code>.page</code> and it scrolls away with the content. The send glyph is <code>arrowUp</code>, deliberately not <code>arrowRight</code> — right is this product’s GO, up is “this text goes from here to there”. This whole family was excluded from the first two builds, which is why it was missing.', `
     <div class="askdock" style="position:relative;bottom:auto;width:100%">
       <button class="askline" aria-label="Ask Tal anything">
@@ -836,6 +904,125 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
     <div id="roseDemo"></div>
     <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
       the interview probes hardest, and what the course spends most of its time on.</p>
+  `)}
+
+  ${ex('The AI-native dashboard head', 'The other shape a <code>.modhead</code> can take, and the one to copy for a portal whose <b>assistant is the page</b> rather than a card on it. §56\'s band reads title / facts / rule / steps / rule / Tal down one column with the page\'s dark card beside it; this turns it out — <b>Tal\'s sentence is the whole left column</b> on its own warm wash, and the steps are the right one. Three things make it work and none of them are guessable from the CSS. <b>The right column is a <code>.sec.head-sec.sec-jrn</code></b>: <code>.head-sec</code> is the documented opt-in that gets a section collected into the band at all — the collector otherwise only takes the ask line and anything carrying Tal\'s mark — and §70 then gives <code>.sec-jrn</code> column two, gated on <code>.modhead:has(&gt; .sec-jrn)</code> so no other page moves. It must be written <b>directly after <code>ph()</code></b>, because the collector walks a run and not a search. <b>The page has no visible title</b>: with the greeting inside Tal\'s sentence a heading above it would say hello twice, so §70 takes the <code>.ph</code> off the screen — <i>visually</i> hidden, still in the accessibility tree, which is the one thing <code>.tal-greet</code>\'s <code>display:none</code> route cannot give you. And <b>the dark card stands down</b>: the second column holds one thing, so a page with a journey column leaves its <code>.plate</code> in the body as a full-width section instead of lifting it into the band. Both columns are <b>top-aligned</b> and Tal\'s label has its §56 top margin zeroed, which is what lands the two labels on one line. Below 900 it is one column and the journey takes a <code>border-top</code>.', `
+    <div class="modhead">
+      <div class="ph"><h1>Welcome back, Maryam!</h1></div>
+      <div class="sec">
+        <div class="ai-aura tile talsum">
+          <div class="ai-head"><span class="ai-label">Summary by Tal</span></div>
+          <div class="ai-body"><p>Welcome back, Maryam! Based on your <b data-sum="quiz">quiz results</b>,
+            you are currently on <b data-sum="track">Explorer track</b>. Your level from E1 &ndash; E5
+            anchors after a 45-minute interview.</p></div>
+        </div>
+      </div>
+      <div class="sec head-sec sec-jrn">
+        <div class="jrn">
+          <div class="jrn-h">
+            <h2 class="jrn-t">Your journey so far</h2>
+            <span class="jrn-pill">Step 2 of 4</span>
+          </div>
+          <ol class="jrn-l">
+            <li class="jrn-i done"><span class="jrn-ic">{{checkFilled}}</span><span class="jrn-n">1.</span><span class="jrn-lab">Leadership quiz</span></li>
+            <li class="jrn-i on"><span class="jrn-ic">{{video}}</span><span class="jrn-n">2.</span><span class="jrn-lab">Interview and level</span></li>
+            <li class="jrn-i"><span class="jrn-ic">{{group}}</span><span class="jrn-n">3.</span><span class="jrn-lab">Enrolled</span></li>
+            <li class="jrn-i"><span class="jrn-ic">{{book}}</span><span class="jrn-n">4.</span><span class="jrn-lab">90-day course</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  `)}
+
+  ${ex('A phrase in the summary, and the card it opens', 'The three accent phrases in Tal\'s sentence are <b>controls</b>, not decoration: <code>&lt;b data-sum="quiz"&gt;</code> marks one and a card opens under it with the reading behind the claim. <b>The key is a subject, not a position</b> — that is what makes this reusable. Any summary on any page can mark a phrase with the same key and get the same card, which is how <code>track</code> serves both the just-joined and the interview-booked dashboards from one entry. A card is four parts: what is true, a named reading in <code>--link</code> blue, a rule, and one way out. <b>The blue is deliberate</b>: the accent is Tal\'s voice all over this band, so a second accent phrase inside a card that <i>is</i> Tal talking would say nothing. Two mechanics to copy if you build your own: position it against the <b>hidden ghost</b> if your summary types itself in (the visible copy is built up a character at a time and is the wrong width mid-type), and <b>lift the band</b> while one is open — <code>.modhead</code> carries <code>isolation:isolate</code>, so the card\'s own <code>z-index</code> is trapped inside the band and the next section paints straight over it. Below is the card on its own; in the portal it is absolutely positioned under the phrase and clamped to the paragraph.', `
+    <div class="sumdrop" style="position:relative">
+      <div class="sd-b">
+        <p class="sd-lead">According to the Next in Leadership quiz, you are evaluated as an Explorer.</p>
+        <p class="sd-read"><b>Discovering your direction:</b> You&rsquo;re exploring what fits you
+          best&mdash;and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.</p>
+      </div>
+      <div class="sd-next">
+        <p class="sd-nt">Your Next Step</p>
+        <p class="sd-nb">Connect with a Talent Next agent to get yourself evaluated and get a level.
+          Your level anchors after a 45-minute interview.</p>
+      </div>
+      <button class="sd-act"><span class="sd-ic">{{calendar}}</span>Book your interview with Priya Nair</button>
+    </div>
+  `)}
+
+  ${ex('A block that is being assembled', 'The loading state for a block the assistant is rebuilding, and the reason it is not a spinner: <b>every bar is the box of the thing it stands in for</b>, so nothing moves when the real content lands. It reuses the resting block\'s own wrappers — the same flex containers, the same gaps — and swaps the content for <code>.sk</code> spans, which is what guarantees the two line up. <b>The fill is the brand ramp at 20%</b> and that is the whole difference between this and a dashboard waiting: a grey skeleton says the page is slow, a warm one in the same gradient as Tal\'s label says the assistant is working. The sweep is a second background layer inside each bar rather than one band crossing the block, because a single overlay would light up the <b>gaps</b> between the bars as well; all bars share one 1.8s timing so the wave reads as one pass. Widths are classes, not inline styles — six numbers on six spans would be six declarations no stylesheet could answer.', `
+    <div class="rec rec-busy" aria-busy="true">
+      <div class="rec-l">
+        <span class="sk sk-ph"></span>
+        <div class="rec-b">
+          <div class="rec-top"><span class="sk sk-n"></span><span class="sk sk-x"></span></div>
+          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
+          <div class="rec-ov">
+            <span class="sk sk-m"></span>
+            <p class="rec-tags"><span class="sk sk-t"></span><span class="sk sk-t"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('A progress column', 'The <b>second thing</b> that can hold a <code>.modhead</code>\'s right-hand column, and the one to copy when the page is about something already running rather than about getting in. Same opt-in as the journey list — <code>.sec.head-sec.head-col</code>, written directly after <code>ph()</code> — and <code>.head-col</code> is the class that opens the column at all. <b><code>.sec-jrn</code> and <code>.sec-prog</code> only say which tenant it is</b>, and that split matters because the two need different track widths: a list of four labels compresses (36%), three marks and the single words "chapters" and "invested" do not (42%, floor 336). Everything inside is components the system already had — <code>.prog</code>, <code>.prog-seg</code>, <code>.prog-figs</code> — rearranged for a narrow measure. Four things change and all four are worth knowing. <b>The figure band loses its border and keeps two hairlines</b>: on a page <code>.prog-figs</code> is a ruled band with four edges, in a column it is the bottom of the block above it, so the dividers are <code>::before</code>/<code>::after</code> placed in <code>1fr</code> slack tracks — grid pseudo-elements, which is what lets one function draw both. Write <code>border:0</code> and not <code>border-top:0;border-bottom:0</code>, or the left and right survive. <b>The percentage and its label share a baseline</b> rather than stacking. <b>The day is <code>--link</code> blue</b> — it is a position, where the other two figures are amounts. And <b><code>overflow-wrap:normal</code></b>, without which a narrow column breaks "chapters" into "chapt / ers" and nothing anywhere reports it. The width below is the file\'s 407; in a band the column sizes itself.', `
+    <div class="sec head-sec head-col sec-prog" style="max-width:407px">
+      <div class="stp stp-open stp-titled wing-prog">
+        <div class="stp-top"><h2 class="u-h3">Your 90 days so far</h2></div>
+        <div class="prog">
+          <div class="prog-top">
+            <div><div class="prog-pct">38<small>%</small></div><div class="prog-l">of the course done</div></div>
+            <div class="prog-day"><div class="prog-dn">Day 34</div><div class="prog-l">of 90</div></div>
+          </div>
+          <div class="prog-seg"><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="prog-figs">
+            <span><i class="prog-ic">{{book}}</i><span class="prog-fb"><b>5 of 13</b><span class="prog-lab">chapters</span></span></span>
+            <span><i class="prog-ic">{{checkFilled}}</i><span class="prog-fb"><b>1 of 3</b><span class="prog-lab">week tasks</span></span></span>
+            <span><i class="prog-ic">{{time}}</i><span class="prog-fb"><b>4h 20m</b><span class="prog-lab">invested</span></span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('A call row, and its two priorities', 'What this system draws for <b>an appointment with a person in it</b> — a countdown, who is running it, and the two things to do about it — and it is the light answer to the same question <code>.plate</code> answers loudly. Read §59\'s argument first: the black card plus the warm haze is the loudest object here and it is spent on something time-sensitive. A weekly call two days out is not, so the plate was drawing its quiet state almost always. The row moves that priority off the whole card and onto <b>the one cell that states the time</b>: grey outside the day, <code>.urgent</code> and the accent inside it. <b>Everything else about the two states is identical</b> — same paddings, same portrait, same two 185×40 buttons — so add <code>.urgent</code> and nothing else, and write any new rule against the tokens rather than against the state. <b>The row does not know where it is, and that is the point</b> — <code>.crow</code> is the bare component and the caller wraps it. Wrap it in <code>.sec.head-sec.head-col.sec-call</code> and it is collected into the head band as a third member spanning both columns; wrap it in a plain <code>.sec</code> and it is an ordinary block in the page body, which is what a page whose second column is already spoken for wants. Same markup either way. Five things the CSS will not tell you. <b>The countdown cell is a fixed 182 and full-bleed on the left</b>: it is a ground, and a ground that stops short of the frame is a card; as a <i>minimum</i> width it takes its max-content and the caption stops wrapping to the two centred lines it wants. <b>The portrait is a 78px square, not <code>avatar()</code></b> — that helper writes its size inline and draws a disc. <b><code>.crow-who</code> carries <code>flex:1 1 300px</code></b>, and that basis is the whole of how the row behaves: wide, the three sit on one line and the leader grows into the slack; narrow, the actions wrap to a line of their own held right, and nothing is ever crushed. And <b>the quiet button keeps its border here</b>, which reverses §64 on this one row — beside a filled accent button, a button with no edge reads as a caption that happens to be clickable. <code>dsCallUrgent(row)</code> picks the state from the words and <code>dsCallLeft(when)</code> words the countdown both ways.', `
+    <div class="crow">
+      <div class="crow-when">
+        <b>2 days left</b>
+        <span>Cohort week call · session 36</span>
+      </div>
+      <div class="crow-who">
+        <span class="crow-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">Priya Nair</span>
+            <span class="crow-v">{{checkFilled}}</span></p>
+          <p class="crow-role">Cohort leader</p>
+          <p class="crow-x"><b>Expertise:</b> System Architecture, assesses E1–E3</p>
+        </div>
+      </div>
+      <div class="crow-a">
+        <button class="btn btn-sm noic ic-l" type="button">{{chat}}Message Priya</button>
+        <button class="btn btn-p btn-sm noic" type="button">Join {{arrowRight}}</button>
+      </div>
+    </div>
+    <div class="crow urgent">
+      <div class="crow-when">
+        <b>In 2 hours</b>
+        <span>Cohort week call</span>
+      </div>
+      <div class="crow-who">
+        <span class="crow-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">Priya Nair</span>
+            <span class="crow-v">{{checkFilled}}</span></p>
+          <p class="crow-role">Cohort leader</p>
+          <p class="crow-x"><b>Expertise:</b> System Architecture, assesses E1–E3</p>
+        </div>
+      </div>
+      <div class="crow-a">
+        <button class="btn btn-sm noic ic-l" type="button">{{chat}}Message Priya</button>
+        <button class="btn btn-p btn-sm noic" type="button">Join {{arrowRight}}</button>
+      </div>
+    </div>
   `)}
 `});
 

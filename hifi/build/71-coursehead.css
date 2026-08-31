@@ -1,0 +1,578 @@
+/* ==========================================================================
+   §71  THE COURSE HEAD — Figma 599:7418
+
+   §70 REDREW THE WAY IN AND LEFT THE COURSE BEHIND. 578:5966 made Tal the page
+   on `new`, `booked` and `assessed`; the three stages with 90 days actually
+   running kept §56's band — title, fact row, hairline, wing, hairline, Tal,
+   with the weekly call as a black plate in the second column. So the product
+   changed voice halfway down its own journey: the assistant spoke first for the
+   four weeks before the course and fourth for the thirteen weeks of it, on the
+   pages a candidate opens most.
+
+   599:7418 is the same reversal one step on, and it is three blocks:
+
+     the summary    Tal's sentence, the band's whole left column, on the wash.
+     the progress   "Your 90 days so far" — `progressStrip` — in column two.
+     the call       a full-width row under both: the countdown, the leader, and
+                    the two things to do about it.
+
+   Everything below the call row is the page as it was.
+
+   WHAT IS IN HERE AND WHAT IS NOT. Layout, grounds, borders, gradients and
+   spacing. NOT font size, weight, case or ink: those four are §63's wherever
+   the layer sits, and every one this file's families need is in §63 §11 —
+   including the two that read as mechanism rather than type, the segment ramp's
+   companion inks and the countdown's violet.
+
+   THREE THINGS IT DOES NOT RESTATE, BECAUSE §70 ALREADY STATES THEM FOR BOTH:
+
+     the wash          `.modhead > .sec:has(> .ai-aura.talsum)` is unconditional
+                       in §70.2 — every band with a summary in it has had the
+                       wash since that layer landed. Block one needed no rule.
+     the phrases       `.ai-body p b` gets the 5% ground and the 4px radius from
+                       §70.2 and the accent ink from §63 §10, so the highlights
+                       in the enrolled summaries came for free.
+     the two columns   §70.3, and it is keyed on `.head-col` rather than on
+                       `.sec-jrn` BECAUSE of this layer. The note over that
+                       block is the argument; what matters here is that §71
+                       adds a second TENANT and not a second grid.
+
+   SO WHAT IS ACTUALLY IN THIS FILE is the progress column's internals, the
+   call row, and the one structural thing §70 has no equivalent of: a THIRD
+   band member that spans both columns on a row of its own.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE PROGRESS COLUMN — 599:7437
+
+   `progressWing` moved out of Tal's card and into the band's second column.
+   Not one declaration of it is new: `.stp .stp-open .stp-titled` is §04's
+   rhythm and §24.4's header row, `.wing-prog` is the hook §59.1 uses to take
+   the page gutter off the figure strip and §65 uses to blend the marks into
+   the column's ground, and the strip itself is `progressStrip` untouched. What
+   this section does is the four places the file's drawing and the wing's
+   differ, and every one of them is a number.
+   ------------------------------------------------------------------------ */
+/* THE PROGRESS COLUMN TAKES A WIDER SHARE THAN THE JOURNEY — 42% AGAINST §70.3'S
+   36% — AND THE REASON IS THAT ITS CONTENT DOES NOT SCALE WITH THE FRAME.
+
+   Both files draw the same split: 925 / 471 of 1396, which is 34%. §70 rounded
+   it to 36 and that is right for the journey, because a list of four labels has
+   no intrinsic width — squeeze it and the labels wrap, which costs a line and
+   nothing else. The figure strip is not like that. It is three marks and three
+   words, and "chapters" and "invested" are single words that cannot wrap at
+   all: the cells need 269px whatever the band is, and at 36% of the product's
+   901 the strip gets 259. Twenty-six short, and the failure is silent (see
+   §71.1c) — the words break mid-syllable rather than the page overflowing.
+
+   42% of 901 is 378, which leaves the strip 296 and Tal's column 523 — a
+   measure that is still well inside §70.2's 733 cap and reads as a paragraph
+   rather than a column. The clamp's floor is 320 rather than 300 for the same
+   reason: below that the strip cannot hold its own words.
+
+   THE FLOOR IS 336 AND IT IS THE BINDING NUMBER, not the 42%. At a 1000px frame
+   the rail and the page gutter leave the band 688, where 42% is 289 — so the
+   clamp sits on its minimum for the whole 900–1150 range and the percentage
+   never applies. 336 leaves the strip 272 against the 254 its longest words
+   need, and Tal 352, which is a narrow measure and the right one to spend:
+   below about 1150 this head is two columns of roughly equal width whatever
+   either of them wants, and the alternative is a strip that cannot say
+   "chapters".
+
+   GATED ON `.sec-prog` SO §70'S PAGES DO NOT MOVE. `.head-col` is the class
+   that opens the column; which tenant is in it is what sizes it, and this is
+   the first time the two have needed different answers. */
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-prog){
+    grid-template-columns:minmax(0,1fr) clamp(336px, 42%, 471px)}}
+
+/* THE BLOCK FILLS THE CELL. §70.3 makes the column a flex box aligned to the
+   top so its heading shares a baseline with Tal's label; a `.stp` is a flex
+   COLUMN with no intrinsic width, so without this it shrinks to its longest
+   word and the strip is a 90px bar in a 300px column. */
+.app .sec-prog > .stp{width:100%;min-width:0;padding:0}
+
+/* 20 UNDER THE HEADING — 599:7438. §56.2 gives `.stp-open > .stp-top` 16, which
+   is the wing's step inside a card; the file gives this column's heading its
+   own 20 because it is a panel heading rather than a row inside one. */
+.app .sec-prog .stp-open > .stp-top{margin-bottom:20px}
+
+/* AND 16 BETWEEN THE STRIP'S THREE PARTS — 599:7443. §02.366 sets `.prog` at 8,
+   which is right for a strip inside a card and reads as three lines of one
+   paragraph in a column of its own. */
+.app .sec-prog .prog{gap:var(--s05)}
+
+/* THE PERCENTAGE AND ITS LABEL SHARE A LINE — 600:7638, and this is markup the
+   file has and the product does not. `progressStrip` wraps `.prog-pct` and
+   `.prog-l` in a bare `<div>`, which stacks them; the file sets "12%" at 32 and
+   "of the course done" at 14 on the same baseline beside it. A flex row on the
+   wrapper says that without touching the strip, which is what keeps this a
+   MOVE — `progressStrip` is still the one function and still draws the same
+   six elements.
+
+   `baseline` RATHER THAN THE FILE'S `items-end`. The two agree on a 32px figure
+   next to a 14px word only because the file's frame has no descenders in "of
+   the course done" — there is a p, a u and a d. Bottom-aligned, the label sits
+   a pixel low against the figure's baseline; on the baseline the two read as
+   one line, which is the thing `items-end` was approximating. */
+.app .sec-prog .prog-top > div:first-child{
+  display:flex;align-items:baseline;gap:var(--s03)}
+
+/* THE DAY IS A STACK AND KEEPS ITS 6 — 600:7656. `.prog-day` is already
+   right-aligned (§04.83); the gap is the file's and is smaller than the 8 the
+   rest of the column uses because the pair is one fact split over two lines. */
+.app .sec-prog .prog-day{display:flex;flex-direction:column;gap:6px}
+
+/* -------------------------------------------------------------------- 1b ---
+   THE RAIL IS THIRTEEN 2px SEGMENTS — 600:7642
+
+   THE FILE DRAWS ELEVEN AND THE PRODUCT DRAWS THIRTEEN, AND THIRTEEN WINS.
+   600:7639..7651 is eleven rectangles with four filled, on a card whose own
+   figure row says "3 of 13 Chapters" — so the count is a placeholder in the
+   file and the two halves of it do not agree with each other. `progressStrip`
+   maps `CH`, which is the thirteen chapters every other surface in the build
+   counts, and one filled block per finished chapter is the whole point of
+   drawing blocks rather than a bar. Nothing here sets a count.
+
+   WHAT IS THE FILE'S IS THE WEIGHT: 2px tall against §10.545's 3, and 4px
+   between against §02's 2. Thinner and further apart is what turns a progress
+   BAR into a row of chapters — at 3px and 2px apart the thirteen read as one
+   dashed line, which is a bar drawn badly.
+
+   AND A FINISHED BLOCK TAKES THE AI RAMP, NOT THE FLAT ACCENT. 600:7639's
+   125.95deg through §70's three stops. §19's rule is that the brand gradient
+   runs through every FILL and the exception is marks that are DRAWN — a stroke,
+   a border, a caret — because a gradient across a hairline is a smudge. A 2px
+   block 33px long is a fill, not a stroke: it is 33px of gradient, which is
+   where a ramp reads. The ramp is `--ai-*` rather than `--accent-grad` for the
+   reason §70.0 gives at length — this is Tal's band and the amber in the middle
+   is what says so. */
+.app .sec-prog .prog-seg{height:2px;gap:4px}
+.app .sec-prog .prog-seg i{
+  background-image:none;
+  background-color:var(--layer-accent-01)}
+.app .sec-prog .prog-seg i.done{
+  opacity:1;
+  background-color:transparent;
+  background-image:linear-gradient(125.95deg,
+    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
+/* the chapter that is open is a finished block turned down, which is the state
+   §02.378 already draws — restated only because the rule above it re-points the
+   same two properties and would otherwise leave `.now` on the flat accent */
+.app .sec-prog .prog-seg i.now{
+  opacity:.4;
+  background-color:transparent;
+  background-image:linear-gradient(125.95deg,
+    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
+
+/* -------------------------------------------------------------------- 1c ---
+   THE THREE FIGURES BECOME A ROW WITH TWO HAIRLINES — 600:7666
+
+   §10.16 draws `.prog-figs` as a CELL GRID: three equal `1fr` tracks with a 1px
+   gap over a rule-coloured ground for the dividers, closed top and bottom by
+   two borders. That is the right drawing for a strip that is a SECTION of a
+   page — it is a band across the content, and a band has two edges. Neither
+   half of it survives a 300px column.
+
+     the two horizontals   the file draws exactly two hairlines here and both
+                           are vertical. With the top and bottom on, the strip
+                           read as a small table dropped into the column rather
+                           than as the bottom of the block above it.
+     the gap technique     a 1px gap over a ground is what gives §10 exact
+                           single dividers however the grid WRAPS, and it is
+                           the reason the cells have to paint their own
+                           background. Nothing in a fixed three-across row
+                           wraps, so what it buys here is the requirement that
+                           the cells name the column's ground — and `--layer-01`
+                           is not `--background` on this surface. A `border-left`
+                           on the second and third cells says the same thing
+                           with no ground anywhere in it.
+
+   AND THE TRACKS CANNOT STAY `1fr`. Three equal thirds of the file's 407 is
+   135 a cell and it fits; three equal thirds of the product's ~300 is 100, and
+   with a 24px mark and its gap that leaves 66px for "week 5 tasks" — which set
+   one character to a line. The three cells are not the same width and were
+   never meant to be: 600:7662/7663/7667 are 101, 120 and 96, sized by their
+   contents with the dividers taking the slack. `auto` tracks and a `1fr` on
+   each divider column is that exactly, and it is why the gap has to go — a
+   grid gap cannot be told to grow.
+
+   THE MARK IS 24 HERE AND 28 EVERYWHERE ELSE — 600:7658. §65's chip is 28 with
+   a 16px glyph and that is the product's figure-cell mark; the file's is 24 in
+   a column that has 100px less to spend than the page does. The glyph stays 16,
+   so what changes is the wash around it, and 8 rather than 12 to the text is
+   the last of the four numbers below. Both are stated on `.sec-prog` so the
+   chip on any other surface is untouched.
+
+   AND THE WHOLE STRIP IS 148px SHORT OF THE FILE, WHICH IS WHY FOUR NUMBERS
+   HERE ARE THE PRODUCT'S AND NOT 600:7666'S. Measured at a 1280 frame: the band
+   is 901, §70.3's `clamp(300px, 36%, 471px)` gives the column 324, §70.3's 32
+   of padding leaves the strip 259. The file's is 407. So the three cells have
+   to fit their marks and their longest single WORD — "chapters", "invested" —
+   into 63% of the room the file had, and the four numbers that get them there
+   are the mark (24 not 28), its gap (8 not 12), the slack tracks' floor (8 not
+   16) and the label's role (`--t-compact`, §63 §11, not the figure's `--t-h4`).
+   Together they are 246 against 259.
+
+   AND NO WORD IS EVER BROKEN, WHICH IS §29.15'S FIX FOR THE SAME FAILURE ONE
+   COMPONENT OVER. `overflow-wrap:break-word` is inherited from §05.101's `.sec`,
+   and §65 gives `.prog-fb` `min-width:0` — so the cell's min-content is zero,
+   an `auto` track will shrink below its longest word, and the label snaps
+   mid-syllable. §29 hit exactly this on `.stand-l` ("POINTS" became "POINT / S")
+   and the note there is worth reading: the answer is `normal` and NOT `nowrap`.
+   A word stays whole; a label of two words may still wrap between them, which
+   is what lets "week 5 tasks" give up a line where "chapters" cannot.
+
+   That also changes what happens when the column is genuinely too narrow. With
+   `break-word` the strip silently mangled the words and nothing measured it —
+   no overflow, no warning, and it took Maryam's eye on the render. With
+   `normal` the longest word holds its cell and the shortfall shows up as a
+   figure sitting over a divider, which is visible. Measure the strip either
+   way; do not look for a scrollbar. */
+/* `border:0` AND NOT `border-top:0; border-bottom:0`, WHICH IS THE LESSON §29 IS
+   FULL OF: when you turn a rule off, grep the class for the LATER layer that
+   already changed it. §10.502 draws the block's two edges as `border-top` and
+   `border-bottom`, so answering those two reads as complete — and §29.17 then
+   generalises the same idea to `.app .page .prog-figs{border:1px solid var(--rule)}`,
+   all four sides, at the same (0,3,0) this rule has. Zeroing the pair left the
+   LEFT and RIGHT standing: four hairlines round three figures where the file has
+   two between them. Maryam caught it on the render; nothing measured it, because
+   a border that should not be there is not an overflow and not a warning. */
+.app .sec-prog .prog-figs{
+  display:grid;
+  grid-template-columns:auto minmax(var(--s03),1fr) auto minmax(var(--s03),1fr) auto;
+  gap:0;background:none;
+  border:0;
+  margin-top:var(--s05)}
+.app .sec-prog .prog-figs > span{
+  grid-row:1;
+  background:none;
+  align-items:center;gap:var(--s03);
+  overflow-wrap:normal;
+  padding:0}
+.app .sec-prog .prog-figs > span:nth-child(1){grid-column:1}
+.app .sec-prog .prog-figs > span:nth-child(2){grid-column:3}
+.app .sec-prog .prog-figs > span:nth-child(3){grid-column:5}
+/* 24 RATHER THAN §65'S 28, with the 16px glyph unchanged — 600:7658. */
+.app .sec-prog .prog-ic{width:24px;height:24px;align-self:center}
+
+/* THE TWO DIVIDERS ARE THE GRID'S OWN PSEUDO-ELEMENTS, PLACED IN THE SLACK
+   TRACKS — 600:7670/7672, which the file draws CENTRED in the gap (cell one
+   ends at 101, the line is at 123.5, cell two starts at 146) rather than hard
+   against the figure that follows.
+
+   `::before` AND `::after` ON A GRID CONTAINER ARE GRID ITEMS, which is the
+   whole reason this works with no markup: `progressStrip` is one function with
+   two callers and the wing still draws the ruled version of the same three
+   cells, so a divider element written into it would have to be styled away
+   there. Two pseudo-elements, `justify-self:center` in a `1fr` track, and the
+   line is exactly where the file puts it at any column width.
+
+   42 IS THE FILE'S HEIGHT and it is a LENGTH rather than `stretch`: the cell is
+   two lines of 19 plus 4, and a divider that stretched would grow with a label
+   that wrapped to three — a hairline taller than the figures beside it reads as
+   a table rule, which is the thing §71.1c just took off the top and bottom. */
+.app .sec-prog .prog-figs::before,
+.app .sec-prog .prog-figs::after{
+  content:'';grid-row:1;
+  justify-self:center;align-self:center;
+  width:1px;height:42px;
+  background:var(--rule)}
+.app .sec-prog .prog-figs::before{grid-column:2}
+.app .sec-prog .prog-figs::after{grid-column:4}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE CALL ROW — 600:7699
+
+   THE THIRD BAND MEMBER, AND THE FIRST ONE THAT IS A ROW RATHER THAN A COLUMN.
+   §56 spans a SECOND dark card across both columns underneath (the promoted
+   dashboard's certificate is the case that made it); this is the same idea
+   declared rather than discovered — `.sec-call` takes row 2 and both columns,
+   because the call is about the whole of the head and not about either half.
+
+   IT IS FULL-BLEED ON THE LEFT AND PAYS 32 ON THE RIGHT — 600:7699's own
+   `pr-[32px]` with no left padding at all. That is not a slip in the file: the
+   grey countdown cell is a GROUND, and a ground that stops 32px short of the
+   frame is a card. Running it to the edge is what makes the row read as a band
+   across the head rather than as a wide tile inside it.
+   ------------------------------------------------------------------------ */
+/* IT WRAPS, AND THE WHOLE OF WHETHER IT WRAPS WELL IS `.crow-who`'S FLEX BASIS.
+   Wrapping is decided on the BASE size, before any shrinking, so with the leader
+   cell at `flex:1 1 auto` its 425px max-content was the base: the three members
+   never fitted one line at any width the product has, and the actions dropped
+   under the photograph on every screen. `nowrap` fixed that at 1280 and broke it
+   at 1000 — with nothing allowed to leave the line the leader was crushed to
+   96px and the row went 1180 tall.
+
+   `flex:1 1 300px` (below) is both answers at once. 300 is a base the row can
+   afford — 182 + 300 + 378 is 860 against the 869 the band has at 1280 — so at
+   desktop the three sit on one line and the leader GROWS into what is left.
+   Narrower, the actions wrap to a second line, held right by their own auto
+   margin, and the leader grows to fill the first. Nothing is crushed and
+   nothing is crammed. Below 900 §71.2b stacks all three deliberately. */
+/* AND NO GAP EITHER — the two left cells are ADJACENT in the file and the space
+   between them is their own padding. 600:7747 wraps the countdown and the
+   leader in one `flex flex-row items-center self-stretch` with nothing between
+   them; what separates them is 24 of right padding on the grey cell and 20 of
+   left padding on the leader, which is also what makes the grey ground stop
+   exactly where it does. A 24px gap on the row put a white channel between the
+   two AND cost `.crow-who` 48px it does not have — it was the difference
+   between the expertise line taking two lines and three. */
+.app .crow{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:0;flex-wrap:wrap;width:100%}
+
+/* THE COUNTDOWN IS THE ROW'S ONLY GROUND — 600:7703. §59 spends a layer arguing
+   that the loudest thing this product draws is spent on something with a clock
+   in it; the plate this row replaces was black-with-a-haze and was standing
+   down to `.plate-quiet` on both stages that drew it, because a weekly call two
+   days out has never been inside the day. The file says the same thing at the
+   right volume: one 4% grey cell holding the one figure on the row that changes
+   by itself, and white for everything else.
+
+   `align-self:stretch` AND `flex:none`. The cell is the row's full height —
+   which is what makes it a band across the left edge rather than a chip — and
+   it must not absorb the free space, because that space is what holds the two
+   buttons against the right edge.
+
+   182 IS A WIDTH AND NOT A MINIMUM, WHICH IS THE DIFFERENCE BETWEEN TWO LINES
+   AND ONE. 600:7703 is 182 with 24 of padding each side, so its content measure
+   is 134 and "Cohort Week Call Session 36" sets on two centred lines — which is
+   the shape of the cell, a short loud figure over a wrapped caption. As a
+   minimum the same string took its max-content and came out 221 wide on ONE
+   line, which reads as a label with a number after it and cost the row 39px it
+   does not have. */
+.app .crow-when{
+  flex:none;align-self:stretch;
+  box-sizing:border-box;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:var(--s03);
+  width:182px;
+  padding:var(--s07) var(--s06);
+  text-align:center;
+  background:var(--layer-02)}
+
+/* THE LEADER — 600:7722. 16 between the portrait and the block, 8 inside it.
+   The 300px basis is the row's whole wrapping behaviour and the note over
+   `.crow` is the argument; what it is as a MEASURE is 78 of portrait, 16 of gap
+   and 40 of padding, leaving 166 for the text — two lines of the expertise row
+   and one each for the name and the role, which is 600:7724 one line deeper.
+   Below that the block stops being a person and starts being a column. */
+.app .crow-who{
+  flex:1 1 300px;min-width:0;
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s07) 20px}
+
+/* 78 SQUARE, AND IT IS NOT `avatar()` — the same call §70.5 makes for `.rec-ph`
+   and for the same two reasons: that helper writes its size inline (trap 1) so
+   no stylesheet can answer it, and it draws a disc where 600:7723 draws a
+   square portrait. The initials are the fallback behind the photograph, which
+   is the one part of `avatar()` worth keeping. */
+.app .crow-ph{
+  position:relative;flex:none;
+  display:grid;place-items:center;
+  width:78px;height:78px;
+  overflow:hidden;
+  background:var(--layer-02)}
+.app .crow-ph img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover}
+
+.app .crow-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0}
+.app .crow-b p{margin:0}
+.app .crow-id{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+/* the tick is the same 20px green mark `.rec-v` carries on the recommendation,
+   so the one verified badge in the product is one drawing of it */
+.app .crow-v{display:inline-grid;place-items:center;width:20px;height:20px}
+.app .crow-v svg{width:20px;height:20px;fill:#00a43c}
+
+/* 185 x 40 AND 8 BETWEEN — 600:7760/7750/7737 and 608:7790/7791/7794, which are
+   the same pair in both states and also §70.5's box, so the two AI-native heads
+   put their actions in the same rectangle. `flex:none` and `margin-left:auto` so
+   the row's free space lands in the gap before the group and the group holds the
+   right edge even on a width where the row wraps. */
+.app .crow-a{
+  flex:none;margin-left:auto;
+  display:flex;align-items:center;gap:var(--s03)}
+.app .crow-a > .btn{
+  width:185px;min-height:40px;
+  justify-content:center;gap:var(--s03)}
+/* THE FILE'S SIDE PADDINGS ARE ASYMMETRIC AND THEY ARE THE SAME 16/20 MIRRORED
+   — 600:7750 is `pl-16 pr-20` with the mark leading, 600:7737 is `pl-20 pr-16`
+   with the arrow trailing. Both put 20 on the side the WORDS are on and 16 on
+   the side the glyph is, so the two buttons' labels sit at the same distance
+   from their own outer edge. §24.302's `.ic-l` sets 12 both sides and a
+   left-aligned label, which is right for a button that sizes to its content and
+   wrong inside a fixed 185. */
+.app .crow-a > .btn.ic-l{
+  justify-content:center;
+  padding-left:var(--s05);padding-right:20px}
+.app .crow-a > .btn-p{padding-left:20px;padding-right:var(--s05)}
+.app .crow-a > .btn svg{flex:none;width:16px;height:16px}
+
+/* THE QUIET BUTTON KEEPS ITS BORDER HERE, AND THAT REVERSES §64 ON ONE ROW.
+   That layer took the outline off 88 quiet buttons — "on a product made of
+   hairlines a drawn rectangle is one more edge than the page has" — and put an
+   arrow on instead. 600:7750 draws the border, and on this row the argument
+   flips: the button is not sitting on a page of hairlines, it is sitting on a
+   band beside a filled accent button, and with no edge at all it reads as a
+   caption that happens to be clickable rather than as the other half of a pair.
+   §64's arrow does not arrive either way — that rule keys on `:not(:has(svg))`
+   and this button leads with the message mark. Maryam's call on 599:7418 /
+   608:7772, and scoped to `.crow-a` so the other 87 are untouched.
+
+   `border-color` RATHER THAN `border`, which is §64.1's own point: `.btn`
+   declares `border:1px solid transparent` and every variant only re-points the
+   colour, so setting the width here would be the one button in the product with
+   a 2px box model. */
+.app .crow-a > .btn:not(.btn-p){border-color:var(--rule)}
+
+/* AND THE JOIN IS THE ACCENT, NOT BLACK — 600:7737 / 608:7794 are both #f47113.
+   `--on-brand-fill:1` plus the ramp is exactly what §19 gives `.plate .btn-p`,
+   which is the button this one replaces, so nothing about the accent CTA is
+   restated: the ink, the focus ring and the transparent border all follow the
+   flag. The file's flat fill against §19's ramp is the same call §70.0 records
+   for `--ai-grad` — a fill in this product is the ramp, and #f47113 is
+   `--accent` to within a shade. */
+.app .crow-a > .btn-p{
+  background-image:var(--accent-grad);
+  border-color:transparent;
+  --on-brand-fill:1}
+
+/* -------------------------------------------------------------------- 2a ---
+   INSIDE THE DAY THE CELL IS THE ACCENT — 608:7774
+
+   §59's two priorities, on the one cell that states the time. Everything else
+   on 608:7772 is 600:7699 to the pixel, so this is one ground and one ink and
+   there is deliberately no `.urgent` variant of any other rule on the row —
+   write the next one against the tokens the way §59 does and it will be correct
+   in both states for free.
+
+   THE INK IS RE-POINTED, NOT RESTATED. §63 §11 sets the countdown violet and
+   the session line in the primary ink; both are answered here by `color`
+   inheritance off the cell rather than by two `.urgent` overrides, which is the
+   same technique §59 uses to flip eleven declarations by reassigning three
+   variables. `--on-brand-fill` is what the rest of the system reads to know it
+   is drawing on a brand ground. */
+.app .crow.urgent .crow-when{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  --on-brand-fill:1}
+
+/* -------------------------------------------------------------------- 2b ---
+   WHERE THE ROW SITS, AND IT IS THE SAME GEOMETRY IN BOTH PLACES
+
+   `crow` returns the bare row and the caller wraps it: the enrolled dashboards
+   wrap it as a `.head-sec` so it lands in the band, and `booked` wraps it as an
+   ordinary `.sec` in the page body, because that band's second column is
+   already the journey. The COMPONENT has to look the same either way, and for
+   one build it did not — this block was scoped `.app .modhead > .sec-call`, so
+   in the body the row kept the section's ordinary `var(--s06) var(--pad-x)`.
+   That put 24px of air above and below it and, worse, inset the countdown cell
+   32px from the left: the one ground on the row stopped short of the frame,
+   which turns a band across the head into a wide tile sitting inside one. The
+   scope is the page now, not the band.
+
+   Below 900 the padding is zero and the three cells pay `--pad-x` themselves —
+   see the stacked block below — so the grey ground is full-bleed at that width
+   too, which is the whole reason the padding is answered here rather than
+   trimmed to the sides. */
+/* EVERY ONE OF THESE IS (0,4,0), AND THAT IS THE WHOLE STORY OF THIS BLOCK.
+   A section's padding is spoken for from three directions at that weight, and
+   `.sec-call` has to answer all three:
+
+     §10.342   `.sec{padding-left:var(--pad-x);padding-right:var(--pad-x)}` and
+               the ordinary section rhythm on top of it, in the page body.
+     §69.4     `.app .modhead > .sec.head-sec` — 24 of top padding and the page
+               gutter on both sides, for the Enroll page's cohort-leader tile.
+     §70.3     `.app .modhead:has(> .head-col) > .head-col` — `var(--s07)` at
+               900 and `padding-left:57px` at 1180.
+
+   Written at (0,3,0) this lost to all three, and it lost PARTIALLY, which is
+   what made it hard to see: in the band below 900 the computed value came out
+   `24px 16px 0px` — three sides from §69.4 and one from here. In the page body
+   it came out `0px 32px`, top and bottom from here and the sides from §10. The
+   tell in both cases is a padding whose four sides do not come from one rule.
+   One class heavier on each selector and the row states its own geometry. */
+.app .page .sec.sec-call{padding:0}
+.app .modhead > .sec.sec-call{padding:0}
+
+/* AND ITS CLOSING HAIRLINE IS FULL-BLEED, for the same reason. §10 draws every
+   section's rule as an `::after` inset by `--pad-x` at both ends, which is
+   right for a section whose content is inset by the same amount. This row's
+   content is not: the grey cell starts at the frame's edge. Inset, the rule
+   stopped 32px short of the ground above it and the corner read as unfinished.
+   In the band this selector does nothing — §25.2 sets `display:none` on
+   `.modhead > .sec::after`, and the band's own closing rule ends the block. */
+.app .page .sec.sec-call::after{left:0;right:0}
+
+/* ------------------------------------------------------------------- 2b.1 ---
+   THE BAND CLOSES ON ONE HAIRLINE, AND THERE IS NO RULE HERE ANY MORE.
+
+   Kept as a note because the bug is worth recognising and the fix moved. Maryam
+   read the bottom edge under the call row as heavy, "like there will be multiple
+   outlines", and it was two: §25.2 draws the band's closing rule as a full-bleed
+   1px `::after`, and §70.3 added `border-bottom:1px solid #d7d5cc` to
+   `.modhead:has(> .head-col)` on top of it. Two hairlines on one boundary, on a
+   product where every other boundary is one.
+
+   §70.3'S PREMISE WAS NEVER MEASURED. Its note said §25.2's rule "is written for
+   a one-column band and stops at the left cell". Measured at 390 / 760 / 900 /
+   1280 / 1500 on both tenants, that `::after` is `left:0; right:0` — it spans
+   the whole band at every width, so the second line was buying nothing.
+
+   §71 zeroed it for one build; §70 has since DELETED the declaration, keeping
+   the wrong reasoning in its own comment so nobody re-derives it. That is the
+   better home — the layer that states a rule is the layer that withdraws it —
+   so the override here is gone rather than left standing as a no-op. If a
+   doubled edge ever comes back, this is the pair to measure first. */
+/* stacked, the three cells are a column and the countdown stops being a
+   left-hand band — it is the row's first line instead, full width, which is
+   where a phone reads it. The buttons go full-bleed for the reason every other
+   button in this product does at this width. */
+@container app (max-width:899.98px){
+  .app .crow{flex-direction:column;align-items:stretch;gap:0}
+  .app .crow-when{align-self:auto;min-width:0;padding:var(--s05) var(--pad-x)}
+  .app .crow-who{padding:var(--s06) var(--pad-x)}
+  .app .crow-a{
+    flex-direction:column;align-items:stretch;
+    gap:var(--s03);
+    padding:0 var(--pad-x) var(--s06)}
+  .app .crow-a > .btn,.app .crow-a > .btn.ic-l{width:100%}}
+
+@container app (min-width:900px){
+  /* ROW 2, BOTH COLUMNS. §70.3's `> *{grid-column:1}` is what every member
+     falls back to and this is the one that must not — written into column one
+     it landed under Tal's sentence at 620px with the two buttons wrapped onto
+     a line of their own, which reads as a section of the page that has ended
+     up inside the band.
+
+     `grid-row:2` EXPLICITLY, and it earns the two characters. Auto-placement
+     would put it on row 2 anyway TODAY, because the two members above it are
+     both pinned to row 1 — and the moment a page adds a fourth member the
+     implicit row is wherever the algorithm finds space. The two tenants above
+     state their row; so does this. */
+  /* 32 ON THE RIGHT AND NOTHING ANYWHERE ELSE — 600:7699's own `pr-[32px]`.
+     Stated on the page so the body copy of the row takes it too: `booked`'s
+     buttons have to stop the same distance from the frame as the enrolled
+     dashboards'. The left stays 0 at both call sites, which is what runs the
+     countdown's ground off the edge. */
+  .app .page .sec.sec-call{padding:0 var(--s07) 0 0}
+
+  /* AND THE BAND RESTATES IT, WHICH IS SPECIFICITY AND NOT DUPLICATION.
+     The row in the band also wears `.head-col`, so §70.3's two rules for that
+     class both reach it: `padding:var(--s07)` at 900 and `padding-left:57px`
+     at 1180, each `.app .modhead:has(> .head-col) > .head-col` at (0,4,0). The
+     page-scoped rule above is (0,3,0) and loses to both — for one build that
+     put 32px of air round the row and pushed the countdown's ground 57px in
+     from the frame, which is the one thing this component must not do.
+     Restated at (0,4,0) it wins on order, §71 landing after §70, and that also
+     covers the 1180 rule without a second query. */
+  .app .modhead:has(> .head-col) > .sec-call{
+    grid-column:1 / -1;grid-row:2;
+    display:block;
+    margin:0;
+    padding:0 var(--s07) 0 0;
+    border-top:1px solid #d7d5cc;
+    border-left:0;
+    background:var(--layer-01)}}

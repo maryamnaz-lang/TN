@@ -86,8 +86,29 @@ function placeBand(){
      `.head-sec` written second in the view comes out THIRD in the band, under
      the sentence. That ordering is load-bearing and is why the view writes it
      immediately after `ph()` rather than where it reads in the page. */
-  let n = ph.nextElementSibling;
-  while(n && (n.classList.contains('ask-sec') || n.classList.contains('head-sec') || _mhIsTal(n))){
+  /* AND IT TAKES AT MOST ONE TAL SECTION, WHICH IS A REAL BUG THIS RUN HAD.
+     `_mhIsTal` recognises a member by CONTENT — anything containing `.ai-aura`
+     or `.ai-label` — and there is exactly one Tal card at the head of a page,
+     so for twenty-odd views the difference never showed. The AI-native
+     dashboard (§70) puts "Tal's recommends" directly under the band as a
+     `.sec` with an `.ai-label.bare` on it, and the run walked straight into
+     it: the recommendation went into the band, landed in the left column at
+     576px instead of the page's 901, and the photograph, the facts and the
+     two actions each wrapped onto a line of their own. Nothing threw and
+     nothing warned — the section was simply somewhere else.
+
+     One is the right cap and not a guess: the band's left column is "title,
+     facts, hairline, wing, hairline, TAL" (§56) and Tal is the last of those
+     by construction, so a second Tal-marked section after it is a section of
+     the page, whatever it contains. A view that genuinely wants one more
+     member up there says so with `.head-sec`, which is what that opt-in is
+     for and which still runs on either side of this. */
+  let n = ph.nextElementSibling, tal = false;
+  while(n){
+    const isTal = _mhIsTal(n);
+    if(isTal && tal) break;
+    if(!isTal && !n.classList.contains('ask-sec') && !n.classList.contains('head-sec')) break;
+    if(isTal) tal = true;
     members.push(n);
     n = n.nextElementSibling;
   }
@@ -307,7 +328,29 @@ function placeLevelCards(){
    own), and a `.sec` wrapped in a `.sec` pays the gutter twice. */
 const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero, .ldr-read';
 
+/* AND IT STANDS DOWN WHERE THE JOURNEY HAS THE COLUMN — §70.3.
+   The band's second column holds one thing. On the three pre-enrolment
+   dashboards that thing is now the four steps, so a plate lifted into the band
+   would land in column ONE, stacked under Tal's sentence, in a slot sized for
+   a paragraph. Left where the view printed it, it is the first section of the
+   page body — which is exactly where it was before §56 pulled it up, and still
+   the right place for it: on `booked` it is the Join, on `assessed` it is the
+   enrolment offer, and both read fine full-width under the band.
+
+   TESTED ON THE PAGE, NOT ON THE STAGE. `.head-col` is what declares "the second
+   column is spoken for", so a page that adopts the AI-native head gets the same
+   answer without being named here — which is exactly what happened: §71 put the
+   progress strip in that column on the three enrolled dashboards and needed no
+   edit in this function beyond the class it tests.
+
+   THE CLASS USED TO BE `.sec-jrn` AND THE RENAME IS THE WHOLE OF THE CHANGE.
+   §70 gated the two-column band on the journey list by name because there was
+   one tenant; there are two now — `.sec-jrn` and `.sec-prog` — so `.head-col`
+   is the structural half and the other two say only WHICH tenant. §70.3 and
+   §71 both key their grid on it and this reads the same class, so the guard
+   cannot drift from the layout it is guarding against. */
 function placeDark(){
+  if(device.querySelector('.page > .modhead > .head-col, .page > .head-col')) return;
   const main = device.querySelector('.view-col > .main') || device.querySelector('.main');
   if(!main) return;
   const page = main.querySelector('.page');
@@ -572,7 +615,19 @@ function splitPlateBody(plate){
    with the ceremony taken off it, and none of the five has a deadline to be
    inside or outside. They keep their ground.
    ========================================================================== */
-const PLATE_SOON = /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
+/* THE PATTERN ITSELF MOVED TO views.js AND IS READ FROM HERE — §71.
+   599:7418 / 608:7772 draw the weekly cohort call as a light ROW with two
+   grounds rather than as a plate with two priorities, and `callRow` has to pick
+   between them while the VIEW is being built. A view cannot read a const this
+   file declares: views.js's boot `render()` is the last statement in that file
+   and runs before this one is parsed, so `#week1/dashboard` off the hash would
+   reach `PLATE_SOON` in the temporal dead zone — the same hazard the note over
+   `COHORT_LEAD` records for `LEADER`.
+
+   So it is declared once, in the file that parses first, and both readers point
+   at it. Which matters more than the ordering: the row and the plate now decide
+   "is this inside the day" two files apart, and one vocabulary is the only thing
+   that stops a call being urgent on the dashboard and quiet in the band. */
 function plateUrgent(plate, when, label){
   const flag = plate.dataset.urgent;
   if(flag === '1' || flag === 'true')  return true;

@@ -165,6 +165,27 @@ const _slot = s => {
 const _w = n => n >= 0 && n <= 12 ? _WORDS[n] : _n(n);
 const _W = n => { const s = _w(n); return s.charAt(0).toUpperCase() + s.slice(1); };
 
+/* THE ONE THING IN THIS FILE THAT READS A CLOCK — Figma 599:7427.
+   The three enrolled dashboards open on "Good morning, Maryam!", which is the
+   file's line and is the only greeting in the table that can be WRONG: the
+   other three say "Welcome Back", which is true at any hour. Rather than take
+   the file's words and let the product say good morning at ten at night, or
+   drop them and lose the one screen that greets you by time of day, it is
+   derived. Four lines, one place.
+
+   THE BOUNDARIES ARE NOON AND SIX, which is the ordinary English division and
+   the one the reader will not notice. `getHours` is local time, which is the
+   reader's, which is the only one a greeting can mean.
+
+   IT RE-TYPES ACROSS A BOUNDARY, and that is correct rather than a side effect.
+   `sumKey` is a function of the summary's own text (see `typeSummary`), so a
+   dashboard left open past noon and returned to types the line again — Tal has
+   said something new, which is exactly when this table wants the animation. */
+const _greet = () => {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+};
+
 const PAGESUM = {
 
   /* --- the journey ----------------------------------------------------- */
@@ -196,17 +217,120 @@ const PAGESUM = {
   dashboard: {
     consult: 'Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
 
-    new: 'You&rsquo;re on the Explorer track from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.',
+    /* THE ONE ENTRY THAT OPENS ON A GREETING AGAIN, AND THE ONE THAT RUNS LONG.
+       578:5966 makes Tal's sentence the whole left column of the band — there is
+       no `<h1>` on screen above it (§70 hides the `.ph` for that band; the view's
+       own note is the argument) — so the summary has to say hello, and it has
+       the room to say more than the table's usual two sentences. Both are
+       deliberate exceptions to the rules at the head of this file and both are
+       local to this key: the other nine entries keep their 18–28 words under a
+       title that is still drawn.
 
-    booked: 'Your interview with Priya is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often; ten minutes of practice is usually enough.',
+       IT IS NOT `.tal-greet`. That span is the mechanism §33.9 built for exactly
+       this shape and it comes with `display:none` on the `.ph` and a 22px line;
+       the file draws the greeting at the paragraph's own size and the heading is
+       wanted in the accessibility tree. Plain text, so it types with the rest of
+       the line rather than being filled in before the clock starts (`SUM_LEAVE`).
 
-    assessed: 'You&rsquo;re Explorer &ndash; E3, rung 3 of 15, signed by Priya on 21 August, with delegation and hard conversations as your growth areas. Enrolling is the only thing left.',
+       THE THREE HIGHLIGHTS ARE `<b>`, WHICH IS WHAT `.ai-body p b` ALREADY IS.
+       The file draws them as absolutely-placed tinted rectangles behind orange
+       text; in markup that is one element with a ground, and §70 gives it the
+       5%-accent wash and 4px radius the file measures. `sumRuns` walks text
+       nodes, so the typing reveals them in place and the ghost holds the same
+       box — inline markup here costs nothing.
 
-    week1: f => `Day ${f.day} of 90 in Cohort 41. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocks today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it; nothing&rsquo;s assessed this week.`,
+       "ON THE RIGHT" BECAME "BELOW", AND THAT IS THE ONE COPY EDIT. 581:6671
+       points at Priya as being in the right-hand column, which is where the file
+       has her; the journey has that column here and the recommendation is the
+       section under the band. A sentence that points at the wrong side of the
+       screen is worse than one that points at no side. */
+    /* 581:6671 VERBATIM, WITH TWO EDITS AND BOTH ARE WRITTEN DOWN. The file
+       reads "Considering your strenghts" — a typo — and it points at Priya as
+       being "on the right", which she is not on either surface: the file draws
+       the recommendation in a section UNDER the band, the same as this page
+       does, so the phrase is a leftover from a layout neither of us has. A
+       sentence that points at the wrong side of the screen is worse than one
+       that points at no side. Everything else is the file's words in the
+       file's order, including "E1 - E5" as a range and "analyzed". */
+    /* A FUNCTION, BECAUSE THE NAME IN IT IS NOW STATE. "Ask Tal for a different
+       agent" swaps the card below for another of the three, and a summary that
+       kept saying "Priya Nair" would be Tal naming a match the page is no
+       longer showing — the exact drift the note at the head of this table is
+       written to prevent. `recKey` and `AGENTS` are views.js's, parsed long
+       before this file. It re-types when it changes, which is correct: Tal has
+       said something new. */
+    new: () => 'Welcome Back, Maryam! Based on your <b data-sum="quiz">quiz results</b>, you are currently on <b data-sum="track">Explorer track</b>. Your level from E1 - E5 anchors after a 45-minute interview. Considering your strengths I have analyzed the active roster and <b data-sum="match">matched you with ' + AGENTS[recKey()].n + ' below</b> to specifically anchor your growth areas.',
 
-    day34: f => `Day ${f.day} of 90, week ${f.week}. ${f.done} of 13 chapters at ${f.avg}%, ${_n(f.mins)} minutes so far. Chapter 4 has been opened four times without finishing &mdash; the three furthest ahead in Cohort 41 had it done by now.`,
+    /* THE SAME SHAPE AS `new`, ONE STEP ON — greeting, then three phrases that
+       open. The facts are the ones this entry already carried; what is added is
+       the greeting §70.3 needs (the `.ph` is off-screen on every page with a
+       journey column) and the three `data-sum` keys. `track` is the SECOND page
+       to use that card, which is the whole point of keying by subject. */
+    booked: 'Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your <b data-sum="interview">interview with Priya</b> is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often, so <b data-sum="prep">ten minutes of practice</b> is usually enough.',
 
-    day90: f => `All 13 chapters done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book the re-interview to have Priya assess whether you move up.`,
+    assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, signed by Priya on 21 August, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
+
+    /* ------------------------------------------------------------------
+       THE THREE ENROLLED STAGES — Figma 599:7418, and the same three
+       exceptions §70 bought for `new`.
+
+       599:7418 gives the course dashboards the AI-native head, so all three
+       of the local rules `new`'s entry records apply here too and for the
+       same reasons: the summary OPENS ON A GREETING (§71 hides the `.ph`, so
+       there is no `<h1>` on screen above it), it RUNS LONGER than the
+       table's usual 18–28 words (it is the band's whole left column rather
+       than a paragraph beside a black card), and it CARRIES `<b>` PHRASES,
+       which §70.2 grounds and §63 §10 inks.
+
+       THE GREETING IS DERIVED — see `_greet` above. 599:7427 says "Good
+       morning, Maryam!" and the other three dashboards say "Welcome Back";
+       the file's is the better line and it is the one that can be false, so
+       it is read off the clock rather than typed. Nothing else in the build
+       knows the time of day, which is the argument for keeping it to four
+       lines in one place.
+
+       WHAT CAME OFF ALL THREE IS THE DAY. Every one of these opened on "Day
+       N of 90" and that is now the second column's own figure, two inches to
+       the right, in 32px type. Restating it is the duplication this table's
+       note is mostly written to prevent — and it is what freed the words the
+       longer shape needed.
+
+       THE FILE'S SECOND PARAGRAPH IS A `<br>`, NOT A SECOND `<p>`.
+       599:7434 draws two blocks with the paragraph spacing set to 0, so what
+       it is asking for is a line break inside one paragraph — which is also
+       the only shape `typeSummary` can take: `placeSummaryPass` assigns
+       `'<p>' + text + '</p>'`, and a `<p>` inside a `<p>` is closed by the
+       parser before it is opened. `sumRuns` walks TEXT nodes, so the break
+       costs the typer nothing and the ghost holds the same box.
+       ------------------------------------------------------------------ */
+    /* WEEK 1 IS THE FILE'S OWN COPY WITH THE PRODUCT'S FIGURES IN IT, and it
+       is the one entry where the two agree almost word for word: 599:7434
+       names chapter 1, "no graded assessments", "4 out of 10 peers", "about
+       45 minutes" and a "55-minute time on course target", and `CH[0]` is
+       ['Why We Exist', 45] with `WEEK_TARGET` at 55. Every one of those is
+       read rather than typed, so the sentence cannot drift from the chapter
+       list or from the chart's own target line.
+
+       THE QUOTATION MARKS ARE NOT TAKEN. The file wraps the whole paragraph
+       in them; nothing else in this table quotes Tal, and a summary in
+       quotes reads as a transcript of something said elsewhere rather than
+       as the page's own voice. */
+    week1: f => `${_greet()}, Maryam! <b>Chapter 1 (&lsquo;${CH[0][0]}&rsquo;)</b> has unlocked today. This week has no graded assessments, so you have a buffer window to explore.<br>Right now, <b>four of the ten in your cohort</b> have already finished it. It takes about ${CH[0][1]} minutes, so starting today puts your <b>${WEEK_TARGET}-minute weekly target</b> within reach without touching next week.`,
+
+    /* DAY 34 KEEPS ITS OWN FACTS AND TAKES THE FILE'S SHAPE. There is no
+       599:7418 copy for a stalled week, so the two sentences this entry
+       already carried are the first block and the second is what the page
+       has never said: what clearing the open chapter actually costs. Both
+       figures in it are read — `CH[f.open]` is the chapter's own title and
+       minutes, so a stage that moves `open` moves the sentence with it. */
+    day34: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
+
+    /* DAY 90 STOPS SHORT OF THE PLATE. "Book the re-interview" is the whole
+       of the second block, because the `.plate` directly under this band
+       already says what the re-interview decides — move up to E4, hold at
+       E3, or drop back to E2 — and one decision explained twice inside one
+       screen is the second of this table's four content bans. */
+    day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b> &mdash; and you passed both.<br>The one thing left is to book the re-interview, and Priya is the agent who assesses it.`,
 
     /* THE DATE CAME OFF THIS LINE, AND IT IS THE CARD THAT HAS IT NOW. The
        sentence used to close on "E4 opens December 1, and at this level you can
@@ -920,6 +1044,28 @@ function placeSummaryPass(){
   const head = aura.querySelector(':scope > .ai-head');
   if(head) head.querySelectorAll('h3').forEach(h => h.remove());
 
+  /* AND THE LABEL SAYS WHAT THE BLOCK IS — Figma 578:5966 (581:6670).
+     Every Tal card in the build is labelled "Tal", which is right for a card
+     that is Tal offering something and thin for the one at the head of a page:
+     with the `h3` removed one line above, "Tal" was a name with nothing after
+     it, over a paragraph that could as easily have been the page's own lede.
+     "Summary by Tal" names the object and keeps the attribution.
+
+     HERE RATHER THAN IN `talLabel`, for the reason step 4 below is here: what
+     makes a card a summary is this pass, not the view that printed it. The
+     twenty-odd cards further down pages — `V.agent`'s advice, `V.booking`'s —
+     are Tal offering something about the thing beside them and keep the name.
+     The view stays free to write `talLabel()` and not know which it will be.
+
+     THE MARK IS STILL TAL'S OWN. 581:6669 draws a four-point sparkle here and
+     §33.2 replaced exactly that with the artwork, on the argument that the
+     sparkle is the generic "there is AI here" mark while `--tal-mark` is Tal's
+     face everywhere else in the product. That argument did not stop being true
+     when the words changed, so the file's words are taken and its mark is not;
+     §70 gives the words the gradient the file paints them in. */
+  const lab = head && head.querySelector(':scope > .ai-label');
+  if(lab && lab.textContent.trim() === 'Tal') lab.textContent = 'Summary by Tal';
+
   let body = aura.querySelector(':scope > .ai-body');
   if(!body){
     body = document.createElement('div');
@@ -957,6 +1103,242 @@ render = function(){
   _baseSum();
   try { placePageSummary(); } catch(e){ console.warn('pagesum', e); }
 };
+
+/* ==========================================================================
+   A PHRASE IN THE SUMMARY OPENS A SECOND SUMMARY — Figma 596:7020 (596:7379)
+
+   The three accent phrases in Tal's sentence were a ground and an ink; they are
+   controls now. Press one and a card opens under it with the reading BEHIND
+   that phrase — where the claim came from, what it means, and the one thing to
+   do about it. That is the difference between a page that states a conclusion
+   and one you can ask "why".
+
+   THE KEYS ARE SUBJECTS, NOT POSITIONS, WHICH IS WHAT MAKES THIS REUSABLE.
+   `data-sum="quiz"` is written into the summary string itself, so any entry in
+   `PAGESUM` — this dashboard's, another stage's, the leader's — can mark a
+   phrase and get the same card with no new code. Three exist; a fourth is one
+   row in `SUMDROP` and one attribute. Nothing here is keyed to `new`.
+
+   EVERY FIGURE IS READ, NONE RESTATED. The quiz card counts its own bands out
+   of `SCORES`, the match card reads `AGENTS` and `REC` for whoever `recKey()`
+   currently names, and the track card is the file's copy verbatim. So swapping
+   the agent changes the third card with the sentence above it, and a change to
+   a score moves the first one.
+
+   A VALUE IS A FUNCTION OR AN OBJECT, the same shape `PAGESUM` uses, with four
+   parts: `lead` (what is true), `label` + `read` (what it means, the label in
+   its own hue), `next` (what to do), and `act` (the way to do it).
+   ========================================================================== */
+const _sumTop = () => SCORES.slice().sort((a,b) => b[1] - a[1])[0];
+
+const SUMDROP = {
+  /* WHERE THE TRACK CAME FROM. The two figures are the quiz's own — its score
+     is the one the `.ph` fact row prints, and its date is `qzTaken()`, which
+     all three `quizResults` call sites and `V.result` also read. */
+  quiz: () => {
+    const [hiN, hiV] = _sumTop();
+    const low = qzLow(2);
+    return {
+      lead: `You scored 64 of 100 on the Next in Leadership quiz on ${qzTaken()}, across five bands.`,
+      label: 'What it measured:',
+      read: `${hiN} came out highest at ${hiV}, and ${low[0][0]} lowest at ${low[0][1]}. A quiz sets the track, not the level &mdash; it is the interview that decides which of E1 to E5 you sit on.`,
+      next: 'Open the full breakdown to see all five bands scored, and the two chapters built on the ones you scored lowest.',
+      act: {ic: I.trophy, go: 'result', t: 'Open your quiz results'}
+    };
+  },
+
+  /* 596:7379, THE FILE'S OWN WORDS. The only thing computed is the agent's
+     name in the action, which follows `recKey()` like everything else. */
+  track: () => ({
+    lead: 'According to the Next in leadership quiz, you are evaluated as an Explorer.',
+    label: 'Discovering your direction:',
+    read: 'You&rsquo;re exploring what fits you best&mdash;and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.',
+    next: 'Connect with Talent Next Agent to get yourself evaluated and get a level. Your level anchors after a 45-minute interview.',
+    act: {ic: I.calendar, go: 'agent:' + recKey(), t: 'Book your interview with ' + AGENTS[recKey()].n}
+  }),
+
+  /* WHY THIS PERSON. `REC` holds the overlap and `AGENTS` the record, so this
+     card and the block below it cannot disagree about the match, the fee or
+     the slot — and both move together when Tal finds another agent. */
+  match: () => {
+    const k = recKey(), a = AGENTS[k], r = REC[k];
+    return {
+      lead: `${a.n} assesses ${a.range} and has run ${a.ivs} interviews, rated ${a.r.toFixed(1)}.`,
+      label: 'Why this pair:',
+      read: `Your growth area is ${r.need.toLowerCase()} and their strength is ${r.strength.toLowerCase()} &mdash; ${r.match} of what your quiz surfaced overlaps with what they assess.`,
+      next: `Their next opening is ${a.slot}, 45 minutes, ${a.price}. Nothing is charged until you confirm the slot.`,
+      act: {ic: I.calendar, go: 'agent:' + k, t: 'Book your interview with ' + a.n}
+    };
+  }
+,
+
+  /* --- the booked stage --------------------------------------------------
+     THE APPOINTMENT, AND WHAT IS INSIDE IT. The four facts are the plate's own
+     — `bkStamp` (ai7) is what makes every hand-written mention of the booking
+     read the actual choice, and this card states the same ones in the same
+     words so it moves with them. */
+  interview: () => ({
+    /* THE RECORD, NOT THE STAGE'S HARD-CODED PAIR — and `try` rather than the
+       `typeof` guard that was here. `bkLong` is `const bkLong = …` (ai7:90), and
+       `typeof` does NOT shield a const in the temporal dead zone: it throws on
+       one instead of returning 'undefined'. This particular call is safe either
+       way — it only runs when a reader presses a phrase, long after every pass
+       has parsed — but the guard was stating a protection it did not provide,
+       and the identical line in `CALL_ROW.iv` DID blank the page on a cold load
+       at `#booked`. Same pattern, so the same correction. */
+    lead: `Your interview with ${AGENTS[(S.booking || {}).agent || 'priya'].n} is `
+      + (() => { try { return bkLong(); }
+                 catch(e){ return 'booked for Thursday 20 August at 6:30 PM ET'; } })() + '.',
+    label: 'What happens in it:',
+    read: '45 minutes, recorded, and real situations rather than hypotheticals. She confirms which of E1 to E5 you sit on and signs a report you keep.',
+    next: 'Nothing has to be prepared. If you want to, ten minutes on delegation is the most useful ten minutes you can spend.',
+    act: {ic: I.calendar, go: 'interviews', t: 'See the booking'}
+  }),
+
+  /* WHY DELEGATION AND NOT SOMETHING ELSE. The band and the chapter are both
+     read rather than typed: `SCORES` has the score and `CH` has the chapter it
+     is built on, which is the same pair `V.result` and `signedSummary` print. */
+  prep: () => {
+    /* DELEGATION BY NAME, NOT BY RANK. The first cut read `qzLow(2)[0]`, which
+       is Coaching at 38 — the lowest band, and not what the product says about
+       Priya. "Delegation is the question she asks most often" is a claim about
+       the AGENT, made in `PAGESUM.booked` and in the view; the rank is a fact
+       about the QUIZ. Looking it up by name keeps the sentence true and still
+       reads its score out of `SCORES` rather than typing it. */
+    const d = SCORES.find(b => b[0] === 'Delegation') || qzLow(2)[0];
+    return {
+      lead: `${d[0]} is the question Priya asks most often, and it is one of your two lowest quiz bands at ${d[1]}.`,
+      label: 'How to spend ten minutes:',
+      read: 'Have one real example ready &mdash; something you handed over, what actually happened, and what you would do differently. She is assessing judgement, not vocabulary.',
+      next: 'Tal can run a mock interview on it whenever you want one, and it does not go on your record.',
+      act: {ic: I.chat, ask: 'Run a mock interview on delegation', t: 'Run a mock interview'}
+    };
+  },
+
+  /* --- the assessed stage ------------------------------------------------ */
+  level: () => ({
+    lead: 'Priya confirmed you at Explorer &ndash; E3 on 21 August, rung 3 of the fifteen-rung ladder.',
+    label: 'What a level is:',
+    read: 'Explorer is rungs 1 to 5 of 15, and the interview is the only thing that sets one &mdash; a quiz cannot. E3 opens the course built for E3, and 90 days later you re-interview.',
+    next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',
+    act: {ic: I.certificate, go: 'level', t: 'See where you are on the ladder'}
+  }),
+
+  growth: () => {
+    const low = qzLow(2);
+    const ch = low.map(b => QZ_CH && QZ_CH[b[0]] ? CH.findIndex(c => c[0] === QZ_CH[b[0]]) + 1 : 0).filter(Boolean);
+    return {
+      lead: `Your two lowest bands were ${low[0][0]} at ${low[0][1]} and ${low[1][0]} at ${low[1][1]}.`,
+      label: 'Where the course meets them:',
+      read: ch.length === 2
+        ? `Chapters ${ch[0]} and ${ch[1]} are built on exactly these two, which is why they are the two Priya wrote up.`
+        : 'Two of the thirteen chapters are built on exactly these, which is why they are the two Priya wrote up.',
+      next: 'The full report has her write-up on both, in her own words, with the evidence she based it on.',
+      act: {ic: I.document, go: 'report', t: 'Read the full report'}
+    };
+  },
+
+  /* NO FIGURES. The fee, the credit and what is due today are `V.enrol`'s three
+     `.kv` rows and the note over `enrolPlate` is explicit that they live there;
+     a fourth statement of them in a popover is the drift that note exists to
+     stop. This card says what enrolling IS and sends you to the page that
+     costs it. */
+  enrol: () => ({
+    lead: 'Enrolling locks in your place in the next cohort and the price you were quoted.',
+    label: 'What the 90 days are:',
+    read: '13 chapters, one a week, each closing on an assessment, with a cohort of ten and a live leader running a weekly call. The average of the thirteen is what an agent reads at your re-interview.',
+    next: 'The next cohort starts within two weeks of paying, and the interview you have already paid for comes off the price.',
+    act: {ic: I.wallet, go: 'enrol', t: 'See what enrolling costs'}
+  })
+};
+
+function sumDropCard(key){
+  const src = SUMDROP[key];
+  if(!src) return '';
+  const d = typeof src === 'function' ? src() : src;
+  return `<div class="sd-b">
+      <p class="sd-lead">${d.lead}</p>
+      <p class="sd-read"><b>${d.label}</b> ${d.read}</p>
+    </div>
+    <div class="sd-next">
+      <p class="sd-nt">Your Next Step</p>
+      <p class="sd-nb">${d.next}</p>
+    </div>
+    <button class="sd-act" ${d.act.ask
+      ? `data-tal-ask="${d.act.ask}"`
+      : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
+}
+
+/* --- the pass -------------------------------------------------------------
+   IT RUNS AFTER `placePageSummary` AND IT MEASURES THE GHOST.
+   `typeSummary` draws the paragraph twice — `.tsum-g` is the finished line held
+   hidden to keep the box open, `.tsum-t` is the visible copy laid over it. The
+   visible one is BUILT UP a character at a time, so mid-type its copy of the
+   phrase is half a word wide or not there at all; the ghost is complete from
+   the first frame. So the card is positioned against the ghost and clicked on
+   the live copy, which is the one on top and the only one that can take a
+   pointer (`visibility:hidden` does not).
+
+   IT DOES NOT CALL `render()` — §65's lesson. `render()` replaces
+   `device.innerHTML` and resets the scroller, and this pass is also what the
+   click handler calls, so opening a card two thirds down a scrolled page would
+   throw the reader back to the top. The card is added and removed on its own;
+   `S.sumDrop` is what survives the next real render.
+
+   THE POSITION IS INLINE STYLE AND THAT IS NOT TRAP 1. Trap 1 is about DESIGN
+   declarations losing to inline styles no stylesheet can answer; these two are
+   measured pixels that only exist at runtime, which is the one thing inline
+   style is for. Everything about how the card LOOKS is in §70.8. */
+function placeSumDrop(){
+  device.querySelectorAll('.sumdrop').forEach(n => n.remove());
+  /* the open phrase is marked in BOTH copies — the live one because that is
+     what the reader sees, the ghost because it is the one holding the box and
+     a class that changes its metrics would shift the line under the other */
+  device.querySelectorAll('[data-sum].on').forEach(n => n.classList.remove('on'));
+  if(!S.sumDrop) return;
+  device.querySelectorAll(`[data-sum="${S.sumDrop}"]`).forEach(n => n.classList.add('on'));
+  const body = device.querySelector('.modhead .ai-aura.talsum .ai-body');
+  if(!body) return;
+  const sel = `[data-sum="${S.sumDrop}"]`;
+  const anchor = body.querySelector('.tsum-g ' + sel) || body.querySelector(sel);
+  if(!anchor){ S.sumDrop = null; return; }
+
+  const card = document.createElement('div');
+  card.className = 'sumdrop';
+  card.innerHTML = sumDropCard(S.sumDrop);
+  body.appendChild(card);
+
+  /* clamped to the paragraph's own box so a phrase near the right edge does not
+     push the card off the panel — the file has it left-aligned under the
+     phrase, and that is what this is until there is no room for it */
+  const bb = body.getBoundingClientRect(), ab = anchor.getBoundingClientRect();
+  const max = Math.max(0, body.offsetWidth - card.offsetWidth);
+  card.style.left = Math.round(Math.max(0, Math.min(ab.left - bb.left, max))) + 'px';
+  card.style.top  = Math.round(ab.bottom - bb.top + 8) + 'px';
+}
+
+const _baseDrop = render;
+render = function(){
+  _baseDrop();
+  try { placeSumDrop(); } catch(e){ console.warn('sumdrop', e); }
+};
+
+/* Toggle, click away, Escape. All three go through the pass rather than a
+   render, for the reason written over it. */
+device.addEventListener('click', e => {
+  const b = e.target.closest('[data-sum]');
+  if(b){
+    S.sumDrop = S.sumDrop === b.dataset.sum ? null : b.dataset.sum;
+    placeSumDrop();
+    return;
+  }
+  /* a control inside the card is doing its own job — `data-go` navigates, and
+     the render that follows clears the card anyway */
+  if(S.sumDrop && !e.target.closest('.sumdrop')){ S.sumDrop = null; placeSumDrop(); }
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && S.sumDrop){ S.sumDrop = null; placeSumDrop(); }
+});
 
 /* the boot render is the last statement in views.js and ran long before this
    file was parsed, so this pass has to draw the first paint itself */

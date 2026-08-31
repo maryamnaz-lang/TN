@@ -174,6 +174,29 @@ invented the markup and got four of six wrong. The recipes are now in
   it; and the open/closed state has to live outside the DOM if your page
   re-renders (`.on` on the section is gone at the next paint).
 
+- A **call row** (`.crow`) is the light answer to what `.plate` answers loudly,
+  and it has **two states in one component**. `.crow` on its own is a call
+  outside the day: a 182px grey countdown cell, a 78px square portrait, the name
+  with its green tick, and two 185×40 buttons. Add **`.urgent`** and the
+  countdown cell alone goes accent with the ink flipped — nothing else about the
+  two differs, so never write a `.urgent` variant of another rule on this row.
+  Three things the CSS will not tell you: the countdown cell is a **fixed** 182
+  (as a minimum it takes its max-content and the caption stops wrapping to two
+  centred lines), the portrait is **not `avatar()`** (that helper writes its size
+  inline and draws a disc), and `.crow-who` carries **`flex:1 1 300px`** — that
+  basis is the whole of how the row behaves, because flex decides wrapping on
+  the base size before it shrinks anything. `dsCallUrgent(row)` picks the state
+  from the words and `dsCallLeft(when)` words the same countdown both ways
+  ("2 days left" / "In 2 hours").
+- The head band's **second column** is `.sec.head-sec.head-col`, written
+  **directly after `ph()`** — the collector walks a run, not a search — and
+  `.head-col` is the class that opens the column at all. `.sec-jrn` (a numbered
+  step list) and `.sec-prog` (a progress column) only say *which tenant*, and
+  they take different track widths on purpose: labels compress, single words
+  like "chapters" do not. A page that writes `.head-col` also gets its `<h1>`
+  visually hidden and its dark card left in the body, so the greeting has to be
+  in Tal's sentence.
+
 `proof.html` is the check: every signature component, hand-written, with no
 portal JS in the document at all. If it looks like the candidate portal, the
 components really are in the stylesheet.
@@ -606,6 +629,9 @@ dsFrame(el)       // stamp the container the layout queries
 dsEnter(app)      // fire the entrance once, then clear the marker
 dsStagger(page)   // stamp --i on each child for the 26ms cascade
 dsTypeSummary(p, key)   // Tal's summary writes itself — see below
+dsPlateQuiet(plate)     // a dark card's two priorities
+dsCallUrgent(row)       // a call row's two priorities — see below
+dsCallLeft(when)        // "in 2 days" -> "2 days left" / "In 2 hours"
 ```
 
 The icon set is the official Material **filled** cut, checked against
@@ -656,6 +682,32 @@ derives what to show from elapsed time, so a throttled tick just arrives with mo
 to reveal.
 
 `gallery.html` has it live under **Signature**, with a button to replay it.
+
+### An appointment has two priorities — `dsPlateQuiet` / `dsCallUrgent`
+
+Black plus the warm haze is the loudest object this system draws, and it is
+spent on something **time-sensitive**. Outside twenty-four hours the same card
+is quiet. There are two components that carry an appointment and they take the
+decision the same way, from opposite defaults:
+
+```js
+app.querySelectorAll('.plate').forEach(dsPlateQuiet);  // adds .plate-quiet when NOT urgent
+app.querySelectorAll('.crow').forEach(dsCallUrgent);   // adds .urgent when it IS
+```
+
+Both read the same vocabulary of inside-the-day — *now, today, tonight,
+starting*, or a count of hours or minutes — off the words the card already
+carries, because in a prototype every appointment is a hand-written string.
+`data-urgent="1"` / `="0"` overrides the reading. Swap either function for a
+date difference in a real build and nothing else changes: **the class is the
+contract**.
+
+They ship for the reason `dsTypeSummary` does. The test is not "is there JS" but
+*does the behaviour need the page's state, or only the element you hand it* —
+and these need only the element. `dsCallLeft(when)` is the other half of the
+call row: the two states word one countdown two ways, a quantity you have
+outside the day and a time it happens at inside it, so a page states its
+countdown once and gets the right phrasing for whichever cell it draws.
 
 ## Rendering
 

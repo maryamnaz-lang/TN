@@ -335,6 +335,81 @@ LAYERS = [
     # is `.found` plus an `.all-desc` outside the panel. `.found` is already
     # in the system (§65) and this only restates its closed padding.
     '69-enrolflow.css',
+    # THE AI-NATIVE HEAD. Four families and a travelling light, and all of it
+    # crosses — none of it is assembled by a render pass and none of it is a
+    # second surface.
+    # `.jrn*` is a numbered step list, `.rec*` a recommendation card, `.qa*` a
+    # pair of action cards: markup a hand-authored page writes in full, which
+    # is the test §69's note applies to `.plate-tab`.
+    # `.ai-edge` is the comet, and it is the one that has to be here rather
+    # than looked at twice. Both halves of it are CSS — a pseudo-element on a
+    # motion path — so unlike §52's typing summary there is no clock left
+    # behind in a JS file, and the class is one a page puts on any block it
+    # wants the light to run round. Its tokens (`--ai-grad`, `--ai-comet`,
+    # `--ai-amber`) ride on `.app`, which is the host every DS page already
+    # declares, and `@keyframes ai-comet` is kept whole by the tokenizer the
+    # same way §40's sphere keyframes are.
+    # LEAVING IT OUT WAS THE FIRST CUT AND IT PRODUCED THE WORST OF THE THREE
+    # OUTCOMES, which is why this note is long: §63 §10 is in the list and
+    # states the type for every one of these families, so the design system
+    # shipped `.jrn-pill`'s ink and size with nothing to draw the pill, and
+    # `.rec-alt`'s `color:transparent` with no gradient under it — a link that
+    # renders as an empty space. A layer of layout whose type layer crosses
+    # without it is not "missing", it is broken, and it is invisible until
+    # somebody builds a page on it. The check that catches it is the one at
+    # the foot of this file: grep the output for a class §70 introduces.
+    '70-ainative.css',
+    # THE COURSE HEAD. Two families and a grid, and all three cross for the
+    # same reason §70's four do: nothing here is assembled by a render pass
+    # and nothing is a second surface.
+    # `.crow*` is the call row — a countdown cell, a square portrait, a name
+    # and two actions, with `.urgent` as its inside-the-day state. It is
+    # markup a hand-authored page writes in full, which is the test §69's
+    # note applies to `.plate-tab`; the ONE thing a caller has to decide for
+    # itself is which of the two states to write, and that decision is a
+    # regex over a hand-written string (`PLATE_SOON`, views.js) rather than
+    # product state — `dsCallUrgent` ships it, the same way `dsPlateQuiet`
+    # ships §59's. Per CLAUDE.md's test: the behaviour needs only the words
+    # it is handed, not `S`.
+    # `.sec-prog` is the progress column, and what crosses is its LAYOUT of
+    # `.prog` / `.prog-figs` — both already in the system since §02/§10. So
+    # this adds no component, it adds the arrangement that turns the page's
+    # figure band into a 300px column: two dividers instead of four borders,
+    # `auto`/`1fr` tracks instead of equal thirds, and `overflow-wrap:normal`
+    # so a narrow column cannot break "chapters" in half.
+    # AND THE GRID IS THE REAL REASON IT CANNOT BE LEFT OUT. §70.3's
+    # two-column band is keyed on `.head-col` BECAUSE of this layer, and §71
+    # is where the second tenant's own track width lives — ship §70 without
+    # §71 and a DS page that writes `.head-col` gets a column sized for a
+    # list of four labels with a figure strip in it.
+    # LEAVING IT OUT WAS ALREADY HALF-DONE ONCE AND IT LOOKED EXACTLY LIKE
+    # §70'S OWN WARNING, which is why this note repeats it: §63 §11 is in the
+    # list and states the type for every one of these families, so for one
+    # build the output carried `.crow-when > b`'s violet, `.crow-n`'s size and
+    # `.sec-prog .prog-figs`'s pair with NO row and NO grid under any of them
+    # — a countdown in magenta on nothing. Grep the output for `.crow-ph`
+    # after either build.
+    '71-coursehead.css',
+    # THE WEEK PULSE — three sections become one row of three columns: what
+    # you are on, whether that is enough, what it has earned. It crosses for
+    # the reason §71 does, and with the same one JS dependency in the same
+    # place: `pacePart` derives the segment counts, everything else is markup
+    # plus this layer.
+    # AND IT ADDS NO COMPONENT, WHICH IS WHY IT IS CHEAP TO CARRY. The ring is
+    # `ring()`, the standing cells are `standRow`, the marks are §65's `.stat`
+    # chip in §65's three named hues, the bar is §71.1b's rail with a different
+    # count. What `.pulse*` states is the GRID that holds them and the four
+    # places a component drawn for a full-width section has to change to live
+    # in a 290px column — which is exactly the kind of rearrangement a second
+    # portal wants and cannot work out from the components alone.
+    # TWO REASONS IT CANNOT BE LEFT OUT, and both are the failure this list has
+    # now hit twice. §63 §12 IS in the list and states the type for every
+    # `.pulse*` family, so without this layer the output carries their sizes
+    # and inks with no grid under any of them. And `.pulse .stand` re-points
+    # four declarations §15/§29 make on `.stand` — ship one without the other
+    # and the standing column renders as a full-bleed three-across grid inside
+    # a 278px box. Grep the output for `.pulse-ring` after either build.
+    '72-weekpulse.css',
 ]
 
 # ==========================================================================
@@ -1404,6 +1479,56 @@ function dsPlateQuiet(plate){
   }
   plate.classList.toggle('plate-quiet', !urgent);
   return urgent;
+}
+
+/* ==========================================================================
+   THE CALL ROW HAS THE SAME TWO PRIORITIES — `dsCallUrgent`
+
+       dsCallUrgent(row)                    // one row
+       app.querySelectorAll('.crow').forEach(dsCallUrgent);
+       dsCallLeft('in 2 days')              // -> "2 days left"
+       dsCallLeft('in 2 hours')             // -> "In 2 hours"
+
+   §71 draws the row and the argument is §59's, moved: a call outside the day
+   is a white band with one grey cell in it, and inside the day the same row's
+   countdown cell goes accent with the ink flipped. Everything else about the
+   two is identical to the pixel, so this is one class and not a variant.
+
+   IT IS THE SAME VOCABULARY `dsPlateQuiet` READS, deliberately: a product that
+   draws a call as a plate on one screen and a row on another must not disagree
+   about whether it is urgent, so both read `DS_PLATE_SOON`. Note the polarity
+   is the other way round — a plate gets a class when it is QUIET, a row gets
+   one when it is URGENT — because each is a modifier on its own default.
+
+   `dsCallLeft` IS THE OTHER HALF AND IT IS WHY THIS IS NOT DECORATION. The two
+   states word the same countdown two ways: outside the day it is a quantity you
+   have ("2 days left"), inside it a time it happens at ("In 2 hours"). One
+   string in, the right phrasing out, so a page states its countdown once. Both
+   need only what you hand them — no page state — which is the test CLAUDE.md
+   sets for whether a behaviour crosses.
+
+   THE SESSION NUMBER IS THE CALLER'S. `crow` in the portal drops it when the
+   call is urgent; that is a copy decision about one product's cell and not
+   something a helper should do to a string it was handed.
+   ========================================================================== */
+function dsCallUrgent(row){
+  if(!row) return false;
+  const flag = row.dataset.urgent;
+  let urgent;
+  if(flag === '1' || flag === 'true')       urgent = true;
+  else if(flag === '0' || flag === 'false') urgent = false;
+  else {
+    const w = row.querySelector(':scope .crow-when');
+    urgent = DS_PLATE_SOON.test(row.dataset.when || (w ? w.textContent : ''));
+  }
+  row.classList.toggle('urgent', urgent);
+  return urgent;
+}
+
+function dsCallLeft(when){
+  const w = String(when || '');
+  if(!/^in /i.test(w)) return w;
+  return DS_PLATE_SOON.test(w) ? 'In ' + w.slice(3) : w.slice(3) + ' left';
 }
 
 /* ==========================================================================

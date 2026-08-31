@@ -571,6 +571,56 @@ function dsPlateQuiet(plate){
 }
 
 /* ==========================================================================
+   THE CALL ROW HAS THE SAME TWO PRIORITIES — `dsCallUrgent`
+
+       dsCallUrgent(row)                    // one row
+       app.querySelectorAll('.crow').forEach(dsCallUrgent);
+       dsCallLeft('in 2 days')              // -> "2 days left"
+       dsCallLeft('in 2 hours')             // -> "In 2 hours"
+
+   §71 draws the row and the argument is §59's, moved: a call outside the day
+   is a white band with one grey cell in it, and inside the day the same row's
+   countdown cell goes accent with the ink flipped. Everything else about the
+   two is identical to the pixel, so this is one class and not a variant.
+
+   IT IS THE SAME VOCABULARY `dsPlateQuiet` READS, deliberately: a product that
+   draws a call as a plate on one screen and a row on another must not disagree
+   about whether it is urgent, so both read `DS_PLATE_SOON`. Note the polarity
+   is the other way round — a plate gets a class when it is QUIET, a row gets
+   one when it is URGENT — because each is a modifier on its own default.
+
+   `dsCallLeft` IS THE OTHER HALF AND IT IS WHY THIS IS NOT DECORATION. The two
+   states word the same countdown two ways: outside the day it is a quantity you
+   have ("2 days left"), inside it a time it happens at ("In 2 hours"). One
+   string in, the right phrasing out, so a page states its countdown once. Both
+   need only what you hand them — no page state — which is the test CLAUDE.md
+   sets for whether a behaviour crosses.
+
+   THE SESSION NUMBER IS THE CALLER'S. `crow` in the portal drops it when the
+   call is urgent; that is a copy decision about one product's cell and not
+   something a helper should do to a string it was handed.
+   ========================================================================== */
+function dsCallUrgent(row){
+  if(!row) return false;
+  const flag = row.dataset.urgent;
+  let urgent;
+  if(flag === '1' || flag === 'true')       urgent = true;
+  else if(flag === '0' || flag === 'false') urgent = false;
+  else {
+    const w = row.querySelector(':scope .crow-when');
+    urgent = DS_PLATE_SOON.test(row.dataset.when || (w ? w.textContent : ''));
+  }
+  row.classList.toggle('urgent', urgent);
+  return urgent;
+}
+
+function dsCallLeft(when){
+  const w = String(when || '');
+  if(!/^in /i.test(w)) return w;
+  return DS_PLATE_SOON.test(w) ? 'In ' + w.slice(3) : w.slice(3) + ' left';
+}
+
+/* ==========================================================================
    FIVE SCORES AS A ROSE — `dsQuizRose`
 
        el.innerHTML = dsQuizRose([['Decisiveness',78],['Delegation',41],

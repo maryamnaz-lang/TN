@@ -118,13 +118,61 @@ let ASK_FRESH = false;
    depends on where in the row you land. It is `aria-hidden` for the same
    reason — the row already has one accessible name, and reading a rotating
    example out as part of it would make that name change under the user. */
+/* THE LIGHT THAT RUNS THE FIELD'S BORDER — §70.1 has the whole argument for
+   why this is a stroked rectangle and not a moving element or a masked conic.
+   What lives here is the half that has to be markup: an SVG cannot be a
+   pseudo-element, and a dash needs a path to be a dash ON.
+
+   `pathLength` AND THE GRADIENT ARE THE ONLY THINGS THE MARKUP DECIDES. The
+   rect carries no x/y/width/height — §70 sets those as CSS geometry properties
+   so the line can inset itself by half its own stroke without this function
+   knowing how wide the dock is. `pathLength="1000"` renumbers the perimeter so
+   the dash is a percentage rather than a pixel count.
+
+   ONE `id` IN THE DOCUMENT, AND THAT IS SAFE HERE because there is exactly one
+   dock: `placeAsk` returns early if the view column already has one. A second
+   copy of this component on a page would need the id suffixed.
+
+   THE LINE'S RAMP IS ITS OWN AND NO LONGER `--ai-grad`'S, which is worth
+   knowing before "tidying" the two back together. Both started as 581:6584's
+   #F47113 -> #E2A600 -> #F0530C; Maryam re-cut the LINE to
+   #F4B413 -> #E2A600 -> #F0BF0C on 30 Aug 2026 and left every other AI surface
+   alone. So the label, the "ask for a different agent" link, the send chip and
+   the step pill are still the orange ramp in §70.0, and this one is gold. The
+   two are meant to differ: those four are ink and a fill, read against white
+   at rest, and this is a moving light read against the field's orange border.
+   Stated as literals here rather than as tokens because they are five exported
+   numbers belonging to one object, and a token implies a second user. */
+const AI_RUN = `<span class="ai-run" aria-hidden="true">
+    <svg preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff"/>
+          <stop offset="0.1952" stop-color="#f4b413"/>
+          <stop offset="0.3989" stop-color="#e2a600"/>
+          <stop offset="0.7921" stop-color="#f0bf0c"/>
+          <stop offset="1" stop-color="#ffffff"/>
+        </linearGradient>
+      </defs>
+      <rect pathLength="1000"/>
+    </svg>
+  </span>`;
+
 function askBar(){
   const q = askQ();
   return `<button class="askline" data-askopen="1" aria-label="Ask Tal anything">
+    ${AI_RUN}
     <span class="askline-mark"><span class="tal-mk"></span></span>
     <span class="askline-t">Ask Tal anything</span>
     <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + q + '&rdquo;' : ''}</span>
-    <span class="askline-send" aria-hidden="true">${I.arrowUp}</span>
+    ${''/* ARROW-RIGHT, NOT ARROW-UP — Figma 578:5966 (581:6589), and it agrees
+          with the note above about the control being drawn OFF. Up is the chat
+          convention for "send this message"; the collapsed line does not send
+          anything, it OPENS the conversation, and the file draws that as the
+          same forward arrow every other "go on to the next screen" control in
+          the build carries. §70 gives the chip the accent gradient at the
+          file's own 20%, which is what says the control is not live yet. */}
+    <span class="askline-send" aria-hidden="true">${I.arrowRight}</span>
   </button>`;
 }
 

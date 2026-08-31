@@ -504,7 +504,86 @@ css = '\n'.join((here / f).read_text() for f in
                  # colour — the one ink decision the invoice needed (the
                  # accent is the total, not the working) is stated in §63
                  # beside the `.plate-v` rule it corrects.
-                 '69-enrolflow.css'])
+                 '69-enrolflow.css',
+                 # THE AI-NATIVE HEAD — Figma 578:5966. The `new` dashboard
+                 # redrawn so the machine is the page rather than a card on
+                 # it: Tal's sentence is the band's whole left column on its
+                 # own wash, the four steps are the right one, and the page's
+                 # next step is ONE agent Tal picked rather than a shortlist
+                 # of three. Plus the gradient comet that runs the border of
+                 # the summary panel and the ask dock (Maryam's ask, on the
+                 # file's own parked 374x2 bar).
+                 # LAST, and three reasons it has to be. It opens a second
+                 # column on `.modhead` the way §56 does for `.sec-dark`, so
+                 # it must land after §56 — and after §59, which re-points
+                 # the tokens that column's tenant reads. It restates
+                 # `.app .modhead .ai-aura.talsum > .ai-head > .ai-label`
+                 # (0,6,0) against §33.2, and per trap 3 its own desktop
+                 # rules are inside `@container app (min-width:900px)` where
+                 # §10, §14 and §56 all state theirs. And its wash lands on
+                 # the same `.sec` §33.4 pads, so it has to be the later of
+                 # the two.
+                 # AFTER §63 AND ALLOWED TO BE, on §64's and §65's test: it
+                 # states grounds, gradients, borders, radii, spacing,
+                 # `offset-path` and one keyframe set, and not one
+                 # font-size, font-weight, text-transform or text colour.
+                 # All of those are in §63 §10 — including the two that look
+                 # like mechanism rather than type, the `color:transparent`
+                 # under each clipped gradient and the three step-state inks,
+                 # which are the two somebody reading §70 alone would
+                 # otherwise go looking for in the wrong file.
+                 '70-ainative.css',
+                 # THE COURSE HEAD — Figma 599:7418. §70's reversal applied to
+                 # the three stages with 90 days actually running: Tal's
+                 # sentence is the band's whole left column, "Your 90 days so
+                 # far" is the second one, and the weekly cohort call is a
+                 # full-width white row under both instead of a black plate
+                 # beside them. Everything below that row is the page as it
+                 # was.
+                 # AFTER §70, AND IT COULD NOT BE ANYWHERE ELSE. It is a second
+                 # TENANT of §70.3's two-column grid rather than a second grid
+                 # — §70's gate was re-keyed from `.sec-jrn` to `.head-col` for
+                 # this, so both layers point at one set of nine rules — and it
+                 # then adds the one thing that grid has no member for, a third
+                 # band row spanning both columns. Its own desktop rules are
+                 # inside `@container app (min-width:900px)` where §10, §14,
+                 # §56 and §70 all state theirs (trap 3).
+                 # AFTER §63 AND ALLOWED TO BE, on §64/§65/§70's test: grounds,
+                 # gradients, borders, spacing and one grid placement, and not
+                 # one font-size, font-weight, text-transform or text colour.
+                 # Those are §63 §11 — including the figure strip's re-
+                 # proportioned pair and the countdown's violet, which are the
+                 # two somebody reading this layer alone would go looking for
+                 # in the wrong file.
+                 '71-coursehead.css',
+                 # THE WEEK PULSE. §71 redrew the head of the three enrolled
+                 # stages and left the page under it as three separate panels —
+                 # "This week", "Time on the course", "Where you stand" — which
+                 # are one question asked three times over 1230px. They are
+                 # three COLUMNS of one section now: what I am on, whether that
+                 # is enough, what it has earned. The thirteen-week stacked
+                 # chart could not be a third of a column and moved to Course
+                 # Progress, which is where `V.dashboard`'s promoted branch has
+                 # claimed the week-by-week record lives since it dropped its
+                 # own copy; the pace column carries that data as a week-
+                 # progress read instead (Maryam, 31 Aug 2026).
+                 # LAST, AND FOR ONE REASON THAT IS NOT NEGOTIABLE: §72.1a
+                 # restates §10.15's label-column opt-out for a wrapper class
+                 # §10 has never heard of, and per trap 3 a rule inside
+                 # `@container app (min-width:900px)` can only be answered from
+                 # inside the same tier. It also re-points four declarations
+                 # §15 and §29 make on `.stand` — the three-across grid, the
+                 # full bleed, the outer border and the end cells' gutter — so
+                 # it has to land after both. Nothing about it interacts with
+                 # §70 or §71; it could sit anywhere after §29 that is also
+                 # after §63, and after §63 is what decides it.
+                 # AFTER §63 AND ALLOWED TO BE, on §64/§65/§70/§71's test: it
+                 # states grids, borders, grounds, spacing and one gradient,
+                 # and not one font-size, font-weight, text-transform or text
+                 # colour. Those are §63 §12 — including the two that read as
+                 # mechanism, the display role on the pace figure and the
+                 # tabular numerals on the three that are meant to be compared.
+                 '72-weekpulse.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

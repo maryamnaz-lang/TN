@@ -1036,101 +1036,254 @@ function ring(pct, label){
   </div>`;
 }
 
-/* THIS WEEK — TWO HALVES AND A RING
-   What the card used to be: the open chapter, a bar, and its minutes. What it
-   left out is the whole of the week either side of that chapter — so it now
-   answers two questions in order, and the chapter it used to be about is the
-   band across the top.
+/* ==========================================================================
+   THE WEEK PULSE — one section, three columns
 
-     what I have done      chapters finished and assessments scored, from
-                           WEEKLY[stage].did. Facts only, past tense; see the
-                           note above WEEKLY for why nothing undone is in it.
-     what is expected      Tal, comparing you with the members of the cohort
-                           who are furthest ahead. Attributed, because it is
-                           the one place in the card reading somebody else's
-                           numbers, and closed by the question a person
-                           actually has at that point.
+   THREE SECTIONS BECAME ONE, AND THE ARGUMENT IS THAT THEY WERE ALREADY ONE
+   QUESTION ASKED THREE TIMES. Under the head band this dashboard drew "This
+   week" (the open chapter, a ring, what you finished, what Tal expects), "Time
+   on the course" (thirteen stacked bars) and "Where you stand" (points, badges,
+   rank) as three separate `.sec`s with three headings and 1230px between the
+   first hairline and the last. Every one of them answers "how am I doing", and
+   split across three panels a person has to hold the first in their head to
+   read the third.
 
-   THE CARD IS NOT A BUTTON ANY MORE. It was `tile clk arrow` — the whole
-   block one click target to the chapter. It cannot stay one: it now contains
-   a Tal chip, and a control inside a control is a click whose destination
-   depends on where in the block you land. Same conclusion §29.16 reached for
-   the report card on My Level, and the same fix — the way in becomes a real
-   button.
+   ONE SECTION, THREE COLUMNS, IN THE ORDER THE QUESTION IS ACTUALLY ASKED:
 
-   THAT BUTTON SITS IN THE TOP BAND, NOT AT THE FOOT. It closed the card for
-   one release, on the argument that a way in belongs where the reading ends.
-   The reading is two blocks long and the button was grey, which made the
-   only required action on the page the last and faintest thing in it. It is
-   primary weight now and sits under the chapter it opens; the foot keeps
-   Tal's question, which is the thing you do when you are NOT ready to open
-   the chapter.
+     current focus   what I am in the middle of — the chapter, its ring, and
+                     what the week already contains.
+     your pace       whether that is enough — the week's minutes against the
+                     55-minute target, and the same figure three ways.
+     your standing   what it has earned — `standRow`, unchanged, stacked.
 
-   Used at both stages that draw the section (week1, day34). Day 90 does not:
-   `f.finished` hides the section entirely, which is why the old markup's
-   `f.finished ? 'Course complete' : …` branch was unreachable and is gone. */
-function weekCard(f){
-  const w = WEEKLY[S.stage] || WEEKLY.week1;
+   WHAT WENT, AND BOTH ARE SUBTRACTIONS WORTH ARGUING:
+
+   THE SECOND TAL PARAGRAPH. `weekCard` closed with Tal comparing you against
+   the members of the cohort furthest ahead — written when Tal spoke fourth on
+   this page and this was the assistant's first word on it. §71 moved Tal's
+   sentence to the head band's whole left column, and the two then said the same
+   thing twice: week 1's card was "Four of the ten in Cohort 41 have already
+   finished chapter 1. Nothing is assessed this week…" against a summary 500px
+   above it reading "Right now, four of the ten in your cohort have already
+   finished it… This week has no graded assessments". That is the duplication
+   the two-copy-slot rule exists to stop, and the head band is the slot that
+   wins. `WEEKLY[stage].tal` is left in data.js — the words are still the right
+   words if a surface ever needs them again, and nothing reads them today.
+
+   THE ASK CHIP WENT WITH IT, AND IT HAD ALREADY GONE. `weekCard` closed on
+   `askChip(w.ask[0], w.ask[1])` and that chip has never rendered: step 1b of
+   `placePageSummary` (ai6) removes every `.chip-tal` on the page that is not
+   inside something of Tal's — the aura card, the panel, the thread, a sheet,
+   or the band — on the reasoning that a lone pill in page flow says neither
+   who is asking nor why, and the ask dock at the foot of the frame is the
+   standing answer to "anything else?". `.wkc-a` is page flow, so the chip was
+   stripped on every render of both stages.
+
+   It was drawn again at the foot of the pace column for one build, on the
+   argument that both of `WEEKLY[stage].ask`'s strings are about the week's
+   WORKLOAD and that is what the column is about. Same rule, same removal — and
+   the rule is right: a figure column is not Tal's either. `WEEKLY[stage].ask`
+   is left in data.js with `.tal` for the same reason, and nothing reads it.
+
+   THE THIRTEEN-WEEK STACKED CHART. It cannot be a third of a column — it is
+   thirteen bars, a four-series legend and a data table — and Maryam's call was
+   that the time data belongs "around week progress", which is what the pace
+   column is. The chart is not deleted: it MOVED to Course Progress, next to the
+   assessment-scores chart, which is the page that already holds the chapter
+   record and the four course figures. That is also where `V.dashboard`'s
+   promoted branch has claimed the week-by-week record lives since it dropped
+   its own copy — the claim was stale when it was written and this makes it
+   true.
+   ========================================================================== */
+/* THE PACE COLUMN HAS TWO READINGS AND THE COURSE BEING OVER IS WHAT PICKS ONE.
+   While the 90 days run, "pace" is this week against the weekly target and the
+   segments are the target itself — one block per TWO minutes, so 28 blocks IS
+   the 55 and ten of them lit is 20 minutes rather than a decorative 36%. That
+   density is 599:7418's; the file draws 7 lit beside its own "36% Of target",
+   which wants 10, so the count is derived here and the two cannot disagree.
+   Once they are over there is no "this week" to be on pace with: the reading
+   becomes the whole course against thirteen weeks of that target, and the
+   segments become the thirteen WEEKS with a week that met its target lit. That
+   second bar is the stacked chart's one durable fact — which weeks you hit —
+   in the same thirteen-block language §71 draws the chapters in. */
+function pacePart(f, g){
+  const per = 2;
+  if(f.finished){
+    const total = g.weeks.reduce((a,b)=>a+b, 0);
+    const goal  = WEEK_TARGET * g.weeks.length;
+    const avg   = Math.round(total / g.weeks.length);
+    const pct   = Math.round(total / goal * 100);
+    return {
+      fig:total.toLocaleString(), unit:'min', sub:`over ${g.weeks.length} weeks, against ${WEEK_TARGET} a week`,
+      segs:g.weeks.map(m => m >= WEEK_TARGET ? 'done' : 'now'),
+      label:`${goal.toLocaleString()} min over the course`,
+      figs:[[total.toLocaleString()+' min','In total'],[avg+' min','A week'],[pct+'%','Of target']]
+    };
+  }
+  const wk   = g.weeks[g.weeks.length-1] || 0;
+  const left = Math.max(0, WEEK_TARGET - wk);
+  const pct  = Math.round(wk / WEEK_TARGET * 100);
+  const n    = Math.round(WEEK_TARGET / per);
+  const lit  = Math.min(n, Math.round(wk / per));
+  return {
+    fig:String(wk), unit:'min', sub:`of the ${WEEK_TARGET} min weekly target`,
+    segs:Array.from({length:n}, (_,i) => i < lit ? 'done' : ''),
+    label:`${WEEK_TARGET} min target`,
+    figs:[[wk+' min','This week'],[left+' min','Remaining'],[pct+'%','Of target']]
+  };
+}
+
+/* THE MARK IS THE `.stat` CHIP AND THE HUES ARE NAMED, NOT CYCLED — the same
+   call §65 records for `progressStrip`'s three figures. A column keeps its hue
+   wherever it is drawn, so "your pace" is the green one on day 34 and on day 90
+   where the focus column is absent and it has moved to first. `nth-child` would
+   have made it blue on one of those two. */
+function pulseCol(mk, ic, label, body){
+  return `<div class="pulse-c" style="--mk:var(--mk-${mk})">
+    <div class="pulse-h"><i class="pulse-ic">${ic}</i><span class="pulse-lab">${label}</span></div>
+    ${body}
+  </div>`;
+}
+
+/* THE LEDE IS DERIVED, NOT WRITTEN, WHICH IS THE ONLY WAY IT CAN BE HERE AT ALL.
+   Every figure in it is read off the same `f` / `g` / `pacePart` the three
+   columns are drawn from, so the sentence cannot disagree with the block under
+   it — which is the risk a second prose slot on this page carries and the
+   reason `PAGESUM`'s entries are hand-written and this one is not.
+
+   IT IS NOT A `PAGESUM` ENTRY AND MUST NOT BECOME ONE. That slot is the head
+   band's, one per page, and `placePageSummary` owns it. This is the section's
+   own opening line: it names the chapter, the week's minutes and the one thing
+   to do, in that order, and it is the sentence the three columns then answer in
+   figures. The overlap with the band's summary is the chapter name and the
+   45 minutes; the band says what has HAPPENED (unlocked today, four of ten
+   ahead of you) and this says where you ARE in it. */
+function pulseLede(f, g, p){
+  if(f.finished){
+    const n = g.weeks.length;
+    return `All <b>13 chapters</b> are done &mdash; ${p.figs[0][0]} across ${n} weeks, ${p.figs[2][0]} of the ${WEEK_TARGET} min weekly target. Booking the re-interview is the only thing left.`;
+  }
   const i = f.open, mins = CH[i][1];
   const did = S.stage === 'day34' ? 12 : 0;
-  const pct = Math.round(did / mins * 100);
-  return `<div class="wkc">
-    <div class="wkc-top">
-      <div class="wkc-tb">
-        <div class="wkc-eb t-label-01">Chapter ${i + 1} &middot; ${S.stage === 'week1' ? 'unlocked today' : 'in progress'}</div>
-        <h3 class="u-h3">${CH[i][0]}</h3>
-        <div class="wkc-min sub">${did} of ${mins} minutes</div>
-        <!-- THE WAY IN IS NOT IN THE CARD ANY MORE — it is the section's head
-             row action, next to "This week", where it replaced a "Coursework"
-             button that pointed at the module rather than the work. The
-             argument for hoisting it out of the card's foot still holds and
-             this is the same argument one step further: the one thing this
-             section exists to make happen is now the first thing on it and in
-             the position every other section on the dashboard uses for its
-             own action. The reading below is what you do INSTEAD of opening
-             the chapter, which is the honest order.
+  const wk = g.weeks[g.weeks.length-1] || 0;
+  /* THE SECOND CLAUSE COLLAPSES WHEN THE TWO FIGURES ARE THE SAME NUMBER.
+     Day 34 has 12 minutes on chapter 4 and 12 minutes on the course this week,
+     because the chapter IS what the week has been spent on — so the sentence
+     came out "12 of 70 minutes … and have spent 12 minutes", which reads as
+     two facts that happen to agree rather than one fact stated once, and
+     invites the reader to look for the difference. Said in words instead. The
+     `did` guard keeps week 1 on the two-figure form, where 0 and 20 are
+     genuinely different and the mock prints both. */
+  const same = did > 0 && did === wk;
+  return `You have completed <b>${did} of ${mins} minutes</b> for <span class="pulse-hl">${CH[i][0]}</span>, ${
+    same ? `which is all the time you have spent learning this week`
+         : `and have spent <b>${wk} minutes</b> learning overall this week`
+  }. Complete chapter ${i+1} to stay on the pace.`;
+}
 
-             NO BACKTICKS IN THIS COMMENT. It is an HTML comment inside a
-             template literal, so a backtick here closes the string and the
-             prose after it is parsed as JavaScript — which is exactly what
-             happened on the first attempt at this edit: the class name below
-             was quoted the way every other note in this file quotes one, and
-             week1 and day34 both threw out of weekCard on first render.
+function pulse(f, g){
+  const w = WEEKLY[S.stage] || WEEKLY.week1;
+  const p = pacePart(f, g);
 
-             The wkc-go rule is §37.3 and is left there: it is the correct
-             treatment IF the button ever comes back inside the top band, and
-             on a card that no longer draws the element it matches nothing. -->
+  /* THE FOCUS COLUMN IS THE ONE THAT CAN BE ABSENT, and `f.finished` is the
+     same test that used to hide the whole "This week" section: on day 90 all
+     thirteen chapters are done and there is nothing to be in the middle of.
+     The row is two columns there, which is why §72 sizes the grid by counting
+     its children rather than writing three tracks. */
+  let focus = '';
+  if(!f.finished){
+    const i = f.open, mins = CH[i][1];
+    const did = S.stage === 'day34' ? 12 : 0;
+    const pct = Math.round(did / mins * 100);
+    /* THE TITLE COMES FIRST AND THE CHAPTER LINE UNDER IT — 599:7418's own
+       order, and `weekCard`'s inverted. The eyebrow-over-title shape is right
+       when the eyebrow is a CATEGORY the title belongs to; here it is the
+       chapter's number and state, which is a fact ABOUT the thing named above
+       it. Read down: what I am on, which chapter that is, how far in.
+       So it is no longer an eyebrow — §63 §12 sets it as a description. */
+    focus = pulseCol(1, I.book, 'Current focus', `
+      <h3 class="pulse-t">${CH[i][0]}</h3>
+      <div class="pulse-eb">Chapter ${i+1} &middot; ${S.stage === 'week1' ? 'Unlocked today' : 'In progress'}</div>
+      <div class="pulse-ring">
+        ${ring(pct, `${pct}% of chapter ${i+1} done`)}
+        <span class="pulse-rb"><b>${did} / ${mins} min</b><span class="pulse-rl">completed</span></span>
       </div>
-      ${ring(pct, `${pct}% of chapter ${i + 1} done`)}
-    </div>
-    <div class="wkc-blk">
-      <div class="wkc-h"><span class="u-overline">What I have done this week</span></div>
+      ${''/* WHAT THE WEEK ALREADY CONTAINS, AND IT DRAWS ONLY WHEN THERE IS
+             SOMETHING IN IT. Facts only, past tense — the note over WEEKLY in
+             data.js is the argument, and nothing undone appears in it.
+
+             THE EMPTY STATE IS GONE AND THAT IS WHY THE MOCK MATCHES. Week 1's
+             list is empty and `weekCard` printed `w.none` in its place —
+             "Nothing finished yet. Chapter 1 unlocked today and nothing this
+             week is assessed." That sentence says what the ring beside it
+             already shows (0%) and what the band's summary says in full, and
+             on 599:7418 the column ends on the button instead. So the empty
+             branch is dropped rather than restyled: on week 1 this column is
+             exactly the four rows the file draws, and on day 34 the two real
+             facts sit above the button rather than being thrown away. */}
       ${w.did.length
-        ? `<ul class="wkc-did">${w.did.map(([t, m]) => `<li class="u-compact">
-            <span class="wkc-tick">${I.checkFilled}</span>
-            <span class="wkc-db"><b>${t}</b><span class="u-caption">${m}</span></span></li>`).join('')}</ul>`
-        : `<p class="wkc-none u-body">${w.none}</p>`}
-    </div>
-    <div class="wkc-blk">
-      <!-- THE ROLE CLASS GOES ON THE SPAN, NOT THE ROW. u-overline is
-           uppercase and text-transform inherits, so on the wrapper it
-           renders Tal's chip as "TAL". The chip is a name.
+        ? `<ul class="pulse-did">${w.did.map(([t,m]) => `<li>
+            <span class="pulse-tick">${I.checkFilled}</span>
+            <span class="pulse-db"><b>${t}</b><span class="pulse-dm">${m}</span></span></li>`).join('')}</ul>`
+        : ''}
+      ${''/* THE COLUMN'S OWN WAY IN, AND IT IS THE SECOND ROUTE TO THE CHAPTER
+             ON THIS SECTION — the head row's "Open chapter N" is the first.
+             That is normally the thing this codebase argues against (§29.16's
+             report card, `weekCard`'s own "Coursework" button), and it is
+             Maryam's call on 599:7418: the two are at opposite ends of a 357px
+             block and the section head's button belongs to the SECTION while
+             this one belongs to the column it closes. The words differ for the
+             same reason — one names the chapter, one names the act. */}
+      <div class="pulse-go"><button class="btn btn-g btn-sm" data-go="chapter:${i}">Continue learning ${I.arrowRight}</button></div>`);
+  }
 
-           AND THE CHIP IS THE BARE MARK HERE — the "bare" variant, styled
-           in §37 the way the page-summary band styles its own. §33 is where
-           the argument is: at the head of a page the mark and the name in
-           accent ink are enough. A solid orange chip with a
-           sheen running through it is the loudest object in a card whose
-           actual point is the black button at the top of it, and it was
-           announcing a one-line attribution. Same name, same mark, no
-           fill: it says who wrote the sentence without competing with the
-           thing the sentence is asking you to do. -->
-      <div class="wkc-h">${talLabel('bare')}<span class="u-overline">What is expected of me this week</span></div>
-      <p class="wkc-p u-body">${w.tal}</p>
-      <div class="wkc-a">
-        ${askChip(w.ask[0], w.ask[1])}
-      </div>
+  const pace = pulseCol(2, I.time, 'Your pace', `
+    <div class="pulse-fig">${p.fig}<small>${p.unit}</small></div>
+    <div class="pulse-sub">${p.sub}</div>
+    <div class="pulse-bar">
+      <span class="pulse-bl">${p.label}</span>
+      <span class="pulse-seg" role="img" aria-label="${p.sub}">${
+        p.segs.map(s => `<i class="${s}"></i>`).join('')}</span>
     </div>
+    <div class="pulse-3">${p.figs.map(([v,l]) =>
+      `<span><b>${v}</b><span class="pulse-3l">${l}</span></span>`).join('')}</div>`);
+
+  /* `standRow` UNCHANGED, and that is the point of reusing it: the rewards page
+     draws the same three cells and the two cannot disagree about what a badge
+     is worth. §72.4 turns the three-across grid into a stacked card and re-lays
+     each row against the file's arrangement — all of it from the outside, with
+     not one declaration on the cell and no change to the markup. */
+  const stand = pulseCol(3, I.star, 'Your standing', standRow(g, true));
+
+  /* THE SECTION'S ACTION IS THE ONE THING IT EXISTS TO MAKE HAPPEN, which
+     while the course runs is the open chapter and once it is over is the
+     standing the last surviving column is about. */
+  const act = f.finished
+    ? `<button class="btn btn-g btn-sm noic" data-go="rewards">View more</button>`
+    : `<button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button>`;
+
+  /* THE HEADING IS TAL'S AND THE MARK SAYS SO — 599:7418 puts the sparkle and
+     "Your learning pulse" where a section heading goes, because the block below
+     it is a reading of your numbers rather than a table of them.
+
+     AND IT IS DELIBERATELY NOT `.ai-label` OR `.ai-aura`, WHICH IS THE ONE
+     THING IN THIS FUNCTION THAT WOULD BREAK THE PAGE. Three passes hunt for
+     those two classes by name: `talFirst` HOISTS any `.sec` containing an
+     `.ai-aura` to directly under the `.ph` (trap 11), and `placeBand`'s
+     `_mhIsTal` treats a section containing EITHER as head furniture and pulls
+     it into the band. §70's own note records that exact bug — "Tal's
+     recommends" wore an `.ai-label.bare`, the band's run walked into it, and
+     the section rendered at 576px instead of 901 with nothing thrown and
+     nothing warned. The one-Tal cap in that run would save this section today,
+     which is precisely the kind of accident not to depend on. `.pulse-mk` is
+     its own class, §72.1b paints it with §70's `--ai-star` and `--ai-grad`, so
+     the mark is the same object the band's label wears and no pass can see it. */
+  return `<div class="sec">
+    <div class="sec-h pulse-head">
+      <h2 class="pulse-ttl"><i class="pulse-mk"></i>Your learning pulse</h2>${act}
+    </div>
+    <p class="pulse-lede">${pulseLede(f, g, p)}</p>
+    <div class="pulse">${focus}${pace}${stand}</div>
   </div>`;
 }
 
@@ -1944,12 +2097,544 @@ const ladderWing = f => `<div class="stp stp-open stp-titled wing-lvl">
     </div>
   </div>`;
 
+/* AND THE ENROLLED STATE LEFT THIS FUNCTION — §71, Figma 599:7418.
+   The table above listed three states and there are two here now. The middle
+   one — `progressStrip` for the three stages with a course running — is still
+   `progressWing` and is still the same block; what changed is the SLOT. 599:7418
+   turns the band round for those stages the way 578:5966 turned it round for the
+   way in: Tal's sentence takes the whole left column and "Your 90 days so far"
+   becomes the second one, so the strip is no longer a member of the left column
+   at all and there is nothing for a wing to be inside. `progCol` (below) is what
+   draws it, and it calls `progressWing` unchanged — the argument for that is the
+   same one the table makes: this is a move, not a redraw.
+
+   `consult` and `promoted` are the two stages left. Neither has a second column
+   spoken for, so both keep §56's band and both still ask this function which
+   block goes in the wing. */
 function wingBlock(){
   const f = cfg(S.stage);
   if(f.complete) return ladderWing(f);
-  if(f.enrolled) return progressWing(f);
   return stepper(journey());
 }
+
+/* ==========================================================================
+   THE COURSE HEAD — Figma 599:7418
+
+   THE SAME REVERSAL §70 MADE FOR THE WAY IN, MADE FOR THE 90 DAYS. 578:5966
+   answered "the product says it is AI-native and then draws a dashboard" for
+   `new`, `booked` and `assessed`; the three stages with a course actually
+   running were left on §56's band — title, fact row, rule, wing, rule, Tal,
+   with the weekly call as a black plate in column two. So the product changed
+   voice halfway down its own journey: Tal spoke first for the four weeks
+   before the course and fourth for the thirteen weeks of it.
+
+   THE FILE DRAWS THREE BLOCKS AND THAT IS THE WHOLE OF THE HEAD:
+
+     the summary    Tal's sentence, the band's whole left column, on §70's wash.
+                    Nothing new — `.talsum` in a `.modhead` already gets the
+                    wash, the gradient label and the tinted phrases from §70.2.
+     the progress   "Your 90 days so far" in the second column. `progressWing`
+                    exactly as the wing drew it, moved.
+     the call       a full-width row UNDER both columns: how long you have, who
+                    leads it, and the two things to do about it.
+
+   Everything after the call row is the page as it was — the week card, the
+   chart, the standing row — which is what the brief asked for and is also the
+   only way this stays a head-band change rather than a redesign of three pages.
+
+   WHY THE CALL IS NOT A `.plate` ANY MORE, AND IT IS THE ONE SUBTRACTION WORTH
+   ARGUING. It was black with §21's warm haze, which §59 spends a layer saying is
+   this product's loudest object and is spent on something time-sensitive — and
+   it was already standing down to `.plate-quiet` on both stages that draw it,
+   because a weekly call two days out is not inside the day. So the plate was
+   drawing its quiet state ~100% of the time. The file draws that same "it is
+   coming, it is not urgent" as a white row with the countdown in its own tinted
+   cell, and takes the countdown out of `placePlates`'s chip and into words. One
+   object doing one job, instead of a loud object permanently turned down.
+
+   WHAT THE ROW DROPS: "Thursday at 6:00 PM ET · 9 others · 60 minutes". That is
+   the file's decision and it is a real loss — the row now says WHEN relative
+   ("2 days left") and never absolutely. It is said in full on the Cohort page,
+   in Interviews, in the notification and in Tal's `cohort` summary, so nothing
+   is unreachable; it is one press further away than it was.
+   ========================================================================== */
+/* THE STRIP IS THE SECOND COLUMN AND IT DECLARES ITSELF WITH `.head-sec`.
+   `placeBand` (ai5) takes a run of sections after the `.ph` and recognises three
+   kinds: the ask line, anything carrying Tal's mark, and a section the VIEW has
+   declared as head furniture. This is the third, exactly as `.sec-jrn` is —
+   and, like it, has to be written directly after `ph()` because the loop is a
+   run rather than a search.
+
+   `.head-col` IS THE CLASS THAT OPENS THE COLUMN, AND IT USED TO BE `.sec-jrn`.
+   §70.3 built the two-column band gated on the journey list by name; there are
+   two tenants now, so the structural half of that gate is a class both wear and
+   `.sec-jrn` / `.sec-prog` are left saying only WHICH tenant it is. `placeDark`
+   tests the same class — see its note. */
+const progCol = f => `<div class="sec head-sec head-col sec-prog">
+    ${progressWing(f)}
+  </div>`;
+
+/* THE CALL ROW — 600:7699 (outside the day) and 608:7772 (inside it).
+
+   THREE CELLS: how long you have, who runs it, and what you would do. The first
+   is the only ground on the row and it is where the two states differ — which is
+   §59's argument arriving at a different drawing. That layer says the loudest
+   object this product has is spent on something time-sensitive and gives a
+   `.plate` two grounds, black-with-a-haze inside the day and quiet outside it.
+   The file keeps the priority and moves it off the whole card and onto the one
+   cell that states the time:
+
+     outside 24h   600:7703, the 4% grey. The row is a white band across the
+                   head with one quiet figure in it.
+     inside 24h    608:7774, the accent, white ink. Everything else on the row
+                   is identical to the pixel — same 24/32 on the cell, same
+                   20/32 on the leader, same 32 on the right, same two 185x40
+                   buttons. One ground is the whole difference.
+
+   ONE ROW WITH TWO GROUNDS RATHER THAN TWO COMPONENTS, and the file is explicit
+   about it: 608:7772 is 600:7699 with the fill changed and the session number
+   dropped. Drawing them as two would be the mistake §29.4 records for the level
+   card, at the exact moment — an appointment about to start — when the two must
+   not disagree about who is running it.
+
+   THE STATE IS READ FROM THE WORDS, because the words are all there is. Every
+   appointment in this build is a hand-written string, so `PLATE_SOON` — now
+   declared here, see the note over `plateUrgent` in ai5 for why it moved — is
+   the vocabulary of inside-the-day, and one pattern serves the row and the
+   plate so a call cannot be urgent on one surface and quiet on the other. Swap
+   it for a date difference in a real build; the class is the contract.
+
+   AND THE SESSION NUMBER COMES OFF WHEN IT IS URGENT. 600:7705's cell reads
+   "2 days Left / Cohort Week Call Session 36" and 608:7775's reads "In 2hrs /
+   Cohort Week Call". Two hours out, which session of thirteen this is stops
+   being the useful half of the sentence, and the cell's measure is 89/80 rather
+   than 134 — the number would have taken a third line for nothing.
+
+   THE PORTRAIT IS SQUARE AND IT IS NOT `avatar()`. Same reasoning §70.5 records
+   for `.rec-ph`: that helper writes its size inline (trap 1) and draws a disc,
+   and 600:7723 is an `aspect-[736/736]` that is `self-stretch`. The initials sit
+   behind the photograph as the same fallback `avatar()` provides.
+
+   EVERY FACT IS `COHORT_LEAD`'S. The name, the mark, the range and the expertise
+   are read off the record rather than typed here, which is what stops this row
+   and the Enroll page's leader card disagreeing about who Priya is. The one
+   string that is this row's own is the session, because nothing else in the
+   build names it.
+
+   IT IS A `.head-sec` TOO, so `placeBand` takes it as the band's third member,
+   and §71.2b spans it across both columns on the row under them. Written after
+   `progCol` for the same reason `progCol` is written after `ph()`. */
+const PLATE_SOON = /\b(now|today|tonight|imminent|starting|under an hour|in an hour|in \d+ ?(h|hr|hrs|hour|hours|m|min|mins|minute|minutes)\b)/i;
+
+/* THE WEEKLY CALL, STATED ONCE. `when` is the countdown in `PLATE_SOON`'s own
+   vocabulary and everything else about the cell is derived from it, so moving
+   the call closer is one edit: "in 2 days" is a grey cell reading "2 days left
+   · session 36" and "in 2 hours" is an accent cell reading "In 2 hours". */
+const WEEK_CALL = {when:'in 2 days', session:36};
+
+/* HOW THE CELL SAYS THE COUNTDOWN. The file writes the two states two ways —
+   600:7705 puts the unit first and the verb last ("2 days Left"), 608:7775 puts
+   the preposition first ("In 2hrs") — and both are the same string with "in "
+   moved. Outside the day the distance is a quantity you have; inside it, it is
+   a time it happens at. Anything that is not an "in …" phrase is already
+   written as the cell wants it ("Due now", "Today 4:30 PM") and is left alone. */
+const callLeft = w => !/^in /i.test(w) ? w
+  : PLATE_SOON.test(w) ? 'In ' + w.slice(3) : w.slice(3) + ' left';
+
+/* ==========================================================================
+   ONE ROW FOR ALL THREE CALLS — Maryam, 31 Aug 2026
+
+   This product has three appointments and it was drawing them two ways: the
+   weekly cohort call as the `.crow` below (600:7723 — a countdown cell, a
+   square portrait, who they are, two actions) and the level interview as a
+   black `.plate` on `booked`. Same object, same four facts, two components —
+   which is the mistake §29.4 records for the level card and the one this
+   file's own note about `.plate` makes for the consultant call.
+
+   SO THE COMPONENT IS THE MARKUP AND `CALL_ROW` IS THE DATA. `crow(kind)`
+   draws the row; a row in the table says who the call is with, what to call
+   it, when it is, and what the second button does. A fourth appointment is a
+   fourth row and no markup.
+
+   THE COUNTDOWN DRIVES THE WHOLE CELL, which is why `when` is written in
+   `PLATE_SOON`'s vocabulary rather than as a date: inside the day the cell
+   goes accent and drops the session number, outside it the cell is grey and
+   keeps it. Move a call closer by editing one string.
+
+   WHO IS READ, NEVER TYPED. The cohort call reads `COHORT_LEAD`, the interview
+   reads whoever was actually booked (`bkAgent`, ai7 — late-bound because that
+   file parses after this one, which is fine for a function called at render).
+   The expertise line comes from `REC` for an agent and from the record for the
+   leader, so this row cannot disagree with the recommendation block or with
+   the Enroll page about who somebody is.
+   ========================================================================== */
+const CALL_ROW = {
+  /* the level interview, on `booked` */
+  iv: () => {
+    /* READ `S`, NOT ai7'S HELPER — and the guard this replaces is the trap.
+       It was `(typeof bkRec === 'function' && bkRec().agent)`, which looks like
+       the safe form of a late-bound reference and is not: **`typeof` only
+       shields an identifier that was never DECLARED.** `bkRec` is
+       `const bkRec = …` (ai7:88), so before ai7 parses it is a declared binding
+       in the temporal dead zone, and `typeof` on one of those THROWS rather
+       than returning 'undefined'.
+
+       views.js's boot `render()` is the last statement in this file and runs
+       before ai7 exists, so a COLD LOAD at `#booked/dashboard` reached this
+       line, threw, and took the whole first paint with it — `device.innerHTML`
+       0 bytes, a white page. A hash change from another stage did not
+       reproduce it, because by then ai7 has parsed; that is why both a
+       220-combination and a 3,065-render in-page sweep passed over it.
+
+       `bkRec()` is `S.booking || S.bk || {defaults}` and all this needs is the
+       agent key, so reading the two state objects directly is the same answer
+       with no ordering question left in it. Same precedence as `bkAgent`:
+       the completed booking, then the flow in progress, then `S.agent`. */
+    const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
+    const a = AGENTS[k] || AGENTS.priya;
+    return {who:a, role:'Talent agent', when:'in 6 days',
+      label:'Level interview &middot; 45 minutes, recorded',
+      x:`${(REC[k] || REC.priya).expertise}, assesses ${a.range}`,
+      kind:'iv', second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
+  },
+  /* the weekly cohort call, on the enrolled dashboards */
+  cohort: () => {
+    const L = COHORT_LEAD, w = WEEK_CALL.when;
+    return {who:L, role:'Cohort leader', when:w,
+      label:`Cohort week call${PLATE_SOON.test(w) ? '' : ` &middot; session ${WEEK_CALL.session}`}`,
+      x:`${L.expertise}, assesses ${L.range}`,
+      kind:'cohort', second:{go:'messages', ic:I.chat, t:'Message ' + L.n.split(' ')[0]}};
+  },
+  /* the re-interview. NOT DRAWN YET and the reason is worth keeping: on day 90
+     the card is "Book your re-interview / Choose an agent" — there is no person
+     on it, because choosing the person IS the action. A row whose subject is a
+     photograph cannot be the card for picking whose photograph it will be. It
+     is here so that a booked re-interview is one call site away. */
+  re: () => {
+    const a = AGENTS.priya;
+    return {who:a, role:'Talent agent', when:'due now',
+      label:'Re-interview &middot; 45 minutes, recorded',
+      x:`${REC.priya.expertise}, assesses ${a.range}`,
+      kind:'re', second:{go:'interviews', ic:I.calendar, t:'See the booking'}};
+  }
+};
+
+/* THE ROW ONLY — the caller wraps it. On the enrolled dashboards it is a
+   `.head-sec` so `placeBand` takes it into the band as a third member spanning
+   both columns; on `booked` it is an ordinary section in the page body, because
+   that band's second column is already the journey (§70.3). Returning the bare
+   `.crow` is what lets one component sit in both places without the component
+   knowing which. */
+function crow(kind){
+  const c = (CALL_ROW[kind] || CALL_ROW.cohort)();
+  const p = c.who;
+  const soon = PLATE_SOON.test(c.when);
+  return `<div class="crow${soon ? ' urgent' : ''}">
+      <div class="crow-when">
+        <b>${callLeft(c.when)}</b>
+        <span>${c.label}</span>
+      </div>
+      <div class="crow-who">
+        <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">${p.n}</span>
+            <span class="crow-v">${I.checkFilled}</span></p>
+          <p class="crow-role">${c.role}</p>
+          <p class="crow-x"><b>Expertise:</b> ${c.x}</p>
+        </div>
+      </div>
+      <div class="crow-a">
+        <button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>
+        <button class="btn btn-p btn-sm noic" data-call="${c.kind}">Join call ${I.arrowRight}</button>
+      </div>
+    </div>`;
+}
+
+/* the enrolled dashboards' wrapper — a band member, per the note above */
+const callRow = () => `<div class="sec head-sec head-col sec-call">${crow('cohort')}</div>`;
+
+/* ==========================================================================
+   THE AI-NATIVE HEAD — Figma 578:5966
+
+   THE JOURNEY LEAVES TAL'S CARD AND BECOMES THE BAND'S SECOND COLUMN.
+   §56 built the left column as `<h1>` / fact row / rule / wing / rule / Tal,
+   with the page's one DARK card in column two. The file turns that inside
+   out for the way in: Tal's sentence is the whole of the left column, on its
+   own warm wash, and the four steps are the right one. Everything that moves
+   is a move rather than a redraw — `journey()` is still the single list,
+   `stepIcon` still picks the mark, and `stepper()` is untouched for the three
+   stages that still draw the horizontal row (`consult`, `booked`, and the
+   leader's pages).
+
+   WHY IT IS A `.head-sec` AND NOT A SECOND `.sec-dark`. `placeBand` (ai5)
+   takes a run of sections after the `.ph` and only recognises three kinds:
+   the ask line, anything containing Tal's mark, and a section the VIEW has
+   declared as head furniture. This is the third — a judgement about one page,
+   which is exactly what `.head-sec` was added for (`V.enrol`'s cohort leader
+   is the other user of it). Column two is then §70's, gated on the band
+   actually containing one, so no other page moves.
+
+   IT STILL HAS TO BE WRITTEN DIRECTLY AFTER `ph()`: the loop is a run, not a
+   search. `placePageSummary` inserts Tal's card after the `.ph` two passes
+   later, so the order in the DOM ends up header, Tal, journey — and §70 puts
+   the journey in the other column regardless, so the source order is only
+   about being collected at all.
+
+   THE FOUR LABELS ARE THE FILE'S, IN `JRN_AI`, AND THAT IS A REVERSAL.
+   The first cut used `JRN` — "Leadership quiz", "Interview and level",
+   "Enrolled", "90-day course" — on two good reasons: `JRN` is where the four
+   steps were settled (the long note over `journey()` is the argument) and §63
+   is explicit that the words go in the markup in sentence case. Maryam's call
+   on 30 Aug 2026 was the file's words exactly, so they are here.
+
+   A SEPARATE LIST RATHER THAN AN EDIT TO `JRN`, because `JRN` is also the
+   horizontal `stepper()` that `consult`, `booked` and the leader's pages draw,
+   and those are not this design. The two are the same four steps in the same
+   order — `JRN_AI[i]` is `JRN[i]` — so `stepIcon` still derives the right mark
+   from either, and a fifth step would have to be added to both. What the file
+   contributes beyond the words is the SHAPE: a numbered vertical list, a tick
+   on what is done, the subject mark on what is not, and the count as a pill on
+   the heading row.
+
+   THE COUNT IS DERIVED. "Step 2 of 4" is the position of the `on` step in the
+   list `journey()` returned, so a stage that moves the marker moves the pill
+   with it and the two cannot disagree. A stage with nothing `on` — every step
+   done — reads as the last step rather than as "Step 0". */
+const JRN_AI = ['Nextinleadership Quiz','Interview &amp; Levelling',
+                'Course Enrollment','90 days Cohort Journey'];
+
+function jrnList(){
+  const steps = journey();
+  const at = steps.findIndex(s => s.st === 'on');
+  const now = at < 0 ? steps.length : at + 1;
+  /* `.head-col` IS WHAT OPENS THE SECOND COLUMN AND `.sec-jrn` IS ONLY WHICH
+     TENANT. §70.3 keyed the whole two-column band on `.sec-jrn` because this
+     was the only thing that ever went in there; §71 puts the progress strip in
+     the same slot on the enrolled dashboards, so the structural half of that
+     gate is now a class both wear. `placeDark` tests the same one. */
+  return `<div class="sec head-sec head-col sec-jrn">
+    <div class="jrn">
+      <div class="jrn-h">
+        <h2 class="jrn-t">Your journey so far</h2>
+        <span class="jrn-pill">Step ${now} of ${steps.length}</span>
+      </div>
+      <ol class="jrn-l">
+        ${steps.map((s,i) => `<li class="jrn-i${s.st ? ' ' + s.st : ''}">
+          ${''/* the mark is derived from the PRODUCT's label, not the file's:
+                `stepIcon` matches on words `STEP_IC` knows ("quiz", "interview",
+                "enrol", "course"), and "Nextinleadership Quiz" happens to carry
+                one while "90 days Cohort Journey" does not. Reading `s.lab`
+                keeps the row's mark the same mark the horizontal stepper gives
+                the same step, which is the one thing CLAUDE.md says must not
+                differ between two drawings of a step. */}
+          <span class="jrn-ic">${s.st === 'done' ? I.checkFilled : stepIcon(s.lab)}</span>
+          <span class="jrn-n">${i + 1}.</span>
+          <span class="jrn-lab">${JRN_AI[i] || s.lab}</span>
+        </li>`).join('')}
+      </ol>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
+   TAL'S ONE RECOMMENDATION — Figma 578:5966 (581:6456)
+
+   THE RAIL OF THREE BECOMES A CHOICE OF ONE, AND THAT IS THE WHOLE POINT OF
+   THE PAGE. `new` used to end its head band with "Book your interview" over a
+   `.rail` of three `agentCardH`s — a shortlist, which is a list you still have
+   to work through. An AI-native page does the working: Tal names ONE person,
+   says on what evidence, and offers the way to disagree with it. The other two
+   are one press away behind that link and behind the nav's own Agents page, so
+   nothing is lost except the obligation to compare.
+
+   EVERY FIGURE IS `AGENTS.priya`'S, READ RATHER THAN RESTATED. The name, the
+   rating, the interview count, the level range and the next slot all come off
+   the record, which is what stops this block and the Agents page disagreeing.
+   THE FEE IS THE ONE PLACE THE FILE AND THE PRODUCT DIFFER: 581:6479 says
+   "$120 Interview Fee" and `AGENTS.priya.price` is $95 — and $95 is also the
+   top of the range Tal's own sentence quotes two inches away, and the number
+   `V.agent` and `V.booking` both charge. A file's placeholder does not get to
+   be the third price on one journey, so the record wins and the design's
+   layout keeps it.
+
+   `REC` IS THE PART THAT IS NOT IN `AGENTS`, and it is here rather than in
+   data.js because it is a statement about THIS candidate's overlap with this
+   agent — a match, a need and a strength — not a property of the agent. One
+   object so the three strings are stated once; the tags read the agent's own
+   first name off the record rather than carrying "Priya" a fourth time. */
+/* ONE ROW PER AGENT, BECAUSE THE OVERLAP IS ABOUT THE PAIR. `AGENTS` holds
+   what is true of the agent — rating, range, fee, slot — and this holds what is
+   true of THIS candidate against them: a match, the need it answers and the
+   strength that answers it. A single row would have made "98% match" a property
+   of the recommendation slot rather than of the recommendation, so swapping the
+   agent would have kept the number and the claim.
+
+   THE THREE ARE THE THREE THE PAGE ALREADY OFFERS — `['priya','owen','lena']`
+   is the shortlist `V.new` drew as a rail before §70, and the copy under it
+   said "three agents assess Explorer candidates". Samuel and Hana assess E3–B2
+   and B1–B4, which is above this candidate.
+
+   AND EVERY STRENGTH IS READ OFF THE AGENT'S OWN `bio` (data.js) rather than
+   invented: Owen's is "how you decide when the information is incomplete",
+   which is also chapter 7's title, and Lena "came up through engineering
+   management". The needs are the candidate's own — delegation is what
+   `PAGESUM.booked` and chapter 4 both name as their growth area. */
+const REC_ORDER = ['priya','owen','lena'];
+const REC = {
+  priya:{match:'98%', need:'System Design',    strength:'Architecture',
+         expertise:'System Architecture', mins:'45 mins call'},
+  owen: {match:'94%', need:'Decision Making',  strength:'Incomplete Information',
+         expertise:'Retail Operations',   mins:'45 mins call'},
+  lena: {match:'91%', need:'Delegation',       strength:'Engineering Teams',
+         expertise:'Engineering Management', mins:'45 mins call'}
+};
+
+/* THE RECOMMENDATION IS STATE, AND `S` IS WHERE IT LIVES — trap 9. `render()`
+   replaces `device.innerHTML`, so which agent is on screen cannot be a class or
+   a dataset value on the card; it is read back out of `S` on every paint and
+   the card is a pure function of it. */
+S.recKey = 'priya';
+S.recBusy = false;
+const recKey = () => REC_ORDER.includes(S.recKey) ? S.recKey : REC_ORDER[0];
+
+/* HOW LONG TAL TAKES TO FIND ONE. Maryam asked for four to five seconds — long
+   enough that the search reads as work rather than as a flicker, short enough
+   that it is not a page that has stopped. */
+const REC_MS = 4500;
+
+/* WHAT TAL LOOKS LIKE WHILE IT IS THINKING — Figma 588:6781 (588:6822).
+
+   THE SKELETON IS THIS BLOCK'S OWN SHAPE, NOT A GENERIC LOADER. Every bar is
+   the box of the thing it stands in for — 236x24 where the name goes, three
+   140s where the three facts go, two 29-tall pills where the two tags go — so
+   nothing moves when the real content lands. A spinner would have been the
+   dashboard answer: a page saying "wait" instead of a page saying "I am
+   assembling this".
+
+   AND IT IS THE BRAND RAMP AT 20%, which is what makes it read as AI rather
+   than as a grey loading state. §70.5b draws the fill and the left-to-right
+   sweep; the file's own bars carry `rgba(244,113,19,.2)` through amber to
+   `rgba(240,83,12,.2)`, one gradient per shape.
+
+   THE BUTTON KEEPS THE OLD AGENT'S NAME at 20% — 588:6992 — because the old
+   recommendation has not been withdrawn yet, it is being replaced. The link
+   under it stops being an offer and becomes a status: "Finding another agent",
+   upright rather than italic, because it is no longer something being quoted. */
+function recSkeleton(){
+  const a = AGENTS[recKey()];
+  const first = a.n.split(' ')[0];
+  return `<div class="sec sec-rec">
+    <span class="ai-label bare rec-lab">Tal recommends</span>
+    <div class="rec rec-busy" aria-busy="true">
+      <div class="rec-l">
+        <span class="sk sk-ph"></span>
+        <div class="rec-b">
+          <div class="rec-top">
+            <span class="sk sk-n"></span>
+            <span class="sk sk-x"></span>
+          </div>
+          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
+          <div class="rec-ov">
+            <span class="sk sk-m"></span>
+            <p class="rec-tags"><span class="sk sk-t"></span><span class="sk sk-t"></span></p>
+          </div>
+        </div>
+      </div>
+      <div class="rec-a">
+        <button class="btn btn-p btn-sm noic rec-off" disabled>Book ${first} Now ${I.arrowRight}</button>
+        <span class="rec-alt rec-finding">Finding another agent</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function talRec(){
+  if(S.recBusy) return recSkeleton();
+  const a = AGENTS[recKey()];
+  const rec = REC[recKey()];
+  const first = a.n.split(' ')[0];
+  return `<div class="sec sec-rec">
+    <span class="ai-label bare rec-lab">Tal recommends</span>
+    ${''/* THE ROW IS TWO GROUPS, NOT THREE ITEMS — 581:6460. The file nests the
+          photograph and the facts inside one frame at gap 16 and pushes the
+          actions to the far edge with `justify-between`; written flat, the
+          same `space-between` puts the free space BETWEEN the photograph and
+          the name as well, which is the one gap on this block that is measured
+          rather than elastic. `.rec-l` is that frame. */}
+    <div class="rec">
+      <div class="rec-l">
+        <span class="rec-ph"><i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="rec-b">
+          <div class="rec-top">
+            <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
+                <span class="rec-v">${I.checkFilled}</span></span>
+              <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
+            <p class="rec-x"><b>Expertise:</b> ${rec.expertise}, Assesses ${a.range}</p>
+          </div>
+          ${''/* THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
+                581:6479 is the one number on this block that contradicts the
+                product: the record says $95, and so do the Agents page, the
+                agent profile and the booking flow. A file's placeholder does
+                not get to be the fourth price on one journey, so the record
+                wins and the file's wording keeps it. Change `AGENTS.priya` if
+                $120 is the real fee and all four surfaces move together. */}
+          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+            <span>${I.video}${rec.mins}</span>
+            <span>${I.calendar}Next slot: ${a.slot}</span></p>
+          <div class="rec-ov">
+            <p class="rec-m">Data Overlap Tags: <i>${rec.match} match</i></p>
+            <p class="rec-tags"><span class="rec-tag need">Your need: ${rec.need}</span>
+              <span class="rec-tag has">${first}&rsquo;s Strength: ${rec.strength}</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="rec-a">
+        <button class="btn btn-p btn-sm noic" data-go="agent:${recKey()}">Book ${first} Now ${I.arrowRight}</button>
+        ${''/* THE WAY TO DISAGREE, AND IT IS A QUESTION RATHER THAN A LINK.
+              "View all agents" would be the ordinary answer and it is the wrong
+              one here: the recommendation was reasoned, so the way past it is to
+              say why it is wrong, which is a thing you say to Tal. `data-tal-ask`
+              is the same attribute every other Ask-Tal control in the build
+              carries, so it opens the thread with the question already put. The
+              nav's Agents item is still the list, for a reader who wants one. */}
+        <button class="rec-alt" data-recswap="1">&ldquo;Ask Tal for a different agent&rdquo;</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
+   QUICK ACTIONS — Figma 578:5966 (581:6344)
+
+   TWO CARDS, AND BOTH OF THEM ARE THINGS THAT USED TO BE SECTIONS. The quiz
+   block (`quizResults`) was ~500px of figures at the foot of this page and its
+   own page already exists — `V.result`, the breakdown §61 built — so the card
+   is the block replaced by the route to it. The second is a question, which is
+   the AI-native half of the pair: the page's other next step is not a screen,
+   it is asking Tal to get you ready.
+
+   `.all-desc` IS LOAD-BEARING — trap 13. A `.sec` with a `.sec-h` takes §10's
+   184px label column at desktop unless it contains one of seven components,
+   and `.qa` is not one of them. `.sec:has(> .all-desc)` is §16's own opt-out
+   and this section has one as a DIRECT child, which is the same way "Book your
+   interview" got away with it on this page before. Move the sentence inside a
+   wrapper and the heading sets on four lines in 184px. */
+const quickActions = () => `<div class="sec sec-qa">
+  <div class="sec-h"><h2>Quick Actions</h2></div>
+  <p class="all-desc">Schedule your interview with an agent to complete your level assessment.</p>
+  <div class="qa">
+    <button class="qa-c" data-go="result">
+      <span class="qa-ic ic-quiz">${I.trophy}</span>
+      <span class="qa-b"><b>Open Quiz Results</b><span>Review your score and quiz performance.</span></span>
+      <span class="qa-go">${I.arrowRight}</span>
+    </button>
+    <button class="qa-c" data-tal-ask="Prepare me for my level interview">
+      <span class="qa-ic ic-prep">${I.lightning}</span>
+      <span class="qa-b"><b>Quick-Start Preparation</b><span>Ask Tal to prepare you for the interview.</span></span>
+      <span class="qa-go">${I.arrowRight}</span>
+    </button>
+  </div>
+</div>`;
 
 /* ============================================================
    AUTH — stage: signup
@@ -2294,105 +2979,68 @@ V.dashboard = (f) => {
       </div>
     </div>`;
 
+  /* ============================================================
+     THE WAY IN, REDRAWN AI-NATIVE — Figma 578:5966
+
+     Four blocks and nothing else: what Tal makes of where you are, how far
+     along you are, the one person Tal picked, and two things to press. The
+     helpers above carry the arguments; what this branch decides is what came
+     OFF the page, and all four subtractions are the same one — the page said
+     the next step five times and now says it once.
+
+       the dark plate       "Your level interview", four facts and a Book
+                            button, in the band's second column. The journey
+                            has that column now, and the four facts it carried
+                            (45 minutes, recorded, sets E1–E5, $80–$95) are on
+                            the recommendation as that agent's own figures.
+       the rail of three    `agentCardH` × 3 under "Book your interview". A
+                            shortlist is the work Tal is supposed to have done;
+                            `talRec` is the answer and the nav's Agents page is
+                            still the list.
+       the quiz block       `quizResults`, ~500px of settled figures at the
+                            foot of a page about what happens next. It is a
+                            Quick Action now, pointing at `V.result`, which is
+                            the page that holds all of it.
+       the wing             `wingBlock()` inside Tal's card. Same four steps,
+                            moved to `jrnList` — see the note over it.
+
+     THE GREETING IS BACK IN THE SENTENCE, AND THE `.ph` GOES WITH IT. It is
+     still printed — `dashPh` is unchanged, so the `<h1>`, the fact row and the
+     rank furniture are all in the DOM and in the accessibility tree — and §70
+     takes it off the screen for the one band that carries a journey column,
+     because 578:5966 opens on Tal speaking and a title above that would be the
+     page saying hello twice. Visually hidden rather than §33.9's `display:none`
+     (which is what `.tal-greet` would have bought): a page whose only heading
+     is inside a paragraph that types itself has no heading at all for a screen
+     reader, and that is a real loss for a look decision.
+     ============================================================ */
   else if(S.stage==='new') body = `
     ${dashPh('Welcome back, Maryam!','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
+    ${jrnList()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
-        <div class="ai-foot noline">
-          <button class="btn btn-p btn-sm ic-l ai-do" data-go="agents">${I.calendar}Book an Interview</button>
-          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    ${''/* THE ONE STAGE WHOSE BAND HAD NO CARD IN IT. Every other dashboard puts
-          something in §56's second column — a call, an enrolment — and this one
-          had the agent rail instead, three sections down. So the page's own
-          next step was the only thing the head band did not say, on the stage
-          whose entire job is that step.
-
-          IT IS WHAT THE INTERVIEW IS, NOT WHEN IT IS. There is nothing booked
-          yet, so the card has no `data-when` and no person on it; what it can
-          carry is the four things a person wants before choosing an agent, and
-          three of them are said nowhere else on this page. The rail below
-          answers WHO and WHEN — faces, ratings, slots and prices — and this
-          answers WHAT, which is why the two are not the same block.
-
-          THE PRICE RANGE IS THE RAIL'S OWN, read off `AGENTS` (Lena $80,
-          Priya $95) rather than restated: the same pair Tal's sentence quotes
-          two inches to the left. If an agent's fee changes there, this line is
-          the one place that has to change with it — the note over `AGENTS` is
-          where that is written down.
-
-          "Book an Agent" AND NOT "Book an Interview", which is the wording
-          Maryam asked for and the more accurate of the two: the thing you do
-          next is choose a person, and the rail it jumps to is a list of three
-          people. Tal's own button above it keeps the other wording because it
-          is Tal offering the step rather than the card naming it. */}
-    <div class="sec">
-      <div class="plate">
-        <div class="plate-t">Your level interview</div>
-        <div class="plate-b">45 minutes, recorded &middot; Real situations, not hypotheticals &middot; Your agent sets your level, E1 to E5 &middot; $80 to $95</div>
-        <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-go="agents">Book an agent ${I.arrowRight}</button>
-        </div>
-      </div>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>Book your interview</h2><button class="btn btn-g btn-sm noic" data-go="agents">View All Agents</button></div>
-      <p class="all-desc">Three agents assess Explorer candidates and have a slot inside seven days. Tal ordered them by how their past candidates progressed.</p>
-    </div>
-    <div class="rail-wrap">
-      <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
-    </div>
-    ${''/* the quiz date is the stepper's, 12 Aug, not consult's 3 Aug */}
-    ${quizResults(qzTaken(), 'the interview decides it')}
-    ${''/* "DECIDED SO FAR" WAS HERE AND IS GONE, and it was the third telling of
-          one fact. Two `.gcard`s said the track is Explorer and that a 90-day
-          course follows — and the quiz block directly above already prints
-          "Title given / Explorer / first of three tracks" as one of its four
-          figures, while Tal's summary at the head of the page opens with "You're
-          on the Explorer track from a quiz score of 64". `patch.py`'s note at
-          line 3163 had already caught this section restating the card above it
-          once before; this is the same section doing it again to the block that
-          replaced that card.
-
-          The two jumps it carried are not lost: both went to `level`, which is
-          where "See full breakdown" and the rail's My Level both go.
-
-          The page now ENDS on the quiz block, which is what `booked` already
-          does — §10 gives a page's last child the frame's own edge, so the
-          tinted block closes itself and needs no closing rule. */}`;
+    ${talRec()}
+    ${quickActions()}`;
 
   else if(S.stage==='booked') body = `
     ${dashPh('Welcome back, Maryam!','Explorer track &middot; interview 20 August &middot; no level yet')}
+    ${jrnList()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
-        <div class="ai-foot">${askChip('Run a mock interview on delegation','Start the mock')}
-          <span class="sp"><button class="ic" aria-label="Helpful">${I.thumbsUp}</button><button class="ic" aria-label="More">${I.overflow}</button></span></div>
       </div>
     </div>
-    <div class="sec">
-      <div class="plate">
-        <div class="plate-who">${avatar(AGENTS.priya,56)}
-          <span class="plate-wb"><b>Priya Nair</b><span>Talent agent &middot; assesses Explorer</span></span>
-        </div>
-        <div class="plate-t">Your level interview</div>
-        <div class="plate-b">Thursday, August 20 at 6:30 PM ET &middot; 45 minutes, recorded</div>
-        <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-call="iv">Join ${I.video}</button>
-          <button class="btn btn-sm noic plate-b2" data-go="interviews">Reschedule</button>
-        </div>
-      </div>
-    </div>
+    ${''/* THE INTERVIEW IS THE SAME ROW THE WEEKLY CALL DRAWS — see `CALL_ROW`.
+          It was a black `.plate` here and a `.crow` on the enrolled dashboards,
+          which is one appointment drawn two ways. Not a `.head-sec`: this
+          band's second column is the journey (§70.3), so the row is the first
+          section of the page body. */}
+    <div class="sec sec-call">${crow('iv')}</div>
     ${''/* WHAT THE 45 MINUTES ACTUALLY ARE — AND IT COMES BEFORE THE QUIZ.
           The one thing this stage's page did not say. Everything on it was
           about the booking — who, when, how long — and nothing about what
@@ -2475,14 +3123,11 @@ V.dashboard = (f) => {
 
   else if(S.stage==='assessed') body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
+    ${jrnList()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
-        <div class="ai-foot"><a class="lk" data-go="enrol">See the cohorts</a></div>
       </div>
     </div>
     ${''/* THE CARD IN THE HEAD BAND'S COLUMN IS THE ENROLMENT, NOT THE LEVEL.
@@ -2722,7 +3367,25 @@ V.dashboard = (f) => {
           dashboards, which was invisible while the greeting inside Tal's
           summary was drawing the title. Same words as the other seven now. */}
     ${dashPh('Welcome back, Maryam!', f.finished?'Explorer Track &ndash; E3 &middot; Cohort 41 &middot; ninety days complete':`Explorer Track &ndash; E3 &middot; Cohort 41 &middot; week ${f.week} of 13`)}
+    ${''/* THE TWO HEAD MEMBERS THE FILE ADDS, AND THEY GO HERE BECAUSE THE RUN
+          IS A RUN. `placeBand` walks forward from the `.ph` and stops at the
+          first section that is neither Tal's card nor a declared `.head-sec`,
+          so both have to be written before anything else — including `reBook`,
+          which is a `.plate` and would end the run. The note over `progCol`
+          is the long version. In the DOM they end up THIRD and FOURTH, because
+          `talFirst` hoists Tal's card to sit directly under the header. */}
+    ${progCol(f)}
+    ${''/* NO CALL ON DAY 90. `f.finished` is the 90 days being over, and the
+          weekly call goes with them — the same test the plate this replaces
+          carried. The band is then two columns and no third row, which is
+          correct rather than something to fill. */}
+    ${f.finished?'':callRow(f)}
     ${reBook}
+    ${''/* THE WING LEFT THIS CARD — §71. `wingBlock()` sat here in a `.stp-wing`
+          and drew the progress strip as the last member of the band's LEFT
+          column; 599:7418 gives the strip a column of its own, so what is left
+          in here is what the card was always for. `progCol` above is the same
+          block in its new slot. */}
     <div class="sec">
       <div class="ai-aura tile tight">
         <div class="ai-head">${talLabel()}<h3>${stalling?'Where you are stuck':dueRe?'Before your re-interview':'Getting started'}</h3></div>
@@ -2730,96 +3393,16 @@ V.dashboard = (f) => {
           ?`Day ${f.day} of 90, week ${f.week}. You&rsquo;ve finished ${f.done} of 13 chapters, averaging ${f.avg}% &mdash; ${f.mins.toLocaleString()} minutes so far. But chapter 4 has been opened four times without finishing. The three furthest ahead in Cohort 41 had it done by now.`
           :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
           :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
       </div>
     </div>
-    ${/* NO EYEBROW ON THIS ONE. "Weekly call" over "Cohort … Session" was the
-          same fact said twice — the title already names the thing — and the
-          label was costing a whole row above the title on a card whose only
-          real content is four short lines. `data-when` carries the distance
-          in time instead of the old "label · when" eyebrow; `placePlates` in
-          ai5.js reads it and, finding no label, seats the TITLE in the head
-          row so the timer chip holds the opposite corner of the title's own
-          line rather than of an empty one. The note there is where that is
-          written down. */''}
-    ${f.finished?'':`<div class="sec">
-      <div class="plate" data-when="in 2 days">
-        <div class="plate-who">${avatar(AGENTS.priya,56)}
-          <span class="plate-wb"><b>Priya Nair</b><span>Cohort leader &middot; leads Cohort 41</span></span>
-        </div>
-        <div class="plate-t">Cohort Week 36 Session</div>
-        <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
-        <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-call="cohort">Join call ${I.video}</button>
-        </div>
-      </div>
-    </div>`}
-    ${''/* THIS WEEK IS WHITE NOW, AND IT IS THE FIRST BLOCK UNDER THE CALL.
-          `tint` is §12's mark for supporting material — the tone says "this
-          is a note about the page, not the page". That was the wrong claim
-          for the one block on this dashboard that holds the week's actual
-          work and the way into the chapter, and it was reading as one:
-          filled, it sat back while the points row above it sat forward.
-          The hairlines either side already separate it, so nothing is lost
-          by taking the ground away.
-
-          Two rules in §32 are keyed on `.sec.tint` for this card — the block
-          dividers and the ring track. They are left in place rather than
-          deleted: they are the correct values IF this card is ever put back
-          on a panel, and on white the base values they were stepping down
-          from are what applies. */}
-    ${''/* AND THE WAY IN IS THE SECTION'S OWN ACTION.
-          The head row held "Coursework" — the module, not the work — while the
-          chapter button sat inside the card four lines below it. Two routes
-          into the same module, one general and one specific, with the general
-          one given the more prominent position: a person on this dashboard
-          wants chapter 4, and the rail already carries Coursework on every
-          screen, so the generic route was a duplicate of the rail spending the
-          section's action slot.
-
-          One button, in the slot every other section on this page uses for
-          "the thing this section is for" (`Where you stand` → View more), and
-          it is the specific route. `weekCard` therefore no longer draws its
-          own — see the note over `.wkc-go` there. */}
-    ${f.finished?'':`<div class="sec">
-      <div class="sec-h"><h2>This week</h2><button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button></div>
-      ${weekCard(f)}
-    </div>`}
-    ${''/* THE PROGRESS STRIP WAS HERE AND IS NOW THE HEAD BAND'S WING.
-          It is the one block on this page that answers "where am I in the 90
-          days", which is exactly the question §56's wing exists to answer, and
-          it was doing it two thirds of the way down the page under the week
-          card. `wingBlock` (above `V.dashboard`) is where it is drawn now, in
-          the slot the journey row holds on the four stages before this one.
-          Drawn in both places it would be the same percentage, the same
-          thirteen blocks and the same three figures twice on one screen.
-
-          THE WEEKLY CHART STAYS DOWN HERE, and the difference is worth a line:
-          the strip is a POSITION (day 34 of 90) and belongs at the head with
-          the rest of the page's state, while the chart is a RECORD, thirteen
-          weeks of minutes, and is read after the work rather than before it. */}
-    <div class="sec">
-      <div class="tile" style="padding-top:var(--s05)">
-        ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:g.weeks,
-          target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
-      </div>
-    </div>
-    ${''/* POINTS, BADGES AND RANK GO LAST.
-          This row sat third on the page, directly under the cohort call —
-          which put the standing before the work, and pushed the week's own
-          chapter below it. None of it is due, none of it moves your level
-          (§ai6's rewards summary says so in as many words), and it is the
-          one block here a person reads out of interest rather than need. So
-          it closes the page instead of interrupting it, under the record of
-          the 90 days that earned the number. */}
-  ${g?`<div class="sec">
-    <div class="sec-h"><h2>Where you stand</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View more</button></div>
-    ${standRow(g)}
-  </div>`:''}
+    ${''/* THE THREE SECTIONS THAT USED TO BE HERE ARE ONE — see the note over
+          `pulse`. "This week", "Time on the course" and "Where you stand" were
+          three headings and three panels asking one question; they are three
+          COLUMNS of one section now, in the order the question is asked. The
+          thirteen-week chart went with the merge and is on Course Progress. */}
+    ${g?pulse(f,g):''}
 `;
   }
   return `<main class="main"><div class="page">${body}</div></main>`;
@@ -3533,6 +4116,19 @@ const COHORT_LEAD = {
      for the same field — every reader of it drops it into innerHTML, and one
      of the two spellings would eventually be compared against the other */
   range:'E1–E3',
+  /* WHAT SHE IS EXPERT IN — 600:7748, added for §71's call row.
+     `REC.priya.expertise` (above `talRec`) carries the same three words and
+     that is not a duplicate to fold together: `REC` is what is true of this
+     candidate's overlap with an AGENT they might book, and this is what is true
+     of the cohort LEADER they have been assigned. The two happen to be the same
+     person in the prototype and would not be in a real cohort — Priya assesses
+     E1–E3 as an agent AND leads Cohort 41, which is why she has a row in both
+     objects at all. Change one and read the other before assuming it follows.
+
+     A JS-side reference cannot be used the other way round either: `REC` is
+     declared ~1700 lines above this and evaluates at parse time, so it could
+     not read a field stated here. */
+  expertise:'System Architecture',
   /* AND THERE IS NO BIO FIELD, WHICH WAS A DECISION AND THEN A REVERSAL.
      A sentence in her own voice about how she runs the call was written here
      and cut on Maryam's read, 28 Aug 2026 — with the logistics rows gone too
@@ -4141,6 +4737,36 @@ V.transcript = (f) => {
     </div>
   </div>
 `:''}
+  ${''/* THE WEEK-BY-WEEK MINUTES ARRIVED HERE FROM THE DASHBOARD, and this is
+        the page that page's promoted branch has claimed they were on since it
+        dropped its own copy of them: "The chart is still on Course Progress,
+        which is where the week-by-week record belongs and which the heading
+        links to." That was not true when it was written — `stackChart` had
+        exactly one caller, the enrolled dashboard — and it is true now.
+
+        IT COMES BECAUSE IT COULD NOT BE A COLUMN. `pulse` compresses the
+        dashboard's three panels into three columns and the pace one carries
+        the time data as a WEEK PROGRESS read: this week against the target, or
+        once the 90 days are over the whole course against thirteen of them.
+        What that cannot carry is the four-series split — video, reading,
+        roleplay, assessment — and the thirteen weeks side by side, which is a
+        RECORD rather than a position. The distinction is the one the dashboard
+        already drew between the progress strip and this chart, one step on:
+        the position is at the head of the dashboard, the record is here.
+
+        IT SITS UNDER THE SCORES, NOT OVER THEM. Both are thirteen-slot charts
+        of the same 90 days and the scores are the sharper reading — what you
+        got — so the minutes follow as the working behind it. `f.done` gates
+        both: with nothing finished there is no record to draw and week 1's
+        single 20-minute bar in a thirteen-slot frame is an empty chart with a
+        mark in the corner. */}
+  ${f.done && GAME[S.stage]?`<div class="sec">
+    <div class="tile" style="padding-top:var(--s05)">
+      ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:GAME[S.stage].weeks,
+        target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
+    </div>
+  </div>
+`:''}
   ${''/* SHOW ALL 13 OPENS THE REST OF THE LIST, IT DOES NOT LEAVE THE PAGE.
         It was `data-go="coursework"` — a button whose words promise more of
         the block you are looking at and whose behaviour was a navigation to
@@ -4564,6 +5190,56 @@ V.terms = AUTH.terms;
    RUNTIME
    ============================================================ */
 const device = document.getElementById('device');
+
+/* ASKING FOR ANOTHER AGENT — the one interaction on the recommendation block.
+   It sets a flag, paints, and comes back four and a half seconds later with the
+   next agent in `REC_ORDER`. Three things it deliberately is not:
+
+   NOT A ROUTE INTO TAL'S THREAD. The link carried `data-tal-ask` for one build,
+   which opened the conversation with the question typed in. That is the right
+   answer for "what is Priya like to be interviewed by" and the wrong one here —
+   the reader is not asking to talk, they are asking for a different card, and
+   the answer belongs where the card is.
+
+   NOT `requestAnimationFrame` — trap 17. rAF never fires in a hidden document
+   and this prototype is usually read in a pane that reports itself hidden, so a
+   frame loop would leave the skeleton up for ever in exactly the case nobody
+   would think to test. `setTimeout` is throttled in the background but it
+   arrives.
+
+   AND NOT UP BESIDE `talRec`, WHICH IS WHERE IT WAS WRITTEN AND WHERE IT BLANKS
+   THE PAGE. `device` is `const`, declared on the line above this one, so a
+   listener registered at the top of the file reads it in the temporal dead zone
+   and throws before the first render — the whole app comes up empty, which is
+   the hazard the note over `COHORT_LEAD` records for `LEADER`. Handlers go with
+   the other handlers, under the declaration. */
+/* ASKING FOR ANOTHER AGENT — the one interaction on this block.
+   It sets a flag, paints, and comes back four and a half seconds later with the
+   next agent in `REC_ORDER`. Two things it deliberately is not:
+
+   NOT A ROUTE INTO TAL'S THREAD. The link carried `data-tal-ask` for one build,
+   which opened the conversation with the question typed in. That is the right
+   answer for "what is Priya like to be interviewed by" and the wrong one here —
+   the reader is not asking to talk, they are asking for a different card, and
+   the answer belongs where the card is.
+
+   NOT `requestAnimationFrame` — trap 17. rAF never fires in a hidden document
+   and this prototype is usually read in a pane that reports itself hidden, so a
+   frame loop would leave the skeleton up for ever in exactly the case nobody
+   would think to test. `setTimeout` is throttled in the background but it
+   arrives. */
+device.addEventListener('click', e => {
+  const t = e.target.closest('[data-recswap]');
+  if(!t || S.recBusy) return;
+  S.recBusy = true;
+  render();
+  setTimeout(() => {
+    S.recKey = REC_ORDER[(REC_ORDER.indexOf(recKey()) + 1) % REC_ORDER.length];
+    S.recBusy = false;
+    render();
+  }, REC_MS);
+});
+
 const pick   = document.getElementById('pick');
 const cap    = document.getElementById('cap');
 
@@ -5382,8 +6058,39 @@ function statCell(ic, label, value, note, jump){
 }
 
 /* Three standings, three marks. Points is a number moving toward a target,
-   badges are a count out of four, rank is where those two put you. */
-function standRow(g){
+   badges are a count out of four, rank is where those two put you.
+
+   `icons` IS THE MARK MODE AND THERE ARE TWO, WHICH IS THE HONEST ANSWER TO ONE
+   COMPONENT ON TWO SURFACES (Maryam, 31 Aug 2026).
+
+   The default is the client's own award ARTWORK — the gold coins, the shield,
+   the star medal — and the note over `ACH` records why: "the mark on the banner
+   should be the SAME object the rewards page and the leaderboard draw: you
+   earned a specific shield, and a generic glyph of a shield is a picture of the
+   category instead." That argument is about the REWARDS page, and it is right
+   there. `V.rewards` is where you go to look at what you have won, and the
+   artwork is the thing itself.
+
+   It is the wrong mark inside the pulse. Those three WebPs are photographic —
+   gold gradients, a silver bevel, a navy roundel — and they are the only
+   photographic objects in a section otherwise made of hairlines, flat glyphs
+   and one green bar. At 32px in a 278px column they were the heaviest things on
+   the screen, and what they were marking is not an award you have won: two of
+   the three rows say you have NOT won it yet ("Bronze at 2,500 points", "Earn
+   the Silver badge"). A picture of a trophy over a row about not having one is
+   the category glyph doing its job better than the artefact does.
+
+   So the pulse asks for glyphs and every other caller keeps the artwork. One
+   function, one set of three facts, two marks — rather than a second function
+   that could disagree about what a badge is worth.
+
+   THE THREE ICONS ARE THE PRODUCT'S OWN AND EACH IS ALREADY USED FOR ITS OWN
+   SUBJECT: `I.trophy` is Points in the promoted dashboard's `.stats` grid,
+   `I.shield` is what the badge artwork is a picture OF, and `I.star` is what a
+   rank is literally named in ("1-Star"). The hues are `--mk-1/2/3`, NAMED per
+   row — §65's and §72's decision both times, so a row keeps its colour and
+   cannot be re-tinted by its position. */
+function standRow(g, icons){
   const nb = nextBadge(g.pts);
   const bdgArt = ['bronze','silver','gold','involved'][Math.max(0, Math.min(3, g.badges-1))];
   /* THE LABEL AND THE FIGURE ARE ONE LINE. `.stand-top` is the only structural
@@ -5401,9 +6108,11 @@ function standRow(g){
      read without measuring a stripe. Gone, so all three cells hold two lines,
      the box is as tall as it needs to be, and every cell's content sits on
      the same centre line. §29.15 has the rest. */
-  const cell = (art, artOff, label, value, note) => `
+  const cell = (art, artOff, label, value, note, ic, mk) => `
     <button class="stand-c" data-go="rewards">
-      <span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>
+      ${icons
+        ? `<span class="stand-ic" style="--mk:var(--mk-${mk})">${ic}</span>`
+        : `<span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>`}
       <span class="stand-b">
         <span class="stand-top">
           <span class="stand-l">${label}</span>
@@ -5414,11 +6123,14 @@ function standRow(g){
     </button>`;
   return `<div class="stand">
     ${cell(AWARD.points, false, 'Points', g.pts.toLocaleString(),
-      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned')}
+      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned',
+      I.trophy, 1)}
     ${cell(AWARD[bdgArt], !g.badges, 'Badges', g.badges+' <small>of 4</small>',
-      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points')}
+      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points',
+      I.shield, 2)}
     ${cell(AWARD['rank'+g.rank], false, 'Rank', RANKS[g.rank-1].n,
-      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder')}
+      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder',
+      I.star, 3)}
   </div>`;
 }
 

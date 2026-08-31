@@ -847,3 +847,536 @@
 .app .tbl .num,.app .ios-time,.app .ch-num,.app .s-n,.app .stp-c,
 .app .call-clock,.app .qz-val,.app .stand-v,.app .ring-n{
   font-variant-numeric:tabular-nums;font-feature-settings:'tnum' 1}
+
+/* ------------------------------------------------------------------ 10 ---
+   THE AI-NATIVE HEAD — §70's families
+
+   §70 draws Figma 578:5966 and, per the rule at the head of this file, owns
+   none of its type: every font size, weight, case and ink for the classes it
+   introduces is here. They are in §63 rather than §70 even though §70 lands
+   after it, because "which file is a text colour in" has to have one answer,
+   and the two rules that look least like type — a transparent ink under a
+   clipped gradient, and the three step states — are the two most likely to be
+   changed by somebody reading §70 alone.
+
+   THE FILE'S SIZES ARE MAPPED TO ROLES, NOT TRANSCRIBED. 578:5966 is drawn on
+   a 1920 frame with a 1396 content column and sets its body at 16px; the
+   product's desktop frame is 1280 with a ~1200 column and its body role is
+   13.5. Copying 16 across would have put this one page a full step above every
+   other page in the build — the file's 16/16/18/14 is really "body, body,
+   one up, one down", which is exactly `--t-body` / `--t-h4` / `--t-h3` /
+   `--t-compact`. Two roles do all of it and no ninth size is added.
+
+   THE ONE RELATIONSHIP WORTH KEEPING is that the file sets Tal's label and
+   Tal's sentence at the SAME size — the label is not a caption over the
+   paragraph, it is the first words of it. §33 had the label at 12.5 against a
+   13.5 sentence; `--t-h4` (14) against `--t-body` (13.5) reads as the file's
+   pair does.
+   ------------------------------------------------------------------------ */
+
+/* TAL'S NAME, AND THE INK THAT IS NOT AN INK. §70 clips `--ai-grad` to these
+   glyphs; the clip is only visible through a transparent foreground, so this
+   declaration is the other half of that rule and not a colour decision. It has
+   to be `.app .modhead .ai-aura.talsum > .ai-head > .ai-label` exactly — §33.2
+   sets `--accent-text` on that same selector at (0,6,0), so anything shorter
+   loses on specificity however late it lands. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;
+  color:transparent}
+
+/* THE THREE ACCENT PHRASES IN THE SENTENCE. `--accent-text` is the AA-safe
+   accent ink (4.63:1) and the phrases sit on §70's 5% ground, which lifts the
+   requirement by nothing worth measuring. Strong, because the file sets them
+   in Kräftig and because a tint alone is not enough to mark a phrase inside a
+   line that is already being read as one thing. */
+.app .modhead .ai-aura.talsum .ai-body p b{
+  font-weight:var(--t-w-strong);
+  color:#f47113}
+
+/* THE JOURNEY COLUMN. Heading and step labels at one size, which is the file's
+   relationship — the heading is told apart by the pill beside it, not by being
+   bigger. The count is one step down and Buch, because it is a figure about
+   the list rather than a member of it. */
+.app .jrn-t,
+.app .jrn-lab{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none}
+.app .jrn-n{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong)}
+.app .jrn-pill{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:#f47113}
+
+/* THE THREE STEP STATES, AND THE MARK TAKES THE ROW'S INK. `currentColor` on
+   the icon (§70) is what makes one declaration per state colour both halves of
+   the row, so a tick cannot be green beside a label that is grey.
+
+   THE FILE'S THREE EXACTLY — 587:6753 #00a43c, 587:6756 #f47113, 587:6759
+   #515151 — and that is Maryam's call over this layer's own contrast rule,
+   made twice and recorded here rather than quietly softened. The first cut
+   substituted `--support-success-ink` (#1a7f37) and `--accent-text` (#b94a09),
+   which are the same two hues at inks the build's AA sweep passes; the file's
+   read 2.8:1 and 3.1:1 on white against the 4.5:1 that 14px text wants. What
+   the substitution cost is that the current step — the one thing on the page
+   the reader is meant to find — came out a brown that did not match the accent
+   anywhere else on the screen. The design wins; the two ratios are the known
+   price and are worth re-testing if this ever leaves prototype. */
+.app .jrn-i{color:#515151}
+.app .jrn-i.done{color:#00a43c}
+.app .jrn-i.on{color:#f47113}
+
+/* THE RECOMMENDATION. The name is the one thing on the block a step up; the
+   rest of it is compact, with the fact row and the description in the one grey
+   a description takes (§3 of this file). */
+.app .rec-n{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .rec-r,
+.app .rec-x,
+.app .rec-m,
+.app .rec-alt{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+.app .rec-x b{font-weight:var(--t-w-strong)}
+.app .rec-f{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:#414141}
+/* the match figure is the block's one claim, so it is set apart the way the
+   file sets it — strong, italic, and in the blue its own tag uses */
+.app .rec-m i{font-style:italic;font-weight:var(--t-w-strong);color:#0488c5}
+.app .rec-tag{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none}
+.app .rec-tag.need{color:#973177}
+.app .rec-tag.has{color:#0488c5}
+/* transparent for the clip, exactly as the label above — §70 paints the ramp */
+.app .rec-alt{font-style:italic;color:transparent}
+
+/* QUICK ACTIONS. Title and description are the pair §63 draws everywhere else
+   — one strong line and one in the description grey — and the card's own ink
+   is what the arrow inherits. */
+.app .qa-c{color:var(--text-primary)}
+.app .qa-b b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none}
+.app .qa-b > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:#717171}
+
+/* "TAL'S RECOMMENDS" IS BLACK, AND THAT IS THE FILE BEING DELIBERATE —
+   581:6670 sets "Summary by Tal" in the gradient and 584:6692 sets this one in
+   plain ink, two labels of the same size and shape four inches apart. The
+   difference is what each block IS: the summary is Tal talking, so the words
+   are painted in the ramp; the recommendation is a section of the page that
+   Tal chose the contents of, so the sparkle says whose it is and the heading
+   behaves like a heading. Two gradients would have made the sparkle mean
+   nothing. §37 gives `.ai-label.bare` `--accent-text`, which this answers. */
+.app .ai-label.bare.rec-lab{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;
+  color:var(--text-primary)}
+
+/* QUICK ACTIONS' HEADING IS ONE STEP UP — 581:6404 sets it at 18 against the
+   14 of everything in the cards under it, which is the same relationship
+   `--t-h3` has to `--t-h4`. It is restated here because §63 §8b's desktop
+   block sizes `.sec:has(> .all-desc) > .sec-h h2` inside a container query,
+   and per trap 3 that tier can only be answered from inside itself. */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec-qa > .sec-h h2{
+    font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls)}
+}
+
+/* THE ASK LINE — 581:6571/6586. The offer is at body size in full ink and the
+   example question one step down in the helper tier, which is the distinction
+   §21's own note draws in words ("this is the line's own voice" against "an
+   example of what you could type") and had been drawing with colour alone. */
+.app .askdock .askline-t{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .askdock .askline-q{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:#474747}
+
+/* THE "FINDING ANOTHER AGENT" STATUS — 588:6864. It shares `.rec-alt` with the
+   offer it replaces, so it inherits the size, the ramp and the underline; what
+   differs is one property. The file sets the offer in Söhne Buch Kursiv and
+   this in Buch, and the reason is legible: the offer is a quoted question and
+   this is the product reporting what it is doing. */
+.app .rec-alt.rec-finding{font-style:normal}
+
+/* THE CARD A PHRASE OPENS — 596:7379. Everything in it is 14/1.8 black except
+   the "Your Next Step" label, which is 12 and strong, and the coloured lead-in
+   on the read. `--t-compact` is 13.5/19; the card's own 1.8 line height is what
+   makes a 310px measure readable at this size, so it is stated rather than
+   taken from the role's `-lh`.
+
+   THE LEAD-IN IS `--link`, NOT THE ACCENT. 596:7384 sets "Discovering your
+   direction:" in #0488c5 — the same blue as the match figure and the overlap
+   tag — and that is the point of it: the accent is Tal's own voice all over
+   this band, so a second accent phrase inside a card that IS Tal talking says
+   nothing. The blue marks it as a named reading rather than as emphasis. */
+.app .sumdrop .sd-lead,
+.app .sumdrop .sd-read,
+.app .sumdrop .sd-nb{
+  font-size:var(--t-compact-size);line-height:1.8;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+.app .sumdrop .sd-read b{font-weight:var(--t-w-strong);color:#0488c5}
+.app .sumdrop .sd-nt{
+  font-size:var(--t-caption-size);line-height:1.8;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--text-primary)}
+/* transparent for the clip, as every gradient-inked control in this layer is */
+.app .sumdrop .sd-act{
+  font-size:var(--t-compact-size);line-height:18px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  color:transparent}
+
+/* ------------------------------------------------------------------ 11 ---
+   THE COURSE HEAD — §71's families
+
+   §71 draws Figma 599:7418 and owns none of its type, on the same terms §10
+   sets out for §70: every size, weight, case and ink for the classes it
+   introduces is here, including the two that read as mechanism — the figure
+   strip's pair, which §71 re-proportions without touching, and the countdown's
+   violet, which is the one hue on the row.
+
+   THE FILE SETS THIS SCREEN AT 16 AND SO DID 578:5966, so the mapping is §10's
+   and not a second reading of it: 16 is `--t-body`, 18 is one up (`--t-h3`),
+   14 is one down (`--t-compact`), and the 32 on "12%" is the only figure large
+   enough to need a role of its own.
+   ------------------------------------------------------------------------ */
+
+/* THE PERCENTAGE — 600:7634 at 32, against §04.79's 34 and §63 §2's mapping of
+   `.prog-pct` onto the display role. It keeps the display role: 34 is the
+   nearest thing the scale has to 32 and it is what "38%" has been set at on
+   these pages since §04. Restating it at 32 would be a ninth size bought for
+   two characters. Nothing here — the row is listed so the next person does not
+   go looking for the rule that sets it.
+
+   ITS LABEL IS THE LINE'S SECOND HALF — 600:7636. §02.368 has `.prog-l` at
+   12.5, which is right under a stacked figure and thin beside one: §71.1 puts
+   the two on a baseline, so the label is now reading AS part of "12% of the
+   course done" and takes the compact role. */
+.app .sec-prog .prog-top > div:first-child > .prog-l{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-secondary)}
+
+/* THE DAY IS THE LINK BLUE — 600:7652 sets "Day 17" in #0488c5 while every
+   other figure on the block is ink. It is the one value in the head that is a
+   POSITION rather than an amount — the two beside it are a percentage and a
+   count, and this says where in the ninety days you are standing — and the file
+   marks that with the same blue it gives the match figure and the overlap tag
+   on 578:5966. `--link` and not the file's hex: §12's own note records that
+   `--link` IS #0488C5 darkened to clear AA, which 12.5px text on white needs
+   and 16px on white does not quite. One blue in the product.
+
+   "of 90" UNDER IT STAYS THE DESCRIPTION GREY, which §02.372/373 already give
+   `.prog-dn` / `.prog-day` — restated because the rule above re-points the
+   first line's colour and the pair has to be told apart by more than size. */
+.app .sec-prog .prog-day > .prog-dn{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  color:var(--link)}
+.app .sec-prog .prog-day > .prog-l{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-secondary)}
+
+/* THE THREE FIGURES ARE ONE SIZE, TOLD APART BY WEIGHT AND INK — 600:7660.
+   The file sets "3 of 13" and "Chapters" both at 16, Kräftig over Buch, in two
+   greys. That is the same relationship §10 keeps for Tal's label and Tal's
+   sentence and for the same reason: the label is not a caption over the figure,
+   it is the figure's second line.
+
+   IT REPLACES A TWO-STEP PAIR. §63 §2 has `.prog-figs > span b` at `--t-h3`
+   (17) and `.prog-figs > span` at `--t-eyebrow` (11.5 strong) — a 5.5px drop
+   with the label in the eyebrow role, which was correct while the strip was a
+   band across a page and the labels were the row's captions. In a 300px column
+   the same pair reads as a figure with a footnote.
+
+   THE LABEL IS `--t-compact` AND NOT `--t-h4`, WHICH IS HALF A STEP AND IS ALSO
+   ARITHMETIC. §10's note maps the file's 16 two ways — Tal's label to `--t-h4`
+   and Tal's sentence to `--t-body` — so a 16 in this file is already allowed to
+   be either, and `--t-compact` is `--t-body`'s size at a cell's line height,
+   which is what these two lines are. The arithmetic is the other half: §71.1c
+   works out that the strip has 259px against the file's 407 and needs its three
+   cells inside 246, and 14 → 13.5 on the three labels is the last 8px of that.
+   Both reasons point the same way, which is the only reason it is a half step
+   rather than a compromise.
+
+   SCOPED TO `.sec-prog`, at (0,3,0) against §2's (0,2,0). The strip has one
+   emitter in the build (`progressStrip`) and one caller (`progCol`), so the
+   scope is not currently buying separation — it is buying the guarantee that
+   a `.prog-figs` drawn anywhere else keeps the band's proportions. */
+.app .sec-prog .prog-figs > span b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .sec-prog .prog-figs > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-helper)}
+
+/* THE COUNTDOWN — 600:7705 at 18 in #b948c7, over the session at 14 in ink.
+
+   THE VIOLET IS THE FILE'S AND IT IS A FOURTH HUE ON A PAGE THAT HAS THREE,
+   which is worth saying out loud before it gets "corrected" to the accent. The
+   accent is Tal's voice all over this band — the label, the phrases, the
+   thirteen blocks — and the countdown is the one figure in the head that is
+   not Tal's: it is the product saying when something happens. In the accent it
+   would have read as one more thing the assistant was pointing at. #b948c7 is
+   `--mk-3`'s family (#7c4bb0, the violet the "invested" mark already carries
+   two inches above it) at the file's lightness; it reads 4.0:1 on the 4% grey
+   ground, under the 4.5:1 that 18px would want if it were body text and over
+   the 3:1 that large text takes. Recorded rather than softened, which is the
+   same call §10 records for the journey's three step states.
+
+   THE SESSION LINE IS COMPACT AND IN FULL INK — 600:7734 sets it black, not
+   grey, and that is right: it is what the countdown is counting DOWN to, so it
+   is the subject and the violet line is the modifier. */
+.app .crow-when > b{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:#b948c7}
+.app .crow-when > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+
+/* AND INSIDE THE DAY BOTH LINES ARE WHITE — 608:7775/7776, which set the pair
+   on the accent in `text-white` with the violet gone. Two declarations rather
+   than a re-pointed token because these two ARE the tokens: the violet is a
+   literal (its argument is above) and the session line is `--text-primary`, so
+   there is nothing to reassign on the cell that the rest of the system would
+   follow. `--on-dark` is the product's ink on a brand ground; §19's
+   `--on-brand-fill` flag is already on the cell for anything else that reads
+   it. */
+.app .crow.urgent .crow-when > b,
+.app .crow.urgent .crow-when > span{color:var(--on-dark)}
+
+/* THE LEADER — 600:7727/7732/7748. The name is one step up and the two lines
+   under it are compact: the role in full ink because it is what she IS, and
+   the expertise with a strong lead-in, which is the shape `.rec-x` already
+   draws on the recommendation. Two blocks four inches apart naming a person's
+   expertise should not be set two different ways. */
+.app .crow-n{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .crow-role,
+.app .crow-x{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+.app .crow-x b{font-weight:var(--t-w-strong)}
+
+/* ------------------------------------------------------------------ 12 ---
+   THE WEEK PULSE — §72's families
+
+   §72 merges the enrolled dashboard's three panels into three columns and owns
+   none of their type, on the same terms §10 and §11 set out for §70 and §71.
+   Eleven classes, and every one of them takes a role that already exists —
+   there is no twelfth size here and there was no reason for one. What the
+   merge changed is the WIDTH each reading gets, not the reading, so the
+   question this block answers is which of the eight sizes each fact deserves
+   in a 290px column rather than across a page.
+
+   THE ONE THING WORTH READING BEFORE CHANGING ANY OF IT: the three columns are
+   a comparison, so the three FIGURES have to be the same size. `.pulse-fig`
+   (the week's minutes) is `--t-display`, `.ring-n` inside `.pulse-ring` is
+   already `--t-h2` by §63 §7b, and `.stand-v` is 24 by §15 and restated at
+   §63.848. Those are three different sizes for three columns' headline numbers
+   and that is deliberate rather than an oversight: they are not the same KIND
+   of number. The ring is a percentage OF something drawn beside it, the
+   standing figures are three stacked rows and take a row's size, and the
+   minutes figure is the only one on the row that stands alone. Setting all
+   three to one size makes the standing column read as three headlines.
+   ------------------------------------------------------------------------ */
+
+/* THE COLUMN NAME TAKES h4 — UP FROM THE EYEBROW'S 11.5 (Maryam, 31 Aug 2026),
+   and h4 is the right role rather than just the next size: §63 §3 defines it as
+   "a row title, a card title", and each of these titles a column. The eyebrow
+   role is for a line that LABELS a figure sitting under it, which is what these
+   were when the mark was a chip and the pair read as one figure-cell heading;
+   with §72's ground gone the three are the section's own subheadings and 11.5px
+   was reading as a caption over a 34px number.
+
+   14 IS ALSO ONE STEP UNDER `.pulse-ttl`, which is now h3 at 17 — so the
+   section reads 17 / 14 / figures, three ranks, rather than 17 / 11.5 with a
+   gap in the middle wide enough to look like an omission.
+
+   Still `--text-secondary` rather than the mark's hue: the GLYPH carries the
+   colour, and a coloured word beside a coloured mark reads as a status pill.
+   Sentence case, like everything since §63 §3. */
+.app .pulse-lab{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* THE SECTION HEADING TAKES h3, WHICH IS "YOUR 90 DAYS SO FAR" EXACTLY
+   (Maryam, 31 Aug 2026). That block is `wingHead`'s `<h2 class="u-h3">` in the
+   band's second column, and the two are the head of the page and the head of
+   the section under it — the same rank, so the same size. Two steps up from
+   §63 §7b's 12.5 on `.sec-h > h2`, which is what "This week" was set at, and
+   one up from the band's 14px "Summary by Tal".
+
+   IT NEEDS (0,3,1) TO LAND, AND THAT IS THE WHOLE REASON THE SELECTOR IS
+   WRITTEN THIS WAY. §63 §4 puts `.app .sec-h h2` in the h4 list at (0,2,1) —
+   two classes and an element. A rule written `.app .pulse-ttl` is (0,2,0) and
+   LOSES to it however late it lands, which is trap "specificity beats order"
+   stated at the head of §7b. It read 14px rather than 17 and looked correct,
+   because this layer's first cut asked for h4 and the two agreed by accident.
+   `.app .sec-h h2.pulse-ttl` is (0,3,1) and wins on weight.
+
+   The ink is primary and NOT the ramp — §70.2 clips the band's label to
+   `--ai-grad` because that label is Tal speaking; this one heads a grid of
+   figures, and a gradient heading over a table is the ramp used as
+   decoration. The mark carries the voice; the words carry the ink. */
+.app .sec-h h2.pulse-ttl{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* THE LEDE IS BODY — it is prose, the only prose in the section, and §63 §3
+   reserves the body role for exactly that. Its `<b>` figures stay in the
+   PRIMARY ink at strong weight rather than taking the accent: §70.2 gives
+   `.ai-body p b` the 5% ground and §63 §10 the accent ink, and both belong to
+   the band, where the highlights are Tal pointing at numbers. Here the numbers
+   are printed again 40px below at four times the size, so lighting them twice
+   is the same figure shouted in two registers.
+
+   THE ONE ACCENT PHRASE IS THE CHAPTER NAME — 599:7418 sets exactly one span
+   in orange and it is "Why We Exist". It earns it by being the only thing in
+   the sentence that is NOT repeated as a figure below: the title also heads
+   the focus column, so the accent is what ties the sentence to the column that
+   answers it. No ground under it — a tint here would make it a chip. */
+.app .pulse-lede{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .pulse-lede b{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .pulse-hl{font-weight:var(--t-w-strong);color:var(--accent-text)}
+
+/* THE FOCUS COLUMN. The title is h3 — a card title, and `weekCard` set it there
+   too — and the chapter line now sits UNDER it, which changes what that line
+   is: an eyebrow labels the thing below it, and this labels the thing above.
+   So it takes the description role rather than the eyebrow's strong weight,
+   and it is the one grey §63 §3 allows a description to be. The minutes beside
+   the ring stay h4 over a caption, which is `.stat`'s own pairing. */
+.app .pulse-eb{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .pulse-t{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .pulse-rb > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .pulse-rl{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* WHAT IS DONE — the thing finished in full ink at compact, and how it went
+   underneath at the floor tier. `--text-helper` and not `--text-secondary`:
+   "Assessed 86%" and "Yesterday · earned Get Involved" are a timestamp and a
+   score, which is exactly what §63 §3 reserves the floor tier for. The empty
+   state is a SENTENCE and takes the description grey — one grey for every
+   description, which is the same rule. */
+.app .pulse-db > b{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .pulse-dm{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+/* `.pulse-none` WAS HERE AND IS GONE. It was the empty-state sentence for a
+   column with nothing in it; the sentence was dropped from `pulse` when §72
+   was reshaped, and the type rule outlived the markup. Nothing in either
+   portal, the gallery or the starter writes the class — so the design system
+   was shipping a family whose gate nothing ever stamps, which is the exact
+   "the component is decoration" tell CLAUDE.md tells you to grep for. Removed
+   rather than left: a dead rule in the type layer is the one place it is most
+   likely to be copied as a precedent. */
+
+/* THE PACE FIGURE IS THE DISPLAY ROLE, AND IT IS INSIDE THE ROLE'S OWN RULE.
+   §63 §2 narrows display to "hero numerals and nothing else" after the level
+   name was found to be words at 34 sitting under a page title at 24. This is
+   the other case: `20`, `700` — a numeral that carries no reading, standing
+   alone at the head of a column with nothing above it but an 11.5px label. Its
+   unit rides at h4 in the secondary grey, which is `.prog-pct`'s own `<small>`
+   treatment and the reason "min" does not need a rule of its own to stop it
+   setting at 34.
+
+   THE LINE UNDER IT IS A DESCRIPTION AND THEREFORE ONE GREY — §63 §3's floor
+   is for timestamps and axes and this is neither: "of the 55 min weekly
+   target" is what the figure MEANS. */
+.app .pulse-fig{
+  font-size:var(--t-display-size);line-height:var(--t-display-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-display-ls);
+  text-transform:none;color:var(--text-primary);
+  font-variant-numeric:tabular-nums}
+.app .pulse-fig small{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h4-ls);
+  color:var(--text-secondary);margin-left:var(--s02)}
+.app .pulse-sub{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--text-secondary)}
+
+/* THE BAR'S LABEL IS THE CHART'S REFERENCE LINE BY ANOTHER NAME — "55 min
+   target" is the string §15 sets on `.chart-ref` in the stacked chart this
+   column replaces, so it takes the same floor tier that chart's axes do. */
+.app .pulse-bl{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* THE THREE FIGURES — h4 over caption, which is `progressStrip`'s pairing
+   (§63 §11) and `.stat`'s. Tabular numerals so "20 min" and "35 min" line up
+   across the two dividers; they are the one place on the row where three
+   figures are meant to be compared with each other. */
+.app .pulse-3 > span > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary);
+  font-variant-numeric:tabular-nums}
+.app .pulse-3l{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* THE STANDING LABEL INSIDE THE PULSE IS THE ROW'S SUBJECT, NOT ITS CAPTION.
+   §15 sets `.stand-l` at 11px in `--text-helper` — the floor tier — which is
+   right in the three-across band where the label is a column header over a
+   figure, and wrong stacked: 599:7418 draws "Points" as the row's title with
+   "1,515 to Bronze" as the note under it and the figure at the right. Title
+   and note cannot both be the floor tier, so the label takes h4 in primary ink
+   and `.stand-d` keeps the caption it already has. Scoped to `.pulse` — the
+   rewards page draws the same component as a band and keeps §15's reading. */
+.app .page .pulse .stand .stand-l{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}

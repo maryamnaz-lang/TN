@@ -1,0 +1,987 @@
+/* ==========================================================================
+   §70  THE AI-NATIVE HEAD — Figma 578:5966
+
+   THE PRODUCT SAYS IT IS AI-NATIVE ON THE SIGN-UP SCREEN AND THEN DRAWS A
+   DASHBOARD. That is the whole of what this layer answers. `new`'s page opened
+   on a title, a fact row, a stepper and a black card, with Tal's sentence
+   fourth and a shortlist of three agents to work through underneath — a
+   competent portal, and one where the machine is a feature in a box rather
+   than the thing you are talking to. 578:5966 turns it round: Tal speaks
+   first and at full width, the journey is a column beside it, and the page's
+   next step is ONE named person Tal has already picked.
+
+   WHAT IS IN HERE, AND WHAT IS NOT. Layout, grounds, borders, gradients,
+   radii, spacing and motion. NOT font size, font weight, text-transform or
+   text colour: those four are §63's wherever the layer sits in the list, and
+   every one this file's families need is stated in §63 §10. Two of them are
+   not obviously type — `.ai-hl`'s ink and the gradient-clipped label's
+   `color:transparent` — and both are there for the same reason, which is that
+   splitting the rule is cheaper than the next person having to guess which
+   file a colour is in.
+
+   IT FOLLOWS THE FILE, AND THE ONE PLACE IT DOES NOT IS PRIYA'S FEE. 581:6479
+   says $120 and `AGENTS.priya.price` says $95, which is also what the Agents
+   page, the agent profile and the booking flow charge; a file's placeholder
+   does not get to be the fourth price on one journey, so the record wins and
+   views.js records it beside the row.
+
+   THREE THINGS WERE HELD BACK AT FIRST AND ALL THREE WERE REVERSED on Maryam's
+   read, 30 Aug 2026 — they are listed here because the arguments against them
+   are still good arguments and the next person will make them again:
+
+     the step labels    kept as `JRN`'s sentence case, per §63's own rule that
+                        the words go in the markup in sentence case. `JRN_AI`
+                        (views.js) carries the file's four instead.
+     the sparkle        kept as Tal's 32px sphere, per §33.2. §70.2a is the
+                        reversal and the size is the argument.
+     the three inks     the step states were moved to the build's AA-safe
+                        hues. §63 §10 has the two ratios that cost, and the
+                        file's #00a43c / #f47113 are what render.
+
+   AND THE TWO COLUMNS ARE TOP-ALIGNED, which is not the file: 581:6662 and
+   587:6742 are both centred in the 243. §70.3 has the reason.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 0 ---
+   THE GRADIENT, AND WHY IT IS A THIRD STOP RATHER THAN A NEW RAMP
+
+   `--accent-grad` (§01) is two stops, `--accent` to `--accent-2`, and the file
+   paints every AI surface on this screen with THREE: #f47113 -> #e2a600 ->
+   #f0530c. The outer two are the tokens already — #f47113 is `--accent`
+   (#f57414) to within a shade and #f0530c is `--accent-2` exactly — so what is
+   actually new is the amber in the middle, and it is what makes the ramp read
+   as a spectrum rather than as one hue getting darker. That is the difference
+   between "our brand colour" and "something is thinking", which is the whole
+   job of this ramp.
+
+   SO IT IS A SEPARATE TOKEN AND NOT A CHANGE TO `--accent-grad`. Sixty-odd
+   rules paint buttons, chips and the rail marker with that gradient and none
+   of them are about Tal; putting amber through the middle of the primary
+   button is a rebrand, not a page. `--ai-grad` is the AI ramp and it is used
+   on four things: Tal's own label, the comet, the ask dock's send chip, and
+   the "ask for another" link.
+
+   THE ANGLES ARE THE FILE'S, kept to the degree because they are what stops
+   the four surfaces reading as four different gradients: 99.54 on the label,
+   92.49 on the send chip, 113.05 on the link, 172.99 along the comet, 107.51
+   across the panel wash. A single angle would have been tidier and would have
+   put the amber in a different place on each object.
+   ------------------------------------------------------------------------ */
+.app{
+  /* THE FILE'S THREE STOPS, TO THE HEX. §01's `--accent` is #f57414 and the
+     file's is #f47113 — a shade apart, invisible on a button and not invisible
+     here, because these three are also the conic that runs the border and a
+     ramp assembled from two sources drifts the first time either moves. So the
+     AI ramp states its own three and §01's accent stays the product's. */
+  --ai-1:#f47113;
+  --ai-2:#e2a600;
+  --ai-3:#f0530c;
+  --ai-amber:var(--ai-2);
+
+  --ai-grad:linear-gradient(99.54deg,
+    var(--ai-1) 1.04%, var(--ai-2) 39.89%, var(--ai-3) 99.58%);
+
+  /* the same three stops at the angle 583:6677 gives the "ask for another"
+     link — a separate token rather than a second literal, for the reason the
+     ramp is one: the two are the same gradient and have to stay so */
+  --ai-grad-alt:linear-gradient(113.05deg,
+    var(--ai-1) 1.04%, var(--ai-2) 39.89%, var(--ai-3) 99.58%);
+
+  /* THE PANEL WASH — 578:6047. Three stops at FIVE PER CENT, which is the
+     number that matters: at .05 the panel is a warm cast on white paper
+     rather than a tinted box, so the sentence on it is still the darkest
+     thing in the band. §25.1's corner ellipses are still there underneath and
+     the two do not fight, because this one has no edge anywhere in it. */
+  --ai-wash:linear-gradient(107.51deg,
+    rgba(255,255,255,.05) 35.98%, rgba(226,166,0,.05) 66.82%,
+    rgba(240,83,12,.05) 114.21%);
+
+  /* THE INLINE HIGHLIGHT behind an accent phrase in Tal's sentence — 581:6664.
+     The file draws these as absolutely-placed rectangles behind the words,
+     which is Figma's way of saying "a ground on a text run". */
+  --ai-hl-bg:rgba(244,113,19,.05);
+
+  /* THE FOUR-POINT STAR — 581:6669 / 584:6691, the file's own path rather than
+     §12's `--tal-star`. The two are both four-point stars and they are not the
+     same drawing: §12's is four straight triangles meeting at the centre, and
+     this one's arms are CONCAVE — each side is a cubic that bows inward, so it
+     reads as a spark rather than as a compass rose. At 18px that is most of
+     what the mark is. Kept in its own 14.5815 viewBox, which is the file's, so
+     the curve control points are the exported numbers and not a retracing. */
+  --ai-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.5815 14.5815'%3E%3Cpath d='M6.36136 0.630895C6.69544 -0.210297 7.88606 -0.210299 8.22014 0.630894L9.6898 4.33142C9.79144 4.58736 9.99414 4.79005 10.2501 4.8917L13.9506 6.36136C14.7918 6.69544 14.7918 7.88606 13.9506 8.22014L10.2501 9.6898C9.99414 9.79144 9.79144 9.99414 9.6898 10.2501L8.22014 13.9506C7.88606 14.7918 6.69544 14.7918 6.36136 13.9506L4.8917 10.2501C4.79005 9.99414 4.58736 9.79144 4.33142 9.6898L0.630895 8.22014C-0.210297 7.88606 -0.210299 6.69544 0.630894 6.36136L4.33142 4.8917C4.58736 4.79005 4.79005 4.58736 4.8917 4.33142L6.36136 0.630895Z'/%3E%3C/svg%3E");
+}
+
+/* --------------------------------------------------------------------- 1 ---
+   THE LINE RUNS THE ASK FIELD'S BORDER — Maryam, on 581:6584
+
+   581:6584 parks a 374 x 2 gradient bar, blurred 2px, on the field's top edge.
+   Maryam's ask is that it MOVES: one small line, the same size the whole way,
+   round every side, continuously, at one speed, with nothing that appears,
+   disappears, stretches or turns a corner in a hurry.
+
+   IT IS A STROKED RECTANGLE WITH A DASH ON IT, and the two techniques it is
+   not are both worth knowing, because both look correct while you are writing
+   them and neither survives contact with a 976 x 64 field.
+
+     offset-path      a real 374 x 2 element moved along `offset-path:
+                      border-box`. Constant linear speed, which is the right
+                      pace — and the element is RIGID, so it cannot go round a
+                      corner. Its anchor is its own centre, so within 187px of
+                      a corner up to half its length hangs off the end of the
+                      edge and paints outside the field; and `offset-rotate:
+                      auto` follows the path's direction, which on a rectangle
+                      is a step function, so the bar snaps 90 degrees between
+                      one frame and the next. Overshoot and jerk.
+
+     conic + mask     a conic gradient clipped to a 2px ring. Cannot leave the
+                      box and has no orientation to snap, so it fixes both of
+                      the above — and it STRETCHES, which is worse. A conic
+                      sweeps a fixed ANGLE, and on a flat rectangle a fixed
+                      angle is a wildly variable LENGTH: at the middle of this
+                      field's top edge one degree of sweep moves about 0.6px,
+                      and at its corner about 8.5px. So a 22%-of-360 arc is a
+                      ~170px line in the middle of the edge and a ~1200px
+                      smear at the corner. It reads exactly as it is — the
+                      light stretching out along the top, collapsing through
+                      the corner, and stretching again. An earlier note in
+                      this layer worked the error out per-EDGE, got 1.5x, and
+                      called it small; that arithmetic is not wrong, it is
+                      answering the wrong question. The variation WITHIN one
+                      edge is 15x and that is the one you see.
+
+   A DASH IS A LENGTH OF THE PERIMETER, which is the whole point: it is the
+   same number of pixels wherever it is, it moves at one speed because
+   `stroke-dashoffset` is measured along the path, and it bends round the
+   corners because the path does. Nothing about it is aspect-dependent.
+
+   `pathLength="1000"` IS WHAT MAKES IT SIZE-INDEPENDENT. It renumbers the
+   perimeter to 1000 units whatever the field's real dimensions, so
+   `stroke-dasharray:180 820` is 18% of the border — 374px on this field's
+   ~2080px perimeter, which is 581:6584's own bar length — and stays 18% if
+   the field is resized. The two numbers sum to 1000, so the dash pattern
+   tiles the path exactly once and the loop has no seam: `stroke-dashoffset`
+   running 1000 to 0 arrives back at the frame it started on.
+
+   THE GRADIENT IS THE FILE'S FIVE STOPS ACROSS THE BOX, and it is the one
+   place a stroke cannot do what the file does. 581:6584's ramp runs along the
+   BAR; an SVG gradient is a field the stroke samples by position, so the line
+   picks up its colour from where it is rather than carrying it along. Laid
+   corner to corner the effect is close and the difference is not nameable on
+   a 2px blurred line: the light is white-hot at the top left, warms through
+   gold and amber, deepens across the bottom right. Diagonal rather than
+   horizontal so that neither vertical side is a single flat colour.
+
+   THE STOPS LIVE IN `AI_RUN` (ai4.js) AND ARE NOT `--ai-grad`. Maryam re-cut
+   this one ramp to #F4B413 / #E2A600 / #F0BF0C and left the other four AI
+   surfaces on the orange. The note over `AI_RUN` is where that is written up;
+   what matters from this side is that a rule here must not "fix" the
+   difference by pointing the stroke at `--ai-grad`.
+   ------------------------------------------------------------------------ */
+.app{--ai-lap:9s}
+
+@keyframes ai-run{from{stroke-dashoffset:1000}to{stroke-dashoffset:0}}
+
+/* THE HOST HAS TO BE POSITIONED and the line is `inset:-1px` so it sits ON the
+   field's 1px border rather than a pixel inside it — a light running just
+   inside a line it is meant to be running along reads as two rules that failed
+   to meet. `overflow:visible` on both the span and the svg so the 2px blur can
+   spread past the box instead of being clipped to a hard edge. */
+.app .askdock > .askline{position:relative}
+
+.app .ai-run{
+  position:absolute;inset:-1px;
+  z-index:2;pointer-events:none;
+  overflow:visible}
+.app .ai-run svg{
+  display:block;width:100%;height:100%;
+  overflow:visible;
+  /* 1px, Maryam's re-cut of 581:6584 on 30 Aug 2026 — the file's `filter:
+     blur(2px)` softened a 2px stroke until it had no core left and read as a
+     stain rather than a line. Half the blur is what puts the line back inside
+     the glow. It is the reason the stroke can stay at 2 as well: the earlier
+     ring was widened to 3px to survive the heavier blur, and that compensation
+     is not needed now. */
+  filter:blur(1px)}
+
+/* THE RECT'S GEOMETRY IS CSS, NOT ATTRIBUTES. `width="calc(100% - 2px)"` is
+   not valid as a presentation attribute, but `width` IS a CSS geometry
+   property on an SVG rect in every browser this prototype targets — so the
+   rect can be inset by half its own stroke without the markup knowing the
+   field's size. Inset by 1 so a 2px stroke sits centred on the border box. */
+.app .ai-run rect{
+  x:1px;y:1px;
+  width:calc(100% - 2px);
+  height:calc(100% - 2px);
+  fill:none;
+  stroke:url(#aiRunGrad);
+  stroke-width:2px;
+  stroke-dasharray:180 820;
+  animation:ai-run var(--ai-lap) linear infinite}
+
+/* REDUCED MOTION PARKS IT ON THE TOP EDGE, which is where 581:6584 draws it
+   standing still. Its own block for the reason §21.4, §27.8, §33.6 and §40
+   each state theirs: §13.187 clamps every duration to 1ms, and 1ms on an
+   INFINITE animation is a strobe rather than "off".
+
+   910 IS THE FILE'S POSITION, arithmetic rather than taste. The path starts at
+   the rect's top-left and runs clockwise, so the middle of the top edge is at
+   `w/2` of a `2(w+h)` perimeter — 23.4% of this field, or 234 of the 1000
+   units. The dash's own 180 units sit BEHIND the offset, so parking its centre
+   there means an offset of 234 + 90 = 324 ahead of the start, which as a
+   dashoffset counted backwards is 1000 - 324 = 676. Rounded to the tens the
+   pair either side reads the same; 676 is the one that matches the file. */
+@media (prefers-reduced-motion:reduce){
+  .app .ai-run rect{animation:none;stroke-dashoffset:676}}
+
+/* §69.4 DRAWS A TOP HAIRLINE ON EVERY `.head-sec` AND THIS ONE IS A COLUMN.
+   That rule is `.app .modhead > .sec.head-sec::before` and it was written for
+   the Enroll page, where the cohort leader is a third member STACKED under
+   Tal's sentence in the left column and wants a divider above it. The journey
+   uses the same opt-in to get into the band and is not stacked under anything
+   — it is the second column, divided from the first by its own `border-left`
+   — so the rule drew a stray rule across the top of the white column, above
+   "Your journey so far" and level with nothing.
+   AT BOTH WIDTHS, which is the part worth reading: below 900 the column IS
+   stacked and does want a line above it, and it already has one — this layer's
+   own `border-top` on `.head-col`. §69's `::before` was the second of two. */
+.app .modhead > .sec.head-col::before{display:none}
+
+/* --------------------------------------------------------------------- 2 ---
+   TAL'S SENTENCE IS THE PANEL — 578:6047
+
+   The wash, the panel's own air, and the hairline that separates it from the
+   journey column. All three are on the `.sec` rather than on the card, because
+   the panel is the band's whole left CELL — the card inside it is 733 wide in a
+   925 cell and the wash runs to the cell's edges, which is what makes the two
+   columns read as two panels rather than as a paragraph next to a list.
+
+   NO GROUND ON THE CARD. `.ai-aura` carries its own tint on the twenty pages
+   where it is a card in the body of a page; in the band §33 already took that
+   off, and the wash here would otherwise be the second of two.
+   ------------------------------------------------------------------------ */
+/* NO SWEEP ON THIS PANEL. A light crossing it every eight seconds — the
+   skeleton's animation borrowed for the block above it — went in and came
+   straight back out (Maryam, 30 Aug 2026). Worth a line so it is not
+   reinvented: the summary is the one object on the page that is already
+   moving, because the sentence types itself in (§52), and it is also the one
+   the reader is trying to READ. Ambient motion belongs where nothing is being
+   read — the ask field's border — and on a block that is genuinely waiting,
+   which is what the skeleton is. This panel is neither. */
+.app .modhead > .sec:has(> .ai-aura.talsum){
+  background-image:var(--ai-wash)}
+
+/* THE THREE ACCENT PHRASES — 581:6664/6665/6667. A ground and 4px of radius on
+   a `<b>` inside the summary; §63 §10 owns the ink. `box-decoration-break` is
+   what stops a phrase that wraps losing its ground on the second line, which
+   "matched you with Priya Nair below" does at every width under about 1100. */
+.app .modhead .ai-aura.talsum .ai-body p b{
+  background-color:var(--ai-hl-bg);
+  border-radius:4px;
+  padding:1px 4px;margin:0 -1px;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* THE SENTENCE IS CAPPED AT THE FILE'S 733 — 581:6662, and at a LENGTH rather
+   than at 79% of the column. §33.3 uncapped it deliberately ("a summary is two
+   sentences read once") and that held while the summary WAS two sentences in a
+   band beside a black card; it is four sentences in the band's whole left
+   column now, which is the case §05's measure exists for.
+
+   The ratio was the first cut and it is the wrong reading of the file: 733 of
+   925 is a MEASURE the file had room to state, not a proportion it wanted
+   kept. Applied as 79% to the product's ~620px of column it took 130px off a
+   line that was already inside the measure, and left the panel two thirds
+   full with the wash running on past it. As a length it does nothing until
+   there is more than 733px to do it in, which is what a measure is for. */
+.app .modhead .ai-aura.talsum > .ai-body,
+.app .modhead .ai-aura.talsum > .ai-body p{max-width:733px}
+
+/* TAL'S NAME IN THE RAMP — 581:6670. The gradient is clipped to the glyphs,
+   which is the same construction §51.4 uses for the ask page's "What's going
+   on?" and the one place in the build a gradient is allowed to be ink. §63 §10
+   states the `color:transparent` that makes the clip visible; without it the
+   words paint over their own gradient and nothing appears to have changed. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label{
+  background-image:var(--ai-grad);
+  -webkit-background-clip:text;background-clip:text;
+  gap:6px}
+
+/* --------------------------------------------------------------------- 2a --
+   THE MARK ON BOTH LABELS IS THE FILE'S SPARKLE — 581:6669 / 584:6691
+
+   AND THIS REVERSES §33.6 AND §37.2, WHICH IS WORTH READING BEFORE CHANGING IT
+   BACK. Both of those replaced a sparkle with Tal's own artwork on one
+   argument: the four-point star is the generic "there is AI here" mark, and
+   `--tal-mark` is Tal's face everywhere else in the product, so the head band
+   should carry the face. That is a good argument about a card in a page.
+
+   It is the wrong one for a LABEL, and 578:5966 is what makes the difference
+   visible. The mark here is 18px on a line of 14px type — at that size the
+   32px sphere §33.6 draws is scaled to a soft peach disc with no chevron
+   readable in it, which is not Tal's face, it is a smudge where a bullet
+   should be; and `.bare`'s PNG is the same blob smaller. A sparkle is a GLYPH:
+   it survives 18px because it is four points and a gap. Tal's face is still
+   Tal's face at 32 and above — the ask page's 132px orb, the dock's mark, the
+   chat bubbles — and none of those change.
+
+   `--tal-star` is the mask §12 already uses on `.ai-label::before`, so this is
+   the product's own sparkle rather than a new drawing, and the ramp is painted
+   through it so the mark and the words it sits beside are one object.
+
+   NO ANIMATION ON IT. §33.6's sphere carries a breathing glow and a turning
+   band of light and both go with it, which is the other half of the size
+   argument: a 4s glow on an 18px disc is a flicker. What moves on this page is
+   the comet, which is one moving thing where there had been two.
+   ------------------------------------------------------------------------ */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
+.app .ai-label.bare.rec-lab::before{
+  content:'';
+  /* 12, AND THAT IS BELOW THE FILE'S RATIO ON PURPOSE (Maryam, 30 Aug 2026).
+     581:6669 sets the star at 18 against a 16px label; §63 maps that label to
+     `--t-h4`, which is 14, so carrying the file's proportion across gives 15 —
+     which is what shipped first and was still too heavy. At 12 the mark is
+     smaller than the cap height of the words beside it, so it reads as a
+     bullet introducing the line rather than as a second object competing with
+     it. The 6px gap is unchanged, which is what keeps the pair tight. */
+  width:12px;height:12px;flex:none;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat;
+  box-shadow:none;
+  animation:none}
+/* §33.6 draws the sphere's turning highlight as a second pseudo-element and it
+   has nothing to sit on now */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE BAND IS TWO COLUMNS AND THE SECOND ONE IS THE JOURNEY
+
+   §56 opens a second column for `.sec-dark` holding a `.plate`; this is the
+   same grid with a different tenant, gated on the band actually containing a
+   journey column so no other page is touched.
+
+   AND THE GATE IS `.head-col`, NOT `.sec-jrn`, WHICH IS A LATER CORRECTION.
+   Everything in §70.3 is about the BAND having a second column and nothing in
+   it is about what is in that column, so keying it on the journey list by name
+   was one tenant's class doing a structural job. §71 (Figma 599:7418) puts the
+   progress strip in the same slot on the three enrolled dashboards, and with
+   the old gate it would have had to restate this whole block to get it — nine
+   rules copied, which is nine rules to keep in step. `.head-col` is the class
+   both tenants wear; `.sec-jrn` and `.sec-prog` now say only which one it is.
+   `placeDark` (ai5) tests the same class, so the pass that stands down and the
+   layout it stands down for cannot disagree.
+
+   THE SPLIT IS A PROPORTION, NOT §56'S FIXED TRACK. 925 / 471 is the file's,
+   which is 66 / 34, and §56's `minmax(300px,330px)` shape is wrong for it:
+   the frame is 1396 wide in Figma and ~900 in the product's desktop, so a
+   471px maximum took 52% of the real band and left Tal's sentence in 430px —
+   a column narrower than the list beside it, on the block that is supposed to
+   be the page. `clamp(280px, 34%, 471px)` holds the file's ratio at every
+   width and still stops at its number when there is finally room for it.
+   §56's card can be fixed because a plate has an intrinsic width; a list of
+   four labels has none, so it takes a share instead.
+
+   THE `.ph` IS OFF THE SCREEN AND STILL IN THE TREE. views.js's own note is
+   the argument; what matters here is that it is `position:absolute`, so it is
+   not a grid item and cannot claim a row. `display:none` — which is what
+   §33.9's `.tal-greet` route would have bought — would take the page's only
+   `<h1>` out of the accessibility tree, on a page whose remaining headings are
+   a section title and a paragraph that types itself.
+   ------------------------------------------------------------------------ */
+.app .modhead:has(> .head-col) > .ph{
+  position:absolute;width:1px;height:1px;
+  margin:-1px;padding:0;border:0;
+  clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+
+/* Below 900 there is one column, so the second one is a block under the
+   sentence and pays the page's own gutter. The hairline turns with it — a rule
+   on the left of a column that is no longer beside anything is a line down the
+   middle of nothing. */
+.app .modhead > .head-col{
+  padding:var(--s06) var(--pad-x) var(--s06);
+  border-top:1px solid #d7d5cc}
+
+@container app (min-width:900px){
+  .app .modhead:has(> .head-col){
+    display:grid;
+    grid-template-columns:minmax(0,1fr) clamp(300px, 36%, 471px);
+    column-gap:0;row-gap:0;align-items:stretch}
+  .app .modhead:has(> .head-col) > *{grid-column:1}
+  /* THE DIVIDER HAS TO RUN THE BAND'S FULL HEIGHT, so the margin goes. §10
+     gives every `.sec` 16px of top rhythm and it is meaningless on a grid
+     cell — it held the column 16px off the band's top edge, which stopped the
+     hairline 16px short at the top and made the white column look like a card
+     dropped into the band rather than the other half of it. */
+  /* BOTH COLUMNS START AT THE TOP (Maryam, 30 Aug 2026), which the file does
+     not: 581:6662 and 587:6742 are both `-translate-y-1/2` at 50%, centred in
+     the 243. Centring is right for two blocks of the same height and this pair
+     is not — the summary is three lines and the journey is five rows, so the
+     two labels that name them started 26px apart and the band read as two
+     cards dropped in at different depths. Aligned to the top they share one
+     line, and the band's height is then whichever column is longer rather than
+     a number both are floated inside. */
+  .app .modhead:has(> .head-col) > .head-col{
+    grid-column:2;grid-row:1;
+    display:flex;align-items:flex-start;
+    margin:0;
+    padding:var(--s07);
+    border-top:0;
+    border-left:1px solid #d7d5cc;
+    background:var(--layer-01)}
+  /* 57 ON THE LEFT IS THE FILE'S — 587:6742 — AND IT ONLY FITS WHEN THE TRACK
+     DOES. In 471 the inset leaves the list 330; the product's track is ~324 at
+     a 900 band, where the same 57 leaves 235 and "Your journey so far" sets on
+     two lines beside a pill it has squeezed. So the file's inset is applied
+     from the width the file's track exists at and 32 is what holds below it —
+     the same shape §63 §8b uses for the four sizes that only apply at 900. */
+  /* the left cell keeps its own air and stretches to whichever column is
+     taller, which is what the wash needs to fill the row. Its margin goes for
+     the same reason the journey's does. */
+  .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum){
+    grid-column:1;grid-row:1;
+    display:flex;align-items:flex-start;
+    margin:0;
+    padding:var(--s07) var(--s07) var(--s07) var(--pad-x)}
+  .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum) > .ai-aura{
+    width:100%}
+
+  /* AND THE TWO LABELS LAND ON ONE LINE. Top-aligning the cells got the two
+     columns to the same y and left the two labels 16px apart, because §56.2
+     gives Tal's label a `margin-top:var(--s05)` — air it needs when the card
+     is the LAST member of a column, under a hairline, and does not when it is
+     the first thing in the column. Trap 3: §56 states it once unconditionally
+     and again inside this same query, so it can only be answered from in here,
+     and at 0,7,0 against its 0,6,0. `.jrn` has no equivalent, so zero is what
+     puts "Summary by Tal" and "Your journey so far" on the same baseline —
+     which is the whole point of the top alignment. */
+  .app .modhead:has(> .head-col) .ai-aura.talsum > .ai-head > .ai-label{
+    margin-top:0}
+
+  /* AND THE PAGE'S 4px GOES, so the band's top edge meets the tab bar. §01
+     gives `.page` `padding-top:var(--s02)` from 900 up — 4px of air that is
+     right for a page opening on a white `<h1>` and wrong for one opening on a
+     full-bleed washed panel, where it reads as a seam between the header and
+     the content. Scoped to this band so the other thirty views keep it.
+
+     `:has(> .modhead > .head-col)` AND NOT `:has(> .modhead:has(> .head-col))`.
+     A `:has()` may not contain another `:has()` — it is invalid, so the whole
+     rule is dropped at parse time and nothing anywhere reports it. The first
+     cut was written the nested way, matched the band's own selector by eye,
+     and did nothing at all. A relative selector takes a full child chain, so
+     the flat form says the same thing and parses. */
+  .app .page:has(> .modhead > .head-col){padding-top:0}
+
+  /* NO CLOSING BORDER HERE, AND THE RULE THAT WAS IS WORTH RECORDING.
+     587:6778 gives the band a `border-b` and this layer drew it, on the
+     reasoning that "§25.2's full-bleed closing rule is written for a
+     one-column band and stops at the left cell, so the white column has no
+     bottom edge". THAT PREMISE IS FALSE and it was never measured — §25.2's
+     `.modhead::after` computes `left:0; right:0; bottom:0`, 1px of `--rule`,
+     at every width and on both tenants. So the band already closed edge to
+     edge and this added a second hairline directly on top of the first.
+
+     Maryam read it as "heavy, like multiple outlines", which is the only way
+     two coincident 1px rules ever announce themselves — no sweep measures a
+     line that is drawn twice in the same place. §71 caught it and zeroed this
+     from its own layer; the declaration is deleted here instead, so there is
+     one rule doing the job rather than one rule and a counter-rule. If §71's
+     `border-bottom:0` is still present it is now a no-op and can go too. */}
+
+@container app (min-width:1180px){
+  .app .modhead:has(> .head-col) > .head-col{padding-left:57px}}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE JOURNEY AS A LIST — 587:6741
+
+   Four rows, each a mark, its number and its label, with the state carried by
+   the mark's ink and the label's. The horizontal `stepper()` is untouched and
+   still draws `consult`, `booked` and the leader's pages; this is a second
+   shape for the same four steps, not a replacement.
+
+   THE MARK'S GROUND IS THE ROW'S STATE AND THERE IS NO RAIL. §56's row paints
+   a rail segment to the right of each mark because a row of four marks with
+   nothing between them is four marks; a vertical list is already a sequence —
+   the numbers say so — so a spine down the left would be a third thing saying
+   the same. What is left is the mark, in the ink of what the step IS.
+
+   THE NUMBERS ARE A REAL `<ol>` with its own marker off. A list of ordered
+   steps is a list of ordered steps, and `.jrn-n` exists so the number sits
+   inside the row's flex line at a measured distance rather than at whatever
+   `list-style-position` gives it.
+   ------------------------------------------------------------------------ */
+.app .jrn{display:flex;flex-direction:column;gap:var(--s06);width:100%}
+
+.app .jrn-h{display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
+.app .jrn-t{margin:0}
+
+/* THE COUNT — 587:6745. A hairline pill in the accent, on a ground that is the
+   file's own two 10% stops. It is the one place on this page the accent draws
+   an outline, and it earns it: the pill is the only element in the band that is
+   a figure about the list rather than a member of it. */
+.app .jrn-pill{
+  flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:3px 14px;
+  border:1px solid var(--ai-1);
+  border-radius:100px;
+  background-image:linear-gradient(90deg,
+    rgba(255,255,255,.1), rgba(255,192,146,.1))}
+
+.app .jrn-l{
+  list-style:none;margin:0;padding:0;
+  display:flex;flex-direction:column;gap:var(--s05)}
+
+.app .jrn-i{display:flex;align-items:center;gap:var(--s03)}
+.app .jrn-ic{flex:none;display:grid;place-items:center;width:20px;height:20px}
+.app .jrn-ic svg{width:20px;height:20px;fill:currentColor}
+.app .jrn-n{flex:none}
+
+/* --------------------------------------------------------------------- 5 ---
+   THE RECOMMENDATION — 581:6456
+
+   A square photograph, a block of facts beside it, and the two actions held
+   against the right edge on the same baseline as the tags. At desktop that is
+   one row; the actions column wraps under at narrow widths rather than
+   squeezing the fact rows, because the three fact rows are what the block is.
+
+   THE PHOTOGRAPH IS 166 SQUARE AND IT IS NOT `avatar()`. That helper writes
+   `width`/`height` inline (trap 1), which no stylesheet can then answer, and
+   it is built for a 36-72px disc. This is a portrait, square, at a size the
+   layer owns — so it is its own element with the initials behind it as the
+   same fallback `avatar()` provides.
+
+   THE TWO OVERLAP TAGS TAKE THE PRODUCT'S INK, NOT THE FILE'S. 581:6539 is
+   #973177 on #fbf1f9 and 584:6688 is #0488c5 on #e5f3f9 — 4.0:1 and 3.1:1,
+   both under AA for 14px text. `--mk-4` (#a83a6b) and `--link` (#0371a4) are
+   the same two hues at a luminance the build already checks, and §12's note on
+   `--link` records that it IS the file's #0488C5 darkened for exactly this.
+   The grounds are mixed from the ink at 8% so the pair cannot drift apart.
+   ------------------------------------------------------------------------ */
+/* THE SECTION IS 32 ALL ROUND WITH 20 UNDER THE LABEL — 581:6456. §10 pays the
+   page's gutter on the sides already, so what this states is the two the file
+   gives the block and the label's own gap. */
+.app .sec-rec{
+  display:flex;flex-direction:column;gap:20px;
+  padding:var(--s07) var(--pad-x)}
+.app .rec-lab{gap:6px}
+
+/* THE ROW IS TWO GROUPS AT THE OUTSIDE EDGES — 581:6460. `items-end` is the
+   file's and it is what lines the actions' last line up with the tags rather
+   than with the name six rows above. `flex-wrap` is the only thing here that
+   is not in the file: the file has 1332 to spend and the product has ~1000 at
+   a 1500 frame and ~836 at 1280, so the actions have to be able to fall under
+   the group rather than crush the fact row. */
+.app .rec{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:var(--s06);flex-wrap:wrap}
+
+.app .rec-l{
+  flex:1 1 620px;min-width:0;
+  display:flex;align-items:stretch;gap:var(--s05)}
+
+/* 166 SQUARE — 581:6462, an `aspect-[736/736]` that is `self-stretch`, so it
+   is as tall as the facts beside it and square. `aspect-ratio` rather than a
+   height, for the same reason: the block is what sets the size. */
+.app .rec-ph{
+  position:relative;flex:none;
+  display:grid;place-items:center;
+  width:166px;aspect-ratio:1;
+  overflow:hidden;
+  background:var(--layer-02)}
+.app .rec-ph img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover}
+
+/* 16 BETWEEN THE THREE BLOCKS — 581:6463 — and 8 inside the first, which is
+   what keeps the expertise line reading as the second half of the name rather
+   than as the first of the facts (581:6464). */
+.app .rec-b{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;justify-content:center;gap:var(--s05)}
+.app .rec-b p{margin:0}
+.app .rec-top,.app .rec-ov{display:flex;flex-direction:column;gap:var(--s03)}
+.app .rec-ov{gap:var(--s05)}
+
+/* 4 BETWEEN THE NAME AND THE RATING, 8 INSIDE THE NAME — 581:6465/6466. Two
+   different gaps on one line and the file means both: the tick belongs to the
+   name and the rating is a separate claim. */
+.app .rec-id{display:flex;align-items:center;gap:var(--s02);flex-wrap:wrap}
+.app .rec-who{display:inline-flex;align-items:center;gap:var(--s03)}
+.app .rec-v{display:inline-grid;place-items:center;width:20px;height:20px}
+.app .rec-v svg{width:20px;height:20px;fill:#00a43c}
+.app .rec-r{display:inline-flex;align-items:center;gap:var(--s02)}
+.app .rec-r svg{width:16px;height:16px;fill:#f47113}
+
+/* THE THREE FACTS — 581:6476. A wrapping row rather than a grid: the three are
+   independent and of very different lengths, and `.facts` would draw its
+   hairlines as the grid gap on a row it does not fill (trap: the `.stats` /
+   `.facts` cell counts). Twenty between them and six inside each is the
+   file's; they are stated in px because 20 is not on the 8-step scale and
+   rounding it to 16 or 24 is what makes three facts read as one run-on line or
+   as three separate ones. */
+.app .rec-f{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.app .rec-f > span{display:inline-flex;align-items:center;gap:6px}
+.app .rec-f svg{flex:none;width:16px;height:16px;fill:currentColor}
+
+.app .rec-tags{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.app .rec-tag{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:5px 16px;border-radius:100px}
+.app .rec-tag.need{background-color:#fbf1f9}
+.app .rec-tag.has{background-color:#e5f3f9}
+
+/* 186 WIDE, 12 BETWEEN, AND THE BUTTON IS 185 x 40 — 583:6679 / 581:6548. The
+   column is `flex:none` so the row's free space all lands in the gap before
+   it, which is what `justify-between` is for here. */
+.app .rec-a{
+  flex:none;
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:var(--s04);width:186px}
+.app .rec-a > .btn{
+  width:185px;min-height:40px;
+  justify-content:center;gap:var(--s03);
+  padding-left:20px;padding-right:var(--s05)}
+
+/* THE WAY TO DISAGREE — 583:6677. A button drawn as a line of text: the ramp
+   clipped to the glyphs, underlined, in italics because it is quoted speech —
+   the same treatment the file gives it and the same reason `.rec-m`'s figure
+   is italic. `text-decoration-color` has to be stated: with the ink
+   transparent for the clip, an inherited underline would be invisible. */
+.app .rec-alt{
+  appearance:none;-webkit-appearance:none;
+  margin:0;padding:0;border:0;background:none;
+  text-align:left;cursor:pointer;
+  background-image:var(--ai-grad-alt);
+  -webkit-background-clip:text;background-clip:text;
+  text-decoration:underline;
+  text-decoration-color:var(--ai-1);
+  text-underline-offset:2px}
+
+/* ON A PHONE THE PORTRAIT GOES ON TOP. The file has no narrow frame, so this
+   is the block's own answer: at 390 the page is ~200px of content and a 166px
+   photograph beside it leaves 34 for a name, so the two would each be a
+   column of one word. Stacked, the photograph is a header for the facts and
+   both are readable — and 220 is a cap rather than a width, because a portrait
+   that grows to the full column is a portrait pretending to be a hero image.
+   The actions go full-bleed for the same reason every other button in this
+   product does at this width. */
+@container app (max-width:599.98px){
+  .app .rec-l{flex-direction:column;gap:var(--s05)}
+  .app .rec-ph{width:min(100%, 220px)}
+  .app .rec-a,.app .rec-a > .btn{width:100%}}
+
+/* -------------------------------------------------------------------- 5b ---
+   WHAT TAL LOOKS LIKE WHILE IT IS THINKING — Figma 588:6781 (588:6822)
+
+   The skeleton is the recommendation's own shape with the content taken out:
+   every bar is the box of the thing it stands in for, so nothing shifts when
+   the real card lands. The geometry is the file's to the pixel — 236x24 for
+   the name, 314x19 for the expertise line, three 140x19 for the facts, 198x19
+   for the overlap line, two flexible 29-tall pills for the tags — and it
+   reuses `.rec-l` / `.rec-b` / `.rec-top` / `.rec-f` / `.rec-ov` / `.rec-tags`
+   unchanged, which is what guarantees the gaps and the columns match.
+
+   THE WIDTHS ARE CLASSES, NOT INLINE STYLES — trap 1. Six numbers on six spans
+   would have been six inline declarations that no later layer could answer,
+   on the one part of this block most likely to be re-measured.
+
+   THE FILL IS THE BRAND RAMP AT 20%, which is the whole reason this does not
+   look like a dashboard waiting: a grey skeleton says the page is slow, and a
+   warm one in the same gradient as Tal's own label says the assistant is
+   working. The file gives each bar its own angle (92.5 to 125.7 degrees,
+   generated from each rect's proportions); one angle is used here because the
+   difference between them is not visible at 20% alpha and six variants would
+   be six things to keep in step.
+
+   THE SWEEP IS THE SECOND BACKGROUND LAYER, and it is per-bar and in unison.
+   A single band crossing the whole block would have to pass over the GAPS
+   between the bars as well, which lights up empty page; layering it inside
+   each bar keeps it on the shapes. All bars share one 1.8s timing so the wave
+   reads as one pass left to right rather than as six loaders. Only
+   `background-position` animates — no `opacity` (trap 2) and no layout. */
+.app .sk{
+  display:block;flex:none;
+  border-radius:4px;
+  background-image:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,.7) 50%, rgba(255,255,255,0) 100%),
+    linear-gradient(107.08deg,
+      rgba(244,113,19,.2) 1.04%, rgba(226,166,0,.2) 39.89%, rgba(240,83,12,.2) 99.58%);
+  background-repeat:no-repeat,no-repeat;
+  background-size:65% 100%,100% 100%;
+  background-position:-80% 0,0 0;
+  animation:rec-sweep 1.8s linear infinite}
+
+@keyframes rec-sweep{to{background-position:180% 0,0 0}}
+
+/* REDUCED MOTION STILLS THE SWEEP AND KEEPS THE SKELETON, for the reason
+   §21.4, §27.8, §33.6, §40 and §70.1 each state theirs: §13.187 clamps every
+   duration to 1ms, and 1ms on an INFINITE animation is a strobe rather than
+   "off" — here that would be nine bars flickering at 1000Hz, which is the
+   worst thing on the page for the reader this query exists for. The bars stay,
+   parked with the highlight off the left edge so each one is its flat 20%
+   ramp: the block still says "this is being assembled", it just says it
+   without moving. `aria-busy` on the row is what says it to a screen reader
+   either way. */
+@media (prefers-reduced-motion:reduce){
+  .app .sk{animation:none;background-position:-200% 0,0 0}}
+
+.app .sk-ph{width:166px;aspect-ratio:1}
+.app .sk-n{width:236px;height:24px}
+.app .sk-x{width:314px;height:19px}
+.app .sk-f{width:140px;height:19px}
+.app .sk-m{width:198px;height:19px}
+/* the two tag pills share the row the way the real tags do, and take the tag's
+   own 100px radius rather than the bars' 4 */
+.app .sk-t{flex:1 1 0;min-width:0;height:29px;border-radius:100px}
+
+/* THE PHOTOGRAPH'S PLACEHOLDER IS THE ONLY BAR THAT CAN SHRINK, because §70.5's
+   phone rule caps `.rec-ph` at 220 and the skeleton has to follow it or the
+   loading state is wider than the card it replaces. */
+@container app (max-width:599.98px){
+  .app .sk-ph{width:min(100%, 220px)}
+  .app .sk-n,.app .sk-x,.app .sk-m{width:100%}
+  .app .sk-f{flex:1 1 90px;width:auto}}
+
+/* THE OLD CARD'S BUTTON, STILL NAMED AND NO LONGER LIVE — 588:6992 at 20%.
+   `disabled` in the markup is what actually takes it out of the tab order; this
+   is only how it looks. §64's arrow rule keys on `:not(:has(svg))` and this
+   button has one, so nothing extra arrives. */
+.app .rec-off{opacity:.2;pointer-events:none}
+
+/* AND THE LINK BECOMES A STATUS. Same ramp and same underline as `.rec-alt`,
+   which it shares a class with, minus the italic — 588:6864 sets it upright
+   because it is no longer a quoted question. §63 owns that one declaration. */
+
+/* --------------------------------------------------------------------- 5c ---
+   THE CARD A PHRASE OPENS — Figma 596:7020 (596:7379)
+
+   352 wide, white, a 1px accent border, 8px of radius and 20 of padding, with
+   three blocks at 20 between them: what is true, a hairline, what to do. It is
+   the one object in this layer that is NOT square — every other surface here
+   takes §01's `--radius:0`, and the file gives this 8 deliberately: it is the
+   only thing on the page that FLOATS, and a floating panel with hard corners
+   reads as a misplaced section rather than as something that opened.
+
+   THE ANCHOR IS `.ai-body`, WHICH HAS TO BE THE CONTAINING BLOCK. The card is
+   absolutely positioned and `placeSumDrop` (ai6) writes its two offsets from a
+   measurement, so the paragraph needs `position:relative` — and it must NOT
+   clip, because the file has the card hanging well past the panel's bottom
+   edge and across the column beside it.
+
+   `z-index:40` PUTS IT OVER THE BAND AND UNDER THE DOCK. §25 gives `.modhead`
+   `isolation:isolate`, so the card cannot escape the band's stacking context —
+   which is correct, the ask dock is outside it and should stay on top. Inside
+   the band it has to clear the second column and the dark card, both of which
+   are ordinary positioned children.
+
+   THE SHADOW IS THE FILE'S TWO LAYERS and the offset one is the reason it does
+   not look like a tooltip: `-40px 40px 40px` throws it down and to the LEFT,
+   away from the phrase, so the card reads as lifted off the page rather than
+   as a box drawn on it. */
+.app .modhead .ai-aura.talsum > .ai-body{position:relative;overflow:visible}
+
+/* AND THE BAND HAS TO BE LIFTED WHILE ONE IS OPEN, which is not the same thing
+   as the card's own `z-index` and is what actually made it visible. §25 gives
+   `.modhead` `isolation:isolate` so the wash at -1 cannot escape — and that
+   also traps everything inside it, including a card that is `z-index:40`
+   against its own siblings. The band itself sits at `z-index:auto` among the
+   page's sections, so "Tal recommends", which comes after it in the document,
+   paints over the whole thing: the card was drawn in full and the section on
+   top of it hid everything below the panel's bottom edge. It read exactly like
+   an `overflow:hidden` somewhere, and there is no `overflow:hidden` anywhere.
+
+   `:has(.sumdrop)` rather than always, because a band that is permanently
+   above the page is a band that will one day cover something it should not.
+   It is lifted for as long as a card is open and no longer. */
+.app .page > .modhead:has(.sumdrop){position:relative;z-index:60}
+
+.app .sumdrop{
+  position:absolute;z-index:40;
+  width:352px;max-width:100%;
+  box-sizing:border-box;
+  display:flex;flex-direction:column;gap:20px;align-items:flex-start;
+  padding:20px;
+  background:var(--layer-01);
+  border:1px solid var(--ai-1);
+  border-radius:8px;
+  box-shadow:0 0 100px 0 rgba(128,128,128,.06),
+             -40px 40px 40px 0 rgba(0,0,0,.04)}
+
+.app .sumdrop .sd-b{display:flex;flex-direction:column;gap:var(--s03);width:100%}
+.app .sumdrop p{margin:0}
+
+/* THE HAIRLINE IS THE `.sd-next` BLOCK'S TOP EDGE rather than an element of its
+   own — 596:7385 is a line at 178 in a 20-gap stack, which is the gap itself
+   with a rule through it. A `<hr>` in the markup would be a third child to keep
+   in step with the two gaps around it. */
+.app .sumdrop .sd-next{
+  display:flex;flex-direction:column;gap:var(--s02);width:100%;
+  padding-top:20px;
+  border-top:1px solid var(--rule)}
+
+/* THE ACTION IS A LINE OF TEXT WITH A MARK, not a button with a box. 596:7391
+   has no ground and no border — it is the card's one way out, and giving it a
+   fill would make it compete with the black CTA three inches below it. */
+.app .sumdrop .sd-act{
+  appearance:none;-webkit-appearance:none;
+  margin:0;padding:0;border:0;background:none;
+  display:inline-flex;align-items:center;gap:var(--s03);
+  text-align:left;cursor:pointer;
+  background-image:var(--ai-grad-alt);
+  -webkit-background-clip:text;background-clip:text}
+.app .sumdrop .sd-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
+.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--ai-1)}
+
+/* THE PHRASE IS A CONTROL NOW. `<b data-sum>` keeps §70.2's ground and ink and
+   gains a pointer and a focus ring; `all:unset` is not used because the ground,
+   the radius and the padding are exactly what should survive. The open one
+   deepens by a step so it is clear which of the three the card belongs to. */
+.app .modhead .ai-aura.talsum .ai-body p b[data-sum]{
+  cursor:pointer;
+  -webkit-user-select:none;user-select:none}
+.app .modhead .ai-aura.talsum .ai-body p b[data-sum]:focus-visible{
+  outline:2px solid var(--brand-primary);outline-offset:1px}
+.app .modhead .ai-aura.talsum .ai-body p b[data-sum].on{
+  background-color:color-mix(in srgb, var(--ai-1) 16%, transparent)}
+
+/* Below 600 the card takes the paragraph's own width — 352 is wider than the
+   column and `placeSumDrop`'s clamp would pin it to the left edge every time,
+   which is the right answer stated the long way round. */
+@container app (max-width:599.98px){
+  .app .sumdrop{width:100%}}
+
+/* --------------------------------------------------------------------- 6 ---
+   QUICK ACTIONS — 581:6344
+
+   Two cards, each an icon column, a title over a description, and an arrow
+   held at the right edge. `auto-fit` at a 340px floor rather than a fixed
+   pair, so a third card is markup and no CSS, and so the two stack rather
+   than crush below about 780.
+
+   THE CARDS ARE HAIRLINE ON #fdfdfd, WHICH IS THE FILE'S AND IS ALSO WHAT
+   §64 LEFT ALONE. §64 took the border off the quiet BUTTONS on the argument
+   that a drawn rectangle is one more edge than a page of hairlines has; these
+   are cards, not buttons in a row — the border is the card — so the arrow
+   §64 adds is not wanted here either and the markup carries its own.
+   ------------------------------------------------------------------------ */
+/* THE SECTION'S OWN AIR — 581:6344: 32 all round, a top hairline, 8 between
+   the heading and the sentence and 20 before the cards. §16 already gives
+   `.all-desc` a margin and this restates the pair as the file has them, so the
+   three parts read as one block rather than as a heading with two strangers. */
+.app .sec-qa{
+  padding:var(--s07) var(--pad-x);
+  border-top:1px solid #d7d5cc}
+.app .sec-qa > .sec-h{margin:0 0 var(--s03);padding:0}
+.app .sec-qa > .all-desc{margin:0 0 20px}
+
+.app .qa{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:var(--s04);
+  max-width:784px}
+
+/* TWO GAPS, 12 AND 32, AND FLATTENING THEM TO ONE COSTS A LINE. 581:6617 nests
+   the icon and the text at gap 12 inside a frame the arrow sits 32 from; one
+   32 across all three took 20px off the text column, which is exactly enough
+   to break "Review your score and quiz performance." onto a second line and
+   make the card 95 tall against the file's 74. The arrow makes up the
+   difference with a margin so the nesting stays out of the markup. */
+.app .qa-c{
+  appearance:none;-webkit-appearance:none;
+  display:flex;align-items:center;gap:var(--s04);
+  width:100%;margin:0;min-height:74px;
+  padding:var(--s05) var(--s06) var(--s05) 20px;
+  border:1px solid rgba(0,0,0,.1);
+  background-color:#fdfdfd;
+  text-align:left;cursor:pointer;
+  transition:border-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .qa-c:hover{border-color:var(--text-primary)}
+.app .qa-c:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+
+.app .qa-ic{flex:none;display:grid;place-items:center;width:16px;height:16px;
+  align-self:flex-start;margin-top:3px}
+/* A HUE PER CARD, NAMED RATHER THAN CYCLED (Maryam, 30 Aug 2026). Both cards
+   carried the accent, which made the two marks one mark drawn twice; the file
+   gives the cup #00A43C and the flash #0488C5, so the icon says which KIND of
+   next step this is before the words do — one reviews something finished, one
+   starts a conversation.
+
+   `.ic-quiz` / `.ic-prep` AND NOT `:nth-child`, which is §65's rule and the
+   reason it exists: `.prog-ic`'s hues are named "so a chapter is blue in both
+   places", against §29's cycling. A third Quick Action inserted first would
+   silently repaint the other two.
+
+   BOTH HEXES ARE ALREADY IN THIS LAYER, which is the useful part: #00A43C is
+   the journey's done-step green (§63 §10) and #0488C5 is the match figure and
+   the blue overlap tag. So the page has three greens and three blues that are
+   the same three, not six near-misses. */
+.app .qa-ic svg{width:16px;height:16px;fill:var(--ai-1)}
+.app .qa-ic.ic-quiz svg{fill:#00a43c}
+.app .qa-ic.ic-prep svg{fill:#0488c5}
+
+.app .qa-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
+.app .qa-go{flex:none;display:grid;place-items:center;width:16px;height:16px;
+  margin-left:20px}
+.app .qa-go svg{width:16px;height:16px;fill:currentColor}
+
+/* --------------------------------------------------------------------- 7 ---
+   THE ASK DOCK'S SEND CHIP — 581:6588
+
+   The ramp at the file's 20%, square, filling the field's height. §21 argues
+   at length that the control has to be visibly OFF because there is nothing to
+   send yet, and drew that as a grey box; a fifth of the AI ramp says the same
+   thing and says whose control it is. The glyph is `currentColor` so §63 owns
+   its ink like everything else.
+
+   `align-self:stretch` because the file's chip is the full 32px of the row's
+   inner height rather than a square floated in it — §21.2 gives the send a
+   fixed box, and this is the one declaration that has to answer it.
+   ------------------------------------------------------------------------ */
+/* THE LINE'S OWN GEOMETRY — 581:6568/6569/6587: 64 tall, 24 of side padding
+   and 16 top and bottom, the mark at 32, 12 from the mark to "Ask Tal
+   anything" and 20 from that to the example question. §21 built the row at a
+   smaller mark and a single gap; these four numbers are what make it the
+   file's line rather than a field with the same words in it.
+
+   THE PADDING IS SYMMETRIC, AND `padding-right:0` WAS A MISREADING OF THE
+   FILE. 581:6588 is 32 x 32 at x=870 in a 926-wide frame whose padding is
+   `px-[24px]` — so its right edge is at 902, which is the right edge of the
+   CONTENT box, not of the field. The chip is flush with the content, and the
+   content is inset 24 from the border like everything else on the row. Read as
+   "the file runs it to the border" it lost the whole right gutter: the chip
+   went hard against the orange hairline with 24 of air on the left of the row
+   and none on the right, which is the asymmetry Maryam is pointing at. */
+.app .askdock > .askline{
+  min-height:64px;
+  gap:20px;
+  padding:var(--s05) var(--s06)}
+.app .askdock .askline-mark{width:32px;height:32px;margin-right:-8px}
+.app .askdock .askline-mark .tal-mk{width:32px;height:32px}
+.app .askdock .askline-t{flex:none;margin-left:12px}
+.app .askdock .askline-q{flex:1 1 auto;min-width:0}
+
+/* AND THE CHIP IS A FIXED 32 SQUARE — 581:6588 — not a column stretched to
+   the row. `align-self:stretch` gave the same 32 here only because the row's
+   content box happens to be 32 tall; it is the wrong statement of the same
+   number, and it would grow the chip the moment anything made the row taller.
+   The arrow is 20 in a 32 box, which is the file's `px-[6px]` arrived at by
+   centring rather than by padding. */
+.app .askdock .askline-send{
+  flex:none;align-self:center;
+  width:32px;height:32px;
+  display:grid;place-items:center;
+  border:0;border-radius:0;
+  background-color:transparent;
+  background-image:linear-gradient(92.49deg,
+    color-mix(in srgb, var(--ai-1) 20%, transparent) 1.04%,
+    color-mix(in srgb, var(--ai-2) 20%, transparent) 39.89%,
+    color-mix(in srgb, var(--ai-3) 20%, transparent) 99.58%)}
+.app .askdock .askline-send svg{width:20px;height:20px;fill:currentColor}
+
+/* THE DOCK'S OWN EDGE IS THE ACCENT — 581:6568. One hairline in `--accent`
+   around the line, which is what the comet runs on. It replaces §21's neutral
+   border rather than sitting inside it: two borders on a 64px field is the
+   double-frame §39 spent a whole section undoing on the widgets. */
+.app .askdock > .askline{border-color:var(--ai-1)}
