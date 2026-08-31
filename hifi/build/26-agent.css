@@ -76,6 +76,58 @@
   font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.4px;
   color:var(--text-primary);white-space:nowrap}
 
+/* --------------------------------------------------------------------- 3b --
+   THE "RECOMMENDED" CHIP
+
+   `agentCardH` stamps it on whichever agent `recKey()` returns, inside `.agh-nn`
+   so that the name and the chip share one grid cell — that function's note is
+   the argument for the wrapper and is the thing to read first. Nothing here
+   draws the chip: it is an ordinary `.tag.acc.sm`. What this states is the three
+   consequences of putting an object on a line that was pure text.
+
+   `.agh-nn` MUST BE ABLE TO SHRINK. It is a grid item in §26.4's
+   `minmax(0,1fr)` track, and a flex/grid item's default `min-width:auto` is its
+   min-CONTENT — which for a `white-space:nowrap` chip plus a name is wider than
+   a third of a 265px card. Without `min-width:0` the track refuses to go below
+   that and the fee is pushed out of the card.
+
+   THE CHIP WRAPS UNDER THE NAME RATHER THAN SHRINKING, which is what
+   `align-items:baseline` on the parent would otherwise fight. In the wide list
+   row (480–899) there is room for both on one line; in the three-across rail
+   there is not, and the second line is free — every one of the six names already
+   takes two lines in that column, so a recommended card is exactly as tall as
+   the five beside it rather than 32px taller.
+
+   IT STATES ITS OWN `display` AND THAT IS NOT BELT AND BRACES. It was a
+   `.tag.acc.sm` first, and `.tag` computes to `display:flex` however §02
+   declares it — so the chip became a block-level flex inside the name and took
+   the whole line (570px at a 744 frame), then collapsed to 18px inside §26.4's
+   `minmax(0,1fr)` track at 1024. `inline-flex` plus `flex:none` is what makes it
+   an object ON a line of text rather than a box that owns one.
+
+   18 TALL INSIDE A 23px LINE BOX, so it cannot grow the row. §26 pins `.agh-n`
+   to `min-height:23px` so a short name cannot pull the card up under the fee;
+   anything taller than that shifts the rating, the meta line and the foot on one
+   card out of six, which is exactly the "do not disturb the layout of the card"
+   this was rebuilt to satisfy. 18 + `vertical-align:middle` sits it optically on
+   the name's centre with 2px of air top and bottom.
+
+   A PILL, WHICH IS THE ONE SHAPE THIS SYSTEM LETS CURVE. `--radius` is 0px by
+   token and §72 records that a curved card would be the only one in the portal —
+   but `.jrn-pill` and §70's `.rec-tag` are both `border-radius:100px`, because a
+   pill is not a card: it is a label with no corners to align to anything. This
+   is the third of those, so the exception is a pattern rather than a one-off. */
+.app .agh-book .agh-nn{
+  min-width:0;
+  display:block}
+.app .agh-book .ag-rec{
+  display:inline-flex;align-items:center;flex:none;
+  height:18px;padding:0 6px;
+  margin:0 0 0 6px;
+  border-radius:100px;
+  background:#e5f3f9;
+  vertical-align:middle;white-space:nowrap}
+
 /* the fee is now the tallest thing on the row and nothing may reflow around
    it, so the identity column has to clear it on its own account: 40 of fee
    against 23 of name plus 29 of rating is already past it, and the meta

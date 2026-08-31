@@ -230,12 +230,55 @@ function avatar(a,size){
 const talStar = (q) => `<button class="tal-star" data-tal-ask="${q}" aria-label="Ask Tal"><span class="lbl">Ask Tal</span><span class="sk-mark xs"></span></button>`;
 
 /* horizontal card for the shortlist rail */
+/* THE RECOMMENDATION IS A CHIP ON THE CARD (Maryam, 31 Aug 2026: "add a
+   'Recommended' chip next to priya nair name in all agent card"). It replaces
+   `talRec` on the Interviews module — the note in `V.interviews` is the
+   argument, and the short version is that on the page which LISTS the six
+   agents, a 166px block about one of them printed that person twice.
+
+   IT IS DERIVED FROM `recKey()`, NEVER FROM THE NAME. Priya is only today's
+   answer: `S.recKey` cycles through `REC_ORDER` and the chip has to follow it,
+   or the page would recommend Priya in the grid while Tal's own block on the
+   dashboard recommended Owen. Testing the key rather than `a.n` also means the
+   sixth card cannot wear it by accident — that cell used to be `'priya'` again.
+
+   IT IS BLUE ON LIGHT BLUE AND IT IS NOT A `.tag` (Maryam, 31 Aug 2026). Both
+   halves of that were corrections. It shipped for one round as `.tag.acc.sm`,
+   which is a solid ACCENT block — and at 24px tall against a 17px name it read
+   as a status banner stretched across the card rather than a note beside a name.
+   The accent was wrong for a second reason too: on this page the accent is the
+   Book button on all six cards, so an orange chip on one of them competes with
+   the thing you press.
+
+   AND `.tag` COULD NOT BE MADE TO BEHAVE, WHICH IS THE PART WORTH RECORDING.
+   §02.12 declares it `display:inline-flex`, but it computes to `display:flex` —
+   so in `.agh-nn` it became a block-level flex and took the whole line: 570px
+   wide at a 744 frame, and squeezed to 18px inside §26.4's `minmax(0,1fr)` track
+   at 1024, where it was unreadable. A chip that has to sit inside a line of text
+   cannot inherit a block's display, so `.ag-rec` states its own — see §26.3b.
+
+   THE NAME IS WRAPPED IN `.agh-nn` AND THAT IS THE WHOLE REASON THIS NEEDED
+   MARKUP. `.agh-n` looks like a line of text and is a GRID in the two cases
+   that matter: §26.4 makes it `grid-template-columns:minmax(0,1fr) auto` inside
+   a three-across `.rail` at 900+, and §26's `max-width:479.98px` block does the
+   same on a phone — both so the fee can sit in its own track instead of
+   overhanging a 130px column. In a grid the name is an ANONYMOUS grid item, so
+   a chip written beside it is a SECOND item: it auto-placed into row 2 column 1
+   and was squeezed to 18px by `minmax(0,1fr)`, which also made the recommended
+   card 32px taller than the five next to it. Nothing errored; the chip was
+   simply somewhere else, at a size it could not be read at.
+
+   Wrapping the name puts the two in ONE cell, where the chip is an ordinary
+   inline-flex after a text node and wraps under the name only when the column
+   is too narrow for both. Every existing rule keeps working — §26 and §24 place
+   `.ag-price`, and `.agh-n`'s own type inherits down. */
 function agentCardH(key){
   const a=AGENTS[key];
+  const rec = key === recKey() ? '<span class="ag-rec">Recommended</span>' : '';
   return `<div class="agh draw agh-book">
     <span class="bd"><i></i><i></i><i></i><i></i></span>
     ${avatar(a,72)}
-    <span class="agh-n">${a.n}<span class="ag-price">${a.price}</span></span>
+    <span class="agh-n"><span class="agh-nn">${a.n}${rec}</span><span class="ag-price">${a.price}</span></span>
     <span class="agh-r">${stars(a.r)}<span class="num">${a.r.toFixed(1)}</span></span>
     <span class="agh-m">${a.range} · ${a.ivs} interviews</span>
     <span class="agh-f"><span class="agh-slot">${a.slot}</span>
@@ -1686,11 +1729,37 @@ function factIcon(t){
    is: one rule, and a fact added next week gets it for free. Only a letter is
    touched, so "$95 paid" and "&ndash; E3" are left exactly as written. */
 const _cap = t => t.replace(/^([a-z])/, (m,c) => c.toUpperCase());
+/* ==========================================================================
+   THE FACT ROW IS OFF, EVERYWHERE — Maryam, 31 Aug 2026: "remove this
+   component where we have insights with the heading, we just need to show the
+   heading everywhere. please do this everywhere."
+
+   ONE RETURN, NOT THIRTY EDITS. Thirty-odd `ph()` calls across two portals
+   pass a `&middot;` spine as their second argument, and every one of them
+   reaches this function; answering it here means a call site keeps its string
+   and simply stops drawing it, so nothing has to be found and nothing can be
+   missed. It also leaves the sentence in the view for whoever brings the row
+   back — the argument for it is in `ph()`'s own note above, and the argument
+   against is that the head of a page now says its name once and lets Tal do
+   the rest.
+
+   THE PROSE BRANCH SURVIVES, AND THAT IS THE ONE EXCEPTION. A `sub` with no
+   middot in it is not a fact row — it is the auth screens' one line of prose,
+   and those pages have no Tal card under the title, so removing it would leave
+   `Create your account` with nothing at all. That is the exception `ph()`'s
+   note already states, and it is the same test this function already made.
+
+   `factIcon` / `PH_IC` / `_cap` STAY. They are unreached from here now, and
+   they are not the "gate nothing writes" case CLAUDE.md describes — that is
+   about CSS shipped without its behaviour. This is markup with no caller, kept
+   because bringing the row back is one line and re-deriving thirty icon
+   patterns is not. If the row is not wanted by the next release, delete all
+   four together.
+   ========================================================================== */
 const phSub = sub => {
   const parts = String(sub).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
   if(parts.length < 2) return `<p>${sub}</p>`;
-  return `<p class="ph-facts">${parts.map(t =>
-    `<span class="ph-f">${factIcon(t)}<span>${_cap(t)}</span></span>`).join('')}</p>`;
+  return '';
 };
 /* `mark` IS A FIFTH ARGUMENT AND NOT A SIXTH SHAPE. One page in the product
    opens with a face — the dashboard, whose subject is the reader — and 486:1084
@@ -1718,12 +1787,21 @@ function ph(title,sub,act,backTo,mark){
    marked segments are showing, "your level" is what the sub already says, and
    "your track" is the card's own heading — a line restating all three under a
    bar that draws them is the grid's redundancy carried across in text. */
-function trackBand(track){
+/* `codes` IS THE SAME OPT-IN `ladder()` TAKES, AND FOR THE SAME REASON.
+   The note over `ladder` is the argument: the black hero prints the level at
+   34px directly above fifteen small blocks, so naming them there is the card
+   saying it twice, and the wing on white gives each block ~40px and reads
+   better named. My Level draws this band in the wing now (`lvlWing`), so the
+   pre-interview state and the confirmed one are the same bar with the same
+   labels — which is what makes "you are somewhere in E1 to E5" a picture
+   rather than five orange blocks the reader has to place by counting. The
+   hero on `V.report` still calls this with no argument and is unchanged. */
+function trackBand(track, codes){
   const T = ['Explorer','Builder','Trailblazer'];
   const ti = Math.max(0, T.indexOf(track));
   const lo = ti * 5;
   return `<div class="ladder ladder-track" role="img" aria-label="${track} track, levels ${lo+1} to ${lo+5} of 15. Your level is set at the interview.">
-    ${Array.from({length:15},(_,i)=>`<i class="${i>=lo&&i<lo+5?'mine':''}"></i>`).join('')}
+    ${Array.from({length:15},(_,i)=>`<i class="${i>=lo&&i<lo+5?'mine':''}">${codes?`<b>${LVL_CODES[i]}</b>`:''}</i>`).join('')}
   </div>
   <div class="ladder-lab">${T.map(n=>`<span${n===track?' class="on"':''}>${n}</span>`).join('')}</div>`;
 }
@@ -2591,14 +2669,37 @@ function jrnList(){
       </div>
       <ol class="jrn-l">
         ${steps.map((s,i) => `<li class="jrn-i${s.st ? ' ' + s.st : ''}">
-          ${''/* the mark is derived from the PRODUCT's label, not the file's:
-                `stepIcon` matches on words `STEP_IC` knows ("quiz", "interview",
-                "enrol", "course"), and "Nextinleadership Quiz" happens to carry
-                one while "90 days Cohort Journey" does not. Reading `s.lab`
-                keeps the row's mark the same mark the horizontal stepper gives
-                the same step, which is the one thing CLAUDE.md says must not
-                differ between two drawings of a step. */}
-          <span class="jrn-ic">${s.st === 'done' ? I.checkFilled : stepIcon(s.lab)}</span>
+          ${''/* THE MARK IS THE STATE, NOT THE SUBJECT, AND THIS REVERSES THE
+                NOTE THAT WAS HERE (Maryam, 31 Aug 2026: "the ui i sent you for
+                this section have completion and progress or queue icons instead
+                of the icons relevant to the level").
+
+                WHAT IT USED TO DO AND WHY THAT ARGUMENT LOST. It called
+                `stepIcon(s.lab)`, which matches on words `STEP_IC` knows, so the
+                four rows came out a tick, a video camera, a group and a book —
+                and the note defended it on the grounds that CLAUDE.md forbids a
+                step's mark differing between two drawings of the same step. That
+                rule is about `stepIcon`'s TABLE not being forked, so that
+                "Vetting" cannot be a shield on one page and a ring on another;
+                it is not a rule that every drawing of a step must use that
+                table. `stepper()` is untouched and still does.
+
+                AND THE SUBJECT MARK WAS SAYING NOTHING HERE. A row already
+                carries its subject in words 8px to the right — "Interview &
+                Levelling" beside a video camera is the label twice — while the
+                one thing the row does NOT say is where you are in it. 587:6741
+                spends the mark on that instead: tick for done, `hourglass_top`
+                for the step that is yours and unfinished (icons.js's own note on
+                why the filled top cut, not the empty one), a clock for a step
+                that is only queued. Three marks, three states, and the ink §63
+                gives the row already agrees with each.
+
+                THE NUMBERS ARE WHAT CARRY THE SEQUENCE, which is what makes the
+                subject mark affordable to spend: the list is an `<ol>` and every
+                row is numbered, so nothing is lost by the mark stopping being a
+                second label. */}
+          <span class="jrn-ic">${s.st === 'done' ? I.checkFilled
+                                : s.st === 'on' ? I.hourglass : I.time}</span>
           <span class="jrn-n">${i + 1}.</span>
           <span class="jrn-lab">${JRN_AI[i] || s.lab}</span>
         </li>`).join('')}
@@ -2691,11 +2792,45 @@ const REC_MS = 4500;
    recommendation has not been withdrawn yet, it is being replaced. The link
    under it stops being an offer and becomes a status: "Finding another agent",
    upright rather than italic, because it is no longer something being quoted. */
+/* `no-band` IS AN OPT-OUT AND IT STOPS THE ONE-TAL CAP BEING LOAD-BEARING.
+
+   `placeBand` (ai5) collects a RUN of sections after the `.ph` and `_mhIsTal`
+   recognises a member by CONTENT — anything containing `.ai-aura` or
+   `.ai-label`. This block wears an `.ai-label.bare` for "Agent recommended by
+   Tal", so it
+   qualifies, and §70's own note records the bug that caused: on the `new`
+   dashboard the run walked into it and laid the whole recommendation out in the
+   band's left column at 576px instead of the page's 901, with the photograph,
+   the facts and the actions each wrapping onto a line of their own. Nothing
+   threw and nothing warned.
+
+   WHAT SAVED IT WAS AN ACCIDENT. The run also breaks on a SECOND Tal member,
+   and on that page Tal's own summary card comes first, so the cap caught it —
+   which §70's note calls "precisely the accident not to depend on". On a MODULE
+   page it does not hold: `placePageSummary` (ai6) inserts the summary card two
+   passes later, so at `placeBand` time this block is the FIRST member after the
+   `.ph` and the cap is not armed. `V.interviews` draws it directly under the
+   band, which is exactly that case.
+
+   SO THE VIEW SAYS SO, which is `head-sec`'s mechanism turned round: that class
+   opts a section IN when what it contains cannot tell the pass anything, and
+   this opts one OUT when what it contains says the wrong thing. One class, one
+   `break`, and the cap goes back to being a backstop.
+
+   NOT A FIX TO `.rec-lab` ITSELF, and that is worth recording because it is the
+   tidier-looking answer. §72 solved the same trap by giving `.pulse-mk` its own
+   class rather than wearing `.ai-label`, and it could afford to because that
+   mark was new. This label is drawn by §03, §12, §19, §37, §53 and §63 between
+   them — six layers of gradient, mask, size and ink — so re-creating it on
+   `.rec-lab` means restating all six and keeping them in step, to change a
+   class name. The opt-out is one line. */
+const recWrap = () => 'sec sec-rec no-band';
+
 function recSkeleton(){
   const a = AGENTS[recKey()];
   const first = a.n.split(' ')[0];
-  return `<div class="sec sec-rec">
-    <span class="ai-label bare rec-lab">Tal recommends</span>
+  return `<div class="${recWrap()}">
+    <span class="ai-label bare rec-lab">Agent recommended by Tal</span>
     <div class="rec rec-busy" aria-busy="true">
       <div class="rec-l">
         <span class="sk sk-ph"></span>
@@ -2705,9 +2840,17 @@ function recSkeleton(){
             <span class="sk sk-x"></span>
           </div>
           <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
+          ${''/* ONE BAR, NOT TWO PILLS, because the block it stands in for is
+                one sentence now (581:6539). The skeleton's whole point is that
+                every bar is the BOX of the thing it replaces so nothing moves
+                when the real content lands, which stops being true the moment
+                the real content changes shape. Updated even though nothing can
+                currently reach this function — see the note in `talRec`: if the
+                swap is not re-homed the family goes, and until then a skeleton
+                describing a layout that no longer exists is worse than none. */}
           <div class="rec-ov">
             <span class="sk sk-m"></span>
-            <p class="rec-tags"><span class="sk sk-t"></span><span class="sk sk-t"></span></p>
+            <p class="rec-tags"><span class="sk sk-t sk-why"></span></p>
           </div>
         </div>
       </div>
@@ -2724,8 +2867,8 @@ function talRec(){
   const a = AGENTS[recKey()];
   const rec = REC[recKey()];
   const first = a.n.split(' ')[0];
-  return `<div class="sec sec-rec">
-    <span class="ai-label bare rec-lab">Tal recommends</span>
+  return `<div class="${recWrap()}">
+    <span class="ai-label bare rec-lab">Agent recommended by Tal</span>
     ${''/* THE ROW IS TWO GROUPS, NOT THREE ITEMS — 581:6460. The file nests the
           photograph and the facts inside one frame at gap 16 and pushes the
           actions to the far edge with `justify-between`; written flat, the
@@ -2752,23 +2895,71 @@ function talRec(){
           <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
             <span>${I.video}${rec.mins}</span>
             <span>${I.calendar}Next slot: ${a.slot}</span></p>
+          ${''/* THE TWO TAGS BECOME ONE SENTENCE — 581:6535 (Maryam, 31 Aug
+                2026). The pair was "Your need: System Design" and "Priya's
+                Strength: Architecture", two pills side by side, and the reader
+                had to do the join themselves: the block stated a need, stated a
+                strength, and left the fact that they are the SAME fact as an
+                inference. 581:6539 says it — "Priya's Architecture strength
+                perfectly matches your need for System Design." — which is the
+                one claim the recommendation is actually making.
+
+                IT IS DERIVED FROM `REC`, NEVER TYPED. `rec.strength` and
+                `rec.need` are the same two strings the pills read, and the
+                first name comes off the record, so pressing the swap cannot
+                leave a sentence about Priya over Owen's photograph. Owen's
+                reads "Owen's Incomplete Information strength perfectly matches
+                your need for Decision Making" — clumsier than Priya's, and the
+                alternative is a third hand-written string per agent in `REC`
+                that could disagree with the two beside it.
+
+                AND THE FILE'S INK SURVIVES HERE, WHICH IS A REVERSAL OF THE
+                NOTE BELOW. §70.5's own argument for substituting `--mk-4` was
+                that #973177 on the tag's #fbf1f9 ground fails AA at 14px. With
+                the ground gone the same ink is 6.95:1 on white — measured, not
+                assumed — so the file's colour is used exactly. `.rec-m`'s
+                figure keeps `--link` for #0488c5, which is 3.94:1 on white and
+                still fails. One block, two inks, two different reasons. */}
           <div class="rec-ov">
             <p class="rec-m">Data Overlap Tags: <i>${rec.match} match</i></p>
-            <p class="rec-tags"><span class="rec-tag need">Your need: ${rec.need}</span>
-              <span class="rec-tag has">${first}&rsquo;s Strength: ${rec.strength}</span></p>
+            <p class="rec-why">${first}&rsquo;s ${rec.strength} strength perfectly matches your need for ${rec.need}.</p>
           </div>
         </div>
       </div>
+      ${''/* TWO BUTTONS, AND "VIEW ALL AGENTS" IS THE ORDINARY ANSWER AFTER ALL
+            — 583:6679 (Maryam, 31 Aug 2026). This slot held one button and one
+            line of quoted italic text, and the note that was here argued for it:
+            "the recommendation was reasoned, so the way past it is to say why it
+            is wrong, which is a thing you say to Tal". That is a good argument
+            about Tal and a bad one about this reader — the file gives them the
+            list, and a reader who does not want Priya usually wants to SEE the
+            other four rather than to open a conversation about her.
+
+            Both are 185 x 40 with 12 between, held to the right edge, which is
+            the geometry `.rec-a` already had for the single button; §70.5 only
+            has to turn the column into a row. `View all agents` goes FIRST,
+            per 581:6548 — the quiet one on the left, the accent one closest to
+            the edge, which is the order every `.btn-row` in this product uses.
+
+            THIS LEAVES THE 4.5s SKELETON WITH NO TRIGGER. `data-recswap` was
+            the only thing that ever set `S.recBusy`, so `recSkeleton` (§70.5b,
+            588:6781) is now unreachable — kept rather than deleted, because it
+            is a designed state with a node behind it and re-homing the swap is
+            a decision rather than a tidy-up. If it is not re-homed, that whole
+            family is the "gate nothing writes" tell CLAUDE.md describes and
+            should go: `recSkeleton`, `REC_MS`, `S.recBusy`, the `[data-recswap]`
+            handler, §70.5b and §63's `.rec-alt` / `.rec-finding` rules.
+
+            A `noAll` FLAG DROPPED THE QUIET BUTTON FOR ONE ROUND AND IS GONE.
+            `V.interviews` drew this block over its own agent list, so "View all
+            agents" was a link to the page it was already on; the flag answered
+            that. That page no longer draws the block at all — the recommendation
+            is a chip on the card (`agentCardH`) — so the flag had one caller and
+            then none, which is the "mode nobody asks for" CLAUDE.md warns about.
+            Both buttons are unconditional again. */}
       <div class="rec-a">
+        <button class="btn btn-s btn-sm noic rec-see" data-go="agents">View all agents ${I.arrowRight}</button>
         <button class="btn btn-p btn-sm noic" data-go="agent:${recKey()}">Book ${first} Now ${I.arrowRight}</button>
-        ${''/* THE WAY TO DISAGREE, AND IT IS A QUESTION RATHER THAN A LINK.
-              "View all agents" would be the ordinary answer and it is the wrong
-              one here: the recommendation was reasoned, so the way past it is to
-              say why it is wrong, which is a thing you say to Tal. `data-tal-ask`
-              is the same attribute every other Ask-Tal control in the build
-              carries, so it opens the thread with the question already put. The
-              nav's Agents item is still the list, for a reader who wants one. */}
-        <button class="rec-alt" data-recswap="1">&ldquo;Ask Tal for a different agent&rdquo;</button>
       </div>
     </div>
   </div>`;
@@ -3607,6 +3798,87 @@ V.dashboard = (f) => {
   return `<main class="main"><div class="page">${body}</div></main>`;
 };
 
+/* ==========================================================================
+   MY LEVEL OPENS ON THE LADDER WING, NOT ON THE BLACK HERO — Maryam, 31 Aug
+   2026: take the black card out of the summary section, put it after it, and
+   draw it the way the promoted-to-E4 prototype draws the ladder, on white.
+
+   THREE THINGS THAT ALL FOLLOW FROM ONE MOVE, and the move is the class.
+
+   1. IT LEAVES THE HEAD BAND BY CEASING TO BE A DARK CARD. `.lvl-hero` is in
+      `DARK_CARD` (ai5), so `placeDark` lifted it into the `.modhead` and §25.12
+      gave it the full width under the header — which is why the level card was
+      INSIDE the summary block with the band's rule closing underneath it. There
+      is no `keep-place` needed and no pass to teach: `.wing-lvl` is not a dark
+      card, so nothing lifts it, and it stays exactly where the view writes it —
+      the first section after the band. The band is the title and Tal's sentence,
+      which is what a summary section is.
+
+   2. IT IS `ladderWing`'S SHAPE AND ALL OF §59's RULES ALREADY REACH IT.
+      Every `.wing-lvl` selector in that layer is written `.app .wing-lvl …`
+      rather than scoped to `.modhead`, so the component travels: the ladder's
+      track goes to `--layer-accent-01` instead of the hero's on-dark white,
+      each block carries its level code, the level you are ON is lit rather than
+      filled, and the three track names sit over their own first rungs. That is
+      the whole of "like the promoted prototype but with a white background" —
+      there is no dark-to-light translation to write, because §59 wrote it for
+      the wing on the band's wash and the wash is not what any of it depends on.
+
+   3. THE EYEBROW IS GONE, AND ON THE PRE-INTERVIEW STATE IT IS THE THING THAT
+      WAS ASKED FOR. `placeLevelCards` (ai5) moves `.eb` into a `.lvl-foot`
+      under the bar, which is where "Your track, from the quiz" was printed. The
+      wing has no eyebrow slot: the confirmation line is `.prog-l`, directly
+      under the level, where the reference puts "confirmed at your re-interview".
+      So the quiz attribution is not relocated, it is dropped — the page's own
+      note two blocks down ("A quiz cannot set your level") is the sentence that
+      was doing that job properly, and Tal's summary says it a third time.
+
+   WHY IT IS NOT `ladderWing` ITSELF. That function has one state — a confirmed
+   level, `f.track &ndash; f.level`, "confirmed at your re-interview" — because
+   `wingBlock` only calls it when `f.complete`. This page is drawn at every
+   stage including the two where there is no level at all, and it has its own
+   right-hand figure for each. Sharing would mean a second parameter and two
+   branches inside a function whose one caller passes neither.
+
+   `.lvl-hero` STAYS IN THE BUILD. `V.report` still opens on it, so the black
+   card, `placeLevelCards` and §05/§10/§15/§29's hero rules all keep a live
+   caller — this is a change to one page, not the retirement of a component. */
+const lvlWing = f => {
+  const confirmed = !f.pred;
+  return `<div class="sec">
+    <div class="stp stp-open stp-titled wing-lvl">
+      ${wingHead('Where you are on the ladder')}
+      <div class="prog">
+        <div class="prog-top">
+          <div><div class="prog-pct">${confirmed?lvlName(f.level):f.track}</div>
+            ${''/* THE SIGNATURE IS THE SUB-LINE, WHICH IS WHERE THE EYEBROW'S
+                  CONTENT ACTUALLY BELONGED. "Confirmed August 21, signed by
+                  Priya Nair" is a fact about the level printed 4px above it,
+                  and it read as a caption for the bar when `placeLevelCards`
+                  parked it under the ladder. The middot became a comma: the
+                  hero drew this as its own row and a `&middot;` was the
+                  separator; here it is one line under a headline, which is
+                  prose, and ai6's note on `_slot` makes the same call. */}
+            <div class="prog-l">${confirmed
+              ?(f.complete?'Promoted 21 November, signed by Priya Nair':'Confirmed 21 August, signed by Priya Nair')
+              :'Your level is set at the interview'}</div></div>
+          ${''/* THE RIGHT-HAND FIGURE IS THE POSITION, AND BEFORE THE INTERVIEW
+                THE POSITION IS A RANGE. "4 of 15" is the reference's figure and
+                it needs a level; with none set, the honest answer is the five
+                rungs the track covers, which is exactly what the marked run in
+                the bar below is drawing. It is not a prediction — every
+                Explorer is somewhere in E1 to E5 whatever the interview says —
+                which is the distinction §29.4 makes about the band itself. */}
+          <div class="prog-day">
+            <div class="prog-dn">${confirmed?rungOf(f.level):'1&ndash;5'}<small> of 15</small></div>
+            <div class="prog-l">${confirmed?'on the ladder':'in this track'}</div></div>
+        </div>
+        ${confirmed?ladder(f.level, true):trackBand(f.track, true)}
+      </div>
+    </div>
+  </div>`;
+};
+
 V.level = (f) => {
   const confirmed = !f.pred;
   return `<main class="main"><div class="page">
@@ -3618,12 +3890,7 @@ V.level = (f) => {
         DRAWN: the fifteen-rung ladder below is the position, and Tal says
         which rung and what moves it. See the note over `ph()`. */}
   ${ph('My Level')}
-  <div class="lvl-hero">
-    <div class="eb">${confirmed?(f.complete?'Promoted November 21 · signed by Priya Nair':'Confirmed August 21 · signed by Priya Nair'):'Your track, from the quiz'}</div>
-    <div class="big">${confirmed?lvlName(f.level):f.track}</div>
-    <div class="sub">${confirmed?'Level '+rungOf(f.level)+' of 15':'Your level is set at the interview'}</div>
-    ${confirmed?ladder(f.level):trackBand(f.track)}
-  </div>
+  ${lvlWing(f)}
   <!-- ONE WAY INTO THE REPORT, NOT THREE. A black primary button sat here
        saying "Read my full report", the signed card below it is itself a
        button to the same place, and that card closes with "Read the full
@@ -4027,17 +4294,39 @@ V.interviews = (f) => {
         left states where the candidate is in the one sequence this module is
         about, and Tal's summary does the counting. */}
   ${ph('Interviews','45 minutes, by video &middot; recorded &middot; sets your level')}
-  ${due?`
-  <div class="sec">
-    <div class="plate">
-      <div class="plate-eb">${dueRe?'Due now':'Next step'}</div>
-      <div class="plate-t">${dueRe?'Book your re-interview':'Book your level interview'}</div>
-      <div class="plate-b">${dueRe
-        ?'Your 90 days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.'
-        :'Forty-five minutes by video with the agent you pick. It sets the level you enroll at, and the report is yours to keep.'}</div>
-      <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
-    </div>
-  </div>`:''}
+  ${''/* THE PLATE WENT AND NOTHING REPLACED IT IN THE HEAD — THE LIST BELOW
+        CARRIES THE RECOMMENDATION AS A CHIP (Maryam, 31 Aug 2026: "remove this
+        recommended by tal whole section and add a 'Recommended' chip next to
+        priya nair name in all agent card").
+
+        WHAT THE PLATE WAS SAYING, AND WHY IT HAD TO GO EITHER WAY. Eyebrow
+        "Next step", title "Book your level interview", a paragraph restating the
+        `.ph` fact row one line above it, and a button reading "Choose an agent"
+        — which sent you to a list to do the work Tal is supposed to have already
+        done. Four elements to say "go and choose", on the page whose whole
+        subject is the choice.
+
+        AND `talRec` WAS NOT THE ANSWER HERE EITHER, WHICH TOOK TWO TRIES TO
+        SEE. It went into the band's second column first as a `.head-col`, then
+        full width directly under the band. Both drew the same person twice on
+        one screen: a 166px portrait with six rows of facts, and then the same
+        face, rating, band and fee again as card one of six 300px lower. The
+        recommendation is one BIT of information — which of these six — and it
+        does not need a block of its own on the page that lists them. On the
+        `new` dashboard it still does, because there the list is a page away and
+        the block IS the shortlist; `talRec` is unchanged and that page is
+        untouched.
+
+        SO THE MODULE'S HEAD IS THE BAND AND NOTHING ELSE, and `agentCardH`
+        stamps `.ag-rec` on whichever agent `recKey()` returns. One chip, in the
+        grid, on the row you would press anyway.
+
+        THE RE-INTERVIEW STAGE READS THE SAME WAY. `dueRe`'s plate carried its
+        own sentence about E4 / E3 / E2, which is `PAGESUM`'s job and is said in
+        the band above it; what is due on day 90 is still a 45-minute
+        conversation with one of six people, and the chip points at the same one
+        for both stages. */}
+  ${due?allAgents():''}
   ${''/* CHOOSING THE SCENES IS THE FIRST THING IN THE MODULE, AND ONLY ONCE.
         The level interview is done, six scenes are cut from it, and the
         candidate keeps three. It opens the module rather than sitting below
@@ -4065,28 +4354,63 @@ V.interviews = (f) => {
         heading sits above the rows and the rows take the column. */}
   ${(f.enrolled||f.complete||!f.pred)?`
   <div class="sec">
-    <div class="sec-h"><h2>Past interviews</h2><span class="t-helper-01">Kept for 24 months</span></div>
+    ${''/* "KEPT FOR 24 MONTHS" CAME OFF (Maryam, 31 Aug 2026). It was a
+          retention POLICY in the corner of a heading — the fourth of the four
+          content bans `PAGESUM`'s note lists ("no policy: nothing renews, no
+          card is kept on file"), stated for the section rather than for Tal but
+          the same mistake. Where a candidate needs it is `V.account`'s Data use
+          notice, which is where every other retention line in the build lives.
+          The row underneath already says what this section is for. */}
+    <div class="sec-h"><h2>Past interviews</h2></div>
     <div class="ivlist">
       ${f.complete?ivRow('re','Re-interview','November 21, 2026','Promoted to Explorer &ndash; E4','44:06'):''}
       ${ivRow('level','Level interview','August 20, 2026','Confirmed Explorer &ndash; E3','45:12')}
     </div>
   </div>`:''}
+  ${''/* SCHEDULED IS THE DASHBOARD'S ROW — Maryam, 31 Aug 2026. It was a
+        four-row `.kv` tile, a three-button set under it and a legal line: the
+        agent as the VALUE of a row labelled "Agent", between a date and a card
+        number, with the join buttons in a separate block below. `crow('iv')` is
+        the same appointment drawn as one object — the countdown and what the
+        session is on the left, the person in the middle, the two actions on the
+        right — and it is already what the `booked` dashboard shows. Two
+        drawings of one appointment is the mistake `CALL_ROW`'s own note was
+        written about; this is the third surface joining the component rather
+        than a fourth drawing.
+
+        AND IT NEEDS NO STAMP. `bkStamp` (ai7) exists because six views TYPE
+        "Priya Nair, Thursday 20 August, 6:30 PM, $95" into their prose, and
+        this tile was one of the six. `CALL_ROW.iv` reads the booked agent out
+        of `S.booking` / `S.bk` and the expertise out of `REC`, so the row
+        cannot disagree with the booking in the first place — the note over
+        `bkStamp` says to prefer that, and this is one fewer site for it.
+
+        WHAT IT DROPS, AND WHY THAT IS NOT A LOSS. "Paid $95 · Visa ending 4242"
+        is a receipt line and the receipt is `V.booking`, one click from the
+        crumb, with the same three rows and the card on it; every charge is also
+        a row on Payments with its own Receipt button. "Add to calendar" goes
+        with the third button — `.crow-a` is two actions by construction (§71
+        fixes both at 185px), and the confirmation page's own note records that
+        control coming off for the same reason: the invite is in the email the
+        moment the booking clears.
+
+        AND IT IS THE ROW ALONE — no heading and no legal line (Maryam, 31 Aug
+        2026). "Scheduled" over a single row that already says "6 days left ·
+        Level interview" is the row's own first cell restated as a heading, and
+        the section is the only thing on this part of the page. The 24-hour
+        reschedule window goes with it: the sentence is stated where the money
+        is, on `V.booking` and `V.payment` — which are the two lines `wRefund`
+        (ai8) reads when Tal is asked — and a policy line under a Join button
+        is the "no policy" ban `PAGESUM`'s note lists, applied to page copy.
+
+        WITH NO `.sec-h` THIS NEEDS NO LAYER. §10.15's label column only reaches
+        `.sec:has(> .sec-h)`, so the section is the same shape the `booked`
+        dashboard already draws — `.sec.sec-call` holding the bare row — and the
+        opt-out, the gutter restatement and the heading padding a headed version
+        needed are all moot. That is why the wrapper matches the dashboard's
+        exactly rather than being this page's own. */}
   ${booked?`
-  <div class="sec">
-    <div class="sec-h"><h2>Scheduled</h2></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Agent</span><span class="v">Priya Nair</span></div>
-      <div class="kv"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
-      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
-      <div class="kv"><span class="k">Paid</span><span class="v n">$95 · Visa ending 4242</span></div>
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-p" data-call="iv">Join the interview ${I.video}</button>
-      <button class="btn btn-t">Add to calendar ${I.calendar}</button>
-      <button class="btn btn-t" data-go="agents">Reschedule or cancel ${I.time}</button>
-    </div>
-    <p class="t-helper-01 mt4">Free to reschedule up to 24 hours before. Inside 24 hours the fee is not refundable.</p>
-  </div>`:`
+  <div class="sec sec-call">${crow('iv')}</div>`:`
   ${''/* THE FOUR FACTS ARE THE HEAD OF "HOW IT WORKS", NOT A BAND ABOVE IT.
         They were their own headingless section — a bordered strip of Length,
         Format, Your report, Fee sitting between the past interviews and the
@@ -4105,8 +4429,35 @@ V.interviews = (f) => {
         §37.16 is the spacing between the two halves; §10's `.facts` keeps its
         own top and bottom rule, which it only gives up as an `:only-child`
         and is not one any more. */}
-  <div class="sec">
-    <div class="sec-h"><h2>How it works</h2></div>
+  ${''/* AND IT IS A DISCLOSURE, CLOSED TO START — §65, `key='how'` (Maryam,
+        31 Aug 2026: "collapse that how it works section, just like the What the
+        interview found collapsed section"). Same component and the same
+        argument `foundHead`'s note makes: four figures and four numbered steps
+        is the longest block on this page, it is a re-read, and it is the one
+        part a reader who has already decided does not need. With the band now
+        naming an agent and the list of five under it, this is the third thing
+        on a page whose first two are the decision.
+
+        THE KEY IS WHY THIS COST NOTHING. `S.disc` is keyed by name — the note
+        over `discOpen` records that it was a single boolean until "How your
+        cohort works" appeared — so a third disclosure is a heading, a wrapper
+        and a string. Nothing in this reaches the stylesheet: §65's rules are
+        about the SHAPE of a disclosure and all of them key on `.found`.
+
+        TRAP 13 IS ALREADY ANSWERED, AND NOT BY LUCK. §65.1a restates §10.15's
+        label-column opt-out on `.app .page .sec.found` inside the container
+        query, precisely because wrapping a panel in `.found-b` is what loses
+        the `:has(> .facts)` opt-out this section used to rely on. That was the
+        bug §65 was written around; it is the reason this one does not have it.
+
+        THE FOUR FIGURES STAY INSIDE THE PANEL, unlike `V.enrol`'s cohort
+        disclosure which keeps its lede outside. There the visible line answers
+        "what IS a cohort" while shut; here every one of the four figures is
+        answered again in the steps below it (the note under this one is the
+        argument), so there is nothing that has to be legible closed. */}
+  <div class="sec found${discOpen('how')?' on':''}">
+    ${foundHead('How it works','','how')}
+    <div class="found-b">
     <div class="facts">
       <div><span class="l">Length</span><span class="v">45 minutes</span></div>
       <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
@@ -4123,30 +4474,50 @@ V.interviews = (f) => {
       <li><span class="s-n">4</span><span class="s-b"><b>The report is yours</b>
         It stays in your account and you decide who ever sees it. Your level opens the course built for that level.</span></li>
     </ol>
+    </div>
   </div>
 `}
 </div></main>`;
 };
 
-V.agents = (f) => `<main class="main"><div class="page">
-  ${crumb(['Interviews','interviews'],'All agents')}
-  ${ph(f.reinterview?'Choose an agent for your re-interview':'Choose an agent','3 agents at your level &middot; 45 minutes, by video &middot; recorded')}
+/* ==========================================================================
+   "ALL AGENTS" IS ONE BLOCK WITH TWO CALL SITES
 
-  <div class="sec" style="padding-bottom:var(--s05)">
-    <div class="ai-aura tile">
-      <div class="ai-head">${talLabel()}<h3>Suggested for you</h3></div>
-      <div class="ai-body"><p>3 of 24 agents assess ${f.pred?'Explorer candidates':'at your level'} and have a slot inside seven days. They are ordered by how their past candidates progressed.</p></div>
-    </div>
-  </div>
+   Maryam, 31 Aug 2026: the Interviews module should carry the agent list under
+   its own head band, not only send you to `V.agents` for it. Two copies of a
+   heading, a sentence, a search field and a six-card grid is how the two start
+   to disagree — the `certCard` precedent, and the same reason `jrnList` is one
+   function drawn by three dashboards.
 
-  <div class="rail-wrap">
-    <div class="rail">${['priya','owen','lena'].map(k=>agentCardH(k)).join('')}</div>
-  </div>
+   THE SIXTH CARD WAS PRIYA AGAIN AND IS NOW CAMILA ROCHA. `AGENTS` held five
+   people and §15.1113 lays `.rail-all` out three to a row, so the sixth cell
+   repeated the first — the same name, rating and fee printed twice in one grid.
+   Maryam's call on 31 Aug 2026 was to add the sixth agent rather than drop to a
+   five-card grid (which leaves an empty cell against the hairline the
+   `nth-child(3n)` rule draws). Her row in `AGENTS` carries the whole argument,
+   including why every figure in it was picked to sit in a gap.
 
+   `.all-desc` IS LOAD-BEARING — trap 13. `.hd-srch` is not on §10.15's opt-out
+   list, so without a direct-child `.all-desc` this heading would take the 184px
+   label column and set "All agents" beside its own search field. It is inside
+   `.hd-srch-t` here, so the opt-out that actually fires is §16's on the SECTION
+   — which is why the sentence must stay a `.sec` descendant and not move into
+   the grid.
+   ========================================================================== */
+const allAgents = () => `
   <div class="sec">
     <div class="hd-srch">
       <div class="hd-srch-t">
-        <div class="sec-h"><h2>All agents</h2></div>
+        ${/* "Choose an agent for your interview", not "All agents" (Maryam,
+              31 Aug 2026). The block is the only thing left on the page since
+              the shortlist rail and the summary came off, so the heading is no
+              longer distinguishing this list from another one above it — it is
+              the page's instruction, and a count of the set is what the search
+              field beside it already says ("Search all 24 agents"). It names
+              the task on both call sites: on `V.agents` the page title says the
+              same thing one size up, and on `V.interviews` this is the block a
+              candidate with no interview booked scrolls to. */''}
+        <div class="sec-h"><h2>Choose an agent for your interview</h2></div>
         <p class="all-desc">Select an agent from whom you want to be interviewed.</p>
       </div>
       <div class="srch all-srch">
@@ -4157,12 +4528,58 @@ V.agents = (f) => `<main class="main"><div class="page">
   </div>
 
   <div class="rail-wrap">
-    <div class="rail rail-all">${['priya','owen','lena','samuel','hana','priya'].map(k=>agentCardH(k)).join('')}</div>
-  </div>
+    <div class="rail rail-all">${['priya','owen','lena','samuel','hana','camila'].map(k=>agentCardH(k)).join('')}</div>
+  </div>`;
+
+V.agents = (f) => `<main class="main"><div class="page">
+  ${crumb(['Interviews','interviews'],'All agents')}
+  ${''/* NO FACT ROW (Maryam, 31 Aug 2026). "3 agents at your level &middot; 45
+        minutes, by video &middot; recorded" was three marks and three phrases
+        under the title, and `phSub` draws each with its own 15px icon — so the
+        heaviest row on a page whose job is to show twenty-four faces was the
+        one above them. All three are said better elsewhere and none of them is
+        a spine: the count is the grid you are looking at, and "45 minutes,
+        recorded" is a `.kv` row on every agent's own page, where it is about
+        the interview you are actually booking. `ph()`'s own note is the rule —
+        where a page has no factual spine, it has no `sub` — and this page's
+        spine is the grid. */}
+  ${ph(f.reinterview?'Choose an agent for your re-interview':'Choose an agent')}
+
+  ${''/* AND TAL'S CARD IS GONE WITH THE SUMMARY (Maryam, 31 Aug 2026: remove
+        the summary from this page). BOTH HALVES HAVE TO GO, and that is trap
+        11 rather than tidiness: `placeSummaryPass` strips a band card's chips
+        and its head-row action BEFORE it reaches `if(!text) return`, so
+        deleting `PAGESUM.agents` while this card stayed would leave it in the
+        band stripped, with its `h3` intact, in a shape §33 does not style —
+        the band renders ~700px wider than the page. With no card and no entry
+        the pass builds nothing and the band is the title.
+
+        NOTHING IS LOST WITH THE WORDS. The card said "3 of 24 agents assess at
+        your level and have a slot inside seven days, ordered by how their past
+        candidates progressed", and the grid under it is that list, in that
+        order, with each agent's range, rating and next slot on their own card.
+        The page is a directory and it now opens as one. */}
+
+  ${''/* AND THE THREE SUGGESTED CARDS ABOVE "ALL AGENTS" ARE GONE (Maryam,
+        31 Aug 2026). A `.rail` of Priya, Owen and Lena sat between the summary
+        and the grid — and the grid's own first row is Priya, Owen and Lena, at
+        the same size, in the same order, with the same price, slot and Book
+        button. Two identical rows separated by one hairline is not a shortlist,
+        it is the page printed twice, and the second copy is the one with the
+        search field and the other twenty-one agents attached to it.
+
+        THE RANKING SURVIVES WITHOUT THE RAIL, which is what makes this a
+        subtraction rather than a loss. `allAgents()` draws its rows in the same
+        order, so the three Tal recommends are still the three you meet first;
+        what the rail added was a claim that they were a different KIND of
+        result, and Tal's sentence in the band above names all three with their
+        fees and says why. `agentCardH` keeps its other callers. */}
+  ${allAgents()}
 </div></main>`;
 
 V.agent = (f) => {
   const a = AGENTS[S.agent||'priya'];
+  const rec = REC[S.agent||'priya'];
   const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
@@ -4191,19 +4608,78 @@ V.agent = (f) => {
         states the facts. */}
   ${ph('Book ' + a.n, null, null, 'agents')}
   <div class="sec" style="padding-top:var(--s05)">
+    ${''/* THE BLOCK BESIDE THE PHOTOGRAPH IS `talRec`'S — 581:6460, Maryam,
+          31 Aug 2026. The identity card here was its own drawing: five gold
+          stars, the rating, the interview count, "Assesses E1–E3" and a green
+          "Verified" word — three lines and eight objects saying what the
+          dashboard's recommendation says in two. The two are the same subject
+          on two pages, so they are one shape now: name, the green check, the
+          single orange star with the figure, then the expertise line, then the
+          fact row.
+
+          THE MARKUP IS `talRec`'S VERBATIM AND NEEDS NO NEW CSS. Every §70.5
+          selector for this family is written `.app .rec-…` rather than under
+          `.rec`, so the block travels; `.agid` keeps the photograph's column
+          and `.rec-b` is what sits in the second one.
+
+          NO "NEXT SLOT" CELL (Maryam, same note). The recommendation card
+          carries `a.slot` because it is the reason to press Book from a
+          dashboard; this page IS the picker, so the next free time is the lit
+          cell in `.daystrip` 200px below and naming another one above it is
+          the disagreement `PAGESUM.agent` was removed for.
+
+          THE EXPERTISE CLAUSE DEGRADES, because `REC` has three entries and
+          `AGENTS` has five. Samuel and Hana have no expertise on record, so
+          they get the range alone rather than a lead-in with nothing after it
+          — and never Priya's, which is what `REC[k] || REC.priya` would do. */}
     <div class="agid">
       ${avatar(a,96)}
-      <div class="agid-b">
-        <div class="agid-n">${a.n}</div>
-        <div class="agid-r">${stars(a.r)}<span class="num">${a.r.toFixed(1)}</span><span class="agid-iv">&middot; ${a.ivs} interviews</span></div>
-        <div class="agid-c"><span>Assesses ${a.range}</span><span class="agid-v">${I.checkFilled}Verified</span></div>
+      <div class="rec-b">
+        <div class="rec-top">
+          <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
+              <span class="rec-v">${I.checkFilled}</span></span>
+            <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
+          <p class="rec-x">${rec?`<b>Expertise:</b> ${rec.expertise}, Assesses ${a.range}`
+            :`<b>Assesses</b> ${a.range}`}</p>
+        </div>
+        <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+          <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
       </div>
     </div>
     ${a.bio?`<p class="agid-bio">${a.bio}</p>`:''}
-    <div class="mt5 kv-bands">
-      <div class="kv"><span class="k">Interview fee</span><span class="v">${a.price}</span></div>
-      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
-      <div class="kv"><span class="k">Report turnaround</span><span class="v n">Within 24 hours</span></div>
+    ${''/* THE THREE FACTS ARE A ROW, NOT A STACK (Maryam, 31 Aug 2026):
+          `.facts.eo-facts`, the same cell §73 draws on the Enroll page — a
+          24px mark, the fact's NAME in h4, its value under it, and a hairline
+          centred in the grid's own column gap.
+
+          They were three `.kv` bands: a 184px label column, a value beside it,
+          a full-width rule under each, 150px of page for nine words. That is
+          the shape for a ledger of many rows read one at a time (`V.booking`'s
+          receipt, `V.account`'s settings); three facts about one purchase are
+          a row you take in at once, which is exactly what §73's note argues
+          about `enrolPlate`'s four.
+
+          THE LABEL IS THE STRONG LINE AND THE VALUE IS UNDER IT, which
+          inverts `.kv` and `.stat` both, and §73's note is the reason: these
+          are not figures being compared, they are three different things, so
+          what you scan is the names. The fee is the one accent string
+          (`eo-fv-acc`), because it is the only one of the three that is a
+          decision.
+
+          NO NEW CLASS AND NO NEW LAYER. Every §73 selector for this family is
+          written `.app .page .facts.eo-facts …` rather than under `.sec.eo`,
+          so the cell travels; what it could not do was count to three, and
+          that is answered in §73 itself by letting the grid count its own
+          children (§72's rule, applied one layer over). */}
+    <div class="facts eo-facts mt5">
+      ${[[I.wallet,   'Interview fee',    a.price, 1],
+         [I.time,     'Length',           '45 minutes, recorded'],
+         [I.document, 'Report turnaround','Within 24 hours']
+        ].map(([ic,lab,val,acc])=>`<div>
+        <i class="eo-fi">${ic}</i>
+        <span class="eo-fb"><span class="eo-fl">${lab}</span>
+          <span class="eo-fv${acc?' eo-fv-acc':''}">${val}</span></span>
+      </div>`).join('')}
     </div>
   </div>
   ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
@@ -4228,17 +4704,72 @@ V.agent = (f) => {
     </div>
     <div class="slots">${slots.map((t,i)=>
       `<button class="slot ${i===4?'on':''}" ${i===0||i===5?'disabled':''}>${t}</button>`).join('')}</div>
-    <p class="slots-note">Two other candidates are looking at Thursday. Slots are held for 10 minutes once you continue.</p>
+    ${''/* NO SCARCITY LINE (Maryam, 31 Aug 2026). "Two other candidates are
+          looking at Thursday. Slots are held for 10 minutes once you continue."
+          was two claims and the product can stand behind neither: nothing in
+          the build counts who is looking at a day, and no timer holds anything
+          — pressing Continue goes to a payment screen that waits indefinitely.
+          A countable-strangers line under a picker is a pressure device, and
+          §59 is a whole layer arguing that this product spends urgency only
+          where urgency is real. */}
   </div>
-</div></main>
-<div class="stickybar">
-  <div class="sb-b">
-    <span class="sb-when">Thu, Aug 20 &middot; 6:30 PM</span>
-    <span class="sb-price">${a.price}</span>
+
+  ${''/* THE PAGE CLOSES ON ONE BUTTON, AND IT REPLACED A FIXED BAR
+        (Maryam, 31 Aug 2026). `.stickybar` — the one in either portal — was
+        pinned to the bottom of the frame carrying the slot, the fee and
+        "Continue to payment". It sat ON TOP of the ask dock's own reserved
+        strip (§21.311 and §16.457 each push the dock and the FAB up 84px
+        purely to clear it), so the foot of the frame was two floating rows
+        deep, and the only thing on screen with a price on it was a slab that
+        scrolled with nothing.
+
+        THE THREE FACTS DID NOT COME WITH IT, AND THAT IS THE SECOND PASS. A
+        `.plate` stood here for one build restating "Your slot · Thursday 20
+        August at 6:30 PM · Interview fee $95" — and every one of those is
+        already on the page: the day and the time are the two lit cells in the
+        picker directly above, and the fee is the first cell of the `.facts`
+        row. A summary card 40px under the thing it summarises is the page
+        printed twice, so what is left is the ACTION, which is the one thing
+        the page did not have.
+
+        IT IS BLACK AND IT IS LEFT-ALIGNED. `.btn-p` in page flow is the
+        product's primary — the black button "Back to my dashboard" and "Book
+        Priya Now" are — and it is only the accent gradient INSIDE a plate,
+        which §19 states and the design-system note records. Taking the plate
+        away is therefore what makes the button black; there is no colour
+        stated here. It also takes the card out of `DARK_CARD`, so `placeDark`
+        no longer has anything to lift and `keep-place` is not needed.
+
+        THE FIGURE IS A LITERAL $695 AND IT IS MARYAM'S, TWICE ASKED FOR
+        (31 Aug 2026, reaffirmed after this was flagged). It was written
+        `${'$'}{a.price}` first, on this file's own rule — do not type a number a
+        record owns — which renders $95 for Priya, $85 for Owen, $80 for Lena.
+        It is a literal now because the instruction was explicit and repeated.
+
+        WHAT IS STILL OUT OF STEP, SO THE NEXT READER DOES NOT THINK IT IS
+        SETTLED: nothing else in the build says 695. The `.facts` row on this
+        same page prints `a.price`, the agent card you arrived from prints it,
+        `V.booking`'s Paid row prints it, and `AGENTS` is where all three read
+        it. If 695 is the real fee, the fix is `AGENTS.<agent>.price` and all
+        four surfaces follow; if it is the fee plus something this page does not
+        draw, the something belongs on the page before the total does. */}
+  <div class="sec">
+    <button class="btn btn-p" data-go="booking">Proceed to pay $695 ${I.arrowRight}</button>
   </div>
-  <button class="btn btn-p sb-go" data-go="booking">Continue to payment ${I.arrowRight}</button>
-</div>`;
+</div></main>`;
 };
+
+/* `.stickybar` IS NOW DRAWN BY NOTHING IN THIS PORTAL, AND ITS RULES STAY.
+   The class had one call site — the bar removed above — so eight layers
+   (§10, §11, §15, §16, §21, §29, §37, §63) now hold a family the product
+   never writes. That is deliberate and is NOT the "a gate nothing writes"
+   tell CLAUDE.md warns about: that test is for a component shipped without
+   the JS its behaviour needs, and `.stickybar` is complete CSS for a
+   self-contained shape a hand-authored page on `design-system/` can still
+   use. Include-by-default says an unused rule costs a rule; deleting it
+   across eight layers costs the cascade positions those layers argue for.
+   `.app:has(.stickybar)` in §21 and §16 simply never matches, which is what
+   gives the ask dock its own foot of the frame back. */
 
 /* THE CONFIRMATION IS A RECEIPT, AND A RECEIPT IS SHORT.
    Four changes, all the same argument — this page is read once, immediately
@@ -4276,18 +4807,59 @@ V.booking = (f) => {
   <div class="sec" style="padding-top:var(--s06)">
     <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>Interview booked</b>Thursday, August 20 at 6:30 PM ET with ${a.n}. A calendar invite and joining link are in your email.</div></div>
   </div>
+  ${''/* THE RECEIPT IS THE TWO COMPONENTS THIS PRODUCT ALREADY HAS (Maryam,
+        31 Aug 2026). It was a `.tile` holding a 40px `row-lead` and three `.kv`
+        bands — a 184px label column with one short value beside it, three times,
+        under a name in a smaller type than the page it confirms.
+
+        THE PERSON IS `talRec`'S BLOCK, the one `V.agent` now opens with, so the
+        agent you chose is drawn the same way on the page where you chose her,
+        the page that confirms it and the dashboard that reminds you. 96px
+        rather than 40: this is the subject of the receipt, not a row in it.
+
+        THE THREE FACTS ARE `.facts.eo-facts`, the row with the marks and the
+        centred dividers — the same cell the Enroll page's four figures use and
+        the same one `V.agent` states the fee, the length and the turnaround in.
+        Three cells, so §73's grid sizes three tracks (it counts its children).
+
+        THE MARKS ARE THE SUBJECTS, per `PH_IC`'s own rule: a calendar for when,
+        a clock for how long, a wallet for what was paid. No accent on any of
+        them — `.eo-fv-acc` is for a figure that is a DECISION, and this page is
+        the decision already taken.
+
+        THE PORTRAIT IS 56 AND THE ROW HAS AIR UNDER IT (Maryam, 31 Aug 2026).
+        `.agid`'s 96 — 112 at desktop — is sized for `V.agent`, where the block
+        beside it is three rows and a bio; here it is two, so the photograph ran
+        40px past the words and the pair read as a picture with a caption rather
+        than as one row. 56 is the height of the two lines it sits beside, and
+        `avatar()` writes the size inline, which is trap 1 working FOR us: the
+        inline value beats §15's `.agid > .av-ph` without a rule and without
+        touching the page that wants 96.
+
+        `mt6` on the figures is the space asked for: `.eo-facts`' own 20px top
+        padding is the gap between a HEADING and its cells, and this row follows
+        a person rather than a heading. */}
   <div class="sec">
-    <div class="tile">
-      <div class="row-lead">
-        ${avatar(a,40)}
-        <div style="flex:1">
-          <div class="t-heading-compact-01">${a.n}</div>
-          <div class="t-helper-01 mt3">Talent agent &middot; assesses ${a.range}</div>
+    <div class="agid">
+      ${avatar(a,56)}
+      <div class="rec-b">
+        <div class="rec-top">
+          <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
+              <span class="rec-v">${I.checkFilled}</span></span>
+            <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
+          <p class="rec-x"><b>Talent agent,</b> assesses ${a.range}</p>
         </div>
       </div>
-      <div class="kv mt5"><span class="k">When</span><span class="v">Thu, Aug 20 · 6:30 PM ET</span></div>
-      <div class="kv"><span class="k">Length</span><span class="v n">45 minutes, recorded</span></div>
-      <div class="kv"><span class="k">Paid</span><span class="v n">${a.price} · Visa ending 4242</span></div>
+    </div>
+    <div class="facts eo-facts mt6">
+      ${[[I.calendar,'When',  'Thu, Aug 20 &middot; 6:30 PM ET'],
+         [I.time,    'Length','45 minutes, recorded'],
+         [I.wallet,  'Paid',  `${a.price} &middot; Visa ending 4242`]
+        ].map(([ic,lab,val])=>`<div>
+        <i class="eo-fi">${ic}</i>
+        <span class="eo-fb"><span class="eo-fl">${lab}</span>
+          <span class="eo-fv">${val}</span></span>
+      </div>`).join('')}
     </div>
   </div>
   <div class="sec"><button class="btn btn-p" data-go="stage:booked">Back to my dashboard ${I.arrowRight}</button></div>
@@ -4365,9 +4937,15 @@ const COHORT_LEAD = {
    there is no cohort to name (`PAGESUM.payment`: "your cohort is assigned as
    soon as it clears"), so the Enroll page calls this with nothing and the
    confirmation calls it with 41. */
-function leaderCard(co){
+/* `lab` IS A SECOND ARGUMENT AND NOT A SECOND FUNCTION. The confirmation draws
+   this card beside a second one and the reference labels each inside its own
+   box; the Enroll page draws it inside the head band, where the section already
+   says what it is. One optional line rather than a `bare` variant, because the
+   only thing that differs is whether the card names itself. */
+function leaderCard(co, lab){
   const L = COHORT_LEAD;
   return `<div class="tile">
+    ${lab?`<span class="lbl">${lab}</span>`:''}
     <div class="row-lead">
       ${avatar(L,48)}
       <div style="flex:1">
@@ -4679,30 +5257,68 @@ V.payment = (f) => `<main class="main"><div class="page">
    ========================================================================== */
 V.welcome = () => `<main class="main"><div class="page">
   ${ph('Welcome to Cohort 41','Explorer Track &ndash; E3 &middot; starts 1 December &middot; a cohort of ten at your level',null,'dashboard')}
+  ${''/* THE RECEIPT ROW CARRIES ITS OWN WAY IN (Maryam, 31 Aug 2026, from the
+        reference). The banner said "your receipt is in Payments" and left the
+        reader to find Payments in the rail — a sentence pointing at the UI,
+        which is `PAGESUM`'s third content ban applied to page copy. `note-act`
+        is §24's shape for exactly this and the product already uses it on My
+        Level: the note keeps its words and the route sits at the far end of the
+        same row. Quiet, not accent — the page's one primary action is "Go to my
+        dashboard" at the foot, and a receipt is a thing you may want rather than
+        the thing to do. §64 gives it its own arrow, so no icon is written. */}
   <div class="sec">
-    <div class="note succ"><span>${I.checkFilled}</span><div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div></div>
+    <div class="note succ note-act"><span>${I.checkFilled}</span>
+      <div class="nb"><b>You are enrolled</b>$595 paid on Visa ending 4242. Your receipt is in Payments and a copy is in your email.</div>
+      <button class="btn btn-t btn-sm note-cta" data-go="billing">View payment</button></div>
   </div>
-  ${''/* THE LEADER, SECOND, BECAUSE SHE IS THE THING THAT CHANGED. Everything
-        above this is a transaction; the cohort and the person running it are
-        what the transaction bought. Same card as the Enroll page's, with the
-        cohort named this time — see `leaderCard`. */}
-  <div class="sec">
-    <div class="sec-h"><h2>Your cohort leader</h2></div>
-    ${leaderCard(41)}
+  ${''/* THE LEADER AND THE COHORT ARE TWO CARDS ABREAST — the reference's
+        second row, in our language. They were one card with a `.kv` under the
+        photograph, which made the cohort a property OF Priya; they are two
+        answers to two questions — who is running this, and what am I in — and
+        the page is the moment both are true for the first time.
+
+        `leaderCard()` IS CALLED WITH NO COHORT, which is what takes the `.kv`
+        row off it: that row moved into the second card whole, so nothing is
+        restated and the one function still draws the person on both pages.
+        The mark on the right-hand card is `.cardrow-ic`, the warm 40px chip
+        the product already uses for a row's subject — the reference draws a
+        tinted square there and this is ours.
+
+        NO `.sec-h` ON THE SECTION, so §10.15's label column never applies
+        (trap 13 answered by not creating the problem): each card carries its
+        own `.lbl`, which is §63's label role and needs no new type rule. */}
+  <div class="sec wpair">
+    ${leaderCard(null,'Your cohort leader')}
+    <div class="tile">
+      <span class="lbl">Leads</span>
+      <div class="row-lead">
+        <span class="cardrow-ic">${I.group}</span>
+        <div style="flex:1"><div class="t-heading-compact-01">Cohort 41 &middot; ten of you at Explorer &ndash; E3</div></div>
+      </div>
+    </div>
   </div>
   ${''/* AND THE ANSWER TO "SO WHAT DO I DO NOW" IS NOTHING, IN THREE PARTS.
         Counted rather than marked, which is the `.cardrow-n` shape the
         `booked` dashboard's "What to bring" uses — these are in time order and
         a number is what says so. None of them is a task: the point of the
-        block is that the next move is the product's, not the reader's. */}
+        block is that the next move is the product's, not the reader's.
+
+        EACH ROW GAINS ITS SUBJECT'S MARK AT THE FAR END, which is the
+        reference's right-hand chip and is `.cardrow-ic` again — the chapter is
+        a book, the board is the ten of you, the call is a date. It sits last
+        rather than first because `.cardrow-n` already opens the row and two
+        marks before the words would be a number introducing a picture. No rule
+        needed: `.cardrow-b` is `flex:1` (§02.256), so anything after it is
+        pushed to the right edge. */}
   <div class="sec">
     <div class="sec-h"><h2>What happens next</h2></div>
     <div class="tile-stack">
-      ${[['Nothing, until 1 December','Chapter 1, '+CH[0][0]+', unlocks that morning &middot; '+CH[0][1]+' min'],
-         ['Priya introduces the cohort on the board','Before the first call, so you know the ten of you by name'],
-         ['Your first live call is that Thursday','6:00 PM ET &middot; 60 minutes &middot; the invite is already in your email']
-        ].map(([t,d],i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
-        <span class="cardrow-b"><span class="cardrow-t">${t}</span><span class="cardrow-d">${d}</span></span></div>`).join('')}
+      ${[['Nothing, until 1 December','Chapter 1, '+CH[0][0]+', unlocks that morning &middot; '+CH[0][1]+' min',I.book],
+         ['Priya introduces the cohort on the board','Before the first call, so you know the ten of you by name',I.group],
+         ['Your first live call is that Thursday','6:00 PM ET &middot; 60 minutes &middot; the invite is already in your email',I.calendar]
+        ].map(([t,d,ic],i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${t}</span><span class="cardrow-d">${d}</span></span>
+        <span class="cardrow-ic">${ic}</span></div>`).join('')}
     </div>
   </div>
   <div class="sec"><button class="btn btn-p" data-go="stage:week1">Go to my dashboard ${I.arrowRight}</button></div>
@@ -5023,17 +5639,68 @@ V.cohort = (f) => `<main class="main"><div class="page">
         `.callband`'s CSS stays in §15/§19/§22 unreferenced. It is the only
         drawing of a date-tile row in the build and worth keeping around until
         someone decides it is not; nothing renders it today. */''}
-  <div class="sec">
-    <div class="plate">
-      <div class="plate-who">${avatar(AGENTS.priya,56)}
-        <span class="plate-wb"><b>Priya Nair</b><span>Cohort leader &middot; leads Cohort 41</span></span>
-      </div>
-      <div class="plate-eb">Weekly call &middot; in 2 days</div>
-      <div class="plate-t">Cohort 41, week ${f.week}</div>
-      <div class="plate-b">Thursday at 6:00 PM ET &middot; 9 others &middot; 60 minutes</div>
-      <div class="plate-a">
-        <button class="btn btn-p btn-sm noic" data-call="cohort">Join ${I.video}</button>
-        <button class="btn btn-sm noic plate-b2">Add to calendar</button>
+  ${''/* THE BAND'S SECOND COLUMN IS THE LEADER, AND THE CALL LEFT THE BAND
+        ALTOGETHER (Maryam, 31 Aug 2026). The plate that stood here — Priya's
+        face, "Weekly call · in 2 days", the three facts, Join and Add to
+        calendar — was the fourth drawing of the one appointment this product
+        has, and the note it replaces argued its way TO the plate for exactly
+        that reason. The answer has moved on: `crow` is that component now and
+        it is what the enrolled dashboards draw, so the call is a `.sec-call`
+        row under the band like everywhere else.
+
+        WHAT GOES IN THE SLOT IS THE PERSON, WHICH IS THE PAGE'S OTHER SUBJECT.
+        Cohort 41 is ten people and a leader; the discussion below is the ten,
+        so the head is the one. `.head-sec head-col` is the documented opt-in —
+        §70.3 gives `.head-col` column two, a hairline down its left edge and
+        `--layer-01` — so this is the dashboard's own top section with a third
+        tenant in it rather than a new arrangement. The instruction is that
+        rule: whatever goes beside Tal follows the dashboard's band.
+
+        THE WHITE GROUND COMES FREE AND IS THE POINT (Maryam: "the right side
+        card is not the part of the tal summary, that is why it will have white
+        bg"). §70.3's `background:var(--layer-01)` paints over the band's ramp,
+        so the wash reads as Tal's cell and the column beside it as the page's.
+        Nothing here states a colour.
+
+        `.jrn` / `.jrn-h` / `.jrn-t` ARE THE COLUMN'S FURNITURE, not the
+        journey's: a flex column and a heading row (§70.5). Reusing them is what
+        puts "Your cohort leader" on the same baseline as "Summary by Tal"
+        without a rule — the same reason `.sec-prog` reuses the wing's.
+
+        AND THE MESSAGE CONTROL RIDES THE PERSON'S ROW (Maryam, 31 Aug 2026).
+        It was a labelled button at the foot of the column, which made the card
+        four rows deep and put the action a whole block away from the face it
+        acts on. As a mark at the right-hand end of the name row it is where a
+        message control sits in every list this product draws — and losing the
+        row takes ~60px off the column, which is the height reduction asked for
+        and needs no rule: §70.3 stretches both cells to whichever is taller, so
+        the band simply closes up around Tal's sentence instead.
+
+        `data-go="messages"` OPENS THE PRIYA THREAD ITSELF rather than an inbox
+        — `V.messages` IS that conversation — so the mark does what it looks
+        like. The label moves to `aria-label`, because an icon alone is not a
+        name; §70.6 sizes the control. */}
+  <div class="sec head-sec head-col sec-lead">
+    <div class="jrn">
+      <div class="jrn-h"><h2 class="jrn-t">Your cohort leader</h2></div>
+      ${''/* EXPERTISE IS THE THIRD LINE OF THE PERSON, NOT A ROW UNDER THE CARD
+            (Maryam, 31 Aug 2026). It sat outside `.row-lead`, which put it back
+            on the column's own left edge under the photograph — so the card read
+            as a person and then a separate fact about somebody, and it cost a
+            whole row of the column's height. Inside the text cell it is what it
+            is: the third thing you know about her, on the same left edge as her
+            name and her role. `.crow-b` states the same three lines in the same
+            order on the call row 200px below, which is the shape this now
+            matches rather than invents. */}
+      <div class="row-lead">
+        ${avatar(COHORT_LEAD,48)}
+        <div style="flex:1">
+          <div class="t-heading-compact-01">${COHORT_LEAD.n}</div>
+          <div class="t-helper-01 mt3">Cohort leader &middot; leads Cohort 41</div>
+          <p class="rec-x mt3"><b>Expertise:</b> ${COHORT_LEAD.expertise}, assesses ${COHORT_LEAD.range}</p>
+        </div>
+        <button class="btn btn-t btn-sm noic" data-go="messages"
+          aria-label="Message ${COHORT_LEAD.n.split(' ')[0]}">${I.chat}</button>
       </div>
     </div>
   </div>
@@ -5041,9 +5708,18 @@ V.cohort = (f) => `<main class="main"><div class="page">
     <div class="ai-aura tile">
       <div class="ai-head">${talLabel()}<h3>What to bring on Thursday</h3></div>
       <div class="ai-body"><p>Priya is running week ${f.week} on ${f.week<=1?'why we exist':'hard conversations'}. Bring the Sam handover from your notes — it is the closest example you have.</p></div>
-      
+
     </div>
   </div>
+  ${''/* THE CALL, AS THE ROW EVERY OTHER PAGE DRAWS IT. `crow('cohort')` reads
+        `WEEK_CALL` and `COHORT_LEAD`, so the countdown, the session number and
+        the leader cannot disagree with the dashboard's copy of the same row —
+        which is the whole argument for `CALL_ROW` being the data and `crow`
+        being the markup. `.sec.sec-call` is `booked`'s wrapper rather than
+        `callRow()`'s: that one is a `.head-sec` for the band, and this band's
+        second column is spoken for. §73 takes the section's vertical padding
+        off, everywhere. */}
+  <div class="sec sec-call">${crow('cohort')}</div>
   ${/* sec-cs: this section holds a full-bleed tab strip, and §20 needs to know
         so the call plate above it can sit flush. Named rather than sniffed —
         the `:has()` that would have detected it has to nest, and nested
@@ -5156,7 +5832,24 @@ V.billing = (f) => {
           the only moment the number would have told you anything, and by then
           it is not on the page either. Until then it is a count of a list you
           can see in full, set against a ceiling nobody is near. */''}
-    <div class="sec-h"><h2>Saved cards</h2>${S.cards.length<3?`<button class="btn btn-p btn-sm noic sec-h-act" data-addcard="1">Add a card ${I.add}</button>`:''}</div>
+    ${/* AND IT IS TEXT WITH A PLUS ON IT, NOT A BLACK BUTTON (Maryam,
+          31 Aug 2026). `.btn-p` is the page's ONE primary action, and on
+          Payments that is not adding a second card — the page is a ledger you
+          came to read, and the black slab beside "Saved cards" was the
+          loudest object on it. `.btn-t` is §64's quiet variant: the border is
+          already transparent there, and §64's `.sec-h .btn-t{padding-right:0}`
+          sits the words flush with the column edge, so what is left is the
+          label and the mark. `I.add` stays, which is also what keeps §64 from
+          appending its arrow — that pseudo-element is gated on
+          `:not(:has(svg))`. `noic` stays too: it means "do not push the icon
+          to the far edge", which is the whole point of a text control. */''}
+    ${/* THE PLUS LEADS (Maryam, 31 Aug 2026). `ic-l` is the class the product
+          already uses for a mark that opens a label rather than closing it —
+          `.crow-a`'s Reschedule, the note's Book your interview — and it is the
+          right side for this one: a trailing mark reads as the RESULT of the
+          control (§64's arrow, "and then you go there"), a leading one reads as
+          what the control does to the list under it. Add is the second kind. */''}
+    <div class="sec-h"><h2>Saved cards</h2>${S.cards.length<3?`<button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button>`:''}</div>
     <div class="tile-stack">
       ${S.cards.map((c,i)=>`<div class="cardrow">
         <span class="cardrow-ic">${BMK[c.brand]||BMK.card}</span>
@@ -6225,7 +6918,14 @@ function signedSummary(withNote, re, footAction){
       ${withNote ? SIG_CARD(1, I.chat, 'Priya&rsquo;s note', '', re
         ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
         :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;') : ''}
-      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
+      ${''/* THE FOOT ACTION IS TEXT AND AN ARROW (Maryam, 31 Aug 2026). It was
+            `.btn-p` — the black slab — closing a block of three tinted cards on
+            a white panel, which made the loudest object on the page the way OUT
+            of the one thing on it a candidate reads. `.btn-t` is §64's quiet
+            variant: the border is already transparent there and the arrow is
+            already written, so what is left is the words and the mark. The one
+            primary action on this page belongs to the enrolment offer above. */}
+      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-t btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }
 

@@ -355,6 +355,46 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none;color:var(--text-primary)}
 
+/* AND THE ONE LABEL ON A FILLED GROUND TAKES THE ON-ACCENT INK (Maryam,
+   31 Aug 2026). `.pill-def` is the only member of the list above whose own
+   background is solid `--accent` — §15 draws it as a pill and §19 paints it
+   from the generated accent list — so the group's `--text-primary` put #111
+   on orange: 4.0:1, and it read as a disabled chip beside black card text
+   rather than as the marker for the card that gets charged. It keeps the
+   label role's size, weight and tracking; only the ink is the exception, and
+   it is stated here rather than in §15 because §63 owns every text colour in
+   the build. */
+.app .pill-def{color:var(--on-accent)}
+
+/* --- 7c. A NESTED PAGE'S TITLE IS AN h2 ---------------------------------
+   Maryam, 31 Aug 2026: whenever a page opens nested in, with a back button,
+   its heading is h2.
+
+   `.ph-back` IS THE WHOLE TEST AND IT IS THE RIGHT ONE, because `bk()` already
+   makes exactly this judgement in JS: it draws the arrow when there is history
+   AND the view is not a rail root — a page you arrived AT rather than a module
+   you navigated TO. So the mark and the size are one decision read two ways,
+   and a view that becomes a rail root stops being an h2 with no edit here.
+
+   IT IS A SIZE, NOT A TAG. The element stays `<h1>`: it is still the page's
+   one top-level heading and the outline a screen reader builds should say so.
+   What changes is the ROLE it takes from §63's ladder — 28/34 at desktop down
+   to 20/26 — because a nested page is a leaf inside a module rather than the
+   module itself, and "Book Priya Nair" set at the same size as "Interviews" a
+   click behind it makes the two read as siblings.
+
+   AND THE SAME THREE INKS FOR THE `.day` CHIP, which is the one other thing
+   in this block: §63 §5 puts `.day .d` in the description grey and §19 gives
+   `.day.on` a solid accent ground, so the weekday sat at 2.4:1 on orange while
+   the date beside it was white. Both lines take `--on-accent` when the chip is
+   the selection — the same pairing `.slot.on` has had since §03. */
+.app .ph:has(.ph-back) h1{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  letter-spacing:var(--t-h2-ls)}
+
+.app .day.on .d,.app .day.on .n,
+.app .day.sel .d,.app .day.sel .n{color:var(--on-accent)}
+
 /* --- desc: THE grey supporting line, and it is one grey ------------------
    Named in the brief: a description is grey and it is the same grey in every
    place a description appears. Every one of these was already a description;
@@ -432,6 +472,12 @@
   .app .ph h1,.app .t-h1,.app .u-h1,.app .t-heading-01{
     font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
     letter-spacing:var(--t-h1-ls-lg)}
+  /* …EXCEPT ON A NESTED PAGE — restated inside the tier per trap 3, because
+     the step above is what it has to beat and an unconditional rule cannot.
+     The unconditional half is in §7c. */
+  .app .ph:has(.ph-back) h1{
+    font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+    letter-spacing:var(--t-h2-ls)}
   /* THE LEVEL NAME DOES NOT GROW AT DESKTOP, and it is the only role that
      used to. §11 stepped it 34 → 40 alongside the h1's 24 → 28, which meant
      the gap between the page title and a section's subject widened the wrong
@@ -1066,6 +1112,49 @@
   text-transform:none}
 .app .rec-tag.need{color:#973177}
 .app .rec-tag.has{color:#0488c5}
+
+/* THE "RECOMMENDED" CHIP ON AN AGENT CARD — `.ag-rec`, §26.3b draws the pill.
+
+   THE EYEBROW ROLE, WHICH IS THE SMALLEST THE SCALE HAS. Maryam asked for a
+   smaller size to make the chip fit beside the name (31 Aug 2026) and 11.5 is
+   the floor — §63 §11's rule is take the nearest role rather than buy a size,
+   and going to 10 for one chip would be a tenth size with one reader. Strong,
+   because it is a label rather than a description; §4's eyebrow role is already
+   both of those.
+
+   BLUE ON LIGHT BLUE, AND `--link` RATHER THAN THE FILE'S #0488c5. The pair
+   measures 4.75:1 on §26's #e5f3f9 ground, which clears AA for this size; the
+   #0488c5 §70 uses for the overlap figure is 3.47:1 on the same ground and does
+   not. §70.5's note makes the identical substitution for the identical reason
+   and records that `--link` IS that hue darkened for exactly this.
+
+   NOT THE ACCENT, and that is the decision. This chip shipped orange for one
+   round: the accent is the Book button on all six cards, so an accent chip on
+   one of them competes with the control it sits above. Blue is §12's "this is a
+   fact about the object" ink and it is the only other ink on these cards. */
+.app .ag-rec{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;
+  color:var(--link)}
+
+/* THE ONE CLAIM THE BLOCK MAKES — 581:6539, 14px Kräftig #973177. Strong,
+   because the file sets it so and because it is the sentence the whole block
+   exists to deliver; the three fact rows above it are 400.
+
+   AND THIS IS THE FILE'S INK EXACTLY, WHICH THE TWO TAGS ABOVE DID NOT GET.
+   §70.5's note substituted `--mk-4` (#a83a6b) for #973177 on the grounds that
+   the tag's own #fbf1f9 pill dropped it under AA for 14px text. That was the
+   right call for a tinted pill and does not carry: with no ground under it the
+   same ink measures 6.95:1 on white, well clear of 4.5. `.rec-m i` keeps
+   `--link` for the file's #0488c5, which is 3.94:1 on white and does not pass —
+   so the two halves of this block treat the file differently, and the
+   difference is a measurement rather than a preference. */
+.app .rec-why{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;
+  color:#973177}
 /* transparent for the clip, exactly as the label above — §70 paints the ramp */
 .app .rec-alt{font-style:italic;color:transparent}
 

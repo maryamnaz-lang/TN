@@ -141,3 +141,40 @@
      a transition to it without deciding. */
   .app .nav-t-mark,.app .nav-t-menu{transition:none}
 }
+
+/* ==========================================================================
+   AND WITH THE DRAWER OPEN THE PAGE TAKES THE MARGIN BACK
+
+   Maryam, 31 Aug 2026, marking the two bands of white either side of the
+   content: with the navigation open, no margins from left or right.
+
+   §14.3b sets a desktop page in from both sides — `clamp(--s06, 12cqw, 200px)`
+   — and its own note says why: the rail gave the width back and the content
+   ran from the rail to the frame with only its 32px gutter, so the column is
+   placed on the screen rather than poured into it. That reasoning holds while
+   the rail is a 72px strip of icons. It stops holding when the drawer is open:
+   the drawer is 240-odd pixels of the frame, and the margin is then charged
+   TWICE on the left — once by the navigation and once by §14 — so the reading
+   column loses about 350px and the two-column head band collapses toward its
+   900px breakpoint on a 1280px frame.
+
+   SO THE MARGIN IS THE SHUT STATE'S. Open, the page pays only what its own
+   sections pay: `--pad-x`, which is what keeps the words off the edge on every
+   width below 900 (§29's note — "`.main` pays no side padding on any page below
+   900"), so this is a state the layout already has rather than a new one.
+
+   IT HAS TO BE STATED INSIDE THE SAME CONTAINER QUERY — trap 3. §14.3b is in
+   `@container app (min-width:900px)`, and a rule inside a container query beats
+   an unconditional rule of equal weight whatever the layer order, so an
+   `.app[data-rail="open"] .main` written outside this block would lose to a
+   plainer selector in an earlier file. Below 900 there is nothing to answer:
+   the drawer is an overlay there and `--main-pad` is already 0.
+
+   `data-rail` IS THE PERSISTENT STATE, which is trap 5's distinction. `S.nav`
+   is written into it by `shell()` on every render, so it survives the paint;
+   the transition markers (`data-open`) are for motion only and layout must
+   never read them.
+   ========================================================================== */
+@container app (min-width:900px){
+  .app[data-rail="open"] .main{padding-left:0;padding-right:0}
+}

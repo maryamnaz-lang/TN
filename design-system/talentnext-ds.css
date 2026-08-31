@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4431.  Rules dropped as product-specific: 176.
+   Rules kept: 4465.  Rules dropped as product-specific: 176.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3790,6 +3790,7 @@ button{font-family:var(--font-sans)}
   .app .rail.rail-all{grid-template-columns:repeat(3,minmax(0,1fr)); border-top:1px solid var(--rule)}
   .app .rail.rail-all .agh{border-bottom:1px solid var(--rule); border-right:1px solid var(--rule)}
   .app .rail.rail-all .agh:nth-child(3n){border-right:0}
+  .app .rail.rail-all .agh:nth-last-child(-n+3){border-bottom:0}
   .app .rail.rail-all .agh:nth-child(3n+1){padding-left:var(--pad-x)}
   .app .rail.rail-all .agh:nth-child(3n){padding-right:var(--pad-x)}
 }
@@ -3874,6 +3875,7 @@ button{font-family:var(--font-sans)}
 .app .composer-send svg{width:20px; height:20px; fill:var(--on-accent); display:block}
 .app .ivlist{margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1); border-top:1px solid var(--rule)}
 .app .ivrow{padding:var(--s06) var(--pad-x); border-bottom:1px solid var(--rule); cursor:pointer}
+.app .ivrow:last-child{border-bottom:0}
 .app .ivrow-h{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s05); flex-wrap:wrap}
 .app .ivrow-eb{font-size:11px; line-height:15px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
 .app .ivrow-out{font-size:13.5px; line-height:19px; font-weight:600; color:var(--accent-text)}
@@ -3912,6 +3914,7 @@ button{font-family:var(--font-sans)}
   .app .page:not(.form-page) .sec > .cs{margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1)}
 }
 .app .sec > .cs{margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1)}
+.app .page > .modhead + .sec > .cs{border-top:0}
 .app .msg-page,
 .app .msg-page > .msgs,
 .app .msg-page > .msg-foot{min-width:0}
@@ -4615,9 +4618,10 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .ph{padding-bottom:var(--s05)}
   .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)){padding-bottom:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){padding-top:var(--s05)}
-  .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call){padding-bottom:var(--s05)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){padding-top:var(--s05)}
+  .app .page > .sec:has(> .plate) + .sec.sec-cs,
+  .app .page > .sec-call + .sec{padding-top:0}
   .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
 }
 
@@ -5168,6 +5172,8 @@ button.btn-p:active,
 .app .page .agh.agh-book > .agh-m{grid-area:meta; padding-top:var(--s02)}
 .app .agh-book .agh-n{position:relative; font-size:17px; line-height:23px; font-weight:600; letter-spacing:-.1px; color:var(--text-primary)}
 .app .agh-book .agh-n .ag-price{position:absolute; right:0; top:0; font-size:24px; line-height:30px; font-weight:600; letter-spacing:-.4px; color:var(--text-primary); white-space:nowrap}
+.app .agh-book .agh-nn{min-width:0; display:block}
+.app .agh-book .ag-rec{display:inline-flex; align-items:center; flex:none; height:18px; padding:0 6px; margin:0 0 0 6px; border-radius:100px; background:#e5f3f9; vertical-align:middle; white-space:nowrap}
 .app .page .agh.agh-book > .agh-m{min-height:17px}
 .app .agh-book .agh-n{min-height:23px}
 @container app (max-width:479.98px){
@@ -5734,6 +5740,9 @@ button.btn-p:active,
   .app .nav-t-mark,
   .app .nav-t-menu{transition:none}
 }
+@container app (min-width:900px){
+  .app[data-rail="open"] .main{padding-left:0; padding-right:0}
+}
 
 /* ---- 35-book.css ---- */
 .app .bkw{display:block; margin-top:var(--s05); --pad-x:0px}
@@ -5903,6 +5912,7 @@ button.btn-p:active,
 /* ---- 37-refit.css ---- */
 .app .page > .rail-wrap:has(+ .sec){position:relative}
 .app .page > .rail-wrap:has(+ .sec)::after{content:''; position:absolute; bottom:0; left:var(--pad-x); right:var(--pad-x); height:1px; background:var(--rule); pointer-events:none}
+.app .page > .rail-wrap:has(> .rail-all)::after{display:none}
 .app .ai-label.bare{height:auto; min-height:0; padding:0; border:0; gap:var(--s03); background:none; background-color:transparent; background-image:none; animation:none; color:var(--accent-text)}
 .app .ai-label.bare::before{width:16px; height:16px; background-color:transparent; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; -webkit-mask:none; mask:none}
 .app .wkc-go{margin-top:var(--s05)}
@@ -6559,6 +6569,7 @@ button.btn-p:active,
 .app .plate-bi b{color:var(--on-dark); font-weight:600}
 .app .page .stats > .stat:not(:has(> .stat-ic)){grid-template-columns:minmax(0,1fr); grid-template-areas:'top' 'd'; column-gap:0}
 .app .cardrow-n{flex:none; width:20px; font-size:13.5px; line-height:22px; font-weight:600; letter-spacing:.1px; font-variant-numeric:tabular-nums; color:var(--text-helper)}
+.app .modhead:not(:has(> .head-col)) > .ph:not(:has(.ph-f)) + .sec:has(> .ai-aura.talsum){padding-top:0}
 
 /* ---- 57-authsplit.css ---- */
 @container app (min-width:900px){
@@ -6628,6 +6639,7 @@ button.btn-p:active,
 @media (prefers-reduced-motion: reduce){
   .app .wing-lvl .ladder i.on::before{animation:none; transform:none}
 }
+.app .wing-lvl .ladder-track i.mine{background-color:color-mix(in srgb, var(--accent) 26%, #fff); background-image:none; opacity:1; color:var(--text-primary)}
 .app .wing-lvl .ladder-lab{display:grid; grid-template-columns:repeat(15,minmax(0,1fr)); gap:2px}
 .app .wing-lvl .ladder-lab > span{grid-column:span 5; justify-self:start; min-width:0; text-align:left}
 .app .wing-lvl .prog-pct{font-variant-numeric:normal; font-feature-settings:normal}
@@ -6933,6 +6945,12 @@ button.btn-p:active,
 .app .score-pts .l,
 .app .path-you,
 .app .chev-you{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-primary)}
+.app .pill-def{color:var(--on-accent)}
+.app .ph:has(.ph-back) h1{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); letter-spacing:var(--t-h2-ls)}
+.app .day.on .d,
+.app .day.on .n,
+.app .day.sel .d,
+.app .day.sel .n{color:var(--on-accent)}
 .app .sub,
 .app .gcard-b .sub,
 .app .cardrow-d,
@@ -7024,6 +7042,7 @@ button.btn-p:active,
   .app .t-h1,
   .app .u-h1,
   .app .t-heading-01{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); letter-spacing:var(--t-h1-ls-lg)}
+  .app .ph:has(.ph-back) h1{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); letter-spacing:var(--t-h2-ls)}
   .app .lvl-hero .big,
   .app .big{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); letter-spacing:var(--t-h2-ls)}
 }
@@ -7199,6 +7218,8 @@ button.btn-p:active,
 .app .rec-tag{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none}
 .app .rec-tag.need{color:#973177}
 .app .rec-tag.has{color:#0488c5}
+.app .ag-rec{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--link)}
+.app .rec-why{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:#973177}
 .app .rec-alt{font-style:italic; color:transparent}
 .app .qa-c{color:var(--text-primary)}
 .app .qa-b b{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none}
@@ -7382,6 +7403,11 @@ button.btn-p:active,
 .app .modhead > .sec.head-sec::before{display:block; content:''; position:absolute; left:var(--pad-x); right:var(--pad-x); top:0; height:1px; background:var(--rule)}
 .app .modhead > .sec.head-sec::after{display:none}
 .app .modhead > .sec.head-sec > .sec-h{margin-bottom:var(--s04)}
+.app .page .sec.wpair{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s05); align-items:start}
+@container app (min-width:900px){
+  .app .page .sec.wpair:has(> .tile > .row-lead){display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:var(--s07)}
+}
+.app .page .sec.wpair > .tile > .lbl{display:block; margin-bottom:var(--s05)}
 
 /* ---- 70-ainative.css ---- */
 .app{--ai-1:#f47113; --ai-2:#e2a600; --ai-3:#f0530c; --ai-amber:var(--ai-2); --ai-grad:linear-gradient(99.54deg,
@@ -7399,7 +7425,9 @@ button.btn-p:active,
   .app .ai-run rect{animation:none; stroke-dashoffset:676}
 }
 .app .modhead > .sec.head-col::before{display:none}
-.app .modhead > .sec:has(> .ai-aura.talsum){background-image:var(--ai-wash)}
+.app .modhead:has(> .sec-jrn) > .sec:has(> .ai-aura.talsum){background-image:var(--ai-wash)}
+.app .modhead::before{background-image:var(--ai-wash)}
+.app .modhead:has(> .sec-jrn)::before{background-image:none}
 .app .modhead .ai-aura.talsum .ai-body p b{background-color:var(--ai-hl-bg); border-radius:4px; padding:1px 4px; margin:0 -1px; -webkit-box-decoration-break:clone; box-decoration-break:clone}
 .app .modhead .ai-aura.talsum > .ai-body,
 .app .modhead .ai-aura.talsum > .ai-body p{max-width:733px}
@@ -7407,13 +7435,13 @@ button.btn-p:active,
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
 .app .ai-label.bare.rec-lab::before{content:''; width:12px; height:12px; flex:none; border-radius:0; background-color:transparent; background-image:var(--ai-grad); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat; box-shadow:none; animation:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
-.app .modhead:has(> .head-col) > .ph{position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; clip-path:inset(50%); overflow:hidden; white-space:nowrap}
+.app .modhead:has(> .head-col) > .ph.ph-you{position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; clip-path:inset(50%); overflow:hidden; white-space:nowrap}
 .app .modhead > .head-col{padding:var(--s06) var(--pad-x) var(--s06); border-top:1px solid #d7d5cc}
 @container app (min-width:900px){
   .app .modhead:has(> .head-col){display:grid; grid-template-columns:minmax(0,1fr) clamp(300px, 36%, 471px); column-gap:0; row-gap:0; align-items:stretch}
   .app .modhead:has(> .head-col) > *{grid-column:1}
-  .app .modhead:has(> .head-col) > .head-col{grid-column:2; grid-row:1; display:flex; align-items:flex-start; margin:0; padding:var(--s07); border-top:0; border-left:1px solid #d7d5cc; background:var(--layer-01)}
-  .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum){grid-column:1; grid-row:1; display:flex; align-items:flex-start; margin:0; padding:var(--s07) var(--s07) var(--s07) var(--pad-x)}
+  .app .modhead:has(> .head-col) > .head-col{grid-column:2; grid-row:1; display:flex; align-items:flex-start; margin:0; padding:var(--s06) var(--s07); border-top:0; border-left:1px solid #d7d5cc; background:var(--layer-01)}
+  .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum){grid-column:1; grid-row:1; display:flex; align-items:flex-start; margin:0; padding:var(--s06) var(--s07) var(--s06) var(--pad-x)}
   .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum) > .ai-aura{width:100%}
   .app .modhead:has(> .head-col) .ai-aura.talsum > .ai-head > .ai-label{margin-top:0}
   .app .page:has(> .modhead > .head-col){padding-top:0}
@@ -7421,7 +7449,7 @@ button.btn-p:active,
 @container app (min-width:1180px){
   .app .modhead:has(> .head-col) > .head-col{padding-left:57px}
 }
-.app .jrn{display:flex; flex-direction:column; gap:20px; width:100%}
+.app .jrn{display:flex; flex-direction:column; gap:var(--s04); width:100%}
 .app .jrn-h{display:flex; align-items:center; justify-content:space-between; gap:var(--s04)}
 .app .jrn-t{margin:0}
 .app .jrn-pill{flex:none; display:inline-flex; align-items:center; justify-content:center; padding:3px 14px; border:1px solid var(--ai-1); border-radius:100px; background-image:linear-gradient(90deg,
@@ -7455,8 +7483,10 @@ button.btn-p:active,
 .app .rec-tag{display:inline-flex; align-items:center; justify-content:center; padding:5px 16px; border-radius:100px}
 .app .rec-tag.need{background-color:#fbf1f9}
 .app .rec-tag.has{background-color:#e5f3f9}
-.app .rec-a{flex:none; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s04); width:186px}
+.app .rec-a{flex:none; margin-left:auto; display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:var(--s04); width:382px}
 .app .rec-a > .btn{width:185px; min-height:40px; justify-content:center; gap:var(--s03); padding-left:20px; padding-right:var(--s05)}
+.app .rec-a > .btn.rec-see{color:#f47113; border-color:#f47113}
+.app .rec-a > .btn.rec-see svg{fill:#f47113}
 .app .rec-alt{appearance:none; -webkit-appearance:none; margin:0; padding:0; border:0; background:none; text-align:left; cursor:pointer; background-image:var(--ai-grad-alt); -webkit-background-clip:text; background-clip:text; text-decoration:underline; text-decoration-color:var(--ai-1); text-underline-offset:2px}
 @container app (max-width:599.98px){
   .app .rec-l{flex-direction:column; gap:var(--s05)}
@@ -7479,6 +7509,7 @@ button.btn-p:active,
 .app .sk-f{width:140px; height:19px}
 .app .sk-m{width:198px; height:19px}
 .app .sk-t{flex:1 1 0; min-width:0; height:29px; border-radius:100px}
+.app .sk-why{flex:0 1 490px; height:19px; border-radius:var(--radius)}
 @container app (max-width:599.98px){
   .app .sk-ph{width:min(100%, 220px)}
   .app .sk-n,
@@ -7529,6 +7560,13 @@ button.btn-p:active,
     color-mix(in srgb, var(--ai-3) 20%, transparent) 99.58%)}
 .app .askdock .askline-send svg{width:20px; height:20px; fill:currentColor}
 .app .askdock > .askline{border-color:var(--ai-1)}
+@container app (min-width:900px){
+  .app .modhead:has(> .head-col) > .ph:not(.ph-you){grid-column:1; grid-row:1}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .sec:has(> .ai-aura.talsum){grid-row:2}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .head-col{grid-row:1 / span 2}
+}
+.app .sec-lead .row-lead > .btn{flex:none; align-self:flex-start; width:36px; height:36px; min-height:0; padding:0; display:grid; place-items:center; background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
+.app .sec-lead .row-lead > .btn svg{width:20px; height:20px; fill:var(--mk-1)}
 
 /* ---- 71-coursehead.css ---- */
 @container app (min-width:900px){
@@ -7656,8 +7694,8 @@ button.btn-p:active,
 .app .sec.eo .aih-a > .btn{width:185px; min-height:40px; justify-content:center}
 .app .eo-when{display:inline-flex; align-items:center; justify-content:center; gap:var(--s03); align-self:center; min-height:40px; padding:0 var(--s05); background:color-mix(in srgb, var(--accent) 10%, transparent)}
 .app .eo-when svg{flex:none; width:16px; height:16px; fill:var(--accent-text)}
-.app .page .facts.eo-facts{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; column-gap:var(--s07); background:none; border:0; padding:20px 0 0}
-.app .page .facts.eo-facts > div{position:relative; display:flex; flex-direction:row; align-items:flex-start; gap:var(--s04); min-width:0; padding:0; background:none}
+.app .page .facts.eo-facts{display:grid; grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:0; column-gap:var(--s07); background:none; border:0; padding:20px 0 0}
+.app .page .facts.eo-facts > div{position:relative; grid-column:auto; display:flex; flex-direction:row; align-items:flex-start; gap:var(--s04); min-width:0; padding:0; background:none}
 .app .page .facts.eo-facts > div + div::before{content:''; position:absolute; left:calc(var(--s07) / -2); top:0; bottom:0; width:1px; background:var(--rule)}
 .app .eo-fi{flex:none; display:grid; place-items:center; width:24px; height:24px}
 .app .eo-fi svg{width:24px; height:24px; fill:var(--text-secondary)}
@@ -7667,6 +7705,7 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .sec:has(> .cov-row){display:block}
   .app .sec:has(> .cov-row) > .sec-h{border-right:0; min-height:0}
+  .app .page .sec > .sec-h.aih{padding-right:0}
 }
 .app .cov-pill{display:inline-flex; align-items:center; min-height:24px; padding:0 var(--s04); background:var(--layer-accent-02, var(--layer-02))}
 .app .cov-row{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:1px; background-color:var(--rule); border:1px solid var(--rule)}
@@ -7679,9 +7718,18 @@ button.btn-p:active,
   .app .page .sec > .sec-h.aih > .aih-b{max-width:none}
   .app .page .sec > .sec-h.aih > .aih-a{flex-direction:column; align-items:stretch; width:100%; margin-left:0; gap:var(--s03)}
   .app .sec.eo .aih-a > .btn{width:100%}
-  .app .page .facts.eo-facts{grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06) var(--s05); padding-top:var(--s05)}
+  .app .page .facts.eo-facts{grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06) var(--s05); padding-top:var(--s05)}
   .app .page .facts.eo-facts > div + div::before{content:none}
   .app .cov-row{grid-template-columns:repeat(5,minmax(200px,1fr)); overflow-x:auto; border-left:0; border-right:0}
+}
+@container app (min-width:900px){
+  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call){padding-top:var(--s07); padding-bottom:var(--s07)}
+}
+.app .modhead:not(:has(> .sec))::before,
+.app .modhead:not(:has(> .sec))::after{display:none}
+.app .sec.sec-call{padding-top:0; padding-bottom:0}
+@container app (min-width:900px){
+  .app .page .sec.sec-call{padding-top:0; padding-bottom:0}
 }
 
 /* ---- 74-signedcards.css ---- */
@@ -7707,3 +7755,4 @@ button.btn-p:active,
   .app .sig-pair{grid-template-columns:minmax(0,1fr)}
   .app .signed-when{padding-left:0; border-left:0}
 }
+.app .page .sec > .signed{border-top:1px solid var(--rule); padding-top:var(--s07)}

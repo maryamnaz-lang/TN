@@ -63,8 +63,38 @@ cd hifi/build && python3 build.py
 cd design-system && python3 build-ds.py
 ```
 
-**It is INCLUDE-BY-DEFAULT, and that was a correction.** A new component needs no step at all:
-build it as a layer in `hifi/build/`, rebuild, it is in the design system.
+**It is INCLUDE-BY-DEFAULT FOR A CLASS AND OPT-IN BY HAND FOR A LAYER, and that asymmetry is
+the one step that is easy to miss.** Once a layer is in the list, every class in it crosses
+unless an `EXCLUDE_PREFIXES` entry names it — that is the include-by-default part, and it was
+a correction. But **`LAYERS` in `build-ds.py` is a hand-written list, so a NEW LAYER FILE IS
+NOT PICKED UP BY REBUILDING.** Add the layer to `build.py`, add it to `build-ds.py`'s `LAYERS`
+with a note on what crosses and why, then re-run both builds.
+
+**Nothing used to warn, and it cost four layers.** `verify_subset` checks output → source
+("does every rule I wrote trace back to a layer?"), which a layer that was never read passes
+trivially; coverage is the other direction and had nothing checking it. §70 shipped
+`.jrn-pill`'s ink with no pill and `.rec-alt`'s `color:transparent` with no gradient under it;
+§72's note predicted the same failure and §73/§74 walked into it anyway, so `.aih-t`'s size,
+`.eo-pill`'s violet and `.signed-card`'s title hue all reached the output with nothing to draw
+them. The shape of the failure is always the same and is always quiet: **§63 IS in the list**,
+so the design system ships a family's type with no layer stating its grid, ground or geometry —
+a half-shipped stylesheet, which renders as a subtly wrong page rather than an absent one.
+
+`check_coverage()` now answers it: `build-ds.py` reads `build.py`'s own layer list and **exits
+1** on any layer that is in neither `LAYERS` nor `NOT_IN_DS`. Every build prints
+`layer coverage: N of M portal layers`, so read that line rather than trusting a rebuild.
+`NOT_IN_DS` holds the deliberate omissions with their reasons, and there is exactly one:
+**`49-agentstar.css`**, which is one portal's 16px sizing of `.stars` — a class the system
+already ships and already draws — rather than a component. That layer's own note makes the
+argument; it is the single place this build breaks the "change a layer, re-run both" rule, and
+it is now stated where the list is instead of only in the layer.
+
+**And a layer can go dead the other way too.** §73's `aiHead` replaced §72's own head row, and
+`.pulse-head` / `.pulse-ttl` / `.pulse-lede` / `.pulse-mk` kept shipping with nothing writing
+them — the "gate nothing writes" tell, invisible in the portal because a dead rule costs
+nothing on the page it was written for, and expensive in the box because `gallery.html` went on
+teaching that markup as the recipe. All four are deleted. When a layer takes over another's
+job, grep both files for the classes it replaced.
 
 The first version kept a `SYSTEM` allowlist and asked "does a *second* portal need this word?".
 `tn-agent-portal.html` was built on that output — 127 classes, only two unstyled — and still
@@ -756,6 +786,21 @@ time"). Read this before adding a fourth — it needs no new class and no new ty
   in it — 9px of empty row under the title before its own 12px margin even began. The gaps
   computed to exactly 12 and 20, the specified numbers, and the heading still read as detached
   from its own description. **The margin was right and the box was wrong.**
+- **AND THE CENTRING NEEDS `align-self:center` STATED — `align-items:center` ON THE ROW IS NOT
+  ENOUGH.** §37.11b sets `align-self:flex-start` on every child of a `.sec-h`, on the reasoning
+  that it is inert "wherever the box is not stretched — a full-width heading row is exactly its
+  own content's height, so there is no free space to move into". True of every `.sec-h` that
+  existed when it was written; **`.aih` broke that assumption** by putting two items of
+  different heights in the row. Its exclusion cannot catch it either: `:not(:has(> .btn))`
+  wants the control as a *direct* child and `aiHead` nests it inside `.aih-a`. §73 states
+  `align-self:center` on both children at (0,6,0), which beats §37's (0,4,1).
+  **THE 14px COINCIDENCE IS WHY IT SHIPPED WRONG FOR A BUILD.** 613:7984 puts the 40px action
+  group at y=14 inside the 68-tall block, and 14 *is* the centred offset for those two heights
+  ((68 − 40) / 2) — so top-aligned, the gap between the two tops measures the file's own number.
+  Measuring "is the action 14px down" confirms both states. **The test is the MID-POINTS**:
+  centred is `deltaMid == 0` at every pair of heights, and the cover row (53 / 32) reads 10.5
+  rather than 14, which is the tell. This is trap 19's family — a property whose meaning or
+  winner depends on a parent an earlier layer was reasoning about.
 - **THREE SIZES WHERE THERE SHOULD HAVE BEEN ONE.** `.pulse-ttl`, `.eo-ttl` and `.cov-ttl`
   rendered 16, 12.5 and 14 — because §63 §8b sizes section headings inside a container query
   through eight `:has()` selectors, and each section matched a different one. `.aih-t` and
@@ -856,9 +901,13 @@ applied one page earlier.
 - **ONE STAR PER PAGE REGION.** The sparkle is the offer heading's alone. "What the 90 days
   cover" is a plain `<h2>` — the band already has "Summary by Tal" and the offer above carries
   the second; a third on the block underneath stops reading as attribution and becomes a bullet
-  style. `.eo-mk` is 18px against §70.2a's 12 on the band's label, which is 613:7987's size
-  beside a 16px heading.
-- **AND `.eo-mk` IS NOT `.ai-label` OR `.ai-aura`** — the same hoist trap §72 records. This
+  style. **The class is `.aih-mk`, not `.eo-mk`** — there is no `.eo-mk` and there never was in
+  the shipped build: the mark is `aiHead`'s `mark:true` option, so the offer and the pulse wear
+  the same object. It is **12px**, not the 18 an earlier draft of this note recorded; §70.2a's
+  reasoning won (below the cap height of the words it is a bullet introducing the line, above it
+  a second object competing with it) and one value everywhere is what stops it drifting when a
+  heading's size changes.
+- **AND `.aih-mk` IS NOT `.ai-label` OR `.ai-aura`** — the same hoist trap §72 records. This
   section is the page's second block and must stay there.
 - **THE CLOSING SOCIAL-PROOF ROW WENT** (Maryam, 31 Aug 2026): a tinted bar with "Learners like
   you spend about 12 hours…", three cohort faces and "You're in good company". Two of its three

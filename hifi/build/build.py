@@ -916,6 +916,16 @@ css = css.replace('__AUTHMARK__', f'data:image/webp;base64,{mark}')
 # whole product reads is the wrong place for a photograph two tiles on one
 # surface use, and changing a face in `AV` changes it on nine other pages.
 #
+# `faceW` HAS A THIRD READER NOW AND THE RULE ABOVE STILL HOLDS. `AGENTS.camila`
+# (data.js) is the sixth agent, added on 31 Aug 2026 so the All-agents grid stops
+# repeating Priya in its sixth cell, and her portrait is `CALL_ART.faceW` read
+# DIRECTLY rather than copied into `AV` — which is the distinction that note is
+# making: one more named reader is fine, one more row in the table nine pages
+# walk is not. It works because this block is concatenated ahead of data.js
+# below, so the const is initialised before `AGENTS` is built; if that order ever
+# changes, `AGENTS.camila.img` is the thing that breaks. 240px also covers her
+# 72px `.agh` card and the 166px `.rec-ph` if she is ever recommended.
+#
 # WebP at q78/q80 for the reason the sign-up artwork's note gives: these are
 # photographs, which is the content type WebP is best at, and 28 KB for all
 # three against 99 KB of source JPEG.

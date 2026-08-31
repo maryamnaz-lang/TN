@@ -59,11 +59,29 @@
    booking bubble (§35), where the wrapper is not a page-level block and the
    bubble draws its own boundaries.
    -------------------------------------------------------------------------- */
+/* AND NOT WHEN THE RAIL IS `.rail-all`, WHICH ALREADY HAS A BOTTOM EDGE.
+   §29.6 gives `.page > .rail-wrap > .rail` both a `border-top` and a
+   `border-bottom` — the grid's own box — so on the all-agents grid this drew a
+   SECOND line 24px under the first, inset by the gutter while the box edge runs
+   full width. It could not show until now: the gate is `:has(+ .sec)` and that
+   grid was always the last block on its page, so §37's own note ("a rail that
+   ENDS a page needs no closing rule") was describing the only case there was.
+   `V.interviews` now puts the How-it-works disclosure after it, which is what
+   armed this rule against a block that did not need it — Maryam, 31 Aug 2026:
+   "remove the extra divider at the bottom".
+
+   THE SHORTLIST RAILS STILL WANT IT. `.rail` without `.rail-all` is the
+   three-card horizontal shortlist, and §29.6 gives that a bottom border too —
+   but those sit inside a section's flow rather than as a full-bleed grid, and
+   the closing rule is what separates the rail from the section under it at the
+   CONTENT margin. Keyed on the grid, not on the wrapper, so only the case with
+   its own box opts out. */
 .app .page > .rail-wrap:has(+ .sec){position:relative}
 .app .page > .rail-wrap:has(+ .sec)::after{
   content:'';position:absolute;bottom:0;
   left:var(--pad-x);right:var(--pad-x);
   height:1px;background:var(--rule);pointer-events:none}
+.app .page > .rail-wrap:has(> .rail-all)::after{display:none}
 
 /* --------------------------------------------------------------------------
    2. TAL'S NAME WITHOUT THE CHIP

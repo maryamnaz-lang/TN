@@ -136,3 +136,32 @@
   .app .sig-pair{grid-template-columns:minmax(0,1fr)}
   .app .signed-when{padding-left:0;border-left:0}
 }
+
+/* --------------------------------------------------------------------------
+   §74.6  AND THE BLOCK OPENS ON A RULE OF ITS OWN
+
+   Maryam, 31 Aug 2026: divide this from the content above it, and give the
+   divider padding equal to the width of the content.
+
+   THE SEPARATION IT NEEDS IS NOT THE ONE §14 DRAWS. Every section on a page
+   closes with `::after` at `left:0;right:0` — full bleed, because the rule is
+   the sheet and the section's own gutter is the setting (§14.3b's note). That
+   is right for a run of ordinary sections and wrong here: on `V.level` the
+   signed block follows "What the Explorer track means" with no visual break
+   between them, and a bled rule would run past the three cards it is meant to
+   be introducing.
+
+   SO IT IS A `border-top` ON THE BLOCK, WHICH IS HOW IT GETS THE PADDING FOR
+   FREE. `.signed` sits inside a `.sec` that has already paid `--pad-x`, so a
+   border on the block starts and ends exactly where the cards under it do —
+   no negative margin, no second value to keep in step with the gutter when the
+   gutter changes at 900.
+
+   ONLY WHERE IT IS THE SECTION'S OWN CHILD. `> .signed` excludes the two
+   dashboards, where the block lives inside §65's disclosure — that one already
+   opens on a heading row with a rule under it, and a second line 20px below the
+   first is the "closed disclosure is one row" problem §65's own note describes.
+   -------------------------------------------------------------------------- */
+.app .page .sec > .signed{
+  border-top:1px solid var(--rule);
+  padding-top:var(--s07)}

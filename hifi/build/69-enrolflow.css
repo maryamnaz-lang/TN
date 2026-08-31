@@ -246,3 +246,54 @@
    does not add a `.found-b` margin and find it doubled on the two dashboards,
    where the panel opens on an `.all-desc` of its own that already pays it.
    ------------------------------------------------------------------------ */
+
+/* --------------------------------------------------------------------------
+   §69.6  THE CONFIRMATION'S TWO CARDS SIT ABREAST
+
+   Maryam, 31 Aug 2026, from a reference frame: the leader and the cohort are
+   two boxes on one row rather than one card with a fact under it. The argument
+   is in `V.welcome`; what this states is the grid.
+
+   TWO EQUAL COLUMNS AND THE SECTION'S OWN GUTTER, which is §72.1's shape with
+   one column fewer. `.wpair` carries no `.sec-h`, so §10.15's label column is
+   not in play at all and the section pays its ordinary padding — this is the
+   one two-column block in the build that needed no trap-13 restatement, and it
+   is because the labels went inside the cards rather than above them.
+
+   NO DIVIDER, BECAUSE BOTH CELLS ARE `.tile`s. §72.1 and §73.1a draw an inset
+   rule between their columns precisely because those cells have no edge of
+   their own; here each card is already a bordered box on the panel, so a line
+   in the gap would be a third edge between two that are already there. The gap
+   IS the separation.
+
+   `align-items:start` SO A SHORT CARD DOES NOT STRETCH. The leader's card is
+   two rows and the cohort's is one; stretched, the second box drew 20px of
+   empty ground under its row and read as a card that had lost something.
+
+   AND IT STACKS BELOW 900 with the same gap, which needs no rule: one column
+   is the default and `grid-template-columns` is only stated inside the query.
+   -------------------------------------------------------------------------- */
+.app .page .sec.wpair{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s05);align-items:start}
+/* AND §69.3 CATCHES THIS SECTION, WHICH IS WHY THE DESKTOP RULE IS HEAVIER
+   THAN IT LOOKS. That block is `.app .page .sec:has(> .tile > .row-lead)
+   {display:block}` — the label-column opt-out written for the Enroll page's
+   leader tile — and this section contains exactly that shape, so it matched.
+   TWO things stacked against the plain selector: it is inside the 900px tier
+   (trap 3), and `:has()` carries its argument's specificity, so it is (0,5,0)
+   against `.app .page .sec.wpair`'s (0,4,0). The unconditional `display:grid`
+   above therefore held below 900 and lost above it, which is exactly backwards
+   — the cards stacked at desktop and nothing warned.
+
+   Restated with the same `:has()` so the collision is visible in the selector
+   rather than only in this note. */
+@container app (min-width:900px){
+  .app .page .sec.wpair:has(> .tile > .row-lead){
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:var(--s07)}
+}
+/* the card's own label sits above its content with the tile's own rhythm —
+   `.lbl` is §63's label role and carries no margin of its own */
+.app .page .sec.wpair > .tile > .lbl{display:block;margin-bottom:var(--s05)}

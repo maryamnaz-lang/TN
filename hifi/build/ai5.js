@@ -103,8 +103,28 @@ function placeBand(){
      the page, whatever it contains. A view that genuinely wants one more
      member up there says so with `.head-sec`, which is what that opt-in is
      for and which still runs on either side of this. */
+  /* AND `no-band` IS THE OPT-OUT, WHICH IS `head-sec` TURNED ROUND.
+
+     `head-sec` exists because some members cannot be recognised by what they
+     contain, so the view declares them. This is the mirror: a section that
+     LOOKS like Tal's card to `_mhIsTal` and is not one. `talRec` is the case —
+     it wears an `.ai-label.bare` for "Agent recommended by Tal", so the run
+     claims it, and §70's own note records what that looked like on the `new`
+     dashboard (the whole recommendation laid out in the band's left column at
+     576px instead of the page's 901, nothing thrown and nothing warned).
+
+     WHAT WAS PROTECTING IT WAS THE ONE-TAL CAP ABOVE, AND ONLY BY ACCIDENT.
+     On that dashboard Tal's summary card is written first, so `tal` is already
+     true by the time the run reaches the recommendation. On a MODULE page it is
+     not: `placePageSummary` (ai6) inserts the summary card two passes after
+     this one, so at this moment the recommendation is the first member after
+     the `.ph` and the cap is unarmed. `V.interviews` draws exactly that.
+
+     `break` RATHER THAN `continue`, because the run is a run: a section the
+     band must not have is also the end of the band. */
   let n = ph.nextElementSibling, tal = false;
   while(n){
+    if(n.classList.contains('no-band')) break;
     const isTal = _mhIsTal(n);
     if(isTal && tal) break;
     if(!isTal && !n.classList.contains('ask-sec') && !n.classList.contains('head-sec')) break;

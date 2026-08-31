@@ -250,15 +250,45 @@
    rather than four sides: §29.17 states all four at (0,3,0), so
    `.app .page .facts.eo-facts` is the weight and answering `border-top` alone
    would leave three standing. */
+/* AND THE ROW COUNTS ITS OWN CHILDREN, which is §72.1's rule applied one layer
+   over. `repeat(4,…)` was right while the enrolment offer was the only caller;
+   `V.agent` draws the same cell three times — the fee, the length and the
+   report turnaround — and a fixed four-track grid left those three at three
+   quarters of the row with an empty track and 25% of white at the end of it.
+   `grid-auto-flow:column` with no template sizes the tracks to however many
+   cells the caller emits, so four and three both fill the row and a fifth
+   would too. `minmax(0,1fr)` rather than `1fr` for §72's own reason: a `1fr`
+   floor is `auto`, and a cell whose value does not wrap would otherwise take
+   more than its share.
+
+   `grid-template-columns:none` IS NOT TIDINESS, IT IS THE WHOLE FIX. §29.17
+   gives `.facts` `repeat(auto-fit,minmax(140px,1fr))`, and dropping this rule's
+   own template did not remove that one — it left an EXPLICIT template under a
+   column flow, so `auto-fit` collapsed to a single 140px track and the three
+   cells were laid into implicit columns marching off the right of the frame.
+   Nothing threw. When you take over a component's grid, restate every axis
+   property it set (§73.1a's own lesson, and trap 19's). */
 .app .page .facts.eo-facts{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:none;
+  grid-auto-flow:column;
+  grid-auto-columns:minmax(0,1fr);
   gap:0;column-gap:var(--s07);
   background:none;
   border:0;
   padding:20px 0 0}
+/* `grid-column:auto` UNDOES §10.1180, AND IT ONLY SHOWED UP AT THREE CELLS.
+   `.facts > div:last-child:nth-child(odd){grid-column:1 / -1}` is §10's rule for
+   a row that does not divide evenly — the odd cell spans the width rather than
+   leaving a gap — and with four cells it never fires. `V.agent` draws three, so
+   the last one claimed the whole row, and under `grid-auto-flow:column` a
+   definitely-placed item is laid out FIRST: the page came out "Report
+   turnaround, Interview fee, Length" with nothing thrown and the row otherwise
+   correct. The span is wrong for this grid at any count — the cells are tracks
+   the flow sizes, not a wrapping list. */
 .app .page .facts.eo-facts > div{
   position:relative;
+  grid-column:auto;
   display:flex;flex-direction:row;align-items:flex-start;
   gap:var(--s04);
   min-width:0;
@@ -310,6 +340,26 @@
   .app .sec:has(> .cov-row){display:block}
   .app .sec:has(> .cov-row) > .sec-h{
     border-right:0;min-height:0}
+
+  /* AND THE HEAD ROW PAYS NO RIGHT GUTTER, so the action group ends on the
+     same edge as the figures under it (Maryam, 31 Aug 2026: "the enroll button
+     seems to have the row padding on right").
+
+     §14.4 gives every `.sec-h` `padding-right:var(--s06)` and its note says
+     why — the §16 rules that gave a heading its own padding predate §28's
+     gutter and would charge it twice. That is right for a heading, which is
+     words with white space after them; it is wrong for `.aih`, because this
+     row's right-hand member is a 185px BUTTON and the row is one object with
+     the `.facts` row beneath it. 24px in from an edge nothing else stops at
+     reads as the button having drifted, which is §64's own argument about a
+     `.sec-h` button sitting flush with its column.
+
+     RESTATED INSIDE THIS TIER, and that is not optional: `.app .page .sec >
+     .sec-h.aih` and §14's `.app .page:not(.form-page) .sec > .sec-h` are BOTH
+     (0,5,0) — `:not()` carries its argument's specificity the way `:has()`
+     does — so with equal weight the container query wins on tier alone. Trap 3,
+     and the third time this layer has paid it. */
+  .app .page .sec > .sec-h.aih{padding-right:0}
 }
 
 /* --------------------------------------------------------------------- 2 ---
@@ -412,7 +462,14 @@
      `.facts` would have done this on its own, and that is the cost of taking
      over its grid for the desktop case: what `auto-fit` gives free above 900 has
      to be stated by hand below it. */
+  /* `grid-auto-flow:row` HAS TO BE RESTATED with the template. The desktop rule
+     above places by COLUMN and states no template at all; adding a two-track
+     template under a column flow fills track one downwards before it starts
+     track two, so the four cells came out 1/3 over 2/4 instead of 1/2 over 3/4.
+     Trap 19's lesson in a smaller key: when a rule changes how a grid flows,
+     restate the flow wherever the tracks change. */
   .app .page .facts.eo-facts{
+    grid-auto-flow:row;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:var(--s06) var(--s05);
     padding-top:var(--s05)}
@@ -426,4 +483,118 @@
     grid-template-columns:repeat(5,minmax(200px,1fr));
     overflow-x:auto;
     border-left:0;border-right:0}
+}
+
+/* --------------------------------------------------------------------------
+   AND THE ROWS UNDER AN AI-NATIVE HEAD BREATHE — Maryam, 31 Aug 2026
+
+   "Give some vertical spacing in the rows after the first summary and steps
+   section." The band on these pages is tall and dense — Tal's four-sentence
+   panel beside a four-step list, both on their own grounds — and the sections
+   under it kept §05's ordinary 24px rhythm, so the offer, the course preview
+   and the disclosure ran together as one column with hairlines in it. 32 top
+   and bottom is one step up the same scale, which is what the head's own
+   density asks for on the three pages that have it.
+
+   IT REVISES §73.1's OWN 20, AND THAT IS THE POINT RATHER THAN A COLLISION.
+   `.app .sec.eo{padding-bottom:20px}` is 615:8142 measured off the file — 20px
+   from the figures to what follows, on the reading that the offer and the
+   course preview are one block. That reading is what the instruction changes:
+   they are two rows now, and the smaller of the two paddings was the one
+   holding them together. The declaration stays where it is, with its note, and
+   is answered here for the pages this applies to.
+
+   `.sec-jrn` IS THE GATE, the same one §70.2a uses: the journey column is what
+   makes a head AI-native, and a page without one has the ordinary band and
+   keeps the ordinary rhythm. Desktop only — below 900 the band stacks into a
+   column and 32px between every row is a page you scroll past.
+   -------------------------------------------------------------------------- */
+/* AND `.sec-call` IS EXCLUDED, which is trap 4 and the one case §73.10 below
+   could not reach. That rule takes the call row's vertical padding to 0 at
+   (0,4,0); this one is (0,5,0) — `:has()` carries its argument's specificity, so
+   `:has(> .modhead > .sec-jrn)` is two classes, not one — and both sit inside
+   this same container tier. §73.10's own note claims it wins by landing later;
+   it does not, and the arithmetic is the thing that was wrong rather than the
+   intent.
+
+   IT SHOWED ON EXACTLY ONE SCREEN, which is why it survived a clean sweep. The
+   row has to be a `.page > .sec` AND the band has to carry a journey column, and
+   that pair is only `booked/dashboard`: on the enrolled dashboards the row is
+   inside the `.modhead` so `.page > .sec` never matches it, and on the
+   Interviews module there is no `.sec-jrn`. Both of those measured 0 while this
+   one measured 32 top and bottom — Maryam, 31 Aug 2026: "why are you giving top
+   and bottom padding to the call card, attach this card with the above section
+   and with the bottom section".
+
+   THE EXCLUSION GOES HERE RATHER THAN A HEAVIER RULE IN §73.10, per trap 4: the
+   `:not()` list is where "which sections take the 32px rhythm" is decided, and a
+   section that pays no vertical padding at all is not a rhythm exception, it is
+   not a member of the rhythm. */
+@container app (min-width:900px){
+  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call){
+    padding-top:var(--s07);padding-bottom:var(--s07)}
+}
+
+/* --------------------------------------------------------------------------
+   A BAND WITH NOTHING IN IT BUT THE TITLE IS NOT A BAND — Maryam, 31 Aug 2026
+
+   "On pages where there is nothing on the top section and only heading, remove
+   that section: no bg gradient, no bottom border of that section, just a
+   heading and then the other sections."
+
+   The head band is a SURFACE — §25 gives it a wash and closes it with a rule
+   running the full width of the column — and the whole of that construction is
+   there to hold three things together: the title, what Tal says, and the page's
+   one dark card. With the summaries taken off `agents`, `booking`, `billing`
+   and `agent`, several bands became a heading on a tinted panel with a hairline
+   under it: a block drawn as though it contained something, containing nothing.
+   A ruled empty strip reads as a section that failed to load.
+
+   `:not(:has(> .sec))` IS THE TEST AND IT IS EXACT. Every member the band can
+   hold beyond the crumb and the `.ph` arrives as a `.sec` — Tal's card is one,
+   `placeDark` wraps a bare `.lvl-hero` in one before appending, `.head-sec` and
+   `.head-col` are `.sec`s. So "no `.sec` child" is precisely "nothing but the
+   header", with no list of view names to keep in step.
+
+   BOTH PSEUDO-ELEMENTS, because they are the two halves of the same claim:
+   `::before` is §25.1's ground (now §70.2a's ramp) and `::after` is §25.2's
+   closing rule. Leaving either one draws the container without its contents.
+   The `.ph` keeps its own padding — the title still needs air above and below
+   it, and the section under it pays its own.
+   -------------------------------------------------------------------------- */
+.app .modhead:not(:has(> .sec))::before,
+.app .modhead:not(:has(> .sec))::after{display:none}
+
+/* --------------------------------------------------------------------------
+   AND THE CALL ROW'S SECTION PAYS NO VERTICAL PADDING — Maryam, 31 Aug 2026
+
+   `.crow` is a full-bleed row with its own internal padding: the countdown cell
+   carries a ground that runs to the panel edge, and §71.1 sets the row's own
+   height off its contents. The `.sec` around it then added §05's 24px top and
+   bottom — 32 under the rule above — so the row floated in a band of white
+   twice its own margin, and on the enrolled dashboards it pushed the band's
+   third member away from the two columns it belongs under.
+
+   EVERYWHERE, which is three callers and counting: the enrolled dashboards'
+   `.head-sec`, `booked`'s section and the Interviews module's. Keyed on
+   `.sec-call` rather than on `:has(> .crow)` because the wrapper is what the
+   callers already share and what §71.3 already scopes the band placement to.
+
+   IT IS HERE RATHER THAN IN §71 BECAUSE OF §73's OWN 32px RHYTHM RULE, which
+   is `.app .page:has(> .modhead > .sec-jrn) > .sec` inside a container query and
+   applies to the same page that draws the call row. Stated unconditionally at
+   (0,3,0) this would lose to it outright, so it carries the same tier.
+
+   THE SAME TIER WAS NOT ENOUGH AND THIS NOTE SAID IT WAS. The rhythm rule is
+   (0,5,0), not (0,4,0): `:has()` carries its ARGUMENT's specificity, so
+   `:has(> .modhead > .sec-jrn)` counts two classes. The container rule below is
+   (0,4,0) and lost, on the one screen where both match — `booked/dashboard`,
+   where the row is a `.page > .sec` and the band has a journey column. The fix
+   is `:not(.sec-call)` on the rhythm rule itself (trap 4, and the note over it
+   is the long version), so these two declarations are now the phone case and
+   the desktop case rather than a claim and a counter-claim.
+   -------------------------------------------------------------------------- */
+.app .sec.sec-call{padding-top:0;padding-bottom:0}
+@container app (min-width:900px){
+  .app .page .sec.sec-call{padding-top:0;padding-bottom:0}
 }

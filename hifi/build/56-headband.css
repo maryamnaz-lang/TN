@@ -716,3 +716,45 @@
   font-size:13.5px;line-height:22px;font-weight:600;letter-spacing:.1px;
   font-variant-numeric:tabular-nums;
   color:var(--text-helper)}
+
+/* --------------------------------------------------------------------------
+   AND A TITLE WITH NO FACT ROW SITS CLOSER TO WHAT TAL SAYS
+
+   Maryam, 31 Aug 2026, on the agents page after its `&middot;` row came off:
+   reduce the space between the heading and the summary. The band's rhythm was
+   written for a `.ph` that carries three things — the title, the fact row and,
+   on a dashboard, the wing — so the 16px this section pays on top is the gap
+   between the FACTS and Tal, not between the title and Tal. Where `phSub` drew
+   nothing there is no middle member, and the two blocks that are left sat 44px
+   apart with nothing in between: an `<h1>` and one sentence, reading as two
+   unrelated blocks rather than a heading and its reading.
+
+   `.ph-f` IS THE TEST because it is what `phSub` emits per fact, so this asks
+   "did the fact row draw" rather than "was a `sub` passed" — the auth screens
+   pass prose with no middot and get a plain `<p>`, which still fills the slot
+   and still wants the gap.
+
+   THE TWO-COLUMN BAND IS EXCLUDED, BECAUSE THERE THE TOP PADDING IS WHAT HOLDS
+   THE TWO CELLS LEVEL. The summary is a full-height panel with its own wash
+   beside a second column, and §70.3 goes to real trouble to land its label on
+   the same baseline as the column's heading.
+
+   AND THE EXCLUSION IS `.head-col`, NOT `.sec-jrn` — THE SAME CORRECTION §70.3
+   MADE, FOR THE SAME REASON, ONE LAYER LATER. It was written when the journey
+   list was the only thing that had ever gone in that column, so the tenant's own
+   class stood in for "this band has two columns". §71 then put the progress
+   strip in the same slot as `.sec-prog`, and this `:not()` did not know about
+   it: on `week1`, `day34` and `day90` — whose `.ph` is visually hidden and
+   therefore draws no `.ph-f` — the rule fired, took Tal's cell to
+   `padding-top:0`, and left "Summary by Tal" hard against the band's top edge
+   while "Your 90 days so far" sat 20px lower in the cell beside it. Maryam
+   flagged it as the summary having no top padding (31 Aug 2026) and read it
+   correctly as a component issue rather than a page one.
+
+   `.head-col` is the class both tenants wear and the one §70.3 and `placeDark`
+   both test, so keying on it means a third tenant is covered without another
+   edit here. The specificity is unchanged — one class swapped for one class,
+   still (0,9,0), which is what lets this beat §70.3's rule inside the container
+   query and is why the exclusion has to live on THIS selector. */
+.app .modhead:not(:has(> .head-col)) > .ph:not(:has(.ph-f)) + .sec:has(> .ai-aura.talsum){
+  padding-top:0}

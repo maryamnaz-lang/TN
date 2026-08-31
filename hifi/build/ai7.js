@@ -627,20 +627,24 @@ PAGESUM.dashboard.booked = () => {
     + `<b data-sum="prep">10 minutes practising your delegation talking points</b> before `
     + `${bkWeekday()} is your best strategy to secure an optimal levelling outcome.`;
 };
-PAGESUM.booking = () => {
-  const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
-  const c = (S.booking || {}).card || {brand:'Visa', last:'4242'};
-  return `Booked &mdash; ${a.n}, ${bkLong()}, ${a.price} on a ${c.brand} ending ${c.last}. The invite and joining link are already in your email, and you can move it from here.`;
-};
-/* AND THIS PAGE IS THE ONE PLACE TAL DOES NOT STATE THE BOOKING.
-   The confirmation banner is the first thing under the title and it already
-   says the agent, the day and the time, and that the invite is in the email
-   — so restating any of it here is the duplication ai6's note is about, just
-   with a `.note` in the middle instead of a page description. What Tal is
-   left with is the part the banner cannot answer, which is what happens
-   next. "and you can move it from here" went too: that was a caption for the
-   two buttons directly below. */
-PAGESUM.booking = () => `Nothing to prepare and nothing to bring &mdash; ${bkWeekday()} is a conversation, not a test. It is recorded, and your report follows within 48 hours.`;
+/* AND THIS PAGE HAS NO SUMMARY AT ALL NOW (Maryam, 31 Aug 2026).
+   Two overrides stood here. The first stated the booking — "Booked — Priya
+   Nair, Thursday 20 August, $95 on a Visa ending 4242" — and was cut on the
+   argument that the `.note succ` banner two inches below says the agent, the
+   day, the time and where the invite is. What replaced it was the part the
+   banner could not answer, "nothing to prepare and nothing to bring".
+
+   That is now gone too, and the argument is the same one carried one step
+   further: `V.booking` is a RECEIPT. Its whole job is to confirm that what
+   happened is what was meant to happen, the green banner does that in one
+   line, and a second voice above a confirmation reads as a caveat on it —
+   "nothing to prepare" answers a question nobody asks while checking a
+   booking went through. The preparation offer already lives on the `booked`
+   dashboard, which is where somebody is when they come back to prepare.
+
+   `PAGESUM.booking` is deleted in ai6 rather than left for this file to
+   overwrite, so there is one place to look. `bkWeekday()` keeps its other
+   readers (`PAGESUM.dashboard.booked` above), and `bkLong()` keeps `bkStamp`'s. */
 
 const _bkSum = pageSummary;
 pageSummary = function(){

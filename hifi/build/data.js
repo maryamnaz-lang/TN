@@ -235,7 +235,41 @@ const AGENTS = {
   lena:{n:'Lena Fischer',i:'LF',img:AV.lena,r:4.5,range:'E1–E4',ivs:98,slot:'Mon, Aug 24 · 7:00 PM',price:'$80',
     bio:'I came up through engineering management. Expect a lot of "and then what happened".'},
   samuel:{n:'Samuel Adeyemi',i:'SA',img:AV.samuel,r:4.4,range:'E3–B2',ivs:143,slot:'Wed, Sep 2 · 6:00 PM',price:'$90',bio:''},
-  hana:{n:'Hana Kim',i:'HK',img:AV.hana,r:4.3,range:'B1–B4',ivs:121,slot:'Thu, Sep 3 · 5:30 PM',price:'$110',bio:''}
+  hana:{n:'Hana Kim',i:'HK',img:AV.hana,r:4.3,range:'B1–B4',ivs:121,slot:'Thu, Sep 3 · 5:30 PM',price:'$110',bio:''},
+  /* THE SIXTH AGENT EXISTS TO STOP THE GRID REPEATING A FACE (Maryam, 31 Aug
+     2026). `.rail-all` is three across and there were five people, so the sixth
+     cell was `'priya'` again — the same name, fee and rating printed twice in
+     one grid, six inches apart.
+
+     THE PHOTOGRAPH IS `CALL_ART.faceW` AND IT IS NOT COPIED INTO `AV`, which is
+     what build.py's note on it asks for: `AV` is the table nine pages read, and
+     a face added there changes all nine. Pointing at `CALL_ART` directly works
+     because build.py concatenates `call_js` BEFORE data.js, so the const is
+     already initialised by the time this object is built — the same ordering
+     `AWARD` relies on.
+
+     THE FACE IS ALSO A COHORT MEMBER'S, AND THAT IS THE PROTOTYPE'S OWN HABIT
+     RATHER THAN A NEW COMPROMISE. `COHORT` already dresses all ten members in
+     the five agent portraits — Aisha wears Priya's, Daniel wears Owen's — and
+     `CALL_FACE` overrides exactly two of them with their own photographs on the
+     call surface. So this file has seven real faces for twenty-odd people. What
+     this does NOT do is reuse the NAME: Nora Lindqvist is a candidate in Cohort
+     41, and making her an interviewer would put one person on both sides of an
+     assessment. Same face on two surfaces, two people; that is the trade the
+     duplicate was worth.
+
+     EVERY FIGURE IS PICKED TO SIT IN A GAP, so nothing else in the build has to
+     move. 4.7 is the one rating between Owen's 4.6 and Priya's 4.8. $100 sits
+     between $95 and $110 and leaves Lena's $80 as the minimum, which is what
+     "Fee: From $80" on the Interviews module states. E4–B1 is a band no other
+     agent covers, and — the load-bearing half — it does NOT include E3, so she
+     is correctly absent from `REC_ORDER`: that shortlist is "who assesses
+     Explorer candidates", Tal's summary calls it "three agents … $80 to $95",
+     and an E3-capable sixth would have made both of those wrong and needed a
+     `REC` row of three more invented strings. `bio:''` for the same reason
+     Samuel's and Hana's are empty — a paragraph in her own voice is product
+     copy no data here supports. */
+  camila:{n:'Camila Rocha',i:'CR',img:CALL_ART.faceW,r:4.7,range:'E4–B1',ivs:176,slot:'Tue, Aug 25 · 5:30 PM',price:'$100',bio:''}
 };
 
 /* ============================================================

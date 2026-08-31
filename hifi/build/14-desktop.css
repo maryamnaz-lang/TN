@@ -118,7 +118,7 @@
      DRAWS ITS OWN TOP HAIRLINE. §70.5c gives Quick Actions `border-top:1px`
      because 581:6344 has one, and this rule was drawing the closing hairline
      of the section ABOVE it as well — on the `new` dashboard that is
-     `.sec-rec`, so the seam under "Tal recommends" was TWO 1px rules one pixel
+     `.sec-rec`, so the seam under the recommendation was TWO 1px rules one pixel
      apart: §14's inset by `--pad-x` at the section's `bottom:0`, §70's full
      width at the next section's top. Maryam read it as a double bottom border
      (31 Aug 2026), which is the only way two nearly-coincident hairlines ever

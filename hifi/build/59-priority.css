@@ -222,6 +222,47 @@
   .app .wing-lvl .ladder i.on::before{animation:none;transform:none}
 }
 
+/* -------------------------------------------------------------------- 2c2 ---
+   AND BEFORE THE INTERVIEW, THE FIVE LEVELS OF YOUR TRACK
+
+   `trackBand` — the pre-interview bar — marks the five rungs of your own track
+   with `.mine` and fills NOTHING, because the level is what the interview
+   decides. My Level draws that bar in this wing now (`lvlWing`, views.js)
+   instead of on the black hero, and `.mine` was the one state that did not
+   travel: §29.147 states it as `.app .lvl-hero .ladder-track i.mine`, scoped to
+   the card, so outside it the five blocks fell back to `--layer-accent-01` and
+   the band drew fifteen identical greys — the track was simply not marked.
+
+   IT IS NOT §29's SOLID ACCENT, AND THAT IS THE WHOLE OF THE DECISION. On the
+   black hero, solid accent is right for the reason §29's own note gives: it is
+   the only marked run on its own bar, with no confirmed level beside it to
+   outrank. On white it is not on its own — `.done` in this same wing IS solid
+   accent and means "a level you have climbed, signed off in a report". Five
+   solid blocks here would make the identical claim about five levels nobody has
+   been assessed on, on the one page whose note two blocks down says a quiz
+   cannot set your level.
+
+   SO IT TAKES THE LIT TONE, WHICH IS `.on`'s GROUND STANDING STILL. §59.2c
+   mixes the accent at 14% and 38% with white for the level you are on; this is
+   the same family a little stronger, at 26%, because it has to separate from
+   `--layer-accent-01` across five blocks rather than one and there is no
+   travelling band to draw the eye. Static: the animation on `.on` says "this is
+   where you are right now", and a range of five cannot say that.
+
+   `background-image:none` because §19 paints every accent fill in the build
+   from a generated list and `.ladder-track i.mine` is on it — the same reason
+   §59.2c states its own colour separately. The ink is full primary, per the
+   argument written over `.on` above: an accent ink on an accent tint at 10px
+   is the wrong pairing, and `--text-primary` is the answer §56 already reached
+   for the step you are on. Both declarations are stated HERE rather than in a
+   layer after §63, which may not set a text colour.
+   -------------------------------------------------------------------------- */
+.app .wing-lvl .ladder-track i.mine{
+  background-color:color-mix(in srgb, var(--accent) 26%, #fff);
+  background-image:none;
+  opacity:1;
+  color:var(--text-primary)}
+
 /* --------------------------------------------------------------------- 2d ---
    AND A TRACK'S NAME SITS OVER ITS FIRST LEVEL
 

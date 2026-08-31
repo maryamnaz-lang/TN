@@ -357,8 +357,29 @@ const PAGESUM = {
   /* ONE STRING, NOT TWO IDENTICAL ONES. `consult` and `new` were separate
      keys holding the same sentence, which is a thing that stays in step for
      exactly as long as nobody edits one of them. */
+  /* AND THE PRE-INTERVIEW ONE IS THE DASHBOARD'S SENTENCE, SHORTENED (Maryam,
+     31 Aug 2026). §70's `dashboard.new` narrates the same fact at length —
+     "Based on your quiz results, you are currently on Explorer track. Your
+     level from E1 - E5 anchors after a 45-minute interview" — and this page
+     said it flatly, in Tal's earlier voice, with no accent phrase in it. Two
+     summaries of one fact in two registers is the thing this table is mostly
+     written to stop, so this one is the dashboard's, cut to the part My Level
+     is about.
+
+     WHAT IT DROPS is the whole of the dashboard's second half: the roster, the
+     match and Priya. That is a recommendation, and the page it belongs to is
+     the one that draws her card underneath it — here the block directly below
+     is the ladder, and the note two sections down already carries "an interview
+     with an agent sets the level" with the button that books one.
+
+     THREE ACCENT PHRASES, WHICH IS THE DASHBOARD'S COUNT. §70.2's highlight is
+     `.modhead .ai-aura.talsum .ai-body p b` and is not scoped to the AI-native
+     band, so a `<b>` here gets the same tinted ground; §63 §10 owns the ink.
+     They are the three things the sentence is actually about — what you did,
+     where it put you, and what decides the rest — and every figure in it is the
+     ladder's own (`trackBand` marks exactly those five rungs). */
   level: (() => {
-    const pre = 'No level yet. The quiz gives you a track, not a level &mdash; Explorer is levels 1 to 5 of 15, and a 45-minute interview decides which.';
+    const pre = 'Your <b>quiz result</b> puts you on the <b>Explorer track</b>, levels 1 to 5 of 15. A <b>45-minute interview</b> is what decides which of the five is yours.';
     return {
       consult: pre,
       new: pre,
@@ -408,23 +429,47 @@ const PAGESUM = {
     return 'One on record: 20 August with Priya, which set Explorer &ndash; E3. A re-interview at the end of the 90 days is what moves the level.';
   },
 
-  agents: 'Three agents assess at your level and have a slot this week &mdash; Priya $95, Owen $85, Lena $80. Same 45 minutes whoever you pick.',
+  /* NO `agents` ENTRY (Maryam, 31 Aug 2026). It read "Three agents assess at
+     your level and have a slot this week — Priya $95, Owen $85, Lena $80. Same
+     45 minutes whoever you pick." Every figure in it is a cell in the grid
+     eighty pixels below: the three names lead the list, each card prints its
+     own price and its own next slot, and the search field says how many there
+     are in total. A summary of a directory is the directory read aloud.
 
-  /* `a.slot` IS A DATA STRING, NOT A CLAUSE. It is drawn on the agent card
-     as "Thu, Aug 20 · 6:30 PM", which is right in a card and wrong inside a
-     sentence — a middot mid-prose reads as a break in the sentence. The
-     separator becomes "at" here and nowhere else, so the card keeps its own
-     drawing. Same reason `a.r` gains its denominator: "rates 4.8" is a
-     figure read out, "4.8 out of 5" is a figure a person can use. */
-  agent: () => {
-    const a = AGENTS[S.agent || 'priya'];
-    return `${a.n} assesses ${a.range} and has run ${a.ivs} interviews, rated ${a.r.toFixed(1)} out of 5. ${a.price} for 45 minutes, next free ${_slot(a.slot)}.`;
-  },
+     THE VIEW'S OWN TAL CARD WENT WITH IT — see the note where it was in
+     `V.agents`. Trap 11: this pass strips a card before it tests for copy, so
+     an entry removed on its own leaves the card in the band unstyled. */
 
-  /* ai7.js replaces this one — see the note there for why it says nothing
-     about the booking itself. Kept in step so the two cannot read as two
-     different writers if the override ever goes. */
-  booking: 'Nothing to prepare and nothing to bring &mdash; Thursday is a conversation, not a test. It is recorded, and your report follows within 48 hours.',
+
+  /* NO `agent` AND NO `booking` ENTRY, AND BOTH ARE DELETIONS RATHER THAN
+     REWRITES (Maryam, 31 Aug 2026). The two pages either side of paying are
+     the ones where Tal had least left to say, and on both of them the
+     sentence was a read-back of the block directly under it:
+
+     `agent` was "<name> assesses E2–B1 and has run 164 interviews, rated 4.6
+     out of 5. $85 for 45 minutes, next free Friday 21 August at 5:00 PM." —
+     six figures, and the `.agid` block, the three `.kv` rows and the slot
+     picker four inches below state every one of them. It also carried the one
+     disagreement on the page: `a.slot` is the agent's own next free time and
+     the picker is hard-coded to Thursday 20 at 6:30, so for four of the five
+     agents Tal named a slot the page was not offering.
+
+     `booking` was "Nothing to prepare and nothing to bring — Thursday is a
+     conversation, not a test." The `.note succ` banner is the first thing
+     under the title and the page is a receipt; a second voice above a
+     confirmation reads as a caveat on it.
+
+     THIS IS NOT THE "A PAGE WITH NO ENTRY IS WORSE THAN WRONG" TRAP (trap 11
+     in CLAUDE.md). That one is about a view that HAND-AUTHORS an `.ai-aura`
+     card: `placeSummaryPass` strips the card's action and chips before it
+     reaches `if(!text) return`, so the card survives stripped and unstyled.
+     Neither of these views draws a card — both had theirs removed when this
+     file was written — so the pass builds nothing, `placePageSummary` calls
+     `sumIdle()` to clear the typing key, and `placeBand` returns at its own
+     `if(!aura)`. The band is the title and, on `agent`, the slot plate.
+
+     `_slot` still has readers, so it stays. The `booking` override in ai7 is
+     gone with this one — see the note where it was. */
 
   /* THE COURSE'S SHAPE MOVED TO THE PAGE DESCRIPTION — "90 days · 13
      chapters · a cohort of ten" — because it is a factual spine and this
@@ -517,17 +562,17 @@ const PAGESUM = {
      button. A total and a count is what a person opens Payments for; the
      rows are the itemisation. Counted from the same conditions `V.billing`
      pushes them on, so the two cannot disagree. */
-  billing: f => {
-    const paid = [];
-    if(f.enrolled || f.complete) paid.push(595);
-    if(!f.pred) paid.push(95);
-    if(f.booked) paid.push(95);
-    paid.push(490);
-    const t = `$${_n(paid.reduce((a, b) => a + b, 0))}`;
-    return paid.length === 1
-      ? `One payment, ${t}, and it was a single charge &mdash; nothing here renews.`
-      : `${_W(paid.length)} payments, ${t} in total, every one of them a single charge. Nothing here renews.`;
-  },
+  /* AND `billing` HAS NO ENTRY EITHER (Maryam, 31 Aug 2026: remove the summary
+     from the Payments page). The count and the total were derived from the same
+     conditions `V.billing` pushes its rows on, which is what made the sentence
+     safe — and also what made it redundant: the table under it is those rows,
+     each with its date, its card and its amount, and one of them is the whole
+     of "one payment, $490". The half that was not in the table is the policy
+     clause, "nothing here renews", and a policy statement is the second of this
+     table's four content bans.
+
+     THE VIEW DRAWS NO TAL CARD, so this is a deletion and nothing else — trap
+     11 only bites where a card is hand-authored (see `agents` above). */
 
   /* The page description said "Your details, your preferences, and what Tal
      is allowed to do" and this said the same three nouns back. The

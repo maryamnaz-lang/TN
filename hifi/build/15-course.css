@@ -1116,6 +1116,21 @@
   .app .rail.rail-all .agh{
     border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
   .app .rail.rail-all .agh:nth-child(3n){border-right:0}
+  /* AND THE LAST ROW DRAWS NO BOTTOM EITHER, which is the same statement as the
+     line above turned through 90°. §29.6 gives `.rail` its own `border-bottom`
+     — the grid's box — so the final row's card borders landed one pixel above
+     it and the block closed on a 2px edge. Maryam flagged it as multiple bottom
+     borders (31 Aug 2026), which is the only way two coincident hairlines
+     announce themselves; it is the third instance of that artefact in this
+     build, after the band (§70.3) and the Quick Actions seam (§14).
+
+     `:nth-last-child(-n+3)` IS EXACT FOR A FULL LAST ROW AND APPROXIMATE
+     OTHERWISE. Three columns and six cards, so it names 4, 5 and 6 — the row.
+     With seven cards it would also clear the bottom of card 4, which is in the
+     middle row; there is no selector for "in the last row" and the alternative
+     is `:last-child` alone, which leaves two of the three drawing. If the list
+     ever stops being a multiple of three, this is the line to revisit. */
+  .app .rail.rail-all .agh:nth-last-child(-n+3){border-bottom:0}
   .app .rail.rail-all .agh:nth-child(3n+1){padding-left:var(--pad-x)}
   .app .rail.rail-all .agh:nth-child(3n){padding-right:var(--pad-x)}
 }
@@ -1306,6 +1321,15 @@
 .app .ivrow{
   padding:var(--s06) var(--pad-x);
   border-bottom:1px solid var(--rule);cursor:pointer}
+/* AND THE LAST ROW DRAWS NONE, because the SECTION closes itself. `border-bottom`
+   here is the separator BETWEEN rows — one interview from the next — and on the
+   final row it fell 24px above §14's closing rule for the section, so "How it
+   works" underneath arrived under two hairlines (Maryam, 31 Aug 2026: "remove
+   the one divider above the how it works"). The section's rule is the one that
+   stays: it is the boundary between two blocks, and this one is internal to a
+   list that has ended. Same shape as `.rail-all`'s last row and `.agh:last-child`
+   before it — a list's own separators stop at its last item. */
+.app .ivrow:last-child{border-bottom:0}
 .app .ivrow-h{
   display:flex;align-items:baseline;justify-content:space-between;
   gap:var(--s05);flex-wrap:wrap}
@@ -1412,6 +1436,24 @@
 }
 .app .sec > .cs{
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+
+/* AND NO TOP RULE WHEN THE STRIP OPENS THE PAGE BODY, BECAUSE THE BAND ALREADY
+   CLOSED (Maryam, 31 Aug 2026: "remove the multiple top border and keep it
+   one"). §25.2's `.modhead::after` is a full-bleed 1px at the band's `bottom:0`
+   and it draws at every width on both tenants; the strip's own `border-top` then
+   landed on the SAME pixel row, so the Cohort page's tabs sat under a 2px edge.
+
+   THE BAND'S RULE IS THE ONE THAT STAYS — the same call §70.3 records when it
+   deleted its own duplicate of it, and §14 makes for the Quick Actions seam. A
+   band that ends itself needs nothing under it, and the strip's `border-top`
+   exists for the case it was written for: a tab strip further down a page, with
+   ordinary content above it, where the line is the boundary between the two.
+
+   `.modhead + .sec > .cs` RATHER THAN `.sec:first-child`, because the strip is
+   wrapped (`.sec-cs`) and the band is a sibling of that wrapper, not of the
+   strip. Keyed on the adjacency so a page that puts something between the band
+   and its tabs keeps the rule. */
+.app .page > .modhead + .sec > .cs{border-top:0}
 
 /* the conversation holds its own width on a phone */
 .app .msg-page,.app .msg-page > .msgs,.app .msg-page > .msg-foot{min-width:0}

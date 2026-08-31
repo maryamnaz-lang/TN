@@ -65,6 +65,29 @@
      restatement never lands — plate-then-stepper works because of the
      exclusion below, not because of §29. The same 16px was appearing under
      the cohort page's call plate, between it and the Discussion strip. */
+  /* AND `:not(.sec-call)` IS THAT SAME FIX AGAIN, BECAUSE THE COMPONENT MOVED
+     OUT FROM UNDER ITS OWN EXCLUSION. The paragraph above answered the cohort
+     page by naming `:has(> .plate)` — the call was a black `.plate` then. §71
+     rebuilt it as a `.crow` in a `.sec-call`, and the exclusion silently stopped
+     matching: the 16px came back under the card, between it and the Discussion
+     strip, exactly where that note says it had been.
+
+     KEYED ON `.sec-call`, NOT ON WHAT IT CONTAINS, so it cannot come loose a
+     third time if the row inside changes again — and unconditionally rather than
+     per-neighbour, because Maryam's instruction is about the card and not about
+     one page: "wherever this card is, attach it from top section and bottom
+     section, no space in between" (31 Aug 2026). The row is full-bleed with its
+     own internal padding and a ground that runs to the panel edge; every pixel
+     of section padding round it is white between two edges that are meant to
+     meet.
+
+     THE SECTION BELOW HAD TO BE ANSWERED TOO, and zeroing rather than excluding
+     is the point. The `+ .sec` rule further down gives the next block
+     `padding-top:var(--s05)`; taking `.sec-call` out of its left-hand side would
+     have let that block fall back to §05's own 24px, which is more white than
+     the 16 it was replacing. So the line at the foot of this block states 0 for
+     whatever follows a call row, alongside the `.plate`-then-tabs pair it
+     already covered. */
   /* `:not(:has(+ .sec.ldr-dm-sec))` — THE TAB STRIP ABOVE THE LEADER'S INBOX
      IS NOT HALF OF A PAIR, it is the top edge of the thing below it. The panel
      is attached to the strip on purpose (§36.17), so 16px under the strip is
@@ -76,7 +99,7 @@
      classes and loses. The `:not()` list is where "which pairs are joined" is
      decided, so that is where an unjoining goes.
      -------------------------------------------------------------------- */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)){
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call){
     padding-bottom:var(--s05)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
@@ -125,9 +148,10 @@
      a strip and the thing it switches, which reads as the panel having come
      loose. The section states `padding:0` and this is the rule that was
      putting it back, from nine classes deep. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){
     padding-top:var(--s05)}
-  .app .page > .sec:has(> .plate) + .sec.sec-cs{padding-top:0}
+  .app .page > .sec:has(> .plate) + .sec.sec-cs,
+  .app .page > .sec-call + .sec{padding-top:0}
   /* the capture strip is a zero-padding pass-through: it sits between two
      blocks without being one, so the pair either side of it still has to
      behave as a pair. */

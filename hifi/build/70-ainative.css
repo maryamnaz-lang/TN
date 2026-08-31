@@ -267,8 +267,50 @@
    the reader is trying to READ. Ambient motion belongs where nothing is being
    read — the ask field's border — and on a block that is genuinely waiting,
    which is what the skeleton is. This panel is neither. */
-.app .modhead > .sec:has(> .ai-aura.talsum){
+.app .modhead:has(> .sec-jrn) > .sec:has(> .ai-aura.talsum){
   background-image:var(--ai-wash)}
+
+/* -------------------------------------------------------------------- 2a ---
+   AND EVERY OTHER BAND IN THE PRODUCT TAKES THE SAME RAMP, WHOLE
+
+   Maryam, 31 Aug 2026: the first section of every page follows the Just Joined
+   summary's gradient. It did not — §25.1 paints the band with two blurred
+   ellipses in the Tal chip's colours off the top-right corner, a cream-and-cool
+   corner wash, and this ramp was scoped to one cell on one page. Two different
+   warm treatments on the same block, one per page.
+
+   SO THE RAMP MOVES UP ONE LEVEL. `--ai-wash` goes on `.modhead::before` — the
+   layer §25 built for exactly this, already `position:absolute;inset:0` at
+   `z-index:-1` inside the band's own stacking context — and replaces the two
+   radial gradients rather than sitting under them. `background-image` only:
+   §25's positioning, its isolation and its closing rule are untouched, and
+   `--tal-chip-1`/`-2` keep every other reader (the chip and the icon boxes are
+   right at their own scale, which is §25's own note).
+
+   AND THE JUST JOINED BAND IS EXPLICITLY LEFT ALONE, which is the instruction
+   and not a side effect (Maryam, 31 Aug 2026: "i didn't say that you need to
+   change the just joined summary gradient"). That page draws the ramp PER CELL
+   — the summary panel warm, the journey column white — and it is the two-panel
+   reading that makes the band 578:5966 rather than a paragraph beside a list.
+   Painting the band underneath would put 5% over 5% on the left cell and 5%
+   under the journey column's own `--layer-01`, so the one page the ramp came
+   from would be the one page it changed. `:has(> .sec-jrn)` is the same gate
+   §70 uses everywhere else to mean "this is the AI-native head".
+
+   AND THE CELL RULE ABOVE CARRIES THE SAME GATE, WHICH IS ONE GRADIENT PER
+   BAND. Leaving it unscoped was tried for one build on the reasoning that this
+   block should be purely additive; it is not additive, it is a SECOND LAYER —
+   5% on the band and 5% again on the summary cell, so the head of every page
+   read as a pale ramp with a warmer strip cut across the middle of it (Maryam,
+   31 Aug 2026: "we are showing 2 different gradient layers on first cards ...
+   remove the previous gradient values completely"). The ramp is a ground for
+   the whole first section, so it is stated once, on the band. Where the band
+   has no second column the summary is the full width of it and there is
+   nothing for a cell wash to distinguish; where it does — the AI-native head —
+   the cell wash is the distinction, and that is the one place it stays.
+   ------------------------------------------------------------------------ */
+.app .modhead::before{background-image:var(--ai-wash)}
+.app .modhead:has(> .sec-jrn)::before{background-image:none}
 
 /* THE THREE ACCENT PHRASES — 581:6664/6665/6667. A ground and 4px of radius on
    a `<b>` inside the summary; §63 §10 owns the ink. `box-decoration-break` is
@@ -389,8 +431,23 @@
    §33.9's `.tal-greet` route would have bought — would take the page's only
    `<h1>` out of the accessibility tree, on a page whose remaining headings are
    a section title and a paragraph that types itself.
-   ------------------------------------------------------------------------ */
-.app .modhead:has(> .head-col) > .ph{
+
+   AND THE GATE IS `.ph.ph-you`, NOT `.head-col`, WHICH SAYS WHAT THE RULE
+   ALWAYS MEANT. Read on `.head-col` it says "a band with two columns hides the
+   page heading", and that is not the reason: the reason is that a page whose
+   opening line is Tal saying hello does not also print a title, which is a fact
+   about the HEADER. Every `.head-col` in the build is on a dashboard, so the two
+   sets are the same today and the difference cannot show.
+
+   `.ph-you` is the class `ph()` stamps when it is passed a `mark` — which is
+   `dashPh` and only `dashPh`, i.e. exactly the six dashboards, and views.js's
+   note over it already calls it "the gate". Stated this way so that a MODULE
+   page can take the two-column band without losing its `<h1>`; `V.interviews`
+   was built that way for one round and its recommendation has since moved below
+   the band (Maryam, 31 Aug 2026), so nothing exercises it yet. Kept because it
+   costs one class and the alternative is a rule whose selector disagrees with
+   its own note. The selector goes (0,3,0) → (0,4,0) with nothing to beat. */
+.app .modhead:has(> .head-col) > .ph.ph-you{
   position:absolute;width:1px;height:1px;
   margin:-1px;padding:0;border:0;
   clip-path:inset(50%);overflow:hidden;white-space:nowrap}
@@ -422,11 +479,27 @@
      cards dropped in at different depths. Aligned to the top they share one
      line, and the band's height is then whichever column is longer rather than
      a number both are floated inside. */
+  /* THE BLOCK IS SHALLOWER THAN THE FILE — 24 top and bottom, not 32 (Maryam,
+     31 Aug 2026: "reduce the top and bottom padding of both summary and steps
+     blocks a little bit, it is a component change"). 581:6662 and 587:6742 are
+     both inset 32 all round, and at the product's ~900 band that reads deeper
+     than the file looks: the file's frame is 1396 wide, so 32 is 2.3% of it and
+     8.9% of the 324px column, and the journey's four rows sat in a cell half
+     again their own height. Taken off BOTH cells in the same step so the two
+     columns stay level — the divider between them runs the band's full height,
+     so a difference of 8px on one side would show as the hairline overshooting
+     the shorter column.
+
+     THE SIDES ARE THE FILE'S AND STAY. `--pad-x` on the left cell, 32 here
+     stepping to 57 at 1180 (§70.3's own note on why the file's inset only
+     applies from the width the file's track exists at). The ask was top and
+     bottom, and the horizontal rhythm is what lines this band up with every
+     section under it. */
   .app .modhead:has(> .head-col) > .head-col{
     grid-column:2;grid-row:1;
     display:flex;align-items:flex-start;
     margin:0;
-    padding:var(--s07);
+    padding:var(--s06) var(--s07);
     border-top:0;
     border-left:1px solid #d7d5cc;
     background:var(--layer-01)}
@@ -443,7 +516,7 @@
     grid-column:1;grid-row:1;
     display:flex;align-items:flex-start;
     margin:0;
-    padding:var(--s07) var(--s07) var(--s07) var(--pad-x)}
+    padding:var(--s06) var(--s07) var(--s06) var(--pad-x)}
   .app .modhead:has(> .head-col) > .sec:has(> .ai-aura.talsum) > .ai-aura{
     width:100%}
 
@@ -513,19 +586,27 @@
    in the same declaration as the label, because in the file the two are one
    text run and a rule of its own could only make them disagree.
 
-   THE THREE GAPS ARE THE FILE'S OWN NUMBERS AND ONLY ONE OF THEM IS A TOKEN.
-   587:6742 is 20px between the heading row and the list, 587:6747 is 9px
-   between rows, and 587:6748 is 8px from the mark to the words. The last is
-   `--s03`; 20 and 9 fall between steps of the scale, and the nearest steps are
-   what shipped first — `--s06` (24) and `--s05` (16). The 8px overpay under
-   the heading is the smaller half. The 7px one inside the list is not: the
-   file's pitch is 30 (21px row + 9), and at 37 the four rows stop reading as
-   one block and become four separate facts, which is the one thing a journey
-   must not read as. §70.5 states the file's 20 for `.sec-rec` on the same
-   reasoning — a component's internal rhythm is the file's, the page's rhythm
-   is the scale's.
+   THE THREE GAPS, AND ONLY ONE IS THE FILE'S NUMBER. 587:6747 is 9px between
+   rows and 587:6748 is 8px from the mark to the words; both are kept (the
+   second is `--s03`, the first falls between steps of the scale). The 7px the
+   scale's nearest step would have added inside the list is the one that
+   matters: the file's pitch is 30 and at 37 the four rows stop reading as one
+   block and become four separate facts, which is the one thing a journey must
+   not read as.
+
+   THE HEADING GAP IS 12 AND THE FILE SAYS 20 (Maryam, 31 Aug 2026: "reduce the
+   space between the your journey so far heading and the bottom steps"). The
+   file's ratio is defensible on paper — 20 against its own 30 pitch is 0.67,
+   and 20 against ours would be 0.71 — and it is wrong on the screen for a
+   reason the ratio cannot see: the heading row is as tall as the PILL beside
+   it, 25px against the heading's own 19px line box, so there are already 3px
+   of slack under the words before the gap starts. The file's header frame is
+   24 against a 21px line and has 1.5. So 20 was really 23 of visible white
+   under the heading, on a block whose rows are 9 apart. 12 puts it at 15 —
+   still comfortably more than the row gap, so the heading still separates from
+   the list rather than joining it.
    ------------------------------------------------------------------------ */
-.app .jrn{display:flex;flex-direction:column;gap:20px;width:100%}
+.app .jrn{display:flex;flex-direction:column;gap:var(--s04);width:100%}
 
 .app .jrn-h{display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
 .app .jrn-t{margin:0}
@@ -660,17 +741,54 @@
 .app .rec-tag.need{background-color:#fbf1f9}
 .app .rec-tag.has{background-color:#e5f3f9}
 
-/* 186 WIDE, 12 BETWEEN, AND THE BUTTON IS 185 x 40 — 583:6679 / 581:6548. The
-   column is `flex:none` so the row's free space all lands in the gap before
-   it, which is what `justify-between` is for here. */
+/* TWO BUTTONS AT 185 x 40 WITH 12 BETWEEN, HELD RIGHT — 583:6679 / 581:6548.
+   The group is 382 wide (185 + 12 + 185) and `flex:none`, so the row's free
+   space all lands in the gap before it, which is what `justify-between` is for
+   on `.rec`. It was a 186px COLUMN holding one button over one line of text;
+   the button geometry is unchanged and only the direction and the width move,
+   which is why replacing the link with a second button needed no new box.
+
+   `flex-wrap` IS THE SAFETY VALVE AND IT IS NOT DECORATION. 382px of
+   `flex:none` beside a 696px block is the shape §73 records as "THE FIXED-WIDTH
+   ACTION GROUP IS THE ONE THING THAT CANNOT SURVIVE 390" — there, chip 254 +
+   gap 8 + button 185 hung 38px off the edge because nothing could give. Here
+   the narrow rule below stacks the whole block, so wrap only has to catch the
+   band between about 600 and 900 where `.rec` is still a row. */
+/* `margin-left:auto` IS WHAT ACTUALLY HOLDS THE RIGHT EDGE, and `.rec`'s
+   `justify-content:space-between` is not — which only shows once the row wraps.
+   `.rec-l` is `flex:1 1 620px` and this group is 382, so 620 + 24 + 382 is 1026
+   against the 837 a 901px section leaves: the two are on separate lines at every
+   width the product has. `space-between` distributes space BETWEEN items on a
+   line, and a line holding one item has none to distribute, so the group fell
+   to the start — directly under the photograph, reading as a third fact rather
+   than as the block's actions. An auto margin is a property of the item, so it
+   holds the edge whether it shares a line or owns one. */
 .app .rec-a{
-  flex:none;
-  display:flex;flex-direction:column;align-items:flex-start;
-  gap:var(--s04);width:186px}
+  flex:none;margin-left:auto;
+  display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;
+  gap:var(--s04);width:382px}
 .app .rec-a > .btn{
   width:185px;min-height:40px;
   justify-content:center;gap:var(--s03);
   padding-left:20px;padding-right:var(--s05)}
+
+/* AND THE QUIET ONE KEEPS A BORDER, IN THE ACCENT — 581:6548, which is a 1px
+   #f47113 outline with #f47113 text and no fill. That is the third stated
+   reversal of §64 (`.cert-btn` and §71.2's `.crow-a` are the others) and it
+   earns it the same way: this is one of a PAIR, beside a black button of
+   identical size, and §64's borderless treatment made the left half read as a
+   text link that happened to be 185px wide. Stated as `border-color` rather
+   than `border`, because `.btn` already carries a transparent 1px and re-
+   declaring the shorthand would change the pair's box model (§64.1).
+
+   §64'S ARROW DOES NOT DOUBLE HERE. Its mask is gated on `:not(:has(svg))` and
+   the label carries `I.arrowRight`, so the real `<svg>` is the only arrow —
+   which is also why the label must keep it rather than relying on the mask:
+   the mask is pushed to the far edge and 581:6548 centres the pair. */
+.app .rec-a > .btn.rec-see{
+  color:#f47113;
+  border-color:#f47113}
+.app .rec-a > .btn.rec-see svg{fill:#f47113}
 
 /* THE WAY TO DISAGREE — 583:6677. A button drawn as a line of text: the ramp
    clipped to the glyphs, underlined, in italics because it is quoted speech —
@@ -764,6 +882,11 @@
 /* the two tag pills share the row the way the real tags do, and take the tag's
    own 100px radius rather than the bars' 4 */
 .app .sk-t{flex:1 1 0;min-width:0;height:29px;border-radius:100px}
+/* the sentence that replaced the two pills is a LINE, so its stand-in is one:
+   19px tall to the compact role's line box, square, and 490 wide because that
+   is 581:6539's own measure. `.sk-t`'s 29 and its 100px radius are the pill's
+   box and would draw a lozenge where a line of text now goes. */
+.app .sk-why{flex:0 1 490px;height:19px;border-radius:var(--radius)}
 
 /* THE PHOTOGRAPH'S PLACEHOLDER IS THE ONLY BAR THAT CAN SHRINK, because §70.5's
    phone rule caps `.rec-ph` at 220 and the skeleton has to follow it or the
@@ -816,7 +939,7 @@
    `.modhead` `isolation:isolate` so the wash at -1 cannot escape — and that
    also traps everything inside it, including a card that is `z-index:40`
    against its own siblings. The band itself sits at `z-index:auto` among the
-   page's sections, so "Tal recommends", which comes after it in the document,
+   page's sections, so the recommendation, which comes after it in the document,
    paints over the whole thing: the card was drawn in full and the section on
    top of it hid everything below the panel's bottom edge. It read exactly like
    an `overflow:hidden` somewhere, and there is no `overflow:hidden` anywhere.
@@ -908,7 +1031,7 @@
    own top hairline, so the join above it was being stated twice: §10 gives
    every `.sec` a closing rule on `::after` inset by `--pad-x`, and the line
    above gives this one a full-width rule at the next pixel row. On the `new`
-   dashboard that is the seam under "Tal recommends" — an inset 1px at y and a
+   dashboard that is the seam under the recommendation — an inset 1px at y and a
    full-bleed 1px at y+1, which reads as one thick, slightly ragged edge rather
    than as two lines. §70.3's own closing note records the same artefact in the
    band and says the same thing about it: no sweep measures a line drawn twice
@@ -1034,3 +1157,82 @@
    border rather than sitting inside it: two borders on a 64px field is the
    double-frame §39 spent a whole section undoing on the widgets. */
 .app .askdock > .askline{border-color:var(--ai-1)}
+
+/* --------------------------------------------------------------------- 3b ---
+   AND A MODULE PAGE KEEPS ITS TITLE ABOVE THE TWO COLUMNS
+
+   §70.3's own note says this path exists and that nothing exercised it: the
+   `<h1>` is hidden only on `.ph.ph-you`, "so that a MODULE page can take the
+   two-column band without losing its `<h1>`". The Cohort page is the first one
+   to do it (Maryam, 31 Aug 2026), and the placement was wrong the moment it
+   did — `> *{grid-column:1}` puts the header in column one with an AUTO row,
+   and the summary cell is explicitly `grid-row:1`, so the title was pushed to
+   row two and rendered UNDER Tal's sentence with the wash still behind it.
+
+   THREE RULES AND THEY ARE ONE DECISION: the title takes row one of column
+   one, the summary drops to row two beneath it, and the second column spans
+   both so its hairline still runs the band's full height — which is §70.3's
+   own requirement for that divider, restated now that there are two rows to
+   run past.
+
+   `:not(.ph-you)` ON EVERY SELECTOR so the six dashboards are untouched: their
+   header is clipped to a pixel and a grid row of its own would reopen 34px of
+   space above Tal that §70.3 spent a note closing.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .modhead:has(> .head-col) > .ph:not(.ph-you){grid-column:1;grid-row:1}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .sec:has(> .ai-aura.talsum){
+    grid-row:2}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .head-col{
+    grid-row:1 / span 2}
+}
+
+/* --------------------------------------------------------------------- 3c ---
+   THE LEADER COLUMN'S MESSAGE MARK
+
+   Maryam, 31 Aug 2026: the message control moves onto the right-hand end of
+   Priya's row and comes off the foot of the card.
+
+   IT IS A `.btn-t` WITH NO LABEL, WHICH IS THE ONE THING THIS FILE HAS TO SAY
+   ABOUT IT. §02 sizes a button for words — 40px tall with 24px of side padding
+   — so an icon alone sat in a 60px-wide box with the glyph adrift in the middle
+   of it. A square the size of the mark plus its target area is what an icon
+   control is, and 36 is the smallest square this product draws one in (the
+   sheet close is 44 and sits in a header row with nothing beside it).
+
+   NO ARROW ON IT, AND THAT IS §64 WORKING AS WRITTEN rather than an exception:
+   the arrow is `:not(:has(svg))`, so a button whose whole content is an svg is
+   already excluded. `.noic` keeps §02 from pushing the mark to a far edge that
+   is 4px away.
+
+   `align-self:flex-start` AND NOT `stretch` OR `center`. `.row-lead` is a flex
+   row, so a stretched item takes the row's height and the 36px square came out
+   48 and stopped being square. Centring was the first answer and it was right
+   for two lines; the expertise line moved into the same cell (three lines now),
+   and centred the mark drifted down beside the ROLE — a control that looks like
+   it belongs to the middle sentence. Top-aligned it sits on the name, which is
+   the thing it acts on and where the reference draws it.
+
+   AND THE COLUMN LOSES ~60px WITH THE OLD ROW, which needs nothing here: §70.3
+   stretches both cells to the taller of the two, so the band closes up around
+   Tal's sentence on its own. Adding a height anywhere would freeze a number
+   that four different summaries would each want differently.
+   ------------------------------------------------------------------------ */
+/* AND IT IS THE BLUE, ON A 12% GROUND OF THE SAME BLUE (Maryam, 31 Aug 2026).
+   `--mk-1` is §12's named blue — the one the marker hues use and the one §65
+   draws a chip in — rather than `--link`, because this is a MARK and not a
+   link: `--link` is the ink a piece of underlined text takes, and the product
+   spends it on "Remove", "Receipt" and "98% match". The 12% mix is §65's chip
+   formula unchanged, which is what makes this square read as the same object
+   as every other tinted subject mark in the build.
+
+   THE GROUND IS WHAT MAKES IT A CONTROL. Without it the icon was a black glyph
+   floating at the end of a row of text, and nothing said it was pressable — on
+   a product whose hover is disarmed (trap 6) the resting state has to carry
+   that on its own. */
+.app .sec-lead .row-lead > .btn{
+  flex:none;align-self:flex-start;
+  width:36px;height:36px;min-height:0;padding:0;
+  display:grid;place-items:center;
+  background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
+.app .sec-lead .row-lead > .btn svg{width:20px;height:20px;fill:var(--mk-1)}
