@@ -1,0 +1,253 @@
+/* ==========================================================================
+   83. THE RED ACCENT TRIAL, PART TWO — EVERYTHING THAT IS ORANGE WITHOUT
+   GOING THROUGH `--accent`. TEMPORARY. Delete with §67.
+
+   Maryam, 31 Aug 2026: "i asked you to change everything to red, like all the
+   oranges will be red now, the gradients will be red shade gradients, the
+   orange heighlighted texts will also be red."
+
+   §67 RE-POINTS THE ACCENT TOKENS AND THAT IS ALL IT CAN REACH. Its own note
+   records what it deliberately left orange — Tal's sphere and mark, `--askv-*`,
+   and the artwork — on the reasoning that "Tal stays Tal, which is almost
+   certainly right: the mark is a brand object, not an accent fill". That was
+   the earlier trial's call, made when the trial dressed three dashboards for a
+   side-by-side comparison. This instruction reverses it: the `reddemo` stage
+   exists to show somebody a RED PRODUCT, and one orange sphere on it reads as a
+   bug rather than as a brand object being preserved.
+
+   WHY IT IS A SECOND LAYER RATHER THAN MORE OF §67, AND THIS IS THE WHOLE
+   REASON: §70 STATES `--ai-1/2/3` ON `.app`, AND §70 LANDS AFTER §67. Those two
+   selectors are both (0,1,0), so a `.tmp-accent` re-point written in §67 loses
+   on ORDER alone and the AI ramp simply stays orange — silently, because a
+   custom property that loses does not warn. Everything below has the same
+   shape: it either restates a rule that lands after §67, or it needs a class
+   more than the rule it answers. So this layer is LAST, and every selector in
+   it carries `.app.tmp-accent` (0,2,0) or better.
+
+   `tmp` IS ON `build-ds.py`'s EXCLUDE_PREFIXES, so none of this reaches the
+   design system: `keep_selector` drops a selector if ANY class in it is
+   excluded, and every selector here carries `.tmp-accent`.
+
+   THE RED RAMP IS THREE SHADES OF ONE HUE, which is what "red shade gradients"
+   asks for and is also the only way a gradient survives the change. The orange
+   ramp is three different hues — orange, gold, deep orange — and mapping all
+   three onto #ff0000 would flatten every gradient in the product into a solid,
+   including the ones whose whole job is to be a ramp (Tal's sphere, the ask
+   dock's travelling light). So each ramp keeps its LIGHTNESS ARC and changes
+   its hue: light red, pure red, deep red, in whatever order the original put
+   light, mid and dark.
+
+   #ff0000 IS THE MIDDLE STOP EVERYWHERE, so the trial's stated colour is the
+   one the eye lands on and the other two read as its highlight and its shadow.
+
+   AFTER §63 AND *NOT* ALLOWED TO BE THE USUAL WAY — this layer DOES state text
+   `color`, three times, and that is deliberate rather than an oversight. §63's
+   rule is that the four properties belong to §63 "wherever a later layer sits
+   in the list"; the three declarations here re-point colours §63 itself wrote
+   as HARDCODED ORANGE LITERALS (`#f47113` on `.ai-body p b`, `.jrn-pill` and
+   `.jrn-i.on`) rather than as tokens, so there is no token to re-point and no
+   way to answer them from §67. They are listed in §83.4 with their weights.
+   Delete this file and every one of them reverts.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE AI RAMP — §70's three stops, which is the biggest single change here
+
+   `--ai-1/2/3` feed `--ai-grad`, `--ai-grad-alt`, `--ai-wash` and `--ai-hl-bg`,
+   and those four draw: Tal's "Summary by Tal" label, `.aih-mk` (the sparkle on
+   every AI-native section head), `.pulse-mk`, the summary panel's wash, the
+   inline highlight behind an accent phrase in Tal's sentence, and the ask
+   dock's travelling light. Re-pointing the three stops moves all of it, which
+   is exactly what §70 wrote them as tokens for.
+
+   THE ORDER IS §70'S OWN — mid, light, deep. `#f47113` is the orange, `#e2a600`
+   the gold that lifts the middle of the ramp, `#f0530c` the deep end. So the
+   red ramp is a mid red, a light red where the gold was, and a deep red.
+
+   `--ai-amber` FOLLOWS BECAUSE IT IS `var(--ai-2)` AND NOT A LITERAL. §70 wrote
+   it that way so "the two are the same gradient and have to stay so", and that
+   discipline is what makes this three lines instead of ten.
+
+   `--ai-hl-bg` IS A HARDCODED rgba, not derived from `--ai-1`, so it does not
+   follow on its own — the same trap §67 records for `--accent-shadow`. Same 5%
+   alpha, red hue: this is the ground behind "Explorer – E3" and "delegation and
+   hard conversations" in Tal's summary, which is half of what "the orange
+   highlighted texts" names. The other half is the ink, in §83.4. */
+.app.tmp-accent{
+  --ai-1:#ff2d2d;
+  --ai-2:#ff6b6b;
+  --ai-3:#cc0000;
+  --ai-hl-bg:rgba(255,0,0,.05);
+
+  /* §01's warm tint — the ground under a step mark, the date chip and §12's
+     chips. #fcdbc7 is the accent at about 20% over white; this is the same
+     mix on red, so nothing changes weight. */
+  --brand-tint-2:#ffd6d6;
+
+  /* §53's two, both `:root` and both literal oranges: the ask page's stroke
+     and the chip line on Tal's own ground. */
+  --askv-stroke:#ffc0c0;
+  --askv-chip-line:#ff0000;
+}
+
+/* --------------------------------------------------------------------- 2 ---
+   TAL'S SPHERE — §50, all three sizes, one declaration
+
+   §33.6 (the 32px band mark), §40 (the 132px chat orb) and §40 again (the ask
+   dock's line mark) each state their own `background-image`, and §50 then
+   OVERRIDES all three with the sphere: a white specular highlight, a dark
+   underside, and the body gradient under both. Restating §50's three selectors
+   is therefore the whole of it — the three earlier rules never win.
+
+   ONLY THE BODY GRADIENT CHANGES. The two radials are white and black at low
+   alpha and are what make the disc read as a sphere at any hue; they are copied
+   unchanged rather than left out, because `background-image` is one property
+   and a partial restatement would drop the highlight.
+
+   `#F6DC92 → #F47113 → #E85D0F` IS PALE GOLD → ORANGE → DEEP ORANGE, so the red
+   is pale red → pure red → deep red at the same three stops and the same
+   155deg. The sphere keeps its modelling; only its hue moves.
+
+   THE SPECULAR HIGHLIGHT IS WHY THIS CANNOT BE A `filter:hue-rotate()`. That
+   was the cheap version and it is wrong twice: it would rotate the white
+   highlight and the black underside along with the body (they are achromatic,
+   so in practice it leaves them alone) AND it would rotate the CHEVRON, which
+   is Tal's mark rather than a colour. Restating the gradient changes exactly
+   the layer that is orange.
+
+   AND IT IS LIGHTER THAN A STRAIGHT LIGHTNESS MATCH — Maryam, 31 Aug 2026,
+   "lighten the shade of blob". The first cut mapped each orange stop to the red
+   at the SAME HSL lightness (#F6DC92 -> #FF8A8A, #F47113 -> #FF0000, #E85D0F ->
+   #C00000) and came out visibly heavier than the orange sphere it replaced,
+   which is the thing to understand rather than just correct: at equal lightness
+   red is far more SATURATED than orange, and saturation is what the eye reads
+   as weight on a 32px disc. Matching the number gave the wrong answer to the
+   question the number was standing in for. So each stop is lifted — a pale
+   pink top, a mid red where the pure red was, and a deep end that is no longer
+   near-black. The disc still reads as this trial's red; it no longer reads as
+   the heaviest object in the band. */
+.app.tmp-accent .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
+.app.tmp-accent .askdock .askline-mark .tal-mk::before,
+.app.tmp-accent .ask-thread .tal-hero .tal-mk.orb::before{
+  background-image:
+    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
+    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
+    linear-gradient(155deg,#FFD0D0 0%,#FF5C5C 50%,#E63B3B 100%)}
+
+/* -------------------------------------------------------------------- 2a ---
+   THE TRAVELLING LIGHT ON THE ASK FIELD — and it is the one orange in the
+   product that NO CSS SCAN FINDS (Maryam, 31 Aug 2026: "change the moving line
+   colors to shades of red").
+
+   §70.1's dash runs a `<linearGradient>` whose five stops live in `AI_RUN`
+   (ai4.js) as MARKUP, because an SVG cannot be a pseudo-element — so the ramp
+   is five `stop-color` ATTRIBUTES in a JS template, not a declaration in any
+   layer. Grepping the stylesheets for orange literals returns nothing here, and
+   the light went on running gold over a red field for a whole build. Any future
+   sweep for "what is still the old colour" has to read ai4.js as well.
+
+   IT IS ANSWERED IN CSS RATHER THAN IN ai4.js, WHICH IS THE WHOLE POINT.
+   `stop-color` is a PRESENTATION ATTRIBUTE, so any CSS rule beats it — which
+   means the trial can re-point the ramp from inside `.tmp-accent` and every
+   other stage keeps the gold. Editing the five attributes in `AI_RUN` would
+   have been one line and would have turned the light red on all ten stages.
+
+   STOPS 1 AND 5 ARE LEFT WHITE. §70.1's note is explicit that the two outermost
+   stops are the file's own white ends, and that they matter: on the ring they
+   sit on the field's border, "where a hard white end reads as a bright gap
+   chasing the light round". They are not oranges and they do not move.
+
+   THE THREE INNER STOPS ARE GOLD — #f4b413 / #e2a600 / #f0bf0c — and the middle
+   one is the DARKEST of the three, not the lightest. The red keeps that arc, so
+   the light still has a dense centre with brighter shoulders; mapped the other
+   way it would flare in the middle and read as a pulse rather than a moving
+   line. */
+.app.tmp-accent .ai-run stop:nth-child(2){stop-color:#ff5c5c}
+.app.tmp-accent .ai-run stop:nth-child(3){stop-color:#ff0000}
+.app.tmp-accent .ai-run stop:nth-child(4){stop-color:#ff7070}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE TWO GRADIENTS THAT ARE NOT THE RAMP AND NOT THE SPHERE
+
+   TAL'S BUBBLE EDGE — §39. A `border-image` running orange → cream → violet,
+   which is the one gradient in the product that ends on a second hue. The
+   violet stays: it is not an orange and the instruction is about the oranges.
+   The `border` under it is the fallback colour for a browser that ignores
+   `border-image`, so it moves with the first stop or the two disagree.
+
+   THE ASK CHIP'S SPARK — §51 and §53 state the same `linear-gradient(180deg,
+   #FBB2D4 0%, #E98B46 100%)` on `.sk-mark`, pink into a warm orange. Both are
+   restated because the two selectors are different scopes of the same mark and
+   §53's is the later of the two; answering one would leave the chip's spark
+   orange on whichever surface the other one owns. The pink end stays, for the
+   violet's reason. */
+.app.tmp-accent .ask-thread .tal-msg:not(.me) > .bb,
+.app.tmp-accent .tal-panel .tal-msg:not(.me) > .bb{
+  border:1px solid #ff0000;
+  border-image:linear-gradient(135deg,
+    #ff0000 0%, #ffd6d6 50%, #cb8dd7 100%) 1}
+
+.app.tmp-accent .ask-page .ask-sugg .chip-tal .sk-mark,
+.app.tmp-accent .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
+  background-image:linear-gradient(180deg,#FBB2D4 0%,#E84646 100%)}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE ORANGE HIGHLIGHTED TEXTS — three `color`s §63 wrote as literals
+
+   These are the words Maryam's instruction names last and they are the reason
+   this layer is allowed to state `color` at all. §63 owns the four type
+   properties, and it states these three as HARDCODED `#f47113` rather than as
+   `var(--accent-text)` — deliberately, because they are Tal's hue and not the
+   product's accent (§39's note: "#f47113 is NOT --accent"). With no token in
+   the middle there is nothing for §67 to re-point, so they are answered here
+   with one class more than §63 uses:
+
+     `.app .modhead .ai-aura.talsum .ai-body p b`   (0,4,0) -> (0,5,0)
+     `.app .jrn-pill`                               (0,2,0) -> (0,3,0)
+     `.app .jrn-i.on`                               (0,3,0) -> (0,4,0)
+
+   THE INK IS `#dc0000` AND NOT `#ff0000`, WHICH IS §67'S OWN SPLIT. Pure red is
+   4.00:1 on white and fails AA as text; #dc0000 is 5.19:1, the exact ratio the
+   orange `--accent-text` it replaces was measured at. §67's note makes this
+   argument at length for the accent ink and it applies unchanged — the fill is
+   #ff0000, the ink is not, and that is the same separation §01 already makes
+   for the orange. `.ai-body p b` sits on `--ai-hl-bg`, a 5% red wash, where the
+   ratio is 4.98:1 and still clear.
+
+   THE JOURNEY LIST'S CURRENT STEP KEEPS ITS MARK'S HUE BY FOLLOWING `--accent`
+   — `.jrn-i.on` is the numeral and the label of the step you are on, which is
+   the "3. Course Enrollment" line in the band. */
+.app.tmp-accent .modhead .ai-aura.talsum .ai-body p b,
+.app.tmp-accent .jrn-pill,
+.app.tmp-accent .jrn-i.on{color:#dc0000}
+
+/* --------------------------------------------------------------------- 5 ---
+   §70'S THREE REMAINING LITERALS — the recommendation's rating and its
+   "see all" button, all `#f47113` and all on `.rec-*`.
+
+   `var(--accent)` RATHER THAN A FOURTH LITERAL, because §67 already re-points
+   that token and these three should not be able to disagree with the buttons
+   beside them. The `.rec-see` pair is a border and an ink on a WHITE card, so
+   it takes `--accent-text` for the words at §83.4's ratio and the flat accent
+   for the edge — an edge is not text and does not owe AA.
+
+   `.rec-r svg` IS THE STAR RATING'S FILL and is 20px of solid colour, so it
+   takes the fill value. */
+.app.tmp-accent .rec-r svg{fill:var(--accent)}
+.app.tmp-accent .rec-a > .btn.rec-see{
+  color:var(--accent-text);
+  border-color:var(--accent)}
+.app.tmp-accent .rec-a > .btn.rec-see svg{fill:var(--accent-text)}
+
+/* WHAT IS STILL NOT RED, AND IT IS NOW ONLY THE ARTWORK:
+     - the award WebPs and the auth photograph. Images cannot follow a token,
+       and a `hue-rotate` over a photograph is not a colour change, it is a
+       filter you can see.
+     - `--tal-mark` (`tal-circle.png`), the blob behind `.tal-fab` and §21's ask
+       line. §27's end sets `.tal-fab` to `display:none` and §50 replaces the
+       ask line's mark with the sphere above, so nothing on the `reddemo` stage
+       draws it — checked rather than assumed.
+     - `--auth-o-1` / `--auth-o-2`, §01's sign-up namespace. Walled off inside
+       `.auth-card` and unreachable outside it, and no auth screen is in the
+       trial: `reddemo` carries the `full` nav. Left orange deliberately so the
+       trial cannot leak into a surface it was not asked for. */

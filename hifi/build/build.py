@@ -741,7 +741,60 @@ css = '\n'.join((here / f).read_text() for f in
                  # font-size, font-weight, text-transform or text colour.
                  # Those are §63 §19 — including the two that read as
                  # mechanism, the `<ol>` marker's inherited ink and the tag's.
-                 '80-quizpeek.css'])
+                 '80-quizpeek.css',
+                 # THE JOIN THAT IS NOT OPEN YET: the disabled state of the
+                 # accent button on §75's black card. The cohort leader's next
+                 # interview is the first caller (Maryam, 31 Aug 2026 — "disable
+                 # the join call button and enable it at time of the call") and
+                 # `joinLive` in views.js owns the window.
+                 # AFTER §75 AND §71, WHICH IS THE WHOLE OF WHY IT IS A LAYER
+                 # RATHER THAN A LINE IN ONE. Both of those paint this button the
+                 # accent — a colour AND a gradient — and §02.108's disabled
+                 # ground is (0,2,0) against their (0,4,0), so the default
+                 # `disabled` treatment never landed: the button was the full
+                 # accent fill and unpressable, which reads as a broken control
+                 # rather than a closed door. It is stated on `.dark-card` rather
+                 # than on `.crow-dark` so the next black card with a gated
+                 # action gets it free.
+                 # AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/
+                 # §69-§80 each pass: one ground, one image, one border colour,
+                 # one fill and one flag, and not one font-size, font-weight,
+                 # text-transform or text colour. Those four are §63 §20 — one
+                 # declaration, because this layer points the arrow at
+                 # `currentColor`.
+                 '81-joingate.css',
+                 # THE ENROLMENT OFFER BECOMES A BLACK CARD. §73 made it a
+                 # full-width white section on the argument that `.plate` is
+                 # §59's time-sensitive object and enrolling has no clock;
+                 # `.dark-card` is a different object with a different rule —
+                 # §75's "this is the one thing the page is about" — so this
+                 # is not a reversal of that layer and its note says which
+                 # half of §73's argument still stands.
+                 # LATE, and it has to be after §73 and §79: it overrides
+                 # §73.1a's `.facts.eo-facts` padding at equal weight, and it
+                 # re-runs §79.1's answer to trap 13 for a second `aiHead`
+                 # inside a `.dark-card`. §82 IS THE NUMBER BECAUSE §81 WAS
+                 # TAKEN while this was being written — the two were authored
+                 # in parallel and neither depends on the other.
+                 # Allowed after §63 on §64/§75/§79's test: flex, one border,
+                 # two backgrounds, two fills and spacing, and not one
+                 # font-size, font-weight, text-transform or text colour.
+                 # Those four are §63 §21.
+                 '82-enroldark.css',
+                 # TEMPORARY — the red accent trial, part two. Delete with §67
+                 # and `tmpaccent.js`; that layer's head has the full removal
+                 # note and this one's says why the trial needs two layers.
+                 # DEAD LAST, and that is the entire reason it exists as a
+                 # separate file: §70 states `--ai-1/2/3` on `.app`, which is
+                 # the same (0,1,0) as §67's `.tmp-accent`, so a re-point
+                 # written in §67 loses on ORDER and the AI ramp stays orange
+                 # silently. Everything here either restates a rule that lands
+                 # after §67 or needs a class more than the rule it answers.
+                 # It DOES state `color` three times, against §63's rule, and
+                 # §83.4 lists the three with their weights: each re-points a
+                 # hardcoded `#f47113` that §63 itself wrote as a literal
+                 # rather than a token, so there is nothing for §67 to move.
+                 '83-tmpaccent2.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

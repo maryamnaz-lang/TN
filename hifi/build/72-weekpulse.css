@@ -56,6 +56,55 @@
   grid-auto-columns:minmax(0,1fr);
   border:0;border-top:1px solid var(--rule)}
 
+/* THE PACE COLUMN SPANS TWO OF THE AUTO TRACKS (Maryam, 31 Aug 2026: "remove
+   the current focus section and give the second Your pace column that width").
+
+   The focus column is gone — `pulseCols`'s note is why it could go — and two
+   equal halves is the wrong answer: it gives the pace bar 570px for a 28-block
+   measure that is legible at 380, and it makes the standing column, three rows
+   of a mark, a label, a note and a figure, the WIDER of the two. Spanning two
+   of three tracks leaves pace at two thirds and standing at the third it
+   already had, so nothing about the standing cells moves.
+
+   THE SPAN HAS TO BE TURNED OFF WHEN THE FLOW TURNS, and this is §72.3's lesson
+   on the divider in a different property. Below 900 §72 sets
+   `grid-auto-flow:row` for a single stacked column; a `grid-column:span 2` left
+   standing there asks for a second column that does not exist, and the browser
+   makes one — so the pace column came out half width with an empty track beside
+   it. `span 1` rather than `initial`, because that is what every other column
+   in the stacked shape resolves to. */
+@container app (min-width:900px){
+  .app .pulse > .pulse-c.pulse-wide{grid-column:span 2}
+}
+@container app (max-width:899.98px){
+  .app .pulse > .pulse-c.pulse-wide{grid-column:span 1}
+}
+
+/* --------------------------------------------------------------------- 1e ---
+   THE STANDING COLUMN IS AS TALL AS THE PACE COLUMN, NOT TALLER
+   Maryam, 31 Aug 2026: "reduce the right size content font sizes and make this
+   column height equal to the left side your pace section height".
+
+   IT WAS THE COLUMN SETTING THE ROW'S HEIGHT, which is the part worth naming.
+   Both columns are grid items in a stretch row, so their BOXES are always the
+   same height; what differed is which one's content demanded it. Pace is a
+   figure, a bar and three small figures — about 420px. Standing is three rows
+   each holding 32px of artwork, an h4 title, a caption and a 24px figure, and
+   it came to roughly 560. So the row was 560 and the pace column carried 140px
+   of white beneath it, which reads as the block having stopped early.
+
+   THE FIX IS THE CONTENT, NOT A HEIGHT. `height:100%` or a `max-height` on the
+   standing column would have clipped or scrolled three rows of figures inside
+   a section made of hairlines. The rows lose one tier each instead — §63 §20
+   states the three sizes — and the row gap closes from `--s05` to `--s04`. The
+   artwork goes 32 to 24, which is the size §72's own note settled on for these
+   marks in the first place ("KEEPS THE AWARD ARTWORK AT 24px").
+
+   THE ARTWORK IS ALREADY 24 — §72.498 sets it, and that layer's own note is
+   where the decision is argued ("KEEPS THE AWARD ARTWORK AT 24px"). So the only
+   geometry left to this block is the row's padding, and the rest is type. */
+.app .page .pulse .stand .stand-c{padding-top:var(--s04);padding-bottom:var(--s04)}
+
 /* THE COLUMN DIVIDER IS AN INSET PSEUDO-ELEMENT, NOT A `border-left`, AND THE
    INSET IS THE WHOLE POINT (Maryam, 31 Aug 2026).
 
@@ -83,19 +132,59 @@
    Vertical padding only; the separation between columns is the grid's own
    `column-gap`, and the divider sits in the middle of it.
 
-   `left:calc(var(--s07) / -2)` IS THE GAP HALVED, so one value drives both the
+   `left:calc(var(--gap) / -2)` IS THE GAP HALVED, so one value drives both the
    space and the line's position and they cannot drift. A `border-left` would sit
-   hard against the column that follows rather than between the two. */
-.app .pulse{column-gap:var(--s07)}
+   hard against the column that follows rather than between the two.
+
+   THE GAP IS `--s09` (48), UP FROM `--s07` (32) — Maryam, 31 Aug 2026: "give
+   space on the left and right side of the vertical divider in these columns. it
+   is too close right now." Because the line sits in the middle, 32 was only 16
+   clear on each side, and the two things nearest it are the pace column's third
+   figure ("22% / Of target", right-aligned hard against the gutter) and the
+   standing column's 24px star — so both sides had content pressed to within a
+   label's own leading of the rule. 48 gives 24 each side, which is `--s06`, the
+   inset every cell in this section already pays vertically.
+
+   IT IS ONE DECLARATION BECAUSE OF THE `--gap` INDIRECTION. The divider's
+   `left` used to read `calc(var(--s07) / -2)`, so changing the gap meant
+   changing the same token in two places and hoping. A custom property on the
+   grid is what makes "one value drives both" true rather than aspirational. */
+.app .pulse{--gap:var(--s09);column-gap:var(--gap)}
 .app .pulse > .pulse-c{
   position:relative;
   min-width:0;
   padding:var(--s06) 0}
 .app .pulse > .pulse-c + .pulse-c::before{
   content:'';position:absolute;
-  left:calc(var(--s07) / -2);top:var(--s06);bottom:var(--s06);
+  left:calc(var(--gap) / -2);top:var(--s06);bottom:var(--s06);
   width:1px;
   background:var(--rule)}
+
+/* ------------------------------------------------------------------ 72.1d ---
+   NO SECTION SEAM BETWEEN THE FIGURE BLOCK AND THE PULSE
+   Maryam, 31 Aug 2026: "remove the divider after blocks."
+
+   On Course Progress the four-cell `.stats` grid is the section directly above
+   this one, and §10.2 closes every `.sec` with a full-bleed hairline. `.stats`
+   already draws its own box — §29.17 gives it a border on all four sides — so
+   the seam landed 40px under a bordered block and read as that block having two
+   bottom edges rather than as the boundary between two sections. The pulse
+   states its own `border-top` above its columns, which is the rule this section
+   actually needs.
+
+   IT IS A CLASS THE VIEW WRITES, NOT A `:has(+ .sec > .pulse)`, AND THE FIRST
+   VERSION WAS THE SELECTOR. That selector matched — `el.matches()` against the
+   live DOM returned true — and the rule was present in the built stylesheet at
+   (0,6,0) against §10.2's (0,1,0), and the pseudo-element still computed
+   `display:block`. Three probes failed to account for it. Rather than ship a
+   rule I could not explain, the section declares itself.
+
+   IT IS ALSO THE MORE HONEST STATEMENT. `:has(> .stats)` alone would drop the
+   seam under every four-cell grid in the build — the promoted dashboard, the
+   leader's figure bar — where nothing below draws its own rule. What is true
+   here is narrower than any selector: on THIS page, THIS pair is joined.
+   `V.transcript` is where that is known, so that is where it is said. */
+.app .page > .sec.sec-joined::after{display:none}
 
 /* -------------------------------------------------------------------- 1a ---
    THE SECTION HAS TO OPT OUT OF THE LABEL COLUMN — TRAP 13, AND IT IS THE

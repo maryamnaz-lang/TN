@@ -531,7 +531,17 @@
    section that pays no vertical padding at all is not a rhythm exception, it is
    not a member of the rhythm. */
 @container app (min-width:900px){
-  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call){
+  /* AND `.dark-card` IS EXCLUDED FOR `.sec-call`'S REASON, one class along
+     (Maryam, 31 Aug 2026 — the enrolment offer is a §75 card now). §75 gives
+     the card `padding:var(--s07)` on all four sides as part of the recipe, and
+     this rule is (0,6,0) inside a container tier against that (0,3,0), so the
+     card's own frame was being set by a rhythm rule rather than by §75. It
+     happens to compute to the same 32 today, which is exactly why it had to be
+     written down: a card that pays its own frame is not a member of the page
+     rhythm, and the next edit to either number would have silently split them.
+     Extending the `:not()` list is trap 4's instruction and is how `.sec-call`
+     was answered directly above. */
+  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call):not(.dark-card){
     padding-top:var(--s07);padding-bottom:var(--s07)}
 }
 

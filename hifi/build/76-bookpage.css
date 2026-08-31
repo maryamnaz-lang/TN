@@ -59,6 +59,55 @@
 .app .bks-w{padding:var(--s07) 0}
 .app .bkc{border-top:1px solid var(--rule);padding-top:var(--s07)}
 
+/* ------------------------------------------------------------------ 76.1b ---
+   THE CHOOSING AND THE PAYING ARE A CENTRED COLUMN, NARROWER THAN THE PROFILE
+   Maryam, 31 Aug 2026, with the frame marked: "set the date time and bottom
+   button row to have the width of the red block i marked, so they will be
+   middle aligned."
+
+   WHY THESE TWO AND NOT THE PROFILE. The panel above is a portrait beside four
+   facts — content that genuinely reads across a 1013px row, and the one the
+   mark deliberately excluded. The two below it are a 7-column calendar and a
+   list of four times, and a fee with a button: at full width the times column
+   was 600px holding "11:30 AM" against a radio at the far right, which is a
+   row you have to track your eye across to answer a question with four
+   possible answers. 830 is where the calendar keeps its own width and the
+   times column stops being a corridor.
+
+   `min(100%, 830px)`, NOT A PERCENTAGE. Below about 900 the content column is
+   already under 830, so the cap yields and the blocks are full width with no
+   breakpoint in it — which is why this is stated unconditionally rather than
+   inside the 900 query. A `60%` would keep shrinking past the point the two
+   columns fit and would put the cap in charge at widths where the content
+   should be.
+
+   THE SEAM ABOVE IT IS FULL WIDTH AND STAYS ON `.bkp` (Maryam, 31 Aug 2026:
+   "the divider above the Choose a date and time section should be full width").
+
+   THIS REVERSES A MOVE THIS LAYER MADE AND THE REASONING IS WORTH KEEPING,
+   because it is a real trade rather than a mistake. Narrowing the blocks was
+   done together with moving that rule onto `.bks-w`'s top, on the argument that
+   a border belongs to the box that draws it — a full-width rule above an 830px
+   block overhangs it by 91px each side, a hairline running out into nothing.
+
+   What that under-weighted is WHAT THE RULE IS FOR. It is not the choosing
+   block's own top edge, it is the boundary between the profile and the
+   choosing — a section seam, and every other section seam in this product is
+   full-bleed (§10.2 closes every `.sec` edge to edge, §25.2 ends the head band
+   the same way). Read as a seam, spanning the page is the rule and matching the
+   narrower block would be the exception. The overhang is not a hairline into
+   nothing; it is the page's own division, and the block below it happens to be
+   inset from it.
+
+   NOTE THE ASYMMETRY THIS LEAVES: `.bkc`'s `border-top` is still 830, because
+   it moves with the block it is on. If both seams should span the page, that
+   rule needs the same treatment as this one — a full-bleed `::before` on a
+   centred block, since `.bkc` cannot be both 830 wide and draw a 1013px
+   border. */
+.app .bks-w,.app .bkc{
+  width:100%;max-width:min(100%, 830px);
+  margin-left:auto;margin-right:auto}
+
 /* ------------------------------------------------------------------ 76.2 ---
    THE PROFILE PANEL — who, beside what it costs
 

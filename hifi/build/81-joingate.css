@@ -1,0 +1,85 @@
+/* ==========================================================================
+   81. THE JOIN THAT IS NOT OPEN YET — `.dark-card .btn-p[disabled]`
+   Maryam, 31 Aug 2026: "Disable the join call button and enable it at time of
+   the call." The cohort leader's dashboard is the first caller; `joinLive` in
+   views.js owns the window and `crow`'s `{gate:true}` owns the markup.
+
+   ONE RULE AND A HALF, BECAUSE THE STATE ALREADY EXISTS AND ONLY THE GROUND
+   DOES NOT. §02.108 states the whole disabled treatment —
+   `background:var(--layer-02); color:var(--text-disabled); border-color:
+   transparent; cursor:not-allowed; pointer-events:none` — and three of those
+   five are right on any ground. What is wrong on a black card is the same thing
+   that is wrong about every light token there: `--layer-02` is a 4% grey, which
+   on `--gray-100` is a white slab, and it never gets the chance to be one
+   anyway, because §75's accent fill is (0,4,0) against that rule's (0,2,0).
+
+   SO THE DEFAULT STATE OF THIS BUTTON WAS *INVISIBLE*, WHICH IS THE FAILURE
+   WORTH NAMING. Adding `disabled` to a `.btn-p` inside a `.dark-card` and
+   changing nothing else produces a button that is still the full accent
+   gradient with `--on-accent` ink and cannot be pressed — a control that looks
+   exactly as live as the one beside it and does nothing. A gate nobody can see
+   is worse than no gate: the reader concludes the product is broken rather than
+   that the call has not started.
+
+   THE DISABLED GROUND IS `--on-dark-fill`, WHICH IS §02'S SUBSTITUTION MADE IN
+   THE CARD'S OWN REGISTER. White at 12% over #111 is the same read a 4% grey is
+   on white — present, unlit, clearly not the accent — and it is the token §75
+   already reaches for when a light ground has to survive on this card
+   (`.rec-ph`'s photograph fallback) and §77 reached for when the countdown cell
+   did. Measured: `--on-dark-2` on it is 8.0:1, so the words are not merely
+   legible, they are past AA for body text; what says "disabled" is the fill
+   next to the accent one, not a dimmed ink.
+
+   NOT `opacity`, AND TRAP 2 IS THE REASON RATHER THAN TASTE. §13 runs the
+   entrance animations with `fill-mode:both`, so a played animation's last
+   keyframe keeps applying and anything resting on `opacity` is fighting it.
+   The trap's own wording is the instruction: "never style a resting state with
+   `opacity` — put the weight in `background-color`". `--state-disabled` is
+   right for §41's and §76's calendar arrows, which are marks on a white page
+   with no animation over them; it is the wrong mechanism for a filled button
+   inside an animated section.
+
+   AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/§69–§80 each pass: one
+   ground, one image, one border colour, one fill and one flag, and not one
+   font-size, font-weight, text-transform or text colour. Those four are §63 §20.
+   ========================================================================== */
+
+/* `background-image:none` IS HALF THE RULE AND IS EASY TO MISS. Both layers
+   that make this button the accent paint a GRADIENT as well as a colour — §71.2
+   gives `.crow-a > .btn-p` `background-image:var(--accent-grad)` and §75.3
+   repeats it for every `.dark-card .btn.btn-p` — and `background-color` alone
+   leaves the ramp on top of the new ground, so the button stays orange and only
+   its edges change. One property per layer that painted it.
+
+   `--on-brand-fill:0` IS FOR THE AUDIT, NOT FOR THE PAGE. §19 and §01.40 record
+   the flag as what the contrast sweep reads to know a control is drawn on a
+   brand ground; §71 and §75 both set it to 1 on this button, and left at 1 the
+   sweep would measure this pair as white-on-accent — which is neither of the two
+   colours actually on screen. §27.303 sets it back to 0 for the same reason on
+   the ask dock's quiet state.
+
+   (0,5,0) AND EVERY DIGIT OF IT IS NEEDED. §75.3's fill is
+   `.app .dark-card .btn.btn-p` at (0,4,0) and §71.2's is `.app .crow-a > .btn-p`
+   at (0,3,0); an attribute selector weighs the same as a class, so naming the
+   state is exactly the one step of specificity this needs — and it is stated on
+   `.dark-card` rather than on `.crow-dark` because the next black card with a
+   gated action gets it free, which is §75's whole argument for the component. */
+.app .dark-card .btn.btn-p[disabled]{
+  background-color:var(--on-dark-fill);
+  background-image:none;
+  border-color:transparent;
+  --on-brand-fill:0}
+/* THE ARROW FOLLOWS THE WORDS. §75.3 sets `fill:var(--on-accent)` on this
+   button's svg at (0,4,0) — white, which was correct while the ground was
+   orange and is a white arrow on a grey wash here. `currentColor` rather than a
+   named token, so the one `color` declaration in §63 §20 draws the glyph and
+   the label together and there is no second place to keep in step. */
+.app .dark-card .btn.btn-p[disabled] svg{fill:currentColor}
+
+/* AND NOTHING IS STATED FOR A GATED JOIN ON A WHITE GROUND, because §02.108
+   already draws one correctly and this is where a reader will look for the
+   omission. `crow`'s three candidate call sites do not pass `{gate:true}` (the
+   note over that function is the argument — their Joins are the prototype's own
+   way into `callScreen`), so no white row has a disabled button today. If one
+   ever does, the grey plate and `--text-disabled` are already right for it:
+   that rule loses on this card and on no other. */

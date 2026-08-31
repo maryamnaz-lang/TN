@@ -171,6 +171,31 @@
      `--t-h3-*`; nothing else reads it. */
   --t-sec-size:16px;          --t-sec-lh:22px;          --t-sec-ls:-.15px;
 
+  /* THE TENTH SIZE, AND §17 PREDICTED THE MOMENT IT WOULD BE MINTED.
+     18px. That note reads: "This one does NOT get a token: `--t-sec-size`
+     earned one because three headings across two layers read it, and this has
+     a single reader. If a second block ever wants 18, that is the moment to
+     tokenise it rather than to copy the number." A second block wants 18 —
+     the cohort leader's dashboard sets its four section headings there
+     (Maryam, 31 Aug 2026: "Your cohorts", "Needs attention", "Waiting on you",
+     "Booked") — so the number stops being one component's and becomes a role.
+
+     TWO READERS, TWO LAYERS, WHICH IS THE SAME TEST `--t-sec-size` PASSED:
+     `.dc-t` (the black card's title, §17 below) and the leader dashboard's
+     `.sec-h h2` (§21). Both are the head of a BLOCK the reader is meant to
+     land on, one rank above the 16 that heads an AI-native section and two
+     above the 12.5 every other section heading takes.
+
+     IT IS NOT A NEAR-DUPLICATE, which is the other half of §7's test: h3 is
+     17 and is the nearest role, one pixel off — the identical position
+     `--t-sec-size` was in — but the scale now carries 16 and 18 as two named
+     ranks with different jobs, and collapsing either into 17 would put a
+     section heading and a card title at one size for no reason but arithmetic.
+
+     To revert, point `.dc-t` and §21 at `--t-h3-*` and delete these three;
+     nothing else reads them. */
+  --t-sec-lg-size:18px;       --t-sec-lg-lh:24px;       --t-sec-lg-ls:-.2px;
+
   /* TWO WEIGHTS, AND THEY ARE NAMED AFTER THE FACES THEY ACTUALLY LOAD.
      Anything that is not one of these two is a lie about what will render —
      see §0.1. `--t-w-book` is Söhne Buch, `--t-w-strong` is Söhne Kräftig. */
@@ -1046,7 +1071,6 @@
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none}
-.app .jrn-n,
 .app .jrn-lab{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
@@ -1081,6 +1105,30 @@
 .app .jrn-i{color:#515151}
 .app .jrn-i.done{color:#00a43c}
 .app .jrn-i.on{color:#f47113}
+
+/* A FINISHED STEP'S WORDS ARE INK AND ONLY ITS MARK IS GREEN (Maryam, 31 Aug
+   2026: "The complete steps icon should be green just like now but the text
+   needs to be in black color").
+
+   THE THREE RULES ABOVE SET `color` ON THE ROW, and §70.647 gives the mark
+   `fill:currentColor` — one declaration painting both, which is what made the
+   states cheap to write and is why the label went green with the tick. It is
+   also the reading that does not hold once there are two finished steps: green
+   on the WORDS says the words are the news, when what is finished is old and
+   the only thing on this list worth finding is the step you are on.
+
+   SO THE ROW'S `color` IS NOW THE MARK'S CHANNEL and the label states its own.
+   Only the `done` state is turned over: `on` keeps the accent on both, because
+   there the words ARE the news, and a queued step keeps §63's #515151 on both
+   because grey on grey is the whole of what "not yet" has to say.
+
+   IT IS THE THING §63 §10's NOTE PRICED AND DID NOT BUY. That note records the
+   file's #00a43c reading 2.8:1 on white and being kept anyway as Maryam's call
+   over this layer's AA rule. Moving the LABEL to `--text-primary` at 16.9:1
+   pays most of that back without touching the design: the failing ratio is now
+   carried by a 16px tick, which is a graphical object at a 3:1 threshold, and
+   the text beside it passes outright. */
+.app .jrn-i.done .jrn-lab{color:var(--text-primary)}
 
 /* THE RECOMMENDATION. The name is the one thing on the block a step up; the
    rest of it is compact, with the fact row and the description in the one grey
@@ -1210,16 +1258,20 @@
    stay black on black. It is written at (0,5,0) for that reason, which is §7b's
    trap arriving one more time.
 
-   AND THE HEADING IS 18px BY NUMBER, WHICH IS A STATED §7 EXCEPTION. §11's own
-   rule is take the nearest role, and the nearest is `--t-h3` at 17 — one pixel
-   off, exactly the position `--t-sec-size` was in when it was minted. This one
-   does NOT get a token: `--t-sec-size` earned one because three headings across
-   two layers read it, and this has a single reader. If a second block ever
-   wants 18, that is the moment to tokenise it rather than to copy the number.
+   AND THE HEADING IS 18px, WHICH IS NOW `--t-sec-lg-size` RATHER THAN A NUMBER.
+   §11's rule is take the nearest role, and the nearest is `--t-h3` at 17 — one
+   pixel off, exactly the position `--t-sec-size` was in when it was minted.
+   This note used to say the 18 did NOT get a token, because `--t-sec-size`
+   earned one on three readers and this had a single one, and it ended: "If a
+   second block ever wants 18, that is the moment to tokenise it rather than to
+   copy the number." That happened on 31 Aug 2026 — the leader dashboard's four
+   section headings (§21) — so the token exists and this rule reads it. The
+   argument is unchanged and the number is now in one place; §2's own entry for
+   `--t-sec-lg-size` is the long version.
    -------------------------------------------------------------------------- */
 .app .dark-card .dc-t{
-  font-size:18px;line-height:24px;
-  font-weight:var(--t-w-strong);letter-spacing:-.2px;
+  font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls);
   text-transform:none;
   color:var(--on-dark)}
 .app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
@@ -2322,3 +2374,186 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--link)}
+
+/* ==========================================================================
+   20. THE JOIN THAT IS NOT OPEN YET — §81's `.dark-card .btn-p[disabled]`
+
+   Maryam, 31 Aug 2026, on the cohort leader's dashboard: the Join is disabled
+   until the call starts. §81 states the ground and not one of this file's four
+   properties; this is the ink, and it is ONE declaration because that layer
+   points the arrow at `currentColor`.
+
+   `--on-dark-2`, WHICH IS THE CARD'S SUPPORTING INK AND NOT A DISABLED GREY.
+   §02.108 uses `--text-disabled` (#a9a8a5) for every other disabled control,
+   and that token is a value for a light ground: on §81's 12% white wash over
+   `--gray-100` it measures 5.75:1, which is fine, against `--on-dark-2`'s 8.0:1
+   — and the pair of them says the same thing, because on this card WHAT SAYS
+   DISABLED IS THE FILL. The accent gradient beside it is the brightest object
+   on the card and this is a flat grey wash; dimming the words as well would be
+   the state stated twice, and §3's rule for a dark ground is that there are two
+   inks on it rather than three.
+
+   THE SIZE AND WEIGHT ARE NOT RESTATED, WHICH IS THIS FILE'S OWN RULE READ THE
+   RIGHT WAY ROUND. A disabled button is the same button — `.btn-sm`'s 13px
+   Kräftig, from §7 — and a state may not change the type. Only the colour is a
+   property of the state, so only the colour is here.
+
+   (0,5,0), for the reason §81's own note gives: §75.3's `color:var(--on-accent)`
+   on this button is (0,4,0) and would otherwise keep the label white on a pale
+   grey wash — 1.9:1, the one contrast failure this whole change could have
+   shipped. §7b's trap, on a state selector rather than on a component. */
+.app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
+
+/* ==========================================================================
+   22. THE STANDING COLUMN LOSES A TIER — §72's `.stand` inside `.pulse`
+   Maryam, 31 Aug 2026: "reduce the right size content font sizes and make this
+   column height equal to the left side your pace section height".
+
+   THE TWO ASKS ARE ONE CHANGE and §72 §1e is where the arithmetic is. Both
+   columns are grid items in a stretch row, so their boxes are always equal
+   height; what differed was which one's CONTENT demanded it. Standing's three
+   rows came to about 560px against pace's 420, so the row was 560 and the pace
+   column carried 140px of white under it. Clipping or scrolling three rows of
+   figures was not an option in a section made of hairlines, so the rows lose
+   one tier each.
+
+   THE FIGURE GOES h2 TO h3 — 24 to 17. It is the largest thing in the column
+   and the one that can afford it: §63 §2 narrows the display role to hero
+   numerals and this was never one, and the figure is read against the label
+   beside it rather than across the three rows. Its `small` ("of 4") follows to
+   the caption tier so the pair keeps its relationship.
+
+   THE LABEL GOES h4 TO COMPACT. §63 §12 raised it to h4 when the column was
+   stacked, on the argument that "Points" is the row's TITLE and not its
+   caption — that argument survives: compact is still above `.stand-d`'s
+   caption, so the title still reads as the title. What it stops being is the
+   same size as the section headings two rows above it.
+
+   `.stand-d` IS UNTOUCHED. It is already the caption tier and it is the note
+   that has to stay readable — "Earn the Silver badge and the Get Involved
+   badge" is the longest string in the column and §72's note records it setting
+   to four lines when it was given 80px. Shrinking it buys 6px and costs the
+   one line in the column a reader actually has to parse.
+
+   SCOPED TO `.pulse`, like §12's rule it is adjusting. The rewards page draws
+   the same `standRow` as a three-across band and keeps §15's reading; nothing
+   here reaches it.
+   ========================================================================== */
+.app .page .pulse .stand .stand-l{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .page .pulse .stand .stand-v{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .page .pulse .stand .stand-v small{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-secondary)}
+
+/* ==========================================================================
+   21. THE ENROLMENT OFFER ON A BLACK CARD — §82's `.sec.eo.dark-card`
+
+   Maryam, 31 Aug 2026. The offer is a §75 card now and NOT ONE WORD of its
+   content changed, so this group states `color` and nothing else — no size, no
+   weight, no case. A reader comparing the offer with `V.agent`'s copy of the
+   same `.eo-facts` cell should see one difference and it should be the ground.
+
+   TWO INKS, WHICH IS §3'S RULE FOR A DARK GROUND AND THE FOURTH TIME IT IS
+   APPLIED VERBATIM — §15 for `.rec-dark`, §17 for `.crow-dark`, §19 for the
+   pulse, this for the offer. What you read is `--on-dark`: the fact's NAME,
+   which §13's note establishes as the row the eye scans, and the date. What
+   supports it is `--on-dark-2`: the four values under those names.
+
+   THE TITLE AND THE DESCRIPTION NEED NOTHING — §19 already states them, on
+   `.app .page .sec.dark-card > .sec-h.aih …` in both tiers, because `aiHead`
+   inside a `.dark-card` is exactly what the pulse is. That is the component
+   paying for itself: the offer became a black card and its heading was already
+   correct.
+
+   AND THE FEE KEEPS ITS ACCENT, WHICH IS WHERE THIS DIFFERS FROM §19. That
+   group takes `.pulse-hl` off the accent and says why: the bright `--accent` is
+   "the exact colour of the button 60px to its right", and §75's rule for a black
+   card is that the accent belongs to the one thing you press. Both halves of
+   that argument fail here. `--accent-on-dark` (#f68441, §10.1058) is NOT the
+   button's colour — it is the build's dedicated dark-ground accent ink, 7.46:1
+   on `--gray-100`, and `enrolPlate` already prints this same fee in it two
+   stages later. And the fee is not a phrase inside a sentence, it is the number
+   the page is asking you to agree to: §13's note calls it "the one accent
+   string in the row" and that reasoning is about WHICH figure earns the accent,
+   not about the ground it sits on. `--accent-text` is what cannot survive —
+   #b94a09 measures 1.6:1 here, the same trap §15 records for `.rec-dark`'s five
+   inks.
+
+   SPECIFICITY: §13's are `.app .eo-fl` / `.app .eo-fv` / `.app .eo-when > b` at
+   (0,2,0), so inserting `.dark-card` is enough at (0,3,0). None of them sits
+   inside a container query, so unlike §19 there is no tier to answer — trap 3
+   costs nothing here and §19's (0,8,1) arithmetic is not needed.
+   ========================================================================== */
+.app .dark-card .eo-fl{color:var(--on-dark)}
+.app .dark-card .eo-fv{color:var(--on-dark-2)}
+.app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
+/* the chip's word and its glyph together — §82.3 points the mark at
+   `currentColor` so this one declaration draws both */
+/* THE CHIP ITSELF TAKES THE INK, NOT JUST ITS `<b>` (Maryam, 31 Aug 2026:
+   "change the color icon to white"). §82 points the calendar glyph at
+   `currentColor` — §75's technique, one declaration for the mark and the words
+   — but `currentColor` on `.eo-when` was still the PAGE's `--text-primary`,
+   because the only ink stated for this chip was on the `<b>` inside it. So the
+   words were white and the 16px mark beside them was #111 on a #111 card: a
+   glyph that was in the DOM, had a fill, and could not be seen.
+
+   THE `> b` RULE STAYS EVEN THOUGH IT IS NOW REDUNDANT. It is the same value
+   arriving by inheritance, and deleting it would make the chip's text ink
+   depend on a rule two lines up whose subject is a mark — which is the kind of
+   implicit link §63's whole premise is against. Restating costs one
+   declaration and says what the text is. */
+.app .dark-card .eo-when{color:var(--on-dark)}
+.app .dark-card .eo-when > b{color:var(--on-dark)}
+
+/* ==========================================================================
+   §21 — THE COHORT LEADER DASHBOARD'S FOUR SECTION HEADINGS ARE 18px
+
+   Maryam, 31 Aug 2026, by name: "Your cohorts", "Needs attention", "Waiting on
+   you", "Booked" are one rank and that rank is 18 — `--t-sec-lg-size`, the
+   tenth size, which §2's entry mints and §17's note predicted.
+
+   WHY THESE FOUR AND NOT EVERY SECTION HEADING. This page is not a document
+   with sections, it is FOUR QUEUES — the sticky figure bar above them names
+   the same four and scrolls between them, so each heading is a destination
+   rather than a label on a passage. §4 puts an ordinary section heading at
+   12.5 (`--t-label`), which is right for a heading you read past and much too
+   quiet for one you navigate to. The set is closed by the page, not by a
+   pattern: `LEAD_JUMPS` lists exactly these four ids.
+
+   THE SELECTOR IS `[id^="lead-"]` AND THAT IS DELIBERATE. The four sections
+   already carry `#lead-cohorts` / `#lead-attention` / `#lead-waiting` /
+   `#lead-booked` because `leadStick` scrolls to them, so the ids are load-
+   bearing markup rather than hooks added for a stylesheet — which is the same
+   reason §65 keys the disclosure on `data-found`. A new class on all four
+   would be a second way of saying what the id already says.
+
+   TRAP 3 AND §7b's ARITHMETIC, BOTH IN PLAY, WHICH IS WHY IT IS WRITTEN TWICE.
+   §8b sizes section headings INSIDE `@container app (min-width:900px)`, so an
+   unconditional rule cannot answer it at the width the product is read at, no
+   matter how heavy. And §8b's own selectors are `:has()`, which carries its
+   argument's specificity — `.app .page:not(.form-page) .sec:has(> .sec-h > a)
+   > .sec-h h2` is far heavier than it reads. So this lands at (0,6,1) — .app,
+   [data-portal], .page, :not(.form-page), .sec, [id^] — in BOTH tiers: the
+   unconditional one for the phone, the restatement for the frame. Landing in
+   the right tier is necessary and not sufficient; §73 records the same pair of
+   traps costing two tries.
+
+   IT IS SCOPED TO THE LEADER because `[id^="lead-"]` is a prefix and the
+   candidate portal is one `id` away from matching it by accident. Two
+   conditions, neither of which is a coincidence.
+   ========================================================================== */
+.app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
+  font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
+@container app (min-width:900px){
+  .app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
+    font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
+}

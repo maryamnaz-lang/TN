@@ -158,3 +158,51 @@
    property rather than listing the selectors. */
 @container app (max-width:899.98px){
   .app .crow-dark .crow{--pad-x:0px}}
+
+/* ------------------------------------------------------------------ 77.5 ---
+   AND THE ACTION GROUP'S OWN FLOOR GOES WITH IT — THE OTHER HALF OF 77.2
+
+   §77.2 takes `.crow-who`'s padding off inside the card and its note states the
+   principle: "inside a card that already pays 32 all round it is the frame
+   charged twice". `.crow-a` has the same problem in the same tier and was
+   missed, because on a white page it is invisible — §71.3 gives the group
+   `padding:0 var(--pad-x) var(--s06)`, which is the row paying its own bottom
+   air when the row IS the section.
+
+   TRAP 10 AGAIN, AND 77.4 CANNOT ANSWER IT. That block sets `--pad-x:0px`, which
+   zeroes the two SIDES; the 24 at the bottom is a flat `var(--s06)` and survives
+   it. Measured at 390 on both cards: 32px above the heading and 56 below the
+   last button — a card whose content is visibly not centred in its own frame,
+   which is the same artefact §20's join rules were handing out at the section
+   level and reads the same way, as a rendering fault rather than a decision.
+
+   BOTH CARDS, WHICH IS WHY IT IS HERE AND NOT IN THE LEADER'S LAYER. `.crow-dark`
+   is the wrapper both the `booked` dashboard and the leader's next interview
+   wear, and a component's frame is not a property of one caller. (0,3,0) inside
+   the tier, per trap 3 — §71.3's rule is (0,2,0) and lives in this same query,
+   so an unconditional rule of any weight is not guaranteed to answer it. */
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-a{padding-bottom:0}}
+
+/* ------------------------------------------------------------------ 77.6 ---
+   JOIN SITS ON THE BOTTOM OF THE ROW, NOT IN THE MIDDLE OF IT
+   Maryam, 31 Aug 2026: "Join call button should be bottom aligned."
+
+   §71 gives `.crow` `align-items:center`, which is right where that row is a
+   countdown cell and a button of similar heights. On the dark card the row is a
+   name, a role line and an expertise line — 78px — against a 40px button, so
+   centring left 19px of slack under the button and the same above it, and the
+   action floated against the middle of a three-line block with nothing on
+   either side of it to line up with.
+
+   THE BOTTOM IS WHAT THERE IS TO LINE UP WITH. The last line of the text block
+   is the row's own baseline — it is what sets the 78 — so an action resting on
+   it reads as belonging to the block rather than hovering beside it. That is
+   §70's `.rec` arrangement, which states `align-items:flex-end` on the row for
+   exactly this shape, one card earlier in the same journey.
+
+   `align-self` ON THE ITEM, NOT `align-items` ON THE ROW, and the difference
+   matters below 900: §77 stacks the row there and §71.2b gives the button full
+   width, where `flex-end` on the container would also pull the STACKED cells
+   to one side. One item, one declaration, no breakpoint. */
+.app .crow-dark .crow-a{align-self:flex-end}

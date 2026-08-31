@@ -212,10 +212,46 @@ chat:'m240-240-92 92q-19 19-43.5 8.5T80-177v-623q0-33 23.5-56.5T160-880h640q33 0
 
    `chat` above is untouched — the rail's messages icon still uses it. */
 talChat:'M280 -880 H671.2 A200 200 0 0 1 871.2 -680 V-288.8 A200 200 0 0 1 671.2 -88.8 H80 V-680 A200 200 0 0 1 280 -880 ZM248.8 -612 v60 h452 v-60 ZM248.8 -416 v64 h328 v-64 Z',
-group:'M40-240q-17 0-28.5-11.5T0-280v-23q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H40Zm240 0q-17 0-28.5-11.5T240-280v-25q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v25q0 17-11.5 28.5T680-240H280Zm500 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v23q0 17-11.5 28.5T920-240H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z',
+/* COHORT IS `communities`, AND EVERY PEOPLE GLYPH IN THE LIBRARY WAS TRIED
+   FIRST (Maryam, 31 Aug 2026 — the rail's cohort and payment marks "should not
+   look like half filled").
+
+   THE FINDING IS THE USEFUL PART: **Material Symbols has no linear
+   multi-person mark.** `groups`, `group`, `groups_2`, `groups_3`, `diversity_1`
+   `diversity_2`, `diversity_3`, `group_add` and `supervised_user_circle` are
+   all SOLID SILHOUETTES at FILL 0 — Google draws overlapping figures filled on
+   purpose, because outlining two heads that overlap turns to mush at 20px. So
+   FILL 0 is not a promise that a mark is light: a glyph can be solid by
+   construction, and swapping `groups` for another people glyph changes nothing.
+   At the 22px the rail draws, any of them is a dark blob among ten line
+   drawings — which is exactly the "half filled" read.
+
+   The way out is to stop drawing PEOPLE and draw the GROUP: `communities` is a
+   bounded circle with its members inside it, entirely outline, and it is
+   Google's own mark for this idea rather than a shape borrowed to stand in for
+   it. `hub` and `workspaces` are the other two that survive at 22px and both
+   lose the meaning — a network and three objects. `co_present` reads as
+   presenting to a room, which is the leader's job, not the cohort.
+
+   THE KEY IS STILL `group`, SO NOTHING MOVED. It is read by the rail, the
+   leader's Cohorts module, `PH_IC`'s fact rows and three notifications; the
+   name describes the SLOT, and re-keying it would have touched all of them to
+   say the same thing. */
+group:'M358-319q30.94 0 52.97-21.5Q433-362 433-393t-22.03-52.5Q388.94-467 358-467q-30.11 0-51.56 21.5Q285-424 285-393t21.44 52.5Q327.89-319 358-319Zm296.5-21.5Q676-362 676-393t-21.5-52.5Q633-467 602-467t-52.5 21.5Q528-424 528-393t21.5 52.5Q571-319 602-319t52.5-21.5ZM532.96-555.04q22.04-22.05 22.04-53Q555-639 532.97-660T480-681q-30.11 0-51.56 21.44Q407-638.11 407-608q0 30.94 21 52.97Q449-533 479.96-533q30.95 0 53-22.04ZM480.27-80q-82.74 0-155.5-31.5Q252-143 197.5-197.5t-86-127.34Q80-397.68 80-480.5t31.5-155.66Q143-709 197.5-763t127.34-85.5Q397.68-880 480.5-880t155.66 31.5Q709-817 763-763t85.5 127Q880-563 880-480.27q0 82.74-31.5 155.5Q817-252 763-197.68q-54 54.31-127 86Q563-80 480.27-80Zm.23-60Q622-140 721-239.5t99-241Q820-622 721.19-721T480-820q-141 0-240.5 98.81T140-480q0 141 99.5 240.5t241 99.5Zm-.5-340Z',
 dashboard:'M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z',
 chart:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Zm120 200q-17 0-28.5 11.5T280-520v200q0 17 11.5 28.5T320-280q17 0 28.5-11.5T360-320v-200q0-17-11.5-28.5T320-560Zm160-120q-17 0-28.5 11.5T440-640v320q0 17 11.5 28.5T480-280q17 0 28.5-11.5T520-320v-320q0-17-11.5-28.5T480-680Zm160 240q-17 0-28.5 11.5T600-400v80q0 17 11.5 28.5T640-280q17 0 28.5-11.5T680-320v-80q0-17-11.5-28.5T640-440Z',
-wallet:'M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z',
+/* PAYMENTS IS `account_balance_wallet`, NOT `wallet`, for the same reason and
+   with one extra constraint. `wallet` at FILL 0 is an outlined billfold with a
+   SOLID clasp panel across its whole right third — the "half filled" read
+   exactly. `account_balance_wallet` is the same subject drawn as a card with a
+   coin slot: entirely outline, one small disc, legible at 22px.
+   IT IS DELIBERATELY NOT `credit_card`, which is also linear and would have
+   been the easy swap: `creditCard` is already a key here and is drawn on the
+   payment rows and the card artwork, so the MODULE would have worn the same
+   mark as the rows inside it. A wallet holds cards; that is the distinction
+   the rail needs. `savings` and `price_check` were the other linear options
+   and both change the subject — a piggy bank is not what Payments is. */
+wallet:'M200-200v-560 560Zm0 80q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v100h-80v-100H200v560h560v-100h80v100q0 33-23.5 56.5T760-120H200Zm320-160q-33 0-56.5-23.5T440-360v-240q0-33 23.5-56.5T520-680h280q33 0 56.5 23.5T880-600v240q0 33-23.5 56.5T800-280H520Zm280-80v-240H520v240h280Zm-160-60q25 0 42.5-17.5T700-480q0-25-17.5-42.5T640-540q-25 0-42.5 17.5T580-480q0 25 17.5 42.5T640-420Z',
 user:'M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z',
 logout:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h240q17 0 28.5 11.5T480-160q0 17-11.5 28.5T440-120H200Zm487-320H400q-17 0-28.5-11.5T360-480q0-17 11.5-28.5T400-520h287l-75-75q-11-11-11-27t11-28q11-12 28-12.5t29 11.5l143 143q12 12 12 28t-12 28L669-309q-12 12-28.5 11.5T612-310q-11-12-10.5-28.5T613-366l74-74Z',
 launch:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h560v-240q0-17 11.5-28.5T800-480q17 0 28.5 11.5T840-440v240q0 33-23.5 56.5T760-120H200Zm560-584L416-360q-11 11-28 11t-28-11q-11-11-11-28t11-28l344-344H600q-17 0-28.5-11.5T560-800q0-17 11.5-28.5T600-840h200q17 0 28.5 11.5T840-800v200q0 17-11.5 28.5T800-560q-17 0-28.5-11.5T760-600v-104Z',

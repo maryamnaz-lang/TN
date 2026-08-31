@@ -177,6 +177,28 @@
   background-image:none;
   background-color:var(--accent)}
 
+/* AND THE WHOLE RAIL GOES GREEN ONCE EVERY CHAPTER IS DONE (Maryam, 31 Aug
+   2026: it "should turn green when the course is ended").
+
+   THE ACCENT IS "IN PROGRESS" AND IT IS THE WRONG WORD AT 100%. Five of
+   thirteen in the accent reads as how far along you are; thirteen of thirteen
+   in the accent is one orange bar that says nothing the "100%" beside it does
+   not already say, and orange on this product is what you have still to do —
+   it is the CTA colour, the countdown chip, the open chapter. Green is the one
+   state this build already draws for finished, and the rail is now the same
+   colour as the tick in the `3 of 3 week 13 tasks` chip 40px underneath it.
+
+   `--mk-2`, NOT `#00a43c`. Both are in the build: the literal is §63's ink for
+   a tick glyph (`.jrn-i.done`, `.crow-v`) and `--mk-2` is §12's NAMED green,
+   which §65, §72 and §74 all use for a green mark — and which §65 already puts
+   on the tasks chip in this very strip. Matching the chip beside it is the
+   whole point, and a token beats a literal where one exists.
+
+   `.prog-full` IS STAMPED BY `progCol` (views.js) and its note is why the test
+   is the chapter count rather than `f.finished` or the stage. (0,4,0) against
+   the two rules above at (0,3,0), so it lands last and needs no restatement. */
+.app .sec-prog.prog-full .prog-seg i.done{background-color:var(--mk-2)}
+
 /* -------------------------------------------------------------------- 1c ---
    THE THREE FIGURES BECOME A ROW WITH TWO HAIRLINES — 600:7666
 
@@ -542,12 +564,44 @@
    left-hand band — it is the row's first line instead, full width, which is
    where a phone reads it. The buttons go full-bleed for the reason every other
    button in this product does at this width. */
+/* TRAP 19, TWICE, AND IT TOOK A BLACK CARD TO MAKE EITHER VISIBLE — Maryam,
+   31 Aug 2026, on the cohort leader's dashboard.
+
+   `flex-basis` IS THE FOURTH PROPERTY WHOSE MEANING THE PARENT DEFINES, and the
+   trap's own list — the `align-*` / `justify-*` four — does not name it. §71.1
+   gives `.crow-who` `flex:1 1 300px` and its note is an argument entirely about
+   WIDTH: "300 is a base the row can afford … so at desktop the three sit on one
+   line and the leader GROWS into what is left". Turn the row into a column and
+   the identical declaration is a 300px floor on the HEIGHT — with `flex-grow:1`
+   behind it, so it also takes any slack the card has. Measured at 390 before
+   this: a 96px block of text in a 300px cell, which is ~200px of empty ground
+   between the person and the buttons. Nothing overflowed, nothing warned, and
+   the shape is only obvious once the ground is black: on the white row that dead
+   space is white page, and the row simply read as generously spaced.
+
+   AND `margin-left:auto` DISABLES `align-items:stretch`, which is what made this
+   block's own last line a no-op. `.crow-a > .btn{width:100%}` has been here
+   since the layer was written, and its note says the buttons "go full-bleed for
+   the reason every other button in this product does at this width" — but
+   `.crow-a` still carries §71.1's `flex:none;margin-left:auto`, and an auto
+   margin in the CROSS axis consumes the free space instead of letting the item
+   stretch into it. So the group was content-sized and pinned right, and `100%`
+   of a shrink-to-fit box is whatever the widest label happens to be: measured
+   110px for the interview card's one button and 130px each for the leader's two,
+   a pair of stubs against the right edge of a full-width card.
+
+   `margin-left:0` RATHER THAN `align-self:stretch`, because the margin is the
+   thing that is wrong here — stated as a stretch, the auto margin would still be
+   in the box and the next reader would find two rules fighting over one axis.
+   The declaration §71.1 makes is correct in a row and meaningless in a column;
+   this is the column saying so. */
 @container app (max-width:899.98px){
   .app .crow{flex-direction:column;align-items:stretch;gap:0}
   .app .crow-when{align-self:auto;min-width:0;padding:var(--s05) var(--pad-x)}
-  .app .crow-who{padding:var(--s06) var(--pad-x)}
+  .app .crow-who{flex:0 0 auto;padding:var(--s06) var(--pad-x)}
   .app .crow-a{
     flex-direction:column;align-items:stretch;
+    flex:0 0 auto;margin-left:0;
     gap:var(--s03);
     padding:0 var(--pad-x) var(--s06)}
   .app .crow-a > .btn,.app .crow-a > .btn.ic-l{width:100%}}

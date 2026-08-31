@@ -146,37 +146,32 @@ V.leadSessions = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Sessions')}
-  ${ph('Sessions','45 minutes each, recorded &middot; you sign the level afterwards',
-    `<button class="btn btn-g" data-go="leadProfile">Your availability ${I.calendar}</button>`)}
-  ${next ? `
-  <div class="sec">
-    <div class="plate" data-when="${next.when.toLowerCase()}">
-      <div class="plate-who">${avatar({i:next.i, img:AV[next.img]},56)}
-        <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; ${next.re ? '90 days behind them' : 'no level yet'}</span></span>
-      </div>
-      ${''/* NO EYEBROW. A card starts at its heading — "Next up" is a
-            category over a set of one, and this is the only appointment on
-            the page. The time it carried moves to `data-when`, which is
-            where the leader dashboard's own copy of this plate already puts
-            it: `placePlates` in ai5 reads the attribute, draws the chip in
-            the opposite corner, and finding no label seats the TITLE in the
-            head row beside it. Same card, one row shorter. */}
-      <div class="plate-t">${next.re ? 'Re-interview' : 'Level interview'}</div>
-      <div class="plate-b">${next.mins} minutes, recorded &middot; ${next.re ? 'read their 90-day summary first' : 'you sign the level afterwards'}</div>
-      <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
-        <button class="btn btn-sm noic plate-b2">Reschedule ${I.time}</button>
-      </div>
-    </div>
-  </div>` : ''}
-  <div class="sec">
-    <div class="facts">
-      <div><span class="l">Length</span><span class="v">45 minutes</span></div>
-      <div><span class="l">Format</span><span class="v">Video, recorded</span></div>
-      <div><span class="l">Evaluation due</span><span class="v">Within 48 hours</span></div>
-      <div><span class="l">Recording kept</span><span class="v">24 months</span></div>
-    </div>
-  </div>
+  ${''/* THE AVAILABILITY BUTTON CAME OFF THE HEADING (Maryam, 31 Aug 2026).
+         It was a `ph()` action, so it sat above Tal's summary as the first
+         thing on the page — a settings link introducing a page about this
+         week's appointments. It came off the DASHBOARD's Booked section in
+         the same pass, so the route now lives where the setting does:
+         `V.leadProfile`, which owns the availability sheet, reachable from
+         the rail and the account menu. Two buttons pointing at one settings
+         page from two lists of appointments was the thing to remove, not
+         the page. */}
+  ${ph('Sessions','45 minutes each, recorded &middot; you sign the level afterwards')}
+  ${''/* THE PLATE IS NOW THE BLACK CARD, AND IT IS THE DASHBOARD'S OWN
+         (Maryam, 31 Aug 2026 — "follow the same summary and beneath that
+         black call card layout"). `leadCallCard` already states this shape
+         one file up: §75's `.dark-card` recipe, the time in `.dc-when` at
+         the end of the heading row, `livTitle` / `livDetail` for the two
+         strings. Calling it here rather than copying it is the `bkStamp`
+         rule — one appointment, two pages, one drawing.
+         WHY THE PLATE HAD TO GO RATHER THAN BE RESTYLED: `.plate` is in
+         ai5's `DARK_CARD`, so `placeDark` hoists it into the head band —
+         which is exactly what put it beside the summary in the first
+         place. `.dark-card` is in no pass's list, so the summary keeps the
+         full width and the card lands under it, in flow. §81's note on the
+         leader dashboard is the long version of that same move.
+         `second:false` — "All sessions" from the Sessions page is a link
+         to the page you are on. */}
+  ${next ? leadCallCard(next, {second:false}) : ''}
   <div class="sec">
     <div class="sec-h"><h2>Booked</h2><span class="t-helper-01">${up.length} interview${up.length === 1 ? '' : 's'}</span></div>
     ${up.length ? `<div class="tile-stack">
@@ -195,7 +190,14 @@ V.leadSessions = () => {
       <h3>Nothing booked</h3><p>Candidates book you from the times you open on your profile.</p></div>`}
   </div>
   <div class="sec tint">
-    <div class="sec-h"><h2>Finished</h2><span class="t-helper-01">${waiting ? waiting + ' still need an evaluation' : 'all written up'}</span></div>
+    ${''/* "AWAITING DECISIONS", NOT "FINISHED" (Maryam, 31 Aug 2026). The
+           interview being over is the least interesting thing about these
+           rows — every one of them is a candidate whose 90 days cannot
+           start until this leader signs. "Finished" named the state of the
+           CALL; this names the state of the WORK, which is what the
+           section's own count ("2 still need an evaluation") and its one
+           action ("Write it up") have always been about. */}
+    <div class="sec-h"><h2>Awaiting Decisions</h2><span class="t-helper-01">${waiting ? waiting + ' still need an evaluation' : 'all written up'}</span></div>
     <div class="tile-stack">
       ${done.map(s => {
         const e = ldrEvFor(s.name);
@@ -214,7 +216,12 @@ V.leadSessions = () => {
         </div>`;
       }).join('')}
     </div>
-    <p class="t-helper-01 mt4">A candidate cannot enroll until the level is signed, so the evaluation is the thing holding up their 90 days &mdash; not the interview.</p>
+    ${''/* THE CLOSING LINE WENT WITH THE HEADING (Maryam, 31 Aug 2026). It
+           existed to explain why a finished interview still needed
+           something from you — which is the question "Finished" raised and
+           "Awaiting Decisions" answers in two words. A sentence under the
+           list restating the heading above it is the section explaining its
+           own title. */}
   </div>
 </div></main>`;
 };

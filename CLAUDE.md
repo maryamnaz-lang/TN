@@ -785,12 +785,15 @@ implementation — read it before converting anything.
 | inside | `display:flex; flex-direction:column; gap:20px` — 581:6456's number, between the head block and the content |
 | seams | the section's own `::after` / `::before` off; the **next** section's join off if it draws one |
 | head | `.dc-hd` › `.dc-hd-r` (`.dc-t` title + **either** a `.dc-act` control **or** a `.dc-when` time at the right end — never both, they share one auto margin) with `--on-dark-rule` under it, 16 above and below |
-| buttons | `.btn-p` → accent fill (§15.1853 + §19); a quiet button → borderless white |
+| buttons | `.btn-p` → accent fill (§15.1853 + §19); a quiet button → borderless white; a **`disabled` `.btn-p`** → §81's unlit `--on-dark-fill` wash with the gradient off |
 | ink | §63 §15 — `--on-dark` for the title, `--on-dark-2` for what supports it |
+| joins | §20's two desktop pair rules skip it (`:not(.dark-card)`, both sides) — a card's frame is 32 on all four sides and no join rule may take half of one |
 
-**A caller states only what is different about its own content.** Two so far: `.rec-dark`
-(§75.3, the recommendation's portrait, action group and skeleton) and `.crow-dark` (§77, the
-call row). Most of what looks new when you convert a third is already above.
+**A caller states only what is different about its own content.** Three so far: `.rec-dark`
+(§75.3, the recommendation's portrait, action group and skeleton), `.crow-dark` (§77, the call
+row) and `.sec-pulse` (§79, the pulse's head row and next-call block). Most of what looks new
+when you convert a fourth is already above — **the leader dashboard's next interview is the
+proof**: it wears `.dark-card crow-dark` and states not one rule of its own.
 
 **THE GAP WAS MISSING FROM THE RECIPE FOR TWO BUILDS AND ONLY THE SECOND CALLER SHOWED IT.**
 `.sec-rec` carries §70.5's own `flex-direction:column; gap:20px`, and the recommendation wears
@@ -956,6 +959,94 @@ directly after Tal's card before the body. The heading is byte-identical.
   accent button is the brightest object on the card, so the fill makes the distinction and the
   outline is one more edge. `border-color`, not `border` (§64.1): `.btn` carries a transparent
   1px and dropping the shorthand makes this one 2px shorter than the button beside it.
+
+#### The LEADER's next interview — `leadCallCard` (lead.js) + §81, `81-joingate.css`
+
+Maryam, 31 Aug 2026: *"The call card from the top will be out and will be next to the summary
+section. Just like the black call card we have on the candidate portal. Content will be the
+same just the ui changes. Disable the join call button and enable it at time of the call. The
+summary will take the full width."* The leader dashboard's `.plate` becomes the third
+`.dark-card` in the build and the FOURTH caller of `crow` — same slot as `talRec` on `new` and
+`.crow-dark` on `booked`, one portal over. `leadCallCard` in lead.js is the long note.
+
+- **"OUT OF THE TOP" AND "FULL WIDTH" ARE ONE CHANGE, NOT TWO.** `.plate` is in ai5's
+  `DARK_CARD`, so `placeDark` was lifting it into the head band — that is the only reason the
+  card was up there. §56's two-column band is gated on `.modhead:has(> .sec-dark .plate)`, so
+  with no plate on the page the gate stops matching and the band is one `minmax(0,1fr)`
+  column: **the summary takes the width back with nothing restated.** `.dark-card` is in no
+  pass's list, which is §75's whole point.
+- **IT GOES AFTER TAL'S `.sec`, AND THAT IS LOAD-BEARING.** `placeBand`'s run walks forward
+  from the `.ph` and stops at the first section that is not head furniture, so a card written
+  *between* the `.ph` and Tal's card would leave the summary in the page body (trap 11's
+  neighbourhood). Written after it, the card is what stops the run — the job the stats band
+  used to do.
+- **§20'S JOIN RULES MAY NOT TAKE HALF OF A CARD'S FRAME, and this is the first page where
+  they could.** Both of that layer's desktop rules hand `var(--s05)` to one edge of a pair, at
+  thirteen classes inside a container query — so §75's `padding:var(--s07)` (0,3,0) and §77.1's
+  restatement (0,4,0) both lose silently and the card renders with a 32px frame and a 16px top
+  or bottom. `:not(.dark-card)` is added on **both** sides of the pair, per trap 4 (that list is
+  where "which pairs are joined" is decided). Nothing visible moved on the two existing cards:
+  both follow the `.modhead`, which is not a `.sec`, so neither pair ever matched.
+- **THE CONTENT IS THE PLATE'S, ROW FOR ROW** — the time in `.dc-when`, `livTitle(s)` in
+  `.dc-t`, the face at 78, the quiz line as `.crow-role`, `livDetail(s)` as `.crow-x`, and the
+  two buttons in `crow`'s order (primary last, so the eye ends on Join). `livTitle` / `livDetail`
+  are new in lead.js because the booked list states the same two strings — one place, two
+  readers, the `bkStamp` rule.
+- **`crow` TAKES A RECORD NOW, AND THREE FIELDS DEFAULT TO THE CANDIDATE'S ROW.** `CALL_ROW`'s
+  note invites a fourth appointment, but this one's facts are all `lead.js`'s and views.js is
+  parsed first (§69's direction rule), so the leader states its own record and hands it over.
+  `xl:''` drops the **`Expertise:`** lead-in (the leader's third line is the appointment, not a
+  claim about the person), `v:false` drops the **green tick** (a candidate nobody has assessed
+  is not a checked identity — §75's `.rec-v` note is what that mark means), and no `kind` means
+  no `data-call`.
+- **THE JOIN IS GATED, AND STILL UNWIRED — TWO DIFFERENT FACTS.** `joinLive(when, mins)`
+  (views.js) is the window: five minutes before until the session ends. **`PLATE_SOON` cannot
+  answer this** — its first two words are `now` and `today`, because the question it answers is
+  §59's volume question, and a call at 4:30 this afternoon is emphatically "today" and
+  emphatically not joinable at 9am. `JOIN_NOW` is the narrow vocabulary; `joinClock` stamps a
+  `Today h:mm am/pm` string onto today's date and everything else returns null, so "Tomorrow
+  11:00 AM" and "Nov 21, 6:30 PM" stay shut by construction. What has NOT changed is that
+  pressing it does nothing: `callOpen` builds the *candidate's* interview, so a leader-side
+  `CALL` entry is its own piece of work.
+- **THE GATE IS OPT-IN (`{gate:true}`) AND THE THREE CANDIDATE CALL SITES DO NOT TAKE IT.**
+  Their Joins are the prototype's way into `callScreen` — five buttons, one surface — and
+  gating them by the clock would switch the product's own demo off for twenty-three hours a day.
+- **IT ARMS ITSELF WITHOUT A RENDER.** `joinArm()` on a 20s interval writes `disabled` and the
+  `title` on `[data-joinwhen]` in place — `callTick`'s pattern, and trap 9 is not in play
+  because the value is a pure function of `Date.now()` and the button's own attribute, so the
+  next render recomputes exactly what the timer wrote.
+- **THE DEMO DEPENDS ON THE TIME OF DAY, AND THAT IS THE HONEST READING OF THE ASK.**
+  `LEAD_SESSIONS.s3.when` is `'Today 4:30 PM'`, so the button is live 16:25–17:15 and shut the
+  rest of the day. To see the open state at any hour, edit that ONE string into `JOIN_NOW`'s
+  vocabulary ("in 5 minutes", "now") — the same lever `WEEK_CALL.when` is for the cohort call.
+- **§81 EXISTS BECAUSE `disabled` DID NOTHING ON A BLACK CARD.** §02.108's whole disabled
+  treatment is (0,2,0) against §75.3's accent fill at (0,4,0), so the button stayed the full
+  accent gradient with white ink and could not be pressed — a control that looks live and is
+  not, which reads as a broken page rather than a closed door. The ground is `--on-dark-fill`
+  (§02's substitution in the card's own register, and the token §75 and §77 already reach for),
+  the ink is §63 §20's `--on-dark-2` at (0,5,0), and `background-image:none` is half the rule
+  because §71.2 and §75.3 both paint a **gradient** as well as a colour. **Not `opacity`** —
+  trap 2: the entrance animations run with `fill-mode:both`, so a resting state on opacity is
+  fighting a keyframe. Stated on `.dark-card`, so the next black card with a gated action gets
+  it free.
+
+**AND TWO PRE-EXISTING PHONE BUGS IN `crow` CAME OUT WITH IT — BOTH ON THE CANDIDATE PORTAL
+TOO, and both fixed at the cause.** §71.3 turns the row into a column below 900, and:
+
+- **`flex-basis` IS A FIFTH PROPERTY WHOSE MEANING THE PARENT DEFINES — trap 19's list is one
+  short.** §71.1's `.crow-who{flex:1 1 300px}` is argued entirely as a *width* basis; in a
+  column it is a 300px floor on the HEIGHT with `flex-grow:1` behind it. Measured at 390: a
+  96px block of text in a 300px cell — ~200px of dead ground between the person and the
+  buttons. Invisible for as long as the row stood on white paper; obvious the moment the ground
+  is black. `flex:0 0 auto` in the stacked tier.
+- **`margin-left:auto` DISABLES `align-items:stretch`,** so §71.3's own `.crow-a > .btn
+  {width:100%}` had never done anything: the group was content-sized and pinned right, and
+  `100%` of a shrink-to-fit box measured 110px (one button) and 130px (two). `margin-left:0` in
+  the same tier. All four `crow` call sites now stack full-width buttons on a phone, which is
+  what that block always said it did.
+- **AND `.crow-a`'S 24px BOTTOM PADDING IS THE OTHER HALF OF §77.2** — the frame charged twice
+  inside a card, 32 above the heading against 56 below the last button. §77.4's `--pad-x:0px`
+  cannot reach it (that zeroes the sides; the bottom is a flat `var(--s06)`), so §77.5 states it.
 
 ### THE BOOKING PAGE IS THREE PANELS — §76, `76-bookpage.css` + `V.agent`
 
@@ -1323,6 +1414,43 @@ hides the arrow on a rail root anyway, so the one surface reading `S.hist.length
 masking it on exactly the pages it applied to. The trail is the first thing in the product
 to render the whole stack rather than ask whether it is empty.
 
+### THE PRE-COURSE DASHBOARD SHAPE — §82, and `assessed` / `promoted` share it
+
+Maryam, 31 Aug 2026, over two asks: "change the You're enrolling on Explorer – E3 section to a
+black card" and then "the Promoted to E4 prototype is similar to the Leveled, not enrolled
+prototype, so you need to follow that dashboard ui here." **Both dashboards are now the same
+three things:** the band (Tal's summary, with `jrnList` in column two), the enrolment offer as a
+**full-width `.dark-card`**, and the reading blocks as **Quick Actions**.
+
+- **`enrolOffer` IS THE ONLY WAY THE OFFER IS DRAWN — `enrolPlate` IS DELETED.** §73 split it
+  in two for one stated reason: "taking `.plate` off would empty that column on a page this
+  brief does not touch." The brief touched it; `jrnList` fills that column on both pages now, so
+  the reason expired and the second function went. Every figure survives because §73 had already
+  forced both halves to read `ENROL_OPENS` / `ENROL_DESC` / the fee from one place. **E4's
+  optional second line ("Cohort 58 has 7 places left") moved onto the lede** — the date chip is a
+  40px pill measured against the button beside it, so a second line in it breaks §73.1's pair.
+- **§82 IS NOT A REVERSAL OF §73.** That layer's argument was against `.plate`, which §59
+  reserves for an action with a *clock* in it; `.dark-card` is a different object with a
+  different rule — §75's "this is the one thing the page is about". `.dark-card` is also **not**
+  in ai5's `DARK_CARD`, so `placeDark` leaves it in the page body at full width; a `.plate` gets
+  hoisted into §56's column two.
+- **`journey()` NEEDED A `promoted` CASE AND `default` WAS HIDING IT.** That switch fell through
+  to `LEVELLED` — step 3 of 4, "Not enrolled yet" — on a page whose subject is having finished.
+  It rendered, and it was wrong: the failure a `default` branch always hides. With no `on` step
+  the pill reads "Step 4 of 4".
+- **`coverSec` IS DELETED AND ITS STYLESHEET IS NOT**, which is the one place the "gate nothing
+  writes" test has a second reader: `design-system/talentnext-ds.css` ships `.cov-*` and
+  `gallery.html` documents that markup as a recipe, so the box still writes those classes.
+  `enrolPlate` is the opposite case — `.plate-d` / `.plate-n` keep `checkoutPlate` as a writer,
+  so no CSS went with it.
+- **Two Quick Action hues, named per §70.6:** `ic-cover` is `--mk-3`, `.cov-pill`'s own violet;
+  `ic-found` is `--mk-1`, §74's hue for Priya's note. §82.4 states both.
+- **What `promoted` deliberately does NOT copy:** "Cohort 41, in the end", "What changes at E4"
+  and the certificate. `assessed` has no equivalent, so converting them would be designing
+  rather than matching. `.keep-place` still earns its keep on the certificate — its note's
+  "the band already holds the enrolment plate" clause is stale, but `.cert` is still in
+  `DARK_CARD` and would now be hoisted into the journey list's column.
+
 ### THE RED ACCENT DEMO — a TENTH STAGE, and its duplication is deliberate
 
 Maryam, 31 Aug 2026. **"Red Accent Demo" is a frozen copy of Day 34 drawn in solid
@@ -1348,11 +1476,29 @@ dashboards, so **no new layer and no new class were added**.
   `[stage, view]` pairs so a single page can be named again; `[RED_DEMO, '*']` is every page of
   the stage, because a demo you can only walk one page of is a screenshot. §67 names no page in
   its own selector, so widening or narrowing is still one edit in `tmpaccent.js`.
-- **WHAT STAYS ORANGE IS §67's RECORDED DECISION, not an oversight:** Tal's sphere, mark and
-  sparkles (`#F6DC92 → #F47113 → #E85D0F`, hardcoded in §33/§40/§50, and §39 says outright
-  that `#f47113` is NOT `--accent`), the ask dock's frame and its travelling light, and the
-  base64 artwork. Tal is a brand object rather than an accent fill. Raise it before changing
-  it.
+- **IT TAKES TWO LAYERS AND §83 IS THE ONE THAT MATTERS — `83-tmpaccent2.css`.** §67 re-points
+  the `--accent*` tokens and that is *all it can reach*: §70 states `--ai-1/2/3` on `.app`,
+  which is the same (0,1,0) as `.tmp-accent`, and **§70 lands after §67**, so a re-point written
+  there loses on order and the AI ramp stays orange **silently** — a custom property that loses
+  does not warn. §83 is dead last and every selector in it carries `.app.tmp-accent` (0,2,0) or
+  better. It covers the AI ramp (which drags Tal's label, `.aih-mk`, `.pulse-mk`, the summary
+  wash, the inline highlight and the ask dock's travelling light with it), Tal's **sphere** at
+  all three sizes (§50 overrides §33's and §40's own backgrounds, so restating §50's three
+  selectors is the whole of it), `--brand-tint-2`, `--askv-*`, §39's bubble edge, `.sk-mark`,
+  and §70's three `.rec-*` literals.
+- **A RED RAMP IS THREE SHADES OF ONE HUE, NOT #ff0000 THREE TIMES.** Mapping all three stops
+  onto the flat red would flatten every gradient whose whole job is to be a ramp. Each keeps its
+  **lightness arc** and changes hue — light red, pure red, deep red — with `#ff0000` as the
+  middle stop so the trial's stated colour is the one the eye lands on.
+- **§83 STATES `color` THREE TIMES AGAINST §63's RULE, AND THAT IS DELIBERATE.** §63 writes
+  `.ai-body p b`, `.jrn-pill` and `.jrn-i.on` as hardcoded `#f47113` rather than as a token
+  (correctly — §39: "`#f47113` is NOT `--accent`"), so there is nothing for §67 to re-point.
+  §83.4 lists all three with their specificity arithmetic. They take `#dc0000`, not `#ff0000`,
+  for §67's own AA reason.
+- **WHAT IS STILL NOT RED IS ONLY THE ARTWORK:** the award WebPs and the auth photograph
+  (images cannot follow a token), `--tal-mark`'s PNG (nothing on the stage draws it — `.tal-fab`
+  is `display:none` and §50 replaces the ask line's mark), and `--auth-o-*`, left orange so the
+  trial cannot leak into a surface it was not asked for.
 - **THE FILLS ARE `#ff0000` AND THE INK IS `#dc0000`, also §67's** — pure `#ff0000` is 4.00:1
   on white and would fail AA as text, which is exactly the fill/ink split §01 already makes for
   the orange.

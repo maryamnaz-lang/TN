@@ -99,7 +99,30 @@
      classes and loses. The `:not()` list is where "which pairs are joined" is
      decided, so that is where an unjoining goes.
      -------------------------------------------------------------------- */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call){
+  /* AND `:not(.dark-card)` IS THE SAME FIX A THIRD TIME, ON THE COMPONENT THAT
+     REPLACED THE TWO ABOVE. §75's black card owns its own frame — a flat
+     `padding:var(--s07)` on all four sides, "a property of the card rather than
+     of the column it sits in" — and both rules in this block hand out HALF of
+     that figure to one edge. This selector is thirteen classes inside a
+     container query, so it wins (§77.1 restates the card's padding at four
+     classes and loses to it silently), and the symptom is a 32px frame with a
+     16px top or bottom: a card whose content is visibly off-centre in it, which
+     reads as a rendering fault rather than as a spacing decision.
+
+     ON BOTH SIDES OF THE PAIR, which is the one edit rather than two. A dark
+     card is never HALF of a join in either direction: it is not a white block
+     whose bottom edge is a hairline shared with the next one, and the next
+     block's air is its own (§75's note on `margin-top` and `.sec-qa`'s 32 is
+     that argument in full). Nothing visible moves today — `booked`'s card and
+     the enrolled dashboards' both follow the `.modhead`, which is not a `.sec`,
+     so neither pair ever matched — and the leader dashboard's new call card is
+     the first one with a `.sec` on each side of it.
+
+     NOT KEYED ON WHAT IT CONTAINS, for the reason the `.sec-call` note above
+     gives: `:has(> .plate)` came loose the moment the call stopped being a
+     plate. `.dark-card` is the class the conversion is, so this cannot come
+     loose unless the component is renamed. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){
     padding-bottom:var(--s05)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
@@ -148,7 +171,7 @@
      a strip and the thing it switches, which reads as the panel having come
      loose. The section states `padding:0` and this is the rule that was
      putting it back, from nine classes deep. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){
     padding-top:var(--s05)}
   .app .page > .sec:has(> .plate) + .sec.sec-cs,
   .app .page > .sec-call + .sec{padding-top:0}

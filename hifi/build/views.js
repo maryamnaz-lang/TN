@@ -211,7 +211,7 @@ const otherPortal = () => PORTALS.find(([k]) => k !== S.portal);
    THE MODULE IS READ THE SAME WAY THE RAIL READS IT. `PARENT[S.view] ||
    S.view` is `sidenav`'s own line, so the crumb and the lit rail entry cannot
    disagree about which module you are in. `NAVSETS` then supplies the label,
-   which is why the trail says "Course Progress" and "Points" rather than
+   which is why the trail says "Course Progress" and "Achievements" rather than
    `transcript` and `rewards`.
 
    THE RAIL'S FOOT IS NOT IN `NAVSETS` and has to be named: Profile is drawn in
@@ -708,7 +708,7 @@ function wPoints(){
       <span><b>+20</b>someone reacts to your post</span>
      </span>
      <span class="tw-k">You are on ${g.pts.toLocaleString()}. Bronze lands at 2,500.</span>`,
-    twBtn('Open Points','rewards'));
+    twBtn('Open Achievements','rewards'));
 }
 function wPrep(){
   return tw(twIc('checkOutline') + 'A 10-minute run-through',
@@ -771,7 +771,7 @@ function talPanel(f){
   const ctx = (lead ? (lead.ctx[S.view] || lead.ctx.leadDash) : (TALCTX[S.view] || TALCTX.dashboard));
   const where = (lead ? lead.where[S.view] : ({dashboard:'Dashboard',level:'My Level',report:'Your report',interviews:'Interviews',
     agents:'Choosing an agent',agent:'Agent profile',booking:'Interview booked',enrol:'Enrolling',
-    payment:'Payment',welcome:'Enrolled',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Points',
+    payment:'Payment',welcome:'Enrolled',coursework:'Coursework',chapter:'Chapter '+((S.ch??3)+1),transcript:'Course Progress',rewards:'Achievements',
     cohort:'Cohort 41',billing:'Payments',account:'Profile',messages:'Messages'})[S.view]) || 'TalentNext';
   const state = lead ? lead.state()
     : f.complete ? lvlName(f.level)+', cohort complete'
@@ -1361,8 +1361,13 @@ function pacePart(f, g){
    wherever it is drawn, so "your pace" is the green one on day 34 and on day 90
    where the focus column is absent and it has moved to first. `nth-child` would
    have made it blue on one of those two. */
-function pulseCol(mk, ic, label, body){
-  return `<div class="pulse-c" style="--mk:var(--mk-${mk})">
+/* `cls` IS FOR A COLUMN THAT IS NOT A THIRD OF THE ROW. §72.1's grid counts its
+   own children, which is right while every column is equal; the pace column
+   spans two of the auto tracks now, and that is a fact about the GRID rather
+   than about the column's contents — so it is a class §72 keys on, not a style
+   written here. One caller passes it. */
+function pulseCol(mk, ic, label, body, cls){
+  return `<div class="pulse-c${cls ? ' ' + cls : ''}" style="--mk:var(--mk-${mk})">
     <div class="pulse-h"><i class="pulse-ic">${ic}</i><span class="pulse-lab">${label}</span></div>
     ${body}
   </div>`;
@@ -1435,61 +1440,30 @@ function pulseLede(f, g, p){
    band and trap 12 is not in play. `callRow()` keeps its other reader
    (`V.cohort`) and is untouched. */
 function pulseCols(f, g){
-  const w = WEEKLY[S.stage] || WEEKLY.week1;
   const p = pacePart(f, g);
 
-  /* THE FOCUS COLUMN IS THE ONE THAT CAN BE ABSENT, and `f.finished` is the
-     same test that used to hide the whole "This week" section: on day 90 all
-     thirteen chapters are done and there is nothing to be in the middle of.
-     The row is two columns there, which is why §72 sizes the grid by counting
-     its children rather than writing three tracks. */
-  let focus = '';
-  if(!f.finished){
-    const i = f.open, mins = CH[i][1];
-    const did = isDay34(S.stage) ? 12 : 0;
-    const pct = Math.round(did / mins * 100);
-    /* THE TITLE COMES FIRST AND THE CHAPTER LINE UNDER IT — 599:7418's own
-       order, and `weekCard`'s inverted. The eyebrow-over-title shape is right
-       when the eyebrow is a CATEGORY the title belongs to; here it is the
-       chapter's number and state, which is a fact ABOUT the thing named above
-       it. Read down: what I am on, which chapter that is, how far in.
-       So it is no longer an eyebrow — §63 §12 sets it as a description. */
-    focus = pulseCol(1, I.book, 'Current focus', `
-      <h3 class="pulse-t">${CH[i][0]}</h3>
-      <div class="pulse-eb">Chapter ${i+1} &middot; ${S.stage === 'week1' ? 'Unlocked today' : 'In progress'}</div>
-      <div class="pulse-ring">
-        ${ring(pct, `${pct}% of chapter ${i+1} done`)}
-        <span class="pulse-rb"><b>${did} / ${mins} min</b><span class="pulse-rl">completed</span></span>
-      </div>
-      ${''/* WHAT THE WEEK ALREADY CONTAINS, AND IT DRAWS ONLY WHEN THERE IS
-             SOMETHING IN IT. Facts only, past tense — the note over WEEKLY in
-             data.js is the argument, and nothing undone appears in it.
+  /* THE FOCUS COLUMN IS GONE (Maryam, 31 Aug 2026: "remove the current focus
+     section and give the second Your pace column that width").
 
-             THE EMPTY STATE IS GONE AND THAT IS WHY THE MOCK MATCHES. Week 1's
-             list is empty and `weekCard` printed `w.none` in its place —
-             "Nothing finished yet. Chapter 1 unlocked today and nothing this
-             week is assessed." That sentence says what the ring beside it
-             already shows (0%) and what the band's summary says in full, and
-             on 599:7418 the column ends on the button instead. So the empty
-             branch is dropped rather than restyled: on week 1 this column is
-             exactly the four rows the file draws, and on day 34 the two real
-             facts sit above the button rather than being thrown away. */}
-      ${w.did.length
-        ? `<ul class="pulse-did">${w.did.map(([t,m]) => `<li>
-            <span class="pulse-tick">${I.checkFilled}</span>
-            <span class="pulse-db"><b>${t}</b><span class="pulse-dm">${m}</span></span></li>`).join('')}</ul>`
-        : ''}
-      ${''/* THE COLUMN'S OWN WAY IN, AND IT IS THE SECOND ROUTE TO THE CHAPTER
-             ON THIS SECTION — the head row's "Open chapter N" is the first.
-             That is normally the thing this codebase argues against (§29.16's
-             report card, `weekCard`'s own "Coursework" button), and it is
-             Maryam's call on 599:7418: the two are at opposite ends of a 357px
-             block and the section head's button belongs to the SECTION while
-             this one belongs to the column it closes. The words differ for the
-             same reason — one names the chapter, one names the act. */}
-      <div class="pulse-go"><button class="btn btn-g btn-sm" data-go="chapter:${i}">Continue learning ${I.arrowRight}</button></div>`);
-  }
+     IT WAS ALREADY THE ONE COLUMN THAT CAME AND WENT — absent on day 90, where
+     every chapter is finished — and §72.1's grid counts its children precisely
+     so the row could be three or two. Taking it out for good makes two the only
+     shape, and the reason it can go is that nothing in it was only here: the
+     chapter's name, its number and its minutes are the `Current focus` Quick
+     Action on the dashboard (`pulseQA`), the ring is the same figure the strip
+     in the head band draws as thirteen blocks, and `Continue learning` is the
+     section head's own `Open chapter N` two rows above it.
 
+     THE PACE COLUMN TAKES THE WIDTH RATHER THAN THE ROW CLOSING UP. Two equal
+     halves would have given the pace bar 570px for a 28-block measure that is
+     legible at 380 — and made the standing column, which is three rows of a
+     mark, a label, a note and a figure, the wider of the two. `.pulse-wide`
+     spans two of the three auto tracks, so pace is two thirds and standing is
+     the third it already was.
+
+     `f` IS STILL A PARAMETER and `w` is not read any more; `WEEKLY[S.stage]`
+     was the did-list this column drew. `f` is used by the head row's action and
+     the lede below. */
   const pace = pulseCol(2, I.time, 'Your pace', `
     <div class="pulse-fig">${p.fig}<small>${p.unit}</small></div>
     <div class="pulse-sub">${p.sub}</div>
@@ -1499,7 +1473,7 @@ function pulseCols(f, g){
         p.segs.map(s => `<i class="${s}"></i>`).join('')}</span>
     </div>
     <div class="pulse-3">${p.figs.map(([v,l]) =>
-      `<span><b>${v}</b><span class="pulse-3l">${l}</span></span>`).join('')}</div>`);
+      `<span><b>${v}</b><span class="pulse-3l">${l}</span></span>`).join('')}</div>`, 'pulse-wide');
 
   /* `standRow` UNCHANGED, and that is the point of reusing it: the rewards page
      draws the same three cells and the two cannot disagree about what a badge
@@ -1541,7 +1515,7 @@ function pulseCols(f, g){
           reading rather than the product's list. `What the 90 days cover` on
           `assessed` is the case that went the other way. */}
     ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
-    <div class="pulse">${focus}${pace}${stand}</div>
+    <div class="pulse">${pace}${stand}</div>
   </div>`;
 }
 
@@ -1616,7 +1590,7 @@ function pulseCard(f, g){
    ONE CARD PER COLUMN, AND EACH GOES WHERE THAT COLUMN'S DETAIL LIVES. That is
    what makes this a move rather than a deletion: Current focus is the open
    chapter, Your pace is Course Progress — which is also where `pulseCols` now
-   draws in full — and Your standing is Points. Nothing on the dashboard states
+   draws in full — and Your standing is Achievements. Nothing on the dashboard states
    a figure any more; the dashboard states what to do about it.
 
    THE HUES ARE THE COLUMNS' OWN, WHICH IS THE CONTINUITY WORTH KEEPING.
@@ -1793,7 +1767,22 @@ function barChart(id,{title,sub,data,labels,slots,target,targetLabel,unit}){
    and truncating a bar axis would misread. Chapters are sequential, so this is
    a line: 2px stroke, 8px markers with a 2px surface ring, a dashed reference
    line for the cohort average, and the same table view behind the toggle. */
-function lineChart(id,{title,sub,data,labels,slots,target,targetLabel,unit,min,max}){
+/* `targetLabel` IS GONE FROM THIS CHART ONLY (Maryam, 31 Aug 2026: remove the
+   "Chapter 5 86%" and "Cohort average 79%" texts). `stackChart` and `barChart`
+   draw their own `.chart-ref` and are untouched — different class, different
+   callers, and on those two the label is the only thing naming what the dashed
+   line IS. Here the line's value is the fourth cell of the figure row directly
+   above the chart ("Assessment average 88% / cohort average 79%"), so the label
+   was the same number a second time, floating in the plot's own white space.
+   `target` stays: the dashed line is the comparison and it still draws.
+
+   AND THE READOUT GOES WITH IT. `.chart-read` printed the LAST point — "Chapter
+   5  86%" — under the tick row, which is the same figure the table to its left
+   states on its own last row. It was also the only thing three chart types
+   shared, so the three handlers that write into it are now null-guarded rather
+   than assuming it exists. `lineChart` is the one caller that has stopped
+   drawing it; `stackChart` and `barChart` still do. */
+function lineChart(id,{title,sub,data,labels,slots,target,unit,min,max}){
   const W=320,H=104;
   const PAD=5, IW=W-PAD*2;
   const x=i=> slots>1 ? (PAD + i*(IW/(slots-1))) : W/2;
@@ -1808,7 +1797,6 @@ function lineChart(id,{title,sub,data,labels,slots,target,targetLabel,unit,min,m
       width="${w.toFixed(1)}" height="${H}" fill="transparent" aria-label="${labels[i]}, ${v}${unit}"/>`;
   }).join('');
   const ticks = Array.from({length:slots},(_,i)=>`<span>${(i%4===0||i===slots-1)?(i+1):'&nbsp;'}</span>`).join('');
-  const last=data.length-1;
   return `<div class="chart" id="${id}">
     <div class="chart-head"><span class="t">${title}</span><span class="s">${sub}</span></div>
     <div class="chart-line">
@@ -1823,10 +1811,8 @@ function lineChart(id,{title,sub,data,labels,slots,target,targetLabel,unit,min,m
           stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
         ${dots}${hits}
       </svg>
-      <span class="chart-reflab" style="top:calc(${(y(target)/H*100).toFixed(1)}% + 3px)">${targetLabel}</span>
     </div>
     <div class="chart-x">${ticks}</div>
-    <div class="chart-read" data-read="${id}"><span class="k">${labels[last]}</span><span class="v">${data[last]}${unit}</span></div>
     <div class="chart-table ct-bars">${data.map((v,i)=>`<div class="kv" style="--p:${Math.round((v-min)/(max-min)*100)}%"><span class="k">${labels[i]}</span><span class="ct-bar"><i></i></span><span class="v n">${v}${unit}</span></div>`).join('')}</div>
     <div class="mt4"><button class="btn btn-g btn-sm noic" data-tbl="${id}" style="padding-left:0">View as a table</button></div>
   </div>`;
@@ -1938,7 +1924,7 @@ const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
      Tal    the reading — what moved, what is open, what is on you. Prose,
             two sentences, and the only prose at the head of the page.
 
-   AND WHERE THERE IS NO SPINE, THERE IS NO `sub`. Profile, Payments, Points
+   AND WHERE THERE IS NO SPINE, THERE IS NO `sub`. Profile, Payments, Achievements
    before enrolment, What Tal knows, Practice — none of them has a location
    or a date to state, and inventing a sentence to fill the slot is what
    produced the duplication in the first place. `sub` is optional in the
@@ -2380,28 +2366,28 @@ const ENROL_DESC = {
   E3: '90 days at your own level, then a re-interview that can move you up.',
   E4: 'Harder chapters at E4, then a re-interview that can move you again.'
 };
-const enrolPlate = lvl => `<div class="sec">
-      <div class="plate">
-        <div class="plate-t">Enroll on Explorer &ndash; ${lvl}</div>
-        <div class="plate-d">${ENROL_DESC[lvl]}</div>
-        <div class="plate-b">Course price <b>$690</b> &middot; 13 chapters, one a week &middot; 13 assessments, one per chapter &middot; A cohort of ten with a live leader</div>
-        ${''/* `.note acc` IS THE COMPONENT AND `.plate-n` IS THE SLOT — one
-              element wearing both, because a wrapper round it would be a div
-              whose only job is to be found by `placePlates`. The accent note is
-              the product's own tinted callout (§02 assigned it the brand tint
-              and §66 gives it its ground back); the second line is a `.sub` so
-              it takes the description grey rather than the body ink, which is
-              the two-tier shape the file draws. */}
-        ${''/* THE SUB IS EMITTED ONLY IF THERE IS ONE. `.nb` is a flex column
-              with a gap, so an empty `<span class="sub">` is not nothing — it
-              is a second row of zero height with the gap still above it, which
-              left 6px hanging under E3's single line. */}
-        <div class="note acc plate-n"><span>${I.calendar}</span><div class="nb"><b>${ENROL_OPENS[lvl][0]}</b>${ENROL_OPENS[lvl][1]?`<span class="sub">${ENROL_OPENS[lvl][1]}</span>`:''}</div></div>
-        <div class="plate-a">
-          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
-        </div>
-      </div>
-    </div>`;
+/* `enrolPlate` IS GONE AND `enrolOffer` IS THE ONLY WAY THE OFFER IS DRAWN
+   (Maryam, 31 Aug 2026 — the `promoted` dashboard follows `assessed`'s).
+
+   §73 SPLIT THIS INTO TWO FUNCTIONS FOR ONE STATED REASON AND THAT REASON HAS
+   EXPIRED. Its note: "`promoted` draws the same offer one level up and there it
+   IS in the head band — `placeDark` moves the plate into §56's second column.
+   Taking `.plate` off would empty that column on a page this brief does not
+   touch." The brief touches it now; that column holds `jrnList` on both pages,
+   so nothing is emptied and there is no longer a second shape to keep.
+
+   WHAT THE SPLIT COST WHILE IT LASTED is the thing worth remembering: two
+   functions drawing one offer, which §73 could only keep honest by making both
+   read `ENROL_OPENS`, `ENROL_DESC` and the fee from one place. That discipline
+   is what makes deleting this half free — every figure it printed is printed by
+   `enrolOffer` from the same source, including E4's optional second line, which
+   now rides on the lede rather than inside the date chip.
+
+   NO CSS GOES WITH IT. `.plate-d` and `.plate-n` are still written by
+   `V.enrol`'s checkout plate (`checkoutPlate`), and `.plate` / `.plate-t` /
+   `.plate-b` / `.plate-a` are the six other plates in the build. This is the
+   opposite of the `coverSec` case, where the classes survived only because the
+   design system and `gallery.html` write them. */
 
 /* ==========================================================================
    THE ENROLMENT OFFER — Figma, the `assessed` dashboard
@@ -2446,11 +2432,47 @@ const ENROL_FACTS = [
   [I.group,  'Cohort of 10', 'live calls with your leader']
 ];
 
-const enrolOffer = lvl => `<div class="sec eo">
+/* AND IT IS THE BLACK CARD — Maryam, 31 Aug 2026, "change this section to a
+   black card, use the same content". §75's whole recipe arrives as one class
+   and NOT ONE WORD OF THE CONTENT CHANGES: the same `aiHead`, the same date
+   chip and Enroll button, the same four `ENROL_FACTS`.
+
+   THIS IS NOT A REVERSAL OF §73, WHICH IS THE THING WORTH READING BEFORE
+   TOUCHING IT. That layer's argument was against `.plate` — §59 reserves the
+   plate for an action with a CLOCK in it, and enrolling has none, so the offer
+   was permanently drawing §59's quiet state. `.dark-card` is a different
+   object with a different rule: §75 is "this is the one thing this page is
+   about", which is exactly what an enrolment offer is on the page whose whole
+   job is the $690 decision. What §73 took away was the countdown; what this
+   restores is the ground, and the two are separable because §75's card has no
+   clock in it either. `enrolPlate` on `promoted` is untouched — that one is
+   still a plate, still in the head band beside the certificate.
+
+   `.dark-card` AND NOT `.plate` / `.sec.on-dark`, per §75's own warning: both
+   of those are in ai5's `DARK_CARD`, so `placeDark` would hoist this section
+   into the head band's second column — which on `assessed` is the journey list
+   (§70.3) — and it would land there at 330px with the four figures on four
+   lines. Nothing throws and nothing warns. §81 is the layer.
+
+   THE FOUR FIGURES KEEP THEIR OWN ROW AND GAIN A RULE ABOVE THEM, which is
+   §79.2's arrangement for the pulse and the same reason: on a black card the
+   head and the content are two parts of ONE object, and `--on-dark-rule` is
+   what says so. On the white version the head's 20px margin did that job. */
+const enrolOffer = lvl => `<div class="sec eo dark-card">
       ${aiHead({
         mark:true,
         title:`You&rsquo;re enrolling on Explorer &ndash; ${lvl}`,
-        desc:ENROL_DESC[lvl],
+        /* AND THE OPTIONAL SECOND LINE RIDES ON THE LEDE, which is what stops
+           E4 losing a figure when it moves off the plate. `ENROL_OPENS` is a
+           PAIR — a date and, optionally, something live about the cohort being
+           bought — and its own note is explicit that E4 keeps its sub because
+           "Cohort 58 has 7 places left" is a fact about the thing on offer.
+           `enrolPlate` printed both, stacked inside `.note.acc`; the chip here
+           is a 40px pill measured against the button beside it (§73.1), so a
+           second line in it would break the pair's geometry. The lede has room
+           and is the sentence that says what you are buying, so the figure goes
+           there. E3 has no sub and is unchanged. */
+        desc:`${ENROL_DESC[lvl]}${ENROL_OPENS[lvl][1] ? ' ' + ENROL_OPENS[lvl][1] : ''}`,
         act:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
       })}
@@ -2475,51 +2497,22 @@ const enrolOffer = lvl => `<div class="sec eo">
       </div>
     </div>`;
 
-/* WHAT THE 90 DAYS COVER — four chapters, then the count of what is behind them.
-   The list was all thirteen as a two-column flat run, 528px of it, on a page
-   whose next block is Priya's write-up. Four cards say what the course is LIKE;
-   the section's own head action goes to `V.enrol`, which draws all thirteen, so
-   nothing is unreachable. The fifth cell is the remainder and is a real count
-   (`CH.length - 4`), not a "more" link — it is the only cell that is not a
-   chapter, so it says how many there are rather than pretending to be one.
+/* `coverSec` IS GONE — the four-chapter preview is a Quick Action now (Maryam,
+   31 Aug 2026). Its only caller was `V.dashboard`'s `assessed` branch and the
+   note there is the argument; the card points at `V.enrol`, which draws all
+   thirteen chapters, so nothing became unreachable. `enrolHours()` had already
+   gone the same way, and this is the discipline `quizResults` got when its last
+   caller went: a function nobody calls is deleted, not left orphaned.
 
-   THE HUES ARE `--mk-1/2/3` CYCLED AND THAT IS CORRECT HERE, against §65's and
-   §72's decision to name them: those two cycle over cells whose MEANING is
-   fixed (a chapter, a pace, a standing), where a positional hue would move a
-   subject's colour between screens. A chapter's number has no subject — 01 is
-   not "the blue one" — so position is all there is to key on, which is exactly
-   the case §29 wrote the cycle for. */
-const coverSec = () => `<div class="sec cov">
-      ${aiHead({
-        title:'What the 90 days cover',
-        extra:'<span class="cov-pill">Curated for your growth</span>',
-        desc:`${CH.length} chapters, one a week, with a live cohort call alongside each.`,
-        act:'<button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button>'
-      })}
-      <div class="cov-row">
-        ${CH.slice(0, 4).map((c, i) => `<div class="cov-c" style="--mk:var(--mk-${i % 3 + 1})">
-          <span class="cov-n">${String(i + 1).padStart(2, '0')}</span>
-          <span class="cov-t">${c[0]}</span>
-          <span class="cov-m">${c[1]} min</span>
-        </div>`).join('')}
-        <div class="cov-c cov-more">
-          <span class="cov-n">+${CH.length - 4}</span>
-          <span class="cov-t">More chapters up ahead</span>
-        </div>
-      </div>
-      ${''/* AND NOTHING UNDER THE ROW. A tinted closing bar sat here — "Learners
-            like you spend about 12 hours on the chapters…", three cohort faces
-            and "You're in good company" — and it is gone (Maryam, 31 Aug 2026).
-            Two of its three parts were already on the page: the hours are the
-            five cells above it read together, and the cohort of ten is one of
-            the enrolment offer's four figures. What was left was the social
-            proof, which is the one claim on this page the product makes about
-            other people rather than about this candidate.
-
-            `enrolHours()` went with it — it was that sentence's only caller, and
-            a derived figure nothing prints is the "gate no caller writes" tell
-            §72 records for the ask chip. `COHORT` and `AV` are untouched. */}
-    </div>`;
+   ITS STYLESHEET STAYS, AND THAT IS NOT AN OVERSIGHT — it is the one place the
+   "gate nothing writes" test has a second reader. §73.2's `.cov-row` / `.cov-c`
+   / `.cov-n` / `.cov-t` / `.cov-m` / `.cov-more` / `.cov-pill`, §73.3's
+   scroller and §63 §13's type for them are all shipped by
+   `design-system/talentnext-ds.css` and DOCUMENTED IN `gallery.html`, which
+   writes that markup as a recipe. So the box still writes those classes;
+   deleting them would take a live design-system component away from every page
+   built on it. §73.1b's label-column opt-out (`:has(> .cov-row)`) stays with
+   them for the same reason. */
 
 const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course'];
 function journey(){
@@ -2538,6 +2531,30 @@ function journey(){
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
     case 'assessed': return LEVELLED;
+    /* THE ONE STAGE WHERE ALL FOUR ARE BEHIND YOU (Maryam, 31 Aug 2026 — the
+       `promoted` dashboard follows `assessed`'s). It reaches this function now
+       because that page's band took `jrnList` into the column `enrolPlate`
+       used to hold, and `default` would have handed it `LEVELLED` — step 3 of
+       4, "Not enrolled yet" — on a page whose whole subject is having finished.
+       That is the failure a `default` hides: it renders, and it is wrong.
+
+       WITH NO `on` STEP `jrnList` PRINTS "Step 4 of 4", which is what the pill
+       should say here, and the four `sec` lines are the record of the cycle
+       rather than a forecast. Read beside the E4 offer 200px to the left, the
+       list is what makes that offer read as the NEXT one rather than as a
+       repeat of something outstanding.
+
+       THE FIGURES ARE READ, not typed, so a stage that moves `done` or `avg`
+       moves the line with it. The date is 21 November — `ACH.promoted` and the
+       "Cohort 41, in the end" strip both say 21, and `V.dashboard`'s found
+       section says 22; that disagreement is pre-existing and this takes the
+       majority rather than adding a third answer. */
+    case 'promoted': {
+      const p = cfg('promoted');
+      return row(['done','done','done','done'],
+        ['Explorer track &middot; Aug 12', 'E4 &middot; signed by Priya, Nov 21',
+         'Cohort 41 &middot; closed', `${p.done} chapters &middot; ${p.avg}% average`]);
+    }
     default: return LEVELLED;
   }
 }
@@ -3085,11 +3102,27 @@ function crow(kind, o){
           <p class="crow-x">${xl ? `<b>${xl}</b> ` : ''}${c.x}</p>
         </div>
       </div>
-      <div class="crow-a">
-        ${o.second === false ? '' : `<button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>`}
-        <button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+      ${''/* `o.join === false` DROPS THE PRIMARY AND PROMOTES THE SECONDARY
+             (Maryam, 31 Aug 2026). The leader's card carried a Join that
+             §81 gates shut for twenty-three hours a day, so what the card
+             showed almost always was a dead control beside a live one —
+             and §60's rule is that a dead control on a live surface is
+             worse than a missing one. §81's gate was the honest answer
+             while Join was the card's POINT; it is not the point here, so
+             the button goes rather than being explained.
+             WITH THE PAIR GONE THE SURVIVOR CHANGES SHAPE: it loses its
+             leading subject icon and takes a TRAILING `arrowRight`, which
+             is this product's mark for "this takes you somewhere" and ends
+             forty-odd buttons already. `ic-l` comes off with the icon —
+             that class exists to seat a leading mark. Nothing else in the
+             product passes `join`, so the candidate's three call sites and
+             `callRow` render byte-identically. */}
+      <div class="crow-a${o.join === false ? ' crow-a1' : ''}">
+        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" data-go="${c.second.go}">${
+          o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
+        ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           o.gate ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
-          gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>
+          gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
       </div>
     </div>`;
 }
@@ -3195,7 +3228,18 @@ function jrnList(){
                 second label. */}
           <span class="jrn-ic">${s.st === 'done' ? I.checkFilled
                                 : s.st === 'on' ? I.hourglass : I.time}</span>
-          <span class="jrn-n">${i + 1}.</span>
+          ${''/* THE NUMBER IS GONE (Maryam, 31 Aug 2026: "remove the 1,2,3,4
+                 from texts"). It was saying a third time what the list already
+                 says twice: the rows are in order down the page, and the pill in
+                 the head row prints "Step 3 of 4" — so the numeral was position
+                 stated as content, beside a mark whose whole job is to say where
+                 in the sequence this row is. `<ol>` keeps the semantics for a
+                 screen reader with no marker drawn.
+
+                 `.jrn-n` GOES WITH IT rather than being left standing — §70.648
+                 gave it `flex:none` and §63 §10 named it in a `flex` list, and a
+                 class nothing writes is the "gate nothing writes" tell
+                 CLAUDE.md describes. Both removed. */}
           <span class="jrn-lab">${JRN_AI[i] || s.lab}</span>
         </li>`).join('')}
       </ol>
@@ -3780,11 +3824,19 @@ create: () => `${authShell()}
     <div class="f-row"><div class="f"><label for="pw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="pw" type="password" value="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022">
         <button class="pw-eye" data-eye="pw" aria-label="Show password">${I.view}</button></div>
-      <ul class="pw-rules">
-        <li class="ok">${I.checkFilled}At least 12 characters</li>
-        <li class="ok">${I.checkFilled}Upper and lower case</li>
-        <li>${I.circle}One number or symbol</li>
-      </ul></div>
+      ${''/* THE THREE RULES CAME OFF THIS SCREEN (Maryam, 31 Aug 2026), AND
+             OFF THIS SCREEN ONLY. `AUTH.reset` draws the same `<ul class=
+             "pw-rules">` and keeps it: there the reader is CHOOSING a password
+             and the list is the specification they are choosing against. Here
+             the field arrives pre-filled with twelve dots and two of the three
+             already ticked, so the list is a checklist for work the prototype
+             has done — three rows of chrome between the password and the
+             confirm field, on the one screen whose whole job is to be short.
+
+             `.pw-rules` KEEPS ITS RULES in §02, §11, §12, §14 and §17 because
+             it keeps a writer. This is not the "gate nothing writes" case —
+             grep before deleting any of them. */}
+      </div>
     <div class="f last"><label for="pw2">Confirm Password</label>
       <div class="pw-wrap"><input class="inp fill" id="pw2" type="password" placeholder="Re-enter password">
         <button class="pw-eye" data-eye="pw2" aria-label="Show password">${I.view}</button></div></div></div>
@@ -4270,41 +4322,71 @@ V.dashboard = (f) => {
           in the journey row's second step, and in Tal's summary. Its one jump,
           Read my report, is the "What the interview found" section's own head
           action two blocks below. */}
-    ${''/* FOUR CHAPTERS AND A COUNT, NOT ALL THIRTEEN — see the note over
-          `coverSec`. The full list is `V.enrol`, which is where the section's
-          own head action goes. */}
-    ${coverSec()}
-    ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
-          The interview is the only thing that has happened to this candidate,
-          and the page was showing its RESULT — a level, a black hero, a course
-          — without a word of what was actually said in it. The digest goes
-          here rather than higher up because its growth-areas line ends on
-          "chapters 4 and 12", and the thirteen chapters are the block directly
-          above: read in this order the course stops being a catalogue and
-          becomes the answer to what Priya wrote down. Higher up, between the
-          hero and the course, it would have been a third block about the
-          level before the reader had been told what the level buys. */}
-    ${''/* THE QUIET GROUND, `sec tint cards` — #F7F7F7 (§12) with §55's white
-          head action. This block is the one thing on the page you READ rather
-          than act on: it is Priya's write-up, and everything around it is a
-          course to enrol on and a level to look at, which is §45's test. §55
-          takes the head button white so it is not the only thing left in the
-          block still the panel's colour, and §55.2 takes the rule off the
-          block above — a change of ground is already the boundary. */}
-    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
-          argument: the findings are tinted cards now and a 5% wash on a 4%
-          grey ground is invisible. */}
-    <div class="sec found${discOpen('report')?' on':''}">
-      ${foundHead('What the interview found',
-        '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
-      <div class="found-b">
-        <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 21 August. Your strengths, your growth areas and the scenes you kept sit behind it.</p>
-        ${signedSummary(true)}
-      </div>
-    </div>`;
+    ${''/* AND THE LAST TWO SECTIONS BECOME TWO QUICK ACTIONS — Maryam,
+          31 Aug 2026, "change the What the 90 days cover and What the
+          interview found in quick actions, just like we are using".
+
+          THIS IS §79'S MOVE ON A SECOND PAGE AND THE ARGUMENT IS ITS ARGUMENT.
+          There, the pulse's three columns became three Quick Actions on the
+          reasoning that "nothing on the dashboard states a figure any more;
+          the dashboard states what to do about it". This page had the same
+          shape one stage earlier: 528px of chapter preview and Priya's whole
+          write-up, both of them a READING, under a card whose job is a single
+          decision. What is left is the band, the offer, and two ways in.
+
+          ONE CARD PER SECTION, AND EACH GOES WHERE THAT SECTION'S DETAIL
+          LIVES — §79's rule, which is what makes this a move rather than a
+          deletion. The preview's own head action was already "See the full
+          course" pointing at `V.enrol`, which draws all thirteen; the
+          disclosure's was already "Read the full report" pointing at
+          `V.report`, which is Priya's write-up in full. Both cards inherit
+          those exact destinations, so nothing on this page has become
+          unreachable and no route is new.
+
+          THE HUES ARE THE ONES THE TWO BLOCKS ALREADY WORE, per §70.6's rule
+          that a Quick Action's hue is NAMED and never cycled: violet is
+          `.cov-pill`'s "Curated for your growth" (§63 §13 picks `--mk-3` for
+          it) and blue is §74's hue for Priya's note, the third of the three
+          finding cards. A reader who knew the preview as the violet block
+          finds it violet as a card. §81.5 states both.
+
+          THE DESCRIPTIONS ARE READ, NOT TYPED, which is `pulseQA`'s rule:
+          `CH.length` is the chapter count, so a chapter added to the course
+          moves this card. The second card names no DATE deliberately — the
+          block it replaces said "signed 21 August" while `signedSummary`'s own
+          header says "20 August 2026", a pre-existing disagreement this must
+          not spread to a third surface. Both dates are on `V.report`. */}
+    ${quickActions([
+      {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
+       d:`${CH.length} chapters, one a week, with a live cohort call.`, go:'enrol'},
+      {ic:I.document, hue:'ic-found', t:'What the interview found',
+       d:'Priya&rsquo;s signed write-up of your level interview.', go:'report'}
+    ])}`;
 
   else if(f.complete) body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E4 &middot; level 4 of 15 &middot; Cohort 41 closed')}
+    ${''/* THIS PAGE FOLLOWS THE `assessed` DASHBOARD — Maryam, 31 Aug 2026:
+          "the Promoted to E4 prototype is similar to the Leveled, not enrolled
+          prototype, so you need to follow that dashboard ui here."
+
+          THE NOTE BELOW ALREADY SAID THE TWO WERE THE SAME PAGE and only got
+          half way: "This page IS the `assessed` page again, one level up. Both
+          stages are the same moment — a level has just been confirmed and a
+          course has not been started." What it then copied was the two BLOCKS;
+          what it did not copy was the SHAPE, because at the time there was no
+          shape to copy. There is now, and it is three things:
+
+            the band's second column   `jrnList`, where `enrolPlate` used to be
+            the offer                  a full-width `.dark-card`, not a plate
+            the two reading blocks     two Quick Actions
+
+          WHAT DELIBERATELY DOES NOT FOLLOW, because `assessed` has no
+          equivalent and inventing one would be designing rather than matching:
+          "Cohort 41, in the end" (a closing figure strip with the score card),
+          "What changes at E4" (two offers that are already actions with their
+          own buttons), and the certificate. All three are this stage's own
+          content and are untouched. */}
+    ${jrnList()}
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
@@ -4314,58 +4396,50 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${enrolPlate('E4')}
-    ${''/* THE SAME TWO CHANGES AS `assessed`, ONE LEVEL UP — see the note over
-          `enrolPlate`. The black level card and the ladder are gone from this
-          page: `placeDark` hoists any dark card into the head band, so with the
-          enrolment card already in the band's column the two were stacked there,
-          and the fact the hero stated — "Explorer – E4, promoted from E3, rung 4
-          of 15, signed 21 November" — is in the page's own fact row under the
-          title, in the achievement banner directly below it, in the journey
-          row's last step and in Tal's summary. `V.level` is where the ladder is
-          drawn at the width it needs.
+    ${''/* THE OFFER IS THE BLACK CARD, NOT THE PLATE — and this is the change
+          that empties the band's second column, which is why `jrnList` is
+          written above. `enrolOffer` is a `.dark-card` and `.dark-card` is NOT
+          in ai5's `DARK_CARD`, so `placeDark` leaves it in the page body where
+          it spans the full width; `enrolPlate` was a `.plate`, which that pass
+          hoists into §56's column two.
 
-          THE CERTIFICATE KEEPS ITS BUTTON and the enrolment loses its second
-          one: the card in the column is the Enroll action now, and the same
-          action drawn twice 200px apart is the page offering one thing as two.
-          `.btn-set` stays a section of its own rather than being absorbed —
-          `placeLevelCards` (ai5) pulls a lone button row into the hero above it
-          when there is one, and now there is not. */}
-    ${''/* THIS PAGE IS THE `assessed` PAGE AGAIN, ONE LEVEL UP.
-          Both stages are the same moment — a level has just been confirmed
-          and a course has not been started — so they were answering the same
-          two questions, and only one of them was answering them. `assessed`
-          says what the 90 days hold and what the agent actually wrote;
-          `promoted` said neither, and went straight from the level to a
-          points card. The two blocks below are that page's, with the
-          re-interview's report rather than the first one's. */}
-    <div class="sec">
-      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
-      <p class="all-desc">Thirteen chapters at E4, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
-      <div class="ch-two">${CH.map((c,i)=>`
-        <div class="ch ch-flat">
-          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
-          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
-        </div>`).join('')}</div>
-    </div>
-    ${''/* THE QUIET GROUND, `sec tint cards` — #F7F7F7 (§12) with §55's white
-          head action. This block is the one thing on the page you READ rather
-          than act on: it is Priya's write-up, and everything around it is a
-          course to enrol on and a level to look at, which is §45's test. §55
-          takes the head button white so it is not the only thing left in the
-          block still the panel's colour, and §55.2 takes the rule off the
-          block above — a change of ground is already the boundary. */}
-    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
-          argument: the findings are tinted cards now and a 5% wash on a 4%
-          grey ground is invisible. */}
-    <div class="sec found${discOpen('report')?' on':''}">
-      ${foundHead('What the re-interview found',
-        '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
-      <div class="found-b">
-        <p class="all-desc">The short version of Priya&rsquo;s write-up, signed 22 November off the 90 days you had just finished.</p>
-        ${signedSummary(true, true)}
-      </div>
-    </div>
+          §73 SAID THIS FUNCTION HAD TO STAY AND THE REASON HAS EXPIRED. Its
+          note reads: "Taking `.plate` off would empty that column on a page
+          this brief does not touch." The brief touches it now, and the column
+          is filled by the journey list rather than left empty — so the one
+          thing that argument was protecting is answered, and `enrolPlate` is
+          deleted rather than kept as a second way to draw one offer.
+
+          THE CERTIFICATE'S `.keep-place` STILL EARNS ITS KEEP. Its own note
+          says the opt-out exists because "the band already holds the enrolment
+          plate" — that clause is stale, but the conclusion is not: `.cert` is
+          in `DARK_CARD`, so without `.keep-place` it would now be hoisted into
+          the column the journey list occupies. One dark card per page still
+          holds; the certificate is simply no longer the second one. */}
+    ${enrolOffer('E4')}
+    ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
+          `assessed` DRAWS, one level up — §79's move, and the note on that
+          page is the argument. What was here was the full thirteen-chapter
+          `.ch-two` list and Priya's whole re-interview write-up: about 900px
+          of reading between the offer and the closing figures, on a dashboard
+          whose job is to say what to do about them.
+
+          THE DESTINATIONS ARE THE HEAD ACTIONS THESE SECTIONS ALREADY HAD, so
+          nothing is unreachable and no route is new: "See the full course"
+          pointed at `V.enrol`, which draws all thirteen chapters, and "Read
+          the full report" at `V.report`, which is the write-up in full. The
+          hues are `assessed`'s, so a reader who has seen that page finds the
+          same two cards in the same two colours a stage later.
+
+          THE WORDS DIFFER BY ONE THING AND IT IS THE RIGHT ONE: this stage's
+          report is the RE-interview's (`signedSummary(true, true)`), so the
+          card says so. The chapter count is read from `CH`. */}
+    ${quickActions([
+      {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
+       d:`${CH.length} chapters at E4, one a week, with a live cohort call.`, go:'enrol'},
+      {ic:I.document, hue:'ic-found', t:'What the re-interview found',
+       d:'Priya&rsquo;s signed write-up of your re-interview.', go:'report'}
+    ])}
     ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
           The weekly-minutes chart lived here — thirteen stacked bars of how
           long you spent, week by week, on a course that is over. That is a
@@ -4436,26 +4510,30 @@ V.dashboard = (f) => {
     const g = GAME[S.stage];
     const stalling = isDay34(S.stage);
     const dueRe = S.stage==='day90';
-    /* THE ONE REQUIRED ACTION GOES ABOVE THE READING.
-       On day 90 the re-interview is the only thing on this page that has a
-       deadline: everything else — where you stand, the progress strip, the
-       weekly chart — is a record of 90 days that are already over. It
-       sat at the FOOT of that record, four blocks and a chart below the
-       fold, which is the one place a due action cannot be. It sits directly
-       under the achievement band instead, so the top of the page reads:
-       here is what you just won, and here is the thing to do next.
+    /* THE `.plate` IS GONE AND `talRec` HAS THE SLOT (Maryam, 31 Aug 2026:
+       "Replace the book your interview black card with the Just joined agent
+       recommendation black card").
 
-       Order in the source is not order on the page: `talFirst` (below) lifts
-       Tal's card to sit against the header, and `placeBand` in ai5.js then
-       wraps the two into the module head. The plate lands after the band and
-       after the achievement banner, which is where it is wanted. */
-    const reBook = dueRe?`<div class="sec">
-      <div class="plate">
-        <div class="plate-eb">Due now</div>
-        <div class="plate-t">Book your re-interview</div>
-        <div class="plate-b">Your 90 days are complete. The re-interview decides whether you move up to E4, hold at E3, or drop back to E2.</div>
-        <div class="plate-a"><button class="btn btn-p btn-sm noic" data-go="agents">Choose an agent ${I.arrowRight}</button></div>
-      </div></div>`:'';
+       IT IS THE SAME QUESTION ONE STAGE ON, AND THAT IS WHY IT IS THE SAME
+       BLOCK. `new` asks "which agent sets my level" and day 90 asks "which
+       agent decides whether it moves" — one roster, one choice, and the plate
+       was answering it with a paragraph and a button that only said "Choose an
+       agent". The recommendation answers it with the agent: a face, a rating, a
+       fee, a slot and one Book.
+
+       THE PLATE'S OWN COPY IS NOT LOST, it was already said twice. "The
+       re-interview decides whether you move up to E4, hold at E3, or drop back
+       to E2" is `V.level`'s "Moving up" accordion verbatim and the note this
+       replaces is where that duplication was recorded as deliberate; the
+       summary now carries the one clause the page needs.
+
+       AND IT IS WRITTEN AFTER TAL'S CARD, WHICH MATTERS. `talRec` wears an
+       `.ai-label.bare`, so `placeBand`'s `_mhIsTal` counts it as a Tal section
+       — §70 records the build where that put it in the head band at 576px with
+       its photograph, facts and actions each on their own line. The one-Tal cap
+       in that run is what stops it, and the cap is only reached if the real
+       Tal card comes first. `new` writes them in this order for the same
+       reason. */
     body = `
     ${''/* `Welcome Back, Maryam!` until §56 made the header visible again on
           every stage — capital B and an exclamation mark on one of eight
@@ -4480,7 +4558,6 @@ V.dashboard = (f) => {
           `callRow()` ITSELF IS UNTOUCHED AND STILL HAS A READER — `V.cohort`
           draws it. This is one of its two call sites going away, not the
           component. */}
-    ${reBook}
     ${''/* THE WING LEFT THIS CARD — §71. `wingBlock()` sat here in a `.stp-wing`
           and drew the progress strip as the last member of the band's LEFT
           column; 599:7418 gives the strip a column of its own, so what is left
@@ -4505,7 +4582,20 @@ V.dashboard = (f) => {
           Action cards pointing at the pages that hold them. The columns
           themselves are not lost: `pulseCols` draws them in full on Course
           Progress. The thirteen-week chart is already there. */}
-    ${g?pulseCard(f,g):''}
+    ${dueRe ? talRec('Your Next Step - Re-interview') : ''}
+    ${''/* NO PULSE CARD ON DAY 90 (Maryam, 31 Aug 2026: "Remove the 'Your
+          learning pulse' black card"). Two black cards on one page is trap 12's
+          rule about `.plate` and `.cert` in a different register — and the
+          second one was a reading of ninety days that are over, printed above a
+          card whose whole job is the one thing that is not.
+
+          NOTHING IN IT IS LOST. Its sentence is `PAGESUM.day90`'s first clause
+          (all thirteen done, the average, the minutes); its three figures are
+          the Quick Actions directly below; and `pulseCols` draws the columns in
+          full on Course Progress, which is where the note over `pulseCols`
+          says the record belongs. The card stays on week 1 and day 34, where
+          the course is still running and the pulse is a live reading. */}
+    ${g && !dueRe ? pulseCard(f,g) : ''}
     ${g?pulseQA(f,g):''}
 `;
   }
@@ -6079,7 +6169,30 @@ V.agent = (f) => {
   <div class="bkc">
     <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
       <span class="bkc-fv">${a.price}</span></div>
-    <button class="btn btn-p" data-go="booking">Proceed to pay ${a.price} ${I.arrowRight}</button>
+    ${''/* PAYING LANDS ON THE DASHBOARD, NOT ON A CONFIRMATION SCREEN (Maryam,
+           31 Aug 2026: "rather than this screen after the payment, i would like
+           to take the user directly on the dashboard where it now goes on
+           clicking 'Back to dashboard'").
+
+           `stage:booked` IS EXACTLY WHERE `V.booking`'s OWN BUTTON WENT, so
+           this removes a screen from the path rather than changing the
+           destination: the confirmation said "Interview booked", printed the
+           agent, the time and the fee, and offered one black button to the
+           dashboard — where the `booked` dashboard's own plate says the same
+           three facts and offers Join. One press, one page.
+
+           IT IS `stage:booked`, NOT `dashboard`. `go()`'s `stage:` branch runs
+           `setStage`, which is what actually moves the journey on — a plain
+           `data-go="dashboard"` would land on the `new` dashboard with nothing
+           booked. The `booked` stage is the confirmation.
+
+           WHAT THIS ORPHANS: `V.booking` now has no button pointing at it
+           anywhere in the build. It is NOT deleted — it is still in the
+           verification sweep's `reachable` list, still addressable as
+           `#<stage>/booking`, and `bkStamp` (ai7) still fills it from the real
+           choice — but if it is not wanted, that view and its `PARENT` entry go
+           together. Recorded here rather than left for a grep. */}
+    <button class="btn btn-p" data-go="stage:booked">Proceed to pay ${a.price} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -6777,20 +6890,20 @@ V.rewards = (f) => {
      enroll" — the same clause twice with a synonym between them. There is no
      spine to state on a page that has no points on it yet, and the empty
      state below says the rest. */
-  if(!g) return `<main class="main"><div class="page">${ph('Points')}
+  if(!g) return `<main class="main"><div class="page">${ph('Achievements')}
     <div class="sec"><div class="empty" style="padding:0 0 var(--s07)">${I.trophy}<h3 style="margin-top:var(--s06)">Nothing to show yet</h3>
       <p>Points, badges and rank begin when your cohort starts.</p></div></div></div></main>`;
   const tab = S.rtab || 'points';
   const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`};
   return `<main class="main"><div class="page">
-  ${crumb(['Dashboard','dashboard'],'Points')}
+  ${crumb(['Dashboard','dashboard'],'Achievements')}
   ${''/* NO DESCRIPTION HERE EITHER. "Points, badges and rank come from your
         activity across the course and the community" is the page's three
         section names plus a claim, and Tal's summary states the three
         figures. A `&middot;` spine of the same three would have made it
         three statements of one thing on the one page in the product where
         the numbers change nothing. */}
-  ${ph('Points')}
+  ${ph('Achievements')}
   ${/* THE QUESTION BELONGS AT THE TOP OF THE MODULE, NOT AT THE BOTTOM OF IT.
         This chip sat at the very foot of the last section, under the points
         table and the "updates within a few minutes" line — so the one thing
@@ -6859,7 +6972,21 @@ V.transcript = (f) => {
         progress strip on this page draws, at the size a figure should be read
         at, and Tal's summary opens on where you stand. */}
   ${ph('Course Progress')}
-  <div class="sec">
+  ${''/* `.sec-joined` SAYS "THE BLOCK UNDER ME DRAWS ITS OWN RULE" (Maryam, 31
+        Aug 2026: "remove the divider after blocks"). §10.2 closes every `.sec`
+        with a full-bleed hairline; `.stats` already draws its own box on all
+        four sides (§29.17) and the pulse below states its own `border-top`, so
+        the seam landed between two things that were each already edged.
+
+        A CLASS RATHER THAN `:has(+ .sec > .pulse)`, which is what this was
+        first written as. That selector MATCHES — verified against the live DOM —
+        and the rule reached the built stylesheet, and the pseudo-element still
+        computed `display:block`. Rather than keep bisecting a `:has()` chain
+        whose failure I could not account for, the section says what it is. It
+        is also the more honest statement: this is a decision about THIS pair on
+        THIS page, not a rule about every `.stats` that happens to precede a
+        pulse. §72.1d keys on it. */}
+  <div class="sec sec-joined">
     <div class="stats">
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
       ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
@@ -6894,7 +7021,7 @@ V.transcript = (f) => {
     <div class="tile" style="padding-top:var(--s04)">
       ${lineChart('sc',{title:'Assessment scores',sub:'70 to 100%',
         data:SCORE.slice(0,f.done),labels:CH.map((c,i)=>'Chapter '+(i+1)),slots:13,
-        target:79,targetLabel:'Cohort average 79%',unit:'%',min:70,max:100})}
+        target:79,unit:'%',min:70,max:100})}
     </div>
   </div>
 `:''}
@@ -8923,7 +9050,14 @@ device.addEventListener('click', e => {
   const hit = t.closest('.hit');
   if(hit){
     const c = device.querySelector('#'+hit.dataset.chart);
-    const read = c.querySelector('[data-read]');
+    /* NULL-GUARDED, because `lineChart` no longer draws a `.chart-read` and
+       this is the handler for ITS hit areas. The other two chart types still
+       draw one; a `.hit` on a chart without a readout should simply do nothing
+       rather than throw — and a thrown error here is swallowed by the pass
+       wrapper into a `console.warn`, which is the quiet failure respcheck
+       exists to catch. */
+    const read = c && c.querySelector('[data-read]');
+    if(!read) return;
     const [lab,val] = hit.getAttribute('aria-label').split(', ');
     read.innerHTML = `<span class="k">${lab}</span><span class="v">${val}</span>`;
     return;
@@ -8936,8 +9070,9 @@ device.addEventListener('click', e => {
     col.classList.add('on');
     const i = +col.dataset.i, tot = GAME[S.stage].weeks[i]||0;
     const parts = tot? segsOf(tot).map((v,k)=>SERIES[k][0]+' '+v).join(' · ') : 'nothing yet';
-    c.querySelector('[data-read]').innerHTML =
-      `<span class="k">Week ${i+1} · ${parts}</span><span class="v">${tot} min</span>`;
+    const scRead = c && c.querySelector('[data-read]');
+    if(scRead) scRead.innerHTML =
+      `<span class="k">Week ${i+1} &middot; ${parts}</span><span class="v">${tot} min</span>`;
     return;
   }
 
@@ -8946,7 +9081,8 @@ device.addEventListener('click', e => {
     const c = device.querySelector('#'+bar.dataset.chart);
     c.querySelectorAll('.chart-bar').forEach(x=>x.classList.remove('on'));
     bar.classList.add('on');
-    const read = c.querySelector('[data-read]');
+    const read = c && c.querySelector('[data-read]');
+    if(!read) return;
     const [lab,val] = bar.getAttribute('aria-label').split(', ');
     read.innerHTML = `<span class="k">${lab}</span><span class="v">${val}</span>`;
     return;

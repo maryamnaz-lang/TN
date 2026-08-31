@@ -210,12 +210,21 @@ const lnext = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming')[0];
    a call to Cohorts, where its brief is. There is no per-row VERB any more;
    `bookedRow` says why.
    -------------------------------------------------------------------------- */
+/* WHAT AN INTERVIEW IS CALLED AND WHAT IT COMMITS YOU TO, stated once. The
+   booked list and the dashboard's call card both name the appointment and both
+   print what happens after it, and they were two copies of the same two strings
+   — which is the failure `bkStamp` exists to prevent on the candidate side, one
+   portal over. A re-interview is a different sentence in both places, so the
+   branch travels with the words rather than being taken twice. */
+const livTitle = s => s.re ? 'Re-interview' : 'Level interview';
+const livDetail = s => s.mins + ' minutes, recorded &middot; ' + (s.re
+  ? 'they have 90 days behind them, so you read the summary first'
+  : 'you sign the level afterwards');
+
 const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s => ({
     kind:'iv', ord:s.ord, day:s.day, time:s.time, i:s.i, img:s.img,
-    t:(s.re ? 'Re-interview' : 'Level interview') + ' &middot; ' + s.name,
-    d:s.mins + ' minutes, recorded &middot; ' + (s.re
-        ? 'they have 90 days behind them, so you read the summary first'
-        : 'you sign the level afterwards'),
+    t:livTitle(s) + ' &middot; ' + s.name,
+    d:livDetail(s),
     go:'leadSessions'
   })).concat(LEAD_COHORTS.map(c => ({
     kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
@@ -238,6 +247,14 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
    cards in the order they are read, which is what makes the bar legible as a
    position indicator rather than as four buttons that happen to highlight.
    -------------------------------------------------------------------------- */
+/* HOW MANY BOOKINGS THE DASHBOARD SHOWS (Maryam, 31 Aug 2026). Three, with
+   "All sessions" in the heading row for the rest — the full list is a page of
+   its own and printing it twice made that link a route to the same content.
+   Named rather than a literal at the call site because `booked` is merged from
+   two sources (interviews and cohort calls) and this is a decision about the
+   DASHBOARD, not a fact about either of them; `V.leadSessions` slices nothing. */
+const BOOKED_SHOWN = 3;
+
 const LEAD_JUMPS = [
   {id:'lead-cohorts',   ic:'group',      l:'Cohorts'},
   {id:'lead-attention', ic:'warningAlt', l:'Attention'},
@@ -353,6 +370,110 @@ function bookedRow(b){
   </button>`;
 }
 
+/* ==========================================================================
+   THE NEXT INTERVIEW IS THE BLACK CALL CARD — Maryam, 31 Aug 2026
+   "The call card from the top will be out and will be next to the summary
+   section. Just like the black call card we have on the candidate portal.
+   Content will be the same just the ui changes."
+
+   So this is a MOVE and a re-drawing, not a rewrite: every fact on the card is
+   the fact the plate carried, in the same order, and the black card is §75's
+   recipe with §77's row inside it. The candidate portal's `booked` dashboard
+   is the reference and it is one call site of the same two layers.
+
+   1. IT IS NOT A `.plate` ANY MORE, WHICH IS THE WHOLE OF "OUT OF THE TOP".
+   `.plate` is in ai5's `DARK_CARD`, so `placeDark` lifted whichever page child
+   contained it into the head band — that is why the card was at the top, above
+   the four figures, in a 330px column beside Tal's sentence. `.dark-card` is in
+   no pass's list (§75 exists so that a black card is one class and no
+   machinery), so the section stays exactly where this view writes it.
+
+   AND THE SUMMARY TAKES THE WIDTH BACK BY ITSELF. §56's two-column band is
+   gated on `.modhead:has(> .sec-dark .plate)`; with no plate on the page the
+   gate does not match and the band is `minmax(0,1fr)` — one column, full width,
+   with nothing restated. That is the second half of the ask answered by the
+   first half's mechanism.
+
+   2. DIRECTLY AFTER TAL'S CARD, WHICH IS THE SLOT `talRec` AND `crow` BOTH TAKE
+   ON THE CANDIDATE SIDE. §77's note is the argument: on `new` the page's next
+   step is "book an interview", on `booked` it is "join the one you booked", and
+   here it is "run the one they booked with you" — one slot, one object, three
+   stages of the same sentence. It also has to be after Tal's `.sec` rather than
+   before it: `placeBand`'s run walks forward from the `.ph` and stops at the
+   first section that is not head furniture, so a card written between the two
+   would leave Tal's summary in the page body (trap 11's neighbourhood).
+
+   3. THE CONTENT IS THE PLATE'S, ROW FOR ROW.
+
+     the plate                          the card
+     data-when "today 4:30 pm"          `.dc-when` in the heading row (§75)
+     `.plate-t` "Level interview"       `.dc-t`, and derived now (`livTitle`)
+     56px face + name                   `.crow-ph` + `.crow-n` at 78
+     "Explorer band … no level yet"     `.crow-role`, read off `bucket`
+     `.plate-b` "45 minutes, recorded"  `.crow-x`, and `livDetail` states it once
+     Join / All sessions                `.crow-a`, in that order reversed
+
+   THE TWO BUTTONS SWAP ENDS because `crow` puts the primary last, and that is
+   right on a card: the quiet action is the way out of the block and the accent
+   one is what the block is for, so the eye ends on Join. `All sessions` keeps
+   the rail's own calendar mark (`NAVSETS.leader`), so the button and the place
+   it goes wear the same glyph.
+
+   NO TICK AND NO "EXPERTISE:" LEAD-IN — both are `crow`'s new record fields and
+   the note over that function is the argument for each. The short version: the
+   person on this card is a candidate nobody has assessed yet, and the third
+   line is the appointment rather than a claim about them.
+
+   4. THE JOIN IS GATED AND STILL UNWIRED, AND THOSE ARE TWO DIFFERENT FACTS.
+   `{gate:true}` is Maryam's "disable the join call button and enable it at time
+   of the call" — `joinLive` in views.js owns the window and its note owns the
+   argument. What has NOT changed is that pressing it does nothing: `callOpen`
+   builds the CANDIDATE's interview (`bkAgent`, `callMe`), so `data-call="iv"`
+   here would open Priya's own screen from Priya's dashboard. §60's note records
+   the leader's four Joins as taken-but-unwired, and a leader-side `CALL` entry
+   is its own piece of work. The gate makes the button honest for the twenty-
+   three hours it should not be pressed, which is strictly less wrong than a
+   permanently live control that leads nowhere.
+   ========================================================================== */
+/* THE JOIN IS GONE AND THE GATE WENT WITH IT (Maryam, 31 Aug 2026). §81 built
+   `joinLive` because the button was live for fifty minutes a day and a control
+   that looks pressable and is not reads as a broken page; the gate was the
+   honest answer to that. What it could not fix is that the card then spent
+   almost all of its life showing a DISABLED primary — §60's "a dead control on
+   a live surface is worse than a missing one", arrived at from the other side.
+   So the card's one action is the way onward, and `crow`'s `join:false` is
+   where the shape of that is stated.
+   §81'S MACHINERY IS NOT DELETED. `joinLive` / `joinArm` / `JOIN_NOW` still
+   run for `crow`'s gated call sites and the layer's disabled treatment on
+   `.dark-card` is what any future gated action there will want; this card
+   simply stops asking for it. Removing the gate as well would be deleting a
+   decision, not a button.
+
+   THE SECONDARY IS THE CALLER'S, because the two pages that draw this card
+   are in different places. On the dashboard "All sessions" is the way out of a
+   set of one; on the Sessions page it would be a link to the page you are
+   already on, which is the "gate nothing writes" tell wearing a different hat.
+   `second:false` there. */
+const leadCall = (s, second) => ({
+  who:{n:s.name, i:s.i, img:AV[s.img]},
+  role:`${s.bucket} band from their quiz &middot; no level yet`,
+  x:livDetail(s),
+  xl:'',            /* the line is the appointment, not the person */
+  v:false,          /* a candidate is not a checked identity */
+  when:s.when, mins:s.mins,
+  second:second === undefined ? {go:'leadSessions', ic:I.calendar, t:'All sessions'} : second
+  /* no `kind`, so no `data-call` — see 4 above */
+});
+
+const leadCallCard = (s, o) => `<div class="sec dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">${livTitle(s)}</h2>
+        <span class="dc-when">${I.time}${s.when}</span></div>
+    </div>
+    ${crow(leadCall(s, (o || {}).second), {when:false, join:false,
+      second:(o || {}).second === false ? false : undefined})}
+  </div>`;
+
 function faceRow(p, detail, go){
   return `<button class="tile clk gcard face-row" data-go="${go}">
     <span class="mem-av mem-ph">${avatar({i:p.i, img:AV[p.img]}, 36)}</span>
@@ -374,11 +495,17 @@ function faceRow(p, detail, go){
    head row (see ai5.js). Drawing a second one would be two components for one
    idea, which is the mistake §29.4 records for the level card.
 
-   THE SESSION BECOMES A PLATE. An interview is a named person at a time that
-   you join, and every one of those in this product is a `.plate` — the black
-   wall with a face. The wireframe put the next interview in a small card in
-   the right-hand column; there is no right-hand column here, and a plate says
-   "this is an appointment" without a heading having to say it.
+   THE SESSION BECOMES A PLATE — AND SINCE 31 AUG 2026 IT IS THE BLACK CALL
+   CARD INSTEAD, which is the same argument arriving at a component that did not
+   exist when this was written. An interview is a named person at a time that you
+   join, and every one of those in this product WAS a `.plate` — the black wall
+   with a face. `.plate` moves itself into the head band (`placeDark`), so the
+   card sat above the four figures in a 330px column; Maryam took it out of the
+   band and put it where the candidate portal puts the same object, directly
+   under Tal's summary, as §75's `.dark-card` with §77's row in it. The note over
+   `leadCallCard` is the long version. What survives from this paragraph is its
+   conclusion: the card says "this is an appointment" without a heading having to
+   say it, and it is still the only appointment drawn on the page.
 
    THE ATTENTION QUEUE STAYS A TABLE. It is five aligned facts about each of
    several people, read by scanning down a column — the one shape on either
@@ -475,6 +602,7 @@ V.leadDash = () => {
       </div>
     </div>
   </div>
+  ${next ? leadCallCard(next) : ''}
   <div class="sec">
     <div class="stats stats-lead">
       ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1], j.id)).join('')}
@@ -486,39 +614,25 @@ V.leadDash = () => {
         `<button data-jump="${j.id}" role="tab">${j.l}<span class="lf-n">${FIG[j.id][0]}</span></button>`).join('')}
     </div>
   </div>
-  ${next?`
-  <div class="sec">
-    <div class="plate" data-when="${next.when.toLowerCase()}">
-      <div class="plate-who">${avatar({i:next.i, img:AV[next.img]},56)}
-        <span class="plate-wb"><b>${next.name}</b><span>Explorer band from their quiz &middot; no level yet</span></span>
-      </div>
-      ${/* NO "NEXT UP" LABEL. The card is the only appointment on the page and
-            the chip in the opposite corner already says when it is, so the
-            eyebrow was a category name over a card of one. `data-when` carries
-            the time on its own and `placePlates` seats the title in the head
-            row beside it — the same treatment the candidate's weekly call and
-            consultant call plates take, and the note in ai5.js is where it is
-            written down. */''}
-      <div class="plate-t">Level interview</div>
-      <div class="plate-b">${next.mins} minutes, recorded &middot; you sign the level afterwards</div>
-      ${''/* A PLATE'S BUTTON IS ONE OR TWO SHORT WORDS, AND THE CARD IS WHY.
-            §56 gives the band's dark card `minmax(300px,330px)` and 32px of
-            padding, so a two-button row has about 250px to divide — and §56
-            sets `white-space:normal` on those buttons deliberately, as a safety
-            valve rather than a licence: a label that does not fit wraps to two
-            lines instead of overflowing the card. "Join the interview" beside
-            "All sessions" made BOTH of them two lines tall, which is a 38px row
-            of broken phrases where the card wants one 32px row of actions.
-            Measured: 147 + 95 in a 250 row.
-            The card has already said what the appointment is — its title, the
-            person and the time are three rows above — so the button only has to
-            say what you DO about it. `Join` is the whole label. */}
-      <div class="plate-a">
-        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
-        <button class="btn btn-sm noic plate-b2" data-go="leadSessions">All sessions</button>
-      </div>
-    </div>
-  </div>`:''}
+  ${''/* THE PLATE STOOD HERE AND IS NOW `leadCallCard(next)`, 60 lines up the
+         page, directly under Tal's summary (Maryam, 31 Aug 2026). Two notes it
+         carried are worth keeping where a reader of this view will look for
+         them:
+
+         NO "NEXT UP" LABEL, AND THE CARD STILL HAS NONE. The eyebrow was a
+         category name over a card of one; what says "next" is the time at the
+         right end of the heading row, which is `.dc-when`'s whole job on §75's
+         card and was `data-when` + `placePlates` on the plate.
+
+         "A PLATE'S BUTTON IS ONE OR TWO SHORT WORDS" NO LONGER APPLIES AND THE
+         REASON IS THE GEOMETRY, NOT A CHANGE OF MIND. §56 gives the band's dark
+         card `minmax(300px,330px)`, so a two-button row had about 250px to
+         divide and "Join the interview" beside "All sessions" set BOTH labels on
+         two lines (measured: 147 + 95 in a 250 row) — which is why this plate's
+         button said `Join` and nothing else. §71 gives `.crow-a` two 185px
+         buttons on a card that spans the page, so "Join call" and "All sessions"
+         each sit on one line with room to spare. §56's rule is still the rule
+         for anything that lands in that column. */}
   <div class="sec" id="lead-cohorts">
     <div class="sec-h"><h2>Your cohorts</h2><button class="btn btn-g btn-sm noic" data-go="leadCohorts">View all ${LEAD_COHORTS.length}</button></div>
     <div class="tile-stack">
@@ -569,27 +683,36 @@ V.leadDash = () => {
     </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every level decision and summary is signed.</p></div>`}
   </div>
   <div class="sec tint" id="lead-booked">
-    <div class="sec-h"><h2>Booked</h2><span class="t-helper-01">Interviews and cohort calls, in the order they happen</span></div>
+    ${''/* THE WAY OUT MOVED INTO THE HEADING ROW AND THE SENTENCE CAME OFF
+           (Maryam, 31 Aug 2026). "Interviews and cohort calls, in the order
+           they happen" described the list underneath it, which the list
+           already says — every row names its kind and the dates run down
+           the page. The slot it held is where this section's control
+           belongs, and `Your cohorts` 50 lines up already states that shape
+           (`.sec-h` › `<h2>` + `.btn-g.btn-sm.noic`), so this is the page
+           agreeing with itself rather than a new arrangement.
+           "Your availability" is GONE from the page, not moved — it is a
+           profile setting, reachable from the account menu and from
+           `leadProfile` itself, and it was the second of two buttons under
+           a list whose own action is on every row. */}
+    <div class="sec-h"><h2>Booked</h2><button class="btn btn-g btn-sm noic" data-go="leadSessions">All sessions ${I.arrowRight}</button></div>
+    ${''/* THREE ROWS, AND THE SECTION'S CONTROL IS WHAT MAKES THAT HONEST.
+           Six was the whole week, which made "All sessions" a link to the
+           same list again. Three is the next three things that happen, and
+           the heading row says where the rest are. `BOOKED_SHOWN` rather
+           than a literal, because `bookedRow` is fed from two merged
+           sources and the count is a display decision, not a fact about
+           the data. */}
     ${booked.length?`<div class="tile-stack">
-      ${booked.map(bookedRow).join('')}
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-g" data-go="leadSessions">All sessions ${I.arrowRight}</button>
-      <button class="btn btn-t" data-go="leadProfile">Your availability ${I.calendar}</button>
+      ${booked.slice(0, BOOKED_SHOWN).map(bookedRow).join('')}
     </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing booked</h3><p>Interviews you are booked for and your weekly cohort calls both show up here.</p></div>`}
   </div>
-  <div class="sec" id="lead-standing">
-    <div class="sec-h"><h2>Your standing</h2><span class="t-helper-01">Across every cohort you have closed since ${LEADER.since}</span></div>
-    <div class="facts">
-      <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
-      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
-      <div><span class="l">Completion rate</span><span class="v">84%</span></div>
-      <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-g" data-go="leadProfile">Edit public profile ${I.arrowRight}</button>
-    </div>
-  </div>
+  ${''/* "YOUR STANDING" IS OFF THE DASHBOARD (Maryam, 31 Aug 2026), AND IT
+         IS NOT LOST — `V.leadProfile` (lead4.js) draws the same four figures
+         under the same heading, which is where a record of your own belongs:
+         the dashboard is a queue of what needs you today, and a lifetime
+         rating sitting under it was the one section that asked for nothing.
+         `leadStick`'s exit trigger moved with it — see the note there. */}
 </div></main>`;
 };
 
@@ -672,23 +795,34 @@ function leadStick(){
   const stuck = bar.getBoundingClientRect().top <= mr.top + 2;
   bar.classList.toggle('is-stuck', stuck);
 
-  /* THE BAR LEAVES WHEN YOUR STANDING IS FULLY ON SCREEN.
+  /* THE BAR LEAVES WHEN THE LAST COUNTED SECTION IS FULLY ON SCREEN.
 
-     Your standing is the one section on this page that no card counts — it is
-     the leader's own record rather than a queue — so arriving at it is the
-     moment the bar has nothing left to point at.
+     THE ANCHOR USED TO BE "YOUR STANDING" AND THAT SECTION IS GONE (Maryam,
+     31 Aug 2026). The rule it encoded still holds — the bar goes when it has
+     nothing left to point at — but the thing that made Your standing the right
+     anchor was that no card counted it: it sat AFTER the last queue, so
+     reaching it meant the queues were behind you. With it removed, Booked is
+     both the last queue and the end of the page, so the anchor is Booked
+     itself. The reading is the same one step earlier: once the final queue is
+     fully on screen, the bar is pointing at what you are already looking at.
 
-     "Arriving" has to mean FULLY VISIBLE, not "has reached the bar". Your
-     standing is the last thing on the page, so at the very bottom of the scroll
-     its top is still two thirds of the way down the window: a trigger that waits
-     for it to reach the top is a trigger the page can never reach, and the first
-     version of this never fired once.
+     "Fully visible" rather than "has reached the bar", and that is the half of
+     this worth keeping: the anchor is the LAST thing on the page, so at the
+     very bottom of the scroll its top is still well down the window. A trigger
+     waiting for it to reach the top is one the page can never reach, and the
+     first version of this never fired once. `bottom <= mr.bottom` is what
+     makes it reachable, and it is why this survived the anchor moving.
 
      Gated on `stuck` because on a window tall enough to show the whole page at
      once, every section is always fully visible — and an unstuck bar sitting in
      its own flow position must not hide, or the page has a hole where its
-     figures should be. */
-  const stand = device.querySelector('#lead-standing');
+     figures should be.
+
+     NOT `LEAD_JUMPS[LEAD_JUMPS.length-1]`, which would be the clever version:
+     the bar's own list is what decides which sections it POINTS at, and tying
+     the exit to it would mean a future card added to that list silently moves
+     the exit too. The anchor is a judgement about the page's last section. */
+  const stand = device.querySelector('#lead-booked');
   const gone = stuck && !!stand && stand.getBoundingClientRect().bottom <= mr.bottom;
   bar.classList.toggle('is-gone', gone);
 

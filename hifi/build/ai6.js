@@ -342,12 +342,31 @@ const PAGESUM = {
        still holding its `h3`, which renders ~700px wider than the page. */
     reddemo: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
 
-    /* DAY 90 STOPS SHORT OF THE PLATE. "Book the re-interview" is the whole
-       of the second block, because the `.plate` directly under this band
-       already says what the re-interview decides — move up to E4, hold at
-       E3, or drop back to E2 — and one decision explained twice inside one
-       screen is the second of this table's four content bans. */
-    day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b> &mdash; and you passed both.<br>The one thing left is to book the re-interview, and Priya is the agent who assesses it.`,
+    /* DAY 90 NOW GUIDES TO THE AGENT, THE WAY `new` DOES (Maryam, 31 Aug 2026:
+       "The summary should also guide about booking an agent just like we did on
+       the first 'Just Joined' prototype"). The two pages ask one question a
+       course apart — which agent sets my level, which agent decides whether it
+       moves — and `talRec` is the same block on both, so the sentence above it
+       takes the same shape: what the record says, then the roster, then the
+       match by name.
+
+       IT STOPPED SHORT OF THE PLATE BEFORE, and the note here said so: "Book
+       the re-interview" was the whole of the second clause because the `.plate`
+       underneath already spelled out what the re-interview decides. That plate
+       is gone (see `V.dashboard`'s day-90 branch), and what replaced it names
+       an agent rather than explaining a decision — so the ban this was
+       observing no longer applies and the guidance is the sentence's job again.
+
+       THE NAME IS `recKey()`, NOT "Priya". This entry hard-coded her, and "Ask
+       Tal for a different agent" swaps the card below to one of three — which
+       is exactly the drift `new`'s own note describes: Tal naming a match the
+       page is no longer showing. It re-types when it changes, which is correct.
+
+       THE E4/E3/E2 CLAUSE IS NOT CARRIED OVER. It was the plate's, it is
+       `V.level`'s "Moving up" accordion verbatim, and this table's second
+       content ban is policy. "Decides whether your level moves" is the fact;
+       which way it can move is a page away. */
+    day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b> &mdash; and you passed both.<br>The re-interview is what decides whether your level moves, so I have been over the roster and <b>matched you with ${AGENTS[recKey()].n} below</b>.`,
 
     /* THE DATE CAME OFF THIS LINE, AND IT IS THE CARD THAT HAS IT NOW. The
        sentence used to close on "E4 opens December 1, and at this level you can

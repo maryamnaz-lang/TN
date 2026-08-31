@@ -645,7 +645,6 @@
 .app .jrn-i{display:flex;align-items:center;gap:var(--s03)}
 .app .jrn-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
 .app .jrn-ic svg{width:16px;height:16px;fill:currentColor}
-.app .jrn-n{flex:none}
 
 /* --------------------------------------------------------------------- 5 ---
    THE RECOMMENDATION — 581:6456

@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4654.  Rules dropped as product-specific: 176.
+   Rules kept: 4686.  Rules dropped as product-specific: 187.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -4618,8 +4618,8 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .ph{padding-bottom:var(--s05)}
   .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call){padding-bottom:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(:has(> .lead-b)){padding-top:var(--s05)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){padding-bottom:var(--s05)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){padding-top:var(--s05)}
   .app .page > .sec:has(> .plate) + .sec.sec-cs,
   .app .page > .sec-call + .sec{padding-top:0}
   .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
@@ -6771,7 +6771,7 @@ button.btn-p:active,
 }
 
 /* ---- 63-typography.css ---- */
-:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-sec-size:16px; --t-sec-lh:22px; --t-sec-ls:-.15px; --t-w-book:400; --t-w-strong:600}
+:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-sec-size:16px; --t-sec-lh:22px; --t-sec-ls:-.15px; --t-sec-lg-size:18px; --t-sec-lg-lh:24px; --t-sec-lg-ls:-.2px; --t-w-book:400; --t-w-strong:600}
 .app .t-display,
 .app .u-display{font-size:var(--t-display-size); line-height:var(--t-display-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-display-ls); font-variant-numeric:tabular-nums}
 .app .t-h1,
@@ -7175,12 +7175,12 @@ button.btn-p:active,
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:transparent}
 .app .modhead .ai-aura.talsum .ai-body p b{font-weight:var(--t-w-strong); color:#f47113}
 .app .jrn-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none}
-.app .jrn-n,
 .app .jrn-lab{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none}
 .app .jrn-pill{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:#f47113}
 .app .jrn-i{color:#515151}
 .app .jrn-i.done{color:#00a43c}
 .app .jrn-i.on{color:#f47113}
+.app .jrn-i.done .jrn-lab{color:var(--text-primary)}
 .app .rec-n{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
 .app .rec-r,
 .app .rec-x,
@@ -7197,7 +7197,7 @@ button.btn-p:active,
 .app .qa-b b{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none}
 .app .qa-b > span{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:#717171}
 .app .ai-label.bare.rec-lab{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
-.app .dark-card .dc-t{font-size:18px; line-height:24px; font-weight:var(--t-w-strong); letter-spacing:-.2px; text-transform:none; color:var(--on-dark)}
+.app .dark-card .dc-t{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls); text-transform:none; color:var(--on-dark)}
 .app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
 .app .rec-dark .rec-n{color:var(--on-dark)}
 .app .dark-card .dc-hd-r > .btn.dc-act{color:var(--on-dark)}
@@ -7309,6 +7309,19 @@ button.btn-p:active,
 .app .qzp-r-v{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-secondary)}
 .app .qzp-r-tag{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--accent-text)}
 .app .qzp-cta{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--link)}
+.app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
+.app .page .pulse .stand .stand-l{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
+.app .page .pulse .stand .stand-v{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
+.app .page .pulse .stand .stand-v small{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-secondary)}
+.app .dark-card .eo-fl{color:var(--on-dark)}
+.app .dark-card .eo-fv{color:var(--on-dark-2)}
+.app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
+.app .dark-card .eo-when{color:var(--on-dark)}
+.app .dark-card .eo-when > b{color:var(--on-dark)}
+.app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls)}
+@container app (min-width:900px){
+  .app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls)}
+}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
@@ -7482,7 +7495,6 @@ button.btn-p:active,
 .app .jrn-i{display:flex; align-items:center; gap:var(--s03)}
 .app .jrn-ic{flex:none; display:grid; place-items:center; width:16px; height:16px}
 .app .jrn-ic svg{width:16px; height:16px; fill:currentColor}
-.app .jrn-n{flex:none}
 .app .sec-rec{display:flex; flex-direction:column; gap:20px; padding:var(--s07) var(--pad-x)}
 .app .rec-lab{gap:6px}
 .app .rec{display:flex; align-items:flex-end; justify-content:space-between; gap:var(--s06); flex-wrap:wrap}
@@ -7620,6 +7632,7 @@ button.btn-p:active,
 .app .sec-prog .prog-seg i{background-image:none; background-color:var(--layer-accent-01)}
 .app .sec-prog .prog-seg i.done{opacity:1; background-image:none; background-color:var(--accent)}
 .app .sec-prog .prog-seg i.now{opacity:.4; background-image:none; background-color:var(--accent)}
+.app .sec-prog.prog-full .prog-seg i.done{background-color:var(--mk-2)}
 .app .sec-prog .prog-figs{display:grid; grid-template-columns:auto minmax(var(--s03),1fr) auto minmax(var(--s03),1fr) auto; gap:0; background:none; border:0; margin-top:var(--s05)}
 .app .sec-prog .prog-figs > span{grid-row:1; background:none; align-items:center; gap:var(--s03); overflow-wrap:normal; padding:0}
 .app .sec-prog .prog-figs > span:nth-child(1){grid-column:1}
@@ -7654,8 +7667,8 @@ button.btn-p:active,
 @container app (max-width:899.98px){
   .app .crow{flex-direction:column; align-items:stretch; gap:0}
   .app .crow-when{align-self:auto; min-width:0; padding:var(--s05) var(--pad-x)}
-  .app .crow-who{padding:var(--s06) var(--pad-x)}
-  .app .crow-a{flex-direction:column; align-items:stretch; gap:var(--s03); padding:0 var(--pad-x) var(--s06)}
+  .app .crow-who{flex:0 0 auto; padding:var(--s06) var(--pad-x)}
+  .app .crow-a{flex-direction:column; align-items:stretch; flex:0 0 auto; margin-left:0; gap:var(--s03); padding:0 var(--pad-x) var(--s06)}
   .app .crow-a > .btn,
   .app .crow-a > .btn.ic-l{width:100%}
 }
@@ -7666,9 +7679,17 @@ button.btn-p:active,
 
 /* ---- 72-weekpulse.css ---- */
 .app .pulse{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); border:0; border-top:1px solid var(--rule)}
-.app .pulse{column-gap:var(--s07)}
+@container app (min-width:900px){
+  .app .pulse > .pulse-c.pulse-wide{grid-column:span 2}
+}
+@container app (max-width:899.98px){
+  .app .pulse > .pulse-c.pulse-wide{grid-column:span 1}
+}
+.app .page .pulse .stand .stand-c{padding-top:var(--s04); padding-bottom:var(--s04)}
+.app .pulse{--gap:var(--s09); column-gap:var(--gap)}
 .app .pulse > .pulse-c{position:relative; min-width:0; padding:var(--s06) 0}
-.app .pulse > .pulse-c + .pulse-c::before{content:''; position:absolute; left:calc(var(--s07) / -2); top:var(--s06); bottom:var(--s06); width:1px; background:var(--rule)}
+.app .pulse > .pulse-c + .pulse-c::before{content:''; position:absolute; left:calc(var(--gap) / -2); top:var(--s06); bottom:var(--s06); width:1px; background:var(--rule)}
+.app .page > .sec.sec-joined::after{display:none}
 @container app (min-width:900px){
   .app .sec:has(> .pulse){display:block}
   .app .sec:has(> .pulse) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05)}
@@ -7760,7 +7781,7 @@ button.btn-p:active,
   .app .cov-row{grid-template-columns:repeat(5,minmax(200px,1fr)); overflow-x:auto; border-left:0; border-right:0}
 }
 @container app (min-width:900px){
-  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call){padding-top:var(--s07); padding-bottom:var(--s07)}
+  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call):not(.dark-card){padding-top:var(--s07); padding-bottom:var(--s07)}
 }
 .app .modhead:not(:has(> .sec))::before,
 .app .modhead:not(:has(> .sec))::after{display:none}
@@ -7828,6 +7849,8 @@ button.btn-p:active,
 .app .bkp{border-bottom:1px solid var(--rule); padding-bottom:var(--s07)}
 .app .bks-w{padding:var(--s07) 0}
 .app .bkc{border-top:1px solid var(--rule); padding-top:var(--s07)}
+.app .bks-w,
+.app .bkc{width:100%; max-width:min(100%, 830px); margin-left:auto; margin-right:auto}
 .app .bkp{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
 .app .bks-w{display:flex; flex-direction:column}
 .app .bks{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
@@ -7893,6 +7916,10 @@ button.btn-p:active,
 @container app (max-width:899.98px){
   .app .crow-dark .crow{--pad-x:0px}
 }
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-a{padding-bottom:0}
+}
+.app .crow-dark .crow-a{align-self:flex-end}
 
 /* ---- 78-topbar.css ---- */
 .app .crumb-bar{flex:1 1 auto; min-width:0; display:flex; align-items:center; padding-left:var(--s03)}
@@ -7999,3 +8026,22 @@ button.btn-p:active,
 .app .qzp-cta svg{width:18px; height:18px; flex:none; margin-left:auto; fill:currentColor}
 .app .qzp-cta:hover:where(.__nh){cursor:pointer}
 .app .qzp-cta:hover:where(.__nh) span{text-decoration:underline}
+
+/* ---- 81-joingate.css ---- */
+.app .dark-card .btn.btn-p[disabled]{background-color:var(--on-dark-fill); background-image:none; border-color:transparent; --on-brand-fill:0}
+.app .dark-card .btn.btn-p[disabled] svg{fill:currentColor}
+
+/* ---- 82-enroldark.css ---- */
+.app .sec.eo.dark-card{gap:var(--s06)}
+@container app (min-width:900px){
+  .app .sec.eo.dark-card{display:flex; flex-direction:column; gap:var(--s06)}
+  .app .sec.eo.dark-card > .sec-h{border-right:0; min-height:0; padding:0; align-self:stretch}
+}
+.app .page .sec.eo.dark-card > .sec-h.aih{margin:0}
+.app .dark-card .facts.eo-facts{padding-top:var(--s06); border-top:1px solid var(--on-dark-rule)}
+.app .dark-card .facts.eo-facts > div + div::before{background:var(--on-dark-rule)}
+.app .dark-card .eo-fi svg{fill:var(--on-dark-2)}
+.app .dark-card .eo-when{background:none}
+.app .dark-card .eo-when svg{fill:currentColor}
+.app .qa-ic.ic-cover svg{fill:var(--mk-3)}
+.app .qa-ic.ic-found svg{fill:var(--mk-1)}

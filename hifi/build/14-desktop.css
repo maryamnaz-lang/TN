@@ -135,7 +135,19 @@
      KEYED ON THE NEXT SECTION, like `+ .sec.tint.cards` above, because the
      reason is a property of what FOLLOWS: whatever sits above Quick Actions,
      Quick Actions has already drawn the join. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found)::after,
+  /* `.sec-joined` IS THE NEWEST EXCLUSION AND IT IS TRAP 4's PRESCRIBED FIX
+     (Maryam, 31 Aug 2026: "remove the divider after blocks"). This selector is
+     (0,12,0) and it lives inside a container query, so a later layer cannot
+     outweigh it from outside — CLAUDE.md says so about §20's twin and the same
+     is true here: "extend its `:not()` exclusion list instead. That list is
+     where 'which section pairs are already joined' is decided."
+     §72.1d spent three probes on a (0,4,0) rule that matched, reached the
+     built stylesheet, and lost silently — including one written with a
+     `:has(+ .sec > .pulse)` and one with a plain class. This is why: the pulse
+     section's `aiHead` IS a `.sec-h`, so `:has(+ .sec > .sec-h)` matched the
+     figure block above it and turned its rule back ON. The tell was that the
+     identical rule worked with `!important` and not without. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

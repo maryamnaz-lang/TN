@@ -262,8 +262,18 @@ const NOTIF = {
 const NAVSETS = {
   early:   [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Enroll','ticket'],['billing','Payments','wallet']],
-  full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Points','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Points','trophy'],['enrol','Next course','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  /* THE MODULE IS "ACHIEVEMENTS" AND THE CURRENCY IS STILL "POINTS" (Maryam,
+     31 Aug 2026). The rename is the module's NAME — this label, the page's
+     `ph()`, its `crumb()`, Tal's `where` map and the "Open Achievements" button
+     — and it stops there. Every other "Points" in the build is the unit: the
+     `.score-pts` label, `statCell`'s figure on the promoted dashboard, the
+     `.stand-l` row in the pulse, and `PAGESUM.rewards`'s "Points come from
+     signing in, chapters and cohort posts". Renaming those would make the
+     sentences false — achievements do not come from signing in, points do, and
+     the page is where the two meet. The key stays `rewards`, which is neither
+     word and is what `PARENT`, `TALCTX` and every `data-go` already use. */
+  full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
+  next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['enrol','Next course','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   /* THE COHORT LEADER'S SEVEN MODULES, ported from the Cohort Leader portal in
      tn-portals.html. Same order, same names, with one correction the wireframe
      already made and this set keeps: there is no Earnings module. A cohort

@@ -532,6 +532,49 @@ LAYERS = [
     # head of this file. A hand-authored page writes its own `<aside class=peek>`
     # and its own rows; `gallery.html` is where that recipe belongs.
     '80-quizpeek.css',
+    # THE JOIN THAT IS NOT OPEN YET — the disabled accent button on the black
+    # card. Three declarations and a flag.
+    # IT CROSSES BECAUSE THE GATE IS AN HTML ATTRIBUTE, NOT A CLASS A PASS
+    # STAMPS. This is the one distinction the head of this file draws about
+    # behaviour, answered the easy way round: a hand-authored page writes
+    # `<button class="btn btn-p" disabled>` and needs nothing from the portal to
+    # do it, so unlike §52's typing summary there is no clock to leave behind.
+    # What it must NOT do is ship the ink without the ground: §63 IS in this
+    # list, so §63 §20 states `--on-dark-2` on this exact selector, and leaving
+    # this layer out would put a disabled label on a card still painted the full
+    # accent gradient — grey words on orange at 2.2:1, which is worse than
+    # either half alone. The same orphan argument §75, §77, §78, §79 and §80
+    # each carry.
+    # THE WINDOW DOES NOT CROSS AND DOES NOT NEED TO. `joinLive` (views.js)
+    # reads a hand-written appointment string out of the portal's own records;
+    # a second portal's "is it time yet" is its own question, and the attribute
+    # is the whole contract between the answer and the drawing.
+    '81-joingate.css',
+    # THE ENROLMENT OFFER AS A BLACK CARD. It crosses for the orphan argument
+    # §75/§77/§79 each carry, and here that argument is at its sharpest: §63 IS
+    # in this list, so §63 §21 already states `--on-dark`, `--on-dark-2` and
+    # `--accent-on-dark` on `.dark-card .eo-fl` / `.eo-fv` / `.eo-fv-acc`.
+    # Leaving §82 out would ship those three inks with nothing painting the
+    # ground under them — white labels on a white page, which is the
+    # half-shipped stylesheet CLAUDE.md describes and is invisible until
+    # somebody builds the page.
+    # WHAT ACTUALLY CROSSES IS SMALL AND GENERAL: an `aiHead` inside a
+    # `.dark-card` needs its flex model restated against §10.15's label column
+    # (trap 13), needs the head's own margin off so it does not add to the
+    # card's gap, and needs its rule and its dividers in `--on-dark-rule`
+    # instead of `--rule`. All four are true of ANY headed black card a second
+    # portal writes, not just of this one, which is why the selectors are
+    # `.dark-card`-scoped rather than `.eo`-scoped wherever they can be.
+    '82-enroldark.css',
+    # TEMPORARY — the red accent trial, part two. It is in this list rather
+    # than in NOT_IN_DS on purpose: `tmp` is on EXCLUDE_PREFIXES and every
+    # selector in the layer carries `.tmp-accent`, so `keep_selector` drops
+    # all of it by name and the output is unchanged either way. Listing it
+    # keeps `check_coverage()` honest — a layer that is deliberately dropped
+    # is a different fact from a layer nobody thought about, and the whole
+    # point of that check is that the second kind cannot hide. Delete this
+    # entry with §67, §83 and `tmpaccent.js`.
+    '83-tmpaccent2.css',
 ]
 
 # ==========================================================================

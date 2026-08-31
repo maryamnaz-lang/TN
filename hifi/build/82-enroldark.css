@@ -1,0 +1,175 @@
+/* ==========================================================================
+   82. THE ENROLMENT OFFER IS A BLACK CARD — `.sec.eo.dark-card`
+   Maryam, 31 Aug 2026: "change the You're enrolling on Explorer – E3 section
+   to a black card, use the same content. this black card should have page
+   padding just like we are using the black cards now."
+
+   THE CONVERSION IS ONE CLASS AND THAT IS §75'S WHOLE POINT. `.dark-card`
+   brings the ground, §21.22's top-right haze as a background layer, the
+   page-gutter inset as a MARGIN (which is the "page padding just like we are
+   using" — 16 / 24 / 32 by width, so the card's edges land on the same spine
+   as every heading on the page), the 32px frame inside it, both section seams
+   off, and the accent fill on `.btn-p`. None of that is restated here.
+
+   WHAT THIS LAYER OWNS IS ONLY WHAT IS TRUE OF THIS CONTENT ON A DARK GROUND,
+   which is §79's rule for the pulse and §77's for the call. Four things: the
+   card's internal rhythm (and trap 13, which would otherwise draw a label
+   column inside a black card), the rule between the head and the figures, the
+   date chip's ground, and the figure row's dividers. Plus two Quick Action
+   hues for the pair of cards that replaced the two sections under it.
+
+   §79 IS THE CLOSEST READING AND MOST OF THIS IS ITS ARITHMETIC RE-RUN. That
+   layer put an `aiHead` inside a `.dark-card` first; everything it had to
+   answer about §10.15's label column and about margins adding to a flex gap is
+   true here for the same reasons, so the notes below cite it rather than
+   repeating it.
+
+   AFTER §63 AND ALLOWED TO BE, on §64/§75/§77/§79's test: this layer states
+   flex, one border, two backgrounds, two `fill`s and spacing, and not one
+   `font-size`, `font-weight`, `text-transform` or text `color`. All four are
+   §63's, and the inks this card needs are §63 §20.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 82.1 ---
+   THE CARD'S INTERNAL RHYTHM, AND TRAP 13 IS WHAT WOULD BREAK IT
+
+   `aiHead` returns a `.sec-h`, so this section matches §10.4's
+   `.sec:has(> .sec-h)` and at 900 and up it becomes a 184px label column with
+   a vertical rule and the content in track two — inside a black card. §79.1
+   hit this exactly and its note is the long version; the short one is that the
+   answer is `display:flex` and NOT `display:block`, because `.dark-card` is
+   already `display:flex; flex-direction:column; gap:20px` and the card's whole
+   spacing mechanism is that gap. `block` would answer the label column and
+   throw the gap away in the same declaration.
+
+   §73's OWN OPT-OUT DOES NOT COVER THIS. That layer opts the offer out through
+   the `.facts` class in §10.15's list, which is why the white version needed no
+   rule — but §10.15's opt-out sets `display:block`, and block is the value that
+   costs the gap. So the card states the model it wants rather than inheriting
+   an opt-out written for a white section.
+
+   THE GAP IS 24, NOT §75'S 20, matching §79.1: a head block that is a title,
+   a description and a 40px action group is taller than `.crow-dark`'s single
+   heading row, and 20 under it reads as the rule crowding the figures.
+
+   AND THE HEAD'S OWN MARGIN HAS TO GO. §73.1 gives `.sec-h.aih`
+   `margin-bottom:20px` — right on a white page where nothing else spaces the
+   section — and in a flex container margins do not collapse, they ADD, so the
+   rule would sit 44px under the head and 24 above the figures. One mechanism,
+   one number. It needs (0,7,0) to beat §73.1's (0,5,0); `.eo.dark-card` on the
+   section is what buys it.
+
+   `align-self:stretch` AND `border-right:0` AND `min-height:0` ARE THE THREE
+   DECLARATIONS THAT SURVIVE TURNING THE GRID OFF — trap 19, and §79.1 records
+   all three. `align-self:start` in a grid is the block axis ("sit at the top of
+   the rows you span"); in a column flex the same property is the INLINE axis
+   and means "shrink to your content width", which stops the head row filling
+   the card and strands `aiHead`'s `margin-left:auto` short of the edge. It only
+   shows above about 1512, so a one-width check reports this finished when it is
+   not.
+   ------------------------------------------------------------------------ */
+.app .sec.eo.dark-card{gap:var(--s06)}
+@container app (min-width:900px){
+  .app .sec.eo.dark-card{display:flex;flex-direction:column;gap:var(--s06)}
+  .app .sec.eo.dark-card > .sec-h{
+    border-right:0;min-height:0;padding:0;align-self:stretch}
+}
+.app .page .sec.eo.dark-card > .sec-h.aih{margin:0}
+
+/* ------------------------------------------------------------------ 82.2 ---
+   THE RULE BETWEEN THE HEAD AND THE FIGURES — `--on-dark-rule`, §79.2's
+
+   On the white page the head's 20px margin was the whole separation and that
+   was right: two blocks on one ground, spaced. On a black card the head and
+   the figures are two parts of ONE object, and a hairline is what says so —
+   which is the same reading §75 gives `.dc-hd-r` and §79 gives `.pnc`.
+
+   WHITE AT 16%, NOT `--on-dark-border` AT 42%. §15's `.plate-x` note is the
+   argument and it is worth not re-deciding: the border token is for the edge of
+   something you can press, and a 42% rule across a black card reads as the card
+   being two cards.
+
+   24 ABOVE AND 24 BELOW, BY TWO MECHANISMS. The space above the rule is the
+   CARD'S GAP (82.1) and the space below is this block's own `padding-top`; it
+   has to be that way round, because a `margin-top` here would ADD to the gap
+   rather than replace it — §79.1's 64px measurement is what that mistake looks
+   like. §73.1a's `padding:20px 0 0` is the shorthand this overrides, at equal
+   weight and a later layer.
+
+   BELOW 900 IT IS 16, WHICH IS §73.3'S OWN NUMBER AND IS LEFT ALONE. That
+   layer's `padding-top:var(--s05)` is inside a container tier and beats an
+   unconditional rule of equal weight (trap 3); restating 24 there would be
+   fighting a value that is right for the stacked 2 x 2 row. The border is
+   uncontested at either width. */
+.app .dark-card .facts.eo-facts{
+  padding-top:var(--s06);
+  border-top:1px solid var(--on-dark-rule)}
+
+/* THE DIVIDERS BETWEEN THE CELLS FOLLOW THE SAME TOKEN. §73.1a draws them from
+   `--rule` — #e6e5e1, a hairline between two white things — which on
+   `--gray-100` is a bright scratch three shades louder than the rule above it.
+   Same 16% white, so the horizontal rule and the three vertical ones are one
+   line weight. §73.3 already switches these off below 900, where the row is
+   2 x 2 and a line at cell 3's left edge would sit under cell 1. */
+.app .dark-card .facts.eo-facts > div + div::before{background:var(--on-dark-rule)}
+
+/* AND THE FOUR MARKS. §73.1a fills them `--text-secondary` (#525250), which is
+   1.5:1 on this ground — the glyphs are simply not there. `--on-dark-2` is the
+   card's supporting ink and is what §63 §20 gives the labels beside them, so
+   the mark and its words are one colour. A `fill` is not one of §63's four
+   properties, which is why it is stated here and the text is stated there. */
+.app .dark-card .eo-fi svg{fill:var(--on-dark-2)}
+
+/* ------------------------------------------------------------------ 82.3 ---
+   THE DATE CHIP KEEPS ITS SHAPE AND CHANGES ITS GROUND
+
+   §73.1 argues the chip at length and none of that argument moves: it is 40
+   tall to match the button (615:8145 and 613:7990), centred rather than
+   stretched, and its ground is deliberately LOWER-contrast than the button's so
+   the pair reads as one figure and one action rather than as the same control
+   at two saturations.
+
+   WHAT CHANGES IS THE MIX IT IS TAKEN FROM. `color-mix(--accent 10%,
+   transparent)` over white is a warm wash; over #111 it is a dark red-brown
+   that reads as a hole in the card, and `--accent-text` on it (§63 §13) is
+   1.6:1. `--on-dark-fill` is the build's token for exactly this — a raised
+   patch on a dark ground, white at 12% — so the chip stays a wash the date sits
+   ON, in the card's own register. §77 reached the same place for `.dc-when` by
+   dropping the ground entirely; this one keeps it because the chip is one of a
+   PAIR whose geometry §73 measured, and a bare string beside a filled button
+   loses the pairing.
+
+   THE MARK GOES TO `currentColor` so one `color` declaration in §63 draws the
+   glyph and the words together — §75's rule for `.dc-when`, verbatim.
+
+   AND THE GROUND IS GONE (Maryam, 31 Aug 2026: "remove the cohort timing grey
+   bg"), WHICH TURNS OVER THE PARAGRAPH ABOVE. That argument was that the chip
+   is one of a PAIR whose geometry §73 measured, and that a bare string beside a
+   filled button loses the pairing. What it under-weighted is the ground it now
+   sits on: white at 12% over #111 is a light-grey slab, and on a card whose
+   only other filled rectangle is the accent button 8px to its right, a second
+   filled rectangle reads as a second control — a disabled one. §77 reached this
+   same place for `.dc-when` by dropping the ground, and that precedent is the
+   one that holds here too.
+
+   THE PAIRING SURVIVES ON GEOMETRY ALONE. §73's 40px height, the `align-self:
+   center` and the 8px gap are all untouched, so the date and the button are
+   still one 40px row with one gap in it; what changes is that only one of the
+   two is a filled object, which is what says which one you press. */
+.app .dark-card .eo-when{background:none}
+.app .dark-card .eo-when svg{fill:currentColor}
+
+/* ------------------------------------------------------------------ 82.4 ---
+   THE TWO QUICK ACTION HUES, NAMED
+
+   §70.6's rule verbatim and §79.4's application of it: a Quick Action's mark is
+   a NAMED class and never an `nth-child`, because "a third Quick Action
+   inserted first would silently repaint the other two".
+
+   BOTH ARE THE HUE THE SECTION THEY REPLACED ALREADY WORE, which is the
+   continuity worth keeping. Violet is `.cov-pill`'s — §63 §13 picks `--mk-3`
+   for "Curated for your growth" and its note explains why the course preview is
+   not allowed the accent. Blue is §74's third finding card, Priya's own note,
+   which is the half of "what the interview found" a reader remembers. */
+.app .qa-ic.ic-cover svg{fill:var(--mk-3)}
+.app .qa-ic.ic-found svg{fill:var(--mk-1)}
