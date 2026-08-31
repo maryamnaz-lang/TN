@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=32a7e2f3">
+<link rel="stylesheet" href="talentnext-ds.css?b=7d41dfcb">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=32a7e2f3"></script>
+<script src="talentnext-ds.js?b=7d41dfcb"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -620,12 +620,17 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       </ul>
     </div>
   `)}
-  ${ex('Three answers to one question', 'What to copy when a page is asking <b>"how am I doing"</b> and answering it in three parts — what I am on, whether that is enough, what it has earned. Drawn as three sections it does not compose: the reader gets a heading, a hairline and a screenful between each part, and has to hold the first to make sense of the third. One <code>.pulse</code> row puts them side by side in the order the question is asked. <b>Nothing in here is a new component</b>, and that is the point of the entry — the ring is <code>.ring</code>, the standing cells are <code>.stand</code>, the marks are the same 28px <code>.stat</code> chip in the same three named hues, the bar is the chapter rail with a different count. What <code>.pulse</code> states is the <b>grid that holds them</b> and the handful of places a component drawn for a full-width section has to change to live in a 290px column, which is the rearrangement a second portal wants and cannot work out from the components alone. Five things to copy exactly. <b>The heading and the lede are siblings of <code>.pulse</code>, not children</b> — the section reads title row, sentence, grid, and the sentence is the one part of it written from the same figures the columns draw, so it can say what the three of them add up to. <b><code>.pulse-mk</code> is the assistant\'s sparkle and deliberately not <code>.ai-label</code></b>: it paints the same star in the same ramp, so the mark is identical to the one at the head of a band, but it carries no class any render pass looks for. That is what lets a hand-authored page use it without the section being hoisted into a head band. <b>The hue is an inline custom property</b> — <code>style="--mk:var(--mk-1)"</code> on each column — and that is the one inline style this system asks for: it is a token, not a layout value, so no stylesheet needs to answer it and a fourth column is a fourth hue rather than a fourth <code>nth-child</code> rule. It reaches further than the mark: the lit blocks of the pace bar take <code>var(--mk)</code> too, so a column is one colour throughout. <b>The track count counts the children</b>: <code>grid-auto-flow:column</code> and no <code>grid-template-columns</code>, so a page that emits two columns gets two — written as <code>repeat(3,1fr)</code> the survivors sit in the left two thirds with a hairline hanging in space. And the columns are <code>minmax(0,1fr)</code>, because a <code>1fr</code> floor is <code>auto</code> and the standing figures are <code>white-space:nowrap</code>, so they refuse to shrink and push the row wide. Two smaller ones: <code>.pulse-go</code> is pinned to the foot with <code>margin-top:auto</code> so the columns\' buttons line up whatever their content does, and if your page has a <code>.sec-h</code> above this, note the label column — <code>.pulse</code> is a wrapper and gets the 184px spine unless the opt-out is restated for it.', `
-    <div class="sec-h pulse-head">
-      <h2 class="pulse-ttl"><i class="pulse-mk"></i>Your learning pulse</h2>
-      <button class="btn btn-p btn-sm" type="button">Open chapter 4 {{arrowRight}}</button>
+  ${ex('Three answers to one question', 'What to copy when a page is asking <b>"how am I doing"</b> and answering it in three parts — what I am on, whether that is enough, what it has earned. Drawn as three sections it does not compose: the reader gets a heading, a hairline and a screenful between each part, and has to hold the first to make sense of the third. One <code>.pulse</code> row puts them side by side in the order the question is asked. <b>Nothing in here is a new component</b>, and that is the point of the entry — the ring is <code>.ring</code>, the standing cells are <code>.stand</code>, the marks are the same 28px <code>.stat</code> chip in the same three named hues, the bar is the chapter rail with a different count. What <code>.pulse</code> states is the <b>grid that holds them</b> and the handful of places a component drawn for a full-width section has to change to live in a 290px column, which is the rearrangement a second portal wants and cannot work out from the components alone. Five things to copy exactly. <b>The head is <code>aiHead</code>, not this component</b> — see <b>The AI-native section head</b> below, which is the one block that states a heading, its description and the row&rsquo;s action together. This entry used to teach <code>.pulse-head</code> / <code>.pulse-ttl</code> / <code>.pulse-lede</code> / <code>.pulse-mk</code>, four classes §72 stated for its own head row before §73 generalised the shape; all four are <b>deleted</b>, and this recipe taught them for one build after the portal had stopped writing them. What matters here is only that the head is a <b>sibling</b> of <code>.pulse</code> rather than a child, and that the description is the one part written from the same figures the columns draw, so it can say what the three of them add up to. <b>The sparkle is <code>.aih-mk</code> and is deliberately not <code>.ai-label</code> or <code>.ai-aura</code></b>: it paints the same star in the same ramp, so the mark is identical to the one at the head of a band, but it carries no class any render pass looks for &mdash; wearing either of those two would hoist the whole section into the head band. It is <code>aiHead</code>&rsquo;s <code>mark</code> option, and a page carries <b>one</b>. That is what lets a hand-authored page use it without the section being hoisted into a head band. <b>The hue is an inline custom property</b> — <code>style="--mk:var(--mk-1)"</code> on each column — and that is the one inline style this system asks for: it is a token, not a layout value, so no stylesheet needs to answer it and a fourth column is a fourth hue rather than a fourth <code>nth-child</code> rule. It reaches further than the mark: the lit blocks of the pace bar take <code>var(--mk)</code> too, so a column is one colour throughout. <b>The track count counts the children</b>: <code>grid-auto-flow:column</code> and no <code>grid-template-columns</code>, so a page that emits two columns gets two — written as <code>repeat(3,1fr)</code> the survivors sit in the left two thirds with a hairline hanging in space. And the columns are <code>minmax(0,1fr)</code>, because a <code>1fr</code> floor is <code>auto</code> and the standing figures are <code>white-space:nowrap</code>, so they refuse to shrink and push the row wide. Two smaller ones: <code>.pulse-go</code> is pinned to the foot with <code>margin-top:auto</code> so the columns\' buttons line up whatever their content does, and if your page has a <code>.sec-h</code> above this, note the label column — <code>.pulse</code> is a wrapper and gets the 184px spine unless the opt-out is restated for it.', `
+    <div class="sec">
+    <div class="sec-h aih">
+      <div class="aih-b">
+        <h2 class="aih-t"><i class="aih-mk"></i>Your learning pulse</h2>
+        <p class="aih-d">You have completed <b>12 of 70 minutes</b> for <span class="pulse-hl">Delegation Without Drop-Off</span>, which is all the time you have spent learning this week. Complete chapter 4 to stay on the pace.</p>
+      </div>
+      <div class="aih-a">
+        <button class="btn btn-p btn-sm" type="button">Open chapter 4 {{arrowRight}}</button>
+      </div>
     </div>
-    <p class="pulse-lede">You have completed <b>12 of 70 minutes</b> for <span class="pulse-hl">Delegation Without Drop-Off</span>, which is all the time you have spent learning this week. Complete chapter 4 to stay on the pace.</p>
     <div class="pulse">
       <div class="pulse-c" style="--mk:var(--mk-1)">
         <div class="pulse-h"><i class="pulse-ic">{{book}}</i><span class="pulse-lab">Current focus</span></div>
@@ -684,6 +689,115 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
               <span class="stand-l">Rank</span><span class="stand-v">1-Star</span></span>
               <span class="stand-d">Earn the Silver badge and the Get Involved badge</span></span>
           </button>
+        </div>
+      </div>
+    </div>
+    </div>
+  `)}
+  ${ex('The AI-native section head', 'One block for <b>a heading, its description and the row&rsquo;s actions</b>, and the only reason it is its own entry is that three sections in one portal drifted three ways without it. Copy this shape for any section whose heading needs a sentence under it. <b>The structural point is the box, not the margins</b>, and that is the bug measuring could not find: the wrong version put the title and the actions in the <code>.sec-h</code> and left the description as the section&rsquo;s <i>next</i> child. An action group is 40px tall and a 16px title&rsquo;s line box is 22, so the row took 40, the title sat centred in it, and there were 9px of empty row under the title before its own margin began. The gaps computed to exactly the specified 12 and 20 and the heading still read as detached from its own description. Here the title and the description are <b>one flex item</b> (<code>.aih-b</code>) and the action group is centred against the <b>pair</b>. <b>The block is capped at 60%</b> so the description wraps clear of the action — uncapped it grows into every pixel the buttons are not using, and a derived sentence ran 890px to a few characters short of the button, 150 characters on one line where the type system wants about 75. <b>The centring needs <code>align-self:center</code> stated on both children</b>, and <code>align-items:center</code> on the row is not enough — an earlier layer top-aligns every child of a <code>.sec-h</code>, excluding only rows whose control is a <i>direct</i> child, which this one&rsquo;s is not. It shipped top-aligned for a build because the file&rsquo;s specified 14px offset <i>is</i> the centred offset for a 68px block and a 40px action, so the gap between the two tops measures correctly in both states. The test that separates them is the <b>mid-points</b>, not the tops. <b>And the 340px flex-basis is the wrap mechanism</b>, not padding — a flex item only moves to a new line when its <i>base</i> size does not fit, so with <code>auto</code> the block shrank to nothing instead of wrapping and the title set one word to a line on a phone without ever overflowing. <b>The mark is optional and a page gets one.</b> <code>.aih-mk</code> is 12px and does <b>not</b> track the heading&rsquo;s size — below the cap height of the words it reads as a bullet introducing the line, above it as a second object competing with it, so it is one value everywhere. It is deliberately neither <code>.ai-label</code> nor <code>.ai-aura</code>: both of those are claimed by the render passes that build the head band, so a section wearing one gets hoisted out of the page. <b>Two spacing rules to keep:</b> a chip beside a button is <code>align-self:center</code> at a stated 40px height and never <code>stretch</code> — stretch takes the height of the flex <i>line</i>, which these rows set from the text block, so a chip came out 85px against a 40px button and dragged the group to 133. And if the section sits under a heading at desktop, check the 184px label column: <code>.aih</code> is a wrapper, so a new section around it loses whatever opt-out its old contents were getting for free.', `
+    <div class="sec">
+      <div class="sec-h aih">
+        <div class="aih-b">
+          <h2 class="aih-t"><i class="aih-mk"></i>You&rsquo;re enrolling on Explorer &ndash; E3</h2>
+          <p class="aih-d">Thirteen chapters over 90 days, a live cohort call each week, and a re-interview at the end of it.</p>
+        </div>
+        <div class="aih-a">
+          <span class="eo-when">{{calendar}}<b>1 December 2026</b></span>
+          <button class="btn btn-p btn-sm noic" type="button">Enroll now {{arrowRight}}</button>
+        </div>
+      </div>
+      <div class="facts eo-facts">
+        <div><i class="eo-fi">{{wallet}}</i>
+          <span class="eo-fb"><span class="eo-fl">Course fee</span>
+            <span class="eo-fv eo-fv-acc">$690</span></span></div>
+        <div><i class="eo-fi">{{book}}</i>
+          <span class="eo-fb"><span class="eo-fl">Chapters</span>
+            <span class="eo-fv">13, one a week</span></span></div>
+        <div><i class="eo-fi">{{group}}</i>
+          <span class="eo-fb"><span class="eo-fl">Cohort of</span>
+            <span class="eo-fv">10 learners</span></span></div>
+        <div><i class="eo-fi">{{time}}</i>
+          <span class="eo-fb"><span class="eo-fl">Weekly call</span>
+            <span class="eo-fv">Thursdays, 60 min</span></span></div>
+      </div>
+    </div>
+  `)}
+  ${ex('The same head, without the mark', 'The mark is the only difference, and the two examples together are the rule: <b>one star per page</b>. A section that is the product listing something rather than the assistant reading it takes a plain heading. Everything else is identical, which is the point of there being one component. Under it, the other shape §73 draws: a <b>content-sized figure row</b> and a <b>card scroller</b>. <b>The figure row is still <code>.facts</code> and the class is load-bearing</b> — the desktop label-column opt-out names it, so a headed section carrying one keeps the page spine with no extra rule — but almost everything <code>.facts</code> normally gives it is overridden: the cells are content-sized with the dividers centred in the gaps, rather than four equal columns that would put &ldquo;Cohort of 10&rdquo; in the same width as &ldquo;$690&rdquo;. <b>Three dividers needs three elements and a grid container has two</b>, so the row carries <code>::before</code> and <code>::after</code> and the third cell carries its own, positioned out into the gutter beside it. <b>Two rows a cell, and the label is the strong one</b> — that inverts a figure cell deliberately: these four are not figures being compared, they are four different things, and what you scan is the names. One accent string, on the value that is money. <b>The scroller becomes a grid at 900 and its dividers must be switched off, not re-pointed</b>, below it — they are absolutely positioned into named tracks, so a stacked row draws a vertical line down every cell but the first. Same trap as the figure row: at mobile the whole action group goes full width and stacks, because a fixed 254 + 8 + 185 group is a 447px base against a 358px page and nothing can give.', `
+    <div class="sec">
+      <div class="sec-h aih">
+        <div class="aih-b">
+          <h2 class="aih-t">What the 90 days cover<span class="cov-pill">Curated for your growth</span></h2>
+          <p class="aih-d">13 chapters, one a week, with a live cohort call alongside each.</p>
+        </div>
+        <div class="aih-a">
+          <button class="btn btn-g btn-sm noic" type="button">See the full course</button>
+        </div>
+      </div>
+      <div class="cov-row">
+        <div class="cov-c" style="--mk:var(--mk-1)">
+          <span class="cov-n">01</span>
+          <span class="cov-t">Reading the Room</span>
+          <span class="cov-m">55 min</span>
+        </div>
+        <div class="cov-c" style="--mk:var(--mk-2)">
+          <span class="cov-n">02</span>
+          <span class="cov-t">Feedback That Lands</span>
+          <span class="cov-m">70 min</span>
+        </div>
+        <div class="cov-c" style="--mk:var(--mk-3)">
+          <span class="cov-n">03</span>
+          <span class="cov-t">Deciding With Incomplete Information</span>
+          <span class="cov-m">60 min</span>
+        </div>
+        <div class="cov-c" style="--mk:var(--mk-1)">
+          <span class="cov-n">04</span>
+          <span class="cov-t">Delegation Without Drop-Off</span>
+          <span class="cov-m">70 min</span>
+        </div>
+        <div class="cov-c cov-more">
+          <span class="cov-n">+9</span>
+          <span class="cov-t">More chapters up ahead</span>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('A write-up as three findings', 'What to copy when a block is <b>read rather than acted on</b> and its parts are different <i>kinds</i>. This was four paragraphs and two grey labels: the two things a reader most wants to compare &mdash; what you are good at and what you are not &mdash; sat 400px apart in one column, and nothing in the drawing said they were different kinds of claim. Three cards in three of the named marker hues: <b>green for the strengths, violet for the growth areas, blue for the assessor&rsquo;s own note</b>, with the pair abreast and the note under them. <b>Not the accent, and that is the instruction</b> (Maryam, 31 Aug 2026: &ldquo;do not go for orange color only&rdquo;) &mdash; the accent is the assistant&rsquo;s voice and the page&rsquo;s one CTA, and this is the product reporting what a <i>person</i> found. <b>The section has to be white.</b> This lived in a tinted panel, and a 5%-tinted card on a 4% grey ground is two washes a shade apart: the green and the violet vanished and the row read as three empty boxes. White panel, coloured cards. <b>Three mixes from one <code>--mk</code>, and the numbers matter</b>: 5% for the card, 12% for the 28px chip, 14% for the tag. Across a 430px card the chip&rsquo;s 12% is a colour rather than a wash, and three of them read as three status banners. <b>This is the one place a filled chip is right</b> &mdash; the pulse and the offer both went to bare glyphs, because their marks sit inside a bordered cell or beside a column rule where a filled square is a box in a box; here the card <i>is</i> the wash and the chip is a denser patch of it. <b>The card title takes the hue and every other word stays in ink</b>, which is the opposite of the pulse&rsquo;s column labels, and the ground is the difference: there the mark sits on white so a coloured word beside it reads as a status pill, here the card is that hue and the title in it is the card naming itself. One more: the header is <b>two facts with a rule between them</b>, and the name block needs <code>flex:none</code> &mdash; inherited <code>flex:1</code> absorbs the row and throws the date to the far edge, which reads as two unrelated facts rather than a pair.', `
+    <div class="sec">
+      <div class="sec-h"><h2>What the interview found</h2></div>
+      <div class="signed">
+        <div class="signed-h">
+          <span class="av-ph" style="width:44px;height:44px;font-size:13px"><i>PN</i><img src="{{av:priya}}" alt=""></span>
+          <span class="signed-b"><span class="sig-hl">Assessed and signed by</span><b>Priya Nair</b></span>
+          <span class="signed-when">
+            <i class="sig-ic sig-ic-sm" style="--mk:var(--mk-3)">{{calendar}}</i>
+            <span class="signed-b"><span class="sig-hl">Level interview</span><b>20 August 2026</b></span>
+          </span>
+        </div>
+        <div class="sig-pair">
+          <div class="sig-c" style="--mk:var(--mk-2)">
+            <i class="sig-ic">{{star}}</i>
+            <div class="sig-b">
+              <div class="sig-top"><span class="sig-t">Strengths</span><span class="sig-tag">Strong</span></div>
+              <p class="sig-p">You reason from consequence to people, not policy. Three examples, each with a date and a name attached.</p>
+            </div>
+          </div>
+          <div class="sig-c" style="--mk:var(--mk-3)">
+            <i class="sig-ic">{{growth}}</i>
+            <div class="sig-b">
+              <div class="sig-top"><span class="sig-t">Growth areas</span><span class="sig-tag">Focus</span></div>
+              <p class="sig-p">Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.</p>
+            </div>
+          </div>
+        </div>
+        <div class="sig-c" style="--mk:var(--mk-1)">
+          <i class="sig-ic">{{chat}}</i>
+          <div class="sig-b">
+            <div class="sig-top"><span class="sig-t">Priya&rsquo;s note</span></div>
+            <p class="sig-p">&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;</p>
+          </div>
+        </div>
+        <div class="ai-foot signed-foot">
+          <button class="btn btn-p btn-sm noic" type="button">Read the full report {{arrowRight}}</button>
         </div>
       </div>
     </div>

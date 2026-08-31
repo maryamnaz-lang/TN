@@ -509,9 +509,23 @@
    THE NUMBERS ARE A REAL `<ol>` with its own marker off. A list of ordered
    steps is a list of ordered steps, and `.jrn-n` exists so the number sits
    inside the row's flex line at a measured distance rather than at whatever
-   `list-style-position` gives it.
+   `list-style-position` gives it. It is a BOX and nothing else — §63 sets it
+   in the same declaration as the label, because in the file the two are one
+   text run and a rule of its own could only make them disagree.
+
+   THE THREE GAPS ARE THE FILE'S OWN NUMBERS AND ONLY ONE OF THEM IS A TOKEN.
+   587:6742 is 20px between the heading row and the list, 587:6747 is 9px
+   between rows, and 587:6748 is 8px from the mark to the words. The last is
+   `--s03`; 20 and 9 fall between steps of the scale, and the nearest steps are
+   what shipped first — `--s06` (24) and `--s05` (16). The 8px overpay under
+   the heading is the smaller half. The 7px one inside the list is not: the
+   file's pitch is 30 (21px row + 9), and at 37 the four rows stop reading as
+   one block and become four separate facts, which is the one thing a journey
+   must not read as. §70.5 states the file's 20 for `.sec-rec` on the same
+   reasoning — a component's internal rhythm is the file's, the page's rhythm
+   is the scale's.
    ------------------------------------------------------------------------ */
-.app .jrn{display:flex;flex-direction:column;gap:var(--s06);width:100%}
+.app .jrn{display:flex;flex-direction:column;gap:20px;width:100%}
 
 .app .jrn-h{display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
 .app .jrn-t{margin:0}
@@ -531,11 +545,25 @@
 
 .app .jrn-l{
   list-style:none;margin:0;padding:0;
-  display:flex;flex-direction:column;gap:var(--s05)}
+  display:flex;flex-direction:column;gap:9px}
 
+/* THE MARK IS 16 AND NOT 20 — 587:6749. Stated on the box AND on the `<svg>`:
+   the box is what holds the four marks in one optical column whichever glyph
+   `stepIcon` returns, and `fill:currentColor` on the svg is what makes §63's
+   one declaration per state colour both halves of the row. 20 was this layer's
+   own guess at "a hair larger than the words", and against a 19px line box it
+   made the mark the tallest thing in a row it is only meant to open.
+
+   16 IS THE FILE'S NUMBER AND IT IS KEPT EVEN THOUGH THE LABEL IS NOT. §63 §10
+   sets the labels at 13.5 rather than the file's 16 — the two band columns
+   mirror each other and that note is the argument — so the file's 1:1 ratio of
+   mark to text is 16:13.5 here. That is left alone rather than scaled to 14:
+   16px is this product's small-icon size everywhere it appears beside body text
+   (`.rec-f`, `.stand-*`, `.plate-b`), and a 14px mark would be the only one in
+   the build cut to a label's size instead of to the icon rank. */
 .app .jrn-i{display:flex;align-items:center;gap:var(--s03)}
-.app .jrn-ic{flex:none;display:grid;place-items:center;width:20px;height:20px}
-.app .jrn-ic svg{width:20px;height:20px;fill:currentColor}
+.app .jrn-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
+.app .jrn-ic svg{width:16px;height:16px;fill:currentColor}
 .app .jrn-n{flex:none}
 
 /* --------------------------------------------------------------------- 5 ---
@@ -874,6 +902,27 @@
 .app .sec-qa{
   padding:var(--s07) var(--pad-x);
   border-top:1px solid #d7d5cc}
+
+/* AND THE SECTION ABOVE MUST NOT CLOSE ITSELF — the double bottom border
+   (Maryam, 31 Aug 2026). This is the only section in the build that draws its
+   own top hairline, so the join above it was being stated twice: §10 gives
+   every `.sec` a closing rule on `::after` inset by `--pad-x`, and the line
+   above gives this one a full-width rule at the next pixel row. On the `new`
+   dashboard that is the seam under "Tal recommends" — an inset 1px at y and a
+   full-bleed 1px at y+1, which reads as one thick, slightly ragged edge rather
+   than as two lines. §70.3's own closing note records the same artefact in the
+   band and says the same thing about it: no sweep measures a line drawn twice
+   in almost the same place.
+
+   TWO STATEMENTS, ONE INTENT, AND BOTH ARE NEEDED — which is §55.2's shape and
+   §14 predicts it in as many words. At desktop the deciding rule is §14's
+   re-enabler, `:has(+ .sec > .sec-h)` at (0,7,0) inside `@container app
+   (min-width:900px)`: trap 4 says it cannot be outweighed from a later layer,
+   so `:not(:has(+ .sec-qa))` is in ITS list. Below 900 that whole block is out
+   of tier and §10's rule is simply shown, with nothing setting `display` — so
+   this unconditional (0,4,0) is what answers the phone. Deleting either one
+   brings the doubled edge back at one end of the range. */
+.app .page > .sec:has(+ .sec-qa)::after{display:none}
 .app .sec-qa > .sec-h{margin:0 0 var(--s03);padding:0}
 .app .sec-qa > .all-desc{margin:0 0 20px}
 

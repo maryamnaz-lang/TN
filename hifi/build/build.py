@@ -606,7 +606,27 @@ css = '\n'.join((here / f).read_text() for f in
                  # read as mechanism, the h3 on both headings (which needs
                  # (0,3,1) to beat §63 §4's `.app .sec-h h2`) and the pill's
                  # violet.
-                 '73-enroloffer.css'])
+                 '73-enroloffer.css',
+                 # WHAT THE INTERVIEW FOUND. Priya's write-up was four
+                 # paragraphs and two grey labels; it is three cards in three
+                 # of §12's named hues now — green for the strengths, violet
+                 # for the growth areas, blue for her note — with the pair
+                 # abreast and the note under them. Maryam's call on 31 Aug
+                 # 2026, explicitly NOT in the accent: "do not go for orange
+                 # color only". The section goes white in views.js to make the
+                 # tints readable, which is `quizResults`'s own swap.
+                 # LAST, and only one reason is structural: it restates §55's
+                 # white-cell assumption now that the panel is gone, and it
+                 # reaches past §15's `.signed-h` and §02's `.note band`. It
+                 # could sit anywhere after §55; after §63 is what decides it.
+                 # AFTER §63 AND ALLOWED TO BE: grids, grounds, marks, spacing
+                 # and two `color-mix` washes, and not one font-size,
+                 # font-weight, text-transform or text colour. Those are §63
+                 # §14 — including the one that reads as mechanism, the card
+                 # title taking `--mk` where §72 §12 deliberately keeps its
+                 # column labels in grey. The note there says why the two
+                 # differ.
+                 '74-signedcards.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

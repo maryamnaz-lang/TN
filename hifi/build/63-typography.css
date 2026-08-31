@@ -147,6 +147,16 @@
      "You're enrolling on Explorer – E3", "What the 90 days cover" — are one rank
      and that rank is 16.
 
+     STILL THREE, AND 587:6741 IS THE ONE THAT WAS TRIED AND SENT BACK.
+     "Your journey so far" is 16 in the file and took this token for one build,
+     which also pulled the four step labels under it to 16 — the file sets the
+     whole AI-native band at one size. It is h4 again: that heading is not a
+     SECTION head, it is the head of a column inside the band and the peer of
+     "Summary by Tal", which is h4, and §70.3 aligns the two on one baseline.
+     The long version is in §10, over the `.jrn-*` rules. The test for a fourth
+     reader is therefore narrower than "the file says 16": does the thing head a
+     SECTION of the page.
+
      THE SCALE'S OWN RULE SAYS TAKE THE NEAREST ROLE, and §63 §11 applies it in
      as many words: the progress percentage stays on the 34px display role rather
      than "buying a ninth size for two characters" at the file's 32. h3 is 17,
@@ -930,6 +940,13 @@
   text-transform:none;
   color:transparent}
 
+/* AND THE SUMMARY PARAGRAPH IS DELIBERATELY NOT SIZED HERE. It falls through
+   to §2's body role at 13.5, and that is the answer rather than an omission —
+   see the note over the journey column below, which records the decision and
+   why the file's 16 lost. A rule stating 13.5 on this selector would be §2
+   said twice, and the next person to change the body role would have to find
+   both. If the band ever does go to 16, this is where the rule belongs. */
+
 /* THE THREE ACCENT PHRASES IN THE SENTENCE. `--accent-text` is the AA-safe
    accent ink (4.63:1) and the phrases sit on §70's 5% ground, which lifts the
    requirement by nothing worth measuring. Strong, because the file sets them
@@ -939,21 +956,68 @@
   font-weight:var(--t-w-strong);
   color:#f47113}
 
-/* THE JOURNEY COLUMN. Heading and step labels at one size, which is the file's
-   relationship — the heading is told apart by the pill beside it, not by being
-   bigger. The count is one step down and Buch, because it is a figure about
-   the list rather than a member of it. */
-.app .jrn-t,
-.app .jrn-lab{
+/* THE JOURNEY COLUMN — 587:6741, AND THE BAND IS READ AS TWO COLUMNS RATHER
+   THAN AS ONE FRAME. The file sets every text node in the band at 16: the
+   summary's label (581:6670), its paragraph (581:6671), this heading (587:6744)
+   and the four step labels (587:6753 / 6756 / 6759 / 6762). Taken at face value
+   that is the whole band moving to one 16px rank, which is what shipped for one
+   build and is not what the product wants.
+
+   THE RULE IS THAT THE TWO COLUMNS MIRROR EACH OTHER (Maryam, 31 Aug 2026:
+   "the right side steps text should be same font size as of the left side
+   summary"). So the pairing is by ROLE across the divider, not by the file's
+   single size:
+
+     "Summary by Tal"      h4, 14/600   ·   "Your journey so far"  h4, 14/600
+     the summary sentence  body, 13.5/400 · the four step labels   compact, 13.5/400
+
+   which is what §70.3's baseline alignment is for — it goes to real trouble to
+   land those two labels on one line, and two labels on one line at two
+   different sizes is that work undone. The reason to prefer this over the
+   file's 16 is that the left column is `PAGESUM`, the same component on ~34
+   views in both portals: taking it to 16 moves every page in the product, and
+   scoping it to this band would leave one component rendering at two sizes
+   depending on the page, which is the drift §63 exists to stop. So the CONTENT
+   of both columns is the body rank and the two things that NAME them are h4.
+
+   WHAT THE FILE STILL WINS. Everything about this block that is not a size:
+   §70.4's 20px and 9px gaps, its 16px marks, the pill, the three state inks,
+   and the WEIGHT relationship — 587:6744 is Kräftig and all four labels are
+   Buch, so the heading is told apart from the rows by weight rather than by
+   being bigger. That last one was worth keeping on its own: before it, heading
+   and labels were both Kräftig and four labels in the heading's own weight
+   competed with the thing that names them.
+
+   COMPACT AND NOT BODY, at the same 13.5. Both roles are 13.5; body is 22/22
+   leading for prose and compact is 19, which is what a four-row list wants —
+   at body's leading the rows sat 31px apart against the file's 30 pitch, and
+   the list read as four paragraphs. Same size as the summary, list leading.
+
+   AND THE NUMBER IS THE LABEL, in one declaration, because in the file the two
+   are one text run — the `1.` is the `<ol>`'s own decimal marker inside the same
+   Buch node. A rule of its own for `.jrn-n` could only ever make them disagree;
+   it kept them in step by being a copy, which is the same thing said twice.
+   `.jrn-n` survives in §70 as a `flex:none` box, which is all it is for. */
+.app .jrn-t{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none}
-.app .jrn-n{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong)}
-.app .jrn-pill{
+.app .jrn-n,
+.app .jrn-lab{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none}
+
+/* THE COUNT IS THE SMALL STRONG ROLE. 587:6746 is 12px Kräftig and `--t-label`
+   (12.5/17, strong) is the scale's nearest — §63 §11's own rule, rather than
+   half a ninth size for one chip. It shipped as `--t-compact` in Buch: 1.5px
+   too large and a weight too light, which read as a quiet aside about the list
+   instead of the count OF it, and put the pill's words within half a pixel of
+   the four labels it is meant to sit above. */
+.app .jrn-pill{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;
   color:#f47113}
 
 /* THE THREE STEP STATES, AND THE MARK TAKES THE ROW'S INK. `currentColor` on
@@ -1262,9 +1326,14 @@
    with §72's ground gone the three are the section's own subheadings and 11.5px
    was reading as a caption over a 34px number.
 
-   14 IS ALSO ONE STEP UNDER `.pulse-ttl`, which is now h3 at 17 — so the
-   section reads 17 / 14 / figures, three ranks, rather than 17 / 11.5 with a
-   gap in the middle wide enough to look like an omission.
+   14 IS ALSO ONE STEP UNDER THE SECTION'S OWN HEADING — so the section reads
+   heading / 14 / figures, three ranks, rather than heading / 11.5 with a gap in
+   the middle wide enough to look like an omission. That heading was `.pulse-ttl`
+   at h3's 17 when this was written; §73 replaced §72's head row with `aiHead`,
+   so it is `.aih-t` now and §63 §13 sizes it at `--t-sec-size`, the 16px stated
+   under §7. The step is 16 → 14, one rank tighter than it was and the same
+   relationship — which is the point of one title role: this rule did not have
+   to move when the heading above it did.
 
    Still `--text-secondary` rather than the mark's hue: the GLYPH carries the
    colour, and a coloured word beside a coloured mark reads as a status pill.
@@ -1541,3 +1610,55 @@
     font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
     font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
 }
+
+/* ------------------------------------------------------------------ 14 ---
+   WHAT THE INTERVIEW FOUND — §74's families
+
+   §74 redraws Priya's write-up as three coloured cards and owns none of the
+   type. Six classes, and the one decision in all of them is that the CARD TITLE
+   TAKES ITS HUE while every other word in the block stays in ink.
+
+   THE TITLE IS THE ONE COLOURED STRING PER CARD. §72 §12 makes the opposite call
+   for the pulse's column labels — "the GLYPH carries the colour, and a coloured
+   word beside a coloured mark reads as a status pill" — and the difference is the
+   ground. There the mark sits on white, so mark and word in the same hue is two
+   objects claiming to be a badge; here the card is a 5% wash of that hue, so the
+   title in it is the card naming itself and the ink would read as a paragraph
+   that happens to be bolder. One hue, three places: the ground, the chip, the
+   title.
+   ------------------------------------------------------------------------ */
+
+/* THE SIGNATURE ROW — an eyebrow over the fact, which is the two-tier shape
+   `.stat` and §73's fact cells both use. The label is the quieter of the two
+   because "Assessed and signed by" is the frame and "Priya Nair" is the answer. */
+.app .sig-hl{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .signed-b > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* THE CARD TITLE IN ITS HUE, at h4 — a card title, which is what it is. */
+.app .sig-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--mk)}
+
+/* THE TAG is the label role — §63 §3's "a chip, a tag, a small value" — in the
+   same hue as the title, because it is a one-word restatement of it. */
+.app .sig-tag{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--mk)}
+
+/* AND THE FINDING ITSELF IS BODY IN FULL INK. It is prose and it is the thing
+   you came to read, so it takes the reading size and the primary colour — not
+   the description grey the two paragraphs had before. That grey was right when
+   they were supporting lines under a heading; on a card of their own they are
+   the content. */
+.app .sig-p{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}

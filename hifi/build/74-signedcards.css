@@ -1,0 +1,138 @@
+/* ==========================================================================
+   §74  WHAT THE INTERVIEW FOUND — three findings, three hues
+
+   Priya's write-up is the only block on the `assessed` dashboard a candidate
+   READS rather than acts on, and it was set as continuous prose: a grey label, a
+   paragraph, a second grey label, a second paragraph, then her note in a
+   `.note band`. Nothing in the drawing said that the three are three different
+   KINDS of finding — what you are good at, what you are not, and what the
+   assessor made of it — so the two a reader most wants to compare sat 400px
+   apart in one column.
+
+   Three cards, three of §12's named marker hues, the pair abreast and the note
+   underneath. The long argument is over `signedSummary` in views.js, including
+   the two things this deliberately does NOT take from the reference.
+
+   AND THE SECTION HAD TO GO WHITE FOR ANY OF IT TO READ. The block sits in a
+   `sec tint cards` — #F7F7F7 — and a 5%-tinted card on a 4% grey ground is two
+   washes a shade apart: the green and the violet vanished and the row came out as
+   three empty boxes. `quizResults` records the same swap and the same reasoning.
+   The class change is in views.js; what is left for this layer is that the cards
+   now have to state their own ground, because they can no longer inherit
+   §55's white cell.
+
+   WHAT IS IN HERE AND WHAT IS NOT. Grids, grounds, marks and spacing. NOT font
+   size, weight, case or ink — those are §63's, and every one these families need
+   is in §63 §14.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE SIGNATURE ROW — who signed it, and which interview
+
+   TWO FACTS WITH A RULE BETWEEN THEM. They were one stacked pair under a 36px
+   face, which read as a name with a subtitle; they are two independent facts and
+   the reference separates them. The face steps 36 → 44 because it is now one of
+   two members rather than the row's only mark, and at 36 it was the smallest
+   avatar in the product on the one screen where the assessor matters.
+
+   THE DIVIDER IS A `border-left` AND THAT IS CORRECT HERE, against §72's and
+   §73's inset pseudo-elements: those two separate COLUMNS of a section, where a
+   line touching the rule above it reads as a cell wall. This one separates two
+   facts inside a single row that has no rule above it, so there is nothing for
+   it to collide with and the simpler technique is the right one.
+   ------------------------------------------------------------------------ */
+.app .signed-h{
+  display:flex;align-items:center;
+  flex-wrap:wrap;gap:var(--s05) var(--s06);
+  padding-bottom:var(--s06);
+  border-bottom:1px solid var(--rule)}
+/* `flex:none` ON THE NAME BLOCK, because §15 gives `.signed-b` `flex:1` — it was
+   the only member of the old stacked header and took the row. Left there, it
+   absorbs every spare pixel and pushes the date to the far edge, which reads as
+   two unrelated facts at opposite ends rather than a pair with a rule between
+   them. Both members size to their content and the row packs left. */
+.app .signed-h > .av-ph{flex:none}
+.app .signed-h > .signed-b{flex:none}
+.app .signed-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .signed-when{
+  display:flex;align-items:center;gap:var(--s04);
+  padding-left:var(--s06);
+  border-left:1px solid var(--rule)}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE THREE CARDS
+
+   THE PAIR SHARES A ROW BECAUSE THE PAIR IS THE READING. Strengths and growth
+   areas are the two halves of one judgement and the whole point of them is that
+   you read one against the other; the note is about both and takes the width
+   under them. `minmax(0,1fr)` rather than `1fr` for the reason §72.1 records —
+   a `1fr` floor is `auto`, and these cards hold prose that would refuse to
+   shrink.
+   ------------------------------------------------------------------------ */
+.app .sig-pair{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--s05);
+  margin-top:var(--s06)}
+.app .sig-pair + .sig-c{margin-top:var(--s05)}
+
+/* THE CARD IS A 5% WASH OF ITS OWN HUE WITH NO BORDER. §29.17's technique — the
+   ground mixed FROM the hue in one declaration, so the pair can never drift and
+   there is no fourth token. No border, because a tinted ground is already an
+   edge: the two together are the box drawn twice, which is the correction §72
+   and §73 both had to make to their first cuts.
+
+   5% AND NOT 12%. §65's chip is 12% of the hue and that is right for a 28px
+   square; across a 430px card the same mix is a colour rather than a wash, and
+   three of them side by side read as three status banners. 5% is a tint you
+   notice as a grouping and not as a state. */
+.app .sig-c{
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s05);
+  border-radius:var(--radius);
+  background-color:color-mix(in srgb, var(--mk) 5%, var(--layer-01))}
+
+/* THE MARK IS §65'S CHIP AT 36, and this is the one place in these four layers
+   that KEEPS the chip rather than going to a bare glyph. §72 and §73 dropped it
+   because their marks sit inside a bordered cell or beside a column rule, where
+   a filled square is a box in a box. Here the card's own ground is a 5% wash and
+   the chip is 12% of the same hue — so the mark reads as a denser patch of the
+   card it belongs to rather than as an object on top of it, which is what ties
+   the icon, the title and the ground into one thing. */
+.app .sig-ic{
+  flex:none;display:grid;place-items:center;
+  width:36px;height:36px;
+  color:var(--mk);
+  background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
+.app .sig-ic svg{width:20px;height:20px;fill:currentColor}
+.app .sig-ic-sm{width:32px;height:32px}
+.app .sig-ic-sm svg{width:16px;height:16px}
+
+.app .sig-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0;flex:1}
+/* the title and its tag share a line, the tag held to the right edge */
+.app .sig-top{display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
+.app .sig-t{flex:none}
+.app .sig-tag{
+  flex:none;margin-left:auto;
+  display:inline-flex;align-items:center;
+  min-height:22px;padding:0 var(--s03);
+  border-radius:var(--radius);
+  background-color:color-mix(in srgb, var(--mk) 14%, var(--layer-01))}
+.app .sig-p{margin:0}
+
+/* THE FOOT KEEPS ITS BUTTON. `V.level` is the one caller that passes
+   `footAction`, and on that page the card IS the report's summary — see §29.16's
+   note over it. Nothing about the foot changes. */
+.app .signed-foot{margin-top:var(--s06)}
+
+/* --------------------------------------------------------------------- 3 ---
+   BELOW 900 THE PAIR STACKS
+
+   One column, because two cards of prose in half of 358px is four words to the
+   line. The signature row's divider goes with it — stacked, the date is the
+   row's second line and a `border-left` on a full-width member is a stray
+   vertical hairline down the left of the block.
+   ------------------------------------------------------------------------ */
+@container app (max-width:899.98px){
+  .app .sig-pair{grid-template-columns:minmax(0,1fr)}
+  .app .signed-when{padding-left:0;border-left:0}
+}

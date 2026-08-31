@@ -122,42 +122,46 @@
 }
 
 /* -------------------------------------------------------------------- 1a2 --
-   THE HEADING IS TAL'S, AND THE MARK IS §70'S SPARKLE — 599:7418
+   THIS LAYER'S OWN HEAD ROW IS DELETED — §73's `aiHead` TOOK THE JOB
 
-   The section opens with the sparkle and "Your learning pulse" where a plain
-   `<h2>` used to say "This week", and a derived sentence under it. That is a
-   claim about what the block IS: a reading of your numbers, not a table of
-   them — and the three columns below are what the sentence resolves to.
+   THE HEADING IS STILL TAL'S AND IT STILL OPENS WITH THE SPARKLE. What changed
+   is who states it. §72 shipped its own head — a `.sec-h.pulse-head` holding a
+   `.pulse-ttl` with `.pulse-mk` in it and `.pulse-lede` as the section's next
+   child — and §73 then generalised exactly that shape into `aiHead`, one
+   component for all three AI-native sections. That was the whole point of it:
+   `.pulse-ttl`, `.eo-ttl` and `.cov-ttl` had drifted to 16 / 12.5 / 14 because
+   each matched a different `:has()` in §63 §8b, and one title role cannot drift.
+   `pulse` calls `aiHead({mark:true, title, desc, act})` now, so the four
+   selectors this section used to need are `.aih-*` and the mark is `.aih-mk`.
 
-   `.pulse-mk` IS ITS OWN CLASS AND MUST STAY ONE. The note over `pulse` in
-   views.js is the long version: `talFirst` hoists any `.sec` containing an
-   `.ai-aura`, and `placeBand`'s `_mhIsTal` claims any section containing
-   `.ai-aura` OR `.ai-label` as head furniture. Wearing either here would put
-   this section in the band. The MARK is identical — §70's `--ai-star` painted
-   with `--ai-grad`, the same object the band's own label carries — so the two
-   read as one voice while sharing no class a pass can match.
+   ALL FOUR WERE THE "GATE NOTHING WRITES" TELL, AND ONLY A SECOND PORTAL PAYS
+   FOR THEM. CLAUDE.md states the test — a family in the output whose gate is a
+   class nothing in the box ever writes is decoration, so grep both files and if
+   only the stylesheet says it, the component is not there. `.pulse-head`,
+   `.pulse-ttl`, `.pulse-lede` and `.pulse-mk` all passed that test silently for
+   as long as they shipped, because a dead rule costs nothing on the page it was
+   written for. What it cost was the reference: `gallery.html` still taught this
+   markup as the pulse's head, so a page built from the design system got the
+   pre-§73 shape and inherited the drift `aiHead` exists to prevent.
 
-   THE WORDS ARE NOT CLIPPED TO THE GRADIENT and the band's are. §70.2 runs the
-   ramp through "Summary by Tal" because that label is Tal SPEAKING; this is a
-   section heading over a grid of figures, and a gradient heading over a table
-   is the ramp used as decoration. Mark in the ramp, words in ink. */
-.app .pulse-head{align-items:center}
-.app .pulse-ttl{display:flex;align-items:center;gap:var(--s03);margin:0}
-.app .pulse-mk{
-  content:'';flex:none;
-  width:14px;height:14px;
-  border-radius:0;
-  background-color:transparent;
-  background-image:var(--ai-grad);
-  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
-  -webkit-mask:var(--ai-star) center/contain no-repeat;
-          mask:var(--ai-star) center/contain no-repeat}
+   WHY THE MARK GOES WITH THEM, WHICH IS THE ONE NON-OBVIOUS DELETION. §72's
+   argument for `.pulse-mk` was sound and is now §73's to make: the mark must
+   NOT be `.ai-label` or `.ai-aura`, because `talFirst` hoists any `.sec`
+   containing an `.ai-aura` under the `.ph` and `placeBand`'s `_mhIsTal` claims
+   a section containing either as head furniture — so wearing one would move
+   this section into the band. `.aih-mk` satisfies that identically and §73.1
+   paints it from the same two tokens (§70's `--ai-star` through `--ai-grad`),
+   so the object is the same one the band's label carries and no pass can see
+   it. Two classes for one 12px star was the drift in miniature. §73's is 12,
+   not this rule's 14, and that difference is Maryam's call on 31 Aug 2026 —
+   one value everywhere so it cannot move when a heading changes size.
 
-/* THE LEDE RUNS THE SECTION'S FULL WIDTH, ABOVE THE COLUMNS AND OUTSIDE THEM.
-   It is one line at every width this product has (901px of measure against a
-   ~150-character sentence), which is what lets it sit between the head row and
-   the grid without a rule under it — the grid's own top border closes it. */
-.app .pulse-lede{margin:0 0 var(--s05)}
+   WHAT §72 STILL OWNS OF THE HEAD: nothing but the label-column opt-out in §1a
+   above, which keys on `.pulse` and not on the heading, and the words staying
+   in ink rather than clipped to the ramp — §63 §12's call, restated there.
+   §70.2 runs the ramp through "Summary by Tal" because that label is Tal
+   SPEAKING; a gradient heading over a grid of figures is the ramp as
+   decoration. Mark in the ramp, words in ink. */
 
 /* -------------------------------------------------------------------- 1b ---
    THE COLUMN HEAD — the mark, then the name of the reading.

@@ -3395,7 +3395,10 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${discOpen('report')?' on':''}">
+    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
+          argument: the findings are tinted cards now and a 5% wash on a 4%
+          grey ground is invisible. */}
+    <div class="sec found${discOpen('report')?' on':''}">
       ${foundHead('What the interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -3456,7 +3459,10 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${discOpen('report')?' on':''}">
+    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
+          argument: the findings are tinted cards now and a 5% wash on a 4%
+          grey ground is invisible. */}
+    <div class="sec found${discOpen('report')?' on':''}">
       ${foundHead('What the re-interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -6141,28 +6147,84 @@ function boardList(){
 
    A FLAG RATHER THAN A DELETION, DEFAULTING TO OFF: a new call site that
    forgets it gets the version with no duplicate, which is the safe failure. */
+/* ==========================================================================
+   WHAT THE INTERVIEW FOUND — three findings, three hues
+
+   THE BLOCK WAS FOUR PARAGRAPHS AND TWO GREY LABELS. Priya's write-up is the
+   only thing on the `assessed` dashboard a candidate READS rather than acts on,
+   and it was set as continuous prose: "Strengths", a paragraph, "Growth areas",
+   a paragraph, then her note in a `.note band`. Nothing in it said that the
+   three are three different KINDS of finding — what you are good at, what you
+   are not, and what the assessor thought — so the block read as one long
+   sentence about you and the two things a reader actually wants to compare sat
+   400px apart in one column.
+
+   THREE CARDS, THREE NAMED HUES, TWO ABREAST: green for the strengths, violet
+   for the growth areas, blue for the note. §29's argument, which §65 and §72
+   both apply: "four readings drawn in one colour look like four instances of one
+   thing; four hues say these are different measurements before you have read a
+   word of them." Strengths and growth areas are a PAIR and share a row, because
+   the whole point of the two is that you read one against the other; the note is
+   about both and takes the width under them.
+
+   NOT ORANGE, AND THAT IS THE POINT (Maryam, 31 Aug 2026: "do not go for orange
+   color only"). The accent is Tal's voice and the page's one CTA — it is spent
+   twice on this page already. These three are the product reporting what a
+   PERSON found, which is not Tal speaking, so they take the three marker hues
+   §12 defines and §29 cycles.
+
+   AND THE SECTION GOES WHITE, WHICH IS THE DECISION THE TINT FORCED. The block
+   lives in a `sec tint cards` — #F7F7F7 — and a 5%-tinted card on a 4% grey
+   ground is two washes a shade apart: the green and the violet disappeared and
+   the row read as three empty boxes. Two ways out, and taking the panel to white
+   is the better one, for the reason `quizResults` records when it made exactly
+   this swap: "the cells were already WHITE — that is the whole of what `cards`
+   did — so the panel was a 16px frame of #F7F7F7 around four white boxes." Here
+   the cells are not white, they are tinted, and the frame was the thing stopping
+   them from reading. White panel, coloured cards.
+
+   WHAT IT DOES NOT TAKE FROM THE REFERENCE. A "Key takeaways" strip of three
+   more claims — "Clear decision maker", "People impact", "Ready to grow" — and
+   an orange planet. The first is three sentences of new product copy about a
+   candidate that no data in this build supports, which is the one thing a
+   redesign must not invent; the second is decoration on the block that is meant
+   to be read. The tags it DOES take, "Strong" and "Focus", are labels on
+   findings that already exist rather than new findings.
+   ========================================================================== */
+const SIG_CARD = (mk, ic, title, tag, body) => `<div class="sig-c" style="--mk:var(--mk-${mk})">
+        <i class="sig-ic">${ic}</i>
+        <div class="sig-b">
+          <div class="sig-top"><span class="sig-t">${title}</span>${
+            tag ? `<span class="sig-tag">${tag}</span>` : ''}</div>
+          <p class="sig-p">${body}</p>
+        </div>
+      </div>`;
+
 function signedSummary(withNote, re, footAction){
   return `<div class="signed">
+      ${''/* THE HEADER IS TWO FACTS WITH A RULE BETWEEN THEM — who signed it and
+             which interview it was. They were one stacked pair under a 36px
+             face, which made the date look like a subtitle on Priya's name; they
+             are two separate facts and the reference splits them. */}
       <div class="signed-h">
-        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
-        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>${re?'Re-interview &middot; 21 November 2026':'Level interview &middot; 20 August 2026'}</span></span>
+        <span class="av-ph" style="width:44px;height:44px;font-size:13px"><i>PN</i><img src="${AV.priya}" alt=""></span>
+        <span class="signed-b"><span class="sig-hl">Assessed and signed by</span><b>Priya Nair</b></span>
+        <span class="signed-when">
+          <i class="sig-ic sig-ic-sm" style="--mk:var(--mk-3)">${I.calendar}</i>
+          <span class="signed-b"><span class="sig-hl">${re?'Re-interview':'Level interview'}</span><b>${re?'21 November 2026':'20 August 2026'}</b></span>
+        </span>
       </div>
-      <div class="ai-body">
-        <p class="t-label-01 sig-l">Strengths</p>
-        <p>${re
+      <div class="sig-pair">
+        ${SIG_CARD(2, I.star, 'Strengths', 'Strong', re
           ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the 90 days, each with a name and a date on it.'
-          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
-        <p class="t-label-01 sig-l">Growth areas</p>
-        <p>${re
+          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.')}
+        ${SIG_CARD(3, I.growth, 'Growth areas', 'Focus', re
           ?'Delegation still, and coaching rather than fixing. Chapters 3 and 9 on the E4 course are built on exactly this.'
-          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.'}</p>
+          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.')}
       </div>
-      ${withNote?`<div class="note band">
-        <span style="fill:var(--icon-secondary)">${I.user}</span>
-        <div class="nb"><b>Priya&rsquo;s note</b>${re
-          ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
-          :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;'}</div>
-      </div>`:''}
+      ${withNote ? SIG_CARD(1, I.chat, 'Priya&rsquo;s note', '', re
+        ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
+        :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;') : ''}
       ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }

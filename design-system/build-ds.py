@@ -410,6 +410,37 @@ LAYERS = [
     # and the standing column renders as a full-bleed three-across grid inside
     # a 278px box. Grep the output for `.pulse-ring` after either build.
     '72-weekpulse.css',
+    # THE ENROLMENT OFFER, and the AI-native section head with it. `aiHead` is
+    # the one component in these four layers that a second portal will reach
+    # for on its first page: a heading, its description and the row's actions
+    # as ONE block, with the actions centred against the pair rather than
+    # against the title. §73.1 is the whole of that drawing, and it exists
+    # because three sections had already drifted three ways in ONE portal — a
+    # second portal with no rule for it drifts on its first section. `.eo*` and
+    # `.cov*` cross with it because they are that head's two worked examples:
+    # a figure row whose cells are content-sized with the dividers centred
+    # between them, and a horizontal card scroller that becomes a grid at 900.
+    # THE §63 ORPHAN ARGUMENT, WHICH IS NOW THE THIRD TIME THIS LIST HAS HIT
+    # IT. §63 §13 IS in the list and states the type for `.aih-t`, `.aih-d`,
+    # `.eo-*` and `.cov-*` — and `--t-sec-size`, the ninth size, exists only
+    # for these headings. Leaving this layer out shipped `.aih-t`'s size and
+    # `.eo-pill`'s violet with nothing to draw either, exactly as §70 shipped
+    # `.jrn-pill`'s ink with no pill and §72 would have shipped `.pulse*`'s
+    # sizes with no grid. Grep the output for `.aih-mk` after either build.
+    '73-enroloffer.css',
+    # WHAT THE INTERVIEW FOUND — three findings as three cards in three of
+    # §12's named marker hues. It crosses for the reason §65's chip does: it is
+    # the system's answer to "this block is read, not acted on, and its parts
+    # are different KINDS", which is a shape every portal has and none of the
+    # components state. The three mixes are the transferable part — 5% for a
+    # card, 12% for a 28px chip, 14% for a tag, all from one `--mk` — and the
+    # card-title-takes-the-hue rule that §72 §12 deliberately reverses.
+    # SAME ORPHAN ARGUMENT: §63 §14 states `.signed-*`'s type and the card
+    # title's `--mk`, so without this layer the output carries a title coloured
+    # from a variable no rule ever sets. It also restates §55's white-cell
+    # assumption and reaches past §15's `.signed-h`, so shipping §63's half
+    # alone leaves the pair mismatched in both directions.
+    '74-signedcards.css',
 ]
 
 # ==========================================================================
@@ -1075,9 +1106,103 @@ def verify_subset(css, layers):
     return problems
 
 
+# ==========================================================================
+# THE LAYER LIST ABOVE IS THE ONE THING IN THIS BUILD THAT IS NOT
+# INCLUDE-BY-DEFAULT, AND THAT ASYMMETRY IS WHAT KEEPS BITING.
+#
+# `keep_selector` is include-by-default for a CLASS. `LAYERS` is
+# opt-in-by-hand for a FILE. So the documented loop — "change the layer that
+# states the rule, then re-run both builds" — is silently a no-op for a layer
+# nobody appended, and `verify_subset` cannot see it: that check runs
+# output -> source ("does every rule I wrote trace back to a layer?"), which a
+# layer that was never read passes trivially. Coverage is the other direction
+# and had nothing checking it.
+#
+# It has now cost four layers. §70 shipped `.jrn-pill`'s ink with no pill and
+# `.rec-alt`'s `color:transparent` with no gradient under it, because §63 IS
+# in the list and states the type for families whose drawing layer was not.
+# §72's note predicted the same failure and §73/§74 walked straight into it —
+# `.aih-t`'s size, `.eo-pill`'s violet and `.signed-card`'s title hue all
+# reached the output with nothing to draw them. Every one of those was a
+# stylesheet half-shipped, which renders as a subtly wrong page rather than as
+# an absent one, so nothing looked broken enough to chase.
+#
+# So the list is now checked against the PORTAL's list rather than against a
+# number written down here. `build.py` is the authority on what a layer is;
+# anything it builds must be either in `LAYERS` or named in `NOT_IN_DS` with
+# its reason, and a layer in neither stops the build. Adding a layer to the
+# portal and forgetting this file is no longer a thing that can happen quietly.
+#
+# NOT_IN_DS is for the deliberate omissions, and there is one. It is not the
+# same list as EXCLUDE_PREFIXES: that drops a CLASS wherever it appears, this
+# declines a whole FILE. Read the layer's own note before adding an entry —
+# the default is include, and "a second portal probably will not need this"
+# is the reasoning that produced a generic-looking portal the first time.
+NOT_IN_DS = {
+    # §49's own note makes this argument at length and it is the one layer that
+    # deliberately breaks the "re-run both builds" rule. The layer is not a
+    # component: it is one portal's 16px sizing of `.stars`, a class the design
+    # system already ships and already draws correctly at §03.104's 13px
+    # (`tn-agent-portal.html` prints `.ag-r` with `stars()` in it). Including
+    # it would push the candidate portal's card sizing onto every other
+    # portal's rating rows. Nothing else in the file is at stake — the gold is
+    # §01's token and §15.949's fill, both of which cross already.
+    '49-agentstar.css': "one portal's star sizing, not a component — see the layer's own note",
+}
+
+
+def check_coverage():
+    """Every layer the PORTAL builds must be listed here or declined by name."""
+    build_py = SRC / 'build.py'
+    if not build_py.exists():
+        print(f'  ! {build_py} not found — layer coverage NOT checked')
+        return
+    on_disk = {p.name for p in SRC.glob('*.css')}
+    # build.py names its layers as plain quoted strings in one list; anything
+    # it names that is really a file on disk is a layer.
+    portal = {n for n in re.findall(r"'([\w.-]+\.css)'", build_py.read_text())
+              if n in on_disk}
+    listed = set(LAYERS)
+
+    unaccounted = sorted(portal - listed - set(NOT_IN_DS))
+    if unaccounted:
+        print()
+        print('=' * 70)
+        print('LAYER(S) IN THE PORTAL AND IN NEITHER LIST HERE:')
+        for n in unaccounted:
+            print(f'  {n}')
+        print()
+        print('The portal draws these and the design system does not. If §63')
+        print('states type for anything they draw, the output already carries')
+        print('sizes and inks with nothing under them — the failure §70, §72,')
+        print('§73 and §74 each hit in turn.')
+        print()
+        print('Append to LAYERS (with a note on what crosses and why), or add')
+        print('to NOT_IN_DS with the reason. The default is INCLUDE.')
+        print('=' * 70)
+        sys.exit(1)
+
+    stale = sorted(listed - on_disk) + sorted(set(NOT_IN_DS) - on_disk)
+    if stale:
+        sys.exit('layer(s) named here no longer exist: ' + ', '.join(stale))
+
+    orphan = sorted(on_disk - portal)
+    if orphan:
+        # Not fatal: a layer the portal itself does not build is not shipped
+        # anywhere, so it cannot half-ship. Worth saying out loud, because the
+        # usual cause is a new layer added here and forgotten in build.py.
+        print(f'  note: {", ".join(orphan)} — on disk, not built by the portal')
+
+    declined = ', '.join(sorted(NOT_IN_DS))
+    print(f'layer coverage: {len(listed)} of {len(portal)} portal layers'
+          f'{" (declined: " + declined + ")" if declined else ""}')
+
+
 def main():
     if not SRC.is_dir():
         sys.exit(f'source layers not found: {SRC}')
+
+    check_coverage()
 
     stats = {'kept': 0, 'dropped': 0}
     parts = []

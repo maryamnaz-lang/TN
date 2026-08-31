@@ -114,7 +114,28 @@
      same argument §55.2 makes for the block above it), and when it is shut
      it is a single heading with a hairline 12px under it, which reads as an
      underline on the heading rather than as the end of a section. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(.found)::after,
+  /* AND `+ .sec-qa` JOINS IT, WHICH IS THE ONLY SECTION IN THE BUILD THAT
+     DRAWS ITS OWN TOP HAIRLINE. §70.5c gives Quick Actions `border-top:1px`
+     because 581:6344 has one, and this rule was drawing the closing hairline
+     of the section ABOVE it as well — on the `new` dashboard that is
+     `.sec-rec`, so the seam under "Tal recommends" was TWO 1px rules one pixel
+     apart: §14's inset by `--pad-x` at the section's `bottom:0`, §70's full
+     width at the next section's top. Maryam read it as a double bottom border
+     (31 Aug 2026), which is the only way two nearly-coincident hairlines ever
+     announce themselves — and it is the same artefact §70.3's closing note
+     records for the band, found the same way.
+
+     §70'S LINE IS THE ONE THAT STAYS. It is the file's, it is stated with a
+     node number against it, and this one is switched OFF by default at this
+     width anyway — the line above turns every `.page > .sec::after` off, and
+     only this re-enabler brings it back. So the fix is to stop re-enabling it,
+     not to add a counter-rule; per trap 4 this selector is (0,7,0) in a
+     container query and §70 could not have reached it from outside.
+
+     KEYED ON THE NEXT SECTION, like `+ .sec.tint.cards` above, because the
+     reason is a property of what FOLLOWS: whatever sits above Quick Actions,
+     Quick Actions has already drawn the join. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

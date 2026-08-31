@@ -183,7 +183,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `73-enroloffer.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `74-signedcards.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -695,6 +695,49 @@ holds, and the way in), **Your pace** (the week's minutes against the 55-minute 
 **Pre-existing and NOT fixed here:** week 1 shows "0h 0m invested" in the head strip and
 "20 min" in the pace column, because `CFG.week1.mins` is 0 and `GAME.week1.weeks` is `[20]`.
 data.js records that disagreement; the merge only moves the two figures closer together.
+### WHAT THE INTERVIEW FOUND — §74, `74-signedcards.css` + `signedSummary` (views.js)
+
+**Priya's write-up was four paragraphs and two grey labels.** It is the only block on the
+`assessed` dashboard a candidate READS rather than acts on, and nothing in the drawing said the
+three findings are three different KINDS — what you are good at, what you are not, and what the
+assessor made of it — so the two a reader most wants to compare sat 400px apart in one column.
+Three cards now, in three of §12's named marker hues: **green** for the strengths, **violet**
+for the growth areas, **blue** for her note, with the pair abreast and the note under them.
+
+- **NOT ORANGE, AND THAT IS THE INSTRUCTION** (Maryam, 31 Aug 2026: "do not go for orange color
+  only"). The accent is Tal's voice and the page's one CTA, and it is spent twice on this page
+  already. These three are the product reporting what a *person* found, which is not Tal
+  speaking.
+- **THE SECTION HAD TO GO WHITE, AND THAT WAS THE DECISION THE TINT FORCED.** The block lived in
+  a `sec tint cards` — #F7F7F7 — and a 5%-tinted card on a 4% grey ground is two washes a shade
+  apart: the green and the violet vanished and the row read as three empty boxes. Maryam flagged
+  the ground and left the call open; white panel with coloured cards is the answer, and it is
+  `quizResults`'s own swap ("the panel was a 16px frame of #F7F7F7 around four white boxes").
+  **`V.enrol`'s `cohort` disclosure keeps its panel** — it has no tinted cards in it.
+- **5% FOR THE CARD, 12% FOR THE CHIP, 14% FOR THE TAG, all mixed from the one `--mk`.** §65's
+  chip is 12% and that is right for a 28px square; across a 430px card the same mix is a colour
+  rather than a wash and three of them read as three status banners.
+- **THIS IS THE ONE LAYER OF THE FOUR THAT KEEPS §65'S FILLED CHIP.** §72 and §73 both went to
+  bare glyphs because their marks sit inside a bordered cell or beside a column rule, where a
+  filled square is a box in a box. Here the card's ground is a 5% wash and the chip is 12% of the
+  same hue, so the mark reads as a denser patch of the card rather than an object on it.
+- **THE CARD TITLE TAKES THE HUE AND EVERY OTHER WORD STAYS IN INK** — the opposite of §72 §12's
+  call for the pulse's column labels ("a coloured word beside a coloured mark reads as a status
+  pill"). The difference is the ground: there the mark sits on white, here the card *is* that
+  hue, so the title in it is the card naming itself.
+- **WHAT IT REFUSES FROM THE REFERENCE:** a "Key takeaways" strip of three further claims about
+  the candidate — three sentences of new product copy no data in this build supports, which is
+  the one thing a redesign must not invent — and a decorative orange planet on the block whose
+  whole job is to be read. The tags it *does* take, "Strong" and "Focus", are one-word labels on
+  findings that already exist.
+- **`flex:none` ON `.signed-b`, because §10.1130 gives it `flex:1`** — it was the only member of
+  the old stacked header. Left there it absorbs the row and pushes the date to the far edge,
+  which reads as two unrelated facts at opposite ends rather than a pair with a rule between them.
+
+**Pre-existing and NOT touched:** `V.level` has ~608px of horizontal overflow at 1280 from
+`.lvl-hero` and the "How the ladder works" `.acc` — confirmed unrelated (hiding `.signed`
+changes nothing). It predates all of §72–§74.
+
 ### EVERY AI-NATIVE SECTION HEAD IS `aiHead` — ONE COMPONENT, THREE CALLERS
 
 Figma 613:7984. **The heading, its description and the row's actions are one block, and the

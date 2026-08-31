@@ -81,12 +81,40 @@
    three. One value for all three sections, because a per-section measure is the
    thing this component exists to stop.
 
-   THE ACTION IS CENTRED AGAINST THE BLOCK, which is what `align-items:center` on
-   the row already does — and the cap is what makes it visible: against a
-   one-line block there is nothing to centre, and the button looked top-aligned
-   because the block was as short as it was. */
+   THE ACTION IS CENTRED AGAINST THE BLOCK, AND `align-items:center` ON THE ROW
+   IS NOT ENOUGH TO GET IT — §37.11b OVERRIDES IT PER ITEM. This note used to say
+   the row's `align-items` "already does" it, and that the button only LOOKED
+   top-aligned because the block was as short as it was. Both halves were wrong,
+   and the arithmetic is why it went unnoticed for a build:
+
+     .app .page .sec-h:not(:has(> .btn)):not(:has(> a)) > *{align-self:flex-start}
+
+   §37 sets that on the CHILDREN rather than the container, deliberately, and its
+   own note explains that this is inert "wherever the box is not stretched — a
+   full-width heading row is exactly its own content's height, so there is no
+   free space to move into". True of every `.sec-h` that existed when it was
+   written, and false of this one: `.aih` puts TWO items of different heights in
+   the row, so the shorter one has free space and `align-self` bites. That
+   assumption is what §73 broke, which is why the fix belongs here rather than in
+   §37 — and the exclusion cannot catch it either, because `:not(:has(> .btn))`
+   wants the control as a DIRECT child and `aiHead` nests it inside `.aih-a`.
+
+   THE 14px COINCIDENCE IS WHAT HID IT. 613:7984 puts the 40px action group at
+   y=14 inside the 68-tall block, and 14 IS the centred offset for those two
+   heights ((68 - 40) / 2). Top-aligned, the action's mid-point sits exactly 14px
+   above the block's — so the measured gap between the two tops came out at the
+   file's own number while the alignment was the other one. Measuring "is the
+   action 14px down" confirms both states. The test that separates them is the
+   MID-POINTS: centred is `deltaMid == 0` at every pair of heights, and the cover
+   row (53 / 32) reads 10.5 rather than 14, which is the tell.
+
+   STATED ON BOTH CHILDREN, and (0,6,0) beats §37's (0,4,1) — `:has()` carries
+   its argument's specificity, so that rule is a class heavier than it reads,
+   the same arithmetic §73's head-sizing note works through for §63 §8b. Both,
+   not just the action: whichever item is shorter is the one with room to move,
+   and on a wrapped title that is the action rather than the block. */
 .app .page .sec > .sec-h.aih > .aih-b{
-  flex:1 1 340px;min-width:0;max-width:60%;
+  flex:1 1 340px;min-width:0;max-width:60%;align-self:center;
   display:flex;flex-direction:column;gap:var(--s04)}
 /* THE 340px BASIS IS THE MECHANISM THAT LETS THE ROW WRAP. A flex item moves to
    a new line when its BASE size does not fit; §24.132 gives `.sec-h > h2`
@@ -100,7 +128,7 @@
 /* `margin-left:auto` STATED. §24.133 gives it to a `.sec-h`'s direct `.btn` and
    `a`; this is a div wrapping one or two children and matches neither. */
 .app .page .sec > .sec-h.aih > .aih-a{
-  flex:none;margin-left:auto;
+  flex:none;margin-left:auto;align-self:center;
   display:flex;align-items:center;gap:var(--s03)}
 
 /* THE STAR IS 12 SQUARE AND STAYS 12 (Maryam, 31 Aug 2026) — it does NOT track

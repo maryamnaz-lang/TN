@@ -2991,7 +2991,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   .app .page > .sec::after{display:none}
   
   
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(.found)::after,
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,
@@ -9365,17 +9365,19 @@ button.btn-p:active,
 .app .modhead .ai-aura.talsum .ai-body p b{
   font-weight:var(--t-w-strong);
   color:#f47113}
-.app .jrn-t,
-.app .jrn-lab{
+.app .jrn-t{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none}
-.app .jrn-n{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong)}
-.app .jrn-pill{
+.app .jrn-n,
+.app .jrn-lab{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none}
+.app .jrn-pill{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;
   color:#f47113}
 .app .jrn-i{color:#515151}
 .app .jrn-i.done{color:#00a43c}
@@ -9596,6 +9598,26 @@ button.btn-p:active,
     font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
     font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
 }
+.app .sig-hl{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .signed-b > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .sig-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--mk)}
+.app .sig-tag{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--mk)}
+.app .sig-p{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -9878,7 +9900,7 @@ button.btn-p:active,
   }
 @container app (min-width:1180px){
   .app .modhead:has(> .head-col) > .head-col{padding-left:57px}}
-.app .jrn{display:flex;flex-direction:column;gap:var(--s06);width:100%}
+.app .jrn{display:flex;flex-direction:column;gap:20px;width:100%}
 .app .jrn-h{display:flex;align-items:center;justify-content:space-between;gap:var(--s04)}
 .app .jrn-t{margin:0}
 .app .jrn-pill{
@@ -9891,10 +9913,10 @@ button.btn-p:active,
     rgba(255,255,255,.1), rgba(255,192,146,.1))}
 .app .jrn-l{
   list-style:none;margin:0;padding:0;
-  display:flex;flex-direction:column;gap:var(--s05)}
+  display:flex;flex-direction:column;gap:9px}
 .app .jrn-i{display:flex;align-items:center;gap:var(--s03)}
-.app .jrn-ic{flex:none;display:grid;place-items:center;width:20px;height:20px}
-.app .jrn-ic svg{width:20px;height:20px;fill:currentColor}
+.app .jrn-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
+.app .jrn-ic svg{width:16px;height:16px;fill:currentColor}
 .app .jrn-n{flex:none}
 .app .sec-rec{
   display:flex;flex-direction:column;gap:20px;
@@ -10023,6 +10045,7 @@ button.btn-p:active,
 .app .sec-qa{
   padding:var(--s07) var(--pad-x);
   border-top:1px solid #d7d5cc}
+.app .page > .sec:has(+ .sec-qa)::after{display:none}
 .app .sec-qa > .sec-h{margin:0 0 var(--s03);padding:0}
 .app .sec-qa > .all-desc{margin:0 0 20px}
 .app .qa{
@@ -10210,18 +10233,6 @@ button.btn-p:active,
   .app .sec:has(> .pulse) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--s05)}
 }
-.app .pulse-head{align-items:center}
-.app .pulse-ttl{display:flex;align-items:center;gap:var(--s03);margin:0}
-.app .pulse-mk{
-  content:'';flex:none;
-  width:14px;height:14px;
-  border-radius:0;
-  background-color:transparent;
-  background-image:var(--ai-grad);
-  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
-  -webkit-mask:var(--ai-star) center/contain no-repeat;
-          mask:var(--ai-star) center/contain no-repeat}
-.app .pulse-lede{margin:0 0 var(--s05)}
 .app .pulse-h{
   display:flex;align-items:center;gap:var(--s03);
   margin-bottom:var(--s05)}
@@ -10309,14 +10320,14 @@ button.btn-p:active,
   margin-bottom:20px;
   border-right:0;min-height:0}
 .app .page .sec > .sec-h.aih > .aih-b{
-  flex:1 1 340px;min-width:0;max-width:60%;
+  flex:1 1 340px;min-width:0;max-width:60%;align-self:center;
   display:flex;flex-direction:column;gap:var(--s04)}
 .app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{
   display:flex;align-items:center;flex-wrap:wrap;gap:6px;
   margin:0;flex:none;min-width:0}
 .app .page .sec > .sec-h.aih > .aih-b > .aih-d{margin:0}
 .app .page .sec > .sec-h.aih > .aih-a{
-  flex:none;margin-left:auto;
+  flex:none;margin-left:auto;align-self:center;
   display:flex;align-items:center;gap:var(--s03)}
 .app .aih-mk{
   flex:none;align-self:center;
@@ -10409,6 +10420,51 @@ button.btn-p:active,
     grid-template-columns:repeat(5,minmax(200px,1fr));
     overflow-x:auto;
     border-left:0;border-right:0}
+}
+.app .signed-h{
+  display:flex;align-items:center;
+  flex-wrap:wrap;gap:var(--s05) var(--s06);
+  padding-bottom:var(--s06);
+  border-bottom:1px solid var(--rule)}
+.app .signed-h > .av-ph{flex:none}
+.app .signed-h > .signed-b{flex:none}
+.app .signed-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .signed-when{
+  display:flex;align-items:center;gap:var(--s04);
+  padding-left:var(--s06);
+  border-left:1px solid var(--rule)}
+.app .sig-pair{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:var(--s05);
+  margin-top:var(--s06)}
+.app .sig-pair + .sig-c{margin-top:var(--s05)}
+.app .sig-c{
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s05);
+  border-radius:var(--radius);
+  background-color:color-mix(in srgb, var(--mk) 5%, var(--layer-01))}
+.app .sig-ic{
+  flex:none;display:grid;place-items:center;
+  width:36px;height:36px;
+  color:var(--mk);
+  background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
+.app .sig-ic svg{width:20px;height:20px;fill:currentColor}
+.app .sig-ic-sm{width:32px;height:32px}
+.app .sig-ic-sm svg{width:16px;height:16px}
+.app .sig-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0;flex:1}
+.app .sig-top{display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
+.app .sig-t{flex:none}
+.app .sig-tag{
+  flex:none;margin-left:auto;
+  display:inline-flex;align-items:center;
+  min-height:22px;padding:0 var(--s03);
+  border-radius:var(--radius);
+  background-color:color-mix(in srgb, var(--mk) 14%, var(--layer-01))}
+.app .sig-p{margin:0}
+.app .signed-foot{margin-top:var(--s06)}
+@container app (max-width:899.98px){
+  .app .sig-pair{grid-template-columns:minmax(0,1fr)}
+  .app .signed-when{padding-left:0;border-left:0}
 }
 
 </style>
@@ -12711,7 +12767,10 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${discOpen('report')?' on':''}">
+    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
+          argument: the findings are tinted cards now and a 5% wash on a 4%
+          grey ground is invisible. */}
+    <div class="sec found${discOpen('report')?' on':''}">
       ${foundHead('What the interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -12772,7 +12831,10 @@ V.dashboard = (f) => {
           takes the head button white so it is not the only thing left in the
           block still the panel's colour, and §55.2 takes the rule off the
           block above — a change of ground is already the boundary. */}
-    <div class="sec tint cards found${discOpen('report')?' on':''}">
+    ${''/* WHITE, NOT `tint cards` — the note over `signedSummary` is the
+          argument: the findings are tinted cards now and a 5% wash on a 4%
+          grey ground is invisible. */}
+    <div class="sec found${discOpen('report')?' on':''}">
       ${foundHead('What the re-interview found',
         '<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>')}
       <div class="found-b">
@@ -14841,28 +14903,40 @@ function boardList(){
   </div>`;
 }
 
+const SIG_CARD = (mk, ic, title, tag, body) => `<div class="sig-c" style="--mk:var(--mk-${mk})">
+        <i class="sig-ic">${ic}</i>
+        <div class="sig-b">
+          <div class="sig-top"><span class="sig-t">${title}</span>${
+            tag ? `<span class="sig-tag">${tag}</span>` : ''}</div>
+          <p class="sig-p">${body}</p>
+        </div>
+      </div>`;
+
 function signedSummary(withNote, re, footAction){
   return `<div class="signed">
+      ${''/* THE HEADER IS TWO FACTS WITH A RULE BETWEEN THEM — who signed it and
+             which interview it was. They were one stacked pair under a 36px
+             face, which made the date look like a subtitle on Priya's name; they
+             are two separate facts and the reference splits them. */}
       <div class="signed-h">
-        <span class="av-ph" style="width:36px;height:36px;font-size:12px"><i>PN</i><img src="${AV.priya}" alt=""></span>
-        <span class="signed-b"><b>Assessed and signed by Priya Nair</b><span>${re?'Re-interview &middot; 21 November 2026':'Level interview &middot; 20 August 2026'}</span></span>
+        <span class="av-ph" style="width:44px;height:44px;font-size:13px"><i>PN</i><img src="${AV.priya}" alt=""></span>
+        <span class="signed-b"><span class="sig-hl">Assessed and signed by</span><b>Priya Nair</b></span>
+        <span class="signed-when">
+          <i class="sig-ic sig-ic-sm" style="--mk:var(--mk-3)">${I.calendar}</i>
+          <span class="signed-b"><span class="sig-hl">${re?'Re-interview':'Level interview'}</span><b>${re?'21 November 2026':'20 August 2026'}</b></span>
+        </span>
       </div>
-      <div class="ai-body">
-        <p class="t-label-01 sig-l">Strengths</p>
-        <p>${re
+      <div class="sig-pair">
+        ${SIG_CARD(2, I.star, 'Strengths', 'Strong', re
           ?'You argue your own decisions from evidence now, and you no longer play them down as you give them. Three examples out of the 90 days, each with a name and a date on it.'
-          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.'}</p>
-        <p class="t-label-01 sig-l">Growth areas</p>
-        <p>${re
+          :'You reason from consequence to people, not policy. Three examples, each with a date and a name attached.')}
+        ${SIG_CARD(3, I.growth, 'Growth areas', 'Focus', re
           ?'Delegation still, and coaching rather than fixing. Chapters 3 and 9 on the E4 course are built on exactly this.'
-          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.'}</p>
+          :'Delegation, and coaching rather than fixing. Chapters 4 and 12 are built on exactly this.')}
       </div>
-      ${withNote?`<div class="note band">
-        <span style="fill:var(--icon-secondary)">${I.user}</span>
-        <div class="nb"><b>Priya&rsquo;s note</b>${re
-          ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
-          :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;'}</div>
-      </div>`:''}
+      ${withNote ? SIG_CARD(1, I.chat, 'Priya&rsquo;s note', '', re
+        ?'&ldquo;She came back with the reorganization finished and could tell me which parts of it she would do differently. That is an E4.&rdquo;'
+        :'&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;') : ''}
       ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-p btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }
