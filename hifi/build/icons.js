@@ -89,6 +89,15 @@ chevDown:'M480-362q-8 0-15-2.5t-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28
    happen to point opposite ways. */
 chevUp:'M480-529 324-373q-11 11-28 11t-28-11q-11-11-11-28t11-28l184-184q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l184 184q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-529Z',
 chevRight:'M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z',
+/* THE PAIR TO `chevRight`, ADDED FOR THE BOOKING CALENDAR'S MONTH ROW (Maryam,
+   31 Aug 2026). Material's own `chevron_left`, pasted from
+   `symbols/web/chevron_left/materialsymbolsrounded/chevron_left_24px.svg` —
+   NOT `chevRight` reflected in CSS, which is the tempting one-liner and is
+   wrong twice over: a `scaleX(-1)` mirrors the ROUNDED TERMINALS as well as the
+   direction, so the two arrows in one row are subtly different objects, and it
+   puts a transform on a button that §13 may already be animating. The same
+   argument `chevUp` records for not reflecting `chevDown`. */
+chevLeft:'m432-480 156 156q11 11 11 28t-11 28q-11 11-28 11t-28-11L348-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 28-11t28 11q11 11 11 28t-11 28L432-480Z',
 check:'m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z',
 /* ============================================================
    THE FILLED EXCEPTIONS — AND FILL IS A STATE, NOT A STYLE.

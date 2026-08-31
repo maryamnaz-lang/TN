@@ -193,15 +193,26 @@ function stripPageHead(page){
    the trail needs no branch in the router and inherits the "opened from the
    rail starts a fresh stack" rule for free.
 
-   THE SEPARATOR IS A PSEUDO-ELEMENT ON EVERY ITEM BUT THE FIRST (§77), not the
-   `<span class="sep">/</span>` the in-page `crumb()` writes. A separator that
-   is a real element is a tab stop and a text node a screen reader reads aloud
-   between every pair of crumbs; it also has to be counted when the trail is
-   trimmed on a phone. `::before` is none of those things. */
+   THE SEPARATOR IS A CHEVRON AND IT IS A REAL `<svg>` (Maryam, 31 Aug 2026:
+   "use 12px sized chevron in place of backslash"). It was `content:'/'` on a
+   `::before`, which is what this note used to argue for: a separator written
+   as an element is a text node a screen reader reads aloud between every pair
+   of crumbs, and one more child to count when the trail is trimmed on a
+   phone. Both are answered rather than avoided — `aria-hidden` on the mark,
+   and §78.2 hides the whole `<li>` below 600 rather than any part of it.
+
+   AND IT IS `I.chevRight`, NOT A GLYPH AND NOT A MASK. A `content:'›'` would
+   come from the stand-in face, which carries 68 glyphs and not that one — §64
+   records the identical problem with an arrow. §64 then reached for a
+   `mask-image` because an `<svg>` would have meant editing 88 call sites;
+   there is ONE call site here, so the official Material Symbols chevron goes
+   in directly and trap 7's "one cut, pasted rather than drawn" holds with
+   nothing to keep in step. */
 function drawTrail(trail, parts){
+  const sep = `<span class="crumb-sep" aria-hidden="true">${I.chevRight}</span>`;
   trail.innerHTML = parts.map((p, i) => {
     const now = i === parts.length - 1;
-    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${now
+    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${i ? sep : ''}${now
       ? `<span class="crumb-l" aria-current="page">${p.label}</span>`
       : p.go
         ? `<a class="crumb-l" data-go="${p.go}">${p.label}</a>`
@@ -224,7 +235,7 @@ function drawTrail(trail, parts){
    `:has()` is structural, so a `display:none` element still satisfies every
    one of them while costing no space. Removing the element would change which
    of §70's two grid arrangements the band gets, on pages this change has no
-   business moving. `.ph-bare` is the class and §77 draws it.
+   business moving. `.ph-bare` is the class and §78 draws it.
 
    THE BACK ARROW COUNTS AS CONTENT. `bk()` puts it inside `.ph-top` beside the
    heading, and on a sub-page reached from a card it is the only way back that
@@ -244,6 +255,23 @@ function tidyPh(page){
   const main = ph.querySelector('.ph-main');
   if(main && !main.firstElementChild) main.remove();
   ph.classList.toggle('ph-bare', !ph.firstElementChild);
+  /* `.ph-backonly` IS THE OTHER HALF OF TAKING THE HEADING OUT, and it is a
+     class rather than a `:has()` because the test is "this and NOTHING else".
+     §10 gives the `.ph` 40px of top padding and 32 of bottom, and §02 gives
+     `.ph-top` 8 more underneath — spacing measured for a 26px page title with
+     a fact row under it. With the title gone the block is a 40px control
+     paying a 26px title's separation, which is the ~100px of white Maryam
+     measured between the arrow and the content below it.
+
+     A `:has()` cannot say it. `.ph:has(.ph-back)` matches the dashboards too
+     (they have no back arrow, but `.ph:not(:has(h1))` is now every page), and
+     `:has(.ph-back):not(:has(*))` is not a thing — the arrow IS a descendant.
+     The count is the test, and a pass that has just finished removing the
+     other children is the one thing that knows the answer. */
+  ph.classList.toggle('ph-backonly',
+    !!ph.querySelector('.ph-back') &&
+    ph.querySelectorAll('.ph-main > *, .ph > *:not(.ph-main)').length === 1 &&
+    ph.querySelectorAll('.ph-top > *').length === 1);
 }
 
 function placeTopbar(){

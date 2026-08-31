@@ -1,0 +1,251 @@
+/* ==========================================================================
+   79. THE PULSE IS A BLACK CARD — `.sec-pulse`, and the next call is in it
+   Maryam, 31 Aug 2026: the enrolled dashboards take the `Just Joined`
+   prototype's shape. The head band is untouched; below it the white call row
+   and the pulse's head row become ONE §75 card, and the pulse's three columns
+   become three Quick Actions.
+
+   The long argument for each part is over `pulseCard` / `pulseQA` /
+   `pulseCols` in views.js. This layer is four things: the card's own spacing,
+   the rule inside it, the next-call row, and three named Quick Action hues.
+
+   THE CARD ITSELF IS ONE CLASS AND NOT A LINE OF IT IS HERE. `.dark-card` is
+   §75's whole recipe — ground, the top-right haze, the page-gutter inset, the
+   32px frame, both section seams off, the accent fill on `.btn-p` — and §77
+   proved the conversion is a class by doing it once already. What a converting
+   layer owns is only what is true of THIS content on a dark ground.
+
+   AND IT NEEDED LESS THAN §77 DID, WHICH IS THE USEFUL COMPARISON. That layer
+   spends its first rule beating four `.sec-call` paddings, because the call row
+   was the most heavily un-padded section in the build. `.sec-pulse` is a new
+   class with no history, so `.dark-card`'s own padding is uncontested and the
+   section rules here are two lines.
+
+   AFTER §63 AND ALLOWED TO BE: grids, flex, one border, three fills and
+   spacing, and not one `font-size`, `font-weight`, `text-transform` or text
+   `color`. Those four are §63 §18.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 79.1 ---
+   THE CARD'S INTERNAL RHYTHM, AND TRAP 13 IS THE ONE THAT WOULD BREAK IT
+
+   `aiHead` returns a `.sec-h`, so this section matches §10.4's
+   `.sec:has(> .sec-h)` and at 900 and up it becomes a 184px label column with
+   a vertical rule and the content in track two — INSIDE a black card, which is
+   the loudest possible place to draw that mistake. §72.1a restates the opt-out
+   for the pulse's old wrapper and keys it on `> .pulse`; this card has no
+   `.pulse` child, so it inherits nothing and needs its own.
+
+   THE ANSWER IS `display:flex`, NOT `display:block`, AND THAT IS THE WHOLE OF
+   79.1. `.dark-card` is already `display:flex; flex-direction:column; gap:20px`
+   (§75) — the card's spacing is its own gap, and `.rec-dark` and `.crow-dark`
+   both rely on it. §10.4's `display:grid` is inside the query and beats that
+   from the tier, so the card needs its model restated there rather than
+   replaced: `block` would answer the label column and throw away the gap in the
+   same declaration, leaving the two children touching at desktop and 20 apart
+   on a phone.
+
+   SO THE GAP IS THE ONLY SPACING MECHANISM ON THIS CARD, at 24 rather than
+   §75's 20, and the two rules that would compete with it are turned off: the
+   heading's own `margin-bottom` and the call block's `margin-top`. In a flex
+   container margins do NOT collapse, they ADD — measured before this: 64px
+   above the hairline at 390 and 744 (20 of gap + 20 of margin + 24 of margin)
+   against 24 at 1280, where the section happened to be a grid and neither
+   margin applied. One mechanism, one number, both widths.
+
+   THE MARGIN NEEDS (0,5,0) AND (0,3,0) LOSES — §63 §7b's trap on a spacing
+   property rather than a type one. The 20px is §24's `.app .page .sec >
+   .sec-h`, so a `.app .sec-pulse > .sec-h.aih` restatement is one class short
+   and the margin simply stays.
+
+   The `border-right` and `min-height` still have to be answered: §10.4 states
+   both on the heading itself and neither is undone by the parent's display. It
+   copies what §10 DOES rather than what it says — §69's lesson: the `padding:0
+   var(--pad-x)` on that rule is dead (§14.2 zeroes every headed section's
+   heading padding at this width) and restating it would push the heading 32px
+   right of the card's own frame.
+
+   AND SO DOES `align-self` — TRAP 19, AND IT IS THE THIRD DECLARATION FROM THE
+   SAME §10.15 RULE THAT SURVIVES TURNING THE GRID OFF (Maryam, 31 Aug 2026:
+   "right align the open chapter 1 button").
+
+   §10.15 is `.sec:has(> .sec-h) > .sec-h{grid-column:1; grid-row:1/span 99;
+   align-self:start; border-right:1px …}` — the 184px label-column spine. In a
+   GRID `align-self` is the block axis, so `start` means "sit at the top of the
+   99 rows you span", which is what that layer wants. In a COLUMN FLEX the same
+   property is the INLINE axis, so the identical declaration means "shrink to
+   your content width" — and the head row stopped filling the card.
+
+   IT ONLY SHOWS ABOVE ABOUT 1512. Below that the row's own content is wider
+   than the space, so shrink-to-fit and stretch are the same box and the button
+   measured flush; at 1728 the head came out 991 wide inside a 1128 content box
+   and `aiHead`'s `margin-left:auto` pushed the action to the end of THAT — 137px
+   short of the card's edge, 409px at 2000. A one-width check reports this
+   finished, which is trap 3's lesson about §63 §8b in a different property.
+
+   `stretch`, NOT `align-self:auto`. Auto would resolve to the parent's
+   `align-items`, which is `normal` here and behaves as stretch today — but it
+   is a value the parent could change, and the point of this block is that this
+   card's head does not inherit the label column's assumptions.
+   ------------------------------------------------------------------------ */
+.app .sec.sec-pulse{gap:var(--s06)}
+@container app (min-width:900px){
+  .app .sec.sec-pulse{display:flex;flex-direction:column;gap:var(--s06)}
+  .app .sec.sec-pulse > .sec-h{
+    border-right:0;min-height:0;padding:0;align-self:stretch}
+}
+.app .page .sec.sec-pulse > .sec-h.aih{margin:0}
+
+/* ------------------------------------------------------------------ 79.2 ---
+   THE RULE, AND IT IS `--on-dark-rule` RATHER THAN `--on-dark-border`
+
+   §75's `.plate-x` note is the argument and it is worth not re-deciding: white
+   at 16% is a HAIRLINE between two parts of one card, white at 42% is the edge
+   of something you can press. A 42% rule across a black card reads as the card
+   being two cards.
+
+   24 ABOVE AND 24 BELOW: the space above the rule is the CARD'S GAP (79.1) and
+   the space below it is this block's `padding-top`. Two mechanisms for one
+   symmetry, and it has to be that way round — a `margin-top` here would add to
+   the gap rather than replace it, which is the 64px measurement 79.1 records.
+   On day 90 `.pnc` is not emitted at all, so a card with no call has no rule
+   and no trailing space to explain.
+   ------------------------------------------------------------------------ */
+.app .sec-pulse > .pnc{
+  padding-top:var(--s06);
+  border-top:1px solid var(--on-dark-rule);
+  display:flex;flex-direction:column;gap:var(--s05)}
+.app .pnc-t{margin:0}
+
+/* ------------------------------------------------------------------ 79.3 ---
+   THE ROW IS A GRID BECAUSE THE PORTRAIT IS SIZED BY THE TEXT BESIDE IT
+
+   Maryam: "the profile square will be of the height of the right side
+   content." That is `width:auto; height:100%; aspect-ratio:1` — the height is
+   the input and the width follows — and §75's `.rec-l` note is the record of
+   what happens if the row is a flex container instead: flex resolves the main
+   size from the flex BASE size, and `.pnc-ph`'s only content is a
+   `position:absolute` `<img>`, so it contributes zero, the ratio has nothing to
+   transfer into, and the photograph ships at 18px. Silently — nothing throws
+   and the rest of the card looks right. Measured there: flex 18x18, grid
+   120x120.
+
+   THREE TRACKS: the square, the name block, and the time. `auto minmax(0,1fr)
+   auto` — the square is sized by the ratio, the middle takes the slack with a
+   floor of zero so a long name can ellipsis rather than push the time off, and
+   the time is its own content. `align-items:stretch` is the default and is what
+   gives `height:100%` a row box to resolve against; do not set `center` here,
+   it is the one declaration that would silently collapse the square again.
+
+   TRAP 19 IS LIVE ON THIS ROW. Anything that turns the grid into a flex column
+   at a narrow width changes what `align-self` and `height:100%` MEAN, so the
+   stacked rule below re-points the square to a fixed size rather than leaving
+   the ratio to resolve against a row box that no longer exists.
+   ------------------------------------------------------------------------ */
+.app .pnc-row{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:stretch;
+  gap:var(--s05)}
+.app .pnc-ph{
+  position:relative;
+  width:auto;height:100%;aspect-ratio:1;
+  display:grid;place-items:center;
+  overflow:hidden;
+  background:var(--on-dark-fill, rgba(255,255,255,.1))}
+.app .pnc-ph img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover}
+.app .pnc-b{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:var(--s02)}
+.app .pnc-b p{margin:0}
+.app .pnc-n{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+/* the same 20px green tick `.crow-v` and `.rec-v` carry, so the one verified
+   mark in the product is one drawing of it. §63 leaves its hue alone: #00a43c
+   measures 6.2:1 on this card, which §63 §17 already checked for `.crow-v`. */
+.app .pnc-v{display:inline-flex}
+.app .pnc-v svg{width:20px;height:20px;fill:#00a43c;display:block}
+
+/* THE TIME IS TEXT WITH A MARK, NOT A CELL (Maryam: "at the right end add the
+   'In 2 days' text with icon not in block"). §71.1's `.crow-when` is a 182px
+   tinted block and it was the row's left edge on the white version; §77 already
+   deleted its dark-ground restatement when that cell left the interview card.
+   What is left is a glyph and a string, held at the right end of the row by the
+   grid's third track and centred against the pair beside it.
+
+   `align-self:center` IS STATED, and it is the one place on this row where
+   stretch is wrong: the square wants the row's full height and the time wants
+   the middle of it. */
+.app .pnc-when{
+  align-self:center;
+  display:inline-flex;align-items:center;gap:var(--s03);white-space:nowrap}
+.app .pnc-when svg{flex:none;width:16px;height:16px;fill:currentColor;display:block}
+
+/* BELOW 600 THE ROW STACKS AND THE SQUARE TAKES A FIXED SIZE. At a phone width
+   the three tracks divide about 326px, which leaves the name block ~150 with a
+   64px square and the time on the end of it — the time wraps under the name and
+   the row grows a third line that reads as a fourth fact. Stacked, the square
+   is 56 and the time sits under the role, which is where a phone reads it.
+
+   THE RATIO IS REPLACED RATHER THAN LEFT TO RESOLVE — trap 19. In a column the
+   grid's row box is the square's own content height, so `height:100%` would
+   resolve against nothing and `aspect-ratio` would take the width from a
+   stretched column instead: a 326px square. Both are re-pointed. */
+@container app (max-width:599.98px){
+  .app .pnc-row{grid-template-columns:auto minmax(0,1fr);gap:var(--s04) var(--s05)}
+  .app .pnc-ph{width:56px;height:56px}
+  .app .pnc-when{grid-column:2;align-self:start}
+}
+
+/* ------------------------------------------------------------------ 79.4 ---
+   THE THREE QUICK ACTION HUES, NAMED
+
+   §70.6's rule verbatim: a Quick Action's mark is a NAMED class and never an
+   `nth-child`, "a third Quick Action inserted first would silently repaint the
+   other two". These three are the columns' own `--mk-1/2/3` in the columns'
+   own order, so a reader who knew Current focus as blue and Your standing as
+   violet finds them the same colours as cards. On day 90 the focus card is
+   absent and the other two keep their hues, which is the failure a cycle would
+   have.
+   ------------------------------------------------------------------------ */
+.app .qa-ic.ic-focus svg{fill:var(--mk-1)}
+.app .qa-ic.ic-pace  svg{fill:var(--mk-2)}
+.app .qa-ic.ic-stand svg{fill:var(--mk-3)}
+
+/* AND A ROW OF THREE NEEDS THE FULL WIDTH AND A SMALLER FLOOR — §70.6's grid
+   was sized for exactly two and both of its numbers say so. `.qa` is
+   `auto-fit minmax(340px,1fr)` capped at `max-width:784px`, which is 2 x 384
+   plus the gap: three cards need 3 x 340 + 32 = 1052 against that 784, so the
+   third wrapped to a line of its own and the block came out 2 + 1 — one wide
+   card hanging under two, which reads as a card that failed to fit rather than
+   as a set of three.
+
+   `:has(> :nth-child(3))` IS THE GATE AND IT IS THE HONEST ONE. The condition
+   is literally "this row has a third card", so the `new` dashboard's pair is
+   untouched by construction and a fourth card needs no edit here. §70's floor
+   is right for its own reason — "so the two stack rather than crush below about
+   780" — and 260 is the same reasoning re-run for three: below ~810 the row
+   drops to two and then to one, and 260 is where "Delegation Without Drop-Off —
+   chapter 4, 70 minutes." stops setting to four lines.
+
+   THE CAP GOES RATHER THAN GROWING. 784 exists to stop two cards stretching
+   across a 1280 page; three at `1fr` divide whatever they are given, and on
+   this page that is the same 837 the black card above them spans — so the two
+   blocks line up on both edges, which is the thing the cap would break. */
+.app .sec-qa .qa:has(> :nth-child(3)){
+  max-width:none;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+
+/* AND BELOW 900 A ROW OF THREE STACKS RATHER THAN WRAPPING 2 + 1. `auto-fit` at
+   a 260 floor fits two across the tablet frame's 712 and puts the third on a
+   line of its own at half width, with 356px of nothing beside it — which reads
+   as a missing fourth card rather than as a set of three. Three fitting would
+   need a 226 floor, and at 226 the longest description ("Delegation Without
+   Drop-Off — chapter 4, 70 minutes.") sets to four lines in the ~150px the text
+   column has left after the mark and the arrow.
+
+   ONE COLUMN IS WHAT THE PHONE ALREADY DRAWS, so the tablet is the phone's
+   layout at a wider measure rather than a third arrangement. Still gated on the
+   third child, so the `new` dashboard's pair keeps sitting side by side at this
+   width — two cards have no hole to leave. */
+@container app (max-width:899.98px){
+  .app .sec-qa .qa:has(> :nth-child(3)){
+    grid-template-columns:minmax(0,1fr)}}

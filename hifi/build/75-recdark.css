@@ -96,7 +96,26 @@
    next section's air, which is the same figure the card pays inside itself. A
    margin here would add to it rather than replace it and the card would sit
    56px off the block beneath and 24 off the one above. */
+/* THE CARD IS A COLUMN AT 20 AND THAT WAS MISSING FOR TWO BUILDS (Maryam,
+   31 Aug 2026: "why did you attached the content with the divider? follow the
+   black card spaces that we have on just joined dashboard").
+
+   THE COMPONENT WAS INCOMPLETE AND ONLY ONE CALLER SHOWED IT. §70.5 gives
+   `.sec-rec` `display:flex;flex-direction:column;gap:20px` — 581:6456's own
+   number — and the recommendation wears BOTH classes, so it had the spacing all
+   along from a rule that is not the card's. `.crow-dark` wears `.dark-card`
+   alone, and with no flex column its two children stacked as plain blocks: the
+   call row sat flush against the heading's rule, touching it.
+
+   THIS IS THE EXACT FAILURE THE COMPONENT EXISTS TO PREVENT. §75's own opening
+   note says a conversion is one class and lists the recipe — and the recipe was
+   missing the space between the head and the content, which nobody could see
+   while the only caller also carried §70's rule. A component tested through one
+   caller that has extra classes is not tested. 20 is stated here now, so the
+   next conversion gets it and `.sec-rec`'s declaration is a harmless duplicate
+   of the same number rather than the only source of it. */
 .app .sec.dark-card{
+  display:flex;flex-direction:column;gap:20px;
   margin:var(--s06) var(--pad-x) 0;
   padding:var(--s07);
   background-color:var(--gray-100);

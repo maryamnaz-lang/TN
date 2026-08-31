@@ -28,17 +28,22 @@
      on the page it was asked for.
    ========================================================================== */
 
-/* OFF RIGHT NOW (Maryam, 31 Aug 2026). An empty list means the class is never
-   stamped, so every page draws the orange accent and §25.1's own two-ellipse
-   wash — the trial is invisible without being deleted. §67 still ships, and it
-   is inert: `.tmp-accent` is a class nothing writes.
+/* IT IS ONE WHOLE STAGE NOW, NOT THREE SINGLE PAGES (Maryam, 31 Aug 2026).
+   The trial began as three dashboards read side by side against their orange
+   selves, and was switched off after that comparison. What replaced it is the
+   `reddemo` stage — "Red Accent Demo" in the picker, a frozen copy of Day 34
+   whose whole purpose is to be red — so the list names the STAGE and lets the
+   view be anything: a demo you can only walk one page of is a screenshot.
 
-   TO BRING IT BACK: uncomment the three rows. Nothing else has to change.
-   TO DELETE IT FOR GOOD: see the removal note at the head of §67. */
+   `'*'` IS THE VIEW WILDCARD, and the list still holds [stage, view] pairs so
+   a single page can be named again without changing the shape. The nine real
+   stages are untouched by construction: they are simply not in this array, and
+   §67 states no page in its own selector.
+
+   TO DELETE IT FOR GOOD: see the removal note at the head of §67, and the one
+   on the `reddemo` row in data.js's `STAGES` for the stage itself. */
 const TMP_ACCENT_ON = [
-  // ['assessed', 'dashboard'],   // "Levelled, not enrolled"
-  // ['day34',    'dashboard'],   // "Day 34"
-  // ['promoted', 'dashboard'],   // "Promoted to E4"
+  [RED_DEMO, '*'],   // "Red Accent Demo" — every page of it
 ];
 
 const _baseTmpAccent = render;
@@ -47,7 +52,8 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(!app) return;
-    const on = !S.call && TMP_ACCENT_ON.some(([st, vw]) => S.stage === st && S.view === vw);
+    const on = !S.call && TMP_ACCENT_ON.some(([st, vw]) =>
+      S.stage === st && (vw === '*' || S.view === vw));
     /* toggle, not add: `render` rebuilds `.app` from scratch on every pass,
        but this wrapper also runs on renders where the class must come OFF —
        navigating day34 -> messages is the same element being rewritten. */
@@ -57,7 +63,7 @@ render = function(){
 
 /* THE LAST STATEMENT, per trap 8. The boot render is the final line of
    views.js and runs before this file is parsed, so the page on screen at that
-   moment was drawn without the class — and the two pages in the trial are
-   both reachable as a boot hash (`#day34/dashboard`). One call, at the foot,
+   moment was drawn without the class — and every page in the trial is
+   reachable as a boot hash (`#reddemo/dashboard`). One call, at the foot,
    same as every pass before it. */
 render();

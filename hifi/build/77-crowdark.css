@@ -103,23 +103,37 @@
   .app .crow-dark .crow-who{padding:0 0 var(--s05)}}
 
 /* ------------------------------------------------------------------ 77.3 ---
-   THE ROW HAS ONE BUTTON AND IT IS THE ACCENT
+   THE SECOND BUTTON CAME BACK, ON ONE OF THE TWO CARDS
 
-   Reschedule came off (Maryam, 31 Aug 2026) — `crow('iv',{second:false})`. So
-   §75's `.dark-card .btn.btn-p` accent fill is the whole of this card's button
-   styling and this layer states nothing.
+   THE HISTORY IS THE POINT AND IT IS THREE STEPS. This layer shipped with
+   `.crow-dark .crow-a > .btn:not(.btn-p){border-color:transparent}`, §63 §17
+   shipped the matching white ink, and both were deleted when Maryam took
+   Reschedule off the dashboard's card (`crow('iv',{second:false})`) — correctly,
+   because `:not(.btn-p)` then matched nothing under this wrapper and ink with
+   nothing to land on is the "gate nothing writes" tell. The note left behind
+   said: "if a second action ever comes back to a `.crow-dark`, it needs BOTH of
+   those rules again". It came back the same day, on the Interviews module,
+   which keeps Reschedule because that page is where a person goes to use it.
+   Both rules are restored verbatim.
 
-   TWO RULES WENT WITH IT and the deletion is the point. This layer had
-   `.crow-dark .crow-a > .btn:not(.btn-p){border-color:transparent}` and §63 §17
-   had the matching white ink, both written for a quiet button that no longer
-   exists inside `.crow-dark` — `:not(.btn-p)` now matches nothing under this
-   wrapper. §71.2's `var(--rule)` border and §24.302's `.ic-l` are untouched and
-   still correct on the three call sites that keep the button.
+   AND THE PREDICTION IN THAT NOTE IS THE REASON THIS IS NOT ONE RULE. A border
+   of `var(--rule)` on black is INVISIBLE RATHER THAN ABSENT — §71.2 gives
+   `.crow-a`'s quiet button that border on a white page, and left alone here it
+   draws a 1px near-black edge on a near-black card, which reads as a button
+   that failed to render rather than as one drawn quietly. `transparent`, not
+   `0`: §64.1's rule is that `.btn` carries a 1px transparent border in its box
+   model, so dropping the width makes this button 2px shorter than the accent
+   one beside it in the same row.
 
-   THE RULE THIS LEAVES BEHIND, worth stating because it is the next trap: if a
-   second action ever comes back to a `.crow-dark`, it needs BOTH of those rules
-   again, and a border that is `var(--rule)` on black is invisible rather than
-   absent — which looks like a missing button, not a missing border. */
+   THE INK IS §63 §17'S, not this layer's — a colour is one of the four
+   properties this file may not state. `--on-dark` there, which is §75's reading
+   for the same button on `.rec-dark`: on black the accent fill is what
+   distinguishes the primary, so the quiet one is simply the card's ink.
+
+   IT IS SCOPED `:not(.btn-p)`, SO THE DASHBOARD IS UNTOUCHED. That card still
+   emits one button and still matches nothing here; §71.2's border and §24.302's
+   `.ic-l` remain correct on the three call sites that draw the row on white. */
+.app .crow-dark .crow-a > .btn:not(.btn-p){border-color:transparent}
 
 /* ------------------------------------------------------------------ 77.4 ---
    THE STACKED ROW BRINGS THE PAGE'S GUTTER WITH IT — TRAP 10

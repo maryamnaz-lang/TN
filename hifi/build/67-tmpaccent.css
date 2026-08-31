@@ -1,9 +1,12 @@
 /* ==========================================================================
    §67 — THE RED ACCENT TRIAL. TEMPORARY, AND MEANT TO BE DELETED.
 
-   Maryam asked to see the two enrolled-end dashboards — `day34` and
-   `promoted` — with a red accent instead of the brand orange, to judge the
-   look before deciding anything. This is that, and it is deliberately the
+   Maryam asked to see the enrolled-end dashboards with a red accent instead
+   of the brand orange, to judge the look before deciding anything. It now
+   dresses ONE STAGE — `reddemo`, "Red Accent Demo" in the picker, a frozen
+   copy of Day 34 that exists to be shown to somebody (31 Aug 2026) — rather
+   than three named dashboards. Nothing in this layer changed for that: the
+   pages are `tmpaccent.js`'s array, not this selector. Deliberately the
    smallest thing that can produce it:
 
      - it modifies NO component and NO existing token. Every declaration

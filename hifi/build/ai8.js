@@ -494,7 +494,9 @@ const NEXT = {
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
   day90:    ['Book the re-interview', 'All 13 chapters are done at 87% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
-  promoted: ['Enroll in the E4 course', 'You moved up on November 21. The next 90 days are built for E4, and your returning-candidate credit comes off the fee.', 'What is different about E4?', 'enrol']
+  promoted: ['Enroll in the E4 course', 'You moved up on November 21. The next 90 days are built for E4, and your returning-candidate credit comes off the fee.', 'What is different about E4?', 'enrol'],
+  /* THE RED ACCENT DEMO — day 34's row, copied. See `RED_DEMO` in data.js. */
+  reddemo:  ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3']
 };
 
 function wNext(){

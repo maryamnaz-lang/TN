@@ -139,31 +139,43 @@
    BAR into a row of chapters — at 3px and 2px apart the thirteen read as one
    dashed line, which is a bar drawn badly.
 
-   AND A FINISHED BLOCK TAKES THE AI RAMP, NOT THE FLAT ACCENT. 600:7639's
-   125.95deg through §70's three stops. §19's rule is that the brand gradient
+   A FINISHED BLOCK IS SOLID `--accent` (Maryam, 31 Aug 2026: "the progress bar
+   should be of solid orange rather than gradient fill").
+
+   IT TOOK THE AI RAMP FOR ONE BUILD and the reasoning is worth keeping, because
+   it is right about the general case and wrong about this one. 600:7639 draws
+   125.95deg through §70's three stops; §19's rule is that the brand gradient
    runs through every FILL and the exception is marks that are DRAWN — a stroke,
    a border, a caret — because a gradient across a hairline is a smudge. A 2px
-   block 33px long is a fill, not a stroke: it is 33px of gradient, which is
-   where a ramp reads. The ramp is `--ai-*` rather than `--accent-grad` for the
-   reason §70.0 gives at length — this is Tal's band and the amber in the middle
-   is what says so. */
+   block 33px long looked like a fill by that test.
+
+   WHAT THE TEST MISSES IS THAT THE RAMP IS SPLIT THIRTEEN WAYS. Each `<i>` is
+   its own box, so each one paints the WHOLE gradient across its own 33px —
+   thirteen little ramps, not one ramp across the rail — and §70's middle stop
+   is amber at 39.89%, so every finished block goes orange, yellow, orange
+   again. Five of them in a row read as a rail that is patchy rather than one
+   that is filled, which is the opposite of what a progress bar has to say.
+   §19's own smudge argument applies after all, one scale down: 33px is enough
+   room for a ramp and not enough for THIS ramp, whose whole character is the
+   amber in the middle.
+
+   `--accent` FLAT, AND THAT IS ALSO WHAT `.now` GOES BACK TO — §02.378's own
+   state, a finished block turned down, which is what the pair said before this
+   layer re-pointed them. `background-image:none` is stated on both rather than
+   left off, because §19 puts `--accent-grad` on `.prog-seg i.done`
+   product-wide and this has to turn it off, not merely decline to add one. */
 .app .sec-prog .prog-seg{height:2px;gap:4px}
 .app .sec-prog .prog-seg i{
   background-image:none;
   background-color:var(--layer-accent-01)}
 .app .sec-prog .prog-seg i.done{
   opacity:1;
-  background-color:transparent;
-  background-image:linear-gradient(125.95deg,
-    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
-/* the chapter that is open is a finished block turned down, which is the state
-   §02.378 already draws — restated only because the rule above it re-points the
-   same two properties and would otherwise leave `.now` on the flat accent */
+  background-image:none;
+  background-color:var(--accent)}
 .app .sec-prog .prog-seg i.now{
   opacity:.4;
-  background-color:transparent;
-  background-image:linear-gradient(125.95deg,
-    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
+  background-image:none;
+  background-color:var(--accent)}
 
 /* -------------------------------------------------------------------- 1c ---
    THE THREE FIGURES BECOME A ROW WITH TWO HAIRLINES — 600:7666

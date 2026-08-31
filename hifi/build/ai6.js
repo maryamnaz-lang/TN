@@ -334,6 +334,14 @@ const PAGESUM = {
        minutes, so a stage that moves `open` moves the sentence with it. */
     day34: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
 
+    /* THE RED ACCENT DEMO — day 34's entry, copied rather than aliased, so
+       the two summaries can be edited apart. A `reddemo: PAGESUM.day34` would
+       have been shorter and would have re-linked them; see `RED_DEMO` in
+       data.js. Trap 11 is why this row has to exist at all: a stage with no
+       `PAGESUM` entry leaves the head band's card stripped of its body but
+       still holding its `h3`, which renders ~700px wider than the page. */
+    reddemo: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
+
     /* DAY 90 STOPS SHORT OF THE PLATE. "Book the re-interview" is the whole
        of the second block, because the `.plate` directly under this band
        already says what the re-interview decides — move up to E4, hold at
@@ -562,17 +570,42 @@ const PAGESUM = {
      button. A total and a count is what a person opens Payments for; the
      rows are the itemisation. Counted from the same conditions `V.billing`
      pushes them on, so the two cannot disagree. */
-  /* AND `billing` HAS NO ENTRY EITHER (Maryam, 31 Aug 2026: remove the summary
-     from the Payments page). The count and the total were derived from the same
-     conditions `V.billing` pushes its rows on, which is what made the sentence
-     safe — and also what made it redundant: the table under it is those rows,
-     each with its date, its card and its amount, and one of them is the whole
-     of "one payment, $490". The half that was not in the table is the policy
-     clause, "nothing here renews", and a policy statement is the second of this
-     table's four content bans.
+  /* `billing` IS BACK (Maryam, 31 Aug 2026, later the same day: show Tal's
+     summary on this page) AND IT SAYS SOMETHING THE DELETED ONE COULD NOT.
 
-     THE VIEW DRAWS NO TAL CARD, so this is a deletion and nothing else — trap
-     11 only bites where a card is hand-authored (see `agents` above). */
+     THE DELETED ONE WAS A COUNT AND A TOTAL, and both reasons it went still
+     stand: the table under it is those rows, each with its date, its card and
+     its amount, so "one payment, $490" was the table read aloud — and the half
+     that was not in the table was the policy clause "nothing here renews",
+     which is the second of this table's four content bans. Restoring that
+     sentence is not what was asked for and would fail twice over.
+
+     AND THERE IS A HARDER RULE THAN EITHER: TAL HAS NEVER SEEN THIS PAGE. The
+     `NEVER` list on What Tal knows (ai2.js) ends on "Your card details and
+     billing history", clause 4 of the Data use notice says the same, and
+     `wLedger` (ai8) DECLINES "What have I paid so far?" and points here rather
+     than answering it. So a summary that names a figure off this table — the
+     count, the total, the card, any of it — makes three other surfaces into
+     lies, and it is the one kind of wrong answer ai8's own note calls the
+     worst: "the product says so on two other screens".
+
+     SO THE SUMMARY IS TAL SAYING WHAT IT CANNOT SEE, which is not a hedge and
+     not an apology — it is subject 6 of Tal's six (Tal itself: what it holds
+     about you and what it does not), and on the one page whose whole subject is
+     outside its reach it is the most useful true thing available. It is also
+     not the "no policy" ban: that ban is on product-behaviour filler
+     ("nothing renews"), and this is a statement about Tal's own access.
+
+     THE SECOND SENTENCE IS A PROMISE THE PRODUCT KEEPS. `wRefund` (ai8) reads
+     the two refund windows off the legal lines on `V.booking` and `V.payment`
+     and states the rule before handing to a person, which is answer-kind (a) in
+     ai8's table — so "ask about the refund windows" routes to a real answer.
+     It is also the ask dock's own placeholder on this view, so the line and the
+     field under it are offering the same thing.
+
+     THE VIEW DRAWS NO TAL CARD, so this is an entry and nothing else — trap 11
+     only bites where a card is hand-authored (see `agents` above). */
+  billing: 'This is the one page I can&rsquo;t read: your card details and what you&rsquo;ve been charged never reach me. Ask about the refund windows and I can answer.',
 
   /* The page description said "Your details, your preferences, and what Tal
      is allowed to do" and this said the same three nouns back. The

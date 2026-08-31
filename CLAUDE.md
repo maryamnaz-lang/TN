@@ -782,6 +782,7 @@ implementation — read it before converting anything.
 |---|---|
 | ground | `--gray-100` + §21.22's top-right haze, as a `background-image` |
 | place | inset by `--pad-x` as a **margin**, `--s07` padding inside, `margin-top` for section air |
+| inside | `display:flex; flex-direction:column; gap:20px` — 581:6456's number, between the head block and the content |
 | seams | the section's own `::after` / `::before` off; the **next** section's join off if it draws one |
 | head | `.dc-hd` › `.dc-hd-r` (`.dc-t` title + **either** a `.dc-act` control **or** a `.dc-when` time at the right end — never both, they share one auto margin) with `--on-dark-rule` under it, 16 above and below |
 | buttons | `.btn-p` → accent fill (§15.1853 + §19); a quiet button → borderless white |
@@ -790,6 +791,13 @@ implementation — read it before converting anything.
 **A caller states only what is different about its own content.** Two so far: `.rec-dark`
 (§75.3, the recommendation's portrait, action group and skeleton) and `.crow-dark` (§77, the
 call row). Most of what looks new when you convert a third is already above.
+
+**THE GAP WAS MISSING FROM THE RECIPE FOR TWO BUILDS AND ONLY THE SECOND CALLER SHOWED IT.**
+`.sec-rec` carries §70.5's own `flex-direction:column; gap:20px`, and the recommendation wears
+*both* classes — so it had the spacing all along from a rule that is not the card's. `.crow-dark`
+wears `.dark-card` alone and its two children stacked as plain blocks, with the call row touching
+the heading's rule (Maryam: *"why did you attached the content with the divider?"*). **A component
+tested through one caller that has extra classes is not tested.** Stated on `.dark-card` now.
 
 **§77 is the worked example, and what it had to answer is the general shape of the problem** —
 not the card, which was free, but the *host section's existing opinions*: four `.sec-call`
@@ -983,16 +991,85 @@ three purchase facts**, **the picker as two numbered steps**, and **a checkout r
   Trap 10, one component along, answered the same way — at the element.
 - **WHAT IT REFUSES FROM THE REFERENCE.** The **"Talent Agent" chip**, which names the category
   the crumb two rows above already puts you inside (§73 refuses a social-proof row on the same
-  test). And the **month calendar** — §41 is a whole layer arguing the opposite way about this
-  exact page ("a chip row answers 'which of these do you want' perfectly, which is the
-  candidate's question in the booking flow… It is not the agent's question"), and the data
-  says the same: this agent has five open days, so a month would be 26 cells of invented
-  availability. What it *takes* is the reference's real point — column one needs vertical mass
-  or the rule runs past nothing — by making the five days a **3-across grid** rather than a
-  scrolling strip.
+  test).
+- **THE MONTH CALENDAR WAS REFUSED, THEN BUILT, AND THE ROUND TRIP IS THE LESSON.** §76 first
+  declined it on §41's argument ("a chip row answers *which of these do you want* perfectly,
+  which is the candidate's question in the booking flow… It is not the agent's question") **and
+  on the data** — the agent had five open days, so a month was 26 dead cells. Maryam asked for
+  it anyway, and the honest way to build it was to fix the *second* objection rather than
+  override it: `AGENT_CAL` now holds **two months of real weekday availability**, so most of the
+  grid is live. The refusal was right about the data and the data changed.
+- **THE CHEVRONS ARE LIVE, WHICH IS THE ONLY WAY THEY GET TO EXIST.** §60's rule is "a dead
+  control on a live surface is worse than a missing one", and that is exactly why the first
+  version drew none — nothing held a second month, so both would have been permanently inert.
+  So they were not *drawn*, they were *given somewhere to go*. At the ends one is `disabled`,
+  which is a bounded range rather than a dead control: the distinction §60 draws is between a
+  control that can never do anything and one that cannot do anything **from here**.
+- **`S.bkMo` IS STATE — TRAP 9.** Every neighbouring handler moves an `.on` class and returns,
+  because it changes one class on one element. A month is 42 different cells, so it cannot be a
+  class move; the handler sets the number, clamps the step, and `V.agent` is a pure function of
+  it. `data-bkmo` carries **±1**, not a target index, so neither button knows how many months
+  exist.
+- **THE WEEKDAY IS NEVER TYPED.** This replaced five `['Thu','Thursday',20]` tuples — five
+  hand-written names `Date` could contradict, and thirty-odd chances to once availability grew.
+  `dowLong` reads it off `Date`, so the heading cannot call a day Thursday that the grid draws
+  under Wednesday. Availability is derived too: Mon–Fri minus a `skip` list, because **every
+  slot in the build is a weekday** and a bookable Saturday would be the invented data §74 rules
+  out.
+- **THE SELECTION IS A MONTH *AND* A DAY.** It draws `.on` only while its own month shows, but
+  the heading over the times keeps naming it — that heading states what you **chose**, the grid
+  states what you are **looking at**. Aug 20 is the day the rest of the build names (`bkStamp`,
+  `PAGESUM.booked`, `CALL_ROW.iv`).
+- **NO DOTS, NO STEP NUMERALS, NO BORDERS ON THE TIMES** (Maryam, 31 Aug 2026). Each was drawn
+  for a condition that stopped being true: the dot marked five open days out of 31 and now
+  would mark the majority; the `1`/`2` chips restated a reading order two columns with a rule
+  between them already had, and were the only `--brand-tint-2` objects on a page where orange
+  means "you chose this"; the six outlined time cells were the heaviest object on a page whose
+  own three blocks had just lost their frames. **All three deleted, not hidden** — `.bks-n`'s
+  box and ink, `.bkd.day::after` and its `.on` variant.
+- **THE TIMES ARE A LIST, AND THE CELL HAS NOW HAD THREE SELECTED STATES.** §03 filled it solid
+  `--brand-primary` with white on it; §76 made that a `--brand-tint-2` wash when the grid lost
+  its borders; then the wash went too (Maryam, 31 Aug 2026 — *"the orange color and selected
+  radio button is enough"*). What carries the selection is `--accent-text` on the words and a
+  filled ring at the far edge — `I.circleDash` against three `I.circle`s, which are **Material's
+  own radio pair** (icons.js says so), so `.rad .box` is reused in spirit without the
+  `<label>`+`<input>` a `<button>` cannot host. `background:transparent` is **stated**, not
+  deleted — §03's fill is (0,1,0) and would come back.
+  **The rows are `gap:0` at 44px**: §10.29's 8px gap and §03's 48px min-height are a 56px pitch,
+  right for chips that must read as separate targets and far too loose for four rows of one list.
+- **A TAKEN SLOT IS NOT DRAWN, WHICH REVERSES ai7'S RULE FOR THIS PAGE ONLY.** That file argues
+  disabled chips well — "six chips with no gaps says *this is all there is*" — and it stops
+  holding for a list, where a struck-through row is a full-width line you read and discard. **The
+  record keeps both**: `SLOT_ALL` and `taken` are unchanged and `open` is still a real count, so
+  "4 available slots" cannot drift from the list. ai7's own picker is untouched.
+- **`S.bkSlot` IS STATE AND ITS HANDLER RUNS *BEFORE* THE GENERIC `.slot` ONE.** `data-bkslot` is
+  on a `.slot`, so the shared handler matches it too — and that one moves `.on` and returns,
+  which would tint the new row and leave the filled glyph on the old one, because the mark is
+  chosen at render. **Order is the whole of the fix.**
+- **THE DATE KEEPS ITS SOLID ORANGE DISC** and that asymmetry is deliberate: a numeral in a
+  42-cell grid is a **mark** (§56 grants marks the one curve this system allows) and a tint there
+  is a smudge; a row in a list of four carries it in ink.
+- **THE PROFILE'S THREE PURCHASE FACTS CAME OFF AND `.bkp` IS ONE COLUMN.** Two of the three were
+  printed 40px to their left in `.rec-f` ("$95 Interview Fee", "45 mins call"), so the block
+  stated the fee twice and the length twice either side of a divider whose job was to separate
+  them from each other. **What is actually lost is "Within 24 hours"** — the report turnaround,
+  the one of the three not already said twice; `V.booking` still states it, this page no longer
+  does. Three rounds of reasoning went with the column (`fit-content(360px)` on the track, the
+  420px cap on the *row* rather than the column, the chip-to-glyph trade) — all answers to
+  questions the block no longer asks.
+- **"Times in ET" IS GONE AND SO IS THE CLOSING SENTENCE**, so the page states no timezone while
+  you are choosing. `V.booking` names it on the receipt. Flagged, not assumed — if it comes back,
+  the row of times is the place for it, not the heading.
+- **TWO BLOCKS HAVE BEEN BUILT AND REMOVED FROM THE SLOT UNDER THE LIST**: the "Video interview"
+  definition panel, and a dark Scheduling card joining the day and time with a reminder line.
+  §76.5 keeps the note without the rules, because **what the second one was for is still an
+  unmet gap** — nothing on this page puts the date and the time in one string, and the checkout
+  row states the fee and not the when. The place for it is the checkout row.
+- **THE FEE IS `a.price` AND THE $695 CONFLICT IS CLOSED** (Maryam, 31 Aug 2026: "this is $95 not
+  $695"). It had been a literal, twice asked for, disagreeing with the five surfaces that read
+  `AGENTS.<agent>.price`. One record, five surfaces, no drift.
 - **EVERY FIGURE IS READ.** "4 available slots" is the enabled cells counted, not the
-  reference's own "6 available" over a grid with two struck through; the day heading and the
-  strip come off one tuple.
+  reference's own "6 available" over a grid with two struck through.
 - **THE FEE AND THE BUTTON DISAGREE AND THIS ROW MADE IT VISIBLE — NOT FIXED HERE.** `$695` is
   a literal and is Maryam's, twice asked for; every other surface reads `AGENTS.<agent>.price`,
   which is $95 for Priya. The two used to sit ~600px apart down a column and now sit on one
@@ -1173,6 +1250,114 @@ than the section heading above them. `.prose` on the `.tile-stack` takes the wei
 and **leaves the size alone** — dropping to `--t-desc` would make each row a description of
 the number beside it, which is not what it is. Scoped, not global: `V.welcome`'s "What
 happens next" is the same `.cardrow-n` shape with real titles and is correct as it is.
+
+### THE TOP BAR — §78, `78-topbar.css` + `placeTopbar` (ai11.js)
+
+Maryam, 31 Aug 2026. **The portal switch came out of the bar, the breadcrumb took its
+place, and the page heading went with it.** Three asks and they are one change: the switch
+was a personal control standing in the frame's position, the trail is a frame control that
+had no position at all, and the page's name was about to be said twice.
+
+- **THE SWITCH IS A ROW IN THE ACCOUNT MENU.** `.pswitch` / `.psw-t` are **deleted** —
+  §31's whole §1, §34's `margin-left` and §63's four references. §31's head keeps the
+  three decisions in words. The face in the app bar now wears a chevron and opens a
+  two-row menu: **Profile settings** (the `data-go` the avatar always had) and
+  **Switch to {other portal}**, whose mark is the OTHER person's photograph rather than a
+  glyph — `ACH`'s argument, and it needs no new icon.
+- **IT IS `data-swap`, NOT `data-portal`.** That name is also the stamp `lead.js` writes on
+  `.app`, and the router note records what a `closest('[data-portal]')` did when it started
+  matching the root: every navigation in the product died at once, silently. A different
+  attribute retires the collision instead of re-pointing it. Log out is deliberately NOT in
+  the menu — it is in the rail's foot and it ends the session.
+- **THE TRAIL IS THE PATH YOU TOOK, NOT THE PLACE YOU ARE, and this took three tries.**
+  It started at the product (`TalentNext / …`), then at the module read off the view's
+  hand-written `crumb()`. Both print where a page SITS: pressing "Book Priya now" on the
+  dashboard gave `Interviews / All agents / Priya Nair`, three crumbs, two of them links
+  back to pages the reader never opened. `trailParts` walks **`S.hist`** now, so the trail
+  agrees with the back button by construction and `go`'s `fresh` rule — a rail item empties
+  the stack — is free.
+- **`pageLabel`'s FOUR SOURCES ARE IN THAT ORDER FOR A REASON.** A module is its RAIL
+  label, never its heading, because the six dashboards' `<h1>` is a greeting; then the
+  `<h1>`; then the hand-written `crumb()`'s tail; then the module. Nothing is composed from
+  the button that was pressed — `V.agent`'s heading already reads "Book Priya Nair".
+- **THE REMEMBERED LABELS ARE A STACK BESIDE `S.hist`, NOT A MAP KEYED BY VIEW.** A map was
+  the first version and it fails the moment one view is visited twice: `agent` is whichever
+  agent `S.agent` points at, so opening Owen rewrote the earlier "Book Priya Nair" crumb.
+  `syncStack` DIFFS the stack's length on every render instead of hooking the six
+  `S.hist.push` sites across five files.
+- **THE HEADING AND THE IN-PAGE `.crumb` ARE BOTH REMOVED, UNCONDITIONALLY.** `.ph-bare`
+  hides a `.ph` with nothing left in it — **hidden, not removed**, because §56 and §70
+  place the band's members with `:has()` gates and `:has()` is structural, so a
+  `display:none` element still satisfies every one of them at no cost in space. The
+  dashboards keep their `.ph`: §62's face, medal and celebration live in it.
+  `.crumb`'s own rules stay — `gallery.html` documents it for a hand-authored page.
+- **THE BACK CONTROL IS "← Back" AND IT PAYS A CONTROL'S SPACING** (`.ph-backonly`,
+  stamped by `tidyPh` because the test is a COUNT, not a `:has()`). Taking the title away
+  left a 40px glyph paying a 26px heading's separation — ~100px of white.
+  **§25.386 is (0,6,0), not the (0,3,0) it reads as**:
+  `.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph` — `:not()` takes its
+  argument's specificity and so does `:has()`, so every rule in that family is twice as
+  heavy as it looks. It matched exactly the pages this fix is for.
+- **ONE UNDERLINE, NOT TWO, AND GREY NOT BLUE.** §12.405's `.app a[data-go]` is (0,2,1) —
+  every parent crumb is a `data-go` — so it beat the (0,2,0) the trail first shipped at and
+  painted it blue with a border UNDER the anchor's own `text-decoration`. §78.1 kills the
+  decoration and keeps the border (§02.56's idiom); §63 §18 states the three inks at
+  (0,3,1). The trail is **16px `--t-sec-size` in Kräftig** — no new token, and that token
+  now means "the build's 16px role" rather than "the section heading's 16".
+- **IT IS A PASS BECAUSE `shell()` IS EVALUATED BEFORE `view()`** — one string
+  concatenation in `render()`. The header ships an empty `.crumb-trail` and ai11 fills it.
+  **LAST in the bundle**, and it is `tidyPh` that needs it, not the trail.
+
+Riding with it: **the frame is restored before the first paint.** `vpSet` was the last
+statement of the script, so a reload painted the markup's own `data-vp="mobile"` bezel,
+then §01's `transition` on `.device`'s `max-width`/`height` slid it out to the stored
+frame — which read as the page loading twice. A tiny inline script above the bundle stamps
+the attribute (no transition runs: the element has no previous computed style yet) and
+hides the box until the app is in it. The hide is written from JS onto the element's own
+style, **not stated in §01**, because `.device` crosses into `design-system/` and
+`tn-agent-portal.html` hosts itself in one.
+
+**And `ai4.js`'s `go` wrapper was dropping its second argument** — `go(v)` instead of
+`go(v, fresh)` — so a rail item has never emptied the back stack. Nothing showed it: `bk()`
+hides the arrow on a rail root anyway, so the one surface reading `S.hist.length` was
+masking it on exactly the pages it applied to. The trail is the first thing in the product
+to render the whole stack rather than ask whether it is empty.
+
+### THE RED ACCENT DEMO — a TENTH STAGE, and its duplication is deliberate
+
+Maryam, 31 Aug 2026. **"Red Accent Demo" is a frozen copy of Day 34 drawn in solid
+`#FF0000`, last in the stage picker, temporary, and explicitly not linked to anything else** —
+it exists to be shown to somebody. §67 and `tmpaccent.js` already existed for an earlier red
+trial and were inert; the demo is that machinery pointed at one stage instead of three
+dashboards, so **no new layer and no new class were added**.
+
+- **THE DUPLICATED RECORDS ARE THE POINT — DO NOT "TIDY" THEM.** Six stage-keyed records are
+  typed out in full rather than spread from day 34's: `CFG`, `NOTIF`, `GAME`, `WEEKLY`
+  (data.js), `PAGESUM` (ai6.js), `NEXT` (ai8.js). `reddemo: {...CFG.day34}` would have been
+  three characters and would have re-linked the two by construction — every later edit to day
+  34 would land on the demo. They are allowed to drift. `RED_DEMO` in data.js is where the
+  whole argument is written.
+- **WHAT IS STILL SHARED IS `views.js`, and `isDay34(s)` is the one place it is asked.** Eight
+  branches decide seven facts the mock has nowhere else to put — chapter 4's `12 of 70 min ·
+  4 opens`, its in-progress bar, `1 of 3` tasks, `4 of 5` on time, one overdue, 12 minutes
+  done, and whether the dashboard reads as stalling. So a change to how those seven are
+  **drawn** reaches both pages; a change to any stage's **data** reaches one. If the demo ever
+  needs its own rendering, lift those seven literals onto the `CFG` record — where they
+  arguably belong — rather than adding a second branch.
+- **THE STAGE-WIDE SWITCH IS `TMP_ACCENT_ON`'s `'*'` VIEW.** The array still holds
+  `[stage, view]` pairs so a single page can be named again; `[RED_DEMO, '*']` is every page of
+  the stage, because a demo you can only walk one page of is a screenshot. §67 names no page in
+  its own selector, so widening or narrowing is still one edit in `tmpaccent.js`.
+- **WHAT STAYS ORANGE IS §67's RECORDED DECISION, not an oversight:** Tal's sphere, mark and
+  sparkles (`#F6DC92 → #F47113 → #E85D0F`, hardcoded in §33/§40/§50, and §39 says outright
+  that `#f47113` is NOT `--accent`), the ask dock's frame and its travelling light, and the
+  base64 artwork. Tal is a brand object rather than an accent fill. Raise it before changing
+  it.
+- **THE FILLS ARE `#ff0000` AND THE INK IS `#dc0000`, also §67's** — pure `#ff0000` is 4.00:1
+  on white and would fail AA as text, which is exactly the fill/ink split §01 already makes for
+  the orange.
+- **REMOVAL IS ONE LIST**, written twice: the `reddemo` row in `STAGES` carries it, and §67's
+  head carries the layer half.
 
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 

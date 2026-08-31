@@ -1,0 +1,199 @@
+/* ==========================================================================
+   80. THE QUIZ RESULTS IN THE PEEK — §44's COLUMN, FIRST CALLER IN `hifi/`
+   Maryam, 31 Aug 2026, with the frame: "when click on a quick action this is
+   how i want to convert the ui. The right side is showing the click response
+   of quiz results."
+
+   WHAT THIS LAYER IS NOT. It is not a panel — §44 is the panel, and every
+   structural rule the column needs is already there: 420px in flow, the header
+   and footer pinned with only `.peek-b` scrolling, `.main`'s desktop margin
+   zeroed while it is open, and the whole thing going `position:absolute` below
+   860 because there is no second column to be beside. None of that is restated
+   here. What is here is the five blocks INSIDE it.
+
+   IT ALSO TURNS ON A FAMILY NOTHING IN `hifi/` WROTE. §44's CSS has shipped in
+   both builds since it was written, with `tn-agent-portal.html` as its only
+   caller — CLAUDE.md's "gate nothing writes" tell, in the mild form where the
+   rules are correct and simply unreached. `quizPeek` (views.js) is the portal's
+   first caller and it needed no new class from that layer.
+
+   AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/§69–§79 each pass:
+   grids, flex, grounds, borders, spacing, three marks and one radius, and not
+   one font-size, font-weight, text-transform or text colour. All four are
+   §63 §19 — including the two that read as mechanism, the numbered list's
+   marker and the tag's ink.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 80.1 ---
+   THE BODY IS A STACK, AND THE GAP IS THE ONLY SEPARATOR
+
+   §44 gives `.peek-b` 24px of padding and a scroller and nothing else, on the
+   reasoning that what goes in it is a page component that indents itself. This
+   panel's five blocks are not — they are a paragraph, two lists, a chart and
+   two rows — so the stack is stated here rather than by wrapping each one in a
+   `.sec` and inheriting §10's section rhythm. A `.sec` would also bring §10.2's
+   full-bleed closing hairline, and five hairlines down a 372px column is the
+   table this panel is trying not to be. §44.164 already turns the last one off,
+   which is the tell that a `.sec` in here was the wrong unit to begin with.
+   ------------------------------------------------------------------------ */
+.app .peek-qz .peek-b{
+  display:flex;flex-direction:column;gap:var(--s07)}
+
+/* AND THE HEADER'S OWN HAIRLINE COMES OFF (Maryam, 31 Aug 2026: "remove the
+   bottom divider as well"). §44 draws it because that panel's header carries a
+   title and a `<small>` explaining the preview — two lines of chrome that have
+   to be separated from the content they describe. With the description gone
+   this header is one 15px line, and a rule under it made a 60px band of nothing
+   at the top of the column. The panel's own `border-left` is what says it is a
+   surface; §44's footer rule stays, because the footer is pinned over content
+   that scrolls under it and needs the edge. */
+.app .peek-qz .peek-h{border-bottom:0}
+
+/* ------------------------------------------------------------------ 80.2 ---
+   TAL'S SENTENCE, AND THE MARK IS ITS OWN OBJECT
+
+   THE MARK IS `.qzp-mk`, NOT `.ai-label` AND NOT `.ai-aura`, and `quizPeek`'s
+   own note has the argument in full: `talFirst` hoists any `.sec` containing an
+   `.ai-aura` to directly under the `.ph`, and `placeBand`'s `_mhIsTal` claims a
+   section carrying EITHER class as head furniture. Neither pass can reach
+   inside `.peek` today because the peek is not in `.page` — which is exactly
+   the accident §72 warns against depending on. Painted with §70's `--ai-star`
+   so it is the same object the band's label wears.
+
+   IT IS A MASKED BOX AND IT HOLDS NO GLYPH, which is §70's technique and
+   `.aih-mk`'s (§73.147) verbatim: `--ai-star` is a data-URI of the sparkle
+   SHAPE, so the mark is `--ai-grad` seen through it. The first version put
+   `I.ai` in a `<span>` and wrote `fill:var(--ai-star)`, which sets `fill` to a
+   URL and paints nothing — a mark that was there in the DOM and absent on the
+   page. If a sparkle ever goes missing, that is the line to check.
+
+   IT FLOATS IN THE FIRST LINE rather than taking a column of its own. The
+   sentence is four lines in 372px and a 16px mark with a text column beside it
+   would set it in 344 and cost a fifth; `float` puts the mark in the first line
+   only and lets the rest run full measure. This is the one place in the build
+   that floats, and the alternative — an inline-flex mark inside the paragraph —
+   does not sit on a 22px line box without a magic number.
+   ------------------------------------------------------------------------ */
+.app .qzp-lede{margin:0}
+.app .qzp-mk{
+  float:left;width:12px;height:12px;margin:5px var(--s03) 0 0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* ------------------------------------------------------------------ 80.3 ---
+   A HEADING AND A NUMBERED LIST
+
+   THE NUMBERS ARE THE LIST'S OWN MARKER, not a `<span>` per row. `<ol>` is what
+   the markup already is, so `list-style:decimal` inside a padding-left is three
+   declarations against a wrapper and a counter per item — and a real marker is
+   what a screen reader announces as an ordered list.
+
+   `--s02` BETWEEN ROWS AND `--s04` UNDER THE HEADING. Three phrases of four
+   words each are read as a set, so they sit closer to each other than to the
+   words naming the set; 8 and 12 read as one block at this measure.
+
+   THE TWO HEADINGS' HUES ARE §12's PAIR and §63 §19 states them. Nothing here
+   sets a colour — `.ok` and `.acc` are the classes and the ink is type's.
+   ------------------------------------------------------------------------ */
+.app .qzp-g{display:flex;flex-direction:column;gap:var(--s04)}
+.app .qzp-l{
+  margin:0;padding-left:var(--s06);
+  display:flex;flex-direction:column;gap:var(--s02);
+  list-style:decimal}
+
+/* ------------------------------------------------------------------ 80.4 ---
+   THE ROSE SITS IN THE COLUMN AT WHATEVER WIDTH IT IS GIVEN
+
+   `quizRose` draws on a fixed 360-wide viewBox and the panel's content box is
+   372, so it fits today and would not at §44's 42% floor near a thousand
+   pixels. `width:100%` with the SVG's own aspect ratio is what makes that a
+   scale rather than a clip — the chart is geometry, so it loses nothing, and
+   its labels are §63 §5's `fill`-based sizes which scale with it.
+
+   CENTRED, because a rose is radial: left-aligned in a column whose other four
+   blocks are text, the hub sits 40px off the axis the paragraph above it reads
+   on and the whole panel looks like it slipped.
+   ------------------------------------------------------------------------ */
+.app .qzp-rose{display:flex;justify-content:center}
+.app .qzp-rose svg{width:100%;height:auto;max-width:320px}
+
+/* ------------------------------------------------------------------ 80.5 ---
+   WHAT THE TWO WEAKEST BANDS ARE WORTH — LEVELS, NOT CHAPTERS
+
+   Maryam, 31 Aug 2026: "it shows the chapters as well, we will only show which
+   level could improve there lackings. so show the levels in places of the
+   chapters." `qzRung` derives the rung and `quizPeek`'s note is where the
+   derivation is defended — including why it is phrased as what the BAND reads
+   at rather than as your level, which `V.level` would otherwise contradict.
+
+   A ROW IS A MARK, A THREE-LINE BLOCK AND A CHEVRON, and it is `.gcard`'s shape
+   without being `.gcard`: that component is a `.tile` with its own ground and a
+   `.tile-arrow`, and three of them in a 372px column read as cards inside a
+   card inside a panel. One hairline between rows and nothing round them, which
+   is §72.1's decision for the pulse's columns, one scale down.
+
+   THE MARK KEEPS §65'S FILLED CHIP, and that is the same call §74 made: the
+   test is what the mark sits ON. §72 and §79 went to bare glyphs because theirs
+   sit inside a bordered cell or beside a column rule; this one sits on the
+   panel's own white with a hairline above it, where a 28px tinted square is the
+   only thing giving the row a left edge.
+   ------------------------------------------------------------------------ */
+.app .qzp-rows{display:flex;flex-direction:column}
+.app .qzp-r{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s05) 0;
+  border-top:1px solid var(--rule);
+  text-align:left;width:100%}
+.app .qzp-r:last-child{border-bottom:1px solid var(--rule)}
+.app .qzp-r:hover{background-color:var(--overlay-hover);cursor:pointer}
+.app .qzp-r-ic{
+  flex:none;width:28px;height:28px;
+  display:grid;place-items:center;
+  background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
+.app .qzp-r-ic svg{width:16px;height:16px;fill:var(--mk-1)}
+.app .qzp-r-b{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;gap:var(--s01);align-items:flex-start}
+/* the tag is a pill and it is the one curve in this panel — §12's own exception
+   for a status word, the same 100px `.tag` takes everywhere else */
+.app .qzp-r-tag{
+  margin-top:var(--s02);padding:2px var(--s03);border-radius:100px;
+  background-color:color-mix(in srgb, var(--accent) 14%, #fff)}
+/* THE CHEVRON IS CENTRED ON THE FIRST LINE, NOT ON THE ROW. The block is three
+   lines and the row is `flex-start`, so `align-self:center` would put the mark
+   opposite the tag — 30px below the thing it belongs to. 4px of top margin is
+   the difference between a 12px mark and the 20px line box beside it. */
+.app .qzp-r-go{flex:none;margin-top:4px;display:grid;place-items:center}
+.app .qzp-r-go svg{width:16px;height:16px;fill:var(--icon-secondary)}
+
+/* ------------------------------------------------------------------ 80.6 ---
+   THE FOOTER IS ONE SENTENCE AND AN ARROW
+
+   Maryam, 31 Aug 2026: add "Book your interview today" with an arrow at the
+   bottom. §44 already draws `.peek-f` — pinned, `flex:none`, a rule along its
+   top — so this is only what is inside it.
+
+   IT IS A LINK, NOT A `.btn`. Every `.btn` in the build is a box: `.btn-p` is
+   the accent fill and §64 spends a layer taking the border off the quiet three
+   because "on a product made of hairlines a drawn rectangle is one more edge
+   than the page has". A 372px footer holding one filled orange bar would make
+   the panel's last word louder than the dashboard's own CTA a column to its
+   left, which is the same accent and the actual primary action. So it takes
+   §12's link treatment and §64's arrow position: the words, then the mark at
+   the far end of the row.
+
+   THE ARROW IS AN `<svg>` FROM `I.arrowRight`, not §64's `mask-image`. That
+   layer used a mask because it had 88 call sites it could not edit; there is
+   one here, and trap 7's rule is one icon cut, pasted rather than drawn.
+   ------------------------------------------------------------------------ */
+.app .peek-qz .peek-f{justify-content:flex-start}
+.app .qzp-cta{
+  flex:1 1 auto;display:flex;align-items:center;gap:var(--s03);
+  padding:0;background:transparent;border:0;text-align:left}
+.app .qzp-cta svg{
+  width:18px;height:18px;flex:none;margin-left:auto;fill:currentColor}
+.app .qzp-cta:hover{cursor:pointer}
+.app .qzp-cta:hover span{text-decoration:underline}

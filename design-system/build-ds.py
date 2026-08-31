@@ -499,6 +499,39 @@ LAYERS = [
     # page writes its own `<li class="crumb-i">` rows, which is markup and no
     # more; `gallery.html` carries the recipe.
     '78-topbar.css',
+    # THE PULSE ON A BLACK CARD. Everything in it crosses, and the reason is
+    # the one this file keeps repeating: §63 IS in this list, so §63 §19 states
+    # the card's two inks, "Your Next Call" at h4 and the time's compact
+    # strong — and leaving §79 out would ship all of that with no rule under
+    # the heading, no grid under the portrait and no hue on the three Quick
+    # Action marks. §75 and §77's entries make the same argument; this is the
+    # third layer in a row to convert a block onto `.dark-card` and the third
+    # time the type would strand.
+    # WHAT A HAND-AUTHORED PAGE GETS IS THE WHOLE THING, because none of it
+    # needs a pass. The card is a `.sec` with two children, the rule is a
+    # `border-top`, and the portrait-sized-by-its-text is a three-track grid —
+    # the `.rec-l` technique §75 already ships, one component along. There is
+    # no `placeDark` involvement: `.dark-card` is deliberately NOT in ai5's
+    # `DARK_CARD` list, which is what stops the band hoisting it.
+    '79-pulsedark.css',
+    # THE QUIZ RESULTS INSIDE §44's RIGHT-HAND COLUMN.
+    # IT CROSSES BECAUSE §44 ALREADY DOES and this is what finally makes that
+    # layer usable from a page with no render passes: the peek's CSS has shipped
+    # here since it was written with `tn-agent-portal.html` as its only caller,
+    # and what a second portal had to invent for itself was everything that goes
+    # INSIDE the column. Five blocks, all of them generic — a marked lede, two
+    # titled lists, a centred chart and a row of derived findings — and none of
+    # them needs a class §44 does not already provide as their host.
+    # SAME ORPHAN ARGUMENT AS §75, §77, §78 AND §79: §63 IS in this list, so
+    # §63 §19 states the lede's size, the two group headings' hues, the list's
+    # ink, the row's three tiers and the footer's blue. Without this layer the
+    # output carries all of that with no stack, no marker indent, no chip and no
+    # pinned footer row under it.
+    # THE PASS DOES NOT CROSS AND CANNOT. `quizPeek` reads `SCORES`, `S.stage`
+    # and `f.track` — portal state, so it fails the `dsTypeSummary` test at the
+    # head of this file. A hand-authored page writes its own `<aside class=peek>`
+    # and its own rows; `gallery.html` is where that recipe belongs.
+    '80-quizpeek.css',
 ]
 
 # ==========================================================================

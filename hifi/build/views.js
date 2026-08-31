@@ -22,7 +22,7 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    so the stage picker and `portal` are deliberately independent: switching
    stage returns you to the candidate (see setStage), and switching portal
    leaves the stage untouched so you come back to where you were. */
-const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
   /* EVERY DISCLOSURE IS CLOSED UNTIL IT IS OPENED, AND THEY ARE KEYED BY NAME.
      "What the interview found" starts closed because it is the longest block
@@ -42,7 +42,23 @@ const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:nu
      over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
      which no interview has happened, so both start empty. */
   scenes:{level:null, re:null}, scPick:{level:[], re:[]},
-  cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true}]};
+  /* THREE SAVED CARDS (Maryam, 31 Aug 2026), AND TWO OF THE THREE ARE READ OFF
+     THE LEDGER RATHER THAN INVENTED. `V.billing`'s table pays the August rows
+     on Visa 4242 and the February E2 charge on Mastercard 8210, so the second
+     card here IS the card that bought the last track — a saved-cards list whose
+     entries appear nowhere in the history above it is two unrelated blocks on
+     one page. The Amex is the one addition with no row behind it, which is
+     correct: a card on file you have not spent on yet is the ordinary case, and
+     it is what gives the list a third brand mark.
+
+     THIS PUTS THE PAGE AT ITS OWN CAP ON FIRST LOAD, which is a real
+     consequence and not an oversight. `V.billing` hides "Add a card" at three
+     and prints "Three cards is the maximum" instead, so the default state of
+     the page is now the full list with the ceiling stated. That is the cap
+     working; raising it is a separate decision. */
+  cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true},
+         {brand:'Mastercard',last:'8210',exp:'04/28'},
+         {brand:'Amex',last:'1005',exp:'11/27'}]};
 const isLead = () => S.portal === 'leader';
 ;
 const lvlName = c => 'Explorer – ' + c;
@@ -591,7 +607,7 @@ function chRow(i,f){
   const n=i+1, name=CH[i][0], mins=CH[i][1];
   let state='', meta='';
   if(i < f.done){ state='done'; meta=`${mins} min · ${SCORE[i]}% assessment`; }
-  else if(i === f.open && f.enrolled){ state='open'; meta = S.stage==='day34'&&i===3 ? '12 of 70 min · 4 opens' : `Started · ${mins} min`; }
+  else if(i === f.open && f.enrolled){ state='open'; meta = isDay34(S.stage)&&i===3 ? '12 of 70 min · 4 opens' : `Started · ${mins} min`; }
   else if(OPEN_DATES[i] && f.week < i){ state='locked'; meta='Opens '+OPEN_DATES[i]; }
   else { state=''; meta='Not started · '+mins+' min'; }
   const flag = GROWTH.includes(i) ? 'Your growth area' : '';
@@ -641,7 +657,7 @@ const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip
 
 function wChapter(i){
   const g = GAME[S.stage];
-  const done = g && i < g.done, inprog = S.stage==='day34' && i===3;
+  const done = g && i < g.done, inprog = isDay34(S.stage) && i===3;
   return tw(twIc('book') + `Chapter ${i+1} · ${CH[i][0]}`,
     `<span class="tw-row"><span class="tw-bar"><i style="width:${inprog?17:done?100:0}%"></i></span>
      <span class="tw-k">${inprog?'12 of 70':done?CH[i][1]+' of '+CH[i][1]:'0 of '+CH[i][1]} min</span></span>`,
@@ -1122,7 +1138,7 @@ function certCard(f){
 /* progress strip: one percentage, thirteen chapter blocks, three figures */
 function progressStrip(f){
   const pct = Math.round(f.done/13*100);
-  const tasks = S.stage==='week1'?'0 of 3':S.stage==='day34'?'1 of 3':'3 of 3';
+  const tasks = S.stage==='week1'?'0 of 3':isDay34(S.stage)?'1 of 3':'3 of 3';
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
   return `<div class="prog">
     <div class="prog-top">
@@ -1371,7 +1387,7 @@ function pulseLede(f, g, p){
     return `All <b>13 chapters</b> are done &mdash; ${p.figs[0][0]} across ${n} weeks, ${p.figs[2][0]} of the ${WEEK_TARGET} min weekly target. Booking the re-interview is the only thing left.`;
   }
   const i = f.open, mins = CH[i][1];
-  const did = S.stage === 'day34' ? 12 : 0;
+  const did = isDay34(S.stage) ? 12 : 0;
   const wk = g.weeks[g.weeks.length-1] || 0;
   /* THE SECOND CLAUSE COLLAPSES WHEN THE TWO FIGURES ARE THE SAME NUMBER.
      Day 34 has 12 minutes on chapter 4 and 12 minutes on the course this week,
@@ -1388,7 +1404,37 @@ function pulseLede(f, g, p){
   }. Complete chapter ${i+1} to stay on the pace.`;
 }
 
-function pulse(f, g){
+/* THE ENROLLED DASHBOARD IS THE `new` PROTOTYPE'S SHAPE NOW — Maryam, 31 Aug
+   2026. Three functions come out of what was one, and the split is the whole
+   change, so it is worth reading before editing any of them.
+
+   WHAT THE PAGE WAS: the head band, then a WHITE call row as a third band
+   member, then this section — a Tal-marked head row and three columns of
+   figures. What it is: the head band unchanged, then ONE BLACK CARD holding
+   the head row and the next call, then Quick Actions.
+
+   `pulseCard`  the black card — the pulse's own head row, a rule, the call.
+   `pulseQA`    the three columns turned into three Quick Action cards.
+   `pulseCols`  THE THREE COLUMNS, UNCHANGED AND STILL DRAWN. This is the one
+                that matters when reading a diff: Maryam's instruction was "do
+                not lose this UI, I will use this on the details page", so the
+                block is not deleted and not commented out — it is byte-identical
+                to what `pulse` returned and it has a live caller on Course
+                Progress (`V.transcript`), which is the details page for the
+                course. Move that call when the real home is decided; do not
+                leave the function without one, because a component nothing
+                writes is the tell CLAUDE.md warns about and this one is 80
+                lines of it.
+
+   THE CALL ROW LEFT THE BAND, WHICH REVERSES §77'S OWN REASONING. That layer
+   argued `callRow()` should stay white because it is "a `.head-sec` inside the
+   band, and a black card inside the band's own furniture would be a second dark
+   object in a block that already has one, trap 12's neighbourhood". Correct
+   while it WAS a band member — and it is not one any more: the call is inside a
+   page section below the band now, so there is no second dark object in the
+   band and trap 12 is not in play. `callRow()` keeps its other reader
+   (`V.cohort`) and is untouched. */
+function pulseCols(f, g){
   const w = WEEKLY[S.stage] || WEEKLY.week1;
   const p = pacePart(f, g);
 
@@ -1400,7 +1446,7 @@ function pulse(f, g){
   let focus = '';
   if(!f.finished){
     const i = f.open, mins = CH[i][1];
-    const did = S.stage === 'day34' ? 12 : 0;
+    const did = isDay34(S.stage) ? 12 : 0;
     const pct = Math.round(did / mins * 100);
     /* THE TITLE COMES FIRST AND THE CHAPTER LINE UNDER IT — 599:7418's own
        order, and `weekCard`'s inverted. The eyebrow-over-title shape is right
@@ -1497,6 +1543,120 @@ function pulse(f, g){
     ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
     <div class="pulse">${focus}${pace}${stand}</div>
   </div>`;
+}
+
+/* --------------------------------------------------------------------------
+   THE BLACK CARD — the pulse's head row, a rule, and the next call
+
+   578:5966's card, one stage on. `talRec` is the `new` dashboard's "here is the
+   one thing to do next" and this is the enrolled dashboards' answer to the same
+   question: what you are learning, and who you speak to about it.
+
+   THE HEAD ROW IS `aiHead`'S AND IS NOT RE-DRAWN. Same component, same three
+   parts, same order — the sparkle heading, the derived lede, the accent button
+   at the right — so the card and Course Progress cannot disagree about what the
+   pulse says. §79 states what it looks like on a dark ground; §63 §18 states the
+   two inks. What is NOT here is the three columns: they moved to Quick Actions
+   as three routes (`pulseQA`), which is why the head row's own button survives —
+   it is the only way into the chapter left on this page.
+
+   THE CALL BLOCK IS INFORMATION, NOT AN ACTION, AND THAT IS WHY THERE IS NO
+   BUTTON ON IT (Maryam, 31 Aug 2026: "since it is in 2 days so no join button
+   will be there"). §59's argument arrives at the same place from the other
+   direction — urgency is spent only where urgency is real, and a Join on a call
+   two days out is a control that does nothing for two days. `Message Priya`
+   went with it: the row is four facts and the note over it is that they are
+   facts. Messages is a rail root and Priya's thread is one click from it.
+
+   AND THE FIGURE IS `callIn`, NOT `callLeft` — "In 2 days", not "2 days left".
+   The helper's own note is the argument: with no button beside it the figure is
+   not counting down, it is saying when.
+
+   NO CALL ON DAY 90. `f.finished` is the 90 days being over and the weekly call
+   goes with them — the same test `callRow` carried in the band. The card is then
+   the head row alone, with no rule under it, which is correct rather than
+   something to fill.
+   -------------------------------------------------------------------------- */
+function pulseCard(f, g){
+  const p = pacePart(f, g);
+  const act = f.finished
+    ? `<button class="btn btn-p btn-sm noic" data-go="rewards">View more ${I.arrowRight}</button>`
+    : `<button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button>`;
+  const c = f.finished ? null : CALL_ROW.cohort();
+  return `<div class="sec sec-pulse dark-card">
+    ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
+    ${c ? `<div class="pnc">
+      <h3 class="pnc-t">Your Next Call</h3>
+      ${''/* THE PORTRAIT IS A SQUARE SIZED BY THE TEXT BESIDE IT (Maryam, 31 Aug
+             2026: "the profile square will be of the height of the right side
+             content"), and §75's note on `.rec-l` is why the row is a GRID.
+             `width:auto; height:100%; aspect-ratio:1` cannot work in a flex row:
+             flex resolves the main size from the flex base size, and a box whose
+             only content is a `position:absolute` `<img>` contributes zero, so
+             the ratio has nothing to transfer into and the photograph ships at
+             18px — silently, on a card that otherwise looks right. §79 states
+             the three tracks. */}
+      <div class="pnc-row">
+        <span class="pnc-ph"><i>${c.who.i}</i><img src="${c.who.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="pnc-b">
+          <p class="pnc-n">${c.who.n}<span class="pnc-v">${I.checkFilled}</span></p>
+          <p class="pnc-r">${c.role}</p>
+        </div>
+        <span class="pnc-when">${I.time}${callIn(c.when)}</span>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+/* --------------------------------------------------------------------------
+   AND THE THREE COLUMNS BECOME THREE QUICK ACTIONS — Maryam, 31 Aug 2026:
+   "the all three section will be quick action, just like we have on just joined
+   prototype".
+
+   ONE CARD PER COLUMN, AND EACH GOES WHERE THAT COLUMN'S DETAIL LIVES. That is
+   what makes this a move rather than a deletion: Current focus is the open
+   chapter, Your pace is Course Progress — which is also where `pulseCols` now
+   draws in full — and Your standing is Points. Nothing on the dashboard states
+   a figure any more; the dashboard states what to do about it.
+
+   THE HUES ARE THE COLUMNS' OWN, WHICH IS THE CONTINUITY WORTH KEEPING.
+   `pulseCol` writes `--mk-1/2/3` in that order — blue, green, violet — so the
+   three marks are the same three colours in the same three positions they had
+   as columns. §70.6's rule is that a Quick Action's hue is NAMED and not
+   cycled ("a third Quick Action inserted first would silently repaint the other
+   two"), so these are three named classes in §79 rather than an `nth-child`.
+
+   THE DESCRIPTIONS ARE FIGURES AND THEY ARE READ, NOT TYPED. `f.open`, `CH`,
+   `p.figs` and `g.pts` are the same values the columns drew, so a card cannot
+   name a chapter or a total the page below it disagrees with.
+
+   ON DAY 90 THERE ARE TWO, for the same reason the focus column was absent:
+   every chapter is finished and there is nothing to be in the middle of.
+   -------------------------------------------------------------------------- */
+function pulseQA(f, g){
+  const p = pacePart(f, g);
+  const cards = [];
+  /* THE CHAPTER'S TITLE CAME OFF THIS DESCRIPTION (Maryam, 31 Aug 2026). The
+     card is one line of a three-card row and its job is the DECISION — how far
+     in, how long it takes, press the arrow. "Delegation Without Drop-Off" is
+     the heading of the page that arrow opens, and at 34 characters it pushed
+     the two figures onto a second line while the two cards beside it stayed on
+     one. The chapter is still named in full wherever it is the subject rather
+     than the destination: `pulseCol`'s own `.pulse-t` on Course Progress, and
+     Tal's summary in the band directly above this row. */
+  if(!f.finished) cards.push({
+    ic:I.book, hue:'ic-focus', t:'Current focus',
+    d:`Chapter ${f.open+1}, ${CH[f.open][1]} minutes.`,
+    go:`chapter:${f.open}`});
+  cards.push({
+    ic:I.time, hue:'ic-pace', t:'Your pace',
+    d:`${p.figs[0][0]} ${p.figs[0][1].toLowerCase()}, ${p.figs[2][0].toLowerCase()} of target.`,
+    go:'transcript'});
+  cards.push({
+    ic:I.star, hue:'ic-stand', t:'Your standing',
+    d:`${g.pts.toLocaleString()} points at ${RANKS[g.rank-1].n}.`,
+    go:'rewards'});
+  return quickActions(cards);
 }
 
 /* stacked bars: four activity types, Carbon data-viz palette, 2px surface gaps */
@@ -1737,9 +1897,23 @@ const railRoots = () => {
    With history the arrow still means "back", because that is the more
    useful answer when it is available and it is what the arrow means
    everywhere else in the product. */
+/* THE ARROW SAYS "BACK" NOW (Maryam, 31 Aug 2026), and the word is what makes
+   it an accessible name rather than a label bolted to one. `aria-label="Back"`
+   came off both branches: a control with visible text takes that text as its
+   name, and leaving the attribute on would have meant two sources for one
+   string — the failure `bkStamp` exists to stop elsewhere in this file.
+
+   IT IS A `<span>`, NOT A TEXT NODE, because §63 §18 sizes it at 13.5 while
+   the mark beside it is 22. `.ask-top`, `.form-page` and §17's auth card each
+   restyle `.ph-back` and two of them shrink the glyph; a class is what lets
+   §78 hide the word on those without touching the arrow.
+
+   NOT ON THE AUTH SCREENS' OWN BACK. §12.486 already sets `.form-page
+   .ph-back{display:none}`, so the sign-up flow never draws this at all. */
+const bkLabel = `${I.arrowLeft}<span class="ph-back-t">Back</span>`;
 const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
-  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>`
-  : to ? `<button class="ph-back" data-go="${to}" aria-label="Back">${I.arrowLeft}</button>` : '';
+  ? `<button class="ph-back" data-back="1">${bkLabel}</button>`
+  : to ? `<button class="ph-back" data-go="${to}">${bkLabel}</button>` : '';
 /* ==========================================================================
    `sub` IS FACTS, NOT A SENTENCE ABOUT THE PAGE — AND THAT IS A RULE NOW
 
@@ -2535,7 +2709,22 @@ function wingBlock(){
    two tenants now, so the structural half of that gate is a class both wear and
    `.sec-jrn` / `.sec-prog` are left saying only WHICH tenant it is. `placeDark`
    tests the same class — see its note. */
-const progCol = f => `<div class="sec head-sec head-col sec-prog">
+/* `prog-full` IS THE COURSE BEING OVER, AND THE SECTION CARRIES IT RATHER THAN
+   THE STRIP (Maryam, 31 Aug 2026: the strip "should turn green when the course
+   is ended"). §71.1b paints a finished block `--accent`, which is right for
+   five of thirteen and wrong for thirteen of thirteen: at 100% the whole rail
+   is one accent bar and says nothing the "100%" beside it does not.
+
+   THE TEST IS `f.done >= CH.length`, NOT `f.finished` AND NOT THE STAGE.
+   `f.finished` is the ninety DAYS being over, which is a different fact — the
+   `promoted` stage has it true and draws no strip at all — and this is about
+   the CHAPTERS, which is what the blocks are. Reading it off `CH` means a
+   fourteenth chapter cannot leave the rail green a chapter early.
+
+   ON THE SECTION so §71 can key its fills off one class without the strip
+   needing a second one; `progressWing` is shared with the ladder wing and has
+   no business knowing about this. */
+const progCol = f => `<div class="sec head-sec head-col sec-prog${f.done >= CH.length ? ' prog-full' : ''}">
     ${progressWing(f)}
   </div>`;
 
@@ -2605,6 +2794,124 @@ const WEEK_CALL = {when:'in 2 days', session:36};
    written as the cell wants it ("Due now", "Today 4:30 PM") and is left alone. */
 const callLeft = w => !/^in /i.test(w) ? w
   : PLATE_SOON.test(w) ? 'In ' + w.slice(3) : w.slice(3) + ' left';
+
+/* AND THE SAME STRING SAID THE OTHER WAY ROUND — "In 2 days", not "2 days
+   left" (Maryam, 31 Aug 2026, for the pulse card's next-call row).
+
+   THE TWO ARE NOT A STYLE CHOICE, THEY ARE TWO REGISTERS AND THE BUTTON PICKS
+   ONE. `callLeft` is a COUNTDOWN: it sits beside a Join and it is telling you
+   how much of the wait is left, which is why it reserves the "In x" form for
+   inside the day, when the number is small enough to act on. The pulse card
+   has no Join — the call is two days out and there is nothing to press — so
+   the figure is not counting down to anything, it is stating WHEN the thing
+   happens. "2 days left" on a row you cannot act on reads as a deadline you
+   are behind on.
+
+   IT IS TWO LINES RATHER THAN A FLAG ON `callLeft`, because a boolean argument
+   at the call site says nothing about which form you get and this way the name
+   does. Both read the same `when` string, so a call moved by editing that one
+   string still moves on every surface. */
+const callIn = w => /^in /i.test(w) ? 'In ' + w.slice(3) : w;
+
+/* ==========================================================================
+   A JOIN OPENS AT THE TIME OF THE CALL — Maryam, 31 Aug 2026
+   "Disable the join call button and enable it at time of the call."
+
+   `PLATE_SOON` CANNOT ANSWER THIS AND THAT IS THE WHOLE OF WHY THESE EXIST.
+   That pattern is the vocabulary of INSIDE THE DAY — its first two words are
+   `now` and `today` — because the question it answers is §59's: is this
+   appointment urgent enough for the loudest object the product draws. A call at
+   4:30 this afternoon is emphatically "today" and emphatically not something you
+   can join at 9am. Two different questions about one string, so two patterns:
+   `PLATE_SOON` for the volume, `JOIN_NOW` for the door.
+
+   THE WINDOW IS FIVE MINUTES BEFORE UNTIL THE SESSION ENDS, which is the
+   convention every video product this prototype is standing in for uses. Before
+   it the button is `disabled` — not hidden: §76's chevrons settle that argument
+   ("a control that can never do anything" is the one §60 refuses; one that
+   "cannot do anything FROM HERE" is a bounded range, and the card's own
+   `.dc-when` says when the range starts).
+
+   THE CLOCK IS REAL, WHICH MAKES THE DEMO DEPEND ON THE TIME OF DAY. That is
+   the honest reading of the ask and it is worth saying out loud: on the leader's
+   dashboard `LEAD_SESSIONS.s3.when` is `'Today 4:30 PM'`, so the button is live
+   between 16:25 and 17:15 and disabled the rest of the day. To see the open
+   state at any hour, edit that ONE string into `JOIN_NOW`'s vocabulary — "in 5
+   minutes" or "now" — the same lever `WEEK_CALL.when` gives the cohort call.
+
+   `Date`-PARSED RATHER THAN `Date.parse`d. "Today 4:30 PM" is not a date string
+   any parser accepts, and the day is the word `Today` rather than a number, so
+   the hour and minute are read out of the string and stamped onto today's date.
+   Anything else — "Tomorrow 11:00 AM", "Nov 21, 6:30 PM" — returns null and the
+   door stays shut, which is correct for both and is why this does not try to
+   parse them: a prototype that got "Nov 21" wrong by a year would silently open
+   a call that has not been booked yet. */
+const JOIN_NOW = /\b(now|starting|imminent|in \d+ ?(m|min|mins|minute|minutes)\b)/i;
+const JOIN_EARLY = 5;   /* minutes you may arrive before the hour */
+
+const joinClock = (w) => {
+  const m = /\btoday\b[,\s]+(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i.exec(String(w || ''));
+  if(!m) return null;
+  let h = +m[1] % 12;
+  if(/p/i.test(m[3])) h += 12;
+  const d = new Date();
+  d.setHours(h, +m[2], 0, 0);
+  return d.getTime();
+};
+
+/* THE ONE PREDICATE, and both the render and the timer below read it — so a
+   button armed by the clock and a button drawn by a render cannot disagree. */
+function joinLive(when, mins){
+  if(JOIN_NOW.test(String(when || ''))) return true;
+  const t = joinClock(when);
+  if(t === null) return false;
+  const now = Date.now();
+  return now >= t - JOIN_EARLY * 60000 && now <= t + (mins || 45) * 60000;
+}
+
+/* AND IT ARMS ITSELF WHILE THE PAGE IS OPEN, WITHOUT A RENDER. `render()`
+   replaces `device.innerHTML`, which resets the scroller and restarts every
+   entrance animation (§65's own note records the first of those costing a round
+   trip), so a page left open at 4:29 must not be repainted whole at 4:30 to
+   learn one attribute. This is `callTick`'s pattern exactly: find the elements
+   fresh, write the one thing that changed, and derive it from the CLOCK rather
+   than from a counter — so a tick that arrives late in a background tab (trap
+   17) simply arrives with the right answer.
+
+   NOT STATE, WHICH IS WHY TRAP 9 IS NOT IN PLAY. `disabled` here is a pure
+   function of `Date.now()` and the button's own `data-joinwhen`, so the next
+   render recomputes exactly what the timer wrote. That is the test trap 9 sets:
+   a class a handler puts on a button to REMEMBER something is gone at the next
+   paint; a value both sides derive is not remembered anywhere. */
+function joinArm(){
+  const btns = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('[data-joinwhen]') : [];
+  btns.forEach(b => {
+    const live = joinLive(b.dataset.joinwhen, +b.dataset.joinmins || 45);
+    if(live === !b.disabled) return;
+    b.disabled = !live;
+    if(live) b.removeAttribute('title');
+    else b.title = joinShut(b.dataset.joinwhen);
+  });
+}
+/* THE DISABLED BUTTON SAYS WHEN IT OPENS, and it says it in a `title` rather
+   than in its label: the label is one or two words by §56's rule and "Join call
+   (opens 4:25 PM)" is a sentence on a 185px button. The card's heading row
+   already prints the time as a fact — this is the same fact answering the
+   question the pointer is asking. */
+const joinShut = (w) => {
+  const t = joinClock(w);
+  if(t === null) return 'Opens when the call starts';
+  const d = new Date(t - JOIN_EARLY * 60000);
+  const h = d.getHours() % 12 || 12;
+  return `You can join from ${h}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`;
+};
+/* 20 SECONDS, AND THE INTERVAL IS THE CHEAP HALF OF THIS. It is one
+   `querySelectorAll` against a selector nothing on 197 of the product's screens
+   writes, and it does nothing at all unless a gated button is on screen — so
+   the alternative (a `setTimeout` armed and cleared on every render, which is
+   every interaction) would be more machinery for a worse guarantee. */
+setInterval(joinArm, 20000);
 
 /* ==========================================================================
    ONE ROW FOR ALL THREE CALLS — Maryam, 31 Aug 2026
@@ -2720,11 +3027,50 @@ const CALL_ROW = {
    TWO FLAGS RATHER THAN ONE, because they are two decisions: one is about where
    the time is drawn and one is about whether Reschedule exists. A single `bare`
    would make the next caller take both to get either. */
+/* AND THE FIRST ARGUMENT MAY BE THE ROW ITSELF — Maryam, 31 Aug 2026, for the
+   cohort leader's dashboard.
+
+   `CALL_ROW`'s own note says "a fourth appointment is a fourth row and no
+   markup", and the leader's next interview is exactly that fourth appointment —
+   but the row cannot live in `CALL_ROW`, because every fact on it is `lead.js`'s
+   (`lnext()`, `LEAD_SESSIONS`) and this file is parsed FIRST. §69 records the
+   direction that has to hold: `COHORT_LEAD` is here and `LEADER` reads it, not
+   the other way round. So the leader's portal states its own record and hands it
+   over, which is the same relationship `bkAgent` has with this function one file
+   later.
+
+   THREE FIELDS ARE OPTIONAL AND ALL THREE DEFAULT TO THE CANDIDATE'S ROW, so
+   the four existing call sites emit byte-identical markup:
+
+     `xl`    the third line's lead-in, default `Expertise:`. The leader's third
+             line is the APPOINTMENT ("45 minutes, recorded · you sign the level
+             afterwards"), not a claim about the person, and "Expertise: 45
+             minutes" is the row lying about its own content. `''` prints none.
+     `v`     the verified tick, default on. A talent agent is a checked identity
+             — §75's note on `.rec-v` is the argument for what that mark MEANS —
+             and the person on the leader's card is a candidate who has not been
+             interviewed yet. A tick beside their name would be the product
+             vouching for somebody it has not assessed.
+     `kind`  the `data-call`, default absent. `callOpen` builds the candidate's
+             own interview (`bkAgent`, `callMe`), so pointing the leader's Join
+             at it would open Priya's face on Priya's screen. The leader's four
+             Joins have always been unwired (see §60's note) and this one stays
+             that way — what changed is that it is no longer live at 9am.
+
+   `o.gate` IS OPT-IN, AND THE THREE CANDIDATE CALL SITES DELIBERATELY DO NOT
+   TAKE IT. Their Joins are the prototype's way into `callScreen` — five buttons,
+   one surface, and the walkthrough is the point; gating them by the clock would
+   turn the product's own demo off for twenty-three hours a day. The gate belongs
+   where a Join is a real appointment's door, and today that is one card. */
 function crow(kind, o){
-  const c = (CALL_ROW[kind] || CALL_ROW.cohort)();
+  const c = typeof kind === 'object' && kind ? kind : (CALL_ROW[kind] || CALL_ROW.cohort)();
   const p = c.who;
   const soon = PLATE_SOON.test(c.when);
   o = o || {};
+  const xl = c.xl === undefined ? 'Expertise:' : c.xl;
+  /* the gate reads the row's own `when`, so the button and the card's heading
+     row are two readings of one string (`bkStamp`'s rule) */
+  const gate = o.gate ? !joinLive(c.when, c.mins) : false;
   return `<div class="crow${soon ? ' urgent' : ''}">
       ${o.when === false ? '' : `<div class="crow-when">
         <b>${callLeft(c.when)}</b>
@@ -2734,14 +3080,16 @@ function crow(kind, o){
         <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
-            <span class="crow-v">${I.checkFilled}</span></p>
+            ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
           <p class="crow-role">${c.role}</p>
-          <p class="crow-x"><b>Expertise:</b> ${c.x}</p>
+          <p class="crow-x">${xl ? `<b>${xl}</b> ` : ''}${c.x}</p>
         </div>
       </div>
       <div class="crow-a">
         ${o.second === false ? '' : `<button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>`}
-        <button class="btn btn-p btn-sm noic" data-call="${c.kind}">Join call ${I.arrowRight}</button>
+        <button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+          o.gate ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
+          gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>
       </div>
     </div>`;
 }
@@ -2913,6 +3261,16 @@ const REC = {
    a dataset value on the card; it is read back out of `S` on every paint and
    the card is a pure function of it. */
 S.recKey = 'priya';
+/* WHICH MONTH THE BOOKING CALENDAR IS SHOWING — 0 or 1 into `AGENT_CAL`
+   (`V.agent`). State rather than a class, per trap 9: paging the month redraws
+   42 cells, so it cannot survive as a DOM mutation the next `render()` wipes. */
+S.bkMo = 0;
+/* AND WHICH TIME IS CHOSEN — an index into `V.agent`'s `slots`. State for the
+   same reason `S.bkMo` is (trap 9), and for one more: the mark at the end of
+   each row is a GLYPH, so which row is filled is decided at render rather than
+   by a class the generic `.slot` handler moves. A handler that only moved `.on`
+   would tint the new row and leave the filled dot on the old one. */
+S.bkSlot = 4;
 S.recBusy = false;
 const recKey = () => REC_ORDER.includes(S.recKey) ? S.recKey : REC_ORDER[0];
 
@@ -3019,10 +3377,14 @@ function recSkeleton(){
             <span class="sk sk-n"></span>
             <span class="sk sk-rt"></span>
           </div>
-          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
           <div class="rec-ov">
             <p class="rec-tags"><span class="sk sk-t sk-why"></span></p>
           </div>
+          ${''/* THE THREE FACT BARS MOVED WITH THE ROW THEY STAND IN FOR. A
+                skeleton is only worth having while every bar is the BOX of the
+                thing it replaces, so an order it no longer shares is the same
+                failure as a width it no longer shares. */}
+          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
         </div>
       </div>
       <div class="rec-a">
@@ -3033,7 +3395,18 @@ function recSkeleton(){
   </div>`;
 }
 
-function talRec(){
+/* THE HEADING IS A PARAMETER, AND THERE ARE TWO CALLERS NOW (Maryam, 31 Aug
+   2026: "the only thing update here is the heading which will be 'Your Next
+   Step - Re-interview'"). `new` asks for the interview that sets a level and
+   `day90` for the re-interview that moves it, and everything else about the
+   block is identical — same roster, same `recKey`, same swap, same skeleton.
+   A second function would have been two copies of forty lines differing by one
+   string, which is the duplication `enrolPlate`/`enrolOffer` were only allowed
+   because those two draw genuinely different shapes.
+
+   THE DEFAULT KEEPS THE `new` CALL SITE WRITING `talRec()`, so that page's
+   markup is byte-identical to what it emitted before. */
+function talRec(title){
   if(S.recBusy) return recSkeleton();
   const a = AGENTS[recKey()];
   const rec = REC[recKey()];
@@ -3070,7 +3443,7 @@ function talRec(){
           box rather than as a rule. */}
     <div class="dc-hd">
       <div class="dc-hd-r">
-        <h2 class="dc-t">Your Next Step - Interview</h2>
+        <h2 class="dc-t">${title || 'Your Next Step - Interview'}</h2>
         <button class="btn btn-s btn-sm noic dc-act" data-go="agents">View all agents ${I.arrowRight}</button>
       </div>
       <span class="ai-label bare rec-lab">Tal recommends</span>
@@ -3110,16 +3483,6 @@ function talRec(){
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          ${''/* THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
-                581:6479 is the one number on this block that contradicts the
-                product: the record says $95, and so do the Agents page, the
-                agent profile and the booking flow. A file's placeholder does
-                not get to be the fourth price on one journey, so the record
-                wins and the file's wording keeps it. Change `AGENTS.priya` if
-                $120 is the real fee and all four surfaces move together. */}
-          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
-            <span>${I.video}${rec.mins}</span>
-            <span>${I.calendar}Next slot: ${a.slot}</span></p>
           ${''/* THE TWO TAGS BECOME ONE SENTENCE — 581:6535 (Maryam, 31 Aug
                 2026). The pair was "Your need: System Design" and "Priya's
                 Strength: Architecture", two pills side by side, and the reader
@@ -3163,6 +3526,30 @@ function talRec(){
           <div class="rec-ov">
             <p class="rec-why">${first}&rsquo;s ${rec.strength} strength perfectly matches your need for ${rec.need}.</p>
           </div>
+          ${''/* THE FACT ROW CLOSES THE COLUMN (Maryam, 31 Aug 2026: "take the
+                fee row at the end of the priya content"). It sat between the
+                rating and the claim, which put the block's three KINDS in the
+                wrong order: who she is, then what she costs, then why her — so
+                the sentence the whole card exists to deliver was separated from
+                the name it is about by three figures. Last, the column reads
+                identity → claim → terms, and the terms sit directly above the
+                Book button that acts on them.
+
+                IT IS THE SAME ROW AND THE SAME RULES. `.rec-f` is a wrapping
+                flex row (§70.5) and its position in a `column` flex is markup
+                only, so nothing in §70 or §63 moves with it — which is also why
+                `V.agent`'s copy needed no change: that block has no claim
+                sentence, so the row was already its last child.
+                THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
+                581:6479 is the one number on this block that contradicts the
+                product: the record says $95, and so do the Agents page, the
+                agent profile and the booking flow. A file's placeholder does
+                not get to be the fourth price on one journey, so the record
+                wins and the file's wording keeps it. Change `AGENTS.priya` if
+                $120 is the real fee and all four surfaces move together. */}
+          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+            <span>${I.video}${rec.mins}</span>
+            <span>${I.calendar}Next slot: ${a.slot}</span></p>
         </div>
       </div>
       ${''/* ONE BUTTON AGAIN, AND IT IS NOT THE ONE THAT WAS HERE FIRST.
@@ -3232,19 +3619,36 @@ function talRec(){
    because the sentence was a DIRECT child. §70.6 restates the opt-out on
    `.sec-qa` itself, inside the same container query per trap 3. Removing
    content loses an opt-out exactly as adding a wrapper does. */
-const quickActions = () => `<div class="sec sec-qa">
+/* IT TAKES A LIST NOW, AND `QA_NEW` IS WHAT IT USED TO HAVE HARD-CODED. The
+   enrolled dashboards draw three of these (`pulseQA`), so the block is a
+   function of its cards rather than of one page. The default keeps every
+   existing call site — `V.dashboard`'s `new` branch — writing `quickActions()`
+   with no argument and getting exactly the two cards it had.
+
+   A CARD IS `{ic, hue, t, d}` PLUS ONE OF `go` / `ask` / `peek`, and the three
+   are exclusive on purpose: `data-go` navigates, `data-tal-ask` opens the
+   thread, `data-peek` opens the right-hand column, and a button carrying two
+   would do whichever the delegated handler reached first. `hue` is a NAMED class per §70.6 — never an index — so inserting a card
+   at the front cannot repaint the others. */
+const QA_NEW = [
+  /* `peek`, NOT `go`. Opening the breakdown as a right-hand column keeps the
+     dashboard on screen beside it, which is §44's whole argument and is what
+     Maryam's frame draws. `V.result` is still the full page and still reachable
+     from `SUMDROP.quiz` and the microsite; this is the summary read in place. */
+  {ic:I.trophy,    hue:'ic-quiz', t:'Open Quiz Results',
+   d:'Review your score and quiz performance.', peek:'quiz'},
+  {ic:I.lightning, hue:'ic-prep', t:'Quick-Start Preparation',
+   d:'Ask Tal to prepare you for the interview.', ask:'Prepare me for my level interview'}
+];
+const quickActions = (cards) => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
-  <div class="qa">
-    <button class="qa-c" data-go="result">
-      <span class="qa-ic ic-quiz">${I.trophy}</span>
-      <span class="qa-b"><b>Open Quiz Results</b><span>Review your score and quiz performance.</span></span>
+  <div class="qa">${(cards || QA_NEW).map(c => `
+    <button class="qa-c" ${c.ask ? `data-tal-ask="${c.ask}"`
+      : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}>
+      <span class="qa-ic ${c.hue}">${c.ic}</span>
+      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
       <span class="qa-go">${I.arrowRight}</span>
-    </button>
-    <button class="qa-c" data-tal-ask="Prepare me for my level interview">
-      <span class="qa-ic ic-prep">${I.lightning}</span>
-      <span class="qa-b"><b>Quick-Start Preparation</b><span>Ask Tal to prepare you for the interview.</span></span>
-      <span class="qa-go">${I.arrowRight}</span>
-    </button>
+    </button>`).join('')}
   </div>
 </div>`;
 
@@ -4030,7 +4434,7 @@ V.dashboard = (f) => {
 
   else { /* enrolled: week1, day34, day90 */
     const g = GAME[S.stage];
-    const stalling = S.stage==='day34';
+    const stalling = isDay34(S.stage);
     const dueRe = S.stage==='day90';
     /* THE ONE REQUIRED ACTION GOES ABOVE THE READING.
        On day 90 the re-interview is the only thing on this page that has a
@@ -4066,11 +4470,16 @@ V.dashboard = (f) => {
           is the long version. In the DOM they end up THIRD and FOURTH, because
           `talFirst` hoists Tal's card to sit directly under the header. */}
     ${progCol(f)}
-    ${''/* NO CALL ON DAY 90. `f.finished` is the 90 days being over, and the
-          weekly call goes with them — the same test the plate this replaces
-          carried. The band is then two columns and no third row, which is
-          correct rather than something to fill. */}
-    ${f.finished?'':callRow(f)}
+    ${''/* THE CALL LEFT THE BAND (Maryam, 31 Aug 2026). `callRow(f)` stood here
+          as a third band member spanning both columns — a white row with the
+          countdown in a tinted cell and two buttons. It is inside `pulseCard`
+          now, under the pulse's own head row and a hairline, with no buttons on
+          it. So the band is the two columns the file draws and nothing else,
+          which is what "the first row is fine, do not change it" means.
+
+          `callRow()` ITSELF IS UNTOUCHED AND STILL HAS A READER — `V.cohort`
+          draws it. This is one of its two call sites going away, not the
+          component. */}
     ${reBook}
     ${''/* THE WING LEFT THIS CARD — §71. `wingBlock()` sat here in a `.stp-wing`
           and drew the progress strip as the last member of the band's LEFT
@@ -4088,12 +4497,16 @@ V.dashboard = (f) => {
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
       </div>
     </div>
-    ${''/* THE THREE SECTIONS THAT USED TO BE HERE ARE ONE — see the note over
-          `pulse`. "This week", "Time on the course" and "Where you stand" were
-          three headings and three panels asking one question; they are three
-          COLUMNS of one section now, in the order the question is asked. The
-          thirteen-week chart went with the merge and is on Course Progress. */}
-    ${g?pulse(f,g):''}
+    ${''/* THE BLACK CARD AND THEN QUICK ACTIONS — the `new` prototype's shape,
+          one stage on (Maryam, 31 Aug 2026). See the note over `pulseCols`.
+
+          "This week", "Time on the course" and "Where you stand" were three
+          sections, then three columns of one section, and are now three Quick
+          Action cards pointing at the pages that hold them. The columns
+          themselves are not lost: `pulseCols` draws them in full on Course
+          Progress. The thirteen-week chart is already there. */}
+    ${g?pulseCard(f,g):''}
+    ${g?pulseQA(f,g):''}
 `;
   }
   return `<main class="main"><div class="page">${body}</div></main>`;
@@ -4330,6 +4743,162 @@ function qzChapter(band){
    two different surfaces reached from two different pages, so one function is
    still what stops the quiz being sat on two dates. It stays keyed on
    `S.stage` because `consult` is genuinely a different candidate's timeline. */
+/* ==========================================================================
+   A QUICK ACTION OPENS THE PEEK — `quizPeek`, and §80 draws it
+   Maryam, 31 Aug 2026, with the frame: "when click on a quick action this is
+   how i want to convert the ui."
+
+   IT IS THE PEEK, NOT A NEW PANEL, and that is the whole of the structural
+   decision. §44 is a right-hand column that TAKES space rather than covering
+   it — in flow as a third child of `.shell-body`, so the page genuinely
+   narrows and both halves stay at full contrast — and its own head note argues
+   at length why that is not `.notif` (absolute over the page, plus a scrim, so
+   what you are comparing against is dimmed). A quiz breakdown read beside the
+   dashboard it was opened from is exactly the case it was built for.
+
+   IT WAS ALSO A FAMILY NOTHING IN `hifi/` WROTE. §44 ships in the design system
+   and `tn-agent-portal.html` is its only caller, which is CLAUDE.md's "gate
+   nothing writes" tell — the CSS was live in both builds with no markup in the
+   portal to draw it. This is the portal's first caller, and it needed no new
+   class: `.peek` / `.peek-h` / `.peek-t` / `.peek-x` / `.peek-b` / `.peek-f`
+   are that layer's, and the shape is the agent portal's `peekPanel` verbatim.
+
+   `S.peek` HOLDS A KEY, NOT A BOOLEAN. Two Quick Actions on this page and more
+   on the enrolled dashboards, so the panel has to know WHICH card opened it —
+   the same reasoning §65 records for `S.disc` after `S.found` was one flag
+   ("true of those two, and false the moment a third exists"). It is truthy
+   either way, so `OVERLAYS` picks it up and §44's `[data-shown~="peek"]` rules
+   fire without knowing about the key.
+
+   `V.result` IS UNTOUCHED AND STAYS REACHABLE. The panel is a summary read
+   beside the page you were on; the full breakdown is still its own view, and
+   `SUMDROP.quiz` and the NIL microsite still open it. Nothing here restates a
+   figure either page owns — every number is `SCORES`.
+   ========================================================================== */
+
+/* WHICH RUNG A BAND IS WORTH, AND IT IS DERIVED, NOT WRITTEN.
+   Maryam, 31 Aug 2026: "we will only show which level could improve there
+   lackings. so show the levels in places of the chapters."
+
+   THE MAP THIS REPLACES WAS `QZ_CH`, band to chapter, and `QZ_CH` STAYS —
+   `V.result` still draws it and `signedSummary` still has to agree with it.
+   What changed is what the PANEL says: a chapter is what the course does about
+   a weakness, and the question the panel is answering is what the weakness is
+   costing you, which on this product is measured in rungs.
+
+   THERE IS NO BAND-TO-LEVEL TABLE IN THE BUILD AND ONE MUST NOT BE INVENTED
+   (§74's rule). So the rung is the band's own score placed on the five rungs of
+   the candidate's own TRACK — `trackBand`'s arithmetic, `ti * 5` plus the
+   quintile — which introduces no data at all: a 38 is in the second fifth of
+   the scale on any track, and the track is `f.track`.
+
+   AND IT IS PHRASED AS WHAT THE BAND *READS* AT, NEVER AS YOUR LEVEL. `V.level`
+   spends a note establishing that a quiz cannot set a level and that the agent
+   decides it from the interview; five rungs printed in a panel would contradict
+   that outright if they were labelled as the level. "Reads at E2" is a
+   statement about the band. The footer is the sentence that resolves it. */
+const qzRung = (v, track) => {
+  const T = ['Explorer','Builder','Trailblazer'];
+  const lo = Math.max(0, T.indexOf(track || 'Explorer')) * 5;
+  const fifth = Math.min(5, Math.max(1, Math.ceil(v / 20)));
+  return LVL_CODES[lo + fifth - 1];
+};
+
+/* THE LEDE IS DERIVED FROM `SCORES` AND ENDS ON THE LADDER, not on the course.
+   Its last clause used to be "and both have a chapter on the course", which was
+   true of the chapter version of the block below it and is a different promise
+   from the one the rungs make. Highest and lowest are read off the same sorted
+   list the rows are, so the sentence cannot name a band the rows do not. */
+function qzLede(f){
+  const asc = SCORES.slice().sort((a,b) => a[1] - b[1]);
+  const low = asc[0], high = asc[asc.length - 1];
+  return `<b>${high[0]}</b> at ${high[1]} is your strongest band, `
+    + `${low[0].toLowerCase()} at ${low[1]} your weakest. An agent pushes hardest on `
+    + `the two lowest, and both are holding you a rung below the rest of you.`;
+}
+
+/* A LIST OF PHRASES IS NUMBERED, and the two headings are the two colours §12
+   already names for this pair — green for what holds, the accent for what does
+   not. §80 draws them; §63 §19 states their type. */
+const qzList = (title, hue, items) => `<div class="qzp-g">
+  <div class="qzp-t ${hue}">${title}</div>
+  <ol class="qzp-l">${items.map(t => `<li>${t}</li>`).join('')}</ol>
+</div>`;
+
+function quizPeek(f){
+  const asc = SCORES.slice().sort((a,b) => a[1] - b[1]);
+  const impact = asc.slice(0, 2).map(r => r[0]);
+  /* THE ROWS ARE THE TWO LOWEST, IN THE SAME ORDER `qzLow` GIVES THEM, so the
+     panel and `PAGESUM.result` cannot name a different pair. `High impact` is
+     the tag on both because that is what being in the bottom two IS on this
+     page — it is derived, not assigned per row. */
+  const rows = asc.slice(0, 2).map(([band, v]) => `
+    <button class="qzp-r" data-go="level">
+      <span class="qzp-r-ic">${I.group}</span>
+      <span class="qzp-r-b">
+        <span class="qzp-r-k">${band} &middot; ${v}</span>
+        <span class="qzp-r-v">Reads at ${qzRung(v, f.track)} on the ${f.track || 'Explorer'} track</span>
+        <span class="qzp-r-tag">High impact</span>
+      </span>
+      <span class="qzp-r-go">${I.chevRight}</span>
+    </button>`).join('');
+
+  return `<aside class="peek peek-qz" aria-label="Your quiz results">
+    <div class="peek-h">
+      ${''/* NO DESCRIPTION UNDER THE TITLE (Maryam, 31 Aug 2026). §44's
+             `.peek-t > small` is a second line explaining what the panel is,
+             which the agent portal's preview genuinely needs — "What a candidate
+             sees in browse" is the whole of why that column exists. This panel's
+             title is its own explanation, and the date said "From the quiz you
+             sat 12 Aug" directly above a sentence that starts by naming two of
+             that quiz's scores. `qzTaken` keeps its two readers and is not
+             called from here any more. */}
+      <span class="peek-t">Your Quiz Results</span>
+      <button class="peek-x" data-peek="" aria-label="Close the quiz results">${I.close}</button>
+    </div>
+    <div class="peek-b">
+      ${''/* TAL'S MARK AND NOT `.ai-label` OR `.ai-aura` — §72 records this trap
+             at length. `talFirst` hoists any `.sec` containing an `.ai-aura` to
+             under the `.ph` and `placeBand`'s `_mhIsTal` claims either class as
+             head furniture; the peek is outside `.page` so neither pass can
+             reach it today, which is exactly the accident not to depend on.
+
+             AND IT HOLDS NO GLYPH. §70 draws the sparkle by MASKING a gradient
+             — `--ai-star` is a data-URI of the shape, not a colour — so the
+             mark is an empty box that §80.2 paints, the way `.aih-mk` is.
+             `fill:var(--ai-star)` was the first version and painted nothing:
+             it set `fill` to a URL. */}
+      <p class="qzp-lede"><span class="qzp-mk" aria-hidden="true"></span>${qzLede(f)}</p>
+      ${qzList('What you do well', 'ok', QZ_STR)}
+      ${qzList('Where you lose ground', 'acc', QZ_DEV)}
+      <div class="qzp-rose">${quizRose(SCORES, 64, true)}</div>
+      <div class="qzp-g">
+        <div class="qzp-t">Where this puts you on the ladder</div>
+        <div class="qzp-rows">${rows}</div>
+      </div>
+    </div>
+    ${''/* THE FOOTER IS THE ONE THING TO DO ABOUT ALL OF IT (Maryam, 31 Aug
+           2026: add "Book your interview today" with an arrow). It goes to
+           `agents` rather than to Priya: the panel is about five bands and two
+           weaknesses, and the page's own CTA a column to the left is already
+           the one that books the agent Tal picked. It is also the sentence that
+           settles the rungs above it — the interview is what sets a level, and
+           this is the control that starts one. */}
+    <div class="peek-f">
+      <button class="qzp-cta" data-go="agents">Book your interview today${I.arrowRight}</button>
+    </div>
+  </aside>`;
+}
+
+/* ONE DISPATCHER, KEYED THE WAY `S.peek` IS. A second panel is a case here and
+   a `peek:'<key>'` on a card — no change to `quickActions`, to the router or to
+   §44. An unknown key draws nothing rather than an empty panel, so a stale key
+   cannot leave a 420px column of white beside the page. */
+function peekPanel(f){
+  if(S.peek === 'quiz') return quizPeek(f);
+  return '';
+}
+
 const qzTaken = (long) => S.stage === 'consult'
   ? (long ? '3 August 2026'  : '3 Aug')
   : (long ? '12 August 2026' : '12 Aug');
@@ -4358,7 +4927,20 @@ const qzTaken = (long) => S.stage === 'consult'
    colour, the type, and that the legend is `.kv` rows rather than a private
    three-column grid.
    -------------------------------------------------------------------------- */
-function quizRose(dims, score){
+/* `bare` DROPS THE LEGEND AND THE CAPTION, AND IT IS A REAL CALLER'S ASK, not
+   a mode kept in reserve. `quizPeek` draws this chart in a 372px column under a
+   sentence that already names the highest and the lowest band, and above two
+   rows that name the two lowest again — so the `.kv` legend is the third
+   printing of the same five numbers on one surface, and the caption is a
+   paragraph about how to read a chart in a panel whose four other blocks are
+   the reading. `V.result` keeps both: that page IS the breakdown, the legend is
+   where its three-word verdicts live, and the caption is what says the
+   interview probes the two shortest.
+
+   IT HIDES NOTHING IN CSS. A `display:none` on the legend inside `.peek` would
+   leave five `.kv` rows in the DOM for a screen reader to read out between the
+   chart and the ladder rows. */
+function quizRose(dims, score, bare){
   const CX = 180, CY = 158, R0 = 36, R = 108, GAP = 1.4;
   const pol = (a,r) => [CX + r * Math.cos(a * Math.PI/180), CY + r * Math.sin(a * Math.PI/180)];
   /* one wedge: out along its first edge, round at its own radius, back in,
@@ -4412,13 +4994,13 @@ function quizRose(dims, score){
       <text x="${CX}" y="${CY+14}" text-anchor="middle" class="qz-mids">of 100</text>
       ${marks}
     </svg>
-    <div class="qz-key">
+    ${bare ? '' : `<div class="qz-key">
       ${dims.map(([k,v]) => { const [cls,word] = qzBand(v);
         return `<div class="kv"><span class="k"><i class="qz-sw ${cls}"></i>${k}</span>
           <span class="v">${v}<span class="tag qz-vd">${word}</span></span></div>`; }).join('')}
     </div>
     <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
-      the interview probes hardest, and what the course spends most of its time on.</p>
+      the interview probes hardest, and what the course spends most of its time on.</p>`}
   </div>`;
 }
 
@@ -4695,23 +5277,57 @@ V.interviews = (f) => {
         control coming off for the same reason: the invite is in the email the
         moment the booking clears.
 
-        AND IT IS THE ROW ALONE — no heading and no legal line (Maryam, 31 Aug
-        2026). "Scheduled" over a single row that already says "6 days left ·
-        Level interview" is the row's own first cell restated as a heading, and
-        the section is the only thing on this part of the page. The 24-hour
-        reschedule window goes with it: the sentence is stated where the money
-        is, on `V.booking` and `V.payment` — which are the two lines `wRefund`
-        (ai8) reads when Tal is asked — and a policy line under a Join button
-        is the "no policy" ban `PAGESUM`'s note lists, applied to page copy.
+        AND IT IS THE BLACK CARD NOW — THE DASHBOARD'S, EXACTLY (Maryam, 31 Aug
+        2026). §77 converted the `booked` dashboard's row to §75's `.dark-card`
+        and its own note argues this page should NOT follow: "the other two sit
+        under section headings on pages about interviews and cohorts, where the
+        row is one item rather than the answer." That reasoning is right about
+        `V.cohort` and weakest exactly here — on the `booked` stage this row is
+        the only thing on the page that has not happened yet, sitting under a
+        section called "Past interviews". It is the answer, and it is the same
+        appointment the dashboard is calling the answer two clicks away.
 
-        WITH NO `.sec-h` THIS NEEDS NO LAYER. §10.15's label column only reaches
-        `.sec:has(> .sec-h)`, so the section is the same shape the `booked`
-        dashboard already draws — `.sec.sec-call` holding the bare row — and the
-        opt-out, the gutter restatement and the heading padding a headed version
-        needed are all moot. That is why the wrapper matches the dashboard's
-        exactly rather than being this page's own. */}
+        THE HEADING CAME BACK AND ITS REMOVAL IS WHAT MADE THAT FINE. This
+        section was headingless on the argument that "Scheduled" over a row
+        already reading "6 days left · Level interview" is the row's first cell
+        restated. §77 moved the countdown OUT of the row and into the card's
+        heading row (`.dc-when`, `crow('iv',{when:false})`), so the cell that
+        made it a repeat no longer exists — and the heading row is structural on
+        a `.dark-card` rather than optional, since a bare countdown floating at
+        the right of an empty row is what the alternative draws. One word, the
+        page's own name for the block, in sentence case.
+
+        `.dc-t` IS NOT `.sec-h`, so §10.15's label column still does not reach
+        this section — the heading is the card's, inside it. The opt-out, the
+        gutter restatement and the heading padding a `.sec-h` would have needed
+        are all still moot.
+
+        RESCHEDULE STAYS, AND §77.3 IS WHERE THE PRICE OF THAT IS WRITTEN. The
+        dashboard drops it (`{second:false}`) because a next-step card has one
+        action; this is the interviews page, which is where a person comes TO
+        reschedule, so dropping it would remove the control from the one page
+        that should carry it. §77 deleted the two rules a quiet button on this
+        card needs and left instructions to restore both — its own border and
+        §63 §17's ink — and both are back, keyed on `:not(.btn-p)` so the
+        dashboard's single-button card is untouched.
+
+        THE COUNTDOWN STRING IS `callLeft(CALL_ROW.iv().when)`, the dashboard's
+        expression verbatim, so the two surfaces cannot disagree about the same
+        appointment — the failure `bkStamp` exists to prevent, answered here the
+        way the note over `bkStamp` says to prefer: derive it, do not stamp it.
+
+        THE LEGAL LINE STAYS OFF. The 24-hour reschedule window is stated where
+        the money is, on `V.booking` and `V.payment` — the two lines `wRefund`
+        (ai8) reads when Tal is asked — and a policy line under a Join button is
+        the "no policy" ban `PAGESUM`'s note lists, applied to page copy. */}
   ${booked?`
-  <div class="sec sec-call">${crow('iv')}</div>`:`
+  <div class="sec sec-call dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">Scheduled</h2>
+        <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+    </div>
+    ${crow('iv', {when:false})}
+  </div>`:`
   ${''/* THE FOUR FACTS ARE THE HEAD OF "HOW IT WORKS", NOT A BAND ABOVE IT.
         They were their own headingless section — a bordered strip of Length,
         Format, Your report, Fee sitting between the past interviews and the
@@ -4942,50 +5558,83 @@ V.agents = (f) => `<main class="main"><div class="page">
 V.agent = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
-  /* THE DAY CARRIES ITS OWN LONG NAME. The strip prints `d` and `n`; the
-     heading over the times prints `long` and the month. One tuple, so the two
-     cannot name different Thursdays — which is the failure `bkStamp` exists to
-     stop six prose mentions of the booking committing. */
-  const days = [['Wed','Wednesday',19],['Thu','Thursday',20],['Fri','Friday',21],
-                ['Mon','Monday',24],['Tue','Tuesday',25]];
-  const dSel = 1;
   /* ------------------------------------------------------------------------
      THE MONTH GRID — Maryam, 31 Aug 2026, with the reference: "the calendar
-     should follow the reference like dates and month look".
+     should follow the reference like dates and month look", then revised the
+     same day: chevrons on both ends of the month row, more open dates, and no
+     dots under the numerals.
 
      THIS REVERSES §76'S OWN REFUSAL AND THE REFUSAL IS WORTH READING BEFORE
      REVERSING IT AGAIN. §76 declined the month on §41's argument — "a chip row
      answers 'which of these do you want' perfectly, which is the candidate's
-     question in the booking flow" — and on the data: this agent has five open
-     days, so a month is 26 cells with no availability behind them. The second
-     half is answered rather than overridden: the 26 are drawn DISABLED, which
-     is the reference's own treatment of its struck-out days and is a true
-     statement about the month rather than an invented one. A month you cannot
-     click 26 days of is a calendar telling you where the five are.
+     question in the booking flow" — and on the data: the agent had five open
+     days, so a month was 26 cells with no availability behind them. The second
+     half is what the revision answers: there are two months of real
+     availability now, so the grid is mostly live and the chevrons have
+     somewhere to go.
 
-     IT IS AUGUST 2026, NOT THE REFERENCE'S AUGUST 2025, and the difference is
-     load-bearing rather than cosmetic. The five open days are Wed 19, Thu 20,
-     Fri 21, Mon 24, Tue 25 — which is August 2026 (Aug 20 2025 is a Wednesday,
-     so the reference's own grid disagrees with its own strip). The weekday of
-     every cell is read off `Date` rather than typed, so the grid cannot say
-     Thursday over a column the strip calls Wednesday.
+     THE ARROWS ARE LIVE, WHICH IS THE ONLY WAY THEY GET TO EXIST. §60's rule is
+     "a dead control on a live surface is worse than a missing one", and the note
+     this replaces refused the pair on exactly that ground — nothing in the build
+     held a second month, so both would have been permanently inert. So the fix
+     was not to draw them, it was to give them somewhere to go: `AGENT_CAL` is
+     two months and the chevrons move between them. AT THE ENDS ONE IS
+     `disabled`, which is a bounded range rather than a dead control — the
+     distinction §60 is drawing is between a control that can never do anything
+     and one that cannot do anything from here.
 
-     THE MONTH NAME IS READ ONCE. `.bks-day` printed "August" as a literal 40px
-     from a heading that would have printed its own; `CAL_MN` is both, so the
-     two cannot name different months.
+     AVAILABILITY IS A LIST OF DAY NUMBERS AND THE WEEKDAY IS NEVER TYPED. This
+     replaced a `days` array of `['Thu','Thursday',20]` tuples, which was five
+     rows of hand-written weekday names that `Date` could contradict — and with
+     the open days going from five to thirty-odd it would have been thirty
+     chances to. `dowLong` reads the name off `Date`, so the heading over the
+     times cannot call a day Thursday that the grid draws under Wednesday.
 
-     THERE ARE NO ‹ › ARROWS AND THAT IS §60'S RULE, not an omission. Nothing in
-     this build holds availability for July or September, so both controls would
-     be permanently dead — "a dead control on a live surface is worse than a
-     missing one". Real month navigation needs a second month of `days`.
+     THE SELECTION IS A MONTH *AND* A DAY, and it is drawn `.on` only while its
+     own month is showing — but the heading over the times keeps naming it
+     whatever is on screen, because that heading states what you have CHOSEN and
+     the grid states what you are LOOKING AT. Thursday 20 August is the day the
+     rest of the build names (`bkStamp`, `PAGESUM.booked`, `CALL_ROW.iv`), so it
+     is the one selected here.
 
-     THE DOT UNDER A DATE IS THE REFERENCE'S AFFORDANCE USED HONESTLY. It draws
-     one under the selected day only; here it marks every day with slots, so the
-     five are findable before you press one, and it is derived from the same
-     `days` array the cells are enabled from. */
-  const CAL_Y = 2026, CAL_M = 7, CAL_MN = 'August';
-  const calOpen = days.map(d => d[2]);
-  const calSel  = days[dSel][2];
+     `S.bkMo` IS STATE, NOT A CLASS — trap 9. `render()` replaces
+     `device.innerHTML`, so which month is on screen cannot live in the DOM; the
+     handler sets the number and the grid is a pure function of it.
+
+     NO DOTS UNDER THE NUMERALS (Maryam, same note). The reference draws one
+     under its selected day and this drew one under every open day, as a way to
+     find the five before pressing one. With most of the month open the dots
+     were a second mark under thirty cells saying what the enabled/disabled
+     contrast already says. `.bkd.day::after` and its `.on` variant are deleted
+     rather than hidden — a pseudo-element nothing draws is the "gate nothing
+     writes" tell. */
+  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MON = ['January','February','March','April','May','June','July','August',
+               'September','October','November','December'];
+  const dowLong = (y,m,d) => DOW[new Date(y,m,d).getDay()];
+  /* WEEKDAYS ONLY, WHICH IS THE ONE CLAIM THIS LIST MAKES BEYOND "more dates".
+     Every slot in the build is a weekday (§41 says so about the agent's own
+     availability page), so a Saturday with times behind it would be the invented
+     data §74 rules out. Derived rather than listed for that reason: the two
+     months are whatever `Date` says their Mon–Fri are, minus a scattering that
+     keeps it reading as one person's diary rather than as a blanket. */
+  const AGENT_CAL = [{y:2026, m:7, skip:[3,4,10,11,18,27]},
+                     {y:2026, m:8, skip:[3,10,17,24]}];
+  const calDays = c => {
+    const last = new Date(c.y, c.m + 1, 0).getDate(), out = [];
+    for(let n = 1; n <= last; n++){
+      const w = new Date(c.y, c.m, n).getDay();
+      if(w && w < 6 && !c.skip.includes(n)) out.push(n);
+    }
+    return out;
+  };
+  const calI = Math.min(Math.max(S.bkMo | 0, 0), AGENT_CAL.length - 1);
+  const CAL = AGENT_CAL[calI];
+  const CAL_Y = CAL.y, CAL_M = CAL.m, CAL_MN = MON[CAL_M];
+  const calOpen = calDays(CAL);
+  const selMo = 0, selD = 20;
+  const selCal = AGENT_CAL[selMo];
+  const calSel = calI === selMo ? selD : -1;
   const calLead = new Date(CAL_Y, CAL_M, 1).getDay();
   const calLast = new Date(CAL_Y, CAL_M + 1, 0).getDate();
   const calPrev = new Date(CAL_Y, CAL_M, 0).getDate();
@@ -4996,9 +5645,27 @@ V.agent = (f) => {
   /* TAKEN AND CHOSEN ARE DATA, so the count under the heading is derived from
      the same array the grid is drawn from. §41's note is why the taken ones are
      still drawn rather than omitted. */
-  const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
-  const taken = [0,5], sSel = 4;
-  const open = slots.length - taken.length;
+  /* A TAKEN SLOT IS NOT DRAWN (Maryam, 31 Aug 2026), WHICH REVERSES ai7'S RULE
+     FOR THIS PAGE ONLY. `ai7.js` has a note headed "WHY THE DISABLED SLOTS ARE
+     STILL DRAWN" and it is a good argument about a CHIP ROW: eight chips with
+     two struck through says "this day is busy", and six chips with no gaps says
+     "this is all there is", which is a different and less true statement. It
+     stops holding for a LIST. A struck-through row is a full-width line you read
+     and then discard, and two of them in a list of six is a third of the column
+     spent on times you cannot have — the chip row could afford it because a dead
+     chip costs 100px, and a dead row costs a whole line of the page.
+
+     THE RECORD KEEPS BOTH, AND THAT IS THE PART THAT MATTERS. `SLOT_ALL` and
+     `taken` are unchanged, so the day still knows which of its six are gone;
+     what changed is what the view draws. `open` is `slots.length` now rather
+     than a subtraction, and it is still a count of the real thing — which is
+     what stops "4 available slots" and the list under it disagreeing, the same
+     guarantee the subtraction was giving. ai7's own picker is untouched. */
+  const SLOT_ALL = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
+  const taken = [0,5];
+  const slots = SLOT_ALL.filter((t,i) => !taken.includes(i));
+  const sSel = Math.min(Math.max(S.bkSlot | 0, 0), slots.length - 1);
+  const open = slots.length;
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
   ${''/* THIS PAGE HAD NO HEADER AND THEREFORE NO WAY BACK.
@@ -5112,48 +5779,31 @@ V.agent = (f) => {
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
-      ${''/* THE THREE FACTS ARE THREE LINES, LABEL LEFT AND VALUE RIGHT
-            (Maryam, 31 Aug 2026). They were a name over a value with a 28px
-            tinted chip beside the pair — §65's figure cell, which is the shape
-            for a number you SCAN against the two beside it. These are not that:
-            they are three different questions with one answer each, and an
-            answer belongs on the line of its question. Stacked, the eye read
-            six lines to get three facts.
+      ${''/* THE THREE PURCHASE FACTS CAME OFF AND THE BLOCK IS ONE COLUMN
+            (Maryam, 31 Aug 2026). "Interview fee $95 / Length 45 minutes,
+            recorded / Report turnaround Within 24 hours" was the reference's
+            right-hand column and it survived four rewrites of this page; what
+            it never survived is the question of what it ADDED. Two of the three
+            are printed 40px to their left in `.rec-f` — "$95 Interview Fee" and
+            "45 mins call" — so the block stated the fee twice and the length
+            twice, in two different type pairs, either side of a divider whose
+            job was to separate them from each other.
 
-            THE CHIP WENT AND THE GLYPH STEPS 16 -> 20, which is exactly the
-            trade §72 made for the pulse's column marks: "the hue survives and
-            the wash goes; the glyph steps because it now holds the line alone".
-            The reason is the same one, one page over — three filled squares in
-            a column of three rows are the heaviest objects in a block that no
-            longer has a border round it, and a chip on a row is a box on a
-            line rather than a mark in front of one.
+            THE FEE IS ALSO IN THE CHECKOUT ROW, which is where a price belongs
+            on a page that ends in a Proceed button.
 
-            THE THREE ROWS ARE ONE WIDTH AND IT IS THE WIDEST ROW'S, which is
-            the whole of what makes the right edge read as an edge. §76 sizes
-            the grid track with `fit-content()` rather than a fixed `minmax()`,
-            so the column is exactly as wide as "Report turnaround / Within 24
-            hours" needs and the other two stretch to it. A fixed track would
-            either clip that row or leave the other two ending short of it.
+            WHAT IS ACTUALLY LOST IS "Within 24 hours" — the report turnaround,
+            the one of the three this page did not already say twice. It is
+            still true and `V.booking` still states it, but this page no longer
+            does. Raised rather than assumed: if it should stay, it belongs
+            beside the other two facts about the appointment in `.rec-f`, not in
+            a column of its own.
 
-            THE HUES ARE NAMED, NOT CYCLED — §65's and §72's rule both. The fee
-            is `--mk-1` on both this page and anywhere else these three appear,
-            so a fact cannot change colour by moving position.
-
-            THE LABEL IS THE STRONG ONE AND THE VALUE IS THE QUIET ONE, which
-            inverts `.kv` and `.stat` both and is §73's argument kept verbatim
-            through the turn onto one line: these are three different things,
-            so what you scan is the names. The fee is the one accent string,
-            because it is the only one of the three that is a decision. */}
-      <div class="bkp-r">
-        ${[[I.wallet,   'Interview fee',    a.price, 1],
-           [I.time,     'Length',           '45 minutes, recorded'],
-           [I.document, 'Report turnaround','Within 24 hours']
-          ].map(([ic,lab,val,acc],i)=>`<div class="bkp-f" style="--mk:var(--mk-${i+1})">
-          <i class="bkp-fi">${ic}</i>
-          <span class="bkp-fl">${lab}</span>
-          <span class="bkp-fv${acc?' bkp-fv-acc':''}">${val}</span>
-        </div>`).join('')}
-      </div>
+            `.bkp-r`, `.bkp-f`, `.bkp-fi`, `.bkp-fl`, `.bkp-fv` and
+            `.bkp-fv-acc` are written by nothing now, so §76's column and §63's
+            two type roles go with the markup rather than being left as gates
+            nothing writes. The divider goes too — it was a `border-left` on a
+            column that no longer exists. */}
     </div>
   ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
         This page carried a hand-written "What to expect with <name>" card
@@ -5192,7 +5842,17 @@ V.agent = (f) => {
   <div class="bks-w">
     <div class="bks">
       <div class="bks-c">
-        <div class="bks-h"><span class="bks-n">1</span><h3>Choose a date</h3></div>
+        ${''/* THE NUMERALS CAME OFF BOTH HEADINGS (Maryam, 31 Aug 2026). §76's
+              own note argued them as "what a numbered step says without a word
+              of copy" — true, and it was answering a question the layout had
+              already answered: the two sit side by side with a rule between
+              them and the left one names a date the right one then uses, so the
+              order is in the reading direction. Two tinted chips were a second
+              statement of it, and the only two `--brand-tint-2` objects on a
+              page whose accent means "you chose this".
+              `.bks-n` is written by nothing now, so §76's box and §63's ink go
+              with the markup rather than being left as a gate nothing writes. */}
+        <div class="bks-h"><h3>Choose a date</h3></div>
         ${''/* THE CELL KEEPS `.day` SO THE SELECTION KEEPS WORKING. views.js's
               own delegated handler is `t.closest('.day')` — it clears `.on`
               across every `.day` in the device and sets it on the one pressed —
@@ -5213,7 +5873,19 @@ V.agent = (f) => {
               42 reads as a filled table cell, which is the thing the tick-mark
               lattice already means somewhere else. */}
         <div class="bkcal">
-          <p class="bkcal-m">${CAL_MN} ${CAL_Y}</p>
+          ${''/* THE MONTH ROW IS A CONTROL, A LABEL AND A CONTROL. `data-bkmo`
+                carries the STEP rather than the target index, so the handler
+                clamps once and neither button needs to know how many months
+                `AGENT_CAL` holds. `disabled` at each end is what makes the pair
+                honest — see the note over `AGENT_CAL` for why that is not the
+                dead control §60 rules out. */}
+          <div class="bkcal-top">
+            <button class="bkcal-b" data-bkmo="-1"${calI ? '' : ' disabled'}
+              aria-label="Previous month">${I.chevLeft}</button>
+            <p class="bkcal-m">${CAL_MN} ${CAL_Y}</p>
+            <button class="bkcal-b" data-bkmo="1"${calI < AGENT_CAL.length - 1 ? '' : ' disabled'}
+              aria-label="Next month">${I.chevRight}</button>
+          </div>
           <div class="bkcal-w">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
             .map(d=>`<span>${d}</span>`).join('')}</div>
           <div class="bkcal-g">${calCells.map(([n,out])=>{
@@ -5224,27 +5896,76 @@ V.agent = (f) => {
         </div>
       </div>
       <div class="bks-c">
-        <div class="bks-h"><span class="bks-n">2</span><h3>Choose a time</h3>
-          <span class="bks-tz">${I.time}Times in ET</span></div>
+        ${''/* "Times in ET" CAME OFF THE HEADING (Maryam, 31 Aug 2026) and the
+              page no longer states a timezone at all — the closing sentence
+              "All available times are in Eastern Time (ET)" went in an earlier
+              pass. Both were true and both were furniture on a heading row that
+              now holds one thing. `.bks-tz` is written by nothing, so §76's box
+              and §63's floor-tier ink go with it.
+              RAISED, NOT ASSUMED: every time on this page is ET and the product
+              says so nowhere on it now. `V.booking`'s receipt names the zone, so
+              a candidate sees it once they have paid rather than while they are
+              choosing. If it should come back, the heading row is the wrong
+              place for it and the row of times is the right one. */}
+        <div class="bks-h"><h3>Choose a time</h3></div>
         ${''/* THE COUNT IS COUNTED. The reference prints "6 available slots"
               over a grid in which two of the six are struck through, so its own
               chip disagrees with the thing it labels by two. `open` is
               `slots.length - taken.length`, so the pill cannot drift from the
               grid however either changes. */}
-        <p class="bks-day"><b>${days[dSel][1]}, ${CAL_MN} ${days[dSel][2]}</b>
+        ${''/* IT NAMES THE SELECTION, NOT THE MONTH ON SCREEN. Paging to
+              September does not change what you have chosen, so this keeps
+              saying "Thursday, August 20" until a different day is pressed —
+              and every part of it is read off `selCal` / `selD` through
+              `dowLong`, so the weekday, the month and the number cannot
+              disagree with the cell that is lit. */}
+        <p class="bks-day"><b>${dowLong(selCal.y, selCal.m, selD)}, ${MON[selCal.m]} ${selD}</b>
           <span class="bks-cnt">${open} available slots</span></p>
+        ${''/* THE TIMES ARE A LIST, NOT A GRID — Maryam, 31 Aug 2026, with a
+              reference. Six blocks three-across were six things to compare; a
+              time is not compared with another time, it is CHOSEN, and a list
+              with one mark per row is the shape that says so. It also gives the
+              column the vertical mass the calendar beside it has, which the
+              two-row grid never did.
+
+              THE MARK IS `I.circle` / `I.circleDash` AND THEY ARE THE OFFICIAL
+              RADIO PAIR — icons.js's own note says so ("`circle` is
+              `radio_button_unchecked`, `circleDash` is `radio_button_checked`").
+              So the row draws the same two states `.rad .box` does without
+              re-creating a component §02, §10 and §12 draw between them, and
+              without needing the `<label>` + `<input>` that `.rad` requires and
+              a `<button>` cannot host. §75's note about `.rec-lab` is the rule
+              being followed here.
+
+              `data-bkslot` AND A RE-RENDER, NOT THE GENERIC `.slot` HANDLER.
+              That one moves `.on` and returns, which is right for a picker
+              whose selected state is entirely a ground — and wrong the moment
+              the state is also a GLYPH, because the markup that chose the glyph
+              has already run. The row's mark and the scheduling card's line are
+              both pure functions of `S.bkSlot` now, so they cannot disagree. */}
         <div class="slots bks-slots">${slots.map((t,i)=>
-          `<button class="slot ${i===sSel?'on':''}" ${taken.includes(i)?'disabled':''}>${t}</button>`).join('')}</div>
-        ${''/* WHAT THE THING YOU ARE BUYING ACTUALLY IS. The reference puts it
-              here and it is the one piece of its copy the product can stand
-              behind without inventing anything: `V.booking`, `CALL` and the
-              `booked` dashboard all already say this interview is a video call,
-              and `callOpen('iv')` is the surface it opens. It sits under the
-              times because that is the moment the abstraction — "a slot" —
-              becomes a thing that happens to you on a Thursday evening. */}
-        <div class="bks-note"><i class="bks-ni">${I.video}</i>
-          <span class="bks-nb"><b>Video interview</b>
-            <span>You&rsquo;ll join a video call with ${a.n.split(' ')[0]}.</span></span></div>
+          `<button class="slot${i===sSel?' on':''}" data-bkslot="${i}">${I.time}<span class="slot-t">${t}</span><i class="slot-r">${i===sSel?I.circleDash:I.circle}</i></button>`).join('')}</div>
+        ${''/* THE COLUMN ENDS ON THE LIST, AND TWO BLOCKS HAVE NOW BEEN TRIED
+              IN THIS SLOT AND REMOVED (Maryam, 31 Aug 2026). First the
+              "Video interview / You'll join a video call with Priya" note — a
+              definition, which `PAGESUM.agent`, the profile block's "45 mins
+              call" and `V.booking`'s receipt each already give. Then a
+              Scheduling card joining the chosen day and time into one string
+              with a reminder line. Both were removed the same day.
+
+              WHAT THE SECOND ONE WAS FOR, so the next person does not rebuild
+              it: nothing else on this page puts the date and the time in one
+              string — the day is the heading above the list and the time is
+              whichever row is lit — and the checkout row underneath states the
+              fee and not the when. That join is still unstated. It is a real
+              gap and it was not worth a block of its own; the place for it, if
+              anywhere, is the checkout row, which is the one line on the page
+              that is about the transaction rather than about the choice.
+
+              THE SLOT IS EMPTY ON PURPOSE. The column is a heading, a day and
+              four rows; the calendar beside it is taller, and that asymmetry is
+              what two columns of a picker look like when one of them is a month
+              and the other is one day's times. */}
       </div>
     </div>
     ${''/* THE TIMEZONE IS SAID ONCE NOW (Maryam, 31 Aug 2026). "All available
@@ -5358,7 +6079,7 @@ V.agent = (f) => {
   <div class="bkc">
     <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
       <span class="bkc-fv">${a.price}</span></div>
-    <button class="btn btn-p" data-go="booking">Proceed to pay $695 ${I.arrowRight}</button>
+    <button class="btn btn-p" data-go="booking">Proceed to pay ${a.price} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -5989,7 +6710,7 @@ PARKED.coursework = (f) => {
 PARKED.chapter = (f) => {
   const i = S.ch ?? f.open ?? 3;
   const name = CH[i][0], mins = CH[i][1];
-  const inprog = S.stage==='day34' && i===3;
+  const inprog = isDay34(S.stage) && i===3;
   const stg = Math.min(S.stg||0, STAGE_L.length-1);
   const done = i < f.done;
   return `<main class="main"><div class="page">
@@ -6116,6 +6837,18 @@ V.rewards = (f) => {
 V.transcript = (f) => {
   const pct = Math.round(f.done/13*100);
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
+  /* THIS IS WHERE THE PULSE COLUMNS LIVE NOW — Maryam, 31 Aug 2026: "do not
+     lose this UI, I will use this on the details page." Course Progress IS the
+     details page for the course, and it is where the thirteen-week chart
+     already went when §72 merged the three dashboard sections; the three
+     columns are the same reading one level of detail down from the Quick
+     Actions that replaced them, and two of those three cards point here.
+
+     A PROVISIONAL HOME, STATED AS ONE. If the real destination turns out to be
+     somewhere else, move this one call — `pulseCols` is untouched and takes
+     `(f, g)`. What it must not do is sit with NO caller: a component nothing
+     writes is the "gate nothing writes" tell, and this one is eighty lines. */
+  const g = GAME[S.stage];
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Course Progress')}
   ${''/* NO FACT ROW HERE EITHER — see the note over `V.payment`'s header. This
@@ -6131,9 +6864,10 @@ V.transcript = (f) => {
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
       ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
       ${statCell(I.time, `Time invested`, `${hrs.split(' ')[0]}<small>${hrs.replace(/^\S+/,'')}</small>`, `${f.done?Math.round(f.mins/f.done)+' min per chapter':'not started'}`)}
-      ${statCell(I.flag, `Tasks on time`, `${S.stage==='day34'?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
+      ${statCell(I.flag, `Tasks on time`, `${isDay34(S.stage)?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
     </div>
   </div>
+  ${g?pulseCols(f,g):''}
   ${''/* THE 90-DAY SUMMARY APPEARS WHEN THERE IS ONE.
         This block used to draw at every stage, with an unsigned variant that
         said, in three places at once, that nothing in it was final: a heading
@@ -6411,10 +7145,19 @@ V.billing = (f) => {
   rows.push(['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210']);
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Payments')}
-  ${''/* "One-off payments only. Nothing here recurs." is two statements of
-        one fact, and Tal's summary closes on the same one. Tal keeps it,
-        because on this page it is the answer to the question the page
-        raises; there is no spine to state above it. */}
+  ${''/* NO DESCRIPTION, AND THE SUMMARY IS BACK ABOVE IT (Maryam, 31 Aug
+        2026). This slot once held "One-off payments only. Nothing here
+        recurs." — two statements of one fact, and a policy line, which is the
+        second of `PAGESUM`'s four content bans applied to page copy. There is
+        no spine to state here either: Payments is one of the eight pages that
+        pass `title` alone.
+
+        WHAT TAL SAYS INSTEAD IS NOT ABOUT THE TABLE, and the reason is worth
+        knowing before adding to it: the `NEVER` list (ai2) and clause 4 of the
+        Data use notice both say Tal has never seen billing, and `wLedger`
+        (ai8) declines a "what have I paid" question and points at this page.
+        `PAGESUM.billing` is where that is argued out. Do not "improve" the
+        line by putting a total in it. */}
   ${ph('Payments')}
   <div class="sec pay-sec">
     <div class="paytbl">
@@ -7769,7 +8512,11 @@ function render(){
        product where Tal can see nothing: the chapter is in a frame we do not
        read. Tal is a rail away on every page that leads here. */
     const NO_FAB = ['terms','coursework','chapter'];
-    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div></div>' + (NO_FAB.includes(S.view)?'':talFab())
+    /* THE PEEK IS A THIRD CHILD OF `.shell-body`, AFTER `.view-col`, and §44's
+       head note is why: in flow, so the page narrows instead of being covered
+       and dimmed. It is `typeof`-guarded nowhere because `peekPanel` is a
+       function declaration in this file, hoisted above this line. */
+    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
          + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
          + (S.view==='account'?profileSheet()+photoSheet():'');
   }
@@ -7780,7 +8527,7 @@ function render(){
      the kind alone. Opening and closing each change the key exactly once. */
   const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
-  const OVERLAYS = ['nav','notif','acct','tal','editProfile','editPhoto','addCard','notes'];
+  const OVERLAYS = ['nav','notif','acct','peek','tal','editProfile','editPhoto','addCard','notes'];
   /* `data-open` is a TRANSITION MARKER and it is meant to be: §13.2 gates every
      entrance on it precisely because it lasts one render, so an animation does
      not replay each time a switch is flipped or a character is typed.
@@ -7993,6 +8740,23 @@ device.addEventListener('click', e => {
     return;
   }
 
+  /* `data-peek` CARRIES THE KEY AND AN EMPTY VALUE CLOSES IT, which is what
+     lets the panel's own `.peek-x` and the card that opened it be the same
+     branch. Pressing the live card again closes it too — a Quick Action that
+     opens a column has to be able to shut it, or the only way out is the small
+     control at the other end of the frame.
+     BEFORE `[data-go]`: the panel's rows and its footer ARE `data-go`, and they
+     live inside the peek, so this branch has to be the one that does not match
+     them. It does not, because they carry no `data-peek`. */
+  const pkc = t.closest('[data-peek]');
+  if(pkc){
+    const k = pkc.dataset.peek;
+    S.peek = (!k || S.peek === k) ? null : k;
+    if(S.peek){ S.notif = false; S.acct = false; }
+    render();
+    return;
+  }
+
   const g = t.closest('[data-go]');
   if(g){ e.preventDefault();
     const mark = g.dataset.read; if(mark && !S.read.includes(mark)) S.read.push(mark);
@@ -8066,8 +8830,28 @@ device.addEventListener('click', e => {
     return;
   }
   const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
+  /* THE BOOKING PAGE'S TIME IS STATE AND IT HAS TO BE TESTED FIRST, which is
+     the whole reason this is three lines above `.slot` rather than three below.
+     `data-bkslot` is on a `.slot`, so the generic handler underneath matches it
+     too — and that one moves `.on` and RETURNS, which would tint the new row
+     and leave the filled glyph on the old one, because the mark is chosen at
+     render (see `S.bkSlot`). Order is the whole of the fix; every other picker
+     in the build carries no `data-bkslot` and keeps the cheap class move. */
+  const ts = t.closest('[data-bkslot]');
+  if(ts && !ts.disabled){ S.bkSlot = +ts.dataset.bkslot; render(); return; }
   const sl = t.closest('.slot');        if(sl && !sl.disabled){ device.querySelectorAll('.slot').forEach(x=>x.classList.remove('on')); sl.classList.add('on'); return; }
   const dy = t.closest('.day');         if(dy){ device.querySelectorAll('.day').forEach(x=>x.classList.remove('on')); dy.classList.add('on'); return; }
+  /* THE MONTH IS STATE AND THE GRID IS RE-RENDERED — trap 9. Every other
+     handler on this line moves an `.on` class and returns, because the thing it
+     changes is one class on one element that survives to the next paint. A month
+     is 42 different cells, so it cannot be a class move; `S.bkMo` is the number
+     and `V.agent` is a pure function of it. The step is clamped here rather than
+     in the view so both call sites stay `data-bkmo="±1"`. */
+  const mo = t.closest('[data-bkmo]');
+  if(mo && !mo.disabled){
+    S.bkMo = Math.max(0, Math.min(1, (S.bkMo | 0) + (+mo.dataset.bkmo)));
+    render(); return;
+  }
   /* A tab that carries data-ctab / data-rtab changes what is RENDERED, so it
      must not be intercepted by the generic strip handler below it — that one
      only moves the `.on` class and returns, which is why the cohort tabs

@@ -468,8 +468,8 @@ css = '\n'.join((here / f).read_text() for f in
                  # accent, which has to be conditional on the card being
                  # quiet because #b94a09 on #111 is 1.6:1.
                  '66-enrolcard.css',
-                 # TEMPORARY — the red accent trial, on `day34/dashboard` and
-                 # `promoted/dashboard` only. Delete this entry, the layer,
+                 # TEMPORARY — the red accent trial, on the `reddemo` stage
+                 # ("Red Accent Demo") only. Delete this entry, the layer,
                  # `tmpaccent.js` and its entry below, and `'tmp'` in
                  # `build-ds.py`'s EXCLUDE_PREFIXES, and it is gone.
                  # LAST, and it has to be: it re-points accent tokens inside
@@ -705,7 +705,43 @@ css = '\n'.join((here / f).read_text() for f in
                  # font-weight, text-transform or text colour. Those four are
                  # §63 §18 — including the separator's ink, which reads as
                  # mechanism and is a type decision.
-                 '78-topbar.css'])
+                 '78-topbar.css',
+                 # THE PULSE IS A BLACK CARD: the enrolled dashboards take the
+                 # `Just Joined` shape — the white call row and the pulse's own
+                 # head row become one §75 card with a hairline between them,
+                 # and the three pulse columns become three Quick Actions.
+                 # AFTER §75 BECAUSE IT CONVERTS §75'S CARD, and after §77 for
+                 # the same reason that layer is after §75: both are "what is
+                 # true of THIS content on a dark ground" and neither restates
+                 # the recipe. It needs less than §77 did — `.sec-pulse` is a
+                 # new class with no padding history to beat, so the section
+                 # rules are two lines against that layer's four-rule fight
+                 # with `.sec-call`.
+                 # AND AFTER §70, WHICH IS WHAT MAKES §79.4 POSSIBLE: the three
+                 # Quick Action hues are named classes on §70's `.qa-ic`, per
+                 # that layer's own rule against cycling.
+                 # AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/
+                 # §69-§78 each pass: grids, flex, one border, three fills and
+                 # spacing, and not one font-size, font-weight, text-transform
+                 # or text colour. Those four are §63 §19.
+                 '79-pulsedark.css',
+                 # THE QUIZ RESULTS IN §44's RIGHT-HAND COLUMN. A Quick Action
+                 # opens the peek beside the dashboard instead of navigating
+                 # away; this is the five blocks INSIDE the panel, and §44 is
+                 # still the panel. It is also the first thing in `hifi/` to
+                 # write `.peek*` at all — that layer's only caller until now
+                 # was tn-agent-portal.html, which is the mild form of the
+                 # "gate nothing writes" tell.
+                 # LAST, and one rule needs it: §44.164 turns off the closing
+                 # hairline on `.peek-b > .sec:last-child`, and §80.1 replaces
+                 # that whole approach with a flex stack on `.peek-b` — which
+                 # has to land after the layer it is answering.
+                 # AFTER §63 AND ALLOWED TO BE: grids, flex, grounds, borders,
+                 # spacing, three marks, one radius and one float, and not one
+                 # font-size, font-weight, text-transform or text colour.
+                 # Those are §63 §19 — including the two that read as
+                 # mechanism, the `<ol>` marker's inherited ink and the tag's.
+                 '80-quizpeek.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1233,6 +1269,67 @@ HTML = f"""<!DOCTYPE html>
   </div>
 </div>
 
+<!-- ============================================================
+     THE FRAME IS RESTORED BEFORE THE FIRST PAINT, NOT AFTER THE BUNDLE
+     Maryam, 31 Aug 2026, with a screen recording: a reload showed a phone
+     bezel on the dark stage, an empty white block inside it, and then the
+     desktop frame sliding out from under it.
+
+     ALL THREE ARE THE SAME CAUSE. `vpSet` is the LAST statement of the
+     script below, so the stored preference could not be applied until two
+     megabytes of bundle had parsed and rendered — until then the markup's
+     own `data-vp="mobile"` stood, which is the bezel. §01 then gives
+     `.device` a `transition` on `max-width` and `height`, so the correction
+     was not a jump but a 240ms slide, which is what made it read as the page
+     reloading twice.
+
+     THIS SCRIPT IS TINY AND IT IS FIRST. It stamps the attribute and the
+     switcher's `.on` before anything paints — and because the element has
+     no previous computed style at that point, THE TRANSITION DOES NOT RUN.
+     That is the whole fix for the slide; nothing had to be turned off, and
+     the transition is still there for a real press of the switcher, which is
+     the interaction it was written for.
+
+     AND THE BOX IS HIDDEN UNTIL THE APP IS IN IT, which is the third part —
+     a correctly sized empty white rectangle is still an empty white
+     rectangle for as long as the bundle takes to parse. `visibility` rather
+     than `display`, so the frame keeps its space and the stage does not
+     reflow when it arrives; and it is set from JS onto the element's own
+     style rather than stated in §01, DELIBERATELY: `.device` crosses into
+     `design-system/`, `tn-agent-portal.html` hosts itself in one, and a rule
+     hiding it until some class arrives would hide a hand-authored page for
+     good. A prototype-chrome concern belongs in the prototype's chrome.
+
+     IF THE BUNDLE NEVER PARSES the box stays hidden, and that is the right
+     failure: the alternative was an empty frame that looked like a rendered
+     product with nothing in it, which is the exact symptom the `node --check`
+     below exists to prevent shipping.
+     ============================================================ -->
+<script>
+(function(){{
+  var SIZE = {{mobile:[390,844], tablet:[744,1133], fluid:[1440,900]}};
+  var d = document.getElementById('device');
+  d.style.visibility = 'hidden';
+  var v = null;
+  try {{ v = localStorage.getItem('tn-vp'); }} catch(e){{ /* storage denied */ }}
+  if(!SIZE[v]) return;
+  d.dataset.vp = v;
+  var b = document.querySelectorAll('#vp button');
+  for(var i = 0; i < b.length; i++) b[i].classList.toggle('on', b[i].dataset.vp === v);
+  /* The inline size too, not just the attribute: `fitFrame` writes
+     `style.width` / `style.height` and the attribute alone only moves
+     §01's `max-width`, so the box would still be 844 tall on a desktop
+     frame until the bundle got round to it. */
+  if(v === 'fluid'){{
+    d.style.width = '100%';
+    d.style.height = Math.max(520, window.innerHeight - 160) + 'px';
+  }} else {{
+    d.style.width = SIZE[v][0] + 'px';
+    d.style.height = Math.min(SIZE[v][1], Math.round(window.innerHeight * 0.82)) + 'px';
+  }}
+}})();
+</script>
+
 <script>
 {js}
 
@@ -1330,6 +1427,12 @@ window.addEventListener('resize', fitFrame);
 let vpFirst = null;
 try {{ vpFirst = localStorage.getItem(VP_KEY); }} catch(e){{}}
 vpSet(vpFirst || 'mobile', true);
+/* THE FRAME IS SHOWN ONLY NOW. The early script above hid it; this is the
+   first moment the app is actually inside it — the bundle has parsed, every
+   pass has run and `fitFrame` has just set the exact scale. Clearing the
+   inline value rather than setting `visible` hands the property back to the
+   stylesheet, so nothing here can outrank a rule §01 might want later. */
+device.style.visibility = '';
 </script>
 </body>
 </html>

@@ -31,7 +31,26 @@ const STAGES = [
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
-  ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.']
+  ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.'],
+  /* TEMPORARY, AND LAST BECAUSE IT IS NOT PART OF THE JOURNEY (Maryam,
+     31 Aug 2026). A frozen copy of Day 34 drawn in solid #FF0000, to show
+     somebody what a red accent looks like. It sits after `promoted` rather
+     than beside `day34` for exactly that reason: the nine rows above it read
+     top to bottom as one candidate's ninety days, and a demo of a colour is
+     not a step in that.
+
+     IT IS A FORK, NOT AN ALIAS, and that is the whole point of it. Every
+     stage-keyed record day 34 owns is COPIED here rather than shared —
+     `CFG`, `NOTIF`, `GAME`, `WEEKLY` below, `PAGESUM` in ai6.js and `NEXT`
+     in ai8.js — so editing day 34's content leaves this untouched and
+     editing this one leaves day 34 untouched. See `RED_DEMO` under the
+     hidden-stages note for what IS still shared and why.
+
+     TO DELETE IT COMPLETELY: this row, the four records below, `RED_DEMO`
+     and `isDay34` under them, the two records in ai6.js / ai8.js, the eight
+     `isDay34(S.stage)` call sites in views.js (back to `S.stage==='day34'`),
+     and the one row in `TMP_ACCENT_ON`. Nothing else was touched. */
+  ['reddemo', 'Red Accent Demo',       'A frozen copy of Day 34 in solid #FF0000. Temporary, for a demo &mdash; nothing else in the product links to it.']
 ];
 
 /* ==========================================================================
@@ -80,6 +99,41 @@ function stageResolve(k){
 }
 
 
+/* ==========================================================================
+   THE RED ACCENT DEMO — WHAT IS FORKED AND WHAT IS SHARED
+
+   `reddemo` copies day 34's CONTENT and shares day 34's VIEW CODE, and the
+   line between those two is worth stating plainly because it is the whole of
+   what "not linked to anything else" can honestly mean here.
+
+   FORKED — every stage-keyed record, written out in full rather than derived
+   from day 34's. Six of them: `CFG`, `NOTIF`, `GAME` and `WEEKLY` in this
+   file, `PAGESUM` in ai6.js, `NEXT` in ai8.js. A copy TAKEN AT RUNTIME
+   (`{...CFG.day34}`) would have been three characters instead of forty lines
+   and would have re-linked the two by construction — the demo would follow
+   every later edit to day 34, which is the one thing it was asked not to do.
+   So the values are typed out. They are allowed to drift; that is the point.
+
+   SHARED — `views.js` itself. Eight branches there ask "is this day 34?" to
+   decide seven facts the mock has nowhere else to put: chapter 4's `12 of 70
+   min · 4 opens`, its in-progress bar, `1 of 3` tasks this week, `4 of 5` on
+   time, one overdue, 12 minutes done, and whether the dashboard reads as
+   stalling. `isDay34` is the ONE place that question is asked, so the demo
+   answers it the same way day 34 does and the two pages draw identically
+   today. A change to how those SEVEN facts are DRAWN reaches both pages; a
+   change to any stage's data reaches one. If the demo ever needs a rendering
+   of its own, the move is to lift those seven literals onto the `CFG` record
+   — where they arguably belong anyway — not to add a second branch here.
+
+   TEMPORARY. See the note on the `reddemo` row in `STAGES` for the whole
+   removal list.
+   ========================================================================== */
+const RED_DEMO = 'reddemo';
+
+/* the stage that draws mid-course-and-stalled. Two answer yes. */
+const isDay34 = s => s === 'day34' || s === RED_DEMO;
+
+
 const CFG = {
   /* the run-up has no product chrome at all — no rail, no app bar — but
      cfg() and setStage() both read `nav`, so it names the smallest set and
@@ -98,7 +152,10 @@ const CFG = {
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
   day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260},
   day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:87,  mins:700, reinterview:true, finished:true},
-  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:87, mins:700}
+  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:87, mins:700},
+  /* THE RED ACCENT DEMO — day 34's record, copied. Typed out rather than
+     spread from `CFG.day34` so the two can be edited apart; see `RED_DEMO`. */
+  reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260}
 };
 
 const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0, open:0, avg:null, mins:0};
@@ -191,6 +248,14 @@ const NOTIF = {
     {ic:'trophy',   t:'Promoted to Explorer – E4',    b:'Priya signed the decision on November 21.',                    w:'Today', go:'level',       unread:1},
     {ic:'certificate',t:'Certificate available',      b:'Explorer Track – E3, Cohort 41. Yours to download and share.', w:'Today', go:'transcript',  unread:1},
     {ic:'ticket',   t:'Explorer Track – E4 opens December 1',b:'Cohort 58 has 7 places left.',                          w:'Yesterday', go:'enrol',    unread:0}
+  ],
+  /* THE RED ACCENT DEMO — day 34's five, copied. See `RED_DEMO` in this file. */
+  reddemo:[
+    {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
+    {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
+    {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
   ]
 };
 
@@ -385,7 +450,9 @@ const GAME = {
   week1:   {pts:985,  got:[0,1,3],           badges:0, rank:1, last:['08/13/2026','07/23/2026','','07/23/2026','','','','',''], weeks:[20]},
   day34:   {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
   day90:   {pts:2955, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
-  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]}
+  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  /* THE RED ACCENT DEMO — day 34's row, copied. See `RED_DEMO` in this file. */
+  reddemo: {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
 };
 
 const WEEK_TARGET = 55;
@@ -442,6 +509,14 @@ const WEEKLY = {
        one fact this column is about — a chapter finished and what it scored.
        `WEEKLY[stage].did` is read only by `pulse` now, so removing it here
        removes it from the product rather than hiding it. */
+    did: [
+      ['Chapter 5 finished', 'Assessed 86%']
+    ],
+    tal: 'The three furthest ahead in Cohort 41 had this week&rsquo;s chapter finished and its assessment submitted by day 34. You are 58 minutes and one assessment behind that pace, and chapter 4 is the growth area in your report — so it is the one worth the extra time.',
+    ask: ['What do I have to do to catch up this week?', 'How do I catch up?']
+  },
+  /* THE RED ACCENT DEMO — day 34's entry, copied. See `RED_DEMO` in this file. */
+  reddemo: {
     did: [
       ['Chapter 5 finished', 'Assessed 86%']
     ],

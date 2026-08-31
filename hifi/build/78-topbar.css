@@ -55,27 +55,64 @@
   display:flex;align-items:center;min-width:0;flex:0 1 auto}
 .app .crumb-now{flex:0 1 auto}
 
-/* THE SEPARATOR IS A PSEUDO-ELEMENT, NOT AN ELEMENT, and the in-page `.crumb`
-   component's `<span class="sep">/</span>` is why that is worth stating. A
-   separator that is a real element is one more node between every pair of
-   crumbs for a screen reader to read out, and one more thing to count when
-   the trail is trimmed on a phone below. `::before` is neither.
+/* THE SEPARATOR IS A 12px CHEVRON (Maryam, 31 Aug 2026), drawn as a real
+   `<svg>` by `drawTrail` (ai11.js) rather than as `content:'/'` on a
+   `::before` — that function's note has the argument, and the short version is
+   that the stand-in face carries 68 glyphs and a chevron is not one of them,
+   and that there is a single call site to put a mark into.
 
-   `flex:none` so the slash never absorbs the shrink the label needs. */
-.app .crumb-i + .crumb-i::before{
-  content:'/';flex:none;
-  padding:0 var(--s02)}
+   12 AGAINST 16px TYPE, WHICH IS §70.2a's REASONING AGAIN: below the cap
+   height of the words a mark reads as punctuation between them, at or above it
+   as an object competing with them. A separator is punctuation by definition,
+   so it wants to be under.
 
-/* A crumb's own label is a single line that ellipsises. The underline is the
-   hover affordance the in-page `.crumb` already uses (§02.56) — a transparent
-   1px in the resting state so nothing moves when it arrives. Written PLAIN,
-   per trap 18: the build rewrites `:hover` to `:hover:where(.__nh)` itself,
-   and a source that pre-disarms it fails `build-ds.py`'s subset check. */
+   THE SPACE EITHER SIDE IS `--s04`, UP FROM `--s02` ("add more space between
+   texts and chevrons"). 4px was measured for a slash, which is a tall thin
+   character carrying its own air on both sides; a chevron is a wide mark that
+   fills its box, so at 4 it sat against both words. 12 each side gives 24px
+   between crumbs.
+
+   `flex:none` so the mark never absorbs the shrink the label needs, and
+   `currentColor` so §63 §18's ink is the only place a colour is decided. */
+.app .crumb-sep{
+  flex:none;display:inline-flex;align-items:center;
+  padding:0 var(--s04)}
+.app .crumb-sep svg{
+  width:12px;height:12px;display:block;fill:currentColor}
+
+/* A crumb's own label is a single line that ellipsises.
+
+   NO UNDERLINE AT ALL, and it took two passes because there were TWO of them.
+   The first ask was "make this double bottom lines just one line" and the
+   second took the survivor off as well (Maryam, 31 Aug 2026). The pair came
+   from two rules that each thought they were
+   the only one drawing it: §12.405 gives `.app a[data-go]` a
+   `border-bottom-color:currentColor` — every navigating link in the product is
+   a `data-go`, so the trail's parent crumbs are — and the anchor's own
+   `text-decoration` was still on underneath it, one pixel lower. Keeping the
+   border and dropping the decoration was the first fix — §02.56's idiom for
+   the in-page `.crumb` — and the call is that a trail in the CHROME needs
+   neither. Its parent crumbs are the only text in the app bar, they are 12px
+   from a chevron that already says they are steps in a path, and there is
+   nothing around them to be distinguished FROM, which is the whole job an
+   underline does in prose. The rule stays rather than being deleted: §12.405
+   is what it is turning off, and `border-bottom:0` is where that is said.
+
+   IT IS AT (0,3,1) AND IT HAS TO BE. §12.405 is `.app a[data-go]`, which is
+   (0,2,1) and beats the (0,2,0) this rule was first written at — which is why
+   the line and the blue both survived a build. `.crumb-trail` is the qualifier
+   because it says what these links ARE, rather than adding a class to win.
+
+   `:hover` WRITTEN PLAIN, per trap 18: the build rewrites it to
+   `:hover:where(.__nh)` itself, and a source that pre-disarms it fails
+   `build-ds.py`'s subset check. */
 .app .crumb-l{
   display:block;min-width:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  border-bottom:1px solid transparent}
-.app a.crumb-l:hover{border-bottom-color:currentColor;cursor:pointer}
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .crumb-trail a.crumb-l{
+  text-decoration:none;
+  border-bottom:0}
+.app .crumb-trail a.crumb-l:hover{cursor:pointer}
 
 /* ------------------------------------------------------------------ 78.2 ---
    ON A PHONE THE TRAIL IS THE PAGE
@@ -93,7 +130,9 @@
    ------------------------------------------------------------------------ */
 @container app (max-width:599.98px){
   .app .crumb-i:not(.crumb-now){display:none}
-  .app .crumb-i + .crumb-i::before{content:none}
+  /* the surviving crumb is the LAST one, so its own leading chevron would
+     open the trail with a mark pointing at nothing */
+  .app .crumb-sep{display:none}
   .app .crumb-bar{padding-left:var(--s02)}
 }
 
@@ -234,3 +273,70 @@
    CLAUDE.md's "gate nothing writes" test explicitly exempts: the behaviour
    ships with it, because there is no behaviour. */
 .app .ph.ph-bare{display:none}
+
+/* ------------------------------------------------------------------ 78.7 ---
+   THE BACK CONTROL IS A WORD AND AN ARROW, AND IT PAYS A CONTROL'S SPACING
+
+   Maryam, 31 Aug 2026: "Add a 'Back' text of 13.5px font size with the back
+   arrow. Reduce the space between back and the bottom content. It is a lot
+   right now."
+
+   THE TWO ASKS ARE ONE CHANGE. §02 draws `.ph-back` as a 40x40 icon square
+   because it sat beside a 26px `<h1>` and had to match its line box; §10 then
+   pads the `.ph` 40 over and 32 under, and §02's `.ph-top` adds 8 more, all
+   measured for a page title with a fact row beneath it. §78 took the title
+   away, so what was left was a lone glyph paying a heading's separation —
+   about 100px of white between the arrow and the first thing on the page.
+   Naming the control and tightening the block are the same correction: it
+   stopped being a heading's ornament and became a row of its own.
+
+   `.ph-backonly` IS STAMPED BY `tidyPh` (ai11.js), NOT MATCHED BY `:has()`,
+   and that function's own note has the argument — the test is "the back
+   control and nothing else", which is a COUNT, and the pass that has just
+   finished removing the other children is the only thing that can answer it.
+
+   THE WORD IS HIDDEN WHERE THE ARROW IS NOT THIS CONTROL. `.ask-top` (§21,
+   §51) and §17's auth card both re-draw `.ph-back` at 20px inside a row that
+   already has a title in it; a word there is a second label on a control that
+   is already beside one. Neither draws `.ph-back-t` in its own markup, so this
+   only has to answer the shared `bk()` — which is why the rule is stated on
+   the CONTEXT rather than on the button.
+   ------------------------------------------------------------------------ */
+.app .ph-back{
+  width:auto;height:32px;
+  display:inline-flex;align-items:center;gap:var(--s02);
+  padding:0 var(--s03) 0 var(--s02)}
+.app .ph-back svg{width:20px;height:20px;flex:none}
+.app .ask-top .ph-back-t,.app .auth-card .ph-back-t{display:none}
+
+/* The block keeps a control's own breathing room and gives back the heading's.
+   `--s05` over and nothing under: the section below brings its own top
+   padding, and two paddings meeting is what produced the gap in the first
+   place. §20's `.app .page > .ph{padding-bottom:var(--s05)}` sits inside a
+   container query, so per trap 3 this has to be restated there to win. */
+.app .ph.ph-backonly{padding-top:var(--s05);padding-bottom:0}
+.app .ph.ph-backonly .ph-top{margin-bottom:0}
+/* TRAP 3, AND THE CHILD COMBINATOR WAS THE SECOND HALF OF THE MISTAKE. §10.353
+   restates `.ph`'s padding at 40/32 inside this query, and a container query is
+   its own cascade tier — so the unconditional rule above cannot reach it at any
+   weight and the block kept its 32px. The first fix was written
+   `.app .page > .ph.ph-backonly` and still missed, because `placeBand` (ai5)
+   LIFTS the `.ph` into the `.modhead` on every module page: a direct child of
+   `.page` is exactly what it stops being. Descendant, inside the tier. */
+@container app (min-width:900px){
+  .app .ph.ph-backonly{padding-top:var(--s05);padding-bottom:0}
+}
+/* AND ONE MORE, AT (0,6,0), BECAUSE `:not(:has())` COUNTS TWICE OVER. §25.386
+   is `.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph` — it READS
+   as three classes and it is SIX, because `:not()` takes the specificity of its
+   argument and `:has()` takes the specificity of its own. That is §73's lesson
+   about `:has()` carrying its argument's weight, doubled: every rule in this
+   family is heavier than it looks, and the (0,3,0) above lost to it silently on
+   exactly the pages this correction is for — a `.modhead` holding nothing but
+   the back control has no Tal card in it, which is precisely what that
+   `:not(:has(.ai-aura))` is testing for.
+
+   STATED ON THE SAME SHAPE rather than won with a heavier qualifier of its own:
+   this is the rule being answered, so it is the rule that is named. */
+.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph.ph-backonly{
+  padding-bottom:0}

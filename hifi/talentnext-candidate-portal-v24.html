@@ -9635,30 +9635,11 @@ button.btn-p:active,
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-primary)}
-.app .bkp-fl{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  text-transform:none;color:var(--text-primary)}
-.app .bkp-fv{
-  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  text-transform:none;color:var(--text-secondary)}
-.app .bkp-fv-acc{
-  font-weight:var(--t-w-strong);color:var(--accent-text);
-  font-variant-numeric:tabular-nums}
 .app .bks-h > h3{
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
-.app .bks-n{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
-  text-transform:none;color:var(--accent-text);
-  font-variant-numeric:tabular-nums}
-.app .bks-tz{
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
-  text-transform:none;color:var(--text-helper)}
+.app .bks-slots > .slot.on{color:var(--accent-text)}
 .app .bkcal-m{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
@@ -9683,14 +9664,6 @@ button.btn-p:active,
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
   text-transform:none;color:var(--text-secondary)}
-.app .bks-nb > b{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  text-transform:none;color:var(--text-primary)}
-.app .bks-nb > span{
-  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  text-transform:none;color:var(--text-secondary)}
 .app .bkc-fl{
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
@@ -9703,20 +9676,80 @@ button.btn-p:active,
 .app .crow-dark .crow-role,
 .app .crow-dark .crow-x{color:var(--on-dark-2)}
 .app .crow-dark .crow-n{color:var(--on-dark)}
+.app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
+.app .crow-dark .crow-a > .btn:not(.btn-p) svg{fill:var(--on-dark)}
 .app .crumb-l{
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-sec-ls);
-  text-transform:none;color:var(--text-secondary)}
-.app .crumb-now .crumb-l{
-  font-weight:var(--t-w-book);color:var(--text-primary)}
-.app .crumb-i + .crumb-i::before{
-  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
-  font-weight:var(--t-w-book);
-  color:var(--text-helper)}
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-helper)}
+.app .crumb-trail a.crumb-l{color:var(--text-helper)}
+.app .crumb-trail .crumb-now .crumb-l{color:var(--text-primary)}
+.app .crumb-sep{color:var(--gray-50)}
 .app .acct-i-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-primary)}
+.app .ph-back-t{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .page .sec.dark-card > .sec-h.aih > .aih-b > h2.aih-t{color:var(--on-dark)}
+.app .page .sec.dark-card > .sec-h.aih > .aih-b > .aih-d{color:var(--on-dark-2)}
+@container app (min-width:900px){
+  .app .page .sec.dark-card:has(> .sec-h) > .sec-h.aih > .aih-b > h2.aih-t{
+    color:var(--on-dark)}
+  .app .page .sec.dark-card:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{
+    color:var(--on-dark-2)}
+}
+.app .dark-card .aih-d b,
+.app .dark-card .aih-d .pulse-hl{color:var(--on-dark)}
+.app .pnc-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--on-dark)}
+.app .pnc-n{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--on-dark)}
+.app .pnc-r{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--on-dark-2)}
+.app .pnc-when{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--on-dark)}
+.app .qzp-lede{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .qzp-lede b{font-weight:var(--t-w-strong)}
+.app .qzp-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .qzp-t.ok{color:var(--mk-2)}
+.app .qzp-t.acc{color:var(--accent-text)}
+.app .qzp-l li{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .qzp-r-k{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .qzp-r-v{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .qzp-r-tag{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--accent-text)}
+.app .qzp-cta{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--link)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -10254,14 +10287,12 @@ button.btn-p:active,
   background-color:var(--layer-accent-01)}
 .app .sec-prog .prog-seg i.done{
   opacity:1;
-  background-color:transparent;
-  background-image:linear-gradient(125.95deg,
-    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
+  background-image:none;
+  background-color:var(--accent)}
 .app .sec-prog .prog-seg i.now{
   opacity:.4;
-  background-color:transparent;
-  background-image:linear-gradient(125.95deg,
-    var(--ai-1) 19.52%, var(--ai-2) 39.89%, var(--ai-3) 79.21%)}
+  background-image:none;
+  background-color:var(--accent)}
 .app .sec-prog .prog-figs{
   display:grid;
   grid-template-columns:auto minmax(var(--s03),1fr) auto minmax(var(--s03),1fr) auto;
@@ -10633,6 +10664,7 @@ button.btn-p:active,
   border-top:1px solid var(--rule);
   padding-top:var(--s07)}
 .app .sec.dark-card{
+  display:flex;flex-direction:column;gap:20px;
   margin:var(--s06) var(--pad-x) 0;
   padding:var(--s07);
   background-color:var(--gray-100);
@@ -10691,25 +10723,6 @@ button.btn-p:active,
 .app .bkp{
   display:grid;grid-template-columns:minmax(0,1fr);
   gap:var(--s06)}
-.app .bkp-r{display:flex;flex-direction:column;gap:var(--s05);
-  border-top:1px solid var(--rule);padding-top:var(--s06)}
-.app .bkp-f{max-width:420px}
-@container app (min-width:900px){
-  .app .bkp{
-    grid-template-columns:minmax(0,1fr) fit-content(360px);
-    gap:var(--s07)}
-  .app .bkp-r{
-    border-top:0;padding-top:0;
-    border-left:1px solid var(--rule);padding-left:var(--s07)}
-}
-.app .bkp-f{display:flex;align-items:baseline;gap:var(--s04)}
-.app .bkp-fi{
-  flex:none;display:grid;place-items:center;
-  width:20px;height:20px;
-  position:relative;top:3px}
-.app .bkp-fi svg{width:20px;height:20px;fill:var(--mk);display:block}
-.app .bkp-fl{min-width:0}
-.app .bkp-fv{flex:none;margin-left:auto;padding-left:var(--s06);text-align:right}
 .app .bks-w{display:flex;flex-direction:column}
 .app .bks{
   display:grid;grid-template-columns:minmax(0,1fr);
@@ -10726,26 +10739,44 @@ button.btn-p:active,
 }
 .app .bks-h{display:flex;align-items:center;gap:var(--s03)}
 .app .bks-h h3{margin:0;flex:1 1 auto;min-width:0}
-.app .bks-n{
-  flex:none;display:grid;place-items:center;
-  width:24px;height:24px;
-  background-color:var(--brand-tint-2)}
-.app .bks-tz{flex:none;display:inline-flex;align-items:center;gap:var(--s02)}
-.app .bks-tz svg{flex:none;width:14px;height:14px;fill:currentColor;display:block}
 .app .bks-day{margin:0;display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
 .app .bks-cnt{
   flex:none;display:inline-flex;align-items:center;
   padding:2px 10px;
   background-color:var(--layer-02)}
 .app .bks-slots{
-  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
   margin:0;padding:0}
-@container app (max-width:599.98px){
-  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@container app (min-width:900px) and (max-width:1099.98px){
-  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.app .bks-slots > .slot{
+  justify-content:flex-start;
+  min-height:44px;
+  gap:var(--s04);
+  padding-left:var(--s05);padding-right:var(--s05)}
+.app .bks-slots > .slot > svg{flex:none;width:18px;height:18px;fill:currentColor}
+.app .slot-t{flex:1 1 auto;min-width:0;text-align:left}
+.app .slot-r{flex:none;display:grid;place-items:center;width:20px;height:20px}
+.app .slot-r svg{width:20px;height:20px;fill:currentColor;display:block}
+.app .bks-slots > .slot:not(.on) > svg,
+.app .bks-slots > .slot:not(.on) .slot-r{color:var(--text-helper)}
+.app .bks-slots > .slot{border-color:transparent}
+.app .bks-slots > .slot.on{
+  background:transparent;
+  border-color:transparent}
 .app .bkcal{display:flex;flex-direction:column;gap:var(--s04);max-width:336px}
-.app .bkcal-m{margin:0;text-align:center}
+.app .bkcal-top{
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s03)}
+.app .bkcal-m{margin:0;text-align:center;grid-column:2}
+.app .bkcal-b{
+  display:grid;place-items:center;
+  width:32px;height:32px;padding:0;
+  border:0;background:transparent;
+  transition:background var(--dur-short) var(--ease-standard)}
+.app .bkcal-b:first-child{justify-self:start}
+.app .bkcal-b:last-child{justify-self:end}
+.app .bkcal-b svg{width:20px;height:20px;fill:var(--icon-primary);display:block}
+.app .bkcal-b:hover:where(.__nh){background:var(--layer-02);cursor:pointer}
+.app .bkcal-b:disabled{opacity:var(--state-disabled);pointer-events:none}
 .app .bkcal-w,.app .bkcal-g{
   display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s02)}
 .app .bkcal-w > span{display:grid;place-items:center;padding-bottom:var(--s01)}
@@ -10759,22 +10790,6 @@ button.btn-p:active,
 .app .bkd.day:hover:where(.__nh){background:var(--layer-02);border-color:transparent}
 .app .bkd.day.on{background:var(--accent);border-radius:50%}
 .app .bkd:disabled{cursor:default}
-.app .bkd.day::after{
-  content:'';position:absolute;bottom:5px;left:50%;
-  width:4px;height:4px;margin-left:-2px;border-radius:50%;
-  background:var(--accent)}
-.app .bkd.day.on::after{background:var(--on-accent)}
-.app .bks-note{
-  display:flex;align-items:flex-start;gap:var(--s04);
-  padding:var(--s05);
-  background-color:var(--layer-02);
-  --mk:var(--mk-1)}
-.app .bks-ni{
-  flex:none;display:grid;place-items:center;
-  width:36px;height:36px;
-  background-color:color-mix(in srgb, var(--mk) 13%, var(--layer-01))}
-.app .bks-ni svg{width:18px;height:18px;fill:var(--mk);display:block}
-.app .bks-nb{min-width:0;display:flex;flex-direction:column;gap:var(--s01)}
 .app .bkc{
   display:flex;align-items:center;flex-wrap:wrap;
   gap:var(--s05)}
@@ -10791,6 +10806,7 @@ button.btn-p:active,
 .app .crow-dark .crow-who{padding:0}
 @container app (max-width:899.98px){
   .app .crow-dark .crow-who{padding:0 0 var(--s05)}}
+.app .crow-dark .crow-a > .btn:not(.btn-p){border-color:transparent}
 @container app (max-width:899.98px){
   .app .crow-dark .crow{--pad-x:0px}}
 .app .crumb-bar{
@@ -10803,17 +10819,21 @@ button.btn-p:active,
 .app .crumb-i{
   display:flex;align-items:center;min-width:0;flex:0 1 auto}
 .app .crumb-now{flex:0 1 auto}
-.app .crumb-i + .crumb-i::before{
-  content:'/';flex:none;
-  padding:0 var(--s02)}
+.app .crumb-sep{
+  flex:none;display:inline-flex;align-items:center;
+  padding:0 var(--s04)}
+.app .crumb-sep svg{
+  width:12px;height:12px;display:block;fill:currentColor}
 .app .crumb-l{
   display:block;min-width:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  border-bottom:1px solid transparent}
-.app a.crumb-l:hover:where(.__nh){border-bottom-color:currentColor;cursor:pointer}
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app .crumb-trail a.crumb-l{
+  text-decoration:none;
+  border-bottom:0}
+.app .crumb-trail a.crumb-l:hover:where(.__nh){cursor:pointer}
 @container app (max-width:599.98px){
   .app .crumb-i:not(.crumb-now){display:none}
-  .app .crumb-i + .crumb-i::before{content:none}
+  .app .crumb-sep{display:none}
   .app .crumb-bar{padding-left:var(--s02)}
 }
 @container app (min-width:900px){
@@ -10856,6 +10876,114 @@ button.btn-p:active,
   .app .acct-menu,.app .acct-t .acct-c{transition:none}
 }
 .app .ph.ph-bare{display:none}
+.app .ph-back{
+  width:auto;height:32px;
+  display:inline-flex;align-items:center;gap:var(--s02);
+  padding:0 var(--s03) 0 var(--s02)}
+.app .ph-back svg{width:20px;height:20px;flex:none}
+.app .ask-top .ph-back-t,.app .auth-card .ph-back-t{display:none}
+.app .ph.ph-backonly{padding-top:var(--s05);padding-bottom:0}
+.app .ph.ph-backonly .ph-top{margin-bottom:0}
+@container app (min-width:900px){
+  .app .ph.ph-backonly{padding-top:var(--s05);padding-bottom:0}
+}
+.app .modhead:not(:has(.ai-aura)):not(:has(.ask-sec)) > .ph.ph-backonly{
+  padding-bottom:0}
+.app .sec.sec-pulse{gap:var(--s06)}
+@container app (min-width:900px){
+  .app .sec.sec-pulse{display:flex;flex-direction:column;gap:var(--s06)}
+  .app .sec.sec-pulse > .sec-h{
+    border-right:0;min-height:0;padding:0;align-self:stretch}
+}
+.app .page .sec.sec-pulse > .sec-h.aih{margin:0}
+.app .sec-pulse > .pnc{
+  padding-top:var(--s06);
+  border-top:1px solid var(--on-dark-rule);
+  display:flex;flex-direction:column;gap:var(--s05)}
+.app .pnc-t{margin:0}
+.app .pnc-row{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:stretch;
+  gap:var(--s05)}
+.app .pnc-ph{
+  position:relative;
+  width:auto;height:100%;aspect-ratio:1;
+  display:grid;place-items:center;
+  overflow:hidden;
+  background:var(--on-dark-fill, rgba(255,255,255,.1))}
+.app .pnc-ph img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover}
+.app .pnc-b{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:var(--s02)}
+.app .pnc-b p{margin:0}
+.app .pnc-n{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.app .pnc-v{display:inline-flex}
+.app .pnc-v svg{width:20px;height:20px;fill:#00a43c;display:block}
+.app .pnc-when{
+  align-self:center;
+  display:inline-flex;align-items:center;gap:var(--s03);white-space:nowrap}
+.app .pnc-when svg{flex:none;width:16px;height:16px;fill:currentColor;display:block}
+@container app (max-width:599.98px){
+  .app .pnc-row{grid-template-columns:auto minmax(0,1fr);gap:var(--s04) var(--s05)}
+  .app .pnc-ph{width:56px;height:56px}
+  .app .pnc-when{grid-column:2;align-self:start}
+}
+.app .qa-ic.ic-focus svg{fill:var(--mk-1)}
+.app .qa-ic.ic-pace  svg{fill:var(--mk-2)}
+.app .qa-ic.ic-stand svg{fill:var(--mk-3)}
+.app .sec-qa .qa:has(> :nth-child(3)){
+  max-width:none;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+@container app (max-width:899.98px){
+  .app .sec-qa .qa:has(> :nth-child(3)){
+    grid-template-columns:minmax(0,1fr)}}
+.app .peek-qz .peek-b{
+  display:flex;flex-direction:column;gap:var(--s07)}
+.app .peek-qz .peek-h{border-bottom:0}
+.app .qzp-lede{margin:0}
+.app .qzp-mk{
+  float:left;width:12px;height:12px;margin:5px var(--s03) 0 0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+.app .qzp-g{display:flex;flex-direction:column;gap:var(--s04)}
+.app .qzp-l{
+  margin:0;padding-left:var(--s06);
+  display:flex;flex-direction:column;gap:var(--s02);
+  list-style:decimal}
+.app .qzp-rose{display:flex;justify-content:center}
+.app .qzp-rose svg{width:100%;height:auto;max-width:320px}
+.app .qzp-rows{display:flex;flex-direction:column}
+.app .qzp-r{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s05) 0;
+  border-top:1px solid var(--rule);
+  text-align:left;width:100%}
+.app .qzp-r:last-child{border-bottom:1px solid var(--rule)}
+.app .qzp-r:hover:where(.__nh){background-color:var(--overlay-hover);cursor:pointer}
+.app .qzp-r-ic{
+  flex:none;width:28px;height:28px;
+  display:grid;place-items:center;
+  background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
+.app .qzp-r-ic svg{width:16px;height:16px;fill:var(--mk-1)}
+.app .qzp-r-b{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;gap:var(--s01);align-items:flex-start}
+.app .qzp-r-tag{
+  margin-top:var(--s02);padding:2px var(--s03);border-radius:100px;
+  background-color:color-mix(in srgb, var(--accent) 14%, #fff)}
+.app .qzp-r-go{flex:none;margin-top:4px;display:grid;place-items:center}
+.app .qzp-r-go svg{width:16px;height:16px;fill:var(--icon-secondary)}
+.app .peek-qz .peek-f{justify-content:flex-start}
+.app .qzp-cta{
+  flex:1 1 auto;display:flex;align-items:center;gap:var(--s03);
+  padding:0;background:transparent;border:0;text-align:left}
+.app .qzp-cta svg{
+  width:18px;height:18px;flex:none;margin-left:auto;fill:currentColor}
+.app .qzp-cta:hover:where(.__nh){cursor:pointer}
+.app .qzp-cta:hover:where(.__nh) span{text-decoration:underline}
 
 </style>
 </head>
@@ -10884,6 +11012,67 @@ button.btn-p:active,
     <div class="device" id="device" data-vp="mobile"></div>
   </div>
 </div>
+
+<!-- ============================================================
+     THE FRAME IS RESTORED BEFORE THE FIRST PAINT, NOT AFTER THE BUNDLE
+     Maryam, 31 Aug 2026, with a screen recording: a reload showed a phone
+     bezel on the dark stage, an empty white block inside it, and then the
+     desktop frame sliding out from under it.
+
+     ALL THREE ARE THE SAME CAUSE. `vpSet` is the LAST statement of the
+     script below, so the stored preference could not be applied until two
+     megabytes of bundle had parsed and rendered — until then the markup's
+     own `data-vp="mobile"` stood, which is the bezel. §01 then gives
+     `.device` a `transition` on `max-width` and `height`, so the correction
+     was not a jump but a 240ms slide, which is what made it read as the page
+     reloading twice.
+
+     THIS SCRIPT IS TINY AND IT IS FIRST. It stamps the attribute and the
+     switcher's `.on` before anything paints — and because the element has
+     no previous computed style at that point, THE TRANSITION DOES NOT RUN.
+     That is the whole fix for the slide; nothing had to be turned off, and
+     the transition is still there for a real press of the switcher, which is
+     the interaction it was written for.
+
+     AND THE BOX IS HIDDEN UNTIL THE APP IS IN IT, which is the third part —
+     a correctly sized empty white rectangle is still an empty white
+     rectangle for as long as the bundle takes to parse. `visibility` rather
+     than `display`, so the frame keeps its space and the stage does not
+     reflow when it arrives; and it is set from JS onto the element's own
+     style rather than stated in §01, DELIBERATELY: `.device` crosses into
+     `design-system/`, `tn-agent-portal.html` hosts itself in one, and a rule
+     hiding it until some class arrives would hide a hand-authored page for
+     good. A prototype-chrome concern belongs in the prototype's chrome.
+
+     IF THE BUNDLE NEVER PARSES the box stays hidden, and that is the right
+     failure: the alternative was an empty frame that looked like a rendered
+     product with nothing in it, which is the exact symptom the `node --check`
+     below exists to prevent shipping.
+     ============================================================ -->
+<script>
+(function(){
+  var SIZE = {mobile:[390,844], tablet:[744,1133], fluid:[1440,900]};
+  var d = document.getElementById('device');
+  d.style.visibility = 'hidden';
+  var v = null;
+  try { v = localStorage.getItem('tn-vp'); } catch(e){ /* storage denied */ }
+  if(!SIZE[v]) return;
+  d.dataset.vp = v;
+  var b = document.querySelectorAll('#vp button');
+  for(var i = 0; i < b.length; i++) b[i].classList.toggle('on', b[i].dataset.vp === v);
+  /* The inline size too, not just the attribute: `fitFrame` writes
+     `style.width` / `style.height` and the attribute alone only moves
+     §01's `max-width`, so the box would still be 844 tall on a desktop
+     frame until the bundle got round to it. */
+  if(v === 'fluid'){
+    d.style.width = '100%';
+    d.style.height = Math.max(520, window.innerHeight - 160) + 'px';
+  } else {
+    d.style.width = SIZE[v][0] + 'px';
+    d.style.height = Math.min(SIZE[v][1], Math.round(window.innerHeight * 0.82)) + 'px';
+  }
+})();
+</script>
 
 <script>
 const AWARD = {
@@ -10921,6 +11110,7 @@ arrowUp:'M440-647 244-451q-12 12-28 11.5T188-452q-11-12-11.5-28t11.5-28l264-264q
 chevDown:'M480-362q-8 0-15-2.5t-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5Z',
 chevUp:'M480-529 324-373q-11 11-28 11t-28-11q-11-11-11-28t11-28l184-184q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l184 184q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-529Z',
 chevRight:'M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z',
+chevLeft:'m432-480 156 156q11 11 11 28t-11 28q-11 11-28 11t-28-11L348-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 28-11t28 11q11 11 11 28t-11 28L432-480Z',
 check:'m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z',
 checkFilled:'m424-408-86-86q-11-11-28-11t-28 11q-11 11-11 28t11 28l114 114q12 12 28 12t28-12l226-226q11-11 11-28t-11-28q-11-11-28-11t-28 11L424-408Zm56 328q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z',
 verified:'m438-452-58-57q-11-11-27.5-11T324-508q-11 11-11 28t11 28l86 86q12 12 28 12t28-12l170-170q12-12 11.5-28T636-592q-12-12-28.5-12.5T579-593L438-452ZM326-90l-58-98-110-24q-15-3-24-15.5t-7-27.5l11-113-75-86q-10-11-10-26t10-26l75-86-11-113q-2-15 7-27.5t24-15.5l110-24 58-98q8-13 22-17.5t28 1.5l104 44 104-44q14-6 28-1.5t22 17.5l58 98 110 24q15 3 24 15.5t7 27.5l-11 113 75 86q10 11 10 26t-10 26l-75 86 11 113q2 15-7 27.5T802-212l-110 24-58 98q-8 13-22 17.5T584-74l-104-44-104 44q-14 6-28 1.5T326-90Zm52-72 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Z',
@@ -11043,7 +11233,8 @@ const STAGES = [
   ['week1',   'Week 1',                'Cohort 41 has started. Full navigation, eight items. Nothing done yet.'],
   ['day34',   'Day 34',                'Mid-course. Chapter 4 has stalled and one task is overdue.'],
   ['day90',   'Day 90, course finished','All 13 chapters done. The re-interview unlocks now.'],
-  ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.']
+  ['promoted','Promoted to E4',        'Cohort closed, level moved up one, next course offered.'],
+  ['reddemo', 'Red Accent Demo',       'A frozen copy of Day 34 in solid #FF0000. Temporary, for a demo &mdash; nothing else in the product links to it.']
 ];
 
 const STAGES_HIDDEN = new Set(['consult']);
@@ -11060,6 +11251,11 @@ function stageResolve(k){
 }
 
 
+const RED_DEMO = 'reddemo';
+
+const isDay34 = s => s === 'day34' || s === RED_DEMO;
+
+
 const CFG = {
   nil:     {nav:'early',  track:'Explorer', pred:true},
   signup:  {nav:'early',  track:'Explorer', pred:true},
@@ -11070,7 +11266,8 @@ const CFG = {
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
   day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260},
   day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:87,  mins:700, reinterview:true, finished:true},
-  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:87, mins:700}
+  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:87, mins:700},
+  reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260}
 };
 
 const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0, open:0, avg:null, mins:0};
@@ -11135,6 +11332,13 @@ const NOTIF = {
     {ic:'trophy',   t:'Promoted to Explorer – E4',    b:'Priya signed the decision on November 21.',                    w:'Today', go:'level',       unread:1},
     {ic:'certificate',t:'Certificate available',      b:'Explorer Track – E3, Cohort 41. Yours to download and share.', w:'Today', go:'transcript',  unread:1},
     {ic:'ticket',   t:'Explorer Track – E4 opens December 1',b:'Cohort 58 has 7 places left.',                          w:'Yesterday', go:'enrol',    unread:0}
+  ],
+  reddemo:[
+    {ic:'warning',  t:'Week 4 reflection is overdue', b:'It was due Monday. Priya can see it on her roster.',           w:'2h ago', go:'coursework',  unread:1},
+    {ic:'group',    t:'Weekly call in 2 days',        b:'Thursday 6:00 PM ET. Week 5 covers hard conversations.',        w:'Today', go:'cohort',      unread:1},
+    {ic:'trophy',   t:'25 points awarded',            b:'Chapter completion. You are 1,405 points from Bronze.',        w:'Today', go:'rewards',     unread:1},
+    {ic:'chat',     t:'Priya replied',                b:'“Bring the vendor review example on Thursday.”',               w:'Yesterday', go:'messages', unread:0},
+    {ic:'book',     t:'Chapter 5 opens Monday',       b:'Hard Conversations. 55 minutes.',                              w:'3 days ago', go:'coursework', unread:0}
   ]
 };
 
@@ -11246,7 +11450,8 @@ const GAME = {
   week1:   {pts:985,  got:[0,1,3],           badges:0, rank:1, last:['08/13/2026','07/23/2026','','07/23/2026','','','','',''], weeks:[20]},
   day34:   {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]},
   day90:   {pts:2955, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/14/2026','11/16/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
-  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]}
+  promoted:{pts:3205, got:[0,1,2,3,4,5,6],   badges:1, rank:1, last:['08/13/2026','07/23/2026','11/18/2026','11/21/2026','09/12/2026','09/21/2026','09/24/2026','',''], weeks:[52,61,48,55,62,58,70,49,55,60,52,66,58]},
+  reddemo: {pts:1095, got:[0,1,2,3],         badges:0, rank:1, last:['08/13/2026','07/23/2026','08/04/2026','07/23/2026','','','','',''], weeks:[52,61,48,55,12]}
 };
 
 const WEEK_TARGET = 55;
@@ -11259,6 +11464,13 @@ const WEEKLY = {
     ask: ['What should I get done this week?', 'Plan my week']
   },
   day34: {
+    did: [
+      ['Chapter 5 finished', 'Assessed 86%']
+    ],
+    tal: 'The three furthest ahead in Cohort 41 had this week&rsquo;s chapter finished and its assessment submitted by day 34. You are 58 minutes and one assessment behind that pace, and chapter 4 is the growth area in your report — so it is the one worth the extra time.',
+    ask: ['What do I have to do to catch up this week?', 'How do I catch up?']
+  },
+  reddemo: {
     did: [
       ['Chapter 5 finished', 'Assessed 86%']
     ],
@@ -11313,11 +11525,13 @@ const BMK = {
 ;
 const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
 
-const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
   disc:{},
   scenes:{level:null, re:null}, scPick:{level:[], re:[]},
-  cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true}]};
+  cards:[{brand:'Visa',last:'4242',exp:'09/29',def:true},
+         {brand:'Mastercard',last:'8210',exp:'04/28'},
+         {brand:'Amex',last:'1005',exp:'11/27'}]};
 const isLead = () => S.portal === 'leader';
 ;
 const lvlName = c => 'Explorer – ' + c;
@@ -11605,7 +11819,7 @@ function chRow(i,f){
   const n=i+1, name=CH[i][0], mins=CH[i][1];
   let state='', meta='';
   if(i < f.done){ state='done'; meta=`${mins} min · ${SCORE[i]}% assessment`; }
-  else if(i === f.open && f.enrolled){ state='open'; meta = S.stage==='day34'&&i===3 ? '12 of 70 min · 4 opens' : `Started · ${mins} min`; }
+  else if(i === f.open && f.enrolled){ state='open'; meta = isDay34(S.stage)&&i===3 ? '12 of 70 min · 4 opens' : `Started · ${mins} min`; }
   else if(OPEN_DATES[i] && f.week < i){ state='locked'; meta='Opens '+OPEN_DATES[i]; }
   else { state=''; meta='Not started · '+mins+' min'; }
   const flag = GROWTH.includes(i) ? 'Your growth area' : '';
@@ -11636,7 +11850,7 @@ const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip
 
 function wChapter(i){
   const g = GAME[S.stage];
-  const done = g && i < g.done, inprog = S.stage==='day34' && i===3;
+  const done = g && i < g.done, inprog = isDay34(S.stage) && i===3;
   return tw(twIc('book') + `Chapter ${i+1} · ${CH[i][0]}`,
     `<span class="tw-row"><span class="tw-bar"><i style="width:${inprog?17:done?100:0}%"></i></span>
      <span class="tw-k">${inprog?'12 of 70':done?CH[i][1]+' of '+CH[i][1]:'0 of '+CH[i][1]} min</span></span>`,
@@ -11892,7 +12106,7 @@ function certCard(f){
 
 function progressStrip(f){
   const pct = Math.round(f.done/13*100);
-  const tasks = S.stage==='week1'?'0 of 3':S.stage==='day34'?'1 of 3':'3 of 3';
+  const tasks = S.stage==='week1'?'0 of 3':isDay34(S.stage)?'1 of 3':'3 of 3';
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
   return `<div class="prog">
     <div class="prog-top">
@@ -11991,7 +12205,7 @@ function pulseLede(f, g, p){
     return `All <b>13 chapters</b> are done &mdash; ${p.figs[0][0]} across ${n} weeks, ${p.figs[2][0]} of the ${WEEK_TARGET} min weekly target. Booking the re-interview is the only thing left.`;
   }
   const i = f.open, mins = CH[i][1];
-  const did = S.stage === 'day34' ? 12 : 0;
+  const did = isDay34(S.stage) ? 12 : 0;
   const wk = g.weeks[g.weeks.length-1] || 0;
   const same = did > 0 && did === wk;
   return `You have completed <b>${did} of ${mins} minutes</b> for <span class="pulse-hl">${CH[i][0]}</span>, ${
@@ -12000,14 +12214,14 @@ function pulseLede(f, g, p){
   }. Complete chapter ${i+1} to stay on the pace.`;
 }
 
-function pulse(f, g){
+function pulseCols(f, g){
   const w = WEEKLY[S.stage] || WEEKLY.week1;
   const p = pacePart(f, g);
 
   let focus = '';
   if(!f.finished){
     const i = f.open, mins = CH[i][1];
-    const did = S.stage === 'day34' ? 12 : 0;
+    const did = isDay34(S.stage) ? 12 : 0;
     const pct = Math.round(did / mins * 100);
     focus = pulseCol(1, I.book, 'Current focus', `
       <h3 class="pulse-t">${CH[i][0]}</h3>
@@ -12074,6 +12288,55 @@ function pulse(f, g){
     ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
     <div class="pulse">${focus}${pace}${stand}</div>
   </div>`;
+}
+
+function pulseCard(f, g){
+  const p = pacePart(f, g);
+  const act = f.finished
+    ? `<button class="btn btn-p btn-sm noic" data-go="rewards">View more ${I.arrowRight}</button>`
+    : `<button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button>`;
+  const c = f.finished ? null : CALL_ROW.cohort();
+  return `<div class="sec sec-pulse dark-card">
+    ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
+    ${c ? `<div class="pnc">
+      <h3 class="pnc-t">Your Next Call</h3>
+      ${''/* THE PORTRAIT IS A SQUARE SIZED BY THE TEXT BESIDE IT (Maryam, 31 Aug
+             2026: "the profile square will be of the height of the right side
+             content"), and §75's note on `.rec-l` is why the row is a GRID.
+             `width:auto; height:100%; aspect-ratio:1` cannot work in a flex row:
+             flex resolves the main size from the flex base size, and a box whose
+             only content is a `position:absolute` `<img>` contributes zero, so
+             the ratio has nothing to transfer into and the photograph ships at
+             18px — silently, on a card that otherwise looks right. §79 states
+             the three tracks. */}
+      <div class="pnc-row">
+        <span class="pnc-ph"><i>${c.who.i}</i><img src="${c.who.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        <div class="pnc-b">
+          <p class="pnc-n">${c.who.n}<span class="pnc-v">${I.checkFilled}</span></p>
+          <p class="pnc-r">${c.role}</p>
+        </div>
+        <span class="pnc-when">${I.time}${callIn(c.when)}</span>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+function pulseQA(f, g){
+  const p = pacePart(f, g);
+  const cards = [];
+  if(!f.finished) cards.push({
+    ic:I.book, hue:'ic-focus', t:'Current focus',
+    d:`Chapter ${f.open+1}, ${CH[f.open][1]} minutes.`,
+    go:`chapter:${f.open}`});
+  cards.push({
+    ic:I.time, hue:'ic-pace', t:'Your pace',
+    d:`${p.figs[0][0]} ${p.figs[0][1].toLowerCase()}, ${p.figs[2][0].toLowerCase()} of target.`,
+    go:'transcript'});
+  cards.push({
+    ic:I.star, hue:'ic-stand', t:'Your standing',
+    d:`${g.pts.toLocaleString()} points at ${RANKS[g.rank-1].n}.`,
+    go:'rewards'});
+  return quickActions(cards);
 }
 
 ;
@@ -12270,9 +12533,10 @@ const railRoots = () => {
   const set = NAVSETS[isLead() ? 'leader' : cfg(S.stage).nav] || [];
   return set.map(([k]) => k).concat(isLead() ? ['leadProfile'] : ['account']);
 };
+const bkLabel = `${I.arrowLeft}<span class="ph-back-t">Back</span>`;
 const bk = (to) => (S.hist.length && !railRoots().includes(S.view))
-  ? `<button class="ph-back" data-back="1" aria-label="Back">${I.arrowLeft}</button>`
-  : to ? `<button class="ph-back" data-go="${to}" aria-label="Back">${I.arrowLeft}</button>` : '';
+  ? `<button class="ph-back" data-back="1">${bkLabel}</button>`
+  : to ? `<button class="ph-back" data-go="${to}">${bkLabel}</button>` : '';
 const PH_IC = [
   [/re-?interview|interview/i,                        'video'],
   [/track|explorer|builder|trailblazer/i,             'growth'],
@@ -12506,7 +12770,7 @@ function wingBlock(){
   return stepper(journey());
 }
 
-const progCol = f => `<div class="sec head-sec head-col sec-prog">
+const progCol = f => `<div class="sec head-sec head-col sec-prog${f.done >= CH.length ? ' prog-full' : ''}">
     ${progressWing(f)}
   </div>`;
 
@@ -12516,6 +12780,49 @@ const WEEK_CALL = {when:'in 2 days', session:36};
 
 const callLeft = w => !/^in /i.test(w) ? w
   : PLATE_SOON.test(w) ? 'In ' + w.slice(3) : w.slice(3) + ' left';
+
+const callIn = w => /^in /i.test(w) ? 'In ' + w.slice(3) : w;
+
+const JOIN_NOW = /\b(now|starting|imminent|in \d+ ?(m|min|mins|minute|minutes)\b)/i;
+const JOIN_EARLY = 5;   /* minutes you may arrive before the hour */
+
+const joinClock = (w) => {
+  const m = /\btoday\b[,\s]+(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i.exec(String(w || ''));
+  if(!m) return null;
+  let h = +m[1] % 12;
+  if(/p/i.test(m[3])) h += 12;
+  const d = new Date();
+  d.setHours(h, +m[2], 0, 0);
+  return d.getTime();
+};
+
+function joinLive(when, mins){
+  if(JOIN_NOW.test(String(when || ''))) return true;
+  const t = joinClock(when);
+  if(t === null) return false;
+  const now = Date.now();
+  return now >= t - JOIN_EARLY * 60000 && now <= t + (mins || 45) * 60000;
+}
+
+function joinArm(){
+  const btns = (typeof device !== 'undefined' && device)
+    ? device.querySelectorAll('[data-joinwhen]') : [];
+  btns.forEach(b => {
+    const live = joinLive(b.dataset.joinwhen, +b.dataset.joinmins || 45);
+    if(live === !b.disabled) return;
+    b.disabled = !live;
+    if(live) b.removeAttribute('title');
+    else b.title = joinShut(b.dataset.joinwhen);
+  });
+}
+const joinShut = (w) => {
+  const t = joinClock(w);
+  if(t === null) return 'Opens when the call starts';
+  const d = new Date(t - JOIN_EARLY * 60000);
+  const h = d.getHours() % 12 || 12;
+  return `You can join from ${h}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`;
+};
+setInterval(joinArm, 20000);
 
 const CALL_ROW = {
   iv: () => {
@@ -12543,10 +12850,12 @@ const CALL_ROW = {
 };
 
 function crow(kind, o){
-  const c = (CALL_ROW[kind] || CALL_ROW.cohort)();
+  const c = typeof kind === 'object' && kind ? kind : (CALL_ROW[kind] || CALL_ROW.cohort)();
   const p = c.who;
   const soon = PLATE_SOON.test(c.when);
   o = o || {};
+  const xl = c.xl === undefined ? 'Expertise:' : c.xl;
+  const gate = o.gate ? !joinLive(c.when, c.mins) : false;
   return `<div class="crow${soon ? ' urgent' : ''}">
       ${o.when === false ? '' : `<div class="crow-when">
         <b>${callLeft(c.when)}</b>
@@ -12556,14 +12865,16 @@ function crow(kind, o){
         <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
-            <span class="crow-v">${I.checkFilled}</span></p>
+            ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
           <p class="crow-role">${c.role}</p>
-          <p class="crow-x"><b>Expertise:</b> ${c.x}</p>
+          <p class="crow-x">${xl ? `<b>${xl}</b> ` : ''}${c.x}</p>
         </div>
       </div>
       <div class="crow-a">
         ${o.second === false ? '' : `<button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>`}
-        <button class="btn btn-p btn-sm noic" data-call="${c.kind}">Join call ${I.arrowRight}</button>
+        <button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+          o.gate ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
+          gate ? ` disabled title="${joinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>
       </div>
     </div>`;
 }
@@ -12635,6 +12946,8 @@ const REC = {
 };
 
 S.recKey = 'priya';
+S.bkMo = 0;
+S.bkSlot = 4;
 S.recBusy = false;
 const recKey = () => REC_ORDER.includes(S.recKey) ? S.recKey : REC_ORDER[0];
 
@@ -12673,10 +12986,14 @@ function recSkeleton(){
             <span class="sk sk-n"></span>
             <span class="sk sk-rt"></span>
           </div>
-          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
           <div class="rec-ov">
             <p class="rec-tags"><span class="sk sk-t sk-why"></span></p>
           </div>
+          ${''/* THE THREE FACT BARS MOVED WITH THE ROW THEY STAND IN FOR. A
+                skeleton is only worth having while every bar is the BOX of the
+                thing it replaces, so an order it no longer shares is the same
+                failure as a width it no longer shares. */}
+          <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
         </div>
       </div>
       <div class="rec-a">
@@ -12687,7 +13004,7 @@ function recSkeleton(){
   </div>`;
 }
 
-function talRec(){
+function talRec(title){
   if(S.recBusy) return recSkeleton();
   const a = AGENTS[recKey()];
   const rec = REC[recKey()];
@@ -12724,7 +13041,7 @@ function talRec(){
           box rather than as a rule. */}
     <div class="dc-hd">
       <div class="dc-hd-r">
-        <h2 class="dc-t">Your Next Step - Interview</h2>
+        <h2 class="dc-t">${title || 'Your Next Step - Interview'}</h2>
         <button class="btn btn-s btn-sm noic dc-act" data-go="agents">View all agents ${I.arrowRight}</button>
       </div>
       <span class="ai-label bare rec-lab">Tal recommends</span>
@@ -12764,16 +13081,6 @@ function talRec(){
                 <span class="rec-v">${I.verified}</span></span></p>
             <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
-          ${''/* THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
-                581:6479 is the one number on this block that contradicts the
-                product: the record says $95, and so do the Agents page, the
-                agent profile and the booking flow. A file's placeholder does
-                not get to be the fourth price on one journey, so the record
-                wins and the file's wording keeps it. Change `AGENTS.priya` if
-                $120 is the real fee and all four surfaces move together. */}
-          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
-            <span>${I.video}${rec.mins}</span>
-            <span>${I.calendar}Next slot: ${a.slot}</span></p>
           ${''/* THE TWO TAGS BECOME ONE SENTENCE — 581:6535 (Maryam, 31 Aug
                 2026). The pair was "Your need: System Design" and "Priya's
                 Strength: Architecture", two pills side by side, and the reader
@@ -12817,6 +13124,30 @@ function talRec(){
           <div class="rec-ov">
             <p class="rec-why">${first}&rsquo;s ${rec.strength} strength perfectly matches your need for ${rec.need}.</p>
           </div>
+          ${''/* THE FACT ROW CLOSES THE COLUMN (Maryam, 31 Aug 2026: "take the
+                fee row at the end of the priya content"). It sat between the
+                rating and the claim, which put the block's three KINDS in the
+                wrong order: who she is, then what she costs, then why her — so
+                the sentence the whole card exists to deliver was separated from
+                the name it is about by three figures. Last, the column reads
+                identity → claim → terms, and the terms sit directly above the
+                Book button that acts on them.
+
+                IT IS THE SAME ROW AND THE SAME RULES. `.rec-f` is a wrapping
+                flex row (§70.5) and its position in a `column` flex is markup
+                only, so nothing in §70 or §63 moves with it — which is also why
+                `V.agent`'s copy needed no change: that block has no claim
+                sentence, so the row was already its last child.
+                THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
+                581:6479 is the one number on this block that contradicts the
+                product: the record says $95, and so do the Agents page, the
+                agent profile and the booking flow. A file's placeholder does
+                not get to be the fourth price on one journey, so the record
+                wins and the file's wording keeps it. Change `AGENTS.priya` if
+                $120 is the real fee and all four surfaces move together. */}
+          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+            <span>${I.video}${rec.mins}</span>
+            <span>${I.calendar}Next slot: ${a.slot}</span></p>
         </div>
       </div>
       ${''/* ONE BUTTON AGAIN, AND IT IS NOT THE ONE THAT WAS HERE FIRST.
@@ -12863,19 +13194,21 @@ function talRec(){
   </div>`;
 }
 
-const quickActions = () => `<div class="sec sec-qa">
+const QA_NEW = [
+  {ic:I.trophy,    hue:'ic-quiz', t:'Open Quiz Results',
+   d:'Review your score and quiz performance.', peek:'quiz'},
+  {ic:I.lightning, hue:'ic-prep', t:'Quick-Start Preparation',
+   d:'Ask Tal to prepare you for the interview.', ask:'Prepare me for my level interview'}
+];
+const quickActions = (cards) => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
-  <div class="qa">
-    <button class="qa-c" data-go="result">
-      <span class="qa-ic ic-quiz">${I.trophy}</span>
-      <span class="qa-b"><b>Open Quiz Results</b><span>Review your score and quiz performance.</span></span>
+  <div class="qa">${(cards || QA_NEW).map(c => `
+    <button class="qa-c" ${c.ask ? `data-tal-ask="${c.ask}"`
+      : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}>
+      <span class="qa-ic ${c.hue}">${c.ic}</span>
+      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
       <span class="qa-go">${I.arrowRight}</span>
-    </button>
-    <button class="qa-c" data-tal-ask="Prepare me for my level interview">
-      <span class="qa-ic ic-prep">${I.lightning}</span>
-      <span class="qa-b"><b>Quick-Start Preparation</b><span>Ask Tal to prepare you for the interview.</span></span>
-      <span class="qa-go">${I.arrowRight}</span>
-    </button>
+    </button>`).join('')}
   </div>
 </div>`;
 
@@ -13557,7 +13890,7 @@ V.dashboard = (f) => {
 
   else { /* enrolled: week1, day34, day90 */
     const g = GAME[S.stage];
-    const stalling = S.stage==='day34';
+    const stalling = isDay34(S.stage);
     const dueRe = S.stage==='day90';
     const reBook = dueRe?`<div class="sec">
       <div class="plate">
@@ -13580,11 +13913,16 @@ V.dashboard = (f) => {
           is the long version. In the DOM they end up THIRD and FOURTH, because
           `talFirst` hoists Tal's card to sit directly under the header. */}
     ${progCol(f)}
-    ${''/* NO CALL ON DAY 90. `f.finished` is the 90 days being over, and the
-          weekly call goes with them — the same test the plate this replaces
-          carried. The band is then two columns and no third row, which is
-          correct rather than something to fill. */}
-    ${f.finished?'':callRow(f)}
+    ${''/* THE CALL LEFT THE BAND (Maryam, 31 Aug 2026). `callRow(f)` stood here
+          as a third band member spanning both columns — a white row with the
+          countdown in a tinted cell and two buttons. It is inside `pulseCard`
+          now, under the pulse's own head row and a hairline, with no buttons on
+          it. So the band is the two columns the file draws and nothing else,
+          which is what "the first row is fine, do not change it" means.
+
+          `callRow()` ITSELF IS UNTOUCHED AND STILL HAS A READER — `V.cohort`
+          draws it. This is one of its two call sites going away, not the
+          component. */}
     ${reBook}
     ${''/* THE WING LEFT THIS CARD — §71. `wingBlock()` sat here in a `.stp-wing`
           and drew the progress strip as the last member of the band's LEFT
@@ -13602,12 +13940,16 @@ V.dashboard = (f) => {
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
       </div>
     </div>
-    ${''/* THE THREE SECTIONS THAT USED TO BE HERE ARE ONE — see the note over
-          `pulse`. "This week", "Time on the course" and "Where you stand" were
-          three headings and three panels asking one question; they are three
-          COLUMNS of one section now, in the order the question is asked. The
-          thirteen-week chart went with the merge and is on Course Progress. */}
-    ${g?pulse(f,g):''}
+    ${''/* THE BLACK CARD AND THEN QUICK ACTIONS — the `new` prototype's shape,
+          one stage on (Maryam, 31 Aug 2026). See the note over `pulseCols`.
+
+          "This week", "Time on the course" and "Where you stand" were three
+          sections, then three columns of one section, and are now three Quick
+          Action cards pointing at the pages that hold them. The columns
+          themselves are not lost: `pulseCols` draws them in full on Course
+          Progress. The thirteen-week chart is already there. */}
+    ${g?pulseCard(f,g):''}
+    ${g?pulseQA(f,g):''}
 `;
   }
   return `<main class="main"><div class="page">${body}</div></main>`;
@@ -13730,11 +14072,98 @@ function qzChapter(band){
   return i < 0 ? null : {n:i + 1, t};
 }
 
+
+const qzRung = (v, track) => {
+  const T = ['Explorer','Builder','Trailblazer'];
+  const lo = Math.max(0, T.indexOf(track || 'Explorer')) * 5;
+  const fifth = Math.min(5, Math.max(1, Math.ceil(v / 20)));
+  return LVL_CODES[lo + fifth - 1];
+};
+
+function qzLede(f){
+  const asc = SCORES.slice().sort((a,b) => a[1] - b[1]);
+  const low = asc[0], high = asc[asc.length - 1];
+  return `<b>${high[0]}</b> at ${high[1]} is your strongest band, `
+    + `${low[0].toLowerCase()} at ${low[1]} your weakest. An agent pushes hardest on `
+    + `the two lowest, and both are holding you a rung below the rest of you.`;
+}
+
+const qzList = (title, hue, items) => `<div class="qzp-g">
+  <div class="qzp-t ${hue}">${title}</div>
+  <ol class="qzp-l">${items.map(t => `<li>${t}</li>`).join('')}</ol>
+</div>`;
+
+function quizPeek(f){
+  const asc = SCORES.slice().sort((a,b) => a[1] - b[1]);
+  const impact = asc.slice(0, 2).map(r => r[0]);
+  const rows = asc.slice(0, 2).map(([band, v]) => `
+    <button class="qzp-r" data-go="level">
+      <span class="qzp-r-ic">${I.group}</span>
+      <span class="qzp-r-b">
+        <span class="qzp-r-k">${band} &middot; ${v}</span>
+        <span class="qzp-r-v">Reads at ${qzRung(v, f.track)} on the ${f.track || 'Explorer'} track</span>
+        <span class="qzp-r-tag">High impact</span>
+      </span>
+      <span class="qzp-r-go">${I.chevRight}</span>
+    </button>`).join('');
+
+  return `<aside class="peek peek-qz" aria-label="Your quiz results">
+    <div class="peek-h">
+      ${''/* NO DESCRIPTION UNDER THE TITLE (Maryam, 31 Aug 2026). §44's
+             `.peek-t > small` is a second line explaining what the panel is,
+             which the agent portal's preview genuinely needs — "What a candidate
+             sees in browse" is the whole of why that column exists. This panel's
+             title is its own explanation, and the date said "From the quiz you
+             sat 12 Aug" directly above a sentence that starts by naming two of
+             that quiz's scores. `qzTaken` keeps its two readers and is not
+             called from here any more. */}
+      <span class="peek-t">Your Quiz Results</span>
+      <button class="peek-x" data-peek="" aria-label="Close the quiz results">${I.close}</button>
+    </div>
+    <div class="peek-b">
+      ${''/* TAL'S MARK AND NOT `.ai-label` OR `.ai-aura` — §72 records this trap
+             at length. `talFirst` hoists any `.sec` containing an `.ai-aura` to
+             under the `.ph` and `placeBand`'s `_mhIsTal` claims either class as
+             head furniture; the peek is outside `.page` so neither pass can
+             reach it today, which is exactly the accident not to depend on.
+
+             AND IT HOLDS NO GLYPH. §70 draws the sparkle by MASKING a gradient
+             — `--ai-star` is a data-URI of the shape, not a colour — so the
+             mark is an empty box that §80.2 paints, the way `.aih-mk` is.
+             `fill:var(--ai-star)` was the first version and painted nothing:
+             it set `fill` to a URL. */}
+      <p class="qzp-lede"><span class="qzp-mk" aria-hidden="true"></span>${qzLede(f)}</p>
+      ${qzList('What you do well', 'ok', QZ_STR)}
+      ${qzList('Where you lose ground', 'acc', QZ_DEV)}
+      <div class="qzp-rose">${quizRose(SCORES, 64, true)}</div>
+      <div class="qzp-g">
+        <div class="qzp-t">Where this puts you on the ladder</div>
+        <div class="qzp-rows">${rows}</div>
+      </div>
+    </div>
+    ${''/* THE FOOTER IS THE ONE THING TO DO ABOUT ALL OF IT (Maryam, 31 Aug
+           2026: add "Book your interview today" with an arrow). It goes to
+           `agents` rather than to Priya: the panel is about five bands and two
+           weaknesses, and the page's own CTA a column to the left is already
+           the one that books the agent Tal picked. It is also the sentence that
+           settles the rungs above it — the interview is what sets a level, and
+           this is the control that starts one. */}
+    <div class="peek-f">
+      <button class="qzp-cta" data-go="agents">Book your interview today${I.arrowRight}</button>
+    </div>
+  </aside>`;
+}
+
+function peekPanel(f){
+  if(S.peek === 'quiz') return quizPeek(f);
+  return '';
+}
+
 const qzTaken = (long) => S.stage === 'consult'
   ? (long ? '3 August 2026'  : '3 Aug')
   : (long ? '12 August 2026' : '12 Aug');
 
-function quizRose(dims, score){
+function quizRose(dims, score, bare){
   const CX = 180, CY = 158, R0 = 36, R = 108, GAP = 1.4;
   const pol = (a,r) => [CX + r * Math.cos(a * Math.PI/180), CY + r * Math.sin(a * Math.PI/180)];
   const seg = (a0,a1,r) => {
@@ -13784,13 +14213,13 @@ function quizRose(dims, score){
       <text x="${CX}" y="${CY+14}" text-anchor="middle" class="qz-mids">of 100</text>
       ${marks}
     </svg>
-    <div class="qz-key">
+    ${bare ? '' : `<div class="qz-key">
       ${dims.map(([k,v]) => { const [cls,word] = qzBand(v);
         return `<div class="kv"><span class="k"><i class="qz-sw ${cls}"></i>${k}</span>
           <span class="v">${v}<span class="tag qz-vd">${word}</span></span></div>`; }).join('')}
     </div>
     <p class="t-helper-01 qz-note">Each wedge reaches out as far as its score. The two shortest are what
-      the interview probes hardest, and what the course spends most of its time on.</p>
+      the interview probes hardest, and what the course spends most of its time on.</p>`}
   </div>`;
 }
 
@@ -14035,23 +14464,57 @@ V.interviews = (f) => {
         control coming off for the same reason: the invite is in the email the
         moment the booking clears.
 
-        AND IT IS THE ROW ALONE — no heading and no legal line (Maryam, 31 Aug
-        2026). "Scheduled" over a single row that already says "6 days left ·
-        Level interview" is the row's own first cell restated as a heading, and
-        the section is the only thing on this part of the page. The 24-hour
-        reschedule window goes with it: the sentence is stated where the money
-        is, on `V.booking` and `V.payment` — which are the two lines `wRefund`
-        (ai8) reads when Tal is asked — and a policy line under a Join button
-        is the "no policy" ban `PAGESUM`'s note lists, applied to page copy.
+        AND IT IS THE BLACK CARD NOW — THE DASHBOARD'S, EXACTLY (Maryam, 31 Aug
+        2026). §77 converted the `booked` dashboard's row to §75's `.dark-card`
+        and its own note argues this page should NOT follow: "the other two sit
+        under section headings on pages about interviews and cohorts, where the
+        row is one item rather than the answer." That reasoning is right about
+        `V.cohort` and weakest exactly here — on the `booked` stage this row is
+        the only thing on the page that has not happened yet, sitting under a
+        section called "Past interviews". It is the answer, and it is the same
+        appointment the dashboard is calling the answer two clicks away.
 
-        WITH NO `.sec-h` THIS NEEDS NO LAYER. §10.15's label column only reaches
-        `.sec:has(> .sec-h)`, so the section is the same shape the `booked`
-        dashboard already draws — `.sec.sec-call` holding the bare row — and the
-        opt-out, the gutter restatement and the heading padding a headed version
-        needed are all moot. That is why the wrapper matches the dashboard's
-        exactly rather than being this page's own. */}
+        THE HEADING CAME BACK AND ITS REMOVAL IS WHAT MADE THAT FINE. This
+        section was headingless on the argument that "Scheduled" over a row
+        already reading "6 days left · Level interview" is the row's first cell
+        restated. §77 moved the countdown OUT of the row and into the card's
+        heading row (`.dc-when`, `crow('iv',{when:false})`), so the cell that
+        made it a repeat no longer exists — and the heading row is structural on
+        a `.dark-card` rather than optional, since a bare countdown floating at
+        the right of an empty row is what the alternative draws. One word, the
+        page's own name for the block, in sentence case.
+
+        `.dc-t` IS NOT `.sec-h`, so §10.15's label column still does not reach
+        this section — the heading is the card's, inside it. The opt-out, the
+        gutter restatement and the heading padding a `.sec-h` would have needed
+        are all still moot.
+
+        RESCHEDULE STAYS, AND §77.3 IS WHERE THE PRICE OF THAT IS WRITTEN. The
+        dashboard drops it (`{second:false}`) because a next-step card has one
+        action; this is the interviews page, which is where a person comes TO
+        reschedule, so dropping it would remove the control from the one page
+        that should carry it. §77 deleted the two rules a quiet button on this
+        card needs and left instructions to restore both — its own border and
+        §63 §17's ink — and both are back, keyed on `:not(.btn-p)` so the
+        dashboard's single-button card is untouched.
+
+        THE COUNTDOWN STRING IS `callLeft(CALL_ROW.iv().when)`, the dashboard's
+        expression verbatim, so the two surfaces cannot disagree about the same
+        appointment — the failure `bkStamp` exists to prevent, answered here the
+        way the note over `bkStamp` says to prefer: derive it, do not stamp it.
+
+        THE LEGAL LINE STAYS OFF. The 24-hour reschedule window is stated where
+        the money is, on `V.booking` and `V.payment` — the two lines `wRefund`
+        (ai8) reads when Tal is asked — and a policy line under a Join button is
+        the "no policy" ban `PAGESUM`'s note lists, applied to page copy. */}
   ${booked?`
-  <div class="sec sec-call">${crow('iv')}</div>`:`
+  <div class="sec sec-call dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">Scheduled</h2>
+        <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+    </div>
+    ${crow('iv', {when:false})}
+  </div>`:`
   ${''/* THE FOUR FACTS ARE THE HEAD OF "HOW IT WORKS", NOT A BAND ABOVE IT.
         They were their own headingless section — a bordered strip of Length,
         Format, Your report, Fee sitting between the past interviews and the
@@ -14197,12 +14660,27 @@ V.agents = (f) => `<main class="main"><div class="page">
 V.agent = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
-  const days = [['Wed','Wednesday',19],['Thu','Thursday',20],['Fri','Friday',21],
-                ['Mon','Monday',24],['Tue','Tuesday',25]];
-  const dSel = 1;
-  const CAL_Y = 2026, CAL_M = 7, CAL_MN = 'August';
-  const calOpen = days.map(d => d[2]);
-  const calSel  = days[dSel][2];
+  const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MON = ['January','February','March','April','May','June','July','August',
+               'September','October','November','December'];
+  const dowLong = (y,m,d) => DOW[new Date(y,m,d).getDay()];
+  const AGENT_CAL = [{y:2026, m:7, skip:[3,4,10,11,18,27]},
+                     {y:2026, m:8, skip:[3,10,17,24]}];
+  const calDays = c => {
+    const last = new Date(c.y, c.m + 1, 0).getDate(), out = [];
+    for(let n = 1; n <= last; n++){
+      const w = new Date(c.y, c.m, n).getDay();
+      if(w && w < 6 && !c.skip.includes(n)) out.push(n);
+    }
+    return out;
+  };
+  const calI = Math.min(Math.max(S.bkMo | 0, 0), AGENT_CAL.length - 1);
+  const CAL = AGENT_CAL[calI];
+  const CAL_Y = CAL.y, CAL_M = CAL.m, CAL_MN = MON[CAL_M];
+  const calOpen = calDays(CAL);
+  const selMo = 0, selD = 20;
+  const selCal = AGENT_CAL[selMo];
+  const calSel = calI === selMo ? selD : -1;
   const calLead = new Date(CAL_Y, CAL_M, 1).getDay();
   const calLast = new Date(CAL_Y, CAL_M + 1, 0).getDate();
   const calPrev = new Date(CAL_Y, CAL_M, 0).getDate();
@@ -14210,9 +14688,11 @@ V.agent = (f) => {
   for(let i = 0; i < calLead; i++) calCells.push([calPrev - calLead + 1 + i, true]);
   for(let n = 1; n <= calLast; n++) calCells.push([n, false]);
   while(calCells.length % 7) calCells.push([calCells.length - calLead - calLast + 1, true]);
-  const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
-  const taken = [0,5], sSel = 4;
-  const open = slots.length - taken.length;
+  const SLOT_ALL = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
+  const taken = [0,5];
+  const slots = SLOT_ALL.filter((t,i) => !taken.includes(i));
+  const sSel = Math.min(Math.max(S.bkSlot | 0, 0), slots.length - 1);
+  const open = slots.length;
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
   ${''/* THIS PAGE HAD NO HEADER AND THEREFORE NO WAY BACK.
@@ -14326,48 +14806,31 @@ V.agent = (f) => {
             <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
       </div>
-      ${''/* THE THREE FACTS ARE THREE LINES, LABEL LEFT AND VALUE RIGHT
-            (Maryam, 31 Aug 2026). They were a name over a value with a 28px
-            tinted chip beside the pair — §65's figure cell, which is the shape
-            for a number you SCAN against the two beside it. These are not that:
-            they are three different questions with one answer each, and an
-            answer belongs on the line of its question. Stacked, the eye read
-            six lines to get three facts.
+      ${''/* THE THREE PURCHASE FACTS CAME OFF AND THE BLOCK IS ONE COLUMN
+            (Maryam, 31 Aug 2026). "Interview fee $95 / Length 45 minutes,
+            recorded / Report turnaround Within 24 hours" was the reference's
+            right-hand column and it survived four rewrites of this page; what
+            it never survived is the question of what it ADDED. Two of the three
+            are printed 40px to their left in `.rec-f` — "$95 Interview Fee" and
+            "45 mins call" — so the block stated the fee twice and the length
+            twice, in two different type pairs, either side of a divider whose
+            job was to separate them from each other.
 
-            THE CHIP WENT AND THE GLYPH STEPS 16 -> 20, which is exactly the
-            trade §72 made for the pulse's column marks: "the hue survives and
-            the wash goes; the glyph steps because it now holds the line alone".
-            The reason is the same one, one page over — three filled squares in
-            a column of three rows are the heaviest objects in a block that no
-            longer has a border round it, and a chip on a row is a box on a
-            line rather than a mark in front of one.
+            THE FEE IS ALSO IN THE CHECKOUT ROW, which is where a price belongs
+            on a page that ends in a Proceed button.
 
-            THE THREE ROWS ARE ONE WIDTH AND IT IS THE WIDEST ROW'S, which is
-            the whole of what makes the right edge read as an edge. §76 sizes
-            the grid track with `fit-content()` rather than a fixed `minmax()`,
-            so the column is exactly as wide as "Report turnaround / Within 24
-            hours" needs and the other two stretch to it. A fixed track would
-            either clip that row or leave the other two ending short of it.
+            WHAT IS ACTUALLY LOST IS "Within 24 hours" — the report turnaround,
+            the one of the three this page did not already say twice. It is
+            still true and `V.booking` still states it, but this page no longer
+            does. Raised rather than assumed: if it should stay, it belongs
+            beside the other two facts about the appointment in `.rec-f`, not in
+            a column of its own.
 
-            THE HUES ARE NAMED, NOT CYCLED — §65's and §72's rule both. The fee
-            is `--mk-1` on both this page and anywhere else these three appear,
-            so a fact cannot change colour by moving position.
-
-            THE LABEL IS THE STRONG ONE AND THE VALUE IS THE QUIET ONE, which
-            inverts `.kv` and `.stat` both and is §73's argument kept verbatim
-            through the turn onto one line: these are three different things,
-            so what you scan is the names. The fee is the one accent string,
-            because it is the only one of the three that is a decision. */}
-      <div class="bkp-r">
-        ${[[I.wallet,   'Interview fee',    a.price, 1],
-           [I.time,     'Length',           '45 minutes, recorded'],
-           [I.document, 'Report turnaround','Within 24 hours']
-          ].map(([ic,lab,val,acc],i)=>`<div class="bkp-f" style="--mk:var(--mk-${i+1})">
-          <i class="bkp-fi">${ic}</i>
-          <span class="bkp-fl">${lab}</span>
-          <span class="bkp-fv${acc?' bkp-fv-acc':''}">${val}</span>
-        </div>`).join('')}
-      </div>
+            `.bkp-r`, `.bkp-f`, `.bkp-fi`, `.bkp-fl`, `.bkp-fv` and
+            `.bkp-fv-acc` are written by nothing now, so §76's column and §63's
+            two type roles go with the markup rather than being left as gates
+            nothing writes. The divider goes too — it was a `border-left` on a
+            column that no longer exists. */}
     </div>
   ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
         This page carried a hand-written "What to expect with <name>" card
@@ -14406,7 +14869,17 @@ V.agent = (f) => {
   <div class="bks-w">
     <div class="bks">
       <div class="bks-c">
-        <div class="bks-h"><span class="bks-n">1</span><h3>Choose a date</h3></div>
+        ${''/* THE NUMERALS CAME OFF BOTH HEADINGS (Maryam, 31 Aug 2026). §76's
+              own note argued them as "what a numbered step says without a word
+              of copy" — true, and it was answering a question the layout had
+              already answered: the two sit side by side with a rule between
+              them and the left one names a date the right one then uses, so the
+              order is in the reading direction. Two tinted chips were a second
+              statement of it, and the only two `--brand-tint-2` objects on a
+              page whose accent means "you chose this".
+              `.bks-n` is written by nothing now, so §76's box and §63's ink go
+              with the markup rather than being left as a gate nothing writes. */}
+        <div class="bks-h"><h3>Choose a date</h3></div>
         ${''/* THE CELL KEEPS `.day` SO THE SELECTION KEEPS WORKING. views.js's
               own delegated handler is `t.closest('.day')` — it clears `.on`
               across every `.day` in the device and sets it on the one pressed —
@@ -14427,7 +14900,19 @@ V.agent = (f) => {
               42 reads as a filled table cell, which is the thing the tick-mark
               lattice already means somewhere else. */}
         <div class="bkcal">
-          <p class="bkcal-m">${CAL_MN} ${CAL_Y}</p>
+          ${''/* THE MONTH ROW IS A CONTROL, A LABEL AND A CONTROL. `data-bkmo`
+                carries the STEP rather than the target index, so the handler
+                clamps once and neither button needs to know how many months
+                `AGENT_CAL` holds. `disabled` at each end is what makes the pair
+                honest — see the note over `AGENT_CAL` for why that is not the
+                dead control §60 rules out. */}
+          <div class="bkcal-top">
+            <button class="bkcal-b" data-bkmo="-1"${calI ? '' : ' disabled'}
+              aria-label="Previous month">${I.chevLeft}</button>
+            <p class="bkcal-m">${CAL_MN} ${CAL_Y}</p>
+            <button class="bkcal-b" data-bkmo="1"${calI < AGENT_CAL.length - 1 ? '' : ' disabled'}
+              aria-label="Next month">${I.chevRight}</button>
+          </div>
           <div class="bkcal-w">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
             .map(d=>`<span>${d}</span>`).join('')}</div>
           <div class="bkcal-g">${calCells.map(([n,out])=>{
@@ -14438,27 +14923,76 @@ V.agent = (f) => {
         </div>
       </div>
       <div class="bks-c">
-        <div class="bks-h"><span class="bks-n">2</span><h3>Choose a time</h3>
-          <span class="bks-tz">${I.time}Times in ET</span></div>
+        ${''/* "Times in ET" CAME OFF THE HEADING (Maryam, 31 Aug 2026) and the
+              page no longer states a timezone at all — the closing sentence
+              "All available times are in Eastern Time (ET)" went in an earlier
+              pass. Both were true and both were furniture on a heading row that
+              now holds one thing. `.bks-tz` is written by nothing, so §76's box
+              and §63's floor-tier ink go with it.
+              RAISED, NOT ASSUMED: every time on this page is ET and the product
+              says so nowhere on it now. `V.booking`'s receipt names the zone, so
+              a candidate sees it once they have paid rather than while they are
+              choosing. If it should come back, the heading row is the wrong
+              place for it and the row of times is the right one. */}
+        <div class="bks-h"><h3>Choose a time</h3></div>
         ${''/* THE COUNT IS COUNTED. The reference prints "6 available slots"
               over a grid in which two of the six are struck through, so its own
               chip disagrees with the thing it labels by two. `open` is
               `slots.length - taken.length`, so the pill cannot drift from the
               grid however either changes. */}
-        <p class="bks-day"><b>${days[dSel][1]}, ${CAL_MN} ${days[dSel][2]}</b>
+        ${''/* IT NAMES THE SELECTION, NOT THE MONTH ON SCREEN. Paging to
+              September does not change what you have chosen, so this keeps
+              saying "Thursday, August 20" until a different day is pressed —
+              and every part of it is read off `selCal` / `selD` through
+              `dowLong`, so the weekday, the month and the number cannot
+              disagree with the cell that is lit. */}
+        <p class="bks-day"><b>${dowLong(selCal.y, selCal.m, selD)}, ${MON[selCal.m]} ${selD}</b>
           <span class="bks-cnt">${open} available slots</span></p>
+        ${''/* THE TIMES ARE A LIST, NOT A GRID — Maryam, 31 Aug 2026, with a
+              reference. Six blocks three-across were six things to compare; a
+              time is not compared with another time, it is CHOSEN, and a list
+              with one mark per row is the shape that says so. It also gives the
+              column the vertical mass the calendar beside it has, which the
+              two-row grid never did.
+
+              THE MARK IS `I.circle` / `I.circleDash` AND THEY ARE THE OFFICIAL
+              RADIO PAIR — icons.js's own note says so ("`circle` is
+              `radio_button_unchecked`, `circleDash` is `radio_button_checked`").
+              So the row draws the same two states `.rad .box` does without
+              re-creating a component §02, §10 and §12 draw between them, and
+              without needing the `<label>` + `<input>` that `.rad` requires and
+              a `<button>` cannot host. §75's note about `.rec-lab` is the rule
+              being followed here.
+
+              `data-bkslot` AND A RE-RENDER, NOT THE GENERIC `.slot` HANDLER.
+              That one moves `.on` and returns, which is right for a picker
+              whose selected state is entirely a ground — and wrong the moment
+              the state is also a GLYPH, because the markup that chose the glyph
+              has already run. The row's mark and the scheduling card's line are
+              both pure functions of `S.bkSlot` now, so they cannot disagree. */}
         <div class="slots bks-slots">${slots.map((t,i)=>
-          `<button class="slot ${i===sSel?'on':''}" ${taken.includes(i)?'disabled':''}>${t}</button>`).join('')}</div>
-        ${''/* WHAT THE THING YOU ARE BUYING ACTUALLY IS. The reference puts it
-              here and it is the one piece of its copy the product can stand
-              behind without inventing anything: `V.booking`, `CALL` and the
-              `booked` dashboard all already say this interview is a video call,
-              and `callOpen('iv')` is the surface it opens. It sits under the
-              times because that is the moment the abstraction — "a slot" —
-              becomes a thing that happens to you on a Thursday evening. */}
-        <div class="bks-note"><i class="bks-ni">${I.video}</i>
-          <span class="bks-nb"><b>Video interview</b>
-            <span>You&rsquo;ll join a video call with ${a.n.split(' ')[0]}.</span></span></div>
+          `<button class="slot${i===sSel?' on':''}" data-bkslot="${i}">${I.time}<span class="slot-t">${t}</span><i class="slot-r">${i===sSel?I.circleDash:I.circle}</i></button>`).join('')}</div>
+        ${''/* THE COLUMN ENDS ON THE LIST, AND TWO BLOCKS HAVE NOW BEEN TRIED
+              IN THIS SLOT AND REMOVED (Maryam, 31 Aug 2026). First the
+              "Video interview / You'll join a video call with Priya" note — a
+              definition, which `PAGESUM.agent`, the profile block's "45 mins
+              call" and `V.booking`'s receipt each already give. Then a
+              Scheduling card joining the chosen day and time into one string
+              with a reminder line. Both were removed the same day.
+
+              WHAT THE SECOND ONE WAS FOR, so the next person does not rebuild
+              it: nothing else on this page puts the date and the time in one
+              string — the day is the heading above the list and the time is
+              whichever row is lit — and the checkout row underneath states the
+              fee and not the when. That join is still unstated. It is a real
+              gap and it was not worth a block of its own; the place for it, if
+              anywhere, is the checkout row, which is the one line on the page
+              that is about the transaction rather than about the choice.
+
+              THE SLOT IS EMPTY ON PURPOSE. The column is a heading, a day and
+              four rows; the calendar beside it is taller, and that asymmetry is
+              what two columns of a picker look like when one of them is a month
+              and the other is one day's times. */}
       </div>
     </div>
     ${''/* THE TIMEZONE IS SAID ONCE NOW (Maryam, 31 Aug 2026). "All available
@@ -14572,7 +15106,7 @@ V.agent = (f) => {
   <div class="bkc">
     <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
       <span class="bkc-fv">${a.price}</span></div>
-    <button class="btn btn-p" data-go="booking">Proceed to pay $695 ${I.arrowRight}</button>
+    <button class="btn btn-p" data-go="booking">Proceed to pay ${a.price} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
@@ -14996,7 +15530,7 @@ PARKED.coursework = (f) => {
 PARKED.chapter = (f) => {
   const i = S.ch ?? f.open ?? 3;
   const name = CH[i][0], mins = CH[i][1];
-  const inprog = S.stage==='day34' && i===3;
+  const inprog = isDay34(S.stage) && i===3;
   const stg = Math.min(S.stg||0, STAGE_L.length-1);
   const done = i < f.done;
   return `<main class="main"><div class="page">
@@ -15118,6 +15652,7 @@ V.rewards = (f) => {
 V.transcript = (f) => {
   const pct = Math.round(f.done/13*100);
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
+  const g = GAME[S.stage];
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Course Progress')}
   ${''/* NO FACT ROW HERE EITHER — see the note over `V.payment`'s header. This
@@ -15133,9 +15668,10 @@ V.transcript = (f) => {
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
       ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
       ${statCell(I.time, `Time invested`, `${hrs.split(' ')[0]}<small>${hrs.replace(/^\S+/,'')}</small>`, `${f.done?Math.round(f.mins/f.done)+' min per chapter':'not started'}`)}
-      ${statCell(I.flag, `Tasks on time`, `${S.stage==='day34'?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
+      ${statCell(I.flag, `Tasks on time`, `${isDay34(S.stage)?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
     </div>
   </div>
+  ${g?pulseCols(f,g):''}
   ${''/* THE 90-DAY SUMMARY APPEARS WHEN THERE IS ONE.
         This block used to draw at every stage, with an unsigned variant that
         said, in three places at once, that nothing in it was final: a heading
@@ -15413,10 +15949,19 @@ V.billing = (f) => {
   rows.push(['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210']);
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Payments')}
-  ${''/* "One-off payments only. Nothing here recurs." is two statements of
-        one fact, and Tal's summary closes on the same one. Tal keeps it,
-        because on this page it is the answer to the question the page
-        raises; there is no spine to state above it. */}
+  ${''/* NO DESCRIPTION, AND THE SUMMARY IS BACK ABOVE IT (Maryam, 31 Aug
+        2026). This slot once held "One-off payments only. Nothing here
+        recurs." — two statements of one fact, and a policy line, which is the
+        second of `PAGESUM`'s four content bans applied to page copy. There is
+        no spine to state here either: Payments is one of the eight pages that
+        pass `title` alone.
+
+        WHAT TAL SAYS INSTEAD IS NOT ABOUT THE TABLE, and the reason is worth
+        knowing before adding to it: the `NEVER` list (ai2) and clause 4 of the
+        Data use notice both say Tal has never seen billing, and `wLedger`
+        (ai8) declines a "what have I paid" question and points at this page.
+        `PAGESUM.billing` is where that is argued out. Do not "improve" the
+        line by putting a total in it. */}
   ${ph('Payments')}
   <div class="sec pay-sec">
     <div class="paytbl">
@@ -16263,13 +16808,13 @@ function render(){
   } else {
     const view = V[S.view] || (isLead() && V.leadDash) || V.dashboard;
     const NO_FAB = ['terms','coursework','chapter'];
-    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div></div>' + (NO_FAB.includes(S.view)?'':talFab())
+    html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
          + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
          + (S.view==='account'?profileSheet()+photoSheet():'');
   }
   const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
-  const OVERLAYS = ['nav','notif','acct','tal','editProfile','editPhoto','addCard','notes'];
+  const OVERLAYS = ['nav','notif','acct','peek','tal','editProfile','editPhoto','addCard','notes'];
   const opened = OVERLAYS.filter(k => S[k] && !MO.open[k]);
   const shown  = OVERLAYS.filter(k => S[k]);
   const grew = S.thread.length > MO.thread;
@@ -16383,6 +16928,15 @@ device.addEventListener('click', e => {
     return;
   }
 
+  const pkc = t.closest('[data-peek]');
+  if(pkc){
+    const k = pkc.dataset.peek;
+    S.peek = (!k || S.peek === k) ? null : k;
+    if(S.peek){ S.notif = false; S.acct = false; }
+    render();
+    return;
+  }
+
   const g = t.closest('[data-go]');
   if(g){ e.preventDefault();
     const mark = g.dataset.read; if(mark && !S.read.includes(mark)) S.read.push(mark);
@@ -16435,8 +16989,15 @@ device.addEventListener('click', e => {
     return;
   }
   const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
+  const ts = t.closest('[data-bkslot]');
+  if(ts && !ts.disabled){ S.bkSlot = +ts.dataset.bkslot; render(); return; }
   const sl = t.closest('.slot');        if(sl && !sl.disabled){ device.querySelectorAll('.slot').forEach(x=>x.classList.remove('on')); sl.classList.add('on'); return; }
   const dy = t.closest('.day');         if(dy){ device.querySelectorAll('.day').forEach(x=>x.classList.remove('on')); dy.classList.add('on'); return; }
+  const mo = t.closest('[data-bkmo]');
+  if(mo && !mo.disabled){
+    S.bkMo = Math.max(0, Math.min(1, (S.bkMo | 0) + (+mo.dataset.bkmo)));
+    render(); return;
+  }
   const cs = t.closest('.cs button:not([data-ctab]):not([data-rtab])');
   if(cs){ cs.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); cs.classList.add('on'); return; }
   const rt2 = t.closest('[data-rtab]');
@@ -20267,6 +20828,8 @@ const PAGESUM = {
 
     day34: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
 
+    reddemo: f => `${_greet()}, Maryam! You are <b>${f.done} of 13 chapters</b> in at ${f.avg}%, ${_n(f.mins)} minutes on the course so far. <b>Chapter ${f.open + 1} (&lsquo;${CH[f.open][0]}&rsquo;)</b> has been opened four times without finishing, and the three furthest ahead in Cohort 41 had it done by now.<br>It is ${CH[f.open][1]} minutes of work. Clearing it this week is what puts you back on the <b>${WEEK_TARGET}-minute weekly target</b> before week ${f.week + 1} adds its own.`,
+
     day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b> &mdash; and you passed both.<br>The one thing left is to book the re-interview, and Priya is the agent who assesses it.`,
 
     promoted: f => `You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. At this level you can also volunteer to lead a cohort.`,
@@ -20343,6 +20906,7 @@ const PAGESUM = {
   messages: 'Priya can see your chapters, scores and attendance already, so you never have to explain where you are.',
 
 
+  billing: 'This is the one page I can&rsquo;t read: your card details and what you&rsquo;ve been charged never reach me. Ask about the refund windows and I can answer.',
 
   account: 'Everything here saves as you go. The block worth a look is the last one &mdash; what I&rsquo;m allowed to remember, and what I can do without asking.',
 
@@ -21333,7 +21897,8 @@ const NEXT = {
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
   day90:    ['Book the re-interview', 'All 13 chapters are done at 87% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
-  promoted: ['Enroll in the E4 course', 'You moved up on November 21. The next 90 days are built for E4, and your returning-candidate credit comes off the fee.', 'What is different about E4?', 'enrol']
+  promoted: ['Enroll in the E4 course', 'You moved up on November 21. The next 90 days are built for E4, and your returning-candidate credit comes off the fee.', 'What is different about E4?', 'enrol'],
+  reddemo:  ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3']
 };
 
 function wNext(){
@@ -22012,9 +22577,10 @@ function stripPageHead(page){
 }
 
 function drawTrail(trail, parts){
+  const sep = `<span class="crumb-sep" aria-hidden="true">${I.chevRight}</span>`;
   trail.innerHTML = parts.map((p, i) => {
     const now = i === parts.length - 1;
-    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${now
+    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${i ? sep : ''}${now
       ? `<span class="crumb-l" aria-current="page">${p.label}</span>`
       : p.go
         ? `<a class="crumb-l" data-go="${p.go}">${p.label}</a>`
@@ -22030,6 +22596,10 @@ function tidyPh(page){
   const main = ph.querySelector('.ph-main');
   if(main && !main.firstElementChild) main.remove();
   ph.classList.toggle('ph-bare', !ph.firstElementChild);
+  ph.classList.toggle('ph-backonly',
+    !!ph.querySelector('.ph-back') &&
+    ph.querySelectorAll('.ph-main > *, .ph > *:not(.ph-main)').length === 1 &&
+    ph.querySelectorAll('.ph-top > *').length === 1);
 }
 
 function placeTopbar(){
@@ -22054,9 +22624,7 @@ render();
 
 
 const TMP_ACCENT_ON = [
-  // ['assessed', 'dashboard'],   // "Levelled, not enrolled"
-  // ['day34',    'dashboard'],   // "Day 34"
-  // ['promoted', 'dashboard'],   // "Promoted to E4"
+  [RED_DEMO, '*'],   // "Red Accent Demo" — every page of it
 ];
 
 const _baseTmpAccent = render;
@@ -22065,7 +22633,8 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(!app) return;
-    const on = !S.call && TMP_ACCENT_ON.some(([st, vw]) => S.stage === st && S.view === vw);
+    const on = !S.call && TMP_ACCENT_ON.some(([st, vw]) =>
+      S.stage === st && (vw === '*' || S.view === vw));
     app.classList.toggle('tmp-accent', on);
   } catch(e){ console.warn('tmp accent', e); }
 };
@@ -22167,6 +22736,12 @@ window.addEventListener('resize', fitFrame);
 let vpFirst = null;
 try { vpFirst = localStorage.getItem(VP_KEY); } catch(e){}
 vpSet(vpFirst || 'mobile', true);
+/* THE FRAME IS SHOWN ONLY NOW. The early script above hid it; this is the
+   first moment the app is actually inside it — the bundle has parsed, every
+   pass has run and `fitFrame` has just set the exact scale. Clearing the
+   inline value rather than setting `visible` hands the property back to the
+   stylesheet, so nothing here can outrank a rule §01 might want later. */
+device.style.visibility = '';
 </script>
 </body>
 </html>
