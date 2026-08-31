@@ -1,85 +1,37 @@
 /* ==========================================================================
-   31. THE PORTAL SWITCH, AND THE COHORT LEADER'S PAGES
+   31. THE COHORT LEADER'S PAGES
 
-   The switch is two tabs in the app bar, next to the mark. Everything else in
-   this layer is a correction the leader's pages need and the candidate's do
-   not, so every rule is scoped to `[data-portal="leader"]` — stamped on `.app`
-   by lead.js — rather than to the leader's own class names. That way a
-   component the two portals share keeps ONE set of rules and this layer only
-   ever says "and on the leader's side, this much differs".
+   Every rule in this layer is a correction the leader's pages need and the
+   candidate's do not, so all of them are scoped to `[data-portal="leader"]` —
+   stamped on `.app` by lead.js — rather than to the leader's own class names.
+   That way a component the two portals share keeps ONE set of rules and this
+   layer only ever says "and on the leader's side, this much differs".
+
+   THE PORTAL SWITCH WAS §31.1 AND IS GONE (Maryam, 31 Aug 2026). It was a
+   segmented control in the app bar beside the mark, and the argument for that
+   position was that a switch between two products belongs where the product
+   names itself. What answered it is that this is not a switch between two
+   products — it signs you in as somebody else, which is a personal control,
+   and it now sits in the account menu under your own face (§77, `acctMenu` in
+   views.js). Three rules' worth of the old block are worth keeping in words
+   because they were all decisions:
+
+     - IT WAS A SEGMENTED CONTROL, NOT TWO BUTTONS, because the two portals
+       are exclusive and exhaustive and that is what a segment says.
+     - THE LIVE HALF WAS `--brand-primary`, the strongest fill in the bar. That
+       is the half of the reasoning that did not survive: the loudest fill in
+       the product was spent, permanently, on a control pressed twice a demo.
+     - IT OWNED THE HAIRLINE ON BOTH ITS SIDES, or the black block sat a pixel
+       inside a grey line and read as misprinted. §77's menu has one border and
+       no such pair, so the problem does not recur.
+
+   The whole `.pswitch` / `.psw-t` family is deleted rather than left standing,
+   including its three container-query blocks — nothing in either portal writes
+   the class now, which is CLAUDE.md's "a gate nothing writes" tell, and a dead
+   family in `31-lead.css` would go on crossing into `design-system/` as a
+   component a second portal could reach for. §34's `.pswitch{margin-left}` and
+   §63's four references went with it.
    ========================================================================== */
-
-/* --------------------------------------------------------------------------
-   1. THE SWITCH
-
-   IT IS A SEGMENTED CONTROL, NOT TWO BUTTONS. The two portals are exclusive
-   and exhaustive — you are one or the other, always — and that is exactly what
-   a segment says and what two adjacent buttons do not. One border around the
-   pair, one hairline between them, and the live half filled solid.
-
-   THE FILL IS `--brand-primary`, WHICH IS BLACK. It has to be the strongest
-   fill in the bar, because the thing it marks is the biggest fact on screen:
-   which product you are looking at. `--overlay-selected` — what `.shell-act.on`
-   uses for the bell — is an 8% wash, right for "this panel is open" and far
-   too quiet for "you are signed in as somebody else".
-   -------------------------------------------------------------------------- */
-.app .pswitch{
-  flex:none;display:inline-flex;align-items:stretch;
-  height:32px;
-  border:1px solid var(--border-subtle-02);
-  background-color:var(--layer-01)}
-.app .psw-t{
-  display:flex;align-items:center;
-  padding:0 var(--s04);
-  font-size:12.5px;line-height:16px;font-weight:500;letter-spacing:.1px;
-  color:var(--text-secondary);
-  white-space:nowrap;
-  transition:background-color var(--dur-short) var(--ease-standard),
-             color var(--dur-short) var(--ease-standard)}
-.app .psw-t + .psw-t{border-left:1px solid var(--border-subtle-02)}
-.app .psw-t:hover{background-color:var(--overlay-hover);cursor:pointer}
-.app .psw-t.on{
-  background-color:var(--brand-primary);
-  color:var(--on-brand);
-  font-weight:600}
-/* The live half owns the hairline on both of its sides, or the black block
-   sits a pixel inside a grey line and reads as misprinted. */
-.app .psw-t.on,.app .psw-t.on + .psw-t{border-color:var(--brand-primary)}
-
-/* AT 390 THE BAR CANNOT HOLD IT. Hamburger, mark, two tabs, bell and face come
-   to more than the phone has, and the first thing to lose would be the tabs —
-   the one control that must never be the thing that got dropped. So on the
-   phone the switch takes the row under the bar: full width, one segment each,
-   flush to both edges. It is the same control in the same reading position,
-   directly beneath the mark rather than beside it.
-
-   `order` and the wrap, rather than a second copy of the markup in `shell()`:
-   one element, one state, and nothing to keep in sync. */
-@container app (max-width:599.98px){
-  /* The bar's right padding was on the HEADER, so once the header wraps that
-     padding lands at the end of the second row and the switch stops 8px short
-     of the edge — a segmented control with a gap after it reads as a control
-     that failed to fill. The padding moves onto the row that wanted it. */
-  .app .shell{flex-wrap:wrap;height:auto;padding-right:0;padding-bottom:0}
-  /* the bar's own row keeps the height it had, so nothing above the switch moves */
-  .app .shell > .shell-act,.app .shell > .shell-logo{height:var(--appbar-h)}
-  .app .shell > .shell-right{height:var(--appbar-h);padding-right:var(--s03)}
-  .app .pswitch{
-    order:9;width:100%;height:44px;
-    border-left:0;border-right:0;border-bottom:0;
-    margin-top:0}
-  .app .psw-t{flex:1;justify-content:center;font-size:13px}
-  .app .psw-t + .psw-t{border-left-color:var(--border-subtle-02)}
-  .app .psw-t.on + .psw-t{border-left-color:var(--brand-primary)}
-}
-
-/* On the tablet and up the switch sits in the bar, and at 900 the mark takes
-   the drawer column (§01/§14) — so the switch lands exactly at the content
-   column's left edge, which is where the page it frames begins. */
-@container app (min-width:900px){
-  .app .pswitch{height:36px;margin-left:calc(var(--s02) * -1)}
-  .app .psw-t{padding:0 var(--s05);font-size:13px}
-}
 
 /* --------------------------------------------------------------------------
    2. THE LEADER'S DATA TABLE

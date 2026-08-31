@@ -1,0 +1,369 @@
+/* ==========================================================================
+   75. THE BLACK CARD — `.dark-card`, and the recommendation is its first caller
+   Maryam, 31 Aug 2026 — "i want you to make this card black, you know what our
+   black card do right? it has the top right gradient."
+
+   IT IS A COMPONENT, AND THAT IS A STANDING INSTRUCTION RATHER THAN A GUESS
+   (Maryam, same day): "now when i say convert a section to black card, you have
+   this reference right? … i will not tell you that remove the bottom border
+   attached or give black box padding, do this all yourself."
+
+   SO `.dark-card` IS THE WHOLE RECIPE AND A CONVERSION IS ONE CLASS. Every part
+   below is something that had to be found once and must never be asked for
+   again — the ground, the haze, the page-gutter inset, the section space above,
+   the section's own hairlines off, the NEXT section's join off, the heading row
+   with its rule, and the two buttons' fills. §63 §15 carries the matching ink.
+   What a caller states is only what is different about ITS content; the two so
+   far are `.rec-dark` (§75.3, the recommendation) and `.crow-dark` (§77, the
+   call). Read those before adding a third — most of what looks new is here.
+
+   §70.5 drew Tal's recommendation as a white section: a 166px portrait, the
+   facts beside it, the two actions held against the right edge. Everything
+   about the composition is right and the ground was wrong. The `new` dashboard
+   asks one question — who do you interview — and §70 already answered it by
+   deleting the rail of three and the dark plate that used to carry it; what was
+   left was the page's one decision drawn in the same white as the four blocks
+   of context around it. §59's argument for `.plate` is exactly this one: black
+   plus §21.22's warm haze is the loudest object the product has, and it is
+   spent on the action that is time-sensitive. The block names a slot on Thursday
+   and a fee, so it qualifies.
+
+   THE HEADING AND THE ATTRIBUTION ARE TWO LINES NOW, NOT ONE. "Agent
+   recommended by Tal" was saying what the block is and whose choice it is in
+   the same breath. `Your Next Step - Interview` at 18 says the first and "Tal
+   recommends" under it says the second. The markup and the reasoning are in
+   `talRec`.
+
+   AFTER §63 AND ALLOWED TO BE, on §64/§65/§70/§71/§72/§73/§74's test: this
+   layer states a ground, a radial, five geometry rules, two button fills and
+   two borders, and not one `font-size`, `font-weight`, `text-transform` or
+   text `color`. All four are §63's — the 18px heading is a stated §7 exception
+   there and the card's two inks are the group above it.
+
+   AND IT IS `.rec-dark`, NOT `.plate` AND NOT `.sec.on-dark`. Both of those are
+   in ai5's `DARK_CARD`, so `placeDark` would hoist the whole block into the
+   head band's second column — which on this page is the journey list. The long
+   version of that trap is over `recWrap` in views.js.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 75.1 ---
+   THE GROUND AND THE LIGHT
+
+   `--gray-100` is `.plate`'s own value and `--surface-dark` is the identical
+   #111111 by a different name; the plate's token is used because the plate is
+   what this is being made into.
+
+   THE HAZE IS A BACKGROUND LAYER HERE AND A CHILD ELEMENT ON A PLATE, and the
+   difference is deliberate. §21.22 draws it as `.dark-glow`, an absolutely
+   positioned `inset:0` div that `injectGlow` (ai4) appends to everything in
+   `GLOW_ON` — which then costs three more rules: `position:relative` and
+   `overflow:hidden` on the card so the light cannot escape (§21's own note
+   records `.ldr-read` painting a 700px orange rectangle across the band for
+   want of exactly that), and `position:relative;z-index:2` on every direct
+   child so the content sits above it. A `background-image` is behind all
+   content by definition, cannot escape a box it is painted into, and needs no
+   pass to arrive — so a hand-authored page that links the design system gets
+   the card by writing one class, which is not true of the plate.
+
+   THE VALUES ARE §21.22'S TO THE NUMBER. Its `.dark-glow` carries
+   `opacity:.22` on a radial running `var(--accent)` to transparent; element
+   opacity over an opaque ground and per-stop alpha composite identically when
+   the far stop is already transparent, so the .22 moves into the stop and the
+   geometry — `78% 135% at 92% -8%`, dying out at 64% — is copied unchanged.
+   `color-mix` rather than a hard rgba, so re-pointing `--accent` still moves
+   the light.
+   ------------------------------------------------------------------------ */
+/* THE CARD IS INSET BY THE PAGE'S OWN GUTTER AND STANDS OFF THE BLOCK ABOVE IT
+   (Maryam, 31 Aug 2026). §70.5 gives `.sec-rec` `padding:var(--s07) var(--pad-x)`
+   — the black is painted on the SECTION, so it ran rail to rail and the card had
+   no edges of its own: at the top it met the head band's closing hairline
+   directly, which reads as the page turning black rather than as an object
+   arriving on it.
+
+   MARGIN FOR THE GUTTER, PADDING FOR THE CARD, AND THE TWO CANNOT BE THE SAME
+   DECLARATION. `--pad-x` is what every other section pays to keep its content
+   off the rails (16 / 24 / 32 by width, §10.338); moved to `margin` it insets
+   the GROUND by exactly that, so the card's edges land on the same spine as
+   every heading on the page. What the card then pays inside is its own — `--s07`
+   flat, which is 581:6456's 32 and no longer varies with the page, because a
+   32px frame is a property of the card rather than of the column it sits in.
+
+   `margin-top` AND NOT `margin-bottom`, AND THE REASON CHANGED UNDER THIS RULE
+   ONE EDIT LATER. It was written when Quick Actions still drew its own
+   `border-top` (§70.5c) — a bottom margin would have opened a gap in a hairline
+   that was meant to be the join. That border is off under this card now (below),
+   so what holds the space is `.sec-qa`'s own `padding:var(--s07)`: 32px of the
+   next section's air, which is the same figure the card pays inside itself. A
+   margin here would add to it rather than replace it and the card would sit
+   56px off the block beneath and 24 off the one above. */
+.app .sec.dark-card{
+  margin:var(--s06) var(--pad-x) 0;
+  padding:var(--s07);
+  background-color:var(--gray-100);
+  background-image:radial-gradient(78% 135% at 92% -8%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 64%);
+  background-repeat:no-repeat}
+
+/* THE SEAM ABOVE AND BELOW IT. A hairline is a line between two white things;
+   against a black band the section's own closing rule is either invisible or a
+   grey scratch one pixel off the card's edge, which is the artefact §14's note
+   on `.sec-qa` spends a paragraph on. Off on both sides — the ground change IS
+   the division. */
+.app .page > .sec.dark-card::after,
+.app .page > .sec.dark-card::before{content:none}
+
+/* AND QUICK ACTIONS' OWN TOP HAIRLINE COMES OFF WHEN IT FOLLOWS THIS CARD
+   (Maryam, 31 Aug 2026). §70.5c gives `.sec-qa` a `border-top` because
+   581:6344 draws one, and it is the only section in the build that closes the
+   join from below — §14 and §70.5's own note both stop the section ABOVE from
+   drawing its rule for exactly that reason.
+
+   THAT ARRANGEMENT STOPPED WORKING THE MOMENT THE CARD GOT A MARGIN. A join
+   between two white sections is a line; a join under a black card is the card's
+   own bottom edge, and a full-bleed grey rule at the next pixel row runs past
+   the card's inset on both sides — so it reads as a line stuck to the bottom of
+   the card rather than as the top of the section under it. Measured: the two
+   boxes are flush, `nextRectTop` is 0.
+
+   KEYED ON WHAT PRECEDES IT, which is the mirror of §14's rule and of §70.5's
+   own `:has(+ .sec-qa)`: both of those key on what FOLLOWS, because there the
+   reason was a property of Quick Actions. Here the reason is a property of the
+   card, so the selector reads the other way. Anything else above `.sec-qa` is a
+   white section and keeps the line. */
+.app .page > .sec.dark-card + .sec-qa{border-top:0}
+
+/* ------------------------------------------------------------------ 75.2 ---
+   THE HEAD PAIR
+
+   `.sec-rec` is a column at 20 — 581:6456's gap between the label and the row
+   of content under it — and a heading dropped into that column is 20 off its
+   own attribution as well, so the two stop reading as one block. `.rec-hdb` is
+   the pair at 8, which is `.rec-top`'s gap: the same relationship the name and
+   the rating have four rows down, for the same reason.
+   ------------------------------------------------------------------------ */
+/* 16 ABOVE THE RULE AND 16 UNDER IT (Maryam, 31 Aug 2026), and the two numbers
+   have to be set in two different places because one is padding inside the row
+   and the other is the column's gap. It shipped at 12/12 for one build and read
+   as a rule crowding the heading — an 18px line needs more air under it than a
+   13.5px one, which is the whole reason this is stated rather than inherited
+   from `.rec-hdb`'s old 8. */
+.app .dark-card .dc-hd{
+  display:flex;flex-direction:column;gap:var(--s05)}
+.app .dark-card .dc-t{margin:0;flex:1 1 auto;min-width:0}
+
+/* THE HEADING ROW AND THE RULE UNDER IT — Maryam, 31 Aug 2026. The heading and
+   the way out of the section share a line, and the hairline is what makes that
+   line a HEADER rather than two things that happen to be level with each other.
+
+   `--on-dark-rule`, WHITE AT 16%, AND NOT `--on-dark-border` AT 42%. §15's note
+   over `.plate-x` is where this is argued and it applies unchanged: the border
+   token is for the edge of something you can press, and a rule drawn at that
+   weight reads as the top of a box. 16% is the token for "a rule on a black
+   card" and it is the only thing this row needed that the build did not have.
+
+   `flex-wrap` WITH THE AUTO MARGIN ON THE BUTTON, not `space-between` — §70.5
+   makes this exact argument about `.rec-a` and it is the same geometry one row
+   up. At 390 the heading and the button do not fit on one line; wrapped,
+   `space-between` would leave the button on a line of its own with no free
+   space to distribute and it would fall to the LEFT edge, directly under the
+   heading, reading as a subtitle. An auto margin is a property of the item. */
+.app .dark-card .dc-hd-r{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s03) var(--s05);
+  padding-bottom:var(--s05);
+  border-bottom:1px solid var(--on-dark-rule)}
+
+/* AND THE WAY OUT IS WHITE, WHICH IS THE THIRD TIME THIS BUTTON HAS CHANGED
+   INK AND THE FIRST TIME IT IS NOT PART OF A PAIR.
+
+   §70.5 gave it 581:6548's accent outline and stated it as the third reversal
+   of §64, on the reasoning that it "is one of a PAIR, beside a black button of
+   identical size, and §64's borderless treatment made the left half read as a
+   text link that happened to be 185px wide". §75 then took the border off when
+   the card went black. Both of those were about a pair, and the pair is gone:
+   the accent button is 200px down and 800px across, so nothing is being
+   distinguished from anything. `--on-dark` is simply the card's ink, and the
+   only two things on this card that are not white are the one action and Tal's
+   own mark — which is the discipline every `.plate` in the build already keeps.
+
+   THE ARROW TAKES `currentColor` SO ONE DECLARATION COLOURS BOTH HALVES. §70.5
+   hard-set `fill:#f47113` on this svg; that rule is scoped `.rec-a > .btn` and
+   no longer matches now the button has left that group, but it is re-pointed
+   rather than left to miss — a fill that depends on a selector not matching is
+   a rule waiting to come back. §64's mask arrow does not double here for the
+   reason it never did: the gate is `:not(:has(svg))` and the label carries a
+   real one.
+
+   NO WIDTH AND NO `min-height`. §70.5's 185 x 40 was the pair's geometry. In a
+   heading row the control is the size of its own label, which is what every
+   other `.sec-h` action in the build is. */
+.app .dark-card .dc-hd-r > .dc-act{
+  flex:none;margin-left:auto;
+  padding-left:0;padding-right:0;
+  gap:var(--s03);
+  border-color:transparent;background:none}
+.app .dark-card .dc-hd-r > .dc-act svg{fill:currentColor}
+
+/* AND THE SLOT TAKES A FACT AS WELL AS A CONTROL — `.dc-when`, Maryam, 31 Aug
+   2026. The right end of the heading row is where a card says what it is ABOUT,
+   and on a card whose subject is an appointment the answer is a time. It takes
+   `.dc-act`'s position and `.dc-act`'s ink and is deliberately a different
+   class: one is a control that navigates and the other is a figure that does
+   nothing, and a `<span>` wearing the button's class would be the worst of both
+   — no affordance, and every `.btn` rule in the build reaching it.
+
+   THE MARK IS 16 AND `currentColor`, which is this product's small-icon size
+   beside body text everywhere it appears (§70's own note lists `.rec-f`,
+   `.stand-*` and `.plate-b`). One `color` declaration in §63 §15 draws the
+   glyph and the words together.
+
+   ONE OR THE OTHER, NEVER BOTH. Both are `margin-left:auto` — two of them would
+   put the second hard against the first with the whole row's slack in front of
+   the pair, which reads as a two-part control rather than as a heading with a
+   fact at the end of it. There is no card that wants both today; if one ever
+   does, the row needs a group, not a second auto margin. */
+.app .dark-card .dc-hd-r > .dc-when{
+  flex:none;margin-left:auto;
+  display:inline-flex;align-items:center;gap:var(--s03)}
+.app .dark-card .dc-hd-r > .dc-when svg{
+  flex:none;width:16px;height:16px;fill:currentColor;display:block}
+
+/* THE RATING IS ITS OWN ROW UNDER THE NAME. `.rec-r` is `display:inline-flex`
+   because `V.agent` and `V.booking` still write it INSIDE `.rec-id`, on one
+   line with the name — the class travels between three pages and only its
+   position changes. Here it is a direct child of a column flex, so it would
+   stretch to the block's full width: harmless to look at, and it makes the
+   paragraph's box 620px wide when its content is 178, which is the kind of
+   thing that only announces itself later. `align-self:flex-start` is the whole
+   of the difference. */
+.app .rec-dark .rec-top > .rec-r{align-self:flex-start;margin:0}
+
+/* THE PORTRAIT'S FALLBACK GROUND FOLLOWS THE CARD. `.rec-ph` paints
+   `--layer-02` behind the image so the initials have something to sit on
+   (§70.5); on black that is a light grey square that shows for as long as the
+   photograph takes to decode, and for good if it 404s. `--on-dark-fill` is the
+   same idea in the card's own register. */
+.app .rec-dark .rec-ph{background:var(--on-dark-fill)}
+
+/* THE PORTRAIT IS AS TALL AS THE BLOCK BESIDE IT, WHICH IS §70.5'S OWN INTENT
+   AND WAS ITS OWN MECHANISM UNTIL THIS CARD SHORTENED THE BLOCK (Maryam,
+   31 Aug 2026).
+
+   §70.5 states `width:166px;aspect-ratio:1` and its note explains the ratio as
+   "an `aspect-[736/736]` that is `self-stretch`, so it is as tall as the facts
+   beside it AND square" — two claims that were one claim only because the two
+   numbers happened to agree. On the file's block `.rec-b` was five rows and
+   measured 166; taking the expertise line and the overlap row off (§75, the
+   same round) left it at four rows and 121, and the square kept its 166. So
+   the photograph hung 45px below the sentence it sits beside — a portrait with
+   a plinth of black under it rather than a column ending where its column ends.
+
+   THE RATIO STAYS AND THE **WIDTH** IS WHAT GOES. This was got wrong once in
+   the obvious direction and the correction is the whole point of the note:
+   dropping `aspect-ratio` and keeping `width:166px` does make the box as tall
+   as the block, and it makes it a 166x121 RECTANGLE. The photograph has to stay
+   SQUARE (Maryam, 31 Aug 2026) — so the height is the input and the width is
+   derived from it, which is `aspect-ratio` doing exactly the job it is for,
+   pointed the other way round.
+
+   AND `.rec-l` HAS TO BECOME A GRID FOR IT, WHICH IS THE PART THAT COST THE
+   ROUND TRIP. The obvious version — leave the flex row alone, set `width:auto`,
+   `aspect-ratio:1` and `align-self:stretch` — ships a photograph **18px wide**,
+   and it does so silently. Flex resolves an item's MAIN size from its flex base
+   size, and a box whose only content is a `position:absolute` `<img>` has a
+   content contribution of zero; the cross size arrives later, from stretching,
+   and by then the main size is settled. So the ratio has a width to transfer
+   FROM and nothing to transfer INTO. Measured across four candidates on the
+   live page: flex 18x18, grid 120x120 against a 120px block.
+
+   Grid sizes the item against its track and its row, so the stretched height is
+   available when the ratio resolves the width. `auto minmax(0,1fr)` rather than
+   `auto 1fr`, because `1fr`'s floor is `auto` and `.rec-b` holds a `nowrap`
+   fact row — the same reason §72.2 gives for the pulse's columns. `height:100%`
+   is stated as well as the stretch: both work here, and the explicit one says
+   which box the square is being measured against.
+
+   TRAP 19 IS LIVE ON THIS CHANGE AND IS ANSWERED BY THE QUERY. §70.5's phone
+   rule is `.rec-l{flex-direction:column}` — inert on a grid, so a grid at every
+   width would leave the portrait beside the facts in ~300px of phone. That is
+   also why the ratio flip cannot simply be unconditional: below 600 the cross
+   axis is horizontal, `stretch` would set the WIDTH, and the ratio would turn
+   that into a height fighting §70.5's `width:min(100%,220px)` cap for the same
+   property. Everything here is inside `min-width:600px`; below it `.rec-l` is
+   §70.5's flex column and the portrait is the fixed square header it wrote.
+   The stand-in follows the real thing, because a skeleton that is not the box
+   of what it replaces is the one thing a skeleton must not be. */
+@container app (min-width:600px){
+  .app .rec-dark .rec-l{
+    display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch}
+  .app .rec-dark .rec-ph,
+  .app .rec-dark .sk-ph{
+    width:auto;height:100%;aspect-ratio:1;align-self:stretch}}
+
+/* ------------------------------------------------------------------ 75.3 ---
+   THE TWO ACTIONS
+
+   THE PRIMARY CANNOT STAY BLACK, and §15's own line for the plate says it in
+   as many words ("the plate is dark, so its primary action cannot be black").
+   Both halves are copied: §15.1853's solid `--accent` with `--on-accent` ink,
+   and §19's gradient over it — that layer lists `.app .plate .btn-p` and could
+   not have known about this class. `--on-brand-fill:1` is the flag the contrast
+   sweep reads, per §19's note; without it the button is white-on-orange to a
+   reader and unmeasured to the audit.
+
+   AND THE QUIET ONE LOSES ITS STROKE (Maryam, same note), which turns over
+   §70.5's third stated reversal of §64. That note's argument was that a
+   borderless button beside a black one of identical size "read as a text link
+   that happened to be 185px wide" — true on white, where the pair differed only
+   by fill weight. On this ground the accent button is the brightest object on
+   the card and the quiet one is orange words on black, so the distinction is
+   made by the fill and the outline is one more edge on a product built out of
+   hairlines. §64's own argument, arriving where §70 had to refuse it.
+
+   `border-color`, NOT `border` — §64.1's rule. `.btn` carries
+   `border:1px solid transparent`, so the pixel stays in the box model and the
+   two buttons in the row keep the same height; dropping the shorthand would
+   make this one 2px shorter than the accent button beside it.
+
+   THE INK STAYS #f47113 AND IS §70'S, NOT THIS LAYER'S. It measures 6.5:1 on
+   `--gray-100` — clear of AA at any size — so there is nothing for §63 to
+   answer and the declaration stays where it already is.
+   ------------------------------------------------------------------------ */
+/* `.rec-a` HOLDS ONE BUTTON NOW, so §70.5's stated 382px — 185 + 12 + 185 —
+   is the width of a pair that no longer exists and would leave 190px of empty
+   group hanging off the right edge. `auto` with the auto margin kept, which is
+   what actually holds the edge (§70.5's own note). */
+.app .rec-dark .rec-a{width:auto}
+.app .dark-card .btn.btn-p{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  color:var(--on-accent);
+  border-color:transparent;
+  --on-brand-fill:1}
+.app .dark-card .btn.btn-p svg{fill:var(--on-accent)}
+
+/* ------------------------------------------------------------------ 75.4 ---
+   THE SKELETON'S BARS ON A BLACK GROUND
+
+   §70.5b's `.sk` is the brand ramp at 20% with a white sweep across it, drawn
+   for a white card: at 20% alpha over white the bars are a pale warm grey, and
+   over #111 the same three stops are all but invisible — the loading state
+   would be a black rectangle with a white band travelling across it. The ramp
+   is lifted to 34% and the sweep dropped to .28, which is the same read on the
+   dark ground: measured against the white card's bars rather than guessed.
+
+   THE ANIMATION IS §70.5B'S AND IS NOT RESTATED. Only the two gradients are
+   re-declared, so `rec-sweep`, its 1.8s timing and the reduced-motion parking
+   position all continue to apply — `background-image` and `animation` are
+   different properties and the later declaration of one does not disturb the
+   other. Nothing here can be reached today (`data-recswap` is the only thing
+   that ever set `S.recBusy` and §70.5's note records it having no home); it is
+   stated because a designed state whose ground has moved out from under it is
+   the half-shipped failure CLAUDE.md describes, not because it renders.
+   ------------------------------------------------------------------------ */
+.app .rec-dark .sk{
+  background-image:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 100%),
+    linear-gradient(107.08deg,
+      rgba(244,113,19,.34) 1.04%, rgba(226,166,0,.34) 39.89%, rgba(240,83,12,.34) 99.58%)}

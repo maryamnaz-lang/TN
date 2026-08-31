@@ -523,7 +523,7 @@ function askOpen(q){
     S.askFrom = S.view;
     S.askOpen = true;
     ASK_FRESH = true;
-    S.nav = false; S.notif = false; S.tal = false;
+    S.nav = false; S.notif = false; S.acct = false; S.tal = false;
     render();
     if(q) return ask(q);
     const el = device.querySelector('#askIn');
@@ -577,8 +577,23 @@ device.addEventListener('keydown', e => {
 /* leaving the module closes the conversation with it — the thread belongs to
    the page it was opened from, and carrying it onto another one would make
    "back" point somewhere you never were */
+/* A WRAPPER MUST PASS ON EVERY ARGUMENT IT WAS GIVEN, and this one dropped
+   `fresh` for as long as it has existed. `go(target, fresh)` empties `S.hist`
+   when the destination came from the rail or the wordmark — a module is a
+   top-level destination and starts a new stack, which is the rule the note
+   over that branch states — and calling `_goAsk(v)` threw the second argument
+   away, so the stack only ever grew. Nothing showed it: `bk()` hides the back
+   arrow on a rail root anyway (`railRoots().includes(S.view)`), so the one
+   surface that reads `S.hist.length` was masking it on exactly the pages the
+   bug applied to.
+
+   §78's breadcrumb is drawn from `S.hist`, so it showed it immediately —
+   opening Interviews from the rail after booking an agent read "Dashboard /
+   Book Priya Nair / Interviews", three crumbs for a destination reached in one
+   press. The trail is the first thing in the product to render the whole
+   stack rather than just ask whether it is empty. */
 const _goAsk = go;
-go = function(v){ if(S.askOpen && v !== S.askFrom){ S.askOpen = false; } _goAsk(v); };
+go = function(v, fresh){ if(S.askOpen && v !== S.askFrom){ S.askOpen = false; } _goAsk(v, fresh); };
 
 render();
 

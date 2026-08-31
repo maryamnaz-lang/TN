@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=1752c068">
+<link rel="stylesheet" href="talentnext-ds.css?b=b58cee30">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=1752c068"></script>
+<script src="talentnext-ds.js?b=b58cee30"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -247,14 +247,14 @@ const fillLive = s => s
    reason as the two above; `CALL_ART` is the table build-ds.py embeds. */
   .replace(/\{\{art:(\w+)\}\}/g, (_, n) => (typeof CALL_ART === 'object' && CALL_ART[n]) || '')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
-    (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">${inner(n)}</svg>`)
+    (_, n, c) => `<svg class="${c}" viewBox="0 -960 960 960">${inner(n)}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => I[n] || '');
 const fillSrc = s => s
   .replace(/\{\{av:(\w+)\}\}/g, (_, n) => '${AV.' + n + '}')
   .replace(/\{\{aw:(\w+)\}\}/g, (_, n) => '${AWARD.' + n + '}')
   .replace(/\{\{art:(\w+)\}\}/g, (_, n) => '${CALL_ART.' + n + '}')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
-    (_, n, c) => `<svg class="${c}" viewBox="0 0 24 24">\${inner('${n}')}</svg>`)
+    (_, n, c) => `<svg class="${c}" viewBox="0 -960 960 960">\${inner('${n}')}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => '${I.' + n + '}');
 
 /* one example: a title, the live thing, and its source. `noSrc` is for the
@@ -1592,7 +1592,7 @@ SECTIONS.push({id:'nav', nav:'Navigation', icon:'view', build: () => `
 
 /* -------------------------------------------------------------------- icons */
 SECTIONS.push({id:'icons', nav:'Icons', icon:'star', build: () => `
-  ${ex('The set', 'Material Icons, the FILLED cut, one tone and one path each — checked against <code>@material-design-icons/svg/filled</code>. Several look linear and are correct: Material’s filled cut is intrinsically hollow for a ring or a tick, so do not blanket-fill them. Call one as <code>I.name</code> for a whole &lt;svg&gt;, or <code>inner(\'name\')</code> for the path alone.', `
+  ${ex('The set', 'Material <b>Symbols</b>, the <b>Rounded</b> style at <b>FILL&nbsp;0</b> — Google’s current library, linear, one tone and one path each, pasted from <code>google/material-design-icons</code>. Call one as <code>I.name</code> for a whole &lt;svg&gt;, or <code>inner(\'name\')</code> for the path alone — and if you wrap <code>inner()</code> yourself the box is <code>viewBox="0 -960 960 960"</code>, not the 24 grid, or the mark renders as an invisible speck in the corner.<br><br><b>Four marks are filled, because fill is a STATE axis and not a style</b> — Google’s own definition of it. The set sits at FILL&nbsp;0 and flips to 1 to say “this one is on”: <code>star</code>&nbsp;/&nbsp;<code>starOutline</code> (a rating’s lit and unlit slots), <code>checkFilled</code> (done, against <code>checkOutline</code>’s not-done) and <code>stopFilled</code> (a solid dot). The test for a fifth is whether the <em>same glyph also appears unfilled</em> and the difference is the information — which is why <code>trophy</code>, <code>certificate</code> and <code>shield</code> stay linear: they are subject marks and never appear both ways.', `
     <div class="ic-grid">${Object.keys(IP).sort().map(k =>
       `<div class="ic-c">${I[k]}<span>${k}</span></div>`).join('')}</div>
   `, true)}

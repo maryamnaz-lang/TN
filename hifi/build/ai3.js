@@ -141,7 +141,7 @@ V.rp = (f) => {
               <span class="rp-w">With ${r.who} &middot; ${r.role.toLowerCase()}</span>
               <span class="rp-src">${I.video}${r.from}</span>
             </span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`; }).join('')}
       </div>
     </div>

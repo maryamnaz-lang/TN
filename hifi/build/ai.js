@@ -226,7 +226,7 @@ V.ivt = (f) => {
   <div class="sec">
     <div class="sec-h"><h2>The transcript</h2><span class="t-helper-01">${lines.length} of ${iv.lines.length} lines</span></div>
     <div class="srch ivt-srch">
-      <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+      <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
       <input class="inp" id="ivtQ" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${S.ivq||''}">
     </div>
     <div class="ivt-filters">

@@ -626,7 +626,86 @@ css = '\n'.join((here / f).read_text() for f in
                  # title taking `--mk` where §72 §12 deliberately keeps its
                  # column labels in grey. The note there says why the two
                  # differ.
-                 '74-signedcards.css'])
+                 '74-signedcards.css',
+                 # THE RECOMMENDATION IS THE BLACK CARD. Maryam, 31 Aug 2026 —
+                 # `talRec` on the `new` dashboard takes `.plate`'s ground and
+                 # §21.22's top-right haze, with the heading and the
+                 # attribution split into two lines above it. `.rec-dark`
+                 # rather than `.plate` or `.sec.on-dark` on purpose: both of
+                 # those are in ai5's `DARK_CARD`, so `placeDark` would hoist
+                 # the block into the head band's second column, which on this
+                 # page is the journey list. The note over `recWrap` is the
+                 # long version.
+                 # LAST, and every reason is structural: it re-points §70.5's
+                 # own ground, geometry and skeleton bars, it turns over §70's
+                 # stated reversal of §64 on the quiet button, and it copies
+                 # §15.1853 + §19's plate CTA onto a class neither could have
+                 # named. Nothing before §70 can reach it.
+                 # AFTER §63 AND ALLOWED TO BE: a ground, a radial, five
+                 # geometry rules, two button fills, two borders and two
+                 # skeleton gradients, and not one font-size, font-weight,
+                 # text-transform or text colour. Those are §63's own
+                 # recommendation group — including the 18px heading, which is
+                 # a STATED §7 exception rather than a tenth role (the nearest
+                 # is h3 at 17; the note says why it is not tokenised).
+                 '75-recdark.css',
+                 # THE BOOKING PAGE IS THREE PANELS. Maryam, 31 Aug 2026, with
+                 # a reference screen — "the look and feel will be ours, but
+                 # take the structuring inspo from the reference". Six loose
+                 # blocks down one column become the profile beside its three
+                 # purchase facts, the picker as two numbered steps, and a
+                 # checkout row. The long argument, including what it refuses
+                 # from the reference (the role chip, the month calendar) and
+                 # why, is over `V.agent` in views.js.
+                 # LAST, and the reasons are structural: it re-lays §10.29's
+                 # `.daystrip` and `.slots` (including giving back §10.3's
+                 # bleed, trap 10), it reaches past §15's `.agid-bio` margin,
+                 # and it borrows §65's chip and §41's panel frame. Nothing
+                 # before §15 can reach it.
+                 # AFTER §63 AND ALLOWED TO BE: grids, flex, grounds, borders,
+                 # spacing, three marks and one auto margin, and not one
+                 # font-size, font-weight, text-transform or text colour.
+                 # Those are §63 §16 — including the two that read as
+                 # mechanism, the step numeral's `--accent-text` on the tint
+                 # and the fee's tabular figures.
+                 '76-bookpage.css',
+                 # THE CALL IS A BLACK CARD. Maryam, 31 Aug 2026 — the `booked`
+                 # dashboard's interview row takes §75's `.dark-card` under the
+                 # same heading `talRec` carries one stage earlier, because the
+                 # two are the same slot: "book an interview" then "join the one
+                 # you booked". This layer is ONLY what is true of the row on a
+                 # dark ground — §75 owns the card and states the recipe once,
+                 # per Maryam's standing instruction that a conversion never
+                 # asks about the ground, the inset or the hairlines again.
+                 # LAST, and every reason is structural: it beats four
+                 # `.sec-call` padding rules from §71 and §73 (two of them
+                 # inside the 900 query, so it is restated there per trap 3),
+                 # it answers §20's `+ .sec{padding-top:0}` from inside §20's
+                 # own tier, and it re-points §71.1's countdown ground and
+                 # §71.2's quiet-button border.
+                 # AFTER §63 AND ALLOWED TO BE: paddings, one ground, one
+                 # border colour and one custom-property reset, and not one
+                 # font-size, font-weight, text-transform or text colour.
+                 # Those are §63 §17 — including the one that reads as
+                 # mechanism, the quiet button's `fill:currentColor`.
+                 '77-crowdark.css',
+                 # THE TOP BAR: the breadcrumb that took the portal switch's
+                 # place beside the wordmark, the account menu the switch moved
+                 # INTO, and the page heading the trail replaced.
+                 # LAST, and two of the three reasons are structural. It
+                 # re-shapes §01's `.shell-act` for the one control in that bar
+                 # that holds two objects, and it restates §34's own
+                 # `var(--s05)` inset inside its own copy of that container
+                 # query (trap 3) now that the trail rather than the switch is
+                 # what follows the wordmark. The third is §78.6: `.ph-bare`
+                 # has to beat every `.ph` rule §25, §56, §62 and §70 write.
+                 # AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/
+                 # §69-§77 each pass: geometry, grounds, borders, one
+                 # transition and two fills, and not one font-size,
+                 # font-weight, text-transform or text colour. Those four are
+                 # §63 §18 — including the separator's ink, which reads as
+                 # mechanism and is a type decision.
+                 '78-topbar.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1084,6 +1163,26 @@ js = award_js + '\n\n' + call_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here
                                                         # been pressed. It reads `COHORT`, `CH`, `AV`, `cfg`
                                                         # and `who` from views.js and data.js.
                                                         'ai10.js',
+                                                        # THE TOP BAR'S BREADCRUMB, and the page heading it
+                                                        # replaces. The portal switch left the bar for the
+                                                        # account menu and the trail took its place, so the
+                                                        # header now names the page — which made the `<h1>`
+                                                        # 40px below it the same words twice.
+                                                        # IT IS A PASS BECAUSE `shell()` IS EVALUATED BEFORE
+                                                        # `view()`: one string concatenation in `render()`,
+                                                        # so the header cannot read a page that does not
+                                                        # exist yet. It ships an empty `.crumb-trail` and
+                                                        # this fills it — the same shape `placeBand` and
+                                                        # `placePageSummary` take, and trap 11's family.
+                                                        # LAST, and it is the tidy-up at the foot that needs
+                                                        # it rather than the trail: `tidyPh` asks whether
+                                                        # anything is LEFT in the `.ph` once the heading is
+                                                        # out, and §62's face, `talFirst`'s hoist and
+                                                        # `placeBand`'s lift all have to have finished
+                                                        # before that question has a stable answer.
+                                                        # It reads `CRUMB_HOME`, `crumbHome` and `crumbMod`
+                                                        # from views.js and touches no other state.
+                                                        'ai11.js',
                                                         # TEMPORARY — the red accent trial's page list.
                                                         # Delete with §67; that layer's head has the
                                                         # full removal note. LAST so its wrapper is the

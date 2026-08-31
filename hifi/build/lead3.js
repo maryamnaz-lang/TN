@@ -267,7 +267,7 @@ V.leadEvals = () => {
             <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
             <span class="gcard-b"><h3>${e.name}</h3>
               <span class="sub">Interviewed ${e.when.toLowerCase()} &middot; quiz ${e.quiz} of 100 &middot; I proposed Explorer &ndash; ${e.ai}</span></span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`
         : `<div class="cardrow">
             <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
@@ -289,7 +289,7 @@ V.leadEvals = () => {
             <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
             <span class="gcard-b"><h3>${s.name}</h3>
               <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days</span></span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`
         : `<div class="cardrow">
             <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>

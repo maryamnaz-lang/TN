@@ -213,7 +213,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `74-signedcards.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `77-crowdark.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -768,6 +768,238 @@ for the growth areas, **blue** for her note, with the pair abreast and the note 
 `.lvl-hero` and the "How the ladder works" `.acc` — confirmed unrelated (hiding `.signed`
 changes nothing). It predates all of §72–§74.
 
+### THE BLACK CARD IS A COMPONENT — §75, `.dark-card` — AND CONVERTING IS ONE CLASS
+
+**Standing instruction (Maryam, 31 Aug 2026):** *"now when i say convert a section to black
+card, you have this reference right? … i will not tell you that remove the bottom border
+attached or give black box padding, do this all yourself."* So **"make this a black card" means
+the whole recipe** and none of it is a question to ask. `75-recdark.css` is the reference
+implementation — read it before converting anything.
+
+**What `.dark-card` gives you, all of it stated once in §75:**
+
+| | |
+|---|---|
+| ground | `--gray-100` + §21.22's top-right haze, as a `background-image` |
+| place | inset by `--pad-x` as a **margin**, `--s07` padding inside, `margin-top` for section air |
+| seams | the section's own `::after` / `::before` off; the **next** section's join off if it draws one |
+| head | `.dc-hd` › `.dc-hd-r` (`.dc-t` title + **either** a `.dc-act` control **or** a `.dc-when` time at the right end — never both, they share one auto margin) with `--on-dark-rule` under it, 16 above and below |
+| buttons | `.btn-p` → accent fill (§15.1853 + §19); a quiet button → borderless white |
+| ink | §63 §15 — `--on-dark` for the title, `--on-dark-2` for what supports it |
+
+**A caller states only what is different about its own content.** Two so far: `.rec-dark`
+(§75.3, the recommendation's portrait, action group and skeleton) and `.crow-dark` (§77, the
+call row). Most of what looks new when you convert a third is already above.
+
+**§77 is the worked example, and what it had to answer is the general shape of the problem** —
+not the card, which was free, but the *host section's existing opinions*: four `.sec-call`
+padding rules from §71 and §73 (two inside the 900 query, so restated there per trap 3), §20's
+`+ .sec{padding-top:0}` answered from inside §20's own tier, `--layer-02` grounds and
+`var(--rule)` borders that vanish on black, and trap 10 — a stacked component bringing the page
+gutter inside a card that already pays it (`--pad-x:0px` on the row, **not** on the section, or
+the card loses its own inset).
+
+**Never `.plate` or `.sec.on-dark`.** Both are in ai5's `DARK_CARD`, so `placeDark` hoists the
+section into the head band. The long version is over `recWrap` in views.js.
+
+#### The recommendation — §75.3, `.rec-dark`
+
+Maryam, 31 Aug 2026 — "make this card black, you know what our black card do right? it has the
+top right gradient". `talRec` on the `new` dashboard was the first caller. Six things:
+
+- **IT IS `.rec-dark`, NOT `.plate` AND NOT `.sec.on-dark`.** Both of those are in ai5's
+  `DARK_CARD`, so `placeDark` would hoist the whole block into the head band's second column —
+  which on this page is §70's journey list. It would land there at 330px with the photograph,
+  the facts and the two buttons each on a line of their own, and **nothing would throw and
+  nothing would warn**: exactly the bug §70 records for `placeBand` walking into `.rec-lab`.
+- **THE HAZE IS A `background-image`, NOT `.dark-glow`.** §21.22 draws it as an absolutely
+  positioned div that `injectGlow` (ai4) appends, which then costs three more rules —
+  `position:relative` + `overflow:hidden` on the card so the light cannot escape (§21's own
+  note records `.ldr-read` painting a 700px orange rectangle across the band for want of it),
+  and `z-index:2` on every child. A background layer is behind all content by definition and
+  needs no pass, so the design system carries the card as **one class**. The values are §21's
+  to the number: element opacity `.22` over an opaque ground and per-stop alpha composite
+  identically when the far stop is already transparent, so the `.22` moves into the stop.
+- **THE HEADING AND THE ATTRIBUTION ARE TWO LINES.** "Agent recommended by Tal" said what the
+  block is and whose choice it is at once; `Your Next Step - Interview` at **18px** says the
+  first and "Tal recommends" says the second. `.rec-hdb` wraps the pair, because `.sec-rec` is
+  a column at 20 (581:6456's gap to the content) and a heading dropped straight into it sits
+  20 off its own attribution.
+- **THE HEADING IS A ROW WITH A RULE UNDER IT, AND "VIEW ALL AGENTS" IS ON IT.** That button
+  was the left half of a pair at the card's foot, beside Book — and the two are not the same
+  kind of thing: Book is what the card is *for*, View all agents is the way out of the
+  *section*. The rule is `--on-dark-rule` (white at 16%), **not `--on-dark-border`** at 42% —
+  §15's `.plate-x` note is the argument, the border token is for the edge of something you can
+  press. 16px above it and 16 below, set in two places (the row's `padding-bottom` and
+  `.rec-hdb`'s gap); it shipped at 12/12 for one build and crowded an 18px heading.
+- **THE BUTTON IS WHITE, WHICH IS ITS THIRD INK AND THE FIRST TIME IT IS NOT IN A PAIR.**
+  §70.5 gave it 581:6548's accent outline as "one of a PAIR, beside a black button of
+  identical size"; §75 took the border off when the card went black; now the pair is gone —
+  the accent button is 200px down and 800px across — so the orange was distinguishing it from
+  nothing. `--on-dark` is simply the card's ink, and the arrow follows on `currentColor`
+  (§70.5's hard `fill:#f47113` is re-pointed rather than left to miss). `.rec-a`'s stated
+  382px goes with it: that was 185 + 12 + 185.
+- **THE CARD IS INSET BY `--pad-x` AS A MARGIN AND PAYS `--s07` INSIDE.** The black is on the
+  `.sec`, so it ran rail to rail and met the head band's closing hairline directly — the page
+  turning black rather than an object arriving on it. Margin for the gutter (16 / 24 / 32 by
+  width, so the card's edges land on the page's spine), flat 32 for the frame, `margin-top`
+  only — the space below is `.sec-qa`'s own 32px of padding, and a margin would add to it
+  rather than replace it.
+- **AND QUICK ACTIONS' `border-top` COMES OFF UNDER THIS CARD.** §70.5c gives `.sec-qa` the
+  only bottom-drawn join in the build (581:6344), and §14 and §70.5 both stop the section
+  *above* it from closing itself for that reason. **The arrangement stopped working the moment
+  the card got a margin**: a full-bleed grey rule at the pixel row below an inset black card
+  runs past it on both sides and reads as a line stuck to the card, not as the top of the next
+  section. `.rec-dark + .sec-qa` — keyed on what PRECEDES, the mirror of §14's and §70.5's
+  `:has(+ .sec-qa)`, because here the reason is a property of the card. Any other section above
+  Quick Actions keeps the line.
+- **THE PORTRAIT IS A SQUARE SIZED BY THE CONTENT'S HEIGHT, AND FLEX CANNOT DO IT.** §70.5's
+  `width:166px;aspect-ratio:1` described itself as "as tall as the facts beside it AND square"
+  — two claims that were one only because 166 happened to be both. With two rows off the block
+  it measures ~120, so the square hung 45px below the sentence. The fix is to make the HEIGHT
+  the input: `width:auto; height:100%; aspect-ratio:1`. **In a flex row that ships an 18px
+  photograph, silently** — flex resolves the main size from the flex base size, and a box whose
+  only content is a `position:absolute` `<img>` contributes zero, so the ratio has nothing to
+  transfer into. `.rec-l` becomes `display:grid; grid-template-columns:auto minmax(0,1fr)` at
+  600 and up (measured on the live page: flex 18×18, grid 120×120). **Trap 19 is live on it** —
+  §70.5's phone rule is `flex-direction:column`, which is inert on a grid, so the whole block
+  is gated at `min-width:600px` and below it the fixed square header stands.
+- **`.rec-v` IS `I.verified`, NOT `I.checkFilled`, AND ALL THREE CALL SITES MOVED.** A ringed
+  tick is this product's "done" mark — `jrnList` puts it against a finished step — so beside a
+  name it read as "Priya Nair: complete". A scalloped badge is "this identity has been
+  checked", a property of the person. The glyph is Material Symbols Rounded FILL 0 24px,
+  **pasted** from `symbols/web/verified/materialsymbolsrounded/verified_24px.svg` per icons.js's
+  own rule, on the same `0 -960 960 960` grid as everything else there. `talRec`, `V.agent` and
+  `V.booking` all write `.rec-v` and it means the same thing on each.
+  **`.crow-v` was NOT changed** — the reference screen for the call row draws the ringed tick,
+  and that change was asked for on the recommendation. One to raise rather than assume.
+
+#### The call — §77, `77-crowdark.css` + `.crow-dark`
+
+Maryam, 31 Aug 2026. The `booked` dashboard's interview row takes `.dark-card` **under the same
+heading `talRec` carries one stage earlier**, because the two are the same slot: on `new` the
+page's next step is "book an interview", here it is "join the one you booked", and both sit
+directly after Tal's card before the body. The heading is byte-identical.
+
+- **NO CONTROL ON THE HEADING ROW, WHICH `.dc-hd-r` ALLOWS.** `talRec` puts "View all agents"
+  there because the recommendation is one of five and the way out belongs to the section. A
+  booked interview is not one of anything — Reschedule is on the row, where it acts on *this*
+  appointment rather than being a way past it. `.dc-hd` holds one child here and two there.
+- **ONE CALL SITE OF FOUR, AND `.crow-dark` IS ON THE WRAPPER SO THE VIEW DECIDES.** `crow` is
+  drawn by this dashboard, the Interviews module, `V.cohort` and `callRow()`. Only this one is a
+  page's *next step*; `callRow()` is a `.head-sec` **inside the band**, where a black card would
+  be a second dark object in a block that already has one.
+- **THE COUNTDOWN IS IN THE HEADING ROW AND §71.1'S 182px CELL IS GONE** (Maryam, 31 Aug 2026).
+  That cell was argued as "the row's only ground" — the one figure that changes by itself, set
+  apart by a tint — and that argument was about a row standing on a **white page**, where a
+  ground is the only way to lift a figure. Inside a card, the heading row is already where a
+  card says what it is *about*. `.dc-when` takes `.dc-act`'s slot, ink and auto margin; the
+  portrait goes back on the card's own spine, which the 20px cell inset had been breaking.
+- **`.dc-when` IS NOT `.dc-act`, AND THEY ARE ONE-OR-THE-OTHER.** Same position, same ink,
+  different element: `.dc-act` is a control that navigates, this is a figure that does nothing.
+  Both carry `margin-left:auto`, so two of them would jam together with the row's slack in
+  front of the pair — a card that wants both needs a group, not a second auto margin.
+- **"In 1 minute" IS DERIVED, NOT TYPED.** `CALL_ROW.iv.when` is `'in 1 minute'` and
+  `callLeft` produces exactly that string — `PLATE_SOON` matches `in \d+ minute`, so the
+  preposition-first branch fires. **Flagged and not fixed:** Tal's summary on this stage says
+  the interview is "confirmed for Thursday, August 20 at 6:30 PM" and `dashPh` says "interview
+  20 August". A one-minute countdown cannot be true alongside a date six days out — one edit
+  either way, and `bkStamp`'s note is why they have to agree.
+- **THE VIOLET WENT WITH THE CELL IT WAS WRITTEN FOR.** §63 §11's `#b948c7` existed to lift a
+  figure off a 4% grey ground; there is no ground left. `.dc-when` is `--on-dark` and **not the
+  accent even though it is urgent** — §59's answer to urgency *is* the card, and the accent is
+  already spent on Join 100px below.
+- **`crow(kind, o)` TAKES TWO FLAGS AND BOTH MODES HAVE A CALLER** — `{when:false, second:false}`
+  here, defaults everywhere else. Two rather than one because they are two decisions. **`when`
+  takes the label with it** ("Level interview · 45 minutes, recorded"), which is only acceptable
+  because Tal's summary 40px above says the same thing; on a page with no summary that is a
+  fact going missing.
+- **FIVE RULES WERE DELETED AS THE CARD LOST PARTS**, and that is the discipline rather than an
+  aside: the countdown cell's ground (§77), the quiet button's border (§77), and three inks in
+  §63 §17. Each was keyed on a class `.crow-dark` no longer writes — the "gate nothing writes"
+  tell, which a stylesheet accumulates fastest, because a colour matching nothing costs nothing
+  to look at. The same classes on the other three `crow` call sites are untouched.
+- **`.crow.urgent` NEEDED NOTHING** either way, which is §71.2a's design paying off on a ground
+  it never imagined: that state re-points the cell's *ground* and lets both lines inherit.
+- **18px IS A STATED §63 §7 EXCEPTION AND IS NOT TOKENISED.** §11's rule is take the nearest
+  role and h3 is 17 — the same one-pixel gap that minted `--t-sec-size`. That one earned a
+  token because three headings across two layers read it; this has one reader. If a second
+  block ever wants 18, tokenise it then rather than copying the number.
+- **TWO INKS ON THE CARD, NOT FIVE.** The block ran `#414141`, `#973177`, `#0488c5`, primary
+  and secondary, all picked on a white page; three of the five are under 3:1 on `--gray-100`,
+  including the magenta claim at 2.1:1 — the one line the block exists to deliver. §63 §15 is
+  `--on-dark` for the name and the claim, `--on-dark-2` for everything supporting them.
+  **`.rec-n` / `.rec-r` / `.rec-f` are scoped to `.rec-dark` and `.rec-why` is not**, and the
+  difference is who writes them: the first three are drawn on `V.agent`'s white page too, and
+  `.rec-why` has exactly one caller. A `.rec-dark` scope on it would be a condition that is
+  true every time it is evaluated.
+- **THE LABEL NEEDED (0,5,0).** `.app .ai-label.bare.rec-lab` is (0,4,0), so a
+  `.app .rec-dark .rec-lab` restatement at (0,3,0) loses **silently** — the words simply stay
+  black on black. §63 §7b's trap, one more time.
+- **THE ROWS THAT CAME OFF.** The expertise line and "Data Overlap Tags: 98% match" are gone
+  and the rating moved under the name to take the row the first left, so `.rec-top` is still
+  two rows and the 166px portrait is still square against its own content. `rec.match` and
+  `rec.expertise` both keep readers elsewhere (`SUMDROP.quiz` in ai6; `V.agent`); **`.rec-m`
+  and the skeleton's `.sk-x` / `.sk-m` do not, so their rules are deleted** rather than left
+  as the "gate nothing writes" tell.
+- **THE QUIET BUTTON LOST ITS STROKE, which turns over §70.5's third stated reversal of §64.**
+  That note argued a borderless button beside a black one "read as a text link that happened
+  to be 185px wide" — true on white, where the pair differed only by fill weight. On black the
+  accent button is the brightest object on the card, so the fill makes the distinction and the
+  outline is one more edge. `border-color`, not `border` (§64.1): `.btn` carries a transparent
+  1px and dropping the shorthand makes this one 2px shorter than the button beside it.
+
+### THE BOOKING PAGE IS THREE PANELS — §76, `76-bookpage.css` + `V.agent`
+
+Maryam, 31 Aug 2026, with a reference screen — "the look and feel will be ours, but take the
+structuring inspo from the reference". Six loose blocks down one column (identity, bio, a
+`.facts` row, a heading, a day strip, a time row, a button) become **the profile beside its
+three purchase facts**, **the picker as two numbered steps**, and **a checkout row**.
+
+- **ONE `.sec`, THREE PANELS.** §10.2 closes every section with a full-bleed hairline and tick
+  marks at the rails, so three sections would draw a page-wide rule one pixel under each
+  panel's own bottom border — §14's "TWO 1px rules one pixel apart", three times over. The
+  inline `style="padding-top"` came off with the merge (trap 1).
+- **THE FRAME IS §41'S** — `1px solid var(--rule)` on `--layer-01`, the only other bounded
+  panel in the build. The reference's cards have an 8px radius and a soft shadow; `--radius`
+  is `0px` by token and §02's opening note is that "depth is expressed as rhythm and rule
+  weight, nothing else".
+- **THE DIVIDER IS A `border-left` AND §72.1 ARGUES FOR A PSEUDO-ELEMENT.** Both are right and
+  the difference is what the rule would meet: §72's columns sit under a rule of their own, so
+  a full-height border forms a corner with it; these sit inside a panel with nothing above
+  them, and the grid item's own stretched height *is* the inset. A border also turns over
+  correctly at the stack — it becomes `border-top` on the same element. §72.3's `content:none`
+  warning is about an **absolutely positioned** divider and does not apply.
+- **THE THREE FACTS ARE A COLUMN AND ARE NO LONGER `.facts.eo-facts`.** §73's cell draws its
+  hairlines as the grid's column gap and gives cell 3 an absolutely-positioned divider out
+  into the gutter; stacked, all three mechanisms draw vertical lines down a column. §76 states
+  the column and the mark goes to **§65's 28px tinted chip** — the shape for a figure cell in a
+  continuous band, which is what three rows on one ground are. Hues named, not cycled.
+- **THE STEP NUMERAL IS `--brand-tint-2`, NOT A SOLID ACCENT.** §10.29 reserves the solid
+  accent for the candidate's own SELECTION, and the lit day and the lit time are 30px below
+  the numeral. `--accent-text` on the tint (5.8:1) rather than `--on-accent` on the accent.
+- **`.bks-slots` AND `.bks-days` HAVE TO GIVE BACK §10.3'S BLEED.** `.sec > .slots` pulls
+  itself out by `--pad-x` on both sides; inside a panel that hangs the grid over both borders.
+  Trap 10, one component along, answered the same way — at the element.
+- **WHAT IT REFUSES FROM THE REFERENCE.** The **"Talent Agent" chip**, which names the category
+  the crumb two rows above already puts you inside (§73 refuses a social-proof row on the same
+  test). And the **month calendar** — §41 is a whole layer arguing the opposite way about this
+  exact page ("a chip row answers 'which of these do you want' perfectly, which is the
+  candidate's question in the booking flow… It is not the agent's question"), and the data
+  says the same: this agent has five open days, so a month would be 26 cells of invented
+  availability. What it *takes* is the reference's real point — column one needs vertical mass
+  or the rule runs past nothing — by making the five days a **3-across grid** rather than a
+  scrolling strip.
+- **EVERY FIGURE IS READ.** "4 available slots" is the enabled cells counted, not the
+  reference's own "6 available" over a grid with two struck through; the day heading and the
+  strip come off one tuple.
+- **THE FEE AND THE BUTTON DISAGREE AND THIS ROW MADE IT VISIBLE — NOT FIXED HERE.** `$695` is
+  a literal and is Maryam's, twice asked for; every other surface reads `AGENTS.<agent>.price`,
+  which is $95 for Priya. The two used to sit ~600px apart down a column and now sit on one
+  line, which is what a checkout row is for. **The structure is not the bug.** If 695 is real
+  the fix is `AGENTS.<agent>.price` and five surfaces follow; if it is the fee plus something
+  this page does not draw, that something belongs in the row before the total does.
+
 ### EVERY AI-NATIVE SECTION HEAD IS `aiHead` — ONE COMPONENT, THREE CALLERS
 
 Figma 613:7984. **The heading, its description and the row's actions are one block, and the
@@ -1188,8 +1420,11 @@ the person you are talking to.
   something you switched ON, the error tint on the way out. Same tint as the speaking
   participant's tile, so "on" is one colour on this surface however it is drawn.
 - **Six icons were added to `icons.js`** — `micOff`, `videoOff`, `screenShare`, `raiseHand`,
-  `captions`, `callEnd` — all pasted from `@material-design-icons/svg/filled`, per trap 7.
-  `overflow` already IS `more_vert`, so More reuses it.
+  `captions`, `callEnd` — all pasted from the official set, per trap 7 (Material Symbols
+  Rounded at FILL 0 since 31 Aug 2026; they were the filled cut when this was written).
+  `overflow` already IS `more_vert`, so More reuses it. The two "off" marks read BETTER
+  linear than they did filled: the slash now cuts through an open form rather than across a
+  solid one.
 - **Three photographs are embedded** (`CALL_ART` in build.py): a 735x412 landscape still for
   the feed and two 240px faces. `AV`'s squares are cut for a 36px disc and the first cut
   stretched one across a 1200px feed — a 6x upscale, which read as a very bad connection. The
@@ -1367,12 +1602,46 @@ annotations ("Open question — client decision") deliberately do **not** cross 
 6. **Hover is deliberately disarmed.** `build.py` rewrites every `:hover` to
    `:hover:where(.__nh)` — 300-odd selectors; the build prints the count. Only the handful in
    `HOVER_KEEP` stay live. To keep a new one, add it there.
-7. **The icon set is already official Material *filled*.** Checked against
-   `material-design-icons/svg/filled`: `group`, `copy`, `wallet`, `creditCard`, `search`,
-   `circle`, `circleDash`, `view`, `chat`, `document`, `chart`, `book`, `calendar`,
-   `certificate` are byte-identical to the official filled cut. Material's filled cut is
-   intrinsically hollow for many marks (filled `radio_button_unchecked` is a ring). Icons that
-   look "linear" mostly are correct — do not blanket-fill them.
+7. **The icon set is official Material *Symbols*, the ROUNDED style at FILL 0 — LINEAR, and
+   ON A `0 -960 960 960` BOX.** Changed platform-wide on 31 Aug 2026 (Maryam, by name and
+   with the Google Fonts panel: Material Symbols / Rounded / Fill off) from the Material
+   *Icons* filled cut. Every mark is the official Rounded outlined file from
+   `google/material-design-icons`, pasted rather than drawn. Do not mix a filled mark in —
+   what made the previous cut work was holding ONE cut, not which cut it was, so the same
+   rule now points the other way.
+   **THE GRID IS THE THING THAT BREAKS A CALL SITE.** Material Symbols are forty times the
+   size of Material Icons and are drawn ABOVE a y=0 baseline, into negative y. A Symbols path
+   in a `0 0 24 24` box renders as an invisible speck in the top-left corner and **nothing
+   throws**. `I.name` and `inner()`'s proxy state the box once; the 25 call sites that wrap
+   `inner()` in an `<svg>` of their own were all repointed with it. After touching `icons.js`,
+   `grep 'viewBox="0 0 24 24"'` and expect only the deliberate exceptions — **the built portal
+   contains exactly five and they are all correct**: `nil.js`'s `NILP` proxy and views.js's
+   two `ls-*` chapter-player marks (pictures of somebody else's UI, both already excluded from
+   the design system), and the **prototype chrome's Back and Reset buttons, which live in
+   `build.py`'s HTML template rather than in a layer** — the frame around the device is not
+   the product. In source, add `CHEV` and `TN_MARK` (brand marks carrying their own boxes,
+   `gallery.html` draws the first) and `tn-agent-portal.html`'s own chrome Reset. That is the
+   whole list; anything else is a call site that was missed.
+   **`talChat` was REGRIDDED, NOT REDRAWN** — it is Maryam's traced mark, not Google's, so it
+   was mapped through `(x,y) -> (40x, 40y - 960)`, the exact affine between the two boxes, and
+   checked by rendering both into one 960 box for equal bounding boxes. A uniform scale plus a
+   translate cannot change a shape; re-tracing it against the Rounded cut would have been a
+   redrawing of a mark that was never Google's.
+   **FOUR MARKS ARE STILL FILLED AND THAT IS THE RULE, NOT AN EXCEPTION TO IT.** In Material
+   Symbols `FILL` is an axis for conveying STATE — selected/unselected, done/not done — not a
+   second look you may prefer. So the set sits at FILL 0 and flips to 1 to say "this one is
+   on": `star` / `starOutline` (a rating's lit and unlit slots), `checkFilled` (done, against
+   `checkOutline`'s not-done) and `stopFilled` (a solid dot, which is what its name says).
+   **The test for a fifth is whether the SAME glyph also appears unfilled and the difference
+   is what the reader is being asked to see.** `trophy`, `certificate` and `shield` fail it —
+   they are subject marks (a widget's topic, a stat cell's category, the security note beside
+   a card form) and never appear both ways, so a filled trophy would be an award nobody has or
+   has not won. `circleDash` needs no entry either: Rounded's `radio_button_checked` already
+   draws its centre solid at FILL 0.
+   **`stars()` is the one call site the pairing forced to change** — in views.js and again in
+   `tn-agent-portal.html`'s own copy. It printed `star` five times and let a `.f` class carry
+   the whole rating in colour, which was doing half the work when the glyph was solid and
+   would have been doing all of it here. `.f` stays; it is no longer alone.
 8. **Any new `ai*.js`-style pass file must end with `render()`.** The boot render is the last
    statement in `views.js` and runs before any pass is parsed, so each pass re-renders at its
    own foot. `ai5.js` was missing that call and the module head band was absent from the first

@@ -882,7 +882,7 @@ const TALQ = {
    alone.
 
    AND ONLY THESE THIRTEEN ICON KEYS ARE REAL. `I` is a Proxy in
-   `talentnext-ds.js` and an unknown key returns `<svg viewBox="0 0 24 24">`
+   `talentnext-ds.js` and an unknown key returns `<svg viewBox="0 -960 960 960">`
    with no path in it — not an error, an EMPTY mark, which renders as a 15px
    hole rather than as anything you would notice was wrong. `person`, `badge`,
    `verified`, `user` and `account` are all missing and all look present.
@@ -1070,7 +1070,7 @@ const goRow = (icon, eyebrow, title, sub, go, attr) => `
     <span class="cardrow-ic">${I[icon]}</span>
     <span class="gcard-b">${eyebrow ? `<span class="eyebrow">${eyebrow}</span>` : ''}
       <h3>${title}</h3><span class="sub">${sub}</span></span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 
 /* A detail row: two lines and a trailing tag instead of a chevron. */
@@ -1146,7 +1146,7 @@ const checkRow = (st, title, detail, go, n) => {
     ? `<button class="tile clk gcard ckrow rst-${k}" data-go="${go}">
          ${num}
          <span class="gcard-b"><h3>${title}${status}</h3><span class="sub">${detail}</span></span>
-         <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`
+         <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg></button>`
     : `<div class="cardrow ckrow rst-${k}">
          ${num}
          <span class="cardrow-b"><span class="cardrow-t">${title}${status}</span>
@@ -1191,8 +1191,13 @@ const checkRow = (st, title, detail, go, n) => {
    anything, or marking the filled ones any other way, gives five grey stars. */
 function stars(n){
   let out = '';
+  /* THE LIT SLOT IS A DIFFERENT GLYPH, NOT THE SAME ONE IN A DIFFERENT COLOUR.
+     The set is Material Symbols at FILL 0 now, so `star` is filled and
+     `starOutline` is not — the pair is the fill AXIS, which is what a rating
+     needs. The `.f` class still carries the colour, exactly as the note above
+     says; it is no longer carrying the whole rating on its own. */
   for(let i = 1; i <= 5; i++)
-    out += `<svg class="${i <= Math.round(n) ? 'f' : ''}" viewBox="0 0 24 24">${inner('star')}</svg>`;
+    out += `<svg class="${i <= Math.round(n) ? 'f' : ''}" viewBox="0 -960 960 960">${inner(i <= Math.round(n) ? 'star' : 'starOutline')}</svg>`;
   return `<span class="stars" role="img" aria-label="${(n || 0).toFixed(1)} out of 5">${out}</span>`;
 }
 
@@ -1734,7 +1739,7 @@ const faceRow = (x, detail, go) => `
   <button class="tile clk gcard face-row" data-go="${go}" data-iv="${x.id}">
     <span class="mem-av mem-ph">${avatar(x.i, PHOTOS[x.id], 36)}</span>
     <span class="gcard-b"><h3>${x.n}</h3><span class="sub">${detail}</span></span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 
 /* --------------------------------------------------------------------------
@@ -1779,7 +1784,7 @@ const bookedRow = b => `<button class="cardrow bk-row" data-go="${b.go}" data-iv
     <span class="cardrow-t">${b.t}</span>
     <span class="cardrow-d">${b.d}</span>
   </span>
-  <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
 </button>`;
 
 /* THE DIARY IS BOOKED INTERVIEWS, IN THE ORDER THEY HAPPEN — and nothing else.
@@ -3653,7 +3658,7 @@ const roleRow = (icon, eyebrow, title, sub, attr) => `
     <span class="cardrow-ic">${I[icon]}</span>
     <span class="gcard-b"><span class="eyebrow">${eyebrow}</span>
       <h3>${title}</h3><span class="sub">${sub}</span></span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 
 const SIGNIN = {

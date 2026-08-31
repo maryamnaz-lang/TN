@@ -1,0 +1,386 @@
+/* ==========================================================================
+   76. THE BOOKING PAGE IS THREE BLOCKS
+   Maryam, 31 Aug 2026, with a reference screen: "take the structuring inspo
+   from the reference" — the look and feel stays ours. Revised the same day
+   ("what even is this UI?"): the three panels lost their frames.
+
+   The long argument for each block is over `V.agent` in views.js. What this
+   layer is: the rules that divide the three, the two-column split inside the
+   first two, the month grid, and the row that closes the page.
+
+   THE FRAMES CAME OFF AND THE FIRST VERSION'S OPENING ARGUMENT IS WHY THEY
+   WERE WRONG. It said: `.cal` is the only other bounded panel this product
+   draws, so these take §41's `1px solid var(--rule)` on `var(--layer-01)`
+   rather than inventing a card. Both halves were true and the conclusion did
+   not follow — `.cal` is ONE panel on a page of flow, and this was three of
+   them stacked inside a `.sec` that closes itself with a rule, each with a
+   1px column divider inside it. Four nested edges before any content. §02's
+   opening note is the test they failed: "depth is expressed as rhythm and rule
+   weight, nothing else" — and a border repeated three times is neither rhythm
+   nor weight, it is a box habit.
+
+   SO THE BLOCKS ARE FLOW AND THE DIVISIONS ARE TWO HAIRLINES: one under the
+   profile, one over the checkout. The picker in the middle is bounded by both
+   and states neither. Each block takes the page's own `--gutter` from the
+   `.sec` rather than paying its own padding, which is what "full width" means
+   here — the profile's photograph now starts on the same spine as the `<h1>`
+   above it instead of 32px inside a border.
+
+   AFTER §63 AND ALLOWED TO BE, on the same test §64/§65/§70–§75 each pass:
+   grids, flex, grounds, borders, spacing, three marks and one auto margin, and
+   not one `font-size`, `font-weight`, `text-transform` or text `color`. Those
+   four are §63 §16.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 76.1 ---
+   THE SECTION AND THE TWO RULES
+
+   One `.sec` holding all three, because §10.2 closes every section with a
+   full-bleed hairline and a pair of tick marks at the rails — three sections
+   would draw a page-wide rule one pixel under each block, which is §14's
+   "TWO 1px rules one pixel apart" three times over.
+
+   THE SPACE IS SYMMETRICAL AROUND EACH RULE AND THAT IS WHY THE SECTION'S GAP
+   IS ZERO. With `gap:var(--s06)` still on the column, a block's own
+   `padding-bottom` would land on TOP of the gap and the rule would sit 24px
+   from the block above it and 56 from the one below. The gap is off and each
+   rule's air is stated as padding on both sides of it, so all four measures
+   are the same 32.
+
+   THE RULES ARE INSET, NOT FULL-BLEED, and the distinction is whose boundary
+   it is. §10.2's closing hairline runs rail to rail because it ends a SECTION;
+   these two divide blocks INSIDE one, so they run the content's width and stop
+   where the content stops. A full-bleed rule here would read as three sections
+   and put the tick marks back.
+   ------------------------------------------------------------------------ */
+.app .sec-bk{
+  display:flex;flex-direction:column;gap:0}
+.app .bkp{border-bottom:1px solid var(--rule);padding-bottom:var(--s07)}
+.app .bks-w{padding:var(--s07) 0}
+.app .bkc{border-top:1px solid var(--rule);padding-top:var(--s07)}
+
+/* ------------------------------------------------------------------ 76.2 ---
+   THE PROFILE PANEL — who, beside what it costs
+
+   THE DIVIDER IS A `border-left` HERE AND §72.1 ARGUES FOR A PSEUDO-ELEMENT.
+   Both are right and the difference is what the rule would meet. §72's columns
+   sit under a rule of their own, so a full-height border would form a corner
+   with it and turn three columns back into a table; these two sit inside a
+   panel with nothing above them, and the grid item's own height IS the inset —
+   it stretches to the row box, which is exactly where the reference's line
+   starts and stops. A border also turns over correctly at the stack: it becomes
+   `border-top` on the same element. §72.3's warning is about an ABSOLUTELY
+   POSITIONED divider, which has to be switched off with `content:none` rather
+   than re-pointed; a border has no such trap.
+
+   THE RIGHT COLUMN IS SIZED BY ITS OWN WIDEST ROW — `fit-content(360px)`, not
+   the `minmax(240px,300px)` this shipped with, and the change is what answers
+   "whichever of these three got maximum width the other two should have same
+   width so they looked aligned" (Maryam, 31 Aug 2026). A grid track sized
+   `fit-content(L)` resolves to `min(max-content, L)`, so the column is exactly
+   as wide as "Report turnaround / Within 24 hours" on one line and the other
+   two rows stretch to it: three rows, one width, one right edge. A fixed
+   `minmax()` cannot do this — at 240 the longest row wraps, at 300 it fits and
+   the other two end short of it, and neither number knows what the strings are.
+   The 360 cap is the safety valve, not the size; nothing reaches it today.
+
+   `.bkp-l` IS GONE, NOT RENAMED. It wrapped `.agid` and the bio; the bio came
+   off the page, so the wrapper had one child and a `flex-direction:column` with
+   nothing to lay out. `.agid` is the grid item now. Its `.agid-bio` margin
+   rule goes with it — the class keeps ai7's booking widget as a caller, so the
+   FAMILY is alive and only this scoping of it is dead.
+   ------------------------------------------------------------------------ */
+.app .bkp{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s06)}
+
+/* THE 420 CAP IS FOR THE STACKED WIDTHS AND IT IS WHAT `fit-content()` CANNOT
+   DO FROM HERE. Below 900 the block is one column, so the three rows take the
+   page — 712px at the tablet frame, which put "Interview fee" and "$95" at
+   opposite ends of a line with 560px of white between them and stopped reading
+   as a pair. A cap rather than `width:fit-content` because at 390 the natural
+   width is already the page's and shrinking to content would leave the values
+   ragged; 420 is above the phone's measure and below the tablet's, so it binds
+   at exactly the one width that needed it.
+
+   IT IS ON THE ROW, NOT ON THE COLUMN, and that is not arbitrary. `.bkp-r`
+   carries the stacked divider (`border-top`), so capping the column shortened
+   that rule to 420 while the block's own closing rule 160px below it stayed at
+   the full 712 — two hairlines of different lengths doing the same job, which
+   reads as one of them being clipped. Capping the rows leaves every rule on the
+   page the width of its block. */
+.app .bkp-r{display:flex;flex-direction:column;gap:var(--s05);
+  border-top:1px solid var(--rule);padding-top:var(--s06)}
+.app .bkp-f{max-width:420px}
+
+@container app (min-width:900px){
+  .app .bkp{
+    grid-template-columns:minmax(0,1fr) fit-content(360px);
+    gap:var(--s07)}
+  .app .bkp-r{
+    border-top:0;padding-top:0;
+    border-left:1px solid var(--rule);padding-left:var(--s07)}
+}
+
+/* THE CHIP CAME OFF AND THE GLYPH TOOK ITS PLACE AT 20px — Maryam, 31 Aug
+   2026, and it is §72's trade exactly. This shipped with §65's 28px tinted
+   square on the argument that these are "a figure cell in a continuous band,
+   where the chip is what separates one number from the three beside it". That
+   argument depended on two things that are no longer true: the block had a
+   border round it, so a filled square inside it was one object among several;
+   and the fact was a LABEL OVER A VALUE, so the chip had two lines to stand
+   against. Turned onto one line inside an unframed block, three filled squares
+   in a column were the heaviest thing on the page — §72's own words for the
+   same discovery: "a box inside a box inside a box".
+
+   The hue survives, on the glyph. §72 stepped 16 -> 20 for exactly this reason
+   ("it now holds the line alone") and the same number is right here.
+   `--surface-mix` goes with the chip: nothing mixes against the ground any
+   more, and a variable nothing reads is the tell CLAUDE.md names.
+
+   THE HUES ARE NAMED, NOT CYCLED — `--mk` is written inline per fact, §72's
+   rule. An `nth-child` cycle would repaint the fee if a fourth fact ever landed
+   above it.
+
+   `margin-left:auto` ON THE VALUE IS WHAT RIGHT-ALIGNS IT, NOT
+   `justify-content:space-between`, and §76.4 makes the same argument about the
+   checkout row for the same reason: `space-between` distributes space BETWEEN
+   items on a line, so a row that ever wrapped would drop its value to the left
+   edge of the second line. An auto margin is a property of the item. The `s06`
+   left padding is the floor between a long label and its value — with the track
+   sized to the widest row, two of the three have slack and this is what stops
+   the shortest one reading as two unrelated strings.
+
+   `.bkp-fb` IS DELETED. It wrapped the label and the value as a column; there
+   is no column any more, and a wrapper nothing writes is the "gate nothing
+   writes" tell. */
+.app .bkp-f{display:flex;align-items:baseline;gap:var(--s04)}
+.app .bkp-fi{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;
+  position:relative;top:3px}
+.app .bkp-fi svg{width:20px;height:20px;fill:var(--mk);display:block}
+.app .bkp-fl{min-width:0}
+.app .bkp-fv{flex:none;margin-left:auto;padding-left:var(--s06);text-align:right}
+
+/* ------------------------------------------------------------------ 76.3 ---
+   THE PICKER — two numbered steps
+
+   THE DATE COLUMN IS FIXED AND THE TIME COLUMN TAKES THE REST, which is the
+   reverse of the block above and for the same reason: a seven-across month grid
+   has a natural width and six time cells do not.
+
+   IT STAYED AT 300 AND THE CALENDAR WAS SIZED TO IT, WHICH IS THE OPPOSITE OF
+   HOW THIS WENT FIRST. The track was widened to 336 for seven 45px cells, and
+   that number was chosen by looking at the calendar alone — at a 900 frame it
+   left the time column 148px of usable grid, so even two time cells came out
+   70 wide against the 81 "11:30 AM" needs, and the labels set on two lines at
+   the narrow end of the desktop range. Back at 300 the cells are 39px, which is
+   within a pixel of the reference's own, and the time column clears 81 at every
+   width. THE TIGHT END IS WHERE THIS HAD TO BE MEASURED: at 1280 both numbers
+   work and nothing shows.
+   ------------------------------------------------------------------------ */
+.app .bks-w{display:flex;flex-direction:column}
+.app .bks{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s06)}
+.app .bks-c{display:flex;flex-direction:column;gap:var(--s05)}
+.app .bks-c + .bks-c{border-top:1px solid var(--rule);padding-top:var(--s06)}
+
+@container app (min-width:900px){
+  .app .bks{
+    grid-template-columns:minmax(0,300px) minmax(0,1fr);
+    gap:var(--s07)}
+  .app .bks-c + .bks-c{
+    border-top:0;padding-top:0;
+    border-left:1px solid var(--rule);padding-left:var(--s07)}
+}
+
+/* THE STEP NUMERAL IS `--brand-tint-2`, NOT THE ACCENT ITSELF, AND THE
+   DISTINCTION IS §10.29'S. That layer reserves the solid accent for the
+   candidate's own SELECTION — the lit day and the lit time, both of which are
+   30px below this row — so a solid accent numeral above them would be a third
+   orange fill that is not a choice anybody made. The tint is the same hue at
+   the weight §56 uses for "the step you are on", which is what a numbered step
+   is. §63 states the ink. */
+.app .bks-h{display:flex;align-items:center;gap:var(--s03)}
+.app .bks-h h3{margin:0;flex:1 1 auto;min-width:0}
+.app .bks-n{
+  flex:none;display:grid;place-items:center;
+  width:24px;height:24px;
+  background-color:var(--brand-tint-2)}
+.app .bks-tz{flex:none;display:inline-flex;align-items:center;gap:var(--s02)}
+.app .bks-tz svg{flex:none;width:14px;height:14px;fill:currentColor;display:block}
+
+.app .bks-day{margin:0;display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
+.app .bks-cnt{
+  flex:none;display:inline-flex;align-items:center;
+  padding:2px 10px;
+  background-color:var(--layer-02)}
+
+/* THE TIMES ARE THREE COLUMNS — the reference's, and what turns six chips into
+   a shape rather than a sentence. `.slots` is `auto-fill minmax(140px,1fr)` by
+   §10.29, which at this block's ~600px would be four and at the phone's ~300
+   would be two; the counts are stated instead, so the grid cannot change shape
+   at a width nobody measured.
+
+   AND THE COUNT IS DERIVED FROM ONE MEASURED NUMBER: 81px. That is `.slot`'s
+   max-content width — "11:30 AM" at 13.5px plus its 12px of side padding — so
+   three across needs 3x81 + 2x8 of gap = 259 and two across needs 170. Every
+   threshold below is that arithmetic against the measured column, not a guess:
+
+     < 600     the phone, one column, ~358 wide          -> TWO (3 would be 74)
+     600-900   stacked but wide, 712 at the tablet frame -> three
+     900-1100  TWO, AND THIS BAND SHIPPED BROKEN. The two-column picker gives
+               the times only what the 336px calendar leaves: 180px at 900,
+               274 at 1024. Three across is 60 and 91, so every label set on
+               two lines — "9:00 / AM" — through the whole of the range the
+               product is actually read at. Two across is 86 and 133, which
+               clears 81 at the tightest point with room.
+     >= 1100   three, where the column reaches 332.
+
+   1100 IS A THIRD BREAKPOINT AND IT IS DELIBERATE. CLAUDE.md's "900 is the
+   portal's only real breakpoint" is about LAYOUT — this is not a layout change,
+   it is one grid's column count, and §63 already states 672 and §70 599.98 for
+   the same kind of reason. The alternative was stacking the picker below 1100,
+   which throws away the calendar-beside-the-times pairing that is the whole
+   point of the two steps, for a problem that is one declaration.
+
+   AND IT MUST GIVE BACK §10'S BLEED. `.sec > .slots` pulls itself out by
+   `--pad-x` on both sides (§10.3's "lists that bleed") and §15 restates the
+   margin; inside a column that hangs the grid over both edges. Trap 10 is the
+   same failure one component along, and it is answered the same way — at the
+   element, not by chasing selectors. */
+.app .bks-slots{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  margin:0;padding:0}
+@container app (max-width:599.98px){
+  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container app (min-width:900px) and (max-width:1099.98px){
+  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ------------------------------------------------------------------ 76.3b --
+   THE MONTH GRID — Maryam, 31 Aug 2026, following the reference
+
+   `V.agent`'s note is where the reversal of §76's original refusal is argued
+   and where the data honesty is worked out. This is the drawing. Five things:
+
+   AN OPEN DATE IS A `.day` AND EVERY OTHER CELL IS NOT, so views.js's existing
+   `t.closest('.day')` handler selects one for free and §10.29's accent fill
+   draws it. What §10.29 gives `.day` has to be undone here, though, and all
+   three declarations matter: `min-width:64px` is 448px of row across seven
+   columns, the `1px solid var(--rule)` border turns 42 cells into a spreadsheet,
+   and the `padding` is sized for a two-line chip. A cell is a square with a
+   numeral in it.
+
+   THE SELECTED DATE IS A DISC AND `--radius` IS DELIBERATELY NOT USED. That
+   token is 0px and every `border-radius` in the build resolves through it, so
+   `50%` is stated as a literal exception the way §56 states it for a mark ("a
+   mark is one of the two things this system lets curve"). A square accent fill
+   on one cell of a 7x6 grid reads as a selected spreadsheet cell.
+
+   `aspect-ratio:1` IS WHAT MAKES THE DISC ROUND, and it needs `min-width:0` on
+   the button to work: a `<button>`'s default `min-width:auto` in a grid floors
+   the track at the content's min-content width, and a two-digit tabular numeral
+   is wider than the row's share at 390.
+
+   THE AVAILABILITY DOT IS A PSEUDO-ELEMENT ON THE OPEN CELLS ONLY, which is
+   why `.bkd.day` and not `.bkd` — the gate is the same class that means
+   bookable, so the dot cannot get out of step with what is clickable. It needs
+   `position:relative` on the cell; §10.29 does not give `.day` one.
+
+   ADJACENT-MONTH CELLS ARE DRAWN, NOT BLANKED. The reference greys July's and
+   September's tail rather than leaving holes, and it is right: a 7-column grid
+   with six empty cells in the first row reads as a rendering fault. §63 gives
+   them their ink. */
+/* THE 336 CAP IS NOT A DESKTOP NUMBER REPEATED, IT IS THE ONE THING A MONTH
+   GRID NEEDS THAT A CHIP ROW DID NOT. A calendar cell is `aspect-ratio:1`, so
+   its HEIGHT is a seventh of whatever width the column gives it — and below 900
+   the column is the page. At the tablet frame that is 712px, which made the
+   cells 98px square, the selected disc a 98px orange circle and the grid 600px
+   tall: the month became the page. The strip this replaced had a fixed cell and
+   could not do it. Capped, every width draws the same ~45px cell the desktop
+   column does, and the grid sits at the start of the stack rather than being
+   centred — it is the first control in a numbered step, not a figure. */
+.app .bkcal{display:flex;flex-direction:column;gap:var(--s04);max-width:336px}
+.app .bkcal-m{margin:0;text-align:center}
+.app .bkcal-w,.app .bkcal-g{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s02)}
+.app .bkcal-w > span{display:grid;place-items:center;padding-bottom:var(--s01)}
+
+.app .bkd{
+  min-width:0;aspect-ratio:1;padding:0;
+  display:grid;place-items:center;position:relative;
+  border:0;background:transparent;
+  transition:background var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .bkd.day{border:0;border-radius:50%}
+.app .bkd.day:hover{background:var(--layer-02);border-color:transparent}
+.app .bkd.day.on{background:var(--accent);border-radius:50%}
+.app .bkd:disabled{cursor:default}
+
+.app .bkd.day::after{
+  content:'';position:absolute;bottom:5px;left:50%;
+  width:4px;height:4px;margin-left:-2px;border-radius:50%;
+  background:var(--accent)}
+.app .bkd.day.on::after{background:var(--on-accent)}
+
+/* WHAT THE THING IS, IN THE BLUE §12 KEEPS FOR "a fact about the object".
+   NOT the accent: the two lit cells directly above are the accent doing its one
+   job, and this note is not a choice. §74's "do not go for orange color only"
+   is the same call one page over. */
+.app .bks-note{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s05);
+  background-color:var(--layer-02);
+  --mk:var(--mk-1)}
+.app .bks-ni{
+  flex:none;display:grid;place-items:center;
+  width:36px;height:36px;
+  background-color:color-mix(in srgb, var(--mk) 13%, var(--layer-01))}
+.app .bks-ni svg{width:18px;height:18px;fill:var(--mk);display:block}
+.app .bks-nb{min-width:0;display:flex;flex-direction:column;gap:var(--s01)}
+
+/* `.bks-foot` IS DELETED, not left standing. The closing "All available times
+   are in Eastern Time (ET)" came off the page (Maryam, 31 Aug 2026) and its two
+   rules here — plus its half of §63's `.bks-tz, .bks-foot` pair — went with it.
+   A family whose gate nothing writes is the tell CLAUDE.md names; `.bks-tz`
+   keeps the timezone and keeps both rules alive on its own. */
+
+/* ------------------------------------------------------------------ 76.4 ---
+   THE CHECKOUT ROW
+
+   `margin-left:auto` ON THE BUTTON IS WHAT HOLDS IT AT THE RIGHT EDGE, and
+   `justify-content:space-between` on the row is not — §70.5's note makes this
+   exact argument about `.rec-a` and §76.2's fact rows now make it a third time.
+   `space-between` distributes space BETWEEN items on a line, so once the row
+   wraps the line holding one item has none to distribute and the group falls to
+   the start. An auto margin is a property of the item, so it holds whether or
+   not it shares a line.
+
+   THE AUTO MARGIN MOVED FROM `.bkc-s` TO THE BUTTON WHEN THE SECURITY NOTE
+   WENT, and that is the whole of what removing that line cost here. It had been
+   the first member of the right-hand group, so it carried the margin and the
+   button simply followed it; with it gone the button was the only thing left to
+   hold the edge. Left on the deleted element, the row would have ended with the
+   fee on the left and the button 16px after it.
+
+   THE BORDER CAME OFF AND A RULE WENT ABOVE IT (Maryam, 31 Aug 2026) — §76.1
+   states that pair, because the padding on both sides of the rule belongs to
+   the section's rhythm rather than to this row. What is left here is the row's
+   own layout. */
+.app .bkc{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s05)}
+.app .bkc-fee{flex:none;display:flex;flex-direction:column}
+.app .bkc > .btn{flex:none;margin-left:auto;min-height:44px}
+
+/* THE PHONE STACKS IT AND THE BUTTON GOES FULL WIDTH, which is what every
+   other button in this product does at this width. The auto margin is cleared
+   rather than left standing: in a column flex it is the INLINE axis, so it
+   would shrink the button to its own content and park it at the right edge —
+   trap 19's family, a property whose meaning is defined by the parent's
+   formatting context, and the reason `width:100%` alone would not save it. */
+@container app (max-width:599.98px){
+  .app .bkc{flex-direction:column;align-items:stretch;gap:var(--s04)}
+  .app .bkc > .btn{margin-left:0;width:100%;justify-content:center}}

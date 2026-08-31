@@ -1,0 +1,146 @@
+/* ==========================================================================
+   77. THE CALL IS A BLACK CARD — `.crow-dark`
+   Maryam, 31 Aug 2026, with a reference screen of the row's contents.
+
+   The `booked` dashboard's interview row takes §75's `.dark-card`, under the
+   same heading `talRec` carries one stage earlier: on `new` the page's next
+   step is "book an interview", here it is "join the one you booked", and the
+   two sit in the identical slot. The argument is over the call site in
+   `V.dashboard`.
+
+   WHAT THIS LAYER IS *NOT*. Every part of the card — ground, haze, the
+   page-gutter inset, the space above, the section's hairlines, the next
+   section's join, the heading row and its rule, the two button fills — is §75's
+   and is stated once there, because Maryam's instruction is that a conversion
+   never asks about those again. This layer is only what is true of THIS ROW on
+   a dark ground, and after Maryam's 31 Aug revisions it is THREE rules: the
+   section's padding (which `.sec-call` fights from four of its own), the row's
+   own frame, and the gutter the stacked row brings with it. It shipped with two
+   more — a ground for the countdown cell and a border for the quiet button —
+   and both were deleted the moment the card stopped drawing those parts. The
+   notes for the deletions are kept in place, because "why is there no rule
+   here" is the question a later reader asks.
+
+   IT IS ONE CALL SITE OF FOUR AND THAT IS DELIBERATE. `crow` is drawn by the
+   `booked` dashboard, the Interviews module, `V.cohort` and `callRow()` — and
+   only this one is a page's NEXT STEP. `callRow()` is a `.head-sec` inside the
+   band (a black card inside the band's own furniture would be a second dark
+   object in a block that already has one, trap 12's neighbourhood), and the
+   other two sit under section headings on pages about interviews and cohorts,
+   where the row is one item rather than the answer. `.crow-dark` is on the
+   wrapper, so which one converts is a decision the view makes.
+
+   AFTER §63 AND ALLOWED TO BE: paddings, one ground, one border colour and one
+   custom-property reset, and not one `font-size`, `font-weight`,
+   `text-transform` or text `color`. Those are §63 §17.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 77.1 ---
+   THE SECTION GETS ITS PADDING BACK, AND FOUR RULES HAVE TO BE BEATEN
+
+   `.sec-call` is the most heavily un-padded section in the build, because in
+   every other place it appears the row IS the section and pays its own insets:
+   §71.2b states `padding:0` twice, §71 restates a right-hand inset inside the
+   900 query, and §73.10 zeroes the vertical padding in both tiers. Wrapped in a
+   card the row is content again and the card is what pays.
+
+   ALL FOUR ARE (0,3,0) OR LESS, so `.sec.sec-call.dark-card` at (0,4,0) takes
+   them — and it has to be stated in BOTH tiers, because two of the four live
+   inside `@container app (min-width:900px)` and per trap 3 a tier can only be
+   answered from inside itself. This is the shape of every conversion of a
+   section that already has opinions: the card's own padding is (0,2,0) and
+   loses silently, which renders as a black rectangle with the content flush to
+   its edges rather than as an unstyled one.
+   ------------------------------------------------------------------------ */
+.app .page .sec.sec-call.dark-card{padding:var(--s07)}
+@container app (min-width:900px){
+  .app .page .sec.sec-call.dark-card{padding:var(--s07)}}
+
+/* AND THE SECTION AFTER IT GETS ITS AIR BACK. §20's desktop block ends with
+   `.app .page > .sec-call + .sec{padding-top:0}` — right when the call row is a
+   full-bleed band whose own bottom edge is the join, and wrong under a card
+   that is inset by the page gutter, where the next section starts flush against
+   a floating black rectangle. (0,5,0) inside the same tier, per trap 3 and
+   trap 4: that selector is in §20's nine-class neighbourhood and cannot be
+   outweighed from outside the query. */
+@container app (min-width:900px){
+  .app .page > .sec-call.dark-card + .sec{padding-top:var(--s06)}}
+
+/* ------------------------------------------------------------------ 77.2 ---
+   THE COUNTDOWN CELL IS GONE, AND SO ARE THE RULES THAT DREW IT
+
+   This layer shipped one build with `.crow-dark .crow-when{background:
+   var(--on-dark-fill)}` — §71.1's tinted cell re-mixed for a dark ground,
+   because `--layer-02` on black is a white slab. The cell itself has since
+   moved into the card's heading row as `.dc-when` (Maryam, 31 Aug 2026), so
+   `crow('iv',{when:false})` emits no `.crow-when` at all and that rule had
+   nothing left to paint. Deleted rather than left standing: a ground keyed on a
+   class this wrapper never writes is the "gate nothing writes" tell CLAUDE.md
+   names, and it is the exact shape §70 shipped `.jrn-pill`'s ink in.
+
+   THE OTHER THREE CALL SITES ARE UNTOUCHED — §71.1's cell, its violet and its
+   `.urgent` accent state are all still drawn wherever `crow` keeps its default.
+
+   WHAT REPLACED IT NEEDS NOTHING HERE. `.dc-when` is §75's, because a time at
+   the right end of a heading row is a property of the CARD rather than of this
+   row — the next black card about an appointment gets it free.
+
+   AND `.crow-who` HAS TO GIVE BACK ITS OWN LEFT PADDING. §71 gives it
+   `padding:var(--s07) 20px`, which was the row's inset when the tinted cell was
+   its left edge and the row paid its own frame. Inside a card that already pays
+   32 all round it is the frame charged twice, and with the cell gone the
+   portrait started 20px right of the heading directly above it — the one
+   misalignment a card makes obvious. Vertical padding goes too: the row is the
+   card's only content and the card's own 32 is the air. */
+.app .crow-dark .crow-who{padding:0}
+/* AND IT HAS TO BE STATED IN THE PHONE TIER TOO, per trap 3 — §71.3's stacked
+   rule lives inside `@container app (max-width:899.98px)` and a tier is its own
+   cascade level, so an unconditional (0,3,0) cannot be relied on to answer a
+   (0,2,0) rule inside one. Stacked, the row's two members have `gap:0` between
+   them (§71.3), so the person needs a floor before the button; 16 is it, and the
+   side padding stays off because the card is still paying the gutter. */
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-who{padding:0 0 var(--s05)}}
+
+/* ------------------------------------------------------------------ 77.3 ---
+   THE ROW HAS ONE BUTTON AND IT IS THE ACCENT
+
+   Reschedule came off (Maryam, 31 Aug 2026) — `crow('iv',{second:false})`. So
+   §75's `.dark-card .btn.btn-p` accent fill is the whole of this card's button
+   styling and this layer states nothing.
+
+   TWO RULES WENT WITH IT and the deletion is the point. This layer had
+   `.crow-dark .crow-a > .btn:not(.btn-p){border-color:transparent}` and §63 §17
+   had the matching white ink, both written for a quiet button that no longer
+   exists inside `.crow-dark` — `:not(.btn-p)` now matches nothing under this
+   wrapper. §71.2's `var(--rule)` border and §24.302's `.ic-l` are untouched and
+   still correct on the three call sites that keep the button.
+
+   THE RULE THIS LEAVES BEHIND, worth stating because it is the next trap: if a
+   second action ever comes back to a `.crow-dark`, it needs BOTH of those rules
+   again, and a border that is `var(--rule)` on black is invisible rather than
+   absent — which looks like a missing button, not a missing border. */
+
+/* ------------------------------------------------------------------ 77.4 ---
+   THE STACKED ROW BRINGS THE PAGE'S GUTTER WITH IT — TRAP 10
+
+   Below 900 §71.3 turns the row into a column and gives `.crow-when` and
+   `.crow-who` `padding: … var(--pad-x)`, because there the row is the full
+   width of the page and has to pay the gutter itself. Inside a card that
+   already pays 32 all round, that is the gutter charged twice — and it is trap
+   10 exactly ("a page component borrowed into a bubble brings the page's gutter
+   with it"), answered the way §35.1 answers it: one declaration at the root of
+   the borrowed component rather than a selector per cell.
+
+   ON `.crow`, NOT ON THE SECTION. `.dark-card`'s own inset margin is
+   `var(--pad-x)` too, and zeroing it on the wrapper would put the card back on
+   the rails. The custom property is set on the row, so the card keeps its
+   gutter and the cells inside it lose theirs.
+
+   IT IS STILL NEEDED WITH THE CELL GONE. §71.3 names `.crow-when` AND
+   `.crow-who`, and only the first of the two left this card — the person's block
+   still asks for `var(--pad-x)` on both sides when it stacks. One declaration
+   answers whatever §71.3 grows to name, which is the argument for setting the
+   property rather than listing the selectors. */
+@container app (max-width:899.98px){
+  .app .crow-dark .crow{--pad-x:0px}}

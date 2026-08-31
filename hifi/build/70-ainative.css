@@ -718,6 +718,14 @@
    name and the rating is a separate claim. */
 .app .rec-id{display:flex;align-items:center;gap:var(--s02);flex-wrap:wrap}
 .app .rec-who{display:inline-flex;align-items:center;gap:var(--s03)}
+/* THE MARK IS `I.verified` AND ALL THREE CALL SITES MOVED TOGETHER — Maryam,
+   31 Aug 2026. `.rec-v` is written by `talRec`, `V.agent` and `V.booking`, and
+   it says the same thing on each: this person's identity has been checked. It
+   was `I.checkFilled`, a ringed tick, which is this product's "done" mark —
+   `jrnList` puts it against a finished step and `signedSummary` against a
+   signed report — so beside a name it read as "Priya Nair: complete". The
+   glyph's own note in icons.js is the argument; the box and the green are
+   unchanged, because neither was ever about which mark sat inside them. */
 .app .rec-v{display:inline-grid;place-items:center;width:20px;height:20px}
 .app .rec-v svg{width:20px;height:20px;fill:#00a43c}
 .app .rec-r{display:inline-flex;align-items:center;gap:var(--s02)}
@@ -874,11 +882,23 @@
 @media (prefers-reduced-motion:reduce){
   .app .sk{animation:none;background-position:-200% 0,0 0}}
 
+/* THE TOP OF THE BLOCK CHANGED SHAPE AND SO DID ITS STAND-INS (Maryam, 31 Aug
+   2026). `.sk-hd` and `.sk-lab` are the heading and the attribution under it —
+   24 and 19 to the two line boxes §63 gives them. `.sk-rt` replaced `.sk-x`:
+   the expertise line came off the block and the rating took the row it left, so
+   the second bar in `.rec-top` is now 178 wide (a rating, not a sentence)
+   rather than 314. `.sk-m` went with "Data Overlap Tags", leaving `.rec-ov`
+   holding the one `.sk-why` line the sentence needs. Both deleted rather than
+   left standing: a width with no span to land on is the same dead rule the
+   `.rec-m` note in §63 describes, and on the one part of this block whose
+   entire job is to be the same size as something else. */
 .app .sk-ph{width:166px;aspect-ratio:1}
+.app .sk-hd{flex:0 1 262px;height:24px}
+.app .sk-see{flex:none;width:138px;height:19px}
+.app .sk-lab{width:126px;height:19px}
 .app .sk-n{width:236px;height:24px}
-.app .sk-x{width:314px;height:19px}
+.app .sk-rt{width:178px;height:19px}
 .app .sk-f{width:140px;height:19px}
-.app .sk-m{width:198px;height:19px}
 /* the two tag pills share the row the way the real tags do, and take the tag's
    own 100px radius rather than the bars' 4 */
 .app .sk-t{flex:1 1 0;min-width:0;height:29px;border-radius:100px}
@@ -893,7 +913,8 @@
    loading state is wider than the card it replaces. */
 @container app (max-width:599.98px){
   .app .sk-ph{width:min(100%, 220px)}
-  .app .sk-n,.app .sk-x,.app .sk-m{width:100%}
+  .app .sk-hd,.app .sk-lab,.app .sk-n,.app .sk-rt{flex:1 1 auto;width:100%}
+  .app .sk-see{width:110px}
   .app .sk-f{flex:1 1 90px;width:auto}}
 
 /* THE OLD CARD'S BUTTON, STILL NAMED AND NO LONGER LIVE — 588:6992 at 20%.
@@ -1018,10 +1039,14 @@
    are cards, not buttons in a row — the border is the card — so the arrow
    §64 adds is not wanted here either and the markup carries its own.
    ------------------------------------------------------------------------ */
-/* THE SECTION'S OWN AIR — 581:6344: 32 all round, a top hairline, 8 between
-   the heading and the sentence and 20 before the cards. §16 already gives
-   `.all-desc` a margin and this restates the pair as the file has them, so the
-   three parts read as one block rather than as a heading with two strangers. */
+/* THE SECTION'S OWN AIR — 581:6344: 32 all round, a top hairline, and 20
+   between the heading and the cards.
+
+   THE FILE'S THIRD PART IS GONE AND THE SPACING IS ONE GAP NOW. 581:6344 has a
+   heading, a sentence 8 under it and the cards 20 under that; the sentence came
+   off (Maryam, 31 Aug 2026 — the two cards each carry their own description and
+   it described only the first of them), so the heading takes the 20 the cards
+   were owed rather than the 8 that was the gap to a sentence no longer there. */
 .app .sec-qa{
   padding:var(--s07) var(--pad-x);
   border-top:1px solid #d7d5cc}
@@ -1046,8 +1071,29 @@
    this unconditional (0,4,0) is what answers the phone. Deleting either one
    brings the doubled edge back at one end of the range. */
 .app .page > .sec:has(+ .sec-qa)::after{display:none}
-.app .sec-qa > .sec-h{margin:0 0 var(--s03);padding:0}
-.app .sec-qa > .all-desc{margin:0 0 20px}
+.app .sec-qa > .sec-h{margin:0 0 20px;padding:0}
+
+/* AND THE LABEL COLUMN HAS TO BE OPTED OUT OF BY NAME NOW — trap 13. §10.4
+   turns any `.sec` with a `.sec-h` into a 184px label column plus content at
+   900 and up, and `.qa` is not on its seven-component exemption list; this
+   section was getting away with it through §16's `.sec:has(> .all-desc)`,
+   because the sentence under the heading was a direct child. With the sentence
+   removed the opt-out stopped matching and "Quick Actions" set in a 184px
+   column with a vertical rule between it and its own cards.
+
+   The three declarations mirror §16's, keyed on `.sec-qa` instead — and they
+   are stated INSIDE the container query, per trap 3: §10.4 is in that tier, so
+   the unconditional `.app .sec-qa` padding above cannot answer it at any
+   weight. (0,4,0) and (0,5,0) against §10.4's (0,2,0) and (0,3,0), which is
+   more room than is needed and is what §16 already carries. */
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec-qa{
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec-qa > .sec-h{
+    border-right:0;min-height:0;margin:0 0 20px;padding:0}
+  .app .page:not(.form-page) .sec-qa > :not(.sec-h){
+    padding-left:0;padding-right:0}
+}
 
 .app .qa{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
@@ -1236,3 +1282,43 @@
   display:grid;place-items:center;
   background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
 .app .sec-lead .row-lead > .btn svg{width:20px;height:20px;fill:var(--mk-1)}
+
+/* --------------------------------------------------------------------- 3d ---
+   THE LEADER COLUMN IS WIDER AND PAYS THE PLAIN INSET
+
+   §71.1 made this same adjustment for the progress strip and its note is the
+   argument in full: `.head-col` is the class that opens the second column and
+   WHICH TENANT is in it is what sizes it. The journey is four short labels with
+   no intrinsic width — squeeze it and a label wraps, which costs a line. This
+   column is a 48px portrait, a three-line block and a 36px control on one row,
+   and those do not compress: at §70.3's `clamp(300px, 36%, 471px)` the product's
+   901 band gives 324, the file's 57px left inset takes it to 235, and the text
+   cell came out 118 wide — "Priya Nair" on two lines with the role and the
+   expertise on six between them.
+
+   TWO NUMBERS, AND THE SECOND IS THE ONE THAT MATTERS. 40% of 901 is 360, and
+   dropping the inset back to §70.3's own 32 leaves 296 of content — 180 for the
+   text cell, which holds the name on one line. The 57 is 587:6742's and it is
+   the JOURNEY's: §70.3's note already says the file's inset is applied from the
+   width the file's track exists at, and this tenant's track is a different one.
+
+   The floor is 340 rather than 300 for the reason §71's is 336: below it the
+   name wraps whatever the percentage says, and between 900 and about 1150 the
+   clamp sits on its minimum for the whole range.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-lead){
+    grid-template-columns:minmax(0,1fr) clamp(340px, 40%, 471px)}
+}
+@container app (min-width:1180px){
+  .app .modhead:has(> .head-col) > .sec-lead{padding-left:var(--s07)}
+}
+
+/* THE ROW TOP-ALIGNS, WHICH IS WHAT MOVING THE EXPERTISE LINE IN COST.
+   §02.229 gives `.row-lead` `align-items:center`, and that is right while the
+   row is a 48px portrait beside two short lines. With the expertise line inside
+   the same cell the text block is taller than the portrait, so centring floated
+   the photograph down its middle and the NAME sat above the top of the face —
+   the one alignment in a person row that has to hold. Top-aligned, the portrait,
+   the name and the mark all start on one line. */
+.app .sec-lead .row-lead{align-items:flex-start}

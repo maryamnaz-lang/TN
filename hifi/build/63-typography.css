@@ -337,7 +337,7 @@
 /* --- body-compact: a line in a list, a cell, a field --------------------- */
 .app .kv,.app .kv .k,.app .tbl,.app .tbl td,.app .chart-table,.app .msg .nm,
 .app .inp,.app select.inp,.app textarea.inp,.app .memo-w span,
-.app .plate-b,.app .psw-t,.app .pw-rules li,.app .ok{
+.app .plate-b,.app .pw-rules li,.app .ok{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls)}
 /* the value in a key/value pair is the strong weight — it is the answer, and
@@ -866,7 +866,7 @@
    §2, §3 or §7 — it only catches families those sections do not name, which
    is what makes it safe to write this broadly.
    ------------------------------------------------------------------------ */
-.app :where(b,strong,th,.notif-g,.psw-t.on){font-weight:var(--t-w-strong)}
+.app :where(b,strong,th,.notif-g){font-weight:var(--t-w-strong)}
 .app :where(em,i,small,p,li,td){font-weight:var(--t-w-book)}
 
 /* ------------------------------------------------------------------ 8b --
@@ -923,11 +923,9 @@
   .app[data-rail="open"] .sn-item .badge{font-size:10px;line-height:1}
   .app .shell-name{
     font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
-  .app .psw-t{
-    font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
 }
 @container app (max-width:599.98px){
-  .app .psw-t,.app .plate-b{
+  .app .plate-b{
     font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
   .app .cal-n{
     font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
@@ -1091,9 +1089,14 @@
   font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
   text-transform:none;color:var(--text-primary)}
+/* `.rec-m` CAME OUT OF THIS LIST AND ITS ITALIC FIGURE WENT WITH IT. "Data
+   Overlap Tags: 98% match" is off the recommendation (Maryam, 31 Aug 2026) and
+   nothing else in either portal writes the class, so the two rules would have
+   been the "gate nothing writes" tell — a size and a blue with no element to
+   land on. The argument for dropping the row is in `talRec`; `rec.match` itself
+   still has a reader in ai6. */
 .app .rec-r,
 .app .rec-x,
-.app .rec-m,
 .app .rec-alt{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
@@ -1103,9 +1106,6 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
   color:#414141}
-/* the match figure is the block's one claim, so it is set apart the way the
-   file sets it — strong, italic, and in the blue its own tag uses */
-.app .rec-m i{font-style:italic;font-weight:var(--t-w-strong);color:#0488c5}
 .app .rec-tag{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -1142,19 +1142,21 @@
    because the file sets it so and because it is the sentence the whole block
    exists to deliver; the three fact rows above it are 400.
 
-   AND THIS IS THE FILE'S INK EXACTLY, WHICH THE TWO TAGS ABOVE DID NOT GET.
-   §70.5's note substituted `--mk-4` (#a83a6b) for #973177 on the grounds that
-   the tag's own #fbf1f9 pill dropped it under AA for 14px text. That was the
-   right call for a tinted pill and does not carry: with no ground under it the
-   same ink measures 6.95:1 on white, well clear of 4.5. `.rec-m i` keeps
-   `--link` for the file's #0488c5, which is 3.94:1 on white and does not pass —
-   so the two halves of this block treat the file differently, and the
-   difference is a measurement rather than a preference. */
+   THIS IS THE FILE'S INK EXACTLY AND IT IS NOW THE FALLBACK, NOT THE ANSWER.
+   The value has been argued three times and each round was a measurement
+   against a different ground: §70.5 substituted `--mk-4` (#a83a6b) because
+   #973177 on the tag's #fbf1f9 pill is 4.0:1, under AA at 14px; with the pill
+   gone the file's own ink measures 6.95:1 on white and came back; and on §75's
+   `--gray-100` card it is 2.1:1, so the block that actually draws this sentence
+   overrides it to `--on-dark` in the §75 group above. The rule stays because
+   the class is not the card's — `V.agent`'s identity block reuses this family
+   on a white page — and because "the same ink on three grounds" is the shape of
+   the mistake, not the value. Measure before reusing it. */
 .app .rec-why{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;
-  color:#973177}
+  color:var(--on-dark)}
 /* transparent for the clip, exactly as the label above — §70 paints the ramp */
 .app .rec-alt{font-style:italic;color:transparent}
 
@@ -1184,6 +1186,84 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;
   color:var(--text-primary)}
+
+/* --------------------------------------------------------------------------
+   THE RECOMMENDATION ON BLACK — §75's card, and §63 §7's exception for it
+
+   Maryam, 31 Aug 2026: the block is `.plate`'s ground and `.plate`'s haze now,
+   so every ink above it has to turn over. §75 states the ground, the geometry
+   and the two buttons' fills and NOT ONE of these four properties; this is
+   where the four live, per this file's own rule.
+
+   TWO INKS, NOT THREE — §3's rule for a dark ground, stated in one place. The
+   name and the one claim the block makes are `--on-dark`; the rating, the three
+   facts and anything else supporting them are `--on-dark-2`. Before this the
+   block ran five inks (#414141, #973177, #0488c5, primary, secondary) picked
+   per row on a white page, and on `--gray-100` three of the five are under 3:1
+   — the magenta claim measured 2.1:1, which is the one line the whole block
+   exists to deliver.
+
+   THESE ALL NEED A CLASS MORE THAN THE RULE THEY ANSWER, and one of them needs
+   three. `.app .rec-n` and `.app .rec-f` are (0,2,0) so `.app .rec-dark .rec-n`
+   at (0,3,0) takes them; but the label above is `.app .ai-label.bare.rec-lab`
+   at (0,4,0), and a (0,3,0) restatement loses to it silently — the words simply
+   stay black on black. It is written at (0,5,0) for that reason, which is §7b's
+   trap arriving one more time.
+
+   AND THE HEADING IS 18px BY NUMBER, WHICH IS A STATED §7 EXCEPTION. §11's own
+   rule is take the nearest role, and the nearest is `--t-h3` at 17 — one pixel
+   off, exactly the position `--t-sec-size` was in when it was minted. This one
+   does NOT get a token: `--t-sec-size` earned one because three headings across
+   two layers read it, and this has a single reader. If a second block ever
+   wants 18, that is the moment to tokenise it rather than to copy the number.
+   -------------------------------------------------------------------------- */
+.app .dark-card .dc-t{
+  font-size:18px;line-height:24px;
+  font-weight:var(--t-w-strong);letter-spacing:-.2px;
+  text-transform:none;
+  color:var(--on-dark)}
+.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+.app .rec-dark .rec-n{color:var(--on-dark)}
+/* THE WAY OUT OF THE SECTION IS WHITE (Maryam, 31 Aug 2026), and this ink has
+   moved three times. §70.5 set 581:6548's #f47113 when the button was the quiet
+   half of a PAIR on a white card; §75 kept it when the card went black, where
+   it measures 6.5:1 and passes. What changed is not the contrast — it is that
+   the pair is gone. The accent button is 200px down and 800px across, so the
+   orange was distinguishing this control from nothing, and the only two things
+   on a `.plate` that are not white are the one action and Tal's own mark.
+   §70.5's `.rec-a > .btn.rec-see` no longer matches (the button left that
+   group), so this is the only rule colouring it; the arrow follows on
+   `currentColor`, which §75.2 re-points. (0,4,1) so it clears §70's own weight
+   if that selector is ever generalised back. */
+.app .dark-card .dc-hd-r > .btn.dc-act{color:var(--on-dark)}
+/* AND THE FACT IN THE SAME SLOT — `.dc-when`, §75. h4 rather than the button's
+   own size, because it is the one figure on the row and the row's other member
+   is an 18px heading: at `--t-compact` it read as a caption on the heading
+   instead of as a fact of its own. Strong for the same reason, and `--on-dark`
+   because on this card the two inks are "the thing you read" and "what supports
+   it" (§3's rule for a dark ground) and a time you have one minute of is the
+   first kind.
+
+   NOT THE ACCENT, EVEN THOUGH IT IS URGENT. §59 is a whole layer on urgency and
+   its answer is the CARD — black plus the warm haze is the loudest object this
+   product draws and it is already spent here. The accent on this card is the
+   Join button 100px below; a second accent string at the top would be the page
+   pointing at two things at once. §63 §11's violet went with the cell it was
+   written for: that hue existed to lift a figure off a 4% grey ground, and
+   there is no ground left to lift it off. */
+.app .dark-card .dc-hd-r > .dc-when{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--on-dark)}
+.app .rec-dark .rec-r,
+.app .rec-dark .rec-f{color:var(--on-dark-2)}
+/* `.rec-why` IS NOT IN THAT LIST AND THE REASON IS WHO WRITES IT. The name, the
+   rating and the fact row are written on a WHITE page too — `V.agent`'s
+   identity block reuses all three — so their dark values have to be scoped or
+   that page turns white-on-white. The claim sentence has exactly one caller,
+   `talRec`, and `talRec` is the black card, so a `.rec-dark` scope on it would
+   be a condition that is true every time it is evaluated with a #973177 under
+   it that nothing can ever see. Stated on the class itself, below. */
 
 /* QUICK ACTIONS' HEADING IS ONE STEP UP — 581:6404 sets it at 18 against the
    14 of everything in the cards under it, which is the same relationship
@@ -1748,6 +1828,291 @@
    they were supporting lines under a heading; on a card of their own they are
    the content. */
 .app .sig-p{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* ==========================================================================
+   16. THE BOOKING PAGE — §76's three panels
+
+   Maryam, 31 Aug 2026. The page is `.bkp` (who, beside what it costs), `.bks`
+   (the two numbered steps) and `.bkc` (the checkout row); §76 states every box
+   and none of these four properties, per this file's rule. The long argument
+   for each block is over `V.agent`.
+
+   NOTHING HERE IS A NEW SIZE. Eleven roles and the one stated exception
+   (`--t-sec-size`) cover all nine strings on the page, which is the test §11's
+   own rule sets — take the nearest role rather than buy a size. The reference
+   runs six sizes across these three panels; five of them land on `--t-h4` and
+   `--t-compact`, which is the pair §73 already uses for exactly this shape.
+   ========================================================================== */
+
+/* THE THREE PURCHASE FACTS — h4 over compact, and the LABEL is the strong one.
+   §73 §8078/8079 is where that inversion is argued and this is the same row
+   turned on its side: these are not figures being compared, they are three
+   different things, so what you scan is the names. The fee is the one accent
+   string, on the value, because it is the only one of the three that is a
+   decision — `--accent-text` for §12's readable pair, and tabular figures so
+   it lines up with the same number in the checkout row 400px below. */
+.app .bkp-fl{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bkp-fv{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bkp-fv-acc{
+  font-weight:var(--t-w-strong);color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+
+/* THE STEP HEADINGS ARE `--t-sec-size`, THE STATED NINTH SIZE, and this is the
+   fourth and fifth reader it has — which is the condition §73's note set for it
+   ("it is a ROLE across two layers rather than one component's one-off").
+   16 is right for the same reason it was there: these are section headings
+   inside a panel, and every other section heading on a page is 12.5, so h3 at
+   17 would make two headings inside one panel larger than the page's own.
+
+   AND THEY ARE `<h3>`, WHICH MEANS §63 §4'S ELEMENT RULE IS WHAT THIS BEATS,
+   not §8b's container-query block. §8b sizes `.sec:has(> .sec-h) > .sec-h h2`
+   and this panel has no `.sec-h` at all — deliberately, per the note in
+   `V.agent` — so trap 3 does not arise and an unconditional rule is enough.
+   Stated at (0,3,0) so it clears §02's `.sec-h h2` neighbourhood by weight
+   rather than by luck. */
+.app .bks-h > h3{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* THE NUMERAL IS `--accent-text` ON THE TINT, NOT `--on-accent` ON THE ACCENT.
+   §76 gives the chip `--brand-tint-2` rather than a solid accent, because the
+   solid accent on this panel is the SELECTED day and the SELECTED time thirty
+   pixels below it (§10.29 reserves it for exactly that). `--accent-text` is
+   §12's readable ink for a string on a warm tint; it measures 5.8:1 on
+   `#fcdbc7`. Label role, tabular, because it is a small value in a chip. */
+.app .bks-n{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+
+/* THE TIMEZONE TAG IS THE FLOOR TIER and it earns it — §3's rule is that
+   `--text-helper` is timestamps, legal, chart axes and captions ONLY, and this
+   is a note about how to read the numbers rather than one of them. Its mark
+   takes `currentColor` (§76), so one declaration colours the pair.
+
+   `.bks-foot` WAS THE SECOND HALF OF THIS SELECTOR AND IS DELETED. The closing
+   "All available times are in Eastern Time (ET)" came off the page on 31 Aug
+   2026, so the rule would have been styling a class nothing writes. */
+.app .bks-tz{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--text-helper)}
+
+/* ------------------------------------------------------------------------
+   THE MONTH GRID — §76.3b. Four roles, and three of them are one line each.
+
+   THE MONTH IS h4, NOT A HEADING ROLE ABOVE IT. It names the grid under it the
+   way `.bks-day` names the slot grid, and the two sit at the same height on
+   either side of the column rule — a step up here would make the left column's
+   caption louder than the right column's, which is the same pair of headings
+   §63 already keeps level at `--t-sec-size` one row above.
+
+   THE WEEKDAY STRIP IS THE CAPTION TIER IN SENTENCE CASE, AND THE CASE IS THE
+   RULE RATHER THAN A PREFERENCE. The reference sets SUN MON TUE in capitals;
+   §2 of this layer is that NOTHING in this product is, and the strings are
+   written "Sun" in the markup so there is no `text-transform` to state. It also
+   reverses §10.29's `.day .d`, which is the one place a weekday abbreviation
+   was uppercased — that element is not drawn on this page any more.
+
+   A DATE IS TABULAR AND IT IS THE ONLY REASON THE GRID LOOKS LIKE A GRID.
+   Söhne's proportional 1 is ~40% the width of its 0, so without
+   `font-variant-numeric` the 11th and the 18th sit visibly off their columns'
+   centres even inside a `place-items:center` cell.
+
+   THREE INKS, AND THE MIDDLE ONE IS THE POINT. Primary for a date you can
+   book, `--text-helper` for one you cannot, and the same helper at 55% for the
+   adjacent month — so "this month, closed" and "not this month" are one step
+   apart rather than the same grey. §3's floor-tier rule holds: a closed date is
+   not a description, it is the disabled state of a control, which is what §10's
+   `:disabled` ink is for everywhere else. `.bkd.day.on` takes `--on-accent`
+   from §10.29's `.day.on` — stated here anyway at (0,3,0), because that rule is
+   `.day.on` at (0,2,0) and a bare numeral has no `.n` for §63 §5 to reach. */
+.app .bkcal-m{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bkcal-w > span{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--text-helper)}
+.app .bkd{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-helper);
+  font-variant-numeric:tabular-nums}
+.app .bkd.day{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .bkd.day.on{color:var(--on-accent)}
+.app .bkd.bkd-out{color:color-mix(in srgb, var(--text-helper) 55%, transparent)}
+
+/* THE DAY OVER THE TIMES, AND ITS COUNT. The day is h4 — it is a heading for
+   the grid under it, not a figure — and the count is the label role in the
+   description grey, which is §3's "a description is one grey" for a chip that
+   qualifies the line beside it. NOT the accent: it is a fact about the day, and
+   §12's blue is for facts about an object rather than about a quantity. */
+.app .bks-day > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bks-cnt{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* "VIDEO INTERVIEW" AND ITS SENTENCE — the pair §63 draws everywhere a title
+   sits over an explanation. h4 over compact again, and the title stays in INK
+   rather than taking the `--mk-1` its mark carries: §74's card titles take the
+   hue because the card IS that hue and the title is the card naming itself,
+   and this note's ground is `--layer-02` with a single tinted chip on it. §72
+   §12's rule is the one that applies — "a coloured word beside a coloured mark
+   reads as a status pill". */
+.app .bks-nb > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bks-nb > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* THE CHECKOUT ROW. The fee's label is the eyebrow tier and its figure is h3 —
+   the one place on this page a number is meant to be READ as a number rather
+   than scanned as one of a set, which is `.stat`'s relationship rather than
+   `.bkp-f`'s and is why the two are not the same pair. It is `--accent-text`
+   and tabular, so it reads as the same object as the fee 400px above it.
+
+   `.bkc-s` WAS THE THIRD RULE HERE AND IS DELETED. "Secure & encrypted
+   payment" came off the row on 31 Aug 2026, so its floor-tier rule would have
+   been styling a class nothing writes. */
+.app .bkc-fl{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bkc-fv{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+
+/* ==========================================================================
+   17. THE CALL ROW ON A BLACK CARD — §77's `.crow-dark`
+
+   Maryam, 31 Aug 2026. The `booked` dashboard's interview row is inside §75's
+   `.dark-card` now, under the same heading `talRec` carries one stage earlier.
+   §77 states the section's padding, the countdown cell's ground and the quiet
+   button's border and NOT ONE of these four properties, per this file's rule.
+
+   TWO INKS, WHICH IS §3'S RULE FOR A DARK GROUND AND IS THE SAME PAIR §15 SETS
+   FOR `.rec-dark` twenty lines up. The name and the line the countdown is
+   counting down TO are `--on-dark`; the role, the expertise and everything else
+   supporting them are `--on-dark-2`. Before this the row ran `--text-primary`
+   on five classes, which on `--gray-100` is 1.1:1 — invisible, not merely dim.
+
+   THE VIOLET IS NOT IN THIS LIST AND THAT IS DELIBERATE. §11 sets the countdown
+   `#b948c7` and its note is a long argument for why the figure is not in the
+   accent (the accent is Tal's voice; this is the product saying when something
+   happens). It was accepted there at 4.0:1 on a 4% grey ground; on the card it
+   measures 6.0:1, so the ONE thing that would have needed answering answers
+   itself. Do not "fix" it to white — the hue is carrying a meaning.
+
+   NOR IS `.crow.urgent`. §11 already sets both of that cell's lines to
+   `--on-dark` because the cell goes accent-filled inside the day, and those
+   rules are (0,3,1) against this block's (0,3,0) — so the urgent state is
+   correct here without a word, which is §71.2a's "write the next one against
+   the tokens and it will be correct in both states for free" arriving on a
+   ground that layer never imagined.
+
+   THE GREEN TICK IS LEFT ALONE. `.crow-v` is `#00a43c` at 20px, which is 6.2:1
+   on this card. It is NOT changed to `I.verified` the way `.rec-v` was on the
+   same day: that change was asked for on the recommendation, and the reference
+   screen for this row draws the ringed tick. One to raise rather than assume.
+   ========================================================================== */
+.app .crow-dark .crow-role,
+.app .crow-dark .crow-x{color:var(--on-dark-2)}
+.app .crow-dark .crow-n{color:var(--on-dark)}
+
+/* THREE RULES CAME OUT OF THIS BLOCK AND THE DELETIONS ARE THE POINT.
+   `.crow-dark .crow-when > span` was the session line inside the tinted cell,
+   and `.crow-dark .crow-a > .btn:not(.btn-p)` — colour and `fill` — was
+   Reschedule. Maryam took both off the card on 31 Aug 2026: the countdown moved
+   to the heading row as `.dc-when` and the second action went. Neither class is
+   written under this wrapper any more, so all three were ink with nothing to
+   land on — the "gate nothing writes" tell, and the one this file is most
+   likely to accumulate, because a colour that matches nothing costs nothing to
+   look at. The same classes on the other three call sites are §11's and are
+   untouched. */
+
+/* ==========================================================================
+   18. THE TOP BAR — §78's TRAIL AND ACCOUNT MENU
+
+   §78 turns the page's `<h1>` into the last crumb of a breadcrumb in the app
+   bar, which makes this the one place in the build where a type decision moves
+   a string from one size to another rather than restating the size it already
+   had. Three roles and no new token.
+
+   THE TRAIL IS `--t-sec-size` — 16px, BY NUMBER (Maryam, 31 Aug 2026: "Make
+   the header heading font size 16px"). It shipped at `--t-compact` for one
+   build on §11's take-the-nearest-role rule, matching `.shell-name` at the
+   other end of the bar; 16 is the call, and the reasoning it replaces is
+   worth keeping because it is what makes 16 the RIGHT 16: as an `<h1>` this
+   string was 24px at desktop, and it is now the only name the page has, so a
+   step down to 13.5 was a bigger demotion than moving it into the bar
+   warranted.
+
+   NO NEW TOKEN. `--t-sec-size` is already 16px and already a stated §7
+   exception, minted when three AI-native section headings needed a size §63
+   did not have. Pointing a fourth family at it BROADENS what it means — it is
+   the build's 16px role now, not "the section heading's 16" — which is the
+   trade §11's own rule asks for: take a size that exists over minting a
+   near-duplicate doing the same job. A `--t-crumb-size:16px` beside it would
+   be exactly the duplication §7 refuses.
+
+   THE WHOLE TRAIL TAKES IT, NOT JUST THE LAST CRUMB. The parent crumbs and the
+   separators are the same line of type, and 16 beside 13.5 with a 13.5 slash
+   between them reads as a heading somebody appended a breadcrumb to. The ink
+   is what separates the page from the path, and it already does.
+
+   THE TRAIL IS TWO INKS, WHICH IS THE WHOLE OF ITS HIERARCHY. The page you are
+   on is `--text-primary` and everything behind it is `--text-secondary` — the
+   description tier, per §3, because a parent crumb is supporting text for the
+   crumb after it. THE SEPARATOR IS THE FLOOR TIER: `--text-helper` is the
+   punctuation-and-timestamps grey, and a slash set in the same grey as the
+   words either side of it reads as a character in the label rather than as the
+   space between two of them.
+
+   THE CURRENT CRUMB IS NOT THE STRONG WEIGHT. There are two weights and they
+   carry a lot elsewhere; here the ink already separates the last crumb from
+   the ones before it, and Kräftig on top of that makes a 15px label in the
+   chrome compete with the section headings underneath it. §7b's `:where(b,
+   strong, …)` cannot reach it — `.crumb-l` is a `<span>` or an `<a>` — so this
+   needs no exclusion, only the statement.
+
+   THE MENU'S ROW IS `--t-body`, not compact. It is the one place in the bar
+   with a pointer target rather than a reading target, and a row you press at
+   15px in a 248px panel is the same near-miss the notification rows already
+   avoid at body size (§2 names `.nrow-t`).
+   ========================================================================== */
+.app .crumb-l{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .crumb-now .crumb-l{
+  font-weight:var(--t-w-book);color:var(--text-primary)}
+.app .crumb-i + .crumb-i::before{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-book);
+  color:var(--text-helper)}
+.app .acct-i-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-primary)}

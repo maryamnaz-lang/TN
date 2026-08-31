@@ -6594,42 +6594,6 @@ button.btn-p:active,
 }
 .nil .nil-hand{margin-top:var(--s10);display:flex;justify-content:center}
 .nil .nil-foot-band{flex:none;height:34px;background:var(--nil-lime)}
-.app .pswitch{
-  flex:none;display:inline-flex;align-items:stretch;
-  height:32px;
-  border:1px solid var(--border-subtle-02);
-  background-color:var(--layer-01)}
-.app .psw-t{
-  display:flex;align-items:center;
-  padding:0 var(--s04);
-  font-size:12.5px;line-height:16px;font-weight:500;letter-spacing:.1px;
-  color:var(--text-secondary);
-  white-space:nowrap;
-  transition:background-color var(--dur-short) var(--ease-standard),
-             color var(--dur-short) var(--ease-standard)}
-.app .psw-t + .psw-t{border-left:1px solid var(--border-subtle-02)}
-.app .psw-t:hover{background-color:var(--overlay-hover);cursor:pointer}
-.app .psw-t.on{
-  background-color:var(--brand-primary);
-  color:var(--on-brand);
-  font-weight:600}
-.app .psw-t.on,.app .psw-t.on + .psw-t{border-color:var(--brand-primary)}
-@container app (max-width:599.98px){
-  .app .shell{flex-wrap:wrap;height:auto;padding-right:0;padding-bottom:0}
-  .app .shell > .shell-act,.app .shell > .shell-logo{height:var(--appbar-h)}
-  .app .shell > .shell-right{height:var(--appbar-h);padding-right:var(--s03)}
-  .app .pswitch{
-    order:9;width:100%;height:44px;
-    border-left:0;border-right:0;border-bottom:0;
-    margin-top:0}
-  .app .psw-t{flex:1;justify-content:center;font-size:13px}
-  .app .psw-t + .psw-t{border-left-color:var(--border-subtle-02)}
-  .app .psw-t.on + .psw-t{border-left-color:var(--brand-primary)}
-}
-@container app (min-width:900px){
-  .app .pswitch{height:36px;margin-left:calc(var(--s02) * -1)}
-  .app .psw-t{padding:0 var(--s05);font-size:13px}
-}
 .app[data-portal="leader"] .tbl{min-width:520px}
 .app[data-portal="leader"] .tbl td:first-child{font-weight:600}
 .app[data-portal="leader"] .sec.tint .tbl th{border-bottom-color:var(--rule)}
@@ -6993,7 +6957,6 @@ button.btn-p:active,
   .app .shell-act.nav-t{
     height:100%;border-radius:0;flex:none;
     border-right:1px solid var(--border-subtle-01)}
-  .app .pswitch{margin-left:var(--s05)}
   
   .app[data-rail="shut"] .shell-logo{display:none}
   .app[data-rail="shut"] .shell-act.nav-t{width:var(--rail-w-nav)}
@@ -9137,7 +9100,7 @@ button.btn-p:active,
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
 .app .kv,.app .kv .k,.app .tbl,.app .tbl td,.app .chart-table,.app .msg .nm,
 .app .inp,.app select.inp,.app textarea.inp,.app .memo-w span,
-.app .plate-b,.app .psw-t,.app .pw-rules li,.app .ok{
+.app .plate-b,.app .pw-rules li,.app .ok{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls)}
 .app .kv .v,.app .msg .nm,.app .signed-b b{
@@ -9347,7 +9310,7 @@ button.btn-p:active,
 .app .call-self .call-selfn{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls)}
-.app :where(b,strong,th,.notif-g,.psw-t.on){font-weight:var(--t-w-strong)}
+.app :where(b,strong,th,.notif-g){font-weight:var(--t-w-strong)}
 .app :where(em,i,small,p,li,td){font-weight:var(--t-w-book)}
 @container app (min-width:672px){
   .app .bhead > span{
@@ -9376,11 +9339,9 @@ button.btn-p:active,
   .app[data-rail="open"] .sn-item .badge{font-size:10px;line-height:1}
   .app .shell-name{
     font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
-  .app .psw-t{
-    font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
 }
 @container app (max-width:599.98px){
-  .app .psw-t,.app .plate-b{
+  .app .plate-b{
     font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
   .app .cal-n{
     font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
@@ -9422,7 +9383,6 @@ button.btn-p:active,
   text-transform:none;color:var(--text-primary)}
 .app .rec-r,
 .app .rec-x,
-.app .rec-m,
 .app .rec-alt{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
@@ -9432,7 +9392,6 @@ button.btn-p:active,
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
   color:#414141}
-.app .rec-m i{font-style:italic;font-weight:var(--t-w-strong);color:#0488c5}
 .app .rec-tag{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -9448,7 +9407,7 @@ button.btn-p:active,
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;
-  color:#973177}
+  color:var(--on-dark)}
 .app .rec-alt{font-style:italic;color:transparent}
 .app .qa-c{color:var(--text-primary)}
 .app .qa-b b{
@@ -9464,6 +9423,20 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;
   color:var(--text-primary)}
+.app .dark-card .dc-t{
+  font-size:18px;line-height:24px;
+  font-weight:var(--t-w-strong);letter-spacing:-.2px;
+  text-transform:none;
+  color:var(--on-dark)}
+.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+.app .rec-dark .rec-n{color:var(--on-dark)}
+.app .dark-card .dc-hd-r > .btn.dc-act{color:var(--on-dark)}
+.app .dark-card .dc-hd-r > .dc-when{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--on-dark)}
+.app .rec-dark .rec-r,
+.app .rec-dark .rec-f{color:var(--on-dark-2)}
 @container app (min-width:900px){
   .app .page:not(.form-page) .sec-qa > .sec-h h2{
     font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
@@ -9659,6 +9632,88 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none;color:var(--mk)}
 .app .sig-p{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bkp-fl{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bkp-fv{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bkp-fv-acc{
+  font-weight:var(--t-w-strong);color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+.app .bks-h > h3{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bks-n{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+.app .bks-tz{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--text-helper)}
+.app .bkcal-m{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bkcal-w > span{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--text-helper)}
+.app .bkd{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-helper);
+  font-variant-numeric:tabular-nums}
+.app .bkd.day{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .bkd.day.on{color:var(--on-accent)}
+.app .bkd.bkd-out{color:color-mix(in srgb, var(--text-helper) 55%, transparent)}
+.app .bks-day > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bks-cnt{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bks-nb > b{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .bks-nb > span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bkc-fl{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .bkc-fv{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+.app .crow-dark .crow-role,
+.app .crow-dark .crow-x{color:var(--on-dark-2)}
+.app .crow-dark .crow-n{color:var(--on-dark)}
+.app .crumb-l{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .crumb-now .crumb-l{
+  font-weight:var(--t-w-book);color:var(--text-primary)}
+.app .crumb-i + .crumb-i::before{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-book);
+  color:var(--text-helper)}
+.app .acct-i-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-primary)}
@@ -10055,15 +10110,18 @@ button.btn-p:active,
 @media (prefers-reduced-motion:reduce){
   .app .sk{animation:none;background-position:-200% 0,0 0}}
 .app .sk-ph{width:166px;aspect-ratio:1}
+.app .sk-hd{flex:0 1 262px;height:24px}
+.app .sk-see{flex:none;width:138px;height:19px}
+.app .sk-lab{width:126px;height:19px}
 .app .sk-n{width:236px;height:24px}
-.app .sk-x{width:314px;height:19px}
+.app .sk-rt{width:178px;height:19px}
 .app .sk-f{width:140px;height:19px}
-.app .sk-m{width:198px;height:19px}
 .app .sk-t{flex:1 1 0;min-width:0;height:29px;border-radius:100px}
 .app .sk-why{flex:0 1 490px;height:19px;border-radius:var(--radius)}
 @container app (max-width:599.98px){
   .app .sk-ph{width:min(100%, 220px)}
-  .app .sk-n,.app .sk-x,.app .sk-m{width:100%}
+  .app .sk-hd,.app .sk-lab,.app .sk-n,.app .sk-rt{flex:1 1 auto;width:100%}
+  .app .sk-see{width:110px}
   .app .sk-f{flex:1 1 90px;width:auto}}
 .app .rec-off{opacity:.2;pointer-events:none}
 .app .modhead .ai-aura.talsum > .ai-body{position:relative;overflow:visible}
@@ -10107,8 +10165,15 @@ button.btn-p:active,
   padding:var(--s07) var(--pad-x);
   border-top:1px solid #d7d5cc}
 .app .page > .sec:has(+ .sec-qa)::after{display:none}
-.app .sec-qa > .sec-h{margin:0 0 var(--s03);padding:0}
-.app .sec-qa > .all-desc{margin:0 0 20px}
+.app .sec-qa > .sec-h{margin:0 0 20px;padding:0}
+@container app (min-width:900px){
+  .app .page:not(.form-page) .sec-qa{
+    display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  .app .page:not(.form-page) .sec-qa > .sec-h{
+    border-right:0;min-height:0;margin:0 0 20px;padding:0}
+  .app .page:not(.form-page) .sec-qa > :not(.sec-h){
+    padding-left:0;padding-right:0}
+}
 .app .qa{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
   gap:var(--s04);
@@ -10166,6 +10231,14 @@ button.btn-p:active,
   display:grid;place-items:center;
   background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
 .app .sec-lead .row-lead > .btn svg{width:20px;height:20px;fill:var(--mk-1)}
+@container app (min-width:900px){
+  .app .modhead:has(> .sec-lead){
+    grid-template-columns:minmax(0,1fr) clamp(340px, 40%, 471px)}
+}
+@container app (min-width:1180px){
+  .app .modhead:has(> .head-col) > .sec-lead{padding-left:var(--s07)}
+}
+.app .sec-lead .row-lead{align-items:flex-start}
 @container app (min-width:900px){
   .app .modhead:has(> .sec-prog){
     grid-template-columns:minmax(0,1fr) clamp(336px, 42%, 471px)}}
@@ -10559,6 +10632,230 @@ button.btn-p:active,
 .app .page .sec > .signed{
   border-top:1px solid var(--rule);
   padding-top:var(--s07)}
+.app .sec.dark-card{
+  margin:var(--s06) var(--pad-x) 0;
+  padding:var(--s07);
+  background-color:var(--gray-100);
+  background-image:radial-gradient(78% 135% at 92% -8%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 64%);
+  background-repeat:no-repeat}
+.app .page > .sec.dark-card::after,
+.app .page > .sec.dark-card::before{content:none}
+.app .page > .sec.dark-card + .sec-qa{border-top:0}
+.app .dark-card .dc-hd{
+  display:flex;flex-direction:column;gap:var(--s05)}
+.app .dark-card .dc-t{margin:0;flex:1 1 auto;min-width:0}
+.app .dark-card .dc-hd-r{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s03) var(--s05);
+  padding-bottom:var(--s05);
+  border-bottom:1px solid var(--on-dark-rule)}
+.app .dark-card .dc-hd-r > .dc-act{
+  flex:none;margin-left:auto;
+  padding-left:0;padding-right:0;
+  gap:var(--s03);
+  border-color:transparent;background:none}
+.app .dark-card .dc-hd-r > .dc-act svg{fill:currentColor}
+.app .dark-card .dc-hd-r > .dc-when{
+  flex:none;margin-left:auto;
+  display:inline-flex;align-items:center;gap:var(--s03)}
+.app .dark-card .dc-hd-r > .dc-when svg{
+  flex:none;width:16px;height:16px;fill:currentColor;display:block}
+.app .rec-dark .rec-top > .rec-r{align-self:flex-start;margin:0}
+.app .rec-dark .rec-ph{background:var(--on-dark-fill)}
+@container app (min-width:600px){
+  .app .rec-dark .rec-l{
+    display:grid;grid-template-columns:auto minmax(0,1fr);align-items:stretch}
+  .app .rec-dark .rec-ph,
+  .app .rec-dark .sk-ph{
+    width:auto;height:100%;aspect-ratio:1;align-self:stretch}}
+.app .rec-dark .rec-a{width:auto}
+.app .dark-card .btn.btn-p{
+  background-color:var(--accent);
+  background-image:var(--accent-grad);
+  color:var(--on-accent);
+  border-color:transparent;
+  --on-brand-fill:1}
+.app .dark-card .btn.btn-p svg{fill:var(--on-accent)}
+.app .rec-dark .sk{
+  background-image:
+    linear-gradient(90deg,
+      rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 100%),
+    linear-gradient(107.08deg,
+      rgba(244,113,19,.34) 1.04%, rgba(226,166,0,.34) 39.89%, rgba(240,83,12,.34) 99.58%)}
+.app .sec-bk{
+  display:flex;flex-direction:column;gap:0}
+.app .bkp{border-bottom:1px solid var(--rule);padding-bottom:var(--s07)}
+.app .bks-w{padding:var(--s07) 0}
+.app .bkc{border-top:1px solid var(--rule);padding-top:var(--s07)}
+.app .bkp{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s06)}
+.app .bkp-r{display:flex;flex-direction:column;gap:var(--s05);
+  border-top:1px solid var(--rule);padding-top:var(--s06)}
+.app .bkp-f{max-width:420px}
+@container app (min-width:900px){
+  .app .bkp{
+    grid-template-columns:minmax(0,1fr) fit-content(360px);
+    gap:var(--s07)}
+  .app .bkp-r{
+    border-top:0;padding-top:0;
+    border-left:1px solid var(--rule);padding-left:var(--s07)}
+}
+.app .bkp-f{display:flex;align-items:baseline;gap:var(--s04)}
+.app .bkp-fi{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;
+  position:relative;top:3px}
+.app .bkp-fi svg{width:20px;height:20px;fill:var(--mk);display:block}
+.app .bkp-fl{min-width:0}
+.app .bkp-fv{flex:none;margin-left:auto;padding-left:var(--s06);text-align:right}
+.app .bks-w{display:flex;flex-direction:column}
+.app .bks{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s06)}
+.app .bks-c{display:flex;flex-direction:column;gap:var(--s05)}
+.app .bks-c + .bks-c{border-top:1px solid var(--rule);padding-top:var(--s06)}
+@container app (min-width:900px){
+  .app .bks{
+    grid-template-columns:minmax(0,300px) minmax(0,1fr);
+    gap:var(--s07)}
+  .app .bks-c + .bks-c{
+    border-top:0;padding-top:0;
+    border-left:1px solid var(--rule);padding-left:var(--s07)}
+}
+.app .bks-h{display:flex;align-items:center;gap:var(--s03)}
+.app .bks-h h3{margin:0;flex:1 1 auto;min-width:0}
+.app .bks-n{
+  flex:none;display:grid;place-items:center;
+  width:24px;height:24px;
+  background-color:var(--brand-tint-2)}
+.app .bks-tz{flex:none;display:inline-flex;align-items:center;gap:var(--s02)}
+.app .bks-tz svg{flex:none;width:14px;height:14px;fill:currentColor;display:block}
+.app .bks-day{margin:0;display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
+.app .bks-cnt{
+  flex:none;display:inline-flex;align-items:center;
+  padding:2px 10px;
+  background-color:var(--layer-02)}
+.app .bks-slots{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  margin:0;padding:0}
+@container app (max-width:599.98px){
+  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container app (min-width:900px) and (max-width:1099.98px){
+  .app .bks-slots{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.app .bkcal{display:flex;flex-direction:column;gap:var(--s04);max-width:336px}
+.app .bkcal-m{margin:0;text-align:center}
+.app .bkcal-w,.app .bkcal-g{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s02)}
+.app .bkcal-w > span{display:grid;place-items:center;padding-bottom:var(--s01)}
+.app .bkd{
+  min-width:0;aspect-ratio:1;padding:0;
+  display:grid;place-items:center;position:relative;
+  border:0;background:transparent;
+  transition:background var(--dur-short) var(--ease-standard),
+             color var(--dur-short) var(--ease-standard)}
+.app .bkd.day{border:0;border-radius:50%}
+.app .bkd.day:hover:where(.__nh){background:var(--layer-02);border-color:transparent}
+.app .bkd.day.on{background:var(--accent);border-radius:50%}
+.app .bkd:disabled{cursor:default}
+.app .bkd.day::after{
+  content:'';position:absolute;bottom:5px;left:50%;
+  width:4px;height:4px;margin-left:-2px;border-radius:50%;
+  background:var(--accent)}
+.app .bkd.day.on::after{background:var(--on-accent)}
+.app .bks-note{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s05);
+  background-color:var(--layer-02);
+  --mk:var(--mk-1)}
+.app .bks-ni{
+  flex:none;display:grid;place-items:center;
+  width:36px;height:36px;
+  background-color:color-mix(in srgb, var(--mk) 13%, var(--layer-01))}
+.app .bks-ni svg{width:18px;height:18px;fill:var(--mk);display:block}
+.app .bks-nb{min-width:0;display:flex;flex-direction:column;gap:var(--s01)}
+.app .bkc{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s05)}
+.app .bkc-fee{flex:none;display:flex;flex-direction:column}
+.app .bkc > .btn{flex:none;margin-left:auto;min-height:44px}
+@container app (max-width:599.98px){
+  .app .bkc{flex-direction:column;align-items:stretch;gap:var(--s04)}
+  .app .bkc > .btn{margin-left:0;width:100%;justify-content:center}}
+.app .page .sec.sec-call.dark-card{padding:var(--s07)}
+@container app (min-width:900px){
+  .app .page .sec.sec-call.dark-card{padding:var(--s07)}}
+@container app (min-width:900px){
+  .app .page > .sec-call.dark-card + .sec{padding-top:var(--s06)}}
+.app .crow-dark .crow-who{padding:0}
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-who{padding:0 0 var(--s05)}}
+@container app (max-width:899.98px){
+  .app .crow-dark .crow{--pad-x:0px}}
+.app .crumb-bar{
+  flex:1 1 auto;min-width:0;
+  display:flex;align-items:center;
+  padding-left:var(--s03)}
+.app .crumb-trail{
+  display:flex;align-items:center;min-width:0;
+  margin:0;padding:0;list-style:none}
+.app .crumb-i{
+  display:flex;align-items:center;min-width:0;flex:0 1 auto}
+.app .crumb-now{flex:0 1 auto}
+.app .crumb-i + .crumb-i::before{
+  content:'/';flex:none;
+  padding:0 var(--s02)}
+.app .crumb-l{
+  display:block;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  border-bottom:1px solid transparent}
+.app a.crumb-l:hover:where(.__nh){border-bottom-color:currentColor;cursor:pointer}
+@container app (max-width:599.98px){
+  .app .crumb-i:not(.crumb-now){display:none}
+  .app .crumb-i + .crumb-i::before{content:none}
+  .app .crumb-bar{padding-left:var(--s02)}
+}
+@container app (min-width:900px){
+  .app .crumb-bar{padding-left:var(--s05)}
+}
+.app .shell-act.acct-t{
+  width:auto;height:48px;
+  display:flex;align-items:center;gap:var(--s02);
+  padding:0 var(--s02) 0 var(--s03)}
+.app .acct-t .acct-c{
+  width:16px;height:16px;flex:none;
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .acct-t.on .acct-c{transform:rotate(180deg)}
+.app .shell-right{position:relative}
+.app .acct-menu{
+  position:absolute;top:calc(100% - var(--s02));right:0;z-index:40;
+  min-width:248px;
+  display:flex;flex-direction:column;
+  background:var(--layer-01);
+  border:1px solid var(--rule);
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.app .acct-menu.on{opacity:1;visibility:visible;transform:translateY(0)}
+.app .acct-i{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  text-align:left;width:100%}
+.app .acct-i + .acct-i{border-top:1px solid var(--rule)}
+.app .acct-i:hover:where(.__nh){background-color:var(--overlay-hover);cursor:pointer}
+.app .acct-i-mk{
+  flex:none;width:24px;height:24px;
+  display:grid;place-items:center;position:relative;overflow:hidden}
+.app .acct-i-mk svg{width:20px;height:20px;fill:var(--icon-primary)}
+.app .acct-i-av img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.app .acct-i-t{min-width:0}
+@media (prefers-reduced-motion:reduce){
+  .app .acct-menu,.app .acct-t .acct-c{transition:none}
+}
+.app .ph.ph-bare{display:none}
 
 </style>
 </head>
@@ -10612,90 +10909,93 @@ const TAL_BLOB = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1w
 const TAL_BLOB_POSTER = 'data:image/webp;base64,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';
 
 
+
 const IP = {
-menu:'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z',
-close:'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
-notification:'M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z',
-arrowRight:'m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z',
-attachFile:'M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z',
-arrowLeft:'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
-arrowUp:'m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z',
-chevDown:'M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z',
-chevUp:'M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z',
-chevRight:'M10 6 8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z',
-check:'M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
-checkFilled:'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-circle:'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z',
-circleDash:'M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z',
-locked:'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z',
-info:'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',
-warning:'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
-error:'M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z',
-view:'M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z',
-viewOff:'M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z',
-star:'M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
-time:'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.71L11 12.41V7h2v4.59l3.71 3.71-1.42 1.41z',
-hourglass:'m6 2 .01 6L10 12l-3.99 4.01L6 22h12v-6l-4-4 4-3.99V2H6zm10 14.5V20H8v-3.5l4-4 4 4z',
-calendar:'M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z',
-video:'M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z',
-book:'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z',
-chat:'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z',
-talChat:'M7 2H16.78A5 5 0 0 1 21.78 7V16.78A5 5 0 0 1 16.78 21.78H2V7A5 5 0 0 1 7 2ZM6.22 8.7v1.5h11.3v-1.5ZM6.22 13.6v1.6h8.2v-1.6Z',
-group:'M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.61c0-1.18.68-2.26 1.76-2.73 1.17-.52 2.61-.91 4.24-.91zM4 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm1.13 1.1c-.37-.06-.74-.1-1.13-.1-.99 0-1.93.21-2.78.58A2.01 2.01 0 0 0 0 16.43V18h4.5v-1.61c0-.83.23-1.61.63-2.29zM20 13c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm4 3.43c0-.81-.48-1.53-1.22-1.85A6.95 6.95 0 0 0 20 14c-.39 0-.76.04-1.13.1.4.68.63 1.46.63 2.29V18H24v-1.57zM12 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3z',
-dashboard:'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z',
-chart:'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z',
-wallet:'M21 18v1c0 1.1-.9 2-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14c1.1 0 2 .9 2 2v1h-9a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
-user:'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-logout:'m17 7-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z',
-launch:'M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z',
-document:'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z',
-download:'M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z',
-trophy:'M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1a5.01 5.01 0 0 0 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z',
-send:'M2.01 21 23 12 2.01 3 2 10l15 2-15 2z',
-play:'M8 5v14l11-7z',
-ai:'m19 9 1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z',
-bot:'M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zM7.5 11.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5S9.83 13 9 13s-1.5-.67-1.5-1.5zM16 17H8v-2h8v2zm-1-4c-.83 0-1.5-.67-1.5-1.5S14.17 10 15 10s1.5.67 1.5 1.5S15.83 13 15 13z',
-restart:'M12 5V2L8 6l4 4V7c3.31 0 6 2.69 6 6 0 2.97-2.17 5.43-5 5.91v2.02c3.95-.49 7-3.85 7-7.93 0-4.42-3.58-8-8-8zm-6 8c0-1.65.67-3.15 1.76-4.24L6.34 7.34A8.014 8.014 0 0 0 4 13c0 4.08 3.05 7.44 7 7.93v-2.02c-2.83-.48-5-2.94-5-5.91z',
-location:'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z',
-shield:'M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z',
-email:'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z',
-edit:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
-filter:'M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39A.998.998 0 0 0 18.95 4H5.04c-.83 0-1.3.95-.79 1.61z',
-search:'M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z',
-overflow:'M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
-idea:'M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z',
-ticket:'M22 10V6a2 2 0 0 0-2-2H4c-1.1 0-1.99.89-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2s.9-2 2-2zm-9 7.5h-2v-2h2v2zm0-4.5h-2v-2h2v2zm0-4.5h-2v-2h2v2z',
-pause:'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
-microphone:'M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z',
-micOff:'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3 3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z',
-videoOff:'m21 6.5-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2 2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z',
-screenShare:'M21 3H3c-1.11 0-2 .89-2 2v14c0 1.11.89 2 2 2h18c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 16.02H3V4.98h18v14.04zM10 12H8l4-4 4 4h-2v4h-4v-4z',
-raiseHand:'M19.75 8c-.69 0-1.25.56-1.25 1.25V15H18c-1.65 0-3 1.35-3 3h-1c0-2.04 1.53-3.72 3.5-3.97V3.25a1.25 1.25 0 0 0-2.5 0V11h-1V1.25a1.25 1.25 0 0 0-2.5 0V11h-1V2.75a1.25 1.25 0 0 0-2.5 0V12H7V5.75a1.25 1.25 0 0 0-2.5 0v10c0 4.56 3.69 8.25 8.25 8.25S21 20.31 21 15.75v-6.5C21 8.56 20.44 8 19.75 8z',
-captions:'M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 7H9.5v-.5h-2v3h2V13H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V13H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z',
-callEnd:'M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.956.956 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28a11.27 11.27 0 0 0-2.67-1.85.996.996 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z',
-thumbsUp:'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z',
-thumbsDown:'M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z',
-copy:'M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z',
-renew:'M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.87 5.87 0 0 1 6 12c0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z',
-misuse:'M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z',
-helpDesk:'M21 12.22C21 6.73 16.74 3 12 3c-4.69 0-9 3.65-9 9.28-.6.34-1 .98-1 1.72v2c0 1.1.9 2 2 2h1v-6.1c0-3.87 3.13-7 7-7s7 3.13 7 7V19h-8v2h8c1.1 0 2-.9 2-2v-1.22c.59-.31 1-.92 1-1.64v-2.3c0-.7-.41-1.31-1-1.62z M18 11.03A6.04 6.04 0 0 0 12.05 6c-3.03 0-6.29 2.51-6.03 6.45a8.075 8.075 0 0 0 4.86-5.89c1.31 2.63 4 4.44 7.12 4.47z',
-certificate:'M9.68 13.69 12 11.93l2.31 1.76-.88-2.85L15.75 9h-2.84L12 6.19 11.09 9H8.25l2.31 1.84-.88 2.85zM20 10c0-4.42-3.58-8-8-8s-8 3.58-8 8c0 2.03.76 3.87 2 5.28V23l6-2 6 2v-7.72A7.96 7.96 0 0 0 20 10zm-8-6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6z',
-courseCard:'M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3 1 9l11 6 9-4.91V17h2V9L12 3z',
-lightning:'M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z',
-flag:'M14.4 6 14 4H5v17h2v-7h5.6l.4 2h7V6z',
-settings:'M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z',
-link:'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
-receipt:'M19.5 3.5 18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2v14H3v3c0 1.66 1.34 3 3 3h12c1.66 0 3-1.34 3-3V2l-1.5 1.5zM19 19c0 .55-.45 1-1 1s-1-.45-1-1v-3H8V5h11v14z M9 7h6v2H9zm7 0h2v2h-2zm-7 3h6v2H9zm7 0h2v2h-2z',
-attachment:'M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 0 1 5 0v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5a2.5 2.5 0 0 0 5 0V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z',
-add:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
-subtract:'M19 13H5v-2h14v2z',
-caretDown:'m7 10 5 5 5-5z',
-checkOutline:'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z',
-warningAlt:'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
-stopFilled:'M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2z',
-skill:'M13 8.57a1.43 1.43 0 1 0 0 2.86 1.43 1.43 0 0 0 0-2.86z M13 3C9.25 3 6.2 5.94 6.02 9.64L4.1 12.2a.5.5 0 0 0 .4.8H6v3c0 1.1.9 2 2 2h1v3h7v-4.68A6.999 6.999 0 0 0 13 3zm3 7c0 .13-.01.26-.02.39l.83.66c.08.06.1.16.05.25l-.8 1.39c-.05.09-.16.12-.24.09l-.99-.4c-.21.16-.43.29-.67.39L14 13.83c-.01.1-.1.17-.2.17h-1.6c-.1 0-.18-.07-.2-.17l-.15-1.06c-.25-.1-.47-.23-.68-.39l-.99.4c-.09.03-.2 0-.25-.09l-.8-1.39a.19.19 0 0 1 .05-.25l.84-.66c-.01-.13-.02-.26-.02-.39s.02-.27.04-.39l-.85-.66c-.08-.06-.1-.16-.05-.26l.8-1.38c.05-.09.15-.12.24-.09l1 .4c.2-.15.43-.29.67-.39L12 6.17c.02-.1.1-.17.2-.17h1.6c.1 0 .18.07.2.17l.15 1.06c.24.1.46.23.67.39l1-.4c.09-.03.2 0 .24.09l.8 1.38a.2.2 0 0 1-.05.26l-.85.66c.03.12.04.25.04.39z',
-growth:'m16 6 2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z',
-creditCard:'M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z'
+menu:'M160-240q-17 0-28.5-11.5T120-280q0-17 11.5-28.5T160-320h640q17 0 28.5 11.5T840-280q0 17-11.5 28.5T800-240H160Zm0-200q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520h640q17 0 28.5 11.5T840-480q0 17-11.5 28.5T800-440H160Zm0-200q-17 0-28.5-11.5T120-680q0-17 11.5-28.5T160-720h640q17 0 28.5 11.5T840-680q0 17-11.5 28.5T800-640H160Z',
+close:'M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z',
+notification:'M200-200q-17 0-28.5-11.5T160-240q0-17 11.5-28.5T200-280h40v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h40q17 0 28.5 11.5T800-240q0 17-11.5 28.5T760-200H200Zm280-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z',
+arrowRight:'M647-440H200q-17 0-28.5-11.5T160-480q0-17 11.5-28.5T200-520h447L451-716q-12-12-11.5-28t12.5-28q12-11 28-11.5t28 11.5l264 264q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L508-188q-11 11-27.5 11T452-188q-12-12-12-28.5t12-28.5l195-195Z',
+attachFile:'M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z',
+arrowLeft:'m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z',
+arrowUp:'M440-647 244-451q-12 12-28 11.5T188-452q-11-12-11.5-28t11.5-28l264-264q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l264 264q11 11 11 27.5T772-452q-12 12-28.5 12T715-452L520-647v447q0 17-11.5 28.5T480-160q-17 0-28.5-11.5T440-200v-447Z',
+chevDown:'M480-362q-8 0-15-2.5t-13-8.5L268-557q-11-11-11-28t11-28q11-11 28-11t28 11l156 156 156-156q11-11 28-11t28 11q11 11 11 28t-11 28L508-373q-6 6-13 8.5t-15 2.5Z',
+chevUp:'M480-529 324-373q-11 11-28 11t-28-11q-11-11-11-28t11-28l184-184q6-6 13-8.5t15-2.5q8 0 15 2.5t13 8.5l184 184q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-529Z',
+chevRight:'M504-480 348-636q-11-11-11-28t11-28q11-11 28-11t28 11l184 184q6 6 8.5 13t2.5 15q0 8-2.5 15t-8.5 13L404-268q-11 11-28 11t-28-11q-11-11-11-28t11-28l156-156Z',
+check:'m382-354 339-339q12-12 28-12t28 12q12 12 12 28.5T777-636L410-268q-12 12-28 12t-28-12L182-440q-12-12-11.5-28.5T183-497q12-12 28.5-12t28.5 12l142 143Z',
+checkFilled:'m424-408-86-86q-11-11-28-11t-28 11q-11 11-11 28t11 28l114 114q12 12 28 12t28-12l226-226q11-11 11-28t-11-28q-11-11-28-11t-28 11L424-408Zm56 328q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z',
+verified:'m438-452-58-57q-11-11-27.5-11T324-508q-11 11-11 28t11 28l86 86q12 12 28 12t28-12l170-170q12-12 11.5-28T636-592q-12-12-28.5-12.5T579-593L438-452ZM326-90l-58-98-110-24q-15-3-24-15.5t-7-27.5l11-113-75-86q-10-11-10-26t10-26l75-86-11-113q-2-15 7-27.5t24-15.5l110-24 58-98q8-13 22-17.5t28 1.5l104 44 104-44q14-6 28-1.5t22 17.5l58 98 110 24q15 3 24 15.5t7 27.5l-11 113 75 86q10 11 10 26t-10 26l-75 86 11 113q2 15-7 27.5T802-212l-110 24-58 98q-8 13-22 17.5T584-74l-104-44-104 44q-14 6-28 1.5T326-90Zm52-72 102-44 104 44 56-96 110-26-10-112 74-84-74-86 10-112-110-24-58-96-102 44-104-44-56 96-110 24 10 112-74 86 74 84-10 114 110 24 58 96Zm102-318Z',
+circle:'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+circleDash:'M480-280q83 0 141.5-58.5T680-480q0-83-58.5-141.5T480-680q-83 0-141.5 58.5T280-480q0 83 58.5 141.5T480-280Zm0 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+locked:'M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm0-80h480v-400H240v400Zm240-120q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80ZM240-160v-400 400Z',
+info:'M480-280q17 0 28.5-11.5T520-320v-160q0-17-11.5-28.5T480-520q-17 0-28.5 11.5T440-480v160q0 17 11.5 28.5T480-280Zm0-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+warning:'M109-120q-11 0-20-5.5T75-140q-5-9-5.5-19.5T75-180l370-640q6-10 15.5-15t19.5-5q10 0 19.5 5t15.5 15l370 640q6 10 5.5 20.5T885-140q-5 9-14 14.5t-20 5.5H109Zm69-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm0-120q17 0 28.5-11.5T520-400v-120q0-17-11.5-28.5T480-560q-17 0-28.5 11.5T440-520v120q0 17 11.5 28.5T480-360Zm0-100Z',
+error:'m480-424 116 116q11 11 28 11t28-11q11-11 11-28t-11-28L536-480l116-116q11-11 11-28t-11-28q-11-11-28-11t-28 11L480-536 364-652q-11-11-28-11t-28 11q-11 11-11 28t11 28l116 116-116 116q-11 11-11 28t11 28q11 11 28 11t28-11l116-116Zm0 344q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+view:'M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-134 0-244.5-72T61-462q-5-9-7.5-18.5T51-500q0-10 2.5-19.5T61-538q64-118 174.5-190T480-800q134 0 244.5 72T899-538q5 9 7.5 18.5T909-500q0 10-2.5 19.5T899-462q-64 118-174.5 190T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z',
+viewOff:'M607-627q29 29 42.5 66t9.5 76q0 15-11 25.5T622-449q-15 0-25.5-10.5T586-485q5-26-3-50t-25-41q-17-17-41-26t-51-4q-15 0-25.5-11T430-643q0-15 10.5-25.5T466-679q38-4 75 9.5t66 42.5Zm-127-93q-19 0-37 1.5t-36 5.5q-17 3-30.5-5T358-742q-5-16 3.5-31t24.5-18q23-5 46.5-7t47.5-2q137 0 250.5 72T904-534q4 8 6 16.5t2 17.5q0 9-1.5 17.5T905-466q-18 40-44.5 75T802-327q-12 11-28 9t-26-16q-10-14-8.5-30.5T753-392q24-23 44-50t35-58q-50-101-144.5-160.5T480-720Zm0 520q-134 0-245-72.5T60-463q-5-8-7.5-17.5T50-500q0-10 2-19t7-18q20-40 46.5-76.5T166-680l-83-84q-11-12-10.5-28.5T84-820q11-11 28-11t28 11l680 680q11 11 11.5 27.5T820-84q-11 11-28 11t-28-11L624-222q-35 11-71 16.5t-73 5.5ZM222-624q-29 26-53 57t-41 67q50 101 144.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z',
+star:'M480-269 314-169q-11 7-23 6t-21-8q-9-7-14-17.5t-2-23.5l44-189-147-127q-10-9-12.5-20.5T140-571q4-11 12-18t22-9l194-17 75-178q5-12 15.5-18t21.5-6q11 0 21.5 6t15.5 18l75 178 194 17q14 2 22 9t12 18q4 11 1.5 22.5T809-528L662-401l44 189q3 13-2 23.5T690-171q-9 7-21 8t-23-6L480-269Z',
+starOutline:'m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143Zm126 18L314-169q-11 7-23 6t-21-8q-9-7-14-17.5t-2-23.5l44-189-147-127q-10-9-12.5-20.5T140-571q4-11 12-18t22-9l194-17 75-178q5-12 15.5-18t21.5-6q11 0 21.5 6t15.5 18l75 178 194 17q14 2 22 9t12 18q4 11 1.5 22.5T809-528L662-401l44 189q3 13-2 23.5T690-171q-9 7-21 8t-23-6L480-269Zm0-201Z',
+time:'M520-496v-144q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640v159q0 8 3 15.5t9 13.5l132 132q11 11 28 11t28-11q11-11 11-28t-11-28L520-496ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-400Zm0 320q133 0 226.5-93.5T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 133 93.5 226.5T480-160Z',
+hourglass:'M320-160h320v-120q0-66-47-113t-113-47q-66 0-113 47t-47 113v120ZM200-80q-17 0-28.5-11.5T160-120q0-17 11.5-28.5T200-160h40v-120q0-61 28.5-114.5T348-480q-51-32-79.5-85.5T240-680v-120h-40q-17 0-28.5-11.5T160-840q0-17 11.5-28.5T200-880h560q17 0 28.5 11.5T800-840q0 17-11.5 28.5T760-800h-40v120q0 61-28.5 114.5T612-480q51 32 79.5 85.5T720-280v120h40q17 0 28.5 11.5T800-120q0 17-11.5 28.5T760-80H200Z',
+calendar:'M580-240q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29ZM200-80q-33 0-56.5-23.5T120-160v-560q0-33 23.5-56.5T200-800h40v-40q0-17 11.5-28.5T280-880q17 0 28.5 11.5T320-840v40h320v-40q0-17 11.5-28.5T680-880q17 0 28.5 11.5T720-840v40h40q33 0 56.5 23.5T840-720v560q0 33-23.5 56.5T760-80H200Zm0-80h560v-400H200v400Zm0-480h560v-80H200v80Zm0 0v-80 80Z',
+video:'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l126-126q10-10 22-5t12 19v344q0 14-12 19t-22-5L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z',
+book:'M240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h480q33 0 56.5 23.5T800-800v640q0 33-23.5 56.5T720-80H240Zm0-80h480v-640h-80v245q0 12-10 17.5t-20-.5l-49-30q-10-6-20.5-6t-20.5 6l-49 30q-10 6-20.5.5T440-555v-245H240v640Zm0 0v-640 640Zm200-395q0 12 10.5 17.5t20.5-.5l49-30q10-6 20.5-6t20.5 6l49 30q10 6 20 .5t10-17.5q0 12-10 17.5t-20-.5l-49-30q-10-6-20.5-6t-20.5 6l-49 30q-10 6-20.5.5T440-555Z',
+chat:'m240-240-92 92q-19 19-43.5 8.5T80-177v-623q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240Zm-34-80h594v-480H160v525l46-45Zm-46 0v-480 480Zm120-80h240q17 0 28.5-11.5T560-440q0-17-11.5-28.5T520-480H280q-17 0-28.5 11.5T240-440q0 17 11.5 28.5T280-400Zm0-120h400q17 0 28.5-11.5T720-560q0-17-11.5-28.5T680-600H280q-17 0-28.5 11.5T240-560q0 17 11.5 28.5T280-520Zm0-120h400q17 0 28.5-11.5T720-680q0-17-11.5-28.5T680-720H280q-17 0-28.5 11.5T240-680q0 17 11.5 28.5T280-640Z',
+talChat:'M280 -880 H671.2 A200 200 0 0 1 871.2 -680 V-288.8 A200 200 0 0 1 671.2 -88.8 H80 V-680 A200 200 0 0 1 280 -880 ZM248.8 -612 v60 h452 v-60 ZM248.8 -416 v64 h328 v-64 Z',
+group:'M40-240q-17 0-28.5-11.5T0-280v-23q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H40Zm240 0q-17 0-28.5-11.5T240-280v-25q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v25q0 17-11.5 28.5T680-240H280Zm500 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v23q0 17-11.5 28.5T920-240H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z',
+dashboard:'M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z',
+chart:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Zm120 200q-17 0-28.5 11.5T280-520v200q0 17 11.5 28.5T320-280q17 0 28.5-11.5T360-320v-200q0-17-11.5-28.5T320-560Zm160-120q-17 0-28.5 11.5T440-640v320q0 17 11.5 28.5T480-280q17 0 28.5-11.5T520-320v-320q0-17-11.5-28.5T480-680Zm160 240q-17 0-28.5 11.5T600-400v80q0 17 11.5 28.5T640-280q17 0 28.5-11.5T680-320v-80q0-17-11.5-28.5T640-440Z',
+wallet:'M240-160q-66 0-113-47T80-320v-320q0-66 47-113t113-47h480q66 0 113 47t47 113v320q0 66-47 113t-113 47H240Zm0-480h480q22 0 42 5t38 16v-21q0-33-23.5-56.5T720-720H240q-33 0-56.5 23.5T160-640v21q18-11 38-16t42-5Zm-74 130 445 108q9 2 18 0t17-8l139-116q-11-15-28-24.5t-37-9.5H240q-26 0-45.5 13.5T166-510Z',
+user:'M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z',
+logout:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h240q17 0 28.5 11.5T480-160q0 17-11.5 28.5T440-120H200Zm487-320H400q-17 0-28.5-11.5T360-480q0-17 11.5-28.5T400-520h287l-75-75q-11-11-11-27t11-28q11-12 28-12.5t29 11.5l143 143q12 12 12 28t-12 28L669-309q-12 12-28.5 11.5T612-310q-11-12-10.5-28.5T613-366l74-74Z',
+launch:'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h560v-240q0-17 11.5-28.5T800-480q17 0 28.5 11.5T840-440v240q0 33-23.5 56.5T760-120H200Zm560-584L416-360q-11 11-28 11t-28-11q-11-11-11-28t11-28l344-344H600q-17 0-28.5-11.5T560-800q0-17 11.5-28.5T600-840h200q17 0 28.5 11.5T840-800v200q0 17-11.5 28.5T800-560q-17 0-28.5-11.5T760-600v-104Z',
+document:'M360-240h240q17 0 28.5-11.5T640-280q0-17-11.5-28.5T600-320H360q-17 0-28.5 11.5T320-280q0 17 11.5 28.5T360-240Zm0-160h240q17 0 28.5-11.5T640-440q0-17-11.5-28.5T600-480H360q-17 0-28.5 11.5T320-440q0 17 11.5 28.5T360-400ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h287q16 0 30.5 6t25.5 17l194 194q11 11 17 25.5t6 30.5v447q0 33-23.5 56.5T720-80H240Zm280-560v-160H240v640h480v-440H560q-17 0-28.5-11.5T520-640ZM240-800v200-200 640-640Z',
+download:'M480-337q-8 0-15-2.5t-13-8.5L308-492q-12-12-11.5-28t11.5-28q12-12 28.5-12.5T365-549l75 75v-286q0-17 11.5-28.5T480-800q17 0 28.5 11.5T520-760v286l75-75q12-12 28.5-11.5T652-548q11 12 11.5 28T652-492L508-348q-6 6-13 8.5t-15 2.5ZM240-160q-33 0-56.5-23.5T160-240v-80q0-17 11.5-28.5T200-360q17 0 28.5 11.5T240-320v80h480v-80q0-17 11.5-28.5T760-360q17 0 28.5 11.5T800-320v80q0 33-23.5 56.5T720-160H240Z',
+trophy:'M440-200v-124q-49-11-87.5-41.5T296-442q-75-9-125.5-65.5T120-640v-40q0-33 23.5-56.5T200-760h80q0-33 23.5-56.5T360-840h240q33 0 56.5 23.5T680-760h80q33 0 56.5 23.5T840-680v40q0 76-50.5 132.5T664-442q-18 46-56.5 76.5T520-324v124h120q17 0 28.5 11.5T680-160q0 17-11.5 28.5T640-120H320q-17 0-28.5-11.5T280-160q0-17 11.5-28.5T320-200h120ZM280-528v-152h-80v40q0 38 22 68.5t58 43.5Zm200 128q50 0 85-35t35-85v-240H360v240q0 50 35 85t85 35Zm200-128q36-13 58-43.5t22-68.5v-40h-80v152Zm-200-52Z',
+send:'M792-443 176-183q-20 8-38-3.5T120-220v-520q0-22 18-33.5t38-3.5l616 260q25 11 25 37t-25 37ZM200-280l474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z',
+play:'M320-273v-414q0-17 12-28.5t28-11.5q5 0 10.5 1.5T381-721l326 207q9 6 13.5 15t4.5 19q0 10-4.5 19T707-446L381-239q-5 3-10.5 4.5T360-233q-16 0-28-11.5T320-273Zm80-207Zm0 134 210-134-210-134v268Z',
+ai:'M760 -628 q-5 0 -10.48 -3 Q744 -634 742 -640 l-32 -70 -70 -32 q-6 -2 -9 -7.52 Q628 -755 628 -760 t3 -10.52 Q634 -776 640 -778 l70 -32 32 -70 q2 -6 7.52 -9 5.48 -3 10.48 -3 t10.52 3 q5.48 3 7.48 9 l32 70 70 32 q6 2 9 7.48 3 5.52 3 10.52 t-3 10.48 Q886 -744 880 -742 l-70 32 -32 70 q-2 6 -7.48 9 -5.52 3 -10.52 3 Zm0 560 q-5 0 -10.48 -3 -5.52 -3 -7.52 -9 l-32 -70 -70 -32 q-6 -2 -9 -7.52 -3 -5.48 -3 -10.48 t3 -10.48 q3 -5.52 9 -7.52 l70 -32 32 -70 q2 -6 7.52 -9 5.48 -3 10.48 -3 t10.52 3 q5.48 3 7.48 9 l32 70 70 32 q6 2 9 7.52 3 5.48 3 10.48 t-3 10.48 q-3 5.52 -9 7.52 l-70 32 -32 70 q-2 6 -7.48 9 -5.52 3 -10.52 3 ZM360 -217 q-11 0 -21 -6 T324 -240 l-64 -140 L120 -444 q-11 -5 -17 -15 -6 -10 -6 -21 t6 -21 q6 -10 17 -15 l140 -64 L324 -720 q5 -11 15 -17 10 -6 21 -6 t21 6 q10 6 15 17 l64 140 140 64 q11 5 17 15 6 10 6 21 t-6 21 q-6 10 -17 15 l-140 64 L396 -240 q-5 11 -15 17 -10 6 -21 6 Zm0 -137 L400 -440 l86 -40 L400 -520 360 -606 320 -520 l-86 40 L320 -440 ZM360 -480 Z',
+bot:'M160-360q-50 0-85-35t-35-85q0-50 35-85t85-35v-80q0-33 23.5-56.5T240-760h120q0-50 35-85t85-35q50 0 85 35t35 85h120q33 0 56.5 23.5T800-680v80q50 0 85 35t35 85q0 50-35 85t-85 35v160q0 33-23.5 56.5T720-120H240q-33 0-56.5-23.5T160-200v-160Zm200-80q25 0 42.5-17.5T420-500q0-25-17.5-42.5T360-560q-25 0-42.5 17.5T300-500q0 25 17.5 42.5T360-440Zm240 0q25 0 42.5-17.5T660-500q0-25-17.5-42.5T600-560q-25 0-42.5 17.5T540-500q0 25 17.5 42.5T600-440ZM360-280h240q17 0 28.5-11.5T640-320q0-17-11.5-28.5T600-360H360q-17 0-28.5 11.5T320-320q0 17 11.5 28.5T360-280Zm-120 80h480v-480H240v480Zm240-240Z',
+restart:'M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-70q0-17 11.5-28.5T760-800q17 0 28.5 11.5T800-760v200q0 17-11.5 28.5T760-520H560q-17 0-28.5-11.5T520-560q0-17 11.5-28.5T560-600h128q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q68 0 124.5-34.5T692-367q8-14 22.5-19.5t29.5-.5q16 5 23 21t-1 30q-41 80-117 128t-169 48Z',
+location:'M480-186q122-112 181-203.5T720-552q0-109-69.5-178.5T480-800q-101 0-170.5 69.5T240-552q0 71 59 162.5T480-186Zm0 79q-14 0-28-5t-25-15q-65-60-115-117t-83.5-110.5q-33.5-53.5-51-103T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 45-17.5 94.5t-51 103Q698-301 648-244T533-127q-11 10-25 15t-28 5Zm0-453Zm0 80q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Z',
+shield:'M480-84q-7 0-13-1t-12-3q-135-45-215-166.5T160-516v-189q0-25 14.5-45t37.5-29l240-90q14-5 28-5t28 5l240 90q23 9 37.5 29t14.5 45v189q0 140-80 261.5T505-88q-6 2-12 3t-13 1Zm0-80q104-33 172-132t68-220v-189l-240-90-240 90v189q0 121 68 220t172 132Zm0-316Z',
+email:'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm640-480L501-453q-5 3-10.5 4.5T480-447q-5 0-10.5-1.5T459-453L160-640v400h640v-400ZM480-520l320-200H160l320 200ZM160-640v10-59 1-32 32-.5 58.5-10 400-400Z',
+edit:'M200-200h57l391-391-57-57-391 391v57Zm-40 80q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm600-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z',
+filter:'M440-160q-17 0-28.5-11.5T400-200v-240L168-736q-15-20-4.5-42t36.5-22h560q26 0 36.5 22t-4.5 42L560-440v240q0 17-11.5 28.5T520-160h-80Zm40-308 198-252H282l198 252Zm0 0Z',
+search:'M380-320q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z',
+overflow:'M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z',
+idea:'M480-80q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM360-200q-17 0-28.5-11.5T320-240q0-17 11.5-28.5T360-280h240q17 0 28.5 11.5T640-240q0 17-11.5 28.5T600-200H360Zm-30-120q-69-41-109.5-110T180-580q0-125 87.5-212.5T480-880q125 0 212.5 87.5T780-580q0 81-40.5 150T630-320H330Zm24-80h252q45-32 69.5-79T700-580q0-92-64-156t-156-64q-92 0-156 64t-64 156q0 54 24.5 101t69.5 79Zm126 0Z',
+ticket:'M160-160q-33 0-56.5-23.5T80-240v-135q0-11 7-19t18-10q24-8 39.5-29t15.5-47q0-26-15.5-47T105-556q-11-2-18-10t-7-19v-135q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v135q0 11-7 19t-18 10q-24 8-39.5 29T800-480q0 26 15.5 47t39.5 29q11 2 18 10t7 19v135q0 33-23.5 56.5T800-160H160Zm0-80h640v-102q-37-22-58.5-58.5T720-480q0-43 21.5-79.5T800-618v-102H160v102q37 22 58.5 58.5T240-480q0 43-21.5 79.5T160-342v102Zm320-40q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm0-160q17 0 28.5-11.5T520-480q0-17-11.5-28.5T480-520q-17 0-28.5 11.5T440-480q0 17 11.5 28.5T480-440Zm0-160q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 120Z',
+pause:'M600-200q-33 0-56.5-23.5T520-280v-400q0-33 23.5-56.5T600-760h80q33 0 56.5 23.5T760-680v400q0 33-23.5 56.5T680-200h-80Zm-320 0q-33 0-56.5-23.5T200-280v-400q0-33 23.5-56.5T280-760h80q33 0 56.5 23.5T440-680v400q0 33-23.5 56.5T360-200h-80Zm320-80h80v-400h-80v400Zm-320 0h80v-400h-80v400Zm0-400v400-400Zm320 0v400-400Z',
+microphone:'M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v240q0 50-35 85t-85 35Zm0-240Zm-40 480v-83q-92-13-157.5-78T203-479q-2-17 9-29t28-12q17 0 28.5 11.5T284-480q14 70 69.5 115T480-320q72 0 127-45.5T676-480q4-17 15.5-28.5T720-520q17 0 28 12t9 29q-14 91-79 157t-158 79v83q0 17-11.5 28.5T480-120q-17 0-28.5-11.5T440-160Zm40-320q17 0 28.5-11.5T520-520v-240q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v240q0 17 11.5 28.5T480-480Z',
+micOff:'M672-377q-14-8-18-24.5t4-30.5q7-11 11.5-23.5T676-481q4-17 15.5-28t28.5-11q17 0 28 12t9 29q-3 23-10.5 45T727-392q-8 14-24.5 18.5T672-377ZM480-594Zm0-286q50 0 85 35t35 85v190q0 20-12.5 30T560-530q-15 0-27.5-10.5T520-571v-189q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v30q0 20-12.5 30T400-690q-15 0-27.5-10.5T360-731v-29q0-50 35-85t85-35Zm-40 720v-83q-92-12-157.5-77.5T203-479q-2-17 9-29t28-12q17 0 29 11.5t15 28.5q14 71 69 115.5T480-320q34 0 64.5-10.5T600-360l57 57q-29 23-63.5 39T520-243v83q0 17-11.5 28.5T480-120q-17 0-28.5-11.5T440-160Zm324 76L84-764q-11-11-11-28t11-28q11-11 28-11t28 11l680 680q11 11 11 28t-11 28q-11 11-28 11t-28-11Z',
+videoOff:'m720-540 126-126q10-10 22-5t12 19v344q0 14-12 19t-22-5L720-420q0 17-11.5 28.5T680-380q-17 0-28.5-11.5T640-420v-300H360q-20 0-30-12.5T320-760q0-15 10-27.5t30-12.5h280q33 0 56.5 23.5T720-720v180Zm74 486L54-794q-11-11-11-28t11-28q11-11 28-11t28 11l740 740q11 11 11 28t-11 28q-11 11-28 11t-28-11ZM498-575ZM382-464ZM160-800l80 80h-80v480h480v-80l80 80q0 33-23.5 56.5T640-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800Z',
+screenShare:'M440-487v127q0 17 11.5 28.5T480-320q17 0 28.5-11.5T520-360v-126l36 35q12 11 28 11.5t28-11.5q12-12 12-28.5T612-508L508-612q-12-12-28-12t-28 12L348-508q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z',
+raiseHand:'M520-920q17 0 28.5 11.5T560-880v360q0 17-11.5 28.5T520-480q-17 0-28.5-11.5T480-520v-360q0-17 11.5-28.5T520-920Zm-160 40q17 0 28.5 11.5T400-840v320q0 17-11.5 28.5T360-480q-17 0-28.5-11.5T320-520v-320q0-17 11.5-28.5T360-880ZM500-40q-142 0-241-99t-99-241v-380q0-17 11.5-28.5T200-800q17 0 28.5 11.5T240-760v380q0 109 75.5 184.5T500-120q109 0 184.5-75.5T760-380v-140q-17 0-28.5 11.5T720-480v120q0 17-11.5 28.5T680-320h-80q-33 0-56.5 23.5T520-240v40q0 17-11.5 28.5T480-160q-17 0-28.5-11.5T440-200v-40q0-66 47-113t113-47h40v-400q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v207q10-3 19.5-5t20.5-2h40q17 0 28.5 11.5T840-560v180q0 142-99 241T500-40Zm40-320Z',
+captions:'M200-160q-33 0-56.5-23.5T120-240v-480q0-33 23.5-56.5T200-800h560q33 0 56.5 23.5T840-720v480q0 33-23.5 56.5T760-160H200Zm0-80h560v-480H200v480Zm80-120h120q17 0 28.5-11.5T440-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T400-600H280q-17 0-28.5 11.5T240-560v160q0 17 11.5 28.5T280-360Zm400-240H560q-17 0-28.5 11.5T520-560v160q0 17 11.5 28.5T560-360h120q17 0 28.5-11.5T720-400v-20q0-9-6-15t-15-6h-18q-9 0-15 6t-6 15h-80v-120h80q0 9 6 15t15 6h18q9 0 15-6t6-15v-20q0-17-11.5-28.5T680-600ZM200-240v-480 480Z',
+callEnd:'m136-304-92-90q-12-12-12-28t12-28q88-95 203-142.5T480-640q118 0 232.5 47.5T916-450q12 12 12 28t-12 28l-92 90q-11 11-25.5 12t-26.5-8l-116-88q-8-6-12-14t-4-18v-114q-38-12-78-19t-82-7q-42 0-82 7t-78 19v114q0 10-4 18t-12 14l-116 88q-12 9-26.5 8T136-304Zm104-198q-29 15-56 34.5T128-424l40 40 72-56v-62Zm480 2v60l72 56 40-38q-29-26-56-45t-56-33Zm-480-2Zm480 2Z',
+thumbsUp:'M840-640q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14H280v-520l240-238q15-15 35.5-17.5T595-888q19 10 28 28t4 37l-45 183h258Zm-480 34v406h360l120-280v-80H480l54-220-174 174ZM160-120q-33 0-56.5-23.5T80-200v-360q0-33 23.5-56.5T160-640h120v80H160v360h120v80H160Zm200-80v-406 406Z',
+thumbsDown:'M120-320q-32 0-56-24t-24-56v-80q0-7 2-15t4-15l120-282q9-20 30-34t44-14h440v520L440-82q-15 15-35.5 17.5T365-72q-19-10-28-28t-4-37l45-183H120Zm480-34v-406H240L120-480v80h360l-54 220 174-174Zm200-486q33 0 56.5 23.5T880-760v360q0 33-23.5 56.5T800-320H680v-80h120v-360H680v-80h120Zm-200 80v406-406Z',
+copy:'M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-520q0-17 11.5-28.5T160-720q17 0 28.5 11.5T200-680v520h400q17 0 28.5 11.5T640-120q0 17-11.5 28.5T600-80H200Zm160-240v-480 480Z',
+renew:'M240-478q0 16 2 31.5t7 30.5q5 17-1 32.5T227-361q-16 8-31.5 1.5T175-383q-8-23-11.5-47t-3.5-48q0-134 93-228t227-94h7l-36-36q-11-11-11-28t11-28q11-11 28-11t28 11l104 104q12 12 12 28t-12 28L507-628q-11 11-28 11t-28-11q-11-11-11-28t11-28l36-36h-7q-100 0-170 70.5T240-478Zm480-4q0-16-2-31.5t-7-30.5q-5-17 1-32.5t21-22.5q16-8 31.5-1.5T785-577q8 23 11.5 47t3.5 48q0 134-93 228t-227 94h-7l36 36q11 11 11 28t-11 28q-11 11-28 11t-28-11L349-172q-12-12-12-28t12-28l104-104q11-11 28-11t28 11q11 11 11 28t-11 28l-36 36h7q100 0 170-70.5T720-482Z',
+misuse:'m480-424 116 116q11 11 28 11t28-11q11-11 11-28t-11-28L536-480l116-116q11-11 11-28t-11-28q-11-11-28-11t-28 11L480-536 364-652q-11-11-28-11t-28 11q-11 11-11 28t11 28l116 116-116 116q-11 11-11 28t11 28q11 11 28 11t28-11l116-116Zm0 344q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+helpDesk:'M480-120q-17 0-28.5-11.5T440-160q0-17 11.5-28.5T480-200h280v-284q0-117-81.5-198.5T480-764q-117 0-198.5 81.5T200-484v204q0 17-11.5 28.5T160-240q-33 0-56.5-23.5T80-320v-80q0-21 10.5-39.5T120-469l3-53q8-68 39.5-126t79-101q47.5-43 109-67T480-840q68 0 129 24t109 66.5Q766-707 797-649t40 126l3 52q19 9 29.5 27t10.5 38v92q0 20-10.5 38T840-249v49q0 33-23.5 56.5T760-120H480ZM360-400q-17 0-28.5-11.5T320-440q0-17 11.5-28.5T360-480q17 0 28.5 11.5T400-440q0 17-11.5 28.5T360-400Zm240 0q-17 0-28.5-11.5T560-440q0-17 11.5-28.5T600-480q17 0 28.5 11.5T640-440q0 17-11.5 28.5T600-400Zm-359-62q-7-106 64-182t177-76q89 0 156.5 56.5T720-519q-91-1-167.5-49T435-698q-16 80-67.5 142.5T241-462Z',
+certificate:'m480-483-68 52q-6 5-12 .5t-4-11.5l26-84-70-56q-5-5-3-11.5t9-6.5h86l26-82q2-7 10-7t10 7l26 82h85q7 0 9.5 6.5T608-582l-71 56 26 84q2 7-4 11.5t-12-.5l-67-52Zm0 363L293-58q-20 7-36.5-5T240-95v-254q-38-42-59-96t-21-115q0-134 93-227t227-93q134 0 227 93t93 227q0 61-21 115t-59 96v254q0 20-16.5 32T667-58l-187-62Zm0-200q100 0 170-70t70-170q0-100-70-170t-170-70q-100 0-170 70t-70 170q0 100 70 170t170 70ZM320-159l160-41 160 41v-124q-35 20-75.5 31.5T480-240q-44 0-84.5-11.5T320-283v124Zm160-62Z',
+courseCard:'M242-249q-20-11-31-29.5T200-320v-192l-96-53q-11-6-16-15t-5-20q0-11 5-20t16-15l338-184q9-5 18.5-7.5T480-829q10 0 19.5 2.5T518-819l381 208q10 5 15.5 14.5T920-576v256q0 17-11.5 28.5T880-280q-17 0-28.5-11.5T840-320v-236l-80 44v192q0 23-11 41.5T718-249L518-141q-9 5-18.5 7.5T480-131q-10 0-19.5-2.5T442-141L242-249Zm238-203 274-148-274-148-274 148 274 148Zm0 241 200-108v-151l-161 89q-9 5-19 7.5t-20 2.5q-10 0-20-2.5t-19-7.5l-161-89v151l200 108Zm0-241Zm0 121Zm0 0Z',
+lightning:'m422-232 207-248H469l29-227-185 267h139l-30 208Zm-62-128H236q-24 0-35.5-21.5T203-423l299-430q10-14 26-19.5t33 .5q17 6 25 21t6 32l-32 259h155q26 0 36.5 23t-6.5 43L416-100q-11 13-27 17t-31-3q-15-7-23.5-21.5T328-139l32-221Zm111-110Z',
+flag:'M280-400v240q0 17-11.5 28.5T240-120q-17 0-28.5-11.5T200-160v-600q0-17 11.5-28.5T240-800h287q14 0 25 9t14 23l10 48h184q17 0 28.5 11.5T800-680v320q0 17-11.5 28.5T760-320H553q-14 0-25-9t-14-23l-10-48H280Zm306 0h134v-240H543q-14 0-25-9t-14-23l-10-48H280v240h257q14 0 25 9t14 23l10 48Zm-86-160Z',
+settings:'M433-80q-27 0-46.5-18T363-142l-9-66q-13-5-24.5-12T307-235l-62 26q-25 11-50 2t-39-32l-47-82q-14-23-8-49t27-43l53-40q-1-7-1-13.5v-27q0-6.5 1-13.5l-53-40q-21-17-27-43t8-49l47-82q14-23 39-32t50 2l62 26q11-8 23-15t24-12l9-66q4-26 23.5-44t46.5-18h94q27 0 46.5 18t23.5 44l9 66q13 5 24.5 12t22.5 15l62-26q25-11 50-2t39 32l47 82q14 23 8 49t-27 43l-53 40q1 7 1 13.5v27q0 6.5-2 13.5l53 40q21 17 27 43t-8 49l-48 82q-14 23-39 32t-50-2l-60-26q-11 8-23 15t-24 12l-9 66q-4 26-23.5 44T527-80h-94Zm7-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z',
+link:'M280-280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h120q17 0 28.5 11.5T440-640q0 17-11.5 28.5T400-600H280q-50 0-85 35t-35 85q0 50 35 85t85 35h120q17 0 28.5 11.5T440-320q0 17-11.5 28.5T400-280H280Zm80-160q-17 0-28.5-11.5T320-480q0-17 11.5-28.5T360-520h240q17 0 28.5 11.5T640-480q0 17-11.5 28.5T600-440H360Zm200 160q-17 0-28.5-11.5T520-320q0-17 11.5-28.5T560-360h120q50 0 85-35t35-85q0-50-35-85t-85-35H560q-17 0-28.5-11.5T520-640q0-17 11.5-28.5T560-680h120q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H560Z',
+receipt:'M240-80q-50 0-85-35t-35-85v-80q0-17 11.5-28.5T160-320h80v-536q0-7 6-9.5t11 2.5l29 29q6 6 14 6t14-6l32-32q6-6 14-6t14 6l32 32q6 6 14 6t14-6l32-32q6-6 14-6t14 6l32 32q6 6 14 6t14-6l32-32q6-6 14-6t14 6l32 32q6 6 14 6t14-6l32-32q6-6 14-6t14 6l32 32q6 6 14 6t14-6l29-29q5-5 11-2.5t6 9.5v656q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-560H320v440h320q17 0 28.5 11.5T680-280v80q0 17 11.5 28.5T720-160ZM400-680h160q17 0 28.5 11.5T600-640q0 17-11.5 28.5T560-600H400q-17 0-28.5-11.5T360-640q0-17 11.5-28.5T400-680Zm0 120h160q17 0 28.5 11.5T600-520q0 17-11.5 28.5T560-480H400q-17 0-28.5-11.5T360-520q0-17 11.5-28.5T400-560Zm280-40q-17 0-28.5-11.5T640-640q0-17 11.5-28.5T680-680q17 0 28.5 11.5T720-640q0 17-11.5 28.5T680-600Zm0 120q-17 0-28.5-11.5T640-520q0-17 11.5-28.5T680-560q17 0 28.5 11.5T720-520q0 17-11.5 28.5T680-480ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm-40 0v-80 80Z',
+attachment:'M720-330q0 104-73 177T470-80q-104 0-177-73t-73-177v-370q0-75 52.5-127.5T400-880q75 0 127.5 52.5T580-700v350q0 46-32 78t-78 32q-46 0-78-32t-32-78v-330q0-17 11.5-28.5T400-720q17 0 28.5 11.5T440-680v330q0 13 8.5 21.5T470-320q13 0 21.5-8.5T500-350v-350q-1-42-29.5-71T400-800q-42 0-71 29t-29 71v370q-1 71 49 120.5T470-160q70 0 119-49.5T640-330v-350q0-17 11.5-28.5T680-720q17 0 28.5 11.5T720-680v350Z',
+add:'M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z',
+subtract:'M240-440q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h480q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H240Z',
+caretDown:'M459-381 314-526q-3-3-4.5-6.5T308-540q0-8 5.5-14t14.5-6h304q9 0 14.5 6t5.5 14q0 2-6 14L501-381q-5 5-10 7t-11 2q-6 0-11-2t-10-7Z',
+checkOutline:'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z',
+warningAlt:'M109-120q-11 0-20-5.5T75-140q-5-9-5.5-19.5T75-180l370-640q6-10 15.5-15t19.5-5q10 0 19.5 5t15.5 15l370 640q6 10 5.5 20.5T885-140q-5 9-14 14.5t-20 5.5H109Zm69-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm0-120q17 0 28.5-11.5T520-400v-120q0-17-11.5-28.5T480-560q-17 0-28.5 11.5T440-520v120q0 17 11.5 28.5T480-360Zm0-100Z',
+stopFilled:'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z',
+skill:'m434-410 4 32q1 8 6.5 13t13.5 5h44q8 0 13.5-5t6.5-13l4-32q8-3 14.5-7t11.5-9l30 13q7 3 14 1t11-9l22-38q4-7 2.5-14t-7.5-12l-26-19q2-8 2-16t-2-16l26-19q6-5 7.5-12t-2.5-14l-22-38q-4-7-11-9t-14 1l-30 13q-5-5-11.5-9t-14.5-7l-4-32q-1-8-6.5-13t-13.5-5h-44q-8 0-13.5 5t-6.5 13l-4 32q-8 3-14.5 7t-11.5 9l-30-13q-7-3-14-1t-11 9l-22 38q-4 7-2.5 14t7.5 12l26 19q-2 8-2 16t2 16l-26 19q-6 5-7.5 12t2.5 14l22 38q4 7 11 9t14-1l30-13q5 5 11.5 9t14.5 7Zm46-50q-25 0-42.5-17.5T420-520q0-25 17.5-42.5T480-580q25 0 42.5 17.5T540-520q0 25-17.5 42.5T480-460ZM240-252q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v40q0 17-11.5 28.5T560-80q-17 0-28.5-11.5T520-120v-80q0-17 11.5-28.5T560-240h120v-160q0-17 11.5-28.5T720-440h68l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v168q0 17-11.5 28.5T280-80q-17 0-28.5-11.5T240-120v-132Zm254-188Z',
+growth:'M108-255q-12-12-11.5-28.5T108-311l211-214q23-23 57-23t57 23l103 104 208-206h-64q-17 0-28.5-11.5T640-667q0-17 11.5-28.5T680-707h160q17 0 28.5 11.5T880-667v160q0 17-11.5 28.5T840-467q-17 0-28.5-11.5T800-507v-64L593-364q-23 23-57 23t-57-23L376-467 164-255q-11 11-28 11t-28-11Z',
+creditCard:'M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720Zm-720 80h640v-80H160v80Zm0 160v240h640v-240H160Zm0 240v-480 480Z'
 };
 const CHEV = 'M5.6 3h4.7l7.9 9-7.9 9H5.6l7.9-9-7.9-9Z';
 
@@ -10721,7 +11021,7 @@ const ARROW_LINE = '<svg viewBox="0 0 20 20" aria-hidden="true" fill="none">' +
   '</svg>';
 
 const I = new Proxy({}, {
-  get: (_, k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${IP[k] ? `<path d="${IP[k]}"/>` : ''}</svg>`
+  get: (_, k) => `<svg viewBox="0 -960 960 960" aria-hidden="true">${IP[k] ? `<path d="${IP[k]}"/>` : ''}</svg>`
 });
 const inner = n => IP[n] ? `<path d="${IP[n]}"/>` : '';
 
@@ -11013,7 +11313,7 @@ const BMK = {
 ;
 const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
 
-const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
   disc:{},
   scenes:{level:null, re:null}, scPick:{level:[], re:[]},
@@ -11080,10 +11380,33 @@ function sidenav(f){
   </nav>`;
 }
 
-const PORTALS = [['candidate','Candidate'],['leader','Cohort Leader']];
-function pswitch(){
-  return `<div class="pswitch" role="tablist" aria-label="Portal">
-    ${PORTALS.map(([k,l])=>`<button class="psw-t ${S.portal===k?'on':''}" role="tab" aria-selected="${S.portal===k}" data-portal="${k}">${l}</button>`).join('')}
+const PORTALS = [['candidate','Candidate','hana'],['leader','Cohort Leader','priya']];
+const otherPortal = () => PORTALS.find(([k]) => k !== S.portal);
+
+const CRUMB_FOOT = {account:'Profile', leadProfile:'Profile'};
+
+function crumbMod(view){
+  const v = view || S.view;
+  const k = PARENT[v] || v;
+  if(CRUMB_FOOT[k]) return [CRUMB_FOOT[k], k];
+  const row = NAVSETS[isLead() ? 'leader' : cfg(S.stage).nav].find(([n]) => n === k);
+  return row ? [row[1], row[0]] : null;
+}
+
+const crumbBar = () =>
+  `<nav class="crumb-bar" aria-label="Breadcrumb"><ol class="crumb-trail"></ol></nav>`;
+
+function acctMenu(){
+  const [ok, ol, oi] = otherPortal();
+  return `<div class="acct-menu ${S.acct?'on':''}" role="menu" aria-label="Account">
+    <button class="acct-i" role="menuitem" data-go="${isLead()?'leadProfile':'account'}">
+      <span class="acct-i-mk">${I.settings}</span>
+      <span class="acct-i-t">Profile settings</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-swap="${ok}">
+      <span class="acct-i-mk acct-i-av"><img src="${AV[oi]}" alt=""></span>
+      <span class="acct-i-t">Switch to ${ol}</span>
+    </button>
   </div>`;
 }
 
@@ -11095,11 +11418,27 @@ function shell(){
     <button class="shell-act nav-t ${S.nav?'on':''}" data-toggle="nav" aria-label="${S.nav?'Collapse':'Expand'} navigation" title="${S.nav?'Collapse':'Expand'} navigation">${S.nav?I.close
       :`<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
     <button class="shell-logo" data-go="${isLead()?'leadDash':'dashboard'}" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
-    ${pswitch()}
+    ${crumbBar()}
     <div class="shell-right">
       <span class="shell-name">${name}</span>
       <button class="shell-act ${S.notif?'on':''}" data-toggle="notif" aria-label="Notifications">${I.notification}${unreadCount()?`<span class="shell-badge">${unreadCount()}</span>`:''}</button>
-      <button class="shell-act" data-go="${isLead()?'leadProfile':'account'}" aria-label="Account"><span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span></button>
+      ${/* THE FACE IS A MENU NOW, NOT A LINK, and the chevron is what says so.
+            Pressed, it used to go straight to Profile; that destination is the
+            menu's first item, so nothing was taken away — a second one was
+            added under the same mark, which is the only reason the affordance
+            has to change. `aria-haspopup` and `aria-expanded` are the pair a
+            screen reader needs to hear the difference.
+
+            THE CHEVRON IS `.acct-c`, NOT A `.shell-act svg`. §01 sizes every
+            glyph in this bar at 24px and fills it `--icon-primary`; at 24 next
+            to a 32px face it reads as a second control rather than as the
+            face's own disclosure. §77 sizes it and §63 §17 inks it. */''}
+      <button class="shell-act acct-t ${S.acct?'on':''}" data-toggle="acct"
+        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct?'true':'false'}">
+        <span class="shell-avatar"><img src="${isLead()?AV.priya:AV.hana}" alt=""><i>${isLead()?'PN':'MN'}</i></span>
+        <svg class="acct-c" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg>
+      </button>
+      ${acctMenu()}
     </div>
   </header>`;
 }
@@ -11117,7 +11456,7 @@ const talLabel = (s) => `<span class="ai-label${s?' '+s:''}">Tal</span>`;
 
 function stars(n){
   let out='';
-  for(let i=1;i<=5;i++) out += `<svg class="${i<=Math.round(n)?'f':''}" viewBox="0 0 24 24">${inner('star')}</svg>`;
+  for(let i=1;i<=5;i++) out += `<svg class="${i<=Math.round(n)?'f':''}" viewBox="0 -960 960 960">${inner(i<=Math.round(n)?'star':'starOutline')}</svg>`;
   return `<span class="stars">${out}</span>`;
 }
 ;
@@ -11157,7 +11496,7 @@ function agentCard(key){
       <span class="ag-m">${a.range} · ${a.ivs} interviews</span>
       <span class="ag-foot"><span style="color:var(--text-secondary)">Next: ${a.slot}</span><span class="ag-price">${a.price}</span></span>
     </span>
-    <svg class="card-go" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="card-go" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </div>`;
 }
 function mem(name,ini,meta,you,img){
@@ -11480,7 +11819,7 @@ const gcard = (kind,tag,title,sub,go) => `<button class="tile clk gcard" data-go
     ${tag?`<span class="eyebrow">${tag}</span>`:''}
     <h3>${title}</h3><span class="sub">${sub}</span>
   </span>
-  <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+  <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
 </button>`;
 
 const pict = (k,cls) => `<span class="pict ${cls||''}">${PG[k]}</span>`;
@@ -12182,7 +12521,7 @@ const CALL_ROW = {
   iv: () => {
     const k = (S.booking && S.booking.agent) || (S.bk && S.bk.agent) || S.agent || 'priya';
     const a = AGENTS[k] || AGENTS.priya;
-    return {who:a, role:'Talent agent', when:'in 6 days',
+    return {who:a, role:'Talent agent', when:'in 1 minute',
       label:'Level interview &middot; 45 minutes, recorded',
       x:`${(REC[k] || REC.priya).expertise}, assesses ${a.range}`,
       kind:'iv', second:{go:'interviews', ic:I.calendar, t:'Reschedule'}};
@@ -12203,15 +12542,16 @@ const CALL_ROW = {
   }
 };
 
-function crow(kind){
+function crow(kind, o){
   const c = (CALL_ROW[kind] || CALL_ROW.cohort)();
   const p = c.who;
   const soon = PLATE_SOON.test(c.when);
+  o = o || {};
   return `<div class="crow${soon ? ' urgent' : ''}">
-      <div class="crow-when">
+      ${o.when === false ? '' : `<div class="crow-when">
         <b>${callLeft(c.when)}</b>
         <span>${c.label}</span>
-      </div>
+      </div>`}
       <div class="crow-who">
         <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
         <div class="crow-b">
@@ -12222,7 +12562,7 @@ function crow(kind){
         </div>
       </div>
       <div class="crow-a">
-        <button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>
+        ${o.second === false ? '' : `<button class="btn btn-sm noic ic-l" data-go="${c.second.go}">${c.second.ic}${c.second.t}</button>`}
         <button class="btn btn-p btn-sm noic" data-call="${c.kind}">Join call ${I.arrowRight}</button>
       </div>
     </div>`;
@@ -12300,32 +12640,41 @@ const recKey = () => REC_ORDER.includes(S.recKey) ? S.recKey : REC_ORDER[0];
 
 const REC_MS = 4500;
 
-const recWrap = () => 'sec sec-rec no-band';
+const recWrap = () => 'sec sec-rec no-band dark-card rec-dark';
 
 function recSkeleton(){
   const a = AGENTS[recKey()];
   const first = a.n.split(' ')[0];
   return `<div class="${recWrap()}">
-    <span class="ai-label bare rec-lab">Agent recommended by Tal</span>
+    ${''/* THE HEADING IS REAL AND ITS STAND-IN IS A BAR, because it is the one
+          thing on the block that does NOT change when Tal picks somebody else.
+          Drawn rather than printed all the same: the skeleton replaces the
+          whole section, and a live 18px heading over nine ramp bars would read
+          as a heading that had lost its block. */}
+    <div class="dc-hd">
+      <div class="dc-hd-r"><span class="sk sk-hd"></span><span class="sk sk-see"></span></div>
+      <span class="sk sk-lab"></span>
+    </div>
     <div class="rec rec-busy" aria-busy="true">
       <div class="rec-l">
         <span class="sk sk-ph"></span>
         <div class="rec-b">
+          ${''/* TWO BARS IN THE TOP BLOCK AND THEY ARE THE NAME AND THE RATING
+                — the expertise line came off the real block (Maryam, 31 Aug
+                2026) and the rating moved under the name to take its row. The
+                skeleton's whole point is that every bar is the BOX of the thing
+                it replaces so nothing moves when the real content lands, which
+                stops being true the moment the real content changes shape.
+                Updated even though nothing can currently reach this function —
+                see the note in `talRec`: if the swap is not re-homed the family
+                goes, and until then a skeleton describing a layout that no
+                longer exists is worse than none. */}
           <div class="rec-top">
             <span class="sk sk-n"></span>
-            <span class="sk sk-x"></span>
+            <span class="sk sk-rt"></span>
           </div>
           <p class="rec-f"><span class="sk sk-f"></span><span class="sk sk-f"></span><span class="sk sk-f"></span></p>
-          ${''/* ONE BAR, NOT TWO PILLS, because the block it stands in for is
-                one sentence now (581:6539). The skeleton's whole point is that
-                every bar is the BOX of the thing it replaces so nothing moves
-                when the real content lands, which stops being true the moment
-                the real content changes shape. Updated even though nothing can
-                currently reach this function — see the note in `talRec`: if the
-                swap is not re-homed the family goes, and until then a skeleton
-                describing a layout that no longer exists is worse than none. */}
           <div class="rec-ov">
-            <span class="sk sk-m"></span>
             <p class="rec-tags"><span class="sk sk-t sk-why"></span></p>
           </div>
         </div>
@@ -12344,7 +12693,42 @@ function talRec(){
   const rec = REC[recKey()];
   const first = a.n.split(' ')[0];
   return `<div class="${recWrap()}">
-    <span class="ai-label bare rec-lab">Agent recommended by Tal</span>
+    ${''/* THE BLOCK NAMES ITSELF, AND THE LABEL BECOMES THE ATTRIBUTION UNDER
+          IT (Maryam, 31 Aug 2026). "Agent recommended by Tal" was doing two
+          jobs in one line — saying what this block IS and saying whose choice
+          it is — which is why it read as a caption on a page whose other three
+          blocks all open with a heading. The heading answers the first ("Your
+          Next Step - Interview", which is the page's own question) and the
+          sparkle line answers the second in three words.
+
+          THE PAIR IS WRAPPED, and it is not decoration: `.sec-rec` is a column
+          at 20px, which is the file's gap between the label and the row of
+          content beneath it. A heading dropped straight into that column sits
+          20px off its own attribution and 20px off the block, so the three
+          read as three things. `.rec-hdb` holds the head at 12 and leaves the
+          20 where 581:6456 puts it.
+
+          AND "VIEW ALL AGENTS" MOVED UP HERE, WITH A RULE UNDER THE ROW
+          (Maryam, 31 Aug 2026). It was the left half of a pair at the foot of
+          the card, beside Book — and the two were never the same KIND of
+          thing. Book is what this card is for; View all agents is the way out
+          of it, which belongs to the SECTION rather than to Priya. On the
+          heading's row it is the section's own control and the card underneath
+          has one action, which is what a recommendation should have.
+
+          THE RULE IS WHAT MAKES THE ROW A HEADER rather than two things that
+          happen to be on one line — and it is `--on-dark-rule`, white at 16%,
+          not `--on-dark-border` at 42%. §15's note on `.plate-x` is where that
+          distinction is argued: the border token is for something you can
+          press, and a hairline drawn at that weight reads as the top edge of a
+          box rather than as a rule. */}
+    <div class="dc-hd">
+      <div class="dc-hd-r">
+        <h2 class="dc-t">Your Next Step - Interview</h2>
+        <button class="btn btn-s btn-sm noic dc-act" data-go="agents">View all agents ${I.arrowRight}</button>
+      </div>
+      <span class="ai-label bare rec-lab">Tal recommends</span>
+    </div>
     ${''/* THE ROW IS TWO GROUPS, NOT THREE ITEMS — 581:6460. The file nests the
           photograph and the facts inside one frame at gap 16 and pushes the
           actions to the far edge with `justify-between`; written flat, the
@@ -12355,11 +12739,30 @@ function talRec(){
       <div class="rec-l">
         <span class="rec-ph"><i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
         <div class="rec-b">
+          ${''/* THE RATING IS A ROW OF ITS OWN UNDER THE NAME, AND THE
+                EXPERTISE LINE IS GONE (Maryam, 31 Aug 2026).
+
+                THE TWO CHANGES ARE ONE CHANGE. `.rec-top` is a column at 8px
+                that held two rows: name-and-rating, then "Expertise: System
+                Architecture, Assesses E1–E3". Dropping the second and moving
+                the rating down keeps the block exactly two rows tall, so the
+                166px photograph beside it is still square against its own
+                content — and what the second row says is now a measure of the
+                person rather than a restatement of their range, which the
+                three facts under it and the claim under those already circle.
+                The range itself is not lost: `V.agent` is one press away and
+                draws `.rec-x` in full, which is why that class stays.
+
+                `.rec-id` KEEPS ITS WRAPPER AROUND ONE CHILD, deliberately.
+                `V.agent` and `V.booking` write the same three-class shape with
+                the rating still inside it, and every §70.5 selector for this
+                family is written `.app .rec-…` so the markup travels between
+                the three. Collapsing it here would fork the block into two
+                shapes to save one div. §75 is what re-lays the row. */}
           <div class="rec-top">
             <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
-                <span class="rec-v">${I.checkFilled}</span></span>
-              <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
-            <p class="rec-x"><b>Expertise:</b> ${rec.expertise}, Assesses ${a.range}</p>
+                <span class="rec-v">${I.verified}</span></span></p>
+            <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
           </div>
           ${''/* THE FEE IS `AGENTS.priya.price` AND THE FILE SAYS $120.
                 581:6479 is the one number on this block that contradicts the
@@ -12389,33 +12792,53 @@ function talRec(){
                 alternative is a third hand-written string per agent in `REC`
                 that could disagree with the two beside it.
 
-                AND THE FILE'S INK SURVIVES HERE, WHICH IS A REVERSAL OF THE
-                NOTE BELOW. §70.5's own argument for substituting `--mk-4` was
-                that #973177 on the tag's #fbf1f9 ground fails AA at 14px. With
-                the ground gone the same ink is 6.95:1 on white — measured, not
-                assumed — so the file's colour is used exactly. `.rec-m`'s
-                figure keeps `--link` for #0488c5, which is 3.94:1 on white and
-                still fails. One block, two inks, two different reasons. */}
+                AND THE INK IS NO LONGER THE FILE'S, BECAUSE THE GROUND IS NOT
+                WHITE ANY MORE. Two rounds of this note argued about #973177:
+                §70.5 substituted `--mk-4` for it on the tag's #fbf1f9 pill
+                (4.0:1, under AA at 14px) and the previous version restored the
+                file's own value once the pill went, measuring 6.95:1 on white.
+                On `--gray-100` the same magenta is 2.1:1 and neither answer
+                survives. §63 sets the sentence in `--on-dark` — the plate's own
+                discipline, where the title and the one thing worth reading are
+                white and every supporting line is `--on-dark-2`. Three inks on
+                a black card is a card with a highlighter on it.
+
+                AND "DATA OVERLAP TAGS: 98% MATCH" IS GONE WITH THE PILLS
+                (Maryam, 31 Aug 2026). It was the same fact as the sentence
+                under it, stated as a number — and the sentence is the readable
+                half: "98% match" needs the reader to know what was matched
+                against what, which is exactly what the line beneath spells out.
+                `rec.match` is untouched in the record and still has a reader,
+                `SUMDROP.quiz`'s read in ai6, so nothing in the data goes dead —
+                but `.rec-m` is now written by nobody, which is the "gate
+                nothing writes" tell, so its two rules come out of §63 with it.
+                `.rec-ov` keeps its wrapper: one child at the same 16px gap
+                `.rec-b` already has, and the skeleton mirrors it. */}
           <div class="rec-ov">
-            <p class="rec-m">Data Overlap Tags: <i>${rec.match} match</i></p>
             <p class="rec-why">${first}&rsquo;s ${rec.strength} strength perfectly matches your need for ${rec.need}.</p>
           </div>
         </div>
       </div>
-      ${''/* TWO BUTTONS, AND "VIEW ALL AGENTS" IS THE ORDINARY ANSWER AFTER ALL
-            — 583:6679 (Maryam, 31 Aug 2026). This slot held one button and one
-            line of quoted italic text, and the note that was here argued for it:
-            "the recommendation was reasoned, so the way past it is to say why it
-            is wrong, which is a thing you say to Tal". That is a good argument
-            about Tal and a bad one about this reader — the file gives them the
-            list, and a reader who does not want Priya usually wants to SEE the
-            other four rather than to open a conversation about her.
+      ${''/* ONE BUTTON AGAIN, AND IT IS NOT THE ONE THAT WAS HERE FIRST.
 
-            Both are 185 x 40 with 12 between, held to the right edge, which is
-            the geometry `.rec-a` already had for the single button; §70.5 only
-            has to turn the column into a row. `View all agents` goes FIRST,
-            per 581:6548 — the quiet one on the left, the accent one closest to
-            the edge, which is the order every `.btn-row` in this product uses.
+            THE HISTORY IS WORTH THE THREE LINES, because this slot has now held
+            three different things and each change was an argument about what a
+            recommendation IS. It began as Book plus a line of quoted italic text
+            — "the recommendation was reasoned, so the way past it is to say why
+            it is wrong, which is a thing you say to Tal". Then 583:6679 made the
+            way past it an ordinary button, `View all agents`, on the reasoning
+            that a reader who does not want Priya wants to SEE the other four
+            rather than open a conversation about her. That is still true; what
+            was wrong was the PLACEMENT. Book is what this card is for and View
+            all agents is the way out of the section, so as a pair at the card's
+            foot they read as two answers to one question. The second is in the
+            heading row now (§75.2) and this slot holds the card's own action.
+
+            SO `.rec-a`'S 382px IS GONE WITH IT. That width was 185 + 12 + 185,
+            stated because the group had to be `flex:none` for §70.5's
+            `margin-left:auto` to hold the right edge against a `flex:1 1 620px`
+            block. One button needs no stated width and `auto` keeps the auto
+            margin working, which is the whole of §75.3's change.
 
             THIS LEAVES THE 4.5s SKELETON WITH NO TRIGGER. `data-recswap` was
             the only thing that ever set `S.recBusy`, so `recSkeleton` (§70.5b,
@@ -12434,7 +12857,6 @@ function talRec(){
             then none, which is the "mode nobody asks for" CLAUDE.md warns about.
             Both buttons are unconditional again. */}
       <div class="rec-a">
-        <button class="btn btn-s btn-sm noic rec-see" data-go="agents">View all agents ${I.arrowRight}</button>
         <button class="btn btn-p btn-sm noic" data-go="agent:${recKey()}">Book ${first} Now ${I.arrowRight}</button>
       </div>
     </div>
@@ -12443,7 +12865,6 @@ function talRec(){
 
 const quickActions = () => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
-  <p class="all-desc">Schedule your interview with an agent to complete your level assessment.</p>
   <div class="qa">
     <button class="qa-c" data-go="result">
       <span class="qa-ic ic-quiz">${I.trophy}</span>
@@ -12662,7 +13083,7 @@ created: () => `${authShell()}
         ${['What happens in the interview?','How do I move up a level?','Which agent suits me?'].map(q=>
         `<button class="tile clk arrow band" data-go="stage:new">
           <span class="t-body-compact-01">${q}</span>
-          <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg></button>`).join('')}
+          <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg></button>`).join('')}
       </div>
     </div>
   </div>
@@ -12765,8 +13186,59 @@ V.dashboard = (f) => {
           It was a black `.plate` here and a `.crow` on the enrolled dashboards,
           which is one appointment drawn two ways. Not a `.head-sec`: this
           band's second column is the journey (§70.3), so the row is the first
-          section of the page body. */}
-    <div class="sec sec-call">${crow('iv')}</div>
+          section of the page body.
+
+          AND IT IS THE BLACK CARD, IN THE SAME SLOT AND UNDER THE SAME HEADING
+          AS `talRec` ONE STAGE EARLIER (Maryam, 31 Aug 2026). That is the whole
+          argument: on `new` the page's next step is "book an interview" and it
+          is `talRec`; here the next step is "join the interview you booked", it
+          sits in the identical position — directly after Tal's card, before the
+          body — and it was a white row. One slot, one object.
+
+          THE HEADING IS BYTE-IDENTICAL to `talRec`'s, cased as that one is. The
+          two are the same sentence about the same thing at two stages, so a
+          reader moving from one to the other should see the card change and not
+          the words above it.
+
+          NO CONTROL ON THE HEADING ROW, WHICH `.dc-hd-r` ALLOWS. `talRec` puts
+          "View all agents" there because the recommendation is one of five and
+          the way out belongs to the section. A booked interview is not one of
+          anything — Reschedule is on the row itself, where it is an action on
+          THIS appointment rather than a way past it. `.dc-hd` holds one child
+          here and two there.
+
+          `.dark-card` AND `.crow-dark`, and the split is the point: everything
+          about the card is §75's and everything about this row inside it is
+          §77's. §75's own note is where the recipe is listed.
+
+          THE COUNTDOWN IS IN THE HEADING ROW AND THE 182px CELL IS GONE
+          (Maryam, 31 Aug 2026). §71.1 argued that cell as "the row's only
+          ground" — one tinted band holding the one figure that changes by
+          itself — and that argument was about a row standing on a white page,
+          where a ground is the only way to set a figure apart. Inside a card
+          the heading row is already the place a card says what it is ABOUT, and
+          `.dc-hd-r`'s right-hand slot is already load-bearing on `talRec`
+          ("View all agents"). So the time takes the slot and the cell goes,
+          which also puts the portrait back on the card's own spine.
+
+          `.dc-when`, NOT `.dc-act`, AND THEY ARE NOT INTERCHANGEABLE. The slot
+          holds one or the other: `.dc-act` is a control — a way out of the
+          section — and this is a fact about the thing below it. Same position,
+          same ink, different element and no `data-go`; a `<span>` that looked
+          like the button beside it on the other card would be the worst of both.
+
+          THE STRING IS `callLeft(CALL_ROW.iv().when)` AND NOT A LITERAL, which
+          is what stops the head and the row disagreeing about the same
+          appointment — the failure `bkStamp` exists to prevent for six prose
+          mentions of the booking. `CALL_ROW.iv` is read twice on this page and
+          both reads are derived. */}
+    <div class="sec sec-call dark-card crow-dark">
+      <div class="dc-hd">
+        <div class="dc-hd-r"><h2 class="dc-t">Your Next Step - Interview</h2>
+          <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
+      </div>
+      ${crow('iv', {when:false, second:false})}
+    </div>
     ${''/* WHAT THE 45 MINUTES ACTUALLY ARE — AND IT COMES BEFORE THE QUIZ.
           The one thing this stage's page did not say. Everything on it was
           about the booking — who, when, how long — and nothing about what
@@ -13666,7 +14138,7 @@ const allAgents = () => `
         <p class="all-desc">Select an agent from whom you want to be interviewed.</p>
       </div>
       <div class="srch all-srch">
-        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
         <input class="inp" placeholder="Search all 24 agents" aria-label="Search agents">
       </div>
     </div>
@@ -13725,7 +14197,22 @@ V.agents = (f) => `<main class="main"><div class="page">
 V.agent = (f) => {
   const a = AGENTS[S.agent||'priya'];
   const rec = REC[S.agent||'priya'];
+  const days = [['Wed','Wednesday',19],['Thu','Thursday',20],['Fri','Friday',21],
+                ['Mon','Monday',24],['Tue','Tuesday',25]];
+  const dSel = 1;
+  const CAL_Y = 2026, CAL_M = 7, CAL_MN = 'August';
+  const calOpen = days.map(d => d[2]);
+  const calSel  = days[dSel][2];
+  const calLead = new Date(CAL_Y, CAL_M, 1).getDay();
+  const calLast = new Date(CAL_Y, CAL_M + 1, 0).getDate();
+  const calPrev = new Date(CAL_Y, CAL_M, 0).getDate();
+  const calCells = [];
+  for(let i = 0; i < calLead; i++) calCells.push([calPrev - calLead + 1 + i, true]);
+  for(let n = 1; n <= calLast; n++) calCells.push([n, false]);
+  while(calCells.length % 7) calCells.push([calCells.length - calLead - calLast + 1, true]);
   const slots = ['9:00 AM','11:30 AM','2:00 PM','4:30 PM','6:30 PM','8:00 PM'];
+  const taken = [0,5], sSel = 4;
+  const open = slots.length - taken.length;
   return `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],['All agents','agents'],a.n)}
   ${''/* THIS PAGE HAD NO HEADER AND THEREFORE NO WAY BACK.
@@ -13752,7 +14239,31 @@ V.agent = (f) => {
         open" was a caption for the page. The title names the person and Tal
         states the facts. */}
   ${ph('Book ' + a.n, null, null, 'agents')}
-  <div class="sec" style="padding-top:var(--s05)">
+  ${''/* THE THREE BLOCKS ARE ONE SECTION, AND THAT IS NOT TIDINESS.
+        §10.2 closes every `.sec` with a full-bleed hairline `::after` and, at
+        760 and up, a pair of tick marks where it crosses the rails. Three
+        sections would therefore put a page-wide rule one pixel under each
+        block — the "TWO 1px rules one pixel apart" artefact §14's note on
+        `.sec-qa` spends a paragraph on, three times over. One section, three
+        blocks separated by their own rules, and the section's closing rule
+        ends the page where it should.
+
+        AND THE THREE ARE NO LONGER PANELS (Maryam, 31 Aug 2026: "what even is
+        this UI?"). Every one of them carried §41's `1px solid var(--rule)` on
+        `--layer-01`, so the page was three bordered boxes inside a bordered
+        frame inside a section that closes itself with a rule — four edges deep
+        before any content, and the two-column splits INSIDE the first two then
+        drew a fifth. The frames are off, the blocks take the page's own gutter,
+        and what separates them is one hairline each: after the profile, and
+        above the checkout. Three blocks, two rules, no boxes. §02's opening
+        note is the argument this belatedly follows — "depth is expressed as
+        rhythm and rule weight, nothing else".
+
+        THE `style="padding-top"` CAME OFF WITH THE MERGE — trap 1. It was
+        beating §10's own top padding at both widths with an inline
+        declaration no stylesheet could answer, to buy 8px against the `.ph`
+        above. The page takes the section rhythm every other page takes. */}
+  <div class="sec sec-bk">
     ${''/* THE BLOCK BESIDE THE PHOTOGRAPH IS `talRec`'S — 581:6460, Maryam,
           31 Aug 2026. The identity card here was its own drawing: five gold
           stars, the rating, the interview count, "Assesses E1–E3" and a green
@@ -13773,60 +14284,91 @@ V.agent = (f) => {
           cell in `.daystrip` 200px below and naming another one above it is
           the disagreement `PAGESUM.agent` was removed for.
 
-          THE EXPERTISE CLAUSE DEGRADES, because `REC` has three entries and
-          `AGENTS` has five. Samuel and Hana have no expertise on record, so
-          they get the range alone rather than a lead-in with nothing after it
-          — and never Priya's, which is what `REC[k] || REC.priya` would do. */}
-    <div class="agid">
-      ${avatar(a,96)}
-      <div class="rec-b">
-        <div class="rec-top">
-          <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
-              <span class="rec-v">${I.checkFilled}</span></span>
-            <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
-          <p class="rec-x">${rec?`<b>Expertise:</b> ${rec.expertise}, Assesses ${a.range}`
-            :`<b>Assesses</b> ${a.range}`}</p>
+          THE EXPERTISE LINE AND THE BIO ARE BOTH GONE (Maryam, 31 Aug 2026),
+          and with them the last two things on this block that were about the
+          agent rather than about the booking. "Expertise: System Architecture,
+          Assesses E1–E3" and "Fifteen years running operations teams…" are a
+          profile, and this page is a picker — you arrive on it having already
+          chosen, which is what the "Book <name>" title says. Both are still
+          READ where choosing happens: `agentCardH` on All Agents carries the
+          expertise, and `PAGESUM.agent` quotes the bio into Tal's summary in
+          the head band 200px above this, so the sentence had been printed twice
+          on one screen.
+
+          `.rec-x` KEEPS TWO OTHER CALLERS (`V.enrol`'s leader tile and the
+          cohort-lead row), so its rules are not the "gate nothing writes" tell
+          and stay. `.agid-bio` keeps ai7's booking widget. Neither family is
+          deleted — this page simply stops writing them. */}
+    ${''/* THE BLOCK IS TWO COLUMNS AND THE RULE BETWEEN THEM IS THE WHOLE
+          POINT. Left is the person — who they are and the two figures that
+          belong to their profile. Right is what BUYING one costs, which is a
+          different question, so it gets its own column rather than a full-width
+          row underneath.
+
+          THE RATING MOVED UNDER THE NAME (Maryam, 31 Aug 2026), which is now
+          `talRec`'s shape EXACTLY rather than a second arrangement of the same
+          three classes. The note that used to stand here said the rating stays
+          on the name's line "because this page keeps the expertise line, so
+          `.rec-top` still has two rows" — that was the whole of the reason, and
+          removing the expertise line removed it. The two blocks are the same
+          subject on two pages and they are now one shape, which is what §75's
+          `.app .rec-…` scoping was for. */}
+    <div class="bkp">
+      <div class="agid">
+        ${avatar(a,96)}
+        <div class="rec-b">
+          <div class="rec-top">
+            <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
+                <span class="rec-v">${I.verified}</span></span></p>
+            <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
+          </div>
+          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+            <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
         </div>
-        <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
-          <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
+      </div>
+      ${''/* THE THREE FACTS ARE THREE LINES, LABEL LEFT AND VALUE RIGHT
+            (Maryam, 31 Aug 2026). They were a name over a value with a 28px
+            tinted chip beside the pair — §65's figure cell, which is the shape
+            for a number you SCAN against the two beside it. These are not that:
+            they are three different questions with one answer each, and an
+            answer belongs on the line of its question. Stacked, the eye read
+            six lines to get three facts.
+
+            THE CHIP WENT AND THE GLYPH STEPS 16 -> 20, which is exactly the
+            trade §72 made for the pulse's column marks: "the hue survives and
+            the wash goes; the glyph steps because it now holds the line alone".
+            The reason is the same one, one page over — three filled squares in
+            a column of three rows are the heaviest objects in a block that no
+            longer has a border round it, and a chip on a row is a box on a
+            line rather than a mark in front of one.
+
+            THE THREE ROWS ARE ONE WIDTH AND IT IS THE WIDEST ROW'S, which is
+            the whole of what makes the right edge read as an edge. §76 sizes
+            the grid track with `fit-content()` rather than a fixed `minmax()`,
+            so the column is exactly as wide as "Report turnaround / Within 24
+            hours" needs and the other two stretch to it. A fixed track would
+            either clip that row or leave the other two ending short of it.
+
+            THE HUES ARE NAMED, NOT CYCLED — §65's and §72's rule both. The fee
+            is `--mk-1` on both this page and anywhere else these three appear,
+            so a fact cannot change colour by moving position.
+
+            THE LABEL IS THE STRONG ONE AND THE VALUE IS THE QUIET ONE, which
+            inverts `.kv` and `.stat` both and is §73's argument kept verbatim
+            through the turn onto one line: these are three different things,
+            so what you scan is the names. The fee is the one accent string,
+            because it is the only one of the three that is a decision. */}
+      <div class="bkp-r">
+        ${[[I.wallet,   'Interview fee',    a.price, 1],
+           [I.time,     'Length',           '45 minutes, recorded'],
+           [I.document, 'Report turnaround','Within 24 hours']
+          ].map(([ic,lab,val,acc],i)=>`<div class="bkp-f" style="--mk:var(--mk-${i+1})">
+          <i class="bkp-fi">${ic}</i>
+          <span class="bkp-fl">${lab}</span>
+          <span class="bkp-fv${acc?' bkp-fv-acc':''}">${val}</span>
+        </div>`).join('')}
       </div>
     </div>
-    ${a.bio?`<p class="agid-bio">${a.bio}</p>`:''}
-    ${''/* THE THREE FACTS ARE A ROW, NOT A STACK (Maryam, 31 Aug 2026):
-          `.facts.eo-facts`, the same cell §73 draws on the Enroll page — a
-          24px mark, the fact's NAME in h4, its value under it, and a hairline
-          centred in the grid's own column gap.
-
-          They were three `.kv` bands: a 184px label column, a value beside it,
-          a full-width rule under each, 150px of page for nine words. That is
-          the shape for a ledger of many rows read one at a time (`V.booking`'s
-          receipt, `V.account`'s settings); three facts about one purchase are
-          a row you take in at once, which is exactly what §73's note argues
-          about `enrolPlate`'s four.
-
-          THE LABEL IS THE STRONG LINE AND THE VALUE IS UNDER IT, which
-          inverts `.kv` and `.stat` both, and §73's note is the reason: these
-          are not figures being compared, they are three different things, so
-          what you scan is the names. The fee is the one accent string
-          (`eo-fv-acc`), because it is the only one of the three that is a
-          decision.
-
-          NO NEW CLASS AND NO NEW LAYER. Every §73 selector for this family is
-          written `.app .page .facts.eo-facts …` rather than under `.sec.eo`,
-          so the cell travels; what it could not do was count to three, and
-          that is answered in §73 itself by letting the grid count its own
-          children (§72's rule, applied one layer over). */}
-    <div class="facts eo-facts mt5">
-      ${[[I.wallet,   'Interview fee',    a.price, 1],
-         [I.time,     'Length',           '45 minutes, recorded'],
-         [I.document, 'Report turnaround','Within 24 hours']
-        ].map(([ic,lab,val,acc])=>`<div>
-        <i class="eo-fi">${ic}</i>
-        <span class="eo-fb"><span class="eo-fl">${lab}</span>
-          <span class="eo-fv${acc?' eo-fv-acc':''}">${val}</span></span>
-      </div>`).join('')}
-    </div>
-  </div>
   ${''/* TWO TAL CARDS ON ONE PAGE, AND THE SECOND ONE WENT.
         This page carried a hand-written "What to expect with <name>" card
         from before ai6 existed. ai6 then gave the page a summary of its own
@@ -13841,14 +14383,93 @@ V.agent = (f) => {
         composer at the foot of the page carries this page's suggestions
         (§ai4 keys them off the view), and "Run a mock interview with me" is
         one of them. */}
-  <div class="sec">
-    <div class="sec-h"><h2>Pick a slot</h2><span class="t-helper-01">Times in ET</span></div>
-    <div class="daystrip">
-      ${[['Wed',19],['Thu',20],['Fri',21],['Mon',24],['Tue',25]].map(([d,n],i)=>
-        `<button class="day ${i===1?'on':''}"><div class="d">${d}</div><div class="n">${n}</div></button>`).join('')}
+  ${''/* THE PICKER IS TWO NUMBERED STEPS AND THE "Pick a slot" HEADING IS GONE
+        WITH THEM. One heading over two controls said the pair was one act; it
+        is two, and the second depends on the first, which is exactly what a
+        numeral in front of each says without a word of copy. It also buys the
+        thing the old shape could not have: with the day named above the times,
+        "Thursday, August 20" is READ rather than inferred from which cell in
+        the row above is orange.
+
+        THE HEADING IS A `<h3>`, NOT A `.sec-h`. §15's own slot-picker block
+        keys on `.sec:has(> .daystrip)` and re-lays that section's `.sec-h` at
+        desktop — a rule written for one heading over the whole width, which is
+        the shape this replaces. Two headings inside a panel are not that
+        section's heading, so the panel takes none and §76 draws the row.
+
+        TRAP 13 DOES NOT BITE HERE and it is worth saying why rather than
+        finding out: §10.15's 184px label column only reaches a `.sec` that
+        CONTAINS a `.sec-h`, and neither of these two sections has one. That is
+        the reason the picker keeps its own heading inside the panel rather than
+        being given the section's — the opt-out list would have had to grow by a
+        class, and §69/§73 both record how quietly that is lost again. */}
+  <div class="bks-w">
+    <div class="bks">
+      <div class="bks-c">
+        <div class="bks-h"><span class="bks-n">1</span><h3>Choose a date</h3></div>
+        ${''/* THE CELL KEEPS `.day` SO THE SELECTION KEEPS WORKING. views.js's
+              own delegated handler is `t.closest('.day')` — it clears `.on`
+              across every `.day` in the device and sets it on the one pressed —
+              so an open date wearing that class is selectable for free, and
+              §10.29's accent fill is what draws it. Re-creating either is the
+              mistake §75's note records about `.rec-lab`.
+
+              AND ONLY AN OPEN DATE WEARS IT. The 26 closed ones and the six
+              adjacent-month ones are `.bkd` alone and `disabled`, so the
+              handler cannot see them and there is no state to clear. That is
+              also what keeps the class honest: `.day` means "a day you can
+              book" on this page exactly as it does on every other.
+
+              THE DISC IS A STATED EXCEPTION TO `--radius` (§76). Every
+              `border-radius` in the build resolves through a 0px token; §56
+              grants marks the one curve this system allows, and a date numeral
+              in a 7-column grid is a mark. A square accent fill on one cell of
+              42 reads as a filled table cell, which is the thing the tick-mark
+              lattice already means somewhere else. */}
+        <div class="bkcal">
+          <p class="bkcal-m">${CAL_MN} ${CAL_Y}</p>
+          <div class="bkcal-w">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+            .map(d=>`<span>${d}</span>`).join('')}</div>
+          <div class="bkcal-g">${calCells.map(([n,out])=>{
+            const open = !out && calOpen.includes(n);
+            return `<button class="bkd${open?' day':''}${out?' bkd-out':''}${
+              open&&n===calSel?' on':''}"${open?'':' disabled'}>${n}</button>`;
+          }).join('')}</div>
+        </div>
+      </div>
+      <div class="bks-c">
+        <div class="bks-h"><span class="bks-n">2</span><h3>Choose a time</h3>
+          <span class="bks-tz">${I.time}Times in ET</span></div>
+        ${''/* THE COUNT IS COUNTED. The reference prints "6 available slots"
+              over a grid in which two of the six are struck through, so its own
+              chip disagrees with the thing it labels by two. `open` is
+              `slots.length - taken.length`, so the pill cannot drift from the
+              grid however either changes. */}
+        <p class="bks-day"><b>${days[dSel][1]}, ${CAL_MN} ${days[dSel][2]}</b>
+          <span class="bks-cnt">${open} available slots</span></p>
+        <div class="slots bks-slots">${slots.map((t,i)=>
+          `<button class="slot ${i===sSel?'on':''}" ${taken.includes(i)?'disabled':''}>${t}</button>`).join('')}</div>
+        ${''/* WHAT THE THING YOU ARE BUYING ACTUALLY IS. The reference puts it
+              here and it is the one piece of its copy the product can stand
+              behind without inventing anything: `V.booking`, `CALL` and the
+              `booked` dashboard all already say this interview is a video call,
+              and `callOpen('iv')` is the surface it opens. It sits under the
+              times because that is the moment the abstraction — "a slot" —
+              becomes a thing that happens to you on a Thursday evening. */}
+        <div class="bks-note"><i class="bks-ni">${I.video}</i>
+          <span class="bks-nb"><b>Video interview</b>
+            <span>You&rsquo;ll join a video call with ${a.n.split(' ')[0]}.</span></span></div>
+      </div>
     </div>
-    <div class="slots">${slots.map((t,i)=>
-      `<button class="slot ${i===4?'on':''}" ${i===0||i===5?'disabled':''}>${t}</button>`).join('')}</div>
+    ${''/* THE TIMEZONE IS SAID ONCE NOW (Maryam, 31 Aug 2026). "All available
+          times are in Eastern Time (ET)" stood under the picker as well as
+          `.bks-tz` on the column heading, and the argument for keeping both —
+          that "ET" beside the numbers is not enough for a reader who does not
+          know the abbreviation — did not survive the row being read: the
+          sentence sat below the grid it qualifies, so a reader who needed it
+          had already read the times. The tag stays, because it is beside them.
+          `.bks-foot`'s rules go with the markup rather than being left as the
+          "gate nothing writes" tell — §76 and §63 both. */}
     ${''/* NO SCARCITY LINE (Maryam, 31 Aug 2026). "Two other candidates are
           looking at Thursday. Slots are held for 10 minutes once you continue."
           was two claims and the product can stand behind neither: nothing in
@@ -13856,7 +14477,9 @@ V.agent = (f) => {
           — pressing Continue goes to a payment screen that waits indefinitely.
           A countable-strangers line under a picker is a pressure device, and
           §59 is a whole layer arguing that this product spends urgency only
-          where urgency is real. */}
+          where urgency is real. THE REFERENCE HAS NONE EITHER, which is worth
+          recording: the pressure it applies is "6 available slots", and that is
+          a count of a real thing. */}
   </div>
 
   ${''/* THE PAGE CLOSES ON ONE BUTTON, AND IT REPLACED A FIXED BAR
@@ -13898,8 +14521,59 @@ V.agent = (f) => {
         it. If 695 is the real fee, the fix is `AGENTS.<agent>.price` and all
         four surfaces follow; if it is the fee plus something this page does not
         draw, the something belongs on the page before the total does. */}
-  <div class="sec">
+  ${''/* AND THE CHECKOUT IS A ROW, NOT A LOOSE BUTTON (Maryam, 31 Aug 2026).
+        The button had a section of its own with nothing else in it, so the page
+        ended on 40px of black in a field of white and the transaction had no
+        boundary — you could not tell whether the button belonged to the picker
+        above it or to the page. It is a row now: what it costs on the left, the
+        action on the right.
+
+        THE BOUNDARY IS A RULE ABOVE IT, NOT A BOX ROUND IT (Maryam, 31 Aug
+        2026, same pass as the other two). The four-sided border was doing one
+        job — separating the transaction from the picker — and three sides of it
+        were paying for that one. A hairline above says the same thing and is
+        the same object the profile block closes on 400px higher, so the page
+        reads as three blocks divided twice rather than as three boxes.
+
+        "SECURE & ENCRYPTED PAYMENT" WENT WITH IT. It was the one piece of new
+        copy on the page and it was true — `ai7`'s note is explicit that the fee
+        is taken by Stripe on its own hosted page — but true is not the test for
+        a line that sits beside the button it qualifies. It was reassurance
+        offered before anything had been asked for, on a screen that does not
+        draw a card field, and with the box gone it was a grey sentence floating
+        between a figure and a black button. The handoff still says it: the next
+        screen is Stripe's. `.bkc-s` goes from §76 and §63 with the markup.
+
+        IT IS STILL NOT `.stickybar`, AND THAT IS THE SAME DECISION AS BEFORE.
+        The bar this replaced was `position:fixed` and sat ON TOP of the ask
+        dock's reserved strip — §21.311 and §16.457 each push the dock up 84px
+        purely to clear it — so the foot of the frame was two floating rows
+        deep. This is in page flow. The reference's is too: it scrolls with the
+        page and is simply the last thing on it.
+
+        THE BUTTON STAYS BLACK. `.btn-p` in page flow is the product's primary
+        and the accent gradient is what it takes INSIDE a plate (§19, and §75
+        for the recommendation's black card). The reference's is orange because
+        everything else on its page is violet; ours is orange only where it is
+        the one lit thing on a dark ground, and this row is white.
+
+        THE FEE AND THE BUTTON DISAGREE, AND THIS ROW IS WHERE IT BECAME
+        VISIBLE. `$695` is a literal and it is Maryam's, twice asked for
+        (31 Aug 2026, reaffirmed after being flagged); every other surface in
+        the build reads `AGENTS.<agent>.price`, which is $95 for Priya — the
+        `.rec-f` chip in the panel above, that panel's first fact, the agent
+        card you arrived from, and `V.booking`'s Paid row. Those two figures
+        used to sit ~600px apart down a column and now sit on one line, which is
+        the reference's structure doing what a checkout row is for: it puts the
+        price beside the total. THE STRUCTURE IS NOT THE BUG. If 695 is the real
+        fee the fix is `AGENTS.<agent>.price` and all five surfaces follow; if
+        it is the fee plus something this page does not draw, that something
+        belongs in this row as a second line before the total does. */}
+  <div class="bkc">
+    <div class="bkc-fee"><span class="bkc-fl">Interview fee</span>
+      <span class="bkc-fv">${a.price}</span></div>
     <button class="btn btn-p" data-go="booking">Proceed to pay $695 ${I.arrowRight}</button>
+  </div>
   </div>
 </div></main>`;
 };
@@ -13955,7 +14629,7 @@ V.booking = (f) => {
       <div class="rec-b">
         <div class="rec-top">
           <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
-              <span class="rec-v">${I.checkFilled}</span></span>
+              <span class="rec-v">${I.verified}</span></span>
             <span class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</span></p>
           <p class="rec-x"><b>Talent agent,</b> assesses ${a.range}</p>
         </div>
@@ -15416,7 +16090,7 @@ function ivRow(kind, label, date, outcome, len){
     <div class="ivrow-who">
       ${avatar(a,40)}
       <span class="ivrow-wb"><b>${a.n}</b><span>45 minutes &middot; report signed</span></span>
-      <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+      <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
     </div>
   </div>`;
 }
@@ -15595,7 +16269,7 @@ function render(){
   }
   const key = S.stage + '/' + S.view + (S.call ? '/call' : '');
   const entered = key !== MO.key;
-  const OVERLAYS = ['nav','notif','tal','editProfile','editPhoto','addCard','notes'];
+  const OVERLAYS = ['nav','notif','acct','tal','editProfile','editPhoto','addCard','notes'];
   const opened = OVERLAYS.filter(k => S[k] && !MO.open[k]);
   const shown  = OVERLAYS.filter(k => S[k]);
   const grew = S.thread.length > MO.thread;
@@ -15643,6 +16317,8 @@ device.addEventListener('input', e => {
 
 device.addEventListener('click', e => {
   const t = e.target;
+
+  if(S.acct && !t.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
 
   const askT = t.closest('[data-tal-ask]');
   if(askT){
@@ -15693,16 +16369,17 @@ device.addEventListener('click', e => {
   const ra = t.closest('[data-readall]');
   if(ra){ notifList().forEach(n=>{ if(!S.read.includes(n.t)) S.read.push(n.t); }); render(); return; }
 
-  const pw = t.closest('.psw-t[data-portal]');
+  const pw = t.closest('[data-swap]');
   if(pw){
-    const k = pw.dataset.portal;
+    const k = pw.dataset.swap;
     if(k !== S.portal){
       S.portal = k;
       S.view = k==='leader' ? 'leadDash' : 'dashboard';
       S.hist = []; S.nav = false; S.notif = false; S.tal = false;
       talReset();
-      render();
     }
+    S.acct = false;
+    render();
     return;
   }
 
@@ -15710,6 +16387,7 @@ device.addEventListener('click', e => {
   if(g){ e.preventDefault();
     const mark = g.dataset.read; if(mark && !S.read.includes(mark)) S.read.push(mark);
     if(S.notif) S.notif=false;
+    if(S.acct) S.acct=false;
     const fresh = !!(g.closest('.sn-item') || g.classList.contains('shell-logo'));
     go(g.dataset.go, fresh); return; }
 
@@ -15718,7 +16396,8 @@ device.addEventListener('click', e => {
     const w = tog.dataset.toggle;
     if(w==='nav'){ S.nav=!S.nav; render(); }
     if(w==='tal'){ S.tal=!S.tal; if(!S.tal) talReset(); render(); }
-    if(w==='notif'){ S.notif=!S.notif; render(); }
+    if(w==='notif'){ S.notif=!S.notif; if(S.notif) S.acct=false; render(); }
+    if(w==='acct'){ S.acct=!S.acct; if(S.acct) S.notif=false; render(); }
     return;
   }
   if(t.closest('[data-close="nav"]')){ S.nav=false; render(); return; }
@@ -16052,7 +16731,7 @@ V.ivt = (f) => {
   <div class="sec">
     <div class="sec-h"><h2>The transcript</h2><span class="t-helper-01">${lines.length} of ${iv.lines.length} lines</span></div>
     <div class="srch ivt-srch">
-      <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+      <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
       <input class="inp" id="ivtQ" placeholder="Find a word in the transcript" aria-label="Search the transcript" value="${S.ivq||''}">
     </div>
     <div class="ivt-filters">
@@ -16484,7 +17163,7 @@ V.rp = (f) => {
               <span class="rp-w">With ${r.who} &middot; ${r.role.toLowerCase()}</span>
               <span class="rp-src">${I.video}${r.from}</span>
             </span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`; }).join('')}
       </div>
     </div>
@@ -16877,7 +17556,7 @@ function askOpen(q){
     S.askFrom = S.view;
     S.askOpen = true;
     ASK_FRESH = true;
-    S.nav = false; S.notif = false; S.tal = false;
+    S.nav = false; S.notif = false; S.acct = false; S.tal = false;
     render();
     if(q) return ask(q);
     const el = device.querySelector('#askIn');
@@ -16927,7 +17606,7 @@ device.addEventListener('keydown', e => {
 });
 
 const _goAsk = go;
-go = function(v){ if(S.askOpen && v !== S.askFrom){ S.askOpen = false; } _goAsk(v); };
+go = function(v, fresh){ if(S.askOpen && v !== S.askFrom){ S.askOpen = false; } _goAsk(v, fresh); };
 
 render();
 
@@ -17641,7 +18320,7 @@ function bookedRow(b){
       <span class="cardrow-t">${b.t}</span>
       <span class="cardrow-d">${b.d}</span>
     </span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 }
 
@@ -17649,7 +18328,7 @@ function faceRow(p, detail, go){
   return `<button class="tile clk gcard face-row" data-go="${go}">
     <span class="mem-av mem-ph">${avatar({i:p.i, img:AV[p.img]}, 36)}</span>
     <span class="gcard-b"><h3>${p.name}</h3><span class="sub">${detail}</span></span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 }
 
@@ -17762,7 +18441,7 @@ V.leadDash = () => {
     <div class="sec-h"><h2>Needs attention</h2><span class="t-helper-01">From course activity, not from you</span></div>
     <div class="lead-tools">
       <div class="srch lead-srch">
-        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
         <input class="inp" id="leadQ" value="${S.leadQ}" placeholder="Search a name or cohort" aria-label="Search flagged candidates" autocomplete="off">
       </div>
       <div class="cs lead-filter" role="tablist" aria-label="Severity">
@@ -18014,7 +18693,7 @@ V.leadCohorts = () => {
             <td class="num">${lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>'}</td>
             <td class="num">${bad ? `<span class="tag red sm">${bad} at risk</span> ` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
             <td>${c.callDay} <span class="t-helper-01">${c.callTime.toLowerCase()}</span></td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>
@@ -18081,7 +18760,7 @@ V.leadCohort = () => {
             <td><span class="tag ${tk === 'done' ? 'green' : tk === 'late' ? 'org' : tk === 'none' ? 'red' : ''} sm">${tl}</span></td>
             <td>${m.last.toLowerCase()}</td>
             <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>
@@ -18315,7 +18994,7 @@ V.leadReports = () => {
             <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>
@@ -18649,7 +19328,7 @@ V.leadEvals = () => {
             <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
             <span class="gcard-b"><h3>${e.name}</h3>
               <span class="sub">Interviewed ${e.when.toLowerCase()} &middot; quiz ${e.quiz} of 100 &middot; I proposed Explorer &ndash; ${e.ai}</span></span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`
         : `<div class="cardrow">
             <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
@@ -18671,7 +19350,7 @@ V.leadEvals = () => {
             <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
             <span class="gcard-b"><h3>${s.name}</h3>
               <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days</span></span>
-            <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
           </button>`
         : `<div class="cardrow">
             <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
@@ -21165,7 +21844,7 @@ function callOpen(kind){
   const spec = make(cfg(S.stage));
   S.call = {kind, t0:Date.now(), spec,
     mic:true, cam:true, share:false, hand:false, cc:true, panel:spec.panel};
-  S.nav = false; S.notif = false; S.tal = false;
+  S.nav = false; S.notif = false; S.acct = false; S.tal = false;
   callStop();
   callTimer = setInterval(callTick, 500);
   render();
@@ -21277,6 +21956,98 @@ device.addEventListener('click', e => {
   else S.call[k] = !S.call[k];
   render();
 });
+
+render();
+
+
+
+
+function pageLabel(page){
+  const h = page.querySelector('.ph h1');
+  const title = h ? h.textContent.trim() : '';
+  const mod = crumbMod();
+  if(!PARENT[S.view] && mod) return mod[0];
+  if(title) return title;
+  const c = page.querySelector('.crumb span:not(.sep)');
+  if(c && c.textContent.trim()) return c.textContent.trim();
+  return mod ? mod[0] : null;
+}
+
+const CRUMB_STACK = [];
+let CRUMB_PREV = null;
+
+function syncStack(){
+  const n = S.hist.length;
+  if(n < CRUMB_STACK.length){ CRUMB_STACK.length = n; return; }
+  while(CRUMB_STACK.length < n){
+    const at = CRUMB_STACK.length;
+    CRUMB_STACK.push(at === n - 1 ? CRUMB_PREV : null);
+  }
+}
+
+function trailParts(page){
+  const label = pageLabel(page);
+  syncStack();
+
+  const out = S.hist.map((v, i) => {
+    const m = crumbMod(v);
+    return {label: CRUMB_STACK[i] || (m ? m[0] : null), go: v};
+  }).filter(p => p.label);
+
+  if(!out.length && PARENT[S.view]){
+    const m = crumbMod();
+    if(m) out.push({label: m[0], go: m[1]});
+  }
+
+  if(label) out.push({label});
+  CRUMB_PREV = label;
+  return out;
+}
+
+function stripPageHead(page){
+  const h = page.querySelector('.ph h1');
+  if(h) h.remove();
+  const c = page.querySelector('.crumb');
+  if(c) c.remove();
+}
+
+function drawTrail(trail, parts){
+  trail.innerHTML = parts.map((p, i) => {
+    const now = i === parts.length - 1;
+    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${now
+      ? `<span class="crumb-l" aria-current="page">${p.label}</span>`
+      : p.go
+        ? `<a class="crumb-l" data-go="${p.go}">${p.label}</a>`
+        : `<span class="crumb-l">${p.label}</span>`}</li>`;
+  }).join('');
+}
+
+function tidyPh(page){
+  const ph = page.querySelector('.ph');
+  if(!ph) return;
+  const top = ph.querySelector('.ph-top');
+  if(top && !top.firstElementChild) top.remove();
+  const main = ph.querySelector('.ph-main');
+  if(main && !main.firstElementChild) main.remove();
+  ph.classList.toggle('ph-bare', !ph.firstElementChild);
+}
+
+function placeTopbar(){
+  const trail = device.querySelector('.shell .crumb-trail');
+  const page  = device.querySelector('.view-col .page');
+  if(!trail || !page) return;
+
+  const parts = trailParts(page);
+  stripPageHead(page);
+  drawTrail(trail, parts);
+  tidyPh(page);
+}
+
+const _baseTop = render;
+render = function(){
+  _baseTop();
+  try { placeTopbar(); } catch(e){ console.warn('topbar', e); }
+};
 
 render();
 

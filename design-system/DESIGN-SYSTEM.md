@@ -650,10 +650,29 @@ dsCallUrgent(row)       // a call row's two priorities — see below
 dsCallLeft(when)        // "in 2 days" -> "2 days left" / "In 2 hours"
 ```
 
-The icon set is the official Material **filled** cut, checked against
-`@material-design-icons/svg/filled`. Several marks look linear and are correct:
-the filled cut is intrinsically hollow for a ring or a tick. Do not blanket-fill
-them.
+The icon set is **Material Symbols, the Rounded style at FILL 0** — Google's
+current library, linear, with rounded terminals. Every mark is the official
+Rounded outlined file from `google/material-design-icons`, pasted rather than
+drawn, so the set is one optical family. Do not mix a filled mark into it: the
+cut this replaced was filled, and what made it work was holding ONE cut, not
+which cut it was.
+
+**Four marks are filled, and fill is a STATE axis rather than a style** — which
+is Google's own definition of it. The set sits at FILL 0 and flips to 1 to say
+"this one is on": `star` / `starOutline` (a rating's lit and unlit slots),
+`checkFilled` (done, against `checkOutline`'s not-done) and `stopFilled` (a
+solid dot). The test for adding a fifth is whether the **same glyph also appears
+unfilled** and the difference is the information. `trophy`, `certificate` and
+`shield` fail it — they are subject marks and never appear both ways.
+
+**The viewBox is `0 -960 960 960`, not `0 0 24 24`.** Material Symbols are drawn
+forty times larger than Material Icons, with the baseline at y=0 and the glyph
+above it in negative y. `I.name` states this for you; if you wrap `inner('name')`
+in an `<svg>` of your own you must state it too, or the mark renders as an
+invisible speck in the top-left corner — nothing throws.
+
+The two brand marks keep their own boxes: `TN_MARK` is `0 0 194.28 194.28` and
+`CHEV` is a bare 24-grid path you supply a `0 0 24 24` box for.
 
 ### Tal's summary types itself — `dsTypeSummary(p, key)`
 

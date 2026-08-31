@@ -290,7 +290,7 @@ function callOpen(kind){
   /* the rail and any open panel belong to the page underneath; leaving them set
      would put them back over the page the moment the call closes, which is not
      where the reader left them */
-  S.nav = false; S.notif = false; S.tal = false;
+  S.nav = false; S.notif = false; S.acct = false; S.tal = false;
   callStop();
   callTimer = setInterval(callTick, 500);
   render();

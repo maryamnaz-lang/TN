@@ -4,38 +4,98 @@
     {
       "name": "tn",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8799", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8799",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8799
     },
     {
       "name": "tn2",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8802", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8802",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8802
     },
     {
       "name": "tn3",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8806", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8806",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8806
     },
     {
       "name": "tn4",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8811", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8811",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8811
     },
     {
       "name": "tn5",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8823", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8823",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8823
     },
     {
       "name": "tn6",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8831", "--bind", "127.0.0.1"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8831",
+        "--bind",
+        "127.0.0.1"
+      ],
       "port": 8831
+    },
+    {
+      "name": "tn7",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8841",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8841
+    },
+    {
+      "name": "tn8",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8853",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8853
     }
   ]
 }

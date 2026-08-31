@@ -1,0 +1,236 @@
+/* ==========================================================================
+   78. THE TOP BAR — THE TRAIL, AND THE FACE THAT OPENS A MENU
+   Maryam, 31 Aug 2026: "the switcher from the top left should be removed …
+   the profile icon on the very right should have a chevron on its right side,
+   on its click it should give 2 options … since we removed the switcher from
+   left, I want you to show the module name there and breadcrum as well …
+   since we are showing heading on the top header so remove the heading from
+   the first section."
+
+   THREE MOVES AND THEY ARE ONE MOVE. The portal switch was a personal control
+   in the frame's position; the trail is a frame control and had no position at
+   all; the page's name was being said twice, once by a trail that did not
+   exist yet and once by an `<h1>`. Each of the three is the answer to the one
+   before it, which is why they land in a single layer rather than three.
+
+   WHAT IS IN HERE AND WHAT IS NOT. This layer states geometry, grounds,
+   borders, one transition and two fills. Every font-size, font-weight,
+   text-transform and text colour these families use is §63 §17 — including
+   the separator's ink, which reads as mechanism and is not: `content:'/'` is
+   markup this layer supplies and the grey it is set in is a type decision.
+
+   THE MARKUP IS `crumbBar` / `acctMenu` (views.js) AND `placeTopbar`
+   (ai11.js), and the trail is drawn by the pass rather than by the header for
+   the reason both of those notes give: `shell()` is evaluated before `view()`,
+   so the bar cannot read a page that does not exist yet.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 78.1 ---
+   THE TRAIL TAKES THE SLACK, AND `min-width:0` IS WHAT MAKES THAT SAFE
+
+   `.shell` is a flex row and `.shell-right` holds its place with
+   `margin-left:auto` (§01). Giving the trail `flex:1 1 auto` means it absorbs
+   everything between the wordmark and the bell — which is what a breadcrumb
+   should do — but a flex item's default `min-width` is `auto`, so a long trail
+   would refuse to shrink below its content and push the bell off the bar
+   instead. `min-width:0` on both the item and the list is the pair that lets
+   `overflow:hidden` work at all.
+
+   IT IS AN `<ol>`, because a breadcrumb is an ordered list and that is what a
+   screen reader is looking for. The list marker is off in §01's reset.
+   ------------------------------------------------------------------------ */
+.app .crumb-bar{
+  flex:1 1 auto;min-width:0;
+  display:flex;align-items:center;
+  padding-left:var(--s03)}
+.app .crumb-trail{
+  display:flex;align-items:center;min-width:0;
+  margin:0;padding:0;list-style:none}
+
+/* Each crumb may shrink, and the LAST one shrinks last. `flex:0 1 auto` on
+   every item lets the trail give way from the left, which is the order a
+   reader can afford to lose it in — the product's name is the crumb you can
+   guess and the page you are on is the one you cannot. */
+.app .crumb-i{
+  display:flex;align-items:center;min-width:0;flex:0 1 auto}
+.app .crumb-now{flex:0 1 auto}
+
+/* THE SEPARATOR IS A PSEUDO-ELEMENT, NOT AN ELEMENT, and the in-page `.crumb`
+   component's `<span class="sep">/</span>` is why that is worth stating. A
+   separator that is a real element is one more node between every pair of
+   crumbs for a screen reader to read out, and one more thing to count when
+   the trail is trimmed on a phone below. `::before` is neither.
+
+   `flex:none` so the slash never absorbs the shrink the label needs. */
+.app .crumb-i + .crumb-i::before{
+  content:'/';flex:none;
+  padding:0 var(--s02)}
+
+/* A crumb's own label is a single line that ellipsises. The underline is the
+   hover affordance the in-page `.crumb` already uses (§02.56) — a transparent
+   1px in the resting state so nothing moves when it arrives. Written PLAIN,
+   per trap 18: the build rewrites `:hover` to `:hover:where(.__nh)` itself,
+   and a source that pre-disarms it fails `build-ds.py`'s subset check. */
+.app .crumb-l{
+  display:block;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  border-bottom:1px solid transparent}
+.app a.crumb-l:hover{border-bottom-color:currentColor;cursor:pointer}
+
+/* ------------------------------------------------------------------ 78.2 ---
+   ON A PHONE THE TRAIL IS THE PAGE
+
+   At 390 the bar is the toggle, the wordmark, the bell and the face — about
+   226px of it — and what is left will not hold three crumbs and two slashes.
+   Trimming to the last two was tried and is worse than it sounds: "… /
+   Transcript" reads as a trail that failed to load, and the parent it keeps is
+   the one crumb the rail already shows lit.
+
+   So below 600 the trail is its last item, which is the page's own name — the
+   `<h1>` that came off the first section, back in the one place there is room
+   for it. §31's old note about the switch taking a second row on the phone is
+   the shape this replaces; there is no second row now.
+   ------------------------------------------------------------------------ */
+@container app (max-width:599.98px){
+  .app .crumb-i:not(.crumb-now){display:none}
+  .app .crumb-i + .crumb-i::before{content:none}
+  .app .crumb-bar{padding-left:var(--s02)}
+}
+
+/* At 900 the wordmark takes the drawer's own column (§01/§14) and §34 puts a
+   rule down its right edge, so the trail starts exactly where the content
+   column does — which is where the page it names begins. That is the position
+   §31's note claimed for the switch, and it is a better fit for a trail: the
+   switch framed the whole product and sat over the rail; this names the column
+   under it. */
+@container app (min-width:900px){
+  .app .crumb-bar{padding-left:var(--s05)}
+}
+
+/* ------------------------------------------------------------------ 78.3 ---
+   THE FACE, AND THE CHEVRON THAT SAYS IT IS A MENU
+
+   `.shell-act` is a 48px square with `place-items:center` (§01) and every
+   other control in the bar is exactly that. This one holds two objects, so it
+   takes an auto width and its own padding — and keeps the 48px height, so the
+   bar's row is unchanged and the hover wash is still the same block as the
+   bell's beside it.
+
+   THE CHEVRON IS 16px AND NOT §01'S 24. `.shell-act svg` sizes every glyph in
+   this bar for a control that IS the glyph; here the glyph is the face's
+   disclosure, and at 24 beside a 30px portrait it reads as a second control
+   rather than as one object's affordance. It is (0,3,0) against §01's (0,2,0),
+   which is enough — both are unconditional.
+
+   IT TURNS OVER WHEN THE MENU IS OPEN, which is the one piece of state on the
+   bar that a reader can see without moving the pointer. */
+.app .shell-act.acct-t{
+  width:auto;height:48px;
+  display:flex;align-items:center;gap:var(--s02);
+  padding:0 var(--s02) 0 var(--s03)}
+.app .acct-t .acct-c{
+  width:16px;height:16px;flex:none;
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .acct-t.on .acct-c{transform:rotate(180deg)}
+
+/* ------------------------------------------------------------------ 78.4 ---
+   THE MENU
+
+   ANCHORED ON `.shell-right`, NOT ON THE BUTTON. The row is the bar's own
+   right-hand group and it ends at the header's padding edge, so `right:0` puts
+   the menu's right edge on the same pixel as the face's — and it stays there
+   when the bell's badge appears and the group gets 4px wider. Anchoring on the
+   button would need `position:relative` on a 48px box that the menu is four
+   times the width of, which also puts it inside that box's own hover wash.
+
+   §01 gives `.shell` `z-index:30` and `.notif` is 50; this sits between them,
+   above the page and under the panel — which is the order the two controls are
+   in, and the reason the bell and the face cannot both be open (views.js).
+
+   IT IS A PANEL WITH ONE HAIRLINE, NOT A CARD WITH A SHADOW. `--radius` is 0px
+   by token and §02's opening note is that depth here is rhythm and rule weight
+   and nothing else, so this is `--layer-01` inside `1px solid var(--rule)` —
+   the same two declarations §41's `.cal` and §76's three panels take.
+
+   VISIBILITY, NOT `display`, so the arrival can be a transition at all — the
+   pair §03.276 already uses for the notification panel, for the same reason. */
+.app .shell-right{position:relative}
+.app .acct-menu{
+  position:absolute;top:calc(100% - var(--s02));right:0;z-index:40;
+  min-width:248px;
+  display:flex;flex-direction:column;
+  background:var(--layer-01);
+  border:1px solid var(--rule);
+  opacity:0;visibility:hidden;transform:translateY(-4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.app .acct-menu.on{opacity:1;visibility:visible;transform:translateY(0)}
+
+/* A ROW IS A MARK AND A LABEL, and the mark column is a fixed 24 so the glyph
+   and the portrait start on the same pixel. `text-align:left` because a
+   `<button>` centres its content by default and these are rows, not controls
+   in a row. */
+.app .acct-i{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  text-align:left;width:100%}
+.app .acct-i + .acct-i{border-top:1px solid var(--rule)}
+.app .acct-i:hover{background-color:var(--overlay-hover);cursor:pointer}
+.app .acct-i-mk{
+  flex:none;width:24px;height:24px;
+  display:grid;place-items:center;position:relative;overflow:hidden}
+.app .acct-i-mk svg{width:20px;height:20px;fill:var(--icon-primary)}
+
+/* THE SWITCH ROW'S MARK IS THE OTHER PERSON'S FACE, and it is square because
+   `.shell-avatar` two inches above it is square. §56 lets a mark curve — the
+   journey's step discs — and that is a rule about a mark in a ROW OF MARKS,
+   where the disc is what separates one from the next. Here there are two rows
+   and one of them is a glyph. */
+.app .acct-i-av img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* The label may be long — "Switch to Cohort Leader" is the longer of the two —
+   and the menu is 248 wide, so it wraps rather than overflowing. `min-width:0`
+   for the same reason the trail needs it. */
+.app .acct-i-t{min-width:0}
+
+/* ------------------------------------------------------------------ 78.5 ---
+   REDUCED MOTION NEEDS ITS OWN BLOCK
+
+   §13.187 clamps every duration to 1ms, which on a transition is close enough
+   to off. It is not off for the chevron's `transform`, which would still
+   snap through 180 degrees — harmless — but the menu's `visibility` under a
+   1ms transition can arrive before its `opacity`, which is a flash. Stated
+   rather than inherited, the way §21.4, §27.8, §33.6, §40 and §70 each do.
+   ------------------------------------------------------------------------ */
+@media (prefers-reduced-motion:reduce){
+  .app .acct-menu,.app .acct-t .acct-c{transition:none}
+}
+
+/* ------------------------------------------------------------------ 78.6 ---
+   WHAT IS LEFT OF THE PAGE HEADER
+
+   `placeTopbar` takes the `<h1>` out and stamps `.ph-bare` on a `.ph` that has
+   nothing left in it — which is most of them, because `phSub` already draws
+   nothing for a `&middot;` fact row (its own note says why), so `ph('Profile')`
+   was the heading and no more.
+
+   IT IS HIDDEN RATHER THAN REMOVED, and that is deliberate. §56 and §70 place
+   the head band's members with `:has()` gates and explicit grid rows —
+   `.modhead:has(> .head-col) > .ph.ph-you`, `:has(> .ph:not(.ph-you))` — and
+   `:has()` is STRUCTURAL, so a `display:none` element still satisfies every
+   one of them at no cost in space. Deleting the node would flip §70's band
+   between its two arrangements on pages this change has no business moving.
+
+   THE DASHBOARDS KEEP THEIRS. §62 puts the reader's face, their rank medal and
+   the celebration line in this same `.ph`; take the greeting out and all three
+   are still there, so `.ph-bare` never lands on it.
+
+   `.crumb`'S OWN RULES (§02.53, §06.4, §11.77, §12.416) ARE NOT DELETED. The
+   pass removes that element from the portal's pages, so nothing in `hifi/`
+   draws it any more — but it is a design-system component that `gallery.html`
+   documents and a hand-authored page can still use, which is the case
+   CLAUDE.md's "gate nothing writes" test explicitly exempts: the behaviour
+   ships with it, because there is no behaviour. */
+.app .ph.ph-bare{display:none}

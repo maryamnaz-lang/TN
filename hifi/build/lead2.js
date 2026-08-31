@@ -223,7 +223,7 @@ V.leadCohorts = () => {
             <td class="num">${lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>'}</td>
             <td class="num">${bad ? `<span class="tag red sm">${bad} at risk</span> ` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
             <td>${c.callDay} <span class="t-helper-01">${c.callTime.toLowerCase()}</span></td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>
@@ -309,7 +309,7 @@ V.leadCohort = () => {
             <td><span class="tag ${tk === 'done' ? 'green' : tk === 'late' ? 'org' : tk === 'none' ? 'red' : ''} sm">${tl}</span></td>
             <td>${m.last.toLowerCase()}</td>
             <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>
@@ -632,7 +632,7 @@ V.leadReports = () => {
             <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
-            <td class="ldr-go"><svg viewBox="0 0 24 24">${inner('chevRight')}</svg></td>
+            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
           </tr>`;
         }).join('')}
       </table>

@@ -87,13 +87,19 @@
      down its right edge has to land on the same pixel as the rail's own
      border-right or the frame has two vertical lines a hair apart. §01 sets
      `gap:var(--s02)` on the shell for the phone's row of round controls;
-     here the first child owns its width exactly and the switch that follows
-     brings its own margin. */
+     here the first child owns its width exactly and what follows brings its
+     own inset.
+
+     WHAT FOLLOWS IS THE BREADCRUMB NOW, not the portal switch, and the inset
+     moved with it: `.pswitch{margin-left:var(--s05)}` was here and §77.2
+     states the same `var(--s05)` on `.crumb-bar` inside its own copy of this
+     query. The value did not change because the reason did not — it is where
+     the content column under the bar begins. §31's head records why the switch
+     went. */
   .app .shell{gap:0}
   .app .shell-act.nav-t{
     height:100%;border-radius:0;flex:none;
     border-right:1px solid var(--border-subtle-01)}
-  .app .pswitch{margin-left:var(--s05)}
 
   /* --- COLLAPSED: one control, the width of the rail under it ------------ */
   .app[data-rail="shut"] .shell-logo{display:none}

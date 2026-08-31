@@ -349,7 +349,7 @@ function bookedRow(b){
       <span class="cardrow-t">${b.t}</span>
       <span class="cardrow-d">${b.d}</span>
     </span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 }
 
@@ -357,7 +357,7 @@ function faceRow(p, detail, go){
   return `<button class="tile clk gcard face-row" data-go="${go}">
     <span class="mem-av mem-ph">${avatar({i:p.i, img:AV[p.img]}, 36)}</span>
     <span class="gcard-b"><h3>${p.name}</h3><span class="sub">${detail}</span></span>
-    <svg class="tile-arrow" viewBox="0 0 24 24">${inner('arrowRight')}</svg>
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 }
 
@@ -535,7 +535,7 @@ V.leadDash = () => {
     <div class="sec-h"><h2>Needs attention</h2><span class="t-helper-01">From course activity, not from you</span></div>
     <div class="lead-tools">
       <div class="srch lead-srch">
-        <svg class="mag" viewBox="0 0 24 24">${inner('search')}</svg>
+        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
         <input class="inp" id="leadQ" value="${S.leadQ}" placeholder="Search a name or cohort" aria-label="Search flagged candidates" autocomplete="off">
       </div>
       <div class="cs lead-filter" role="tablist" aria-label="Severity">
