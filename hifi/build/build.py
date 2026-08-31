@@ -583,7 +583,30 @@ css = '\n'.join((here / f).read_text() for f in
                  # colour. Those are §63 §12 — including the two that read as
                  # mechanism, the display role on the pace figure and the
                  # tabular numerals on the three that are meant to be compared.
-                 '72-weekpulse.css'])
+                 '72-weekpulse.css',
+                 # THE ENROLMENT OFFER. The `assessed` dashboard's black
+                 # enrolment plate becomes a full-width white offer — the head
+                 # row carries the date and the CTA, the four figures become a
+                 # `.facts` row — and its thirteen-chapter flat list becomes
+                 # four cards plus the remainder, closed by one tinted row
+                 # where the cohort is people. §71's plate-to-white-row move,
+                 # applied to the one decision this page exists to ask
+                 # (Maryam, 31 Aug 2026).
+                 # LAST, and the reasons are §72's plus one. It restates the
+                 # sparkle §70.2a and §72.1b both draw, so it must land after
+                 # both; its head rows extend §24.13's `.sec-h`; and it leans
+                 # on §10.15 having already opted `.facts` out of the label
+                 # column and on §29.17 having already drawn that grid's cells,
+                 # so it has to be after both of those too. Its own responsive
+                 # rules are inside `@container app (max-width:899.98px)`.
+                 # AFTER §63 AND ALLOWED TO BE, on §64/§65/§70/§71/§72's test:
+                 # grounds, grids, borders, spacing, one mask and one negative
+                 # margin, and not one font-size, font-weight, text-transform
+                 # or text colour. Those are §63 §13 — including the two that
+                 # read as mechanism, the h3 on both headings (which needs
+                 # (0,3,1) to beat §63 §4's `.app .sec-h h2`) and the pill's
+                 # violet.
+                 '73-enroloffer.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

@@ -8658,6 +8658,9 @@ button.btn-p:active,
   .app .auth-card .form-page .btn.btn-full{
     width:fit-content;min-width:0;display:inline-flex;
     gap:32px;padding-left:24px;padding-right:24px}
+  
+  .app .auth-card .foot-row{flex-wrap:wrap}
+  .app .auth-card .foot-row > div{flex:none}
 }
 .app .signed .ai-body .t-label-01.sig-l,
 .app .ai-body .t-label-01.sig-l{
@@ -9025,6 +9028,8 @@ button.btn-p:active,
   --t-eyebrow-size:11.5px;    --t-eyebrow-lh:16px;      --t-eyebrow-ls:.2px;
   --t-caption-size:11.5px;    --t-caption-lh:16px;      --t-caption-ls:.1px;
   
+  --t-sec-size:16px;          --t-sec-lh:22px;          --t-sec-ls:-.15px;
+  
   --t-w-book:400;
   --t-w-strong:600;
 }
@@ -9214,6 +9219,7 @@ button.btn-p:active,
   font-weight:var(--t-w-book);letter-spacing:0;color:var(--text-secondary)}
 .app .nrow:not(.un) .nrow-t{font-weight:var(--t-w-book)}
 .app .nrow.un .nrow-t{font-weight:var(--t-w-strong)}
+.app .tile-stack.prose .cardrow-t{font-weight:var(--t-w-book)}
 .app .tal-sugg > button,.app .tal-sugg .chip-tal{
   font-size:var(--t-label-size);font-weight:var(--t-w-strong)}
 .app .pi-lab,.app .stp-now .pi-lab,.app .stps .pi-lab{
@@ -9485,15 +9491,15 @@ button.btn-p:active,
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;color:var(--text-secondary)}
-.app .sec-h h2.pulse-ttl{
-  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+.app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
-.app .pulse-lede{
-  font-size:var(--t-body-size);line-height:var(--t-body-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
-.app .pulse-lede b{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .aih-d b{font-weight:var(--t-w-strong);color:var(--text-primary)}
 .app .pulse-hl{font-weight:var(--t-w-strong);color:var(--accent-text)}
 .app .pulse-eb{
   font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
@@ -9549,6 +9555,47 @@ button.btn-p:active,
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;color:var(--text-primary)}
+.app .eo-when > b{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--accent-text)}
+.app .eo-fl{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .eo-fv{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .eo-fv-acc{
+  font-weight:var(--t-w-strong);color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+.app .cov-pill{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--mk-3)}
+.app .cov-n{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;
+  font-variant-numeric:tabular-nums}
+.app .cov-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .cov-m{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > h2.aih-t{
+    font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+    text-transform:none;color:var(--text-primary)}
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{
+    font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+    font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
+}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -10148,13 +10195,14 @@ button.btn-p:active,
   grid-auto-flow:column;
   grid-auto-columns:minmax(0,1fr);
   border:0;border-top:1px solid var(--rule)}
+.app .pulse{column-gap:var(--s07)}
 .app .pulse > .pulse-c{
   position:relative;
   min-width:0;
-  padding:var(--s06)}
+  padding:var(--s06) 0}
 .app .pulse > .pulse-c + .pulse-c::before{
   content:'';position:absolute;
-  left:0;top:var(--s06);bottom:var(--s06);
+  left:calc(var(--s07) / -2);top:var(--s06);bottom:var(--s06);
   width:1px;
   background:var(--rule)}
 @container app (min-width:900px){
@@ -10233,10 +10281,12 @@ button.btn-p:active,
 .app .pulse-3::after{grid-column:4}
 .app .page .pulse .stand{
   grid-template-columns:minmax(0,1fr);
+  gap:0;
   margin-left:0;margin-right:0;
-  border:1px solid var(--rule);border-radius:var(--radius)}
+  background:none;
+  border:0}
 .app .page .pulse .stand > .stand-c{
-  padding-left:var(--s05);padding-right:var(--s05)}
+  padding-left:0;padding-right:0}
 .app .page .pulse .stand .stand-b{
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   align-items:start;gap:2px var(--s04)}
@@ -10244,18 +10294,121 @@ button.btn-p:active,
 .app .page .pulse .stand .stand-l{grid-column:1;grid-row:1;align-self:center}
 .app .page .pulse .stand .stand-d{grid-column:1 / -1;grid-row:2;margin-top:0}
 .app .page .pulse .stand .stand-v{grid-column:2;grid-row:1;margin-left:0}
-.app .page .pulse .stand .stand-ic{
-  flex:none;display:grid;place-items:center;
-  width:24px;height:24px;
-  color:var(--mk);
-  background:none}
-.app .page .pulse .stand .stand-ic svg{width:24px;height:24px;fill:currentColor}
+.app .page .pulse .stand .stand-mk{width:24px;height:24px}
 @container app (max-width:899.98px){
   .app .pulse{grid-auto-flow:row;grid-auto-columns:auto}
+  .app .pulse{column-gap:0}
   .app .pulse > .pulse-c{
-    padding:var(--s06) var(--pad-x)}
+    padding:var(--s06) 0}
   .app .pulse > .pulse-c + .pulse-c::before{content:none}
   .app .pulse > .pulse-c + .pulse-c{border-top:1px solid var(--rule)}
+}
+.app .page .sec > .sec-h.aih{
+  display:flex;align-items:center;
+  flex-wrap:wrap;gap:var(--s04) var(--s05);
+  margin-bottom:20px;
+  border-right:0;min-height:0}
+.app .page .sec > .sec-h.aih > .aih-b{
+  flex:1 1 340px;min-width:0;max-width:60%;
+  display:flex;flex-direction:column;gap:var(--s04)}
+.app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  margin:0;flex:none;min-width:0}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{margin:0}
+.app .page .sec > .sec-h.aih > .aih-a{
+  flex:none;margin-left:auto;
+  display:flex;align-items:center;gap:var(--s03)}
+.app .aih-mk{
+  flex:none;align-self:center;
+  width:12px;height:12px;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+.app .sec.eo .aih-a > .btn-p{
+  background-image:var(--accent-grad);
+  border-color:transparent;
+  --on-brand-fill:1}
+.app .sec.eo .aih-a > .btn{width:185px;min-height:40px;justify-content:center}
+.app .eo-when{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s03);
+  align-self:center;min-height:40px;
+  padding:0 var(--s05);
+  background:color-mix(in srgb, var(--accent) 10%, transparent)}
+.app .eo-when svg{flex:none;width:16px;height:16px;fill:var(--accent-text)}
+.app .page .facts.eo-facts{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;column-gap:var(--s07);
+  background:none;
+  border:0;
+  padding:20px 0 0}
+.app .page .facts.eo-facts > div{
+  position:relative;
+  display:flex;flex-direction:row;align-items:flex-start;
+  gap:var(--s04);
+  min-width:0;
+  padding:0;
+  background:none}
+.app .page .facts.eo-facts > div + div::before{
+  content:'';position:absolute;
+  left:calc(var(--s07) / -2);top:0;bottom:0;
+  width:1px;
+  background:var(--rule)}
+.app .eo-fi{flex:none;display:grid;place-items:center;width:24px;height:24px}
+.app .eo-fi svg{width:24px;height:24px;fill:var(--text-secondary)}
+.app .eo-fb{display:flex;flex-direction:column;gap:4px;min-width:0}
+.app .sec.eo{padding-bottom:20px}
+.app .sec.eo::after{display:none}
+@container app (min-width:900px){
+  .app .sec:has(> .cov-row){display:block}
+  .app .sec:has(> .cov-row) > .sec-h{
+    border-right:0;min-height:0}
+}
+.app .cov-pill{
+  display:inline-flex;align-items:center;
+  min-height:24px;padding:0 var(--s04);
+  background:var(--layer-accent-02, var(--layer-02))}
+.app .cov-row{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:1px;
+  background-color:var(--rule);
+  border:1px solid var(--rule)}
+.app .cov-c{
+  display:flex;flex-direction:column;
+  gap:var(--s03);
+  padding:var(--s05);
+  background-color:var(--layer-01)}
+.app .cov-n{
+  align-self:flex-start;
+  display:grid;place-items:center;
+  min-width:28px;height:28px;
+  padding:0 6px;
+  color:var(--mk);
+  background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
+.app .cov-t{min-width:0}
+.app .cov-m{margin-top:auto}
+.app .cov-more{--mk:var(--text-helper)}
+@container app (max-width:899.98px){
+  
+  .app .page .sec > .sec-h.aih > .aih-b{max-width:none}
+  .app .page .sec > .sec-h.aih > .aih-a{
+    flex-direction:column;align-items:stretch;
+    width:100%;margin-left:0;gap:var(--s03)}
+  .app .sec.eo .aih-a > .btn{width:100%}
+  
+  .app .page .facts.eo-facts{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--s06) var(--s05);
+    padding-top:var(--s05)}
+  .app .page .facts.eo-facts > div + div::before{content:none}
+  .app .cov-row{
+    grid-template-columns:repeat(5,minmax(200px,1fr));
+    overflow-x:auto;
+    border-left:0;border-right:0}
 }
 
 </style>
@@ -10657,8 +10810,7 @@ const WEEKLY = {
   },
   day34: {
     did: [
-      ['Chapter 5 finished', 'Assessed 86%'],
-      ['Posted in the cohort discussion', 'Yesterday &middot; earned Get Involved']
+      ['Chapter 5 finished', 'Assessed 86%']
     ],
     tal: 'The three furthest ahead in Cohort 41 had this week&rsquo;s chapter finished and its assessment submitted by day 34. You are 58 minutes and one assessment behind that pace, and chapter 4 is the growth area in your report — so it is the one worth the extra time.',
     ask: ['What do I have to do to catch up this week?', 'How do I catch up?']
@@ -11299,6 +11451,16 @@ function ring(pct, label){
   </div>`;
 }
 
+function aiHead({mark, title, desc, act, extra}){
+  return `<div class="sec-h aih">
+    <div class="aih-b">
+      <h2 class="aih-t">${mark ? '<i class="aih-mk"></i>' : ''}${title}${extra || ''}</h2>
+      ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+    </div>
+    ${act ? `<div class="aih-a">${act}</div>` : ''}
+  </div>`;
+}
+
 function pacePart(f, g){
   const per = 2;
   if(f.finished){
@@ -11404,17 +11566,22 @@ function pulse(f, g){
     <div class="pulse-3">${p.figs.map(([v,l]) =>
       `<span><b>${v}</b><span class="pulse-3l">${l}</span></span>`).join('')}</div>`);
 
-  const stand = pulseCol(3, I.star, 'Your standing', standRow(g, true));
+  const stand = pulseCol(3, I.star, 'Your standing', standRow(g));
 
   const act = f.finished
     ? `<button class="btn btn-g btn-sm noic" data-go="rewards">View more</button>`
     : `<button class="btn btn-p btn-sm" data-go="chapter:${f.open}">Open chapter ${f.open+1} ${I.arrowRight}</button>`;
 
   return `<div class="sec">
-    <div class="sec-h pulse-head">
-      <h2 class="pulse-ttl"><i class="pulse-mk"></i>Your learning pulse</h2>${act}
-    </div>
-    <p class="pulse-lede">${pulseLede(f, g, p)}</p>
+    ${''/* ONE STAR PER PAGE, AND ON THE ENROLLED DASHBOARDS THIS IS IT. The rule
+          is Maryam's (31 Aug 2026) — "do not use star with each new section" —
+          and it is a rule about a page, not about a component: the mark says a
+          block is Tal speaking, and a page that says it three times has stopped
+          attributing and started decorating. The band's "Summary by Tal" carries
+          its own label, and this is the one section below it that is Tal's
+          reading rather than the product's list. `What the 90 days cover` on
+          `assessed` is the case that went the other way. */}
+    ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
     <div class="pulse">${focus}${pace}${stand}</div>
   </div>`;
 }
@@ -11727,6 +11894,74 @@ const enrolPlate = lvl => `<div class="sec">
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
         </div>
       </div>
+    </div>`;
+
+const ENROL_FACTS = [
+  [I.wallet, 'Course fee',   '$690',                          1],
+  [I.book,   'Chapters',     '13, one a week'],
+  [I.chart,  'Assessments',  '13, one per chapter'],
+  [I.group,  'Cohort of 10', 'live calls with your leader']
+];
+
+const enrolOffer = lvl => `<div class="sec eo">
+      ${aiHead({
+        mark:true,
+        title:`You&rsquo;re enrolling on Explorer &ndash; ${lvl}`,
+        desc:ENROL_DESC[lvl],
+        act:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>
+          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
+      })}
+      ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
+             label-column opt-out names it, so a headed section carrying one gets
+             the page spine with no rule in §73 (trap 13). Almost everything else
+             §29.17 gives it — the box, the equal columns, the cell padding — is
+             overridden in §73.1a, because 613:8074 draws content-sized cells with
+             the dividers centred between them rather than a four-across grid.
+
+             TWO ROWS A CELL, NOT THREE. 613:8078/8079 are one 21px line and one
+             19px line and that is the whole cell; the version before this had a
+             label, a figure and a caption, which is `.stat`'s shape and one row
+             more than the file. The middle line absorbed the third: "13" and
+             "one a week" are one value, not a figure with a footnote. */}
+      <div class="facts eo-facts">
+        ${ENROL_FACTS.map(([ic, lab, val, acc]) => `<div>
+          <i class="eo-fi">${ic}</i>
+          <span class="eo-fb"><span class="eo-fl">${lab}</span>
+            <span class="eo-fv${acc ? ' eo-fv-acc' : ''}">${val}</span></span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+const coverSec = () => `<div class="sec cov">
+      ${aiHead({
+        title:'What the 90 days cover',
+        extra:'<span class="cov-pill">Curated for your growth</span>',
+        desc:`${CH.length} chapters, one a week, with a live cohort call alongside each.`,
+        act:'<button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button>'
+      })}
+      <div class="cov-row">
+        ${CH.slice(0, 4).map((c, i) => `<div class="cov-c" style="--mk:var(--mk-${i % 3 + 1})">
+          <span class="cov-n">${String(i + 1).padStart(2, '0')}</span>
+          <span class="cov-t">${c[0]}</span>
+          <span class="cov-m">${c[1]} min</span>
+        </div>`).join('')}
+        <div class="cov-c cov-more">
+          <span class="cov-n">+${CH.length - 4}</span>
+          <span class="cov-t">More chapters up ahead</span>
+        </div>
+      </div>
+      ${''/* AND NOTHING UNDER THE ROW. A tinted closing bar sat here — "Learners
+            like you spend about 12 hours on the chapters…", three cohort faces
+            and "You're in good company" — and it is gone (Maryam, 31 Aug 2026).
+            Two of its three parts were already on the page: the hours are the
+            five cells above it read together, and the cohort of ten is one of
+            the enrolment offer's four figures. What was left was the social
+            proof, which is the one claim on this page the product makes about
+            other people rather than about this candidate.
+
+            `enrolHours()` went with it — it was that sentence's only caller, and
+            a derived figure nothing prints is the "gate no caller writes" tell
+            §72 records for the ask chip. `COHORT` and `AV` are untouched. */}
     </div>`;
 
 const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course'];
@@ -12257,7 +12492,11 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${quizResults(qzTaken(), 'the interview decides it')}
+    ${''/* THE QUIZ BLOCK STOOD HERE AND DOES NOT ANY MORE — the argument is
+          the note where `quizResults` used to be defined. "How this works"
+          directly under the plate is the better neighbour for it anyway: the
+          first thing that accordion says is that the quiz gives you a title,
+          which is the one of the four figures this page still needs. */}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -12366,16 +12605,30 @@ V.dashboard = (f) => {
         ${statCell('', `Fee`, `From $80`, `credited to the course`)}
       </div>
       <div class="u-overline mt6">What to bring</div>
-      <div class="tile-stack mt4">
+      ${''/* `.prose` IS THE ROW SAYING IT IS A SENTENCE, NOT A TITLE (Maryam,
+             31 Aug 2026). `.cardrow-t` is the h4 role in §63 and everywhere
+             else in both portals it holds a NAME — a member, a cohort, a
+             session, a card brand — where the strong weight is what separates
+             the name from the description under it. These three rows have no
+             description: they are the whole of the row, and each is a full
+             sentence up to nine words long. Nine words of Kräftig in a numbered
+             list reads as three headings with nothing under them, which is why
+             they came out heavier than the section heading above them.
+             §63 §7b takes the weight to Buch and leaves the 15/20 size alone —
+             the row is still a row, it is just not shouting. The class goes on
+             the STACK rather than the row so the whole list is declared at
+             once, and it is scoped rather than global because `V.welcome`'s
+             "What happens next" uses the same `.cardrow-n` shape with real
+             titles and a `.cardrow-d` under each — that one is correct as it
+             is. */}
+      <div class="tile-stack prose mt4">
         ${['One situation from the last three months that did not go well',
            'A decision you would make differently now',
            'Somewhere quiet &mdash; the transcript is part of the assessment'
           ].map((t,i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
           <span class="cardrow-b"><span class="cardrow-t">${t}</span></span></div>`).join('')}
       </div>
-    </div>
-    ${''/* on this stage the "what sets it" answer has a name and a date on it */}
-    ${quizResults(qzTaken(), 'Priya sets it on 20 Aug')}`;
+    </div>`;
 
   else if(S.stage==='assessed') body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
@@ -12417,7 +12670,12 @@ V.dashboard = (f) => {
           read as a deadline on the offer. When the next cohort starts is Tal's
           sentence on this stage, two inches to the left ("The next cohort starts
           within two weeks"), where it is a fact rather than a clock. */}
-    ${enrolPlate('E3')}
+    ${''/* FULL WIDTH AND WHITE ON THIS STAGE — `enrolOffer`, not `enrolPlate`.
+          The long argument is over that function; the short one is that this
+          page's whole job is the enrolment, so the offer is the page's second
+          block rather than a card in the head band's column. `promoted` keeps
+          the plate, where the offer sits beside a certificate. */}
+    ${enrolOffer('E3')}
     ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
           moved down: `placeDark` (ai5) hoists any dark card on the page into the
           head band wherever the view puts it, so "further down" is not a place a
@@ -12432,15 +12690,10 @@ V.dashboard = (f) => {
           in the journey row's second step, and in Tal's summary. Its one jump,
           Read my report, is the "What the interview found" section's own head
           action two blocks below. */}
-    <div class="sec">
-      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
-      <p class="all-desc">Thirteen chapters, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
-      <div class="ch-two">${CH.map((c,i)=>`
-        <div class="ch ch-flat">
-          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
-          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
-        </div>`).join('')}</div>
-    </div>
+    ${''/* FOUR CHAPTERS AND A COUNT, NOT ALL THIRTEEN — see the note over
+          `coverSec`. The full list is `V.enrol`, which is where the section's
+          own head action goes. */}
+    ${coverSec()}
     ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
           The interview is the only thing that has happened to this candidate,
           and the page was showing its RESULT — a level, a black hero, a course
@@ -14614,17 +14867,6 @@ function signedSummary(withNote, re, footAction){
     </div>`;
 }
 
-function quizResults(taken, levelNote){
-  return `<div class="sec">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="result">See full breakdown</button></div>
-      <div class="stats">
-        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
-        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
-        ${statCell(I.calendar, `Taken`, taken, `2026 &middot; one attempt`)}
-        ${statCell(I.growth, `Level`, `Not set`, levelNote)}
-      </div>
-    </div>`;
-}
 function statCell(ic, label, value, note, jump){
   const body = `${ic ? `<span class="stat-ic">${ic}</span>` : ''}
       <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
@@ -14634,14 +14876,12 @@ function statCell(ic, label, value, note, jump){
     : `<div class="stat">${body}</div>`;
 }
 
-function standRow(g, icons){
+function standRow(g){
   const nb = nextBadge(g.pts);
   const bdgArt = ['bronze','silver','gold','involved'][Math.max(0, Math.min(3, g.badges-1))];
-  const cell = (art, artOff, label, value, note, ic, mk) => `
+  const cell = (art, artOff, label, value, note) => `
     <button class="stand-c" data-go="rewards">
-      ${icons
-        ? `<span class="stand-ic" style="--mk:var(--mk-${mk})">${ic}</span>`
-        : `<span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>`}
+      <span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>
       <span class="stand-b">
         <span class="stand-top">
           <span class="stand-l">${label}</span>
@@ -14652,14 +14892,11 @@ function standRow(g, icons){
     </button>`;
   return `<div class="stand">
     ${cell(AWARD.points, false, 'Points', g.pts.toLocaleString(),
-      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned',
-      I.trophy, 1)}
+      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned')}
     ${cell(AWARD[bdgArt], !g.badges, 'Badges', g.badges+' <small>of 4</small>',
-      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points',
-      I.shield, 2)}
+      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points')}
     ${cell(AWARD['rank'+g.rank], false, 'Rank', RANKS[g.rank-1].n,
-      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder',
-      I.star, 3)}
+      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder')}
   </div>`;
 }
 
@@ -18669,7 +18906,7 @@ const PAGESUM = {
 
     new: () => 'Welcome Back, Maryam! Based on your <b data-sum="quiz">quiz results</b>, you are currently on <b data-sum="track">Explorer track</b>. Your level from E1 - E5 anchors after a 45-minute interview. Considering your strengths I have analyzed the active roster and <b data-sum="match">matched you with ' + AGENTS[recKey()].n + ' below</b> to specifically anchor your growth areas.',
 
-    booked: 'Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your <b data-sum="interview">interview with Priya</b> is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often, so <b data-sum="prep">ten minutes of practice</b> is usually enough.',
+    booked: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
 
     assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, signed by Priya on 21 August, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
 
@@ -19492,10 +19729,13 @@ function bkStamp(){
 
 PAGESUM.dashboard.booked = () => {
   const a = AGENTS[(S.booking || {}).agent || 'priya'];
-  return `Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your `
-    + `<b data-sum="interview">interview with ${a.n}</b> is ${bkLong()} &mdash; forty-five minutes, `
-    + `recorded and paid. Delegation is the question ${a.n.split(' ')[0]} asks most often, so `
-    + `<b data-sum="prep">ten minutes of practice</b> is usually enough.`;
+  return `Welcome back, Maryam! Your <b data-sum="interview">levelling interview with ${a.n}</b> `
+    + `is confirmed for ${bkLong()} (45 minutes, video-recorded). My analysis of `
+    + `${a.n.split(' ')[0]}&rsquo;s historical evaluation patterns shows a heavy emphasis on `
+    + `delegation frameworks. Since your initial quiz score placed you on the `
+    + `<b data-sum="track">Explorer track</b>, spending just `
+    + `<b data-sum="prep">10 minutes practising your delegation talking points</b> before `
+    + `${bkWeekday()} is your best strategy to secure an optimal levelling outcome.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];
@@ -20392,9 +20632,9 @@ render();
 
 
 const TMP_ACCENT_ON = [
-  ['assessed', 'dashboard'],   // "Levelled, not enrolled"
-  ['day34',    'dashboard'],   // "Day 34"
-  ['promoted', 'dashboard'],   // "Promoted to E4"
+  // ['assessed', 'dashboard'],   // "Levelled, not enrolled"
+  // ['day34',    'dashboard'],   // "Day 34"
+  // ['promoted', 'dashboard'],   // "Promoted to E4"
 ];
 
 const _baseTmpAccent = render;

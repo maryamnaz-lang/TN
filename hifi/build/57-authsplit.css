@@ -427,4 +427,36 @@
   .app .auth-card .form-page .btn.btn-full{
     width:fit-content;min-width:0;display:inline-flex;
     gap:32px;padding-left:24px;padding-right:24px}
+
+  /* AND THE ROW WRAPS RATHER THAN CRUSHING THE LABEL. `fit-content` above is a
+     MAXIMUM and `min-width:0` removes §14.15's 217px floor, so nothing was
+     left holding the button open: the wrapper is a flex item of `.foot-row`
+     with the default `flex-shrink:1`, and on the OTP screen it was shrunk to
+     168px. That is 42px less than the label needs (24 + 110 + 32 + 20 + 24),
+     so "Verify & Continue" set on two lines — inside a box whose height is a
+     fixed 48 with 16 of padding a side, which leaves 16px of content box for
+     36px of text. The words spilled out of the button.
+
+     THE OTP SCREEN IS THE ONLY AUTH ROW THIS CAN HAPPEN TO, and the reason is
+     worth knowing before generalising the fix: the other two closing rows are
+     `.foot-stack`, whose second half is prose, and §37.5 stacks them into a
+     column where nothing competes for the line. This row's second half is
+     another BUTTON — "Resend Code in 0:40" — so the two actions want
+     213 + 16 + 180 in a 353px section and both shrink.
+
+     MEASURED BROKEN FROM 900 TO ABOUT 1100 AND CORRECT AGAIN AT 1280, which is
+     the whole argument for sweeping more than one width (§63 §8b's lesson, and
+     `respcheck.mjs` is where it is now checked): the row happens to fit at the
+     width this card was drawn at, and the failure lives in the band between
+     the breakpoint and it — a landscape tablet.
+
+     `flex:none` ON THE WRAPPER, NOT `min-width:fit-content` ON THE BUTTON.
+     The button is not the flex item; the `<div>` around it is. Flooring the
+     button instead leaves the wrapper free to shrink underneath it, so the
+     label stops wrapping and the button paints past its own parent — the same
+     bug one level out, and one that reads as fine until something clips it.
+     With the row allowed to wrap, the pair stays on one line where it fits and
+     the Resend drops to its own line where it does not. */
+  .app .auth-card .foot-row{flex-wrap:wrap}
+  .app .auth-card .foot-row > div{flex:none}
 }

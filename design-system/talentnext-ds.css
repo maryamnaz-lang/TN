@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4360.  Rules dropped as product-specific: 176.
+   Rules kept: 4376.  Rules dropped as product-specific: 176.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6599,6 +6599,8 @@ button.btn-p:active,
 .app .auth-card .btn-p:focus-visible{outline-color:var(--accent)}
 @container app (min-width:900px){
   .app .auth-card .form-page .btn.btn-full{width:fit-content; min-width:0; display:inline-flex; gap:32px; padding-left:24px; padding-right:24px}
+  .app .auth-card .foot-row{flex-wrap:wrap}
+  .app .auth-card .foot-row > div{flex:none}
 }
 
 /* ---- 58-finding.css ---- */
@@ -6780,7 +6782,7 @@ button.btn-p:active,
 }
 
 /* ---- 63-typography.css ---- */
-:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-w-book:400; --t-w-strong:600}
+:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-sec-size:16px; --t-sec-lh:22px; --t-sec-ls:-.15px; --t-w-book:400; --t-w-strong:600}
 .app .t-display,
 .app .u-display{font-size:var(--t-display-size); line-height:var(--t-display-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-display-ls); font-variant-numeric:tabular-nums}
 .app .t-h1,
@@ -7083,6 +7085,7 @@ button.btn-p:active,
 .app .score-pts .n small{font-size:var(--t-label-size); line-height:1; font-weight:var(--t-w-book); letter-spacing:0; color:var(--text-secondary)}
 .app .nrow:not(.un) .nrow-t{font-weight:var(--t-w-book)}
 .app .nrow.un .nrow-t{font-weight:var(--t-w-strong)}
+.app .tile-stack.prose .cardrow-t{font-weight:var(--t-w-book)}
 .app .tal-sugg > button,
 .app .tal-sugg .chip-tal{font-size:var(--t-label-size); font-weight:var(--t-w-strong)}
 .app .pi-lab,
@@ -7226,10 +7229,10 @@ button.btn-p:active,
 .app .crow-role,
 .app .crow-x{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-primary)}
 .app .crow-x b{font-weight:var(--t-w-strong)}
-.app .pulse-lab{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
-.app .pulse-ttl{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
-.app .pulse-lede{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
-.app .pulse-lede b{font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .pulse-lab{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-secondary)}
+.app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
+.app .aih-d b{font-weight:var(--t-w-strong); color:var(--text-primary)}
 .app .pulse-hl{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .pulse-eb{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
 .app .pulse-t{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
@@ -7244,6 +7247,18 @@ button.btn-p:active,
 .app .pulse-3 > span > b{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary); font-variant-numeric:tabular-nums}
 .app .pulse-3l{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
 .app .page .pulse .stand .stand-l{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
+.app .eo-when > b{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--accent-text)}
+.app .eo-fl{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
+.app .eo-fv{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-secondary)}
+.app .eo-fv-acc{font-weight:var(--t-w-strong); color:var(--accent-text); font-variant-numeric:tabular-nums}
+.app .cov-pill{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--mk-3)}
+.app .cov-n{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; font-variant-numeric:tabular-nums}
+.app .cov-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
+.app .cov-m{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > h2.aih-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls)}
+}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
@@ -7569,9 +7584,10 @@ button.btn-p:active,
 }
 
 /* ---- 72-weekpulse.css ---- */
-.app .pulse{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); border:1px solid var(--rule)}
-.app .pulse > .pulse-c{min-width:0; padding:var(--s06); border-left:1px solid var(--rule)}
-.app .pulse > .pulse-c:first-child{border-left:0}
+.app .pulse{display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); border:0; border-top:1px solid var(--rule)}
+.app .pulse{column-gap:var(--s07)}
+.app .pulse > .pulse-c{position:relative; min-width:0; padding:var(--s06) 0}
+.app .pulse > .pulse-c + .pulse-c::before{content:''; position:absolute; left:calc(var(--s07) / -2); top:var(--s06); bottom:var(--s06); width:1px; background:var(--rule)}
 @container app (min-width:900px){
   .app .sec:has(> .pulse){display:block}
   .app .sec:has(> .pulse) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--s05)}
@@ -7581,8 +7597,8 @@ button.btn-p:active,
 .app .pulse-mk{content:''; flex:none; width:14px; height:14px; border-radius:0; background-color:transparent; background-image:var(--ai-grad); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat}
 .app .pulse-lede{margin:0 0 var(--s05)}
 .app .pulse-h{display:flex; align-items:center; gap:var(--s03); margin-bottom:var(--s05)}
-.app .pulse-ic{flex:none; display:grid; place-items:center; width:28px; height:28px; color:var(--mk); background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
-.app .pulse-ic svg{width:16px; height:16px; fill:currentColor}
+.app .pulse-ic{flex:none; display:grid; place-items:center; width:20px; height:20px; color:var(--mk); background:none}
+.app .pulse-ic svg{width:20px; height:20px; fill:currentColor}
 .app .pulse-t{margin:0 0 var(--s02)}
 .app .pulse-eb{margin-bottom:var(--s06)}
 .app .pulse-ring{display:flex; align-items:center; gap:var(--s05); margin-bottom:var(--s06)}
@@ -7611,16 +7627,18 @@ button.btn-p:active,
 .app .pulse-3::after{content:''; grid-row:1; justify-self:center; align-self:center; width:1px; height:32px; background:var(--rule)}
 .app .pulse-3::before{grid-column:2}
 .app .pulse-3::after{grid-column:4}
-.app .page .pulse .stand{grid-template-columns:minmax(0,1fr); margin-left:0; margin-right:0; border:1px solid var(--rule); border-radius:var(--radius)}
-.app .page .pulse .stand > .stand-c{padding-left:var(--s05); padding-right:var(--s05)}
+.app .page .pulse .stand{grid-template-columns:minmax(0,1fr); gap:0; margin-left:0; margin-right:0; background:none; border:0}
+.app .page .pulse .stand > .stand-c{padding-left:0; padding-right:0}
 .app .page .pulse .stand .stand-b{display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:2px var(--s04)}
 .app .page .pulse .stand .stand-top{display:contents}
 .app .page .pulse .stand .stand-l{grid-column:1; grid-row:1; align-self:center}
 .app .page .pulse .stand .stand-d{grid-column:1 / -1; grid-row:2; margin-top:0}
 .app .page .pulse .stand .stand-v{grid-column:2; grid-row:1; margin-left:0}
-.app .page .pulse .stand .stand-mk{width:32px; height:32px}
+.app .page .pulse .stand .stand-mk{width:24px; height:24px}
 @container app (max-width:899.98px){
   .app .pulse{grid-auto-flow:row; grid-auto-columns:auto}
-  .app .pulse > .pulse-c{padding:var(--s06) var(--pad-x); border-left:0; border-top:1px solid var(--rule)}
-  .app .pulse > .pulse-c:first-child{border-top:0}
+  .app .pulse{column-gap:0}
+  .app .pulse > .pulse-c{padding:var(--s06) 0}
+  .app .pulse > .pulse-c + .pulse-c::before{content:none}
+  .app .pulse > .pulse-c + .pulse-c{border-top:1px solid var(--rule)}
 }

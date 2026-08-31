@@ -401,9 +401,15 @@ const WEEKLY = {
     ask: ['What should I get done this week?', 'Plan my week']
   },
   day34: {
+    /* ONE ROW, NOT TWO (Maryam, 31 Aug 2026). "Posted in the cohort discussion
+       / Yesterday · earned Get Involved" came out of the focus column: it is a
+       cohort event rather than coursework, and the badge it earned is printed
+       again in the standing column two panels to the right. What is left is the
+       one fact this column is about — a chapter finished and what it scored.
+       `WEEKLY[stage].did` is read only by `pulse` now, so removing it here
+       removes it from the product rather than hiding it. */
     did: [
-      ['Chapter 5 finished', 'Assessed 86%'],
-      ['Posted in the cohort discussion', 'Yesterday &middot; earned Get Involved']
+      ['Chapter 5 finished', 'Assessed 86%']
     ],
     tal: 'The three furthest ahead in Cohort 41 had this week&rsquo;s chapter finished and its assessment submitted by day 34. You are 58 minutes and one assessment behind that pace, and chapter 4 is the growth area in your report — so it is the one worth the extra time.',
     ask: ['What do I have to do to catch up this week?', 'How do I catch up?']

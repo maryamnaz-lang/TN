@@ -183,7 +183,7 @@ next build overwrites it, and it carries no comments (the build strips ~250 KB o
 
 The real source is `hifi/build/`:
 
-- **The numbered CSS layers**, `01-foundation.css` → `72-weekpulse.css` (there is no 48),
+- **The numbered CSS layers**, `01-foundation.css` → `73-enroloffer.css` (there is no 48),
   concatenated in
   the exact order listed in `build.py`. Cascade order *is* the architecture — later layers
   patch earlier ones by name. Everything from `30-nil` on is late because every rule in it
@@ -590,6 +590,24 @@ holds, and the way in), **Your pace** (the week's minutes against the 55-minute 
   the same object the band's label wears and **no pass can see it**. The words are in ink, not
   clipped to the ramp: §70 clips the band's label because that label is Tal *speaking*; this
   one heads a grid of figures, and a gradient heading over a table is the ramp as decoration.
+  **It is 16px, and so are §73's two** — see the note on `--t-sec-size` below.
+- **THE COLUMN MARKS ARE BARE GLYPHS AND THE LABELS ARE h4** (Maryam, 31 Aug 2026). §65's chip
+  — 28px tinted square, 16px glyph — is the mark for a figure cell in a *continuous band*,
+  where the chip is what separates one number from the three beside it. These three each open a
+  column with a rule between them, so the chip was a box inside a box inside a box and three
+  filled squares were the heaviest objects in a section made of hairlines. The hue survives and
+  the wash goes; the glyph steps 16 → 20 because it now holds the line alone. The label goes
+  11.5 → 14 with it: with no chip the pair stopped being a figure-cell heading and became the
+  section's own subheading, and the section reads 17 / 14 / figures rather than 17 / 11.5.
+- **THERE IS NO BOX ROUND THE ROW — ONE RULE ABOVE IT** (Maryam, 31 Aug 2026), and the column
+  dividers are **inset pseudo-elements, not `border-left`**. A border runs the column's full
+  height, so it meets the rule above and the two form a corner — which turns three columns back
+  into the table this section is trying not to be. `top`/`bottom` at the column's own `--s06`,
+  so the line spans exactly the content box. §71.1c reached the same shape for the figure strip
+  and used grid items in slack tracks, because *its* dividers had to sit centred in a negotiated
+  gap; here the columns are equal `1fr`s and the divider belongs to the column it precedes.
+  Below 900 it must be switched **off** (`content:none`), not re-pointed — it is absolutely
+  positioned, so stacked it would draw a vertical line down every row but the first.
 - **THE LEDE IS DERIVED, NOT WRITTEN, AND IS NOT A `PAGESUM` ENTRY.** Every figure in it is
   read off the same `f` / `g` / `pacePart` the columns are drawn from, so it cannot disagree
   with the block under it. That slot belongs to the head band, one per page, and
@@ -620,10 +638,22 @@ holds, and the way in), **Your pace** (the week's minutes against the 55-minute 
   own bar draws 7 lit beside that 36%; the count is derived in `pacePart` so the two cannot
   disagree. Once the 90 days are over the blocks become the thirteen **weeks**, lit where the
   week met target — the stacked chart's one durable fact in §71's thirteen-block language.
-- **THE STANDING CARD KEEPS `standRow` UNTOUCHED.** The rewards page draws the same three
-  cells and the two must not disagree about what a badge is worth, so §72.4 works entirely
-  from outside: `display:contents` on `.stand-top` dissolves the wrapper and promotes the
-  label and the figure into `.stand-b`'s grid. **The note runs full width under the pair, and
+- **THE STANDING ROWS HAVE NO BOX AND NO DIVIDERS, AND KEEP THE AWARD ARTWORK AT 24px**
+  (Maryam, 31 Aug 2026). Both were tried the other way first and both notes are worth reading
+  before reversing them. A `standRow(g, icons)` mode replaced the three WebPs with
+  `I.trophy` / `I.shield` / `I.star` on the argument that they are the only photographic
+  objects in the section and that two of the three rows describe an award you have *not* won
+  ("Bronze at 2,500 points"); the artwork came back, which also restores `ACH`'s own reasoning
+  — "a generic glyph of a shield is a picture of the category instead". The parameter is gone
+  rather than left unused: a mode no caller asks for is the "gate nothing writes" tell.
+  The card went the same way — inside a column already delimited by §72.1's inset divider it
+  was a third nested edge. **Both halves of §15's divider technique have to go together**:
+  `gap:0` alone leaves the rule-coloured GROUND painted behind the cells, so `background:none`
+  goes with it, and `border:0` rather than `border-top/bottom` because §29.17 states all four
+  sides at (0,3,0).
+- **THE STANDING CELL ITSELF IS UNTOUCHED.** §72.4 works entirely from outside:
+  `display:contents` on `.stand-top` dissolves the wrapper and promotes the label and the
+  figure into `.stand-b`'s grid. **The note runs full width under the pair, and
   that is a correction to the file.** 599:7418 puts the figure beside a note in column one,
   which works for its "Earn the Silver badge"; the product's is "Earn the Silver badge and the
   Get Involved badge", and in the 80px left after a 32px mark and a 60px figure it set to
@@ -638,6 +668,11 @@ holds, and the way in), **Your pace** (the week's minutes against the 55-minute 
   inside `@container app (min-width:900px)` per trap 3 — and copies what §10 *does*, not what
   it says: the `padding:0 var(--pad-x)` on that rule is dead (§14.2 zeroes it) and restating
   it would set this one heading 32px right of the page. That is §69's lesson.
+- **THE CALL ROW'S JOIN IS "Join call"** (Maryam, 31 Aug 2026). §71's `.crow-a` buttons are a
+  fixed 185px so there is no wrap risk, and the phrase is sentence case to match "Cohort week
+  call · session 36" 200px to its left. `V.cohort`'s plate Join is deliberately **not** changed:
+  §56's "one or two short words" rule cut those labels on 28 Aug 2026 to stop a two-button plate
+  row setting both labels on two lines.
 - **TWO ROUTES TO THE CHAPTER, DELIBERATELY** (Maryam, 31 Aug 2026). The head row's "Open
   chapter N" belongs to the *section*; "Continue learning" closes the *column*, pinned to its
   foot by `margin-top:auto` so the three columns end level whatever the did-list holds. It
@@ -660,6 +695,161 @@ holds, and the way in), **Your pace** (the week's minutes against the 55-minute 
 **Pre-existing and NOT fixed here:** week 1 shows "0h 0m invested" in the head strip and
 "20 min" in the pace column, because `CFG.week1.mins` is 0 and `GAME.week1.weeks` is `[20]`.
 data.js records that disagreement; the merge only moves the two figures closer together.
+### EVERY AI-NATIVE SECTION HEAD IS `aiHead` — ONE COMPONENT, THREE CALLERS
+
+Figma 613:7984. **The heading, its description and the row's actions are one block, and the
+actions are centred against the title-and-description pair — not against the title.** Frame 209
+is the title row (27) + 12 + the description (29) = 68 tall, and Frame 211, the 447×40 action
+group, sits at y=14 inside that same 68. `aiHead({mark, title, desc, act, extra})` in views.js
+is the markup; §73.1 is the drawing; §63 §12 states its two type roles once.
+
+**This existed because three sections had drifted three different ways** (Maryam, 31 Aug 2026:
+"no section should have this kind of heading and description random placements, do this one
+time"). Read this before adding a fourth — it needs no new class and no new type rule.
+
+- **THE BUG THAT MEASURING MARGINS COULD NOT FIND.** The wrong version put the title and the
+  actions in a `.sec-h` and left the description as the section's *next* child. The action group
+  is 40px tall and a 16px title's line box is 22, so the row took 40 and the title sat centred
+  in it — 9px of empty row under the title before its own 12px margin even began. The gaps
+  computed to exactly 12 and 20, the specified numbers, and the heading still read as detached
+  from its own description. **The margin was right and the box was wrong.**
+- **THREE SIZES WHERE THERE SHOULD HAVE BEEN ONE.** `.pulse-ttl`, `.eo-ttl` and `.cov-ttl`
+  rendered 16, 12.5 and 14 — because §63 §8b sizes section headings inside a container query
+  through eight `:has()` selectors, and each section matched a different one. `.aih-t` and
+  `.aih-d` are one role each.
+- **`:has()` CARRIES ITS ARGUMENT'S SPECIFICITY, AND THAT IS THE TRAP THIS COST MOST TIME ON.**
+  §63 §8b's `.app .sec:has(> .sec-h) > .sec-h h2` is **(0,4,1)**, not the (0,2,1) it reads as.
+  Landing a restatement in the right container tier is necessary and not sufficient: a (0,3,1)
+  rule loses inside the same tier, which looks exactly like the tier fix not having worked. Four
+  of §8b's eight selectors are `:has()` and every one is a class heavier than it appears.
+- **THE BLOCK IS CAPPED AT 60% SO THE DESCRIPTION WRAPS CLEAR OF THE ACTION.** 613:7985 is 687
+  of 1332 — 51.6% — and 60 is that with slack. Uncapped, `flex:1 1 340px` grows to every pixel
+  the action group is not using, and the pulse's derived sentence ran 890px to a few characters
+  short of the button: one line of prose across the frame, 150 characters where §63 wants ~75.
+  **The cap is also what makes the centring visible** — against a one-line block there is
+  nothing to centre, so the button merely looked top-aligned.
+- **THE 340px BASIS IS THE WRAP MECHANISM.** §24.132 gives `.sec-h > h2` `flex:1 1 auto` with
+  `min-width:0` at (0,3,1); a flex item only moves to a new line when its BASE size does not
+  fit, so with `auto` there was no base and the block shrank to 0 instead of wrapping — the
+  title set one word to a line at 390 and the page did not overflow, so nothing measured it.
+- **THE STAR IS 12px AND DOES NOT TRACK THE HEADING** (Maryam, 31 Aug 2026). 613:7987 draws 18
+  against a 16px heading and that shipped for one round; §70.2a's reasoning is the one that
+  holds — below the cap height of the words it reads as a bullet introducing the line, above it
+  as a second object competing with it. One value everywhere, so it cannot drift when a heading
+  changes size.
+- **ONE STAR PER PAGE, NOT PER SECTION.** The mark says a block is Tal *speaking*; a page that
+  says it three times has stopped attributing and started decorating. On `assessed` it is the
+  enrolment offer; on the enrolled dashboards it is the pulse. "What the 90 days cover" is a
+  plain `<h2>`.
+- **AND `.aih-mk` IS NOT `.ai-label` OR `.ai-aura`** — `talFirst` hoists any `.sec` containing
+  an `.ai-aura` to under the `.ph`, and `placeBand`'s `_mhIsTal` claims either class as head
+  furniture. §72 records that trap at length.
+- **REMOVING CONTENT LOSES A LABEL-COLUMN OPT-OUT TOO — TRAP 13, TWICE IN ONE CHANGE.** The
+  course preview was opting out through §10.15's `:has(> .all-desc)` because its lede carried
+  that class; folding the lede into `aiHead` dropped it, and the heading, the pill and the lede
+  stacked into a 184px column with five chapter cards crushed beside them. §73.1b restates it on
+  `:has(> .cov-row)`. §69 says this in as many words: "Adding a wrapper is not the only way to
+  lose an opt-out — removing content does it too."
+
+**Two more spacing rules both rows follow, and both were corrections:** the columns take the
+section's own gutter and nothing else — no side padding on any cell, so the first mark is flush
+with the heading above it — and the separation is the grid's `column-gap` with the divider at
+`calc(var(--s07) / -2)`, one value driving the space and the line together. And a chip beside a
+button is `align-self:center` at a stated 40, never `stretch`: stretch takes the height of the
+flex LINE, which on these rows is set by the text block, so the chip came out 85px against a
+40px button and dragged the group to 133.
+
+### THE ENROLMENT OFFER — §73, `73-enroloffer.css` + `enrolOffer` / `coverSec` (views.js)
+
+Figma 613:7983. **The page whose job is a $690 decision was drawing that decision as a black
+card.** `enrolPlate` is a `.plate`, and §59 spends a layer establishing that as the loudest
+object the product has, spent on something with a clock in it — while the note over
+`enrolPlate` records its countdown being *removed* because "IN 2 WEEKS" read as a deadline on
+the offer. So it was permanently drawing §59's quiet state. It is now a full-width white
+section: a Tal-marked heading with the date chip and the accent CTA on its row, a lede, and the
+four figures as a `.facts` row. Under it, `coverSec` replaces the flat thirteen-chapter list
+with **four chapter cards and the remainder as a fifth cell**. §71's plate-to-white-row move,
+applied one page earlier.
+
+- **`enrolOffer` IS A SECOND FUNCTION AND `enrolPlate` STAYS.** `promoted` draws the same offer
+  one level up and there it *is* in the head band — `placeDark` moves the plate into §56's
+  second column, where the certificate is the second dark card spanning underneath. Taking
+  `.plate` off would empty that column on a page this brief does not touch. What the two must
+  not do is disagree about the offer, and they cannot: `ENROL_OPENS`, `ENROL_DESC` and the fee
+  are read from one place by both.
+- **TWO OF THE FILE'S FOUR FACTS ARE NOT TRUE HERE.** 613:7983 draws Course Fee, Cohort of 10,
+  **Report Turnaround** and **Nearest Available Slot**. The last two are interview facts, and on
+  `assessed` the interview has already happened — Priya signed the report on 21 August, which is
+  what put the candidate on this page. Printing a nearest slot would offer a booking that is not
+  on offer. The row keeps the file's shape and takes the four things enrolling actually buys,
+  which are `enrolPlate`'s own `.plate-b` rows.
+- **THE CELLS ARE CONTENT-SIZED WITH THE DIVIDERS CENTRED BETWEEN THEM**, which is §71.1c's grid
+  again: 613:8074's cells are 187 / 213 / 175 / 196 across 1020, with Line 27/28/29 exactly half
+  way between each pair. `.facts` is `auto-fit minmax(140px,1fr)` — four equal thirds, which
+  puts "Cohort of 10" in the same width as "$690". **The class is still `.facts`** because
+  §10.15's label-column opt-out names it (trap 13 answered by the class choice), but almost
+  everything §29.17 gives it is overridden. **Three dividers needs three elements and a grid
+  container has two**: the row carries `::before` and `::after`, and cell 3 carries its own,
+  absolutely positioned out into the gutter beside it.
+- **TWO ROWS A CELL, NOT THREE, AND THE LABEL IS THE STRONG ONE.** 613:8078/8079 are a 21px
+  line over a 19px line — h4 over compact to the pixel — so the row that *names* the fact is
+  larger than the row that states it. That inverts `.stat`, and it is right: these four are not
+  figures being compared, they are four different things, and what you scan is the names. The
+  fee is the one accent string, on the value.
+- **`--t-sec-size` IS A NINTH SIZE AND IT IS RECORDED, NOT SMUGGLED IN.** 16px, for the three
+  AI-native section headings — "Your learning pulse", "You're enrolling on…", "What the 90 days
+  cover" (Maryam, 31 Aug 2026, by number). §63 §11's own rule is *take the nearest role* and h3
+  is 17, one pixel off, which is what these shipped at first. This is a stated exception under
+  §63 §7 on two grounds: it is a ROLE across two layers rather than one component's one-off, and
+  every other section heading is 12.5, so it is not a near-duplicate of a size doing the same
+  job. To revert, delete the token and point the three rules at `--t-h3-*`; nothing else reads it.
+- **THE HEADING NEEDED (0,6,1) AND TWO TRIES, WHICH IS TRAP 3 PLUS `:has()` ARITHMETIC.** §63
+  §8b sizes section headings *inside* `@container app (min-width:900px)`, so an unconditional
+  rule cannot answer it at any weight — the three read 16 on a phone and 12.5 or 14 on the frame
+  the product is read at. Restating inside the tier was still not enough: §8b's selector is
+  `.app .sec:has(> .sec-h) > .sec-h h2`, and **`:has()` carries its argument's specificity**, so
+  that is (0,4,1) rather than the (0,2,1) it looks like. Four of §8b's eight selectors are
+  `:has()` and every one is a class heavier than it reads.
+- **ONE STAR PER PAGE REGION.** The sparkle is the offer heading's alone. "What the 90 days
+  cover" is a plain `<h2>` — the band already has "Summary by Tal" and the offer above carries
+  the second; a third on the block underneath stops reading as attribution and becomes a bullet
+  style. `.eo-mk` is 18px against §70.2a's 12 on the band's label, which is 613:7987's size
+  beside a 16px heading.
+- **AND `.eo-mk` IS NOT `.ai-label` OR `.ai-aura`** — the same hoist trap §72 records. This
+  section is the page's second block and must stay there.
+- **THE CLOSING SOCIAL-PROOF ROW WENT** (Maryam, 31 Aug 2026): a tinted bar with "Learners like
+  you spend about 12 hours…", three cohort faces and "You're in good company". Two of its three
+  parts were already on the page — the hours are the five chapter cells read together, the
+  cohort of ten is one of the four figures. `enrolHours()` went with it, being that sentence's
+  only caller.
+- **THE FIXED-WIDTH ACTION GROUP IS THE ONE THING THAT CANNOT SURVIVE 390.** Chip 254 + gap 8 +
+  button 185 is a 447px base against a 358px page, and with `flex:none` nothing could give: the
+  row wrapped exactly as designed and then hung 38px off the edge. Full width and stacked below
+  900, and the figures go 2 × 2 with the dividers switched **off** (`content:none`) rather than
+  re-pointed — they are placed in named tracks that no longer exist.
+
+### THE QUIZ BLOCK IS OFF THE DASHBOARDS, AND `quizResults` IS DELETED
+
+Maryam, 31 Aug 2026. `V.dashboard`'s `consult` and `booked` branches were its last two
+callers — `new` had already swapped it for a Quick Action when §70 rebuilt that page — so
+the function is gone rather than orphaned. **Nothing is unreachable:** `V.result` still
+holds all five bands and the rose, and the three routes in are `quickActions`
+(`data-go="result"`), `SUMDROP.quiz`'s action (ai6.js) and the NIL microsite's Verify &
+continue. The long argument is where the function was defined, in `views.js`.
+
+`qzTaken()` STAYS and its own note is corrected in place: it now has two readers,
+`V.result` and the `quiz` summary card, and they still must not sit the quiz on two dates.
+
+### A COUNTED LIST OF SENTENCES IS BUCH — `.tile-stack.prose`, §63 §7b
+
+`.cardrow-t` is in §63's h4 list because in fourteen of its fifteen call sites it holds a
+**name** with a `.cardrow-d` description under it. The `booked` dashboard's "What to bring"
+has neither: three full sentences, one per numbered row, which at 15/600 came out heavier
+than the section heading above them. `.prose` on the `.tile-stack` takes the weight to Buch
+and **leaves the size alone** — dropping to `--t-desc` would make each row a description of
+the number beside it, which is not what it is. Scoped, not global: `V.welcome`'s "What
+happens next" is the same `.cardrow-n` shape with real titles and is correct as it is.
+
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
 Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a
@@ -1194,6 +1384,64 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     cascade will not tell you they flipped.
 
 ### Verifying a change
+
+**RESPONSIVE IS PART OF DONE — A COMPONENT THAT ONLY WORKS AT DESKTOP IS NOT FINISHED.**
+Standing instruction (Maryam, 31 Aug 2026): every new design or component is authored at
+desktop and must be verified at **mobile and tablet too, in the same task**, with nothing
+broken. It is not a follow-up and not a separate ticket.
+
+Sweep at **390, 760, 1000 and 1280** — one width will tell you a thing is finished when it is
+not. `@container app (min-width:900px)` is the portal's only real breakpoint, so 760 and 1000
+straddle it and 1280 catches what only resizes *inside* the query (§63 §8b is exactly this
+mistake). What to look for, all of which has actually happened here: horizontal overflow, a
+`.sec-h` heading colliding with its own content (trap 13's label column), a two-column block
+that did not stack, a fixed-px child inside a narrow column (trap 15's 58px `.tw-lines` label
+in a 76px cell), an absolutely-positioned divider still drawing once the columns stacked
+(§72.3 — switch it off with `content:none`, do not re-point it), and a `.plate-a > .btn` label
+on two lines (§56).
+
+A rule that must differ per width goes **inside** the container query, restated there per
+trap 3 — a later layer cannot outweigh the tier from outside it.
+
+**Measure with the Browser pane OPEN.** Hidden, the frame reports `innerWidth: 0`, every
+element measures 0 and the page's scrollHeight comes back around 15,000px, which reads exactly
+like a broken layout and is not one. `window.innerWidth === 0` is the check.
+
+#### `hifi/respcheck.mjs` IS THAT CHECK, AND A HOOK RUNS IT ON EVERY REBUILD
+
+```bash
+cd hifi && node respcheck.mjs          # 197 screens x 390/744/1024/1280, ~90s
+cd hifi && node respcheck.mjs --edge   # adds 899/900/940 — the breakpoint seam
+cd hifi && node respcheck.mjs --quick  # ~30 screens, ~15s — the triage
+```
+
+It enumerates the matrix **from `STAGES` / `NAVSETS` in the page**, so a stage or module added
+to data.js is swept without touching the script, and it checks the six failures that have
+actually happened here: frame overflow, §10.15's label column live below 900, a heading
+wrapping past three lines in that column, content escaping its own section, a button label on
+two lines, and a vertical divider still drawn after the columns stacked — plus thrown errors,
+`console.warn` and `undefined`/`NaN` leaks.
+
+- **It runs on the installed Chrome, resolved from the Playwright MCP's npx cache** — no
+  download and no `node_modules` in this repo. That is why it works and `verify.mjs` /
+  `audit.mjs` do not: those hardcode `/opt/pw-browsers/chromium`, a Linux CI path.
+- **It is deliberately NOT more of `verify.mjs`.** That sweep is the whole product audit and
+  its type-scale and tone tables predate §63/§64, so running it today prints a wall of stale
+  failures with the real ones buried in it. This one answers one question, so its silence
+  means something.
+- **`respcheck-hook.sh` is a PostToolUse hook on Bash** (`.claude/settings.json`, checked in,
+  so every session in this repo gets it). It does nothing unless the command that just ran was
+  a `build.py`, then runs `--quick --quiet`: silent when clean, and on a finding it prints the
+  report to stderr and exits 2, which is the code that feeds it back to the model. A checker
+  failure (no Chrome, no built file) prints once and exits **0** — a missing browser is not a
+  broken layout, and blocking on it would put a false finding in front of every rebuild.
+- **The skip key includes the mode.** `--quiet` exits early when the built file's hash is one
+  a previous clean run measured; that key carries `quick|full` and the widths, because
+  otherwise the hook's 30-screen triage would silently stand in for the 197-screen sweep.
+- **A child of a horizontal scroller is not an overflow, and the test is computed.** The first
+  cut named the four scrollers it knew and §73's `.cov-row` — a scroller below 900 by design —
+  broke it immediately. It walks up for a real `overflow-x` now; the scroller's own box is
+  still measured.
 
 Open the built file over http (not `file://` — the browser blocks it) and sweep the matrix:
 

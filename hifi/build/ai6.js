@@ -265,8 +265,17 @@ const PAGESUM = {
        open. The facts are the ones this entry already carried; what is added is
        the greeting §70.3 needs (the `.ph` is off-screen on every page with a
        journey column) and the three `data-sum` keys. `track` is the SECOND page
-       to use that card, which is the whole point of keying by subject. */
-    booked: 'Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your <b data-sum="interview">interview with Priya</b> is in 6 days &mdash; Thursday 20 August at 6:30 PM ET, 45 minutes, recorded. Delegation is the question she asks most often, so <b data-sum="prep">ten minutes of practice</b> is usually enough.',
+       to use that card, which is the whole point of keying by subject.
+
+       AND IT IS DEAD COPY, KEPT IN SYNC ON PURPOSE. `ai7.js` overrides this key
+       outright (`PAGESUM.dashboard.booked = () => …`) so that the name, the
+       date and the day come off the booking record rather than being typed —
+       ai7 parses after this file and always wins. What is written here is the
+       same sentence with the record's four values frozen at their defaults, so
+       that reading this table tells you what the page says. Edit the two
+       together; a hard-coded fallback that disagrees with the live line is
+       worse than no fallback. */
+    booked: 'Welcome back, Maryam! Your <b data-sum="interview">levelling interview with Priya Nair</b> is confirmed for Thursday, August 20 at 6:30 PM ET (45 minutes, video-recorded). My analysis of Priya&rsquo;s historical evaluation patterns shows a heavy emphasis on delegation frameworks. Since your initial quiz score placed you on the <b data-sum="track">Explorer track</b>, spending just <b data-sum="prep">10 minutes practising your delegation talking points</b> before Thursday is your best strategy to secure an optimal levelling outcome.',
 
     assessed: 'Welcome Back, Maryam! You are <b data-sum="level">Explorer &ndash; E3</b>, rung 3 of 15, signed by Priya on 21 August, with <b data-sum="growth">delegation and hard conversations</b> as your growth areas. <b data-sum="enrol">Enrolling</b> is the only thing left.',
 

@@ -1095,6 +1095,54 @@ function ring(pct, label){
    its own copy — the claim was stale when it was written and this makes it
    true.
    ========================================================================== */
+/* ==========================================================================
+   THE AI-NATIVE SECTION HEAD — `aiHead`, and it is ONE component for all three
+
+   THE HEADING AND ITS DESCRIPTION ARE ONE BLOCK, AND THE ACTIONS ARE CENTRED
+   AGAINST THAT BLOCK — 613:7984. This is the structural point and it is what
+   three sections got wrong in three slightly different ways before it existed.
+
+   What the wrong version was: a `.sec-h` holding the title and the action group,
+   with the description as the section's NEXT child. The action group is 40px
+   tall and the title's line box is 22, so the row was 40 and the title sat
+   centred in it — which put 9px of empty row under the title before its own
+   12px margin even began, and the description read as a detached paragraph
+   floating below the heading. The gaps measured 12 and 20 exactly as specified
+   and still looked wrong, which is why measuring the margins was not enough:
+   the margin was right and the BOX was wrong.
+
+   613:7984 is explicit about it. Frame 209 — the left column — is the title row
+   (27) plus 12 plus the description (29), 68 tall. Frame 211, the 447x40 action
+   group, sits at y=14 inside that same 68: centred against the pair, not against
+   the title. So the title starts at the top of its column and the actions
+   straddle both lines.
+
+   ONE FUNCTION, THREE CALLERS, AND THAT IS THE WHOLE POINT (Maryam, 31 Aug
+   2026: "no section should have this kind of heading and description random
+   placements, do this one time"). `.aih-t` and `.aih-d` are one title role and
+   one description role — §63 §13 states each once, instead of the three pairs
+   that had drifted to 12.5 / 14 / 16 depending on which `:has()` in §63 §8b a
+   section happened to match. A fourth section needs no new class and no new
+   type rule.
+
+   `mark` IS OPTIONAL AND ONLY ONE SECTION PASSES IT. The sparkle is Tal's voice
+   and a page carries one — the band's "Summary by Tal" is the first, the
+   enrolment offer's heading is the second, and a third on the block underneath
+   stops reading as attribution. `.aih-mk` is deliberately NOT `.ai-label` or
+   `.ai-aura`: `talFirst` hoists any `.sec` containing an `.ai-aura` to under the
+   `.ph` and `placeBand`'s `_mhIsTal` claims either class as head furniture, so
+   wearing one would move the section into the band. §72 records that trap at
+   length. */
+function aiHead({mark, title, desc, act, extra}){
+  return `<div class="sec-h aih">
+    <div class="aih-b">
+      <h2 class="aih-t">${mark ? '<i class="aih-mk"></i>' : ''}${title}${extra || ''}</h2>
+      ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+    </div>
+    ${act ? `<div class="aih-a">${act}</div>` : ''}
+  </div>`;
+}
+
 /* THE PACE COLUMN HAS TWO READINGS AND THE COURSE BEING OVER IS WHAT PICKS ONE.
    While the 90 days run, "pace" is this week against the weekly target and the
    segments are the target itself — one block per TWO minutes, so 28 blocks IS
@@ -1253,7 +1301,7 @@ function pulse(f, g){
      is worth. §72.4 turns the three-across grid into a stacked card and re-lays
      each row against the file's arrangement — all of it from the outside, with
      not one declaration on the cell and no change to the markup. */
-  const stand = pulseCol(3, I.star, 'Your standing', standRow(g, true));
+  const stand = pulseCol(3, I.star, 'Your standing', standRow(g));
 
   /* THE SECTION'S ACTION IS THE ONE THING IT EXISTS TO MAKE HAPPEN, which
      while the course runs is the open chapter and once it is over is the
@@ -1279,10 +1327,15 @@ function pulse(f, g){
      its own class, §72.1b paints it with §70's `--ai-star` and `--ai-grad`, so
      the mark is the same object the band's label wears and no pass can see it. */
   return `<div class="sec">
-    <div class="sec-h pulse-head">
-      <h2 class="pulse-ttl"><i class="pulse-mk"></i>Your learning pulse</h2>${act}
-    </div>
-    <p class="pulse-lede">${pulseLede(f, g, p)}</p>
+    ${''/* ONE STAR PER PAGE, AND ON THE ENROLLED DASHBOARDS THIS IS IT. The rule
+          is Maryam's (31 Aug 2026) — "do not use star with each new section" —
+          and it is a rule about a page, not about a component: the mark says a
+          block is Tal speaking, and a page that says it three times has stopped
+          attributing and started decorating. The band's "Summary by Tal" carries
+          its own label, and this is the one section below it that is Tal's
+          reading rather than the product's list. `What the 90 days cover` on
+          `assessed` is the case that went the other way. */}
+    ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
     <div class="pulse">${focus}${pace}${stand}</div>
   </div>`;
 }
@@ -1980,6 +2033,124 @@ const enrolPlate = lvl => `<div class="sec">
           <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>
         </div>
       </div>
+    </div>`;
+
+/* ==========================================================================
+   THE ENROLMENT OFFER — Figma, the `assessed` dashboard
+
+   THE SAME MOVE §71 MADE FOR THE WEEKLY CALL, MADE FOR THE ONE THING THIS PAGE
+   EXISTS TO SELL. `enrolPlate` is a `.plate` — black ground plus §21's warm haze
+   — and §59 spends a layer arguing that is the loudest object this product draws
+   and is spent on something TIME-SENSITIVE. Enrolling has no clock: the note
+   over `enrolPlate` already records that its `data-when` was removed because "IN
+   2 WEEKS" over the price read as a deadline on the offer. So the card was
+   drawing §59's quiet state permanently, which is a loud object turned down
+   rather than the right object.
+
+   Full width and white, with the offer's four figures as a ROW rather than a
+   stacked list: the section is the page's second block and 901px wide, and four
+   facts in a 265px column had to be four lines when they are four cells.
+
+   WHY IT IS A SECOND FUNCTION AND NOT A CHANGED `enrolPlate`. `promoted` draws
+   the same offer one level up, and there it IS in the head band — `placeDark`
+   moves the plate into §56's second column, where the certificate is the second
+   dark card spanning underneath. Taking `.plate` off would empty that column on
+   a page this brief does not touch. The two surfaces are genuinely different
+   shapes now: a full-width offer that is the page's subject, and a card beside a
+   certificate. What they must not do is disagree about the OFFER, and they
+   cannot — `ENROL_OPENS`, `ENROL_DESC` and the fee are read from one place by
+   both, which is what those tables were written for.
+
+   THE FOUR FACTS ARE THIS PAGE'S OWN, AND TWO OF THE FILE'S ARE NOT.
+   The reference draws Course Fee, Cohort of 10, **Report Turnaround** and
+   **Nearest Available Slot**. The last two are INTERVIEW facts — a turnaround on
+   the write-up and a bookable slot — and on `assessed` the interview has already
+   happened: Priya signed the report on 21 August, which is what put the
+   candidate on this page. Printing a nearest slot here would offer a booking
+   that is not on offer, and a report turnaround for a report that is two blocks
+   below, readable. So the row keeps the file's SHAPE — mark, label, value — and
+   takes the four facts `enrolPlate`'s own `.plate-b` states, which are the four
+   things enrolling actually buys. */
+const ENROL_FACTS = [
+  [I.wallet, 'Course fee',   '$690',                          1],
+  [I.book,   'Chapters',     '13, one a week'],
+  [I.chart,  'Assessments',  '13, one per chapter'],
+  [I.group,  'Cohort of 10', 'live calls with your leader']
+];
+
+const enrolOffer = lvl => `<div class="sec eo">
+      ${aiHead({
+        mark:true,
+        title:`You&rsquo;re enrolling on Explorer &ndash; ${lvl}`,
+        desc:ENROL_DESC[lvl],
+        act:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>
+          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
+      })}
+      ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
+             label-column opt-out names it, so a headed section carrying one gets
+             the page spine with no rule in §73 (trap 13). Almost everything else
+             §29.17 gives it — the box, the equal columns, the cell padding — is
+             overridden in §73.1a, because 613:8074 draws content-sized cells with
+             the dividers centred between them rather than a four-across grid.
+
+             TWO ROWS A CELL, NOT THREE. 613:8078/8079 are one 21px line and one
+             19px line and that is the whole cell; the version before this had a
+             label, a figure and a caption, which is `.stat`'s shape and one row
+             more than the file. The middle line absorbed the third: "13" and
+             "one a week" are one value, not a figure with a footnote. */}
+      <div class="facts eo-facts">
+        ${ENROL_FACTS.map(([ic, lab, val, acc]) => `<div>
+          <i class="eo-fi">${ic}</i>
+          <span class="eo-fb"><span class="eo-fl">${lab}</span>
+            <span class="eo-fv${acc ? ' eo-fv-acc' : ''}">${val}</span></span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+/* WHAT THE 90 DAYS COVER — four chapters, then the count of what is behind them.
+   The list was all thirteen as a two-column flat run, 528px of it, on a page
+   whose next block is Priya's write-up. Four cards say what the course is LIKE;
+   the section's own head action goes to `V.enrol`, which draws all thirteen, so
+   nothing is unreachable. The fifth cell is the remainder and is a real count
+   (`CH.length - 4`), not a "more" link — it is the only cell that is not a
+   chapter, so it says how many there are rather than pretending to be one.
+
+   THE HUES ARE `--mk-1/2/3` CYCLED AND THAT IS CORRECT HERE, against §65's and
+   §72's decision to name them: those two cycle over cells whose MEANING is
+   fixed (a chapter, a pace, a standing), where a positional hue would move a
+   subject's colour between screens. A chapter's number has no subject — 01 is
+   not "the blue one" — so position is all there is to key on, which is exactly
+   the case §29 wrote the cycle for. */
+const coverSec = () => `<div class="sec cov">
+      ${aiHead({
+        title:'What the 90 days cover',
+        extra:'<span class="cov-pill">Curated for your growth</span>',
+        desc:`${CH.length} chapters, one a week, with a live cohort call alongside each.`,
+        act:'<button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button>'
+      })}
+      <div class="cov-row">
+        ${CH.slice(0, 4).map((c, i) => `<div class="cov-c" style="--mk:var(--mk-${i % 3 + 1})">
+          <span class="cov-n">${String(i + 1).padStart(2, '0')}</span>
+          <span class="cov-t">${c[0]}</span>
+          <span class="cov-m">${c[1]} min</span>
+        </div>`).join('')}
+        <div class="cov-c cov-more">
+          <span class="cov-n">+${CH.length - 4}</span>
+          <span class="cov-t">More chapters up ahead</span>
+        </div>
+      </div>
+      ${''/* AND NOTHING UNDER THE ROW. A tinted closing bar sat here — "Learners
+            like you spend about 12 hours on the chapters…", three cohort faces
+            and "You're in good company" — and it is gone (Maryam, 31 Aug 2026).
+            Two of its three parts were already on the page: the hours are the
+            five cells above it read together, and the cohort of ten is one of
+            the enrolment offer's four figures. What was left was the social
+            proof, which is the one claim on this page the product makes about
+            other people rather than about this candidate.
+
+            `enrolHours()` went with it — it was that sentence's only caller, and
+            a derived figure nothing prints is the "gate no caller writes" tell
+            §72 records for the ask chip. `COHORT` and `AV` are untouched. */}
     </div>`;
 
 const JRN = ['Leadership quiz','Interview and level','Enrolled','90-day course'];
@@ -2966,7 +3137,11 @@ V.dashboard = (f) => {
         </div>
       </div>
     </div>
-    ${quizResults(qzTaken(), 'the interview decides it')}
+    ${''/* THE QUIZ BLOCK STOOD HERE AND DOES NOT ANY MORE — the argument is
+          the note where `quizResults` used to be defined. "How this works"
+          directly under the plate is the better neighbour for it anyway: the
+          first thing that accordion says is that the quiz gives you a title,
+          which is the one of the four figures this page still needs. */}
     <div class="sec flat">
       <div class="sec-h"><h2>How this works</h2></div>
       <div class="acc">
@@ -3110,16 +3285,34 @@ V.dashboard = (f) => {
         ${statCell('', `Fee`, `From $80`, `credited to the course`)}
       </div>
       <div class="u-overline mt6">What to bring</div>
-      <div class="tile-stack mt4">
+      ${''/* `.prose` IS THE ROW SAYING IT IS A SENTENCE, NOT A TITLE (Maryam,
+             31 Aug 2026). `.cardrow-t` is the h4 role in §63 and everywhere
+             else in both portals it holds a NAME — a member, a cohort, a
+             session, a card brand — where the strong weight is what separates
+             the name from the description under it. These three rows have no
+             description: they are the whole of the row, and each is a full
+             sentence up to nine words long. Nine words of Kräftig in a numbered
+             list reads as three headings with nothing under them, which is why
+             they came out heavier than the section heading above them.
+             §63 §7b takes the weight to Buch and leaves the 15/20 size alone —
+             the row is still a row, it is just not shouting. The class goes on
+             the STACK rather than the row so the whole list is declared at
+             once, and it is scoped rather than global because `V.welcome`'s
+             "What happens next" uses the same `.cardrow-n` shape with real
+             titles and a `.cardrow-d` under each — that one is correct as it
+             is. */}
+      <div class="tile-stack prose mt4">
         ${['One situation from the last three months that did not go well',
            'A decision you would make differently now',
            'Somewhere quiet &mdash; the transcript is part of the assessment'
           ].map((t,i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
           <span class="cardrow-b"><span class="cardrow-t">${t}</span></span></div>`).join('')}
       </div>
-    </div>
-    ${''/* on this stage the "what sets it" answer has a name and a date on it */}
-    ${quizResults(qzTaken(), 'Priya sets it on 20 Aug')}`;
+    </div>`;
+  /* AND THE QUIZ BLOCK IS NOT HERE ANY MORE — the long version of why is the
+     note where `quizResults` used to be defined. In short: the four figures
+     were the last ~500px of this page and every one of them is settled
+     somewhere above. `V.result` still holds all five bands. */
 
   else if(S.stage==='assessed') body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
@@ -3161,7 +3354,12 @@ V.dashboard = (f) => {
           read as a deadline on the offer. When the next cohort starts is Tal's
           sentence on this stage, two inches to the left ("The next cohort starts
           within two weeks"), where it is a fact rather than a clock. */}
-    ${enrolPlate('E3')}
+    ${''/* FULL WIDTH AND WHITE ON THIS STAGE — `enrolOffer`, not `enrolPlate`.
+          The long argument is over that function; the short one is that this
+          page's whole job is the enrolment, so the offer is the page's second
+          block rather than a card in the head band's column. `promoted` keeps
+          the plate, where the offer sits beside a certificate. */}
+    ${enrolOffer('E3')}
     ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
           moved down: `placeDark` (ai5) hoists any dark card on the page into the
           head band wherever the view puts it, so "further down" is not a place a
@@ -3176,15 +3374,10 @@ V.dashboard = (f) => {
           in the journey row's second step, and in Tal's summary. Its one jump,
           Read my report, is the "What the interview found" section's own head
           action two blocks below. */}
-    <div class="sec">
-      <div class="sec-h"><h2>What the 90 days cover</h2><button class="btn btn-g btn-sm noic" data-go="enrol">See the full course</button></div>
-      <p class="all-desc">Thirteen chapters, one a week, with a live cohort call alongside each. Everything opens on enrolment.</p>
-      <div class="ch-two">${CH.map((c,i)=>`
-        <div class="ch ch-flat">
-          <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
-          <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
-        </div>`).join('')}</div>
-    </div>
+    ${''/* FOUR CHAPTERS AND A COUNT, NOT ALL THIRTEEN — see the note over
+          `coverSec`. The full list is `V.enrol`, which is where the section's
+          own head action goes. */}
+    ${coverSec()}
     ${''/* AND WHY THOSE CHAPTERS, IMMEDIATELY UNDER THEM.
           The interview is the only thing that has happened to this candidate,
           and the page was showing its RESULT — a level, a black hero, a course
@@ -3491,11 +3684,16 @@ V.level = (f) => {
 
    What it deliberately does NOT carry:
 
-     THE FOUR FIGURES. Title given, quiz score, taken, level — that is
-     `quizResults`, the block whose button brought you here, and restating it
-     as the first thing on the destination is the "See full breakdown" of a
-     breakdown you have already read. The `ph` fact row says the same three
-     facts in one line because a page has to say where it sits.
+     THE FOUR FIGURES. Title given, quiz score, taken, level — that was
+     `quizResults`, the block whose "See full breakdown" button used to bring
+     you here, and restating it as the first thing on the destination is the
+     breakdown of a breakdown you have already read. The `ph` fact row says
+     the same three facts in one line because a page has to say where it sits.
+     THE BLOCK ITSELF IS GONE FROM ALL THREE DASHBOARDS NOW (31 Aug 2026, the
+     note where `quizResults` was defined), which does not change this refusal
+     — it strengthens it. This page is the only place those figures live, so
+     printing them here as a header over the same five bands would be the one
+     surface that has them saying everything twice.
 
      THE TITLE AS A HERO. `Explorer` set at 30px over "level to be confirmed"
      is `.lvl-hero` on My Level, one click away, and this page's own crumb
@@ -3551,11 +3749,13 @@ function qzChapter(band){
   return i < 0 ? null : {n:i + 1, t};
 }
 
-/* WHEN IT WAS TAKEN, ONCE. `quizResults` takes the date as an argument
-   because each dashboard's stepper prints its own and the block cannot
-   contradict the line above it — the note over that function is the long
-   version. This is the rule behind those arguments, so the three call sites
-   and this page read one function and cannot drift apart. */
+/* WHEN IT WAS TAKEN, ONCE. `quizResults` took the date as an argument because
+   each dashboard's stepper prints its own and the block could not contradict
+   the line above it. THAT BLOCK IS GONE (31 Aug 2026) and this is not: two
+   readers are left — `V.result` and `SUMDROP.quiz` (ai6.js) — and they are on
+   two different surfaces reached from two different pages, so one function is
+   still what stops the quiz being sat on two dates. It stays keyed on
+   `S.stage` because `consult` is genuinely a different candidate's timeline. */
 const qzTaken = (long) => S.stage === 'consult'
   ? (long ? '3 August 2026'  : '3 Aug')
   : (long ? '12 August 2026' : '12 Aug');
@@ -5967,7 +6167,52 @@ function signedSummary(withNote, re, footAction){
     </div>`;
 }
 
-/* THE QUIZ RESULT, ON EVERY DASHBOARD STAGE THAT STILL HAS NO LEVEL
+/* ==========================================================================
+   THE QUIZ RESULT BLOCK IS OFF THE DASHBOARDS — Maryam, 31 Aug 2026
+
+   `quizResults` is DELETED, not orphaned: it had two callers left, `consult`
+   and `booked`, and both are gone. `new` had already replaced it with a Quick
+   Action pointing at `V.result` when §70 rebuilt that page (the note over
+   `quickActions` makes the same argument this one finishes), so what happened
+   here is that decision applied to the two stages it had not reached.
+
+   WHY. The block was ~500px of figures at the FOOT of a dashboard, and none
+   of the four is news by the time you scroll to it:
+
+     Title given · Explorer   the `.ph` fact row prints "Explorer track" at
+                              the top of the same page, and the journey step
+                              beside it says the same thing again.
+     Quiz score · 64/100      Tal's summary states it in the band, in a
+                              sentence that also says what it is FOR.
+     Taken · 12 Aug           a date the reader has no decision to make about.
+     Level · Not set          the whole of what every one of these pages is
+                              already about, printed as a fourth figure.
+
+   Four settled facts under a heading, at the end of a page whose job is the
+   one thing that is NOT settled, is the product answering a question nobody
+   asked twice as loudly as the one it did.
+
+   NOTHING IS ORPHANED AND `V.result` IS UNCHANGED. The breakdown page §61
+   built still holds all five bands, the rose, the two weakest against their
+   chapters — everything the block's "See full breakdown" button went to — and
+   there are still three ways in: the `new` dashboard's Quick Action
+   (`quickActions`, `data-go="result"`), the `quiz` card behind the summary's
+   own phrase (`SUMDROP.quiz`, ai6.js), and the NIL microsite's Verify &
+   continue. That is the trade this makes: the figures stop being printed on
+   three pages that have moved past them, and stay on the one page that is
+   about them.
+
+   `qzTaken()` STAYS AND STILL HAS READERS. Its own note below says "all three
+   `quizResults` call sites"; that half is now historical — `V.result` and the
+   `quiz` summary card are what read it, and they still must not disagree.
+
+   THE ARGUMENT THE FUNCTION CARRIED IS KEPT BELOW, because two of the three
+   parts of it are about `.stat` and the canvas rather than about the quiz,
+   and both are live decisions somewhere else.
+   -------------------------------------------------------------------------
+   THE ORIGINAL NOTE, for the record:
+
+   THE QUIZ RESULT, ON EVERY DASHBOARD STAGE THAT STILL HAS NO LEVEL
    `consult`, `new` and `booked` are all the same sentence — the quiz has
    happened and nothing has replaced it yet — so all three now print the same
    four figures rather than the reader losing sight of their score the moment
@@ -6029,18 +6274,8 @@ function signedSummary(withNote, re, footAction){
    that selector simply stops matching.
 
    ALL THREE STAGES, because this is one function and the block is the same
-   block. `consult`, `new` and `booked` print the same four figures. */
-function quizResults(taken, levelNote){
-  return `<div class="sec">
-      <div class="sec-h"><h2>Quiz results</h2><button class="btn btn-g btn-sm noic" data-go="result">See full breakdown</button></div>
-      <div class="stats">
-        ${statCell(I.trophy, `Title given`, `Explorer`, `first of three tracks`)}
-        ${statCell(I.chart, `Quiz score`, `64<small>/100</small>`, `places you on Explorer`)}
-        ${statCell(I.calendar, `Taken`, taken, `2026 &middot; one attempt`)}
-        ${statCell(I.growth, `Level`, `Not set`, levelNote)}
-      </div>
-    </div>`;
-}
+   block. `consult`, `new` and `booked` print the same four figures.
+   ========================================================================== */
 /* AND `ic` IS OPTIONAL — pass nothing and the cell has no mark at all, which is
    a different thing from passing an empty one. §29 draws the mark as a 28px chip
    in one of four hues and §24 as the warm Tal-chip square; an empty `.stat-ic`
@@ -6060,37 +6295,16 @@ function statCell(ic, label, value, note, jump){
 /* Three standings, three marks. Points is a number moving toward a target,
    badges are a count out of four, rank is where those two put you.
 
-   `icons` IS THE MARK MODE AND THERE ARE TWO, WHICH IS THE HONEST ANSWER TO ONE
-   COMPONENT ON TWO SURFACES (Maryam, 31 Aug 2026).
-
-   The default is the client's own award ARTWORK — the gold coins, the shield,
-   the star medal — and the note over `ACH` records why: "the mark on the banner
-   should be the SAME object the rewards page and the leaderboard draw: you
-   earned a specific shield, and a generic glyph of a shield is a picture of the
-   category instead." That argument is about the REWARDS page, and it is right
-   there. `V.rewards` is where you go to look at what you have won, and the
-   artwork is the thing itself.
-
-   It is the wrong mark inside the pulse. Those three WebPs are photographic —
-   gold gradients, a silver bevel, a navy roundel — and they are the only
-   photographic objects in a section otherwise made of hairlines, flat glyphs
-   and one green bar. At 32px in a 278px column they were the heaviest things on
-   the screen, and what they were marking is not an award you have won: two of
-   the three rows say you have NOT won it yet ("Bronze at 2,500 points", "Earn
-   the Silver badge"). A picture of a trophy over a row about not having one is
-   the category glyph doing its job better than the artefact does.
-
-   So the pulse asks for glyphs and every other caller keeps the artwork. One
-   function, one set of three facts, two marks — rather than a second function
-   that could disagree about what a badge is worth.
-
-   THE THREE ICONS ARE THE PRODUCT'S OWN AND EACH IS ALREADY USED FOR ITS OWN
-   SUBJECT: `I.trophy` is Points in the promoted dashboard's `.stats` grid,
-   `I.shield` is what the badge artwork is a picture OF, and `I.star` is what a
-   rank is literally named in ("1-Star"). The hues are `--mk-1/2/3`, NAMED per
-   row — §65's and §72's decision both times, so a row keeps its colour and
-   cannot be re-tinted by its position. */
-function standRow(g, icons){
+   THE MARK IS THE CLIENT'S AWARD ARTWORK, AND IT CAME BACK (Maryam, 31 Aug
+   2026). A glyph mode was added for the pulse on the reasoning that the WebPs
+   are the only photographic objects in that section and that two of the three
+   rows describe an award you have NOT won yet. Maryam's call is the artwork,
+   smaller — which also restores `ACH`'s own argument for it: "you earned a
+   specific shield, and a generic glyph of a shield is a picture of the category
+   instead." §72.4 sizes it down to 24 inside the pulse; the parameter and the
+   three icons are gone rather than left unused, because a mode nothing asks for
+   is the "gate no caller writes" tell. */
+function standRow(g){
   const nb = nextBadge(g.pts);
   const bdgArt = ['bronze','silver','gold','involved'][Math.max(0, Math.min(3, g.badges-1))];
   /* THE LABEL AND THE FIGURE ARE ONE LINE. `.stand-top` is the only structural
@@ -6108,11 +6322,9 @@ function standRow(g, icons){
      read without measuring a stripe. Gone, so all three cells hold two lines,
      the box is as tall as it needs to be, and every cell's content sits on
      the same centre line. §29.15 has the rest. */
-  const cell = (art, artOff, label, value, note, ic, mk) => `
+  const cell = (art, artOff, label, value, note) => `
     <button class="stand-c" data-go="rewards">
-      ${icons
-        ? `<span class="stand-ic" style="--mk:var(--mk-${mk})">${ic}</span>`
-        : `<span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>`}
+      <span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>
       <span class="stand-b">
         <span class="stand-top">
           <span class="stand-l">${label}</span>
@@ -6123,14 +6335,11 @@ function standRow(g, icons){
     </button>`;
   return `<div class="stand">
     ${cell(AWARD.points, false, 'Points', g.pts.toLocaleString(),
-      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned',
-      I.trophy, 1)}
+      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned')}
     ${cell(AWARD[bdgArt], !g.badges, 'Badges', g.badges+' <small>of 4</small>',
-      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points',
-      I.shield, 2)}
+      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points')}
     ${cell(AWARD['rank'+g.rank], false, 'Rank', RANKS[g.rank-1].n,
-      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder',
-      I.star, 3)}
+      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder')}
   </div>`;
 }
 

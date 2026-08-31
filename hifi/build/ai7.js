@@ -600,10 +600,32 @@ PAGESUM.dashboard.booked = () => {
      `interview`/`prep` are this stage's. This override still exists for the
      FACTS, which is why the name and the date are still `a.n` and `bkLong()`
      rather than the hard-coded pair the stage was written around. */
-  return `Welcome Back, Maryam! You are on <b data-sum="track">Explorer track</b> and your `
-    + `<b data-sum="interview">interview with ${a.n}</b> is ${bkLong()} &mdash; forty-five minutes, `
-    + `recorded and paid. Delegation is the question ${a.n.split(' ')[0]} asks most often, so `
-    + `<b data-sum="prep">ten minutes of practice</b> is usually enough.`;
+  /* THE ORDER OF THE THREE CLAUSES IS THE ORDER OF THE QUESTIONS (Maryam,
+     31 Aug 2026): what is booked and when, what that person weights, and what
+     to do about it before the day. It reads as a recommendation with its
+     reasoning shown rather than three facts in a row, which is why the
+     "Explorer track" phrase moved from the head of the sentence into the
+     middle of the last clause — it is now the PREMISE of the advice rather
+     than a standing statement about you, and the `track` card behind it says
+     the same thing either way.
+
+     FOUR THINGS ARE STILL DERIVED AND NONE OF THEM ARE TYPED: the agent's
+     full name and first name (`a.n`), the date (`bkLong()`) and the day the
+     preparation is due by (`bkWeekday()`). Change the booking in the flow and
+     all four follow — which is the whole reason this override exists.
+
+     THREE SPELLINGS THAT ARE THE BUILD'S, NOT THE BRIEF'S. "levelling" with
+     two l's is what `views.js`'s journey step and `lead4.js` say, and this
+     sentence sits ~300px from that step; "quiz" and "delegation frameworks"
+     are common nouns and the house rule is sentence case in the markup
+     (§63's note on capitals). The words are otherwise verbatim. */
+  return `Welcome back, Maryam! Your <b data-sum="interview">levelling interview with ${a.n}</b> `
+    + `is confirmed for ${bkLong()} (45 minutes, video-recorded). My analysis of `
+    + `${a.n.split(' ')[0]}&rsquo;s historical evaluation patterns shows a heavy emphasis on `
+    + `delegation frameworks. Since your initial quiz score placed you on the `
+    + `<b data-sum="track">Explorer track</b>, spending just `
+    + `<b data-sum="prep">10 minutes practising your delegation talking points</b> before `
+    + `${bkWeekday()} is your best strategy to secure an optimal levelling outcome.`;
 };
 PAGESUM.booking = () => {
   const a = AGENTS[(S.booking || {}).agent || S.agent || 'priya'];

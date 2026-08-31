@@ -1,0 +1,401 @@
+/* ==========================================================================
+   §73  THE ENROLMENT OFFER AND THE COURSE PREVIEW — the `assessed` dashboard
+
+   THE PAGE WHOSE JOB IS A $690 DECISION WAS DRAWING THAT DECISION AS A CARD.
+   `enrolPlate` is a `.plate` — §15's black ground plus §21's warm haze — and
+   §59 spends a layer establishing that as the loudest object this product has,
+   spent on something with a clock in it. Enrolling has no clock (the note over
+   `enrolPlate` records its countdown being removed for exactly that reason), so
+   the card was permanently drawing §59's quiet state: a loud object turned down
+   rather than the right object chosen.
+
+   §71 made this same move for the weekly call — plate to white row — and the
+   argument transfers whole. What is different here is the WIDTH: the call row is
+   a band inside the head, and this is the page's second block at its full 901,
+   which is what lets four figures be four cells instead of four lines.
+
+   TWO SECTIONS, AND NEITHER IS A NEW COMPONENT WHERE AN OLD ONE FITS:
+
+     the offer     `.sec-h` for the head row, `.facts` for the figures — §10.15
+                   already opts `.facts` out of the label column and §29.17
+                   already draws its cells and hairlines, so trap 13 is answered
+                   by the class choice rather than by a rule in this file.
+     the preview   four chapter cards, the remainder as a fifth cell, and a
+                   closing row where the cohort is people rather than a count.
+
+   WHAT IS IN HERE AND WHAT IS NOT. Layout, grounds, borders, spacing and one
+   negative margin. NOT font size, weight, case or ink — those are §63's
+   wherever this layer sits, and every one these families need is in §63 §13.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE AI-NATIVE SECTION HEAD — 613:7984, and it is ONE component for three
+   sections. `aiHead` in views.js is the markup and its note is the argument.
+
+   THE TITLE AND ITS DESCRIPTION ARE ONE BLOCK; THE ACTIONS ARE CENTRED AGAINST
+   THAT BLOCK. Frame 209 is the title row (27) + 12 + the description (29) = 68,
+   and Frame 211 — the 447x40 action group — sits at y=14 inside the same 68.
+   So the title starts at the TOP of its column and the buttons straddle both
+   lines.
+
+   THIS IS THE BUG THAT MEASURING MARGINS COULD NOT FIND. Before this the title
+   and the actions shared a `.sec-h` and the description was the section's next
+   child: the row took the action group's 40px height, the title's 22px line box
+   sat centred in it, and 9px of empty row appeared under the title before its
+   own 12px margin started. The gaps computed to exactly 12 and 20 — the
+   specified numbers — and the heading still read as detached from its own
+   description. The margin was right and the box was wrong.
+
+   ONE TITLE ROLE AND ONE DESCRIPTION ROLE, so a fourth section needs no new
+   class: `.aih-t` and `.aih-d` are stated once in §63 §13. The three they
+   replace had drifted to 12.5, 14 and 16 depending on which `:has()` in §63 §8b
+   each section happened to match — which is the whole reason this is one
+   component now (Maryam, 31 Aug 2026).
+   ------------------------------------------------------------------------ */
+/* THE SELECTORS CARRY `.page .sec >` TO EARN THEIR WEIGHT, and the margin is
+   restated inside the 900px tier. Both are the same trap in two forms:
+   §24.132's `.app .page .sec-h > h2` is (0,3,1) and takes the title's `flex`;
+   §10.15's and §72.1a's `.sec:has(…) > .sec-h` are (0,4,1) INSIDE a container
+   query and take the row's `margin-bottom`. `:has()` carries its argument's
+   specificity, which is what makes those (0,4,1) rather than the (0,2,1) they
+   read as. See §63 §13b — the same pair had to be answered for the type. */
+.app .page .sec > .sec-h.aih{
+  display:flex;align-items:center;
+  flex-wrap:wrap;gap:var(--s04) var(--s05);
+  margin-bottom:20px;
+  border-right:0;min-height:0}
+/* 12 BETWEEN THE TITLE AND THE DESCRIPTION — 613:7988 ends at 27 and 613:7989
+   opens at 39. The block is a flex COLUMN, so the gap is the only spacing in it
+   and neither child carries a margin. */
+/* AND THE BLOCK IS CAPPED AT 60% SO THE DESCRIPTION WRAPS CLEAR OF THE ACTION
+   (Maryam, 31 Aug 2026). Without a cap `flex:1 1 340px` grows to every pixel the
+   action group is not using, so the pulse's derived sentence ran 890px and ended
+   a few characters short of the button — one line of prose across the whole
+   frame, which reads as a caption on the button rather than as the section's
+   opening line, and which is also 150 characters to the line where §63 wants
+   about 75.
+
+   613:7985 IS 687 OF 1332, WHICH IS 51.6%, and 60 is that number with slack.
+   The file's own description is 68 characters and fits one line at either width;
+   the pulse's is 150 and needs the extra 8% to come out at TWO lines rather than
+   three. One value for all three sections, because a per-section measure is the
+   thing this component exists to stop.
+
+   THE ACTION IS CENTRED AGAINST THE BLOCK, which is what `align-items:center` on
+   the row already does — and the cap is what makes it visible: against a
+   one-line block there is nothing to centre, and the button looked top-aligned
+   because the block was as short as it was. */
+.app .page .sec > .sec-h.aih > .aih-b{
+  flex:1 1 340px;min-width:0;max-width:60%;
+  display:flex;flex-direction:column;gap:var(--s04)}
+/* THE 340px BASIS IS THE MECHANISM THAT LETS THE ROW WRAP. A flex item moves to
+   a new line when its BASE size does not fit; §24.132 gives `.sec-h > h2`
+   `flex:1 1 auto` with `min-width:0`, which has no base to not fit, so the block
+   shrank to 0 instead of wrapping and the title set one word to a line at 390.
+   340 is the longest title's max-content at §63's 16px, measured. */
+.app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{
+  display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+  margin:0;flex:none;min-width:0}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{margin:0}
+/* `margin-left:auto` STATED. §24.133 gives it to a `.sec-h`'s direct `.btn` and
+   `a`; this is a div wrapping one or two children and matches neither. */
+.app .page .sec > .sec-h.aih > .aih-a{
+  flex:none;margin-left:auto;
+  display:flex;align-items:center;gap:var(--s03)}
+
+/* THE STAR IS 12 SQUARE AND STAYS 12 (Maryam, 31 Aug 2026) — it does NOT track
+   the heading size. §70.2a sets the band's label mark at 12 and records the
+   reasoning: at that size the mark is smaller than the cap height of the words
+   beside it, so it reads as a bullet introducing the line rather than a second
+   object competing with it. 613:7987 draws 18 against a 16px heading and this
+   build went there for one round; 18 is a mark, 12 is a bullet, and the product
+   wants the bullet. One value for every heading that carries one, so the mark
+   cannot drift when a heading's size does.
+
+   Same three declarations §70.2a and §72.1b use — the `--ai-star` mask over
+   `--ai-grad`. Restated rather than shared because a selector list spanning
+   three layers would have to live in the earliest, and §70 cannot name a class
+   §73 introduces. */
+.app .aih-mk{
+  flex:none;align-self:center;
+  width:12px;height:12px;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* ENROLL IS THE ACCENT, NOT BLACK — the file's own fill. §19 gives
+   `.plate .btn-p` the brand gradient, so while this offer WAS a plate its button
+   was already orange; taking the plate away took the accent with it and left the
+   page's one decision as a black rectangle. §71.2 answered the same thing the
+   same way when the weekly call stopped being a plate. `--on-brand-fill:1` plus
+   the ramp is the whole of it — §19 keys the ink, the focus ring and the
+   transparent border off that flag. Scoped to the offer's own head so the two
+   quiet heads keep their grey buttons. */
+.app .sec.eo .aih-a > .btn-p{
+  background-image:var(--accent-grad);
+  border-color:transparent;
+  --on-brand-fill:1}
+/* 185 x 40 — 613:7990, which is also §71.2's box for `.crow-a`, so the two
+   AI-native surfaces put their actions in one rectangle. */
+.app .sec.eo .aih-a > .btn{width:185px;min-height:40px;justify-content:center}
+
+/* THE DATE IS A TINTED CHIP, NOT A `.note acc`. `enrolPlate` uses the accent
+   note — a mark and two lines in a filled box — which is right inside a card and
+   wrong beside a CTA, where a callout reads as a second CTA. 40 tall to match
+   the button (615:8145). `--brand-tint-2` is §12's warm tint, the ground the
+   note was already using, so no colour moves. */
+/* AND THE TINT IS LOWER THAN THE BUTTON'S BECAUSE IT IS NOT ONE (Maryam,
+   31 Aug 2026). `--brand-tint-2` is #fcdbc7 — §12's warm tint, and the ground
+   the accent note was already using — which beside a filled accent button reads
+   as the same object at two saturations, i.e. as a disabled button. Mixed at 10%
+   of `--accent` the cell is a wash the date sits ON rather than a control: the
+   pair now reads as one figure and one action, which is what it is. Stated as a
+   `color-mix` off `--accent` rather than a fifth literal, so it follows the
+   brand.
+
+   40 TALL AND `align-self:center`, NOT `stretch`. Both are 40 in the file
+   (615:8145 and 613:7990). `stretch` was tried first, to guarantee the two
+   matched whatever `.btn`'s own padding added — and it takes the height of the
+   FLEX LINE, which on this row is set by the title-and-description block beside
+   it: the chip came out 85px tall against a 40px button and dragged the action
+   group to 133. The line's height is not the button's height. Centred at a
+   stated 40, the pair matches and neither can grow. */
+.app .eo-when{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--s03);
+  align-self:center;min-height:40px;
+  padding:0 var(--s05);
+  background:color-mix(in srgb, var(--accent) 10%, transparent)}
+.app .eo-when svg{flex:none;width:16px;height:16px;fill:var(--accent-text)}
+
+/* -------------------------------------------------------------------- 1a ---
+   THE FIGURE CELLS — a mark column and a three-row stack
+
+   §29.17 draws `.facts` as bordered cells with `var(--s05)` of padding and a
+   hairline between; all of that is inherited. What a cell here adds is the mark
+   to the LEFT of the stack — §65's arrangement for `.stat`, and the reason the
+   label, value and sub had to be wrapped in `.eo-fb`: three bare children would
+   each take a column of the cell's flex row.
+
+   THE MARK IS A BARE GLYPH, NOT §65'S TINTED CHIP, which is the call §72.1b
+   made for the pulse's column heads on 31 Aug 2026 and holds for the same
+   reason: `.facts` already draws a box round every cell, so a filled square
+   inside it is a box in a box. Ink rather than a hue, because these four are
+   one subject — what enrolling costs and buys — and four colours would claim
+   they are four unrelated measurements. */
+/* NO BOX, AND ONE DIVIDER BETWEEN EACH PAIR — 613:8074 draws Line 27/28/29 and
+   no rectangle, which is Maryam's instruction and the file agreeing.
+
+   FOUR EQUAL COLUMNS AND THE DIVIDER BELONGS TO THE CELL IT PRECEDES. The first
+   cut of this followed the file's own geometry — content-sized cells (187, 213,
+   175, 196) with each line centred in the slack between them, which is §71.1c's
+   grid. It does not survive contact with three dividers: a grid container has
+   exactly two usable pseudo-elements, so the third line had to be a cell's own,
+   absolutely positioned half a gutter to its left — and a `1fr` gutter has no
+   width a stylesheet can read. It shipped against an undefined custom property,
+   which computes to `0px`, so two lines landed in the wrong gutters and the
+   third drew on a cell edge. Equal columns make the divider a property of the
+   cell instead: `+ .div::before` at the cell's own left edge, three of them, no
+   arithmetic. The visual cost against the file is that "Cohort of 10" gets the
+   same width as "$690", which on a 901px row is 225 each and ample.
+
+   `top:0;bottom:0` RATHER THAN THE FILE'S 46px HEIGHT. 46 is exactly the cell
+   content in 613:8074 and would be right today; stretched, the line follows a
+   value that wraps to two lines instead of hanging short of it. The row's own
+   20px of top padding is what detaches it from the lede above — the same
+   reasoning §72.1 uses for the pulse's inset dividers, arrived at for free here
+   because the padding is on the grid and the divider is on the cell.
+
+   AND `flex-direction:row` IS STATED, WHICH IS THE BUG THIS BLOCK EXISTED
+   WITHOUT. §10.1067 is `.facts > div{display:flex;flex-direction:column}` — the
+   direction is the component's, not the default. Overriding `display:flex` and
+   the gap while leaving the direction alone inherited `column`, so every cell
+   drew its 24px mark ON TOP of its two lines: three stacked rows, a section
+   half again as tall as it needed to be, and no overflow to measure it by.
+   When you take over a component's grid, restate every axis property it set.
+
+   ONLY THE OUTER BORDER GOES, and §10.16's gap-over-a-ground technique goes with
+   it — with `gap:0` there is no gap for the ground to show through, so
+   `background:none` or the rule colour paints behind the whole row. `border:0`
+   rather than four sides: §29.17 states all four at (0,3,0), so
+   `.app .page .facts.eo-facts` is the weight and answering `border-top` alone
+   would leave three standing. */
+.app .page .facts.eo-facts{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;column-gap:var(--s07);
+  background:none;
+  border:0;
+  padding:20px 0 0}
+.app .page .facts.eo-facts > div{
+  position:relative;
+  display:flex;flex-direction:row;align-items:flex-start;
+  gap:var(--s04);
+  min-width:0;
+  padding:0;
+  background:none}
+/* the three lines, one per cell after the first */
+/* THE SEPARATION IS THE GRID'S `column-gap` AND THE LINE SITS IN THE MIDDLE OF
+   IT — no side padding on any cell, so the first mark is flush with the heading
+   above it (Maryam, 31 Aug 2026). `left:calc(var(--s07) / -2)` is that gap
+   halved: one value drives the space and the line's position together. */
+.app .page .facts.eo-facts > div + div::before{
+  content:'';position:absolute;
+  left:calc(var(--s07) / -2);top:0;bottom:0;
+  width:1px;
+  background:var(--rule)}
+
+/* 24 AND 12 — 613:8076 is a 24px mark and Frame 125 starts at x=36. §73's first
+   cut used §72.1b's 20, which is the pulse's number for a mark beside a 14px
+   label; the file gives a fact cell 24. Ink rather than a hue, because these
+   four are one subject — what enrolling costs and buys — and four colours would
+   claim they are four unrelated measurements. */
+.app .eo-fi{flex:none;display:grid;place-items:center;width:24px;height:24px}
+.app .eo-fi svg{width:24px;height:24px;fill:var(--text-secondary)}
+/* 4 BETWEEN THE TWO LINES — 613:8078 ends at 21 and 613:8079 opens at 25. */
+.app .eo-fb{display:flex;flex-direction:column;gap:4px;min-width:0}
+
+/* 20 FROM THE FIGURES TO WHAT FOLLOWS — 615:8142 opens at y=206 against a facts
+   row that ends at 186. The section's own bottom padding is §05's and is larger,
+   so it is answered here rather than left to the page rhythm: this section and
+   the course preview under it are one block in the file. */
+.app .sec.eo{padding-bottom:20px}
+.app .sec.eo::after{display:none}
+
+/* -------------------------------------------------------------------- 1b ---
+   AND THE COURSE PREVIEW NEEDS ITS OWN LABEL-COLUMN OPT-OUT — TRAP 13, AND IT
+   WAS LOST BY A SUBTRACTION RATHER THAN A WRAPPER.
+
+   That section was opting out through §10.15's `.sec:has(> .all-desc)`, because
+   its lede carried `.all-desc`. Folding the lede into `aiHead` dropped the class
+   — the description is `.aih-d` now — and nothing warned: the heading, the pill
+   and the lede stacked into a 184px column with the five chapter cards crushed
+   into the 717 beside them.
+
+   This is §69's lesson word for word: "Adding a wrapper is not the only way to
+   lose an opt-out — removing content does it too." Restated on what the section
+   actually contains, inside the same container query per trap 3.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .sec:has(> .cov-row){display:block}
+  .app .sec:has(> .cov-row) > .sec-h{
+    border-right:0;min-height:0}
+}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE COURSE PREVIEW — four chapters, the remainder, and the cohort
+
+   THE HEAD ROW IS THREE MEMBERS, so unlike §73.1 the pill has to be told where
+   it sits: title, pill, then the action pushed right by its own auto margin. A
+   `space-between` row with three children puts the pill in the middle of the
+   section, which reads as a second heading.
+   ------------------------------------------------------------------------ */
+/* THE PILL RIDES INSIDE THE TITLE, which is what `aiHead`'s `extra` slot is
+   for: it is a tag ON the heading, not a third member of the row, so it wraps
+   with the words rather than pushing the action group. */
+.app .cov-pill{
+  display:inline-flex;align-items:center;
+  min-height:24px;padding:0 var(--s04);
+  background:var(--layer-accent-02, var(--layer-02))}
+
+
+
+/* THE FIVE CELLS ARE A FIXED FIVE-TRACK GRID, NOT `auto-fit`.
+   `.facts`'s `auto-fit minmax(140px,1fr)` is right for figures, which can wrap
+   to a second row and still read; a chapter row cannot — wrapped, "05" would
+   start a line under "01" and the sequence would read as two lists. Five equal
+   `minmax(0,1fr)` tracks hold the sequence at every width above 900, and §73.4
+   turns them into a scroller below it rather than letting them wrap.
+
+   THE GAP IS 1px OVER A RULE GROUND — §10.16's technique, so the four dividers
+   are exact single hairlines and the row needs no per-cell borders. Each cell
+   names the surface it sits on, which is what that technique costs. */
+.app .cov-row{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:1px;
+  background-color:var(--rule);
+  border:1px solid var(--rule)}
+.app .cov-c{
+  display:flex;flex-direction:column;
+  gap:var(--s03);
+  padding:var(--s05);
+  background-color:var(--layer-01)}
+
+/* THE NUMBER IS A 28px TINTED SQUARE IN THE CELL'S OWN HUE — §65's chip, and
+   here it IS the right component: the number is a label on the chapter rather
+   than a mark for a figure, and the cell has no other colour in it. The hue is
+   cycled by `coverSec` rather than named, and the note there is the argument. */
+.app .cov-n{
+  align-self:flex-start;
+  display:grid;place-items:center;
+  min-width:28px;height:28px;
+  padding:0 6px;
+  color:var(--mk);
+  background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
+
+/* THE MINUTES ARE PINNED TO THE FOOT so the four cells' figures line up
+   whatever a title does — "Delegation Without Drop-Off" is two lines and the
+   other three are one. */
+.app .cov-t{min-width:0}
+.app .cov-m{margin-top:auto}
+
+/* THE REMAINDER CELL IS THE ONE THAT IS NOT A CHAPTER, and it says so by having
+   no ground under its count and no minutes at its foot. `--mk` is unset on it,
+   so the chip falls back to the rule grey — stated rather than inherited,
+   because `color-mix` on an undefined custom property computes to nothing and
+   the chip would lose its ground entirely. */
+.app .cov-more{--mk:var(--text-helper)}
+
+/* --------------------------------------------------------------------- 3 ---
+   BELOW 900
+
+   The offer's head row and figure cells need nothing — `.sec-h` wraps by §73.1
+   and `.facts` is `auto-fit`, so both answer the width themselves. The chapter
+   row does not: five fixed tracks in a 358px page are 71px cells. It becomes a
+   horizontal scroller, which is the one place in this product that is the right
+   answer for a SEQUENCE — the cells keep their order and their size, and the
+   row says there is more by running off the edge. `.facts` would wrap; a
+   sequence must not.
+   ------------------------------------------------------------------------ */
+@container app (max-width:899.98px){
+  /* THE ACTION GROUP GOES FULL WIDTH AND STACKS, which is what every other
+     button in this product does at this width and is also the one thing in
+     §73.1 that CANNOT survive the narrow frame: the chip is 254 and the button
+     185, so the group's base size is 447 against a 358px page. With `flex:none`
+     on it and a fixed width on the button, nothing was allowed to give and the
+     page overflowed by 38px — the row wrapped exactly as designed and then the
+     group hung off the edge. §71.2b answers the same shape the same way. */
+  /* the cap is a desktop measure; stacked, the block IS the row */
+  .app .page .sec > .sec-h.aih > .aih-b{max-width:none}
+  .app .page .sec > .sec-h.aih > .aih-a{
+    flex-direction:column;align-items:stretch;
+    width:100%;margin-left:0;gap:var(--s03)}
+  .app .sec.eo .aih-a > .btn{width:100%}
+
+  /* AND THE FOUR FIGURES GO 2 x 2. Four `auto` cells and three slack tracks in
+     358px leaves each cell about 70px, which is a 24px mark and a wrapped word.
+     Two across is the same reading in two rows; the dividers go with the
+     single-row grid — the pseudo-elements are placed in named tracks that no
+     longer exist, so they have to be switched OFF rather than re-pointed, which
+     is §72.5's lesson about an absolutely-positioned divider.
+     `.facts` would have done this on its own, and that is the cost of taking
+     over its grid for the desktop case: what `auto-fit` gives free above 900 has
+     to be stated by hand below it. */
+  .app .page .facts.eo-facts{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--s06) var(--s05);
+    padding-top:var(--s05)}
+  /* THE DIVIDERS GO OFF, NOT NARROWER. Two across means cell 3 opens a second
+     ROW, so a line at its left edge would sit under cell 1 with nothing beside
+     it. `content:none` because the rule is a pseudo-element — §72.5's lesson —
+     and the paddings go with it or the two columns are indented unequally. */
+  .app .page .facts.eo-facts > div + div::before{content:none}
+
+  .app .cov-row{
+    grid-template-columns:repeat(5,minmax(200px,1fr));
+    overflow-x:auto;
+    border-left:0;border-right:0}
+}

@@ -76,13 +76,24 @@
    gap the tracks negotiated. Here the columns are equal `1fr`s and the divider
    belongs to the column it precedes, so it is that column's own pseudo-element
    and needs no track of its own. */
+/* THE ROW TAKES THE SECTION'S OWN GUTTER AND NOTHING ELSE (Maryam, 31 Aug
+   2026). The cells carried `padding:var(--s06)` on all four sides, which
+   indented the first column's mark 24px past the heading and the lede directly
+   above it — three blocks in one section starting at three different left edges.
+   Vertical padding only; the separation between columns is the grid's own
+   `column-gap`, and the divider sits in the middle of it.
+
+   `left:calc(var(--s07) / -2)` IS THE GAP HALVED, so one value drives both the
+   space and the line's position and they cannot drift. A `border-left` would sit
+   hard against the column that follows rather than between the two. */
+.app .pulse{column-gap:var(--s07)}
 .app .pulse > .pulse-c{
   position:relative;
   min-width:0;
-  padding:var(--s06)}
+  padding:var(--s06) 0}
 .app .pulse > .pulse-c + .pulse-c::before{
   content:'';position:absolute;
-  left:0;top:var(--s06);bottom:var(--s06);
+  left:calc(var(--s07) / -2);top:var(--s06);bottom:var(--s06);
   width:1px;
   background:var(--rule)}
 
@@ -350,21 +361,31 @@
    technique and it is exactly right here, one hairline between each pair, and
    the cells already name their ground for it.
 
-   IT IS A CARD ON 599:7418, so §29.17's border is kept rather than removed:
-   the three rows sit in their own box inside the column, which is the one
-   place in this section a nested edge is right — the rows are a LIST of three
-   like things, and the box is what says the list ended. SQUARE, though. The
-   file draws it with a ~10px radius and this product's `--radius` is `0px` by
-   token; every `border-radius` in the build resolves through it, and a single
-   rounded card would be the only curved rectangle in the portal. Stated as
-   `var(--radius)` rather than omitted, so a future decision to curve the
-   product curves this too. */
+   NO BOX AND NO DIVIDERS (Maryam, 31 Aug 2026). The reference draws the three
+   rows in a rounded card with a hairline between each pair, and it shipped that
+   way for one build with §29.17's border kept and §15's 1px-gap dividers
+   intact. Both come off: inside a column that is already delimited by §72.1's
+   inset divider, the card was a third nested edge — the section's rule, the
+   column's divider, then a box — and the two hairlines inside it made three
+   rows of one reading look like three rows of a table.
+
+   WHICH MEANS BOTH HALVES OF §15'S DIVIDER TECHNIQUE HAVE TO GO, and this is
+   the trap: §10's cell grids draw their dividers as a 1px `gap` over a
+   rule-coloured GROUND, so `gap:0` alone leaves the ground painted behind
+   cells that each declare their own background — invisible here, and one grey
+   line at the foot of the last cell if any cell's background ever changes.
+   `background:none` with it. `border:0` rather than four `border-*:0`, which is
+   §29's own lesson about turning a rule off: §29.17 states this border on all
+   four sides at (0,3,0) and answering `border-top`/`bottom` would leave the
+   sides standing. */
 .app .page .pulse .stand{
   grid-template-columns:minmax(0,1fr);
+  gap:0;
   margin-left:0;margin-right:0;
-  border:1px solid var(--rule);border-radius:var(--radius)}
+  background:none;
+  border:0}
 .app .page .pulse .stand > .stand-c{
-  padding-left:var(--s05);padding-right:var(--s05)}
+  padding-left:0;padding-right:0}
 
 /* THE ROW IS A MARK, A STACKED PAIR, AND THE FIGURE — 599:7418, and it differs
    from §29.14's arrangement on one point that matters. That layer puts the
@@ -407,23 +428,19 @@
 .app .page .pulse .stand .stand-l{grid-column:1;grid-row:1;align-self:center}
 .app .page .pulse .stand .stand-d{grid-column:1 / -1;grid-row:2;margin-top:0}
 .app .page .pulse .stand .stand-v{grid-column:2;grid-row:1;margin-left:0}
-/* THE ROW MARK IS A BARE GLYPH IN THE ROW'S OWN HUE, NOT THE AWARD ARTWORK
-   (Maryam, 31 Aug 2026). `standRow(g, true)` is what asks for it and the long
-   argument is over that function; what this rule does is give the glyph the
-   same treatment §72.1b gives the column heads — hue, no ground, no box — so
-   the six marks in this section are one family. 24px against the heads' 20:
-   these sit against a 14px label over an 11.5px note and a 24px figure, which
-   is a taller row than a column heading.
+/* THE ARTWORK AT 24, DOWN FROM §29.14'S 28 (Maryam, 31 Aug 2026).
+   This layer briefly replaced the three WebPs with flat glyphs and the artwork
+   is back — the note over `standRow` records the whole exchange. What survives
+   of it is the size: 32 was tried first (the reference's), 28 is the product's
+   figure-cell mark, and 24 is what these need in a 278px column now that the
+   card around them is gone. With no box to sit in, a 32px photographic mark
+   beside a 14px label was the heaviest object in the section by some distance;
+   at 24 it reads as the row's mark rather than as a picture.
 
-   `.stand-mk` KEEPS ITS RULES AND IS SIMPLY NOT DRAWN HERE. The artwork mode
-   is still what `V.rewards` renders, so §29.14's 28px and §15's `.none`
-   greyscale are untouched — there is no `.stand-mk` override in this file. */
-.app .page .pulse .stand .stand-ic{
-  flex:none;display:grid;place-items:center;
-  width:24px;height:24px;
-  color:var(--mk);
-  background:none}
-.app .page .pulse .stand .stand-ic svg{width:24px;height:24px;fill:currentColor}
+   §15'S `.none` GREYSCALE IS UNTOUCHED and still applies — the Badges row shows
+   an unearned shield at 38% opacity on every stage before one is earned, which
+   is the one state that would otherwise claim you have it. */
+.app .page .pulse .stand .stand-mk{width:24px;height:24px}
 
 /* --------------------------------------------------------------------- 5 ---
    BELOW 900 THE THREE COLUMNS ARE THREE ROWS
@@ -433,6 +450,24 @@
    count — at any width narrow enough that three columns do not fit, none of
    them do, and a two-across step would put the standing column alone on a
    second row half the width of the pair above it.
+
+   900 IS THE RIGHT NUMBER, AND FOR A WHILE IT WAS NOT — WORTH KNOWING BECAUSE
+   THE SAME 75px BAND WILL CATCH THE NEXT THING PUT IN THIS COLUMN. When the
+   cells still carried `padding:var(--s06)` on all four sides, the three columns
+   between 900 and about 975 were 182 to 195px wide, which is 134 to 147px of
+   content after 24 a side. "Continue learning" needs 155: 12 of padding, 105 of
+   label, the 4px gap and an 18px arrow, 16 again. So the button that closes the
+   focus column set on TWO LINES across that whole band, on `week1` and `day34`
+   both, and came right again at 1000. §72.1's move to vertical-only padding
+   gives the column its full 161px back at 900 and the label fits at every width
+   — the fix is that change, not a second breakpoint, which is why there is no
+   rule here answering it.
+
+   THE BAND IS THE POINT. That failure was in a 75px window ABOVE the product's
+   only breakpoint — a landscape tablet, a half-width desktop window — so
+   neither 390 nor 1280 could see it, and the layer was correct at both. It was
+   found by `respcheck.mjs`, and anything added to these columns should be swept
+   at 900 and 940 before it is called finished.
 
    THE COLUMNS PAY THE PAGE GUTTER HERE. `--pad-x` rather than §72.1's 24, so
    the stacked rows sit on the same spine as every other section on the page.
@@ -448,8 +483,9 @@
    own. */
 @container app (max-width:899.98px){
   .app .pulse{grid-auto-flow:row;grid-auto-columns:auto}
+  .app .pulse{column-gap:0}
   .app .pulse > .pulse-c{
-    padding:var(--s06) var(--pad-x)}
+    padding:var(--s06) 0}
   .app .pulse > .pulse-c + .pulse-c::before{content:none}
   .app .pulse > .pulse-c + .pulse-c{border-top:1px solid var(--rule)}
 }

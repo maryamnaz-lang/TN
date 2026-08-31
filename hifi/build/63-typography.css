@@ -141,6 +141,26 @@
   --t-eyebrow-size:11.5px;    --t-eyebrow-lh:16px;      --t-eyebrow-ls:.2px;
   --t-caption-size:11.5px;    --t-caption-lh:16px;      --t-caption-ls:.1px;
 
+  /* THE NINTH SIZE, AND IT IS RECORDED RATHER THAN SMUGGLED IN.
+     `--t-sec-size` is 16px and it exists because Maryam asked for it by number
+     (31 Aug 2026): the three AI-native section headings — "Your learning pulse",
+     "You're enrolling on Explorer – E3", "What the 90 days cover" — are one rank
+     and that rank is 16.
+
+     THE SCALE'S OWN RULE SAYS TAKE THE NEAREST ROLE, and §63 §11 applies it in
+     as many words: the progress percentage stays on the 34px display role rather
+     than "buying a ninth size for two characters" at the file's 32. h3 is 17,
+     one pixel off, and that is what these three shipped at first. This is a
+     stated exception under §63 §7 instead, on two grounds: it is a ROLE — three
+     headings across two layers, not one component's one-off — and unlike the 32
+     it is not a near-duplicate of a size in use for the same job, because §63 §4
+     puts every other section heading at 12.5. Eight sizes and one exception,
+     written down, beats nine sizes nobody can account for.
+
+     If it goes back to h3, delete this token and point the three rules at
+     `--t-h3-*`; nothing else reads it. */
+  --t-sec-size:16px;          --t-sec-lh:22px;          --t-sec-ls:-.15px;
+
   /* TWO WEIGHTS, AND THEY ARE NAMED AFTER THE FACES THEY ACTUALLY LOAD.
      Anything that is not one of these two is a lie about what will render —
      see §0.1. `--t-w-book` is Söhne Buch, `--t-w-strong` is Söhne Kräftig. */
@@ -586,6 +606,30 @@
    changes, 500 → 400, because 500 is not a weight this face has (§0.1). */
 .app .nrow:not(.un) .nrow-t{font-weight:var(--t-w-book)}
 .app .nrow.un .nrow-t{font-weight:var(--t-w-strong)}
+
+/* 0,3,0 — A COUNTED LIST OF SENTENCES IS BUCH, NOT KRÄFTIG (Maryam, 31 Aug
+   2026). The same argument as the notification above it, reached from the
+   other direction. §2's h4 list carries `.cardrow-t` because in fourteen of
+   its fifteen call sites the row title is a NAME with a `.cardrow-d`
+   description under it, and the strong weight is what separates the two. The
+   `booked` dashboard's "What to bring" has no description and no name: three
+   full sentences, up to nine words, one per numbered row. At 15/600 they
+   were the heaviest text in the section — heavier than "Your session, step
+   by step" above them — so the list read as three headings that had lost
+   their content.
+
+   THE SIZE IS UNTOUCHED AND THAT IS DELIBERATE. Dropping to `--t-desc` as
+   well would make them a description of the number beside them, which is not
+   what they are: each row is a thing you bring, and it is the row. 15/20 in
+   Buch is the body role at the h4 measure, which is exactly the register a
+   numbered instruction wants.
+
+   SCOPED THROUGH THE STACK, NOT THE ROW. `.prose` is written on the
+   `.tile-stack` by the view (views.js, `V.dashboard`'s booked branch, where
+   the reasoning is repeated in place), so the list declares itself once and
+   `V.welcome`'s "What happens next" — same `.cardrow-n` shape, real titles,
+   a `.cardrow-d` under each — is left alone. */
+.app .tile-stack.prose .cardrow-t{font-weight:var(--t-w-book)}
 
 /* 0,3,0 — Tal's suggestion chips were the label role at 500 */
 .app .tal-sugg > button,.app .tal-sugg .chip-tal{
@@ -1230,29 +1274,30 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;color:var(--text-secondary)}
 
-/* THE SECTION HEADING TAKES h3, WHICH IS "YOUR 90 DAYS SO FAR" EXACTLY
-   (Maryam, 31 Aug 2026). That block is `wingHead`'s `<h2 class="u-h3">` in the
-   band's second column, and the two are the head of the page and the head of
-   the section under it — the same rank, so the same size. Two steps up from
-   §63 §7b's 12.5 on `.sec-h > h2`, which is what "This week" was set at, and
-   one up from the band's 14px "Summary by Tal".
+/* ONE TITLE ROLE AND ONE DESCRIPTION ROLE, FOR EVERY `aiHead` SECTION.
+   `aiHead` is one component and these are its two type rules — where there were
+   three pairs, one per section, which had drifted to 12.5, 14 and 16 depending
+   on which `:has()` in §63 §8b each section happened to match. Maryam's
+   instruction was to do it once (31 Aug 2026); doing it once is also what makes
+   a fourth section free.
 
-   IT NEEDS (0,3,1) TO LAND, AND THAT IS THE WHOLE REASON THE SELECTOR IS
-   WRITTEN THIS WAY. §63 §4 puts `.app .sec-h h2` in the h4 list at (0,2,1) —
-   two classes and an element. A rule written `.app .pulse-ttl` is (0,2,0) and
-   LOSES to it however late it lands, which is trap "specificity beats order"
-   stated at the head of §7b. It read 14px rather than 17 and looked correct,
-   because this layer's first cut asked for h4 and the two agreed by accident.
-   `.app .sec-h h2.pulse-ttl` is (0,3,1) and wins on weight.
+   IT NEEDS (0,5,1) AND THE TIER — see §63 §13b. §63 §4's `.app .page .sec-h > h2`
+   is (0,3,1), and §63 §8b sizes section headings inside
+   `@container app (min-width:900px)`, which is its own cascade tier and cannot
+   be answered from outside it at any weight.
 
-   The ink is primary and NOT the ramp — §70.2 clips the band's label to
-   `--ai-grad` because that label is Tal speaking; this one heads a grid of
-   figures, and a gradient heading over a table is the ramp used as
-   decoration. The mark carries the voice; the words carry the ink. */
-.app .sec-h h2.pulse-ttl{
-  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+   THE INK IS PRIMARY AND NOT THE RAMP — §70.2 clips the band's label to
+   `--ai-grad` because that label is Tal speaking; these head grids of figures,
+   and a gradient heading over a table is the ramp used as decoration. The mark
+   carries the voice; the words carry the ink. */
+.app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-secondary)}
 
 /* THE LEDE IS BODY — it is prose, the only prose in the section, and §63 §3
    reserves the body role for exactly that. Its `<b>` figures stay in the
@@ -1267,11 +1312,7 @@
    the sentence that is NOT repeated as a figure below: the title also heads
    the focus column, so the accent is what ties the sentence to the column that
    answers it. No ground under it — a tint here would make it a chip. */
-.app .pulse-lede{
-  font-size:var(--t-body-size);line-height:var(--t-body-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
-.app .pulse-lede b{font-weight:var(--t-w-strong);color:var(--text-primary)}
+.app .aih-d b{font-weight:var(--t-w-strong);color:var(--text-primary)}
 .app .pulse-hl{font-weight:var(--t-w-strong);color:var(--accent-text)}
 
 /* THE FOCUS COLUMN. The title is h3 — a card title, and `weekCard` set it there
@@ -1380,3 +1421,123 @@
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
   text-transform:none;color:var(--text-primary)}
+
+/* ------------------------------------------------------------------ 13 ---
+   THE ENROLMENT OFFER — §73's families
+
+   §73 turns the `assessed` dashboard's black enrolment plate into a full-width
+   white offer and its thirteen-chapter list into four cards, and owns none of
+   the type. Same terms as §10, §11 and §12: every size, weight, case and ink
+   for the classes it introduces is here.
+
+   ITS TWO HEADINGS AND ITS LEDE ARE NOT HERE. Both take `aiHead`, whose title
+   and description roles are stated once in §63 §12 — that is the whole point of
+   the component (Maryam, 31 Aug 2026). This section states only what is left:
+   the date chip, the four fact cells, the pill and the chapter cards.
+   ------------------------------------------------------------------------ */
+
+/* THE DATE CHIP — the label role, which §63 §3 defines as "a chip, a tag, a
+   small value". In `--accent-text` because the chip's ground is the warm tint
+   and that pairing is §12's; the mark beside it is set to the same in §73. */
+.app .eo-when > b{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--accent-text)}
+
+/* THE FOUR FACT CELLS ARE TWO LINES, AND THE LABEL IS THE STRONG ONE.
+   613:8078 is a 21px line and 613:8079 a 19px line, in that order — so the row
+   that names the fact is the larger of the two and the row that states it is the
+   smaller. That inverts `.stat`, where an 11.5px label sits over a 24px figure,
+   and it is right for this row: these four are not figures being compared, they
+   are four different things enrolling buys, and what you scan is the names.
+   h4 over compact, which is 21 and 19 to the pixel.
+
+   THE FEE IS THE ONE ACCENT AND IT IS THE VALUE, not the label — 613:8079 is the
+   only orange string in the row. It earns it by being the number the page is
+   asking you to agree to; the other three values are counts that follow from it.
+   `--accent-text` rather than `--accent`, which is §12's readable pair. */
+.app .eo-fl{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .eo-fv{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .eo-fv-acc{
+  font-weight:var(--t-w-strong);color:var(--accent-text);
+  font-variant-numeric:tabular-nums}
+
+/* THE PILL — the label role again, in the violet `--mk-3` the reference draws
+   it in. It is the one tag on the page and it is a claim about the COURSE being
+   chosen for you, so it takes the third named hue rather than the accent: the
+   accent on this page is Tal's mark and the Enroll button, and a third accent
+   object beside them would read as a third action. */
+.app .cov-pill{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--mk-3)}
+
+/* THE CHAPTER CARDS — the number is a label inside its chip, the title is h4
+   (a card title, which is what it is), the minutes are the floor tier. The
+   remainder cell's title takes the same h4 as a chapter's so the five cells
+   read as one row; what marks it out is its grey chip and its missing minutes,
+   which is §73.2's job and not this layer's. */
+.app .cov-n{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;
+  font-variant-numeric:tabular-nums}
+.app .cov-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .cov-m{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+
+
+/* ----------------------------------------------------------------- 13b ---
+   AND ALL THREE HAVE TO BE RESTATED INSIDE THE 900px TIER — trap 3, and this
+   is the third time §63 has had to write this block down.
+
+   §63 §8b sizes section headings at desktop, in a container query:
+   `.app .sec:has(> .sec-h) > .sec-h h2` at `--t-label` (12.5), plus a second
+   group at h4 (14) for the seven shapes that "carry something". A rule inside
+   `@container app (…)` is ITS OWN CASCADE TIER, so an unconditional rule cannot
+   answer it at any specificity — §63 §3's own note says so and §8b exists
+   because §3 forgot it once already.
+
+   WHAT IT LOOKED LIKE: the three headings read 16 below 900 and 12.5 or 14 above
+   it — "You're enrolling on Explorer – E3" at 12.5 next to a 40px button, and
+   "What the 90 days cover" at 14 because its section carries an `.all-desc` and
+   so matched §8b's second group. Both correct-looking on a phone, both wrong on
+   the frame the product is read at. This is trap 3's own warning about sweeping
+   at one width, in the layer that warns about it.
+
+   The unconditional rules above stay: below 900 there is no tier to beat and
+   they are what wins against §63 §4's (0,2,1).
+   ------------------------------------------------------------------------ */
+/* AND THE WEIGHT INSIDE THE TIER IS (0,6,1), WHICH IS THE SECOND HALF OF THIS
+   TRAP AND THE PART THAT COST THE EXTRA ROUND TRIP. Landing in the right tier is
+   necessary and not sufficient: §8b's selector is
+   `.app .sec:has(> .sec-h) > .sec-h h2`, and `:has()` takes the specificity of
+   its ARGUMENT — so that is `.app` + `.sec` + `.sec-h`(inside) + `.sec-h` + `h2`
+   = (0,4,1), not the (0,2,1) it looks like. A restatement at `.app .sec-h
+   h2.eo-ttl` is (0,4,1) minus one class = (0,3,1) and still loses, in the same
+   tier, which reads exactly like the tier fix not having worked.
+
+   Counting `:has()` is the thing to remember: four of the eight selectors in
+   §8b's second group are `:has()` and every one of them is a class heavier than
+   it appears. */
+@container app (min-width:900px){
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > h2.aih-t{
+    font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+    text-transform:none;color:var(--text-primary)}
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{
+    font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+    font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
+}

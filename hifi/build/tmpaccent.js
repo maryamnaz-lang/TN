@@ -28,10 +28,17 @@
      on the page it was asked for.
    ========================================================================== */
 
+/* OFF RIGHT NOW (Maryam, 31 Aug 2026). An empty list means the class is never
+   stamped, so every page draws the orange accent and §25.1's own two-ellipse
+   wash — the trial is invisible without being deleted. §67 still ships, and it
+   is inert: `.tmp-accent` is a class nothing writes.
+
+   TO BRING IT BACK: uncomment the three rows. Nothing else has to change.
+   TO DELETE IT FOR GOOD: see the removal note at the head of §67. */
 const TMP_ACCENT_ON = [
-  ['assessed', 'dashboard'],   // "Levelled, not enrolled"
-  ['day34',    'dashboard'],   // "Day 34"
-  ['promoted', 'dashboard'],   // "Promoted to E4"
+  // ['assessed', 'dashboard'],   // "Levelled, not enrolled"
+  // ['day34',    'dashboard'],   // "Day 34"
+  // ['promoted', 'dashboard'],   // "Promoted to E4"
 ];
 
 const _baseTmpAccent = render;
