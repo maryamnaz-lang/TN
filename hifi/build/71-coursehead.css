@@ -411,6 +411,16 @@
 .app .crow-ph img{
   position:absolute;inset:0;
   width:100%;height:100%;object-fit:cover}
+/* AND THE FALLBACK IS NOT ITALIC. `<i>` is italic by default — the trap §56's
+   ladder note records — and every other initials slot in the build normalises
+   it: §09.12 for `.av-ph i`, §11.134 for `.av i` / `.mem-av i` /
+   `.shell-avatar i`. This one was missed because a photograph has always
+   covered it, so the italic was invisible rather than absent. The leader's
+   weekly-call card is the first row whose mark is a LABEL and not a face
+   (`41`, the cohort's number, with no image behind it), which is where it would
+   have shipped. `font-style` is not one of §63's four properties, so it is
+   stated here with the component rather than in the type layer. */
+.app .crow-ph i{font-style:normal}
 
 .app .crow-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0}
 .app .crow-b p{margin:0}

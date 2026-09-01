@@ -386,3 +386,46 @@
       rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 100%),
     linear-gradient(107.08deg,
       rgba(244,113,19,.34) 1.04%, rgba(226,166,0,.34) 39.89%, rgba(240,83,12,.34) 99.58%)}
+
+/* ------------------------------------------------------------------ 75.5 ---
+   THE SEAMS INSIDE THE CARD — the other half of §63 §6a
+
+   §63 §6a re-inks everything a converted section might hold, on the finding
+   that `.dark-card` had inherited none of the build's generic on-dark ink:
+   the whole `.on-dark` family is written against a class this one deliberately
+   does not carry, because `.sec.on-dark` is in ai5's `DARK_CARD` and would be
+   hoisted into the head band. That fixed the WORDS. These are the three
+   non-colour halves of the same finding, here rather than there because
+   `border-color` and `background-color` are not among §63's four properties.
+
+   THE HAIRLINES INSIDE A CARD ARE `--on-dark-rule`. `.kv`, `.stat`, `.facts`
+   and `.tile` all draw their seams in `--rule` — a light grey tuned for white
+   paper, which on `--gray-100` is the brightest thing on the card and turns a
+   quiet band of figures into a drawn table. 16% white is the token §75.2
+   already uses for the head row's rule, so a converted section's internal
+   seams and its heading's seam are the same line. NOT `--on-dark-border` at
+   42%, for §15's `.plate-x` reason: that weight is the edge of something you
+   can press.
+
+   THE QUIET BUTTON LOSES ITS STROKE, which is §77.6's finding generalised from
+   one caller to the class. That note is the argument in full: on white a
+   borderless button "read as a text link that happened to be 185px wide", and
+   on black the accent button is the brightest object on the card, so the fill
+   makes the distinction and the outline is one more edge. `border-color`
+   rather than `border`, per §64.1 — `.btn` carries a transparent 1px and
+   dropping the shorthand would make this the one button in the product with a
+   2px box model, 2px shorter than the `.btn-p` beside it in the same row.
+
+   `.tile` AND `.note` LOSE THEIR GROUND. Both paint `--layer-01`/`--layer-02`,
+   which are near-white: inside the card they read as a white box sitting on
+   the black one rather than as a block of it. Transparent, and the card's own
+   ground shows through — the same subtraction §69.4 makes for the leader tile
+   inside the head band, for the same reason ("inside the band every member is
+   transparent and on the spine").
+   ------------------------------------------------------------------------ */
+.app .dark-card .kv,.app .dark-card .kv > div,
+.app .dark-card .stat,.app .dark-card .facts,.app .dark-card .facts > div,
+.app .dark-card .tile,.app .dark-card .cardrow,.app .dark-card .note{
+  border-color:var(--on-dark-rule)}
+.app .dark-card .btn:not(.btn-p){border-color:transparent}
+.app .dark-card .tile,.app .dark-card .note{background-color:transparent}

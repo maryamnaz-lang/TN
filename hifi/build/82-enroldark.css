@@ -123,11 +123,27 @@
 /* ------------------------------------------------------------------ 82.3 ---
    THE DATE CHIP KEEPS ITS SHAPE AND CHANGES ITS GROUND
 
-   §73.1 argues the chip at length and none of that argument moves: it is 40
-   tall to match the button (615:8145 and 613:7990), centred rather than
-   stretched, and its ground is deliberately LOWER-contrast than the button's so
-   the pair reads as one figure and one action rather than as the same control
-   at two saturations.
+   THE PAIR THIS SECTION IS ABOUT NO LONGER EXISTS, AND THE RULE BELOW IS KEPT
+   ANYWAY — read this before reasoning from the paragraphs under it. On
+   1 Sep 2026 the chip moved out of the action group and into `aiHead`'s `under`
+   slot, and §73's own note is the long version: it is not a chip any more, it is
+   the lede's next line, so its ground, its padding and its 40px floor all came
+   off there. Everything below about "one of a PAIR whose geometry §73 measured"
+   was true of the arrangement this layer was written for and is not true now.
+
+   WHAT IS STILL LOAD-BEARING IS THE MARK'S COLOUR — `currentColor`, so §63's one
+   `color` draws the glyph and the words together on the black card. The
+   `background:none` is now said twice, here and in §73's slot rule, and it is
+   left standing rather than deleted because the two answer different questions:
+   §73's is "this is not a chip", this one is "a warm 10% wash is wrong on #111",
+   and a hand-authored page that puts an `.eo-when` back in a `.dark-card`
+   action group still needs the second one.
+
+   The original argument, for the record: §73.1 argues the chip at length and
+   none of that argument moves: it is 40 tall to match the button (615:8145 and
+   613:7990), centred rather than stretched, and its ground is deliberately
+   LOWER-contrast than the button's so the pair reads as one figure and one
+   action rather than as the same control at two saturations.
 
    WHAT CHANGES IS THE MIX IT IS TAKEN FROM. `color-mix(--accent 10%,
    transparent)` over white is a warm wash; over #111 it is a dark red-brown
@@ -173,3 +189,34 @@
    which is the half of "what the interview found" a reader remembers. */
 .app .qa-ic.ic-cover svg{fill:var(--mk-3)}
 .app .qa-ic.ic-found svg{fill:var(--mk-1)}
+
+/* ------------------------------------------------------------------ 82.5 ---
+   THE PAGE STOPS ON THE CERTIFICATE, WITH NO RULE UNDER IT
+
+   Maryam, 1 Sep 2026: "remove the divider at the page end after the
+   certification card."
+
+   THIS WAS ALREADY ANSWERED FOR EVERY OTHER PAGE AND A WRAPPER BROKE IT.
+   §14.200 is `.app .page > .sec:last-child::after{display:none}` — a closing
+   hairline under the last section has nothing after it to separate, so the
+   build already turns it off. `certCard` returns a `.sec`, but on this page it
+   is wrapped: `<div class="keep-place">${'$'}{certCard(f)}</div>`, the opt-out that
+   stops `placeDark` hoisting a `.cert` into the head band (trap 12). So the
+   cert's `.sec` is a grandchild of `.page`, §14's child combinator stopped
+   matching, and the rule came back — trap 13's family exactly, a `> ` selector
+   lost to a wrapper introduced for an unrelated reason.
+
+   STATED IN BOTH TIERS, PER TRAP 3. §14.200 lives inside
+   `@container app (min-width:900px)` and §10.66 draws `.sec:last-child::after`
+   in `var(--rule)` below it, so answering only the desktop tier would leave the
+   line on a phone. The unconditional rule handles the narrow tier and the
+   restatement wins inside the query, where §14's own rule is.
+
+   KEYED ON `.keep-place`, NOT ON `.cert`. What is being answered is "this is the
+   last thing on the page", which is a fact about the wrapper's position — and
+   `V.transcript` draws the same `certCard` mid-page, where its closing rule is
+   correct and must stay. `:last-child` keeps it that way by construction. */
+.app .page > .keep-place:last-child > .sec::after{display:none}
+@container app (min-width:900px){
+  .app .page > .keep-place:last-child > .sec::after{display:none}
+}

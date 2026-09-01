@@ -77,6 +77,57 @@
   outline:2px solid var(--accent);outline-offset:-2px}
 
 /* --------------------------------------------------------------------------
+   §36.2a THE CANDIDATE CELL — A FACE AND A NAME ON ONE LINE
+
+   `.ldr-who` HAD NO RULE AT ALL AND THE NAME WAS SETTING UNDER THE FACE. The
+   cell is a `<span>`, so it was `display:inline` — and §11.132 gives
+   `.mem-av` `display:grid`, which is a BLOCK-level box. A block inside an
+   inline breaks the line around itself, so every one of the twenty-eight rows
+   drew the photograph on one line and the name on the next: measured at 1280,
+   the row was 45px tall with the face at y=0 and the name at y=27, their
+   mid-points 23px apart. On all four tabs of Course Reports, because the
+   filter re-renders one section rather than hiding rows.
+
+   IT WAS INVISIBLE FOR THE USUAL REASON — nothing warned. A class written
+   into the markup with no rule behind it is valid CSS and valid HTML, and the
+   cell still contained the right two things in the right order. This is the
+   mirror of §77's "gate nothing writes": there the stylesheet kept a colour
+   for markup that had gone, here the markup kept a hook for a rule that was
+   never written. Both are found by asking the same question of the two sides
+   at once.
+
+   NOT SCOPED TO THE LEADER, on §31.5's precedent and for its exact reason.
+   `.ldr-who` is a name no other markup in the portal uses, so a
+   `[data-portal="leader"]` scope would protect nothing and would make the
+   cell unreachable from a third portal built on the design system — which is
+   what that scope did to `.face-row` until it was taken off. "A person in a
+   table row" is not a fact about cohort leaders.
+
+   `white-space:nowrap` AND `flex-wrap:nowrap`, AND THAT IS §36.104's ANSWER
+   ONE COLUMN OVER. A first pass used `flex-wrap:wrap` so the optional
+   "32 behind" `.tag` could give way on a narrow cell — which fixed desktop
+   and left the phone drawing the same bug in a new place: at 390 the cell is
+   squeezed, so the NAME became the flex item that moved to line 2 and twelve
+   of the twenty-eight rows were still stacked (measured, 83px at the worst).
+   The wrap was answering the wrong question. **This table is a horizontal
+   scroller by construction** — §02.468 gives `.tbl-wrap` `overflow-x:auto`
+   and §31.50 puts a 520px floor under the leader's `.tbl` — so a cell that
+   will not fit is meant to make the table WIDER, not taller. Held on one
+   line, the column takes its natural width, the table passes 520 and the
+   scroller absorbs it. §36.104 states exactly this for the figure cells one
+   column over ("a cell of two figures is one reading, so the helper half must
+   not wrap onto its own line and make it look like two"), and a person and
+   their name is the same claim.
+
+   `flex:none` on the mark because §11 already sizes it and a flex parent
+   would otherwise let a long name squeeze the photograph.
+   -------------------------------------------------------------------------- */
+.app .ldr-who{
+  display:flex;align-items:center;gap:var(--s03);
+  flex-wrap:nowrap;white-space:nowrap}
+.app .ldr-who > .mem-av{flex:none}
+
+/* --------------------------------------------------------------------------
    §36.3 SEVERITY, ON THE TABLES THIS PASS ADDS
 
    §31 states this treatment for `.tbl-flag`, the dashboard's attention queue.
@@ -116,26 +167,22 @@
    this kind of mark — `.tq-scene` is an icon and a word in `--support-attention`
    — so these two are that same shape in the two inks §12 tuned for a verdict.
    Nothing else about the line changes: same grid, same quote, same measure.
-   -------------------------------------------------------------------------- */
-.app .ldr-pos,.app .ldr-neg{
-  display:inline-flex;align-items:center;gap:var(--s02);
-  letter-spacing:.6px}
-.app .ldr-pos svg,.app .ldr-neg svg{
-  width:13px;height:13px;display:block;fill:currentColor}
-.app .ldr-pos{color:var(--support-success)}
-.app .ldr-neg{color:var(--support-attention)}
-
-/* The reading under the quote is a second `.tq-x`, and two of them stacked
-   need the gap `.tq-b` gives its children to open up a little — otherwise the
-   note reads as the next sentence of the quotation rather than as a comment
-   on it. */
-.app .tq-x + .tq-x{margin-top:var(--s03)}
+   --------------------------------------------------------------------------
+   DELETED 1 SEP 2026 — A COHORT LEADER DOES NOT INTERVIEW, so there is no
+   level decision and nothing quotes a transcript on this portal. Four rules
+   went: `.ldr-pos` / `.ldr-neg` and their glyphs, and `.tq-x + .tq-x`, the
+   gap between a quote and the reading under it (the candidate's own transcript
+   draws one `.tq-x` a row, so that selector matched nothing else). The note
+   above is kept because the SHAPE is the answer if a marked quotation ever
+   comes back: it goes in `.tq-w` beside the speaker, in §12's two verdict
+   inks, and nothing else about the line changes. */
 
 /* --------------------------------------------------------------------------
-   §36.5 THREE PICKERS MADE OF BUTTONS
+   §36.5 TWO PICKERS MADE OF BUTTONS
 
-   A level, a recommendation and a cohort board are all "choose one of a few",
-   and none of them is a tab strip: `.cs` is full-bleed chrome that changes
+   It was three until 1 Sep 2026, when the level picker went with the level
+   decision (see the deletion note under the rule below). A recommendation and
+   a cohort board are both "choose one of a few", and neither is a tab strip: `.cs` is full-bleed chrome that changes
    what is rendered, and these change a value inside a form or a panel. So
    they are `.btn`s in a `.btn-set`, with the chosen one taking `.btn-p` — the
    same way the wireframe drew its level picker and the same way every toggle
@@ -146,58 +193,20 @@
    picker names its cohorts. Wrapping is all those two rules do.
    -------------------------------------------------------------------------- */
 .app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
-/* a level is one character, so the button should not be as wide as a word */
-.app .ldr-rungs .btn{min-width:64px;justify-content:center}
+/* THE FIFTEEN-LEVEL PICKER IS DELETED (1 Sep 2026) and it was the longest
+   block in this layer: `.ldr-rungs` as a non-wrapping scroller below 900 and a
+   fifteen-column grid above it, with the band break drawn as an
+   `nth-child(5n+1)` gap. Nothing sets a level on this portal any more — a
+   cohort leader does not interview — so the class has no writer, and
+   `ldrRungView`, the post-render pass that centred the chosen rung in the
+   scroller, went with it (lead3.js records that).
 
-/* THE FIFTEEN LEVELS ARE ONE LINE, AND THE LINE NEVER WRAPS.
-   The ladder is the product's one picture of "how far from here to the top",
-   and it is always drawn as a single run of fifteen — `ladder()` in views.js,
-   the track band, the accordion that says "fifteen levels in one line". A
-   picker that wraps it into 8 + 7 is not that picture any more: the level you
-   are choosing is a POSITION, and a position needs an axis to be read against.
-   Wrapping also produced the specific ugliness the five-level version had, a
-   last row of one button stretched to the full width of the form and reading
-   as the recommended answer.
-
-   TWO LAYOUTS, ONE AXIS.
-
-   DESKTOP — fifteen equal columns. `minmax(0,1fr)` overrides the `min-width`
-   above so each level takes a fifteenth of the column: at 1400px that is 88px
-   for a two-character label, comfortable, and every level the same width, which
-   is what makes the row read as a scale rather than as a toolbar.
-
-   TABLET AND PHONE — the same single line, scrolled. Fifteen buttons cannot
-   fit 390px at a legible size, and the answer is not to wrap it but to let it
-   run: `overflow-x:auto` with `flex:none` buttons, which is exactly what
-   `.daystrip` (§29) does for the slot picker's days. `scrollbar-width:none`
-   for the same reason it does — the row is short and the scrollbar would be
-   half the height of the control. The 6px of bottom padding is the focus
-   ring's room, or a keyboard user's outline gets clipped by the scroll box.
-
-   THE BAND BREAK IS A GAP, NOT A LABEL. Five levels, gap, five, gap, five —
-   `nth-child(5n+1)` from the second group on. It is the only thing separating
-   Explorer from Builder in the row, and it is enough because the labels carry
-   their band letter; a legend under fifteen buttons would be a second row of
-   type saying what the buttons already say.
-   -------------------------------------------------------------------------- */
-.app .ldr-rungs{
-  display:flex;flex-wrap:nowrap;gap:var(--s03);
-  overflow-x:auto;overscroll-behavior-x:contain;
-  scrollbar-width:none;padding-bottom:6px}
-.app .ldr-rungs::-webkit-scrollbar{display:none}
-.app .ldr-rungs .btn{
-  flex:none;min-width:56px;
-  padding-left:var(--s04);padding-right:var(--s04)}
-.app .ldr-rungs .btn:nth-child(5n+1):not(:first-child){margin-left:var(--s05)}
-@container app (min-width:900px){
-  /* the whole ladder fits, so it stops being a scroller and becomes a scale:
-     equal columns, no scroll, and the band gaps carried over as grid gaps */
-  .app .ldr-rungs{
-    display:grid;grid-template-columns:repeat(15,minmax(0,1fr));
-    overflow:visible;padding-bottom:0}
-  .app .ldr-rungs .btn{
-    min-width:0;padding-left:var(--s02);padding-right:var(--s02)}
-}
+   THE ONE ARGUMENT WORTH KEEPING, because it is about the ladder rather than
+   about this control: the ladder is the product's one picture of "how far from
+   here to the top" and it is always drawn as a single run of fifteen, so a
+   picker that wrapped it into 8 + 7 stopped being that picture — the level you
+   choose is a POSITION and a position needs an axis to be read against. Any
+   future fifteen-level control wants the scroller, not the wrap. */
 
 /* the count on a board picker: the same treatment §31 gives `.lf-n` on the
    dashboard's filter chips, which is where a count-inside-a-control was first
@@ -325,8 +334,11 @@
    The class goes on the cell rather than on the table, because the same table
    also ends rows in a chevron, which §36.2 wants right-aligned. Naming the
    prose is the only way to tell those two apart.
-   -------------------------------------------------------------------------- */
-.app .tbl td.ldr-prose{text-align:left}
+   --------------------------------------------------------------------------
+   DELETED 1 SEP 2026 with the competency table it named — `.app .tbl
+   td.ldr-prose{text-align:left}`. The reasoning above is the general rule and
+   is kept: a prose cell in a table of figures is named on the CELL, because
+   the same table right-aligns a chevron. */
 
 /* --------------------------------------------------------------------------
    §36.12 THE COMPETENCY READ IS A DARK CARD
@@ -356,33 +368,19 @@
    is for: THE LEVEL TAL PROPOSES is a filled white chip, every other reading is
    the outlined chip the plate's timer already uses. Direction is what the
    sentence under the table is for, and it says it in words.
-   -------------------------------------------------------------------------- */
-.app .ldr-read{
-  background-color:var(--surface-dark);color:var(--on-dark);
-  padding:var(--s06)}
-.app .ldr-read-h{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:var(--s05);margin-bottom:var(--s05)}
-.app .ldr-read-h > h2{
-  font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.05px;
-  color:var(--on-dark)}
-.app .ldr-read .tbl th{
-  color:var(--on-dark-2);border-bottom-color:var(--on-dark-border)}
-.app .ldr-read .tbl td{
-  color:var(--on-dark-2);border-bottom-color:var(--on-dark-rule)}
-.app .ldr-read .tbl td:first-child{color:var(--on-dark);font-weight:600}
-.app .ldr-read .ldr-read-x{
-  margin-top:var(--s05);max-width:64ch;
-  font-size:13px;line-height:21px;color:var(--on-dark-2)}
-/* the outlined chip, for every chip on this card… */
-.app .ldr-read .tag{
-  background-color:transparent;border-color:var(--on-dark-border);
-  color:var(--on-dark)}
-/* …and the filled one, for the single reading that is Tal's answer */
-.app .ldr-read .tag.brand{
-  background-color:var(--on-dark);border-color:var(--on-dark);
-  color:var(--surface-dark)}
-.app .ldr-read .tag svg{fill:currentColor}
+   --------------------------------------------------------------------------
+   ALL TWELVE RULES ARE DELETED (1 Sep 2026). `.ldr-read` was the competency
+   read on a level decision, and a cohort leader does not interview, so nothing
+   writes the class — the whole card went with `V.leadEval`. Its two type rules
+   in §63, its `position:relative` / `overflow:hidden` pair in §21.22 and its
+   entry in ai5's `DARK_CARD` all went in the same pass; §75's note still cites
+   §21's record of this card painting a 700px orange rectangle across the band
+   for want of that pair, which is why that record is kept where it stands.
+
+   THE CHIP ARGUMENT ABOVE IS THE PART TO REUSE, and it is general: on a black
+   card `.tag.brand` disappears and `.tag.green` / `.tag.org` read at 1.5:1, so
+   the answer is an outlined chip for every reading and a FILLED one for the
+   single reading that is the answer. The next dark table wants exactly that. */
 
 /* --------------------------------------------------------------------------
    §36.13 THE QUOTED EVIDENCE IS NOT A TRANSCRIPT
@@ -403,10 +401,15 @@
    §37.1 both make, that nothing draws a rule onto a block that already has an
    edge. Portal-scoped because `.ivt-lines` on the candidate side is the
    transcript, where every one of §16's choices is right.
-   -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .ivt-lines{margin-left:0;margin-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq{padding-left:0;padding-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq:last-child{border-bottom:0}
+   --------------------------------------------------------------------------
+   DELETED 1 SEP 2026. All three rules were `[data-portal="leader"]`-scoped and
+   the leader has no page that borrows `.ivt-lines` any more — the level
+   decision was its only caller on this side. The candidate's transcript is
+   untouched, which is what the portal scope was protecting; §36.9's
+   label-column opt-out for `.ivt-lines` is NOT scoped and stays, because that
+   one serves the transcript page too. The argument above is kept because it is
+   the general one, made twice elsewhere (§26.11, §37.1): nothing draws a rule
+   onto a block that already has an edge. */
 
 /* --------------------------------------------------------------------------
    §36.14 A RECORD, A FORM AND A LIST OF SWITCHES ALL PUT THEIR HEADING ON TOP

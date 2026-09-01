@@ -36,6 +36,27 @@
    Cohort 41 is Maryam's, and its ten members ARE `COHORT` in views.js — same
    names, same activity. The wireframe's per-member progress numbers are carried
    onto them so the two portals agree about the same ten people.
+
+   AND THE LEADER DOES NOT INTERVIEW ANYBODY — Maryam, 1 Sep 2026. This is the
+   largest departure from the wireframe on this side, and it is a correction
+   rather than a redraw: the wireframe's leader ran the initial level interview
+   AND led the 90 days, which put the same act on two portals at once, because
+   the candidate side has always shown a TALENT AGENT doing the interviewing and
+   the signing. A cohort leader takes cohort calls. Three consequences run
+   through every file here, and each one is written up where it lands:
+
+   1. `LEAD_SESSIONS` and `LEAD_EVALS` are gone, and the diary is derived from
+      `LEAD_COHORTS` (`lcall` / `lcalls`, with `LEAD_RUN` for the calls already
+      run). The note over those is the argument.
+   2. `Sessions` is `Calls` — one rail slot, renamed and repointed, holding this
+      week's three calls and the ones behind them. `V.leadCalls` in lead3.js.
+   3. `Evaluations` is the 90-day summary alone. Its second queue and the whole
+      of `V.leadEval` — Tal's competency read, the transcript quotes, the
+      fifteen-rung picker and the override box — are deleted, not hidden.
+
+   What survives untouched is point 2 above it: the leader is still measured on
+   their candidates, and a summary that closes 90 days they were in the room for
+   is still theirs to sign.
    ========================================================================== */
 
 /* THE SAME PERSON THE CANDIDATE SEES, AND THE FACTS ARE STATED ONCE.
@@ -149,89 +170,85 @@ const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.memb
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
 
-/* --- the interviews the leader runs -------------------------------------- */
-/* EVERY PERSON ON THIS PORTAL CARRIES A FACE. The leader's whole job is people,
-   and a leader scanning a queue recognises a face before they read a name — so
-   `i` and `img` travel with the record rather than being chosen at the call
-   site. `img` names one of the five photos in `AV`; the initials show through
-   if the image fails, which is what `avatar()` is built to do. */
-/* `day`, `time` and `ord` sit beside `when` rather than replacing it. `when` is
-   a sentence — "today 4:30 pm" reads correctly inside a line of prose, which is
-   where the plate and the waiting rows use it. The booked list is a COLUMN of
-   appointments, and a column needs the day and the hour apart so they stack in
-   a date chip and line up down the page. `ord` is an explicit sort key because
-   these are human strings: parsing "Tomorrow" and "Nov 21" into comparable
-   dates would be a date library's job, and the order here is a fixed demo
-   week — Thursday — so it is stated rather than computed. */
-const LEAD_SESSIONS = [
-  {id:'s1', name:'Thomas Beck',   i:'TB', img:'samuel', when:'Today 10:00 AM',    day:'Today',    time:'10:00 AM', ord:0, mins:45, state:'done',     quiz:64, bucket:'Explorer'},
-  {id:'s2', name:'Rachel Okonjo', i:'RO', img:'lena',   when:'Yesterday 3:30 PM', day:'Yesterday',time:'3:30 PM',  ord:-1,mins:45, state:'done',     quiz:71, bucket:'Explorer'},
-  {id:'s3', name:'Femi Adebayo',  i:'FA', img:'owen',   when:'Today 4:30 PM',     day:'Today',    time:'4:30 PM',  ord:1, mins:45, state:'upcoming', quiz:58, bucket:'Explorer'},
-  {id:'s4', name:'Sana Qureshi',  i:'SQ', img:'hana',   when:'Tomorrow 11:00 AM', day:'Tomorrow', time:'11:00 AM', ord:3, mins:45, state:'upcoming', quiz:69, bucket:'Explorer'},
-  {id:'s5', name:'Maryam Naz',    i:'MN', img:'hana',   when:'Nov 21, 6:30 PM',   day:'Nov 21',   time:'6:30 PM',  ord:9, mins:45, state:'upcoming', quiz:64, bucket:'Explorer', re:true}
-];
+/* --------------------------------------------------------------------------
+   THE CALLS THE LEADER RUNS — AND THERE IS ONLY ONE KIND OF APPOINTMENT
 
-/* A LEVEL DECISION IS THE LEADER'S SIGNATURE, NOT THE MODEL'S. Tal reads the
-   transcript and proposes a level with its reasoning; the level is not set until
-   a person signs it. `ai` is the proposal and `status` is whether anybody has
-   agreed yet — the wireframe kept those two facts apart and so does this. */
-const LEAD_EVALS = [
-  {id:'e1', name:'Thomas Beck',   i:'TB', img:'samuel', when:'Today 10:00 AM',    quiz:64, ai:'E1', status:'pending',
-   why:'The quiz put them in the Explorer band and the interview places them at the entry level. Clear intent and good scoping, but they described keeping work rather than handing it over — twice.'},
-  {id:'e2', name:'Rachel Okonjo', i:'RO', img:'lena',   when:'Yesterday 3:30 PM', quiz:71, ai:'E3', status:'pending',
-   why:'Top of the Explorer band. Reframed an under-specified brief into three testable options unprompted; a weak conflict-repair answer is what holds this at 3 rather than 4.'}
-];
+   A COHORT LEADER TAKES COHORT CALLS AND DOES NOT INTERVIEW ANYBODY (Maryam,
+   1 Sep 2026: "a cohort leader will only be taking cohort calls, not
+   interviewing the initial candidates, so please change this flow overall").
+   `LEAD_SESSIONS` — five 45-minute level interviews, each with a face, a quiz
+   score and a level to sign afterwards — is DELETED, and so is the whole
+   assessment pipeline it fed (`LEAD_EVALS`, `V.leadEval`, `LDR_AN`, the level
+   picker and the override box; lead3.js's head is the long version).
 
+   THE INITIAL INTERVIEW IS THE TALENT AGENT'S AND THE PRODUCT ALREADY SAID SO.
+   One portal over, Priya interviews the candidate, Priya signs the report, and
+   the candidate enrols on the strength of it — `signedSummary` (§74) draws that
+   report, `PAGESUM.assessed` dates it, and §73's whole argument is about the
+   page it unlocks. A leader signing a level as well was one act performed twice
+   by two people, and the leader's half was the half with no evidence under it:
+   lead2.js tells them in as many words that "the full recording is never shared
+   with you". What the leader keeps is the signature that is genuinely theirs —
+   the 90-day summary, which closes thirteen weeks they were in the room for.
+
+   THE DIARY IS DERIVED FROM `LEAD_COHORTS`, NOT STATED A SECOND TIME. Every
+   fact about a weekly call — the day, the hour, which week of thirteen, how many
+   candidates and at what level — is already on the cohort record that the
+   Cohorts page, the roster and the candidate's own Cohort page all read. A
+   parallel list of the same three appointments is exactly the drift `bkStamp`
+   exists to prevent, so there is not one: `lcall(c)` is a VIEW of a cohort and
+   `ord` is the cohort's own `callOrd` (an explicit sort key, because "Today" and
+   "Mon" are human strings and parsing them into dates would be a date library's
+   job on a fixed demo week).
+
+   WHAT IS NOT DERIVABLE IS WHO TURNED UP. That, and only that, is written down.
+   `LEAD_RUN` is the calls already run — cohort, week, the date in words, and the
+   attendance — and the chapter each one covered is read off `CH` the way `lcall`
+   reads it, because a call in week 4 covered chapter 4 and writing that down
+   would be a fourth place for it to disagree. Cohort 47 is in week 1 and has no
+   rows here at all, which is the empty half of the list the page has to draw
+   anyway.
+   -------------------------------------------------------------------------- */
+const lcall = c => ({
+  id:'c' + c.id, co:c.id, ord:c.callOrd, day:c.callDay, time:c.callTime,
+  when:c.callDay + ' ' + c.callTime, mins:60,
+  week:c.week, level:c.level, seats:c.members.length,
+  chapter:CH[Math.min(12, c.week - 1)][0]
+});
+const lcalls = () => LEAD_COHORTS.map(lcall).sort((a,b) => a.ord - b.ord);
+const lnext  = () => lcalls()[0];
+
+const LEAD_RUN = [
+  {co:41, week:4,  when:'Thursday 28 August', attended:9},
+  {co:33, week:10, when:'Friday 22 August',   attended:7},
+  {co:41, week:3,  when:'Thursday 21 August', attended:8},
+  {co:33, week:9,  when:'Friday 15 August',   attended:8}
+];
 const LEAD_SUMMARIES = [
   {id:'m1', name:'Owen Clarke',  i:'OC', img:'owen', cohort:33, status:'pending'},
   {id:'m2', name:'Lena Fischer', i:'LF', img:'lena', cohort:33, status:'pending'}
 ];
 
-const lpending = () => LEAD_EVALS.filter(e => e.status === 'pending').length
-                     + LEAD_SUMMARIES.filter(s => s.status === 'pending').length;
-const lnext = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming')[0];
+/* ONE QUEUE, NOT TWO. This was level decisions plus summaries, and the note
+   over `V.leadEvals` argued the pair well — "a level decision opens a
+   candidate's 90 days; a 90-day summary closes them". Only the closing half is
+   the leader's now, so the sum has one term. It is still a function rather than
+   a literal because publishing a summary empties it live. */
+const lpending = () => LEAD_SUMMARIES.filter(s => s.status === 'pending').length;
 
-/* --------------------------------------------------------------------------
-   WHAT "BOOKED" MEANS
+/* WHAT A CALL IS CALLED AND WHAT IT COMMITS YOU TO, stated once and read by
+   three surfaces — the dashboard's black card, its Booked list and the Calls
+   page. Two copies of these strings is the failure `bkStamp` exists to prevent
+   on the candidate side, one portal over. */
+const lcTitle  = k => 'Cohort ' + k.co + ' call';
+const lcDetail = k => k.mins + ' minutes &middot; week ' + k.week + ' of 13 &middot; ' + k.chapter;
 
-   There are two kinds of appointment in a cohort leader's week and the
-   dashboard had only ever counted one of them. An INTERVIEW is one candidate,
-   forty-five minutes, and it ends in a level the leader signs. A COHORT CALL is
-   ten candidates, sixty minutes, every week, and it ends in nothing being
-   decided. Different objects — but both are "a time you have to be somewhere",
-   and a leader looking at a card that says Booked is asking about their diary,
-   not about one of the two kinds.
-
-   So the count is both, and the section lists both, interleaved in time rather
-   than grouped by kind: the question the list answers is "what is next", and
-   two separate groups make you read two lists and do the merge yourself.
-   `kind` survives on each row so the mark and the detail line can differ, and
-   `go` so the two kinds open different pages — an interview goes to Sessions,
-   a call to Cohorts, where its brief is. There is no per-row VERB any more;
-   `bookedRow` says why.
-   -------------------------------------------------------------------------- */
-/* WHAT AN INTERVIEW IS CALLED AND WHAT IT COMMITS YOU TO, stated once. The
-   booked list and the dashboard's call card both name the appointment and both
-   print what happens after it, and they were two copies of the same two strings
-   — which is the failure `bkStamp` exists to prevent on the candidate side, one
-   portal over. A re-interview is a different sentence in both places, so the
-   branch travels with the words rather than being taken twice. */
-const livTitle = s => s.re ? 'Re-interview' : 'Level interview';
-const livDetail = s => s.mins + ' minutes, recorded &middot; ' + (s.re
-  ? 'they have 90 days behind them, so you read the summary first'
-  : 'you sign the level afterwards');
-
-const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s => ({
-    kind:'iv', ord:s.ord, day:s.day, time:s.time, i:s.i, img:s.img,
-    t:livTitle(s) + ' &middot; ' + s.name,
-    d:livDetail(s),
-    go:'leadSessions'
-  })).concat(LEAD_COHORTS.map(c => ({
-    kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
-    t:'Cohort call &middot; ' + lname(c),
-    d:'60 minutes &middot; week ' + c.week + ' of 13 &middot; ' + c.members.length + ' candidates at ' + llevel(c),
-    go:'leadCohorts'
-  }))).sort((a,b) => a.ord - b.ord);
+const lbooked = () => lcalls().map(k => ({
+  ...k,
+  t:lcTitle(k),
+  d:k.seats + ' candidates at Explorer &ndash; ' + k.level + ' &middot; ' + lcDetail(k),
+  go:'leadCalls'
+}));
 
 /* --------------------------------------------------------------------------
    THE FOUR CARDS AND THE FOUR SECTIONS ARE ONE LIST
@@ -247,19 +264,20 @@ const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s =>
    cards in the order they are read, which is what makes the bar legible as a
    position indicator rather than as four buttons that happen to highlight.
    -------------------------------------------------------------------------- */
-/* HOW MANY BOOKINGS THE DASHBOARD SHOWS (Maryam, 31 Aug 2026). Three, with
-   "All sessions" in the heading row for the rest — the full list is a page of
-   its own and printing it twice made that link a route to the same content.
-   Named rather than a literal at the call site because `booked` is merged from
-   two sources (interviews and cohort calls) and this is a decision about the
-   DASHBOARD, not a fact about either of them; `V.leadSessions` slices nothing. */
+/* HOW MANY APPOINTMENTS THE DASHBOARD SHOWS (Maryam, 31 Aug 2026). Three, with
+   "All calls" in the heading row for the rest — the full list is a page of its
+   own and printing it twice made that link a route to the same content. Named
+   rather than a literal at the call site because it is a decision about the
+   DASHBOARD and not a fact about the data: it happens to equal the number of
+   cohorts today, and a fourth cohort must not turn this section into the whole
+   list with a link pointing at itself. `V.leadCalls` slices nothing. */
 const BOOKED_SHOWN = 3;
 
 const LEAD_JUMPS = [
   {id:'lead-cohorts',   ic:'group',      l:'Cohorts'},
   {id:'lead-attention', ic:'warningAlt', l:'Attention'},
   {id:'lead-waiting',   ic:'edit',       l:'Waiting on you'},
-  {id:'lead-booked',    ic:'video',      l:'Booked'}
+  {id:'lead-booked',    ic:'video',      l:'Calls'}
 ];
 
 /* --- the bell -----------------------------------------------------------
@@ -273,11 +291,18 @@ const LEAD_JUMPS = [
    `typeof` throw a ReferenceError rather than answer 'undefined'. `var` is
    hoisted, so the guard means what it says and deleting this file degrades to
    an empty bell instead of a broken render. */
+/* TWO OF THESE FIVE WERE THE INTERVIEWER'S AND BOTH ARE REPLACED IN KIND
+   (1 Sep 2026). "Thomas Beck is waiting on a level decision" pointed at a queue
+   that no longer exists; the summary it becomes is the signature that IS the
+   leader's, and it still blocks somebody. "Femi Adebayo booked you for 4:30 PM"
+   was the bookable-slot model in one line — nobody books a cohort leader now —
+   so the calendar row is the appointment the leader actually has today, read off
+   the same cohort record `lcall` reads. */
 var LEAD_NOTIF = [
-  {ic:'edit',       t:'Thomas Beck is waiting on a level decision', b:'Interview finished at 10:00 AM. They cannot enroll until you sign it.', w:'25 min ago', go:'leadEvals',    unread:1},
+  {ic:'edit',       t:'Owen Clarke is waiting on his 90-day summary',b:'Cohort 33 closes next week. Nothing goes to his next agent until you publish it.', w:'25 min ago', go:'leadEvals',    unread:1},
   {ic:'warningAlt', t:'Yuki Tanaka has not signed in for 12 days',  b:'Cohort 41, week 5. Nine per cent through the chapters.',                w:'2h ago',     go:'leadReports',  unread:1},
   {ic:'chat',       t:'3 new posts in Cohort 41',                    b:'Chapter 4 came up again on the discussion board.',                     w:'4h ago',     go:'leadMessages', unread:1},
-  {ic:'calendar',   t:'Femi Adebayo booked you for 4:30 PM',         b:'45 minutes. Explorer band from their quiz, no level yet.',              w:'Today',      go:'leadSessions', unread:0},
+  {ic:'calendar',   t:'Cohort 41 meets today at 6:00 PM',            b:'Week 5 of 13. Sixty minutes, ten candidates.',                         w:'Today',      go:'leadCalls',    unread:0},
   {ic:'certificate',t:'Your fourth cohort completed',                b:'Cohort 26 closed with eight of ten promoted.',                         w:'Yesterday',  go:'leadCerts',    unread:0}
 ];
 
@@ -288,15 +313,15 @@ var LEAD_NOTIF = [
    accurate opener and leader-shaped suggestions, so nothing in it claims to
    know something it does not.                                             */
 var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
-  where: {leadDash:'Dashboard', leadSessions:'Sessions', leadEvals:'Evaluations',
+  where: {leadDash:'Dashboard', leadCalls:'Calls', leadEvals:'Evaluations',
           leadCohorts:'Cohorts', leadReports:'Course reports', leadMessages:'Messages',
           leadCerts:'Certifications', leadProfile:'Your profile'},
   state: () => LEAD_COHORTS.length + ' cohorts, ' + lmembers().length + ' candidates, '
-             + lpending() + ' decision' + (lpending()===1?'':'s') + ' waiting',
+             + lpending() + ' summar' + (lpending()===1?'y':'ies') + ' waiting',
   ctx: {
-    leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','Summarise the two evaluations waiting'],
-    leadSessions: ['What should I ask Femi Adebayo?','Who is booked this week?'],
-    leadEvals: ['Why did you propose E1 for Thomas?','What evidence supports this level?'],
+    leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','What is waiting on my signature?'],
+    leadCalls: ['Brief me for tonight&rsquo;s call','Who missed the last one?'],
+    leadEvals: ['Is Owen Clarke ready to be promoted?','What should the summary say?'],
     leadCohorts: ['Where is Cohort 41 stuck?','Which cohort needs me most?'],
     leadReports: ['Who has stopped in the last week?','Which chapter is losing people?'],
     leadMessages: ['Draft a check-in to Yuki Tanaka','What came up on the board this week?'],
@@ -332,10 +357,14 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    exactly this — a bordered box, the word over the figure — so the leader's
    diary and the candidate's slot picker draw a date the same way.
 
-   AN INTERVIEW SHOWS A FACE AND A CALL SHOWS A GROUP. The mark answers "who am
-   I meeting", and for one person that is their face and for ten it is not any
-   one of them. Same slot, two answers, and it means the two kinds are
-   distinguishable at a glance without a tag saying which is which.
+   THE MARK IS A GROUP, AND IT IS NO LONGER A BRANCH (1 Sep 2026). This slot
+   used to answer "who am I meeting" two ways — a face for an interview, a group
+   for a cohort call — which is what made the two kinds distinguishable without a
+   tag saying which. With interviews off the portal there is one kind left, so
+   the face branch is deleted rather than left standing: a condition that is
+   false every time it is evaluated is the "gate nothing writes" tell in JS. The
+   argument survives as the reason the mark is `I.group` and not a photograph —
+   for ten people it is not any one of them.
 
    THE CHIP IS ONE WIDTH FOR EVERY ROW, set in §31.5 — not sized to its own
    words. "TODAY", "TOMORROW" and "NOV 21" are three different lengths, so a
@@ -347,14 +376,11 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    applies here for one extra reason. The two words in this slot were "Join"
    and "Brief", which named the KIND of appointment as much as the action, and
    neither happened here: both opened another page. So the row is the target,
-   it carries the arrow every openable row in this product wears, and `kind` is
-   still legible from the mark and the detail line. `go` survives on the row
-   data; `cta` does not, because nothing prints it any more.
+   it carries the arrow every openable row in this product wears. `go` survives
+   on the row data; `cta` does not, because nothing prints it any more.
    -------------------------------------------------------------------------- */
 function bookedRow(b){
-  const mark = b.kind === 'iv'
-    ? `<span class="mem-av mem-ph">${avatar({i:b.i, img:AV[b.img]}, 36)}</span>`
-    : `<span class="cardrow-ic">${I.group}</span>`;
+  const mark = `<span class="cardrow-ic">${I.group}</span>`;
   /* `bk-now` is the whole of "this one is today": §31.5 gives its label full
      ink and leaves every other day in helper grey. A date column read down
      needs one mark saying where NOW is, and a weight is the cheapest one. */
@@ -371,7 +397,38 @@ function bookedRow(b){
 }
 
 /* ==========================================================================
-   THE NEXT INTERVIEW IS THE BLACK CALL CARD — Maryam, 31 Aug 2026
+   THE NEXT COHORT CALL IS THE BLACK CALL CARD
+
+   IT WAS THE NEXT INTERVIEW UNTIL 1 SEP 2026, and everything below about HOW it
+   is drawn is unchanged — the card is still §75's `.dark-card` with §77's row in
+   it, still directly after Tal's `.sec`, still the reason the summary has the
+   band to itself. What changed is its SUBJECT: with interviews off this portal
+   the leader's next appointment is a cohort call, so the card reads the same
+   cohort record the Cohorts page and the roster read (`lcall`) instead of a
+   session record that no longer exists.
+
+   THREE THINGS THE NEW SUBJECT CHANGES, AND `crow` WAS ALREADY BUILT FOR ALL
+   THREE — its own note names this card as the case it was widened for:
+
+     the mark      a cohort is not a person, so the record carries `i:'41'` and
+                   NO `img`. `crow` omits the `<img>` rather than writing an
+                   undefined `src` (its note is the argument: a 404 on every
+                   render is what `respcheck` reads as a broken screen), §71.405
+                   normalises the `<i>` out of italic for exactly this row, and
+                   §77/§63 §17 give the square the card's own register so a
+                   label reads as a mark rather than as a failed photograph.
+     the ONE ACTION is "Generate the brief", and it is the first action on this
+                   card that actually does something. It was "All sessions" — a
+                   way out of a set of one — and before that a Join that §81 had
+                   to gate shut for twenty-three hours a day. The brief is
+                   `data-ldrbrief="<id>"`, a SHEET rather than a route, which is
+                   what `second.at` exists for; `go` still wins where a caller
+                   has one.
+     no tick       `v:false` for a new reason. It was "a candidate nobody has
+                   assessed is not a checked identity"; now the subject is not
+                   an identity at all.
+
+   Maryam, 31 Aug 2026, on the shape itself:
    "The call card from the top will be out and will be next to the summary
    section. Just like the black call card we have on the candidate portal.
    Content will be the same just the ui changes."
@@ -397,80 +454,65 @@ function bookedRow(b){
    2. DIRECTLY AFTER TAL'S CARD, WHICH IS THE SLOT `talRec` AND `crow` BOTH TAKE
    ON THE CANDIDATE SIDE. §77's note is the argument: on `new` the page's next
    step is "book an interview", on `booked` it is "join the one you booked", and
-   here it is "run the one they booked with you" — one slot, one object, three
-   stages of the same sentence. It also has to be after Tal's `.sec` rather than
-   before it: `placeBand`'s run walks forward from the `.ph` and stops at the
-   first section that is not head furniture, so a card written between the two
-   would leave Tal's summary in the page body (trap 11's neighbourhood).
+   here it is "the cohort you meet next" — one slot, one object, three readings
+   of the same sentence. It also has to be after Tal's `.sec` rather than before
+   it: `placeBand`'s run walks forward from the `.ph` and stops at the first
+   section that is not head furniture, so a card written between the two would
+   leave Tal's summary in the page body (trap 11's neighbourhood).
 
-   3. THE CONTENT IS THE PLATE'S, ROW FOR ROW.
+   3. THE CONTENT IS ONE COHORT RECORD, ROW FOR ROW.
 
-     the plate                          the card
-     data-when "today 4:30 pm"          `.dc-when` in the heading row (§75)
-     `.plate-t` "Level interview"       `.dc-t`, and derived now (`livTitle`)
-     56px face + name                   `.crow-ph` + `.crow-n` at 78
-     "Explorer band … no level yet"     `.crow-role`, read off `bucket`
-     `.plate-b` "45 minutes, recorded"  `.crow-x`, and `livDetail` states it once
-     Join / All sessions                `.crow-a`, in that order reversed
+     `lcall(c)` reads              the card draws
+     `callDay` + `callTime`        `.dc-when` in the heading row (§75)
+     the cohort's id              `.dc-t` "Cohort 41 call" (`lcTitle`)
+     the cohort's id              `.crow-ph`'s label + `.crow-n` at 78
+     `members.length`, `level`    `.crow-role` "10 candidates at Explorer – E3"
+     `week` + `CH[week-1]`        `.crow-x` (`lcDetail`, stated once)
+     the brief sheet              `.crow-a`, one button
 
-   THE TWO BUTTONS SWAP ENDS because `crow` puts the primary last, and that is
-   right on a card: the quiet action is the way out of the block and the accent
-   one is what the block is for, so the eye ends on Join. `All sessions` keeps
-   the rail's own calendar mark (`NAVSETS.leader`), so the button and the place
-   it goes wear the same glyph.
-
-   NO TICK AND NO "EXPERTISE:" LEAD-IN — both are `crow`'s new record fields and
-   the note over that function is the argument for each. The short version: the
-   person on this card is a candidate nobody has assessed yet, and the third
-   line is the appointment rather than a claim about them.
-
-   4. THE JOIN IS GATED AND STILL UNWIRED, AND THOSE ARE TWO DIFFERENT FACTS.
-   `{gate:true}` is Maryam's "disable the join call button and enable it at time
-   of the call" — `joinLive` in views.js owns the window and its note owns the
-   argument. What has NOT changed is that pressing it does nothing: `callOpen`
-   builds the CANDIDATE's interview (`bkAgent`, `callMe`), so `data-call="iv"`
-   here would open Priya's own screen from Priya's dashboard. §60's note records
-   the leader's four Joins as taken-but-unwired, and a leader-side `CALL` entry
-   is its own piece of work. The gate makes the button honest for the twenty-
-   three hours it should not be pressed, which is strictly less wrong than a
-   permanently live control that leads nowhere.
-   ========================================================================== */
-/* THE JOIN IS GONE AND THE GATE WENT WITH IT (Maryam, 31 Aug 2026). §81 built
+   4. THE JOIN IS GONE AND THE GATE WENT WITH IT (Maryam, 31 Aug 2026). §81 built
    `joinLive` because the button was live for fifty minutes a day and a control
    that looks pressable and is not reads as a broken page; the gate was the
    honest answer to that. What it could not fix is that the card then spent
    almost all of its life showing a DISABLED primary — §60's "a dead control on
    a live surface is worse than a missing one", arrived at from the other side.
    So the card's one action is the way onward, and `crow`'s `join:false` is
-   where the shape of that is stated.
+   where the shape of that is stated. It reads better still now that the one
+   action DOES something: `callOpen` builds the CANDIDATE's interview, so every
+   leader-side Join in this build is unwired (§60's note), and the brief sheet is
+   the leader's real next move on a call sixty minutes long.
    §81'S MACHINERY IS NOT DELETED. `joinLive` / `joinArm` / `JOIN_NOW` still
    run for `crow`'s gated call sites and the layer's disabled treatment on
    `.dark-card` is what any future gated action there will want; this card
    simply stops asking for it. Removing the gate as well would be deleting a
    decision, not a button.
-
-   THE SECONDARY IS THE CALLER'S, because the two pages that draw this card
-   are in different places. On the dashboard "All sessions" is the way out of a
-   set of one; on the Sessions page it would be a link to the page you are
-   already on, which is the "gate nothing writes" tell wearing a different hat.
-   `second:false` there. */
-const leadCall = (s, second) => ({
-  who:{n:s.name, i:s.i, img:AV[s.img]},
-  role:`${s.bucket} band from their quiz &middot; no level yet`,
-  x:livDetail(s),
-  xl:'',            /* the line is the appointment, not the person */
-  v:false,          /* a candidate is not a checked identity */
-  when:s.when, mins:s.mins,
-  second:second === undefined ? {go:'leadSessions', ic:I.calendar, t:'All sessions'} : second
+   ========================================================================== */
+/* THE SECONDARY IS THE RECORD'S AND IT IS THE SAME ON BOTH PAGES NOW. It used
+   to be the caller's, because "All sessions" from the Sessions page was a link
+   to the page you were already on — the "gate nothing writes" tell wearing a
+   different hat — so that page passed `second:false` and the card ended with no
+   action at all. The brief is per-CALL rather than per-page, so it is correct on
+   the dashboard and on Calls alike, and the parameter survives for a caller that
+   genuinely has nothing to offer. */
+const leadCall = (k, second) => ({
+  who:{n:'Cohort ' + k.co, i:String(k.co)},   /* no `img` — see the mark, above */
+  role:`${k.seats} candidates at Explorer &ndash; ${k.level}`,
+  x:lcDetail(k),
+  xl:'',            /* the line is the appointment, not the cohort */
+  v:false,          /* a cohort is not an identity, checked or otherwise */
+  when:k.when, mins:k.mins,
+  second:second === undefined
+    ? {at:`data-ldrbrief="${k.co}"`, ic:I.edit, t:'Generate the brief'}
+    : second
   /* no `kind`, so no `data-call` — see 4 above */
 });
 
-const leadCallCard = (s, o) => `<div class="sec dark-card crow-dark">
+const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">${livTitle(s)}</h2>
-        <span class="dc-when">${I.time}${s.when}</span></div>
+      <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
+        <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
-    ${crow(leadCall(s, (o || {}).second), {when:false, join:false,
+    ${crow(leadCall(k, (o || {}).second), {when:false, join:false,
       second:(o || {}).second === false ? false : undefined})}
   </div>`;
 
@@ -497,7 +539,7 @@ function faceRow(p, detail, go){
 
    THE SESSION BECOMES A PLATE — AND SINCE 31 AUG 2026 IT IS THE BLACK CALL
    CARD INSTEAD, which is the same argument arriving at a component that did not
-   exist when this was written. An interview is a named person at a time that you
+   exist when this was written. An appointment is a subject at a time that you
    join, and every one of those in this product WAS a `.plate` — the black wall
    with a face. `.plate` moves itself into the head band (`placeDark`), so the
    card sat above the four figures in a 330px column; Maryam took it out of the
@@ -505,7 +547,9 @@ function faceRow(p, detail, go){
    under Tal's summary, as §75's `.dark-card` with §77's row in it. The note over
    `leadCallCard` is the long version. What survives from this paragraph is its
    conclusion: the card says "this is an appointment" without a heading having to
-   say it, and it is still the only appointment drawn on the page.
+   say it, and it is still the only appointment drawn on the page — which since
+   1 Sep 2026 is the next COHORT CALL, the only kind of appointment a cohort
+   leader has.
 
    THE ATTENTION QUEUE STAYS A TABLE. It is five aligned facts about each of
    several people, read by scanning down a column — the one shape on either
@@ -563,21 +607,27 @@ V.leadDash = () => {
   const FIG = {
     'lead-cohorts':   [LEAD_COHORTS.length, `${lmembers().length} candidates`],
     'lead-attention': [att.length,          `${bad} severe`],
-    'lead-waiting':   [pend,                'levels and summaries'],
+    'lead-waiting':   [pend,                '90-day summaries'],
     'lead-booked':    [booked.length,       booked[0] ? 'next ' + booked[0].day.toLowerCase() + ' ' + booked[0].time.toLowerCase() : 'nothing booked']
   };
 
   /* Tal leads with whatever is most urgent, and the required action follows the
      same test the wireframe's banner used: a signature blocks a candidate, so
-     it outranks a call that is still two days away. */
+     it outranks a call that is still two days away.
+     THE FIRST BRANCH IS SUMMARIES NOW, NOT LEVEL DECISIONS (1 Sep 2026), and it
+     is still first for the same reason it always was — nothing about the person
+     it names moves until the leader signs. The second branch is the call the
+     card 40px below already draws, so it says the one thing the card does not:
+     what the brief is FOR. */
+  const s0 = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const talRead = pend
-    ? {h:'Two decisions are blocking two people',
-       p:`<b>${LEAD_EVALS[0].name}</b> and <b>${LEAD_EVALS[1].name}</b> finished their interviews and neither can enroll until you sign a level. Both of my proposals are in the band their quiz put them in.`,
+    ? {h:`${pend === 1 ? 'One summary is' : 'Two summaries are'} waiting on you`,
+       p:`${s0.map(s => `<b>${s.name}</b>`).join(' and ')} finished the 90 days in Cohort ${s0[0].cohort}. Nothing reaches their next agent, and no level moves, until you publish what you saw.`,
        a:'leadEvals', ab:'Open evaluations'}
     : next
-    ? {h:'Your next interview is '+next.when.toLowerCase(),
-       p:`<b>${next.name}</b>, ${next.mins} minutes. Their quiz puts them in the Explorer band; they have no level yet, so this conversation sets it.`,
-       a:'leadSessions', ab:'Open sessions'}
+    ? {h:'Cohort ' + next.co + ' meets ' + next.day.toLowerCase(),
+       p:`Week ${next.week} of 13, ${next.seats} candidates. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
+       a:'leadCalls', ab:'Open calls'}
     : {h:'Cohort 41 meets on Thursday',
        p:`Week ${c41.week} of 13. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
        a:'leadCohorts', ab:'Open Cohort 41'};
@@ -676,11 +726,9 @@ V.leadDash = () => {
   <div class="sec" id="lead-waiting">
     <div class="sec-h"><h2>Waiting on you</h2></div>
     ${pend?`<div class="tile-stack">
-      ${LEAD_EVALS.filter(e=>e.status==='pending').map(e=>
-        faceRow(e, `Level decision &middot; I proposed Explorer &ndash; ${e.ai} &middot; ${e.when.toLowerCase()}`, 'leadEvals')).join('')}
       ${LEAD_SUMMARIES.filter(s=>s.status==='pending').map(s=>
         faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their 90 days`, 'leadEvals')).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every level decision and summary is signed.</p></div>`}
+    </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every 90-day summary is published.</p></div>`}
   </div>
   <div class="sec tint" id="lead-booked">
     ${''/* THE WAY OUT MOVED INTO THE HEADING ROW AND THE SENTENCE CAME OFF
@@ -695,17 +743,23 @@ V.leadDash = () => {
            profile setting, reachable from the account menu and from
            `leadProfile` itself, and it was the second of two buttons under
            a list whose own action is on every row. */}
-    <div class="sec-h"><h2>Booked</h2><button class="btn btn-g btn-sm noic" data-go="leadSessions">All sessions ${I.arrowRight}</button></div>
-    ${''/* THREE ROWS, AND THE SECTION'S CONTROL IS WHAT MAKES THAT HONEST.
-           Six was the whole week, which made "All sessions" a link to the
-           same list again. Three is the next three things that happen, and
-           the heading row says where the rest are. `BOOKED_SHOWN` rather
-           than a literal, because `bookedRow` is fed from two merged
-           sources and the count is a display decision, not a fact about
-           the data. */}
+    <div class="sec-h"><h2>Your calls</h2><button class="btn btn-g btn-sm noic" data-go="leadCalls">All calls ${I.arrowRight}</button></div>
+    ${''/* THE HEADING IS "YOUR CALLS", NOT "BOOKED" (1 Sep 2026). "Booked" was
+           the right word for a diary holding two kinds of thing — an interview
+           somebody else took a slot for and a call that repeats every week —
+           and it was chosen precisely because a leader reading it "is asking
+           about their diary, not about one of the two kinds". With one kind
+           left, the word that named the merge names nothing, and nobody books
+           a cohort leader. The count in the card above it is unchanged.
+
+           `BOOKED_SHOWN` STILL EARNS ITS NAME with three cohorts and three
+           calls, because it is a decision about the DASHBOARD rather than a
+           fact about the data: a fourth cohort is a fourth call, and the day
+           that happens this section must not silently become the whole list
+           again with "All calls" pointing at itself. */}
     ${booked.length?`<div class="tile-stack">
       ${booked.slice(0, BOOKED_SHOWN).map(bookedRow).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing booked</h3><p>Interviews you are booked for and your weekly cohort calls both show up here.</p></div>`}
+    </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
   </div>
   ${''/* "YOUR STANDING" IS OFF THE DASHBOARD (Maryam, 31 Aug 2026), AND IT
          IS NOT LOST — `V.leadProfile` (lead4.js) draws the same four figures
@@ -725,7 +779,7 @@ V.leadDash = () => {
    four more sit under them:
 
      lead2.js   Cohorts, one cohort's roster, one candidate, Course Reports
-     lead3.js   Sessions, Evaluations, one level decision, one 90-day summary
+     lead3.js   Calls, Evaluations, one 90-day summary
      lead4.js   Messages, Certifications, the leader's own profile
 
    Two things a reader of this file needs from those three, both of which cost

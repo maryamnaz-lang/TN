@@ -886,14 +886,22 @@
    as the name of the thing you are talking to. 18 is one step down §11's
    scale and it sits on the mark's centre line.
 
-   THE ARROW IS `I.arrowLeft` NOW — Material's filled `arrow_back` — which
-   `askView` prints in place of the file's mirrored line arrow. So §51.2's
-   `transform:scaleX(-1)` has nothing left to flip and would point this one the
-   wrong way; it comes off, and the glyph takes the 24-viewBox `fill` every
-   other mark in `IP` takes.
+   THE ARROW IS `I.arrowLeft` NOW — Material's `arrow_back` — which `askView`
+   prints in place of the file's mirrored line arrow. So §51.2's
+   `transform:scaleX(-1)` had nothing left to flip and would point this one the
+   wrong way; the glyph takes the 24-viewBox `fill` every other mark in `IP`
+   takes.
+
+   AND `transform:none` IS DELETED WITH THE FLIP IT ANSWERED (1 Sep 2026). §51.2
+   states no transform any more — that whole rule came apart when the button's
+   20x20 box turned out to be crushing the glyph to 8px wide, and its note is
+   the long version. A declaration written to undo one that no longer exists is
+   the "gate nothing writes" tell in its other form: it costs nothing to look at
+   and it tells the next reader there is a mirror somewhere to be careful of.
+   The `width`/`height` STAY — they are the platform's 20px glyph stated at the
+   weight this context needs, not an override of anything.
    ------------------------------------------------------------------------ */
 .app .ask-page .ask-top-t{font-size:18px}
 .app .ask-page .ask-top .ph-back svg{
   width:20px;height:20px;
-  transform:none;
   fill:currentColor}

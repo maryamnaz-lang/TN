@@ -55,13 +55,28 @@
   .app .page .sec.found > .sec-h{
     border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
   .app .page .sec.found > :not(.sec-h){padding-left:0;padding-right:0}
-  /* and the heading is a TITLE again, not a spine. §8b of §63 puts a headed
-     section's `h2` on the label role at this width because at 184px it is a
-     column label; this section has no column, so it keeps the h4 it has at
-     every other width. */
-  .app .page .sec.found > .sec-h h2{
-    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-    letter-spacing:var(--t-h4-ls)}
+  /* THE HEADING'S SIZE CAME OFF HERE — 1 Sep 2026, one section heading size
+     everywhere (Maryam). The rule set `--t-h4` and argued: "§8b of §63 puts a
+     headed section's `h2` on the label role at this width because at 184px it
+     is a column label; this section has no column, so it keeps the h4 it has
+     at every other width."
+
+     THE OBSERVATION WAS RIGHT AND MORE GENERAL THAN THE FIX. A disclosure has
+     no label column — but nor does almost anything else: measured across 184
+     pages, 254 of 290 section headings have no 184px column, because §10.15's
+     opt-out is keyed on contents and nearly every section is built from the
+     components on that list. So this was one of five sizes patching a default
+     whose premise held for 36 headings, and carving out one more case would
+     have gone on making the product less consistent, not more. §8b now states
+     the size once and says so in its own note.
+
+     IT ALSO PUT TYPE IN A LAYER THAT MAY NOT OWN IT. §63 is at index 61 of 83
+     and this file lands after it, so a `font-size` here beats the type layer
+     on order — exactly what "no layer after §63 may set a font size, a font
+     weight, a text-transform or a text colour" exists to prevent. This was the
+     only such rule in the build; removing it puts §63 back in charge of the
+     section heading at every width. The three layout rules above stay: they
+     are the label-column opt-out (trap 13) and are this layer's business. */
 }
 
 /* `.found-t` TAKES THE `<h2>`'S PLACE IN THE ROW, and this is the whole of

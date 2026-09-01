@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=fdcb3a08">
+<link rel="stylesheet" href="talentnext-ds.css?b=fa7234ba">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=fdcb3a08"></script>
+<script src="talentnext-ds.js?b=fa7234ba"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -1135,6 +1135,40 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       <div class="crow-a">
         <button class="btn btn-sm noic ic-l" type="button">{{chat}}Message Priya</button>
         <button class="btn btn-p btn-sm noic" type="button">Join {{arrowRight}}</button>
+      </div>
+    </div>
+  `)}
+  ${ex('The black card — one class, and it is the whole recipe', 'The object the product uses for <b>the one thing a page is about</b>, and the reason it is here is that <code>.dark-card</code> was in the stylesheet with its markup written down nowhere. <b>Adding the class is the entire conversion</b> — §75 states the ground, the haze, the inset, the frame, the seams, the head row, the button inks and the joins in one place, so a caller states only what is different about its own content. The leader portal\'s next interview is the proof: it wears <code>.dark-card crow-dark</code> and adds not one rule of its own. Six things you cannot read off the CSS. <b>The haze is a <code>background-image</code>, not an element</b> — the portal\'s <code>.dark-glow</code> is an absolutely positioned div a render pass appends, which then costs <code>position:relative</code>, <code>overflow:hidden</code> and a <code>z-index</code> on every child; a background layer is behind all content by definition, so the card ships as one class with no pass behind it. <b>The card insets itself by <code>--pad-x</code> as a MARGIN and pays <code>--s07</code> inside</b>, so its edges land on the page\'s spine instead of running rail to rail — a full-bleed black <code>.sec</code> reads as the page turning black rather than as an object arriving on it. <b>The head row takes a control OR a time, never both</b>: <code>.dc-act</code> and <code>.dc-when</code> occupy the same slot with the same ink and both carry <code>margin-left:auto</code>, so two of them jam together with the row\'s slack in front of the pair — a card that wants both needs a group, not a second auto margin. <b>The gap between the head and the content is the card\'s</b>, not the caller\'s: it shipped missing for two builds because the first caller also wore <code>.sec-rec</code>, which brings its own <code>flex-direction:column;gap:20px</code>, and only the second caller — wearing <code>.dark-card</code> alone — showed the content welded to the heading rule. <b>A <code>disabled</code> <code>.btn-p</code> needs §81 and gets it free here</b>: the default disabled treatment is (0,2,0) against the card\'s accent fill at (0,4,0), so without it the button stays the full gradient and cannot be pressed, which reads as a broken page rather than a closed door. It is <code>background-image:none</code> as well as a ground, because the accent is a gradient and a colour. And <b>never <code>.plate</code> and never <code>.sec.on-dark</code></b> — both are in the portal\'s <code>DARK_CARD</code> list, so a render pass hoists them into the head band; <code>.dark-card</code> is in no pass\'s list, which is the whole point of it.', `
+    <div class="sec dark-card">
+      <div class="dc-hd">
+        <div class="dc-hd-r"><h2 class="dc-t">You&rsquo;re enrolling on Explorer &ndash; E3</h2>
+          <button class="btn btn-sm noic dc-act" type="button">What&rsquo;s included {{arrowRight}}</button></div>
+      </div>
+      <div class="kv"><span class="k">Course fee</span><span class="v">$690</span></div>
+      <div class="kv"><span class="k">Starts</span><span class="v">1 December</span></div>
+      <div class="btn-row">
+        <button class="btn btn-p btn-sm noic" type="button">Enrol now</button>
+        <button class="btn btn-sm noic" type="button">Read the outline</button>
+      </div>
+    </div>
+    <div class="sec dark-card crow-dark">
+      <div class="dc-hd">
+        <div class="dc-hd-r"><h2 class="dc-t">Level interview</h2>
+          <span class="dc-when">{{time}}Today 4:30 PM</span></div>
+      </div>
+      <div class="crow urgent">
+        <div class="crow-who">
+          <span class="crow-ph"><i>PN</i><img src="{{av:priya}}" alt=""></span>
+          <div class="crow-b">
+            <p class="crow-id"><span class="crow-n">Priya Nair</span></p>
+            <p class="crow-role">Explorer band from their quiz &middot; no level yet</p>
+            <p class="crow-x">45 minutes, recorded &middot; you sign the level afterwards</p>
+          </div>
+        </div>
+        <div class="crow-a">
+          <button class="btn btn-sm noic ic-l" type="button">{{calendar}}All sessions</button>
+          <button class="btn btn-p btn-sm noic" type="button" disabled title="Opens five minutes before the call">Join call</button>
+        </div>
       </div>
     </div>
   `)}

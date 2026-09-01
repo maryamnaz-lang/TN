@@ -341,12 +341,18 @@ function placeLevelCards(){
    to do, so the pass survives running on a page it has already arranged —
    which it does, on every render.
    ========================================================================== */
-/* `.ldr-read` — the competency read on a level decision — is a card class
-   INSIDE its section rather than a `.sec` variant, and that is what keeps it
-   out of the wrapping branch below: a host that matches this list is wrapped
-   in a fresh `.sec` (the branch `.lvl-hero` needs, having no section of its
-   own), and a `.sec` wrapped in a `.sec` pays the gutter twice. */
-const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero, .ldr-read';
+/* `.ldr-read` WAS ON THIS LIST AND IS OFF IT (1 Sep 2026): the competency read
+   was the level decision's card, and a cohort leader does not interview. The
+   argument it carried is general and is the reason to read this line before
+   adding a seventh member — it was a card class INSIDE its section rather than
+   a `.sec` variant, which is what kept it out of the wrapping branch below: a
+   host that matches this list is wrapped in a fresh `.sec` (the branch
+   `.lvl-hero` needs, having no section of its own), and a `.sec` wrapped in a
+   `.sec` pays the gutter twice.
+   `.dark-card` (§75) IS DELIBERATELY NOT HERE either, and its own layer says
+   why: a black card that is the page's subject stays in the page body at full
+   width. Everything on this line gets hoisted into the head band. */
+const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero';
 
 /* AND IT STANDS DOWN WHERE THE JOURNEY HAS THE COLUMN — §70.3.
    The band's second column holds one thing. On the three pre-enrolment

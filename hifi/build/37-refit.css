@@ -237,6 +237,15 @@
    container query, so neither a later layer nor the same query could reach
    it. Per the trap, the fix for that rule is to extend its `:not()` list,
    which is where `.lead-bar` now appears.
+
+   AND SO IS THE HAIRLINE, FOR THE SAME REASON AND IN THE SAME LIST. The
+   `display:none` two lines below is unconditional, so at desktop §14.2's
+   re-enabler — `:has(+ .sec > .sec-h)`, inside `@container app (min-width:900px)`
+   — turned it back on: "Your cohorts" is a headed section, so this zero-height
+   band drew a full-width rule at the boundary directly under the four figure
+   cells, which already close themselves with their own border. Trap 3, not
+   trap 4: the weight was never the problem, the tier was. `:not(.lead-bar)` is
+   in §14's list now, and the rule below is what still answers it below 900.
    -------------------------------------------------------------------------- */
 .app[data-portal="leader"] .lead-bar{
   height:0;min-height:0;padding-top:0;padding-bottom:0;overflow:visible}

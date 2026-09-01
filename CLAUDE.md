@@ -786,7 +786,8 @@ implementation — read it before converting anything.
 | seams | the section's own `::after` / `::before` off; the **next** section's join off if it draws one |
 | head | `.dc-hd` › `.dc-hd-r` (`.dc-t` title + **either** a `.dc-act` control **or** a `.dc-when` time at the right end — never both, they share one auto margin) with `--on-dark-rule` under it, 16 above and below |
 | buttons | `.btn-p` → accent fill (§15.1853 + §19); a quiet button → borderless white; a **`disabled` `.btn-p`** → §81's unlit `--on-dark-fill` wash with the gradient off |
-| ink | §63 §15 — `--on-dark` for the title, `--on-dark-2` for what supports it |
+| ink | **§63 §6a** — the generic pair for anything the card holds: headings, body, `<b>`, `.v`/`.n`/`.ttl` → `--on-dark`; descriptions, eyebrows, helpers, `.k`/`.l`/`.d` → `--on-dark-2`; a quiet `.btn` and its `svg` → `--on-dark`. §63 §15/§17 still state `.rec-*`/`.crow-*` by hand at (0,3,0) and still win |
+| seams inside | **§75.5** — `.kv` / `.stat` / `.facts` / `.tile` / `.cardrow` / `.note` borders → `--on-dark-rule`; a quiet button's border → transparent; `.tile` / `.note` grounds → transparent |
 | joins | §20's two desktop pair rules skip it (`:not(.dark-card)`, both sides) — a card's frame is 32 on all four sides and no join rule may take half of one |
 
 **A caller states only what is different about its own content.** Three so far: `.rec-dark`
@@ -801,6 +802,22 @@ proof**: it wears `.dark-card crow-dark` and states not one rule of its own.
 wears `.dark-card` alone and its two children stacked as plain blocks, with the call row touching
 the heading's rule (Maryam: *"why did you attached the content with the divider?"*). **A component
 tested through one caller that has extra classes is not tested.** Stated on `.dark-card` now.
+
+**AND THE INK WAS MISSING FOR THREE CALLERS, FOR THE SAME REASON ONE LAYER DOWN.** Every generic
+on-dark ink rule in the build — §02, §06, §11, §12, §24, §63 §6 — keys on `.on-dark`,
+`.lvl-hero`, `.cert`, `.score.on-dark` or `.plate-*`. `.dark-card` carries **none** of those
+classes, and that is the whole point of it: `.sec.on-dark` and `.plate` are in ai5's `DARK_CARD`,
+so `placeDark` hoists them into the head band, and this class was minted precisely to be a black
+card that stays in the page body. It bought that by giving up every rule the build writes against
+the class it dropped. **Nothing was broken, which is why it survived three callers** — all three
+hold `.crow-*` / `.rec-*` content and §63 §15/§17 ink those by hand, component by component. So
+the card looked complete for exactly as long as nobody put anything else in it. Measured on a
+`.sec` holding an ordinary `.kv` band and a `.btn-row`: the **values came out at 1:1**, `#111` on
+`#111`, the keys at 1.7:1 and the quiet button's label invisible. Against a standing instruction
+that a conversion is one class, that is the half-shipped component this build most needs not to
+ship. §63 §6a is the ink and §75.5 is the seams; both are written against the `--on-dark*`
+**tokens**, so §59's quiet plate keeps working, and both are (0,2,x) so every per-component rule
+already in §15 and §17 still wins and nothing already drawn moved.
 
 **§77 is the worked example, and what it had to answer is the general shape of the problem** —
 not the card, which was free, but the *host section's existing opinions*: four `.sec-call`
@@ -826,7 +843,9 @@ top right gradient". `talRec` on the `new` dashboard was the first caller. Six t
 - **THE HAZE IS A `background-image`, NOT `.dark-glow`.** §21.22 draws it as an absolutely
   positioned div that `injectGlow` (ai4) appends, which then costs three more rules —
   `position:relative` + `overflow:hidden` on the card so the light cannot escape (§21's own
-  note records `.ldr-read` painting a 700px orange rectangle across the band for want of it),
+  note records `.ldr-read` painting a 700px orange rectangle across the band for want of it —
+  that card was deleted on 1 Sep 2026 and the record is deliberately kept, because it is the
+  only worked example in the build of a card joining `GLOW_ON` and not §21's clip list),
   and `z-index:2` on every child. A background layer is behind all content by definition and
   needs no pass, so the design system carries the card as **one class**. The values are §21's
   to the number: element opacity `.22` over an opaque ground and per-stop alpha composite
@@ -960,7 +979,14 @@ directly after Tal's card before the body. The heading is byte-identical.
   outline is one more edge. `border-color`, not `border` (§64.1): `.btn` carries a transparent
   1px and dropping the shorthand makes this one 2px shorter than the button beside it.
 
-#### The LEADER's next interview — `leadCallCard` (lead.js) + §81, `81-joingate.css`
+#### The LEADER's next cohort call — `leadCallCard` (lead.js) + §81, `81-joingate.css`
+
+**IT WAS THE NEXT INTERVIEW UNTIL 1 SEP 2026** and everything below about HOW it is placed is
+unchanged — what changed is its subject, because a cohort leader does not interview anybody.
+Two bullets have been rewritten in place (the content table and the record's fields); the Join
+and its gate were already off this card before that, on 31 Aug 2026, and the last three bullets
+are kept because §81's machinery is still the reference for any future gated action on a black
+card.
 
 Maryam, 31 Aug 2026: *"The call card from the top will be out and will be next to the summary
 section. Just like the black call card we have on the candidate portal. Content will be the
@@ -987,18 +1013,29 @@ summary will take the full width."* The leader dashboard's `.plate` becomes the 
   or bottom. `:not(.dark-card)` is added on **both** sides of the pair, per trap 4 (that list is
   where "which pairs are joined" is decided). Nothing visible moved on the two existing cards:
   both follow the `.modhead`, which is not a `.sec`, so neither pair ever matched.
-- **THE CONTENT IS THE PLATE'S, ROW FOR ROW** — the time in `.dc-when`, `livTitle(s)` in
-  `.dc-t`, the face at 78, the quiz line as `.crow-role`, `livDetail(s)` as `.crow-x`, and the
-  two buttons in `crow`'s order (primary last, so the eye ends on Join). `livTitle` / `livDetail`
-  are new in lead.js because the booked list states the same two strings — one place, two
-  readers, the `bkStamp` rule.
+- **THE CONTENT IS ONE COHORT RECORD, ROW FOR ROW** — `lcall(c)`'s `callDay`+`callTime` in
+  `.dc-when`, `lcTitle(k)` ("Cohort 41 call") in `.dc-t`, the cohort's NUMBER as the 78px mark
+  and again as `.crow-n`, `members.length` + `level` as `.crow-role`, and `lcDetail(k)` (60
+  minutes · week 5 of 13 · the chapter off `CH`) as `.crow-x`. `lcTitle` / `lcDetail` live in
+  lead.js because three surfaces state those strings — this card, the dashboard's list and the
+  Calls page — one place, three readers, the `bkStamp` rule.
+  **THE MARK IS A LABEL AND THAT NEEDED TWO LAYERS.** `crow` omits the `<img>` when the record
+  carries no `img` (an undefined `src` 404s on every render, which `respcheck` reads as a broken
+  screen), §71.405 normalises the `<i>` out of italic — its note names this exact card as the
+  case it was written for — §77.7 gives the square `--on-dark-fill` so two digits on a pale grey
+  ground do not read as a photograph that failed to load, and §63 §17 sizes it at h2 (`.av-ph i`
+  is unsized everywhere else and inherits body, which is right in a 56px plate mark and lost in
+  78px of black).
+  **ITS ONE ACTION IS "GENERATE THE BRIEF"**, `second.at` — a sheet, not a route — and it is the
+  first time this card's action has done anything. It was "All sessions", a way out of a set of
+  one, and before that the gated Join below.
 - **`crow` TAKES A RECORD NOW, AND THREE FIELDS DEFAULT TO THE CANDIDATE'S ROW.** `CALL_ROW`'s
   note invites a fourth appointment, but this one's facts are all `lead.js`'s and views.js is
   parsed first (§69's direction rule), so the leader states its own record and hands it over.
-  `xl:''` drops the **`Expertise:`** lead-in (the leader's third line is the appointment, not a
-  claim about the person), `v:false` drops the **green tick** (a candidate nobody has assessed
-  is not a checked identity — §75's `.rec-v` note is what that mark means), and no `kind` means
-  no `data-call`.
+  `xl:''` drops the **`Expertise:`** lead-in (the third line is the appointment, not a claim
+  about its subject), `v:false` drops the **green tick** — the reason has CHANGED and is now
+  stronger: it was "a candidate nobody has assessed is not a checked identity", and the subject
+  is no longer an identity at all — and no `kind` means no `data-call`.
 - **THE JOIN IS GATED, AND STILL UNWIRED — TWO DIFFERENT FACTS.** `joinLive(when, mins)`
   (views.js) is the window: five minutes before until the session ends. **`PLATE_SOON` cannot
   answer this** — its first two words are `now` and `today`, because the question it answers is
@@ -1015,10 +1052,12 @@ summary will take the full width."* The leader dashboard's `.plate` becomes the 
   `title` on `[data-joinwhen]` in place — `callTick`'s pattern, and trap 9 is not in play
   because the value is a pure function of `Date.now()` and the button's own attribute, so the
   next render recomputes exactly what the timer wrote.
-- **THE DEMO DEPENDS ON THE TIME OF DAY, AND THAT IS THE HONEST READING OF THE ASK.**
-  `LEAD_SESSIONS.s3.when` is `'Today 4:30 PM'`, so the button is live 16:25–17:15 and shut the
-  rest of the day. To see the open state at any hour, edit that ONE string into `JOIN_NOW`'s
-  vocabulary ("in 5 minutes", "now") — the same lever `WEEK_CALL.when` is for the cohort call.
+- **THE DEMO USED TO DEPEND ON THE TIME OF DAY**, which was the honest reading of the ask:
+  `LEAD_SESSIONS.s3.when` was `'Today 4:30 PM'`, so the button was live 16:25–17:15 and shut the
+  rest of the day. That record no longer exists and this card has no Join, so the lever is gone
+  with it. `WEEK_CALL.when` is still the same lever for the candidate's cohort call, and
+  `LEAD_COHORTS[n].callDay` / `.callTime` is what moves the leader's — but those only move the
+  card's `.dc-when`, not a gate.
 - **§81 EXISTS BECAUSE `disabled` DID NOTHING ON A BLACK CARD.** §02.108's whole disabled
   treatment is (0,2,0) against §75.3's accent fill at (0,4,0), so the button stayed the full
   accent gradient with white ink and could not be pressed — a control that looks live and is
@@ -1536,7 +1575,8 @@ Seven things worth knowing before touching it:
   `.stp .stp-open .stp-titled` — §04's rhythm, §24.4's header row, §56.2's 16 under it — with
   `.wing-prog` / `.wing-lvl` as §59's hooks for the gutter (trap 10) and the ladder's track,
   and the ladder wing is the one that carries **`ladder(cur, true)`** — a level code in every
-  one of the fifteen blocks (`LVL_CODES`, which `lead3.js`'s `LDR_RUNGS` is now an alias of),
+  one of the fifteen blocks (`LVL_CODES` — `lead3.js`'s `LDR_RUNGS` was an alias of it and is
+  deleted with the leader's level picker),
   the track names left-aligned to E1 / B1 / T1 by a fifteen-column grid on `.ladder-lab`, and
   the level you are ON **lit rather than filled**: a repeating two-tint strip on a `::before`,
   one tile wide, translated by exactly one tile so the loop has no seam. Two bugs worth not
@@ -1623,8 +1663,9 @@ down. Four things to know:
   eyebrow label, which is what makes "Due now" — a label, not a clock — come out urgent.
   `data-urgent="1"`/`="0"` on the card overrides it. A card with no time at all is quiet.
   Swap the one function for a date difference in a real build; the class is the contract.
-- **Only `.plate`.** The other five members of `DARK_CARD` are not actions: `.cert` is an
-  award, `.lvl-hero` a level, `.score` a table, `.ldr-read` a competency read. None of them
+- **Only `.plate`.** The other members of `DARK_CARD` are not actions: `.cert` is an award,
+  `.lvl-hero` a level, `.score` a table, `.lead-b` a wall. (`.ldr-read`, the competency read,
+  was a sixth and left the list with the level decision on 1 Sep 2026.) None of them
   has a deadline to be inside or outside, and a quiet certificate is a certificate with the
   ceremony taken off it. They keep their ground.
 - **Below 900 the divider turns with the layout** — no second column to divide, so it is a
@@ -1737,8 +1778,10 @@ the person you are talking to.
   `data-call` on a button.
 - **Wired to five buttons**, all candidate-side: the booked dashboard plate, the Interviews
   module's Scheduled tile, the dashboard's weekly-call plate (which used to `data-go="cohort"`
-  — a Join that opened a *page*) and the Cohort page's own plate. **The leader's four Joins and
-  the consultant call's are still dead** — the component takes them, nothing points at them yet.
+  — a Join that opened a *page*) and the Cohort page's own plate. **The leader's remaining Join
+  and the consultant call's are still dead** — the component takes them, nothing points at them
+  yet. There were four leader-side Joins; three went with the interviews on 1 Sep 2026 and the
+  one left is on `V.leadCohort`'s weekly-call plate.
 - **Every control on the bar does something, and that is what decided the list.** Mic, camera,
   share, hand and captions are states of the call and are drawn everywhere they show — your
   tile's marks, your picture-in-picture, the feed's banner. People and More decide what the one
@@ -1894,10 +1937,55 @@ every key is prefixed `lead`.
 
 | File | Views |
 |---|---|
-| `lead.js` | the data (`LEAD_COHORTS`, `LEAD_SESSIONS`, `LEAD_EVALS`, `LEADER`), `leadDash`, the sticky figure bar, the attention queue's search/filter |
+| `lead.js` | the data (`LEAD_COHORTS`, `LEAD_RUN`, `LEAD_SUMMARIES`, `LEADER`), `leadDash`, `leadCallCard`, the sticky figure bar, the attention queue's search/filter |
 | `lead2.js` | `leadCohorts`, `leadCohort`, `leadMember`, `leadReports`, the brief and note sheets, `LDR_SHEETS` |
-| `lead3.js` | `leadSessions`, `leadEvals`, `leadEval`, `leadSum` — and the two signature flows |
+| `lead3.js` | `leadCalls`, `leadEvals`, `leadSum` — and the one signature flow |
 | `lead4.js` | `leadMessages`, `leadCerts`, `leadProfile`, the profile and availability sheets |
+
+**A COHORT LEADER TAKES COHORT CALLS AND DOES NOT INTERVIEW ANYBODY** — Maryam, 1 Sep 2026:
+"a cohort leader will only be taking cohort calls, not interviewing the initial candidates, so
+please change this flow overall in the cohort leader portal." This is the largest correction
+this side has taken and it removed a whole module's worth of work, so read it before adding
+anything that assesses a candidate here.
+
+The initial level interview is the **talent agent's**, and the candidate portal has always
+drawn it that way: Priya interviews, Priya signs the report, and the candidate enrols on the
+strength of it (`signedSummary`, §74; `PAGESUM.assessed` dates it; §73 is about the page it
+unlocks). A leader signing a level as well was one act performed twice by two people, and the
+leader's half had no evidence under it — lead2.js tells them in as many words that "the full
+recording is never shared with you". What the leader keeps is the signature that is genuinely
+theirs: the **90-day summary**, which closes thirteen weeks they were in the room for.
+
+- **`LEAD_SESSIONS` and `LEAD_EVALS` are gone, and the diary is DERIVED from `LEAD_COHORTS`.**
+  `lcall(c)` is a view of a cohort — day, hour, week, seats, level, and the chapter off `CH` —
+  so the three appointments cannot drift from the record the Cohorts page and the roster read.
+  `LEAD_RUN` is the calls already run and states **attendance and nothing else**, because that
+  is the only fact about a finished call no other record knows. Cohort 47 is in week 1 and has
+  no rows in it, which is the empty half of the Calls list.
+- **`Sessions` is `Calls`** (`V.leadCalls`, lead3.js) — one rail slot renamed and repointed:
+  this week's three calls with their briefs, and "Already run" with the week, the chapter and
+  who turned up. **`V.leadCohorts` gave its own "This week's calls" section UP to it** with a
+  route at the foot, because two pages drawing one list is the "route to the same content" this
+  portal keeps deleting.
+- **`Evaluations` is the 90-day summary alone.** The level-decision queue, `V.leadEval` (Tal's
+  competency read, the transcript quotes, the fifteen-rung picker, the override box), `LDR_AN`,
+  `ldrConf`, `ldrEvOf`, `ldrEvFor`, `LDR_RUNGS` and `ldrRungView` are **deleted, not hidden** —
+  and so are the rules that only they wrote: `.ldr-rungs`, `.ldr-read*`, `.ldr-pos`/`.ldr-neg`,
+  `.ldr-prose`, `.tq-x + .tq-x`, §36's leader-scoped `.ivt-lines` trio, `.ldr-read`'s two §63
+  rules and its §21.22 pair, plus its entries in ai5's `DARK_CARD` and (already absent) ai4's
+  `GLOW_ON`. Every deletion note keeps the ARGUMENT and drops the selector; §36's chip note and
+  ai4's haze-over-content note are the two worth reading before the next dark table.
+- **The dashboard's black card is the next cohort call**, and `crow` plus §71.405 were already
+  built for it — both files name "the leader's weekly-call card" as the first row whose mark is
+  a LABEL rather than a face. It carries `i:'41'` and no `img` (an undefined `src` 404s on every
+  render, which `respcheck` reads as a broken screen), §77.7 gives the square `--on-dark-fill`
+  so a label does not read as a failed photograph, and §63 §17 sizes it at h2. Its one action
+  is **"Generate the brief"** — `second.at`, a sheet rather than a route — which is the first
+  time that card's action has done anything.
+- **What did NOT change.** The re-interview is still in the product and still the agent's, so
+  `V.leadSum`'s "published to whichever agent runs their re-interview" is now more accurate
+  rather than less. `LDR_RECS` and its required-reason box are untouched, and they are now the
+  only place on the portal that makes the argument the override box used to make with them.
 
 Four rules the wireframe settled and this side keeps: **no money anywhere** (a cohort leader
 volunteers — Certifications replaced Earnings, and there is no fee on any leader page); the
@@ -1906,7 +1994,7 @@ so it clears when the candidate comes back; and Cohort 41 is Maryam's, its ten m
 `COHORT` in `views.js`, and its board *is* `ROOM` — post on the leader side and it is there on
 the candidate side.
 
-Detail pages take their subject from `S.ldrCo` / `S.ldrMem` / `S.ldrEv` / `S.ldrSum`, set by a
+Detail pages take their subject from `S.ldrCo` / `S.ldrMem` / `S.ldrSum`, set by a
 **capture-phase** listener on `device` reading `data-ldrco` / `data-ldrmem` / … so `data-go`
 stays a plain view name and `go()` needs no colon-splitting branch (the wireframe's
 `data-ag="member:41:Maryam Naz"` is what that avoids). The wireframe's client-facing
@@ -1932,7 +2020,16 @@ annotations ("Open question — client decision") deliberately do **not** cross 
    `data-shown`; only motion may read `data-open`.
 6. **Hover is deliberately disarmed.** `build.py` rewrites every `:hover` to
    `:hover:where(.__nh)` — 300-odd selectors; the build prints the count. Only the handful in
-   `HOVER_KEEP` stay live. To keep a new one, add it there.
+   `HOVER_KEEP` stay live. To keep a new one, add it there — **there and nowhere else**:
+   `build-ds.py` now PARSES that tuple out of `build.py` rather than keeping a copy, and
+   filters it by `EXCLUDE_PREFIXES` so the four `nil-*` entries do not name rules the design
+   system does not ship. The copy it used to keep had drifted two entries — `tal-star` and
+   `tal-fab` were live in the portal and disarmed in the box, so the design system shipped the
+   agent card's ask control with **no way to open it** (`.tal-star` is collapsed to a mark until
+   you point at it, and `.agh-book .tal-star:hover .lbl` could never match because `.__nh` is on
+   no element in any page). It fails silently in both directions: a rewritten `:hover` is still
+   a perfectly valid rule, and an ARMED hover the portal does not have would be just as
+   invisible. One source, parsed.
 7. **The icon set is official Material *Symbols*, the ROUNDED style at FILL 0 — LINEAR, and
    ON A `0 -960 960 960` BOX.** Changed platform-wide on 31 Aug 2026 (Maryam, by name and
    with the Google Fonts panel: Material Symbols / Rounded / Fill off) from the Material

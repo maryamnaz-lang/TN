@@ -188,6 +188,32 @@ invented the markup and got four of six wrong. The recipes are now in
   the base size before it shrinks anything. `dsCallUrgent(row)` picks the state
   from the words and `dsCallLeft(when)` words the same countdown both ways
   ("2 days left" / "In 2 hours").
+- The **black card** is `.dark-card` on a `.sec`, and **adding the class is the
+  whole conversion**. §75 states the ground, the top-right haze, the page-gutter
+  inset, the 32px frame, the section's own hairlines off, the next section's
+  join off, the heading row and its rule, the two button fills and the ink, so a
+  caller writes only what is different about its own content — the leader
+  portal's next interview wears `.dark-card crow-dark` and adds not one rule.
+  The head is `.dc-hd` › `.dc-hd-r` › `.dc-t`, and that row takes **either** a
+  `.dc-act` control **or** a `.dc-when` time at its right end, **never both**:
+  they share one `margin-left:auto`, so two of them jam together with the row's
+  slack in front of the pair. Four things the CSS will not tell you. The haze is
+  a **`background-image`, not an element** — the portal's `.dark-glow` is a div
+  a render pass appends, which then needs `position:relative`, `overflow:hidden`
+  and a `z-index` on every child, so the card ships as one class with no pass
+  behind it. The gap between the head and the content **belongs to the card**;
+  it shipped missing for two builds because the first caller also wore
+  `.sec-rec`, which brings its own `gap:20px`. A `disabled` `.btn-p` gets §81's
+  unlit wash **and the gradient turned off** — the default disabled treatment is
+  (0,2,0) against the card's accent fill at (0,4,0), so without it the button
+  stays fully accent and unpressable, which reads as a broken page. And **never
+  `.plate` or `.sec.on-dark`** — both are in the portal's `DARK_CARD` list, so a
+  render pass hoists them into the head band; `.dark-card` is in no pass's list,
+  which is the entire reason it exists. That is also why it needed its own ink:
+  every generic on-dark rule in the build keys on the class it deliberately does
+  not carry, so §63 §6a states the pair for `.dark-card` separately. Before that
+  rule a converted section holding an ordinary `.kv` band drew its **values at
+  1:1** — `#111` on `#111` — and its quiet button invisible.
 - The head band's **second column** is `.sec.head-sec.head-col`, written
   **directly after `ph()`** — the collector walks a run, not a search — and
   `.head-col` is the class that opens the column at all. `.sec-jrn` (a numbered

@@ -98,12 +98,39 @@
   border-bottom:1px solid rgba(0,0,0,.1);
   background:transparent;
   gap:var(--s04)}
-.app .ask-page .ask-top .ph-back{
-  width:20px;height:20px;color:var(--text-primary)}
-/* the back arrow is the file's arrow-right, mirrored. One drawing, two
-   directions — which is also why `icons.js` gains one icon and not two. */
-.app .ask-page .ask-top .ph-back svg{
-  width:20px;height:20px;transform:scaleX(-1)}
+/* THE 20x20 BOX CAME OFF AND THE ARROW WAS BEING CRUSHED TO 8px WIDE (Maryam,
+   1 Sep 2026: "the back arrow should be of the size of other back arrows on the
+   platform").
+
+   THIS IS A COLLISION WITH §78, AND IT IS BOX-SIZING RATHER THAN A SIZE. This
+   rule stated `width:20px;height:20px` on the BUTTON, on the reading that the
+   whole control is 20px in the file's band — true when it was written, because
+   §21.2's `.ph-back` had no padding of its own. §78 then gave every back
+   control on the platform `padding:0 var(--s03) 0 var(--s02)` at (0,2,0), which
+   this rule does not override because it never mentioned padding. With
+   `box-sizing:border-box` a 20px box paying 12px of padding has an **8px
+   content box**, and the SVG — 20px by §53.16, and capped by the sheet's
+   `max-width:100%` on media — computed to **8 x 20**. Measured on the live
+   page: `rectSvg [8, 20]` here against `[20, 20]` on every other back control.
+
+   NOTHING WARNED AND NOTHING OVERFLOWED, which is why it survived §78's own
+   sweep: the glyph did not spill its box, it silently squashed inside it, so an
+   overflow check passes and only a per-element measurement finds it. §63 §7b's
+   trap wearing a different hat — the rule that lost is the one that never
+   stated the property.
+
+   THE BOX IS §21.2's 32x32 NOW, WHICH IS THE PLATFORM CONTROL. 32 minus the
+   12px of §78 padding is exactly 20 of content, so the glyph comes out at the
+   20px every other back arrow in the build draws and no size is restated here
+   to get it. §78's `.ph-back-t` is already hidden inside `.ask-top`, so the
+   word does not come with it — this row has a title of its own beside the
+   arrow, which is that rule's whole argument. */
+.app .ask-page .ask-top .ph-back{color:var(--text-primary)}
+/* THE MIRROR IS GONE. This was the file's arrow-right flipped with
+   `scaleX(-1)` — one drawing, two directions — and `askView` prints Material's
+   own `arrow_back` now, so §53.16 sets `transform:none` over the top of it.
+   Stating the flip here and undoing it two layers later is two rules doing
+   nothing; the glyph is left alone and §53.16 keeps the `fill`. */
 .app .ask-page .ask-top-id{
   display:flex;align-items:center;gap:var(--s03)}
 .app .ask-page .ask-top-id .tal-mk{width:28px;height:28px}

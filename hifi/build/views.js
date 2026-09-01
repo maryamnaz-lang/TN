@@ -1308,11 +1308,33 @@ function ring(pct, label){
    `.ph` and `placeBand`'s `_mhIsTal` claims either class as head furniture, so
    wearing one would move the section into the band. §72 records that trap at
    length. */
-function aiHead({mark, title, desc, act, extra}){
+/* `under` IS A FOURTH SLOT AND IT IS IN `.aih-b`, NOT BESIDE IT (Maryam,
+   1 Sep 2026: "take the Cohort starts on 1st Dec, 2026 beneath the 90 days at
+   your own level, then a re-interview that can move you up. text").
+
+   THERE WAS NO SLOT FOR THIS AND `extra` IS NOT IT. `extra` renders INSIDE the
+   `<h2>`, which is right for `.cov-pill` — a label on the heading — and wrong
+   for anything that has to sit under the description. The alternative was to
+   append the chip to `desc`, and that is worse than it looks: `.aih-d` is a
+   `<p>`, so a 40px pill inside it becomes an inline box in the middle of a
+   sentence's line box and drags the lede's line-height with it.
+
+   ONE CALLER, AND THE SLOT IS STILL WORTH HAVING RATHER THAN A LITERAL IN
+   `enrolOffer`. §73's whole argument for this component is that three sections
+   had drifted three ways and "no section should have this kind of heading and
+   description random placements" — a caller reaching around `aiHead` to put its
+   own block between the description and the action group is exactly that drift
+   starting again. Declared here, the stacking order is the component's.
+
+   IT IS THE LAST CHILD OF `.aih-b`, so §73.1's `gap:var(--s04)` on that column
+   is what separates it from the lede — no margin is stated anywhere, and a
+   caller cannot get the spacing wrong. */
+function aiHead({mark, title, desc, act, extra, under}){
   return `<div class="sec-h aih">
     <div class="aih-b">
       <h2 class="aih-t">${mark ? '<i class="aih-mk"></i>' : ''}${title}${extra || ''}</h2>
       ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+      ${under || ''}
     </div>
     ${act ? `<div class="aih-a">${act}</div>` : ''}
   </div>`;
@@ -1480,7 +1502,21 @@ function pulseCols(f, g){
      is worth. §72.4 turns the three-across grid into a stacked card and re-lays
      each row against the file's arrangement — all of it from the outside, with
      not one declaration on the cell and no change to the markup. */
-  const stand = pulseCol(3, I.star, 'Your standing', standRow(g));
+  /* THE MARK IS `I.trophy` AND THE FILL AXIS IS THE WHOLE ARGUMENT (Maryam,
+     1 Sep 2026: "change this star icon here to a cup/trophy/badge. that should
+     not be a filled icon"). `I.star` is one of the four marks the set keeps at
+     FILL 1, and trap 7 is explicit about what that fill MEANS: it is a state
+     axis, "selected/unselected, done/not done", which is why `star` exists as a
+     pair with `starOutline` for a rating's lit and unlit slots. This column
+     heads three rows about points and badges — a SUBJECT, not a lit slot — so
+     the filled cut was making the same claim `trophy`, `certificate` and
+     `shield` are listed as failing: a mark that is filled with nothing to be
+     unfilled against. `I.trophy` is the FILL 0 Rounded file already in the set
+     and already the subject mark for this topic — `statCell(I.trophy, 'Points',
+     …)` drew it two stages later — so nothing is added to `icons.js` and no
+     grid question arises. `pulseQA`'s "Your standing" card takes the same mark
+     in the same breath; the two draw one subject and must not differ. */
+  const stand = pulseCol(3, I.trophy, 'Your standing', standRow(g));
 
   /* THE SECTION'S ACTION IS THE ONE THING IT EXISTS TO MAKE HAPPEN, which
      while the course runs is the open chapter and once it is over is the
@@ -1626,8 +1662,12 @@ function pulseQA(f, g){
     ic:I.time, hue:'ic-pace', t:'Your pace',
     d:`${p.figs[0][0]} ${p.figs[0][1].toLowerCase()}, ${p.figs[2][0].toLowerCase()} of target.`,
     go:'transcript'});
+  /* `I.trophy`, NOT `I.star`, AND THE FILL AXIS IS THE ARGUMENT (Maryam,
+     1 Sep 2026: "change this star icon here to a cup/trophy/badge. that should
+     not be a filled icon"). See the twin call site in `pulse()`; the reasoning
+     is written there once. */
   cards.push({
-    ic:I.star, hue:'ic-stand', t:'Your standing',
+    ic:I.trophy, hue:'ic-stand', t:'Your standing',
     d:`${g.pts.toLocaleString()} points at ${RANKS[g.rank-1].n}.`,
     go:'rewards'});
   return quickActions(cards);
@@ -2473,8 +2513,29 @@ const enrolOffer = lvl => `<div class="sec eo dark-card">
            and is the sentence that says what you are buying, so the figure goes
            there. E3 has no sub and is unchanged. */
         desc:`${ENROL_DESC[lvl]}${ENROL_OPENS[lvl][1] ? ' ' + ENROL_OPENS[lvl][1] : ''}`,
-        act:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>
-          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
+        /* THE DATE MOVED OUT OF THE ACTION GROUP AND UNDER THE LEDE (Maryam,
+           1 Sep 2026), AND IT IS A BETTER PLACE FOR IT THAN THE PAIR WAS.
+           §73.1 argued the chip and the button as one 447px group — "one figure
+           and one action" — which is 613:7983's own arrangement. What that
+           reading missed is that the two are not the same KIND of thing: the
+           button is what you DO, and the start date is a fact ABOUT the offer,
+           in the same family as the lede's "90 days at your own level" and the
+           four figures below. Beside the button it read as a second control;
+           under the sentence it reads as the sentence's last fact.
+
+           THIS RETIRES THE 447px BASE THAT §73's OWN NOTE CALLS "the one thing
+           that cannot survive 390". The group is now the 185px button alone, so
+           the mobile block's `flex-direction:column` on `.aih-a` has one child
+           to stack and nothing overflows at any width — the stacked rules stay
+           because the button still wants full width there.
+
+           `ENROL_OPENS[lvl][0]` IS UNCHANGED AND SO IS THE PAIR RULE: index 0
+           is the date and index 1 still rides on the lede. Moving the chip does
+           not make room for the sub — a 40px pill still cannot hold two lines,
+           and E4's "Cohort 58 has 7 places left" is a fact about the cohort
+           rather than about when it starts. */
+        under:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>`,
+        act:`<button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -2531,30 +2592,56 @@ function journey(){
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
     case 'assessed': return LEVELLED;
-    /* THE ONE STAGE WHERE ALL FOUR ARE BEHIND YOU (Maryam, 31 Aug 2026 — the
-       `promoted` dashboard follows `assessed`'s). It reaches this function now
-       because that page's band took `jrnList` into the column `enrolPlate`
-       used to hold, and `default` would have handed it `LEVELLED` — step 3 of
-       4, "Not enrolled yet" — on a page whose whole subject is having finished.
-       That is the failure a `default` hides: it renders, and it is wrong.
+    /* THIS STAGE IS THREE STEPS, NOT FOUR, AND IT IS THE ONE PLACE THE LIST IS
+       NOT THE SAME LIST (Maryam, 1 Sep 2026: "this is not a component change,
+       others steps on previous prototypes will remain same, for this one change
+       the steps names to Re-interview & Leveling, Course Enrollment, 90 days
+       Cohort Journey. There will be three steps only. And the user is on the
+       second step that is Course Enrollment").
 
-       WITH NO `on` STEP `jrnList` PRINTS "Step 4 of 4", which is what the pill
-       should say here, and the four `sec` lines are the record of the cycle
-       rather than a forecast. Read beside the E4 offer 200px to the left, the
-       list is what makes that offer read as the NEXT one rather than as a
-       repeat of something outstanding.
+       SO IT RETURNS ITS ROWS DIRECTLY RATHER THAN THROUGH `row()`. That helper
+       maps over `JRN`, which is four labels by definition; a three-step stage
+       cannot be expressed as a `row()` call at all. The four other stages still
+       go through it and are untouched, which is what the ask means by "not a
+       component change".
 
-       THE FIGURES ARE READ, not typed, so a stage that moves `done` or `avg`
-       moves the line with it. The date is 21 November — `ACH.promoted` and the
-       "Cohort 41, in the end" strip both say 21, and `V.dashboard`'s found
-       section says 22; that disagreement is pre-existing and this takes the
-       majority rather than adding a third answer. */
-    case 'promoted': {
-      const p = cfg('promoted');
-      return row(['done','done','done','done'],
-        ['Explorer track &middot; Aug 12', 'E4 &middot; signed by Priya, Nov 21',
-         'Cohort 41 &middot; closed', `${p.done} chapters &middot; ${p.avg}% average`]);
-    }
+       AND THE LABELS TRAVEL WITH THE STEPS, IN `ai`, BECAUSE `jrnList` LOOKS
+       THEM UP BY INDEX. That function prints `JRN_AI[i]`, so a three-row list
+       would have come out "Nextinleadership Quiz / Interview & Levelling /
+       Course Enrollment" — the first three of a four-step vocabulary against
+       rows that mean something else entirely, and it would have rendered
+       without a word. `ai` is read first and only this stage sets it, so no
+       other page's labels move. `lab` still carries the `JRN` word underneath,
+       which is what `stepIcon` derives a subject mark from if any drawing of
+       these steps ever wants one again.
+
+       WHAT THE THREE STEPS ARE SAYING. The way IN is not this reader's journey
+       any more — they have been through it once — so the quiz is gone from the
+       list and the cycle starts at the re-interview that moved them to E4. That
+       is done; enrolling at E4 is what is open; the 90 days are ahead. With an
+       `on` step the pill now derives "Step 2 of 3" rather than the "Step 4 of 4"
+       a fully-done list printed, and read beside the E4 offer to its left the
+       list says the offer is the step you are ON rather than a fifth thing.
+
+       "LEVELLING" WITH TWO L's, which is the one character of the ask this does
+       not take verbatim. Every other surface in both portals spells it that way
+       — `JRN_AI[1]` is "Interview &amp; Levelling", and `livTitle` and the
+       `PAGESUM` entries agree — so a single L here would be the only one in the
+       build and would read as a typo rather than as a decision.
+
+       THE DATE IS 21 NOVEMBER, unchanged: `ACH.promoted` says 21 and
+       `V.dashboard`'s found section says 22. That disagreement is pre-existing
+       and this takes the majority rather than adding a third answer. */
+    case 'promoted': return [
+      {st:'done', lab:'Interview and level', ai:'Re-interview &amp; Levelling',
+       sec:'E4 &middot; signed by Priya, Nov 21'},
+      /* the same words `LEVELLED` gives this step in this state, so the two
+         pre-course stages cannot describe one unstarted enrolment two ways */
+      {st:'on',   lab:'Enrolled',            ai:'Course Enrollment',
+       sec:'Not enrolled yet'},
+      {st:'',     lab:'90-day course',       ai:'90 days Cohort Journey',
+       sec:AHEAD[1]}
+    ];
     default: return LEVELLED;
   }
 }
@@ -3070,9 +3157,11 @@ const CALL_ROW = {
              vouching for somebody it has not assessed.
      `kind`  the `data-call`, default absent. `callOpen` builds the candidate's
              own interview (`bkAgent`, `callMe`), so pointing the leader's Join
-             at it would open Priya's face on Priya's screen. The leader's four
-             Joins have always been unwired (see §60's note) and this one stays
-             that way — what changed is that it is no longer live at 9am.
+             at it would open Priya's face on Priya's screen. Every leader-side
+             Join has always been unwired (see §60's note) and this one has since
+             gone entirely — the card's action is the brief sheet, and after
+             1 Sep 2026 the leader has exactly ONE Join left in the build, on
+             `V.leadCohort`'s weekly-call plate.
 
    `o.gate` IS OPT-IN, AND THE THREE CANDIDATE CALL SITES DELIBERATELY DO NOT
    TAKE IT. Their Joins are the prototype's way into `callScreen` — five buttons,
@@ -3094,7 +3183,16 @@ function crow(kind, o){
         <span>${c.label}</span>
       </div>`}
       <div class="crow-who">
-        <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        ${''/* THE `<img>` IS OMITTED WHEN THERE IS NO PHOTOGRAPH, rather than
+               written with an undefined `src`. The leader's weekly call is the
+               first row whose subject is not a person — the mark is the cohort's
+               number — and `src="undefined"` is a real request that 404s: the
+               `onerror` hides the element, so the card LOOKS right and the
+               console carries a failed resource on every render, which is
+               exactly what `respcheck` reads as a broken screen. The `<i>` is
+               the mark in that case (§71 normalises its `font-style`). */}
+        <span class="crow-ph"><i>${p.i}</i>${p.img
+          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
             ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
@@ -3118,7 +3216,15 @@ function crow(kind, o){
              product passes `join`, so the candidate's three call sites and
              `callRow` render byte-identically. */}
       <div class="crow-a${o.join === false ? ' crow-a1' : ''}">
-        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" data-go="${c.second.go}">${
+        ${''/* AND THE SECONDARY'S ATTRIBUTE IS THE RECORD'S, because not every
+               way onward is a `data-go`. The leader's weekly-call card opens the
+               brief SHEET, which is `data-ldrbrief="<id>"` (lead2) — a
+               `data-go="null"` would have been a route into the router with no
+               view behind it. `second.at` is a raw attribute the caller states;
+               `go` still wins when it is there, so the four rows that had one
+               are untouched. */}
+        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
+          c.second.go ? `data-go="${c.second.go}"` : (c.second.at || '')}>${
           o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
         ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           o.gate ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
@@ -3240,7 +3346,16 @@ function jrnList(){
                  gave it `flex:none` and §63 §10 named it in a `flex` list, and a
                  class nothing writes is the "gate nothing writes" tell
                  CLAUDE.md describes. Both removed. */}
-          <span class="jrn-lab">${JRN_AI[i] || s.lab}</span>
+          ${''/* `s.ai` FIRST, BECAUSE `JRN_AI` IS INDEXED AND ONE STAGE IS NOT
+                 FOUR STEPS LONG (Maryam, 1 Sep 2026). `promoted` returns three
+                 rows with their own words, and looking those up by position in a
+                 four-label list would have printed the first three labels of the
+                 way IN against rows about the way round again — silently, since
+                 `JRN_AI[0..2]` all exist. Only that stage sets `ai`; every other
+                 step object has none, so `JRN_AI[i]` still answers for them and
+                 no other page's labels move. `s.lab` stays as the last resort
+                 for a fifth step added to `journey()` and not to `JRN_AI`. */}
+          <span class="jrn-lab">${s.ai || JRN_AI[i] || s.lab}</span>
         </li>`).join('')}
       </ol>
     </div>
@@ -4164,99 +4279,57 @@ V.dashboard = (f) => {
       </div>
       ${crow('iv', {when:false, second:false})}
     </div>
-    ${''/* WHAT THE 45 MINUTES ACTUALLY ARE — AND IT COMES BEFORE THE QUIZ.
-          The one thing this stage's page did not say. Everything on it was
-          about the booking — who, when, how long — and nothing about what
-          happens inside the call, which is the only question a person has
-          between booking one and taking it. The copy is Maryam's.
+    ${''/* THE SESSION BLOCK IS TWO QUICK ACTIONS NOW (Maryam, 1 Sep 2026:
+          "change the content beneath the black card into 2 quick actions").
+          What stood here was one `.sec` running ~640px under the black card: a
+          lede, a four-cell `.stats` strip (Length, Format, Your report, Fee)
+          and "What to bring" as three numbered sentences.
 
-          FIRST, BECAUSE IT IS THE ONLY THING AHEAD. The quiz is three months
-          behind this reader and settled; the interview is on Thursday. Read in
-          this order the page runs forwards — the card in the head band says
-          when, this section says what it is and what to bring, and the quiz
-          block closes on where the level came from. It was the other way round
-          for one build, which put a finished score above the open appointment.
+          THIS IS §82'S MOVE, ONE STAGE EARLIER, AND THE ARGUMENT CARRIES OVER
+          UNCHANGED. That layer turned the `assessed` and `promoted` dashboards'
+          reading blocks into Quick Actions on the reasoning that a dashboard
+          states where you are and offers the ways on, while the READING belongs
+          on the page that owns it. Everything in the strip was a fact about an
+          interview that has a whole module — `V.interviews` opens on
+          "45 minutes, by video · recorded · sets your level", which is this
+          block's four cells said once — and the section's own head row already
+          carried an "Interview details" button pointing there. A section whose
+          heading row links to the page that says the same thing better is a
+          section arguing for its own removal.
 
-          BOTH ON THE CANVAS NOW, AND THE JOIN IS A HAIRLINE AGAIN. These two
-          were a pair for three builds — "two sections in a row cannot both be
-          filled or the page reads as panels all the way down", so the quiz block
-          took §12's panel and this one took the canvas. The quiz block is white
-          from this build (Maryam's call; the note over `quizResults` is the long
-          version), which answers the pair rule the other way round: neither
-          filled rather than one filled.
+          SO THE TWO CARDS ARE THE TWO THINGS IT HELD, and neither loses a
+          reader: the session's shape goes to `V.interviews` by `go`, and "what
+          to bring" goes to Tal by `ask`, which is a better home than a list of
+          three fixed sentences — `wPrep` runs the questions rather than
+          printing them, and data.js's `/prepare/` route is already the one the
+          `new` dashboard's own second card fires.
 
-          What that changes here is one line and it comes back on its own. While
-          the block below was a `.cards` panel, §55.2 took the closing rule off
-          THIS section on the ground that a change of ground is already a
-          boundary. There is no change of ground now, so that selector stops
-          matching and the hairline is the boundary — which is the ordinary
-          rhythm every other pair of sections on the page uses. Nothing is
-          restated to get it; §55.2 is keyed on `.cards` and the class went with
-          the panel. A `.sec-notop` class lived in §56 for one build to subtract
-          the same boundary from the other direction, and went the same way.
+          THE PAGE IS NOW THE §82 SHAPE ON EVERY PRE-COURSE STAGE: the band,
+          one black card, two Quick Actions. `new`, `booked`, `assessed` and
+          `promoted` all read the same way, which is what §70.6's named hues
+          were for — `ic-cover` and `ic-prep` mean the same thing on each.
 
-          THE FOUR FACTS ARE A `.stats` STRIP, which is the component Maryam's
-          card was drawing: `.stats` is a FIXED four-column grid, so Length,
-          Format, Your report and Fee is the shape, one line each. The two facts
-          a strip cannot hold — "real situations, not hypotheticals" and "their
-          judgement, not a score" — are the character of the interview rather
-          than figures about it, and they are the section's lede.
+          NO FIGURE IS RESTATED AND THAT IS DELIBERATE. The old strip typed
+          "45 minutes", "48 hours" and "From $80" into this view; the fee in
+          particular was the RANGE ("from $80") because `bkStamp` cannot reach a
+          number, and it sat two inches under a black card naming the actual
+          agent. A card description that names no figure cannot drift from the
+          page it opens — which also retires this view's last dependence on the
+          "your agent, not Priya" rule the old note had to state.
 
-          NO MARKS ON ANY OF THE SEVEN. The four cells are LABELLED figures, so
-          a chip in front of one is a third statement of the same thing; four of
-          them turn a quiet strip into a row of objects. What to bring is three
-          sentences, and they are counted rather than marked — `.cardrow-n` in
-          §56.7 is the 20px slot, and the rows keep §02.10's rule under them
-          because a list that is numbered is a list of items.
-
-          THE AGENT IS "YOUR AGENT", NOT PRIYA. `bkStamp` (ai7) rewrites the
-          hand-written mentions of the booked agent on this stage so a booking
-          made inside Tal reads back correctly, and its note says a new surface
-          naming the agent has to be added there. Written without a name, this
-          needs no entry and cannot go stale — and the fee is the RANGE the rail
-          shows ("from $80") for the same reason, since it is true of all three
-          agents. The exact fee is on the plate above and on Payments.
-
-          AND IT DOES NOT REPEAT THE BOOKING. Maryam's copy closes on "You are
-          booked in for Thu 3 Sep · 14:00 with Dana Whitfield"; on this page the
-          black card two inches up already states the agent, the day and the
-          time, the fact row states the date a third time, and Tal's summary a
-          fourth. The section says what the session IS and leaves when it is to
-          the card that exists to say so. */}
-    <div class="sec">
-      <div class="sec-h"><h2>Your session, step by step</h2><button class="btn btn-g btn-sm noic" data-go="interviews">Interview details</button></div>
-      <p class="all-desc">Your agent asks for real situations &mdash; what you actually did, not hypotheticals &mdash; and sets your level from what you describe. Their judgement, not a score.</p>
-      <div class="stats">
-        ${statCell('', `Length`, `45 minutes`, `one sitting`)}
-        ${statCell('', `Format`, `Video`, `recorded, with a transcript`)}
-        ${statCell('', `Your report`, `48 hours`, `your level, E1 to E5`)}
-        ${statCell('', `Fee`, `From $80`, `credited to the course`)}
-      </div>
-      <div class="u-overline mt6">What to bring</div>
-      ${''/* `.prose` IS THE ROW SAYING IT IS A SENTENCE, NOT A TITLE (Maryam,
-             31 Aug 2026). `.cardrow-t` is the h4 role in §63 and everywhere
-             else in both portals it holds a NAME — a member, a cohort, a
-             session, a card brand — where the strong weight is what separates
-             the name from the description under it. These three rows have no
-             description: they are the whole of the row, and each is a full
-             sentence up to nine words long. Nine words of Kräftig in a numbered
-             list reads as three headings with nothing under them, which is why
-             they came out heavier than the section heading above them.
-             §63 §7b takes the weight to Buch and leaves the 15/20 size alone —
-             the row is still a row, it is just not shouting. The class goes on
-             the STACK rather than the row so the whole list is declared at
-             once, and it is scoped rather than global because `V.welcome`'s
-             "What happens next" uses the same `.cardrow-n` shape with real
-             titles and a `.cardrow-d` under each — that one is correct as it
-             is. */}
-      <div class="tile-stack prose mt4">
-        ${['One situation from the last three months that did not go well',
-           'A decision you would make differently now',
-           'Somewhere quiet &mdash; the transcript is part of the assessment'
-          ].map((t,i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
-          <span class="cardrow-b"><span class="cardrow-t">${t}</span></span></div>`).join('')}
-      </div>
-    </div>`;
+          WHAT IS GENUINELY GONE is the three "what to bring" sentences as
+          standing copy. They are Maryam's words and they are worth keeping, so
+          they are NOT deleted — `wPrep` is where the same ground is covered,
+          and the card's own `ask` is what opens it. If they should be on the
+          page again, they are a Tal card (`PAGESUM` owns the head, so a `.sec`
+          with an `.ai-aura` under the cards), not a numbered list. */}
+    ${quickActions([
+      {ic:I.video, hue:'ic-cover', t:'Your session, step by step',
+       d:'How 45 minutes interview will set your level', go:'interviews'},
+      {ic:I.lightning, hue:'ic-prep', t:'What to bring',
+       d:'Ask Tal what to have ready for the call.',
+       ask:'What should I prepare for my level interview?'}
+    ])}`;
   /* AND THE QUIZ BLOCK IS NOT HERE ANY MORE — the long version of why is the
      note where `quizResults` used to be defined. In short: the four figures
      were the last ~500px of this page and every one of them is settled
@@ -4356,11 +4429,33 @@ V.dashboard = (f) => {
           block it replaces said "signed 21 August" while `signedSummary`'s own
           header says "20 August 2026", a pre-existing disagreement this must
           not spread to a third surface. Both dates are on `V.report`. */}
+    ${''/* BOTH DESCRIPTIONS ARE MARYAM'S COPY (1 Sep 2026), and each drops a
+          clause the card did not need.
+
+          THE COUNT IS STILL DERIVED. The ask was "13 Chapters, weekly live
+          cohort calls" with the number typed; `${CH.length}` is kept, because
+          the one thing the previous note promises is that "a chapter added to
+          the course moves this card" and a literal 13 breaks it silently. The
+          rendered string is identical today.
+          Sentence case on "chapters" is §63's rule, which is why the C is not
+          capital — the only word of the ask this does not take verbatim.
+
+          "one a week, with a live cohort call" -> "weekly live cohort calls".
+          The cadence was said twice, once per clause: thirteen chapters at one
+          a week IS thirteen weeks, and the call is weekly for the same reason.
+
+          THE SECOND CARD STOPS NAMING PRIYA, which is the `booked` section's own
+          "your agent, not Priya" rule arriving one stage later. `bkStamp` (ai7)
+          rewrites the hand-written mentions of the booked agent so a booking
+          made inside Tal reads back correctly, and its note says a new surface
+          naming the agent has to be added there — this one now needs no entry
+          and cannot go stale. "on interview" also keeps the card free of the
+          date disagreement the note above records. */}
     ${quickActions([
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
-       d:`${CH.length} chapters, one a week, with a live cohort call.`, go:'enrol'},
+       d:`${CH.length} chapters, weekly live cohort calls`, go:'enrol'},
       {ic:I.document, hue:'ic-found', t:'What the interview found',
-       d:'Priya&rsquo;s signed write-up of your level interview.', go:'report'}
+       d:'Signed write-up by the agent on interview', go:'report'}
     ])}`;
 
   else if(f.complete) body = `
@@ -4391,9 +4486,30 @@ V.dashboard = (f) => {
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
+        ${''/* THE LADDER WING CAME OUT OF TAL'S CARD (Maryam, 1 Sep 2026:
+               "remove the where you are on the ladder section from the tal
+               summary section"). It was `<div class="stp-wing">${'$'}{wingBlock()}
+               </div>` — `ladderWing`, the third of §56's three wing states: the
+               heading, "Explorer &ndash; E4", "4 of 15 on the ladder" and the
+               fifteen-block rail.
+
+               THE PAGE SAYS ITS LEVEL FOUR OTHER TIMES, which is what makes this
+               a subtraction rather than a loss: `dashPh`'s fact row is
+               "Explorer Track &ndash; E4 &middot; level 4 of 15", the app bar
+               reads "Explorer &ndash; E4", the journey list's first row is "E4
+               &middot; signed by Priya, Nov 21", and Tal's own sentence directly
+               above says "You moved from E3 to E4". The rail was the only one of
+               the five that drew the ladder, and My Level is one press away with
+               the full fifteen rungs and the tracks under them.
+
+               WHAT IT LEAVES BEHIND, flagged rather than swept: `wingBlock()`'s
+               `f.complete` branch was `ladderWing`'s only caller, so that
+               function and §59's `.wing-lvl` hooks are now a gate nothing
+               writes. They are NOT deleted here — `wingBlock`'s three states are
+               §56's documented contract and `.wing-lvl` ships in
+               `design-system/talentnext-ds.css`, so pruning it is a design-system
+               decision rather than a side effect of moving one block on one
+               page. `consult` still calls `wingBlock()` for `stepper()`. */}
       </div>
     </div>
     ${''/* THE OFFER IS THE BLACK CARD, NOT THE PLATE — and this is the change
@@ -4433,62 +4549,64 @@ V.dashboard = (f) => {
 
           THE WORDS DIFFER BY ONE THING AND IT IS THE RIGHT ONE: this stage's
           report is the RE-interview's (`signedSummary(true, true)`), so the
-          card says so. The chapter count is read from `CH`. */}
+          card says so. The chapter count is read from `CH`.
+
+          AND THEY FOLLOW `assessed`'S REWRITE (Maryam, 1 Sep 2026), WHICH IS
+          NOT SCOPE CREEP BUT THE RULE THIS PAIR EXISTS UNDER. The ask named the
+          `assessed` cards; §82's whole point is that these two pages carry "the
+          same two cards in the same two colours a stage later", so leaving this
+          copy behind would have the two dashboards describe one course in two
+          registers — "13 chapters, weekly live cohort calls" on one page and
+          "13 chapters at E4, one a week, with a live cohort call" on the next.
+          That is the drift the pairing was written to prevent.
+
+          THE TWO DELIBERATE DIFFERENCES SURVIVE INTACT: `at E4`, because this
+          stage's course is the level up, and `re-interview` in both the title
+          and the description, because that is the report this page links to.
+          Everything else is byte-identical to `assessed`. */}
     ${quickActions([
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
-       d:`${CH.length} chapters at E4, one a week, with a live cohort call.`, go:'enrol'},
+       d:`${CH.length} chapters at E4, weekly live cohort calls`, go:'enrol'},
       {ic:I.document, hue:'ic-found', t:'What the re-interview found',
-       d:'Priya&rsquo;s signed write-up of your re-interview.', go:'report'}
+       d:'Signed write-up by the agent on re-interview', go:'report'}
     ])}
-    ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
-          The weekly-minutes chart lived here — thirteen stacked bars of how
-          long you spent, week by week, on a course that is over. That is a
-          chart you read WHILE you are behind on it; once the 90 days are
-          closed the only questions left are what you finished, how well, and
-          what it earned, and all four of those are one number each. The
-          chart is still on Course Progress, which is where the week-by-week
-          record belongs and which the heading links to. */}
-    ${''/* AND THESE TWO ARE ON THE CANVAS, WHILE THE WRITE-UP ABOVE KEEPS ITS
-          PANEL. Maryam's call, and the pair rule is what it turns on: three
-          filled sections running to the foot of the page read as panels all the
-          way down, so the tone has to say which one is different rather than
-          which three are the same.
+    ${''/* TWO SECTIONS CAME OFF THE FOOT OF THIS PAGE (Maryam, 1 Sep 2026:
+          "remove the Cohort 41, in the end section" and "remove the What
+          changes at E4 section"). §82's note listed them as the three things
+          `promoted` deliberately did NOT convert to Quick Actions, "because
+          `assessed` has no equivalent and inventing one would be designing
+          rather than matching". That reasoning was about not INVENTING a card
+          for them; removing them outright is the other way to close the same
+          gap, and it leaves the page at exactly `assessed`'s shape — the band,
+          the offer as a black card, two Quick Actions — plus the two things
+          this stage genuinely owns, the points strip and the certificate.
 
-          THE WRITE-UP IS THE ONE THAT IS DIFFERENT. §45's test is whether a
-          block is READ or acted on, and Priya's re-interview summary is the only
-          thing down here you read — a closing figure strip and two offers with
-          buttons on them are not. `sec tint cards` stays on it; these two lose
-          `tint` and their cells go white by §10 rather than by §55's override,
-          which is the same swap `quizResults` made. */}
-    <div class="sec">
-      <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
-      <div class="stats">
-        ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
-        ${statCell(I.chart, `Average`, `${f.avg}<small>%</small>`, `assessments, all thirteen`)}
-        ${statCell(I.trophy, `Points`, GAME.promoted.pts.toLocaleString(), `${GAME.promoted.badges} of 4 badges`)}
-        ${statCell(I.growth, `Level`, `E3 &rarr; E4`, `up one, on 21 November`)}
-      </div>
-      <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>What changes at E4</h2></div>
-      ${/* THE ACTION GOES TO THE END OF THE ROW IT BELONGS TO.
-            Both of these were a heading, a line, and a button on a line of
-            its own underneath — three rows for one offer, twice, in a block
-            whose two halves are the same shape. There is a column and a
-            half of empty tile to the right of each sentence and the button
-            is the only other thing in the row, so that is where it goes:
-            what changes on the left, what to do about it at the right-hand
-            end, one row each. `.chgrow` is the shape; §24 draws it. */''}
-      <div class="tile-stack">
-        <div class="tile chgrow"><div class="chgrow-b"><h3>You can lead a cohort</h3>
-          <div class="sub">Volunteer to lead any cohort below E4. It is recognition, not payment, and your request goes to the admin team.</div></div>
-          <button class="btn btn-g btn-sm" data-go="transcript">Become a Cohort Leader ${I.arrowRight}</button></div>
-        <div class="tile chgrow"><div class="chgrow-b"><h3>Your listing goes public</h3>
-          <div class="sub">Your level and certificates become a shareable page. Nothing else on your profile is published.</div></div>
-          <button class="btn btn-g btn-sm" data-go="account">Manage what is shown ${I.arrowRight}</button></div>
-      </div>
-    </div>
+          "COHORT 41, IN THE END" WAS TWO BLOCKS IN ONE `.sec` AND BOTH GO, which
+          is worth stating because only the first carries the heading: a `.stats`
+          row of four cells (Chapters 13/13, Average 87%, Points 3,205, Level
+          E3 → E4) AND, under it, the `.score-link` wrapping `scoreCard` — the
+          Points 3,205 / 1-Star / "1,795 points to Silver" block, which reads on
+          screen as a section of its own and is not one. Taking the section takes
+          both.
+
+          NOTHING IN EITHER IS THE ONLY COPY. The chapters and the average are in
+          Tal's sentence at the top of this page word for word ("13 chapters,
+          87% average"); the level is in the fact row, the app bar and the
+          journey list's first step; and the points, the badge and the distance
+          to Silver are `V.rewards`, which is exactly where the `.score-link`
+          went and is on the rail. `Course Progress` was the head action and
+          `V.transcript` is on the rail too.
+
+          "WHAT CHANGES AT E4" was two `.chgrow` tiles — lead a cohort, and your
+          listing goes public — each a heading, a line and a button. Both
+          destinations survive: `V.transcript` and `V.account` are rail items.
+
+          WHAT IS NOW ORPHANED, flagged rather than quietly deleted. `.chgrow` /
+          `.chgrow-b` (§24) and `.score-link` had these as their ONLY call sites
+          in either portal, so their rules are the "gate nothing writes" tell —
+          and all three ship in `design-system/talentnext-ds.css`. Pruning them
+          is a design-system call, not a side effect of emptying one page.
+          `scoreCard` itself is untouched and still has `V.rewards`' caller. */}
     ${''/* THE CERTIFICATE CLOSES THE PAGE, AND IT HAS TO OPT OUT OF THE BAND
           TO DO IT. `.cert` is in `DARK_CARD`, so `placeDark` (ai5) lifts
           whichever page child contains one into the head band — trap 12 —
@@ -4695,30 +4813,43 @@ V.level = (f) => {
         which rung and what moves it. See the note over `ph()`. */}
   ${ph('My Level')}
   ${lvlWing(f)}
-  <!-- ONE WAY INTO THE REPORT, NOT THREE. A black primary button sat here
-       saying "Read my full report", the signed card below it is itself a
-       button to the same place, and that card closes with "Read the full
-       report" as a link. Three controls, one destination, stacked. The two
-       that belong to the card stay — the card IS the report's summary, so
-       the way in reads off the thing it summarises — and the loose button
-       above goes. The link at the foot of the card is where the reading
-       ends, which is where the next step belongs. -->
-  <div class="sec mt6">
-    <!-- ONE CONTROL, AT THE FOOT. The card used to be a button — the whole
-         block clickable, with a trailing arrow saying so — AND it closed with
-         a link to the same place. Now that the link is a real button (§29.16)
-         the card stops being one: two controls wrapping one destination is a
-         click target inside a click target, and the arrow was the only thing
-         announcing the outer one. The button says it better, and says it
-         where the reading ends. -->
-    ${confirmed?signedSummary(false, false, true):`<div class="tile bordered">
+  ${''/* THE SIGNED REPORT BLOCK LEFT THIS PAGE (Maryam, 1 Sep 2026: "instead of
+        this page, remove the report section above the How the ladder works and
+        show this against the interview details in interviews module"). It was
+        `signedSummary(false, false, true)` in a `.sec mt6` right here — the
+        two-fact signature header, the Strengths and Growth areas cards, and
+        "Read the full report" at the foot.
+
+        AND THE PAGE IS BETTER FOR IT, WHICH IS WHY THE MOVE IS THE RIGHT SHAPE
+        RATHER THAN JUST A RELOCATION. This page answers "where am I on the
+        ladder": the fifteen rungs, the track names, and how the thing works.
+        The signed block answers "what did Priya say about me in August" — the
+        same question `ivRow` is a row about, one module over, sitting in a list
+        of the interviews it came out of. Read here it was a report with no
+        interview beside it; read there it is the newest row's own findings.
+
+        THE NON-CONFIRMED BRANCH STAYS AND IS ALL THAT IS LEFT. "What the
+        Explorer track means" is not the report — it is what the TRACK is, for a
+        reader whose quiz has given them a track and no level yet — so it
+        belongs to this page and to no other. The `.sec` is now gated rather
+        than holding a ternary, because a section that renders empty still pays
+        its padding and draws its closing hairline.
+
+        WHAT THIS PAGE NO LONGER HAS IS A ROUTE TO `V.report`, and that is
+        stated rather than discovered: the foot action went with the block. The
+        report is still reached from `ivRow` (every row on the Interviews
+        module), from the `assessed` and `promoted` dashboards' "What the
+        interview found" Quick Action, and from the block's own foot button in
+        its new home. Three ways in, none of them this page. */}
+  ${!confirmed?`<div class="sec mt6">
+    <div class="tile bordered">
       <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
         <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
         <p>Your interview places you on one of five levels inside it, and that decides which course you take.</p>
       </div>
-    </div>`}
-  </div>
+    </div>
+  </div>`:''}
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
   </div>`:''}
@@ -5339,6 +5470,37 @@ V.interviews = (f) => {
       ${f.complete?ivRow('re','Re-interview','November 21, 2026','Promoted to Explorer &ndash; E4','44:06'):''}
       ${ivRow('level','Level interview','August 20, 2026','Confirmed Explorer &ndash; E3','45:12')}
     </div>
+    ${''/* THE SIGNED FINDINGS, MOVED HERE FROM `V.level` (Maryam, 1 Sep 2026).
+          The long version is where it used to be drawn; what matters here is
+          the placement, and three things decided it.
+
+          INSIDE THIS SECTION, NOT AFTER IT. The ask is "against the interview
+          details", and the interview details on this module ARE these rows. As
+          the section's own next child the block reads as what the newest row
+          found; as a section of its own it would be a second block about the
+          same interview with a heading competing with "Past interviews".
+
+          IT NEEDS NO HEADING AND MUST NOT BE GIVEN ONE — trap 13. `.signed` is
+          not in §10.15's opt-out list, so a `.sec-h` on a section built round it
+          takes the 184px label column. This section already opts out through
+          `.ivlist` (§38's `.sec:has(> .ivlist){display:block}`), so the rows and
+          the block both get the full width — and the block carries its own
+          heading anyway, in the two facts of `.signed-h`.
+
+          §74'S `border-top` IS THE SEPARATION AND IT ONLY WORKS AS A DIRECT
+          CHILD. `.app .page .sec > .signed` gives the block a rule and
+          `--s07` above it, inset to the section's own gutter — written for
+          exactly this, a signed block following something else inside one
+          section. Wrapping it in a div would lose the rule and nothing would
+          warn.
+
+          `re` IS `f.complete`, SO THE CARDS DESCRIBE THE TOP ROW. On the
+          promoted stage the list opens with the re-interview, and the block's
+          header names which one it is reporting — "Re-interview / 21 November
+          2026" against "Level interview / 20 August 2026". Passing `false` here
+          the way `V.level` did would have printed August's findings under
+          November's row with nothing saying so. */}
+    ${signedSummary(false, !!f.complete, true)}
   </div>`:''}
   ${''/* SCHEDULED IS THE DASHBOARD'S ROW — Maryam, 31 Aug 2026. It was a
         four-row `.kv` tile, a three-button set under it and a legal line: the
@@ -8400,7 +8562,22 @@ function signedSummary(withNote, re, footAction){
             variant: the border is already transparent there and the arrow is
             already written, so what is left is the words and the mark. The one
             primary action on this page belongs to the enrolment offer above. */}
-      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-t btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
+      ${''/* `data-iv` IS DERIVED FROM `re`, SO THE BUTTON CANNOT OPEN A REPORT
+             THE CARDS ABOVE IT ARE NOT ABOUT (1 Sep 2026). It shipped as a bare
+             `data-go="report"`, which was harmless while `V.level` was the only
+             caller and always passed `re:false` — but `V.report` READS `S.iv`
+             (its eyebrow is "Re-interview · confirmed November 22" or "Level
+             interview · confirmed August 21"), and `S.iv` is only ever written
+             by the `[data-iv]` capture listener. So the destination was
+             whichever interview the reader had last touched, or the default if
+             they had touched none.
+
+             That became live the moment this block moved next to `ivRow`, where
+             both rows write `S.iv` on the way past. `re` is already the flag
+             that picks which interview's two paragraphs are printed, so reading
+             the attribute off it means the summary and the report it opens are
+             one decision rather than two that have to be kept in step. */}
+      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-t btn-sm noic" data-go="report" data-iv="${re?'re':'level'}">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }
 

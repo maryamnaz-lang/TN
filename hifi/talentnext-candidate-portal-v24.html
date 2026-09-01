@@ -2992,7 +2992,8 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   
   
   
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined)::after,
+  
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,
@@ -5169,7 +5170,7 @@ button.btn-p:active,
   .app .ask-thread{padding-top:var(--s07);padding-bottom:var(--s07)}
 }
 .app .plate,.app .lvl-hero,.app .cert,
-.app .sec.on-dark,.app .score.on-dark,.app .ldr-read{position:relative;overflow:hidden}
+.app .sec.on-dark,.app .score.on-dark{position:relative;overflow:hidden}
 .app .dark-glow{
   position:absolute;inset:0;
   background:radial-gradient(78% 135% at 92% -8%,
@@ -5181,7 +5182,6 @@ button.btn-p:active,
 .app .lvl-hero > :not(.dark-glow),
 .app .cert > :not(.dark-glow),
 .app .sec.on-dark > :not(.dark-glow),
-.app .ldr-read > :not(.dark-glow),
 .app .score.on-dark > :not(.dark-glow){position:relative;z-index:2}
 @keyframes ask-drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 @keyframes ask-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -7052,6 +7052,10 @@ button.btn-p:active,
   width:18px;height:18px;display:inline-block;fill:var(--icon-secondary)}
 .app .ldr-tr:focus-visible{
   outline:2px solid var(--accent);outline-offset:-2px}
+.app .ldr-who{
+  display:flex;align-items:center;gap:var(--s03);
+  flex-wrap:nowrap;white-space:nowrap}
+.app .ldr-who > .mem-av{flex:none}
 .app[data-portal="leader"] .ldr-tbl .flag-t{
   display:inline-flex;align-items:center;gap:var(--s03);
   font-weight:600;letter-spacing:.1px;white-space:nowrap}
@@ -7060,32 +7064,7 @@ button.btn-p:active,
 .app[data-portal="leader"] .ldr-tbl tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .ldr-tbl tr.mod .flag-t{color:var(--support-attention)}
 .app[data-portal="leader"] .ldr-tbl td.num .t-helper-01{white-space:nowrap}
-.app .ldr-pos,.app .ldr-neg{
-  display:inline-flex;align-items:center;gap:var(--s02);
-  letter-spacing:.6px}
-.app .ldr-pos svg,.app .ldr-neg svg{
-  width:13px;height:13px;display:block;fill:currentColor}
-.app .ldr-pos{color:var(--support-success)}
-.app .ldr-neg{color:var(--support-attention)}
-.app .tq-x + .tq-x{margin-top:var(--s03)}
 .app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
-.app .ldr-rungs .btn{min-width:64px;justify-content:center}
-.app .ldr-rungs{
-  display:flex;flex-wrap:nowrap;gap:var(--s03);
-  overflow-x:auto;overscroll-behavior-x:contain;
-  scrollbar-width:none;padding-bottom:6px}
-.app .ldr-rungs::-webkit-scrollbar{display:none}
-.app .ldr-rungs .btn{
-  flex:none;min-width:56px;
-  padding-left:var(--s04);padding-right:var(--s04)}
-.app .ldr-rungs .btn:nth-child(5n+1):not(:first-child){margin-left:var(--s05)}
-@container app (min-width:900px){
-  .app .ldr-rungs{
-    display:grid;grid-template-columns:repeat(15,minmax(0,1fr));
-    overflow:visible;padding-bottom:0}
-  .app .ldr-rungs .btn{
-    min-width:0;padding-left:var(--s02);padding-right:var(--s02)}
-}
 .app .ldr-n{
   margin-left:var(--s03);
   font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
@@ -7118,34 +7097,6 @@ button.btn-p:active,
   font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;
   color:var(--text-helper)}
 .app .cs button.on > .lf-n{color:inherit;opacity:.7}
-.app .tbl td.ldr-prose{text-align:left}
-.app .ldr-read{
-  background-color:var(--surface-dark);color:var(--on-dark);
-  padding:var(--s06)}
-.app .ldr-read-h{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:var(--s05);margin-bottom:var(--s05)}
-.app .ldr-read-h > h2{
-  font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.05px;
-  color:var(--on-dark)}
-.app .ldr-read .tbl th{
-  color:var(--on-dark-2);border-bottom-color:var(--on-dark-border)}
-.app .ldr-read .tbl td{
-  color:var(--on-dark-2);border-bottom-color:var(--on-dark-rule)}
-.app .ldr-read .tbl td:first-child{color:var(--on-dark);font-weight:600}
-.app .ldr-read .ldr-read-x{
-  margin-top:var(--s05);max-width:64ch;
-  font-size:13px;line-height:21px;color:var(--on-dark-2)}
-.app .ldr-read .tag{
-  background-color:transparent;border-color:var(--on-dark-border);
-  color:var(--on-dark)}
-.app .ldr-read .tag.brand{
-  background-color:var(--on-dark);border-color:var(--on-dark);
-  color:var(--surface-dark)}
-.app .ldr-read .tag svg{fill:currentColor}
-.app[data-portal="leader"] .ivt-lines{margin-left:0;margin-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq{padding-left:0;padding-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq:last-child{border-bottom:0}
 @container app (min-width:900px){
   .app .sec:has(> .tile .f),
   .app[data-portal="leader"] .sec:has(> .tile),
@@ -8013,10 +7964,7 @@ button.btn-p:active,
   border-bottom:1px solid rgba(0,0,0,.1);
   background:transparent;
   gap:var(--s04)}
-.app .ask-page .ask-top .ph-back{
-  width:20px;height:20px;color:var(--text-primary)}
-.app .ask-page .ask-top .ph-back svg{
-  width:20px;height:20px;transform:scaleX(-1)}
+.app .ask-page .ask-top .ph-back{color:var(--text-primary)}
 .app .ask-page .ask-top-id{
   display:flex;align-items:center;gap:var(--s03)}
 .app .ask-page .ask-top-id .tal-mk{width:28px;height:28px}
@@ -8350,7 +8298,6 @@ button.btn-p:active,
 .app .ask-page .ask-top-t{font-size:18px}
 .app .ask-page .ask-top .ph-back svg{
   width:20px;height:20px;
-  transform:none;
   fill:currentColor}
 .app .page > .rail-wrap:has(+ .sec.tint)::after{display:none}
 .app .sec.tint.cards .stats > .stat,
@@ -9203,6 +9150,23 @@ button.btn-p:active,
   color:var(--on-dark)}
 .app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
 .app .path-step.on .path-n{color:var(--on-dark)}
+.app .dark-card,
+.app .dark-card h2,.app .dark-card h3,.app .dark-card h4,
+.app .dark-card p,.app .dark-card li,.app .dark-card b,.app .dark-card strong,
+.app .dark-card .t-body,.app .dark-card .t-compact,
+.app .dark-card .v,.app .dark-card .n,.app .dark-card .ttl{
+  color:var(--on-dark)}
+.app .dark-card .sub,.app .dark-card .t-desc,
+.app .dark-card .eyebrow,.app .dark-card .t-eyebrow,
+.app .dark-card .help,.app .dark-card .t-helper-01,
+.app .dark-card .legal,.app .dark-card .t-legal-01,.app .dark-card .t-caption,
+.app .dark-card .k,.app .dark-card .l,.app .dark-card .d,
+.app .dark-card .note-d{
+  color:var(--on-dark-2)}
+.app .dark-card .btn:not(.btn-p){color:var(--on-dark)}
+.app .dark-card .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .dark-card a[data-go],.app .dark-card .lk,.app .dark-card .lnk{
+  color:var(--on-dark)}
 .app .plate.plate-quiet .plate-v{color:var(--accent-text)}
 .app .plate.plate-quiet .plate-tab > .plate-bi:not(:last-child) > .plate-v{
   color:var(--on-dark)}
@@ -9296,13 +9260,6 @@ button.btn-p:active,
 .app .cs button > .lf-n,.app .ldr-copick .lf-n{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book)}
-.app .ldr-read-h > h2{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  color:var(--on-dark)}
-.app .ldr-read .ldr-read-x{
-  font-size:var(--t-compact-size);line-height:21px;
-  color:var(--on-dark-2)}
 .app .call-p-n{
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
@@ -9332,8 +9289,8 @@ button.btn-p:active,
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
-    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+    font-size:var(--t-label-size);line-height:var(--t-label-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
   .app .ph .lead{
     font-size:var(--t-body-size);line-height:var(--t-body-lh);
     letter-spacing:var(--t-body-ls)}
@@ -9441,11 +9398,6 @@ button.btn-p:active,
   text-transform:none;color:var(--on-dark)}
 .app .rec-dark .rec-r,
 .app .rec-dark .rec-f{color:var(--on-dark-2)}
-@container app (min-width:900px){
-  .app .page:not(.form-page) .sec-qa > .sec-h h2{
-    font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls)}
-}
 .app .askdock .askline-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
@@ -9519,8 +9471,8 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
 .app .page .sec > .sec-h.aih > .aih-b > .aih-d{
-  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-secondary)}
 .app .aih-d b{font-weight:var(--t-w-strong);color:var(--text-primary)}
 .app .pulse-hl{font-weight:var(--t-w-strong);color:var(--accent-text)}
@@ -9616,8 +9568,8 @@ button.btn-p:active,
     font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
     text-transform:none;color:var(--text-primary)}
   .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{
-    font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
-    font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
+    font-size:var(--t-body-size);line-height:var(--t-body-lh);
+    font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
 }
 .app .sig-hl{
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
@@ -9682,6 +9634,10 @@ button.btn-p:active,
 .app .crow-dark .crow-n{color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .crow-dark .crow-ph i{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls);
+  color:var(--on-dark)}
 .app .crumb-l{
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
@@ -9772,14 +9728,6 @@ button.btn-p:active,
 .app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
 .app .dark-card .eo-when{color:var(--on-dark)}
 .app .dark-card .eo-when > b{color:var(--on-dark)}
-.app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
-  font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
-@container app (min-width:900px){
-  .app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
-    font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
-}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -9809,9 +9757,6 @@ button.btn-p:active,
   .app .page .sec.found > .sec-h{
     border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
   .app .page .sec.found > :not(.sec-h){padding-left:0;padding-right:0}
-  .app .page .sec.found > .sec-h h2{
-    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-    letter-spacing:var(--t-h4-ls)}
 }
 .app .page .sec-h.found-h{align-items:center}
 .app .page .sec-h.found-h > .found-t{
@@ -10372,6 +10317,7 @@ button.btn-p:active,
 .app .crow-ph img{
   position:absolute;inset:0;
   width:100%;height:100%;object-fit:cover}
+.app .crow-ph i{font-style:normal}
 .app .crow-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0}
 .app .crow-b p{margin:0}
 .app .crow-id{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
@@ -10565,6 +10511,9 @@ button.btn-p:active,
   align-self:center;min-height:40px;
   padding:0 var(--s05);
   background:color-mix(in srgb, var(--accent) 10%, transparent)}
+.app .aih-b > .eo-when{
+  align-self:flex-start;min-height:0;padding:0;background:none}
+.app .page .sec.eo > .sec-h.aih > .aih-a{align-self:flex-start}
 .app .eo-when svg{flex:none;width:16px;height:16px;fill:var(--accent-text)}
 .app .page .facts.eo-facts{
   display:grid;
@@ -10754,6 +10703,12 @@ button.btn-p:active,
       rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 100%),
     linear-gradient(107.08deg,
       rgba(244,113,19,.34) 1.04%, rgba(226,166,0,.34) 39.89%, rgba(240,83,12,.34) 99.58%)}
+.app .dark-card .kv,.app .dark-card .kv > div,
+.app .dark-card .stat,.app .dark-card .facts,.app .dark-card .facts > div,
+.app .dark-card .tile,.app .dark-card .cardrow,.app .dark-card .note{
+  border-color:var(--on-dark-rule)}
+.app .dark-card .btn:not(.btn-p){border-color:transparent}
+.app .dark-card .tile,.app .dark-card .note{background-color:transparent}
 .app .sec-bk{
   display:flex;flex-direction:column;gap:0}
 .app .bkp{border-bottom:1px solid var(--rule);padding-bottom:var(--s07)}
@@ -10854,6 +10809,7 @@ button.btn-p:active,
 @container app (max-width:899.98px){
   .app .crow-dark .crow-a{padding-bottom:0}}
 .app .crow-dark .crow-a{align-self:flex-end}
+.app .crow-dark .crow-ph{background:var(--on-dark-fill)}
 .app .crumb-bar{
   flex:1 1 auto;min-width:0;
   display:flex;align-items:center;
@@ -11051,6 +11007,10 @@ button.btn-p:active,
 .app .dark-card .eo-when svg{fill:currentColor}
 .app .qa-ic.ic-cover svg{fill:var(--mk-3)}
 .app .qa-ic.ic-found svg{fill:var(--mk-1)}
+.app .page > .keep-place:last-child > .sec::after{display:none}
+@container app (min-width:900px){
+  .app .page > .keep-place:last-child > .sec::after{display:none}
+}
 .app.tmp-accent{
   --ai-1:#ff2d2d;
   --ai-2:#ff6b6b;
@@ -11088,6 +11048,11 @@ button.btn-p:active,
   color:var(--accent-text);
   border-color:var(--accent)}
 .app.tmp-accent .rec-a > .btn.rec-see svg{fill:var(--accent-text)}
+.app .page > .sec.tint::after,
+.app .page > .sec:has(+ .sec.tint)::after,
+.app .page > .ph:has(+ .sec.tint)::after,
+.app .page > .crumb:has(+ .sec.tint)::after{display:none}
+.app .page > .sec:has(+ .sec.sec-rep)::after{display:none}
 
 </style>
 </head>
@@ -11451,13 +11416,13 @@ const NAVSETS = {
   assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Enroll','ticket'],['billing','Payments','wallet']],
   full:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['coursework','Coursework','book'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['cohort','Cohort','group'],['messages','Messages','chat',1],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
   next:    [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['transcript','Course Progress','chart'],['rewards','Achievements','trophy'],['enrol','Next course','ticket'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  leader:  [['leadDash','Dashboard','dashboard'],['leadSessions','Sessions','calendar'],['leadEvals','Evaluations','edit'],['leadCohorts','Cohorts','group'],['leadReports','Course Reports','chart'],['leadMessages','Messages','chat',2],['leadCerts','Certifications','certificate']]
+  leader:  [['leadDash','Dashboard','dashboard'],['leadCalls','Calls','calendar'],['leadEvals','Evaluations','edit'],['leadCohorts','Cohorts','group'],['leadReports','Course Reports','chart'],['leadMessages','Messages','chat',2],['leadCerts','Certifications','certificate']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',
                 booking:'interviews', chapter:'coursework', payment:'enrol', terms:'account',
                 welcome:'enrol',
-                leadCohort:'leadCohorts', leadMember:'leadCohorts', leadEval:'leadEvals'};
+                leadCohort:'leadCohorts', leadMember:'leadCohorts'};
 
 const AV = {
   priya:'data:image/jpeg;base64,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',
@@ -12259,11 +12224,12 @@ function ring(pct, label){
   </div>`;
 }
 
-function aiHead({mark, title, desc, act, extra}){
+function aiHead({mark, title, desc, act, extra, under}){
   return `<div class="sec-h aih">
     <div class="aih-b">
       <h2 class="aih-t">${mark ? '<i class="aih-mk"></i>' : ''}${title}${extra || ''}</h2>
       ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+      ${under || ''}
     </div>
     ${act ? `<div class="aih-a">${act}</div>` : ''}
   </div>`;
@@ -12332,7 +12298,7 @@ function pulseCols(f, g){
     <div class="pulse-3">${p.figs.map(([v,l]) =>
       `<span><b>${v}</b><span class="pulse-3l">${l}</span></span>`).join('')}</div>`, 'pulse-wide');
 
-  const stand = pulseCol(3, I.star, 'Your standing', standRow(g));
+  const stand = pulseCol(3, I.trophy, 'Your standing', standRow(g));
 
   const act = f.finished
     ? `<button class="btn btn-g btn-sm noic" data-go="rewards">View more</button>`
@@ -12395,7 +12361,7 @@ function pulseQA(f, g){
     d:`${p.figs[0][0]} ${p.figs[0][1].toLowerCase()}, ${p.figs[2][0].toLowerCase()} of target.`,
     go:'transcript'});
   cards.push({
-    ic:I.star, hue:'ic-stand', t:'Your standing',
+    ic:I.trophy, hue:'ic-stand', t:'Your standing',
     d:`${g.pts.toLocaleString()} points at ${RANKS[g.rank-1].n}.`,
     go:'rewards'});
   return quickActions(cards);
@@ -12698,8 +12664,8 @@ const enrolOffer = lvl => `<div class="sec eo dark-card">
         mark:true,
         title:`You&rsquo;re enrolling on Explorer &ndash; ${lvl}`,
         desc:`${ENROL_DESC[lvl]}${ENROL_OPENS[lvl][1] ? ' ' + ENROL_OPENS[lvl][1] : ''}`,
-        act:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>
-          <button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
+        under:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>`,
+        act:`<button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -12739,12 +12705,14 @@ function journey(){
     case 'booked': return row(['done','on','',''],
       ['Explorer track', 'Priya Nair &middot; Thu, Aug 20', ...AHEAD]);
     case 'assessed': return LEVELLED;
-    case 'promoted': {
-      const p = cfg('promoted');
-      return row(['done','done','done','done'],
-        ['Explorer track &middot; Aug 12', 'E4 &middot; signed by Priya, Nov 21',
-         'Cohort 41 &middot; closed', `${p.done} chapters &middot; ${p.avg}% average`]);
-    }
+    case 'promoted': return [
+      {st:'done', lab:'Interview and level', ai:'Re-interview &amp; Levelling',
+       sec:'E4 &middot; signed by Priya, Nov 21'},
+      {st:'on',   lab:'Enrolled',            ai:'Course Enrollment',
+       sec:'Not enrolled yet'},
+      {st:'',     lab:'90-day course',       ai:'90 days Cohort Journey',
+       sec:AHEAD[1]}
+    ];
     default: return LEVELLED;
   }
 }
@@ -12874,7 +12842,16 @@ function crow(kind, o){
         <span>${c.label}</span>
       </div>`}
       <div class="crow-who">
-        <span class="crow-ph"><i>${p.i}</i><img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+        ${''/* THE `<img>` IS OMITTED WHEN THERE IS NO PHOTOGRAPH, rather than
+               written with an undefined `src`. The leader's weekly call is the
+               first row whose subject is not a person — the mark is the cohort's
+               number — and `src="undefined"` is a real request that 404s: the
+               `onerror` hides the element, so the card LOOKS right and the
+               console carries a failed resource on every render, which is
+               exactly what `respcheck` reads as a broken screen. The `<i>` is
+               the mark in that case (§71 normalises its `font-style`). */}
+        <span class="crow-ph"><i>${p.i}</i>${p.img
+          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
             ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
@@ -12898,7 +12875,15 @@ function crow(kind, o){
              product passes `join`, so the candidate's three call sites and
              `callRow` render byte-identically. */}
       <div class="crow-a${o.join === false ? ' crow-a1' : ''}">
-        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" data-go="${c.second.go}">${
+        ${''/* AND THE SECONDARY'S ATTRIBUTE IS THE RECORD'S, because not every
+               way onward is a `data-go`. The leader's weekly-call card opens the
+               brief SHEET, which is `data-ldrbrief="<id>"` (lead2) — a
+               `data-go="null"` would have been a route into the router with no
+               view behind it. `second.at` is a raw attribute the caller states;
+               `go` still wins when it is there, so the four rows that had one
+               are untouched. */}
+        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
+          c.second.go ? `data-go="${c.second.go}"` : (c.second.at || '')}>${
           o.join === false ? `${c.second.t} ${I.arrowRight}` : `${c.second.ic}${c.second.t}`}</button>`}
         ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
           o.gate ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
@@ -12967,7 +12952,16 @@ function jrnList(){
                  gave it `flex:none` and §63 §10 named it in a `flex` list, and a
                  class nothing writes is the "gate nothing writes" tell
                  CLAUDE.md describes. Both removed. */}
-          <span class="jrn-lab">${JRN_AI[i] || s.lab}</span>
+          ${''/* `s.ai` FIRST, BECAUSE `JRN_AI` IS INDEXED AND ONE STAGE IS NOT
+                 FOUR STEPS LONG (Maryam, 1 Sep 2026). `promoted` returns three
+                 rows with their own words, and looking those up by position in a
+                 four-label list would have printed the first three labels of the
+                 way IN against rows about the way round again — silently, since
+                 `JRN_AI[0..2]` all exist. Only that stage sets `ai`; every other
+                 step object has none, so `JRN_AI[i]` still answers for them and
+                 no other page's labels move. `s.lab` stays as the last resort
+                 for a fifth step added to `journey()` and not to `JRN_AI`. */}
+          <span class="jrn-lab">${s.ai || JRN_AI[i] || s.lab}</span>
         </li>`).join('')}
       </ol>
     </div>
@@ -13619,99 +13613,57 @@ V.dashboard = (f) => {
       </div>
       ${crow('iv', {when:false, second:false})}
     </div>
-    ${''/* WHAT THE 45 MINUTES ACTUALLY ARE — AND IT COMES BEFORE THE QUIZ.
-          The one thing this stage's page did not say. Everything on it was
-          about the booking — who, when, how long — and nothing about what
-          happens inside the call, which is the only question a person has
-          between booking one and taking it. The copy is Maryam's.
+    ${''/* THE SESSION BLOCK IS TWO QUICK ACTIONS NOW (Maryam, 1 Sep 2026:
+          "change the content beneath the black card into 2 quick actions").
+          What stood here was one `.sec` running ~640px under the black card: a
+          lede, a four-cell `.stats` strip (Length, Format, Your report, Fee)
+          and "What to bring" as three numbered sentences.
 
-          FIRST, BECAUSE IT IS THE ONLY THING AHEAD. The quiz is three months
-          behind this reader and settled; the interview is on Thursday. Read in
-          this order the page runs forwards — the card in the head band says
-          when, this section says what it is and what to bring, and the quiz
-          block closes on where the level came from. It was the other way round
-          for one build, which put a finished score above the open appointment.
+          THIS IS §82'S MOVE, ONE STAGE EARLIER, AND THE ARGUMENT CARRIES OVER
+          UNCHANGED. That layer turned the `assessed` and `promoted` dashboards'
+          reading blocks into Quick Actions on the reasoning that a dashboard
+          states where you are and offers the ways on, while the READING belongs
+          on the page that owns it. Everything in the strip was a fact about an
+          interview that has a whole module — `V.interviews` opens on
+          "45 minutes, by video · recorded · sets your level", which is this
+          block's four cells said once — and the section's own head row already
+          carried an "Interview details" button pointing there. A section whose
+          heading row links to the page that says the same thing better is a
+          section arguing for its own removal.
 
-          BOTH ON THE CANVAS NOW, AND THE JOIN IS A HAIRLINE AGAIN. These two
-          were a pair for three builds — "two sections in a row cannot both be
-          filled or the page reads as panels all the way down", so the quiz block
-          took §12's panel and this one took the canvas. The quiz block is white
-          from this build (Maryam's call; the note over `quizResults` is the long
-          version), which answers the pair rule the other way round: neither
-          filled rather than one filled.
+          SO THE TWO CARDS ARE THE TWO THINGS IT HELD, and neither loses a
+          reader: the session's shape goes to `V.interviews` by `go`, and "what
+          to bring" goes to Tal by `ask`, which is a better home than a list of
+          three fixed sentences — `wPrep` runs the questions rather than
+          printing them, and data.js's `/prepare/` route is already the one the
+          `new` dashboard's own second card fires.
 
-          What that changes here is one line and it comes back on its own. While
-          the block below was a `.cards` panel, §55.2 took the closing rule off
-          THIS section on the ground that a change of ground is already a
-          boundary. There is no change of ground now, so that selector stops
-          matching and the hairline is the boundary — which is the ordinary
-          rhythm every other pair of sections on the page uses. Nothing is
-          restated to get it; §55.2 is keyed on `.cards` and the class went with
-          the panel. A `.sec-notop` class lived in §56 for one build to subtract
-          the same boundary from the other direction, and went the same way.
+          THE PAGE IS NOW THE §82 SHAPE ON EVERY PRE-COURSE STAGE: the band,
+          one black card, two Quick Actions. `new`, `booked`, `assessed` and
+          `promoted` all read the same way, which is what §70.6's named hues
+          were for — `ic-cover` and `ic-prep` mean the same thing on each.
 
-          THE FOUR FACTS ARE A `.stats` STRIP, which is the component Maryam's
-          card was drawing: `.stats` is a FIXED four-column grid, so Length,
-          Format, Your report and Fee is the shape, one line each. The two facts
-          a strip cannot hold — "real situations, not hypotheticals" and "their
-          judgement, not a score" — are the character of the interview rather
-          than figures about it, and they are the section's lede.
+          NO FIGURE IS RESTATED AND THAT IS DELIBERATE. The old strip typed
+          "45 minutes", "48 hours" and "From $80" into this view; the fee in
+          particular was the RANGE ("from $80") because `bkStamp` cannot reach a
+          number, and it sat two inches under a black card naming the actual
+          agent. A card description that names no figure cannot drift from the
+          page it opens — which also retires this view's last dependence on the
+          "your agent, not Priya" rule the old note had to state.
 
-          NO MARKS ON ANY OF THE SEVEN. The four cells are LABELLED figures, so
-          a chip in front of one is a third statement of the same thing; four of
-          them turn a quiet strip into a row of objects. What to bring is three
-          sentences, and they are counted rather than marked — `.cardrow-n` in
-          §56.7 is the 20px slot, and the rows keep §02.10's rule under them
-          because a list that is numbered is a list of items.
-
-          THE AGENT IS "YOUR AGENT", NOT PRIYA. `bkStamp` (ai7) rewrites the
-          hand-written mentions of the booked agent on this stage so a booking
-          made inside Tal reads back correctly, and its note says a new surface
-          naming the agent has to be added there. Written without a name, this
-          needs no entry and cannot go stale — and the fee is the RANGE the rail
-          shows ("from $80") for the same reason, since it is true of all three
-          agents. The exact fee is on the plate above and on Payments.
-
-          AND IT DOES NOT REPEAT THE BOOKING. Maryam's copy closes on "You are
-          booked in for Thu 3 Sep · 14:00 with Dana Whitfield"; on this page the
-          black card two inches up already states the agent, the day and the
-          time, the fact row states the date a third time, and Tal's summary a
-          fourth. The section says what the session IS and leaves when it is to
-          the card that exists to say so. */}
-    <div class="sec">
-      <div class="sec-h"><h2>Your session, step by step</h2><button class="btn btn-g btn-sm noic" data-go="interviews">Interview details</button></div>
-      <p class="all-desc">Your agent asks for real situations &mdash; what you actually did, not hypotheticals &mdash; and sets your level from what you describe. Their judgement, not a score.</p>
-      <div class="stats">
-        ${statCell('', `Length`, `45 minutes`, `one sitting`)}
-        ${statCell('', `Format`, `Video`, `recorded, with a transcript`)}
-        ${statCell('', `Your report`, `48 hours`, `your level, E1 to E5`)}
-        ${statCell('', `Fee`, `From $80`, `credited to the course`)}
-      </div>
-      <div class="u-overline mt6">What to bring</div>
-      ${''/* `.prose` IS THE ROW SAYING IT IS A SENTENCE, NOT A TITLE (Maryam,
-             31 Aug 2026). `.cardrow-t` is the h4 role in §63 and everywhere
-             else in both portals it holds a NAME — a member, a cohort, a
-             session, a card brand — where the strong weight is what separates
-             the name from the description under it. These three rows have no
-             description: they are the whole of the row, and each is a full
-             sentence up to nine words long. Nine words of Kräftig in a numbered
-             list reads as three headings with nothing under them, which is why
-             they came out heavier than the section heading above them.
-             §63 §7b takes the weight to Buch and leaves the 15/20 size alone —
-             the row is still a row, it is just not shouting. The class goes on
-             the STACK rather than the row so the whole list is declared at
-             once, and it is scoped rather than global because `V.welcome`'s
-             "What happens next" uses the same `.cardrow-n` shape with real
-             titles and a `.cardrow-d` under each — that one is correct as it
-             is. */}
-      <div class="tile-stack prose mt4">
-        ${['One situation from the last three months that did not go well',
-           'A decision you would make differently now',
-           'Somewhere quiet &mdash; the transcript is part of the assessment'
-          ].map((t,i) => `<div class="cardrow"><span class="cardrow-n">${i+1}</span>
-          <span class="cardrow-b"><span class="cardrow-t">${t}</span></span></div>`).join('')}
-      </div>
-    </div>`;
+          WHAT IS GENUINELY GONE is the three "what to bring" sentences as
+          standing copy. They are Maryam's words and they are worth keeping, so
+          they are NOT deleted — `wPrep` is where the same ground is covered,
+          and the card's own `ask` is what opens it. If they should be on the
+          page again, they are a Tal card (`PAGESUM` owns the head, so a `.sec`
+          with an `.ai-aura` under the cards), not a numbered list. */}
+    ${quickActions([
+      {ic:I.video, hue:'ic-cover', t:'Your session, step by step',
+       d:'How 45 minutes interview will set your level', go:'interviews'},
+      {ic:I.lightning, hue:'ic-prep', t:'What to bring',
+       d:'Ask Tal what to have ready for the call.',
+       ask:'What should I prepare for my level interview?'}
+    ])}`;
 
   else if(S.stage==='assessed') body = `
     ${dashPh('Welcome back, Maryam!','Explorer Track &ndash; E3 &middot; level 3 of 15 &middot; not enrolled yet')}
@@ -13807,11 +13759,33 @@ V.dashboard = (f) => {
           block it replaces said "signed 21 August" while `signedSummary`'s own
           header says "20 August 2026", a pre-existing disagreement this must
           not spread to a third surface. Both dates are on `V.report`. */}
+    ${''/* BOTH DESCRIPTIONS ARE MARYAM'S COPY (1 Sep 2026), and each drops a
+          clause the card did not need.
+
+          THE COUNT IS STILL DERIVED. The ask was "13 Chapters, weekly live
+          cohort calls" with the number typed; `${CH.length}` is kept, because
+          the one thing the previous note promises is that "a chapter added to
+          the course moves this card" and a literal 13 breaks it silently. The
+          rendered string is identical today.
+          Sentence case on "chapters" is §63's rule, which is why the C is not
+          capital — the only word of the ask this does not take verbatim.
+
+          "one a week, with a live cohort call" -> "weekly live cohort calls".
+          The cadence was said twice, once per clause: thirteen chapters at one
+          a week IS thirteen weeks, and the call is weekly for the same reason.
+
+          THE SECOND CARD STOPS NAMING PRIYA, which is the `booked` section's own
+          "your agent, not Priya" rule arriving one stage later. `bkStamp` (ai7)
+          rewrites the hand-written mentions of the booked agent so a booking
+          made inside Tal reads back correctly, and its note says a new surface
+          naming the agent has to be added there — this one now needs no entry
+          and cannot go stale. "on interview" also keeps the card free of the
+          date disagreement the note above records. */}
     ${quickActions([
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
-       d:`${CH.length} chapters, one a week, with a live cohort call.`, go:'enrol'},
+       d:`${CH.length} chapters, weekly live cohort calls`, go:'enrol'},
       {ic:I.document, hue:'ic-found', t:'What the interview found',
-       d:'Priya&rsquo;s signed write-up of your level interview.', go:'report'}
+       d:'Signed write-up by the agent on interview', go:'report'}
     ])}`;
 
   else if(f.complete) body = `
@@ -13842,9 +13816,30 @@ V.dashboard = (f) => {
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
         <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
-        <div class="stp-wing">
-          ${wingBlock()}
-        </div>
+        ${''/* THE LADDER WING CAME OUT OF TAL'S CARD (Maryam, 1 Sep 2026:
+               "remove the where you are on the ladder section from the tal
+               summary section"). It was `<div class="stp-wing">${'$'}{wingBlock()}
+               </div>` — `ladderWing`, the third of §56's three wing states: the
+               heading, "Explorer &ndash; E4", "4 of 15 on the ladder" and the
+               fifteen-block rail.
+
+               THE PAGE SAYS ITS LEVEL FOUR OTHER TIMES, which is what makes this
+               a subtraction rather than a loss: `dashPh`'s fact row is
+               "Explorer Track &ndash; E4 &middot; level 4 of 15", the app bar
+               reads "Explorer &ndash; E4", the journey list's first row is "E4
+               &middot; signed by Priya, Nov 21", and Tal's own sentence directly
+               above says "You moved from E3 to E4". The rail was the only one of
+               the five that drew the ladder, and My Level is one press away with
+               the full fifteen rungs and the tracks under them.
+
+               WHAT IT LEAVES BEHIND, flagged rather than swept: `wingBlock()`'s
+               `f.complete` branch was `ladderWing`'s only caller, so that
+               function and §59's `.wing-lvl` hooks are now a gate nothing
+               writes. They are NOT deleted here — `wingBlock`'s three states are
+               §56's documented contract and `.wing-lvl` ships in
+               `design-system/talentnext-ds.css`, so pruning it is a design-system
+               decision rather than a side effect of moving one block on one
+               page. `consult` still calls `wingBlock()` for `stepper()`. */}
       </div>
     </div>
     ${''/* THE OFFER IS THE BLACK CARD, NOT THE PLATE — and this is the change
@@ -13884,62 +13879,64 @@ V.dashboard = (f) => {
 
           THE WORDS DIFFER BY ONE THING AND IT IS THE RIGHT ONE: this stage's
           report is the RE-interview's (`signedSummary(true, true)`), so the
-          card says so. The chapter count is read from `CH`. */}
+          card says so. The chapter count is read from `CH`.
+
+          AND THEY FOLLOW `assessed`'S REWRITE (Maryam, 1 Sep 2026), WHICH IS
+          NOT SCOPE CREEP BUT THE RULE THIS PAIR EXISTS UNDER. The ask named the
+          `assessed` cards; §82's whole point is that these two pages carry "the
+          same two cards in the same two colours a stage later", so leaving this
+          copy behind would have the two dashboards describe one course in two
+          registers — "13 chapters, weekly live cohort calls" on one page and
+          "13 chapters at E4, one a week, with a live cohort call" on the next.
+          That is the drift the pairing was written to prevent.
+
+          THE TWO DELIBERATE DIFFERENCES SURVIVE INTACT: `at E4`, because this
+          stage's course is the level up, and `re-interview` in both the title
+          and the description, because that is the report this page links to.
+          Everything else is byte-identical to `assessed`. */}
     ${quickActions([
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
-       d:`${CH.length} chapters at E4, one a week, with a live cohort call.`, go:'enrol'},
+       d:`${CH.length} chapters at E4, weekly live cohort calls`, go:'enrol'},
       {ic:I.document, hue:'ic-found', t:'What the re-interview found',
-       d:'Priya&rsquo;s signed write-up of your re-interview.', go:'report'}
+       d:'Signed write-up by the agent on re-interview', go:'report'}
     ])}
-    ${''/* AND THE COHORT CLOSES OUT IN FIGURES, NOT IN A CHART.
-          The weekly-minutes chart lived here — thirteen stacked bars of how
-          long you spent, week by week, on a course that is over. That is a
-          chart you read WHILE you are behind on it; once the 90 days are
-          closed the only questions left are what you finished, how well, and
-          what it earned, and all four of those are one number each. The
-          chart is still on Course Progress, which is where the week-by-week
-          record belongs and which the heading links to. */}
-    ${''/* AND THESE TWO ARE ON THE CANVAS, WHILE THE WRITE-UP ABOVE KEEPS ITS
-          PANEL. Maryam's call, and the pair rule is what it turns on: three
-          filled sections running to the foot of the page read as panels all the
-          way down, so the tone has to say which one is different rather than
-          which three are the same.
+    ${''/* TWO SECTIONS CAME OFF THE FOOT OF THIS PAGE (Maryam, 1 Sep 2026:
+          "remove the Cohort 41, in the end section" and "remove the What
+          changes at E4 section"). §82's note listed them as the three things
+          `promoted` deliberately did NOT convert to Quick Actions, "because
+          `assessed` has no equivalent and inventing one would be designing
+          rather than matching". That reasoning was about not INVENTING a card
+          for them; removing them outright is the other way to close the same
+          gap, and it leaves the page at exactly `assessed`'s shape — the band,
+          the offer as a black card, two Quick Actions — plus the two things
+          this stage genuinely owns, the points strip and the certificate.
 
-          THE WRITE-UP IS THE ONE THAT IS DIFFERENT. §45's test is whether a
-          block is READ or acted on, and Priya's re-interview summary is the only
-          thing down here you read — a closing figure strip and two offers with
-          buttons on them are not. `sec tint cards` stays on it; these two lose
-          `tint` and their cells go white by §10 rather than by §55's override,
-          which is the same swap `quizResults` made. */}
-    <div class="sec">
-      <div class="sec-h"><h2>Cohort 41, in the end</h2><button class="btn btn-g btn-sm noic" data-go="transcript">Course Progress</button></div>
-      <div class="stats">
-        ${statCell(I.book, `Chapters`, `13<small>/13</small>`, `all finished`)}
-        ${statCell(I.chart, `Average`, `${f.avg}<small>%</small>`, `assessments, all thirteen`)}
-        ${statCell(I.trophy, `Points`, GAME.promoted.pts.toLocaleString(), `${GAME.promoted.badges} of 4 badges`)}
-        ${statCell(I.growth, `Level`, `E3 &rarr; E4`, `up one, on 21 November`)}
-      </div>
-      <button class="score-link mt5" data-go="rewards">${scoreCard(GAME.promoted)}</button>
-    </div>
-    <div class="sec">
-      <div class="sec-h"><h2>What changes at E4</h2></div>
-      ${/* THE ACTION GOES TO THE END OF THE ROW IT BELONGS TO.
-            Both of these were a heading, a line, and a button on a line of
-            its own underneath — three rows for one offer, twice, in a block
-            whose two halves are the same shape. There is a column and a
-            half of empty tile to the right of each sentence and the button
-            is the only other thing in the row, so that is where it goes:
-            what changes on the left, what to do about it at the right-hand
-            end, one row each. `.chgrow` is the shape; §24 draws it. */''}
-      <div class="tile-stack">
-        <div class="tile chgrow"><div class="chgrow-b"><h3>You can lead a cohort</h3>
-          <div class="sub">Volunteer to lead any cohort below E4. It is recognition, not payment, and your request goes to the admin team.</div></div>
-          <button class="btn btn-g btn-sm" data-go="transcript">Become a Cohort Leader ${I.arrowRight}</button></div>
-        <div class="tile chgrow"><div class="chgrow-b"><h3>Your listing goes public</h3>
-          <div class="sub">Your level and certificates become a shareable page. Nothing else on your profile is published.</div></div>
-          <button class="btn btn-g btn-sm" data-go="account">Manage what is shown ${I.arrowRight}</button></div>
-      </div>
-    </div>
+          "COHORT 41, IN THE END" WAS TWO BLOCKS IN ONE `.sec` AND BOTH GO, which
+          is worth stating because only the first carries the heading: a `.stats`
+          row of four cells (Chapters 13/13, Average 87%, Points 3,205, Level
+          E3 → E4) AND, under it, the `.score-link` wrapping `scoreCard` — the
+          Points 3,205 / 1-Star / "1,795 points to Silver" block, which reads on
+          screen as a section of its own and is not one. Taking the section takes
+          both.
+
+          NOTHING IN EITHER IS THE ONLY COPY. The chapters and the average are in
+          Tal's sentence at the top of this page word for word ("13 chapters,
+          87% average"); the level is in the fact row, the app bar and the
+          journey list's first step; and the points, the badge and the distance
+          to Silver are `V.rewards`, which is exactly where the `.score-link`
+          went and is on the rail. `Course Progress` was the head action and
+          `V.transcript` is on the rail too.
+
+          "WHAT CHANGES AT E4" was two `.chgrow` tiles — lead a cohort, and your
+          listing goes public — each a heading, a line and a button. Both
+          destinations survive: `V.transcript` and `V.account` are rail items.
+
+          WHAT IS NOW ORPHANED, flagged rather than quietly deleted. `.chgrow` /
+          `.chgrow-b` (§24) and `.score-link` had these as their ONLY call sites
+          in either portal, so their rules are the "gate nothing writes" tell —
+          and all three ship in `design-system/talentnext-ds.css`. Pruning them
+          is a design-system call, not a side effect of emptying one page.
+          `scoreCard` itself is untouched and still has `V.rewards`' caller. */}
     ${''/* THE CERTIFICATE CLOSES THE PAGE, AND IT HAS TO OPT OUT OF THE BAND
           TO DO IT. `.cert` is in `DARK_CARD`, so `placeDark` (ai5) lifts
           whichever page child contains one into the head band — trap 12 —
@@ -14077,30 +14074,43 @@ V.level = (f) => {
         which rung and what moves it. See the note over `ph()`. */}
   ${ph('My Level')}
   ${lvlWing(f)}
-  <!-- ONE WAY INTO THE REPORT, NOT THREE. A black primary button sat here
-       saying "Read my full report", the signed card below it is itself a
-       button to the same place, and that card closes with "Read the full
-       report" as a link. Three controls, one destination, stacked. The two
-       that belong to the card stay — the card IS the report's summary, so
-       the way in reads off the thing it summarises — and the loose button
-       above goes. The link at the foot of the card is where the reading
-       ends, which is where the next step belongs. -->
-  <div class="sec mt6">
-    <!-- ONE CONTROL, AT THE FOOT. The card used to be a button — the whole
-         block clickable, with a trailing arrow saying so — AND it closed with
-         a link to the same place. Now that the link is a real button (§29.16)
-         the card stops being one: two controls wrapping one destination is a
-         click target inside a click target, and the arrow was the only thing
-         announcing the outer one. The button says it better, and says it
-         where the reading ends. -->
-    ${confirmed?signedSummary(false, false, true):`<div class="tile bordered">
+  ${''/* THE SIGNED REPORT BLOCK LEFT THIS PAGE (Maryam, 1 Sep 2026: "instead of
+        this page, remove the report section above the How the ladder works and
+        show this against the interview details in interviews module"). It was
+        `signedSummary(false, false, true)` in a `.sec mt6` right here — the
+        two-fact signature header, the Strengths and Growth areas cards, and
+        "Read the full report" at the foot.
+
+        AND THE PAGE IS BETTER FOR IT, WHICH IS WHY THE MOVE IS THE RIGHT SHAPE
+        RATHER THAN JUST A RELOCATION. This page answers "where am I on the
+        ladder": the fifteen rungs, the track names, and how the thing works.
+        The signed block answers "what did Priya say about me in August" — the
+        same question `ivRow` is a row about, one module over, sitting in a list
+        of the interviews it came out of. Read here it was a report with no
+        interview beside it; read there it is the newest row's own findings.
+
+        THE NON-CONFIRMED BRANCH STAYS AND IS ALL THAT IS LEFT. "What the
+        Explorer track means" is not the report — it is what the TRACK is, for a
+        reader whose quiz has given them a track and no level yet — so it
+        belongs to this page and to no other. The `.sec` is now gated rather
+        than holding a ternary, because a section that renders empty still pays
+        its padding and draws its closing hairline.
+
+        WHAT THIS PAGE NO LONGER HAS IS A ROUTE TO `V.report`, and that is
+        stated rather than discovered: the foot action went with the block. The
+        report is still reached from `ivRow` (every row on the Interviews
+        module), from the `assessed` and `promoted` dashboards' "What the
+        interview found" Quick Action, and from the block's own foot button in
+        its new home. Three ways in, none of them this page. */}
+  ${!confirmed?`<div class="sec mt6">
+    <div class="tile bordered">
       <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
         <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
         <p>Your interview places you on one of five levels inside it, and that decides which course you take.</p>
       </div>
-    </div>`}
-  </div>
+    </div>
+  </div>`:''}
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
   </div>`:''}
@@ -14510,6 +14520,37 @@ V.interviews = (f) => {
       ${f.complete?ivRow('re','Re-interview','November 21, 2026','Promoted to Explorer &ndash; E4','44:06'):''}
       ${ivRow('level','Level interview','August 20, 2026','Confirmed Explorer &ndash; E3','45:12')}
     </div>
+    ${''/* THE SIGNED FINDINGS, MOVED HERE FROM `V.level` (Maryam, 1 Sep 2026).
+          The long version is where it used to be drawn; what matters here is
+          the placement, and three things decided it.
+
+          INSIDE THIS SECTION, NOT AFTER IT. The ask is "against the interview
+          details", and the interview details on this module ARE these rows. As
+          the section's own next child the block reads as what the newest row
+          found; as a section of its own it would be a second block about the
+          same interview with a heading competing with "Past interviews".
+
+          IT NEEDS NO HEADING AND MUST NOT BE GIVEN ONE — trap 13. `.signed` is
+          not in §10.15's opt-out list, so a `.sec-h` on a section built round it
+          takes the 184px label column. This section already opts out through
+          `.ivlist` (§38's `.sec:has(> .ivlist){display:block}`), so the rows and
+          the block both get the full width — and the block carries its own
+          heading anyway, in the two facts of `.signed-h`.
+
+          §74'S `border-top` IS THE SEPARATION AND IT ONLY WORKS AS A DIRECT
+          CHILD. `.app .page .sec > .signed` gives the block a rule and
+          `--s07` above it, inset to the section's own gutter — written for
+          exactly this, a signed block following something else inside one
+          section. Wrapping it in a div would lose the rule and nothing would
+          warn.
+
+          `re` IS `f.complete`, SO THE CARDS DESCRIBE THE TOP ROW. On the
+          promoted stage the list opens with the re-interview, and the block's
+          header names which one it is reporting — "Re-interview / 21 November
+          2026" against "Level interview / 20 August 2026". Passing `false` here
+          the way `V.level` did would have printed August's findings under
+          November's row with nothing saying so. */}
+    ${signedSummary(false, !!f.complete, true)}
   </div>`:''}
   ${''/* SCHEDULED IS THE DASHBOARD'S ROW — Maryam, 31 Aug 2026. It was a
         four-row `.kv` tile, a three-button set under it and a legal line: the
@@ -16866,7 +16907,22 @@ function signedSummary(withNote, re, footAction){
             variant: the border is already transparent there and the arrow is
             already written, so what is left is the words and the mark. The one
             primary action on this page belongs to the enrolment offer above. */}
-      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-t btn-sm noic" data-go="report">Read the full report ${I.arrowRight}</button></div>`:''}
+      ${''/* `data-iv` IS DERIVED FROM `re`, SO THE BUTTON CANNOT OPEN A REPORT
+             THE CARDS ABOVE IT ARE NOT ABOUT (1 Sep 2026). It shipped as a bare
+             `data-go="report"`, which was harmless while `V.level` was the only
+             caller and always passed `re:false` — but `V.report` READS `S.iv`
+             (its eyebrow is "Re-interview · confirmed November 22" or "Level
+             interview · confirmed August 21"), and `S.iv` is only ever written
+             by the `[data-iv]` capture listener. So the destination was
+             whichever interview the reader had last touched, or the default if
+             they had touched none.
+
+             That became live the moment this block moved next to `ivRow`, where
+             both rows write `S.iv` on the way past. `re` is already the flag
+             that picks which interview's two paragraphs are printed, so reading
+             the attribute off it means the summary and the report it opens are
+             one decision rather than two that have to be kept in step. */}
+      ${footAction?`<div class="ai-foot signed-foot"><button class="btn btn-t btn-sm noic" data-go="report" data-iv="${re?'re':'level'}">Read the full report ${I.arrowRight}</button></div>`:''}
     </div>`;
 }
 
@@ -18434,7 +18490,7 @@ function placeLevelCards(){
   });
 }
 
-const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero, .ldr-read';
+const DARK_CARD = '.plate, .cert, .sec.on-dark, .score.on-dark, .lead-b, .lvl-hero';
 
 function placeDark(){
   if(device.querySelector('.page > .modhead > .head-col, .page > .head-col')) return;
@@ -18912,46 +18968,37 @@ const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.memb
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
 
-const LEAD_SESSIONS = [
-  {id:'s1', name:'Thomas Beck',   i:'TB', img:'samuel', when:'Today 10:00 AM',    day:'Today',    time:'10:00 AM', ord:0, mins:45, state:'done',     quiz:64, bucket:'Explorer'},
-  {id:'s2', name:'Rachel Okonjo', i:'RO', img:'lena',   when:'Yesterday 3:30 PM', day:'Yesterday',time:'3:30 PM',  ord:-1,mins:45, state:'done',     quiz:71, bucket:'Explorer'},
-  {id:'s3', name:'Femi Adebayo',  i:'FA', img:'owen',   when:'Today 4:30 PM',     day:'Today',    time:'4:30 PM',  ord:1, mins:45, state:'upcoming', quiz:58, bucket:'Explorer'},
-  {id:'s4', name:'Sana Qureshi',  i:'SQ', img:'hana',   when:'Tomorrow 11:00 AM', day:'Tomorrow', time:'11:00 AM', ord:3, mins:45, state:'upcoming', quiz:69, bucket:'Explorer'},
-  {id:'s5', name:'Maryam Naz',    i:'MN', img:'hana',   when:'Nov 21, 6:30 PM',   day:'Nov 21',   time:'6:30 PM',  ord:9, mins:45, state:'upcoming', quiz:64, bucket:'Explorer', re:true}
-];
+const lcall = c => ({
+  id:'c' + c.id, co:c.id, ord:c.callOrd, day:c.callDay, time:c.callTime,
+  when:c.callDay + ' ' + c.callTime, mins:60,
+  week:c.week, level:c.level, seats:c.members.length,
+  chapter:CH[Math.min(12, c.week - 1)][0]
+});
+const lcalls = () => LEAD_COHORTS.map(lcall).sort((a,b) => a.ord - b.ord);
+const lnext  = () => lcalls()[0];
 
-const LEAD_EVALS = [
-  {id:'e1', name:'Thomas Beck',   i:'TB', img:'samuel', when:'Today 10:00 AM',    quiz:64, ai:'E1', status:'pending',
-   why:'The quiz put them in the Explorer band and the interview places them at the entry level. Clear intent and good scoping, but they described keeping work rather than handing it over — twice.'},
-  {id:'e2', name:'Rachel Okonjo', i:'RO', img:'lena',   when:'Yesterday 3:30 PM', quiz:71, ai:'E3', status:'pending',
-   why:'Top of the Explorer band. Reframed an under-specified brief into three testable options unprompted; a weak conflict-repair answer is what holds this at 3 rather than 4.'}
+const LEAD_RUN = [
+  {co:41, week:4,  when:'Thursday 28 August', attended:9},
+  {co:33, week:10, when:'Friday 22 August',   attended:7},
+  {co:41, week:3,  when:'Thursday 21 August', attended:8},
+  {co:33, week:9,  when:'Friday 15 August',   attended:8}
 ];
-
 const LEAD_SUMMARIES = [
   {id:'m1', name:'Owen Clarke',  i:'OC', img:'owen', cohort:33, status:'pending'},
   {id:'m2', name:'Lena Fischer', i:'LF', img:'lena', cohort:33, status:'pending'}
 ];
 
-const lpending = () => LEAD_EVALS.filter(e => e.status === 'pending').length
-                     + LEAD_SUMMARIES.filter(s => s.status === 'pending').length;
-const lnext = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming')[0];
+const lpending = () => LEAD_SUMMARIES.filter(s => s.status === 'pending').length;
 
-const livTitle = s => s.re ? 'Re-interview' : 'Level interview';
-const livDetail = s => s.mins + ' minutes, recorded &middot; ' + (s.re
-  ? 'they have 90 days behind them, so you read the summary first'
-  : 'you sign the level afterwards');
+const lcTitle  = k => 'Cohort ' + k.co + ' call';
+const lcDetail = k => k.mins + ' minutes &middot; week ' + k.week + ' of 13 &middot; ' + k.chapter;
 
-const lbooked = () => LEAD_SESSIONS.filter(s => s.state === 'upcoming').map(s => ({
-    kind:'iv', ord:s.ord, day:s.day, time:s.time, i:s.i, img:s.img,
-    t:livTitle(s) + ' &middot; ' + s.name,
-    d:livDetail(s),
-    go:'leadSessions'
-  })).concat(LEAD_COHORTS.map(c => ({
-    kind:'call', ord:c.callOrd, day:c.callDay, time:c.callTime,
-    t:'Cohort call &middot; ' + lname(c),
-    d:'60 minutes &middot; week ' + c.week + ' of 13 &middot; ' + c.members.length + ' candidates at ' + llevel(c),
-    go:'leadCohorts'
-  }))).sort((a,b) => a.ord - b.ord);
+const lbooked = () => lcalls().map(k => ({
+  ...k,
+  t:lcTitle(k),
+  d:k.seats + ' candidates at Explorer &ndash; ' + k.level + ' &middot; ' + lcDetail(k),
+  go:'leadCalls'
+}));
 
 const BOOKED_SHOWN = 3;
 
@@ -18959,27 +19006,27 @@ const LEAD_JUMPS = [
   {id:'lead-cohorts',   ic:'group',      l:'Cohorts'},
   {id:'lead-attention', ic:'warningAlt', l:'Attention'},
   {id:'lead-waiting',   ic:'edit',       l:'Waiting on you'},
-  {id:'lead-booked',    ic:'video',      l:'Booked'}
+  {id:'lead-booked',    ic:'video',      l:'Calls'}
 ];
 
 var LEAD_NOTIF = [
-  {ic:'edit',       t:'Thomas Beck is waiting on a level decision', b:'Interview finished at 10:00 AM. They cannot enroll until you sign it.', w:'25 min ago', go:'leadEvals',    unread:1},
+  {ic:'edit',       t:'Owen Clarke is waiting on his 90-day summary',b:'Cohort 33 closes next week. Nothing goes to his next agent until you publish it.', w:'25 min ago', go:'leadEvals',    unread:1},
   {ic:'warningAlt', t:'Yuki Tanaka has not signed in for 12 days',  b:'Cohort 41, week 5. Nine per cent through the chapters.',                w:'2h ago',     go:'leadReports',  unread:1},
   {ic:'chat',       t:'3 new posts in Cohort 41',                    b:'Chapter 4 came up again on the discussion board.',                     w:'4h ago',     go:'leadMessages', unread:1},
-  {ic:'calendar',   t:'Femi Adebayo booked you for 4:30 PM',         b:'45 minutes. Explorer band from their quiz, no level yet.',              w:'Today',      go:'leadSessions', unread:0},
+  {ic:'calendar',   t:'Cohort 41 meets today at 6:00 PM',            b:'Week 5 of 13. Sixty minutes, ten candidates.',                         w:'Today',      go:'leadCalls',    unread:0},
   {ic:'certificate',t:'Your fourth cohort completed',                b:'Cohort 26 closed with eight of ten promoted.',                         w:'Yesterday',  go:'leadCerts',    unread:0}
 ];
 
 var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
-  where: {leadDash:'Dashboard', leadSessions:'Sessions', leadEvals:'Evaluations',
+  where: {leadDash:'Dashboard', leadCalls:'Calls', leadEvals:'Evaluations',
           leadCohorts:'Cohorts', leadReports:'Course reports', leadMessages:'Messages',
           leadCerts:'Certifications', leadProfile:'Your profile'},
   state: () => LEAD_COHORTS.length + ' cohorts, ' + lmembers().length + ' candidates, '
-             + lpending() + ' decision' + (lpending()===1?'':'s') + ' waiting',
+             + lpending() + ' summar' + (lpending()===1?'y':'ies') + ' waiting',
   ctx: {
-    leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','Summarise the two evaluations waiting'],
-    leadSessions: ['What should I ask Femi Adebayo?','Who is booked this week?'],
-    leadEvals: ['Why did you propose E1 for Thomas?','What evidence supports this level?'],
+    leadDash: ['Brief me for Thursday&rsquo;s call','Who should I worry about this week?','What is waiting on my signature?'],
+    leadCalls: ['Brief me for tonight&rsquo;s call','Who missed the last one?'],
+    leadEvals: ['Is Owen Clarke ready to be promoted?','What should the summary say?'],
     leadCohorts: ['Where is Cohort 41 stuck?','Which cohort needs me most?'],
     leadReports: ['Who has stopped in the last week?','Which chapter is losing people?'],
     leadMessages: ['Draft a check-in to Yuki Tanaka','What came up on the board this week?'],
@@ -18989,9 +19036,7 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
 };
 
 function bookedRow(b){
-  const mark = b.kind === 'iv'
-    ? `<span class="mem-av mem-ph">${avatar({i:b.i, img:AV[b.img]}, 36)}</span>`
-    : `<span class="cardrow-ic">${I.group}</span>`;
+  const mark = `<span class="cardrow-ic">${I.group}</span>`;
   const now = /^today$/i.test(b.day) ? ' bk-now' : '';
   return `<button class="cardrow bk-row" data-go="${b.go}">
     <span class="day bk-day${now}"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
@@ -19004,22 +19049,24 @@ function bookedRow(b){
   </button>`;
 }
 
-const leadCall = (s, second) => ({
-  who:{n:s.name, i:s.i, img:AV[s.img]},
-  role:`${s.bucket} band from their quiz &middot; no level yet`,
-  x:livDetail(s),
-  xl:'',            /* the line is the appointment, not the person */
-  v:false,          /* a candidate is not a checked identity */
-  when:s.when, mins:s.mins,
-  second:second === undefined ? {go:'leadSessions', ic:I.calendar, t:'All sessions'} : second
+const leadCall = (k, second) => ({
+  who:{n:'Cohort ' + k.co, i:String(k.co)},   /* no `img` — see the mark, above */
+  role:`${k.seats} candidates at Explorer &ndash; ${k.level}`,
+  x:lcDetail(k),
+  xl:'',            /* the line is the appointment, not the cohort */
+  v:false,          /* a cohort is not an identity, checked or otherwise */
+  when:k.when, mins:k.mins,
+  second:second === undefined
+    ? {at:`data-ldrbrief="${k.co}"`, ic:I.edit, t:'Generate the brief'}
+    : second
 });
 
-const leadCallCard = (s, o) => `<div class="sec dark-card crow-dark">
+const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">${livTitle(s)}</h2>
-        <span class="dc-when">${I.time}${s.when}</span></div>
+      <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
+        <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
-    ${crow(leadCall(s, (o || {}).second), {when:false, join:false,
+    ${crow(leadCall(k, (o || {}).second), {when:false, join:false,
       second:(o || {}).second === false ? false : undefined})}
   </div>`;
 
@@ -19044,18 +19091,19 @@ V.leadDash = () => {
   const FIG = {
     'lead-cohorts':   [LEAD_COHORTS.length, `${lmembers().length} candidates`],
     'lead-attention': [att.length,          `${bad} severe`],
-    'lead-waiting':   [pend,                'levels and summaries'],
+    'lead-waiting':   [pend,                '90-day summaries'],
     'lead-booked':    [booked.length,       booked[0] ? 'next ' + booked[0].day.toLowerCase() + ' ' + booked[0].time.toLowerCase() : 'nothing booked']
   };
 
+  const s0 = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const talRead = pend
-    ? {h:'Two decisions are blocking two people',
-       p:`<b>${LEAD_EVALS[0].name}</b> and <b>${LEAD_EVALS[1].name}</b> finished their interviews and neither can enroll until you sign a level. Both of my proposals are in the band their quiz put them in.`,
+    ? {h:`${pend === 1 ? 'One summary is' : 'Two summaries are'} waiting on you`,
+       p:`${s0.map(s => `<b>${s.name}</b>`).join(' and ')} finished the 90 days in Cohort ${s0[0].cohort}. Nothing reaches their next agent, and no level moves, until you publish what you saw.`,
        a:'leadEvals', ab:'Open evaluations'}
     : next
-    ? {h:'Your next interview is '+next.when.toLowerCase(),
-       p:`<b>${next.name}</b>, ${next.mins} minutes. Their quiz puts them in the Explorer band; they have no level yet, so this conversation sets it.`,
-       a:'leadSessions', ab:'Open sessions'}
+    ? {h:'Cohort ' + next.co + ' meets ' + next.day.toLowerCase(),
+       p:`Week ${next.week} of 13, ${next.seats} candidates. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
+       a:'leadCalls', ab:'Open calls'}
     : {h:'Cohort 41 meets on Thursday',
        p:`Week ${c41.week} of 13. I can pull a brief from where the cohort actually is rather than from where the syllabus says it should be.`,
        a:'leadCohorts', ab:'Open Cohort 41'};
@@ -19154,11 +19202,9 @@ V.leadDash = () => {
   <div class="sec" id="lead-waiting">
     <div class="sec-h"><h2>Waiting on you</h2></div>
     ${pend?`<div class="tile-stack">
-      ${LEAD_EVALS.filter(e=>e.status==='pending').map(e=>
-        faceRow(e, `Level decision &middot; I proposed Explorer &ndash; ${e.ai} &middot; ${e.when.toLowerCase()}`, 'leadEvals')).join('')}
       ${LEAD_SUMMARIES.filter(s=>s.status==='pending').map(s=>
         faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their 90 days`, 'leadEvals')).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every level decision and summary is signed.</p></div>`}
+    </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every 90-day summary is published.</p></div>`}
   </div>
   <div class="sec tint" id="lead-booked">
     ${''/* THE WAY OUT MOVED INTO THE HEADING ROW AND THE SENTENCE CAME OFF
@@ -19173,17 +19219,23 @@ V.leadDash = () => {
            profile setting, reachable from the account menu and from
            `leadProfile` itself, and it was the second of two buttons under
            a list whose own action is on every row. */}
-    <div class="sec-h"><h2>Booked</h2><button class="btn btn-g btn-sm noic" data-go="leadSessions">All sessions ${I.arrowRight}</button></div>
-    ${''/* THREE ROWS, AND THE SECTION'S CONTROL IS WHAT MAKES THAT HONEST.
-           Six was the whole week, which made "All sessions" a link to the
-           same list again. Three is the next three things that happen, and
-           the heading row says where the rest are. `BOOKED_SHOWN` rather
-           than a literal, because `bookedRow` is fed from two merged
-           sources and the count is a display decision, not a fact about
-           the data. */}
+    <div class="sec-h"><h2>Your calls</h2><button class="btn btn-g btn-sm noic" data-go="leadCalls">All calls ${I.arrowRight}</button></div>
+    ${''/* THE HEADING IS "YOUR CALLS", NOT "BOOKED" (1 Sep 2026). "Booked" was
+           the right word for a diary holding two kinds of thing — an interview
+           somebody else took a slot for and a call that repeats every week —
+           and it was chosen precisely because a leader reading it "is asking
+           about their diary, not about one of the two kinds". With one kind
+           left, the word that named the merge names nothing, and nobody books
+           a cohort leader. The count in the card above it is unchanged.
+
+           `BOOKED_SHOWN` STILL EARNS ITS NAME with three cohorts and three
+           calls, because it is a decision about the DASHBOARD rather than a
+           fact about the data: a fourth cohort is a fourth call, and the day
+           that happens this section must not silently become the whole list
+           again with "All calls" pointing at itself. */}
     ${booked.length?`<div class="tile-stack">
       ${booked.slice(0, BOOKED_SHOWN).map(bookedRow).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing booked</h3><p>Interviews you are booked for and your weekly cohort calls both show up here.</p></div>`}
+    </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
   </div>
   ${''/* "YOUR STANDING" IS OFF THE DASHBOARD (Maryam, 31 Aug 2026), AND IT
          IS NOT LOST — `V.leadProfile` (lead4.js) draws the same four figures
@@ -19353,24 +19405,27 @@ V.leadCohorts = () => {
       ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`)}
     </div>
   </div>
-  <div class="sec">
-    <div class="sec-h"><h2>This week&rsquo;s calls</h2><span class="t-helper-01">Sixty minutes each</span></div>
-    <div class="tile-stack">
-      ${LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd).map(c => `
-      <div class="cardrow bk-row">
-        <span class="day bk-day"><div class="d">${c.callDay}</div><div class="n">${c.callTime}</div></span>
-        <span class="cardrow-ic">${I.group}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${lname(c)} &middot; week ${c.week} of 13</span>
-          <span class="cardrow-d">${c.members.length} candidates at ${llevel(c)} &middot; ${CH[Math.min(12, c.week - 1)][0]}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-ldrbrief="${c.id}">Brief</button>
-        </span>
-      </div>`).join('')}
-    </div>
-    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
-  </div>
+  ${''/* "THIS WEEK'S CALLS" IS OFF THIS PAGE AND ON `V.leadCalls` (1 Sep 2026).
+         It was three `.bk-row`s with a date chip and a Brief button — exactly
+         the list the Calls page now opens with, and the reason the Calls module
+         survived the interviews leaving. Two pages drawing one list is the
+         "route to the same content" this portal keeps deleting (`BOOKED_SHOWN`
+         in lead.js is the same argument from the dashboard's side), and of the
+         two this was the wrong one to keep: a call is an appointment, and
+         Cohorts is about cohort STATE.
+         NOTHING IS LOST HERE. The figure band's fourth cell is "Next call" with
+         the cohort and the hour in its note, and the All cohorts table below
+         carries a "Next call" column per row — so this page still answers "when
+         do I meet them" for every cohort on it, in the two places it was
+         already answering it. What went is only the third copy, the one with
+         the button on it, and the button is on the Calls page's own rows.
+         AND THE WAY THERE IS ON THE HEADING ROW, which is the shape the
+         dashboard's own "Your cohorts" and "Your calls" sections both use
+         (`.sec-h` › `<h2>` + `.btn-g.btn-sm.noic`). A list handed to another
+         page needs a route to it, or the subtraction is a dead end rather than
+         a move. It is NOT in `ph()`'s action slot: that slot sits above Tal's
+         summary, and both this file and lead3 record emptying it for exactly
+         that reason. */}
   <div class="sec tint">
     <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of 90, evenly spread</span></div>
     <div class="tbl-wrap">
@@ -19399,6 +19454,23 @@ V.leadCohorts = () => {
           Tal card at the top of this page states in the same words and the
           PROGRESS column shows on the row it belongs to. Three copies of one
           fact, the quietest of them last. */''}
+  </div>
+  ${''/* THE WAY TO THE CALLS PAGE IS THE FOOT OF THE PAGE, and the two places
+         it is NOT are both deliberate. Not `ph()`'s action slot: that sits
+         above Tal's summary, and this file and lead3 both record emptying it
+         for that reason. Not the "All cohorts" heading row either — that slot
+         holds the helper line defining what the Progress column is measured
+         against ("day of 90, evenly spread"), which the deleted pace footnote
+         below explicitly leans on, so putting a control there would trade a
+         definition for a link.
+         `.btn-set` at the foot is the shape `V.leadCohort` already ends with —
+         "Post to the cohort board" and "Course reports" — so a way onward from
+         a cohort page is drawn the same whether you are looking at one cohort
+         or at all three. */}
+  <div class="sec">
+    <div class="btn-set">
+      <button class="btn btn-g" data-go="leadCalls">This week&rsquo;s calls ${I.calendar}</button>
+    </div>
   </div>
 </div></main>`;
 };
@@ -19586,11 +19658,26 @@ V.leadMember = () => {
     <div class="sec-h"><h2>Their level</h2></div>
     <div class="tile">
       <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
+      ${''/* THE ROWS NAME THE AGENT NOW, NOT AN ANONYMOUS "REVIEWER" (1 Sep
+             2026). A cohort leader does not run the initial interview, so this
+             block is a RECORD of somebody else's decision — which it always was
+             on this page, since nothing here is editable and lead2 already tells
+             the leader "the full recording is never shared with you". What
+             changed is that the words no longer let a reader think the leader
+             might have been the reviewer. `agent` rather than a name, because
+             this build does not record WHICH agent interviewed each of the 28
+             candidates and inventing one would be the fabricated data §74 rules
+             out — Priya is Maryam's agent and nobody else's.
+             AND THE TAG IS "one below", NOT "one below the proposal". Measured
+             at 390: the longer string put the `.tag` 5px past the page's right
+             edge inside a `.kv` value — the only overflow the leader sweep
+             found. The row's key says WHO signed and the sentence under the
+             tile says what they did, so the pill only has to say the gap. */}
       <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
-      <div class="kv"><span class="k">Assigned</span><span class="v">${llevel(c)} <span class="tag org sm">reviewer went lower</span></span></div>
+      <div class="kv"><span class="k">Signed by their agent</span><span class="v">${llevel(c)} <span class="tag org sm">one below</span></span></div>
       <div class="kv"><span class="k">Next level</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
     </div>
-    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} one below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
+    <p class="t-helper-01 mt4">Set at the interview by their talent agent, not by the quiz and not by you. They placed ${first} one below the proposal, so this level should be within reach &mdash; persistent struggle at a level set conservatively is usually something other than placement.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
@@ -19663,8 +19750,33 @@ V.leadReports = () => {
       ${statCell(I.misuse, 'Never signed in', never.length, never.length ? 'no activity at all' : 'everyone has started')}
     </div>
   </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>Course progress</h2><span class="t-helper-01">Ordered by the gap to expected pace</span></div>
+  ${''/* THE TABLE IS WHITE AND HAS NOTHING DRAWN ABOVE IT — Maryam, 31 Aug 2026:
+        "remove the grey bg color of the 4 tables against all 4 tabs. also remove
+        the top border of the table that is dividing it from the upper blocks.
+        also remove the 'Ordered by the gap to expected pace' text."
+
+        ONE SECTION, FOUR STATES. "The 4 tables" are this block under each of the
+        four tabs — the filter re-renders rather than hiding rows (the note at
+        the head of this view is the argument), so there is one place to change
+        and the change lands on all four by construction.
+
+        `.sec-rep` IS A NAME, NOT A STYLE. With `tint` gone the grey goes, and
+        the hairline above it is then the only thing left dividing the table from
+        the figure band — which is what the second half of the instruction takes
+        off. That line belongs to the section ABOVE (§18.129), and at desktop it
+        is drawn by §14's (0,12,0) re-enabler, which per trap 4 can only be
+        answered from inside its own `:not()` list. So the section says what it
+        IS and two rules name it: §14's list and §84's phone tier. The marker
+        idiom is §20's own — `.sec-cs`, `.sec-out`, `.cap-sec`, `.lead-bar`.
+
+        THE SORT ORDER IS NO LONGER STATED IN WORDS, and that is the third half
+        of the instruction. It was already the weakest line on the page: the
+        `.tag` on every row ("32 behind") states the gap this is sorted by, the
+        first row IS the worst, and the sentence under the table names them. Tal
+        says the same thing at the top — the note above `ph()` in this view
+        records the earlier round of exactly this subtraction. */}
+  <div class="sec sec-rep">
+    <div class="sec-h"><h2>Course progress</h2></div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl">
         <tr><th>Candidate</th>${sel === 'all' ? '<th>Cohort</th>' : ''}<th class="num">Chapters</th>
@@ -19864,184 +19976,123 @@ render();
 
 
 
-const LDR_AN = {
-  e1: {
-    conf:'High',
-    sum:'Quiz and interview both land in the Explorer band, at entry level. Clear intent and sound scoping, but two refusals to hand work over cap this at 1.',
-    quiz:'64 out of 100 sits inside the Explorer band. The foundational questions carried the score; the multi-step delegation items are where the points went, which is the same gap the interview surfaced.',
-    comps:[
-      ['Task delegation','E1','Completed the steps personally. Handed work over only when asked to directly.'],
-      ['Handling ambiguity','E2','Asked scoping questions before acting &mdash; a notch above the entry level.'],
-      ['Quality checking','E1','Accepted the first output without a verification pass on two of three tasks.'],
-      ['Communication','E2','Narrated intent clearly. Left some of the detail unexplained.']
-    ],
-    ev:[
-      ['pos','14:20','Let me confirm the date range before I pull anything.','Scoped the task before acting. A genuine strength and the reason this is not below E1.'],
-      ['neg','31:05','I&rsquo;d rather write that part myself than explain it to someone else.','Handover avoidance, said twice. This is the entry-level tell.']
-    ],
-    watch:'The two handover moments are what hold this at E1 rather than E2. Worth re-checking delegation at the 90-day mark.'
-  },
-  e2: {
-    conf:'Medium',
-    sum:'Top of the Explorer band, with standout reframing. Ambiguity and stakeholder reading come out a level above the rest; a weak conflict-repair answer pulls the blend back to 3.',
-    quiz:'71 out of 100 is the top of the Explorer band. The structural questions drove the score and the interpersonal ones pulled it back, which is exactly what the interview then showed.',
-    comps:[
-      ['Handling ambiguity','E4','Reframed an under-specified brief into three testable options, unprompted.'],
-      ['Stakeholder reading','E4','Named the real decision-makers and the incentives pulling against each other.'],
-      ['Conflict repair','E2','Took the disagreement to escalation rather than working it through.'],
-      ['Delegation','E3','Comfortable splitting work up. Lighter on checking what came back.']
-    ],
-    ev:[
-      ['pos','18:44','There are really three readings of this ask &mdash; here is how I would test which one they mean.','Reframing at the E4 level, and the strongest single moment in the interview.'],
-      ['neg','36:12','If they pushed back I would probably just escalate it to the lead.','Avoids repairing the conflict directly. The E2 signal, and the one thing holding this at 3.']
-    ],
-    watch:'Ambiguity and stakeholder reading sit at E4; conflict repair at E2 is what averages this to E3. Confidence is medium &mdash; one more interpersonal scenario would firm it up.'
-  }
-};
-
-const ldrConf = k => `<span class="tag ${k === 'High' ? 'green' : k === 'Low' ? 'red' : 'org'} sm">${k} confidence</span>`;
-
-const ldrEvOf  = id => LEAD_EVALS.filter(e => e.id === id)[0] || LEAD_EVALS[0];
 const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMARIES[0];
-const ldrEvFor = name => LEAD_EVALS.filter(e => e.name === name)[0];
 
-const LDR_RUNGS = LVL_CODES;
+const lranChapter = r => CH[Math.min(12, r.week - 1)][0];
 
-S.ldrEv = null;
 S.ldrSum = null;
-S.ldrPick = null;
 S.ldrRec = null;
 S.ldrErr = false;
 
-V.leadSessions = () => {
-  const up = LEAD_SESSIONS.filter(s => s.state === 'upcoming');
-  const done = LEAD_SESSIONS.filter(s => s.state === 'done');
+V.leadCalls = () => {
+  const up = lcalls();
   const next = up[0];
-  const waiting = done.filter(s => { const e = ldrEvFor(s.name); return e && e.status === 'pending'; }).length;
+  const run = LEAD_RUN;
+  const seats = run.reduce((s,r) => s + lcoOf(r.co).members.length, 0);
+  const came  = run.reduce((s,r) => s + r.attended, 0);
 
   return `<main class="main"><div class="page">
-  ${crumb(['Dashboard','leadDash'],'Sessions')}
+  ${crumb(['Dashboard','leadDash'],'Calls')}
   ${''/* THE AVAILABILITY BUTTON CAME OFF THE HEADING (Maryam, 31 Aug 2026).
          It was a `ph()` action, so it sat above Tal's summary as the first
          thing on the page — a settings link introducing a page about this
-         week's appointments. It came off the DASHBOARD's Booked section in
-         the same pass, so the route now lives where the setting does:
-         `V.leadProfile`, which owns the availability sheet, reachable from
-         the rail and the account menu. Two buttons pointing at one settings
-         page from two lists of appointments was the thing to remove, not
-         the page. */}
-  ${ph('Sessions','45 minutes each, recorded &middot; you sign the level afterwards')}
+         week's appointments. It came off the DASHBOARD's own list in the same
+         pass, so the route lives where the setting does: `V.leadProfile`,
+         reachable from the rail and the account menu. Two buttons pointing at
+         one settings page from two lists of appointments was the thing to
+         remove, not the page. The sentence it sat beside has changed with the
+         subject: the leader is not booked BY anybody now, so the spine states
+         the shape of the commitment instead. */}
+  ${ph('Calls',`${up.length} cohorts &middot; one call a week each &middot; 60 minutes, not recorded`)}
   ${''/* THE PLATE IS NOW THE BLACK CARD, AND IT IS THE DASHBOARD'S OWN
          (Maryam, 31 Aug 2026 — "follow the same summary and beneath that
-         black call card layout"). `leadCallCard` already states this shape
-         one file up: §75's `.dark-card` recipe, the time in `.dc-when` at
-         the end of the heading row, `livTitle` / `livDetail` for the two
-         strings. Calling it here rather than copying it is the `bkStamp`
-         rule — one appointment, two pages, one drawing.
+         black call card layout"). `leadCallCard` states that shape one file
+         up: §75's `.dark-card` recipe, the time in `.dc-when` at the end of
+         the heading row, `lcTitle` / `lcDetail` for the two strings. Calling
+         it here rather than copying it is the `bkStamp` rule — one
+         appointment, two pages, one drawing.
          WHY THE PLATE HAD TO GO RATHER THAN BE RESTYLED: `.plate` is in
          ai5's `DARK_CARD`, so `placeDark` hoists it into the head band —
          which is exactly what put it beside the summary in the first
          place. `.dark-card` is in no pass's list, so the summary keeps the
          full width and the card lands under it, in flow. §81's note on the
          leader dashboard is the long version of that same move.
-         `second:false` — "All sessions" from the Sessions page is a link
-         to the page you are on. */}
-  ${next ? leadCallCard(next, {second:false}) : ''}
+         IT KEEPS ITS ACTION HERE, WHICH IT DID NOT BEFORE. This page used to
+         pass `second:false`, because "All sessions" from the Sessions page
+         was a link to the page you were on; the brief is per-CALL, so it is
+         correct on both pages and the card no longer ends empty. */}
+  ${next ? leadCallCard(next) : ''}
   <div class="sec">
-    <div class="sec-h"><h2>Booked</h2><span class="t-helper-01">${up.length} interview${up.length === 1 ? '' : 's'}</span></div>
+    <div class="sec-h"><h2>This week</h2><span class="t-helper-01">${up.length} call${up.length === 1 ? '' : 's'} &middot; sixty minutes each</span></div>
     ${up.length ? `<div class="tile-stack">
-      ${up.map(s => `<div class="cardrow bk-row">
-        <span class="day bk-day"><div class="d">${s.day}</div><div class="n">${s.time}</div></span>
-        <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+      ${up.map(k => `<div class="cardrow bk-row${/^today$/i.test(k.day) ? ' bk-now' : ''}">
+        <span class="day bk-day"><div class="d">${k.day}</div><div class="n">${k.time}</div></span>
+        <span class="cardrow-ic">${I.group}</span>
         <span class="cardrow-b">
-          <span class="cardrow-t">${s.name}${s.re ? ' <span class="tag sm">Re-interview</span>' : ''}</span>
-          <span class="cardrow-d">${s.mins} minutes &middot; quiz ${s.quiz} of 100, ${s.bucket} band &middot; ${s.re ? 'assessed against their 90 days' : 'no level yet'}</span>
+          <span class="cardrow-t">${lcTitle(k)}</span>
+          <span class="cardrow-d">${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${lcDetail(k)}</span>
         </span>
         <span class="cardrow-a">
-          <button class="btn btn-p btn-sm noic">Join</button>
+          <button class="btn btn-p btn-sm noic" data-ldrbrief="${k.co}">Brief</button>
         </span>
       </div>`).join('')}
     </div>` : `<div class="empty" style="border:0">${I.calendar}
-      <h3>Nothing booked</h3><p>Candidates book you from the times you open on your profile.</p></div>`}
+      <h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
+    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
   </div>
   <div class="sec tint">
-    ${''/* "AWAITING DECISIONS", NOT "FINISHED" (Maryam, 31 Aug 2026). The
-           interview being over is the least interesting thing about these
-           rows — every one of them is a candidate whose 90 days cannot
-           start until this leader signs. "Finished" named the state of the
-           CALL; this names the state of the WORK, which is what the
-           section's own count ("2 still need an evaluation") and its one
-           action ("Write it up") have always been about. */}
-    <div class="sec-h"><h2>Awaiting Decisions</h2><span class="t-helper-01">${waiting ? waiting + ' still need an evaluation' : 'all written up'}</span></div>
-    <div class="tile-stack">
-      ${done.map(s => {
-        const e = ldrEvFor(s.name);
-        const pend = e && e.status === 'pending';
+    ${''/* THE COUNT OPPOSITE THE HEADING IS THE ATTENDANCE ACROSS ALL OF THEM,
+           because that is the one reading a list of past calls is FOR. Row by
+           row it says who came to which; read together it says whether the
+           cohorts are still turning up, which is the question the attention
+           queue answers about the chapters and nothing answered about the
+           calls. Cohort 47 is in week 1 and has no rows here at all — the
+           empty half of the list, drawn rather than hidden. */}
+    <div class="sec-h"><h2>Already run</h2><span class="t-helper-01">${run.length ? came + ' of ' + seats + ' seats filled' : 'nothing yet'}</span></div>
+    ${run.length ? `<div class="tile-stack">
+      ${run.map(r => {
+        const c = lcoOf(r.co);
+        const miss = c.members.length - r.attended;
         return `<div class="cardrow">
-          <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+          <span class="cardrow-ic">${I.group}</span>
           <span class="cardrow-b">
-            <span class="cardrow-t">${s.name} ${pend ? '<span class="tag org sm">Evaluation due</span>' : e ? `<span class="tag green sm">Signed ${e.assigned ? 'Explorer &ndash; ' + e.assigned : ''}</span>` : '<span class="tag green sm">Written up</span>'}</span>
-            <span class="cardrow-d">${s.when.toLowerCase()} &middot; ${s.mins} minutes &middot; recording and transcript available</span>
-          </span>
-          <span class="cardrow-a">
-            ${pend
-              ? `<button class="btn btn-p btn-sm noic" data-ldrev="${e.id}" data-go="leadEval">Write it up</button>`
-              : `<button class="btn btn-sm noic">Recording</button>`}
+            <span class="cardrow-t">Cohort ${r.co} &middot; week ${r.week} <span class="tag ${miss > 2 ? 'org' : 'green'} sm">${r.attended} of ${c.members.length} attended</span></span>
+            <span class="cardrow-d">${r.when} &middot; ${lranChapter(r)}${miss ? ' &middot; ' + miss + ' did not join' : ''}</span>
           </span>
         </div>`;
       }).join('')}
-    </div>
-    ${''/* THE CLOSING LINE WENT WITH THE HEADING (Maryam, 31 Aug 2026). It
-           existed to explain why a finished interview still needed
-           something from you — which is the question "Finished" raised and
-           "Awaiting Decisions" answers in two words. A sentence under the
-           list restating the heading above it is the section explaining its
-           own title. */}
+    </div>` : `<div class="empty" style="border:0">${I.time}
+      <h3>No calls behind you yet</h3><p>Your first cohort call is this week.</p></div>`}
   </div>
 </div></main>`;
 };
 
 V.leadEvals = () => {
-  const pe = LEAD_EVALS.filter(e => e.status === 'pending');
   const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
-  const signed = LEAD_EVALS.filter(e => e.status === 'done');
   const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
-  const e0 = pe[0];
+  const c0 = lcoOf((ps[0] || LEAD_SUMMARIES[0]).cohort);
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
-  ${''/* Tal states the two counts and names the first candidate, so a line
-        saying that there are level decisions and summaries waiting is the
-        same sentence without the numbers in it. */}
-  ${ph('Evaluations',`${lpending()} waiting on your signature`)}
+  ${''/* NO `sub`, AND THAT IS THE DOCUMENTED MOVE. It said "2 waiting on your
+         signature" directly above Tal saying "Two 90-day summaries are waiting
+         on you" — the exact duplication CLAUDE.md's two-copy-slots rule exists
+         to stop, and it survived the old version only because Tal's sentence
+         there led on level decisions instead. This page has no factual SPINE of
+         its own: the queue is one to four candidates from whichever cohort has
+         reached day 90, which is a count rather than a coordinate, and the four
+         figure cells below state it four ways. So Tal's sentence is the opening
+         line, which is what the rule prescribes for a page with no spine. */}
+  ${ph('Evaluations')}
   <div class="sec">
     <div class="stats">
-      ${statCell(I.edit, 'Level decisions', pe.length, pe.length ? 'nobody can enroll until signed' : 'all signed')}
-      ${statCell(I.document, 'Summaries', ps.length, ps.length ? 'closing a cohort' : 'all published')}
-      ${statCell(I.checkFilled, 'Signed by you', signed.length + published.length, 'this session')}
-      ${statCell(I.time, 'Due within', '48<small>h</small>', 'of the interview')}
+      ${statCell(I.document, '90-day summaries', ps.length, ps.length ? 'closing a cohort' : 'all published')}
+      ${statCell(I.checkFilled, 'Published by you', published.length, 'this session')}
+      ${statCell(I.group, 'Cohort closing', c0.id, `week ${c0.week} of 13`)}
+      ${statCell(I.time, 'Due by', 'Day 90', 'of their cohort')}
     </div>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Level decisions</h2><span class="t-helper-01">${pe.length ? pe.length + ' waiting' : 'nothing waiting'}</span></div>
-    ${LEAD_EVALS.length ? `<div class="tile-stack">
-      ${LEAD_EVALS.map(e => e.status === 'pending'
-        ? `<button class="tile clk gcard face-row" data-ldrev="${e.id}" data-go="leadEval">
-            <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
-            <span class="gcard-b"><h3>${e.name}</h3>
-              <span class="sub">Interviewed ${e.when.toLowerCase()} &middot; quiz ${e.quiz} of 100 &middot; I proposed Explorer &ndash; ${e.ai}</span></span>
-            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
-          </button>`
-        : `<div class="cardrow">
-            <span class="mem-av mem-ph">${avatar({i:e.i, img:AV[e.img]}, 36)}</span>
-            <span class="cardrow-b">
-              <span class="cardrow-t">${e.name} <span class="tag green sm">Signed Explorer &ndash; ${e.assigned}</span>${e.override ? ' <span class="tag org sm">override</span>' : ''}</span>
-              <span class="cardrow-d">${e.override ? 'You signed ' + e.assigned + ' against my ' + e.ai + ' &middot; your reason is on the decision' : 'You signed the level I proposed'}</span>
-            </span>
-          </div>`).join('')}
-    </div>` : ''}
-  </div>
-  <div class="sec tint">
     <div class="sec-h"><h2>90-day summaries</h2><span class="t-helper-01">${ps.length ? ps.length + ' waiting' : 'nothing waiting'}</span></div>
     <div class="tile-stack">
       ${LEAD_SUMMARIES.map(s => {
@@ -20070,154 +20121,6 @@ V.leadEvals = () => {
           when it tells you something the rows do not; this one restated the
           page's own subject. */''}
   </div>
-</div></main>`;
-};
-
-V.leadEval = () => {
-  const e = ldrEvOf(S.ldrEv);
-  const an = LDR_AN[e.id];
-  const pick = S.ldrPick || e.ai;
-  const over = pick !== e.ai;
-  const band = e.ai[0];
-  const signed = e.status === 'done';
-
-  return `<main class="main"><div class="page">
-  ${crumb(['Evaluations','leadEvals'], e.name)}
-  ${ph(`Level decision &middot; ${e.name}`, `Interviewed ${e.when.toLowerCase()} &middot; 45 minutes, recorded &middot; ${signed ? 'signed Explorer &ndash; ' + e.assigned : 'waiting on your signature'}`)}
-  ${/* Tal's reading of the interview is the band at the top of this page —
-        `PAGESUM.leadEval` — for the reason lead2.js records above `ldrRead`.
-        What stays on the page is the EVIDENCE for it, which is the part a
-        leader argues with: the quiz reading, the four competencies, the two
-        quoted moments, and how confident Tal is about the blend. The
-        confidence rides the competency heading rather than a card of its own,
-        because it is a statement about those four readings. */''}
-  ${/* THE COMPETENCY READ IS TAL'S, SO IT GOES WHERE TAL'S CARD GOES.
-        The four readings and the confidence on them are the body of the
-        paragraph `PAGESUM.leadEval` states in one sentence at the top of the
-        page — the same claim, itemised. Drawn as a light section three blocks
-        down, it read as the page's own record; a leader scrolling past it had
-        no way to tell Tal's inference from the platform's facts, which is the
-        one distinction this page exists to make.
-
-        So it takes the DARK CARD, the object this product uses for exactly
-        that — the dashboard's due-now plate, the level card, the certificate —
-        and `placeDark` (ai5) lifts it into the module head band with them, one
-        block under the sentence it expands. It comes FIRST in the source for
-        the case where there is no band to join: `placeDark`'s fallback seats
-        dark cards straight after the crumb, and a page whose Tal card has been
-        hoisted still reads Tal-first that way.
-
-        `.ldr-read` IS THE HOOK, NOT `.sec.on-dark`. Both are DARK_CARD
-        members, but a `.sec` that matches gets WRAPPED in a second `.sec` by
-        `placeDark` — the branch that exists for `.lvl-hero`, which has no
-        section of its own — and two nested sections pay the gutter twice. A
-        card class inside the section means the section is the host and moves
-        as it stands, which is what every other dark card does. */''}
-  ${an ? `
-  <div class="sec">
-    <div class="ldr-read on-dark">
-      <div class="ldr-read-h"><h2>Competency read</h2>${ldrConf(an.conf)}</div>
-      <div class="tbl-wrap">
-        <table class="tbl ldr-tbl">
-          <tr><th>Competency</th><th>Reads at</th><th>What I heard</th></tr>
-          ${an.comps.map(([n,r,read]) => `<tr>
-            <td>${n}</td>
-            <td><span class="tag ${r === e.ai ? 'brand' : +r[1] > +e.ai[1] ? 'green' : 'org'} sm">${r}</span></td>
-            <td class="ldr-prose">${read}</td>
-          </tr>`).join('')}
-        </table>
-      </div>
-      <p class="ldr-read-x">${an.watch}</p>
-    </div>
-  </div>` : ''}
-  <div class="sec">
-    <div class="facts">
-      <div><span class="l">Quiz</span><span class="v">${e.quiz} of 100</span></div>
-      <div><span class="l">Band</span><span class="v">${e.bucket || 'Explorer'}</span></div>
-      <div><span class="l">I propose</span><span class="v">Explorer &ndash; ${e.ai}</span></div>
-      <div><span class="l">Recorded</span><span class="v">45 minutes</span></div>
-    </div>
-  </div>
-  ${an ? `
-  <div class="sec">
-    <div class="sec-h"><h2>From the interview</h2><span class="t-helper-01">Quoted from the transcript</span></div>
-    <div class="ivt-lines">
-      ${an.ev.map(([k,t,q,note]) => `
-      <div class="tq them">
-        <span class="tq-t">${t}</span>
-        <span class="tq-b">
-          <span class="tq-w">${e.name}
-            <span class="ldr-${k}">${k === 'pos' ? I.checkFilled : I.warningAlt}${k === 'pos' ? 'Strength' : 'Concern'}</span></span>
-          <span class="tq-x">&ldquo;${q}&rdquo;</span>
-          <span class="tq-x t-helper-01">${note}</span>
-        </span>
-      </div>`).join('')}
-    </div>
-  </div>
-  ${/* THE QUIZ READING FOLLOWS THE EVIDENCE, NOT THE FACTS BAND.
-        It is a footnote on one number — "64 of 100" — and it sat directly
-        under the band that prints it, which put the smallest claim on the page
-        above the two things the decision actually turns on: the competency
-        read and what the candidate said. A leader reads the inference, then
-        the quotes, and only then wants to know how the score was made up.
-        It is a `.note` and not a `.tile` for the reason it always was: `.tile`
-        styles rows and headings, not prose. */''}
-  <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>How the quiz reads</b>${an.quiz}</div></div>
-  </div>` : ''}
-  ${signed ? `
-  <div class="sec">
-    <div class="sec-h"><h2>Your decision</h2></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Signed at</span><span class="v">Explorer &ndash; ${e.assigned}</span></div>
-      <div class="kv"><span class="k">My proposal</span><span class="v n">Explorer &ndash; ${e.ai}${e.override ? ' &middot; you overrode it' : ' &middot; you agreed'}</span></div>
-      ${e.reason ? `<div class="kv"><span class="k">Your reason</span><span class="v n">${e.reason}</span></div>` : ''}
-      ${e.notes ? `<div class="kv"><span class="k">For their report</span><span class="v n">${e.notes}</span></div>` : ''}
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-p" data-go="leadEvals">Back to evaluations ${I.arrowLeft}</button>
-    </div>
-  </div>` : `
-  <div class="sec">
-    ${/* NO HELPER OPPOSITE THE HEADING. "The level is yours, not mine" is the
-          page's whole argument and it is already made twice where it counts —
-          the closing line under the fields says it in full ("Agreeing with me
-          is still your signature, not mine"), and Tal's own card says the
-          proposal is a proposal. Beside the heading it was a third copy, set
-          hard against the far edge of a 1500px column, which is where a COUNT
-          or a state belongs and not a sentence: the heading and its own words
-          ended up a metre apart with nothing between them. */''}
-    <div class="sec-h"><h2>Your decision</h2></div>
-    <div class="tile">
-      ${/* THE LABEL NAMES THE LADDER AND WHERE THE QUIZ PUT THEM, because with
-            all fifteen levels offered the picker no longer says which band was
-            proposed — the five buttons used to say it by being the only five
-            there. `data-band` marks the proposed band's five so §36.5 can
-            group them; it is a mark on the SET, not a lock on the others. */''}
-      <div class="f"><label>Level, E1 to T5 &middot; the quiz puts ${e.name.split(' ')[0]} in ${e.bucket || 'Explorer'}</label>
-        <div class="btn-set ldr-rungs">
-          ${LDR_RUNGS.map(r => `<button class="btn ${r === pick ? 'btn-p' : 'btn-g'} noic" data-ldrpick="${r}"${r[0] === band ? ' data-band="1"' : ''}>${r}</button>`).join('')}
-        </div>
-      </div>
-      ${over ? `
-      <div class="f mt5"><label for="ldrWhy">Why ${pick} instead of ${e.ai}?</label>
-        <textarea class="inp" id="ldrWhy" rows="3" placeholder="Recorded on the decision. The human call wins, and the record says why."></textarea></div>
-      ${S.ldrErr ? `<div class="note"><span>${I.warningAlt}</span><div class="nb"><b>An override needs a reason</b>You are signing ${pick} against my ${e.ai}. Say why in a sentence and it goes on the record with the decision.</div></div>` : ''}
-      ` : ''}
-      <div class="f mt5"><label for="ldrNotes">Notes for their report</label>
-        <textarea class="inp" id="ldrNotes" rows="3" placeholder="Strengths, growth areas, and what to work on during the 90 days."></textarea></div>
-      ${/* THE CLOSING LINE HAD TO CHANGE WITH THE PICKER. It said "the quiz
-            fixes the band and you set the level", which was true of five
-            buttons and is not true of fifteen: the band is now yours to
-            depart from as well, and the sentence that describes the control
-            has to describe the control. */''}
-      <p class="t-helper-01">You can sign any level on the ladder, including outside the band the quiz proposed. ${over ? 'Overrides are logged with your reason.' : 'Agreeing with me is still your signature, not mine.'}</p>
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-p" data-ldrsign="${e.id}">${over ? 'Sign as ' + pick + ' &middot; override' : 'Sign as ' + e.ai} ${I.checkFilled}</button>
-      <button class="btn btn-t" data-go="leadEvals">Decide later ${I.time}</button>
-    </div>
-  </div>`}
 </div></main>`;
 };
 
@@ -20329,17 +20232,11 @@ V.leadSum = () => {
 };
 
 device.addEventListener('click', e => {
-  const ev = e.target.closest('[data-ldrev]');
-  if(ev){ S.ldrEv = ev.dataset.ldrev; S.ldrPick = ldrEvOf(S.ldrEv).ai; S.ldrErr = false; }
   const su = e.target.closest('[data-ldrsum]');
   if(su){ S.ldrSum = su.dataset.ldrsum; S.ldrRec = 'promote'; S.ldrErr = false; }
 }, true);
 
 function ldrDraftRead(){
-  const why = device.querySelector('#ldrWhy');
-  if(why) S.ldrWhy = why.value;
-  const notes = device.querySelector('#ldrNotes');
-  if(notes) S.ldrEvNotes = notes.value;
   const sw = device.querySelector('#ldrSumWhy');
   if(sw) S.ldrSumWhy = sw.value;
   const g = device.querySelector('#ldrGrowth');
@@ -20349,32 +20246,8 @@ function ldrDraftRead(){
 }
 
 device.addEventListener('click', e => {
-  const pk = e.target.closest('[data-ldrpick]');
-  if(pk){ ldrDraftRead(); S.ldrPick = pk.dataset.ldrpick; S.ldrErr = false; render(); return; }
-
   const rc = e.target.closest('[data-ldrrec]');
   if(rc){ ldrDraftRead(); S.ldrRec = rc.dataset.ldrrec; S.ldrErr = false; render(); return; }
-
-  const sg = e.target.closest('[data-ldrsign]');
-  if(sg){
-    ldrDraftRead();
-    const ev = ldrEvOf(sg.dataset.ldrsign);
-    const pick = S.ldrPick || ev.ai;
-    const over = pick !== ev.ai;
-    if(over && !(S.ldrWhy || '').trim()){
-      S.ldrErr = true; render();
-      const box = device.querySelector('#ldrWhy'); if(box) box.focus();
-      return;
-    }
-    ev.status = 'done';
-    ev.assigned = pick;
-    ev.override = over;
-    ev.reason = (S.ldrWhy || '').trim();
-    ev.notes = (S.ldrEvNotes || '').trim();
-    S.ldrWhy = ''; S.ldrEvNotes = ''; S.ldrErr = false;
-    render();
-    return;
-  }
 
   const pb = e.target.closest('[data-ldrpub]');
   if(pb){
@@ -20399,26 +20272,15 @@ device.addEventListener('click', e => {
 
 function ldrDraftWrite(){
   const put = (id,v) => { const el = device.querySelector('#' + id); if(el && v) el.value = v; };
-  put('ldrWhy', S.ldrWhy);
-  put('ldrNotes', S.ldrEvNotes);
   put('ldrSumWhy', S.ldrSumWhy);
   put('ldrGrowth', S.ldrGrowth);
   put('ldrDev', S.ldrDev);
-}
-
-function ldrRungView(){
-  const set = device.querySelector('.ldr-rungs');
-  if(!set || set.scrollWidth <= set.clientWidth + 1) return;
-  const on = set.querySelector('.btn-p');
-  if(!on) return;
-  set.scrollLeft = on.offsetLeft - (set.clientWidth - on.offsetWidth) / 2;
 }
 
 const _baseLdr3 = render;
 render = function(){
   _baseLdr3();
   try { ldrDraftWrite(); } catch(e){ console.warn('ldr draft', e); }
-  try { ldrRungView(); } catch(e){ console.warn('ldr rung', e); }
 };
 
 render();
@@ -20628,6 +20490,7 @@ const LDR_CERTS = [
 V.leadCerts = () => {
   const led = 8, hours = 42;
   const promoted = 34;
+  const calls = led * 13;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Certifications')}
   ${''/* Three blocks in a row were explaining this page: this line, Tal's
@@ -20698,17 +20561,24 @@ V.leadCerts = () => {
         Eight closed, so this one is done. Completion means the cohort finished the 90 days, not that every candidate was promoted.</span></li>
       <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Forty hours of leader training</b>
         ${hours} hours this year. The Advanced track adds twelve more, which is the part still open.</span></li>
-      <li><span class="s-n">3</span><span class="s-b"><b>Twelve signed level decisions reviewed</b>
+      ${''/* IT WAS "TWELVE SIGNED LEVEL DECISIONS REVIEWED" (1 Sep 2026). A
+             cohort leader does not set levels, so the requirement that named
+             them named nothing — and the requirement it becomes is the same
+             SHAPE, which is the point: nine of twelve reviewed, three still
+             waiting, and the one thing on this list you cannot finish alone.
+             What is reviewed is the 90-day summary, which is the leader's own
+             signed document and the only one there is. */}
+      <li><span class="s-n">3</span><span class="s-b"><b>Twelve published 90-day summaries reviewed</b>
         Nine of twelve reviewed by the manager of cohort leaders. The three waiting are from the cohorts you closed in June.</span></li>
     </ol>
-    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your decision against the transcript and agreed with the level. It is the one requirement you cannot finish on your own.</p>
+    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your summary against the cohort&rsquo;s own record and agreed with the recommendation. It is the one requirement you cannot finish on your own.</p>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>The record behind them</h2></div>
     <div class="facts">
       <div><span class="l">Leading since</span><span class="v">${LEADER.since}</span></div>
       <div><span class="l">Cohorts closed</span><span class="v">${led}</span></div>
-      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Cohort calls led</span><span class="v">${calls}</span></div>
       <div><span class="l">Assessing range</span><span class="v">${LEADER.range}</span></div>
     </div>
   </div>
@@ -20735,7 +20605,7 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div class="kv"><span class="k">Display name</span><span class="v">${LEADER.n}</span></div>
       <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
       <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
-      <div class="kv"><span class="k">Session length</span><span class="v n">45 minutes</span></div>
+      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
       <div class="kv"><span class="k">Role</span><span class="v n">Volunteer cohort leader &middot; unpaid</span></div>
     </div>
   </div>
@@ -20746,34 +20616,44 @@ V.leadProfile = () => `<main class="main"><div class="page">
         <span class="av-ph" style="width:56px;height:56px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
         <div class="idhead-b">
           <span class="idname">${LEADER.n}</span>
-          <span class="idmeta">${stars(4.9)} 4.9 &middot; 62 interviews &middot; ${LEADER.range}</span>
+          <span class="idmeta">${stars(4.9)} 4.9 &middot; 8 cohorts led &middot; ${LEADER.range}</span>
         </div>
       </div>
       <p class="t-helper-01">&ldquo;Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback &mdash; if something is not working I will say so in the first ten minutes.&rdquo;</p>
     </div>
-    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interview fees, where they apply, are set on your agent listing and not here &mdash; leading a cohort is unpaid.</p>
+    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Availability</h2><span class="t-helper-01">Candidates can only book what you open</span></div>
+    ${''/* TWO ROWS BECAME ONE, AND THE ONE THAT SURVIVED IS THE REAL ONE
+           (1 Sep 2026). The first row was a bookable calendar — "Tuesday and
+           Thursday afternoons &middot; 6 slots open next week" — which only
+           meant anything while candidates could book this person for an
+           interview. Nobody books a cohort leader. The second row was already
+           the truth and is now the section: three cohorts, three fixed hours a
+           week, read off the same cohort record `lcall` reads.
+           IT KEEPS THE SHEET, because the hours themselves are still a setting
+           a leader changes — what changed is that changing one moves a call
+           rather than opening a slot. */}
+    <div class="sec-h"><h2>When you are on</h2><span class="t-helper-01">Three cohorts, one hour a week each</span></div>
     <div class="tile-stack">
       <div class="cardrow">
-        <span class="cardrow-ic">${I.calendar}</span>
+        <span class="cardrow-ic">${I.group}</span>
         <span class="cardrow-b">
-          <span class="cardrow-t">Weekly calendar</span>
-          <span class="cardrow-d">Tuesday and Thursday afternoons, Friday morning &middot; 6 slots open next week</span>
+          <span class="cardrow-t">Your cohort calls</span>
+          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.call.toLowerCase()).join(' &middot; ')}</span>
         </span>
         <span class="cardrow-a">
           <button class="btn btn-sm noic" data-ldravail="1">Manage</button>
         </span>
       </div>
       <div class="cardrow">
-        <span class="cardrow-ic">${I.group}</span>
+        <span class="cardrow-ic">${I.calendar}</span>
         <span class="cardrow-b">
-          <span class="cardrow-t">Cohort calls</span>
-          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.callDay + ' ' + c.callTime.toLowerCase()).join(' &middot; ')}</span>
+          <span class="cardrow-t">Calls already run</span>
+          <span class="cardrow-d">${LEAD_RUN.length} behind you &middot; attendance is on the Calls page</span>
         </span>
         <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-go="leadCohorts">Cohorts</button>
+          <button class="btn btn-sm noic" data-go="leadCalls">Calls</button>
         </span>
       </div>
     </div>
@@ -20782,11 +20662,11 @@ V.leadProfile = () => `<main class="main"><div class="page">
     <div class="sec-h"><h2>Your standing</h2><span class="t-helper-01">Read-only &middot; across every cohort you have closed</span></div>
     <div class="facts">
       <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
-      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Cohorts led</span><span class="v">8</span></div>
       <div><span class="l">Completion rate</span><span class="v">84%</span></div>
       <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
     </div>
-    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; levelling somebody too high comes back later as a candidate who does not finish.</p>
+    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; recommending a promotion somebody is not ready for comes back later as a candidate who does not finish the next 90 days.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Who reviews you</h2></div>
@@ -20794,15 +20674,15 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div class="kv"><span class="k">You</span><span class="v">Cohort leader</span></div>
       <div class="kv"><span class="k">Reviewed by</span><span class="v n">Manager of cohort leaders, then supervisor</span></div>
       <div class="kv"><span class="k">Your own level</span><span class="v n">Adjustable by a super-admin</span></div>
-      <div class="kv"><span class="k">Decisions reviewed</span><span class="v n">9 of 12 signed this year</span></div>
+      <div class="kv"><span class="k">Summaries reviewed</span><span class="v n">9 of 12 published this year</span></div>
     </div>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>Notifications</h2></div>
     <label class="tg"><div class="tb"><b>A candidate goes quiet</b><span>After four days without a sign-in</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>An interview is booked with you</b><span>As soon as a candidate takes a slot</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>A cohort call is an hour away</b><span>One reminder, on the day</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Posts on a cohort board</b><span>A daily digest rather than each one</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>Evaluation reminders</b><span>24 hours before the 48-hour deadline</span></div><input type="checkbox"><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Summary reminders</b><span>A week before a cohort reaches day 90</span></div><input type="checkbox"><span class="sw"></span></label>
   </div>
 </div></main>`;
 
@@ -20826,8 +20706,8 @@ function ldrProfileSheet(){
           <input class="inp" id="ldrPs" value="Operations teams, first-line leadership"></div>
         <div class="f"><label for="ldrPb">Bio shown on your card</label>
           <textarea class="inp" id="ldrPb" rows="3">Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.</textarea></div>
-        <div class="f"><label for="ldrPl">Session length</label>
-          <select class="inp" id="ldrPl"><option>45 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>
+        <div class="f"><label for="ldrPl">Cohort call length</label>
+          <select class="inp" id="ldrPl"><option>60 minutes</option><option>45 minutes</option><option>90 minutes</option></select></div>
         <p class="t-helper-01">Your assessing range comes from your certifications and cannot be set here.</p>
       </div>
       <div class="sheet-f">
@@ -20838,26 +20718,29 @@ function ldrProfileSheet(){
   </div>`;
 }
 
-const LDR_DAYS = [['Monday','Cohort 47 call at 6:00 PM',0],['Tuesday','2:00 – 5:00 PM',1],
-                  ['Wednesday','Nothing open',0],['Thursday','2:00 – 5:00 PM &middot; Cohort 41 call at 6:00 PM',1],
-                  ['Friday','9:00 AM – 12:00 PM &middot; Cohort 33 call at 5:00 PM',1],
-                  ['Saturday','Nothing open',0],['Sunday','Nothing open',0]];
+const LDR_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const ldrDays = () => LDR_DAY_NAMES.map(d => {
+  const c = LEAD_COHORTS.filter(x => x.call.split(' ')[0] === d)[0];
+  return c
+    ? [d, `${lname(c)} &middot; ${c.call.split(' ').slice(1).join(' ')} &middot; 60 minutes`, 1]
+    : [d, 'Nothing scheduled', 0];
+});
 
 function ldrAvailSheet(){
   return `<div class="modal ${S.ldrAvail ? 'on' : ''}" data-ldrclose="avail">
     <div class="sheet">
-      <div class="sheet-h"><h2>Your weekly availability</h2>
+      <div class="sheet-h"><h2>Your weekly calls</h2>
         <button class="x" data-ldrclose="avail" aria-label="Close">${I.close}</button></div>
       <div class="sheet-b">
-        <p class="t-helper-01 mb6">Candidates can only book the hours you open here. Your three cohort calls are fixed and shown for context &mdash; they are not bookable.</p>
-        ${LDR_DAYS.map(([d,detail,on],i) => `
+        <p class="t-helper-01 mb6">One call a week for each cohort you lead. Moving one moves it for every candidate in that cohort, so the change is announced on their board.</p>
+        ${ldrDays().map(([d,detail,on],i) => `
         <label class="tg"><div class="tb"><b>${d}</b><span>${detail}</span></div>
           <input type="checkbox" id="ldrDay${i}" ${on ? 'checked' : ''}><span class="sw"></span></label>`).join('')}
-        <p class="t-helper-01 mt5">Six slots open next week. A candidate booking one of them is the interview appearing on your Sessions page.</p>
+        <p class="t-helper-01 mt5">${LEAD_COHORTS.length} calls a week, ${LEAD_COHORTS.length * 60} minutes in total. A cohort that reaches day 90 gives its slot back.</p>
       </div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-ldrclose="avail">Cancel</button>
-        <button class="btn btn-p noic" data-ldrclose="avail">Save availability</button>
+        <button class="btn btn-p noic" data-ldrclose="avail">Save changes</button>
       </div>
     </div>
   </div>`;
@@ -20920,12 +20803,11 @@ device.addEventListener('keydown', e => {
 
 Object.assign(LEAD_TAL.where, {
   leadCohort:'a cohort', leadMember:'a candidate',
-  leadEval:'a level decision', leadSum:'a 90-day summary'
+  leadSum:'a 90-day summary'
 });
 Object.assign(LEAD_TAL.ctx, {
   leadCohort: ['Where is this cohort stuck?','Brief me for this call','Who here needs me most?'],
   leadMember: ['What should I say to them?','Is this recoverable?','Draft a check-in'],
-  leadEval:   ['Why did you propose this level?','What evidence supports it?','What would change your mind?'],
   leadSum:    ['Are they ready to be promoted?','What should I write here?']
 });
 Object.assign(ASK_WHERE, LEAD_TAL.where);
@@ -21066,31 +20948,23 @@ const PAGESUM = {
   leadDash: () => {
     const att = lattention(), pend = lpending();
     const bad = att.filter(x => x.m.flag.k === 'bad').length;
-    return `${_W(pend)} decision${pend === 1 ? '' : 's'} ${pend === 1 ? 'is' : 'are'} waiting on your signature, and nobody in that queue can enroll until you sign. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
+    return `${_W(pend)} 90-day ${pend === 1 ? 'summary is' : 'summaries are'} waiting on your signature, and nothing reaches those candidates&rsquo; next agent until you publish. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
   },
 
-  leadSessions: () => {
-    const up = LEAD_SESSIONS.filter(s => s.state === 'upcoming');
-    const done = LEAD_SESSIONS.filter(s => s.state === 'done');
-    const due = done.filter(s => { const e = LEAD_EVALS.filter(x => x.name === s.name)[0]; return e && e.status === 'pending'; }).length;
+  leadCalls: () => {
+    const up = lcalls();
     const nx = up[0];
-    return `${_W(up.length)} booked and ${_w(done.length)} already run${nx ? `, ${nx.name} next at ${nx.when.toLowerCase().replace(/^today /, '')} today` : ''}.${due ? ` ${_W(due)} of the finished ones still ${due === 1 ? 'needs' : 'need'} your evaluation before ${due === 1 ? 'that candidate' : 'those candidates'} can enroll.` : ''}`;
+    const run = LEAD_RUN.length;
+    const seats = LEAD_RUN.reduce((s,r) => s + lcoOf(r.co).members.length, 0);
+    const came = LEAD_RUN.reduce((s,r) => s + r.attended, 0);
+    return `${_W(up.length)} calls this week${nx ? `, Cohort ${nx.co} first at ${nx.time.toLowerCase()} ${nx.day.toLowerCase()}` : ''}. ${run ? `Across the ${_w(run)} behind you, ${came} of ${seats} seats were filled &mdash; the brief reads from where each cohort actually is.` : 'Your first cohort call is this week.'}`;
   },
 
   leadEvals: () => {
-    const pe = LEAD_EVALS.filter(e => e.status === 'pending');
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
-    const e0 = pe[0];
-    if(!pe.length && !ps.length) return 'Nothing is waiting on your signature &mdash; every level and every summary is signed.';
-    return `${pe.length ? `${_W(pe.length)} level decision${pe.length === 1 ? '' : 's'}` : 'No level decisions'} and ${ps.length ? `${_w(ps.length)} 90-day ${ps.length === 1 ? 'summary' : 'summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the level is yours to set.` : ''}`;
-  },
-
-  leadEval: () => {
-    const e = LEAD_EVALS.filter(x => x.id === S.ldrEv)[0] || LEAD_EVALS[0];
-    const an = typeof LDR_AN !== 'undefined' ? LDR_AN[e.id] : null;
-    if(e.status === 'done')
-      return `Signed at Explorer &ndash; ${e.assigned}${e.override ? `, against my proposal of ${e.ai}` : ''}. ${e.name} can enroll now.`;
-    return an ? an.sum : e.why;
+    const s0 = ps[0];
+    if(!ps.length) return 'Nothing is waiting on your signature &mdash; every 90-day summary is published.';
+    return `${_W(ps.length)} 90-day ${ps.length === 1 ? 'summary is' : 'summaries are'} waiting on you, from Cohort ${s0.cohort}. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
   },
 
   leadSum: () => {

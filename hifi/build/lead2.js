@@ -188,24 +188,27 @@ V.leadCohorts = () => {
       ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`)}
     </div>
   </div>
-  <div class="sec">
-    <div class="sec-h"><h2>This week&rsquo;s calls</h2><span class="t-helper-01">Sixty minutes each</span></div>
-    <div class="tile-stack">
-      ${LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd).map(c => `
-      <div class="cardrow bk-row">
-        <span class="day bk-day"><div class="d">${c.callDay}</div><div class="n">${c.callTime}</div></span>
-        <span class="cardrow-ic">${I.group}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${lname(c)} &middot; week ${c.week} of 13</span>
-          <span class="cardrow-d">${c.members.length} candidates at ${llevel(c)} &middot; ${CH[Math.min(12, c.week - 1)][0]}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-ldrbrief="${c.id}">Brief</button>
-        </span>
-      </div>`).join('')}
-    </div>
-    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
-  </div>
+  ${''/* "THIS WEEK'S CALLS" IS OFF THIS PAGE AND ON `V.leadCalls` (1 Sep 2026).
+         It was three `.bk-row`s with a date chip and a Brief button — exactly
+         the list the Calls page now opens with, and the reason the Calls module
+         survived the interviews leaving. Two pages drawing one list is the
+         "route to the same content" this portal keeps deleting (`BOOKED_SHOWN`
+         in lead.js is the same argument from the dashboard's side), and of the
+         two this was the wrong one to keep: a call is an appointment, and
+         Cohorts is about cohort STATE.
+         NOTHING IS LOST HERE. The figure band's fourth cell is "Next call" with
+         the cohort and the hour in its note, and the All cohorts table below
+         carries a "Next call" column per row — so this page still answers "when
+         do I meet them" for every cohort on it, in the two places it was
+         already answering it. What went is only the third copy, the one with
+         the button on it, and the button is on the Calls page's own rows.
+         AND THE WAY THERE IS ON THE HEADING ROW, which is the shape the
+         dashboard's own "Your cohorts" and "Your calls" sections both use
+         (`.sec-h` › `<h2>` + `.btn-g.btn-sm.noic`). A list handed to another
+         page needs a route to it, or the subtraction is a dead end rather than
+         a move. It is NOT in `ph()`'s action slot: that slot sits above Tal's
+         summary, and both this file and lead3 record emptying it for exactly
+         that reason. */}
   <div class="sec tint">
     <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of 90, evenly spread</span></div>
     <div class="tbl-wrap">
@@ -234,6 +237,23 @@ V.leadCohorts = () => {
           Tal card at the top of this page states in the same words and the
           PROGRESS column shows on the row it belongs to. Three copies of one
           fact, the quietest of them last. */''}
+  </div>
+  ${''/* THE WAY TO THE CALLS PAGE IS THE FOOT OF THE PAGE, and the two places
+         it is NOT are both deliberate. Not `ph()`'s action slot: that sits
+         above Tal's summary, and this file and lead3 both record emptying it
+         for that reason. Not the "All cohorts" heading row either — that slot
+         holds the helper line defining what the Progress column is measured
+         against ("day of 90, evenly spread"), which the deleted pace footnote
+         below explicitly leans on, so putting a control there would trade a
+         definition for a link.
+         `.btn-set` at the foot is the shape `V.leadCohort` already ends with —
+         "Post to the cohort board" and "Course reports" — so a way onward from
+         a cohort page is drawn the same whether you are looking at one cohort
+         or at all three. */}
+  <div class="sec">
+    <div class="btn-set">
+      <button class="btn btn-g" data-go="leadCalls">This week&rsquo;s calls ${I.calendar}</button>
+    </div>
   </div>
 </div></main>`;
 };
@@ -513,11 +533,26 @@ V.leadMember = () => {
     <div class="sec-h"><h2>Their level</h2></div>
     <div class="tile">
       <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
+      ${''/* THE ROWS NAME THE AGENT NOW, NOT AN ANONYMOUS "REVIEWER" (1 Sep
+             2026). A cohort leader does not run the initial interview, so this
+             block is a RECORD of somebody else's decision — which it always was
+             on this page, since nothing here is editable and lead2 already tells
+             the leader "the full recording is never shared with you". What
+             changed is that the words no longer let a reader think the leader
+             might have been the reviewer. `agent` rather than a name, because
+             this build does not record WHICH agent interviewed each of the 28
+             candidates and inventing one would be the fabricated data §74 rules
+             out — Priya is Maryam's agent and nobody else's.
+             AND THE TAG IS "one below", NOT "one below the proposal". Measured
+             at 390: the longer string put the `.tag` 5px past the page's right
+             edge inside a `.kv` value — the only overflow the leader sweep
+             found. The row's key says WHO signed and the sentence under the
+             tile says what they did, so the pill only has to say the gap. */}
       <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
-      <div class="kv"><span class="k">Assigned</span><span class="v">${llevel(c)} <span class="tag org sm">reviewer went lower</span></span></div>
+      <div class="kv"><span class="k">Signed by their agent</span><span class="v">${llevel(c)} <span class="tag org sm">one below</span></span></div>
       <div class="kv"><span class="k">Next level</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
     </div>
-    <p class="t-helper-01 mt4">Set at the interview, not by the quiz. The reviewer placed ${first} one below the proposal, so this level should be within reach. Persistent struggle at a level set conservatively is usually something other than placement.</p>
+    <p class="t-helper-01 mt4">Set at the interview by their talent agent, not by the quiz and not by you. They placed ${first} one below the proposal, so this level should be within reach &mdash; persistent struggle at a level set conservatively is usually something other than placement.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
@@ -606,8 +641,33 @@ V.leadReports = () => {
       ${statCell(I.misuse, 'Never signed in', never.length, never.length ? 'no activity at all' : 'everyone has started')}
     </div>
   </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>Course progress</h2><span class="t-helper-01">Ordered by the gap to expected pace</span></div>
+  ${''/* THE TABLE IS WHITE AND HAS NOTHING DRAWN ABOVE IT — Maryam, 31 Aug 2026:
+        "remove the grey bg color of the 4 tables against all 4 tabs. also remove
+        the top border of the table that is dividing it from the upper blocks.
+        also remove the 'Ordered by the gap to expected pace' text."
+
+        ONE SECTION, FOUR STATES. "The 4 tables" are this block under each of the
+        four tabs — the filter re-renders rather than hiding rows (the note at
+        the head of this view is the argument), so there is one place to change
+        and the change lands on all four by construction.
+
+        `.sec-rep` IS A NAME, NOT A STYLE. With `tint` gone the grey goes, and
+        the hairline above it is then the only thing left dividing the table from
+        the figure band — which is what the second half of the instruction takes
+        off. That line belongs to the section ABOVE (§18.129), and at desktop it
+        is drawn by §14's (0,12,0) re-enabler, which per trap 4 can only be
+        answered from inside its own `:not()` list. So the section says what it
+        IS and two rules name it: §14's list and §84's phone tier. The marker
+        idiom is §20's own — `.sec-cs`, `.sec-out`, `.cap-sec`, `.lead-bar`.
+
+        THE SORT ORDER IS NO LONGER STATED IN WORDS, and that is the third half
+        of the instruction. It was already the weakest line on the page: the
+        `.tag` on every row ("32 behind") states the gap this is sorted by, the
+        first row IS the worst, and the sentence under the table names them. Tal
+        says the same thing at the top — the note above `ph()` in this view
+        records the earlier round of exactly this subtraction. */}
+  <div class="sec sec-rep">
+    <div class="sec-h"><h2>Course progress</h2></div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl">
         <tr><th>Candidate</th>${sel === 'all' ? '<th>Cohort</th>' : ''}<th class="num">Chapters</th>

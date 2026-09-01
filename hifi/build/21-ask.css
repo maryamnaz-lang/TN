@@ -417,9 +417,14 @@
    `GLOW_ON` (ai4) and not to this line, and the haze duly painted a 700px
    orange rectangle across the band's own gradient, over the card and past it
    on both sides. `overflow:hidden` is what clips it to the card; `relative` is
-   what makes the card the box it is clipped to. */
+   what makes the card the box it is clipped to.
+   THAT CARD IS GONE (1 Sep 2026) — the competency read went with the level
+   decision, because a cohort leader does not interview — so `.ldr-read` is off
+   both this line and the z-index stack below. The RECORD stays here because it
+   is the only place in the build that says what happens when a card joins
+   `GLOW_ON` and not this list, and §75.3 cites it by name for exactly that. */
 .app .plate,.app .lvl-hero,.app .cert,
-.app .sec.on-dark,.app .score.on-dark,.app .ldr-read{position:relative;overflow:hidden}
+.app .sec.on-dark,.app .score.on-dark{position:relative;overflow:hidden}
 .app .dark-glow{
   /* A BROAD WARM HAZE OFF THE TOP RIGHT, not a lamp with an edge. The
      earlier version was a small blurred ellipse and it read as a discrete
@@ -441,7 +446,6 @@
 .app .lvl-hero > :not(.dark-glow),
 .app .cert > :not(.dark-glow),
 .app .sec.on-dark > :not(.dark-glow),
-.app .ldr-read > :not(.dark-glow),
 .app .score.on-dark > :not(.dark-glow){position:relative;z-index:2}
 
 /* ==========================================================================

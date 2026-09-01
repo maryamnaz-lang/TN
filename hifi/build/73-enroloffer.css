@@ -190,12 +190,83 @@
    FLEX LINE, which on this row is set by the title-and-description block beside
    it: the chip came out 85px tall against a 40px button and dragged the action
    group to 133. The line's height is not the button's height. Centred at a
-   stated 40, the pair matches and neither can grow. */
+   stated 40, the pair matches and neither can grow.
+
+   AND `align-self` HAS SINCE CHANGED AXIS UNDER IT — TRAP 19, EXACTLY AS
+   WRITTEN, and the second time this build has walked into it. The chip moved
+   out of `.aih-a` and into `aiHead`'s new `under` slot (Maryam, 1 Sep 2026), so
+   its parent went from `.aih-a` — a ROW flex — to `.aih-b`, which §73.1 makes a
+   COLUMN flex. In a row, `align-self:center` is the cross axis and means
+   "centre the chip against the button beside it", which is the sentence above.
+   In a column it is the INLINE axis and means "centre the chip across the
+   block" — so the identical declaration would have parked a 254px pill in the
+   middle of a 60%-wide text block, floating clear of the left edge every other
+   line on the card is set from. Nothing errors, nothing overflows, and the tell
+   is only that the chip is no longer on the spine.
+
+   `flex-start`, so the chip's left edge lands on the lede's. The 40px floor
+   STAYS but its reason has changed with its parent: it is no longer matching a
+   button's height, it is the pill's own shape, and dropping it would leave a
+   16px-tall wash that reads as a highlighted phrase rather than as a chip.
+
+   NO `margin-top`. `.aih-b` is a column at `gap:var(--s04)`, so the separation
+   from the lede is the block's own rhythm — the same gap that already sits
+   between the title and the description.
+
+   AND IT IS STATED ON `.aih-b > .eo-when`, NOT ON `.eo-when` ITSELF, WHICH IS
+   THE DESIGN SYSTEM'S CLAIM ON THIS RULE. `gallery.html` documents the chip in
+   the ACTION GROUP — "a chip beside a button is `align-self:center` at a stated
+   40, never `stretch`" is one of the two spacing rules that entry is built
+   around, with the 85px-tall chip it cost written out underneath. That recipe
+   is still a correct use of `aiHead`; the portal has simply stopped being its
+   caller. Flipping the base declaration would have left every hand-authored
+   page copying that recipe with a chip top-aligned against its button, breaking
+   a documented component to move one card on one screen — and `build-ds.py`
+   would have shipped the break without a word, because §73 IS in `LAYERS` and
+   `verify_subset` only asks whether an output rule traces back to a source.
+   Both placements are supported now, and each states its own axis. */
 .app .eo-when{
   display:inline-flex;align-items:center;justify-content:center;gap:var(--s03);
   align-self:center;min-height:40px;
   padding:0 var(--s05);
   background:color-mix(in srgb, var(--accent) 10%, transparent)}
+/* --------------------------------------------------------------------------
+   THE `under` SLOT: THE CHIP STOPS BEING A CHIP
+
+   `.aih-b` is a column, so `align-self` here is the inline axis — see the trap
+   19 note above. (0,3,0) over the (0,2,0) base.
+
+   AND THE WASH AND THE PADDING GO WITH THE PAIR THEY WERE DRAWN FOR (Maryam,
+   1 Sep 2026: "align the E4 opens on December 1 on left"). The box was already
+   ON the spine — measured, `chipLeft === ledeLeft === titleLeft` — and it still
+   read as indented, because `padding:0 var(--s05)` pushed the calendar mark 16px
+   inside a ground nobody can see: 10% of `--accent` over `--gray-100` is about
+   two levels of black, so on the card the pill is invisible and all the reader
+   gets is a fact line that does not start where the two lines above it start.
+
+   SO THE FIX IS NOT `margin-left:-16px`. A negative margin would put the mark on
+   the spine and hang the invisible wash out over the card's own 32px frame,
+   which is a bug waiting for the day the ground becomes visible. What is wrong
+   is that a chip is the wrong object here at all: beside a button it needed a
+   ground to read as one figure against one action, and under the lede it is the
+   lede's next line. The ground, the padding and the 40px floor were all that
+   pair's furniture and all three come off; the calendar mark and the strong date
+   are the whole component now, and they land on the spine because nothing is
+   pushing them off it.
+
+   THE ACTION GROUP GOES TOP-ALIGNED IN THIS SECTION ONLY (Maryam, 1 Sep 2026:
+   "top align the enroll now button"). §73.1's `align-self:center` on both
+   children is argued at length and is still right for the two callers it was
+   written for — the pulse and the cover row, whose blocks are a title and one
+   description against a 40px control, where centring is what 613:7984 draws.
+   The offer's block is now THREE rows (title, lede, date), so centring parked
+   the button beside the lede with the title 30px above it, and the card's one
+   action no longer lined up with the card's own heading. `.sec.eo` scopes it, at
+   (0,5,0) over §73.1's (0,4,0). The other two `aiHead` callers do not move.
+   -------------------------------------------------------------------------- */
+.app .aih-b > .eo-when{
+  align-self:flex-start;min-height:0;padding:0;background:none}
+.app .page .sec.eo > .sec-h.aih > .aih-a{align-self:flex-start}
 .app .eo-when svg{flex:none;width:16px;height:16px;fill:var(--accent-text)}
 
 /* -------------------------------------------------------------------- 1a ---

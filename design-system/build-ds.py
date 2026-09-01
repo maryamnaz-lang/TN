@@ -575,6 +575,19 @@ LAYERS = [
     # point of that check is that the second kind cannot hide. Delete this
     # entry with §67, §83 and `tmpaccent.js`.
     '83-tmpaccent2.css',
+    # A TINTED SECTION HAS NO HAIRLINE ABOVE OR BELOW IT, and all of it
+    # crosses. Every selector is `.sec` / `.tint` / `.ph` / `.crumb` — the
+    # JS-free core, four classes `SYSTEM` already names — and the rule it
+    # states is a fact about the LOOK rather than about a page: a change of
+    # ground is already a boundary, so a grey band does not also draw an edge.
+    # A second portal that tints a section gets the same answer for free, and
+    # a second portal that does not tint anything is unaffected, because every
+    # selector needs `.tint` (or `.sec-rep`) to match at all.
+    # `.sec-rep` CROSSES TOO, and it is a marker rather than a component: it
+    # says "the section above me draws no closing rule", which is the same job
+    # §20's list gives `.sec-cs`, `.sec-out` and `.cap-sec`. A hand-authored
+    # page with a white table under a figure band wants exactly that word.
+    '84-tintnorule.css',
 ]
 
 # ==========================================================================
@@ -844,7 +857,52 @@ def classify(name):
 # borderless row reads as a box that was not there a moment ago. Set
 # DS_ARM_HOVER=1 to build with the state layers live.
 ARM_HOVER = bool(int(__import__('os').environ.get('DS_ARM_HOVER', '0')))
-HOVER_KEEP = ('sn-item', 'btn-p', 'nav-t', 'stat-jump', 'psw-t')
+
+
+# ==========================================================================
+# THE KEEP-LIST IS READ OFF build.py, NOT COPIED, AND THE COPY HAD DRIFTED.
+#
+# This was a hand-typed duplicate of build.py's `HOVER_KEEP` and it was two
+# entries short: `tal-star` and `tal-fab` were live in the portal and DISARMED
+# here. `.tal-star` is the ask control on an agent card, and build.py's own
+# note says what that costs — "it is collapsed to a mark until you point at
+# it; disarmed, it never opens". So the design system shipped that control
+# with no way to open it, and `.agh-book .tal-star:hover .lbl` — the rule that
+# reveals its label — could never match, because `.__nh` is on no element in
+# any page. A control that cannot be reached is the half-shipped component
+# this build exists to prevent, and nothing warned: a `:hover` rewritten to
+# `:hover:where(.__nh)` is still a perfectly valid rule.
+#
+# THE FAILURE MODE IS SILENT IN BOTH DIRECTIONS, which is why this is now a
+# read rather than a list. A hover ARMED here and not in the portal would give
+# the design system a state layer the product does not have — the thing the
+# note below says would make this the wrong artefact — and that is just as
+# invisible. One source, parsed, so the two cannot disagree again.
+#
+# EXCLUDED FAMILIES ARE FILTERED OUT rather than carried. build.py keeps four
+# `nil-*` hovers live because that microsite is boxed cards and filled buttons
+# where a pointer state is what the page already looks like; `nil` is on
+# EXCLUDE_PREFIXES, so those selectors are not in this output at all and
+# naming them here would be a keep-list entry for a rule that cannot exist.
+# `psw-t` survives the filter and matches nothing — §78 deleted `.pswitch` —
+# which is build.py's to drop, and harmless until it does.
+# ==========================================================================
+def _hover_keep():
+    src = (SRC / 'build.py')
+    if not src.exists():
+        sys.exit('build-ds: cannot read build.py to take its HOVER_KEEP — '
+                 'the two hover treatments would silently diverge.')
+    m = re.search(r'^HOVER_KEEP\s*=\s*\((.*?)\)', src.read_text(), re.S | re.M)
+    if not m:
+        sys.exit('build-ds: build.py no longer declares HOVER_KEEP as a plain '
+                 'tuple literal — this reader needs updating with it.')
+    names = re.findall(r"'([^']+)'", m.group(1))
+    if not names:
+        sys.exit('build-ds: build.py HOVER_KEEP parsed empty.')
+    return tuple(n for n in names if not excluded(n.split('.')[0]))
+
+
+HOVER_KEEP = _hover_keep()
 
 # Font placeholders build.py fills. The DS embeds the same faces, so one
 # <link> is the whole dependency — no relative font paths to get wrong.

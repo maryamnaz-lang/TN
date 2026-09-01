@@ -1,0 +1,72 @@
+/* ==========================================================================
+   84. A TINTED SECTION HAS NO HAIRLINE ABOVE OR BELOW IT — Maryam, 31 Aug 2026
+   "remove the top and bottom border of the grey sections, do it for all grey
+   sections."
+
+   THE GROUND IS THE BOUNDARY, WHICH IS AN ARGUMENT THIS BUILD ALREADY MAKES
+   TWICE AND NEVER FINISHED. §54's whole note is it — "a change of ground is
+   already a boundary. Both together is TWO boundaries for one join, four pixels
+   apart — a hairline, then a colour step — and it reads as a divider that has
+   been left behind rather than as the top of the block under it" — and §55.2
+   reaches the same conclusion for `.sec.tint.cards`. Both stated it for ONE
+   neighbour: §54 for a `.rail-wrap`, §55.2 for the cards variant. This is that
+   sentence applied to every grey section in the product, which is what the
+   instruction asks for and what those two layers were each a special case of.
+
+   THE TWO EDGES ARE TWO DIFFERENT RULES, and that is the whole difficulty:
+
+     the BOTTOM edge   is the tinted section's OWN `::after`
+     the TOP edge      is the PREVIOUS block's `::after` — §18.129 says so in
+                       as many words ("the rule under the block ABOVE a filled
+                       one is that block's top edge") and hands it the full
+                       bleed so it belongs to the fill.
+
+   So removing "the tint's borders" means switching off a rule that belongs to
+   its neighbour, which is why this cannot be one selector and why §18's own
+   list is the map of where they are.
+
+   IT IS NOT `.warm` AND NOT `.on-dark`. The instruction is about the GREY
+   sections — `--layer-02`, #f7f7f7, which is `.sec.tint` and its `.info` /
+   `.cards` variants (both carry `.tint`, so both are covered by these
+   selectors). `.sec.warm` is `--layer-01`, the cream panel, and a black
+   `.on-dark` section is a different object again; each keeps its edges until
+   somebody asks otherwise.
+
+   AFTER §63 AND ALLOWED TO BE: three `display` declarations and nothing else —
+   no font-size, font-weight, text-transform or text colour.
+   ========================================================================== */
+
+/* THE PHONE TIER IS WHAT THIS BLOCK IS FOR, and it is the half that a §14 edit
+   cannot reach. Below 900 §10's rules are shown as written and every section
+   draws its own closing hairline, so both edges are live there; at desktop §14
+   turns every `.page > .sec::after` off and re-enables the pairs it names, so
+   the desktop answer is an exclusion in THAT list (see §14.138 — "the `:not()`
+   list is where 'which pairs are joined' is decided"). Two widths, two
+   statements, one intent, which is the shape §18, §36.9 and §55.2 already use.
+
+   `display:none` RATHER THAN `content:none`, because that is what every other
+   subtraction of one of these rules in the build uses — §54, §55.2, §26.137 —
+   and a hairline switched off two ways would be two idioms for one act. */
+.app .page > .sec.tint::after,
+.app .page > .sec:has(+ .sec.tint)::after,
+.app .page > .ph:has(+ .sec.tint)::after,
+.app .page > .crumb:has(+ .sec.tint)::after{display:none}
+
+/* AND THE REPORTS TABLE, WHICH IS THE SAME INSTRUCTION ARRIVING FROM THE OTHER
+   SIDE (Maryam, 31 Aug 2026: "remove the grey bg color of the 4 tables against
+   all 4 tabs. also remove the top border of the table that is dividing it from
+   the upper blocks").
+
+   THAT SECTION IS NO LONGER TINTED, so the rule above cannot answer it. Course
+   Reports' table was a `.sec.tint` and is now a plain white section — one
+   section in four states, one per tab — and with the grey gone the hairline
+   above it is the only thing left dividing it from the figure band, which is
+   what the instruction takes off. It carries `.sec-rep` for the reason §20's
+   list carries `.sec-cs`, `.sec-out` and `.cap-sec`: a NAMED section, because
+   the marker says what the section is rather than asking what it happens to
+   contain, and one level of `:has()` stays valid CSS.
+
+   THE PAIR IS KEYED ON WHAT FOLLOWS, like §14's own `+ .sec.tint.cards` and
+   `+ .sec-qa` entries, because the reason is a property of the table section
+   rather than of the figure band above it. */
+.app .page > .sec:has(+ .sec.sec-rep)::after{display:none}

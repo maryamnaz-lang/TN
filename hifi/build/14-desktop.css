@@ -147,7 +147,43 @@
      section's `aiHead` IS a `.sec-h`, so `:has(+ .sec > .sec-h)` matched the
      figure block above it and turned its rule back ON. The tell was that the
      identical rule worked with `!important` and not without. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined)::after,
+  /* AND `.tint` JOINS THE LIST ON BOTH SIDES — Maryam, 31 Aug 2026: "remove the
+     top and bottom border of the grey sections, do it for all grey sections."
+     §84 is where that instruction is written up; these are its two desktop
+     halves, and they are here rather than there for the reason the paragraph
+     above gives — (0,12,0) inside a container query cannot be answered from
+     outside it, so an unjoining goes in this list.
+
+     `:not(.tint)`               a grey section does not close itself.
+     `:not(:has(+ .sec.tint))`   and the block above one does not close it
+                                 either — §18.129's "the rule under the block
+                                 ABOVE a filled one is that block's top edge".
+
+     THE SECOND REPLACES `:not(:has(+ .sec.tint.cards))` AND SUBSUMES IT
+     EXACTLY. §55's entry was this same subtraction for one variant of the same
+     class ("a tinted panel whose ground already ends where the section ends"),
+     and every `.sec.tint.cards` in the build carries `.tint`, so the narrow test
+     could only ever match where the general one already does. Its reasoning is
+     kept here rather than in a selector that can no longer be reached.
+
+     `:not(:has(+ .sec.sec-rep))` IS THE MIRROR CASE. That section used to be a
+     `.tint` and is now white (Maryam, same day: the four Course Reports tables
+     lose their grey), so it falls OUT of the rule above and has to be named.
+     §84's closing block is the argument. */
+  /* AND `.lead-bar` JOINS IT, WHICH IS §37.6's OWN INTENT FINALLY REACHING THIS
+     WIDTH (Maryam, 1 Sep 2026: "remove the divider below the 4 cards"). That
+     layer already says `.lead-bar::after{display:none}` — a section collapsed to
+     `height:0` so the sticky tab row can float out of the flow has nothing to
+     close, and its rule can only ever land on somebody else's boundary. It was
+     losing on the TIER, not on weight: §37's statement is unconditional and this
+     re-enabler is inside the container query, so at desktop the leader
+     dashboard's zero-height `.lead-bar` sat between the figure band and "Your
+     cohorts", matched `:has(+ .sec > .sec-h)`, and drew the hairline §37.6 had
+     just switched off — 24px under a four-cell band that already ends itself
+     with its own border (the rule immediately below, which took the stats
+     section's `::after` away for exactly that reason and could not see this
+     one). Per trap 4 the unjoining goes in this list. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

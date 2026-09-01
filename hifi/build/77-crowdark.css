@@ -206,3 +206,31 @@
    width, where `flex-end` on the container would also pull the STACKED cells
    to one side. One item, one declaration, no breakpoint. */
 .app .crow-dark .crow-a{align-self:flex-end}
+
+/* ------------------------------------------------------------------ 77.7 ---
+   A MARK THAT IS A LABEL, NOT A FACE
+   1 Sep 2026, with the leader's card becoming the next COHORT CALL.
+
+   §71.405 already anticipated this row — its note names "the leader's weekly-
+   call card" as the first `.crow-ph` whose mark is a label (`41`, the cohort's
+   number, with no image behind it) and normalises the `<i>` out of italic for
+   it. What it could not answer is the GROUND, because that argument is about
+   the black card and not about the component: §71 gives `.crow-ph`
+   `--layer-02`, a pale grey, which was invisible for as long as a photograph
+   covered it and on a black card is a light rectangle with two digits in it —
+   which reads as a photograph that failed to load, the exact artefact `crow`'s
+   own note is at pains to avoid by omitting the `<img>` rather than writing an
+   undefined `src`.
+
+   `--on-dark-fill` IS THE CARD'S OWN ANSWER, and it is the token §81 reaches
+   for to say "a filled patch in this card's register" (its unlit button) and
+   §75 and §77 both already use. A 12% white square on `--gray-100` reads as a
+   denser patch of the card, which is what a mark on a black ground should be —
+   §74 makes the same argument one hue over for its 5%-card / 12%-chip pair.
+
+   UNCONDITIONAL, AND IT DOES NOT NEED A `:not(:has(img))`. A photograph is
+   `position:absolute;inset:0` over the whole square (§71.411), so on the three
+   call sites that have one the ground is not visible either way. One rule, no
+   test. The INK is §63 §17's — `color` is one of that layer's four properties
+   wherever it appears. */
+.app .crow-dark .crow-ph{background:var(--on-dark-fill)}

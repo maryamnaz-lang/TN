@@ -590,6 +590,76 @@
 .app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
 .app .path-step.on .path-n{color:var(--on-dark)}
 
+/* ------------------------------------------------------------------ 6a ---
+   AND `.dark-card` GETS THE SAME PAIR, WHICH IT HAD NEVER HAD.
+
+   Everything above keys on `.on-dark`, `.lvl-hero`, `.cert`, `.score.on-dark`
+   or `.plate-*` — the black objects that existed when §6 was written. §75's
+   `.dark-card` is the newest one and it inherited NONE of it, for a reason
+   that is worth stating because it is not an oversight: the whole point of
+   that class is that it is NOT `.sec.on-dark` and NOT `.plate`. Both of those
+   are in ai5's `DARK_CARD`, so `placeDark` hoists them into the head band;
+   `.dark-card` was minted precisely to be a black card that stays in the page
+   body. It bought that by giving up the class every generic on-dark ink rule
+   in the build is written against.
+
+   NOTHING IN THE PRODUCT WAS BROKEN BY THAT, WHICH IS WHY IT SURVIVED THREE
+   CALLERS. All three — `.rec-dark`, `.crow-dark` and the leader's next
+   interview — hold `.crow-*` / `.rec-*` content, and §15 and §17 below state
+   the ink for those by hand, component by component. So the card looked
+   complete for as long as nobody put anything ELSE in it.
+
+   IT IS A STANDING INSTRUCTION THAT MAKES THIS URGENT (Maryam, 31 Aug 2026):
+   "now when i say convert a section to black card, you have this reference
+   right? … i will not tell you that remove the bottom border attached or give
+   black box padding, do this all yourself." A conversion is supposed to be one
+   class. Measured before this rule, a `.sec` holding an ordinary `.kv` band and
+   a `.btn-row` came out with the VALUES AT 1:1 — `#111` on `#111`, invisible —
+   the keys at 1.7:1 and the quiet button's label invisible too, because all
+   three were still drawing the page's ink on the card's ground. That is the
+   half-shipped component this file exists to prevent, and it fails silently:
+   the markup is right, the class is right, and the words are simply not there.
+
+   THE PER-COMPONENT RULES ALL STILL WIN, so nothing already drawn moves. These
+   are (0,2,0) and (0,2,1); §15's `.rec-dark *` group and §17's `.crow-dark *`
+   group are (0,3,0), which beats them on specificity whatever the order.
+   §59's quiet plate keeps working too — like every rule in §6 this is written
+   against the `--on-dark*` TOKENS, not against white, so a caller that
+   re-points them re-points this.
+
+   `.k` / `.v` / `.l` / `.n` / `.d` ARE IN THE LIST DELIBERATELY. They are the
+   single-letter cell classes `.kv`, `.stat` and `.score` are built out of —
+   the most likely content of a converted section and the ones that were
+   invisible. §03's legacy utility rule of the same names is empty and drops
+   out of the design system entirely, so there is no collision to inherit. */
+.app .dark-card,
+.app .dark-card h2,.app .dark-card h3,.app .dark-card h4,
+.app .dark-card p,.app .dark-card li,.app .dark-card b,.app .dark-card strong,
+.app .dark-card .t-body,.app .dark-card .t-compact,
+.app .dark-card .v,.app .dark-card .n,.app .dark-card .ttl{
+  color:var(--on-dark)}
+.app .dark-card .sub,.app .dark-card .t-desc,
+.app .dark-card .eyebrow,.app .dark-card .t-eyebrow,
+.app .dark-card .help,.app .dark-card .t-helper-01,
+.app .dark-card .legal,.app .dark-card .t-legal-01,.app .dark-card .t-caption,
+.app .dark-card .k,.app .dark-card .l,.app .dark-card .d,
+.app .dark-card .note-d{
+  color:var(--on-dark-2)}
+
+/* THE QUIET BUTTON IS THE CARD'S OWN INK WHEREVER IT SITS, not only inside a
+   `.crow-a`. §17 states this for `.crow-dark .crow-a > .btn:not(.btn-p)` and
+   §15 for `.rec-a`'s, both (0,3,0) and both about one caller's action group;
+   a `.btn-row` dropped straight into a converted section had neither and drew
+   `--text-primary` on black. The `fill` is stated for the same reason §17
+   states it — `.ic-l`'s mark is an `<svg>` inside the label and does not
+   inherit `color`. §64's arrow is a `mask-image` on `currentColor` and follows
+   without a word. The BORDER is not here: it is not one of this layer's four
+   properties and §75 states it with the rest of the card's geometry. */
+.app .dark-card .btn:not(.btn-p){color:var(--on-dark)}
+.app .dark-card .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .dark-card a[data-go],.app .dark-card .lk,.app .dark-card .lnk{
+  color:var(--on-dark)}
+
 /* AND THE FIGURE AT THE END OF A FACT ROW IS THE ACCENT, ON A QUIET CARD ONLY.
    `.plate-v` is the value `splitPlateBody` lifts out of "Course price
    <b>$690</b>" (ai5.js) and §66 puts on the row's right edge. The accent is the
@@ -843,15 +913,13 @@
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book)}
 
-/* the competency read is a dark card: its heading is the h4 tier and its
-   closing paragraph is body-compact, both on `--on-dark*` */
-.app .ldr-read-h > h2{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  color:var(--on-dark)}
-.app .ldr-read .ldr-read-x{
-  font-size:var(--t-compact-size);line-height:21px;
-  color:var(--on-dark-2)}
+/* THE COMPETENCY READ'S TWO TYPE RULES ARE DELETED (1 Sep 2026). `.ldr-read-h
+   > h2` at the h4 tier and `.ldr-read-x` at body-compact, both on `--on-dark*`
+   — a cohort leader does not interview, so nothing draws that card and §36 has
+   deleted its twelve rules with it. The pairing is the part worth remembering:
+   a dark card's heading takes h4 and its closing paragraph takes compact, on
+   `--on-dark` and `--on-dark-2`, which is what §15 and §17 say for `.rec-dark`
+   and `.crow-dark` and is now stated only there. */
 
 /* THE LIVE CALL. §60 is a surface rather than a page, so it is not reached
    by walking the view registry — the sweep only found these once it called
@@ -907,15 +975,44 @@
    Everything here is a restatement, at the same width, of a size a layer
    already changed at that width. No new breakpoint is introduced.
 
-   THE SECTION HEADING IS THE ONE WITH AN ARGUMENT IN IT. At ≥900 a `.sec`
-   with a `.sec-h` becomes a 184px label column (§10.15, trap 13) and the
-   heading stops being a title and starts being a spine — which is why §10
-   drops it to 13 rather than leaving it at 14. That is right, and it is
-   kept: the spine takes the LABEL role. §15 and §16 then push it back up to
-   15 for the four cases where the heading carries an action, a link or a
-   day strip, because those headings are read as controls; that is kept too,
-   at the h4 size it already has on mobile. Two tiers, both on the ladder,
-   and the distinction between them survives.
+   THE SECTION HEADING IS ONE SIZE — Maryam, 1 Sep 2026: "make the section
+   heading size consistent everywhere, in some grey sections it is different
+   and in some white sections it is different."
+
+   IT HAD FIVE AT THIS WIDTH, and the grey/white reading is exactly what five
+   sizes assigned by CONTENT look like from the outside. Measured across 184
+   pages: 12.5 (`--t-label`, 177 headings), 14 (`--t-h4`, the seven `:has()`
+   exceptions below plus §65's `.found`, 38), 16 (`--t-sec`, the AI-native
+   heads, 35), 17 (`--t-h3`, "Quick Actions" on 54 dashboards) and 18
+   (`--t-sec-lg`, the leader dashboard's four queue headings, 8). The Enroll
+   page is the case to picture: "Your cohort leader" 12.5, "What you'll
+   learn" 14, "How your cohort works" 14 on grey, "What you get" 12.5. Four
+   peers, two ranks, and the two odd ones happen to be one white and one
+   grey — which is why it reads as a ground problem and is not one.
+
+   THE SIZE IS `--t-label` AND THE OLD REASON FOR IT WAS MOSTLY FALSE. This
+   block used to say the heading "stops being a title and starts being a
+   spine" at ≥900, because §10.15 turns a headed `.sec` into a 184px label
+   column. That is a good argument and it covers 36 of 290 headings — four
+   distinct ones, all on "What Tal knows". Every other section opts OUT of
+   the column (§10.15's list is keyed on CONTENTS — `.tile-stack`, `.stats`,
+   `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard`, `.kv` — and almost everything
+   is built from those, which is trap 13 working as intended). So the spine
+   was never the reason 131 of these were 12.5; being the default was.
+   It is kept because it is the size the product already used most and
+   because Maryam chose it over 14 and 16 when the three were put side by
+   side — not because the heading is a column label. §65 spotted the same
+   hole from the other end and carved `.found` out at h4; that carve-out is
+   gone with the rest.
+
+   THE SEVEN SELECTORS BELOW ARE KEPT AND RE-POINTED, NOT DELETED, AND THAT
+   IS THE ONE THING TO GET RIGHT HERE. §15 and §16 state the SAME seven
+   selectors at 15px, inside this same container query, at (0,5,2) — heavier
+   than the default rule above at (0,4,1). Delete this block and those win:
+   the seven headings go to 15px instead of 12.5 and the page looks less
+   consistent than before the edit. Re-pointing the values is what makes the
+   default reach them. (Deleting §15's and §16's rules at source would work
+   too and is a bigger change to two layers that own layout, not type.)
    ------------------------------------------------------------------------ */
 @container app (min-width:672px){
   .app .bhead > span{
@@ -927,7 +1024,11 @@
   .app .sec:has(> .sec-h) > .sec-h h2{
     font-size:var(--t-label-size);line-height:var(--t-label-lh);
     font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
-  /* the four headings that carry something */
+  /* THE SEVEN THAT USED TO BE ONE STEP UP — now the same size as every other
+     section heading. They are still listed because §15 and §16 state these
+     exact selectors at 15px in this same tier and outweigh the default; this
+     is what brings them back to it. Same values as the rule above, on
+     purpose: this is a neutraliser, not a variant. */
   .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h h2,
@@ -935,8 +1036,8 @@
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
-    font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+    font-size:var(--t-label-size);line-height:var(--t-label-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
   /* the page lead is prose at every width — §10 grew it to 15 at desktop,
      which put a fourth size between the h1 and the body for one element */
   .app .ph .lead{
@@ -1317,16 +1418,20 @@
    be a condition that is true every time it is evaluated with a #973177 under
    it that nothing can ever see. Stated on the class itself, below. */
 
-/* QUICK ACTIONS' HEADING IS ONE STEP UP — 581:6404 sets it at 18 against the
-   14 of everything in the cards under it, which is the same relationship
-   `--t-h3` has to `--t-h4`. It is restated here because §63 §8b's desktop
-   block sizes `.sec:has(> .all-desc) > .sec-h h2` inside a container query,
-   and per trap 3 that tier can only be answered from inside itself. */
-@container app (min-width:900px){
-  .app .page:not(.form-page) .sec-qa > .sec-h h2{
-    font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls)}
-}
+/* QUICK ACTIONS' HEADING WAS ONE STEP UP AND IS NOT ANY MORE — deleted
+   1 Sep 2026 with §8b's other four section-heading sizes.
+
+   The rule read `--t-h3` and its note argued from 581:6404, which "sets it at
+   18 against the 14 of everything in the cards under it, which is the same
+   relationship `--t-h3` has to `--t-h4`". Both halves had stopped being true.
+   The file's 18 was implemented as 17, so the product never drew the file's
+   number; and the 14 it was measured against is §8b's, which is 12.5 at this
+   width — so the ratio it was preserving had not existed for as long as §8b
+   has. What it did draw was a 17px heading on 54 dashboards, the only 17 on
+   any of them, one rank off every other section on the same page.
+
+   Nothing replaces it: §8b's default is the heaviest rule left on this
+   heading, which the sweep confirms rather than the arithmetic. */
 
 /* THE ASK LINE — 581:6571/6586. The offer is at body size in full ink and the
    example question one step down in the helper tier, which is the distinction
@@ -1584,9 +1689,34 @@
   font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
   text-transform:none;color:var(--text-primary)}
+/* `--t-body`, NOT `--t-desc` (Maryam, 1 Sep 2026: "this desc font size should be
+   equal to the tal summary content font size"), pointed at the pulse's derived
+   opening sentence on the black card.
+
+   THE TWO ARE THE SAME KIND OF LINE AND WERE AT TWO SIZES. Tal's summary is
+   `.ai-body p`, which is in §3's `--t-body` list at 13.5/22; this was 12.5/17.
+   §3's own note draws the line the roles are for — body is "a sentence to be
+   READ", desc is what supports a thing named above it — and `.aih-d` is on the
+   wrong side of it: the pulse's lede is a full derived sentence with four
+   figures in it, the offer's is what you are buying, and both are the block's
+   opening prose rather than a caption under a title. Read 200px under a Tal
+   summary saying the same kind of thing a size larger, the smaller one looked
+   like a footnote to its own heading.
+
+   IT MOVES ALL THREE `aiHead` CALLERS AND THAT IS THE POINT OF THE COMPONENT.
+   §73's rule is "`.aih-t` and `.aih-d` are one role each" — the layer exists
+   because three sections had drifted three ways — so this is one role changing
+   value, not one page getting an exception. The ink is untouched: still
+   `--text-secondary` on a page and `--on-dark-2` on a card (§20), which is §3's
+   "a description is one grey" and is orthogonal to the size.
+
+   THE LINE-HEIGHT COMES WITH IT. Taking the size and leaving `--t-desc-lh` at
+   17 would set 13.5px type on a 17px rhythm — the pulse's lede wraps to two
+   lines at every width the product is read at, so that is the one place it
+   would show. Roles are read as a triple here for exactly this reason. */
 .app .page .sec > .sec-h.aih > .aih-b > .aih-d{
-  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   text-transform:none;color:var(--text-secondary)}
 
 /* THE LEDE IS BODY — it is prose, the only prose in the section, and §63 §3
@@ -1827,9 +1957,15 @@
     font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
     font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
     text-transform:none;color:var(--text-primary)}
+  /* THE SAME MOVE TO `--t-body`, RESTATED HERE BECAUSE OF TRAP 3 AND §8b.
+     §8b sizes section headings inside this query through `:has()` selectors,
+     so the desktop tier is its own cascade and the unconditional rule above
+     cannot reach it at any weight. Changing only the outer one would have left
+     the pulse at 12.5 on every frame the product is actually read at and moved
+     it only on a phone — the exact half-fix §73's own note records. */
   .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{
-    font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
-    font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls)}
+    font-size:var(--t-body-size);line-height:var(--t-body-lh);
+    font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
 }
 
 /* ------------------------------------------------------------------ 14 ---
@@ -2108,6 +2244,30 @@
    The same classes on the other three call sites are §11's and are untouched. */
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{fill:var(--on-dark)}
+
+/* THE MARK CAN BE A LABEL, AND A LABEL HAS TYPE (1 Sep 2026). The leader's card
+   is the next COHORT CALL, and a cohort is not a person: `crow` puts the
+   cohort's number in `.crow-ph`'s `<i>` and omits the `<img>` (its own note is
+   the argument — an undefined `src` 404s on every render, which `respcheck`
+   reads as a broken screen). §71.423 normalises the italic and §77.7 gives the
+   square the card's own `--on-dark-fill` ground; what neither can state is the
+   size and the ink, because both are this layer's.
+
+   h2, WHICH IS THE ONE ROLE THAT FITS A 78px SQUARE. `.av-ph i` is unsized
+   everywhere else in the build and inherits body — right on `ldrMark`'s 56px
+   cohort mark inside a plate, where the number sits against a sentence at the
+   same size, and lost in 78px of black with nothing beside it. 20px is the
+   nearest existing role rather than a ninth size, per §7's rule: take the role,
+   do not mint a number.
+
+   IT IS SCOPED TO `.crow-dark`, NOT TO `.crow-ph i`. The three candidate call
+   sites all carry a photograph over the whole square, so a size there would be
+   type nothing renders — and the day one of them wears a label, this is the
+   rule to widen rather than the place to add a second. */
+.app .crow-dark .crow-ph i{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls);
+  color:var(--on-dark)}
 
 /* ==========================================================================
    18. THE TOP BAR — §78's TRAIL AND ACCOUNT MENU
@@ -2513,47 +2673,30 @@
 .app .dark-card .eo-when > b{color:var(--on-dark)}
 
 /* ==========================================================================
-   §21 — THE COHORT LEADER DASHBOARD'S FOUR SECTION HEADINGS ARE 18px
+   §21 — THE COHORT LEADER DASHBOARD'S FOUR SECTION HEADINGS — DELETED
 
-   Maryam, 31 Aug 2026, by name: "Your cohorts", "Needs attention", "Waiting on
-   you", "Booked" are one rank and that rank is 18 — `--t-sec-lg-size`, the
-   tenth size, which §2's entry mints and §17's note predicted.
+   They were 18px, `--t-sec-lg-size`, asked for by name on 31 Aug 2026: "Your
+   cohorts", "Needs attention", "Waiting on you", "Booked" as one rank, on the
+   argument that this page "is not a document with sections, it is FOUR QUEUES
+   — the sticky figure bar above them names the same four and scrolls between
+   them, so each heading is a destination rather than a label on a passage."
 
-   WHY THESE FOUR AND NOT EVERY SECTION HEADING. This page is not a document
-   with sections, it is FOUR QUEUES — the sticky figure bar above them names
-   the same four and scrolls between them, so each heading is a destination
-   rather than a label on a passage. §4 puts an ordinary section heading at
-   12.5 (`--t-label`), which is right for a heading you read past and much too
-   quiet for one you navigate to. The set is closed by the page, not by a
-   pattern: `LEAD_JUMPS` lists exactly these four ids.
+   THAT ARGUMENT IS STILL A GOOD ONE AND IT LOST TO A LATER, WIDER INSTRUCTION
+   (Maryam, 1 Sep 2026): make the section heading one size everywhere. Asked
+   which sizes should survive, she kept 16 for the AI-native heads and let
+   everything else collapse — these four included. Recorded rather than
+   quietly dropped, because the queue reading is the kind of thing that gets
+   re-noticed: if the leader dashboard ever wants its headings to out-rank the
+   page again, this selector and `--t-sec-lg-size` are both still here, and
+   the note above is the case for it.
 
-   THE SELECTOR IS `[id^="lead-"]` AND THAT IS DELIBERATE. The four sections
-   already carry `#lead-cohorts` / `#lead-attention` / `#lead-waiting` /
-   `#lead-booked` because `leadStick` scrolls to them, so the ids are load-
-   bearing markup rather than hooks added for a stylesheet — which is the same
-   reason §65 keys the disclosure on `data-found`. A new class on all four
-   would be a second way of saying what the id already says.
+   THE SCROLL TARGETS ARE UNAFFECTED. `#lead-cohorts` / `#lead-attention` /
+   `#lead-waiting` / `#lead-booked` are `leadStick`'s, not this rule's — only
+   the type came off.
 
-   TRAP 3 AND §7b's ARITHMETIC, BOTH IN PLAY, WHICH IS WHY IT IS WRITTEN TWICE.
-   §8b sizes section headings INSIDE `@container app (min-width:900px)`, so an
-   unconditional rule cannot answer it at the width the product is read at, no
-   matter how heavy. And §8b's own selectors are `:has()`, which carries its
-   argument's specificity — `.app .page:not(.form-page) .sec:has(> .sec-h > a)
-   > .sec-h h2` is far heavier than it reads. So this lands at (0,6,1) — .app,
-   [data-portal], .page, :not(.form-page), .sec, [id^] — in BOTH tiers: the
-   unconditional one for the phone, the restatement for the frame. Landing in
-   the right tier is necessary and not sufficient; §73 records the same pair of
-   traps costing two tries.
-
-   IT IS SCOPED TO THE LEADER because `[id^="lead-"]` is a prefix and the
-   candidate portal is one `id` away from matching it by accident. Two
-   conditions, neither of which is a coincidence.
+   `--t-sec-lg-size` IS DOWN TO ONE READER AGAIN, `.dark-card .dc-t`. §2's
+   entry for it says it was minted when a second reader appeared; that reader
+   was this rule. It stays a token rather than going back to a literal — §7's
+   test is about whether a number is worth naming, and un-naming and re-naming
+   it across two edits would be churn, not discipline.
    ========================================================================== */
-.app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
-  font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
-@container app (min-width:900px){
-  .app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{
-    font-size:var(--t-sec-lg-size);line-height:var(--t-sec-lg-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls)}
-}

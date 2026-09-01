@@ -794,7 +794,28 @@ css = '\n'.join((here / f).read_text() for f in
                  # §83.4 lists the three with their weights: each re-points a
                  # hardcoded `#f47113` that §63 itself wrote as a literal
                  # rather than a token, so there is nothing for §67 to move.
-                 '83-tmpaccent2.css'])
+                 '83-tmpaccent2.css',
+                 # A TINTED SECTION HAS NO HAIRLINE ABOVE OR BELOW IT. §54 and
+                 # §55.2 each reached this conclusion for one neighbour; the
+                 # layer's own head is the argument for applying it to every
+                 # grey section, which is what was asked for.
+                 # AFTER §83 ON THE NUMBERING AND THAT IS SAFE. §83's "dead
+                 # last" claim is about the accent TOKENS — it has to land
+                 # after §70 states `--ai-1/2/3` at equal weight. This layer
+                 # states three `display:none`s and nothing else, so the two
+                 # touch disjoint properties and neither can lose to the
+                 # other. When §67/§83 are deleted with the red trial, this
+                 # one is last on its own and nothing moves.
+                 # THE OTHER HALF IS IN §14, NOT HERE, and that is trap 4: at
+                 # desktop the closing hairlines are re-enabled by a (0,12,0)
+                 # rule inside a container query, which cannot be answered
+                 # from a later layer at all. The `:not()` list is where "which
+                 # pairs are joined" is decided, so the desktop half is two
+                 # entries added to it. This file is the phone tier.
+                 # AFTER §63 AND ALLOWED TO BE on the usual test: three
+                 # `display` declarations, and not one font-size, font-weight,
+                 # text-transform or text colour.
+                 '84-tintnorule.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

@@ -636,8 +636,12 @@ render();
    and `.plate` sit next to a level card on the same pages and still carry
    the haze, which is what keeps the level card's flat black readable as a
    deliberate difference rather than as a card that failed to load. */
-/* `.ldr-read` IS NOT ON THE LIST, and it fails the test above for a second
-   reason the level card did not have. The haze reaches in from the top right
+/* `.ldr-read` WAS NOT ON THE LIST and the card itself is now gone too (1 Sep
+   2026 — a cohort leader does not interview, so there is no level decision).
+   The reasoning is kept because it is the one worked example in the build of a
+   haze failing over CONTENT rather than over a ground, and the next dark table
+   will want it. It failed the test above for a second reason the level card did
+   not have: the haze reaches in from the top right
    and dies out two thirds of the way across — over a plate that is a title and
    a sentence, that is light on an empty ground. The competency read is a TABLE
    in that corner: the haze crossed the "what I heard" column, so four rows of

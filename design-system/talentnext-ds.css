@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4686.  Rules dropped as product-specific: 187.
+   Rules kept: 4676.  Rules dropped as product-specific: 187.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -730,7 +730,7 @@ svg.arrow,
 .nrow.un::after{content:''; position:absolute; left:8px; top:26px; width:6px; height:6px; background:var(--accent)}
 .tal-fab{position:absolute; right:var(--s05); bottom:var(--s05); z-index:45; width:56px; height:56px; display:grid; place-items:center; background:var(--brand-primary); color:var(--on-brand); border-radius:var(--radius); transition:background var(--dur-short) var(--ease-standard)}
 .tal-fab svg{width:24px; height:24px; fill:var(--on-brand)}
-.tal-fab:hover:where(.__nh){background:var(--brand-primary-hover)}
+.tal-fab:hover{background:var(--brand-primary-hover)}
 .tal-fab::before{content:''; position:absolute; inset:-3px; border:1px solid var(--accent); opacity:.6; animation:aura 3.2s linear infinite}
 @keyframes aura{0%{transform:rotate(0deg) scale(1);opacity:.6} 50%{transform:rotate(180deg) scale(1.04);opacity:.25} 100%{transform:rotate(360deg) scale(1);opacity:.6}}
 @media (prefers-reduced-motion:reduce){
@@ -759,7 +759,7 @@ svg.arrow,
 .ai-inline{display:inline-flex; align-items:center; gap:var(--s02); height:28px; padding:0 var(--s03); font-size:11.5px; color:var(--accent-text); flex:none}
 .tal-star svg,
 .ai-inline svg{width:14px; height:14px; fill:var(--accent-text)}
-.tal-star:hover:where(.__nh){background:var(--brand-tint-2)}
+.tal-star:hover{background:var(--brand-tint-2)}
 .tw{display:flex; flex-direction:column; gap:var(--s03); margin-top:var(--s04); padding:var(--s04); background:var(--layer-01); border:1px solid var(--border-subtle-02)}
 .tw-h{font-size:11.5px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
 .tw-row{display:flex; align-items:baseline; gap:var(--s04); font-size:12.5px}
@@ -1730,7 +1730,7 @@ button[data-go]:active{background:var(--overlay-pressed)}
 .acc-h:hover:where(.__nh),
 .shell-act:hover:where(.__nh),
 .shell-logo:hover:where(.__nh),
-.tal-star:hover:where(.__nh),
+.tal-star:hover,
 .pw-eye:hover:where(.__nh),
 .tg:hover:where(.__nh){cursor:pointer}
 .btn-p:hover{background:var(--brand-primary-hover)}
@@ -2753,10 +2753,10 @@ button{font-family:var(--font-sans)}
 .device{width:390px; max-width:none; transform-origin:top center; transition:none}
 .pt-stage{padding-left:var(--s03); padding-right:var(--s03)}
 .pt-scale{display:inline-grid; place-items:center; height:32px; padding:0 var(--s03); margin-left:var(--s02); font-size:11px; letter-spacing:.4px; color:var(--on-dark-2); font-variant-numeric:tabular-nums}
-.app .tal-fab:hover:where(.__nh),
+.app .tal-fab:hover,
 .app .tal-fab:focus-visible{background-color:var(--accent)}
 .app .tal-fab:active{background-color:var(--accent-hover)}
-.app .tal-fab:hover:where(.__nh)::before{opacity:1; border-color:var(--accent)}
+.app .tal-fab:hover::before{opacity:1; border-color:var(--accent)}
 .app .page > .stp,
 .app .page > .f,
 .app .page > .pw-rules,
@@ -3241,7 +3241,7 @@ button{font-family:var(--font-sans)}
   .app .ph::before,
   .app .score::before{display:none}
   .app .page > .sec::after{display:none}
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint.cards)):not(:has(+ .sec-qa)):not(.found)::after,
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,
@@ -4702,8 +4702,7 @@ button.btn-p:active,
 .app .lvl-hero,
 .app .cert,
 .app .sec.on-dark,
-.app .score.on-dark,
-.app .ldr-read{position:relative; overflow:hidden}
+.app .score.on-dark{position:relative; overflow:hidden}
 .app .dark-glow{position:absolute; inset:0; background:radial-gradient(78% 135% at 92% -8%,
     var(--accent) 0%, transparent 64%); opacity:.22; pointer-events:none; z-index:1}
 .app .lvl-hero::before{z-index:0}
@@ -4711,7 +4710,6 @@ button.btn-p:active,
 .app .lvl-hero > :not(.dark-glow),
 .app .cert > :not(.dark-glow),
 .app .sec.on-dark > :not(.dark-glow),
-.app .ldr-read > :not(.dark-glow),
 .app .score.on-dark > :not(.dark-glow){position:relative; z-index:2}
 @keyframes ask-drop{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 @keyframes ask-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -4807,7 +4805,7 @@ button.btn-p:hover,
 .btn-p:hover,
 .on-dark .btn-p:hover,
 .sec.on-dark .btn-p:hover,
-.app .tal-fab:hover:where(.__nh),
+.app .tal-fab:hover,
 .app .tal-fab:focus-visible{background-color:var(--accent); background-image:var(--accent-grad); color:var(--on-accent); border-color:transparent; --on-brand-fill:1}
 .auth-card .btn-p:hover{background-color:var(--accent-2); background-image:var(--accent-grad-hover); color:var(--on-accent); border-color:transparent; --on-brand-fill:1}
 .btn.btn-p:active,
@@ -4880,9 +4878,9 @@ button.btn-p:active,
              border-color var(--dur-short) var(--ease-standard)}
 .app .agh-book .tal-star .sk-mark{width:14px; height:14px; flex:none; order:-1; background-color:var(--accent)}
 .app .agh-book .tal-star .lbl{display:block; overflow:hidden; white-space:nowrap; max-width:0; font-size:13.5px; line-height:18px; font-weight:600; letter-spacing:.05px; color:var(--text-primary); transition:max-width var(--dur-standard) var(--ease-standard)}
-.app .agh-book .tal-star:hover:where(.__nh),
+.app .agh-book .tal-star:hover,
 .app .agh-book .tal-star:focus-visible{gap:var(--s02); padding:0 var(--s04)}
-.app .agh-book .tal-star:hover:where(.__nh) .lbl,
+.app .agh-book .tal-star:hover .lbl,
 .app .agh-book .tal-star:focus-visible .lbl{max-width:80px}
 .app .sec-stp{padding-top:var(--s06)}
 .app .stp-top{display:flex; align-items:center; gap:var(--s05); margin-bottom:var(--s05)}
@@ -5311,7 +5309,7 @@ button.btn-p:active,
 .app .tal-fab svg{position:relative; z-index:2; width:22px; height:22px; fill:var(--on-accent); filter:drop-shadow(0 1px 2px rgb(0 0 0 / .32)); animation:tal-orb-breathe 6.4s ease-in-out infinite,
             tal-orb-track 14s linear infinite}
 .app .tal-fab .tal-fab-t{display:none}
-.app .tal-fab:hover:where(.__nh),
+.app .tal-fab:hover,
 .app .tal-fab:focus-visible{background-color:transparent; background-image:none; scale:1.07; filter:drop-shadow(0 0 16px color-mix(in srgb,var(--accent) 45%,transparent))}
 .app .tal-fab:active{background-color:transparent; background-image:none; scale:.94}
 .app .tal-fab:focus-visible{outline:2px solid var(--accent); outline-offset:5px}
@@ -5766,29 +5764,15 @@ button.btn-p:active,
 .app .ldr-tr .ldr-go{width:24px; vertical-align:middle}
 .app .ldr-tr .ldr-go svg{width:18px; height:18px; display:inline-block; fill:var(--icon-secondary)}
 .app .ldr-tr:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+.app .ldr-who{display:flex; align-items:center; gap:var(--s03); flex-wrap:nowrap; white-space:nowrap}
+.app .ldr-who > .mem-av{flex:none}
 .app[data-portal="leader"] .ldr-tbl .flag-t{display:inline-flex; align-items:center; gap:var(--s03); font-weight:600; letter-spacing:.1px; white-space:nowrap}
 .app[data-portal="leader"] .ldr-tbl .flag-t svg{width:16px; height:16px; flex:none; fill:currentColor}
 .app[data-portal="leader"] .ldr-tbl tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .ldr-tbl tr.mod .flag-t{color:var(--support-attention)}
 .app[data-portal="leader"] .ldr-tbl td.num .t-helper-01{white-space:nowrap}
-.app .ldr-pos,
-.app .ldr-neg{display:inline-flex; align-items:center; gap:var(--s02); letter-spacing:.6px}
-.app .ldr-pos svg,
-.app .ldr-neg svg{width:13px; height:13px; display:block; fill:currentColor}
-.app .ldr-pos{color:var(--support-success)}
-.app .ldr-neg{color:var(--support-attention)}
-.app .tq-x + .tq-x{margin-top:var(--s03)}
 .app .ldr-recs,
 .app .ldr-picker{flex-wrap:wrap}
-.app .ldr-rungs .btn{min-width:64px; justify-content:center}
-.app .ldr-rungs{display:flex; flex-wrap:nowrap; gap:var(--s03); overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; padding-bottom:6px}
-.app .ldr-rungs::-webkit-scrollbar{display:none}
-.app .ldr-rungs .btn{flex:none; min-width:56px; padding-left:var(--s04); padding-right:var(--s04)}
-.app .ldr-rungs .btn:nth-child(5n+1):not(:first-child){margin-left:var(--s05)}
-@container app (min-width:900px){
-  .app .ldr-rungs{display:grid; grid-template-columns:repeat(15,minmax(0,1fr)); overflow:visible; padding-bottom:0}
-  .app .ldr-rungs .btn{min-width:0; padding-left:var(--s02); padding-right:var(--s02)}
-}
 .app .ldr-n{margin-left:var(--s03); font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-helper)}
 .app .btn-p .ldr-n{color:inherit; opacity:.75}
 .app .ldr-on{background-color:color-mix(in srgb, var(--accent) 8%, transparent)}
@@ -5808,20 +5792,6 @@ button.btn-p:active,
 }
 .app .cs button > .lf-n{margin-left:var(--s03); font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-helper)}
 .app .cs button.on > .lf-n{color:inherit; opacity:.7}
-.app .tbl td.ldr-prose{text-align:left}
-.app .ldr-read{background-color:var(--surface-dark); color:var(--on-dark); padding:var(--s06)}
-.app .ldr-read-h{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s05); margin-bottom:var(--s05)}
-.app .ldr-read-h > h2{font-size:15px; line-height:21px; font-weight:600; letter-spacing:-.05px; color:var(--on-dark)}
-.app .ldr-read .tbl th{color:var(--on-dark-2); border-bottom-color:var(--on-dark-border)}
-.app .ldr-read .tbl td{color:var(--on-dark-2); border-bottom-color:var(--on-dark-rule)}
-.app .ldr-read .tbl td:first-child{color:var(--on-dark); font-weight:600}
-.app .ldr-read .ldr-read-x{margin-top:var(--s05); max-width:64ch; font-size:13px; line-height:21px; color:var(--on-dark-2)}
-.app .ldr-read .tag{background-color:transparent; border-color:var(--on-dark-border); color:var(--on-dark)}
-.app .ldr-read .tag.brand{background-color:var(--on-dark); border-color:var(--on-dark); color:var(--surface-dark)}
-.app .ldr-read .tag svg{fill:currentColor}
-.app[data-portal="leader"] .ivt-lines{margin-left:0; margin-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq{padding-left:0; padding-right:0}
-.app[data-portal="leader"] .ivt-lines > .tq:last-child{border-bottom:0}
 @container app (min-width:900px){
   .app .sec:has(> .tile .f),
   .app[data-portal="leader"] .sec:has(> .tile),
@@ -6316,8 +6286,7 @@ button.btn-p:active,
     rgba(var(--askv-wash),.3) 30%,
     rgba(var(--askv-wash),0) 52%); background-repeat:no-repeat}
 .app .ask-page .ask-top{padding:var(--s05) var(--pad-x); border-bottom:1px solid rgba(0,0,0,.1); background:transparent; gap:var(--s04)}
-.app .ask-page .ask-top .ph-back{width:20px; height:20px; color:var(--text-primary)}
-.app .ask-page .ask-top .ph-back svg{width:20px; height:20px; transform:scaleX(-1)}
+.app .ask-page .ask-top .ph-back{color:var(--text-primary)}
 .app .ask-page .ask-top-id{display:flex; align-items:center; gap:var(--s03)}
 .app .ask-page .ask-top-id .tal-mk{width:28px; height:28px}
 .app .ask-page .ask-top-t{font-size:20px; line-height:normal; font-weight:600; letter-spacing:.16px; color:var(--text-primary)}
@@ -6448,7 +6417,7 @@ button.btn-p:active,
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{width:16px; height:16px; flex:none; background-color:transparent; background-image:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%); background-size:100% 100%; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat; border-radius:0; animation:none}
 .app .ask-page .ask-thread .tal-msg > .bb .tw-chips{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s04)}
 .app .ask-page .ask-top-t{font-size:18px}
-.app .ask-page .ask-top .ph-back svg{width:20px; height:20px; transform:none; fill:currentColor}
+.app .ask-page .ask-top .ph-back svg{width:20px; height:20px; fill:currentColor}
 
 /* ---- 54-tintedge.css ---- */
 .app .page > .rail-wrap:has(+ .sec.tint)::after{display:none}
@@ -7058,6 +7027,37 @@ button.btn-p:active,
 .app .lead-t{color:var(--on-dark)}
 .app .path-step:not(.on) .path-n{color:var(--on-dark-2)}
 .app .path-step.on .path-n{color:var(--on-dark)}
+.app .dark-card,
+.app .dark-card h2,
+.app .dark-card h3,
+.app .dark-card h4,
+.app .dark-card p,
+.app .dark-card li,
+.app .dark-card b,
+.app .dark-card strong,
+.app .dark-card .t-body,
+.app .dark-card .t-compact,
+.app .dark-card .v,
+.app .dark-card .n,
+.app .dark-card .ttl{color:var(--on-dark)}
+.app .dark-card .sub,
+.app .dark-card .t-desc,
+.app .dark-card .eyebrow,
+.app .dark-card .t-eyebrow,
+.app .dark-card .help,
+.app .dark-card .t-helper-01,
+.app .dark-card .legal,
+.app .dark-card .t-legal-01,
+.app .dark-card .t-caption,
+.app .dark-card .k,
+.app .dark-card .l,
+.app .dark-card .d,
+.app .dark-card .note-d{color:var(--on-dark-2)}
+.app .dark-card .btn:not(.btn-p){color:var(--on-dark)}
+.app .dark-card .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .dark-card a[data-go],
+.app .dark-card .lk,
+.app .dark-card .lnk{color:var(--on-dark)}
 .app .plate.plate-quiet .plate-v{color:var(--accent-text)}
 .app .plate.plate-quiet .plate-tab > .plate-bi:not(:last-child) > .plate-v{color:var(--on-dark)}
 .app .av,
@@ -7120,8 +7120,6 @@ button.btn-p:active,
 .app .fa-b b{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong)}
 .app .cs button > .lf-n,
 .app .ldr-copick .lf-n{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book)}
-.app .ldr-read-h > h2{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); color:var(--on-dark)}
-.app .ldr-read .ldr-read-x{font-size:var(--t-compact-size); line-height:21px; color:var(--on-dark-2)}
 .app .call-p-n{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls)}
 .app .call-p-n em{font-weight:var(--t-w-book)}
 .app .call-sub{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); color:var(--on-dark-2)}
@@ -7231,7 +7229,7 @@ button.btn-p:active,
 .app .crow-x b{font-weight:var(--t-w-strong)}
 .app .pulse-lab{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-secondary)}
 .app .page .sec > .sec-h.aih > .aih-b > h2.aih-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
-.app .page .sec > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
+.app .page .sec > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-secondary)}
 .app .aih-d b{font-weight:var(--t-w-strong); color:var(--text-primary)}
 .app .pulse-hl{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .pulse-eb{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
@@ -7257,7 +7255,7 @@ button.btn-p:active,
 .app .cov-m{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
 @container app (min-width:900px){
   .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > h2.aih-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
-  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls)}
+  .app .page .sec:has(> .sec-h) > .sec-h.aih > .aih-b > .aih-d{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls)}
 }
 .app .sig-hl{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
 .app .signed-b > b{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
@@ -7281,6 +7279,7 @@ button.btn-p:active,
 .app .crow-dark .crow-n{color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p){color:var(--on-dark)}
 .app .crow-dark .crow-a > .btn:not(.btn-p) svg{fill:var(--on-dark)}
+.app .crow-dark .crow-ph i{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h2-ls); color:var(--on-dark)}
 .app .crumb-l{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-helper)}
 .app .crumb-trail a.crumb-l{color:var(--text-helper)}
 .app .crumb-trail .crumb-now .crumb-l{color:var(--text-primary)}
@@ -7648,6 +7647,7 @@ button.btn-p:active,
 .app .crow-who{flex:1 1 300px; min-width:0; display:flex; align-items:flex-start; gap:var(--s05); padding:var(--s07) 20px}
 .app .crow-ph{position:relative; flex:none; display:grid; place-items:center; width:78px; height:78px; overflow:hidden; background:var(--layer-02)}
 .app .crow-ph img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.app .crow-ph i{font-style:normal}
 .app .crow-b{display:flex; flex-direction:column; gap:var(--s03); min-width:0}
 .app .crow-b p{margin:0}
 .app .crow-id{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
@@ -7751,6 +7751,8 @@ button.btn-p:active,
 .app .sec.eo .aih-a > .btn-p{background-image:var(--accent-grad); border-color:transparent; --on-brand-fill:1}
 .app .sec.eo .aih-a > .btn{width:185px; min-height:40px; justify-content:center}
 .app .eo-when{display:inline-flex; align-items:center; justify-content:center; gap:var(--s03); align-self:center; min-height:40px; padding:0 var(--s05); background:color-mix(in srgb, var(--accent) 10%, transparent)}
+.app .aih-b > .eo-when{align-self:flex-start; min-height:0; padding:0; background:none}
+.app .page .sec.eo > .sec-h.aih > .aih-a{align-self:flex-start}
 .app .eo-when svg{flex:none; width:16px; height:16px; fill:var(--accent-text)}
 .app .page .facts.eo-facts{display:grid; grid-template-columns:none; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:0; column-gap:var(--s07); background:none; border:0; padding:20px 0 0}
 .app .page .facts.eo-facts > div{position:relative; grid-column:auto; display:flex; flex-direction:row; align-items:flex-start; gap:var(--s04); min-width:0; padding:0; background:none}
@@ -7843,6 +7845,17 @@ button.btn-p:active,
       rgba(255,255,255,0) 0%, rgba(255,255,255,.28) 50%, rgba(255,255,255,0) 100%),
     linear-gradient(107.08deg,
       rgba(244,113,19,.34) 1.04%, rgba(226,166,0,.34) 39.89%, rgba(240,83,12,.34) 99.58%)}
+.app .dark-card .kv,
+.app .dark-card .kv > div,
+.app .dark-card .stat,
+.app .dark-card .facts,
+.app .dark-card .facts > div,
+.app .dark-card .tile,
+.app .dark-card .cardrow,
+.app .dark-card .note{border-color:var(--on-dark-rule)}
+.app .dark-card .btn:not(.btn-p){border-color:transparent}
+.app .dark-card .tile,
+.app .dark-card .note{background-color:transparent}
 
 /* ---- 76-bookpage.css ---- */
 .app .sec-bk{display:flex; flex-direction:column; gap:0}
@@ -7920,6 +7933,7 @@ button.btn-p:active,
   .app .crow-dark .crow-a{padding-bottom:0}
 }
 .app .crow-dark .crow-a{align-self:flex-end}
+.app .crow-dark .crow-ph{background:var(--on-dark-fill)}
 
 /* ---- 78-topbar.css ---- */
 .app .crumb-bar{flex:1 1 auto; min-width:0; display:flex; align-items:center; padding-left:var(--s03)}
@@ -8045,3 +8059,14 @@ button.btn-p:active,
 .app .dark-card .eo-when svg{fill:currentColor}
 .app .qa-ic.ic-cover svg{fill:var(--mk-3)}
 .app .qa-ic.ic-found svg{fill:var(--mk-1)}
+.app .page > .keep-place:last-child > .sec::after{display:none}
+@container app (min-width:900px){
+  .app .page > .keep-place:last-child > .sec::after{display:none}
+}
+
+/* ---- 84-tintnorule.css ---- */
+.app .page > .sec.tint::after,
+.app .page > .sec:has(+ .sec.tint)::after,
+.app .page > .ph:has(+ .sec.tint)::after,
+.app .page > .crumb:has(+ .sec.tint)::after{display:none}
+.app .page > .sec:has(+ .sec.sec-rep)::after{display:none}

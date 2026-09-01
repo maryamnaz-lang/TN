@@ -657,44 +657,41 @@ const PAGESUM = {
        time on it — so the summary was spending a third of itself on the
        thing hardest to miss. What is left is the two things that are only
        findable by reading, and the first is first because it blocks other
-       people: an unsigned decision is a candidate who cannot enroll. */
-    return `${_W(pend)} decision${pend === 1 ? '' : 's'} ${pend === 1 ? 'is' : 'are'} waiting on your signature, and nobody in that queue can enroll until you sign. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
+       people: an unpublished summary is a candidate whose 90 days cannot close.
+       IT WAS "DECISIONS" AND IT IS "SUMMARIES" (1 Sep 2026). A cohort leader
+       does not interview, so no level decision reaches this portal; the clause
+       about enrolling went with it, because what a summary blocks is the far end
+       of the 90 days rather than the near one. */
+    return `${_W(pend)} 90-day ${pend === 1 ? 'summary is' : 'summaries are'} waiting on your signature, and nothing reaches those candidates&rsquo; next agent until you publish. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
   },
 
-  /* THE SEVEN MODULES, AND THE FOUR PAGES UNDER THEM.
+  /* THE SEVEN MODULES, AND THE THREE PAGES UNDER THEM.
      An entry here is what turns a hand-authored Tal card at the head of a
      leader page into `.talsum`; a page with NO entry leaves that card in a
      shape §33 does not style — a 1786px head band on a 1068px page. The long
      note above `ldrRead` in lead2.js records the whole mechanism. So every
-     leader view has one, and the four detail pages read their subject off
+     leader view has one, and the three detail pages read their subject off
      `S` the way `agent` and `chapter` do on the candidate side. */
-  leadSessions: () => {
-    const up = LEAD_SESSIONS.filter(s => s.state === 'upcoming');
-    const done = LEAD_SESSIONS.filter(s => s.state === 'done');
-    const due = done.filter(s => { const e = LEAD_EVALS.filter(x => x.name === s.name)[0]; return e && e.status === 'pending'; }).length;
+  /* `leadSessions` AND `leadEval` WERE HERE AND BOTH ARE DELETED (1 Sep 2026):
+     a cohort leader takes cohort calls and does not interview anybody, so the
+     five booked interviews and the level decision they produced are off the
+     portal. `leadCalls` is the diary that replaced the first; there is no page
+     under Evaluations any more except the summary, which already had its own
+     entry below. */
+  leadCalls: () => {
+    const up = lcalls();
     const nx = up[0];
-    return `${_W(up.length)} booked and ${_w(done.length)} already run${nx ? `, ${nx.name} next at ${nx.when.toLowerCase().replace(/^today /, '')} today` : ''}.${due ? ` ${_W(due)} of the finished ones still ${due === 1 ? 'needs' : 'need'} your evaluation before ${due === 1 ? 'that candidate' : 'those candidates'} can enroll.` : ''}`;
+    const run = LEAD_RUN.length;
+    const seats = LEAD_RUN.reduce((s,r) => s + lcoOf(r.co).members.length, 0);
+    const came = LEAD_RUN.reduce((s,r) => s + r.attended, 0);
+    return `${_W(up.length)} calls this week${nx ? `, Cohort ${nx.co} first at ${nx.time.toLowerCase()} ${nx.day.toLowerCase()}` : ''}. ${run ? `Across the ${_w(run)} behind you, ${came} of ${seats} seats were filled &mdash; the brief reads from where each cohort actually is.` : 'Your first cohort call is this week.'}`;
   },
 
   leadEvals: () => {
-    const pe = LEAD_EVALS.filter(e => e.status === 'pending');
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
-    const e0 = pe[0];
-    if(!pe.length && !ps.length) return 'Nothing is waiting on your signature &mdash; every level and every summary is signed.';
-    return `${pe.length ? `${_W(pe.length)} level decision${pe.length === 1 ? '' : 's'}` : 'No level decisions'} and ${ps.length ? `${_w(ps.length)} 90-day ${ps.length === 1 ? 'summary' : 'summaries'}` : 'no summaries'} waiting on you.${e0 ? ` I&rsquo;ve proposed Explorer &ndash; ${e0.ai} for ${e0.name}, but the level is yours to set.` : ''}`;
-  },
-
-  /* THE QUIZ SCORE LEFT THIS ONE. It arrived as a bare third sentence —
-     "Their quiz was 64 of 100." — under an analysis that had already said
-     the quiz and the interview agree, and above a `.note` on the same page
-     whose whole subject is how to read that 64. Three statements of one
-     number, and this was the one with nothing to add. */
-  leadEval: () => {
-    const e = LEAD_EVALS.filter(x => x.id === S.ldrEv)[0] || LEAD_EVALS[0];
-    const an = typeof LDR_AN !== 'undefined' ? LDR_AN[e.id] : null;
-    if(e.status === 'done')
-      return `Signed at Explorer &ndash; ${e.assigned}${e.override ? `, against my proposal of ${e.ai}` : ''}. ${e.name} can enroll now.`;
-    return an ? an.sum : e.why;
+    const s0 = ps[0];
+    if(!ps.length) return 'Nothing is waiting on your signature &mdash; every 90-day summary is published.';
+    return `${_W(ps.length)} 90-day ${ps.length === 1 ? 'summary is' : 'summaries are'} waiting on you, from Cohort ${s0.cohort}. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
   },
 
   leadSum: () => {

@@ -293,6 +293,13 @@ const LDR_CERTS = [
 V.leadCerts = () => {
   const led = 8, hours = 42;
   const promoted = 34;
+  /* THIRTEEN CALLS A COHORT, DERIVED FROM THE COHORTS CLOSED (1 Sep 2026). This
+     cell was "Interviews conducted: 62", which is an AGENT's figure — the same
+     number the public listing printed, and the one thing on a volunteer's own
+     record that belonged to the paid role. A cohort leader's throughput is the
+     calls they ran, and a closed cohort ran thirteen of them, so the figure is
+     `led` × 13 rather than a second literal that could disagree with it. */
+  const calls = led * 13;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Certifications')}
   ${''/* Three blocks in a row were explaining this page: this line, Tal's
@@ -363,17 +370,24 @@ V.leadCerts = () => {
         Eight closed, so this one is done. Completion means the cohort finished the 90 days, not that every candidate was promoted.</span></li>
       <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Forty hours of leader training</b>
         ${hours} hours this year. The Advanced track adds twelve more, which is the part still open.</span></li>
-      <li><span class="s-n">3</span><span class="s-b"><b>Twelve signed level decisions reviewed</b>
+      ${''/* IT WAS "TWELVE SIGNED LEVEL DECISIONS REVIEWED" (1 Sep 2026). A
+             cohort leader does not set levels, so the requirement that named
+             them named nothing — and the requirement it becomes is the same
+             SHAPE, which is the point: nine of twelve reviewed, three still
+             waiting, and the one thing on this list you cannot finish alone.
+             What is reviewed is the 90-day summary, which is the leader's own
+             signed document and the only one there is. */}
+      <li><span class="s-n">3</span><span class="s-b"><b>Twelve published 90-day summaries reviewed</b>
         Nine of twelve reviewed by the manager of cohort leaders. The three waiting are from the cohorts you closed in June.</span></li>
     </ol>
-    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your decision against the transcript and agreed with the level. It is the one requirement you cannot finish on your own.</p>
+    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your summary against the cohort&rsquo;s own record and agreed with the recommendation. It is the one requirement you cannot finish on your own.</p>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>The record behind them</h2></div>
     <div class="facts">
       <div><span class="l">Leading since</span><span class="v">${LEADER.since}</span></div>
       <div><span class="l">Cohorts closed</span><span class="v">${led}</span></div>
-      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Cohort calls led</span><span class="v">${calls}</span></div>
       <div><span class="l">Assessing range</span><span class="v">${LEADER.range}</span></div>
     </div>
   </div>
@@ -393,8 +407,17 @@ V.leadCerts = () => {
    reuse: that component prints `a.price`, and a fee on the volunteer portal
    would contradict the rule lead.js is built on in the one place a leader
    looks at themselves. What it draws instead is the part of the public listing
-   that IS about leading — the rating, the interviews, the range and the bio —
-   and it says which of the two roles the page is about.
+   that IS about leading — the rating, the cohorts, the range and the bio — and
+   it says which of the two roles the page is about.
+
+   AND SINCE 1 SEP 2026 THE SEPARATION IS THE WHOLE PAGE, NOT A CAVEAT ON IT.
+   A cohort leader does not interview, so three things on this page were the
+   agent's record standing on the volunteer's page: "62 interviews" on the
+   public card and again under Your standing, a 45-minute "session length", and
+   an availability calendar whose entire purpose was letting candidates book an
+   interview. Each is replaced by the leading equivalent rather than deleted,
+   because the page still has to answer the same four questions — who you are,
+   what candidates see, when you are on, and how you are measured.
 
    EDITING IS A SHEET, READING IS THE PAGE. Same shape as the candidate's own
    Profile: `.idhead` with the photo, a `.tile` of `.kv` rows for what is set,
@@ -421,7 +444,7 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div class="kv"><span class="k">Display name</span><span class="v">${LEADER.n}</span></div>
       <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
       <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
-      <div class="kv"><span class="k">Session length</span><span class="v n">45 minutes</span></div>
+      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
       <div class="kv"><span class="k">Role</span><span class="v n">Volunteer cohort leader &middot; unpaid</span></div>
     </div>
   </div>
@@ -432,34 +455,44 @@ V.leadProfile = () => `<main class="main"><div class="page">
         <span class="av-ph" style="width:56px;height:56px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
         <div class="idhead-b">
           <span class="idname">${LEADER.n}</span>
-          <span class="idmeta">${stars(4.9)} 4.9 &middot; 62 interviews &middot; ${LEADER.range}</span>
+          <span class="idmeta">${stars(4.9)} 4.9 &middot; 8 cohorts led &middot; ${LEADER.range}</span>
         </div>
       </div>
       <p class="t-helper-01">&ldquo;Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback &mdash; if something is not working I will say so in the first ten minutes.&rdquo;</p>
     </div>
-    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interview fees, where they apply, are set on your agent listing and not here &mdash; leading a cohort is unpaid.</p>
+    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Availability</h2><span class="t-helper-01">Candidates can only book what you open</span></div>
+    ${''/* TWO ROWS BECAME ONE, AND THE ONE THAT SURVIVED IS THE REAL ONE
+           (1 Sep 2026). The first row was a bookable calendar — "Tuesday and
+           Thursday afternoons &middot; 6 slots open next week" — which only
+           meant anything while candidates could book this person for an
+           interview. Nobody books a cohort leader. The second row was already
+           the truth and is now the section: three cohorts, three fixed hours a
+           week, read off the same cohort record `lcall` reads.
+           IT KEEPS THE SHEET, because the hours themselves are still a setting
+           a leader changes — what changed is that changing one moves a call
+           rather than opening a slot. */}
+    <div class="sec-h"><h2>When you are on</h2><span class="t-helper-01">Three cohorts, one hour a week each</span></div>
     <div class="tile-stack">
       <div class="cardrow">
-        <span class="cardrow-ic">${I.calendar}</span>
+        <span class="cardrow-ic">${I.group}</span>
         <span class="cardrow-b">
-          <span class="cardrow-t">Weekly calendar</span>
-          <span class="cardrow-d">Tuesday and Thursday afternoons, Friday morning &middot; 6 slots open next week</span>
+          <span class="cardrow-t">Your cohort calls</span>
+          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.call.toLowerCase()).join(' &middot; ')}</span>
         </span>
         <span class="cardrow-a">
           <button class="btn btn-sm noic" data-ldravail="1">Manage</button>
         </span>
       </div>
       <div class="cardrow">
-        <span class="cardrow-ic">${I.group}</span>
+        <span class="cardrow-ic">${I.calendar}</span>
         <span class="cardrow-b">
-          <span class="cardrow-t">Cohort calls</span>
-          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.callDay + ' ' + c.callTime.toLowerCase()).join(' &middot; ')}</span>
+          <span class="cardrow-t">Calls already run</span>
+          <span class="cardrow-d">${LEAD_RUN.length} behind you &middot; attendance is on the Calls page</span>
         </span>
         <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-go="leadCohorts">Cohorts</button>
+          <button class="btn btn-sm noic" data-go="leadCalls">Calls</button>
         </span>
       </div>
     </div>
@@ -468,11 +501,11 @@ V.leadProfile = () => `<main class="main"><div class="page">
     <div class="sec-h"><h2>Your standing</h2><span class="t-helper-01">Read-only &middot; across every cohort you have closed</span></div>
     <div class="facts">
       <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
-      <div><span class="l">Interviews conducted</span><span class="v">62</span></div>
+      <div><span class="l">Cohorts led</span><span class="v">8</span></div>
       <div><span class="l">Completion rate</span><span class="v">84%</span></div>
       <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
     </div>
-    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; levelling somebody too high comes back later as a candidate who does not finish.</p>
+    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; recommending a promotion somebody is not ready for comes back later as a candidate who does not finish the next 90 days.</p>
   </div>
   <div class="sec tint">
     <div class="sec-h"><h2>Who reviews you</h2></div>
@@ -480,15 +513,15 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div class="kv"><span class="k">You</span><span class="v">Cohort leader</span></div>
       <div class="kv"><span class="k">Reviewed by</span><span class="v n">Manager of cohort leaders, then supervisor</span></div>
       <div class="kv"><span class="k">Your own level</span><span class="v n">Adjustable by a super-admin</span></div>
-      <div class="kv"><span class="k">Decisions reviewed</span><span class="v n">9 of 12 signed this year</span></div>
+      <div class="kv"><span class="k">Summaries reviewed</span><span class="v n">9 of 12 published this year</span></div>
     </div>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>Notifications</h2></div>
     <label class="tg"><div class="tb"><b>A candidate goes quiet</b><span>After four days without a sign-in</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>An interview is booked with you</b><span>As soon as a candidate takes a slot</span></div><input type="checkbox" checked><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>A cohort call is an hour away</b><span>One reminder, on the day</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Posts on a cohort board</b><span>A daily digest rather than each one</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>Evaluation reminders</b><span>24 hours before the 48-hour deadline</span></div><input type="checkbox"><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Summary reminders</b><span>A week before a cohort reaches day 90</span></div><input type="checkbox"><span class="sw"></span></label>
   </div>
 </div></main>`;
 
@@ -517,8 +550,8 @@ function ldrProfileSheet(){
           <input class="inp" id="ldrPs" value="Operations teams, first-line leadership"></div>
         <div class="f"><label for="ldrPb">Bio shown on your card</label>
           <textarea class="inp" id="ldrPb" rows="3">Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.</textarea></div>
-        <div class="f"><label for="ldrPl">Session length</label>
-          <select class="inp" id="ldrPl"><option>45 minutes</option><option>30 minutes</option><option>60 minutes</option></select></div>
+        <div class="f"><label for="ldrPl">Cohort call length</label>
+          <select class="inp" id="ldrPl"><option>60 minutes</option><option>45 minutes</option><option>90 minutes</option></select></div>
         <p class="t-helper-01">Your assessing range comes from your certifications and cannot be set here.</p>
       </div>
       <div class="sheet-f">
@@ -529,31 +562,50 @@ function ldrProfileSheet(){
   </div>`;
 }
 
-/* THE CALENDAR IS A WEEK OF TOGGLES, not a month grid. What a leader opens is
-   a repeating weekly pattern — "Tuesday afternoons" — and a month view would
-   ask them to do that fifty-two times. `.tg` with `.sw` is the product's own
-   switch row, so the availability a candidate books against is drawn by the
-   same control as the notification a leader turns off. */
-const LDR_DAYS = [['Monday','Cohort 47 call at 6:00 PM',0],['Tuesday','2:00 – 5:00 PM',1],
-                  ['Wednesday','Nothing open',0],['Thursday','2:00 – 5:00 PM &middot; Cohort 41 call at 6:00 PM',1],
-                  ['Friday','9:00 AM – 12:00 PM &middot; Cohort 33 call at 5:00 PM',1],
-                  ['Saturday','Nothing open',0],['Sunday','Nothing open',0]];
+/* THE CALENDAR IS A WEEK OF TOGGLES, not a month grid. What a leader sets is a
+   repeating weekly pattern — "Thursday evenings" — and a month view would ask
+   them to do that fifty-two times. `.tg` with `.sw` is the product's own switch
+   row, so the hours a leader commits are drawn by the same control as the
+   notification they turn off.
+
+   IT IS THE CALL SCHEDULE NOW, NOT BOOKABLE HOURS (1 Sep 2026). Every row used
+   to carry two different things: an open window a candidate could book an
+   interview in ("2:00 – 5:00 PM") and a fixed cohort call shown "for context".
+   Nobody books a cohort leader, so the windows are gone and the calls are the
+   whole list — which also fixes something the old sheet could not: the three
+   days with a call were the three that were ON, so a leader turning Thursday
+   off was switching off a bookable window and appearing to switch off Cohort
+   41's call.
+
+   THE DAYS ARE READ OFF `LEAD_COHORTS`, NOT TYPED. `c.call` is already
+   "Thursday 6:00 PM" and the Cohorts page, the roster and the candidate's own
+   Cohort page all read it; a second copy here is the drift `bkStamp` exists to
+   prevent, and this sheet had already drifted once — its Monday row said
+   "Cohort 47 call at 6:00 PM" while `LEAD_COHORTS[2].call` said the same thing
+   in two other places. A day with no call is `Nothing scheduled` and is off. */
+const LDR_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const ldrDays = () => LDR_DAY_NAMES.map(d => {
+  const c = LEAD_COHORTS.filter(x => x.call.split(' ')[0] === d)[0];
+  return c
+    ? [d, `${lname(c)} &middot; ${c.call.split(' ').slice(1).join(' ')} &middot; 60 minutes`, 1]
+    : [d, 'Nothing scheduled', 0];
+});
 
 function ldrAvailSheet(){
   return `<div class="modal ${S.ldrAvail ? 'on' : ''}" data-ldrclose="avail">
     <div class="sheet">
-      <div class="sheet-h"><h2>Your weekly availability</h2>
+      <div class="sheet-h"><h2>Your weekly calls</h2>
         <button class="x" data-ldrclose="avail" aria-label="Close">${I.close}</button></div>
       <div class="sheet-b">
-        <p class="t-helper-01 mb6">Candidates can only book the hours you open here. Your three cohort calls are fixed and shown for context &mdash; they are not bookable.</p>
-        ${LDR_DAYS.map(([d,detail,on],i) => `
+        <p class="t-helper-01 mb6">One call a week for each cohort you lead. Moving one moves it for every candidate in that cohort, so the change is announced on their board.</p>
+        ${ldrDays().map(([d,detail,on],i) => `
         <label class="tg"><div class="tb"><b>${d}</b><span>${detail}</span></div>
           <input type="checkbox" id="ldrDay${i}" ${on ? 'checked' : ''}><span class="sw"></span></label>`).join('')}
-        <p class="t-helper-01 mt5">Six slots open next week. A candidate booking one of them is the interview appearing on your Sessions page.</p>
+        <p class="t-helper-01 mt5">${LEAD_COHORTS.length} calls a week, ${LEAD_COHORTS.length * 60} minutes in total. A cohort that reaches day 90 gives its slot back.</p>
       </div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-ldrclose="avail">Cancel</button>
-        <button class="btn btn-p noic" data-ldrclose="avail">Save availability</button>
+        <button class="btn btn-p noic" data-ldrclose="avail">Save changes</button>
       </div>
     </div>
   </div>`;
@@ -627,14 +679,15 @@ device.addEventListener('keydown', e => {
 });
 
 /* ==========================================================================
-   THE FOUR NEW PAGES NAME THEMSELVES
+   THE PAGES UNDER A MODULE NAME THEMSELVES
 
    `LEAD_TAL.where` is the leader's map of view to page name, written in
    lead.js for the Tal panel's own header and copied into `ASK_WHERE` for the
    ask field's "Back to ..." label. It has an entry per module, which was
    every leader page there was. These four are pages UNDER a module — a
-   roster, a candidate, a decision, a summary — and without an entry each one
-   would be labelled "TalentNext" by ai4's fallback.
+   roster, a candidate, a summary — and without an entry each one would be
+   labelled "TalentNext" by ai4's fallback. `leadEval` was the fourth and is
+   deleted with the level decision (1 Sep 2026).
 
    `.ctx` is the same story for Tal's suggested questions: a page with no
    entry falls back to the dashboard's three, which ask about the wrong page.
@@ -643,12 +696,11 @@ device.addEventListener('keydown', e => {
    ========================================================================== */
 Object.assign(LEAD_TAL.where, {
   leadCohort:'a cohort', leadMember:'a candidate',
-  leadEval:'a level decision', leadSum:'a 90-day summary'
+  leadSum:'a 90-day summary'
 });
 Object.assign(LEAD_TAL.ctx, {
   leadCohort: ['Where is this cohort stuck?','Brief me for this call','Who here needs me most?'],
   leadMember: ['What should I say to them?','Is this recoverable?','Draft a check-in'],
-  leadEval:   ['Why did you propose this level?','What evidence supports it?','What would change your mind?'],
   leadSum:    ['Are they ready to be promoted?','What should I write here?']
 });
 Object.assign(ASK_WHERE, LEAD_TAL.where);
