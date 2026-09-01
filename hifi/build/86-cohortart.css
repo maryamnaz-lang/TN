@@ -1,0 +1,78 @@
+/* ==========================================================================
+   86. THE COHORT COVER — `.gcard-art`
+   Maryam, 1 Sep 2026: "the cohort left blocks should have images … also the
+   block square should have the height equal to the right side content."
+
+   WHAT IT REPLACES. `gcard`'s leading slot is `.cardrow-ic` — a 40px box with
+   a glyph in it — and on the leader's three cohort rows that glyph was `I.group`
+   three times over. §31's `faceRow` note makes the argument this is the other
+   half of: "four rows carrying the same pencil say nothing except *these are the
+   same kind of task*, which the heading above them already said". A cohort has
+   no face, so it gets a cover; the covers are Maryam's own three and build.py's
+   `COHORT_ART` note says how they are cropped and why they are keyed by level.
+
+   THE HEIGHT IS THE CONTENT'S, AND `align-self:stretch` IS THE WHOLE OF IT.
+   The art is a flex item in `.gcard`'s row (§02.229), so stretching it makes its
+   height the row's own content height — no measurement, no `100%` against an
+   indefinite parent, and it follows §63 automatically when a type role changes.
+
+   THE WIDTH IS STATED, AND THAT IS DELIBERATE RATHER THAN A SHORTFALL. The
+   obvious way to write "square" is `aspect-ratio:1` with an `auto` width, and it
+   does not work here — §75.3 records the same trap from the other side. A flex
+   (or grid) container sizes the cross axis LAST: at the point the row's main
+   axis is being resolved the item's height is not yet known, so a ratio has
+   nothing to transfer into and the box collapses to its content (§75.3 measured
+   an 18px photograph shipping silently). So the side is written down instead —
+   but as a `calc()` of the THREE TYPE ROLES the body draws, not as a number:
+
+     `--t-eyebrow-lh`   16   "Cohort 41 · Explorer – E3"
+     `--s03`             8   §02.33's margin under `.eyebrow`
+     `--t-h4-lh`        19   "Week 5 of 13"      (§02.257 / §63's h4 tier)
+     2px                 2   §02.261's margin over `.sub`
+     `--t-desc-lh`      17   the progress line
+                       ---
+                        62
+
+   which means the two are equal BY CONSTRUCTION at one line each, and a change
+   to any of those five values moves both together. A literal 62px would have
+   been the same pixels and the wrong rule.
+
+   AND WHEN THE DESCRIPTION WRAPS THE BOX GETS TALLER, WHICH IS CORRECT. On a
+   phone that progress line is three lines, so the content is ~96px and the cover
+   becomes a 62 × 96 portrait crop rather than a square. That is what the ask
+   says — the height equals the content — and it is the better of the two
+   failures: a 96px square would take a quarter of a 390px row, and a 62px square
+   floating beside 96px of text is the mismatch this rule exists to remove.
+   `object-fit:cover` is what makes a taller box read as a tighter crop instead
+   of a stretched picture.
+
+   THE `<i>` IS THE FALLBACK, NOT DECORATION. `gcard` writes the cohort's number
+   behind the `<img>` and the image's `onerror` uncovers it, which is the same
+   arrangement `avatar()` and `.crow-ph` use — so a cover that fails to decode
+   leaves a numbered tile rather than an empty one. §63 §23 states its type.
+   ========================================================================== */
+.app .gcard-art{
+  --gcard-art:calc(var(--t-eyebrow-lh) + var(--s03) + var(--t-h4-lh) + 2px + var(--t-desc-lh));
+  position:relative;overflow:hidden;
+  flex:none;align-self:stretch;
+  width:var(--gcard-art);min-height:var(--gcard-art);
+  display:grid;place-items:center;
+  background:var(--layer-02)}
+.app .gcard-art > img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover}
+/* `<i>` is italic by default — the trap §56's ladder note records, and §11.134's
+   list of initials slots does not reach this one. Its SIZE and ink are §63 §23's;
+   `font-style` is not one of that layer's four properties, so it is stated here
+   with the component. */
+.app .gcard-art > i{font-style:normal}
+
+/* THE ROW STOPS CENTRING ITS OWN CONTENT, because a stretched item and a
+   centred one cannot both be right: §02.229 sets `align-items:center` on every
+   list row in the build, and `align-self:stretch` on the art is what overrides
+   it for this one item. The body and the arrow keep the centring — the arrow
+   explicitly, because with a two-line body it would otherwise sit against the
+   top of a 96px row. Stated on the ART and the ARROW rather than by turning the
+   row into `align-items:stretch`, which would also stretch the 16px chevron
+   into a 62px column. */
+.app .gcard:has(> .gcard-art) > .tile-arrow{align-self:center}

@@ -183,7 +183,23 @@
      with its own border (the rule immediately below, which took the stats
      section's `::after` away for exactly that reason and could not see this
      one). Per trap 4 the unjoining goes in this list. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
+  /* `:not(:has(+ .sec.dark-card))` — A BLACK CARD IS NEVER THE FAR HALF OF A
+     HAIRLINE JOIN (Maryam, 1 Sep 2026: "remove the divider between these
+     cards"). §20.102 made exactly this argument for the padding half of the
+     pair — "a dark card is never HALF of a join in either direction: it is not
+     a white block whose bottom edge is a hairline shared with the next one" —
+     and the rule list never got the matching entry, because until now nothing
+     had a `.sec` directly above a `.dark-card`.
+     THE `promoted` DASHBOARD IS THE FIRST, and it matched by accident of
+     structure rather than by intent: this selector's test is "does the next
+     block name itself with a heading", and `aiHead` returns a `.sec-h`, so the
+     offer answered yes. It does name itself — and it does it with a black edge
+     32px further down, so the hairline was a second boundary for one seam, at
+     the one width where the card's own inset makes the two visibly different
+     lengths. §75's recipe already says the card owns its seams; this is the
+     side of it the recipe could not state, because it is a property of the
+     NEIGHBOUR and lives in this list by trap 4's rule. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

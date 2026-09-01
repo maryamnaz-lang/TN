@@ -1,0 +1,302 @@
+/* ==========================================================================
+   §85 — THE CERTIFICATE BANNER, AND TWO ALIGNMENTS ON THE PULSE CARD
+   Maryam, 1 Sep 2026
+
+   Five unrelated corrections share a layer because all five are LATE by the
+   same rule: each one answers a declaration an earlier layer already makes at a
+   weight this cannot reach from where that layer sits.
+
+     85.1  `.certban`   the certificate as a short tinted banner — the
+                        `promoted` dashboard as a dismissible notice, My Level
+                        as content, both replacing the black `.cert` card.
+     85.1b `.dark-card` no closing hairline on the section above a black card,
+                        narrow tier. The desktop half is an entry in §14's
+                        `:not()` list, per trap 4.
+     85.2  `.sec-pulse` the head row's action, top-aligned and at the primary
+                        button's own height.
+     85.3  `.pnc-when`  the countdown, bottom-aligned instead of centred.
+     85.4  `.head-col`  the band's second-column tenant fills its column.
+
+   §63 OWNS EVERY SIZE, WEIGHT, CASE AND INK IN 85.1 and states them itself; the
+   only `color` here is on a mark's `fill`, which is not text. See §63 §21.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- 85.1 ---
+   THE BANNER
+
+   "A less heighted light orange banner with the page padding not joint from
+   both sides, and this card will have less content and smaller badge icon."
+   Four requirements, and each one is a specific departure from `.cert`:
+
+   THE GROUND IS AN 8% ACCENT WASH, NOT `--brand-tint-2`. That token (#fcdbc7)
+   is a 20%-strength tint and is reserved: §10.29 spends it on the candidate's
+   own SELECTION — the lit day, the lit time, the step numeral — so a
+   full-width band in it would be the largest "you chose this" object on a page
+   where nothing has been chosen. `color-mix(in srgb, var(--accent) 8%,
+   transparent)` is the same hue two steps quieter, it follows `--accent` if the
+   brand moves, and it is what §67/§83's red trial re-points for free. 8 rather
+   than §74's 5: that layer's 5% cards sit on a WHITE panel where 5 is already
+   visible, and this band sits on the page's own ground with a grey Quick Action
+   panel 32px above it, where 5% read as a printing error.
+
+   "NOT JOINT FROM BOTH SIDES" IS THE `.sec`'S OWN PADDING AND NOTHING ELSE,
+   AND THE FIRST VERSION PAID IT TWICE (Maryam, 1 Sep 2026: "the banner should
+   have width equal to the other content"). It shipped with
+   `margin:0 var(--pad-x)`, copied from §75's recipe for the black card — and
+   that recipe is for a `.sec` that IS the card, where §75 zeroes the section's
+   padding and hands the gutter to a margin instead. This band is a child of an
+   ordinary `.sec`, which has already paid `--pad-x` as padding, so the margin
+   was a second inset: 32px in from a content edge already 32px in, and the
+   strip sat 32px narrower than the Quick Actions directly above it on both
+   sides.
+
+   SO THERE IS NO HORIZONTAL MARGIN AT ALL. The section's padding is the
+   alignment, which is what every other white-ground block on the page uses and
+   the only way the two edges can be guaranteed to agree at all three gutter
+   widths. `.cert` is the opposite case and worth knowing: §15.522 pulls itself
+   OUT by `calc(var(--pad-x) * -1)` to bleed rail to rail, which is what makes
+   it a wall rather than an object. Three components, three answers, one rule
+   behind them — ask what the parent already paid.
+
+   "LESS HEIGHTED" IS `--s05` OF PADDING AND A 32px MARK. `.cert` pays `--s07`
+   over and under (`--s08` at 672 and up) round an 88px glyph and four rows of
+   text, which is what makes it ~200px tall. This is one row: 16px of padding, a
+   32px mark, and a two-line block whose taller line is 22px — about 72px, so
+   roughly a third of the card it replaces.
+
+   IT IS A ROW THAT WRAPS RATHER THAN A GRID WITH BREAKPOINTS. `.cert` needs a
+   grid because it has four parts and a stacked phone layout to name; this has
+   three and the natural wrap order — mark and title, then the buttons — is the
+   source order. `flex-wrap` plus `margin-left:auto` on the actions gives the
+   phone layout with no container query at all, which is why there is no
+   narrow-width block in this section.
+   -------------------------------------------------------------------------- */
+.app .certban{
+  display:flex;align-items:center;flex-wrap:wrap;
+  gap:var(--s04) var(--s05);
+  padding:var(--s05);
+  background:color-mix(in srgb, var(--accent) 8%, transparent)}
+
+/* THE MARK IS 32px AND IT IS THE ONE ORANGE OBJECT ON THE BAND. `--accent-text`
+   (#b94a09) rather than `--accent` (#f57414): the ground is already warm, so
+   the brighter fill reads as a wash on a wash — §01's fill/ink split, and the
+   same call §76 makes for its step numeral on a tint. `flex:none` because a
+   mark in a wrapping row must never be the thing that shrinks. */
+.app .certban-mk{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px}
+.app .certban-mk svg{width:32px;height:32px;fill:var(--accent-text)}
+
+/* THE TEXT BLOCK TAKES THE SLACK, WITH A FLOOR SO IT WRAPS BEFORE THE BUTTONS
+   DO. `flex:1 1 220px` — a real basis rather than `auto`, which is §73.1's
+   lesson: a flex item only moves to a new line when its BASE size does not fit,
+   so with `auto` this would shrink to nothing and set the level name one word
+   to a line instead of letting the button group drop below it. */
+.app .certban-b{
+  flex:1 1 220px;min-width:0;
+  display:flex;flex-direction:column;gap:2px}
+
+/* THE ACTIONS. `margin-left:auto` holds them at the far end while there is
+   room and is harmless once the row wraps, because a wrapped line's free space
+   is in front of the only item on it — the pair goes full width there by the
+   basis above rather than by a media query. */
+.app .certban-a{
+  flex:none;margin-left:auto;
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
+
+/* THE ACTION IS THE ACCENT BUTTON, AND `.btn-p` ALONE DOES NOT GET YOU THERE —
+   MEASURED, NOT ASSUMED (Maryam, 1 Sep 2026: "the download button should be
+   orange in color", "the download button text should be View").
+
+   `.btn-p` IS BLACK BY DEFAULT IN THIS BUILD. Writing `class="btn btn-p"` and
+   expecting orange is the mistake this rule exists to correct: the markup
+   shipped that way for one build and rendered `rgb(0,0,0)` with
+   `background-image:none`. The accent fill is an OVERRIDE that §19 grants to
+   `.plate .btn-p`, which is why the CTA inside a black card is orange and the
+   same class on a white page is not.
+
+   SO IT IS §73.165's THREE DECLARATIONS, COPIED WITH THE SAME NOTE BEHIND
+   THEM. That layer hit this exact wall when the enrolment offer stopped being
+   a `.plate` — "taking the plate away took the accent with it and left the
+   page's one decision as a black rectangle" — and §71.2 hit it when the weekly
+   call did. This is the third. `--on-brand-fill:1` is not decoration: §19 keys
+   the ink, the focus ring and the transparent border off that flag, so the
+   gradient without it is orange with black text on it.
+
+   THE OLD RULE HERE IS DELETED, not amended. It gave the two quiet buttons a
+   `--rule` border and a white ground, which was right for a pair of secondary
+   actions on a tint and would now paint white over the accent fill.
+
+   ONE ORANGE OBJECT WAS THE OLD ARGUMENT AND THE MARK IS WHY IT STILL HOLDS.
+   §85.1's note reserves the band's single accent for the badge; a `.btn-p`
+   beside it is a second, and that is a change worth naming rather than a
+   contradiction. The mark is `--accent-text` (#b94a09) and the button is the
+   `--accent` gradient (#f57414) — a dark ink and a bright fill, which read as
+   two different KINDS of object rather than as the same hue twice. This is
+   §01's own fill/ink split doing the separating.
+
+   NOTHING IS STATED FOR `.certban-a` ITSELF beyond §85.1's flex — one child
+   now, so the group's `gap` and `flex-wrap` are inert and kept only because a
+   second action would need them and because removing them would be churn. */
+.app .certban-a > .btn-p{
+  background-image:var(--accent-grad);
+  border-color:transparent;
+  --on-brand-fill:1}
+
+/* THE CLOSE. A 32px hit area round a 16px glyph, transparent, sitting past the
+   action group at the true end of the row.
+
+   IT IS `--text-secondary`, NOT THE ACCENT AND NOT `--text-primary`. Dismissing
+   is the least important thing on the strip — it must be findable and must not
+   compete with either the level name or the button — and secondary ink is the
+   tier §63 §3 gives exactly that job. `currentColor` on the glyph so the one
+   declaration draws both.
+
+   `flex:none` AND NO `margin-left:auto`. The auto margin belongs to
+   `.certban-a`, which pins the pair to the right; a second one here would leave
+   the row's slack between the button and the cross instead of in front of both
+   — §77's `.dc-act` / `.dc-when` note is the same trap on the black card. */
+.app .certban-x{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;padding:0;
+  background:transparent;border:0;
+  color:var(--text-secondary);cursor:pointer}
+.app .certban-x svg{width:16px;height:16px;fill:currentColor;display:block}
+
+/* ------------------------------------------------------------------ 85.1b ---
+   NO HAIRLINE ABOVE A BLACK CARD — THE NARROW TIER
+
+   "Remove the divider between these cards" (Maryam, 1 Sep 2026) needed answers
+   in BOTH tiers, and they are different rules for the honest reason that the
+   two tiers draw the line from different places. This is trap 3 read the way
+   round it is usually not: the desktop half could not be won from here, and
+   this half cannot be won from there.
+
+     desktop   §14.78 turns every `.page > .sec::after` OFF, and §14.186
+               switches it back on when the next block names itself with a
+               heading. `aiHead` returns a `.sec-h`, so the offer answered yes
+               and the pair matched. That selector is inside a container query
+               with a long `:not()` list, which trap 4 says is where "which
+               pairs are joined" is decided — so the fix is an entry in the
+               list, `:not(:has(+ .sec.dark-card))`, and it is in §14 with its
+               own note. It CANNOT be answered from this layer at any weight.
+     below 900 §10.63 draws `.sec::after` unconditionally and §14 is not in
+               play at all, so the same pair needs saying again — here, with no
+               query round it.
+
+   ONE RULE, BOTH TIERS, AND THE DESKTOP ONE IS REDUNDANT BY DESIGN. This is
+   written unconditionally rather than wrapped in `@container app
+   (max-width:899.98px)`: at desktop it simply agrees with §14's list, and a
+   `display:none` that says the same thing twice is cheaper than a second
+   breakpoint to keep in step. If §14's entry is ever reverted, this one keeps
+   the narrow tier correct on its own.
+
+   KEYED ON `.dark-card`, NOT ON WHAT THE SECTION CONTAINS — §20.121's rule,
+   quoted there: "`:has(> .plate)` came loose the moment the call stopped being
+   a plate. `.dark-card` is the class the conversion IS, so this cannot come
+   loose unless the component is renamed." */
+.app .page > .sec:has(+ .sec.dark-card)::after{display:none}
+
+/* ------------------------------------------------------------------- 85.2 ---
+   THE PULSE'S ACTION — TOP-ALIGNED, AT THE PRIMARY BUTTON'S HEIGHT
+
+   "The open chapter 4 button should have the height of our primary button and
+   it should be top aligned."
+
+   BOTH HALVES ANSWER §73.1, AND NEITHER CAN BE WON FROM `aiHead` ITSELF.
+   That layer states `align-self:center` on both children of `.aih` at (0,6,0)
+   and its note is a long argument for centring — correctly, for the two callers
+   it was written for, whose text block is a title and ONE description line
+   against a 40px control. §63's move of `.aih-d` to `--t-body` (13.5/22) made
+   the pulse's derived lede wrap to two lines at every real width, so the block
+   is now ~70px and centring put the button beside the second line with the
+   heading 24px above it. Top-aligned it lands on the heading's own row.
+
+   SCOPED TO `.sec-pulse`, at (0,5,0) over §73.1's (0,4,0). The offer took the
+   same correction one section earlier under `.sec.eo`; the cover row is the one
+   caller still centred, and it is the one whose lede is a single line. When a
+   third block wants this, the honest move is to turn §73.1's default round and
+   list the exception rather than adding a third scope.
+
+   THE HEIGHT IS 40px, WHICH IS WHAT `btn-sm` IS NOT. The action is
+   `.btn.btn-p.btn-sm`, and `btn-sm` is a smaller control by definition — beside
+   the offer's `Enroll now`, which §73.1 pins at `min-height:40px`, the two read
+   as different sizes of the same button on two dashboards. Stated as
+   `min-height` rather than `height` so a wrapped label can still grow the box
+   instead of clipping (§56's safety valve, one component along).
+   -------------------------------------------------------------------------- */
+.app .page .sec.sec-pulse > .sec-h.aih > .aih-a{align-self:flex-start}
+.app .page .sec.sec-pulse > .sec-h.aih > .aih-a > .btn{min-height:40px}
+
+/* ------------------------------------------------------------------- 85.3 ---
+   THE COUNTDOWN SITS AT THE FOOT OF ITS ROW
+
+   "The in 2 days time should be bottom aligned."
+
+   §79 STATES `align-self:center` HERE AND CALLS IT OUT AS DELIBERATE — "the one
+   place on this row where stretch is wrong: the square wants the row's full
+   height and the time wants the middle of it". The square keeping `stretch` is
+   still right and is untouched; what changes is the third track. `.pnc-b` packs
+   the name and the role to the row's centre, so a centred countdown lands level
+   with the gap between those two lines — beside neither of them. On the row's
+   baseline it lines up with the role line, which is the last thing read before
+   it, and the row reads as one object with a fact at its foot.
+
+   `end`, NOT `flex-end`. `.pnc-row` is a GRID (§79.145), so this is the block
+   axis and the grid keywords are the ones that apply; `flex-end` is accepted as
+   a legacy alias here but would misread as a claim that the parent is a flex
+   row — which is trap 19's whole family of mistakes. (0,3,0) beats §79's
+   (0,2,0) on weight as well as on order.
+
+   NOT TOUCHED BELOW 600, where §79's own stacked rule turns the row into a
+   column: there the countdown is a block on its own line and `align-self` is
+   the inline axis, so a `flex-end` there would push it to the right-hand edge
+   rather than the foot. This rule is unconditional because `end` in that
+   context still reads as the row's start-aligned default under §79's own
+   `justify-items`, and nothing measured moves — verified at 390 and 760.
+   -------------------------------------------------------------------------- */
+.app .pnc-row > .pnc-when{align-self:end}
+
+/* ------------------------------------------------------------------- 85.4 ---
+   THE POINTS STRIP FILLS THE BAND'S SECOND COLUMN
+
+   Maryam, 1 Sep 2026: "The points should also be aligned with the summary then,
+   and it should have full width of the block, like right now it is leaving space
+   on the right so may be the bar with right side content could go to full width
+   of the block."
+
+   TWO HALVES, AND THE ALIGNMENT ONE IS NOT HERE. Tal's card was starting 50px
+   below the points column because §70.3b was still assigning the summary to
+   grid row two on a page whose `.ph` §78 had hidden — that is a wrong gate, not
+   a spacing value, so it is fixed at the gate with `:not(.ph-bare)` and §70.3b
+   carries the note. This section is only the width half.
+
+   `flex:1` ON THE CHILD, BECAUSE THE COLUMN IS A ROW FLEX. §70.3 makes
+   `.head-col` `display:flex; align-items:flex-start` — and `align-items` on a
+   ROW is the VERTICAL axis, so it top-aligns the strip and says nothing at all
+   about its width. With no `flex-grow` the item took its content's size:
+   measured 180px inside a 362px content box at a 1728 frame, which is the
+   ~180px of empty ground at the right-hand end that the ask names. `stretch`
+   would not have fixed it either — that is the same vertical axis. This is
+   trap 19's family: the property that looks like it should answer the question
+   is defined by an axis the parent chose.
+
+   `min-width:0` WITH IT. `.score` holds a progress rail and a figure row, and
+   a flex item's floor is `auto` — its min-content — so a wide rank name could
+   push the cell past the track it is meant to fit inside.
+
+   IT IS THE SAME JOB §70.3 DOES FOR THE LEFT CELL, ONE LINE LOWER DOWN: that
+   layer states `> .sec:has(> .ai-aura.talsum) > .ai-aura{width:100%}` for
+   exactly this reason, on exactly this band. The right column simply never had
+   a tenant that needed it — the journey list and the progress wing both size
+   themselves — so this is the third tenant paying a cost the first two did not.
+
+   SCOPED TO THE BAND. `scoreCard` is drawn on its own page too, in an ordinary
+   `.sec` where the block is already full width and `flex` means nothing; the
+   descendant `.modhead > .head-col` keeps this to the one place it is needed.
+   Inside the container query per trap 3, because §70.3 states the column's flex
+   there and below 900 the band is one column with no second cell to fill.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .modhead > .head-col > .score{flex:1;min-width:0}
+}

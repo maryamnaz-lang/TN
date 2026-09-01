@@ -13,17 +13,38 @@
    introduces itself with a heading, an accordion, a tab strip or the level
    hero — the point where the page genuinely changes subject.
 
-   And the spacing follows from that, which is the half of this that
-   actually makes it read as one section rather than three that happen to
-   have lost their lines. TWO BLOCKS WITH NO RULE BETWEEN THEM PAY HALF THE
+   THE HALF-GAP IS GONE — Maryam, 1 Sep 2026: "each section on all pages on
+   both portals should have equal spacing from each other."
+
+   This layer used to say: "TWO BLOCKS WITH NO RULE BETWEEN THEM PAY HALF THE
    GAP: 16 and 16 rather than 24 and 24. Where a rule does fall, the full 24
    stays on both sides of it, because there the space is doing the same job
-   the rule is.
+   the rule is." That is a good system and it is the single largest source of
+   the unevenness the instruction is about: measured across 184 pages, **94 of
+   349 adjacent section pairs sat at 32px against the product's 48**, all of
+   them at desktop, because this tier is the only place the halving is stated.
+   A reader scrolling one page met both.
 
-   The `:not()` chain below is not decoration — it is the same condition
-   layer 14 uses to decide which rules survive, restated so that the spacing
-   and the rules can never disagree with each other. If one changes, both
-   have to.
+   IT IS ALSO A SYSTEM THAT HAD LOST ITS OTHER HALF. The argument is "space
+   follows the rule" — half the gap where no hairline falls. §54, §55.2 and
+   §84 have since taken the hairline off every tinted section and its
+   neighbour, and §14's re-enabler list has grown four entries, so "no rule
+   between them" stopped predicting "these two are one block" some time ago.
+   The pairing the note describes is no longer visible on the page; only the
+   spacing difference is.
+
+   WHAT IS KEPT IS THE `:not()` CHAIN, AND THAT IS THE WHOLE REASON THESE TWO
+   RULES ARE RE-POINTED RATHER THAN DELETED. The exclusions are not about the
+   half-gap: `.lead-bar` is a zero-height sticky hook whose height must never
+   change, `.ldr-dm-sec` is a panel attached to the tab strip above it, and
+   `.cap-sec` is a pass-through. Those must keep paying nothing, and this
+   selector runs to fourteen classes inside a container query, so per trap 4
+   nothing later can put them back. Stating `--s06` here makes the rule agree
+   with §10's base for everything it still reaches, and leaves the exclusions
+   doing the job they were actually written for.
+
+   The chain is still the same condition layer 14 uses to decide which rules
+   survive. If one changes, both have to.
    ========================================================================== */
 
 /* the page header no longer closes itself */
@@ -123,7 +144,7 @@
      plate. `.dark-card` is the class the conversion is, so this cannot come
      loose unless the component is renamed. */
   .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){
-    padding-bottom:var(--s05)}
+    padding-bottom:var(--s06)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
   /* A TAB STRIP UNDER A WALL PAYS NOTHING AT ALL, which is why the pair is
@@ -172,11 +193,18 @@
      loose. The section states `padding:0` and this is the rule that was
      putting it back, from nine classes deep. */
   .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){
-    padding-top:var(--s05)}
-  .app .page > .sec:has(> .plate) + .sec.sec-cs,
-  .app .page > .sec-call + .sec{padding-top:0}
+    padding-top:var(--s06)}
+  /* THE TWO HARD JOINS ARE GONE WITH THE HALF-GAP (1 Sep 2026). Both set
+     `padding-top:0` so two grounds would meet on one line — the tab strip
+     under a plate, and whatever follows the call row. They were the only
+     pairs in the product at a 0px gap, which is the furthest thing from
+     equal spacing, so they go with the rest. The argument for the tab strip
+     is in the note above and is worth reading before restoring either: it
+     is about two full-bleed SURFACES meeting, not about two blocks being
+     related, and it is the one case here that a uniform rhythm genuinely
+     costs something. */
   /* the capture strip is a zero-padding pass-through: it sits between two
      blocks without being one, so the pair either side of it still has to
      behave as a pair. */
-  .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
+  .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s06)}
 }

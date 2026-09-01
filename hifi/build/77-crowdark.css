@@ -228,9 +228,18 @@
    denser patch of the card, which is what a mark on a black ground should be —
    §74 makes the same argument one hue over for its 5%-card / 12%-chip pair.
 
+   IT IS THE FALLBACK NOW, AND IT STILL EARNS ITS PLACE. Later the same day the
+   card took a cohort COVER (§86, `cohortArt` in lead.js), so the label is behind
+   an `<img>` and this ground is behind both — visible only when the image fails
+   to decode, which is exactly when it matters: `crow`'s `onerror` hides the
+   `<img>`, and what it uncovers has to read as a mark rather than as a hole.
+   That is the same reason §63 §23 types `.gcard-art`'s numeral, and the reason
+   this rule was NOT deleted when the cover arrived — a fallback nothing draws is
+   not the "gate nothing writes" tell, it is the tell's opposite.
+
    UNCONDITIONAL, AND IT DOES NOT NEED A `:not(:has(img))`. A photograph is
-   `position:absolute;inset:0` over the whole square (§71.411), so on the three
-   call sites that have one the ground is not visible either way. One rule, no
-   test. The INK is §63 §17's — `color` is one of that layer's four properties
-   wherever it appears. */
+   `position:absolute;inset:0` over the whole square (§71.411), so wherever one
+   decodes the ground is not visible either way. One rule, no test. The INK is
+   §63 §17's — `color` is one of that layer's four properties wherever it
+   appears. */
 .app .crow-dark .crow-ph{background:var(--on-dark-fill)}

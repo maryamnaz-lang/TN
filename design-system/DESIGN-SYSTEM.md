@@ -485,10 +485,44 @@ would either overflow the box or leave it half empty:
    width. **Sweep at more than one width, or you will call this finished when
    it is not.**
 
-At ≥900 a `.sec` with a `.sec-h` becomes a 184px label column and its heading
-is a *spine*, so it takes the **label** role rather than h4 — and the four
-headings that carry an action, a link or a day strip stay at **h4**. Two tiers,
-both on the ladder, and the distinction survives.
+### A section heading is one size — `--t-sec`, 16px
+
+**Every `.sec-h h2`, on any ground, at every width** (Maryam, 1 Sep 2026).
+There is no exception: `.aih-t`, the AI-native section head, shares the same
+token rather than out-ranking it, so the product has exactly one
+section-heading size. Measured after the change: 286 headings at 16px at 390
+and at 1280, white and grey alike, and no page drawing two.
+
+It had five sizes at desktop before that — a 12.5 label default, an h4 tier for
+"headings that carry an action, a link or a day strip", 16 for the AI-native
+heads, 17 for Quick Actions and 18 for the leader dashboard's four queues — and
+a flat 14 on a phone, so the heading also changed rank at 900. Each tier was
+defensible on its own and together they read as randomness; and because they
+were keyed on what a section CONTAINS, the odd ones landed on grey and white
+alike, which makes it look like a ground problem when it is not.
+
+Three things worth knowing if you touch this:
+
+- **It is stated twice**, unconditionally and inside `@container app
+  (min-width:900px)`, so the heading does not change size with the frame. The
+  unconditional half exists because §4 sizes `.app .sec-h h2` as part of a
+  shared list (`.cardrow-t`, `.nrow-t`, `.gcard-b h3`, a dozen more) that
+  cannot be re-pointed without moving all of them.
+- **The "spine" argument is gone and was mostly false.** The old label role was
+  justified by §10.15's 184px column — a heading in a 184px rail is a spine,
+  not a title. True, and it applies to **36 of 290** headings: everything else
+  opts out of that column, because the opt-out is keyed on contents and almost
+  every section is built from the components on the list. The 184px column
+  holds 16px fine; that is trap 13's "heading wraps past three lines" and it
+  was checked rather than assumed.
+- **A wrapped heading falls out of the rule.** The selector is
+  `.sec:has(> .sec-h) > .sec-h h2` — a direct child twice — so a section that
+  puts its `.sec-h` inside a wrapper lands on the unconditional h4 instead and
+  renders one step larger than its neighbours. That is trap 13 reaching the
+  type layer. There is exactly one such shape in the portal (the Agents page's
+  search header) and §8b names it; if you write a third, name it there rather
+  than loosening the combinator, which would reach `.sec-h` inside sheets, Tal's
+  bubbles and the auth card.
 
 ## The five things to know before building a page
 

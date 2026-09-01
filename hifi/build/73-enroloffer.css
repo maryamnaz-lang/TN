@@ -612,8 +612,21 @@
      rhythm, and the next edit to either number would have silently split them.
      Extending the `:not()` list is trap 4's instruction and is how `.sec-call`
      was answered directly above. */
+  /* THE 32 IS NOW 24 — one page rhythm, 1 Sep 2026 ("each section on all pages
+     on both portals should have equal spacing from each other"). This rule gave
+     the AI-native dashboards a rhythm of their own: 32 top and bottom against
+     §10's 24 everywhere else, which measured as 64px between two sections here
+     and 48px on every other page in the product. It was the second-largest
+     source of the unevenness after §20's half-gap, and the two together
+     accounted for 148 of 349 section pairs.
+
+     THE RULE IS KEPT, NOT DELETED, FOR ITS `:not()` LIST — the same reason §20's
+     two are. `.sec-call` and `.dark-card` pay their own frames and must not be
+     given a page rhythm at all; that arithmetic is worked out in the two notes
+     above and is easy to get wrong a second time. Pointed at `--s06` it agrees
+     with §10's base for everything it still reaches. */
   .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call):not(.dark-card){
-    padding-top:var(--s07);padding-bottom:var(--s07)}
+    padding-top:var(--s06);padding-bottom:var(--s06)}
 }
 
 /* --------------------------------------------------------------------------

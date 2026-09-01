@@ -56,8 +56,28 @@
 /* The reach on each of these is set by whatever is colouring it today —
    §10 and §12 both hand out `--accent-text` from four selectors deep — so
    these are written to win rather than to be tidy. */
+/* THE OPEN ACCORDION'S TITLE CAME OFF THIS LIST (Maryam, 1 Sep 2026: "The
+   opened row's heading like here 'The three tracks' is the heading so it should
+   be orange in color"), restoring §12's `--accent-text` on it.
+
+   IT WAS THE ONE ENTRY THAT FAILED THIS SECTION'S OWN TEST. The rule above is
+   "none of these was ever a status — they were accent-coloured because the
+   accent was the only second ink the sheet had", and it is right about a
+   numbered step, an unread count and who is speaking in a transcript: each is a
+   LABEL, and the accent on it said nothing. An open disclosure is different in
+   kind. `.acc-i.on` is a STATE, it is the only one this component has, and the
+   accent is what says which of six questions you are currently reading.
+
+   AND §23 ONLY TOOK HALF OF IT, WHICH IS THE TELL. §12 states the pair — the
+   title AND `.acc-h .chev svg` — and this list named the title only. So the
+   caret stayed orange and pointed at a black heading: the component marking its
+   own open state in two places and disagreeing with itself. Removing the entry
+   is what puts the two back in step, rather than a third rule to re-accent it.
+
+   §12.626 IS THE RULE THAT WINS NOW, unchanged and unmoved. Nothing is restated
+   here — the entry is simply gone, so the layer that owns the component's open
+   state owns it again. */
 .app .s-n,                              /* a numbered step                 */
-.app .acc-i.on .acc-h .ttl,             /* an open accordion's title       */
 .app .page .tq.me .tq-w,                /* who is speaking, in a transcript */
 .app .m-unread > span,                  /* how many are unread             */
 .app .page .ai-inline,

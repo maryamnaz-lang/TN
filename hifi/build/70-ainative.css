@@ -333,9 +333,39 @@
    kept. Applied as 79% to the product's ~620px of column it took 130px off a
    line that was already inside the measure, and left the panel two thirds
    full with the wash running on past it. As a length it does nothing until
-   there is more than 733px to do it in, which is what a measure is for. */
-.app .modhead .ai-aura.talsum > .ai-body,
-.app .modhead .ai-aura.talsum > .ai-body p{max-width:733px}
+   there is more than 733px to do it in, which is what a measure is for.
+
+   AND IT ONLY APPLIES WHERE THERE IS A SECOND COLUMN — Maryam, 1 Sep 2026:
+   "when there is no block on the right side of tal summary block then give
+   its summary full width rather than making it go on the second line."
+
+   THE CAP WAS WRITTEN FOR A BAND THAT HAS SOMETHING BESIDE IT and was landing
+   on every band in the product. 581:6662 states 733 of 925 in a frame whose
+   right-hand side is occupied; on the 104 pages whose band is a single column
+   the same number is not a measure, it is a ragged right edge — the summary
+   broke to a second line with 168px of empty cream beside it, which reads as
+   the panel having failed to fill rather than as a controlled line length.
+   Measured at 1280: band 901, summary 733, two lines, and the last line was
+   the word "it."
+
+   THE GATE IS THE UNION OF THE TWO THAT BUILD THE SECOND COLUMN, and it is
+   exact rather than approximate: `:has(> .head-col)` is §70/§73's own gate and
+   `:has(> .sec-dark .plate)` is §56's. Swept over every page that draws a
+   summary — 146 of them — the pair matches all 32 two-column bands and none
+   of the 114 single-column ones. `:has(> .sec-dark)` alone was the obvious
+   short version and is WRONG: it also matches ten single-column bands whose
+   dark card is a `.cert` or a `.lvl-hero`, which §56 leaves under the head
+   rather than putting beside it.
+
+   UNCAPPED, THE ONE-COLUMN SUMMARY FALLS TO §33.3's `max-width:none` — which
+   is what that layer wanted in the first place ("a summary is two sentences
+   read once") and is why nothing else has to be stated here. §14's
+   `.app .ai-body p{max-width:68ch}` is (0,2,1) against §33's (0,4,1) and does
+   not come back. */
+.app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body,
+.app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body p,
+.app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
+.app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body p{max-width:733px}
 
 /* TAL'S NAME IN THE RAMP — 581:6670. The gradient is clipped to the glyphs,
    which is the same construction §51.4 uses for the ask page's "What's going
@@ -1046,8 +1076,15 @@
    off (Maryam, 31 Aug 2026 — the two cards each carry their own description and
    it described only the first of them), so the heading takes the 20 the cards
    were owed rather than the 8 that was the gap to a sentence no longer there. */
+/* THE 32 IS THE PAGE RHYTHM'S 24 NOW (1 Sep 2026, one spacing everywhere).
+   581:6344 draws this block's own frame at 32 and that was right while the
+   AI-native dashboards ran a 32px rhythm of their own (§73.10); with that
+   rhythm folded into §10's 24, a `.sec-qa` paying 32 was the last section in
+   the product with a padding of its own — 88px under the black card above it
+   against 48 everywhere else. The BORDER stays: it is the only bottom-drawn
+   join in the build and §75.3 still takes it off under the recommendation. */
 .app .sec-qa{
-  padding:var(--s07) var(--pad-x);
+  padding:var(--s06) var(--pad-x);
   border-top:1px solid #d7d5cc}
 
 /* AND THE SECTION ABOVE MUST NOT CLOSE ITSELF — the double bottom border
@@ -1224,11 +1261,35 @@
    header is clipped to a pixel and a grid row of its own would reopen 34px of
    space above Tal that §70.3 spent a note closing.
    ------------------------------------------------------------------------ */
+/* AND `:not(.ph-bare)` IS THE SECOND EXCLUSION, ADDED 1 Sep 2026 (Maryam: "the
+   summary alignment is off, follow the summary component spacing here").
+
+   §78 INVALIDATED THIS BLOCK'S ASSUMPTION AND NOTHING WARNED. These three
+   rules were written when a module page's `.ph` still DREW something — the
+   Cohort page's `<h1>` — so giving it row one and pushing the summary to row
+   two was the whole point. §78 then took the page heading out of every module
+   `.ph` and hid the empty ones with `.ph-bare`, and **`display:none` is not a
+   grid item**: row one stopped having anything in it, but the summary was
+   still explicitly assigned to row TWO and the right-hand column still spanned
+   both. So the spanning cell's own height was distributed across an empty row
+   one and a row two, which dropped Tal's card ~50px below the top of the band
+   while the column beside it stayed flush. Measured on Achievements: summary
+   at y=170, points at y=120, in a band 177 tall.
+
+   THE TELL IS A ROW WITH NOTHING IN IT, and it is invisible to every check
+   this repo runs — nothing overflows, nothing wraps, no rule is unmatched, and
+   `respcheck` has no question that would catch a column starting late.
+
+   `.ph-backonly` IS DELIBERATELY NOT EXCLUDED. §78 hides a `.ph` only when it
+   has nothing left in it at all; a module page that still shows "← Back" has a
+   real, drawn header and wants exactly the two-row arrangement below. So the
+   test is "is this header PAINTED", which `.ph-bare` is the class for, rather
+   than "is this a module page". */
 @container app (min-width:900px){
-  .app .modhead:has(> .head-col) > .ph:not(.ph-you){grid-column:1;grid-row:1}
-  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .sec:has(> .ai-aura.talsum){
+  .app .modhead:has(> .head-col) > .ph:not(.ph-you):not(.ph-bare){grid-column:1;grid-row:1}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you):not(.ph-bare)) > .sec:has(> .ai-aura.talsum){
     grid-row:2}
-  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .head-col{
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you):not(.ph-bare)) > .head-col{
     grid-row:1 / span 2}
 }
 

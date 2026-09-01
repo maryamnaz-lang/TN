@@ -191,32 +191,30 @@
 .app .qa-ic.ic-found svg{fill:var(--mk-1)}
 
 /* ------------------------------------------------------------------ 82.5 ---
-   THE PAGE STOPS ON THE CERTIFICATE, WITH NO RULE UNDER IT
+   THE `.keep-place` CLOSING-RULE FIX IS DELETED, AND THE NOTE IS THE POINT
 
-   Maryam, 1 Sep 2026: "remove the divider at the page end after the
-   certification card."
+   It stood for one build: `.app .page > .keep-place:last-child > .sec::after
+   {display:none}`, stated in both tiers, answering Maryam's "remove the divider
+   at the page end after the certification card."
 
-   THIS WAS ALREADY ANSWERED FOR EVERY OTHER PAGE AND A WRAPPER BROKE IT.
-   §14.200 is `.app .page > .sec:last-child::after{display:none}` — a closing
-   hairline under the last section has nothing after it to separate, so the
-   build already turns it off. `certCard` returns a `.sec`, but on this page it
-   is wrapped: `<div class="keep-place">${'$'}{certCard(f)}</div>`, the opt-out that
-   stops `placeDark` hoisting a `.cert` into the head band (trap 12). So the
-   cert's `.sec` is a grandchild of `.page`, §14's child combinator stopped
-   matching, and the rule came back — trap 13's family exactly, a `> ` selector
-   lost to a wrapper introduced for an unrelated reason.
+   WHAT IT WAS ACTUALLY ANSWERING was never the divider — §14.200 already turns
+   the last section's hairline off for every page in the build. It was the
+   WRAPPER: `.keep-place` exists only to opt a `.cert` out of `placeDark`, and
+   putting it round the card made the `.sec` a grandchild of `.page`, so §14's
+   child combinator stopped matching and the rule that was already there could
+   not reach it. Trap 13's family, one component along.
 
-   STATED IN BOTH TIERS, PER TRAP 3. §14.200 lives inside
-   `@container app (min-width:900px)` and §10.66 draws `.sec:last-child::after`
-   in `var(--rule)` below it, so answering only the desktop tier would leave the
-   line on a phone. The unconditional rule handles the narrow tier and the
-   restatement wins inside the query, where §14's own rule is.
+   THE CAUSE IS GONE, SO THE PATCH GOES WITH IT. `promoted` closes on
+   `certBanner` now (Maryam, 1 Sep 2026) — a `.certban` is not a `.cert`, so it
+   is invisible to `placeDark`, needs no wrapper, and is a direct `.sec` child of
+   `.page` again. §14.200 matches it unaided. `V.level` is the only writer of
+   `.keep-place` left and its card is followed by "How the ladder works", so it
+   is not `:last-child` and this rule could never fire there either.
 
-   KEYED ON `.keep-place`, NOT ON `.cert`. What is being answered is "this is the
-   last thing on the page", which is a fact about the wrapper's position — and
-   `V.transcript` draws the same `certCard` mid-page, where its closing rule is
-   correct and must stay. `:last-child` keeps it that way by construction. */
-.app .page > .keep-place:last-child > .sec::after{display:none}
-@container app (min-width:900px){
-  .app .page > .keep-place:last-child > .sec::after{display:none}
-}
+   A RULE THAT MATCHES NOTHING IS THE "GATE NOTHING WRITES" TELL, and a
+   `display:none` on a pseudo-element is the cheapest possible thing to leave
+   lying around and the most misleading — the next reader would take it as
+   evidence that a page somewhere ends on a `.keep-place`. Deleted rather than
+   kept "in case", which is the same discipline `enrolPlate` and `.chgrow` are
+   being held to. If a page ever does end on one, §14.200 is the rule to restate
+   and this note is the argument. */

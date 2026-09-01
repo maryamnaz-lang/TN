@@ -170,6 +170,26 @@ const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.memb
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
 
+/* THE COVER IS KEYED BY LEVEL, NOT BY COHORT ID (Maryam, 1 Sep 2026, with three
+   images). `COHORT_ART` is embedded by build.py — its note is the argument for
+   the crop and the file order — and this is the whole of the lookup.
+
+   BY LEVEL BECAUSE A FOURTH COHORT MUST NOT NEED A FOURTH FILE. There are three
+   cohorts today and three covers, so keying on `c.id` would have worked and
+   would have been a coincidence: the next cohort would land on `undefined`,
+   which `crow`'s own note explains is worse than a missing image (an undefined
+   `src` 404s on every render, which `respcheck` reads as a broken screen). The
+   level is the one property of a cohort this build guarantees, and it also makes
+   the assignment a RULE rather than three arbitrary pairings.
+
+   THE FALLBACK IS E1, NOT NOTHING. `AGENTS.priya.range` is E1–E3 so nothing on
+   this portal is outside it today, but a leader certified into the Builder band
+   is the next thing this page will hold (the Certifications page says so in as
+   many words), and a B-band cohort with no cover would be the blank square the
+   paragraph above is about. `lc()` lowercases because the record's `level` is
+   `E1` and the keys are `e1`. */
+const cohortArt = c => COHORT_ART[String(c.level).toLowerCase()] || COHORT_ART.e1;
+
 /* --------------------------------------------------------------------------
    THE CALLS THE LEADER RUNS — AND THERE IS ONLY ONE KIND OF APPOINTMENT
 
@@ -495,14 +515,14 @@ function bookedRow(b){
    the dashboard and on Calls alike, and the parameter survives for a caller that
    genuinely has nothing to offer. */
 const leadCall = (k, second) => ({
-  who:{n:'Cohort ' + k.co, i:String(k.co)},   /* no `img` — see the mark, above */
+  who:{n:'Cohort ' + k.co, i:String(k.co), img:cohortArt(k)},
   role:`${k.seats} candidates at Explorer &ndash; ${k.level}`,
   x:lcDetail(k),
   xl:'',            /* the line is the appointment, not the cohort */
   v:false,          /* a cohort is not an identity, checked or otherwise */
   when:k.when, mins:k.mins,
   second:second === undefined
-    ? {at:`data-ldrbrief="${k.co}"`, ic:I.edit, t:'Generate the brief'}
+    ? {go:'leadCalls', ic:I.calendar, t:'View all calls'}
     : second
   /* no `kind`, so no `data-call` — see 4 above */
 });
@@ -691,7 +711,8 @@ V.leadDash = () => {
         const ahead = lavg(c,'pc') >= lpace(c);
         return gcard('cohort', lname(c)+' &middot; '+llevel(c), 'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
-          + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohorts');
+          + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohorts',
+          {src:cohortArt(c), i:String(c.id)});
       }).join('')}
     </div>
   </div>

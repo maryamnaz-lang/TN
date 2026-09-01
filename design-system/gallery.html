@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=fa7234ba">
+<link rel="stylesheet" href="talentnext-ds.css?b=28c2a102">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=fa7234ba"></script>
+<script src="talentnext-ds.js?b=28c2a102"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -1466,6 +1466,22 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
         <span class="cardrow-ic">{{chart}}</span>
         <span class="gcard-b"><h3>Your assessment</h3>
           <span class="sub">Average 92% across thirteen</span></span>
+        {{arrowRight|tile-arrow}}
+      </button>
+    </div>
+  `)}
+  ${ex('Navigation row with a cover', 'When the subject of a row is a <b>thing rather than a category</b>, the 40px glyph slot becomes <code>.gcard-art</code> — a cover image whose height is the height of the three lines beside it. It is one class and an <code>&lt;img&gt;</code>; the square side is a <code>calc()</code> of the eyebrow, title and description line-heights, so the two stay level if a type role changes. Keep the <code>&lt;i&gt;</code> behind the image: <code>onerror</code> uncovers it, so a cover that fails to load leaves a labelled tile rather than an empty one. Below about 500px the description wraps and the box becomes a taller crop — that is the rule working, not breaking.', `
+    <div class="tile-stack">
+      <button class="tile clk gcard">
+        <span class="gcard-art"><i>41</i><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJmNmZlMCIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg0IiByPSI0NiIgZmlsbD0iIzEyMmM1YyIvPjxyZWN0IHg9IjM4IiB5PSIxNTAiIHdpZHRoPSIxMjQiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSIjOGZiNmYyIi8+PC9zdmc+" alt=""></span>
+        <span class="gcard-b"><span class="eyebrow">Cohort 41 &middot; Explorer &ndash; E3</span>
+          <h3>Week 5 of 13</h3><span class="sub">Thursday 6:00 PM &middot; 38% average progress</span></span>
+        {{arrowRight|tile-arrow}}
+      </button>
+      <button class="tile clk gcard">
+        <span class="gcard-art"><i>33</i><img src="" alt=""></span>
+        <span class="gcard-b"><span class="eyebrow">Cohort 33 &middot; Explorer &ndash; E1</span>
+          <h3>Week 11 of 13</h3><span class="sub">The fallback, with no cover behind it</span></span>
         {{arrowRight|tile-arrow}}
       </button>
     </div>

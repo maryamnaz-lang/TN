@@ -310,6 +310,50 @@ backed by `--t-<role>-size` / `-lh` / `-ls` tokens. Six things that bite:
   name and `text` is not one, so the charts and the rose fell through to 6px,
   7.5px, 9.5px, 10.5px, 12px and 26px. §5 brings them in, on `fill` rather than
   `color`.
+- **A SECTION HEADING IS `--t-sec` — 16px, EVERY SECTION, EVERY WIDTH** (Maryam,
+  1 Sep 2026: "make the section heading size consistent everywhere, in some grey
+  sections it is different and in some white sections it is different"). It had
+  **five at desktop** — 12.5 `--t-label` (177), 14 `--t-h4` (§8b's seven
+  `:has()` exceptions plus §65's `.found`, 38), 16 `--t-sec` (the AI-native
+  heads, 35), 17 `--t-h3` ("Quick Actions", 54) and 18 `--t-sec-lg` (the leader
+  dashboard's four queues, 8) — and 14 for everything on a phone. It is now
+  **286 headings at 16px at 390 and at 1280, white ground and grey alike, with
+  no page drawing two.** `.aih-t` shares the token rather than out-ranking it,
+  so there is exactly one section-heading size in the product. §8b states it in
+  both tiers; §21 and the `.sec-qa` rule are deleted with their arguments
+  preserved in place; §65's `font-size` is gone, which was **the only rule in
+  the build breaking "no type after §63"**.
+  - **`--t-sec` IS NO LONGER AN EXCEPTION BESIDE THE SECTION HEADING, IT IS THE
+    SECTION HEADING.** Its token note used to justify itself as a distinct rank
+    "because §63 §4 puts every other section heading at 12.5"; that is the
+    sentence the instruction overturned. `--t-sec-lg` is down to one reader,
+    `.dc-t`.
+  - **IT IS STATED TWICE, UNCONDITIONALLY AND INSIDE THE QUERY**, because the
+    heading must not change rank at 900 and because §4 sizes `.app .sec-h h2`
+    as part of a shared LIST (`.cardrow-t`, `.nrow-t`, `.gcard-b h3`, a dozen
+    more) that cannot be moved without moving all of them.
+  - **THE SPINE ARGUMENT IS GONE AND WAS MOSTLY FALSE.** §8b used to justify a
+    smaller heading at ≥900 by §10.15's 184px column — "it stops being a title
+    and starts being a spine". Measured across 184 pages, **36 of 290 section
+    headings actually have that column** (four distinct ones, all on What Tal
+    knows); everything else opts out, because §10.15's list is keyed on
+    CONTENTS and nearly every section is built from the components on it. Worth
+    knowing if a smaller spine is ever re-proposed: it is right for an eighth
+    of the product. **The 184px column holds 16px** — checked, not assumed:
+    that is trap 13's "heading wraps past three lines", and `respcheck --edge`
+    passes it at seven widths.
+  - **THE SEVEN `:has()` SELECTORS ARE RE-POINTED, NOT DELETED.** §15 and §16
+    state the same seven at 15px inside the same container query at (0,5,2),
+    heavier than §8b's default at (0,4,1). Delete §8b's block and those win —
+    the headings go to 15 and the page is less consistent than before the edit.
+  - **AND TRAP 13 REACHES THE TYPE LAYER.** `.sec:has(> .sec-h) > .sec-h` is a
+    direct child twice over, so a section that WRAPS its heading drops out and
+    lands on §4's unconditional h4. The Agents page does exactly that
+    (`.sec > .hd-srch > .hd-srch-t > .sec-h`) and was the last 14 left. It is
+    the only wrapped one in either portal — a sweep finds two shapes, 238
+    direct and 12 wrapped — so §8b names it rather than loosening the
+    combinator to `.sec .sec-h h2`, which would reach `.sec-h` inside sheets,
+    Tal's bubbles and the auth card.
 
 **THE DISPLAY ROLE IS HERO NUMERALS AND NOTHING ELSE.** §11 described it as
 "hero numerals, the level name" and the second half was the mistake: a numeral
@@ -332,6 +376,47 @@ reports `innerWidth: 0`, every element measures 0 and the page's scrollHeight
 comes back around 15,000px — which reads exactly like a broken layout and is
 not one. `window.innerWidth === 0` is the check; re-open the preview and
 measure again. This is trap 15's sibling and cost twenty minutes.
+
+### ONE SECTION RHYTHM — 48px, EVERY PAGE, BOTH PORTALS
+
+Maryam, 1 Sep 2026: *"each section on all pages on both portals should have equal spacing
+from each other."* §10's base has always said `.sec{padding:var(--s06)}` — 24 top and
+bottom, so 48 between two sections. Everything that made it uneven was an override of
+that base, and the fix was to take the overrides out rather than to state a new rule.
+Measured over 184 pages, 349 adjacent section pairs: **270 now sit at exactly 48px, at
+390 and at 1280 alike.** Before, there were eight distinct gaps at desktop and seven at
+mobile.
+
+The four that mattered, by count:
+
+| was | pairs | cause | now |
+|---|---|---|---|
+| 32 | 94 | **§20's half-gap** — "two blocks with no rule between them pay 16 and 16" | 24 + 24 |
+| 64 | 54 | **§73.10** gave the AI-native dashboards their own 32px rhythm | `--s06` |
+| 88 | 54 | **§70's `.sec-qa`** paid its own `--s07` frame | `--s06` |
+| 72 | 12 | a `.mt6` margin utility stacked on a section's own padding | class removed |
+
+- **§20's TWO RULES ARE RE-POINTED, NOT DELETED, AND SO IS §73.10's.** Their `:not()`
+  chains are not about the half-gap — they keep `.lead-bar` (a zero-height sticky hook),
+  `.ldr-dm-sec` (a panel attached to its tab strip) and `.cap-sec` (a pass-through)
+  paying nothing, and `.sec-call` / `.dark-card` paying their own frames. Those selectors
+  run to fourteen classes inside a container query, so per trap 4 nothing later can put
+  them back. Pointed at `--s06` they agree with §10's base for everything they still
+  reach.
+- **§20's ARGUMENT HAD ALSO LOST ITS OTHER HALF.** "Space follows the rule" only works
+  while the rule is visible, and §54, §55.2 and §84 have since taken the hairline off
+  every tinted section and its neighbour. The pairing stopped being drawn; only the
+  spacing difference was left.
+- **A DARK CARD'S 32 IS ITS FRAME, NOT THE GAP.** All 64 dark-card pairs read 80px
+  content-to-content — 24 (neighbour) + 24 (card margin) + 32 (the card's own inside).
+  Edge to edge that is the same 48 as everything else. `.dark-card` now carries
+  `margin:var(--s06) var(--pad-x)` on **both** edges; it was top-only, and §75's note
+  records both reasons that had expired.
+- **TWO STRUCTURAL EXCEPTIONS SURVIVE AND ARE NOT BUGS.** `.sec-call` → `.sec-cs` at 0
+  (nine pairs) is two full-bleed surfaces meant to meet on one line — §16 zeroes a
+  section holding a tab strip and §71 zeroes the call row — and `→ .lead-bar` at 24 is
+  the zero-height sticky hook whose height must never change. Both are named in §20's
+  note; forcing 48 on them puts white between two grounds.
 
 ### THE QUIET BUTTON — §64, `64-quietbtn.css`
 

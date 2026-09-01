@@ -901,8 +901,34 @@ const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'g
    the `.tile-arrow` svg are structure the CSS keys on, and a guessed version
    looks broken rather than absent. Five lines of template against the next
    page re-deriving them from the stylesheet. */
-const gcard = (kind,tag,title,sub,go) => `<button class="tile clk gcard" data-go="${go}">
-  <span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>
+/* THE SIXTH ARGUMENT IS A COVER, AND IT REPLACES THE GLYPH RATHER THAN JOINING
+   IT (Maryam, 1 Sep 2026, for the leader's cohort rows). `art` is a data URI —
+   `COHORT_ART` is the one caller today — and when it is there the 40px
+   `.cardrow-ic` becomes a `.gcard-art` square that takes the row's own content
+   height (§86 is the drawing and the argument for that height).
+
+   IT IS OPTIONAL, SO THE COMPONENT DOES NOT FORK. Every other `gcard` in the
+   product and the ten in `tn-agent-portal.html` emit byte-identical markup, and
+   the gallery's recipe still documents the glyph shape as the default. A second
+   function would have been the alternative and it is the worse one: `.gcard`'s
+   markup is load-bearing (`.gcard-b`, the `.tile-arrow` svg) in exactly the way
+   CLAUDE.md warns about, so two copies of it is two places to get it wrong.
+
+   THE `<img>` IS NOT `avatar()`. That helper writes its size inline (trap 1), so
+   no stylesheet could answer the height this slot needs, and it draws a disc —
+   §75.3 and §71.400 both make this call for the same reason. The `<i>` behind it
+   is the fallback the `onerror` uncovers, which is why the ground and the
+   letterform in §86 are stated rather than left to the image.
+
+   `art` IS `{src, i}` AND THE LABEL IS THE CALLER'S, not derived here. Deriving
+   it was the first version — digits off the title — and it read "513" on the
+   leader's rows, because a cohort row's title is "Week 5 of 13" and its NUMBER
+   is in the eyebrow. A component cannot know which of two strings holds the
+   identity; the caller does. */
+const gcard = (kind,tag,title,sub,go,art) => `<button class="tile clk gcard" data-go="${go}">
+  ${art
+    ? `<span class="gcard-art">${art.i ? `<i>${art.i}</i>` : ''}<img src="${art.src}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
+    : `<span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>`}
   <span class="gcard-b">
     ${tag?`<span class="eyebrow">${tag}</span>`:''}
     <h3>${title}</h3><span class="sub">${sub}</span>
@@ -1117,20 +1143,223 @@ const foundHead = (title, act, key) => `<div class="sec-h found-h">
    §56 spans it across both columns underneath — which is the behaviour that
    is written down, not a surprise. Do not add a third.
    ========================================================================== */
-function certCard(f){
+/* THE TWO CERTIFICATES ARE A RECORD NOW, AND NOTHING IS INVENTED BY IT
+   (1 Sep 2026, for the Achievements module's new Certificates tab).
+
+   `certCard` STATED BOTH ALREADY, as the two halves of one ternary: `f.complete`
+   printed "Explorer Track – E3 / Completed November 21, 2026 · Cohort 41 /
+   Signed by Priya Nair" and every earlier stage printed the E2 one. So the
+   build has always asserted that this candidate holds an E2 certificate from
+   Cohort 12 — it just could never show you two at once, because a ternary
+   returns one branch. Lifting the two into a list is the same two facts with
+   the `?:` taken out, which is what §74's "do not invent data" rule allows and
+   `AGENT_CAL` is the precedent for.
+
+   `certsFor` IS WHAT KEEPS THE OLD CALLERS BYTE-IDENTICAL. The card wants the
+   LATEST certificate and the tab wants all of them, so the list is filtered by
+   stage once and each caller takes what it needs: `certCard` and `certBanner`
+   read `.slice(-1)[0]`, `certList` maps the lot. Before `complete` there is one
+   row either way, so the card's output on those stages cannot have changed.
+
+   ORDER IS OLDEST FIRST, so `slice(-1)` is the newest and the tab reads as a
+   record accumulating. `certList` reverses for display — newest at the top is
+   what `V.leadCerts` does with `LDR_CERTS` and the reason is the same. */
+const CERTS = [
+  {lvl:'E2', on:'May 4, 2026',       cohort:'Cohort 12', by:'Daniel Kerr'},
+  {lvl:'E3', on:'November 21, 2026', cohort:'Cohort 41', by:'Priya Nair'}
+];
+const certsFor = f => f.complete ? CERTS : CERTS.slice(0, 1);
+
+/* `certCard` IS DELETED (Maryam, 1 Sep 2026) — the candidate's black
+   certificate card. It drew `.cert` with the 88px mark, the "Certificate of
+   completion" eyebrow, the level, the completion line, the signer and a
+   Download / Share link pair.
+
+   ITS THREE CALLERS WENT ONE AT A TIME ON THE SAME DAY: the `promoted`
+   dashboard took `certBanner`, then My Level took `certBanner`, then Course
+   Progress dropped the block outright. The last removal is what makes this a
+   deletion rather than a change — an orphan is the "gate nothing writes" tell
+   in its most expensive form, because the next reader has to work out which of
+   two certificate drawings is the live one.
+
+   §15'S `.cert` RULES ARE NOT DELETED WITH IT, and that distinction is the
+   point: `V.leadCerts` (lead4.js) still draws the leader's most recent
+   certification as a `.cert` hero with the same parts. The class has a writer;
+   this FUNCTION did not. `coverSec`'s note records the same split from the
+   other side — there the CSS stayed because `gallery.html` writes the markup.
+
+   `certsFor` KEEPS BOTH REMAINING READERS, `certBanner` and `certList`, so the
+   record stays where it is. */
+
+/* ==========================================================================
+   THE CERTIFICATE HAS THREE DRAWINGS NOW, AND THE GROUND IS WHAT PICKS ONE
+   (Maryam, 1 Sep 2026)
+
+   `.cert`           the black card. My Level and Course Progress — the two
+                     pages where the certificate is the SUBJECT, and a page can
+                     afford one loud object.
+   `.certrow`        a row in a list. The Achievements module's Certificates
+                     tab, beside the points, badges and rank rows, where the
+                     answer to "what have I earned" is a table and a black card
+                     would be one entry shouting over the other three tabs.
+   `.certban`        a short tinted banner. The `promoted` dashboard, where the
+                     certificate is the last thing on a page whose subject is
+                     the NEXT course — see the note over `certBanner`.
+
+   ALL THREE READ `certsFor(f)` so no drawing can name a level, a date or a
+   cohort the others disagree about. That is the whole reason the ternary became
+   a record.
+   ========================================================================== */
+
+/* THE ROWS ARE `.cardrow`, WHICH IS `V.leadCerts`' OWN SHAPE. That view lists
+   `LDR_CERTS` as a `.tile-stack` of `.cardrow`s with a mark, a title, a
+   description and an action at the far end — the same four parts this needs —
+   so the candidate's certificates are the leader's list with the candidate's
+   data in it rather than a fifth row component.
+
+   TWO ACTIONS, NOT ONE, AND IT NEEDED NO CSS. The leader's row ends in a single
+   "Certificate" button; the ask here is "user could download and share their
+   link", so the cell holds a pair — and §02.282 already gives `.cardrow-a`
+   `display:flex` with `gap:var(--s04)`, so the two sit side by side with the
+   row's own gap between them. A `.certrow` / `.certrow-a` pair was written first
+   and deleted before it shipped: two classes nothing would have styled, which is
+   the "gate nothing writes" tell arriving before the gate.
+
+   NEWEST FIRST. `CERTS` is stored oldest-first so `slice(-1)` is the current
+   one; a list of what you have earned reads down from the most recent, which is
+   `V.leadCerts`' `.slice().reverse()` for the same reason. */
+function certList(f){
+  return certsFor(f).slice().reverse().map(c => `<div class="cardrow">
+    <span class="cardrow-ic">${I.certificate}</span>
+    <span class="cardrow-b">
+      <span class="cardrow-t">Explorer Track &ndash; ${c.lvl}</span>
+      <span class="cardrow-d">Completed ${c.on} &middot; ${c.cohort} &middot; signed by ${c.by}</span>
+    </span>
+    <span class="cardrow-a">
+      <button class="btn btn-sm noic" data-go="transcript">Download</button>
+      <button class="btn btn-sm noic">Share link</button>
+    </span>
+  </div>`).join('');
+}
+
+/* THE BANNER — the certificate on the `promoted` dashboard (Maryam, 1 Sep 2026:
+   "show a less heighted light orange banner with the page padding not joint
+   from both sides, and this card will have less content and smaller badge
+   icon").
+
+   WHY THE BLACK CARD WAS WRONG *HERE* SPECIFICALLY, which is the thing to
+   understand before touching this. §75's rule for a dark card is "this is the
+   one thing the page is about", and on this page it is not: the subject is
+   enrolling at E4, which already has the loud object 400px above. The E3
+   certificate is what you finished LAST — worth having on the page, worth
+   pressing, and not worth the loudest treatment the product owns. Two black
+   cards on one page is trap 12's warning read as a tone problem rather than a
+   layout one.
+
+   IT IS NOT `.cert` AND SO IT IS NOT IN `DARK_CARD`, which is why there is no
+   `.keep-place` round it any more. `placeDark` (ai5) lifts whichever page child
+   holds a `.cert` into the head band, and the wrapper existed purely to opt out
+   of that. A `.certban` is invisible to that pass, so the opt-out has nothing
+   left to do and the section is a plain `.sec` again — which also hands the
+   trailing hairline back to §14.200's `.page > .sec:last-child::after`, the rule
+   §82.5 had to restate BECAUSE of the wrapper.
+
+   "LESS CONTENT" IS TWO LINES AND THE TWO BUTTONS. What the black card has and
+   this does not: the "Certificate of completion" eyebrow (the mark and the word
+   "Track" say it), and "Signed by Priya Nair" (she is named twice on this page
+   already, in the journey list and in Tal's sentence). What survives is the one
+   thing that identifies the document — which level, finished when — and the two
+   things you can do with it.
+
+   THE INK IS THE PAGE'S, NOT THE ACCENT'S, AND THE MARK IS THE ONE ORANGE
+   OBJECT. On an 8% accent wash the title in `--accent-text` would make a banner
+   of one hue at three saturations, and the page's real accent is spent on Enroll
+   now. So: `--text-primary` for the level, `--text-secondary` for the date, and
+   `--accent-text` for the mark alone. `--accent-text` (#b94a09) rather than
+   `--accent` (#f57414) because the ground is already warm — §01's own fill/ink
+   split, and the same call §76 makes for the step numeral on `--brand-tint-2`. */
+/* SIX CORRECTIONS ON 1 Sep 2026, and four of them are one decision: THE BANNER
+   IS A NOTICE, NOT A CARD.
+
+     "the banner should have width equal to the other content"
+     "take the banner above the black card"
+     "the banner should have a cross icon at the right end so it should be
+      closeable"
+     "remove the share button"
+     "the download button should be orange in color"
+     "the download button text should be View"
+
+   A CLOSEABLE STRIP AT THE HEAD OF A PAGE, ONE ACCENT ACTION, NO SECOND
+   ACTION — that is a notice, and every one of these follows from it. It moved
+   above the black card, so it is the first thing on the page rather than the
+   last; a thing you can dismiss has to be somewhere dismissing it is a
+   relief. One action, because a notice offers a way to the thing and not a
+   menu of things to do with it — Share link is on the certificate itself, on
+   My Level and in the Achievements module's Certificates tab, both of which
+   this points at. "View" rather than "Download", because `data-go="transcript"`
+   navigates to a page and does not download a file; the old label named an
+   action the button has never performed.
+
+   IT IS ABOVE THE BLACK CARD AND THAT IS SAFE FROM `placeBand`. That pass
+   walks a RUN forward from the `.ph` and stops at the first sibling that is
+   not head furniture — Tal's card, the ask line, or a declared `.head-sec`.
+   A `.sec` holding a `.certban` is none of the three, so the run stops HERE
+   instead of at the offer, which is the same job the offer was doing before.
+   Nothing about the band changes: it was already one column on this page.
+
+   THE CLOSE IS STATE — TRAP 9. `render()` replaces `device.innerHTML`, so a
+   class a handler puts on the strip is gone at the next paint. `S.certBan`
+   holds it and the section is a pure function of it: closed, `certBanner`
+   returns the empty string and the page simply starts at the offer. It is
+   session-only and deliberately not persisted — `tn-vp` is in `localStorage`
+   because a frame preference is about how this reader looks at the prototype,
+   and a dismissed notice is about one reading of one page.
+
+   `certsFor` STILL DECIDES WHICH CERTIFICATE, so the strip and the two lists
+   cannot name different levels. */
+/* TWO CALLERS NOW, AND THE CROSS IS OPT-IN (Maryam, 1 Sep 2026: "instead of
+   this black certification card, use the same light orange banner here as well
+   that we have on the dashboard"). My Level takes the same band and does NOT
+   take `close`, and that asymmetry is the point rather than an omission:
+
+     `promoted` dashboard   a NOTICE. The page is about enrolling at E4; the
+                            E3 certificate is a thing you finished, worth a
+                            strip at the head and worth getting out of the way.
+     My Level               CONTENT. The page's subject is which rung you hold
+                            and the certificate is the document that says so —
+                            it is why the card was put on this page at all.
+
+   AND A SHARED BOOLEAN IS THE CONCRETE REASON, not just a tidy argument.
+   `S.certBan` is one flag; had the cross shipped on both, dismissing the notice
+   on the dashboard would ALSO empty the block on My Level, where nothing else
+   states that a certificate exists. A reader would have hidden a page's content
+   from a different page. `certCard`'s black drawing survives on Course
+   Progress, so the document still has one loud rendering in the build.
+
+   `close` DEFAULTS OFF, so a third caller has to ask for the control rather
+   than inherit it — the same direction §81 takes for `crow`'s join gate and for
+   the same reason: a dismiss on a surface that needs its content is a bug you
+   only find by pressing it. */
+function certBanner(f, {close = false} = {}){
+  if(close && S.certBan === false) return '';
+  const c = certsFor(f).slice(-1)[0];
   return `<div class="sec">
-    <div class="cert">
-      <span class="cert-mark">${I.certificate}</span>
-      <div class="cert-b">
-        <div class="cert-eb">Certificate of completion</div>
-        <div class="n">Explorer Track &ndash; ${f.complete?'E3':'E2'}</div>
-        <div class="m">${f.complete?'Completed November 21, 2026 &middot; Cohort 41':'Completed May 4, 2026 &middot; Cohort 12'}</div>
-        <div class="m">Signed by ${f.complete?'Priya Nair':'Daniel Kerr'}</div>
-      </div>
-      <div class="cert-act">
-        <button class="btn btn-sm noic cert-btn" data-go="transcript">Download</button>
-        <button class="btn btn-sm noic cert-btn">Share link</button>
-      </div>
+    <div class="certban">
+      <span class="certban-mk">${I.certificate}</span>
+      <span class="certban-b">
+        <span class="certban-t">Explorer Track &ndash; ${c.lvl}</span>
+        <span class="certban-m">Completed ${c.on} &middot; ${c.cohort}</span>
+      </span>
+      <span class="certban-a">
+        <button class="btn btn-p btn-sm" data-go="transcript">View</button>
+      </span>
+      ${''/* THE CROSS IS ITS OWN CHILD, OUTSIDE `.certban-a`, so the action
+             group's `margin-left:auto` still pins the pair to the right and the
+             close sits past it at the true end of the row. Inside the group the
+             two would share one auto margin — §77's `.dc-act` / `.dc-when`
+             problem, one component along. `aria-label` because the button's
+             only content is a glyph. */}
+      ${close?`<button class="certban-x" data-certban="0" aria-label="Dismiss">${I.close}</button>`:''}
     </div>
   </div>`;
 }
@@ -3992,7 +4221,7 @@ terms: () => `${authShell('create')}
     <div class="acc-i"><button class="acc-h"><span class="ttl">6. Your controls</span><span class="chev">${I.chevDown}</span></button>
       <div class="acc-b"><p>Profile holds every switch: pause Tal, ask for a level review, download everything we hold, delete a recording, or close your account.</p></div></div>
   </div>
-  <div class="sec mt6"><button class="btn btn-g noic" style="padding-left:var(--s04)">${I.download} Download as PDF</button></div>
+  <div class="sec"><button class="btn btn-g noic" style="padding-left:var(--s04)">${I.download} Download as PDF</button></div>
 </div></main>
 <div style="flex:none;border-top:1px solid var(--border-subtle-01);display:flex;gap:1px">
   <button class="btn btn-s noic" data-go="create" style="flex:1;max-width:none;justify-content:center">Back</button>
@@ -4454,8 +4683,14 @@ V.dashboard = (f) => {
     ${quickActions([
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
        d:`${CH.length} chapters, weekly live cohort calls`, go:'enrol'},
+      /* "Signed" CAME OFF (Maryam, 1 Sep 2026, on the `promoted` twin). The
+         word was carrying nothing the card needed: a write-up BY the agent is
+         the signed document by definition — there is no unsigned one in the
+         product — and the two lines it set at the card's width were a wrap
+         bought with a redundant adjective. Mirrored here per §82's pairing
+         rule, which is why the promoted note does not repeat the argument. */
       {ic:I.document, hue:'ic-found', t:'What the interview found',
-       d:'Signed write-up by the agent on interview', go:'report'}
+       d:'Write-up by the agent on interview', go:'report'}
     ])}`;
 
   else if(f.complete) body = `
@@ -4532,6 +4767,21 @@ V.dashboard = (f) => {
           in `DARK_CARD`, so without `.keep-place` it would now be hoisted into
           the column the journey list occupies. One dark card per page still
           holds; the certificate is simply no longer the second one. */}
+    ${''/* THE CERTIFICATE NOTICE COMES FIRST NOW (Maryam, 1 Sep 2026: "take the
+          banner above the black card"), which also makes IT the thing that
+          stops `placeBand`'s run rather than the offer — the pass walks forward
+          from the `.ph` taking Tal's card, the ask line and declared
+          `.head-sec`s, and a `.sec` holding a `.certban` is none of those. The
+          band is unaffected either way: it has been one column on this page
+          since the plate left it.
+
+          READ IN THIS ORDER THE PAGE RUNS FORWARDS AGAIN. Last build it was
+          offer, actions, certificate — the thing you finished at the foot of a
+          page about the thing you have not started. A dismissible strip at the
+          head says "that is closed, here is what is next" and then gets out of
+          the way, which is what a notice is for and what the cross makes true.
+          `certBanner`'s own note is the rest of the argument. */}
+    ${certBanner(f, {close:true})}
     ${enrolOffer('E4')}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
@@ -4568,7 +4818,7 @@ V.dashboard = (f) => {
       {ic:I.book, hue:'ic-cover', t:'What the 90 days cover',
        d:`${CH.length} chapters at E4, weekly live cohort calls`, go:'enrol'},
       {ic:I.document, hue:'ic-found', t:'What the re-interview found',
-       d:'Signed write-up by the agent on re-interview', go:'report'}
+       d:'Write-up by the agent on re-interview', go:'report'}
     ])}
     ${''/* TWO SECTIONS CAME OFF THE FOOT OF THIS PAGE (Maryam, 1 Sep 2026:
           "remove the Cohort 41, in the end section" and "remove the What
@@ -4607,22 +4857,36 @@ V.dashboard = (f) => {
           and all three ship in `design-system/talentnext-ds.css`. Pruning them
           is a design-system call, not a side effect of emptying one page.
           `scoreCard` itself is untouched and still has `V.rewards`' caller. */}
-    ${''/* THE CERTIFICATE CLOSES THE PAGE, AND IT HAS TO OPT OUT OF THE BAND
-          TO DO IT. `.cert` is in `DARK_CARD`, so `placeDark` (ai5) lifts
-          whichever page child contains one into the head band — trap 12 —
-          and on this page the band already holds the enrolment plate, so it
-          arrived as a second black slab directly under the fold.
+    ${''/* THE CERTIFICATE CLOSES THE PAGE AS A TINTED BANNER, NOT A BLACK CARD
+          (Maryam, 1 Sep 2026). `certBanner` is the drawing and its own note is
+          the argument; what matters at this call site is that the wrapper went
+          with it. `.certban` is not `.cert`, so it is not in ai5's `DARK_CARD`,
+          so `placeDark` cannot lift it and `.keep-place` has nothing to opt out
+          of — the section is a plain `.sec` again.
 
-          That is the wrong place for it. The band is what you are being
-          asked to do next, and this level's enrolment is that; the
-          certificate is what you have already finished, which is where a
-          page ends rather than where it starts. `.keep-place` is the opt-out
+          THAT ALSO HANDS THE CLOSING HAIRLINE BACK TO §14.200. `.page > .sec
+          :last-child::after{display:none}` is the build's answer to "a rule
+          under the last section has nothing after it to separate", and it was
+          `.keep-place` — a wrapper introduced for `placeDark` and nothing else —
+          that broke its child combinator and made §82.5 necessary. With the
+          wrapper gone the original rule matches again.
+
+          THE PARAGRAPHS BELOW ARE THE HISTORY OF THE BLACK CARD IN THIS SLOT
+          and are kept because they are why it is not in the band: the band is
+          what you are being asked to do next, and this level's enrolment is
+          that; the certificate is what you have already finished, which is where
+          a page ends rather than where it starts. `.keep-place` was the opt-out
           and `placeDark` reads it — one class, so any other card that wants
           to stay where it was written can say so the same way.
 
           It is still the same `certCard` as `V.transcript`'s, so the two
-          cannot disagree about what the certificate says. */}
-    <div class="keep-place">${certCard(f)}</div>`;
+          cannot disagree about what the certificate says.
+
+          AND THE STRIP HAS SINCE MOVED TO THE HEAD OF THE PAGE (Maryam,
+          1 Sep 2026) — the call is written above `enrolOffer` now, so this
+          slot is empty and the page's last section is the Quick Actions.
+          §14.200 turns that one's closing hairline off unaided, which is the
+          same reason §82.5 could be deleted. */}`;
 
   else { /* enrolled: week1, day34, day90 */
     const g = GAME[S.stage];
@@ -4841,7 +5105,7 @@ V.level = (f) => {
         module), from the `assessed` and `promoted` dashboards' "What the
         interview found" Quick Action, and from the block's own foot button in
         its new home. Three ways in, none of them this page. */}
-  ${!confirmed?`<div class="sec mt6">
+  ${!confirmed?`<div class="sec">
     <div class="tile bordered">
       <div class="ai-head"><h3>What the Explorer track means</h3></div>
       <div class="ai-body">
@@ -4850,6 +5114,35 @@ V.level = (f) => {
       </div>
     </div>
   </div>`:''}
+  ${''/* THE CERTIFICATE, AS THE TINTED BANNER (Maryam, 1 Sep 2026: "instead of
+        this black certification card, use the same light orange banner here as
+        well that we have on the dashboard"). It arrived as `certCard` — the
+        black card — earlier the same day, and the band replaces it.
+
+        IT TAKES THE SLOT THE REPORT BLOCK LEFT: between the ladder and "How the
+        ladder works", so the page reads position, proof, then how the ladder
+        works for everyone. The reference block stays last because it is the
+        only part of this page that is not about you.
+
+        NO `close` HERE, WHICH IS THE ONE DIFFERENCE FROM THE DASHBOARD'S CALL —
+        `certBanner`'s own note is the argument, and the short version is that
+        `S.certBan` is a single flag: with the cross on both, dismissing the
+        notice on the dashboard would empty this block too, on the one page
+        where nothing else states that a certificate exists.
+
+        AND `.keep-place` WENT WITH THE BLACK CARD. It existed only to opt a
+        `.cert` out of `placeDark`'s lift (trap 12); a `.certban` is not in
+        ai5's `DARK_CARD`, so there is nothing to opt out of. **That leaves
+        `.keep-place` with no writer anywhere in the build** — ai5's check for
+        it still stands and is now a gate nothing writes. Flagged rather than
+        deleted: it is a pass's documented escape hatch, not a style rule, and
+        the next `.cert` on a page with a band will want it.
+
+        GATED ON `f.done > 0`, WHICH IS `V.transcript`'S OWN CONDITION rather
+        than a new one. A certificate is a course you finished, so the stages
+        with nothing finished draw nothing — and matching Course Progress means
+        the two pages cannot disagree about whether one exists. */}
+  ${f.done>0?certBanner(f):''}
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
   </div>`:''}
@@ -5302,7 +5595,7 @@ V.report = (f) => `<main class="main"><div class="page">
     <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
     ${sceneRow(S.iv === 're' ? 're' : 'level')}
   </div>
-  <div class="sec mt6">
+  <div class="sec">
     <div class="tile">
       <div class="row-lead">
         ${avatar(AGENTS.priya,40)}
@@ -7056,7 +7349,29 @@ V.rewards = (f) => {
     <div class="sec"><div class="empty" style="padding:0 0 var(--s07)">${I.trophy}<h3 style="margin-top:var(--s06)">Nothing to show yet</h3>
       <p>Points, badges and rank begin when your cohort starts.</p></div></div></div></main>`;
   const tab = S.rtab || 'points';
-  const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`};
+  /* A FOURTH TAB — CERTIFICATES (Maryam, 1 Sep 2026: "you first have to add a
+     tab in tabs row of points, badges, and ranks by the name of Certificates
+     and show the certificates there, not in black card but in rows, user could
+     download and share their link").
+
+     IT BELONGS ON THIS MODULE ON THE MODULE'S OWN TERMS. Points, badges and
+     rank are three answers to "what has this course earned me"; a certificate
+     is the fourth and the only one that is a document you can hand to somebody.
+     It is also the one the black card could never put in a LIST — one card
+     states one certificate, and this reader has two.
+
+     THE LABELS ARE A MAP NOW BECAUSE `k[0].toUpperCase() + k.slice(1)` CANNOT
+     SPELL IT. That expression gave the other three their names for free and
+     would give this one "Certs" — an abbreviation nothing else in the product
+     uses. The key stays short because it is what `S.rtab` and `data-rtab`
+     carry; only the visible word is looked up. */
+  const TAB_N = {points:'Points', badges:'Badges', rank:'Rank', certs:'Certificates'};
+  const nCerts = certsFor(f).length;
+  const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`,
+    /* READ, NOT TYPED — one certificate before the re-interview and two after,
+       and `certsFor` is the same list the rows are drawn from, so the count and
+       the list cannot disagree. */
+    certs:`${nCerts} earned`};
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Achievements')}
   ${''/* NO DESCRIPTION HERE EITHER. "Points, badges and rank come from your
@@ -7093,18 +7408,60 @@ V.rewards = (f) => {
   <div class="sec ask-chips"><div class="ai-asks">
     ${askChip('How do I earn points fastest?','Ask Tal how to earn more')}
   </div></div>
-  <div class="sec" style="padding-bottom:var(--s06)">${scoreCard(g)}</div>
+  ${''/* THE POINTS STRIP GOES BESIDE THE SUMMARY, NOT UNDER IT (Maryam,
+        1 Sep 2026: "the points section on the bottom of the summary should be
+        on the right side of the summary just like our component where we have
+        summary and progress side by side").
+
+        THE COMPONENT SHE MEANS IS §56'S TWO-COLUMN BAND, AND IT NEEDS NO NEW
+        CSS — two classes on the section this already drew. `.head-sec` is
+        `placeBand`'s documented opt-in: that pass walks a RUN forward from the
+        `.ph` and takes Tal's card, the ask line, and anything a view has
+        DECLARED as head furniture, so a section that is neither of the first
+        two says so itself. `.head-col` is the half that opens column two —
+        §56.742 and §71.35 both record that the gate was corrected from
+        `.sec-jrn` to `.head-col` exactly so a second tenant could use the slot,
+        and this is the third: the journey list on the pre-course dashboards,
+        `progressWing` on the enrolled ones, the points strip here.
+
+        IT HAS TO STAY WRITTEN THIRD, after the `.ph` and the ask chips, because
+        the run STOPS at the first sibling that is not head furniture. The
+        `.tabs` row below is what ends it, which is also why the strip could not
+        simply be moved above the chips.
+
+        AND THE INLINE `padding-bottom` CAME OFF — trap 1. An inline
+        declaration beats every stylesheet rule at any specificity, and in the
+        band the column's spacing is §70.3's. Left there it would have been a
+        value from the page body silently winning inside the head. */}
+  <div class="sec head-sec head-col">${scoreCard(g)}</div>
   <div class="tabs">
-    ${['points','badges','rank'].map(k=>`<button class="${k===tab?'on':''}" data-rtab="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}
+    ${['points','badges','rank','certs'].map(k=>`<button class="${k===tab?'on':''}" data-rtab="${k}">${TAB_N[k]}</button>`).join('')}
   </div>
   <div class="sec nofill" style="padding-top:var(--s05)">
     <div class="sec-h" style="margin-bottom:var(--s04)"><span class="t-helper-01">${counts[tab]}</span>
       <span class="t-helper-01" style="margin-left:auto">Updated today</span></div>
-    <div class="aw-list">
+    ${''/* THE CERTIFICATES TAB IS A `.tile-stack`, NOT AN `.aw-list`, and the
+          wrapper is branched rather than shared. `.aw-list` is the container for
+          `.aw` rows — a mark, a name and description, a value and a state at the
+          right end — and a certificate has no value and no percentage; it is a
+          `.cardrow`, which is what `V.leadCerts` already draws its list of
+          certificates as. Reusing `.aw-list` would have meant styling `.cardrow`
+          against a parent written for a different row.
+
+          BOTH WRAPPERS OPT THIS SECTION OUT OF THE LABEL COLUMN — trap 13.
+          §10.451 names `.sec:has(.cardrow)` and `.sec:has(> .tile-stack)`
+          alongside the list this section already relied on, so the switch cannot
+          drop the opt-out the way §69's and §73's content changes did. */}
+    ${tab==='certs'?`<div class="tile-stack">${certList(f)}</div>`:`<div class="aw-list">
       ${tab==='points'?pointsList(g):tab==='badges'?badgeList(g):rankList(g)}
-    </div>
+    </div>`}
     ${tab==='points'?`<p class="t-helper-01 mt5">Points update within a few minutes of the activity.</p>`:''}
     ${tab==='rank'?`<p class="t-helper-01 mt5">Rank reflects your activity. It is separate from your level.</p>`:''}
+    ${''/* WHAT A CERTIFICATE IS FOR, once, where the other two tabs put their
+          one-line note. It is the only tab whose rows DO something outside the
+          product, so the line says what the share link is rather than repeating
+          what the buttons are labelled. */}
+    ${tab==='certs'?`<p class="t-helper-01 mt5">A share link is public and shows the level and the date only. Nothing else on your profile is published.</p>`:''}
   </div>
 </div></main>`;
 };
@@ -7235,7 +7592,28 @@ V.transcript = (f) => {
     <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
     <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
   </div>
-  ${f.done>0?certCard(f):''}
+  ${''/* THE CERTIFICATE CARD IS OFF THIS PAGE (Maryam, 1 Sep 2026: "remove this
+        black card from course progress page"). It was `certCard(f)` gated on
+        `f.done>0`.
+
+        AND IT WAS THE LAST CALLER, SO `certCard` IS DELETED. The candidate's
+        three drawings of a certificate resolved to one over the course of the
+        day: the `promoted` dashboard and My Level both took `certBanner`, and
+        this was the only place the black card was still drawn. A function whose
+        callers have all gone is deleted rather than left orphaned — the same
+        discipline `quizResults`, `enrolPlate`, `coverSec` and `enrolHours` were
+        each held to.
+
+        `.cert`'S STYLESHEET STAYS AND IS NOT ORPHANED, which is the difference
+        from those four. `V.leadCerts` (lead4.js) draws the leader's most recent
+        certification as a `.cert` hero with the same `.cert-mark` / `.cert-eb` /
+        `.cert-act` parts, so §15's rules keep a live writer one portal over.
+        Deleting them would take a working component off that page.
+
+        NOTHING BECAME UNREACHABLE. The certificate is on My Level as the tinted
+        band, on the `promoted` dashboard as the dismissible notice, and in full
+        in the Achievements module's Certificates tab, which is the one place it
+        is a LIST and the only one that shows both. */}
 </div></main>`;
 };
 
@@ -8970,6 +9348,14 @@ device.addEventListener('click', e => {
   const bk = t.closest('[data-back]');
   if(bk){ back(); return; }
 
+  /* THE CERTIFICATE NOTICE'S CLOSE. Same shape as the two below it — read the
+     attribute, set the state, re-render — because that is what a boolean the
+     view is a pure function of costs (trap 9). It carries `"0"` rather than
+     being a bare marker so re-opening is one call site away if anything ever
+     wants to. */
+  const cb = t.closest('[data-certban]');
+  if(cb){ S.certBan = cb.dataset.certban === '1'; render(); return; }
+
   const ep = t.closest('[data-editprofile]');
   if(ep){ S.editProfile = ep.dataset.editprofile==='1'; render(); return; }
 
@@ -9133,7 +9519,39 @@ device.addEventListener('click', e => {
     fd.setAttribute('aria-expanded', S.disc[k] ? 'true' : 'false');
     return;
   }
-  const ah = t.closest('.acc-h');       if(ah){ ah.parentElement.classList.toggle('on'); return; }
+  /* ONE QUESTION OPEN AT A TIME (Maryam, 1 Sep 2026: "Open one question at a
+     time, means if i open the next the previous one will be closed").
+
+     IT WAS A BARE `toggle`, so every row was independent and all six of the
+     Data use notice's clauses could stand open at once — which is a page of
+     prose with headings in it rather than a set of questions you pick from.
+     Closing the others is what makes the chevron mean "this one", and it is
+     also what keeps the block's height roughly constant as you read down it.
+
+     SCOPED TO THE NEAREST `.acc`, NOT THE DOCUMENT. `V.account` draws one
+     accordion and `V.level` another, and a page could hold two; closing "every
+     `.acc-i.on` on the page" would make two unrelated lists fight each other.
+     `closest('.acc')` is the group, with a fallback to the parent's parent for
+     any markup that ever nests the items without the wrapper.
+
+     THE TOGGLE SURVIVES: pressing the OPEN row still shuts it. `wasOn` is read
+     before the sweep, so the sweep closes it and the `if` declines to reopen —
+     which is the behaviour a disclosure needs and the thing a naive
+     "close all, then open this" gets wrong.
+
+     STILL A DOM CLASS, NOT `S`, and that is unchanged and correct here. The
+     note over §65's disclosure explains the split: `.acc` is on pages nothing
+     re-renders under the reader, so trap 9 does not bite. `S.disc` exists for
+     the dashboards, where Tal answering a question repaints the page. */
+  const ah = t.closest('.acc-h');
+  if(ah){
+    const item = ah.parentElement;
+    const wasOn = item.classList.contains('on');
+    const group = item.closest('.acc') || item.parentElement;
+    group.querySelectorAll('.acc-i.on').forEach(x => x.classList.remove('on'));
+    if(!wasOn) item.classList.add('on');
+    return;
+  }
   /* THE BOOKING PAGE'S TIME IS STATE AND IT HAS TO BE TESTED FIRST, which is
      the whole reason this is three lines above `.slot` rather than three below.
      `data-bkslot` is on a `.slot`, so the generic handler underneath matches it

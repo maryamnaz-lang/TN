@@ -815,7 +815,51 @@ css = '\n'.join((here / f).read_text() for f in
                  # AFTER §63 AND ALLOWED TO BE on the usual test: three
                  # `display` declarations, and not one font-size, font-weight,
                  # text-transform or text colour.
-                 '84-tintnorule.css'])
+                 '84-tintnorule.css',
+                 # THE CERTIFICATE BANNER, AND TWO ALIGNMENTS ON THE PULSE CARD.
+                 # Three corrections in one layer, and all three are late for
+                 # the same reason: each answers a declaration an earlier layer
+                 # already makes at a weight it cannot be outweighed from where
+                 # that layer sits.
+                 #   `.certban` is the certificate as a short tinted band on the
+                 #   `promoted` dashboard. It reverses exactly one declaration —
+                 #   §15.522's negative `--pad-x` margins, which bleed `.cert`
+                 #   rail to rail — and takes §75's inset-as-a-margin instead.
+                 #   `.sec-pulse`'s action goes top-aligned at 40px, against
+                 #   §73.1's `align-self:center` at (0,6,0) inside `aiHead`.
+                 #   That default is still right for the cover row; the pulse
+                 #   and the offer are both two-line blocks now that §63 moved
+                 #   `.aih-d` to `--t-body`, so both take the exception.
+                 #   `.pnc-when` goes bottom-aligned, against §79's stated
+                 #   `align-self:center` on the same element.
+                 # AFTER §63 AND ALLOWED TO BE, on the usual test: layout,
+                 # grounds, borders and a mark's `fill`. Not one font-size,
+                 # font-weight, text-transform or text colour — the banner's
+                 # two type roles and its two inks are stated in §63 §21.
+                 # AFTER §84 AND DISJOINT FROM IT: that layer states three
+                 # `display:none`s on tinted sections and this one touches no
+                 # `.sec.tint`. Order between the two is free.
+                 # AFTER §83 AND SAFE for §83's own stated reason — its "dead
+                 # last" claim is about the `--accent*` and `--ai-*` TOKENS, and
+                 # this layer states no token. The banner's ground is a
+                 # `color-mix` off `var(--accent)`, so the red trial re-points
+                 # it for free rather than needing an entry.
+                 '85-certbanner.css',
+                 # THE COHORT COVER. `.gcard-art` — the leader's cohort rows and
+                 # her black call card take an image where they drew `I.group`
+                 # (Maryam, 1 Sep 2026). Late for one reason and it is the usual
+                 # one: §02.229 gives every list row in the build
+                 # `align-items:center` and §04.12 restates it for `.tile.gcard`,
+                 # so the `align-self:stretch` that makes the cover as tall as
+                 # its own row has to land after both. It also reads `--t-*-lh`
+                 # tokens in a `calc`, which only exist from §63 on.
+                 # AFTER §63 AND ALLOWED TO BE: layout, a ground and an
+                 # `object-fit`. The cover's fallback numeral is typed in §63 §21
+                 # with the banner's roles, not here.
+                 # NOTHING ELSE IN THE BUILD WRITES `.gcard-art`, so this layer
+                 # is disjoint from §84 and §85 and the order between the three
+                 # is free.
+                 '86-cohortart.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1127,6 +1171,43 @@ call_js = 'const CALL_ART = {\n  ' + _ca + '\n};\n'
 print(f'call photographs embedded: {len(CALL_ART)} files, '
       f'{sum((here / f).stat().st_size for f in CALL_ART.values())/1024:.0f} KB')
 
+# ==========================================================================
+# THE COHORT COVERS — Maryam's own three, 1 Sep 2026
+#
+# THE LEADER'S COHORT ROWS AND HER BLACK CALL CARD DREW A GLYPH, and a glyph is
+# the wrong mark for a cohort: `I.group` is the same two figures on all three
+# rows, which says "these are the same kind of thing" — the sentence the
+# heading above them already says. §31's `faceRow` note makes exactly this
+# argument for a queue of people ("a face is the one mark that distinguishes
+# the rows from each other"); a cohort has no face, so it gets a cover.
+#
+# KEYED BY LEVEL, NOT BY COHORT ID, so a fourth cohort at E1 gets a cover for
+# free rather than needing a fourth file — `cohortArt` in lead.js is the lookup
+# and its note is the argument. The three files are in the order Maryam sent
+# them, which IS the level order: Business Exploration for E1, Business Idea for
+# E2, Startup Course for E3.
+#
+# 200px SQUARES, CROPPED OUT OF BUILD. The display size is the row's own content
+# height — about 70 CSS px (§86) and 78 on the black card — so 200 is better
+# than 2x on the densest screen anybody reads this on, and cropping here rather
+# than with `object-position` is what lets each one keep its OWN focal point:
+# the E1 art is a centred circle so it takes a centre crop, while E2's lightbulb
+# and E3's blue title panel are both left of centre and a centre crop cut the
+# words in half. That decision cannot be expressed in CSS per-image without
+# three more rules, and it is a property of the picture rather than of the slot.
+#
+# WebP at q82 for the reason the call photographs' note gives — these are flat
+# illustrations rather than photographs, which is why q82 comes in at 17 KB for
+# all three against 66 KB of source JPEG/AVIF.
+# ==========================================================================
+COHORT_ART = ['e1', 'e2', 'e3']
+_co = ',\n  '.join(
+    "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'cohorts' / ('cohort-' + k + '.webp')).read_bytes()).decode())
+    for k in COHORT_ART)
+cohort_js = 'const COHORT_ART = {\n  ' + _co + '\n};\n'
+print(f'cohort covers embedded: {len(COHORT_ART)} files, '
+      f'{sum((here / "cohorts" / ("cohort-" + k + ".webp")).stat().st_size for k in COHORT_ART)/1024:.0f} KB')
+
 AWARDS = ['points', 'bronze', 'silver', 'gold', 'involved', 'rank1', 'rank2', 'rank3']
 _aw = ',\n  '.join(
     "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'awards' / (k + '.webp')).read_bytes()).decode())
@@ -1192,7 +1273,7 @@ print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + call_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)

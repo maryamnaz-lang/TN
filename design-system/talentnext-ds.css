@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 4676.  Rules dropped as product-specific: 187.
+   Rules kept: 4690.  Rules dropped as product-specific: 187.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3241,7 +3241,7 @@ button{font-family:var(--font-sans)}
   .app .ph::before,
   .app .score::before{display:none}
   .app .page > .sec::after{display:none}
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,
@@ -4618,11 +4618,9 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .ph{padding-bottom:var(--s05)}
   .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){padding-bottom:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){padding-top:var(--s05)}
-  .app .page > .sec:has(> .plate) + .sec.sec-cs,
-  .app .page > .sec-call + .sec{padding-top:0}
-  .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s05)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){padding-bottom:var(--s06)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){padding-top:var(--s06)}
+  .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s06)}
 }
 
 /* ---- 21-ask.css ---- */
@@ -4837,7 +4835,6 @@ button.btn-p:active,
 .app .ai-asks .chip-tal:hover:where(.__nh),
 .app .bub .chip-tal:hover:where(.__nh){color:var(--text-primary)}
 .app .s-n,
-.app .acc-i.on .acc-h .ttl,
 .app .page .tq.me .tq-w,
 .app .m-unread > span,
 .app .page .ai-inline,
@@ -6569,7 +6566,7 @@ button.btn-p:active,
 /* ---- 59-priority.css ---- */
 .app .wing-prog .prog,
 .app .wing-lvl .prog{--pad-x:0px}
-.app .wing-prog .prog-figs > span:first-child{padding-left:var(--s05)}
+.app .wing-prog .prog-figs > span:first-child{padding-left:0}
 .app .wing-lvl .ladder i{background:var(--layer-accent-01)}
 .app .wing-lvl .ladder i.done{background:var(--accent); opacity:1}
 .app .wing-lvl .ladder-lab{color:var(--text-helper)}
@@ -7126,18 +7123,21 @@ button.btn-p:active,
 .app .call-self .call-selfn{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls)}
 .app :where(b, strong, th, .notif-g){font-weight:var(--t-w-strong)}
 .app :where(em, i, small, p, li, td){font-weight:var(--t-w-book)}
+.app .sec:has(> .sec-h) > .sec-h h2,
+.app .sec > .hd-srch .sec-h h2{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls)}
 @container app (min-width:672px){
   .app .bhead > span{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong)}
 }
 @container app (min-width:900px){
-  .app .sec:has(> .sec-h) > .sec-h h2{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls)}
+  .app .sec:has(> .sec-h) > .sec-h h2,
+  .app .sec > .hd-srch .sec-h h2{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls)}
   .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .lnk) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(.stp) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2,
-  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls)}
+  .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls)}
   .app .ph .lead{font-size:var(--t-body-size); line-height:var(--t-body-lh); letter-spacing:var(--t-body-ls)}
   .app .payhead > span{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong)}
   .app[data-rail="open"] .sn-item .badge{font-size:10px; line-height:1}
@@ -7202,9 +7202,6 @@ button.btn-p:active,
 .app .dark-card .dc-hd-r > .dc-when{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--on-dark)}
 .app .rec-dark .rec-r,
 .app .rec-dark .rec-f{color:var(--on-dark-2)}
-@container app (min-width:900px){
-  .app .page:not(.form-page) .sec-qa > .sec-h h2{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls)}
-}
 .app .askdock .askline-t{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
 .app .askdock .askline-q{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:#474747}
 .app .rec-alt.rec-finding{font-style:normal}
@@ -7317,10 +7314,9 @@ button.btn-p:active,
 .app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
 .app .dark-card .eo-when{color:var(--on-dark)}
 .app .dark-card .eo-when > b{color:var(--on-dark)}
-.app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls)}
-@container app (min-width:900px){
-  .app[data-portal="leader"] .page:not(.form-page) .sec[id^="lead-"] > .sec-h > h2{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls)}
-}
+.app .certban-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
+.app .certban-m{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
+.app .gcard-art > i{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-secondary)}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
@@ -7351,7 +7347,6 @@ button.btn-p:active,
   .app .page .sec.found{display:block; padding-left:var(--pad-x); padding-right:var(--pad-x)}
   .app .page .sec.found > .sec-h{border-right:0; min-height:0; margin:0 0 var(--s04); padding:0}
   .app .page .sec.found > :not(.sec-h){padding-left:0; padding-right:0}
-  .app .page .sec.found > .sec-h h2{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); letter-spacing:var(--t-h4-ls)}
 }
 .app .page .sec-h.found-h{align-items:center}
 .app .page .sec-h.found-h > .found-t{display:flex; align-items:center; gap:var(--s03); flex:1 1 auto; min-width:0; min-height:0; padding:0; margin:0; border:0; background:none; text-align:left; cursor:pointer}
@@ -7465,8 +7460,10 @@ button.btn-p:active,
 .app .modhead::before{background-image:var(--ai-wash)}
 .app .modhead:has(> .sec-jrn)::before{background-image:none}
 .app .modhead .ai-aura.talsum .ai-body p b{background-color:var(--ai-hl-bg); border-radius:4px; padding:1px 4px; margin:0 -1px; -webkit-box-decoration-break:clone; box-decoration-break:clone}
-.app .modhead .ai-aura.talsum > .ai-body,
-.app .modhead .ai-aura.talsum > .ai-body p{max-width:733px}
+.app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body,
+.app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body p,
+.app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
+.app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body p{max-width:733px}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{background-image:var(--ai-grad); -webkit-background-clip:text; background-clip:text; gap:6px}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
 .app .ai-label.bare.rec-lab::before{content:''; width:12px; height:12px; flex:none; border-radius:0; background-color:transparent; background-image:var(--ai-grad); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat; box-shadow:none; animation:none}
@@ -7573,7 +7570,7 @@ button.btn-p:active,
 @container app (max-width:599.98px){
   .app .sumdrop{width:100%}
 }
-.app .sec-qa{padding:var(--s07) var(--pad-x); border-top:1px solid #d7d5cc}
+.app .sec-qa{padding:var(--s06) var(--pad-x); border-top:1px solid #d7d5cc}
 .app .page > .sec:has(+ .sec-qa)::after{display:none}
 .app .sec-qa > .sec-h{margin:0 0 20px; padding:0}
 @container app (min-width:900px){
@@ -7604,9 +7601,9 @@ button.btn-p:active,
 .app .askdock .askline-send svg{width:20px; height:20px; fill:currentColor}
 .app .askdock > .askline{border-color:var(--ai-1)}
 @container app (min-width:900px){
-  .app .modhead:has(> .head-col) > .ph:not(.ph-you){grid-column:1; grid-row:1}
-  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .sec:has(> .ai-aura.talsum){grid-row:2}
-  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you)) > .head-col{grid-row:1 / span 2}
+  .app .modhead:has(> .head-col) > .ph:not(.ph-you):not(.ph-bare){grid-column:1; grid-row:1}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you):not(.ph-bare)) > .sec:has(> .ai-aura.talsum){grid-row:2}
+  .app .modhead:has(> .head-col):has(> .ph:not(.ph-you):not(.ph-bare)) > .head-col{grid-row:1 / span 2}
 }
 .app .sec-lead .row-lead > .btn{flex:none; align-self:flex-start; width:36px; height:36px; min-height:0; padding:0; display:grid; place-items:center; background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
 .app .sec-lead .row-lead > .btn svg{width:20px; height:20px; fill:var(--mk-1)}
@@ -7783,7 +7780,7 @@ button.btn-p:active,
   .app .cov-row{grid-template-columns:repeat(5,minmax(200px,1fr)); overflow-x:auto; border-left:0; border-right:0}
 }
 @container app (min-width:900px){
-  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call):not(.dark-card){padding-top:var(--s07); padding-bottom:var(--s07)}
+  .app .page:has(> .modhead > .sec-jrn) > .sec:not(.sec-call):not(.dark-card){padding-top:var(--s06); padding-bottom:var(--s06)}
 }
 .app .modhead:not(:has(> .sec))::before,
 .app .modhead:not(:has(> .sec))::after{display:none}
@@ -7818,7 +7815,7 @@ button.btn-p:active,
 .app .page .sec > .signed{border-top:1px solid var(--rule); padding-top:var(--s07)}
 
 /* ---- 75-recdark.css ---- */
-.app .sec.dark-card{display:flex; flex-direction:column; gap:20px; margin:var(--s06) var(--pad-x) 0; padding:var(--s07); background-color:var(--gray-100); background-image:radial-gradient(78% 135% at 92% -8%,
+.app .sec.dark-card{display:flex; flex-direction:column; gap:20px; margin:var(--s06) var(--pad-x); padding:var(--s07); background-color:var(--gray-100); background-image:radial-gradient(78% 135% at 92% -8%,
     color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 64%); background-repeat:no-repeat}
 .app .page > .sec.dark-card::after,
 .app .page > .sec.dark-card::before{content:none}
@@ -8059,10 +8056,6 @@ button.btn-p:active,
 .app .dark-card .eo-when svg{fill:currentColor}
 .app .qa-ic.ic-cover svg{fill:var(--mk-3)}
 .app .qa-ic.ic-found svg{fill:var(--mk-1)}
-.app .page > .keep-place:last-child > .sec::after{display:none}
-@container app (min-width:900px){
-  .app .page > .keep-place:last-child > .sec::after{display:none}
-}
 
 /* ---- 84-tintnorule.css ---- */
 .app .page > .sec.tint::after,
@@ -8070,3 +8063,26 @@ button.btn-p:active,
 .app .page > .ph:has(+ .sec.tint)::after,
 .app .page > .crumb:has(+ .sec.tint)::after{display:none}
 .app .page > .sec:has(+ .sec.sec-rep)::after{display:none}
+
+/* ---- 85-certbanner.css ---- */
+.app .certban{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); padding:var(--s05); background:color-mix(in srgb, var(--accent) 8%, transparent)}
+.app .certban-mk{flex:none; display:grid; place-items:center; width:32px; height:32px}
+.app .certban-mk svg{width:32px; height:32px; fill:var(--accent-text)}
+.app .certban-b{flex:1 1 220px; min-width:0; display:flex; flex-direction:column; gap:2px}
+.app .certban-a{flex:none; margin-left:auto; display:flex; align-items:center; gap:var(--s04); flex-wrap:wrap}
+.app .certban-a > .btn-p{background-image:var(--accent-grad); border-color:transparent; --on-brand-fill:1}
+.app .certban-x{flex:none; display:grid; place-items:center; width:32px; height:32px; padding:0; background:transparent; border:0; color:var(--text-secondary); cursor:pointer}
+.app .certban-x svg{width:16px; height:16px; fill:currentColor; display:block}
+.app .page > .sec:has(+ .sec.dark-card)::after{display:none}
+.app .page .sec.sec-pulse > .sec-h.aih > .aih-a{align-self:flex-start}
+.app .page .sec.sec-pulse > .sec-h.aih > .aih-a > .btn{min-height:40px}
+.app .pnc-row > .pnc-when{align-self:end}
+@container app (min-width:900px){
+  .app .modhead > .head-col > .score{flex:1; min-width:0}
+}
+
+/* ---- 86-cohortart.css ---- */
+.app .gcard-art{--gcard-art:calc(var(--t-eyebrow-lh) + var(--s03) + var(--t-h4-lh) + 2px + var(--t-desc-lh)); position:relative; overflow:hidden; flex:none; align-self:stretch; width:var(--gcard-art); min-height:var(--gcard-art); display:grid; place-items:center; background:var(--layer-02)}
+.app .gcard-art > img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+.app .gcard-art > i{font-style:normal}
+.app .gcard:has(> .gcard-art) > .tile-arrow{align-self:center}

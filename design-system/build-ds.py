@@ -588,6 +588,38 @@ LAYERS = [
     # §20's list gives `.sec-cs`, `.sec-out` and `.cap-sec`. A hand-authored
     # page with a white table under a figure band wants exactly that word.
     '84-tintnorule.css',
+    # THE CERTIFICATE BANNER AND TWO ALIGNMENTS, AND ALL OF IT CROSSES.
+    # `.certban*` is a component in the plainest sense — a tinted band with a
+    # mark, two lines and a pair of buttons, drawn entirely in flexbox off
+    # `--accent`, `--pad-x` and the spacing scale. No render pass touches it
+    # (it is deliberately NOT `.cert`, so `placeDark` cannot see it — that is
+    # the whole point of the class), no JS writes it, and a hand-authored page
+    # that wants a quiet "here is a document you earned" row wants exactly
+    # this. It is the counter-example to the `.cert` card, which a second
+    # portal often cannot afford to draw at full volume.
+    # THE TWO ALIGNMENT RULES ARE SCOPED TO `.sec-pulse` AND `.pnc-row`, both
+    # of which the design system already ships (§72/§79 are in this list), so
+    # they cross with the components they correct rather than as loose rules.
+    # A page that draws neither is unaffected: every selector needs one of
+    # those two classes to match at all.
+    # NOTHING HERE IS RENDER-PASS-BOUND, which is the test this list applies —
+    # `.certban` is markup plus CSS, and `gallery.html` can write it as-is.
+    '85-certbanner.css',
+    # THE COHORT COVER CROSSES, AND IT IS THE PURE CASE FOR THIS LIST'S POLICY.
+    # §86 is `.gcard-art`: a cover image in a list row's leading slot, sized to
+    # the row's own content height. The IMAGES are the portal's (build.py embeds
+    # three cohort covers and this build embeds none of them), but the rules know
+    # nothing about them — they are layout, a ground and an `object-fit`, and a
+    # hand-authored page pointing the `<img>` at its own artwork gets the whole
+    # component. `.gcard` is already here with 68 rules and its own gallery entry,
+    # so this is one more shape of a component the box ships rather than a new
+    # dependency.
+    # NO RENDER PASS IS INVOLVED — the markup is `gcard`'s optional sixth
+    # argument, five lines of template, and `gallery.html` can write it as-is.
+    # THE `calc()` READS §63'S TOKENS, which this build ships (§63 is in this
+    # list), so the square stays equal to the three lines beside it in the box
+    # exactly as it does in the portal.
+    '86-cohortart.css',
 ]
 
 # ==========================================================================

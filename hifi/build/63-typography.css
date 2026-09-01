@@ -163,12 +163,20 @@
      one pixel off, and that is what these three shipped at first. This is a
      stated exception under §63 §7 instead, on two grounds: it is a ROLE — three
      headings across two layers, not one component's one-off — and unlike the 32
-     it is not a near-duplicate of a size in use for the same job, because §63 §4
-     puts every other section heading at 12.5. Eight sizes and one exception,
-     written down, beats nine sizes nobody can account for.
+     it is not a near-duplicate of a size in use for the same job.
 
-     If it goes back to h3, delete this token and point the three rules at
-     `--t-h3-*`; nothing else reads it. */
+     AND IT IS NOW THE SECTION HEADING ITSELF (Maryam, 1 Sep 2026). This entry
+     used to end "because §63 §4 puts every other section heading at 12.5" —
+     that was the argument for it being a distinct rank, and the instruction
+     that followed was to make the section heading one size everywhere, at 16.
+     So §8b points the ordinary section heading at this token too: `--t-sec` is
+     no longer an exception beside the section heading, it IS the section
+     heading, and `.aih-t` shares it rather than out-ranking it. Nine sizes
+     with one of them doing more work, which is the direction to prefer.
+
+     If it ever goes back to h3, delete this token and point its readers at
+     `--t-h3-*` — but note that is now most of the product's headings, not the
+     three this note was written about. */
   --t-sec-size:16px;          --t-sec-lh:22px;          --t-sec-ls:-.15px;
 
   /* THE TENTH SIZE, AND §17 PREDICTED THE MOMENT IT WOULD BE MINTED.
@@ -180,11 +188,14 @@
      (Maryam, 31 Aug 2026: "Your cohorts", "Needs attention", "Waiting on you",
      "Booked") — so the number stops being one component's and becomes a role.
 
-     TWO READERS, TWO LAYERS, WHICH IS THE SAME TEST `--t-sec-size` PASSED:
-     `.dc-t` (the black card's title, §17 below) and the leader dashboard's
-     `.sec-h h2` (§21). Both are the head of a BLOCK the reader is meant to
-     land on, one rank above the 16 that heads an AI-native section and two
-     above the 12.5 every other section heading takes.
+     ONE READER NOW, AND IT USED TO BE TWO. `.dc-t`, the black card's title
+     (§17 below), is all that reads it; the leader dashboard's four queue
+     headings (§21) were the second reader and were folded into the one
+     section-heading size on 1 Sep 2026. It is the head of a BLOCK the reader
+     is meant to land on, one rank above the 16 every section heading now
+     takes. Kept as a token rather than reverted to a literal: §7's test is
+     about whether a number is worth naming, and un-naming it here only to
+     re-name it the next time a second block wants 18 is churn.
 
      IT IS NOT A NEAR-DUPLICATE, which is the other half of §7's test: h3 is
      17 and is the nearest role, one pixel off — the identical position
@@ -990,40 +1001,86 @@
    peers, two ranks, and the two odd ones happen to be one white and one
    grey — which is why it reads as a ground problem and is not one.
 
-   THE SIZE IS `--t-label` AND THE OLD REASON FOR IT WAS MOSTLY FALSE. This
-   block used to say the heading "stops being a title and starts being a
-   spine" at ≥900, because §10.15 turns a headed `.sec` into a 184px label
-   column. That is a good argument and it covers 36 of 290 headings — four
-   distinct ones, all on "What Tal knows". Every other section opts OUT of
-   the column (§10.15's list is keyed on CONTENTS — `.tile-stack`, `.stats`,
-   `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard`, `.kv` — and almost everything
-   is built from those, which is trap 13 working as intended). So the spine
-   was never the reason 131 of these were 12.5; being the default was.
-   It is kept because it is the size the product already used most and
-   because Maryam chose it over 14 and 16 when the three were put side by
-   side — not because the heading is a column label. §65 spotted the same
-   hole from the other end and carved `.found` out at h4; that carve-out is
-   gone with the rest.
+   THE SIZE IS `--t-sec` — 16px, AT EVERY WIDTH. Maryam's own number, and the
+   one already carried by `.aih-t`, so the AI-native heads and every ordinary
+   section heading are now the same rank and there is exactly ONE section
+   heading size in the product. Measured after: 286 headings, 16px, at 390 and
+   at 1280, white ground and grey alike, and no page drawing two.
+
+   THE "SPINE" ARGUMENT IS GONE AND IT WAS MOSTLY FALSE ANYWAY. This block used
+   to put the heading on the LABEL role at ≥900 — "it stops being a title and
+   starts being a spine", because §10.15 turns a headed `.sec` into a 184px
+   column. Good argument, and it covers 36 of 290 headings: four distinct ones,
+   all on "What Tal knows". Every other section opts OUT of that column, since
+   §10.15's list is keyed on CONTENTS (`.tile-stack`, `.stats`, `.tbl-wrap`,
+   `.facts`, `.cardrow`, `.gcard`, `.kv`) and almost everything is built from
+   those — trap 13 working as intended. So the label role was never justified
+   for 254 of the headings it was sizing; it was just the default. Worth
+   keeping in mind if anyone re-proposes a smaller spine: it would be right for
+   about an eighth of the product.
+
+   THE HEADING NO LONGER CHANGES RANK AT 900, which is why the rule is stated
+   TWICE — once unconditionally just below, once inside the query. §4 puts
+   `.app .sec-h h2` on h4 as part of a shared LIST (`.cardrow-t`, `.nrow-t`,
+   `.gcard-b h3` and a dozen more), so the section heading cannot be moved by
+   editing that list without moving all of them.
 
    THE SEVEN SELECTORS BELOW ARE KEPT AND RE-POINTED, NOT DELETED, AND THAT
    IS THE ONE THING TO GET RIGHT HERE. §15 and §16 state the SAME seven
    selectors at 15px, inside this same container query, at (0,5,2) — heavier
    than the default rule above at (0,4,1). Delete this block and those win:
-   the seven headings go to 15px instead of 12.5 and the page looks less
-   consistent than before the edit. Re-pointing the values is what makes the
-   default reach them. (Deleting §15's and §16's rules at source would work
-   too and is a bigger change to two layers that own layout, not type.)
+   the seven headings go to 15px and the page is less consistent than before
+   the edit. Re-pointing the values is what makes the default reach them.
+   (Deleting §15's and §16's rules at source would work too and is a bigger
+   change to two layers that own layout, not type.)
+
+   THE 184px COLUMN STILL HOLDS 16px, and that was the risk worth checking
+   rather than assuming: a bigger heading in a 184px rail is trap 13's
+   "heading wraps past three lines". `respcheck --edge`, 219 screens at seven
+   widths including the 899/900 seam, passes that check — but it is the first
+   thing to look at if a heading's words ever grow.
    ------------------------------------------------------------------------ */
+/* THE SECTION HEADING IS 16 AT EVERY WIDTH, AND THIS IS THE UNCONDITIONAL
+   HALF OF IT. §4 puts `.app .sec-h h2` on the h4 role at (0,2,1) — but that
+   rule is a LIST, shared with `.cardrow-t`, `.nrow-t`, `.gcard-b h3` and a
+   dozen more, so the section heading cannot be moved by editing it without
+   moving all of them. It gets its own statement instead, at (0,4,1), which
+   also clears §02's 16, §05's 18, §10's 15 and §12's `.u-h2` 17 — every
+   pre-§63 layer that ever sized this element.
+
+   THE TWO SELECTORS ARE §8b's, REPEATED. Same pair, same reason: the second
+   is the Agents page's wrapped `.sec-h`, which the direct-child form cannot
+   reach. Stated in both tiers because §8b's block has to exist anyway (§15
+   and §16 outweigh the default inside the query) and a heading that changed
+   rank at 900 is what this change is undoing. */
+.app .sec:has(> .sec-h) > .sec-h h2,
+.app .sec > .hd-srch .sec-h h2{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls)}
+
 @container app (min-width:672px){
   .app .bhead > span{
     font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
     font-weight:var(--t-w-strong)}
 }
 @container app (min-width:900px){
-  /* the spine */
-  .app .sec:has(> .sec-h) > .sec-h h2{
-    font-size:var(--t-label-size);line-height:var(--t-label-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
+  /* the one size, and the second selector is trap 13 in the type layer.
+     `.sec:has(> .sec-h) > .sec-h` is a DIRECT child both ways, so a section
+     that wraps its heading drops out of this rule and lands on §4's
+     unconditional `.app .sec-h h2` (h4) instead — which is why "Choose an
+     agent for your interview" was 14 while every heading around it was 12.5.
+     The Agents page puts its heading inside a search header,
+     `.sec > .hd-srch > .hd-srch-t > .sec-h`, and it is the ONLY wrapped one
+     in either portal: a sweep of 184 pages finds two shapes, 238 direct and
+     these 12. Named rather than answered by loosening the combinator to
+     `.sec .sec-h h2`, because `.sec-h` is also used inside sheets, Tal's
+     bubbles and the auth card, where a descendant rule would reach headings
+     this size is not meant for. If a third shape appears, add it here — and
+     the cheaper fix is to stop wrapping the heading. */
+  .app .sec:has(> .sec-h) > .sec-h h2,
+  .app .sec > .hd-srch .sec-h h2{
+    font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls)}
   /* THE SEVEN THAT USED TO BE ONE STEP UP — now the same size as every other
      section heading. They are still listed because §15 and §16 state these
      exact selectors at 15px in this same tier and outweigh the default; this
@@ -1036,8 +1093,8 @@
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
-    font-size:var(--t-label-size);line-height:var(--t-label-lh);
-    font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls)}
+    font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+    font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls)}
   /* the page lead is prose at every width — §10 grew it to 15 at desktop,
      which put a fourth size between the h1 and the body for one element */
   .app .ph .lead{
@@ -2048,8 +2105,10 @@
    fourth and fifth reader it has — which is the condition §73's note set for it
    ("it is a ROLE across two layers rather than one component's one-off").
    16 is right for the same reason it was there: these are section headings
-   inside a panel, and every other section heading on a page is 12.5, so h3 at
-   17 would make two headings inside one panel larger than the page's own.
+   inside a panel, so they take the section-heading size — which since
+   1 Sep 2026 is this token for every heading on a page too, not just for the
+   AI-native ones. h3 at 17 would make two headings inside one panel larger
+   than the page's own; at 16 the panel and the page agree.
 
    AND THEY ARE `<h3>`, WHICH MEANS §63 §4'S ELEMENT RULE IS WHAT THIS BEATS,
    not §8b's container-query block. §8b sizes `.sec:has(> .sec-h) > .sec-h h2`
@@ -2247,11 +2306,15 @@
 
 /* THE MARK CAN BE A LABEL, AND A LABEL HAS TYPE (1 Sep 2026). The leader's card
    is the next COHORT CALL, and a cohort is not a person: `crow` puts the
-   cohort's number in `.crow-ph`'s `<i>` and omits the `<img>` (its own note is
-   the argument — an undefined `src` 404s on every render, which `respcheck`
-   reads as a broken screen). §71.423 normalises the italic and §77.7 gives the
-   square the card's own `--on-dark-fill` ground; what neither can state is the
-   size and the ink, because both are this layer's.
+   cohort's number in `.crow-ph`'s `<i>`. §71.423 normalises the italic and §77.7
+   gives the square the card's own `--on-dark-fill` ground; what neither can
+   state is the size and the ink, because both are this layer's.
+
+   IT IS THE FALLBACK RATHER THAN THE MARK ITSELF, since the card took a cohort
+   COVER later the same day (§86). The rule stays for the reason §77.7's does:
+   `crow`'s `onerror` hides a cover that fails to decode, and what it uncovers is
+   this numeral — so the one state where this type renders is the one state where
+   the card would otherwise show an empty grey square.
 
    h2, WHICH IS THE ONE ROLE THAT FITS A 78px SQUARE. `.av-ph i` is unsized
    everywhere else in the build and inherits body — right on `ldrMark`'s 56px
@@ -2700,3 +2763,77 @@
    test is about whether a number is worth naming, and un-naming and re-naming
    it across two edits would be churn, not discipline.
    ========================================================================== */
+
+/* ==========================================================================
+   21. THE CERTIFICATE BANNER — §85's two roles and two inks
+   Maryam, 1 Sep 2026
+
+   §85 draws the band, its geometry and its ground and states not one size,
+   weight, case or colour of text — which is §63's rule for every layer after
+   it, and the reason this block exists rather than four declarations over
+   there. Two rows, two roles, both already in the scale.
+
+   THE LEVEL IS h4, WHICH IS `.cardrow-t`'S OWN ROLE. The two drawings of a
+   certificate that this build ships as a ROW — the Achievements module's
+   Certificates tab and the leader's `LDR_CERTS` list — both put "Explorer
+   Track – E3" in a `.cardrow-t`, and §7b's list has that at h4. The banner is
+   the same fact at the same rank on a tinted ground, so it takes the same role
+   and the three cannot drift. It is emphatically NOT `.cert .n`'s 24px: that
+   size belongs to the black card, where the certificate IS the page's subject
+   and the card is 200px tall. Here it closes a page about the next course.
+
+   THE DATE IS `--t-desc`, THE DESCRIPTION ROLE, and its ink is
+   `--text-secondary` — §3's "a description is one grey", with no exception
+   earned by the ground being tinted. `--text-helper` would be the floor tier
+   and this is not a timestamp in a corner; it is the line that identifies which
+   certificate the buttons act on.
+
+   THE INK IS THE PAGE'S AND THE ACCENT IS SPENT ON THE MARK ALONE. Both rows
+   take the ordinary page inks rather than `--accent-text`, and that is the
+   decision worth keeping: on an 8% accent wash, an accent title over an accent
+   date beside an accent glyph is one hue at three saturations, which reads as a
+   status banner rather than as a document. §74 §12 makes the opposite call for
+   its finding cards and states why — there the card IS the hue and the title
+   names it — and the difference is that those cards carry no artwork and no
+   controls. Measured on the wash: `--text-primary` 15.9:1, `--text-secondary`
+   7.5:1, and §85's `--accent-text` mark 5.5:1.
+
+   SPECIFICITY: `.app .certban-t` / `.app .certban-m` at (0,2,0), which is the
+   same weight §63 gives every other assignment in this file and enough here —
+   §85 states no `color` and no `font-*` on either element, so there is nothing
+   to beat.
+   ========================================================================== */
+.app .certban-t{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .certban-m{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* ==========================================================================
+   23. THE COHORT COVER'S FALLBACK NUMERAL — §86's `.gcard-art > i`
+
+   IT IS TYPE NOTHING NORMALLY RENDERS, and it is stated anyway. The cover is an
+   `<img>` over the whole square (§86) and the `<i>` behind it only appears when
+   the image fails to decode — the same arrangement `avatar()` and `.crow-ph` use
+   and the same reason §77.7 states that square's ground: `crow`'s own note is
+   that a broken mark must read as a mark rather than as a failed photograph.
+
+   h4, WHICH IS THE ROW'S OWN TIER. Every other initials slot in the build is
+   unsized and inherits body (§11.134 only normalises the italic), which is right
+   at 36px and lost in a 62px square. h4 is what "Week 5 of 13" beside it takes,
+   so a cover that has fallen back matches the line it belongs to rather than
+   introducing a size. Not h2 — that is §17's call for the 78px mark on the black
+   card, where the numeral holds the object alone.
+
+   `font-style:normal` IS NOT HERE. `<i>` is italic by default — the trap §56's
+   ladder note records — and §11.134's list already reaches `.av-ph i` and
+   friends but not this one, so §86 states it with the component. `font-style` is
+   not one of this layer's four properties.
+   ========================================================================== */
+.app .gcard-art > i{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--text-secondary)}

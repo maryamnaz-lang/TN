@@ -114,11 +114,14 @@ V.leadCalls = () => {
          place. `.dark-card` is in no pass's list, so the summary keeps the
          full width and the card lands under it, in flow. §81's note on the
          leader dashboard is the long version of that same move.
-         IT KEEPS ITS ACTION HERE, WHICH IT DID NOT BEFORE. This page used to
-         pass `second:false`, because "All sessions" from the Sessions page
-         was a link to the page you were on; the brief is per-CALL, so it is
-         correct on both pages and the card no longer ends empty. */}
-  ${next ? leadCallCard(next) : ''}
+         THE SECONDARY IS THE CALLER'S AGAIN, and this page is why. The
+         dashboard's card says "View all calls" and points here (Maryam,
+         1 Sep 2026); on THIS page that would be a link to the page you are
+         already on — the "gate nothing writes" tell wearing a different hat,
+         and the reason this call site used to pass `second:false` and end
+         with no action at all. The brief is per-CALL rather than per-page, so
+         it is the right action here and the card keeps one. */}
+  ${next ? leadCallCard(next, {second:{at:`data-ldrbrief="${next.co}"`, ic:I.edit, t:'Generate the brief'}}) : ''}
   <div class="sec">
     <div class="sec-h"><h2>This week</h2><span class="t-helper-01">${up.length} call${up.length === 1 ? '' : 's'} &middot; sixty minutes each</span></div>
     ${up.length ? `<div class="tile-stack">

@@ -43,9 +43,47 @@
    `--pad-x:0px` ON THE STRIP is the whole fix, and it is the same declaration
    §35.1 makes for a page component borrowed into a Tal bubble. The one thing
    it takes with it is the first cell's own `padding-left`, which resolves to
-   the same variable and would leave that one figure flush against the spine
-   while the other two sit 16px in — so it is restated at `--s05` and the three
-   cells are one row of equal boxes.
+   the same variable.
+
+   AND THE FIRST CELL IS FLUSH NOW — THE RESTATEMENT IS REVERSED (Maryam,
+   1 Sep 2026: "there should be no space on the left of this row, remove that
+   space and make it look left aligned").
+
+   THE REASON THIS RULE GAVE HAD GONE STALE, AND THAT IS THE WHOLE STORY. It
+   said `padding-left:var(--s05)` was needed because leaving the first cell at 0
+   "would leave that one figure flush against the spine while the other two sit
+   16px in — so it is restated at `--s05` and the three cells are one row of
+   equal boxes". That was true against §10.16's cell grid, which pays
+   `var(--s04) var(--s05)` on every cell.
+
+   §71 THEN REDREW THE STRIP AND ZEROED ALL OF IT. §71.275 replaces the cell
+   grid with a five-track `auto | slack | auto | slack | auto` row whose
+   dividers live in the slack tracks, and §71.281 states `padding:0` on every
+   `span`. From that build on, cells two and three had NO left padding — so this
+   rule was not keeping three boxes equal, it was indenting the FIRST cell and
+   only the first cell, which is precisely the misalignment the ask reports.
+   Measured before the change at 1280: `.prog-top` and `.prog-seg` both at
+   x=781, cells two and three with `padding:0`, and the first figure's mark
+   alone at 797.
+
+   SO THE FIX IS TO STOP PAYING IT. With `padding-left:0` all three cells match
+   each other and the first mark lands on the same left edge as the percentage
+   and the thirteen chapter blocks above it — one spine down the whole column.
+   Verified at 390, 760, 1000 and 1280 on all three enrolled stages.
+
+   THE LESSON, AND IT IS THIS REPO'S OWN: a rule whose justification names
+   another layer's values has to be re-read when that layer is rewritten. §71's
+   note is thorough about what it changed and could not know which later rules
+   were reasoning about what it replaced. Nothing warned — a first cell 16px in
+   is not an overflow, not a wrap and not a console warning, and `respcheck` has
+   no question that would see it.
+
+   STATED, NOT DELETED. Removing the rule would let §10.512 hand the cell
+   `padding-left:var(--pad-x)`, which resolves to the 0 set above — the same
+   answer today. But that rule lives inside `@container app (min-width:700px)`,
+   so below 700 the first cell would fall back to §10.140's `var(--s05)` and the
+   phone would keep the indent this ask removed. One unconditional declaration
+   is what makes it true at every width.
    -------------------------------------------------------------------------- */
 /* BOTH WINGS, because a `.prog` in the head band pays no page gutter whichever
    state it is in — but only the progress wing has figure cells to put back on
@@ -54,7 +92,7 @@
    thing nothing draws. */
 .app .wing-prog .prog,
 .app .wing-lvl .prog{--pad-x:0px}
-.app .wing-prog .prog-figs > span:first-child{padding-left:var(--s05)}
+.app .wing-prog .prog-figs > span:first-child{padding-left:0}
 
 /* --------------------------------------------------------------------- 2 ---
    THE LADDER'S TRACK IS AN ON-DARK VALUE AND THE WING IS NOT DARK
