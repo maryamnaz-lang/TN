@@ -248,6 +248,37 @@
    label inside a centred flex column. */
 .app .conf .conf-f{width:100%;margin:var(--s03) 0 0}
 .app .conf .conf-f > label{text-align:center}
+/* ---- THE FRICTION FIELD IS A BOX, AND THIS IS THE PART THAT WAS BROKEN
+   (Maryam, 2 Sep 2026: "please correct our ui, it is broken", against the
+   anatomy).
+
+   `.inp` IS AN UNDERLINE, WHICH IS RIGHT EVERYWHERE ELSE AND WRONG HERE.
+   Measured: `border-bottom:1px solid var(--border-strong-01)`, transparent
+   ground, `text-align:start`, `padding-right:40px`. In a left-aligned form —
+   Edit details, the card form, the auth screens — that is the product's field
+   and the label above it carries the alignment. Dropped into a CENTRED dialog
+   it broke three ways at once: a grey word sitting hard left under a centred
+   heading reads as a value already typed rather than as a prompt, the 40px of
+   right padding is reserved for a trailing affordance this field does not have
+   (so the box is visibly off-centre), and one hairline under the text 30px
+   above the footer's own hairline read as two rules with a word between them
+   instead of as a control.
+
+   SO IT TAKES §41's BOUNDED PANEL — `1px solid var(--rule)` on `--layer-01`,
+   the same frame §76 gives the booking page's three panels, which is what this
+   product draws when something has to look like a box you act on. Square, by
+   `--radius`. The text centres with the rest of the column and the padding is
+   even, so the placeholder sits in the middle of the field and reads as an
+   instruction.
+
+   THE FOCUS RING IS THE BORDER GOING TO INK rather than a new colour: §10.262
+   already does exactly this for a quiet button's hover, so the field's focused
+   state is the idiom the rest of the build uses and needs no token. */
+.app .conf .conf-f .inp{
+  border:1px solid var(--rule);border-radius:var(--radius);
+  background:var(--layer-01);
+  text-align:center;padding:0 var(--s05)}
+.app .conf .conf-f .inp:focus{border-color:var(--rule-ink);outline:none}
 /* AND THE TWO ACTIONS ARE EQUAL HALVES, which §02.421's `.sheet-f .btn{flex:1}`
    already does — the safe exit on the left, the destructive one on the right,
    in source order, which is the anatomy's own arrangement.
@@ -260,6 +291,30 @@
    pointing the wrong way. Scoped to this dialog's action row, so all 88 of the
    quiet buttons that do go somewhere keep it. */
 .app .conf-a :is(.btn-s,.btn-t,.btn-g)::after{content:none}
+/* ---- AND TWO MORE THINGS THE FOOTER HAD TO GIVE UP ----
+
+   NO RULE ABOVE THE BUTTONS. §02.421 gives `.sheet-f` a `border-top`, which is
+   right for a SHEET — a scrolling body with a fixed action bar under it, where
+   the line says the bar is not part of the list. This dialog is six short
+   objects in one centred column with nothing to scroll, so the line cut the
+   actions off from the sentence they answer, and with the friction field's own
+   underline 30px above it the block had two hairlines in 30px. The anatomy
+   draws neither.
+
+   THE SAFE EXIT GETS ITS OUTLINE BACK, WHICH REVERSES §64 FOR THIS PAIR — the
+   same reversal §77.2 makes for `.crow-a` and for the same reason, read the
+   other way round. §64's argument is that on a page made of hairlines a drawn
+   rectangle is one more edge than the page has; here the two buttons ARE the
+   page's only objects, they are equal halves of one row (§02.421's `flex:1`),
+   and one of them is a solid red fill. Borderless, "Keep my account" read as a
+   caption beside a button rather than as the other half of a choice — and this
+   is the one dialog in the product where the reader must be able to see both
+   ways out at a glance. `border-color`, not `border`: §64.1's note — `.btn`
+   carries a transparent 1px, so the shorthand would make this one 2px shorter
+   than the button beside it. `var(--rule)` is the colour §10.261 gave it
+   before §64, so nothing new is invented and hover still goes to `--rule-ink`. */
+.app .conf > .conf-a{border-top:0}
+.app .conf-a .btn-s{border-color:var(--rule)}
 
 /* ------------------------------------------------------------------ 105.7 ---
    THE ASK FIELD'S TWO CONTROLS ARE DISCS
@@ -486,27 +541,37 @@
    answers it the same way round (`--pad-x:0px` on the row, never on the
    section, "or the card loses its own inset").
    -------------------------------------------------------------------------- */
-/* THE BOTTOM MARGIN IS 0 AND THE GAP UNDER THE CARD IS 48 (Maryam, 2 Sep 2026:
-   "there is a lot of space between the black card and the bottom content, reduce
-   that to a normal section spacing"). It measured 72, and the arithmetic is the
-   whole of why:
+/* THE CARD OWNS ITS SPACING AND THE SECTION OWNS NONE (Maryam, 2 Sep 2026:
+   "there is a lot of space between the black card and the bottom content,
+   reduce that to a normal section spacing"). It measured 72 at desktop, and the
+   arithmetic is the whole of why:
 
      24  the card's own `margin-bottom`
      24  its section's `padding-bottom`
      24  the identity section's `padding-top`
 
-   §75's `.dark-card` cannot hit this because the card IS the `.sec` there — its
-   margin and the section's are one box, so a neighbour's 24 makes 48. Here the
-   card is a CHILD of its section, so the margin is inside and adds to the
-   section's own padding. It is trap 10 in the vertical: a component that pays
-   the page's spacing inside something that has already paid it.
+   §75's `.dark-card` cannot hit this because the card IS the `.sec` there — one
+   box, one margin, so a neighbour's 24 makes 48. Here the card is a CHILD of
+   its section, so its margin is inside and stacks on the section's padding.
+   That is trap 10 in the vertical: a component paying the page's spacing inside
+   something that has already paid it.
 
-   THE TOP MARGIN STAYS AND IS DOING SOMETHING DIFFERENT. That section's
-   computed `padding-top` is 0 (§28.61 zeroes the box and §20's join list keeps
-   it there), so the 24 above the card is the card's own margin COLLAPSING
-   through the section's open top edge — which is why it reads as 24 from the
-   summary band and not 48. Zeroing both edges for symmetry would put the card
-   back against the band, which is half of what this ask was about.
+   ZEROING THE MARGIN ALONE WAS THE FIRST FIX AND IT WAS RIGHT AT ONE WIDTH,
+   which is the trap worth recording. Below 900 the section's own padding is 0
+   (§28.61, unconditional), and something restores 24 to its bottom edge at
+   desktop only — so `margin-bottom:0` measured a correct 48 at 1280 and a
+   collapsed 24 at 390. Every one of the three terms had to be pinned rather
+   than one of them adjusted.
+
+   SO THE SECTION IS ZEROED ON BOTH VERTICAL EDGES AND THE CARD CARRIES `--s06`
+   ON BOTH OF ITS OWN. That makes it §75's model exactly: 24 above, 24 below,
+   and the neighbour's 24 padding adds to the lower one for the product's 48.
+   The margin collapses out through the section's open edges, which is why the
+   band above sits 24 away and not 48. (0,5,0) on the section — `.keep-place` is
+   in the selector for the weight, and honestly, since that class is what makes
+   this a page child in the first place.
    -------------------------------------------------------------------------- */
+.app .page > .sec.keep-place:has(> .lead-b){
+  padding-top:0;padding-bottom:0}
 .app .page .lead-b{
-  margin:var(--s06) var(--pad-x) 0;padding:var(--s07)}
+  margin:var(--s06) var(--pad-x);padding:var(--s07)}

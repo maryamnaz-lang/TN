@@ -278,6 +278,89 @@
 .app .dark-card .dc-hd-r > .dc-when svg{
   flex:none;width:16px;height:16px;fill:currentColor;display:block}
 
+/* ------------------------------------------------------------------ 75.2c ---
+   AND THE CARD'S OWN ACTION ROW, AT THE BOTTOM RIGHT — `.dc-a`
+
+   Maryam, 2 Sep 2026, of the talent agent portal's setup card: "take the orange
+   button on the bottom right of the black card just like our black card
+   structure." It was a `.btn-row`, which is the page's button row and puts its
+   buttons on the LEFT — right for a page, wrong here, because on every black
+   card this build already draws the action sits at the far end of the card:
+   `.rec-a` on the recommendation, `.crow-a` on the two call rows, `.dc-act` in
+   the heading row. This is the missing member of the recipe rather than a new
+   idea, and it was missing because the three callers so far all had `.crow` or
+   `.rec` content carrying its own action group.
+
+   `.btn-row` COULD NOT BE RE-POINTED, WHICH IS WHY THIS IS A NEW CLASS. That
+   row is `flex-wrap` with `flex:1 1 auto` on every `.btn` — a single button in
+   one GROWS to the full width of the card, which is what a page's one action
+   should do and the opposite of an action at a corner. Giving it
+   `justify-content:flex-end` inside `.dark-card` would have fixed the alignment
+   and left the growth, so the button would have been right-aligned and 837px
+   wide. `flex:none` here is the other half.
+
+   THE BUTTON KEEPS ITS FULL HEIGHT, and that is the same instruction's second
+   half ("the button height should be equal to our primary button height"). The
+   three existing cards use `.btn-sm` because their actions sit in a row beside
+   a portrait or inside a heading; a card whose action is alone at its foot is
+   the page's primary action, so the call site writes `.btn.btn-p` and gets
+   §02's own height. Nothing here states a height — that would be this layer
+   deciding a thing §02 already owns.
+
+   BELOW 900 IT GOES FULL WIDTH, which is §71.3's treatment for `.crow-a` and is
+   the phone's rule for a lone primary action everywhere in the build. Written
+   AFTER the unconditional rule per trap 3 — restating inside the tier is
+   necessary and being later is the other half, which §77.6a records the cost of
+   getting wrong. */
+.app .dark-card .dc-a{
+  display:flex;align-items:center;justify-content:flex-end;
+  gap:var(--s04);flex-wrap:wrap}
+.app .dark-card .dc-a > .btn{flex:none}
+
+/* ------------------------------------------------------------------ 75.2d ---
+   AND THE ACTION SHARES A ROW WITH THE CONTENT, BOTTOM-ALIGNED TO IT — `.dc-b`
+
+   Maryam, 2 Sep 2026, comparing the two portals: "see the button in the black
+   card is always bottom align with the left side content. implement this on
+   every black card." §75.2c put the action at the card's bottom RIGHT and that
+   was only half of it — the row it sits in was its own, so the content above
+   ran the card's full width and the button dropped below it. On the
+   recommendation card the two share one row and the button's bottom edge lands
+   on the last line of the block beside it, which is what makes the card read as
+   one object rather than as a paragraph with a footer.
+
+   THE CARD ALREADY DID THIS FOR ITS OTHER TWO CALLERS AND THAT IS WHY IT WAS
+   MISSED. `.rec-dark` and `.crow-dark` both pass content that carries its OWN
+   action group — `.rec-a`, `.crow-a` — and §77.6 gives the second
+   `align-self:flex-end` for exactly this reason, with its own note arguing the
+   bottom is "what there is to line up with… the last line of the text block is
+   the row's own baseline". A card whose body is plain prose had no such group,
+   so it fell back to the column and nothing in the layer noticed.
+
+   `align-items:flex-end` ON THE ROW, NOT `align-self` ON THE ACTION, and the
+   difference is which one survives a second child. §77.6 states it on the item
+   because that row has three cells and only one of them should drop; here the
+   row is content-plus-action by construction, so the rule belongs to the row —
+   a card that later grows a third member gets the same treatment for free
+   rather than needing a second declaration.
+
+   `min-width:0` ON THE CONTENT, which is the flex default nobody remembers: a
+   flex item's floor is its min-content width, so a long unbroken figure in the
+   paragraph would push the button off the card's right edge rather than wrap.
+
+   BELOW 900 IT STACKS, and the two rules that follow do the whole of it — the
+   row becomes a column and `.dc-a`'s own stacked-tier rule above already takes
+   the button to full width. Written AFTER the unconditional rules per trap 3;
+   §77.6a is the counter-example that cost a build cycle. */
+.app .dark-card .dc-b{
+  display:flex;align-items:flex-end;gap:var(--s06)}
+.app .dark-card .dc-b > :first-child{flex:1 1 auto;min-width:0;margin:0}
+.app .dark-card .dc-b > .dc-a{flex:none}
+@container app (max-width:899.98px){
+  .app .dark-card .dc-a{justify-content:stretch}
+  .app .dark-card .dc-a > .btn{flex:1 1 auto;width:100%}
+  .app .dark-card .dc-b{flex-direction:column;align-items:stretch;gap:var(--s05)}}
+
 /* THE RATING IS ITS OWN ROW UNDER THE NAME. `.rec-r` is `display:inline-flex`
    because `V.agent` and `V.booking` still write it INSIDE `.rec-id`, on one
    line with the name — the class travels between three pages and only its

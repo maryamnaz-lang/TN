@@ -941,7 +941,12 @@ const PAGESUM = {
 
   leadCerts: () => `${_W(LDR_CERTS.length)} earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it opens the Builder band.`,
 
-  leadProfile: 'Your listing is what candidates read when they choose you. The bio and photo are yours to write; the assessing range comes from your certifications.'
+  /* IT COVERS BOTH TABS SINCE 2 SEP 2026 and does NOT name them — `PAGESUM`'s
+     third content ban is pointing at the UI, so the sentence says what the two
+     halves HOLD rather than that there are two of them. First clause is the
+     listing (the Public tab's whole subject), second is everything a candidate
+     never sees. */
+  leadProfile: 'Your listing is what candidates read when they choose you &mdash; the bio is yours to write, the assessing range comes from your certifications. The rest is the account behind it.'
 };
 
 function pageSummary(){

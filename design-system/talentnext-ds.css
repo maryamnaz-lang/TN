@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5119.  Rules dropped as product-specific: 186.
+   Rules kept: 5132.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -4617,7 +4617,7 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .ph{padding-bottom:var(--s05)}
   .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){padding-bottom:var(--s06)}
+  .app .page > .sec:not(.cap-sec):not(:has(> .lead-b)):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){padding-bottom:var(--s06)}
   .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child))):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(.sec-band):not(:has(> .lead-b)){padding-top:var(--s06)}
   .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s06)}
 }
@@ -7918,6 +7918,16 @@ button.btn-p:active,
 .app .dark-card .dc-hd-r > .dc-act svg{fill:currentColor}
 .app .dark-card .dc-hd-r > .dc-when{flex:none; margin-left:auto; display:inline-flex; align-items:center; gap:var(--s03)}
 .app .dark-card .dc-hd-r > .dc-when svg{flex:none; width:16px; height:16px; fill:currentColor; display:block}
+.app .dark-card .dc-a{display:flex; align-items:center; justify-content:flex-end; gap:var(--s04); flex-wrap:wrap}
+.app .dark-card .dc-a > .btn{flex:none}
+.app .dark-card .dc-b{display:flex; align-items:flex-end; gap:var(--s06)}
+.app .dark-card .dc-b > :first-child{flex:1 1 auto; min-width:0; margin:0}
+.app .dark-card .dc-b > .dc-a{flex:none}
+@container app (max-width:899.98px){
+  .app .dark-card .dc-a{justify-content:stretch}
+  .app .dark-card .dc-a > .btn{flex:1 1 auto; width:100%}
+  .app .dark-card .dc-b{flex-direction:column; align-items:stretch; gap:var(--s05)}
+}
 .app .rec-dark .rec-top > .rec-r{align-self:flex-start; margin:0}
 .app .rec-dark .rec-ph{background:var(--on-dark-fill)}
 @container app (min-width:600px){
@@ -8602,7 +8612,11 @@ button.btn-p:active,
 .app .conf .conf-x{margin:var(--sec-desc-gap) 0 0; max-width:42ch}
 .app .conf .conf-f{width:100%; margin:var(--s03) 0 0}
 .app .conf .conf-f > label{text-align:center}
+.app .conf .conf-f .inp{border:1px solid var(--rule); border-radius:var(--radius); background:var(--layer-01); text-align:center; padding:0 var(--s05)}
+.app .conf .conf-f .inp:focus{border-color:var(--rule-ink); outline:none}
 .app .conf-a :is(.btn-s, .btn-t, .btn-g)::after{content:none}
+.app .conf > .conf-a{border-top:0}
+.app .conf-a .btn-s{border-color:var(--rule)}
 .app .ask-page .askfield{padding-right:12px; gap:var(--s03)}
 .app .ask-page .askfield-send,
 .app .askfield-send{flex:none; width:40px; height:40px; display:grid; place-items:center; border:0; border-radius:999px; background:var(--accent); background-image:none; --on-brand-fill:1}
@@ -8629,7 +8643,8 @@ button.btn-p:active,
 .app .lead-b .lead-tags > span svg{flex:none; width:20px; height:20px; fill:var(--on-dark)}
 .app .page > .sec:has(> .pf-tgs)::after,
 .app .page > .sec:has(> .pf-facts)::after{display:none}
-.app .page .lead-b{margin:var(--s06) var(--pad-x) 0; padding:var(--s07)}
+.app .page > .sec.keep-place:has(> .lead-b){padding-top:0; padding-bottom:0}
+.app .page .lead-b{margin:var(--s06) var(--pad-x); padding:var(--s07)}
 
 /* ---- 106-roundfaces.css ---- */
 .app .av-ph,

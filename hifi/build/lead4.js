@@ -115,6 +115,15 @@ S.ldrEditProfile = false;
 /* `S.ldrAvail` was the third and is deleted with the weekly-calls sheet
    (2 Sep 2026) — a leader does not reschedule a cohort call. */
 
+/* WHICH HALF OF THE PROFILE IS OPEN — trap 9, and it cannot be anything else.
+   `render()` replaces `device.innerHTML`, so a class a click handler moves onto
+   a tab button is gone at the next paint; and this tab does not merely SHOW a
+   panel, it decides which sections the page emits at all, which is the same
+   call `V.leadReports`' cohort strip makes with `S.ldrRep`. General is the
+   default because it is the account — the thing you came to Profile to change —
+   and the listing is what you came to check. */
+S.ldrPfTab = 'general';
+
 /* ==========================================================================
    MESSAGES
 
@@ -428,6 +437,47 @@ V.leadCerts = () => {
    Profile: `.idhead` with the photo, a `.tile` of `.kv` rows for what is set,
    and an Edit control on the row it edits (§29.10). A page of live inputs
    would be the wireframe's drawing, and this product does not have one.
+
+   AND IT IS TWO TABS SINCE 2 SEP 2026 — General Profile and Public Profile
+   (Maryam: "this page should have 2 tabs right after the summary section …
+   divide the content in both profile tabs accordingly").
+
+   THE LINE BETWEEN THEM IS *WHO THE BLOCK IS FOR*, which this page had already
+   half-drawn: "What candidates see" is a section whose whole heading is that
+   distinction, and every note above about the money problem is the same
+   question asked once. **Public is what a candidate reads when they choose you.
+   General is the account behind it — nobody else ever sees a line of it.**
+
+     Public   the card, the bio, the three listing fields that MAKE the card
+              (specialism, assessing range, call length), and Your standing —
+              the four figures the card's "4.9 · 8 cohorts led" is the summary of
+     General  who you are and how to reach you, when you are on, who reviews
+              you, and what you are told about
+
+   THE `.kv` TILE IS THE ONE BLOCK THAT HAD TO BE CUT IN TWO, and the cut is not
+   arbitrary — it is the EDIT SHEET's own list. `ldrProfileSheet` edits display
+   name, specialism, bio and call length, and four of those five rows are
+   therefore listing copy; only Role is a fact about the account. So General
+   keeps Display name and Role, and Public takes Specialism, Assessing range and
+   Call length under a heading that says what they are for. A reader who wants
+   to change the bio and a reader who wants to change their notifications were
+   being sent to the same undifferentiated tile.
+
+   YOUR STANDING GOES PUBLIC AND THAT IS THE ONE JUDGEMENT WORTH ARGUING. It is
+   headed "Read-only · across every cohort you have closed", which sounds like a
+   private performance record — but 4.9 and "8 cohorts led" are printed on the
+   card 200px above it, so the section is the working behind two numbers a
+   candidate is already reading. On the General tab it would be the only block
+   there that somebody else can see.
+
+   THE STRIP IS `.sec.sec-cs` + `.cs`, WHICH IS `V.leadReports`' OWN SHAPE —
+   §16 zeroes a section holding a tab strip and §20 knows the marker, so the
+   two grounds meet on one line with no rule of its own. It sits directly after
+   `ph()` so it is the first thing under the head band, which is what "right
+   after the summary section" names: `placeBand`'s run walks forward from the
+   `.ph` taking Tal's card, the ask line and any declared `.head-sec`, and a
+   plain `.sec` is none of those — so the run stops HERE and the band closes
+   above the tabs rather than swallowing them.
    ========================================================================== */
 V.leadProfile = () => `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Your profile')}
@@ -435,6 +485,20 @@ V.leadProfile = () => `<main class="main"><div class="page">
         what candidates read when they choose you" — so the line above it
         went rather than the line below. */}
   ${ph('Your profile',`${LEADER.range} &middot; leading since ${LEADER.since}`)}
+  ${''/* TWO WORDS EACH AND NO COUNT. `V.leadReports`' strip carries a `.lf-n`
+        because its four tabs are four cohorts of different sizes and the size is
+        the reason you pick one. These two are not quantities of anything, and a
+        number in a `.lf-n` beside "Public Profile" would have to be a number OF
+        something. */}
+  <div class="sec sec-cs">
+    <div class="cs" role="tablist" aria-label="Profile sections">
+      <button class="${S.ldrPfTab === 'general' ? 'on' : ''}" role="tab"
+        aria-selected="${S.ldrPfTab === 'general'}" data-ldrpf="general">General Profile</button>
+      <button class="${S.ldrPfTab === 'public' ? 'on' : ''}" role="tab"
+        aria-selected="${S.ldrPfTab === 'public'}" data-ldrpf="public">Public Profile</button>
+    </div>
+  </div>
+  ${S.ldrPfTab === 'general' ? `
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
@@ -445,16 +509,25 @@ V.leadProfile = () => `<main class="main"><div class="page">
       </div>
       <div class="idhead-a"><button class="btn btn-g" data-ldrprof="1">Edit details ${I.edit}</button></div>
     </div>
-    <div class="tile">
-      <div class="kv"><span class="k">Display name</span><span class="v">${LEADER.n}</span></div>
-      <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
-      <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
-      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
-      <div class="kv"><span class="k">Role</span><span class="v n">Volunteer cohort leader &middot; unpaid</span></div>
-    </div>
-  </div>
+    ${''/* THE `.kv` TILE IS GONE (Maryam, 2 Sep 2026 — "remove all the content in
+           the red box on general profile"). Three of its five rows had just
+           moved to the Public tab as listing copy; the two left, Display name
+           and Role, are both said by the `.idhead` directly above — `LEADER.n`
+           is the `.idname` and "Volunteer cohort leader" is the `.idmeta`. A
+           label column restating the two lines above it is a table of the
+           header, which is what made the block worth removing rather than
+           re-pointing. */}
+  </div>` : `
   <div class="sec tint">
-    <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span></div>
+    ${''/* THE EDIT CONTROL IS ON THIS ROW AND NOWHERE ELSE ON THE TAB. One per
+           tab, at the top, is what General already does with "Edit details" on
+           the identity row — §29.10's rule that an action sits on the thing it
+           acts on. It goes on the CARD rather than on the field list below it,
+           because a reader who wants to change the bio looks at the bio; the
+           fields are the same record and the same sheet, so one control covers
+           both blocks and two would be two doors to one form. */}
+    <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span>
+      <button class="btn btn-t btn-sm ic-l" data-ldrprof="1">${I.edit}Edit listing</button></div>
     <div class="tile">
       <div class="idhead" style="padding-top:0">
         <span class="av-ph" style="width:56px;height:56px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
@@ -467,55 +540,25 @@ V.leadProfile = () => `<main class="main"><div class="page">
     </div>
     <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
   </div>
-  <div class="sec">
-    ${''/* TWO ROWS BECAME ONE, AND THE ONE THAT SURVIVED IS THE REAL ONE
-           (1 Sep 2026). The first row was a bookable calendar — "Tuesday and
-           Thursday afternoons &middot; 6 slots open next week" — which only
-           meant anything while candidates could book this person for an
-           interview. Nobody books a cohort leader. The second row was already
-           the truth and is now the section: three cohorts, three fixed hours a
-           week, read off the same cohort record `lcall` reads.
-           IT KEPT THE SHEET FOR ONE DAY AND THE SHEET IS NOW GONE TOO (Maryam,
-           2 Sep 2026: "a cohort leader can not reschedule a weekly call so
-           remove that flow"). The note above ended "the hours themselves are
-           still a setting a leader changes — what changed is that changing one
-           moves a call rather than opening a slot", and that second clause is
-           exactly what the instruction rules out: if moving one moves the call
-           for ten candidates, it is not this person's setting. `Manage` is
-           deleted with `ldrAvailSheet`, `ldrDays`, `LDR_DAY_NAMES`,
-           `S.ldrAvail` and both handler branches — the whole flow, on the same
-           reasoning that took the level decision off this portal on 1 Sep.
+  ${''/* THE THREE FIELDS THAT MAKE THE CARD, DIRECTLY UNDER IT. They were rows
+         two to four of the identity tile on the old single-column page, where
+         they sat 400px above the card they describe and read as account
+         settings. Here the heading says what they are for and the Edit control
+         is the same sheet the card's bio is written in, so the block a reader
+         is looking at and the control that changes it are one object.
 
-           THE ROW STAYS AND IS NOW WHAT IT ALWAYS DESCRIBED: the three hours
-           this leader is committed to, read off `LEAD_COHORTS`, stated once on
-           the page that says who they are. A settings page is allowed to hold a
-           fact about you that you did not set — "Volunteer cohort leader ·
-           unpaid" two sections up is the same kind of row. */}
-    <div class="sec-h"><h2>When you are on</h2><span class="t-helper-01">Three cohorts, one hour a week each</span></div>
-    <div class="tile-stack">
-      <div class="cardrow">
-        <span class="cardrow-ic">${I.group}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">Your cohort calls</span>
-          <span class="cardrow-d">${LEAD_COHORTS.map(c => c.call.toLowerCase()).join(' &middot; ')}</span>
-        </span>
-      </div>
-      <div class="cardrow">
-        <span class="cardrow-ic">${I.calendar}</span>
-        <span class="cardrow-b">
-          ${''/* IT NO LONGER SAYS WHERE THE ATTENDANCE IS (1 Sep 2026). "Attendance
-                 is on the Calls page" was true until that page's "Already run"
-                 section was removed; the figure survives in `PAGESUM.leadCalls`,
-                 which is Tal's own reading of it, and a settings row is not the
-                 place to say so. What is left is the count, which this row is
-                 for, and the way to the page it belongs to. */}
-          <span class="cardrow-t">Calls already run</span>
-          <span class="cardrow-d">${LEAD_RUN.length} behind you across your three cohorts</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-go="leadCalls">Upcoming Sessions</button>
-        </span>
-      </div>
+         THE SHEET IS ONE FORM FOR BOTH TABS AND STAYS THAT WAY.
+         `ldrProfileSheet` holds the display name AND the listing fields, so
+         "Edit details" on General and "Edit listing" on Public open the same
+         record — splitting it would be two forms writing one `LEADER`. That is
+         also why this block has no control of its own: the card above it is one
+         press away and does this block's job too. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Your listing</h2><span class="t-helper-01">What the card above is built from</span></div>
+    <div class="tile">
+      <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
+      <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
+      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
     </div>
   </div>
   <div class="sec">
@@ -527,23 +570,47 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
     </div>
     <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; recommending a promotion somebody is not ready for comes back later as a candidate who does not finish the next 90 days.</p>
-  </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>Who reviews you</h2></div>
-    <div class="tile">
-      <div class="kv"><span class="k">You</span><span class="v">Cohort leader</span></div>
-      <div class="kv"><span class="k">Reviewed by</span><span class="v n">Manager of cohort leaders, then supervisor</span></div>
-      <div class="kv"><span class="k">Your own level</span><span class="v n">Adjustable by a super-admin</span></div>
-      <div class="kv"><span class="k">Summaries reviewed</span><span class="v n">9 of 12 published this year</span></div>
-    </div>
-  </div>
+  </div>`}
+  ${''/* THE GENERAL TAB IS THE IDENTITY ROW AND NOTIFICATIONS, AND NOTHING ELSE
+         (Maryam, 2 Sep 2026 — "remove all the content in the red box on general
+         profile of a cohort leader", drawn round everything between the two).
+         Three blocks went, and the arguments are kept because two of them are
+         about the PRODUCT rather than about this page:
+
+         WHEN YOU ARE ON — "Your cohort calls" (the three hours, read off
+         `LEAD_COHORTS`) and "Calls already run" with its route to the Calls
+         page. It had already lost its Manage control the same day the
+         reschedule flow went, which left a heading, a helper line and two rows
+         that only READ; the diary itself is a rail slot one click away and
+         states all of it in context. This is the second half of that
+         subtraction rather than a new decision: a fact about your week is a
+         page, not a settings row.
+
+         WHO REVIEWS YOU — four `.kv` rows about the chain above this person.
+         True, and not a thing a leader does anything about from here; it is the
+         kind of policy line `PAGESUM`'s own content bans keep off a page.
+
+         THE `.kv` TILE — see the note in the identity section above; both its
+         surviving rows were the two lines of the header restated as a table.
+
+         `LEAD_RUN` KEEPS ITS ONE READER, `PAGESUM.leadCalls`, which sums seats
+         across it ("across the four behind you, 32 of 36 seats were filled").
+         That was already the only place attendance is stated in the product and
+         it is untouched — nothing here was the last reader of any record, which
+         is what makes this a subtraction and not a deletion.
+
+         YOUR STANDING ALSO STOOD IN THIS RUN and is on the Public tab rather
+         than removed: 4.9 and "8 cohorts led" are printed on the card there, so
+         those four figures are the working behind two numbers a candidate
+         already reads. */}
+  ${S.ldrPfTab === 'general' ? `
   <div class="sec">
     <div class="sec-h"><h2>Notifications</h2></div>
     <label class="tg"><div class="tb"><b>A candidate goes quiet</b><span>After four days without a sign-in</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>A cohort call is an hour away</b><span>One reminder, on the day</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Posts on a cohort board</b><span>A daily digest rather than each one</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Summary reminders</b><span>A week before a cohort reaches day 90</span></div><input type="checkbox"><span class="sw"></span></label>
-  </div>
+  </div>` : ''}
 </div></main>`;
 
 /* ==========================================================================
@@ -704,6 +771,15 @@ device.addEventListener('click', e => {
     render();
     return;
   }
+
+  /* THE PROFILE TABS. `render()` rather than an `.on` class move, because the
+     tab decides which sections the page EMITS — trap 9's other half: a class
+     move is only ever right when the thing that changes is a class. Read
+     BEFORE `[data-ldrprof]` is tested, not for a specificity reason but so the
+     two attribute names cannot be confused by a future reader; they are
+     different controls on the same page and `ldrpf` is the shorter one. */
+  const tab = t.closest('[data-ldrpf]');
+  if(tab){ S.ldrPfTab = tab.dataset.ldrpf; render(); return; }
 
   const pf = t.closest('[data-ldrprof]');
   if(pf){ S.ldrEditProfile = true; render(); return; }

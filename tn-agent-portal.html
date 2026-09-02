@@ -198,8 +198,10 @@
      `.crow`      inside it, wherever the subject is an appointment with a
                   person. `.crow-dark` on the wrapper is what pairs the two.
      `.jrn`       the journey, as the head band's second column.
-     `.wkc`+`.ring` the four training lessons, drawn the way the candidate's
-                  chapters are drawn.
+     `.stats`     the four figures on Training and Standing, and the two
+                  dashboards' bands. **`.wkc` and `.ring` are NOT used** — the
+                  training page follows Course Progress's layout, which has no
+                  week card; see `V.training`'s progress band.
      `.cert`      the certificate. **`.lvl-hero` is NOT used** — this portal
                   has no agent level and the class has no caller here; see the
                   note over `A`.
@@ -805,7 +807,7 @@ const PAGESUM = {
     training:'Three of four lessons done, and calibration is Thursday 20 June with Derek Hale. Certification is the last thing before you can be booked.',
     live:    'Listed since Monday and nothing booked yet. Six slots are open over the next fortnight, and Friday at 5:00 PM is the first.',
     working: 'Sofia Marek’s report is due at 6:00 PM today, and Rafael Ortiz is Thursday at 3:00 PM. $204 is held for you in escrow.',
-    reviewed:'Nadia moved you to A3 on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
+    reviewed:'Nadia widened your range on 1 October, so you can assess E1 to B2 now. Two bookings arrived in the week since.'
   },
 
 
@@ -944,7 +946,11 @@ const TALQ = {
   standing: [
     ['What’s actually being scored?',
      'Your half of the conversation — how well you followed up, and how deep you got. Tal reads the transcript. The candidate’s rating is counted separately.'],
-    ['What moves me to A3?',
+    /* NO TIER IN THIS ONE EITHER — it asked "What moves me to A3?", which is
+       the removed concept in the question rather than in the answer. What a
+       reader actually wants to know is what the review looks at and where they
+       stand against it, which is what the answer already said. */
+    ['What widens my range?',
      'The last quarter’s volume and both scores, read by Nadia on 1 October. Follow-up at 4.5 is the usual bar; you’re at 4.4.'],
     ['Does my rank change my fee?',
      'No — you set your fee. Rank changes where you sit in browse, which is a different thing, and it is recalculated weekly.']
@@ -1297,32 +1303,45 @@ const foundSec = (title, key, body, desc, ground) => `
   </section>`;
 
 /* ==========================================================================
-   QUICK ACTIONS WERE HERE AND ARE DELETED — §70's `.sec-qa`, removed 2 Sep 2026
+   QUICK ACTIONS — §70's `.sec-qa`, and on this dashboard it is now the whole
+   body of the page
 
-   Maryam: "remove the quick actions". `quickActions(cards)` and `qaAttr` drew
-   the block on the working dashboard: three `.qa-c` cards — finish the report,
-   open or close a slot, see what is held for you — closing the page where a
-   `.btn-row` of two plain navigation buttons used to sit.
+   Maryam, 2 Sep 2026: "change the awaiting decisions and upcoming interviews
+   into quick actions." So the two list sections under the figure band are gone
+   and their rows are cards: one per thing that is actually on the agent this
+   week. The block had been removed one instruction earlier and is back for a
+   different job — it used to be three cards pointing at OTHER pages, closing a
+   page made of lists; it is now the list itself.
 
-   THE ARGUMENT FOR IT WAS SOUND AND IS NOT WHAT REMOVED IT. A `.qa-c` card says
-   where it goes AND what is there, which is the difference between a way out
-   and a button; that is why §70 put the block on the candidate's dashboard. What
-   changed is what this page became: with the note, the descriptions and the
-   head-row actions all off, the dashboard is now the black card, four figures
-   and two short lists — and every one of those three cards pointed at something
-   already on it. The report is the first list, the slots are one rail item, the
-   escrow is a figure in the band. A card that restates the thing above it is
-   the duplication §70 was built to remove, arriving from the other direction.
+   A CARD IS `{ic, hue, t, d}` PLUS EXACTLY ONE OF `go` / `ask` / `peek` /
+   `sheet`, and they are exclusive on purpose — a button carrying two would do
+   whichever the delegated handler reached first. `sheet` is this portal's own
+   fourth, because some of what is worth a card here opens a sheet rather than a
+   page, and §60's rule is that a control does what its label says. `iv` rides
+   alongside rather than being a fifth: it names the SUBJECT of a `data-go`,
+   which is the `data-iv` capture-phase idiom the rest of the file uses.
 
-   TWO THINGS WORTH KEEPING IF IT COMES BACK. A card is `{ic, hue, t, d}` plus
-   exactly ONE of `go` / `ask` / `peek` / `sheet` — exclusive, because a button
-   carrying two would do whichever the delegated handler reached first, and
-   `sheet` was this portal's own fourth (three of its worthwhile cards open a
-   sheet rather than a page). And the hue is a NAMED class, never an index
-   (§70.6): the set the design system ships is green `ic-quiz`, blue `ic-prep`,
-   violet `ic-stand` and a second green `ic-pace`, so a page gets three cards
-   before two of them agree. `gallery.html` documents the markup.
+   THE HUE IS A NAMED CLASS, NEVER AN INDEX — §70.6. Inserting a card at the
+   front must not repaint the ones behind it, which is the failure `nth-child`
+   hues have and the reason §72's pulse columns are named too. The set the design
+   system ships is green (`ic-quiz`), blue (`ic-prep`), violet (`ic-stand`) and
+   a second green (`ic-pace`); there is no red, which is why the report's
+   urgency is carried by its words rather than by its mark.
    ========================================================================== */
+const qaAttr = c => c.ask ? `data-ask="${c.ask}"`
+  : c.peek ? `data-peek="${c.peek}"`
+  : c.sheet ? `data-sheet="${c.sheet}"`
+  : `data-go="${c.go}"`;
+const quickActions = cards => `<section class="sec sec-qa">
+  <div class="sec-h"><h2>Quick Actions</h2></div>
+  <div class="qa">${cards.map(c => `
+    <button class="qa-c" ${qaAttr(c)}${c.iv ? ` data-iv="${c.iv}"` : ''}>
+      <span class="qa-ic ${c.hue}">${c.ic}</span>
+      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
+      <span class="qa-go">${I.arrowRight}</span>
+    </button>`).join('')}
+  </div>
+</section>`;
 
 /* ==========================================================================
    THE STICKY SECTION STRIP WAS BUILT HERE AND REMOVED, AND THE MEASUREMENT IS
@@ -1415,58 +1434,42 @@ const factRow = (icon, title, detail, tag) => `
    nobody notices and everybody feels, and the rail already holds the answer.
    A row with no `go` — "Agent role added" goes nowhere, it is a fact — names
    its own icon, which is what the fourth argument is for. */
-/* THE MARK IS THE STEP'S NUMBER, and it went through the whole argument to get
-   there. It was the stepper's tick/ring/dot, which said the state and left the
-   subject unsaid; then it was the page's own icon in its own colour, which said
-   the subject — and four coloured tiles down the left of four rows turned out to
-   be four different signals competing in a list whose whole point is that it is
-   ORDERED. These are not four unrelated things you might do, they are steps one
-   to four before you can be listed, and the one fact the mark was never carrying
-   is the one the reader needs first: which number this is.
+/* `checkRow` WAS HERE AND HAS NO CALLER LEFT — deleted 2 Sep 2026 with the
+   "Before you list" checklist it drew (Maryam: "change the before you list 3
+   items left into quick actions"). It rendered one step of that list: a `.ch-num`
+   tile, the title with a state glyph inline after it, the detail line, and an
+   arrow where the step opened a page.
 
-   `.ch-num` IS THAT COMPONENT AND IT IS NOT NEW. §03.139 draws it — a 32px tile,
-   tabular numerals, secondary ink — and §15.453 already had this exact argument
-   about it in the chapter list: "the number is a number", no state colour on the
-   tile, because the row says its state in the tick beside its title. Which is
-   precisely the arrangement §42 gives these rows. So the mark is a number, the
-   status is the glyph by the heading, and the trailing slot is the arrow. Three
-   slots, three jobs, nothing said twice.
+   FOUR ARGUMENTS IT SETTLED, and each is about a shape the design system still
+   ships, so they are kept here rather than deleted with the function:
 
-   The subject-ink machinery in §42 stays — a checklist row that wants an icon
-   still gets one, and the next portal may — but this list does not use it. */
-const checkRow = (st, title, detail, go, n) => {
-  /* `wait` is a class rather than the absence of one so the three states read
-     as three states in the markup. */
-  const k = st === 'done' ? 'done' : st === 'now' ? 'now' : 'wait';
-  /* AN HOURGLASS FOR THE ONE YOU ARE ON, and `circleDash` is why. A ring with a
-     dot in it is a radio button — a CONTROL — so beside a title it made a
-     status look like something you could pick, and the two states "on you" and
-     "not started" were the same shape at two greys. An hourglass is not a
-     control and says the one thing this state means: started, not finished. */
-  const stg = k === 'done' ? I.checkFilled : k === 'now' ? I.hourglass : I.circle;
-  const status = `<span class="row-st ${k}" role="img" aria-label="${
-    k === 'done' ? 'Done' : k === 'now' ? 'In progress' : 'Not started'}">${stg}</span>`;
-  const num = `<span class="ch-num">${n}</span>`;
-  /* `ckrow` IS ON BOTH BRANCHES AND IT IS NOT DECORATION. A step you can open is
-     a `.tile.clk.gcard` and a step you cannot is a `.cardrow`, and the two are
-     not the same height: §24.275 gives a clickable row in a `.tile-stack` 24px of
-     vertical padding, §02 gives a `.cardrow` 12px. So the SAME four steps drew
-     104px apart at `setup`, where two of them are still open, and 76px apart at
-     `training`, where they are done — one list with two rhythms, changing under
-     the reader as they made progress. The class is the hook §42 needs to give
-     both the same box; the compact one wins, because it is the one the list has
-     when it is finished and the one a reader is comparing four short rows in. */
-  return go && st !== 'done'
-    ? `<button class="tile clk gcard ckrow rst-${k}" data-go="${go}">
-         ${num}
-         <span class="gcard-b"><h3>${title}${status}</h3><span class="sub">${detail}</span></span>
-         <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg></button>`
-    : `<div class="cardrow ckrow rst-${k}">
-         ${num}
-         <span class="cardrow-b"><span class="cardrow-t">${title}${status}</span>
-           <span class="cardrow-d">${detail}</span></span>
-       </div>`;
-};
+     - THE MARK IS THE STEP'S NUMBER, and that took three passes to reach. It was
+       the stepper's tick/ring/dot, which said the STATE and left the subject
+       unsaid; then the destination page's own icon in its own colour, which said
+       the subject — and four coloured tiles down the left of four rows turned out
+       to be four signals competing in a list whose whole point is that it is
+       ORDERED. `.ch-num` (§03.139) is the component: a 32px tile, tabular
+       numerals, secondary ink, and §15.453 had already made this exact argument
+       for the chapter list — "the number is a number", no state colour on the
+       tile, because the row states its state beside its title.
+     - THE NUMBERS WERE WRITTEN, NOT COUNTED. Four steps in a fixed order, the
+       product's order rather than the array's, so a step that stops applying is
+       removed from the page rather than renumbered by a loop and "3" always
+       meant the fee and payouts.
+     - THE STATUS IS A 15px GLYPH INLINE AFTER THE TITLE, where it is read, and
+       the trailing slot is the arrow. `circleDash` is deliberately NOT the
+       not-started mark: a ring with a dot in it is Material's radio button, so
+       beside a title it made a status look like something you could pick. An
+       hourglass for the step you are on says the one thing that state means.
+     - `.ckrow` IS THE HOOK THAT KEPT ONE LIST ONE HEIGHT. A step you can open is
+       a `.tile.clk.gcard` and a step you cannot is a `.cardrow`, and §24.275 gives
+       the first 24px of vertical padding against §02's 12 — so the SAME four
+       steps drew 104px apart at `setup` and 76px apart at `training`, one list
+       with two rhythms, changing under the reader as they made progress.
+
+   The subject-ink machinery in §42 and `.ch-num` in §03 both still ship, and
+   `V.training`'s four lesson rows hand-write that shape — so a checklist is
+   still a thing this portal can draw; it just has no list left that wants one. */
 
 /* --------------------------------------------------------------------------
    THE PEEK — HOW A CANDIDATE SEES YOU, BESIDE THE PAGE WHERE YOU EDIT IT
@@ -1777,8 +1780,25 @@ const darkCard = ({title, when, act, body, actions, cls}) => `
           : act ? `<button class="btn btn-sm noic dc-act" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`
           : ''}</div>
     </div>
-    ${body || ''}
-    ${actions ? `<div class="btn-row">${actions}</div>` : ''}
+    ${/* THE ACTION SHARES THE CONTENT'S ROW AND BOTTOM-ALIGNS TO IT (Maryam,
+          2 Sep 2026: "see the button in the black card is always bottom align
+          with the left side content"). §75.2d is the rule and `.dc-b` is the
+          row; §75.2c is the `.dc-a` group inside it.
+
+          THE WRAPPER ONLY APPEARS WHEN THERE IS AN ACTION, because `.dark-card`
+          is itself a column flex at `gap:20px` — a body with nothing beside it
+          wants to be a direct child of that column, and wrapping it anyway
+          would put a one-item flex row between the card and its content for no
+          reason. The two `callCard` callers land here with no `actions` at all:
+          a `.crow` carries its own `.crow-a`, which §77.6 already bottom-aligns.
+
+          `.btn-row` IS DELIBERATELY NOT USED. It is the PAGE's button row —
+          buttons left, `flex:1 1 auto` on each — so one button in it grows to
+          the card's full width, where every black card in this build puts its
+          action at the far end. */''}
+    ${actions
+      ? `<div class="dc-b">${body || ''}<div class="dc-a">${actions}</div></div>`
+      : (body || '')}
   </section>`;
 
 /* --------------------------------------------------------------------------
@@ -1883,17 +1903,17 @@ const avatar = (initials, photo, size) => `
        `overflow:hidden`, which clips a corner badge as happily as it clips the
        photograph. */
 
-/* THE RING — two SVG circles, not a conic gradient. `--arc` is a
-   stroke-dasharray LENGTH rather than a percentage: r=26, so the
-   circumference is 163.36 and arc = 163.36 × pct/100. */
-const ring = pct => `
-  <div class="ring" role="img" aria-label="${pct}% done">
-    <svg viewBox="0 0 64 64" aria-hidden="true">
-      <circle class="ring-t" cx="32" cy="32" r="26"></circle>
-      <circle class="ring-f" cx="32" cy="32" r="26" style="--arc:${(163.36 * pct / 100).toFixed(1)}"></circle>
-    </svg>
-    <span class="ring-n u-h2">${pct}<small>%</small></span>
-  </div>`;
+/* `ring()` WAS HERE AND HAS NO CALLER LEFT — deleted 2 Sep 2026 with the `.wkc`
+   card it sat in (see `V.training`'s progress band). It drew the 64px progress
+   ring: two concentric SVG circles with the percentage in the middle.
+
+   THE ONE THING TO KNOW IF IT COMES BACK is the arithmetic, because it is the
+   part a guess gets wrong: the ring is TWO SVG CIRCLES and not a conic
+   gradient, and `--arc` is a stroke-dasharray LENGTH rather than a percentage.
+   At r=26 the circumference is 163.36, so the arc is `163.36 × pct / 100` —
+   `--arc:75` is not three quarters of anything, it is 46% of the circle.
+   `gallery.html` documents the markup under Signature and `.ring*` all still
+   ship. */
 
 /* --------------------------------------------------------------------------
    THE STEPPER USED TO LIVE INSIDE TAL'S CARD, AND IT IS DELETED
@@ -2016,23 +2036,38 @@ const jrnCol = v => {
    The rows stay because a five-row journey with its first two missing would
    start at "Public profile and payouts" and read as though that were step one. */
 const JRN_ROWS = v => {
-  const at = {setup:2, training:3}[S.stage] ?? 4;
-  /* "Application", NOT "Your application", AND THE MEASUREMENT THAT DECIDED IT
-     HAS EXPIRED WITHOUT CHANGING THE ANSWER. §56's rail was a five-track grid
-     with `gap:0` — each `.stps-i` painted the segment to its own right, so a
-     column gap would have put holes in the rail — which gave each label a
-     101.4px track at the band's 507px left column, and "Your application"
-     rendered 101.1px: a 0.3px gutter, read as "Your applicationVetting". §70's
-     column is a vertical list at 300–471px, so no label is width-constrained
-     any more and a sixth row would cost nothing. The word still goes: it was
-     the only possessive in a list that otherwise reads "Vetting", "Public
-     profile and payouts", "Training and calibration", "Interviewing". */
+  /* THREE ROWS, NOT FIVE (Maryam, 2 Sep 2026), and both edits are the same one:
+     the list holds only the steps this portal can be AT.
+
+     APPLICATION AND VETTING ARE ONE ROW BECAUSE NEITHER CAN EVER BE `on`. The
+     note over `STAGES` records why — Stage 1 is not drawn, so `at` is 1 at the
+     earliest stage this file has, and those two were always two `done` ticks
+     stacked above the live one. Two rows that only ever say the same thing are
+     one row, and "Application & Vetting" is how you got here in the words the
+     removed stage used.
+
+     AND "INTERVIEWING" GOES BECAUSE THE COLUMN IS GONE BY THEN. `V.dashboard`
+     draws the journey only while `!v.certified`, and interviewing starts the day
+     you are certified — so that row could never be anything but the grey row at
+     the foot of the list, naming a step the reader cannot reach from any page
+     that draws it. What it was there for is now the whole rest of the portal.
+
+     `at` IS 1 AND 2, WHICH IS THE SAME MAPPING ONE ROW SHORTER: setup is on the
+     public profile, training is on the lessons. The `?? 3` fallback lands past
+     the end for the certified stages, which is correct rather than unreachable —
+     it is what `journey()` on the candidate side calls the `default` branch, and
+     §82 records what a `default` that silently returns the wrong step costs.
+
+     "Application", NOT "Your application" — the possessive was the only one in
+     the list, and the measurement that first forced it out has expired without
+     changing the answer: §56's rail gave each label a 101.4px track where "Your
+     application" rendered 101.1, and §70's column is a vertical list at 300–471
+     where nothing is width-constrained. */
+  const at = {setup:1, training:2}[S.stage] ?? 3;
   const rows = [
-    'Application',
-    'Vetting',
+    'Application &amp; Vetting',
     'Public profile and payouts',
-    'Training and calibration',
-    'Interviewing'
+    'Training and calibration'
   ];
   return rows.map((lab, n) => ({st: n < at ? 'done' : n === at ? 'on' : '', lab}));
 };
@@ -2370,13 +2405,20 @@ V.dashboard = v => {
      `setup`, which is the case that makes it worst — a list with two live rows
      does not say which one to start.
 
-     SO THE PLATE IS THE FIRST UNFINISHED STEP, AND IT IS DERIVED FROM THE SAME
-     ORDER THE LIST USES. `checkRow` marks step 2 `done` on `v.listing`, step 3
-     on `v.paid`, step 4 on `v.lessonsDone === 4`; this reads those three flags in the
-     same sequence and stops at the first that is false. So the card and the row
-     it duplicates can never disagree — there is no second table of "what is
-     next" to keep in step, which is the failure mode a hand-written hero card
-     has. Change a flag in `CFG` and both move together.
+     SO THE CARD IS THE FIRST UNFINISHED STEP, AND IT IS DERIVED FROM THE SAME
+     ORDER THE CARDS BELOW IT USE. `SETUP_STEPS` tests `v.listing`, then
+     `v.paid`, then `v.lessonsDone === 4`; this reads the same three flags in the
+     same sequence and stops at the first that is false. So the black card and
+     the Quick Action it repeats can never disagree — there is no second table of
+     "what is next" to keep in step, which is the failure mode a hand-written
+     hero card has. Change a flag in `CFG` and both move together.
+
+     THE TWO LISTS ARE STILL SEPARATE ARRAYS AND THAT IS THE ONE LOOSE END HERE.
+     `NEXT_STEP` carries the black card's fuller copy (a `.kv` body per step) and
+     `SETUP_STEPS` the cards' one-liners, so the ORDER is stated twice even
+     though the flags are not. Worth merging if a fourth step ever arrives;
+     three, in a fixed order, with the tests written in the same sequence eight
+     lines apart, is not yet worth the indirection.
 
      EACH ONE CARRIES WHAT THAT STEP ACTUALLY HAS. The public profile has no date
      and no person, so it gets neither — `plate()` omits the countdown chip and
@@ -2415,29 +2457,47 @@ V.dashboard = v => {
      first two: a chip reading "soon" over a task with no deadline is furniture.
      `.dc-when` is simply omitted, and §75's head row then holds the title
      alone. */
+  /* THE HEADING NAMES THE SLOT, NOT THE TASK — "Your Next Step - X" (Maryam,
+     2 Sep 2026), which is byte-for-byte the pattern §75.3 gives the candidate
+     portal's recommendation card ("Your Next Step - Interview"). Two things it
+     buys: the card says what it IS before it says what to do, so the reader
+     learns the slot once and finds the same words in it at every stage; and the
+     verb moves to the button, which is where a verb belongs. The task is not
+     lost — it is the second half of the heading and the button's own label.
+
+     THE BODY IS A PARAGRAPH, NOT A `.kv`. Two rows of label-and-value is a
+     SPEC — right where the reader is comparing figures, which is what §69's
+     invoice card and §73's offer are doing — and wrong for two facts about one
+     task, where the labels ("What it needs", "Visible when") were furniture in
+     front of the only words that carried anything. One sentence per card, and
+     each says the requirement and then the consequence.
+
+     `<p>` WITH NO CLASS, AND THAT IS DELIBERATE. §63 §6a inks anything a
+     `.dark-card` holds — body prose to `--on-dark`, descriptions to
+     `--on-dark-2` — so a paragraph in here needs no role class to come out
+     right, and giving it one would be this file having an opinion about type,
+     which §63 owns. */
   const NEXT_STEP = [
     [v => !v.listing, v => darkCard({
-      title: 'Write your public profile',
-      body: kv([
-        ['What it needs', 'Photo, bio, four specialisms and the range you assess'],
-        ['Visible when', 'Nothing is shown until you are certified']]),
-      actions: `<button class="btn btn-p btn-sm noic" data-go="profile">Open your public profile ${I.arrowRight}</button>
-        <button class="btn btn-sm noic" data-peek="1">See how you will appear</button>`
+      title: 'Your Next Step - Public Profile',
+      body: `<p>Your card needs a photo, a bio, four specialisms and the range you
+        assess. Nothing is shown in browse until you are certified, so a half-built
+        one is never seen.</p>`,
+      actions: `<button class="btn btn-p noic" data-go="profile">Open your public profile ${I.arrowRight}</button>`
     })],
     [v => !v.paid, v => darkCard({
-      title: 'Connect a payout destination',
-      body: kv([
-        ['Your rate', `${money(v.fee)} an interview, ${money(v.share)} of it yours`],
-        ['How it connects', 'A Stripe handoff — TalentNext never sees an account number']]),
-      actions: `<button class="btn btn-p btn-sm noic" data-go="earnings">Continue to Stripe ${I.launch}</button>`
+      title: 'Your Next Step - Payouts',
+      body: `<p>You charge ${money(v.fee)} an interview and keep ${money(v.share)} of it.
+        Connecting a destination is a Stripe handoff, so TalentNext never sees an
+        account number &mdash; and nobody can book you until there is one.</p>`,
+      actions: `<button class="btn btn-p noic" data-go="earnings">Continue to Stripe ${I.launch}</button>`
     })],
     [v => v.lessonsDone !== 4, v => darkCard({
-      title: `Finish ${LESSONS[v.lessonsDone || 0][0].toLowerCase()}`,
-      body: kv([
-        ['Lessons done', `${v.lessonsDone || 0} of four`],
-        ['Then', '45 minutes with Derek Hale on Thursday 20 June'],
-        ['Who Derek is', 'Head of agent standards']]),
-      actions: `<button class="btn btn-p btn-sm noic" data-go="training">Open Training ${I.arrowRight}</button>`
+      title: 'Your Next Step - Training',
+      body: `<p>${v.lessonsDone || 0} of four lessons are done. The four are followed by
+        45 minutes with Derek Hale, head of agent standards, on Thursday 20 June &mdash;
+        and the calibration cannot be booked until they are finished.</p>`,
+      actions: `<button class="btn btn-p noic" data-go="training">Open Training ${I.arrowRight}</button>`
     })]
   ];
   const nextStep = v => {
@@ -2445,42 +2505,72 @@ V.dashboard = v => {
     return hit ? hit[1](v) : '';
   };
 
-  if(!v.certified) return band(nextStep(v)) + `
-    <section class="sec">
-      <div class="sec-h"><h2>Before you list</h2></div>
-      <div class="tile-stack">
-        ${/* `user`, and it is the one row here that names its own icon: this
-              row opens nothing — the agent role is a fact about the account,
-              not a page — so there is no rail item for `navIcon` to read. */''}
-        ${/* THE NUMBERS ARE WRITTEN, NOT COUNTED. Four steps in a fixed order,
-              and the order is the product's rather than the array's — a step
-              that stops applying is removed from the page, not renumbered by a
-              loop, so "3" always means the fee and payouts. `checkRow`'s last
-              argument is the one it prints. */''}
-        ${checkRow('done', 'Agent role added', 'On the account you already had, 12 June', null, 1)}
-        ${checkRow(v.listing ? 'done' : 'now', 'Your public profile', v.listing ? 'Written, with four specialisms' : 'Photo, bio, specialisms and the range you assess', 'profile', 2)}
-        ${checkRow(v.paid ? 'done' : 'now', 'Your fee and payouts', v.paid ? `${money(v.fee)} an interview &middot; Stripe connected` : `${money(v.fee)} set. A payout destination is still needed`, 'earnings', 3)}
-        ${checkRow(v.lessonsDone === 4 ? 'done' : v.listing ? 'now' : '', 'Training and calibration',
-          v.lessonsDone === 4 ? 'All four lessons and the calibration interview' : `${v.lessonsDone || 0} of four lessons done &middot; calibration Thursday 20 June`, 'training', 4)}
-      </div>
-    </section>
-    <section class="sec">
-      ${/* AN AGENT IS BOOKED; AN AGENT DOES NOT BOOK. "Nothing is bookable yet"
-            has no subject in it, and the sentence a reader supplies is the wrong
-            one — it reads as "there is nothing for you to book", which is a
-            thing this portal never asks anyone to do. A candidate finds an agent
-            in browse, takes one of their open slots and pays for it at that
-            moment; the agent's only control is which slots are open. So the note
-            names who does the booking, and it is not the person reading it.
+  /* "BEFORE YOU LIST" IS QUICK ACTION CARDS NOW, AND ONLY THE STEPS THAT ARE
+     LEFT (Maryam, 2 Sep 2026: "change the before you list 3 items left into
+     quick actions"). The working dashboard made the same move one branch down,
+     so both dashboards are the black card, the band, and one block of cards.
 
-            The same slip is worth watching for anywhere else this portal talks
-            about a booking. "Booked means paid", "a booking arrives paid for"
-            and "there is nothing to accept" are all already passive and all
-            already correct — the agent is the object of the sentence in every
-            one of them, which is the test. */''}
-      <div class="note"><span>${I.info}</span><div class="nb"><b>Candidates cannot book you yet</b>
-        Your public profile goes into browse the day you are certified, and not before &mdash; a half-built one is never shown.</div></div>
-    </section>`;
+     `SETUP_STEPS` IS THE LIST AND `done` IS A PREDICATE ON `v`, which is what
+     keeps the block honest as the stages advance: `setup` has three cards
+     (profile, money, training), `training` has one (training), and a stage that
+     finished all three would draw none rather than a heading over nothing.
+
+     THE FOURTH STEP IS GONE RATHER THAN FILTERED. "Agent role added" was row 1
+     and permanently `done` — a tick on a fact about the account, with nothing to
+     press, which is exactly what a Quick Action cannot be. `PAGESUM.dashboard`'s
+     setup copy already opens on it ("Approved on 12 June, and the agent role
+     sits on the account you already had"), which is where a thing that has
+     already happened belongs.
+
+     AND THE NUMBERS GO WITH THE CHECKLIST. `checkRow`'s last argument printed a
+     written-not-counted `1`–`4` so that "3" always meant the fee whatever was
+     filtered out; a card block has no numerals and needs none, because the one
+     thing the sequence was carrying — which step is next — is now the order the
+     cards are in, with nothing done left among them to skip over.
+
+     THE "CANDIDATES CANNOT BOOK YOU YET" NOTE IS DELETED with the list it
+     closed. Its wording was carefully passive and the reason is worth keeping
+     against the next sentence about a booking: an agent IS booked, an agent does
+     not book, so "nothing is bookable yet" reads as "there is nothing for you to
+     book" — a thing this portal never asks anyone to do. The fact it stated is
+     said twice over anyway: the black card's own "Nothing is shown until you are
+     certified" row, and step 2's card here. */
+  /* A DESCRIPTION IS ONE LINE, AND THE BUDGET IS 26 CHARACTERS (Maryam, 2 Sep
+     2026: "keep the quick actions desc short so it wont go to the second
+     line"). Measured rather than guessed, and the number is smaller than it
+     looks like it should be: at 1280 the `.qa` grid is three 271px columns, and
+     a card spends its width on 17px of padding each side, a 20px mark, an arrow
+     and two gaps — which leaves the text column **165px**. At §63's
+     `--t-desc` 13.5px that is about 26 characters.
+
+     THE TIGHTEST WIDTH IS THE WIDEST FRAME, which is why this is easy to get
+     wrong by checking a phone. 390 gives one column and 252px of text, 760
+     gives one column and 620px; only 1280's three-across squeezes it. The
+     candidate portal's own cards run to 41 characters and fit because there are
+     TWO of them — a two-card row is 408px wide. Three cards is the constraint,
+     not the component.
+
+     SO EACH ONE IS A PHRASE, NOT A SENTENCE, and the card's title carries the
+     verb. What came off is not information the page loses: the fee is a figure
+     in the band, "nobody can book you until there is somewhere to pay you" is
+     the black card's own paragraph, and the calibration date is on the page the
+     card opens. */
+  const SETUP_STEPS = [
+    {done: v => v.listing, ic: I.document, hue: 'ic-prep', go: 'profile',
+     t: 'Write your public profile',
+     d: 'Photo, bio, specialisms.'},
+    {done: v => v.paid, ic: I.wallet, hue: 'ic-quiz', go: 'earnings',
+     t: 'Connect a payout destination',
+     d: 'A Stripe handoff.'},
+    {done: v => v.lessonsDone === 4, ic: I.book, hue: 'ic-stand', go: 'training',
+     t: 'Finish training and calibration',
+     d: v => `${v.lessonsDone || 0} of four lessons done.`}
+  ];
+
+  if(!v.certified) return band(nextStep(v)) + quickActions(
+    SETUP_STEPS.filter(s => !s.done(v)).map(s => ({
+      ic: s.ic, hue: s.hue, go: s.go, t: s.t,
+      d: typeof s.d === 'function' ? s.d(v) : s.d})));
 
   /* --- stage 4, day one: listed, empty ---------------------------------- */
   if(!v.busy) return band() + `
@@ -2589,58 +2679,60 @@ V.dashboard = v => {
         ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`]])}
     </section>
 
-    ${/* "AWAITING DECISIONS" IS THE LEADER'S "AWAITING EVALUATIONS", ROW FOR ROW
-          (Maryam, 2 Sep 2026). That section is a plain heading over a list of
-          people waiting on the reader to sign something — no description, no
-          action on the head row, and the row itself is the way in. So the
-          `aiHead` this section briefly carried comes off: its sentence was the
-          twenty-four-hour promise, which the report page states where the work
-          happens, and "Open the report" was a second door to the row beneath it.
+    ${/* BOTH LISTS ARE QUICK ACTION CARDS NOW (Maryam, 2 Sep 2026: "change the
+          awaiting decisions and upcoming interviews into quick actions"), so the
+          page is the black card, the four figures and one block of cards.
 
-          THE DUE PHRASE IS RED, AND IT IS `.flag-t.red` RATHER THAN A SPAN THIS
-          FILE STYLES. §31's component is "a mark and a phrase in one hue" — what
-          a cell says when its value is a STATE rather than a number — and a
-          deadline that has to be met tonight is exactly that. The modifier is
-          new in that layer (it had quiet / warn / green and no red, because the
-          leader's red comes from its table ROW) and it takes `--danger-ink`, not
-          `--support-error`: the second is a fill, and §01 forbids a fill as a
-          text colour. No icon inside it — the leader's list carries none and the
-          phrase is doing the work. */''}
-    <section class="sec">
-      <div class="sec-h"><h2>Awaiting Decisions</h2></div>
-      <div class="tile-stack">
-        ${faceRow(due, `Report &middot; Tal has a draft off the transcript &middot; <span class="flag-t red">due ${due.due}</span>`, 'interview')}
-      </div>
-    </section>
+          THE CARDS ARE DERIVED FROM THE TWO LISTS THEY REPLACE, not written out.
+          `IVS`'s report-owed rows become the first cards and `diary(v)` the
+          rest, so the block is still two readings of the same arrays the rest of
+          the portal reads — a second report or a third booking appears here
+          without this call site changing, which is what the lists gave for free
+          and a hand-written set of three cards would have thrown away.
 
-    ${/* "UPCOMING INTERVIEWS" IS THE LEADER'S "COHORT CALLS" (Maryam, 2 Sep
-          2026), which is a plain heading over a diary — no description under it
-          and, here, no action beside it. Three things came off with the rename:
-          the `.aih-d` sentence ("Booked interviews, in the order they happen",
-          which a date column says by being one), the "All interviews" button,
-          and the "There is nothing to accept" note. The note's own words are
-          not lost — `PAGESUM.dashboard`'s live copy and `V.interviews`' "Booked
-          means paid" disclosure both state it, which is where a rule about how
-          bookings arrive belongs.
+          THE REPORT COMES FIRST BECAUSE IT IS THE ONLY ONE WITH A DEADLINE. The
+          two interviews are appointments that will happen to the agent; the
+          report is work the agent owes tonight, and `.qa` lays cards out in
+          source order.
 
-          AND IT SHOWS BOTH, WHICH REVERSES `diary`'s `not` ARGUMENT. That
+          THE URGENCY IS IN THE WORDS, NOT THE MARK. §70.6's hue set is green,
+          blue and two violets — there is no red — so the due phrase keeps
+          `.flag-t.red` (§31's "a phrase in one hue", on `--danger-ink` rather
+          than the `--support-error` FILL that §01 forbids as text) and the card's
+          own mark stays a subject glyph. Both interviews share `ic-prep`,
+          deliberately: they are the same KIND of thing, and giving two calls two
+          hues would be colour saying nothing.
+
+          `diary(v)` WITH NO EXCLUSION, WHICH REVERSES ITS `not` ARGUMENT. That
           parameter exists because "the next interview is the black card at the
           head of the page, and a diary that repeats it is the page saying the
-          same appointment twice" — a fair reading, and overruled: the leader's
-          Cohort Calls lists the call its own black card is about, first row,
-          and a section headed Upcoming Interviews that hides the next one is
-          the more confusing of the two. `diary(v)` with no exclusion.
+          same appointment twice" — overruled: the leader's own Cohort Calls
+          lists the call its black card is about as its first row, and a block
+          that hides the nearest interview is the more confusing of the two. */''}
+    ${/* ONE LINE EACH — see `SETUP_STEPS`' note for the 26-character budget and
+          where it comes from. The report's whole description is now the red due
+          phrase, which is the only part of it that was doing work: "Tal has a
+          draft off the transcript" is said on the page the card opens and again
+          in Tal's summary at the head of this one. `.flag-t` is `inline-flex`
+          with `white-space:nowrap`, so that phrase cannot break mid-way even if
+          a longer time ever lands in it — it either fits or it pushes the card,
+          which is the honest failure of the two.
 
-          THE MARK STAYS A FACE. The leader's rows carry a video glyph because a
-          cohort call has no one person in it; every row here is one interview
-          with one candidate, which is `bookedRow`'s own stated rule — "the mark
-          answers who am I meeting". */''}
-    <section class="sec tint">
-      <div class="sec-h"><h2>Upcoming Interviews</h2></div>
-      <div class="tile-stack">
-        ${diary(v).map(bookedRow).join('')}
-      </div>
-    </section>`;
+          AND THE INTERVIEWS KEEP THE WHEN, NOT THE HOW LONG. "45 minutes,
+          recorded" is true of every interview in the product, so it was the
+          part of the line carrying no information about THIS one. */''}
+    ${quickActions([
+      ...IVS.filter(x => x.st === 'report').map(x => ({
+        ic: I.certificate, hue: 'ic-stand',
+        t: `${x.n}&rsquo;s report`,
+        d: `<span class="flag-t red">due ${x.due}</span>`,
+        go: 'interview', iv: x.id})),
+      ...diary(v).map(b => ({
+        ic: I.video, hue: 'ic-prep',
+        t: b.t,
+        d: `${b.chip}, ${b.time.replace(' ET', '')}`,
+        go: 'interview', iv: b.iv}))
+    ])}`;
 };
 
 /* --------------------------------------------------------------------------
@@ -2748,14 +2840,16 @@ V.training = v => {
         <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
       </div>`
     : '';
+  /* THE SAME SHAPE THE DASHBOARD'S CARDS TAKE — "Your Next Step - X", a
+     paragraph, and one full-height button at the bottom right. It is the same
+     SLOT one page over (the thing to do next, as this page's one black card), so
+     it reads the same way; §75.2c's note has the structural half. */
   const heroBody = at === 'unstarted'
     ? darkCard({
-        title: `Start with ${next[0].toLowerCase()}`,
-        body: kv([
-          ['What it covers', next[1]],
-          ['Where it sits', 'Lesson 1 of 4'],
-          ['After all four', 'A 45-minute calibration with Derek Hale']]),
-        actions: `<button class="btn btn-p btn-sm noic">Open lesson 1 ${I.arrowRight}</button>`
+        title: 'Your Next Step - Lesson 1',
+        body: `<p>${next[0]} covers ${next[1].toLowerCase()}. It is the first of four,
+          and the four are followed by a 45-minute calibration with Derek Hale.</p>`,
+        actions: `<button class="btn btn-p noic">Open lesson 1 ${I.arrowRight}</button>`
       })
     : at === 'underway'
       /* NO `.dc-when` HERE, AND THAT IS THE DATA'S ANSWER RATHER THAN A STYLE
@@ -2791,40 +2885,56 @@ V.training = v => {
     plate: heroBand
   }) + heroBody + `
 
+  ${/* THE FIGURE BAND GOES STRAIGHT AFTER THE BLACK CARD, WHICH IS COURSE
+        PROGRESS'S LAYOUT (Maryam, 2 Sep 2026: "For the Training module of talent
+        agent, i want you to follow the course progress page layout, just do not
+        add the line graph in agent training"). That page reads band → black card
+        → four figures → the chapter list, and this page now reads band → black
+        card → four figures → the lesson list. Two things changed to get there.
+
+        THE `.wkc` CARD AND ITS RING ARE DELETED, and the ring is the reason
+        rather than a casualty. Course Progress has no week card — it is the
+        candidate's WEEK block, which that page does not draw — and everything
+        this one was carrying is a figure: the count, the percentage, which lesson
+        is next, and what is finished. The last of those is the lesson list forty
+        pixels below with a tick on every done row, which is where a reader looks
+        for it. So the card was a second progress idea stacked on the list, and
+        four cells say the same in one row. `ring()` keeps its definition and
+        loses its only caller here; `.wkc*` all still ship and `gallery.html`
+        documents them.
+
+        NO LINE GRAPH, WHICH IS THE INSTRUCTION AND ALSO THE DATA. Course
+        Progress's "Your performance" is an assessment score per chapter over
+        thirteen chapters; a lesson is finished or it is not, and there are four
+        of them — a chart of four booleans is a chart of nothing. The whole
+        section goes rather than being drawn empty, and the "Key insight" row
+        under it goes with the chart it was a reading of.
+
+        THE FOUR CELLS ABSORB THE CALIBRATION BAND, so the page still has ONE
+        figure row. Course Progress has one, and two on a page 400px apart read
+        as two attempts at the same job. `.stats` is a fixed 2/4-column grid
+        whose hairlines are the 1px gap, so it wants exactly four — and there are
+        exactly four readings here worth a cell: how far through, what is next,
+        when the calibration is, and whether it is passed. Derek moves into the
+        help line under the band, where the sentence about the mock interview
+        already names him. */''}
   <section class="sec">
     <div class="sec-h"><h2>Your progress</h2></div>
-    ${/* THE WEEK CARD AND ITS RING. Four lessons run in sequence and each one is
-          either finished or not, which is exactly the shape the candidate's
-          chapter card draws — so it is drawn with the same component rather than
-          with a second progress idea invented here.
-
-          THE EYEBROW SAYS WHICH STATE, and "in progress" was wrong in the one it
-          was hard-coded for: nothing is in progress when nothing is started, and
-          the ring beside it read 0%. The heading is the lesson the eyebrow is
-          about, so at `unstarted` both name lesson 1 and agree.
-
-          The section is headed "Your progress" and not "The method" — the method
-          is what the four lessons TEACH, and it was the heading over a card
-          about how far through them you are. */''}
-    <div class="wkc">
-      <div class="wkc-top">
-        <div class="wkc-tb">
-          <div class="wkc-eb t-label-01">${at === 'certified'
-            ? 'All four lessons &middot; finished'
-            : `Lesson ${lessonsDone + 1} of 4 &middot; ${at === 'unstarted' ? 'not started' : 'next'}`}</div>
-          <h3 class="u-h3">${at === 'certified' ? 'The interview method' : next[0]}</h3>
-          <div class="wkc-min sub">${lessonsDone} of 4 lessons done</div>
-        </div>
-        ${ring(Math.round(lessonsDone / 4 * 100))}
-      </div>
-      <span class="eyebrow">${at === 'certified' ? 'What you were taken through' : 'What you have finished'}</span>
-      <ul class="wkc-did">
-        ${LESSONS.filter((m, n) => n < lessonsDone).map(m =>
-          `<li class="u-compact"><span class="wkc-tick">${I.checkFilled}</span>
-            <span class="wkc-db"><b>${m[0]}</b><span class="sub">${m[1]}</span></span></li>`).join('')
-          || '<li class="u-compact"><span class="wkc-db"><span class="sub">Nothing yet &mdash; lesson 1 is where it starts.</span></span></li>'}
-      </ul>
-    </div>
+    ${stats([
+      ['book', 'Lessons done', `${lessonsDone}<small>/4</small>`,
+        `${Math.round(lessonsDone / 4 * 100)}% complete`],
+      ['time', 'Next up',
+        at === 'certified' ? '&mdash;' : `Lesson ${lessonsDone + 1}`,
+        at === 'certified' ? 'All four are behind you' : next[0]],
+      ['calendar', 'Calibration',
+        at === 'unstarted' ? '&mdash;' : '20 June',
+        at === 'unstarted' ? 'Once the four lessons are done'
+        : at === 'certified' ? 'Thursday, and it is behind you' : 'Thursday, 4:00 PM ET'],
+      ['certificate', 'Certified',
+        at === 'certified' ? 'Passed' : 'Not yet',
+        at === 'certified' ? 'Signed off 20 June' : 'After the calibration']])}
+    <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it.
+      Derek Hale, head of agent standards, watches your half of the conversation.</p>
   </section>
 
   ${at === 'certified' ? '' : `
@@ -2871,45 +2981,40 @@ V.training = v => {
     </div>
   </section>`}
 
-  <section class="sec">
-    <div class="sec-h"><h2>Calibration</h2></div>
-    ${/* FOUR CELLS, NOT FOUR ROWS. A `.kv` is the right shape for a definition
-          list of any length — but these four are all short, they are all facts
-          about one appointment, and read as rows they were four lines of text
-          each 900px wide with 700px of nothing after the words. `.stats` is the
-          band for exactly this: a mark, a label, a figure and a note, four
-          across, and CLAUDE.md's own rule for it is "give it exactly four",
-          which is what there is. `.facts` would have been the mistake — its
-          `auto-fit` columns leave a spare track painting the rule colour at the
-          widths where a cell wraps; §10's note on `.facts` is that argument.
+  ${/* THE CALIBRATION SECTION IS GONE AND ITS FOUR CELLS ARE THE PROGRESS BAND
+        (Maryam, 2 Sep 2026, with the Course Progress layout). That page has ONE
+        figure row and this page had two — the progress band above and this one
+        400px below it, four cells each, which reads as two attempts at the same
+        job rather than as two subjects.
 
-          THE FIGURE IS SHORT AND THE NOTE CARRIES THE REST, because `.stat` puts
-          the label and the figure on ONE line with the figure `nowrap` at the
-          right edge. "Thursday 20 June, 4:00 PM ET" as a figure truncates to
-          "Thursday 20 J…" the moment the page narrows — so the date is the
-          figure, the time is the note, and every cell holds at the width four
-          columns leaves it. `.stats` also opts the section out of §10.15's label
-          column, so the heading takes the full width for free. */''}
-    ${stats([
-      ['user', 'With', 'Derek Hale', 'Head of agent standards'],
-      ['calendar', 'When',
-        at === 'unstarted' ? '&mdash;' : '20 June',
-        at === 'unstarted' ? 'Once the four lessons are done'
-        : at === 'certified' ? 'Thursday, and it is behind you' : 'Thursday, 4:00 PM ET'],
-      ['time', 'Length', '45 min', 'Recorded, and kept'],
-      ['certificate', 'Result',
-        at === 'certified' ? 'Passed' : 'Not sat',
-        at === 'certified' ? 'Certified 20 June'
-        : at === 'unstarted' ? 'Not scheduled yet' : 'Waiting on the call']])}
-    <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it. Derek watches your half of the conversation.</p>
-    ${at === 'certified' ? '' : `
-    ${/* THE NOTE MOVED HERE, TO THE THING IT IS ABOUT. It was the last block on
-          the page, under the rubric, where it read as a warning about the rubric.
-          What it is actually about is the gate: the calibration is what the
-          public profile waits on. */''}
-    <div class="note warn mt5"><span>${I.warning}</span><div class="nb"><b>Your public profile waits on this</b>
-      Nothing goes into browse until the calibration is passed &mdash; and it cannot be booked until the four lessons are done.</div></div>`}
-  </section>
+        WHAT MOVED AND WHAT WENT. `When` and `Result` are cells 3 and 4 of the
+        band above, unchanged in their branching. `With` is the help line under
+        it — Derek's name and his role, in the sentence that was already about
+        him. `Length` ("45 min, recorded and kept") is the one fact that went: it
+        is in the black card's own paragraph on the two stages that draw one, and
+        it is true of every calibration in the product rather than of this one.
+
+        THE `.stats`-OVER-`.kv` ARGUMENT IS WORTH KEEPING and it is why the band
+        above is a `.stats` rather than four rows. These four are short, they are
+        facts about one thing, and as `.kv` rows they were four lines of text
+        900px wide with 700px of nothing after the words. `.facts` would have
+        been the other mistake — its `auto-fit` columns leave a spare track
+        painting the rule colour at the widths where a cell wraps. And the FIGURE
+        stays short with the note carrying the rest, because `.stat` puts the
+        label and the figure on one line with the figure `nowrap` at the right
+        edge: "Thursday 20 June, 4:00 PM ET" as a figure truncates to "Thursday
+        20 J…" the moment the page narrows.
+
+        THE WARNING NOTE SURVIVES ON ITS OWN, directly under the lesson list. It
+        had been moved here once already, from the foot of the page where it read
+        as a warning about the rubric; what it is about is the GATE, and the
+        nearest thing to the gate is now the list of what has to be finished
+        first. */''}
+  ${at === 'certified' ? '' : `
+  <section class="sec">
+    <div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your public profile waits on this</b>
+      Nothing goes into browse until the calibration is passed &mdash; and it cannot be booked until the four lessons are done.</div></div>
+  </section>`}
 
   ${/* THE RUBRIC IS A §65 DISCLOSURE. Nothing in it is yours to do — it is the
         standard you are being read against — and it is the same three sentences

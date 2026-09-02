@@ -10065,7 +10065,21 @@ ${S.delAsk?`<div class="modal on" data-del="0">
     </div>
     <div class="sheet-f conf-a">
       <button class="btn btn-s noic" data-del="0">Keep my account</button>
-      <button class="btn btn-p noic danger" data-delgo="1">Delete everything</button>
+      ${''/* "Delete Account", NOT "Delete everything" (Maryam, 2 Sep 2026) —
+             the anatomy's own label for the destructive CTA. The old one named
+             the CONSEQUENCE, which the description two rows above already
+             states in full ("your profile, your notes and every interview
+             recording"), and it did it in a word that does not appear anywhere
+             else in the flow: the section is "Closing your account", the
+             control that opens this is "Delete my account", the title asks
+             "Delete your account?" and the safe exit is "Keep my account". One
+             noun through the whole flow, and this button was the only place it
+             changed. Title Case is the reference's and is deliberate here:
+             §63 §2 takes CAPITALS off the product, which is a different thing
+             from a two-word button label matching the diagram it is drawn
+             from — and it is what pairs it with "Keep my account" at a glance
+             without repeating that phrase's ending. */}
+      <button class="btn btn-p noic danger" data-delgo="1">Delete Account</button>
     </div>
   </div>
 </div>`:''}`;

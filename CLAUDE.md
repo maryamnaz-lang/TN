@@ -2371,6 +2371,43 @@ theirs: the **90-day summary**, which closes thirteen weeks they were in the roo
   rather than less. `LDR_RECS` and its required-reason box are untouched, and they are now the
   only place on the portal that makes the argument the override box used to make with them.
 
+#### The leader's Profile is TWO TABS — `S.ldrPfTab`, `V.leadProfile`
+
+Maryam, 2 Sep 2026: *"this page should have 2 tabs right after the summary section, 'General
+Profile' and 'Public Profile' … divide the content in both profile tabs accordingly."*
+
+- **THE LINE IS WHO THE BLOCK IS FOR, and the page had already half-drawn it.** "What candidates
+  see" is a section whose entire heading is that distinction. **Public** is what a candidate
+  reads when they choose you — the card, the bio, the three listing fields that MAKE the card,
+  and Your standing. **General** is the account behind it — who you are, when you are on, who
+  reviews you, notifications. Nobody else ever sees a line of the General tab.
+- **THE `.kv` TILE IS THE ONE BLOCK CUT IN TWO, AND THE CUT IS `ldrProfileSheet`'s OWN LIST.**
+  That sheet edits display name, specialism, bio and call length — so four of the tile's five
+  rows are listing copy and only Role is a fact about the account. General keeps **Display name**
+  and **Role**; Public takes **Specialism**, **Assessing range** and **Call length** under a
+  "Your listing" heading directly under the card they build.
+- **YOUR STANDING GOES PUBLIC, which is the one judgement worth arguing.** Its own heading says
+  "Read-only · across every cohort you have closed", which reads private — but 4.9 and "8 cohorts
+  led" are printed on the card 200px above it, so the four figures are the working behind two
+  numbers a candidate already reads. On General it would be the only block anyone else can see.
+- **ONE EDIT CONTROL PER TAB, AT THE TOP, AND ONE SHEET BEHIND BOTH.** "Edit details" on
+  General's identity row, "Edit listing" on Public's `What candidates see` heading — §29.10's
+  rule that an action sits on the thing it acts on. `ldrProfileSheet` holds the whole record, so
+  splitting it as well would be two forms writing one `LEADER`. "Your listing" therefore has no
+  control of its own: the card above it is one press away and covers it.
+- **`S.ldrPfTab` IS STATE — TRAP 9, and it is the version of the trap that is easy to get wrong.**
+  The tab does not SHOW a hidden panel, it decides which sections the page emits, so a class move
+  on the button (the idiom every neighbouring handler uses) would paint nothing. `V.leadReports`'
+  cohort strip makes the same call with `S.ldrRep`, and `.sec.sec-cs` + `.cs` is that page's
+  markup reused — §16 zeroes a section holding a tab strip and §20 knows the marker, so the two
+  grounds meet on one line with no rule of its own. **No new CSS at all.**
+- **"RIGHT AFTER THE SUMMARY SECTION" IS FREE, AND `placeBand` IS WHY.** That pass walks forward
+  from the `.ph` taking Tal's card, the ask line and any declared `.head-sec`, and stops at the
+  first sibling that is none of those. A plain `.sec` holding the strip, written directly after
+  `ph()`, is what stops the run — so the band closes above the tabs instead of swallowing them.
+- **`PAGESUM.leadProfile` NOW COVERS BOTH HALVES AND NAMES NEITHER TAB** — pointing at the UI is
+  one of that record's four content bans, so the sentence says what the two halves hold.
+
 #### The cohort cover — §86, `.gcard-art` + `COHORT_ART` / `cohortArt`
 
 Maryam, 1 Sep 2026: *"the cohort left blocks should have images … also the block square should

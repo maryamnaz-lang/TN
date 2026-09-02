@@ -166,7 +166,20 @@
      an only child, and at 390 they stack into exactly the pair this is for. A
      section whose FIRST child is its `.sec-h` still fails the test, which is
      the part that matters: a headed section is joined against its heading. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){
+  /* `:not(:has(> .lead-b))` — A SECTION THAT IS A BLACK CARD PAYS THE CARD'S
+     FRAME, NOT THE PAIR'S (Maryam, 2 Sep 2026: "there is a lot of space between
+     the black card and the bottom content, reduce that to a normal section
+     spacing"). This is §20.102's own argument — "a dark card is never HALF of a
+     join in either direction" — arriving from the other side: the list already
+     carries `:not(:has(+ .sec > .lead-b))` for the section ABOVE the card and
+     had no entry for the section that IS it.
+     WHAT IT COST: §28.61 zeroes that section's padding so the card's own
+     `--s06` margin can be the whole rhythm, and this rule put 24 back on the
+     bottom edge — inside the section, under the margin — so the gap measured
+     24 + 24 + 24 = 72 at desktop and 48 below 900, where this query is not in
+     play. §105.9 states the zero and is (0,5,0); this selector is fourteen
+     classes, so per trap 4 it can only be excluded here. */
+  .app .page > .sec:not(.cap-sec):not(:has(> .lead-b)):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){
     padding-bottom:var(--s06)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
