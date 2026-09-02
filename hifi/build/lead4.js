@@ -112,7 +112,8 @@ S.ldrTh = 0;
    panel from scratch (trap 9). */
 S.ldrThOpen = false;
 S.ldrEditProfile = false;
-S.ldrAvail = false;
+/* `S.ldrAvail` was the third and is deleted with the weekly-calls sheet
+   (2 Sep 2026) — a leader does not reschedule a cohort call. */
 
 /* ==========================================================================
    MESSAGES
@@ -474,9 +475,22 @@ V.leadProfile = () => `<main class="main"><div class="page">
            interview. Nobody books a cohort leader. The second row was already
            the truth and is now the section: three cohorts, three fixed hours a
            week, read off the same cohort record `lcall` reads.
-           IT KEEPS THE SHEET, because the hours themselves are still a setting
-           a leader changes — what changed is that changing one moves a call
-           rather than opening a slot. */}
+           IT KEPT THE SHEET FOR ONE DAY AND THE SHEET IS NOW GONE TOO (Maryam,
+           2 Sep 2026: "a cohort leader can not reschedule a weekly call so
+           remove that flow"). The note above ended "the hours themselves are
+           still a setting a leader changes — what changed is that changing one
+           moves a call rather than opening a slot", and that second clause is
+           exactly what the instruction rules out: if moving one moves the call
+           for ten candidates, it is not this person's setting. `Manage` is
+           deleted with `ldrAvailSheet`, `ldrDays`, `LDR_DAY_NAMES`,
+           `S.ldrAvail` and both handler branches — the whole flow, on the same
+           reasoning that took the level decision off this portal on 1 Sep.
+
+           THE ROW STAYS AND IS NOW WHAT IT ALWAYS DESCRIBED: the three hours
+           this leader is committed to, read off `LEAD_COHORTS`, stated once on
+           the page that says who they are. A settings page is allowed to hold a
+           fact about you that you did not set — "Volunteer cohort leader ·
+           unpaid" two sections up is the same kind of row. */}
     <div class="sec-h"><h2>When you are on</h2><span class="t-helper-01">Three cohorts, one hour a week each</span></div>
     <div class="tile-stack">
       <div class="cardrow">
@@ -484,9 +498,6 @@ V.leadProfile = () => `<main class="main"><div class="page">
         <span class="cardrow-b">
           <span class="cardrow-t">Your cohort calls</span>
           <span class="cardrow-d">${LEAD_COHORTS.map(c => c.call.toLowerCase()).join(' &middot; ')}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-ldravail="1">Manage</button>
         </span>
       </div>
       <div class="cardrow">
@@ -572,56 +583,32 @@ function ldrProfileSheet(){
   </div>`;
 }
 
-/* THE CALENDAR IS A WEEK OF TOGGLES, not a month grid. What a leader sets is a
-   repeating weekly pattern — "Thursday evenings" — and a month view would ask
-   them to do that fifty-two times. `.tg` with `.sw` is the product's own switch
-   row, so the hours a leader commits are drawn by the same control as the
-   notification they turn off.
+/* THE WEEKLY-CALLS SHEET IS DELETED — `ldrAvailSheet`, `ldrDays` and
+   `LDR_DAY_NAMES` with it (Maryam, 2 Sep 2026: "a cohort leader can not
+   reschedule a weekly call so remove that flow").
 
-   IT IS THE CALL SCHEDULE NOW, NOT BOOKABLE HOURS (1 Sep 2026). Every row used
-   to carry two different things: an open window a candidate could book an
-   interview in ("2:00 – 5:00 PM") and a fixed cohort call shown "for context".
-   Nobody books a cohort leader, so the windows are gone and the calls are the
-   whole list — which also fixes something the old sheet could not: the three
-   days with a call were the three that were ON, so a leader turning Thursday
-   off was switching off a bookable window and appearing to switch off Cohort
-   41's call.
+   IT WAS A WEEK OF `.tg` TOGGLES, one row per weekday, each cohort's hour read
+   off `LEAD_COHORTS` so the sheet could not drift from the three other surfaces
+   that state the same string — and its own helper line is the sentence that
+   ended it: "moving one moves it for every candidate in that cohort, so the
+   change is announced on their board." A control that reschedules ten people's
+   week is not a leader's, which is the same boundary 1 Sep drew when the level
+   decision came off this portal.
 
-   THE DAYS ARE READ OFF `LEAD_COHORTS`, NOT TYPED. `c.call` is already
-   "Thursday 6:00 PM" and the Cohorts page, the roster and the candidate's own
-   Cohort page all read it; a second copy here is the drift `bkStamp` exists to
-   prevent, and this sheet had already drifted once — its Monday row said
-   "Cohort 47 call at 6:00 PM" while `LEAD_COHORTS[2].call` said the same thing
-   in two other places. A day with no call is `Nothing scheduled` and is off. */
-const LDR_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const ldrDays = () => LDR_DAY_NAMES.map(d => {
-  const c = LEAD_COHORTS.filter(x => x.call.split(' ')[0] === d)[0];
-  return c
-    ? [d, `${lname(c)} &middot; ${c.call.split(' ').slice(1).join(' ')} &middot; 60 minutes`, 1]
-    : [d, 'Nothing scheduled', 0];
-});
+   THE DERIVATION IS WORTH KEEPING IN WORDS, because the next sheet that lists a
+   leader's week will want it: the day column was `c.call.split(' ')[0]` rather
+   than a typed list, after this sheet had already drifted once — its Monday row
+   said "Cohort 47 call at 6:00 PM" while `LEAD_COHORTS[2].call` said the same
+   thing in two other places. `lcall` / `lcTitle` / `lcDetail` in lead.js are
+   that rule as it survives, with three readers each.
 
-function ldrAvailSheet(){
-  return `<div class="modal ${S.ldrAvail ? 'on' : ''}" data-ldrclose="avail">
-    <div class="sheet">
-      <div class="sheet-h"><h2>Your weekly calls</h2>
-        <button class="x" data-ldrclose="avail" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">
-        <p class="t-helper-01 mb6">One call a week for each cohort you lead. Moving one moves it for every candidate in that cohort, so the change is announced on their board.</p>
-        ${ldrDays().map(([d,detail,on],i) => `
-        <label class="tg"><div class="tb"><b>${d}</b><span>${detail}</span></div>
-          <input type="checkbox" id="ldrDay${i}" ${on ? 'checked' : ''}><span class="sw"></span></label>`).join('')}
-        <p class="t-helper-01 mt5">${LEAD_COHORTS.length} calls a week, ${LEAD_COHORTS.length * 60} minutes in total. A cohort that reaches day 90 gives its slot back.</p>
-      </div>
-      <div class="sheet-f">
-        <button class="btn btn-s noic" data-ldrclose="avail">Cancel</button>
-        <button class="btn btn-p noic" data-ldrclose="avail">Save changes</button>
-      </div>
-    </div>
-  </div>`;
-}
+   `S.ldrAvail`, THE `data-ldravail` BRANCH AND THE `'avail'` CLOSE BRANCH GO
+   TOO, and so do both call sites — the Calls page's Reschedule (lead3) and this
+   page's own Manage row. A sheet nothing opens is the "gate nothing writes"
+   tell one level up. `.tg` / `.sw` are untouched: the notification switches
+   three sections above are the component's real caller. */
 
-LDR_SHEETS.push(ldrProfileSheet, ldrAvailSheet);
+LDR_SHEETS.push(ldrProfileSheet);
 
 /* ==========================================================================
    THE LISTENERS
@@ -721,14 +708,13 @@ device.addEventListener('click', e => {
   const pf = t.closest('[data-ldrprof]');
   if(pf){ S.ldrEditProfile = true; render(); return; }
 
-  const av = t.closest('[data-ldravail]');
-  if(av){ S.ldrAvail = true; render(); return; }
-
+  /* THE `data-ldravail` BRANCH AND THE `'avail'` CLOSE ARE DELETED with the
+     weekly-calls sheet (2 Sep 2026 — the long note is where the sheet was).
+     One sheet left, so the close branch tests one key rather than two. */
   const cl = t.closest('[data-ldrclose]');
-  if(cl && (cl.dataset.ldrclose === 'prof' || cl.dataset.ldrclose === 'avail')){
+  if(cl && cl.dataset.ldrclose === 'prof'){
     if(cl.classList.contains('modal') && t !== cl) return;
-    if(cl.dataset.ldrclose === 'prof') S.ldrEditProfile = false;
-    if(cl.dataset.ldrclose === 'avail') S.ldrAvail = false;
+    S.ldrEditProfile = false;
     render();
     return;
   }

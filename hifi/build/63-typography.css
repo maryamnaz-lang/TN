@@ -457,7 +457,7 @@
 .app .tbl th,.app .chart-table th,.app .tw-h,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
-.app .rp-src,.app .rp-opts-h,.app .lead-eb,.app .stp-pop-h,.app .bkw .bk-h,
+.app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
 .app .cal-wd,.app .cal-row > .l,.app .call-rec,.app .qz-lab,
 .app .signed .ai-body .t-label-01,.app .callband-tz,.app .wcall-d b,
 .app .callband-d b{
@@ -1545,6 +1545,8 @@
   font-size:var(--t-compact-size);line-height:1.8;
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
   color:var(--text-primary)}
+/* THIS RULE IS (0,3,1) AND IT NEVER WON — kept for the weight, which nothing
+   contests, and answered below for the colour. See §10a. */
 .app .sumdrop .sd-read b{font-weight:var(--t-w-strong);color:#0488c5}
 .app .sumdrop .sd-nt{
   font-size:var(--t-caption-size);line-height:1.8;
@@ -1555,6 +1557,35 @@
   font-size:var(--t-compact-size);line-height:18px;
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   color:transparent}
+
+/* ----------------------------------------------------------------- 10a ---
+   THE LEAD-IN IS BLUE, AND THIS IS THE SPECIFICITY THAT MAKES IT SO
+   (Maryam, 2 Sep 2026: "for all the popovers, i need you to use blue color for
+   the inner paragraph highlight… we have such paragraph starting on each
+   popover so use blue for that").
+
+   §10 above already stated `#0488c5` on `.app .sumdrop .sd-read b` and gave the
+   reason — the accent is Tal's voice throughout the band, so a second accent
+   phrase inside a card that IS Tal talking marks nothing, and the blue reads as
+   a named reading instead. That intent was right and it had never rendered:
+   `placeSumDrop` appends the card INTO `.ai-body` and `.sd-read` is a `<p>`, so
+   §10's own accent-phrase rule — `.app .modhead .ai-aura.talsum .ai-body p b`,
+   (0,5,2), written for the three phrases in the sentence — also matches this
+   `<b>` and outranks (0,3,1). Every popover in the product has been drawing an
+   orange lead-in on an orange ground.
+
+   THIS IS §7b's TRAP, ONE MORE TIME, and the cheapest kind to miss: a colour
+   that loses does not warn, it just renders the other one. The tell was in the
+   product the whole time — the label was orange in every screenshot of every
+   card — and the layer said blue.
+
+   (0,7,1), FOR TWO REASONS RATHER THAN ONE. It has to beat the accent rule at
+   (0,5,2), and it has to beat §83.4's red-demo ink at (0,6,2) — that layer
+   re-points the same `.ai-body p b` selector with one extra class, and the
+   lead-in must not follow the accent into red on that stage, for the same
+   reason it is not orange on every other one. Seven classes settle both.
+   §70 states the matching 5% ground on the identical selector. */
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{color:#0488c5}
 
 /* ------------------------------------------------------------------ 11 ---
    THE COURSE HEAD — §71's families
@@ -3827,7 +3858,9 @@
   text-transform:none;color:var(--text-primary)}
 
 /* =========================================================================
-   30 — THE LOG IN ROLE BLOCK (§104)
+   32 — THE LOG IN ROLE BLOCK (§104)
+   (numbered 32 because 29, 30 and 31 were taken while this was written — this
+   layer's section numbers are labels, not an order)
 
    TWO INKS ON ONE ROLE, WHICH IS WHAT THE ASK ASKS FOR (Maryam, 2 Sep 2026:
    "orange text… the text will be 'Login as Candidate'", and "black text of
@@ -3859,3 +3892,81 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-primary)}
 .app .form-page .role-c.on .role-t{color:var(--accent-text)}
+
+/* =========================================================================
+   33 — REMOVE, ON A SAVED CARD (§105.5)
+
+   ONE INK, AND IT REACHES THE MARK FOR FREE (Maryam, 2 Sep 2026: "the remove
+   text should have delete icon on its left and both icon and text should be in
+   red color"). §12.411 gives every `.lnk`'s svg `fill:currentColor`, so stating
+   the colour once on the control paints the bin with the words — which is also
+   what stops the two drifting if the token moves.
+
+   `--danger-ink` IS THE PRODUCT'S RED AND IT IS ALREADY THE ONE FOR THIS JOB.
+   §29 spends it on `.btn.danger` — "Delete my account", the only other
+   destructive control in the candidate portal — and §31 on the leader's severe
+   flag. A second red would be a second severity, which this is not: removing a
+   card and closing an account are the same KIND of act at two scales.
+
+   IT NEEDS (0,3,0), WHICH IS §63 §7b's TRAP AGAIN. §12.405 states
+   `.app .lnk{color:var(--link)}` at (0,2,0); an `.app .card-del` restatement is
+   also (0,2,0) and would win on layer order alone — true today, and exactly the
+   kind of tie a later layer breaks by accident. `.app .cardrow .card-del` says
+   which list it is about and outweighs the blue rather than outlasting it.
+
+   NO SIZE, WEIGHT OR CASE HERE. The control is a `.lnk` and keeps the rank
+   every other link on the page has; only the ink is different, because only the
+   consequence is. */
+.app .cardrow .card-del{color:var(--danger-ink)}
+.app .cardrow .card-del:hover{color:var(--danger-ink)}
+
+/* =========================================================================
+   34 — THE PROFILE'S IDENTITY BAND (§105.1)
+
+   Maryam, 2 Sep 2026: "reduce the font size of the big black texts on these
+   blocks, also increase the font size of the texts next to the icon a little
+   bit." One cell, two roles, and the change is one step in each direction.
+
+   THE BAND IS `.facts` AND THAT IS WHY IT CAME OUT LIKE THIS. §105 states no
+   type at all — its own head note makes a point of it — so the cells took
+   `.facts`' own two ranks: `.facts .v` is h3 (17/strong) because on every other
+   `.facts` row the value is a FIGURE, and `.facts .l` is the eyebrow (11.5)
+   because it labels one. This band inverts that: the values are "Eastern Time
+   (ET)", "Explorer – E4", "January 8, 2026" — words and dates, not figures —
+   so 17px set four short phrases larger than the section headings above them,
+   and an 11.5px label beside a 20px glyph (§105.1's bare mark) read as a
+   caption on a picture rather than as the name of the thing under it.
+
+   ONE STEP EACH, AND BOTH ARE EXISTING ROLES — §7's rule is take the nearest
+   rank rather than mint a size. The value goes h3 -> h4 (17 -> 14) and the
+   label eyebrow -> label (11.5 -> 12.5). That leaves 1.5px and a weight
+   between them, which is enough because they are not competing: the mark's hue
+   and the 4px gap already pair them, and §105.1's `--s03` under the label is
+   what says which of the two is the subject.
+
+   THE VALUE KEEPS STRONG AND PRIMARY, THE LABEL KEEPS STRONG AND SECONDARY.
+   Only the size moved. `--t-label` is the same 17px line the eyebrow had, so
+   nothing in §105's arrangement reflows — the cell is the same height and the
+   mark still centres on the label row.
+
+   IT NEEDS (0,4,0) AND THE COUNT IS THE WHOLE OF IT — §7b's trap, one more
+   time. `.app .facts .v` and `.app .facts .l` are both (0,3,0), so a
+   `.app .pf-facts .v` restatement is a TIE broken by layer order — and §63 is
+   last, so it would win today and lose the moment a later layer touches
+   `.facts`. `.app .page .pf-facts` says which band it is about and outweighs
+   the generic rank rather than outlasting it. `.pf-l` rather than `.l` for the
+   label, so the selector names the class §105 minted for this row.
+
+   THE NUMERALS ARE UNAFFECTED. §9's tabular list carries `.facts .v` at
+   (0,3,0) and sets `font-variant-numeric` only, which is not one of the four
+   properties this layer owns — so "January 8, 2026" stays tabular at 14 the
+   way it was at 17.
+   ========================================================================= */
+.app .page .pf-facts .v{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:var(--text-primary)}
+.app .page .pf-facts .pf-l{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}

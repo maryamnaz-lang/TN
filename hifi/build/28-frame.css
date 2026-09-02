@@ -72,7 +72,10 @@
   position:relative;display:block;
   background:var(--surface-dark);color:var(--on-dark);
   padding:var(--s08) var(--pad-x);margin:0;border:0}
-.app .lead-b .lead-eb{color:var(--on-dark-2)}
+/* `.lead-eb`'s ON-DARK INK IS DELETED with the eyebrow (2 Sep 2026). It was
+   `--on-dark-2`, the same secondary the description takes — which is the pair
+   §63 §6a states for every dark card, so a future eyebrow on this wall would
+   get it from there rather than from here. */
 .app .lead-b .lead-t{color:var(--on-dark)}
 /* THE SECOND HALF OF §16's CAP REMOVAL, and it had to go with it: this rule is
    (0,3,0) against §16's (0,2,0), so taking the measure off `.lead-x` alone

@@ -291,7 +291,16 @@ function wCard(){
     `<span class="tw-list">
        <span>The number goes straight to our payment processor. It never reaches a TalentNext server.</span>
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
-       <span>Three saved cards is the maximum, and you can remove any of them from Payments.</span>
+       ${''/* THE CAP CAME OFF THE PRODUCT, SO IT CAME OFF THIS ANSWER (2 Sep
+              2026). This read "Three saved cards is the maximum, and you can
+              remove any of them from Payments" — and `V.billing` no longer
+              hides "Add a card" at three or states a limit, so the sentence
+              was Tal asserting a rule the page had stopped having. That is the
+              exact failure this file's own note warns about: "do not restate a
+              number here that a page owns; read it, or the two drift."
+              What is left is the half that is still the page's: you can take
+              any of them off, there. */}
+       <span>You can add another or remove any of them from Payments.</span>
      </span>
      <span class="tw-k">I ${hl('cannot see')} any of it. Card details are on the list of things I have never been shown.</span>`,
     twBtn('Open Payments','billing'));

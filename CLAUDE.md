@@ -125,6 +125,66 @@ are deleted or left caller-less with their arguments preserved in place. Also on
 because that screen was the only element writing `data-portal`, the route to `hifi/` moved to
 `V.profile`'s "Your roles", which is §78's account-menu decision one step longer.
 
+**AND §78 LANDED ON IT LAST** (Maryam, 2 Sep 2026: *"we are not using headings or insights on
+our new ui look. please follow the structure of candidate and cohort portal"*). Every module
+page still opened with an `<h1>` and a `&middot;` fact row where the other two portals put the
+page's name in the bar — checked rather than assumed, by sweeping 55 candidate screens and
+finding **zero `<h1>`s and zero `.ph-facts`**. Both mechanisms are now ported: `phSub` returns
+`''` for a multi-part row (the single-part branch stays, because that is the auth screens'
+prose), and a `placeTopbar` pass at the foot of the file reads `pageLabel`, strips the heading,
+draws the trail and marks the `.ph` `.ph-bare` / `.ph-backonly`. **The back stack is `S.hist`
+with `{view, label}` entries and ONE push site** — the `data-go` branch, which captures the
+label off the page still on screen; the candidate portal diffs the stack's length instead
+because it has six push sites across five files, and §78's note records why a map keyed by view
+fails. A rail item empties the stack, a hash arrival empties it, and a deep link gets its
+module prepended. The local `.shell .shell-name` rule is **deleted** with the label it styled,
+so the agent portal's `<style>` block is prototype chrome and nothing else.
+
+**AND THERE IS NO AGENT LEVEL** (Maryam, 2 Sep 2026: *"we don't have any concept of agent
+level, so remove that kinda thing totally from the talent agent portal"*). `A.level:'A2'` /
+`A.levels:4` were an A1–A4 ladder for the agent themselves — a mirror of the candidate ladder
+that nothing outside that one file ever defined: no agent ladder in the flow diagram, none in
+`hifi/`, none in the wireframes. Gone with it: Standing's `.lvl-hero` hero card, its `Level`
+figure cell, `askState`'s `Agent – A2` lead, a notification headed "Nadia moved you to A3",
+and every "A3 is E1 to B2" gloss. **Three things it was confused with all survive** and are
+different concepts: `range`/`rangeShort` (which candidate levels this agent may assess — a
+permission, and what the quarterly review actually moves), `rank`/`pool` (9 of 38 in browse,
+recalculated weekly), and the review by `A.manager`. The range took the level's figure-cell
+slot, so `.stats` still has its required four. Swept: **zero `\bA[1-4]\b` and zero
+`.lvl-hero` in the rendered text of all 44 screens.**
+
+**THE DASHBOARD'S SECTIONS TOOK THE LEADER'S HEAD BLOCKS AND GROUND RHYTHM, AND THE STICKY
+STRIP WAS BUILT AND REMOVED** (Maryam, 2 Sep 2026: *"for the sections improvement on talent
+agent dashboard, please utilize the components from the cohort leader dashboard"*). What landed:
+`aiHead` on "On you" (the page's last bare `.sec-h`), the alternating white/tint ground that is
+the leader's page rhythm, and the "nothing to accept" note folded into the section it is about.
+What did not, and why it is worth knowing: the **sticky section strip** (`.lead-bar` /
+`.lead-tabs`) was ported in full and worked — then measured. This dashboard is 1270px in a 600px
+frame and the strip sits 609px down, so it had **61px of scroll** before its own `is-gone` rule
+correctly hid it. §60's "a dead control on a live surface is worse than a missing one". The
+longest page in the portal is Profile at 1793px; the leader's dashboard is ~3000px with four
+substantial queues. **The four figure cells are deliberately not `.stat-jump` cells** — the
+leader's each count a section below them, an agent's are readings ($204 has no section to
+scroll to), and making them jump would have meant inventing sections.
+
+- **THE CSS UN-SCOPING STAYS, and it fixed a real defect:** `.lead-bar`, `.lead-tabs` and
+  `.stat-jump` were `[data-portal="leader"]`-scoped, so a hand-authored page could write the
+  markup and get nothing — §31.5's exact `.bk-row` problem. Nineteen selectors across §31 and
+  §37 lost the attribute; `scroll-margin-top` gained a `.jump-sec` class beside its
+  `[id^="lead-"]` half so a second portal's sections need not be called `lead-anything`.
+  **`.stats-lead` deliberately kept its scope** — it is five `nth-child` rules carrying the
+  leader's four NAMED hues (red = falling behind, amber = awaiting signature, blue = scheduled,
+  violet = cohorts), which are semantics of that portal's content.
+- **AND UN-SCOPING SILENTLY DROPS A RULE'S WEIGHT — the one regression, caught by measuring.**
+  `.app[data-portal="leader"] .stat-jump{cursor:pointer}` is (0,3,0) and beat §10.16's
+  `.app .stats > .stat{cursor:default}` — also (0,3,0) — on order. Un-scoped to `.app
+  .stat-jump` it is (0,2,0) and **lost**, so the leader's jump cells stopped saying they were
+  pressable. Nothing warns: the rule is still valid and still matches. Re-qualified as
+  `.app .stats > .stat-jump`, which is (0,3,0) again and states a structural truth. **Removing
+  an attribute from a selector is a specificity change, so re-check every declaration in it
+  against what it was competing with** — §63 §7b's trap, arriving from a direction that layer
+  does not describe.
+
 That portal has since been **rebuilt on the include-by-default output** and is no longer the
 example of the problem — it is the example of the fix. Tal speaks from `.ai-aura`, the next
 interview and the calibration slot are `.plate`s with the orange CTA, the training modules are
@@ -1814,6 +1874,45 @@ dashboards, so **no new layer and no new class were added**.
 - **REMOVAL IS ONE LIST**, written twice: the `reddemo` row in `STAGES` carries it, and §67's
   head carries the layer half.
 
+### EVERY PHOTOGRAPH OF A PERSON IS A DISC — §106, `106-roundfaces.css`
+
+Maryam, 2 Sep 2026: *"everywhere on the candidate, cohort leader, and talent agent portal we
+have an image I need it to be a circle image not a block image."* **One `border-radius`, stated
+at the component**, and it is the platform decision §89.2 wrote down and declined to make
+("rounding all of them is a platform decision rather than this page's").
+
+- **IT REPLACES FIVE SCOPED COPIES OF THE SAME VALUE AND ALL FIVE ARE DELETED.** §89.2 rounded
+  the cohort page's three lists, §89.5 the leader's three wrappers, §103 the message thread's
+  faces, §105 the profile picture and §70.3e the cohort leader's portrait — five layers, five
+  selectors, one shape, and the product still drew a **square** face in the app bar, on every
+  dashboard, on the black recommendation card, on the call row, in the interviews list and down
+  the leader's rosters. That is what a restatement costs. `.idphoto-round` went with §105's rule:
+  a class nothing styles is the same dead weight as a rule nothing writes.
+- **THE LIST IS §09's THREE PLUS SIX PORTRAITS THAT ARE NOT THEM.** `.av-ph` / `.av` / `.mem-av`
+  carry everything `avatar()` draws; `.shell-avatar`, `.acct-i-av`, `.rec-ph`, `.pnc-ph`,
+  `.crow-ph` and `.idphoto` / `.photopick` were each hand-built as their own span. Swept over
+  219 screens both portals: **41 person photographs round, 15 artwork boxes still square.**
+- **ARTWORK IS NOT A FACE, and the four families that stay square are named in the layer**: the
+  wordmark, the eight award WebPs, `.crt-art`, and §86's cohort covers — where a circle is
+  exactly the crop the 1 Sep instruction ruled out ("so the image do not cut from sides"), since
+  the half that carries the meaning is the line of type across the middle. `.crow-ph` is the one
+  element on both lists, so `:not(.crow-cover)` is the one exclusion written as a selector — it
+  reads the RECORD's decision (`crow`'s `cover:true`), not the portal's.
+- **TWO RULES HAD TO BE ANSWERED AT SOURCE RATHER THAN OUT-WEIGHED.** §11.194/195's
+  `border-radius:0` on `.idphoto` is deleted, and §27's `.ask-thread .tal-msg.me .av` is (0,4,0)
+  — heavier than anything the component can state — **and its box was 35×37**, so a `999px` on it
+  would have drawn an ellipse. Squared to 36 in §27. A non-square box is the one thing that makes
+  this change read as a bug rather than as a shape; check for it before adding a portrait.
+- **`.ph-rank`'s CORNER MEDAL IS NOT A PROBLEM AND IT IS WORTH KNOWING WHY**: §62's face row is
+  clipped to 1px on every dashboard since §78 took the page heading out, so nothing in the
+  product draws that pairing today. Left alone rather than re-placed blind. §106.3 *does* move
+  the photo picker's `.on` tick — a 14px mark at `right:4px;bottom:4px` sits outside a disc,
+  whose own edge on that diagonal is ~12px in — to bottom centre.
+- **THE THIRD PORTAL GETS IT FROM THE BOX.** `tn-agent-portal.html` is hand-written on
+  `design-system/` and draws `.av-ph`, `.av` and `.mem-av mem-ph`, so re-running `build-ds.py` is
+  the whole of its half of the ask. §106 is in **both** layer lists; without the `build-ds.py`
+  entry the design system would go *backwards*, since §89/§103/§105's own copies are gone.
+
 ### The head band is TWO COLUMNS — §56, `56-headband.css`
 
 Figma 486:1084. The left column reads: the `<h1>`, the `&middot;` fact row under it, a
@@ -2430,16 +2529,23 @@ the calls behind the leader with the week, the chapter and who turned up.
   the four behind you, 32 of 36 seats were filled" — which is now the only place attendance
   appears in the product, and a figure read once is what a Tal summary is for. `lranChapter` went
   with the rows; `V.leadProfile`'s row stopped promising "attendance is on the Calls page".
-- **BRIEF BECAME RESCHEDULE, AS A SECONDARY** — *"just a black text with reschedule icon on its
-  left"*. `.btn-t btn-sm ic-l`: §64 took the border off `.btn-t` and left the ink at
-  `--text-primary`, so a text button on a page IS black words, and §64's trailing arrow does not
-  arrive because its test is `:not(:has(svg))` and this one carries a mark. **The mark is
-  `I.calendar`, which is what Reschedule already wears** on the candidate's own call row — one
-  word, one glyph, rather than a second mark for the same verb. **It opens the weekly-calls
-  sheet** (`data-ldravail`, mounted on every leader page by `placeLdrSheets`), which is the
-  surface that actually moves a call: pointing it at the brief would be a button lying about what
-  it does, and inert would be §60's dead control. The brief is still the black card's action at
-  the top of the page and is on the cohort page twice.
+- **BRIEF BECAME RESCHEDULE ON 1 SEP AND THE WHOLE RESCHEDULE FLOW IS GONE ON 2 SEP** (Maryam:
+  *"a cohort leader can not reschedule a weekly call so remove that flow"*). The row now has **no
+  action at all**, and that is the point: a weekly cohort call belongs to the PROGRAMME — ten
+  candidates, a fixed hour, thirteen weeks — and lead4's sheet said so in its own helper line
+  ("moving one moves it for every candidate in that cohort"). This is the 1 Sep correction one
+  surface smaller; the portal keeps drifting toward giving this person an agent's powers.
+  **Deleted together, because a sheet nothing opens is the "gate nothing writes" tell one level
+  up:** the Calls page's Reschedule button, `V.leadProfile`'s "Manage" control on the *Your
+  cohort calls* row, `ldrAvailSheet`, `ldrDays`, `LDR_DAY_NAMES`, `S.ldrAvail`, the
+  `data-ldravail` branch and the `'avail'` close branch — `LDR_SHEETS` is down to the profile
+  sheet plus lead2's two. **What survives is what a leader still does**: "Generate the brief" is
+  the black card's action at the top of the page and is on the cohort page twice, and the Profile
+  row is now a FACT — the three hours they are committed to, read off `LEAD_COHORTS`, in the same
+  register as "Volunteer cohort leader · unpaid" two sections above it.
+  **THE CANDIDATE'S RESCHEDULE IS UNTOUCHED** and the distinction is the whole rule: `CALL_ROW.iv`
+  moves an *interview* the candidate booked and paid for with an agent who sets their own
+  availability. `I.calendar` still means Reschedule product-wide; there is one caller now, not two.
 
 Four rules the wireframe settled and this side keeps: **no money anywhere** (a cohort leader
 volunteers — Certifications replaced Earnings, and there is no fee on any leader page); the
@@ -2634,6 +2740,18 @@ annotations ("Open question — client decision") deliberately do **not** cross 
     re-read every `align-*` / `justify-*` an earlier layer set on its children** — those are
     the four properties whose meaning is defined by the parent's formatting context, and the
     cascade will not tell you they flipped.
+20. **"AS TALL AS ITS CONTENT" MEANS NOTHING WHILE THE PARENT HAS A `min-height`, and this one
+    cost two days and a repeated ask.** §70.3e makes the cohort leader's portrait `height:100%`
+    inside a grid row so it measures the two lines beside it, and its note argues the whole thing
+    correctly — grid rather than flex (§75.3's collapse), `stretch` rather than `center`, the
+    transfer through `aspect-ratio`. It resolved against **§02.229's `min-height:64px` on
+    `.row-lead`**, four layers back, which is right for a 64px person row and is that row's
+    height whatever it holds. The text cell is 43 (19 + 8 + 16, two type roles and the gap) and
+    the face came out 64, hanging 21px below the role line. **Everything in the note was true and
+    the box it measured was the wrong box** — which is why the ask came back a second day
+    unchanged. `min-height:0` is the fix and a stated `43px` is not: a number has to be
+    re-derived every time the cell's content changes, which it had twice already. Read
+    `getComputedStyle(parent).minHeight` before trusting a percentage height.
 
 ### Verifying a change
 

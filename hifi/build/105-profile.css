@@ -37,85 +37,95 @@
   display:flex;align-items:center;gap:var(--s03)}
 .app .page .pf-facts .pf-l svg{
   flex:none;width:20px;height:20px;fill:var(--mk)}
-/* THE VALUE AND ITS SUB-LINE ARE ONE OBJECT, 2px APART, which is the same pair
-   `.aw-n` / `.aw-d` and `.nrow-t` / `.nrow-d` draw. The gap under the LABEL is
-   the cell's own, and it is bigger, because that is a heading over a value
-   rather than two lines of one statement — §01's `--sec-desc-gap` argument at
-   the scale of a cell. */
+/* THE VALUE SITS `--s03` UNDER ITS LABEL — a heading over a value, not two
+   lines of one statement, which is §01's `--sec-desc-gap` argument at the scale
+   of a cell.
+
+   THE `.d` RULE IS DELETED WITH THE THIRD ROW (Maryam, 2 Sep 2026 — "remove the
+   'Set at the interview' and 'Not enrolled yet' texts from the blocks"). It was
+   `display:block;margin-top:2px`, the `.aw-n`/`.aw-d` pairing; `pfFact` no
+   longer takes a `sub`, so nothing in the product writes a `.d` inside this
+   band and a rule whose gate nothing writes is the tell this repo deletes on.
+   §63 still types `.facts .d` — that role has readers elsewhere. */
 .app .page .pf-facts .v{display:block;margin-top:var(--s03)}
-.app .page .pf-facts .d{display:block;margin-top:2px}
+
+/* ---- the photograph ----
+   ROUND, WHICH IS §103's DECISION ON THE THREAD'S FACES AND §89.2's ON THE
+   COHORT LISTS (Maryam, 2 Sep 2026: "make the profile picture circle"). A face
+   is a mark, and §56 grants marks the one curve this system allows; the literal
+   `999px` rather than a re-pointed `--radius` is §89.2's reason — re-pointing
+   the token here would curve the badge the photo used to carry and everything
+   else in the header.
+
+   IT HAS TO BEAT §11.195, which states `.idphoto .av-ph{border-radius:0}` at
+   (0,2,0) — written when every avatar in the build was square. `.app .idphoto
+   .av-ph` inside `.idphoto-round` is (0,3,0) and says which photo it means, so
+   the leader's own profile picture is untouched until it asks.
+
+   §09's `overflow:hidden` ON `.av-ph` IS WHAT MAKES IT WORK: the `<img>` is
+   absolutely positioned inside that box, so the box's radius is what clips it —
+   no radius on the image itself, which would have to be kept in step.
+
+   THE RULE AND THE `.idphoto-round` CLASS ARE BOTH DELETED (§106, one day
+   later). "So the leader's own profile picture is untouched until it asks" was
+   the reason for the scope, and it asked: every photograph of a person in all
+   three portals is a disc now, stated once at the component. The class went
+   with the rule rather than being left on the button — a class nothing styles
+   is the same dead weight as a rule nothing writes, in the other direction.
+   §106 also had to delete §11.195, which this note names as the rule it beats;
+   the arithmetic here is the record of why that one had to go rather than be
+   out-weighted a second time. */
+
+/* ---- the way out ----
+   "ALIGN THE LOGOUT ON THE LEFT" (Maryam, 2 Sep 2026) IS THE BUTTON'S OWN
+   PADDING. The control was already at the page gutter — measured 32px, the same
+   `--pad-x` every heading on the page starts at — but `.btn` carries 16px of
+   horizontal padding, so the WORDS started at 48 while every other line of type
+   on the page started at 32. Against four left-aligned blocks that reads as an
+   indent, not as a button.
+
+   §64 ALREADY MAKES THIS MOVE FOR THE SAME REASON: `.sec-h .btn-t
+   {padding-right:0}` sits a heading row's text control flush with the column's
+   right edge, "so what is left is the label and the mark". This is that rule on
+   the other edge, for the one control on the page that is a line of type in its
+   own section. Only the left padding goes — the right keeps the label clear of
+   whatever is beside it, and there is nothing beside it. */
+.app .page .sec-out > .btn{padding-left:0}
 
 /* ------------------------------------------------------------------ 105.2 ---
-   WHAT YOU HOLD, BESIDE WHAT HAS HAPPENED
+   WHAT YOU HOLD, BESIDE WHAT HAS HAPPENED — DELETED, 2 Sep 2026
 
-   TWO PANELS IN ONE SECTION, side by side at desktop and stacked below it. The
-   frame is §41's — `1px solid var(--rule)` on `--layer-01`, square through
-   `--radius` — which is the answer §76 gave the same reference decision on the
-   booking panels rather than minting a second bounded-panel look.
+   "Remove this from profile" (Maryam), against the whole two-panel row:
+   Achievements — two `.crt-card`s off `certAll` — beside Recent activity, four
+   `.nrow`s off `NOTIF`, in one `.sec` with a divider between them. `pfPair` is
+   deleted in views.js and its note is the argument; these were its rules and
+   nothing else in either portal writes `.pf-pair` / `.pf-card` / `.pf-hd` /
+   `.pf-ach` / `.pf-act`, so they go with it rather than becoming five families
+   whose gate nothing writes. `105-profile.css` is in `build-ds.py`'s LAYERS,
+   which is what makes that more than tidiness: a dead rule here ships to every
+   page built on the design system too.
 
-   `1fr 1fr` AND NOT `auto-fit`, which is the opposite call from §102's award
-   grid and for the opposite reason: there are exactly two panels, always, and
-   they are not a collection. An `auto-fit` track would let the Achievements
-   panel size itself off three cards and leave the log narrower than it.
+   FIVE ARGUMENTS ARE WORTH KEEPING BECAUSE THEY ARE NOT ABOUT THIS BLOCK:
 
-   THE HEAD ROW HAS NO RULE UNDER IT. The reference draws none, and §18's rule
-   is that a block with a ground of its own is its own edge — a hairline 16px
-   inside a hairline frame is the second boundary §57.4b took out from under the
-   identity panel. */
-.app .page .pf-pair{
-  display:grid;gap:var(--s05);grid-template-columns:minmax(0,1fr)}
-@container app (min-width:900px){
-  .app .page .pf-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-.app .page .pf-card{
-  display:flex;flex-direction:column;gap:var(--s05);
-  padding:var(--s05);
-  background-color:var(--layer-01);
-  border:1px solid var(--rule);border-radius:var(--radius)}
-/* THE CONTROL IS AT THE TRUE END OF THE ROW on its own auto margin, and the
-   heading takes the slack with `min-width:0` so a long one wraps rather than
-   pushing "View all" out of the panel — §93's lesson, one component over. */
-.app .page .pf-hd{
-  display:flex;align-items:center;gap:var(--s05)}
-.app .page .pf-hd > h3{flex:1 1 auto;min-width:0;margin:0}
-.app .page .pf-hd > .btn{flex:none;margin-left:auto}
+     - TWO PANELS ABREAST NEED ONE RULE, NOT TWO FRAMES. §72's "there is no box
+       round the row, one rule above it" and §74's "a third nested edge" both
+       land the same way on a pair of columns inside a section.
+     - THE DIVIDER IS AN INSET PSEUDO-ELEMENT, NOT A `border-left` (§72.1): a
+       border runs the column's full height and forms a corner with whatever
+       rule is above it. And below 900 it is switched OFF with `content:none`
+       rather than re-pointed — §72.3's warning, because an absolutely
+       positioned divider stacked draws a line down one column's edge.
+     - THE GAP AND THE LINE ARE ONE VALUE: `--s07` between the columns and the
+       divider at `calc(var(--s07) / -2)`, which is §73's "one value driving
+       the space and the line together".
+     - `1fr 1fr` AND NOT `auto-fit` for a fixed pair — `auto-fit` would size the
+       card panel off its cards and leave the log narrower than it.
+     - `--pad-x:0px` ON A LIST OF `.nrow`s IS TRAP 10, one declaration, the same
+       one §35.1 uses for a page component borrowed into a Tal bubble.
 
-/* ---- the three certifications ----
-   §96's CARD, ONE SIZE DOWN, AND THE MECHANISM IS §96's OWN. That layer sizes
-   the badge slot from `--crt-art-w/h` and re-points the pair on its grid card
-   (`120x130` against the hero's `70x76`); this re-points them again to 56x61,
-   the same 70:76 ratio, so the artwork is a downscale at every call site and
-   nothing is resampled. A fixed 240px track cannot go in a half-width column,
-   which is the whole reason the size is a custom property.
-
-   `minmax(0,1fr)` ON THREE COLUMNS, not `auto-fit`: the panel shows exactly
-   three and "View all" is what shows the rest, so there is no count for the
-   grid to discover. `align-content:start` keeps them at the top of a panel that
-   is as tall as the log beside it. */
-.app .page .pf-ach{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:var(--s04);align-content:start}
-.app .page .pf-ach > .crt-card{
-  padding:var(--s04);gap:2px}
-.app .page .pf-ach > .crt-card > .crt-art{
-  --crt-art-w:56px;--crt-art-h:61px;
-  align-self:center;margin-bottom:var(--s04)}
-
-/* ---- the log ----
-   THE ROWS ARE `.nrow` AND THE LIST IS A COLUMN OF THEM WITH THE HAIRLINE
-   BETWEEN, not around: §02's `.nrow` already carries the separator, and the
-   panel's own frame is the outer edge. The last row gives its rule up because a
-   rule against the frame's bottom padding is two lines for one join.
-
-   `--pad-x:0px` ON THE LIST IS TRAP 10, and it is the same one declaration
-   §35.1 uses for a page component borrowed into a Tal bubble. §10.871 gives
-   every direct child of a row container the page gutter, so inside a panel that
-   has already paid `--s05` the rows were indented twice — 16 inside 16. Set on
-   the list rather than on the rows, so anything else dropped in here inherits
-   the answer. */
-.app .page .pf-act{
-  --pad-x:0px;
-  display:flex;flex-direction:column}
-.app .page .pf-act > .nrow:last-child{border-bottom:0}
+   `.crt-card`, `.nrow` and their marks are untouched — §96's grid and the bell
+   are their live writers, and both were only being re-pointed from here.
+   -------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------ 105.3 ---
    THE SWITCHES ARE A ROW OF THREE
@@ -150,6 +160,234 @@
   width:20px;height:20px;margin-top:1px}
 .app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--mk)}
 
+/* ------------------------------------------------------------------ 105.5 ---
+   THE SAVED CARD ROW — a radio on the spine and a red Remove
+   Maryam, 2 Sep 2026. The markup and the argument for both are over the row in
+   `V.billing`; this is the geometry.
+
+   THE RING SITS ON THE ROW'S OWN LEFT EDGE, BEFORE THE BRAND MARK, so three
+   rows are scanned down one column of controls — §86's "a diary is scanned down
+   the date and across the detail, and both of those need a straight edge", one
+   component over. `.rad` carries `padding:var(--s03) 0` for a consent line that
+   wraps under its own box (§02.190); in a row that is already 16px tall per
+   cell that padding is what would push the ring off the brand mark's centre, so
+   it is zeroed and the row's own `align-items` does the aligning.
+
+   `gap:0` BECAUSE THERE IS NOTHING TO SPACE. `.rad`'s `--s04` gap is between
+   the box and its `.txt`, and this label has no words in it — the card's name
+   is the row's own second cell. Left standing it is 12px of dead ground between
+   the ring and the mark, on top of `.cardrow`'s own `--s05`.
+
+   THE REMOVE CONTROL IS RED, MARK AND WORDS TOGETHER, AND ITS UNDERLINE IS OFF.
+   §12.411 already gives a `.lnk`'s svg `fill:currentColor`, so the mark takes
+   the ink §63 §33 states and nothing here says a colour. What this states is
+   the shape: the mark leads at 18px — the size §64 draws a leading mark at —
+   and the underline goes, because §12's decision is that a link is blue since
+   blue is the only blue on the screen, and a red underlined word beside a red
+   glyph says "not ordinary text" twice.
+
+   `.lnk` IS STILL THE ELEMENT and that is deliberate: it is a text control, not
+   a `.btn`, so it keeps the 44px hit area and the focus treatment §15.416 gives
+   every link in the product — a destructive control is the last one that should
+   lose its focus ring. */
+.app .cardrow > .card-rad{flex:none;padding:0;gap:0}
+.app .cardrow .card-del{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  text-decoration:none}
+.app .cardrow .card-del:focus-visible{text-decoration:none}
+.app .cardrow .card-del svg{flex:none;width:18px;height:18px}
+
+/* ------------------------------------------------------------------ 105.6 ---
+   THE DELETE CONFIRMATION IS A CENTRED DIALOG
+   Maryam's anatomy diagram, 2 Sep 2026. The five parts and what this refuses
+   from the reference are over the markup in `V.account`; this is the drawing.
+
+   THE SIGNAL EMPHASIS PATTERN IS TWO HAIRLINE RINGS AND A TINTED DISC, which is
+   how this product draws attention to a mark: §02's opening note is that "depth
+   is expressed as rhythm and rule weight, nothing else", so the reference's
+   soft glow becomes two rules at 12% and 24% of the danger hue and the disc is
+   `--support-error-bg`. Marks are the one thing §56 lets curve, so all three
+   circles are literal `999px` rather than a re-pointed `--radius`.
+
+   THE RINGS ARE `box-shadow`, NOT TWO PSEUDO-ELEMENTS, and that is the one
+   mechanism choice worth recording: `0 0 0 Npx` spread rings paint outside the
+   border box without taking layout, so the disc stays a 48px item in a flex
+   column and the rings cannot push the title down. Two pseudo-elements would
+   each need `position:absolute` on a parent, and §21's own note records what an
+   absolutely-positioned decoration costs when it escapes its box.
+
+   AND IT IS NOT A SHADOW IN THE PROHIBITED SENSE. §02 rules out `box-shadow` as
+   DEPTH — a blur under a card, standing in for elevation. These have no blur and
+   no offset: they are two concentric hairlines, which is the same thing
+   `outline` would draw if `outline` could draw two.
+
+   THE TITLE, THE DESCRIPTION AND THE LABEL ARE ROLES §63 ALREADY STATES — an
+   `h2`, a `<p>` and an `.f > label` — so this section sets no size, weight,
+   case or colour. The only `color` is the mark's `fill`, which §85 settles is
+   not text. */
+.app .conf > .conf-b{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:var(--s05);padding:var(--s07) var(--s06) var(--s06)}
+.app .conf .conf-mk{
+  flex:none;display:grid;place-items:center;
+  width:48px;height:48px;margin-bottom:var(--s04);
+  background:var(--support-error-bg);border-radius:999px;
+  box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
+             0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
+.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink)}
+/* THE TITLE AND ITS DESCRIPTION ARE ONE OBJECT — `--sec-desc-gap`, §01's token
+   for exactly this pair, against the `--s05` the column gives everything else.
+   A heading and the sentence about it are closer to each other than either is
+   to anything around them (§38's `.scene-hb`, and the note there is the
+   working). `margin:0` on both because the flex column's `gap` is the spacing
+   and a `<p>`'s UA margin would double it. */
+.app .conf .conf-t{margin:0}
+.app .conf .conf-x{margin:var(--sec-desc-gap) 0 0;max-width:42ch}
+/* THE FRICTION FIELD TAKES THE WIDTH and its label centres with the rest. `.f`
+   is a block by default, so `width:100%` is what stops it shrinking to its
+   label inside a centred flex column. */
+.app .conf .conf-f{width:100%;margin:var(--s03) 0 0}
+.app .conf .conf-f > label{text-align:center}
+/* AND THE TWO ACTIONS ARE EQUAL HALVES, which §02.421's `.sheet-f .btn{flex:1}`
+   already does — the safe exit on the left, the destructive one on the right,
+   in source order, which is the anatomy's own arrangement.
+
+   THE ONE THING THAT HAD TO BE TAKEN OFF IS §64's ARROW. That layer appends a
+   masked `→` to any quiet button with no icon in it, and its own note says what
+   the mark means: "a trailing mark reads as the RESULT of pressing — and then
+   you go there". "Keep my account" is the one control in the product whose
+   result is that nothing happens and you stay where you are, so the arrow was
+   pointing the wrong way. Scoped to this dialog's action row, so all 88 of the
+   quiet buttons that do go somewhere keep it. */
+.app .conf-a :is(.btn-s,.btn-t,.btn-g)::after{content:none}
+
+/* ------------------------------------------------------------------ 105.7 ---
+   THE ASK FIELD'S TWO CONTROLS ARE DISCS
+   Maryam, 2 Sep 2026, with a reference: "on our tal chat, I want the bottom
+   send button in round orange filled circle, and on it's left there should be a
+   voice icon in round light grey border as well." The mic's behaviour is in
+   ai4's `askMic`; this is the drawing.
+
+   THE SEND GOES BACK TO THE ACCENT, WHICH REVERSES §27's OWN DECISION and is
+   worth stating rather than quietly overwriting. That layer took the gradient
+   off — "the panel closes on a black square; this one closed on the brand
+   gradient, which put the loudest colour on the screen two inches from Tal's
+   own mark and made the two read as one control" — and that argument was about
+   a 46px SQUARE of gradient sitting against Tal's 32px orange blob at the other
+   end of the same row. A 40px flat disc is a different object: it reads as one
+   round control among the row's two, and the mark it might be confused with is
+   no longer beside it (the ask page's field carries the clip, not the blob).
+   Flat `--accent`, not `--accent-grad` — a gradient inside 40px is a texture
+   nobody can see, and §01's fill value is what every other accent disc uses.
+
+   THE MIC IS THE OPPOSITE PAIR: no fill, a `--rule` hairline, the glyph in
+   `--icon-secondary`. Two filled discs would be two primary actions; one filled
+   and one outlined is the same "the accent leads a pair" rule §75 states for a
+   black card's buttons and §77 for the call row.
+
+   40px, NOT 46. §21.380 sizes the send at 46 to fill a 48px field edge to edge,
+   which is right for a square that IS the field's end. A disc has to sit inside
+   the field with air round it, so the field grows a 4px inset frame on the right
+   and both controls come in to 40 — which is also the product's own disc size
+   (§89.3's message control, `.crt-menu`'s box).
+
+   LITERAL `999px`, NOT A RE-POINTED `--radius`: §89.2's reason, and these are
+   marks in the sense §56 grants the curve to.
+
+   IT HAS TO BE SCOPED `.ask-page`, WHICH COST A BUILD — §63 §7b's trap again.
+   §51.341 states `.app .ask-page .askfield-send{width:20px;height:20px;
+   background:none}` at (0,3,0): the ask page's own field draws the send as "a
+   bare 20px arrow in black ink", which is that layer's reading of the file. A
+   generic `.app .askfield-send` restatement is (0,2,0) and loses — measured, the
+   button stayed 20x20 and transparent while the mic beside it rendered
+   correctly at 40, which is exactly the kind of half-applied result a
+   specificity loss produces. Both selectors are stated here at (0,3,0), so the
+   layer order decides and nothing about the panel's own field moved.
+
+   AND THE GLYPH IS `I.send`, NOT `ARROW_LINE`. §51's arrow is drawn `fill:none`
+   as an outlined stroke, which is right for a bare mark on paper and invisible
+   on an accent disc. The paper plane is what the reference draws, what
+   `.composer-send` has always drawn in Messages, and it is a filled shape — so
+   one glyph now means "send" on both of the product's composers.
+
+   NOT ONE font-size, font-weight, text-transform OR text colour — the only
+   `color` below is on a mark's `fill`. */
+.app .ask-page .askfield{padding-right:12px;gap:var(--s03)}
+.app .ask-page .askfield-send,
+.app .askfield-send{
+  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  border:0;border-radius:999px;
+  background:var(--accent);background-image:none;
+  --on-brand-fill:1}
+.app .ask-page .askfield-send svg,
+.app .askfield-send svg{
+  width:18px;height:18px;fill:var(--on-accent);display:block}
+.app .ask-page .askfield-mic,
+.app .askfield-mic{
+  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--rule);border-radius:999px;
+  cursor:pointer}
+.app .ask-page .askfield-mic svg,
+.app .askfield-mic svg{
+  width:18px;height:18px;fill:var(--icon-secondary);display:block}
+/* LISTENING IS THE DANGER HUE, WHICH IS THE ONE PLACE IN THIS BUILD IT MEANS
+   "live" RATHER THAN "wrong" — the convention every recorder on every platform
+   uses, and the same reading §60 gives the call bar's leave control. The ring
+   fills so the state is legible without reading the glyph, and it is a ground
+   change rather than an `opacity` one per trap 2. */
+.app .ask-page .askfield-mic.on,
+.app .askfield-mic.on{
+  background:var(--danger-ink);border-color:var(--danger-ink)}
+.app .ask-page .askfield-mic.on svg,
+.app .askfield-mic.on svg{fill:var(--on-brand)}
+
+/* THE SEND IS OFF UNTIL THE FIELD HAS WORDS IN IT (Maryam, 2 Sep 2026), and the
+   disabled register is §21's own for this control: `--layer-accent-01`, the 20%
+   accent wash the collapsed dock already draws its arrow chip in, with the mark
+   in `--text-placeholder`. So "off" is a state the reader has already met at the
+   bottom of every page rather than a new grey.
+
+   IT HAS TO BEAT §02.108's GENERIC DISABLED TREATMENT, which is §81's finding on
+   a black card: that block is (0,2,0) and an accent fill stated at (0,3,0) wins,
+   so a `disabled` button kept the full accent and looked live. Same arithmetic
+   here, from the other side — the fill is mine, so the OFF state has to be mine
+   too, at the same weight.
+
+   `background-image:none` IS HALF THE RULE for §81's other reason: the accent
+   can arrive as a gradient as well as a colour, and clearing one leaves the
+   other painting. `cursor:default` because §02 gives every `.btn` a pointer and
+   a pointer over a control that cannot be pressed is the lie the `disabled`
+   attribute is here to stop. */
+.app .ask-page .askfield-send:disabled,
+.app .askfield-send:disabled{
+  background:var(--layer-accent-01);background-image:none;cursor:default}
+.app .ask-page .askfield-send:disabled svg,
+.app .askfield-send:disabled svg{fill:var(--text-placeholder)}
+
+/* ---- and the dock's pair, which is the same shape one register quieter ----
+   THE ROW IS ONE `<button>`, so these two are `<span>`s and the mic's press is
+   read before the row's (`askBar`'s note has the argument). What this states is
+   only the shape: §21.220 already draws the send chip at 32px in the accent
+   wash — it is round now, and the mic beside it takes the outlined half of the
+   pair at the same size, so the dock and the chat's field read as the same two
+   controls at two sizes rather than as two different rows.
+
+   32, NOT 40. The dock is a 56px row against the chat field's 64, and §21 sized
+   its chip to that; a 40px disc in a 56px row leaves 8px above and below, which
+   is not air, it is a gap. */
+.app .askdock .askline-send{border-radius:999px}
+.app .askdock .askline-mic{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;margin-left:auto;
+  background:transparent;border:1px solid var(--rule);border-radius:999px}
+/* THE AUTO MARGIN MOVES TO THE MIC, because §21.220 puts it on the send to hold
+   the row's right edge "by the thing that has to hold it, whatever else is in
+   the row" — and the mic is now what else is in the row. Left on both, the pair
+   would split and the mic would sit mid-row beside the prompt. */
+.app .askdock .askline-mic + .askline-send{margin-left:var(--s03)}
+.app .askdock .askline-mic svg{
+  width:16px;height:16px;fill:var(--icon-secondary);display:block}
+
 /* ------------------------------------------------------------------ 105.4 ---
    THE INVITATION'S CONDITIONS ARE MARKS, NOT CHIPS
 
@@ -174,3 +412,101 @@
   padding:0;border:0}
 .app .lead-b .lead-tags > span svg{
   flex:none;width:20px;height:20px;fill:var(--on-dark)}
+
+/* ------------------------------------------------------------------ 105.8 ---
+   NO CLOSING RULE UNDER THE SWITCH ROW OR THE FACT BAND — THE NARROW TIER
+
+   "Remove the divider at the bottom of the notifications section" and "remove
+   the line at the bottom of 4 cards" (Maryam, 2 Sep 2026) are one rule with two
+   selectors, and both are the same finding: the block already ends on an edge
+   it drew itself — three §41 cells for the switch row, §10.16's own
+   `border-bottom` for the `.facts` band — so the join hairline was a second
+   boundary for one seam. §14's list carries the desktop half of each with the
+   argument; this is the narrow tier.
+
+   Like every divider ask it needs answering in BOTH tiers
+   from two different places. §85.1b is the worked example and its table reads
+   the same way here:
+
+     desktop   §14.78 turns every `.page > .sec::after` OFF and §14.186
+               switches it back on when the next block names itself with a
+               heading — "Closing your account" does, so the pair matched. That
+               selector is (0,5,0) inside a container query, which trap 4 says
+               is where "which pairs are joined" is decided, so the fix is an
+               entry in that list and CANNOT be won from here at any weight.
+     below 900 §10.63 draws `.sec::after` unconditionally and §14 is not in
+               play at all, so the same pair has to be said again — here, with
+               no query round it.
+
+   WRITTEN UNCONDITIONALLY, so at desktop it simply agrees with §14's `:not()`
+   and keeps the narrow tier correct on its own if that entry is ever reverted.
+   §85.1b makes the same trade in the same words.
+   -------------------------------------------------------------------------- */
+.app .page > .sec:has(> .pf-tgs)::after,
+.app .page > .sec:has(> .pf-facts)::after{display:none}
+
+/* ------------------------------------------------------------------ 105.9 ---
+   THE INVITATION IS A CARD ON THE PAGE, NOT A WALL ACROSS IT
+
+   Maryam, 2 Sep 2026: "why this black card is attached to the walls and top
+   section, we are giving page padding to these cards as well."
+
+   §28 DREW IT AS A WALL AND THAT IS WHY. Its two rules are `.sec:has(> .lead-b)
+   {padding:0}` and `.lead-b{padding:var(--s08) var(--pad-x);margin:0}` — the
+   section gives its gutter up and the black runs rail to rail, which is what
+   `.plate` and `.sec.on-dark` do INSIDE the head band, where the band's own
+   edges are the frame. This card is a page child (`keep-place`, see `leadSec`),
+   so there is no band round it: it met the summary band's closing hairline on
+   its top edge and both rails on its sides, which reads as the page turning
+   black rather than as an object arriving on it. §75.3 records the identical
+   finding for the recommendation card, in those words.
+
+   SO IT TAKES §75's PLACEMENT, WHICH IS THE ANSWER TO THE QUESTION ASKED —
+   "we are giving page padding to these cards as well". `margin:var(--s06)
+   var(--pad-x)` and a flat `var(--s07)` frame is `.dark-card`'s own geometry to
+   the number: the gutter as a MARGIN so the card's edges land on the page's
+   spine at every width (16 / 24 / 32), and 32 inside on all four sides because
+   a frame is not a gutter — the note over §75's table is the long version.
+   `margin` on both edges, not `margin-top` only, per §75's own correction.
+
+   IT IS STILL NOT `.dark-card`, AND `leadSec`'s REFUSAL STANDS. That class
+   would also bring the haze as a `background-image` (this card is in ai4's
+   `GLOW_ON` and gets §21.22's as an element), the `.dc-hd` head row and its
+   `--on-dark-rule`, and §75.5's seam re-pointing — a different object from the
+   wall §28 draws. What was wrong was the PLACEMENT, so the placement is what
+   changes; one class would have changed five things.
+
+   THE VERTICAL PADDING COMES DOWN `--s08` -> `--s07` WITH IT. Bleeding, the
+   card had no side frame to be in proportion with; inset, 40 top and bottom
+   against 32 at the sides would make it the only black card in the build whose
+   frame is not square, and §75's is flat 32 on all four.
+
+   §28.61's `padding:0` ON THE SECTION IS LEFT ALONE. The gutter is the card's
+   margin now, so a section padding would be paid twice — trap 10, and §77.4
+   answers it the same way round (`--pad-x:0px` on the row, never on the
+   section, "or the card loses its own inset").
+   -------------------------------------------------------------------------- */
+/* THE BOTTOM MARGIN IS 0 AND THE GAP UNDER THE CARD IS 48 (Maryam, 2 Sep 2026:
+   "there is a lot of space between the black card and the bottom content, reduce
+   that to a normal section spacing"). It measured 72, and the arithmetic is the
+   whole of why:
+
+     24  the card's own `margin-bottom`
+     24  its section's `padding-bottom`
+     24  the identity section's `padding-top`
+
+   §75's `.dark-card` cannot hit this because the card IS the `.sec` there — its
+   margin and the section's are one box, so a neighbour's 24 makes 48. Here the
+   card is a CHILD of its section, so the margin is inside and adds to the
+   section's own padding. It is trap 10 in the vertical: a component that pays
+   the page's spacing inside something that has already paid it.
+
+   THE TOP MARGIN STAYS AND IS DOING SOMETHING DIFFERENT. That section's
+   computed `padding-top` is 0 (§28.61 zeroes the box and §20's join list keeps
+   it there), so the 24 above the card is the card's own margin COLLAPSING
+   through the section's open top edge — which is why it reads as 24 from the
+   summary band and not 48. Zeroing both edges for symmetry would put the card
+   back against the band, which is half of what this ask was about.
+   -------------------------------------------------------------------------- */
+.app .page .lead-b{
+  margin:var(--s06) var(--pad-x) 0;padding:var(--s07)}

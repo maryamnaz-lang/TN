@@ -435,7 +435,7 @@ const PAGESUM = {
      Explorer track, 45-minute interview — so §70.2's tinted ground still lands
      on what you did, where it put you and what decides the rest. */
   level: (() => {
-    const pre = 'Your <b>quiz result</b> places you on the <b>Explorer track</b>, with your level to be determined through a <b>45-minute interview</b>. The ladder shows your current path across Explorer &rarr; Builder &rarr; Trailblazer, with five levels in each track.';
+    const pre = 'Your <b data-sum="quiz">quiz result</b> places you on the <b data-sum="track">Explorer track</b>, with your level to be determined through a <b data-sum="ivwhat">45-minute interview</b>. The ladder shows your current path across Explorer &rarr; Builder &rarr; Trailblazer, with five levels in each track.';
     return {
       consult: pre,
       new: pre,
@@ -454,7 +454,7 @@ const PAGESUM = {
          a nested stage value with `cfg(stage)`, and `bkLong()` is in scope at
          render time however much later ai7 parses. Not done here: it is a
          change to what the entry IS, not to what it says. */
-      booked: 'Your interview is booked for <b>20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b>Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
+      booked: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
       promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview &mdash; one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };
@@ -528,7 +528,7 @@ const PAGESUM = {
       const c = CALL_ROW.iv();
       const ex = String(c.x || '').split(', assesses ')[0] || 'your';
       const rng = (c.who && c.who.range) || 'E1&ndash;E3';
-      return `Your <b>45-minute interview with ${c.who.n}</b> is scheduled and <b>ready to join</b>. `
+      return `Your <b data-sum="interview">45-minute interview with ${c.who.n}</b> is scheduled and <b data-sum="join">ready to join</b>. `
         + `She&rsquo;ll assess your ${ex} skills across the ${rng} levels, and your final level `
         + `and report will be based on this conversation.`;
     }
@@ -558,7 +558,7 @@ const PAGESUM = {
        this page: pick an agent, book the call. "Determine your level" is the
        outcome of both and is deliberately left in ink, because lighting a
        consequence as well makes the accent decoration rather than a target. */
-    if(f.pred) return 'You haven&rsquo;t completed an interview yet. Choose from <b>24 available agents</b> to book a <b>45-minute conversation</b> and determine your level, with options across different experience areas, ratings, and fees.';
+    if(f.pred) return 'You haven&rsquo;t completed an interview yet. Choose from <b data-sum="roster">24 available agents</b> to book a <b data-sum="ivwhat">45-minute conversation</b> and determine your level, with options across different experience areas, ratings, and fees.';
     return 'One on record: 20 August with Priya, which set Explorer &ndash; E3. A re-interview at the end of the 90 days is what moves the level.';
   },
 
@@ -657,7 +657,25 @@ const PAGESUM = {
     return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment &mdash; only the assessment counts towards your average.`;
   },
 
-  transcript: f => f.done
+  /* THE THIRD BRANCH IS `promoted`, AND WITHOUT IT THE SENTENCE WAS STALE
+     (2 Sep 2026). "This is the record an agent reads before your re-interview"
+     is true from week 1 to day 90 and false the moment the re-interview has
+     happened — at this stage Priya signed it on November 21, which is what
+     moved the candidate to E4. The page under it changed with the same edit:
+     the black card is the E4 enrolment offer and the closed cohort is one
+     collapsed block at the foot (`pastSec` in views.js).
+
+     IT DOES NOT NAME THE START DATE. `enrolOffer`'s date chip is eighteen
+     inches to the right in the same band and says "E4 opens on December 1";
+     the summary's job is the READING, which here is why the record has stopped
+     moving. The figures are the same three the other branch derives, and the
+     cohort's NAME is read off `CERTS` through `certsFor` — the same row
+     `pastSec` heads its block with, so Tal and the block cannot name two
+     different cohorts. Both are views.js consts and views.js is concatenated
+     first, so they are in scope by the time a summary is asked for. */
+  transcript: f => f.complete
+    ? `${certsFor(f).slice(-1)[0].cohort} is closed &mdash; ${f.done} chapters at ${f.avg}%, about ${_hrs(f.mins)} hours of coursework. Nothing lands on this record again until you enroll at ${f.level}.`
+    : f.done
     ? `${f.done} of 13 chapters at ${f.avg}%, about ${_hrs(f.mins)} hours in. This is the record an agent reads before your re-interview.`
     : 'Nothing on the record yet &mdash; the 90 days only started this week.',
 
@@ -767,7 +785,7 @@ const PAGESUM = {
      on. Worth knowing if it is ever revisited: the ONE fact on this page no
      row states is that the E2 charge went to the Mastercard, not to the
      default Visa. */
-  billing: 'Your payment history shows a <b>$490 charge</b> for <b>Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b>Visa ending 4242</b>.',
+  billing: 'Your payment history shows a <b data-sum="charge">$490 charge</b> for <b data-sum="tracke2">Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b data-sum="defcard">Visa ending 4242</b>.',
 
   /* The page description said "Your details, your preferences, and what Tal
      is allowed to do" and this said the same three nouns back. The
@@ -1422,6 +1440,53 @@ render = function(){
    ========================================================================== */
 const _sumTop = () => SCORES.slice().sort((a,b) => b[1] - a[1])[0];
 
+/* THE INTERVIEW ACTION, ONCE, FOR EVERY CARD THAT WANTS TO POINT AT IT.
+   Three keys need the same button and the right answer depends on whether an
+   interview exists: book one, or go and look at the one you have. Written out
+   per card it was three copies of the same conditional and one of them was
+   already wrong (see `track`).
+
+   IT ALSO ANSWERS "THE PAGE I AM ALREADY ON". `V.interviews` is where a
+   booking is listed, so offering "See the booking" from the Interviews page is
+   a button that reloads the page under it — §60's dead control by another
+   route. From there it goes one level deeper, to `V.booking`, which is the
+   appointment's own page. */
+const _bookedAct = () => {
+  /* THE TEST IS THE STAGE, NOT `S.booking`, AND THAT DISTINCTION IS THE WHOLE
+     BUG THIS HELPER WAS WRITTEN TO FIX — it shipped once with `if(S.booking)`
+     and still offered "Book your interview with Priya Nair" on the booked
+     stage, which is what it exists to prevent.
+
+     `S.booking` is only written when a reader actually walks ai7's flow in the
+     thread. Arriving at `#booked` from the stage picker or a link leaves it
+     null while every other surface on the page reads the appointment perfectly
+     — `bkRec()` is `S.booking || S.bk || {defaults}`, which is why `bkLong()`
+     prints the date either way. So `S.booking` answers "did this reader book
+     it just now", and the question here is "is there an interview", which is
+     `cfg(S.stage)`.
+
+     AND `f.pred` ALONE IS NOT THAT QUESTION — the second half of the same bug.
+     `CFG.booked` is `{pred:true, booked:true}`: `pred` means the LEVEL is only
+     predicted, which stays true right up until an agent signs it, so it is
+     true on the booked stage as well. `PAGESUM.interviews` encodes this by
+     testing `f.booked` BEFORE `f.pred`, and the order is the whole of its
+     correctness. Same order here. */
+  const f = (typeof cfg === 'function' ? cfg(S.stage) : null) || {};
+  if(f.pred && !f.booked && !S.booking){
+    const k = recKey();
+    return {ic: I.calendar, go: 'agent:' + k, t: 'Book your interview with ' + AGENTS[k].n};
+  }
+  /* AND FROM THE INTERVIEWS PAGE IT GOES ONE LEVEL DEEPER. That page is where
+     a booking is listed, so "See the booking" from it reloads the page under
+     the reader's finger; `V.booking` is the appointment's own page. */
+  if(S.view === 'interviews') return {ic: I.calendar, go: 'booking', t: 'See the booking details'};
+  /* once the interview has run, the module is a list of interviews and their
+     reports rather than one appointment */
+  return f.booked || S.booking
+    ? {ic: I.calendar, go: 'interviews', t: 'See the booking'}
+    : {ic: I.document, go: 'interviews', t: 'See your interviews'};
+};
+
 const SUMDROP = {
   /* WHERE THE TRACK CAME FROM. The two figures are the quiz's own — its score
      is the one the `.ph` fact row prints, and its date is `qzTaken()`, which
@@ -1439,13 +1504,23 @@ const SUMDROP = {
   },
 
   /* 596:7379, THE FILE'S OWN WORDS. The only thing computed is the agent's
-     name in the action, which follows `recKey()` like everything else. */
+     name in the action, which follows `recKey()` like everything else.
+
+     THE ACTION IS NOW STAGE-AWARE, AND THAT WAS A PRE-EXISTING WRONG BUTTON.
+     This key is written on `new` (`PAGESUM.dashboard.new`) AND on `booked`
+     (ai7's assembled line, and `PAGESUM.level.booked` since 2 Sep 2026), and
+     it offered "Book your interview with Priya" on all of them — on a stage
+     whose whole subject is that the interview is already booked. `_bookedAct`
+     is the shared answer: the appointment if there is one, booking one if
+     there is not. §60's rule is that a control which cannot do anything is
+     worse than no control; this one could act, it just acted on a decision
+     already taken. */
   track: () => ({
     lead: 'According to the Next in leadership quiz, you are evaluated as an Explorer.',
     label: 'Discovering your direction:',
     read: 'You&rsquo;re exploring what fits you best&mdash;and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.',
     next: 'Connect with Talent Next Agent to get yourself evaluated and get a level. Your level anchors after a 45-minute interview.',
-    act: {ic: I.calendar, go: 'agent:' + recKey(), t: 'Book your interview with ' + AGENTS[recKey()].n}
+    act: _bookedAct()
   }),
 
   /* WHY THIS PERSON. `REC` holds the overlap and `AGENTS` the record, so this
@@ -1483,7 +1558,7 @@ const SUMDROP = {
     label: 'What happens in it:',
     read: '45 minutes, recorded, and real situations rather than hypotheticals. She confirms which of E1 to E5 you sit on and signs a report you keep.',
     next: 'Nothing has to be prepared. If you want to, ten minutes on delegation is the most useful ten minutes you can spend.',
-    act: {ic: I.calendar, go: 'interviews', t: 'See the booking'}
+    act: _bookedAct()
   }),
 
   /* WHY DELEGATION AND NOT SOMETHING ELSE. The band and the chapter are both
@@ -1540,6 +1615,142 @@ const SUMDROP = {
     read: '13 chapters, one a week, each closing on an assessment, with a cohort of ten and a live leader running a weekly call. The average of the thirteen is what an agent reads at your re-interview.',
     next: 'The next cohort starts within two weeks of paying, and the interview you have already paid for comes off the price.',
     act: {ic: I.wallet, go: 'enrol', t: 'See what enrolling costs'}
+  }),
+
+  /* ======================================================================
+     SIX MORE, FOR THE FIVE SUMMARIES REWRITTEN ON 2 Sep 2026 (Maryam). The
+     standing rule from that ask: a phrase is highlighted ONLY if pressing it
+     says something — *"if you feel somewhere that there should not be any
+     popover against a highlighted text then you can remove the highlight from
+     that text so user does not expect anything"*. So the accent and the card
+     are one decision, and every phrase those five lines light has a row here.
+
+     THREE PHRASES REUSE EXISTING KEYS rather than getting near-duplicates:
+     `quiz` and `track` for the two the dashboard already explains, and
+     `interview` for the appointment on both booked pages. That is what the
+     head of this block means by "the keys are subjects, not positions".
+     ====================================================================== */
+
+  /* WHAT A LEVEL INTERVIEW IS, BEFORE THERE IS ONE. Two phrases across two
+     pages point here — "45-minute interview" on My Level and "45-minute
+     conversation" on Interviews — because they are the same subject named
+     twice, and one card is what stops the two pages explaining it differently.
+
+     IT IS NOT `interview`, AND THAT IS THE WHOLE REASON IT EXISTS. That key
+     opens "Your interview with Priya Nair is booked for…", which is false on
+     every stage before one is. This card names no agent and no date, so it is
+     true whether or not anything is booked, and its action is `_bookedAct`'s
+     — which on those stages is "book one". */
+  ivwhat: () => ({
+    lead: 'A level interview is 45 minutes with a talent agent, video-recorded, and it is the only thing that sets a level.',
+    label: 'What happens in it:',
+    read: 'Real situations rather than hypotheticals. The agent decides which of E1 to E5 you sit on and signs a report you keep &mdash; a quiz can predict the track, but it cannot set the rung.',
+    next: 'Any agent whose range covers your track can run it. Nothing is charged until you confirm a slot.',
+    act: _bookedAct()
+  }),
+
+  /* HOW TO CHOOSE ONE — for "24 available agents" on the Interviews page.
+
+     IT STATES NO COUNT, DELIBERATELY. The phrase it hangs off says 24 and
+     `AGENTS` holds six, so any count in this card either contradicts the
+     sentence above it or invents a relationship between the two numbers ("18
+     have no slot") that no record supports. The fee and rating spreads ARE
+     read off `AGENTS`, so every figure here is one the grid below prints. The
+     literal 24 is noted where `PAGESUM.interviews` states it. */
+  roster: () => {
+    const ks = Object.keys(AGENTS);
+    const ps = ks.map(k => Number(String(AGENTS[k].price).replace(/[^0-9.]/g, ''))).filter(Boolean);
+    const rs = ks.map(k => AGENTS[k].r);
+    return {
+      lead: `Every agent sets their own fee and assesses their own band of levels &mdash; $${Math.min(...ps)} to $${Math.max(...ps)} here, rated ${Math.min(...rs).toFixed(1)} to ${Math.max(...rs).toFixed(1)}.`,
+      label: 'What has to match:',
+      read: 'The range, and only the range &mdash; an agent assesses a band of the fifteen rungs, and yours has to sit inside it. Fee, rating and what they assess for are yours to weigh after that.',
+      next: 'Tal already has a pick, on the strength of what your quiz surfaced.',
+      act: _bookedAct()
+    };
+  },
+
+  /* --- Payments -----------------------------------------------------------
+     ALL THREE OF THESE POINT AT SOMETHING TAL IS ALLOWED TO KNOW, AND THAT IS
+     THE ONE DESIGN CONSTRAINT ON THIS PAGE. `NEVER` (ai2) and clause 4 of the
+     Data use notice both say Tal has never seen billing, and `wLedger` (ai8)
+     declines a "what have I paid" question outright. `PAGESUM.billing` now
+     recites the ledger anyway, which is Maryam's call and is flagged over that
+     entry — but a popover is Tal EXPLAINING, so these three are written about
+     the ladder, the refund windows and how a card is held, every one of which
+     is inside Tal's six subjects. Two of the three actions are real routed
+     questions (`wRefund`, and the card-storage route at ai8:956).
+
+     NONE OF THEM ADDS A FIGURE THE TABLE DOES NOT ALREADY PRINT, and the
+     charge card reads `PAY_E2` (views.js) rather than retyping its five
+     fields — the row was lifted to a const for exactly these readers. */
+
+  charge: () => {
+    const [what, when, amt, brand, last] = PAY_E2;
+    return {
+      lead: `${amt} on ${when} for ${what}, charged to the ${brand} ending ${last}.`,
+      label: 'What a row is:',
+      read: 'A course purchase rather than an interview fee &mdash; the two are always separate rows, and each one keeps its own receipt for as long as the account is open.',
+      next: 'A course and an interview have different refund windows, and Tal can state both.',
+      act: {ic: I.time, ask: 'What is the refund window?', t: 'Ask about the refund windows'}
+    };
+  },
+
+  /* WHAT E2 IS. Keyed on the ladder rather than on the purchase, because the
+     charge card beside it already owns the money. Its `next` must be true at
+     EVERY stage — `PAGESUM.billing` is one string for all seven, so a phrase
+     in it is pressable on all seven, and "your level is not set yet" would be
+     false from `assessed` on. The ladder is the answer that never expires. */
+  tracke2: () => ({
+    lead: 'E2 is rung 2 of the fifteen-rung ladder, inside the Explorer track.',
+    label: 'How the ladder reads:',
+    read: 'Explorer is rungs 1 to 5 of 15, then Builder, then Trailblazer. A course is bought for the rung you are on, and an interview is the only thing that moves you up one.',
+    next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',
+    act: {ic: I.certificate, go: 'level', t: 'See where you are on the ladder'}
+  }),
+
+  /* THE DEFAULT CARD. Every figure is `S.cards`, which is also what the list
+     under the table is drawn from, so the two cannot disagree about which card
+     is default or how many are on file. It states no cap, and as of 2 Sep 2026
+     there is no cap to state: `V.billing` used to hide "Add a card" at three
+     and the list happened to hold three, so deriving a maximum from
+     `S.cards.length` would have been reading a coincidence. The control is
+     unconditional now and the sentence under the list is gone, so this card was
+     right by accident and is right on purpose. `wCard` (ai8) is the one place
+     that DID assert the cap; it no longer does. */
+  defcard: () => {
+    const cs = S.cards || [];
+    const def = cs.find(c => c.def) || cs[0] || {brand: 'Visa', last: '4242', exp: '09/29'};
+    const others = Math.max(0, cs.length - 1);
+    return {
+      lead: `${def.brand} ending ${def.last} is your default card, expiring ${def.exp}.`,
+      label: 'What default means:',
+      read: 'It is the card a new charge is offered against first, and it is a preference rather than a commitment &mdash; you can switch it, or take a card off, without touching anything already paid.',
+      next: others
+        ? `The other ${others === 1 ? 'one is' : _w(others) + ' are'} on file for later, and each can be made the default from the list below.`
+        : 'It is the only card on file.',
+      act: {ic: I.shield, ask: 'Is my card stored?', t: 'Ask how your card is held'}
+    };
+  },
+
+  /* --- joining ------------------------------------------------------------
+     THE WINDOW IS READ, NOT TYPED. `JOIN_EARLY` (views.js) is the five minutes
+     `joinLive` actually opens the door on, so the card and the gate cannot
+     drift. The candidate's Joins are deliberately UNGATED (the `{gate:true}`
+     note on `leadCallCard`), so this button opens the call whenever it is
+     pressed, exactly like the other three candidate Joins.
+
+     `act.call` IS A THIRD ACTION KIND and `sumDropCard` now emits `data-call`
+     for it. Nothing else was needed: ai10 already listens for `[data-call]` on
+     `device`, and ai6's own click handler leaves controls inside `.sumdrop`
+     alone. The card then clears itself on the next render, because the call
+     screen has no `.ai-body` for `placeSumDrop` to anchor in. */
+  join: () => ({
+    lead: `The call opens ${_w(JOIN_EARLY)} minutes before the start and stays open until the session ends.`,
+    label: 'What you are joining:',
+    read: 'A video call in the browser &mdash; camera, microphone, screen share and captions. It is recorded, and the recording goes to your agent rather than to Tal.',
+    next: 'Nothing has to be prepared. If the time no longer works, reschedule from the card below.',
+    act: {ic: I.video, call: 'iv', t: 'Join the interview'}
   })
 };
 
@@ -1557,7 +1768,9 @@ function sumDropCard(key){
     </div>
     <button class="sd-act" ${d.act.ask
       ? `data-tal-ask="${d.act.ask}"`
-      : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
+      : d.act.call
+        ? `data-call="${d.act.call}"`
+        : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
 }
 
 /* --- the pass -------------------------------------------------------------

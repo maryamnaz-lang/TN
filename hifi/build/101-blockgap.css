@@ -91,10 +91,30 @@
    below is (0,8,0) and clears both.
    ========================================================================== */
 
+/* AND A BLACK CARD IS EXCLUDED FROM THIS ONE — `:not(.dark-card)` (Maryam,
+   2 Sep 2026: "why did the black card bottom padding is zero? correct this").
+
+   §81's LESSON, ARRIVING FROM A NEW DIRECTION: "§20's join rules may not take
+   half of a card's frame." That layer added the same exclusion to §20's two
+   desktop pair rules; this rule is the same shape one layer later — it hands a
+   block's bottom edge to nothing when a band ends it and another band follows —
+   and §75's frame is 32 on all four sides of a card, which no join may spend.
+
+   IT ONLY BECAME REACHABLE ON 2 Sep 2026, which is why it survived this long.
+   The rule needs the section's LAST child to be a `.facts` and its NEXT sibling
+   to be a band or another dark card. `enrolOffer`'s card ends in a `.facts` row
+   and used to be followed by `.sec-qa`, which is on neither list; moving the
+   certificate banner below the card (`certBanner`'s note) put a `.certban`
+   section there and the pair started matching. The card rendered `32px 32px 0`
+   — the four figures flush against the black edge.
+
+   ONLY THE LEFT-HAND SIDE NEEDS IT. A dark card as the SECOND member is already
+   handled: the two rules below give it `margin-top` rather than padding, which
+   is the card's own inset and not part of its frame. */
 /* the first block's edge goes to nothing */
 .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   margin-bottom:0}
-.app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+.app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   padding-bottom:0}
 
 /* and the second block's edge pays the whole of it */
@@ -106,7 +126,7 @@
 @container app (min-width:900px){
   .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     margin-bottom:0}
-  .app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+  .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     padding-bottom:0}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
     margin-top:var(--pad-x)}

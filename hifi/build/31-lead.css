@@ -123,6 +123,17 @@
 .app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
 .app .flag-t.warn{color:var(--support-attention)}
 .app .flag-t.green{color:var(--support-success-ink)}
+/* AND A FOURTH INK — 2 Sep 2026, for the agent's report deadline (Maryam: "the
+   due part should be red in color"). `tr.sev` gives the leader's table its red
+   from the ROW, which a caller outside a table has no way to ask for; this is
+   the same hue as a named modifier, which is what the note above says the three
+   below it are for.
+
+   `--danger-ink` AND NOT `--support-error`, which is the whole point of there
+   being two: the second is a FILL, tuned to sit under text, and §01 says never
+   to use one as a text colour. `--danger-ink` is the ink at 5.5:1 on both
+   grounds. */
+.app .flag-t.red{color:var(--danger-ink)}
 /* --------------------------------------------------------------------------
    AND IN THE ATTENTION TABLE IT IS A ROUNDED CHIP
    Maryam, 1 Sep 2026: "i want the flag items in the table to be round chips,
@@ -425,6 +436,32 @@
      gone      once "Your standing" reaches it, lifted out by transform —
                never by `display`, which would take its flow box with it
    ========================================================================== */
+/* AND THE SCOPE IS OFF THIS FAMILY — 2 Sep 2026, for the talent agent portal
+   (Maryam: "for the sections improvement on talent agent dashboard, please
+   utilize the components from the cohort leader dashboard").
+
+   `.lead-bar`, `.lead-tabs` and `.stat-jump` were all
+   `[data-portal="leader"]`-scoped, which meant a hand-authored page on
+   `design-system/` could write the markup and get NOTHING — the same failure
+   §31.5 records for `.bk-row`, which was scoped for the same reason and lost
+   the scope for the same one. Fourteen selectors, and the un-scoping is the
+   whole of the change: the leader still matches every one of them, because
+   dropping an attribute from a selector only widens what it reaches.
+
+   THE NAMES STAY `lead-*`, and that is §31.5's call rather than laziness. A
+   rename would touch `lead.js`, the views that write it, `gallery.html` and
+   `build-ds.py`'s prefix list, and buy a better word — `.bk-row` kept its name
+   through exactly this and the note there says so.
+
+   WHAT DID **NOT** LOSE ITS SCOPE, and this is the part worth reading before
+   widening anything else in this file: `.stats-lead`. That family is five
+   `nth-child` rules and nothing else — it is the leader's four NAMED hues (red
+   for the queue of people falling behind, amber for work waiting on a
+   signature, blue for a scheduled session, violet for the cohorts), which are
+   semantics of the leader's own content. Un-scoped, an agent's band of
+   Interviews / Follow-up / Earned / Held would come out red-amber-blue-violet
+   and claim four things about itself that are not true. A second portal's
+   figure band takes plain `.stats` and §29's neutral cycle instead. */
 /* THE BAND DOES NOT MAKE AN ENTRANCE — TRAP 2, EXACTLY AS WRITTEN.
    §13.1 animates every `.page > .sec` with `mo-rise` at `fill-mode:both`, so a
    played animation's last keyframe keeps applying: the band was left holding
@@ -438,9 +475,9 @@
    this band is frame the moment it sticks, and a position indicator that slides
    up into place is claiming to be something you read rather than something you
    steer with. The selector carries `[data-enter]` so it outweighs §13.1's. */
-.app[data-enter][data-portal="leader"] .page > .lead-bar{animation:none}
+.app[data-enter] .page > .lead-bar{animation:none}
 
-.app[data-portal="leader"] .lead-bar{
+.app .lead-bar{
   position:sticky;top:0;z-index:20;
   background-color:var(--background);
   /* the resting band has no shadow, so the transition has something to run
@@ -501,12 +538,12 @@
 
    `padding:0` here is not a state change — it is this row's only height, held in
    both states, so it costs nothing. */
-.app[data-portal="leader"] .lead-bar{
+.app .lead-bar{
   padding-top:0;padding-bottom:0;
   border-top:0}
-.app[data-portal="leader"] .lead-bar.is-stuck{
+.app .lead-bar.is-stuck{
   box-shadow:0 6px 16px -12px rgba(17,17,17,.3)}
-.app[data-portal="leader"] .lead-bar > .lead-tabs{margin-bottom:0}
+.app .lead-bar > .lead-tabs{margin-bottom:0}
 
 /* --------------------------------------------------------------------------
    THE FOUR TABS SHARE THE WIDTH, AND THE ROW IS CLOSED ON BOTH SIDES
@@ -528,14 +565,14 @@
    four. Below it "Waiting on you" cannot hold a quarter of a phone, and the
    strip goes back to being what `.cs` is — auto-width cells that scroll. */
 @container app (min-width:700px){
-  .app[data-portal="leader"] .lead-tabs{
+  .app .lead-tabs{
     border-left:1px solid var(--rule);border-right:1px solid var(--rule);
     overflow-x:hidden}
-  .app[data-portal="leader"] .lead-tabs button{
+  .app .lead-tabs button{
     flex:1 1 0;min-width:0;
     display:flex;align-items:center;justify-content:center;
     padding-left:var(--s04);padding-right:var(--s04)}
-  .app[data-portal="leader"] .lead-tabs button:last-child{border-right:0}
+  .app .lead-tabs button:last-child{border-right:0}
 }
 
 /* WHERE A JUMP STOPS. A sticky strip covers the top of whatever you scroll to,
@@ -552,17 +589,24 @@
    buttons a 48px minimum and the strip a rule top and bottom — so if the tab
    grows, this follows it. `--s04` is the air, so the heading you jumped to is
    not welded to the strip that took you there. */
-.app[data-portal="leader"] .page > .sec[id^="lead-"]{
+/* TWO SELECTORS, AND THE SECOND IS HOW A HAND-AUTHORED PAGE OPTS IN. The
+   id-prefix half is the leader's and is left exactly as it was, so un-scoping
+   this family cost `leadDash` no change at all; `.jump-sec` is a CLASS, because
+   `[id^="lead-"]` is one portal's naming convention and a second portal's
+   sections are not called `lead-anything`. A page that draws the bar puts the
+   class on every section the bar points at. */
+.app .page > .sec[id^="lead-"],
+.app .page > .sec.jump-sec{
   scroll-margin-top:calc(48px + 2px + var(--s05))}
 /* the count rides the label, in the tone the filter chips use for theirs —
    one way of putting a number in a tab, not two */
-.app[data-portal="leader"] .lead-tabs .lf-n{
+.app .lead-tabs .lf-n{
   margin-left:var(--s03);font-variant-numeric:tabular-nums;
   color:var(--text-helper);font-weight:400}
-.app[data-portal="leader"] .lead-tabs button.on .lf-n{color:var(--text-secondary)}
+.app .lead-tabs button.on .lf-n{color:var(--text-secondary)}
 
 /* GONE */
-.app[data-portal="leader"] .lead-bar.is-gone{
+.app .lead-bar.is-gone{
   transform:translateY(-100%);visibility:hidden;pointer-events:none;
   box-shadow:none}
 
@@ -591,7 +635,17 @@
    colour, four cells wide. The button reset has to name the cell's own ground
    rather than clear it. Same value §10 gives the `<div>` version, so a pressable
    cell and a read-only one are the same white. */
-.app[data-portal="leader"] .stat-jump{
+/* `.app .stats > .stat-jump` AND NOT `.app .stat-jump`, WHICH IS WHAT THE
+   UN-SCOPING COST AND IS §63 §7b's TRAP EXACTLY: landing later is not enough.
+   `.app .stats > .stat` (§10.16) sets `cursor:default` on every cell of the
+   band and is **(0,3,0)** — three classes — where `.app .stat-jump` is (0,2,0).
+   While this rule carried `[data-portal="leader"]` it was (0,3,0) too and won
+   the tie on order; dropping the attribute took it under, and the jump cells
+   lost their pointer SILENTLY — nothing warns, the rule is still valid, and the
+   only tell is a pressable cell that does not say it is pressable.
+   Re-qualified through the container it always sits in, which is (0,3,0) again
+   and states a structural truth: a jump cell is a cell OF a figure band. */
+.app .stats > .stat-jump{
   -webkit-appearance:none;appearance:none;border:0;
   background-color:var(--background);
   font:inherit;color:inherit;text-align:left;width:100%;
@@ -600,9 +654,9 @@
 /* WEIGHT, NOT OPACITY — §13.2. The band's entrance animation runs with
    fill-mode:both, so a played keyframe keeps applying and an opacity set here
    would be overwritten by it. `color-mix` on the ground survives. */
-.app[data-portal="leader"] .stat-jump:hover{
+.app .stats > .stat-jump:hover{
   background-color:color-mix(in srgb, var(--mk, var(--text-primary)) 4%, var(--background))}
-.app[data-portal="leader"] .stat-jump:focus-visible{
+.app .stats > .stat-jump:focus-visible{
   outline:2px solid var(--text-primary);outline-offset:-2px}
 
 /* --------------------------------------------------------------------------

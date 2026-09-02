@@ -198,14 +198,17 @@ invented the markup and got four of six wrong. The recipes are now in
 
 - A **call row** (`.crow`) is the light answer to what `.plate` answers loudly,
   and it has **two states in one component**. `.crow` on its own is a call
-  outside the day: a 182px grey countdown cell, a 78px square portrait, the name
+  outside the day: a 182px grey countdown cell, a 78px round portrait, the name
   with its green tick, and two 185×40 buttons. Add **`.urgent`** and the
   countdown cell alone goes accent with the ink flipped — nothing else about the
   two differs, so never write a `.urgent` variant of another rule on this row.
   Three things the CSS will not tell you: the countdown cell is a **fixed** 182
   (as a minimum it takes its max-content and the caption stops wrapping to two
   centred lines), the portrait is **not `avatar()`** (that helper writes its size
-  inline and draws a disc), and `.crow-who` carries **`flex:1 1 300px`** — that
+  inline, which trap 1 makes unanswerable from a layer — both are discs since
+  §106, and **`.crow-cover`** is the opt-out that turns the mark into a 9:5
+  square-cornered rectangle for artwork), and `.crow-who` carries
+  **`flex:1 1 300px`** — that
   basis is the whole of how the row behaves, because flex decides wrapping on
   the base size before it shrinks anything. `dsCallUrgent(row)` picks the state
   from the words and `dsCallLeft(when)` words the same countdown both ways

@@ -841,6 +841,20 @@ LAYERS = [
     # NO JS AND NO RENDER PASS — the `--mk` on each mark is the markup's, which
     # is §72's `pulseCol` idiom and needs no class per hue.
     '105-profile.css',
+    # EVERY PHOTOGRAPH OF A PERSON IS A DISC (§106).
+    # IT CROSSES BECAUSE THE ASK NAMES THE THIRD PORTAL BY NAME — Maryam, 2 Sep
+    # 2026: "everywhere on the candidate, cohort leader, and talent agent portal
+    # we have an image I need it to be a circle image not a block image."
+    # `tn-agent-portal.html` is hand-written on this output and draws `.av-ph`,
+    # `.av` and `.mem-av mem-ph`, so it takes the shape from the stylesheet with
+    # no edit of its own. That is the whole reason the rule is stated at the
+    # component rather than at six wrappers.
+    # IT IS ALSO WHAT KEEPS THE BOX HONEST: §89.2, §103 and §105 each shipped
+    # their own copy of this value and all three are deleted, so without this
+    # entry the design system would go BACKWARDS — square faces in the message
+    # thread and on the profile, which the box drew round yesterday.
+    # NO JS AND NO RENDER PASS — one property on classes §09 already ships.
+    '106-roundfaces.css',
 ]
 
 # ==========================================================================

@@ -95,10 +95,17 @@
    in `.mem-av.mem-ph`. Keying on the wrapper rather than on `.av-ph` inside a
    `.cs` panel means the rule says which LIST it is about, which is what the ask
    is about too.
+
+   THE THREE SELECTORS ARE DELETED AND THE SCOPING ARGUMENT ABOVE IS WHY (2 Sep
+   2026). "Rounding all of them is a platform decision rather than this page's"
+   was the right call and the platform decision has now been taken — Maryam:
+   "everywhere on the candidate, cohort leader, and talent agent portal we have
+   an image I need it to be a circle image not a block image." §106 states it
+   once on `.av-ph` / `.av` / `.mem-av`, so all three of these are a value the
+   component already has. Four layers had accumulated their own copy of it and
+   the product still drew a square face in six places; that is the drift a
+   restatement costs.
    -------------------------------------------------------------------------- */
-.app .cmt-av .av-ph,
-.app .b-who .av-ph,
-.app .mem-av .av-ph{border-radius:999px}
 
 /* ------------------------------------------------------------------- 89.3 ---
    THE LEADER'S MESSAGE CONTROL IS A DISC
@@ -188,7 +195,10 @@
    an avatar appears in about thirty places and rounding all of them is a
    platform decision. These three are wrappers that this portal's own rows added,
    and every one of them is already round INSIDE.
+
+   AND THE PLATFORM-WIDE CHANGE HAS SINCE BEEN MADE, so all three are deleted
+   (§106, 2 Sep 2026). `.mem-av` is one of §09's three avatar classes and §106
+   rounds it at the component, which is exactly what this rule was reaching the
+   wrapper for — the difference is that it now also reaches `.ev-top`'s and
+   `.ldr-who`'s copies of the same wrapper, two more this list never named.
    -------------------------------------------------------------------------- */
-.app .face-row > .mem-av,
-.app .ldr-dm-t > .mem-av,
-.app .ldr-dm-h > .mem-av{border-radius:999px}

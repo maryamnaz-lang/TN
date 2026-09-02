@@ -143,6 +143,17 @@ let ASK_FRESH = false;
    at rest, and this is a moving light read against the field's orange border.
    Stated as literals here rather than as tokens because they are five exported
    numbers belonging to one object, and a token implies a second user. */
+/* THE SPEECH API, TESTED ONCE AND ABOVE `askView` — §69's direction rule, which
+   is the one thing that would have broken this: `askView` reads `SPEECH_OK` to
+   decide whether to draw the mic at all, so a `const` declared further down the
+   file would be in the temporal dead zone for any render that happened before
+   this line ran. `COHORT_LEAD` is the worked example of that hazard and
+   `notifList` the guard against it. */
+const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SPEECH_OK = !!SPEECH;
+/* the live recogniser, or null. Not in `S`: see the note over `askMic`. */
+let _rec = null;
+
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
       <defs>
@@ -172,6 +183,25 @@ function askBar(){
           same forward arrow every other "go on to the next screen" control in
           the build carries. §70 gives the chip the accent gradient at the
           file's own 20%, which is what says the control is not live yet. */}
+    ${''/* THE DOCK CARRIES THE SAME PAIR AS THE CHAT'S FIELD (Maryam, 2 Sep
+           2026: "the tal bar should also have the round arrow icon with the mic
+           like we have on the tal chat page"), and the mic here is a `<span>`
+           for the reason this whole row is one `<button>`: §21's note — "a
+           button inside a button is a click whose destination depends on where
+           in the row you land".
+
+           IT IS NOT A DEAD CONTROL EITHER, which is the other half. §60's rule
+           would refuse a decorative mic, so pressing it does the one thing it
+           can honestly mean on a collapsed line: it opens the conversation AND
+           starts dictating, in that order. `data-askmicopen` is read before
+           `data-askopen` in the click handler, so the mark is a shortcut into
+           the same surface rather than a second destination.
+
+           AND IT IS DRAWN ONLY WHERE DICTATION EXISTS — `SPEECH_OK`, the same
+           constructor test the chat's field uses. A browser with no Web Speech
+           API gets the row exactly as it was. */}
+    ${SPEECH_OK ? `<span class="askline-mic" data-askmicopen="1"
+      title="Ask Tal by voice">${I.microphone}</span>` : ''}
     <span class="askline-send" aria-hidden="true">${I.arrowRight}</span>
   </button>`;
 }
@@ -364,7 +394,36 @@ function askView(f){
       <div class="askfield">
         <span class="askv-clip">${I.attachFile}</span>
         <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
-        <button class="askfield-send" data-asksend="1" aria-label="Send">${ARROW_LINE}</button>
+        ${''/* THE MIC IS DRAWN ONLY WHERE IT CAN WORK — §60's rule, applied to a
+               browser capability rather than to missing data: "a dead control on
+               a live surface is worse than a missing one", which is why the
+               month chevrons stayed off §76 until `AGENT_CAL` gave them
+               somewhere to go. `SPEECH_OK` is the constructor test, so in a
+               browser with no Web Speech API the field is exactly what it was.
+
+               IT IS DICTATION, NOT A RECORDING. `.composer`'s mic in Messages
+               is "record a voice message" and sends audio; this one writes into
+               the field you are already typing in, which is why it sits beside
+               the send rather than at the far end with the clip. */}
+        ${SPEECH_OK ? `<button class="askfield-mic" data-askmic="1"
+          aria-label="Dictate your question" aria-pressed="false"
+          title="Dictate your question">${I.microphone}</button>` : ''}
+        ${''/* THE SEND IS OFF UNTIL THERE IS SOMETHING TO SEND (Maryam, 2 Sep
+               2026: "keep the send arrow circle little disable until nothing has
+               been written or no voice has been recorded yet"). It is the real
+               `disabled` attribute rather than a class, so the control cannot be
+               pressed as well as not looking pressable — §21's original note for
+               the collapsed line makes the argument for the look ("a control
+               that is visibly OFF tells the truth"), and this adds the half that
+               makes it true.
+
+               `disabled` AT RENDER IS ALWAYS CORRECT, which is why there is no
+               state to keep: `placeAsk` rebuilds the field on every render, so
+               the `<input>` is new and empty every time it is drawn. What turns
+               it on is `askSendArm`, from the field's own `input` event and from
+               dictation's `onresult` — neither of which re-renders, for the
+               caret reason ai4's own trap records. */}
+        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.send}</button>
       </div>
     </div>
   </div>`;
@@ -554,15 +613,99 @@ function askClose(){
 }
 
 device.addEventListener('click', e => {
+  /* BEFORE `data-askopen`, AND IT HAS TO BE: the dock's mic is a `<span>` INSIDE
+     the row's own button, so both attributes match the same press and the
+     handler that runs is whichever is tested first. It opens the conversation
+     and then dictates into it — `askOpen` renders, so the mic has to be armed
+     after that paint or it would be reaching for a field that does not exist
+     yet. One frame is enough and `setTimeout(…, 0)` is the whole of it; there is
+     no rAF here for trap 17's reason. */
+  if(e.target.closest('[data-askmicopen]')){ askOpen(); setTimeout(askMic, 0); return; }
   if(e.target.closest('[data-askopen]')){ askOpen(); return; }
   if(e.target.closest('[data-askback]')){ askClose(); return; }
+  /* DICTATION, AND IT IS REAL (Maryam, 2 Sep 2026: "this voice icon should be
+     functional"). The Web Speech API writes into the field the reader is
+     already typing in; there is no fake waveform and no timer pretending to
+     listen, because the one thing a voice control must not do is look like it
+     heard you when it did not.
+
+     NOTHING ABOUT IT IS IN `S` AND THAT IS DELIBERATE — §65's split, stated
+     there in as many words: "the class goes on the element for THIS
+     interaction". `placeAsk` rebuilds the whole `.ask-page` from `S.thread` on
+     every render, and ai4's own trap is that a render destroys the `<input>`
+     and takes the caret with it — so a dictation that survived a render would
+     be writing into an element that no longer exists. The recogniser is closed
+     over instead, the button's `.on` and `aria-pressed` are written in place
+     (`joinArm`'s pattern), and a render simply ends the session.
+
+     `onresult` APPENDS RATHER THAN REPLACES, so speaking after typing adds to
+     what is there — the field is one sentence being composed, not two. And
+     `interimResults` is on: the words appear as they are recognised, which is
+     the only feedback that distinguishes "listening" from "stuck".
+
+     EVERY EXIT CLEARS THE STATE, which is three of them: `onend` (the reader
+     stopped talking), `onerror` (no permission, no network, no microphone) and
+     a second press. A listening state with no way out of it is the failure this
+     control has most of, and `onerror` is the common one — the built file is
+     usually read from `file://`, which is not a secure context, so the API
+     starts and immediately reports `not-allowed`. That is the honest behaviour:
+     the button lights, fails, and goes out. */
+  if(e.target.closest('[data-askmic]')){ askMic(); return; }
   if(e.target.closest('[data-asksend]')){
     const el = device.querySelector('#askIn');
     const v = el && el.value.trim();
-    if(v){ el.value = ''; ask(v); }
+    if(v){ el.value = ''; askSendArm(); ask(v); }
     return;
   }
 });
+
+/* THE SEND FOLLOWS THE FIELD, IN PLACE. One function so the three things that
+   can put words in that field — typing, dictation, and a render that clears it
+   — all reach the same test. `disabled` is toggled on the element rather than
+   re-rendered, per ai4's caret trap. */
+function askSendArm(){
+  const el = device.querySelector('#askIn');
+  const b = device.querySelector('.askfield-send');
+  if(el && b) b.disabled = !el.value.trim();
+}
+device.addEventListener('input', e => { if(e.target.id === 'askIn') askSendArm(); });
+
+function askMicOff(){
+  const b = device.querySelector('[data-askmic]');
+  if(b){ b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
+  _rec = null;
+}
+function askMic(){
+  if(!SPEECH_OK) return;
+  if(_rec){ try{ _rec.stop(); }catch(err){} askMicOff(); return; }
+  const b = device.querySelector('[data-askmic]');
+  const el = device.querySelector('#askIn');
+  if(!b || !el) return;
+  const r = new SPEECH();
+  r.lang = 'en-US';
+  r.interimResults = true;
+  r.continuous = false;
+  /* THE BASE IS READ ONCE, AT THE START. `onresult` hands back the whole
+     session's transcript every time, so appending the latest result to the
+     field's CURRENT value would repeat the sentence on each interim event. */
+  const base = el.value ? el.value.replace(/\s+$/, '') + ' ' : '';
+  r.onresult = ev => {
+    let said = '';
+    for(let i = 0; i < ev.results.length; i++) said += ev.results[i][0].transcript;
+    el.value = base + said.trim();
+    /* PROGRAMMATIC WRITES FIRE NO `input` EVENT, so the send has to be armed by
+       hand here — this is the "no voice has been recorded yet" half of the ask,
+       and without it dictating a whole question would leave the control off. */
+    askSendArm();
+  };
+  r.onerror = askMicOff;
+  r.onend = askMicOff;
+  try{ r.start(); }catch(err){ askMicOff(); return; }
+  _rec = r;
+  b.classList.add('on');
+  b.setAttribute('aria-pressed', 'true');
+  el.focus();
+}
 
 device.addEventListener('keydown', e => {
   if(e.target.id === 'askIn' && e.key === 'Enter'){

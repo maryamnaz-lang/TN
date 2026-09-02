@@ -199,7 +199,32 @@
      lengths. §75's recipe already says the card owns its seams; this is the
      side of it the recipe could not state, because it is a property of the
      NEIGHBOUR and lives in this list by trap 4's rule. */
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
+  /* `:not(:has(> .pf-tgs))` — THE SWITCH ROW ENDS ITSELF (Maryam, 2 Sep 2026:
+     "remove the divider at the bottom of the notifications section"). §105.3
+     draws the three notification toggles as §41's bordered cells, so the block
+     already closes on three drawn edges; the join hairline landed 24px under
+     them and read as a fourth line belonging to nothing. It is the argument the
+     `.stats` entry two rules below makes — "a four-cell band that already ends
+     itself with its own border" — and the same one §20.102 makes for a dark
+     card: a block whose own bottom edge is drawn is never half of a hairline
+     join. Per trap 4 the unjoining goes in this list, because the pair is
+     decided here and cannot be outweighed from a later layer at any weight
+     (this selector is (0,5,0) — `:has()` carries its argument's classes).
+     `.pf-tgs` rather than `.sec`-plus-a-new-class: the row is the reason, and
+     keying on it means the next page that puts bordered cells at the foot of a
+     section gets the same answer. The narrow tier needs its own rule (§105.8,
+     §85.1b's split).
+
+     `:not(:has(> .pf-facts))` IS THE SAME ARGUMENT AND THE PLAINEST CASE OF IT
+     (Maryam, 2 Sep 2026: "remove the line at the bottom of 4 cards"). §10.16
+     gives `.facts` a `border-top` AND a `border-bottom` of its own, so the join
+     hairline landed one 24px gap under a rule the band had already drawn — the
+     `.stats` entry below says this in as many words, and a `.facts` band is the
+     same object with content-sized cells. Keyed on `.pf-facts` rather than on
+     `.facts`, because this is a decision about the pair on THIS page: a `.facts`
+     row is the last child of eight other sections in the build and every one of
+     them is joined to its neighbour today. */
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,

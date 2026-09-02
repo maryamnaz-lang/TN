@@ -1087,7 +1087,7 @@ css = '\n'.join((here / f).read_text() for f in
                  # screen, and the hairline under the description removed.
                  # AFTER §63 AND CLEAN: grid, two grounds, one radius and one
                  # ring background. Not one font-size, font-weight,
-                 # text-transform or text colour — §63 §30 states the two inks.
+                 # text-transform or text colour — §63 §32 states the two inks.
                  # LATE FOR A CASCADE REASON: it turns off §17.6's `border-top`
                  # and §17.395's phone `::before`, both of which are inside
                  # `@container` tiers, and it re-points §02.193's white ring
@@ -1104,7 +1104,22 @@ css = '\n'.join((here / f).read_text() for f in
                  # LATE FOR A CASCADE REASON: it re-points §16.598's tag gap and
                  # §28.79's chip border on the black card, §96's `--crt-art-w/h`
                  # for a half-column card, and §02.190's `.tg` alignment.
-                 '105-profile.css'])
+                 '105-profile.css',
+                 # EVERY PHOTOGRAPH OF A PERSON IS A DISC (§106) — one
+                 # `border-radius` on the avatar component and on the six
+                 # portraits that are not it, and the corner tick on the photo
+                 # picker moved to where a circle has room for it.
+                 # AFTER §63 AND CLEAN: one property, one value, plus three
+                 # position declarations. Not one font-size, font-weight,
+                 # text-transform or text colour.
+                 # LATE FOR A CASCADE REASON: it replaces five scoped
+                 # restatements of the same value across §70.3e, §89.2, §89.5,
+                 # §103 and §105, all of which are deleted with it — a layer
+                 # that generalises has to land after every layer it retires,
+                 # and §11.194/195's `border-radius:0` is answered at source
+                 # rather than out-weighted because nothing at the component's
+                 # weight could reach §27's (0,4,0) copy either.
+                 '106-roundfaces.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

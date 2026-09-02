@@ -1,0 +1,161 @@
+/* ==========================================================================
+   §106 — EVERY PHOTOGRAPH OF A PERSON IS A DISC
+
+   Maryam, 2 Sep 2026: "can you please make sure that everywhere on the
+   candidate, cohort leader, and talent agent portal we have an image I need it
+   to be a circle image not a block image."
+
+   THIS IS THE PLATFORM DECISION §89.2 DECLINED TO MAKE, and its note is the
+   argument in full: "`.av-ph` is drawn in about thirty places — the app bar,
+   the agent cards, the call screen's tiles, `signedSummary`'s signature row,
+   the leader portal's rosters — and rounding all of them is a platform decision
+   rather than this page's." It was right to scope itself and it is right to be
+   deleted now that the decision has been taken.
+
+   FOUR ASKS ARRIVED AT IT ONE SURFACE AT A TIME and the drift is the reason
+   this layer exists rather than a fifth scoped rule: §89.2 rounded the cohort
+   page's three lists (1 Sep), §89.3 the leader's message control, §103 the
+   message thread's faces, §105 the profile picture ("make the profile picture
+   circle", 2 Sep) and §70.3e the cohort leader's portrait. Five layers, five
+   selectors, one shape — and the product still drew a square face in the app
+   bar, on every dashboard, on the black recommendation card, on the call row,
+   in the interviews list and down the leader's own rosters. **One rule, stated
+   at the component.**
+
+   A CURVE IS SPENT ON A MARK AND ON NOTHING ELSE, which is what makes this a
+   small change rather than a re-skin. `--radius` is `0px` by token and §02's
+   opening note is that "depth is expressed as rhythm and rule weight, nothing
+   else"; §56 grants exactly one exception — the MARK — and the journey's step
+   discs take that grant. A photograph of a person is the clearest case of it:
+   it is never a surface, and nothing is laid out against its corners.
+
+   THE LITERAL `999px`, NOT A RE-POINTED `--radius`, which is §89.2's reason
+   and §105's: every `border-radius` in the build resolves through that token,
+   so re-pointing it would curve every card, chip and panel in the product.
+
+   §09's `overflow:hidden` IS WHAT MAKES ONE DECLARATION ENOUGH. `.av-ph`,
+   `.av` and `.mem-av` all carry it and the `<img>` inside is absolutely
+   positioned, so the box's radius clips it — no radius on the image itself,
+   which would then have to be kept in step at thirty call sites.
+
+     106.1  the avatar component, and the six portraits that are not it
+     106.2  the two `border-radius:0` rules that now contradict it
+     106.3  the selected-photo tick, which had been drawn in a corner
+
+   WHAT IS DELIBERATELY NOT ROUND, all of it artwork rather than a person:
+
+     the wordmark      `.auth-logo` / `.shell-logo` — TalentNext's own mark.
+     the awards        `.ph-rank`, `.ph-earned-mk`, `.certban-mk` and the
+                       `.score-rank` medal — eight WebPs cut as shaped artwork
+                       on a transparent ground; a disc would put a circle round
+                       a thing that already has an outline.
+     the certificates  `.crt-art` — a portrait-format document, 96×104.
+     the cohort covers `.gcard-art`, `.cco-art`, `.crow-cover` — §86's 9:5
+                       title cards, and the instruction behind them was
+                       explicitly about NOT cutting the sides ("i need the image
+                       blocks in horizontal rectangle form so the image do not
+                       cut from sides", 1 Sep 2026). A circle is that crop at
+                       its worst: the half of the cover that carries the meaning
+                       is the line of type across the middle.
+
+   `.crow-ph` IS THE ONE ELEMENT ON BOTH LISTS, so it is the one exclusion
+   written as a selector. `crow` stamps `.crow-cover` beside it when the record
+   carries a cover instead of a face (§86.2) — the leader's own next-call card
+   is that case and the candidate's booked interview is not, on the same two
+   classes. `:not(.crow-cover)` reads the record's decision rather than the
+   portal's.
+
+   IT CROSSES INTO `design-system/` AND THAT IS THE THIRD PORTAL. The ask names
+   `tn-agent-portal.html`, which is hand-written on the box and draws `.av-ph`,
+   `.av` and `.mem-av mem-ph` — so it takes this from the stylesheet with no
+   edit of its own, which is the whole point of stating it at the component.
+
+   §63 OWNS NO PART OF THIS — not one font-size, font-weight, text-transform or
+   text colour. One property, one value.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 106.1 ---
+   THE AVATAR COMPONENT, AND THE SIX PORTRAITS THAT ARE NOT IT
+
+   `.av-ph` / `.av` / `.mem-av` are §09's three and between them they draw
+   everything that goes through `avatar()`: the dashboards' face, the agent
+   cards, the rosters, the message list, the report's signature row, the
+   interviews list, the booking page's 96px hero, the photo picker's five.
+
+   THE OTHER SIX DO NOT WEAR THOSE CLASSES and each was built as its own span
+   with its own `<i>` fallback and its own absolutely-positioned `<img>`:
+
+     `.shell-avatar`  the app bar, 30px.  (The agent portal spells it
+                      `av-ph sm shell-avatar` and is covered twice over.)
+     `.acct-i-av`     the account menu's "Switch to …" row — the OTHER
+                      person's photograph, §78's decision to use a face rather
+                      than a glyph, so it is a portrait like the rest.
+     `.rec-ph`        the recommendation's 120px portrait on the black card.
+     `.crow-ph`       the call row's 78px mark, minus the cover case.
+     `.pnc-ph`        the pulse's next-call row, 43px.
+     `.idphoto`       the profile photograph, and the CONTAINER is what takes
+                      the radius here as well as its `.av-ph` — it is a
+                      `<button>` with the edit badge positioned against it.
+     `.photopick`     the picker's cells, which carry their own 1px frame and
+                      their `.on` outline; both follow the radius.
+
+   `.call-p-av` IS ALREADY A DISC and is not in this list — §60 drew the cohort
+   call's participant column as discs from the start, on its own argument that
+   nine 16:9 thumbnails in a 300px column are nine letterbox slits. Restating it
+   here would be a rule that changes nothing.
+   -------------------------------------------------------------------------- */
+.app .av-ph,
+.app .av,
+.app .mem-av,
+.app .shell-avatar,
+.app .acct-i-av,
+.app .rec-ph,
+.app .pnc-ph,
+.app .idphoto,
+.app .photopick,
+.app .crow-ph:not(.crow-cover){border-radius:999px}
+
+/* ------------------------------------------------------------------ 106.2 ---
+   THE ONE RULE THAT STILL HAS TO BE ANSWERED BY WEIGHT
+
+   §11.194/195 stated `border-radius:0` on `.idphoto` and `.idphoto .av-ph` at
+   (0,1,0) and (0,2,0) — written when every avatar in the build was square, and
+   both are DELETED in place rather than out-weighted from here. §105.68's
+   `.idphoto-round` restatement went with them and so did §89.2's three,
+   §89.194's and §103's: a rule whose job has moved to the component is the
+   "gate nothing writes" tell this repo deletes on, and five copies of one
+   value is how the drift above happened in the first place.
+
+   §27 IS THE EXCEPTION AND IT IS ANSWERED AT SOURCE, not here. The ask page's
+   own bubble draws your face as `.ask-thread .tal-msg.me .av` at (0,4,0) with
+   `border-radius:0` and a 35×37 box — heavier than anything this layer could
+   sensibly state, and the box is not square, so a `999px` on it would have
+   drawn an ellipse. Squared to 36 and the two `border-radius:0` declarations
+   removed, in §27 where they were written. **A non-square box is the one thing
+   that makes this change visible as a bug rather than as a shape**, so it is
+   worth checking for before adding a portrait to the list above.
+   -------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------ 106.3 ---
+   THE SELECTED PHOTO'S TICK MOVES OFF THE CORNER
+
+   §11 puts a 14px accent square at `right:4px;bottom:4px` inside the picker
+   cell — correct against a square photograph and outside the disc against a
+   round one: at 82px across, the circle's own edge on that diagonal is ~12px
+   in from each side, so the mark sat half on the picture and half on the
+   sheet's white ground.
+
+   BOTTOM CENTRE, WHERE A CIRCLE HAS THE MOST ROOM, and a disc rather than a
+   square because it is now a mark ON a mark. The accent ring §11 already draws
+   round the chosen cell (`outline` follows `border-radius`) is what carries the
+   selection; this is the second, redundant-by-design signal that keeps the
+   state legible for anyone who cannot see the hue.
+
+   `left:50%` + `translateX(-50%)` RATHER THAN A GEOMETRIC INSET, because the
+   picker's cells are `aspect-ratio:1` inside an `auto-fill minmax(84px,1fr)`
+   grid — the diameter is whatever the sheet is wide, so any number worked out
+   against 82 would be right at one width only.
+   -------------------------------------------------------------------------- */
+.app .photopick.on::after{
+  right:auto;left:50%;bottom:5px;transform:translateX(-50%);
+  border-radius:999px}

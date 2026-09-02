@@ -11,11 +11,12 @@
      on file://:
          python3 -m http.server 8799 --bind 127.0.0.1
      Every class used below is a real class from design-system/gallery.html.
-     The <style> block is prototype chrome — the wordmark's size, and the
-     stage's foot padding, which the design system sizes for a caption row this
-     file does not print — plus ONE product rule, `.shell-name`, kept local
-     because the app bar's role label is styled for this portal only. Its own
-     note says why. Nothing else here restyles a component.
+     The <style> block is prototype chrome and NOTHING ELSE — the wordmark's
+     size, and the stage's foot padding, which the design system sizes for a
+     caption row this file does not print. It held one product rule until §78
+     took the app bar's role label out for the breadcrumb trail; that rule is
+     deleted and its note records what it argued. Nothing here restyles a
+     component.
      ========================================================================== -->
 <link rel="stylesheet" href="design-system/talentnext-ds.css">
 
@@ -49,38 +50,26 @@
 .pt-stage{padding-bottom:var(--s05);gap:0}
 
 /* ==========================================================================
-   THE ONE PRODUCT RULE IN THIS FILE — the app bar's role label.
+   THERE IS NO PRODUCT RULE IN THIS FILE ANY MORE, AND THAT IS THE POINT
 
-   Everything above is prototype chrome. This is not: it restyles a design
-   system component, in this portal only, and it is written here rather than in
-   `talentnext-ds.css` for exactly that reason — the candidate and cohort
-   leader bars keep the label the system gives them. Never hand-edit
-   `talentnext-ds.css`; it is build output of `design-system/build-ds.py`.
+   A `.shell .shell-name` block was here — three declarations restyling the app
+   bar's role label for this portal only: 20px of left padding off the nav
+   toggle, `#000000` rather than the system's #111111, and `font-weight:600`
+   because the label's inherited 500 was being synthesised off the 400 file
+   (Söhne is embedded at 400 and 600 and nothing between).
 
-   The span itself is untouched — same `.shell-name`, same string, still
-   `display:none` below 900px, so the mobile bar is unaffected. Three
-   declarations, all of them asked for:
+   IT IS DELETED BECAUSE §78 TOOK THE LABEL OUT OF THE BAR. The breadcrumb
+   trail has that slot now, and nothing in this file writes `.shell-name` — so
+   the rule was the "gate nothing writes" tell, in the one place this file
+   writes CSS at all. §63 §18 states the trail's three inks and §78 its
+   spacing, both out of the design system, so the replacement needs no local
+   rule either.
 
-   PADDING FROM THE LEFT. The label moved to the left of the bar (see the note
-   at `shell()`), which put it hard against the nav toggle's right edge — the
-   shell's own `gap` is `var(--s02)`, 4px, which is a gap between controls and
-   not a gutter for type. `var(--s05)` takes it to 20px off the divider.
-
-   #000000, NOT `--text-primary`. The system's primary ink is #111111 and the
-   label was `--text-secondary`, two steps lighter again. Pure black was asked
-   for, so it is written literally: a token would be a lie about which value
-   this is.
-
-   600, WHICH IS THE KRÄFTIG FACE. `talentnext-ds.css` embeds Söhne at 400 and
-   at 600 and nothing between, so the label's inherited `font-weight:500` was
-   being synthesised off the 400 file — a faux-bold of Buch, not Kräftig. 600
-   is the weight the real semibold face is registered at.
+   The two arguments worth keeping if a bar label ever comes back: the shell's
+   own `gap` is `var(--s02)` — 4px, a gap between controls rather than a gutter
+   for type — and a weight between 400 and 600 is a faux-bold of Buch rather
+   than Kräftig, so it must be written as one of the two the face has.
    ========================================================================== */
-.shell .shell-name{
-  padding-left:var(--s05);
-  color:#000000;
-  font-weight:600;
-}
 </style>
 </head>
 <body>
@@ -203,11 +192,17 @@
    `gallery.html`, all with fixed internal markup:
 
      `.ai-aura`   Tal's band. Every page's summary, and Tal's report draft.
-     `.plate`     the black hero: the next interview, the calibration slot.
+     `.dark-card` the black hero, full width in the page body: the next
+                  interview, the calibration slot, the setup step you are on.
                   Its CTA is a plain `.btn.btn-p` and comes out ORANGE.
+     `.crow`      inside it, wherever the subject is an appointment with a
+                  person. `.crow-dark` on the wrapper is what pairs the two.
+     `.jrn`       the journey, as the head band's second column.
      `.wkc`+`.ring` the four training lessons, drawn the way the candidate's
                   chapters are drawn.
-     `.lvl-hero`  the agent's level. `.cert` for the certificate.
+     `.cert`      the certificate. **`.lvl-hero` is NOT used** — this portal
+                  has no agent level and the class has no caller here; see the
+                  note over `A`.
 
    Tal answers with `tw()` — the portal's own reply widget — and offers with
    `.chip-tal`. **`.tal-panel` and `.tal-fab` are still NOT used**: §27 hides
@@ -259,8 +254,9 @@
        on the two stages that have one, and §70's rule is that a page with a
        head column leaves its dark card in the page body — which is also §75's
        whole point, since `.dark-card` is in no render pass's list. The note
-       over `darkCard` has the argument; `.cert` and `.lvl-hero` still go in the
-       band, because §56 treats a wide object differently from a vertical card.
+       over `darkCard` has the argument. `.cert` is the one dark object still
+       placed in the band, because §56 treats a wide object differently from a
+       vertical card — its stablemate `.lvl-hero` went with the agent level.
      - THE JOURNEY IS §70'S VERTICAL LIST, `.jrn` in a `.sec.head-sec.head-col
        .sec-jrn`. It has been three shapes here: §33.7's dropdown, then §56's
        five-across open row, now this. The note over the deleted `stepper()`
@@ -307,7 +303,29 @@ const A = {
   range:'Explorer E2 – Builder B1', rangeShort:'E2 – B1',
   fee:85, share:68, cut:17,          /* $85, split 80/20 → $68 and $17 */
   rating:4.6, ivs:164, month:9,
-  level:'A2', levels:4, rank:12, pool:38,
+  /* THERE IS NO AGENT LEVEL (Maryam, 2 Sep 2026: "we don't have any concept of
+     agent level, so remove that kinda thing totally from the talent agent
+     portal"). `level:'A2'` and `levels:4` were here — an A1–A4 ladder for the
+     agent themselves, drawn as a `.lvl-hero` on Standing, a figure cell beside
+     it, and a rank tier in Tal's answers.
+
+     IT WAS A MIRROR OF THE CANDIDATE LADDER THAT THE PRODUCT DOES NOT HAVE.
+     Nothing outside this file ever defined it: the flow diagram has no agent
+     ladder, `hifi/` has no A-levels, and the wireframes never drew one. What it
+     was standing in for is the RANGE — which candidate levels this agent is
+     allowed to assess — and that is real, is `range`/`rangeShort` below, and is
+     what the quarterly review actually moves.
+
+     THREE THINGS THAT SURVIVE AND ARE NOT THE SAME CONCEPT, so none of them
+     came out with it:
+       - `range` / `rangeShort` — E2 – B1, the candidate levels Owen may assess.
+         A property of his permissions, not a tier he holds.
+       - `rank` / `pool` — 9 of 38 in browse, recalculated weekly off follow-up
+         and depth. A position in a list, which `TALQ` already says is "a
+         different thing" from anything else about the agent.
+       - the quarterly review by `manager` — real, and still on Standing. What
+         changed is what it is described as moving: the range, not a level. */
+  rank:12, pool:38,
   follow:4.4, depth:4.7,
   manager:'Nadia Rahman',
   escrow:204, earned:612,
@@ -347,7 +365,7 @@ const STAGES = [
   ['training', 'Training',              'Stage 3. Your public profile and your money are done. Three of four lessons are finished and the calibration interview is the last thing before the certification gate.'],
   ['live',     'Listed, nothing booked','Stage 4, day one. Certified 20 June and visible in the marketplace since Monday. Six slots are open and no one has taken one yet.'],
   ['working',  'A working week',        'Stage 4. Two interviews ahead, one report due tonight, and $204 held for you in escrow. This is the portal as an agent actually uses it.'],
-  ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review moved Owen to A3 and widened the range he may assess to E1 – B2.']
+  ['reviewed', 'After a review',        'Stage 4, step 13. The quarterly review widened the range Owen may assess to E1 – B2, and his follow-up score came up over the quarter.']
 ];
 
 /* Stage config. Anything absent falls back to `A`. */
@@ -369,7 +387,7 @@ const CFG = {
              busy:true},
   reviewed: {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
              busy:true, reviewed:true,
-             level:'A3', range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
+             range:'Explorer E1 – Builder B2', rangeShort:'E1 – B2',
              rank:9, follow:4.6, ivs:171, month:7}
 };
 
@@ -406,6 +424,27 @@ const S = {stage:'working', view:'dashboard', nav:false, tal:false, notif:false,
               moves the class in place and writes the flag for the next render;
               §65's own note is the long version of both halves. */
            disc:{},
+           /* `hist` IS THE BACK STACK AND THE BREADCRUMB IS DRAWN FROM IT —
+              §78. Each entry is `{view, label}`: the view to return to, and
+              what that page called itself at the moment you left it.
+
+              THE LABEL IS STORED, NOT LOOKED UP, and that is the one decision
+              here that is not obvious. §78's own note records the version that
+              failed: a map keyed by view looks correct until you open one view
+              twice, because `interview` is whichever interview `S.iv` points
+              at — open Rafael from the dashboard, then Amara from the list, and
+              the earlier crumb silently becomes "Amara Osei". The candidate
+              portal answers it by diffing the stack's length after every
+              render, because it has six `push` sites across five files. This
+              file has ONE, in the `data-go` branch, so it can simply capture
+              the label off the page it is leaving — which is the same fact, one
+              step earlier and with nothing to keep in step.
+
+              A RAIL ITEM EMPTIES IT. Pressing a module in the rail is starting
+              again rather than going deeper, so the trail is that module alone
+              — `go`'s `fresh` rule on the other side, and here it is a test on
+              whether the destination is in `NAVSETS`. */
+           hist:[],
            perms:{draft:true, brief:true, live:false}};
 
 const f = () => ({...A, ...CFG[S.stage]});
@@ -444,6 +483,36 @@ const parentOf = (view, nav) =>
   view === 'interview' ? 'interviews'
   : (view === 'training' && nav === 'full') ? 'standing'
   : null;
+
+/* --------------------------------------------------------------------------
+   THE BREADCRUMB — §78, and the trail is THE PATH YOU TOOK, not the place you
+   sit
+
+   `crumbMod` NAMES A VIEW'S MODULE, and it is the rail's own label rather than
+   the page's heading. The candidate portal's version makes the argument and it
+   holds here for the same reason: a module's `<h1>` on this portal was a
+   greeting or a plural ("Interviews"), and the rail is the one place the
+   product has already decided what a module is called.
+
+   THE RAIL'S FOOT IS NOT IN `NAVSETS` AND HAS TO BE NAMED. Profile is drawn in
+   `.sn-foot` and reached from the avatar as well, so it appears in no rail set
+   and `crumbMod` would return null for it — the same gap `CRUMB_FOOT` fills on
+   the other side. One entry here, because this portal's foot holds one page.
+
+   IT TAKES A VIEW ARGUMENT so the trail can name the pages BEHIND you, which is
+   the fallback for an entry whose own label was never captured.
+   -------------------------------------------------------------------------- */
+const CRUMB_FOOT = {profile: 'Profile'};
+const crumbMod = view => {
+  const v = view || S.view;
+  const k = parentOf(v, f().nav) || v;
+  if(CRUMB_FOOT[k]) return [CRUMB_FOOT[k], k];
+  const row = NAVSETS[f().nav].find(([n]) => n === k);
+  return row ? [row[1], row[0]] : null;
+};
+
+const crumbBar = () =>
+  `<nav class="crumb-bar" aria-label="Breadcrumb"><ol class="crumb-trail"></ol></nav>`;
 
 /* --------------------------------------------------------------------------
    THE INTERVIEWS
@@ -775,7 +844,7 @@ const PAGESUM = {
   },
 
   standing: {
-    reviewed:'The review moved you up a level on 1 October, so you may assess E1 to B2 now. Follow-up came up to 4.6 over the quarter.',
+    reviewed:'The review widened your range on 1 October, so you may assess E1 to B2 now. Follow-up came up to 4.6 over the quarter.',
     _:       'Follow-up came up to 4.4 in August and depth has held at 4.7 since May. Nadia Rahman reads the quarter on 1 October.'
   },
 
@@ -820,8 +889,16 @@ const TALQ = {
      'Yes, and it applies to new bookings only. Anything already in escrow settles at the rate it was booked at, including Thursday’s.'],
     ['What does pausing do?',
      'It takes you out of browse. Interviews already booked still stand, and your public profile comes back exactly as it was — nothing is re-approved.'],
+    /* NO TIER IN THE ANSWER. This read "The range comes off your agent level,
+       and A2 is E2 to B1" — the range explained by a thing that explained
+       nothing, since the tier was only ever a name for the range. The quarterly
+       review is the real mechanism and it is what the answer names now.
+
+       A PLAIN BLOCK COMMENT AND NOT A `${''}` ONE: `TALQ` is an object of
+       arrays rather than a template literal, so the interpolation form the
+       views use is a syntax error here. */
     ['Why can’t I assess above B1?',
-     'The range comes off your agent level, and A2 is E2 to B1. A review is what moves it; Nadia looks at yours on 1 October.']
+     'Your range is Explorer E2 – Builder B1 today, and a candidate outside it cannot book you at all. The quarterly review is what widens it; Nadia reads yours on 1 October.']
   ],
   training: [
     ['What is calibration?',
@@ -944,9 +1021,28 @@ const _cap = t => t.replace(/^([a-z])/, (m,c) => c.toUpperCase());
    row, and the auth-style pages that pass a sentence must not grow a mark. */
 const phSub = sub => {
   const parts = String(sub).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  /* THE FACT ROW IS NOT DRAWN ANY MORE, AND THIS IS THE CANDIDATE PORTAL'S OWN
+     `phSub` (Maryam, 2 Sep 2026: "we are not using headings or insights on our
+     new ui look. please follow the structure of candidate and cohort portal").
+     Checked rather than assumed: swept over 55 candidate-portal screens, there
+     are ZERO `<h1>`s and ZERO `.ph-facts` in that portal — the `<h1>` is
+     stripped by §78's pass and the `&middot;` row is stopped right here, by a
+     `return ''` this function now makes too.
+
+     THE SPINE MOVED TO THE TOP BAR RATHER THAN BEING DELETED. That is the whole
+     of §78: the page's name is a crumb in `.crumb-trail`, so an `<h1>` under it
+     says it twice and a row of figures under THAT is a third block of chrome
+     before the page starts. What the figures said is still said — every one of
+     them is in Tal's summary two lines below, which is the slot that owns the
+     reading (`PAGESUM`'s note is the rule).
+
+     `parts.length < 2` STILL RETURNS A `<p>`, and that branch is the auth
+     screens. A `sub` with no middot in it is prose rather than a spine —
+     "Enter the email address and password on your TalentNext account" — and
+     those five screens have no Tal card to carry it. CLAUDE.md names them as
+     the standing exception. */
   if(parts.length < 2) return `<p>${sub}</p>`;
-  return `<p class="ph-facts">${parts.map(t =>
-    `<span class="ph-f">${factIcon(t)}<span>${_cap(t)}</span></span>`).join('')}</p>`;
+  return '';
 };
 
 /* THE PAGE HEAD, in `hifi/`'s own shape: one `.ph` per page, carrying the only
@@ -1201,43 +1297,86 @@ const foundSec = (title, key, body, desc, ground) => `
   </section>`;
 
 /* ==========================================================================
-   QUICK ACTIONS — §70's `.sec-qa`, and it replaced a stranded `.btn-row`
+   QUICK ACTIONS WERE HERE AND ARE DELETED — §70's `.sec-qa`, removed 2 Sep 2026
 
-   THREE PAGES ENDED ON A `.note` AND A ROW OF NAVIGATION BUTTONS, which is
-   exactly the shape §70 took off the candidate's dashboard: two or three plain
-   buttons hard left at the foot of the page, naming destinations, with no
-   indication of what is at either end of them. A `.qa-c` card says where it
-   goes AND what you will find, which is the difference between a button and a
-   way out.
+   Maryam: "remove the quick actions". `quickActions(cards)` and `qaAttr` drew
+   the block on the working dashboard: three `.qa-c` cards — finish the report,
+   open or close a slot, see what is held for you — closing the page where a
+   `.btn-row` of two plain navigation buttons used to sit.
 
-   A CARD IS `{ic, hue, t, d}` PLUS ONE OF `go` / `ask` / `peek` / `sheet`, and
-   they are exclusive on purpose — a button carrying two would do whichever the
-   delegated handler reached first. `sheet` is this portal's fourth, because
-   three of the things worth putting on a card here open a sheet rather than a
-   page (adding a slot, changing the fee, noting a brief), and §60's rule is
-   that a control does what its label says.
+   THE ARGUMENT FOR IT WAS SOUND AND IS NOT WHAT REMOVED IT. A `.qa-c` card says
+   where it goes AND what is there, which is the difference between a way out
+   and a button; that is why §70 put the block on the candidate's dashboard. What
+   changed is what this page became: with the note, the descriptions and the
+   head-row actions all off, the dashboard is now the black card, four figures
+   and two short lists — and every one of those three cards pointed at something
+   already on it. The report is the first list, the slots are one rail item, the
+   escrow is a figure in the band. A card that restates the thing above it is
+   the duplication §70 was built to remove, arriving from the other direction.
 
-   THE HUE IS A NAMED CLASS, NEVER AN INDEX — §70.6. Inserting a card at the
-   front of the list must not repaint the three behind it, which is the failure
-   `nth-child` hues have and the reason §72's pulse columns are named too. The
-   set the design system ships is green (`ic-quiz`), blue (`ic-prep`), violet
-   (`ic-stand`) and a second green (`ic-pace`); there is no rose, so a page gets
-   three cards before two of them agree.
+   TWO THINGS WORTH KEEPING IF IT COMES BACK. A card is `{ic, hue, t, d}` plus
+   exactly ONE of `go` / `ask` / `peek` / `sheet` — exclusive, because a button
+   carrying two would do whichever the delegated handler reached first, and
+   `sheet` was this portal's own fourth (three of its worthwhile cards open a
+   sheet rather than a page). And the hue is a NAMED class, never an index
+   (§70.6): the set the design system ships is green `ic-quiz`, blue `ic-prep`,
+   violet `ic-stand` and a second green `ic-pace`, so a page gets three cards
+   before two of them agree. `gallery.html` documents the markup.
    ========================================================================== */
-const qaAttr = c => c.ask ? `data-ask="${c.ask}"`
-  : c.peek ? `data-peek="${c.peek}"`
-  : c.sheet ? `data-sheet="${c.sheet}"`
-  : `data-go="${c.go}"`;
-const quickActions = cards => `<section class="sec sec-qa">
-  <div class="sec-h"><h2>Quick Actions</h2></div>
-  <div class="qa">${cards.map(c => `
-    <button class="qa-c" ${qaAttr(c)}${c.iv ? ` data-iv="${c.iv}"` : ''}>
-      <span class="qa-ic ${c.hue}">${c.ic}</span>
-      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
-      <span class="qa-go">${I.arrowRight}</span>
-    </button>`).join('')}
-  </div>
-</section>`;
+
+/* ==========================================================================
+   THE STICKY SECTION STRIP WAS BUILT HERE AND REMOVED, AND THE MEASUREMENT IS
+   WHY — the leader's `.lead-bar` / `.lead-tabs`, working, on a page too short
+   to need it
+
+   Maryam, 2 Sep 2026: "for the sections improvement on talent agent dashboard,
+   please utilize the components from the cohort leader dashboard." That
+   dashboard's most distinctive section component is its sticky strip — four
+   tabs with counts that appear once the figure band scrolls away and jump to
+   the four queues below. It was ported in full and it worked: §31's rules lost
+   their `[data-portal="leader"]` scope for it (that layer's note records which
+   families moved and which deliberately did not), `.jump-sec` carried the
+   `scroll-margin-top`, and a `jumpStick` scroll-spy lit the tab for whichever
+   section the reader was in.
+
+   THEN IT WAS MEASURED. This dashboard is 1270px tall in a 600px frame — 670px
+   of scroll — and the strip sits 609px down, because it belongs directly under
+   the figure band it replaces. So it had 61px of scroll in which to exist, and
+   its own `is-gone` rule then correctly hid it: that rule leaves when the last
+   section it points at is fully on screen, which on a two-screen page is almost
+   immediately. The component was behaving exactly as designed and the page had
+   nothing for it to do. The leader's is ~3000px with four substantial queues;
+   after §65 folded four long reference blocks shut, the longest page in THIS
+   portal is Profile at 1793px.
+
+   A CONTROL WITH NOTHING TO DO IS WORSE THAN A MISSING ONE — §60's rule, and
+   this is the same call §41 made about the month calendar and §73 made about
+   the social-proof row. A section navigator that flashes for a tenth of a
+   scroll is chrome that announces itself and then leaves.
+
+   WHAT THE PAGE TOOK INSTEAD is every other section component of that
+   dashboard: a head block with a description and a way out on the row (`aiHead`
+   on "On you", which was the last bare `.sec-h` on the page), the alternating
+   white/tint ground that is the leader's page rhythm, and the note folded into
+   the section it is about rather than standing as a section of its own.
+
+   AND THE FOUR FIGURE CELLS ARE STILL NOT JUMP CELLS, which is the one thing
+   here that looks like it should copy the leader and must not — it is the
+   reason the strip had only three tabs to point at. `.stats-lead`'s cells each
+   count a section a few hundred pixels below them, so "Attention Required 3" is
+   three rows you can go and read. An agent's four are READINGS: 7 interviews
+   this month, follow-up at 4.6, $612 earned, $204 held. There is no "$204
+   section" to scroll to, and making them jump would have meant inventing
+   sections to be jumped to. `.stats-lead`'s named hues stay scoped to the
+   leader for the same reason.
+
+   THE CSS UN-SCOPING STAYS, and that is deliberate rather than a leftover: the
+   classes being unreachable outside one portal was a real defect — the same one
+   §31.5 fixed for `.bk-row` — so the component is available to the first page
+   in this portal that is long enough to want it. `V.profile` at 1793px is the
+   nearest candidate. Bringing it back is `jumpBar`, `jumpStick` and three ids;
+   this note and §31's are the recipe.
+   ========================================================================== */
 
 /* The navigation row — the design system's replacement for every card. */
 const goRow = (icon, eyebrow, title, sub, go, attr) => `
@@ -2400,6 +2539,12 @@ V.dashboard = v => {
      draws. Read off the same word the plate's `data-when` carried, so the two
      generations agree about what "inside the day" means. */
   const due = iv('sofia'), next = iv('rafael');
+  /* `owedCount` WAS HERE AND IS GONE WITH THE DESCRIPTION IT COUNTED — a derived
+     `IVS.filter(x => x.st === 'report').length` feeding "One report is owed" /
+     "N reports are owed" so the sentence could not claim one when there were
+     two. Awaiting Decisions takes no description now, so nothing reads it, and a
+     derived value with no reader is the same dead weight as a class nothing
+     writes. `V.interviews`' `owed` is the surviving one. */
   return band(callCard({
       title: 'Your next interview',
       when: `${next.day.replace(/^\w+ /, '')}, ${next.time}`,
@@ -2421,7 +2566,22 @@ V.dashboard = v => {
           same reason. On the pages that keep theirs — Earnings, Public profile,
           Standing — the row sits among other sections and the heading is what
           separates them; here it is the first thing under the head band. */''}
-    <section class="sec">
+    ${/* `.sec-joined` KILLS THE RULE UNDER THE FIGURE BAND (Maryam, 2 Sep 2026:
+          "remove the line after the 4 blocks row"), and it needs no CSS —
+          §14.138 records the class as trap 4's prescribed fix and it means "the
+          block under me draws its own rule".
+
+          THE LINE WAS §14's RE-ENABLER, NOT THE BASE RULE, which is the part
+          worth knowing before chasing it again. A `.sec` holding a `.stats`
+          already has `::after{display:none}` unconditionally — the cells are
+          bordered, so the band ends itself — and §14.217 then turns the rule
+          back ON at desktop for any section FOLLOWED BY a headed one. Awaiting
+          Decisions is headed, so the band drew a full-width hairline one pixel
+          under four cells that had just closed themselves. The leader's own band
+          dodges it only because the section after it is `.lead-bar`, which is in
+          that selector's `:not()` list. Per trap 4 the list is where this is
+          decided, and `.sec-joined` is the entry already in it. */''}
+    <section class="sec sec-joined">
       ${stats([
         ['video',      'Interviews', String(v.month),   `${v.ivs} in total`],
         ['growth',     'Follow-up',  String(v.follow),  'up from 4.2 in July'],
@@ -2429,65 +2589,58 @@ V.dashboard = v => {
         ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`]])}
     </section>
 
+    ${/* "AWAITING DECISIONS" IS THE LEADER'S "AWAITING EVALUATIONS", ROW FOR ROW
+          (Maryam, 2 Sep 2026). That section is a plain heading over a list of
+          people waiting on the reader to sign something — no description, no
+          action on the head row, and the row itself is the way in. So the
+          `aiHead` this section briefly carried comes off: its sentence was the
+          twenty-four-hour promise, which the report page states where the work
+          happens, and "Open the report" was a second door to the row beneath it.
+
+          THE DUE PHRASE IS RED, AND IT IS `.flag-t.red` RATHER THAN A SPAN THIS
+          FILE STYLES. §31's component is "a mark and a phrase in one hue" — what
+          a cell says when its value is a STATE rather than a number — and a
+          deadline that has to be met tonight is exactly that. The modifier is
+          new in that layer (it had quiet / warn / green and no red, because the
+          leader's red comes from its table ROW) and it takes `--danger-ink`, not
+          `--support-error`: the second is a fill, and §01 forbids a fill as a
+          text colour. No icon inside it — the leader's list carries none and the
+          phrase is doing the work. */''}
     <section class="sec">
-      <div class="sec-h"><h2>On you</h2></div>
+      <div class="sec-h"><h2>Awaiting Decisions</h2></div>
       <div class="tile-stack">
-        ${faceRow(due, `Report &middot; Tal has a draft off the transcript &middot; due ${due.due}`, 'interview')}
+        ${faceRow(due, `Report &middot; Tal has a draft off the transcript &middot; <span class="flag-t red">due ${due.due}</span>`, 'interview')}
       </div>
     </section>
 
-    ${/* THE SENTENCE UNDER THE HEADING IS `.aih-d` NOW AND NOT A `.t-helper-01`
-          SPAN. Written as a sibling of the `<h2>` it paid `--sec-h-gap` (12px,
-          which is a heading's distance from its CONTENT) where a description
-          pays `--sec-desc-gap` (8px, which is a heading's distance from a
-          sentence ABOUT it), and it took the helper ink where §63 puts every
-          description on `--text-secondary`. §73's block is the two as one
-          object, which is what they are.
+    ${/* "UPCOMING INTERVIEWS" IS THE LEADER'S "COHORT CALLS" (Maryam, 2 Sep
+          2026), which is a plain heading over a diary — no description under it
+          and, here, no action beside it. Three things came off with the rename:
+          the `.aih-d` sentence ("Booked interviews, in the order they happen",
+          which a date column says by being one), the "All interviews" button,
+          and the "There is nothing to accept" note. The note's own words are
+          not lost — `PAGESUM.dashboard`'s live copy and `V.interviews`' "Booked
+          means paid" disclosure both state it, which is where a rule about how
+          bookings arrive belongs.
 
-          AND THE WAY OUT OF THE SECTION IS ON THE SECTION'S OWN ROW. "All
-          interviews" was the left half of a `.btn-row` at the very foot of the
-          page, under a note, 400px below the list it opens more of — the same
-          arrangement §75.3 undid for "View all agents" on the recommendation
-          card, and for the same reason: that button is not a thing to do about
-          the diary, it is the way past it. */''}
-    <section class="sec">
-      ${aiHead('After that', 'Booked interviews, in the order they happen',
-        `<button class="btn btn-g btn-sm noic" data-go="interviews">All interviews ${I.arrowRight}</button>`)}
+          AND IT SHOWS BOTH, WHICH REVERSES `diary`'s `not` ARGUMENT. That
+          parameter exists because "the next interview is the black card at the
+          head of the page, and a diary that repeats it is the page saying the
+          same appointment twice" — a fair reading, and overruled: the leader's
+          Cohort Calls lists the call its own black card is about, first row,
+          and a section headed Upcoming Interviews that hides the next one is
+          the more confusing of the two. `diary(v)` with no exclusion.
+
+          THE MARK STAYS A FACE. The leader's rows carry a video glyph because a
+          cohort call has no one person in it; every row here is one interview
+          with one candidate, which is `bookedRow`'s own stated rule — "the mark
+          answers who am I meeting". */''}
+    <section class="sec tint">
+      <div class="sec-h"><h2>Upcoming Interviews</h2></div>
       <div class="tile-stack">
-        ${diary(v, next.id).map(bookedRow).join('')}
+        ${diary(v).map(bookedRow).join('')}
       </div>
-    </section>
-
-    <section class="sec">
-      <div class="note"><span>${I.info}</span><div class="nb"><b>There is nothing to accept</b>
-        A booking arrives paid for. Your availability is the control &mdash; a slot you leave open can be taken without asking you first.</div></div>
-    </section>
-
-    ${/* QUICK ACTIONS CLOSE THE PAGE — §70, and they replace the `.btn-row` that
-          used to sit under that note. Two plain buttons hard left at the foot of
-          a dashboard name destinations and say nothing about either end of them;
-          a `.qa-c` card says where it goes AND what is there. The note above
-          keeps its own words because it is a RULE about how bookings arrive,
-          not a way anywhere — which is exactly the split §70 drew when it took
-          the candidate's dashboard apart.
-
-          THE THIRD CARD IS THE ONE THE `.btn-row` COULD NOT HOLD. Availability
-          and All interviews were the two buttons; the report due tonight is the
-          only thing on this page with a deadline on it that is not the black
-          card, and it was reachable only by finding Sofia's row under "On you".
-          Hues are named per §70.6 — violet, blue, green — so a fourth card
-          inserted at the front cannot repaint the three behind it. */''}
-    ${quickActions([
-      {ic: I.certificate, hue: 'ic-stand', t: 'Finish the report due tonight',
-       d: `${due.n}'s write-up &mdash; Tal has a draft off the transcript.`,
-       go: 'interview', iv: due.id},
-      {ic: I.calendar, hue: 'ic-prep', t: 'Open or close a slot',
-       d: `${openSlots().length} open over the next fortnight. This is your whole workload.`,
-       go: 'availability'},
-      {ic: I.wallet, hue: 'ic-quiz', t: 'See what is held for you',
-       d: `${money(v.escrow)} in escrow, released three days after each report.`,
-       go: 'earnings'}
-    ])}`;
+    </section>`;
 };
 
 /* --------------------------------------------------------------------------
@@ -3369,35 +3522,56 @@ V.earnings = v => {
    conversation went, which is a different question from what the candidate is
    worth — that answer is the report, and the report is written by a person.
    -------------------------------------------------------------------------- */
-/* THREE SLOTS, THREE JOBS, AND THE HERO IS NOW ONE OF THEM. The grey line is
-   the spine, the hero card states the level and what it entitles you to, and
-   Tal reads what moved. The first draft of this page had all three saying "A2,
-   ranked 12 of 38, reviewed by Nadia" — which is the duplication the two-slot
-   rule exists to stop, arriving through a third surface. */
+/* THE PAGE HAS NO HERO CARD ANY MORE, AND THAT IS THE AGENT LEVEL COMING OUT
+   (Maryam, 2 Sep 2026: "we don't have any concept of agent level, so remove
+   that kinda thing totally from the talent agent portal"). `A`'s note has the
+   argument for the concept; this is what it cost the page.
+
+   WHAT WAS HERE: a `.lvl-hero` in the head band reading "Your agent level /
+   Agent – A3 / You may assess Explorer E1 – Builder B2", and a `Level` figure
+   cell beside it at "A3 / A1 to A4". The note defended the card on the grounds
+   that `.lvl-hero` is how the product draws a level on both sides and an
+   agent's level is "the same kind of fact about the same kind of person" —
+   which was the whole mistake in one sentence. The candidate's level is a real
+   rung on a fifteen-step ladder the product is built around; the agent's was a
+   second ladder nothing else in the product defines.
+
+   THE RANGE IS WHAT THE CARD WAS ACTUALLY FOR, so it moves into the figure band
+   as a cell rather than being deleted with the tier it was printed under. "You
+   may assess Explorer E1 – Builder B2" is the one fact on that card a reader
+   needs, and `.stats` wants exactly four cells (a fixed 2/4-column grid whose
+   hairlines are the 1px gap, so a row it does not fill paints grey). Four real
+   readings, and the level's slot is the range's now.
+
+   AND WITH NO HERO THE BAND IS ONE COLUMN, which §70 does on its own — there is
+   no `.head-col` and no dark card, so Tal's summary takes the full width and
+   uncaps. That is the arrangement the other module pages on this portal already
+   have, so Standing stopped being the one page with a card in its band.
+
+   THE PAGE'S TWO SLOTS STILL DO DIFFERENT JOBS, which is the surviving half of
+   the note that was here. Its first draft had the spine, the hero and Tal all
+   saying "A2, ranked 12 of 38, reviewed by Nadia"; the figures are the band's
+   and what MOVED is Tal's, and neither says the other's thing. */
 V.standing = v => head({
     title: 'Your standing',
-    sub: `Agent level ${v.level} of A${v.levels} &middot; ranked ${v.rank} of ${v.pool} &middot; reviewed quarterly`,
-    /* .lvl-hero IS THE LEVEL, on both sides of the product. The candidate's own
-       level is drawn with this card; an agent's level is the same kind of fact
-       about the same kind of person, so it is drawn the same way rather than as
-       a fifth figure cell — and it belongs in the band for the same reason the
-       plate does: it is what the page is about. */
-    plate: `<div class="lvl-hero">
-      <span class="eyebrow">Your agent level</span>
-      <div class="big">Agent &ndash; ${v.level}</div>
-      <p class="sub">You may assess ${v.range}.</p>
-    </div>`
+    sub: `Ranked ${v.rank} of ${v.pool} in browse &middot; assesses ${v.rangeShort} &middot; reviewed quarterly`
   }) + `
 
   <section class="sec">
     <div class="sec-h"><h2>Where you are</h2></div>
-    ${/* THE LABEL AND THE VALUE SWAP ROUND ON THE FIRST CELL. This was value
-          "A2" under label "Of A4", which put the scale in the label column and
-          left the cell without a name — the label is what the four cells are
-          scanned by, so it has to say WHICH reading this is. "Level / A2 / A1 to
-          A4" says all three things in the order they are asked for. */''}
+    ${/* THE RANGE LEADS, because it is the only cell here that is a PERMISSION
+          rather than a score — it says which candidates may book you at all,
+          where the other three say how the conversations went. It takes
+          `skill`, which is the mark Profile's own band already gives it, so the
+          same fact wears the same glyph on both pages.
+
+          `rangeShort` AND NOT `range`, because `.stat` puts the label and the
+          figure on one line with the figure `nowrap` at the right edge — the
+          long form ("Explorer E2 – Builder B1") would hold the cell open and
+          truncate the moment the page narrows. The note carries the long form's
+          information in words instead. */''}
     ${stats([
-      ['trophy', 'Level',      v.level,                            `A1 to A${v.levels}`],
+      ['skill',  'Assesses',   v.rangeShort,                        'Explorer to Builder'],
       ['search', 'In browse',  `${v.rank}<small>/${v.pool}</small>`, 'by follow-up and depth'],
       ['growth', 'Follow-up',  String(v.follow),                   'up from 4.2 in July'],
       ['chart',  'Depth',      String(v.depth),                    'unchanged since May']])}
@@ -3434,12 +3608,19 @@ V.standing = v => head({
 
   <section class="sec">
     <div class="sec-h"><h2>Your review</h2></div>
+    ${/* WHAT THE REVIEW MOVES IS THE RANGE, AND THAT IS THE ONLY THING IT EVER
+          ACTUALLY MOVED. These rows read "moved to A3" / "held at A2" and "Your
+          level, and the range you may assess" — two names for one outcome, and
+          the first of them was the tier this portal no longer has. The range is
+          read off `v.rangeShort` rather than typed, so the row and the figure
+          cell above it cannot disagree. */''}
     ${kv([
       ['Reviewed by', `${v.manager} &middot; manager of agents`],
       ['How often', 'Every quarter'],
-      ['Last one', v.reviewed ? '1 October &middot; moved to A3' : '1 July &middot; held at A2'],
+      ['Last one', v.reviewed ? `1 October &middot; range widened to ${v.rangeShort}`
+                              : `1 July &middot; range held at ${v.rangeShort}`],
       ['Next', v.reviewed ? '1 January' : '1 October'],
-      ['What it can move', 'Your level, and the range you may assess']])}
+      ['What it can move', 'The range you may assess, and where you sit in browse']])}
   </section>
 
   <section class="sec">
@@ -3451,10 +3632,15 @@ V.standing = v => head({
   </section>
 
   <section class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>A level change moves your range</b>
+    ${/* THE NOTE IS ABOUT THE RANGE ITSELF NOW. It was headed "A level change
+          moves your range" and then explained the range in terms of the tier —
+          "A3 is E1 to B2" — which is the concept coming out. What is worth
+          saying is what a wider range DOES to the work, which is the half of
+          each sentence that was already true. */''}
+    <div class="note"><span>${I.info}</span><div class="nb"><b>Your range decides who can book you</b>
       ${v.reviewed
-        ? 'A3 is E1 to B2, which is why Explorer’s first two levels appeared in your queue this month.'
-        : 'A2 is E2 to B1. A3 would add Explorer’s first two levels and Builder’s second.'}</div></div>
+        ? 'The review widened it to Explorer E1 – Builder B2, which is why Explorer’s first two levels appeared in your queue this month.'
+        : 'It is Explorer E2 – Builder B1 today. Widening it would add Explorer’s first two levels and Builder’s second.'}</div></div>
   </section>`;
 
 /* --------------------------------------------------------------------------
@@ -3666,7 +3852,7 @@ const AGENT_NOTIF = {
     {ic:'star',       t:'Nina Haddad rated the interview', b:'4.3 on follow-up and 4.7 on depth. Signed at Explorer – E4 on 15 August.',                w:'3 days ago', go:'standing',    unread:0}
   ],
   reviewed:[
-    {ic:'trophy',     t:'Nadia moved you to A3',           b:'The quarterly review landed on 1 October. You may assess E1 to B2 now.',                  w:'Today',      go:'standing',    unread:1},
+    {ic:'trophy',     t:'Nadia widened your range',        b:'The quarterly review landed on 1 October. You may assess Explorer E1 to Builder B2 now.', w:'Today',      go:'standing',    unread:1},
     {ic:'chart',      t:'Follow-up came up to 4.6',        b:'Over the quarter, across 171 interviews. Depth has held at 4.7 since May.',               w:'Today',      go:'standing',    unread:1},
     {ic:'view',       t:'Your range widened in browse',    b:'Candidates at Builder B2 can find you now.',                                              w:'Yesterday',  go:'profile',     unread:0},
     {ic:'certificate',t:'Nothing is due until June',       b:'The method is re-checked once a year, and the re-check is two lessons rather than four.',  w:'3 days ago', go:'training',    unread:0}
@@ -3729,24 +3915,34 @@ function shell(v){
          document reference. (No backticks in a comment inside a template
          literal, either — they end the string.) -->
     <button class="shell-logo" data-go="dashboard" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
-    ${/* THE ROLE LABEL SITS ON THE LEFT, and it is here rather than in
-          `.shell-right` because at desktop this bar has nothing else on its
-          left: `.shell-logo` is `display:none` at that width, so the row was
-          a 72px nav toggle and then 1130px of white before the bell. Read at
-          1440 the whole bar looked right-aligned by accident.
+    ${/* THE BREADCRUMB TRAIL TAKES THE SLOT THE ROLE LABEL HAD — §78, and both
+          halves of that change land here (Maryam, 2 Sep 2026: "we are not using
+          headings or insights on our new ui look. please follow the structure of
+          candidate and cohort portal").
 
-          THE COMPONENT IS UNTOUCHED — same `.shell-name` span, same string,
-          same rules out of the design system (`display:none` below 900px,
-          `display:block` at 13px/500 above it). This is a DOM move, not a
-          restyle, so nothing has to be overridden locally and the mobile bar
-          is bit-for-bit what it was.
+          WHAT WAS HERE: `<span class="shell-name">Talent agent · E2 – B1</span>`,
+          the agent's role and range. It was moved to the left in the first place
+          because at desktop `.shell-logo` is `display:none`, so the row was a
+          72px nav toggle and then 1130px of white before the bell — read at 1440
+          the whole bar looked right-aligned by accident. `.crumb-bar` fills that
+          slot properly: it is `flex:1 1 auto`, so it takes the slack the label
+          was standing in rather than sitting in it.
 
-          It lands after the logo rather than before it on purpose: at widths
-          where `.shell-logo` DOES paint, the lockup still reads first and the
-          label follows it, which is the order the other two portals use.
+          THE SWAP IS ALSO WHY THE ROLE LINE IS NOT LOST. It said two things —
+          which role this is, and the range — and both are on the page an agent
+          opens to check them: Profile's roles block names the role, and Standing
+          states the range in its own fact row. What the bar carries now is where
+          you ARE, which nothing else on the screen was saying once §78 took the
+          in-page heading out.
+
+          IT SHIPS EMPTY AND A PASS FILLS IT, because `shell()` is evaluated
+          before `view()` — one string concatenation in `render()` — so the trail
+          cannot know the page's name at the moment the bar is built. `crumbBar`
+          is the `<nav>`/`<ol>` pair the candidate portal ships verbatim, and
+          `placeTopbar` at the foot of this file is the pass.
 
           A `${}` comment, not an HTML one — see the note below. */''}
-    <span class="shell-name">Talent agent${v.certified ? ` &middot; ${v.rangeShort}` : ''}</span>
+    ${crumbBar()}
     ${/* THE RIGHT-HAND END OF THE BAR IS THE ROW OF THINGS ABOUT YOU: your
           name, your bell, your face. It used to hold a Tal button, and that was
           wrong twice over.
@@ -3893,9 +4089,16 @@ const askWhere = view => {
 
 /* THE LINE IN THE TOP-RIGHT IS THE STAGE, IN ONE PHRASE. `hifi/` prints where
    the candidate is in their 90 days; the agent's equivalent is where they are in
-   being enabled, which is the same fact the stepper draws. */
-const askState = v => v.busy ? `Agent – ${v.level} · ${v.month} interviews this month`
-  : v.certified ? `Agent – ${v.level} · listed, nothing booked`
+   being enabled, which is the same fact the journey column draws.
+
+   IT LED ON `Agent – A2` AND NOW LEADS ON THE RANGE, which is the agent-level
+   concept coming out (see `A`'s note). The tier was doing the identifying work
+   in this line and the range does it better: what a reader wants from a
+   one-phrase state is what they are allowed to do and how much of it they have
+   done, and "Explorer E2 – Builder B1" is the first half of that where "A2" was
+   a label for it. `rangeShort`, because this is one line in a dock. */
+const askState = v => v.busy ? `Assesses ${v.rangeShort} · ${v.month} interviews this month`
+  : v.certified ? `Assesses ${v.rangeShort} · listed, nothing booked`
   : 'Approved, not yet certified';
 
 function askView(v){
@@ -4593,6 +4796,12 @@ window.addEventListener('hashchange', () => {
   if(!readHash()) return;
   S.nav = false; S.tal = false; S.notif = false;
   S.confirm = false; S.sheet = false; S.peek = false;
+  /* THE TRAIL RESETS, because a hash arrival has no path — the reader did not
+     press their way here, and §78's whole correction is that the trail is the
+     path you took. `trailParts` then puts the module in front of a sub-page on
+     its own, which is the honest one-crumb answer for a deep link. Left
+     standing, the stack would describe a journey that ended two pages ago. */
+  S.hist = [];
   render();
 });
 
@@ -4732,6 +4941,13 @@ device.addEventListener('click', e => {
     S.nav = false; S.tal = false; S.notif = false; S.read = []; S.peek = false;
     S.thread = []; S.typing = false; S.askFrom = 'dashboard';
     S.confirm = false; S.sheet = false;
+    /* THE TRAIL GOES WITH THE THREAD AND THE READ-LIST, for the reason those
+       two are cleared here: a stage is a different snapshot of the product, so
+       a path walked through the last one names pages that were about other
+       figures. It also lands on the dashboard, which is a rail root and would
+       have emptied the stack anyway had this gone through the `data-go`
+       branch. Stated rather than relied on. */
+    S.hist = [];
     return render();
   }
 
@@ -4795,6 +5011,34 @@ device.addEventListener('click', e => {
        count honest. Marking before the navigation, because `render()` below
        reprints the badge. */
     if(d.read && !S.read.includes(d.read)) S.read.push(d.read);
+    /* THE BACK STACK IS WRITTEN HERE, BEFORE THE VIEW CHANGES — §78, and this
+       is the file's only `push` site.
+
+       THE LABEL IS READ OFF THE PAGE THAT IS STILL ON SCREEN, which is the
+       whole reason it is captured at this moment rather than reconstructed
+       later: `pageLabel` can see the `<h1>` of the page being LEFT, and after
+       `render()` that page is gone. It is also why the stack holds a string
+       instead of a key — see `S.hist`'s note for the bug that forces it.
+
+       A RAIL ITEM STARTS AGAIN. `NAVSETS[nav]` is the test rather than a list
+       of names, so the rule follows the rail: a module empties the stack, and
+       everything else deepens it. `profile` is deliberately NOT exempt even
+       though it is reached from the avatar — arriving there from Standing is a
+       path worth being able to walk back.
+
+       AND IT DOES NOT PUSH A PAGE ONTO ITSELF. Pressing a `data-go` for the
+       view already showing happens on the logo (`data-go="dashboard"` from the
+       dashboard) and on the trail's own last crumb if it ever became a link;
+       a duplicate entry there would put the same word in the trail twice. */
+    if(d.go !== S.view){
+      const root = NAVSETS[f().nav].some(([k]) => k === d.go);
+      if(root) S.hist = [];
+      else {
+        const page = device.querySelector('.page');
+        const label = page ? pageLabel(page) : null;
+        S.hist.push({view: S.view, label});
+      }
+    }
     S.view = d.go; S.nav = false; S.notif = false; S.tal = false; S.typing = false;
     if(d.go === 'interviews') S.tab = 'next';
     render();
@@ -4896,6 +5140,157 @@ window.addEventListener('resize', fitFrame);
    entrance cascade and `MO.key` are both stamped by that render, so restoring
    the page afterwards would replay the animation and count the restore as a
    navigation. */
+/* ==========================================================================
+   THE TOP BAR — §78, ported whole, and it is the LAST thing in this file
+
+   Maryam, 2 Sep 2026: "we are not using headings or insights on our new ui
+   look. please follow the structure of candidate and cohort portal for seeing
+   the latest ui implementation." Three changes and they are one: the page's
+   name moves into the bar as a breadcrumb, the in-page `<h1>` is removed, and
+   the `&middot;` fact row under it is not drawn (`phSub`, above).
+
+   IT IS A PASS AND NOT PART OF `render()` FOR THE REASON §78 GIVES: `shell()`
+   is evaluated before `view()` — one string concatenation — so the bar is built
+   before the page's name exists. The header ships an empty `.crumb-trail` and
+   this fills it.
+
+   AND IT IS THE LAST STATEMENT IN THE FILE, per CLAUDE.md's trap 8. The boot
+   render is below, and a wrapper installed after it would leave the first paint
+   without a trail and with its heading still on the page — visible for exactly
+   one paint, which is the kind of flicker that reads as a broken load. So the
+   wrapper is installed here and `render()` below is the first call through it.
+   ========================================================================== */
+
+/* THE PAGE'S NAME, IN PRIORITY ORDER, AND THERE ARE THREE SOURCES.
+
+   1. A MODULE IS ITS RAIL LABEL, NEVER ITS HEADING. Every rail root on this
+      portal had a heading that is the wrong crumb: the dashboard's was a
+      greeting, and "Interviews" / "Your standing" are the plural and the
+      possessive of words the rail already states. `parentOf` is what makes the
+      test "is this a module", so a sub-page falls through.
+   2. THE `<h1>`, for a sub-page. This is the one that earns the ordering:
+      `V.interview`'s heading is the candidate's name, which is exactly what the
+      crumb should say and is already written in the view. Nothing here composes
+      a label out of the button that was pressed — the destination names itself.
+   3. THE MODULE, for a sub-page whose own heading is missing.
+
+   There is no fourth. A view nothing can name returns null and is dropped
+   rather than printed as a key. */
+function pageLabel(page){
+  const mod = crumbMod();
+  if(!parentOf(S.view, f().nav) && mod) return mod[0];
+  const h = page.querySelector('.ph h1');
+  const title = h ? h.textContent.trim() : '';
+  if(title) return title;
+  return mod ? mod[0] : null;
+}
+
+/* THE TRAIL IS `S.hist` PLUS THE PAGE YOU ARE ON. Every entry but the last is
+   a `data-go`, which is this file's one navigation attribute — so the trail
+   needs no branch in the router and inherits the rail-resets-the-stack rule
+   for free.
+
+   A DEEP LINK HAS NO PATH, so a sub-page loaded straight from the hash gets its
+   module put in front of it. Without that, `#working/interview` opens with a
+   one-crumb trail reading "Rafael Ortiz", which says nothing about where that
+   sits. Only when the stack is empty: the moment there IS a path, the path is
+   the answer, and prepending a module would put a crumb in the trail the reader
+   never pressed. */
+function trailParts(page){
+  const out = S.hist
+    .map(h => ({label: h.label || (crumbMod(h.view) || [])[0], go: h.view}))
+    .filter(p => p.label);
+
+  if(!out.length && parentOf(S.view, f().nav)){
+    const m = crumbMod();
+    if(m) out.push({label: m[0], go: m[1]});
+  }
+
+  const label = pageLabel(page);
+  if(label) out.push({label});
+  return out;
+}
+
+/* THE LAST CRUMB IS NOT A LINK, because it is the page you are on. The
+   separator is a 12px chevron drawn as a real `<svg>` rather than
+   `content:'/'` — a `content` glyph would come from the stand-in face, which
+   carries 68 glyphs and not that one (§64 records the identical problem with an
+   arrow), and there is ONE call site here so the official mark goes in
+   directly. `aria-hidden` on it, so a screen reader is not read a chevron
+   between every pair of crumbs. */
+function drawTrail(trail, parts){
+  const sep = `<span class="crumb-sep" aria-hidden="true">${I.chevRight}</span>`;
+  trail.innerHTML = parts.map((p, i) => {
+    const now = i === parts.length - 1;
+    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${i ? sep : ''}${now
+      ? `<span class="crumb-l" aria-current="page">${p.label}</span>`
+      : `<a class="crumb-l" data-go="${p.go}">${p.label}</a>`}</li>`;
+  }).join('');
+}
+
+/* THE HEADING IS REMOVED UNCONDITIONALLY, and it is read one line before it is
+   removed — `pageLabel` inside `trailParts` is its only reader. It goes even on
+   a page whose name came from the rail rather than from the heading: leaving it
+   where the trail happened not to need it would put "Interviews" back above
+   three pages and not the others. */
+function stripPageHead(page){
+  const h = page.querySelector('.ph h1');
+  if(h) h.remove();
+}
+
+/* WHAT IS LEFT OF THE `.ph`, AND IT IS HIDDEN RATHER THAN REMOVED. With the
+   heading out and `phSub` drawing nothing, most pages' header is an empty flex
+   box still paying its margins — 24px of white between the band's top and Tal's
+   card. §56 and §70 place the band's members with `:has()` gates, and `:has()`
+   is structural, so a `display:none` element still satisfies every one of them
+   at no cost in space; removing it would change which of §70's two grid
+   arrangements the band gets on pages this has no business moving.
+
+   THE BACK ARROW COUNTS AS CONTENT. On a sub-page reached from a row it is the
+   only way back that is not the trail itself, so `.ph-top` survives when it
+   still holds one and the `.ph` with it.
+
+   `.ph-backonly` IS THE OTHER HALF, and it is a class rather than a `:has()`
+   because the test is "this and NOTHING else" — §10 gives the `.ph` 40px of top
+   padding and 32 of bottom, measured for a 26px title with a row under it, so a
+   lone 40px control was paying a title's separation. A pass that has just
+   finished removing the other children is the one thing that knows the count. */
+function tidyPh(page){
+  const ph = page.querySelector('.ph');
+  if(!ph) return;
+  const top = ph.querySelector('.ph-top');
+  if(top && !top.firstElementChild) top.remove();
+  const main = ph.querySelector('.ph-main');
+  if(main && !main.firstElementChild) main.remove();
+  ph.classList.toggle('ph-bare', !ph.firstElementChild);
+  ph.classList.toggle('ph-backonly',
+    !!ph.querySelector('.ph-back') &&
+    ph.querySelectorAll('.ph-main > *, .ph > *:not(.ph-main)').length === 1 &&
+    ph.querySelectorAll('.ph-top > *').length === 1);
+}
+
+/* THE SIGN-IN SCREENS REACH NEITHER BRANCH, and bailing on whichever half is
+   missing is what covers them: `signinShell` draws no `.crumb-trail`, so the
+   first lookup returns null and the pass returns before it can strip an `<h1>`
+   those five screens genuinely need — they have no bar to move it to and no Tal
+   card to carry the sentence under it. */
+function placeTopbar(){
+  const trail = device.querySelector('.shell .crumb-trail');
+  const page  = device.querySelector('.page');
+  if(!trail || !page) return;
+
+  const parts = trailParts(page);
+  stripPageHead(page);
+  drawTrail(trail, parts);
+  tidyPh(page);
+}
+
+const _baseTop = render;
+render = function(){
+  _baseTop();
+  try { placeTopbar(); } catch(e){ console.warn('topbar', e); }
+};
+
 readHash();
 render();
 fitFrame();

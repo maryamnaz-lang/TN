@@ -291,7 +291,6 @@
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
     column-gap:var(--s08);align-items:end}
-  .app .lead-b .lead-eb,
   .app .lead-b .lead-t,
   .app .lead-b .lead-tags,
   .app .lead-b .lead-ok{grid-column:1}
@@ -316,13 +315,17 @@
      own `align-items`, which is within a pixel of where the span already drew
      it: the button was already reading as being on the chip row.
 
-     ROW 4 IS COUNTED: column 1 auto-places the eyebrow (1), the title (2), the
-     tags (4) and `.lead-ok` (5) once the request is sent, with the spanning
-     description taking row 3. A fifth member above the tags moves this number,
-     which is the price of an explicit row and the reason it is written down. */
+     ROW 3 IS COUNTED, AND IT WAS 4 UNTIL THE EYEBROW WENT (2 Sep 2026 —
+     "remove the 'Give back & grow' text from black card"). Column 1 now
+     auto-places the title (1), the tags (3) and `.lead-ok` (4) once the request
+     is sent, with the spanning description taking row 2. THIS IS THE COST THE
+     PREVIOUS VERSION OF THIS NOTE PREDICTED — "a fifth member above the tags
+     moves this number" — arriving as a member REMOVED rather than added, which
+     moves it the other way. The tell is a button one row below the chips it is
+     meant to sit level with; §16 carries the same pair. */
   .app .lead-b .lead-x{grid-column:1 / -1}
   .app .lead-b .lead-a{
-    grid-column:2;grid-row:4;
+    grid-column:2;grid-row:3;
     margin-top:0;justify-self:end;align-self:end}
 }
 

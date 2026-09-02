@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=ef88c7b6">
+<link rel="stylesheet" href="talentnext-ds.css?b=fa1f7a38">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=ef88c7b6"></script>
+<script src="talentnext-ds.js?b=fa1f7a38"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -1108,7 +1108,7 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
       </div>
     </div>
   `)}
-  ${ex('A call row, and its two priorities', 'What this system draws for <b>an appointment with a person in it</b> — a countdown, who is running it, and the two things to do about it — and it is the light answer to the same question <code>.plate</code> answers loudly. Read §59\'s argument first: the black card plus the warm haze is the loudest object here and it is spent on something time-sensitive. A weekly call two days out is not, so the plate was drawing its quiet state almost always. The row moves that priority off the whole card and onto <b>the one cell that states the time</b>: grey outside the day, <code>.urgent</code> and the accent inside it. <b>Everything else about the two states is identical</b> — same paddings, same portrait, same two 185×40 buttons — so add <code>.urgent</code> and nothing else, and write any new rule against the tokens rather than against the state. <b>The row does not know where it is, and that is the point</b> — <code>.crow</code> is the bare component and the caller wraps it. Wrap it in <code>.sec.head-sec.head-col.sec-call</code> and it is collected into the head band as a third member spanning both columns; wrap it in a plain <code>.sec</code> and it is an ordinary block in the page body, which is what a page whose second column is already spoken for wants. Same markup either way. Five things the CSS will not tell you. <b>The countdown cell is a fixed 182 and full-bleed on the left</b>: it is a ground, and a ground that stops short of the frame is a card; as a <i>minimum</i> width it takes its max-content and the caption stops wrapping to the two centred lines it wants. <b>The portrait is a 78px square, not <code>avatar()</code></b> — that helper writes its size inline and draws a disc. <b><code>.crow-who</code> carries <code>flex:1 1 300px</code></b>, and that basis is the whole of how the row behaves: wide, the three sit on one line and the leader grows into the slack; narrow, the actions wrap to a line of their own held right, and nothing is ever crushed. And <b>the quiet button keeps its border here</b>, which reverses §64 on this one row — beside a filled accent button, a button with no edge reads as a caption that happens to be clickable. <code>dsCallUrgent(row)</code> picks the state from the words and <code>dsCallLeft(when)</code> words the countdown both ways.', `
+  ${ex('A call row, and its two priorities', 'What this system draws for <b>an appointment with a person in it</b> — a countdown, who is running it, and the two things to do about it — and it is the light answer to the same question <code>.plate</code> answers loudly. Read §59\'s argument first: the black card plus the warm haze is the loudest object here and it is spent on something time-sensitive. A weekly call two days out is not, so the plate was drawing its quiet state almost always. The row moves that priority off the whole card and onto <b>the one cell that states the time</b>: grey outside the day, <code>.urgent</code> and the accent inside it. <b>Everything else about the two states is identical</b> — same paddings, same portrait, same two 185×40 buttons — so add <code>.urgent</code> and nothing else, and write any new rule against the tokens rather than against the state. <b>The row does not know where it is, and that is the point</b> — <code>.crow</code> is the bare component and the caller wraps it. Wrap it in <code>.sec.head-sec.head-col.sec-call</code> and it is collected into the head band as a third member spanning both columns; wrap it in a plain <code>.sec</code> and it is an ordinary block in the page body, which is what a page whose second column is already spoken for wants. Same markup either way. Five things the CSS will not tell you. <b>The countdown cell is a fixed 182 and full-bleed on the left</b>: it is a ground, and a ground that stops short of the frame is a card; as a <i>minimum</i> width it takes its max-content and the caption stops wrapping to the two centred lines it wants. <b>The portrait is a 78px box, not <code>avatar()</code></b> — that helper writes its size inline (trap 1), which is unanswerable from a layer; both are discs since §106. <b>Give it <code>.crow-cover</code> when the mark is artwork rather than a face</b> and it becomes a 9:5 rectangle and stays square-cornered, which is what a cohort&rsquo;s title card needs. <b><code>.crow-who</code> carries <code>flex:1 1 300px</code></b>, and that basis is the whole of how the row behaves: wide, the three sit on one line and the leader grows into the slack; narrow, the actions wrap to a line of their own held right, and nothing is ever crushed. And <b>the quiet button keeps its border here</b>, which reverses §64 on this one row — beside a filled accent button, a button with no edge reads as a caption that happens to be clickable. <code>dsCallUrgent(row)</code> picks the state from the words and <code>dsCallLeft(when)</code> words the countdown both ways.', `
     <div class="crow">
       <div class="crow-when">
         <b>2 days left</b>
@@ -1538,7 +1538,7 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
       </div>
     </div>
   `)}
-  ${ex('People', 'The avatar is square, because radius 0 travels everywhere.', `
+  ${ex('People', 'The avatar is a <b>disc</b>, and it is one of only two things in this system that curve. <code>--radius</code> is <code>0px</code> by token — a card, a chip, a field and a panel are all square — and §56 grants the exception to <b>marks</b>: the journey&rsquo;s step discs, and a photograph of a person. §106 states it once on <code>.av-ph</code>, <code>.av</code> and <code>.mem-av</code>, so every face in every portal is round with nothing to add at the call site. <b>Artwork is not a face</b> — the award WebPs, the certificates, the cohort covers and the wordmark all stay square, and the cohort cover is 9:5 for a stated reason (a circle would crop the line of type that is the whole subject of the picture).', `
     <div class="tile-stack">
       <div class="mem"><span class="av mem-av">MN</span>
         <span class="mem-b"><span class="mem-n">Maryam Naz</span>

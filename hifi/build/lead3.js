@@ -132,38 +132,34 @@ V.leadCalls = () => {
           <span class="cardrow-t">${lcTitle(k)}</span>
           <span class="cardrow-d">${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${lcDetail(k)}</span>
         </span>
-        ${''/* RESCHEDULE, NOT BRIEF, AND IT IS A SECONDARY (Maryam, 1 Sep 2026:
-               "instead of brief, give a reschedule button, a secondary button,
-               not in black color, just a black text with reschedule icon on its
-               left").
+        ${''/* THE ROW HAS NO ACTION, AND THAT IS THE POINT (Maryam, 2 Sep 2026:
+               "a cohort leader can not reschedule a weekly call so remove that
+               flow"). It carried Reschedule for one day — `.btn-t btn-sm ic-l`
+               with `I.calendar`, opening lead4's weekly-calls sheet — and the
+               whole flow is deleted with it: the sheet, `S.ldrAvail`, the
+               `data-ldravail` handler and the Profile row's Manage control.
 
-               `.btn-t` IS THE BLACK-TEXT BUTTON. §64 took the border off
-               `.btn-s` / `.btn-t` / `.btn-g` and left the ink at
-               `--text-primary`, so a text button on a page IS black words —
-               and §64's arrow does NOT arrive, because its own test is
-               `:not(:has(svg))` and this one carries a mark. `ic-l` is what
-               seats that mark on the LEFT; without it the icon is pushed to
-               the far edge.
+               THE ASK IS ABOUT AUTHORITY, NOT ABOUT A BUTTON. A weekly cohort
+               call is the PROGRAMME's — ten candidates, a fixed hour, thirteen
+               weeks — and the sheet said so itself in its own helper line:
+               "moving one moves it for every candidate in that cohort". That is
+               not a leader's decision to make from a diary row, so there is
+               nothing for a control here to open. This is the same correction
+               as 1 Sep's "a cohort leader does not interview anybody", one
+               surface smaller: the portal keeps drifting toward giving this
+               person an agent's powers.
 
-               THE MARK IS `I.calendar`, WHICH IS WHAT RESCHEDULE ALREADY WEARS.
-               `CALL_ROW.iv`'s own Reschedule (views.js) is `ic:I.calendar`, so
-               this is one word with one mark across both portals rather than a
-               second glyph for the same verb. `I.renew` was the alternative and
-               reads better in isolation — circular arrows say "move it" — but a
-               product where Reschedule is a calendar on one page and arrows on
-               another is the drift `stepIcon`'s table exists to prevent.
+               SO THE ROW IS A FACT, and a diary you read is a legitimate page —
+               `.cardrow` with no `.cardrow-a` is the shape §02 already draws
+               for one. What a leader DOES on this page is at the top of it, on
+               the black card: "Generate the brief".
 
-               IT OPENS THE WEEKLY-CALLS SHEET, which is the surface that
-               actually moves a call: `data-ldravail` (lead4), mounted on every
-               leader page by `placeLdrSheets`. Pointing it at the brief sheet
-               would have been a button lying about what it does, and leaving it
-               inert would be §60's "a dead control on a live surface is worse
-               than a missing one". THE BRIEF IS NOT LOST — it is the black
-               card's own action at the top of this page, and the cohort page
-               has it twice. */}
-        <span class="cardrow-a">
-          <button class="btn btn-t btn-sm ic-l" data-ldravail="1">${I.calendar}Reschedule</button>
-        </span>
+               THE CANDIDATE'S RESCHEDULE IS UNTOUCHED. `CALL_ROW.iv`'s control
+               moves an INTERVIEW the candidate booked and paid for with an
+               agent who sets their own availability, which is a different
+               appointment with a different owner. It keeps `I.calendar`, so the
+               one-word-one-mark rule this note used to make is still true —
+               there is simply one caller now instead of two. */}
       </div>`).join('')}
     </div>` : `<div class="empty" style="border:0">${I.calendar}
       <h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}

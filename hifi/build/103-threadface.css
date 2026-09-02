@@ -27,6 +27,11 @@
    be maintained. `.app .m-av .av-ph` is (0,3,0) against §09.7's (0,1,0).
 
    NOT ONE font-size, font-weight, text-transform OR text colour.
+
+   BOTH SELECTORS ARE DELETED (§106, 2 Sep 2026). Everything above is the
+   argument §106 generalises — a face beside a line of speech is a mark, and a
+   literal `999px` rather than a re-pointed token — and it now applies to every
+   photograph in all three portals rather than to this thread's two. Keying on
+   the wrapper "so no page scope has to be maintained" was the right instinct
+   and the component is one level better than the wrapper.
    ========================================================================== */
-.app .m-av .av-ph,
-.app .mhead-av .av-ph{border-radius:999px}

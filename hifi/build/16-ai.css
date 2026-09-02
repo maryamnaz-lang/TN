@@ -589,9 +589,13 @@
   background-color:var(--surface-2);
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
   padding:var(--s06) var(--pad-x)}
-.app .lead-eb{
-  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--text-helper)}
+/* `.lead-eb`'s TYPE RULE IS DELETED — the card lost its eyebrow on 2 Sep 2026
+   ("remove the 'Give back & grow' text from black card") and this was its only
+   ranking outside §63 §4's list. The rank it held is worth keeping in words: an
+   eyebrow in this build is 11/15 in Kräftig with .8px of tracking, and it was
+   the ONE rule left in the product still asking for `text-transform:uppercase`
+   on a class §63 §2 had already switched off — so it had been a dead
+   declaration inside a live rule for as long as §63 has existed. */
 .app .lead-t{
   margin-top:var(--s03);
   font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
@@ -629,7 +633,7 @@
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
     column-gap:var(--s08);align-items:start}
-  .app .lead-eb,.app .lead-t,.app .lead-tags,.app .lead-ok{grid-column:1}
+  .app .lead-t,.app .lead-tags,.app .lead-ok{grid-column:1}
   /* AND THE DESCRIPTION SPANS BOTH COLUMNS — the other half of "this desc
      should have full width" (Maryam, 2 Sep 2026). Taking §16's and §28's
      `max-width:72ch` off gave it its COLUMN, which is the card less the action
@@ -657,7 +661,12 @@
      build and did nothing at all, which is the tell for a rule that lost rather
      than a rule that is wrong. Change both. */
   .app .lead-x{grid-column:1 / -1}
-  .app .lead-a{grid-column:2;grid-row:4;margin-top:0;justify-self:end;align-self:center}
+  /* ROW 3, NOT 4 — THE EYEBROW WENT AND THE ROWS SHIFTED (2 Sep 2026). This is
+     the price of an explicit row that the note above named in advance: column 1
+     auto-places the title (1), the tags (3) and `.lead-ok` (4) once the request
+     is sent, with the spanning description taking row 2. Left at 4 the button
+     dropped a row below the chips it is supposed to sit level with. */
+  .app .lead-a{grid-column:2;grid-row:3;margin-top:0;justify-self:end;align-self:center}
 }
 
 /* deleting an account is the one destructive action in the product */

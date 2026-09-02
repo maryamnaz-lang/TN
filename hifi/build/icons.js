@@ -338,7 +338,23 @@ warningAlt:'M109-120q-11 0-20-5.5T75-140q-5-9-5.5-19.5T75-180l370-640q6-10 15.5-
 stopFilled:'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z',
 skill:'m434-410 4 32q1 8 6.5 13t13.5 5h44q8 0 13.5-5t6.5-13l4-32q8-3 14.5-7t11.5-9l30 13q7 3 14 1t11-9l22-38q4-7 2.5-14t-7.5-12l-26-19q2-8 2-16t-2-16l26-19q6-5 7.5-12t-2.5-14l-22-38q-4-7-11-9t-14 1l-30 13q-5-5-11.5-9t-14.5-7l-4-32q-1-8-6.5-13t-13.5-5h-44q-8 0-13.5 5t-6.5 13l-4 32q-8 3-14.5 7t-11.5 9l-30-13q-7-3-14-1t-11 9l-22 38q-4 7-2.5 14t7.5 12l26 19q-2 8-2 16t2 16l-26 19q-6 5-7.5 12t2.5 14l22 38q4 7 11 9t14-1l30-13q5 5 11.5 9t14.5 7Zm46-50q-25 0-42.5-17.5T420-520q0-25 17.5-42.5T480-580q25 0 42.5 17.5T540-520q0 25-17.5 42.5T480-460ZM240-252q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v40q0 17-11.5 28.5T560-80q-17 0-28.5-11.5T520-120v-80q0-17 11.5-28.5T560-240h120v-160q0-17 11.5-28.5T720-440h68l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v168q0 17-11.5 28.5T280-80q-17 0-28.5-11.5T240-120v-132Zm254-188Z',
 growth:'M108-255q-12-12-11.5-28.5T108-311l211-214q23-23 57-23t57 23l103 104 208-206h-64q-17 0-28.5-11.5T640-667q0-17 11.5-28.5T680-707h160q17 0 28.5 11.5T880-667v160q0 17-11.5 28.5T840-467q-17 0-28.5-11.5T800-507v-64L593-364q-23 23-57 23t-57-23L376-467 164-255q-11 11-28 11t-28-11Z',
-creditCard:'M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720Zm-720 80h640v-80H160v80Zm0 160v240h640v-240H160Zm0 240v-480 480Z'
+creditCard:'M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720Zm-720 80h640v-80H160v80Zm0 160v240h640v-240H160Zm0 240v-480 480Z',
+/* THE BIN — `delete`, and it is the set's outline cut like everything else
+   here: Material Symbols Rounded at FILL 0, on the `0 -960 960 960` grid
+   (trap 7 — a Symbols path in a `0 0 24 24` box renders as an invisible speck
+   in the corner and nothing throws).
+
+   FILL 0 IS NOT A PREFERENCE HERE, IT IS THE RULE. The four filled marks in
+   this file are filled to convey STATE — `star` against `starOutline`,
+   `checkFilled` against `checkOutline` — and a bin has no unfilled twin in the
+   product to be distinguished from. It is a subject mark for one verb.
+
+   ADDED 2 Sep 2026 for the saved-card row's Remove control, which is the first
+   place the product deletes one of several things rather than the whole
+   account. `V.account`'s "Delete my account" wears `misuse` — a circle-slash,
+   which is the right mark for ending something that cannot be re-created and
+   the wrong one for taking one card off a list of three. */
+delete:'M280-120q-33 0-56.5-23.5T200-200v-520h-40q-17 0-28.5-11.5T120-760q0-17 11.5-28.5T160-800h160v-40q0-17 11.5-28.5T360-880h240q17 0 28.5 11.5T640-840v40h160q17 0 28.5 11.5T840-760q0 17-11.5 28.5T800-720h-40v520q0 33-23.5 56.5T680-120H280Zm0-600v520h400v-520H280Zm80 400q0 17 11.5 28.5T400-280q17 0 28.5-11.5T440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280Zm160 0q0 17 11.5 28.5T560-280q17 0 28.5-11.5T600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280ZM280-720v520-520Z'
 };
 /* Chevron — the brand's own mark, not a Material icon. Used for the
    Explorer / Builder / Trailblazer signature and as a section device. */

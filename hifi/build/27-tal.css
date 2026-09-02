@@ -102,8 +102,14 @@
   display:flex;align-items:center;gap:8px;flex:none}
 .app .tal-panel .tal-msg .tal-who-n{
   font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
-.app .tal-panel .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
-.app .tal-panel .tal-msg.me .av img{width:100%;height:100%;object-fit:cover;border-radius:0}
+/* SQUARED AND UNROUNDED WITH THE ASK PAGE'S COPY (§106, 2 Sep 2026). The panel
+   is `display:none` at the foot of this layer, so nothing here is on screen —
+   changed anyway, because the note over the second copy is that these are "the
+   same selector list with a second scope rather than a second design; if one
+   changes, both do", and a dead half that has drifted is how a re-enabled
+   surface ships wrong. */
+.app .tal-panel .tal-msg.me .av{width:36px;height:36px;flex:none}
+.app .tal-panel .tal-msg.me .av img{width:100%;height:100%;object-fit:cover}
 
 /* WHAT TAL SAYS IS A CARD, WHAT YOU SAID IS A BUBBLE. The file gives Tal a
    white panel with a hairline round it and 17 of padding — it holds answers
@@ -276,9 +282,16 @@
   display:flex;align-items:center;gap:8px;flex:none}
 .app .ask-thread .tal-msg .tal-who-n{
   font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
-.app .ask-thread .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
+/* THE BOX IS SQUARE AND THE `border-radius:0` IS GONE (2 Sep 2026). §106 makes
+   every photograph of a person a disc, and this is one — `talMsg` puts your own
+   face here. It is answered at source rather than out-weighted from §106
+   because of the two halves it got wrong when it was written against a square:
+   the (0,4,0) selector, which nothing at the component's weight can reach, and
+   the 35×37 BOX, which a `999px` would have drawn as an ellipse. 36 is the
+   nearest square and the size every other icon-scale mark in this thread is. */
+.app .ask-thread .tal-msg.me .av{width:36px;height:36px;flex:none}
 .app .ask-thread .tal-msg.me .av img{
-  width:100%;height:100%;object-fit:cover;border-radius:0}
+  width:100%;height:100%;object-fit:cover}
 
 /* Tal answers in a card, you speak in a block. On a page the column is
    wider than the panel's 556, so the two widths are stated as a share of

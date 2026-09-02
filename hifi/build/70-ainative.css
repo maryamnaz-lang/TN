@@ -101,6 +101,18 @@
      which is Figma's way of saying "a ground on a text run". */
   --ai-hl-bg:rgba(244,113,19,.05);
 
+  /* AND THE SAME WASH IN THE POPOVER'S BLUE — the lead-in on `.sd-read`
+     ("What it measured:", "What happens in it:"). §63 §10a is the ink and the
+     argument; this is its ground, at the same 5% of the same hue, so the two
+     highlights are one treatment in two colours rather than two treatments.
+
+     IT IS ITS OWN TOKEN AND NOT A `color-mix` OF `--link`, for §83's sake:
+     `--ai-hl-bg` is re-pointed for the red-accent demo, and this one must NOT
+     be. The lead-in is blue precisely because it is not the accent (§63 §10a),
+     so a demo that turns the accent red has no business turning this. A
+     literal is what makes that immovable. */
+  --sd-hl-bg:rgba(4,136,197,.05);
+
   /* THE FOUR-POINT STAR — 581:6669 / 584:6691, the file's own path rather than
      §12's `--tal-star`. The two are both four-point stars and they are not the
      same drawing: §12's is four straight triangles meeting at the centre, and
@@ -321,6 +333,34 @@
   border-radius:4px;
   padding:1px 4px;margin:0 -1px;
   -webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* THE POPOVER'S LEAD-IN TAKES THE BLUE WASH, AND IT IS THE RULE ABOVE THAT
+   MADE IT ORANGE (Maryam, 2 Sep 2026: "for all the popovers, i need you to use
+   blue color for the inner paragraph highlight").
+
+   THE CARD IS APPENDED INTO `.ai-body` — `placeSumDrop` puts it there so it can
+   be positioned against the ghost — and `.sd-read` is a `<p>`. So the selector
+   above, written for the three accent phrases in Tal's SENTENCE, reaches the
+   `<b>` inside the card as well: same `.ai-body`, same `p`, same `b`. It has
+   been painting that lead-in orange on its own ground since the day the card
+   shipped, and §63 §10a's `#0488c5` at (0,3,1) lost to it silently — a stated
+   colour that never once rendered. §63's note says in as many words that the
+   lead-in "is `--link`, NOT the accent… the accent is Tal's own voice all over
+   this band, so a second accent phrase inside a card that IS Tal talking says
+   nothing", which is the argument for the fix as well as for the intent.
+
+   ONLY `background-color` IS RESTATED. The radius, the padding and the
+   `box-decoration-break` above are right for this label too — it is the same
+   shape of highlight in a different hue, which is what was asked for — so they
+   are left to inherit rather than copied. §63 §10a states the ink at the same
+   weight, and the pair is the whole change.
+
+   (0,7,1) BEATS BOTH THINGS THAT COULD TAKE IT BACK: the rule above at (0,5,2),
+   and §83.4's red-demo ink at (0,6,2). Seven classes outrank six whatever the
+   element count, which is what keeps the lead-in blue on the one stage where
+   every accent in the product turns red. */
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{
+  background-color:var(--sd-hl-bg)}
 
 /* THE SENTENCE IS CAPPED AT THE FILE'S 733 — 581:6662, and at a LENGTH rather
    than at 79% of the column. §33.3 uncapped it deliberately ("a summary is two
@@ -1451,14 +1491,38 @@
    `V.booking` draw through `leaderCard`, where the row is still a flex row and
    the declaration is load-bearing.
 
-   THE CIRCLE IS ON `.av-ph` HERE AND NOWHERE ELSE. `--radius` is `0px` by
-   token and every avatar in the build is square; §56 grants the one curve
-   this system allows to MARKS, and a portrait introducing a person is that.
-   Scoped to `.sec-lead` so the nine other surfaces reading `.av-ph` — the
-   call row, the roster, the message list, `.ivrow` — are untouched.
+   THE CIRCLE WAS STATED HERE AND IS §106's NOW. It was scoped to `.sec-lead`
+   because every other avatar in the build was square; on 2 Sep 2026 every
+   photograph of a person became a disc, so the declaration came off this rule
+   rather than being repeated under it. The argument above is the one §106
+   generalises — a portrait introducing a person is a MARK, and §56 grants
+   marks the one curve this system allows.
+
+   AND `min-height:0` IS THE WHOLE OF WHY THIS DID NOT WORK FOR TWO DAYS.
+   Maryam had to ask twice ("the size of the cohort leader image should be
+   equal to the height of the right side content", 2 Sep 2026), and the reason
+   is one declaration four layers back: §02.229 gives `.row-lead` a
+   `min-height:64px`, which is right for a 64px row of face-plus-name and is
+   the row's height whatever it holds. So `height:100%` on the portrait was
+   perfectly correct AND resolved against 64 — the text cell is 43 (19 + 8 +
+   16, the two type roles and the gap between them), and the face came out 64
+   beside it, hanging 21px below the role line. Everything in the note above
+   was true and the box it measured was the wrong box.
+
+   ZEROED RATHER THAN RESTATED AS A NUMBER. The obvious fix is
+   `width:43px;height:43px` off the type tokens — §86's `--gcard-art-h` does
+   exactly that — and it is wrong here for the reason this rule exists at all:
+   43 is a number that changes every time the text cell does, which it has
+   twice already (the expertise line moved in and back out over two days and
+   the portrait sat at 48 through both). With the floor at 0 the row is its own
+   content and `height:100%` measures it, which is what the note above claims
+   and now what it does. Measured at 1280: row 43, portrait 43×43, text 43.
+
+   `align-items:stretch` IS WHAT CARRIES IT, and §3c's `align-self:flex-start`
+   on `.row-lead > .btn` is still why the 36px control does not stretch with it.
    ------------------------------------------------------------------------ */
 .app .sec-lead .row-lead{
   display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:stretch}
+  align-items:stretch;min-height:0}
 .app .sec-lead .row-lead > .av-ph{
-  width:auto;height:100%;aspect-ratio:1;border-radius:50%}
+  width:auto;height:100%;aspect-ratio:1}

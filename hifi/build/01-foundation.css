@@ -562,7 +562,27 @@ body{background:var(--surround);color:var(--text-primary);
     display:block;font-size:13px;font-weight:500;letter-spacing:.1px;
     color:var(--text-secondary);margin-right:var(--s02)}
   .main{padding:0 var(--s06)}
-  .page{padding-top:var(--s02)}
+  /* THE PAGE'S 4px OF TOP PADDING IS DELETED (Maryam, 2 Sep 2026: "there is a
+     gap above the first section component on all portals, can you please
+     remove this"). It was `padding-top:var(--s02)` at desktop only, and it is
+     the whole of that gap — measured 4px between the app bar's closing rule and
+     the first `.sec` on every module page of both portals.
+
+     4px OF WHITE IS NOT AIR, IT IS A SEAM. The first section on most pages is
+     the head band, which is a full-bleed tinted block: a hair of white between
+     the bar's rule and the start of the colour reads as a misalignment rather
+     than as space, which is exactly what §18's "a block with a ground of its
+     own is its own edge" says about every other join in the product.
+
+     §70.617 ALREADY MADE THIS CALL FOR THE PAGES IT COULD REACH —
+     `.app .page:has(> .modhead > .head-col){padding-top:0}`, the dashboards
+     whose band has a second column — so this is that decision generalised
+     rather than a new one. That rule is now saying what the base already says;
+     it is left where it is because its note carries the argument, and a
+     duplicate value is not the "gate nothing writes" case this repo deletes on.
+
+     NOTHING BELOW 900 CHANGES: the declaration only ever existed inside this
+     tier, so the phone and tablet have always had the sections flush. */
 }
 @container app (min-width:1200px){
   :root{--drawer-w:280px;--gutter:32px}

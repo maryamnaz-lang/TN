@@ -99,48 +99,49 @@
 }
 
 /* --------------------------------------------------------------------- 2 ---
-   TAL'S SPHERE — §50, all three sizes, one declaration
+   TAL'S SPHERE IS NOT DRAWN ANY MORE, AND THIS BLOCK USED TO PUT IT BACK
+   (Maryam, 31 Aug 2026: "use the tal blob we are using inside the chat on the
+   bottom tal bar as well, instead of this red gradient circle").
 
-   §33.6 (the 32px band mark), §40 (the 132px chat orb) and §40 again (the ask
-   dock's line mark) each state their own `background-image`, and §50 then
-   OVERRIDES all three with the sphere: a white specular highlight, a dark
-   underside, and the body gradient under both. Restating §50's three selectors
-   is therefore the whole of it — the three earlier rules never win.
+   WHAT WAS HERE. Three selectors restating §50's sphere in the trial's hue —
+   the 32px band mark, the ask dock's line mark and the 132px chat orb. It was
+   correct when it was written and it had already stopped being correct before
+   the hue moved, which is the thing worth understanding rather than just
+   deleting: §53 §7 retired the sphere from the whole platform and pointed
+   every one of those marks at `--tal-mark`, the supplied blob as an animated
+   WebP. §83 lands after §53, so it was reinstating a component the product no
+   longer draws, on one stage only.
 
-   ONLY THE BODY GRADIENT CHANGES. The two radials are white and black at low
-   alpha and are what make the disc read as a sphere at any hue; they are copied
-   unchanged rather than left out, because `background-image` is one property
-   and a partial restatement would drop the highlight.
+   THE FAILURE WAS INVISIBLE ON TWO OF THE THREE AND OBVIOUS ON THE OTHER, and
+   that is why it survived a build:
 
-   `#F6DC92 → #F47113 → #E85D0F` IS PALE GOLD → ORANGE → DEEP ORANGE, so the red
-   is pale red → pure red → deep red at the same three stops and the same
-   155deg. The sphere keeps its modelling; only its hue moves.
+     the band mark   §70.2a masks it to the ✦ sparkle, so both the ramp and
+                     the sphere came out as a rose sparkle. Cosmetically
+                     near-identical, structurally wrong — every other stage
+                     fills that mask with `--ai-grad`, which §83.1 already
+                     re-points, so the trial was drawing the one thing it did
+                     not need to draw.
+     the chat orb    `.ask-thread .tal-hero` NEVER MATCHED. The hero lives in
+                     `.ask-page`, so §53's blob was winning by default — which
+                     is exactly why the chat looked right and the dock did not,
+                     and is what let the two be compared side by side.
+     the dock mark   the one place the sphere actually reached, and the one
+                     the instruction names: a rose gradient disc on the bottom
+                     bar against the blob two clicks away in the chat.
 
-   THE SPECULAR HIGHLIGHT IS WHY THIS CANNOT BE A `filter:hue-rotate()`. That
-   was the cheap version and it is wrong twice: it would rotate the white
-   highlight and the black underside along with the body (they are achromatic,
-   so in practice it leaves them alone) AND it would rotate the CHEVRON, which
-   is Tal's mark rather than a colour. Restating the gradient changes exactly
-   the layer that is orange.
+   SO THE WHOLE BLOCK GOES, not just the dock's selector. Deleting one line
+   would fix the bar and leave a sphere on the band and a rule matching
+   nothing — the "gate nothing writes" tell this project deletes on sight.
+   With it gone all three marks fall through to §53 and the trial's Tal is the
+   same object as every other stage's, differing only where §83.1 moves the
+   ramp.
 
-   AND IT IS LIGHTER THAN A STRAIGHT LIGHTNESS MATCH — Maryam, 31 Aug 2026,
-   "lighten the shade of blob". The first cut mapped each orange stop to the red
-   at the SAME HSL lightness (#F6DC92 -> #FF8A8A, #F47113 -> #FF0000, #E85D0F ->
-   #C00000) and came out visibly heavier than the orange sphere it replaced,
-   which is the thing to understand rather than just correct: at equal lightness
-   red is far more SATURATED than orange, and saturation is what the eye reads
-   as weight on a 32px disc. Matching the number gave the wrong answer to the
-   question the number was standing in for. So each stop is lifted — a pale
-   pink top, a mid red where the pure red was, and a deep end that is no longer
-   near-black. The disc still reads as this trial's red; it no longer reads as
-   the heaviest object in the band. */
-.app.tmp-accent .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
-.app.tmp-accent .askdock .askline-mark .tal-mk::before,
-.app.tmp-accent .ask-thread .tal-hero .tal-mk.orb::before{
-  background-image:
-    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
-    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#FDC4CD 0%,#F9687F 50%,#E4445E 100%)}
+   THE BLOB STAYS WARM AND THAT IS ACCEPTED, not overlooked. `--tal-mark` is
+   FOOTAGE — a base64 WebP — so it cannot follow a token, and this file's
+   closing note already lists the artwork as the one thing the trial leaves
+   orange. The instruction points AT the chat's blob as the reference, so the
+   warm mark is what was asked for. If Tal ever has to be rose too, that is a
+   second encode in `build.py`, not a rule here. */
 
 /* -------------------------------------------------------------------- 2a ---
    THE TRAVELLING LIGHT ON THE ASK FIELD — and it is the one orange in the

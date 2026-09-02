@@ -314,7 +314,6 @@ body{background:var(--surround);color:var(--text-primary);
     display:block;font-size:13px;font-weight:500;letter-spacing:.1px;
     color:var(--text-secondary);margin-right:var(--s02)}
   .main{padding:0 var(--s06)}
-  .page{padding-top:var(--s02)}
 }
 @container app (min-width:1200px){
   :root{--drawer-w:280px;--gutter:32px}
@@ -2361,8 +2360,7 @@ button[data-toggle]:hover:where(.__nh),button[data-addcard]:hover:where(.__nh){b
 .tg{padding-right:0}
 .tg .tb{padding-right:var(--s04)}
 .idhead{display:flex;align-items:center;gap:var(--s05);margin-bottom:var(--s06)}
-.idphoto{position:relative;flex:none;display:block;border-radius:0}
-.idphoto .av-ph{border-radius:0}
+.idphoto{position:relative;flex:none;display:block}
 .idphoto-edit{
   position:absolute;right:0;bottom:0;z-index:2;width:26px;height:26px;
   display:grid;place-items:center;background:var(--brand-primary)}
@@ -2997,7 +2995,8 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   
   
   
-  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
+  
+  .app .page > .sec:has(+ .sec > .sec-h):not(:has(> .lead-b)):not(:has(> .signed)):not(:has(> .pf-tgs)):not(:has(> .pf-facts)):not(:has(+ .sec.tint)):not(:has(+ .sec.sec-rep)):not(:has(+ .sec-qa)):not(:has(+ .sec.dark-card)):not(.found):not(.sec-joined):not(.tint):not(.lead-bar)::after,
   .app .page > .sec:has(+ .sec > .eyebrow)::after,
   .app .page > .sec:has(+ .lvl-hero)::after,
   .app .page > .sec:has(+ .acc)::after,
@@ -4552,9 +4551,6 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   background-color:var(--surface-2);
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
   padding:var(--s06) var(--pad-x)}
-.app .lead-eb{
-  font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--text-helper)}
 .app .lead-t{
   margin-top:var(--s03);
   font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
@@ -4576,9 +4572,9 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
     column-gap:var(--s08);align-items:start}
-  .app .lead-eb,.app .lead-t,.app .lead-tags,.app .lead-ok{grid-column:1}
+  .app .lead-t,.app .lead-tags,.app .lead-ok{grid-column:1}
   .app .lead-x{grid-column:1 / -1}
-  .app .lead-a{grid-column:2;grid-row:4;margin-top:0;justify-self:end;align-self:center}
+  .app .lead-a{grid-column:2;grid-row:3;margin-top:0;justify-self:end;align-self:center}
 }
 .app .btn.danger{color:var(--danger-ink);border-color:var(--danger-ink)}
 .app .btn.danger svg,.app .btn.danger span svg{fill:var(--danger-ink)}
@@ -5876,8 +5872,8 @@ button.btn-p:active,
   display:flex;align-items:center;gap:8px;flex:none}
 .app .tal-panel .tal-msg .tal-who-n{
   font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
-.app .tal-panel .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
-.app .tal-panel .tal-msg.me .av img{width:100%;height:100%;object-fit:cover;border-radius:0}
+.app .tal-panel .tal-msg.me .av{width:36px;height:36px;flex:none}
+.app .tal-panel .tal-msg.me .av img{width:100%;height:100%;object-fit:cover}
 .app .tal-panel .tal-msg > .bb{
   max-width:305px;margin:0;
   padding:17px;background:var(--layer-01);
@@ -5939,9 +5935,9 @@ button.btn-p:active,
   display:flex;align-items:center;gap:8px;flex:none}
 .app .ask-thread .tal-msg .tal-who-n{
   font-size:13.5px;line-height:19px;font-weight:400;color:var(--text-secondary)}
-.app .ask-thread .tal-msg.me .av{width:35px;height:37px;flex:none;border-radius:0}
+.app .ask-thread .tal-msg.me .av{width:36px;height:36px;flex:none}
 .app .ask-thread .tal-msg.me .av img{
-  width:100%;height:100%;object-fit:cover;border-radius:0}
+  width:100%;height:100%;object-fit:cover}
 .app .ask-thread{align-items:stretch}
 .app .ask-thread .tal-msg > .bb{
   max-width:min(55%, 620px);margin:0;
@@ -6060,7 +6056,6 @@ button.btn-p:active,
   position:relative;display:block;
   background:var(--surface-dark);color:var(--on-dark);
   padding:var(--s08) var(--pad-x);margin:0;border:0}
-.app .lead-b .lead-eb{color:var(--on-dark-2)}
 .app .lead-b .lead-t{color:var(--on-dark)}
 .app .lead-b .lead-x{color:var(--on-dark-2)}
 .app .lead-b .lead-tags{margin-top:var(--s06)}
@@ -6132,13 +6127,12 @@ button.btn-p:active,
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
     column-gap:var(--s08);align-items:end}
-  .app .lead-b .lead-eb,
   .app .lead-b .lead-t,
   .app .lead-b .lead-tags,
   .app .lead-b .lead-ok{grid-column:1}
   .app .lead-b .lead-x{grid-column:1 / -1}
   .app .lead-b .lead-a{
-    grid-column:2;grid-row:4;
+    grid-column:2;grid-row:3;
     margin-top:0;justify-self:end;align-self:end}
 }
 .app .btn-full,
@@ -6612,6 +6606,7 @@ button.btn-p:active,
 .app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
 .app .flag-t.warn{color:var(--support-attention)}
 .app .flag-t.green{color:var(--support-success-ink)}
+.app .flag-t.red{color:var(--danger-ink)}
 .app[data-portal="leader"] .tbl-flag .flag-t{
   gap:var(--s02);padding:var(--s01) var(--s03);border-radius:999px}
 .app[data-portal="leader"] .tbl-flag .flag-t svg{width:14px;height:14px}
@@ -6640,8 +6635,8 @@ button.btn-p:active,
 .app[data-portal="leader"] .kv .stars{margin-right:var(--s02)}
 .app[data-portal="leader"] .kv .stars svg{width:14px;height:14px}
 .app[data-portal="leader"] .kv .v{display:flex;align-items:center}
-.app[data-enter][data-portal="leader"] .page > .lead-bar{animation:none}
-.app[data-portal="leader"] .lead-bar{
+.app[data-enter] .page > .lead-bar{animation:none}
+.app .lead-bar{
   position:sticky;top:0;z-index:20;
   background-color:var(--background);
   box-shadow:0 0 0 0 rgba(17,17,17,0);
@@ -6649,40 +6644,41 @@ button.btn-p:active,
              margin var(--dur-short) var(--ease-standard),
              transform var(--dur-standard) var(--ease-standard),
              visibility var(--dur-standard)}
-.app[data-portal="leader"] .lead-bar{
+.app .lead-bar{
   padding-top:0;padding-bottom:0;
   border-top:0}
-.app[data-portal="leader"] .lead-bar.is-stuck{
+.app .lead-bar.is-stuck{
   box-shadow:0 6px 16px -12px rgba(17,17,17,.3)}
-.app[data-portal="leader"] .lead-bar > .lead-tabs{margin-bottom:0}
+.app .lead-bar > .lead-tabs{margin-bottom:0}
 @container app (min-width:700px){
-  .app[data-portal="leader"] .lead-tabs{
+  .app .lead-tabs{
     border-left:1px solid var(--rule);border-right:1px solid var(--rule);
     overflow-x:hidden}
-  .app[data-portal="leader"] .lead-tabs button{
+  .app .lead-tabs button{
     flex:1 1 0;min-width:0;
     display:flex;align-items:center;justify-content:center;
     padding-left:var(--s04);padding-right:var(--s04)}
-  .app[data-portal="leader"] .lead-tabs button:last-child{border-right:0}
+  .app .lead-tabs button:last-child{border-right:0}
 }
-.app[data-portal="leader"] .page > .sec[id^="lead-"]{
+.app .page > .sec[id^="lead-"],
+.app .page > .sec.jump-sec{
   scroll-margin-top:calc(48px + 2px + var(--s05))}
-.app[data-portal="leader"] .lead-tabs .lf-n{
+.app .lead-tabs .lf-n{
   margin-left:var(--s03);font-variant-numeric:tabular-nums;
   color:var(--text-helper);font-weight:400}
-.app[data-portal="leader"] .lead-tabs button.on .lf-n{color:var(--text-secondary)}
-.app[data-portal="leader"] .lead-bar.is-gone{
+.app .lead-tabs button.on .lf-n{color:var(--text-secondary)}
+.app .lead-bar.is-gone{
   transform:translateY(-100%);visibility:hidden;pointer-events:none;
   box-shadow:none}
-.app[data-portal="leader"] .stat-jump{
+.app .stats > .stat-jump{
   -webkit-appearance:none;appearance:none;border:0;
   background-color:var(--background);
   font:inherit;color:inherit;text-align:left;width:100%;
   position:relative;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
-.app[data-portal="leader"] .stat-jump:hover{
+.app .stats > .stat-jump:hover{
   background-color:color-mix(in srgb, var(--mk, var(--text-primary)) 4%, var(--background))}
-.app[data-portal="leader"] .stat-jump:focus-visible{
+.app .stats > .stat-jump:focus-visible{
   outline:2px solid var(--text-primary);outline-offset:-2px}
 .app .bk-day{
   align-self:stretch;width:104px;min-width:0;cursor:default;
@@ -7244,13 +7240,13 @@ button.btn-p:active,
 .app .foot-row.foot-stack{
   flex-direction:column;align-items:stretch;justify-content:flex-start}
 .app .foot-row.foot-stack > p{text-align:left}
-.app[data-portal="leader"] .lead-bar{
+.app .lead-bar{
   height:0;min-height:0;padding-top:0;padding-bottom:0;overflow:visible}
-.app[data-portal="leader"] .lead-bar::after{display:none}
-.app[data-portal="leader"] .lead-bar > .lead-tabs{
+.app .lead-bar::after{display:none}
+.app .lead-bar > .lead-tabs{
   visibility:hidden;background-color:var(--background)}
-.app[data-portal="leader"] .lead-bar.is-stuck > .lead-tabs{visibility:visible}
-.app[data-portal="leader"] .lead-bar.is-gone > .lead-tabs{visibility:hidden}
+.app .lead-bar.is-stuck > .lead-tabs{visibility:visible}
+.app .lead-bar.is-gone > .lead-tabs{visibility:hidden}
 .app[data-portal="leader"] .page > .sec:has(> .stats-lead)::after{display:none}
 @container app (min-width:900px){
   .app .view-col > .main > .page.msg-page{flex:1 1 auto;min-height:0}
@@ -9091,7 +9087,7 @@ button.btn-p:active,
 .app .tbl th,.app .chart-table th,.app .tw-h,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
-.app .rp-src,.app .rp-opts-h,.app .lead-eb,.app .stp-pop-h,.app .bkw .bk-h,
+.app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
 .app .cal-wd,.app .cal-row > .l,.app .call-rec,.app .qz-lab,
 .app .signed .ai-body .t-label-01,.app .callband-tz,.app .wcall-d b,
 .app .callband-d b{
@@ -9433,6 +9429,7 @@ button.btn-p:active,
   font-size:var(--t-compact-size);line-height:18px;
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   color:transparent}
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{color:#0488c5}
 .app .sec-prog .prog-top > div:first-child > .prog-l{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
@@ -9978,6 +9975,16 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-primary)}
 .app .form-page .role-c.on .role-t{color:var(--accent-text)}
+.app .cardrow .card-del{color:var(--danger-ink)}
+.app .cardrow .card-del:hover:where(.__nh){color:var(--danger-ink)}
+.app .page .pf-facts .v{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:var(--text-primary)}
+.app .page .pf-facts .pf-l{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -10179,6 +10186,8 @@ button.btn-p:active,
   
   --ai-hl-bg:rgba(244,113,19,.05);
   
+  --sd-hl-bg:rgba(4,136,197,.05);
+  
   --ai-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14.5815 14.5815'%3E%3Cpath d='M6.36136 0.630895C6.69544 -0.210297 7.88606 -0.210299 8.22014 0.630894L9.6898 4.33142C9.79144 4.58736 9.99414 4.79005 10.2501 4.8917L13.9506 6.36136C14.7918 6.69544 14.7918 7.88606 13.9506 8.22014L10.2501 9.6898C9.99414 9.79144 9.79144 9.99414 9.6898 10.2501L8.22014 13.9506C7.88606 14.7918 6.69544 14.7918 6.36136 13.9506L4.8917 10.2501C4.79005 9.99414 4.58736 9.79144 4.33142 9.6898L0.630895 8.22014C-0.210297 7.88606 -0.210299 6.69544 0.630894 6.36136L4.33142 4.8917C4.58736 4.79005 4.79005 4.58736 4.8917 4.33142L6.36136 0.630895Z'/%3E%3C/svg%3E");
 }
 .app{--ai-lap:9s}
@@ -10213,6 +10222,8 @@ button.btn-p:active,
   border-radius:4px;
   padding:1px 4px;margin:0 -1px;
   -webkit-box-decoration-break:clone;box-decoration-break:clone}
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{
+  background-color:var(--sd-hl-bg)}
 .app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body,
 .app .modhead:has(> .head-col) .ai-aura.talsum > .ai-body p,
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
@@ -10501,9 +10512,9 @@ button.btn-p:active,
 .app .sec-lead .row-lead{align-items:flex-start}
 .app .sec-lead .row-lead{
   display:grid;grid-template-columns:auto minmax(0,1fr) auto;
-  align-items:stretch}
+  align-items:stretch;min-height:0}
 .app .sec-lead .row-lead > .av-ph{
-  width:auto;height:100%;aspect-ratio:1;border-radius:50%}
+  width:auto;height:100%;aspect-ratio:1}
 @container app (min-width:900px){
   .app .modhead:has(> .sec-prog){
     grid-template-columns:minmax(0,1fr) clamp(336px, 42%, 471px)}}
@@ -11281,13 +11292,6 @@ button.btn-p:active,
   --askv-stroke:#fdcdd5;
   --askv-chip-line:#f95873;
 }
-.app.tmp-accent .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
-.app.tmp-accent .askdock .askline-mark .tal-mk::before,
-.app.tmp-accent .ask-thread .tal-hero .tal-mk.orb::before{
-  background-image:
-    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
-    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#FDC4CD 0%,#F9687F 50%,#E4445E 100%)}
 .app.tmp-accent .ai-run stop:nth-child(2){stop-color:#fa758b}
 .app.tmp-accent .ai-run stop:nth-child(3){stop-color:#f95873}
 .app.tmp-accent .ai-run stop:nth-child(4){stop-color:#fb899c}
@@ -11492,17 +11496,11 @@ button.btn-p:active,
 .app .cmt-ic{display:grid;place-items:center;width:18px;height:18px}
 .app .cmt-ic svg{width:18px;height:18px;fill:currentColor}
 .app .cmt-reply{padding-left:var(--s04);padding-right:var(--s04)}
-.app .cmt-av .av-ph,
-.app .b-who .av-ph,
-.app .mem-av .av-ph{border-radius:999px}
 .app .lead-msg{border-radius:999px}
 @container app (min-width:900px){
   .app .modhead:has(> .head-col) > .head-col.sec-score{padding-left:var(--s07)}
   .app .modhead > .sec-score .score{padding-top:0}
 }
-.app .face-row > .mem-av,
-.app .ldr-dm-t > .mem-av,
-.app .ldr-dm-h > .mem-av{border-radius:999px}
 .app .ev-row{
   --ev-gap:var(--s07);
   display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
@@ -11881,7 +11879,7 @@ button.btn-p:active,
 .app .msgs > *{padding-left:0;padding-right:0}
 .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   margin-bottom:0}
-.app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+.app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
   padding-bottom:0}
 .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
   margin-top:var(--pad-x)}
@@ -11890,7 +11888,7 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     margin-bottom:0}
-  .app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+  .app .page > .sec:not(.dark-card):is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
     padding-bottom:0}
   .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
     margin-top:var(--pad-x)}
@@ -11915,8 +11913,6 @@ button.btn-p:active,
   width:100%;margin-top:var(--s05);
   display:flex;flex-direction:column;gap:var(--s03)}
 .app .aw-grid > .aw > .awc-m > .aw-s{margin-top:0}
-.app .m-av .av-ph,
-.app .mhead-av .av-ph{border-radius:999px}
 .app .form-page .sec.sec-role{padding-top:12px;padding-bottom:12px}
 .app .form-page .sec.sec-role::after{display:none;content:none}
 .app .form-page .role-pick{
@@ -11941,32 +11937,7 @@ button.btn-p:active,
 .app .page .pf-facts .pf-l svg{
   flex:none;width:20px;height:20px;fill:var(--mk)}
 .app .page .pf-facts .v{display:block;margin-top:var(--s03)}
-.app .page .pf-facts .d{display:block;margin-top:2px}
-.app .page .pf-pair{
-  display:grid;gap:var(--s05);grid-template-columns:minmax(0,1fr)}
-@container app (min-width:900px){
-  .app .page .pf-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
-.app .page .pf-card{
-  display:flex;flex-direction:column;gap:var(--s05);
-  padding:var(--s05);
-  background-color:var(--layer-01);
-  border:1px solid var(--rule);border-radius:var(--radius)}
-.app .page .pf-hd{
-  display:flex;align-items:center;gap:var(--s05)}
-.app .page .pf-hd > h3{flex:1 1 auto;min-width:0;margin:0}
-.app .page .pf-hd > .btn{flex:none;margin-left:auto}
-.app .page .pf-ach{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:var(--s04);align-content:start}
-.app .page .pf-ach > .crt-card{
-  padding:var(--s04);gap:2px}
-.app .page .pf-ach > .crt-card > .crt-art{
-  --crt-art-w:56px;--crt-art-h:61px;
-  align-self:center;margin-bottom:var(--s04)}
-.app .page .pf-act{
-  --pad-x:0px;
-  display:flex;flex-direction:column}
-.app .page .pf-act > .nrow:last-child{border-bottom:0}
+.app .page .sec-out > .btn{padding-left:0}
 .app .page .pf-tgs{
   display:grid;gap:var(--s05);
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
@@ -11981,12 +11952,86 @@ button.btn-p:active,
   flex:none;display:grid;place-items:center;
   width:20px;height:20px;margin-top:1px}
 .app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--mk)}
+.app .cardrow > .card-rad{flex:none;padding:0;gap:0}
+.app .cardrow .card-del{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  text-decoration:none}
+.app .cardrow .card-del:focus-visible{text-decoration:none}
+.app .cardrow .card-del svg{flex:none;width:18px;height:18px}
+.app .conf > .conf-b{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:var(--s05);padding:var(--s07) var(--s06) var(--s06)}
+.app .conf .conf-mk{
+  flex:none;display:grid;place-items:center;
+  width:48px;height:48px;margin-bottom:var(--s04);
+  background:var(--support-error-bg);border-radius:999px;
+  box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
+             0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
+.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink)}
+.app .conf .conf-t{margin:0}
+.app .conf .conf-x{margin:var(--sec-desc-gap) 0 0;max-width:42ch}
+.app .conf .conf-f{width:100%;margin:var(--s03) 0 0}
+.app .conf .conf-f > label{text-align:center}
+.app .conf-a :is(.btn-s,.btn-t,.btn-g)::after{content:none}
+.app .ask-page .askfield{padding-right:12px;gap:var(--s03)}
+.app .ask-page .askfield-send,
+.app .askfield-send{
+  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  border:0;border-radius:999px;
+  background:var(--accent);background-image:none;
+  --on-brand-fill:1}
+.app .ask-page .askfield-send svg,
+.app .askfield-send svg{
+  width:18px;height:18px;fill:var(--on-accent);display:block}
+.app .ask-page .askfield-mic,
+.app .askfield-mic{
+  flex:none;width:40px;height:40px;display:grid;place-items:center;
+  background:transparent;border:1px solid var(--rule);border-radius:999px;
+  cursor:pointer}
+.app .ask-page .askfield-mic svg,
+.app .askfield-mic svg{
+  width:18px;height:18px;fill:var(--icon-secondary);display:block}
+.app .ask-page .askfield-mic.on,
+.app .askfield-mic.on{
+  background:var(--danger-ink);border-color:var(--danger-ink)}
+.app .ask-page .askfield-mic.on svg,
+.app .askfield-mic.on svg{fill:var(--on-brand)}
+.app .ask-page .askfield-send:disabled,
+.app .askfield-send:disabled{
+  background:var(--layer-accent-01);background-image:none;cursor:default}
+.app .ask-page .askfield-send:disabled svg,
+.app .askfield-send:disabled svg{fill:var(--text-placeholder)}
+.app .askdock .askline-send{border-radius:999px}
+.app .askdock .askline-mic{
+  flex:none;display:grid;place-items:center;
+  width:32px;height:32px;margin-left:auto;
+  background:transparent;border:1px solid var(--rule);border-radius:999px}
+.app .askdock .askline-mic + .askline-send{margin-left:var(--s03)}
+.app .askdock .askline-mic svg{
+  width:16px;height:16px;fill:var(--icon-secondary);display:block}
 .app .lead-b .lead-tags{gap:var(--s05) var(--s07)}
 .app .lead-b .lead-tags > span{
   min-height:0;display:inline-flex;align-items:center;gap:var(--s03);
   padding:0;border:0}
 .app .lead-b .lead-tags > span svg{
   flex:none;width:20px;height:20px;fill:var(--on-dark)}
+.app .page > .sec:has(> .pf-tgs)::after,
+.app .page > .sec:has(> .pf-facts)::after{display:none}
+.app .page .lead-b{
+  margin:var(--s06) var(--pad-x) 0;padding:var(--s07)}
+.app .av-ph,
+.app .av,
+.app .mem-av,
+.app .shell-avatar,
+.app .acct-i-av,
+.app .rec-ph,
+.app .pnc-ph,
+.app .idphoto,
+.app .photopick,
+.app .crow-ph:not(.crow-cover){border-radius:999px}
+.app .photopick.on::after{
+  right:auto;left:50%;bottom:5px;transform:translateX(-50%);
+  border-radius:999px}
 
 </style>
 </head>
@@ -12209,7 +12254,8 @@ warningAlt:'M109-120q-11 0-20-5.5T75-140q-5-9-5.5-19.5T75-180l370-640q6-10 15.5-
 stopFilled:'M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z',
 skill:'m434-410 4 32q1 8 6.5 13t13.5 5h44q8 0 13.5-5t6.5-13l4-32q8-3 14.5-7t11.5-9l30 13q7 3 14 1t11-9l22-38q4-7 2.5-14t-7.5-12l-26-19q2-8 2-16t-2-16l26-19q6-5 7.5-12t-2.5-14l-22-38q-4-7-11-9t-14 1l-30 13q-5-5-11.5-9t-14.5-7l-4-32q-1-8-6.5-13t-13.5-5h-44q-8 0-13.5 5t-6.5 13l-4 32q-8 3-14.5 7t-11.5 9l-30-13q-7-3-14-1t-11 9l-22 38q-4 7-2.5 14t7.5 12l26 19q-2 8-2 16t2 16l-26 19q-6 5-7.5 12t2.5 14l22 38q4 7 11 9t14-1l30-13q5 5 11.5 9t14.5 7Zm46-50q-25 0-42.5-17.5T420-520q0-25 17.5-42.5T480-580q25 0 42.5 17.5T540-520q0 25-17.5 42.5T480-460ZM240-252q-57-52-88.5-121.5T120-520q0-150 105-255t255-105q125 0 221.5 73.5T827-615l52 205q5 19-7 34.5T840-360h-80v120q0 33-23.5 56.5T680-160h-80v40q0 17-11.5 28.5T560-80q-17 0-28.5-11.5T520-120v-80q0-17 11.5-28.5T560-240h120v-160q0-17 11.5-28.5T720-440h68l-38-155q-23-91-98-148t-172-57q-116 0-198 81t-82 197q0 60 24.5 114t69.5 96l26 24v168q0 17-11.5 28.5T280-80q-17 0-28.5-11.5T240-120v-132Zm254-188Z',
 growth:'M108-255q-12-12-11.5-28.5T108-311l211-214q23-23 57-23t57 23l103 104 208-206h-64q-17 0-28.5-11.5T640-667q0-17 11.5-28.5T680-707h160q17 0 28.5 11.5T880-667v160q0 17-11.5 28.5T840-467q-17 0-28.5-11.5T800-507v-64L593-364q-23 23-57 23t-57-23L376-467 164-255q-11 11-28 11t-28-11Z',
-creditCard:'M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720Zm-720 80h640v-80H160v80Zm0 160v240h640v-240H160Zm0 240v-480 480Z'
+creditCard:'M880-720v480q0 33-23.5 56.5T800-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720Zm-720 80h640v-80H160v80Zm0 160v240h640v-240H160Zm0 240v-480 480Z',
+delete:'M280-120q-33 0-56.5-23.5T200-200v-520h-40q-17 0-28.5-11.5T120-760q0-17 11.5-28.5T160-800h160v-40q0-17 11.5-28.5T360-880h240q17 0 28.5 11.5T640-840v40h160q17 0 28.5 11.5T840-760q0 17-11.5 28.5T800-720h-40v520q0 33-23.5 56.5T680-120H280Zm0-600v520h400v-520H280Zm80 400q0 17 11.5 28.5T400-280q17 0 28.5-11.5T440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280Zm160 0q0 17 11.5 28.5T560-280q17 0 28.5-11.5T600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280ZM280-720v520-520Z'
 };
 const CHEV = 'M5.6 3h4.7l7.9 9-7.9 9H5.6l7.9-9-7.9-9Z';
 
@@ -15131,22 +15177,35 @@ V.dashboard = (f) => {
           in `DARK_CARD`, so without `.keep-place` it would now be hoisted into
           the column the journey list occupies. One dark card per page still
           holds; the certificate is simply no longer the second one. */}
-    ${''/* THE CERTIFICATE NOTICE COMES FIRST NOW (Maryam, 1 Sep 2026: "take the
-          banner above the black card"), which also makes IT the thing that
-          stops `placeBand`'s run rather than the offer — the pass walks forward
-          from the `.ph` taking Tal's card, the ask line and declared
-          `.head-sec`s, and a `.sec` holding a `.certban` is none of those. The
-          band is unaffected either way: it has been one column on this page
-          since the plate left it.
+    ${''/* THE CERTIFICATE NOTICE SITS UNDER THE BLACK CARD (Maryam, 2 Sep 2026:
+          "take the badge banner below the black card, wherever it is above the
+          black card take it below"). It was above it — 1 Sep 2026, "take the
+          banner above the black card" — and the two asks are a week apart on
+          the same strip, so what follows is why the second one is an
+          improvement rather than a reversal.
 
-          READ IN THIS ORDER THE PAGE RUNS FORWARDS AGAIN. Last build it was
-          offer, actions, certificate — the thing you finished at the foot of a
-          page about the thing you have not started. A dismissible strip at the
-          head says "that is closed, here is what is next" and then gets out of
-          the way, which is what a notice is for and what the cross makes true.
+          THE BANNER IS THE PAST AND THE CARD IS THE NEXT STEP. Both readings
+          are defensible and the first note argued the other one ("a dismissible
+          strip at the head says 'that is closed, here is what is next' and then
+          gets out of the way"). What settles it is which of the two the page is
+          FOR: this dashboard's job is the E4 enrolment, and the offer is the
+          only thing on it with a decision in it. A notice about a course that
+          finished should not be the first object under the summary on the page
+          that is selling the next one.
+
+          THE STRIP IS STILL DISMISSIBLE, so the reader can close what they have
+          already read; that is what the cross is for and it is unchanged.
+
+          AND THE OFFER IS WHAT STOPS `placeBand`'s RUN NOW. The pass walks
+          forward from the `.ph` taking Tal's card, the ask line and declared
+          `.head-sec`s; a `.sec.dark-card` holding `enrolOffer` is none of those,
+          so the run ends there instead of at the banner. The band is
+          unaffected either way — it has been one column on this page since the
+          plate left it. `.dark-card` is also not in ai5's `DARK_CARD`, which is
+          §75's whole point and the reason the offer can be a page child at all.
           `certBanner`'s own note is the rest of the argument. */}
-    ${certBanner(f, {close:true, key:'dash'})}
     ${enrolOffer('E4')}
+    ${certBanner(f, {close:true, key:'dash'})}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
           page is the argument. What was here was the full thirteen-chapter
@@ -15370,28 +15429,29 @@ V.level = (f) => {
         DRAWN: the fifteen-rung ladder below is the position, and Tal says
         which rung and what moves it. See the note over `ph()`. */}
   ${ph('My Level')}
-  ${''/* THE CERTIFICATE BAND OPENS THE PAGE BODY (Maryam, 1 Sep 2026: "take the
-        badge banner below the tal summary section"). It was between the ladder
-        and "How the ladder works" — see the note that stood there — and the
-        argument for that slot was "position, proof, then how the ladder works
-        for everyone". The instruction overturns the first two: the proof of the
-        rung comes before the drawing of it.
+  ${''/* THE CERTIFICATE BAND SITS UNDER THE LADDER (Maryam, 2 Sep 2026: "take
+        the badge banner below the black card, wherever it is above the black
+        card take it below"), and the two notes it has already carried are both
+        kept because the third position is the one that agrees with both.
 
-        IT IS WRITTEN DIRECTLY AFTER `ph()` AND STILL LANDS SECOND, which is
-        §69's ordering rule and the reason this is safe. `placePageSummary`
-        inserts Tal's card after the `.ph` two passes later, so the banner ends
-        up below the summary rather than above it — exactly where the ask puts
-        it — without this view knowing anything about the band.
+        IT WAS BETWEEN THE LADDER AND "How the ladder works" first, on the
+        argument "position, proof, then how the ladder works for everyone".
+        Then it opened the page body (1 Sep 2026, "take the badge banner below
+        the tal summary section"), on the argument that the proof of the rung
+        comes before the drawing of it. The ladder is a black card now (§97, and
+        `lvlWing`'s own note), and the standing instruction is that a badge
+        banner goes below one — which puts it back in its original slot, with
+        the original reasoning intact.
 
-        AND IT IS WHAT STOPS `placeBand`'s RUN, which is the same job it does on
-        the `promoted` dashboard. That pass walks forward from the `.ph` and
-        takes members until it meets a sibling that is not head furniture (Tal's
-        card, the ask line, a declared `.head-sec`). A `.sec` holding a
-        `.certban` is none of the three, so the run ends here — the band is one
-        column on this page and stays one column. `.certban` is also not in
-        ai5's `DARK_CARD`, so `placeDark` leaves it in the page body. */}
-  ${f.done>0?certBanner(f,{close:true, key:'level'}):''}
+        `lvlWing` IS WHAT STOPS `placeBand`'s RUN NOW, and it stops it for
+        exactly the reason the banner used to. That pass walks forward from the
+        `.ph` and takes members until it meets a sibling that is not head
+        furniture (Tal's card, the ask line, a declared `.head-sec`); a
+        `.sec.dark-card` is none of the three. The band is one column on this
+        page and stays one column, and neither `.dark-card` nor `.certban` is in
+        ai5's `DARK_CARD`, so `placeDark` leaves both in the page body. */}
   ${lvlWing(f)}
+  ${f.done>0?certBanner(f,{close:true, key:'level'}):''}
   ${''/* THE SIGNED REPORT BLOCK LEFT THIS PAGE (Maryam, 1 Sep 2026: "instead of
         this page, remove the report section above the How the ladder works and
         show this against the interview details in interviews module"). It was
@@ -17482,6 +17542,48 @@ const scoresSheet = f => `<div class="modal ${S.scores?'on':''}" data-close="sco
     </div>
   </div>`;
 
+const courseStats = (f, pct, hrs) => `<div class="stats">
+      ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
+      ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
+      ${statCell(I.time, `Time invested`, `${hrs.split(' ')[0]}<small>${hrs.replace(/^\S+/,'')}</small>`, `${f.done?Math.round(f.mins/f.done)+' min per chapter':'not started'}`)}
+      ${statCell(I.flag, `Tasks on time`, `${isDay34(S.stage)?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
+    </div>`;
+
+const pastInsight = (f) => {
+  const [g1, g2] = RPT_GROWTH;
+  return `${perfInsight(f)} ${CH[g1][0]} and ${CH[g2][0]} &mdash; chapters ${g1+1} and ${g2+1} &mdash; are the two your report names as growth areas.`;
+};
+
+const pastSec = (f, pct, hrs) => {
+  const c = certsFor(f).slice(-1)[0];
+  return `<div class="sec found${discOpen('past')?' on':''}">
+    ${''/* "READ THE FULL REPORT" IS OUTSIDE THE BUTTON, per §65's third
+           decision: it is the way to the whole document and it is useful
+           whether or not the summary is open. It also replaces a §60 dead
+           control — the tile this block subsumes ended on `<a class="lk">Read
+           the summary</a>` with no route on it at all. */}
+    ${foundHead(`Your ${c.cohort} record`,
+      `<button class="btn btn-g btn-sm noic" data-go="report">Read the full report</button>`, 'past')}
+    <p class="all-desc">Explorer Track &ndash; ${c.lvl}, closed ${c.on} and signed by ${c.by}.</p>
+    <div class="found-b">
+      ${courseStats(f, pct, hrs)}
+      ${''/* THE STRIP IS `perfSec`'s FOOTER, REUSED WHOLE — §88.3's shape: the
+             insight takes the slack on a real `flex:1 1 320px` basis so the
+             sentence wraps to its own line instead of shrinking to nothing,
+             and `.perf-a`'s auto margin puts the action at the far end. None
+             of it is scoped to `.perf`, so this is the same three rules doing
+             the same job one section along. */}
+      <div class="perf-f">
+        <div class="perf-ins">
+          <span class="perf-ins-mk"></span>
+          <span class="perf-ins-b"><b>Key insight</b><span>${pastInsight(f)}</span></span>
+        </div>
+        <button class="btn btn-g btn-sm noic perf-a" data-scores="1">View scores</button>
+      </div>
+    </div>
+  </div>`;
+};
+
 V.transcript = (f) => {
   const pct = Math.round(f.done/13*100);
   const hrs = Math.floor(f.mins/60)+'h '+(f.mins%60)+'m';
@@ -17541,15 +17643,45 @@ V.transcript = (f) => {
         `.dark-card` draws no closing hairline. Keyed on the card rather than on
         this page, so it is the same rule the `promoted` dashboard's banner
         needed. */}
-  ${g?pulseCols(f,g):''}
-  <div class="sec sec-joined">
-    <div class="stats">
-      ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
-      ${statCell(I.chart, `Assessment average`, `${f.avg?f.avg+'<small>%</small>':'<small>Not yet</small>'}`, `${f.avg?'cohort average 79%':'nothing assessed yet'}`)}
-      ${statCell(I.time, `Time invested`, `${hrs.split(' ')[0]}<small>${hrs.replace(/^\S+/,'')}</small>`, `${f.done?Math.round(f.mins/f.done)+' min per chapter':'not started'}`)}
-      ${statCell(I.flag, `Tasks on time`, `${isDay34(S.stage)?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
-    </div>
-  </div>
+  ${''/* AND AT `promoted` THE BLACK CARD IS THE ENROLMENT OFFER (Maryam, 2 Sep
+        2026: "the black card will be the enrollment card which user has to
+        enroll in to start the course").
+
+        THE PULSE CARD WAS DRAWING A COURSE THAT DOES NOT EXIST YET. `CFG.promoted`
+        carries no `finished` flag and inherits `open:0` from `CFG_BASE`, so
+        `pulseLede`'s live branch fired on a stage with all thirteen chapters
+        done: "You have completed 0 of 45 minutes for Why We Exist … Complete
+        chapter 1 to stay on the pace", with "Open chapter 1" beside it. A page
+        cannot have everything finished and chapter 1 open — `PAGESUM.coursework`
+        records the identical bug on its own copy and the fix there was the same
+        one: state the stage rather than fall through to the live branch.
+
+        SO THE SLOT CHANGES SUBJECT RATHER THAN EMPTYING. §75's rule for a black
+        card is "this is the one thing the page is about", and once the cohort is
+        closed the one thing this page is about is enrolling on the next one.
+        `enrolOffer` is the component, unchanged and un-parameterised beyond the
+        level — the same card the `promoted` dashboard draws, reading
+        `ENROL_OPENS`, `ENROL_DESC` and the fee from one place, so the two
+        surfaces cannot disagree about the offer. Its default action is
+        `data-go="enrol"`, which is right here: this is not the Enroll page, and
+        `enrol` is in the `next` rail.
+
+        `'E4'` IS WRITTEN OUT, NOT READ FROM `f.level`, to match the dashboard's
+        own call site byte for byte. `f.level` is 'E4' at this stage and would
+        work today; `ENROL_OPENS` / `ENROL_DESC` are keyed E3/E4 only, so a
+        derived level is a silent `undefined` in the lede the moment a fifth rung
+        enrols. Two call sites, one literal, one branch that only `promoted`
+        reaches.
+
+        `pulseCols` KEEPS ITS CALLER at week 1, day 34 and day 90 — the three
+        stages the note over it was written for. */}
+  ${f.complete ? enrolOffer('E4') : (g?pulseCols(f,g):'')}
+  ${''/* THE FOUR FIGURES ARE THE ARCHIVE'S RECAP NOW, so at `promoted` they are
+        inside `pastSec`'s panel rather than a section of their own. Same
+        `courseStats` either way. */}
+  ${f.complete ? '' : `<div class="sec sec-joined">
+    ${courseStats(f, pct, hrs)}
+  </div>`}
   ${''/* THE 90-DAY SUMMARY APPEARS WHEN THERE IS ONE.
         This block used to draw at every stage, with an unsigned variant that
         said, in three places at once, that nothing in it was final: a heading
@@ -17564,21 +17696,37 @@ V.transcript = (f) => {
         lead with it. So the block keeps its position and loses its unsigned
         state — which also takes the `.tag.warm` / `.tag.cool` pair and the
         second `.lk` off the page while the course is running. */}
-  ${f.complete?`<div class="sec">
-    <div class="tile">
-      <div class="ai-head"><h3>90-day summary · signed</h3></div>
-      <div class="ai-body"><p>Priya signed this on November 21. It is what your re-interview was assessed against, and it is yours to share.</p></div>
-      <div class="tag-row mt5"><span class="tag green">${I.checkFilled}Signed by Priya Nair</span></div>
-      <div class="ai-foot"><a class="lk">Read the summary</a></div>
-    </div>
-  </div>`:''}
+  ${''/* AND THE SIGNED-SUMMARY TILE IS DELETED — `pastSec` says all three of its
+        facts and says them better (Maryam, 2 Sep 2026). It drew a `.tile` with
+        "90-day summary · signed", a sentence dating the signature, a green
+        "Signed by Priya Nair" tag and `<a class="lk">Read the summary</a>`.
+
+        `f.complete` IS ONLY `promoted`, so this block had exactly one stage and
+        that stage is the one being rebuilt — there is no other caller to keep it
+        for. Its three facts survive as the disclosure's visible lede (the level,
+        the close date and the signer, read off `CERTS` instead of hardcoded as
+        "November 21"), and its fourth part was a §60 DEAD CONTROL: that `.lk`
+        carried no `data-go`, so "Read the summary" has never opened anything.
+        `foundHead`'s "Read the full report" is the live version of it.
+
+        THE GREEN TAG GOES WITH IT rather than moving. A chip reading "Signed by
+        Priya Nair" beside a sentence reading "signed by Priya Nair" is one fact
+        drawn twice, and §74's rule for a tag is a one-word label on a finding.
+        The `.tag.green` / `.tag-row` classes have plenty of other writers. */}
   ${''/* "ASSESSMENT SCORES" IS "YOUR PERFORMANCE" NOW (Maryam, 1 Sep 2026, with
         a reference screen). It was `lineChart('sc', …)` in a `.tile` — a 320x104
         sparkline over a thirteen-row data table. The note over `perfSec` is the
         argument; what changes on the page is that the average is the largest
         figure on it and the block ends on a conclusion rather than on a table.
         The table is not lost: it is behind "View scores". */}
-  ${f.done?perfSec(f):''}
+  ${''/* AND IT IS OFF THE PAGE AT `promoted` — the plotted axis, the legend, the
+        thirteen dots and the average callout are "these much details from their
+        previous 90-day cohort" almost exactly (Maryam, 2 Sep 2026). What the
+        section was FOR survives inside the disclosure: its average is one of
+        `courseStats`' four figures, its conclusion is `pastInsight`'s first
+        sentence, and its "View scores" button is the same control on the same
+        `scoresSheet`. `perfSec` keeps its callers at day 34 and day 90. */}
+  ${f.done && !f.complete ? perfSec(f) : ''}
   ${''/* "TIME ON THE COURSE" IS OFF THIS PAGE (Maryam, 1 Sep 2026: "remove the
         time on the course section"). It was `stackChart('wk', …)` — thirteen
         stacked bars of minutes a week split four ways (video, reading, roleplay,
@@ -17613,11 +17761,22 @@ V.transcript = (f) => {
         per view: a person who opened the list and went to look at a chapter
         comes back to it open. The label and the chevron both follow it, so
         the control says which way it goes rather than only what it did. */}
-  <div class="sec tint">
+  ${''/* THIRTEEN CHAPTER ROWS ARE THE DEFINITION OF THE DETAIL THIS STAGE DOES
+        NOT WANT, so the list is off the page at `promoted` too. Each row is a
+        number, a title, a tick, minutes, a percentage and sometimes a growth
+        marker — the finest grain the product keeps about a course that closed.
+        `pastInsight` carries the two rows that still matter (the growth pair)
+        and `scoresSheet` carries all thirteen percentages, so the grain is one
+        press away rather than printed. `chRow` keeps its callers. */}
+  ${f.complete ? '' : `<div class="sec tint">
     <div class="sec-h"><h2>Your progress by chapter</h2></div>
     <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
     <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
-  </div>
+  </div>`}
+  ${''/* AND THE WHOLE OF THE ABOVE COMES BACK AS ONE COLLAPSED BLOCK AT THE FOOT.
+        `pastSec` is the note; it is last on the page because a closed cohort is
+        the last thing a candidate enrolling on the next one needs. */}
+  ${f.complete ? pastSec(f, pct, hrs) : ''}
   ${''/* THE CERTIFICATE CARD IS OFF THIS PAGE (Maryam, 1 Sep 2026: "remove this
         black card from course progress page"). It was `certCard(f)` gated on
         `f.done>0`.
@@ -17914,12 +18073,14 @@ V.messages = (f) => {
 </div></main>`;
 };
 
+const PAY_E2 = ['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210'];
+
 V.billing = (f) => {
   const rows = [];
   if(f.enrolled||f.complete) rows.push(['Explorer Track &ndash; E3','Aug 14, 2026','$595','Visa','4242']);
   if(!f.pred) rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
   if(S.stage==='booked') rows.push(['Interview · Priya Nair','Aug 13, 2026','$95','Visa','4242']);
-  rows.push(['Explorer Track &ndash; E2','Feb 4, 2026','$490','Mastercard','8210']);
+  rows.push(PAY_E2.slice());
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Payments')}
   ${''/* NO DESCRIPTION, AND THE SUMMARY IS BACK ABOVE IT (Maryam, 31 Aug
@@ -17936,10 +18097,34 @@ V.billing = (f) => {
         `PAGESUM.billing` is where that is argued out. Do not "improve" the
         line by putting a total in it. */}
   ${ph('Payments')}
+  ${''/* THE LEDGER HAS A HEADING NOW (Maryam, 2 Sep 2026: "give the previous
+        transactions section a heading 'Previous Transactions'"). It was the one
+        block on the page with none — the table's own column head row said
+        What / When / Card / Amount, which names the COLUMNS and not the block,
+        so "Saved cards" 40px below it was the first heading a reader met.
+
+        TRAP 13 IS ALREADY ANSWERED AND §10.15's OWN NOTE PREDICTED THIS EXACT
+        EDIT. `.paytbl` is on the label-column opt-out list, and the argument
+        recorded beside it is that the table bleeds — "it had never been drawn
+        under a heading before: `V.billing` gives the page a `.ph` and a `.sec`
+        with no `.sec-h` at all, so the label column never applied and nothing
+        showed". That entry was added for the agent portal's Earnings ledger; it
+        is what makes this a one-line change here rather than a new rule.
+
+        THE WORDS ARE MARYAM'S CAPITALISATION. §63 §2's rule is that nothing is
+        set in capitals by CSS and the words go in the markup as they should
+        read; it does not overrule a title the product's owner has typed, and
+        "Quick Actions" is the same shape two pages over. */}
   <div class="sec pay-sec">
+    <div class="sec-h"><h2>Previous Transactions</h2></div>
     <div class="paytbl">
+      ${''/* "Paid for" AND "Paid on", NOT "What" AND "When" (Maryam, 2 Sep
+             2026). Both old labels were generic enough to head any table in the
+             product; these two say what the column holds ON A LEDGER, which is
+             the one thing a payment row's first two cells are about. Card and
+             Amount already named themselves and are unchanged. */}
       <div class="payrow payhead">
-        <span>What</span><span>When</span><span>Card</span>
+        <span>Paid for</span><span>Paid on</span><span>Card</span>
         <span class="num">Amount</span><span></span>
       </div>
       ${rows.map(([n,d,amt,br,last])=>`<div class="payrow">
@@ -17974,21 +18159,76 @@ V.billing = (f) => {
           right side for this one: a trailing mark reads as the RESULT of the
           control (§64's arrow, "and then you go there"), a leading one reads as
           what the control does to the list under it. Add is the second kind. */''}
-    <div class="sec-h"><h2>Saved cards</h2>${S.cards.length<3?`<button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button>`:''}</div>
+    ${''/* THE CAP IS GONE AND SO IS THE SENTENCE ABOUT IT (Maryam, 2 Sep 2026:
+          "remove the card limitation text… take back the add card button on
+          this screen as well"). Both halves are one change: "Three cards is the
+          maximum. Remove one to add another." only appeared AT three cards, and
+          it was there to explain why the control above it had disappeared. With
+          the sentence gone the hidden button would be an unexplained absence,
+          so `Add a card` is unconditional now.
+
+          THAT ALSO RETIRES THE NOTE ABOVE ABOUT "NO 1 OF 3" — its argument was
+          "a count of a list you can see in full, set against a ceiling nobody
+          is near", and there is no ceiling left to count against. The other
+          three notes stand: the control is still text with a leading plus
+          rather than a black button, for the reasons written there. */}
+    <div class="sec-h"><h2>Saved cards</h2><button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button></div>
+    ${''/* THE DEFAULT IS A RADIO ON THE LEFT, NOT A "Make default" LINK ON THE
+          RIGHT (Maryam, 2 Sep 2026: "instead of the make default text, add a
+          radio button on the left side of each card row, the one with default
+          will be selected").
+
+          IT IS THE RIGHT COMPONENT BECAUSE THE QUESTION IS EXCLUSIVE. One card
+          of three is the default, and a radio is the only control that says
+          "one of these" in its own shape — where two "Make default" links said
+          it three times over, once per row that was not it, and the row that
+          WAS it had a gap where the others had a control. `.rad` is §02's own
+          radio, the same one `.ldr-rec` and the log in screen's role blocks
+          use, so nothing new is drawn.
+
+          `checked` IS WRITTEN FROM `c.def` ON EVERY RENDER — trap 9. The
+          handler is unchanged: `data-setdef` stays on the label, which is what
+          lets the existing `[data-setdef]` branch answer both the click on the
+          ring and the click on the row's own control. Nothing about the state
+          moved into the DOM.
+
+          THE RING IS THE COMPONENT'S BLACK, NOT THE ACCENT. §104's role blocks
+          re-point it to `--accent` because Maryam asked for an orange radio
+          there; nothing was asked here, so it keeps §02.201's `--brand-primary`
+          — which is what `.ldr-rec` already draws one portal over.
+
+          THE "Default" PILL STAYS. It is not the same statement as the ring:
+          the ring is the control you press, the pill is the word for the state
+          it is in, and a reader scanning three rows for which card gets charged
+          reads the word. Only "Make default" was named in the ask. */}
     <div class="tile-stack">
       ${S.cards.map((c,i)=>`<div class="cardrow">
+        <label class="rad card-rad" data-setdef="${i}" title="Make this my default card">
+          <input type="radio" name="paydef"${c.def?' checked':''}><span class="box"></span></label>
         <span class="cardrow-ic">${BMK[c.brand]||BMK.card}</span>
         <span class="cardrow-b">
           <span class="cardrow-t">${c.brand} ending ${c.last}${c.def?' <span class="pill-def">Default</span>':''}</span>
           <span class="cardrow-d">Expires ${c.exp}</span>
         </span>
+        ${''/* REMOVE IS RED WITH A BIN IN FRONT OF IT AND NO UNDERLINE (Maryam,
+               2 Sep 2026). All three parts point the same way: this is the one
+               destructive control in the list, and the product's rule for those
+               is §29's `.btn.danger` — `--danger-ink` on the words AND on the
+               mark. The underline came off because it is no longer standing in
+               for a colour: §12's decision is that a link is blue because blue
+               is the only blue on the screen, and a red underlined word beside
+               a red glyph is two ways of saying "this is not ordinary text".
+
+               THE MARK LEADS, which is `ic-l`'s own argument (§64): a trailing
+               mark reads as the RESULT of pressing ("and then you go there"), a
+               leading one as what the control does to the row it is on. `I.delete`
+               is new to the set and its note in icons.js says why `misuse` —
+               "Delete my account"'s circle-slash — is not it. */}
         <span class="cardrow-a">
-          ${c.def?'':`<button class="lnk" data-setdef="${i}">Make default</button>`}
-          <button class="lnk" data-delcard="${i}">Remove</button>
+          <button class="lnk card-del" data-delcard="${i}">${I.delete}Remove</button>
         </span>
       </div>`).join('')}
     </div>
-    ${S.cards.length<3?'':`<p class="t-helper-01 mt4">Three cards is the maximum. Remove one to add another.</p>`}
   </div>
 </div></main>`;
 };
@@ -18081,15 +18321,23 @@ function cardSheet(){
 
 const MEMBER_SINCE = 'January 8, 2026';
 
-const pfFact = (ic, mk, label, val, sub) => `<div style="--mk:var(${mk})">
+const pfFact = (ic, mk, label, val) => `<div style="--mk:var(${mk})">
   <span class="l pf-l">${ic}${label}</span>
-  <span class="v">${val}</span>
-  ${sub ? `<span class="d">${sub}</span>` : ''}</div>`;
+  <span class="v">${val}</span></div>`;
 
 function leadSec(f){
-  return `<div class="sec">
+  return `<div class="sec keep-place">
     <div class="lead-b">
-      <div class="lead-eb">Give back &amp; grow</div>
+      ${''/* THE EYEBROW IS GONE (Maryam, 2 Sep 2026: "remove the 'Give back &
+             grow' text from black card"). "Give back & grow" was a category
+             label over a heading that already says the same thing in the
+             imperative — "Become a cohort leader" is the giving back — so the
+             card opened by naming its own genre.
+
+             `.lead-eb`'s RULES GO WITH IT: §16.592 and §28.75 had exactly one
+             writer between them and this was it, which is the "gate nothing
+             writes" tell. Its ranks are recorded in §63 §4's eyebrow list and
+             §28's on-dark pair, and both notes are kept where they are. */}
       <div class="lead-t">Become a cohort leader</div>
       ${''/* THE DESCRIPTION IS MARYAM'S, 2 Sep 2026, VERBATIM, and it is a
              quarter of the length of what it replaces — three sentences of
@@ -18119,34 +18367,6 @@ function leadSec(f){
   </div>`;
 }
 
-const GAME_NONE = {pts:0, got:[], badges:0, rank:1, last:[], weeks:[]};
-function pfPair(f){
-  const g = GAME[S.stage] || GAME_NONE;
-  const certs = certAll(f, g).slice(0, 3);
-  const act = (NOTIF[S.stage] || []).slice(0, 4);
-  return `<div class="sec">
-    <div class="pf-pair">
-      <div class="pf-card">
-        <div class="pf-hd"><h3>Achievements</h3>
-          <button class="btn btn-g btn-sm noic" data-go="rewards" data-gotab="certs">View all</button></div>
-        <div class="pf-ach">${certs.map(c=>`<div class="crt-card">
-          <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
-          <span class="crt-n">${c.n}</span>
-          <span class="crt-on">${c.on}</span>
-        </div>`).join('')}</div>
-      </div>
-      <div class="pf-card">
-        <div class="pf-hd"><h3>Recent activity</h3>
-          <button class="btn btn-g btn-sm noic" data-toggle="notif">View all</button></div>
-        <div class="pf-act">${act.map(n=>`<button class="nrow" data-go="${n.go}" data-read="${n.t}">
-          <span class="nrow-ic">${I[n.ic]}</span>
-          <span class="nrow-b"><span class="nrow-t">${n.t}</span></span>
-          <span class="nrow-w">${n.w}</span>
-        </button>`).join('')}</div>
-      </div>
-    </div>
-  </div>`;
-}
 
 V.account = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Profile')}
@@ -18172,14 +18392,39 @@ V.account = (f) => `<main class="main"><div class="page">
   ${leadSec(f)}
   <div class="sec">
     <div class="idhead">
+      ${''/* THE PENCIL BADGE IS OFF THE PHOTOGRAPH AND THE PHOTOGRAPH IS ROUND
+             (Maryam, 2 Sep 2026). The badge was a 24px accent disc hanging on
+             the picture's corner, 40px from an "Edit details" button that opens
+             the same kind of thing — two affordances for one row, and the
+             smaller of the two was the only object on the page wearing the
+             accent.
+
+             THE `<button>` STAYS, WHICH IS THE PART WORTH RECORDING. It is the
+             only route to `editphoto` in the product, so removing the element
+             would take the photo picker out of the build; what it loses is the
+             visible badge, not the control or its `aria-label`. That is a
+             quieter affordance than §60 likes, and the trade is deliberate: the
+             row's own Edit details is 40px away and does the same job for
+             everything else on it.
+
+             `.idphoto-edit`'s RULES STAY TOO — §11.199 still has a writer, the
+             photo sheet's own preview at the foot of this file. */}
+      ${''/* `.idphoto-round` CAME OFF (§106, 2 Sep 2026). It was the gate on
+             §105's own `border-radius:999px`, and §106 rounds every photograph
+             of a person at the component — so the class styled nothing, which
+             is the "gate nothing writes" tell read from the markup's side. */}
       <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
         <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
-        <span class="idphoto-edit">${I.edit}</span>
       </button>
+      ${''/* AND THE TRACK CHIP UNDER THE EMAIL IS GONE (Maryam, 2 Sep 2026). It
+             was the third line of a three-line header saying what the band 80px
+             below says twice — "Level: Explorer track" and "Primary track:
+             Explorer track" — and the app bar has said it on every page since
+             §78. What the header holds now is the two things that are only
+             here: who you are and how to reach you. */}
       <div class="idhead-b">
         <span class="idname">Maryam Naz</span>
         <span class="idmeta">maryam.naz@tkxel.io</span>
-        <span class="tag">${f.pred ? f.track + ' track' : lvlName(f.level)}</span>
       </div>
       <!-- EDIT SITS ON THE ROW IT EDITS. It was below the table, so the
            control was two blocks away from the name and photo it changes, and
@@ -18200,17 +18445,30 @@ V.account = (f) => `<main class="main"><div class="page">
           true rather than duplicated, because at that point the track IS all
           the level says, which is exactly what the sub-line under it reports.
           Once Priya has signed, Level goes to the rung and the two differ. */}
+    ${''/* TWO ROWS A CELL, NOT THREE (Maryam, 2 Sep 2026: "remove the 'Set at
+          the interview' and 'Not enrolled yet' texts from the blocks"). Both
+          sub-lines were qualifications rather than facts — one said WHEN the
+          level gets set, the other that the track has no cohort yet — and a
+          band of four cells is scanned for the four values, not read.
+
+          FLAGGED: before the interview, Level and Primary track now print the
+          same string ("Explorer track"), because the sub-lines were the only
+          thing distinguishing them at that stage. The reference draws that
+          duplication too, and from `assessed` on the two differ (the rung
+          against the track). Worth knowing rather than fixing here — the fix
+          would be a copy change, not a layout one. */}
     <div class="facts pf-facts">
       ${pfFact(I.time, '--mk-1', 'Time zone', 'Eastern Time (ET)')}
-      ${pfFact(I.chart, '--mk-3', 'Level',
-        f.pred ? f.track + ' track' : lvlName(f.level),
-        f.pred ? 'Set at the interview' : 'Confirmed by your agent')}
+      ${pfFact(I.chart, '--mk-3', 'Level', f.pred ? f.track + ' track' : lvlName(f.level))}
       ${pfFact(I.calendar, '--mk-2', 'Member since', MEMBER_SINCE)}
-      ${pfFact(I.growth, '--mk-4', 'Primary track', f.track + ' track',
-        f.enrolled || f.complete ? 'Cohort 41' : 'Not enrolled yet')}
+      ${pfFact(I.growth, '--mk-4', 'Primary track', f.track + ' track')}
     </div>
   </div>
-  ${pfPair(f)}
+  ${''/* ACHIEVEMENTS BESIDE RECENT ACTIVITY STOOD HERE — see the note over the
+        deleted `pfPair`. What the page loses between the identity band and
+        Notifications is a preview of two surfaces that exist in full
+        elsewhere; what it gains is that every block left on Profile is
+        something you can change from Profile. */}
   ${''/* THE SWITCHES ARE A ROW OF THREE, AND THE HEADING GAINED THE SENTENCE
         THE REFERENCE PUTS UNDER IT. `.all-desc` is the component for a heading
         and its own description — §16 states the pair at `--sec-desc-gap`, and
@@ -18223,7 +18481,14 @@ V.account = (f) => `<main class="main"><div class="page">
         it has always been, so nothing about how a toggle works moved. The marks
         say which KIND of message each one is — a call, a task, an email — which
         is the same test §29's four figure marks are chosen by. */}
-  <div class="sec tint">
+  ${''/* THE SECTION IS WHITE (Maryam, 2 Sep 2026: "remove the grey bg from
+        notifications section"). It was `.sec tint` — §12's panel tone — which
+        put the page's one grey band round three cells that are themselves
+        `--layer-01` with a hairline: a white box on grey inside a grey block,
+        which is the "5%-tinted card on a 4% grey ground" §74 took the tint out
+        for. On white the cells are §41's bounded panels and their own edges are
+        what separate them. */}
+  <div class="sec">
     <div class="sec-h"><h2>Notifications</h2></div>
     <p class="all-desc">Manage what updates you want to receive.</p>
     <div class="pf-tgs">
@@ -18267,11 +18532,62 @@ V.account = (f) => `<main class="main"><div class="page">
     <button class="btn btn-g" data-go="stage:signup/login">Log out ${I.logout}</button>
   </div>
 </div></main>
-${S.delAsk?`<div class="modal" data-del="0">
-  <div class="sheet sheet-c" role="dialog" aria-modal="true" aria-label="Delete your account">
-    <div class="sheet-h"><h2>Delete your account?</h2><button class="x" data-del="0" aria-label="Close">${I.close}</button></div>
-    <div class="sheet-b">
-      <div class="note err"><span>${I.warning}</span><div class="nb"><b>This cannot be undone</b>Your profile, your notes and every interview recording are deleted. Your certificates stay valid and downloadable from the link in your email.</div></div>
+${''/* THE CONFIRMATION IS A CENTRED DIALOG — §105.6, Maryam's anatomy diagram,
+      2 Sep 2026: "on clicking to delete account, i want you to show such modal
+      on the page, obviously in our design language."
+
+      THE FIVE PARTS ARE THE DIAGRAM'S, IN ITS ORDER: the mark inside its signal
+      rings, the title as a question, the description carrying the consequence,
+      the friction field, then the safe exit and the destructive action side by
+      side. Every one of them already existed here — what changes is that they
+      are centred, the mark is drawn rather than boxed, and the header row is
+      gone.
+
+      THE `.sheet-h` AND ITS × ARE REMOVED, which the anatomy asks for and two
+      other exits make safe: "Keep my account" is the labelled way out and the
+      backdrop still carries `data-del="0"`. A × in the corner of a dialog whose
+      whole point is a deliberate choice is a third way out, and the quietest of
+      the three — §60's argument turned round.
+
+      THE `.note err` BOX IS GONE AND ITS SENTENCE IS THE DESCRIPTION. A bordered
+      red panel inside a dialog that is already about one destructive act is the
+      "box in a box" §72 and §74 both take out; the consequence reads as prose,
+      which is what the diagram calls Description. "This cannot be undone" is
+      folded into it as the closing clause rather than a `<b>` heading over it.
+
+      WHAT IT REFUSES FROM THE REFERENCE: the 16px radius and the drop shadow
+      (§02's opening note — "depth is expressed as rhythm and rule weight,
+      nothing else" — and `--radius` is 0 by token), the rose-red palette (ours
+      is `--danger-ink`, which §29 already spends on this exact control), and
+      the label-less friction field. That last one is the only deliberate
+      departure from the anatomy: our forms label their fields (§02's `.f >
+      label`), and a placeholder-only instruction disappears at exactly the
+      moment the reader is typing the word it was telling them to type. */}
+${''/* `.on` IS WHAT MAKES A MODAL VISIBLE, AND THIS ONE NEVER HAD IT. §02.398
+      draws `.modal` at `opacity:0;visibility:hidden` and `.modal.on` is the
+      only rule that turns it on — every other sheet in the build writes
+      `class="modal ${state?'on':''}"` (the photo picker, the card form, Edit
+      details, the leader's two). This one wrote `class="modal"` and gated the
+      whole element on `S.delAsk` instead, so pressing "Delete my account" set
+      the flag, rendered a complete dialog, and painted nothing.
+
+      IT HAD NEVER WORKED — the same markup is in the last commit's source and
+      in its built output, so the confirmation has been invisible for as long as
+      it has existed. Conditional rendering and the `.on` class look like two
+      ways to do one job and are not: the element has to be in the DOM for the
+      transition to run against, which is why the pattern everywhere else is
+      "always render, toggle the class".
+
+      BOTH ARE KEPT rather than dropping the condition. `S.delAsk` decides
+      whether the dialog exists at all, which keeps a `<input>` and two live
+      buttons out of the page while it is shut; `.on` decides whether it is
+      shown. Written together they cannot disagree. */}
+${S.delAsk?`<div class="modal on" data-del="0">
+  <div class="sheet sheet-c conf" role="dialog" aria-modal="true" aria-label="Delete your account">
+    <div class="sheet-b conf-b">
+      <span class="conf-mk">${I.warning}</span>
+      <h2 class="conf-t">Delete your account?</h2>
+      <p class="conf-x">Your profile, your notes and every interview recording are deleted. Your certificates stay valid and downloadable from the link in your email. This cannot be undone.</p>
       ${/* THE CONFIRM WORD IS SENTENCE CASE AND THE CHECK ALREADY ALLOWED IT.
             This was the one string in the build that was typed in capitals
             and rendered — §63 takes case off everything else, but no
@@ -18281,9 +18597,9 @@ ${S.delAsk?`<div class="modal" data-del="0">
             accepted any casing; only the instruction was in capitals, and a
             capitalised instruction beside a lowercase-accepting field was
             telling the reader to do something the form did not require. */''}
-      <div class="f mt5"><label for="delc">Type Delete to confirm</label><input class="inp" id="delc" placeholder="Delete" autocomplete="off"></div>
+      <div class="f conf-f"><label for="delc">Type Delete to confirm</label><input class="inp" id="delc" placeholder="Delete" autocomplete="off"></div>
     </div>
-    <div class="sheet-f">
+    <div class="sheet-f conf-a">
       <button class="btn btn-s noic" data-del="0">Keep my account</button>
       <button class="btn btn-p noic danger" data-delgo="1">Delete everything</button>
     </div>
@@ -20107,6 +20423,10 @@ S.askOpen = false;
 S.askFrom = null;
 let ASK_FRESH = false;
 
+const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SPEECH_OK = !!SPEECH;
+let _rec = null;
+
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
       <defs>
@@ -20136,6 +20456,25 @@ function askBar(){
           same forward arrow every other "go on to the next screen" control in
           the build carries. §70 gives the chip the accent gradient at the
           file's own 20%, which is what says the control is not live yet. */}
+    ${''/* THE DOCK CARRIES THE SAME PAIR AS THE CHAT'S FIELD (Maryam, 2 Sep
+           2026: "the tal bar should also have the round arrow icon with the mic
+           like we have on the tal chat page"), and the mic here is a `<span>`
+           for the reason this whole row is one `<button>`: §21's note — "a
+           button inside a button is a click whose destination depends on where
+           in the row you land".
+
+           IT IS NOT A DEAD CONTROL EITHER, which is the other half. §60's rule
+           would refuse a decorative mic, so pressing it does the one thing it
+           can honestly mean on a collapsed line: it opens the conversation AND
+           starts dictating, in that order. `data-askmicopen` is read before
+           `data-askopen` in the click handler, so the mark is a shortcut into
+           the same surface rather than a second destination.
+
+           AND IT IS DRAWN ONLY WHERE DICTATION EXISTS — `SPEECH_OK`, the same
+           constructor test the chat's field uses. A browser with no Web Speech
+           API gets the row exactly as it was. */}
+    ${SPEECH_OK ? `<span class="askline-mic" data-askmicopen="1"
+      title="Ask Tal by voice">${I.microphone}</span>` : ''}
     <span class="askline-send" aria-hidden="true">${I.arrowRight}</span>
   </button>`;
 }
@@ -20219,7 +20558,36 @@ function askView(f){
       <div class="askfield">
         <span class="askv-clip">${I.attachFile}</span>
         <input class="inp" id="askIn" placeholder="What can I help you with?" autocomplete="off">
-        <button class="askfield-send" data-asksend="1" aria-label="Send">${ARROW_LINE}</button>
+        ${''/* THE MIC IS DRAWN ONLY WHERE IT CAN WORK — §60's rule, applied to a
+               browser capability rather than to missing data: "a dead control on
+               a live surface is worse than a missing one", which is why the
+               month chevrons stayed off §76 until `AGENT_CAL` gave them
+               somewhere to go. `SPEECH_OK` is the constructor test, so in a
+               browser with no Web Speech API the field is exactly what it was.
+
+               IT IS DICTATION, NOT A RECORDING. `.composer`'s mic in Messages
+               is "record a voice message" and sends audio; this one writes into
+               the field you are already typing in, which is why it sits beside
+               the send rather than at the far end with the clip. */}
+        ${SPEECH_OK ? `<button class="askfield-mic" data-askmic="1"
+          aria-label="Dictate your question" aria-pressed="false"
+          title="Dictate your question">${I.microphone}</button>` : ''}
+        ${''/* THE SEND IS OFF UNTIL THERE IS SOMETHING TO SEND (Maryam, 2 Sep
+               2026: "keep the send arrow circle little disable until nothing has
+               been written or no voice has been recorded yet"). It is the real
+               `disabled` attribute rather than a class, so the control cannot be
+               pressed as well as not looking pressable — §21's original note for
+               the collapsed line makes the argument for the look ("a control
+               that is visibly OFF tells the truth"), and this adds the half that
+               makes it true.
+
+               `disabled` AT RENDER IS ALWAYS CORRECT, which is why there is no
+               state to keep: `placeAsk` rebuilds the field on every render, so
+               the `<input>` is new and empty every time it is drawn. What turns
+               it on is `askSendArm`, from the field's own `input` event and from
+               dictation's `onresult` — neither of which re-renders, for the
+               caret reason ai4's own trap records. */}
+        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.send}</button>
       </div>
     </div>
   </div>`;
@@ -20333,15 +20701,55 @@ function askClose(){
 }
 
 device.addEventListener('click', e => {
+  if(e.target.closest('[data-askmicopen]')){ askOpen(); setTimeout(askMic, 0); return; }
   if(e.target.closest('[data-askopen]')){ askOpen(); return; }
   if(e.target.closest('[data-askback]')){ askClose(); return; }
+  if(e.target.closest('[data-askmic]')){ askMic(); return; }
   if(e.target.closest('[data-asksend]')){
     const el = device.querySelector('#askIn');
     const v = el && el.value.trim();
-    if(v){ el.value = ''; ask(v); }
+    if(v){ el.value = ''; askSendArm(); ask(v); }
     return;
   }
 });
+
+function askSendArm(){
+  const el = device.querySelector('#askIn');
+  const b = device.querySelector('.askfield-send');
+  if(el && b) b.disabled = !el.value.trim();
+}
+device.addEventListener('input', e => { if(e.target.id === 'askIn') askSendArm(); });
+
+function askMicOff(){
+  const b = device.querySelector('[data-askmic]');
+  if(b){ b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
+  _rec = null;
+}
+function askMic(){
+  if(!SPEECH_OK) return;
+  if(_rec){ try{ _rec.stop(); }catch(err){} askMicOff(); return; }
+  const b = device.querySelector('[data-askmic]');
+  const el = device.querySelector('#askIn');
+  if(!b || !el) return;
+  const r = new SPEECH();
+  r.lang = 'en-US';
+  r.interimResults = true;
+  r.continuous = false;
+  const base = el.value ? el.value.replace(/\s+$/, '') + ' ' : '';
+  r.onresult = ev => {
+    let said = '';
+    for(let i = 0; i < ev.results.length; i++) said += ev.results[i][0].transcript;
+    el.value = base + said.trim();
+    askSendArm();
+  };
+  r.onerror = askMicOff;
+  r.onend = askMicOff;
+  try{ r.start(); }catch(err){ askMicOff(); return; }
+  _rec = r;
+  b.classList.add('on');
+  b.setAttribute('aria-pressed', 'true');
+  el.focus();
+}
 
 device.addEventListener('keydown', e => {
   if(e.target.id === 'askIn' && e.key === 'Enter'){
@@ -22534,38 +22942,34 @@ V.leadCalls = () => {
           <span class="cardrow-t">${lcTitle(k)}</span>
           <span class="cardrow-d">${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${lcDetail(k)}</span>
         </span>
-        ${''/* RESCHEDULE, NOT BRIEF, AND IT IS A SECONDARY (Maryam, 1 Sep 2026:
-               "instead of brief, give a reschedule button, a secondary button,
-               not in black color, just a black text with reschedule icon on its
-               left").
+        ${''/* THE ROW HAS NO ACTION, AND THAT IS THE POINT (Maryam, 2 Sep 2026:
+               "a cohort leader can not reschedule a weekly call so remove that
+               flow"). It carried Reschedule for one day — `.btn-t btn-sm ic-l`
+               with `I.calendar`, opening lead4's weekly-calls sheet — and the
+               whole flow is deleted with it: the sheet, `S.ldrAvail`, the
+               `data-ldravail` handler and the Profile row's Manage control.
 
-               `.btn-t` IS THE BLACK-TEXT BUTTON. §64 took the border off
-               `.btn-s` / `.btn-t` / `.btn-g` and left the ink at
-               `--text-primary`, so a text button on a page IS black words —
-               and §64's arrow does NOT arrive, because its own test is
-               `:not(:has(svg))` and this one carries a mark. `ic-l` is what
-               seats that mark on the LEFT; without it the icon is pushed to
-               the far edge.
+               THE ASK IS ABOUT AUTHORITY, NOT ABOUT A BUTTON. A weekly cohort
+               call is the PROGRAMME's — ten candidates, a fixed hour, thirteen
+               weeks — and the sheet said so itself in its own helper line:
+               "moving one moves it for every candidate in that cohort". That is
+               not a leader's decision to make from a diary row, so there is
+               nothing for a control here to open. This is the same correction
+               as 1 Sep's "a cohort leader does not interview anybody", one
+               surface smaller: the portal keeps drifting toward giving this
+               person an agent's powers.
 
-               THE MARK IS `I.calendar`, WHICH IS WHAT RESCHEDULE ALREADY WEARS.
-               `CALL_ROW.iv`'s own Reschedule (views.js) is `ic:I.calendar`, so
-               this is one word with one mark across both portals rather than a
-               second glyph for the same verb. `I.renew` was the alternative and
-               reads better in isolation — circular arrows say "move it" — but a
-               product where Reschedule is a calendar on one page and arrows on
-               another is the drift `stepIcon`'s table exists to prevent.
+               SO THE ROW IS A FACT, and a diary you read is a legitimate page —
+               `.cardrow` with no `.cardrow-a` is the shape §02 already draws
+               for one. What a leader DOES on this page is at the top of it, on
+               the black card: "Generate the brief".
 
-               IT OPENS THE WEEKLY-CALLS SHEET, which is the surface that
-               actually moves a call: `data-ldravail` (lead4), mounted on every
-               leader page by `placeLdrSheets`. Pointing it at the brief sheet
-               would have been a button lying about what it does, and leaving it
-               inert would be §60's "a dead control on a live surface is worse
-               than a missing one". THE BRIEF IS NOT LOST — it is the black
-               card's own action at the top of this page, and the cohort page
-               has it twice. */}
-        <span class="cardrow-a">
-          <button class="btn btn-t btn-sm ic-l" data-ldravail="1">${I.calendar}Reschedule</button>
-        </span>
+               THE CANDIDATE'S RESCHEDULE IS UNTOUCHED. `CALL_ROW.iv`'s control
+               moves an INTERVIEW the candidate booked and paid for with an
+               agent who sets their own availability, which is a different
+               appointment with a different owner. It keeps `I.calendar`, so the
+               one-word-one-mark rule this note used to make is still true —
+               there is simply one caller now instead of two. */}
       </div>`).join('')}
     </div>` : `<div class="empty" style="border:0">${I.calendar}
       <h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
@@ -23111,7 +23515,6 @@ const LDR_THREADS = [
 S.ldrTh = 0;
 S.ldrThOpen = false;
 S.ldrEditProfile = false;
-S.ldrAvail = false;
 
 V.leadMessages = () => {
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
@@ -23346,9 +23749,22 @@ V.leadProfile = () => `<main class="main"><div class="page">
            interview. Nobody books a cohort leader. The second row was already
            the truth and is now the section: three cohorts, three fixed hours a
            week, read off the same cohort record `lcall` reads.
-           IT KEEPS THE SHEET, because the hours themselves are still a setting
-           a leader changes — what changed is that changing one moves a call
-           rather than opening a slot. */}
+           IT KEPT THE SHEET FOR ONE DAY AND THE SHEET IS NOW GONE TOO (Maryam,
+           2 Sep 2026: "a cohort leader can not reschedule a weekly call so
+           remove that flow"). The note above ended "the hours themselves are
+           still a setting a leader changes — what changed is that changing one
+           moves a call rather than opening a slot", and that second clause is
+           exactly what the instruction rules out: if moving one moves the call
+           for ten candidates, it is not this person's setting. `Manage` is
+           deleted with `ldrAvailSheet`, `ldrDays`, `LDR_DAY_NAMES`,
+           `S.ldrAvail` and both handler branches — the whole flow, on the same
+           reasoning that took the level decision off this portal on 1 Sep.
+
+           THE ROW STAYS AND IS NOW WHAT IT ALWAYS DESCRIBED: the three hours
+           this leader is committed to, read off `LEAD_COHORTS`, stated once on
+           the page that says who they are. A settings page is allowed to hold a
+           fact about you that you did not set — "Volunteer cohort leader ·
+           unpaid" two sections up is the same kind of row. */}
     <div class="sec-h"><h2>When you are on</h2><span class="t-helper-01">Three cohorts, one hour a week each</span></div>
     <div class="tile-stack">
       <div class="cardrow">
@@ -23356,9 +23772,6 @@ V.leadProfile = () => `<main class="main"><div class="page">
         <span class="cardrow-b">
           <span class="cardrow-t">Your cohort calls</span>
           <span class="cardrow-d">${LEAD_COHORTS.map(c => c.call.toLowerCase()).join(' &middot; ')}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="btn btn-sm noic" data-ldravail="1">Manage</button>
         </span>
       </div>
       <div class="cardrow">
@@ -23439,35 +23852,8 @@ function ldrProfileSheet(){
   </div>`;
 }
 
-const LDR_DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-const ldrDays = () => LDR_DAY_NAMES.map(d => {
-  const c = LEAD_COHORTS.filter(x => x.call.split(' ')[0] === d)[0];
-  return c
-    ? [d, `${lname(c)} &middot; ${c.call.split(' ').slice(1).join(' ')} &middot; 60 minutes`, 1]
-    : [d, 'Nothing scheduled', 0];
-});
 
-function ldrAvailSheet(){
-  return `<div class="modal ${S.ldrAvail ? 'on' : ''}" data-ldrclose="avail">
-    <div class="sheet">
-      <div class="sheet-h"><h2>Your weekly calls</h2>
-        <button class="x" data-ldrclose="avail" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">
-        <p class="t-helper-01 mb6">One call a week for each cohort you lead. Moving one moves it for every candidate in that cohort, so the change is announced on their board.</p>
-        ${ldrDays().map(([d,detail,on],i) => `
-        <label class="tg"><div class="tb"><b>${d}</b><span>${detail}</span></div>
-          <input type="checkbox" id="ldrDay${i}" ${on ? 'checked' : ''}><span class="sw"></span></label>`).join('')}
-        <p class="t-helper-01 mt5">${LEAD_COHORTS.length} calls a week, ${LEAD_COHORTS.length * 60} minutes in total. A cohort that reaches day 90 gives its slot back.</p>
-      </div>
-      <div class="sheet-f">
-        <button class="btn btn-s noic" data-ldrclose="avail">Cancel</button>
-        <button class="btn btn-p noic" data-ldrclose="avail">Save changes</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-LDR_SHEETS.push(ldrProfileSheet, ldrAvailSheet);
+LDR_SHEETS.push(ldrProfileSheet);
 
 device.addEventListener('click', e => {
   const t = e.target;
@@ -23514,14 +23900,10 @@ device.addEventListener('click', e => {
   const pf = t.closest('[data-ldrprof]');
   if(pf){ S.ldrEditProfile = true; render(); return; }
 
-  const av = t.closest('[data-ldravail]');
-  if(av){ S.ldrAvail = true; render(); return; }
-
   const cl = t.closest('[data-ldrclose]');
-  if(cl && (cl.dataset.ldrclose === 'prof' || cl.dataset.ldrclose === 'avail')){
+  if(cl && cl.dataset.ldrclose === 'prof'){
     if(cl.classList.contains('modal') && t !== cl) return;
-    if(cl.dataset.ldrclose === 'prof') S.ldrEditProfile = false;
-    if(cl.dataset.ldrclose === 'avail') S.ldrAvail = false;
+    S.ldrEditProfile = false;
     render();
     return;
   }
@@ -23603,11 +23985,11 @@ const PAGESUM = {
   },
 
   level: (() => {
-    const pre = 'Your <b>quiz result</b> places you on the <b>Explorer track</b>, with your level to be determined through a <b>45-minute interview</b>. The ladder shows your current path across Explorer &rarr; Builder &rarr; Trailblazer, with five levels in each track.';
+    const pre = 'Your <b data-sum="quiz">quiz result</b> places you on the <b data-sum="track">Explorer track</b>, with your level to be determined through a <b data-sum="ivwhat">45-minute interview</b>. The ladder shows your current path across Explorer &rarr; Builder &rarr; Trailblazer, with five levels in each track.';
     return {
       consult: pre,
       new: pre,
-      booked: 'Your interview is booked for <b>20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b>Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
+      booked: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
       promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview &mdash; one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };
@@ -23630,11 +24012,11 @@ const PAGESUM = {
       const c = CALL_ROW.iv();
       const ex = String(c.x || '').split(', assesses ')[0] || 'your';
       const rng = (c.who && c.who.range) || 'E1&ndash;E3';
-      return `Your <b>45-minute interview with ${c.who.n}</b> is scheduled and <b>ready to join</b>. `
+      return `Your <b data-sum="interview">45-minute interview with ${c.who.n}</b> is scheduled and <b data-sum="join">ready to join</b>. `
         + `She&rsquo;ll assess your ${ex} skills across the ${rng} levels, and your final level `
         + `and report will be based on this conversation.`;
     }
-    if(f.pred) return 'You haven&rsquo;t completed an interview yet. Choose from <b>24 available agents</b> to book a <b>45-minute conversation</b> and determine your level, with options across different experience areas, ratings, and fees.';
+    if(f.pred) return 'You haven&rsquo;t completed an interview yet. Choose from <b data-sum="roster">24 available agents</b> to book a <b data-sum="ivwhat">45-minute conversation</b> and determine your level, with options across different experience areas, ratings, and fees.';
     return 'One on record: 20 August with Priya, which set Explorer &ndash; E3. A re-interview at the end of the 90 days is what moves the level.';
   },
 
@@ -23660,7 +24042,9 @@ const PAGESUM = {
     return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment &mdash; only the assessment counts towards your average.`;
   },
 
-  transcript: f => f.done
+  transcript: f => f.complete
+    ? `${certsFor(f).slice(-1)[0].cohort} is closed &mdash; ${f.done} chapters at ${f.avg}%, about ${_hrs(f.mins)} hours of coursework. Nothing lands on this record again until you enroll at ${f.level}.`
+    : f.done
     ? `${f.done} of 13 chapters at ${f.avg}%, about ${_hrs(f.mins)} hours in. This is the record an agent reads before your re-interview.`
     : 'Nothing on the record yet &mdash; the 90 days only started this week.',
 
@@ -23678,7 +24062,7 @@ const PAGESUM = {
   messages: 'Priya can see your chapters, scores and attendance already, so you never have to explain where you are.',
 
 
-  billing: 'Your payment history shows a <b>$490 charge</b> for <b>Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b>Visa ending 4242</b>.',
+  billing: 'Your payment history shows a <b data-sum="charge">$490 charge</b> for <b data-sum="tracke2">Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b data-sum="defcard">Visa ending 4242</b>.',
 
   account: 'Everything here saves as you go. The block worth a look is the last one &mdash; what I&rsquo;m allowed to remember, and what I can do without asking.',
 
@@ -23956,6 +24340,18 @@ render = function(){
 
 const _sumTop = () => SCORES.slice().sort((a,b) => b[1] - a[1])[0];
 
+const _bookedAct = () => {
+  const f = (typeof cfg === 'function' ? cfg(S.stage) : null) || {};
+  if(f.pred && !f.booked && !S.booking){
+    const k = recKey();
+    return {ic: I.calendar, go: 'agent:' + k, t: 'Book your interview with ' + AGENTS[k].n};
+  }
+  if(S.view === 'interviews') return {ic: I.calendar, go: 'booking', t: 'See the booking details'};
+  return f.booked || S.booking
+    ? {ic: I.calendar, go: 'interviews', t: 'See the booking'}
+    : {ic: I.document, go: 'interviews', t: 'See your interviews'};
+};
+
 const SUMDROP = {
   quiz: () => {
     const [hiN, hiV] = _sumTop();
@@ -23974,7 +24370,7 @@ const SUMDROP = {
     label: 'Discovering your direction:',
     read: 'You&rsquo;re exploring what fits you best&mdash;and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.',
     next: 'Connect with Talent Next Agent to get yourself evaluated and get a level. Your level anchors after a 45-minute interview.',
-    act: {ic: I.calendar, go: 'agent:' + recKey(), t: 'Book your interview with ' + AGENTS[recKey()].n}
+    act: _bookedAct()
   }),
 
   match: () => {
@@ -23996,7 +24392,7 @@ const SUMDROP = {
     label: 'What happens in it:',
     read: '45 minutes, recorded, and real situations rather than hypotheticals. She confirms which of E1 to E5 you sit on and signs a report you keep.',
     next: 'Nothing has to be prepared. If you want to, ten minutes on delegation is the most useful ten minutes you can spend.',
-    act: {ic: I.calendar, go: 'interviews', t: 'See the booking'}
+    act: _bookedAct()
   }),
 
   prep: () => {
@@ -24038,6 +24434,71 @@ const SUMDROP = {
     read: '13 chapters, one a week, each closing on an assessment, with a cohort of ten and a live leader running a weekly call. The average of the thirteen is what an agent reads at your re-interview.',
     next: 'The next cohort starts within two weeks of paying, and the interview you have already paid for comes off the price.',
     act: {ic: I.wallet, go: 'enrol', t: 'See what enrolling costs'}
+  }),
+
+
+  ivwhat: () => ({
+    lead: 'A level interview is 45 minutes with a talent agent, video-recorded, and it is the only thing that sets a level.',
+    label: 'What happens in it:',
+    read: 'Real situations rather than hypotheticals. The agent decides which of E1 to E5 you sit on and signs a report you keep &mdash; a quiz can predict the track, but it cannot set the rung.',
+    next: 'Any agent whose range covers your track can run it. Nothing is charged until you confirm a slot.',
+    act: _bookedAct()
+  }),
+
+  roster: () => {
+    const ks = Object.keys(AGENTS);
+    const ps = ks.map(k => Number(String(AGENTS[k].price).replace(/[^0-9.]/g, ''))).filter(Boolean);
+    const rs = ks.map(k => AGENTS[k].r);
+    return {
+      lead: `Every agent sets their own fee and assesses their own band of levels &mdash; $${Math.min(...ps)} to $${Math.max(...ps)} here, rated ${Math.min(...rs).toFixed(1)} to ${Math.max(...rs).toFixed(1)}.`,
+      label: 'What has to match:',
+      read: 'The range, and only the range &mdash; an agent assesses a band of the fifteen rungs, and yours has to sit inside it. Fee, rating and what they assess for are yours to weigh after that.',
+      next: 'Tal already has a pick, on the strength of what your quiz surfaced.',
+      act: _bookedAct()
+    };
+  },
+
+
+  charge: () => {
+    const [what, when, amt, brand, last] = PAY_E2;
+    return {
+      lead: `${amt} on ${when} for ${what}, charged to the ${brand} ending ${last}.`,
+      label: 'What a row is:',
+      read: 'A course purchase rather than an interview fee &mdash; the two are always separate rows, and each one keeps its own receipt for as long as the account is open.',
+      next: 'A course and an interview have different refund windows, and Tal can state both.',
+      act: {ic: I.time, ask: 'What is the refund window?', t: 'Ask about the refund windows'}
+    };
+  },
+
+  tracke2: () => ({
+    lead: 'E2 is rung 2 of the fifteen-rung ladder, inside the Explorer track.',
+    label: 'How the ladder reads:',
+    read: 'Explorer is rungs 1 to 5 of 15, then Builder, then Trailblazer. A course is bought for the rung you are on, and an interview is the only thing that moves you up one.',
+    next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',
+    act: {ic: I.certificate, go: 'level', t: 'See where you are on the ladder'}
+  }),
+
+  defcard: () => {
+    const cs = S.cards || [];
+    const def = cs.find(c => c.def) || cs[0] || {brand: 'Visa', last: '4242', exp: '09/29'};
+    const others = Math.max(0, cs.length - 1);
+    return {
+      lead: `${def.brand} ending ${def.last} is your default card, expiring ${def.exp}.`,
+      label: 'What default means:',
+      read: 'It is the card a new charge is offered against first, and it is a preference rather than a commitment &mdash; you can switch it, or take a card off, without touching anything already paid.',
+      next: others
+        ? `The other ${others === 1 ? 'one is' : _w(others) + ' are'} on file for later, and each can be made the default from the list below.`
+        : 'It is the only card on file.',
+      act: {ic: I.shield, ask: 'Is my card stored?', t: 'Ask how your card is held'}
+    };
+  },
+
+  join: () => ({
+    lead: `The call opens ${_w(JOIN_EARLY)} minutes before the start and stays open until the session ends.`,
+    label: 'What you are joining:',
+    read: 'A video call in the browser &mdash; camera, microphone, screen share and captions. It is recorded, and the recording goes to your agent rather than to Tal.',
+    next: 'Nothing has to be prepared. If the time no longer works, reschedule from the card below.',
+    act: {ic: I.video, call: 'iv', t: 'Join the interview'}
   })
 };
 
@@ -24055,7 +24516,9 @@ function sumDropCard(key){
     </div>
     <button class="sd-act" ${d.act.ask
       ? `data-tal-ask="${d.act.ask}"`
-      : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
+      : d.act.call
+        ? `data-call="${d.act.call}"`
+        : `data-go="${d.act.go}"`}><span class="sd-ic">${d.act.ic}</span>${d.act.t}</button>`;
 }
 
 function placeSumDrop(){
@@ -24521,7 +24984,16 @@ function wCard(){
     `<span class="tw-list">
        <span>The number goes straight to our payment processor. It never reaches a TalentNext server.</span>
        <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
-       <span>Three saved cards is the maximum, and you can remove any of them from Payments.</span>
+       ${''/* THE CAP CAME OFF THE PRODUCT, SO IT CAME OFF THIS ANSWER (2 Sep
+              2026). This read "Three saved cards is the maximum, and you can
+              remove any of them from Payments" — and `V.billing` no longer
+              hides "Add a card" at three or states a limit, so the sentence
+              was Tal asserting a rule the page had stopped having. That is the
+              exact failure this file's own note warns about: "do not restate a
+              number here that a page owns; read it, or the two drift."
+              What is left is the half that is still the page's: you can take
+              any of them off, there. */}
+       <span>You can add another or remove any of them from Payments.</span>
      </span>
      <span class="tw-k">I ${hl('cannot see')} any of it. Card details are on the list of things I have never been shown.</span>`,
     twBtn('Open Payments','billing'));

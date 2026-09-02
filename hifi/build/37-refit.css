@@ -247,13 +247,20 @@
    trap 4: the weight was never the problem, the tier was. `:not(.lead-bar)` is
    in §14's list now, and the rule below is what still answers it below 900.
    -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .lead-bar{
+/* THE SCOPE IS OFF THESE FIVE TOO — 2 Sep 2026, with §31's fourteen. These are
+   the half of the component that makes it a FLOATING strip rather than a band
+   in the flow, and leaving them scoped while §31's travelled would have been
+   worse than leaving both: a second portal would have got the resting band
+   §31's own note describes (a 50px strip standing in the page, always visible)
+   and none of the behaviour that band was replaced by. Read §31's head note for
+   which families moved and which deliberately did not. */
+.app .lead-bar{
   height:0;min-height:0;padding-top:0;padding-bottom:0;overflow:visible}
-.app[data-portal="leader"] .lead-bar::after{display:none}
-.app[data-portal="leader"] .lead-bar > .lead-tabs{
+.app .lead-bar::after{display:none}
+.app .lead-bar > .lead-tabs{
   visibility:hidden;background-color:var(--background)}
-.app[data-portal="leader"] .lead-bar.is-stuck > .lead-tabs{visibility:visible}
-.app[data-portal="leader"] .lead-bar.is-gone > .lead-tabs{visibility:hidden}
+.app .lead-bar.is-stuck > .lead-tabs{visibility:visible}
+.app .lead-bar.is-gone > .lead-tabs{visibility:hidden}
 
 /* AND THE CARD BAND CLOSES ON THE CARDS, NOT ON A RULE.
    The four figure cells are a bordered block — they draw their own bottom

@@ -191,11 +191,19 @@
    PROFILE
    ========================================================================== */
 .idhead{display:flex;align-items:center;gap:var(--s05);margin-bottom:var(--s06)}
-.idphoto{position:relative;flex:none;display:block;border-radius:0}
-.idphoto .av-ph{border-radius:0}
-/* the badge sits in the photograph's corner, not hanging off it: a square
-   photo with a square tab reads as one object. z-index because the <img> is
-   itself absolutely positioned and would otherwise paint over it. */
+/* THE TWO `border-radius:0` DECLARATIONS ARE DELETED (2 Sep 2026). They were
+   written when every avatar in the build was square and they said so twice —
+   once on the button and once on the photograph inside it. §106 makes every
+   photograph of a person a disc, so both would now be contradicting the
+   component from four layers back; the argument they carried ("a square photo
+   with a square tab reads as one object") is answered below rather than lost. */
+.idphoto{position:relative;flex:none;display:block}
+/* the badge sits in the photograph's corner, not hanging off it. z-index
+   because the <img> is itself absolutely positioned and would otherwise paint
+   over it. WITH A ROUND PHOTO the corner is outside the disc — which is why
+   §106.3 moves the picker's tick to bottom centre; this badge is not drawn on
+   any screen in the product today (the profile page renders `.idphoto` with no
+   `.idphoto-edit` child), so it is left stated rather than re-placed blind. */
 .idphoto-edit{
   position:absolute;right:0;bottom:0;z-index:2;width:26px;height:26px;
   display:grid;place-items:center;background:var(--brand-primary)}
