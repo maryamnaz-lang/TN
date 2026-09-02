@@ -129,7 +129,9 @@ stated as rules to follow. All of these are in `gallery.html` → **Spacing**.
 | | |
 |---|---|
 | Horizontal | Only `--pad-x` — 16 / 24 / 32 by tier |
-| Vertical | `.sec` pays it for you: `--s06`, `--s07` from 900px |
+| Vertical | `.sec` pays it for you: `--s06` top and bottom, at every width |
+| Heading to content | `--sec-h-gap` — 12px, one token, every section |
+| Heading to its own description | `--sec-desc-gap` — 8px; a heading and the sentence under it are one object |
 | Gaps inside a component | Only `--s01` … `--s12` (2, 4, 8, 12, 16, 24, 32, 40, 48, 64, 80, 96) |
 | Column width | `--content-max`, centred by `.page` |
 | Radius | `--radius` = 0, everywhere |
@@ -140,6 +142,26 @@ edge whatever is drawn in it. A page that hard-codes `padding-left:20px` is a
 page whose rows no longer line up with their own headings — and that mismatch is
 the most visible way a new portal stops looking like the others. `.sec` already
 pays it; do not pay it twice.
+
+**And the vertical rhythm is ONE number: 48px between any two sections**, which
+is `.sec`'s own `--s06` paid twice (Maryam, 1 Sep 2026 — "each section on all
+pages on both portals should have equal spacing from each other"). Two things
+follow from that:
+
+- **Do not give a section a vertical margin, and do not put a margin utility on
+  one.** `.sec` already pays the rhythm; anything added stacks. A `.sec.mt6` in
+  the portal was drawing 72 where its neighbours drew 48, and it was the whole
+  cause.
+- **A card's own frame is not the gap.** `.dark-card` pays `--s07` inside and
+  carries `margin:var(--s06) var(--pad-x)`, so it sits the same 24 clear of its
+  neighbours as any section and reads at 48 edge to edge — while measuring 80
+  content-to-content, because 32 of that is the card. That is correct and is
+  the one place the two ways of measuring disagree.
+
+Two structural exceptions exist in the portal and are deliberate: a **full-bleed
+surface meeting another** (a call row above a tab strip) pays 0 so the two
+grounds meet on one line, and a **zero-height sticky hook** pays nothing because
+its height must never change.
 
 ### The markup is part of the component
 

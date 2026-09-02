@@ -228,7 +228,7 @@
 @container app (min-width:900px){
   .app .peek .sec{display:block;padding-left:0;padding-right:0}
   .app .peek .sec > .sec-h{
-    border-right:0;min-height:0;margin-bottom:var(--s04);
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0;align-self:stretch}
   .app .peek .sec > :not(.sec-h){padding-left:0;padding-right:0}
 }

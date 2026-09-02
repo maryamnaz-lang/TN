@@ -53,7 +53,7 @@
   .app .page .sec.found{
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .app .page .sec.found > .sec-h{
-    border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
+    border-right:0;min-height:0;margin:0 0 var(--sec-h-gap);padding:0}
   .app .page .sec.found > :not(.sec-h){padding-left:0;padding-right:0}
   /* THE HEADING'S SIZE CAME OFF HERE — 1 Sep 2026, one section heading size
      everywhere (Maryam). The rule set `--t-h4` and argued: "§8b of §63 puts a

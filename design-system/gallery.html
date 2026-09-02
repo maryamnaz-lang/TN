@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=28c2a102">
+<link rel="stylesheet" href="talentnext-ds.css?b=288eef02">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=28c2a102"></script>
+<script src="talentnext-ds.js?b=288eef02"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -246,6 +246,14 @@ const fillLive = s => s
    still the feed is drawn on and the two faces beside it. Same split, same
    reason as the two above; `CALL_ART` is the table build-ds.py embeds. */
   .replace(/\{\{art:(\w+)\}\}/g, (_, n) => (typeof CALL_ART === 'object' && CALL_ART[n]) || '')
+/* AND `{{ph:flame}}` FOR THE SECOND ICON FAMILY. `P` is Phosphor Duotone on
+   its own 256 box (icons.js's head is the argument for why there are two sets
+   and where the line between them runs), so it cannot go through the bare
+   `{{name}}` form below — that one hands the name to `I` and would return an
+   empty `<svg>` for a Phosphor key, silently. A prefix keeps the two families
+   impossible to confuse in a snippet, which is the whole point of having
+   drawn the line. */
+  .replace(/\{\{ph:(\w+)\}\}/g, (_, n) => (typeof P === 'object' && P[n]) || '')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
     (_, n, c) => `<svg class="${c}" viewBox="0 -960 960 960">${inner(n)}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => I[n] || '');
@@ -253,6 +261,7 @@ const fillSrc = s => s
   .replace(/\{\{av:(\w+)\}\}/g, (_, n) => '${AV.' + n + '}')
   .replace(/\{\{aw:(\w+)\}\}/g, (_, n) => '${AWARD.' + n + '}')
   .replace(/\{\{art:(\w+)\}\}/g, (_, n) => '${CALL_ART.' + n + '}')
+  .replace(/\{\{ph:(\w+)\}\}/g, (_, n) => '${P.' + n + '}')
   .replace(/\{\{(\w+)\|([\w-]+)\}\}/g,
     (_, n, c) => `<svg class="${c}" viewBox="0 -960 960 960">\${inner('${n}')}</svg>`)
   .replace(/\{\{(\w+)\}\}/g, (_, n) => '${I.' + n + '}');
@@ -285,8 +294,9 @@ const swatch = (name, val, note) => `<div class="sw-c">
    `.stat-ic` sits in `grid-area:ic` — so a cell written without the icon does
    not merely lack a mark, it loses the area and the figures stop lining up.
    The mark colour is NOT chosen here: §29 cycles `--mk` over
-   `nth-child(4n+1…4)`, the svg takes `fill:var(--mk)` and the box a
-   `color-mix` of it, so the fourth cell is magenta because it is fourth.
+   `nth-child(4n+1…4)` and the svg takes `fill:var(--mk)`, so the fourth cell
+   is magenta because it is fourth. The mark is a BARE 20px glyph — the 28px
+   tinted chip came off on 1 Sep 2026.
    Markup read off the running portal, not written from the CSS. */
 const statCell = (icon, label, fig, note) => `<div class="stat">
       <span class="stat-ic">${I[icon] || ''}</span>
@@ -1486,6 +1496,31 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
       </button>
     </div>
   `)}
+  ${ex('Earned row', 'For a list of things somebody <b>won</b> rather than pages they can open — points, badges, streaks. The mark is <code>.aw-ph</code>: a Phosphor Duotone glyph from <code>P</code> (the second icon family — see the head of <code>talentnext-ds.js</code>) on a disc tinted 12% of the row&rsquo;s own hue. <b>The row states one variable.</b> <code>style="--mk:var(--mk-1)"</code> paints the disc, the duotone&rsquo;s pale body and its figure together, so the three cannot drift apart. <b>State it only when the row has been earned</b> — the default is grey, and an inline custom property beats any rule that would try to drain it afterwards.', `
+    <div class="aw-list">
+      <div class="aw got">
+        <span class="aw-ph" style="--mk:var(--mk-1)">{{ph:bookOpenText}}</span>
+        <span class="aw-b"><span class="aw-n">Chapter completion</span>
+          <span class="aw-d">Complete any chapter and earn 25 points</span></span>
+        <span class="aw-r"><span class="aw-v">+25</span>
+          <span class="aw-s">Awarded 08/04/2026</span></span>
+      </div>
+      <div class="aw got">
+        <span class="aw-ph" style="--mk:var(--mk-3)">{{ph:graduationCap}}</span>
+        <span class="aw-b"><span class="aw-n">Course completion</span>
+          <span class="aw-d">Complete any course and earn 250 points</span></span>
+        <span class="aw-r"><span class="aw-v">+250</span>
+          <span class="aw-s">Awarded 07/23/2026</span></span>
+      </div>
+      <div class="aw not">
+        <span class="aw-ph">{{ph:chatsCircle}}</span>
+        <span class="aw-b"><span class="aw-n">Join the conversation</span>
+          <span class="aw-d">The same row with no hue stated &mdash; not yet earned</span></span>
+        <span class="aw-r"><span class="aw-v">+10</span>
+          <span class="aw-s">Not yet</span></span>
+      </div>
+    </div>
+  `)}
   ${ex('Detail row', 'Same family, two lines and a trailing action instead of a chevron.', `
     <div class="tile-stack">
       <div class="cardrow">
@@ -1525,7 +1560,7 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
 
 /* ------------------------------------------------------------------ figures */
 SECTIONS.push({id:'figures', nav:'Figures', icon:'chart', build: () => `
-  ${ex('Figure cells', 'Where several figures belong together they become cells of one grid sharing single hairlines — the opposite of a row of cards. <b>Each cell is a named grid and needs all three parts:</b> <code>.stat-ic</code> (<code>grid-area:ic</code>), <code>.stat-top</code> holding <code>.l</code> + <code>.n</code>, and <code>.d</code> underneath. Leave the icon out and the cell loses its grid area — the figures stop lining up, which is the misalignment you get from the older <code>.k</code>/<code>.v</code> spelling. <b>The mark is coloured and it cycles:</b> §29 sets <code>--mk</code> per <code>nth-child(4n+1…4)</code> to <code>--mk-1</code>…<code>--mk-4</code> (blue, green, purple, magenta), the icon takes <code>fill:var(--mk)</code> and its box a <code>color-mix</code> of it. You do not pick the colour — position does. <b>Keep <code>.l</code> short.</b> §37.11 puts the label and the figure on one line and drops the figure underneath when the pair will not fit — so one long label staggers its own cell 15px below its neighbours. The portal shows both: its four-short-label row lines up exactly, and its <i>Assessment average</i> cell sits low for this reason. One or two words per label. Put <code>.stats</code> straight in the section: it is one of the six containers that opt a heading out of the label column. <b>Give it exactly four.</b> The hairlines <i>are</i> the 1px grid gap, with the rule colour showing through from the container’s own background, and the grid is <i>fixed</i> — 2 columns on a phone, 4 from 700px. An incomplete row therefore paints grey rather than collapsing. An odd count is handled: <code>:last-child:nth-child(odd)</code> spans the last cell across the row — but the row above it still has to be full.', `
+  ${ex('Figure cells', 'Where several figures belong together they become cells of one grid sharing single hairlines — the opposite of a row of cards. <b>Each cell is a named grid and needs all three parts:</b> <code>.stat-ic</code> (<code>grid-area:ic</code>), <code>.stat-top</code> holding <code>.l</code> + <code>.n</code>, and <code>.d</code> underneath. Leave the icon out and the cell loses its grid area — the figures stop lining up, which is the misalignment you get from the older <code>.k</code>/<code>.v</code> spelling. <b>The mark is a bare 20px glyph and its colour cycles:</b> §29 sets <code>--mk</code> per <code>nth-child(4n+1…4)</code> to <code>--mk-1</code>…<code>--mk-4</code> (blue, green, purple, magenta) and the icon takes <code>fill:var(--mk)</code>. You do not pick the colour — position does. It used to sit in a 28px square washed with a <code>color-mix</code> of the same hue; that came off on 1 Sep 2026 and the glyph stepped 16 &rarr; 20 to hold the line alone, which is the move §72 had already made for the pulse columns. <b>A portal may name the hues instead of cycling them</b> where they mean something — the leader&rsquo;s four jump cells are red, amber, blue and violet by <i>kind</i>, not by position. <b>The cell is three columns:</b> <code>&#39;ic top n&#39; / &#39;ic d n&#39; / &#39;ic sl n&#39;</code> — the mark, the label with its note under it, and the figure in a column of its own spanning all three rows, so the number sits <b>right and middle of the block</b> however tall the cell grows. The third row is a <code>1fr</code> spacer and it is what makes &ldquo;middle&rdquo; mean the cell rather than the text: without it the rows pack to the top and the figure centres on the content, so a cell whose label wraps puts its number ~9px below its neighbours&rsquo;. <code>.stat-top</code> is <code>display:contents</code> — the wrapper dissolves so its two children can take grid areas without a markup change. <b>A long label now wraps inside its own column</b> instead of pushing the figure underneath, which is what used to stagger a cell 15px below the rest of its row; it still makes that cell taller, so one or two words per label is still the advice. Put <code>.stats</code> straight in the section: it is one of the six containers that opt a heading out of the label column. <b>Give it exactly four.</b> The hairlines <i>are</i> the 1px grid gap, with the rule colour showing through from the container’s own background, and the grid is <i>fixed</i> — 2 columns on a phone, 4 from 700px. An incomplete row therefore paints grey rather than collapsing. An odd count is handled: <code>:last-child:nth-child(odd)</code> spans the last cell across the row — but the row above it still has to be full.', `
     <div class="stats">
       ${statCell('book',   'Chapters',  '5 <small>of 13</small>', '38% done')}
       ${statCell('chart',  'Average',   '88<small>%</small>',     'cohort 79%')}

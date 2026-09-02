@@ -1,0 +1,56 @@
+/* ==========================================================================
+   98. A TAB STRIP HAS AIR UNDER IT, AND A HIGHLIGHTED ROW HAS NO EDGES
+   Maryam, 2 Sep 2026, two asks about two components that happen to sit on the
+   same screen.
+
+   --------------------------------------------------------------------- 1 ---
+   "AFTER TABS ROW, THERE SHOULD BE MORE SPACE BEFORE THE CONTENT STARTS"
+
+   THERE ARE TWO TAB STRIPS IN THIS BUILD AND BOTH NEEDED IT. `.tabs` is the
+   Achievements module's four (Points, Badges, Rank, Certificates) and `.cs` is
+   the Cohort's three (Discussion, Ranking, Members). They are different
+   components with different markup — `.tabs` is a page child with the content
+   in the NEXT section, `.cs` is inside a `.sec` with the content as its
+   sibling — which is exactly why the gap had drifted to two different values:
+   16px on one and 0 on the other.
+
+   `--s06`, WHICH IS THE PRODUCT'S ONE HEADING-TO-SECTION STEP. 24 is what a
+   `.sec` pays top and bottom, so a strip and the block under it now sit at the
+   same distance as any two blocks on the page. A tab strip is a heading that
+   can be pressed, and 0 made the Cohort's board read as part of the strip.
+
+   THE 16px CAME OFF AN INLINE STYLE, WHICH IS TRAP 1 AND THE REASON THIS RULE
+   COULD NOT SIMPLY BE WRITTEN. `V.rewards` carried `style="padding-top:
+   var(--s05)"` on the wrapper, and an inline declaration beats every rule at
+   any specificity — so a stylesheet answer would have been silently ignored on
+   exactly one of the two strips. It is deleted at the source.
+
+   --------------------------------------------------------------------- 2 ---
+   "REMOVE THE TOP AND BOTTOM DIVIDER THAT ARE ATTACHED WITH THE ORANGE FILLED
+   ROW IN THE TABLE, THEY ARE LOOKING LIKE ITS BORDER"
+
+   §15.1543 gives every `.brow` a `border-bottom`, which is right for ten rows
+   of a leaderboard and wrong either side of the ONE row that carries a ground:
+   a hairline immediately above and below a tinted band stops reading as the
+   list's rhythm and starts reading as that band's frame — the same finding §72
+   records for the pulse ("a border runs the column's full height, so it meets
+   the rule above and the two form a corner"), and §84's for a tinted section.
+
+   IT IS TWO RULES BECAUSE A BOTTOM BORDER BELONGS TO THE ROW ABOVE. `.mine`
+   drops its own; `:has(+ .mine)` drops the one the previous row was drawing
+   under itself. `:has()` carries its argument's specificity, so that selector
+   is (0,3,0) against §15's (0,2,0) and wins on weight rather than on order.
+
+   THE ROW KEEPS ITS TINT AND ITS THREE ACCENT INKS. Nothing about which row is
+   yours changes — what goes is the pair of lines that were describing it as a
+   box. On a list where every other row is separated by a hairline, the ground
+   alone is more than enough to find yourself by.
+   ========================================================================== */
+
+/* ---- 1. the two tab strips ---- */
+.app .page > .tabs + .sec{padding-top:var(--s06)}
+.app .sec-cs > .cs + *{margin-top:var(--s06)}
+
+/* ---- 2. the highlighted row ---- */
+.app .brow.mine{border-bottom:0}
+.app .brow:has(+ .brow.mine){border-bottom:0}

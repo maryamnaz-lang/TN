@@ -1,0 +1,67 @@
+/* ==========================================================================
+   94. THE POINTS LIST'S MARK — `.aw-ph`, a duotone glyph on its own hue
+   Maryam, 2 Sep 2026, with a reference of this list drawn in colour: the marks
+   should not be "as dry as the other icon library we are using".
+
+   ONE VARIABLE DRAWS THE WHOLE MARK. The row states `--mk` and this layer
+   spends it three times — the disc's ground at 12%, the duotone's pale body
+   (Phosphor's own `opacity:.2` on `currentColor`) and its solid figure. That is
+   the reason the set is duotone rather than solid: a second tone that is a
+   FUNCTION of the first cannot drift from it, and the unearned state is one
+   re-point instead of a parallel table of greys.
+
+   12% IS §65'S CHIP, NOT A NEW MIX. That layer's `.prog-ic` is 12% of `--mk`
+   behind a glyph of the same hue and §74's note works out why the number is
+   what it is (5% for a 430px card, 12% for a 28px square, 14% for a tag).
+   This is a 36px square's worth of ground doing exactly §65's job, so it takes
+   §65's number rather than inventing one two points either side of it.
+
+   IT IS A DISC AND THAT IS THE ONE CURVE THIS SYSTEM ALLOWS. `--radius` is 0px
+   by token and every `border-radius` in the build resolves through it; §56
+   grants the exception to MARKS and the journey stepper already spends it. A
+   literal `999px` rather than a re-pointed token, per §31's rule for the flag
+   pill — the token stays honest and the exception stays visible.
+
+   36 AND 20 AT EVERY WIDTH. §15.1437 argues the fixed size for `.aw-art`: the
+   name and the description are the same size at every width, so a mark that
+   grows at 900 stops matching the only thing it is supposed to match. §10.323
+   steps `.aw-ic` 36 → 28 → 24 and that is the older, container-stepped mark;
+   this one does not follow it. The glyph is 20 of the 36, which is §65's
+   16-in-28 ratio at this size and the product's own bare-glyph size besides.
+
+   THE ROW CENTRES, WHICH IS `.has-art`'s CALL (§15.1443) MADE AGAIN. §06.10
+   packs `.aw` to `flex-start` and gives `.aw-ic` a 2px nudge, which is right
+   for a 24px mark against a two-line block and wrong for a 36px disc — the
+   disc is taller than the name's line box, so top-aligned it hangs above the
+   description. Keyed on `:has(> .aw-ph)` rather than on a class the view has to
+   remember, because it is a property of which mark the row drew.
+
+   AN UNEARNED MARK GOES GREY, IT DOES NOT FADE. Trap 2: the entrance
+   animations run with `fill-mode:both`, so a resting state written in `opacity`
+   is fighting a keyframe — and it would fight Phosphor's own .2 as well, which
+   is composited against it. The grey is `--icon-secondary` and all three uses
+   follow it: a pale grey disc under a grey figure. `--text-placeholder` was the
+   other candidate and is too light — the body tone would be 20% of #a9a8a5,
+   which is a mark that failed to load rather than one not yet earned, and the
+   name and description beside it stay at full `--text-secondary`.
+
+   THE GREY IS THE DEFAULT AND THE HUE IS THE OVERRIDE, WHICH IS TRAP 1 AND NOT
+   A STYLE PREFERENCE. `--mk` arrives as an INLINE custom property on the row's
+   own mark, so `.app .aw.not .aw-ph{--mk:…}` at (0,3,0) cannot answer it — that
+   is what this rule was on the first build, and all five unearned rows drew in
+   full rose and red with nothing thrown. Stated here as the initial value, the
+   grey is what a mark has until a row says otherwise, and `awardRow` writes the
+   hue only on a row that has been earned.
+
+   NOT ONE font-size, font-weight, text-transform OR text colour. `fill` is the
+   icon's colour and belongs to the layer that draws the mark — §29's `.stat-ic`
+   and §65's `.prog-ic` both state their own, and §63 §5 only claims `fill`
+   where it is standing in for `color` on SVG `<text>`.
+   ========================================================================== */
+.app .aw-ph{
+  --mk:var(--icon-secondary);
+  flex:none;display:grid;place-items:center;
+  width:36px;height:36px;border-radius:999px;
+  background:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
+.app .aw-ph svg{width:20px;height:20px;fill:var(--mk)}
+.app .aw:has(> .aw-ph){align-items:center}

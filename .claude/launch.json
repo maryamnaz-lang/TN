@@ -86,6 +86,42 @@
       "port": 8841
     },
     {
+      "name": "tn9",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8867",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8867
+    },
+    {
+      "name": "tn10",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8879",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8879
+    },
+    {
+      "name": "tn11",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8891",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8891
+    },
+    {
       "name": "tn8",
       "runtimeExecutable": "python3",
       "runtimeArgs": [

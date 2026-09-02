@@ -1,0 +1,358 @@
+/* ==========================================================================
+   92. THE COHORT CARD — `.cco`, and the table it replaces
+   Maryam, 2 Sep 2026, with a reference screen of three cards: "I want such
+   cards for my cohorts", then "we already have 3 cohort images that we are
+   using on the dashboard, use those here as well".
+
+   WHAT IT REPLACES, AND THE ARGUMENT IT TURNS OVER. `V.leadCohorts` drew the
+   three cohorts as a seven-column `.tbl` and lead2's own note is the case for
+   it: "the question this page exists to answer is which cohort needs the
+   leader most, which is a comparison — so the six facts become six columns and
+   the three cohorts become three rows, and the answer is a scan down one
+   column instead of a diff across three cards." That reasoning is still true
+   of a table and it is not the whole question any more. A table can only be
+   scanned; it cannot be RECOGNISED. Three cohorts are three places a leader
+   spends thirteen weeks, and the cover — which this product already draws on
+   the dashboard's own cohort rows — is the thing that says which is which
+   before a single figure is read.
+
+   SO THE COMPARISON IS KEPT INSIDE THE CARD RATHER THAN GIVEN UP. The four
+   facts are four labelled rows in ONE order on all three cards, on one grid,
+   with the figures right-aligned on a shared edge — so "which cohort is
+   behind" is still a scan across three cards at the same height, which is the
+   half of the table's argument that survives contact with a card. What is lost
+   is the sixth column (`Week`), and it is not lost: it is in the line under the
+   title, where it is read once per cohort rather than compared.
+
+   THE FOUR MARKS ARE `.prog-ic`, NOT A NEW CHIP. §65's chip is the mark for a
+   figure cell in a CONTINUOUS BAND — four rows on one ground with a hairline
+   between them is exactly that shape, and §76's three-fact column reached for
+   the same component for the same reason. The 1 Sep instruction that took the
+   chip off `.stat` and `.qa-c` does not reach it: those are bare cells on a
+   page, where §72's note says a filled square is "a box inside a box"; here
+   the chip is what separates one figure from the three under it. Reused whole
+   rather than restated — the hue is `--mk` inline, which is `pulseCol`'s idiom
+   (§72), and §65's `--surface-mix` default resolves against the card's own
+   white.
+
+   THE HUES ARE NAMED, NEVER CYCLED, and that is §72.6's rule rather than a
+   preference: `nth-child` would make Progress green on a card that draws four
+   rows and green on something else the moment a cohort has no assessment to
+   report. Progress is `--mk-2`, assessment `--mk-3`, the flag
+   `--support-attention` (the amber §31 already gives the leader's demand for a
+   signature) and the call `--mk-4`.
+
+   THE PROGRESS BAR COMES BACK, AND THAT IS THE ONE THING THE TABLE COULD NOT
+   HOLD. lead2's note is right that "`.bar` inside a table cell would set a
+   width against a column that is being negotiated against five others". A card
+   negotiates with nothing, so §03's own bar is drawn unchanged — `--accent`
+   fill, the same object the candidate's course progress uses, so a per cent
+   here and a per cent there are drawn by one rule.
+
+   §63 §25 OWNS EVERY SIZE, WEIGHT, CASE AND INK HERE. This layer states
+   layout, grounds, the two radii and the marks' `fill` (which is §65's).
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 92.1 ---
+   THE GRID, AND THE OPT-OUT THAT CAME OFF WITH THE TABLE
+
+   TRAP 13, AND IT IS THE WHOLE REASON THIS BLOCK IS FIRST. The section was
+   opting out of §10.15's 184px label column through `.sec:has(> .tbl-wrap)`,
+   which is a property of the TABLE — take the table out and the heading falls
+   into the column with nothing warning, which is §69's lesson said the other
+   way round ("removing content loses an opt-out too"). Restated on the grid
+   inside `@container app (min-width:900px)` per trap 3, because §10's list
+   lives in that tier and nothing outside it can answer it at any weight.
+
+   IT COPIES WHAT §10 DOES, NOT WHAT IT SAYS — §69.3's rule. That rule's
+   fourth declaration is `padding:0 var(--pad-x)` on the heading and it is DEAD
+   (§14.2 zeroes every headed section's `.sec-h` padding at this width);
+   restating it would set this one heading 32px right of the cards below it.
+
+   `auto-fit`, NOT `repeat(3,1fr)`. Three cohorts is today's count and the
+   record is an array — a fourth would leave `repeat(3,...)` drawing one card
+   below two-thirds of a row. `auto-fit` also collapses the tracks it does not
+   fill, so at a frame wide enough for four the three still divide it in three
+   rather than leaving a gap where a fourth would go.
+
+   THE FLOOR IS 260px AND IT IS MEASURED, NOT ROUND. The page column is 901 at
+   a 1280 frame, which is what decides whether this reads as the reference's
+   three-across or as two and a stray: at 280 the arithmetic is
+   (861 + 24) / (280 + 24) = 2.9, so 1280 draws TWO cards and drops the third
+   onto a row of its own. 260 gives three cards of 263, and 263 is above this
+   card's real floor — swept at that width the four labels each hold one line
+   and no row overflows, which is the number that had to be checked rather than
+   assumed. Below about 850 of column it falls to two and at 390 to one.
+   -------------------------------------------------------------------------- */
+.app .cco-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:var(--s06)}
+
+/* AND IT STANDS OFF THE FIGURE BAND ABOVE IT (Maryam, 2 Sep 2026: "why the
+   cards are attached with the cohort cards?"). Merging the band and the grid
+   into one section put them in the same block with nothing between them, so
+   `.stats`'s own bottom border landed on the first card's top border — two 1px
+   rules on adjacent pixel rows, which reads as one thick line and makes the
+   band look like a fourth card that lost its picture. `--s06` is the section's
+   own rhythm, so the two blocks inside one section are as far apart as two rows
+   inside one table.
+   KEYED ON THE PAIR, not stated on the grid: a `.cco-grid` that opens its
+   section has nothing above it to stand off, and the section's own padding is
+   already the space there. */
+.app .stats + .cco-grid{margin-top:var(--s06)}
+
+@container app (min-width:900px){
+  .app .sec:has(> .cco-grid){display:block}
+  .app .sec:has(> .cco-grid) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
+}
+
+/* ------------------------------------------------------------------ 92.2 ---
+   THE CARD
+
+   A `<button>`, so the whole card is the target — the argument lead.js records
+   for `faceRow` and lead2 for `.ldr-tr`: a 40px arrow on a 430px card that is
+   otherwise dead is a smaller target than the object it sits in.
+
+   `overflow:hidden` IS LOAD-BEARING, not tidiness: the cover is full bleed and
+   the card's own 1px border is what it has to stop at.
+
+   NO RADIUS. `--radius` is 0px by token and §02's opening note is that "depth
+   is expressed as rhythm and rule weight, nothing else" — the reference draws
+   an 8px corner and a soft shadow, and taking those off is the same trade §76
+   made for the booking panels.
+
+   `text-align:left` BECAUSE §02 CENTRES A BUTTON'S LABEL. Every other card in
+   the product is a `.tile`, which restates it; this one is not a `.tile` (that
+   component is a flex ROW with a `min-height` and a bottom hairline, and three
+   of those four would have to be undone here).
+   -------------------------------------------------------------------------- */
+.app .cco{
+  display:flex;flex-direction:column;
+  border:1px solid var(--rule);background:var(--layer-01);
+  padding:0;overflow:hidden;text-align:left;
+  border-radius:var(--radius)}
+
+/* ------------------------------------------------------------------ 92.3 ---
+   THE COVER
+
+   THE COVERS ARE THE ONES THE DASHBOARD ALREADY DRAWS (Maryam, 2 Sep 2026),
+   `COHORT_ART` keyed by level through `cohortArt(c)` — so a cohort wears the
+   same picture on the dashboard row, on the black call card and here, and
+   build.py's note on the crop is the one place that decision lives.
+
+   `object-fit:cover` HERE AND `contain` ON THE ROWS, and the difference is the
+   box rather than a change of mind. §86's slot is a 112px rectangle whose job
+   is to identify the cohort in a list, so it letterboxes rather than trim a
+   title card's words. This box is the full width of the card at 9:5 — the
+   assets' own ratio — so `cover` and `contain` draw the same pixels today, and
+   `cover` is what keeps the picture edge-to-edge if a future asset is a
+   different shape. A letterboxed bar at the top of a card reads as a broken
+   image; on a 112px chip it reads as part of the slot.
+
+   `aspect-ratio` WORKS HERE AND DOES NOT WORK IN §86, which is worth stating
+   because the two rules look contradictory. §86's box is a flex ITEM on the
+   main axis, so its height is unknown when the ratio would need it (§75.3
+   measured an 18px photograph shipping silently). This is a column flex item:
+   the width is definite from the stretch, and the ratio has something to
+   transfer into.
+
+   THE PILL IN THE CORNER IS `.cco-pill`, AND IT HAS HELD TWO THINGS IN ONE DAY.
+   It shipped as the level ("Explorer – E3"), came off, and came back holding the
+   headcount ("10 Candidates") — same object, same corner, same three hues keyed
+   by level, so the class is named for WHERE IT SITS rather than for what it
+   happens to say. That rename is the whole of what the second ask cost.
+
+   IT IS THE LAYER'S ONE ROUNDED OBJECT, AND IT IS THE THIRD PILL IN THE BUILD,
+   NOT A NEW EXCEPTION. §56 grants the one curve to MARKS; §87's chips and §31's
+   flag chip take that grant from the same side, on the argument that "a pill is
+   two circles and a span, not a rounded rectangle". This one names a property of
+   the cohort under it, it is never a surface, and nothing is laid out against
+   its corners. Stated as a literal `999px` rather than through `--radius`, per
+   §31, so the token stays honest at 0 for everything that reads it.
+
+   `--pill` INLINE IS `pulseCol`'S IDIOM. `nth-child` would colour the pill by
+   where the cohort sits in the array, so re-sorting the list would recolour E3;
+   the view states the hue and the note over `CCO_PILL` is the argument.
+
+   IT SITS ON A PHOTOGRAPH, WHICH IS WHY THE GROUND IS SOLID rather than a wash:
+   §74's 5%-of-the-hue card grounds work on white paper and would disappear over
+   a title card. The three covers put their own type mid-frame and to the left,
+   so the corner it takes is the one clear on all three — checked against each,
+   not assumed.
+   -------------------------------------------------------------------------- */
+.app .cco-art{
+  position:relative;display:block;
+  width:100%;aspect-ratio:9 / 5;
+  background:var(--layer-02)}
+.app .cco-art > img{
+  display:block;width:100%;height:100%;object-fit:cover}
+/* The `<i>` is the fallback the `<img>`'s `onerror` uncovers — §86's
+   arrangement, and `avatar()`'s before it. `font-style` is not one of §63's
+   four properties, so the normalisation is stated with the component. */
+.app .cco-art > i{
+  position:absolute;inset:0;display:grid;place-items:center;font-style:normal}
+.app .cco-pill{
+  position:absolute;left:var(--s04);top:var(--s04);
+  padding:2px var(--s04);border-radius:999px;
+  background:var(--pill,var(--mk-1))}
+
+/* ------------------------------------------------------------------ 92.4 ---
+   THE HEAD BLOCK — THE NAME, ITS TWO LINES, AND THE RING
+
+   Maryam, 2 Sep 2026: "instead of showing the progress in the row, use a
+   progress circle with the percentage in it, this will be on the right end of
+   the 10 candidates · week 5 of 13 / Chapter 5, Hard Conversations row."
+
+   THE RING IS §32'S, AT §90'S 56px, AND IT IS NOT A NEW COMPONENT. `ring(pct,
+   label)` in views.js is the markup — two circles and an `--arc` length — and
+   §90 has already made the one adjustment a 64px ring needs in a row of text:
+   56 with the stroke down 6 → 5 so the ratio holds. Same object on the pulse,
+   on the evaluation row and here.
+
+   IT SPANS BOTH ROWS OF THE BLOCK, WHICH IS WHY THE BLOCK IS A GRID. The ask
+   places it against the two-line description, and the name sits above that —
+   `auto` column, `span 2`, centred — so the ring is centred on the pair rather
+   than on either line. Two rows and two columns, no wrappers beyond the one
+   the text needs.
+
+   THE EXPECTED PACE IS A CAPTION UNDER IT, AND IT IS NOT DECORATION. The row
+   this replaces read "39% of 38%"; a ring can hold one figure, so the second
+   goes under it in the same words. Cohort 47 is the case that decides it: 6%
+   on its own reads as a cohort that has stopped, and 6% of 4% is a cohort four
+   days old that is AHEAD. `<small>` is §63 §7's generic sub-figure — the same
+   role the row gave it — so nothing new is stated for it.
+
+   THE TRACK IS §32'S DEFAULT AGAIN, WHICH THE MERGE HANDED BACK. §32.84 steps
+   `.ring-t` down to `--rule-on-2` inside a `.sec.tint`; with the section white
+   (2 Sep) that rule stops matching and the pale warm `--layer-accent-01` track
+   it was written for is correct — the ring sits on a white card either way.
+   -------------------------------------------------------------------------- */
+.app .cco-b{
+  display:flex;flex-direction:column;flex:1 1 auto;
+  padding:var(--s05)}
+.app .cco-hd{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;gap:var(--s05);
+  padding-bottom:var(--s05)}
+.app .cco-hb{
+  display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+.app .cco-ring{
+  grid-column:2;grid-row:1 / -1;
+  display:flex;flex-direction:column;align-items:center;gap:2px}
+.app .cco-ring .ring{width:56px;height:56px}
+.app .cco-ring .ring circle{stroke-width:5}
+/* THE ARC TAKES THE CARD'S OWN HUE, WHICH THE VIEW STATES (Maryam, 2 Sep 2026).
+   `ccoRing(pc)` picks one of three §01 support tokens by how far through the 90
+   days the cohort is, and the note over that function is why it is the odometer
+   rather than a reading of pace. Inline `--ring-ink` is `pulseCol`'s idiom
+   again, so the hue cannot be cycled by position.
+   IT NEEDS (0,4,0): §32.82 states `.app .ring .ring-f{stroke:var(--accent)}` at
+   (0,3,0), and this layer landing later is not enough on its own — §63 §7b's
+   trap, which on a stroke fails the quiet way, with every ring simply staying
+   orange. The fallback is that same accent, so a caller that states nothing
+   gets §32's ring unchanged. */
+.app .cco-ring .ring .ring-f{stroke:var(--ring-ink,var(--accent))}
+
+/* ------------------------------------------------------------------ 92.5 ---
+   THE THREE ROWS
+
+   THE ROW IS A GRID OF THREE TRACKS: mark, label, figure. It was four rows and
+   the first of them carried a progress bar under its figure; with the progress
+   in the ring above, the bar would be the same figure drawn twice — §90's own
+   note about its reference — so both are gone and `.cco-bar` with them.
+
+   THE FIGURE TRACK'S UPPER BOUND IS `auto` AND NOT `1fr`, WHICH IS THE ONE
+   THING HERE THAT FAILS SILENTLY. `1fr` reads as "share the slack with the
+   label" and caps the track at the share it gets: measured at a 263px card
+   that capped it at its 96px floor and wrapped "Today 6:00 pm" onto three
+   lines, while the labels beside it stayed on one — so the row grew and
+   nothing about the rule looked wrong. `auto` lets the track take its own
+   max-content, so a figure never wraps and the label — `minmax(0,1fr)`, the
+   only thing here that may shrink — gives up the pixels instead.
+
+   THE HAIRLINE IS ON TOP OF EVERY ROW, WHICH IS THREE RULES AND NOT FOUR. The
+   first separates the rows from the head block and the last row closes on
+   white — the same reason §02 takes the bottom border off a list's last child.
+
+   THE MARK IS A BARE 20px GLYPH (Maryam, 2 Sep 2026: "remove the icons
+   backgrounds"). It was §65's `.prog-ic` — a 28px square washed to 13% of the
+   row's hue with a 16px glyph in it — and this is the third time the product
+   has made this subtraction: §72 took the chip off the pulse's column marks
+   and §29 off `.stat`, both stepping the glyph 16 → 20 because "a bare mark has
+   no padding to hold the line with". Same move, same size, so the four marks
+   on this card are the same object as the four in the figure band above it.
+   The column stays 28px wide: it is what puts a 20px glyph on the same left
+   edge as the 28px marks the rest of the page draws, and centring the glyph in
+   it is one declaration rather than a second measurement.
+   `fill:var(--mk)` rather than `currentColor`, for §29's reason — the row sets
+   no `color` of its own, so there is nothing for the mark to inherit.
+   -------------------------------------------------------------------------- */
+.app .cco-r{
+  display:grid;grid-template-columns:28px minmax(0,1fr) minmax(96px,auto);
+  align-items:center;gap:var(--s04);
+  padding:var(--s04) 0;border-top:1px solid var(--rule)}
+.app .cco-ic{
+  display:grid;place-items:center;justify-self:start;
+  width:20px;height:20px}
+.app .cco-ic svg{width:20px;height:20px;fill:var(--mk)}
+.app .cco-v{text-align:right}
+/* A flag cell holds chips rather than a figure, so it gives up the right
+   alignment the other two share: two `.tag`s pushed to the far edge and
+   wrapping backwards read as a right-to-left list. */
+.app .cco-tags{
+  display:flex;flex-wrap:wrap;gap:var(--s02);justify-content:flex-end}
+
+/* ------------------------------------------------------------------ 92.5b ---
+   THE TWO FLAG CHIPS ARE ROUND, AND THEY ARE §31'S PILL
+   Maryam, 2 Sep 2026: "instead of blocks, make the risk and watch round chips,
+   risk will be red in color with light red bg, watch will be orange in color
+   with the light orange bg."
+
+   THE VALUES ARE THE ATTENTION QUEUE'S, TO THE PERCENTAGE. §31 answered this
+   exact ask for the dashboard's table on 1 Sep and its note is the argument:
+   the grounds are mixed off the SAME ink each chip already carried rather than
+   taken from `--support-error-bg` / `--support-warning-bg`, because the second
+   of that pair is `#fcf4d6`, a pale YELLOW that does not belong to
+   `--support-attention`'s hue at all. 12% for red and 14% for amber, not one
+   figure for both — red is the stronger hue and an equal mix reads darker
+   beside the amber.
+
+   WHY IT IS RESTATED HERE RATHER THAN REUSED. §31's pill is written
+   `.app[data-portal="leader"] .tbl-flag tr.sev .flag-t` — keyed on a TABLE ROW
+   carrying a severity class, which is what that queue has and a card does not.
+   Its own note is explicit that the pill is scoped on purpose ("a chip per row
+   there would be five filled pills down a column of plain text"), so widening
+   it to every `.flag-t` in the build would undo a decision rather than reuse
+   one. What crosses is the recipe, named as such, and the two mixes are the
+   only declarations duplicated.
+
+   `--layer-01` IS THE GROUND TO MIX INTO, and it is right by luck no longer:
+   the section went white on 2 Sep and the card was already `--layer-01`, so the
+   wash sits on the same paper §31 mixed against.
+
+   THE RADIUS IS A LITERAL 999px, per §31 and §87 — `--radius` is 0 by token and
+   §56 grants the one curve to MARKS, so a pill states its own rather than
+   re-pointing a token every square corner in the product reads.
+   §63 §25 OWNS THE TWO INKS, because a colour after §63 is that layer's rule
+   and not this one's. Here: the grounds, the radius and the border.
+   -------------------------------------------------------------------------- */
+.app .cco-tags .tag{border-radius:999px;border-color:transparent}
+.app .cco-tags .tag.red{
+  background-color:color-mix(in srgb, var(--danger-ink) 12%, var(--layer-01))}
+.app .cco-tags .tag.org{
+  background-color:color-mix(in srgb, var(--support-attention) 14%, var(--layer-01))}
+
+/* ------------------------------------------------------------------ 92.6 ---
+   BELOW 900
+
+   NOTHING TURNS OVER, AND THAT IS THE POINT OF `auto-fit`: the grid falls to
+   two columns and then to one on its own, and the card is unchanged in either.
+   The one thing relaxed is the figure track's floor: at 390 the card is the
+   full column and a 96px minimum on a figure that reads "88%" is 96px of white
+   between the label and the number. `auto` there sizes it to the figure, which
+   is all a single-column card needs.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .cco-r{grid-template-columns:28px minmax(0,1fr) auto}
+}

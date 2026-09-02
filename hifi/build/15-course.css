@@ -751,11 +751,11 @@
    step and the next runs the full width of the column.
    ========================================================================== */
 .app .sec:has(> .steps) > .sec-h{
-  padding-left:0;padding-right:0;margin-bottom:var(--s05)}
+  padding-left:0;padding-right:0;margin-bottom:var(--sec-h-gap)}
 @container app (min-width:900px){
   .app .page:not(.form-page) .sec:has(> .steps){display:block}
   .app .page:not(.form-page) .sec:has(> .steps) > .sec-h{
-    padding-left:0;padding-right:0;margin-bottom:var(--s05)}
+    padding-left:0;padding-right:0;margin-bottom:var(--sec-h-gap)}
   .app .page:not(.form-page) .sec:has(> .steps) > :not(.sec-h){padding-left:0}
 }
 .app .steps{
@@ -844,7 +844,7 @@
     gap:var(--s05);flex-wrap:wrap;
     grid-column:auto;grid-row:auto;
     border-right:0;min-height:0;
-    margin:0 0 var(--s05);padding:0}
+    margin:0 0 var(--sec-h-gap);padding:0}
 
   .app .page:not(.form-page) .sec:has(> .sec-h > a) > .sec-h h2,
   .app .page:not(.form-page) .sec:has(> .sec-h > .lk) > .sec-h h2,
@@ -896,7 +896,7 @@
   .app .page:not(.form-page) .sec:has(> .acc){
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .app .page:not(.form-page) .sec:has(> .acc) > .sec-h{
-    border-right:0;min-height:0;margin:0 0 var(--s05);
+    border-right:0;min-height:0;margin:0 0 var(--sec-h-gap);
     padding:0}
   .app .page:not(.form-page) .sec:has(> .acc) > :not(.sec-h){padding-left:0}
 }
@@ -997,7 +997,7 @@
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h{
     display:flex;align-items:baseline;justify-content:space-between;
     gap:var(--s05);border-right:0;min-height:0;
-    margin:0 0 var(--s05);padding:0}
+    margin:0 0 var(--sec-h-gap);padding:0}
   .app .page:not(.form-page) .sec:has(> .daystrip) > .sec-h h2{
     font-size:15px;line-height:20px;letter-spacing:-.05px}
   .app .page:not(.form-page) .sec:has(> .daystrip) > :not(.sec-h){
@@ -1315,9 +1315,16 @@
    other list on the page, and the three artefacts sit as a run of three
    cells so you can see that all three are there.
    ========================================================================== */
+/* AND THE LIST OPENS ON NOTHING — Maryam, 1 Sep 2026 ("remove the divider
+   after the Past interviews heading"). `border-top` here was the rule under
+   "Past interviews", and it was drawing a job the heading already does: a
+   `.sec-h` with a section heading in it IS the top of the block, and a
+   hairline 20px under it made the list read as a table with a header row.
+   The separator BETWEEN rows stays (`.ivrow`'s `border-bottom`) and the one
+   CLOSING the section stays (§14's `::after`) — what went is the one that
+   only marked a start something else had already marked. */
 .app .ivlist{
-  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1);
-  border-top:1px solid var(--rule)}
+  margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
 .app .ivrow{
   padding:var(--s06) var(--pad-x);
   border-bottom:1px solid var(--rule);cursor:pointer}
@@ -1330,20 +1337,53 @@
    list that has ended. Same shape as `.rail-all`'s last row and `.agh:last-child`
    before it — a list's own separators stop at its last item. */
 .app .ivrow:last-child{border-bottom:0}
-.app .ivrow-h{
-  display:flex;align-items:baseline;justify-content:space-between;
-  gap:var(--s05);flex-wrap:wrap}
+/* NOTHING HERE FOR `.ivrow-h` ANY MORE. It was the full-width header row that
+   held the label-and-date at one end and the outcome at the other; both facts
+   are lines in `.ivrow-wb` now and `ivRow` (views.js) emits no such element,
+   so a rule laying it out would be a rule about markup the build does not
+   render — the "gate nothing writes" tell. The argument it carried is kept
+   over `ivRow`, which is where the four lines are decided. */
 .app .ivrow-eb{
   font-size:11px;line-height:15px;font-weight:600;letter-spacing:.8px;
   text-transform:uppercase;color:var(--text-helper)}
 .app .ivrow-out{
   font-size:13.5px;line-height:19px;font-weight:600;color:var(--accent-text)}
+/* THE ROW IS A GRID SO THE PORTRAIT CAN MEASURE ITSELF (Maryam, 1 Sep 2026:
+   "increase the height of the priya image, it should be equal to the height of
+   the right side content"). Three tracks — the face, the lines, the arrow —
+   and the face takes the row's height with `aspect-ratio` turning that into
+   its width.
+
+   FLEX CANNOT DO IT AND §75.3 IS THE WORKED EXAMPLE. There the recommendation's
+   166px square was re-specified as "as tall as the facts beside it AND square",
+   and in a flex row it shipped an 18×18 photograph, silently: flex resolves the
+   main size from the flex base size, and `.av-ph`'s only content is an
+   absolutely-positioned `<img>`, so the box contributes zero and the ratio has
+   nothing to transfer into. A grid item's inline size is resolved against its
+   track, so `height:100%` + `aspect-ratio:1` works there and only there.
+
+   `align-items` IS LEFT AT `stretch` AND THE ARROW OPTS OUT INDIVIDUALLY. The
+   whole mechanism is the portrait's track being as tall as the text one, so
+   centring the row would defeat it; the arrow says `align-self:center` for
+   itself, which is where it sat before.
+
+   AND THE SIZE IS GONE FROM THE MARKUP, WHICH IS WHAT MADE THIS POSSIBLE.
+   `ivRow` called `avatar(a,40)` and that helper writes `width`/`height` inline
+   — trap 1, unanswerable from any layer. It calls `avatar(a)` now. */
 .app .ivrow-who{
-  display:flex;align-items:center;gap:var(--s05);margin-top:var(--s05)}
-.app .ivrow-who .av-ph{flex:none;width:40px;height:40px}
-.app .ivrow-wb{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:var(--s05)}
+.app .ivrow-who .av-ph{width:auto;height:100%;aspect-ratio:1}
+.app .ivrow-who .tile-arrow{align-self:center}
+.app .ivrow-wb{display:flex;flex-direction:column;gap:1px;min-width:0}
 .app .ivrow-wb b{font-size:15px;line-height:21px;font-weight:600;letter-spacing:-.1px}
-.app .ivrow-wb > span{font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+/* THREE LINES, THREE KINDS OF FACT, so the two joins are equal — who, what it
+   decided, when. It ran name/length at 1px with the eyebrow and the outcome
+   pushed 3px clear, because the middle pair WAS one fact said twice; with the
+   length line gone (`ivRow`'s note) there is no pair left to hold together and
+   an even 3px is what stops the three reading as a paragraph. */
+.app .ivrow-wb > .ivrow-out{margin-top:3px}
+.app .ivrow-wb > .ivrow-eb{margin-top:3px}
 .app .ivrow-who .tile-arrow{flex:none;width:18px;height:18px;fill:var(--icon-secondary)}
 
 .app .ivrow-kit{

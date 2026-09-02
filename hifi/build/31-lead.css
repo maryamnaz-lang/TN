@@ -123,70 +123,183 @@
 .app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
 .app .flag-t.warn{color:var(--support-attention)}
 .app .flag-t.green{color:var(--support-success-ink)}
-.app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink)}
-.app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention)}
+/* --------------------------------------------------------------------------
+   AND IN THE ATTENTION TABLE IT IS A ROUNDED CHIP
+   Maryam, 1 Sep 2026: "i want the flag items in the table to be round chips,
+   the red item will have a light red chip bg and the orange item will have a
+   light orange bg."
 
-/* every row keeps its rule, including the last: with rows hidden by the filter
-   there is no way to say "the last VISIBLE row" in CSS, and a table whose
-   bottom rule appears and disappears as you type reads as a rendering fault */
-.app[data-portal="leader"] .tbl-flag tr td{border-bottom:1px solid var(--rule-on-2)}
-.app[data-portal="leader"] .tbl-flag tr.is-off{display:none}
+   THE INK WAS ALREADY THE ROW'S AND STAYS THE ROW'S — `tr.sev` / `tr.mod` are
+   the two facts this table has about a flag, and they now carry a ground as well
+   as a colour. The tint is a `color-mix` off the SAME ink rather than
+   `--support-error-bg` / `--support-warning-bg`: those two are `.tag`'s pair and
+   the warning one is `#fcf4d6`, a pale YELLOW, which is not the light orange the
+   ask names and does not belong to `--support-attention`'s hue at all. Mixed off
+   the ink, each chip is a wash of its own colour and the two cannot drift apart
+   — §74's idiom, and its own note is the argument for a percentage rather than a
+   second token.
+
+   12% AND 14%, NOT ONE FIGURE. Red is the stronger hue, so equal mixes give a
+   chip that reads darker than the amber one beside it; §74 makes the same
+   adjustment across three hues. Measured on the mixes: `--danger-ink` on its own
+   12% wash is 5.9:1 and `--support-attention` on its 14% is 5.3:1, both AA at
+   this size.
+
+   THIS IS THE ONLY ROUNDED RECTANGLE IN THE BUILD, AND IT IS BY INSTRUCTION.
+   `--radius` is `0px` by token and §02's opening note is that "depth is
+   expressed as rhythm and rule weight, nothing else" — §56 grants the one
+   exception to MARKS, which curve because a mark is a disc. A pill is the shape
+   the ask names, so it is stated as a literal `999px` rather than through
+   `--radius`, which keeps the token honest: nothing else inherits this.
+
+   SCOPED TO THE TABLE, so `.flag-t`'s other reader is untouched. The agent's
+   payment ledger draws the same component in the same three inks with no ground,
+   and §31's note above is the argument for why it can — a chip per row there
+   would be five filled pills down a column of plain text, which is the drawing
+   that component replaced.
+   -------------------------------------------------------------------------- */
+/* AND IT IS A SMALLER CHIP THAN IT SHIPPED AS (Maryam, 1 Sep 2026: "the chips
+   text and icon needs to be smaller in size so the chips height and width gets
+   shorten"). Three values carry that and none of them is a new idea:
+
+     the words   §63 §24 takes them from the cell's own `--t-compact` (13.5/19)
+                 to `--t-label` (12.5/17), which is the role every other chip in
+                 the build already has — `.tag`, `.badge`, `.chip-tal` are all in
+                 §63 §7's label list. Not `--t-caption`: that is the floor tier
+                 §63 §3 reserves for timestamps and axes, and this is a reading.
+     the mark    16px to 14px, stated here because a glyph's box is not one of
+                 §63's four properties. It tracks the 17px line rather than
+                 setting the chip's height on its own — at 16 against a 17px
+                 line the icon WAS the height.
+     the padding 4px/12px to 2px/8px, one step down the scale on both axes.
+
+   MEASURED: 27px tall and ~150 wide becomes 21 tall and ~124, and the row it
+   sits in comes down with it. The pill's radius is a literal 999px, so it
+   follows the height with nothing to keep in step.
+
+   THE GAP GOES 8 TO 4 WITH THEM. At 8px a 14px mark and a 12.5px phrase read as
+   two objects in one box rather than as one label — the gap was measured
+   against a 16px mark and 13.5px words, and it is the one value here that had to
+   move to keep the chip reading as a single thing. */
+.app[data-portal="leader"] .tbl-flag .flag-t{
+  gap:var(--s02);padding:var(--s01) var(--s03);border-radius:999px}
+.app[data-portal="leader"] .tbl-flag .flag-t svg{width:14px;height:14px}
+.app[data-portal="leader"] .tbl-flag tr.sev .flag-t{
+  color:var(--danger-ink);
+  background-color:color-mix(in srgb, var(--danger-ink) 12%, var(--layer-01))}
+.app[data-portal="leader"] .tbl-flag tr.mod .flag-t{
+  color:var(--support-attention);
+  background-color:color-mix(in srgb, var(--support-attention) 14%, var(--layer-01))}
+
+/* ONE RULE, UNDER THE COLUMN HEADS, AND IT IS LIGHT GREY
+   Maryam, 1 Sep 2026: "remove the lines between the table rows, keep the one
+   after the column header but use light grey color for that."
+
+   WHAT WAS HERE. `.tbl-flag tr td{border-bottom:1px solid var(--rule-on-2)}`,
+   with a note arguing that every row keeps its rule INCLUDING THE LAST —
+   because with rows hidden by the filter there was no way to say "the last
+   VISIBLE row" in CSS, and a bottom rule that appeared and disappeared as you
+   typed read as a rendering fault. The filter is deleted (lead.js records it),
+   so the constraint that produced a twelfth hairline is gone with it, and three
+   rows ruled apart is a table drawing more lines than it has facts.
+
+   TWO DECLARATIONS, AND BOTH ARE OVERRIDES OF A BASE THIS TABLE NO LONGER WANTS.
+   §02.461 gives every `td` a `border-bottom` and §10.243 re-points it to
+   `--rule`, so the row lines have to be turned OFF rather than simply not turned
+   on. And §10.242 gives `.tbl th` `--rule-ink`, which is `#111` — a black rule
+   under the heads, right for the dense tables §10 wrote it for and far too heavy
+   over three rows with nothing under them. `--rule` (#d7d5cd) is the build's one
+   hairline, which is what "light grey" names.
+
+   SPECIFICITY: `.app[data-portal="leader"] .tbl-flag th` is (0,3,1) against
+   §10's (0,1,1), so it wins outright rather than on order — worth stating
+   because §10 is a much earlier layer and the two could otherwise be read as
+   depending on the file list.
+
+   THE ROW STILL CARRIES `sev` / `mod`. Those classes now do exactly one job —
+   §31's ink on `.flag-t`, twenty lines up — which is a different question from
+   which rows are visible. */
+.app[data-portal="leader"] .tbl-flag td{border-bottom:0}
+.app[data-portal="leader"] .tbl-flag th{border-bottom-color:var(--rule)}
 
 /* --------------------------------------------------------------------------
-   THE QUEUE'S TWO CONTROLS
-   Search and severity, on one line above the table: the field takes the space
-   because a name is what you usually arrive knowing, and the three chips sit at
-   the end where a tab strip sits everywhere else in this product. Under 700 the
-   two stack — a 200px search field and three chips on one phone row is neither.
+   THE FIRST ROW STANDS OFF THE RULE
+   Maryam, 1 Sep 2026: "give Yuki Tanaka row space from above."
+
+   §02.461 gives every cell 12px top and bottom, which is the right pitch
+   BETWEEN rows and too tight under the heading — the rule above it is the only
+   line the table draws now (the row hairlines came off in the block above), so
+   the first row was sitting on it while the other two floated in 24px of air
+   between them. `--s06` doubles it, which is the same 24 a pair of rows already
+   has: the heading is separated from the body by exactly what separates two
+   rows, and nothing new is invented for it.
+
+   `tr:first-child + tr` RATHER THAN `tr:nth-child(2)`, because the two say the
+   same thing today and only the first says WHY. The header is a `<tr>` of `<th>`
+   in the same implied tbody — there is no `<thead>` in this markup — so "the row
+   after the header row" is the sentence, and an index would silently mean
+   something else the day a caption or a second heading row arrives.
    -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .lead-tools{
-  display:flex;flex-direction:column;gap:var(--s04);
-  padding:0 var(--pad-x) var(--s05)}
-.app[data-portal="leader"] .lead-srch{flex:1;min-width:0;max-width:420px}
-.app[data-portal="leader"] .lead-filter{margin:0;flex:none}
-/* `.cs button:first-child` zeroes its left padding to sit a heading's strip on
-   the spine. This strip is not on the spine — it is at the end of a row — so
-   the first chip pays the same padding as the other two or it reads as clipped. */
-.app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s04)}
-.app[data-portal="leader"] .lead-filter .lf-n{
-  margin-left:var(--s03);font-variant-numeric:tabular-nums;
-  color:var(--text-helper);font-weight:400}
-.app[data-portal="leader"] .lead-filter button.on .lf-n{color:var(--text-secondary)}
-.app[data-portal="leader"] .lead-none{padding:var(--s08) 0}
-/* ON A PHONE THE THREE FILTERS SPAN THE ROW, END TO END.
-   Stacked under the search field the strip is a full-width row with three
-   content-width tabs in it, so it ended a third of the way short — and the
-   empty third still carried the strip's own bottom rule, which reads as a
-   fourth tab that failed to load. Below 700 the strip is where the row's width
-   comes from, so it divides it: three equal columns, each tab centred in its
-   own, and the whole strip is one control the width of the table it filters.
-   `overflow:visible` because a grid of three fractions cannot overflow, and
-   the `auto` inherited from `.cs` would otherwise leave a scroll box that
-   scrolls nowhere. */
-.app[data-portal="leader"] .lead-filter{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
-.app[data-portal="leader"] .lead-filter button{
-  min-width:0;padding-left:var(--s03);padding-right:var(--s03);
-  justify-content:center;text-align:center}
-.app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s03)}
-@container app (min-width:700px){
-  .app[data-portal="leader"] .lead-tools{
-    flex-direction:row;align-items:flex-end;justify-content:space-between;
-    gap:var(--s06)}
-  /* back to a strip at the end of the row, sized to its words — and CLOSED ON
-     THE LEFT. `.cs` rules its own top and bottom and gives every tab a right
-     border, which is exactly right for a strip that starts at the page's spine:
-     there is nothing to its left to be separated from. This one floats at the
-     end of a row, so the same set of borders left it open on one side — three
-     cells in a box with a missing wall. One declaration on the strip rather
-     than a border on the first tab, so the line is the strip's edge and lines
-     up with its own top and bottom. */
-  .app[data-portal="leader"] .lead-filter{
-    display:flex;overflow-x:auto;border-left:1px solid var(--rule)}
-  .app[data-portal="leader"] .lead-filter button{
-    padding-left:var(--s04);padding-right:var(--s04)}
-  .app[data-portal="leader"] .lead-filter button:first-child{padding-left:var(--s04)}
-}
+.app[data-portal="leader"] .tbl-flag tr:first-child + tr td{padding-top:var(--s06)}
+
+/* --------------------------------------------------------------------------
+   31.6 THE ACTION COLUMN — `.tbl-act`
+   The queue's last cell is a control, and three of `.tbl`'s own defaults are
+   written for a cell that holds data. Each of these is one of them:
+
+   MIDDLE, NOT TOP. §02.463 sets `vertical-align:top`, which is right for a cell
+   whose value wraps to three lines and wrong for a row whose tallest object is a
+   button: top-aligned, the label sat 6px above the chip and the figures beside
+   it. Every cell in this table is one line, so the whole row is centred rather
+   than the action cell alone — a cell that centres inside a top-aligned row is
+   the same misalignment with a different winner.
+
+   NO SIDE PADDING ON THE BUTTON. §24.304 gives `.btn-sm.ic-l` 12px each side,
+   so "Contact" started 12px inside its own column and did not line up with the
+   "Action" head above it. A column is scanned down its left edge (§31.5's own
+   argument for the date chip), and this is the last column, so the row would
+   also have paid 12px of dead width at its right rail. The button keeps its
+   height as the target.
+
+   24px, NOT `.btn-sm`'s 32. The point of the ask above was a shorter row; a
+   32px control in a cell with 12px above and below would have handed back every
+   pixel the chip gave up and then some. 24 clears the 17px line it sits beside
+   and the row measures 48 rather than 51.
+
+   THE MARK IS 16px, matching the chip's own family rather than §02.81's 20px
+   button glyph — a 20px icon beside 12.5px words is the icon shouting the verb.
+   -------------------------------------------------------------------------- */
+.app[data-portal="leader"] .tbl-flag td{vertical-align:middle}
+.app[data-portal="leader"] .tbl-flag .tbl-act .btn{
+  min-height:24px;padding-left:0;padding-right:0}
+.app[data-portal="leader"] .tbl-flag .tbl-act .btn svg{width:16px;height:16px}
+
+/* --------------------------------------------------------------------------
+   THE QUEUE'S TWO CONTROLS — DELETED 1 SEP 2026
+
+   Twenty-two rules went: `.lead-tools`, `.lead-srch`, `.lead-filter` (including
+   its whole phone tier), `.lead-filter .lf-n` and `.lead-none`. Nothing writes
+   any of them — lead.js took the search field, the three severity chips, the
+   count line and the empty state off the section in one pass, and its own note
+   is the argument.
+
+   TWO THINGS IN THERE WERE GENERAL AND ARE WORTH NOT RE-DERIVING:
+
+   A `.cs` STRIP THAT IS NOT ON THE SPINE NEEDS ITS FIRST TAB'S PADDING BACK, and
+   a border on its left. `.cs button:first-child` zeroes the left padding so a
+   heading's strip sits on the page's spine, and `.cs` rules its own top and
+   bottom and gives every tab a RIGHT border — both correct for a strip that
+   starts at the spine, and both wrong for one floating at the end of a row,
+   where the first reads as clipped and the second leaves three cells in a box
+   with a missing wall. `.lead-tabs` (the sticky band, still live) is on the
+   spine; anything that floats is not.
+
+   THREE TABS IN A FULL-WIDTH ROW SHOULD DIVIDE IT, not sit content-width at one
+   end — the empty remainder still carried the strip's bottom rule and read as a
+   fourth tab that had failed to load. `grid-template-columns:repeat(3,minmax(0,1fr))`
+   with `overflow:visible`, because a grid of fractions cannot overflow and `.cs`'s
+   inherited `auto` otherwise leaves a scroll box that scrolls nowhere.
+   -------------------------------------------------------------------------- */
 
 /* --------------------------------------------------------------------------
    THE FIGURE CELLS SAY WHAT KIND OF NUMBER THEY ARE
@@ -208,12 +321,45 @@
    own four hues are. The four `statCell` calls are adjacent in one place and
    commented there; if a fifth is added, this block is the other half of it.
    -------------------------------------------------------------------------- */
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(1){--mk:var(--gray-70)}
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(2){--mk:var(--danger-ink)}
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3){--mk:var(--support-attention)}
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(4){--mk:var(--gray-70)}
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(2) .n,
-.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3) .n{color:var(--mk)}
+/* RE-POINTED 1 SEP 2026 WITH THE ORDER, and that is what "coupled by
+   `nth-child`" costs: Maryam put the two demands first — Attention required,
+   Awaiting decisions, Cohort calls, Cohorts — so the red moved from cell 2 to
+   cell 1 and the amber from 3 to 2. If `LEAD_JUMPS` is reordered again, this
+   block is the other half of it.
+
+   AND ALL FOUR CARRY A HUE NOW (Maryam, same day: "all four icons should be in
+   different relevant colors to their nature"). The two counts were `--gray-70`
+   on the argument recorded above — "neutral for the two that are just counts"
+   — which was right while the mark was a 13% wash behind a glyph, where a hue
+   on a count would have read as a status. §29 has taken the wash off and the
+   mark is a bare 20px glyph; with nothing tinted, a grey glyph beside three
+   coloured ones reads as two marks that failed to load rather than as two
+   neutral facts.
+
+   THE FOUR ARE SEMANTIC, NOT A CYCLE, which is the same call §65 and §72 make
+   for their own marks ("the hues are NAMED rather than cycled by
+   `nth-child`"): red is the queue of people falling behind, amber the work
+   waiting on a signature, blue a scheduled session — the hue `.qa-ic.ic-prep`
+   already gives a call — and violet the cohorts themselves, which is the hue
+   §82 gives `.cov-pill` and the course cover. The two demands keep the two
+   support tokens so they stay tied to the product's danger and attention
+   colours; the two counts take marker hues, which are named for exactly this.
+
+   AND THE FIGURE IS INK ON ALL FOUR (Maryam, 1 Sep 2026: "they should be in
+   black color only"). Two rules used to put `--mk` on `.n` for cells 1 and 2,
+   argued as "a hue on the MARK says what kind of thing this is, a hue on the
+   FIGURE says this number needs you". That distinction was legible while the
+   two counts had no hue at all — red mark AND red number against grey mark
+   and black number. With all four marks coloured, a coloured number on two of
+   them is a third state nothing else on the band uses, and the four figures
+   stop being comparable as figures. The hue lives on the mark; the number is
+   the number. The rules are DELETED rather than re-pointed — `.n` has no ink
+   of its own here now and falls to §63's body ink, which is what the other
+   two were already doing. */
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(1){--mk:var(--danger-ink)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(2){--mk:var(--support-attention)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(3){--mk:var(--mk-1)}
+.app[data-portal="leader"] .page .stats-lead > .stat:nth-child(4){--mk:var(--mk-3)}
 
 /* --------------------------------------------------------------------------
    YOUR STANDING IS A FACT BAND
@@ -552,17 +698,23 @@
   -webkit-appearance:none;appearance:none;width:100%;
   font:inherit;color:inherit;text-align:left}
 .app .bk-row > .tile-arrow{align-self:center;margin-left:var(--s04)}
-.app .bk-row > .mem-av{
-  width:36px;height:36px;flex:none;position:relative;overflow:hidden;
-  background-color:var(--gray-80)}
-/* the group mark on a cohort call sits in the same 36px the face does, or the
-   two kinds of row disagree about where their text starts */
+/* `.bk-row > .mem-av` WAS DELETED HERE ON 1 SEP 2026 and its argument is kept.
+   It was the 36px face an interview row wore, and it outlived the interviews —
+   `bookedRow`'s face branch went with them, so the rule had become the "gate
+   nothing writes" tell: no markup in either portal writes a `.mem-av` inside a
+   `.bk-row`. What it shared with the rule below is the reason the mark is 36px
+   whichever kind it is — "or the two kinds of row disagree about where their
+   text starts". */
+/* THE CALL MARK SITS IN THE 36px THE FACE DID. `I.video` in `.cardrow-ic`'s
+   plate — and for one build (1 Sep 2026) this slot held §86's 112 × 62 cohort
+   cover instead. `bookedRow`'s note is the argument for coming back; what it
+   cost in CSS is this pair of rules and nothing else, which is the component
+   swap working as intended. */
 .app .bk-row > .cardrow-ic{width:36px;height:36px}
 .app .bk-row > .cardrow-ic svg{width:20px;height:20px}
 @container app (max-width:599.98px){
   /* the phone drops the mark rather than the date: which day it is is the
-     thing you scan a diary for, and the face is a nicety next to it */
-  .app .bk-row > .mem-av,
+     thing you scan a diary for, and the glyph is a nicety next to it */
   .app .bk-row > .cardrow-ic{display:none}
   /* the chip keeps its 104px here too. This used to narrow to 74px, which the
      longest label never fit, so the phone was where the ragged column was

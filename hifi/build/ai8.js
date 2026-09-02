@@ -493,7 +493,7 @@ const NEXT = {
   assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does &mdash; $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
-  day90:    ['Book the re-interview', 'All 13 chapters are done at 87% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
+  day90:    ['Book the re-interview', 'All 13 chapters are done at 83% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
   promoted: ['Enroll in the E4 course', 'You moved up on November 21. The next 90 days are built for E4, and your returning-candidate credit comes off the fee.', 'What is different about E4?', 'enrol'],
   /* THE RED ACCENT DEMO — day 34's row, copied. See `RED_DEMO` in data.js. */
   reddemo:  ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3']
@@ -845,7 +845,74 @@ const CH_ONE  = /chapters?\s*(1[0-3]|[235-9])\b(?!\d)/i;
    sees "cancel", and `wRefund` has to see "is the fee refundable" before
    `wCost` sees "fee".
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   WHY THESE SCENES — THE CHOOSER'S ONE QUESTION, ANSWERED FROM `SCENES`
+
+   Maryam, 1 Sep 2026: the six cards on the Interviews module lost their
+   descriptions, and the section gained one line under the grid — "Ask Tal why
+   these scenes were chosen from your interview?" — with the head band's own
+   star on it. Pressing it opens Tal, "then tal will response back with the
+   reasoning".
+
+   THE REASONING IS THE SIX DESCRIPTIONS THAT CAME OFF THE CARDS. `SCENES`
+   holds `[title, why, from, length]` and the second field is exactly the line
+   each card used to print — "Where you changed your mind after listening". So
+   nothing is written here: the copy moved from the strip into the reply, and
+   `SCENES` stays the one record it was, which is the `bkStamp` rule (one
+   place, many readers) applied to six sentences. Editing a scene's `why`
+   changes the strip and the answer together, because there is only one of it.
+
+   AND THE ANSWER IS NOT AN ANSWER TO "WHO CHOSE THEM", WHICH IS THE ONE
+   CONSTRAINT THE COPY HAS. The note over `SCENES` is explicit: nothing in the
+   product says where the six came from, because "the moment the copy names a
+   sender, the choice reads as approving somebody else's shortlist rather than
+   picking your own three". So Tal says what each moment IS and what keeping
+   three does, and never that anybody picked them — the honest reading of "why
+   these" being what is in them, not whose list it was.
+
+   THE SET FOLLOWS `S.iv`, WHICH IS WHAT THE PAGE IS ABOUT. The re-interview
+   has its own six on `promoted`, and `V.report` / `ivRow` already write `S.iv`
+   on the way past, so the reply describes the interview the reader was last
+   looking at rather than always the first one.
+
+   THE STATE LINE IS DERIVED THREE WAYS because the block has three states and
+   they are genuinely different answers: nothing saved yet (the chooser is on
+   screen and this is what saving does), a set saved (the three are named), and
+   a set part-picked. `sceneKeep` / `scenePicked` are the two arrays views.js
+   already keeps apart, and the note over them is why.
+   -------------------------------------------------------------------------- */
+function wScenes(){
+  const kind = S.iv === 're' ? 're' : 'level';
+  const set = (typeof SCENES === 'object' && SCENES[kind]) || [];
+  if(!set.length) return '';
+  const kept = (typeof sceneKeep === 'function' && sceneKeep(kind)) || null;
+  const picked = (typeof scenePicked === 'function' && scenePicked(kind)) || [];
+  const which = kind === 're' ? 're-interview' : 'level interview';
+  return tw(twIc('play') + `The six moments from your ${which}`,
+    `<span class="tw-lede">Each one is a stretch of the recording where you were doing
+       something the interview was looking for &mdash; not a highlight, and not a
+       verdict.</span>
+     <span class="tw-list">
+       ${set.map(s => `<span><b>${s[0]}</b><br>${s[1]} &middot; ${s[3]}</span>`).join('')}
+     </span>
+     <span class="tw-k">${kept
+        ? 'You kept ' + kept.map(i => set[i][0]).join(', ') + '. Those three are what shows on your interview; the other three are not published anywhere.'
+        : picked.length
+          ? 'You have ' + picked.length + ' of three chosen. Save them and those three are what shows on your interview from now on &mdash; the other three are not published anywhere.'
+          : 'Keep three of the six. Those three are what shows on your interview from now on, and the other three are not published anywhere.'}</span>`,
+    twBtn('Open Interviews','interviews'));
+}
+
 TAL_ROUTES.unshift(
+  /* FIRST IN THE LIST, and narrow enough to afford it. The button sends "Why
+     were these scenes chosen from my interview?"; a person typing it will
+     write it some other way, so the test is the word `scene` next to the
+     product's own vocabulary for the block rather than the exact sentence.
+     `\bscenes?\b` alone would be too wide — "what happens to the scene" is a
+     different question and the chapter player has scenes in it — so it is
+     paired with choosing, keeping or publishing. */
+  [/\bscenes?\b[^.?!]{0,40}\b(chosen|choose|choosing|cut|keep|kept|pick|picked|show|shown|publish\w*|mean)\b|\b(why|which|what)\b[^.?!]{0,30}\bscenes?\b|six moments/i, wScenes],
+
   /* --- what are you for ------------------------------------------------ */
   /* FIRST, because the dashboard's Meet Tal card asks it and because it is
      the only question whose answer is the whole of this file. */

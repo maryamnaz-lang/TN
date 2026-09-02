@@ -46,12 +46,26 @@
    — opening Tal, the bell, the ask field — for the same reason `S.leadQ`
    does, which is that `render()` rebuilds the view column from `S` and
    nothing else. Prefixed `ldr` rather than `lead` because `S.leadQ` and
-   `S.leadFilter` are already taken by the dashboard's queue, and two
+   `S.leadFilter` were taken by the dashboard's queue when this was written (both
+   deleted with its search and filter on 1 Sep 2026 — the prefix stays, since the
+   collision it avoids is with `lead*` as a whole), and two
    prefixes that differ by one letter are worse than two that do not overlap.
    -------------------------------------------------------------------------- */
 S.ldrCo = LEAD_COHORTS[0].id;
 S.ldrMem = null;
-S.ldrRep = 'all';
+/* THE REPORTS PAGE OPENS ON A COHORT, NOT ON "ALL COHORTS" (Maryam, 2 Sep
+   2026: "remove all cohorts tab just show the other three"). It was `'all'`,
+   which is the only value that was never one of the three tabs — so the tab
+   strip is now exactly the record, and `S.ldrRep` is always a cohort id as a
+   STRING (`data-ldrrep` hands it back as one and `+sel` is what reads it). The
+   first cohort rather than a literal, so a re-ordered `LEAD_COHORTS` opens on
+   whatever is first rather than on a number written down here. */
+S.ldrRep = String(LEAD_COHORTS[0].id);
+/* The chapter list's own expand state — NOT the candidate's `S.chAll`, per
+   §65's two-disclosures lesson: one boolean for two surfaces holds the first
+   one's value the moment both can be open, and the portal switch resets
+   neither. */
+S.ldrChAll = false;
 S.ldrBrief = null;
 S.ldrNote = null;
 
@@ -60,11 +74,32 @@ S.ldrNote = null;
    is what the roster and the reports both hand over, and seeded with two so
    the member page shows the component doing its job rather than its empty
    state on first look. */
+/* A NOTE IS FOUR FIELDS NOW — `t` title, `b` body, `k` kind, `w` when (Maryam,
+   2 Sep 2026, with three annotated states). It was two, `t` and `w`, and the
+   list drew the whole note as its own title, which is why the rows ran to three
+   lines of bold. The reference's row is a heading, a paragraph under it and a
+   type tag, and the tag is the field that did not exist.
+
+   THE KIND IS ONE OF THREE AND THE LIST IS CLOSED: `strength`, `develop`,
+   `general`. Two are the reference's own ("Strength", "Area to develop") and
+   the third is what a note that is neither has to be — most of these are
+   neither, and forcing a leader to call an escalation a strength or a weakness
+   would be the form filling in the reader. */
 S.ldrNotes = {
-  'Yuki Tanaka':[{t:'Twelve days without a sign-in. Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', w:'2 days ago'}],
-  'James Whitby':[{t:'Re-taking assessments three and four rather than moving on. Told him on the call to leave them at 65 and come back after chapter 6 — the material builds, the score does not.', w:'Last week'},
-                  {t:'Asked for the handover framework twice. Sent it. Worth checking he used it.', w:'Earlier'}]
+  'Yuki Tanaka':[{k:'develop', t:'Twelve days without a sign-in', b:'Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', w:'2 days ago'}],
+  'James Whitby':[{k:'develop', t:'Re-taking assessments rather than moving on', b:'Told him on the call to leave three and four at 65 and come back after chapter 6 — the material builds, the score does not.', w:'Last week'},
+                  {k:'general', t:'Asked for the handover framework twice', b:'Sent it. Worth checking he used it.', w:'Earlier'}]
 };
+
+/* The composer's state. `S.ldrNoteAt` is null when it is shut, `-1` while a new
+   note is being written and the note's index while one is being edited — one
+   key for three states, so the panel cannot be adding and editing at once. */
+/* Which of the cohort page's three tabs is open. Its own key, not the
+   candidate's `S.ctab` — the two pages can both be open behind the portal
+   switch, which resets neither. */
+S.ldrCTab = 'discussion';
+S.ldrNoteAt = null;
+S.ldrNoteK = 'general';
 
 /* --------------------------------------------------------------------------
    READINGS OF THE ROSTER
@@ -105,6 +140,210 @@ const ltask = (m,c) => m.last === 'Never' ? ['none','Not started']
 
 const lnotes = name => S.ldrNotes[name] || [];
 
+/* THE COHORT'S RANKING, DERIVED FROM ITS OWN ROSTER — `boardList`'s markup with
+   this cohort's numbers. That function reads `BOARD`, which is the CANDIDATE's
+   own leaderboard (ten rows, one of them "You", with star ranks off `GAME`);
+   a leader looking at Cohort 33 has no row in it and neither do its members.
+   Everything here is data the roster already carries: `pts` per member — the
+   same scale the candidate's Points page awards against — and `lbadge`, which
+   is arithmetic on it, so a candidate cannot hold a badge their points do not
+   support. THE STAR RANK IS NOT DRAWN, because a rank is `GAME[stage]`'s and
+   this side holds none: three columns that are real beat four with a guess. */
+const ldrRankBoard = c => `<div class="board">
+    <div class="brow bhead">
+      <span>#</span><span>Member</span><span>Earned</span><span class="num">Points</span>
+    </div>
+    ${c.members.slice().sort((a,b) => b.pts - a.pts).map((m,k) => {
+      const b = lbadge(m.pts);
+      return `<div class="brow">
+        <span class="b-n">${k + 1}</span>
+        <span class="b-who">${avatar({i:m.ini, img:AV[m.img]}, 32)}<span class="b-nm">${m.name}</span></span>
+        <span class="b-earn">
+          ${b ? `<span class="b-mk" title="${b.n}"><img src="${AWARD[b.n.toLowerCase().replace(/ /g,'')]}" alt="${b.n}"></span>` : ''}
+          <span class="b-earn-t">${b ? b.n + ' badge' : 'No badge yet'}</span>
+        </span>
+        <span class="num b-pts">${m.pts.toLocaleString()}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+/* ==========================================================================
+   YOUR PRIVATE NOTES — three states, all live (Maryam, 2 Sep 2026, with an
+   annotated sheet of all three): empty, a list, and the composer.
+
+   THE SECTION IS WHITE. It was `.sec tint`, and the panel inside it is a
+   bordered white card — §74's decision, word for word: "a 5%-tinted card on a
+   4% grey ground is two washes a shade apart", and here it is a white card on
+   a grey one, which reads as the panel having failed to load rather than as a
+   card lying on a ground. `quizResults` made the same swap.
+
+   THE COMPOSER IS INLINE AND THE SHEET IS DELETED. Adding a note was a
+   `.modal > .sheet` — a full-screen surface with a scrim, a title, a textarea
+   and two feet — for one field. The reference puts it in the panel, which is
+   also what the note IS: a row being written where the rows are. `ldrNoteSheet`
+   and its `LDR_SHEETS` entry go with it; `data-ldrnote` now opens the composer
+   in place, so the chip at the top of the page and the button in the panel
+   still work and still mean the same thing.
+
+   WHAT THE REFERENCE DRAWS AND THIS DOES NOT, and each is §60 rather than a
+   shortcut — a dead control on a live surface is worse than a missing one:
+     the paperclip   nothing in this build stores a file.
+     the `@`         there is nobody to mention: a note is private to one
+                     leader and nothing else reads it.
+     the kebab       its only real item is Delete, and a menu holding one thing
+                     is a menu too many. The row carries the pencil and an ×,
+                     both live, which is the same two actions one press sooner.
+   WHAT IT DOES DRAW AND WIRE: search, the type filter, add, edit, delete, and
+   the type itself.
+
+   SEARCH FILTERS THE DOM AND DOES NOT RE-RENDER, which is the technique
+   lead.js kept in a note when the attention queue's own search was deleted:
+   `render()` replaces `device.innerHTML`, so a re-render on every keystroke
+   destroys the `<input>` and takes the caret with it. The rows are hidden by
+   class instead and the count line is written in place.
+   ========================================================================== */
+const NOTE_K = {
+  strength:{t:'Strength',        ink:'--support-success-ink', mix:'12%'},
+  develop: {t:'Area to develop', ink:'--support-attention',   mix:'14%'},
+  general: {t:'General',         ink:'--link',                mix:'10%'}
+};
+
+const ldrNoteRow = (n, name, i) => {
+  const k = NOTE_K[n.k] || NOTE_K.general;
+  return `<div class="note-row" data-note-i="${i}" data-note-k="${n.k || 'general'}"
+       style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
+    <span class="note-mk">${I.edit}<i class="note-dot"></i></span>
+    <span class="note-b">
+      <span class="note-t">${n.t}</span>
+      ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
+      <span class="note-f"><span class="note-tag">${k.t}</span><span class="note-w">Added by you &middot; ${n.w}</span></span>
+    </span>
+    ${''/* THE TWO ACTIONS ARE CHIPS (Maryam, 2 Sep 2026: "instead of this, give
+           chips of edit and delete, edit chip will have the blue color … delete
+           chip will have red text red icon on left and light red bg"). They
+           were two bare `.ic` glyphs — a pencil and a cross — which is the
+           product's shape for an action on a ROW in a dense list, and these two
+           sit on a note that is three lines tall with nothing else beside it.
+           A chip names what it does, which is what an irreversible one should.
+           SAME COMPONENT AS THE HEADER'S PAIR: `.ldr-chip`, the mark leading
+           the words, the ground mixed from the ink the words are set in. Blue
+           is §12's "goes somewhere" and red is `--danger-ink`, this build's red
+           as INK — §31 measures both pairs.
+           THE DELETE MARK IS `I.close`, NOT A BIN. The icon set has no `delete`
+           glyph, and trap 7's rule is that a mark is PASTED from the official
+           Rounded set rather than drawn — inventing a path here would be the
+           one thing that file forbids. The × is what this row already used and
+           what every sheet in the build dismisses with. */}
+    <span class="note-a">
+      <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}">${I.edit} Edit</button>
+      <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}">${I.close} Delete</button>
+    </span>
+  </div>`;
+};
+
+/* THE COMPOSER. One textarea and a type, which is what the reference has, plus
+   a title field it does not — and the field is not an addition for its own
+   sake: state 2's row is a heading with a paragraph under it, so a composer
+   with one box could only fill that heading by cutting the first sentence off
+   the body, which is a guess about the writing dressed up as a feature. */
+const ldrNoteBox = (name, n) => `<div class="note-box">
+    <span class="note-mk note-mk-w">${I.edit}</span>
+    ${''/* THE TYPE AND THE TWO BUTTONS ARE INSIDE THE BOX (Maryam, 2 Sep 2026:
+           "the type selection should not have a bottom line and it should be
+           inside the note block at the bottom left, and it should have a
+           chevron with it so user knows that there is some kind of selection
+           option here"). The textarea kept the frame and the row sat under it,
+           so the composer read as a field and then two unrelated controls; one
+           box holding all three is the reference's own arrangement and says
+           they belong to the note being written.
+           SO THE FRAME MOVES OFF THE TEXTAREA AND ONTO `.note-fbox`, and the
+           textarea goes borderless inside it — otherwise the box has a second
+           box in it, which is the thing this whole pass has been removing.
+           THE CHEVRON IS A REAL `I.chevDown` OVER A REAL `<select>`, not a
+           background image and not a menu of our own: the select keeps the
+           keyboard and the platform's own picker, and the mark sits over it
+           with `pointer-events:none` so a press still opens it. */}
+    <div class="note-form">
+      <input class="inp note-ttl" id="ldrNoteT" placeholder="A short title"
+        value="${n ? n.t.replace(/"/g,'&quot;') : ''}" aria-label="Note title">
+      <div class="note-fbox">
+        <textarea class="inp note-body" id="ldrNoteB" rows="3"
+          placeholder="Write your note here…" aria-label="Note">${n ? n.b || '' : ''}</textarea>
+        <div class="note-form-a">
+          ${''/* THE LABEL IS DRAWN AND THE SELECT IS LAID OVER IT INVISIBLY
+                 (Maryam, 2 Sep 2026: "take the chevron close to the type, it
+                 should have only 8px gap"). A native `<select>` at `width:auto`
+                 sizes to its WIDEST option, so with "Area to develop" in the
+                 list the box stayed that wide whatever was chosen and the
+                 chevron sat ~100px past the word — nothing in CSS shrinks a
+                 select to its selected option. Drawing the chosen label as text
+                 and stretching the real select over the pair gives the exact
+                 width, keeps the keyboard and the platform's own picker, and
+                 costs one span. */}
+          <span class="note-sel-w">
+            <span class="note-sel-t">${NOTE_K[(n ? n.k : S.ldrNoteK)] ? NOTE_K[(n ? n.k : S.ldrNoteK)].t : NOTE_K.general.t}</span>
+            <span class="note-sel-ch">${I.chevDown}</span>
+            <select class="note-sel" id="ldrNoteK" aria-label="Note type">
+              ${Object.keys(NOTE_K).map(k => `<option value="${k}"${(n ? n.k : S.ldrNoteK) === k ? ' selected' : ''}>${NOTE_K[k].t}</option>`).join('')}
+            </select>
+          </span>
+          <span class="note-form-b">
+            <button class="btn btn-s btn-sm noic note-cancel" data-ldrnotecancel="1">Cancel</button>
+            <button class="btn btn-p btn-sm noic" data-ldrnotesave="${name}">Save note</button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+const ldrNotesSec = m => {
+  const notes = lnotes(m.name);
+  const open = S.ldrNoteAt !== null;
+  const editing = S.ldrNoteAt >= 0 ? notes[S.ldrNoteAt] : null;
+  /* THE SECTION LOST ITS FURNITURE (Maryam, 2 Sep 2026: "there are a lot of
+     unnecessary lines in this section"). Four things went and each was drawing
+     a line or a box round something that did not need one:
+
+       the panel's border   the notes ARE the section; a frame round them drew a
+                            second edge inside a page already made of hairlines,
+                            and the panel's own width was less than the column's.
+       the toolbar          "1 note", the search field and the type filter. On a
+                            list that is one or two rows long a search is a
+                            control for finding what is already on the screen —
+                            §60 from the other side. `ldrNoteFilter` and its two
+                            listeners are deleted with it rather than left
+                            listening for a field nothing draws.
+       the foot             "Showing 1 of 1 note" reported what the search had
+                            filtered, so it went with the search.
+       the rules            a note had a hairline above it and another below.
+                            One BETWEEN two notes is the list's rhythm; one over
+                            the first and under the last is a box drawn in two
+                            pieces, which is what the border was already doing.
+
+     THE ADD BUTTON MOVES INTO THE HEADING ROW and the helper line comes out of
+     it, which is the shape every other headed section on this portal uses
+     (`.sec-h` › `<h2>` + `.btn-g.btn-sm`). "Feeds the 90-day summary" is not
+     lost: it is the one sentence the empty state still makes, which is where a
+     reader who has never written a note actually needs it. */
+  return `<div class="sec">
+    <div class="sec-h"><h2>Your private notes</h2>
+      ${open ? '' : `<button class="btn btn-g btn-sm ic-l" data-ldrnote="${m.name}">${I.edit} Add note</button>`}
+    </div>
+    ${!notes.length && !open
+      ? `<div class="note-panel note-empty">
+          <span class="note-mk note-mk-lg">${I.edit}</span>
+          <h3>No notes added yet</h3>
+          <p>Write anything that helps capture ${m.name.split(' ')[0]}&rsquo;s progress, strengths and areas to develop. These private notes feed the 90-day summary.</p>
+          <button class="btn btn-s noic note-first" data-ldrnote="${m.name}">${I.add} Add your first note</button>
+        </div>`
+      : `<div class="note-list">
+          ${open ? ldrNoteBox(m.name, editing) : ''}
+          ${notes.map((n,i) => ldrNoteRow(n, m.name, i)).join('')}
+        </div>`}
+  </div>`;
+};
+
+
 /* Severity as a tag, for the pages that show a flag on a ROW rather than in
    the dashboard's table. The table has `.flag-t` and a row class; a row in a
    tile-stack has neither, and `.tag` already carries the two inks — `red` and
@@ -144,34 +383,200 @@ const lpaceGap  = c => lavg(c,'pc') - lpace(c);
 /* ==========================================================================
    COHORTS — THE INDEX
 
-   THE THREE COHORTS ARE A TABLE, NOT THREE CARDS.
-   The wireframe drew a `.g3` of three cards, each with a progress bar and
-   five `.kv` rows. Every cohort therefore reported the same six facts in a
-   column, and comparing two of them meant reading down one card and across
-   to the next. The question this page exists to answer is which cohort needs
-   the leader most, which is a comparison — so the six facts become six
-   columns and the three cohorts become three rows, and the answer is a scan
-   down one column instead of a diff across three cards. It is also what the
-   client has asked for twice: aligned figures over decorative charts.
+   THE THREE COHORTS ARE THREE CARDS (Maryam, 2 Sep 2026, with a reference
+   screen: "I want such cards for my cohorts", then "we already have 3 cohort
+   images that we are using on the dashboard, use those here as well").
 
-   THE BAR DOES NOT SURVIVE THE MOVE. `.bar` inside a table cell would set a
-   width against a column that is being negotiated against five others, and
-   §12 has no rule for it. Progress against expected pace is two numbers and
-   it reads better as two numbers.
+   WHAT THIS TURNS OVER, AND THE HALF OF IT THAT SURVIVES. This page drew a
+   seven-column table, and the note that stood here made the case for it: the
+   question is which cohort needs the leader most, which is a COMPARISON, so
+   six facts became six columns and the answer was a scan down one column
+   rather than a diff across three cards. That is still true of a table and it
+   was never the whole question — a table can be scanned and it cannot be
+   RECOGNISED. Three cohorts are three places a leader spends thirteen weeks,
+   and the cover is what says which is which before a figure is read.
+   The comparison is kept INSIDE the card instead of given up: four labelled
+   rows in one order on all three cards, on one grid, with the figures on a
+   shared right edge — so "which cohort is behind" is still a scan across three
+   cards at the same height. §92 is the drawing and the long version.
 
-   ONE ROW OPENS ONE ROSTER, AND THE WHOLE ROW IS THE TARGET — the argument
-   lead.js records for `faceRow`: a 60px "Open" button on a 700px row that is
-   otherwise dead, and a verb that promises the opening happens here. `.ldr-tr`
-   in §35 is the whole of what that costs.
+   THE BAR COMES BACK, and the old note is why it could not be here before:
+   "`.bar` inside a table cell would set a width against a column that is being
+   negotiated against five others". A card negotiates with nothing, so the
+   progress row draws §03's own bar, the same object the candidate's course
+   progress uses.
+
+   ONE CARD OPENS ONE ROSTER, AND THE WHOLE CARD IS THE TARGET — the argument
+   lead.js records for `faceRow` and this file recorded for `.ldr-tr`. The
+   arrow in the corner is the mark, not the control.
+
+   `.ldr-tbl` / `.ldr-tr` / `.ldr-go` KEEP FOUR OTHER WRITERS (the roster, the
+   reports list and two on this file's own member pages), so none of §36's
+   table rules is orphaned by this and none is deleted.
    ========================================================================== */
+
+/* THE COVER IS THE ONE THE DASHBOARD ALREADY DRAWS, and that was the whole of
+   the second instruction: `cohortArt(c)` reads `COHORT_ART` by LEVEL, so one
+   cohort wears one picture on its dashboard row, on the leader's black call
+   card and here. The `<i>` behind the `<img>` is the fallback the `onerror`
+   uncovers — §86's arrangement, and the reason it is the cohort's NUMBER is
+   `gcard`'s: a component cannot know which of two strings holds the identity,
+   so the caller states it.
+
+   THE PILL ON THE COVER IS BACK, AND IT COUNTS PEOPLE (Maryam, 2 Sep 2026:
+   "we had tags on the top left of the cohort cards before, take them back, but
+   the text in those tags will be the candidate count like 10 Candidates"). It
+   was "Explorer – E3" and came off earlier the same day; what returns is the
+   same object in the same corner with a different string, so the class is
+   `.cco-pill` rather than the `.cco-lvl` it was — a name that says where it
+   sits rather than what it happened to hold.
+
+   THE HUE IS STILL KEYED BY LEVEL, and that is now decoration rather than a
+   label — which is the honest description of it, so it is worth stating. The
+   three cards carry three colours because three cards want telling apart at a
+   glance, and level is the one property that already keys the artwork under it,
+   so the pill and its cover can never disagree. `nth-child` would colour it by
+   position, so re-sorting the list would recolour E3.
+
+   THE LEVEL IS STILL SAID ELSEWHERE, which is what made it safe to give the
+   slot away: the `ph()` line reads "all Explorer" and the roster one click in
+   names the level in full.
+
+   THE COUNT LEAVES THE LINE UNDER THE NAME AS IT ARRIVES HERE (Maryam, same
+   message pair: "below cohort name, only show Week 5 of 13, remove the other
+   candidate and chapter content"), so the card states it once. The chapter goes
+   with it — `CH` has no reader on this card now.
+
+   THE PROGRESS IS A RING, NOT A ROW (Maryam, 2 Sep 2026: "instead of showing
+   the progress in the row, use a progress circle with the percentage in it,
+   this will be on the right end of the … row"). It is `ring(pct,label)`, §32's
+   own component, at §90's 56px — so the card, the pulse and the evaluation row
+   all draw one object. Two consequences:
+     - THE BAR GOES WITH IT. A bar under a ring is the same figure drawn twice,
+       which is §90's own note about its reference ("a second drawing of the
+       figure already in the ring").
+     - THE EXPECTED PACE STAYS, AS A CAPTION UNDER THE RING. The row said "39%
+       of 38%" and the second half is not decoration: cohort 47 is on 6% and
+       reads like a disaster until you see the 4% beside it. A ring cannot hold
+       two figures, so the comparison sits under it in the same words the row
+       used, and the ring's own `aria-label` states both for a screen reader.
+
+   THE LINE UNDER THE NAME IS DERIVED, AND IT IS NOT THE REFERENCE'S. That
+   screen prints a sentence of level marketing under each title ("Building the
+   foundation of leadership through exploration and self-awareness"); nothing
+   in this build holds a description of a level, and inventing three is the one
+   thing §74 rules out — "three sentences of new product copy no data in this
+   build supports". What the slot takes instead is the two facts the card does
+   not otherwise state: the headcount, and the chapter the cohort is on this
+   week, read off `CH` by week the way `lcDetail` does it so the two cannot
+   disagree. The WEEK moves here from the table's own column, where it was
+   being compared; on a card it is read once. */
+/* THE RING'S HUE IS HOW FAR THROUGH THE 90 DAYS THE COHORT IS, IN THREE BANDS
+   (Maryam, 2 Sep 2026: "change 6% progress color to yellow, 83% to green").
+
+   IT IS THE FIGURE, NOT A VERDICT, and the difference matters because the two
+   readings point opposite ways on this very data. Against PACE, cohort 47 is
+   ahead (6% of 4%, four days old) and cohort 33 is a point behind (83% of 84%)
+   — so a pace colouring would make 47 green and 33 amber, the exact inverse of
+   what was asked for. What the ask describes is the odometer: just started,
+   under way, nearly done. Named that way it cannot be misread as "cohort 47 is
+   in trouble", which is the misreading the `of 4%` caption under the ring
+   already exists to head off.
+
+   THE TWO THRESHOLDS ARE THE ONES THE ASK IMPLIES — a quarter and three
+   quarters of the course, which is 6 / 39 / 83 falling one to a band. Round
+   numbers rather than tuned ones, so a fourth cohort lands somewhere sensible
+   rather than in whichever band three data points happened to leave open.
+
+   THE HUES ARE §01's SUPPORT TOKENS, and the middle band keeps the accent it
+   already had. `--support-warning-ic` rather than `--support-warning` for the
+   same reason §02 gives it to `.note.warn`'s edge: it is the cut of that yellow
+   meant for a MARK, and #f1c21b on white against a pale warm track is a stroke
+   you have to look for. */
+const ccoRing = pc => pc >= 75 ? '--support-success'
+                    : pc < 25  ? '--support-warning-ic'
+                    : '--accent';
+
+/* The pill's hue, by level. Three of §12's marker hues, written as a custom
+   property the way `pulseCol` writes `--mk`. */
+const CCO_PILL = {e1:'--mk-2', e2:'--mk-3', e3:'--mk-1'};
+
+const cohortCard = c => {
+  const bad  = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
+  const wa   = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
+  const pc   = lavg(c,'pc');
+  const pace = lpace(c);
+  const pill = CCO_PILL[String(c.level).toLowerCase()] || '--mk-1';
+  /* A row is a mark, a label and a figure. The mark is a BARE glyph (Maryam,
+     2 Sep 2026: "remove the icons backgrounds") — the same subtraction §72 made
+     for the pulse's column marks and §29 for `.stat`, and the same 20px it left
+     them at, since a mark with no ground has no padding to hold the line with.
+     The hue survives the chip and is named per row, never cycled. */
+  const row = (mk,ic,label,val) => `<span class="cco-r" style="--mk:var(${mk})">
+      <span class="cco-ic">${ic}</span>
+      <span class="cco-l">${label}</span>
+      <span class="cco-v">${val}</span>
+    </span>`;
+  return `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
+    <span class="cco-art">
+      <i>${c.id}</i>
+      <img src="${cohortArt(c)}" alt="" loading="lazy" onerror="this.style.display='none'">
+      <span class="cco-pill" style="--pill:var(${pill})">${c.members.length} Candidates</span>
+    </span>
+    <span class="cco-b">
+      <span class="cco-hd">
+        <span class="cco-hb">
+          <span class="cco-n">${lname(c)}</span>
+          <span class="cco-d">Week ${c.week} of 13</span>
+        </span>
+        ${''/* THE "of 38%" CAPTION IS GONE (Maryam, 2 Sep 2026: "remove the
+               'of n%' from the bottom of each progress circle"). It was the
+               second half of the row this ring replaced — "39% of 38%" — and
+               what it bought is worth naming so nobody re-derives it by
+               accident: without it a card states progress and not progress
+               AGAINST PACE, so cohort 47's 6% reads as a cohort that has
+               stopped rather than one that is four days old and ahead. Two
+               things still carry the comparison and neither is on this card:
+               Tal's summary at the head of the page names the widest gap by
+               cohort, and Course Reports is built on it per candidate. The
+               ring's `aria-label` keeps both figures, so a screen reader is
+               told what a sighted reader is now trusted to know from the week
+               beside the name. */}
+        <span class="cco-ring" style="--ring-ink:var(${ccoRing(pc)})">
+          ${ring(pc, `${pc}% of ${pace}% expected`)}
+        </span>
+      </span>
+      ${row('--mk-3', I.chart, 'Assessment',
+            lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>')}
+      ${row('--support-attention', I.warningAlt, 'Flagged',
+            bad || wa
+              ? `<span class="cco-tags">${bad ? `<span class="tag red sm">${bad} at risk</span>` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}</span>`
+              : '<span class="t-helper-01">none</span>')}
+      ${row('--mk-4', I.calendar, 'Next call',
+            `${c.callDay} <small>${c.callTime.toLowerCase()}</small>`)}
+      ${''/* THE CORNER ARROW IS GONE (Maryam, 2 Sep 2026: "remove the bottom
+             arrows from each card"), and with it §92.5's whole argument for
+             drawing a box round it. The card is still the button — that has not
+             changed and is what makes the arrow subtractable: §64's rule is
+             that on a product made of hairlines a drawn rectangle is one more
+             edge than the page has, and this was the last one on the card.
+             `.cco-f` / `.cco-go` are deleted rather than hidden, which takes
+             `margin-top:auto` with them: the cards are stretched to the tallest
+             by the grid and now simply end after their last row. */}
+    </span>
+  </button>`;
+};
 V.leadCohorts = () => {
   const flagged = lmembers().filter(x => x.m.flag);
   const severe = flagged.filter(x => x.m.flag.k === 'bad');
   const next = LEAD_COHORTS.slice().sort((a,b) => a.callOrd - b.callOrd)[0];
-  /* Worst is by GAP, not by raw average: cohort 47 is on 6% and four days
-     old, which is nothing to act on, while 41 is on 46% in week five and
-     eight points down. Same reading as the dashboard queue's own sort. */
-  const worst = LEAD_COHORTS.slice().sort((a,b) => lpaceGap(a) - lpaceGap(b))[0];
+  /* `worst` WAS COMPUTED HERE AND READ BY NOTHING, and it goes with the
+     identical one on the reports page. The argument it carried is worth
+     keeping: worst is by GAP, not by raw average — cohort 47 is on 6% and four
+     days old, which is nothing to act on, while 41 is on 46% in week five and
+     eight points down. That is the dashboard queue's own sort, and `lpaceGap`
+     is where it lives. The reader here was the pace footnote under the table,
+     deleted when the table became three cards. */
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Cohorts')}
@@ -180,81 +585,66 @@ V.leadCohorts = () => {
         showed the same count in two notations. The spine keeps the figures in
         one notation and Tal keeps the finding. */}
   ${ph('Cohorts',`${LEAD_COHORTS.length} cohorts &middot; ${lmembers().length} candidates &middot; all Explorer`)}
+  ${''/* ONE SECTION, ONE HEADING (Maryam, 2 Sep 2026: "take the All cohorts
+         heading above the 4 cards row", and "remove the grey background of the
+         3 cards section"). The figure band and the three cards were two
+         sections and the second one carried the heading, so the page opened on
+         four unlabelled figures and then named itself half way down. They are
+         one block and always were: the band is the three cohorts added up and
+         the cards are the three cohorts, so "All cohorts" heads both and the
+         helper line that defines expected pace now sits above the first figure
+         it applies to rather than below it.
+         THE TINT GOES WITH THE MERGE and would have had to anyway: §12 steps a
+         `.stats` band down onto a panel by re-pointing its cells to the panel's
+         own colour and drawing the hairlines as the grid's gaps, so a band and
+         a row of white cards on one grey ground is two different treatments of
+         "a thing lying on a panel" in one section. On white the band draws its
+         own rules and the cards their own border. */}
   <div class="sec">
+    ${''/* THE HELPER LINE IS GONE (Maryam, 2 Sep 2026: "remove the Expected
+           pace is day of 90, evenly spread text"). It defined what the Progress
+           COLUMN was measured against, and that column left with the table: the
+           comparison now sits on each card as "of 38%" under its own ring,
+           where the figure it qualifies is 20px away rather than 400. The
+           heading row holds the heading alone. */}
+    <div class="sec-h"><h2>All cohorts</h2></div>
     <div class="stats">
       ${statCell(I.group,  'Cohorts',   LEAD_COHORTS.length, `${lmembers().length} candidates`)}
       ${statCell(I.growth, 'On pace',   LEAD_COHORTS.filter(c => lpaceGap(c) >= 0).length + ` <small>of ${LEAD_COHORTS.length}</small>`, 'against expected progress')}
       ${statCell(I.warningAlt, 'Flagged', flagged.length, `${severe.length} severe`)}
-      ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`)}
+      ${''/* THE FOURTH CELL OPENS THE CALLS MODULE (Maryam, 2 Sep 2026: "the 4
+             card of the next call should be clickable and should take me to the
+             calls module"). It is the one cell of the four whose subject lives
+             on another page — the other three are counts OF this page — and it
+             is also the route the closing "This week's calls" button used to
+             carry, so the way there is back on the page in the place the figure
+             already names it. `statCell`'s sixth argument is a raw attribute
+             and the capture-phase router does the rest. */}
+      ${statCell(I.calendar, 'Next call', next.callDay, `${lname(next)} &middot; ${next.callTime.toLowerCase()}`, null, 'data-go="leadCalls"')}
+    </div>
+    <div class="cco-grid">
+      ${LEAD_COHORTS.map(cohortCard).join('')}
     </div>
   </div>
-  ${''/* "THIS WEEK'S CALLS" IS OFF THIS PAGE AND ON `V.leadCalls` (1 Sep 2026).
-         It was three `.bk-row`s with a date chip and a Brief button — exactly
-         the list the Calls page now opens with, and the reason the Calls module
-         survived the interviews leaving. Two pages drawing one list is the
-         "route to the same content" this portal keeps deleting (`BOOKED_SHOWN`
-         in lead.js is the same argument from the dashboard's side), and of the
-         two this was the wrong one to keep: a call is an appointment, and
-         Cohorts is about cohort STATE.
-         NOTHING IS LOST HERE. The figure band's fourth cell is "Next call" with
-         the cohort and the hour in its note, and the All cohorts table below
-         carries a "Next call" column per row — so this page still answers "when
-         do I meet them" for every cohort on it, in the two places it was
-         already answering it. What went is only the third copy, the one with
-         the button on it, and the button is on the Calls page's own rows.
-         AND THE WAY THERE IS ON THE HEADING ROW, which is the shape the
-         dashboard's own "Your cohorts" and "Your calls" sections both use
-         (`.sec-h` › `<h2>` + `.btn-g.btn-sm.noic`). A list handed to another
-         page needs a route to it, or the subtraction is a dead end rather than
-         a move. It is NOT in `ph()`'s action slot: that slot sits above Tal's
-         summary, and both this file and lead3 record emptying it for exactly
-         that reason. */}
-  <div class="sec tint">
-    <div class="sec-h"><h2>All cohorts</h2><span class="t-helper-01">Expected pace is day of 90, evenly spread</span></div>
-    <div class="tbl-wrap">
-      <table class="tbl ldr-tbl">
-        <tr><th>Cohort</th><th>Week</th><th class="num">Progress</th><th class="num">Assessment</th>
-            <th class="num">Flagged</th><th>Next call</th><th></th></tr>
-        ${LEAD_COHORTS.map(c => {
-          const bad = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
-          const wa  = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
-          const gap = lpaceGap(c);
-          return `<tr class="ldr-tr" data-ldrco="${c.id}" data-go="leadCohort" tabindex="0" role="button">
-            <td>${lname(c)} <span class="t-helper-01">${llevel(c)}</span></td>
-            <td>${c.week} <span class="t-helper-01">of 13</span></td>
-            <td class="num">${lavg(c,'pc')}% <span class="t-helper-01">of ${lpace(c)}%</span></td>
-            <td class="num">${lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>'}</td>
-            <td class="num">${bad ? `<span class="tag red sm">${bad} at risk</span> ` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}${!bad && !wa ? '<span class="t-helper-01">none</span>' : ''}</td>
-            <td>${c.callDay} <span class="t-helper-01">${c.callTime.toLowerCase()}</span></td>
-            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
-          </tr>`;
-        }).join('')}
-      </table>
-    </div>
-    ${/* THE PACE FOOTNOTE IS GONE. Two sentences: one defining "expected
-          pace", which the heading's own helper line already defines — "day of
-          90, evenly spread" — and one naming the worst cohort, which the
-          Tal card at the top of this page states in the same words and the
-          PROGRESS column shows on the row it belongs to. Three copies of one
-          fact, the quietest of them last. */''}
-  </div>
-  ${''/* THE WAY TO THE CALLS PAGE IS THE FOOT OF THE PAGE, and the two places
-         it is NOT are both deliberate. Not `ph()`'s action slot: that sits
-         above Tal's summary, and this file and lead3 both record emptying it
-         for that reason. Not the "All cohorts" heading row either — that slot
-         holds the helper line defining what the Progress column is measured
-         against ("day of 90, evenly spread"), which the deleted pace footnote
-         below explicitly leans on, so putting a control there would trade a
-         definition for a link.
-         `.btn-set` at the foot is the shape `V.leadCohort` already ends with —
-         "Post to the cohort board" and "Course reports" — so a way onward from
-         a cohort page is drawn the same whether you are looking at one cohort
-         or at all three. */}
-  <div class="sec">
-    <div class="btn-set">
-      <button class="btn btn-g" data-go="leadCalls">This week&rsquo;s calls ${I.calendar}</button>
-    </div>
-  </div>
+  ${''/* "THIS WEEK'S CALLS" IS OFF THIS PAGE ENTIRELY, IN TWO STEPS.
+         The LIST went to `V.leadCalls` on 1 Sep 2026 — three `.bk-row`s with a
+         date chip and a Brief button, which is exactly the list the Calls page
+         opens with, and two pages drawing one list is the "route to the same
+         content" this portal keeps deleting. What was left behind was a
+         `.btn-set` at the foot carrying the way there, on the rule that "a list
+         handed to another page needs a route to it, or the subtraction is a
+         dead end rather than a move".
+         THE BUTTON IS GONE TOO (Maryam, 2 Sep 2026: "remove the bottom This
+         week's calls row"), and the rule it was answering is satisfied a
+         different way: Calls is a RAIL MODULE, one slot above Cohorts, so the
+         way there is permanent and one click from anywhere. A button at the
+         foot of a page repeating a rail item is the third copy of a route
+         rather than the only one — which is the same test the list itself
+         failed. The page now ends on the three cards, which is what it is
+         about.
+         NOTHING ABOUT THE CALLS IS LOST HERE EITHER: the figure band's fourth
+         cell is "Next call" with the cohort and the hour in its note, and every
+         card carries a "Next call" row of its own. */}
 </div></main>`;
 };
 
@@ -287,23 +677,36 @@ V.leadCohort = () => {
 
   return `<main class="main"><div class="page">
   ${crumb(['Cohorts','leadCohorts'], lname(c))}
-  ${ph(lname(c), `${c.members.length} candidates at ${llevel(c)} &middot; week ${c.week} of 13 &middot; day ${c.day} of 90`,
-    `<button class="btn btn-p" data-ldrbrief="${c.id}">Generate the brief ${I.arrowRight}</button>`)}
-  <div class="sec">
-    <div class="plate">
-      <div class="plate-who">${ldrMark(String(c.id), 56)}
-        <span class="plate-wb"><b>${c.members.length} candidates</b><span>${llevel(c)} &middot; led by you</span></span>
-      </div>
-      <div class="plate-eb">Weekly call &middot; ${c.callDay.toLowerCase()}</div>
-      <div class="plate-t">Week ${c.week} &middot; ${chapter[0]}</div>
-      <div class="plate-b">${c.call} &middot; 60 minutes &middot; ${severe.length ? severe.length + ' to raise privately, not in the group' : 'nobody flagged severely this week'}</div>
-      <div class="plate-a">
-        ${''/* one or two short words — the note over `leadDash`'s plate is why */}
-        <button class="btn btn-p btn-sm noic">Join ${I.video}</button>
-        <button class="btn btn-sm noic plate-b2" data-ldrbrief="${c.id}">Brief</button>
-      </div>
-    </div>
-  </div>
+  ${ph(lname(c), `${c.members.length} candidates at ${llevel(c)} &middot; week ${c.week} of 13 &middot; day ${c.day} of 90`)}
+  ${''/* THE WEEKLY CALL IS `leadCallCard`, AND THIS PAGE IS THE THIRD SURFACE
+         TO MAKE THE SAME MOVE (Maryam, 2 Sep 2026: "you know well about our
+         other pages layout, please position and update the design of this page
+         accordingly"). It was a `.plate`, and §81 records what that costs and
+         why the dashboard stopped doing it on 1 Sep — word for word the
+         arrangement this page still had:
+
+           `.plate` IS IN ai5's `DARK_CARD`, so `placeDark` hoists it into the
+           head band. §56 then makes the band two columns, and the LEFT column
+           on this page holds one sentence — Tal's summary, two lines — against
+           a 370px card. The result is the band's own note describing a page
+           that does not exist: 200px of empty cream beside a black box.
+           `.dark-card` is in no pass's list, so the gate stops matching, the
+           band falls to one `minmax(0,1fr)` column and the summary takes the
+           width back with nothing restated. That is §81's sentence exactly:
+           "out of the top" and "full width" are one change, not two.
+
+         AND THE `ph()` ACTION SLOT EMPTIES WITH IT. "Generate the brief" was a
+         `.btn-p` in that slot, which sits ABOVE Tal's summary — the placement
+         both this file and lead3 record emptying for exactly that reason, twice.
+         It is the card's own secondary now, which is where the Calls page
+         already puts it: the brief is per-CALL, so it belongs on the card that
+         names the call rather than on the page that happens to contain it.
+
+         ONE DRAWING, THREE PAGES. The dashboard, the Calls page and now this one
+         all call `leadCallCard(lcall(c))`, so the same appointment cannot be
+         described three ways — the `bkStamp` rule, one portal over. What this
+         caller states is only its own secondary. */}
+  ${leadCallCard(lcall(c), {second:{at:`data-ldrbrief="${c.id}"`, ic:I.edit, t:'Generate the brief'}})}
   <div class="sec">
     <div class="stats">
       ${statCell(I.growth, 'Average progress', lavg(c,'pc') + '<small>%</small>', `${gap >= 0 ? '+' + gap : gap} against pace`)}
@@ -313,35 +716,103 @@ V.leadCohort = () => {
     </div>
   </div>
   <div class="sec tint">
-    <div class="sec-h"><h2>Roster</h2><span class="t-helper-01">From the course platform &middot; ordered by progress</span></div>
+    ${''/* THE ROSTER IS THE COURSE REPORTS TABLE WITH THE FLAG COLUMN ON IT
+           (Maryam, 2 Sep 2026: "instead of the roasters table, we should have
+           the discussions, ranking, and members against a cohort but before
+           that we need to show the candidate progress table just like we have
+           on the course report page but … we have the flags column in the
+           roaster table, add that").
+
+           IT IS ONE TABLE DRAWN TWICE, NOT TWO TABLES. Course Reports and this
+           page were reporting the same ten people in two column sets — Progress
+           against pace, a week task and a flag here; chapters, assessment,
+           attempts and time there — so a leader comparing the two saw the same
+           roster described two ways. The columns are Course Reports' now,
+           because they are the platform's own fields, plus the FLAG, which is
+           the one reading this page had that the other did not.
+           WHAT WENT WITH THE OLD COLUMNS: "Progress %+gap" is the figure band
+           two blocks up (it states the cohort's own average and its gap), and
+           the "Week N task" chip is `ltask`, which is derived from progress
+           against pace — the same reading the flag column makes, said twice.
+           `ltask` keeps its other reader on the member page.
+           THE ROW IS THE COURSE REPORTS ROW to the class: `.ldr-tbl.tbl-flag`
+           for §31's quiet treatment, a face in the first cell, and "View
+           Progress" in the last. */}
+    <div class="sec-h"><h2>Candidate Progress</h2><span class="t-helper-01">From the course platform</span></div>
     <div class="tbl-wrap">
-      <table class="tbl ldr-tbl">
-        <tr><th>Candidate</th><th class="num">Progress</th><th class="num">Assessment</th>
-            <th class="num">Attempts</th><th>Week ${c.week} task</th><th>Last active</th><th>Flag</th><th></th></tr>
-        ${c.members.slice().sort((a,b) => b.pc - a.pc).map(m => {
-          const [tk,tl] = ltask(m,c);
-          const d = m.pc - lpace(c);
-          return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td>${m.name}</td>
-            <td class="num">${m.pc}% <span class="t-helper-01">${d >= 0 ? '+' + d : d}</span></td>
-            <td class="num">${m.avg ? m.avg + '%' : '<span class="t-helper-01">&mdash;</span>'}</td>
+      <table class="tbl ldr-tbl tbl-flag">
+        <tr><th>Candidate</th><th class="num">Chapters</th><th class="num">Assessment</th>
+            <th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th>Flag</th><th></th></tr>
+        ${c.members.slice().sort((a,b) => (a.pc - lpace(c)) - (b.pc - lpace(c))).map(m => `
+          <tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
+            <td><span class="ldr-who">
+              <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
+              <span class="ldr-who-n">${m.name}</span>
+            </span></td>
+            <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
+            <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td><span class="tag ${tk === 'done' ? 'green' : tk === 'late' ? 'org' : tk === 'none' ? 'red' : ''} sm">${tl}</span></td>
+            <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
             <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
-          </tr>`;
-        }).join('')}
+            <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
+          </tr>`).join('')}
       </table>
     </div>
   </div>
-  <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Attempts</b>How many times a candidate went back through the same content. Above 2.0 with assessments under 75% is the clearest struggle signal this data can give you.</div></div>
-    <div class="btn-set mt5">
-      <button class="btn btn-g" data-go="leadMessages">Post to the cohort board ${I.chat}</button>
-      <button class="btn btn-t" data-go="leadReports">Course reports ${I.chart}</button>
+  ${''/* AND THE COHORT'S OWN THREE TABS, WHICH ARE THE CANDIDATE'S. The
+         candidate's Cohort page has drawn Discussion / Ranking / Members since
+         it existed, and this is the leader's view of the same cohort — so it is
+         the same strip, the same components and, for Cohort 41, the same board:
+         `ROOM` and `COHORT` ARE Cohort 41, which is the decision lead.js records
+         ("post on the leader side and it is there on the candidate side").
+
+         `S.ldrCTab` IS ITS OWN KEY, not the candidate's `S.ctab` — §65's
+         two-disclosures lesson, and here the two really can be open at once
+         because the portal switch resets neither.
+
+         RANKING AND MEMBERS ARE DERIVED FROM THE COHORT, so all three cohorts
+         have them: `c.members` carries the names, the faces and `pts`, and
+         `lbadge` turns the points into the badge. That is why this is
+         `ldrRankBoard(c)` rather than a call to `boardList()`, which reads the
+         CANDIDATE's own `BOARD`.
+
+         DISCUSSION IS COHORT 41'S ONLY, AND THE OTHER TWO SAY SO. There is one
+         board in this build. Drawing it under Cohort 33 would be ten posts by
+         people who are not in it — the invented data §74 rules out — so 33 and
+         47 get the empty state and the composer, which is what a board with
+         nothing on it is. */}
+  <div class="sec sec-cs">
+    <div class="cs">
+      <button class="${(S.ldrCTab || 'discussion') === 'discussion' ? 'on' : ''}" data-ldrctab="discussion">Discussion</button>
+      <button class="${S.ldrCTab === 'ranking' ? 'on' : ''}" data-ldrctab="ranking">Ranking</button>
+      <button class="${S.ldrCTab === 'members' ? 'on' : ''}" data-ldrctab="members">Members</button>
     </div>
+    ${S.ldrCTab === 'members'
+      ? `<div class="tile-stack">${c.members.map(m => mem(m.name, m.ini, `${llevel(c)} &middot; ${m.pc}% of the course`, false, m.img)).join('')}</div>`
+      : S.ldrCTab === 'ranking' ? ldrRankBoard(c)
+      : c.id === 41 ? discussionRoom()
+      : `<div class="empty" style="border:0">${I.chat}
+          <h3>Nothing posted yet</h3>
+          <p>${lname(c)}&rsquo;s board is empty. Anything you post here, all ${c.members.length} of them read.</p>
+        </div>`}
   </div>
+  ${''/* THE "ATTEMPTS" NOTE IS DELETED (Maryam, 2 Sep 2026: "remove the bottom
+         Attempts section"). It defined the column — how many times a candidate
+         went back through the same content, and that over 2.0 with assessments
+         under 75% is the clearest struggle signal the data gives. The
+         definition is not lost so much as made unnecessary: `lflag` applies
+         exactly that test and prints its answer as "Struggling" in the Flag
+         column, on the row it is about. A footnote explaining a column the
+         table already interprets is the third copy of a reading. */}
+  ${''/* THE CLOSING BUTTON ROW IS GONE (Maryam, 2 Sep 2026: "remove the bottom
+         Post to the cohort board / Course reports texts"). Both were routes to
+         somewhere else and both stopped being the only one on the same day:
+         the Discussion tab 200px above now carries the board's OWN composer, so
+         "Post to the cohort board" was a link to a field already on the screen,
+         and Course Reports is a rail module one click from anywhere. The page
+         ends on the cohort, which is what it is about — the same subtraction
+         `V.leadCohorts` made when its "This week's calls" button came off. */}
 </div></main>`;
 };
 
@@ -426,6 +897,59 @@ function ldrRead(m,c){
    so the scenes here are drawn by `ldrScene`, which is `clip()` with the
    control taken out rather than a second drawing of a video row.
    ========================================================================== */
+/* A CHAPTER ROW ON THE LEADER'S SIDE — `chRow`'s markup, this member's data.
+   Maryam, 2 Sep 2026, with the candidate portal's own list as the reference.
+
+   WHY IT IS NOT A CALL TO `chRow`. That function takes the SIGNED-IN
+   candidate's stage facts and reads three of their own records — `SCORE` (their
+   thirteen assessments), `GROWTH` (their two growth areas) and `OPEN_DATES` —
+   and it stamps `data-go="chapter:i"`, which from a leader page would open the
+   leader inside somebody else's chapter player. Every class here is §15's, so
+   the two portals draw one component; what differs is where the numbers come
+   from and that this row is not a control.
+
+   THE SCORE IS DERIVED THE WAY THE TABLE THIS REPLACES DERIVED IT, and its
+   guard is kept word for word: no score without an assessment average, because
+   `m.avg` of 0 means the course platform has sent nothing back and a
+   per-chapter figure spun out of it invents a 60% for a candidate the band
+   above describes as "nothing assessed yet".
+
+   NO TRAIL ON A FINISHED CHAPTER. The candidate's row ends in "Restart"; a
+   leader cannot restart anybody's chapter and §60's rule is that a dead control
+   is worse than a missing one. The unfinished rows keep §15's state mark, which
+   is a picture rather than a control. */
+const ldrChRow = (i, m, done) => {
+  const [name, mins] = CH[i];
+  const complete = i < done, open = i === done;
+  const sc = (complete && m.avg > 0)
+    ? Math.max(60, Math.min(100, m.avg + ((i % 3) - 1) * 7)) : null;
+  const meta = complete ? `${mins} min &middot; ${sc ? sc + '% assessment' : 'not assessed'}`
+             : open     ? `Started &middot; ${mins} min`
+             :            `Not started &middot; ${mins} min`;
+  return `<div class="ch ${complete ? 'done' : open ? 'open' : ''}">
+    <span class="ch-num">${String(i + 1).padStart(2,'0')}</span>
+    <span class="ch-b">
+      <span class="ch-n">${name}${complete ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
+      <span class="ch-m">${meta}</span>
+    </span>
+    ${complete ? '' : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`}
+  </div>`;
+};
+
+/* A SCENE CARD ON THE LEADER'S SIDE — `sceneCard`'s markup, this member's face.
+   `STILL_Y` is views.js's own six crops of one portrait, reused so a scene here
+   and the same scene in the candidate's portal are framed identically. It is a
+   `<button>` with no `data-scene-play`, which is exactly what the `.clip` row it
+   replaces was: the play mark is part of the picture of a video, and nothing in
+   either portal opens a clip yet. */
+const ldrSceneCard = (sc, m, i) => `<button class="scene" type="button" aria-label="${sc[0]}, ${sc[3]}">
+    <span class="scene-still" style="background-image:url('${AV[m.img]}');--still-y:${STILL_Y[i % 6]}">
+      <span class="scene-play">${I.play}</span>
+      <span class="scene-len">${sc[3]}</span>
+    </span>
+    <span class="scene-b"><span class="scene-t">${sc[0]}</span></span>
+  </button>`;
+
 const ldrScene = (title,note,stamp,len) => `<div class="clip">
     <span class="thumb">${I.play}<span class="t">${len}</span></span>
     <span class="cb"><span class="ct">${title}</span><span class="cq">${note} &middot; from ${stamp}</span></span>
@@ -480,9 +1004,21 @@ V.leadMember = () => {
             for the leader's own record, so the outward-facing one leads; and
             the note keeps the pencil it carried in the header. Both are
             `.btn-g` — neither is the page's primary action, the record is. */''}
+      ${''/* THEY ARE CHIPS NOW, AND THE MARK LEADS (Maryam, 2 Sep 2026: "i
+             need message and notes icons to be on the left side of the texts",
+             "the message and notes should be chips, notes should yellow text
+             and light bg, message should be blue text and light blue bg").
+             `.btn-g` put the glyph after the label — §02's own order for a
+             button, where the trailing mark is the direction of travel. A chip
+             is a label, so its mark leads the words the way `.flag-t`'s does.
+             THE TWO HUES SAY WHICH DIRECTION EACH ONE FACES. Blue is this
+             build's "information / goes somewhere" ink (§12) and the message
+             leaves the page; yellow is the note, which stays. Neither is the
+             accent, because neither is the page's primary action — the record
+             is, which is what `.btn-g` was saying in a different way. */}
       <div class="idhead-a">
-        <button class="btn btn-g" data-go="leadMessages">Message ${I.chat}</button>
-        <button class="btn btn-g" data-ldrnote="${m.name}">Add a note ${I.edit}</button>
+        <button class="ldr-chip chip-msg" data-go="leadMessages">${I.chat} Message</button>
+        <button class="ldr-chip chip-note" data-ldrnote="${m.name}">${I.edit} Add a note</button>
       </div>
     </div>
   </div>
@@ -494,102 +1030,86 @@ V.leadMember = () => {
       ${statCell(I.time,   'Time on the course', lhrs(lmins(m)), done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
     </div>
   </div>
-  ${done ? `<div class="sec tint">
-    <div class="sec-h"><h2>Chapter record</h2><span class="t-helper-01">From the course platform</span></div>
-    <div class="tbl-wrap">
-      <table class="tbl ldr-tbl">
-        <tr><th>#</th><th>Chapter</th><th>Status</th><th class="num">Score</th><th class="num">Attempts</th></tr>
-        ${CH.slice(0, Math.min(13, done + 1)).map((ch,i) => {
-          const complete = i < done;
-          /* NO SCORE WITHOUT AN ASSESSMENT AVERAGE. `m.avg` of 0 means the
-             course platform has sent nothing back, so a per-chapter score
-             derived from it invented a 60% for a candidate the band above
-             this table describes as "nothing assessed yet". */
-          const sc = (complete && m.avg > 0) ? Math.max(60, Math.min(100, m.avg + ((i % 3) - 1) * 7)) : null;
-          const at = complete ? (m.att >= 2 ? (i % 2 ? 3 : 2) : 1) : 1;
-          return `<tr>
-            <td class="num">${i+1}</td>
-            <td><b>${ch[0]}</b></td>
-            <td><span class="tag ${complete ? 'green' : ''} sm">${complete ? 'Complete' : 'In progress'}</span></td>
-            <td class="num">${sc ? `<span class="tag ${sc >= 85 ? 'green' : sc >= 75 ? '' : 'org'} sm">${sc}%</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${at}</td>
-          </tr>`;
-        }).join('')}
-      </table>
+  ${''/* PROGRESS BY CHAPTER IS THE CANDIDATE'S OWN LIST (Maryam, 2 Sep 2026,
+         with a screenshot of it: "use that ui but the heading should be
+         Progress by Chapter and show chapters like the candidate with the show
+         all button at bottom"). It replaces a five-column `.tbl` — #, chapter,
+         status, score, attempts — which said the same four things in a shape
+         built for scanning twenty-eight rows rather than reading thirteen.
+         `ldrChRow` IS `chRow`'S MARKUP WITH THE LEADER'S DATA, not a call to it.
+         Every class is §15's (`.ch`, `.ch-num`, `.ch-b`, `.ch-n`, `.ch-tick`,
+         `.ch-m`, `.ch-ic`) so the two portals draw one component, and three
+         things could not cross: `chRow` reads `SCORE`, `GROWTH` and
+         `OPEN_DATES`, which are the SIGNED-IN candidate's own; and it stamps
+         `data-go="chapter:i"`, which from here would open the leader inside
+         somebody else's chapter player.
+         THE TRAIL IS EMPTY ON A FINISHED CHAPTER, WHICH IS THE ONE VISIBLE
+         DIFFERENCE. The candidate's row ends in "Restart" — an action on their
+         own course. A leader cannot restart anybody's chapter, and §60's rule
+         is that a dead control on a live surface is worse than a missing one,
+         so the slot carries the state mark and nothing else.
+         `S.ldrChAll` IS ITS OWN KEY, not the candidate's `S.chAll`. §65 records
+         why: one boolean for two surfaces holds the first one's value the
+         moment they can both be open, and these two can — the portal switch
+         does not reset either. */}
+  <div class="sec tint">
+    <div class="sec-h"><h2>Progress by Chapter</h2><span class="t-helper-01">From the course platform</span></div>
+    ${done ? `<div class="tile-stack">
+      ${(S.ldrChAll ? CH : CH.slice(0,5)).map((_,i) => ldrChRow(i, m, done)).join('')}
     </div>
-    ${done < 12 ? `<p class="t-helper-01 mt4">Chapters ${done+2}&ndash;13 not reached yet.</p>` : ''}
-  </div>` : `<div class="sec tint">
-    <div class="sec-h"><h2>Chapter record</h2></div>
-    <div class="empty" style="border:0">${I.book}
+    <div class="mt4"><button class="btn btn-g" data-ldrchall="1">${S.ldrChAll ? `Show the first five ${I.chevUp}` : `Show all 13 ${I.chevDown}`}</button></div>`
+    : `<div class="empty" style="border:0">${I.book}
       <h3>Nothing on the record</h3>
       <p>${first} has not opened a chapter, so the course platform has sent nothing back. The record fills in the moment they start.</p>
-    </div>
-  </div>`}
-  <div class="sec">
-    ${/* SHORT HEADINGS IN THIS COLUMN. At desktop §10 gives a section with a
-          `.sec-h` a 184px label column, and "Where the level came from" set
-          three words to a line in it while the helper under it took four more.
-          Two words, and the sentence it needed moves under the tile. */''}
-    <div class="sec-h"><h2>Their level</h2></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Quiz band</span><span class="v n">Explorer &middot; ${m.avg ? m.avg >= 85 ? 'top of the band' : 'mid band' : 'not assessed'}</span></div>
-      ${''/* THE ROWS NAME THE AGENT NOW, NOT AN ANONYMOUS "REVIEWER" (1 Sep
-             2026). A cohort leader does not run the initial interview, so this
-             block is a RECORD of somebody else's decision — which it always was
-             on this page, since nothing here is editable and lead2 already tells
-             the leader "the full recording is never shared with you". What
-             changed is that the words no longer let a reader think the leader
-             might have been the reviewer. `agent` rather than a name, because
-             this build does not record WHICH agent interviewed each of the 28
-             candidates and inventing one would be the fabricated data §74 rules
-             out — Priya is Maryam's agent and nobody else's.
-             AND THE TAG IS "one below", NOT "one below the proposal". Measured
-             at 390: the longer string put the `.tag` 5px past the page's right
-             edge inside a `.kv` value — the only overflow the leader sweep
-             found. The row's key says WHO signed and the sentence under the
-             tile says what they did, so the pill only has to say the gap. */}
-      <div class="kv"><span class="k">Proposed at interview</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)}</span></div>
-      <div class="kv"><span class="k">Signed by their agent</span><span class="v">${llevel(c)} <span class="tag org sm">one below</span></span></div>
-      <div class="kv"><span class="k">Next level</span><span class="v n">Explorer &ndash; ${c.level[0]}${Math.min(5, +c.level[1] + 1)} &middot; at the re-interview</span></div>
-    </div>
-    <p class="t-helper-01 mt4">Set at the interview by their talent agent, not by the quiz and not by you. They placed ${first} one below the proposal, so this level should be within reach &mdash; persistent struggle at a level set conservatively is usually something other than placement.</p>
-  </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>Your private notes</h2><span class="t-helper-01">${notes.length ? notes.length + ' note' + (notes.length === 1 ? '' : 's') + ' &middot; feeds the 90-day summary' : 'Feeds the 90-day summary'}</span></div>
-    ${notes.length ? `<div class="tile-stack">
-      ${notes.map((n,i) => `<div class="cardrow ldr-note">
-        <span class="cardrow-ic">${I.edit}</span>
-        <span class="cardrow-b">
-          <span class="cardrow-t">${n.t}</span>
-          <span class="cardrow-d">${n.w}</span>
-        </span>
-        <span class="cardrow-a">
-          <button class="ic ldr-note-x" data-ldrnotedel="${m.name}:${i}" aria-label="Delete this note">${I.close}</button>
-        </span>
-      </div>`).join('')}
-    </div>` : `<div class="empty" style="border:0">${I.edit}
-      <h3>No notes yet</h3>
-      <p>What you write here is private to you, and it is what the 90-day summary is drafted from at the end of the 90 days.</p>
     </div>`}
-    <div class="btn-set mt5">
-      <button class="btn btn-g" data-ldrnote="${m.name}">Add a note ${I.add}</button>
-    </div>
   </div>
-  <div class="sec">
-    <div class="sec-h"><h2>Attendance and this week</h2></div>
-    <div class="facts">
-      <div><span class="l">Calls attended</span><span class="v">${Math.max(0, c.week - (m.flag && m.flag.k === 'bad' ? 3 : 1))} of ${c.week}</span></div>
-      <div><span class="l">Passed first time</span><span class="v">${Math.max(0, done - (m.att > 1 ? 1 : 0))} of ${done}</span></div>
-      <div><span class="l">Week ${c.week} task</span><span class="v">${tl}</span></div>
-      <div><span class="l">Last active</span><span class="v">${m.last}</span></div>
-    </div>
-  </div>
+  ${''/* "THEIR LEVEL" AND "ATTENDANCE AND THIS WEEK" ARE BOTH DELETED (Maryam,
+         2 Sep 2026). What each was and what is left of it:
+         THEIR LEVEL was a four-row `.kv` — quiz band, proposed at interview,
+         signed by their agent, next level — under a sentence explaining that
+         the level is the talent agent's decision and not the leader's. That
+         sentence is the part worth not losing, and it is not lost: `V.leadSum`
+         makes the same point where it matters, on the page where the leader
+         signs something. The four rows were a record of a decision taken in
+         another portal, on a page about how this person is doing this week.
+         ATTENDANCE AND THIS WEEK was four `.facts` cells, and three of the four
+         were DERIVED FROM THE FLAG rather than reported: "calls attended"
+         subtracted 3 from the week if the candidate was flagged and 1 if they
+         were not, and "passed first time" subtracted 1 if their attempts
+         average was over 1. Nothing in this build holds per-candidate
+         attendance (`LEAD_RUN` counts seats per CALL), so those two figures
+         were arithmetic dressed as data — the invented figures §74 rules out —
+         and deleting the section is the honest way to stop printing them. The
+         fourth, "last active", is in the `ph()` line and on the flag chip. */}
+  ${ldrNotesSec(m)}
   <div class="sec tint">
-    <div class="sec-h"><h2>Interview scenes</h2><span class="t-helper-01">The three ${first} chose to show</span></div>
-    <div class="tile-stack">
-      ${pick.map(i => ldrScene(...LDR_SCENES[i])).join('')}
+    ${''/* THE HEADING STANDS ALONE (Maryam, 2 Sep 2026: "remove the top right
+           The three Maryam chose to show text ... remove the bottom These are
+           the clips ... text as well").
+           BOTH LINES SAID THE SAME THING, ONE ABOVE THE ROW AND ONE BELOW IT:
+           the helper said the candidate chose these three, the paragraph said it
+           again at length and added the privacy rule. Three stills under a
+           heading that names them do not need a caption saying there are three.
+           THE PRIVACY FACT IS NOT LOST — it is on `V.leadProfile`'s data-use row
+           and in the Data use notice, which is where a rule about what a leader
+           may see belongs; a caption under one row of clips is a bad place for a
+           policy, and lead.js's own note cites the sentence rather than this
+           element. */}
+    <div class="sec-h"><h2>Interview scenes</h2></div>
+    ${''/* THE SCENES ARE THE CANDIDATE PORTAL'S CARDS (Maryam, 2 Sep 2026:
+           "Interview scenes section should be from the candidate portal, the
+           three scene row should be added here"). They were `.clip` rows — a
+           40px thumbnail, a title and a caption, stacked — and the candidate
+           sees the same three moments as three stills across a row. One
+           component, both portals, which is the rule `lcTitle` and `bkStamp`
+           already hold this side to.
+           THE STILL IS THE CANDIDATE'S OWN PHOTOGRAPH, which is the one place
+           this improves on the original: `sceneCard` hardcodes `AV.hana`
+           because the candidate portal has exactly one signed-in face, and
+           here the row is about whichever of the 28 you opened. */}
+    <div class="scene-row">
+      ${pick.map((i,n) => ldrSceneCard(LDR_SCENES[i], m, i)).join('')}
     </div>
-    <p class="t-helper-01 mt4">These are the clips ${first} kept from their interview and published on their profile &mdash; the same three visible in their own portal. The full recording is never shared with you.</p>
   </div>
 </div></main>`;
 };
@@ -610,15 +1130,111 @@ V.leadMember = () => {
    does — the four figures are of the SELECTION, or a leader reading "3 behind
    pace" under a cohort tab would be reading a number about all three.
    ========================================================================== */
+/* ==========================================================================
+   THE ONE CANDIDATE WHO NEEDS THE LEADER — `ldrAttention`, a `.dark-card`
+   Maryam, 2 Sep 2026: "add a black card on the screens after the tabs row,
+   this black card will show the candidate who has been inactive for more then
+   7 days or are not performing any assessment or not taking cohort calls, this
+   black card will have the profile image and info of the candidate with its
+   progress, the flag, last activity, and at the bottom right a text with icon
+   of Contact Candidate."
+
+   IT IS ONE PERSON, WHICH IS WHAT MAKES IT A BLACK CARD. §75's rule is that
+   the card is "the one thing the page is about", and the standing instruction
+   is that asking for one is asking for the whole recipe. A queue of everybody
+   flagged is a different object and this page already draws it — the table
+   under this card is every candidate in the cohort, sorted worst first. So the
+   card takes the top of that sort and states it as a person rather than a row.
+
+   THE TEST IS `lflag`, NOT A SECOND ONE WRITTEN HERE. That function already
+   encodes the ask almost word for word — `Never signed in`, `Inactive N days`
+   at seven days or more, `Struggling` for attempts over 2.0 with an average
+   under the pass mark — and it is DERIVED, so the card clears itself when the
+   candidate comes back. Writing the three conditions again here would be the
+   drift `bkStamp` exists to prevent, one portal over.
+   THE THIRD CONDITION IS THE ONE THIS BUILD CANNOT ANSWER, and it is flagged
+   rather than faked: nothing holds per-candidate call attendance. `m.att` is
+   attempts per chapter (the reports table prints it under "Attempts"), and the
+   only attendance figure in the product is `LEAD_RUN`'s per-CALL seat count.
+   A cohort-call absence flag needs a field on `lmem` first.
+
+   THE ORDER IS THE DASHBOARD QUEUE'S: severity first, then the longest silence,
+   then the widest gap to pace. Same reading, so the person on this card cannot
+   disagree with the person at the top of the dashboard's own queue for the same
+   cohort.
+
+   NOTHING ON IT IS TINTED, AND THAT IS §77'S RULE RATHER THAN AN OMISSION. The
+   flag would carry `--danger-ink` on a white page; on black that red is 3.7:1
+   and the two support inks are tuned for paper. §77 settled this for the
+   countdown that used to be violet: "§59's answer to urgency IS the card". The
+   ground is the alarm, so the chip and the ring are `--on-dark` and no new
+   on-dark hue had to be minted.
+
+   THE ACTION IS THE DASHBOARD'S — `data-ldrdm` opens a thread with that person
+   by name (lead4's listener sets the tab, the thread and, below 900, the open
+   state). "Contact Candidate" rather than the queue's "Contact" because here it
+   is the card's only control and has the width for the noun.
+   ========================================================================== */
+const ldrAtt = rows => {
+  const rank = x => x.m.flag ? (x.m.flag.k === 'bad' ? 0 : 1) : 2;
+  const idle = m => /(\d+)d ago/.test(m.last) ? +m.last.match(/(\d+)d/)[1]
+             : m.last === 'Never' ? 99 : 0;
+  return rows.filter(x => x.m.flag).slice().sort((a,b) =>
+    rank(a) - rank(b)
+    || idle(b.m) - idle(a.m)
+    || (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
+};
+
+const ldrAttention = x => {
+  if(!x) return '';
+  const m = x.m, c = x.c;
+  const last = m.last === 'Never' ? 'Never signed in' : 'Last active ' + m.last.toLowerCase();
+  return `${''/* THE CLASS GOES ON THE `.sec`, NOT ON A DIV INSIDE IT. §75 is
+                written `.app .sec.dark-card` — the ground, the haze, the 32px
+                frame and the `--pad-x` inset are the SECTION's, and the layer's
+                seam rules turn that section's own `::after` off. Wrapped in a
+                plain `.sec` the card matched nothing and rendered as a
+                transparent block with white ink on white paper: every rule
+                missing at once, and no warning. This is the whole of what
+                "convert a section to a black card" means literally. */}
+  <div class="sec dark-card att">
+      ${''/* THE ACTION IS IN THE HEADING ROW (Maryam, 2 Sep 2026: "take the
+             contact candidate button to the top right of the card aligned with
+             the heading"), which is `.dc-act` — the slot §75 documents on
+             `.dc-hd-r` and `talRec` already uses for "View all agents". It is
+             the same button with the same handler; what changes is that §75
+             gives it the row's baseline, the auto margin and the borderless
+             white ink for free, so the card's own footer row is deleted rather
+             than restyled.
+             THE SLOT IS ONE-OR-THE-OTHER: `.dc-act` (a control) or `.dc-when`
+             (a time). Both carry `margin-left:auto`, so a card wanting both
+             needs a group rather than a second auto margin — §77's note. */}
+      <div class="dc-hd"><div class="dc-hd-r"><h2 class="dc-t">Needs your attention</h2>
+        <button class="btn btn-s btn-sm noic dc-act" data-ldrdm="${m.name}">${I.chat} Contact Candidate</button>
+      </div></div>
+      <div class="att-b">
+        <span class="att-av">${avatar({i:m.ini, img:AV[m.img]}, 56)}</span>
+        <span class="att-who">
+          <span class="ttl">${m.name}</span>
+          <span class="sub">${lname(c)} &middot; ${llevel(c)} &middot; week ${c.week} of 13</span>
+          <span class="att-fl">
+            <span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>
+            <span class="sub">${last}</span>
+          </span>
+        </span>
+        <span class="att-ring">${ring(m.pc, `${m.pc}% of ${lpace(c)}% expected`)}</span>
+      </div>
+  </div>`;
+};
+
 V.leadReports = () => {
   const sel = S.ldrRep;
   const all = lmembers();
-  const rows = (sel === 'all' ? all : all.filter(x => x.c.id === +sel));
+  const rows = all.filter(x => x.c.id === +sel);
   const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
   const weak = rows.filter(x => x.m.avg > 0 && x.m.avg < 75);
   const never = rows.filter(x => x.m.last === 'Never');
   const avg = rows.length ? Math.round(rows.reduce((s,x) => s + x.m.pc, 0) / rows.length) : 0;
-  const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Course Reports')}
@@ -627,15 +1243,35 @@ V.leadReports = () => {
         the argument at length. Tal now opens on the finding instead of on a
         description of the sort order. */}
   ${ph('Course Reports','From the course platform &middot; chapters, scores, attempts, attendance')}
+  ${''/* THE STRIP IS THE RECORD AND NOTHING ELSE (Maryam, 2 Sep 2026: "remove
+         all cohorts tab just show the other three"). "All cohorts" was the
+         first tab and the default, and it was the one tab that was not a
+         cohort: 28 candidates from three courses at three different weeks, sorted
+         into one list by a gap to a pace that means something different in each
+         of them. The four figures above it read "across all three cohorts" for
+         the same reason and were the same average of three unlike things.
+         WHAT IT COSTS, STATED RATHER THAN HIDDEN: there is no longer one list
+         of everybody on this page. The dashboard's Attention Required queue is
+         the cross-cohort view — it is the only reading of all 28 that is a
+         comparison of like with like ("who has stopped"), and it is already
+         drawn. `lmembers()` keeps two readers here, the strip's own counts and
+         the figure band's denominators. */}
   <div class="sec sec-cs">
     <div class="cs">
-      <button class="${sel === 'all' ? 'on' : ''}" data-ldrrep="all">All cohorts<span class="lf-n">${all.length}</span></button>
       ${LEAD_COHORTS.map(c => `<button class="${sel === String(c.id) ? 'on' : ''}" data-ldrrep="${c.id}">${lname(c)}<span class="lf-n">${c.members.length}</span></button>`).join('')}
     </div>
   </div>
-  <div class="sec">
+  ${ldrAttention(ldrAtt(rows))}
+  ${''/* THE FIGURE BAND PAYS A HALF FRAME (Maryam, 2 Sep 2026: "reduce the
+         space above and below the 4 cards row"). `.sec-band` is the marker and
+         §92.7 is the rule; §10's own `--s06` is what it steps down from, so the
+         page's other sections keep the 48px rhythm the 1 Sep instruction set.
+         It is a marker class rather than a `:has(> .stats)` selector for §55's
+         reason: whether a band is tight is an editorial call about one page,
+         and every other `.stats` in both portals wants the standard frame. */}
+  <div class="sec sec-band">
     <div class="stats">
-      ${statCell(I.growth, 'Average progress', avg + '<small>%</small>', sel === 'all' ? 'across all three cohorts' : 'in this cohort')}
+      ${statCell(I.growth, 'Average progress', avg + '<small>%</small>', 'in this cohort')}
       ${statCell(I.warningAlt, 'Behind pace', behind.length, 'five points or more')}
       ${statCell(I.chart, 'Below pass mark', weak.length, 'assessments under 75%')}
       ${statCell(I.misuse, 'Never signed in', never.length, never.length ? 'no activity at all' : 'everyone has started')}
@@ -666,14 +1302,29 @@ V.leadReports = () => {
         first row IS the worst, and the sentence under the table names them. Tal
         says the same thing at the top — the note above `ph()` in this view
         records the earlier round of exactly this subtraction. */}
+  ${''/* IT IS DRAWN LIKE THE DASHBOARD'S ATTENTION QUEUE (Maryam, 2 Sep 2026:
+         "i want this tab structure to be like the Attention Required section
+         table on the dashboard, the spacing, colors, implementation should be
+         like that"), and the implementation is the same CLASS rather than the
+         same rules written twice. `.tbl-flag` carries five decisions §31 made
+         for that queue on 1 Sep — no rule between rows, one light-grey rule
+         under the heads instead of §10's `#111`, the first row standing 24px
+         off it, cells centred rather than top-aligned, and the rounded flag
+         chip — and every one of them is about a SHORT table of people rather
+         than about flags. So the class now has two writers and §31's note says
+         so; nothing about the queue moved.
+         `.ldr-tbl` STAYS ON IT: that class carries §36's own four rules (the
+         row cursor, the chevron cell, the focus ring) which this table needs
+         and the dashboard's queue does not have, because its rows are not
+         links. The two classes answer two different questions. */}
   <div class="sec sec-rep">
-    <div class="sec-h"><h2>Course progress</h2></div>
+    <div class="sec-h"><h2>Candidate Progress</h2></div>
     <div class="tbl-wrap">
-      <table class="tbl ldr-tbl">
-        <tr><th>Candidate</th>${sel === 'all' ? '<th>Cohort</th>' : ''}<th class="num">Chapters</th>
+      <table class="tbl ldr-tbl tbl-flag">
+        <tr><th>Candidate</th><th class="num">Chapters</th>
             <th class="num">Assessment</th><th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th></th></tr>
         ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
-          const m = x.m, d = m.pc - lpace(x.c);
+          const m = x.m;
           return `<tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${x.c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
             ${/* A FACE IN THE FIRST CELL, the same argument `faceRow` makes in
                   lead.js: every row on this portal is a PERSON, and twenty-eight
@@ -681,27 +1332,61 @@ V.leadReports = () => {
                   hold. The mark is `mem-av mem-ph` at 24px — the roster's own
                   slot, one step down for a table row — so the reports table and
                   the roster draw the same candidate the same way. */''}
+            ${/* THE "n BEHIND" CHIP IS GONE (Maryam, 2 Sep 2026: "i do not know
+                  what does the 29 behind tag means, if it is stupid then remove
+                  these tags"). It was the gap in PERCENTAGE POINTS between a
+                  candidate's chapter progress and the pace expected on the day
+                  — so "29 behind" was 9% against 38% — and a figure that has to
+                  be explained on a row that also prints "1 of 13" is a figure
+                  the row does not need. Nothing is lost: the table is SORTED by
+                  that gap so the worst is still the first row, the figure band
+                  above counts everyone five points or more back, and the line
+                  under the table names the furthest behind and states both
+                  numbers in full. `d` goes with it. */''}
             <td><span class="ldr-who">
               <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
               <span class="ldr-who-n">${m.name}</span>
-              ${d <= -5 ? `<span class="tag org sm">${Math.abs(d)} behind</span>` : ''}
             </span></td>
-            ${sel === 'all' ? `<td>${x.c.id} <span class="t-helper-01">${x.c.level}</span></td>` : ''}
             <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
             <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
-            <td class="ldr-go"><svg viewBox="0 -960 960 960">${inner('chevRight')}</svg></td>
+            ${''/* THE LAST CELL IS A NAMED LINK, NOT A CHEVRON (Maryam, 2 Sep
+                  2026: "instead of a chevron at the end we should have View
+                  Progress blue text with a blue arrow next to it"). The chevron
+                  said "this row opens" and left what it opens to be guessed;
+                  the words say it. It is NOT a `<button>` — the whole row is
+                  the target (`role=button`, `tabindex=0`, `data-go`), and a
+                  control inside a control is two targets for one action. The
+                  arrow is `I.arrowRight` rather than §64's `mask-image`, which
+                  only reaches a `.btn`. */}
+            <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
           </tr>`;
         }).join('')}
       </table>
     </div>
-    ${worst ? `<p class="t-helper-01 mt4">${worst.m.name} is furthest behind &mdash; ${worst.m.pc}% against ${lpace(worst.c)}% expected in ${lname(worst.c).toLowerCase()}.</p>` : ''}
+    ${''/* THE CLOSING LINE IS GONE (Maryam, 2 Sep 2026: "remove the bottom
+           text Yuki Tanaka is furthest behind — 9% against 38% expected in
+           cohort 41"). It named the worst candidate and printed the gap, and
+           by the time it was written the page said that twice above it: Tal's
+           summary at the head names the same person and the same figure, and
+           the black card 200px below the tabs draws them with their photograph
+           on it. The table is sorted worst first, so the first row is the third
+           statement of it. `worst` goes with the line rather than being left
+           computed and unread. */}
   </div>
-  <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Activity, not quality</b>Chapters, scores, attempts and timing are everything the course platform can tell you. None of it says how well somebody is thinking &mdash; that is in their written answers.</div></div>
-  </div>
+  ${''/* "ACTIVITY, NOT QUALITY" IS DELETED (Maryam, 2 Sep 2026: "remove the
+         bottom Activity, not quality section"). It was a `.note` closing the
+         page: chapters, scores, attempts and timing are all the course platform
+         can report, and none of them says how well somebody is THINKING.
+         THE ARGUMENT IS KEPT BECAUSE IT IS STILL TRUE AND IS STILL SAID — the
+         `ph()` line at the head of this page names the source in the same
+         breath as the columns ("From the course platform · chapters, scores,
+         attempts, attendance"), which is the fact the note existed to carry.
+         What the note added on top of that was a caution about what the numbers
+         do not mean, at the foot of a page nobody scrolls to twice. If it comes
+         back it belongs beside the figures, not under them. */}
 </div></main>`;
 };
 
@@ -779,33 +1464,13 @@ function ldrBriefSheet(){
   </div>`;
 }
 
-function ldrNoteSheet(){
-  const name = S.ldrNote;
-  return `<div class="modal ${name ? 'on' : ''}" data-ldrclose="note">
-    <div class="sheet">
-      <div class="sheet-h"><h2>${name ? 'A note on ' + name.split(' ')[0] : 'Add a note'}</h2>
-        <button class="x" data-ldrclose="note" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">
-        <div class="f"><label for="ldrNoteT">What you want to remember</label>
-          <textarea class="inp" id="ldrNoteT" rows="4" placeholder="What you saw, what you asked them to try, what to check next."></textarea></div>
-        <p class="t-helper-01">Private to you. ${name ? name.split(' ')[0] : 'The candidate'} never sees it, and it is what the 90-day summary is drafted from at the end of the 90 days.</p>
-      </div>
-      <div class="sheet-f">
-        <button class="btn btn-s noic" data-ldrclose="note">Cancel</button>
-        <button class="btn btn-p noic" data-ldrnotesave="1">Save the note</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-/* A REGISTRY, NOT A LIST WRITTEN OUT HERE. The leader portal's sheets are
-   spread across the files that own the pages they belong to — the brief and
-   the note here, the profile and availability sheets in lead4.js — and there
-   is one host for all of them. A later file pushes its own drawing function
-   onto this array rather than mounting a second host of its own, so there is
-   exactly one place in the DOM where a leader-side sheet can be and exactly
-   one pass that fills it. */
-const LDR_SHEETS = [ldrBriefSheet, ldrNoteSheet];
+/* `ldrNoteSheet` IS DELETED (2 Sep 2026). Adding a note was a `.modal >
+   .sheet` — scrim, heading, one textarea, a legal line and two feet — and the
+   composer is inline in the panel now, where the rows are. The argument that
+   put it in a sheet is in `LDR_SHEETS`'s own note ("one task begun and finished
+   without leaving the page underneath"), and it still holds for the BRIEF,
+   which is a document you read. A note is a row you write. */
+const LDR_SHEETS = [ldrBriefSheet];
 
 function placeLdrSheets(){
   const app = device.querySelector('.app');
@@ -860,30 +1525,63 @@ device.addEventListener('keydown', e => {
   row.click();
 });
 
+/* `ldrNoteFilter` AND ITS TWO LISTENERS ARE DELETED (2 Sep 2026) with the
+   toolbar they served — the search field, the type select and the count line.
+   The technique is worth not re-deriving and lead.js already keeps it written
+   down for the next control typed into on a leader page: filter the DOM and do
+   NOT re-render, because `render()` replaces `device.innerHTML` and takes the
+   caret with it. The notes panel had it; the notes panel no longer has a field.
+   `S.ldrNoteF` goes too. `S.ldrNoteK` stays and keeps its own listener below —
+   it is the composer's remembered type, which is a different thing from a
+   filter: open the composer twice and it offers the kind you chose last. */
+device.addEventListener('change', e => { if(e.target.id === 'ldrNoteK') S.ldrNoteK = e.target.value; });
 device.addEventListener('click', e => {
   /* the cohort filter on Course Reports */
   const rep = e.target.closest('[data-ldrrep]');
   if(rep){ S.ldrRep = rep.dataset.ldrrep; render(); return; }
 
+  /* the cohort page's three tabs */
+  const ctb = e.target.closest('[data-ldrctab]');
+  if(ctb){ S.ldrCTab = ctb.dataset.ldrctab; render(); return; }
+
+  /* the member page's chapter list, five rows or thirteen */
+  if(e.target.closest('[data-ldrchall]')){ S.ldrChAll = !S.ldrChAll; render(); return; }
+
   /* the brief */
   const br = e.target.closest('[data-ldrbrief]');
   if(br){ S.ldrBrief = +br.dataset.ldrbrief; render(); return; }
 
-  /* a note: open, save, delete. The textarea is read BEFORE the render that
-     closes the sheet, because that render replaces it. */
+  /* A NOTE: OPEN, EDIT, CANCEL, SAVE, DELETE. All five read the fields BEFORE
+     the render that closes the composer, because that render replaces them —
+     the same order the sheet needed and the reason `render()` is always last. */
   const nt = e.target.closest('[data-ldrnote]');
-  if(nt){ S.ldrNote = nt.dataset.ldrnote; render(); return; }
+  if(nt){ S.ldrNoteAt = -1; S.ldrNoteK = 'general'; render(); return; }
 
-  if(e.target.closest('[data-ldrnotesave]')){
-    const box = device.querySelector('#ldrNoteT');
-    const text = box ? box.value.trim() : '';
-    if(!text){ if(box) box.focus(); return; }
-    const name = S.ldrNote;
-    if(name){
-      S.ldrNotes[name] = S.ldrNotes[name] || [];
-      S.ldrNotes[name].unshift({t:text, w:'Just now'});
-    }
-    S.ldrNote = null;
+  const ed = e.target.closest('[data-ldrnoteedit]');
+  if(ed){
+    const raw = ed.dataset.ldrnoteedit, cut = raw.lastIndexOf(':');
+    S.ldrNoteAt = +raw.slice(cut + 1);
+    render();
+    return;
+  }
+
+  if(e.target.closest('[data-ldrnotecancel]')){ S.ldrNoteAt = null; render(); return; }
+
+  const sv = e.target.closest('[data-ldrnotesave]');
+  if(sv){
+    const name = sv.dataset.ldrnotesave;
+    const tt = device.querySelector('#ldrNoteT'), bb = device.querySelector('#ldrNoteB');
+    const kk = device.querySelector('#ldrNoteK');
+    const t = tt ? tt.value.trim() : '', b = bb ? bb.value.trim() : '';
+    /* A TITLE IS THE ONE REQUIRED FIELD, because it is the row. An empty body
+       draws a two-line row rather than a broken one, which is why `.note-x` is
+       conditional in the markup. */
+    if(!t){ if(tt) tt.focus(); return; }
+    const k = kk ? kk.value : 'general';
+    S.ldrNotes[name] = S.ldrNotes[name] || [];
+    if(S.ldrNoteAt >= 0) S.ldrNotes[name][S.ldrNoteAt] = {k, t, b, w:S.ldrNotes[name][S.ldrNoteAt].w};
+    else S.ldrNotes[name].unshift({k, t, b, w:'Just now'});
+    S.ldrNoteAt = null;
     render();
     return;
   }

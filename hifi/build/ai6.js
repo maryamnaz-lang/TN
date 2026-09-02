@@ -691,7 +691,19 @@ const PAGESUM = {
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
     const s0 = ps[0];
     if(!ps.length) return 'Nothing is waiting on your signature &mdash; every 90-day summary is published.';
-    return `${_W(ps.length)} 90-day ${ps.length === 1 ? 'summary is' : 'summaries are'} waiting on you, from Cohort ${s0.cohort}. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
+    /* THE SENTENCE NAMES THE COHORT'S SIZE NOW, because the page under it holds
+       the whole roster in two lists (1 Sep 2026) and "two are waiting" over
+       eight rows read as a count of the page rather than of the work. `two of
+       eight` is the shape: the fraction is the reading, and both halves are
+       read — `ps.length` and the cohort's own `members.length` — so it cannot
+       disagree with either list. Still one sentence and 27 words, inside
+       PAGESUM's 18&ndash;28.
+       BOTH COUNTS ARE SPELT, and the second one has to be: "33&rsquo;s 8 90-day"
+       puts two numerals against each other with a hyphenated third behind them,
+       which is three numbers in five characters. `_w` is the lowercase half of
+       the pair the leader's other summaries already use for this. */
+    const size = _w(lcoOf(s0.cohort).members.length);
+    return `${_W(ps.length)} of Cohort ${s0.cohort}&rsquo;s ${size} 90-day ${ps.length === 1 ? 'summary is' : 'summaries are'} still waiting on you. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
   },
 
   leadSum: () => {
@@ -732,13 +744,17 @@ const PAGESUM = {
   /* "Ordered by distance from expected pace" was a caption for a sort order
      the column headings state, so the finding is the first sentence now. */
   leadReports: () => {
+    /* THE "ALL COHORTS" TAB IS GONE (Maryam, 2 Sep 2026) and both branches that
+       served it go with it — `S.ldrRep` is a cohort id now and cannot be
+       `'all'`, so a summary that still tested for it would be a condition that
+       is false every time it is evaluated. The sentence always names the
+       cohort, which is what the page is always showing. */
     const sel = S.ldrRep;
-    const all = lmembers();
-    const rows = sel === 'all' ? all : all.filter(x => x.c.id === +sel);
+    const rows = lmembers().filter(x => x.c.id === +sel);
     const behind = rows.filter(x => x.m.pc - lpace(x.c) <= -5);
     const never = rows.filter(x => x.m.last === 'Never');
     const worst = behind.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c)))[0];
-    const where = sel === 'all' ? `of the ${rows.length}` : `of the ${rows.length} in cohort ${sel}`;
+    const where = `of the ${rows.length} in cohort ${sel}`;
     if(!behind.length) return `None ${where} is more than five points behind pace${never.length ? `, though ${_w(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.`;
     return `${_W(behind.length)} ${where} are five points or more behind pace${never.length ? `, and ${_w(never.length)} ${never.length === 1 ? 'has' : 'have'} never signed in` : ''}.${worst ? ` ${worst.m.name} is furthest back at ${worst.m.pc}%.` : ''}`;
   },
@@ -1048,6 +1064,28 @@ function placeSummaryPass(){
      class also carries the candidate page's own flex layout (§16, §37.7), and
      this page is a tab strip over two surfaces, not one thread. */
   if(page.classList.contains('msg-mod')) return;
+
+  /* AND `nosum` IS THE GENERAL FORM OF THE SAME OPT-OUT — a view saying "not on
+     this page" without the class also having to name a surface. The two above
+     are `.msg-*` because both were arguments about what a MESSAGES page is; this
+     one is for a page whose reason is its own content, and `V.leadSum` is the
+     first (Maryam, 1 Sep 2026): the 90-day summary page IS a summary, so Tal's
+     line was reprinting the recommendation the page states as a `.kv` row and
+     the four figures it states as a `.stats` band.
+
+     IT MUST BE CHECKED HERE, BEFORE STEP 1, and that is the whole reason this is
+     a `return` at the top rather than a `PAGESUM` entry deleted. Trap 11: the
+     stripping passes run FIRST — `talFirst` hoists, `placeBand` claims, and only
+     then does this function look for text — so a page with no entry gets its
+     card stripped of its action and its words and then left in a shape §33 does
+     not style, which renders the head band ~700px wider than the page. An early
+     return means no card is inserted at all.
+
+     THE KEY IS STILL CLEARED, because `placePageSummary` is the two-line wrapper
+     that exists for exactly this: only the success path returns `true`, so an
+     opt-out cannot leave a stale typing key behind and make the NEXT page print
+     instantly (the eight-plain-`return`s note above says why). */
+  if(page.classList.contains('nosum')) return;
 
   const band = page.querySelector(':scope > .modhead');
 

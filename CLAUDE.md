@@ -418,6 +418,153 @@ The four that mattered, by count:
   the zero-height sticky hook whose height must never change. Both are named in §20's
   note; forcing 48 on them puts white between two grounds.
 
+### A MARK IS A BARE 20px GLYPH — the chip came off `.stat` on 1 Sep 2026
+
+Maryam: *"the icons should not have the background, all four icons should be in different
+relevant colors to their nature. increase the size of the icons since removing the
+background will make them look very small otherwise"* — then, of the Quick Action cards,
+*"do the same for the quick action icons as well."*
+
+**§72 HAD ALREADY MADE THIS MOVE AND ITS NOTE IS THE ARGUMENT.** That layer took the same
+28px tinted square off the pulse's three column marks and stepped the glyph 16 → 20
+"because it now holds the line alone". §29's `.stat-ic` is the last caller of the chip and
+goes the same way: **20px box, 20px glyph, no ground**, hue still inherited from `--mk` so
+the mark and the figure cannot disagree. The box is 20 and not 28 for `.pulse-ic`'s reason
+— a bare mark has no padding to hold, and an oversized box reads as a bad gap before the
+label rather than as a column. `fill:var(--mk)` rather than `currentColor`, because
+`.stat` sets no `color` (§72 could use `currentColor` only because `.pulse-ic` sets one).
+
+**IT IS A COMPONENT CHANGE, SO THE CANDIDATE PORTAL MOVED TOO** — every `.stats > .stat`
+in the product, not just the leader's jump band. §29's `nth-child` cycle is untouched
+there, so those four are still blue / green / violet / rose by position.
+
+**THE LEADER'S FOUR ARE NAMED, NOT CYCLED, AND ALL FOUR NOW CARRY A HUE.** §31 had the two
+counts on `--gray-70` — "neutral for the two that are just counts" — which was right while
+the mark was a wash behind a glyph, where a hue on a count would have read as a status.
+With nothing tinted, a grey glyph beside three coloured ones reads as two marks that
+failed to load. Red `--danger-ink` for the queue of people falling behind, amber
+`--support-attention` for the work waiting on a signature, blue `--mk-1` for a scheduled
+session (the hue `.qa-ic.ic-prep` already gives a call) and violet `--mk-3` for the
+cohorts (§82's hue for `.cov-pill` and the course cover). **The FIGURE still reddens on
+the two demands only** — a hue on the mark says what kind of thing this is, a hue on the
+number says it needs you.
+
+`.qa-ic` steps 16 → 20 with it and its `margin-top` drops 3 → 1: that offset optically
+centred a 16px glyph against the card's 21px title line, and four more pixels of glyph is
+two more above the cap height. 20 is now the product's one bare-glyph size, shared by
+`.stat-ic`, `.pulse-ic` and `.qa-ic`.
+
+**Pre-existing and NOT introduced here:** below about 1200 the leader's first two jump
+cells drop their figure under the label (`.stat-top` wraps the pair, §37.11). Measured
+with the old 28px chip and the new 20px glyph at 1150 / 1280 / 1440 / 1600 — identical at
+every width, so the smaller mark neither caused it nor fixed it.
+
+### THE FIGURE CELL AND THE QUICK ACTION CARD ARE ONE SHAPE — 1 Sep 2026
+
+Maryam, over three messages: the marks lose their grounds and grow; *"the content and
+icons both should be aligned from top"*; *"the arrow and the numbers on both screenshots
+should be right middle aligned to the block"*; and *"just like the quick action block
+headings, give the same to the 4 blocks heading, the font size and weight should be same."*
+Read together they make `.stat` and `.qa-c` the same object — a small bordered block whose
+first line names it, whose second line qualifies it, and whose one figure or control holds
+the right edge.
+
+| | `.stat` (§29) | `.qa-c` (§70) |
+|---|---|---|
+| mark | bare 20px glyph, hue from `--mk` | bare 20px glyph, hue per card |
+| title | `--t-h4` — 14 / 600 / 19 | `--t-h4` — 14 / 600 / 19 |
+| content | hangs from the top | hangs from the top |
+| right-hand item | the figure, centred on the cell | the arrow, centred on the card |
+
+- **`.stat` IS THREE COLUMNS NOW** — `'ic top n' 'ic d n' 'ic sl n'` — with
+  `display:contents` on `.stat-top` so the wrapper dissolves and its two children take grid
+  areas without a markup change (§72.4's move on `.stand-top`). **The third row is a `1fr`
+  spacer and it is the whole of why "middle" means the block**: `align-content:start`
+  packed the rows to the top and left the slack undistributed, so the figure centred on the
+  CONTENT and a cell whose label wrapped put its number ~9px below its neighbours'.
+- **IT RETIRES §37.11's STAGGER.** The old `.stat-top` was a baseline flex line that wrapped
+  the label/figure PAIR — the reason the transcript's "Assessment average" cell sat 15px
+  low. A long label now wraps inside its own column and every cell in a row starts level.
+- **`.qa-c` IS `align-items:flex-start`, NOT `center`.** Centred, two cards side by side
+  started their titles at different heights whenever their descriptions ran to different
+  numbers of lines — measured at 1280, y=1 against y=11. The arrow keeps its own
+  `align-self:center` plus `margin-left:auto`, which is what "right middle" needs once the
+  text block no longer fills the row.
+- **THE LABEL CAME OFF THE EYEBROW ROLE**, pulled out of §63 §4's thirty-class list at
+  (0,4,0) rather than moved inside it — every other member of that list really is an
+  eyebrow. `.stats .k` / `.stat .k` stay behind deliberately: they are the older `.k`/`.v`
+  spelling `gallery.html` documents as the shape *not* to build a figure cell from.
+- **A 20px GLYPH NEEDS NO OPTICAL OFFSET AGAINST A 19px LINE.** `.stat-ic` briefly carried
+  `margin-top:4px` to answer the old baseline push; with the label starting its own row at
+  top 0 that same 4px put the mark 4px low. Both are `align-self:start` at 0 now.
+
+### THE GAP INSIDE A SECTION IS `--sec-h-gap` — 12px, ONE TOKEN
+
+Maryam, 1 Sep 2026: *"you need to reduce the spacing within the section, means between
+section heading and it's content … so they seems connected."* The sections are 48 apart
+(above); this is the other half — the heading and its own content read as one object.
+
+**IT WAS NOT ONE VALUE AND IT WAS NOT IN ONE PLACE — twenty-six declarations across
+eighteen layers.** §02 and §10 set the base and then §12, §14, §15 (×5), §16 (×2), §17,
+§28, §32, §36 (×2), §38 (×3), §43, §44, §65, §69 (×2), §70 (×2), §72 and §73 each said it
+again, because every one of them had to restate `padding` or `border-right` for a section
+that opts out of §10.15's label column, and carried `margin-bottom` along for the ride.
+Measured over 184 pages: **16px on 116 headed sections at desktop, 20 on 54, 12 on 18 and
+32 on one.** "Reduce the gap" meant finding all twenty-six.
+
+**SO IT IS A TOKEN NOW.** `--sec-h-gap:12px` in §01, and all twenty-six sites read it —
+197 headed sections at desktop and 233 at mobile now measure exactly 12, and the next
+adjustment is one line. **16 → 12 is deliberately one step**: the instruction is "a little
+bit", and 8 would put a 16px heading closer to its content than the 12 that already
+separates two `.kv` rows. Heading-to-content 12 against section-to-section 48 is a 4:1
+ratio where it was 3:1.
+
+- **THE `mb:0` SECTIONS ARE NOT MISSING THE TOKEN.** 75 headed sections at desktop are
+  §10.15's label column, where the heading sits *beside* its content — there is no
+  vertical gap to set, and their measured "gap" is negative for that reason.
+- **NINE SECTIONS STILL READ 19–42px AND IT IS THE CONTENT'S OWN MARGIN, NOT THE
+  HEADING'S.** `.stand`, `.tile-stack` and `.scene-pick` each carry a `margin-top`; the
+  heading pays 12 in every one of them. Worth knowing before chasing the number again.
+- **THE `.sec-h.aih` BLOCK MEASURES 80–176 AND IS NOT A GAP.** `aiHead` puts the title,
+  the description and the actions all *inside* the `.sec-h`, so "heading text bottom to
+  next sibling" spans the whole head block. Its margin is the token like everything else.
+
+### A HEADING AND ITS DESCRIPTION ARE ONE OBJECT — `--sec-desc-gap`, 8px
+
+Maryam, 1 Sep 2026: *"wherever there will be desc with the heading, their gap will be this
+much which we have in the choose your scenes and it's desc."* §38's `.scene-hb` is the
+reference and its own note has the working — 16 → 12 → 8 over two asks, ending at "the
+pair is closer to each other than either is to anything else on the page".
+
+**TWO TOKENS, AND THE DIFFERENCE IS WHAT THE SPACE SEPARATES.** `--sec-h-gap` (12) is a
+heading from its CONTENT — a grid, a table, a row of cards, which are different objects.
+`--sec-desc-gap` (8) is a heading from a sentence ABOUT that heading: one object on two
+lines. Both are in §01 next to each other.
+
+**THREE PLACES DRAW THE PAIR AND THEY WERE THREE VALUES.** Measured over 184 pages:
+
+| | was | count |
+|---|---|---|
+| `aiHead`'s `.aih-b` flex gap (613:7984's own 12) | 12 | 44 |
+| a `.sec-h` followed by an `.all-desc` — paying `--sec-h-gap`, because the sentence is a SIBLING of the heading rather than a child of the head block | 12 | 16 |
+| `.scene-hb` | 8 | 1 |
+
+**61 of 62 now measure 8 at desktop and 67 of 68 at 390.**
+
+- **THE `.all-desc` RULE HAS NO `.sec >` IN IT, AND THAT IS TRAP 13 AGAIN.** Written as
+  `.sec > .sec-h:has(+ .all-desc)` it missed the Agents page at both widths — that section
+  wraps its heading (`.sec > .hd-srch > .hd-srch-t > .sec-h`), the same wrapper that drops
+  it out of §63 §8b's heading size. Twelve sections, one per stage, all reading 12 while
+  every other description read 8. Keyed on the PAIR instead: wherever a `.sec-h` is
+  immediately followed by an `.all-desc`, whatever wraps them. `:has(+ .all-desc)` is also
+  what keeps it narrow — it cannot reach a `.sec-h` in a sheet or a Tal bubble.
+- **IT NEEDED BOTH TIERS.** §16 states it inside `@container app (min-width:900px)` for
+  the sections that opt out of the label column there; the unconditional rule is what
+  reaches the phone, where the heading otherwise falls to the base `--sec-h-gap`.
+- **THE ONE SECTION STILL AT 24 IS NOT A PAIR.** `.ldr-board`'s `.sec-h` holds the heading
+  AND a cohort tab strip, so the helper line under it is separated by the tabs, not by a
+  margin. Its heading pays the token like everything else.
+
 ### THE QUIET BUTTON — §64, `64-quietbtn.css`
 
 `.btn-s` / `.btn-t` / `.btn-g` — 88 of them — were outlined, and on a product
@@ -475,7 +622,7 @@ worth avoiding. Three things that cost a round trip each:
 - **`.found-t` has to carry `flex:1 1 auto`.** §24.13 gives it to `.sec-h > h2`
   — a direct child — and wrapping the `<h2>` in the toggle made it a grandchild.
 
-Riding with it: `.prog-ic`, `.stat`'s 28px tinted chip on the three
+Riding with it: `.prog-ic`, `.stat`'s mark on the three
 `progressStrip` figures, with the hues **named** (`--mk-1/2/3`) rather than
 cycled by `nth-child` the way §29 does it, so a chapter is blue in both places.
 The mark is a left-hand COLUMN, not a row above the figure, which is why the
@@ -610,6 +757,24 @@ ever been one at the head of a page, so the cap never mattered. "Tal's recommend
 `.ai-label.bare`, so the run walked into it: the section went into the band, laid out in the
 left column at 576px instead of the page's 901, and the photograph, the facts and the actions
 each wrapped onto a line of their own. Nothing threw and nothing warned.
+
+**TAL'S SUMMARY IS CAPPED AT 733 ONLY WHERE THERE IS A SECOND COLUMN** (Maryam, 1 Sep
+2026: *"when there is no block on the right side of tal summary block then give its
+summary full width rather than making it go on the second line"*). 581:6662's 733 of 925
+is a measure stated in a frame whose right-hand side is occupied; applied to every band
+it was landing on the **104 pages whose band is a single column**, where it is not a
+measure but a ragged right edge — at 1280 the summary broke to a second line with 168px
+of empty cream beside it, and on `assessed/level` the second line was the word "it."
+Uncapped, those fall to §33.3's `max-width:none`, which is what that layer wanted
+("a summary is two sentences read once"); §14's `.app .ai-body p{max-width:68ch}` is
+(0,2,1) against §33's (0,4,1) and does not come back.
+
+**THE GATE IS THE UNION OF THE TWO THAT BUILD THE SECOND COLUMN** — `:has(> .head-col)`
+(§70/§73's own) and `:has(> .sec-dark .plate)` (§56's). Swept over all 146 pages that
+draw a summary, the pair matches all 32 two-column bands and none of the 114
+single-column ones. **`:has(> .sec-dark)` alone is the obvious short version and is
+wrong**: it also matches ten single-column bands whose dark card is a `.cert` or a
+`.lvl-hero`, which §56 leaves under the head rather than beside it.
 
 **The travelling light is ON THE ASK FIELD ONLY, and it STOPS.** The file parks a 374×2
 blurred bar on two edges — the summary panel's bottom and the dock's top — and both were
@@ -2064,13 +2229,197 @@ theirs: the **90-day summary**, which closes thirteen weeks they were in the roo
   built for it — both files name "the leader's weekly-call card" as the first row whose mark is
   a LABEL rather than a face. It carries `i:'41'` and no `img` (an undefined `src` 404s on every
   render, which `respcheck` reads as a broken screen), §77.7 gives the square `--on-dark-fill`
-  so a label does not read as a failed photograph, and §63 §17 sizes it at h2. Its one action
-  is **"Generate the brief"** — `second.at`, a sheet rather than a route — which is the first
-  time that card's action has done anything.
+  so a label does not read as a failed photograph, and §63 §17 sizes it at h2.
+  **THE MARK IS A COVER NOW AND THE LABEL IS ITS FALLBACK** — see the cover section below;
+  §77.7's ground and §63 §17's numeral both stay, because `crow`'s `onerror` is exactly when
+  they render.
+  **ITS ACTION IS THE CALLER'S: "View all calls" on the dashboard, "Generate the brief" on the
+  Calls page** (Maryam, 1 Sep 2026). Both are a change from "All sessions", which was a way out
+  of a set of one, and both DO something — the first is `data-go="leadCalls"`, the second
+  `data-ldrbrief`, a sheet rather than a route. On the Calls page "View all calls" would be a
+  link to the page you are on, which is why the secondary is per-caller again.
+  **AND IT SITS IN THE CORNER — §77.6 PUT ITS BOX THERE AND §77.8 PUT THE WORDS THERE.**
+  Measured at 1280, `.crow-a`'s right edge was already exactly on `.crow`'s and its bottom on the
+  row's, both 32px inside the card, which is `.dark-card`'s own `--s07` frame and not slack. What
+  was not aligned was the part you can see: §71.441 gives `.crow-a > .btn` a stated `width:185px`
+  from a Figma row that ends in a PAIR of equal buttons, and the label is centred in it, so one
+  borderless button stopped ~26px short of the corner. §77.8 lets the SINGLE action size to its
+  content and give up its right padding — scoped to `crow`'s own `.crow-a1` flag so the
+  two-button rows keep the pair, and to ≥900 per trap 3 because §71.617 gives the button
+  `width:100%` in the stacked tier and that is right.
 - **What did NOT change.** The re-interview is still in the product and still the agent's, so
   `V.leadSum`'s "published to whichever agent runs their re-interview" is now more accurate
   rather than less. `LDR_RECS` and its required-reason box are untouched, and they are now the
   only place on the portal that makes the argument the override box used to make with them.
+
+#### The cohort cover — §86, `.gcard-art` + `COHORT_ART` / `cohortArt`
+
+Maryam, 1 Sep 2026: *"the cohort left blocks should have images … also the block square should
+have the height equal to the right side content"*, then *"show the yellow one in the black call
+cards"*. Three covers, embedded by `build.py` as 200px WebP squares (18 KB for all three).
+
+- **THE COVER IS KEYED BY LEVEL, NOT BY COHORT ID.** `cohortArt(c)` reads `c.level` and falls
+  back to `e1`. Keying on the id would have worked with three cohorts and three files and would
+  have been a coincidence — a fourth cohort lands on `undefined`, and `crow`'s note is why that
+  is worse than no image at all (an undefined `src` 404s on every render, which `respcheck`
+  reads as a broken screen).
+- **THE ORANGE ONE IS E3's BECAUSE THE BLACK CARD ASKED FOR IT.** The card draws the NEXT cohort
+  call and takes that cohort's own cover, because a card showing another cohort's artwork is the
+  card lying about its subject. The next call is Cohort 41 at E3, so E3 holds the orange one.
+  **The consequence is stated rather than hidden**: a week where Cohort 33 came first would put
+  the E1 cover on the card. If it must be orange whatever it is about, that is a fixed cover on
+  `leadCall`, not a fourth file.
+- **IT IS A 9:5 RECTANGLE AND IT SHIPPED SQUARE FOR ONE BUILD** (Maryam, 1 Sep 2026: *"i need
+  the image blocks in horizontal rectangle form so the image do not cut from sides. this does not
+  mean that you use different widths for different images, just use a rectangle for same width
+  for all."*). All three covers are ~1.80:1 title cards, so a square threw away 45% of every one
+  of them from the SIDES — on a cover whose subject is a line of type, the half that carries the
+  meaning. 9:5 is 1.800, which is what the three measure to within 1%, so the box shows each one
+  whole and the render is 1:1 with the asset.
+- **ONE WIDTH FOR ALL THREE, WHICH THE ASK STATES AND THE COMPONENT WOULD WANT ANYWAY.** A
+  per-image ratio would size the column from the picture, so three rows in one `.tile-stack`
+  would start their text at three different x — §31.5's own argument for the date chip ("a diary
+  is scanned down the date and across the detail, and both of those need a straight edge").
+- **`object-fit` IS `contain`, NOT `cover`.** With the box and every asset at 9:5 the two are
+  identical today; they stop being identical the moment somebody points this at artwork of
+  another shape, and `cover` would go back to trimming the sides. `contain` fills the width and
+  letterboxes against the box's own ground instead.
+- **BOTH DIMENSIONS ARE STATED, AND ONE `calc()` GIVES BOTH.** `--gcard-art-h` is the sum of the
+  three type roles the body draws — `--t-eyebrow-lh` + `--s03` + `--t-h4-lh` + 2px +
+  `--t-desc-lh` = **62px** — and `--gcard-art-w` is that sum at 9:5, so the box is a rectangle
+  AND exactly as tall as the three lines beside it. Measured 112 × 62 against a 62px body.
+  **`aspect-ratio` does NOT work in this position** and §75.3 records the same trap from the
+  other side: a flex or grid container resolves the main axis first, so the item's height is
+  unknown when the ratio would need it and the box collapses to its content.
+- **THE HEIGHT IS STATED RATHER THAN STRETCHED, AND THAT WAS THE COST OF THE RECTANGLE.** It was
+  `align-self:stretch`, which gave the box the row's content height for free — right for a square
+  and wrong for a rectangle: at 390 the description wraps, so a stretched box became 111 × 79
+  (1.4:1) and started cutting the sides again at the width the row can least afford it. Stated,
+  the picture is uncut at every width and the box is centred in a taller row.
+- **THE BLACK CARD'S SLOT IS THE SAME RECTANGLE — §86.2, `.crow-cover`.** `crow`'s portrait slot
+  is a 78px square because on its other four call sites it holds a FACE, so the card was reading
+  "BUSINESS FOUNDATIO". The height stays §71's 78 (the mark and the three lines beside it are the
+  same height by design) and only the width changes, to 78 × 9/5. **It is a class the record asks
+  for, not a portal scope**: `.crow-dark` is worn by the candidate's booked interview too, where
+  the mark IS a face, so `crow` takes a `cover:true` field — `img` is whether there is a picture,
+  `cover` is what shape the slot should be.
+- **THE CROP IS DONE OUT OF BUILD, PER IMAGE, AND THAT IS WHY.** E1 and E2 are centred
+  compositions and E3's title sits hard left, so a single `object-position` could not serve all
+  three and three CSS rules would put a property of the PICTURE in the stylesheet.
+- **`gcard`'s SIXTH ARGUMENT IS `{src, i}` AND THE LABEL IS THE CALLER'S.** Deriving it inside
+  the component was the first version — digits off the title — and it read "513", because a
+  cohort row's title is "Week 5 of 13" and its number is in the eyebrow. The `<i>` sits behind
+  the `<img>` and the `onerror` uncovers it; §63 §23 types it at h4, the row's own tier.
+- **IT CROSSES INTO `design-system/`** — the rules know nothing about the images, so a
+  hand-authored page pointing the `<img>` at its own artwork gets the whole component.
+  `gallery.html` documents it under **Rows** with both states, the cover and the fallback.
+
+#### The dashboard's four blocks — `LEAD_JUMPS` — and the three flags
+
+**THE ORDER AND THE FOUR WORDS ARE MARYAM'S, 1 Sep 2026:** Attention Required, Awaiting
+Decisions, Cohort Calls, Cohorts — *"the order of these block here and on the page as well"*.
+
+- **`LEAD_JUMPS` IS THE ONE LIST AND IT DRIVES THREE THINGS**, which is why a reorder is one edit
+  and two follow-ups. The cards are generated from the array, the four page sections carry its
+  ids, and **§31's four hues are keyed by `nth-child`** — so the red moved from cell 2 to cell 1
+  and the amber from 3 to 2 with it. The rule is unchanged in substance: the two cells that are
+  DEMANDS carry a hue, the two that are counts stay ink. If it is reordered again, §31 is the
+  other half.
+- **THE TWO DEMANDS COME FIRST.** Attention and the signature queue are somebody waiting on this
+  leader; Calls and Cohorts are counts of what they hold.
+- **`lead-booked` IS NOW `lead-calls`.** That id is from the week the diary held interviews
+  somebody had booked, and nobody books a cohort leader.
+- **THE GROUNDS ALTERNATE BY POSITION, NOT BY SUBJECT.** White, tint, white, tint was already the
+  page's rhythm and it is a property of where a section SITS, so the two blocks that swapped ends
+  swapped grounds with them. Nothing about §84 or §55 changes; the classes moved.
+
+**THREE FLAGGED CANDIDATES, ONE SEVERE** (Maryam, 1 Sep 2026: *"show only three attentions in
+total, from which 1 will be severe and one will be moderate"*). Read as one severe and the
+remainder moderate, because `lflag` has no third severity: **1 severe, 2 moderate** — Yuki
+Tanaka inactive 12 days, Chloe Ferreira behind pace, James Whitby struggling, all in Cohort 41.
+
+- **IT IS DONE BY MOVING THE ACTIVITY DATA, NOT BY SLICING THE QUEUE.** A flag is derived, never
+  set (the rule below), so capping the list at three rows would have left twelve flags behind it
+  and made `lattention` disagree with the cohort pages, the reports and the figure card — all of
+  which count the same predicate. Nine candidates came back instead.
+- **EACH ONE HAD TO CLEAR EVERY TEST, not just the one that was firing.** `lflag` runs six in
+  order, so raising progress on somebody eight days quiet only moves them from "at risk" to
+  "inactive". Tobias, Ivan and Zoe each needed progress AND a recent sign-in AND an attempts
+  figure under 2.0; Cohort 47's four "Never" needed a first sign-in.
+- **TWO PLACES OUTSIDE `LEAD_COHORTS` HAD TO FOLLOW**, both hand-written prose naming a number
+  that array owns: `COHORT` (views.js) reads Tobias's last-active on the CANDIDATE's own Cohort
+  page, and `LDR_THREADS` (lead4) opened Priya's message to him with "eight days quiet and 18% at
+  week 5". His thread now shows a reply — which is what a resolved one looks like, and a message
+  list that only held currently-flagged people would delete its own history every time somebody
+  recovered.
+- **YUKI IS THE ONE THIS HAD TO LEAVE ALONE.** `LEAD_NOTIF` names her 12 days and her 9%, and
+  her own thread is about them.
+
+**AND THE SECTION LOST ITS FIVE CONTROLS WITH THEM** (Maryam, same day): the helper line "From
+course activity, not from you", the search field, the All / Severe / Moderate strip, the
+"All 3 flagged candidates." count and the empty state are all deleted. They were answers to one
+premise — that this was a queue of twelve you had to work through — and it is three rows.
+
+- **THE JS WENT WITH THE MARKUP.** `S.leadQ`, `S.leadFilter`, `leadFilterApply`, the `input` and
+  `[data-lfilter]` listeners, the render wrapper's call to it, and `data-nm` / `data-co` on each
+  row (attributes only the search read). §31 lost `.lead-tools`, `.lead-srch`, `.lead-filter`
+  and its phone tier, `.lead-none` and `tr.is-off` — twenty-two rules. The row still carries
+  `sev` / `mod`, because §31 keys the flag's INK on it, which is a different job from visibility.
+  **The technique is kept in a note** rather than the code: it filtered the DOM and did NOT
+  re-render, because `render()` destroys an `<input>` and takes the caret with it (ai4's trap).
+  The next control typed into on a leader page wants that shape.
+- **THE TABLE KEEPS ONE RULE AND IT IS LIGHT GREY** — *"remove the lines between the table rows,
+  keep the one after the column header but use light grey"*. Two declarations, and both are
+  overrides of a base this table no longer wants: §02.461 gives every `td` a border and §10.243
+  points it at `--rule`, so the row lines are turned OFF rather than not turned on; and §10.242
+  gives `.tbl th` `--rule-ink`, which is **`#111`** — a black rule, right for the dense tables
+  §10 wrote it for and far too heavy over three rows. `--rule` (#d7d5cd) is the build's one
+  hairline, which is what "light grey" names. `.app[data-portal="leader"] .tbl-flag th` is
+  (0,3,1) against §10's (0,1,1), so it wins on weight rather than on the layer order.
+- **THE FLAG IS A ROUNDED CHIP IN THIS TABLE** — *"round chips, the red item will have a light
+  red chip bg and the orange item will have a light orange bg"*. The tint is a `color-mix` off the
+  same ink the row already carried (12% for red, 14% for amber — red is the stronger hue, §74's
+  own adjustment) rather than `--support-error-bg` / `--support-warning-bg`: those are `.tag`'s
+  pair and the warning one is `#fcf4d6`, a pale YELLOW that does not belong to
+  `--support-attention`'s hue. **It is the only rounded rectangle in the build and it is by
+  instruction** — `--radius` is `0px` by token and §56 grants the one exception to MARKS, so the
+  pill is a literal `999px` rather than a re-pointed token, which keeps the token honest. Scoped
+  to `.tbl-flag`, so the agent's payment ledger keeps `.flag-t` with no ground — five filled
+  pills down a column of plain text is the drawing that component replaced.
+- **A ROW THAT OPENS ONE OF SOMETHING CARRIES ITS SUBJECT, and this bit twice in one afternoon.**
+  *"it should not take me there instead open the detail view"* (Awaiting Decisions), then *"on
+  clicking a cohort, i should go to it's detail page, not on cohort module"*. `data-go` can only
+  name a VIEW, so both lists opened their module — which then drew the same rows again one click
+  below the ones just pressed. The fix is the same in both places and is `crow`'s `second.at`
+  idiom: **`faceRow` takes a fourth argument and `gcard` a seventh, both a raw attribute**, and
+  the dashboard passes `data-ldrsum="<id>"` / `data-ldrco="<id>"` beside the `data-go`. lead2's
+  and lead3's capture-phase listeners set `S.ldrCo` / `S.ldrSum` before `go()` runs. Both are
+  optional, so every other caller — including the ten `gcard`s in `tn-agent-portal.html` — emits
+  byte-identical markup. **The heading row's "View all 3" is still how you reach the list**, which
+  is the whole reason a row does not have to be it.
+
+**AND THE CALLS PAGE LOST ITS PAST** (Maryam, same day): *"remove this section"* — "Already run",
+the calls behind the leader with the week, the chapter and who turned up.
+
+- **THAT SECTION WAS THE MODULE'S OWN ARGUMENT, so the argument is restated rather than dropped.**
+  §-note over `V.leadCalls` used to say the page earned its rail slot on the PAST, because
+  `V.leadCohorts` was already listing the week's three calls. It no longer holds — and the slot
+  is still earned by the simpler fact that Cohorts gave its call list up to this page in the same
+  pass, so this is now the only place the week's appointments are listed at all.
+- **`LEAD_RUN` STAYS, WITH ONE READER.** `PAGESUM.leadCalls` sums the seats across it — "across
+  the four behind you, 32 of 36 seats were filled" — which is now the only place attendance
+  appears in the product, and a figure read once is what a Tal summary is for. `lranChapter` went
+  with the rows; `V.leadProfile`'s row stopped promising "attendance is on the Calls page".
+- **BRIEF BECAME RESCHEDULE, AS A SECONDARY** — *"just a black text with reschedule icon on its
+  left"*. `.btn-t btn-sm ic-l`: §64 took the border off `.btn-t` and left the ink at
+  `--text-primary`, so a text button on a page IS black words, and §64's trailing arrow does not
+  arrive because its test is `:not(:has(svg))` and this one carries a mark. **The mark is
+  `I.calendar`, which is what Reschedule already wears** on the candidate's own call row — one
+  word, one glyph, rather than a second mark for the same verb. **It opens the weekly-calls
+  sheet** (`data-ldravail`, mounted on every leader page by `placeLdrSheets`), which is the
+  surface that actually moves a call: pointing it at the brief would be a button lying about what
+  it does, and inert would be §60's dead control. The brief is still the black card's action at
+  the top of the page and is on the cohort page twice.
 
 Four rules the wireframe settled and this side keeps: **no money anywhere** (a cohort leader
 volunteers — Certifications replaced Earnings, and there is no fee on any leader page); the

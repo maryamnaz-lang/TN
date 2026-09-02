@@ -1,0 +1,277 @@
+/* ==========================================================================
+   99. YOUR PRIVATE NOTES — the panel and its three states
+   Maryam, 2 Sep 2026, with an annotated sheet of all three: "the private notes
+   section bg should be white … i am attaching the 3 states of notes as well,
+   please create these design states to be completely functional."
+
+     99.1  `.note-panel`            the bordered white card all three live in
+     99.2  `.note-empty`            state 1 — nothing written yet
+     99.3  `.note-bar` / `.note-row` / `.note-foot`   state 2 — the list
+     99.4  `.note-box`              state 3 — the composer
+
+   ONE PANEL, THREE CONTENTS, which is what makes this a component rather than
+   three sections. The frame, the ground and the rhythm are stated once on
+   `.note-panel` and each state fills it; the reference draws exactly that, and
+   it is also why the composer replaces the toolbar rather than sitting above it
+   — a panel showing both is a panel in two states at once.
+
+   THE FRAME IS §41'S, the build's one bounded panel: `1px solid var(--rule)` on
+   `--layer-01`, square through `--radius`. The reference has an 8px corner and
+   §02's opening note is why it does not cross ("depth is expressed as rhythm
+   and rule weight, nothing else") — §76 made the same trade for the booking
+   panels.
+
+   THE HUE IS THE NOTE'S OWN AND IT ARRIVES INLINE. `--note-ink` and `--note-bg`
+   are written on the row by `ldrNoteRow` from `NOTE_K`, so the mark, the dot and
+   the tag are three tints of one colour and cannot drift — §31's mix technique
+   and §72's `pulseCol` idiom together. Nothing here names a hue.
+
+   §63 §28 OWNS EVERY SIZE, WEIGHT, CASE AND INK.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 99.1 ---
+   THE PANEL, AND THE MARK EVERY STATE SHARES
+   -------------------------------------------------------------------------- */
+.app .note-panel{
+  border:1px solid var(--rule);border-radius:var(--radius);
+  background:var(--layer-01)}
+
+/* THE MARK IS §65'S CHIP AT THE NOTE'S OWN HUE — 40px here rather than 28,
+   because it leads a two-line row instead of a figure. The dot is the
+   reference's and it is NOT redundant with the tag: on a phone the tag wraps to
+   its own line and the dot is what keeps the row's kind readable at a glance
+   while it does. `flex:none` because the row's middle column is `minmax(0,1fr)`
+   and a mark that shrinks is a mark that has stopped being a square. */
+.app .note-mk{
+  position:relative;flex:none;
+  display:grid;place-items:center;
+  width:40px;height:40px;
+  background:var(--note-bg,var(--layer-02))}
+.app .note-mk svg{width:20px;height:20px;fill:var(--note-ink,var(--text-secondary))}
+.app .note-dot{
+  position:absolute;right:-3px;bottom:-3px;
+  width:8px;height:8px;border-radius:999px;
+  background:var(--note-ink);border:2px solid var(--layer-01)}
+
+/* ------------------------------------------------------------------ 99.2 ---
+   STATE 1 — NOTHING WRITTEN YET
+
+   THE BORDER IS DASHED, which is the one place in the build it is, and it earns
+   that: a dashed edge is the product's way of saying the box is waiting to be
+   filled rather than that it holds something. It is the panel's own border
+   restated rather than a second box inside it — the empty state IS the panel
+   here, unlike state 2 where the panel holds a toolbar and a list.
+   -------------------------------------------------------------------------- */
+.app .note-empty{
+  border-style:dashed;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:var(--s04);padding:var(--s08) var(--s06)}
+.app .note-mk-lg{width:56px;height:56px;background:var(--layer-02)}
+.app .note-mk-lg svg{width:28px;height:28px;fill:var(--text-helper)}
+/* The measure is the reason this is stated at all: centred prose with no cap
+   runs the panel's full width and the two lines break at different places on
+   every screen. 46ch is §63's reading measure for a short block. */
+.app .note-empty > p{max-width:46ch}
+.app .note-empty > .note-first{margin-top:var(--s02)}
+
+/* ------------------------------------------------------------------ 99.3 ---
+   STATE 2 — THE LIST
+
+   THE BAR AND THE FOOT ARE THE PANEL'S OWN EDGES, ruled off from the rows
+   rather than boxed: one hairline under the toolbar and one over the count, so
+   the panel reads as a table of notes rather than as three stacked cards. The
+   rows divide with the same hairline and the LAST one does not, which is §02's
+   own rule for a list's last child.
+   -------------------------------------------------------------------------- */
+/* `.note-bar` / `.note-bar-a` / `.note-foot` / `.note-n` ARE DELETED with the
+   toolbar and the count line (2 Sep 2026) — the search, the type filter and
+   "Showing 1 of 1 note". `.note-srch` is NOT deleted with them: §36.20's inbox
+   search borrows it, which is the difference between a rule nothing writes and
+   a rule this page stopped writing. */
+/* The search field is a mark and an input sharing one box, which is the shape
+   §26 gives the agent search: the glyph is inside the frame, not beside it. */
+.app .note-srch{
+  position:relative;display:flex;align-items:center}
+.app .note-srch svg{
+  position:absolute;left:var(--s03);width:16px;height:16px;
+  fill:var(--icon-secondary);pointer-events:none}
+.app .note-srch .inp{width:180px;padding-left:calc(var(--s03) * 2 + 16px)}
+.app .note-sel{width:auto}
+/* THE LIST IS THE SECTION'S OWN WIDTH AND HAS NO FRAME. `.note-panel` keeps its
+   border for the EMPTY state alone, where the dashed box is the design — a
+   frame round a box waiting to be filled. A list of notes is content. */
+.app .note-list{display:flex;flex-direction:column}
+/* A RULE BETWEEN TWO NOTES AND NOWHERE ELSE (Maryam, 2 Sep 2026: "remove the
+   dividers on the top and bottom of the note, a divider will come at the bottom
+   when a new note will be added"). It was a `border-bottom` on every row with
+   the last one's taken off, which draws a line under the composer and above the
+   first note as well; `+` draws one only where two rows meet, so a single note
+   has none and a second one brings its own. The rows pay no side padding either
+   — with the panel gone the section's gutter is the only inset there is. */
+.app .note-row{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:var(--s05);align-items:start;
+  padding:var(--s05) 0}
+.app .note-row + .note-row{border-top:1px solid var(--rule)}
+/* `is-off` IS THE SEARCH'S ONLY HANDLE. The filter hides rows without a
+   re-render (a re-render would take the caret with it), so it can only add a
+   class — and `display:none` rather than a fade, because a row that is filtered
+   out is not a row in a different state, it is a row that is not in the list. */
+.app .note-row.is-off{display:none}
+.app .note-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .note-f{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s03);margin-top:var(--s03)}
+.app .note-tag{
+  display:inline-flex;align-items:center;
+  padding:2px var(--s03);border-radius:999px;
+  background:var(--note-bg)}
+.app .note-a{display:flex;align-items:center;gap:var(--s02);flex:none}
+.app .note-a .ic svg{width:16px;height:16px}
+
+/* ------------------------------------------------------------------ 99.4 ---
+   STATE 3 — THE COMPOSER
+
+   THE MARK STAYS AND THE FIELDS TAKE THE REST, so the composer sits on the same
+   left edge as the rows it will join — the reference's own arrangement, and the
+   reason the panel does not simply become a form.
+
+   THE TWO CONTROLS SPLIT THE FOOT: the type at the left, Cancel and Save at the
+   right, on an auto margin. Save is the accent — it is the one thing this panel
+   is for, and §10.29 reserves the solid accent for what the reader chose to do.
+   -------------------------------------------------------------------------- */
+.app .note-box{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:var(--s05);align-items:start;padding:var(--s05) 0}
+.app .note-mk-w{background:var(--layer-02)}
+.app .note-mk-w svg{fill:var(--text-secondary)}
+/* THE TITLE STANDS OFF THE BOX (Maryam, 2 Sep 2026: "give add a title row and
+   the note block some space, they are too attached right now"). It was `--s03`,
+   which is the gap BETWEEN two fields of one form — right when the two were a
+   line and a box of the same kind, and too tight once the second became a
+   bordered block: an 8px gap under an underlined field reads as the underline
+   belonging to the box beneath it. `--s05` is the step the product puts between
+   two different objects. */
+.app .note-form{display:flex;flex-direction:column;gap:var(--s05);min-width:0}
+.app .note-body{resize:vertical}
+.app .note-form-a{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.app .note-form-b{display:flex;align-items:center;gap:var(--s03);margin-left:auto}
+
+/* ------------------------------------------------------------------ 99.5 ---
+   BELOW 900
+
+   THE ROW'S ACTIONS MOVE UNDER ITS TEXT rather than staying in a third column:
+   at 390 the panel's content box is about 246px, and a 40px mark plus two 32px
+   controls leaves ~130px for a title, a paragraph and a tag. The toolbar wraps
+   on its own (`flex-wrap` above), and the search field gives up its stated
+   180px so the row it wraps onto is the field alone rather than a field and a
+   clipped select.
+   -------------------------------------------------------------------------- */
+@container app (max-width:899.98px){
+  .app .note-row{grid-template-columns:auto minmax(0,1fr)}
+  .app .note-a{grid-column:2;margin-top:var(--s03)}
+  .app .note-bar-a{margin-left:0;width:100%}
+  .app .note-srch{flex:1 1 auto}
+  .app .note-srch .inp{width:100%}
+}
+
+/* ------------------------------------------------------------------ 99.6 ---
+   TRAP 13 — THE LABEL COLUMN, AND IT SHOWED THE MOMENT THE PANEL LANDED
+
+   AND IT NAMES BOTH STATES. The list stopped being a `.note-panel` when the
+   frame came off (2 Sep 2026), so a rule keyed on the panel alone would have
+   opted the EMPTY state out and left every populated one in the column — the
+   same failure one state along.
+
+   §10.15 gives a `.sec` with a `.sec-h` a 184px label column at desktop unless
+   it contains one of a named list — `.tile-stack`, `.stats`, `.tbl-wrap`,
+   `.facts`, `.cardrow`, `.gcard`, `.kv`. The notes section used to be a
+   `.tile-stack` of `.cardrow`s, so it opted out through TWO of those names
+   without ever saying so. `.note-panel` is on the list under neither, and the
+   heading set as "Your / private / notes" in three lines beside the panel —
+   which is the failure §65, §69, §72 and §73 each hit in turn, and it is
+   always the same one: an opt-out is a property of the CONTENTS, so replacing
+   the contents loses it.
+
+   RESTATED INSIDE THE SAME CONTAINER QUERY, per trap 3 — §10's list lives in
+   `@container app (min-width:900px)` and nothing outside that tier can answer
+   it at any weight.
+
+   FOUR DECLARATIONS, NOT THREE, and §96 is where that was learnt the hard way
+   this week: the label column zeroes `margin-bottom` (a heading beside its
+   content has no vertical gap to set), so a restatement without it draws the
+   heading with the panel touching it. Copy what the rule DOES.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .note-panel),.app .sec:has(> .note-list){display:block;padding-left:var(--pad-x)}
+  .app .sec:has(> .note-panel) > .sec-h,.app .sec:has(> .note-list) > .sec-h{
+    width:auto;border-right:0;padding:0;margin-bottom:var(--sec-h-gap)}
+}
+
+/* ------------------------------------------------------------------ 99.7 ---
+   THE COMPOSER'S ONE BOX, ITS TYPE PICKER AND THE CANCEL
+   Maryam, 2 Sep 2026, three corrections to state 3.
+
+   THE FRAME IS ON `.note-fbox`, NOT ON THE TEXTAREA. The type and the two
+   buttons sit inside it now, so the box is the note being written rather than
+   the field alone; the textarea gives its border up rather than drawing a
+   second one 12px inside the first.
+
+   THE SELECT LOSES ITS UNDERLINE AND GAINS A CHEVRON. `.inp` draws a bottom
+   rule on every field in the build, which is right for a field on a form and
+   one line too many inside a box that already has an edge. The chevron is the
+   real `I.chevDown` laid over the select and `pointer-events:none`, so the
+   native picker still opens on a press — a drawn menu of our own would be a
+   third component for a choice of three words.
+
+   THE CANCEL'S TRAILING ARROW COMES OFF. §64 gives every quiet button one
+   through `:not(:has(svg))`, on the argument that a borderless button needs
+   something to say it is a control — true of "Download as PDF" at the foot of
+   a page, and wrong for the left half of a Cancel / Save pair, where the arrow
+   points away from the button that finishes the job. `content:none` on the
+   pseudo-element rather than a new variant: the button is still a `.btn-s`.
+   -------------------------------------------------------------------------- */
+.app .note-fbox{
+  display:flex;flex-direction:column;gap:var(--s03);
+  padding:var(--s04);border:1px solid var(--rule);border-radius:var(--radius)}
+.app .note-fbox > .note-body{
+  border:0;padding:0;min-height:72px;background:transparent}
+.app .note-sel-w{position:relative;display:inline-flex;align-items:center;gap:var(--s03)}
+/* The real select covers the pair and is invisible: it keeps the keyboard, the
+   platform's picker and the `change` event, and gives up only its own box —
+   which is the thing that could not be sized. `opacity:0` rather than
+   `visibility:hidden`, because a hidden control is not clickable. */
+.app .note-sel-w > .note-sel{
+  position:absolute;inset:0;width:100%;height:100%;
+  opacity:0;border:0;padding:0;cursor:pointer}
+.app .note-sel-ch{display:inline-flex;pointer-events:none}
+.app .note-sel-ch svg{width:16px;height:16px;fill:var(--icon-secondary)}
+/* THE CANCEL'S ARROW NEEDED (0,4,0). §64 draws it as a `mask-image` on an
+   `::after` with `content:''`, and its selector carries `:not(:has(svg))` —
+   `:not()` and `:has()` both take their argument's specificity, so that rule is
+   a class heavier than it reads and a (0,2,0) restatement loses in silence,
+   which is exactly what shipped. §63 §7b's trap, on a pseudo-element. */
+.app .note-form-b .btn.note-cancel::after{content:none}
+
+/* ------------------------------------------------------------------ 99.8 ---
+   THE HEADING ROW'S BUTTON HOLDS THE SECTION'S RIGHT EDGE
+   Maryam, 2 Sep 2026: "the top add note should be right aligned."
+
+   THE BUTTON WAS ALREADY PINNED AND THE ROW WAS THE PROBLEM. §24.130 gives
+   `.sec-h > .btn` `margin-left:auto`, so nothing was needed there; what put the
+   button 24px inside the panel below it was `padding-right` on the ROW.
+
+   AND IT TOOK TWO GOES BECAUSE THE RULE THAT SETS IT IS A CLASS HEAVIER THAN IT
+   LOOKS. `.app .page:not(.form-page) .sec > .sec-h{padding-right:var(--s06)}` is
+   **(0,5,0)** — `:not()` carries its argument's specificity, which is §63 §7b's
+   trap and the same arithmetic §73 records for `:has()`. A restatement keyed on
+   `.sec:has(> .note-list) > .sec-h` is (0,4,0) and lost in silence: the rule was
+   in the build, it matched, and the padding did not move. Measured by walking
+   the stylesheet for every rule that matches this element and sets padding —
+   which is the only way to see a specificity loss, since a grep tells you the
+   rule exists and the computed value tells you it did not win.
+
+   SO IT IS STATED AT (0,6,0), by taking that rule's own selector and adding the
+   `:has()` — the narrowest thing that outranks it, and it says plainly which
+   rule it is answering.
+   -------------------------------------------------------------------------- */
+.app .page:not(.form-page) .sec:has(> .note-panel) > .sec-h,
+.app .page:not(.form-page) .sec:has(> .note-list) > .sec-h{padding-right:0}

@@ -150,12 +150,12 @@ const CFG = {
   booked:  {nav:'early',  track:'Explorer', pred:true,  booked:true},
   assessed:{nav:'assessed',track:'Explorer',level:'E3',pred:false},
   week1:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:4,  week:1,  done:0,  open:0, avg:null, mins:0},
-  day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260},
-  day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:87,  mins:700, reinterview:true, finished:true},
-  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:87, mins:700},
+  day34:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260},
+  day90:   {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:90, week:13, done:13, open:12, avg:83,  mins:700, reinterview:true, finished:true},
+  promoted:{nav:'next',   track:'Explorer', level:'E4', pred:false, complete:true, day:90, week:13, done:13, avg:83, mins:700},
   /* THE RED ACCENT DEMO — day 34's record, copied. Typed out rather than
      spread from `CFG.day34` so the two can be edited apart; see `RED_DEMO`. */
-  reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:88,   mins:260}
+  reddemo: {nav:'full',   track:'Explorer', level:'E3', pred:false, enrolled:true, day:34, week:5,  done:5,  open:3, avg:75,   mins:260}
 };
 
 const CFG_BASE = {track:'Explorer', level:'E3', pred:true, day:1, week:1, done:0, open:0, avg:null, mins:0};
@@ -199,7 +199,43 @@ const CH = [
   ['Leading Through Change',60]
 ];
 
-const SCORE = [92,88,84,79,86,90,83,88,91,85,87,84,89];
+/* THE THIRTEEN ASSESSMENT SCORES, AND THE FIRST FIVE WERE RESHAPED TO THE
+   CURVE MARYAM DREW (2 Sep 2026: "the graph first point starts from 75%", "the
+   red point should be at 50%", "the last point should be the top point").
+
+   THE SHAPE IS SET HERE RATHER THAN IN THE CHART, WHICH IS THE WHOLE POINT.
+   `perfChart` plots `SCORE.slice(0, f.done)` and eight other surfaces read the
+   same array — the per-chapter rows on Course Progress, the scores sheet,
+   `perfInsight`, the pulse's standing, and every Tal summary that says "5 of 13
+   chapters at N%". Giving the chart its own numbers would have made the
+   drawing disagree with the table under it, which is the one thing this build
+   does not allow. One record, nine readers, so the curve is the data.
+
+   WHAT THE FIVE NOW SAY: 75, 80, 78, 50, 92. The first point opens at 75, the
+   low is 50 at chapter 4 and the fifth is the highest — the three positions
+   asked for, and nothing between them was invented beyond the two middle
+   values that make the line read as a dip rather than a step.
+
+   CHAPTER 4 BEING THE FLOOR IS NOT A COINCIDENCE AND IS WORTH KEEPING. It is
+   `Delegation Without Drop-Off`, it is `GROWTH[0]`, it is one of the two
+   `RPT_GROWTH` focus areas, and `SCORES` puts Delegation at 41 on the quiz —
+   the lowest of the five bands. So a 50 here is the same story the quiz, the
+   report and the course all already tell, and `perfInsight` names it without
+   being told to.
+
+   AND THE THIRTEENTH WENT 89 -> 94 SO THE RULE HOLDS AT DAY 90 TOO. "The last
+   point should be the top point" is a statement about the line, and the line
+   is five points on day 34 and thirteen on day 90; leaving 89 there would have
+   made the shape true on one stage and false on the other, with the green halo
+   jumping back to chapter 5.
+
+   THE CONSEQUENCE IS REAL AND IS NOT HIDDEN: day 34's average falls 88 -> 75,
+   which is BELOW the cohort's 79. Every surface follows by derivation (`CFG`'s
+   `avg` is restated below, and the Tal summaries template it), and it fits the
+   stage rather than fighting it — day 34 is the stalling dashboard, the one
+   with a chapter opened four times unfinished and a task overdue. Day 90 lands
+   at 83, so the 90 days still read as a recovery. */
+const SCORE = [75,80,78,50,92,90,83,88,91,85,87,84,94];
 
 const OPEN_DATES = ['','','','','','Mon, Aug 18','Mon, Aug 25','Mon, Sep 1','Mon, Sep 8','Mon, Sep 15','Mon, Sep 22','Mon, Sep 29','Mon, Oct 6'];
 
@@ -245,7 +281,7 @@ const NOTIF = {
   day90:[
     {ic:'calendar', t:'Your re-interview is available',b:'The 90 days are complete. Book it to have them assessed.', w:'Today', go:'agents',      unread:1},
     {ic:'document', t:'Your 90-day summary is ready to read',b:'Priya signs it once the re-interview is booked.',       w:'Today', go:'transcript',  unread:1},
-    {ic:'checkFilled',t:'Course complete',           b:'All 13 chapters done, 87% average.',                           w:'Yesterday', go:'transcript', unread:1}
+    {ic:'checkFilled',t:'Course complete',           b:'All 13 chapters done, 83% average.',                           w:'Yesterday', go:'transcript', unread:1}
   ],
   promoted:[
     {ic:'trophy',   t:'Promoted to Explorer – E4',    b:'Priya signed the decision on November 21.',                    w:'Today', go:'level',       unread:1},
@@ -264,7 +300,7 @@ const NOTIF = {
 
 const NAVSETS = {
   early:   [['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['billing','Payments','wallet']],
-  assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Enroll','ticket'],['billing','Payments','wallet']],
+  assessed:[['dashboard','Dashboard','dashboard'],['level','My Level','growth'],['interviews','Interviews','calendar'],['enrol','Course Enrollment','ticket'],['billing','Payments','wallet']],
   /* THE MODULE IS "ACHIEVEMENTS" AND THE CURRENCY IS STILL "POINTS" (Maryam,
      31 Aug 2026). The rename is the module's NAME — this label, the page's
      `ph()`, its `crumb()`, Tal's `where` map and the "Open Achievements" button
@@ -283,8 +319,28 @@ const NAVSETS = {
      leader volunteers — they are unpaid, and what they earn is the
      certification. So `wallet` never appears on this rail, and no page under it
      shows a fee. Every key is prefixed `lead` because these views live in the
-     same `V` registry as the candidate's and `messages` is a page in both. */
-  leader:  [['leadDash','Dashboard','dashboard'],['leadCalls','Calls','calendar'],['leadEvals','Evaluations','edit'],['leadCohorts','Cohorts','group'],['leadReports','Course Reports','chart'],['leadMessages','Messages','chat',2],['leadCerts','Certifications','certificate']]
+     same `V` registry as the candidate's and `messages` is a page in both.
+
+     THE SECOND SLOT IS "UPCOMING SESSIONS" (Maryam, 2 Sep 2026), and it is the
+     third name that slot has had. It was Sessions when the leader interviewed
+     candidates, became Calls on 1 Sep when they stopped (a cohort leader takes
+     cohort calls and interviews nobody — lead.js's head is the argument), and
+     is now Upcoming Sessions. The KEY is `leadCalls` throughout and does not
+     move: it is in `PARENT`, in five `data-go`s and in `PAGESUM`, and a rail
+     label is a word on a screen while a key is a contract between files.
+     FOUR OTHER PLACES NAME THE MODULE and all four follow, because `pageLabel`
+     (ai11) reads THIS label for the breadcrumb and a page whose trail says
+     "Upcoming Sessions" must not be introduced anywhere as "Calls":
+     `V.leadCalls`'s own `crumb()` and `ph()` (lead3), `LEAD_TAL.where` (lead.js)
+     and the button on `V.leadProfile` (lead4). The two buttons that POINT at it
+     — the black card's "View all sessions" and the dashboard section's "All
+     sessions" — follow the same rule lead.js records for that pair: the label
+     is the destination.
+     WHAT DOES NOT FOLLOW IS THE PROSE. A cohort call is still a call, so
+     `PAGESUM.leadCalls`, `lcTitle`'s "Cohort 41 call" and the dashboard's own
+     "Cohort Calls" heading are unchanged — the module is being named, not the
+     thing it holds. */
+  leader:  [['leadDash','Dashboard','dashboard'],['leadCalls','Upcoming Sessions','calendar'],['leadEvals','Evaluations','edit'],['leadCohorts','Cohorts','group'],['leadReports','Course Reports','chart'],['leadMessages','Messages','chat',2],['leadCerts','Certifications','certificate']]
 };
 
 const PARENT = {report:'level', result:'level', agents:'interviews', agent:'interviews',

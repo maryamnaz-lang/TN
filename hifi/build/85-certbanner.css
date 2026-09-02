@@ -300,3 +300,81 @@
 @container app (min-width:900px){
   .app .modhead > .head-col > .score{flex:1;min-width:0}
 }
+
+/* ------------------------------------------------------------------- 85.5 ---
+   THE PULSE'S COLUMNS ON A BLACK CARD — the half that is not type
+
+   Maryam, 1 Sep 2026: "the your pulse should be in black card above the 4
+   blocks." §63 §19b inks the words; this is everything else the two columns
+   draw, and all three items were measured wrong on the dark ground before it.
+
+   1. THE COLUMN DIVIDER WAS `--rule` — #d7d5cd, a hairline picked to be nearly
+      invisible on white paper and therefore one of the brightest objects on
+      `--gray-100`. `--on-dark-rule` is white at 16%, which is the token §75's
+      recipe already hands every seam inside a black card; the stacked tier's
+      `border-top` (§72.582) takes it too, or the same line comes back below 900.
+
+   2. THE PACE BAR WAS INVERTED, WHICH IS THE ONE THAT WOULD HAVE SHIPPED AS A
+      LIE. `.pulse-seg > i` is `--layer-accent-01` for a block that has NOT been
+      earned and `--mk` for one that has. Measured on the card: unlit
+      `rgb(220,218,211)` against lit `rgb(28,122,94)` — so on black the EMPTY
+      blocks were pale and bright and the filled ones were dark and dim, and a
+      reader would have counted the wrong ones. The unlit block becomes
+      `--on-dark-fill` (white at 12%), which is the card's own register for "a
+      slot with nothing in it", and it is now darker than the lit one at every
+      hue.
+
+   3. THE THREE MARK HUES ARE RE-POINTED RATHER THAN THE RULES RESTATED, which
+      is §67/§83's technique and the reason it is worth using here: `--mk-1/2/3`
+      are read by the column marks, the lit pace blocks AND `.pulse-seg > i.now`'s
+      `color-mix`, so one re-point moves all three and any later reader gets it
+      free. §12's values (#0f6ba8, #1c7a5e, #7c4bb0) are picked to carry on white
+      and measure 2.4:1 to 3.2:1 on `--gray-100` — under the 3:1 a graphical
+      object needs. These are the same three hues lightened to sit on black; the
+      HUE is unchanged so a chapter is still blue in both places, which is §65's
+      rule for why they are named rather than cycled.
+
+   SCOPED TO `.dark-card .pulse`, NOT TO `.sec-pulse`. What has changed is the
+   GROUND, and `.dark-card` is the class that means that — the dashboards' pulse
+   is `.sec-pulse` too and already gets all of this by wearing both. A future
+   white `.sec-pulse`, if there is one, is untouched.
+   -------------------------------------------------------------------------- */
+.app .dark-card .pulse{
+  --mk-1:#6bb6e8;
+  --mk-2:#5fc9a4;
+  --mk-3:#c2a0e8}
+.app .dark-card .pulse{border-top-color:var(--on-dark-rule)}
+.app .dark-card .pulse > .pulse-c + .pulse-c::before{background:var(--on-dark-rule)}
+
+/* 4. THE STANDING CELLS WERE STILL WHITE, AND THAT ONE WAS VISIBLE FROM ACROSS
+      THE ROOM. §15.1871 gives `.stand-c` `background-color:var(--background)` —
+      each of the three rows is its own white plate, which is right on a white
+      page where it is what separates a pressable row from the sheet. Inside the
+      black card it drew a pale panel down the whole standing column, and §63
+      §19b's on-dark ink then landed ON that panel: white text on white, which
+      is the same 1:1 the ink block had just fixed one element over.
+
+      IT IS THE `.tile` / `.note` LINE OF §75.5, ONE COMPONENT FURTHER. That
+      section already turns those two grounds transparent inside a card for
+      exactly this reason; `.stand-c` was simply not on the list, because no
+      black card had ever held one. Transparent rather than re-tinted: the card's
+      own ground is the row's ground, and a second dark fill would make three
+      plates on a plate.
+
+      THE ROWS ARE STILL PRESSABLE and nothing says so less than before — they
+      are `<button>`s and the mark, the label and the figure are the affordance
+      on both grounds. */
+.app .dark-card .pulse .stand > .stand-c{background-color:transparent}
+/* `:not(.done):not(.now)` IS LOAD-BEARING AND THE FIRST VERSION HAD IT WRONG.
+   Written as `.app .dark-card .pulse-seg > i` this is (0,3,1) — exactly the
+   weight of §72.393's `.app .pulse-seg > i.done` — so being in a later layer it
+   won on ORDER and painted the earned blocks the same 12% white as the empty
+   ones. The bar came out uniformly blank at every stage: the inversion this
+   section exists to fix, replaced by no signal at all. Measured before the
+   `:not()`: lit and unlit both `rgba(255,255,255,.12)`.
+   Excluding the two states leaves §72's `--mk` rules to draw them and makes
+   this rule what it claims to be — the EMPTY block only. */
+.app .dark-card .pulse-seg > i:not(.done):not(.now){background-color:var(--on-dark-fill)}
+@container app (max-width:899.98px){
+  .app .dark-card .pulse > .pulse-c + .pulse-c{border-top-color:var(--on-dark-rule)}
+}

@@ -354,7 +354,7 @@
   .app .form-page .sec:has(> .sec-h){
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .app .form-page .sec:has(> .sec-h) > .sec-h{
-    padding:0;border-right:0;margin-bottom:var(--s05);min-height:0}
+    padding:0;border-right:0;margin-bottom:var(--sec-h-gap);min-height:0}
   .app .form-page .sec:has(> .sec-h) > :not(.sec-h){padding-left:0}
   .app .form-page{max-width:720px}
 }
@@ -424,6 +424,15 @@
    floating button's glyph. Same element, masked rather than filled, so no
    markup anywhere has to change.
    ========================================================================== */
+/* THE SCENE CHOOSER'S ASK IS NOT ON THIS LIST, AND THAT WAS A CORRECTION.
+   It was added here for one build, when the question sat on each of the six
+   cards and wore this 13px accent sparkle. Maryam named a different mark when
+   the six became one (1 Sep 2026): "the star I am asking you to use is the one
+   we are using with the summary on each page" — §70.2a's, the ramp-painted
+   `--ai-star`, which §73.147 already ships as `.aih-mk`. So `.scene-ask` wears
+   that class and this rule is back to its three readers. The two stars are
+   different objects on purpose: this one is the accent, marking a control;
+   that one is the AI ramp, marking Tal. */
 .app .chip-tal .sk-mark,.app .tal-star .sk-mark,.app .av .sk-mark{
   width:13px;height:13px;flex:none;animation:none;
   background-color:var(--accent);

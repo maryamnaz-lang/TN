@@ -620,6 +620,182 @@ LAYERS = [
     # list), so the square stays equal to the three lines beside it in the box
     # exactly as it does in the portal.
     '86-cohortart.css',
+    # WHAT YOU'LL LEARN — the tick list and the chip row, and all of it
+    # crosses. `.lrn*` is a two-column list with a mark against each item and
+    # `.skl*` is a row of pill tokens with a text control on the end: two of the
+    # plainest components in the box, drawn in grid and flex off the spacing
+    # scale and `--layer-02`, with no render pass and no JS anywhere near them.
+    # A second portal listing what a thing includes wants the first; one listing
+    # tags or topics wants the second.
+    # `.skl-full` IS THE ONE RULE THAT NEEDS THE DIALOG, and §02's `.modal` /
+    # `.sheet` are already in the system — so a hand-authored page can write the
+    # "Show all" sheet from `gallery.html`'s own modal recipe plus this class.
+    # The BOOLEAN behind it does not cross and does not need to: the sheet is
+    # `.on` or not, which is one class a page can toggle however it likes.
+    '87-learnsec.css',
+    # YOUR PERFORMANCE — the figure/plot/conclusion block, and all of it
+    # crosses. `.perf*` is a grid, a legend, an inline SVG and a hairline
+    # footer strip: no render pass, no JS, and every value off the spacing
+    # scale, `--rule`, `--dv-grad-a/b` and §12's success and danger inks —
+    # all of which the system already ships. A second portal reporting a
+    # score over time wants exactly this, and it is the only chart in the box
+    # with a y axis.
+    # THE INSIGHT'S MARK NEEDS §70's `--ai-star` / `--ai-grad`, which cross
+    # too, so the sparkle is drawn rather than half-shipped — the failure
+    # §70's own entry in this list records for `.jrn-pill` and `.rec-alt`.
+    # `.kv-list` CROSSES WITH IT: one flex column round §02's `.kv` rows, for
+    # a dialog listing label-and-value pairs.
+    '88-perfsec.css',
+    # THE COHORT PAGE'S UI, and all of it crosses. `.cmt*` is a comment
+    # thread — a grid, a round mark, a name row, prose and three borderless
+    # controls — which is the one discussion shape the box did not have (it
+    # ships the two-sided chat as `.m*` and now the many-sided board too). No
+    # render pass, no JS, no state: the row is markup plus these rules.
+    # THE THREE ROUND-AVATAR RULES CROSS AS WRITTEN and are deliberately
+    # SCOPED — `.cmt-av`, `.b-who`, `.mem-av` — so a hand-authored page gets
+    # round photographs in a comment thread, a ranking and a member list and
+    # square ones everywhere else, which is the portal's own arrangement
+    # rather than a global that would round the app bar too.
+    '89-cohortui.css',
+    # THE AWAITING-EVALUATIONS ROW (§90) — two people side by side inside a
+    # black card, each with a ring and a quiet action, an inset hairline
+    # between them, stacking below 900.
+    # IT CROSSES WHOLE AND IT IS WORTH HAVING: `.ev-row` is the answer to "two
+    # or three of something abreast inside a `.dark-card`", which the box could
+    # not draw before — §72's pulse columns are for a white section and carry
+    # that section's own type and marks. Every class is new, so nothing is
+    # excluded and nothing collides.
+    # NO JS AND NO RENDER PASS. The row is markup plus these rules; the ring is
+    # `ring(pct,label)`, which the design system already ships as `dsRing` — so
+    # a hand-authored page writes the two circles and the `--arc` length the way
+    # `gallery.html` documents under Signature.
+    '90-evalrow.css',
+    # THE 90-DAY SUMMARY PAGE (§91) — a 280px figure column beside a prose
+    # column, a hairline between them, stacking below 900.
+    # IT CROSSES WHOLE: `.sump` is "evidence beside a decision", which is a page
+    # shape any second portal will want and the box could not draw — §76's
+    # three-panel booking grid is the only other two-column section in it and
+    # that one is about a picker. The figure row (`.sump-f`) is also the answer
+    # to "a label and a value with a mark, in a narrow column", which `.stats`
+    # cannot be at 280px.
+    # NO JS AND NO RENDER PASS. The ring is `ring(pct,label)` — the same two
+    # circles and `--arc` length `gallery.html` documents under Signature.
+    '91-sumpage.css',
+    # THE COHORT CARD (§92) — a cover, a pill over it, a name, a derived line
+    # and four labelled rows on one grid, in a `auto-fit` grid of them.
+    # IT CROSSES WHOLE AND IT IS THE SHAPE THE BOX WAS MISSING: every other card
+    # this system ships is a ROW (`.gcard`, `.cardrow`, `.ag`) or a black card,
+    # so "three of something abreast, each with its own picture" had no answer in
+    # it. Every class is new, so nothing collides and nothing is excluded.
+    # ITS TWO REUSED PARTS ALREADY SHIP. The marks are §65's `.prog-ic` (the
+    # chip, its wash and its 16px glyph) and the progress bar is §03's `.bar`, so
+    # a hand-authored page writes the markup and gets both.
+    # NO JS AND NO RENDER PASS — the hue of the pill and of each mark is a custom
+    # property the markup states, which is `pulseCol`'s idiom and needs no pass.
+    # THE ONE THING THAT DOES NOT CROSS IS THE PICTURE: `COHORT_ART` is the
+    # portal's own three covers, so a second portal points the `<img>` at its
+    # own artwork exactly as it does for `.gcard-art`.
+    '92-cohortcards.css',
+    # A ROW WITH TWO ACTIONS STACKS ON A PHONE (§93) — below 600 a `.cardrow`
+    # whose action cell holds more than one button wraps that cell onto its own
+    # line, indented to the text column.
+    # IT CROSSES BECAUSE IT IS A FIX TO A COMPONENT THE BOX ALREADY SHIPS, not a
+    # new one: `.cardrow` and `.cardrow-a` are both in the output and §02.282's
+    # `flex:none` crosses with them, so a hand-authored page that puts two
+    # buttons in a row inherits the 55px text column unless this comes too.
+    # KEYED ON THE SHAPE (`> .cardrow-a > .btn + .btn`), so it reaches a second
+    # portal's own two-action rows with no class to remember.
+    # NO JS AND NO RENDER PASS — flex and one derived padding.
+    '93-tworowact.css',
+    # THE POINTS LIST'S MARK (§94) — `.aw-ph`, a duotone glyph on a 36px disc
+    # tinted 12% of the row's own `--mk`, with an unearned state that re-points
+    # that one variable to grey.
+    # IT CROSSES BECAUSE BOTH HALVES DO. icons.js is copied verbatim, so `P` and
+    # the nine Phosphor paths are already in `talentnext-ds.js`; shipping the
+    # proxy with no rules to draw its output is precisely the half-shipped
+    # component this build has been burned by (§70's `.jrn-pill`).
+    # THE HUE IS THE MARKUP'S — `style="--mk:var(--mk-3)"` — so a hand-authored
+    # page gets the whole mark with no class per colour, which is `pulseCol`'s
+    # idiom and the reason there is no `nth-child` cycle in here.
+    # NO JS AND NO RENDER PASS.
+    '94-phmark.css',
+    # THE ATTENTION CARD AND THE NAMED ROW LINK (§95) — one person inside a
+    # `.dark-card` (face, name, two lines, a ring and a quiet action at the
+    # foot), and a table row that ends in a named blue link instead of a
+    # chevron.
+    # IT CROSSES WHOLE AND IT IS THE SINGULAR OF §90. That layer answers "two or
+    # three people abreast inside a black card"; this one answers "one person
+    # and what to do about them", which is the commoner shape and the box could
+    # not draw it. Every class is new, so nothing is excluded and nothing
+    # collides.
+    # ITS REUSED PARTS ALREADY SHIP: `.dark-card` (§75), `avatar()`, `.flag-t`
+    # (§31) and the ring, which the box carries as `dsRing`. `.ldr-view` is
+    # layout plus §63 §26's one ink, so a hand-authored table gets it by writing
+    # the span.
+    # NO JS AND NO RENDER PASS. The card's own action is a `data-` attribute the
+    # host page wires; nothing here reads `S`.
+    '95-attention.css',
+    # THE CERTIFICATES TAB (§96) — the hero row inside a black card, the badge
+    # slot both drawings share, and the `auto-fill` grid of upright cards.
+    # IT CROSSES BECAUSE THE CARD DOES. `.dark-card` is already in the output and
+    # §75's own note is that a caller "states only what is different about its
+    # own content" — this is that statement for the commonest such content: a
+    # mark beside two lines with the actions at the end of the row.
+    # THE ONE THING THAT DOES NOT CROSS IS THE PICTURE. `CERT_ART` is Maryam's
+    # own six badges, so a hand-authored page points the `<img>` at its own
+    # artwork exactly as it does for `.gcard-art` and `.cco-art`.
+    # NO JS AND NO RENDER PASS.
+    '96-certgrid.css',
+    # THE LEVEL IS A BLACK CARD ON BOTH PAGES (§97) — the hero's page gutter and
+    # the ladder wing's on-dark values.
+    # IT CROSSES BECAUSE BOTH COMPONENTS DO: `.lvl-hero` and `.wing-lvl` are in
+    # the output and `gallery.html` documents the wing under Signature, so a
+    # hand-authored page that wraps one in a `.dark-card` gets the whole
+    # translation rather than a ladder that vanishes into the ground.
+    # NO JS AND NO RENDER PASS.
+    '97-lvldark.css',
+    # A TAB STRIP HAS AIR UNDER IT (§98) — `--s06` under both tab strips, and a
+    # highlighted leaderboard row with no hairline above or below it.
+    # IT CROSSES BECAUSE `.tabs`, `.cs` and `.brow` all ship. The spacing half is
+    # the more useful one for a second portal: a tab strip is the commonest thing
+    # a hand-authored page builds out of this box, and 0 is what it gets without
+    # this rule.
+    # NO JS AND NO RENDER PASS.
+    '98-tabgap.css',
+    # YOUR PRIVATE NOTES (§99) — one bordered white panel with three contents:
+    # the empty state, the list with its toolbar, and the composer.
+    # IT CROSSES WHOLE. Every class is new, so nothing collides and nothing is
+    # excluded, and the panel is §41's frame — the box's one bounded panel —
+    # holding a shape it could not previously draw: a small stateful editor.
+    # THE HUE IS THE MARKUP'S, not this layer's: the row states `--note-ink` and
+    # `--note-bg` inline (§72's `pulseCol` idiom), so a hand-authored page picks
+    # its own colours with no class per hue.
+    # ADDED FROM A NEIGHBOURING SESSION'S LAYER so `check_coverage` passes and
+    # the design system can be rebuilt — if the author of §99 wants it in
+    # `NOT_IN_DS` instead, this entry is the one to move.
+    '99-notes.css',
+    # THE MESSAGE THREAD (§100) — the chat header, the bubble's rounded corner
+    # and square tail, the read tick, and a day marker with no rule.
+    # IT CROSSES BECAUSE THE THREAD DOES: `.msgs`, `.m`, `.m-b` and the composer
+    # are all in the output and `gallery.html` documents them, so a second
+    # portal that builds a thread would otherwise get square bubbles and a page
+    # heading where the person should be.
+    # NO JS AND NO RENDER PASS — the four header controls are inert by design
+    # and the host page wires them if it has somewhere for them to go.
+    '100-msgui.css',
+    # THE BLOCK RHYTHM (§101) — two adjacent blocky rows sit `--pad-x` apart.
+    # IT CROSSES, AND IT IS ONE OF THE FEW LAYERS THAT COSTS A SECOND PORTAL
+    # NOTHING TO ADOPT: every selector is `.page > .sec` plus a `:has()` test on
+    # what the section CONTAINS, so a hand-authored page that stacks a `.stats`
+    # band under a `.dark-card` gets the right gap without knowing the rule
+    # exists. `.stats`, `.facts`, `.tile`, `.note`, `.certban` and `.dark-card`
+    # are all already in the output and all six are documented in
+    # `gallery.html`, so there is no half-shipped family here.
+    # IT READS `--pad-x`, WHICH THE HOST OWNS: §10 declares 16/24/32 on `:root`
+    # and §14 re-points it to `--s07` on `.page`. A page built on
+    # `starter.html` has both; a page that invents its own gutter gets its own
+    # number, which is the correct behaviour rather than a bug.
+    '101-blockgap.css',
 ]
 
 # ==========================================================================
@@ -1574,6 +1750,18 @@ def main():
    states that for you; wrapping `inner('name')` in an <svg> of your own means
    stating it yourself, or the mark is an invisible speck in the corner and
    nothing throws. `TN_MARK` and `CHEV` keep their own boxes.
+
+   THERE IS A SECOND FAMILY AND IT IS FOR ONE KIND OF OBJECT. `P.flame` is
+   Phosphor Duotone (MIT), on its own `0 0 256 256` box — two paths, a pale body
+   and a solid figure, both `currentColor`, so one hue paints the whole mark:
+
+       <span class="aw-ph" style="--mk:var(--mk-3)">${P.graduationCap}</span>
+
+   Use it for things somebody EARNED — points, badges, streaks — and `I` for
+   every verb and every control. The two must not both name the same object on
+   one page; that is the line the portal draws and the reason a second family is
+   allowed at all. §94 is the mark's drawing and icons.js's own head is the long
+   version of the argument.
    ========================================================================== */
 """
     js_tail = """

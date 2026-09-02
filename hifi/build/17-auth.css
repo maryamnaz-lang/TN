@@ -263,7 +263,7 @@
      ------------------------------------------------------------------------ */
   .app .auth-card .page > .sec.sec-rule{
     padding-top:24px;padding-bottom:24px;border-top:1px solid var(--auth-rule)}
-  .auth-card .sec-rule > .sec-h{margin-bottom:16px;min-height:0;padding:0}
+  .auth-card .sec-rule > .sec-h{margin-bottom:var(--sec-h-gap);min-height:0;padding:0}
   .auth-card .sec-rule > .sec-h h2{margin:0}
 
   /* ------------------------------------------------------------------ 7 ---

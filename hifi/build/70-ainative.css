@@ -1107,7 +1107,7 @@
    this unconditional (0,4,0) is what answers the phone. Deleting either one
    brings the doubled edge back at one end of the range. */
 .app .page > .sec:has(+ .sec-qa)::after{display:none}
-.app .sec-qa > .sec-h{margin:0 0 20px;padding:0}
+.app .sec-qa > .sec-h{margin:0 0 var(--sec-h-gap);padding:0}
 
 /* AND THE LABEL COLUMN HAS TO BE OPTED OUT OF BY NAME NOW — trap 13. §10.4
    turns any `.sec` with a `.sec-h` into a 184px label column plus content at
@@ -1126,7 +1126,7 @@
   .app .page:not(.form-page) .sec-qa{
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .app .page:not(.form-page) .sec-qa > .sec-h{
-    border-right:0;min-height:0;margin:0 0 20px;padding:0}
+    border-right:0;min-height:0;margin:0 0 var(--sec-h-gap);padding:0}
   .app .page:not(.form-page) .sec-qa > :not(.sec-h){
     padding-left:0;padding-right:0}
 }
@@ -1144,7 +1144,16 @@
    difference with a margin so the nesting stays out of the markup. */
 .app .qa-c{
   appearance:none;-webkit-appearance:none;
-  display:flex;align-items:center;gap:var(--s04);
+  /* TOP-ALIGNED, NOT CENTRED — Maryam, 1 Sep 2026: "the content and icons both
+     should be aligned from top, this is disturbing the whole structure."
+     `align-items:center` centred the mark and the text block in a card whose
+     height is set by the TALLEST card in the row, so two cards side by side
+     started their titles at different heights whenever their descriptions ran
+     to different numbers of lines — measured at 1280, "Your session, step by
+     step" (two lines) began at y=1 and "What to bring" (one line) at y=11.
+     The card is a heading with a note under it, not a centred label, so its
+     content hangs from the top and the slack falls to the bottom. */
+  display:flex;align-items:flex-start;gap:var(--s04);
   width:100%;margin:0;min-height:74px;
   padding:var(--s05) var(--s06) var(--s05) 20px;
   border:1px solid rgba(0,0,0,.1);
@@ -1154,8 +1163,21 @@
 .app .qa-c:hover{border-color:var(--text-primary)}
 .app .qa-c:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
 
-.app .qa-ic{flex:none;display:grid;place-items:center;width:16px;height:16px;
-  align-self:flex-start;margin-top:3px}
+/* 20px, MATCHING THE FIGURE CELL'S BARE GLYPH (Maryam, 1 Sep 2026: "the icon
+   size that you are gonna increase for the above blocks icons, do the same for
+   the quick action icons as well"). This mark never had a chip — it has always
+   been a bare glyph on the card — so nothing is being removed here; it is the
+   second half of one instruction, so that the two marks a dashboard draws are
+   the same size. §29's `.stat-ic` and §72's `.pulse-ic` are the other two at
+   20, which is now the product's one bare-glyph size.
+
+   `margin-top` DROPS 3 → 1 WITH IT. That offset optically centred a 16px glyph
+   against the card's 21px title line; four more pixels of glyph is two more
+   above the cap height, so the same correction is now 1. `align-self` stays
+   `flex-start` — the card is 74 tall and the mark belongs on the title's line,
+   not in the middle of the two. */
+.app .qa-ic{flex:none;display:grid;place-items:center;width:20px;height:20px;
+  align-self:flex-start;margin-top:1px}
 /* A HUE PER CARD, NAMED RATHER THAN CYCLED (Maryam, 30 Aug 2026). Both cards
    carried the accent, which made the two marks one mark drawn twice; the file
    gives the cup #00A43C and the flash #0488C5, so the icon says which KIND of
@@ -1171,13 +1193,22 @@
    the journey's done-step green (§63 §10) and #0488C5 is the match figure and
    the blue overlap tag. So the page has three greens and three blues that are
    the same three, not six near-misses. */
-.app .qa-ic svg{width:16px;height:16px;fill:var(--ai-1)}
+.app .qa-ic svg{width:20px;height:20px;fill:var(--ai-1)}
 .app .qa-ic.ic-quiz svg{fill:#00a43c}
 .app .qa-ic.ic-prep svg{fill:#0488c5}
 
 .app .qa-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
+/* THE ARROW IS RIGHT AND MIDDLE OF THE CARD — Maryam, 1 Sep 2026: "the arrow
+   and the numbers on both screenshots should be right middle aligned to the
+   block." `align-self:center` because the card is `align-items:flex-start`
+   now (see `.qa-c` above): the text block hangs from the top and, without
+   this, the arrow hung with it and sat on the title's line rather than in the
+   card. `margin-left:auto` rather than a fixed 20 so it holds the right edge
+   whatever the text does — 20 was the gap to a `.qa-b` that happened to fill
+   the row, and a one-line card left the arrow floating in the middle of the
+   card's slack. */
 .app .qa-go{flex:none;display:grid;place-items:center;width:16px;height:16px;
-  margin-left:20px}
+  align-self:center;margin-left:auto}
 .app .qa-go svg{width:16px;height:16px;fill:currentColor}
 
 /* --------------------------------------------------------------------- 7 ---
@@ -1382,3 +1413,52 @@
    the one alignment in a person row that has to hold. Top-aligned, the portrait,
    the name and the mark all start on one line. */
 .app .sec-lead .row-lead{align-items:flex-start}
+
+/* --------------------------------------------------------------------- 3e ---
+   THE LEADER'S PORTRAIT IS A DISC, AND IT MEASURES ITSELF
+
+   Maryam, 1 Sep 2026: "priya image on right should be in circle and should
+   have the height equal to the right side content."
+
+   THE ROW BECOMES A GRID, WHICH IS THE ONLY FORMATTING CONTEXT THAT CAN DO
+   THIS. §75.3 records the failure in full: in a flex row a box with
+   `width:auto` + `aspect-ratio:1` collapses to its content, and `.av-ph`'s
+   only content is an absolutely-positioned `<img>`, so it contributed zero and
+   shipped an 18px photograph without warning. Flex resolves the main size
+   from the flex base size; a grid item resolves its inline size against its
+   track, so `height:100%` has something to transfer into. Three tracks: the
+   face, the two lines, the message control.
+
+   IT TURNS OVER THE RULE DIRECTLY ABOVE, AND THAT RULE'S REASON IS SPENT.
+   §3d's `align-items:flex-start` was written when the text cell held THREE
+   lines — the expertise line had just moved in — and centring floated the
+   portrait down past the name. The expertise line came off again the next day
+   (the note in `views.js` is the record), so the cell is two lines and the
+   portrait is exactly as tall as it. `stretch` is what makes that true rather
+   than a coincidence, and it is stated here so the two rules read in order
+   rather than one of them looking wrong.
+
+   THE CONTROL OPTS OUT ON ITS OWN, which §3c already had it doing:
+   `align-self:flex-start` on `.row-lead > .btn` is why a stretched row does
+   not turn a 36px square into a 48px rectangle. That note calls `stretch` out
+   by name as the thing not to do to it, and it is still right — what changed
+   is that the PORTRAIT now wants it.
+
+   AND `flex:1` ON THE TEXT CELL IS AN INLINE STYLE THAT NOW DOES NOTHING.
+   `views.js` writes `style="flex:1"` on the middle div; `flex` has no meaning
+   on a grid item, so the track does the work instead (`minmax(0,1fr)`). Left
+   in place rather than removed: it is the same markup `V.enrol` and
+   `V.booking` draw through `leaderCard`, where the row is still a flex row and
+   the declaration is load-bearing.
+
+   THE CIRCLE IS ON `.av-ph` HERE AND NOWHERE ELSE. `--radius` is `0px` by
+   token and every avatar in the build is square; §56 grants the one curve
+   this system allows to MARKS, and a portrait introducing a person is that.
+   Scoped to `.sec-lead` so the nine other surfaces reading `.av-ph` — the
+   call row, the roster, the message list, `.ivrow` — are untouched.
+   ------------------------------------------------------------------------ */
+.app .sec-lead .row-lead{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:stretch}
+.app .sec-lead .row-lead > .av-ph{
+  width:auto;height:100%;aspect-ratio:1;border-radius:50%}

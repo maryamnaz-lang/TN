@@ -1,0 +1,200 @@
+/* ==========================================================================
+   96. THE CERTIFICATES TAB — the black card's row and the grid under it
+   Maryam, 2 Sep 2026, with two Credly screenshots: the most recent
+   certification as a black card with the badge on the left and our buttons at
+   the right end of the row, then "All certifications" over upright cards.
+
+   THE CARD ITSELF IS NOT HERE, AND THAT IS §75 WORKING. Ground, haze, inset,
+   32px frame, the head row's rule, the ink flip, the button treatment and the
+   join to the next section all arrive with `.dark-card`. What this layer states
+   is only what is different about this caller's content — the hero row and the
+   grid — which is the discipline §75's own note asks for ("the leader dashboard
+   is the proof: it wears `.dark-card crow-dark` and states not one rule").
+
+   THE BADGE SLOT IS SIZED TO THE ASSET, NOT THE ASSET TO THE SLOT. §86 does the
+   opposite for the cohort covers — a stated box, a 200px source, `contain` — and
+   is right to, because those are 1.8:1 artwork going into a fixed rectangle.
+   These arrived at 70x76 and there is nothing above 1:1 to draw with, so the
+   hero's box IS 70x76 and that picture is never resampled. `--crt-art-w/h` are
+   the two numbers and the grid card overrides them locally — see the note on
+   the card's proportion below, which is the one place this layer accepts an
+   upscale and says why. A 2x export changes the files and not these rules.
+
+   NO `loading="lazy"` ON EITHER `<img>`, AND `.aw-art`'s IS WORTH REVISITING
+   FOR THE SAME REASON. Every picture in this build is a base64 data URI already
+   inside the document, so lazy buys no request and costs a real failure mode:
+   the attribute defers decoding until the element intersects the viewport, and
+   in a tab that never becomes visible — which is how this prototype is usually
+   read, per trap 17 — the intersection never happens and `img.complete` stays
+   false forever. Measured here: three badges at `naturalWidth` 0 until the
+   attribute came off.
+
+   THE GRID IS `auto-fill`, NOT `auto-fit`, AND THE DIFFERENCE IS VISIBLE HERE.
+   At day 34 the list is two cards: `auto-fit` collapses the empty tracks and
+   stretches those two across the full 1200px, which makes a two-item collection
+   look like a two-column layout that lost a row. `auto-fill` keeps the empty
+   tracks, so two cards are two cards and the grid reads the same at every count.
+
+   THE TRACK IS FIXED, NOT `minmax(240px,1fr)` (Maryam, 2 Sep 2026: "the bottom
+   certification cards should be less in width so they look vertical cards not
+   horizontal cards"). The width it is fixed AT is the next note down; what this
+   one settles is that it is fixed at all. A `1fr` maximum made them horizontal:
+   with two cards in a 1380px page each track resolved to 266px against a 196px
+   height, so the card got wider as the collection got emptier. A fixed track
+   means the card is the same object whether there are two of them or twelve,
+   and `justify-content:start` keeps the row left-aligned instead of centring
+   the shortfall.
+
+   240 x ~275 IS THE SIZE, DRAWN ON THE SCREEN RATHER THAN ARGUED (Maryam,
+   2 Sep 2026, with red boxes over the two cards). It shipped at 180 x 218
+   first, which was the smallest width that made the card taller than it is
+   wide; the boxes ask for a card with room in it, so the track goes to 240, the
+   frame to `--s07` — the same 32 every black card pays — and the badge fills
+   the width it now has.
+
+   THE BADGE IS THE HEIGHT, AND IT IS WHERE THE COST IS. The three text lines
+   are 51px however wide the card is, so the mark is the only thing that can
+   make a card upright: 120x130 here against the hero's 70x76. THAT IS A 1.71x
+   UPSCALE on a 70px source and it is the one place in this layer that resamples
+   — visible as softness in the ring type, which is the part of the artwork that
+   carries no meaning at this size. It is refused on the hero, where the mark
+   sits beside 17px words that would show it up. **A 2x export of the six PNGs
+   (140x152, same names, `hifi/build/certs/`) removes this entirely** and is the
+   single change that would most improve this component.
+
+   THE CARD IS SQUARE WITH A HAIRLINE, WHICH IS §76's CALL MADE AGAIN. The
+   reference draws an 8px radius and a soft shadow; `--radius` is 0px by token
+   and §02's opening note is that "depth is expressed as rhythm and rule weight,
+   nothing else". §76 met the same reference decision on the booking panels and
+   answered it with §41's frame — `1px solid var(--rule)` on `--layer-01` — so
+   this takes the same one rather than minting a second bounded-panel look.
+
+   IT IS NOT A `<button>` ANY MORE — it grew a menu, and a button inside a
+   button is invalid interactive nesting (`certGrid`'s note has the argument).
+   What it keeps from that version is `text-align:left`, because the two rows
+   inside the popup are buttons and a UA centres those.
+
+   TRAP 13, AND IT IS THE ONE THING HERE THAT WOULD BREAK THE PAGE. `.crt-grid`
+   is a new wrapper, so the "All certifications" section falls into §10.15's
+   184px label column at desktop — the heading set narrow beside its own cards.
+   Restated inside `@container app (min-width:900px)` per trap 3, and it copies
+   what §10 DOES rather than what it says: no `padding` on the `.sec-h`, because
+   §14.2 zeroes that for every headed section at this width and restating it
+   would set this one heading 32px right of the grid (§69's lesson).
+
+   NOT ONE font-size, font-weight, text-transform OR text colour — §63 §29
+   states the hero's two roles and the card's three.
+   ========================================================================== */
+:root{--crt-art-w:70px;--crt-art-h:76px}
+
+/* ---- the black card's row ---- */
+.app .crt-hero{
+  display:flex;align-items:center;gap:var(--s05);flex-wrap:wrap}
+.app .crt-hero-b{flex:1 1 240px;min-width:0;display:flex;flex-direction:column;gap:2px}
+/* The pair sits at the true end of the row on its own auto margin. `flex:none`
+   so a long certification name wraps in the middle column rather than
+   squeezing the two controls — §93's lesson one component over. */
+.app .crt-hero-a{
+  flex:none;margin-left:auto;display:flex;align-items:center;gap:var(--s04)}
+
+/* ---- the badge, shared by the card and the grid ---- */
+.app .crt-art{
+  flex:none;display:grid;place-items:center;
+  width:var(--crt-art-w);height:var(--crt-art-h)}
+.app .crt-art img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* ---- the grid ---- */
+.app .crt-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,240px);
+  justify-content:start;gap:var(--s05)}
+.app .crt-card{
+  position:relative;
+  display:flex;flex-direction:column;align-items:flex-start;gap:2px;
+  padding:var(--s07);text-align:left;
+  background:var(--layer-01);border:1px solid var(--rule);border-radius:var(--radius)}
+
+/* ---- the card's menu ----
+   THE TOGGLE IS ABSOLUTE, NOT A ROW. A control in the card's flow would take a
+   line of its own above the badge and push the whole composition down; the
+   reference's card puts it in the corner precisely because it is about the card
+   rather than part of it. 12px in from the card's own 32px frame, so it sits
+   inside the padding rather than on the border.
+
+   THE PANEL IS ANCHORED ON THE SAME CORNER and opens DOWN, not up: a card can
+   be the last row of the grid, where a panel opening upward would cover the
+   badge it belongs to. `z-index:2` is enough — the grid paints in order, so
+   only the card's own children are above it, and no ancestor here creates a
+   stacking context that would trap it.
+
+   AND IT FLOATS WITHOUT A SHADOW. Every menu this product draws says it is
+   above the page with a hairline and a solid ground rather than a blur — §02's
+   opening note is that "depth is expressed as rhythm and rule weight, nothing
+   else", and `.acct-menu` in the app bar is the precedent. A `box-shadow` here
+   would be the only one in the build. */
+.app .crt-menu{
+  position:absolute;top:12px;right:12px;z-index:2;
+  display:grid;place-items:center;width:32px;height:32px;
+  background:transparent;border:0;cursor:pointer;color:var(--icon-secondary)}
+.app .crt-menu svg{width:20px;height:20px;fill:currentColor}
+.app .crt-pop{
+  position:absolute;top:44px;right:12px;z-index:3;min-width:168px;
+  display:flex;flex-direction:column;
+  background:var(--layer-01);border:1px solid var(--rule)}
+.app .crt-pop-i{
+  display:flex;align-items:center;gap:var(--s03);
+  padding:var(--s04) var(--s05);
+  background:transparent;border:0;cursor:pointer;text-align:left;
+  color:var(--text-primary)}
+.app .crt-pop-i + .crt-pop-i{border-top:1px solid var(--rule)}
+.app .crt-pop-i svg{width:18px;height:18px;flex:none;fill:currentColor}
+/* THE WORDS ARE LEFT AND THE BADGE IS CENTRED, AND THE TWO ARE NOT IN CONFLICT
+   (Maryam, 2 Sep 2026, over two asks: first "the content should be placed there
+   and should be left aligned", then — with the three text rows boxed in red —
+   "the red lined box shows where the card content needs to be, it should be
+   left aligned. the badge will stay in the center").
+
+   THE FIRST ASK WAS READ TOO WIDELY AND THIS IS THE CORRECTION. It was taken as
+   "everything on one x", so the badge was pulled to `flex-start` with the words
+   on §86's argument that a column of cards is scanned down a straight edge. The
+   second ask says which half that argument was about: the CONTENT. The badge is
+   not a row of the card, it is the card's subject — the one object you identify
+   the certificate by before reading a word of it — and Credly, the reference,
+   centres it for the same reason.
+
+   SO THE STRAIGHT EDGE STILL HOLDS WHERE IT MATTERS. `.crt-card` keeps
+   `align-items:flex-start` and `text-align:left`, so the title, the issuer and
+   the issue date all start at the card's 32px frame and scan down a column
+   cleanly. Only the artwork opts out, which is what `align-self` is for — and
+   §72's standing rule that an image is a picture of the thing rather than a row
+   of it is the same distinction one component over.
+
+   ONE DECLARATION IS THE WHOLE CHANGE, which is the tell that the card was
+   built right: nothing about the words had to move to let the badge back into
+   the middle. */
+.app .crt-card > .crt-art{
+  --crt-art-w:120px;--crt-art-h:130px;
+  align-self:center;margin-bottom:var(--s05)}
+
+/* ---- trap 13 ---- */
+@container app (min-width:900px){
+  .app .sec:has(> .crt-grid){display:block;padding-left:var(--pad-x)}
+  /* `margin-bottom` IS THE FOURTH DECLARATION AND LEAVING IT OUT COST A BUILD.
+     §10.15's label column zeroes it — a heading that sits BESIDE its content
+     has no vertical gap to set — so restating the opt-out without it produced
+     exactly what the reader saw: "All certifications" with the first card
+     touching it (Maryam, 2 Sep 2026: "there is no gap between all certificated
+     heading and the card"). The token is the product's one heading-to-content
+     gap; §69's lesson is copy what the rule DOES, and what §10 does here is
+     four declarations, not three. */
+  .app .sec:has(> .crt-grid) > .sec-h{
+    width:auto;border-right:0;padding:0;margin-bottom:var(--sec-h-gap)}
+}
+
+/* Below 600 the hero stacks: the badge and the words on one line, the two
+   buttons full width under them. `margin-left:auto` is what has to go — §93.3
+   records the same trap on `.crow-a`, where an auto margin quietly disables
+   `align-items:stretch` and a `width:100%` button measures its own content. */
+@container app (max-width:599.98px){
+  .app .crt-hero-a{margin-left:0;flex:1 0 100%}
+  .app .crt-hero-a > .btn{flex:1 1 0;justify-content:center}
+}

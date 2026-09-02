@@ -481,11 +481,59 @@
    what to do with the list, then the field you do it with. The desktop label
    column is for a heading that names a set of rows you scan; this heading
    introduces an instruction, and an instruction belongs under it. */
+/* THE SAME PAIR AT EVERY WIDTH, AND THIS IS THE RULE THAT REACHES ALL OF THEM.
+   The rule inside the 900 tier below cannot reach the phone, where the heading
+   falls to §02/§10's base `margin-bottom:var(--sec-h-gap)` — so the sentence
+   sat 12 under its heading at 390 and 8 at desktop.
+
+   NO `.sec >` IN IT, AND THAT IS TRAP 13 ONE MORE TIME. Written as
+   `.sec > .sec-h:has(+ .all-desc)` this missed the Agents page at both widths:
+   that section wraps its heading (`.sec > .hd-srch > .hd-srch-t > .sec-h`), so
+   the direct-child chain does not match — the same wrapper that drops it out
+   of §63 §8b's heading size and needs naming there too. Twelve sections, one
+   per stage, all reading 12 while every other description read 8. Keyed on the
+   PAIR instead: wherever a `.sec-h` is immediately followed by an `.all-desc`,
+   whatever wraps them, the two belong together.
+
+   `:has(+ .all-desc)` IS ALSO WHAT KEEPS IT NARROW. It cannot reach a `.sec-h`
+   in a sheet or a Tal bubble unless that heading is followed by exactly this
+   class, which only a section lede uses. (0,4,0) clears the base at (0,1,0)
+   and every restatement of it. */
+.app .page .sec-h:has(+ .all-desc){margin-bottom:var(--sec-desc-gap)}
+
+/* AND THE OTHER SHAPE OF THE SAME PAIR — the lede INSIDE the heading row.
+   Where a section's heading row also carries something on its right (a chart
+   legend, a save button), the `<h2>` and its sentence are wrapped together so
+   the pair holds one flex item and the right-hand thing holds the other:
+   `.scene-hb` does it, and §88's `.perf-hb` does it. In that shape the rule
+   above cannot help — the `.all-desc` is no longer the `.sec-h`'s sibling, it
+   is the heading's — so the gap is a margin on the sentence instead.
+
+   IT WAS ZERO ON `.perf-hb` AND THAT IS WHAT THIS FIXES. `.scene-hb` states
+   `display:flex;flex-direction:column;gap:var(--sec-desc-gap)` and gets the
+   pair spacing from the gap; `.perf-hb` states only `flex:1 1 320px`, so its
+   two children sat in block flow with no margin between them and "Your
+   performance" was touching its own description. A wrapper is easy to add and
+   easy to add without the gap, so the rule is stated on the PAIR rather than
+   on the wrapper — the next one gets it without knowing about this.
+
+   SCOPED INSIDE `.sec-h`, which is what stops it doubling. An `.all-desc` that
+   sits AFTER the heading row takes its space from the heading's margin-bottom
+   (above); if this rule reached that one too, the pair would pay both and come
+   out at 16. */
+.app .page .sec-h h2 + .all-desc{margin-top:var(--sec-desc-gap)}
+
 @container app (min-width:900px){
   .app .page:not(.form-page) .sec:has(> .all-desc){
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
+  /* AND THE GAP UNDER IT IS `--sec-desc-gap`, NOT `--sec-h-gap`, because what
+     follows is the heading's own SENTENCE and not the section's content. This
+     is the third of the three places a heading is paired with a description
+     and the only one where the description is a SIBLING rather than a child of
+     the head block — which is why it pays a heading margin at all, and why it
+     was 12 with `.scene-hb` at 8. */
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h{
-    border-right:0;min-height:0;margin:0 0 var(--s04);padding:0}
+    border-right:0;min-height:0;margin:0 0 var(--sec-desc-gap);padding:0}
   .app .page:not(.form-page) .sec:has(> .all-desc) > .sec-h h2{
     font-size:15px;line-height:20px;letter-spacing:-.05px}
   .app .page:not(.form-page) .sec:has(> .all-desc) > :not(.sec-h){
@@ -520,7 +568,7 @@
     display:block;padding-left:var(--pad-x);padding-right:var(--pad-x)}
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h{
     display:flex;align-items:center;gap:var(--s05);
-    border-right:0;min-height:0;margin:0 0 var(--s05);padding:0}
+    border-right:0;min-height:0;margin:0 0 var(--sec-h-gap);padding:0}
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > .sec-h h2{
     font-size:15px;line-height:20px;letter-spacing:-.05px}
   .app .page:not(.form-page) .sec:has(> .sec-h > .sec-h-act) > :not(.sec-h){

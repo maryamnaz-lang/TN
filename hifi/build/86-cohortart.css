@@ -1,7 +1,11 @@
 /* ==========================================================================
    86. THE COHORT COVER — `.gcard-art`
-   Maryam, 1 Sep 2026: "the cohort left blocks should have images … also the
-   block square should have the height equal to the right side content."
+   Maryam, 1 Sep 2026, in three asks: "the cohort left blocks should have
+   images … also the block square should have the height equal to the right side
+   content", then "show the yellow one in the black call cards", then "i need the
+   image blocks in horizontal rectangle form so the image do not cut from sides.
+   this does not mean that you use different widths for different images, just
+   use a rectangle for same width for all."
 
    WHAT IT REPLACES. `gcard`'s leading slot is `.cardrow-ic` — a 40px box with
    a glyph in it — and on the leader's three cohort rows that glyph was `I.group`
@@ -11,19 +15,27 @@
    no face, so it gets a cover; the covers are Maryam's own three and build.py's
    `COHORT_ART` note says how they are cropped and why they are keyed by level.
 
-   THE HEIGHT IS THE CONTENT'S, AND `align-self:stretch` IS THE WHOLE OF IT.
-   The art is a flex item in `.gcard`'s row (§02.229), so stretching it makes its
-   height the row's own content height — no measurement, no `100%` against an
-   indefinite parent, and it follows §63 automatically when a type role changes.
+   IT IS A 9:5 RECTANGLE, AND THE RATIO IS THE PICTURES' OWN. It shipped square
+   for one build and a square is the wrong box for this content: all three covers
+   are ~1.80:1 title cards, so `object-fit:cover` in a square threw away 45% of
+   every one of them from the SIDES — which on a cover whose subject is a line of
+   type is the half that carries the meaning ("BUSINESS FOUNDATIONS" arrived as
+   "BUSINESS / FOUNDATI"). 9:5 is 1.800, which is what those three measure to
+   within 1%, so the box now shows each one whole: build.py crops full-width and
+   trims at most 1px of height, and the render is 1:1 with the asset.
 
-   THE WIDTH IS STATED, AND THAT IS DELIBERATE RATHER THAN A SHORTFALL. The
-   obvious way to write "square" is `aspect-ratio:1` with an `auto` width, and it
-   does not work here — §75.3 records the same trap from the other side. A flex
-   (or grid) container sizes the cross axis LAST: at the point the row's main
-   axis is being resolved the item's height is not yet known, so a ratio has
-   nothing to transfer into and the box collapses to its content (§75.3 measured
-   an 18px photograph shipping silently). So the side is written down instead —
-   but as a `calc()` of the THREE TYPE ROLES the body draws, not as a number:
+   ONE WIDTH FOR ALL THREE, WHICH THE ASK STATES AND THE COMPONENT WOULD WANT
+   ANYWAY. A per-image ratio would size the column from the picture, so three
+   rows in one `.tile-stack` would start their text at three different x — and a
+   list is scanned down that edge (§31.5 makes exactly this argument for the date
+   chip: "a diary is scanned down the date and across the detail, and both of
+   those need a straight edge"). The picture fits the slot; the slot is not cut
+   to the picture.
+
+   THE HEIGHT IS STILL THE CONTENT'S, AND ONE `calc()` GIVES BOTH. `--gcard-art-h`
+   is the sum of the three type roles the body draws and `--gcard-art-w` is that
+   sum at 9:5 — so the box is a 9:5 rectangle AND exactly as tall as the three
+   lines beside it, with no second measurement and nothing to keep in step:
 
      `--t-eyebrow-lh`   16   "Cohort 41 · Explorer – E3"
      `--s03`             8   §02.33's margin under `.eyebrow`
@@ -31,20 +43,42 @@
      2px                 2   §02.261's margin over `.sub`
      `--t-desc-lh`      17   the progress line
                        ---
-                        62
+                        62   × 9/5 = 111.6 wide
 
-   which means the two are equal BY CONSTRUCTION at one line each, and a change
-   to any of those five values moves both together. A literal 62px would have
-   been the same pixels and the wrong rule.
+   A change to any of those five values moves the height and the width together.
+   Two literals would have been the same pixels and the wrong rule.
 
-   AND WHEN THE DESCRIPTION WRAPS THE BOX GETS TALLER, WHICH IS CORRECT. On a
-   phone that progress line is three lines, so the content is ~96px and the cover
-   becomes a 62 × 96 portrait crop rather than a square. That is what the ask
-   says — the height equals the content — and it is the better of the two
-   failures: a 96px square would take a quarter of a 390px row, and a 62px square
-   floating beside 96px of text is the mismatch this rule exists to remove.
-   `object-fit:cover` is what makes a taller box read as a tighter crop instead
-   of a stretched picture.
+   THE HEIGHT IS STATED RATHER THAN STRETCHED, AND THAT IS THE CHANGE THIS ASK
+   FORCED. It was `align-self:stretch`, which made the box the row's own content
+   height for free — right while the box was square, and wrong for a rectangle:
+   at 390 the progress line wraps, so a stretched box became 111 × 79 (1.4:1) and
+   started cutting the sides again at exactly the width where the row can least
+   afford it. Stated, the picture is uncut at every width and the box is centred
+   in a taller row instead — `align-self:center`, which is also §02.229's default
+   for every list row, so the declaration is there to say so rather than to fight
+   anything.
+
+   WHY NOT `aspect-ratio`. The obvious spelling is `aspect-ratio:9/5` with one
+   dimension auto, and it does not work in this position — §75.3 records the same
+   trap from the other side. A flex or grid container resolves the main axis
+   FIRST, so at the point the row is sizing its columns the item's height is not
+   known, the ratio has nothing to transfer into, and the box collapses to its
+   content (§75.3 measured an 18px photograph shipping silently). Both dimensions
+   are therefore definite and the ratio is arithmetic rather than a property.
+
+   THE APPOINTMENT ROWS HELD IT FOR ONE BUILD AND GAVE IT BACK (1 Sep 2026, both
+   asks Maryam's: "add each cohort image instead of the icon block", then "take
+   back the cohort icon with block instead of cohort images, but show call icon
+   instead"). Worth keeping because it is the one place this component has been
+   tried and rejected, and the reason is about the ROW rather than the cover:
+   a `.bk-row` is a date chip, a mark, a title and a detail line, so a 112 × 62
+   picture is three times the plate's area and becomes what the eye lands on —
+   and it is the one thing on the row that is not about that appointment, since
+   the artwork belongs to the course and the same three pictures are eighty
+   pixels below in Your cohorts. The full argument is over `bookedRow` in
+   lead.js. Two things it settled that a future caller can reuse: the box does
+   NOT need re-cutting for a two-line body (it is centred in the taller row by
+   `align-self:center`), and §31's phone tier is where a row drops it.
 
    THE `<i>` IS THE FALLBACK, NOT DECORATION. `gcard` writes the cohort's number
    behind the `<img>` and the image's `onerror` uncovers it, which is the same
@@ -52,27 +86,65 @@
    leaves a numbered tile rather than an empty one. §63 §23 states its type.
    ========================================================================== */
 .app .gcard-art{
-  --gcard-art:calc(var(--t-eyebrow-lh) + var(--s03) + var(--t-h4-lh) + 2px + var(--t-desc-lh));
+  --gcard-art-h:calc(var(--t-eyebrow-lh) + var(--s03) + var(--t-h4-lh) + 2px + var(--t-desc-lh));
+  --gcard-art-w:calc(var(--gcard-art-h) * 9 / 5);
   position:relative;overflow:hidden;
-  flex:none;align-self:stretch;
-  width:var(--gcard-art);min-height:var(--gcard-art);
+  flex:none;align-self:center;
+  width:var(--gcard-art-w);height:var(--gcard-art-h);
   display:grid;place-items:center;
   background:var(--layer-02)}
+/* `contain`, NOT `cover` — "fit in the image by width" (Maryam, 1 Sep 2026).
+   With the box at 9:5 and every asset exported at 9:5 the two are identical
+   today, and they stop being identical the moment somebody points this at
+   artwork of another shape: `cover` would go back to trimming the sides, which
+   is the thing three of these asks have been about. `contain` fills the WIDTH
+   and letterboxes against the box's own ground instead — which on the rows is
+   `--layer-02` and on the black card is §77.7's `--on-dark-fill`, so a bar reads
+   as part of the slot rather than as a gap. Nothing letterboxes at the moment;
+   this is the declaration that keeps it that way. */
 .app .gcard-art > img{
   position:absolute;inset:0;
-  width:100%;height:100%;object-fit:cover}
+  width:100%;height:100%;object-fit:contain}
 /* `<i>` is italic by default — the trap §56's ladder note records, and §11.134's
    list of initials slots does not reach this one. Its SIZE and ink are §63 §23's;
    `font-style` is not one of that layer's four properties, so it is stated here
    with the component. */
 .app .gcard-art > i{font-style:normal}
 
-/* THE ROW STOPS CENTRING ITS OWN CONTENT, because a stretched item and a
-   centred one cannot both be right: §02.229 sets `align-items:center` on every
-   list row in the build, and `align-self:stretch` on the art is what overrides
-   it for this one item. The body and the arrow keep the centring — the arrow
-   explicitly, because with a two-line body it would otherwise sit against the
-   top of a 96px row. Stated on the ART and the ARROW rather than by turning the
-   row into `align-items:stretch`, which would also stretch the 16px chevron
-   into a 62px column. */
-.app .gcard:has(> .gcard-art) > .tile-arrow{align-self:center}
+/* THE ARROW NEEDED A RULE WHILE THE BOX STRETCHED AND DOES NOT NOW.
+   `.app .gcard:has(> .gcard-art) > .tile-arrow{align-self:center}` was here to
+   stop the chevron riding to the top of a row the stretched cover had made 96px
+   tall. With the cover's height stated, §02.229's `align-items:center` is doing
+   that for every child again, so the rule is deleted rather than left as a
+   declaration that restates its own parent. */
+
+/* --------------------------------------------------------------------------
+   86.2 THE SAME RECTANGLE ON THE BLACK CALL CARD — `.crow-cover`
+
+   The leader's black card draws its cohort's cover in `crow`'s portrait slot,
+   and that slot is a 78px SQUARE (§71.405) because on its other four call sites
+   it holds a face. A square crop of a 1.8:1 title card loses the same 45% here
+   as it did on the rows, and this is the copy of it Maryam was looking at when
+   she asked for the rectangle — the card was reading "BUSINESS FOUNDATIO".
+
+   THE HEIGHT IS §71'S 78 AND ONLY THE WIDTH CHANGES. That 78 is not arbitrary:
+   the row beside it is a name, a role line and a detail line, so the mark and
+   the text are the same height by design (§77.6 lines the action up on the same
+   bottom edge). Widening to 78 × 9/5 keeps all of that and fixes the crop.
+
+   `.crow-cover` IS A CLASS THE RECORD ASKS FOR, NOT A PORTAL SCOPE. The obvious
+   short version is `.app[data-portal="leader"] .crow-dark .crow-ph`, which is
+   true today and for the wrong reason: `.crow-dark` is worn by the candidate's
+   booked interview too, where the mark IS a face, so the rule would be keyed on
+   which portal you are in rather than on what the mark is. `crow`'s note over
+   the slot states the distinction.
+
+   IT DOES NOT NEED THE 900 TIER. §71.3 stacks the row below 900 and gives
+   `.crow-who` the full width, so a 140px cover has room at 390 — measured, not
+   assumed. The `overflow:hidden` and the `<img>`'s `object-fit` come from
+   §71.405 and §71.411 — and the `object-fit` there is `cover`, so §86.2 restates
+   `contain` for this slot too: same reasoning as the rows, one instruction.
+   -------------------------------------------------------------------------- */
+.app .crow-cover{width:calc(78px * 9 / 5)}
+
+.app .crow-cover > img{object-fit:contain}

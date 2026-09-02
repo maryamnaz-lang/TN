@@ -71,14 +71,171 @@
   font-variant-numeric:tabular-nums}
 
 .app .scene-b{display:flex;flex-direction:column;gap:2px;min-width:0}
-.app .scene-eb{
-  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
-  text-transform:uppercase;color:var(--text-helper)}
+/* `.scene-eb` AND `.scene-q` ARE DELETED (Maryam, 2 Sep 2026: "remove the
+   Scene 1 · from 02:14 and Where you changed your mind after listening texts,
+   just the headings are fine"). Both were three-line-card rules and neither
+   class is written by anything now — `sceneCard` emits the title alone and the
+   picker had already dropped the pair — which is the "gate nothing writes" tell
+   this build deletes on sight. The argument is kept because the CARD still has
+   room for a second line if one is ever wanted: the eyebrow was the scene's
+   number and its timestamp in the recording, and the timestamp is the one fact
+   the still cannot show. The duration chip in the corner survives it. */
 .app .scene-t{
   font-size:14px;line-height:19px;font-weight:600;letter-spacing:-.1px;
   color:var(--text-primary)}
-.app .scene-q{
-  font-size:12.5px;line-height:17px;color:var(--text-secondary)}
+
+/* --------------------------------------------------------------------- 1b ---
+   THE SECTION'S ONE ASK, UNDER THE GRID
+   Maryam, 1 Sep 2026: one orange question after the scenes row, carrying the
+   star "we are using with the summary on each page". The markup is in
+   `scenePick` and the mark is `.aih-mk` — §73.147's class, which is §70.2a's
+   `.ai-label::before` lifted out so it can be worn rather than copied. Nothing
+   about the star is stated here.
+
+   IT IS A `<button>` AND HAS TO BE STRIPPED BACK TO A LINE OF TEXT. §02 gives
+   `.btn` a 40px box, side padding and a border; this is not a `.btn` — it
+   carries no button class at all — but a bare `<button>` still arrives with
+   the UA's own border, background, padding and centred inherited font. Four
+   declarations undo that, and `text-align:left` is one of them: a `<button>`
+   centres its content, which on a full-width row would float the question in
+   the middle of the section.
+
+   `width:fit-content` IS WHAT MAKES THE TARGET THE WORDS. A block-level button
+   spans the section, so a press 600px to the right of the question — over
+   empty paper — would open Tal. Sized to its content it is a phrase you aim
+   at. (`inline-flex` cannot do it here: this is a flex item of nothing, but it
+   is also the last child of a block, and a stray inline box would take a text
+   baseline and a word-space from the grid above it.)
+
+   `align-items:center` AND NOT `baseline`, because the star has no baseline —
+   it is a masked box with no text in it, so a baseline row would hang it off
+   the bottom of the line. `.aih-mk` already states `align-self:center` for the
+   same reason; the row states its own so the pair does not depend on which of
+   the two is read first.
+
+   IT IS THE RAMP, NOT THE ACCENT (Maryam, 1 Sep 2026: "use the gradient
+   colours we are using in summary heading here"). §70.2 paints "Summary by
+   Tal" by clipping `--ai-grad` to the glyphs, and this line takes the same
+   two declarations — so the words and the `.aih-mk` beside them are painted
+   out of one ramp and read as one object, which is what the flat
+   `--accent-text` it shipped at could not do beside a gradient star.
+   `background-clip:text` is only visible through a transparent foreground, so
+   §63 §27 carries the `color:transparent` that completes it — the same split
+   §63 §10 makes for the band's own label, and the reason the colour is not
+   stated here.
+
+   THE GRADIENT IS PAINTED ACROSS THE ELEMENT, WHICH IS WHY `fit-content`
+   MATTERS TWICE. A full-width button would spread the ramp over the whole
+   section and the words would sample one narrow slice of it; sized to the
+   text, the line runs the ramp end to end the way the band's label does.
+
+   SPACE ON BOTH SIDES (Maryam, same message). It was `margin-top` only, which
+   left the question sitting on the section's closing rule — a line of Tal's
+   voice with 16px above it and nothing below reads as a caption on the grid
+   rather than as the section's own last row. `--s06` both ways is the
+   product's block rhythm and the same value the grid pays above it.
+   ------------------------------------------------------------------------ */
+.app .scene-ask{
+  display:flex;align-items:center;gap:var(--s03);
+  width:fit-content;max-width:100%;
+  margin:var(--s06) 0;
+  padding:0;border:0;text-align:left;cursor:pointer;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  -webkit-background-clip:text;background-clip:text}
+
+/* --------------------------------------------------------------------- 1c ---
+   THE HEADING AND ITS DESCRIPTION ARE ONE CHILD OF THE ROW
+   Maryam, 1 Sep 2026: "the desc should be close to the heading not with the
+   bottom scenes. once you make them close give the space between the desc and
+   the scenes row" — and, in the same message, the save "should be middle
+   aligned with the heading and desc row".
+
+   THE DESCRIPTION USED TO BE A SIBLING OF THE `.sec-h`, which is what put it
+   equidistant between the two: §10.212 gives the heading `margin-bottom:16`
+   and the paragraph carried `.mb5` under itself, so 16 above and 16 below and
+   nothing said which block it belonged to. Inside `.scene-hb` the pair is one
+   object at §73's own 12 — the number `aiHead` uses for exactly this pair —
+   and the air below is the heading row's, stated once at `--s07`.
+
+   `flex:1 1 auto; min-width:0` IS §24.6's `> h2` RULE, RE-POINTED. That layer
+   hands the row's slack to a direct-child `<h2>`; the `<h2>` is a grandchild
+   now, so without this the block is content-sized and the save button sits
+   against the end of the sentence instead of at the row's right edge.
+
+   NO `max-width` ON THE BLOCK, WHICH IS THE DIFFERENCE FROM `aiHead` and the
+   reason this is not that component. §73.1 caps `.aih-b` at 60% so a
+   description wraps clear of the action; measured here the sentence is 610px
+   and 60% of the row is 483, so the cap would break it in two — undoing the
+   one-line instruction from earlier the same day. Flex already stops it
+   reaching the button: the block takes the row minus the 132px save and the
+   gap, which is 657 at the 901 frame.
+   ------------------------------------------------------------------------ */
+/* 8, AND IT WENT 16 → 12 → 8 OVER TWO ASKS. `aiHead`'s 12 is the file's own
+   number for a title-and-description pair (613:7984) and it was the right
+   first move off the 16 the sibling paragraph was paying; "reduce the space
+   between scenes heading and desc a little more" (Maryam, 1 Sep 2026) takes it
+   one step down the scale. At `--s03` the pair is closer to each other than
+   either is to anything else on the page — the heading row's own 32 below it
+   is four times the join, which is what makes the two read as one block. */
+.app .page .sec-h > .scene-hb{
+  flex:1 1 auto;min-width:0;
+  display:flex;flex-direction:column;gap:var(--sec-desc-gap)}
+
+/* AND THE AIR BELOW IS THE GRID'S, NOT THE HEADING'S — WHICH IS A CHANGE THIS
+   RULE LOST ONCE AND SHOULD NOT LOSE AGAIN. It was written as
+   `margin-bottom:var(--s07)` on this section's `.sec-h`, on the reasoning that
+   a heading row carrying two lines needs more under it than one carrying a
+   title. §01's `--sec-h-gap` then landed — one token for all twenty-six
+   headed sections, 24 → 12 across the product — and swept this restatement up
+   with the rest, so the section shipped with 8px inside the pair and 12 below
+   it and the description read as belonging to the grid again.
+
+   THE TOKEN IS RIGHT AND THE FIX BELONGS SOMEWHERE ELSE. A rule about "the
+   gap under a section heading" is exactly what that token is for, and stating
+   a second value for it here would be arguing with a product-wide decision
+   from one section. What this section actually needs is space above its GRID,
+   because the grid is what the description must not read as part of — so the
+   margin goes on `.scene-pick`, where it is a property of the strip and out
+   of the token's way.
+
+   AND IT DOES NOT ADD TO THE HEADING'S 12 — IT REPLACES IT. The section is
+   `display:block` at every width, so these are adjacent siblings and their
+   margins COLLAPSE to the larger of the two rather than summing. Written as
+   16 the gap measured 16, not 28, which is why the value is stated as the one
+   the section wants rather than as a top-up: 24 against the 8 inside the pair
+   is the 3:1 that makes the title and its sentence read as one object with
+   the strip a separate block below. It is also exactly what `.scene-ask` pays
+   on the other side of the grid, so the strip sits in equal air. */
+.app .sec > .scene-pick{margin-top:var(--s06)}
+
+/* --------------------------------------------------------------------- 1d ---
+   THE SAVE SITS ON THE GRID'S RIGHT EDGE, NOT THE HEADING ROW'S
+   Maryam, 1 Sep 2026: "align the save scenes button on the right."
+
+   IT WAS ALREADY FLUSH WITH ITS OWN BOX AND THAT WAS THE PROBLEM. §24.6 gives
+   a `.sec-h > .btn` `margin-left:auto`, so the button was hard against the end
+   of the heading row — and at desktop that row pays `padding:0 var(--pad-x)`
+   from §4's opt-out restatement while the six-column grid under it does not.
+   Two different right edges 24px apart, with the button on the inner one, so
+   it read as stopping short of the strip it belongs to.
+
+   THE PADDING IS THE THING TO FIX, NOT THE BUTTON. A negative margin on the
+   button would move the words and leave the heading's own edge wherever it
+   was; taking the row's side padding off lands the heading on the first card's
+   left edge and the button on the last card's right edge at once, which is the
+   alignment the section actually wants. §69's lesson applies to why the
+   padding was there at all — §4 copies §10.15's four declarations and one of
+   them is dead in §10 (§14.2 zeroes a headed section's `.sec-h` padding), so
+   this is undoing a line that was inherited rather than chosen.
+
+   ONLY THIS SECTION. The other two members of §4's list — `.scene-row` and
+   `.ivlist` — are full-bleed lists whose rows pay the gutter themselves, so
+   their headings need the padding to line up with their content.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .page .sec:has(> .scene-pick) > .sec-h{padding-left:0;padding-right:0}
+}
 
 /* --------------------------------------------------------------------------
    2. THREE ACROSS, AND ONE ACROSS ON A PHONE
@@ -125,9 +282,7 @@
 @container app (min-width:900px){
   .app .scene-pick{grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s04)}
   .app .scene-sel{gap:var(--s03)}
-  .app .scene-sel .scene-eb{font-size:10px;line-height:13px;letter-spacing:.6px}
   .app .scene-sel .scene-t{font-size:12.5px;line-height:17px}
-  .app .scene-sel .scene-q{font-size:11.5px;line-height:15px}
   /* the play mark is a proportion of the still, not a fixed 44px: at a sixth
      of the column the still is ~79px tall and a 44px button is most of it */
   .app .scene-sel .scene-play{width:32px;height:32px}
@@ -188,15 +343,16 @@
 .app .scene-full .scene-play{background-color:rgba(255,255,255,.72)}
 .app .scene-full .scene-box{border-color:var(--rule);background-color:transparent}
 
-/* the count and the save, on one line under the grid */
-.app .scene-bar{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:var(--s05);flex-wrap:wrap;
-  margin-top:var(--s06);padding-top:var(--s05);
-  border-top:1px solid var(--rule)}
-.app .scene-count{
-  font-size:13px;line-height:18px;font-weight:600;color:var(--text-secondary);
-  font-variant-numeric:tabular-nums}
+/* NOTHING HERE FOR `.scene-bar` OR `.scene-count` ANY MORE — Maryam, 1 Sep
+   2026 ("take the save these three button on the right end of the choose your
+   scenes row", "remove the divider after the scenes row", "remove the nothing
+   chosen yet row"). All three are one change: the save moved to the section
+   heading, where §24.6 already puts a section's control, and with the count
+   deleted the bar was an empty flex row whose `border-top` was the divider
+   the second ask names. `sceneSave` (views.js) is where the argument lives.
+   Both rules are deleted rather than left standing, because a rule gated on a
+   class nothing writes is what a stylesheet accumulates fastest — and
+   `.scene-count` had a §63 entry sizing it, which went with it. */
 
 /* --------------------------------------------------------------------------
    4. TWO SECTIONS THAT MUST NOT TAKE THE LABEL COLUMN
@@ -233,8 +389,38 @@
   .app .sec:has(> .scene-row) > .sec-h,
   .app .sec:has(> .scene-pick) > .sec-h,
   .app .sec:has(> .ivlist) > .sec-h{
-    border-right:0;min-height:0;margin-bottom:var(--s05);
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}
+
+  /* NOTHING HERE FOR THE CHOOSER'S HEADING GAP ANY MORE. A restatement lived
+     at this spot for one build, giving the section a bigger `margin-bottom`
+     than the three-selector rule above hands out — and §01's `--sec-h-gap`
+     has since made that one number for the whole product. §1c is where the
+     replacement is and why: the extra air is on `.scene-pick` now, which is a
+     property of the strip rather than an argument with the token. */
+
+/* --------------------------------------------------------------------------
+   4b. THE CHOOSER'S LEDE TAKES THE COLUMN, NOT THE MEASURE
+   Maryam, 1 Sep 2026: "keep the desc one liner, do not let it go to two or
+   three lines." The sentence was cut to one clause in views.js and that was
+   only half of it — §14.3 caps `.app .sec > p` at 68ch, which is about 660px
+   of the 1380px this section is laid out across, so a 95-character line still
+   broke in two with 700px of empty paper beside it.
+
+   §70 MADE THIS EXACT CALL ON TAL'S SUMMARY and its reasoning is the one that
+   applies: a measure is right where something occupies the other half of the
+   line and is "not a measure but a ragged right edge" where nothing does.
+   Here nothing does — the block under this line is a six-column grid of
+   stills using every pixel of the column — and the lede is one sentence read
+   once, which is the case 68ch was never protecting.
+
+   IT CANNOT BE ANSWERED FROM OUTSIDE THE TIER (trap 3): §14's rule is inside
+   `@container app (min-width:900px)`, so this restatement is in the same
+   query, and `.app .sec > p.scene-lede` is (0,3,1) against §14's (0,2,1) so
+   it wins on weight as well as on order. Below 900 there is no cap to undo
+   and the sentence wraps to the phone's own column, which is correct.
+   -------------------------------------------------------------------------- */
+  .app .sec > p.scene-lede{max-width:none}
 }
 
 /* --------------------------------------------------------------------------

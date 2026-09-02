@@ -22,7 +22,7 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    so the stage picker and `portal` are deliberately independent: switching
    stage returns you to the candidate (see setStage), and switching portal
    leaves the stage untouched so you come back to where you were. */
-const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', ctab:'discussion', hist:[], thread:[], typing:false,
+const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
   /* EVERY DISCLOSURE IS CLOSED UNTIL IT IS OPENED, AND THEY ARE KEYED BY NAME.
      "What the interview found" starts closed because it is the longest block
@@ -37,6 +37,23 @@ const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:nu
      A map rather than a second boolean, so the next one costs a string. The
      keys are the names the views pass to `foundHead`: `report`, `cohort`. */
   disc:{},
+  /* THE DISMISSED CERTIFICATE BANDS, KEYED BY SURFACE, AND IT IS THE SAME
+     LESSON ONE COMPONENT OVER. This was a bare boolean set on first press and
+     never declared here, with `S.certBan === false` as the closed test — which
+     worked while exactly one caller drew the cross. My Level asked for one too
+     (Maryam, 1 Sep 2026) and a single flag would have meant dismissing the
+     notice on the `promoted` dashboard also emptied the band on My Level: a
+     reader hiding one page's content from a different page. `disc` two
+     declarations up records the identical mistake and the identical fix.
+
+     `true` MEANS CLOSED, which is the opposite of `disc`'s sense and is right
+     for both: a disclosure is closed until you open it, a notice is open until
+     you shut it, so in each case an absent key is the resting state and `{}` is
+     a correct empty. `banClosed(key)` is the reader. Session-only and
+     deliberately not persisted — `tn-vp` is in `localStorage` because a frame
+     preference is about how this reader looks at the prototype; a dismissed
+     notice is about one reading of one page. */
+  certBan:{},
   /* the three scenes kept from each interview. `null` means "not chosen yet",
      which is what puts the chooser on the Interviews module — see the note
      over `SCENES` and the seeding in `setStage`. The boot stage is `new`, at
@@ -355,8 +372,21 @@ function stars(n){
    with no network request. The initials stay behind each one as a fallback. */
 ;
 ;
+/* THE SIZE IS OPTIONAL, AND CALLING IT WITHOUT ONE IS HOW A STYLESHEET GETS TO
+   OWN THE PORTRAIT (1 Sep 2026). This helper writes `width`/`height` INLINE,
+   which is trap 1 — an inline declaration beats every rule at any specificity —
+   so for as long as a size was compulsory no layer could size a face it drew.
+   `youMark` (§62) worked around it by not calling this at all and writing the
+   markup itself, which is a second copy of the same three lines.
+
+   TWO PORTRAITS NOW HAVE TO MEASURE THEMSELVES AGAINST THE TEXT BESIDE THEM —
+   the Past interviews row and the dashboard's cohort-leader card, both asked
+   for on 1 Sep 2026 — and neither can be a number typed here: the answer is
+   "as tall as the lines next to it", which only the layout knows. Omitting the
+   argument leaves §09's own 40px in force until a layer says otherwise, so a
+   call site that forgets it degrades to the default rather than to zero. */
 function avatar(a,size){
-  return `<span class="av-ph" style="width:${size}px;height:${size}px">
+  return `<span class="av-ph"${size?` style="width:${size}px;height:${size}px"`:''}>
     <i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`;
 }
 const talStar = (q) => `<button class="tal-star" data-tal-ask="${q}" aria-label="Ask Tal"><span class="lbl">Ask Tal</span><span class="sk-mark xs"></span></button>`;
@@ -540,10 +570,25 @@ function sceneCard(kind, i, n){
       <span class="scene-play">${I.play}</span>
       <span class="scene-len">${s[3]}</span>
     </span>
+    ${''/* THE CARD IS ITS TITLE AND NOTHING ELSE (Maryam, 2 Sep 2026: "remove
+          the Scene 1 · from 02:14 and Where you changed your mind after
+          listening texts, just the headings are fine").
+
+          BOTH DELETED LINES WERE ALREADY DRAWN SOMEWHERE ON THE CARD. The
+          eyebrow's timestamp is the one fact the still cannot show, and the
+          duration chip in the corner is the figure a reader of a video actually
+          wants; "Scene 1" is the card's position in a row of three, which the
+          row states by being a row. The `.scene-q` line described the clip in
+          the same register as the title above it, so the pair read as a heading
+          and its own restatement.
+
+          `n` STAYS A PARAMETER AND `s[1]` / `s[2]` STAY IN THE RECORD. The
+          number is still what `aria-label` would want if this ever grows one
+          beyond the title, and both strings have a second reader in the scene
+          chooser (§38), where the description is what you choose BY. Deleting
+          them from `SCENES` would break that page. */}
     <span class="scene-b">
-      <span class="scene-eb">Scene ${n} &middot; from ${s[2]}</span>
       <span class="scene-t">${s[0]}</span>
-      <span class="scene-q">${s[1]}</span>
     </span>
   </button>`;
 }
@@ -586,22 +631,134 @@ function scenePick(kind){
                 takes no aria of its own and no tabindex. */}
           <span class="scene-box">${I.check}</span>
         </span>
+        ${''/* ONE LINE, NOT THREE — Maryam, 1 Sep 2026 ("remove the 'From
+              {time}' below each scene"), then, the same afternoon, "remove the
+              'Why this scene?' from each scene, instead after the scenes row
+              add only one."
+
+              THE PER-CARD ASK SHIPPED FOR ONE BUILD AND THE CORRECTION IS THE
+              INTERESTING PART. Six cards each carrying "Why this scene?" made
+              the question the most repeated string in the section — six orange
+              phrases against six black titles, so the accent stopped marking
+              anything and the strip read as six controls rather than six
+              pictures. The question is also the same question six times: it is
+              about the CUT, not about any one of them. `.scene-ask` under the
+              grid asks it once and reads as the section's own line.
+
+              IT ALSO GETS TO BE A REAL `<button>` DOWN THERE, which the
+              per-card version could not: the card is a button and a button
+              inside a button is interactive content nested in interactive
+              content — the objection `.scene-box` records for the checkbox two
+              elements above. That version was a `<span>` with `data-tal-ask`,
+              which worked on a press and was unreachable on a keyboard.
+
+              THE TIMECODE WAS THE ONE FACT ON THE CARD YOU CANNOT USE. "From
+              02:14" is an offset into a recording this product does not let
+              you scrub — the six are the only cuts there are, and the card
+              already prints its own length in the still's corner. It stays on
+              `sceneCard`, the kept-scenes row on `V.report`, because there it
+              is written "Scene 1 · from 02:14" and the SCENE NUMBER is what
+              names one of the three you chose.
+
+              AND THE DESCRIPTION ANSWERED A QUESTION AT THE WRONG MOMENT.
+              "Where you changed your mind after listening" is the reading of a
+              scene, printed on the card while you are deciding whether to keep
+              it — so the strip was six titles and six readings, and the reading
+              is longer than the title. The line is now the question itself, and
+              pressing it puts it to Tal, who has the scene's own sentence to
+              answer with (`SCENES` is one record and `talScene` in ai8 reads
+              it). Nothing is lost; it moved behind a press.
+
+              IT IS A `<span>` WITH `data-tal-ask`, NOT A `<button>`, and that
+              is forced rather than chosen: the card IS a button, and a button
+              inside a button is interactive content nested in interactive
+              content — the exact objection `.scene-box` two elements above
+              records for the checkbox. The click listener tests
+              `[data-tal-ask]` as its first real branch and `[data-scene]` ~290
+              lines later, so the ask wins the press and returns before the
+              selection handler sees it. What a span cannot do is take focus,
+              so on a keyboard the card still selects and the question is not
+              reachable — the honest trade for keeping the card a real button.
+
+              AND THE DESCRIPTION IS NOT LOST, IT MOVED BEHIND THE PRESS.
+              `SCENES` holds `[title, why, from, length]` and `why` is the line
+              the card used to print; `wScenes` (ai8) reads all six out of that
+              same record, so the copy has one home and Tal's answer cannot
+              disagree with the strip. */}
         <span class="scene-b">
-          <span class="scene-eb">From ${s[2]}</span>
           <span class="scene-t">${s[0]}</span>
-          <span class="scene-q">${s[1]}</span>
         </span>
       </button>`;
     }).join('')}
   </div>
-  <div class="scene-bar">
-    <span class="scene-count">${n === 0 ? 'Nothing chosen yet' : n === 3 ? 'Three chosen' : n + ' of 3 chosen'}</span>
-    ${''/* §2 already styles `.btn[disabled]`, so the attribute is the whole of
-          the treatment — no companion class, and the button cannot be pressed
-          rather than being pressable and refused. */}
-    <button class="btn btn-p btn-sm" data-scenesave="${kind}"
-      ${n === 3 ? '' : 'disabled'}>Save these three ${I.arrowRight}</button>
-  </div>`;
+  ${''/* THE SECTION'S ONE ASK, UNDER THE GRID (Maryam, 1 Sep 2026, with the
+        wording and the mark both specified: "'Ask Tal why these scenes were
+        chosen from your interview?' this text should be in orange color, the
+        star I am asking you to use is the one we are using with the summary on
+        each page").
+
+        THE MARK IS `.aih-mk`, WHICH IS THAT STAR AND IS ALREADY A CLASS. §70.2a
+        draws the head band's "Summary by Tal" sparkle as `.ai-label::before` —
+        `--ai-star` masked over `--ai-grad` at 12px — and §73.147 lifted exactly
+        that into `.aih-mk` so `aiHead` could wear it. Reusing the class is what
+        makes this the same object rather than a copy of one: if the ramp or the
+        glyph changes, all three follow.
+
+        AND IT MUST BE `.aih-mk`, NOT `.ai-label` OR `.ai-aura`. `talFirst`
+        (this file) hoists any `.sec` containing an `.ai-aura` to directly under
+        the `.ph`, and `placeBand`'s `_mhIsTal` (ai5) claims a section holding
+        EITHER class as head furniture — §70 and §72 both record the bug that
+        follows, a section rendering at 576px instead of 901 with nothing thrown
+        and nothing warned. This line sits in the page's second section and has
+        to stay there.
+
+        IT IS THE PAGE'S SECOND STAR AND THAT IS A DEPARTURE, STATED RATHER THAN
+        SMUGGLED. §73's rule is one star per page region, because a mark that
+        says "Tal is speaking" stops attributing when it is repeated. The band
+        above carries "Summary by Tal"; this is the second. The reason it is
+        acceptable is that the two are doing different jobs — that one labels
+        Tal's own sentence, this one labels a question you are about to ASK Tal
+        — and the reason it is worth watching is that a third would make the
+        sparkle this page's bullet style. Six of them did exactly that, which is
+        why the per-card version came off. */}
+  <button class="scene-ask" data-tal-ask="Why were these scenes chosen from my interview?"><i class="aih-mk"></i>Ask Tal why these scenes were chosen from your interview?</button>`;
+}
+
+/* THE SAVE IS THE SECTION HEADING'S CONTROL — Maryam, 1 Sep 2026 ("take the
+   save these three button on the right end of the choose your scenes row").
+   It was the right-hand half of a `.scene-bar` under the grid, with a count
+   ("Nothing chosen yet") on the left and a hairline over the pair. Three
+   things went with the move and all three were the bar's, not the button's:
+
+     THE COUNT. It said in words what the grid says in pictures — three ticked
+     boxes and three outlined cards, with the unpickable three already washed
+     out by §38.3's scrim. "Nothing chosen yet" over six cards none of which
+     is ticked is the state restated for a reader who has just looked at it.
+
+     THE RULE. `.scene-bar` drew a `border-top`, which is what made the bar a
+     block of its own; with nothing in it, a hairline between the last row of
+     stills and the section's own closing rule is two lines a hand's width
+     apart (§14's "TWO 1px rules one pixel apart", one section along).
+
+     AND THE BAR ITSELF. §24.6 already makes `.sec-h` a row that holds its
+     control on an `auto` margin, so the heading row is where a section's one
+     action goes in this product — `V.payments`' "Add a card" and `V.points`'
+     "View Points" are the same shape. A second row underneath doing the same
+     job is a component this page did not need.
+
+   IT IS SEPARATE FROM `scenePick` because the two land in different parents:
+   the grid is the section's body and this is its heading's child. Returning
+   both from one function would mean the heading could only be written where
+   the grid is. `n` is read again rather than passed, so the disabled state
+   and the grid cannot disagree.
+
+   §2 already styles `.btn[disabled]`, so the attribute is the whole of the
+   treatment — no companion class, and the button cannot be pressed rather
+   than being pressable and refused. */
+function sceneSave(kind){
+  const n = scenePicked(kind).length;
+  return `<button class="btn btn-p btn-sm" data-scenesave="${kind}"
+    ${n === 3 ? '' : 'disabled'}>Save Scenes ${I.arrowRight}</button>`;
 }
 function chRow(i,f){
   const n=i+1, name=CH[i][0], mins=CH[i][1];
@@ -924,8 +1081,17 @@ const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'g
    it was the first version — digits off the title — and it read "513" on the
    leader's rows, because a cohort row's title is "Week 5 of 13" and its NUMBER
    is in the eyebrow. A component cannot know which of two strings holds the
-   identity; the caller does. */
-const gcard = (kind,tag,title,sub,go,art) => `<button class="tile clk gcard" data-go="${go}">
+   identity; the caller does.
+
+   AND THE SEVENTH ARGUMENT IS A RAW ATTRIBUTE, for the reason `faceRow`'s fourth
+   is (Maryam, 1 Sep 2026: "on clicking a cohort, i should go to it's detail page,
+   not on cohort module"). `data-go` can only name a VIEW, so a row that opens ONE
+   of something has to carry its subject beside it — `data-ldrco`, `data-ldrmem`,
+   `data-ldrsum`, whichever capture-phase listener owns it. Without it the row
+   opened the module's list, which then drew the same rows again one click below
+   the ones just pressed. Optional, so every other `gcard` in the product and the
+   ten in `tn-agent-portal.html` emit byte-identical markup. */
+const gcard = (kind,tag,title,sub,go,art,at) => `<button class="tile clk gcard" data-go="${go}"${at ? ' ' + at : ''}>
   ${art
     ? `<span class="gcard-art">${art.i ? `<i>${art.i}</i>` : ''}<img src="${art.src}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
     : `<span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>`}
@@ -1170,6 +1336,82 @@ const CERTS = [
 ];
 const certsFor = f => f.complete ? CERTS : CERTS.slice(0, 1);
 
+/* ==========================================================================
+   THE SIX CERTIFICATION BADGES — Maryam's artwork, 2 Sep 2026, and what each
+   one is EARNED BY
+
+   `CERTS` above is the LEVEL certificate and stays exactly what it was — two
+   rows, both read by `certBanner`, which hardcodes "Explorer Track – " and
+   would print `undefined` the moment a non-level row entered that list. So the
+   other five are a second record and `certAll` merges them for the tab.
+
+   NOTHING HERE IS NEW COPY. Every name is the word printed on the badge Maryam
+   supplied — Course Complete, Assessment Ace, Cohort Champion, Fast Tracker,
+   Top Performer — so the artwork names the certification rather than a
+   sentence somebody wrote to go under it. §74's rule is about inventing claims
+   ABOUT THE CANDIDATE, and these make none: each is a threshold, and the
+   threshold is read off a figure the build already keeps.
+
+   THE GATES ARE THE PART TO ARGUE WITH, so they are one table and each names
+   the record it reads:
+
+     Course Complete   every chapter of a course finished. Dated the most
+                       recent completion, which is the newest LEVEL
+                       certificate's own date — so it is true at day 34 (the
+                       E2 course finished in May) without claiming the current
+                       course is over.
+     Assessment Ace    `f.avg >= 80`. 75 at day 34, 83 from day 90, so this
+                       arrives with the finished course rather than with the
+                       stage.
+     Fast Tracker      eight of thirteen weeks at or above `WEEK_TARGET`.
+                       `GAME[stage].weeks` has nine on day 90 and two at day 34.
+     Cohort Champion   all three community point rows earned (post, reply,
+                       reaction) — `GAME.got` indexes 4, 5 and 6.
+     Top Performer     `g.pts >= 2500`, which is `BDG[0].need`, the Bronze
+                       threshold. Read from the record rather than typed.
+
+   TWO DATES ARE READ AND TWO ARE STATED. Cohort Champion takes `g.last[6]` —
+   the day the last of its three rows was awarded, already in `GAME` — and Top
+   Performer takes the Bronze badge's own date. Assessment Ace and Fast Tracker
+   have no date anywhere in the build, so they carry one here, in the same way
+   `CERTS` carries "May 4, 2026". That is the whole of what this record adds.
+   ========================================================================== */
+const BRONZE_ON = '11/06/2026';
+const CERTIFS = [
+  {k:'course', n:'Course Complete',  gate:() => true,
+    on:(f)     => certsFor(f).slice(-1)[0].on},
+  {k:'assess', n:'Assessment Ace',   gate:(f)   => f.avg >= 80,
+    on:()      => 'November 18, 2026'},
+  {k:'pace',   n:'Fast Tracker',     gate:(f,g) => (g.weeks||[]).filter(w => w >= WEEK_TARGET).length >= 8,
+    on:()      => 'October 30, 2026'},
+  {k:'cohort', n:'Cohort Champion',  gate:(f,g) => [4,5,6].every(i => g.got.includes(i)),
+    on:(f,g)   => longDate(g.last[6])},
+  {k:'top',    n:'Top Performer',    gate:(f,g) => g.pts >= BDG[0].need,
+    on:()      => longDate(BRONZE_ON)}
+];
+
+/* `08/13/2026` -> `August 13, 2026`. The points list stores its award dates in
+   the product's MM/DD/YYYY house format and a certificate prints them long —
+   "Completed May 4, 2026" is how `CERTS` has always read, and a Credly card
+   says "Issued Jan 24, 2023". One place, so the two formats cannot drift. */
+const MONTHS = ['January','February','March','April','May','June','July',
+  'August','September','October','November','December'];
+const longDate = s => {
+  const [m,d,y] = String(s||'').split('/');
+  return MONTHS[+m-1] ? `${MONTHS[+m-1]} ${+d}, ${y}` : s;
+};
+
+/* THE TAB'S ONE LIST — level certificates and the five badges, newest first.
+   The level rows keep `explorer`, the badge for the track they are on, so the
+   E2 and E3 cards wear the same artwork: they are the same certification at two
+   levels, which is exactly what Credly's own page shows with its Co-Creator and
+   Practitioner pair. Sorted by real date so the black card's "most recent" is
+   the true one at every stage rather than whichever row was typed last. */
+const certAll = (f, g) => [
+  ...certsFor(f).map(c => ({k:'explorer', n:`Explorer Track &ndash; ${c.lvl}`, on:c.on})),
+  ...CERTIFS.filter(c => c.gate(f, g)).map(c => ({k:c.k, n:c.n, on:c.on(f, g)}))
+].sort((a, b) => new Date(b.on) - new Date(a.on));
+
 /* `certCard` IS DELETED (Maryam, 1 Sep 2026) — the candidate's black
    certificate card. It drew `.cert` with the 88px mark, the "Certificate of
    completion" eyebrow, the level, the completion line, the signer and a
@@ -1211,35 +1453,125 @@ const certsFor = f => f.complete ? CERTS : CERTS.slice(0, 1);
    a record.
    ========================================================================== */
 
-/* THE ROWS ARE `.cardrow`, WHICH IS `V.leadCerts`' OWN SHAPE. That view lists
-   `LDR_CERTS` as a `.tile-stack` of `.cardrow`s with a mark, a title, a
-   description and an action at the far end — the same four parts this needs —
-   so the candidate's certificates are the leader's list with the candidate's
-   data in it rather than a fifth row component.
+/* ==========================================================================
+   THE CERTIFICATES TAB IS CREDLY-SHAPED — `certsTab`, 2 Sep 2026
+   Maryam, with two screenshots of a Credly profile: a black card headed
+   "Congratulations on your most recent certification 🎉" holding the badge on
+   the left, the certification and its issuer beside it and our buttons at the
+   right end of the row; then "All certifications" over a grid of upright cards
+   in Credly's own shape.
 
-   TWO ACTIONS, NOT ONE, AND IT NEEDED NO CSS. The leader's row ends in a single
-   "Certificate" button; the ask here is "user could download and share their
-   link", so the cell holds a pair — and §02.282 already gives `.cardrow-a`
-   `display:flex` with `gap:var(--s04)`, so the two sit side by side with the
-   row's own gap between them. A `.certrow` / `.certrow-a` pair was written first
-   and deleted before it shipped: two classes nothing would have styled, which is
-   the "gate nothing writes" tell arriving before the gate.
+   `certList` IS DELETED AND ITS ROW WENT WITH IT. That was a `.tile-stack` of
+   `.cardrow`s, `V.leadCerts`' shape borrowed one portal over, and the argument
+   for it was that a certificate is "a mark, a name, a description and an action
+   at the far end". This reference disagrees about the mark: the badge IS the
+   object, not an icon standing in for it, and a 40px glyph slot cannot hold a
+   70px disc with type around its rim. §63's inks for `.crt-dl` / `.crt-sh` stay
+   — see the note over them — because the pair moved onto the black card, where
+   they take the card's own ink instead.
 
-   NEWEST FIRST. `CERTS` is stored oldest-first so `slice(-1)` is the current
-   one; a list of what you have earned reads down from the most recent, which is
-   `V.leadCerts`' `.slice().reverse()` for the same reason. */
-function certList(f){
-  return certsFor(f).slice().reverse().map(c => `<div class="cardrow">
-    <span class="cardrow-ic">${I.certificate}</span>
-    <span class="cardrow-b">
-      <span class="cardrow-t">Explorer Track &ndash; ${c.lvl}</span>
-      <span class="cardrow-d">Completed ${c.on} &middot; ${c.cohort} &middot; signed by ${c.by}</span>
-    </span>
-    <span class="cardrow-a">
-      <button class="btn btn-sm noic" data-go="transcript">Download</button>
-      <button class="btn btn-sm noic">Share link</button>
-    </span>
+   THE BLACK CARD IS `.dark-card` AND THAT IS THE WHOLE RECIPE (§75, and the
+   standing instruction of 31 Aug 2026: "i will not tell you that remove the
+   bottom border attached or give black box padding, do this all yourself").
+   Ground, haze, inset, 32px frame, the head row's rule, the ink flip and the
+   button treatment all arrive with the one class. What this caller states is
+   only what is different about its own content, which is `.crt-hero`.
+
+   NOT `.plate` AND NOT `.sec.on-dark`: both are in ai5's `DARK_CARD`, so
+   `placeDark` would hoist the section into the head band — where this page
+   already has the points strip in column two. §75.3 records that exact bug.
+
+   THE BUTTONS ARE ON THE ROW, NOT IN THE HEAD. `.dc-hd-r` allows a `.dc-act`
+   at the right end of the heading row and §77's call card uses it; here the
+   controls act on the CERTIFICATE, which is the row underneath, and the heading
+   is a congratulation rather than a place to put a control. Credly draws them
+   the same way and for the same reason.
+
+   THE GRID CARDS CARRY NO BUTTONS, WHICH IS ALSO CREDLY'S. Every card is a
+   `data-go="transcript"` target instead — the page that already holds the
+   certificate and its download — so the row that is not featured is still one
+   press from the thing it names, and there is no dead control (§60). */
+function certHero(c){
+  /* `.dark-card` GOES ON THE `.sec` ITSELF, not on a child of one. §75.123
+     states the whole recipe as `.app .sec.dark-card` — the inset margin, the
+     32px frame and the section's own `::after` all key on that — and every
+     caller writes it that way (`leadCallCard`, `pulse`). Wrapped, the card
+     would pay the section's padding outside its own frame and draw the
+     hairline the section is supposed to have suppressed. */
+  return `<div class="sec dark-card crt-dark">
+    <div class="dc-hd"><div class="dc-hd-r">
+      <h2 class="dc-t">Congratulations on your most recent certification &#127881;</h2>
+    </div></div>
+    <div class="crt-hero">
+      <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
+      <span class="crt-hero-b">
+        <span class="crt-hero-n">${c.n}</span>
+        <span class="crt-hero-i">TALENTnext</span>
+      </span>
+      ${''/* ON THE CARD THE PAIR LOSES ITS TWO HUES AND TAKES THE CARD'S.
+            §63 §26's blue and violet were picked against `--layer-01` and read
+            2.3:1 and 2.6:1 on `--gray-100`; §75's recipe already answers what a
+            button does here — `.btn-p` is the accent fill, a quiet button is
+            borderless white — so the classes simply do not come along.
+
+            DOWNLOAD IS THE PRIMARY (Maryam, 2 Sep 2026: "the download button
+            should be orange and share link should be without bg"), which
+            reverses what shipped first. That version followed the reference,
+            where Share is the card's whole point; this product's certificate
+            is a thing you TAKE — the tab's own second control has always been
+            Download and `V.transcript` is where it goes — and a share link is
+            something you generate afterwards. The order swaps with the fill,
+            because the accent button leads a pair. */}
+      <span class="crt-hero-a">
+        <button class="btn btn-p btn-sm ic-l" data-go="transcript">${I.download} Download</button>
+        <button class="btn btn-sm ic-l">${I.link} Share link</button>
+      </span>
+    </div>
+  </div>`;
+}
+/* THE CARD STOPPED BEING A `<button>` THE MOMENT IT GREW A CONTROL (Maryam,
+   2 Sep 2026: "on the top right of both card give a 3 dots menu icon, on click
+   to that give download and share link options"). A button inside a button is
+   interactive content nested in interactive content — invalid, and in practice
+   a click target fighting the one around it. §38's `.scene-box` note records
+   the same finding from the other side, where a `<label>` could not go inside
+   the card for exactly this reason.
+
+   WHAT IS LOST IS THE WHOLE-CARD PRESS, AND THE MENU IS WHY THAT IS FINE. The
+   card was a `data-go="transcript"` target so no row was a dead end (§60); the
+   two things a certificate can actually do are now on it by name, which is
+   better than a card that silently went somewhere.
+
+   THE OPEN MENU IS `S.crtMenu`, NOT A CLASS — trap 9. `render()` replaces
+   `device.innerHTML`, so a class a handler puts on one card is gone at the next
+   paint; the index is state and the card is a pure function of it. Keyed by
+   INDEX rather than by `c.k`, because the level certificates share `explorer`
+   and two cards would open as one. */
+function certGrid(list){
+  return list.map((c, i) => `<div class="crt-card${S.crtMenu === i ? ' on' : ''}">
+    <button class="crt-menu" data-crtmenu="${i}" aria-haspopup="true"
+      aria-expanded="${S.crtMenu === i}" aria-label="Actions for ${c.n}">${I.overflow}</button>
+    ${S.crtMenu === i ? `<div class="crt-pop">
+      <button class="crt-pop-i" data-go="transcript">${I.download} Download</button>
+      <button class="crt-pop-i">${I.link} Share link</button>
+    </div>` : ''}
+    <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
+    <span class="crt-n">${c.n}</span>
+    <span class="crt-i">TALENTnext</span>
+    <span class="crt-on">Issued ${c.on}</span>
   </div>`).join('');
+}
+/* THE FEATURED ONE IS ALSO IN THE GRID, which is what the reference does and
+   is worth stating because the other reading is tempting: "all" that silently
+   excludes the newest is a collection with a hole in it, and at day 34 — where
+   the list is two long — it would leave one card under a heading that says all.
+   `certAll` is sorted by date, so `[0]` is the most recent at every stage. */
+function certsTab(f, g){
+  const all = certAll(f, g);
+  return certHero(all[0]) + `<div class="sec">
+    <div class="sec-h"><h2>All certifications</h2></div>
+    <div class="crt-grid">${certGrid(all)}</div>
+  </div>`;
 }
 
 /* THE BANNER — the certificate on the `promoted` dashboard (Maryam, 1 Sep 2026:
@@ -1317,31 +1649,43 @@ function certList(f){
 
    `certsFor` STILL DECIDES WHICH CERTIFICATE, so the strip and the two lists
    cannot name different levels. */
-/* TWO CALLERS NOW, AND THE CROSS IS OPT-IN (Maryam, 1 Sep 2026: "instead of
-   this black certification card, use the same light orange banner here as well
-   that we have on the dashboard"). My Level takes the same band and does NOT
-   take `close`, and that asymmetry is the point rather than an omission:
+/* TWO CALLERS, BOTH WITH THE CROSS, AND THE DISMISS IS KEYED BY SURFACE
+   (Maryam, 1 Sep 2026: "the cross icon in the badge banner at the right is
+   missing here", of My Level).
 
-     `promoted` dashboard   a NOTICE. The page is about enrolling at E4; the
-                            E3 certificate is a thing you finished, worth a
-                            strip at the head and worth getting out of the way.
-     My Level               CONTENT. The page's subject is which rung you hold
-                            and the certificate is the document that says so —
-                            it is why the card was put on this page at all.
+   THE CONTROL SHIPPED ON ONE CALLER AND THE REASON WAS A CONCRETE BUG, NOT A
+   PREFERENCE. `S.certBan` was a single boolean, so a cross on both would have
+   meant dismissing the notice on the `promoted` dashboard ALSO emptied the
+   block on My Level — a reader hiding one page's content from a different
+   page. The note that stood here argued the asymmetry as a content judgement
+   too (a notice on one page, the page's subject on the other), and that half
+   was thinner: a dismiss says "I have read this", which is a thing a reader is
+   allowed to say about either drawing.
 
-   AND A SHARED BOOLEAN IS THE CONCRETE REASON, not just a tidy argument.
-   `S.certBan` is one flag; had the cross shipped on both, dismissing the notice
-   on the dashboard would ALSO empty the block on My Level, where nothing else
-   states that a certificate exists. A reader would have hidden a page's content
-   from a different page. `certCard`'s black drawing survives on Course
-   Progress, so the document still has one loud rendering in the build.
+   SO THE FLAG BECAME A MAP, WHICH IS §65'S DISCLOSURE DECISION EXACTLY. That
+   layer started with one boolean `S.found` on the same reasoning — "the two
+   dashboards never appear together so a second key would only hold the first
+   one's value" — and it broke the moment a third surface wanted one.
+   `S.certBan` is `{}` now and `banClosed(key)` reads it, so `dash` and `level`
+   dismiss independently and a third caller gets its own key by naming one.
 
-   `close` DEFAULTS OFF, so a third caller has to ask for the control rather
-   than inherit it — the same direction §81 takes for `crow`'s join gate and for
-   the same reason: a dismiss on a surface that needs its content is a bug you
-   only find by pressing it. */
-function certBanner(f, {close = false} = {}){
-  if(close && S.certBan === false) return '';
+   `key` IS REQUIRED WHENEVER `close` IS, AND THE DEFAULT IS THE SAFE FAILURE.
+   A caller that asks for the cross and forgets the key lands on `'cert'` — one
+   shared bucket, which is the old behaviour rather than a crash or a control
+   that cannot be dismissed at all.
+
+   `close` STILL DEFAULTS OFF, so a third caller has to ask for the control
+   rather than inherit it — the same direction §81 takes for `crow`'s join gate
+   and for the same reason: a dismiss on a surface that needs its content is a
+   bug you only find by pressing it. `certCard`'s black drawing survives on
+   Course Progress, so the document still has one loud rendering in the build. */
+/* `banClosed` IS THE READER, AND IT MIRRORS `discOpen` DELIBERATELY. Same
+   shape, one line, one place the key defaults — so the click handler needs no
+   branch and a third band costs a string in the view and nothing here. */
+const banClosed = (key) => !!S.certBan[key || 'cert'];
+
+function certBanner(f, {close = false, key = 'cert'} = {}){
+  if(close && banClosed(key)) return '';
   const c = certsFor(f).slice(-1)[0];
   return `<div class="sec">
     <div class="certban">
@@ -1359,7 +1703,7 @@ function certBanner(f, {close = false} = {}){
              two would share one auto margin — §77's `.dc-act` / `.dc-when`
              problem, one component along. `aria-label` because the button's
              only content is a glyph. */}
-      ${close?`<button class="certban-x" data-certban="0" aria-label="Dismiss">${I.close}</button>`:''}
+      ${close?`<button class="certban-x" data-certban="${key}" aria-label="Dismiss">${I.close}</button>`:''}
     </div>
   </div>`;
 }
@@ -1770,7 +2114,27 @@ function pulseCols(f, g){
      which is precisely the kind of accident not to depend on. `.pulse-mk` is
      its own class, §72.1b paints it with §70's `--ai-star` and `--ai-grad`, so
      the mark is the same object the band's label wears and no pass can see it. */
-  return `<div class="sec">
+  /* IT IS A BLACK CARD ON COURSE PROGRESS TOO (Maryam, 1 Sep 2026: "the your
+     pulse should be in black card above the 4 blocks").
+
+     `.sec-pulse dark-card` IS THE DASHBOARD'S OWN PAIR OF CLASSES, so this is
+     reuse rather than a second dark treatment. `pulse()` — the enrolled
+     dashboards' card — already returns `.sec sec-pulse dark-card` round the same
+     `aiHead`, and §79 was written for that shape: `gap:var(--s06)`, the column
+     flex and the head row's zeroed margin are all it states outside `.pnc-*`,
+     and the `.pnc-*` rules simply do not match here because this card has no
+     next-call block. Nothing new is added to either layer.
+
+     WHAT THE TWO CARDS NOW SHARE, and it is the point: one component, one
+     ground, the same head row, on the dashboard and on the page the dashboard's
+     Quick Actions point at. §75's recipe carries the ink (§63 §6a), the seams
+     (§75.5) and the accent button; §85.2's top-aligned 40px action is keyed on
+     `.sec-pulse` and follows for free.
+
+     THE DIFFERENCE IS WHAT IS INSIDE — the dashboard's card holds the next
+     call, this one holds the two columns. That is the split §72 and §79 already
+     draw and neither layer had to learn about the other. */
+  return `<div class="sec sec-pulse dark-card">
     ${''/* ONE STAR PER PAGE, AND ON THE ENROLLED DASHBOARDS THIS IS IT. The rule
           is Maryam's (31 Aug 2026) — "do not use star with each new section" —
           and it is a rule about a page, not about a component: the mark says a
@@ -1779,8 +2143,24 @@ function pulseCols(f, g){
           its own label, and this is the one section below it that is Tal's
           reading rather than the product's list. `What the 90 days cover` on
           `assessed` is the case that went the other way. */}
+    ${''/* THE TWO COLUMNS CAME OFF (Maryam, 1 Sep 2026: "remove the your pace
+           and your standing from the black card"). `<div class="pulse">` held
+           `pace` and `stand` — the minutes against the weekly target with its
+           28-block bar, and the three standing rows.
+
+           NEITHER READING IS LOST AND BOTH ARE ONE PRESS AWAY. Pace is the
+           `.stats` strip directly under this card (Time invested, Chapters
+           done) and the lede's own "0 of 45 minutes … 20 minutes this week";
+           standing is the Achievements module, which draws `standRow` from the
+           same `GAME[stage]` record — the note over `pulseCols` always said the
+           two could not disagree, and that is why moving the reading costs
+           nothing.
+
+           WHAT IS LEFT IS THE HEAD ROW, which is the whole card now: Tal's
+           mark, the derived sentence, and the way into the open chapter. That
+           is exactly `pulse()`'s shape on the dashboards minus the next call,
+           so the two are one component again. */}
     ${aiHead({mark:true, title:'Your learning pulse', desc:pulseLede(f, g, p), act})}
-    <div class="pulse">${pace}${stand}</div>
   </div>`;
 }
 
@@ -1965,11 +2345,37 @@ function scoreCard(g){
    WebP at 160px: these are read at 40-56px and never printed. */
 const BDG_ART = ['bronze','silver','gold','involved'];
 
-function awardRow({name,desc,val,state,when,pct,tone,art}){
+/* THE MARK HAS THREE FORMS NOW AND THE ROW PICKS ONE BY WHAT IT IS ABOUT.
+   `art` is the client's award WebP — a photograph of a medal, right for the
+   badge and rank lists, where the object being named IS that artwork. `ph` is
+   a Phosphor duotone glyph on a disc of its own hue (§94) — right for the
+   points list, where nine different ACTIVITIES needed nine different marks and
+   there is no artwork for "reply to a post". The fallback is the generic
+   `.aw-ic` tick / minus / padlock, which nothing calls today and is kept
+   because it is what a fourth list with neither would get.
+
+   `tone` IS DELETED. It wrote `style="color:…"` onto `.aw-ic` and no caller in
+   this file passed it — views-orig.js's badge and rank lists did, before both
+   moved to `art` — so it was the "gate nothing writes" tell with an inline
+   style behind it (trap 1). Its job is now `mk`, which is a CUSTOM PROPERTY
+   rather than a colour: the stylesheet decides what to do with the hue on each
+   of the mark's two tones, and the row only says which hue. */
+function awardRow({name,desc,val,state,when,pct,art,ph,mk}){
   const neg = val<0;
   const mark = art
     ? `<span class="aw-art"><img src="${AWARD[art]}" alt="" loading="lazy"></span>`
-    : `<span class="aw-ic"${tone?` style="color:${tone}"`:''}>${state==='got'?I.checkFilled:(neg?I.subtract:I.locked)}</span>`;
+    : ph
+    /* THE HUE IS WRITTEN ONLY WHEN THE ROW HAS BEEN EARNED, AND THAT IS TRAP 1
+       ANSWERED RATHER THAN FOUGHT. §94 drains an unearned mark to grey, and the
+       first cut did it with `.aw.not .aw-ph{--mk:…}` — a (0,3,0) rule against an
+       inline custom property, which loses to the inline every time and did:
+       all five unearned rows shipped in full rose and red for one build, with
+       nothing thrown. A custom property is still a declaration. So the DEFAULT
+       is the grey (stated once, in §94) and a row states its hue only when the
+       hue is true; the drained state is the absence of a statement rather than
+       an override of one. */
+    ? `<span class="aw-ph"${mk && state==='got'?` style="--mk:var(${mk})"`:''}>${P[ph]}</span>`
+    : `<span class="aw-ic">${state==='got'?I.checkFilled:(neg?I.subtract:I.locked)}</span>`;
   return `<div class="aw ${state}${art?' has-art':''}">
     ${mark}
     <span class="aw-b">
@@ -1982,11 +2388,48 @@ function awardRow({name,desc,val,state,when,pct,tone,art}){
     </span>
   </div>`;
 }
+/* NINE ROWS, NINE MARKS, FOUR HUES — and the hue is by SUBJECT, not by row.
+   Every row used to draw the same `AWARD.points` coin stack, so the list said
+   "points" nine times and nothing about what each line actually asks of you.
+
+   THE HUE NAMES THE KIND OF THING, WHICH IS §29's AND §31's RULE. Four
+   subjects live in this list and they take one hue each: signing in, the
+   course, the community, and the two penalties. That is why rows 1 and 2 share
+   the amber even though the reference draws them orange and green — they are
+   both "you turned up", and a hue that changes between two rows of one subject
+   is a hue saying nothing.
+
+   THE TWO COURSE HUES ARE ALREADY DECIDED ELSEWHERE AND ARE NOT A CHOICE HERE.
+   A chapter is `--mk-1` because §65 says so in as many words ("so a chapter is
+   blue in both places"), and the course is `--mk-3` because §82 gives that
+   violet to `.cov-pill` and the course cover. The reference draws the cap blue;
+   the product's own answer wins, because a candidate meets the course cover
+   twenty times before they open this tab.
+
+   ROSE IS THE THREE COMMUNITY ROWS and is the one named marker §12 has not
+   spent yet. Green is deliberately left out of this list rather than given to
+   something for the sake of using it.
+
+   THE PENALTY HUE IS UNREACHABLE TODAY AND IS STATED ANYWAY. Rows 8 and 9 are
+   in no stage's `got`, and §94 drains every unearned mark to grey, so the red
+   cannot render on any screen in this build. It is here because the day a
+   penalty lands the row must not come up in the community's rose. */
+const PTS_MK = [
+  {ph:'flame',          mk:'--support-attention'},
+  {ph:'sealCheck',      mk:'--support-attention'},
+  {ph:'bookOpenText',   mk:'--mk-1'},
+  {ph:'graduationCap',  mk:'--mk-3'},
+  {ph:'chatNew',        mk:'--mk-4'},
+  {ph:'chatsCircle',    mk:'--mk-4'},
+  {ph:'heart',          mk:'--mk-4'},
+  {ph:'clockCountdown', mk:'--danger-ink'},
+  {ph:'calendarX',      mk:'--danger-ink'}
+];
 function pointsList(g){
   const got = PTS.map((r,i)=>({r,i})).filter(x=>g.got.includes(x.i));
   const rest = PTS.map((r,i)=>({r,i})).filter(x=>!g.got.includes(x.i));
   return [...got,...rest].map(({r,i})=>awardRow({
-    name:r.n, desc:r.d, val:r.v, art:'points',
+    name:r.n, desc:r.d, val:r.v, ...PTS_MK[i],
     state:g.got.includes(i)?'got':'not', when:g.last[i]
   })).join('');
 }
@@ -2727,7 +3170,23 @@ const ENROL_FACTS = [
    §79.2's arrangement for the pulse and the same reason: on a black card the
    head and the content are two parts of ONE object, and `--on-dark-rule` is
    what says so. On the white version the head's 20px margin did that job. */
-const enrolOffer = lvl => `<div class="sec eo dark-card">
+/* THE ACTION IS THE CALLER'S NOW, AND THAT IS THE WHOLE OF THE SECOND
+   ARGUMENT (Maryam, 1 Sep 2026 — the Course Enrollment page takes this card).
+   The two dashboards offer the course and their button OPENS the page that
+   sells it; that page draws the same card and its button is the next step in
+   the same flow — payment. One `data-go="enrol"` for both would have made the
+   Enroll page's own CTA a link to itself, which is the loop §60 calls a dead
+   control by another route.
+
+   DEFAULTED, SO THE DASHBOARDS ARE UNCHANGED. `assessed` and `promoted` both
+   call `enrolOffer(lvl)` with one argument and get exactly the markup they had.
+   Only the caller that needs a different destination states one.
+
+   THE FIGURES ARE NOT PARAMETERISED and must not be: `ENROL_OPENS`,
+   `ENROL_DESC` and the fee are read from one place by every caller, which is
+   the whole reason §82 could delete `enrolPlate`. What varies between callers
+   is where the button GOES, not what the card says. */
+const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
       ${aiHead({
         mark:true,
         title:`You&rsquo;re enrolling on Explorer &ndash; ${lvl}`,
@@ -2764,7 +3223,7 @@ const enrolOffer = lvl => `<div class="sec eo dark-card">
            and E4's "Cohort 58 has 7 places left" is a fact about the cohort
            rather than about when it starts. */
         under:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>`,
-        act:`<button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
+        act:act || `<button class="btn btn-p btn-sm noic" data-go="enrol">Enroll now ${I.arrowRight}</button>`
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -3420,7 +3879,15 @@ function crow(kind, o){
                console carries a failed resource on every render, which is
                exactly what `respcheck` reads as a broken screen. The `<i>` is
                the mark in that case (§71 normalises its `font-style`). */}
-        <span class="crow-ph"><i>${p.i}</i>${p.img
+        ${''/* `c.cover` MEANS "THIS MARK IS ARTWORK, NOT A FACE", and it is a
+               separate field from `img` because the two are different questions:
+               `img` is whether there is a picture, `cover` is what SHAPE the slot
+               should be. A face wants the 78px square §71.405 draws; a cohort's
+               course cover is a ~1.8:1 title card, and a square crop of one
+               throws away the half that carries the words (§86 is the argument
+               and the ratio). One flag, one class, and the four call sites that
+               draw a person are untouched. */}
+        <span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i}</i>${p.img
           ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
@@ -4781,7 +5248,7 @@ V.dashboard = (f) => {
           head says "that is closed, here is what is next" and then gets out of
           the way, which is what a notice is for and what the cross makes true.
           `certBanner`'s own note is the rest of the argument. */}
-    ${certBanner(f, {close:true})}
+    ${certBanner(f, {close:true, key:'dash'})}
     ${enrolOffer('E4')}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
@@ -5031,7 +5498,13 @@ V.dashboard = (f) => {
    caller — this is a change to one page, not the retirement of a component. */
 const lvlWing = f => {
   const confirmed = !f.pred;
-  return `<div class="sec">
+  /* IT IS A BLACK CARD NOW (Maryam, 2 Sep 2026: "where you are on the ladder
+     should be in the black card"), which reverses the ground the note above
+     argues for and keeps everything else that note decided. `.dark-card` rather
+     than `.lvl-hero`: the 31 Aug ask was to get this block OUT of the summary
+     section, and `.lvl-hero` is in ai5's `DARK_CARD`, so `placeDark` would lift
+     it straight back in. §97 §2 is the drawing and §63 §30 the four inks. */
+  return `<div class="sec dark-card">
     <div class="stp stp-open stp-titled wing-lvl">
       ${wingHead('Where you are on the ladder')}
       <div class="prog">
@@ -5076,6 +5549,27 @@ V.level = (f) => {
         DRAWN: the fifteen-rung ladder below is the position, and Tal says
         which rung and what moves it. See the note over `ph()`. */}
   ${ph('My Level')}
+  ${''/* THE CERTIFICATE BAND OPENS THE PAGE BODY (Maryam, 1 Sep 2026: "take the
+        badge banner below the tal summary section"). It was between the ladder
+        and "How the ladder works" — see the note that stood there — and the
+        argument for that slot was "position, proof, then how the ladder works
+        for everyone". The instruction overturns the first two: the proof of the
+        rung comes before the drawing of it.
+
+        IT IS WRITTEN DIRECTLY AFTER `ph()` AND STILL LANDS SECOND, which is
+        §69's ordering rule and the reason this is safe. `placePageSummary`
+        inserts Tal's card after the `.ph` two passes later, so the banner ends
+        up below the summary rather than above it — exactly where the ask puts
+        it — without this view knowing anything about the band.
+
+        AND IT IS WHAT STOPS `placeBand`'s RUN, which is the same job it does on
+        the `promoted` dashboard. That pass walks forward from the `.ph` and
+        takes members until it meets a sibling that is not head furniture (Tal's
+        card, the ask line, a declared `.head-sec`). A `.sec` holding a
+        `.certban` is none of the three, so the run ends here — the band is one
+        column on this page and stays one column. `.certban` is also not in
+        ai5's `DARK_CARD`, so `placeDark` leaves it in the page body. */}
+  ${f.done>0?certBanner(f,{close:true, key:'level'}):''}
   ${lvlWing(f)}
   ${''/* THE SIGNED REPORT BLOCK LEFT THIS PAGE (Maryam, 1 Sep 2026: "instead of
         this page, remove the report section above the How the ladder works and
@@ -5114,35 +5608,30 @@ V.level = (f) => {
       </div>
     </div>
   </div>`:''}
-  ${''/* THE CERTIFICATE, AS THE TINTED BANNER (Maryam, 1 Sep 2026: "instead of
-        this black certification card, use the same light orange banner here as
-        well that we have on the dashboard"). It arrived as `certCard` — the
-        black card — earlier the same day, and the band replaces it.
+  ${''/* THE CERTIFICATE BAND IS NOT HERE ANY MORE — IT OPENS THE PAGE (Maryam,
+        1 Sep 2026: "take the badge banner below the tal summary section"). The
+        call is directly after `ph()` and the note there is the placement
+        argument; what is kept here is why it was ever in this slot and the two
+        decisions that outlived the move.
 
-        IT TAKES THE SLOT THE REPORT BLOCK LEFT: between the ladder and "How the
-        ladder works", so the page reads position, proof, then how the ladder
-        works for everyone. The reference block stays last because it is the
-        only part of this page that is not about you.
+        IT HAD TAKEN THE SLOT THE SIGNED REPORT BLOCK LEFT, on the reading that
+        the page should go position, proof, then how the ladder works for
+        everyone. That ordering was a judgement about a page whose first block
+        is the ladder; putting the proof first is the same three things in the
+        order the instruction asks for, and the reference block is still last
+        because it is the only part of this page that is not about you.
 
-        NO `close` HERE, WHICH IS THE ONE DIFFERENCE FROM THE DASHBOARD'S CALL —
-        `certBanner`'s own note is the argument, and the short version is that
-        `S.certBan` is a single flag: with the cross on both, dismissing the
-        notice on the dashboard would empty this block too, on the one page
-        where nothing else states that a certificate exists.
-
-        AND `.keep-place` WENT WITH THE BLACK CARD. It existed only to opt a
-        `.cert` out of `placeDark`'s lift (trap 12); a `.certban` is not in
-        ai5's `DARK_CARD`, so there is nothing to opt out of. **That leaves
-        `.keep-place` with no writer anywhere in the build** — ai5's check for
-        it still stands and is now a gate nothing writes. Flagged rather than
-        deleted: it is a pass's documented escape hatch, not a style rule, and
-        the next `.cert` on a page with a band will want it.
+        `.keep-place` WENT WITH THE BLACK CARD THIS REPLACED and has no writer
+        anywhere in the build. It existed only to opt a `.cert` out of
+        `placeDark`'s lift (trap 12); a `.certban` is not in ai5's `DARK_CARD`,
+        so there is nothing to opt out of. Flagged rather than deleted: it is a
+        pass's documented escape hatch, not a style rule, and the next `.cert`
+        on a page with a band will want it.
 
         GATED ON `f.done > 0`, WHICH IS `V.transcript`'S OWN CONDITION rather
         than a new one. A certificate is a course you finished, so the stages
         with nothing finished draw nothing — and matching Course Progress means
         the two pages cannot disagree about whether one exists. */}
-  ${f.done>0?certBanner(f):''}
   ${!confirmed?`<div class="sec">
     <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
   </div>`:''}
@@ -5576,8 +6065,19 @@ V.result = (f) => {
 
 V.report = (f) => `<main class="main"><div class="page">
   ${crumb(['My Level','level'],'Report')}
+  ${''/* THE EYEBROW IS GONE (Maryam, 2 Sep 2026: "remove the Level interview ·
+        confirmed August 21 text from the black card"), and nothing else needs
+        to change for it. `placeLevelCards` (ai5) builds the `.lvl-foot` out of
+        whatever it finds — `if(eb)` for the eyebrow, and `if(!eb &&
+        !acts.children.length) return` — so with no eyebrow and no button row
+        under the card the foot is simply not built.
+
+        WHAT IS LOST IS THE DATE, and it is said twice elsewhere on the way in:
+        `PAGESUM.assessed` dates the report and `signedSummary` prints "Assessed
+        and signed by Priya Nair" 400px below this card. The crumb above says
+        Report. §05's `.lvl-hero .eb` rules keep a caller — `V.level`'s
+        pre-interview state — so nothing is orphaned. */}
   <div class="lvl-hero">
-    <div class="eb">${S.iv==='re'?'Re-interview · confirmed November 22':'Level interview · confirmed August 21'}</div>
     <div class="big">${lvlName(f.level)}</div>
     <div class="sub">Level ${rungOf(f.level)} of 15 on the Explorer track</div>
     ${ladder(f.level)}
@@ -5595,33 +6095,39 @@ V.report = (f) => `<main class="main"><div class="page">
     <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
     ${sceneRow(S.iv === 're' ? 're' : 'level')}
   </div>
+  ${''/* WHAT THE INTERVIEW FOUND — MOVED HERE FROM THE INTERVIEWS MODULE
+        (Maryam, 1 Sep 2026: "the strengths and growth section should show
+        inside interview details, remove from here and add in the interview
+        detail page"). This is that page.
+
+        IT REPLACED TWO TILES RATHER THAN JOINING THEM, and that is the whole
+        of the change. What stood here was Priya's write-up drawn the way §74
+        was built to stop drawing it: a `row-lead` tile carrying "Assessed and
+        signed by Priya Nair" with a `.note band` under it, then a second tile
+        headed "Strengths and growth areas" with two grey labels and two
+        paragraphs. §74's own note is the argument against exactly that shape —
+        "nothing in it said that the three are three different KINDS of
+        finding" — and it had been answered everywhere except here, because
+        this page was never one of `signedSummary`'s call sites. Appending the
+        cards would have left the page saying it twice.
+
+        THE THREE ARGUMENTS ARE THE SAME ONES, so nothing new is decided here:
+        `withNote` is on because her note is one of the three findings and this
+        page is where it was already drawn; `re` reads `S.iv`, which is what the
+        hero above it reads, so the cards and the eyebrow name one interview;
+        and `footAction` is OFF — it opens "Read the full report", and this is
+        the full report.
+
+        THE REVIEW BUTTON IS GONE (Maryam, 2 Sep 2026), and the sentence above
+        used to be its argument: it was the only route to a level dispute in the
+        product, stated here because it did not come from `signedSummary`. That
+        is worth knowing rather than deleting, because the route goes with the
+        button — `V.account`'s Data use section is still where a dispute would
+        be raised and there is now nothing on the report pointing at it. Tal
+        answers "can my level be reviewed" and hands over to support, which is
+        the only path left. */}
   <div class="sec">
-    <div class="tile">
-      <div class="row-lead">
-        ${avatar(AGENTS.priya,40)}
-        <div style="flex:1">
-          <div class="t-heading-compact-01">Assessed and signed by Priya Nair</div>
-          <div class="t-helper-01 mt3">August 21, 2026 · 45-minute interview</div>
-        </div>
-      </div>
-      <div class="note mt5 band">
-        <span style="fill:var(--icon-secondary)">${I.user}</span>
-        <div class="nb"><b>Priya&rsquo;s note</b>&ldquo;She talks cautiously, but she has already run a reorganization and can explain every call she made in it. That is an E3, not an E2.&rdquo;</div>
-      </div>
-      <div class="mt5"><button class="btn btn-g" data-go="account">Ask for your level to be reviewed ${I.renew}</button></div>
-    </div>
-  </div>
-  <div class="sec">
-    <div class="tile">
-      <div class="ai-head"><h3>Strengths and growth areas</h3></div>
-      <div class="ai-body">
-        <p class="t-label-01 sig-l">Strengths</p>
-        <p>You reason from consequence to people, not policy. You gave three examples where you changed a decision after listening, and each one had a date and a name attached.</p>
-        <p class="t-label-01 sig-l">Growth areas</p>
-        <p>You describe delegation as risk. Twice you took work back rather than let it land badly. Chapters 4 and 12 are built on exactly this.</p>
-      </div>
-      <div class="ai-foot"><span class="t-legal-01" style="color:var(--text-helper)">Written by Priya Nair from your interview</span></div>
-    </div>
+    ${signedSummary(true, S.iv === 're', false)}
   </div>
   ${''/* WHAT WAS HERE: a "From this interview" block — a 45:12 recording plate
         with Watch, Read the transcript and Download — and, under it, the
@@ -5640,10 +6146,15 @@ V.report = (f) => `<main class="main"><div class="page">
   <div class="sec">
     ${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}
   </div>
-  <div class="sec"><div class="btn-set">
-    ${f.enrolled||f.complete?'':`<button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>`}
-    <button class="btn btn-t">Download report as PDF ${I.download}</button>
-  </div></div>
+  ${''/* "DOWNLOAD REPORT AS PDF" IS GONE (Maryam, 2 Sep 2026) AND THE SECTION
+        GOES WITH IT WHEN IT IS EMPTY. On `week1` and after, the enrol button is
+        already suppressed, so what was left would have been a `.sec` holding an
+        empty `.btn-set` — 48px of white and a join rule under it, which reads as
+        a section that failed to load rather than one that has nothing to say.
+        The whole block is conditional on the one control it can still hold. */}
+  ${f.enrolled||f.complete?'':`<div class="sec"><div class="btn-set">
+    <button class="btn btn-p" data-go="enrol">Enroll on Explorer Track &ndash; E3 ${I.arrowRight}</button>
+  </div></div>`}
 </div></main>`;
 
 /* --------------------------------------------------------------------------
@@ -5739,8 +6250,59 @@ V.interviews = (f) => {
         to the three — see the note over `SCENES`. */}
   ${(f.enrolled||f.complete||!f.pred) && !sceneDone('level')?`
   <div class="sec">
-    <div class="sec-h"><h2>Choose your scenes</h2></div>
-    <p class="t-body-01 mb5" style="color:var(--text-secondary)">Six moments were cut from your interview. Keep the three you would be happy for someone to watch &mdash; they are what shows on your interview from now on, and you can play any of them first.</p>
+    ${''/* THE HEADING AND ITS DESCRIPTION ARE ONE BLOCK, AND THE SAVE IS
+          CENTRED AGAINST THE PAIR (Maryam, 1 Sep 2026: "the desc should be
+          close to the heading not with the bottom scenes… the save scenes
+          button should be middle aligned with the heading and desc row").
+          `.scene-hb` is what makes both true at once — the description was a
+          SIBLING of the `.sec-h`, so it paid §10.212's 16px heading margin on
+          top and its own `.mb5` underneath, which put it exactly half way
+          between the title and the grid, and it left the button with nothing
+          but the `<h2>` to centre against.
+
+          IT IS `.sec-h` AND NOT `aiHead`, WHICH IS THE ONE CALL WORTH
+          RECORDING. §73's note says to read it before adding a fourth caller
+          and that it "needs no new class and no new type rule", and both are
+          true — the component is exactly this shape. What stops it is its own
+          measure: `.aih-b` is capped at 60% so a description wraps clear of
+          the action, and 60% of this row is 483px against a sentence that
+          measures 610. The cap is right for the three sections it was written
+          for, whose descriptions are two lines by design; here it would undo
+          the "keep the desc one liner" instruction from the same afternoon.
+          Overriding a component's defining measure at one call site is worse
+          than not using it, so this states the two rules it actually needs.
+
+          THE CENTRING IS §24.6's, ALREADY THERE. `.sec-h` is a flex row with
+          `align-items:center`, and §37.11b's `align-self:flex-start` on every
+          child excludes a row holding a `> .btn` — for this exact reason,
+          written when the only such rows were one line tall. With the pair in
+          one child the button centres against both lines with nothing added. */}
+    <div class="sec-h"><div class="scene-hb"><h2>Choose your scenes</h2>
+    ${''/* ONE LINE, AND THE SENTENCE WAS CUT TO MAKE IT ONE (Maryam, 1 Sep
+          2026: "keep the desc one liner, do not let it go to two or three
+          lines"). Two clauses came off — "they are what shows on your
+          interview from now on, and you can play any of them first" — and
+          both are said better elsewhere: the first is what the section is
+          FOR, which its heading and the six checkboxes already say, and the
+          second is a description of a control the card itself draws (a play
+          mark on every still). That is `PAGESUM`'s third content ban,
+          "no pointing at the UI", applied to a section lede.
+
+          CUTTING IT WAS NOT ENOUGH ON ITS OWN — §14.3 caps `.sec > p` at
+          68ch at desktop, which is ~660px of a 1380px column, so the short
+          sentence still broke at "someone to". `.scene-lede` uncaps it in
+          §38.5, which is §70's move on Tal's summary ("a measure stated in a
+          frame whose right-hand side is occupied; applied to a band with no
+          second column it is not a measure but a ragged right edge"). Same
+          here: there is nothing to the right of this line, and the grid
+          under it is laid out against the full column. */}
+    ${''/* THE INLINE `color` AND THE `t-body-01 mb5` UTILITIES CAME OFF WITH
+          THE WRAPPER. The colour was trap 1 waiting to happen — an inline
+          declaration no layer can answer — and §63 owns ink; `.mb5` was the
+          gap to the grid, which is `.sec-h`'s own margin now that the
+          paragraph is inside it. §63 §22 states the size and the ink. */}
+    <p class="scene-lede">Six moments were cut from your interview. Keep the three you would be happy for someone to watch.</p>
+    </div>${sceneSave('level')}</div>
     ${scenePick('level')}
   </div>`:''}
   ${''/* PAST INTERVIEWS IS A VERTICAL BLOCK. §10.15 gives a `.sec` with a
@@ -5763,37 +6325,27 @@ V.interviews = (f) => {
       ${f.complete?ivRow('re','Re-interview','November 21, 2026','Promoted to Explorer &ndash; E4','44:06'):''}
       ${ivRow('level','Level interview','August 20, 2026','Confirmed Explorer &ndash; E3','45:12')}
     </div>
-    ${''/* THE SIGNED FINDINGS, MOVED HERE FROM `V.level` (Maryam, 1 Sep 2026).
-          The long version is where it used to be drawn; what matters here is
-          the placement, and three things decided it.
+    ${''/* THE SIGNED FINDINGS ARE NOT HERE ANY MORE — THEY ARE ON THE INTERVIEW
+          ITSELF (Maryam, 1 Sep 2026: "the strengths and growth section should
+          show inside interview details, remove from here and add in the
+          interview detail page"). `V.report` is that page, and it is one press
+          away: every row in `.ivlist` is `data-go="report"`.
 
-          INSIDE THIS SECTION, NOT AFTER IT. The ask is "against the interview
-          details", and the interview details on this module ARE these rows. As
-          the section's own next child the block reads as what the newest row
-          found; as a section of its own it would be a second block about the
-          same interview with a heading competing with "Past interviews".
+          WHY IT READS BETTER THERE, AND WHY IT WAS DEFENSIBLE HERE. The block
+          arrived on this module when it left `V.level`, on the argument that
+          "the interview details on this module ARE these rows" — true of the
+          module, and the ask has now drawn the line one level lower: a LIST is
+          a list, and what one interview found belongs on the page about that
+          interview. The list holds TWO rows on `promoted`, so the block sitting
+          under both of them had to name which one it was reporting in its own
+          header; on `V.report` the whole page is one interview and `S.iv` has
+          already picked it, so the question does not arise.
 
-          IT NEEDS NO HEADING AND MUST NOT BE GIVEN ONE — trap 13. `.signed` is
-          not in §10.15's opt-out list, so a `.sec-h` on a section built round it
-          takes the 184px label column. This section already opts out through
-          `.ivlist` (§38's `.sec:has(> .ivlist){display:block}`), so the rows and
-          the block both get the full width — and the block carries its own
-          heading anyway, in the two facts of `.signed-h`.
-
-          §74'S `border-top` IS THE SEPARATION AND IT ONLY WORKS AS A DIRECT
-          CHILD. `.app .page .sec > .signed` gives the block a rule and
-          `--s07` above it, inset to the section's own gutter — written for
-          exactly this, a signed block following something else inside one
-          section. Wrapping it in a div would lose the rule and nothing would
-          warn.
-
-          `re` IS `f.complete`, SO THE CARDS DESCRIBE THE TOP ROW. On the
-          promoted stage the list opens with the re-interview, and the block's
-          header names which one it is reporting — "Re-interview / 21 November
-          2026" against "Level interview / 20 August 2026". Passing `false` here
-          the way `V.level` did would have printed August's findings under
-          November's row with nothing saying so. */}
-    ${signedSummary(false, !!f.complete, true)}
+          AND IT WAS THE SECOND WRITE-UP THERE. `V.report` already drew Priya's
+          two paragraphs and her note as two `.tile`s of prose — the exact block
+          §74 was built to replace. Moving this one in did not add a section, it
+          finished a swap that had been half done since §74 shipped. The long
+          version is over `signedSummary`. */}
   </div>`:''}
   ${''/* SCHEDULED IS THE DASHBOARD'S ROW — Maryam, 31 Aug 2026. It was a
         four-row `.kv` tile, a three-button set under it and a legal line: the
@@ -6906,6 +7458,139 @@ const RPT_GROWTH = ['Delegation Without Drop-Off','Coaching vs Fixing']
    that rule is stated.
    ========================================================================== */
 const ENROL_CREDIT = {E3:'Interview already paid', E4:'Returning candidate credit'};
+/* ==========================================================================
+   WHAT YOU'LL LEARN — the outcomes as a tick list, the topics as chips
+   Maryam, 1 Sep 2026, with a reference screen.
+
+   THE TWO LISTS ARE TWO RECORDS THE BUILD ALREADY HAS, and that is the one
+   decision worth reading before changing any of it. The reference shows four
+   outcome lines and a dozen skill chips; a prototype can only draw what it
+   knows, and §74's rule is that inventing product copy is the thing a redesign
+   must not do. So:
+
+     `SCORES`   the five competency bands — Decisiveness, Delegation,
+                Directness, Coaching, Composure. These are what the quiz
+                measures and what the re-interview reads, so they are the
+                OUTCOMES: what you will be better at. `qzLow` and `QZ_CH`
+                already treat them as the product's competency vocabulary.
+     `CH`       the thirteen chapter titles — what the course actually covers,
+                week by week. Those are the TOPICS, and the chip row is the
+                shape the reference draws them in.
+
+   THE NUMBERS ARE READ, NOT TYPED. `SCORES.length` is five and `CH.length` is
+   thirteen; add a chapter and the chip row and the modal both grow. The visible
+   chip count is the only literal, and it is a layout number rather than a fact
+   about the course.
+
+   `SKL_SHOWN` IS TEN BECAUSE THE ROW IS TWO LINES AT DESKTOP. Thirteen chips
+   run to three lines and the block stops reading as a summary; ten plus the
+   link is two. It is also what makes "Show all" mean something — a control that
+   reveals three more items is worth pressing, and with all thirteen shown it
+   would be a button with nothing behind it (§60).
+
+   WHAT IS DELIBERATELY NOT HERE: a length per row. The chapter minutes are on
+   the card's own `.facts` and in the lede, and a tick list with a figure at the
+   end of every line is the numbered table this replaces. */
+/* THE TICK LINES ARE SENTENCES, NOT BAND NAMES (Maryam, 1 Sep 2026: "for these
+   tick mark content, use the same content that we have in the reference
+   image"). They shipped for one build as the five bare `SCORES` words —
+   Decisiveness, Delegation, Directness, Coaching, Composure — which is the
+   right DATA and the wrong shape: the reference's lines say what you will be
+   able to DO, and a one-word noun beside a tick reads as a label with a tick
+   next to it.
+
+   EVERY LINE IS ONE BAND ANCHORED TO THE CHAPTERS THAT TEACH IT, so this is
+   derived copy rather than invented copy — the distinction §74 draws. Read the
+   pairs off `SCORES` and `CH`:
+
+     Decisiveness  ch 7  Decisions Under Incomplete Information
+     Delegation    ch 4  Delegation Without Drop-Off
+     Directness    ch 5  Hard Conversations,  ch 9  Feedback That Lands
+     Coaching      ch 12 Coaching vs Fixing
+     Composure     ch 11 Conflict and Repair, ch 13 Leading Through Change
+
+   `QZ_CH` already maps a band to a chapter for `V.result`, which is the same
+   claim one page over — so nothing here asserts a competency the course does
+   not have a chapter for.
+
+   A LIST RATHER THAN A MAP ON `SCORES`, because the band name is not in the
+   sentence and a `{Decisiveness: '…'}` would read as five keys nothing looks
+   up. The order is `SCORES`' order, so the two lists stay in step by eye.
+
+   FIVE, NOT FOUR. The reference draws four; we have five bands and dropping one
+   would be choosing which competency the course does not teach. Five is 3 + 2
+   in the two columns, which is what the screenshot shows. */
+const LEARN = [
+  'Decide with incomplete information and explain the call afterwards',
+  'Hand work over without it dropping, and without taking it back',
+  'Say the hard thing directly, and give feedback that lands',
+  'Coach people through a problem instead of fixing it for them',
+  'Hold a team steady through conflict, repair and change'
+];
+
+const SKL_SHOWN = 10;
+
+const learnSec = () => `<div class="sec">
+    <div class="sec-h"><h2>What you&rsquo;ll learn</h2></div>
+    ${''/* THE LEDE IS GONE — AND IT TOOK THE LABEL-COLUMN OPT-OUT WITH IT
+           (Maryam, 1 Sep 2026: "remove the desc of what you'll learn").
+
+           WHAT IT SAID AND WHY LOSING IT COSTS NOTHING. "Thirteen chapters, one
+           a week, 45 to 70 minutes each. Every one closes with an assessment,
+           and the average of the thirteen is what an agent reads at your
+           re-interview." Every figure in it is printed on this page already:
+           the four-cell `.facts` row 40px above states "13, one a week" and
+           "13, one per chapter", and what an agent reads at the re-interview is
+           `PAGESUM.enrol`'s job in the band. The section is a list of outcomes
+           and it can open on them.
+
+           TRAP 13, AND THIS IS THE CASE THE TRAP IS NAMED FOR. §10.15's opt-out
+           is keyed by CONTENTS and neither `.lrn` nor `.skl` is on the list, so
+           that `.all-desc` was the only thing keeping this section out of the
+           184px label column — the note that stood here said exactly that, and
+           deleting the sentence is the failure §69 records in as many words:
+           "Adding a wrapper is not the only way to lose an opt-out — removing
+           content does it too." §87.1a restates it on `:has(> .lrn)`, inside
+           the same container query per trap 3. Nothing warns; without that rule
+           the heading sets in a 184px gutter beside a two-column list. */}
+    <ul class="lrn">
+      ${LEARN.map(t => `<li class="lrn-i"><span class="lrn-tk">${I.check}</span><span class="lrn-t">${t}</span></li>`).join('')}
+    </ul>
+    <h3 class="skl-h">Skills you&rsquo;ll gain</h3>
+    <div class="skl">
+      ${CH.slice(0, SKL_SHOWN).map(c => `<span class="skl-c">${c[0]}</span>`).join('')}
+      ${CH.length > SKL_SHOWN ? `<button class="skl-more" data-sklall="1">Show all</button>` : ''}
+    </div>
+  </div>`;
+
+/* THE MODAL IS §02.14'S DIALOG, NOT A NEW COMPONENT. `.modal` + `.sheet` is the
+   build's own centred dialog — `align-items:flex-end` on a phone, `center` from
+   600 up, which is the "little modal on page mid" the ask describes — and
+   `profileSheet` / `photoSheet` / `cardSheet` are three working call sites to
+   copy the shape from: `.sheet-h` with a title and a close `.x`, `.sheet-b` for
+   the body.
+
+   IT IS A SIBLING OF `.shell-body`, appended in `render()`, and it has to be:
+   `.modal` is `position:absolute; inset:0` against the app, so nested inside a
+   `.sec` it would be clipped to that section. The three existing sheets are
+   appended the same way and gated on `S.view`.
+
+   THE STATE IS `S.sklAll` — trap 9. `render()` replaces `device.innerHTML`, so
+   the open class cannot live in the DOM; the sheet is a pure function of `S` and
+   the two controls set the boolean. `data-close` on the scrim is the same
+   dismiss the profile sheet uses, so pressing the dim area closes it. */
+const skillsSheet = () => `<div class="modal ${S.sklAll?'on':''}" data-close="sklall">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Skills you&rsquo;ll gain</h2>
+        <button class="x" data-sklall="0" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="skl skl-full">
+          ${CH.map(c => `<span class="skl-c">${c[0]}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+
 const checkoutPlate = lvl => `<div class="sec">
     <div class="plate">
       <div class="plate-t">Your enrolment</div>
@@ -6923,7 +7608,7 @@ V.enrol = (f) => {
   const lvl = next?'E4':'E3';
   const [g1,g2] = RPT_GROWTH;
   return `<main class="main"><div class="page">
-  ${crumb(['Dashboard','dashboard'],next?'Next course':'Enroll')}
+  ${crumb(['Dashboard','dashboard'],next?'Next course':'Course Enrollment')}
   ${''/* A `&middot;` SPINE, NOT A SENTENCE. Tal's summary used to open "90
         days, 13 chapters and a cohort of ten with a live leader" — this line
         with two commas moved. The facts stay here where a description belongs
@@ -6968,111 +7653,46 @@ V.enrol = (f) => {
         inventing one to fill a section is worse than the section being
         absent; what a leader IS is the second row of "How your cohort works",
         on both levels. */}
-  ${next?'':`<div class="sec head-sec">
-    <div class="sec-h"><h2>Your cohort leader</h2></div>
-    ${leaderCard()}
-  </div>`}
-  ${''/* THE HAND-WRITTEN TAL CARD IS GONE AND NOTHING IS LOST WITH IT.
-        Per trap 11 `placePageSummary` strips a page's Tal card back to its
-        label and replaces the heading and the body with `PAGESUM.enrol`, so
-        "What the 90 days ask of you" and its sentence were never on screen —
-        and the ask chip beside it was removed by the same pass's step 1b. The
-        pass BUILDS the card when a page has none, which is what `V.payment`
-        has always relied on. The words live in `PAGESUM.enrol`. */}
-  ${checkoutPlate(lvl)}
-  ${''/* THE ORDER OF THIS PAGE IS THE ORDER OF THE QUESTIONS, and it was
-        settled by reading it rather than by argument (Maryam, 28 Aug 2026).
-        The band answers "what is this and what does it cost" before anything
-        scrolls. Then, in the column: WHO you would be doing it with, WHAT you
-        would learn, HOW the cohort runs, and last the four figures that recap
-        all three. The person leads because she is the only thing on the page
-        that is not a fact about a product; the mechanics sit under the
-        curriculum because nobody asks how a cohort works before they know
-        what is in it, which is also why they are behind a disclosure. */}
-  ${''/* WHAT YOU LEARN IS THIRTEEN CHAPTERS, AND IT IS ALL THIRTEEN.
-        This was four `chRow`s and an "All 13" button. Both halves were wrong.
-        `chRow` draws a chapter's PROGRESS — "Not started &middot; 45 min" — on
-        a page for somebody who has not bought the course, so the one thing
-        every row said about itself was that nothing had happened yet; and the
-        button went to `coursework`, which is the LightspeedVT frame and is
-        empty until you are enrolled, so the way to see the other nine was a
-        blank screen.
+  ${''/* THE PAGE IS THREE BLOCKS NOW (Maryam, 1 Sep 2026): Tal's summary, the
+        black enrolment card, and what you'll learn. Four sections came off and
+        each one is accounted for below — none of them is a figure that now
+        appears nowhere.
 
-        `.ch-two` is the flat form the `assessed` dashboard already uses — a
-        number, a title, a length, no state — and all thirteen of them fit in
-        two columns. The dashboard's block ends on "See the full course" and
-        points here, so this page has to be the fuller one; it is, by the
-        section under it.
+        THE CHECKOUT PLATE WENT AND `V.payment` ALREADY HELD ITS THREE FIGURES.
+        `checkoutPlate` was "Course fee $690 / Interview already paid −$95 / Due
+        today $595" with "Continue to payment" under it. The payment page states
+        all three as `.kv` rows — $690, Interview credit −$95, Total $595 — and
+        its button reads "Pay $595 and start", so the breakdown is one press away
+        and unchanged. What the black card carries instead is the fee and the
+        four things it buys; the CREDIT is the one line that is now only on
+        `V.payment`, which is where a credit belongs.
 
-        THE OPT-OUT IS `> .all-desc` (§16, trap 13). `.ch-two` is not in
-        §10.15's list, so the lede is what keeps this section out of the 184px
-        label column, and it has to stay a DIRECT child of the `.sec`. */}
-  <div class="sec">
-    <div class="sec-h"><h2>What you&rsquo;ll learn</h2></div>
-    <p class="all-desc">Thirteen chapters, one a week, 45 to 70 minutes each. Every one closes with an assessment, and the average of the thirteen is what an agent reads at your re-interview.</p>
-    <div class="ch-two">${CH.map((c,i)=>`
-      <div class="ch ch-flat">
-        <span class="ch-num">${String(i+1).padStart(2,'0')}</span>
-        <span class="ch-b"><span class="ch-t">${c[0]}</span><span class="ch-s">${c[1]} min</span></span>
-      </div>`).join('')}</div>
-    ${''/* AND TWO OF THE THIRTEEN ARE THIS READER'S, WHICH IS THE ONLY THING
-          ON THE PAGE THAT IS NOT TRUE OF EVERYBODY. It closes the section for
-          the reason the dashboard's report block closes its own: read after
-          the list, the thirteen stop being a catalogue and become the answer
-          to what Priya wrote down.
+        THE COHORT LEADER CARD WENT. Priya is named on this page by Tal's
+        summary and, one step later, by `V.welcome`'s "Leads Cohort 41" —
+        which is the receipt, and the point at which she becomes yours.
 
-          ONLY ON THE FIRST COURSE. At `promoted` the report is the
-          re-interview's and it names chapters 3 and 9 of the E4 curriculum —
-          a curriculum this page does not list, since `CH` is E3's. Naming a
-          number against the wrong list is worse than saying nothing. */}
-    ${next?'':`<div class="note mt5"><span>${I.certificate}</span><div class="nb"><b>Two of these are yours by name</b>Priya&rsquo;s report names delegation, and coaching rather than fixing. Chapter ${g1+1}, ${CH[g1][0]}, and chapter ${g2+1}, ${CH[g2][0]}, are built on exactly that.</div></div>`}
-  </div>
-  ${''/* AND THE MECHANICS ARE A DISCLOSURE, ON THE SAME COMPONENT AS "WHAT THE
-        INTERVIEW FOUND" — Maryam's ask, and the same argument holds: six rows
-        of how-it-works is the longest block on the page and it is the one part
-        a reader who has already decided does not need. `foundHead`'s note is
-        the long version; the key is `cohort` so the report's disclosure on the
-        dashboard keeps its own state.
+        "HOW YOUR COHORT WORKS" WENT, AND IT IS THE ONE REAL SUBTRACTION. Six
+        `.kv` rows — who is in it, who leads it, the weekly call, between calls,
+        if you miss one, which cohort — and they exist nowhere else in the build.
+        Flagged rather than quietly dropped: if they should stay, they are the
+        §65 disclosure again with `key:'cohort'` and `discOpen` is untouched.
 
-        THE LEDE STAYS OUTSIDE `.found-b`. §65 hides the panel and nothing
-        else, so a closed disclosure is normally a heading on its own; here the
-        one line that answers "what IS a cohort" is visible shut, and what
-        expands is the detail. Somebody who has read it once never opens it
-        again and still knows what the block says.
+        "WHAT YOU GET" WENT because the black card's own `.facts` row is four
+        figures about the same purchase — Chapters 13, Assessments 13, Cohort of
+        10 — and the two rows disagreed on nothing. Live calls and Day 91 are
+        said by the lede and by Tal.
 
-        NO MEMBER LIST. Ten faces here would be a claim the product has not
-        made — the cohort is assigned when the payment clears, which is the
-        last row in the panel. `V.cohort` is where the ten people are. */}
-  <div class="sec tint cards found${discOpen('cohort')?' on':''}">
-    ${foundHead('How your cohort works','','cohort')}
-    <p class="all-desc">Ten people at Explorer &ndash; ${lvl}, the same ten for all 90 days, with one live call a week.</p>
-    <div class="found-b">
-      <div class="kv mt5"><span class="k">Who is in it</span><span class="v">Up to ten candidates, all at your level</span></div>
-      <div class="kv"><span class="k">Who leads it</span><span class="v n">A volunteer, certified by TalentNext and unpaid</span></div>
-      <div class="kv"><span class="k">The weekly call</span><span class="v n">Thursdays, 6:00 PM ET &middot; 60 minutes, not recorded</span></div>
-      <div class="kv"><span class="k">Between calls</span><span class="v n">A discussion board the whole cohort can see</span></div>
-      <div class="kv"><span class="k">If you miss one</span><span class="v n">Nothing is marked &mdash; your leader posts what was covered</span></div>
-      <div class="kv"><span class="k">Which cohort</span><span class="v n">Assigned by your level and start date, not chosen</span></div>
-    </div>
-  </div>
-  ${''/* THE STRIP KEEPS ITS FOUR CELLS AND GAINS A HEADING. `.stats` is a
-        fixed four-column grid (trap 13's opt-out list, so no label column) and
-        these are the four figures the fee buys that the card does not state.
-        Unheaded it was a row of numbers floating under a title. */}
-  <div class="sec">
-    <div class="sec-h"><h2>What you get</h2></div>
-    <div class="stats">
-      ${statCell(I.book, `Chapters`, `13`, `one a week`)}
-      ${statCell(I.video, `Live calls`, `13`, `60 min, weekly`)}
-      ${statCell(I.group, `Cohort size`, `10`, `max, all at ${lvl}`)}
-      ${statCell(I.calendar, `Re-interview`, `Day 91`, `then you move`)}
-    </div>
-  </div>
+        THE ACTION IS THIS PAGE'S, NOT THE DASHBOARD'S. `enrolOffer` takes the
+        button as a second argument for exactly this: on a dashboard it opens
+        this page, and here it goes to payment. Without it the CTA would be a
+        link to the page it is on. */}
+  ${enrolOffer(lvl, `<button class="btn btn-p btn-sm noic" data-go="payment">Continue to payment ${I.arrowRight}</button>`)}
+  ${learnSec()}
 </div></main>`;
 };
 
 V.payment = (f) => `<main class="main"><div class="page">
-  ${crumb(['Enroll','enrol'],'Payment')}
+  ${crumb(['Course Enrollment','enrol'],'Payment')}
   ${''/* The last clause was a sentence spliced onto a `&middot;` row, and Tal
         below said it as one — "your cohort is assigned as soon as it clears".
         A spine states, it does not promise. */}
@@ -7366,12 +7986,13 @@ V.rewards = (f) => {
      uses. The key stays short because it is what `S.rtab` and `data-rtab`
      carry; only the visible word is looked up. */
   const TAB_N = {points:'Points', badges:'Badges', rank:'Rank', certs:'Certificates'};
-  const nCerts = certsFor(f).length;
-  const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`,
-    /* READ, NOT TYPED — one certificate before the re-interview and two after,
-       and `certsFor` is the same list the rows are drawn from, so the count and
-       the list cannot disagree. */
-    certs:`${nCerts} earned`};
+  /* THERE IS NO `certs` COUNT ANY MORE (Maryam, 2 Sep 2026 — remove "1 earned"
+     and "Updated today"). The certificates tab draws no meta row at all, so the
+     entry had no reader and `nCerts` went with it rather than being left as the
+     "gate nothing writes" tell. It was READ, NOT TYPED — `certsFor(f).length`,
+     the same list the rows are drawn from — and that is the shape to restore it
+     in if the count ever comes back. The other three tabs keep the row. */
+  const counts = {points:`${g.got.length} of ${PTS.length} earned`, badges:`${g.badges} of ${BDG.length} earned`, rank:`Currently ${RANKS[g.rank-1].n}`};
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Achievements')}
   ${''/* NO DESCRIPTION HERE EITHER. "Points, badges and rank come from your
@@ -7433,38 +8054,383 @@ V.rewards = (f) => {
         declaration beats every stylesheet rule at any specificity, and in the
         band the column's spacing is §70.3's. Left there it would have been a
         value from the page body silently winning inside the head. */}
-  <div class="sec head-sec head-col">${scoreCard(g)}</div>
+  ${''/* `.sec-score` NAMES THE TENANT, which is the pattern §70.3's own note
+        sets out: "`.head-col` IS WHAT OPENS THE SECOND COLUMN AND `.sec-jrn` IS
+        ONLY WHICH TENANT". The journey list, the progress wing and now the
+        points strip are three tenants of one slot, and each needs a word so a
+        rule about ITS spacing cannot reach the other two. §89.4 is the rule. */}
+  <div class="sec head-sec head-col sec-score">${scoreCard(g)}</div>
   <div class="tabs">
     ${['points','badges','rank','certs'].map(k=>`<button class="${k===tab?'on':''}" data-rtab="${k}">${TAB_N[k]}</button>`).join('')}
   </div>
-  <div class="sec nofill" style="padding-top:var(--s05)">
+  ${''/* THE CERTIFICATES TAB LEAVES THE SHARED WRAPPER ENTIRELY (Maryam,
+        2 Sep 2026). The other three are one list inside one `.sec`; this one is
+        a black card and then a headed grid, which is two sections — and a
+        `.dark-card` inside a `.sec` that also holds a meta row would pay that
+        section's padding on top of its own 32px frame. Branching here rather
+        than inside the wrapper is also what drops the inline `padding-top`
+        (trap 1) for this tab, which was a value from the page body that no
+        stylesheet could answer. */}
+  ${tab==='certs' ? certsTab(f, g) : `<div class="sec nofill">
+    ${''/* THE META ROW IS OFF ON THE CERTIFICATES TAB (Maryam, 2 Sep 2026), and
+          the row survives on the other three because their left half is a real
+          figure — "3 of 12 earned", "Currently 1-Star" — read off the same
+          record the list below is drawn from. On certs it was "1 earned" over a
+          list of one, which is the count restating the thing it counts. Both
+          halves go together: "Updated today" alone would be a right-aligned
+          timestamp with nothing on its line. */}
     <div class="sec-h" style="margin-bottom:var(--s04)"><span class="t-helper-01">${counts[tab]}</span>
       <span class="t-helper-01" style="margin-left:auto">Updated today</span></div>
-    ${''/* THE CERTIFICATES TAB IS A `.tile-stack`, NOT AN `.aw-list`, and the
-          wrapper is branched rather than shared. `.aw-list` is the container for
-          `.aw` rows — a mark, a name and description, a value and a state at the
-          right end — and a certificate has no value and no percentage; it is a
-          `.cardrow`, which is what `V.leadCerts` already draws its list of
-          certificates as. Reusing `.aw-list` would have meant styling `.cardrow`
-          against a parent written for a different row.
-
-          BOTH WRAPPERS OPT THIS SECTION OUT OF THE LABEL COLUMN — trap 13.
-          §10.451 names `.sec:has(.cardrow)` and `.sec:has(> .tile-stack)`
-          alongside the list this section already relied on, so the switch cannot
-          drop the opt-out the way §69's and §73's content changes did. */}
-    ${tab==='certs'?`<div class="tile-stack">${certList(f)}</div>`:`<div class="aw-list">
+    <div class="aw-list">
       ${tab==='points'?pointsList(g):tab==='badges'?badgeList(g):rankList(g)}
-    </div>`}
+    </div>
     ${tab==='points'?`<p class="t-helper-01 mt5">Points update within a few minutes of the activity.</p>`:''}
     ${tab==='rank'?`<p class="t-helper-01 mt5">Rank reflects your activity. It is separate from your level.</p>`:''}
-    ${''/* WHAT A CERTIFICATE IS FOR, once, where the other two tabs put their
-          one-line note. It is the only tab whose rows DO something outside the
-          product, so the line says what the share link is rather than repeating
-          what the buttons are labelled. */}
-    ${tab==='certs'?`<p class="t-helper-01 mt5">A share link is public and shows the level and the date only. Nothing else on your profile is published.</p>`:''}
-  </div>
+  </div>`}
 </div></main>`;
 };
+
+/* THE COHORT AVERAGE IS A RECORD NOW, AND IT HAD BEEN TYPED TWICE. 79 was a
+   literal in the `.stats` cell ("cohort average 79%") and again as `lineChart`'s
+   `target:79` — the dashed comparison line and the caption naming it, two
+   statements of one number with nothing keeping them in step. The `bkStamp`
+   rule, on a figure rather than a booking. */
+const COHORT_AVG = 79;
+
+/* ==========================================================================
+   YOUR PERFORMANCE — §88, and it replaces the "Assessment scores" chart
+   Maryam, 1 Sep 2026, with a reference screen.
+
+   WHAT THE REFERENCE ADDS OVER `lineChart` is not the plot, it is the READING
+   around it: the average as the page's largest figure, the movement since the
+   first five chapters, and a footer that names the one thing to do about it.
+   `lineChart` draws a title, a plot and a data table — a chart with a caption.
+   This is a figure, a chart and a conclusion.
+
+   EVERY NUMBER IS DERIVED FROM `SCORE` AND `f.done`. Nothing here is typed:
+   the average is `f.avg`, the plot is the assessed chapters, the delta is the
+   arithmetic below, the low and high are `Math.min` / `Math.max` of the same
+   slice, and the focus areas are `RPT_GROWTH` — the two chapters Priya's report
+   names, which is what makes them focus areas rather than just the low scores.
+   The dashed line is `COHORT_AVG`.
+
+   THE DELTA ONLY DRAWS WHEN THERE IS A SECOND GROUP. On day 34 five chapters
+   are assessed, so "improvement from the first five" has nothing to compare
+   against and the rail shows the average alone. Printing a 0 there would be a
+   claim that nothing moved, which is not the same as not knowing yet.
+
+   WHAT IT REFUSES FROM THE REFERENCE: the "Chapter view" dropdown in the top
+   right. There is one view of this data and §60's rule is that a dead control
+   on a live surface is worse than a missing one — the same test that kept the
+   month chevrons off §76 until `AGENT_CAL` gave them somewhere to go.
+
+   AND THE EYEBROW IS A SECTION HEADING. The file sets "YOUR PERFORMANCE" in
+   caps and §63 §2 is explicit that nothing in this product is: the words go in
+   the markup in sentence case. So it is `.sec-h h2` at the one section-heading
+   size, with the file's second line as the section's lede — which also keeps
+   trap 13's opt-out, since `.all-desc` is what holds a `.perf` section out of
+   the 184px label column.
+   ========================================================================== */
+const perfAvg = a => Math.round(a.reduce((x,y)=>x+y,0) / a.length);
+
+function perfParts(f){
+  const done  = SCORE.slice(0, f.done);
+  const first = done.slice(0, 5), rest = done.slice(5);
+  const lo = done.indexOf(Math.min(...done));
+  const hi = done.indexOf(Math.max(...done));
+  return {done, lo, hi,
+    delta: rest.length ? perfAvg(rest) - perfAvg(first) : null};
+}
+
+/* THE INSIGHT IS ONE DERIVED SENTENCE AND EVERY BRANCH OF IT IS STRICTLY TRUE.
+   The reference's line is a claim about a trend; ours is the same claim computed
+   rather than written, so it cannot say the average rose on a page where it
+   fell. Three cases, and the third is the one that matters: with five chapters
+   assessed there is no trend yet, so the sentence reports the lowest instead of
+   inventing a direction. */
+function perfInsight(f){
+  const {done, lo, delta} = perfParts(f);
+  const ch = i => `chapter ${i+1}, ${CH[i][0]},`;
+  /* "1 points" shipped for one build. The delta is an integer that is genuinely
+     1 on day 90 — 87 across chapters 6-13 against 86 across the first five — so
+     this is not a hypothetical plural. */
+  const pt = n => n === 1 ? 'point' : 'points';
+  if(delta === null)
+    return `Five chapters are assessed so far. ${ch(lo)[0].toUpperCase()+ch(lo).slice(1)} is your lowest at ${done[lo]}%.`;
+  if(delta > 0)
+    return `Your average is ${delta} ${pt(delta)} higher from chapter 6 on than across the first five, and ${done.filter(v=>v>=COHORT_AVG).length} of ${done.length} chapters are at or above the cohort's ${COHORT_AVG}%.`;
+  if(delta < 0)
+    return `Your average is ${-delta} ${pt(-delta)} lower from chapter 6 on than across the first five. ${ch(lo)[0].toUpperCase()+ch(lo).slice(1)} is the lowest at ${done[lo]}%.`;
+  return `Your average is level with the first five chapters, and ${ch(lo)} at ${done[lo]}%, is the lowest.`;
+}
+
+/* THE PLOT. Its own SVG rather than `lineChart`'s, because the composition is
+   different — a y axis with stated gridlines, a legend, and two points called
+   out — and bending that function would mean four more options on a chart three
+   other callers share.
+
+   THE HOUSE IDIOMS ARE KEPT: a `viewBox` with the geometry in user units,
+   `vector-effect:non-scaling-stroke` so a stretched plot keeps a 1px rule, and
+   the line in `--dv-grad-a/b` like every other chart in the build. What is NOT
+   kept is `preserveAspectRatio="none"` — `lineChart` stretches its 320x104 box
+   to whatever width it gets, which is fine for a sparkline and wrong here,
+   because the dots would go oval and the y labels would shear.
+
+   THE TWO CALL-OUTS ARE THE LOWEST AND THE HIGHEST, in the danger and success
+   inks §12 already owns — the reference draws a red and a green halo and those
+   are the two words this product has for "under" and "over". They are the same
+   two points `perfInsight` names, so the chart and the sentence cannot disagree.
+
+   §63 §23 SIZES THE `<text>`. Trap 7's sibling: SVG text is not in §11's
+   element list, so a chart that states its own `font-size` is the one place
+   type escapes the system — §63 §5 brought the other charts in on `fill` and
+   this follows it. */
+function perfChart(f){
+  const {done, lo, hi} = perfParts(f);
+  /* THE viewBox IS 900x250 AND THAT IS A MEASUREMENT, NOT A TASTE (2 Sep 2026).
+     Two of the day's asks pull against each other: "stretch the graph from left
+     to right" removes the 760 cap, and "use 12px font size for the vertical and
+     horizontal values" is a RENDERED size — but the SVG scales uniformly, so a
+     stated size only survives at scale 1. The build's desktop column is 901px
+     (§14's content margin), so a 900-unit box renders at 1:1 there and §63 §23's
+     12 is 12 on the glass. 560 would have rendered it at 19.
+     AND 180 TALL, DOWN FROM 250 (Maryam, 2 Sep 2026: "reduce the vertical gaps
+     between the graph lines"). The gap between two gridlines is `IH / 5`, and
+     `IH` is whatever the box has left after the top and bottom margins — so the
+     only way to close the rows up is to shorten the box. 250 gave 41 units a
+     row against a 900-wide plot; 180 gives 28.8, which is close to the pitch
+     the x labels sit at and stops the five rows reading as five bands of empty
+     paper. `B` comes down 32 -> 24 with it: that margin is the x-label strip and
+     the labels are 8px now (§63 §23), so the old value was reserving room for
+     type that is no longer there. */
+  const W=900, H=180, L=40, R=10, T=12, B=24;
+  const IW=W-L-R, IH=H-T-B;
+  const x=i=> L + (done.length>1 ? i*(IW/12) : IW/2);
+  const y=v=> T + IH - (v/100)*IH;
+  const path = done.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
+  /* 80 KEEPS ITS LABEL AND LOSES ITS LINE (Maryam, 2 Sep 2026: "remove the
+     solid line against 80% so only dotted line shows there"). The cohort rule
+     is drawn at `COHORT_AVG` — 79 — which is one user unit off the 80 gridline,
+     so the two painted as a solid and a dashed hairline a pixel apart: not a
+     grid line and a comparison, a thick smudge. The label stays because the
+     axis still needs its 80 mark, and at that distance it reads as labelling
+     the dashed line, which is the more useful of the two things it is near. */
+  const grid = [0,20,40,60,80,100].map(v=>`
+    ${v===80?'':`<line x1="${L}" x2="${W-R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"
+      stroke="var(--rule)" stroke-width="1" vector-effect="non-scaling-stroke"/>`}
+    <text class="perf-yl" x="${L-8}" y="${(y(v)+4).toFixed(1)}" text-anchor="end">${v}%</text>`).join('');
+  const dots = done.map((v,i)=>{
+    const call = i===lo ? ' perf-lo' : i===hi ? ' perf-hi' : '';
+    return `${call?`<circle class="perf-halo${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="9"/>`:''}
+      <circle class="perf-dot${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4"/>`;
+  }).join('');
+  const xl = Array.from({length:13},(_,i)=>`
+    <text class="perf-xl" x="${x(i).toFixed(1)}" y="${H-10}" text-anchor="middle">${i+1}</text>`).join('');
+  /* THE AVERAGE MOVED ONTO THE CHART, HUNG UNDER THE HIGHEST POINT (Maryam,
+     2 Sep 2026: "remove the left side 88% part", "the top point should have an
+     opened little box below it with the average score text and the
+     percentage"). It is the same figure `.perf-rail` used to print beside the
+     plot, so nothing is added or lost — the section's one number is now inside
+     the drawing it is a number about.
+
+     IT IS ANCHORED TO `hi` AND CLAMPED TO THE PLOT. The top point is the last
+     one (`SCORE`'s own note is why), so an un-clamped box centred on it would
+     hang half its width past the right edge; `Math.min/max` keeps it inside
+     the axis at every width. Below the dot rather than above it because the
+     top point is near the ceiling of the box — there is 14 user units of room
+     over a 92% dot and 100 under it.
+
+     THE FILL IS THE PAGE'S OWN GROUND, WHICH IS WHAT MAKES IT A BOX RATHER
+     THAN A LABEL. The gridlines run under it; an unfilled box would have two
+     of them striking through the words. `--background` matches whatever the
+     section sits on, the same variable `.perf-dot`'s ring uses two rules down
+     for the identical reason.
+
+     GUARDED ON `hi >= 0` AND ON THE AVERAGE EXISTING. `perfParts` returns
+     `indexOf` on an empty array as -1 when nothing is assessed, and `CFG`'s
+     `avg` is `null` before week 1 — either way the chart draws its axis and no
+     box, rather than a box reading "null%". */
+  /* THE RING IS THE FIGURE DRAWN AS WELL AS WRITTEN (Maryam, 2 Sep 2026: "show
+     a round progress circle on the left"), and it is the build's own `.ring`
+     technique rather than a new one: two concentric circles, the track and the
+     arc, with `stroke-dasharray` cutting the arc to the fraction. §56's note on
+     `.ring` is the long version — `--arc` there is a dasharray LENGTH, not a
+     percentage, and the same arithmetic is done here in user units because this
+     one lives inside the plot's SVG and cannot take a CSS custom property that
+     depends on the radius.
+
+     `rotate(-90)` STARTS IT AT TWELVE O'CLOCK. An SVG circle's path begins at
+     three, so without it 75% would read as a gap in the wrong quarter — the one
+     thing a progress ring must not do.
+
+     THE VALUE STEPPED DOWN A ROLE with it ("the block on the highest point
+     should have value in little smaller font size"). It was `--t-h4` (15) and
+     is `--t-compact` (13.5) in §63 §23: with the ring beside it the box states
+     the figure twice, so the numeral no longer has to carry it alone. */
+  const cal = (hi >= 0 && f.avg != null) ? (() => {
+    const bw = 104, bh = 34, gap = 12, r = 9;
+    /* BESIDE THE POINT, NOT UNDER IT (Maryam, 2 Sep 2026: "take this card on
+       the right side of the dot instead of hiding the lines with this much big
+       card"). Hung below, a 46-tall box centred on the dot dropped straight
+       through the plot — it covered the cohort rule, two gridlines and the red
+       call-out 40 units to its left, which is the one thing a label on a chart
+       must not do. Vertically centred on the dot and set to its right, it sits
+       in the empty half of the plot instead.
+
+       IT PREFERS RIGHT AND FLIPS LEFT WHEN THERE IS NO ROOM, which is not
+       hypothetical: the highest point is the LAST one (`SCORE`'s note), so on
+       day 34 that is chapter 5 with eight empty columns beside it, and on day
+       90 it is chapter 13 hard against the axis. One test rather than two
+       call sites — prefer the right, take the left if the box would cross
+       `W - R`, then clamp both axes so a narrow plot cannot push it out. */
+    let bx = x(hi) + gap;
+    if(bx + bw > W - R) bx = x(hi) - gap - bw;
+    bx = Math.max(L, Math.min(W - R - bw, bx));
+    const by = Math.max(T, Math.min(T + IH - bh, y(done[hi]) - bh / 2));
+    const cx = bx + 8 + r, cy = by + bh / 2;
+    const C = 2 * Math.PI * r;
+    const arc = (C * Math.min(100, Math.max(0, f.avg)) / 100).toFixed(1);
+    return `<g class="perf-cal">
+      <rect x="${bx}" y="${by}" width="${bw}" height="${bh}"/>
+      <circle class="perf-cal-trk" cx="${cx}" cy="${cy}" r="${r}"/>
+      <circle class="perf-cal-arc" cx="${cx}" cy="${cy}" r="${r}"
+        stroke-dasharray="${arc} ${(C - arc).toFixed(1)}"
+        transform="rotate(-90 ${cx} ${cy})"/>
+      <text class="perf-cal-l" x="${bx + 34}" y="${by + 15}">Average score</text>
+      <text class="perf-cal-v" x="${bx + 34}" y="${by + 27}">${f.avg}%</text>
+    </g>`;
+  })() : '';
+  return `<div class="perf-plot">
+    <svg class="perf-svg" viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="Assessment score for each of the ${done.length} assessed chapters, against a cohort average of ${COHORT_AVG}%">
+      ${''/* THE LINE, THE DOTS AND THE COHORT RULE ARE ALL ONE GREEN (Maryam,
+             2 Sep 2026), so the `g-perf` gradient is gone with its `<defs>` —
+             §63 §23 and §88.2 carry the colour and nothing here paints. The
+             two-stop `--dv-grad-a/b` ramp was the build's chart idiom and it
+             is the wrong idiom for a series that has to read as ONE
+             measurement against a threshold: a line that changes hue along its
+             length invites the reader to look for what changed at the middle.
+             The only hue break left is the one that means something — the
+             lowest point in red. */}
+      ${grid}
+      <line class="perf-avg-line" x1="${L}" x2="${W-R}"
+        y1="${y(COHORT_AVG).toFixed(1)}" y2="${y(COHORT_AVG).toFixed(1)}"
+        stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+      <path class="perf-line" d="${path}" fill="none" stroke-width="2"
+        stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+      ${dots}${xl}${cal}
+    </svg>
+  </div>`;
+}
+
+const perfSec = f => {
+  return `<div class="sec perf">
+    ${''/* THE LEGEND IS THE HEADING ROW'S CONTROL SLOT (Maryam, 2 Sep 2026:
+           "the Your score / Cohort average 79% row should come on the right
+           end of the heading and desc row of this section"). It was the first
+           child of `.perf-plot`, which put it level with the rail's figure and
+           gave the plot a row of its own furniture; on the heading row it is
+           the key to the whole section, read before the drawing rather than
+           inside it. Same shape `.scene-hb` takes on the Interviews module —
+           §24.6 already makes `.sec-h` a flex row and hands the right-hand
+           child an `auto` margin, so nothing new is invented for the position.
+
+           THE `<h2>` AND THE LEDE MOVE INSIDE `.perf-hb` TOGETHER, and that is
+           what loses §10.15's label-column opt-out — TRAP 13, third time this
+           week. The section was opting out through `.all-desc` as a DIRECT
+           child of the `.sec`; one level down it stops matching, and the
+           heading sets in a 184px gutter with the chart crushed beside it.
+           §88.1a restates it on `:has(> .perf-b)` inside the container query.
+           §69's sentence covers both directions: a wrapper loses an opt-out
+           and so does removing the content it was keyed on. */}
+    <div class="sec-h"><div class="perf-hb"><h2>Your performance</h2>
+    ${''/* ONE LINE, AND IT IS THE REFERENCE'S OWN (Maryam, 1 Sep 2026: 'this
+           desc will be changed to "Assessment average across 13 chapters."').
+           It ran two lines and carried two more claims — "Every chapter closes
+           with one, and their average is what an agent reads at your
+           re-interview" — which is the same sentence "What you'll learn" was
+           opening with on the Enroll page until its lede came off the same
+           afternoon. Said twice in one product, and here it sat between the
+           heading and the figure the section is about.
+
+           IT ALSO DROPS THE DERIVED `${f.done} of 13`, WHICH IS THE ONE THING
+           WORTH KNOWING. The figure below still reads the assessed count, and
+           `perfInsight` still opens on it ("Five chapters are assessed so far")
+           — so the count is on the page twice rather than three times, and the
+           line that names it is the one deriving it. A fixed "13 chapters" is
+           what the course HAS; how many are marked is a figure, not a lede.
+
+           `.all-desc` STAYS AND IS LOAD-BEARING — trap 13. Neither `.perf-b`
+           nor `.perf-f` is in §10.15's opt-out list, so this paragraph is what
+           keeps the section out of the 184px label column. Shortening it is
+           safe; deleting it is what §87.1a had to answer for `learnSec`. */}
+    <p class="all-desc">Assessment average across 13 chapters.</p></div>
+      <div class="perf-leg">
+        <span class="perf-lg"><i class="perf-lg-l"></i>Your score</span>
+        <span class="perf-lg"><i class="perf-lg-d"></i>Cohort average ${COHORT_AVG}%</span>
+      </div>
+    </div>
+    ${''/* THE RAIL IS GONE AND THE PLOT TAKES THE ROW (Maryam, 2 Sep 2026:
+           "remove the left side 88% part", "stretch the graph from left to
+           right"). `.perf-b` was `auto minmax(0,1fr)` — a content-sized column
+           holding the figure and the delta, then the chart in what was left.
+
+           THE FIGURE IS NOT LOST, IT IS ON THE CHART. `perfChart`'s callout box
+           hangs "Average score" and the percentage under the highest point, so
+           the section still states its one number once. What DID go with the
+           rail is the delta row — "Improvement from the first five chapters" —
+           and that is a real subtraction rather than a move: it only ever drew
+           past chapter 5, and `perfInsight` computes the same comparison in
+           words at the foot of the section. Two readings of one trend, one of
+           them a figure with no chart position; the sentence is the better of
+           the two and it is the one that survives.
+
+           `.perf-b` STAYS AS THE WRAPPER even though it now holds one child.
+           It is what §88.1a's opt-out is keyed on, it carries the row's top
+           margin, and a second column is exactly what a wider reference would
+           want back — deleting it would mean re-deriving the grid to add one. */}
+    <div class="perf-b">${perfChart(f)}</div>
+    <div class="perf-f">
+      <div class="perf-ins">
+        <span class="perf-ins-mk"></span>
+        <span class="perf-ins-b"><b>Key insight</b><span>${perfInsight(f)}</span></span>
+      </div>
+      ${''/* FOCUS AREAS CAME OFF THE STRIP (Maryam, 2 Sep 2026). It printed
+             "Chapter 4, Chapter 12" from `RPT_GROWTH`, which is the same pair
+             the page states three times over: the chapter rows above carry
+             "Your growth area" on both, `perfInsight` names chapter 4 by title
+             in the sentence 200px to its left, and the report block on
+             Interviews closes on "Chapters 4 and 12 are built on exactly
+             this". A labelled block restating two numbers already on screen is
+             the fourth telling, and it was the one with the least around it.
+
+             `RPT_GROWTH` KEEPS ITS OTHER READERS, so nothing in data.js
+             changes — this was one of several. The divider §88.3 draws between
+             the insight and this block goes with it; the strip is the sentence
+             and the action now, which is the shape it had before the reference
+             added a third column. */}
+      <button class="btn btn-g btn-sm noic perf-a" data-scores="1">View scores</button>
+    </div>
+  </div>`;
+};
+
+/* THE SCORES SHEET — §02.14's dialog again, the same component the skills list
+   uses. It is where the per-chapter table that `lineChart` drew under its plot
+   went: thirteen rows of chapter and percentage, which is data the page would
+   otherwise only show for the five chapter rows visible above "Show all 13".
+   That is what makes "View scores" a real control rather than the reference's
+   decoration — §60's test, answered by giving it something to open. */
+const scoresSheet = f => `<div class="modal ${S.scores?'on':''}" data-close="scores">
+    <div class="sheet">
+      <div class="sheet-h"><h2>Assessment scores</h2>
+        <button class="x" data-scores="0" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">
+        <div class="kv-list">
+          ${SCORE.slice(0, f.done).map((v,i)=>`<div class="kv"><span class="k">Chapter ${i+1} &middot; ${CH[i][0]}</span><span class="v n">${v}%</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
 
 V.transcript = (f) => {
   const pct = Math.round(f.done/13*100);
@@ -7504,7 +8470,39 @@ V.transcript = (f) => {
         whose failure I could not account for, the section says what it is. It
         is also the more honest statement: this is a decision about THIS pair on
         THIS page, not a rule about every `.stats` that happens to precede a
-        pulse. §72.1d keys on it. */}
+        pulse. §72.1d keys on it.
+
+        AND IT SURVIVES THE PULSE MOVING ABOVE IT (1 Sep 2026), which is worth
+        stating because it was nearly dropped in that edit. The paragraph above
+        gives TWO reasons and only one of them was about the neighbour: `.stats`
+        draws its own box on all four sides, so the section's full-bleed closing
+        hairline lands one pixel under that box's bottom border whatever follows
+        it. That is §14's "two 1px rules one pixel apart" and it is a property of
+        this section alone. The pulse's `border-top` was the second edge in the
+        pair and has gone; the first is still here. */}
+  ${''/* THE PULSE COMES FIRST NOW (Maryam, 1 Sep 2026: "the your pulse should
+        be in black card above the 4 blocks"). It sat under the four-cell strip
+        and is above it — the black card is what the page is about, and the
+        strip is the detail underneath.
+
+        THE ORDER IS ALSO WHAT THE PAGE SAYS IN WORDS. Tal's summary opens on
+        "5 of 13 chapters at 88%, about 4 hours in"; the pulse then reads those
+        numbers back as pace and standing, and the `.stats` row is the four
+        figures the reading is made of. Reading detail-then-conclusion was the
+        wrong way round for a page whose first line is already the conclusion.
+
+        `.sec-joined` STAYS ON THE STRIP, and dropping it was the first thing
+        this edit got wrong. Its note reads as one reason and is two: `.stats`
+        draws its own box AND the pulse below drew a `border-top`. Only the
+        second is about the neighbour. The strip is still a boxed component, so
+        its section's full-bleed hairline still lands a pixel under that box —
+        that is why the class is where it was.
+
+        THE NEW SEAM, above the card, is §85.1b's: a section before a
+        `.dark-card` draws no closing hairline. Keyed on the card rather than on
+        this page, so it is the same rule the `promoted` dashboard's banner
+        needed. */}
+  ${g?pulseCols(f,g):''}
   <div class="sec sec-joined">
     <div class="stats">
       ${statCell(I.book, `Chapters done`, `${f.done} <small>of 13</small>`, `${pct}%`)}
@@ -7513,7 +8511,6 @@ V.transcript = (f) => {
       ${statCell(I.flag, `Tasks on time`, `${isDay34(S.stage)?'4 <small>of 5</small>':S.stage==='week1'?'0 <small>of 0</small>':'12 <small>of 13</small>'}`, `${S.stage==='week1'?'none due yet':'one overdue'}`)}
     </div>
   </div>
-  ${g?pulseCols(f,g):''}
   ${''/* THE 90-DAY SUMMARY APPEARS WHEN THERE IS ONE.
         This block used to draw at every stage, with an unsigned variant that
         said, in three places at once, that nothing in it was final: a heading
@@ -7536,44 +8533,34 @@ V.transcript = (f) => {
       <div class="ai-foot"><a class="lk">Read the summary</a></div>
     </div>
   </div>`:''}
-  ${f.done?`<div class="sec">
-    <div class="tile" style="padding-top:var(--s04)">
-      ${lineChart('sc',{title:'Assessment scores',sub:'70 to 100%',
-        data:SCORE.slice(0,f.done),labels:CH.map((c,i)=>'Chapter '+(i+1)),slots:13,
-        target:79,unit:'%',min:70,max:100})}
-    </div>
-  </div>
-`:''}
-  ${''/* THE WEEK-BY-WEEK MINUTES ARRIVED HERE FROM THE DASHBOARD, and this is
-        the page that page's promoted branch has claimed they were on since it
-        dropped its own copy of them: "The chart is still on Course Progress,
-        which is where the week-by-week record belongs and which the heading
-        links to." That was not true when it was written — `stackChart` had
-        exactly one caller, the enrolled dashboard — and it is true now.
+  ${''/* "ASSESSMENT SCORES" IS "YOUR PERFORMANCE" NOW (Maryam, 1 Sep 2026, with
+        a reference screen). It was `lineChart('sc', …)` in a `.tile` — a 320x104
+        sparkline over a thirteen-row data table. The note over `perfSec` is the
+        argument; what changes on the page is that the average is the largest
+        figure on it and the block ends on a conclusion rather than on a table.
+        The table is not lost: it is behind "View scores". */}
+  ${f.done?perfSec(f):''}
+  ${''/* "TIME ON THE COURSE" IS OFF THIS PAGE (Maryam, 1 Sep 2026: "remove the
+        time on the course section"). It was `stackChart('wk', …)` — thirteen
+        stacked bars of minutes a week split four ways (video, reading, roleplay,
+        assessment), a 55-minute target line, and a week-by-week table under it.
 
-        IT COMES BECAUSE IT COULD NOT BE A COLUMN. `pulse` compresses the
-        dashboard's three panels into three columns and the pace one carries
-        the time data as a WEEK PROGRESS read: this week against the target, or
-        once the 90 days are over the whole course against thirteen of them.
-        What that cannot carry is the four-series split — video, reading,
-        roleplay, assessment — and the thirteen weeks side by side, which is a
-        RECORD rather than a position. The distinction is the one the dashboard
-        already drew between the progress strip and this chart, one step on:
-        the position is at the head of the dashboard, the record is here.
+        `stackChart` NOW HAS NO CALLER AND IS KEPT, WHICH IS THE ONE EXCEPTION
+        THIS FILE MAKES TO ITS OWN RULE. Every other orphan today was deleted —
+        `certCard`, `enrolPlate`, `quizResults`, `coverSec`. This one is ~100
+        lines of chart with a four-series legend, a target rule and a readout,
+        and it is the only stacked chart in the build: `design-system/` ships its
+        stylesheet and `gallery.html` documents the markup, so the box has a
+        live reader even though the portal does not. Deleting the function would
+        leave that recipe undrawable.
+        The DATA is untouched too — `GAME[stage].weeks` is what `pacePart` reads
+        for the pulse's own thirteen-week bar, so the record survives in the one
+        place that still reads it.
 
-        IT SITS UNDER THE SCORES, NOT OVER THEM. Both are thirteen-slot charts
-        of the same 90 days and the scores are the sharper reading — what you
-        got — so the minutes follow as the working behind it. `f.done` gates
-        both: with nothing finished there is no record to draw and week 1's
-        single 20-minute bar in a thirteen-slot frame is an empty chart with a
-        mark in the corner. */}
-  ${f.done && GAME[S.stage]?`<div class="sec">
-    <div class="tile" style="padding-top:var(--s05)">
-      ${stackChart('wk',{title:'Time on the course',sub:'minutes each week',weeks:GAME[S.stage].weeks,
-        target:WEEK_TARGET,targetLabel:WEEK_TARGET+' min target'})}
-    </div>
-  </div>
-`:''}
+        WHAT THE PAGE LOSES is the four-way split of where the minutes went.
+        Nothing else in the build states it; `.stats`' "Time invested" is the
+        total and the pulse's bar is the weekly rhythm. Flagged rather than
+        buried: if the split should stay, this is one `stackChart` call. */}
   ${''/* SHOW ALL 13 OPENS THE REST OF THE LIST, IT DOES NOT LEAVE THE PAGE.
         It was `data-go="coursework"` — a button whose words promise more of
         the block you are looking at and whose behaviour was a navigation to
@@ -7588,7 +8575,7 @@ V.transcript = (f) => {
         comes back to it open. The label and the chevron both follow it, so
         the control says which way it goes rather than only what it did. */}
   <div class="sec tint">
-    <div class="sec-h"><h2>Chapter record</h2></div>
+    <div class="sec-h"><h2>Your progress by chapter</h2></div>
     <div class="tile-stack">${(S.chAll?CH:CH.slice(0,5)).map((_,i)=>chRow(i,f)).join('')}</div>
     <div class="mt4"><button class="btn btn-g" data-chall="1">${S.chAll?`Show the first five ${I.chevUp}`:`Show all 13 ${I.chevDown}`}</button></div>
   </div>
@@ -7698,14 +8685,50 @@ V.cohort = (f) => `<main class="main"><div class="page">
             name and her role. `.crow-b` states the same three lines in the same
             order on the call row 200px below, which is the shape this now
             matches rather than invents. */}
+      ${''/* A DISC, AS TALL AS THE TWO LINES BESIDE IT (Maryam, 1 Sep 2026:
+             "priya image on right should be in circle and should have the
+             height equal to the right side content").
+
+             THE SIZE IS NOT TYPED HERE, WHICH IS THE WHOLE OF IT. `avatar(x,
+             48)` writes 48px inline and inline beats every rule (trap 1), so
+             the 48 was unanswerable from any layer — and 48 is a number that
+             has to change every time the text cell does. It already had: the
+             expertise line moved in and then out again over two days, and the
+             portrait sat at 48 through both. `avatar(COHORT_LEAD)` with no
+             size hands the measurement to §70.3e, which stretches it to the
+             cell and takes the width off `aspect-ratio`.
+
+             AND THE CIRCLE IS THE SECOND HALF OF THE SAME ASK. `--radius` is
+             `0px` by token and §56 grants the one curve this system allows to
+             MARKS — the journey's step discs are the precedent. A portrait
+             introducing a person is that, and it is the only avatar in the
+             build drawn round, which is stated in §70 rather than pushed onto
+             `.av-ph` where nine other surfaces would follow it. */}
       <div class="row-lead">
-        ${avatar(COHORT_LEAD,48)}
+        ${avatar(COHORT_LEAD)}
         <div style="flex:1">
           <div class="t-heading-compact-01">${COHORT_LEAD.n}</div>
           <div class="t-helper-01 mt3">Cohort leader &middot; leads Cohort 41</div>
-          <p class="rec-x mt3"><b>Expertise:</b> ${COHORT_LEAD.expertise}, assesses ${COHORT_LEAD.range}</p>
         </div>
-        <button class="btn btn-t btn-sm noic" data-go="messages"
+        ${''/* THE EXPERTISE LINE CAME OFF (Maryam, 1 Sep 2026). The note above
+               argued it INTO the text cell as "the third thing you know about
+               her", and that was the right fix for a line already on the page in
+               the wrong place. What it did not ask is whether the page needs it:
+               `crow('cohort')` states the identical string 200px below in
+               `.crow-x`, so the column and the call row said one claim about
+               Priya twice. This card is who she is; the call row is the
+               appointment and carries the credential.
+               `COHORT_LEAD.expertise` and `.range` keep their readers — the call
+               row here, `V.enrol`'s leader card, and the leader portal. */}
+        ${''/* THE MESSAGE CONTROL IS A DISC (Maryam, 1 Sep 2026: "the message
+               icon on the right of the cohort leader should have circle frame
+               not square"). `--radius` is `0px` by token and §02's opening note
+               is that depth is rhythm and rule weight — so a curve is spent only
+               on a MARK, which §56 grants as one of the two exceptions. This is
+               an icon control beside a round photograph, which is exactly that
+               case: the disc pairs it with the face it acts on rather than with
+               the page's rectangles. §89 is the one declaration. */}
+        <button class="btn btn-t btn-sm noic lead-msg" data-go="messages"
           aria-label="Message ${COHORT_LEAD.n.split(' ')[0]}">${I.chat}</button>
       </div>
     </div>
@@ -7725,7 +8748,38 @@ V.cohort = (f) => `<main class="main"><div class="page">
         `callRow()`'s: that one is a `.head-sec` for the band, and this band's
         second column is spoken for. §73 takes the section's vertical padding
         off, everywhere. */}
-  <div class="sec sec-call">${crow('cohort')}</div>
+  ${''/* THE CALL IS THE BLACK CARD (Maryam, 1 Sep 2026: "the call card should be
+        the black card like how we have on our platform"). `.dark-card crow-dark`
+        is §75's recipe and §77's caller — the same two classes the `booked`
+        dashboard's interview wears — so this states nothing of its own and the
+        standing instruction is honoured: the inset, the haze, the frame, the
+        hairline under the heading, the ink flip and the accent Join all come
+        with the class.
+
+        THE HEADING ROW IS THE CARD'S, and it carries the countdown rather than a
+        control. §77's rule is that `.dc-act` and `.dc-when` share one auto margin
+        and are one-or-the-other: on `talRec` the slot is "View all agents"
+        because the recommendation is one of five, and here — as on `booked` —
+        there is one call and the figure that changes by itself is what the card
+        is about. "Cohort week call · session 36" is the row's own label.
+
+        `when:false` FOLLOWS FROM THAT, exactly as §77 argues it: the countdown
+        moves to the heading row, so the row must not print it again. What that
+        flag also takes is the label, and here the loss is covered twice over —
+        the heading names the call and Tal's card two sections up says which week
+        it is and what it covers.
+
+        `second:false` BECAUSE THE ROW'S SECOND ACTION WAS "Message Priya", and
+        the disc at the top of this page's own leader card is now that control.
+        Two ways to message one person on one page is what §77 removed from the
+        interview card for the same reason. */}
+  <div class="sec sec-call dark-card crow-dark">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">Your Next Call</h2>
+        <span class="dc-when">${I.time}${callLeft(WEEK_CALL.when)}</span></div>
+    </div>
+    ${crow('cohort', {when:false, second:false})}
+  </div>
   ${/* sec-cs: this section holds a full-bleed tab strip, and §20 needs to know
         so the call plate above it can sit flush. Named rather than sniffed —
         the `:has()` that would have detected it has to nest, and nested
@@ -7746,11 +8800,20 @@ V.messages = (f) => {
   const her = AGENTS.priya;
   const you = {i:'MN', img: AV.hana};
   const av = a => avatar(a, 32);
-  const m = (side, who, body, when) => `<div class="m ${side}">
+  /* THE STAMP IS THE TIME AND, ON YOUR OWN LINES, A DOUBLE TICK (2 Sep 2026,
+     with a chat reference). It used to read "Priya Nair · 9:12 AM" on every
+     line, which is the name said once per message in a thread with exactly two
+     people in it — and the face is already there saying it. The reference drops
+     the name on both sides and the read state is what the outgoing side gets
+     instead, in the accent, which is the one place in this thread a colour
+     means a state rather than a person. `who` is still the parameter because
+     `.msgs.room` (the cohort board) has ten people in it and needs it. */
+  const m = (side, who, body, when, name) => `<div class="m ${side}">
     <span class="m-av">${av(side === 'me' ? you : her)}</span>
     <div class="m-c">
       <div class="m-b">${body}</div>
-      <div class="m-w">${who} &middot; ${when}</div>
+      <div class="m-w">${name ? who + ' &middot; ' : ''}${when}${
+        side === 'me' ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
     </div>
   </div>`;
   const voice = (len) => `<span class="vn">
@@ -7761,9 +8824,41 @@ V.messages = (f) => {
     <span class="fa-ic">${I.document}</span>
     <span class="fa-b"><b>${n}</b><span>${s}</span></span>
     <span class="fa-dl">${I.download}</span></span>`;
+  /* THE THREAD OPENS ON A CHAT HEADER, NOT ON A PAGE HEADING (Maryam,
+        2 Sep 2026, with a reference). The `.ph` stays and stays EMPTY: §78
+        strips the `<h1>` and the in-page crumb out of every page and stamps
+        `.ph-bare`, which hides the box without removing it — the band's
+        `:has()` gates are structural, so the element still has to exist. What
+        it used to hold besides the heading was one grey line about the thread,
+        and that line is the header's second row now, where a chat puts it.
+
+        FOUR CONTROLS AND EVERY ONE OF THEM IS INERT, WHICH IS WHY THEY ARE
+        DRAWN AS THEY ARE. §60's rule is "a dead control on a live surface is
+        worse than a missing one", and the reference's header carries call,
+        video, info and more. The honest version of that here is what the call
+        screen already does for the two it cannot wire: they are `.mh-act`s
+        with `title` and `aria-label`, not `.btn`s, so nothing about them
+        promises the page will change — and the two that COULD be wired one day
+        (call and video) are the two `callOpen` already knows how to build. */
   return `<main class="main"><div class="page msg-page">
-  <div class="ph" style="padding-bottom:var(--s04)"><h1>Messages</h1>
-    <p>One-to-one with Priya Nair. Private, and it stays after the cohort closes.</p></div>
+  <div class="ph"><h1>Messages</h1></div>
+  <div class="mhead">
+    ${''/* NO SIZE ARGUMENT — `avatar(a, size)` writes it as an inline style and
+          that is trap 1: the header's face steps down on a phone and an inline
+          declaration cannot be answered from a layer. §62's `youMark` refuses
+          the helper's size for exactly this reason and states both in CSS. */}
+    <span class="mhead-av">${avatar(her)}<i class="mhead-on" aria-hidden="true"></i></span>
+    <span class="mhead-b">
+      <span class="mhead-n">Priya Nair<i class="mhead-dot" aria-hidden="true"></i></span>
+      <span class="mhead-s">Cohort leader &middot; private, and it stays after the cohort closes</span>
+    </span>
+    <span class="mhead-a">
+      <button class="mhead-act" title="Call" aria-label="Call">${I.phone}</button>
+      <button class="mhead-act" title="Video call" aria-label="Video call">${I.video}</button>
+      <button class="mhead-act" title="About this thread" aria-label="About this thread">${I.info}</button>
+      <button class="mhead-act" title="More" aria-label="More">${I.overflow}</button>
+    </span>
+  </div>
 
   <div class="msgs">
     <div class="m-day"><span>Monday</span></div>
@@ -8690,16 +9785,66 @@ function talFirst(){
 
    `len` is still taken as an argument and no longer drawn, for the same
    reason — the callers pass the recording length. */
+/* ONE COLUMN, FOUR LINES — Maryam, 1 Sep 2026 ("make 'Level interview ·
+   August 20, 2026' / 'Confirmed Explorer – E3' both lines part of the content
+   after the priya image, list these two on that priya name column").
+
+   IT WAS A HEADER ROW OVER A PERSON ROW. `.ivrow-h` held the two facts at
+   opposite ends of a full-width line — the label and date left, the outcome
+   right — and `.ivrow-who` held the face, the name and the length under it.
+   At 1380px that put "Level interview · August 20, 2026" and "Confirmed
+   Explorer – E3" about 1200px apart, which is far enough that they read as
+   two unrelated captions rather than as what one interview WAS and what it
+   DECIDED. They are the same fact split in half, and a candidate reads them
+   together or not at all.
+
+   SO THE ROW IS AN AVATAR, A COLUMN AND AN ARROW, and the column reads down
+   in the order the facts are asked for: which interview and when, who ran it,
+   how long it was, what it decided. Nothing about the row's other three parts
+   changed — the face is still 40px, the arrow still sits on the right end of
+   the row rather than of the column, and both stay vertically centred against
+   a block that is now four lines rather than two.
+
+   THREE LINES, IN THIS ORDER, AND MARYAM NAMED ALL THREE (1 Sep 2026: "remove
+   the '45 minutes · report signed' text", then "this data will be in this
+   order — Priya Nair / Confirmed Explorer – E3 / August 20, 2026"). So the
+   column opens on the PERSON, then what the interview decided, then when. Two
+   things came off with it and both are worth stating rather than discovering:
+
+     "45 MINUTES · REPORT SIGNED" IS SAID ON THE PAGE THIS ROW OPENS. `V.report`
+     draws the length and the signature in `.signed-h` — "Assessed and signed by
+     Priya Nair", "Level interview / 20 August 2026" — and every interview in
+     the build is 45 minutes and every past one is signed, so as a line on the
+     list it distinguished no row from any other.
+
+     THE LABEL WENT WITH IT, AND THAT IS THE ONE LOSS TO WATCH. The date line
+     was "Level interview · August 20, 2026"; the order Maryam gave ends on the
+     date alone, so nothing on the row now says whether it was the level
+     interview or the re-interview. On `promoted` the list holds both, and what
+     separates them is the outcome line — "Promoted to Explorer – E4" against
+     "Confirmed Explorer – E3" — plus the dates, which is enough to tell them
+     apart and is not the same as naming them. `ivRow` still TAKES `label` and
+     the two call sites still pass it, because putting it back is one line and
+     deleting the argument would make that a rewrite.
+
+   THE PORTRAIT IS UNSIZED HERE AND SIZED IN §15 ("increase the height of the
+   priya image, it should be equal to the height of the right side content").
+   `avatar(a, 40)` writes the 40 inline, which is trap 1 — no rule can answer
+   it — so this calls `avatar(a)` and §15 makes `.ivrow-who` a grid whose
+   portrait stretches to the column beside it. Flex could not: §75.3 records
+   `width:auto` + `aspect-ratio` collapsing to 18px in a flex row, because
+   flex resolves the main size from the flex base size and a box whose only
+   content is an absolutely-positioned `<img>` contributes nothing. */
 function ivRow(kind, label, date, outcome, len){
   const a = AGENTS.priya;
   return `<div class="ivrow" role="button" tabindex="0" data-go="report" data-iv="${kind}">
-    <div class="ivrow-h">
-      <span class="ivrow-eb">${label} &middot; ${date}</span>
-      <span class="ivrow-out">${outcome}</span>
-    </div>
     <div class="ivrow-who">
-      ${avatar(a,40)}
-      <span class="ivrow-wb"><b>${a.n}</b><span>45 minutes &middot; report signed</span></span>
+      ${avatar(a)}
+      <span class="ivrow-wb">
+        <b>${a.n}</b>
+        <span class="ivrow-out">${outcome}</span>
+        <span class="ivrow-eb">${date}</span>
+      </span>
       <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
     </div>
   </div>`;
@@ -8716,17 +9861,20 @@ const COHORT = [
   ['Nora Lindqvist','NL','lena','Active 3 days ago'],
   ['James Whitby','JW','owen','Active today'],
   ['Chloe Ferreira','CF','priya','Active 5 days ago'],
-  ['Tobias Mensah','TM','samuel','Active 8 days ago'],
+  ['Tobias Mensah','TM','samuel','Active 2 days ago'],
   ['Yuki Tanaka','YT','hana','Not active recently']];
 
 /* The room. Everyone is somebody else, so everything sits on the left. */
 const ROOM = [
   ['day','Yesterday'],
-  ['Daniel Kerr','owen','DK','Did anyone else find chapter 4 harder than the three before it? I have read the handover section twice.','4:12 PM'],
-  ['Aisha Bello','priya','AB','Yes. It is the first one that asks you to change something at work rather than understand something.','4:31 PM'],
-  ['Maryam Naz','hana','MN','I took a piece of work back off someone this week and could not explain why. That is the whole chapter, I think.','7:02 PM',true],
+  ['Daniel Kerr','owen','DK','Did anyone else find chapter 4 harder than the three before it? I have read the handover section twice.','4:12 PM',false,4],
+  ['Aisha Bello','priya','AB','Yes. It is the first one that asks you to change something at work rather than understand something.','4:31 PM',false,6],
+  ['Maryam Naz','hana','MN','I took a piece of work back off someone this week and could not explain why. That is the whole chapter, I think.','7:02 PM',true,3],
   ['day','Today'],
-  ['Ravi Chandran','samuel','RC','Priya said on the call that the handover is where it fails, not the work. That helped me.','8:40 AM'],
+  ['Ravi Chandran','samuel','RC','Priya said on the call that the handover is where it fails, not the work. That helped me.','8:40 AM',false,2],
+  /* NO COUNT ON THE LAST ONE, DELIBERATELY. It went up this morning and the
+     row has to be drawn with the field absent — the reference's own most
+     common state, and the case a `0` would get wrong. */
   ['Sofia Marchetti','lena','SM','Bringing my example on Thursday. Mine is a vendor review that went badly and I still think I was right to take it back.','9:15 AM']];
 
 /* THE ATTRIBUTION IS A HEADER ON A BOARD POST, NOT A FOOTNOTE.
@@ -8741,21 +9889,64 @@ const ROOM = [
    different weights, which a single text node cannot carry. The middot goes
    with the join — two elements a gap apart do not need a separator to be two
    things. */
-function roomLine(name, img, ini, body, when, mine){
-  return `<div class="m them">
-    <span class="m-av">${avatar({i:ini, img:AV[img]}, 32)}</span>
-    <div class="m-c">
-      <div class="m-w"><b>${mine ? 'You' : name}</b><span>${when}</span></div>
-      <div class="m-b">${body}</div>
+/* THE DISCUSSION IS A COMMENT THREAD, NOT A CHAT (Maryam, 1 Sep 2026, with a
+   YouTube comments reference). It was `.m.them` — the one-to-one thread's own
+   bubble row, borrowed — and the borrow was always the wrong shape for this
+   surface:
+
+     A CHAT HAS TWO SIDES AND A BOARD HAS TEN. `V.messages` is you and Priya, so
+     a bubble on a side is what says who is speaking. Here every consecutive
+     post is a different person and the NAME is the thing you need first — the
+     note over `ROOM` says exactly that ("reading it after the sentence means
+     re-reading the sentence knowing who said it") and then left the bubble on.
+     A grey bubble on a board is ten identical grey rectangles down a page.
+     A CHAT IS A SESSION AND A BOARD IS A RECORD. The day dividers were the
+     chat's ("Yesterday", "Today"); a comment carries its own timestamp, which
+     is why the reference has no dividers and this now prints the day INTO the
+     stamp instead of breaking the list in two.
+
+   SO THE ROW IS THE REFERENCE'S: a round avatar, the name and the age on one
+   line, the text in the page's own ink with NO ground, then a row of actions.
+   §89 draws it.
+
+   THE ACTIONS ARE A LIKE, A COUNT AND A REPLY, and the count only draws when
+   there is one — the reference does the same, and a "0" beside a thumb is a
+   post reporting that nobody liked it. `ROOM`'s rows gain an optional seventh
+   field for it; the five that have no number are unchanged and read as no
+   count rather than as zero.
+
+   NOTHING IS WIRED, AND THAT IS STATED RATHER THAN HIDDEN. Pressing a thumb or
+   Reply does nothing yet: `S.thread` is Tal's and the room has no state of its
+   own, so a like would be a class a `render()` throws away (trap 9). They are
+   drawn because the row's shape is what was asked for; wiring them is a
+   `S.room` record and a handler, and §60's "a dead control on a live surface"
+   is the argument for doing it rather than leaving them. Flagged. */
+function roomLine(name, img, ini, body, when, mine, likes){
+  return `<div class="cmt">
+    <span class="cmt-av">${avatar({i:ini, img:AV[img]}, 40)}</span>
+    <div class="cmt-c">
+      <div class="cmt-h"><b class="cmt-n">${mine ? 'You' : name}</b><span class="cmt-w">${when}</span></div>
+      <div class="cmt-b">${body}</div>
+      <div class="cmt-a">
+        <button class="cmt-act" aria-label="Like"><span class="cmt-ic">${I.thumbsUp}</span>${likes?`<span class="cmt-ct">${likes}</span>`:''}</button>
+        <button class="cmt-act" aria-label="Dislike"><span class="cmt-ic">${I.thumbsDown}</span></button>
+        <button class="cmt-act cmt-reply">Reply</button>
+      </div>
     </div>
   </div>`;
 }
 
 function discussionRoom(){
-  return `<div class="msgs room">
-    ${ROOM.map(r => r[0] === 'day'
-      ? `<div class="m-day"><span>${r[1]}</span></div>`
-      : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
+  /* THE DAY BECOMES PART OF THE STAMP. `ROOM` still carries its `['day', …]`
+     rows — they are the record of when the posts were made and three other
+     shapes could want them — so the list walks the same array and keeps the
+     current day in a variable instead of drawing a divider from it. */
+  let day = '';
+  return `<div class="cmts">
+    ${ROOM.map(r => {
+      if(r[0] === 'day'){ day = r[1]; return ''; }
+      return roomLine(r[0], r[1], r[2], r[3], day ? day + ' &middot; ' + r[4] : r[4], r[5], r[6]);
+    }).join('')}
   </div>
   <div class="composer room-composer">
     <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
@@ -9075,13 +10266,30 @@ function signedSummary(withNote, re, footAction){
    cell would be three lines indented past a coloured blank. §56 states the
    mark-less cell's template — one column, three rows — against the same
    `:not(:has(> .stat-ic))` test this line creates. */
-function statCell(ic, label, value, note, jump){
+/* AND THE SIXTH ARGUMENT IS A RAW ATTRIBUTE, which is `gcard`'s and `faceRow`'s
+   idiom for the same problem (Maryam, 2 Sep 2026: "the 4 card of the next call
+   should be clickable and should take me to the calls module"). `jump` scrolls
+   to a section on the page it is already on — `data-jump` is an anchor, and the
+   leader's dashboard band is its only caller — and this is the other thing a
+   figure cell can do: go somewhere. Passing `data-go="leadCalls"` through as an
+   attribute means the router needs no new branch and this function needs no
+   knowledge of views.
+
+   BOTH SHAPES ARE THE SAME BUTTON, and that is deliberate rather than lazy:
+   §31.4's `.stat-jump` is the whole of what a pressable figure cell looks like
+   — the button reset, the cell's own white ground back on top of `.stats`'s
+   1px-gap grid, the pointer and the focus ring — and none of it is about
+   scrolling. A second class would be that rule list written twice so that two
+   cells which look identical and behave identically could be told apart in the
+   stylesheet.
+   `at` WINS IF BOTH ARE PASSED, and nothing passes both. */
+function statCell(ic, label, value, note, jump, at){
   const body = `${ic ? `<span class="stat-ic">${ic}</span>` : ''}
       <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
       <div class="d">${note}</div>`;
-  return jump
-    ? `<button class="stat stat-jump" data-jump="${jump}">${body}</button>`
-    : `<div class="stat">${body}</div>`;
+  if(at)   return `<button class="stat stat-jump" ${at}>${body}</button>`;
+  if(jump) return `<button class="stat stat-jump" data-jump="${jump}">${body}</button>`;
+  return `<div class="stat">${body}</div>`;
 }
 
 /* Three standings, three marks. Points is a number moving toward a target,
@@ -9200,7 +10408,9 @@ function render(){
        function declaration in this file, hoisted above this line. */
     html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
          + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
-         + (S.view==='account'?profileSheet()+photoSheet():'');
+         + (S.view==='account'?profileSheet()+photoSheet():'')
+         + (S.view==='enrol'?skillsSheet():'')
+         + (S.view==='transcript'?scoresSheet(f):'');
   }
   /* THE CALL IS PART OF THE KEY, because it is a whole surface arriving and
      leaving: without it, joining a call is a repaint of the same stage and
@@ -9323,6 +10533,9 @@ device.addEventListener('click', e => {
      one handler is harmless here: `data-open` is a transition marker that has
      already been consumed by the time this runs (trap 5). */
   if(S.acct && !t.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
+  /* the certificate menu closes the same way and for the same reason — a press
+     anywhere that is not the toggle or the panel itself */
+  if(S.crtMenu !== null && !t.closest('.crt-menu, .crt-pop')){ S.crtMenu = null; render(); }
 
   /* EVERY ASK OPENS THE SAME SURFACE.
      This used to be `S.tal = true; ask(q)` — the question went into the side
@@ -9349,12 +10562,33 @@ device.addEventListener('click', e => {
   if(bk){ back(); return; }
 
   /* THE CERTIFICATE NOTICE'S CLOSE. Same shape as the two below it — read the
-     attribute, set the state, re-render — because that is what a boolean the
-     view is a pure function of costs (trap 9). It carries `"0"` rather than
-     being a bare marker so re-opening is one call site away if anything ever
-     wants to. */
+     attribute, set the state, re-render — because that is what state the view
+     is a pure function of costs (trap 9).
+
+     THE ATTRIBUTE IS THE SURFACE'S KEY, NOT A BOOLEAN. It carried `"0"` while
+     `S.certBan` was one flag, on the reasoning that a value left room for
+     re-opening; the value it actually needed was WHICH band. `data-found` on
+     §65's disclosures is the same attribute doing the same job, which is why
+     this handler is one line like that one. Nothing re-opens a dismissed band
+     in this build — a fresh render of the page is what brings it back. */
   const cb = t.closest('[data-certban]');
-  if(cb){ S.certBan = cb.dataset.certban === '1'; render(); return; }
+  if(cb){ S.certBan[cb.dataset.certban] = true; render(); return; }
+
+  /* THE SKILLS MODAL. Same shape as the two below — read the attribute, set the
+     boolean, re-render — because the sheet is a pure function of `S.sklAll`
+     (trap 9: `render()` replaces `device.innerHTML`, so an `.on` class put on
+     the modal by a handler would be gone at the next paint). */
+  const sk = t.closest('[data-sklall]');
+  if(sk){ S.sklAll = sk.dataset.sklall === '1'; render(); return; }
+
+  /* the scores sheet, same shape */
+  const scr = t.closest('[data-scores]');
+  if(scr){ S.scores = scr.dataset.scores === '1'; render(); return; }
+  if(t.closest('[data-close="scores"]') && !t.closest('.sheet')){ S.scores=false; render(); return; }
+  /* the scrim: pressing the dim area closes it, which is what `data-close` does
+     for the profile and photo sheets. The test is that the press did NOT land
+     inside `.sheet`, so a click on the dialog itself is not a dismiss. */
+  if(t.closest('[data-close="sklall"]') && !t.closest('.sheet')){ S.sklAll=false; render(); return; }
 
   const ep = t.closest('[data-editprofile]');
   if(ep){ S.editProfile = ep.dataset.editprofile==='1'; render(); return; }
@@ -9582,6 +10816,17 @@ device.addEventListener('click', e => {
   if(cs){ cs.parentElement.querySelectorAll('button').forEach(x=>x.classList.remove('on')); cs.classList.add('on'); return; }
   const rt2 = t.closest('[data-rtab]');
   if(rt2){ S.rtab = rt2.dataset.rtab; render(); return; }
+  /* THE CERTIFICATE CARD'S MENU — a toggle, so pressing the open one shuts it.
+     It has to run BEFORE the generic `[data-go]` router below, because the
+     popup's own rows carry `data-go` and the button that opens it does not; and
+     it returns rather than falling through, so opening a menu never navigates.
+     The click-away is with `S.acct`'s, at the head of this handler. */
+  const cm = t.closest('[data-crtmenu]');
+  if(cm){
+    const i = +cm.dataset.crtmenu;
+    S.crtMenu = S.crtMenu === i ? null : i;
+    render(); return;
+  }
   /* the chapter record's own "show all" — a re-render, not a navigation, and it
      goes through `S` for trap 9's reason: the list is rebuilt from scratch on
      every render, so a class toggled on the button here would not survive the

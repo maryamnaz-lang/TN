@@ -62,7 +62,7 @@
 .app .page .sec > .sec-h.aih{
   display:flex;align-items:center;
   flex-wrap:wrap;gap:var(--s04) var(--s05);
-  margin-bottom:20px;
+  margin-bottom:var(--sec-h-gap);
   border-right:0;min-height:0}
 /* 12 BETWEEN THE TITLE AND THE DESCRIPTION — 613:7988 ends at 27 and 613:7989
    opens at 39. The block is a flex COLUMN, so the gap is the only spacing in it
@@ -113,9 +113,16 @@
    the same arithmetic §73's head-sizing note works through for §63 §8b. Both,
    not just the action: whichever item is shorter is the one with room to move,
    and on a wrapped title that is the action rather than the block. */
+/* THE PAIR'S GAP IS `--sec-desc-gap`, NOT THE FILE'S 12 (Maryam, 1 Sep 2026 —
+   one gap wherever a heading has a description under it, taken from
+   "Choose your scenes"). 613:7988 ends at 27 and 613:7989 opens at 39, so the
+   file says 12 and that is what this shipped at; §38's `.scene-hb` went 16 →
+   12 → 8 over two asks and 8 is what was asked for again here. The token is
+   §01's and the same number now joins the title to its description in all
+   three places that draw one. */
 .app .page .sec > .sec-h.aih > .aih-b{
   flex:1 1 340px;min-width:0;max-width:60%;align-self:center;
-  display:flex;flex-direction:column;gap:var(--s04)}
+  display:flex;flex-direction:column;gap:var(--sec-desc-gap)}
 /* THE 340px BASIS IS THE MECHANISM THAT LETS THE ROW WRAP. A flex item moves to
    a new line when its BASE size does not fit; §24.132 gives `.sec-h > h2`
    `flex:1 1 auto` with `min-width:0`, which has no base to not fit, so the block

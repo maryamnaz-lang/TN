@@ -1,0 +1,59 @@
+/* ==========================================================================
+   93. A ROW WITH TWO ACTIONS STACKS ON A PHONE
+   Written while giving the certificate row its mark-led Download and Share
+   link (Maryam, 2 Sep 2026). The hues are §63 §26; this is the half the
+   standing "responsive is part of done" instruction makes part of the same
+   task rather than a follow-up.
+
+   §02.282 GIVES `.cardrow-a` `flex:none`, WHICH IS RIGHT AND IS THE WHOLE
+   PROBLEM. A cell that cannot shrink is correct for one button at the end of
+   a row — the label must not wrap, which is §56's rule for a plate's button
+   said one component over. With TWO buttons the same declaration takes 229px
+   of a 356px content box at 390, and the only thing left that can give is
+   `.cardrow-b`, which §02.256 makes `flex:1`. Measured at 390: the text
+   column came out **55px** and the description set eleven lines tall.
+
+   IT WAS ALREADY WRONG BEFORE THE MARKS WENT IN — 99px and 150px tall with
+   two bare labels — so this is not the icons' bug, it is the icons making a
+   pre-existing squeeze impossible to keep ignoring. Worth stating because the
+   cheap fix (take the two marks off again at 390) would look like it worked.
+
+   KEYED ON THE SHAPE, NOT ON A NAME. `> .cardrow-a > .btn + .btn` is "an
+   action cell holding more than one control", which is precisely the
+   condition that breaks — so the next row to grow a second button is answered
+   the day it is written, and every single-action `.cardrow` in either portal
+   is untouched. A `.certrow` class was written for this and deleted before it
+   shipped (`certList`'s own note records it as the "gate nothing writes" tell
+   arriving before the gate); reviving it would have named ONE caller for a
+   rule that is about an arrangement.
+
+   THE INDENT IS DERIVED AND IT IS THREE TERMS. The wrapped line starts under
+   the TEXT, not under the mark: 40px (§02.249's icon slot) + `--s05` (§03.431's
+   row gap) − `--s04` (the button's own left padding, §02.105 via §24.304), so
+   the first label's glyphs land on the title's own left edge rather than 12px
+   right of it. `padding-left` rather than `margin-left`, because the cell is
+   `flex-basis:100%` and §01.352's `border-box` keeps the padding inside that
+   100% — a margin would push the group past the row's right edge.
+
+   600 IS THE SEAM, NOT 900. At 744 the text column measures 409px and the row
+   is one line, so the portal's own `@container app (min-width:900px)` would
+   stack a tablet that has no need of it. 600 is §02.113's existing breakpoint
+   — the one that already decides when a `.btn-row` stops being full-width —
+   and this is the same question about the same objects.
+
+   NOT ONE font-size, font-weight, text-transform OR text colour: flex only.
+   §63 §26 owns the two inks and §24.302 the mark's side of the row.
+   ========================================================================== */
+.app .cardrow:has(> .cardrow-a > .btn + .btn){flex-wrap:wrap}
+.app .cardrow:has(> .cardrow-a > .btn + .btn) > .cardrow-a{
+  flex:1 0 100%;margin-left:0;justify-content:flex-start;
+  padding-left:calc(40px + var(--s05) - var(--s04))}
+
+/* Back to one line as soon as there is room for it. Restated rather than
+   scoped to a max-width so the mobile state is the unconditional one — this
+   file's rules are the phone's, and the query is the exception. */
+@container app (min-width:600px){
+  .app .cardrow:has(> .cardrow-a > .btn + .btn){flex-wrap:nowrap}
+  .app .cardrow:has(> .cardrow-a > .btn + .btn) > .cardrow-a{
+    flex:none;margin-left:auto;padding-left:0}
+}

@@ -243,3 +243,34 @@
    §63 §17's — `color` is one of that layer's four properties wherever it
    appears. */
 .app .crow-dark .crow-ph{background:var(--on-dark-fill)}
+
+/* ------------------------------------------------------------------ 77.8 ---
+   THE CARD'S ONE ACTION SITS IN THE CORNER, NOT IN A 185px BOX
+   Maryam, 1 Sep 2026: "please align the view all calls button on the very right
+   and bottom as well, means right bottom aligned."
+
+   ITS BOX ALREADY WAS, WHICH IS WHY THIS IS A WIDTH RULE AND NOT AN ALIGNMENT
+   ONE. Measured at 1280: `.crow-a`'s right edge sits exactly on `.crow`'s, and
+   both are 32px inside the card — which is `.dark-card`'s own `--s07` frame,
+   the same 32 the cover's left edge pays, and not slack anybody can take out.
+   §77.6 had already put its bottom edge on the row's. What was NOT aligned was
+   the part you can see: §71.441 gives `.crow-a > .btn` a stated `width:185px`
+   from 608:7772, where the row ends in a PAIR of equal buttons, and the label is
+   centred in it — so with one borderless button the words stopped ~26px short of
+   the corner and read as floating.
+
+   SO THE SINGLE ACTION SIZES TO ITS CONTENT AND GIVES UP ITS RIGHT PADDING, and
+   the arrow's own edge becomes the card's edge. This is only right because §64
+   and §77.3 already took the border off: a bordered button flush to a frame
+   reads as a box that has slipped, while a label and an arrow read as a corner
+   control — the shape §70.5's "way out of the section" buttons already have.
+
+   SCOPED TO `.crow-a1`, WHICH IS `crow`'s OWN FLAG FOR "the primary is gone".
+   The two-button rows keep the 185px pair, because there the width is what makes
+   them equal to each other. And scoped to ≥900 per trap 3: §71.617 gives the
+   button `width:100%` in the stacked tier and that is right — a full-width
+   button under a full-width block — so an unconditional rule here would beat it
+   on weight (0,4,0 against 0,3,0) and un-stack the phone.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .crow-dark .crow-a1 > .btn{width:auto;padding-right:0}}

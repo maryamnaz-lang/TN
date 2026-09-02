@@ -899,33 +899,109 @@
 }
 
 /* --- the cell: mark, then the pair, then the note ----------------------- */
+/* THE FIGURE IS A THIRD COLUMN, RIGHT AND MIDDLE OF THE WHOLE CELL — Maryam,
+   1 Sep 2026: "the arrow and the numbers on both screenshots should be right
+   middle aligned to the block."
+
+   IT WAS THE SECOND HALF OF THE FIRST ROW. `.stat-top` was a flex line holding
+   the label and the figure, baseline-aligned, with the figure on an auto
+   margin — so the number sat on the LABEL's line and the note underneath ran
+   past beneath it. Against a two-line cell that reads as a number belonging to
+   the first line rather than to the cell.
+
+   `display:contents` ON `.stat-top` IS WHAT MAKES IT ONE GRID WITHOUT TOUCHING
+   THE MARKUP — §72.4 uses the same move on `.stand-top` for the same reason.
+   The wrapper dissolves and its two children become items of `.stat`'s own
+   grid, so the figure can take a column that spans both rows and centre in it
+   while the label and the note keep theirs.
+
+   AND IT RETIRES §37.11's STAGGER. That flex line wrapped the PAIR when the
+   two would not fit, which is what made the candidate transcript's
+   "Assessment average" cell sit 15px lower than its neighbours — the case
+   `gallery.html` documents as "keep `.l` short". In three columns the label
+   wraps inside its own column instead and every cell in a row starts level.
+   `min-width:0` on the label column is what allows that; without it the
+   label's longest word sets a floor and the row overflows.
+
+   THE NOTE STAYS UNDER THE LABEL ONLY, in column two — it describes the label,
+   not the figure, and running it under the number would put a caption beneath
+   something that is already right-aligned away from it.
+
+   THE THIRD ROW IS A SPACER AND IT IS WHAT MAKES "MIDDLE" MEAN THE BLOCK. The
+   cells in a row are all as tall as the tallest, but `align-content:start`
+   packed the two content rows at the top and left the slack UNDISTRIBUTED — so
+   the figure's area ended where the note ended, and `align-self:center`
+   centred it in the content rather than in the cell. Side by side that showed
+   immediately: a cell whose label wrapped to two lines put its number ~9px
+   lower than its neighbours'. A `1fr` third row absorbs the slack instead, the
+   `n` area spans all three, and the number centres on the cell's own height
+   whatever the label does. `align-content` is dropped with it — with a `1fr`
+   row there is no free space left for it to place. */
 .app .page .stats > .stat{
-  grid-template-columns:auto minmax(0,1fr);
-  grid-template-areas:'ic top' 'ic d';
-  column-gap:var(--s04);row-gap:2px;
-  align-content:start}
+  grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:'ic top n' 'ic d n' 'ic sl n';
+  grid-template-rows:auto auto 1fr;
+  column-gap:var(--s04);row-gap:2px}
 .app .page .stats > .stat > .stat-ic{grid-area:ic}
-.app .page .stats > .stat > .stat-top{grid-area:top}
+.app .page .stats > .stat > .stat-top{display:contents}
 .app .page .stats > .stat > .d{grid-area:d}
 
-/* the label and the figure share a line and neither breaks — the label holds
-   its line, and when the two cannot fit the PAIR wraps, exactly as §29.15
-   describes for the standings */
-.app .page .stats .stat-top{
-  display:flex;align-items:baseline;flex-wrap:wrap;
-  gap:0 var(--s04);width:100%}
-.app .page .stats .stat-top > .l{flex:0 1 auto;min-width:0;overflow-wrap:normal}
+.app .page .stats .stat-top > .l{grid-area:top;min-width:0;align-self:start}
+/* AND IT STANDS OFF THE EDGE (Maryam, 1 Sep 2026: "the values on the right
+   should have little more space from the right"). The cell pays `--s05` all
+   round, so `justify-self:end` put the figure 16 from the divider — the same
+   16 the MARK sits from the left, which sounds balanced and is not: the mark
+   is a 20px square whose ink stops short of its box, and a numeral's glyph
+   runs to its own edge, so the two read at different distances. `--s03` more
+   gives 24, and the note under the label is what confirms it — that line ends
+   well inside the cell, so a figure at 16 was the only thing touching the
+   divider. Stated on the item, not as cell padding, because the label and the
+   note keep the 16. */
 .app .page .stats .stat-top > .n{
-  flex:none;margin-left:auto;text-align:right;white-space:nowrap}
+  grid-area:n;align-self:center;justify-self:end;
+  margin-right:var(--s03);
+  text-align:right;white-space:nowrap}
 
 /* --- the mark ------------------------------------------------------------ */
+/* IT IS A BARE GLYPH, NOT A CHIP — Maryam, 1 Sep 2026: "the icons should not
+   have the background … increase the size of the icons since removing the
+   background will make them look very small otherwise."
+
+   THIS IS §72's MOVE, ONE COMPONENT ALONG, AND ITS NOTE IS THE ARGUMENT. That
+   layer took the same 28px tinted square off the pulse's three column marks
+   and stepped the glyph 16 → 20 "because it now holds the line alone". The
+   chip earns its keep where a figure cell sits in a CONTINUOUS band and the
+   wash is what separates one number from the three beside it; on the leader's
+   four jump cells each cell already has a border of its own, so the chip was
+   a filled box inside a bordered box and the heaviest object in a row made of
+   hairlines.
+
+   20 AND NOT 28 FOR THE BOX EITHER. `.pulse-ic` sets box and glyph to the same
+   20 — a bare mark has no padding to hold, and leaving the 28px box would put
+   8px of empty space between the glyph and the label that reads as a bad gap
+   rather than as a column. The cell's own `column-gap:var(--s04)` is what
+   spaces them.
+
+   THE HUE IS UNCHANGED AND STILL COMES FROM `--mk` on the cell, so the mark
+   and the figure cannot disagree; what is gone is the 13% wash mixed from it.
+   `fill:var(--mk)` rather than `currentColor` because `.stat` does not set
+   `color` — §72 could use `currentColor` only because `.pulse-ic` sets it. */
 .app .page .stats > .stat > .stat-ic{
-  width:28px;height:28px;margin-top:0;align-self:start;
+  /* THE MARK SITS ON THE LABEL'S LINE, and since 1 Sep 2026 that needs no
+     offset at all. It briefly carried `margin-top:4px`: `.stat-top` was then a
+     baseline-aligned flex line whose height came from the 23px FIGURE, so the
+     16px label was pushed to top 6 and `align-self:start` left the glyph a
+     clear step above the words. Both halves of that are gone — the figure has
+     its own column now (see the grid above) and the label starts the row at
+     top 0 — so the same 4px was putting the mark 4px BELOW the label instead.
+     A 20px glyph against the label's 19px line box is within half a pixel of
+     centred, which is what `align-self:start` gives on its own. */
+  width:20px;height:20px;margin-top:0;align-self:start;
   border:0;
-  background-color:color-mix(in srgb, var(--mk) 13%, var(--background));
+  background-color:transparent;
   background-image:none}
 .app .page .stats > .stat > .stat-ic svg{
-  width:16px;height:16px;fill:var(--mk)}
+  width:20px;height:20px;fill:var(--mk)}
 
 /* one hue per cell, by position. `--mk` is inherited by the chip and the
    glyph from the cell, so the wash and the mark can only ever agree. */
@@ -957,9 +1033,20 @@
    so a third line between them would be the same statement a third time.
    -------------------------------------------------------------------------- */
 .app .page > .sec:has(> .stand){padding-bottom:var(--s06)}
+/* `.sec-band` IS NAMED OUT OF THE THIRD SELECTOR (Maryam, 2 Sep 2026: "reduce
+   the space above and below the 4 cards row", of Course Reports). This rule is
+   the one that actually governs a section whose only child is a figure band, and
+   it is a class heavier than it reads: `:has()` carries its argument's
+   specificity, so `.app .page > .sec:has(> .stats:only-child)` is (0,5,0) rather
+   than the (0,3,0) it looks like — §63 §12's trap, and the reason §36.19's
+   three-class restatement lost to it in silence. Excluded here rather than
+   outweighed, which is §20's standing practice for the same shape of problem.
+   ONLY THE `.stats` SELECTOR. `.facts` and `.prog-figs` have no such caller and
+   an exclusion on a selector nothing writes is the tell this build keeps
+   deleting; the day one wants it, this note is where it goes. */
 .app .page > .sec:has(> .facts:only-child),
 .app .page > .sec:has(> .prog-figs:only-child),
-.app .page > .sec:has(> .stats:only-child){
+.app .page > .sec:not(.sec-band):has(> .stats:only-child){
   padding-top:var(--s06);padding-bottom:var(--s06)}
 
 /* AND THE SAME SENTENCE, TWO LAYERS EARLIER. §10 says it about the other

@@ -27,7 +27,7 @@
 
 .sec-h{
   display:flex;align-items:baseline;gap:var(--s04);
-  margin-bottom:var(--s05)}
+  margin-bottom:var(--sec-h-gap)}
 .sec-h h2{font-size:16px;line-height:22px;font-weight:600;letter-spacing:-.1px}
 .sec-h .lk,.sec-h .lnk{margin-left:auto;flex:none}
 .eyebrow{display:block;margin-bottom:var(--s03)}

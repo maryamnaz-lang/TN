@@ -706,9 +706,15 @@
    under them — the dividers came back with the numbers, because a list that is
    counted is a list of items rather than a paragraph in three parts.
    -------------------------------------------------------------------------- */
+/* A CELL WITH NO MARK LOSES THE MARK'S COLUMN AND KEEPS THE FIGURE'S — §29's
+   grid is `'ic top n'` and only the first track goes. Written as two columns
+   rather than one since 1 Sep 2026, when the figure became a column of its own
+   (right and middle of the cell); left at `minmax(0,1fr)` alone the number
+   would have been placed into an implicit track with no alignment stated. */
 .app .page .stats > .stat:not(:has(> .stat-ic)){
-  grid-template-columns:minmax(0,1fr);
-  grid-template-areas:'top' 'd';
+  grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:'top n' 'd n' 'sl n';
+  grid-template-rows:auto auto 1fr;
   column-gap:0}
 
 .app .cardrow-n{

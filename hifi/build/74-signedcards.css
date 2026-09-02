@@ -91,21 +91,47 @@
   border-radius:var(--radius);
   background-color:color-mix(in srgb, var(--mk) 5%, var(--layer-01))}
 
-/* THE MARK IS §65'S CHIP AT 36, and this is the one place in these four layers
-   that KEEPS the chip rather than going to a bare glyph. §72 and §73 dropped it
-   because their marks sit inside a bordered cell or beside a column rule, where
-   a filled square is a box in a box. Here the card's own ground is a 5% wash and
-   the chip is 12% of the same hue — so the mark reads as a denser patch of the
-   card it belongs to rather than as an object on top of it, which is what ties
-   the icon, the title and the ground into one thing. */
+/* THE MARK IS A BARE 20px GLYPH — the chip came off on 2 Sep 2026 (Maryam:
+   "remove the icons background from strengths, growth areas, and priya's
+   notes"), and this layer's own note is now the record of an argument that
+   lost. It said: "this is the one place in these four layers that KEEPS the
+   chip rather than going to a bare glyph. §72 and §73 dropped it because their
+   marks sit inside a bordered cell or beside a column rule, where a filled
+   square is a box in a box. Here the card's own ground is a 5% wash and the
+   chip is 12% of the same hue — so the mark reads as a denser patch of the card
+   it belongs to rather than as an object on top of it."
+
+   IT IS THE FOURTH TIME THE SAME MOVE HAS BEEN MADE and the through-line is
+   worth stating once: §72 took the chip off the pulse's three column marks,
+   §29 took it off `.stat` and `.qa-c` on 1 Sep, and now these three. A 12% wash
+   at 36px is a filled square whichever ground it stands on, and on a product
+   made of hairlines the square is always the heaviest object in the block. The
+   hue stays and does the whole job.
+
+   20 AND NOT 36, AND THE BOX GOES WITH THE GROUND. §72's reasoning is the one
+   to copy: "a bare mark has no padding to hold, and an oversized box reads as a
+   bad gap before the label rather than as a column". The glyph was already 20
+   inside the 36; the box is 20 now, so `.sig-c`'s own `gap` is the only space
+   between the mark and the words. 20 is the product's one bare-glyph size,
+   shared with `.stat-ic`, `.pulse-ic`, `.qa-ic` and `.aw-ph`'s inner mark.
+
+   `.sig-ic-sm` IS DELETED RATHER THAN RE-POINTED. It existed to make the header's
+   calendar smaller than the cards' marks — 32/16 against 36/20 — and with no
+   chip on either there is nothing left for it to say: two bare glyphs at one
+   size is the rule, not a coincidence. `signedSummary` still writes the class,
+   because the header's mark is a different KIND of thing from the three cards'
+   and a hook there is worth keeping; it simply states nothing now.
+
+   `align-self:start` REPLACES WHAT THE 36px BOX WAS DOING. `.sig-c` is
+   `align-items:flex-start`, so the chip used to sit level with the title's line
+   box by being tall enough to. A 20px glyph against a 21px title line needs no
+   optical offset — §29's own finding when `.stat-ic` made this move — so this
+   is one declaration, not a margin. */
 .app .sig-ic{
-  flex:none;display:grid;place-items:center;
-  width:36px;height:36px;
-  color:var(--mk);
-  background-color:color-mix(in srgb, var(--mk) 12%, transparent)}
+  flex:none;display:grid;place-items:center;align-self:start;
+  width:20px;height:20px;
+  color:var(--mk)}
 .app .sig-ic svg{width:20px;height:20px;fill:currentColor}
-.app .sig-ic-sm{width:32px;height:32px}
-.app .sig-ic-sm svg{width:16px;height:16px}
 
 .app .sig-b{display:flex;flex-direction:column;gap:var(--s03);min-width:0;flex:1}
 /* the title and its tag share a line, the tag held to the right edge */
@@ -165,3 +191,20 @@
 .app .page .sec > .signed{
   border-top:1px solid var(--rule);
   padding-top:var(--s07)}
+
+/* AND NOT WHERE THERE IS NOTHING ABOVE IT TO DIVIDE FROM (1 Sep 2026). The
+   rule above separates the block from CONTENT IN ITS OWN SECTION — that is
+   what "divide this from the content above it" asked for and what the two
+   call sites it was written for had. `V.report` is the third, and there the
+   block is the section's first and only child: §14's `::after` closes the
+   Scenes section 48px higher, so the border drew a second full-width-inset
+   hairline in the same gap and the block opened on a double rule.
+
+   `:first-child` rather than a class, because the condition IS the position
+   and a class would be a second place to keep it in step. It is (0,3,1)
+   against the rule above at (0,3,1) — equal, so this wins on order, which is
+   why it is stated here rather than in a later layer. The padding goes with
+   the border: `--s07` under a rule is the rule's own air, and with no rule it
+   is 32px of white between two sections that already pay 24 each. */
+.app .page .sec > .signed:first-child{
+  border-top:0;padding-top:0}

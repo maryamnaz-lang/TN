@@ -1,0 +1,317 @@
+/* ==========================================================================
+   91. THE 90-DAY SUMMARY PAGE — `.sump`, the candidate beside the decision
+   Maryam, 1 Sep 2026, with a reference screen: "this page should look like the
+   reference, obviously with our design language."
+
+   WHAT IT REPLACES. Four stacked sections: an `.idhead` header row, a `.stats`
+   band of four, and then either a `.kv` record or the form. At 1280 the
+   recommendation — the one thing the page exists to take — began 700px down,
+   and the figures it turns on had scrolled off the top by the time you reached
+   it. Two columns put the evidence beside the decision, which is the whole idea
+   the reference is carrying.
+
+   THE COLUMNS ARE 280px AND THE REST, WITH A HAIRLINE BETWEEN THEM — §76's
+   shape and §76's argument for it, one page over: "the frame is 1px solid
+   var(--rule)… the reference's cards have an 8px radius and a soft shadow;
+   `--radius` is 0px by token and §02's opening note is that depth is expressed
+   as rhythm and rule weight, nothing else". So there is no card here either,
+   and Maryam ruled the same thing out for the Evaluations columns in the same
+   session ("do not close the candidates in cards since this is not our ui
+   language").
+
+   IT IS A `border-left`, NOT §90'S PSEUDO-ELEMENT, and the two are not in
+   conflict — §76.3 states the test and this is the other side of it. §90's
+   divider sits under the black card's head rule, so a full-height border would
+   meet that line and form a corner; here each column carries its OWN heading
+   and there is no rule above them to meet, so the grid item's stretched height
+   IS the inset. A border also turns over correctly when the columns stack: the
+   same declaration becomes `border-top` on the same element.
+
+   280px IS THE FIGURE COLUMN'S MEASURE, not a fraction. The left column holds a
+   ring, three label/value rows and a button, all of which are content-sized;
+   the right column holds prose, which is the half that should take the slack
+   (§63's ~75-character line is the reason the page has a measure at all). At
+   1280 that is 280 / 32 / 557.
+
+   ONE SECTION, TWO HEADINGS, AND §63 §8b HAD TO LEARN THE SHAPE. Both headings
+   are wrapped — `.sec > .sump > .sump-c > .sec-h` — and §8b's selector is a
+   direct child twice over, so untouched they would have landed on §4's h4 (14px)
+   while every other section heading in the product is 16. That layer's own note
+   invites this ("if a third shape appears, add it here"), and §63 now lists
+   `.sec > .sump .sec-h h2` beside the Agents page's `.hd-srch`. Trap 13's
+   cousin, in the type layer, for the third time.
+   ========================================================================== */
+.app .sump{display:grid;gap:var(--s06)}
+@container app (min-width:900px){
+  .app .sump{grid-template-columns:280px minmax(0,1fr);gap:var(--s07);align-items:start}
+  .app .sump > .sump-b{
+    border-left:1px solid var(--rule);padding-left:var(--s07)}
+}
+@container app (max-width:899.98px){
+  /* stacked, the divider is the rule ABOVE the decision — same declaration,
+     turned through 90°, per §76.3 */
+  .app .sump > .sump-b{
+    border-top:1px solid var(--rule);padding-top:var(--s06)}
+}
+.app .sump-c,.app .sump-b{display:flex;flex-direction:column;gap:var(--s05);min-width:0}
+/* the heading rows inside the columns pay nothing of their own: §14 zeroes a
+   headed section's `.sec-h` padding at this width and these are inside one, so
+   the only thing they need is the gap the column already gives them */
+.app .sump .sec-h{margin-bottom:0}
+
+/* ------------------------------------------------------------------- 91.2 ---
+   THE CANDIDATE COLUMN
+
+   THE FACE IS 88px AND ROUND, WITH THE NAME UNDER IT. `.idhead` put a 72px
+   square beside three lines and a button, which is a header row — right for a
+   page whose first block is an identity band, and wrong for a 280px column,
+   which is read DOWN. Round because §89.2 already made that call for every mark
+   this portal draws in a list, and because a photograph of a person is the one
+   object this system lets curve (§56).
+
+   `.av-ph`'s OWN `border-radius` HAS TO BE STATED HERE. §89.2 rounds
+   `.mem-av .av-ph` — a wrapper this markup does not have, because `avatar()` is
+   not used: the face carries an inline size (trap 1) and the `<i>`/`<img>`
+   fallback pair, which is what `.av-ph` alone gives. One declaration rather
+   than a wrapper element that exists only to be rounded.
+
+   THE RING IS 48px AND ITS LABEL IS BESIDE IT, NOT UNDER IT — the opposite of
+   §90's `.ev-ring`, and the difference is what the ring is for on each page.
+   There it is one of two figures being compared across a card, so the label
+   under it keeps the pair symmetrical; here it is the first row of a column of
+   rows, so it reads as a row: mark, name, value.
+
+   THE THREE FIGURE ROWS ARE A HAIRLINE GRID, NOT `.stats`. That component is a
+   fixed 2/4-column band that draws its seams as the grid GAP and wants exactly
+   four cells (CLAUDE.md says so); three of them down a 280px column is a table
+   with one column. `.sump-f` is label-left, value-right with a rule between
+   rows, which is `.kv`'s shape without `.kv`'s 184px label column (§10.5) —
+   that column is the thing that cannot survive at 280px.
+   -------------------------------------------------------------------------- */
+.app .sump-id{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s02)}
+.app .sump-face{border-radius:999px;margin-bottom:var(--s03)}
+/* THE ARC IS GREEN, WHICH FOLLOWS THE CARD ONE PAGE BACK. Maryam asked for
+   green rings on the Evaluations card in the same session ("the progress circles
+   should be green") and the reference for THIS page draws its ring green too, so
+   the two rings a cohort leader sees are one object. `#00a43c` is the product's
+   one green — §71.2's verified badge, §72's done tick, §79's on a black card —
+   and it is used on white paper there as well as on black, so no second value is
+   needed. §90 argues the same reversal at length; the short form is that the
+   accent is the voice of "this is yours, act on it", and a figure the platform
+   reported about somebody else is not that.
+   §32's `--accent` still draws every ring in the candidate portal. */
+.app .sump-ring{display:flex;align-items:center;gap:var(--s05)}
+.app .sump-ring .ring{width:48px;height:48px;flex:none}
+.app .sump-ring .ring circle{stroke-width:5}
+.app .sump-ring .ring-f{stroke:#00a43c}
+.app .sump-rb{display:flex;flex-direction:column;gap:1px;min-width:0}
+.app .sump-figs{display:flex;flex-direction:column}
+.app .sump-f{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) 0;border-top:1px solid var(--rule)}
+/* THE MARK IS A BARE 20px GLYPH IN ITS OWN HUE, which is the platform's answer
+   since 1 Sep 2026 — the tinted 28px chip came off `.stat` and `.qa-ic` on
+   Maryam's instruction ("the icons should not have the background, all four
+   icons should be in different relevant colors to their nature. increase the
+   size of the icons"), and §72 had already made the same move for the pulse's
+   column marks. The reference draws a round tinted plate behind every one of
+   these; that is the shape this product has just removed everywhere else, so
+   taking it here would be re-introducing it on one page.
+   `fill:var(--mk)` rather than `currentColor`, per §29's note: the row sets no
+   `color` of its own, so there is nothing for the glyph to inherit. */
+.app .sump-fi{flex:none;width:20px;height:20px;display:grid;place-items:center}
+.app .sump-fi svg{width:20px;height:20px;fill:var(--mk)}
+.app .sump-fl{flex:1;min-width:0}
+.app .sump-fv{flex:none;font-variant-numeric:tabular-nums}
+/* the button closes the column and is the width of its words — a 280px
+   full-width outline under three hairline rows reads as a fourth row */
+.app .sump-go{align-self:flex-start;margin-top:var(--s02)}
+
+/* ------------------------------------------------------------------- 91.3 ---
+   THE RECOMMENDATION STRIP — `.sump-recs`
+
+   FIVE CELLS DOWN, NOT ACROSS, AND THAT IS THE ONE PLACE THIS LEAVES THE
+   REFERENCE'S LAYOUT. The file draws them as five columns; five cells across
+   557px is 111px each, which fits neither "Not ready to re-interview" nor the
+   line under it — the reference's own cells are ~215px wide because its card is
+   1100. A column of five is also how this product already draws a set of
+   choices you read before picking one (§76's time list: "the rows are `gap:0` at
+   44px … right for four rows of one list").
+
+   THE LIT CELL IS `--brand-tint-2` WITH `--accent-text` ON THE TITLE, which is
+   this product's "you chose this" and nothing more: §76 arrived at the same
+   answer for the slot picker ("the orange colour and selected radio button is
+   enough") after trying a solid fill and a wash. The mark is `I.checkFilled`
+   against `I.circle` — Material's own radio pair is `circle`/`circleDash`, and
+   §76 uses exactly that for a slot; a tick is used here instead because these
+   five are not equivalent options being sampled, they are one decision being
+   RECORDED, and a published summary has to read as settled rather than as a form
+   somebody left filled in.
+
+   THE CELLS ARE `<button>` WHILE PENDING AND `<div>` ONCE PUBLISHED, so §60's
+   rule holds — no dead control on a live surface — and the strip needs the
+   button reset for the first case: `.btn`'s reset does not apply because these
+   are not `.btn`s (a 2-line cell with a mark is not a button component), so the
+   appearance, the inherited font and the left-aligned text are stated here the
+   way §31 states them for `button.bk-row`.
+
+   IT IS ONE CELL NOW, AND BOTH BORDERS CAME OFF WITH THE OTHER FOUR (Maryam,
+   2 Sep 2026: "show only one green row … also remove the border of this block,
+   green fill is enough"). The paragraphs above are the record of why five were
+   drawn; what matters here is that the two rules were STRUCTURAL rather than
+   decorative — the outer `border` bounded a stack and the per-row `border-top`
+   separated members of it — so with one member both are describing a set that
+   no longer exists. A 1px rectangle drawn tight around a single filled green
+   cell is the second frame §74 states for its own cards ("a 5%-tinted card on a
+   4% grey ground is two washes a shade apart") and §39 states for a widget in a
+   bubble: one frame, and here the ground IS the frame.
+   `:first-child` GOES TOO rather than being left to zero a border that is no
+   longer declared — the "gate nothing writes" tell, one line long.
+   -------------------------------------------------------------------------- */
+.app .sump-recs{display:flex;flex-direction:column}
+.app .sump-r{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  background:none;text-align:left;width:100%;
+  -webkit-appearance:none;appearance:none;font:inherit;color:inherit}
+/* THE LIT CELL IS THE SUCCESS REGISTER, NOT THE ACCENT (Maryam, 1 Sep 2026).
+   `--support-success-bg` (#d7f0dd) is §01's light green ground and `#00a43c` is
+   the product's one green, the same tick §72, §79 and §90 draw. It shipped in
+   `--brand-tint-2` with `--accent-text` on the title for one build; the accent
+   is the voice of a choice being MADE and this cell is a decision that has been
+   taken, which is the reference's own reading and the reason its whole palette
+   here is green. The title goes back to primary ink with it (§63 §28) — the
+   reference's lit title is dark, and a green ground under green words is the
+   cell shouting. */
+.app .sump-r.on{background:var(--support-success-bg)}
+.app .sump-rm{flex:none;width:20px;height:20px;display:grid;place-items:center;margin-top:1px}
+.app .sump-rm svg{width:20px;height:20px;fill:var(--icon-secondary)}
+.app .sump-r.on .sump-rm svg{fill:#00a43c}
+.app .sump-rb2{display:flex;flex-direction:column;gap:1px;min-width:0}
+
+/* ------------------------------------------------------------------- 91.4 ---
+   THE PROSE AND THE SIGNATURE
+
+   A HEADING OVER ITS OWN PARAGRAPH, with a hairline between blocks and none
+   above the first. The `.kv` band this replaces gave a three-sentence answer a
+   184px label column and set it at the value's 13.5/19 — right for
+   "Recommendation — Ready to promote" and wrong for the paragraph the page
+   exists to carry. §63 §28 states the two roles: h4 over `--t-body`.
+
+   THE SIGNATURE IS DELETED (Maryam, 2 Sep 2026) and its rule with it. It was a
+   28px face and one line at the foot — "Published by Priya Nair" — added on the
+   argument that "a 90-day summary is a document somebody signed and the only
+   name on it was in the app bar". The name is still in the app bar and it is
+   the signed-in leader's OWN: this page is reached only from that leader's
+   queue, so the line was telling the reader who they are. Provenance belongs on
+   a copy that has been handed on, and this is the author's.
+   THE RULE GOES WITH THE MARKUP rather than being left behind as a gate nothing
+   writes — the tell §75 and §77 both record, and the one a stylesheet
+   accumulates fastest because a rule matching nothing costs nothing to look at.
+   -------------------------------------------------------------------------- */
+.app .sump-prose{display:flex;flex-direction:column}
+.app .sump-p{padding:var(--s05) 0;border-top:1px solid var(--rule)}
+.app .sump-p:first-child{border-top:0;padding-top:0}
+.app .sump-p > h3{margin:0 0 var(--s03)}
+.app .sump-p > p{margin:0}
+
+/* ------------------------------------------------------------------- 91.5 ---
+   THE GREEN NOTICE — AND THE STATUS LINE THAT IS NO LONGER DRAWN
+
+   THE STATUS BLOCK IS DELETED (Maryam, 2 Sep 2026: "remove the top published row
+   and the Shared with Samuel … banner beneath that"). It was a tick and the word
+   "Published" over a green `.note succ`, and between them they spent the first
+   screen of the page on its STATE — which `ph()`'s fact row already ends on
+   (`&middot; published`) and which §91.3's green cell says again in the register
+   the whole page is drawn in. `.sump-top` and the two `.sump-st` rules go with
+   the markup.
+   `.note.succ svg` STAYS, and that is the distinction worth keeping: it is a
+   property of §02's SUCCESS VARIANT, not of this page, and the four other
+   `.note succ` banners in the product (the candidate's booked interview, ai7's,
+   §80's) are its readers. Deleting a rule because one caller left is the mirror
+   of leaving one behind that no caller ever had.
+
+   `.note-ok` IS THE SUCCESS REGISTER OF §02's NOTICE — the same box, the same
+   3px edge, the same mark slot, in the three green values §01 already declares:
+   `--support-success-bg` for the ground, `--support-success-ink` for the edge,
+   `#00a43c` for the mark. §02's `.note` is neutral (`--layer-02` on
+   `--border-strong-01`) because most of what it carries is a caveat; this one
+   reports something that has succeeded, which is what the reference draws and
+   what the state of this page actually is.
+   IT IS A MODIFIER, NOT A SECOND COMPONENT, so §63 states no type for it — the
+   words are `.note`'s own body and `<b>` lead-in.
+   -------------------------------------------------------------------------- */
+/* AND THE SUCCESS NOTE'S MARK IS GREEN, which is the one thing `.note succ` was
+   missing. §02 draws every note's glyph in `--icon-secondary` — right for a
+   neutral note and for a warning whose ground already carries the register, and
+   wrong for this one: a grey shield on a green ground is the only element in the
+   box not saying what the box says. Stated on the VARIANT rather than on this
+   page, because it is a property of the component: the four other `.note succ`
+   banners in the product (the candidate's booked interview, ai7's, §80's) all
+   draw `I.checkFilled` in it and all four are better for it.
+   `#00a43c` is the product's one green — §71.2, §72, §79, §90 — rather than
+   `--support-success` (#24a148), which is the FILL those two tokens split; §01's
+   own note makes that distinction where they are declared. */
+.app .note.succ svg{fill:#00a43c}
+
+/* ------------------------------------------------------------------- 91.6 ---
+   THE CANDIDATE COLUMN IS CENTRED ON ITS OWN COLUMN — Maryam, 2 Sep 2026
+   ("the candidate profile part ... should be middle aligned to the column it is
+   in"), with the block attached separately so there was no doubt which one.
+
+   §91.1 sets `align-items:start` on the grid, which packed BOTH columns to the
+   top — right while the two were within a screen of each other and wrong now
+   that the right-hand column has lost its status block, its helper line, four
+   recommendation rows, a signature and a button. The face, the name, the ring
+   and the three figures are ~330px against a prose column that runs past 600,
+   so top-aligned the left column reads as a caption that ran out rather than as
+   the other half of the page.
+
+   `align-self` ON THE ITEM, NOT `align-items:center` ON THE GRID, and that is
+   trap 19's family: the right-hand column is a flex COLUMN whose foot is its
+   own content, and centring the track would move both — `.sump-b` would float
+   off the heading row it shares with `.sump-c`'s. One item moves.
+
+   ONLY AT ≥900, because that is the only tier with a second column to be
+   centred against. Stacked, `.sump` is one column and every member is already
+   full width; a centring declaration there is inert at best and, per trap 3, a
+   rule that must differ per width belongs inside the query rather than being
+   written once and hoped over. */
+@container app (min-width:900px){
+  .app .sump > .sump-c{align-self:center}
+}
+
+/* ------------------------------------------------------------------- 91.7 ---
+   THE DRAFT'S RECOMMENDATION IS A RADIO LIST — `.ldr-recs`
+
+   Maryam, 2 Sep 2026: "instead of arrows and full button type selection, give
+   radio buttons to each one, and the below fields will depend on the upper radio
+   button selection." The second clause already held — `needsWhy` puts the "Why
+   not a promotion?" box under the strip whenever the answer is not a straight
+   promotion — so what changed is the CONTROL.
+
+   FIVE `.btn`s WERE FIVE ACTIONS. The set drew the chosen option as a solid
+   black `.btn-p` and the other four as outlined `.btn-g`, which §64 then gave a
+   trailing arrow apiece (its test is `:not(:has(svg))` and these carry no icon).
+   So a single-choice question was drawn as four promises to navigate and one
+   thing that had already happened — §60's dead control, four times over, and the
+   black cell reading as this page's primary action while the real one sits at
+   the foot.
+
+   `.rad` IS §02's AND IS UNMODIFIED. The only thing this states is the STACK:
+   the component is a row (mark, then words) and five of them need to be a
+   column, which is also what makes the dependent field read as a consequence
+   rather than as the next item in a line. `--s02` between rows because `.rad`
+   already pays `--s03` top and bottom of its own — 8 + 4 + 8 is the 20px pitch
+   §76's time list settled on for "four rows of one list".
+
+   NO BORDER AND NO GROUND. §91.3's published strip is a filled cell because it
+   is a RECORD of an answer; this is the question, and a radio's own mark is what
+   carries the selection — §76's "the orange colour and selected radio button is
+   enough", reached there after a solid fill and a wash were both tried.
+
+   `.ldr-rec` IS ON THE LABEL SO THE HANDLER IS UNTOUCHED: `[data-ldrrec]` is
+   read with `closest()`, and the class exists for the type layer to reach the
+   words without also reaching §02's checkbox. */
+.app .ldr-recs{display:flex;flex-direction:column;gap:var(--s02);align-items:flex-start}
+.app .ldr-rec{padding-block:var(--s03)}

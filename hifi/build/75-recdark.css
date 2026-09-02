@@ -157,6 +157,31 @@
    white section and keeps the line. */
 .app .page > .sec.dark-card + .sec-qa{border-top:0}
 
+/* AND THE SECTION AFTER A BLACK CARD PAYS NOTHING ON TOP — Maryam, 1 Sep 2026
+   ("reduce the space between black card and bottom 4 cards").
+
+   48px WAS TWO FRAMES, NOT ONE GAP. `.dark-card` carries `margin:var(--s06)` on
+   both edges — §75's own correction, so the card's inset is the same on all four
+   sides — and the next `.sec` then pays §10's base `padding:var(--s06)` on top.
+   Between an object with a black edge and the row under it that reads as one
+   space, and 48 is the rhythm for two WHITE sections that need a boundary drawn
+   between them. Here the boundary is the ground change; the card's own margin is
+   already saying it.
+
+   IT IS KEYED ON WHAT PRECEDES, WHICH IS §75.4's SHAPE. That rule takes Quick
+   Actions' `border-top` off under a card for the mirror reason — the property
+   belongs to the CARD, not to whatever follows it — and the same argument holds
+   here: any section after this card wants the card's frame to be the whole gap,
+   and any section after anything else keeps §10's 24.
+
+   §20 CANNOT DO THIS AND MUST NOT BE ASKED TO. Both of its desktop join rules
+   carry `:not(.dark-card)` on both sides of the pair, deliberately (§81's note:
+   "a card's frame is 32 on all four sides and no join rule may take half of
+   one") — and they hand `var(--s05)` to one edge, which is a different value and
+   a different intent. This zeroes one edge outside that machinery, at (0,4,0),
+   so nothing in §20's fourteen-class list has to learn about black cards. */
+.app .page > .sec.dark-card + .sec{padding-top:0}
+
 /* ------------------------------------------------------------------ 75.2 ---
    THE HEAD PAIR
 

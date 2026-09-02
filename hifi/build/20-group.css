@@ -143,7 +143,30 @@
      gives: `:has(> .plate)` came loose the moment the call stopped being a
      plate. `.dark-card` is the class the conversion is, so this cannot come
      loose unless the component is renamed. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card){
+  /* AND A PAIR OF BLOCKY ROWS IS NOT THIS RULE'S PAIR — §101 (2 Sep 2026).
+     Where a section's bottom edge IS a block and the next section's top edge is
+     another, the space between them is `--pad-x`, so the two boxes are as far
+     apart as they are from the page walls. That is one value handed to the
+     pair, not `var(--s06)` handed to each edge, so it cannot be expressed from
+     inside this rule at all.
+     IT IS AN EXCLUSION RATHER THAN AN OUTWEIGHING, which is trap 4 and this
+     list's own job ("where 'which section pairs are already joined' is
+     decided"). Both rules here run to twenty-odd classes inside a container
+     query; §101's pair selector is (0,8,0) and could not beat them from any
+     later layer, at any weight a person would write on purpose.
+     THE TEST CANNOT NEST `:has()` — that is invalid CSS and drops the whole
+     selector silently, which on a rule this size would have turned every
+     section join in the product off at once. So "the next section is blocky" is
+     spelled `:has(+ .sec > .stats:only-child)` — one `:has()`, reaching through
+     the combinator — rather than `:has(+ .sec:has(> .stats))`.
+     THE TEST IS THE EDGE CHILD, NOT `:only-child`. What decides this is what the
+     reader SEES where the two sections meet: `:has(> .tile:last-child)` above
+     and `:has(> .tile:first-child)` below. `:only-child` was the first cut and
+     it missed `V.welcome`'s `.wpair` — two tiles in one section, so neither is
+     an only child, and at 390 they stack into exactly the pair this is for. A
+     section whose FIRST child is its `.sec-h` still fails the test, which is
+     the part that matters: a headed section is joined against its heading. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){
     padding-bottom:var(--s06)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */
@@ -192,7 +215,21 @@
      a strip and the thing it switches, which reads as the panel having come
      loose. The section states `padding:0` and this is the rule that was
      putting it back, from nine classes deep. */
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(:has(> .lead-b)){
+  /* `.sec-band` IS THE NEWEST MEMBER AND IT IS ON BOTH SIDES OF THE PAIR
+     (Maryam, 2 Sep 2026: "reduce the space above and below the 4 cards row",
+     of the Course Reports figure band). It is the first section in the product
+     that pays LESS than the 48px rhythm the 1 Sep instruction set, so it is
+     worth saying plainly what it is and is not: it is not a new rhythm, it is
+     one band on one page whose four figures belong to the tab strip above them
+     rather than standing as a block of their own. Everything else on that page
+     and in both portals still pays `--s06` on both edges.
+     IT HAS TO BE EXCLUDED HERE RATHER THAN OVERRIDDEN, which is this list's
+     standing reason: both rules run to thirteen classes inside a container
+     query, so §36's three-class restatement would lose at desktop and hold on a
+     phone — the failure that reads as "the fix did not work at the width I am
+     looking at". Named, not sniffed (`:has(> .stats)` would find every figure
+     band in both portals), exactly as `.sec-cs`, `.sec-out` and `.cap-sec` are. */
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(.sec-band):not(:has(> .lead-b)){
     padding-top:var(--s06)}
   /* THE TWO HARD JOINS ARE GONE WITH THE HALF-GAP (1 Sep 2026). Both set
      `padding-top:0` so two grounds would meet on one line — the tab strip

@@ -34,7 +34,7 @@
     display:block}
   .app[data-view="account"] .page > .sec:has(> .sec-h) > .sec-h,
   .app[data-view="account"] .page > .sec:has(> .eyebrow) > .eyebrow{
-    margin:0 0 var(--s05);padding:0;width:auto;max-width:none}
+    margin:0 0 var(--sec-h-gap);padding:0;width:auto;max-width:none}
 }
 
 /* ==========================================================================

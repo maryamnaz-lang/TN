@@ -1,0 +1,115 @@
+/* ==========================================================================
+   101. TWO BLOCKY ROWS ARE `--pad-x` APART — the block rhythm
+
+   Maryam, 2 Sep 2026: "this is component level change, since we defined the
+   section spaces from each other, but whenever there is a view where we get to
+   have two or more blocky rows, we need to give them the space equal to the
+   left and right padding from the page walls."
+
+   THIS IS THE SECOND HALF OF THE 48px SECTION RHYTHM, NOT A REVERSAL OF IT.
+   That rule (1 Sep 2026) is about two SECTIONS — different subjects, with a
+   boundary to draw between them, and 24 + 24 is what draws it. A blocky row is
+   not a subject, it is an OBJECT sitting on the page: a black card, a band of
+   four figures, a certificate banner, a bordered tile. Two of those in a row
+   are one stack of objects, and the space in a stack is the space around the
+   stack — which the page has already stated, on the left and the right, as
+   `--pad-x`.
+
+   SO THE CARD BECOMES SQUARE IN ITS INSET. §75's own note claimed
+   `margin:var(--s06) var(--pad-x)` gave `.dark-card` "the same inset on all
+   four sides", and that was true only between 600 and 1199, where `--pad-x`
+   happens to be 24. At the width the product is actually read at, `--pad-x` is
+   32 (§14 gives `.page` `--s07`) and the card was 24 above and below against 32
+   left and right — a rectangle pretending to be evenly inset. Measured over 219
+   screens at 1280: sixteen blocky pairs, fifteen at 48px and one at 24, against
+   a 32px gutter. Every one of them is now 32.
+
+   ------------------------------------------------------------------ 101.1 ---
+   WHAT COUNTS AS A BLOCKY ROW, AND WHY THE TEST IS THE EDGE CHILD
+
+   A blocky row is a box that spans the content column, draws its own ground or
+   border, and is inset from the walls. In markup that is one of two shapes:
+
+     - `.sec.dark-card` — the section IS the card (§75), so its gap is its
+       MARGIN, and its `padding` is the black interior and must not be touched.
+     - a `.sec` whose edge child is the block — `.stats`, `.facts`, `.certban`,
+       `.tile`, `.note`. Here the gap is the section's PADDING.
+
+   THE TEST IS ASYMMETRIC AND THAT IS THE POINT: `:has(> .tile:last-child)` on
+   the section ABOVE and `:has(> .tile:first-child)` on the section BELOW. What
+   decides this rule is what the reader sees where the two sections MEET, so
+   each side is asked about the edge that faces the other. A section can be
+   blocky at its bottom and not at its top, and several are.
+
+   A HEADED SECTION STILL FAILS THE TEST AT ITS TOP, which is the part that
+   keeps this honest: a `.sec` whose first child is its `.sec-h` is joined
+   against its heading, and §20's rules are right about it. So the pair only
+   collapses to `--pad-x` when there is genuinely a box above and a box below
+   with nothing between them.
+
+   `:only-child` WAS THE FIRST CUT AND IT WAS TOO NARROW. It missed
+   `V.welcome`'s `.wpair` — two `.tile`s in one section, so neither is an only
+   child — which at 390 stacks into exactly the pair this rule exists for. The
+   edge test also means a section moves between the two rhythms by itself when a
+   heading is added or removed, which is the property this needs: the
+   alternative is a hand-maintained list of view names that goes stale the way
+   §70's and §73's did.
+
+   FULL-BLEED BANDS ARE DELIBERATELY NOT HERE. `.sec.tint` and `.sec.sec-cs`
+   paint rail to rail; a ground change is not an object on the page, and the
+   space around it is the section rhythm. This is also why the test is what a
+   section CONTAINS rather than whether it has a background.
+
+   ------------------------------------------------------------------ 101.2 ---
+   ONE EDGE PAYS THE WHOLE GAP
+
+   The pair is `--pad-x` apart, not `--pad-x` each, so the first block's bottom
+   goes to nothing and the second block's top pays all of it. Splitting it in
+   half was tried first and is wrong for one concrete reason: `--pad-x` is 16 at
+   the phone, and `calc(16px / 2)` on each of two edges is two 8s that any later
+   rule touching either section silently turns into 8 + 24. One edge, one
+   declaration, one number to read back.
+
+   WHICH PROPERTY DEPENDS ON WHICH SHAPE, which is why there are four rules
+   rather than two: a `.dark-card` carries its gap as a margin and everything
+   else carries it as section padding. Writing `padding-top` on a black card
+   would push its own content down inside the black instead of moving the card.
+
+   ------------------------------------------------------------------ 101.3 ---
+   IT IS STATED TWICE, AND THE SECOND STATEMENT IS TRAP 3
+
+   `--pad-x` is a variable, so ONE rule would carry the right value at all three
+   widths. The restatement is not about the value, it is about who wins: §20's
+   two join rules live inside `@container app (min-width:900px)` and run to
+   twenty-odd classes, and per trap 4 nothing later can outweigh them from
+   outside that tier. They now carry an exclusion for exactly this pair (§20's
+   own note records it), and these rules are restated inside the same tier so
+   that what replaces §20's 24 + 24 is stated where §20 stated it.
+
+   Below 900 the only competitors are §10's base `.sec{padding:var(--s06)}` at
+   (0,1,0) and §75/§97's dark-card joins at (0,4,0); the unconditional block
+   below is (0,8,0) and clears both.
+   ========================================================================== */
+
+/* the first block's edge goes to nothing */
+.app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+  margin-bottom:0}
+.app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+  padding-bottom:0}
+
+/* and the second block's edge pays the whole of it */
+.app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
+  margin-top:var(--pad-x)}
+.app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
+  padding-top:var(--pad-x)}
+
+@container app (min-width:900px){
+  .app .page > .sec.dark-card:is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+    margin-bottom:0}
+  .app .page > .sec:is(:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child)){
+    padding-bottom:0}
+  .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec.dark-card{
+    margin-top:var(--pad-x)}
+  .app .page > .sec:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)) + .sec:is(:has(> .stats:first-child),:has(> .facts:first-child),:has(> .certban:first-child),:has(> .tile:first-child),:has(> .note:first-child)){
+    padding-top:var(--pad-x)}
+}

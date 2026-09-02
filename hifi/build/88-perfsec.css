@@ -1,0 +1,350 @@
+/* ==========================================================================
+   §88 — YOUR PERFORMANCE: a figure, a plot and a conclusion
+   Maryam, 1 Sep 2026, with a reference screen.
+
+   Course Progress's assessment block. `perfSec` / `perfChart` (views.js) are
+   the markup and the note there is why every figure in it is derived.
+
+   THREE ROWS, AND THE MIDDLE ONE IS THE ONLY GRID: the section heading and its
+   lede (§10's own), then the rail beside the plot, then the footer. §63 §23 owns
+   every size, weight, case and ink including the SVG `<text>`.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- 88.1 ---
+   THE RAIL BESIDE THE PLOT
+
+   `auto minmax(0,1fr)` FROM 900, STACKED BELOW IT. The rail is content-sized —
+   its widest line is the delta's label — and the plot takes everything left,
+   which is what keeps the chart legible instead of dividing the row in half.
+   `minmax(0,1fr)` and not `1fr`: a `1fr` floor is `auto`, and an SVG's
+   intrinsic width would stop the column ever shrinking (trap 19's family).
+
+   900 IS THE PORTAL'S ONE BREAKPOINT and this is the width the reference's
+   side-by-side needs — below it the rail's 44px figure and a 13-point plot in
+   one row leaves the plot about 200px, where the x labels collide. Stacked, the
+   figure reads first and the chart gets the full measure.
+
+   `align-items:start` SO THE RAIL TOPS OUT WITH THE PLOT. The plot is taller
+   than the rail at every width; centred, the average figure would float in the
+   middle of the chart's height and stop reading as the first thing in the row.
+   -------------------------------------------------------------------------- */
+/* THE RAIL IS GONE AND THE ROW IS ONE COLUMN (Maryam, 2 Sep 2026: "remove the
+   left side 88% part", "stretch the graph from left to right"). The note above
+   is kept because it is the argument for the SHAPE — a content-sized rail and
+   a plot that takes what is left — and that shape is what a wider reference
+   would want back. What changed is that the rail's two readings both moved:
+   the average onto the chart as `perfChart`'s callout, the delta into
+   `perfInsight`'s sentence at the foot. `.perf-rail` / `.perf-fig` / `.perf-d`
+   are deleted with it rather than left as gates nothing writes. */
+.app .perf-b{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  margin-top:var(--s06)}
+
+/* ------------------------------------------------------------------ 88.1a ---
+   THE SECTION MUST NOT TAKE THE 184px LABEL COLUMN — TRAP 13
+
+   It used to opt out through `.all-desc` as a DIRECT child of the `.sec`, and
+   the lede moved inside `.perf-hb` when the legend took the heading row's
+   right-hand slot. §10.15's list is keyed on `> .all-desc`, so one level down
+   it stops matching — and nothing warns: the heading simply sets to three
+   lines in a 184px gutter with the chart crushed beside it. `:has(> .perf-b)`
+   is the honest condition, since the plot row is what the section always has.
+
+   INSIDE THE SAME CONTAINER QUERY PER TRAP 3, and copying what §10 DOES rather
+   than what it says: its fourth declaration, `padding:0 var(--pad-x)` on the
+   heading, is dead (§14.2 zeroes a headed section's `.sec-h` padding at this
+   width) and restating it would set this heading 24px right of its own chart.
+   §87.1a and §72.1a are the same rule for the same reason.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .perf-b){display:block}
+  .app .sec:has(> .perf-b) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
+}
+
+/* ------------------------------------------------------------------ 88.1b ---
+   THE HEADING, THE LEDE AND THE LEGEND ON ONE ROW
+   `.perf-hb` takes §24.6's slack the way `.scene-hb` does — that layer's rule
+   hands it to a direct-child `<h2>`, and the `<h2>` is a grandchild now, so
+   without this the block is content-sized and the legend sits against the end
+   of the sentence instead of at the row's right edge.
+
+   NO `max-width` ON THE BLOCK. §73.1 caps `.aih-b` at 60% so a description
+   wraps clear of the action; this lede is one short line by instruction, so
+   the cap would only be a rule waiting to be wrong. Flex already stops it
+   reaching the legend.
+
+   THE LEGEND WRAPS TO ITS OWN LINE RATHER THAN SHRINKING. `flex-wrap` on the
+   row plus `flex:none` here: at a narrow desktop the pair is 260px of
+   swatches and words that must not break mid-item, and a wrapped legend under
+   the lede still reads as the chart's key. */
+/* THE ROW HAS TO BE ALLOWED TO WRAP, AND §24.6 SAYS `nowrap`. That layer built
+   `.sec-h` for a heading and one small button — a pair that always fits — so it
+   pins the row to a single line. The legend is ~260px of swatches and words,
+   which at 390 left the heading block about 90px and set a 38-character lede to
+   three lines. `flex-wrap:wrap` here, scoped to this section, so §24's rule is
+   unchanged for the twenty other headings that hold a control.
+
+   AND THE BLOCK NEEDS A REAL BASIS, NOT `auto` — §73.1's lesson, which cost that
+   layer a round: a flex item only moves to a new line when its BASE size does
+   not fit, so `flex:1 1 auto` has nothing to overflow with and the item shrinks
+   to nothing instead of wrapping. 320 is the width the lede and the heading both
+   hold on one line.
+
+   `margin-left:auto` PINS THE LEGEND RIGHT AND SURVIVES THE WRAP: on a wrapped
+   line the auto margin is in front of the only item, which puts the legend at
+   the right of its own row — still the chart's key, still at the end of the
+   heading block, one line lower. */
+.app .page .sec.perf > .sec-h{flex-wrap:wrap}
+.app .page .sec-h > .perf-hb{flex:1 1 320px;min-width:0}
+.app .page .sec-h > .perf-leg{flex:none;margin-left:auto}
+
+/* THE DELTA IS A ROW WITH A CHEVRON, NOT A COLOURED PILL. The reference draws
+   "↑ 5%" in green as bare text and that is right for this product: a tint here
+   would make the one number that is a COMPARISON louder than the average it is
+   a comparison against. §12's success and danger inks are the two words the
+   sheet has for direction and §63 §23 states them.
+
+   THE MARK IS `I.chevUp` / `I.chevDown`, which are already in the set and are
+   already what every disclosure in the build turns. An arrow glyph would be a
+   new icon for a direction the chevron pair already says. */
+/* `.perf-d` / `.perf-l` are deleted with the rail — see §88.1. The delta's
+   reasoning is kept above because it is a decision about how this product
+   draws a direction, and the next block that needs one wants it. */
+
+/* ------------------------------------------------------------------- 88.2 ---
+   THE PLOT
+
+   THE SVG KEEPS ITS ASPECT AND THAT IS THE DEPARTURE FROM `lineChart`. That
+   chart is `preserveAspectRatio="none"` on a 320x104 box, which is right for a
+   sparkline and wrong for a plot with a y axis: stretched, the dots go oval and
+   the y labels shear. The default `xMidYMid meet` plus a stated `height` keeps
+   the geometry the `viewBox` describes.
+
+   `height` IN px AND `width:100%`. The box is 560x200 in user units, so at any
+   column width the plot scales to fit and the height is what stops it growing
+   to 1200px tall in a wide column — an SVG with only `width:100%` takes its
+   ratio's height and this one would tower over the rail beside it.
+
+   THE GRIDLINES ARE `--rule` AND THE COHORT LINE IS `--border-strong-01`, which
+   is `lineChart`'s own pair for exactly this — the axis is furniture and the
+   comparison is a statement, so the second is the darker of the two. Both are
+   `vector-effect:non-scaling-stroke` so a scaled plot keeps 1px rules.
+   -------------------------------------------------------------------------- */
+/* AND THE FIXED `height` WAS THE BUG — Maryam, 1 Sep 2026 ("please follow the
+   alignments correctly, our section seems broken").
+
+   `width:100%; height:200px` ON A 560x200 viewBox LETTERBOXES HORIZONTALLY, and
+   that is what "broken" was. `preserveAspectRatio` defaults to `xMidYMid meet`,
+   which fits the drawing into the box on its MORE constrained axis and centres
+   it on the other. At desktop the column is ~1100px against a 200px height —
+   a 5.5:1 box holding a 2.8:1 drawing — so the height constrains it, the plot
+   renders at its natural 560px, and the remaining ~540px becomes empty paper
+   split evenly either side. The chart floated in the middle of its column with
+   the gridlines stopping short of both edges, level with a legend that started
+   at the column's real left edge. Nothing was misaligned in the markup; the
+   drawing simply was not where the box was.
+
+   `aspect-ratio` IS THE FIX BECAUSE IT MAKES THE BOX MATCH THE viewBox. With
+   `height:auto` and the drawing's own ratio there is no spare axis to centre
+   on, so `meet` fills exactly and the plot's left edge is the column's left
+   edge — which is what makes the legend above it line up without either of
+   them stating a position.
+
+   AND THE PLOT IS CAPPED, BECAUSE A UNIFORM SCALE TAKES THE TYPE WITH IT. This
+   is the trade the fixed height was avoiding: scale the box and the `<text>`
+   scales too, so an uncapped plot at 1100px would render §63 §23's 11px labels
+   at 21px and be 393px tall — the axis shouting over the figures it labels.
+   760 is where the labels land near 15px and the plot is ~271 tall, which is
+   the reference's own proportion (its plot is about 4.8:1 including the axis).
+   Left-aligned rather than centred, so the cap reads as a measure and not as
+   the letterbox this replaces.
+
+   BELOW 900 NOTHING CHANGES AND IT MUST NOT. Stacked, the column is 390–890
+   against the same 200px — boxes flatter than 2.8:1 only below ~560px, so
+   `meet` fits the WIDTH there and the horizontal gap never existed on a phone.
+   Giving mobile the aspect treatment would scale the labels DOWN with the
+   column (0.7x at 390, under 8px), which is the same trade running the other
+   way. The fixed height stays where it is right. */
+.app .perf-plot{min-width:0;overflow-x:auto}
+.app .perf-svg{
+  display:block;width:100%;min-width:640px;
+  height:auto;aspect-ratio:900 / 180;
+  overflow:visible}
+
+/* THE CALLOUT UNDER THE HIGHEST POINT. `perfChart` places it; this is the box.
+   `--background` fill because the gridlines run underneath it and an unfilled
+   box would have two of them striking through the words — the same reason
+   `.perf-dot` rings itself in the page's ground two rules down. The border is
+   the line's own green at a third, so the box reads as belonging to the series
+   it hangs off rather than as a second object on the plot. §63 §23 types it. */
+.app .perf-cal rect{
+  fill:var(--background);
+  stroke:color-mix(in srgb, var(--support-success-ink) 34%, transparent);
+  stroke-width:1;vector-effect:non-scaling-stroke}
+
+/* THE RING INSIDE THE CALLOUT. Two circles, the track and the arc — `.ring`'s
+   own construction (§56), drawn here in the plot's user units because the
+   dasharray depends on the radius and this one lives inside `perfChart`'s SVG.
+
+   THE STROKE IS **NOT** `non-scaling-stroke`, WHICH IS THE ONE DIFFERENCE FROM
+   EVERY OTHER LINE IN THIS CHART. The gridlines and the cohort rule are
+   hairlines: they must stay 1px however the plot scales, or a wide column paints
+   a 2px axis. A progress ring is a SHAPE — its weight is part of how thick the
+   ring looks against its own radius — so it scales with the drawing like the
+   dots do, and a `vector-effect` here would make the ring thin out as the
+   section widened.
+
+   `stroke-linecap:butt` AND NOT `round`. A rounded cap on a 13px radius adds a
+   visible degree and a half at each end, so 75% draws as about 78 — small
+   enough to look like a rendering choice and large enough to disagree with the
+   numeral 20px to its right. */
+/* 2.5 RATHER THAN 3, WITH THE RING AT r=9 (was 13). A ring's weight has to
+   fall with its radius or a small one reads as a filled disc with a hole: 3 on
+   9 is a third of the radius, 2.5 is closer to the quarter the larger one had.
+   Stated rather than derived because there is one ring and one size of it. */
+.app .perf-cal-trk,.app .perf-cal-arc{fill:none;stroke-width:2.5}
+.app .perf-cal-trk{stroke:color-mix(in srgb, var(--support-success-ink) 20%, transparent)}
+.app .perf-cal-arc{stroke:var(--support-success-ink);stroke-linecap:butt}
+
+/* THE LEGEND. Two items, a line swatch and a dashed swatch, above the plot —
+   the reference's arrangement, and it is what lets the dashed rule go unlabelled
+   inside the plot (§10's note on `lineChart` removing `targetLabel` for the same
+   reason: a label floating in the plot's white space is the number said twice). */
+.app .perf-leg{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--s03) var(--s06)}
+.app .perf-lg{display:inline-flex;align-items:center;gap:var(--s03)}
+.app .perf-lg-l{
+  width:18px;height:2px;flex:none;
+  background:var(--support-success-ink)}
+.app .perf-lg-d{
+  width:18px;height:0;flex:none;
+  border-top:1px dashed var(--support-success-ink)}
+
+/* THE DOTS AND THE TWO CALL-OUTS. A dot is the line's own gradient with the
+   page behind it, which is `lineChart`'s treatment — the 2px ring is what keeps
+   a dot readable where the line passes under it. The lowest and the highest get
+   a 9px halo in the danger and success tints: the reference's red and green
+   rings, in the two inks §12 already owns, at the tint strength a HALO wants
+   rather than the ink strength a word would.
+
+   THE HALO IS A SECOND CIRCLE, NOT A `filter` OR A BOX-SHADOW. SVG shadows are
+   a filter primitive and would cost a whole filter region for a solid disc; two
+   circles is one paint each and scales with the viewBox. */
+.app .perf-line{stroke:var(--support-success-ink)}
+.app .perf-avg-line{stroke:var(--support-success-ink)}
+.app .perf-dot{
+  fill:var(--support-success-ink);stroke:var(--background);stroke-width:2;
+  vector-effect:non-scaling-stroke}
+.app .perf-dot.perf-lo{fill:var(--danger-ink)}
+.app .perf-dot.perf-hi{fill:var(--support-success-ink)}
+.app .perf-halo{stroke:none}
+.app .perf-halo.perf-lo{fill:color-mix(in srgb, var(--danger-ink) 22%, transparent)}
+.app .perf-halo.perf-hi{fill:color-mix(in srgb, var(--support-success-ink) 22%, transparent)}
+
+/* ------------------------------------------------------------------- 88.3 ---
+   THE FOOTER — the conclusion
+
+   THE STRIP IS THE SECTION'S OWN GROUND WITH A RULE ABOVE IT, not a card. The
+   reference draws a tinted panel; §84's rule is that a change of ground is a
+   boundary and a tinted strip inside a white section would be a third ground on
+   the page. A hairline is what this product uses to say "the block above is
+   finished and this is what it means" — §72's pulse row and §74's signed cards
+   both close that way.
+
+   THREE PARTS, WRAPPING IN SOURCE ORDER: the insight takes the slack, the focus
+   areas are content-sized, and the button is last. `flex:1 1 320px` on the
+   insight is the wrap mechanism — §73.1's lesson, a real basis rather than
+   `auto`, so the sentence moves to its own line instead of shrinking to nothing.
+
+   `margin-left:auto` ON THE BUTTON ONLY, so the pair before it stays together
+   at the left and the action sits at the far end. On a wrapped line the auto
+   margin is in front of the only item, which puts the button at the right of
+   its own row — which is where an action belongs either way.
+   -------------------------------------------------------------------------- */
+.app .perf-f{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--s05) var(--s06);
+  margin-top:var(--s06);padding-top:var(--s06);
+  border-top:1px solid var(--rule)}
+.app .perf-ins{flex:1 1 320px;min-width:0;display:flex;align-items:flex-start;gap:var(--s04)}
+.app .perf-ins-b{min-width:0;display:flex;flex-direction:column;gap:2px}
+.app .perf-fa{flex:none;display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .perf-a{flex:none;margin-left:auto}
+
+/* A RULE BETWEEN THE TWO READINGS, WHICH THE REFERENCE DRAWS AND THE STRIP
+   NEEDED (Maryam, 1 Sep 2026). "Key insight" and "Focus areas" are two labelled
+   blocks on one line with only a gap between them, and at desktop the insight's
+   sentence runs long enough that the pair read as one wrapped paragraph with a
+   bold word in the middle of it. A hairline is what §72.1 uses between the
+   pulse's columns for exactly this — two readings side by side, no box.
+
+   `border-left` ON `.perf-fa`, NOT A PSEUDO-ELEMENT, and §76.3 is the argument:
+   a pseudo-element is for a divider that has to sit centred in a negotiated
+   gap, and a border is right when the item's own stretched height IS the inset.
+   It also turns over correctly when the strip wraps — it simply stops being
+   drawn, because the block is then at the start of its own line.
+
+   THE PADDING IS HALF THE ROW'S GAP so the line sits midway between the two,
+   and it is switched OFF on a wrapped line: below 900 the three parts stack, a
+   left border would run down the side of one block only, and §72.3's warning is
+   the same shape (a divider written for a row has to be turned off, not
+   re-pointed, once the row is a column). */
+@container app (min-width:900px){
+  .app .perf-fa{
+    padding-left:var(--s06);
+    border-left:1px solid var(--rule)}
+}
+
+/* THE INSIGHT'S MARK IS TAL'S SPARKLE, AND IT IS `.perf-ins-mk` RATHER THAN
+   `.ai-label` OR `.ai-aura` — the hoist trap §72 records at length. `talFirst`
+   lifts any `.sec` containing an `.ai-aura` to under the `.ph` and `placeBand`'s
+   `_mhIsTal` claims either class as head furniture, so a section wearing one
+   leaves the page body. This is the same object §70 paints the band's label with
+   — `--ai-star` masked over `--ai-grad` — under a class no pass can see, which
+   is exactly what `.pulse-mk` and `.aih-mk` do.
+
+   IT IS A DERIVED READING, WHICH IS WHY IT GETS THE MARK AT ALL. §73's rule is
+   one star per page region and Course Progress spends its other one on the pulse
+   card's heading — a black card at the top of the page, this a hairline strip at
+   the foot of a section, so the two do not read as one attribution repeated. */
+.app .perf-ins-mk{
+  flex:none;width:16px;height:16px;margin-top:2px;
+  background:var(--ai-grad, linear-gradient(135deg,var(--ai-1),var(--ai-3)));
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* THE SCORES SHEET's list. `.kv` is the build's own label-and-value row and
+   §02's dialog has already paid its padding, so this states the gap and nothing
+   else. Thirteen rows is inside `.sheet-b`'s own scroll (§02.14). */
+.app .kv-list{display:flex;flex-direction:column}
+
+/* THE ROW IS A TITLE AND A FIGURE AT THE TWO ENDS (Maryam, 2 Sep 2026: "the
+   scores should be on the very right of the row", "the left side text should be
+   in one line rather than go into 2 lines"). Both asks are one cause: §10.5
+   makes `.kv` a grid of `minmax(0,10rem) minmax(0,1fr)` — a 160px LABEL column
+   with the value left-aligned in what is left. That is right for the band it was
+   written for, where the keys are one or two words and the values are sentences.
+   Here it is the other way round: the key is "Chapter 4 · Delegation Without
+   Drop-Off" and the value is "50%", so the title wrapped inside 160px and the
+   figure sat immediately after it in the middle of a 470px sheet.
+
+   THE TRACKS ARE SWAPPED, NOT RESIZED. `minmax(0,1fr) auto` gives the title
+   every pixel the figure does not need, which is what puts it on one line, and
+   `auto` plus `text-align:right` is what pins the figure to the far edge — one
+   change answering both.
+
+   IT NEEDS NO CONTAINER-QUERY RESTATEMENT AND THAT IS WORTH BEING EXPLICIT
+   ABOUT, because trap 3 reads as though it would. §10's desktop rule
+   (`var(--label-col)` and `gap:0`) is inside `@container app (min-width:900px)`,
+   but a container query adds no specificity and no tier of its own — §37.11b's
+   note works this out in full. `.app .kv-list > .kv` is (0,3,0) against §10's
+   (0,1,0), so it wins on weight at every width, `gap` included.
+
+   SCOPED TO `.kv-list`, so the forty other `.kv` bands in the build keep §10's
+   label column. This is the one place the pair is a table of figures. */
+.app .kv-list > .kv{
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--s05)}
+.app .kv-list > .kv .k{padding-right:0}
+.app .kv-list > .kv .v{text-align:right}

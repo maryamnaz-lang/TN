@@ -1,0 +1,191 @@
+/* ==========================================================================
+   95. THE ATTENTION CARD, AND THE ROW'S NAMED LINK
+   Maryam, 2 Sep 2026, two asks on Course Reports:
+     95.1  `.att*`       the one candidate who needs the leader, as a black card
+                         under the tab strip.
+     95.2  `.ldr-view`   the table row ends in "View Progress" and an arrow
+                         rather than in a chevron.
+
+   §95.1 STATES ALMOST NOTHING, WHICH IS THE POINT OF §75. `.dark-card` brings
+   the ground and its haze, the inset margin and the 32px frame, the 20px gap
+   between the head block and the content, the section's own seams off, the
+   `.dc-hd` heading row with its rule, the quiet button borderless in white, and
+   §63 §6a's ink for everything the card holds. What is left here is this card's
+   own content — three columns and a footer — which is what a caller is supposed
+   to be: `.crow-dark` and `.rec-dark` are the same size for the same reason.
+
+   §63 §26 OWNS EVERY SIZE, WEIGHT, CASE AND INK. This layer states layout and
+   two strokes.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 95.1 ---
+   THE CARD'S BODY — A FACE, WHO THEY ARE, AND HOW FAR ALONG
+
+   THREE COLUMNS: the photograph, the block that names them, the ring. `auto
+   minmax(0,1fr) auto` so the two marks are their own size and the text takes
+   what is left with a real floor — the shape §90's row uses beside its own
+   ring, and the reason it is a grid rather than a flex is that the middle
+   column needs the floor without a `min-width:0` said separately.
+
+   THE RING IS §32'S AT §90'S 56px, and both of its strokes are re-pointed
+   because §32 draws them for white paper: the track is `--layer-accent-01`, a
+   pale warm tint that is the brightest thing on a black card, and the arc is
+   `--accent`. On this card they are `--on-dark-rule` and `--on-dark`, which is
+   §77's decision rather than a new one — the black IS the alarm (§59), so
+   nothing inside it needs a hue to say the same thing a second time. It needs
+   (0,4,0) to beat §32's `.app .ring .ring-f` at (0,3,0); landing later is not
+   enough, and on a stroke that failure is silent.
+
+   THE FLAG CHIP KEEPS ITS GLYPH AND LOSES ITS HUE, for the same reason. §31's
+   `.flag-t` sets no colour of its own — only its modifiers and the attention
+   table's rows do — so inside the card it simply inherits `--on-dark`, and this
+   layer states nothing about it at all.
+
+   THE ACTION IS NOT DRAWN HERE AT ALL. It shipped for one build as a footer row
+   of its own (`.att-a`, a flex pinned right) and moved into the heading row the
+   same day — `.dc-act`, the slot §75 documents on `.dc-hd-r`. That is three
+   declarations deleted rather than moved: the slot already carries the auto
+   margin, the borderless white ink (§75) and the baseline against the title, so
+   the card's own layer says nothing about its control.
+   -------------------------------------------------------------------------- */
+.app .att-b{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  gap:var(--s05);align-items:center}
+.app .att-av{display:block;flex:none}
+.app .att-who{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+/* The flag and the last-active line read as one statement — what is wrong and
+   when it started — so they share a line and wrap together rather than
+   stacking into two more rows under the name. */
+.app .att-fl{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s04)}
+.app .att-ring .ring{width:56px;height:56px}
+.app .att-ring .ring circle{stroke-width:5}
+.app .att-ring .ring .ring-t{stroke:var(--on-dark-rule)}
+.app .att-ring .ring .ring-f{stroke:var(--on-dark)}
+
+/* BELOW 900 THE RING TAKES ITS OWN ROW. At 390 the card's content box is about
+   246px, and a 56px face plus a 56px ring plus two gaps leaves ~110px for a
+   name, a cohort line and a flag chip — the chip alone is wider than that. On
+   its own row, left-aligned under the pair, everything keeps its own width and
+   nothing wraps mid-phrase. It is `justify-self:start` rather than centred
+   because the block above it is left-aligned and a centred ring under a ragged
+   left edge reads as a third column that lost its heading. */
+@container app (max-width:899.98px){
+  .app .att-b{grid-template-columns:auto minmax(0,1fr)}
+  .app .att-ring{grid-column:1 / -1;justify-self:start}
+}
+
+/* ------------------------------------------------------------------ 95.2 ---
+   "VIEW PROGRESS" — THE ROW'S LAST CELL
+
+   IT REPLACES A CHEVRON, AND THE CELL'S RULES HAVE TO TURN OVER WITH IT. §36.2
+   gives `.ldr-tr .ldr-go` a stated `width:24px` — right for an 18px mark and a
+   guillotine for a two-word phrase, which would wrap to "View / Progress" and
+   set every row in the table two lines tall. `width:auto` and
+   `white-space:nowrap`, so the column is exactly the phrase and the data
+   columns negotiate what is left. §37's `text-align:right` on the cell stands.
+
+   THE ARROW IS AN `<svg>` FROM `I.arrowRight`, so it takes `currentColor` and
+   follows the link's ink with nothing said twice. §36.2's `fill:
+   var(--icon-secondary)` is scoped to `.ldr-go svg` and would win on order, so
+   this restates the fill at (0,4,0) rather than hoping.
+
+   IT IS 16px AGAINST §36'S 18. The mark now sits beside 12.5px words rather
+   than alone in a 24px cell, and §31's chip note settles the same question the
+   same way: "a 20px icon beside 12.5px words is the icon shouting the verb".
+   -------------------------------------------------------------------------- */
+.app .ldr-tr .ldr-go{width:auto;white-space:nowrap}
+.app .ldr-view{display:inline-flex;align-items:center;gap:var(--s02)}
+.app .ldr-tr .ldr-go .ldr-view svg{
+  width:16px;height:16px;flex:none;fill:currentColor}
+
+/* ------------------------------------------------------------------ 95.3 ---
+   THE TAB STRIP ABOVE IT PAYS NOTHING
+   Maryam, 2 Sep 2026: "the space between the tabs row and black card should be
+   equal to the space of the black card with the bottom 4 cards."
+
+   IT WAS 48 ABOVE AND 24 BELOW, and only one of those was the card's. §75.1
+   already zeroes the padding-top of whatever FOLLOWS a black card, on the
+   stated ground that the card's `margin` is the gap and no neighbour may add to
+   a frame that is 32 on all four sides. Nothing had ever needed the mirror of
+   that rule, because until this page every `.dark-card` in the build followed
+   the `.modhead` — which is not a `.sec` and pays no bottom padding. Here it
+   follows the tab strip, so the strip's own `--s06` stacked on the card's
+   `--s06` margin and the block sat twice as far from the tabs as from the
+   figures under it.
+
+   SCOPED TO THE STRIP, NOT WRITTEN AS THE GENERAL MIRROR. `.app .page > .sec
+   :has(+ .sec.dark-card){padding-bottom:0}` is the tempting one-liner and it is
+   the same argument §75.1 makes, so it is probably right — but it would move
+   the gap above five cards on five pages that are already signed off, silently
+   and all at once. This is §36.17's idiom instead (`.sec-cs:has(+ …)`), which
+   says the narrower and more defensible thing: a tab strip is attached to what
+   it switches. If the general rule is ever wanted, this is the note it replaces.
+   -------------------------------------------------------------------------- */
+.app .page > .sec.sec-cs:has(+ .sec.dark-card){padding-bottom:0}
+
+/* ------------------------------------------------------------------ 95.4 ---
+   THE MEMBER PAGE'S TWO ACTIONS ARE CHIPS — `.ldr-chip`
+   Maryam, 2 Sep 2026: "i need message and notes icons to be on the left side of
+   the texts", and "the message and notes should be chips, notes should yellow
+   text and light bg, message should be blue text and light blue bg".
+
+   THE MARK LEADS, WHICH IS THE WHOLE OF THE FIRST ASK AND IS ALSO WHY THESE
+   STOPPED BEING BUTTONS. §02 puts a `.btn`'s glyph AFTER the label, and that is
+   right for a button, where a trailing mark is the direction of travel (§64
+   makes the same argument when it gives 88 quiet buttons a trailing arrow).
+   A chip is a LABEL — §31's `.flag-t`, §87's topic chips, `.tag` — and every
+   chip in this build leads with its mark. Writing these as `.btn-g` and
+   reversing the icon would have been one component contradicting itself.
+
+   THE GROUNDS ARE THE §31 MIX, WHICH IS NOW THIS BUILD'S ONE WAY OF TINTING A
+   CHIP: `color-mix` off the SAME ink the words are set in, so the pair cannot
+   drift and no second token is minted. 10% for the blue and 14% for the yellow
+   — the yellow is the weaker hue and needs more of itself to read as a ground,
+   which is §31's own adjustment upside down (there red was the strong one at
+   12% against amber's 14).
+
+   PILLS, PER §56'S MARK GRANT — the same literal `999px` as §31's flag chip and
+   §92's cover pill, stated rather than re-pointed so `--radius` stays 0 for
+   everything that reads it.
+
+   §63 §27 OWNS THE TWO INKS. Measured on their own washes: `--link` on its 10%
+   is 4.6:1 and `--support-warning-ic` on its 14% is 4.6:1, both AA at label
+   size.
+   -------------------------------------------------------------------------- */
+.app .ldr-chip{
+  display:inline-flex;align-items:center;gap:var(--s02);
+  height:32px;padding:0 var(--s05);
+  border:0;border-radius:999px;cursor:pointer;
+  background-color:var(--chip-bg)}
+.app .ldr-chip svg{width:16px;height:16px;flex:none;fill:currentColor}
+.app .chip-msg,.app .chip-edit{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
+.app .chip-note{--chip-bg:color-mix(in srgb, var(--support-warning-ic) 14%, var(--layer-01))}
+/* THE FOURTH HUE IS RED AND IT ARRIVED WITH THE NOTE ROW'S DELETE (2 Sep 2026).
+   12% rather than the yellow's 14, which is §31's own adjustment: red is the
+   stronger hue and an equal mix reads darker beside the others. `--danger-ink`
+   (#c21520) rather than `--support-error` (#da1e28) — §01's split, the ink cut
+   for words and the fill cut for grounds, and this chip is both at once so it
+   takes the one that has to be legible.
+   THE BLUE IS SHARED WITH `.chip-msg` RATHER THAN COPIED. Two names for one
+   hue is how a palette drifts; they are the same declaration and §63 §27 states
+   the ink for the pair in one rule too. */
+.app .chip-del{--chip-bg:color-mix(in srgb, var(--danger-ink) 12%, var(--layer-01))}
+
+/* ------------------------------------------------------------------ 95.5 ---
+   AND THE IDENTITY ROW STOPS PAYING TWICE
+   Maryam, 2 Sep 2026: "reduce the gap between the Yuki Tanaka row and the 4
+   card row beneath it, the gap should be equal to other section gaps."
+
+   §11.193 gives `.idhead` `margin-bottom:var(--s06)`, which is right when the
+   row is followed by content INSIDE its own section — the profile page's `.kv`
+   tile is the case it was written for. On the member page the row is the
+   section's only child, so that margin lands on top of the section's own 24 and
+   the next section's 24: 72px against the 48 every other pair on the page pays,
+   and measured as exactly that.
+
+   `:last-child`, NOT A PAGE SCOPE. The rule is about what the margin is FOR —
+   separating the row from what follows it — so where nothing follows it inside
+   the section there is nothing to separate. `V.leadProfile`'s row keeps its
+   margin because its `.kv` tile is still there.
+   -------------------------------------------------------------------------- */
+.app .sec > .idhead:last-child{margin-bottom:0}

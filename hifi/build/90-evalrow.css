@@ -1,0 +1,297 @@
+/* ==========================================================================
+   90. THE AWAITING-EVALUATIONS ROW — `.ev-row`, inside §75's black card
+   Maryam, 1 Sep 2026, with a reference screen: "rather than vertical, arrange
+   both candidates horizontally, there should be a divider between both
+   candidates, the divider color should be the one we are using after the
+   awaiting evaluation heading … just follow the progress circle in the name
+   row, and the text below that circle should be Scored. do not close the
+   candidates in cards since this is not our ui language. ignore the 3 stats and
+   progress bar, just give a secondary button at top left Evaluate Candidate
+   with an arrow."
+
+   WHAT IT REPLACES. The two waiting summaries were two `.tile` rows stacked
+   down the card — a face, a name and a `&middot;` subtitle each, with the whole
+   row a `<button>` ending in a chevron. Side by side, each candidate has room
+   for a figure and its own action, which is what the reference is actually
+   about: the two people are read against each other rather than one after the
+   other.
+
+   THREE THINGS THE REFERENCE WAS REFUSED, and each is the same test §73 and §74
+   apply — take the STRUCTURE, refuse anything that is another product's visual
+   language or that invents data:
+
+     the cards        Each candidate sat in a bordered, rounded, tinted card
+                      inside the black one. Maryam ruled it out in the ask and
+                      §02's opening note is the reason ("depth is expressed as
+                      rhythm and rule weight, nothing else"); `--radius` is 0
+                      besides. A column between two rules is the product's way
+                      of saying "these are separate things".
+     the three stats  Assessments / Days to Close / Sign to Close, each with a
+                      tinted glyph. Two of the three are the same 90 days twice,
+                      and a "days to close" this build does not hold.
+     the progress bar A second drawing of the figure already in the ring, 40px
+                      under it, with the percentage printed a third time beside
+                      it.
+
+   THE DIVIDER IS THE HEAD ROW'S OWN RULE — `--on-dark-rule`, 16% white, which
+   §75.2 draws under `.dc-hd` and §75.5 gives to every seam inside the card. The
+   ask names it that way ("the one we are using after the awaiting evaluation
+   heading") and it is the only hairline token a black card has.
+
+   IT IS AN INSET PSEUDO-ELEMENT, NOT A `border-left`, and §72.1 is the argument
+   in full: a border runs the column's whole height, so it reaches up to the head
+   row's rule and the two form a corner — which turns two columns back into the
+   table this card is trying not to be. §76's counter-argument (a border is right
+   when there is nothing above to meet) does not apply here for exactly that
+   reason. `top`/`bottom` at 0 with the row's own `padding-top` above it keeps the
+   line clear of the rule at both ends.
+
+   THE DIVIDER BELONGS TO THE COLUMN THAT FOLLOWS IT — `.ev-c + .ev-c` — and sits
+   half of `--ev-gap` out into it, so one value drives the space and the line
+   together. §72.1 and §73.1 both do this. §90.1b below is where the cap and that
+   gap are set, and it is the part Maryam corrected.
+
+   THE COLUMNS COUNT THEMSELVES. `grid-auto-flow:column` with
+   `grid-auto-columns` and no `grid-template-columns`, which is §72.2's rule and
+   it matters here for the same reason: the queue empties as the leader signs, so
+   this row draws TWO today and ONE after the first signature. A `repeat(2,…)`
+   would leave a half-width column with a hairline hanging in space beside it.
+   The track's floor is `minmax(0,…)` rather than `auto` because the name row
+   holds a `white-space:nowrap` figure and an `auto` floor cannot shrink under
+   it.
+   THE QUEUE CANNOT GROW HERE, which is what makes `auto-flow:column` safe: it
+   is `LEAD_SUMMARIES` filtered to `pending`, and the only thing that writes that
+   field is the publish handler, which moves a record OUT. If a future cohort
+   ever arrives with eight waiting, this row wants
+   `repeat(auto-fit,minmax(280px,1fr))` and the divider wants to become a gap
+   hairline — a wrapped second line would otherwise draw a vertical rule down its
+   own first column.
+
+   BELOW 900 IT STACKS AND THE DIVIDER TURNS OVER RATHER THAN SWITCHING OFF.
+   §72.3's warning is why the two halves are stated separately: the desktop
+   divider is absolutely positioned, so left standing it would draw a vertical
+   line down every stacked column but the first. `content:none` kills it, and the
+   same hairline comes back as a `border-top` on the same element — which is
+   §76.3's turn-over, reached from the other technique.
+   ========================================================================== */
+/* ------------------------------------------------------------------- 90.1b ---
+   THE CELL IS A MEASURE AND THE DIVIDER IS CENTRED BETWEEN TWO OF THEM
+   Maryam, 1 Sep 2026, with the card marked up: two boxes round the candidates
+   and a line between them. Read off the annotation, the three numbers are a
+   ~580px block per candidate, a ~128px gap with the line down its middle, and
+   the slack left over at the card's right edge.
+
+   WHAT IT CORRECTS. The row was `minmax(0,1fr)` per candidate, so the two cells
+   ate the whole card — 721px each at 1280 — and everything followed from that:
+   the ring, which sits at its cell's right edge, was pushed 440px away from the
+   name it belongs to and 16px from the divider; the divider itself, at half of a
+   32px gap, ended up hard against the SECOND candidate's face. So the line read
+   as part of Lena rather than as the boundary between the two, which is exactly
+   what the annotation is pointing at.
+
+   THE SLACK GOES OUTSIDE THE PAIR, NOT INSIDE THE CELLS, and that is the whole
+   difference. `1fr` distributes leftover width INTO each track, which is why the
+   ring drifts; a capped track leaves it at the end of the row, where it is empty
+   black and costs nothing. `justify-content:start` is what keeps the pair
+   left-aligned rather than pushing the second cell to the far edge
+   (`space-between` was the other candidate and it moves Lena 140px right of
+   where the annotation puts her).
+
+   `--ev-gap` EXISTS SO ONE VALUE DRIVES BOTH THE SPACE AND THE LINE. The gap and
+   the divider's own offset are the same number — §72.1 and §73.1 both make this
+   point — so the line cannot come off centre when the gap changes, and the
+   stacked tier can re-point one variable instead of two rules.
+
+   THE CAP IS A MEASURE, NOT A BREAKPOINT: `minmax(0,580px)` shrinks below it, so
+   at a 900px container the two cells take 354 each and the gap still holds the
+   line. Nothing here needs a second tier.
+   -------------------------------------------------------------------------- */
+.app .ev-row{
+  --ev-gap:var(--s07);
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);
+  column-gap:var(--ev-gap)}
+@container app (min-width:900px){
+  .app .ev-row{
+    --ev-gap:128px;
+    grid-auto-columns:minmax(0,580px);justify-content:start}
+}
+.app .ev-c{position:relative;display:flex;flex-direction:column;gap:var(--s05)}
+.app .ev-c + .ev-c::before{
+  content:'';position:absolute;top:0;bottom:0;left:calc(var(--ev-gap) / -2);
+  width:1px;background:var(--on-dark-rule)}
+
+/* --------------------------------------------------------------------------
+   90.2 THE NAME ROW — the face, who they are, and the one figure
+
+   THE RING IS THE ASSESSMENT AVERAGE AND THE WORD UNDER IT IS "Scored", which
+   is the one place this layer had to decide something the reference does not
+   say. 92% "Complete" in the file is course progress; the label Maryam asked for
+   names a SCORE, and this product has exactly one — `m.avg`, the assessments
+   average, which the roster, the reports and the summary page all read. So the
+   ring shows 87 / 90 and not 92 / 88, and the progress figure stays in the line
+   under the name where it already was. A ring labelled "Scored" showing chapters
+   finished would be the figure and its caption disagreeing.
+
+   THE RING IS §32'S, AT 56px. `ring(pct,label)` in views.js is the component —
+   two SVG circles and `--arc` as a dasharray LENGTH — and the only change is the
+   box: 64 is right beside a `.wkc`'s three lines of text and one pixel too proud
+   of a 36px face. The stroke comes down with it (6 &rarr; 5) so the ratio holds.
+
+   BOTH STROKES ARE RE-POINTED AND THIS IS THE FIRST RING ON A BLACK CARD.
+   §32.81 strokes `.ring-t` in `--layer-accent-01`, a pale warm tint tuned for
+   white paper; on `--gray-100` it is the brightest object on the card, a solid
+   near-white circle with the arc lost inside it. `--on-dark-rule` is the card's
+   own hairline, which is what a track is.
+
+   THE ARC IS GREEN, NOT THE ACCENT (Maryam, 1 Sep 2026: "the progress circles
+   should be green"), and it is the product's ONE green — `#00a43c`, the same
+   literal §71.2 gives the leader's verified badge, §72 the pulse's done tick and
+   §79 the tick on the dark pulse card. §79's note has already measured it on this
+   exact ground: **6.2:1 on `--gray-100`**, which is why no on-dark variant is
+   needed. Not `--support-success-ink` (#1a7f37): that is the ink tuned to pass as
+   TEXT on white paper and it is nearly black against this card.
+   WHAT THE ACCENT WAS DOING THERE, since it shipped that way for one build: §32
+   draws every ring in `--accent` because a ring on a white page is a figure about
+   YOUR progress, and the accent is that voice. Here the card is already the
+   loudest object on the page and the figure is a SCORE somebody has earned rather
+   than a task in progress — green is the product's word for "this part is done",
+   which is what a closed 90 days is. It also stops the card spending the accent
+   twice, 40px from Tal's own orange label above it.
+   §32's `--accent` keeps every other ring in both portals; this is (0,4,0)
+   against its (0,3,0) and scoped to `.ev-ring` inside a `.dark-card`.
+
+   SPECIFICITY: §32's rules are `.app .ring .ring-t` and `.app .ring .ring-f` at
+   (0,3,0), so a `.dark-card`-scoped restatement wins on weight AND on order —
+   which is why this cannot live in §31 (layer 31 is before §32 and would lose
+   silently, the trap §83 records for the AI ramp).
+
+   THE COHORT IS A LINE, NOT A CHIP. The reference draws "Cohort 33" as a pill
+   with a group glyph in it; a pill on a black card is the shape §75 reserves for
+   `.dc-when` and a chip here would be the third box in a card that has just had
+   two removed. It is the row's supporting line, which is also where the progress
+   percentage lives.
+
+   THE ROW STATES NO TYPE AT ALL, WHICH IS WHY THERE IS NO §63 SECTION FOR IT.
+   Every string in it wears a role §63 already owns: the name is `.ttl` (§63 §4's
+   h4 list — a row title), both small lines are `.sub` (§63 §7b's one description
+   grey, which §63 §6a re-points to `--on-dark-2` inside this card), and the
+   figure is `.ring-n` (§63 §3's h3, tabular by §63 §9). Three new classes here
+   are layout only. That is the cheapest possible version of this row and it is
+   also the reason it needed no new type exception: a name, a description and a
+   figure are three roles the system already has.
+
+   THE FACE IS `avatar()` AT 44px WITH NO GROUND BEHIND IT. It is wrapped in
+   `.mem-av.mem-ph`, which §15.1508 strips to `background:none; width:auto` and
+   §89.2 rounds — so the wrapper hugs the photograph and there is no square
+   `--gray-80` box to show at the corners (§89.2b's finding, answered here by
+   picking the wrapper that has no ground rather than by a fourth rule). The size
+   is the inline argument `avatar()` takes, per trap 1's note: 44 against a 56px
+   ring and two lines of text.
+   -------------------------------------------------------------------------- */
+.app .ev-top{display:flex;align-items:center;gap:var(--s05)}
+.app .ev-id{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+/* ------------------------------------------------------------------- 90.2b ---
+   THE NAME'S ROW AND THE POINTS LINE
+
+   THE BADGE IS ON THE NAME'S OWN LINE AND THE LINE CAN WRAP. `.ev-nm` is a flex
+   row with `flex-wrap` for one measured reason: at 900 each column is ~370px and
+   "Samuel Adeyemi" plus a badge is 210 of it, but a longer name with Gold beside
+   it is not, and the alternative to wrapping is the badge shrinking or the name
+   truncating — a badge is 18px of artwork and cannot shrink, and a name is the
+   one string on this card that must not be cut. Wrapped, the badge drops under
+   the name and the row grows; nothing overlaps at any width.
+
+   `align-items:center` ON THAT ROW, not baseline: the badge is an 18px OBJECT,
+   which is §72's own argument for the ring ("there is no baseline in it to
+   share"). The `.sub` label beside it centres on the artwork, so "Silver" and
+   its medal read as one mark.
+
+   THE POINTS MARK IS 14px AND `currentColor`. It is a glyph inside a `.sub`, so
+   it takes that role's ink — `--on-dark-2` inside the card, §63 §6a — and no
+   colour is stated here; 14 against a 17px line is §72's ratio for a mark that
+   introduces a line rather than heading a column (its own note: below the cap
+   height it reads as a bullet, above it as a second object).
+   -------------------------------------------------------------------------- */
+.app .ev-nm{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
+.app .ev-bdg{display:inline-flex;align-items:center;gap:var(--s02);flex:none}
+.app .ev-bdg > img{width:18px;height:18px;flex:none;display:block}
+.app .ev-pts{display:inline-flex;align-items:center;gap:var(--s02)}
+.app .ev-pts > svg{width:14px;height:14px;flex:none;fill:currentColor}
+.app .dark-card .ev-ring .ring{width:56px;height:56px}
+.app .dark-card .ev-ring .ring circle{stroke-width:5}
+.app .dark-card .ev-ring .ring-t{stroke:var(--on-dark-rule)}
+.app .dark-card .ev-ring .ring-f{stroke:#00a43c}
+/* the label sits UNDER the ring and the pair is one object, centred on it —
+   `text-align:center` rather than a flex column, because the ring is already a
+   `place-items:center` grid and a second nesting would earn nothing */
+.app .ev-ring{flex:none;display:flex;flex-direction:column;align-items:center;
+  gap:var(--s02)}
+
+/* --------------------------------------------------------------------------
+   90.3 THE ACTION IS LEFT-ALIGNED UNDER THE NAME
+
+   "a secondary button at top left" — the reference's own "View Candidate" is
+   bottom-right inside its card, and with the stats and the bar refused there is
+   nothing between the name row and the action for it to be at the bottom OF. On
+   the column's left edge it lines up with the face above it, which is the edge a
+   column is read down (§31.5's argument for the date chip, §86's for one cover
+   width).
+
+   `align-self:flex-start` SO IT IS THE WIDTH OF ITS WORDS. `.ev-c` is a column
+   flex, so the default `stretch` would run the button the full width of the
+   column — 430px of border for two words, and two of them side by side would
+   read as a pair of bars rather than as two controls.
+
+   THE ARROW IS §64'S AND IS NOT WRITTEN IN THE MARKUP. A `.btn-s` with no
+   `<svg>` of its own gets the trailing arrow as a `mask-image` on
+   `currentColor`, so it inherits §63 §6a's `--on-dark` here with nothing said.
+
+   AND THE BORDER IS §75.5'S, WHICH MEANS THERE IS NONE (Maryam, 1 Sep 2026:
+   "the button should not have borders"). ONE RULE WAS DELETED HERE and the
+   argument is kept because it is the second time this exact reversal has been
+   proposed and rejected:
+
+     `.app .dark-card .ev-c > .btn:not(.btn-p){border-color:var(--on-dark-border)}`
+
+   It shipped for one build on the reasoning that with the row's chevron gone the
+   button is the column's only affordance, so it wants the 42% white §15's
+   `.plate-x` note reserves for "the edge of something you can press" — the same
+   reversal §71.2 and §72's `.pulse-go` make on white paper. What that misses is
+   §77's finding, which is about black specifically: §70.5 argued a borderless
+   button "read as a text link that happened to be 185px wide", and §77 turned it
+   over for the card — on black the fill or the ink makes the distinction and the
+   outline is one more edge. Two outlined buttons abreast inside a card that has
+   just had its own frames removed is that edge twice. §64's arrow is what says
+   this is a control.
+
+   NOTHING REPLACES IT: with the rule gone, §75.5's
+   `.app .dark-card .btn:not(.btn-p){border-color:transparent}` reaches it, which
+   is the class doing its job. Per §64.1 that is `border-color`, not `border:0` —
+   `.btn` carries a transparent 1px and dropping the shorthand would make this the
+   one button in the product 2px shorter than its neighbours.
+
+   AND WITH NO BORDER, THE SIDE PADDING HAD TO GO TOO (Maryam, 1 Sep 2026: "left
+   align the buttons with the above candidate profile"). §02.105 gives `.btn-sm`
+   `padding:0 var(--s04)`, which is 12px of inset the box needs while it HAS a
+   box — it keeps the label off its own outline. With the outline transparent the
+   12px is invisible and its only effect is that the words start 12px right of
+   the photograph directly above them, which on a column read down its left edge
+   is the ragged edge §31.5 and §86 both argue against. Zeroed, the label is flush
+   under the face: measured at 1280, the button's text box and `.ev-top`'s first
+   child share an x.
+
+   THE HEIGHT AND THE TARGET ARE UNTOUCHED — `min-height` is §02's and this only
+   drops the horizontal padding, so what the pointer can hit above and below the
+   words is what it was. The Contact control in the attention queue (§31.6) is the
+   same subtraction for the same reason, one portal page over.
+   -------------------------------------------------------------------------- */
+.app .ev-c > .btn{align-self:flex-start;padding-left:0;padding-right:0}
+
+@container app (max-width:899.98px){
+  /* one column, and the rule between the two becomes the rule above the second
+     — §72.3's `content:none` and §76.3's turn-over in one block */
+  .app .ev-row{grid-auto-flow:row;row-gap:var(--s06)}
+  .app .ev-c + .ev-c::before{content:none}
+  .app .ev-c + .ev-c{
+    border-top:1px solid var(--on-dark-rule);padding-top:var(--s06)}
+}

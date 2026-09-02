@@ -261,6 +261,51 @@
   --s01:2px; --s02:4px; --s03:8px;  --s04:12px; --s05:16px; --s06:24px;
   --s07:32px; --s08:40px; --s09:48px; --s10:64px; --s11:80px; --s12:96px;
 
+  /* THE GAP BETWEEN A SECTION HEADING AND ITS CONTENT — one number, and it is
+     a token because it was twenty-six (Maryam, 1 Sep 2026: "reduce the spacing
+     within the section, means between section heading and it's content … so
+     they seems connected").
+
+     IT WAS NOT ONE VALUE AND IT WAS NOT IN ONE PLACE. Sixteen layers each
+     restated `.sec-h`'s bottom margin — §02 and §10 set the base and then §12,
+     §14, §15 (×5), §16 (×2), §17, §28, §32, §36 (×2), §38 (×3), §43, §44, §65,
+     §69 (×2), §70 (×2), §72 and §73 said it again, because every one of them
+     had to re-state `padding` or `border-right` for a section that opts out of
+     §10.15's label column and carried the margin along for the ride. Measured
+     across 184 pages: 16px on 116 headed sections at desktop, 20 on 54, 12 on
+     18 and 32 on one. Reducing "the" gap meant finding all twenty-six.
+
+     24 → 12 IS THE WHOLE CHANGE and it is deliberately one step, not two: the
+     instruction is "a little bit", and 8 would put a 16px heading closer to its
+     content than the 12 that already separates a `.kv` row from the next.
+     The heading and the block under it now read as one object with 48 between
+     them and the next section — a 4:1 ratio, where it was 3:1.
+
+     TO CHANGE IT AGAIN, CHANGE IT HERE. That is the point of the token; the
+     twenty-six sites all read it now. */
+  --sec-h-gap:12px;
+
+  /* AND WHEN THE THING UNDER THE HEADING IS ITS OWN DESCRIPTION, IT IS CLOSER
+     STILL — 8px (Maryam, 1 Sep 2026: "wherever there will be desc with the
+     heading, their gap will be this much which we have in the choose your
+     scenes and it's desc").
+
+     TWO GAPS, NOT ONE, AND THE DIFFERENCE IS WHAT THE SPACE SEPARATES.
+     `--sec-h-gap` is a heading from its CONTENT — a grid, a table, a row of
+     cards — which are different objects and read as such. This is a heading
+     from a sentence ABOUT that heading: one object on two lines. §38's
+     `.scene-hb` is where the number was settled and its note has the working
+     — 16 → 12 → 8 over two asks, ending at "the pair is closer to each other
+     than either is to anything else on the page".
+
+     IT WAS THREE VALUES BEFORE THIS. Measured over 184 pages: `aiHead`'s
+     title-and-description pair at 12 (44 of them, §73's `.aih-b` gap, the
+     Figma's own 613:7984 number), a `.sec-h` followed by an `.all-desc` at 12
+     (16 of them, paying `--sec-h-gap` because the sentence is a SIBLING of the
+     heading rather than inside it), and `.scene-hb` at 8. The 8 is the one
+     that was asked for twice, so it is the one that generalises. */
+  --sec-desc-gap:8px;
+
   /* --- shape. MUI default is 4. The brand is square. --- */
   --radius:0px;
 

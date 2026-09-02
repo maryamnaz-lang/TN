@@ -1,0 +1,194 @@
+/* ==========================================================================
+   §89 — THE COHORT PAGE: a comment thread, and three rounds of avatar
+   Maryam, 1 Sep 2026, with a YouTube comments reference.
+
+   Four asks, and the last one is the one with a rule behind it rather than a
+   value: the photographs on this page are DISCS.
+
+     89.1  `.cmt*`      the discussion as a comment thread.
+     89.2  `.av-ph`     round avatars in the discussion, the ranking and the
+                        members list.
+     89.3  `.lead-msg`  the leader's message control as a disc.
+
+   A CURVE IS SPENT ON A MARK AND ON NOTHING ELSE. `--radius` is `0px` by token
+   and §02's opening note is that "depth is expressed as rhythm and rule weight,
+   nothing else" — so §56 grants exactly one exception, the MARK, and gives the
+   journey's step marks discs on that grant. A photograph of a person is the
+   clearest case of it: it is a mark, it is never a surface, and nothing is laid
+   out against its corners. §87's chips take the same grant from the other side
+   (a pill is two circles and a span, not a rounded rectangle).
+
+   §63 §24 owns every size, weight, case and ink here.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- 89.1 ---
+   THE COMMENT THREAD
+
+   NO GROUND AND NO BUBBLE, WHICH IS THE WHOLE CHANGE. `.m-b` gives the chat's
+   text a `--layer-02` bubble because a chat has two sides and the bubble plus
+   the side is what says who is speaking. A board has ten speakers and one side,
+   so the bubble says nothing and ten of them read as ten grey slabs; the NAME
+   is what does the work, which is what `ROOM`'s own note says and what the
+   reference draws.
+
+   THE ROW IS A GRID, NOT A FLEX. `auto minmax(0,1fr)` — the avatar column is
+   the mark's own width and the body takes the rest with a real floor, so a long
+   unbroken word cannot push the column. Flex would need `min-width:0` on the
+   body to get the same floor and is the same rule said less directly.
+
+   `align-items:start` SO THE AVATAR SITS ON THE NAME. The body is three rows
+   deep (head, text, actions) and centring the mark against it would park a 40px
+   disc beside the comment's second line.
+
+   THE GAP BETWEEN COMMENTS IS `--s06` AND THERE IS NO DIVIDER. The reference has
+   none, and this product's own rule is that a change of ground or a rule is a
+   boundary — ten hairlines down a discussion would make it the table it is not.
+   White space and the round mark are what separate the rows.
+   -------------------------------------------------------------------------- */
+.app .cmts{display:flex;flex-direction:column;gap:var(--s06)}
+.app .cmt{
+  display:grid;grid-template-columns:auto minmax(0,1fr);
+  gap:var(--s05);align-items:start}
+.app .cmt-av{flex:none;display:block}
+.app .cmt-c{min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
+.app .cmt-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:var(--s03)}
+
+/* THE ACTION ROW. Three controls, all of them borderless and transparent —
+   §64's argument at its strongest: a drawn rectangle round a thumb on a page
+   made of hairlines is one more edge than the page has, and the reference draws
+   none either. The hit area is the padding.
+
+   `-8px` OF LEFT MARGIN so the first mark's optical left edge lands on the
+   comment's text above it. The button pays `var(--s03)` of left padding for its
+   target area, and without the pull the whole row sits 8px in from the sentence
+   it belongs to — which reads as an indent nobody asked for. This is the same
+   negative-margin-for-a-control trick §02 uses on `.ph-back`.
+
+   THE MARKS ARE 18px AND THE COUNT IS BESIDE THEM, INSIDE THE BUTTON. Pressing
+   the number is pressing the like, which is what the reference does; a count
+   outside the control would be a figure you can point at and not press. */
+.app .cmt-a{
+  display:flex;align-items:center;gap:var(--s02);
+  margin-top:var(--s02);margin-left:calc(var(--s03) * -1)}
+.app .cmt-act{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  padding:var(--s03);
+  background:transparent;border:0;cursor:pointer}
+.app .cmt-ic{display:grid;place-items:center;width:18px;height:18px}
+.app .cmt-ic svg{width:18px;height:18px;fill:currentColor}
+.app .cmt-reply{padding-left:var(--s04);padding-right:var(--s04)}
+
+/* ------------------------------------------------------------------- 89.2 ---
+   THE PHOTOGRAPHS ARE DISCS — the discussion, the ranking, the members
+
+   `overflow:hidden` IS ALREADY THERE (§09) so the `<img>` is clipped by the
+   radius with nothing else stated. The `<i>` initials fall inside the same box.
+
+   SCOPED TO THE THREE LISTS THE ASK NAMES, NOT GLOBAL. `.av-ph` is drawn in
+   about thirty places — the app bar, the agent cards, the call screen's tiles,
+   `signedSummary`'s signature row, the leader portal's rosters — and rounding
+   all of them is a platform decision rather than this page's. The three
+   selectors here are the three tabs of this page's own tab strip.
+
+   `.b-who` AND `.mem-av` ARE THE OTHER TWO because that is where the ranking
+   and the members list put the mark: `boardList` wraps it in `.b-who` and `mem`
+   in `.mem-av.mem-ph`. Keying on the wrapper rather than on `.av-ph` inside a
+   `.cs` panel means the rule says which LIST it is about, which is what the ask
+   is about too.
+   -------------------------------------------------------------------------- */
+.app .cmt-av .av-ph,
+.app .b-who .av-ph,
+.app .mem-av .av-ph{border-radius:999px}
+
+/* ------------------------------------------------------------------- 89.3 ---
+   THE LEADER'S MESSAGE CONTROL IS A DISC
+
+   A 36px square is what §70.6 sizes this control at and the note there is why
+   an icon-only button is a square rather than a 60px box built for words. The
+   curve is the only change: it sits at the end of a row whose other mark is a
+   round photograph, so the disc pairs the two as marks rather than reading as
+   the page's one rounded rectangle.
+
+   `border-radius` ALONE — the ground, the ink and the size are §70.6's and §64
+   has already taken the border off a `.btn-t`. One declaration.
+   -------------------------------------------------------------------------- */
+.app .lead-msg{border-radius:999px}
+
+/* ------------------------------------------------------------------- 89.4 ---
+   THE POINTS STRIP SITS ON THE SUMMARY'S OWN TOP AND SIDE
+
+   Maryam, 1 Sep 2026: "align the points section content top align considering
+   the section padding that should be equal to left side summary padding."
+
+   TWO CAUSES, MEASURED. At 1280 on the Achievements band, Tal's label sat at
+   y=148 and the points strip's first row at y=168 — twenty pixels lower, in two
+   columns whose boxes both start at 120:
+
+     THE TOP  §15 gives `.score` `padding:var(--s06) 0 0` — a 24px top of its
+              own, which is right on `V.rewards`' old in-page section where the
+              strip was the section's only child and needed air above it. In the
+              band the column has ALREADY paid `var(--s06)`, so the strip paid it
+              twice. Zeroed here, its first row lands at 144 and Tal's label at
+              148, the 4px being `.ai-aura`'s own inset — aligned to the eye and
+              honest about the wash's edge.
+     THE SIDE §70.3 insets `.head-col` by `var(--s07)` stepping to 57px at 1180,
+              and its note defends the 57 as "587:6742's own" — measured for the
+              journey list in a 330px track. The summary beside it pays
+              `var(--pad-x)`, so the two columns' content started on two
+              different left edges. `var(--s07)` matches the summary at every
+              width, which is what was asked for.
+
+   SCOPED TO `.sec-score` AND NOT TO `.head-col`. The 57 is still correct for the
+   journey list and the progress wing — that is the width their headings and
+   pills were fitted to, and §70.3's note is the record of what happens at 235px
+   of content. This is one tenant asking for the summary's own gutter.
+
+   INSIDE THE CONTAINER QUERY PER TRAP 3. §70.3 states both the padding and the
+   57 inside `@container app (min-width:900px)`, so an unconditional rule cannot
+   reach either at any weight. Below 900 the band is one column and neither
+   value is in play.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .modhead:has(> .head-col) > .head-col.sec-score{padding-left:var(--s07)}
+  .app .modhead > .sec-score .score{padding-top:0}
+}
+
+/* ------------------------------------------------------------------- 89.2b ---
+   AND THE WRAPPER ROUND THE DISC HAD TO GO WITH IT — the black corners
+   Maryam, 1 Sep 2026, on the leader's Evaluations rows: "the images should be in
+   circle, not like these black edges."
+
+   THE MARK WAS ALREADY A CIRCLE. §89.2 above rounds `.mem-av .av-ph`, and it
+   does apply here — measured on the live page: the photograph is a 36px disc at
+   `999px`. What the reader was looking at is the box BEHIND it. Three rows in
+   this portal wrap `avatar()` in a second element that repeats the avatar's own
+   ground and box — `width:36px; height:36px; overflow:hidden;
+   background-color:var(--gray-80)` — so a `--gray-80` SQUARE sat under a round
+   photograph and showed at all four corners. Near-black on white paper, which is
+   exactly "black edges" and reads as a photograph that failed to crop.
+
+   THE WRAPPER'S GROUND IS REDUNDANT, NOT WRONG, WHICH IS WHY IT SURVIVED. A
+   failed image already falls back to the initials on `.av-ph`'s own ground
+   (§09.7, and §09's opening note is that arrangement), so nothing needs a second
+   copy of it one element out. Rounding is the smaller of the two fixes and the
+   safer one: taking the background off would leave a white gap at any width
+   where the two boxes are not the same size, and the corner is the only part of
+   it anybody can see.
+
+   THREE SELECTORS, WHICH IS ALL OF THEM. `.face-row > .mem-av` (§31.383) is the
+   queue row — the dashboard's Awaiting Evaluations list and the Evaluations
+   page's two lists, one rule for both, so the same person is not a disc on one
+   page and a square on the other. `.ldr-dm-t` and `.ldr-dm-h` (§36.582 / §36.611)
+   are the message inbox's thread list and its open thread's header, which had the
+   identical defect from the identical three declarations and were not in the ask
+   — fixed together because a leader who has just seen round faces in a queue
+   should not find square ones in the inbox two clicks later.
+
+   IT IS NOT THE PLATFORM-WIDE CHANGE §89.2 DECLINED. That note's argument holds:
+   an avatar appears in about thirty places and rounding all of them is a
+   platform decision. These three are wrappers that this portal's own rows added,
+   and every one of them is already round INSIDE.
+   -------------------------------------------------------------------------- */
+.app .face-row > .mem-av,
+.app .ldr-dm-t > .mem-av,
+.app .ldr-dm-h > .mem-av{border-radius:999px}

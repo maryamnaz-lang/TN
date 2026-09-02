@@ -39,11 +39,12 @@
 
 const ldrSumOf = id => LEAD_SUMMARIES.filter(s => s.id === id)[0] || LEAD_SUMMARIES[0];
 
-/* THE CHAPTER A PAST CALL COVERED IS DERIVED, NOT STORED — the same read
-   `lcall` takes for an upcoming one, one week back. `LEAD_RUN` states the
-   attendance and nothing else, because the attendance is the only thing about a
-   call that has already happened that no other record knows. */
-const lranChapter = r => CH[Math.min(12, r.week - 1)][0];
+/* `lranChapter` WAS HERE AND IS DELETED WITH "ALREADY RUN" (1 Sep 2026). It read
+   the chapter a past call covered off `CH` — the same read `lcall` takes for an
+   upcoming one, one week back — so that `LEAD_RUN` only ever had to state the
+   ATTENDANCE, which is the one thing about a finished call no other record
+   knows. That principle is still how `LEAD_RUN` is shaped and is worth keeping:
+   if the list ever comes back, the chapter is derived, not stored. */
 
 S.ldrSum = null;
 S.ldrRec = null;
@@ -58,21 +59,15 @@ S.ldrErr = false;
    names one: three cohort calls a week, sixty minutes each, and the ones
    already behind them.
 
-   THE PAGE EARNS ITS PLACE ON THE PAST, WHICH IS THE HALF NOTHING ELSE HOLDS.
-   `V.leadCohorts` already lists this week's three calls with their briefs, so a
-   page that only did that would be the "route to the same content" this portal
-   keeps deleting — the note over `BOOKED_SHOWN` is the same argument from the
-   dashboard's side. So Cohorts gives its own call list UP to this page (its
-   heading row points here), and this page holds both halves: what is coming,
-   and what happened — the week, the chapter it covered, and who turned up.
-
-   AN UPCOMING CALL AND A FINISHED ONE ARE DIFFERENT ROWS ON PURPOSE, and this
-   is the one piece of the interview page's reasoning that ports verbatim.
-   Upcoming answers "when, and which cohort" and its action is the brief.
-   Finished answers "how did it go" and has no action at all. So the upcoming
-   rows carry the date chip the dashboard's list uses, and the past rows carry
-   the attendance instead — a date chip on something that already happened is
-   the least useful thing in the row.
+   IT EARNED ITS PLACE ON THE PAST AND NO LONGER HOLDS ONE. The page opened with
+   "This week" and "Already run", and the second was the argument for the module:
+   `V.leadCohorts` had been listing the week's three calls too, so the calls
+   BEHIND the leader were the half nothing else held. Maryam took that section
+   off on 1 Sep 2026 (its own note in the view is the record), which leaves this
+   as the diary and nothing else — and the reason it still earns the slot is the
+   simpler one: `V.leadCohorts` gave its call list up to this page in the same
+   pass, so this is now the only place the week's appointments are listed at all.
+   Worth knowing before anything else is moved here or away.
 
    THE MONEY IS GONE AND SO IS THE FEE COLUMN. `SESSIONS` in the wireframe
    carried `fee:180` on every row; lead.js states the rule this portal is built
@@ -82,14 +77,12 @@ S.ldrErr = false;
 V.leadCalls = () => {
   const up = lcalls();
   const next = up[0];
-  const run = LEAD_RUN;
-  /* Every attendance in `LEAD_RUN` against every seat those calls had, so the
-     figure is the real ratio rather than a number typed next to it. */
-  const seats = run.reduce((s,r) => s + lcoOf(r.co).members.length, 0);
-  const came  = run.reduce((s,r) => s + r.attended, 0);
+  /* `run`, `seats` and `came` were read here for "Already run"'s heading count
+     and went with the section. `LEAD_RUN` is still summed — in
+     `PAGESUM.leadCalls`, which is its one remaining reader. */
 
   return `<main class="main"><div class="page">
-  ${crumb(['Dashboard','leadDash'],'Calls')}
+  ${crumb(['Dashboard','leadDash'],'Upcoming Sessions')}
   ${''/* THE AVAILABILITY BUTTON CAME OFF THE HEADING (Maryam, 31 Aug 2026).
          It was a `ph()` action, so it sat above Tal's summary as the first
          thing on the page — a settings link introducing a page about this
@@ -100,7 +93,7 @@ V.leadCalls = () => {
          remove, not the page. The sentence it sat beside has changed with the
          subject: the leader is not booked BY anybody now, so the spine states
          the shape of the commitment instead. */}
-  ${ph('Calls',`${up.length} cohorts &middot; one call a week each &middot; 60 minutes, not recorded`)}
+  ${ph('Upcoming Sessions',`${up.length} cohorts &middot; one call a week each &middot; 60 minutes, not recorded`)}
   ${''/* THE PLATE IS NOW THE BLACK CARD, AND IT IS THE DASHBOARD'S OWN
          (Maryam, 31 Aug 2026 — "follow the same summary and beneath that
          black call card layout"). `leadCallCard` states that shape one file
@@ -127,43 +120,76 @@ V.leadCalls = () => {
     ${up.length ? `<div class="tile-stack">
       ${up.map(k => `<div class="cardrow bk-row${/^today$/i.test(k.day) ? ' bk-now' : ''}">
         <span class="day bk-day"><div class="d">${k.day}</div><div class="n">${k.time}</div></span>
-        <span class="cardrow-ic">${I.group}</span>
+        ${''/* `I.video`, NOT `I.group` — and for one build this slot held the
+               cohort's cover instead. Both changes followed `bookedRow`'s and
+               for the same reason: these are the dashboard's three rows drawn a
+               second time, so a mark that differed between the two lists would
+               be the drift `lcTitle` / `lcDetail` exist to prevent. The
+               argument for the glyph and against the picture is written over
+               `bookedRow` (lead.js). */}
+        <span class="cardrow-ic">${I.video}</span>
         <span class="cardrow-b">
           <span class="cardrow-t">${lcTitle(k)}</span>
           <span class="cardrow-d">${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${lcDetail(k)}</span>
         </span>
+        ${''/* RESCHEDULE, NOT BRIEF, AND IT IS A SECONDARY (Maryam, 1 Sep 2026:
+               "instead of brief, give a reschedule button, a secondary button,
+               not in black color, just a black text with reschedule icon on its
+               left").
+
+               `.btn-t` IS THE BLACK-TEXT BUTTON. §64 took the border off
+               `.btn-s` / `.btn-t` / `.btn-g` and left the ink at
+               `--text-primary`, so a text button on a page IS black words —
+               and §64's arrow does NOT arrive, because its own test is
+               `:not(:has(svg))` and this one carries a mark. `ic-l` is what
+               seats that mark on the LEFT; without it the icon is pushed to
+               the far edge.
+
+               THE MARK IS `I.calendar`, WHICH IS WHAT RESCHEDULE ALREADY WEARS.
+               `CALL_ROW.iv`'s own Reschedule (views.js) is `ic:I.calendar`, so
+               this is one word with one mark across both portals rather than a
+               second glyph for the same verb. `I.renew` was the alternative and
+               reads better in isolation — circular arrows say "move it" — but a
+               product where Reschedule is a calendar on one page and arrows on
+               another is the drift `stepIcon`'s table exists to prevent.
+
+               IT OPENS THE WEEKLY-CALLS SHEET, which is the surface that
+               actually moves a call: `data-ldravail` (lead4), mounted on every
+               leader page by `placeLdrSheets`. Pointing it at the brief sheet
+               would have been a button lying about what it does, and leaving it
+               inert would be §60's "a dead control on a live surface is worse
+               than a missing one". THE BRIEF IS NOT LOST — it is the black
+               card's own action at the top of this page, and the cohort page
+               has it twice. */}
         <span class="cardrow-a">
-          <button class="btn btn-p btn-sm noic" data-ldrbrief="${k.co}">Brief</button>
+          <button class="btn btn-t btn-sm ic-l" data-ldravail="1">${I.calendar}Reschedule</button>
         </span>
       </div>`).join('')}
     </div>` : `<div class="empty" style="border:0">${I.calendar}
       <h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
-    <p class="t-helper-01 mt4">A brief is generated from where the cohort actually is, not from where the syllabus says it should be.</p>
+    ${''/* THE CLOSING LINE WENT WITH THE BRIEF BUTTON (Maryam, same pass). "A
+           brief is generated from where the cohort actually is, not from where
+           the syllabus says it should be" was an explanation of the control on
+           every row; with the control gone it explained nothing on the page. The
+           sentence still earns its place next to a Brief button, and there is one
+           on `V.leadCohort`. */}
   </div>
-  <div class="sec tint">
-    ${''/* THE COUNT OPPOSITE THE HEADING IS THE ATTENDANCE ACROSS ALL OF THEM,
-           because that is the one reading a list of past calls is FOR. Row by
-           row it says who came to which; read together it says whether the
-           cohorts are still turning up, which is the question the attention
-           queue answers about the chapters and nothing answered about the
-           calls. Cohort 47 is in week 1 and has no rows here at all — the
-           empty half of the list, drawn rather than hidden. */}
-    <div class="sec-h"><h2>Already run</h2><span class="t-helper-01">${run.length ? came + ' of ' + seats + ' seats filled' : 'nothing yet'}</span></div>
-    ${run.length ? `<div class="tile-stack">
-      ${run.map(r => {
-        const c = lcoOf(r.co);
-        const miss = c.members.length - r.attended;
-        return `<div class="cardrow">
-          <span class="cardrow-ic">${I.group}</span>
-          <span class="cardrow-b">
-            <span class="cardrow-t">Cohort ${r.co} &middot; week ${r.week} <span class="tag ${miss > 2 ? 'org' : 'green'} sm">${r.attended} of ${c.members.length} attended</span></span>
-            <span class="cardrow-d">${r.when} &middot; ${lranChapter(r)}${miss ? ' &middot; ' + miss + ' did not join' : ''}</span>
-          </span>
-        </div>`;
-      }).join('')}
-    </div>` : `<div class="empty" style="border:0">${I.time}
-      <h3>No calls behind you yet</h3><p>Your first cohort call is this week.</p></div>`}
-  </div>
+  ${''/* "ALREADY RUN" IS DELETED (Maryam, 1 Sep 2026). It was the calls behind
+         this leader — cohort, week, the date, the chapter it covered and who
+         turned up — and it was this page's whole claim to a rail slot of its
+         own: the note at the head of this view argues that `V.leadCohorts`
+         already lists the week's three calls, so the PAST was the half nothing
+         else held. That argument is now spent, and what is left is the diary.
+         Keeping it written down because the next person to ask "why is Calls a
+         module" will find the answer here and it is no longer this.
+
+         `LEAD_RUN` STAYS AND STILL HAS ONE READER. `PAGESUM.leadCalls` counts
+         the seats across it — "across the four behind you, 32 of 36 seats were
+         filled" — which is now the only place attendance appears anywhere in
+         the product, and a figure read once is exactly what a Tal summary is
+         for. `lranChapter` went with the rows; it had no other caller.
+         `V.leadProfile`'s "Calls already run" row pointed at this section for
+         the attendance and has been re-pointed at Tal. */}
 </div></main>`;
 };
 
@@ -191,17 +217,151 @@ V.leadCalls = () => {
    which is the condition ai6's own note sets for removing it: every pending
    summary is a row you press.
 
-   THE FIGURE BAND IS FOUR CELLS ABOUT ONE QUEUE, NOT TWO ABOUT TWO. "Due
-   within 48h of the interview" went with the interview; a summary is due when
-   the cohort closes, which is a date the cohort record already knows.
+   THE PAGE IS TWO LISTS AND IT USED TO BE ONE (Maryam, 1 Sep 2026: "all members
+   of the cohort will be there, not only 2 … the other members' evaluations have
+   been sent but these two are awaiting. Show these two on top and add another
+   section below with the name Evaluated Candidates").
+
+   THE SCENARIO IS WHAT THE DASHBOARD ALREADY CLAIMS. Cohort 33 is in week 11 and
+   this page opens when a cohort closes, so the queue is not a list of two people
+   — it is a list of two people who are LEFT. `LEAD_SUMMARIES` now carries all
+   eight, six of them `done`, and lead.js's note is the argument for reading the
+   roster rather than picking a number.
+
+   ONE LIST COULD NOT SAY THAT. The published rows were in the same `.tile-stack`
+   as the waiting ones, separated only by a green tag on row three — so the
+   section heading said "2 waiting" over a stack of eight, and the eye had to
+   read every row's tag to find the two that are the work. Two sections, two
+   headings, two counts.
+
+   THE FOUR FIGURE CELLS ARE DELETED WITH THEIR SECTION AND THEIR HAIRLINE
+   (Maryam, same day: "remove the top 4 blocks and the divider below those
+   blocks"). Every one of them was a count the page now draws as a list:
+   "90-day summaries 2" is the first heading's own `2 waiting`, "Published by
+   you 0" is the second heading's count and was WRONG as written — it said 0 on
+   a page where six are published, because it counted this SESSION's signatures
+   — "Cohort closing 33" is on every row of both lists, and "Due by Day 90" is
+   the page's premise rather than a figure. `c0` goes with them and `statCell`
+   does NOT — `V.leadSum` draws four of them about one candidate, which is the
+   band this page was borrowing the shape from. The divider was that `.sec`'s own
+   §10.2 closing rule, so removing the section removes the line.
+
+   WHAT THE BAND WAS FOR is worth keeping: it was written when the page opened on
+   a queue of one to four and needed to say which cohort and by when. The list
+   answers both now that it holds the whole cohort.
    ========================================================================== */
 V.leadEvals = () => {
   const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
   const published = LEAD_SUMMARIES.filter(s => s.status === 'done');
-  /* the cohort every waiting summary belongs to — all of them are Cohort 33
-     today, and `lcoOf` is what makes the week and the seats read rather than
-     be typed if a second cohort ever reaches day 90 */
-  const c0 = lcoOf((ps[0] || LEAD_SUMMARIES[0]).cohort);
+
+  /* BOTH ROWS ARE THE SAME COMPONENT AND THE DIFFERENCE IS THE SUBTITLE, which
+     is what made the split cheap. A published row says what you decided; a
+     waiting row says what the numbers are and what pressing it does. Both open
+     `V.leadSum` — the published state of that page is fully drawn (the
+     recommendation, the reason, the four figures), and it was previously
+     reachable only in the seconds after signing, which is §60's dead-content
+     tell wearing the other hat: the page existed and nothing pointed at it.
+
+     THE "PUBLISHED" TAG IS GONE (Maryam, 1 Sep 2026). It was a green pill after
+     every name in the second list — eight rows, six pills, all saying the same
+     word — and by the time it shipped the list itself was already saying it: a
+     row is under the heading "Evaluated Candidates" and its own subtitle opens
+     "you recommended". The tag was written when both kinds of row sat in ONE
+     stack and it was the only thing telling them apart; the split retired it and
+     it stayed a build too long. It is the "gate nothing writes" test applied to
+     COPY rather than CSS — a word that is true of every row in a list is the
+     list's heading, not the row's. */
+  const sumRow = s => {
+    const c = lcoOf(s.cohort);
+    const m = lmemOf(c, s.name);
+    return `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
+      <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
+      <span class="gcard-b"><h3>${s.name}</h3>
+        <span class="sub">${s.status === 'done'
+          ? `${lname(c)} &middot; you recommended: ${s.rec}`
+          : `${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days`}</span></span>
+      <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+    </button>`;
+  };
+
+  /* ------------------------------------------------------------------------
+     A WAITING CANDIDATE IS A COLUMN, NOT A ROW (Maryam, 1 Sep 2026, with a
+     reference screen). §90 is the drawing and its head carries the three things
+     the reference was refused; what this function decides is the CONTENT.
+
+     THE COLUMN IS NOT A BUTTON, and that is what having an action costs. The
+     stacked version was a `<button>` ending in a chevron, so the whole row was
+     the target; a column with "Evaluate Candidate" in it cannot also be one —
+     nested interactive elements. The button carries the `data-ldrsum` the row
+     used to, so the route is unchanged and lead3's capture listener still sets
+     the subject before `go()` runs.
+
+     THE RING SHOWS `m.avg` AND THE WORD UNDER IT IS "Scored". The reference puts
+     course progress in the circle over the word "Complete"; the label Maryam
+     asked for names a score, and the assessments average is the only score this
+     product holds. So the ring is 87 / 90 and the progress percentage stays in
+     the line under the name, where the stacked row already had it — one figure
+     each, neither printed twice.
+
+     `aria-label` SAYS WHAT THE RING IS, because "Scored" beside a bare number is
+     the one thing a screen reader gets less of than the eye does: the visual
+     pairing of a figure with the word under it is not in the markup order.
+
+     THE SUPPORTING LINE IS POINTS, AND THE BADGE SITS BESIDE THE NAME (Maryam,
+     1 Sep 2026: "instead of Cohort 33 · 92% complete, show the points earned by
+     the candidate with the small points icon on its left … next to the name,
+     show the highest badge earned"). Three subtractions and two additions:
+
+       gone   the cohort — it is in the card's own context (every row on this
+              page is Cohort 33's, and Tal's sentence above names it once) and it
+              was the same three words on both columns.
+       gone   "92% complete" — course progress, which is not what this card is
+              for: the ring beside it is the score and the button opens the page
+              that holds the four figures.
+       gone   from an earlier pass, "assessments 87%" (now the ring) and "sign to
+              close their 90 days" (now the button, in the words of what it does).
+       new    the points total, `m.pts` off the member record, with `I.trophy` on
+              its left — the product's own subject mark for points (`statCell(
+              I.trophy, 'Points', …)` on the candidate's dashboard, and §72's
+              pulse takes the same one for "Your standing").
+       new    the highest badge, `lbadge(m.pts)` — DERIVED from those points via
+              `BDG`'s ladder, so the two cannot disagree. Owen has cleared Silver
+              and Lena has not, which is what makes the pair legible as a fact
+              about each candidate rather than a decoration on both.
+
+     THE BADGE IS THE AWARD ARTWORK, THE POINTS MARK IS A GLYPH, and §72 already
+     drew that line: its three column marks are bare glyphs because they name a
+     subject, and its standing rows keep the award WebPs at 24px because "a
+     generic glyph of a shield is a picture of the category instead". A badge is
+     an object somebody earned; points are a topic.
+
+     NO BADGE IS NO ELEMENT. Below 2,500 `lbadge` returns null and the span is not
+     drawn — an empty slot beside a name would read as artwork that failed to
+     load, which is `crow`'s own rule for a missing `img`.
+     ------------------------------------------------------------------------ */
+  const evCol = s => {
+    const c = lcoOf(s.cohort);
+    const m = lmemOf(c, s.name);
+    const b = lbadge(m.pts);
+    return `<div class="ev-c">
+      <div class="ev-top">
+        <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 44)}</span>
+        <span class="ev-id">
+          <span class="ev-nm">
+            <h3 class="ttl">${s.name}</h3>
+            ${b ? `<span class="ev-bdg"><img src="${AWARD[b.n.toLowerCase()]}" alt="">
+              <span class="sub">${b.n}</span></span>` : ''}
+          </span>
+          <span class="sub ev-pts">${I.trophy}${m.pts.toLocaleString()} points</span>
+        </span>
+        <span class="ev-ring">
+          ${ring(m.avg, `${m.avg}% scored on assessments`)}
+          <span class="sub">Scored</span>
+        </span>
+      </div>
+      <button class="btn btn-s btn-sm noic" data-ldrsum="${s.id}" data-go="leadSum">Evaluate Candidate</button>
+    </div>`;
+  };
 
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Evaluations')}
@@ -215,36 +375,46 @@ V.leadEvals = () => {
          figure cells below state it four ways. So Tal's sentence is the opening
          line, which is what the rule prescribes for a page with no spine. */}
   ${ph('Evaluations')}
-  <div class="sec">
-    <div class="stats">
-      ${statCell(I.document, '90-day summaries', ps.length, ps.length ? 'closing a cohort' : 'all published')}
-      ${statCell(I.checkFilled, 'Published by you', published.length, 'this session')}
-      ${statCell(I.group, 'Cohort closing', c0.id, `week ${c0.week} of 13`)}
-      ${statCell(I.time, 'Due by', 'Day 90', 'of their cohort')}
+  ${''/* THE TWO WAITING ARE THE PAGE'S BLACK CARD (Maryam, 1 Sep 2026: "take
+         the 2 candidates awaiting in the black card with the card heading
+         Awaiting Evaluations", and "remove the 90-day summaries heading").
+
+         THE WHOLE §75 RECIPE COMES WITH THE CLASS and none of it is written
+         here — the standing instruction is that "make this a black card" means
+         the inset, the top-right haze, the `--s07` frame, the 20px gap, the
+         section's own hairlines off, the head row's `--on-dark-rule`, the ink
+         flip (§63 §6a) and the internal seams (§75.5). This card is the FOURTH
+         caller and, like the leader's own call card, it states not one rule of
+         its own: the two rows are `.tile`s, so §75.5 turns their ground
+         transparent and their seam to 16% white, and §63 §6a inks the name
+         `--on-dark` and the subtitle `--on-dark-2`.
+
+         NEVER `.plate` OR `.sec.on-dark` — both are in ai5's `DARK_CARD`, so
+         `placeDark` would hoist this section into the head band, where it would
+         land beside Tal's summary at ~330px with each row's face, name and
+         subtitle on three lines of their own. §75.3 records that exact bug.
+
+         THE HEADING MOVED INTO THE CARD RATHER THAN BEING DELETED TWICE. "90-day
+         summaries" was the section's `.sec-h` and "Awaiting Evaluations" is the
+         card's `.dc-t`, which is the same slot one component in — so the page
+         still names this block, and it now names it with the word the dashboard
+         card and the rail-side queue already use. The count went with the
+         heading: `.dc-hd-r` takes a `.dc-t` and then EITHER a control or a time
+         (§75, they share one auto margin), and a bare "2 waiting" is neither —
+         Tal's sentence above the card states it in words anyway.
+
+         WHY IT EARNS THE LOUDEST OBJECT ON THE PAGE: §75's test is "this is the
+         one thing the page is about", and on a page whose other list is a record
+         of work already done, two signatures somebody is waiting on is exactly
+         that. §59's clock test is the `.plate` test, not this one. */}
+  <div class="sec dark-card">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">Awaiting Evaluations</h2></div>
     </div>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>90-day summaries</h2><span class="t-helper-01">${ps.length ? ps.length + ' waiting' : 'nothing waiting'}</span></div>
-    <div class="tile-stack">
-      ${LEAD_SUMMARIES.map(s => {
-        const c = lcoOf(s.cohort);
-        const m = lmemOf(c, s.name);
-        return s.status === 'pending'
-        ? `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
-            <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
-            <span class="gcard-b"><h3>${s.name}</h3>
-              <span class="sub">${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days</span></span>
-            <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
-          </button>`
-        : `<div class="cardrow">
-            <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
-            <span class="cardrow-b">
-              <span class="cardrow-t">${s.name} <span class="tag green sm">Published</span></span>
-              <span class="cardrow-d">${lname(c)} &middot; you recommended: ${s.rec}</span>
-            </span>
-          </div>`;
-      }).join('')}
-    </div>
+    ${ps.length ? `<div class="ev-row">
+      ${ps.map(evCol).join('')}
+    </div>` : `<div class="empty" style="border:0">${I.checkFilled}
+      <h3>Nothing waiting</h3><p>Every 90-day summary in this cohort is published.</p></div>`}
     ${/* THE FOOTNOTE IS GONE. It explained what a summary is FOR — "the
           document a candidate's next level is argued from" — to the one person
           who already knows, at the foot of a list of two rows that each say
@@ -252,6 +422,27 @@ V.leadEvals = () => {
           when it tells you something the rows do not; this one restated the
           page's own subject. */''}
   </div>
+  ${''/* THE SECOND SECTION IS TINTED, WHICH IS THE PAGE'S RHYTHM AND NOT A
+         JUDGEMENT ABOUT THE CONTENT. White, tint, white down a page is what
+         every other leader page does (§55/§84 draw it, `leadDash` alternates
+         its four blocks by POSITION), and it happens to say the useful thing
+         here too: the work is on the white ground at the top and the record is
+         on the quiet one below it.
+         THE COUNT CAME OFF THE HEADING ROW (Maryam, 1 Sep 2026), AND THE ROW
+         IS WHY IT COULD. "6 published" was a `.t-helper-01` at the far right of
+         the heading — the shape the Calls page and the Messages inbox use for a
+         count — and it was saying the word the heading beside it already says
+         ("Evaluated") about rows that each say it again ("you recommended").
+         Tal's sentence at the top of the page is what states the arithmetic:
+         two of eight are still waiting, so six are not. Both counts on this page
+         went the same way and for the same reason; the card's heading lost "2
+         waiting" 30 lines up. */}
+  ${published.length ? `<div class="sec tint">
+    <div class="sec-h"><h2>Evaluated Candidates</h2></div>
+    <div class="tile-stack">
+      ${published.map(sumRow).join('')}
+    </div>
+  </div>` : ''}
 </div></main>`;
 };
 
@@ -290,9 +481,23 @@ V.leadEvals = () => {
    has just chosen a DOUBLE promotion is asking the opposite of what happened,
    and asking "why two levels?" of a hold is worse. One boolean, three strings.
    ========================================================================== */
-const LDR_RECS = [['promote','Ready to promote'],['promote2','Promote two levels'],
-                  ['hold','Hold at this level'],
-                  ['down','Move down a level'],['notready','Not ready to re-interview']];
+/* EACH ONE CARRIES A LINE NOW, and the lines are this note's own argument said
+   in five short forms rather than new product copy (1 Sep 2026, with a reference
+   screen that puts a sentence under every option). The reference's own wording
+   ("Strong performance. Ready to fast-track.") describes the CANDIDATE, which is
+   the one thing an option list must not do — it would be praising somebody
+   before the leader has chosen. These say what the CHOICE means, which is what
+   the paragraphs above already establish: the expected end, the two departures
+   upwards, and the two downwards.
+   THE THIRD FIELD IS OPTIONAL BY POSITION, so `LDR_RECS.map(([k,l]) => …)` at any
+   other call site keeps working — `ldrDraftRead`'s publish handler reads `r[1]`
+   by index and is untouched. */
+const LDR_RECS = [
+  ['promote',  'Ready to promote',        'The end 90 days are built for.'],
+  ['promote2', 'Promote two levels',      'More than 90 days can normally move.'],
+  ['hold',     'Hold at this level',      'Another 90 days at the same level.'],
+  ['down',     'Move down a level',       'The level was set too high.'],
+  ['notready', 'Not ready to re-interview','Not enough here to assess yet.']];
 
 V.leadSum = () => {
   const s = ldrSumOf(S.ldrSum);
@@ -310,9 +515,87 @@ V.leadSum = () => {
   const first = s.name.split(' ')[0];
   const retakes = m.att > 1.4 ? 3 : m.att > 1.1 ? 2 : 1;
 
-  return `<main class="main"><div class="page">
+  /* `nosum` IS HOW A PAGE DECLINES TAL'S SUMMARY (Maryam, 1 Sep 2026: "do
+         not show tal summary on this page"), and ai6's `placeSummaryPass` reads
+         it beside `.msg-page` and `.msg-mod` — the class is the whole test.
+         WHY THIS PAGE. It is the one page in the portal that IS a summary, and
+         Tal's line was reprinting what the page states in its own words 500px
+         below: published, the band read "Published. You recommended: Ready to
+         promote." over a `.kv` row reading "Recommendation — Ready to promote";
+         waiting, it restated the four figures in the band directly above them.
+         That is the duplication CLAUDE.md's two-copy-slots rule exists to stop,
+         and here the second copy is not a sentence in a grey line but the whole
+         body of the page.
+         `PAGESUM.leadSum` STAYS IN ai6, UNREACHED, which is that file's own
+         convention for `PAGESUM.messages` and the courseware's entries — the
+         words are the record of what the band used to say. */
+  /* ------------------------------------------------------------------------
+     THE PAGE IS THE CANDIDATE BESIDE THE DECISION (1 Sep 2026, with a reference
+     screen: "this page should look like the reference, obviously with our design
+     language"). §91 draws it. What was here was four stacked sections — an
+     identity header, a four-cell figure band, and then either the record or the
+     form — so on a 1280 frame the decision the page exists for started 700px
+     down and the figures it turns on had scrolled off the top.
+
+     TWO COLUMNS, ONE SECTION. Left: who this is and what the 90 days produced.
+     Right: the recommendation and the prose. The reference draws each as a
+     bordered, rounded card; §76 is the precedent for refusing that and it is the
+     same argument Maryam made about the Evaluations columns a moment earlier
+     ("do not close the candidates in cards since this is not our ui language") —
+     `--radius` is 0, and a column beside a hairline is how this product says
+     "two things, side by side".
+
+     WHAT THE REFERENCE GETS RIGHT AND THIS TAKES: the candidate's figures beside
+     the decision rather than above it; a ring on the progress figure; the five
+     options shown as a strip with the chosen one lit, so a published summary
+     records what was chosen *out of what was available*; the three prose blocks
+     under it as headed paragraphs; the sharing notice at the top where it is a
+     condition of the page rather than a footnote to the form; and a signature
+     line at the foot.
+
+     WHAT IT REFUSES: "Days to Close 90 days" and "Sign to Close 90 days" — the
+     same number twice, and neither is a figure this build holds; the round
+     tinted glyph behind every mark, because a mark in this product has been a
+     bare 20px glyph since 1 Sep 2026 (CLAUDE.md states it: "the icons should not
+     have the background … increase the size of the icons"); and the `···`
+     overflow control, which would open a menu of nothing.
+     ------------------------------------------------------------------------ */
+  const figRow = (ic, hue, label, val) => `<div class="sump-f">
+    <span class="sump-fi" style="--mk:${hue}">${ic}</span>
+    <span class="sump-fl">${label}</span>
+    <span class="sump-fv">${val}</span>
+  </div>`;
+
+  /* ------------------------------------------------------------------------
+     THE TWO STATES ARE TWO PAGES NOW, AND THAT IS THE CORRECTION (Maryam, 1 Sep
+     2026: "we will not change the ui for the candidate evaluation page that are
+     not done yet. I need the ui of this page back").
+
+     §91's two-column shape came in for the whole view, and it should not have:
+     the reference it was drawn from is a PUBLISHED summary, and the two states
+     are not the same kind of screen. Published, this is a record — the figures
+     and the decision are read side by side, which is what the columns are for.
+     Waiting, it is a FORM: a stack you work down, and the four figures are the
+     brief you read before you fill it in. Restated as one rule, the rule the
+     restructure broke: **a two-column layout is for reading, a single column is
+     for filling in.**
+
+     SO THE WAITING BRANCH IS THE PAGE IT WAS, restored slot for slot — the
+     `.idhead` header with "Their full record", the `.stats` band under "What the
+     90 days produced", and the tinted "Your recommendation" section holding the
+     `.btn-set` of five, the reason box, the two prose boxes, the sharing line
+     and the two buttons. The placeholders say "the numbers above" again, because
+     in this layout they are above.
+
+     WHAT DOES NOT COME BACK IS TAL'S CARD, and that was a separate instruction
+     one message earlier ("do not show tal summary on this page") rather than
+     part of the restructure: `nosum` stays on the page, so neither state draws
+     it. Waiting, the sentence it printed was the four figures directly below it
+     said again; published, it was the recommendation printed twice.
+     ------------------------------------------------------------------------ */
+  if(!done) return `<main class="main"><div class="page nosum">
   ${crumb(['Evaluations','leadEvals'], s.name)}
-  ${ph(`90-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; ${done ? 'published' : 'waiting on your signature'}`)}
+  ${ph(`90-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; waiting on your signature`)}
   <div class="sec">
     <div class="idhead">
       <span class="av-ph" style="width:72px;height:72px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
@@ -347,32 +630,40 @@ V.leadSum = () => {
         roster's numbers and they are one click away on "Their full record",
         which is the button this page already puts beside the person's name.
         The leader's own note count is not a fact about the candidate at all. */''}
-  ${done ? `
-  <div class="sec tint">
-    <div class="sec-h"><h2>What you published</h2></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Recommendation</span><span class="v">${s.rec}</span></div>
-      ${/* THE REASON IS PART OF THE RECORD, so the record prints it. The
-            publish handler has always stored `s.why` and this block never
-            showed it, which made the gate look like a formality: the leader
-            was made to justify an exception into a box whose contents then
-            appeared nowhere. It sits directly under the recommendation it
-            qualifies, because that pair is the whole exception. */''}
-      ${s.why ? `<div class="kv"><span class="k">Why</span><span class="v n">${s.why}</span></div>` : ''}
-      ${s.growth ? `<div class="kv"><span class="k">Where they grew</span><span class="v n">${s.growth}</span></div>` : ''}
-      ${s.develop ? `<div class="kv"><span class="k">Still to develop</span><span class="v n">${s.develop}</span></div>` : ''}
-    </div>
-    <div class="btn-set mt5">
-      <button class="btn btn-p" data-go="leadEvals">Back to evaluations ${I.arrowLeft}</button>
-    </div>
-  </div>` : `
-  <div class="sec tint">
+  ${/* THE SECTION IS WHITE (Maryam, 2 Sep 2026: "remove the grey background from
+        Your recommendation section"). It was `.sec tint` — §55's tinted panel —
+        and the tint was doing the job the `.tile` inside it already does: a 4%
+        grey band wrapping a bordered white card is two frames around one form,
+        which is §39's "one frame" argument and §74's ("a 5%-tinted card on a 4%
+        grey ground is two washes a shade apart"). The published branch has no
+        tint either, so the two states of this page now stand on the same
+        ground. */''}
+  <div class="sec">
     <div class="sec-h"><h2>Your recommendation</h2><span class="t-helper-01">This is what the next agent reads</span></div>
     <div class="tile">
+      ${/* THE CHOICE IS A RADIO LIST, NOT A BUTTON STRIP (Maryam, 2 Sep 2026:
+            "instead of arrows and full button type selection, give radio buttons
+            to each one"). Five `.btn`s in a `.btn-set` drew the one selected
+            option as a solid black `.btn-p` and the other four as outlined
+            `.btn-g` with §64's trailing arrow — so the control read as five
+            ACTIONS, four of which promised to navigate somewhere, when it is one
+            question with five answers. §60's rule from the other side: an arrow
+            that goes nowhere is a dead control.
+            `.rad` IS §02's OWN RADIO and needed no new component — a real
+            `<label>` + `<input type="radio">`, which this can host because it is
+            a form rather than §76's `<button>` grid. The `checked` attribute is
+            written FROM `rec` on every render (trap 9: `render()` replaces
+            `device.innerHTML`, so a natively-toggled input would be gone at the
+            next paint); `data-ldrrec` stays on the label, so the existing
+            handler — which calls `ldrDraftRead()` to keep the typed text — is
+            untouched.
+            IT IS VERTICAL, which is what makes the dependent field legible: the
+            "Why not a promotion?" box below is a consequence of this answer, and
+            a five-across strip put the cause and the effect on the same line. */''}
       <div class="f">
         <label>Where ${first} stands after 90 days</label>
-        <div class="btn-set ldr-recs">
-          ${LDR_RECS.map(([k,l]) => `<button class="btn ${rec === k ? 'btn-p' : 'btn-g'} noic" data-ldrrec="${k}">${l}</button>`).join('')}
+        <div class="ldr-recs">
+          ${LDR_RECS.map(([k,l]) => `<label class="rad ldr-rec" data-ldrrec="${k}"><input type="radio" name="ldrrec"${rec === k ? ' checked' : ''}><span class="box"></span><span class="txt">${l}</span></label>`).join('')}
         </div>
       </div>
       ${needsWhy ? `
@@ -392,11 +683,185 @@ V.leadSum = () => {
         <textarea class="inp" id="ldrDev" rows="3" placeholder="What the next 90 days, or the re-interview, should look at."></textarea></div>
       <p class="t-helper-01">Published to ${first} and to whichever agent runs their re-interview. Your private notes stay private.</p>
     </div>
+    ${/* ONE BUTTON, AND ITS WORDS ARE THE ACT (Maryam, 2 Sep 2026). "Send
+          Recommendation" rather than "Publish the summary": the section above it
+          is headed "Your recommendation" and the radio list asks for one, so the
+          button now names the thing the page has just been filling in. It is the
+          only place in either portal that says "publish", which was the odd word
+          — the candidate's side never uses it.
+          "FINISH LATER" IS GONE. It was `data-go="leadEvals"`, a plain route
+          back to the list that saved nothing — `ldrDraftRead()` runs on the
+          recommendation change, not on that press — so it promised a draft the
+          build does not keep. The crumb and the rail already go back, and §60's
+          rule is that a control which cannot do what it says should not be
+          drawn. `.btn-set` stays on the wrapper for the spacing even with one
+          child, which is what `.mt5` is measured against. */''}
     <div class="btn-set mt5">
-      <button class="btn btn-p" data-ldrpub="${s.id}">Publish the summary ${I.checkFilled}</button>
-      <button class="btn btn-t" data-go="leadEvals">Finish later ${I.time}</button>
+      <button class="btn btn-p" data-ldrpub="${s.id}">Send Recommendation ${I.checkFilled}</button>
     </div>
-  </div>`}
+  </div>
+</div></main>`;
+
+  return `<main class="main"><div class="page nosum">
+  ${crumb(['Evaluations','leadEvals'], s.name)}
+  ${ph(`90-day summary &middot; ${s.name}`, `${lname(c)} &middot; ${llevel(c)} &middot; published`)}
+  ${/* THE PUBLISHED STATE NO LONGER ANNOUNCES ITSELF (Maryam, 2 Sep 2026:
+        "remove the top published row and the Shared with Samuel and with
+        whichever agent runs their re-interview banner beneath that").
+
+        BOTH HALVES SAID THE SAME THING TWICE. The green "Published" pill and the
+        green `.note succ` under it were the reference's title block, and between
+        them they spent the whole first screen on the page's STATE — but `ph()`'s
+        own fact row already ends in `&middot; published`, and the recommendation
+        strip below is drawn in the settled register (§91.3's green cell and tick)
+        precisely so the document reads as decided without a banner saying so.
+        WHAT IS ACTUALLY LOST is the privacy sentence — "your private notes stay
+        private" — and it is not lost, because the DRAFT states it directly over
+        the button that does the sending, which is where a reader needs it. A
+        page that only reports is the wrong place for a rule about what happens
+        next.
+        §91.5's `.sump-top` / `.sump-st` RULES GO WITH IT rather than being left
+        as the "gate nothing writes" tell; `.note succ` is §02's and has other
+        callers, so it stays. */''}
+  <div class="sec">
+    <div class="sump">
+      ${/* THE LEFT COLUMN IS THE CANDIDATE, AND ITS HEADING IS ITS OWN.
+            `.idhead` is gone: it is a full-width header row with the face, three
+            lines and a button on one line, which is the shape this page had
+            before it had a column to put them in. The face is 88px and round —
+            §89.2's argument for the round mark, and the reference's own
+            drawing — with the name under it rather than beside it, because a
+            280px column reads down.
+            "Their full record" SURVIVES as the column's foot: it is the one
+            route off this page that is not the decision, and it was the
+            `.idhead`'s only reason to hold a button. */''}
+      <div class="sump-c">
+        <div class="sec-h"><h2>Candidate</h2></div>
+        <div class="sump-id">
+          <span class="av-ph sump-face" style="width:88px;height:88px"><i>${s.i}</i><img src="${AV[s.img]}" alt=""></span>
+          <span class="idname">${s.name}</span>
+          <span class="idmeta">${lname(c)} &middot; ${llevel(c)}</span>
+        </div>
+        ${/* THE RING IS THE PROGRESS FIGURE AND THE OTHER THREE ARE ROWS, which
+              is the reference's own split and it is right: the ring is the one
+              figure that is a PROPORTION of something whole, and the other
+              three are quantities. `ring()` is §32's component (two circles and
+              `--arc` as a dasharray length) at 48px here.
+              THE HUES ARE NAMED, NOT CYCLED — §65's rule and §72's. Blue for
+              the course, violet for the assessments, green for time, rose for
+              retakes, so a figure keeps its colour if the order ever changes. */''}
+        <div class="sump-ring">
+          ${ring(m.pc, `${m.pc}% of the course complete`)}
+          <span class="sump-rb"><span class="sump-fl">Overall progress</span>
+            <span class="sub">${lchDone(m)} of 13 chapters</span></span>
+        </div>
+        <div class="sump-figs">
+          ${figRow(I.chart, 'var(--mk-3)', 'Assessment average', m.avg + '<small>%</small>')}
+          ${figRow(I.time,  'var(--mk-2)', 'Time on the course', lhrs(lmins(m)))}
+          ${figRow(I.renew, 'var(--mk-4)', 'Chapters retaken', retakes)}
+        </div>
+        <button class="btn btn-g btn-sm noic sump-go" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">Their full record</button>
+      </div>
+
+      <div class="sump-b">
+        ${/* NO HELPER LINE (Maryam, 2 Sep 2026: "remove the What you published
+              text"). It labelled the block as a record at the same moment the
+              block became one — the strip below now draws only the answer that
+              was given, in green, which says "published" better than the words
+              did. The draft branch keeps ITS helper ("This is what the next agent
+              reads") because there the sentence is a warning about a thing that
+              has not happened yet. */''}
+        <div class="sec-h"><h2>Your recommendation</h2></div>
+        ${/* ONLY THE ANSWER IS DRAWN (Maryam, 2 Sep 2026: "since the cohort
+              leader has already recommended so show only one green row that he
+              has recommended, exclude the other 4 rows from this block, also
+              remove the border of this block, green fill is enough").
+
+              THIS TURNS OVER THE PREVIOUS BUILD'S ARGUMENT, WHICH IS RECORDED
+              RATHER THAN DELETED. That version drew all five as one strip on the
+              reasoning that "a published summary that prints only the answer says
+              what was chosen, and a strip with one cell lit says what it was
+              chosen INSTEAD OF". The instruction is that the four unchosen rows
+              are not information on THIS page: the decision is taken, the leader
+              made it, and four grey rows saying what did not happen is the page
+              re-running a form it has already submitted. The alternatives are
+              still on the draft, which is where a choice is live.
+              WITH ONE ROW THE BOX IS THE ROW, so §91.3's outer `border` and the
+              per-row `border-top` both come off — a 1px rectangle around a single
+              green cell is the second frame §74 and §39 both argue against, and
+              the green ground already bounds it.
+              `LDR_RECS` IS STILL THE SOURCE and the row is still FOUND in it
+              rather than printed from `s.rec` — that is what keeps the
+              description in step with the label, and `ldrPub` only ever writes a
+              label that came out of this list (lead3's publish handler). A record
+              whose `rec` matched nothing would draw nothing, which is the honest
+              empty rather than a row with a blank description. */''}
+        ${/* THE LIT CELL IS GREEN, NOT THE ACCENT (Maryam, 1 Sep 2026: "for the
+              candidates that have already been assessed I can see that you
+              didn't follow the colors … from the reference"). It shipped for one
+              build in `--brand-tint-2` with `--accent-text` on the title, on the
+              reasoning that orange is this product's "you chose this" (§76's
+              slot picker). That reasoning is about a choice you are MAKING; a
+              published summary is a decision that has been taken, and the
+              reference draws it in the success register — a light green ground
+              and a green tick — which is also what this page's ring and its
+              notice now use. §91.3 states the two values.
+              `I.checkFilled` RATHER THAN THE REFERENCE'S STAR: a tick is what
+              this build draws for a thing that is settled, and the star is
+              Tal's mark (§70). */''}
+        <div class="sump-recs">
+          ${LDR_RECS.filter(([k,l]) => s.rec === l).map(([k,l,d]) => `<div class="sump-r on">
+              <span class="sump-rm">${I.checkFilled}</span>
+              <span class="sump-rb2"><span class="ttl">${l}</span><span class="sub">${d}</span></span>
+            </div>`).join('')}
+        </div>
+        ${/* THE THREE PROSE BLOCKS ARE HEADED PARAGRAPHS, NOT `.kv` ROWS. That
+              band gave a three-sentence answer a 184px label column and set it
+              in the value's own 13.5px — which is right for "Recommendation —
+              Ready to promote" and wrong for the paragraph this page exists to
+              carry. A heading over its own prose is what the reference draws and
+              what §63's body role is for.
+              THE HEADINGS FOLLOW THE BOXES THEY CAME OUT OF, and the first one
+              is `why` — the exception's reason, which only exists when the
+              recommendation is not a promotion, so it is the one that can be
+              absent on a legitimate record. */''}
+        <div class="sump-prose">
+          ${s.why ? `<div class="sump-p"><h3>${s.rec === 'Promote two levels'
+            ? 'Why two levels' : 'Why this rather than a promotion'}</h3><p>${s.why}</p></div>` : ''}
+          ${s.growth ? `<div class="sump-p"><h3>Where they grew</h3><p>${s.growth}</p></div>` : ''}
+          ${s.develop ? `<div class="sump-p"><h3>Still to develop</h3><p>${s.develop}</p></div>` : ''}
+          ${!s.why && !s.growth && !s.develop
+            ? `<p class="t-helper-01">No notes were added to this summary.</p>` : ''}
+        </div>
+        ${''/* THE EMPTY STATE IS STILL HERE AND IT SHOULD NOW BE UNREACHABLE for
+               every record in the build: all six published summaries carry
+               `growth` and `develop`, and the three holds carry `why` as well.
+               It stays because the publish handler stores whatever was typed and
+               all three boxes are optional — a leader who publishes a promotion
+               with both boxes blank is allowed, and this is what that record
+               looks like rather than a column of headings with nothing under
+               them. */}
+        ${/* THE FOOT IS GONE — BOTH HALVES OF IT (Maryam, 2 Sep 2026: "remove
+              the bottom published by priya and back to evaluations button").
+
+              THE SIGNATURE was added one build earlier on the argument that "a
+              90-day summary is a document somebody signed and the only name on it
+              was in the app bar". The name is still in the app bar, and it is the
+              signed-in leader's own — this page is only ever reached from that
+              leader's own queue, so the line was telling the reader something
+              they are. It reads as provenance on a document that has been handed
+              over, and this page is the author's copy.
+              THE BUTTON was a second way out of a page that already has two: §78
+              put the trail in the top bar ("Evaluations ›") and the rail slot is
+              live. A black `.btn-p` at the foot also made the LAST thing on a
+              published record a call to action, which is the one thing a record
+              does not want — §60's neighbourhood, from the other end.
+              `.sump-sig`'s RULE GOES WITH IT (§91.4) rather than being left as a
+              gate nothing writes. `LEADER` and `avatar` both keep other readers
+              in this file and in lead4, so nothing else moves. */''}
+      </div>
+    </div>
+  </div>
 </div></main>`;
 };
 

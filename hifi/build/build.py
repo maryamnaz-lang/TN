@@ -859,7 +859,211 @@ css = '\n'.join((here / f).read_text() for f in
                  # NOTHING ELSE IN THE BUILD WRITES `.gcard-art`, so this layer
                  # is disjoint from §84 and §85 and the order between the three
                  # is free.
-                 '86-cohortart.css'])
+                 '86-cohortart.css',
+                 # WHAT YOU'LL LEARN — the Course Enrollment page's tick list
+                 # and chip row (§87), with the full list in §02.14's dialog.
+                 # AFTER §63 AND ALLOWED TO BE, on the usual test: grid, flex,
+                 # grounds, a pill radius and the tick's `fill`. Not one
+                 # font-size, font-weight, text-transform or text colour — the
+                 # three type roles are stated in §63 §22.
+                 # LATE FOR NO CASCADE REASON, unlike most of this tail: every
+                 # class in it is new, so nothing earlier can be reasoning about
+                 # them. It is last because it was written last, and it could sit
+                 # anywhere after §02 (whose `.modal` / `.sheet` it reuses) and
+                 # §10 (whose `--layer-02` the chips take).
+                 '87-learnsec.css',
+                 # YOUR PERFORMANCE — Course Progress's assessment block (§88),
+                 # replacing `lineChart`'s sparkline-and-table with a figure, a
+                 # plot with a y axis, and a footer that states the conclusion.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, strokes, fills and a
+                 # mask. Not one font-size, font-weight, text-transform or text
+                 # colour — the seven type roles AND the SVG `<text>` are stated
+                 # in §63 §23, which is §5's rule (a chart that sizes its own
+                 # `<text>` is the one way type escapes the system).
+                 # NEW CLASSES ONLY, so nothing earlier can be reasoning about
+                 # them and the position is free. It is last because it was
+                 # written last; it needs §02 (`.modal` / `.sheet` for the scores
+                 # sheet), §10 (`--rule`) and §70 (`--ai-star` / `--ai-grad` for
+                 # the insight's mark) to have landed, and all three are far
+                 # above.
+                 '88-perfsec.css',
+                 # THE COHORT PAGE — the discussion as a comment thread, round
+                 # avatars in its three lists, and the leader's message control
+                 # as a disc (§89).
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, a negative margin and
+                 # three `border-radius`. Not one font-size, font-weight,
+                 # text-transform or text colour — §63 §24 states the four roles.
+                 # THE RADII ARE THE POINT AND THEY ARE LATE ON PURPOSE. §02
+                 # resolves every corner through `--radius` (0px), and §09 gives
+                 # `.av-ph` its `overflow:hidden`; both have to have landed before
+                 # a rule can round one clip and leave the other thirty square.
+                 '89-cohortui.css',
+                 # THE AWAITING-EVALUATIONS ROW (§90) — the leader's two waiting
+                 # 90-day summaries side by side inside §75's black card, with a
+                 # §32 ring per candidate and an inset divider between them.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, a pseudo-element
+                 # divider, two strokes and two border-colors. Not one font-size,
+                 # font-weight, text-transform or text colour — and §63 needed no
+                 # new section for it either: the name wears `.ttl`, both small
+                 # lines wear `.sub` and the figure is `.ring-n`, three roles §63
+                 # already owns and already re-inks inside a `.dark-card`.
+                 # LATE FOR A CASCADE REASON, unlike §87 and §88. Two of its
+                 # rules re-point rules that already exist: §32.81's ring track
+                 # (`--layer-accent-01`, a white-paper tint that is the brightest
+                 # object on a black card) and §75.5's borderless quiet button.
+                 # Both are (0,3,0), so this layer wins on ORDER and only on
+                 # order — written into §31 it would lose to §32 silently, which
+                 # is the trap §83's head records for the AI ramp.
+                 '90-evalrow.css',
+                 # THE 90-DAY SUMMARY PAGE (§91) — the candidate's figures beside
+                 # the decision, in two columns with a hairline between them,
+                 # replacing four stacked sections.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, borders, one radius,
+                 # two strokes, a ground and two fills. Not one font-size,
+                 # font-weight, text-transform or text colour — §63 §28 states
+                 # the page's four roles and §63 §8b learns its wrapped heading.
+                 # LATE FOR A CASCADE REASON: it re-points `.av-ph`'s radius
+                 # (§09 gives it the token's 0) and sizes a §32 ring, both of
+                 # which are earlier layers, and it has to land after §90 so the
+                 # two dividers' arguments read in the order they were made.
+                 '91-sumpage.css',
+                 # THE COHORT CARD (§92) — the leader's three cohorts as three
+                 # cards with their own covers, replacing the seven-column table
+                 # on `V.leadCohorts`. Cover, level pill, name, a derived line
+                 # and four labelled rows on one grid.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, two grounds, one
+                 # `aspect-ratio`, two radii and the marks' `fill` (which is
+                 # §65's, reused rather than restated). Not one font-size,
+                 # font-weight, text-transform or text colour — §63 §25 states
+                 # the card's five roles and its fallback numeral.
+                 # LATE FOR A CASCADE REASON, and it is trap 13 rather than a
+                 # component: the section was opting out of §10.15's 184px label
+                 # column through `.sec:has(> .tbl-wrap)`, which is a property of
+                 # the TABLE this layer deletes. The opt-out is restated inside
+                 # `@container app (min-width:900px)`, and per trap 3 that can
+                 # only be answered from inside the tier — so it has to land
+                 # after §10 and it may as well land last.
+                 '92-cohortcards.css',
+                 # A ROW WITH TWO ACTIONS STACKS ON A PHONE (§93) — the
+                 # certificate row's Download / Share link pair takes 229px of
+                 # a 356px content box at 390, and §02.282's `flex:none` means
+                 # the text column is the only thing that can give (it measured
+                 # 55px). Below 600 the action cell wraps to its own line,
+                 # indented to the text column.
+                 # AFTER §63 AND ALLOWED TO BE: flex and one padding. Not one
+                 # font-size, font-weight, text-transform or text colour — §63
+                 # §26 states the pair's two inks.
+                 # LATE FOR A CASCADE REASON: it turns over §02.282's `flex:none`
+                 # and `margin-left:auto` on a cell that layer states at (0,1,0),
+                 # and it has to read after §24.302's `.ic-l` (which is what puts
+                 # the marks in front of the labels in the first place) for the
+                 # indent arithmetic to be checkable against one place.
+                 '93-tworowact.css',
+                 # THE POINTS LIST'S MARK (§94) — a Phosphor duotone glyph on a
+                 # 36px disc of its own hue, replacing the one award WebP that
+                 # every row of that list drew. One `--mk` per row paints the
+                 # ground, the duotone's pale body and its figure; an unearned
+                 # row re-points that one variable to grey.
+                 # A SECOND ICON FAMILY, DELIBERATELY AND SCOPED — icons.js's
+                 # own head carries the argument and trap 7 is not suspended:
+                 # Material still draws every verb and every control.
+                 # AFTER §63 AND ALLOWED TO BE: a grid, two sizes, a ground, one
+                 # radius and the mark's `fill`. Not one font-size, font-weight,
+                 # text-transform or text colour.
+                 # LATE FOR A CASCADE REASON: it has to answer §06.10's
+                 # `align-items:flex-start` on `.aw` and stay clear of §10.323's
+                 # container-stepped `.aw-ic`, both of which are earlier layers.
+                 '94-phmark.css',
+                 # THE ATTENTION CARD AND THE NAMED ROW LINK (§95) — the one
+                 # candidate who needs the leader, as a `.dark-card` under the
+                 # Course Reports tab strip, and "View Progress" in place of the
+                 # chevron at the end of every row in that table.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, two stroke re-points
+                 # and one `fill`. Not one font-size, font-weight,
+                 # text-transform or text colour — §63 §26 states the single ink
+                 # this needs and records why the card itself needs none.
+                 # LATE FOR A CASCADE REASON, twice: it re-points §32's ring
+                 # strokes (both (0,3,0), and on a stroke that loss is silent)
+                 # and §36.2's chevron cell, which states a 24px width that
+                 # would set a two-word phrase on two lines.
+                 # NUMBERED 95 AND NOT 93: 93 and 94 were taken while this was
+                 # being written. The layer's own head says §95 throughout.
+                 '95-attention.css',
+                 # THE CERTIFICATES TAB (§96) — the Credly shape: the most
+                 # recent certification as a `.dark-card` with the badge on the
+                 # left and the two actions at the end of the row, then a grid
+                 # of upright cards under "All certifications".
+                 # THE CARD ITSELF IS §75 AND IS NOT RESTATED — this layer is
+                 # the hero row, the badge slot and the grid, which is all a
+                 # `.dark-card` caller should ever have to state.
+                 # AFTER §63 AND ALLOWED TO BE: flex, a grid, one border, one
+                 # ground and two sizes. Not one font-size, font-weight,
+                 # text-transform or text colour — §63 §29 states the five roles.
+                 # LATE FOR A CASCADE REASON: trap 13 again. `.crt-grid` is a new
+                 # wrapper, so the section falls into §10.15's 184px label column
+                 # and the opt-out can only be restated from inside
+                 # `@container app (min-width:900px)` (trap 3).
+                 '96-certgrid.css',
+                 # THE LEVEL IS A BLACK CARD ON BOTH PAGES (§97) — the report's
+                 # hero pays the page gutter instead of running rail to rail,
+                 # and My Level's ladder wing becomes a `.dark-card`.
+                 # AFTER §63 AND ALLOWED TO BE: two margins, one padding and
+                 # four grounds. Not one font-size, font-weight, text-transform
+                 # or text colour — §63 §30 states the wing's four inks on dark.
+                 # LATE FOR A CASCADE REASON, twice: it re-points §25.591's
+                 # `margin:0` on a band member and four §59 values that were
+                 # chosen for a light ground, and both of those are earlier
+                 # layers whose selectors it has to outweigh rather than precede.
+                 '97-lvldark.css',
+                 # A TAB STRIP HAS AIR UNDER IT (§98) — `--s06` after both tab
+                 # strips, and the leaderboard's highlighted row loses the two
+                 # hairlines that were reading as its frame.
+                 # AFTER §63 AND ALLOWED TO BE: one padding, one margin and two
+                 # borders. Not one font-size, font-weight, text-transform or
+                 # text colour.
+                 # LATE FOR A CASCADE REASON: both halves turn over an earlier
+                 # layer on the same element — §14.401's tab spacing and
+                 # §15.1543's row rule — and the second needs `:has()` weight to
+                 # do it rather than order.
+                 '98-tabgap.css',
+                 # YOUR PRIVATE NOTES (§99) — one bordered panel with three
+                 # states (empty, the list, the composer) on the leader's member
+                 # page, all three live.
+                 # AFTER §63 AND ALLOWED TO BE: grid, flex, borders, two grounds
+                 # mixed from a custom property the markup states, and one
+                 # `fill`. Not one font-size, font-weight, text-transform or
+                 # text colour — §63 §28 states the six roles and why the empty
+                 # state's bare `h3`/`p` had to be named.
+                 # LATE FOR A CASCADE REASON: it re-points `.inp`'s width and
+                 # padding (§02) for the search field and the two selects, and
+                 # the panel's dashed edge has to beat §41's solid one.
+                 # NUMBERED 99: 96, 97 and 98 were taken while this was written.
+                 '99-notes.css',
+                 # THE MESSAGE THREAD (§100) — a chat header (face, presence,
+                 # name, what the thread is, four controls), the bubble's
+                 # rounded corner with a square tail, the read tick, and a day
+                 # marker with no rule through it.
+                 # AFTER §63 AND ALLOWED TO BE: flex, four radii, two grounds
+                 # and the marks' `fill`. Not one font-size, font-weight,
+                 # text-transform or text colour — §63 §31 states the header's
+                 # two roles.
+                 # LATE FOR A CASCADE REASON: the radius is the one place the
+                 # build does not resolve through `--radius`, so it has to land
+                 # after §15 states the bubble and after §10 sets the token; the
+                 # day marker turns over §15.1258's `::before`.
+                 '100-msgui.css',
+                 # THE BLOCK RHYTHM (§101) — two adjacent blocky rows sit
+                 # `--pad-x` apart, so a card's gap from the block under it is
+                 # the same as its gap from the page walls.
+                 # LAST, AND IT HAS TO BE, for two reasons that point the same
+                 # way: it reads `--pad-x`, which §14 re-points on `.page` at
+                 # desktop, and it overrides the dark-card joins §75 and §97
+                 # state. It also depends on an exclusion added to §20's two
+                 # join rules — per trap 4 that list cannot be outweighed from
+                 # here, so it was extended rather than fought.
+                 # AFTER §63 AND CLEAN: margin and padding only. Not one
+                 # font-size, font-weight, text-transform or text colour.
+                 '101-blockgap.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1183,9 +1387,26 @@ print(f'call photographs embedded: {len(CALL_ART)} files, '
 #
 # KEYED BY LEVEL, NOT BY COHORT ID, so a fourth cohort at E1 gets a cover for
 # free rather than needing a fourth file — `cohortArt` in lead.js is the lookup
-# and its note is the argument. The three files are in the order Maryam sent
-# them, which IS the level order: Business Exploration for E1, Business Idea for
-# E2, Startup Course for E3.
+# and its note is the argument. Today:
+#
+#   e1   the compass, gears and lightbulb illustration
+#   e2   "Business and Productivity Tools", four faces
+#   e3   "Business Foundations", the orange one
+#
+# E3 IS THE ORANGE ONE BECAUSE THE BLACK CARD ASKED FOR IT (Maryam, 1 Sep 2026:
+# "show the yellow one in the black call cards"). The card draws the NEXT cohort
+# call and takes that cohort's own cover — a card showing artwork belonging to a
+# different cohort would be the card lying about its subject — so the way to put
+# the orange one on it is to give it to the level the next call is at, which is
+# Cohort 41 at E3. The consequence is worth knowing: if the next call ever became
+# Cohort 33 the card would follow it and show the E1 cover. That is the rule
+# working; if the card must be orange whatever it is about, the fix is a fixed
+# cover on `leadCall` rather than a fourth file here.
+#
+# THE FIRST THREE COVERS LASTED ONE BUILD (Business Exploration, Business Idea,
+# Startup Course) and are replaced rather than kept — no caller, no file. The
+# crop anchors moved with them, which is the point of cropping here: E1 and E2
+# are centred compositions and E3's title sits hard left.
 #
 # 200px SQUARES, CROPPED OUT OF BUILD. The display size is the row's own content
 # height — about 70 CSS px (§86) and 78 on the black card — so 200 is better
@@ -1196,9 +1417,10 @@ print(f'call photographs embedded: {len(CALL_ART)} files, '
 # words in half. That decision cannot be expressed in CSS per-image without
 # three more rules, and it is a property of the picture rather than of the slot.
 #
-# WebP at q82 for the reason the call photographs' note gives — these are flat
-# illustrations rather than photographs, which is why q82 comes in at 17 KB for
-# all three against 66 KB of source JPEG/AVIF.
+# WebP at q82 for the reason the call photographs' note gives. Two of the three
+# are flat illustrations and one is four photographed faces, which is why the
+# people cover is twice the size of the orange one at the same quality — 19 KB
+# for all three.
 # ==========================================================================
 COHORT_ART = ['e1', 'e2', 'e3']
 _co = ',\n  '.join(
@@ -1207,6 +1429,38 @@ _co = ',\n  '.join(
 cohort_js = 'const COHORT_ART = {\n  ' + _co + '\n};\n'
 print(f'cohort covers embedded: {len(COHORT_ART)} files, '
       f'{sum((here / "cohorts" / ("cohort-" + k + ".webp")).stat().st_size for k in COHORT_ART)/1024:.0f} KB')
+
+# ==========================================================================
+# THE CERTIFICATION BADGES — Maryam's own six, 2 Sep 2026
+#
+# The Credly-shaped Certificates tab: one of these is the black card's mark and
+# every card in the grid under it carries one. Supplied as `TN Certification
+# Badges/*.png` and converted here to lossless WebP.
+#
+# LOSSLESS, WHICH IS NOT WHAT THE OTHER FOUR SETS USE. `AWARDS`, `COHORT_ART`
+# and `CALL_ART` are all q82 lossy, and the note over the call photographs makes
+# the case for that on photographs and flat illustration. These are 70px discs
+# with a ring of 5px type around them — "TALENT NEXT CERTIFIED" — and q82 turns
+# that ring into a grey smear. 45 KB for all six is the price of the words
+# staying words.
+#
+# 70x76 IS THE SUPPLIED SIZE AND THE RENDER IS 1:1. §86's cohort covers are
+# embedded at 200 for a ~78px slot precisely so a 2x screen has pixels to draw
+# with; these have none to spare, so §96 sizes the slot to the asset instead of
+# the asset to the slot. A 2x export (140x152) is a drop-in: same names, same
+# folder, rebuild.
+#
+# THE KEYS ARE THE SUBJECT, NOT THE FILENAME. `pace` rather than `fast-tracker`
+# and `top` rather than `top-performer`, because the record in data.js reads
+# them and a key with a hyphen in it cannot be a bare property there.
+# ==========================================================================
+CERT_ART = ['explorer', 'course', 'assess', 'cohort', 'pace', 'top']
+_ct = ',\n  '.join(
+    "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'certs' / (k + '.webp')).read_bytes()).decode())
+    for k in CERT_ART)
+cert_js = 'const CERT_ART = {\n  ' + _ct + '\n};\n'
+print(f'certification badges embedded: {len(CERT_ART)} files, '
+      f'{sum((here / "certs" / (k + ".webp")).stat().st_size for k in CERT_ART)/1024:.0f} KB')
 
 AWARDS = ['points', 'bronze', 'silver', 'gold', 'involved', 'rank1', 'rank2', 'rank3']
 _aw = ',\n  '.join(
@@ -1273,7 +1527,7 @@ print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)

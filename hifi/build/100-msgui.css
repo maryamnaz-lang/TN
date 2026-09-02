@@ -1,0 +1,121 @@
+/* ==========================================================================
+   100. THE MESSAGE THREAD LOOKS LIKE A MESSAGE THREAD — `.mhead`, and the
+   bubble gets the corner §15 always said it had
+   Maryam, 2 Sep 2026, with a chat reference: "the message ui should look like
+   the reference ui."
+
+   THE BUBBLE'S RADIUS IS §15's OWN INTENT, NOT A NEW EXCEPTION. That layer's
+   head reads: "a bubble is a shape the message takes, and it is the one place
+   in the product where a corner is not square, because a spoken line is not a
+   row in a table." It then states `.m-b` with no `border-radius` at all —
+   because every radius in the build resolves through `--radius`, which is 0 by
+   token, so writing it would have done nothing. This is that sentence
+   implemented: a literal 14px, the way §31's flag pill states a literal 999px,
+   so the token stays honest and the exception stays visible in the one file
+   that argues for it.
+
+   THE TAIL CORNER IS SQUARE ON THE SPEAKER'S SIDE, which is what makes the
+   shape point at the face beside it rather than float. 4px rather than 0 — the
+   reference's own corner — so it reads as a tail and not as a broken box.
+
+   --------------------------------------------------------------------- 1 ---
+   THE HEADER
+
+   IT REPLACES A PAGE HEADING WITH THE PERSON. The `.ph` is empty and hidden
+   (§78 takes the `<h1>` off every page), so what opened the thread was one grey
+   sentence. A chat opens on who you are talking to: the face, the name, whether
+   they are there, and what this thread is — the same four things the reference
+   puts in a 76px band.
+
+   THE PRESENCE DOT IS DRAWN TWICE AND THAT IS DELIBERATE, because the two say
+   different things at different distances. `.mhead-on` is the 12px dot ON the
+   face — the thing you see first — and `.mhead-dot` is the 8px one after the
+   name, which is what a reader checks when they are already reading the name.
+   The reference draws both. `--support-success` for the same reason `.tag
+   green` uses it: available is the product's one green.
+
+   THE FOUR CONTROLS ARE 40px HIT TARGETS WITH A 20px GLYPH, which is the
+   product's bare-mark size (§29, §72, §94) rather than a `.btn`. A `.btn` would
+   bring §64's arrow, a border box and a 36px minimum height into a row that is
+   four icons; `.mh-act` is the shape `.shell-act` already uses in the app bar
+   for exactly this job.
+
+   --------------------------------------------------------------------- 2 ---
+   THE DAY MARKER LOSES ITS RULE AND THE UNREAD ONE KEEPS IT
+
+   §15.1258 draws both the same way — a centred label with a hairline through
+   it. The reference draws the day as a bare label and keeps the rule for the
+   line you have not read past, which is the distinction the build already
+   makes in COLOUR (`.m-unread` is the accent) and had not made in weight. A
+   hairline across the thread every time the date changes is four horizontal
+   rules on this page, and the one that matters stops being findable.
+   ========================================================================== */
+
+/* ---- 1. the header ---- */
+.app .mhead{
+  display:flex;align-items:center;gap:var(--s05);
+  padding:var(--s05) var(--pad-x);
+  border-bottom:1px solid var(--rule)}
+.app .mhead-av{position:relative;flex:none;display:block}
+.app .mhead-av .av-ph{width:44px;height:44px}
+.app .mhead-on{
+  position:absolute;right:-1px;bottom:-1px;
+  width:12px;height:12px;border-radius:999px;
+  background:var(--support-success);border:2px solid var(--layer-01)}
+.app .mhead-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
+.app .mhead-n{display:flex;align-items:center;gap:var(--s03)}
+.app .mhead-dot{
+  flex:none;width:8px;height:8px;border-radius:999px;
+  background:var(--support-success)}
+.app .mhead-a{flex:none;display:flex;align-items:center;gap:var(--s02)}
+.app .mhead-act{
+  display:grid;place-items:center;width:40px;height:40px;
+  background:transparent;border:0;cursor:pointer;color:var(--icon-secondary)}
+.app .mhead-act svg{width:20px;height:20px;fill:currentColor}
+/* Below 600 the four controls would take 160px of a 358px row against a name
+   and a sentence. The two that could ever be wired stay; info and more are the
+   two whose content has somewhere else to live (§60's distinction between a
+   control that can never act and one that cannot act FROM HERE). */
+@container app (max-width:599.98px){
+  .app .mhead{padding:var(--s04) var(--pad-x)}
+  .app .mhead-av .av-ph{width:36px;height:36px}
+  .app .mhead-act:nth-child(n+3){display:none}
+}
+
+/* ---- 2. the bubble ---- */
+.app .m-b{border-radius:14px}
+.app .m:not(.me) .m-b{border-bottom-left-radius:4px}
+.app .m.me .m-b{border-bottom-right-radius:4px}
+/* the stamp sits outside the bubble, on the speaker's side, with the tick */
+.app .m-w{display:flex;align-items:center;gap:var(--s02)}
+.app .m.me .m-w{justify-content:flex-end}
+.app .m-tick{display:inline-flex;flex:none}
+.app .m-tick svg{width:15px;height:15px;fill:var(--accent);display:block}
+
+/* ---- 3. the day marker ---- */
+.app .m-day::before{content:none}
+.app .m-day > span{padding:0}
+
+/* ---- 4. no rule over the composer ----
+   Maryam, 2 Sep 2026: "remove the divider above the typing field."
+
+   §16.642 draws it, and its own note is the reason it stopped being right.
+   That rule is part of the block that makes the thread grow into the frame —
+   "the page grows into the frame rather than being sized to its content, so the
+   thread gets every pixel the composer is not using" — and the hairline was
+   what said where the scroller ends and the fixed foot begins, on a page where
+   nothing else did.
+
+   THE COMPOSER IS ITS OWN EDGE NOW. §16.680 gives the field the product's
+   bordered box and §29.577 insets it by the page gutter, so the foot arrives
+   as an object with a frame of its own sitting in white space. A full-bleed
+   rule one gutter wider than the thing under it reads as a line stuck to the
+   composer rather than as the end of the thread — §75.4's finding about Quick
+   Actions' `border-top` under an inset black card, one component over.
+
+   THE SCROLL BOUNDARY IS NOT LOST WITH IT: the last stamp in the thread sits
+   16px above the field and the thread scrolls behind nothing. `border-top:0`
+   rather than deleting §16's declaration, because that rule states three
+   things and the other two — `flex:none` and `margin-top:0` — are what keep
+   the foot out of the scroller. */
+.app .msg-page > .msg-foot{border-top:0}

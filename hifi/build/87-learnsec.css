@@ -1,0 +1,221 @@
+/* ==========================================================================
+   §87 — WHAT YOU'LL LEARN: a tick list and a chip row
+   Maryam, 1 Sep 2026, with a reference screen.
+
+   The Course Enrollment page's third block. Two shapes and both are the
+   reference's: the outcomes as a two-column list with a tick against each, and
+   the topics as a row of soft chips ending in a "Show all" that opens §02.14's
+   dialog. `learnSec` / `skillsSheet` (views.js) are the markup and the note
+   there is why the two lists are `SCORES` and `CH`.
+
+   §63 §22 OWNS EVERY SIZE, WEIGHT, CASE AND INK HERE. This layer states layout,
+   grounds and the tick's `fill`, which is a mark rather than text.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- 87.1 ---
+   THE TICK LIST
+
+   TWO COLUMNS FROM 600, ONE BELOW IT, AND THE TWO IS STATED — `auto-fit` was
+   the first version and it is the wrong tool here. `minmax(260px,1fr)` fits as
+   many columns as the measure allows, which is two at 760 and 1000 and **three
+   at 1280** — measured, and three is not what the reference draws. `auto-fit`
+   is right when the item count is unknown and the row should fill; this row has
+   five items and a specified shape, so the shape is what gets written.
+
+   A CONTAINER QUERY RATHER THAN A CLEVER `minmax`. `minmax(min(100%,320px),1fr)`
+   would hold two at 1280 and go to three again at 1728, which is the frame this
+   was reviewed at — a breakpoint that moves with the measure is a breakpoint you
+   cannot state. 600 is where every other two-up block in the build turns
+   (§02.422's dialog, §75.3's portrait grid), so the list turns with them.
+
+   `list-style:none` AND NO PADDING, because it is a `<ul>` for the semantics
+   and a grid for the drawing. The tick IS the marker and a browser bullet
+   beside it would be two.
+
+   THE TICK IS TOP-ALIGNED, NOT CENTRED. Four of the five band names are one
+   line and one may wrap at a narrow width; centred, the mark drifts to the
+   middle of a two-line item and stops reading as the thing that introduces it.
+   §73's `.aih-mk` and §79's `.pnc-v` are the same decision on two other rows.
+
+   `--s03` ROW GAP AND `--s06` COLUMN GAP, AND THE ROW GAP CAME DOWN TWICE
+   (Maryam, 1 Sep 2026: "reduce the space between ticks rows", then "reduce the
+   row spacing between the three rows"). The reference's rows are further apart
+   than its columns are, which is right for a list read down: the vertical gap
+   has to beat the line height so two wrapped items do not merge, and the
+   horizontal one only has to separate two columns that already have white space
+   between their text. At 16 the pitch was 38 against a 22px line — nearly a
+   blank line between every pair, which made five items read as five paragraphs;
+   12 was still a third of a line.
+
+   8 IS THE FLOOR AND THE WRAP IS WHY. Below 900 each item can run to two lines,
+   and the gap has to stay visibly larger than the 22px leading INSIDE an item
+   or a wrapped row merges with the one under it. 8 against 22 is still a clear
+   3:1 the other way — measured at 390, where every item wraps, the rows stay
+   distinct. Anything under 8 would start to read as one paragraph with ticks
+   in it, which is the failure this list cannot have.
+
+   THE COLUMN GAP IS DELIBERATELY UNCHANGED and is now three times the row gap.
+   That is the direction the reference has it in and the direction a two-column
+   list needs: the thing being separated across is a whole column, and the thing
+   being separated down is one line from the next.
+
+   THE TICK IS THE ACCENT (Maryam, same message: "give the ticks orange
+   colour"). `--accent`, the FILL cut, not `--accent-text`: §01 splits the two
+   for AA and the ink cut exists for words — a 20px glyph is a mark, which needs
+   3:1 rather than 4.5:1, and this is the same value §10.721 gives `.sk-mark`
+   and §56 gives a completed step's disc. So the tick is the product's own
+   "this is yours / this is done" orange rather than a second one.
+
+   IT IS A `fill` AND NOT A `color`, WHICH IS WHY IT CAN BE STATED HERE AT ALL.
+   §63 owns size, weight, case and text COLOUR, and this layer lands after it;
+   an icon's fill is none of those four, so it stays with the component that
+   draws the icon. §70.5's `fill` on `.rec-a` and §65's on `.prog-ic` are the
+   same split.
+   -------------------------------------------------------------------------- */
+.app .lrn{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s03) var(--s06);
+  margin:var(--s06) 0 0;padding:0;list-style:none}
+@container app (min-width:600px){
+  .app .lrn{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.app .lrn-i{
+  display:flex;align-items:flex-start;gap:var(--s04);min-width:0}
+.app .lrn-tk{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;margin-top:1px}
+.app .lrn-tk svg{width:20px;height:20px;fill:var(--accent)}
+.app .lrn-t{min-width:0}
+
+/* ------------------------------------------------------------------ 87.1a ---
+   THE SECTION MUST NOT TAKE THE 184px LABEL COLUMN — TRAP 13
+
+   IT USED TO OPT OUT THROUGH ITS LEDE AND THE LEDE IS GONE (Maryam, 1 Sep
+   2026: "remove the desc of what you'll learn"). §10.15 hands any `.sec` with
+   a `.sec-h` a 184px label column at desktop unless its CONTENTS are on an
+   opt-out list; neither `.lrn` nor `.skl` is on that list, so the one thing
+   keeping this section full width was the `.all-desc` paragraph — `learnSec`'s
+   own note said so, which is what made the deletion cheap to get wrong. This
+   is §69's sentence exactly: "Adding a wrapper is not the only way to lose an
+   opt-out — removing content does it too."
+
+   AND NOTHING WARNS. The failure is not an error, it is "What you'll learn"
+   set to three lines in a 184px gutter with a two-column list crushed beside
+   it, which looks like a layout that was always like that.
+
+   INSIDE THE SAME CONTAINER QUERY, PER TRAP 3. §10.15's rules live in
+   `@container app (min-width:900px)`, which is its own cascade tier — a rule of
+   equal weight outside it cannot answer it whatever its layer number.
+
+   AND IT COPIES WHAT §10 DOES, NOT WHAT §10 SAYS. That rule's fourth
+   declaration is `padding:0 var(--pad-x)` on the heading and it is DEAD: §14.2
+   zeroes every headed section's `.sec-h` padding at this width. Restating it
+   would un-do §14 and set this one heading 24px right of the list under it —
+   §69's lesson, which §72.1a repeats for the same reason.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .lrn){display:block}
+  .app .sec:has(> .lrn) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
+}
+
+/* ------------------------------------------------------------------ 87.1c ---
+   THE TWO HALVES OF THE SECTION ARE SEPARATED BY A RULE
+   Maryam, 1 Sep 2026: "add a divider after the What you'll learn section
+   before Skills you'll gain."
+
+   ONE `.sec` WITH TWO BLOCKS IN IT, WHICH IS WHY THIS IS A BORDER AND NOT A
+   SECTION BOUNDARY. `learnSec` is deliberately a single section — the outcomes
+   and the chips are two answers to "what is on this course", and splitting them
+   would give the chips a `.sec-h` of their own and pull both into §10.15's
+   184px label column (trap 13; the lede's `.all-desc` is the only thing keeping
+   this one out). So the separation is drawn INSIDE the section, on the element
+   that starts the second half.
+
+   `border-top` ON `.skl-h`, WHICH IS §74.6's TECHNIQUE AND ITS REASON.
+   `.signed` takes a rule the same way — a border on the block "starts and ends
+   exactly where the content under it does, no negative margin, no second value
+   to keep in step with the gutter when the gutter changes at 900". §10.2's
+   section rule is full-bleed and would run past the list on both sides, which
+   is right for a boundary between sections and wrong for a join inside one.
+
+   24 ABOVE AND 24 BELOW, WHICH REPLACES §63's 32. That layer states
+   `margin:var(--s07) 0 0` on this heading — a spacing declaration in the type
+   layer, which is why it is answered here rather than edited there: §87 lands
+   after §63 and both are (0,2,0), so this wins on order. Splitting the old 32
+   into an even 24/24 keeps the two halves the same distance apart as they were
+   while giving the rule its own air on both sides; an unequal pair would tie
+   the line to one half or the other.
+   -------------------------------------------------------------------------- */
+.app .skl-h{
+  margin-top:var(--s06);
+  padding-top:var(--s06);
+  border-top:1px solid var(--rule)}
+
+/* ------------------------------------------------------------------- 87.2 ---
+   THE CHIP ROW
+
+   THE CHIPS ARE `--layer-02`, NOT THE BRAND TINT. The reference draws them in a
+   pale lilac; this product's equivalent of "a soft ground that is not saying
+   anything" is `--layer-02`, the same #f7f7f7 every tinted section and quiet
+   button uses. `--brand-tint-2` is reserved — §10.29 spends it on the
+   candidate's own SELECTION — and thirteen chips in it would be the largest
+   "you chose this" object on a page where nothing has been chosen, which is
+   §85.1's argument for the banner's ground, one component over.
+
+   FULLY ROUNDED, WHICH IS THE SECOND CURVE THIS SYSTEM ALLOWS. `--radius` is
+   `0px` by token and §02's opening note is that "depth is expressed as rhythm
+   and rule weight, nothing else" — so nothing in the build has a corner except
+   a MARK, where §56 grants the one exception (a disc). A pill is that same
+   exception: `999px` is not a rounded rectangle, it is a shape whose ends are
+   circles, and it is what makes a chip read as a token rather than as a small
+   card. §73's `.cov-pill` and §70's `.jrn-pill` are the precedent and both
+   predate this.
+
+   NO BORDER. A ground and a border would be two statements of the same edge on
+   a component whose whole job is to be quiet — §64's argument for the quiet
+   button, applied to a thing that is not even pressable.
+
+   `.skl-c` IS A `<span>` AND IS NOT A CONTROL. The reference's chips do nothing
+   and neither do these: they name what the course covers. Only "Show all" is a
+   button, which is why it is the one thing in the row with a text decoration.
+   -------------------------------------------------------------------------- */
+.app .skl{
+  display:flex;flex-wrap:wrap;align-items:center;
+  gap:var(--s04);
+  margin-top:var(--s05)}
+.app .skl-c{
+  display:inline-flex;align-items:center;
+  padding:var(--s03) var(--s05);
+  border-radius:999px;
+  background:var(--layer-02)}
+
+/* "SHOW ALL" IS A TEXT CONTROL ON THE END OF THE ROW, NOT A CHIP. It is the one
+   pressable thing here, so it must not wear the chips' ground — a fourteenth
+   pill that happens to be clickable is the affordance failure §60 is about. An
+   underline and the page's own ink is what the reference draws and what §12's
+   `.lk` idiom already means in this product.
+
+   NO `margin-left:auto`. The link belongs to the END OF THE LIST, not to the
+   right-hand edge of the section: with an auto margin it would sit alone at the
+   far side of whatever line the chips stopped on, which at some widths is a
+   different line entirely. Left where the flow puts it, it reads as the last
+   item — which is what it is. */
+.app .skl-more{
+  display:inline-flex;align-items:center;
+  padding:var(--s03) 0;
+  background:transparent;border:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px}
+
+/* ------------------------------------------------------------------- 87.3 ---
+   THE FULL LIST IN THE DIALOG
+
+   §02.14 draws the sheet and this states one thing: the chip row inside it wraps
+   in the sheet's own measure with nothing else to compete with, so it needs no
+   top margin. `.sheet-b` has already paid `--s06` on all four sides.
+
+   THE SHEET IS CENTRED FROM 600 BY §02.422 — "a little modal on page mid" — and
+   bottom-anchored below that, which is the same dialog the profile and photo
+   sheets use. Nothing about the centring is stated here.
+   -------------------------------------------------------------------------- */
+.app .skl-full{margin-top:0}

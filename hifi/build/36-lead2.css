@@ -191,8 +191,16 @@
    `.btn-set` is a flex row and two of these have to WRAP: four
    recommendations do not fit on one line anywhere near a phone, and a board
    picker names its cohorts. Wrapping is all those two rules do.
+
+   BOTH READERS ARE GONE AND THE RULE WITH THEM. `.ldr-picker` went with the
+   fifteen-level picker on 1 Sep 2026 (the block directly below); `.ldr-recs`
+   stopped being a `.btn-set` on 2 Sep 2026, when the five recommendations became
+   a radio list — §91.7 states its stack, and a `flex-wrap` on a column is inert
+   anyway. Left in place this would have been a rule with no writer at all: the
+   "gate nothing writes" tell, and the second half of it (a class whose LAST
+   writer left) is the half that survives longest, because the rule went on
+   matching something real right up until it did not.
    -------------------------------------------------------------------------- */
-.app .ldr-recs,.app .ldr-picker{flex-wrap:wrap}
 /* THE FIFTEEN-LEVEL PICKER IS DELETED (1 Sep 2026) and it was the longest
    block in this layer: `.ldr-rungs` as a non-wrapping scroller below 900 and a
    fifteen-column grid above it, with the band break drawn as an
@@ -302,7 +310,7 @@
   .app .sec:has(> .msgs),.app .sec:has(> .ivt-lines){display:block}
   .app .sec:has(> .msgs) > .sec-h,
   .app .sec:has(> .ivt-lines) > .sec-h{
-    border-right:0;min-height:0;margin-bottom:var(--s05);
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}
 }
 
@@ -462,7 +470,7 @@
   .app .sec:has(> .tile .f) > .sec-h,
   .app[data-portal="leader"] .sec:has(> .tile) > .sec-h,
   .app[data-portal="leader"] .sec:has(> .tg) > .sec-h{
-    border-right:0;min-height:0;margin-bottom:var(--s05);
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding-left:0;padding-right:0}
   .app .sec:has(> .tile .f) > :not(.sec-h),
   .app[data-portal="leader"] .sec:has(> .tile) > :not(.sec-h),
@@ -693,10 +701,100 @@
 }
 .app .ldr-dm-back{flex:none;margin-right:var(--s02)}
 
+/* --------------------------------------------------------------------------
+   36.18b THE INBOX FILLS THE FRAME — Maryam, 2 Sep 2026: "this ui needs to be
+   full heighted, the message or discussion, the latest one appears at the
+   bottom … please follow the candidate portal implementation of messages."
+
+   THE CHAIN IS §15's, CLASS FOR CLASS. `V.messages` gets its height from four
+   rules — `.main:has(> .msg-page)` becomes a flex column that takes the frame's
+   slack, `.msg-page` takes the main's, `.msgs` takes the page's and the
+   composer sits on `margin-top:auto`. This is the same chain with `.msg-mod` in
+   place of `.msg-page` and one more link in it, because the leader's thread is
+   two panes inside a `.sec` rather than the page itself. `:has()` on `.main` is
+   what makes it work without a wrapper element, which is why §15 wrote it that
+   way and why copying the shape is better than inventing one.
+
+   IT REPLACES A CLAMP, AND THE CLAMP IS WHAT THE INSTRUCTION IS ABOUT.
+   `height:clamp(400px, 62cqh, 680px)` gave the pair a box in the middle of the
+   page: at 1280 the thread stopped 680px down with the composer under it and
+   white space below that to the ask dock. A chat is the one surface in this
+   product whose natural size is "whatever there is", because its content grows
+   from the bottom and the field has to stay under your thumb.
+
+   EVERY LINK NEEDS `min-height:0` **AND** `min-width:0`, AND LEAVING THE SECOND
+   OUT COST A BUILD. A flex item's default minimum on both axes is `auto`, which
+   resolves to its CONTENT — so without the height guard the thread pushes the
+   chain taller than the frame instead of scrolling inside it (the scroller
+   silently stops being a scroller and the composer leaves the screen), and
+   without the width guard the longest message decides how wide the page is.
+   Measured at 390 with only `min-height:0` stated: `.msg-mod` came out **1040px
+   inside a 390px frame**, every row of the rail running off the right edge with
+   its `text-overflow:ellipsis` never firing, because a cell that is never
+   narrower than its text has nothing to truncate.
+   §15 STATES BOTH FOR `.msg-page` AND THAT IS THE HALF THAT WAS COPIED WRONG —
+   its `min-height` chain and its `min-width` chain are written 200 lines apart
+   in that layer, so taking the first and missing the second is the easy mistake.
+   Both are here, on one line each.
+
+   THE THREAD HANGS FROM THE BOTTOM — `margin-top:auto` on the first message.
+   That is the half of "the latest one appears at the bottom" that CSS can
+   answer: with a short thread the messages sit on the composer rather than
+   floating at the top of an empty pane, and with a long one the declaration is
+   inert because there is no slack to distribute. `justify-content:flex-end` is
+   the obvious alternative and is the wrong tool — on an overflowing scroller it
+   puts the first message out of reach above the scroll origin. The other half
+   is a scroll, and it cannot be CSS: `ldrPinThread` (lead4.js) parks the
+   scroller at the foot after every render.
+   -------------------------------------------------------------------------- */
+/* `width:100%` IS NOT REDUNDANT WITH STRETCH, AND THIS IS THE THIRD THING §15
+   STATES THAT WAS EASY TO MISS (§15.1513 says it for `.msg-page`). `.page`
+   carries `margin:0 auto` to centre itself under a wide frame — and an AUTO
+   MARGIN ON THE CROSS AXIS TURNS `align-items:stretch` OFF. The item stops
+   being stretched to the container and becomes fit-content instead, capped by
+   its own `max-width:1040px`. Measured at 390 without it: the page came out
+   **1040px wide inside a 390px frame**, clipped by `.main`'s `overflow-x:hidden`
+   so nothing scrolled and nothing warned — the rail's rows simply ran off the
+   right edge with their ellipsis never firing.
+   That failure needs `display:flex` on `.main` to exist at all, which is why it
+   arrived with this block and not before it.
+
+   `padding-bottom` IS THE PAGE'S OWN RHYTHM, NOT §05's DOCK CLEARANCE (Maryam,
+   2 Sep 2026: "please utilize the full page height, take the field and the
+   divider at the bottom. obviously with bottom page padding"). §05 gives every
+   `.page` `--s12` — 96px — to clear the floating ask control, and this view
+   does not draw one: measured at 1728, `.askdock` is absent and 96px of empty
+   white sat under the composer while the thread scrolled above it. `--s06`
+   leaves the pane's closing hairline a section's worth of air below it, which
+   is what "with bottom page padding" asks for, and is the same number §16.680
+   pays under the candidate's composer. */
+.app .main:has(> .msg-mod){display:flex;flex-direction:column;flex:1;min-height:0}
+.app .page.msg-mod{
+  display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
+  width:100%;max-width:100%;box-sizing:border-box;
+  padding-bottom:var(--s06)}
+.app .page.msg-mod > .sec.ldr-dm-sec{
+  display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto;min-height:0}
+.app .main:has(> .msg-mod),.app .page.msg-mod,
+.app .page.msg-mod > .sec.ldr-dm-sec,
+.app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm,
+.app .ldr-dm > .ldr-dm-list,.app .ldr-dm > .ldr-dm-thread,
+.app .ldr-dm-thread > .msgs{min-width:0}
+.app .ldr-dm-thread > .msgs > :first-child{margin-top:auto}
+
+/* stacked, the pane that is showing is the one that fills — §36.18's
+   `display:flex` on the shown column is what this hangs off */
+@container app (max-width:899.98px){
+  .app .ldr-dm.show-thread > .ldr-dm-thread{flex:1 1 auto;min-height:0}
+  .app .ldr-dm.show-thread > .ldr-dm-thread > .msgs{
+    flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+  .app .ldr-dm > .ldr-dm-list{flex:1 1 auto;min-height:0;overflow-y:auto}
+}
+
 @container app (min-width:900px){
   .app .ldr-dm{
-    display:grid;grid-template-columns:25% 75%;gap:0;
-    height:clamp(400px, 62cqh, 680px)}
+    display:grid;grid-template-columns:25% 75%;gap:0}
   .app .ldr-dm-list{
     border-right:1px solid var(--rule);
     overflow-y:auto;overscroll-behavior:contain;min-height:0}
@@ -704,3 +802,97 @@
   .app .ldr-dm-thread > .msgs{
     flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 }
+
+/* --------------------------------------------------------------------------
+   36.19 A FIGURE BAND THAT BELONGS TO THE STRIP ABOVE IT — `.sec-band`
+   Maryam, 2 Sep 2026: "reduce the space above and below the 4 cards row."
+
+   THE FOUR FIGURES ARE THE TAB'S HEADLINE, NOT A SECTION OF THEIR OWN. On
+   Course Reports the strip picks a cohort and the band restates that cohort in
+   four numbers — average progress, behind pace, below the pass mark, never
+   signed in — so the band changes every time the strip is pressed. At the
+   page's own 24 + 24 it sat in the middle of 48px of white above and 48 below,
+   which reads as three unrelated blocks rather than as a control, its answer,
+   and then the table.
+
+   HALF THE FRAME, NOT NONE. `--s04` on both edges, so the band is 24px clear of
+   the strip and 24 clear of the heading under it — the same 24 that separates
+   two rows inside a table, which is the product's own "these belong together"
+   distance (§31.5's first-row rule reaches for it for the same reason). Zero
+   would attach the figures to the tab strip's bottom rule the way §36.17
+   attaches the Direct inbox, and these are not attached: the strip has its own
+   ground and the band has a border of its own.
+
+   TWO EARLIER RULES HAVE TO NAME IT, AND THIS ONE IS THREE CLASSES. That is
+   the whole of what made this take three goes, and both exclusions are the
+   documented practice rather than a shortcut:
+
+     §20's two pair rules  thirteen classes inside `@container app (min-width:
+                           900px)`, so a restatement would hold on a phone and
+                           lose at desktop. `:not(.sec-band)` on both sides.
+     §29.18                `.app .page > .sec:has(> .stats:only-child)` — the
+                           rule that actually governs a section whose only
+                           child is a figure band, and (0,5,0) rather than the
+                           (0,3,0) it reads as, because `:has()` carries its
+                           argument's specificity. It lost SILENTLY: a probe
+                           stylesheet with this exact selector appended after
+                           the app's own did not move the padding either, which
+                           is what a specificity loss looks like from the
+                           outside and is easy to read as "the rule is not in
+                           the build".
+
+   With both of them naming it, the only thing left to beat is §10's
+   `.sec{padding:var(--s06)}` at (0,1,0) and its restatement inside the 900
+   tier at the same weight, so this is stated once and reaches both tiers.
+   -------------------------------------------------------------------------- */
+.app .page > .sec.sec-band{
+  padding-top:var(--s04);padding-bottom:var(--s04)}
+
+/* --------------------------------------------------------------------------
+   36.20 THE MERGED RAIL — `.ldr-inbox-mk`, `.ldr-dm-lh`
+   Maryam, 2 Sep 2026, with a reference: Messages is one inbox, not two tabs.
+
+   THE BAR IS GONE AND SO IS EVERY RULE THAT DREW IT (Maryam, 2 Sep 2026:
+   "remove the top bar of tabs and search"). `.ldr-inbox-bar`, `.ldr-inbox-tabs`
+   and its four states, `.ldr-inbox-srch`, `.ldr-inbox-none` and
+   `.ldr-inbox-pick` are all deleted rather than left behind: the markup that
+   wrote them went with the same instruction, and a rule matching nothing is the
+   "gate nothing writes" tell §75 and §77 both record. §63 §33's two type rules
+   for the tabs go the same way.
+
+   WHAT THE BAR WAS FOR, AND WHY IT DID NOT SURVIVE THE LIST GETTING SHORT: it
+   filtered nine rows — three boards and six threads — every one of which is on
+   screen at once at desktop. A control that can only hide part of a list you
+   can already see whole is worse than no control.
+
+   THE RAIL'S TWO GROUPS ARE ONE LIST. `.ldr-dm-lh` was the list's single
+   heading ("Threads") and is now a group heading drawn twice; nothing about the
+   row changes between them except its mark, which is the point of merging them.
+
+   THE BOARD'S MARK IS THE COHORTS GLYPH, NOT ITS COVER (Maryam, 2 Sep 2026:
+   "cohorts images should not be shown there, only cohort icons would be
+   enough"). It was §86's 9:5 cover, 48 wide against the 36px face beside it, on
+   the argument that a cohort should wear one picture everywhere and that the
+   rectangle told the two kinds apart. Three title-card photographs stacked in a
+   235px rail is three pictures competing with the six faces under them, and the
+   faces are the ones that have to be recognised — a board is told apart by its
+   name. `I.group` is the mark the Cohorts rail slot already uses (`NAVSETS`),
+   so this is the product's own cohort glyph rather than a new one.
+
+   IT IS A 36px SQUARE, WHICH IS THE FACE'S BOX. Both kinds of row now start
+   their text at the same x, which the 48px rectangle never did — §86's own
+   straight-edge argument, turned on the component that was breaking it. The
+   ground is `--layer-02` and the glyph `--icon-secondary`: a mark that is a
+   category rather than a person should not read as a photograph that failed to
+   load, which is §77.7's finding for the black card's label mark.
+   -------------------------------------------------------------------------- */
+/* `.ldr-dm-t.is-off` / `.ldr-dm-lh.is-off` ARE DELETED TOO. They were the
+   search's only handle — it filtered the rail in place rather than re-rendering,
+   because a re-render per keystroke destroys the field and takes the caret with
+   it (ai4's trap, and §99's notes panel makes the same trade). The technique is
+   worth keeping and is recorded in §31's own note about the attention queue's
+   deleted search; the class is not, because nothing writes it. */
+.app .ldr-inbox-mk{
+  flex:none;width:36px;height:36px;display:grid;place-items:center;
+  background:var(--layer-02)}
+.app .ldr-inbox-mk svg{width:20px;height:20px;fill:var(--icon-secondary)}

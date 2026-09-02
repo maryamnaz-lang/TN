@@ -1,0 +1,152 @@
+/* ==========================================================================
+   97. THE LEVEL IS A BLACK CARD ON BOTH PAGES, AND IT PAYS THE PAGE GUTTER
+   Maryam, 2 Sep 2026, over two asks: "the black card should not be attached, it
+   needs to follow the page padding we are using on black cards", and "where you
+   are on the ladder should be in the black card".
+
+   --------------------------------------------------------------------- 1 ---
+   THE REPORT'S HERO IS INSET
+
+   §25.591 states `.app .modhead .lvl-hero{margin-left:0;margin-right:0}` — the
+   band's members are full-bleed by design, because the band is one block and a
+   member that indents itself breaks the spine the `.ph` and Tal's card share.
+   That is right for every other member and wrong for this one: `.lvl-hero` is
+   BLACK, so full-bleed does not read as a member of the band, it reads as the
+   page turning black. §75.3 records the identical finding for `.rec-dark` —
+   "the black is on the `.sec`, so it ran rail to rail and met the head band's
+   closing hairline directly" — and answers it the same way, with `--pad-x` as a
+   margin so the card's edges land on the page's own spine.
+
+   THE FRAME COMES DOWN TO `--s07` WITH IT. §10.198/§14.404 give the hero
+   `--s08`/`--s09` of padding — 32 rising to 48 — which was the right frame for
+   a full-bleed surface, where the padding IS the page gutter and there is
+   nothing else holding the words off the edge. Inset, the two add up: 32 of
+   margin and 48 of padding put the level name 80px in. `--s07` is the number
+   §75 gives every black card and the number this one now has on all four sides.
+
+   IT IS NOT CONVERTED TO `.dark-card`, AND THAT IS DELIBERATE. `.lvl-hero` is in
+   ai5's `DARK_CARD` and `placeDark` is what puts it in the band in the first
+   place; taking it off that list would drop the card into the page body, which
+   is a different change from the one asked for. What this does is give the
+   hoisted card the geometry the page-body card already has.
+
+   --------------------------------------------------------------------- 2 ---
+   MY LEVEL'S LADDER WING GOES BLACK, AND IT REVERSES 31 AUG
+
+   `lvlWing`'s own note is the argument for the white version and it stands as
+   the record: "MY LEVEL OPENS ON THE LADDER WING, NOT ON THE BLACK HERO —
+   Maryam, 31 Aug 2026". Two of its three points survive intact and are the
+   reason this is `.dark-card` rather than a return to `.lvl-hero`:
+
+     1. IT MUST NOT GO BACK INTO THE HEAD BAND. That was the whole of the 31 Aug
+        ask — "take the black card out of the summary section, put it after it".
+        `.lvl-hero` is in `DARK_CARD` and would be hoisted; `.dark-card` is in no
+        pass's list (§75's whole point), so the section stays exactly where the
+        view writes it and only its ground changes.
+     2. IT IS STILL `ladderWing`'S SHAPE. Every §59 rule is written
+        `.app .wing-lvl …` rather than scoped to the band, so the component
+        travels; what follows is only the handful of values that were chosen
+        FOR a light ground.
+
+   §59 §2's NOTE IS THE MAP OF THIS BLOCK, read backwards. That layer moved four
+   values off §05's hero treatment because "the wing is not dark" — the track,
+   the labels, the lit level's two tints and the `<small>`. The wing IS dark
+   here, so all four go back, and each one below names the §59 rule it answers.
+
+   THE LIT LEVEL'S STRIP IS THE ONE THAT NEEDED THINKING ABOUT, TWICE. §59.234
+   mixes both tints with `#fff` — 14% and 38% of the accent on white — which on
+   black is two pale bars brighter than the three FINISHED levels beside them,
+   so the level you are on reads as further along than the ones behind it. Mixed
+   with the card's ground instead, the same two percentages went the other way
+   and came out at #493322: warmer than the empty track and barely a shade off
+   it, which is the tell that a mix carried across grounds keeps its arithmetic
+   and loses its meaning. 38/62 restores what the pair is FOR — clearly lit
+   against the track, clearly under the solid accent of the levels behind it —
+   and keeps §59's own 24-point separation between the two stops so the
+   travelling strip reads the same. The animation is untouched.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 3 ---
+   A BLACK CARD'S TWO NEIGHBOURS — Maryam, 2 Sep 2026, one ask each way
+
+   "REDUCE THE SPACE BETWEEN THE BANNER AND THE BLACK CARD" IS §75.183's OWN
+   ARGUMENT, MIRRORED. That rule zeroes the top padding of the section AFTER a
+   card, on the reasoning that 48 is "two frames, not one gap" — the card
+   carries `margin:var(--s06)` on both edges and the neighbour then pays §10's
+   base 24 on top of it. Everything in that note is true above the card as well
+   and nobody had asked yet, so only one edge had been answered. Keyed on
+   `:has(+ .sec.dark-card)` rather than on the banner, because the property
+   belongs to the CARD — §75.4's shape, stated one more time.
+
+   AND A TINTED SECTION KEEPS ITS TOP PADDING, WHICH IS §75.183's ONE EXCEPTION.
+   That rule was written for the Quick Actions row under the recommendation: a
+   WHITE section, where the card's margin and the section's padding are the same
+   white space and paying for both is paying twice. A tinted section paints its
+   own ground, so the card's margin is white space OUTSIDE the band and cannot
+   stand in for the band's inside — zeroed, "How the ladder works" sat on the
+   top edge of its own grey (Maryam: "the how it works heading is attached to
+   the top of it's bg"). The distinction is whether the neighbour has a ground
+   of its own to hold the words off, and it is the same distinction §84 draws
+   about which sections need a rule between them.
+   -------------------------------------------------------------------------- */
+.app .page > .sec:not(.dark-card):has(+ .sec.dark-card){padding-bottom:0}
+.app .page > .sec.dark-card + .sec.tint{padding-top:var(--s06)}
+
+/* ---- 1. the report hero ----
+   IT IS STATED FOR BOTH PLACES THE CARD LIVES, and finding that out cost a
+   build. `placeDark` only lifts the hero into the band at desktop; below 900
+   the same card is a plain child of `.page`, so a `.modhead .lvl-hero` rule
+   measured 0/0 margin at 744 and looked like it had not applied at all. The
+   unconditional rule is the one that does the work and the `.modhead`
+   restatement exists only to outweigh §25.591, which is (0,3,0).
+
+   AND THE PADDING NEEDS THE QUERY, per trap 3: §14.404 sets this element's side
+   padding inside `@container app (min-width:900px)`, and a container query is
+   its own cascade tier — an unconditional rule cannot answer it at any weight.
+   That is exactly the seam where the card is full-bleed in the band, so getting
+   it wrong is invisible on a phone and wrong on the screen this was asked about. */
+.app .lvl-hero{
+  margin-left:var(--pad-x);margin-right:var(--pad-x);
+  padding:var(--s07)}
+.app .modhead .lvl-hero{margin-left:var(--pad-x);margin-right:var(--pad-x)}
+@container app (min-width:900px){
+  .app .lvl-hero{padding:var(--s07)}
+  .app .modhead .lvl-hero{margin-left:var(--pad-x);margin-right:var(--pad-x)}
+}
+/* THE VERTICAL PAIR IS STATED AGAIN, LAST, because three earlier rules split
+   this element's padding across four declarations: §12.458 and §12.466 own the
+   top, §10.1191 zeroes the bottom (the hero used to end on the ladder's own
+   labels, with `placeLevelCards`' foot supplying the space), and only the sides
+   came from the shorthand above. A shorthand does not beat a longhand that
+   lands later, so the card measured 40 top and 0 bottom inside a 32px frame.
+   `.app .page > .lvl-hero` and the `.modhead` form are both (0,3,0), which is
+   what §12.466's query tier needs. */
+.app .page > .lvl-hero,.app .modhead .lvl-hero{
+  padding-top:var(--s07);padding-bottom:var(--s07)}
+@container app (min-width:900px){
+  .app .page > .lvl-hero,.app .modhead .lvl-hero{
+    padding-top:var(--s07);padding-bottom:var(--s07)}
+}
+
+/* ---- 2. the ladder wing on black ---- */
+/* §04.100 gives `.stp` 16px top and bottom, which inside a 32px frame is a
+   frame charged twice — §77.5's finding on `.crow-a`, one component over. */
+.app .sec.dark-card > .wing-lvl{padding:0}
+/* answers §59.109 — back to §05's on-dark track.
+   `:not(.done):not(.on)` IS LOAD-BEARING AND IT SHIPPED WITHOUT IT FOR ONE
+   BUILD. §59.118's `.wing-lvl .ladder i.done{background:var(--accent)}` is
+   (0,4,0) and so is a bare `.dark-card .wing-lvl .ladder i` — equal weight, and
+   this layer is later, so the empty-track grey won and the three FINISHED
+   levels went grey with the eleven ahead of them. The ladder read as "nothing
+   done" on the one page whose subject is how far you have come. */
+.app .dark-card .wing-lvl .ladder i:not(.done):not(.on){background:var(--on-dark-rule)}
+/* answers §59.122 — back to §05.35's on-dark label */
+.app .dark-card .wing-lvl .ladder-lab{color:var(--on-dark-2)}
+/* answers §59.234 and §59.298 — both tint pairs mixed with the card's ground
+   rather than with white. `--gray-100` by name because `.dark-card`'s ground is
+   a `background-image` over it and `color-mix` cannot read a gradient. */
+.app .dark-card .wing-lvl .ladder i.on{
+  --lvl-a:color-mix(in srgb, var(--accent) 38%, var(--gray-100));
+  --lvl-b:color-mix(in srgb, var(--accent) 62%, var(--gray-100))}
+.app .dark-card .wing-lvl .ladder-track i.mine{
+  background-color:color-mix(in srgb, var(--accent) 26%, var(--gray-100))}
