@@ -796,6 +796,51 @@ LAYERS = [
     # `starter.html` has both; a page that invents its own gutter gets its own
     # number, which is the correct behaviour rather than a bug.
     '101-blockgap.css',
+    # THE AWARD CARD (§102) — the badges and rank rows as upright bordered cards
+    # in a fixed-track grid, artwork centred, words left, a meter at the foot.
+    # IT CROSSES BECAUSE BOTH HALVES ALREADY DO: `.aw`, `.aw-art`, `.aw-n`,
+    # `.aw-d`, `.aw-v`, `.aw-s` and §02's `.pb-track` / `.pb-fill` are all in the
+    # output, so this is the one layer that turns them into a collection view —
+    # the shape a second portal reaches for the moment it has a set of earned
+    # things to show, and the shape it would otherwise have to invent.
+    # THE ARTWORK IS THE HOST'S, like `.crt-art` and `.gcard-art` before it: the
+    # rules know nothing about the pictures, so a hand-authored page points the
+    # `<img>` at its own and gets the whole component.
+    # NO JS AND NO RENDER PASS.
+    '102-awardcards.css',
+    # A FACE IN A THREAD IS A DISC (§103) — `.m-av` on both sides and the chat
+    # header's face.
+    # IT CROSSES BECAUSE THE THREAD DOES. §100 already ships `.m`, `.m-av`,
+    # `.m-b` and `.mhead-*` and `gallery.html` documents them, so without this
+    # a hand-authored thread gets round faces in the cohort room (§89.2) and
+    # square ones in the DM — the half-shipped family this list exists to stop.
+    # NO JS AND NO RENDER PASS.
+    '103-threadface.css',
+    # WHO IS LOGGING IN (§104) — the role blocks on the Log in screen.
+    # IT CROSSES BECAUSE THE AUTH SURFACE DOES: `auth*` came off
+    # EXCLUDE_PREFIXES deliberately, so `.form-page`, `.auth-id` and `.sec-rule`
+    # are all in the output, and this is the one selected/unselected TILE the
+    # box ships — a shape a second portal wants the first time it asks a
+    # question with two answers, and one it would otherwise build out of `.rad`
+    # plus a guessed ground.
+    # IT READS `--auth-r`, which §01 declares on `:root` and the box carries, so
+    # the radius is the same 8 a hand-authored auth screen already has.
+    # NO JS AND NO RENDER PASS — the `checked` attribute and the `.on` class are
+    # the host page's to write from its own state.
+    '104-loginrole.css',
+    # THE PROFILE PAGE (§105) — the identity band's marks, the two-panel pair,
+    # the switch row, and the invitation's marks.
+    # IT CROSSES BECAUSE EVERY COMPONENT IT ARRANGES IS ALREADY IN THE OUTPUT —
+    # `.facts`, `.nrow`, `.crt-card`, `.tg`, `.lead-b` — and this is the one
+    # layer that says how two of them sit BESIDE each other. `.pf-pair` and
+    # `.pf-card` are the box's only two-panel row: a hand-authored page that
+    # wants "what you hold beside what happened" gets the frame, the head row
+    # with its trailing control, and the stack below 900 for free.
+    # `.pf-ach` READS `--crt-art-w/h`, which §96 declares, so a second portal
+    # pointing the `<img>` at its own artwork gets the small card as well.
+    # NO JS AND NO RENDER PASS — the `--mk` on each mark is the markup's, which
+    # is §72's `pulseCol` idiom and needs no class per hue.
+    '105-profile.css',
 ]
 
 # ==========================================================================

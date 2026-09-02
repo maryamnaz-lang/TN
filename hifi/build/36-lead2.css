@@ -849,7 +849,7 @@
   padding-top:var(--s04);padding-bottom:var(--s04)}
 
 /* --------------------------------------------------------------------------
-   36.20 THE MERGED RAIL — `.ldr-inbox-mk`, `.ldr-dm-lh`
+   36.20 THE RAIL — `.ldr-dm-lh`
    Maryam, 2 Sep 2026, with a reference: Messages is one inbox, not two tabs.
 
    THE BAR IS GONE AND SO IS EVERY RULE THAT DREW IT (Maryam, 2 Sep 2026:
@@ -869,30 +869,17 @@
    heading ("Threads") and is now a group heading drawn twice; nothing about the
    row changes between them except its mark, which is the point of merging them.
 
-   THE BOARD'S MARK IS THE COHORTS GLYPH, NOT ITS COVER (Maryam, 2 Sep 2026:
-   "cohorts images should not be shown there, only cohort icons would be
-   enough"). It was §86's 9:5 cover, 48 wide against the 36px face beside it, on
-   the argument that a cohort should wear one picture everywhere and that the
-   rectangle told the two kinds apart. Three title-card photographs stacked in a
-   235px rail is three pictures competing with the six faces under them, and the
-   faces are the ones that have to be recognised — a board is told apart by its
-   name. `I.group` is the mark the Cohorts rail slot already uses (`NAVSETS`),
-   so this is the product's own cohort glyph rather than a new one.
-
-   IT IS A 36px SQUARE, WHICH IS THE FACE'S BOX. Both kinds of row now start
-   their text at the same x, which the 48px rectangle never did — §86's own
-   straight-edge argument, turned on the component that was breaking it. The
-   ground is `--layer-02` and the glyph `--icon-secondary`: a mark that is a
-   category rather than a person should not read as a photograph that failed to
-   load, which is §77.7's finding for the black card's label mark.
+   THE BOARD'S MARK IS DELETED WITH THE BOARDS (2 Sep 2026). `.ldr-inbox-mk`
+   was a 36px square holding `I.group`, and it lasted one build: it replaced
+   §86's 9:5 cohort cover on Maryam's "cohorts images should not be shown there,
+   only cohort icons would be enough", and then the whole Cohort boards section
+   came out of Messages on the same day. Its two rules go with `boardRow`, which
+   was the only thing that ever wrote the class.
+   WHAT THE COVER ARGUMENT WAS, in case a board ever comes back to a rail: three
+   title-card photographs stacked in a 235px column compete with the six faces
+   under them, and the faces are the ones that have to be recognised — a board
+   is told apart by its name. `I.group` is the mark the Cohorts rail slot uses
+   (`NAVSETS`), so it is the product's own cohort glyph rather than a new one,
+   and a 36px square is the face's box, which is what keeps both kinds of row
+   starting their text at the same x.
    -------------------------------------------------------------------------- */
-/* `.ldr-dm-t.is-off` / `.ldr-dm-lh.is-off` ARE DELETED TOO. They were the
-   search's only handle — it filtered the rail in place rather than re-rendering,
-   because a re-render per keystroke destroys the field and takes the caret with
-   it (ai4's trap, and §99's notes panel makes the same trade). The technique is
-   worth keeping and is recorded in §31's own note about the attention queue's
-   deleted search; the class is not, because nothing writes it. */
-.app .ldr-inbox-mk{
-  flex:none;width:36px;height:36px;display:grid;place-items:center;
-  background:var(--layer-02)}
-.app .ldr-inbox-mk svg{width:20px;height:20px;fill:var(--icon-secondary)}

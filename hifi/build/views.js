@@ -24,6 +24,13 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editProfile:false, editPhoto:false, stg:0, notes:false, iv:'level',
+  /* WHICH ACCOUNT THE LOG IN SCREEN IS SIGNING INTO — `candidate` or `leader`
+     (Maryam, 2 Sep 2026). It is `S` and not a DOM class for trap 9's reason:
+     `render()` replaces `device.innerHTML`, so a natively-checked radio is
+     gone at the next paint and the `checked` attribute has to be written from
+     here on every render. It defaults to the candidate because that is the
+     portal the product opens in and the stage picker's own default. */
+  role:'candidate',
   /* EVERY DISCLOSURE IS CLOSED UNTIL IT IS OPENED, AND THEY ARE KEYED BY NAME.
      "What the interview found" starts closed because it is the longest block
      on the two dashboards that carry it and it is a re-read — see the note
@@ -1689,7 +1696,25 @@ function certBanner(f, {close = false, key = 'cert'} = {}){
   const c = certsFor(f).slice(-1)[0];
   return `<div class="sec">
     <div class="certban">
-      <span class="certban-mk">${I.certificate}</span>
+      ${''/* THE MARK IS THE CERTIFICATION BADGE, NOT A GLYPH OF ONE (Maryam,
+             2 Sep 2026: "in these banners, use the badges we are using on the
+             achievements page, not these badge icons").
+
+             IT IS THE SAME PICTURE THE SAME ROW DRAWS ONE CLICK AWAY.
+             `CERT_ART.explorer` is what the Achievements module's Certificates
+             tab puts against this certificate — `certAll` stamps `k:'explorer'`
+             on every `CERTS` row, so the hero, the grid card and this banner
+             are three sizes of one asset and cannot disagree about which award
+             they are announcing. `I.certificate` was a picture of the CATEGORY,
+             which is `ACH`'s own argument for the award WebPs ("a generic glyph
+             of a shield is a picture of the category instead").
+
+             IT IS NOT `AWARD`, and the distinction is worth stating because the
+             ask says "the badges on the achievements page" and that page draws
+             two sets: `AWARD`'s medals on the Badges and Rank tabs, and
+             `CERT_ART`'s badges on Certificates. This banner is a certificate,
+             so it takes the certificate's. */}
+      <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
       <span class="certban-b">
         <span class="certban-t">Explorer Track &ndash; ${c.lvl}</span>
         <span class="certban-m">Completed ${c.on} &middot; ${c.cohort}</span>
@@ -2433,15 +2458,67 @@ function pointsList(g){
     state:g.got.includes(i)?'got':'not', when:g.last[i]
   })).join('');
 }
+/* ==========================================================================
+   A BADGE AND A RANK ARE CARDS — §102, and the points list is not
+   Maryam, 2 Sep 2026, with a reference screen: "I want the badges and ranks
+   page layout like this… by layout i mean the cards layout against badges and
+   ranks tabs… do not change our design look and feel, just adapt this
+   structure."
+
+   THE STRUCTURE IS THE ASK AND THE LOOK IS NOT. What the reference adds over
+   `awardRow` is a shape, not a style: the artwork stops being a 32px mark at
+   the head of a row and becomes the card's subject, with the name, what it
+   asks of you, the points it pays and how far along you are stacked under it.
+   Everything that draws it is already ours — §41's hairline frame on
+   `--layer-01`, square by token, `.pb-track` / `.pb-fill` for the meter, and
+   the same four type classes the row uses, so §63 states not one new role.
+
+   AND IT IS §96's CARD, DELIBERATELY. The certificates tab one click away is a
+   fixed-track grid of bordered upright cards with the badge centred and the
+   words left — Maryam's own correction on that tab the same day ("the red lined
+   box shows where the card content needs to be, it should be left aligned. the
+   badge will stay in the center"). Two tabs of one module drawing the same
+   object two ways is worse than either way, so the reference's centred text
+   loses to the decision already made next door, and the note in §102 says so.
+
+   THE POINTS TAB STAYS A LIST AND THAT IS NOT AN OMISSION. Nine rows, each a
+   different ACTIVITY with a Phosphor mark on its own hue (§94) and no artwork
+   at all — a card grid there would be nine boxes whose subject is a glyph, and
+   the list is scanned down a column of values on purpose. The ask names the two
+   tabs whose rows are pictures of an object.
+
+   ONE THING PER CARD CHANGES WHEN IT IS EARNED and it is the meta line, not the
+   bar: an earned card reads "Awarded <date>" over a full meter, an unearned one
+   the percentage over its own. The bar is drawn in both states so the cards in a
+   row are one height, and 100% under an earned badge is true rather than
+   decorative. `.aw.not`'s grayscale (§15.1442) is untouched — the reference
+   draws every badge in full colour, which is its look and not its structure.
+   ========================================================================== */
+function awardCard({name,desc,val,state,when,pct,art}){
+  const got = state==='got';
+  const p = got ? 100 : Math.max(0, Math.min(100, pct||0));
+  return `<div class="aw awc ${state} has-art">
+    <span class="aw-art"><img src="${AWARD[art]}" alt=""></span>
+    <span class="aw-b">
+      <span class="aw-n">${name}</span>
+      <span class="aw-d">${desc}</span>
+    </span>
+    <span class="aw-v awc-v">+${val}</span>
+    <span class="awc-m">
+      <span class="aw-s">${got?'Awarded '+when:p+'%'}</span>
+      <span class="pb-track"><span class="pb-fill" style="width:${p}%"></span></span>
+    </span>
+  </div>`;
+}
 function badgeList(g){
   return BDG.map((b,i)=>{
     const got = i < g.badges;
-    return awardRow({name:b.n, desc:b.d, val:b.v, state:got?'got':'not', art:BDG_ART[i],
+    return awardCard({name:b.n, desc:b.d, val:b.v, state:got?'got':'not', art:BDG_ART[i],
       when:'11/06/2026', pct: got?undefined:(b.need?Math.min(99,Math.round(g.pts/b.need*100)):0)});
   }).join('');
 }
 function rankList(g){
-  return RANKS.map((r,i)=>awardRow({name:r.n, desc:r.d, val:r.v, art:'rank'+(i+1),
+  return RANKS.map((r,i)=>awardCard({name:r.n, desc:r.d, val:r.v, art:'rank'+(i+1),
     state:i<g.rank?'got':'not', when:'07/23/2026', pct:i<g.rank?undefined:0})).join('');
 }
 
@@ -4484,7 +4561,26 @@ function talRec(title){
    are exclusive on purpose: `data-go` navigates, `data-tal-ask` opens the
    thread, `data-peek` opens the right-hand column, and a button carrying two
    would do whichever the delegated handler reached first. `hue` is a NAMED class per §70.6 — never an index — so inserting a card
-   at the front cannot repaint the others. */
+   at the front cannot repaint the others.
+
+   AND A `go` CARD MAY CARRY `disc:'<key>'` — THE SECTION IT IS SENDING YOU TO,
+   OPEN ON ARRIVAL (Maryam, 2 Sep 2026: "when I click on the Your session, step
+   by step quick actions … I want only this time the how it works collapsed
+   section already opened up when i land on the interviews page"). It emits
+   `data-disc`, which the `[data-go]` branch reads one statement before `go()`.
+
+   IT IS AN ATTRIBUTE ON THE SAME BUTTON, NOT A FOURTH EXCLUSIVE FIELD, and
+   `data-read` on that branch is the precedent — a card still navigates, this
+   only says what state the destination should be in when it gets there. Making
+   it a fourth `go`/`ask`/`peek` sibling would have meant a card that opens a
+   disclosure and goes nowhere.
+
+   AND IT IS PER-ROUTE, NOT PER-PAGE. `V.interviews` still draws the block
+   closed for every other way in — the rail, the crumb, a notification — which
+   is the whole of "only this time". What it does NOT do is shut again behind
+   you: `S.disc.how` is the reader's own flag from then on, exactly as it is
+   when they open the block by hand, and a card that re-closed it on the next
+   render would be the page arguing with the press that opened it. */
 const QA_NEW = [
   /* `peek`, NOT `go`. Opening the breakdown as a right-hand column keeps the
      dashboard on screen beside it, which is §44's whole argument and is what
@@ -4499,7 +4595,7 @@ const quickActions = (cards) => `<div class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
   <div class="qa">${(cards || QA_NEW).map(c => `
     <button class="qa-c" ${c.ask ? `data-tal-ask="${c.ask}"`
-      : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}>
+      : c.peek ? `data-peek="${c.peek}"` : `data-go="${c.go}"`}${c.disc?` data-disc="${c.disc}"`:''}>
       <span class="qa-ic ${c.hue}">${c.ic}</span>
       <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
       <span class="qa-go">${I.arrowRight}</span>
@@ -4550,10 +4646,65 @@ const authId = (label, email, back) => `
     </div>
   </div>`;
 
+/* ==========================================================================
+   WHO IS LOGGING IN — §104, and it is the first thing the screen asks
+   Maryam, 2 Sep 2026: "remove the line beneath the Enter the email address and
+   password on your TalentNext account text. I need a role selection on this
+   modal after the description. So there will be two block in a row like the one
+   we are using on the create account page… both block will have radio buttons
+   on left, first one will have light orange background and orange radio button
+   and orange text, the text will be 'Login as Candidate'. The other will have a
+   grey background with no border and unselected radio button and black text of
+   'Login as Cohort Leader'. Please keep the corners of these blocks round as
+   much as we have the orange block corner radius on create account page."
+
+   THE TWO STATES SHE DESCRIBES ARE THE SELECTED AND UNSELECTED STATES OF ONE
+   CONTROL, not two different blocks. Light orange with orange ink is chosen and
+   grey with black ink is not, so the pair swaps the moment you press the second
+   one — §60's rule is that a dead control on a live surface is worse than a
+   missing one, and a radio you cannot select is the clearest case of one.
+
+   AND IT ACTUALLY SIGNS YOU IN AS THE LEADER. A control reading "Login as
+   Cohort Leader" that lands on the candidate's dashboard is worse than a dead
+   one: it is a control that lies. `data-loginas` on the button is one branch
+   over `go('stage:new')` — `setStage` resets `S.portal` by design (its own note
+   says so), so the portal is stamped AFTER it, which is the order §69's rule
+   about `COHORT_LEAD` and lead.js is written for.
+
+   IT IS §02's OWN RADIO, `.rad`, WHICH IS WHAT `.ldr-rec` USES. A real
+   `<label>` + `<input type="radio">`, which this screen can host because it is
+   a form rather than §76's `<button>` grid; the `checked` attribute is written
+   from `S.role` on every render (trap 9) and `data-lrole` stays on the label so
+   one handler answers both halves.
+
+   THE UNCHOSEN RING NEEDED NO NEW RULE AND THE CHOSEN ONE DID, which is worth
+   knowing before reusing `.rad` for anything that has to be orange: §02.201
+   fills a checked box with `--brand-primary`, and that token is **#000000** in
+   this build — the brand is black and the orange is `--accent`. So a radio
+   inside an accent-tinted block is black until §104 says otherwise, and it does
+   (§104's own note has the arithmetic).
+   ========================================================================== */
+const LOGIN_ROLES = [['candidate','Login as Candidate'],['leader','Login as Cohort Leader']];
+const loginRoles = () => `
+  <div class="sec sec-role">
+    <div class="role-pick">
+      ${LOGIN_ROLES.map(([k,l])=>`<label class="rad role-c${
+        (S.role||'candidate')===k?' on':''}" data-lrole="${k}"><input type="radio" name="lrole"${
+        (S.role||'candidate')===k?' checked':''}><span class="box"></span><span class="txt role-t">${l}</span></label>`).join('')}
+    </div>
+  </div>`;
+
 const AUTH = {
 login: () => `${authShell()}
 <main class="main"><div class="page form-page">
   ${ph('Log in','Enter the email address and password on your TalentNext account.')}
+  ${''/* THE ROLE COMES BEFORE THE CREDENTIALS because it decides what the two
+        fields under it are for, and because §57.4b's argument for the create
+        screen applies here word for word: the block with a ground of its own is
+        what separates the description from the form, so the hairline §17.6 drew
+        there is the "second boundary for one join" that layer removed. §104
+        takes the line off, keyed on what PRECEDES the fields. */}
+  ${loginRoles()}
   <div class="sec sec-rule">
     <div class="f"><label for="lem">Email address</label>
       <input class="inp fill" id="lem" type="email" value="maryam.naz@tkxel.io"></div>
@@ -4563,7 +4714,7 @@ login: () => `${authShell()}
     <p class="t-body-02 aux"><a data-go="forgot">Forgotten your password?</a></p>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-go="stage:new">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-loginas="${S.role||'candidate'}">Log in ${I.arrowRight}</button></div><p class="t-body-02 mt5" style="color:var(--text-secondary)">Don&rsquo;t have an account? <a data-go="create">Sign up</a></p></div>
   </div>
 </div></main>`,
 
@@ -5021,7 +5172,15 @@ V.dashboard = (f) => {
           with an `.ai-aura` under the cards), not a numbered list. */}
     ${quickActions([
       {ic:I.video, hue:'ic-cover', t:'Your session, step by step',
-       d:'How 45 minutes interview will set your level', go:'interviews'},
+       d:'How 45 minutes interview will set your level', go:'interviews',
+       /* THE CARD IS A ROUTE TO ONE BLOCK, SO IT OPENS IT (Maryam, 2 Sep 2026).
+          "How it works" is the four figures and the four numbered steps, and it
+          is closed by default because on every other way into that page it is a
+          re-read. This card is the exception by construction: its title and its
+          description ARE that section's subject, so landing on a shut chevron
+          is the press appearing not to have worked. `disc` is documented over
+          `quickActions`. */
+       disc:'how'},
       {ic:I.lightning, hue:'ic-prep', t:'What to bring',
        d:'Ask Tal what to have ready for the call.',
        ask:'What should I prepare for my level interview?'}
@@ -5539,7 +5698,6 @@ const lvlWing = f => {
 };
 
 V.level = (f) => {
-  const confirmed = !f.pred;
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'My Level')}
   ${''/* NO DESCRIPTION. The old pair named the page's three sections, which
@@ -5586,12 +5744,11 @@ V.level = (f) => {
         of the interviews it came out of. Read here it was a report with no
         interview beside it; read there it is the newest row's own findings.
 
-        THE NON-CONFIRMED BRANCH STAYS AND IS ALL THAT IS LEFT. "What the
-        Explorer track means" is not the report — it is what the TRACK is, for a
-        reader whose quiz has given them a track and no level yet — so it
-        belongs to this page and to no other. The `.sec` is now gated rather
-        than holding a ternary, because a section that renders empty still pays
-        its padding and draws its closing hairline.
+        THE NON-CONFIRMED BRANCH — "What the Explorer track means" — HAS SINCE
+        GONE TOO (Maryam, 2 Sep 2026: "remove the A quiz cannot set your level
+        row and what the explorer track means as well"), so this slot now holds
+        nothing on any stage and the note below is the second half of the same
+        removal.
 
         WHAT THIS PAGE NO LONGER HAS IS A ROUTE TO `V.report`, and that is
         stated rather than discovered: the foot action went with the block. The
@@ -5599,15 +5756,27 @@ V.level = (f) => {
         module), from the `assessed` and `promoted` dashboards' "What the
         interview found" Quick Action, and from the block's own foot button in
         its new home. Three ways in, none of them this page. */}
-  ${!confirmed?`<div class="sec">
-    <div class="tile bordered">
-      <div class="ai-head"><h3>What the Explorer track means</h3></div>
-      <div class="ai-body">
-        <p>Explorer is the first of three tracks. It is for people who already lead work but not a whole function, and it covers the operating basics: rhythm, delegation, hard conversations and feedback.</p>
-        <p>Your interview places you on one of five levels inside it, and that decides which course you take.</p>
-      </div>
-    </div>
-  </div>`:''}
+  ${''/* AND THE TRACK EXPLAINER IS GONE — TWO PARAGRAPHS ABOUT THE TRACK ON A
+        PAGE THAT DRAWS IT (Maryam, 2 Sep 2026). It was a `.tile bordered` with
+        "What the Explorer track means", gated on `!confirmed`.
+
+        BOTH OF ITS SENTENCES ARE SAID BETTER 200px EITHER SIDE OF IT. "Explorer
+        is the first of three tracks" is the first row of "How the ladder works"
+        at the foot of this page — "Explorer (E1–E5), Builder (B1–B5),
+        Trailblazer (T1–T5)" — which states it as the three names rather than as
+        a claim about one. "Your interview places you on one of five levels
+        inside it" is what the wing directly above it draws: the fifteen-rung
+        band with Explorer's five lit and "1–5 of 15 in this track" beside them,
+        under a subtitle reading "Your level is set at the interview".
+
+        SO IT WAS PROSE RESTATING A DIAGRAM ON THE ONE PAGE WHOSE SUBJECT IS
+        THAT DIAGRAM, which is the same test `.sec-qa` was cut down by and the
+        one `PAGESUM`'s note calls "no pointing at the UI" one level up.
+
+        `confirmed` GOES WITH IT. Both of the blocks it gated are gone and it had
+        no third reader in this view — a `const` nothing reads is the "gate
+        nothing writes" tell in JS. `lvlWing` keeps its own copy, which is where
+        the pre-interview / confirmed split is actually drawn. */}
   ${''/* THE CERTIFICATE BAND IS NOT HERE ANY MORE — IT OPENS THE PAGE (Maryam,
         1 Sep 2026: "take the badge banner below the tal summary section"). The
         call is directly after `ph()` and the note there is the placement
@@ -5632,9 +5801,27 @@ V.level = (f) => {
         than a new one. A certificate is a course you finished, so the stages
         with nothing finished draw nothing — and matching Course Progress means
         the two pages cannot disagree about whether one exists. */}
-  ${!confirmed?`<div class="sec">
-    <div class="note quiet note-act"><span>${I.info}</span><div class="nb"><b>A quiz cannot set your level</b>It only tells you your track. An interview with an agent sets the level, and your report follows within 48 hours.</div><button class="btn btn-p ic-l note-cta" data-go="agents">${I.calendar}Book your interview</button></div>
-  </div>`:''}
+  ${''/* "A QUIZ CANNOT SET YOUR LEVEL" IS OFF THIS PAGE (Maryam, 2 Sep 2026:
+        "remove the A quiz cannot set your level row"). It was a `.note quiet
+        note-act` — the info mark, the two-sentence rule, and a black "Book your
+        interview" beside it — gated on `!confirmed`.
+
+        THE SENTENCE IS STILL MADE, THREE TIMES, AND NOT AS A CAVEAT. Tal's
+        summary at the head of this page says it in the reader's own numbers
+        ("Still no level — the interview on 20 August sets it… the quiz only
+        predicted the band"), the wing's subtitle says "Your level is set at the
+        interview" against the rungs, and "Who decides" at the foot names the
+        agent and the signature. A fourth statement in a bordered strip is the
+        product correcting a misunderstanding nobody on this page can still
+        have.
+
+        AND ITS BUTTON WAS THE WEAKEST OF THE FOUR ROUTES TO BOOKING. `data-go=
+        "agents"` from a footnote, on a stage where the dashboard's black card,
+        the Quick Action, the Interviews module's own agent list and Tal's ask
+        bar all point at the same six people. Removing the row removes the
+        page's only route to `agents` — stated rather than discovered, the way
+        the report route above it was. §24.315's `.note-act` rules stay:
+        `V.welcome`'s payment note is the other writer. */}
   <!-- THE REFERENCE BLOCK SITS ON THE PANEL TONE. Everything above this on
        the page is about YOUR level; this is how the ladder works for
        everyone, which is supporting material — exactly what §12's second
@@ -6424,7 +6611,34 @@ V.interviews = (f) => {
         <span class="dc-when">${I.time}${callLeft(CALL_ROW.iv().when)}</span></div>
     </div>
     ${crow('iv', {when:false})}
-  </div>`:`
+  </div>`:''}
+  ${''/* "HOW IT WORKS" IS ON EVERY STAGE NOW, `booked` INCLUDED (Maryam,
+        2 Sep 2026: "add the How It Works section we have on interview module
+        on the Interview booked prototype as well"). It was the ELSE arm of the
+        Scheduled card above — the one stage that has an interview coming was
+        the one stage with nothing explaining what the interview is.
+
+        THE TERNARY WAS NEVER AN ARGUMENT, IT WAS AN ACCIDENT OF ORDER. The
+        card and the disclosure answer different questions — one is "the
+        appointment you have", the other is "what the thing is" — and there was
+        no reason a page could not hold both. `booked` is in fact the stage
+        where the reference is most likely to be re-read: it is the only stage
+        where the conversation is still ahead of the reader.
+
+        AND IT COSTS NOTHING TO SIT UNDER THE CARD. §77.1 already restates the
+        join for `.sec-call.dark-card + .sec` at `--s06` inside the 900 query
+        (§20's own rule zeroes it, which is right for a full-bleed call band and
+        wrong under an inset card), and §20's two pair rules carry
+        `:not(.dark-card)` on both sides, so the pair falls to §10's base 24 on
+        each edge — the product's one 48px rhythm, with the card's own 32px
+        frame inside it.
+
+        STEP 1 READS AS DONE RATHER THAN AS AN INSTRUCTION HERE, and that is
+        the same thing it does on the five stages after `booked` where the
+        interview has already happened. A closed disclosure whose whole subject
+        is the sequence you are inside does not have to be re-worded per
+        stage; the four figures and the four steps are true whichever end of
+        the arc is reading them. */}
   ${''/* THE FOUR FACTS ARE THE HEAD OF "HOW IT WORKS", NOT A BAND ABOVE IT.
         They were their own headingless section — a bordered strip of Length,
         Format, Your report, Fee sitting between the past interviews and the
@@ -6490,7 +6704,6 @@ V.interviews = (f) => {
     </ol>
     </div>
   </div>
-`}
 </div></main>`;
 };
 
@@ -8081,7 +8294,17 @@ V.rewards = (f) => {
           timestamp with nothing on its line. */}
     <div class="sec-h" style="margin-bottom:var(--s04)"><span class="t-helper-01">${counts[tab]}</span>
       <span class="t-helper-01" style="margin-left:auto">Updated today</span></div>
-    <div class="aw-list">
+    ${''/* THE WRAPPER KEEPS `.aw-list` AND TAKES A MODIFIER — it is not a new
+          class, and that is the whole of trap 13 answered here. Six layers
+          reach this element through `:has(> .aw-list)` (§12's ground and its
+          transparent rows, §15's panel strip, §18's fill edge, §10's bleed) and
+          §10.15's label-column opt-out is keyed on `.sec:has(.aw)` — the ROW,
+          by descendant. So a card that is still an `.aw` inside a wrapper that
+          is still an `.aw-list` inherits every one of those decisions, and §102
+          only has to say what a grid does differently. A fresh `.aw-grid`
+          wrapper on its own would have dropped all six and put the heading in
+          the 184px column. */}
+    <div class="aw-list${tab==='points'?'':' aw-grid'}">
       ${tab==='points'?pointsList(g):tab==='badges'?badgeList(g):rankList(g)}
     </div>
     ${tab==='points'?`<p class="t-helper-01 mt5">Points update within a few minutes of the activity.</p>`:''}
@@ -9064,28 +9287,217 @@ function cardSheet(){
   </div>`;
 }
 
-/* WHAT YOU HAVE EARNED, ON THE PAGE THAT IS ABOUT YOU — AND ONLY IF ANY
-   Profile held your name, your level and your switches, and nothing you had
-   won. Points, badges and rank are the one part of the record that is
-   yours rather than the course's, and Profile is where a person goes to look
-   at their own record; making them navigate to Points to see whether they
-   have a badge is making them ask a question the page they are on should
-   already have answered.
+/* "WHAT YOU HAVE EARNED" IS DELETED, AND `pfPair`'s ACHIEVEMENTS PANEL IS WHAT
+   REPLACED IT — same slot, same question, the reference's answer (2 Sep 2026).
 
-   AND IT IS NOT DRAWN AT ZERO. Points do not start until you are on a course,
-   so on five of the eight stages this block would be three cells reading 0,
-   0 of 4 and 1-Star — an empty trophy case, which says "you have nothing"
-   far louder than not asking says anything at all. `GAME[stage]` is
-   undefined before a course and `pts` is the first thing to move once one
-   starts, so the two together are the test. */
-function standSec(){
-  const g = GAME[S.stage];
-  if(!g || !g.pts) return '';
+   `standSec` WAS THE FUNCTION AND ITS ARGUMENT IS STILL RIGHT: "Profile is
+   where a person goes to look at their own record; making them navigate to
+   Points to see whether they have a badge is making them ask a question the
+   page they are on should already have answered." That is exactly what the new
+   panel does, with two differences that made it worth swapping. It draws the
+   CERTIFICATIONS rather than the three `standRow` figures — the reference asks
+   for named awards with dates, and a certification is a thing you hold where
+   "1,095 points" is a running total the Achievements module is for. And it
+   draws at EVERY stage: `standSec` bailed on `!g.pts`, which was right for a
+   band of three zeroes and is unnecessary here, because `certsFor` hands every
+   stage at least the E2 level certificate.
+
+   `standRow` IS UNTOUCHED AND KEEPS ITS READERS — §72's pulse column and the
+   Achievements module both draw it, so nothing went with the caller. That is
+   the whole check before deleting a function: the "gate nothing writes" tell is
+   about a rule or a mode with no writer, not about a component with two. */
+/* ==========================================================================
+   THE PROFILE PAGE — §105, Maryam's reference, 2 Sep 2026
+   "implement this ui on the candidate profile page. obviously we will keep our
+   look and feel."
+
+   WHAT THE REFERENCE ADDS IS STRUCTURE, AND ALL OF IT IS ALREADY A COMPONENT
+   HERE. The page was an identity row over a four-row `.kv` tile, three stacked
+   toggle rows, and the black card at the foot. The reference reads: the card
+   first, then who you are as a header over a band of four facts, then what you
+   have earned beside what has happened, then the switches as a row, then the
+   two ways out. Every one of those is a shape the build already draws —
+   `.facts` for the band, §96's `.crt-card` for a certification, `.nrow` for a
+   line in a log, `.tg` for a switch — so this view mostly stops hand-writing
+   things and starts calling them.
+
+   FOUR THINGS THE REFERENCE ASKS FOR THAT THIS REFUSES, each on a rule the
+   build already has:
+
+     THE MOUNTAIN ILLUSTRATION behind Tal's summary and THE BELL behind the
+     notifications heading. §74's rule — "a decorative orange planet on the
+     block whose whole job is to be read" — and the same one §73 applied to a
+     social-proof row. There is no illustration anywhere in this product and
+     one would be the only one.
+     ROUNDED CARDS AND SHADOWS. `--radius` is 0px by token and §02's opening
+     note is that "depth is expressed as rhythm and rule weight, nothing else".
+     §76 met this exact reference decision on the booking panels and answered it
+     with §41's hairline frame; this takes the same one.
+     FOUR ORANGE MARKS on the fact band. The accent is Tal's voice and the
+     page's one CTA — which on this page is the black card's button — so four
+     accent objects in a white band would outrank it. Maryam's own instruction
+     for the same shape (§29, 1 Sep 2026) is "all four icons should be in
+     different relevant colors to their nature", which is what these take.
+     INVENTED ACHIEVEMENTS. "Consistency Pro", "Engaged Learner" and "Feedback
+     Champ" are three awards this build does not have. What it does have is
+     `certAll` — the level certificates and the five certifications, each gated
+     on a figure the product keeps — so the block draws those. §74's rule: a
+     redesign must not invent the data it is drawing.
+   ========================================================================== */
+
+/* THE DAY THE ACCOUNT WAS OPENED — the one fact on the reference's band that
+   no record in this build owns, so it is stated once here the way `CERTS`
+   states "May 4, 2026" and §96's two certifications state their own dates.
+
+   JANUARY 2026 IS THE ONLY WINDOW THAT AGREES WITH EVERYTHING ELSE. The build
+   asserts an E2 certificate completed 4 May 2026 from Cohort 12, and a cohort
+   is 90 days, so that course began in early February; the quiz is dated 23 July
+   2026 and the E3 interview 20 August. A member since the 8th of January has
+   time for all of it.
+
+   IT IS IN TENSION WITH THE `new` STAGE AND THAT TENSION IS PRE-EXISTING.
+   "Just joined" says the account was created yesterday, and `certsFor` already
+   hands that stage the E2 certificate — the note over `CERTS` records exactly
+   this ("the build has always asserted that this candidate holds an E2
+   certificate"). One date shares that, rather than adding a second problem. */
+const MEMBER_SINCE = 'January 8, 2026';
+
+/* A CELL IN THE IDENTITY BAND. `.facts` is the component and it is the right
+   one twice over: §63 already types all three of its rows (`.l` the eyebrow,
+   `.v` the value, `.d` the line under it), and §10.15's label-column opt-out
+   names it, so the band cannot fall into the 184px spine — trap 13 answered by
+   the class choice, which is §73's move for `.eo-facts`.
+
+   THE MARK GOES INSIDE THE LABEL, not in a column of its own. §29 took the
+   28px chip off `.stat` on 1 Sep 2026 and stepped the glyph to 20 "because it
+   now holds the line alone"; a mark in front of four words is that decision
+   applied to a label rather than to a figure, and it costs the cell no extra
+   row. The hue is written inline as `--mk` — NAMED, never cycled (§72's
+   `pulseCol` idiom), because these four are four different KINDS of fact and an
+   `nth-child` cycle would repaint them all if one were ever inserted. */
+const pfFact = (ic, mk, label, val, sub) => `<div style="--mk:var(${mk})">
+  <span class="l pf-l">${ic}${label}</span>
+  <span class="v">${val}</span>
+  ${sub ? `<span class="d">${sub}</span>` : ''}</div>`;
+
+/* WHAT YOU HOLD, BESIDE WHAT HAS HAPPENED — the reference's two panels.
+
+   THEY ARE ONE `.sec` HOLDING TWO PANELS, NOT TWO SECTIONS. §10.2 closes every
+   section with a full-bleed hairline and tick marks at the rails, so two
+   sections side by side would each draw a page-wide rule under a panel that has
+   its own bottom border — §14's "TWO 1px rules one pixel apart", which is the
+   reasoning §76 used to merge the booking page's three panels into one section.
+   The section carries NO `.sec-h`, so §10.15 never looks at it: each panel
+   states its own heading, which is what the reference draws.
+
+   ACHIEVEMENTS IS `certAll`, AND THE GUARD IS THE WHOLE OF WHAT IT NEEDED.
+   Four of the nine stages have no `GAME` row, and three of the five
+   certification gates read `g.pts` / `g.got` / `g.weeks` — so calling it here
+   would throw on `new`, the very stage the reference is drawn from. `GAME_NONE`
+   is an empty record rather than a branch: no points means none of the
+   point-gated certifications are earned, which is the true answer and gives
+   every stage at least the level certificate `certsFor` already hands it.
+
+   THE CARD IS §96's, ONE SIZE DOWN. `.crt-card` is a fixed 240px track with a
+   120x130 badge, which three of cannot fit a half-width column; §105 re-points
+   `--crt-art-w/h` on this block exactly as §96's own grid card re-points them
+   off the hero's 70x76. The issuer line is dropped — in a 130px card
+   "TALENTnext" is the third of three lines and the only one that is the same on
+   every card.
+
+   RECENT ACTIVITY IS `NOTIF`, AND THAT IS THE RECORD RATHER THAN A SECOND ONE.
+   Every row in it is something that happened to this account with a relative
+   time on it — "Account created", "Payment received", "250 points awarded",
+   "Chapter 1 is unlocked" — and it is the only per-stage log that exists at all
+   nine stages. The bell draws the same rows because the bell is the UNREAD view
+   of this log; "View all" opens it rather than pointing at a page, because
+   there is no page and a dead control is worse than a missing one (§60).
+
+   `.nrow` IS THE ROW AND IT IS ALREADY A `data-go` TARGET, so no line in the
+   log is a dead end. Four rows: day 34 has five and every other stage has
+   three, so the cap only bites where the list is longest. */
+/* THE INVITATION, LIFTED OUT OF THE VIEW SO IT CAN MOVE. It was written inline
+   at the foot of `V.account`; the reference puts it first, and a block that is
+   1500 characters of markup is easier to move as a call than as a cut and
+   paste. One caller, and that is deliberate — this is the only page in the
+   product that asks the candidate for something.
+
+   THE TAGS LOST THEIR CHIP AND GAINED A MARK, which is §29's move on 1 Sep
+   2026 applied one component over: "the icons should not have the background,
+   all four icons should be in different relevant colors to their nature".
+   Three bordered chips inside a card that is already the heaviest object on
+   the page were a box in a box; a 20px glyph in front of three words holds the
+   line on its own, which is exactly what §72 found when the pulse's chips came
+   off. The marks say what each condition IS — people, a certificate, a level.
+
+   THEY ARE WHITE AND NOT HUED, and that is where this parts from the reference.
+   Those three marks are tinted there because that card is drawn on white in the
+   file; on `--gray-100` the named marker hues run 2.2:1 to 3.1:1 and read as
+   three dim smudges. `--on-dark` beside `--on-dark-2` text is §63 §6a's own
+   pair for a dark card, and the mark leading the line at full ink is what makes
+   the row legible rather than decorative. */
+function leadSec(f){
   return `<div class="sec">
-    <div class="sec-h"><h2>What you have earned</h2><button class="btn btn-g btn-sm noic" data-go="rewards">View Points</button></div>
-    ${standRow(g)}
+    <div class="lead-b">
+      <div class="lead-eb">Give back &amp; grow</div>
+      <div class="lead-t">Become a cohort leader</div>
+      ${''/* THE DESCRIPTION IS MARYAM'S, 2 Sep 2026, VERBATIM, and it is a
+             quarter of the length of what it replaces — three sentences of
+             conditions ("It is unpaid", "you can only lead cohorts at a level
+             below your own") down to one invitation. The two conditions are not
+             lost: `.lead-tags` states both on the row underneath ("Volunteer
+             role", "Teaches below Explorer – E4"), which is what that row is
+             for, so the paragraph no longer says in prose what three words say.
+
+             FLAGGED AND NOT CHANGED: "You've completed your 90-day journey" is
+             a claim, and this card is drawn on `V.account` at EVERY stage — on
+             week 1 it is day 4 of 90. The copy is the ask and the ask wins; the
+             one-line fix if it should only appear once it is true is a
+             `f.complete` gate on this function, which is `certCard`'s own
+             condition. Worth a decision rather than a silent gate. */}
+      <div class="lead-x">You&rsquo;ve completed your 90-day journey. Now, guide the next cohort, share what you&rsquo;ve learned, and earn a cohort-leader certification.</div>
+      <div class="lead-tags">
+        <span>${I.group}Volunteer role</span>
+        <span>${I.certificate}Earns a certification</span>
+        <span>${I.growth}Teaches below ${lvlName(f.level)}</span>
+      </div>
+      <div class="lead-a">${S.ledApplied
+        ? `<button class="btn btn-p btn-sm noic" disabled>Request sent ${I.checkFilled}</button>`
+        : `<button class="btn btn-p btn-sm noic" data-leadapply="1">Apply to lead a cohort ${I.arrowRight}</button>`}</div>
+      ${S.ledApplied?`<div class="lead-ok">${I.checkFilled}<span>Your request is with the TalentNext team. They review applications weekly and will email you either way.</span></div>`:''}
+    </div>
   </div>`;
 }
+
+const GAME_NONE = {pts:0, got:[], badges:0, rank:1, last:[], weeks:[]};
+function pfPair(f){
+  const g = GAME[S.stage] || GAME_NONE;
+  const certs = certAll(f, g).slice(0, 3);
+  const act = (NOTIF[S.stage] || []).slice(0, 4);
+  return `<div class="sec">
+    <div class="pf-pair">
+      <div class="pf-card">
+        <div class="pf-hd"><h3>Achievements</h3>
+          <button class="btn btn-g btn-sm noic" data-go="rewards" data-gotab="certs">View all</button></div>
+        <div class="pf-ach">${certs.map(c=>`<div class="crt-card">
+          <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
+          <span class="crt-n">${c.n}</span>
+          <span class="crt-on">${c.on}</span>
+        </div>`).join('')}</div>
+      </div>
+      <div class="pf-card">
+        <div class="pf-hd"><h3>Recent activity</h3>
+          <button class="btn btn-g btn-sm noic" data-toggle="notif">View all</button></div>
+        <div class="pf-act">${act.map(n=>`<button class="nrow" data-go="${n.go}" data-read="${n.t}">
+          <span class="nrow-ic">${I[n.ic]}</span>
+          <span class="nrow-b"><span class="nrow-t">${n.t}</span></span>
+          <span class="nrow-w">${n.w}</span>
+        </button>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
 V.account = (f) => `<main class="main"><div class="page">
   ${crumb(['Dashboard','dashboard'],'Profile')}
   ${''/* THE VERBATIM ONE. This said "Your details, your preferences, and what
@@ -9095,6 +9507,19 @@ V.account = (f) => `<main class="main"><div class="page">
         naming the page's sections, which the section headings do. Tal's is
         rewritten to point at the permissions and this one is gone. */}
   ${ph('Profile')}
+  ${''/* THE BLACK CARD OPENS THE PAGE — the reference's order, and it is the
+        same argument §82 made for the enrolment offer: the one thing on the
+        page that is an INVITATION goes above the record it is addressed to.
+        At the foot it was the last thing after two ways to leave the product.
+
+        IT ALSO STOPS `placeBand`'s RUN, which is the job the identity section
+        used to do. That pass walks forward from the `.ph` taking Tal's card,
+        the ask line and any declared `.head-sec`, and stops at the first
+        sibling that is none of them — a `.sec` holding `.lead-b` is none, so
+        the band stays one column exactly as before. `.lead-b` is NOT in ai5's
+        `DARK_CARD` either, so `placeDark` leaves it in the page body; that is
+        §75's whole point and the reason a black card can be a page child. */}
+  ${leadSec(f)}
   <div class="sec">
     <div class="idhead">
       <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
@@ -9113,31 +9538,53 @@ V.account = (f) => `<main class="main"><div class="page">
            which is where the photo's own edit affordance already is. -->
       <div class="idhead-a"><button class="btn btn-g" data-editprofile="1">Edit details ${I.edit}</button></div>
     </div>
-    <div class="tile">
-      <div class="kv"><span class="k">Name</span><span class="v">Maryam Naz</span></div>
-      <div class="kv"><span class="k">Email</span><span class="v n">maryam.naz@tkxel.io</span></div>
-      <div class="kv"><span class="k">Time zone</span><span class="v n">Eastern Time (ET)</span></div>
-      <div class="kv"><span class="k">Level</span><span class="v n">${f.pred?f.track+' track · set at the interview':lvlName(f.level)+' · confirmed'}</span></div>
+    ${''/* THE FOUR-ROW `.kv` TILE IS A BAND OF FOUR FACTS — the reference's own
+          move, and two of the four rows went with the change. Name and Email
+          were in that tile AND in the header row 40px above it; the header is
+          where a name belongs, so the tile was printing both of them twice.
+          What is left is the four things about the account that are not on the
+          header, which is what the reference's band holds.
+
+          THE LABELS ARE THE REFERENCE'S AND EVERY VALUE IS READ. Level and
+          Primary track both print the track before the interview — that is
+          true rather than duplicated, because at that point the track IS all
+          the level says, which is exactly what the sub-line under it reports.
+          Once Priya has signed, Level goes to the rung and the two differ. */}
+    <div class="facts pf-facts">
+      ${pfFact(I.time, '--mk-1', 'Time zone', 'Eastern Time (ET)')}
+      ${pfFact(I.chart, '--mk-3', 'Level',
+        f.pred ? f.track + ' track' : lvlName(f.level),
+        f.pred ? 'Set at the interview' : 'Confirmed by your agent')}
+      ${pfFact(I.calendar, '--mk-2', 'Member since', MEMBER_SINCE)}
+      ${pfFact(I.growth, '--mk-4', 'Primary track', f.track + ' track',
+        f.enrolled || f.complete ? 'Cohort 41' : 'Not enrolled yet')}
     </div>
   </div>
-  ${standSec()}
+  ${pfPair(f)}
+  ${''/* THE SWITCHES ARE A ROW OF THREE, AND THE HEADING GAINED THE SENTENCE
+        THE REFERENCE PUTS UNDER IT. `.all-desc` is the component for a heading
+        and its own description — §16 states the pair at `--sec-desc-gap`, and
+        being a DIRECT child of the `.sec` is also what holds this section out
+        of §10.15's 184px label column (trap 13, answered by the markup rather
+        than by a new rule).
 
+        EACH SWITCH KEEPS `.tg` AND GAINS A MARK. §105 lays the three out as
+        bordered cells; the row itself is the same `<label>` + `<input>` + `.sw`
+        it has always been, so nothing about how a toggle works moved. The marks
+        say which KIND of message each one is — a call, a task, an email — which
+        is the same test §29's four figure marks are chosen by. */}
   <div class="sec tint">
     <div class="sec-h"><h2>Notifications</h2></div>
-    <label class="tg"><div class="tb"><b>Weekly call reminders</b><span>24 hours and 1 hour before</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>Task deadlines</b><span>The morning a task is due</span></div><input type="checkbox" checked><span class="sw"></span></label>
-    <label class="tg"><div class="tb"><b>Product and course emails</b><span>Occasional, never more than monthly</span></div><input type="checkbox"><span class="sw"></span></label>
-  </div>
-  <div class="sec">
-    <div class="lead-b">
-      <div class="lead-eb">Give back &amp; grow</div>
-      <div class="lead-t">Become a cohort leader</div>
-      <div class="lead-x">Volunteer to guide a cohort through the 90 days. It is unpaid &mdash; what you get back is a recognised cohort-leader certification, and the growth that comes from teaching what you have already learned. You can only lead cohorts at a level below your own, so you are always a step ahead of the people you are mentoring.</div>
-      <div class="lead-tags"><span>Volunteer role</span><span>Earns a certification</span><span>Teaches below ${lvlName(f.level)}</span></div>
-      <div class="lead-a">${S.ledApplied
-        ? `<button class="btn btn-p btn-sm noic" disabled>Request sent ${I.checkFilled}</button>`
-        : `<button class="btn btn-p btn-sm noic" data-leadapply="1">Apply to lead a cohort ${I.arrowRight}</button>`}</div>
-      ${S.ledApplied?`<div class="lead-ok">${I.checkFilled}<span>Your request is with the TalentNext team. They review applications weekly and will email you either way.</span></div>`:''}
+    <p class="all-desc">Manage what updates you want to receive.</p>
+    <div class="pf-tgs">
+      <label class="tg"><span class="tg-mk" style="--mk:var(--mk-1)">${I.calendar}</span><div class="tb"><b>Weekly call reminders</b><span>24 hours and 1 hour before</span></div><input type="checkbox" checked><span class="sw"></span></label>
+      ${''/* `I.hourglass`, NOT `I.checkOutline`. A circle-outline beside a
+             switch shipped for one build and read as an unselected RADIO — two
+             controls on one row, one of which does nothing. An hourglass says
+             the thing this switch is about is a deadline, which is what the
+             row's own second line says in words. */}
+      <label class="tg"><span class="tg-mk" style="--mk:var(--support-attention)">${I.hourglass}</span><div class="tb"><b>Task deadlines</b><span>The morning a task is due</span></div><input type="checkbox" checked><span class="sw"></span></label>
+      <label class="tg"><span class="tg-mk" style="--mk:var(--mk-3)">${I.email}</span><div class="tb"><b>Product and course emails</b><span>Occasional, never more than monthly</span></div><input type="checkbox"><span class="sw"></span></label>
     </div>
   </div>
   <div class="sec">
@@ -9915,26 +10362,65 @@ const ROOM = [
    field for it; the five that have no number are unchanged and read as no
    count rather than as zero.
 
-   NOTHING IS WIRED, AND THAT IS STATED RATHER THAN HIDDEN. Pressing a thumb or
-   Reply does nothing yet: `S.thread` is Tal's and the room has no state of its
-   own, so a like would be a class a `render()` throws away (trap 9). They are
-   drawn because the row's shape is what was asked for; wiring them is a
-   `S.room` record and a handler, and §60's "a dead control on a live surface"
-   is the argument for doing it rather than leaving them. Flagged. */
-function roomLine(name, img, ini, body, when, mine, likes){
-  return `<div class="cmt">
+   THE THREE ACTIONS ARE WIRED NOW (Maryam, 2 Sep 2026: "make the thumbs up and
+   thumbs down icons functional, by default show a thumbs up filled icon in blue
+   color. If I click on the reply then that person name with @ should appear on
+   the bottom type field"). The note that stood here said what it would take —
+   "a `S.room` record and a handler" — and that is exactly what it took.
+
+   THE VOTE IS `S.roomVote`, AN INDEX INTO `ROOM`, BECAUSE IT CANNOT BE A CLASS.
+   Trap 9: `render()` replaces `device.innerHTML`, so a class a click handler
+   puts on a button is gone at the next paint. The map is keyed by the post's
+   position in `ROOM` — the array is the record and the index is its identity.
+
+   "BY DEFAULT" IS THE SEEDING, AND IT COMES OFF THE COUNT. A post that already
+   carries a like count is drawn as one you have liked — filled thumb, blue —
+   and the one that carries none is not. That is what makes the default state
+   readable rather than arbitrary: `ROOM`'s last row deliberately has no count
+   ("it went up this morning"), so it is the one post that starts unvoted, and
+   the four with 4 / 6 / 3 / 2 start lit.
+
+   SO THE COUNT IS BASE-PLUS-YOU, NOT A LITERAL. `likes` is the total INCLUDING
+   your seeded vote, so the base is `likes - 1` for a seeded row and `likes` for
+   any other. Displayed is base + 1 while your vote is up. Un-liking 4 gives 3
+   and re-liking gives 4 back — the number cannot drift, and a row whose total
+   falls to zero hides the count rather than printing "0", which is the same
+   rule the row was drawn with.
+
+   THE TWO THUMBS ARE EXCLUSIVE and each toggles itself off, which is the whole
+   of the state machine: up, down, or neither.
+
+   `idx` IS THE EIGHTH ARGUMENT and it is optional. `roomLine` is called from
+   `discussionRoom` with it; anything that draws a row outside a votable list
+   omits it and gets the buttons in their resting state with no handles on
+   them, which is what a row in a record rather than a discussion should be. */
+function roomLine(name, img, ini, body, when, mine, likes, idx){
+  const votable = idx !== undefined;
+  const vote = votable ? S.roomVote[idx] : null;
+  const base = (likes || 0) - (ROOM_SEED[idx] ? 1 : 0);
+  const n = base + (vote === 'up' ? 1 : 0);
+  return `<div class="cmt"${votable ? ` data-cmt="${idx}" data-cmtbase="${base}"` : ''}>
     <span class="cmt-av">${avatar({i:ini, img:AV[img]}, 40)}</span>
     <div class="cmt-c">
       <div class="cmt-h"><b class="cmt-n">${mine ? 'You' : name}</b><span class="cmt-w">${when}</span></div>
       <div class="cmt-b">${body}</div>
       <div class="cmt-a">
-        <button class="cmt-act" aria-label="Like"><span class="cmt-ic">${I.thumbsUp}</span>${likes?`<span class="cmt-ct">${likes}</span>`:''}</button>
-        <button class="cmt-act" aria-label="Dislike"><span class="cmt-ic">${I.thumbsDown}</span></button>
-        <button class="cmt-act cmt-reply">Reply</button>
+        <button class="cmt-act${vote === 'up' ? ' on' : ''}"${votable ? ' data-cmtvote="up"' : ''} aria-label="Like" aria-pressed="${vote === 'up'}"><span class="cmt-ic">${vote === 'up' ? I.thumbsUpFilled : I.thumbsUp}</span><span class="cmt-ct">${n || ''}</span></button>
+        <button class="cmt-act${vote === 'down' ? ' on' : ''}"${votable ? ' data-cmtvote="down"' : ''} aria-label="Dislike" aria-pressed="${vote === 'down'}"><span class="cmt-ic">${vote === 'down' ? I.thumbsDownFilled : I.thumbsDown}</span></button>
+        <button class="cmt-act cmt-reply"${votable ? ` data-cmtreply="${name}"` : ''}>Reply</button>
       </div>
     </div>
   </div>`;
 }
+
+/* WHICH ROWS WERE SEEDED, WORKED OUT ONCE. `roomLine` needs to know whether a
+   row's count already includes your vote, and asking `ROOM` for it on every
+   render would be the same filter run eleven times a paint. A plain object, so
+   `ROOM_SEED[idx]` on a row that was never seeded is `undefined` and falsy. */
+const ROOM_SEED = {};
+ROOM.forEach((r, i) => { if(r[0] !== 'day' && r[6]) ROOM_SEED[i] = true; });
+S.roomVote = {};
+Object.keys(ROOM_SEED).forEach(i => { S.roomVote[i] = 'up'; });
 
 function discussionRoom(){
   /* THE DAY BECOMES PART OF THE STAMP. `ROOM` still carries its `['day', …]`
@@ -9943,17 +10429,80 @@ function discussionRoom(){
      current day in a variable instead of drawing a divider from it. */
   let day = '';
   return `<div class="cmts">
-    ${ROOM.map(r => {
+    ${ROOM.map((r, i) => {
       if(r[0] === 'day'){ day = r[1]; return ''; }
-      return roomLine(r[0], r[1], r[2], r[3], day ? day + ' &middot; ' + r[4] : r[4], r[5], r[6]);
+      return roomLine(r[0], r[1], r[2], r[3], day ? day + ' &middot; ' + r[4] : r[4], r[5], r[6], i);
     }).join('')}
   </div>
+  ${''/* THE FIELD HAS AN ID BECAUSE REPLY WRITES INTO IT. `data-cmtreply` puts
+         "@Name " at the head of whatever is already typed and focuses the
+         field; it needs one handle, and the composer is the only input on the
+         page. */}
   <div class="composer room-composer">
     <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
-    <input class="inp" placeholder="Say something to Cohort 41" aria-label="Message the cohort">
+    <input class="inp" id="roomPost" placeholder="Say something to Cohort 41" aria-label="Message the cohort">
     <button class="composer-send" aria-label="Send">${I.send}</button>
   </div>`;
 }
+
+/* ==========================================================================
+   THE DISCUSSION'S THREE CONTROLS
+
+   IT DOES NOT RE-RENDER, AND THAT IS THE WHOLE REASON IT IS WRITTEN THIS WAY.
+   Both surfaces that draw `discussionRoom()` have a composer directly under the
+   list, and `render()` rebuilds `device.innerHTML` — so a vote cast after
+   pressing Reply would throw away the "@Name" and anything typed after it,
+   caret and all. That is ai4's trap and the reason §31's deleted search filtered
+   in place. The truth still lives in `S.roomVote`, so the next render for any
+   other reason recomputes exactly what these two lines wrote — `joinArm`'s
+   pattern (§81), where a handler and a renderer agree by construction rather
+   than by one of them winning.
+
+   THE PAINT IS THREE PROPERTIES: the `.on` class, the glyph, and the count.
+   `data-cmtbase` carries the count without you, stamped at render, so the
+   handler never has to look back at `ROOM`.
+   ========================================================================== */
+function roomVotePaint(row){
+  const i = row.dataset.cmt, vote = S.roomVote[i];
+  const base = +row.dataset.cmtbase || 0;
+  const up = row.querySelector('[data-cmtvote="up"]');
+  const down = row.querySelector('[data-cmtvote="down"]');
+  if(!up || !down) return;
+  up.classList.toggle('on', vote === 'up');
+  down.classList.toggle('on', vote === 'down');
+  up.setAttribute('aria-pressed', vote === 'up');
+  down.setAttribute('aria-pressed', vote === 'down');
+  up.querySelector('.cmt-ic').innerHTML = vote === 'up' ? I.thumbsUpFilled : I.thumbsUp;
+  down.querySelector('.cmt-ic').innerHTML = vote === 'down' ? I.thumbsDownFilled : I.thumbsDown;
+  const n = base + (vote === 'up' ? 1 : 0);
+  up.querySelector('.cmt-ct').textContent = n || '';
+}
+
+device.addEventListener('click', e => {
+  const v = e.target.closest('[data-cmtvote]');
+  if(v){
+    const row = v.closest('.cmt');
+    if(!row) return;
+    const kind = v.dataset.cmtvote, i = row.dataset.cmt;
+    /* pressing the vote you already hold takes it back — up, down, or neither */
+    S.roomVote[i] = S.roomVote[i] === kind ? null : kind;
+    roomVotePaint(row);
+    return;
+  }
+  const rp = e.target.closest('[data-cmtreply]');
+  if(rp){
+    const box = device.querySelector('#roomPost');
+    if(!box) return;
+    const at = '@' + rp.dataset.cmtreply + ' ';
+    /* PREPEND RATHER THAN REPLACE, so pressing Reply on a second person adds a
+       second mention instead of throwing away what is half written — and a
+       repeat press of the SAME name is a no-op rather than "@Daniel @Daniel". */
+    if(box.value.indexOf(at) !== 0) box.value = at + box.value;
+    box.focus();
+    box.setSelectionRange(box.value.length, box.value.length);
+    return;
+  }
+});
 
 /* The cohort standing. Points, badges earned and star rank per member;
    the candidate's own row is marked wherever it lands. */
@@ -10681,9 +11230,64 @@ device.addEventListener('click', e => {
     return;
   }
 
+  /* LOGGING IN IS `go('stage:new')` PLUS WHICH PORTAL, AND THE ORDER IS THE
+     WHOLE OF IT. `setStage` stamps `S.portal='candidate'` itself — its own note
+     is the argument ("a stage is a candidate fact") — so the role has to be
+     written after it, which is the same trap `COHORT_LEAD` records for lead.js
+     and the reason this is a branch rather than a `data-go` value.
+
+     THE STACK IS EMPTIED because logging in is a top-level arrival: `go`'s
+     `fresh` does this for a rail item, and the auth screens are behind the
+     reader now, not one back-press away.
+
+     BEFORE `[data-go]` so it cannot be reached by the generic branch, and it
+     carries no `data-go` either — two attributes on one button would do
+     whichever the handler met first, which is `quickActions`'s own rule about
+     `go` / `ask` / `peek`. */
+  const li = t.closest('[data-loginas]');
+  if(li){ e.preventDefault();
+    setStage('new');
+    if(li.dataset.loginas === 'leader'){ S.portal = 'leader'; S.view = 'leadDash'; }
+    S.hist = []; S.nav = false;
+    render(); return;
+  }
+
+  /* THE ROLE IS `S`, NOT THE INPUT'S OWN STATE — trap 9. `render()` replaces
+     `device.innerHTML`, so the natively-checked radio is gone at the next paint
+     and both the `checked` attribute and the chosen block's ground are written
+     from `S.role`. `.ldr-rec` is the same shape one portal over.
+
+     KEYED ON THE LABEL, so the click on the words and the synthetic click the
+     label sends to its own input both resolve to the same value — setting it
+     twice to the same string is idempotent, which is why this needs no guard. */
+  const lr = t.closest('[data-lrole]');
+  if(lr){ S.role = lr.dataset.lrole; render(); return; }
+
   const g = t.closest('[data-go]');
   if(g){ e.preventDefault();
     const mark = g.dataset.read; if(mark && !S.read.includes(mark)) S.read.push(mark);
+    /* `data-disc` OPENS A §65 DISCLOSURE ON THE PAGE BEING OPENED, and it is
+       here rather than in a branch of its own for the same reason `data-read`
+       is: the press still navigates, and this only says what state the
+       destination is in when it arrives. `S.disc` is read at render, so setting
+       it before `go()` is the whole of the mechanism — no pass, no second
+       render, and the section is open in the first paint rather than opening
+       under the reader.
+
+       IT ONLY EVER OPENS. A `= true` cannot fight the reader's own toggle the
+       way a `= !S.disc[k]` would: pressing the card twice is the same
+       destination in the same state, and shutting a block the reader has opened
+       by hand is a control acting on a page it is not on. */
+    const dk = g.dataset.disc; if(dk) S.disc[dk] = true;
+    /* `data-gotab` PICKS THE TAB ON THE PAGE BEING OPENED, and it is the same
+       shape as `data-disc` directly above: the press still navigates, this only
+       says what state the destination arrives in. It exists because `data-rtab`
+       CANNOT be reused here — that attribute has its own handler which sets the
+       tab and RETURNS without navigating, so a button carrying both would do
+       whichever branch the delegated listener reached first and the other would
+       silently never run. A second name retires the collision instead of
+       fighting it, which is §78's own lesson about `data-portal`. */
+    const tb = g.dataset.gotab; if(tb) S.rtab = tb;
     if(S.notif) S.notif=false;
     if(S.acct) S.acct=false;
     /* a module opened from the side nav is a top-level destination, so it starts

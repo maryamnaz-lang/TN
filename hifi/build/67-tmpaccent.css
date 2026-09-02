@@ -36,75 +36,91 @@
    itself must be restated in the scope, which is what makes the same button
    paint red. Same for the two state gradients under it.
 
-   AND THE FILL IS SOLID, WHICH IS A DEPARTURE. §01 says there is no solid
-   secondary colour in this product — hover and pressed cannot be one, so
-   each is the gradient stepped a stop deeper. Maryam asked for flat #ff0000
-   after seeing the gradient version, so this trial overrides that decision
-   on these two pages only. It is stated here rather than left to look
-   accidental, because it is the one thing in this layer that contradicts a
-   rule the system states explicitly.
+   THE ACCENT IS `#F95873` AND THE FILL IS A GRADIENT AGAIN — Maryam,
+   31 Aug 2026: "change the accent color in the red accent demo prototype to
+   #F95873", then "for the gradient color use the shades of #F95873 color".
 
-   The value is still written as a `linear-gradient` with both stops the same
-   colour, NOT as a bare hex. `--accent-grad` is consumed in `background` and
-   in `background-image` positions across the build, and a bare colour is
-   invalid in the second — a flat two-stop gradient is valid in both and
-   paints identically. `--accent-2` goes flat red too, so anything reading
-   that token directly does not come out a darker red than the fills beside
-   it.
+   THAT SECOND SENTENCE REVERSES THE ONE DECISION THIS LAYER USED TO RECORD AS
+   A DEPARTURE, and the reversal is worth reading because it puts the trial
+   back inside the system rather than beside it. §01's rule is that there is no
+   solid secondary colour in this product: hover and pressed cannot be one, so
+   each state is the same gradient stepped a stop deeper. The earlier trial
+   overrode that — flat #ff0000 everywhere, both stops of every gradient the
+   same value, with a note here explaining that it was the one thing in the
+   layer contradicting a rule the system states explicitly. It is not
+   contradicting it any more.
 
-   The press state stays a shade down (#cc0000, solid). Flat #ff0000 for
-   pressed as well would leave the button with no press feedback at all,
-   which is a dead control rather than a colour trial. Hover is disarmed by
-   the build anyway (trap 6).
+   SO THE WHOLE OF THIS IS §01'S OWN LADDER, ONE HUE OVER. That file states
+   four values — `--accent` -> `--accent-2` -> `--accent-hover` ->
+   `--accent-text` — and defines its three gradients as CONSECUTIVE PAIRS on
+   that ladder, which is what makes rest, hover and pressed read as one light
+   moving rather than as three colours. Every rung below is `#F95873` at a
+   lower lightness and a lower saturation, stepped by the same deltas §01's
+   orange ladder uses (measured in HSL off #f57414 / #f0530c / #ae4508 /
+   #b94a09), and the three gradients are copied from §01 verbatim — same
+   104.86deg, same 10.02% / 115.55% stops, same `var()` pairs. Only the four
+   rungs are stated; the shape is not this layer's to invent.
+
+   `#F95873` IS THE TOP RUNG AND NOTHING ELSE IS THAT COLOUR. It is what a
+   button rests at, what a mark fills with, and the first stop of every ramp;
+   the reader sees it and the three below it read as its shadow.
 
    AFTER §63 AND ALLOWED TO BE. §63 owns font size, weight, transform and
    text colour, and this layer declares none of the four — it sets custom
    properties only. Which ink role applies where is still §63's; this only
-   changes what one role resolves to, on two pages.
+   changes what one role resolves to, on one stage.
    ========================================================================== */
 
 .tmp-accent{
-  /* --- the fills. Every accent FILL in the product runs --accent-grad, so
-     flattening that one token is what makes the whole product solid. --- */
-  --accent:#ff0000;
-  --accent-2:#ff0000;
-  --accent-hover:#e60000;
-  /* flat: both stops the same colour. See the head note for why this is a
-     gradient function and not a bare hex. */
+  /* --- THE LADDER. Four shades of one hue, stepping deeper, exactly as §01
+     states the orange. HSL(350, 93%, 66%) is `#F95873` itself; the three
+     below it drop lightness and saturation by §01's own deltas, so the
+     interval between two rungs is the interval a reader already knows from
+     the orange product. --- */
+  --accent:#f95873;
+  --accent-2:#f54e6a;
+  --accent-hover:#b43147;
+
+  /* --- and the three gradients are §01's, pair for pair. They HAVE to be
+     restated in the scope even though every stop is a `var()`: a custom
+     property's computed value is its specified value with `var()` ALREADY
+     SUBSTITUTED, so `#f57414` is baked into `--accent-grad` at `:root` and
+     every descendant inherits the resolved string. Measured on the built
+     portal — a `.btn-p` under a scope setting only `--accent` and
+     `--accent-2` still painted `rgb(245,116,20) -> rgb(240,83,12)`. Restated
+     here, the same three declarations resolve against this scope's ladder.
+     Nothing about their shape is changed. --- */
   --accent-grad:linear-gradient(104.86deg,
-    var(--accent) 0%, var(--accent) 100%);
-  /* Without these two the button would revert to the ORANGE gradient on
-     press, which reads as a bug rather than a trial. Flat, one shade down
-     each, so the press still registers. */
+    var(--accent) 10.02%, var(--accent-2) 115.55%);
   --accent-grad-hover:linear-gradient(104.86deg,
-    var(--accent-hover) 0%, var(--accent-hover) 100%);
+    var(--accent-2) 10.02%, var(--accent-hover) 115.55%);
   --accent-grad-active:linear-gradient(104.86deg,
-    #cc0000 0%, #cc0000 100%);
+    var(--accent-hover) 10.02%, var(--accent-text) 115.55%);
   /* §01's is a hardcoded rgba, not derived from --accent, so it does not
-     follow on its own. Same alpha, red hue. */
-  --accent-shadow:rgba(204,0,0,.18);
+     follow on its own. Same .18 alpha, this ladder's hover rung. */
+  --accent-shadow:rgba(180,49,71,.18);
 
-  /* --- the ink. Matched to the CONTRAST of the orange it replaces, not to
-     its hue, so nothing on these two pages gets less readable than it was.
-     Measured on #ffffff (--layer-01, the page) and #f7f7f7 (--layer-02):
-       --accent-text  #b94a09 = 5.19:1  ->  #dc0000 = 5.19:1  (4.85 on panel)
-       --accent-on-2  #ae4508 = 5.75:1  ->  #cf0000 = 5.75:1  (5.37 on panel)
-     Both clear AA for normal text. Note that pure #ff0000 is only 4.00:1 on
-     white and would FAIL as text, which is why the ink is not the fill —
-     exactly the split §01 already makes for the orange. --- */
-  --accent-text:#dc0000;
-  --accent-on-2:#cf0000;
+  /* --- THE INK IS NOT THE FILL, which is the split §01 already makes for the
+     orange and the one thing about this hue that is not negotiable: `#F95873`
+     is 3.15:1 on white and would FAIL AA as text at any size. So the two ink
+     roles are lower rungs of the same ladder, chosen on measured ratio rather
+     than on hue. On #ffffff (--layer-01) and #f7f7f7 (--layer-02):
+       --accent-text  #b94a09 = 5.19 / 4.85  ->  #c0354c = 5.45 / 5.09
+       --accent-on-2  #ae4508 = 5.75 / 5.37  ->  #b83249 = 5.85 / 5.46
+     Both clear AA comfortably and both are a shade BETTER than the orange
+     they replace, which is the direction to err in. --- */
+  --accent-text:#c0354c;
+  --accent-on-2:#b83249;
   /* the accent at 8% over white — a chip ground, not a surface (§12) */
-  --accent-tint:#ffebeb;
+  --accent-tint:#fef2f4;
 
-  /* §10's accent ink on the black card. INCLUDED because both of these
-     dashboards draw a `.plate`, and leaving it out would strand one orange
-     element on an otherwise red page. It is the one value not matched on
-     ratio: #f68441 is 7.46:1 on #111 and the nearest red at that ratio is a
-     washed pink, so this takes 5.92:1 instead — still clear of AA, and
-     still legibly red. Delete this line to leave the dark card's ink
-     orange. */
-  --accent-on-dark:#ff5252;
+  /* §10's accent ink on the black card, and it is the one rung that goes UP
+     rather than down: #f68441 is a LIGHTENED orange for exactly this reason,
+     and the same logic applies here. HSL(350, 93%, 70%) — `#F95873` lifted,
+     not deepened — measures 6.74:1 on `--gray-100`, comfortably clear of AA
+     and clearly the same hue as the button beside it. Delete this line to
+     leave the dark card's ink orange. */
+  --accent-on-dark:#fa6b83;
 }
 
 /* --------------------------------------------------------------------- 2 ---
@@ -117,16 +133,21 @@
    Maryam asked for the Figma's single-gradient feel on the red pages, so this
    states one gradient and the cool layer simply is not drawn here.
 
-   THE FILL IS THE FILE'S OWN, AND IT IS ALREADY THIS RED. The exported SVG is
-   not interpreted at all:
+   THE FILL IS THE FILE'S OWN AND IT IS WRITTEN AS `--accent`, WHICH IS THE
+   WHOLE REASON THIS SURVIVED THE HUE CHANGE UNTOUCHED. The exported SVG is not
+   interpreted at all:
 
      <ellipse cx="696.706" cy="434.5" rx="440.706" ry="178.5"
               fill="#FF0000" fill-opacity="0.05"/>
      <feGaussianBlur stdDeviation="128"/>
 
-   so the wash is pure #ff0000 at 5% — the same red this trial already uses for
-   the fills, which is why it is written as `--accent` rather than as a second
-   hardcoded hex. Change `--accent` above and the wash follows.
+   The file's own fill is pure #ff0000, and when the trial's accent WAS that
+   colour the two agreed by coincidence. Writing the stop as `--accent` rather
+   than as a second hardcoded hex is what made that a derivation rather than a
+   duplicate — so moving the accent to `#F95873` moved the wash with it, in one
+   edit, and the band cannot be a different hue from the buttons on it. That
+   is the same discipline `--ai-amber` records in §83 and `--accent-shadow`
+   fails one line above: a literal does not follow, a `var()` does.
 
    THE DERIVATION FOLLOWS §25.1's, because the two have to be comparable.
    Figma pads a blurred export by 2 sigma on both axes, and here that is exact:

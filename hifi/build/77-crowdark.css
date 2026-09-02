@@ -207,6 +207,47 @@
    to one side. One item, one declaration, no breakpoint. */
 .app .crow-dark .crow-a{align-self:flex-end}
 
+/* ----------------------------------------------------------------- 77.6a ---
+   AND THE COLUMN HAS TO TAKE IT BACK — TRAP 19, ON THE RULE THAT CITES TRAP 19
+
+   §77.6's last four words are "no breakpoint", and they are the bug.
+   `align-self` is one of the four properties whose AXIS the parent's formatting
+   context defines, which is the whole of trap 19 — §71.3 turns `.crow` into a
+   COLUMN flex below 900, so in that tier the identical declaration stops
+   meaning "sit on the bottom of the row" and starts meaning "shrink to your
+   content width and pin right". The group is then the only member of the stack
+   that is not stretched, and §71.3's `.app .crow-a > .btn{width:100%}` resolves
+   against a shrink-to-fit box.
+
+   WHICH IS THE SAME FAILURE §77.9's NOTE RECORDS FOR `margin-left:auto`,
+   arriving through a second property that was not on that list. That note says
+   the fix made all four `crow` call sites "stack full-width buttons on a
+   phone, which is what that block always said it did" — and it did not, because
+   this rule was still shrink-wrapping the group two paragraphs below it.
+
+   MEASURED AT 390 BEFORE THIS RULE, on all three portals: `.crow-a` 110px
+   inside a 292px row on the candidate's `booked` dashboard, 152px on the
+   leader's dashboard and 143px on the talent agent's. `.crow-who` beside them
+   measures the full 292 — that is the tell, it has `align-self:auto` and is
+   stretched, and the action group is the one member that is not.
+
+   IT IS AFTER §77.6 AND NOT BEFORE IT, AND THAT IS TRAP 3 STATED MORE
+   PRECISELY THAN CLAUDE.md STATES IT. That trap reads "a rule inside
+   `@container app (…)` beats an unconditional rule of equal weight regardless
+   of layer order", which is not what CSS does — a container query adds NO
+   specificity. It has held everywhere it is cited because those query blocks
+   happen to sit later in the file than the rules they answer. Written into
+   §77.5's block, four lines above, this one lost to §77.6 on order at equal
+   (0,3,0) and the group stayed `flex-end` with nothing warning. Restating a
+   rule inside a tier is necessary; being LATER is the other half.
+
+   `stretch` RATHER THAN GATING §77.6 AT 900, so that layer's rule and its
+   argument stay exactly as written for the row it was reasoning about. This is
+   the column saying the declaration does not apply to it — the shape §71.3
+   already uses for `margin-left`, in the same query. */
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-a{align-self:stretch}}
+
 /* ------------------------------------------------------------------ 77.7 ---
    A MARK THAT IS A LABEL, NOT A FACE
    1 Sep 2026, with the leader's card becoming the next COHORT CALL.

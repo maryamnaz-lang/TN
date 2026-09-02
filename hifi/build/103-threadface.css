@@ -1,0 +1,32 @@
+/* ==========================================================================
+   103. A FACE IN A THREAD IS A DISC
+   Maryam, 2 Sep 2026: "user circle images of both sender and reciever."
+
+   BOTH SIDES AND THE HEADER, WHICH IS WHAT MAKES IT ONE OBJECT. `.m-av` is the
+   mark on every message row — `m(side, …)` gives the incoming and the outgoing
+   line the same span and §15.1251 only reverses the row — so one selector
+   answers "both sender and receiver" with no `.me` case. `.mhead-av` is the
+   third face on the screen and the same person as the incoming one; left square
+   it would be the only uncurved face in the component.
+
+   §89.2 IS THE PRECEDENT AND THIS IS THE SAME DECISION FINISHED. That layer
+   made the cohort discussion's `.cmt-av`, the ranking's `.b-who` and the
+   members list's `.mem-av` discs; the message thread was the one conversation
+   surface it did not reach, so the product had round faces in the room and
+   square faces in the DM about the room.
+
+   `--radius` IS 0px BY TOKEN AND THIS IS NOT AN EXCEPTION TO THAT. §56 grants
+   the one curve this system allows to MARKS, and a face beside a line of speech
+   is the clearest mark in the build. It is a literal `999px` rather than a
+   re-pointed token for §89.2's reason: re-pointing `--radius` here would curve
+   the bubble, the file card and the voice note with it.
+
+   KEYED ON THE WRAPPER, NOT ON `.av-ph` INSIDE `.msg-page`, which is §89.2's
+   rule again — the selector says which COMPONENT it is about, so the leader's
+   DM and the cohort board get it from the same line and no page scope has to
+   be maintained. `.app .m-av .av-ph` is (0,3,0) against §09.7's (0,1,0).
+
+   NOT ONE font-size, font-weight, text-transform OR text colour.
+   ========================================================================== */
+.app .m-av .av-ph,
+.app .mhead-av .av-ph{border-radius:999px}

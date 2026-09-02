@@ -105,6 +105,26 @@ the accent gradient), `.wkc*`/`.ring*`, `.ai-aura`/`.ai-head`/`.ai-label`, `.tw-
 artwork", which is why Tal came out a hard orange square. **Excluding a class costs a portal
 that looks generic; including an unused one costs one rule.** Default to include.
 
+**AND IT WAS BROUGHT UP TO THE CURRENT COMPONENT GENERATION ON 2 SEP 2026** (Maryam: "the look
+talent agent portal have right now is a previous design but we have improved this design, so
+see the cohort leader portal and implement those components that suits on talent agent portal
+as per its content", then "follow the candidate portal summary and steps ui … please remove
+picture and welcome context"). It had been left on the §56/§33 generation while §70–§86 landed
+on the other two, so one design system was rendering two generations with class sets that did
+not overlap — the failure that is invisible from either file alone. What changed, all of it
+components the other portals already draw: the head band is **§70's** (Tal's summary is the
+whole left column on the warm wash, the journey is `.jrn` in a `.sec.head-sec.head-col
+.sec-jrn` right column, and the 75px face, the greeting and the fact row are gone behind a
+`.ph-bare`); every `.plate` hero became a full-width **`.dark-card`** in the page body, with
+`.crow-dark` + **`.crow`** wherever the subject is an appointment with a person; headings with
+a sentence under them became **`aiHead`**; six read-once reference blocks became **§65
+disclosures** keyed by name in `S.disc`; and the dashboard's stranded `.btn-row` became
+**Quick Actions**. `plate()`, `stepper()`, `youMark()`, `stepIcon` and `ph()`'s `mark` argument
+are deleted or left caller-less with their arguments preserved in place. Also on 2 Sep: the
+`Choose a portal` sign-in step is **removed** — login goes straight to the dashboard — and
+because that screen was the only element writing `data-portal`, the route to `hifi/` moved to
+`V.profile`'s "Your roles", which is §78's account-menu decision one step longer.
+
 That portal has since been **rebuilt on the include-by-default output** and is no longer the
 example of the problem — it is the example of the fix. Tal speaks from `.ai-aura`, the next
 interview and the calibration slot are `.plate`s with the orange CTA, the training modules are
@@ -2443,9 +2463,18 @@ annotations ("Open question — client decision") deliberately do **not** cross 
 2. **Entrance animations beat normal declarations.** `13-motion.css` runs with
    `fill-mode:both`, so a played animation's final keyframe keeps applying. Never style a
    resting state with `opacity` — put the weight in `background-color` (e.g. `color-mix`).
-3. **A container query is its own cascade tier.** A rule inside `@container app (min-width:900px)`
-   beats an unconditional rule of equal weight regardless of layer order. Restate inside the
-   tier (`25-modhead.css` §7 does this twice).
+3. **A rule that must differ per width has to be restated INSIDE the container query — and it
+   has to be LATER in the file as well.** Restating inside the tier is half of it
+   (`25-modhead.css` §7 does this twice). **This trap used to read "a rule inside `@container
+   app (min-width:900px)` beats an unconditional rule of equal weight regardless of layer
+   order", and that is not what CSS does** — a container query adds **no** specificity, so an
+   unconditional rule of equal weight that lands later still wins. It held everywhere it was
+   cited only because those query blocks happen to sit later in the file than the rules they
+   answer. **§77.6a is the counter-example and it cost a build cycle**: the stacked-tier
+   correction for `.crow-a`'s `align-self` was written into §77.5's existing query block, four
+   lines *above* §77.6's unconditional rule at the same (0,3,0) — it lost on order, the group
+   stayed `flex-end`, and nothing warned. Moved below §77.6 it wins. Check the *order* as well
+   as the tier and the weight.
 4. **`20-group.css`'s desktop rule carries ~13 classes.** It cannot be outweighed from a later
    layer — extend its `:not()` exclusion list instead. That list is where "which section pairs
    are already joined" is decided.

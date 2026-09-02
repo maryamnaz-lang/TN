@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5028.  Rules dropped as product-specific: 187.
+   Rules kept: 5101.  Rules dropped as product-specific: 187.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -4254,7 +4254,7 @@ button{font-family:var(--font-sans)}
 .app .lead-b{background-color:var(--surface-2); margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1); padding:var(--s06) var(--pad-x)}
 .app .lead-eb{font-size:11px; line-height:15px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
 .app .lead-t{margin-top:var(--s03); font-size:17px; line-height:23px; font-weight:600; letter-spacing:-.2px}
-.app .lead-x{margin-top:var(--s04); max-width:72ch; font-size:13.5px; line-height:22px; color:var(--text-secondary)}
+.app .lead-x{margin-top:var(--s04); font-size:13.5px; line-height:22px; color:var(--text-secondary)}
 .app .lead-tags{display:flex; gap:var(--s04); flex-wrap:wrap; margin-top:var(--s05)}
 .app .lead-tags > span{min-height:28px; display:inline-flex; align-items:center; padding:0 var(--s05); border:1px solid var(--rule-on-2); font-size:11.5px; line-height:16px; color:var(--text-secondary)}
 .app .lead-a{margin-top:var(--s06)}
@@ -4265,10 +4265,10 @@ button{font-family:var(--font-sans)}
   .app .lead-b{display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:var(--s08); align-items:start}
   .app .lead-eb,
   .app .lead-t,
-  .app .lead-x,
   .app .lead-tags,
   .app .lead-ok{grid-column:1}
-  .app .lead-a{grid-column:2; grid-row:1 / span 4; margin-top:0; justify-self:end}
+  .app .lead-x{grid-column:1 / -1}
+  .app .lead-a{grid-column:2; grid-row:4; margin-top:0; justify-self:end; align-self:center}
 }
 .app .btn.danger{color:var(--danger-ink); border-color:var(--danger-ink)}
 .app .btn.danger svg,
@@ -4621,8 +4621,8 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .page > .ph{padding-bottom:var(--s05)}
   .app .page > .ph + .sec:not(.cap-sec){padding-top:var(--s05)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){padding-bottom:var(--s06)}
-  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(.sec-band):not(:has(> .lead-b)){padding-top:var(--s06)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){padding-bottom:var(--s06)}
+  .app .page > .sec:not(.cap-sec):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child))):not(.sec-call):not(.dark-card) + .sec:not(.cap-sec):not(.sec-out):not(.lead-bar):not(.ldr-dm-sec):not(.dark-card):not(.sec-band):not(:has(> .lead-b)){padding-top:var(--s06)}
   .app .page > .sec.cap-sec + .sec:not(.cap-sec){padding-top:var(--s06)}
 }
 
@@ -5353,7 +5353,7 @@ button.btn-p:active,
 .app .lead-b{position:relative; display:block; background:var(--surface-dark); color:var(--on-dark); padding:var(--s08) var(--pad-x); margin:0; border:0}
 .app .lead-b .lead-eb{color:var(--on-dark-2)}
 .app .lead-b .lead-t{color:var(--on-dark)}
-.app .lead-b .lead-x{color:var(--on-dark-2); max-width:72ch}
+.app .lead-b .lead-x{color:var(--on-dark-2)}
 .app .lead-b .lead-tags{margin-top:var(--s06)}
 .app .lead-b .lead-tags span{border-color:var(--on-dark-rule); color:var(--on-dark)}
 .app .lead-b .lead-a{position:static; display:flex; justify-content:flex-end; margin-top:var(--s07)}
@@ -5405,10 +5405,10 @@ button.btn-p:active,
   .app .lead-b{display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:var(--s08); align-items:end}
   .app .lead-b .lead-eb,
   .app .lead-b .lead-t,
-  .app .lead-b .lead-x,
   .app .lead-b .lead-tags,
   .app .lead-b .lead-ok{grid-column:1}
-  .app .lead-b .lead-a{grid-column:2; grid-row:1 / span 4; margin-top:0; justify-self:end; align-self:end}
+  .app .lead-b .lead-x{grid-column:1 / -1}
+  .app .lead-b .lead-a{grid-column:2; grid-row:4; margin-top:0; justify-self:end; align-self:end}
 }
 .app .btn-full,
 .app .stickybar .btn,
@@ -5756,8 +5756,6 @@ button.btn-p:active,
 .app[data-portal="leader"] .ldr-tbl tr.sev .flag-t{color:var(--danger-ink)}
 .app[data-portal="leader"] .ldr-tbl tr.mod .flag-t{color:var(--support-attention)}
 .app[data-portal="leader"] .ldr-tbl td.num .t-helper-01{white-space:nowrap}
-.app .ldr-recs,
-.app .ldr-picker{flex-wrap:wrap}
 .app .ldr-n{margin-left:var(--s03); font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-helper)}
 .app .btn-p .ldr-n{color:inherit; opacity:.75}
 .app .ldr-on{background-color:color-mix(in srgb, var(--accent) 8%, transparent)}
@@ -5834,8 +5832,25 @@ button.btn-p:active,
   .app .ldr-dm-back{display:none}
 }
 .app .ldr-dm-back{flex:none; margin-right:var(--s02)}
+.app .main:has(> .msg-mod){display:flex; flex-direction:column; flex:1; min-height:0}
+.app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:var(--s06)}
+.app .page.msg-mod > .sec.ldr-dm-sec{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
+.app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto; min-height:0}
+.app .main:has(> .msg-mod),
+.app .page.msg-mod,
+.app .page.msg-mod > .sec.ldr-dm-sec,
+.app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm,
+.app .ldr-dm > .ldr-dm-list,
+.app .ldr-dm > .ldr-dm-thread,
+.app .ldr-dm-thread > .msgs{min-width:0}
+.app .ldr-dm-thread > .msgs > :first-child{margin-top:auto}
+@container app (max-width:899.98px){
+  .app .ldr-dm.show-thread > .ldr-dm-thread{flex:1 1 auto; min-height:0}
+  .app .ldr-dm.show-thread > .ldr-dm-thread > .msgs{flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain}
+  .app .ldr-dm > .ldr-dm-list{flex:1 1 auto; min-height:0; overflow-y:auto}
+}
 @container app (min-width:900px){
-  .app .ldr-dm{display:grid; grid-template-columns:25% 75%; gap:0; height:clamp(400px, 62cqh, 680px)}
+  .app .ldr-dm{display:grid; grid-template-columns:25% 75%; gap:0}
   .app .ldr-dm-list{border-right:1px solid var(--rule); overflow-y:auto; overscroll-behavior:contain; min-height:0}
   .app .ldr-dm-thread{min-height:0}
   .app .ldr-dm-thread > .msgs{flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain}
@@ -7340,6 +7355,7 @@ button.btn-p:active,
 .app .cmt-w{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-helper)}
 .app .cmt-b{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
 .app .cmt-act{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-secondary)}
+.app .cmt-act.on{color:var(--mk-1)}
 .app .cmt-ct{font-variant-numeric:tabular-nums}
 .app[data-portal="leader"] .tbl-flag .flag-t{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls)}
 .app[data-portal="leader"] .tbl-flag .tbl-act .btn{color:var(--link)}
@@ -7374,18 +7390,21 @@ button.btn-p:active,
 .app .dark-card .wing-lvl .prog-l{color:var(--on-dark-2)}
 .app .dark-card .wing-lvl .prog-dn small{color:var(--on-dark-2)}
 .app .ldr-chip{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none}
-.app .chip-msg{color:var(--link)}
+.app .chip-msg,
+.app .chip-edit{color:var(--link)}
 .app .chip-note{color:var(--support-warning-ic)}
+.app .chip-del{color:var(--danger-ink)}
 .app .note-t,
 .app .note-empty > h3{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .note-x,
 .app .note-empty > p{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
 .app .note-tag{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--note-ink)}
-.app .note-w,
-.app .note-foot{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-helper)}
-.app .note-n{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-primary)}
+.app .note-w{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-helper)}
 .app .mhead-n{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .mhead-s{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
+.app .note-sel-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
+.app .form-page .role-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
+.app .form-page .role-c.on .role-t{color:var(--accent-text)}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
@@ -8001,6 +8020,9 @@ button.btn-p:active,
   .app .crow-dark .crow-a{padding-bottom:0}
 }
 .app .crow-dark .crow-a{align-self:flex-end}
+@container app (max-width:899.98px){
+  .app .crow-dark .crow-a{align-self:stretch}
+}
 .app .crow-dark .crow-ph{background:var(--on-dark-fill)}
 @container app (min-width:900px){
   .app .crow-dark .crow-a1 > .btn{width:auto; padding-right:0}
@@ -8139,8 +8161,9 @@ button.btn-p:active,
 .app .page > .sec:has(+ .sec.sec-rep)::after{display:none}
 
 /* ---- 85-certbanner.css ---- */
-.app .certban{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); padding:var(--s05); background:color-mix(in srgb, var(--accent) 8%, transparent)}
-.app .certban-mk{flex:none; display:grid; place-items:center; width:32px; height:32px}
+.app .certban{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); padding:var(--s05); background:var(--layer-02)}
+.app .certban-mk{flex:none; display:grid; place-items:center; width:37px; height:40px}
+.app .certban-mk img{display:block; width:100%; height:100%; object-fit:contain}
 .app .certban-mk svg{width:32px; height:32px; fill:var(--accent-text)}
 .app .certban-b{flex:1 1 220px; min-width:0; display:flex; flex-direction:column; gap:2px}
 .app .certban-a{flex:none; margin-left:auto; display:flex; align-items:center; gap:var(--s04); flex-wrap:wrap}
@@ -8306,9 +8329,8 @@ button.btn-p:active,
 .app .sump-fl{flex:1; min-width:0}
 .app .sump-fv{flex:none; font-variant-numeric:tabular-nums}
 .app .sump-go{align-self:flex-start; margin-top:var(--s02)}
-.app .sump-recs{display:flex; flex-direction:column; border:1px solid var(--rule)}
-.app .sump-r{display:flex; align-items:flex-start; gap:var(--s04); padding:var(--s04) var(--s05); border-top:1px solid var(--rule); background:none; text-align:left; width:100%; -webkit-appearance:none; appearance:none; font:inherit; color:inherit}
-.app .sump-r:first-child{border-top:0}
+.app .sump-recs{display:flex; flex-direction:column}
+.app .sump-r{display:flex; align-items:flex-start; gap:var(--s04); padding:var(--s04) var(--s05); background:none; text-align:left; width:100%; -webkit-appearance:none; appearance:none; font:inherit; color:inherit}
 .app .sump-r.on{background:var(--support-success-bg)}
 .app .sump-rm{flex:none; width:20px; height:20px; display:grid; place-items:center; margin-top:1px}
 .app .sump-rm svg{width:20px; height:20px; fill:var(--icon-secondary)}
@@ -8319,11 +8341,12 @@ button.btn-p:active,
 .app .sump-p:first-child{border-top:0; padding-top:0}
 .app .sump-p > h3{margin:0 0 var(--s03)}
 .app .sump-p > p{margin:0}
-.app .sump-sig{display:flex; align-items:center; gap:var(--s04); padding-top:var(--s05); border-top:1px solid var(--rule)}
-.app .sump-top{display:flex; flex-direction:column; gap:var(--s05); align-items:flex-start}
-.app .sump-st{display:inline-flex; align-items:center; gap:var(--s03)}
-.app .sump-st svg{width:18px; height:18px; fill:#00a43c; flex:none}
 .app .note.succ svg{fill:#00a43c}
+@container app (min-width:900px){
+  .app .sump > .sump-c{align-self:center}
+}
+.app .ldr-recs{display:flex; flex-direction:column; gap:var(--s02); align-items:flex-start}
+.app .ldr-rec{padding-block:var(--s03)}
 
 /* ---- 92-cohortcards.css ---- */
 .app .cco-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--s06)}
@@ -8388,8 +8411,10 @@ button.btn-p:active,
 .app .page > .sec.sec-cs:has(+ .sec.dark-card){padding-bottom:0}
 .app .ldr-chip{display:inline-flex; align-items:center; gap:var(--s02); height:32px; padding:0 var(--s05); border:0; border-radius:999px; cursor:pointer; background-color:var(--chip-bg)}
 .app .ldr-chip svg{width:16px; height:16px; flex:none; fill:currentColor}
-.app .chip-msg{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
+.app .chip-msg,
+.app .chip-edit{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
 .app .chip-note{--chip-bg:color-mix(in srgb, var(--support-warning-ic) 14%, var(--layer-01))}
+.app .chip-del{--chip-bg:color-mix(in srgb, var(--danger-ink) 12%, var(--layer-01))}
 .app .sec > .idhead:last-child{margin-bottom:0}
 
 /* ---- 96-certgrid.css ---- */
@@ -8400,14 +8425,14 @@ button.btn-p:active,
 .app .crt-art{flex:none; display:grid; place-items:center; width:var(--crt-art-w); height:var(--crt-art-h)}
 .app .crt-art img{display:block; width:100%; height:100%; object-fit:contain}
 .app .crt-grid{display:grid; grid-template-columns:repeat(auto-fill,240px); justify-content:start; gap:var(--s05)}
-.app .crt-card{position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:var(--s07); text-align:left; background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .crt-card{position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:var(--s07) var(--s05) var(--s05); text-align:left; background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
 .app .crt-menu{position:absolute; top:12px; right:12px; z-index:2; display:grid; place-items:center; width:32px; height:32px; background:transparent; border:0; cursor:pointer; color:var(--icon-secondary)}
 .app .crt-menu svg{width:20px; height:20px; fill:currentColor}
 .app .crt-pop{position:absolute; top:44px; right:12px; z-index:3; min-width:168px; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule)}
 .app .crt-pop-i{display:flex; align-items:center; gap:var(--s03); padding:var(--s04) var(--s05); background:transparent; border:0; cursor:pointer; text-align:left; color:var(--text-primary)}
 .app .crt-pop-i + .crt-pop-i{border-top:1px solid var(--rule)}
 .app .crt-pop-i svg{width:18px; height:18px; flex:none; fill:currentColor}
-.app .crt-card > .crt-art{--crt-art-w:120px; --crt-art-h:130px; align-self:flex-start; margin-bottom:var(--s05)}
+.app .crt-card > .crt-art{--crt-art-w:120px; --crt-art-h:130px; align-self:center; margin-bottom:var(--s05)}
 @container app (min-width:900px){
   .app .sec:has(> .crt-grid){display:block; padding-left:var(--pad-x)}
   .app .sec:has(> .crt-grid) > .sec-h{width:auto; border-right:0; padding:0; margin-bottom:var(--sec-h-gap)}
@@ -8454,25 +8479,23 @@ button.btn-p:active,
 .app .note-mk-lg svg{width:28px; height:28px; fill:var(--text-helper)}
 .app .note-empty > p{max-width:46ch}
 .app .note-empty > .note-first{margin-top:var(--s02)}
-.app .note-bar{display:flex; align-items:center; gap:var(--s04); flex-wrap:wrap; padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule)}
-.app .note-bar-a{display:flex; align-items:center; gap:var(--s03); margin-left:auto}
 .app .note-srch{position:relative; display:flex; align-items:center}
 .app .note-srch svg{position:absolute; left:var(--s03); width:16px; height:16px; fill:var(--icon-secondary); pointer-events:none}
 .app .note-srch .inp{width:180px; padding-left:calc(var(--s03) * 2 + 16px)}
 .app .note-sel{width:auto}
-.app .note-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:var(--s05); align-items:start; padding:var(--s05); border-bottom:1px solid var(--rule)}
-.app .note-row:last-child{border-bottom:0}
+.app .note-list{display:flex; flex-direction:column}
+.app .note-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:var(--s05); align-items:start; padding:var(--s05) 0}
+.app .note-row + .note-row{border-top:1px solid var(--rule)}
 .app .note-row.is-off{display:none}
 .app .note-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .app .note-f{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s03)}
 .app .note-tag{display:inline-flex; align-items:center; padding:2px var(--s03); border-radius:999px; background:var(--note-bg)}
 .app .note-a{display:flex; align-items:center; gap:var(--s02); flex:none}
 .app .note-a .ic svg{width:16px; height:16px}
-.app .note-foot{padding:var(--s04) var(--s05); border-top:1px solid var(--rule); text-align:center}
-.app .note-box{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s05); align-items:start; padding:var(--s05)}
+.app .note-box{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s05); align-items:start; padding:var(--s05) 0}
 .app .note-mk-w{background:var(--layer-02)}
 .app .note-mk-w svg{fill:var(--text-secondary)}
-.app .note-form{display:flex; flex-direction:column; gap:var(--s03); min-width:0}
+.app .note-form{display:flex; flex-direction:column; gap:var(--s05); min-width:0}
 .app .note-body{resize:vertical}
 .app .note-form-a{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
 .app .note-form-b{display:flex; align-items:center; gap:var(--s03); margin-left:auto}
@@ -8484,9 +8507,20 @@ button.btn-p:active,
   .app .note-srch .inp{width:100%}
 }
 @container app (min-width:900px){
-  .app .sec:has(> .note-panel){display:block; padding-left:var(--pad-x)}
-  .app .sec:has(> .note-panel) > .sec-h{width:auto; border-right:0; padding:0; margin-bottom:var(--sec-h-gap)}
+  .app .sec:has(> .note-panel),
+  .app .sec:has(> .note-list){display:block; padding-left:var(--pad-x)}
+  .app .sec:has(> .note-panel) > .sec-h,
+  .app .sec:has(> .note-list) > .sec-h{width:auto; border-right:0; padding:0; margin-bottom:var(--sec-h-gap)}
 }
+.app .note-fbox{display:flex; flex-direction:column; gap:var(--s03); padding:var(--s04); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .note-fbox > .note-body{border:0; padding:0; min-height:72px; background:transparent}
+.app .note-sel-w{position:relative; display:inline-flex; align-items:center; gap:var(--s03)}
+.app .note-sel-w > .note-sel{position:absolute; inset:0; width:100%; height:100%; opacity:0; border:0; padding:0; cursor:pointer}
+.app .note-sel-ch{display:inline-flex; pointer-events:none}
+.app .note-sel-ch svg{width:16px; height:16px; fill:var(--icon-secondary)}
+.app .note-form-b .btn.note-cancel::after{content:none}
+.app .page:not(.form-page) .sec:has(> .note-panel) > .sec-h,
+.app .page:not(.form-page) .sec:has(> .note-list) > .sec-h{padding-right:0}
 
 /* ---- 100-msgui.css ---- */
 .app .mhead{display:flex; align-items:center; gap:var(--s05); padding:var(--s05) var(--pad-x); border-bottom:1px solid var(--rule)}
@@ -8514,3 +8548,70 @@ button.btn-p:active,
 .app .m-day::before{content:none}
 .app .m-day > span{padding:0}
 .app .msg-page > .msg-foot{border-top:0}
+.app .msgs > *{padding-left:0; padding-right:0}
+
+/* ---- 101-blockgap.css ---- */
+.app .page > .sec.dark-card:is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child)){margin-bottom:0}
+.app .page > .sec:is(:has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child)){padding-bottom:0}
+.app .page > .sec:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)) + .sec.dark-card{margin-top:var(--pad-x)}
+.app .page > .sec:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)) + .sec:is(:has(> .stats:first-child), :has(> .facts:first-child), :has(> .certban:first-child), :has(> .tile:first-child), :has(> .note:first-child)){padding-top:var(--pad-x)}
+@container app (min-width:900px){
+  .app .page > .sec.dark-card:is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child)){margin-bottom:0}
+  .app .page > .sec:is(:has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)):is(:has(+ .sec.dark-card), :has(+ .sec > .stats:first-child), :has(+ .sec > .facts:first-child), :has(+ .sec > .certban:first-child), :has(+ .sec > .tile:first-child), :has(+ .sec > .note:first-child)){padding-bottom:0}
+  .app .page > .sec:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)) + .sec.dark-card{margin-top:var(--pad-x)}
+  .app .page > .sec:is(.dark-card, :has(> .stats:last-child), :has(> .facts:last-child), :has(> .certban:last-child), :has(> .tile:last-child), :has(> .note:last-child)) + .sec:is(:has(> .stats:first-child), :has(> .facts:first-child), :has(> .certban:first-child), :has(> .tile:first-child), :has(> .note:first-child)){padding-top:var(--pad-x)}
+}
+
+/* ---- 102-awardcards.css ---- */
+.app .aw-list.aw-grid{display:grid; gap:var(--s05); justify-content:start; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); margin-left:0; margin-right:0}
+.app .page .sec .aw-grid > .aw{display:flex; flex-direction:column; align-items:flex-start; gap:0; padding:var(--s07) var(--s05) var(--s05); background-color:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .page .sec .aw-grid > .aw:last-child{border:1px solid var(--rule)}
+.app .aw-grid > .aw > .aw-art{width:96px; height:96px; align-self:center; margin-bottom:var(--s05)}
+.app .aw-grid > .aw > .aw-b{flex:none; width:100%}
+.app .aw-grid > .aw > .awc-v{margin-top:var(--s04)}
+.app .aw-grid > .aw > .awc-m{width:100%; margin-top:var(--s05); display:flex; flex-direction:column; gap:var(--s03)}
+.app .aw-grid > .aw > .awc-m > .aw-s{margin-top:0}
+
+/* ---- 103-threadface.css ---- */
+.app .m-av .av-ph,
+.app .mhead-av .av-ph{border-radius:999px}
+
+/* ---- 104-loginrole.css ---- */
+.app .form-page .sec.sec-role{padding-top:12px; padding-bottom:12px}
+.app .form-page .sec.sec-role::after{display:none; content:none}
+.app .form-page .role-pick{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.app .form-page .role-c{box-sizing:border-box; align-items:center; gap:12px; padding:14px 16px; background-color:var(--layer-02); border:0; border-radius:var(--auth-r)}
+.app .form-page .role-c.on{background-color:var(--brand-tint-2)}
+.app .form-page .role-c input:not(:checked) + .box{background:transparent}
+.app .form-page .role-c input:checked + .box{background:var(--accent); border-color:var(--accent)}
+.app .form-page > .sec.sec-role + .sec.sec-rule{border-top:0}
+.app .auth-card .page > .sec.sec-role + .sec.sec-rule{border-top:0}
+.app .auth-card .page > .sec.sec-role + .sec.sec-rule::before{display:none; content:none}
+
+/* ---- 105-profile.css ---- */
+.app .page .pf-facts .pf-l{display:flex; align-items:center; gap:var(--s03)}
+.app .page .pf-facts .pf-l svg{flex:none; width:20px; height:20px; fill:var(--mk)}
+.app .page .pf-facts .v{display:block; margin-top:var(--s03)}
+.app .page .pf-facts .d{display:block; margin-top:2px}
+.app .page .pf-pair{display:grid; gap:var(--s05); grid-template-columns:minmax(0,1fr)}
+@container app (min-width:900px){
+  .app .page .pf-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+}
+.app .page .pf-card{display:flex; flex-direction:column; gap:var(--s05); padding:var(--s05); background-color:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .page .pf-hd{display:flex; align-items:center; gap:var(--s05)}
+.app .page .pf-hd > h3{flex:1 1 auto; min-width:0; margin:0}
+.app .page .pf-hd > .btn{flex:none; margin-left:auto}
+.app .page .pf-ach{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--s04); align-content:start}
+.app .page .pf-ach > .crt-card{padding:var(--s04); gap:2px}
+.app .page .pf-ach > .crt-card > .crt-art{--crt-art-w:56px; --crt-art-h:61px; align-self:center; margin-bottom:var(--s04)}
+.app .page .pf-act{--pad-x:0px; display:flex; flex-direction:column}
+.app .page .pf-act > .nrow:last-child{border-bottom:0}
+.app .page .pf-tgs{display:grid; gap:var(--s05); grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.app .page .pf-tgs > .tg{align-items:flex-start; gap:var(--s04); padding:var(--s05); background-color:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .page .pf-tgs > .tg > .tb{flex:1 1 auto; min-width:0}
+.app .page .pf-tgs > .tg > .sw{align-self:center}
+.app .page .pf-tgs .tg-mk{flex:none; display:grid; place-items:center; width:20px; height:20px; margin-top:1px}
+.app .page .pf-tgs .tg-mk svg{width:20px; height:20px; fill:var(--mk)}
+.app .lead-b .lead-tags{gap:var(--s05) var(--s07)}
+.app .lead-b .lead-tags > span{min-height:0; display:inline-flex; align-items:center; gap:var(--s03); padding:0; border:0}
+.app .lead-b .lead-tags > span svg{flex:none; width:20px; height:20px; fill:var(--on-dark)}

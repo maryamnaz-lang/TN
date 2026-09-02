@@ -107,18 +107,32 @@
 .app .crt-grid{
   display:grid;grid-template-columns:repeat(auto-fill,240px);
   justify-content:start;gap:var(--s05)}
+/* THE FRAME IS 32 ON TOP AND 16 EVERYWHERE ELSE (Maryam, 2 Sep 2026: "reduce
+   the left right and bottom padding in these cards"). It was a flat `--s07`,
+   which is `.dark-card`'s frame — right for a black card holding a heading, a
+   rule and a row of content, and far too much around three lines of type under
+   a badge: at 240px wide, 32 a side left 176 for a title that wants to sit on
+   one or two lines, so "90-Day Programme Facilitation" broke to two where 208
+   holds it.
+   THE TOP IS THE ONE THAT STAYS, and it is not an oversight. The badge is the
+   card's subject and the only thing above it is the card's own edge, so the
+   space over it is what stops the artwork reading as cropped — the three other
+   sides each have type against them, which needs less. `--s05` matches the
+   grid's own `gap`, so the space inside a card and the space between two cards
+   are one number. */
 .app .crt-card{
   position:relative;
   display:flex;flex-direction:column;align-items:flex-start;gap:2px;
-  padding:var(--s07);text-align:left;
+  padding:var(--s07) var(--s05) var(--s05);text-align:left;
   background:var(--layer-01);border:1px solid var(--rule);border-radius:var(--radius)}
 
 /* ---- the card's menu ----
    THE TOGGLE IS ABSOLUTE, NOT A ROW. A control in the card's flow would take a
    line of its own above the badge and push the whole composition down; the
    reference's card puts it in the corner precisely because it is about the card
-   rather than part of it. 12px in from the card's own 32px frame, so it sits
-   inside the padding rather than on the border.
+   rather than part of it. 12px in from the card's edge, so it sits inside the
+   padding rather than on the border — the top frame is 32 and the right is 16
+   since 2 Sep 2026, and 12 clears both.
 
    THE PANEL IS ANCHORED ON THE SAME CORNER and opens DOWN, not up: a card can
    be the last row of the grid, where a panel opening upward would cover the

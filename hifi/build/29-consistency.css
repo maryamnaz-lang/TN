@@ -293,11 +293,36 @@
     column-gap:var(--s08);align-items:end}
   .app .lead-b .lead-eb,
   .app .lead-b .lead-t,
-  .app .lead-b .lead-x,
   .app .lead-b .lead-tags,
   .app .lead-b .lead-ok{grid-column:1}
+  /* THE DESCRIPTION SPANS BOTH COLUMNS — "this desc should have full width"
+     (Maryam, 2 Sep 2026). Two things had to happen and only the first is
+     obvious: §16 and §28 both capped `.lead-x` at `max-width:72ch`, which is
+     ~1050px of a 13.5px face, and both caps are gone. That gave the paragraph
+     its COLUMN — 552 of the card's 837 — which is not the card.
+
+     AND THIS IS THE LAYER WHERE IT COUNTS, WHICH COST A BUILD. §16 states this
+     whole grid and §29 restates it at (0,3,0) against §16's (0,2,0), so the
+     change written in §16 lost silently and the computed `grid-column` stayed
+     `1`. §63 §7b's trap, in a layer whose entire job is restating §16 — the tell
+     was that the paragraph did not move at all rather than moving wrongly. §16
+     carries the same pair now so the two cannot disagree; this one is what the
+     browser reads.
+
+     WHICH MEANS THE ACTION CANNOT SPAN THE ROWS. `grid-row:1 / span 4` centred
+     it against the whole text block, and a row-spanning item in column 2 plus a
+     column-spanning item in row 3 want the same cell — an overlap, not a
+     layout. Row 4 puts it on the tags' line, `align-self:end` like the card's
+     own `align-items`, which is within a pixel of where the span already drew
+     it: the button was already reading as being on the chip row.
+
+     ROW 4 IS COUNTED: column 1 auto-places the eyebrow (1), the title (2), the
+     tags (4) and `.lead-ok` (5) once the request is sent, with the spanning
+     description taking row 3. A fifth member above the tags moves this number,
+     which is the price of an explicit row and the reason it is written down. */
+  .app .lead-b .lead-x{grid-column:1 / -1}
   .app .lead-b .lead-a{
-    grid-column:2;grid-row:1 / span 4;
+    grid-column:2;grid-row:4;
     margin-top:0;justify-self:end;align-self:end}
 }
 

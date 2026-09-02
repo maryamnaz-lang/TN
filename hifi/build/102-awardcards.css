@@ -1,0 +1,132 @@
+/* ==========================================================================
+   102. THE BADGES AND RANK TABS ARE A CARD GRID
+   Maryam, 2 Sep 2026, with a reference screen: "I want the badges and ranks
+   page layout like this… by layout i mean the cards layout against badges and
+   ranks tabs… do not change our design look and feel, just adapt this
+   structure."
+
+   THE ROW BECOMES A CARD AND NOTHING ELSE CHANGES. `awardCard` (views.js) is
+   the markup and its note is the argument for the shape; this layer turns the
+   list into a grid and the row into an upright box. Every part it draws with
+   is already in the build — §41's `1px solid var(--rule)` frame on
+   `--layer-01`, `--radius` (0px by token), §02.358's `.pb-track` / `.pb-fill`
+   meter, and the four type classes `awardRow` already uses, so §63 states not
+   one new size, weight, case or ink for this component.
+
+   IT IS §96's CARD ON PURPOSE. The certificates tab is one click away and is
+   the same object — a fixed-track grid of bordered upright cards, artwork
+   centred, words left — and that alignment is Maryam's own correction on that
+   tab the same day. The reference centres its text; two tabs of one module
+   drawing one card two ways is worse than either, so the decision already made
+   next door wins and the reference contributes the STRUCTURE it was asked for.
+
+   IT IS `auto-fit` WITH A CEILING, AND BOTH HALVES ARE A DEPARTURE FROM §96
+   THAT ITS OWN NOTE ARGUES FOR. That layer picked `auto-fill` and a FIXED track
+   because a certificate collection GROWS — two cards stretched across 1200px
+   "look like a two-column layout that lost a row", and empty tracks are what
+   tell you the grid is not full. A badge set does not grow: there are exactly
+   four badges and exactly three ranks, always, in every stage of the build. So
+   there is no missing cell for an empty track to stand for, and the row that
+   the set does not fill is not information — it is a gap.
+
+   SO THE COLUMN COUNT FOLLOWS THE SET: `repeat(auto-fit,minmax(150px,1fr))`
+   puts the four badges four across at 197 and the three ranks three across at
+   268 in the product's 837px page measure. Neither tab has an orphan and
+   neither has a hole.
+
+   THE `1fr` MAXIMUM IS THE ONE THING §96 WARNS ABOUT AND IT IS SAFE HERE FOR A
+   STATED REASON. Its failure is a card that changes size with the DATA; these
+   change size with the TAB, and both tabs hold a set whose count is fixed in
+   the product — so the width is a constant per screen rather than an accident
+   of how much loaded. A CEILING WAS TRIED FIRST AND CANNOT DO BOTH:
+   `minmax(150px,240px)` counts its tracks off the 240 maximum, which is 3 in
+   this measure, so the four badges came out 3 + 1 with a card alone on a second
+   row. An orphan is visible; a 268 card beside the certificates' 240 is not.
+
+   ONE RULE AT EVERY WIDTH, so there is no breakpoint to keep in step. At the
+   phone's page measure the same expression gives two columns, which is the
+   layout that tier wants — a fixed 240 track there would leave a third of the
+   row empty beside a single column and read as a card that failed to fill it.
+
+   THREE INHERITED DECLARATIONS HAVE TO BE ANSWERED and all three are the row's:
+   §10.868 bleeds the list out by `--pad-x` on both sides and §10.871 puts it
+   back on each row, which in a grid would be padding inside every card and a
+   grid hanging over both rails; and §06.10's `border-bottom` is the row
+   separator, which a bordered card must not also carry.
+
+   THE GROUND AND THE FRAME NEED (0,5,0), WHICH IS §63 §7b's TRAP ONE MORE TIME.
+   §12.146 sets `background-color:transparent` on `.app .sec:has(> .aw-list)
+   .aw` and §12.154 its `border-bottom-color` — `:has()` carries its argument's
+   specificity, so both are (0,4,0) rather than the (0,3,0) they read as, and a
+   rule written `.app .aw-grid > .aw` would lose SILENTLY: a card with no ground
+   and a grey bottom edge, which looks like the frame not having been written.
+   `.app .page .sec .aw-grid > .aw` is (0,5,0) and states both.
+
+   THE ARTWORK IS 96px AND IS THE ONLY THING THAT MAKES THE CARD UPRIGHT. The
+   four text rows measure ~100px however wide the card is, so the mark is what
+   gives it its proportion — the same trade §96 records. Unlike §96 this one
+   costs nothing: the award WebPs are 160px square, so 96 is a downscale and
+   nothing is resampled. §15.1437's 32px stays the value for the row, which is
+   still what the points tab draws.
+
+   NOT ONE font-size, font-weight, text-transform OR text colour.
+   ========================================================================== */
+
+/* ---- the grid ---- */
+.app .aw-list.aw-grid{
+  display:grid;gap:var(--s05);justify-content:start;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  /* §10.868's bleed is for a list whose rows put the gutter back; a grid has
+     nothing to put it back with, so it sits inside the section like everything
+     else. */
+  margin-left:0;margin-right:0}
+
+/* ---- the card ----
+   THE FRAME IS 32 ON TOP AND 16 EVERYWHERE ELSE, which is §96's own split and
+   for its reason: the artwork is the card's subject and the only thing above it
+   is the card's edge, so the space over it is what stops the mark reading as
+   cropped; the other three sides each have type against them. `--s05` matches
+   the grid's `gap`, so the space inside a card and the space between two cards
+   are one number. */
+.app .page .sec .aw-grid > .aw{
+  display:flex;flex-direction:column;align-items:flex-start;gap:0;
+  padding:var(--s07) var(--s05) var(--s05);
+  background-color:var(--layer-01);
+  border:1px solid var(--rule);border-radius:var(--radius)}
+/* §06.15 takes the separator off the last row only; in a grid there is no
+   separator at all, and the card's own frame is the edge. */
+.app .page .sec .aw-grid > .aw:last-child{border:1px solid var(--rule)}
+
+/* ---- the subject ----
+   CENTRED BY `align-self`, WHICH IS THE ONE DECLARATION THAT OPTS OUT. The
+   card keeps `align-items:flex-start`, so the name, the requirement, the value
+   and the meter all start on the card's own 16px edge and scan down a straight
+   column; only the artwork sits in the middle, because it is the card's subject
+   rather than a row of it (§72's rule, and §96's correction in as many words). */
+.app .aw-grid > .aw > .aw-art{
+  width:96px;height:96px;align-self:center;margin-bottom:var(--s05)}
+
+/* ---- the words ----
+   `flex:none` AND `width:100%` TOGETHER, because §06.22 gives `.aw-b` `flex:1`
+   for the row it was written for — in a column that is the BLOCK axis (trap 19),
+   so left alone the text block would absorb the card's slack and push the meter
+   to the floor of whatever the tallest card in the row happens to be. */
+.app .aw-grid > .aw > .aw-b{flex:none;width:100%}
+
+/* ---- the value ----
+   §03.216's `margin-left:auto` is already neutralised by §06.30, which is what
+   keeps this on the left edge rather than pinned right — trap 19 again, since
+   in this column `margin-left:auto` would be the inline axis. Only the space
+   above it is new. */
+.app .aw-grid > .aw > .awc-v{margin-top:var(--s04)}
+
+/* ---- the meter ----
+   THE PERCENTAGE IS OVER THE BAR, NOT BESIDE IT, and it is `.aw-s` — the same
+   class the row prints "44%" and "Awarded 07/23/2026" in, so the two tabs
+   cannot disagree about how far along something is. `.pb-track` and `.pb-fill`
+   are §02.358's meter untouched: the accent is progress the candidate owns
+   (§19.30), which is exactly what this is. */
+.app .aw-grid > .aw > .awc-m{
+  width:100%;margin-top:var(--s05);
+  display:flex;flex-direction:column;gap:var(--s03)}
+.app .aw-grid > .aw > .awc-m > .aw-s{margin-top:0}

@@ -28,16 +28,31 @@
    both sides, and this card will have less content and smaller badge icon."
    Four requirements, and each one is a specific departure from `.cert`:
 
-   THE GROUND IS AN 8% ACCENT WASH, NOT `--brand-tint-2`. That token (#fcdbc7)
-   is a 20%-strength tint and is reserved: §10.29 spends it on the candidate's
-   own SELECTION — the lit day, the lit time, the step numeral — so a
-   full-width band in it would be the largest "you chose this" object on a page
-   where nothing has been chosen. `color-mix(in srgb, var(--accent) 8%,
-   transparent)` is the same hue two steps quieter, it follows `--accent` if the
-   brand moves, and it is what §67/§83's red trial re-points for free. 8 rather
-   than §74's 5: that layer's 5% cards sit on a WHITE panel where 5 is already
-   visible, and this band sits on the page's own ground with a grey Quick Action
-   panel 32px above it, where 5% read as a printing error.
+   THE GROUND IS `--layer-02`, LIGHT GREY (Maryam, 2 Sep 2026: "change this
+   banner bg color to light grey"). It was an 8% accent wash, and the argument
+   for that is kept below because it is still the right argument about ORANGE —
+   what changed is that the band is no longer orange at all.
+
+   #f7f7f7 IS THE PRODUCT'S ONE LIGHT GREY AND IT IS ALREADY THIS BAND'S
+   NEIGHBOUR. `--layer-02` is what §12 gives a tinted section and what the
+   Quick Action panel above this band is filled with, so the banner now agrees
+   with the block it sits under instead of being the one warm object between two
+   grey ones. It also stops the band competing with the only other accent on
+   the page: `.certban-a`'s View button is an accent fill, and a fill on a wash
+   of the same hue is the weakest way this product can draw a button.
+
+   WHAT THE ORANGE ARGUMENT SETTLED IS STILL WORTH KEEPING, because it is the
+   reason no other value was reached for: `--brand-tint-2` (#fcdbc7) is a
+   20%-strength tint and is RESERVED — §10.29 spends it on the candidate's own
+   SELECTION, the lit day, the lit time, the step numeral — so a full-width band
+   in it would be the largest "you chose this" object on a page where nothing
+   has been chosen. The 8% `color-mix` was that hue two steps quieter, chosen at
+   8 rather than §74's 5 because a 5% wash on the page's own ground read as a
+   printing error. A named grey needs none of that arithmetic.
+
+   THE INKS DID NOT HAVE TO MOVE. §63 §21 states them as `--text-primary` and
+   `--text-secondary`, which are 15.9:1 and 7.4:1 on #f7f7f7 — the two values
+   every other grey band in the build is read at.
 
    "NOT JOINT FROM BOTH SIDES" IS THE `.sec`'S OWN PADDING AND NOTHING ELSE,
    AND THE FIRST VERSION PAID IT TWICE (Maryam, 1 Sep 2026: "the banner should
@@ -75,16 +90,32 @@
   display:flex;align-items:center;flex-wrap:wrap;
   gap:var(--s04) var(--s05);
   padding:var(--s05);
-  background:color-mix(in srgb, var(--accent) 8%, transparent)}
+  background:var(--layer-02)}
 
-/* THE MARK IS 32px AND IT IS THE ONE ORANGE OBJECT ON THE BAND. `--accent-text`
-   (#b94a09) rather than `--accent` (#f57414): the ground is already warm, so
-   the brighter fill reads as a wash on a wash — §01's fill/ink split, and the
-   same call §76 makes for its step numeral on a tint. `flex:none` because a
-   mark in a wrapping row must never be the thing that shrinks. */
+/* THE MARK IS THE CERTIFICATION BADGE NOW (Maryam, 2 Sep 2026: "in these
+   banners, use the badges we are using on the achievements page, not these
+   badge icons"), and the slot is sized to the ASSET rather than the asset to
+   the slot — §96's rule for the same six pictures. They are 70x76, so the box
+   is 37x40 at that ratio and the artwork is never distorted and never upscaled.
+
+   40 RATHER THAN 32, AND THE BAND DOES NOT GROW BY A PIXEL. §85's "less
+   heighted" is `--s05` of padding round a one-row block, and that row's height
+   is set by the text: a 22px title over a 17px meta with 2px between them is
+   41. A 32px mark left 9px of that unused; 40 fills it, so the badge reads as a
+   badge at the one size this band can give it for free. `flex:none` because a
+   mark in a wrapping row must never be the thing that shrinks.
+
+   THE GLYPH RULE STAYS AS THE FALLBACK, which is §86's pattern for
+   `.gcard-art`: the rules know nothing about the pictures, so a hand-authored
+   page that has no badge artwork puts `I.certificate` in the same slot and gets
+   the mark it had before. `--accent-text` (#b94a09) rather than `--accent`
+   (#f57414) is that half's own decision and is unchanged — the ground is
+   already warm, so the brighter fill reads as a wash on a wash (§01's fill/ink
+   split, and the call §76 makes for its step numeral on a tint). */
 .app .certban-mk{
   flex:none;display:grid;place-items:center;
-  width:32px;height:32px}
+  width:37px;height:40px}
+.app .certban-mk img{display:block;width:100%;height:100%;object-fit:contain}
 .app .certban-mk svg{width:32px;height:32px;fill:var(--accent-text)}
 
 /* THE TEXT BLOCK TAKES THE SLACK, WITH A FLOOR SO IT WRAPS BEFORE THE BUTTONS

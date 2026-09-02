@@ -74,7 +74,11 @@
   padding:var(--s08) var(--pad-x);margin:0;border:0}
 .app .lead-b .lead-eb{color:var(--on-dark-2)}
 .app .lead-b .lead-t{color:var(--on-dark)}
-.app .lead-b .lead-x{color:var(--on-dark-2);max-width:72ch}
+/* THE SECOND HALF OF §16's CAP REMOVAL, and it had to go with it: this rule is
+   (0,3,0) against §16's (0,2,0), so taking the measure off `.lead-x` alone
+   would have left the card's own restatement of it standing and nothing would
+   have moved. Only the ink is this layer's business here. */
+.app .lead-b .lead-x{color:var(--on-dark-2)}
 .app .lead-b .lead-tags{margin-top:var(--s06)}
 .app .lead-b .lead-tags span{
   border-color:var(--on-dark-rule);color:var(--on-dark)}

@@ -405,12 +405,56 @@ const PAGESUM = {
      They are the three things the sentence is actually about — what you did,
      where it put you, and what decides the rest — and every figure in it is the
      ladder's own (`trackBand` marks exactly those five rungs). */
+  /* REWRITTEN TO MARYAM'S COPY, 2 Sep 2026, and three things about it are
+     stated rather than quietly adjusted, because each is a rule this table's
+     own head sets and this line is now the exception to it.
+
+     IT IS 36 WORDS AGAINST THE STATED 28 CEILING, and it is two full sentences
+     rather than a sentence and a clause. The ceiling is the reason `result`'s
+     entry names only the lowest band of the two ("28 is the ceiling — see the
+     head of this block"), so this is the first entry over it.
+
+     THE SECOND SENTENCE NAMES THE LADDER, which is the fourth of this table's
+     four content bans — no pointing at the UI. It reads as a pointer at the
+     block 80px below rather than as a fact about the candidate; the mitigation
+     is that the three track NAMES and the five-per-track count are facts the
+     sentence states, not instructions to look at something.
+
+     THE ARROWS FALL OUT OF SÖHNE AND ARE SET BY THE STAND-IN. §11's stack is
+     Söhne then 'Grotesk Stand-in' and nothing else — Inter was removed for
+     exactly this, "every character Söhne's trial file does not carry was
+     silently set in a different typeface" — and §64's note records that the
+     trial file carries 68 glyphs and an arrow is not one of them (which is why
+     the quiet button's arrow is a mask-image). So the two `&rarr;` here are the
+     first rendered arrow characters in the product and they change face
+     mid-sentence. `&middot;` is in the face and is what every fact row in the
+     build already uses; swapping the two characters is the whole fix if the
+     break shows.
+
+     THE THREE `<b>` PHRASES ARE THE SAME THREE WORDS as before — quiz result,
+     Explorer track, 45-minute interview — so §70.2's tinted ground still lands
+     on what you did, where it put you and what decides the rest. */
   level: (() => {
-    const pre = 'Your <b>quiz result</b> puts you on the <b>Explorer track</b>, levels 1 to 5 of 15. A <b>45-minute interview</b> is what decides which of the five is yours.';
+    const pre = 'Your <b>quiz result</b> places you on the <b>Explorer track</b>, with your level to be determined through a <b>45-minute interview</b>. The ladder shows your current path across Explorer &rarr; Builder &rarr; Trailblazer, with five levels in each track.';
     return {
       consult: pre,
       new: pre,
-      booked: 'Still no level &mdash; the interview on 20 August sets it. Explorer covers levels 1 to 5 of 15; the quiz only predicted the band.',
+      /* MARYAM'S COPY, 2 Sep 2026. Two accent phrases, the actionable pair —
+         the appointment and the band it decides between; "still to be
+         determined" and "where you land on the ladder" are the same fact said
+         twice and neither is a target, so both stay in ink.
+
+         THE 20 AUGUST IS A LITERAL AND `bkStamp` DOES NOT REACH IT, which is
+         pre-existing rather than new — the line it replaces said "the interview
+         on 20 August" the same way. That pass (ai7 §4) rewrites the plate, the
+         Scheduled tile and `PAGESUM.dashboard.booked`, which it redefines as a
+         function; this entry is a plain string in an object literal, so a
+         candidate who books Owen on the 21st still reads the 20th here. The fix
+         if it ever matters is to make `booked` a function — `pageSummary` calls
+         a nested stage value with `cfg(stage)`, and `bkLong()` is in scope at
+         render time however much later ai7 parses. Not done here: it is a
+         change to what the entry IS, not to what it says. */
+      booked: 'Your interview is booked for <b>20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b>Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
       promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview &mdash; one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };
@@ -451,8 +495,70 @@ const PAGESUM = {
   interviews: f => {
     if(f.complete) return 'Two interviews on record: 20 August set Explorer &ndash; E3, and 21 November moved you to E4. Both reports are yours to keep.';
     if(f.reinterview) return 'One interview on record, and the re-interview still to book. Whoever you pick reads your 90-day summary before the call.';
-    if(f.booked) return 'One interview booked, 20 August with Priya Nair. Nothing to do before it &mdash; the level and the report both come out of those 45 minutes.';
-    if(f.pred) return 'Nothing on record yet. One 45-minute conversation is what sets your level, and three agents have a slot this week.';
+    /* THE `booked` BRANCH IS MARYAM'S COPY, 2 Sep 2026, AND ITS THREE FACTS
+       ARE READ OFF THE CARD RATHER THAN TYPED. The name, the expertise and the
+       level range are all printed 80px below in `.crow-x` ("Expertise: System
+       Architecture, assesses E1&ndash;E3"), and that row is built from
+       `CALL_ROW.iv()` — so this reads the same call and the two cannot
+       disagree on one screen. The line it replaces hard-coded "Priya Nair",
+       which `bkStamp` does not reach on this view (it rewrites the plate, the
+       Scheduled tile and `PAGESUM.dashboard.booked`, not this table), so
+       booking Owen left the summary naming Priya.
+
+       `x` IS SPLIT RATHER THAN RE-DERIVED, deliberately. Re-deriving means
+       copying `CALL_ROW.iv`'s four-step precedence line — the one its own note
+       spends fifteen lines on, because a `typeof` guard on a `const` in the
+       temporal dead zone THREW and took a whole first paint with it. Splitting
+       the string the card already renders keeps one source and one precedence;
+       if that format ever changes, both surfaces move together or break
+       together, which is the failure worth having.
+
+       "SHE'LL" IS THE ONE WORD THAT DOES NOT FOLLOW THE DERIVED NAME. Book
+       Owen or Samuel and the pronoun is wrong while the three facts are right —
+       one word against the four it replaces. Left as Maryam wrote it because
+       Priya is who the prototype books by default and she is who the demo
+       walks; "They'll" is the fix if a second agent is ever demoed.
+
+       TWO ACCENT PHRASES, THE ACTIONABLE PAIR: the appointment, and the fact
+       that it can be joined now. The assessment detail and the consequence are
+       what the sentence explains, not what it asks you to do.
+
+       IT IS 34 WORDS, six over the ceiling this table's head sets. */
+    if(f.booked){
+      const c = CALL_ROW.iv();
+      const ex = String(c.x || '').split(', assesses ')[0] || 'your';
+      const rng = (c.who && c.who.range) || 'E1&ndash;E3';
+      return `Your <b>45-minute interview with ${c.who.n}</b> is scheduled and <b>ready to join</b>. `
+        + `She&rsquo;ll assess your ${ex} skills across the ${rng} levels, and your final level `
+        + `and report will be based on this conversation.`;
+    }
+    /* THE `pred` BRANCH IS MARYAM'S COPY, 2 Sep 2026, and it deliberately does
+       what the `agents` note directly below rules out — it describes the
+       directory. That entry was DELETED for naming the three leading agents,
+       their prices and their slots, on the reasoning that "a summary of a
+       directory is the directory read aloud"; this line names the count, the
+       length and the three axes the cards are compared on (experience, rating,
+       fee), all of which the grid 80px below prints per card. It is the
+       instruction, so it stands, and the argument against it stays here rather
+       than being deleted with the sentence it lost to.
+
+       THE 24 IS THE SECOND HAND-TYPED COPY OF THAT NUMBER. `AGENTS` is not
+       24 records long — the only other place the figure appears is the search
+       field's own placeholder in `V.agents` ("Search all 24 agents"), also a
+       literal. Two literals cannot disagree today and will the first time the
+       roster changes; if a third surface ever wants it, derive it once.
+
+       IT IS 30 WORDS, two over the ceiling this table's head sets.
+
+       TWO ACCENT PHRASES, AND THEY ARE THE TWO ACTIONABLE ONES (Maryam, 2 Sep
+       2026 — the actionable text carries the orange and the tinted ground).
+       §70.2's `.modhead .ai-aura.talsum .ai-body p b` is not scoped to the
+       AI-native band, so a `<b>` on any summary gets the wash and §63 §10 owns
+       the ink — there is nothing to add per view. The two are what you DO on
+       this page: pick an agent, book the call. "Determine your level" is the
+       outcome of both and is deliberately left in ink, because lighting a
+       consequence as well makes the accent decoration rather than a target. */
+    if(f.pred) return 'You haven&rsquo;t completed an interview yet. Choose from <b>24 available agents</b> to book a <b>45-minute conversation</b> and determine your level, with options across different experience areas, ratings, and fees.';
     return 'One on record: 20 August with Priya, which set Explorer &ndash; E3. A re-interview at the end of the 90 days is what moves the level.';
   },
 
@@ -624,7 +730,44 @@ const PAGESUM = {
 
      THE VIEW DRAWS NO TAL CARD, so this is an entry and nothing else — trap 11
      only bites where a card is hand-authored (see `agents` above). */
-  billing: 'This is the one page I can&rsquo;t read: your card details and what you&rsquo;ve been charged never reach me. Ask about the refund windows and I can answer.',
+  /* REPLACED WITH MARYAM'S COPY, 2 Sep 2026 — AND IT REVERSES THE RULE THE
+     THREE PARAGRAPHS ABOVE ARGUE FOR. Tal now reads the ledger out loud: the
+     charge, its amount, the three saved cards and which one is default. The
+     argument above is kept in full rather than deleted, because it is the
+     record of what this line used to be for and of the three surfaces it was
+     keeping honest.
+
+     THREE SURFACES NOW DISAGREE WITH IT, and all three are one edit each:
+
+       1. `NEVER[2]` (ai2.js) — "Your card details and billing history." That
+          array is clause 4 of the Data use notice on `V.account`, rendered as
+          an eye-off row, so the product tells the reader on that page that Tal
+          cannot see exactly what it has just recited here.
+       2. `wLedger` (ai8.js) — the route for "What have I paid so far?"
+          DECLINES and links this page. Ask Tal the question this summary now
+          answers and Tal says it cannot answer it.
+       3. The ask dock's placeholder on this view is "Is my card stored?",
+          which was written to pair with the old line's offer.
+
+     ai8's own note calls this the worst kind of wrong answer — "the product
+     says so on two other screens" — so if the new reading is the one to keep,
+     those three go with it. Left alone deliberately: changing Tal's stated
+     access to billing is a product decision, not a copy edit, and it is not
+     what was asked for.
+
+     THREE ACCENT PHRASES, THE ACTIONABLE ONES (Maryam, 2 Sep 2026): the
+     amount, what it bought, and the card that will be charged next. The two
+     non-default cards stay in ink — they are context for the default, and
+     lighting all three would put the wash on most of the sentence.
+
+     EVERY FIGURE IN IT IS PRINTED BELOW — $490, Explorer Track &ndash; E2, the
+     three card rows and the Default chip are the table and the card list this
+     summary sits on top of. That is the `agents` objection ("a summary of a
+     directory is the directory read aloud") on a third page; noted, not acted
+     on. Worth knowing if it is ever revisited: the ONE fact on this page no
+     row states is that the E2 charge went to the Mastercard, not to the
+     default Visa. */
+  billing: 'Your payment history shows a <b>$490 charge</b> for <b>Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b>Visa ending 4242</b>.',
 
   /* The page description said "Your details, your preferences, and what Tal
      is allowed to do" and this said the same three nouns back. The
@@ -765,10 +908,17 @@ const PAGESUM = {
      is a catch-up and the second is a tab label. What a leader wants off
      Messages is who is waiting, and the one consequence worth a reminder is
      that a board post is public to the cohort. */
+  /* THE SECOND SENTENCE WAS ABOUT A BOARD THIS PAGE NO LONGER HOLDS. It read
+     "Anything you post to Cohort 41's board, all ten of them see" — the one
+     consequence worth a reminder while Messages carried the cohort boards
+     beside the direct threads. Those came out on 2 Sep 2026, and with them
+     `S.ldrBoardCo`, which this was the last reader of: left as it was, the
+     summary would have called `lcoOf(undefined)` on every render of the page.
+     A page summary is the reading of what is ON the page (`PAGESUM`'s own
+     rule), and what is on this one is three one-to-one threads. */
   leadMessages: () => {
     const waiting = LDR_THREADS.filter(t => t.msgs[t.msgs.length - 1].me === 0).length;
-    const co = lcoOf(S.ldrBoardCo);
-    return `${waiting ? `${_W(waiting)} direct thread${waiting === 1 ? '' : 's'} ${waiting === 1 ? 'is' : 'are'} waiting on a reply` : 'Nothing is waiting on a reply'}. Anything you post to ${lname(co)}&rsquo;s board, all ${_w(co.members.length)} of them see.`;
+    return `${waiting ? `${_W(waiting)} direct thread${waiting === 1 ? '' : 's'} ${waiting === 1 ? 'is' : 'are'} waiting on a reply` : 'Nothing is waiting on a reply'}, out of ${_w(LDR_THREADS.length)} you have open. Everything here is private to you and the candidate.`;
   },
 
   leadCerts: () => `${_W(LDR_CERTS.length)} earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it opens the Builder band.`,

@@ -595,8 +595,24 @@
 .app .lead-t{
   margin-top:var(--s03);
   font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
+/* THE MEASURE IS GONE — THE DESCRIPTION TAKES THE CARD (Maryam, 2 Sep 2026:
+   "also this desc should have full width"). It was `max-width:72ch`, stated
+   here and again in §28, and 72ch of a 13.5px face is ~1050px against a column
+   that measures ~1610 at 1728 — so the paragraph stopped two thirds of the way
+   across a black card with nothing beside it but empty ground.
+
+   IT IS §70's ARGUMENT ABOUT TAL'S SUMMARY, ONE COMPONENT OVER: a measure is
+   right where something occupies the other half of the row and is "not a
+   measure but a ragged right edge" where nothing does. The action DOES occupy
+   the other half of this card — but it is a column of the grid (§16's
+   `minmax(0,1fr) auto` at 900 and up), so the paragraph's own column is already
+   short of the button by 40px of gap. The cap was a second inset inside that.
+
+   AND THE NEW COPY IS WHAT MAKES IT VISIBLE. At four sentences the cap read as
+   a deliberate three-line block; at one sentence it is one line that breaks
+   early. */
 .app .lead-x{
-  margin-top:var(--s04);max-width:72ch;
+  margin-top:var(--s04);
   font-size:13.5px;line-height:22px;color:var(--text-secondary)}
 .app .lead-tags{display:flex;gap:var(--s04);flex-wrap:wrap;margin-top:var(--s05)}
 .app .lead-tags > span{
@@ -613,8 +629,35 @@
   .app .lead-b{
     display:grid;grid-template-columns:minmax(0,1fr) auto;
     column-gap:var(--s08);align-items:start}
-  .app .lead-eb,.app .lead-t,.app .lead-x,.app .lead-tags,.app .lead-ok{grid-column:1}
-  .app .lead-a{grid-column:2;grid-row:1 / span 4;margin-top:0;justify-self:end}
+  .app .lead-eb,.app .lead-t,.app .lead-tags,.app .lead-ok{grid-column:1}
+  /* AND THE DESCRIPTION SPANS BOTH COLUMNS — the other half of "this desc
+     should have full width" (Maryam, 2 Sep 2026). Taking §16's and §28's
+     `max-width:72ch` off gave it its COLUMN, which is the card less the action
+     and the 40px gap — about two thirds of the black. Full width means the
+     card, so it spans.
+
+     WHICH MEANS THE ACTION CANNOT SPAN THE ROWS ANY MORE. It was
+     `grid-row:1 / span 4`, centring itself against the whole text block — and a
+     row-spanning item in column 2 and a column-spanning item in row 3 would
+     occupy the same cell, which is an overlap rather than a layout. Pinned to
+     row 4 it lands on the tags' line, `align-self:center` against them, which
+     is within a pixel or two of where the span already put it: the button was
+     already reading as being on the chip row. So the visible change is the
+     paragraph's measure and nothing else.
+
+     ROW 4 IS COUNTED, NOT GUESSED: column 1 auto-places the eyebrow (1), the
+     title (2), the tags (4) and — when the request has been sent — `.lead-ok`
+     (5), with the spanning description taking row 3. A fifth member added to
+     the left column ABOVE the tags moves this number, which is the cost of an
+     explicit row and the reason it is written down.
+
+     AND THIS PAIR IS NOT WHAT THE BROWSER READS — §29 §8 RESTATES THIS WHOLE
+     GRID at (0,3,0) and wins. The change is stated there and mirrored here so
+     the two layers cannot disagree; it shipped in this layer alone for one
+     build and did nothing at all, which is the tell for a rule that lost rather
+     than a rule that is wrong. Change both. */
+  .app .lead-x{grid-column:1 / -1}
+  .app .lead-a{grid-column:2;grid-row:4;margin-top:0;justify-self:end;align-self:center}
 }
 
 /* deleting an account is the one destructive action in the product */

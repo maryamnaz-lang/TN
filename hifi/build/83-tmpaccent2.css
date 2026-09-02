@@ -31,13 +31,13 @@
    THE RED RAMP IS THREE SHADES OF ONE HUE, which is what "red shade gradients"
    asks for and is also the only way a gradient survives the change. The orange
    ramp is three different hues — orange, gold, deep orange — and mapping all
-   three onto #ff0000 would flatten every gradient in the product into a solid,
+   three onto `#F95873` would flatten every gradient in the product into a solid,
    including the ones whose whole job is to be a ramp (Tal's sphere, the ask
    dock's travelling light). So each ramp keeps its LIGHTNESS ARC and changes
    its hue: light red, pure red, deep red, in whatever order the original put
    light, mid and dark.
 
-   #ff0000 IS THE MIDDLE STOP EVERYWHERE, so the trial's stated colour is the
+   `#F95873` IS THE MIDDLE STOP EVERYWHERE, so the trial's stated colour is the
    one the eye lands on and the other two read as its highlight and its shadow.
 
    AFTER §63 AND *NOT* ALLOWED TO BE THE USUAL WAY — this layer DOES state text
@@ -73,21 +73,29 @@
    alpha, red hue: this is the ground behind "Explorer – E3" and "delegation and
    hard conversations" in Tal's summary, which is half of what "the orange
    highlighted texts" names. The other half is the ink, in §83.4. */
+/* THE THREE STOPS ARE SHADES OF `#F95873` (Maryam, 31 Aug 2026: "for the
+   gradient color use the shades of #F95873 color"). Same hue (350°), same
+   arc: `--ai-1` is the accent itself, `--ai-2` is it lifted where the gold
+   was, `--ai-3` is it deepened. `--ai-1` is written as the literal rather
+   than as `var(--accent)` because §70's ramp is Tal's and §67's ladder is the
+   product's — they agree today and a `var()` would make that agreement a
+   rule, which §39 is explicit is not one ("#f47113 is NOT --accent"). */
 .app.tmp-accent{
-  --ai-1:#ff2d2d;
-  --ai-2:#ff6b6b;
-  --ai-3:#cc0000;
-  --ai-hl-bg:rgba(255,0,0,.05);
+  --ai-1:#f95873;
+  --ai-2:#fb899c;
+  --ai-3:#d32240;
+  --ai-hl-bg:rgba(249,88,115,.05);
 
   /* §01's warm tint — the ground under a step mark, the date chip and §12's
      chips. #fcdbc7 is the accent at about 20% over white; this is the same
-     mix on red, so nothing changes weight. */
-  --brand-tint-2:#ffd6d6;
+     mix on `#F95873`, so nothing changes weight. */
+  --brand-tint-2:#fedee3;
 
   /* §53's two, both `:root` and both literal oranges: the ask page's stroke
-     and the chip line on Tal's own ground. */
-  --askv-stroke:#ffc0c0;
-  --askv-chip-line:#ff0000;
+     and the chip line on Tal's own ground. The stroke is the accent at about
+     30% over white, the chip line is the accent itself. */
+  --askv-stroke:#fdcdd5;
+  --askv-chip-line:#f95873;
 }
 
 /* --------------------------------------------------------------------- 2 ---
@@ -132,7 +140,7 @@
   background-image:
     radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
     radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#FFD0D0 0%,#FF5C5C 50%,#E63B3B 100%)}
+    linear-gradient(155deg,#FDC4CD 0%,#F9687F 50%,#E4445E 100%)}
 
 /* -------------------------------------------------------------------- 2a ---
    THE TRAVELLING LIGHT ON THE ASK FIELD — and it is the one orange in the
@@ -162,9 +170,9 @@
    the light still has a dense centre with brighter shoulders; mapped the other
    way it would flare in the middle and read as a pulse rather than a moving
    line. */
-.app.tmp-accent .ai-run stop:nth-child(2){stop-color:#ff5c5c}
-.app.tmp-accent .ai-run stop:nth-child(3){stop-color:#ff0000}
-.app.tmp-accent .ai-run stop:nth-child(4){stop-color:#ff7070}
+.app.tmp-accent .ai-run stop:nth-child(2){stop-color:#fa758b}
+.app.tmp-accent .ai-run stop:nth-child(3){stop-color:#f95873}
+.app.tmp-accent .ai-run stop:nth-child(4){stop-color:#fb899c}
 
 /* --------------------------------------------------------------------- 3 ---
    THE TWO GRADIENTS THAT ARE NOT THE RAMP AND NOT THE SPHERE
@@ -183,13 +191,13 @@
    violet's reason. */
 .app.tmp-accent .ask-thread .tal-msg:not(.me) > .bb,
 .app.tmp-accent .tal-panel .tal-msg:not(.me) > .bb{
-  border:1px solid #ff0000;
+  border:1px solid #f95873;
   border-image:linear-gradient(135deg,
-    #ff0000 0%, #ffd6d6 50%, #cb8dd7 100%) 1}
+    #f95873 0%, #fedee3 50%, #cb8dd7 100%) 1}
 
 .app.tmp-accent .ask-page .ask-sugg .chip-tal .sk-mark,
 .app.tmp-accent .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
-  background-image:linear-gradient(180deg,#FBB2D4 0%,#E84646 100%)}
+  background-image:linear-gradient(180deg,#FBB2D4 0%,#E84A64 100%)}
 
 /* --------------------------------------------------------------------- 4 ---
    THE ORANGE HIGHLIGHTED TEXTS — three `color`s §63 wrote as literals
@@ -206,20 +214,20 @@
      `.app .jrn-pill`                               (0,2,0) -> (0,3,0)
      `.app .jrn-i.on`                               (0,3,0) -> (0,4,0)
 
-   THE INK IS `#dc0000` AND NOT `#ff0000`, WHICH IS §67'S OWN SPLIT. Pure red is
-   4.00:1 on white and fails AA as text; #dc0000 is 5.19:1, the exact ratio the
-   orange `--accent-text` it replaces was measured at. §67's note makes this
+   THE INK IS `#c0354c` AND NOT `#f95873`, WHICH IS §67'S OWN SPLIT. The accent
+   is 3.15:1 on white and fails AA as text at any size; #c0354c is 5.45:1, a
+   shade better than the 5.19 the orange `--accent-text` it replaces measured. §67's note makes this
    argument at length for the accent ink and it applies unchanged — the fill is
-   #ff0000, the ink is not, and that is the same separation §01 already makes
-   for the orange. `.ai-body p b` sits on `--ai-hl-bg`, a 5% red wash, where the
-   ratio is 4.98:1 and still clear.
+   #f95873, the ink is not, and that is the same separation §01 already makes
+   for the orange. `.ai-body p b` sits on `--ai-hl-bg`, a 5% wash of the
+   same hue, where the ratio is 5.23:1 and still clear.
 
    THE JOURNEY LIST'S CURRENT STEP KEEPS ITS MARK'S HUE BY FOLLOWING `--accent`
    — `.jrn-i.on` is the numeral and the label of the step you are on, which is
    the "3. Course Enrollment" line in the band. */
 .app.tmp-accent .modhead .ai-aura.talsum .ai-body p b,
 .app.tmp-accent .jrn-pill,
-.app.tmp-accent .jrn-i.on{color:#dc0000}
+.app.tmp-accent .jrn-i.on{color:#c0354c}
 
 /* --------------------------------------------------------------------- 5 ---
    §70'S THREE REMAINING LITERALS — the recommendation's rating and its

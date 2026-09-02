@@ -119,3 +119,42 @@
    things and the other two — `flex:none` and `margin-top:0` — are what keep
    the foot out of the scroller. */
 .app .msg-page > .msg-foot{border-top:0}
+
+/* ------------------------------------------------------------------ 100.5 ---
+   A THREAD HAS ONE GUTTER, NOT TWO — Maryam, 2 Sep 2026: "the messages and
+   discussions should not have extra paddings, align the left ones on the left
+   side and align the right ones on the right side."
+
+   THE ROW WAS PAYING THE GUTTER ITS CONTAINER HAD ALREADY PAID. §10's
+   `.tile-stack > *, .aw-list > *, .msgs > *, …` gives every direct child of a
+   handful of list containers `padding-left/right:var(--pad-x)` — correct for
+   the lists it was written for, where the container is full-bleed and the ROW
+   is what indents (trap 10's shape). `.msgs` is not one of those: §15 gives it
+   `padding:var(--s06) var(--pad-x)` of its own, and §36 gives the leader's
+   `var(--s05)`, so every message was inset twice.
+
+   MEASURED AT 1728, LEFT EDGE OF THE ROW'S CONTENT AGAINST ITS OWN COMPOSER:
+     leader DM        16 (container) + 32 (row) = 48, composer at 16
+     leader board     16 + 32 = 48, composer at 16
+     candidate msgs   32 + 32 = 64, composer at 32
+   So on all three the thread sat a full gutter inside the field you type into,
+   and on the leader it was three times the field's inset.
+
+   `.cmts` IS THE PROOF THAT ONE GUTTER IS THE INTENT. The candidate's Cohort
+   discussion draws the same `roomLine` rows in `.cmts` rather than `.msgs`,
+   and there both the container and the row measure 0 — the `.sec` pays the
+   page gutter and nothing pays it again. That is the surface Maryam named as
+   the reference, and this brings the other three onto it.
+
+   IT FIXES BOTH SIDES AT ONCE, which is what "align the left ones on the left
+   and the right ones on the right" needs: `.m` spans the full row and `.m.me`
+   is `flex-direction:row-reverse` (§15.1251), so with the row flush the
+   incoming face lands on the container's left padding edge and the outgoing
+   one on its right. No second rule for the `me` case.
+
+   STATED HERE RATHER THAN BY EDITING §10, because that selector list serves
+   five other components — `.tile-stack`, `.aw-list`, `.pointsList`,
+   `.badgeList`, `.rankList` — which all still want the row to carry the
+   gutter. `.app .msgs > *` is (0,2,0) against §10's (0,1,0) and this layer is
+   later, so it wins on both counts. */
+.app .msgs > *{padding-left:0;padding-right:0}

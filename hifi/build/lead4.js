@@ -4,27 +4,42 @@
    The last three modules. Two of them are about other people and one is the
    only page on this portal that is about Priya.
 
-   THE BOARD IS THE SAME BOARD. `ROOM` in views.js is Cohort 41's discussion
-   and the candidate reads it on their own Cohort page; the wireframe's leader
-   read the identical thread from the other side, and that was the point of
-   sharing it. So Cohort 41's board here IS `ROOM` — the same array, so a post
-   made on this portal is on the candidate's page when the switcher flips, and
-   the two sides cannot drift. The other two cohorts get their own boards
-   because nothing on the candidate side has drawn them yet.
+   THE BOARD IS THE SAME BOARD, AND IT IS NO LONGER READ FROM HERE. `ROOM` in
+   views.js is Cohort 41's discussion; the candidate reads it on their own
+   Cohort page and the leader reads the identical thread from the other side, so
+   a post made on either portal is on the other the moment the switcher flips.
+   That is unchanged. What changed on 2 Sep 2026 is the DOOR: Messages used to
+   hold the three cohort boards beside the direct threads, and Maryam took that
+   section out ("remove the cohort boards section from messages module"). The
+   leader now reads and posts to a board from the cohort's own page, where
+   `V.leadCohort`'s Discussion tab draws `discussionRoom()`.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   THE OTHER TWO BOARDS
+   THE OTHER TWO BOARDS — KEPT, AND CURRENTLY UNREAD
 
-   Cohort 33 is in week 11 and its board sounds like it: people comparing
-   notes on the end of the 90 days. Cohort 47 is four days old, so its
-   board is the leader's own opening post and one reply — a thin board is the
-   honest drawing of a cohort that has barely started, and it is what makes
-   the picker worth having.
+   Cohort 33 is in week 11 and its board sounds like it: people comparing notes
+   on the end of the 90 days. Cohort 47 is four days old, so its board is the
+   leader's own opening post and one reply — a thin board is the honest drawing
+   of a cohort that has barely started.
+
+   THESE TWO HAVE NO READER SINCE 2 Sep 2026 and they are kept anyway, which is
+   a deliberate exception to this build's rule about deleting what nothing
+   writes. That rule is about RULES and HANDLERS, where an orphan reads as a
+   live capability; this is written CONTENT, and deleting nine posts of prose to
+   satisfy a lint is a worse trade than leaving them addressable. `ldrBoard` is
+   kept with them for the same reason: it is the one line that maps an id onto a
+   board, so re-wiring is one edit rather than a rewrite.
+
+   WHERE THEY BELONG IF THEY COME BACK: `V.leadCohort`'s Discussion tab
+   (lead2), which today draws `discussionRoom()` for Cohort 41 and an empty
+   state for the other two — so those two cohorts are described as empty while
+   their boards sit here. Pointing that tab at `ldrBoard(c.id)` is the fix, and
+   it needs `discussionRoom` to take its rows as an argument rather than
+   closing over `ROOM`.
 
    Same row shape as `ROOM` — [name, img, initials, body, when, mine] — so
-   `roomLine` draws all three without a branch, and `mine` marks a post as the
-   leader's own.
+   `roomLine` draws all three without a branch.
    -------------------------------------------------------------------------- */
 const LDR_BOARDS = {
   33: [
@@ -44,13 +59,10 @@ const LDR_BOARDS = {
 };
 
 const ldrBoard = id => +id === LEAD_COHORTS[0].id ? ROOM : (LDR_BOARDS[id] || []);
-/* THE POST COUNT IS NO LONGER DRAWN. It rode inside each cohort tab as an
-   `.lf-n` — "Cohort 41  5" — and a tab is a place you go, not a figure you
-   read: three counts in a three-tab strip is three numbers competing with the
-   three names you are actually choosing between, and the count of posts on a
-   board you are about to open is on the board. The helper stays because the
-   board's own head is where a count belongs if one is ever wanted. */
-const ldrPosts = id => ldrBoard(id).filter(r => r[0] !== 'day').length;
+/* `ldrPosts` IS DELETED (2 Sep 2026) — it counted a board's posts for a tab
+   chip that had already gone, so it was a helper on a helper with no reader.
+   It was `ldrBoard(id).filter(r => r[0] !== 'day').length` if a count is ever
+   wanted on a board's own head, which is where that note said it belonged. */
 
 /* --------------------------------------------------------------------------
    THE LEADER'S ONE-TO-ONE THREADS
@@ -86,15 +98,11 @@ const LDR_THREADS = [
   ]}
 ];
 
-/* WHICH CONVERSATION IS OPEN: 'boards', 'direct' or 'new'. It used to be which
-   TAB was open, which is the same key doing a smaller job — the rail holds both
-   kinds now, so this says what the right-hand pane is showing. */
-S.ldrMsg = 'boards';
-/* The inbox filter, 'all' or 'unread'. On `S` because it is a decision rather
-   than a keystroke: the panel re-renders whenever a message is sent, and coming
-   back to the list you chose is right where coming back to a half-typed query
-   is not (the notes panel makes the same split). */
-S.ldrBoardCo = LEAD_COHORTS[0].id;
+/* `S.ldrMsg` AND `S.ldrBoardCo` ARE BOTH GONE (2 Sep 2026). The first said
+   which of three panes was showing — a board, a thread or the new-message
+   picker — and the last two of those were removed on the same day, so a key
+   with one possible value is not state. The second named which cohort's board
+   the pane held. `S.ldrTh` is now the whole of what the pane reads. */
 S.ldrTh = 0;
 /* NARROW WIDTHS SHOW ONE OF THE TWO COLUMNS AT A TIME, and this is which.
    Both columns are always rendered — the class on `.ldr-dm` is what §36.17
@@ -109,101 +117,39 @@ S.ldrAvail = false;
 /* ==========================================================================
    MESSAGES
 
-   ONE TAB STRIP, NOT TWO. The wireframe had a pair of buttons for the two
-   sections and then a second list inside each one to pick the cohort or the
-   thread. Two strips stacked is two decisions before you have read anything.
-   Here the strip picks the SECTION, and what it picks between is a board with
-   a cohort picker made of buttons and a thread list made of rows — a picker
-   for three things that are the same kind, and a list for three things that
-   are each a person.
+   IT IS ONE LIST OF PEOPLE. The wireframe had a pair of buttons for two
+   sections and a second list inside each; then this file merged them into one
+   rail of boards over threads; and on 2 Sep 2026 the boards came out
+   altogether. What is left is the surface the module is named after — the
+   leader's one-to-one threads — and a cohort's discussion is read on the
+   cohort's own page, where `V.leadCohort`'s Discussion tab draws it.
 
-   THE COMPOSER IS THE PRODUCT'S OWN, on both. `.composer` with `.room-composer`
-   is what the candidate's cohort board uses and `.composer` alone is what
-   their one-to-one uses, so the leader's two surfaces are drawn by the two
-   components the candidate already reads.
+   THE COMPOSER IS THE PRODUCT'S OWN. `.composer` is what the candidate's
+   one-to-one uses, with the same four controls in the same order, so the two
+   halves of one conversation are drawn by one component.
    ========================================================================== */
-/* ==========================================================================
-   MESSAGES IS ONE INBOX — 2 Sep 2026
-   Maryam, with a reference: "i want messages module to have the structure like
-   the reference attached." One left rail holding BOTH kinds of conversation —
-   the three cohort boards and the direct threads, grouped and labelled — with
-   the conversation on the right, a filter row above the pair, and one field at
-   the foot of whatever is open.
-
-   WHAT IT REPLACES, AND WHY THE TWO-TAB VERSION HAD TO GO. The module was
-   `Cohort boards | Direct` as a `.cs` strip, and each tab drew its own surface:
-   boards a single board with a cohort picker in its heading row, Direct a
-   two-pane list-and-thread. Both halves were right about their own content and
-   the pair was wrong about the module: a leader with a board post and two
-   people waiting had to choose a TAB before they could see either, and the
-   unread count sat on a tab rather than on the row it belonged to. An inbox is
-   one list of conversations, sorted by kind, and this product already draws
-   that shape one tab down — so the two-pane frame stays, the cohort picker and
-   the tab strip both go, and the rail carries everything.
-
-   THE RIGHT-HAND PANE IS UNCHANGED IN KIND: `.msgs` for the thread, `.composer`
-   pinned under it, the pair scrolling inside its own box (§36.17). What changes
-   is that it now renders one of THREE things — a board, a thread, or the
-   new-message picker — off `S.ldrMsg`.
-
-   FOUR CONTROLS FROM THE REFERENCE ARE NOT DRAWN, and each is §60 rather than
-   an omission: the **filter funnel** (All and Unread are the filter, and a
-   second one would filter by a field no conversation carries), **Mentions** (no
-   message in this build records a mention, so the tab would open an empty list
-   for ever), **Archived conversations** (nothing archives one, and a row that
-   opens an empty drawer is the dead control the rule is about) and the chat
-   header's **call / video / info / more** — `callOpen` builds the CANDIDATE's
-   interview, so every leader-side Join in this build is unwired, and three of
-   the four are menus with nothing in them.
-   WHAT IS DRAWN IS WIRED: All / Unread, the search, New message, picking any
-   conversation, and posting to either kind.
-   ========================================================================== */
-/* THE INBOX SEARCH FILTERS THE DOM AND DOES NOT RE-RENDER, for the reason ai4
-   records and the notes panel repeats: `render()` replaces `device.innerHTML`,
-   so a re-render per keystroke destroys the field and takes the caret with it.
-   The rail is a flat run of group headings and rows, so the walk carries the
-   heading it last passed and switches it off when nothing under it survived —
-   a group label over an empty group is the tell that a filter is hiding
-   something rather than that there is nothing there. */
-
 V.leadMessages = () => {
-  const co = lcoOf(S.ldrBoardCo);
-  const board = ldrBoard(co.id);
   const th = LDR_THREADS[S.ldrTh] || LDR_THREADS[0];
   const waiting = t => t.msgs.length && t.msgs[t.msgs.length - 1].me === 0;
   /* `fresh` WENT WITH THE PICKER — it derived "everybody you have not written
      to yet" for the New message list, and with that list gone it was a query
      with no reader. `lmembers()` keeps three other callers. */
 
-  /* THE ROW IS ONE SHAPE FOR BOTH KINDS, which is the whole point of merging
-     the two lists: a board and a person are both "a conversation, what was said
-     last, and when". Only the mark differs — a cover for a board (§86's 9:5
-     rectangle, so a cohort wears the same picture here as on its own card) and
-     a face for a person. */
-  const boardRow = c => {
-    const b = ldrBoard(c.id), last = b.filter(r => r[0] !== 'day').pop();
-    const on = S.ldrMsg === 'boards' && c.id === co.id;
-    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="board:${c.id}" role="tab" aria-selected="${on}">
-      <span class="ldr-inbox-mk">${I.group}</span>
-      <span class="ldr-dm-tb">
-        ${''/* THE LEVEL IS ON THE SECOND LINE, NOT BESIDE THE NAME. It shipped
-               as a caption inside the title and the rail is ~235px wide at a
-               1280 frame: "Cohort 41" plus "Explorer – E3" wrapped, and the
-               wrapped half ran under the timestamp holding the row's right
-               edge. The title line is one string on every row now — a name,
-               exactly like the DM rows beside it — and the level joins the
-               facts underneath, where §36's own truncation already handles a
-               line that is too long. */}
-        <span class="ldr-dm-tn">${lname(c)}</span>
-        <span class="ldr-dm-tx">${llevel(c)} &middot; ${c.members.length} members${last ? ' &middot; ' + (last[5] ? 'You: ' : last[0].split(' ')[0] + ': ') + last[3] : ''}</span>
-      </span>
-      <span class="ldr-dm-tw">${last ? last[4] : ''}</span>
-    </button>`;
-  };
+  /* THE RAIL IS ONE LIST OF PEOPLE (Maryam, 2 Sep 2026: "remove the cohort
+     boards section from messages module"). It held two groups — three cohort
+     boards over the direct threads — and `boardRow` drew the first with a
+     `data-ldrpick="board:<id>"`.
+
+     NOTHING IS LOST, BECAUSE THE BOARD IS NOT THIS MODULE'S. A cohort's
+     discussion is on the cohort's own page: `V.leadCohort`'s Discussion tab
+     (lead2) already draws Cohort 41's through `discussionRoom()`, the same
+     component and the same `ROOM` array the candidate reads. Messages is now
+     the one-to-one surface it is named after, and a board is where the cohort
+     is. */
   const dmRow = (t, i) => {
     const last = t.msgs[t.msgs.length - 1];
-    const on = S.ldrMsg === 'direct' && i === S.ldrTh;
-    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="dm:${i}" role="tab" aria-selected="${on}">
+    const on = i === S.ldrTh;
+    return `<button class="ldr-dm-t${on ? ' on' : ''}" data-ldrpick="${i}" role="tab" aria-selected="${on}">
       <span class="mem-av mem-ph">${avatar({i:t.i, img:AV[t.img]}, 36)}</span>
       <span class="ldr-dm-tb">
         <span class="ldr-dm-tn">${t.who}${waiting(t) ? '<i class="ldr-dm-dot" aria-label="waiting on your reply"></i>' : ''}</span>
@@ -236,29 +182,16 @@ V.leadMessages = () => {
            candidate because of something you just read about them. */}
     <div class="ldr-dm${S.ldrThOpen ? ' show-thread' : ''}">
       <div class="ldr-dm-list" role="tablist" aria-label="Your conversations">
-        <div class="ldr-dm-lh">Cohort boards<span class="t-helper-01">${LEAD_COHORTS.length}</span></div>
-        ${LEAD_COHORTS.map(boardRow).join('')}
         <div class="ldr-dm-lh">Direct messages<span class="t-helper-01">${LDR_THREADS.length}</span></div>
         ${LDR_THREADS.map(dmRow).join('')}
       </div>
       <div class="ldr-dm-thread">
-        ${S.ldrMsg === 'boards' ? `
-        <div class="ldr-dm-h">
-          <button class="ph-back ldr-dm-back" data-ldrthback="1" aria-label="Back to your conversations">${I.arrowLeft}</button>
-          <span class="ldr-inbox-mk">${I.group}</span>
-          <span class="ldr-dm-hb"><b>${lname(co)}</b><span>${co.members.length} members &middot; week ${co.week} of 13 at ${llevel(co)} &middot; the same board they read on their own Cohort page</span></span>
-        </div>
-        ${board.length ? `<div class="msgs room">
-          ${board.map(r => r[0] === 'day'
-            ? `<div class="m-day"><span>${r[1]}</span></div>`
-            : roomLine(r[0], r[1], r[2], r[3], r[4], r[5])).join('')}
-        </div>` : `<div class="msgs"><div class="empty" style="border:0">${I.chat}
-          <h3>Nothing posted yet</h3><p>${lname(co)} started ${co.day} day${co.day === 1 ? '' : 's'} ago. Opening the board yourself is usually what starts it.</p></div></div>`}
-        <div class="composer">
-          <input class="inp" id="ldrPost" placeholder="Post to ${lname(co)}" aria-label="Post to the cohort">
-          <button class="composer-send" data-ldrpost="1" aria-label="Post">${I.send}</button>
-        </div>`
-        : `
+        ${''/* THE BOARDS BRANCH IS DELETED (Maryam, 2 Sep 2026: "remove the
+               cohort boards section from messages module"). The pane used to be
+               a ternary — a cohort board on one side, this thread on the other —
+               and with one kind of conversation left there is nothing to choose
+               between, so the thread is drawn straight rather than as the
+               surviving arm of a condition nothing evaluates. */}
         <div class="ldr-dm-h">
           <button class="ph-back ldr-dm-back" data-ldrthback="1" aria-label="Back to your conversations">${I.arrowLeft}</button>
           <span class="mem-av mem-ph">${avatar({i:th.i, img:AV[th.img]}, 36)}</span>
@@ -266,18 +199,34 @@ V.leadMessages = () => {
         </div>
         <div class="msgs">
           ${th.msgs.length ? '' : `<div class="m-day"><span>No messages yet &mdash; this one starts with you</span></div>`}
+          ${''/* THE STAMP IS THE TIME AND A READ TICK, WHICH IS `V.messages`'s
+                 OWN CORRECTION APPLIED HERE. That thread used to print
+                 "Priya Nair &middot; 9:12 AM" on every line and its note says why
+                 it stopped: the name is said once per message in a thread with
+                 exactly two people in it, and the face beside the bubble is
+                 already saying it. What the outgoing side gets instead is the
+                 read state — `I.doneAll` in the accent, the one place in a
+                 thread where a colour means a state rather than a person.
+                 This side was still printing the name on both halves. */}
           ${th.msgs.map(msg => `<div class="m ${msg.me ? 'me' : 'them'}">
             <span class="m-av">${avatar(msg.me ? {i:LEADER.i, img:LEADER.img} : {i:th.i, img:AV[th.img]}, 32)}</span>
             <div class="m-c">
               <div class="m-b">${msg.t}</div>
-              <div class="m-w">${msg.me ? 'You' : th.who} &middot; ${msg.w}</div>
+              <div class="m-w">${msg.w}${msg.me ? `<i class="m-tick">${I.doneAll}</i>` : ''}</div>
             </div>
           </div>`).join('')}
         </div>
+        ${''/* THE FIELD IS `V.messages`'s — attachment, then the input, then the
+               microphone, then send. §16.12's note argues the order: the leading
+               slot is "add a thing to this message" and the right end is send
+               plus the one control that RECORDS a message. A one-to-one thread
+               is the surface that carries all four, and this one had two. */}
         <div class="composer">
+          <button class="composer-act composer-lead" aria-label="Attach a file">${I.attachment}</button>
           <input class="inp" id="ldrReply" placeholder="${th.msgs.length ? 'Reply to' : 'Message'} ${th.who.split(' ')[0]}" aria-label="${th.msgs.length ? 'Reply' : 'Message'}">
+          <button class="composer-act" aria-label="Record a voice message">${I.microphone}</button>
           <button class="composer-send" data-ldrreply="1" aria-label="Send">${I.send}</button>
-        </div>`}
+        </div>
       </div>
     </div>
   </div>
@@ -384,13 +333,12 @@ const ldrCertGrid = list => list.slice().reverse().map(c => `<div class="crt-car
 V.leadCerts = () => {
   const led = 8, hours = 42;
   const promoted = 34;
-  /* THIRTEEN CALLS A COHORT, DERIVED FROM THE COHORTS CLOSED (1 Sep 2026). This
-     cell was "Interviews conducted: 62", which is an AGENT's figure — the same
-     number the public listing printed, and the one thing on a volunteer's own
-     record that belonged to the paid role. A cohort leader's throughput is the
-     calls they ran, and a closed cohort ran thirteen of them, so the figure is
-     `led` × 13 rather than a second literal that could disagree with it. */
-  const calls = led * 13;
+  /* `calls` IS DELETED WITH "THE RECORD BEHIND THEM" (2 Sep 2026), which was its
+     only reader. It was `led * 13` — thirteen calls a cohort, derived rather than
+     typed so the figure could not disagree with the cohorts closed — and the cell
+     it filled replaced an "Interviews conducted: 62" that was an AGENT's number on
+     a volunteer's record. Worth restoring in that derived form if a call count
+     ever comes back; it belongs on `V.leadProfile` with the other four. */
   return `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Certifications')}
   ${''/* Three blocks in a row were explaining this page: this line, Tal's
@@ -425,38 +373,28 @@ V.leadCerts = () => {
     <div class="sec-h"><h2>All certifications</h2><span class="t-helper-01">Yours to keep and to share</span></div>
     <div class="crt-grid">${ldrCertGrid(LDR_CERTS)}</div>
   </div>
-  <div class="sec tint">
-    <div class="sec-h"><h2>In progress</h2><span class="t-helper-01">Candidate Mentoring &middot; Advanced track</span></div>
-    <div class="tile">
-      <div class="kv"><span class="k">What it opens</span><span class="v n">Assessing the Builder band, B1 to B3</span></div>
-      <div class="kv"><span class="k">Awarded when</span><span class="v n">All three below are complete</span></div>
-    </div>
-    <ol class="steps mt5">
-      <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Lead six cohorts to completion</b>
-        Eight closed, so this one is done. Completion means the cohort finished the 90 days, not that every candidate was promoted.</span></li>
-      <li><span class="s-n">${I.checkFilled}</span><span class="s-b"><b>Forty hours of leader training</b>
-        ${hours} hours this year. The Advanced track adds twelve more, which is the part still open.</span></li>
-      ${''/* IT WAS "TWELVE SIGNED LEVEL DECISIONS REVIEWED" (1 Sep 2026). A
-             cohort leader does not set levels, so the requirement that named
-             them named nothing — and the requirement it becomes is the same
-             SHAPE, which is the point: nine of twelve reviewed, three still
-             waiting, and the one thing on this list you cannot finish alone.
-             What is reviewed is the 90-day summary, which is the leader's own
-             signed document and the only one there is. */}
-      <li><span class="s-n">3</span><span class="s-b"><b>Twelve published 90-day summaries reviewed</b>
-        Nine of twelve reviewed by the manager of cohort leaders. The three waiting are from the cohorts you closed in June.</span></li>
-    </ol>
-    <p class="t-helper-01 mt4">Reviewed means a manager of cohort leaders read your summary against the cohort&rsquo;s own record and agreed with the recommendation. It is the one requirement you cannot finish on your own.</p>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>The record behind them</h2></div>
-    <div class="facts">
-      <div><span class="l">Leading since</span><span class="v">${LEADER.since}</span></div>
-      <div><span class="l">Cohorts closed</span><span class="v">${led}</span></div>
-      <div><span class="l">Cohort calls led</span><span class="v">${calls}</span></div>
-      <div><span class="l">Assessing range</span><span class="v">${LEADER.range}</span></div>
-    </div>
-  </div>
+  ${''/* "IN PROGRESS" AND "THE RECORD BEHIND THEM" ARE BOTH DELETED (Maryam,
+         2 Sep 2026). The page is now the hero certificate and the grid of all
+         of them, which is what "Certifications" is.
+
+         WHAT "IN PROGRESS" WAS: the Candidate Mentoring / Advanced track
+         requirement — a `.kv` pair (what it opens, awarded when) over a
+         three-step `ol.steps` with two ticked and one counted, and a paragraph
+         explaining what "reviewed" means. It was the longest block on the page
+         and it was about a certificate that does not exist yet, under a heading
+         that says the page is about the ones that do.
+
+         WHAT "THE RECORD BEHIND THEM" WAS: a four-cell `.facts` band — leading
+         since, cohorts closed, cohort calls led, assessing range. Every one of
+         those four is on `V.leadProfile`, which is where a fact about the
+         LEADER belongs rather than on a page about their certificates.
+
+         ONLY `calls` LOSES ITS READER. `led` and `hours` are still the third
+         and fourth cells of the `.stats` band at the top of this page, so they
+         stay; `LEADER.since` and `LEADER.range` are drawn on `V.leadProfile`.
+         The one figure with nowhere left to go is the call count, and its
+         derivation is recorded where it was declared rather than deleted in
+         silence. */}
 </div></main>`;
 };
 
@@ -691,24 +629,19 @@ LDR_SHEETS.push(ldrProfileSheet, ldrAvailSheet);
 device.addEventListener('click', e => {
   const t = e.target;
 
-  const ms = t.closest('[data-ldrmsg]');
-  /* pressing the tab always lands on the list, never back inside whichever
-     thread was open last time — the tab is "Direct", not "Yuki Tanaka" */
-  if(ms){ S.ldrMsg = ms.dataset.ldrmsg; S.ldrThOpen = false; render(); return; }
+  /* `data-ldrmsg` AND `data-ldrboard` ARE BOTH DELETED, and both were already
+     dead: nothing in the build had written either attribute since the tab strip
+     and the cohort picker came out. A handler for markup that no view emits is
+     the "gate nothing writes" tell in JS, where it is worse than in CSS — it
+     reads as a live capability rather than as an unused rule.
 
-  const bd = t.closest('[data-ldrboard]');
-  if(bd){ S.ldrBoardCo = +bd.dataset.ldrboard; render(); return; }
-
-  /* ONE BRANCH PICKS EITHER KIND. The rail's two groups are one list of
-     conversations, so a row carries `kind:id` and this sets both halves of what
-     the right-hand pane reads. Split on the FIRST colon: the id is a number and
-     the kind is a word, neither of which can contain one. `S.ldrThOpen` is what
-     §36.17 reads below 900, where the list and the pane are two screens. */
+     THE RAIL IS ONE KIND NOW, so a row carries a bare index rather than
+     `kind:id`. The split on the first colon is gone with the boards it was
+     written for. `S.ldrThOpen` is what §36.17 reads below 900, where the list
+     and the pane are two screens. */
   const pk = t.closest('[data-ldrpick]');
   if(pk){
-    const [kind, id] = pk.dataset.ldrpick.split(':');
-    if(kind === 'board'){ S.ldrMsg = 'boards'; S.ldrBoardCo = +id; }
-    else { S.ldrMsg = 'direct'; S.ldrTh = +id; }
+    S.ldrTh = +pk.dataset.ldrpick;
     S.ldrThOpen = true;
     render();
     return;
@@ -762,27 +695,20 @@ device.addEventListener('click', e => {
       LDR_THREADS.push({who, i:rec.m.ini, img:rec.m.img, co:rec.c.id, msgs:[]});
       i = LDR_THREADS.length - 1;
     }
-    S.ldrMsg = 'direct';
     S.ldrTh = i;
     S.ldrThOpen = true;
     go('leadMessages');
     return;
   }
 
-  /* POSTING PUTS IT ON THE SHARED ARRAY. Cohort 41's board IS `ROOM`, so a
-     post here is on the candidate's Cohort page the moment the switcher
-     flips — which is the whole reason the two sides share one board. `true`
-     in the last field is what marks a line as the poster's own; on this
-     portal that is the leader, and `roomLine` prints "You" for it. */
-  if(t.closest('[data-ldrpost]')){
-    const box = device.querySelector('#ldrPost');
-    const text = box ? box.value.trim() : '';
-    if(!text){ if(box) box.focus(); return; }
-    ldrBoard(S.ldrBoardCo).push([LEADER.n, 'priya', LEADER.i, text, 'Just now', true]);
-    render();
-    return;
-  }
-
+  /* POSTING TO A BOARD IS NOT THIS MODULE'S JOB ANY MORE (2 Sep 2026). The
+     handler pushed onto `ldrBoard(S.ldrBoardCo)` — Cohort 41's board IS `ROOM`,
+     so a post made here was on the candidate's Cohort page the moment the
+     switcher flipped, which was the whole reason the two sides share one array.
+     THAT IS STILL TRUE AND STILL REACHABLE, from the cohort rather than from
+     the inbox: `V.leadCohort`'s Discussion tab draws `discussionRoom()` — the
+     candidate's own component, with its own composer writing to the same
+     `ROOM`. Nothing about the shared board changed; only the door into it. */
   if(t.closest('[data-ldrreply]')){
     const box = device.querySelector('#ldrReply');
     const text = box ? box.value.trim() : '';
@@ -808,11 +734,10 @@ device.addEventListener('click', e => {
   }
 });
 
-/* Enter posts, on both composers, because a composer that only responds to a
-   button is a composer you have to reach for the mouse to use. */
+/* Enter sends, because a composer that only responds to a button is one you
+   have to reach for the mouse to use. One composer left. */
 device.addEventListener('keydown', e => {
   if(e.key !== 'Enter' || e.shiftKey) return;
-  if(e.target.id === 'ldrPost'){ e.preventDefault(); device.querySelector('[data-ldrpost]').click(); }
   if(e.target.id === 'ldrReply'){ e.preventDefault(); device.querySelector('[data-ldrreply]').click(); }
 });
 

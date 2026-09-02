@@ -1,0 +1,176 @@
+/* ==========================================================================
+   105. THE PROFILE PAGE
+   Maryam's reference, 2 Sep 2026: "implement this ui on the candidate profile
+   page. obviously we will keep our look and feel." The whole argument — what
+   the reference adds, and the four things this refuses from it — is over
+   `V.account` in views.js. This layer is the drawing, and it is deliberately
+   short: every block is an existing component, so what is here is the four
+   places one of them is arranged differently.
+
+   NOT ONE font-size, font-weight, text-transform OR text colour. That is not
+   restraint, it is the test that the components were the right ones: `.facts`'s
+   three rows, `.nrow`'s title and time, `.crt-card`'s name and date and `.tg`'s
+   two lines are all already roles in §63, so a page that reuses them needs no
+   type at all. The only `color` below is on a mark's `fill`, which §85's note
+   settles is not text.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 105.1 ---
+   THE IDENTITY BAND — a mark inside the label
+
+   `.facts` DRAWS ITS HAIRLINES AS THE 1px GRID GAP (§29.915 and its note), so
+   the cells are separated by the same rule that frames them and nothing is
+   added here for the edges. What this states is the mark: `.pf-l` puts the
+   glyph in front of the label rather than in a column of its own, which is
+   §29's 1 Sep decision — the chip came off and the glyph stepped to 20 because
+   "it now holds the line alone" — applied to a label instead of a figure.
+
+   20px IS THE PRODUCT'S ONE BARE-GLYPH SIZE, shared with `.stat-ic`, `.pulse-ic`
+   and `.qa-ic`. `flex:none` so a mark never shrinks in a wrapping row, and the
+   hue comes from the `--mk` the markup states inline — named per cell, never
+   cycled, for §72's `pulseCol` reason.
+
+   `align-items:center` ON THE LABEL ROW rather than a baseline: the label is
+   `--t-eyebrow` at 15px of line and the glyph is 20, so a shared baseline hangs
+   the mark below the cap height of four small words. */
+.app .page .pf-facts .pf-l{
+  display:flex;align-items:center;gap:var(--s03)}
+.app .page .pf-facts .pf-l svg{
+  flex:none;width:20px;height:20px;fill:var(--mk)}
+/* THE VALUE AND ITS SUB-LINE ARE ONE OBJECT, 2px APART, which is the same pair
+   `.aw-n` / `.aw-d` and `.nrow-t` / `.nrow-d` draw. The gap under the LABEL is
+   the cell's own, and it is bigger, because that is a heading over a value
+   rather than two lines of one statement — §01's `--sec-desc-gap` argument at
+   the scale of a cell. */
+.app .page .pf-facts .v{display:block;margin-top:var(--s03)}
+.app .page .pf-facts .d{display:block;margin-top:2px}
+
+/* ------------------------------------------------------------------ 105.2 ---
+   WHAT YOU HOLD, BESIDE WHAT HAS HAPPENED
+
+   TWO PANELS IN ONE SECTION, side by side at desktop and stacked below it. The
+   frame is §41's — `1px solid var(--rule)` on `--layer-01`, square through
+   `--radius` — which is the answer §76 gave the same reference decision on the
+   booking panels rather than minting a second bounded-panel look.
+
+   `1fr 1fr` AND NOT `auto-fit`, which is the opposite call from §102's award
+   grid and for the opposite reason: there are exactly two panels, always, and
+   they are not a collection. An `auto-fit` track would let the Achievements
+   panel size itself off three cards and leave the log narrower than it.
+
+   THE HEAD ROW HAS NO RULE UNDER IT. The reference draws none, and §18's rule
+   is that a block with a ground of its own is its own edge — a hairline 16px
+   inside a hairline frame is the second boundary §57.4b took out from under the
+   identity panel. */
+.app .page .pf-pair{
+  display:grid;gap:var(--s05);grid-template-columns:minmax(0,1fr)}
+@container app (min-width:900px){
+  .app .page .pf-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.app .page .pf-card{
+  display:flex;flex-direction:column;gap:var(--s05);
+  padding:var(--s05);
+  background-color:var(--layer-01);
+  border:1px solid var(--rule);border-radius:var(--radius)}
+/* THE CONTROL IS AT THE TRUE END OF THE ROW on its own auto margin, and the
+   heading takes the slack with `min-width:0` so a long one wraps rather than
+   pushing "View all" out of the panel — §93's lesson, one component over. */
+.app .page .pf-hd{
+  display:flex;align-items:center;gap:var(--s05)}
+.app .page .pf-hd > h3{flex:1 1 auto;min-width:0;margin:0}
+.app .page .pf-hd > .btn{flex:none;margin-left:auto}
+
+/* ---- the three certifications ----
+   §96's CARD, ONE SIZE DOWN, AND THE MECHANISM IS §96's OWN. That layer sizes
+   the badge slot from `--crt-art-w/h` and re-points the pair on its grid card
+   (`120x130` against the hero's `70x76`); this re-points them again to 56x61,
+   the same 70:76 ratio, so the artwork is a downscale at every call site and
+   nothing is resampled. A fixed 240px track cannot go in a half-width column,
+   which is the whole reason the size is a custom property.
+
+   `minmax(0,1fr)` ON THREE COLUMNS, not `auto-fit`: the panel shows exactly
+   three and "View all" is what shows the rest, so there is no count for the
+   grid to discover. `align-content:start` keeps them at the top of a panel that
+   is as tall as the log beside it. */
+.app .page .pf-ach{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:var(--s04);align-content:start}
+.app .page .pf-ach > .crt-card{
+  padding:var(--s04);gap:2px}
+.app .page .pf-ach > .crt-card > .crt-art{
+  --crt-art-w:56px;--crt-art-h:61px;
+  align-self:center;margin-bottom:var(--s04)}
+
+/* ---- the log ----
+   THE ROWS ARE `.nrow` AND THE LIST IS A COLUMN OF THEM WITH THE HAIRLINE
+   BETWEEN, not around: §02's `.nrow` already carries the separator, and the
+   panel's own frame is the outer edge. The last row gives its rule up because a
+   rule against the frame's bottom padding is two lines for one join.
+
+   `--pad-x:0px` ON THE LIST IS TRAP 10, and it is the same one declaration
+   §35.1 uses for a page component borrowed into a Tal bubble. §10.871 gives
+   every direct child of a row container the page gutter, so inside a panel that
+   has already paid `--s05` the rows were indented twice — 16 inside 16. Set on
+   the list rather than on the rows, so anything else dropped in here inherits
+   the answer. */
+.app .page .pf-act{
+  --pad-x:0px;
+  display:flex;flex-direction:column}
+.app .page .pf-act > .nrow:last-child{border-bottom:0}
+
+/* ------------------------------------------------------------------ 105.3 ---
+   THE SWITCHES ARE A ROW OF THREE
+
+   EACH ONE IS A BORDERED CELL, which is the reference's arrangement and the one
+   place this page adds a frame the component did not have: a `.tg` is a
+   full-width row separated from its neighbour by a hairline, and three of them
+   abreast need an edge of their own or they read as one wide cell with two
+   gaps in it.
+
+   `align-items:flex-start` — §70's `.qa-c` lesson, measured. Centred, two cells
+   whose descriptions run to different numbers of lines start their titles at
+   different heights; the switch keeps its own `align-self:center` plus the auto
+   margin `.tg` already gives it, which is what "right middle" needs once the
+   text block no longer fills the row.
+
+   THE MARK IS THE SAME 20px BARE GLYPH as the fact band's, in the `--mk` the
+   markup states. `margin-top:1px` is `.qa-ic`'s own offset for a 20px glyph
+   against a 21px title line (§29, 1 Sep 2026), not a guess. */
+.app .page .pf-tgs{
+  display:grid;gap:var(--s05);
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.app .page .pf-tgs > .tg{
+  align-items:flex-start;gap:var(--s04);
+  padding:var(--s05);
+  background-color:var(--layer-01);
+  border:1px solid var(--rule);border-radius:var(--radius)}
+.app .page .pf-tgs > .tg > .tb{flex:1 1 auto;min-width:0}
+.app .page .pf-tgs > .tg > .sw{align-self:center}
+.app .page .pf-tgs .tg-mk{
+  flex:none;display:grid;place-items:center;
+  width:20px;height:20px;margin-top:1px}
+.app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--mk)}
+
+/* ------------------------------------------------------------------ 105.4 ---
+   THE INVITATION'S CONDITIONS ARE MARKS, NOT CHIPS
+
+   §29's 1 Sep 2026 decision, one component over: the border comes off and the
+   glyph carries the line. Three outlined chips inside the heaviest object on
+   the page were a box in a box in a box, which is the sentence §72's note
+   makes about the pulse's three column marks.
+
+   THE ROW SPACES ITSELF FURTHER APART BECAUSE THE BOXES ARE GONE. §16.598 gives
+   `.lead-tags` a `--s04` gap, which is right between two bordered chips and too
+   close between two bare labels — with no edges to separate them, the space IS
+   the separation. `--s07` is what keeps the three reading as three.
+
+   THE MARK IS `--on-dark` AND THE WORDS STAY `--on-dark-2`: §28.75 inks the
+   labels for the card and this only says the glyph is the brighter of the pair,
+   which is what lets it lead the line. On a white card the reference tints
+   these three; the named marker hues run 2.2:1 to 3.1:1 on `--gray-100`, so
+   they do not come along — the note over `leadSec` has the numbers. */
+.app .lead-b .lead-tags{gap:var(--s05) var(--s07)}
+.app .lead-b .lead-tags > span{
+  min-height:0;display:inline-flex;align-items:center;gap:var(--s03);
+  padding:0;border:0}
+.app .lead-b .lead-tags > span svg{
+  flex:none;width:20px;height:20px;fill:var(--on-dark)}

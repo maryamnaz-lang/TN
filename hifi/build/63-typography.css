@@ -3185,6 +3185,17 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-secondary)}
+/* A CAST VOTE IS BLUE (Maryam, 2 Sep 2026: "show a thumbs up filled icon in
+   blue color"). `--mk-1` is §12's blue — the hue `.stat`'s first cell, the
+   `.qa-ic.ic-prep` call mark and §82's `ic-found` already use — rather than
+   `--link`, which means "this word navigates", or the accent, which is Tal's
+   voice and the page's one CTA.
+   IT IS STATED HERE AND NOT IN §89 because it is a text COLOUR, which is one of
+   the four properties this layer owns wherever it appears (§63's opening rule),
+   and because `.cmt-ic svg` is `fill:currentColor` — so one declaration carries
+   both the word and the glyph, and the filled mark cannot end up a different
+   blue from the count beside it. */
+.app .cmt-act.on{color:var(--mk-1)}
 .app .cmt-ct{font-variant-numeric:tabular-nums}
 
 /* ==========================================================================
@@ -3814,3 +3825,37 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-primary)}
+
+/* =========================================================================
+   30 — THE LOG IN ROLE BLOCK (§104)
+
+   TWO INKS ON ONE ROLE, WHICH IS WHAT THE ASK ASKS FOR (Maryam, 2 Sep 2026:
+   "orange text… the text will be 'Login as Candidate'", and "black text of
+   'Login as Cohort Leader'"). Read as a control rather than as two blocks —
+   which is what it is — that is one label with a chosen and an unchosen ink,
+   and the pair swaps when the reader presses the other one.
+
+   `--accent-text` (#b94a09) ON THE CHOSEN ONE, NOT `--accent` (#f57414). §01's
+   fill/ink split is the whole reason both tokens exist, and §76 measured this
+   exact pairing for its step numeral: `--accent-text` on `--brand-tint-2` is
+   5.8:1, where the brighter fill is 2.3:1 and fails AA on the same ground.
+   `--text-primary` on `--layer-02` for the unchosen one, which is "black text"
+   and is what every other label in the build sits at on that fill.
+
+   COMPACT IN KRÄFTIG, WHICH IS THE `.cco-v` / `.note-sel-t` RANK ONE SECTION
+   UP: this is a control's current VALUE, not a description of one. §02.190
+   types `.rad` at 13/19 for a consent paragraph, and a tile that names an
+   account is not that. `.role-t` rides on `.txt` so the box's own layout is
+   untouched — only the role changes.
+
+   THE `.on` CLASS AND NOT `:has(:checked)`, so the ink cannot disagree with the
+   ground: §104 paints `--brand-tint-2` from the same class, and both are
+   written from `S.role` at render (trap 9). `.app .form-page .role-c.on .txt`
+   is (0,4,0), heavier than §02.190's `.rad` at (0,1,0) and than anything the
+   auth layers state on `.txt`.
+   ========================================================================= */
+.app .form-page .role-t{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .form-page .role-c.on .role-t{color:var(--accent-text)}

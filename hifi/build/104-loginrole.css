@@ -1,0 +1,104 @@
+/* ==========================================================================
+   104. THE LOG IN SCREEN ASKS WHO YOU ARE
+   Maryam, 2 Sep 2026 — the ask is quoted in full over `loginRoles` (views.js),
+   which is also where the component choice is argued. This layer draws the two
+   blocks and takes one hairline off.
+
+   THE CHOSEN GROUND IS `--brand-tint-2` AND IT IS THE TOKEN FOR EXACTLY THIS.
+   §10.29 reserves it by name for "the candidate's own SELECTION" — the lit day
+   on the booking grid, the lit time, the step numeral — and this is a selection
+   in the most literal sense the product has. So "light orange" is not a new
+   value picked to match a screenshot; it is the one the build already spends on
+   the state this block is in. §85's 8% `color-mix` is the other light orange in
+   the build and is deliberately NOT used here: that is a full-width notice band
+   on white paper, where 20% would read as a selected row.
+
+   THE UNCHOSEN GROUND IS `--layer-02`, "available", which is the same fill the
+   call bar gives a control that is on and not chosen (§60) and the same one
+   `.aw-ic` had before §29 took the chip off. NO BORDER on either, which the ask
+   states for the grey one and which the orange one gets for §18's reason: a
+   block with a ground of its own is its own edge.
+
+   THE RADIUS IS `--auth-r`, WHICH IS THE ORANGE BLOCK ON THE CREATE SCREEN.
+   "As much as we have the orange block corner radius on create account page" is
+   `.auth-id`'s own `border-radius:var(--auth-r)` (§57.4) — 8px, and §01's token
+   note records it as "the same 8 on the card and on the panel". Read from the
+   token rather than typed, so the auth surface cannot come to hold two radii.
+   This is the auth screens' own exception to `--radius:0`; §57 established it
+   and this joins it rather than opening a second one.
+
+   TWO ACROSS OR STACKED, WITH NO BREAKPOINT. `repeat(auto-fit,minmax(200px,
+   1fr))` puts them side by side in the 397px form column at desktop and stacks
+   them in the phone's ~358, because two 173px blocks would set "Login as Cohort
+   Leader" on three lines beside a one-line neighbour. 200 is the floor at which
+   the longer of the two labels holds one line.
+
+   THE HAIRLINE UNDER THE DESCRIPTION GOES, AND §57.4b IS THE ARGUMENT ALREADY
+   WRITTEN. §17.6 draws `border-top` on `.sec-rule` — "the one rule in the
+   column" — and §57.4b removed it wherever the orange identity panel is the
+   thing above it, keeping it on `login` in as many words: "where the same
+   `.sec-rule` follows the page header and the rule is the only thing separating
+   them". That clause has expired. There is a filled block between them now, so
+   the line is the "second boundary for one join" that layer took out on the
+   other two screens.
+
+   IT IS KEYED ON WHAT PRECEDES, which is §75's `.rec-dark + .sec-qa` idiom: the
+   reason the line goes is a property of the block above it, so any other screen
+   whose `.sec-rule` follows a page header keeps it. BOTH SOURCES HAVE TO BE
+   ANSWERED — the desktop `border-top` and §17.395's phone `::before`, which is
+   an inset 1px bar rather than a border and would otherwise survive on the one
+   width where the blocks are stacked and the join is most crowded.
+
+   §63 §30 OWNS THE TWO INKS. Not one font-size, font-weight, text-transform or
+   text colour is stated here.
+   ========================================================================== */
+
+/* ---- the pair ---- */
+.app .form-page .sec.sec-role{padding-top:12px;padding-bottom:12px}
+.app .form-page .sec.sec-role::after{display:none;content:none}
+.app .form-page .role-pick{
+  display:grid;gap:12px;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+
+/* ---- one block ----
+   `align-items:center` RATHER THAN §02.190's `flex-start`, because the block is
+   one line of type against a 20px ring: flex-start is right for a consent
+   paragraph that wraps under its own box and wrong for a tile. Should a label
+   ever wrap, centring is still what keeps the ring on the block's own axis.
+
+   `box-sizing:border-box` STATED, because §02.190 gives `.rad` vertical padding
+   only and this adds a horizontal frame — the auth column is a grid track, so a
+   block that measured its padding outside its track would overflow the column
+   by 32px at the width where it is already tightest. */
+.app .form-page .role-c{
+  box-sizing:border-box;
+  align-items:center;gap:12px;
+  padding:14px 16px;
+  background-color:var(--layer-02);
+  border:0;border-radius:var(--auth-r)}
+.app .form-page .role-c.on{background-color:var(--brand-tint-2)}
+
+/* THE UNCHOSEN RING HAS TO SIT ON A GREY GROUND. §02.193 gives the box
+   `background:var(--layer-01)` — white, which on `--layer-02` reads as a filled
+   white dot rather than an empty ring, i.e. as a third state. Transparent lets
+   the block's own ground show through. */
+.app .form-page .role-c input:not(:checked) + .box{background:transparent}
+
+/* AND THE CHOSEN RING IS ORANGE, WHICH IT IS NOT FOR FREE — the one place the
+   note over `loginRoles` was wrong. §02.201 fills a checked box with
+   `--brand-primary`, and in this build that token is **#000000**: the brand
+   colour is black (it is what `.btn-p` and the Log in button are) and the
+   orange is `--accent`, a separate token §01 keeps for exactly this reason. So
+   the radio came out black on a light-orange block, which is one hue more than
+   the pair has. `--accent` rather than `--accent-text`: a filled ring is a
+   FILL, so it takes §01's fill value and the ink split does not apply — the
+   same call §10.29 makes for the selected day. §02.204's dot is `--on-brand`,
+   white, which is `--on-accent` too, so nothing about it has to move. */
+.app .form-page .role-c input:checked + .box{
+  background:var(--accent);border-color:var(--accent)}
+
+/* ---- the line under the description ---- */
+.app .form-page > .sec.sec-role + .sec.sec-rule{border-top:0}
+.app .auth-card .page > .sec.sec-role + .sec.sec-rule{border-top:0}
+.app .auth-card .page > .sec.sec-role + .sec.sec-rule::before{
+  display:none;content:none}

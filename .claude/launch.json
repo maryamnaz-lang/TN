@@ -132,6 +132,30 @@
         "127.0.0.1"
       ],
       "port": 8853
+    },
+    {
+      "name": "tn13",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8917",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8917
+    },
+    {
+      "name": "tn12",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8903",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8903
     }
   ]
 }

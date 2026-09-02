@@ -1063,7 +1063,48 @@ css = '\n'.join((here / f).read_text() for f in
                  # here, so it was extended rather than fought.
                  # AFTER §63 AND CLEAN: margin and padding only. Not one
                  # font-size, font-weight, text-transform or text colour.
-                 '101-blockgap.css'])
+                 '101-blockgap.css',
+                 # THE BADGES AND RANK TABS (§102) — the award row becomes an
+                 # upright bordered card in a fixed-track grid, artwork centred
+                 # and words left, with §02's meter under them.
+                 # AFTER §63 AND CLEAN: grid, flex, padding, one ground, one
+                 # border and two box sizes. Not one font-size, font-weight,
+                 # text-transform or text colour — it reuses `.aw-n`, `.aw-d`,
+                 # `.aw-v` and `.aw-s`, which §63 already states.
+                 # LATE FOR A CASCADE REASON: the ground and the frame have to
+                 # beat §12.146/§12.154, which are (0,4,0) because `:has()`
+                 # carries its argument's specificity, and the card's `flex` and
+                 # `align-self` have to land after §06 and §15 state the row.
+                 '102-awardcards.css',
+                 # A FACE IN A THREAD IS A DISC (§103) — `.m-av` on both sides
+                 # of the message thread and the chat header's own face.
+                 # AFTER §63 AND CLEAN: one `border-radius`, twice.
+                 # LATE FOR A CASCADE REASON: it beats §09.7's square `.av-ph`
+                 # and must not be re-pointed through `--radius`, which would
+                 # curve the bubble and the file card with it (§89.2's rule).
+                 '103-threadface.css',
+                 # WHO IS LOGGING IN (§104) — the two role blocks on the Log in
+                 # screen, and the hairline under the description removed.
+                 # AFTER §63 AND CLEAN: grid, two grounds, one radius and one
+                 # ring background. Not one font-size, font-weight,
+                 # text-transform or text colour — §63 §30 states the two inks.
+                 # LATE FOR A CASCADE REASON: it turns off §17.6's `border-top`
+                 # and §17.395's phone `::before`, both of which are inside
+                 # `@container` tiers, and it re-points §02.193's white ring
+                 # ground for the unchosen block.
+                 '104-loginrole.css',
+                 # THE PROFILE PAGE (§105) — the identity band's marks, the
+                 # Achievements / Recent activity pair, the switches as a row of
+                 # three, and the invitation's chips reduced to marks.
+                 # AFTER §63 AND CLEAN: grid, flex, padding, two grounds, one
+                 # border and three `fill`s. Not one font-size, font-weight,
+                 # text-transform or text colour — every text node on the page
+                 # is a role §63 already states, which is the test that the
+                 # components reused were the right ones.
+                 # LATE FOR A CASCADE REASON: it re-points §16.598's tag gap and
+                 # §28.79's chip border on the black card, §96's `--crt-art-w/h`
+                 # for a half-column card, and §02.190's `.tg` alignment.
+                 '105-profile.css'])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
