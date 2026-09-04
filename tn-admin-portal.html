@@ -2687,6 +2687,175 @@ ACTIONS['toggleflag'] = key => {
 };
 
 /* ======================================================================
+   SETTINGS
+   ====================================================================== */
+/* interactive settings state — mutated by the toggles, read on every render */
+const NOTIF_PREFS = {
+  email: {vetting:true, payouts:true, accounts:false, summary:true},
+  inapp: {badge:true, decisions:true, compliance:true}
+};
+const SEC = {twofa:true};
+/* a design-system switch that reads a state path and flips it */
+const swToggle = (label, path, on) => `<div class="kv"><span class="k">${label}</span>
+  <span class="v"><button class="sw${on ? ' on' : ''}" role="switch" aria-checked="${on}" aria-label="${esc(String(label).replace(/<[^>]+>/g, ''))}" data-act="toggleset:${path}"></button></span></div>`;
+
+PAGESUM['settings/general'] = () => `The platform's identity and how dates, currency and the timezone read across the admin. These change the admin views, <b>not what a candidate sees</b>.`;
+PAGESUM['settings/profile'] = () => `Your Super Admin account — <b>${esc(ME.name)}, Head of Operations</b>. The one account with override on any level or setting on the platform.`;
+PAGESUM['settings/notifications'] = () => `What reaches you, by email and in the bell. <b>The vetting queue and settlement alerts</b> are the two worth keeping on.`;
+PAGESUM['settings/security'] = () => `How your session is protected. Two-factor is required for staff, and you can <b>end any other session</b> from here.`;
+PAGESUM['settings/payments'] = () => `The cards and billing details the platform bills against. Full card numbers are never stored — <b>Stripe tokenises them</b>.`;
+
+function settingsGeneral(){
+  return `
+  <section class="sec">
+    ${aiHead('Identity', 'How the platform names itself to staff and in email.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:General settings saved">Save</button>')}
+    <div class="mt4">
+      <label class="f"><span class="lbl">Organisation name</span><input class="inp" value="TalentNext"></label>
+      <label class="f"><span class="lbl">Support email</span><input class="inp" value="support@talentnext.io"></label>
+      <label class="f"><span class="lbl">Support phone</span><input class="inp" value="+44 20 7946 0123"></label>
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('Defaults', 'How the admin reads dates, money and time.')}
+    <div class="mt4">
+      <label class="f"><span class="lbl">Default landing page</span>
+        <select class="inp"><option>Dashboard</option><option>Vetting &amp; Approvals</option><option>Finance &amp; Settlement</option></select></label>
+      <label class="f"><span class="lbl">Timezone</span>
+        <select class="inp"><option>Europe/London (GMT+1)</option><option>UTC</option><option>America/New_York (GMT-4)</option><option>Asia/Karachi (GMT+5)</option></select></label>
+      <label class="f"><span class="lbl">Language</span>
+        <select class="inp"><option>English (United Kingdom)</option><option>English (United States)</option></select></label>
+      <label class="f"><span class="lbl">Date format</span>
+        <select class="inp"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select></label>
+      <label class="f"><span class="lbl">Display currency</span>
+        <select class="inp"><option>GBP (£)</option><option>USD ($)</option><option>EUR (€)</option></select></label>
+    </div>
+  </section>`;
+}
+
+function settingsProfile(){
+  return `
+  <section class="sec">
+    ${aiHead(esc(ME.name), 'Head of Operations · ' + esc(ME.email),
+      '<button class="btn btn-g btn-sm noic" data-act="toast:Photo upload is disabled in the prototype">Change photo</button>')}
+    <div class="mt4">${kv([
+      ['Role', '<span class="tag sm brand">Super Admin</span>'],
+      ['Email', esc(ME.email)],
+      ['Member since', esc(ME.joined)],
+      ['Access', 'Full platform, with override on any level or setting'],
+      ['Two-factor', SEC.twofa ? '<span class="tag sm green">On</span>' : '<span class="tag sm">Off</span>']
+    ])}</div>
+  </section>
+  <section class="sec">
+    ${aiHead('Name & email', 'How your account reads across the admin.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Profile saved">Save</button>')}
+    <div class="mt4">
+      <label class="f"><span class="lbl">Full name</span><input class="inp" value="${esc(ME.name)}"></label>
+      <label class="f"><span class="lbl">Email</span><input class="inp" value="${esc(ME.email)}"></label>
+    </div>
+  </section>`;
+}
+
+function settingsNotifications(){
+  const e = NOTIF_PREFS.email, a = NOTIF_PREFS.inapp;
+  return `
+  <section class="sec">
+    ${aiHead('Email', 'What lands in your inbox.')}
+    <div class="mt4">
+      ${swToggle('Vetting queue', 'email.vetting', e.vetting)}
+      ${swToggle('Payouts &amp; settlement', 'email.payouts', e.payouts)}
+      ${swToggle('New accounts', 'email.accounts', e.accounts)}
+      ${swToggle('Weekly summary', 'email.summary', e.summary)}
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('In-app', 'What shows in the bell and on the dashboard.')}
+    <div class="mt4">
+      ${swToggle('Show the bell badge', 'inapp.badge', a.badge)}
+      ${swToggle('Open decisions', 'inapp.decisions', a.decisions)}
+      ${swToggle('Compliance alerts', 'inapp.compliance', a.compliance)}
+    </div>
+  </section>`;
+}
+
+function settingsSecurity(){
+  const sessions = [
+    {dev:'This device · Chrome on macOS', loc:'London', when:'Current', current:true},
+    {dev:'Safari on iPhone', loc:'London', when:'2h ago', current:false},
+    {dev:'Firefox on Windows', loc:'Manchester', when:'Yesterday', current:false}
+  ];
+  return `
+  <section class="sec">
+    ${aiHead('Sign-in', 'How your session is protected.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Security settings saved">Save</button>')}
+    <div class="mt4">
+      <label class="f"><span class="lbl">Auto sign-out after inactivity</span>
+        <select class="inp"><option>30 minutes</option><option>15 minutes</option><option>1 hour</option><option>8 hours</option></select></label>
+      ${swToggle('Two-factor authentication', 'sec.twofa', SEC.twofa)}
+      <label class="f"><span class="lbl">New password</span><input class="inp" type="password" placeholder="At least 12 characters"></label>
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('Active sessions', 'Where your account is signed in. End any you do not recognise.',
+      '<button class="btn btn-g btn-sm noic" data-act="toast:All other sessions signed out">Sign out others</button>')}
+    <div class="tile-stack">
+      ${sessions.map(s => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('lock')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(s.dev)} ${s.current ? '<span class="tag sm green">Current</span>' : ''}</span>
+            <span class="cardrow-d">${esc(s.loc)} · ${esc(s.when)}</span></span>
+          <span class="cardrow-a">${s.current ? '' : '<button class="btn btn-g btn-sm noic" data-act="toast:Session revoked">Revoke</button>'}</span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function settingsPayments(){
+  const cards = [
+    {brand:'VISA', last:'4242', exp:'08/2028', def:true},
+    {brand:'MASTERCARD', last:'8210', exp:'04/2027', def:false}
+  ];
+  return `
+  <section class="sec">
+    ${aiHead('Cards on file', 'What the platform bills against.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Add a card in the billing provider">' + I.add + ' Add Card</button>')}
+    <div class="tile-stack">
+      ${cards.map(c => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${I.creditCard}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${c.brand} •••• ${c.last} ${c.def ? '<span class="pill-def">Default</span>' : ''}</span>
+            <span class="cardrow-d">Expires ${esc(c.exp)}</span></span>
+          <span class="cardrow-a">${c.def
+            ? '<button class="btn btn-g btn-sm noic" data-act="toast:Card removed">Remove</button>'
+            : '<button class="btn btn-g btn-sm noic" data-act="toast:Set as default card">Make default</button>'}</span>
+        </div>`).join('')}
+    </div>
+    ${note('', 'Tokenised by Stripe', 'TalentNext never stores full card numbers — they are tokenised by Stripe and only the last four digits are held.')}
+  </section>
+  <section class="sec">
+    ${aiHead('Billing details', 'The company on the platform’s own invoices.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Billing details saved">Save</button>')}
+    <div class="mt4">${kv([
+      ['Billing contact', 'Finance team — finance@talentnext.io'],
+      ['Billing email cc', 'accounts@talentnext.io'],
+      ['Company', 'TalentNext Ltd'],
+      ['Address', '14 Old Street, London, EC1V 9BG'],
+      ['VAT', 'GB 123 4567 89']
+    ])}</div>
+  </section>`;
+}
+
+V.settings = () => modView({general:settingsGeneral, profile:settingsProfile,
+  notifications:settingsNotifications, security:settingsSecurity, payments:settingsPayments});
+
+ACTIONS['toggleset'] = key => {
+  const path = key.split(':')[1];
+  if(path === 'sec.twofa'){ SEC.twofa = !SEC.twofa; toast('Two-factor ' + (SEC.twofa ? 'on' : 'off')); return; }
+  const [grp, k] = path.split('.');
+  if(NOTIF_PREFS[grp] && k in NOTIF_PREFS[grp]){ NOTIF_PREFS[grp][k] = !NOTIF_PREFS[grp][k]; }
+};
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
