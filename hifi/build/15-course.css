@@ -1466,7 +1466,7 @@
   position:relative;z-index:1;
   margin-bottom:-1px;padding-bottom:1px;
   background-color:var(--background);
-  color:var(--text-primary);font-weight:600;
+  color:var(--text-primary);font-weight:var(--t-w-strong);
   box-shadow:inset 0 -2px 0 var(--accent)}
 .app .page .cs{padding-left:0;padding-right:0}
 @container app (min-width:900px){

@@ -5137,9 +5137,9 @@
    literal in an earlier layer was "the strong weight" when it was written and
    did not follow the token, so it still renders SemiBold — a third weight the
    system says it does not have. The first `/portal-sync` of the agent portal
-   (4 Sep 2026) re-pointed the eight that render there — §15's `.pay-n` / `.pay-a`,
-   §31's `.flag-t`, §02's and §12's `.tabs button.on`, §09's `.cs button.on`,
-   §04's `.prog-figs > span b` and `.note .nb b` — to
+   (4 Sep 2026) re-pointed the nine that render there — §15's `.pay-n` / `.pay-a`,
+   §31's `.flag-t`, §02's and §12's `.tabs button.on`, §09's and §15's
+   `.cs button.on`, §04's `.prog-figs > span b` and `.note .nb b` — to
    `var(--t-w-strong)`, which moves the same component on all three portals.
 
    FLAGGED, NOT DONE: 289 such literals remain across 36 layers (grep

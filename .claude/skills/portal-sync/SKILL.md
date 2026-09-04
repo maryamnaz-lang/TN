@@ -18,36 +18,27 @@ so run step 4 only.
 `DESIGN.md` is already imported. Re-read §3 (the checklist) and §4 (the recipe index), and open
 `design-system/gallery.html` for any recipe you will port.
 
-## 2. Inventory the gap
+## 2. Diff the components, screen by screen
 
 ```bash
-python3 - tn-agent-portal.html <<'PY'
-import re,sys,pathlib
-html=pathlib.Path(sys.argv[1]).read_text()
-css=pathlib.Path('design-system/talentnext-ds.css').read_text()
-written={c for m in re.findall(r'class="([^"]*)"',html) for c in m.split() if not c.startswith('${')}
-written|={c for m in re.findall(r"class=\\?'([^']*)\\?'",html) for c in m.split()}
-shipped=set(re.findall(r'\.([A-Za-z_][\w-]*)',css))
-STALE={ # older generation -> current (DESIGN.md §4)
- 'plate':'.dark-card (+ .crow-dark / .rec-dark) in the page body',
- 'lvl-hero':'removed — no agent level; a level name is h2',
- 'wkc':'.pulse / .stat cells','ach':'.ph-earned one-line celebration (§62)',
- 'pswitch':'.acct-t account menu (§78)','stp-all':'.stps row (§56) unless the dropdown is wanted',
- 'ph-facts':'no fact row on module pages (§78)','crumb':'top-bar trail (§78)',
- 'tal-panel':'the ask dock','tal-fab':'the ask dock','sec-h':'aiHead where a sentence sits under the heading (§73)',
-}
-stale={c:STALE[c] for c in written if c in STALE}
-unstyled=sorted(c for c in written-shipped if not c.startswith(('pt-','chrome','ad-')))
-print(f'written {len(written)} | shipped-by-DS {len(written&shipped)} | unstyled {len(unstyled)} | stale {len(stale)}')
-print('\nSTALE (port these):'); [print(f'  .{k:14} -> {v}') for k,v in sorted(stale.items())]
-print('\nUNSTYLED (in no layer):', ', '.join(unstyled) or 'none')
-PY
+node hifi/compdiff.mjs --target=tn-agent-portal.html
 ```
 
-Three buckets: **stale** (an older generation of a component the design system has replaced),
-**unstyled** (written by the page and in no layer — either prototype chrome, or a class that
-should not exist), **fine**. The `sec-h` row is a prompt, not a verdict: a `.sec-h` with no
-sentence under it is current.
+It prints, for a set of reference screens on hifi and the same number on the target, the
+SHELL line (which named components the `.app` contains — dock, `.ai-run` light, trail, account
+menu, band members, dark card, quick actions, disclosures, strips) and each `.page` child with
+the components inside it. **Read the two blocks across**: every component a hifi screen has that
+the target's equivalent lacks, or draws in an older shape, is a port. Pass `--ref=` / `--screens=`
+to pick screens (`portal/stage/view` for hifi, `stage/view` for a stage-driven target).
+
+**A CLASS INVENTORY IS NOT THIS STEP AND WAS THE FIRST SYNC'S MISTAKE** (4 Sep 2026): comparing
+the classes the file writes with the classes the stylesheet ships said "331 of 335 present" and
+"current" while the Tal dock was the old `.askline` without §70's travelling light and the
+interviews page drew a `.tabs` strip where the other portals draw `.sec-cs` + `.cs`. Both pass an
+inventory and a rule sweep; only the side-by-side sees them. Three buckets still apply: **stale**
+(an older shape of a component the reference now draws differently), **unstyled** (a class in no
+layer — `grep -o 'class="[^"]*"'` against `talentnext-ds.css` finds these and only these),
+**fine**.
 
 ## 3. Port
 

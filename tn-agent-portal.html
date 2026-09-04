@@ -17,8 +17,26 @@
      took the app bar's role label out for the breadcrumb trail; that rule is
      deleted and its note records what it argued. Nothing here restyles a
      component.
+
+     SYNCED TO THE CURRENT COMPONENT GENERATION, 4 Sep 2026 (/portal-sync).
+     The first pass compared the classes this file writes with the classes
+     the box ships and called it current; Maryam saw the first screen and did
+     not agree, and she was right — a class inventory cannot see an older
+     SHAPE of a component whose classes still ship. `hifi/compdiff.mjs` puts a
+     hifi screen and this file's screen side by side and is the method now.
+     What it found and what moved: the Tal dock takes §70's travelling light
+     (`AI_RUN`, hifi's `ai4.js` verbatim) and the forward arrow, with no mic
+     because this file has no dictation; the Interviews strip is `.sec.sec-cs`
+     + `.cs` like every other tab row on the three portals, not `.tabs`; two
+     sections lost an `.info` class no layer styles; `.prog-fb`'s label is a
+     bare text node per hifi's recipe. In the layers, only this portal draws
+     `41-cal.css`, so its eleven literal sizes and weights now read the type
+     roles, and nine literal 600s in shared components read `--t-w-strong`
+     (§63 §50 has the list and the 289 that remain, flagged). Verified: the
+     rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
+     zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3e9b4974">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=7c2420fc">
 
 <style>
 /* ==========================================================================
@@ -113,7 +131,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=3e9b4974"></script>
+<script src="design-system/talentnext-ds.js?b=7c2420fc"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -2859,14 +2877,46 @@ function askRotate(){
    The send glyph is drawn OFF because there is nothing to send yet; §21 argues
    that a control which is visibly disabled tells the truth where an empty row
    said nothing at all. */
+/* THE TRAVELLING LIGHT — `AI_RUN`, hifi's `ai4.js` verbatim (4 Sep 2026, the first
+   /portal-sync of this file). §70.1 draws the dock's moving line as a stroked
+   rectangle with a dash on it, and the SVG cannot be a pseudo-element, so the
+   markup is half of the component: this span goes FIRST inside `.askline`, the
+   rect carries no geometry (§70 sets it as CSS), `pathLength="1000"` renumbers
+   the perimeter whatever the field's size, and the five stops are Maryam's own
+   (white → red → #CCE7CB → red → white, all at 70% as `stop-opacity`). §70 is in
+   `build-ds.py`'s list, so the rules were already in the box waiting for this.
+
+   WHAT THIS PORT DID NOT TAKE: hifi's `.askline-mic`. It is gated on `SPEECH_OK`
+   there and opens the conversation dictating; this file has no dictation, and a
+   mic that only opened the page would be §60's dead control. */
+const AI_RUN = `<span class="ai-run" aria-hidden="true">
+    <svg preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
+          <stop offset="0.226" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#cce7cb" stop-opacity=".7"/>
+          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
+        </linearGradient>
+      </defs>
+      <rect pathLength="1000"/>
+    </svg>
+  </span>`;
+
 function askDock(){
   const q = askQ();
   return `<div class="askdock">
     <button class="askline" data-askopen="1" aria-label="Ask Tal anything">
+      ${AI_RUN}
       <span class="askline-mark"><span class="tal-mk"></span></span>
       <span class="askline-t">Ask Tal anything</span>
       <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + q + '&rdquo;' : ''}</span>
-      <span class="askline-send" aria-hidden="true">${I.arrowUp}</span>
+      ${''/* ARROW-RIGHT, NOT ARROW-UP — hifi's askBar and Figma 581:6589: the
+            collapsed line does not send anything, it OPENS the conversation, and
+            the file draws that as the same forward arrow every other "go on"
+            control carries. */}
+      <span class="askline-send" aria-hidden="true">${I.arrowRight}</span>
     </button>
   </div>`;
 }
@@ -3824,7 +3874,7 @@ V.training = v => {
         one of them open to you. It is reference material with an action in it
         rather than an action with reference around it, so it takes the quiet
         ground and the black card at the head of the page keeps the emphasis. */''}
-  <section class="sec tint info">
+  <section class="sec tint">
     <div class="sec-h"><h2>The four lessons</h2></div>
     ${/* A `Next` TAG IS NOT AN ACTION. The row that is yours to do carried a
           pill saying so and nothing to press, while the button that opened it sat
@@ -4028,11 +4078,18 @@ V.interviews = v => {
         and nothing else. Parentheses cost nothing and §63 types them with the
         words. It disappears at zero rather than printing "(0)", which is a
         count of a queue that is not there. */''}
-  <div class="tabs">
-    <button class="${S.tab === 'req' ? 'on' : ''}" data-tab="req">New Requests${reqs.length ? ` (${reqs.length})` : ''}</button>
-    <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Coming up</button>
-    <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Finished</button>
-  </div>
+  ${''/* THE STRIP IS `.sec.sec-cs` + `.cs`, NOT `.tabs` (4 Sep 2026, /portal-sync).
+        `.tabs` is the older strip; the candidate's Profile, the leader's Reports
+        and this file's own Profile all draw a tab row as §15's `.cs` inside a
+        `.sec-cs` section, which §16 zeroes so the strip and the panel under it
+        meet on one line. Same buttons, same `data-tab` router. */}
+  <section class="sec sec-cs">
+    <div class="cs">
+      <button class="${S.tab === 'req' ? 'on' : ''}" data-tab="req">New Requests${reqs.length ? ` (${reqs.length})` : ''}</button>
+      <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Coming up</button>
+      <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Finished</button>
+    </div>
+  </section>
 
   ${S.tab === 'req' ? (reqs.length ? `
   <section class="sec">
@@ -4826,7 +4883,7 @@ V.profile = v => head({title: 'Profile'}) + `
         the range with it. */''}
   ${/* `tint info` — §45. Four read-only figures and nothing to press: this is
         the card described back to you, which is reading matter. */''}
-  <section class="sec tint info">
+  <section class="sec tint">
     <div class="sec-h"><h2>On your card</h2></div>
     ${/* THE NOTES HAVE TO HOLD AT `live` TOO, where nothing has happened yet:
           `ivs`, `month` and `rating` are all zero or null the day the listing
