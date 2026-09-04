@@ -2120,6 +2120,241 @@ function employersPlacements(){
 V.employers = () => modView({employers:employersAll, empdetail:employersDetail, unlocks:employersUnlocks, placements:employersPlacements});
 
 /* ======================================================================
+   FINANCE & SETTLEMENT
+   ====================================================================== */
+const finIn = () => TXNS.filter(t => t.dir === 'in' && t.amt).reduce((n, t) => n + t.amt, 0);
+const finOut = () => TXNS.filter(t => t.dir === 'out').reduce((n, t) => n + t.amt, 0);
+const finFees = () => TXNS.reduce((n, t) => n + (t.fee || 0), 0);
+const owedAgents = () => PAYOUTS.filter(p => p.status === 'held' && p.net).reduce((n, p) => n + p.net, 0);
+const outstandingInv = () => INVOICES.filter(i => i.status === 'sent' || i.status === 'overdue').reduce((n, i) => n + i.amount, 0);
+const openDisputes = () => REFUNDS.filter(r => r.status === 'requested' || r.status === 'processing').length;
+
+PAGESUM['finance/overview'] = () => `${money(finIn())} processed and ${money(inProgress())} in progress. Settlement timing is a deliberate black box, <b>${heldPayouts()} payouts are held</b>, and how agents are paid is still an open high-severity decision.`;
+PAGESUM['finance/transactions'] = () => `Every money movement — course fees, interview payments, employer unlocks and agent payouts. <b>Held payments settle on the weekly cycle</b>; a placement charge is blocked until the fee is set.`;
+PAGESUM['finance/payouts'] = () => `${heldPayouts()} payouts are held pending settlement. As Super Admin you can <b>release one ahead of the cycle</b>, and the release is written to the audit log.`;
+PAGESUM['finance/invoices'] = () => {
+  const od = INVOICES.filter(i => i.status === 'overdue').length;
+  const dr = INVOICES.filter(i => i.status === 'draft').length;
+  return `<b>${od} invoices are overdue</b> and ${dr} sit in draft — the drafts are placement fees, blocked until that fee is set.`;
+};
+PAGESUM['finance/refunds'] = () => `${REFUNDS.length} refunds and disputes. A course fee is refundable inside the 14-day window; a card chargeback is fought or lost with the issuer, not by us.`;
+PAGESUM['finance/reconciliation'] = () => `Stripe settles to the platform bank in batches. ${SETTLEMENTS.filter(s => s.status === 'reconciled').length} are reconciled and <b>one is unmatched</b> and needs a look.`;
+PAGESUM['finance/feeconfig'] = () => `Every price the platform charges, in one place. The <b>placement fee is the one still unset</b>, and the platform's share of an interview payment is configured here.`;
+
+function financeOverview(){
+  return `
+  <section class="sec">
+    ${secHead('Money at a glance')}
+    ${stats([
+      ['money', 'Gross', money(finIn()), 'processed this window'],
+      ['wallet', 'Net movement', money(finIn() - finOut()), 'in minus out'],
+      ['bank', 'In progress', money(inProgress()), 'held, not settled'],
+      ['route', 'Available', money(FIN_BALANCE.available), 'ready to pay out']
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('What is owed and open')}
+    ${stats([
+      ['agents', 'Owed to agents', money(owedAgents()), 'held payouts'],
+      ['doc', 'Outstanding invoices', money(outstandingInv()), 'sent or overdue'],
+      ['scale', 'Processing fees', money2(finFees()), 'paid to Stripe'],
+      ['alert', 'Open disputes', String(openDisputes()), 'refunds & chargebacks']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Cash position', 'A Stripe-style balance across the treasury.')}
+    ${kv([
+      ['Available', money(FIN_BALANCE.available), 'n'],
+      ['In transit', money(FIN_BALANCE.inTransit), 'n'],
+      ['Reserved (escrow)', money(FIN_BALANCE.reserved), 'n'],
+      ['Pending in', money(FIN_BALANCE.pendingIn), 'n']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Revenue by line', 'This window, across the fee lines the platform charges.',
+      '<button class="btn btn-g btn-sm noic" data-go="finance/feeconfig">Fee configuration</button>')}
+    ${kv([
+      ['Course fees', `<b>${money(TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0))}</b>`, 'n'],
+      ['Interview fees', `<b>${money(TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0))}</b>`, 'n'],
+      ['Employer unlocks', `<b>${money(TXNS.filter(t => t.cat === 'unlock' && t.dir === 'in').reduce((n, t) => n + t.amt, 0))}</b>`, 'n'],
+      ['Placement fees', 'Not set', 'n']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Open finance decisions', 'The unresolved calls that block settlement and billing.')}
+    <div class="tile-stack">
+      ${DECISIONS.filter(d => d.area === 'Finance').map(d => `
+        <button class="tile clk gcard" data-go="${d.go}">
+          <span class="cardrow-ic">${ic(d.ic)}</span>
+          <span class="gcard-b"><span class="eyebrow">${esc(d.src)}</span><h3>${esc(d.t)}</h3><span class="sub">${d.d}</span></span>
+          <span class="cardrow-a">${tag('flagged', 'High')}</span>
+          <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+        </button>`).join('')}
+    </div>
+  </section>`;
+}
+
+function financeTransactions(){
+  const cf = getFilter('txcat', 'all');
+  const rows = TXNS.filter(t => cf === 'all' ? true : t.cat === cf);
+  return `
+  <section class="sec">
+    ${aiHead('Transactions', 'Every charge, payout and refund. A held payment settles on the weekly cycle.')}
+    <div class="mt4">${filterTabs('txcat', 'all', [
+      ['all', 'All', TXNS.length],
+      ['course', 'Courses', TXNS.filter(t => t.cat === 'course').length],
+      ['interview', 'Interviews', TXNS.filter(t => t.cat === 'interview').length],
+      ['unlock', 'Unlocks', TXNS.filter(t => t.cat === 'unlock').length],
+      ['payout', 'Payouts', TXNS.filter(t => t.cat === 'payout').length]
+    ])}</div>
+    ${table(
+      [{label:'Reference'}, {label:'Who'}, {label:'Description'}, {label:'Amount', num:true}, {label:'Method'}, {label:'Status'}],
+      rows.map(t => ({cells:[
+        idCell(t.ref, t.when),
+        idCell(t.who, t.party),
+        esc(t.kind),
+        (t.dir === 'out' ? '−' : '') + (t.amt ? money(t.amt) : '—'),
+        esc(t.method),
+        tag(t.status)
+      ]})))}
+  </section>`;
+}
+
+function financePayouts(){
+  return `
+  <section class="sec">
+    ${aiHead('Payouts', 'An agent’s net share per interview, settled weekly. A held payout can be released early.')}
+    <div class="tile-stack">
+      ${PAYOUTS.map(p => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('bank')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(p.agent)}
+            <span class="tag sm bordered">${esc(p.ref)}</span> ${tag(p.status)}</span>
+            <span class="cardrow-d">${esc(p.period)} · ${p.interviews} interview${p.interviews === 1 ? '' : 's'} · ${p.net ? 'net ' + money(p.net) : esc(p.when)} · ${esc(p.method)}</span></span>
+          <span class="cardrow-a">${p.status === 'held' && p.net
+            ? `<button class="btn btn-p btn-sm noic" data-act="askrelease:${p.id}">Release ${I.arrowRight}</button>`
+            : `<span class="v n">${p.net ? money(p.net) : '—'}</span>`}</span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function financeInvoices(){
+  return `
+  <section class="sec">
+    ${aiHead('Invoices & billing', 'Employer and candidate billing. A draft is a placement fee, blocked until the fee is set.')}
+    ${table(
+      [{label:'Invoice'}, {label:'Party'}, {label:'Type'}, {label:'Amount', num:true}, {label:'Due'}, {label:'Status'}, {label:''}],
+      INVOICES.map(i => ({cells:[
+        esc(i.num), idCell(i.party, i.partyType), esc(i.type),
+        i.amount ? money(i.amount) : '—', esc(i.due), tag(i.status),
+        i.status === 'sent' || i.status === 'overdue'
+          ? `<button class="btn btn-g btn-sm noic" data-act="askpaid:${i.id}">Mark paid</button>${i.status === 'overdue' ? ` <button class="btn btn-g btn-sm noic" data-act="toast:Reminder sent to ${esc(i.party)}">Remind</button>` : ''}`
+          : i.status === 'draft' ? '<span class="tag sm">Blocked</span>' : ''
+      ]})))}
+  </section>`;
+}
+
+function financeRefunds(){
+  return `
+  <section class="sec">
+    ${aiHead('Refunds & disputes', 'A course fee is refundable inside the 14-day window; a chargeback is the card issuer’s process.')}
+    <div class="tile-stack">
+      ${REFUNDS.map(r => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic(r.type === 'Refund' ? 'scale' : 'alert')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(r.party)}
+            <span class="tag sm bordered">${esc(r.type)} · ${money(r.amount)}</span> ${tag(r.status)}</span>
+            <span class="cardrow-d">${esc(r.reason)} · ${esc(r.txnRef)} · ${esc(r.when)}</span></span>
+          <span class="cardrow-a">${r.status === 'requested'
+            ? `<button class="btn btn-g btn-sm noic" data-act="askrefdecl:${r.id}">Decline</button> <button class="btn btn-p btn-sm noic" data-act="askrefappr:${r.id}">Approve ${I.arrowRight}</button>`
+            : ''}</span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function financeReconciliation(){
+  const matched = SETTLEMENTS.filter(s => s.status === 'reconciled').length;
+  return `
+  <section class="sec">
+    ${aiHead('Reconciliation', 'Stripe settles to the platform bank in batches; each is matched against our payout records.')}
+    ${stats([
+      ['check', 'Reconciled', String(matched), 'matched batches'],
+      ['time', 'Pending', String(SETTLEMENTS.filter(s => s.status === 'pending').length), 'awaiting match'],
+      ['alert', 'Unmatched', String(SETTLEMENTS.filter(s => s.status === 'unmatched').length), 'need a look'],
+      ['bank', 'Settled net', money2(SETTLEMENTS.reduce((n, s) => n + s.net, 0)), 'across batches']
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('Settlement batches')}
+    ${table(
+      [{label:'Batch'}, {label:'When'}, {label:'Gross', num:true}, {label:'Fees', num:true}, {label:'Net', num:true}, {label:'Payouts', num:true}, {label:'Status'}],
+      SETTLEMENTS.map(s => ({cells:[
+        esc(s.ref), esc(s.when), money(s.gross), money2(s.fees), money2(s.net), String(s.count), tag(s.status)
+      ]})))}
+  </section>`;
+}
+
+function financeFeeConfig(){
+  const open = FEES.filter(f => f.state === 'open').length;
+  return `
+  <section class="sec">
+    ${aiHead('Fee configuration', 'Every price the platform charges. Edit a fee here and it takes effect from the date you set.')}
+    ${open ? note('warn', `${open} fee still undefined`, 'The placement fee has no value, and it is the platform’s largest revenue line. Two invoices are blocked in draft until it is set.') : ''}
+    ${table(
+      [{label:'Fee'}, {label:'Value', num:true}, {label:'Applies'}, {label:'State'}, {label:'Effective'}, {label:''}],
+      FEES.map(f => ({cells:[
+        idCell(f.t, f.note),
+        `<b>${esc(f.v)}</b>`,
+        esc(f.unit),
+        f.state === 'set' ? '<span class="tag sm green">Set</span>' : '<span class="tag sm warn">Open</span>',
+        f.effective === '—' ? '—' : `${esc(f.effective)} · ${esc(f.by)}`,
+        `<button class="btn btn-g btn-sm noic" data-act="toast:Edit the ${esc(f.t)} (prototype)">Edit</button>`
+      ]})))}
+  </section>
+  <section class="sec">
+    ${secHead('Change history')}
+    <div class="tile-stack">
+      ${FEE_HISTORY.map(h => memRow(h.who, `${esc(h.what)} — ${esc(h.detail)}`, `<span class="t-caption">${esc(h.when)}</span>`)).join('')}
+    </div>
+  </section>`;
+}
+
+V.finance = () => modView({overview:financeOverview, transactions:financeTransactions, payouts:financePayouts,
+  invoices:financeInvoices, refunds:financeRefunds, reconciliation:financeReconciliation, feeconfig:financeFeeConfig});
+
+/* finance actions */
+ACTIONS['askrelease'] = key => {
+  const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(!p) return;
+  askConfirm({mk:'warning', title:`Release payout to ${p.agent}?`,
+    body:`This releases ${money(p.net)} from escrow to ${p.agent} now, ahead of the normal settlement cycle. Recorded in the audit log.`,
+    ok:`Release ${money(p.net)}`, act:'dorelease:' + p.id});
+};
+ACTIONS['dorelease'] = key => { const p = PAYOUTS.find(x => x.id === key.split(':')[1]); if(p){ p.status = 'settled'; p.when = 'Released'; toast(money(p.net) + ' released to ' + p.agent); } S.confirm = null; };
+ACTIONS['askpaid'] = key => {
+  const i = INVOICES.find(x => x.id === key.split(':')[1]); if(!i) return;
+  askConfirm({mk:'check', title:`Mark ${i.num} paid?`,
+    body:`Records ${money(i.amount)} from ${i.party} as collected and closes the invoice. Written to the audit log.`,
+    ok:'Mark Paid', act:'dopaid:' + i.id});
+};
+ACTIONS['dopaid'] = key => { const i = INVOICES.find(x => x.id === key.split(':')[1]); if(i){ i.status = 'paid'; toast(i.num + ' marked paid'); } S.confirm = null; };
+ACTIONS['askrefappr'] = key => {
+  const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(!r) return;
+  askConfirm({mk:'warning', title:`Approve refund to ${r.party}?`,
+    body:`Refunds ${money(r.amount)} against ${r.txnRef} back to the original payment method. This can’t be undone.`,
+    ok:'Approve Refund', danger:true, act:'dorefappr:' + r.id});
+};
+ACTIONS['dorefappr'] = key => { const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(r){ r.status = 'approved'; toast(money(r.amount) + ' refunded to ' + r.party); } S.confirm = null; };
+ACTIONS['askrefdecl'] = key => {
+  const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(!r) return;
+  askConfirm({mk:'warning', title:`Decline refund for ${r.party}?`,
+    body:`Declines the ${money(r.amount)} request. The requester is notified and the decision is recorded in the audit log.`,
+    ok:'Decline Request', danger:true, act:'dorefdecl:' + r.id});
+};
+ACTIONS['dorefdecl'] = key => { const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(r){ r.status = 'declined'; toast(r.party + '’s refund declined'); } S.confirm = null; };
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
