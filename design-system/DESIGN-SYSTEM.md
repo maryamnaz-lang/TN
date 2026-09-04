@@ -1,5 +1,7 @@
 # The TalentNext design system
 
+**The rules live in `/DESIGN.md` at the repo root; this file is how the box is built.**
+
 The hi-fi candidate portal's design language, extracted so a new page can link it
 and come out looking like that portal — same tokens, same components, same
 desktop behaviour — with no design work to redo.
@@ -28,7 +30,7 @@ network.
 
 ### But that file is build output, so don't edit it
 
-The design system *lives* in `hifi/build/*.css` — the portal's 38 numbered
+The design system *lives* in `hifi/build/*.css` — the portal's numbered
 layers. `talentnext-ds.css` is **generated** from them, the same way
 `hifi/talentnext-candidate-portal-v24.html` is. Two artefacts, one source.
 
@@ -310,7 +312,7 @@ the class name — if only the stylesheet mentions it, the component is decorati
 
 ## Why this is an extraction, not a rewrite
 
-The portal's look is not a set of values you can restate. It is 38 CSS layers in
+The portal's look is not a set of values you can restate. It is 115-odd CSS layers (the build prints the count) in
 which later layers correct earlier ones **by name**, and the cascade order *is*
 the architecture. A hand-written design system that re-declared the tokens and
 re-drew the buttons would look right for a week and then drift, because the rules
@@ -375,16 +377,16 @@ weights in a face that ships two**, **1283 elements set in uppercase**, and
 
 | Role | Class | Size / line | Weight | Tracking | Ink |
 |---|---|---|---|---|---|
-| Display | `.t-display` | 34 / 40 | 600 | −1px | primary |
-| Heading 1 | `.t-h1` | 24 / 30 · **28 / 34 at ≥900** | 600 | −0.5px | primary |
-| Heading 2 | `.t-h2` | 20 / 26 | 600 | −0.3px | primary |
-| Heading 3 | `.t-h3` | 17 / 23 | 600 | −0.2px | primary |
-| Heading 4 | `.t-h4` | 14 / 19 | 600 | −0.02px | primary |
+| Display | `.t-display` | 34 / 40 | 500 | −1px | primary |
+| Heading 1 | `.t-h1` | 24 / 30 · **28 / 34 at ≥900** | 500 | −0.5px | primary |
+| Heading 2 | `.t-h2` | 20 / 26 | 500 | −0.3px | primary |
+| Heading 3 | `.t-h3` | 17 / 23 | 500 | −0.2px | primary |
+| Heading 4 | `.t-h4` | 14 / 19 | 500 | −0.02px | primary |
 | Body | `.t-body` | 13.5 / 22 | 400 | 0.1px | primary |
 | Body compact | `.t-compact` | 13.5 / 19 | 400 | 0.1px | primary |
-| Label | `.t-label` | 12.5 / 17 | 600 | 0.1px | primary |
+| Label | `.t-label` | 12.5 / 17 | 500 | 0.1px | primary |
 | **Description** | `.t-desc` | 12.5 / 17 | 400 | 0.1px | **secondary** |
-| Eyebrow | `.t-eyebrow` | 11.5 / 16 | 600 | 0.2px | **secondary** |
+| Eyebrow | `.t-eyebrow` | 11.5 / 16 | 500 | 0.2px | **secondary** |
 | Caption | `.t-caption` | 11.5 / 16 | 400 | 0.1px | helper |
 
 **Display is for hero NUMERALS and nothing else.** A figure can be huge because
@@ -408,17 +410,64 @@ them. They are aliases, not a second scale — `-01` is h1, `-02` is h3, `-03`
 and `-04` are h4, `-05` is the eyebrow. That ambiguity (`-02` meant 17px in
 §11 and 20px in §01) is what the pinning ends.
 
+### The face is Plus Jakarta Sans
+
+**Maryam, 4 Sep 2026: "change the font of the platform to Plus Jakarta Sans …
+be consistent, do not use bold or extrabold."** It was Söhne (Buch and
+Kräftig); it is now Plus Jakarta Sans **Regular (400)** and **Medium (500)**,
+with SemiBold (600) also loaded so a declared 600 renders a real 600. Embedded in
+this stylesheet, and re-running `build-ds.py` is the whole of the change for a
+portal built on it — `tn-agent-portal.html` needed no edit at all.
+
+Two things went with the swap and both were already dead or redundant:
+
+- **there is no stand-in tier any more.** `'Grotesk Stand-in'` sat behind Söhne
+  because Klim's trial file carried 68 glyphs, so `·` `–` `$` `%` `?` `:` `;`
+  and every parenthesis was silently set in a second typeface. Plus Jakarta
+  Sans carries **721** — everything the product draws — so the stack is the
+  face and then `system-ui`. One visible defect closed itself: the two `→` in
+  Tal's ladder summary were the only rendered arrow characters in the build and
+  they used to change face mid-sentence.
+- **Söhne Mono is gone.** Its `@font-face` had shipped for months with no rule
+  naming the family; `tabular-nums` is what lines a column of figures up.
+
+**It is SIL OFL**, which the old face was not: Söhne was here as Klim's *Test*
+files — evaluation and mockups only, a web licence required before this shipped
+anywhere public, and it is on Vercel. That problem is closed too.
+
+**It is ~4–6% wider than Söhne at the same size.** Nothing about the scale
+moved, but a label that only just fitted a fixed-width box no longer does —
+one did (§73's 185px action button, now a `min-width`). If you state a button
+width from a Figma frame, state it as a minimum.
+
 ### Two weights, because the face has two
 
-Söhne is embedded at **400 (Buch)** and **600 (Kräftig)** and at nothing else.
-Measured: a 40px string is 280.9px wide at both 400 and 500, and 282.9px at
-600, 700 and 800. So `font-weight:500` renders as Buch and 700/800 render as
-Kräftig — they are not a hierarchy, they are three weights that never existed.
+The two ROLES are **400 (Regular)** and **500 (Medium)**. SemiBold (600) is also
+embedded, but no token points at it and this layer assigns it to nothing — it is
+there so that the ~270 literal `font-weight:600` declarations surviving in the
+layers before §63 render a real 600 instead of silently falling back to Medium.
+Bold (700) and ExtraBold (800) are **not** loaded, by instruction, so anything
+written at those weights resolves to SemiBold.
+
+**The strong role was SemiBold for one build and that was wrong.** "Do not use
+bold or extrabold" was read as "the next weight down from Bold"; the answer was
+Medium (Maryam, 4 Sep 2026: "we are mostly using medium or regular"). More than
+half the visible text in this product is the strong role, so a SemiBold second
+style does not read as a heavier page — it reads as a different typeface.
+Measured on one 62-character string at 200px: Regular 7456.6px, Medium 7526.6px,
+SemiBold 7596px.
+Measured (on Söhne, and true of any two-file family): a 40px string is 280.9px
+wide at both 400 and 500, and 282.9px at 600, 700 and 800. So `font-weight:500`
+renders as Regular and 700/800 render as SemiBold — they are not a hierarchy,
+they are three weights that never existed.
 
 - **400** — all prose, all descriptions
-- **600** — all headings, labels, eyebrows and buttons
-- **500 / 700 / 800** — write these and you get a declaration that does not do
-  what it says. Use `var(--t-w-book)` / `var(--t-w-strong)`.
+- **500** — all headings, labels, eyebrows and buttons
+- **700 / 800** — write these and you get a declaration that does not do what it
+  says; they resolve to 600. Use `var(--t-w-book)` / `var(--t-w-strong)`.
+- the token names still say *book* and *strong* rather than *regular* and
+  *semibold*, deliberately: they are the roles, and the roles did not move when
+  the face did.
 
 This reverses the earlier one-weight instruction, and deliberately. §11's note
 records the original rule: hierarchy carried by *size, colour, case and

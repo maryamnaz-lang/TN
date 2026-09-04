@@ -18,7 +18,7 @@
      deleted and its note records what it argued. Nothing here restyles a
      component.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=27f2ce4c">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3e9b4974">
 
 <style>
 /* ==========================================================================
@@ -56,7 +56,7 @@
    bar's role label for this portal only: 20px of left padding off the nav
    toggle, `#000000` rather than the system's #111111, and `font-weight:600`
    because the label's inherited 500 was being synthesised off the 400 file
-   (Söhne is embedded at 400 and 600 and nothing between).
+   (the platform face is embedded at 400 and 600 and nothing between).
 
    IT IS DELETED BECAUSE §78 TOOK THE LABEL OUT OF THE BAR. The breadcrumb
    trail has that slot now, and nothing in this file writes `.shell-name` — so
@@ -67,9 +67,14 @@
 
    The two arguments worth keeping if a bar label ever comes back: the shell's
    own `gap` is `var(--s02)` — 4px, a gap between controls rather than a gutter
-   for type — and a weight between 400 and 600 is a faux-bold of Buch rather
-   than Kräftig, so it must be written as one of the two the face has.
-   ========================================================================== */
+   for type — and a weight between 400 and 600 is a faux-bold of Regular rather
+   than the real SemiBold, so it must be written as one of the two the face has.
+
+   THIS FILE'S TYPEFACE CHANGED ON 4 SEP 2026 AND IT NEEDED NO EDIT, which is
+   the design system working as designed. Söhne became Plus Jakarta Sans in
+   `hifi/build/11-type.css`; `build-ds.py` embeds whatever that layer names, and
+   this page links `talentnext-ds.css`. Re-running that build IS the change
+   here. Do not add an `@font-face` or a `font-family` to this file. */
 </style>
 </head>
 <body>
@@ -108,7 +113,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=27f2ce4c"></script>
+<script src="design-system/talentnext-ds.js?b=3e9b4974"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -331,7 +336,33 @@ const A = {
   follow:4.4, depth:4.7,
   manager:'Nadia Rahman',
   escrow:204, earned:612,
-  payout:'Stripe · account ending 4417'
+  payout:'Stripe · account ending 4417',
+
+  /* WHAT IS STILL MISSING FROM THE PUBLIC CARD, BY NAME — the candidate
+     portal's `pfMiss` (§111) in its smallest possible form. `CARD_PARTS` is the
+     list of what a card is made of and this is the list of which of them are
+     empty, so `readyBand`'s marks, the count in the black card's first sentence
+     and the `SHEETS.listing` textarea all read one record and cannot disagree.
+
+     IT IS A LIST OF GAPS RATHER THAN A FLAG PER FIELD, which is §111's own
+     call: `pfMiss(k)` returns the WORDS for what a section is missing, and a
+     record that says what is absent is shorter than five booleans that are all
+     `true` on four stages out of six.
+
+     EMPTY HERE, AND `CFG.setup` IS THE ONLY OVERRIDE. Owen's card is finished
+     from `training` on, which is exactly what `listing:true` says on those
+     stages — so the two are consistent by construction rather than by
+     coincidence, and a sixth stage that sets `listing:false` owes a `cardGaps`
+     with something in it.
+
+     `bio` IS THE ONE OUTSTANDING FIELD AND IT IS THE ONLY HONEST CHOICE, which
+     is worth writing down because it looks arbitrary. The other four are all
+     DRAWN somewhere at every stage — Profile prints the four specialisms, the
+     fee and the range, and the peek and Profile both draw the photograph — so
+     marking any of those absent would put the black card in a fight with a page
+     one click away. The headline and the bio appear in one place only,
+     `SHEETS.listing`, which is a form this file can answer. */
+  cardGaps:[]
 };
 
 /* --------------------------------------------------------------------------
@@ -380,7 +411,11 @@ const CFG = {
      screen is the established one. */
   signin:   {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
              busy:true},
-  setup:    {nav:'setup', approved:true, ivs:0, month:0, rating:null, escrow:0, earned:0},
+  setup:    {nav:'setup', approved:true, ivs:0, month:0, rating:null, escrow:0, earned:0,
+             /* THE ONE STAGE WITH A GAP IN THE CARD — see `A.cardGaps`. It is
+                the only stage that does not set `listing:true`, so this is that
+                flag said in enough detail for the black card to draw it. */
+             cardGaps:['bio']},
   training: {nav:'setup', approved:true, listed:false, listing:true, paid:true, lessonsDone:3,
              ivs:0, month:0, rating:null, escrow:0, earned:0},
   live:     {nav:'full',  approved:true, listing:true, paid:true, lessonsDone:4, certified:true, listed:true,
@@ -399,9 +434,48 @@ const CFG = {
    `askFrom` is the page the dock was pressed on, which is what "Back to …"
    names and which set of chips is offered. */
 const S = {stage:'working', view:'dashboard', nav:false, tal:false, notif:false,
+           /* `acct` IS THE APP BAR'S ACCOUNT MENU — §78's component, ported on
+              4 Sep 2026. A flag, not a name: there is one menu, it hangs off
+              one control, and the generic `data-toggle` branch flips it. */
+           acct:false,
            read:[],
            thread:[], typing:false, askFrom:'dashboard',
            iv:'rafael', tab:'next', confirm:false, sheet:false, stp:false,
+           /* `req` IS THE ANSWER TO EACH BOOKING REQUEST — id → 'yes' | 'no',
+              and an id that is not in it has not been answered. A map rather
+              than two arrays, because a request has exactly one answer and two
+              lists could hold the same id twice.
+
+              IT IS STATE AND NOT A WRITE-BACK INTO `IVS` — trap 9, one level
+              out from the DOM. Setting `s.iv` on the slot or flipping `x.st`
+              would work for the rest of the paint and then outlive the Reset
+              button and the stage picker, neither of which touches module
+              data. `ivAt` and `ivSt` read this map, so the calendar, the diary,
+              the open-slot count and the tab's own list are all one press away
+              from agreeing.
+
+              WHAT IT DOES NOT MODEL, and it is the thing to settle before this
+              is shown as a payments story: where the fee sits between the
+              request and the answer. `PAYMENTS`, `A.escrow` and the earnings
+              figures are all written against the three interviews that were
+              already booked, so accepting a fourth moves the diary and the
+              calendar and moves no money. The honest reading of the current
+              records is that a request has not been charged yet — which is
+              also what makes declining free. */
+           req:{},
+           /* `pfTab` IS PROFILE'S OWN AND MUST NOT BE `tab` — Interviews already
+              owns that key ('next' / 'done'), and the router's generic
+              `if(d.tab)` branch writes it. Two pages sharing one tab key means
+              opening Interviews and then Profile lands on a tab whose name that
+              page does not have; `V.leadProfile` made the same call one portal
+              over with `S.ldrPfTab`. */
+           pfTab:'me',
+           /* THE NOTIFICATION SWITCHES, and they are STATE rather than a class
+              on the input — trap 9. `render()` replaces `device.innerHTML`, so
+              a checkbox's own `checked` is gone at the next paint; `S.perms`
+              two lines down has carried the same three switches since this file
+              was written and this is the fourth block of the same shape. */
+           pfNotif:{booking:true, report:true, payout:true, product:false},
            /* `cal` is which of `CAL_MONTHS` the calendar shows and `slot` is
               which block's card is open. `slot` holds a slot ID rather than a
               boolean because the card IS about one slot, and the pressed block
@@ -537,8 +611,55 @@ const crumbBar = () =>
    are the same object to somebody reading down a week — counted in days from
    today, which is what `OPEN`'s row below shares it with. `LEAD_SESSIONS` keeps
    the same two fields for the same reason.
+
+   `st:'req'` IS A BOOKING THE AGENT HAS NOT ANSWERED YET, AND IT REVERSES THIS
+   PORTAL'S OLDEST RULE (Maryam, 4 Sep 2026: "add another tab … 'New Requests'
+   … this tab will have the list of interviews that candidates booked with
+   them, they have option to accept or reject an interview").
+
+   THE RULE IT TURNS OVER WAS STATED IN FIVE PLACES AND ALL FIVE MOVED: the
+   empty state's "There is nothing to accept", `PAGESUM.interviews.live`'s same
+   words, `TALQ.interviews`' "Can I decline a booking? — No", the booking
+   notification's line, and the "Booked means paid" disclosure on the page
+   itself (deleted the same afternoon by its own ask). The ARGUMENT is worth
+   keeping because it was coherent and is what a reversal has to answer: a
+   booking arrived paid into escrow, so the agent's only lever on their
+   workload was the SLOT — open it or close it — and an accept step would have
+   been a second gate on money the candidate had already parted with. What the
+   new flow says instead is that the slot is a REQUEST for a time, and the
+   answer to it is the agent's. Where the fee sits between the request and the
+   answer is not modelled here and is the one thing to settle before this is
+   shown as a payments story — see `S.req`'s note.
+
+   A REQUEST HOLDS A SLOT ID, THE TWO BOOKED ROWS DO NOT, and that asymmetry is
+   the join working in the other direction. `SLOTS` carries `iv` for an
+   interview that IS booked; a request cannot write there, because whether it
+   is booked is a decision that has not been taken. So the record names the
+   slot it is asking for and `ivAt(s)` reads the answer back — which is what
+   makes accepting move the calendar, the diary and the open-slot count with
+   one press and no second record.
+
+   THE DAY AND TIME ARE HAND-WRITTEN TO MATCH THE SLOT, exactly as Rafael's and
+   Amara's are: s21 is Friday 21 August at 5:00 PM, s25 Tuesday 25 August at
+   5:00 PM, s26 Wednesday 26 August at 7:00 PM. `w` is how long the request has
+   been waiting and is the only fact here with no other home.
    -------------------------------------------------------------------------- */
 const IVS = [
+  {id:'nadia', n:'Nadia Brenner', i:'NB', st:'req', slot:'s21', w:'2 hours ago',
+   day:'Friday 21 August', time:'5:00 PM ET', kind:'First interview',
+   band:'Explorer, predicted by the quiz', asked:'Running a project across two teams for the first time',
+   paid:'Requested 19 August, accepted by you'},
+
+  {id:'joel', n:'Joel Amankwah', i:'JA', st:'req', slot:'s25', w:'Yesterday',
+   day:'Tuesday 25 August', time:'5:00 PM ET', kind:'Re-interview',
+   band:'Explorer – E3, set 12 May', asked:'Saying no to work, and what changed since the last read',
+   paid:'Requested 18 August, accepted by you', summary:true},
+
+  {id:'ines', n:'Inès Duval', i:'ID', st:'req', slot:'s26', w:'Yesterday',
+   day:'Wednesday 26 August', time:'7:00 PM ET', kind:'First interview',
+   band:'Builder, predicted by the quiz', asked:'Holding a deadline when the brief keeps moving',
+   paid:'Requested 18 August, accepted by you'},
+
   {id:'rafael', n:'Rafael Ortiz', i:'RO', st:'next',
    day:'Thursday 20 August', time:'3:00 PM ET', kind:'First interview',
    band:'Explorer, predicted by the quiz', asked:'Delegation, and being new to managing former peers',
@@ -564,7 +685,12 @@ const IVS = [
    level:'Explorer – E4', signed:'15 August', money:'Paid 19 August',
    follow:4.3, depth:4.7}
 ];
-const iv = id => IVS.find(x => x.id === id) || IVS[0];
+/* THE FALLBACK IS THE FIRST BOOKED INTERVIEW, NOT `IVS[0]`. It was the array's
+   head, which was Rafael for as long as the list opened with a booked row —
+   and the three requests now sit above him, so an unknown id would have landed
+   `V.interview` on a record with no call behind it. The fallback exists for a
+   stale `S.iv` after a stage change; it has to be a page that renders. */
+const iv = id => IVS.find(x => x.id === id) || IVS.find(x => x.st === 'next');
 
 /* --------------------------------------------------------------------------
    THE LEDGER
@@ -609,7 +735,8 @@ const PAYMENTS = [
    the portal's own five, and this is the same fidelity choice `hifi/` states
    for its ten cohort members rather than a claim that these are one person. */
 const PHOTOS = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya,
-                tom: AV.samuel, nina: AV.hana};
+                tom: AV.samuel, nina: AV.hana,
+                nadia: AV.priya, joel: AV.samuel, ines: AV.lena};
 
 /* THE FOUR TRAINING LESSONS, in the order they are taken.
 
@@ -653,6 +780,174 @@ const LESSONS = [
   ['Writing the report', 'The 24 hours after the call']
 ];
 
+/* THE FOUR LESSONS PLUS THE CALIBRATION, WHICH IS FIVE AND NOT FOUR — the rows
+   behind the training meter, and it is TOP LEVEL because two screens draw it.
+
+   ONE LIST, TWO SURFACES. `V.dashboard`'s step-3 black card and `V.training`'s
+   own hero are the same question asked one page apart, and this used to be a
+   local `const` inside the dashboard — so bringing the meter to the Training
+   page would have meant a second copy of the same arithmetic. It sits beside
+   `LESSONS` because that is the record it is a view of.
+
+   THE TITLES ARE `LESSONS`, NOT RETYPED. That record's own note is emphatic
+   that the curriculum is invented and that replacing it should touch `LESSONS`
+   and nothing else; a copy here would be a second place to edit.
+
+   IT IS FIVE BECAUSE THE CALIBRATION IS PART OF THE SAME GATE. The card named
+   both halves in prose before the meter existed — "the four are followed by 45
+   minutes with Derek Hale" — and `lessonsDone === 4` is exactly what unlocks
+   the fifth. The calibration can never be `done` here: the two stages that draw
+   a meter are both short of the gate, and a stage past it draws a certificate.
+
+   THE LABEL IS "Lesson N" AND NOT THE LESSON'S TITLE, which the meter forced
+   and is the better statement anyway. Five inline items sized by their own text
+   want five short uniform labels: "How the interview runs" beside "Drawing out
+   a story" beside "Evidence, not impression" is a row that wraps at every width
+   and reads as a sentence rather than as a scale. `V.training` already numbers
+   them this way, and the titles are one press away — on `V.training` itself,
+   they are 400px down the same page. */
+const trainRows = v => LESSONS.map((_, n) => [n < (v.lessonsDone || 0), `Lesson ${n + 1}`])
+  .concat([[false, 'Calibration']]);
+
+/* THE CALIBRATION IS A PERSON AND A TIME, STATED ONCE — Maryam, 4 Sep 2026:
+   "the calibration interview details should also be part of the card on the
+   dashboard". Derek Hale was `V.training`'s alone, hand-written into the
+   `callCard` on that page, and the dashboard's black card had him only as the
+   word "Calibration" at the end of a meter.
+
+   IT IS A RECORD BECAUSE THERE ARE NOW TWO SURFACES, which is `bkStamp`'s rule
+   and the same move `trainRows` made three lines up. Four fields and a function
+   for the fifth; `V.training` reads them too, so the two pages cannot name a
+   different day or a different person.
+
+   `calWhen` IS DERIVED FROM `lessonsDone`, NOT FROM `V.training`'s LOCAL `at`.
+   That view computes `at` as unstarted / underway / certified and gated the
+   string on `at === 'unstarted'`; the dashboard has no such variable, and the
+   condition it was really testing is "no lesson is finished". Stated as the
+   count, both callers get the same answer. **AND THE SENTENCE IS NOT A TIME** —
+   §77's own rule for `.dc-when` — which is why it stays in the row's detail
+   line where it is allowed to be prose. */
+const CALIB = {av: 'DH', photo: AV.samuel, name: 'Derek Hale',
+  role: 'Head of agent standards', mins: 45};
+
+/* --------------------------------------------------------------------------
+   WHAT PROFILE WAS MISSING — `PF_ACTIVITY`, and the state of the account
+
+   Maryam, 4 Sep 2026, with a reference: "improve the talent agent Profile page
+   according to the reference, we do not need to follow the blocks structure
+   just the content". So this is the CONTENT that reference has and ours did
+   not, and the two-column card grid it draws it in is deliberately not copied —
+   this page keeps §10's one-column sections.
+
+   TWO BLOCKS, AND ONE OF THEM IS ALMOST ENTIRELY DERIVED. Account status is the
+   stage picker's own label, `A.since`, and `v.listed` — three things the
+   product already states, collected on the page that is about the account.
+   Recent activity is the other one and it is AUTHORED; see below.
+
+   WHAT THE REFERENCE ALSO SHOWS AND THIS DOES NOT: a level chip reading
+   "Explorer – E3" beside the agent's name. That is the concept Maryam had
+   removed by name on 2 Sep — "we don't have any concept of agent level, so
+   remove that kinda thing totally from the talent agent portal" — and `A.level`
+   went with `.lvl-hero`, the figure cell and Tal's rank answers. The E3 in the
+   drawing is a CANDIDATE level, and this account's candidate record is E4,
+   which `V.profile`'s roles block already prints. Adding the chip would either
+   reintroduce the ladder or print a number that disagrees with the block 400px
+   below it. Flagged rather than drawn.
+
+   `PF_ACTIVITY` IS THREE AUTHORED ROWS AND THAT IS THE COST OF THE BLOCK — the
+   same honesty §110's `CH_SYL` records. Nothing in this build keeps an edit
+   history, so the WHEN of each row is invented. What is not invented is the
+   WHAT: each row names a thing this page draws and reads its figure off the
+   record, so the log cannot claim a fee, a specialism or a card the page then
+   contradicts. If a real audit trail ever exists, this is the shape it fills.
+
+   THE ORDER IS NEWEST FIRST, which is the one thing a log may not get wrong,
+   and the relative words ("2 days ago") rather than dates: `AGENT_NOTIF` uses
+   exactly that vocabulary and the two lists sit one click apart. */
+const PF_ACTIVITY = [
+  {ic: 'wallet', t: 'Fee updated',      w: '2 days ago',
+   d: v => `You changed your fee to ${money(v.fee)}`},
+  {ic: 'skill',  t: 'Specialism added', w: '1 week ago',
+   d: () => 'Added &ldquo;First-time managers&rdquo;'},
+  {ic: 'view',   t: 'Profile updated',  w: '2 weeks ago',
+   d: () => 'You updated your public profile'}
+];
+
+/* THE STAGE IS READ OFF `STAGES`, NEVER TYPED. That array is the picker's own
+   list of `[key, label, caption]` and its labels are what the chrome prints at
+   the top of the frame, so the page and the picker cannot disagree about which
+   snapshot is on screen. `S.stage` rather than a field on `v`, because a stage
+   is a fact about the prototype rather than about the agent. */
+const stageLabel = () => (STAGES.find(x => x[0] === S.stage) || [, ''])[1];
+
+/* --------------------------------------------------------------------------
+   THE PUBLIC CARD, AS ONE RECORD — `SPECIALISMS` and `PUB`
+
+   Maryam, 4 Sep 2026, with a reference: "this is the public profile tab view".
+   Profile is four tabs now and this is what the second one draws.
+
+   THE FOUR SPECIALISMS WERE TYPED IN TWO PLACES BEFORE THIS and would have been
+   typed in a third. `V.profile`'s tag row and `peekPanel`'s "What they can
+   search you by" both held the same four literals; the Public Profile tab draws
+   them twice more (as chips and as the ticked list the reference has). One
+   array, four readers.
+
+   WHAT IS READ AND WHAT IS AUTHORED, because the reference is a drawing and
+   this build is not all of it:
+
+     - READ: the name, the photograph, the headline and the bio (they were
+       `SHEETS.listing`'s prefilled values and that form now reads them here),
+       the four specialisms, the fee and the split, the 45 minutes, the
+       recording, and the 24-hour turnaround — that last one is `V.booking`'s
+       own promise and §76's note records it leaving the booking page.
+     - AUTHORED: `about`, `expect`, `hours`, `tz` and `langs`. Five fields, and
+       they are the honest cost of the block in exactly the way §110's `CH_SYL`
+       was. `expect` is the one to read before showing this to anyone: four
+       service promises the product does not otherwise make.
+     - REFUSED: the reference's "Explorer – E3" chip under the name. That is an
+       agent LEVEL, the concept Maryam removed by name on 2 Sep 2026, and the E3
+       in the drawing disagrees with the E4 this account's candidate record
+       carries in `V.profile`'s own roles block.
+
+   `yrs` IS DERIVED FROM THE HEADLINE rather than stated twice: "Eleven years in
+   delivery" is the first thing the card says, so a figure cell reading a
+   different number would be the card contradicting its own first line.
+   -------------------------------------------------------------------------- */
+const SPECIALISMS = ['Delegation', 'Hard conversations', 'First-time managers',
+  'Delivery under pressure'];
+
+const PUB = {
+  headline: 'Eleven years in delivery, six of them managing managers',
+  bio: 'I interview for how somebody actually ran a week, not for how they describe themselves.',
+  about: 'I came to interviewing from running delivery teams, which is where I learned that '
+    + 'what somebody says about a week and what they did in it are two different accounts. '
+    + 'I ask for the second one.',
+  /* `yrs` AND `hoursFig` ARE THE FIGURE-CELL FORMS AND `hours` IS THE PROSE ONE,
+     which is §29's constraint rather than a preference: a `.stat` puts the label
+     and the value on ONE line with the value `white-space:nowrap` at the right
+     edge, so a long value takes the cell and the label breaks mid-word behind
+     it. Shipped once with `hours:'2 to 3 hours a week'` in the band and the four
+     labels came out "Experie/nce", "A/v". `V.training`'s own note records the
+     same trap from the other side ("Thursday 20 June, 4:00 PM ET" as a figure).
+     The band takes the short form and the `.kv` under "How I work" takes the
+     sentence. */
+  yrs: '11 yrs',
+  hoursFig: '2–3h',
+  hours: '2 to 3 hours a week',
+  reply: 'Within 24 hours',
+  format: 'One to one, video',
+  length: '45 minutes, recorded',
+  tz: 'Eastern Time (ET)',
+  langs: 'English',
+  expect: ['A conversation, not a quiz',
+    'One thing to work on, named plainly',
+    'A signed report within 24 hours',
+    'A level you can point at the evidence for']
+};
+const calWhen = v => (v.lessonsDone || 0) === 0
+  ? 'Booked once the four lessons are done'
+  : 'Thursday 20 June, 4:00 PM ET';
+
 /* --------------------------------------------------------------------------
    AVAILABILITY, AS DATES RATHER THAN AS WEEK LABELS
 
@@ -694,8 +989,61 @@ const SLOTS = [
 ];
 const slotAt = (y, m, d) => SLOTS.find(s => s.y === y && s.m === m && s.d === d);
 const slotBy = id => SLOTS.find(s => s.id === id);
-const slotForIv = id => SLOTS.find(s => s.iv === id);
-const openSlots = () => SLOTS.filter(s => !s.iv);
+
+/* --------------------------------------------------------------------------
+   WHO HAS THIS SLOT — `ivAt`, and it is the one function the accept button
+   moves
+
+   `s.iv` WAS READ DIRECTLY IN SEVEN PLACES and every one of them is really
+   asking the same question: is this slot somebody's? Two answers make it so —
+   the record says so (`iv`, written into `SLOTS`) or the agent has ACCEPTED a
+   request for it (`S.req[id] === 'yes'`, written by a press). Reading the
+   field alone would have left the accept button changing one list on one tab:
+   the calendar would go on offering the block as open, the dashboard would go
+   on counting it in "slots open", and `nextCall()` — which is what puts the
+   gradient and the Join on one block — would skip it. §60's rule is that a
+   control does what its label says, and "Accept" that leaves the slot open is
+   a control that half does.
+
+   IT IS DERIVED RATHER THAN WRITTEN BACK INTO `SLOTS`, which is trap 9 one
+   level out from the DOM: mutating the record on a click would survive the
+   next render and then survive the stage change and the Reset button too,
+   because neither of those touches module data. `S.req` is cleared by both.
+
+   A PENDING REQUEST DOES NOT HOLD ITS SLOT, AND THAT IS A DECISION RATHER THAN
+   AN OVERSIGHT — flagged, because it is the one place a reader can catch this
+   model out. Availability says "6 slots open" while three of them have a
+   candidate waiting on an answer, and in a real system that is a double
+   booking waiting to happen. The two alternatives were both worse on the
+   screen this ask is about: drawing a requested block as TAKEN says the
+   interview is confirmed, which is the thing the Accept button exists to do,
+   and drawing it as a third state means a new block treatment, a new hue and a
+   new word on a calendar nobody asked to change. Held-on-request is a real
+   state and the honest place to add it is `calBlock`, not here.
+   -------------------------------------------------------------------------- */
+const reqAns = id => S.req[id];
+const ivAt = s => s.iv || (IVS.find(x => x.slot === s.id && reqAns(x.id) === 'yes') || {}).id;
+/* AN INTERVIEW'S OWN SLOT, whichever way it got one. `x.slot` is the request's
+   ask and `s.iv` is the booking; a request that has been accepted answers to
+   both and a declined one answers to neither, which is what keeps it out of
+   the diary without a second filter. */
+const slotForIv = id => {
+  const x = IVS.find(y => y.id === id);
+  if(x && x.slot) return reqAns(id) === 'yes' ? slotBy(x.slot) : null;
+  return SLOTS.find(s => s.iv === id);
+};
+const openSlots = () => SLOTS.filter(s => !ivAt(s));
+
+/* AN ACCEPTED REQUEST IS AN UPCOMING INTERVIEW AND NOTHING ELSE, so `ivSt` is
+   the state every reader asks for and `x.st` is the state the record was
+   written in. One function rather than `x.st === 'next' || (…)` at each site:
+   the diary, `V.interview`'s branch and the figure counts all ask it, and a
+   fourth reader that forgot the second half would draw an accepted interview
+   as a request forever. A declined one stays `'req'` and is drawn by nothing —
+   it is not a fourth state to style, it is a row that has left every list. */
+const ivSt = x => x.st === 'req' ? (reqAns(x.id) === 'yes' ? 'next' : 'req') : x.st;
+/* THE REQUESTS STILL WAITING — the tab's list, its count, and the bell's. */
+const reqOpen = () => IVS.filter(x => x.st === 'req' && !reqAns(x.id));
 
 /* --------------------------------------------------------------------------
    THE DATE HELPERS, AND THEY ARE WHY THE DIARY NO LONGER STORES ITS OWN LABELS
@@ -733,7 +1081,7 @@ const longDate = s => `${WD_L[wdOf(s.y, s.m, s.d)]} ${s.d} ${MON_L[s.m]}`;
    a second place the answer lives, and it is the one fact on this page that
    moves on its own — the moment Rafael's Thursday passes, Amara's Monday is the
    next call and nothing should have to be edited for the gradient to move. */
-const nextCall = () => SLOTS.filter(s => s.iv)
+const nextCall = () => SLOTS.filter(ivAt)
   .sort((a, b) => (a.m - b.m) || (a.d - b.d))[0];
 
 /* THE ONE OPEN SLOT THE DASHBOARD SHOWS, AND IT IS THE SOONEST ONE. `SLOTS` has
@@ -822,21 +1170,47 @@ const PAGESUM = {
     _:       'All four lessons done and calibrated on 20 June by Derek Hale. The method is re-checked once a year, so nothing’s due until June.'
   },
 
+  /* THE BUSY LINE LEADS ON THE REQUESTS, AND IT IS A FUNCTION BECAUSE EVERY
+     FIGURE IN IT MOVES ON A PRESS. Three waiting and two booked becomes two and
+     three the moment one is accepted, so a stored sentence would be wrong one
+     click into the page it heads — the drift `bkStamp` exists to stop, arriving
+     from the state side. What is on you comes before what is settled, which is
+     the record's own rule about the order the facts go in.
+
+     THE NAMES GO WHEN THERE IS A QUEUE and 164 goes with them: two sentences at
+     18–28 words will not hold five facts, and of the two that had to give way,
+     Rafael and Amara are named twice in the list 100px below and the total is
+     read once. It comes back verbatim in the second branch, which is the state
+     this page reaches once every request has an answer.
+
+     `up` IS NEVER 1 as the records stand — Rafael and Amara are both booked at
+     this stage and neither can be declined — so the plural is safe and the
+     first is always tomorrow. Both would need saying again if a stage ever
+     drew this page with one interview ahead. */
   interviews: {
-    live:    'Nothing booked yet. Six slots are open over the next fortnight, and a booking arrives already paid for — there’s nothing to accept.',
-    _:       'Two ahead — Rafael on Thursday, Amara on Monday — and Sofia’s report is due at 6:00 PM. 164 finished in total.'
+    live:    'Nothing booked yet. Six slots are open over the next fortnight, and a request waits here for your answer the moment somebody takes one.',
+    _:       () => {
+      const n = reqOpen().length, up = IVS.filter(x => ivSt(x) === 'next').length;
+      return n
+        ? `${n === 1 ? 'One request is' : `${n} requests are`} waiting on you, and ${up} interviews are booked with the first tomorrow. Sofia’s report is due at 6:00 PM.`
+        : `${up} interviews are booked, the first tomorrow, and Sofia’s report is due at 6:00 PM. ${f().ivs} finished in total.`;
+    }
   },
 
   /* A FUNCTION, BECAUSE THE PAGE IS FIVE DIFFERENT PAGES. Reads `S.iv` and the
      record itself, so the figures cannot drift from the interview being read. */
   interview: () => {
     const v = iv(S.iv);
-    if(v.st === 'next')   return `${v.n} is ${v.day.split(' ')[0]} at ${v.time}, paid and confirmed. ${v.summary ? 'It’s a re-interview, so their 90-day summary is on the brief.' : 'They’re straight off the quiz, so no level exists yet.'}`;
+    /* "paid and confirmed" IS "confirmed" NOW — an accepted request reaches
+       this page too, and what the agent did to it was confirm the time. Where
+       the fee sits at that moment is the one thing `S.req`'s note flags as not
+       modelled, so the sentence states the half this portal can vouch for. */
+    if(ivSt(v) === 'next') return `${v.n} is ${v.day.split(' ')[0]} at ${v.time}, confirmed and in your diary. ${v.summary ? 'It’s a re-interview, so their 90-day summary is on the brief.' : 'They’re straight off the quiz, so no level exists yet.'}`;
     if(v.st === 'report') return `You interviewed ${v.n} yesterday and the write-up is due at ${v.due}. Tal has a draft off the transcript waiting for your edit.`;
     return `${v.n}, ${v.day.replace(/^\w+ /,'')}, confirmed at ${v.level} and signed the same evening. Follow-up scored ${v.follow} and depth ${v.depth}.`;
   },
 
-  availability: () => `${openSlots().length} slots are open over the next fortnight and ${SLOTS.filter(s => s.iv).length} are taken. ${
+  availability: () => `${openSlots().length} slots are open over the next fortnight and ${SLOTS.filter(ivAt).length} are taken. ${
      firstOpenPhrase().replace(/^./, c => c.toUpperCase())} is the first one nobody has claimed.`,
 
   earnings: {
@@ -911,8 +1285,13 @@ const TALQ = {
      'Once a year the method is re-checked, and it’s two lessons rather than four. Yours is due next June.']
   ],
   interviews: [
+    /* THE ANSWER USED TO BE "No", and it is one of the five sites the New
+       Requests tab reverses — `IVS` keeps the whole argument. What survives of
+       the old one is its second half, which was always the better sentence:
+       the slot is still the lever, and closing one is how you stop being asked
+       in the first place. */
     ['Can I decline a booking?',
-     'No — a booking arrives paid for. What you control is the slot: close it and nobody can take it. Availability is the whole of your workload.'],
+     'Yes — a request waits on the Interviews page until you answer it. Declining puts the slot back so somebody else can take it; closing the slot on Availability stops it being offered at all.'],
     ['What if they don’t show?',
      'Wait fifteen minutes, then mark it. The fee stays with the candidate, the slot comes back to you, and it doesn’t touch your scores.'],
     ['What do I read beforehand?',
@@ -1081,6 +1460,14 @@ function pageSummary(){
   let e = PAGESUM[S.view];
   if(typeof e === 'function') e = e();
   if(e && typeof e === 'object') e = e[S.stage] || e._;
+  /* A STAGE'S OWN ENTRY MAY BE A FUNCTION TOO, and this line is why the second
+     test is not a repeat of the first. `PAGESUM.interview` is a function for
+     the whole view because every stage of it reads one record; `interviews`
+     needs it for ONE stage — the busy one, whose figures move when a request is
+     answered — and the other stage is a string that never changes. Without
+     this the object branch would hand the caller a function and the page would
+     print `() => {…}` into Tal's card. */
+  if(typeof e === 'function') e = e();
   return e || '';
 }
 
@@ -1327,17 +1714,51 @@ const foundSec = (title, key, body, desc, ground) => `
    system ships is green (`ic-quiz`), blue (`ic-prep`), violet (`ic-stand`) and
    a second green (`ic-pace`); there is no red, which is why the report's
    urgency is carried by its words rather than by its mark.
-   ========================================================================== */
+
+   A LONE CARD IS ONE CARD WIDE (Maryam, 4 Sep 2026: "change the width of the
+   quick action item, give it required width"). §70's grid is
+   `repeat(auto-fit, minmax(340px,1fr))` capped at 784, and `auto-fit` COLLAPSES
+   the tracks nothing is in — so on the `training` stage, where two of the three
+   setup steps are finished and only "Finish training and calibration" is left,
+   that one card stretched to the full 784 with 600px of nothing after a
+   twenty-character title.
+
+   386 IS ARITHMETIC, NOT A ROUND NUMBER: `(784 - var(--s04)) / 2`, so a single
+   card is exactly the width it would have had as the left of a pair. The card
+   does not change size when a second one appears beside it, which is what makes
+   this read as a grid with one cell in it rather than as a smaller component.
+
+   IT IS A `max-width` ON THE GRID AND NOT A NEW `grid-template-columns`, which
+   is the narrower edit of the two available: `auto-fill` instead of `auto-fit`
+   would also do it and would be this file overriding the design system's own
+   choice of track behaviour for every count. A cap on the container is a
+   per-instance measurement, and it is inert at two and three cards — the
+   two-card row is already 784, and §82's three-card rule sets `max-width:none`
+   at a weight this cannot and must not beat. */
 const qaAttr = c => c.ask ? `data-ask="${c.ask}"`
   : c.peek ? `data-peek="${c.peek}"`
   : c.sheet ? `data-sheet="${c.sheet}"`
   : `data-go="${c.go}"`;
 const quickActions = cards => `<section class="sec sec-qa">
   <div class="sec-h"><h2>Quick Actions</h2></div>
-  <div class="qa">${cards.map(c => `
-    <button class="qa-c" ${qaAttr(c)}${c.iv ? ` data-iv="${c.iv}"` : ''}>
+  <div class="qa"${cards.length === 1 ? ' style="max-width:386px"' : ''}>${cards.map(c => `
+    ${/* `tab` IS THE SECOND PASSTHROUGH AND IT RIDES THE SAME WAY `iv` DOES —
+          a card that names a view whose page has tabs may also name WHICH tab,
+          because the card's own words are about one of them. It is optional and
+          omitted rather than blanked, for `d`'s reason one line down: an
+          `data-tab=""` would be a real value to the router's truthiness test
+          and would land every card on no tab at all. */''}
+    <button class="qa-c" ${qaAttr(c)}${c.iv ? ` data-iv="${c.iv}"` : ''}${c.tab ? ` data-tab="${c.tab}"` : ''}>
       <span class="qa-ic ${c.hue}">${c.ic}</span>
-      <span class="qa-b"><b>${c.t}</b><span>${c.d}</span></span>
+      ${/* THE DESCRIPTION IS OPTIONAL AND THE SPAN GOES WITH IT (Maryam, 2 Sep
+            2026, of the dashboard's two cards: "should not show such data").
+            An always-emitted `<span>${c.d}</span>` prints the word `undefined`
+            for a card with no `d`, and an always-emitted EMPTY one is worse
+            than that in one way it is easy to miss: `.qa-b` is a column flex
+            with `gap:var(--s02)`, so a zero-height second child still charges
+            the gap and pushes the title 4px off centre in a card that has
+            nothing under it. Dropped, not blanked. */''}
+      <span class="qa-b"><b>${c.t}</b>${c.d ? `<span>${c.d}</span>` : ''}</span>
       <span class="qa-go">${I.arrowRight}</span>
     </button>`).join('')}
   </div>
@@ -1414,6 +1835,119 @@ const factRow = (icon, title, detail, tag) => `
       <span class="cardrow-d">${detail}</span></span>
     ${tag ? `<span class="cardrow-a">${tag}</span>` : ''}
   </div>`;
+
+/* --------------------------------------------------------------------------
+   HOW READY A STEP IS — `readyBand`, the black card's data
+
+   Maryam, 4 Sep 2026, with a reference beside our own screen: "improve our
+   black card by adding some data", then — of the first attempt — "please
+   instead follow the horizontal progress bar from the reference, it will have
+   full width". Every `darkCard` on the two setup dashboards was a heading, one
+   paragraph and a button: the card named a step and said nothing about where
+   the step had got to. This is that missing half, and it is a METER.
+
+   THE FIRST VERSION WAS A `.kv` BAND AND IT WAS THE WRONG OBJECT, which is the
+   thing worth keeping out of it. Five rows of key, mark and value answered
+   "what is on my card and what does each one hold" — a table — where the
+   question the card asks is "how close am I". A reader had to count five ticks
+   to get the number the bar now states in one line. The values that went with
+   it (`$85 · $68 yours`, `E2 – B1 · from your level`) are on Profile, one press
+   away, which is what the card's own button opens.
+
+   `[done, label]`, AND THE CALLER RESOLVES `done` ITSELF. The three callers
+   count three different things — a listing's gaps, whether a payout destination
+   exists, and how many lessons are behind you — so a predicate inside the
+   component would be three predicates and one of them would be a `switch`.
+   Tuples in, markup out.
+
+   THREE PARTS AND EVERY ONE OF THEM IS AN EXISTING CLASS. No CSS was written:
+
+     - `.prog-top` — §71's flex row, `justify-content:space-between` and
+       `align-items:flex-end`. The name on the left, the count and the
+       percentage on the right, which is the reference's own arrangement.
+     - `.bar` — the design system's CONTINUOUS meter: 4px, `--layer-accent-01`
+       track, `--accent` fill on a `> i` sized inline. Not `.prog-seg`, which is
+       the segmented rail the head band's `progressStrip` draws — five blocks
+       with 4px gaps would have been a second way of saying what the marks
+       below already say, and Maryam named the bar.
+     - `.ph-f` — §56's fact, `inline-flex` with an 8px gap and a 3px dot after
+       every item but the last. The dot is ours and the reference has none; it
+       is what keeps five marked labels reading as one row rather than five
+       loose pairs, and it is the same object the page title's fact row uses.
+
+   THE ROW'S FLEX CONTAINER IS THE ONE INLINE STYLE, and it is inline because
+   the design system has no unscoped one. `.ph-facts` is `.app .ph .ph-facts`,
+   so it only exists inside a page head; `.tag-row` is the right shape and its
+   `.tag-row span` rule at (0,1,1) would put a `--layer-02` chip round every
+   item AND round every `.row-st` mark inside them. A container the stylesheet
+   says nothing about is not trap 1 — nothing is being outranked — and the
+   alternative was a rule in a layer, two rebuilds and a shared build.
+
+   THE MARK IS `.row-st`, WHICH THE PORTAL ALREADY OWNS. §42's 15px state glyph
+   — green `checkFilled` for done, grey `circle` for not — and `V.earnings`
+   writes exactly this markup beside the payout destination. `circle` and not
+   `circleDash`: Material's radio pair is empty ring / ring with a dot, and a
+   dot in the middle is "this one is selected", not "this one is outstanding".
+
+   THE PERCENTAGE AND THE FILL ARE ONE NUMBER. `pct` is computed once and drives
+   both the width and the figure, so the bar cannot draw 80% over a caption
+   reading 60. `bkStamp`'s rule, one card over.
+   -------------------------------------------------------------------------- */
+const readyBand = (title, rows, cls) => {
+  const done = rows.filter(r => r[0]).length;
+  const pct = Math.round(done / rows.length * 100);
+  return `<div${cls ? ` class="${cls}"` : ''}>
+    <div class="prog-top"><b>${title}</b>
+      <span class="sub">${done} of ${rows.length} done &middot; ${pct}%</span></div>
+    <div class="bar mt3"><i style="width:${pct}%"></i></div>
+    <div class="mt5" style="display:flex; flex-wrap:wrap; gap:var(--s03) var(--s05)">
+      ${rows.map(([ok, label]) => `<span class="ph-f"><span class="row-st${ok ? ' done' : ''}"
+        role="img" aria-label="${ok ? 'Done' : 'Still to do'}">${ok ? I.checkFilled
+        : I.circle}</span>${label}</span>`).join('')}
+    </div>
+  </div>`;
+};
+
+/* THE COUNT ALSO OPENS THE PARAGRAPH, AND THERE IT IS SPELT — house style, and
+   `ai6.js`'s `_W` is the candidate portal's version of this list: "a small
+   count is spelt when it opens a sentence, set when it does not". So the
+   sentence says "Four of five done" and the meter's caption, which opens
+   nothing, says "4 of 5 done · 80%".
+
+   IT IS A FRAGMENT — AND THAT IS GRAMMAR RATHER THAN STYLE. The first draft was
+   "`${count}` things your card needs are done", which reads correctly at four
+   of five and ungrammatically at one of two: the verb agrees with the
+   numerator, so a sentence built round it is right on two of the three cards
+   and wrong on the third. A fragment has no verb to agree and the sentence
+   after it carries the meaning. */
+const _W = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven'];
+const readyCount = rows => {
+  const done = rows.filter(r => r[0]).length;
+  return `${_W[done] || done} of ${(_W[rows.length] || rows.length).toString().toLowerCase()}`;
+};
+
+/* THE BAR RUNS THE CARD'S FULL WIDTH, AND THAT IS WHY THE ACTION LEFT THE BODY.
+   §75.2d puts `.dc-a` in a flex row BESIDE the body — Maryam's own 2 Sep rule,
+   "the button in the black card is always bottom align with the left side
+   content" — and that reserves about 240px at every width from 900 up, so a
+   meter inside it is a two-thirds bar. "it will have full width" (4 Sep) is
+   what overrules it for these three cards.
+
+   IT WENT TO THE HEAD ROW RATHER THAN UNDER THE BAR, which was the build in
+   between: `<div class="dc-a mt6">` closed the body as its own full-width row,
+   which worked and put a lone button in 72px of otherwise empty card. Maryam's
+   next message — "take the edit profile button on the right side of the top
+   heading" — is §75's own `.dc-act` slot, so the card is now a head row with
+   its action in it and a body that is nothing but the meter.
+
+   SO `darkCard` IS CALLED WITH `act` AND NO `actions`. Those are two different
+   slots: `actions` builds the `.dc-b` flex row this is opting out of, `act` is
+   the head row's control. The two `callCard` callers pass neither, for their
+   own reason (a `.crow` carries its own `.crow-a`). */
+const stepBody = (title, lede, rows) => `<div>
+  <p>${lede}</p>
+  ${readyBand(title, rows, 'mt5')}
+</div>`;
 
 /* A CHECKLIST ROW — and the two marks on it had the wrong jobs.
 
@@ -1570,10 +2104,7 @@ function peekPanel(v){
 
       <section class="sec">
         <div class="sec-h"><h2>What they can search you by</h2></div>
-        <div class="tag-row">
-          <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
-          <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
-        </div>
+        <div class="tag-row">${SPECIALISMS.map(t => `<span class="tag">${t}</span>`).join('')}</div>
       </section>
 
       <section class="sec">
@@ -1776,8 +2307,40 @@ const darkCard = ({title, when, act, body, actions, cls}) => `
   <section class="sec dark-card${cls ? ' ' + cls : ''}">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">${title}</h2>
+        ${/* `.dc-act` IS THE QUIET TREATMENT, NOT THE POSITION, AND THAT IS THE
+              WHOLE OF WHY AN ACCENT BUTTON MUST NOT WEAR IT (Maryam, 4 Sep 2026:
+              "please do not disturb components while replacing", then "the edit
+              profile button should be in accent color, what i meant previously
+              was that you removed the button padding and changed its height").
+
+              §75.2's rule is `.app .dark-card .dc-hd-r > .dc-act{flex:none;
+              margin-left:auto; padding-left:0; padding-right:0;
+              border-color:transparent; background:none}` — four of those six
+              declarations exist to UN-DRAW a button, because on `talRec` this
+              slot holds "View all agents", the way out of a section, and the
+              accent is spent on Book 200px below. A build in between added a
+              `cls` argument and put `btn-p` on that same element: the fill
+              arrived over a box with `padding:0`, so the label sat flush against
+              its own left edge. The padding was never removed by hand — it is
+              what `.dc-act` is.
+
+              SO THE ACCENT VARIANT IS A PLAIN `.btn.btn-p.btn-sm` AND WEARS NONE
+              OF IT. It needs nothing to sit at the right end either: §75.2 gives
+              `.dc-t` `flex:1 1 auto`, so the title takes the slack and any
+              sibling lands on the card's edge — `margin-left:auto` was `.dc-act`
+              carrying its own weight, not the row needing it. `.app .dark-card
+              .btn.btn-p` (§75, 0,3,0) then gives the accent fill, `--on-accent`
+              ink and a white arrow, and `.btn-sm` keeps its own `0 var(--s04)`
+              padding and 32px box — the same button as everywhere else in the
+              product.
+
+              THE QUIET PATH IS BYTE-IDENTICAL TO WHAT IT ALWAYS WAS. `accent` is
+              read only where a caller sets it; omit it and this emits exactly
+              the markup it emitted before either change. */''}
         ${when ? `<span class="dc-when">${I.time}${when}</span>`
-          : act ? `<button class="btn btn-sm noic dc-act" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`
+          : act ? (act.accent
+            ? `<button class="btn btn-p btn-sm noic" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`
+            : `<button class="btn btn-sm noic dc-act" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`)
           : ''}</div>
     </div>
     ${/* THE ACTION SHARES THE CONTENT'S ROW AND BOTTOM-ALIGNS TO IT (Maryam,
@@ -2072,6 +2635,114 @@ const JRN_ROWS = v => {
   return rows.map((lab, n) => ({st: n < at ? 'done' : n === at ? 'on' : '', lab}));
 };
 
+/* ==========================================================================
+   THE MONEY IS THE BAND'S SECOND COLUMN ONCE THE JOURNEY IS OVER — §71's
+   `.sec-prog`, which is `progressStrip` in `progCol`'s slot
+
+   Maryam, 2 Sep 2026: "just like the progress block on the right side of the
+   tal summary on candidate portal, i want you to show the earnings, payment in
+   escrow." So this is the same component in the same slot with a different
+   subject, and it is the third thing that column has held across the three
+   portals — the candidate's 90 days, this portal's journey list, and now this.
+
+   IT IS `.sec-prog`, NOT `.sec-jrn`, AND THAT PAIR IS THE WHOLE OPT-IN. §70's
+   note records the correction: `.head-col` is what opens the column and the
+   second class says only which tenant it is. `.sec-jrn` gets §70's vertical
+   list; `.sec-prog` gets §71's headline-figure block — a 34px figure with its
+   own caption, a blue counter at the far end of the same line, a rail, and
+   three figure cells divided by two hairlines. Every rule for it is in
+   `talentnext-ds.css` already, so this is markup and no CSS.
+
+   THE TWO FIGURES THE ASK NAMES ARE THE TWO IN `.prog-top`, which is the one
+   part of the component that is a headline rather than a detail: `v.earned` is
+   the 34px figure and `v.escrow` is the counter opposite it. That mapping is
+   the candidate's exactly — 100% of the course and "Day 90 of 90" are the
+   percentage and the position, and these are the money that has landed and the
+   money that has not.
+
+   `held for you`, NOT `in escrow`, ON THE COUNTER. The note over `held` is the
+   argument and this is the fourth surface it reaches: `A.escrow` is Owen's
+   $204 slice and the gross is $255, so every surface printing the slice says
+   whose it is and names the gross beside it. The gross is the third figure
+   cell, which is where the four-cell band used to state it.
+
+   THE RAIL IS THE LEDGER, WHICH IS THE ONE COUNTABLE SET WITH A STATE ON IT.
+   `.prog-seg` on the candidate is thirteen chapters, `done` behind you and
+   `now` for the open one; `PAYMENTS` is the same shape of thing — five rows,
+   each one interview's money, `green` once it has been paid out and held until
+   then. So `done` is settled and `now` is held, and the three held blocks ARE
+   the $204 above them (three interviews at Owen's $68, which is what `held`
+   derives the gross from). Reversed, because that table is newest-first and a
+   rail reads left to right.
+
+   NOTHING COUNTS THE RAIL, AND THAT IS DELIBERATE. `PAYMENTS` is the recent
+   ledger rather than the month — its own note says so, and Marcus Bell is a
+   sixth person who is not in `IVS` at all — so nine interviews this month and
+   five rows here are both true and must not be added together. The rail shows
+   the SPLIT it is drawn from and no figure on the block is read off it.
+
+   THREE CELLS, ALWAYS, AND THE HUES ARE POSITIONAL. §71's `.prog-figs` is a
+   five-column grid with `nth-child(1|3|5)` placed and `::before`/`::after` as
+   the two dividers, so a fourth cell would land unplaced and a third divider
+   has nowhere to come from. §65 assigns `--mk-1/2/3` by position, which is why
+   the order is the order it is: the count of interviews is blue in both
+   portals.
+
+   AND IT IS ONLY DRAWN WHERE THERE IS MONEY. `live` is stage 4 day one — six
+   slots open, nothing booked, `earned:0` and `escrow:0` — and a block whose two
+   headline figures are both $0 is §60's dead control as a figure. That stage
+   keeps its own four-cell row and its empty state, and the band falls back to
+   one column on its own the way §70 handles a missing `.head-col`.
+   ========================================================================== */
+const moneyCol = v => {
+  /* THE STATE IS READ OFF THE LEDGER ROW, NOT COUNTED. `st === 'green'` is
+     `PAYMENTS`' own settled hue — the same field the Earnings table draws its
+     `.flag-t` from — so a row that settles moves on both surfaces at once. */
+  const rail = PAYMENTS.slice().reverse();
+  return `<div class="sec head-sec head-col sec-prog">
+    <div class="stp stp-open stp-titled wing-prog">
+      <div class="stp-top"><h2 class="u-h3">Your earnings</h2></div>
+      <div class="prog">
+        <div class="prog-top">
+          <div><div class="prog-pct">${money(v.earned)}</div>
+            <div class="prog-l">earned this month</div></div>
+          <div class="prog-day"><div class="prog-dn">${money(v.escrow)}</div>
+            <div class="prog-l">held for you</div></div>
+        </div>
+        <div class="prog-seg">${rail.map(p =>
+          `<i class="${p.st === 'green' ? 'done' : 'now'}" title="${p.n} &middot; ${p.s}"></i>`).join('')}</div>
+        ${/* THE MARK IS A COLUMN AND THE FIGURE NEEDS `.prog-fb` — §65's
+              correction, and it is markup rather than CSS: the label under a
+              figure is a bare text node until it is wrapped, and a bare text
+              node cannot be given a grid column of its own. */''}
+        ${/* THE LABELS ARE ONE WORD OR TWO, AND THAT IS MEASURED RATHER THAN
+              a house-style preference. §71 makes `.prog-figs` five `auto`
+              tracks — cell, gap, cell, gap, cell — with `overflow-wrap:normal`,
+              so a cell is sized by its widest unbreakable run and the three
+              share a column that is `clamp(336px, 42%, 471px)`. The candidate's
+              are "chapters", "week 13 tasks" and "invested"; "interviews this
+              month" and "gross, 3 held" both wrapped to two lines at 1280 and
+              made the row 20px taller than the block underneath it needed.
+
+              THE PERIOD IS SAID ONCE, IN THE HEADLINE'S OWN CAPTION. "earned
+              this month" is 30px above these, so "interviews" does not have to
+              carry the month a second time — which is the same subtraction the
+              four-cell row's footnotes were making when they said "9 in total"
+              under "Interviews" rather than repeating the heading.
+
+              AND CELL 3 IS THE GROSS AGAINST THE COUNTER'S SLICE — "in escrow"
+              beside "held for you", which is `held`'s own rule and is exactly
+              the pair the deleted row printed as "$204 / of $255 in escrow". */''}
+        <div class="prog-figs">
+          <span><i class="prog-ic">${I.video}</i><span class="prog-fb"><b>${v.month}</b> interviews</span></span>
+          <span><i class="prog-ic">${I.wallet}</i><span class="prog-fb"><b>${money(v.share)}</b> an interview</span></span>
+          <span><i class="prog-ic">${I.creditCard}</i><span class="prog-fb"><b>${money(held(v))}</b> in escrow</span></span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+};
+
 /* HOW TAL ANSWERS. `tw()` is the portal's own reply widget — a titled block,
    a body, and an optional action — and `.tw-lines` is the key/value grid
    inside one. Tal replies with a card rather than a paragraph wherever the
@@ -2283,6 +2954,57 @@ const bookedRow = b => `<button class="cardrow bk-row" data-go="${b.go}" data-iv
   <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
 </button>`;
 
+/* --------------------------------------------------------------------------
+   A REQUEST — `.cardrow`, and it is the one row in this portal that is NOT a
+   link
+
+   IT CANNOT BE `faceRow` OR `bookedRow`, AND THE REASON IS THE MARKUP RATHER
+   THAN THE LOOK. Both of those wrap the whole row in a `<button>`, which is
+   what makes an arrow honest — the row IS the target. This row carries two
+   controls, and a `<button>` inside a `<button>` is invalid markup that
+   browsers repair by closing the outer one early, so the second half of the
+   row would fall outside the link. So it is a `<div class="cardrow">` — the
+   same component the training lessons use for exactly the same reason (a row
+   whose action is a button in `.cardrow-a`) — with `mem-av mem-ph` for the
+   face, which is what `bookedRow` already puts in a `.cardrow`. No new class
+   and no new CSS: `.cardrow-a` is `margin-left:auto` with a gap, so the pair
+   sits at the right edge of the row.
+
+   AND THERE IS NO ARROW, WHICH IS THE OTHER HALF OF THAT. `.tile-arrow` says
+   "this opens"; nothing opens here, and the two things you can do are written
+   out. A row that both navigated and held the decision would put three targets
+   on one line and make the largest of them the one that does the least.
+
+   THE DETAIL LINE IS WHEN, THEN HOW LONG, THEN WHAT THEY ASKED FOR. The date
+   leads because it is the thing being agreed to — this is a question about a
+   TIME, not about a person, and the face beside it already answers who. It is
+   the record's own `day` and `time`, so it cannot drift from the slot the
+   accept button fills. `w` — how long it has been waiting — goes last and
+   quiet: it is pressure, not fact about the appointment.
+
+   DECLINE IS `.btn-g` AND ACCEPT IS `.btn-p`, in that order, which is this
+   file's order everywhere a pair of actions ends a row. Neither is `.danger`:
+   declining a request is not destructive, it is one of two ordinary answers,
+   and the red is spent in this portal on things that cannot be undone.
+   -------------------------------------------------------------------------- */
+const reqRow = x => `<div class="cardrow">
+  <span class="mem-av mem-ph">${avatar(x.i, PHOTOS[x.id], 36)}</span>
+  <span class="cardrow-b">
+    <span class="cardrow-t">${x.kind} &middot; ${x.n}</span>
+    <span class="cardrow-d">${x.day.replace(/^\w+ /, '')}, ${x.time} &middot; 45 minutes &middot; ${x.asked.replace(/^./, c => c.toLowerCase())} &middot; asked ${x.w.toLowerCase()}</span>
+  </span>
+  <span class="cardrow-a">
+    ${/* THE MARK ON DECLINE IS §64's OPT-OUT, NOT DECORATION. A quiet button
+          with no `<svg>` in it grows the arrow mask — `:is(.btn-s,.btn-t,.btn-g)
+          :not(:has(svg))::after` — so a bare "Decline" comes out "Decline →"
+          and reads as a link to somewhere. `.noic` is NOT the opt-out (§64: 57
+          buttons are written `.noic` WITH an icon); an icon in the label is.
+          §111 walked into this twice with "Cancel" and "Add". */''}
+    <button class="btn btn-g btn-sm ic-l" data-req="${x.id}" data-reqv="no">${I.close}Decline</button>
+    <button class="btn btn-p btn-sm noic" data-req="${x.id}" data-reqv="yes">Accept</button>
+  </span>
+</div>`;
+
 /* THE DIARY IS BOOKED INTERVIEWS, IN THE ORDER THEY HAPPEN — and nothing else.
 
    AN OPEN SLOT IS NOT AN APPOINTMENT. This list used to take an `open` flag and
@@ -2307,7 +3029,7 @@ const bookedRow = b => `<button class="cardrow bk-row" data-go="${b.go}" data-iv
    and `chipOf` over the slot the interview is booked into, so the diary column,
    the calendar cell and the page's own prose cannot drift. An interview with no
    slot cannot appear — which is correct, because a booking IS a slot. */
-const diary = (v, not) => IVS.filter(x => x.st === 'next' && x.id !== not)
+const diary = (v, not) => IVS.filter(x => ivSt(x) === 'next' && x.id !== not)
   .map(x => ({x, s: slotForIv(x.id)})).filter(r => r.s)
   .map(({x, s}) => ({
     ord: daysOut(s), chip: chipOf(s), time: x.time, id: x.id, i: x.i, iv: x.id,
@@ -2389,9 +3111,24 @@ V.dashboard = v => {
 
      `certified` IS STILL THE TEST rather than a list of stages, because that is
      the fact the last step states — "bookable the day you are certified". A
-     stage added after `reviewed` gets the right answer without being named. */
+     stage added after `reviewed` gets the right answer without being named.
+
+     AND ONCE CERTIFIED THE COLUMN HOLDS THE MONEY (Maryam, 2 Sep 2026: "just
+     like the progress block on the right side of the tal summary on candidate
+     portal, i want you to show the earnings, payment in escrow"). The paragraph
+     above used to end "what replaces it is nothing", and that is what changed:
+     the slot now takes `moneyCol` — §71's `.sec-prog`, the same component the
+     candidate's "Your 90 days so far" is — so the band is two columns at every
+     stage that has anything to put in the second one. The long argument is over
+     `moneyCol`; the two things this call site decides are both here.
+
+     THE TEST IS THE MONEY, NOT THE STAGE, for the reason `certified` is the
+     test above: `live` is certified and has `earned:0` / `escrow:0`, so naming
+     stages would have put a $0 / $0 block on day one. `v.earned || v.escrow` is
+     the fact the block states, and a stage that zeroes both falls back to §70's
+     single-column band without this line knowing which stage it was. */
   const band = extra => head({
-    col: v.certified ? '' : jrnCol(v)
+    col: v.certified ? (v.earned || v.escrow ? moneyCol(v) : '') : jrnCol(v)
   }) + (extra || '');
 
   /* --- stage 2 and 3: approved, not yet bookable ------------------------ */
@@ -2477,28 +3214,152 @@ V.dashboard = v => {
      `--on-dark-2` — so a paragraph in here needs no role class to come out
      right, and giving it one would be this file having an opinion about type,
      which §63 owns. */
+  /* WHAT A PUBLIC CARD IS MADE OF — the black card's own paragraph, itemised.
+
+     THE FIVE ROWS ARE THE SENTENCE THAT USED TO BE ABOVE THEM. "Your card needs
+     a photo, a bio, four specialisms and the range you assess" was the whole of
+     what that card said about its subject, in prose, with no state on any of the
+     four — so the reader could not tell which of them they still owed. The fifth
+     is the FEE, which belongs on this list and was missing from that sentence:
+     the peek draws `$85` on the card in browse, so it is part of the listing and
+     not part of the money step.
+
+     THE RANGE CAN NEVER BE OUTSTANDING AND IS ON THE LIST ANYWAY. `SHEETS.listing`
+     says so in its own helper line — "your name, photo and the range you assess
+     come from your account and your level" — so it is a thing the card HAS
+     rather than a thing you do. It stays because it is one of the five things
+     the meter is a fraction OF: drop it and the same card reads four of four.
+
+     THE LABELS ARE THE FIVE WORDS AND NOTHING ELSE, which is what the meter
+     turned them into. An earlier version carried a value beside each one —
+     "$85 · $68 yours", "E2 – B1 · from your level" — and those are on Profile,
+     which is the page this card's own button opens; on a row of five inline
+     items they were five sentences where the reference has five words. */
+  const CARD_PARTS = [
+    ['photo', 'Photo'],
+    ['bio',   'Bio'],
+    ['specs', 'Specialisms'],
+    ['fee',   'Your fee'],
+    ['range', 'Range you assess']
+  ];
+  const cardRows = v => CARD_PARTS.map(([id, name]) =>
+    [!(v.cardGaps || []).includes(id), name]);
+
+  /* THE PAYOUT STEP IS TWO THINGS AND ONLY ONE OF THEM IS OUTSTANDING, which is
+     why this band is two rows rather than four. The split — $17 to TalentNext,
+     three working days — is a RULE and not a part of the step: it is true before
+     the agent does anything and stays true afterwards, so it has no state to
+     draw and it is already said on `V.earnings` behind a disclosure.
+
+     THIS CARD IS DRAWN BY NO STAGE TODAY and that is pre-existing rather than
+     introduced here: `setup` leaves `listing` unset so the first test wins, and
+     every other stage sets `paid:true`. It is kept in step with the other two
+     because the three are one slot and a set drawn two ways is the drift this
+     file spends most of its notes undoing. */
+  const PAY_PARTS = v => [
+    [true,     'Your fee'],
+    [!!v.paid, 'Payout destination']
+  ];
+
+  /* THE METER'S TITLE NAMES THE SUBJECT, NOT THE METRIC (Maryam, 4 Sep 2026:
+     "change the Profile readiness word to 'Your Profile'"). It is still not the
+     card's heading said twice — "Your Next Step - Public Profile" is the SLOT
+     and this names the thing the bar is a fraction OF — but the fraction is
+     already stated twice on the row, as "4 of 5 done" and as "80%", so a third
+     word for it was the row saying "readiness" over a readiness meter.
+
+     THE THREE ARE NAMED ONE BY ONE AND THEY DO NOT SHARE A SHAPE. "Your
+     Profile" and then "Training Progress" (Maryam, 4 Sep 2026) are a possessive
+     and a noun phrase, and a first pass had made all three "Your X" on the
+     reasoning that one component in one slot should read one way. That is the
+     right instinct about STRUCTURE and the wrong one about copy: what these
+     name is the subject, and the subject's own best name wins. `Your Payouts`
+     is the one nobody has named — flagged rather than silently changed, and it
+     is one word to move. */
+  /* THE LABEL IS A VERB ON THE THING, NOT A ROUTE. "Edit Profile" (Maryam,
+     4 Sep 2026) replaces "Open your public profile", which said the same word
+     the heading two inches to its left already says. The other two follow the
+     shape rather than the string — each names what pressing it does — and
+     "Continue to Stripe" keeps `I.launch`'s meaning even though `darkCard`'s
+     head-row slot always trails an arrow: it is still a handoff, and the row
+     has one mark to give.
+
+     ALL THREE ARE THE QUIET `.dc-act` AND NOT AN ACCENT BUTTON — see the note
+     over `darkCard`'s head row for why, and for what it cost to find out. */
   const NEXT_STEP = [
-    [v => !v.listing, v => darkCard({
-      title: 'Your Next Step - Public Profile',
-      body: `<p>Your card needs a photo, a bio, four specialisms and the range you
-        assess. Nothing is shown in browse until you are certified, so a half-built
-        one is never seen.</p>`,
-      actions: `<button class="btn btn-p noic" data-go="profile">Open your public profile ${I.arrowRight}</button>`
-    })],
-    [v => !v.paid, v => darkCard({
-      title: 'Your Next Step - Payouts',
-      body: `<p>You charge ${money(v.fee)} an interview and keep ${money(v.share)} of it.
-        Connecting a destination is a Stripe handoff, so TalentNext never sees an
-        account number &mdash; and nobody can book you until there is one.</p>`,
-      actions: `<button class="btn btn-p noic" data-go="earnings">Continue to Stripe ${I.launch}</button>`
-    })],
-    [v => v.lessonsDone !== 4, v => darkCard({
-      title: 'Your Next Step - Training',
-      body: `<p>${v.lessonsDone || 0} of four lessons are done. The four are followed by
-        45 minutes with Derek Hale, head of agent standards, on Thursday 20 June &mdash;
-        and the calibration cannot be booked until they are finished.</p>`,
-      actions: `<button class="btn btn-p noic" data-go="training">Open Training ${I.arrowRight}</button>`
-    })]
+    [v => !v.listing, v => {
+      const rows = cardRows(v);
+      return darkCard({
+        title: 'Your Next Step - Public Profile',
+        act: {label: 'Edit Profile', accent: true, attr: 'data-go="profile"'},
+        body: stepBody('Your Profile',
+          `<b>${readyCount(rows)} done.</b> Nothing is shown in browse until you are
+            certified, so a half-built one is never seen.`, rows)
+      });
+    }],
+    [v => !v.paid, v => {
+      const rows = PAY_PARTS(v);
+      return darkCard({
+        title: 'Your Next Step - Payouts',
+        act: {label: 'Continue to Stripe', accent: true, attr: 'data-go="earnings"'},
+        body: stepBody('Your Payouts',
+          `<b>${readyCount(rows)} done.</b> Nobody can book you until there is somewhere
+            to pay you.`, rows)
+      });
+    }],
+    [v => v.lessonsDone !== 4, v => {
+      const rows = trainRows(v);
+      /* THE CALIBRATION IS THE FIFTH ITEM AND NOW ALSO A ROW (Maryam, 4 Sep
+         2026: "the calibration interview details should also be part of the
+         card on the dashboard"). The meter's last mark said the word and
+         nothing else — who it is with, when, and how long were on `V.training`
+         and nowhere on this page.
+
+         IT IS A `crow`, WHICH IS THE COMPONENT FOR EXACTLY THIS, and the card
+         takes `crow-dark` with it. Those two classes are `callCard`'s pair, and
+         this is the first card in either portal to hold a `crow` AND something
+         else — which works because every §77 rule is scoped to a `.crow*`
+         descendant, so the meter above it is untouched, and because a
+         `.dark-card` is a column flex at `gap:20px`, so the two are siblings
+         with the card's own step between them.
+
+         NO BUTTONS ON THE ROW. `V.training` gives it "Ask to move it" and
+         "Confirm the slot" because that page is where the appointment is
+         managed; here the head row already carries "Open Training", and three
+         controls in one card pointing at two places is §112's duplicate. The
+         row is the DETAILS, which is what was asked for.
+
+         IT SITS DIRECTLY UNDER THE DIVIDER, ABOVE THE METER (Maryam, 4 Sep
+         2026: "take the calibration interview details above right after the
+         divider"). It shipped below the meter for one build on the reasoning
+         that the meter's fifth item is what introduces it — read on the page,
+         that put a 78px portrait at the card's bottom edge with nothing under
+         it, and left the card opening on a bar. The person is the concrete
+         thing on this card and the meter is the reading of it. */
+      /* THE CARD HAS NO LEDE AT ALL (Maryam, 4 Sep 2026: "remove the 'Three of
+         five done…' text"), and it is the only one of the four that does not.
+
+         NOTHING IS LOST, WHICH IS WHY IT COULD GO. The count is the meter's own
+         caption 20px below it — "3 of 5 done · 60%", the same two figures — and
+         the clause it existed for ("the calibration cannot be booked until the
+         lessons are finished") was reconciling a bare count against Tal's "Three
+         of four lessons done" in the band above. With the crow row now stating
+         the calibration as a booked appointment with a day on it, that
+         reconciliation is drawn rather than argued.
+
+         SO THIS CALLS `readyBand` DIRECTLY AND NOT `stepBody`. That wrapper is a
+         `<p>` plus the band, and its whole job is the step between the two; with
+         no paragraph it would be a div holding one div. The other three cards
+         still have ledes and still use it. */
+      return darkCard({
+        title: 'Your Next Step - Training',
+        act: {label: 'Open Training', accent: true, attr: 'data-go="training"'},
+        cls: 'crow-dark',
+        body: crow({...CALIB, detail: `${calWhen(v)} &middot; ${CALIB.mins} minutes, recorded`,
+            actions: '', one: true})
+          + readyBand('Training Progress', rows)
+      });
+    }]
   ];
   const nextStep = v => {
     const hit = NEXT_STEP.find(([test]) => test(v));
@@ -2645,93 +3506,94 @@ V.dashboard = v => {
       actions: `<button class="btn btn-sm noic ic-l" data-go="interview" data-iv="${next.id}">${I.document}Read the brief</button>
         <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
     })) + `
-    ${/* NO HEADING OVER THE FIGURE ROW. Every cell here names itself — the
-          label IS what a `.stats` cell is scanned by (§10's note on the label
-          column makes the same point) — and each one carries its own period in
-          its footnote: "9 in total", "up from 4.2 in July", "three interviews,
-          held". A heading of "This month" over four cells where only one of
-          them is a monthly figure was a fifth label that did not match its
-          own row, set at h2 weight above cells that are already headed.
-          The dashboard's other figure row lost its "Your public profile" for the
-          same reason. On the pages that keep theirs — Earnings, Public profile,
-          Standing — the row sits among other sections and the heading is what
-          separates them; here it is the first thing under the head band. */''}
-    ${/* `.sec-joined` KILLS THE RULE UNDER THE FIGURE BAND (Maryam, 2 Sep 2026:
-          "remove the line after the 4 blocks row"), and it needs no CSS —
-          §14.138 records the class as trap 4's prescribed fix and it means "the
-          block under me draws its own rule".
+    ${/* THE FOUR FIGURE CELLS AND THEIR RULE ARE GONE (Maryam, 2 Sep 2026:
+          "remove the 4 blocks below the black card and the line below those 4
+          blocks"), and the reason it is a deletion rather than a move is that
+          three of the four are what the band's second column now states.
 
-          THE LINE WAS §14's RE-ENABLER, NOT THE BASE RULE, which is the part
-          worth knowing before chasing it again. A `.sec` holding a `.stats`
-          already has `::after{display:none}` unconditionally — the cells are
-          bordered, so the band ends itself — and §14.217 then turns the rule
-          back ON at desktop for any section FOLLOWED BY a headed one. Awaiting
-          Decisions is headed, so the band drew a full-width hairline one pixel
-          under four cells that had just closed themselves. The leader's own band
-          dodges it only because the section after it is `.lead-bar`, which is in
-          that selector's `:not()` list. Per trap 4 the list is where this is
-          decided, and `.sec-joined` is the entry already in it. */''}
-    <section class="sec sec-joined">
-      ${stats([
-        ['video',      'Interviews', String(v.month),   `${v.ivs} in total`],
-        ['growth',     'Follow-up',  String(v.follow),  'up from 4.2 in July'],
-        ['wallet',     'Earned',     money(v.earned),   `${money(v.share)} an interview`],
-        ['creditCard', 'Held for you', money(v.escrow), `of ${money(held(v))} in escrow`]])}
-    </section>
+            Interviews    `v.month` — the first `.prog-figs` cell
+            Earned        `v.earned` — the block's 34px headline figure
+            Held for you  `v.escrow` — the counter opposite it, with the gross
+                          in the third cell where this row's footnote had it
 
-    ${/* BOTH LISTS ARE QUICK ACTION CARDS NOW (Maryam, 2 Sep 2026: "change the
-          awaiting decisions and upcoming interviews into quick actions"), so the
-          page is the black card, the four figures and one block of cards.
+          SO ONE FACT ACTUALLY LEAVES THE PAGE and it is worth naming rather
+          than discovering: follow-up at 4.4, "up from 4.2 in July". It is a
+          rating, not money, so there is no cell for it in a money block — and
+          it is not lost from the portal: `V.standing`'s own figure row draws it
+          beside depth, which is the page that exists to hold it, and Tal's
+          summary on this stage is where it would be said again if it needed to
+          be. `v.ivs` — 164 in total — is the other, and `V.interviews`' fact
+          row states it on the page the Quick Action opens.
 
-          THE CARDS ARE DERIVED FROM THE TWO LISTS THEY REPLACE, not written out.
-          `IVS`'s report-owed rows become the first cards and `diary(v)` the
-          rest, so the block is still two readings of the same arrays the rest of
-          the portal reads — a second report or a third booking appears here
-          without this call site changing, which is what the lists gave for free
-          and a hand-written set of three cards would have thrown away.
+          AND THE LINE WENT WITH THE SECTION, WHICH IS WHY `.sec-joined` IS NOT
+          HERE ANY MORE. That class was this row's answer to §14.217 turning the
+          closing rule back on above a headed section, and with no row there is
+          nothing to close. The join under the black card is handled a layer
+          down and needs nothing from this file: §75's own
+          `.page > .sec.dark-card + .sec-qa{border-top:0}` kills Quick Actions'
+          top rule, which is the one hairline that would otherwise arrive in the
+          gap this deletion opens — a full-bleed grey line one pixel under an
+          inset black card, running past it on both sides. Checked in the
+          design system rather than assumed; §75.3 records the same fix keyed on
+          `.rec-dark` and it was generalised to any `.dark-card`. */''}
+    ${/* A QUICK ACTION IS A DESTINATION, NOT A ROW OF A LIST (Maryam, 2 Sep
+          2026: "the blocks in quick actions should not show such data, you
+          loose the quick action context there, it should be 2 action items
+          only, one is 'Awaiting Decisions' and 'Upcoming Interviews'").
 
-          THE REPORT COMES FIRST BECAUSE IT IS THE ONLY ONE WITH A DEADLINE. The
-          two interviews are appointments that will happen to the agent; the
-          report is work the agent owes tonight, and `.qa` lays cards out in
-          source order.
+          THE PREVIOUS VERSION HAD TURNED THE LISTS INTO CARDS ROW FOR ROW, and
+          that is what the instruction names: `IVS`'s report-owed rows became
+          one card each and `diary(v)` the rest, so the block was three cards
+          about three particular people — "Sofia Marek's report, due 6:00 PM
+          today", "First interview · Rafael Ortiz, Tomorrow, 3:00 PM". Every
+          card opened `interview` with a `data-iv` on it, so the block was a
+          list of five interviews with two of them missing, drawn as buttons.
+          It was two queues wearing a third component's clothes, and the count
+          moved with the data — three cards on this stage, a different number on
+          the next — which is the tell that it was a list.
 
-          THE URGENCY IS IN THE WORDS, NOT THE MARK. §70.6's hue set is green,
-          blue and two violets — there is no red — so the due phrase keeps
-          `.flag-t.red` (§31's "a phrase in one hue", on `--danger-ink` rather
-          than the `--support-error` FILL that §01 forbids as text) and the card's
-          own mark stays a subject glyph. Both interviews share `ic-prep`,
-          deliberately: they are the same KIND of thing, and giving two calls two
-          hues would be colour saying nothing.
+          SO THE TWO CARDS ARE THE TWO QUEUES, and each one names the queue
+          rather than a member of it. That makes the block fixed at two on every
+          stage that draws it, which is what lets it read as a set of actions:
+          the reader learns two positions once instead of scanning a set whose
+          length is itself information.
 
-          `diary(v)` WITH NO EXCLUSION, WHICH REVERSES ITS `not` ARGUMENT. That
-          parameter exists because "the next interview is the black card at the
-          head of the page, and a diary that repeats it is the page saying the
-          same appointment twice" — overruled: the leader's own Cohort Calls
-          lists the call its black card is about as its first row, and a block
-          that hides the nearest interview is the more confusing of the two. */''}
-    ${/* ONE LINE EACH — see `SETUP_STEPS`' note for the 26-character budget and
-          where it comes from. The report's whole description is now the red due
-          phrase, which is the only part of it that was doing work: "Tal has a
-          draft off the transcript" is said on the page the card opens and again
-          in Tal's summary at the head of this one. `.flag-t` is `inline-flex`
-          with `white-space:nowrap`, so that phrase cannot break mid-way even if
-          a longer time ever lands in it — it either fits or it pushes the card,
-          which is the honest failure of the two.
+          NO DESCRIPTION AT ALL, WHICH IS THE OTHER HALF OF THE ASK. Anything
+          this file could put under those two titles is the queue's contents — a
+          name, a time, a count — and a count is the same kind of fact as a name
+          one step abstracted. Both are said on the page each card opens, in the
+          component built for saying them: `V.interviews`' "Waiting on you" is
+          the reports and its "Booked" section is the diary, one directly under
+          the other. `quickActions` omits the second line when `d` is absent
+          rather than printing an empty span.
 
-          AND THE INTERVIEWS KEEP THE WHEN, NOT THE HOW LONG. "45 minutes,
-          recorded" is true of every interview in the product, so it was the
-          part of the line carrying no information about THIS one. */''}
+          BOTH GO TO `interviews` AND THAT IS NOT A COLLISION. §60's rule is
+          that a control does what its label says, and both labels name a
+          section of one page — the router's `if(d.go === 'interviews') S.tab =
+          'next'` already forces the tab that holds both, so neither card can
+          land on "Finished" because the reader left it there. Worth knowing if a
+          third is ever added: the honest way to split them further is the
+          `.jump-sec` scroll anchor the sticky strip's note leaves a recipe for,
+          not a second view.
+
+          THE MARKS AND THE HUES ARE THE ONES THE ROW-CARDS CARRIED — violet
+          `ic-stand` on `I.certificate` for a report, blue `ic-prep` on `I.video`
+          for a call — so the change reads as two cards standing in for a set
+          rather than as a new block. §70.6's set has no red, which is why the
+          report's deadline was in words; with no description there is no phrase
+          left to carry it, and it belongs to the row it is a property of. */''}
+    ${/* BOTH CARDS NAME THEIR TAB NOW, and it is the same argument the note
+          above makes one step further on. Each names a SECTION of "Coming up"
+          — the reports queue and the diary — so neither may land on the tab
+          the reader left behind, and as of the New Requests tab neither may
+          take the router's new default either: a card reading "Upcoming
+          Interviews" that opens a list of unanswered requests is §60's dead
+          control in its other form, a live one that does something else.
+          Requests reach this dashboard through the bell, which is where news
+          about somebody else's action has always arrived. */''}
     ${quickActions([
-      ...IVS.filter(x => x.st === 'report').map(x => ({
-        ic: I.certificate, hue: 'ic-stand',
-        t: `${x.n}&rsquo;s report`,
-        d: `<span class="flag-t red">due ${x.due}</span>`,
-        go: 'interview', iv: x.id})),
-      ...diary(v).map(b => ({
-        ic: I.video, hue: 'ic-prep',
-        t: b.t,
-        d: `${b.chip}, ${b.time.replace(' ET', '')}`,
-        go: 'interview', iv: b.iv}))
+      {ic: I.certificate, hue: 'ic-stand', go: 'interviews', tab: 'next', t: 'Awaiting Decisions'},
+      {ic: I.video,       hue: 'ic-prep',  go: 'interviews', tab: 'next', t: 'Upcoming Interviews'}
     ])}`;
 };
 
@@ -2840,16 +3702,31 @@ V.training = v => {
         <p class="sub">Issued 20 June 2024 &middot; signed by Derek Hale &middot; Explorer and Builder</p>
       </div>`
     : '';
-  /* THE SAME SHAPE THE DASHBOARD'S CARDS TAKE — "Your Next Step - X", a
-     paragraph, and one full-height button at the bottom right. It is the same
-     SLOT one page over (the thing to do next, as this page's one black card), so
-     it reads the same way; §75.2c's note has the structural half. */
+  /* THE SAME SHAPE THE DASHBOARD'S CARDS TAKE — and that claim is why this card
+     moved with them (Maryam, 4 Sep 2026: "once you update the card use it in
+     other screens as well which is using the previous card layout").
+
+     This note has always said "the same shape one page over", and for two
+     builds it was the thing keeping the two in step: title, a paragraph, one
+     button at the bottom right. The dashboard's three took the meter and this
+     one did not, so for one build the sentence above it was false — the same
+     slot on two pages drawn two ways, which is the drift this file spends most
+     of its notes undoing. It is `stepBody` + `act.accent` now, exactly as they
+     are, and `trainRows` is the SAME function rather than a copy: it went to
+     top level for this.
+
+     THE LEDE IS THE ONLY THING THIS CARD STILL STATES FOR ITSELF, and it is
+     shorter than it was. The old paragraph's second half — "the four are
+     followed by a 45-minute calibration with Derek Hale" — is the meter's fifth
+     item now, so the sentence keeps the half the meter cannot draw: what lesson
+     1 is actually about, read off `LESSONS` through `next`. */
   const heroBody = at === 'unstarted'
     ? darkCard({
         title: 'Your Next Step - Lesson 1',
-        body: `<p>${next[0]} covers ${next[1].toLowerCase()}. It is the first of four,
-          and the four are followed by a 45-minute calibration with Derek Hale.</p>`,
-        actions: `<button class="btn btn-p noic">Open lesson 1 ${I.arrowRight}</button>`
+        act: {label: 'Open Lesson 1', accent: true},
+        body: stepBody('Training Progress',
+          `<b>${readyCount(trainRows(v))} done.</b> ${next[0]} covers
+            ${next[1].toLowerCase()}.`, trainRows(v))
       })
     : at === 'underway'
       /* NO `.dc-when` HERE, AND THAT IS THE DATA'S ANSWER RATHER THAN A STYLE
@@ -2933,8 +3810,13 @@ V.training = v => {
       ['certificate', 'Certified',
         at === 'certified' ? 'Passed' : 'Not yet',
         at === 'certified' ? 'Signed off 20 June' : 'After the calibration']])}
-    <p class="help mt4">A recorded mock interview with a real candidate who has agreed to it.
-      Derek Hale, head of agent standards, watches your half of the conversation.</p>
+    ${/* THE HELP LINE IS GONE (Maryam, 4 Sep 2026: "remove the 'A recorded mock
+          interview...' text"). It carried two facts and both are said elsewhere
+          now: WHO watches is the black card's `crow` at the top of this page and
+          on the dashboard — his face, his name and his role, rather than his
+          name inside a sentence — and WHAT it is ("recorded", "45 minutes") is
+          that row's own detail line. It was written when the calibration had no
+          card of its own; the card arrived and this stayed. */''}
   </section>
 
   ${at === 'certified' ? '' : `
@@ -2968,8 +3850,23 @@ V.training = v => {
           a tag because it IS a status with nothing to press; the next lesson
           gets the button. */''}
     <div class="tile-stack">
+      ${/* NO NUMERAL ON THE ROW (Maryam, 4 Sep 2026: "remove the 1 2 3 4 count
+            from lessons row"). The note above is kept because its argument was
+            right at the time and is the thing to re-read before putting a mark
+            back: `.ch-num` replaced four identical `book` glyphs, on the
+            grounds that what a mark owes a fixed sequence is WHICH one. What
+            changed is that the sequence is now stated twice above the list —
+            the black card's meter runs "Lesson 1 … Calibration" with a state on
+            each, and the progress band's "Next up" names the open one — so the
+            numeral was the third place on one page counting the same four
+            things. The rows are in order and the list is headed "The four
+            lessons"; the position is the count.
+
+            `.ch-num` STILL SHIPS and is documented in `gallery.html`, so this
+            is §82's case rather than a dead class — one caller went, the
+            component did not. `.ckrow` stays on the row: it is the class that
+            gives a numberless `.cardrow` its own left alignment. */''}
       ${LESSONS.map((m, n) => `<div class="cardrow ckrow">
-        <span class="ch-num">${n + 1}</span>
         <span class="cardrow-b">
           <span class="cardrow-t">${m[0]}${n < lessonsDone
             ? `<span class="row-st done" role="img" aria-label="Finished">${I.checkFilled}</span>` : ''}</span>
@@ -3010,11 +3907,23 @@ V.training = v => {
         as a warning about the rubric; what it is about is the GATE, and the
         nearest thing to the gate is now the list of what has to be finished
         first. */''}
-  ${at === 'certified' ? '' : `
-  <section class="sec">
-    <div class="note warn"><span>${I.warning}</span><div class="nb"><b>Your public profile waits on this</b>
-      Nothing goes into browse until the calibration is passed &mdash; and it cannot be booked until the four lessons are done.</div></div>
-  </section>`}
+  ${/* THE WARNING BANNER IS GONE (Maryam, 4 Sep 2026: "remove the orange
+        banner"). `.note.warn` was the page's one full-width tinted block and it
+        stated the GATE — nothing goes into browse until the calibration is
+        passed, and it cannot be booked until the four lessons are.
+
+        BOTH HALVES SURVIVE AND THAT IS WHY IT COULD GO. The second clause is
+        the black card's own lede at the head of this page and on the dashboard,
+        word for word ("the calibration cannot be booked until the lessons are
+        finished"); the first is `PAGESUM.training` and the journey list's
+        "Training and calibration" step, which is what the rail's third row is
+        FOR. A banner repeating the card 600px above it is the same fact in two
+        registers, which is §62's argument against the green `.ach` band.
+
+        WHAT IS ACTUALLY LOST is the word "browse" on this page — the link
+        between finishing here and being listed. `V.profile`'s peek says it
+        ("your card is not in browse yet — it goes live the day you are
+        certified") and so does the profile black card. Flagged, not replaced. */''}
 
   ${/* THE RUBRIC IS A §65 DISCLOSURE. Nothing in it is yours to do — it is the
         standard you are being read against — and it is the same three sentences
@@ -3032,19 +3941,58 @@ V.training = v => {
         The certified footnote goes INSIDE the panel rather than beside the
         heading — it is a fact about the re-check, which is what the three rows
         are about, not a description of the block. */''}
-  ${foundSec('What Derek watches for', 'rubric', kv([
-      ['Tenacity', 'Do you stay with a thread that is going somewhere'],
-      ['Energy', 'Does the candidate do more talking by the end than the start'],
-      ['Noticing', 'Do you hear what was left out']])
-    + (at === 'certified'
-      ? `<p class="help mt4">The method is re-checked each June, and that is two lessons rather than four.</p>`
-      : ''))}`;
+  ${/* AND "What Derek watches for" IS GONE WITH IT (Maryam, 4 Sep 2026: "remove
+        the what derek watched for section"). It was §65's disclosure holding
+        three rubric rows — Tenacity, Energy, Noticing — plus a certified-only
+        footnote about the June re-check.
+
+        THE ARGUMENT FOR IT IS KEPT BECAUSE IT WAS SOUND and is the thing to
+        read before a second attempt: nothing in it was the agent's to DO, it
+        was the standard they are read against, it was the same three sentences
+        on every visit, and that is exactly what a disclosure is for. The
+        heading was deliberately not "The rubric" — §65's rule is that a closed
+        disclosure's heading has to BE the summary of what is behind it.
+
+        WHAT IT COSTS IS REAL AND IS NOT SAID ANYWHERE ELSE. Those three rows
+        were the only place in the product that states what the calibration is
+        judged on, and the June re-check line was the only place that says the
+        method is re-checked at all — `V.standing`'s "Also held" row says
+        "the method re-checked each June" as a caption, which is the nearest
+        thing left. Both are one `foundSec` call to restore; `S.disc`'s 'rubric'
+        key is now unused and `foundSec` keeps its other callers. */''}`;
 };
 
 /* --------------------------------------------------------------------------
-   INTERVIEWS — steps 9, 10 and 11. Two tabs, because "what is coming" and
-   "what is finished" are two questions and a page that answers both at once
-   makes the reader do the filtering.
+   INTERVIEWS — steps 9, 10 and 11. THREE tabs, because "what is asked of me",
+   "what is coming" and "what is finished" are three questions and a page that
+   answers all three at once makes the reader do the filtering.
+
+   NEW REQUESTS IS FIRST AND IT IS FIRST BECAUSE IT IS THE ONLY ONE WITH
+   SOMEBODY WAITING AT THE OTHER END (Maryam, 4 Sep 2026: "add another tab here
+   with name 'New Requests' and this tab should come before other 2 tabs means
+   at first"). The other two are a diary and a record — they are read. This one
+   is answered, and until it is, a candidate is holding.
+
+   IT IS THE LANDING TAB WHILE ANYTHING IS WAITING, which is one line in the
+   router and is what a count on a strip cannot do on its own. The two Quick
+   Actions on the dashboard still land on "Coming up", because each names a
+   section of THAT tab — see the router's note, which is where the choice is
+   written.
+
+   THE FOURTH SECTION OF THIS PAGE IS GONE (Maryam, 4 Sep 2026: "remove the
+   booked means paid section"). It was §65's disclosure holding three
+   sentences: the fee is taken at the slot, it sits in escrow, and if a
+   candidate does not appear you wait fifteen minutes and mark it.
+
+   THE FIRST TWO WERE OVERTAKEN BY THE TAB ABOVE THEM. "Booked means paid" is a
+   claim that a booking needs no answer, and this page now opens with three
+   bookings waiting for one; leaving the panel would have been the page arguing
+   with its own first tab. THE FIFTEEN-MINUTE RULE IS THE REAL LOSS and it is
+   the reason that block survived an earlier cut: it is stated nowhere else on
+   the page. It is NOT lost from the product — `TALQ.interviews`' "What if they
+   don't show?" carries it word for word, which is one press on the dock at the
+   foot of this screen. Flagged; if it has to be on the page again, the row it
+   belongs to is the appointment, not the section.
    -------------------------------------------------------------------------- */
 V.interviews = v => {
   if(!v.busy) return head({title: 'Interviews',
@@ -3054,23 +4002,59 @@ V.interviews = v => {
           section that merely CONTAINS an empty state among others: the leader's
           candidate page has one of those and stretching it would push the six
           sections under it apart. */''}
+    ${/* THE HELP LINE USED TO SAY "There is nothing to accept" and it was one
+          of the five sites stating the rule the New Requests tab reverses —
+          see `IVS`, which keeps the whole argument. What replaces it is the
+          same sentence's job on the new flow: what arrives, and that it waits
+          for you. The button is unchanged, because opening more slots is still
+          the only thing an agent with nothing booked can do. */''}
     <section class="sec sec-fill">
       <div class="empty">${I.calendar}<span class="t">Nothing booked yet</span>
-        <span class="help">A booking arrives already paid for, with the candidate’s brief attached. There is nothing to accept.</span>
+        <span class="help">A request arrives when a candidate takes one of your slots, with their brief attached, and waits here for your answer.</span>
         <div class="btn-row"><button class="btn btn-p" data-go="availability">Open more slots ${I.arrowRight}</button></div></div>
     </section>`;
 
   const done = IVS.filter(x => x.st === 'done');
   const owed = IVS.filter(x => x.st === 'report');
+  const reqs = reqOpen();
 
   return head({title: 'Interviews',
     sub: `${v.month} this month &middot; ${v.ivs} in total &middot; next Thursday 20 August`}) + `
+  ${/* THE COUNT IS IN THE LABEL, NOT IN A `.lf-n`. That span is the leader's
+        tab-strip count and every rule for it is scoped to `.lead-tabs`, `.cs`
+        or `.ldr-copick` — none of which this strip is — so borrowing the class
+        here would ship an unstyled number, and styling it would mean putting
+        product CSS in this file's `<style>` block, which holds prototype chrome
+        and nothing else. Parentheses cost nothing and §63 types them with the
+        words. It disappears at zero rather than printing "(0)", which is a
+        count of a queue that is not there. */''}
   <div class="tabs">
+    <button class="${S.tab === 'req' ? 'on' : ''}" data-tab="req">New Requests${reqs.length ? ` (${reqs.length})` : ''}</button>
     <button class="${S.tab === 'next' ? 'on' : ''}" data-tab="next">Coming up</button>
     <button class="${S.tab === 'done' ? 'on' : ''}" data-tab="done">Finished</button>
   </div>
 
-  ${S.tab === 'next' ? `
+  ${S.tab === 'req' ? (reqs.length ? `
+  <section class="sec">
+    ${/* THE DESCRIPTION IS THE ONE LINE OF RULE LEFT ON THIS PAGE, and it is
+          here rather than in a panel of its own because it states what the two
+          buttons underneath it DO. Both halves are true of the model: accepting
+          writes the slot (`ivAt`), so the interview is in the diary and on the
+          calendar on the next paint, and declining leaves it open, so it is
+          back in "slots open" and offerable to somebody else. */''}
+    ${aiHead('Waiting for your answer',
+      'A candidate has taken one of your open slots. Accepting confirms the time and puts it in your diary; declining puts the slot back.',
+      `<button class="btn btn-g btn-sm noic" data-go="availability">Availability ${I.arrowRight}</button>`)}
+    <div class="tile-stack">
+      ${reqs.map(reqRow).join('')}
+    </div>
+  </section>` : `
+  <section class="sec sec-fill">
+    <div class="empty">${I.checkFilled}<span class="t">Nothing waiting on you</span>
+      <span class="help">Every request has an answer. The next one arrives when a candidate takes one of your open slots.</span>
+      <div class="btn-row"><button class="btn btn-g" data-tab="next">See what is booked ${I.arrowRight}</button></div></div>
+  </section>`)
+  : S.tab === 'next' ? `
   <section class="sec">
     <div class="sec-h"><h2>Waiting on you</h2></div>
     <div class="tile-stack">
@@ -3088,20 +4072,10 @@ V.interviews = v => {
     </div>
   </section>
 
-  ${/* "BOOKED MEANS PAID" IS A DISCLOSURE NOW, because it is the rule this page
-        runs on rather than news about it. Three sentences, identical on every
-        visit, and it was the last thing on the tab — so an agent checking their
-        week read it every time and needed it once. §65's shape, with the
-        heading carrying the whole claim so the closed row still says the thing.
-
-        THE FIFTEEN-MINUTE RULE IS WHAT MAKES IT WORTH KEEPING AT ALL. The first
-        two sentences are said again in Tal's summary and in the dashboard's own
-        note; "if a candidate does not appear, wait fifteen minutes and mark it"
-        is stated nowhere else in the portal, which is why the block is folded
-        rather than deleted. */''}
-  ${foundSec('Booked means paid', 'paid', `
-    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>The fee is taken at the slot, not at the call</b>
-      It is held in escrow, so an interview reaches you already settled. If a candidate does not appear, wait fifteen minutes and mark it.</div></div>`)}`
+  ${/* "BOOKED MEANS PAID" WAS THE LAST BLOCK ON THIS TAB AND IS DELETED — the
+        view note at the head of this function has the whole argument, and the
+        one sentence that went with it. `S.disc`'s 'paid' key is now unused;
+        `foundSec` keeps its other callers. */''}`
   : `
   <section class="sec">
     <div class="sec-h"><h2>Last five</h2></div>
@@ -3139,10 +4113,16 @@ V.interview = v => {
      fact row saying the same three things is the page telling you twice
      before Tal has said anything. The two finished states have no plate, so
      they keep it. */
-  const PHOTO = {rafael: AV.lena, amara: AV.hana, sofia: AV.priya, tom: AV.samuel, nina: AV.hana};
+  /* THE LOCAL `PHOTO` MAP IS THE MODULE'S `PHOTOS` WITH THREE MORE PEOPLE IN
+     IT, and it is now read from that one rather than restated. It was five
+     pairs written out twice — here and beside `IVS` — which was harmless while
+     the cast was fixed and is the "one fact, two places" trap the moment it is
+     not: the three request records would have drawn a face on every list in
+     the portal and a blank box on this page alone. */
+  const PHOTO = PHOTOS;
   const band = extra => head({
     title: x.n,
-    sub: x.st === 'next' ? '' : `${x.kind} &middot; ${x.day} &middot; ${x.time}`,
+    sub: ivSt(x) === 'next' ? '' : `${x.kind} &middot; ${x.day} &middot; ${x.time}`,
     back: 'interviews',
     plate: extra
   });
@@ -3158,15 +4138,29 @@ V.interview = v => {
      `urgent` READS THE SAME WORD THE PLATE'S `data-when` DID. Rafael is
      tomorrow and inside the day; the other upcoming interview is five days out
      and is not, which is exactly §59's inside/outside test and §71.2a's own
-     state. One expression, both cards. */
-  if(x.st === 'next'){
-    const soon = x.id === 'rafael';
+     state. One expression, both cards.
+
+     AND BOTH HALVES ARE READ OFF THE SLOT NOW, WHICH AN ACCEPTED REQUEST
+     FORCED. `soon` was `x.id === 'rafael'` and the detail line ended in a
+     hand-written "tomorrow" / "in 5 days" — two names for one fact, correct
+     for exactly the two records that existed when they were typed. An accepted
+     request lands here too and can be any date the calendar holds, so a page
+     drawn for Inès on the 26th would have said "in 5 days" about a call seven
+     days out and drawn it quiet or loud by whether the record was Rafael.
+     `daysOut` answers both, and `chipOf`'s own vocabulary — today, tomorrow,
+     the weekday — is what the phrase is built from so this page and the diary
+     column cannot describe one appointment two ways. */
+  if(ivSt(x) === 'next'){
+    const s = slotForIv(x.id), out = s ? daysOut(s) : null;
+    const soon = out !== null && out <= 1;
+    const when = out === 0 ? 'today' : out === 1 ? 'tomorrow'
+               : out === null ? '' : `in ${out} days`;
     return band() + callCard({
       title: x.kind,
       when: `${x.day.replace(/^\w+ /, '')}, ${x.time}`,
       urgent: soon,
       av: x.i, photo: PHOTO[x.id], name: x.n, role: x.band,
-      detail: `45 minutes &middot; video, recorded &middot; ${soon ? 'tomorrow' : 'in 5 days'}`,
+      detail: `45 minutes &middot; video, recorded${when ? ` &middot; ${when}` : ''}`,
       actions: `<button class="btn btn-sm noic ic-l">${I.calendar}Add to calendar</button>
         <button class="btn btn-p btn-sm noic">Join the call ${I.video}</button>`
     }) + `
@@ -3345,8 +4339,8 @@ function calGrid(v){
    decoration for "booked", it is the surface an action sits on. Every other
    booked block says who and nothing else, and offers Join in the card. */
 const calBlock = (s, nx, v) => {
-  const booked = !!s.iv, isNext = nx && s.id === nx.id;
-  const x = booked ? iv(s.iv) : null;
+  const who = ivAt(s), booked = !!who, isNext = nx && s.id === nx.id;
+  const x = booked ? iv(who) : null;
   const cls = ['cal-slot', booked ? 'taken' : '', isNext ? 'next' : '',
                S.slot === s.id ? 'on' : ''].filter(Boolean).join(' ');
   return `<button class="${cls}" data-cal="${s.id}"
@@ -3363,7 +4357,7 @@ const calBlock = (s, nx, v) => {
    and neither offers the other's — a "Join the call" on an empty slot would be a
    button with nothing behind it. */
 const calPop = (s, v) => {
-  const booked = !!s.iv, x = booked ? iv(s.iv) : null;
+  const who = ivAt(s), booked = !!who, x = booked ? iv(who) : null;
   return `<div class="cal-pop" data-side="right">
     <div class="cal-pop-h">
       <span class="cal-pop-d">${longDate(s)}</span>
@@ -3465,7 +4459,7 @@ V.availability = v => head({
         nothing about the opt-out changes. */''}
   <section class="sec">
     ${aiHead('Your calendar',
-      `${SLOTS.filter(s => s.iv).length} taken, ${openSlots().length} open &middot; 45 minutes each, Eastern time`,
+      `${SLOTS.filter(ivAt).length} taken, ${openSlots().length} open &middot; 45 minutes each, Eastern time`,
       `<button class="btn btn-p btn-sm noic" data-sheet="slot">Add a slot ${I.arrowRight}</button>`)}
     ${calGrid(v)}
   </section>
@@ -3756,8 +4750,44 @@ V.standing = v => head({
    Inventing a line to fill the slot is what produces two summaries six
    millimetres apart, which is the duplication the rule exists to stop.
    -------------------------------------------------------------------------- */
+/* PROFILE IS FOUR TABS — Maryam, 4 Sep 2026: "add the Notification and Privacy
+   Settings tab just like we have on the candidate profile". §111's page is My
+   Profile / Notifications / Privacy Settings; this one has a fourth, Public
+   Profile, because an agent has a listing and a candidate does not.
+
+   THE STRIP IS `.sec.sec-cs` + `.cs` AND IT IS STATED BY NOTHING. §15 draws it,
+   §16 zeroes a section holding one and §20 knows the marker, so the two grounds
+   meet on one line with no rule of its own — `V.leadProfile` made the same move
+   one portal over and wrote not a line of CSS either.
+
+   IT SITS DIRECTLY AFTER `ph()`, WHICH IS BOTH WHAT THE REFERENCE DRAWS AND
+   WHAT STOPS `placeBand`'s RUN. That pass walks forward from the `.ph` taking
+   Tal's card and anything declared head furniture, and halts at the first
+   sibling that is none of those — so a plain `.sec` here closes the band above
+   the tabs instead of swallowing them. This file has no render passes of its
+   own, but `dsTypeSummary` and the band markup follow the same shape.
+
+   WHAT MOVED RATHER THAN BEING ADDED: "What Tal does" is on Privacy Settings
+   now, which is where §111 puts it ("What Tal can do"), and Log out went with
+   it — both are account-wide, and neither is what an agent opens Profile to
+   change. My Profile keeps the things about YOU; Public Profile is what
+   somebody else reads.
+
+   THE TABS DO NOT RE-TYPE TAL'S SUMMARY. `dsTypeSummary`'s key is stage / view
+   / interview / tab and `pfTab` is deliberately not in it: switching a tab is
+   an interaction on a page you are already on, and §52's rule is that a summary
+   types on ARRIVAL. */
+const PF_TABS = [['me', 'My Profile'], ['public', 'Public Profile'],
+  ['notif', 'Notifications'], ['privacy', 'Privacy Settings']];
+
 V.profile = v => head({title: 'Profile'}) + `
 
+  <section class="sec sec-cs">
+    <div class="cs">${PF_TABS.map(([k, lab]) =>
+      `<button class="${S.pfTab === k ? 'on' : ''}" data-pftab="${k}">${lab}</button>`).join('')}</div>
+  </section>
+
+  ${S.pfTab === 'me' ? `
   <section class="sec">
     <div class="sec-h"><h2>You</h2></div>
     <div class="tile-stack">
@@ -3819,8 +4849,7 @@ V.profile = v => head({title: 'Profile'}) + `
     ${aiHead('Specialisms',
       'Four is the most a card shows. A candidate searching for one of these sees you before an agent who has not claimed it.')}
     <div class="tag-row">
-      <span class="tag">Delegation</span><span class="tag">Hard conversations</span>
-      <span class="tag">First-time managers</span><span class="tag">Delivery under pressure</span>
+      ${SPECIALISMS.map(t => `<span class="tag">${t}</span>`).join('')}
       <span class="tag bordered">${I.add}Add</span>
     </div>
   </section>
@@ -3885,8 +4914,196 @@ V.profile = v => head({title: 'Profile'}) + `
       Becoming an agent added a role to the account you already had. Your own record as a candidate is untouched by anything you do here.</div></div>`,
     'One account, two roles &mdash; and your own record as a candidate is untouched by anything you do here.')}
 
+  ${/* RECENT ACTIVITY AND ACCOUNT STATUS — the two blocks the reference has and
+        this page did not. They close My Profile, because neither is something
+        you came here to change: one is a log and the other is four read-only
+        facts, and §65's argument for putting a re-read below the things you act
+        on is the same argument.
+
+        THEY ARE NOT A TWO-UP ROW. The reference sets them side by side in its
+        card grid; this page is §10's single column and every other section on
+        it runs full width, so a pair of half-width blocks would be the one
+        place the page changes its mind about its own layout. "Not the blocks
+        structure, just the content." */''}
   <section class="sec">
-    <div class="sec-h"><h2>What Tal does</h2></div>
+    <div class="sec-h"><h2>Recent activity</h2></div>
+    ${/* THE TIME RIDES THE TRAILING SLOT, which is `factRow`'s fourth argument
+          and is where every other row in this file puts a status. It is a
+          `.tag.sm` rather than bare text: the slot is where a control normally
+          sits, so an unstyled string in it reads as a label that lost its
+          button. */''}
+    <div class="tile-stack">
+      ${PF_ACTIVITY.map(r => factRow(r.ic, r.t, r.d(v),
+        `<span class="tag sm">${r.w}</span>`)).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Account status</h2></div>
+    ${/* `.kv` AND NOT `.stats` — four facts, not four figures. §29's cell puts
+          a label and a value on one line with the value `nowrap` at the right
+          edge, which is right for `$85` and wrong for "Not until you are
+          certified". `V.training`'s own note works the same case the other way
+          round and is the reference for the distinction. */''}
+    ${kv([
+      ['Stage', stageLabel()],
+      ['Agent since', A.since],
+      ['In browse', v.listed ? 'Live since 24 June' : 'Not until you are certified'],
+      ['Last active', '3 hours ago']])}
+  </section>` : ''}
+
+  ${/* ===== PUBLIC PROFILE =====================================================
+        The reference's second screen, in this page's own components. Its layout
+        is a two-column card grid and this is not: "we do not need to follow the
+        blocks structure just the content".
+
+        THE HEAD IS `aiHead`, WHICH IS WHAT THAT ROW IS. A title, a sentence
+        about it, and the row's actions — §73's component exists for exactly the
+        shape the reference draws, and it centres the buttons against the pair
+        rather than against the title.
+
+        "Share profile link" IS A DEAD CONTROL AND IS NOT DRAWN. §60's rule is
+        that a control on a live surface must do something, and there is no URL
+        in this build to share — `peekPanel` is the honest answer to "what does
+        somebody else see" and it is one press away on My Profile. Only "Edit
+        public profile" is here, and it opens `SHEETS.listing`, the form that
+        owns the two fields this tab prints. */''}
+  ${S.pfTab === 'public' ? `
+  <section class="sec">
+    ${aiHead('Public Profile', 'This is how candidates see you on TalentNext.',
+      `<button class="btn btn-g btn-sm ic-l" data-sheet="listing">${I.edit}Edit public profile</button>`)}
+    <div class="tile-stack">
+      <div class="cardrow">
+        <span class="cardrow-ic">${avatar(A.i, AV.owen, 40)}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${A.n}</span>
+          <span class="cardrow-d">${PUB.headline}</span></span>
+      </div>
+    </div>
+    <div class="tag-row mt5">${SPECIALISMS.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+  </section>
+
+  ${/* FOUR CELLS, WHICH IS WHAT `.stats` TAKES. §29's band is a fixed 2/4-column
+        grid whose hairlines are the 1px gap, so a row it does not fill paints
+        grey — three cells is the count to avoid, and the reference happens to
+        draw four. Every figure is read: the fee and the split off `A`, the
+        turnaround off the promise `V.booking` makes, the years out of the
+        headline this page prints 40px above. */''}
+  <section class="sec">
+    ${/* THE LABEL AND THE FIGURE SHARE ONE 144px LINE and both were measured
+          rather than estimated. §29's cell is `'ic top n'` — a 20px mark, the
+          label, and the figure `nowrap` at the right edge — so inside a 208px
+          cell at a 1280 frame the label gets 176 − 20 − 12 − <figure> − 12.
+          "Availability" needs 84 and "Reply within" 78; with `2–3 hrs` (57) and
+          `24 hrs` (47) beside them they had 75 and 77, and both broke mid-word.
+          `2–3h` and "Response" are the two edits that clear it.
+
+          THE COMMENT GOES HERE AND NOT INSIDE THE ARRAY. This file's comment
+          idiom is a template-literal SUBSTITUTION holding a block comment and
+          an empty string, so it only works where a template string is being
+          built; the rows of `stats([...])` are plain JS, and one written
+          between them is a syntax error that takes the WHOLE bundle down —
+          `S is not defined` at the first line that reads it, which is the
+          ob.js failure mode CLAUDE.md records.
+
+          AND A COMMENT MAY NOT QUOTE THE IDIOM ITSELF, which is how this note
+          died twice. Writing the opening delimiter inside a comment that is
+          itself inside a template literal closes the string and starts a
+          substitution — the backtick and the dollar-brace are live characters
+          in here, not text. Describe the shape in words. */''}
+    ${stats([
+      ['shield',   'Experience',   PUB.yrs,       'delivery and interviewing'],
+      ['calendar', 'Availability', PUB.hoursFig,  'a week, your open slots'],
+      ['time',     'Response',     '24 hrs',      'a signed report'],
+      ['wallet',   'Fee',          money(v.fee),  `${money(v.share)} of it yours`]])}
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>About me</h2></div>
+    <p class="lead">${PUB.about}</p>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>How I work</h2></div>
+    ${kv([
+      ['Format', PUB.format],
+      ['Call length', PUB.length],
+      ['Availability', PUB.hours],
+      ['Time zone', PUB.tz],
+      ['Languages', PUB.langs]])}
+  </section>
+
+  ${/* `.lrn` IS §87's TICKED LIST and it is the design system's own, so this
+        needed no class: a `<ul class="lrn">` of `.lrn-i` rows, each a `.lrn-tk`
+        mark and a `.lrn-t` line, two columns from 600 up. The mark is
+        `checkFilled` in the accent, which is what that layer draws. */''}
+  <section class="sec">
+    <div class="sec-h"><h2>What to expect</h2></div>
+    <ul class="lrn">
+      ${PUB.expect.map(t => `<li class="lrn-i"><span class="lrn-tk">${I.checkFilled}</span>
+        <span class="lrn-t">${t}</span></li>`).join('')}
+    </ul>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Booking and fee</h2></div>
+    ${kv([
+      ['They pay', `${money(v.fee)} at booking`],
+      ['They get', PUB.length],
+      ['Their level', 'Set by you, within 24 hours'],
+      ['You are paid', `${money(v.share)} &middot; 80%`]])}
+    <p class="help mt4">A candidate sees the fee and never the split.</p>
+  </section>` : ''}
+
+  ${/* ===== NOTIFICATIONS ======================================================
+        §111's tab, with an agent's four things rather than a candidate's.
+        `AGENT_NOTIF` is what the bell actually delivers on each stage, and these
+        four are the categories those rows fall into — a booking arriving, a
+        report coming due, money settling, and the product writing to you. So
+        the switches name what the product already sends rather than a set
+        invented for the screen.
+
+        THE FOURTH IS OFF, and that is the one decision in the block: product
+        news is the only one of the four that is not about this agent's own
+        work, so it is the one a reader would expect to have opted into. */''}
+  ${S.pfTab === 'notif' ? `
+  <section class="sec">
+    <div class="sec-h"><h2>What reaches you</h2></div>
+    <label class="tg"><div class="tb"><b>A candidate books you</b>
+      <span>As soon as a slot is taken, with the brief attached</span></div>
+      <input type="checkbox" data-pfn="booking"${S.pfNotif.booking ? ' checked' : ''}><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>A report is due</b>
+      <span>Once at the call, and again four hours before the 24 is up</span></div>
+      <input type="checkbox" data-pfn="report"${S.pfNotif.report ? ' checked' : ''}><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Money settles</b>
+      <span>When escrow releases and when a payout lands</span></div>
+      <input type="checkbox" data-pfn="payout"${S.pfNotif.payout ? ' checked' : ''}><span class="sw"></span></label>
+    <label class="tg"><div class="tb"><b>Product news</b>
+      <span>What changed in the portal, at most once a month</span></div>
+      <input type="checkbox" data-pfn="product"${S.pfNotif.product ? ' checked' : ''}><span class="sw"></span></label>
+    <p class="help mt4">Everything here also appears in the bell, whether or not it is sent on.</p>
+  </section>` : ''}
+
+  ${/* ===== PRIVACY SETTINGS ===================================================
+        §111's third tab, and its point there is that the page should hold every
+        promise the product has made about what it may remember. Three blocks:
+
+          - WHAT TAL CAN DO is `S.perms`, MOVED here from My Profile rather than
+            written again. §111 calls it "What Tal can do" and puts it on this
+            tab for the reason the move makes obvious: three switches about what
+            an AI may read are a privacy control, not a detail of your listing.
+          - SIGN IN AND SECURITY is the password, which this portal has always
+            said is the account's and not the agent's ("one account, one
+            password", `V.profile`'s own roles block).
+          - YOUR DATA is the recordings and the account. Both are `data-confirm`
+            gates, because both are one-way — the transcript one is what the
+            "Turn drafting off" line has always promised in words.
+
+        LOG OUT IS HERE NOW and not at the foot of My Profile. It ends the
+        session for the whole account, which is this tab's subject; the rail's
+        own Log out is unchanged and is still the one most readers will use. */''}
+  ${S.pfTab === 'privacy' ? `
+  <section class="sec">
+    <div class="sec-h"><h2>What Tal can do</h2></div>
     <label class="tg"><div class="tb"><b>Draft my reports</b>
       <span>From the transcript, within an hour of the call</span></div>
       <input type="checkbox" data-perm="draft"${S.perms.draft ? ' checked' : ''}><span class="sw"></span></label>
@@ -3900,10 +5117,35 @@ V.profile = v => head({title: 'Profile'}) + `
   </section>
 
   <section class="sec">
+    <div class="sec-h"><h2>Sign in and security</h2></div>
+    ${kv([
+      ['Email', A.email],
+      ['Password', 'Last changed 12 June'],
+      ['Sign-in', 'One account, one password']])}
+    <div class="btn-row mt5">
+      <button class="btn btn-g noic" data-sheet="profile">Change your details</button>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h"><h2>Your data</h2></div>
+    <div class="tile-stack">
+      ${factRow('document', 'Download everything we hold',
+        'Your profile, your interviews and every report you have signed',
+        `<button class="btn btn-g btn-sm noic">Request it</button>`)}
+      ${factRow('video', 'Interview recordings',
+        'Kept for 90 days, then deleted &mdash; a candidate can ask for theirs sooner',
+        `<button class="btn btn-g btn-sm noic">Manage</button>`)}
+    </div>
+    <div class="note mt5"><span>${I.info}</span><div class="nb"><b>Closing the agent role</b>
+      It takes the listing out of browse and leaves your candidate record untouched. Anything in escrow settles first.</div></div>
+  </section>
+
+  <section class="sec">
     <div class="btn-row">
       <button class="btn btn-g noic" data-confirm="logout">Log out</button>
     </div>
-  </section>`;
+  </section>` : ''}`;
 
 /* ==========================================================================
    NOTIFICATIONS
@@ -3937,7 +5179,13 @@ const AGENT_NOTIF = {
   setup:[
     {ic:'trophy',     t:'You are approved',                b:'Approved on 12 June. The agent role sits on the account you already had.',               w:'1h ago',     go:'dashboard',   unread:1},
     {ic:'wallet',     t:'Payouts are not set up',          b:'Nothing can be booked until a payout destination exists. It is a Stripe handoff.',        w:'1h ago',     go:'earnings',    unread:1},
-    {ic:'view',       t:'Your public profile is written',    b:'Your fee is $85, which leaves you $68 after the split. Nothing is visible yet.',          w:'Yesterday',  go:'profile',     unread:0}
+    /* IT SAID "Your public profile is written" AND THE STAGE SAYS IT IS NOT.
+       `CFG.setup` is the one stage that leaves `listing` unset — which is the
+       whole reason the Public profile black card is the one this stage draws —
+       so the bell was contradicting the biggest object on the dashboard it
+       links to. Corrected to `A.cardGaps`' own account of it: four of the five
+       fields are there and the bio is the one that is not. */
+    {ic:'view',       t:'Your card is one field short',    b:'The headline and bio are the last thing on it. Your fee is $85, which leaves you $68 after the split.', w:'Yesterday',  go:'profile',     unread:0}
   ],
   training:[
     {ic:'calendar',   t:'Calibration is Thursday 20 June', b:'45 minutes with Derek Hale. It is the last thing before you can be booked.',              w:'2h ago',     go:'training',    unread:1},
@@ -3950,8 +5198,24 @@ const AGENT_NOTIF = {
     {ic:'time',       t:'Six slots are open',              b:'Over the next fortnight. Wednesday at 7:00 PM is the first one nobody has claimed.',       w:'Yesterday',  go:'availability',unread:0}
   ],
   working:[
+    /* THE REQUESTS REACH THE DASHBOARD THROUGH THE BELL, which is where news
+       about somebody else's action has always arrived on this portal — and it
+       is the reason the two Quick Actions did not have to change their subject
+       when the New Requests tab landed.
+
+       IT IS AN EVENT AND NOT A COUNT, which is what keeps a static row honest
+       against a queue that empties. "Three requests are waiting" would be false
+       the moment one is answered and there is nothing here to derive it from;
+       "Nadia asked for Friday, two more came in yesterday" is true whatever the
+       agent does next, exactly like the four rows under it.
+
+       IT CARRIES NO `data-tab`, so the router's own default takes it to the
+       requests while any are open and to the diary once none are — which is the
+       one place in the product where that default is doing the work it was
+       written for rather than being overridden. */
+    {ic:'calendar',   t:'Nadia Brenner asked for Friday',  b:'21 August at 5:00 PM ET, and two more requests came in yesterday.',                       w:'2h ago',     go:'interviews',             unread:1},
     {ic:'warning',    t:'Sofia Marek’s report is due',     b:'6:00 PM today. Tal has a draft off the transcript waiting for your edit.',                w:'2h ago',     go:'interview', iv:'sofia',  unread:1},
-    {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM ET, paid at booking. There is nothing to accept.',           w:'5h ago',     go:'interview', iv:'rafael', unread:1},
+    {ic:'calendar',   t:'Rafael Ortiz booked you',         b:'Thursday 20 August at 3:00 PM ET, and you accepted it the same afternoon.',                w:'5h ago',     go:'interview', iv:'rafael', unread:1},
     {ic:'calendar',   t:'Amara Osei booked a re-interview',b:'Monday 24 August at 6:00 PM ET. Her 90-day summary is on the brief.',                     w:'Yesterday',  go:'interview', iv:'amara',  unread:1},
     {ic:'wallet',     t:'Tom Whelan’s $68 releases Thursday',b:'Three working days after his report went out. $204 is held for you in total.',             w:'Yesterday',  go:'earnings',    unread:0},
     {ic:'star',       t:'Nina Haddad rated the interview', b:'4.3 on follow-up and 4.7 on depth. Signed at Explorer – E4 on 15 August.',                w:'3 days ago', go:'standing',    unread:0}
@@ -4003,6 +5267,84 @@ function notifPanel(){
 /* ==========================================================================
    THE FRAME
    ========================================================================== */
+/* ============================================================
+   THE ACCOUNT MENU — §78's COMPONENT, AND THIS PORTAL WAS THE
+   ONE THAT DID NOT HAVE IT
+
+   Maryam, 4 Sep 2026: "when i switch to talent agent portal the top chevron
+   with the profile icon is missing, i think the top header is not updated
+   component on agent portal, i can switch back to leader or candidate, please
+   do that for me."
+
+   THE FACE WAS A LINK AND IS A MENU. It was `data-go="profile"` on a bare
+   `.av-ph.sm` — the shape §78 replaced in `hifi/` on 31 Aug 2026 and which this
+   file kept, because the account menu landed there in the same pass that took
+   the portal switch out of that bar and this file's switch had gone somewhere
+   else (`V.profile`'s "Your roles"). So the two portals have been drawing two
+   generations of one control, which is the failure that is invisible from
+   either file alone — CLAUDE.md's own note about the §56/§33 generation, one
+   component smaller.
+
+   NOTHING IS TAKEN AWAY: the destination the face used to have is this menu's
+   first row, which is why the affordance has to change at all. `aria-haspopup`
+   and `aria-expanded` are the pair that says so to a screen reader.
+
+   THREE ROWS, AND THE TWO SWITCHES ARE BOTH `data-portal`. In `hifi/` the same
+   menu draws one `data-swap` (Candidate ↔ Cohort Leader, one application with
+   two signed-in users, a repaint) and one `data-doc` (this file, a load). From
+   HERE both of the others are the same kind of thing — another document — so
+   both rows carry this file's own attribute for that, whose handler is one line
+   and whose note records why the name is safe in this file and not in that one.
+
+   THE LEADER ROW CARRIES A HASH AND THE CANDIDATE ROW DOES NOT, and that is the
+   whole of the difference between them. `hifi/` is one document holding both
+   portals: its boot reader takes `#leader/<view>` as "restore the cohort
+   leader", and anything else falls to `setStage('new')`, which is the
+   candidate's own front door. `#leader/leadDash` is therefore the leader's, and
+   the stage it lands on is `new` — the third segment is a stage and the reader
+   guards it, so leaving it off is a choice rather than an omission: a leader has
+   no journey of their own to be part-way through.
+
+   THE MARKS ARE THE TWO PEOPLE, NOT TWO GLYPHS. `AV.hana` is Maryam, the
+   candidate `hifi/` opens as, and `AV.priya` is the cohort leader — the same two
+   faces the candidate portal's own menu shows for the same two rows. `ACH`'s
+   argument: a photograph of the account you are switching INTO says more than a
+   silhouette of the category, and the design system already ships `.acct-i-av`
+   to draw it.
+
+   THE ROW IN `V.profile`'s "Your roles" STAYS, and it is not a duplicate of the
+   candidate row here — §112's test is two controls with the same words on one
+   screen, and these are a bar menu and a block on a page about roles. Its note
+   claiming to be "the ONLY element in this file writing `data-portal`" is what
+   has expired; the attribute now has three writers.
+
+   Log out is deliberately NOT here, for §78's reason: it is in the rail's foot,
+   it is the one item in this family that ends the session, and duplicating it
+   into a menu that opens under the pointer is how a demo gets signed out by
+   accident. This file also gates it behind `data-confirm`, which a menu row
+   would have to carry too.
+
+   RENDERED WHETHER OR NOT IT IS OPEN, with `.on` carrying the state — the shape
+   `notifPanel` already uses here, and what lets §78 transition it. Nothing in it
+   keeps state in the DOM. */
+const CAND_DOC = 'hifi/talentnext-candidate-portal-v24.html';
+function acctMenu(){
+  return `<div class="acct-menu ${S.acct ? 'on' : ''}" role="menu" aria-label="Account">
+    <button class="acct-i" role="menuitem" data-go="profile">
+      <span class="acct-i-mk">${I.settings}</span>
+      <span class="acct-i-t">Profile Settings</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-portal="${CAND_DOC}">
+      <span class="acct-i-mk acct-i-av"><img src="${AV.hana}" alt=""></span>
+      <span class="acct-i-t">Switch to Candidate</span>
+    </button>
+    <button class="acct-i" role="menuitem" data-portal="${CAND_DOC}#leader/leadDash">
+      <span class="acct-i-mk acct-i-av"><img src="${AV.priya}" alt=""></span>
+      <span class="acct-i-t">Switch to Cohort Leader</span>
+    </button>
+  </div>`;
+}
+
 function shell(v){
   return `
   <header class="shell">
@@ -4078,7 +5420,25 @@ function shell(v){
         aria-label="Notifications" aria-expanded="${S.notif}"
         title="Notifications">${I.notification}${unreadCount()
           ? `<span class="shell-badge">${unreadCount()}</span>` : ''}</button>
-      <button class="shell-act" data-go="profile" aria-label="Profile" title="Profile"><span class="av-ph sm shell-avatar"><i>${A.i}</i><img src="${AV.owen}" alt=""></span></button>
+      ${/* THE CHEVRON IS `.acct-c` AND NOT A `.shell-act svg`, which is §78's
+            own note and the reason it is written as an inline `<svg>` here
+            rather than as `I.chevDown`: the design system's `I` proxy returns a
+            complete `<svg>` with no class on it, and every glyph in this bar is
+            sized 24px and filled `--icon-primary` by §01 — at 24 beside a 32px
+            face that reads as a second control instead of as the face's own
+            disclosure. §78 sizes `.acct-c` at 16 and §63 §17 inks it, and both
+            of those rules are already in `talentnext-ds.css`; they need the
+            class, so the element is written out and `inner()` supplies the path.
+
+            `.av-ph.sm` CAME OFF WITH IT. §78's face is `.shell-avatar` alone —
+            the `sm` modifier sized the old link's 28px mark, and inside
+            `.acct-t` the avatar's box is the button's to state. */''}
+      <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
+        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
+        <span class="shell-avatar"><img src="${AV.owen}" alt=""><i>${A.i}</i></span>
+        <svg class="acct-c" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg>
+      </button>
+      ${acctMenu()}
     </div>
   </header>`;
 }
@@ -4320,13 +5680,31 @@ function confirmSheet(){
 
 /* The editing sheets. One component, four titles — the fields differ, the
    frame does not. */
+/* AND ONE OF THE FIVE IS A FUNCTION, BECAUSE A FORM MAY NOT CONTRADICT THE CARD
+   THAT SENT YOU TO IT. `SHEETS` is a `const` evaluated once at parse, so a
+   prefilled headline and bio were the same two strings on every stage — and on
+   `setup`, where `A.cardGaps` says the bio is the one thing outstanding, the
+   editor opened with a written bio in it. That is one click from the black card
+   making the opposite claim.
+
+   `editSheet` calls `s[1]` when it is a function, so only the entry that needs
+   the stage pays for it and the other four are untouched literals. */
 const SHEETS = {
-  listing: ['Your public profile', `
+  listing: ['Your public profile', () => {
+    const gaps = f().cardGaps || [];
+    const has = !gaps.includes('bio');
+    return `
+    ${/* THE TWO VALUES ARE `PUB`'s — the Public Profile tab prints them 400px
+          away, so a literal here would be the form and the card able to
+          disagree about what the card says. */''}
     <label class="f"><span class="lbl">Headline</span>
-      <input class="inp" value="Eleven years in delivery, six of them managing managers"></label>
+      <input class="inp"${has ? ` value="${PUB.headline}"`
+        : ' placeholder="One line a candidate reads first"'}></label>
     <label class="f"><span class="lbl">Bio</span>
-      <textarea class="inp" rows="3">I interview for how somebody actually ran a week, not for how they describe themselves.</textarea></label>
-    <p class="help">Your name, photo and the range you assess come from your account and your level.</p>`],
+      <textarea class="inp" rows="3"${has ? '' : ' placeholder="How you interview, in your words"'}>${has
+        ? PUB.bio : ''}</textarea></label>
+    <p class="help">Your name, photo and the range you assess come from your account and your level.</p>`;
+  }],
   fee: ['Your fee', `
     <label class="f"><span class="lbl">What a candidate pays</span>
       <input class="inp" value="$85"></label>
@@ -4352,7 +5730,7 @@ function editSheet(){
     <div class="sheet">
       <div class="sheet-h"><h2>${s ? s[0] : ''}</h2>
         <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">${s ? s[1] : ''}</div>
+      <div class="sheet-b">${s ? (typeof s[1] === 'function' ? s[1]() : s[1]) : ''}</div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="sheet">Cancel</button>
         <button class="btn btn-p noic" data-close="sheet">Save</button>
@@ -4512,11 +5890,23 @@ const AUTH_ART = `
    the only route to `hifi/` — so it moved to the one block that is already about
    an account carrying two roles, `V.profile`'s "Your roles".
 
-   THAT IS ALSO WHERE THE OTHER SIDE PUTS IT. §78 took the portal switch out of
-   the candidate portal's app bar and made it a row in the ACCOUNT MENU, on the
-   argument that it is a personal control rather than a frame one. This file's
-   avatar opens Profile rather than a menu, so Profile's roles block IS that
-   destination, one step longer.
+   THAT LAST CLAUSE EXPIRED ON 4 SEP 2026 AND THE ROW STAYS ANYWAY. `acctMenu`
+   is the second and third writer of `data-portal`, so this is no longer the only
+   route to `hifi/` — which is what the clause said, and it was true for two
+   days. The row is kept on its own merits: it is the one control on a page whose
+   block is literally titled "Your roles", and §112's test for a duplicate is two
+   controls with the same words on ONE screen, which a bar menu and a page block
+   are not. What HAS to be true is that they agree, and they do — both point at
+   `hifi/talentnext-candidate-portal-v24.html` with no hash, which is that file's
+   own candidate front door.
+
+   AND THE PARAGRAPH BELOW USED TO SAY THIS FILE HAD NO MENU TO PUT IT IN. §78
+   took the portal switch out of the candidate portal's app bar and made it a row
+   in the ACCOUNT MENU, on the argument that it is a personal control rather than
+   a frame one; this file's avatar was a plain link to Profile, so Profile's roles
+   block WAS that destination, one step longer. The avatar is a menu now
+   (`acctMenu`, at the head of `shell`), so the two portals put the switch in the
+   same place and this row is the longer way round rather than the only way.
 
    A BUTTON AND NOT AN `<a href>`, which is the note over `.shell-logo` proved a
    second time. It was written as an anchor on the reasoning that a cross-document
@@ -5001,7 +6391,21 @@ device.addEventListener('click', e => {
      for it is written, the markup carries the attribute, and the click never
      reaches either because `closest` was not looking for it. `data-peek` cost
      exactly that. */
-  const t = e.target.closest('[data-go],[data-signin],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-cal-m]');
+  const t = e.target.closest('[data-go],[data-signin],[data-stage],[data-portal],[data-toggle],[data-close],[data-tab],[data-pftab],[data-req],[data-confirm],[data-sheet],[data-peek],[data-readall],[data-cal],[data-cal-m]');
+
+  /* A CLICK OUTSIDE THE ACCOUNT MENU SHUTS IT, AND IT IS ANSWERED BEFORE THE
+     GUARD ABOVE RETURNS — that is the whole reason this sits here rather than
+     under the branches. A menu that hangs off the app bar is dismissed by
+     pressing ANYWHERE else, and most of "anywhere else" carries no attribute at
+     all, so `if(!t) return` would have swallowed it and left the panel standing
+     over the page. `hifi/`'s router states the same line in the same place.
+
+     THE TEST NAMES BOTH HALVES. `.acct-t` is the toggle, whose own branch flips
+     the flag — closing here as well would flip it twice and the menu would never
+     open — and `.acct-menu` is the panel, so pressing a row inside it runs that
+     row's branch rather than being read as an outside click. */
+  if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
+
   if(!t) return;
   const d = t.dataset;
 
@@ -5084,7 +6488,31 @@ device.addEventListener('click', e => {
   if(d.toggle){ S[d.toggle] = !S[d.toggle]; return render(); }
   if(d.confirm){ S.confirm = d.confirm; return render(); }
   if(d.sheet){ S.sheet = d.sheet; return render(); }
-  if(d.tab){ S.tab = d.tab; return render(); }
+  /* `!d.go` IS WHAT LETS A CONTROL NAME A VIEW AND A TAB AT ONCE. A tab button
+     carries `data-tab` alone and is answered here; the dashboard's two Quick
+     Actions carry both, and matching them here would set the tab and return
+     without ever navigating. See the `data-go` branch, where the pair is read.
+     Everything with a `data-tab` on the CURRENT page still lands here, which is
+     the common case and the cheap one — no render of a view that has not
+     changed. */
+  if(d.tab && !d.go){ S.tab = d.tab; return render(); }
+  /* ACCEPT AND DECLINE — one branch, and the value is on the button rather than
+     being two attributes. `data-reqv` is read straight into the map because
+     both answers are final in the same way: the row leaves the queue either
+     way, and what differs is only whether the slot is filled.
+
+     IT IS ABOVE `data-go` AND RETURNS, which is the ordering §110 and §76 both
+     record: these buttons sit inside a row that carries no `data-go` today, so
+     nothing is being shadowed — the return is what keeps that true if the row
+     ever gains one. It is BELOW `data-tab` for no reason but readability; the
+     two attributes never appear on one element.
+
+     NO CONFIRMATION ON EITHER. Neither answer destroys anything the portal can
+     lose — an accepted slot can be reopened on Availability and a declined
+     request is the candidate's to make again — and the confirmation modal in
+     this file is reserved for signing a report and closing an account. */
+  if(d.req){ S.req[d.req] = d.reqv; return render(); }
+  if(d.pftab){ S.pfTab = d.pftab; return render(); }
   /* THE STEPS DROPDOWN — one flag, and §33.7 hangs the panel off the toggle. */
   /* THE PEEK. `!== undefined` rather than truthiness, for the same reason as
      `data-cal` below: the close cross carries `data-peek=""` and the empty
@@ -5145,7 +6573,25 @@ device.addEventListener('click', e => {
       }
     }
     S.view = d.go; S.nav = false; S.notif = false; S.tal = false; S.typing = false;
-    if(d.go === 'interviews') S.tab = 'next';
+    /* ARRIVING AT INTERVIEWS LANDS ON WHATEVER IS ASKED OF YOU, and on "Coming
+       up" when nothing is. This line used to force `next` unconditionally, and
+       the reason was the two Quick Actions: "Awaiting Decisions" and "Upcoming
+       Interviews" both open this view and each names a SECTION of that one tab,
+       so neither may land on the tab the reader happened to leave behind. That
+       reason is untouched — what changed is that there is now a tab with a
+       person waiting on it, and a strip that opens on the diary while three
+       requests sit one tab to the left is the page hiding the only thing on it
+       with a clock.
+
+       THE TWO QUICK ACTIONS STILL LAND ON `next` AND THEY SAY SO THEMSELVES.
+       They carry `data-tab="next"` alongside their `data-go` — which is why
+       the tab branch above is guarded `!d.go` rather than matching first: a
+       card naming both a view and a tab is asking for one navigation, not two,
+       and a bare `data-tab` (the strip's own buttons, and the empty state's
+       way out) still short-circuits there. A third card wanting the requests
+       tab writes `data-tab="req"`; one wanting whatever is waiting writes no
+       tab at all. */
+    if(d.go === 'interviews') S.tab = d.tab || (reqOpen().length ? 'req' : 'next');
     render();
     device.querySelector('.main').scrollTop = 0;
   }
@@ -5156,6 +6602,12 @@ device.addEventListener('click', e => {
 device.addEventListener('change', e => {
   const p = e.target.closest('[data-perm]');
   if(p){ S.perms[p.dataset.perm] = p.checked; }
+  /* THE NOTIFICATION SWITCHES ARE A SECOND MAP AND NOT A FIFTH `data-perm`.
+     `S.perms` is what Tal is ALLOWED TO DO — a permission, on Privacy Settings —
+     and these four are what the product SENDS. One attribute over both would
+     put a delivery preference inside the record the Data use note is about. */
+  const n = e.target.closest('[data-pfn]');
+  if(n){ S.pfNotif[n.dataset.pfn] = n.checked; }
 });
 
 /* --------------------------------------------------------------------------
@@ -5177,8 +6629,12 @@ document.getElementById('pick').onchange = e => {
      so what was read in one stage is not a row that exists in the next. Leaving
      `S.read` populated would clear an unread dot on a different notification
      that happens to share a title. */
+  /* AND THE REQUESTS GO WITH IT, for the bell's reason one line up: the queue
+     is only drawn on the stage that has a working week in it, and an answer
+     carried across would put an interview in a diary the new stage does not
+     otherwise have. */
   S.stage = e.target.value; S.view = 'dashboard'; S.nav = false; S.tal = false;
-  S.notif = false; S.read = []; S.peek = false;
+  S.notif = false; S.read = []; S.peek = false; S.req = {};
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
   render();
 };
@@ -5187,6 +6643,13 @@ document.getElementById('reset').onclick = () => {
   S.notif = false; S.read = []; S.peek = false;
   S.thread = []; S.typing = false; S.askFrom = 'dashboard';
   S.confirm = false; S.sheet = false; S.tab = 'next'; S.iv = 'rafael';
+  /* AND THE THREE REQUESTS COME BACK UNANSWERED. Reset is "show me this
+     prototype from the top", and an accept is the one press in this portal
+     that changes what four other screens draw — the diary, the calendar, the
+     open-slot count and Tal's line about them. Left standing it would be a
+     demo that quietly starts one interview further on each time. */
+  S.req = {};
+  S.pfTab = 'me';
   render();
 };
 

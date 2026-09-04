@@ -51,7 +51,7 @@
              background var(--dur-short) var(--ease-standard)}
 .cs button:first-child{padding-left:0}
 .cs button:hover{color:var(--text-primary);background:var(--overlay-hover)}
-.cs button.on{color:var(--text-primary);font-weight:600;border-bottom-color:var(--brand-primary)}
+.cs button.on{color:var(--text-primary);font-weight:var(--t-w-strong);border-bottom-color:var(--brand-primary)}
 
 /* the floating button must not sit on top of a row's trailing content */
 .tal-fab{box-shadow:0 0 0 8px var(--background)}

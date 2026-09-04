@@ -1199,10 +1199,10 @@
   border-bottom:1px solid var(--rule)}
 .app .payrow:last-child{border-bottom:0}
 .app .payhead{display:none}
-.app .pay-n{font-size:14px;line-height:19px;font-weight:600;grid-column:1}
+.app .pay-n{font-size:14px;line-height:19px;font-weight:var(--t-w-strong);grid-column:1}
 .app .pay-a{
   grid-column:2;grid-row:1;text-align:right;
-  font-size:14px;line-height:19px;font-weight:600;
+  font-size:14px;line-height:19px;font-weight:var(--t-w-strong);
   font-variant-numeric:tabular-nums}
 .app .pay-d,.app .pay-c{
   font-size:12.5px;line-height:17px;color:var(--text-secondary)}

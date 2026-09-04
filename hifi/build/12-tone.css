@@ -22,12 +22,44 @@
                                a tone rather than a colour, still legible on a
                                laptop, and it recedes instead of arriving.
                                Reached through `.sec.tint.tint-2` (§37.11c),
-                               never named directly by a component. */
-  --rule-on-2:#ede9e2;      /* the hairline, one step darker on the panel. It is
-                               shared by both panels on purpose: it was tuned to
-                               sit just off #f7f7f7, so on the lighter ground it
-                               reads a touch stronger, which is what a reference
-                               block's rules want. */
+                               never named directly by a component.
+
+                               IT HAS A SECOND READER NOW AND IT IS THE PAGE
+                               MARGINS — §18's `.view-col > .main` above 900
+                               (Maryam, 3 Sep 2026: "the color of margins of
+                               the page which is f7f7f7 right now, i want those
+                               to be fbfbfb"). That is the same judgement one
+                               level up: the margin is the surface the column
+                               lies ON, so it has to be set apart from white
+                               without competing with the sheet standing on it,
+                               and at #f7f7f7 it was the same tone as every
+                               tinted section INSIDE the column — so a tinted
+                               section bleeding to the frame met the margin and
+                               the two read as one continuous grey with the
+                               rails floating in it. Half the step down puts
+                               the margin under everything again.
+
+                               SO THE PANEL AND THE MARGIN ARE NOW TWO VALUES
+                               AND MUST STAY TWO. `--surface-2` is the ground
+                               of a block you are meant to act on; this is the
+                               ground of the room it sits in. Setting them to
+                               one value is what this edit undid. */
+  /* THE HAIRLINE ON THE PANEL, AND IT IS NOW THE HAIRLINE. It was #ede9e2 —
+     #d7d5cd re-tuned to sit off #f7f7f7 — and with `--rule` stated neutral at
+     #e9e9e9 (Maryam, 3 Sep 2026) that tuning is what would make the panel the
+     one ground in the product drawing a different line. Pointed at the token.
+
+     THE TOKEN STAYS RATHER THAN BEING DELETED INTO ITS 19 CALL SITES, and the
+     reason is that it is not a duplicate — it is the NAME for "the hairline as
+     drawn on the second tone". Those 19 rules exist because a panel's rule was
+     once a different colour; if it ever needs to be again, this is one line
+     instead of nineteen. What it must not be is a second VALUE.
+
+     It is fainter on the panel than on white — #e9e9e9 on #f7f7f7 is 1.07:1
+     against 1.13:1 — and it was already fainter before this (#ede9e2 on
+     #f7f7f7 is 1.03:1), so the panel's rules read a touch stronger now, not
+     weaker. */
+  --rule-on-2:var(--rule);
   --link:#0371a4;           /* the stated #0488C5, darkened just enough to
                                hold AA: the original is 3.5:1 on the canvas
                                and 3.3:1 on the panel, under the 4.5:1 body
@@ -40,8 +72,14 @@
   --in-progress:#b34d00;    /* the amber a chapter in flight is marked with.
                                3:1 against both grounds as a non-text mark,
                                and 4.7:1 if it is ever used as ink. */
-  --accent-tint:#fde3d4;    /* the accent at 8% — a chip ground, not a surface */
-  --accent-on-2:#ae4508;    /* accent ink ON the panel. --accent-text is tuned
+  /* THE ACCENT AT 20%, WHICH IS WHAT THIS VALUE ALWAYS WAS. The comment said
+     8% and #fde3d4 is #f57414 at 20.1% over white — a drift that mattered on
+     4 Sep 2026, because re-deriving from the comment would have made every
+     chip ground in the product two thirds paler than the day before. This is
+     the same 20.1% of #ff584a. A chip ground, not a surface. */
+  --accent-tint:#ffd6d5;
+  --accent-on-2:#b81a17;    /* accent ink ON the panel, 6.61:1 in the red
+                               (was #ae4508 at 5.19). --accent-text is tuned
                                to 4.63:1 against the canvas and drops to
                                4.35:1 here, under AA. This holds 4.8:1. */
   /* --- FOUR MARK HUES, for a row of figure cells -------------------------
@@ -179,7 +217,11 @@
    tags that carry white type, and the accent text needed one more step of
    darkness to clear AA on the panel rather than on the base.
    -------------------------------------------------------------------------- */
-:root{--accent-text-2:#a24007}
+/* the deepest accent ink, re-derived for the red at the contrast it had:
+   #a24007 was 7.98:1 on white and #9d1e13 is 7.99 */
+/* the deepest accent ink, re-derived for #ff3733 at the ratio it had:
+   #9d1e13 was 7.99:1 on white and #a11714 is 7.93 */
+:root{--accent-text-2:#a11714}
 .app .sec.tint .tag.brand,.app .sec:has(> .tile-stack) .tag.brand{
   background-color:var(--brand-primary);border-color:var(--brand-primary);
   color:var(--on-brand)}
@@ -270,11 +312,40 @@
 .app .btn-full.noic{justify-content:center}
 
 /* fields are ruled on the baseline only — the box was reading as a container */
+/* THE BASELINE IS THE PLATFORM'S HAIRLINE AND THE FOCUS RING IS RED — Maryam,
+   4 Sep 2026: "the line of each field should be the color we are using on the
+   borders of the platform means very light", and "on click to a field the field
+   line color should changed to the accent color FF3733".
+
+   THIS TURNS OVER THE 3 Sep CARVE-OUT, WHICH IS THE THING TO KNOW BEFORE
+   REVERSING IT. That day `--rule` went to #e9e9e9 and the note said in as many
+   words why `--border-strong-01` (#8e8d8a) was NOT following it: "a separator is
+   decoration and is free to be as faint as it was asked to be; a control's
+   boundary has to be findable. An input edged #e9e9e9 is a field you cannot
+   see." The instruction overrules that, and what makes it work rather than
+   merely fainter is the second half — the line the reader is ON is now the
+   loudest hairline on the page instead of a 2px black one, so the field is
+   found by touching it rather than by hunting for it at rest.
+
+   #FF3733 IS A LITERAL AND IS NOT `--accent` (#FF584A). It is a third red,
+   stated by Maryam for this one state; one reader, so it is a value rather than
+   a token (§77's 18px precedent). If the platform re-hues again, this is one of
+   the hexes a grep for the old accent will NOT find — §83's own lesson.
+   **`--brand-primary` IS `#000000`**, so what this replaces is a 2px black rule,
+   which is what the screenshot shows and reads as a field being underlined
+   rather than lit.
+
+   THE 2px AND THE `padding-bottom:0` STAY. A focus state that changes colour
+   without changing weight is invisible to anyone who cannot see the hue, and the
+   padding compensation is what stops the field shifting 1px when it gains the
+   second pixel. `:hover` keeps `--text-primary`: it is disarmed in the portal
+   (trap 6) and on a hand-authored page a pointer landing on a field is a
+   different signal from the caret being in it. */
 .app .inp,.app select.inp,.app textarea.inp{
-  border:0;border-bottom:1px solid var(--border-strong-01);
+  border:0;border-bottom:1px solid var(--rule);
   padding-left:0;padding-right:var(--s08);background-color:transparent}
 .app .inp:hover{border-bottom-color:var(--text-primary);background-color:transparent}
-.app .inp:focus{border:0;border-bottom:2px solid var(--brand-primary);
+.app .inp:focus{border:0;border-bottom:2px solid #FF3733;
   padding-bottom:0;background-color:transparent}
 .app .inp[readonly]{border-bottom-style:dashed}
 .app .pw-wrap .inp{padding-right:52px}
@@ -550,7 +621,38 @@
   background-color:transparent}
 
 /* what replaces it */
-.app .acc-h:hover .ttl,.app .sn-item:hover > span:first-of-type,
+/* THE RAIL LABEL IS OFF THIS LIST (Maryam, 4 Sep 2026: "the module selected
+   icon and text should be in #ff584a and remove the text color on hover").
+   `.app .sn-item:hover > span:first-of-type` stood here and gave a hovered
+   module's word `--accent-text`, which is the whole family's rule — a
+   full-bleed row says "live" with the accent instead of with a wash.
+
+   IT IS THE ONE MEMBER WHERE THAT COSTS MORE THAN IT BUYS, and the reason is
+   §63 §41. The rail already spends the accent on the row you are ON — the word
+   AND the glyph, both `--accent`, which is that note's whole decision ("the
+   word and the mark are read as ONE OBJECT"). So the rail is the only place in
+   the product where the hover ink and a live SELECTED ink are two different
+   reds eight pixels apart: #bd2c1f under the pointer against #ff584a on the
+   current row, which reads as two states of the same kind rather than as
+   "here" and "pressable".
+
+   AND IT REACHED THE SELECTED ROW TOO. `.sn-item.on:hover > span:first-of-type`
+   matches, so pointing at the page you are already on took its label DOWN from
+   #ff584a to #bd2c1f — the one row on the rail that must not change colour.
+   That was invisible from the source and is the half of this worth keeping.
+
+   REMOVED FROM THE LIST RATHER THAN OVERRIDDEN, per trap 4's discipline: this
+   selector is where "which rows recolour their title on hover" is decided, and
+   a later `color` restatement would have to beat (0,3,1) plus a pseudo-class
+   and would still leave the decision written in two places. The 3px marker,
+   the 600 weight and §01.623's `--overlay-hover` wash all stay, so a hovered
+   row still says it is pressable — with a ground, which is what every other
+   control in the rail's own family uses.
+
+   THE OTHER FOURTEEN MEMBERS ARE UNTOUCHED. Every one of them is a row in the
+   PAGE — a card, a chapter, a member, a tab — where nothing else on screen is
+   already wearing the accent for a different reason. */
+.app .acc-h:hover .ttl,
 .app .tile.clk:hover .gcard-b h3,.app .gcard:hover .gcard-b h3,
 .app .ag:hover .ag-n,.app .agh:hover .agh-n,.app .ch:hover .ch-n,
 .app .cardrow:hover .cardrow-t,.app .mem:hover .mem-n,
@@ -822,7 +924,7 @@
   position:relative;z-index:1;
   margin-bottom:-1px;padding-bottom:1px;
   background-color:var(--background);
-  color:var(--text-primary);font-weight:600}
+  color:var(--text-primary);font-weight:var(--t-w-strong)}
 
 /* ==========================================================================
    THE CHAPTER LIST

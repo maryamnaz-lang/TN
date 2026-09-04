@@ -46,6 +46,14 @@
    measures, because which side has room is a fact about where in the week the
    day sits and CSS cannot ask it. See `placeCal` in the portal for the measure;
    this layer states both placements and the arrow that points back at the day.
+   TYPE READS THE ROLES — 4 Sep 2026, the first /portal-sync of the agent portal.
+   This layer predates §63 and stated eleven of its own sizes and weights (600,
+   14, 13, 12, 10.5, 10, 9.5, 11), and §63 restated only two of them (`.cal-wd`
+   as an eyebrow, `.cal-n` under 600px as a caption). Only the agent portal
+   draws `.cal-*`, so nothing in `hifi/` moved. Every declaration now takes the
+   nearest role — h4 / label / compact / eyebrow / caption — and `--t-w-strong`,
+   per DESIGN.md §2: the sub-600 tier's 9.5 / 10 / 11 all land on the caption
+   (11.5), which the checker confirmed does not wrap a day cell at 390.
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -65,7 +73,7 @@
   border-bottom:1px solid var(--rule)}
 .app .cal-m{
   margin:0;flex:1 1 auto;min-width:0;
-  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px}
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);font-weight:var(--t-w-strong);letter-spacing:-.05px}
 .app .cal-tz{
   flex:none;font-size:11.5px;line-height:16px;color:var(--text-helper);
   letter-spacing:.15px}
@@ -91,7 +99,7 @@
 .app .cal-wd{
   padding:var(--s03) var(--s04);
   background:var(--layer-02);
-  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);font-weight:var(--t-w-strong);letter-spacing:.8px;
   text-transform:uppercase;color:var(--text-helper)}
 /* the day cell. `min-height` rather than `aspect-ratio`: a month has 5 or 6
    rows depending on where the 1st falls, and square cells would make the
@@ -103,7 +111,7 @@
   background:var(--background)}
 .app .cal-n{
   flex:none;
-  font-size:12.5px;line-height:17px;font-weight:600;
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);font-weight:var(--t-w-strong);
   font-variant-numeric:tabular-nums;color:var(--text-secondary)}
 /* the weekend and the days that belong to the month either side are the same
    statement — "this is here so the week is a week" — so they are the same tone */
@@ -130,11 +138,11 @@
   transition:border-color var(--dur-short) var(--ease-standard)}
 .app .cal-slot:hover{border-color:var(--text-primary);cursor:pointer}
 .app .cal-t{
-  font-size:12px;line-height:16px;font-weight:600;letter-spacing:.1px;
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);font-weight:var(--t-w-strong);letter-spacing:.1px;
   font-variant-numeric:tabular-nums;color:var(--text-primary);
   white-space:nowrap}
 .app .cal-s{
-  font-size:10.5px;line-height:14px;letter-spacing:.2px;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);letter-spacing:.2px;
   color:var(--text-helper);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -175,7 +183,7 @@
   display:flex;align-items:center;justify-content:center;gap:var(--s02);
   padding:2px 0;
   background:var(--pure-white);
-  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.3px;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);font-weight:var(--t-w-strong);letter-spacing:.3px;
   color:var(--accent-text)}
 .app .cal-join svg{width:12px;height:12px;fill:var(--accent-text);display:block}
 
@@ -216,7 +224,7 @@
   margin:0 0 var(--s02)}
 .app .cal-pop-d{
   flex:1 1 auto;min-width:0;
-  font-size:14px;line-height:20px;font-weight:600;letter-spacing:-.05px;
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);font-weight:var(--t-w-strong);letter-spacing:-.05px;
   color:var(--text-primary)}
 .app .cal-pop-x{
   flex:none;display:grid;place-items:center;width:24px;height:24px;
@@ -232,11 +240,11 @@
 .app .cal-row + .cal-row{margin-top:var(--s04)}
 .app .cal-row > .l{
   display:block;
-  font-size:10.5px;line-height:14px;font-weight:600;letter-spacing:.8px;
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);font-weight:var(--t-w-strong);letter-spacing:.8px;
   text-transform:uppercase;color:var(--text-helper)}
 .app .cal-row > .v{
   display:block;margin-top:1px;
-  font-size:13px;line-height:18px;color:var(--text-primary)}
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);color:var(--text-primary)}
 .app .cal-pop-who{
   display:flex;align-items:center;gap:var(--s04);
   margin:0 0 var(--s05);
@@ -245,7 +253,7 @@
 .app .cal-pop-who .av-ph{flex:none}
 .app .cal-pop-nb{display:flex;flex-direction:column;min-width:0}
 .app .cal-pop-nb > b{
-  font-size:13.5px;line-height:19px;font-weight:600;letter-spacing:.05px}
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);font-weight:var(--t-w-strong);letter-spacing:.05px}
 .app .cal-pop-nb > span{
   font-size:11.5px;line-height:16px;color:var(--text-secondary)}
 /* the action sits on its own line with the card's own padding above it, so the
@@ -268,11 +276,11 @@
    -------------------------------------------------------------------------- */
 @container app (max-width:599.98px){
   .app .cal-d{min-height:60px;padding:var(--s02);gap:var(--s02)}
-  .app .cal-wd{padding:var(--s02) var(--s03);font-size:9.5px;letter-spacing:.5px}
-  .app .cal-n{font-size:11px;line-height:15px}
+  .app .cal-wd{padding:var(--s02) var(--s03);font-size:var(--t-caption-size);letter-spacing:.5px}
+  .app .cal-n{font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
   .app .cal-today .cal-n{width:20px;height:20px;margin:-1px 0 0 -2px}
   .app .cal-slot{padding:1px var(--s02);gap:0}
-  .app .cal-t{font-size:10px;line-height:14px}
+  .app .cal-t{font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
   .app .cal-s,.app .cal-join{display:none}
   .app .cal-pop{
     position:static;width:auto;margin-top:var(--s05);

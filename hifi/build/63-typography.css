@@ -30,13 +30,22 @@
    but dead declarations, and knowing which is which is what makes the fix
    small:
 
-   1. FIVE WEIGHTS, TWO FACES. Söhne is embedded at 400 (Buch) and 600
-      (Kräftig) and at nothing else — `document.fonts` lists exactly those
-      two. Measured: a 40px string is 280.9px wide at both 400 and 500, and
+   1. FIVE WEIGHTS, TWO FACES. The platform face is embedded at 400 and 500
+      and at nothing else — `document.fonts` lists exactly those two.
+      Measured: a 40px string is 280.9px wide at both 400 and 500, and
       282.9px at 600, 700 and 800. So the 979 elements set at 500 already
       render as 400 and the 325 at 700/800 already render as 600. They are
       not a hierarchy, they are three weights that never existed. The
       product has two, and this layer writes two.
+
+      THE FACE CHANGED AND THIS DID NOT (Maryam, 4 Sep 2026 — Söhne Buch and
+      Kräftig became Plus Jakarta Sans Regular and Medium; "do not use bold or
+      extrabold", then "we are mostly using medium or regular" after SemiBold
+      shipped for one build. §11 has that correction in full). The measurement above was taken on Söhne; the FAMILY it
+      is a fact about is a two-file family either way, and CSS font matching
+      walks down from 500 and up from 700 whatever the file is called. The
+      widths are ~4-6% larger now — that moves wrapping, not weight. §11's
+      block is the swap and the reason Bold and ExtraBold are not loaded.
 
    2. h1 IS TWO SIZES AND SO IS h2. `h1` computes 24px on 120 elements and
       20px on 169; `h2` computes 20px on 139, 14px on 561 and 30px on 2.
@@ -209,9 +218,22 @@
 
   /* TWO WEIGHTS, AND THEY ARE NAMED AFTER THE FACES THEY ACTUALLY LOAD.
      Anything that is not one of these two is a lie about what will render —
-     see §0.1. `--t-w-book` is Söhne Buch, `--t-w-strong` is Söhne Kräftig. */
+     see §0.1. `--t-w-book` is Plus Jakarta Sans Regular, `--t-w-strong` is
+     Plus Jakarta Sans **Medium**. The NAMES are deliberately not the file
+     names: they were Buch and Kräftig for a year, then Regular and SemiBold
+     for one build, and the ROLES did not move through any of it — which is
+     exactly why a token called `--t-w-semibold` would have been renamed
+     twice by now.
+
+     THE VALUE WENT 600 → 500 ON 4 SEP 2026 and that is the whole of the
+     SemiBold correction (Maryam: "we are mostly using medium or regular").
+     §11's block has the measurement. Nothing else in this layer moved: every
+     rule here reads the token, so one line changed 148 declarations. The
+     ~270 literal `font-weight:600`s in the layers BEFORE this one are left
+     as they are — with only 400 and 500 loaded they resolve to the 500 file,
+     the same fallback that carried 700/800 for the whole life of the build. */
   --t-w-book:400;
-  --t-w-strong:600;
+  --t-w-strong:500;
 }
 
 /* ------------------------------------------------------------------ 2 ---
@@ -311,7 +333,7 @@
    marketplace card. All of these were 20px already and each was declaring
    it locally; the size is the role now. */
 .app .auth-card .form-page .ph h1,.app .auth-brand .auth-intro h2,
-.app :is(.tal-panel,.ask-thread) .tal-hero h2,.app .ask-page .ask-top-t,
+.app :is(.tal-panel,.ask-thread,.ob-brand) .tal-hero h2,.app .ask-page .ask-top-t,
 .app .agh-n,.app .call-t,.app .cert .n,.app .plate-t,
 .app .big,.app .lvl-hero .big,.app .wing-lvl .prog-pct{
   font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
@@ -366,7 +388,7 @@
 .app .lead,.app .ph .lead,.app .tile > p,.app .ai-body,.app .ai-body p,
 .app .acc-b,.app .acc-b p,.app .note .nb,.app .post-b,.app .s-b,.app .plate-d,
 .app .tw-quote,.app .why,.app .bub,.app .tal-msg .bb,.app .sec > p,
-.app :is(.tal-panel,.ask-thread) .tal-hero p{
+.app :is(.tal-panel,.ask-thread,.ob-brand) .tal-hero p{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls)}
 
@@ -539,6 +561,86 @@
 .nil .nil-band,.nil .nil-f label{
   text-transform:none;letter-spacing:normal}
 
+/* ------------------------------------------------------------------ 4b ---
+   A BUTTON IS SET IN TITLE CASE — every word, every button, all three portals
+
+   Maryam, 3 Sep 2026: "make sure that in buttons on all three portals each word
+   initial should be in uppercase."
+
+   IT IS `capitalize` IN THIS LAYER AND NOT 183 EDITED STRINGS, and that is the
+   same call §2 made in the other direction. Case is one of the four properties
+   this layer owns wherever it appears; 66 uppercase rules were pulled out of 18
+   layers into §4 precisely because case decided per component is case that
+   drifts. A sweep of the sources finds 183 distinct button labels across
+   `views.js`, six `ai*.js`, four `lead*.js`, `ob.js`, `nil.js` and
+   `tn-agent-portal.html` — and about a fifth of them are not strings at all but
+   interpolations (`${act.label}`, `${chip}`, `${IVT[other].label}`, a chapter
+   title, an agent's first name), which no edit to a literal can reach. One
+   declaration reaches every one of them, reaches the button somebody writes
+   tomorrow, and is one line to reverse.
+
+   IT REVERSES §2's "THE WORDS GO IN THE MARKUP", FOR CONTROLS ONLY, AND THE
+   TWO ARE NOT THE SAME QUESTION. §2 is about UPPERCASE, which is a decorative
+   treatment applied to whole strings — the rule there is that a heading is
+   written the way it is read. This is a control's label taking a name-like
+   case because it is a name for an action rather than a sentence about one.
+   Every other family in the product stays sentence case; nothing here reaches
+   a heading, an eyebrow, a description or a tag.
+
+   `capitalize` NEVER LOWERS, WHICH IS WHY IT IS SAFE ON THE INTERPOLATIONS.
+   The property uppercases the first typographic letter unit of each word and
+   leaves every other character alone, so "Continue to TALENTnext" keeps its
+   wordmark, "Explorer Track – E3" keeps its code, "$595" and "0:40" have no
+   letter units to touch, and a name that arrives already capitalised is
+   unchanged. Swept over the RENDERED text of both portals and the agent
+   portal's 48 screens, not just the source strings: no label holds a lowercase
+   word that has to stay lowercase.
+
+   THERE IS EXACTLY ONE HYPHENATED LABEL AND IT IS RECORDED RATHER THAN FIXED,
+   because a hyphen is a word boundary to the engine. `IVT.re.label` is
+   "Re-interview" and Chrome sets it "Re-Interview" — found on the page rather
+   than predicted, and an earlier draft of this note claimed there was no such
+   label. It is the only one in either portal, it is what Chicago does to a
+   hyphenated compound in a title, and it reads correctly on the transcript's
+   110px `.btn-g`. No CSS can except one word, and the string is a record
+   `V.ivt` and the interview header both read — so if it ever has to be
+   "Re-interview" again, that is the second reason this rule becomes a markup
+   change.
+
+   EVERY WORD, INCLUDING THE SMALL ONES, WHICH IS THE ASK READ LITERALLY.
+   "Read The Full Report", not "Read the Full Report" — publishers' title case
+   keeps articles and short prepositions down, and the instruction is "each word
+   initial". A style that lowers them is `capitalize` plus a per-word exception
+   list, which CSS cannot express and which would put the words back in 183
+   places. If she wants the publishers' form, that is the moment this becomes a
+   markup change and this rule goes.
+
+   THE FIVE FAMILIES ARE THE ONES THAT ARE BUTTONS. `.btn` is the component and
+   its eight variants; `.tw-btn` is the button inside one of Tal's widgets, which
+   carries no `.btn` of its own. `.nil-btn` / `.nil-cta` are the microsite's, and
+   they are here on §4's own precedent — that block reaches into `nil` because it
+   "is still a screen inside this product" while leaving its face and colour
+   alone. What is deliberately NOT here is everything else in §3's button TIER:
+   `.slot` is a time, `.day .n` is a date, `.tabs button` / `.cs button` are a
+   tab strip, `.acc-h` is a disclosure heading and `.sn-item` is a rail label.
+   They share a size and a weight with a button; they are not buttons, and title
+   case on a nav label is a different decision nobody asked for.
+
+   `.cert-btn` IS NOT IN THE LIST AND THAT IS NOT AN OVERSIGHT — nothing in
+   either portal writes that class any more. §15, §37 and §64 all still state
+   rules against it, which is the "gate nothing writes" tell one layer over;
+   adding a sixth dead rule to the pile is the one thing that would make it
+   harder to find.
+
+   THE THIRD PORTAL GETS IT FROM THE BOX. `tn-agent-portal.html` is hand-written
+   on `design-system/`, `build-ds.py` keeps §63, and its 43 buttons are `.btn` —
+   so re-running that build is the whole of its share of the ask. `nil*` is
+   excluded from the design system, which is why the two microsite selectors are
+   written apart from the `.app` one rather than folded into it.
+   ------------------------------------------------------------------------ */
+.app .btn,.app .tw-btn{text-transform:capitalize}
+.nil .nil-btn,.nil .nil-cta{text-transform:capitalize}
+
 /* ------------------------------------------------------------------ 5 ---
    SVG TEXT
 
@@ -656,6 +758,35 @@
 .app .dark-card .k,.app .dark-card .l,.app .dark-card .d,
 .app .dark-card .note-d{
   color:var(--on-dark-2)}
+
+/* ------------------------------------------------------------------- 6c ---
+   §87'S THREE FAMILIES WERE ADDED HERE AND ARE REMOVED WITH THE BLOCK THAT
+   NEEDED THEM, AND THE MEASUREMENT IS WORTH KEEPING
+
+   A three-chapter panel on the enrolment offer's black card put `learnSec`'s
+   two sections inside a `.dark-card` for one build (see the note over
+   `enrolOffer` in views.js; Maryam dropped the panel on 2 Sep 2026). While it
+   existed, `.lrn-t`, `.skl-h` and `.skl-c` needed `--on-dark` stated by name —
+   and the reason is the one thing here that generalises, because it is §7b's
+   trap arriving from INSIDE this layer:
+
+   All three state their own `color:var(--text-primary)` in §8, at (0,2,0), and
+   §6a's generic `.app .dark-card p / h4 / …` pair is ALSO (0,2,0) and sits
+   earlier in the file. So the element rule wins on order and the text comes out
+   #111 on #111 — measured 1:1 on the heading, the outcome lines and the pills,
+   with nothing thrown. Every other entry on §7b's list is a rule in another
+   layer out-weighing this one; here both rules are this layer's own.
+
+   THE RULE THAT FALLS OUT OF IT: a `.dark-card` generic can only ever TIE with
+   a rule that keys on the element itself, so any family whose ink §8 states by
+   name needs its own (0,3,0) restatement before it can go on a black card. The
+   four selectors already in §6a's list that do this (`.v`, `.n`, `.ttl`,
+   `.note-d`) work only because §8 does not name them.
+
+   The three rules are deleted rather than left standing, because nothing in the
+   build now draws `.lrn` or `.skl-*` inside a `.dark-card` — a colour matching
+   nothing is the "gate nothing writes" tell this file keeps sweeping out.
+   -------------------------------------------------------------------------- */
 
 /* THE QUIET BUTTON IS THE CARD'S OWN INK WHEREVER IT SITS, not only inside a
    `.crow-a`. §17 states this for `.crow-dark .crow-a > .btn:not(.btn-p)` and
@@ -973,10 +1104,12 @@
 /* ------------------------------------------------------------------ 8 ---
    TWO WEIGHTS, ENFORCED
 
-   §0.1: Söhne loads at 400 and 600 and nothing else, so 500, 700 and 800
+   §0.1: the face loads at 400 and 500 and nothing else, so 600, 700 and 800
    already render as one of those two. They are snapped here so the
-   stylesheet says what the renderer does — a `font-weight:500` that a
+   stylesheet says what the renderer does — a `font-weight:700` that a
    reader believes is a third step is worse than no declaration at all.
+   (This read "400 and 600 … so 500, 700 and 800" until 4 Sep 2026, when the
+   strong file became Medium; the mechanism is identical, the pair moved.)
 
    `:where()` contributes no specificity, so this cannot outrank anything in
    §2, §3 or §7 — it only catches families those sections do not name, which
@@ -1197,9 +1330,41 @@
    requirement by nothing worth measuring. Strong, because the file sets them
    in Kräftig and because a tint alone is not enough to mark a phrase inside a
    line that is already being read as one thing. */
+/* THIS LAYER HAD THREE `#f47113` LITERALS AND THE RE-HUE SPLIT THEM ONE / TWO
+   (4 Sep 2026), which is the useful part of the story rather than an aside.
+
+   ALL THREE WERE POINTED AT `--accent-text` FIRST. §39's rule for the literal
+   was that "#f47113 is NOT --accent", the ramp's hue and the brand's being a
+   shade apart — so a token would have drawn the wrong orange. The re-hue
+   closed that gap from both ends: the accent is #ff584a and the ramp is
+   #fd4e59 into #f480f2, and #f47113 is neither. Left alone, these three would
+   have been the only orange left in the product, which is what the change was
+   reasoning about.
+
+   TWO OF THEM WENT BACK THE SAME AFTERNOON — Maryam: "some places had to have
+   the bright orange accent we had since that shows the in progress, status
+   kinda thing, you can revert back those colors only." `.jrn-pill` and
+   `.jrn-i.on` are the journey's progress reading and its current step, and
+   both notes below have the argument in full.
+
+   SO THE TEST IS NOT "IS THIS THE ACCENT'S HUE" BUT "DOES THIS VALUE MEAN THE
+   BRAND OR DOES IT MEAN A STATE". That is the sentence the first pass was
+   missing, and it is worth carrying into the next re-hue: `#f47113` beside
+   `#00a43c` and `#515151` is the amber of a traffic light and belongs to the
+   set, not to the palette. Everything a re-hue should reach means the brand.
+
+   `.ai-aura.talsum .ai-body p b` IS THE ONE THAT STAYS RED, and it passes that
+   test cleanly: the accent phrases in Tal's sentence are figures being pointed
+   at — "5 of 13 chapters", a chapter's name, a weekly target — not a state
+   anything is in. §63 §10's split is the same one from the other side: the
+   RAMP is Tal speaking, a flat ink is the product pointing. `--accent-text`
+   rather than `--accent` because it is TEXT, which is §01's rule for the whole
+   family: 5.93:1 in the new hue against #b94a09's 5.19, so that one got safer.
+   Flagged rather than assumed — if the figures should be orange too, this is
+   the third line to change and the argument above is what it costs. */
 .app .modhead .ai-aura.talsum .ai-body p b{
   font-weight:var(--t-w-strong);
-  color:#f47113}
+  color:var(--accent-text)}
 
 /* THE JOURNEY COLUMN — 587:6741, AND THE BAND IS READ AS TWO COLUMNS RATHER
    THAN AS ONE FRAME. The file sets every text node in the band at 16: the
@@ -1262,7 +1427,30 @@
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none;
-  color:#f47113}
+  /* THE PILL IS THE ACCENT AND THE STEP BELOW IT IS THE STATUS ORANGE, WHICH
+     IS MARYAM'S CALL AND REVERSES THE PARAGRAPH THIS REPLACES (4 Sep 2026:
+     "the steps chip text should be in FF584A color").
+
+     WHAT THE REVERSED NOTE SAID, so the next reader can weigh it: with the
+     list's "on" state back at #f47113, a red pill 16px above an orange marker
+     was "two colours doing one job inside one component" — so the pill went
+     back with it. That was a judgement call flagged as one, and it is
+     overruled: the two are not one job. `.jrn-i.on` marks WHICH STEP you are
+     on, which is a state in a set of three (done / on / ahead) and is why its
+     green and grey siblings never moved. The pill states WHERE YOU ARE IN THE
+     WHOLE — "Step 2 of 4" — which is a reading of the journey rather than a
+     state of one row in it, and the accent is what the product uses to mark
+     what belongs to this candidate.
+
+     `--accent` AND NOT `--accent-text`, WHICH IS A STATED SUB-AA EXCEPTION.
+     #ff584a is 3.11:1 on white against the 4.5 that 12.5px text wants, and it
+     is asked for by hex. It is the second such exception in this layer and the
+     first one's reasoning holds here too (§41, the rail's selected label): the
+     pill is never the only carrier — it sits inside §63 §4's chip, on the
+     journey block's own heading row, beside four labelled steps that say the
+     same thing at length — and it is one chip per screen. The token rather
+     than the literal so it follows the next re-hue. */
+  color:var(--accent)}
 
 /* THE THREE STEP STATES, AND THE MARK TAKES THE ROW'S INK. `currentColor` on
    the icon (§70) is what makes one declaration per state colour both halves of
@@ -1280,6 +1468,29 @@
    price and are worth re-testing if this ever leaves prototype. */
 .app .jrn-i{color:#515151}
 .app .jrn-i.done{color:#00a43c}
+/* AND `.jrn-i.on` IS ORANGE AGAIN — 4 Sep 2026, and it is the accent re-hue
+   being told where it does NOT reach (Maryam: "some places had to have the
+   bright orange accent we had since that shows the in progress, status kinda
+   thing, you can revert back those colors only", with the current step
+   screenshotted).
+
+   THE PARAGRAPH ABOVE IS THE ARGUMENT AND IT WAS ALREADY WRITTEN. These three
+   are a SET — #00a43c done, #f47113 on, #515151 ahead — and the note calls
+   them "the file's three exactly". Two of the three never moved, because green
+   and grey were never the accent; the middle one was pointed at
+   `--accent-text` in the re-hue on the reasoning that it was the last orange
+   left in the product. That got the category wrong. It is not an accent that
+   drifted out of the token set, it is the AMBER of a traffic light, and a
+   green / dark-red / grey trio says nothing about progress at all — a red
+   "in progress" beside a green "done" reads as a failure.
+
+   SO THE LITERAL IS RIGHT HERE FOR THE REASON §39's WAS WRONG ELSEWHERE. The
+   test the re-hue should have applied: does this value mean "the brand" or
+   does it mean "this state"? Everything else that changed means the brand.
+   This means the state, and its two siblings are literals for the same reason,
+   so tokenising it would separate one member of a set from the other two.
+   The 3.1:1 is unchanged and so is the note above about it being Maryam's
+   call. */
 .app .jrn-i.on{color:#f47113}
 
 /* A FINISHED STEP'S WORDS ARE INK AND ONLY ITS MARK IS GREEN (Maryam, 31 Aug
@@ -2179,119 +2390,35 @@
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
 
-/* THE STEP HEADINGS ARE `--t-sec-size`, THE STATED NINTH SIZE, and this is the
-   fourth and fifth reader it has — which is the condition §73's note set for it
-   ("it is a ROLE across two layers rather than one component's one-off").
-   16 is right for the same reason it was there: these are section headings
-   inside a panel, so they take the section-heading size — which since
-   1 Sep 2026 is this token for every heading on a page too, not just for the
-   AI-native ones. h3 at 17 would make two headings inside one panel larger
-   than the page's own; at 16 the panel and the page agree.
+/* THE BOOKING PICKER'S TYPE IS DELETED WITH THE PICKER (Maryam, 3 Sep 2026 —
+   "calendly is the iframe we will be using so we do no need this design").
+   Eleven rules went: `.bks-h > h3` (the panel heading at `--t-sec`), the month
+   name, the weekday initials, the four `.bkd` day states, the timezone line,
+   `.bks-day > b` and `.bks-cnt`, and `.bks-slots > .slot.on` — whose ink had
+   followed its ground three times and is the worked example this file kept for
+   "write the ink against the ground, not against the component".
 
-   AND THEY ARE `<h3>`, WHICH MEANS §63 §4'S ELEMENT RULE IS WHAT THIS BEATS,
-   not §8b's container-query block. §8b sizes `.sec:has(> .sec-h) > .sec-h h2`
-   and this panel has no `.sec-h` at all — deliberately, per the note in
-   `V.agent` — so trap 3 does not arise and an unconditional rule is enough.
-   Stated at (0,3,0) so it clears §02's `.sec-h h2` neighbourhood by weight
-   rather than by luck. */
-.app .bks-h > h3{
-  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
-  text-transform:none;color:var(--text-primary)}
+   NOT ONE OF THEM IS A ROLE THIS SCALE LOSES. Every string in that block sat on
+   `--t-sec`, `--t-h4`, `--t-compact`, `--t-label` or `--t-caption`, which is
+   what §11's take-the-nearest-role rule is for and why a whole component could
+   be removed without the ladder changing. The embed that replaces them is two
+   lines of type and §63 §49 states both.
 
-/* THE NUMERAL IS `--accent-text` ON THE TINT, NOT `--on-accent` ON THE ACCENT.
-   §76 gives the chip `--brand-tint-2` rather than a solid accent, because the
-   solid accent on this panel is the SELECTED day and the SELECTED time thirty
-   pixels below it (§10.29 reserves it for exactly that). `--accent-text` is
-   §12's readable ink for a string on a warm tint; it measures 5.8:1 on
-   `#fcdbc7`.
+   `.slot` ITSELF IS UNTOUCHED and still has callers — ai7's booking widget in
+   Tal's thread and §41's availability page both draw it. What went is this
+   page's OVERRIDE of its selected state. */
 
-   THE NUMERALS CAME OFF THE HEADINGS AND `.bks-n` WENT WITH THEM (Maryam,
-   31 Aug 2026) — the reading order of two columns with a rule between them was
-   already the numbering, and the chips were the only two `--brand-tint-2`
-   objects on a page where orange means "you chose this". The rule is deleted
-   rather than left: a size and an ink with no element is the tell this file
-   accumulates fastest.
+/* THERE IS NO TYPE FOR THE SCHEDULER AT ALL, and that is the whole shape of
+   the final answer. The booking page's date-and-time block is a Calendly
+   IFRAME: every string in it is set by calendly.com, in their face, at their
+   sizes, and no declaration in this file crosses an origin boundary. §49 held
+   two roles for a placeholder that said "an embed goes here" and §48-and-before
+   held eleven for a picker this product drew itself; both are deleted.
 
-   THE MEASUREMENT IT RECORDED IS THE PART WORTH KEEPING, and it has a new
-   reader one block down: `--accent-text` on `--brand-tint-2` is 5.8:1, which is
-   what lets the chosen TIME be a tint with orange on it rather than a solid
-   fill with white. Same pair, same page, one component along. */
-
-/* THE CHOSEN TIME — §76's `.slot.on` inside `.bks-slots`. §03 sets every
-   `.slot.on` to `--on-brand` on a solid `--brand-primary`; §76 turns this grid's
-   selection into `--brand-tint-2`, so the ink has to turn with the ground or it
-   is white on pale orange. `--accent-text` at (0,3,0) beats §03's (0,1,0) and
-   §12's `.app .slot.on` neighbourhood, and it is scoped to this grid — the slot
-   pickers in Tal's booking widget (§35) and on the leader's side keep the solid
-   fill and the white. */
-.app .bks-slots > .slot.on{color:var(--accent-text)}
-
-/* `.bks-tz` IS DELETED (Maryam, 31 Aug 2026) — "Times in ET" came off the
-   heading row, and the closing "All available times are in Eastern Time (ET)"
-   went in the pass before it, so both halves of what was one selector here are
-   now written by nothing. The page states no timezone while you are choosing;
-   `V.booking` names it on the receipt. Flagged at the call site. */
-
-/* ------------------------------------------------------------------------
-   THE MONTH GRID — §76.3b. Four roles, and three of them are one line each.
-
-   THE MONTH IS h4, NOT A HEADING ROLE ABOVE IT. It names the grid under it the
-   way `.bks-day` names the slot grid, and the two sit at the same height on
-   either side of the column rule — a step up here would make the left column's
-   caption louder than the right column's, which is the same pair of headings
-   §63 already keeps level at `--t-sec-size` one row above.
-
-   THE WEEKDAY STRIP IS THE CAPTION TIER IN SENTENCE CASE, AND THE CASE IS THE
-   RULE RATHER THAN A PREFERENCE. The reference sets SUN MON TUE in capitals;
-   §2 of this layer is that NOTHING in this product is, and the strings are
-   written "Sun" in the markup so there is no `text-transform` to state. It also
-   reverses §10.29's `.day .d`, which is the one place a weekday abbreviation
-   was uppercased — that element is not drawn on this page any more.
-
-   A DATE IS TABULAR AND IT IS THE ONLY REASON THE GRID LOOKS LIKE A GRID.
-   Söhne's proportional 1 is ~40% the width of its 0, so without
-   `font-variant-numeric` the 11th and the 18th sit visibly off their columns'
-   centres even inside a `place-items:center` cell.
-
-   THREE INKS, AND THE MIDDLE ONE IS THE POINT. Primary for a date you can
-   book, `--text-helper` for one you cannot, and the same helper at 55% for the
-   adjacent month — so "this month, closed" and "not this month" are one step
-   apart rather than the same grey. §3's floor-tier rule holds: a closed date is
-   not a description, it is the disabled state of a control, which is what §10's
-   `:disabled` ink is for everywhere else. `.bkd.day.on` takes `--on-accent`
-   from §10.29's `.day.on` — stated here anyway at (0,3,0), because that rule is
-   `.day.on` at (0,2,0) and a bare numeral has no `.n` for §63 §5 to reach. */
-.app .bkcal-m{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  text-transform:none;color:var(--text-primary)}
-.app .bkcal-w > span{
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
-  text-transform:none;color:var(--text-helper)}
-.app .bkd{
-  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  text-transform:none;color:var(--text-helper);
-  font-variant-numeric:tabular-nums}
-.app .bkd.day{font-weight:var(--t-w-strong);color:var(--text-primary)}
-.app .bkd.day.on{color:var(--on-accent)}
-.app .bkd.bkd-out{color:color-mix(in srgb, var(--text-helper) 55%, transparent)}
-
-/* THE DAY OVER THE TIMES, AND ITS COUNT. The day is h4 — it is a heading for
-   the grid under it, not a figure — and the count is the label role in the
-   description grey, which is §3's "a description is one grey" for a chip that
-   qualifies the line beside it. NOT the accent: it is a fact about the day, and
-   §12's blue is for facts about an object rather than about a quantity. */
-.app .bks-day > b{
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
-  text-transform:none;color:var(--text-primary)}
-.app .bks-cnt{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-label-ls);
-  text-transform:none;color:var(--text-secondary)}
+   WHAT IS LEFT ON THAT PAGE FOR §63 TO OWN is the profile panel above the frame
+   and the checkout row below it, and both were already stated elsewhere in this
+   file. Nothing was lost from the scale — every role those blocks used has
+   other readers. */
 
 /* THE SCHEDULING CARD IS DELETED (Maryam, 31 Aug 2026) and so are its three
    type roles. `.bksch-t > b`, `.bksch-t > span` and `.bksch-r > span` were a
@@ -2704,6 +2831,14 @@
    grey wash — 1.9:1, the one contrast failure this whole change could have
    shipped. §7b's trap, on a state selector rather than on a component. */
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
+/* AND `.plate` IS THE SECOND HOST, ADDED 3 SEP 2026 WITH §81.2. The gate is on
+   by default now, so the `consult` dashboard's consultant-call plate draws a
+   disabled accent button — and a plate is the other black card, sharing this
+   one's ground and ink register and none of its classes (§6a's note is the same
+   discovery from the ink side). Restated rather than joined to the selector
+   above it so the two grounds are two rules, which is what §81 does. (0,5,0)
+   against §15.1893's `.app .plate .btn-p svg` and §19's fill on the label. */
+.app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
 
 /* ==========================================================================
    22. THE STANDING COLUMN LOSES A TIER — §72's `.stand` inside `.pulse`
@@ -2810,8 +2945,31 @@
    depend on a rule two lines up whose subject is a mark — which is the kind of
    implicit link §63's whole premise is against. Restating costs one
    declaration and says what the text is. */
-.app .dark-card .eo-when{color:var(--on-dark)}
-.app .dark-card .eo-when > b{color:var(--on-dark)}
+/* AND IT IS THE SUPPORTING INK AT THE BOOK WEIGHT NOW, NOT THE CARD'S PRIMARY
+   (Maryam, 2 Sep 2026: "the cohort date row should be grey and butch weight
+   like desc text, icon will also be in the same color"). "Butch" is Buch —
+   Söhne's 400 — which is `--t-w-book`, and "like desc text" names the ink:
+   `--on-dark-2`, the same grey `.eo-cdesc` takes 40px below.
+
+   WHAT CHANGED THE ANSWER IS WHAT THE CARD NOW HOLDS. When the date was the
+   only thing under the heading it was the head block's one FACT and read as
+   part of it, so `--on-dark` at the strong weight was right. The card now opens
+   on a 28px course name with a paragraph under it, and a white strong date
+   above that reads as a second heading competing with the real one. Quiet, it
+   is what it is: a line of metadata under the slot label.
+
+   THE MARK FOLLOWS WITH NOTHING RESTATED — §82's `.eo-when svg{fill:
+   currentColor}` is why, and the note above is the record of that technique
+   being worth having. One declaration moves the words and the glyph together,
+   which is exactly what the second half of the ask asks for.
+
+   THE `> b` RULE IS NO LONGER REDUNDANT, WHICH REVERSES THE PARAGRAPH ABOVE.
+   It was the same value arriving twice; it now carries the WEIGHT, because a
+   `<b>` is 600 by default and inheriting a book weight from the parent will not
+   undo the element's own boldness. So the second rule states both. */
+.app .dark-card .eo-when{color:var(--on-dark-2)}
+.app .dark-card .eo-when > b{
+  font-weight:var(--t-w-book);color:var(--on-dark-2)}
 
 /* ==========================================================================
    §21 — THE COHORT LEADER DASHBOARD'S FOUR SECTION HEADINGS — DELETED
@@ -2979,19 +3137,27 @@
    case or ink; this is the type half. Three roles, all of them already in the
    scale, and no new token.
 
-   THE OUTCOME LINE IS `--t-body`. It is a thing you READ — one of five short
-   statements about what you will be better at — and §3's split is exactly this:
+   THE OUTCOME LINE IS `--t-body`. It is a thing you READ — one of three short
+   statements about what a chapter will make you better at — and §3's split is
+   exactly this:
    body is "a sentence to be read", desc is what supports a thing named above
    it. At `--t-desc` the five lines would be a caption under the lede rather
    than the section's content, which is the same mistake §63 §13's `.aih-d`
    correction fixed one layer earlier the same day.
 
    "SKILLS YOU'LL GAIN" IS h4, NOT A SECTION HEADING. It is a subhead INSIDE a
-   section that already has one — "What you'll learn" is the `.sec-h` h2 at
-   `--t-sec-size` — so at 16px the two would read as two sections and the block
-   would lose its lede. h4 is what `.cardrow-t` and every other in-section title
-   takes, and §8b's `:has()` rules cannot reach an `<h3>` that is not in a
-   `.sec-h`, so this needs no tier restatement.
+   section that already has one, so at 16px the two would read as two sections.
+   h4 is what `.cardrow-t` and every other in-section title takes, and §8b's
+   `:has()` rules cannot reach an `<h3>` that is not in a `.sec-h`, so this
+   needs no tier restatement.
+
+   AND SINCE 3 SEP 2026 IT TYPES BOTH SUBHEADS. The Course Outline puts "What
+   you'll learn" AND "Skills you'll gain" inside a chapter's collapse panel
+   (`outlineSec`), where the section heading is "Course Outline" — so the two
+   are subheads of equal rank and both wear `.skl-h`. That is what this rule
+   already said; nothing changed except that the first of the pair used to be
+   the `.sec-h` h2 and is now one of these. §110.3 takes §87.1c's divider off
+   the first one, which is layout and not type.
 
    A CHIP IS `--t-compact`, WHICH IS THE BODY SIZE ON A TIGHTER LINE. §2's
    compact role is 13.5/19 against body's 13.5/22 — the same size, three pixels
@@ -3006,11 +3172,7 @@
    as thirteen things switched off. The outcome lines are the section's content
    and the subhead is a heading, so both are primary by the same rule.
 
-   "SHOW ALL" TAKES THE CONTROL ROLE, `--t-body` AT THE STRONG WEIGHT, which is
-   §4's rule for a button: "a control, so it takes the strong weight to separate
-   it from the prose around it but keeps the body size so it does not out-shout
-   the row title it usually sits under". It sits at the end of a row of chips and
-   has to be findable among them without being larger.
+   "SHOW ALL" IS GONE and its rank is recorded over the deleted rule below.
    ========================================================================== */
 .app .lrn-t{
   font-size:var(--t-body-size);line-height:var(--t-body-lh);
@@ -3025,10 +3187,12 @@
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
   text-transform:none;color:var(--text-primary)}
-.app .skl-more{
-  font-size:var(--t-body-size);line-height:18px;
-  font-weight:var(--t-w-strong);letter-spacing:.05px;
-  text-transform:none;color:var(--text-primary)}
+/* `.skl-more` IS DELETED (3 Sep 2026, with §87's "Show all" — the outline).
+   It took the CONTROL role, `--t-body` at the strong weight, which is §4's
+   rule for a button: "a control, so it takes the strong weight to separate it
+   from the prose around it but keeps the body size so it does not out-shout
+   the row title it usually sits under". Kept as a note because that is the
+   rank any future text control on the end of a row wants. */
 
 /* ==========================================================================
    23. YOUR PERFORMANCE — §88's families, including the SVG text
@@ -3970,3 +4134,1018 @@
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none;color:var(--text-secondary)}
+
+/* =========================================================================
+   41. THE MODULE YOU ARE ON IS ORANGE ALL THE WAY ACROSS
+
+   Maryam, 3 Sep 2026, with a screenshot of the rail's Dashboard row: "the
+   selected module text should also bi orange". The row already said where
+   you are three times — a 3px accent marker on its left edge (§01), the
+   glyph in `--accent` (§34.2), and the strong weight — and the word between
+   them was the one part still in page ink. §34.2's own note argued for that
+   and is turned over there rather than deleted; what it kept is the value.
+
+   IT IS `--accent`, THE GLYPH'S OWN VALUE, AND THAT IS A STATED AA EXCEPTION.
+   It shipped as `--accent-text` for one build on §01's fill/ink split —
+   #f57414 is "fills only, never text" — and Maryam turned that over the same
+   afternoon, with a second screenshot: "by orange i meant the color using in
+   the icon, the text should be in the same color". So the argument is not
+   "which orange is legible", it is that the WORD AND THE MARK ARE ONE OBJECT.
+   At 13.5px beside a 22px glyph, #b94a09 against #f57414 does not read as a
+   safer orange, it reads as a label that failed to match its own icon — a
+   rust word next to a bright mark, which is the one outcome worse than either
+   value on its own.
+
+   THE NUMBER IS 2.94:1 AND IT IS WRITTEN DOWN RATHER THAN AVOIDED, which is
+   this build's form for exactly this (§01's gradient carries `--on-brand-fill`
+   so the sweep reports it as a decision; §70's three step states are "Maryam's
+   call over this build's AA rule" at 2.8 and 3.1). Two things make it a
+   narrower exception than the ratio alone suggests: the label is never the
+   only carrier — the 3px marker, the 600 weight and the glyph all say the same
+   thing, and at the collapsed rail the word is not drawn at all — and it
+   applies to ONE row per screen, the one you are already on.
+
+   IF IT IS EVER REVERSED, `--accent-text` IS THE VALUE AND THIS IS THE ONLY
+   LINE TO CHANGE. Do not reverse it by re-pointing `--accent`: the marker,
+   the glyph and 60-odd fills across the product read that token.
+
+   IT NEEDS (0,3,0) AND THAT IS BELT-AND-BRACES RATHER THAN A FIGHT. Nothing
+   currently outranks it: §01.532's `.sn-item.on` sets `background` and
+   `font-weight` only, and the colour it would inherit is §01.525's
+   `.sn-item{color:var(--text-primary)}` at (0,1,0). But `.sn-item.on` is a
+   selector five layers have already restated (§01, §10 twice, §14, §34), so a
+   sixth restatement at (0,2,0) landing after this file is exactly the shape of
+   §7b's trap. `.app` in front makes it a weight question rather than an order
+   question.
+
+   THE HOVER AND PRESSED STATES NEED NOTHING. §01 expresses both as a
+   background overlay, not as ink, so the selected row keeps its colour while
+   you point at it — which is right: hover says "you could go here", the
+   accent says "you are here", and they are different facts.
+
+   THE COLLAPSED RAIL IS UNAFFECTED AND IS THE REASON §34.2 EXISTS. At 72px
+   the label is not drawn, so the glyph is still carrying the signal alone —
+   that layer's fill is what answers that width, and this rule is what answers
+   `--drawer-w`. Both are needed; neither covers the other.
+   ========================================================================= */
+.app .sn-item.on{color:var(--accent)}
+
+/* =========================================================================
+   42. THE ONBOARDING GATE (§107) — eight roles, all of them existing ones
+
+   3 Sep 2026. §107 draws the panel, the spine, the option list, the read-back
+   and the free field, and states not one font-size, font-weight,
+   text-transform or text colour. Every role below is one this layer already
+   has; nothing here is a ninth size and nothing is a stated exception.
+
+   THE PANEL'S OWN TWO ROLES ARE NOT HERE, and that is worth knowing before
+   looking for them: `.ob-brand` was added to §14's and this layer's
+   `:is(.tal-panel,.ask-thread)` host lists, so Tal's greeting and Tal's
+   sentence are typed by the same rules that type them in the chat. One mark,
+   one greeting, one size, three surfaces.
+
+   TWO INKS ON THE SPINE AND NOT THREE. A row ahead of you and a row behind
+   you both take `--text-secondary`; only the row you are ON takes primary and
+   the strong weight. The obvious third tier — `--text-helper` for what is
+   still ahead — is refused on §3's rule: that tier is "timestamps, legal,
+   chart axes, captions" and a step you have not reached is none of those. The
+   distinction is carried by the MARK instead (grey disc, orange disc, orange
+   disc with a tick), which is the "never the only carrier" argument §41 makes
+   for the rail's accent label.
+
+   `.ob-hx` IS BLUE BECAUSE IT IS A LINK. §12.405 makes every `a[data-go]`
+   blue and this is the same act — a way to another screen — drawn as a
+   `<button>` only because §107 needs it inside a grid cell rather than in
+   prose. Painting it `--text-primary` would make it the one navigation in the
+   product that does not say so.
+   ========================================================================= */
+
+/* a — the question, and the figure over it */
+.app .ob-page .ob-step{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+/* THE QUESTION IS h2, WHICH IS 20px, AND IT IS THE PAGE'S TITLE RATHER THAN A
+   SECTION HEADING. §8b's 16px `--t-sec` is for a heading that names a block
+   inside a page; this is the only sentence on the screen and the screen has no
+   `<h1>` — §78 took the page heading out of the product and this stage draws
+   no `.ph` at all. h2 is what `.auth-card`'s own `u-h2` headings take one
+   screen earlier, so the gate opens at the same rank the verify screen closed
+   at. It is an `<h2>` in an `.ob-page` and not in a `.sec-h`, so §4's shared
+   list and §8b's seven `:has()` selectors both miss it and this is (0,2,0)
+   against nothing. */
+.app .ob-page .ob-q{
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h2-ls);
+  color:var(--text-primary)}
+
+/* b — the spine */
+.app .ob-brand .ob-sp span{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-secondary)}
+.app .ob-brand .ob-sp.on span{
+  font-weight:var(--t-w-strong);color:var(--text-primary)}
+/* the tick is white on the accent disc — `--on-accent`, not `currentColor`,
+   because §107 sets no `color` on the mark and the label beside it is grey */
+.app .ob-brand .ob-sp .ob-sp-m svg{fill:var(--on-accent)}
+
+/* c — the two lowest bands, marked in the row. §74's violet is the product's
+   hue for a growth area ("what you are not good at yet"), which is exactly
+   what a lowest band is, so the chip is not a new colour. */
+.app .ob-page .ob-lowt{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
+  text-transform:none;color:var(--mk-3)}
+
+/* d — the read-back's three cells */
+.app .ob-page .ob-hk{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .ob-page .ob-hv{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+.app .ob-page .ob-hx{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--link)}
+
+/* e — the agent, and the sentence under the name. `.ob-rec-n` is h4 for §11's
+   rule — take the nearest role, and the nearest role for "who this row is
+   about" is the one `.cardrow-t` and `.crow-n` already take. */
+.app .ob-page .ob-rec-n{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:var(--text-primary)}
+.app .ob-page .ob-rec-r{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--text-secondary)}
+.app .ob-page .ob-fit{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+.app .ob-page .ob-fit b{font-weight:var(--t-w-strong)}
+/* >>> `.ob-hq` AND `.ob-note` ARE DELETED (3 Sep 2026): question 5 is out of
+   the flow, so the read-back has no quoted row and there is no `<textarea>`
+   left in the build. Both were rules for the same thing — the one string on
+   these screens a reader had typed. */
+
+
+/* g — A DISABLED NEXT, AND IT NEEDS (0,4,1) RATHER THAN THE (0,3,1) IT READS
+   AS. §57.399's `.app .auth-card .btn-p` is (0,3,0) and sets `color` — so a
+   restatement at equal weight would land later and win, which is true today
+   and is exactly §7b's trap the moment a later layer restates that selector.
+   `.ob-page` in the middle states a structural truth and makes it a weight
+   question. `--text-helper` IS right here where §3 would normally refuse it:
+   this is not a tier of content, it is a control that is off. */
+.app .auth-card .ob-page .btn-p[disabled]{color:var(--text-helper)}
+.app .auth-card .ob-page .btn-p[disabled] svg{fill:var(--text-helper)}
+
+/* =========================================================================
+   43. THE ONBOARDING'S OPENING LINE (§107 §0b)
+
+   3 Sep 2026. The intro screen has exactly one string on it — "Good Morning,
+   Maryam!" under the blob — so this is the one type decision that composition
+   makes.
+
+   IT IS h1's LARGE TIER — 28px — AND IT SHIPPED AT h2 FOR ONE BUILD. The
+   first version put it at 20 to match `.ob-q`, on the argument that landing
+   the greeting and the questions on one rank makes the transition read as one
+   flow. Maryam asked for it larger (3 Sep 2026: "increase the text size"), and
+   the ask is right for a reason the parity argument missed: the questions
+   share a screen with four options, a spine and two buttons, and this one
+   shares its screen with nothing. 20px alone in the middle of white paper is
+   not the same size as 20px at the head of a form.
+
+   `--t-h1-size-lg` RATHER THAN A NEW VALUE. §63's scale already carries a
+   large tier for h1 (28/34) — §8's own desktop step for a page title — so this
+   is an existing role rather than a tenth size, which is what §7 asks of any
+   exception.
+
+   AND NOT `--t-display`, WHICH IS THE NEXT STEP UP AND IS REFUSED. §11's own
+   correction is the reason and it is quoted in this layer's head: display is
+   hero NUMERALS, and "Explorer – E4" was the mistake of spending it on words.
+   A greeting with a name in it is words.
+
+   THE DISPLAY ROLE IS REFUSED, AND §11's OWN CORRECTION IS THE REASON. That
+   note records the mistake of spending `--t-display` on "Explorer – E4"
+   because it looked like a hero: "a numeral can be huge because it carries no
+   reading, but that is words". This is words too — a greeting with a name in
+   it — and at 34/40 under a 300px orb it would be a second object competing
+   with the mark rather than its caption. The orb is the hero on that screen;
+   the line is what the hero says.
+
+   NOT LETTERSPACED CAPS, WHICH IS WHAT THE REFERENCE DRAWS. Signal's bottom
+   line is "TAP TO BEGIN" in tracked-out capitals, and §2 of this layer is that
+   nothing in this product is set in capitals — 66 rules across 18 layers
+   declared it and all of them are off. `text-transform:none` is stated rather
+   than omitted so the exception is visible as a decision.
+
+   PRIMARY INK, AND THAT CHANGED WITH THE SIZE AND THE GROUND. It was
+   `--text-secondary` while the line sat UNDER the orb on a warm wash, where
+   §3's "a supporting line is one grey" applied — it was a caption. Above the
+   orb at 28px on white it is the screen's opening statement, and a grey
+   opening statement on white paper reads as disabled rather than as quiet.
+   ========================================================================= */
+.app .ob-greet{
+  font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h1-ls-lg);
+  text-transform:none;color:var(--text-primary)}
+
+/* ==========================================================================
+   44 — THE COURSE DESCRIPTION ON THE ENROLMENT OFFER — `.eo-cdesc`
+
+   THE PROSE ROLE WITH A DESCRIPTION'S INK, WHICH IS WHY IT NEEDS A RULE RATHER
+   THAN A ROLE CLASS IN THE MARKUP. Every other row in that block wears one:
+   the course name is `.t-h2` on an `<h3>` and the leader and the seat count are
+   `.t-desc`. This one wants two halves that no single class carries — 13.5/22
+   from `--t-body`, and `--text-secondary` because it is a description.
+
+   THE SIZE IS THE MEASURED HALF AND IT SHIPPED WRONG FOR ONE BUILD. Written as
+   `.t-desc` it came out 12.5/17, and the string is 44 words: three lines of
+   label-sized type at 17px leading, in a block whose next line is a 20px
+   heading. §4's own note on `.plate-d` is the rule it broke — "body leads at
+   22 and compact at 19, so the description reads as a paragraph and the fact
+   rows read as a list. That distinction is what the two roles are for." A
+   course description is a paragraph; the leader row and the seat count beside
+   it really are compact rows, and they keep `.t-desc`.
+
+   ON THE BLACK CARD IT IS `--on-dark-2`, AND §6a CANNOT DO IT. That block's
+   on-dark list carries `.dark-card p` — this element is a `<p>` — so without a
+   restatement the paragraph comes out full white beside a full-white 20px
+   heading, which is the card shouting twice. `.app .dark-card .eo-cdesc` is
+   (0,3,0) against §6a's (0,2,0), which is what §6c's deleted note records as
+   the general rule: a `.dark-card` generic can only ever TIE with a rule that
+   keys on the element, so it has to be heavier rather than merely later.
+
+   BOTH SURFACES ARE REAL. The white one is the design system's — §108 crosses
+   into `talentnext-ds.css` and nothing in it knows about a course, so a
+   hand-authored page can draw this block on paper.
+   ========================================================================= */
+.app .eo-cdesc{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-secondary)}
+.app .dark-card .eo-cdesc{color:var(--on-dark-2)}
+
+/* THE COURSE NAME IS 28px — `--t-h1-size-lg`, THE DESKTOP STEP OF THE h1 ROLE
+   (Maryam, 2 Sep 2026: "increase the course name font size to 28px"). It
+   shipped at 20 as `.t-h2` and the role class came off with the change, because
+   28 has no role class of its own: §1's table carries it as `-lg` beside the
+   h1's 24, so this is the one size in the scale a page cannot reach by naming a
+   role. NO TOKEN AND NO §7 EXCEPTION IS ADDED — the value was already stated.
+
+   IT IS UNCONDITIONAL, NOT INSIDE THE 900 TIER, unlike the h1's own pair. §8's
+   `.ph h1` steps 24 -> 28 at desktop because a page title has a phone tier to
+   answer; this card's name is two words in a block that is one column at every
+   width, and the mobile tier is where a 28px line has the most room to be the
+   only thing on it. Trap 3's warning is about a rule that MUST differ per width
+   — this one must not.
+
+   AND THE DARK INK NEEDS ITS OWN LINE for §6c's stated reason: §6a's on-dark
+   list carries `.dark-card h3` and this element IS an `<h3>`, so an
+   element-keyed rule later in this file ties and wins on order. (0,3,0) settles
+   it in both directions and keeps the white-page case for the design system. */
+.app .eo-cname{
+  font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h1-ls-lg);
+  text-transform:none;color:var(--text-primary)}
+.app .dark-card .eo-cname{color:var(--on-dark)}
+
+/* THE SEATS CHIP — the label role, which §3 defines as "a chip, a tag, a small
+   value", and the same role §21 gives the date chip 40px above it.
+
+   THE WORDS ARE WHITE AND THE GROUND CARRIES THE RED, WHICH IS §01'S OWN
+   FILL/INK SPLIT ARRIVING ON A BLACK CARD. That token pair exists because
+   `--support-error` "is tuned as a fill and lands at 4.47:1" while
+   `--danger-ink` is the version that may be text — and both are tuned against
+   WHITE paper. On `--gray-100` neither is legible enough to carry a phrase:
+   `--danger-ink` (#c21520) measures 2.4:1 on this ground. So the chip says red
+   the way §31's table flag says it — a tint of the hue as the ground — and the
+   text is the card's own ink on top of it. §108.5 mixes the ground.
+
+   §31's 12% IS THE NUMBER THAT DOES NOT PORT, and that is the one thing to know
+   before copying its recipe: that mix is against `--layer-01`, white paper, so
+   12% red reads clearly. Against black, 12% is invisible and the chip becomes a
+   rectangle of nothing. §108.5 states the value it needs and why. */
+.app .eo-chip{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .dark-card .eo-chip{color:var(--on-dark)}
+
+/* ==========================================================================
+   45 — A CENTRED DIALOG'S TITLE IS A TITLE — `.conf-t`
+
+   §105.6's own note says "the title, the description and the label are roles
+   §63 already states — an `h2`, a `<p>` and an `.f > label` — so this section
+   sets no size, weight, case or colour". The first of the three was not true:
+   §11 neutralises `h2` by name and this layer sizes `.sheet-h h2` (§4's h4
+   list, a sheet's header bar), but a bare `<h2>` inside a `.sheet-b` is in no
+   list at all. So it fell to `--t-body` — MEASURED at 13.5/400 against a
+   13.5/400 description directly under it, which is a heading and its own
+   description rendering as one indistinguishable block of two sentences.
+
+   IT HAD SHIPPED THAT WAY SINCE §105 and nothing showed it, because a title
+   that is merely the same size as its description still reads as a first line.
+   Found by measuring the second caller (§109's "Successfully enrolled"), which
+   is the general shape of this: a component tested through one call site is
+   not tested, and a type role that was never stated fails quietly in a way a
+   wrong one does not.
+
+   `--t-sec-size` — 16px, THE BUILD'S 16px ROLE. §78's own note is the licence:
+   that token "now means 'the build's 16px role' rather than 'the section
+   heading's 16'", which is how the crumb trail reads it. This is the same kind
+   of borrow — the dialog's headline is the only heading on that surface and
+   the sentence under it is the pair §105 already spaces with
+   `--sec-desc-gap`, so it is a heading in every sense but the selector.
+
+   NOT `.sheet-h h2`'s h4, WHICH IS THE OTHER DEFENSIBLE ANSWER. That rank is
+   right for a header BAR — a 14/600 title in a 56px strip with a × beside it
+   and a scrolling body under it, where the words label the panel. A centred
+   confirmation has no bar, no ×, and nothing else above the fold: the title IS
+   the surface. 14 against a 13.5 description is a hierarchy carried by weight
+   alone, and this product has two weights, so weight cannot also be the size.
+
+   BOTH DIALOGS MOVE, AND THAT IS THE POINT rather than a side effect. `.conf`
+   is one component with two callers — "Delete your account?" and "Successfully
+   enrolled" — and a per-caller rank is the drift this layer exists to remove.
+   ========================================================================= */
+.app .conf .conf-t{
+  font-size:var(--t-sec-size);line-height:var(--t-sec-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-ls);
+  text-transform:none;color:var(--text-primary)}
+
+/* =========================================================================
+   44. THE INTRO'S TWO CONTROLS (§107 §0c)
+
+   3 Sep 2026. The voice bars carry no text and need nothing here. The foot
+   control and the two mode pills do.
+
+   THE FOOT CONTROL IS h3 IN THE ACCENT INK. It replaces the reference's "TAP
+   TO OPEN" — a tracked-out 11px caption — and it is deliberately bigger than
+   that, because on our screen it is the only thing to press and the reference
+   has a whole dashboard behind its own. h3 (17) against the greeting's 28
+   keeps the greeting the subject; `--accent-text` rather than `--accent` is
+   §01's fill/ink split applied where the split is meant to apply — this is
+   TEXT, so it takes the 5.8:1 rust rather than the 2.94:1 fill §41 spends on
+   a rail label that has three other carriers.
+
+   THE PILLS ARE `--t-compact` AND THE SELECTED ONE FLIPS ITS INK. §75's
+   generic on-dark pair is what a filled control takes anywhere else in the
+   build, and `--gray-100` is that ground, so `--on-dark` is the ink. Kräftig
+   on both, because §4's rule for a button is that a control takes the strong
+   weight "to separate it from the prose around it" — and here the prose is a
+   greeting at 28px, which makes the separation more necessary rather than
+   less.
+   ========================================================================= */
+.app .ob-go{
+  font-size:var(--t-h3-size);line-height:var(--t-h3-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h3-ls);
+  text-transform:none;color:var(--accent-text)}
+.app .ob-mode{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .ob-mode svg{fill:var(--icon-primary)}
+.app .ob-mode.on{color:var(--on-dark)}
+.app .ob-mode.on svg{fill:var(--on-dark)}
+
+/* =========================================================================
+   45. THE GATE'S CHAT MODE AND ITS MUTE CONTROL (§107 §0c / §0e)
+
+   3 Sep 2026. §44 typed the voice screen's two controls; this types the chat.
+
+   TAL'S PROSE IS BODY AND THE READER'S BUBBLE IS COMPACT, which is the one
+   distinction worth making on this screen. §3's rule is that body is for
+   reading and compact is for a line inside a component — and that is exactly
+   the split: Tal's four paragraphs are the screen's content, the reader's turn
+   is a phrase inside a filled box.
+
+   THE OPENING MESSAGE IS BODY TOO, NOT A HEADING, even though it sits where
+   reference 3 puts a coloured greeting. Its first line already says "Good
+   morning, Maryam!" and §11's correction is why it is not sized up to match:
+   a greeting is words, and the voice screen 200px away already spends 28px on
+   the same sentence. One of the two has to be the quiet one, and it is the one
+   with three more paragraphs under it.
+
+   THE READER'S BUBBLE IS `--on-dark` ON `--gray-100`, which is §75's generic
+   pair for anything filled — no new ink, and it is the same black the primary
+   buttons on the auth surface take (§57.399), so the screen has one filled
+   register rather than two.
+
+   THE MUTED GLYPH DROPS TO THE HELPER TIER AND THE DISC STAYS PUT. §3
+   reserves `--text-helper` for the floor — timestamps, legal, captions — and
+   a control that is switched OFF is the same kind of "present but not
+   speaking". §107's note is why the dimming is on the glyph rather than on the
+   button: a dimmed box reads as disabled, which is the one thing this must
+   not read as.
+   ========================================================================= */
+/* THE CHAT'S PROSE IS 16px, WHICH IS +2.5 ON A REQUEST FOR +2 — and the half
+   pixel is the point (Maryam, 3 Sep 2026: "increase the desc font size to 2px
+   more"). Body is 13.5, so the literal answer is 15.5, and 15.5 would be a
+   TENTH size in a scale this layer spends its whole head arguing down to
+   eight. `--t-sec-size` is 16 and already exists — §73 minted it with a
+   written argument and §78 generalised it to "the build's 16px role" — so
+   taking it costs nothing and adds nothing.
+
+   HALF A PIXEL IS NOT A DESIGN DIFFERENCE AND A NEW SIZE IS. That is §7's own
+   rule ("take the nearest role that exists") applied where it actually bites:
+   the nearest roles either side are 14 and 17, and 16 sits between them
+   because this layer already had a reason to put it there.
+
+   `.ob-m-t` USED TO GO WITH IT and no longer does — see the conversation's own
+   rank below. The welcome and the conversation are two screens now (ob.js's
+   `obChatScreen` note), so the one rule that spanned them had to be split. */
+.app .ob-chat-lede{
+  font-size:var(--t-sec-size);line-height:26px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+
+/* THE CONVERSATION IS 14px — Maryam, 3 Sep 2026: "use 14px font size for the
+   questions and the responses send by the user."
+
+   IT IS `--t-h4-size`, AN EXISTING ROLE, so this adds no size to a scale this
+   layer spends its head arguing down to eight. 14 is what §63 §7 means by
+   "take the nearest role that exists" — it IS the role.
+
+   THE LINE HEIGHT IS 22 AND NOT `--t-h4-lh`'s 19, and that is the one number
+   picked rather than taken. h4 is a TITLE role — a name over a description,
+   one or two words, where 19 is right and a wrap is rare. These are sentences
+   that wrap, so they take the body leading (`--t-body-lh` is 22 at 13.5) and
+   the size is the only thing coming from h4. The alternative was a tenth size
+   at 14/19 for prose, which is the thing §7 exists to refuse.
+
+   TAL'S OWN PROSE GOES WITH THE QUESTIONS, which is a step down from the 16 it
+   held and is the point rather than a side effect. That 16 was the WELCOME's
+   rank — the screen it shared a rule with — and the welcome is no longer on
+   this screen. A thread that asked at 14 and answered at 16 would be one voice
+   at two sizes, which is the merged screen showing through in the type.
+
+   THE FRAMING LINE STAYS AT THE DESCRIPTION TIER (§46). It is not the
+   question; it is the reason for it, and 12.5 under 14 is the same pair
+   `.aih-d` makes under `.aih-t`. */
+.app .ob-m-t{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .ob-m-t b{font-weight:var(--t-w-strong)}
+.app .ob-m-b{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--on-dark)}
+/* THE CHAT'S FIRST LINE IS THE VOICE SCREEN'S GREETING, AT THE VOICE SCREEN'S
+   SIZE (Maryam, 3 Sep 2026: "please use the same font size of good morning
+   text like we have on the voice screen"). It is `OB_CHAT[0]` — the same
+   sentence, one letter of casing apart — and it was arriving at body size as
+   the first of four paragraphs, so the two modes said the same words at 28px
+   and at 13.5px. One greeting, one rank.
+
+   IT IS KEYED ON `:first-child`, NOT GIVEN A CLASS, because the copy is a flat
+   array of paragraphs in ob.js and the first one is the greeting by position.
+   A class would mean splitting `OB_CHAT` into a head and a body, which is two
+   records for one message.
+
+   THE PARAGRAPH UNDER IT KEEPS ITS OWN SPACING — §107 states the margin; this
+   only takes the rank, so the three paragraphs that follow stay body.
+   ========================================================================= */
+.app .ob-chat-lede > p:first-child{
+  font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h1-ls-lg);
+  color:var(--text-primary)}
+
+/* THE CHAT'S CONTROL NEEDS NO RULE HERE, and that is the fix rather than an
+   omission. It was a `.btn-p` with three declarations copied off §44's
+   `.ob-go` to make the two match; it now IS an `.ob-go`, so §44 types it and
+   there is one rule for one control. The deleted block is the shape of the
+   problem it solved — two selectors kept in step by hand. */
+
+.app .ob-mute svg{fill:var(--icon-primary)}
+.app .ob-mute.off svg{fill:var(--text-helper)}
+
+/* THE SEND ARROW WAS BLACK ON BLACK — Maryam, 3 Sep 2026: "the send arrow is
+   missing on chat field." It was not missing; it was `--icon-primary` on
+   §107's `--gray-100` disc, which is #111 on #111. Nothing warned, and the
+   DISABLED state hid it: that disc is `--rule`, a pale grey, so the same fill
+   read perfectly there and the button looked correct on the one screen where
+   it does nothing.
+
+   THE GENERAL SHAPE OF IT is §75's ink rule arriving one component late — a
+   glyph inside a FILLED object needs the on-dark ink stated, and every rule
+   in the build that states it keys on a class this button does not carry. Two
+   rules rather than one, because the two states have opposite grounds: white
+   on the black live disc, and the helper tier on the grey shut one, which is
+   §3's floor and what a control waiting its turn should read as. */
+.app .ob-send svg{fill:var(--on-dark)}
+.app .ob-send[disabled] svg{fill:var(--text-helper)}
+
+/* ==========================================================================
+   45a — THE COURSE OUTLINE'S HOVER LABEL — `.ol-cd`
+
+   Maryam, 3 Sep 2026: the Course Outline's chapter row reveals a "Chapter
+   details" label under the pointer, the way the Coursera reference does.
+   §110.1b hides and shows it; this is the only type §110 needed.
+
+   IT IS THE CONTROL ROLE, WHICH IS §4's RULE AND THE SAME RANK `.skl-more`
+   HELD BEFORE IT WAS DELETED SIX HOURS EARLIER — "a control, so it takes the
+   strong weight to separate it from the prose around it but keeps the body
+   size so it does not out-shout the row title it usually sits under". This one
+   sits BESIDE a 14px row title rather than under it, and at body size in
+   Kräftig it reads as the row's affordance rather than as a second title.
+
+   NOT `--t-compact`, WHICH IS THE OTHER 13.5. That role is 13.5/19 and exists
+   for a token in a pill or a cell in a dense row (§2); this is one line in a
+   72px row with air around it, so the body leading is right and the tighter
+   one would only make it sit oddly against the title's own 19px.
+
+   `--accent-text`, WHICH IS THE ONE PLACE THIS LAYER SPENDS IT ON A LABEL AND
+   IT IS NOT ARBITRARY. §12.667 already gives the OPEN row's `.ttl` and its
+   `.acc-h` the same ink — the accordion's one state treatment, and §23's note
+   records it as such — so a closed row's hover label in the same value is that
+   state arriving one step early, which is what a hover state is. The ink cut,
+   not the fill: this is a word (§01's split), and #b94a09 measures 5.8:1 on
+   `--layer-01`.
+
+   NO `text-decoration`. The reference underlines it because its whole row is
+   a link; ours is a `<button>` and the product's underline means §12's `.lk`
+   (a text control that navigates). This one opens a panel in place, which is
+   what the chevron beside it says.
+   ========================================================================= */
+.app .ol-cd{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--accent-text)}
+
+/* ==========================================================================
+   46 — THE PROFILE, EDITED ON A SCREEN OF ITS OWN — §111's two families
+
+   §111 draws the Quick Action's progress ring, the six-step editor and the
+   Profile module's six tabs, and it states no type at all: every family it
+   introduces wears a ROLE CLASS in the markup — `.t-h2` on the heading, `.t-desc`
+   on the completion line and on a read row's third line, `.t-h4` on an entry's
+   title and an interest group's name, `.t-label` on an entry's numeral. That is
+   §108's move and it is the cheap way to keep this file the only answer to
+   "which file is a text size in".
+
+   TWO THINGS CANNOT BE SAID THAT WAY AND THEY ARE HERE.
+
+   THESE ARE §7-CLASS EXCEPTIONS RECORDED AT THE FOOT, not a new kind of rule.
+   §7 is where a stated exception belongs; both of these arrived with §111, so
+   they are written together where the layer that needs them can be found, and
+   the first one is an exception in §7's exact sense — a component whose box is
+   small enough that the role it should take does not fit in it.
+   ========================================================================== */
+
+/* --- 46a. THE SMALL RING'S FIGURE ---------------------------------------
+   §3 puts `.ring-n` at h3 (17/23) and that is right for every ring in the build
+   but one: they are all §32's 64px box, where the drawable inside the 6px
+   stroke is ~52px across. §111's Quick Action ring is 42 — one title line, a
+   4px gap and one line of description, which is what Maryam asked the circle to
+   be the height of — and inside its 4.5 stroke there is 34px. "50%" in Kraftig
+   at 17 measures ~33 and touches the arc on both sides; at `--t-label`'s 12.5
+   it measures ~23 and sits in the middle of it.
+
+   IT IS THE BOX THAT FORCED THIS, NOT THE FIGURE'S IMPORTANCE. The percentage
+   is still the loudest thing on the card and still the reason the card exists;
+   what changed is that the ring is a mark beside a title rather than a figure
+   at the end of a week card's line. THE 61px VERSION WAS BUILT AND MEASURED —
+   the ring sized to a two-line block, where h3 fits with room — and it was the
+   wrap that went rather than the size: §111.1a spans the card across the row so
+   the description keeps one line at every width. If a second small ring ever
+   appears, `.qa-ring` is the wrong hook and a `--ring-box` token is the right
+   one.
+
+   (0,3,0) AGAINST §3's (0,2,0), so it wins on weight rather than on order —
+   §7b's rule, and the reason `.app` is in front of a two-class selector that
+   would already have been heavy enough today. */
+/* AND IT STEPS ONE MORE, TO `--t-caption` (Maryam, 4 Sep 2026: "reduce the
+   font size of 50% so it does not touch the circle"). The arithmetic above was
+   right about the direction and short by one rank: at 12.5 Kraftig "50%"
+   measures ~23 in a 34px drawable, which is 5.5px of air each side — and the
+   arc is a 4.5px stroke on a curve, so the nearest approach is at the figure's
+   corners rather than at its ends and 5.5 reads as touching. At 11.5 it is ~21
+   and clears by 6.5 with the curve accounted for.
+
+   `--t-caption` RATHER THAN A NINTH SIZE, which is §11's take-the-nearest-role
+   rule and the same move that put this at `--t-label` in the first place. It is
+   now the smallest role in the scale, which is the honest end of this: a third
+   step would need a size, and the paragraph above already says what to do
+   instead — `--ring-box` and a bigger circle. */
+.app .ring.qa-ring .ring-n{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  letter-spacing:var(--t-caption-ls)}
+
+/* --- 46b. AN INTEREST'S FOLLOWER COUNT IS DELETED WITH ITS SECTION -------
+   `<em>` inside §87's pill, on the Interests tab: "Revicto  78 followers" —
+   the name the thing, the count a reading of it, so the two were one pill at
+   one size with the second in the description grey. Maryam removed the whole
+   Interests section on 4 Sep 2026, so nothing writes `.pfe-chip-m` and the
+   rule goes with §111's own two for the same class. WHAT IS WORTH KEEPING is
+   the pairing rule it settled: inside a 999px pill the ink carries the second
+   rank on its own — a second SIZE in a 28px-tall object is two type ranks in
+   one word. */
+
+
+/* =========================================================================
+   46. THE QUESTIONS IN THE CHAT (§107 §0e)
+
+   3 Sep 2026. The five onboarding questions run as a conversation now, so
+   three more roles — Tal's framing line, the question itself, and an option.
+
+   THE QUESTION OUTRANKS ITS FRAMING LINE, WHICH IS THE ONE DECISION HERE.
+   `OB_Q`'s `tal` field is the REASON for the question ("This is the part the
+   fifteen-minute call was for") and its `q` field is the question. Read as one
+   block the reason comes first and the question is the thing to answer, so the
+   reason takes the description tier and the question takes the chat's own body
+   rank. Same split `.aih-d` and `.aih-t` make for a section head.
+
+   AN OPTION IS A CONTROL AND TAKES THE STRONG WEIGHT — §4's rule, and it is
+   what separates four things you could say from the sentence that asked. The
+   ink is `--accent-text` on the hairline pills and `--on-dark` on the filled
+   closing one, which is §02's own pair for the two states of a bordered
+   control.
+
+   THE COMPOSER'S DISABLED PLACEHOLDER DROPS TO THE HELPER TIER. §3 reserves
+   it for the floor, and a field waiting its turn is exactly that — present,
+   legible, not the thing to look at.
+   ========================================================================= */
+.app .ob-q-tal{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-secondary)}
+/* THE QUESTION IS 14px LIKE THE REST OF THE THREAD (§45's note is the
+   instruction and the arithmetic). What separates it from Tal's other
+   sentences is the WEIGHT, not the size — which is the right carrier here,
+   because the question and the answer beside it are the same act of the same
+   conversation and only one of them is being asked. */
+.app .ob-q-ask{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .ob-opt{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--accent-text)}
+.app .ob-opt-go{color:var(--on-dark)}
+
+/* THE QUESTION PANEL — §107 §0h, 3 Sep 2026. Four roles and not one of them
+   is new: the panel's heading is the thread's own question rank, an option
+   label is a title with a description under it, and the count is the floor
+   tier. §46's split, one level in.
+
+   THE OPTION LABEL IS PRIMARY INK AND NOT `--accent-text`, WHICH IS THE ONE
+   CHOICE HERE AND IT REVERSES `.ob-opt` ABOVE. That rule is right for a PILL:
+   an outlined chip is a control with nothing but its own words in it, so the
+   words carry the accent. Inside a panel the row is the control, and four
+   orange labels stacked with four grey descriptions is the "just quick tabs"
+   reading the panel was built to leave behind — colour where a hierarchy was
+   wanted. §74 makes the same call from the other side ("the card title takes
+   the hue and every other word stays in ink") and the difference is the same
+   one: what the coloured thing is sitting on.
+
+   >>> THE WHOLE PANEL IS ONE SIZE NOW — 14/22, THE USER BUBBLE'S (Maryam, 4
+   Sep 2026: "The font should be of one size like the font i am using in user
+   black card responses, i need that font on the tal questions as well… since
+   tal responses has different text colors that colors will remain same just
+   the font size will be consistent").
+
+   IT HAD FOUR: the framing line at 12.5, the question at 14, an option label
+   at 14/19, its description at 12.5 and the count at 11.5. Every one of those
+   was a defensible role in isolation — a description IS a description, a count
+   IS the floor tier — and read together across one card they were a form, not
+   a turn in a conversation. The reader's own bubble sits 40px away at 14/22,
+   so a question set smaller than the answer to it is the wrong way round.
+
+   THE INK IS UNTOUCHED, WHICH IS THE OTHER HALF OF THE INSTRUCTION AND IS WHAT
+   KEEPS THE HIERARCHY. Nothing collapses into one grey: the question and the
+   option labels stay `--text-primary`, the framing line and the descriptions
+   stay `--text-secondary`, the count stays `--text-helper`, and the strong
+   weight still separates a label from the sentence under it. Size stopped
+   doing that job; colour and weight still do.
+
+   THE NUMERAL IN THE CHIP KEEPS `--t-caption` and is deliberately not in this
+   sweep. It is not text of the question — it is a MARK, sharing a 22px box
+   with `I.checkFilled` on the journey panel, and 14px in a 22px chip is a
+   numeral wearing the box rather than sitting in it. §63 §5's split between a
+   glyph and a word, one component along. */
+.app .ob-qp-t{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .ob-qp-n{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-helper)}
+.app .ob-qp-i{
+  font-size:var(--t-caption-size);line-height:1;
+  font-weight:var(--t-w-strong);letter-spacing:0;
+  color:var(--text-helper)}
+.app .ob-qp-l{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .ob-qp-d{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-secondary)}
+/* THE JOURNEY'S THREE ROW STATES — the closing turn, §107. `.ob-plan-f` stood
+   here and is DELETED with the sentence it typed: the closing turn no longer
+   names an agent (Maryam, 3 Sep 2026), so the caveat it qualified is gone and
+   a rule matching nothing is the "gate nothing writes" tell.
+
+   THE CURRENT STEP'S LABEL IS `--accent-text`, AND THAT REVERSES THE NOTE THAT
+   STOOD HERE (4 Sep 2026). It was the literal `#f47113` — `.jrn-i.on`'s own
+   value — on the argument that this list is the dashboard's journey list one
+   screen early and "re-pointing one of the two at a token is how the same four
+   steps come to be two different oranges on two screens". That argument died
+   the moment the gate took its own accent: the two screens now have different
+   primaries by instruction, so matching is not available, and a hardcoded
+   `#f47113` here would be the portal's orange stranded on a coral surface —
+   the one wrong answer of the three.
+
+   IT TAKES THE INK TOKEN RATHER THAN THE FILL. `--accent` is 3.11:1 on white;
+   this is a label a reader has to read, and §107's note is why the two tokens
+   exist. §63 §41's 2.94:1 exception does not reach it — that one is a rail
+   item with a 3px marker, a 600 weight and a glyph all saying the same thing,
+   and this row's only other carrier is a tinted chip.
+
+   >>> AND THE THREE MARKS ARE `.jrn-i`'s OWN INKS, 4 Sep 2026. The journey
+   panel now draws the dashboard's state glyphs (ob.js's `OB_JRN_IC`), so it
+   takes the dashboard's colours with them: §63.1403's green for a finished
+   step and §63.1402's `#515151` for one still ahead — both are STATE colours
+   rather than brand ones, which is why they are the literals `.jrn-i` uses
+   and not the gate's accent.
+
+   THE CURRENT STEP IS THE ONE THAT DIVERGES. `.jrn-i.on` is `#f47113`, the
+   portal's orange; here it takes `--accent-text`, so the hourglass and the
+   label beside it are the gate's `#ff584a`. The two lists cannot match on
+   this one mark and should not try — the gate has its own primary by
+   instruction, and an orange hourglass on a coral screen would be the portal
+   showing through.
+
+   `--on-accent` ON THE TICK IS DELETED with the chip it sat in: the mark is
+   bare now, so the tick is the green itself rather than white on a fill. */
+.app .ob-qp-r.on .ob-qp-l{color:var(--accent-text)}
+.app .ob-qp-r .ob-jr-ic{color:#515151}
+.app .ob-qp-r.done .ob-jr-ic{color:#00a43c}
+.app .ob-qp-r.on .ob-jr-ic{color:var(--accent-text)}
+.app .ob-compose.off .ob-in::placeholder{color:var(--text-helper)}
+
+/* =========================================================================
+   47. THE ARROW'S LABEL ON A PRESSABLE ROW (§112, `.row-cta`)
+
+   IT TAKES §4's CONTROL ROLE, WHICH IS THE POINT OF THE CLASS. The label is
+   not a control — the ROW is the button and this is a `<span>` inside it — but
+   it is the WORDS OF one, and it sits beside a `.btn-t` doing the same job in
+   the heading row above ("View All Cohorts" on the leader's Your cohorts).
+   Typed as anything else the two rank differently and the row reads as a
+   caption that happens to be near an arrow. So it is `--t-body` at the strong
+   weight and 18px of line: the same three values §4 gives `.app .btn`, stated
+   here rather than by joining that selector list because every other member of
+   it really is a control and this one deliberately is not.
+
+   `--text-primary`, NOT THE ARROW'S GREY. §12 gives `.tile-arrow`
+   `--text-disabled` (#a9a8a5) and §63 §33's note is the argument for it — a
+   quiet affordance that must not compete with the row's own words. A WORD at
+   that value reads as a disabled control rather than as a quiet one, which on
+   a row that navigates is the same lie that note rejects on the dark card. The
+   pair is a light mark beside a full-ink label, which is what §64's quiet
+   button already draws.
+
+   NOT THE ACCENT. §10.29 reserves the solid accent for the candidate's own
+   selection and §70's ramp is Tal speaking; two of these labels down a queue
+   in orange would make a list of ordinary rows look like a list of decisions.
+   ========================================================================= */
+.app .row-cta{
+  font-size:var(--t-body-size);line-height:18px;
+  font-weight:var(--t-w-strong);letter-spacing:.05px;
+  color:var(--text-primary)}
+
+/* =========================================================================
+   48. THE RECOMMENDATION CHIP (§31.6, `.rec-tag`)
+
+   ONE STEP DOWN THE SCALE, NOT A NEW SIZE (Maryam, 2 Sep 2026: "reduce the
+   font size of the chips and make them smaller"). §4's label role is
+   `--t-label` at 12.5/17 and every other `.tag` in the product takes it;
+   `--t-caption` at 11.5 is the next role that already exists, which is §11's
+   own rule — take the nearest role rather than mint a size. A ninth size for
+   one chip is what `--t-sec-size` had to argue its way into being, and this
+   has neither of that token's two grounds.
+
+   `line-height:1` BECAUSE THE BOX IS 20px AND CENTRES ITS OWN CONTENT. §31.6
+   states the height and `.tag` is `inline-flex` with `align-items:center`, so
+   a 16px line inside a 20px box is 4px of leading fighting the centring for
+   nothing. `--t-caption-lh` is right for a caption in prose and wrong for a
+   pill.
+
+   WEIGHT, CASE AND INK STAY §4's AND §31.6's. The strong weight is what keeps
+   11.5px legible on a 12% wash, and the ink is the recommendation's own hue,
+   written inline as `--mk` — a colour that is a property of the DATA, which is
+   why it is the one thing here §63 does not state.
+
+   IT NEEDS (0,3,0), WHICH IT HAS. §4's list reaches `.app .tag` at (0,2,0) and
+   lands ABOVE this in the same file, so order alone would not do it; `.app
+   .tag.rec-tag` is one class heavier and wins wherever it sits. §7b's trap,
+   answered before it bites.
+   ========================================================================= */
+.app .tag.rec-tag{
+  font-size:var(--t-caption-size);line-height:1}
+
+/* ------------------------------------------------------------------ 48 ---
+   THE AGENTS TABLE — §114, six columns and five roles
+
+   Maryam, 3 Sep 2026, with the reference screen. `114-agenttable.css` states
+   every box in that block and NOT ONE font-size, font-weight, text-transform
+   or text colour; this is its half.
+
+   NOTHING HERE IS A NEW SIZE. Five roles cover the eleven strings in a row,
+   which is §11's own test — take the nearest role rather than buy a size. The
+   reference runs four sizes across the table and all four land on roles this
+   scale already carries.
+   ------------------------------------------------------------------------ */
+
+/* THE COLUMN HEADS ARE THE EYEBROW ROLE IN SENTENCE CASE, AND THE REFERENCE
+   SETS THEM IN CAPITALS. §2 of this layer is that nothing in this product is
+   set in capitals — 66 rules across 18 layers came off for it, and the eyebrow
+   role carries `text-transform:none` for exactly this reason. It is the second
+   element in one session where a reference asks for capitals (the booking
+   calendar's SUN MON TUE is the other) and the answer is the same both times.
+
+   IT IS THE EYEBROW AND NOT `.tbl th`. §10.242 inks a real table's head at
+   `--rule-ink`, which is #111 — a black rule and near-black labels, right for
+   the dense tables that layer was written for and far too heavy over six rows
+   with 48px portraits in them. `--text-secondary` is §3's description tier and
+   is what a label above a column is. */
+.app .agt-h .agt-c{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-eyebrow-ls);
+  text-transform:none;color:var(--text-secondary)}
+
+/* THE NAME AND THE RATE ARE ONE RANK, which is the row's own hierarchy: the
+   person and what they cost are the two things you scan a directory for, and
+   the reference sets them at the same weight at opposite ends of the row. h4 is
+   the build's row-title role and `.cardrow-t`, `.mem-n` and `.ag-n` are all on
+   it.
+
+   `.agt-fee` IS DELIBERATELY NOT `.ag-price`, WHICH IS THE CLASS IT LOOKS LIKE.
+   That one is h3 (17px) — §3's "a section title and the large value" — because
+   on the agent CARD the fee is the only figure and it carries the cell alone.
+   In a table it sits in a column of six prices with a labelled head above it,
+   so 17 would make the rate column the loudest thing on the page. Same fact,
+   different rank, because the surface is different. */
+.app .agt-n,.app .agt-fee{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:var(--text-primary)}
+
+/* THE FIRST LINE OF A TWO-LINE CELL IS THE COMPACT ROLE IN PRIMARY INK, and
+   the second is the floor tier. "3 yrs" over "210 interviews" and "Thu, Aug 20"
+   over "6:30 PM" are the same shape: a fact and the thing that qualifies it.
+   `--t-compact` rather than h4, because these are read DOWN a column against
+   five others rather than as a title — §73's inversion (the label larger than
+   the value) is for four figure cells that are four different things, and six
+   rows of one fact are not that. */
+.app .agt-v{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:var(--text-primary)}
+
+/* THE SUPPORTING LINE AND THE PERSON'S META LINE ARE ONE INK AND ONE SIZE.
+   `.agt-s` is the second line of a fact cell (the interview count, the time)
+   and `.agt-m` is "E1–E3 · 210 interviews" under the name; both are metadata
+   about the row rather than content of it. `--t-caption` and `--text-helper`
+   are §3's floor tier and its list names exactly this kind of string.
+
+   THE INTERVIEW COUNT IS PRINTED TWICE ON EVERY ROW AND THAT IS THE
+   REFERENCE'S, NOT AN OVERSIGHT — once under the name and once under the years.
+   Both are it, and it is the same read (`a.ivs`), so they cannot disagree; the
+   reference keeps both because the name block is read as an identity and the
+   experience cell is read as a column. Worth knowing before "fixing" it. */
+.app .agt-m,.app .agt-s{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+
+/* THE RATING NUMERAL KEEPS `.num`'s OWN ROLE. `stars()` writes it and §63 §3
+   already types `.num` wherever the star row is drawn — the card, the leader's
+   roster and this. Restating it here would be the near-duplicate §7 rules out,
+   and it would drift the moment the star row's size changed anywhere else. */
+
+/* ------------------------------------------------------------------ 49 ---
+   TAL'S CHAT TAKES THE ONBOARDING'S TYPE — §115's HALF
+
+   Maryam, 4 Sep 2026: "I want our current tal experience on dashboard to be
+   like the one we have created on the tal onboarding. I am talking about the
+   chat ui, copy the font, the message styling, the welcome message also should
+   have the look of the one we are using on onboarding."
+
+   FOUR FAMILIES, AND EVERY VALUE IS ALREADY IN THIS LAYER. §107's chat is
+   typed by §63 §37 and §63 §41a — `.ob-chat-lede`, `.ob-m-t`, `.ob-m-b` — so
+   this is four selectors taking four sets of values that are stated a few
+   hundred lines up, not a new scale:
+
+     the greeting   `.ob-chat-lede > p:first-child`  h1-lg / book / primary
+     the lede       `.ob-chat-lede`                  --t-sec-size / 26 / primary
+     Tal's answer   `.ob-m-t`                        h4 / 22 / primary
+     the reader's   `.ob-m-b`                        h4 / 22 / --on-dark
+
+   "COPY THE FONT" IS THE GREETING AND IT IS THE BIGGEST OF THE FOUR. §53 §13
+   sets it in **Abhaya Libre SemiBold at 34/40px** — a serif, embedded for that
+   one line — against the onboarding's 28px of the platform sans. That layer's
+   `font-family` is turned over in §53 §13 itself (`font-family` is not one of
+   this layer's four properties, so the reversal belongs beside the argument it
+   reverses); what is here is the rank and the weight, and BOTH have to be said
+   or the greeting stays 40px Kräftig in a face that is no longer a display
+   face. `letter-spacing` comes back to the token for the same reason it went
+   away: §53 §13 set `normal` because "Abhaya's own fit at 40px is what the
+   file shows", and Plus Jakarta at 28 wants h1-lg's -.7px.
+
+   28 IS SMALLER THAN 34 AND THAT IS THE POINT. A 40px serif is a display line
+   and this is a greeting at the head of a conversation; §63's display note is
+   the standing rule ("hero NUMERALS and nothing else"), and the onboarding
+   never took the exception.
+
+   THE SECOND LINE IS ONE INK NOW. §51.4 clips a black-to-`--accent-2` ramp to
+   "What's going on?" and `color:transparent` is what makes a clip visible; with
+   §115 §1 taking the gradient away, `transparent` would render the words as
+   blank space. Primary ink, the same as the line above it, which is what the
+   onboarding's greeting is.
+
+   THE ANSWER AND THE BUBBLE ARE 14/22, WAS 13.5/22. Half a pixel, and it is
+   worth taking rather than leaving: §11.58 and §10.860 put `.tal-msg .bb` at
+   13.5 with the rest of the build's prose, and §107 typed its own turns at h4
+   — so the two surfaces were half a step apart in a change whose whole subject
+   is that they should not be. `--t-h4-size` with a literal 22 is §107's pair
+   exactly; 22 is not `--t-h4-lh` (19) and is not a ninth size either, because
+   it is a LEADING for an existing size and §37's own note already carries it.
+
+   `--on-dark` ON THE READER'S BUBBLE is not a restatement of §10.785's
+   `color:var(--on-brand)` — that rule is for the `--brand-primary` fill the
+   bubble used to have, and §39.422 had since replaced the fill with a pale
+   wash and the ink with `--text-primary`. §115 §3 puts a `--gray-100` ground
+   back, so the ink has to come with it or the bubble ships black on black.
+   ------------------------------------------------------------------------ */
+.app .ask-page .tal-hero h2{
+  font-size:var(--t-h1-size-lg);line-height:var(--t-h1-lh-lg);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h1-ls-lg);
+  color:var(--text-primary)}
+.app .ask-page .tal-hero h2 .askv-q{
+  font-weight:var(--t-w-book);
+  color:var(--text-primary)}
+.app .ask-page .tal-hero p{
+  font-size:var(--t-sec-size);line-height:26px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
+.app .ask-page .ask-thread .tal-msg.me > .bb{
+  font-size:var(--t-h4-size);line-height:22px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--on-dark)}
+
+/* ------------------------------------------------------------------ 50 ---
+   "ASK TAL" IS THE RAMP, SO ITS INK IS TRANSPARENT — §114.9a's HALF
+
+   Maryam, 4 Sep 2026: "ask tal color should be of the star gradient color."
+   §114.9a clips `--ai-grad` to the glyphs; `background-clip:text` only shows
+   through if the text itself paints nothing, and this is the declaration that
+   makes it so.
+
+   IT HAS TO BEAT §24.266 — `.app :is(.agh-book,.agt-act) .tal-star .lbl
+   {color:var(--accent)}`, which is (0,4,0). This is (0,4,0) landing later.
+   `-webkit-text-fill-color` is stated in §114 beside the clip because it is
+   the mechanism rather than a colour; §115 §1's note is the same split made in
+   the opposite direction and has the reason a gradient clip needs both.
+
+   ONLY THE TABLE'S. `.agh-book`'s copy of this control keeps `--accent` — it
+   is the black card's ask line, where an accent word on a dark ground is
+   already the right register and the ramp's pink end is 8.3:1 there for the
+   wrong reason. Flagged rather than swept: one selector if the two should
+   match. */
+.app .agt-act .tal-star .lbl{color:transparent}
+
+/* ==========================================================================
+   50. LITERAL 600s ARE THE STRONG WEIGHT WRITTEN BEFORE IT HAD A TOKEN — 4 Sep 2026
+
+   `--t-w-strong` moved 600 → 500 on 4 Sep 2026 (Plus Jakarta Sans, Regular +
+   Medium; Maryam rejected SemiBold twice). Every `font-weight:600` typed as a
+   literal in an earlier layer was "the strong weight" when it was written and
+   did not follow the token, so it still renders SemiBold — a third weight the
+   system says it does not have. The first `/portal-sync` of the agent portal
+   (4 Sep 2026) re-pointed the eight that render there — §15's `.pay-n` / `.pay-a`,
+   §31's `.flag-t`, §02's and §12's `.tabs button.on`, §09's `.cs button.on`,
+   §04's `.prog-figs > span b` and `.note .nb b` — to
+   `var(--t-w-strong)`, which moves the same component on all three portals.
+
+   FLAGGED, NOT DONE: 289 such literals remain across 36 layers (grep
+   `font-weight:\s*(600|700|800)` outside comments), and the bare `<b>` has no
+   rule at all, so it falls to the UA's `bolder` and renders 600 on ~570
+   elements in the candidate portal. Both are one decision — "re-point every
+   literal to the token, and state `.app b,.app strong`" — and it is Maryam's,
+   because it changes the weight of most emphasised text in the product at once.
+   ========================================================================== */

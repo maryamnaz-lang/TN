@@ -302,7 +302,7 @@ svg.arrow,.tile-arrow,.card-go{
              background var(--dur-short) var(--ease-standard)}
 .tabs button:first-child{padding-left:0}
 .tabs button:hover{color:var(--text-primary);background:var(--overlay-hover)}
-.tabs button.on,.tb.on{color:var(--text-primary);font-weight:600;
+.tabs button.on,.tb.on{color:var(--text-primary);font-weight:var(--t-w-strong);
   border-bottom-color:var(--brand-primary)}
 /* segmented control */
 .tg{display:inline-flex;border:1px solid var(--border-strong-01)}

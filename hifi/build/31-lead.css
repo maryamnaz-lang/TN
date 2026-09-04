@@ -117,7 +117,7 @@
    is body ink — a state that is simply true and needs no colour. */
 .app .flag-t{
   display:inline-flex;align-items:center;gap:var(--s03);
-  font-weight:600;letter-spacing:.1px;white-space:nowrap}
+  font-weight:var(--t-w-strong);letter-spacing:.1px;white-space:nowrap}
 .app .flag-t svg{
   width:16px;height:16px;flex:none;fill:currentColor}
 .app .flag-t.quiet{color:var(--text-secondary);font-weight:400}
@@ -201,6 +201,66 @@
 .app[data-portal="leader"] .tbl-flag tr.mod .flag-t{
   color:var(--support-attention);
   background-color:color-mix(in srgb, var(--support-attention) 14%, var(--layer-01))}
+
+/* --------------------------------------------------------------------- 31.6 ---
+   THE RECOMMENDATION CHIP IS THAT CHIP, ONE COMPONENT OVER — `.rec-tag`
+
+   Maryam, 2 Sep 2026: "against each evaluated user next to their name their
+   should be a chips that tell their recommendation … the chip color should be
+   based on the recommendation." `LDR_RECS`' fourth field is which hue, and its
+   note is the argument for the three; this is the drawing, and it is
+   deliberately the same four declarations as the flag chip above it.
+
+   IT IS WRITTEN HERE AND NOT IN A LAYER OF ITS OWN, because a second formula for
+   "a phrase in a hue on 12% of the same hue" is how two chips on one portal end
+   up a shade apart. Reading them together is the point: a leader sees the flag
+   chip on the dashboard's attention queue and this one on Evaluations, and the
+   only difference is which words are in it.
+
+   THE HUE IS `--mk`, WRITTEN INLINE BY THE CALLER, which is §72's `pulseCol`
+   idiom — named per instance, never cycled — and the reason there is no
+   `.rec-tag.green` / `.warn` / `.red` triple here. `LDR_RECS` is where a sixth
+   recommendation would state its colour, in the row that already states its
+   label and its line.
+
+   IT HAS TO BEAT TWO RULES AND BOTH ARE (0,3,0) OR LESS. §10.293 turns the
+   semantic fills off at (0,2,0) and §12's `.app .sec.tint .tag` re-points the
+   ground to transparent at (0,3,0) — this section IS a `.sec.tint`, so without
+   the second half the chip would be correct everywhere except the one list that
+   draws it. `.app .tag.rec-tag` is (0,3,0) and §31 lands after both, so it wins
+   on order; the `border-color` is what answers §10.289's neutral hairline,
+   which on a tinted ground was the only edge the chip had.
+
+   `--layer-01` IN THE MIX RATHER THAN THE SECTION'S OWN GROUND, copied from the
+   flag chip unchanged. The two differ by 4% of grey under a 12% wash, which is
+   below the threshold §74 sets for two tints reading as one; matching the
+   formula matters more than matching the paper.
+
+   NO `.rec-tag` WITH NO `--mk` IS DRAWN BY THESE RULES — `notready` writes no
+   inline hue, so `color-mix` gets an invalid value, the declaration is dropped
+   at parse time on that element and §10's outlined chip stands. That is the
+   intended fallback and it is stated in `LDR_RECS`' note.
+   -------------------------------------------------------------------------- */
+/* AND IT IS SMALLER THAN A `.tag.sm` (Maryam, 2 Sep 2026: "reduce the font size
+   of the chips and make them smaller, they are too big right now"). It shipped
+   at §02's `.sm` box — 24px tall on 8px of side padding — which is the size of a
+   chip that stands ALONE in a row (`.idhead`'s "Assesses E1–E3", the roster's
+   flags). This one sits inside a 19px heading beside the name, so at 24 it was
+   taller than the line it is part of and pushed the row's first line down.
+
+   20px IS THE HEIGHT OF THE h4 LINE IT SITS ON, near enough: `--t-h4-lh` is 19,
+   so the pill reads as part of the name's line rather than as an object landed
+   on it. `--s03` stays as the side padding — 4 is the next step down the scale
+   and at that width a 999px radius has nothing to curve around, so the pill
+   stops looking like one.
+
+   THE SIZE IS §63 §48's, not this rule's — a font-size is §63's property
+   wherever the layer sits, and §31 states the box. */
+.app .tag.rec-tag{
+  height:20px;padding:0 var(--s03);border-radius:999px}
+.app .tag.rec-tag[style]{
+  color:var(--mk);border-color:transparent;
+  background-color:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
 
 /* ONE RULE, UNDER THE COLUMN HEADS, AND IT IS LIGHT GREY
    Maryam, 1 Sep 2026: "remove the lines between the table rows, keep the one

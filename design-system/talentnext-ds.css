@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5448.  Rules dropped as product-specific: 185.
+   Rules kept: 5507.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -409,7 +409,7 @@ svg.arrow,
 .tabs button:first-child{padding-left:0}
 .tabs button:hover:where(.__nh){color:var(--text-primary); background:var(--overlay-hover)}
 .tabs button.on,
-.tb.on{color:var(--text-primary); font-weight:600; border-bottom-color:var(--brand-primary)}
+.tb.on{color:var(--text-primary); font-weight:var(--t-w-strong); border-bottom-color:var(--brand-primary)}
 .tg{display:inline-flex; border:1px solid var(--border-strong-01)}
 .tg button{min-height:40px; padding:0 var(--s05); font-size:13px; font-weight:500; border-right:1px solid var(--border-strong-01)}
 .tg button:last-child{border-right:0}
@@ -880,9 +880,9 @@ svg.arrow,
 .sec.flat .acc-b{padding-left:var(--gutter); padding-right:var(--gutter)}
 .note .nb b,
 .nrow-b b,
-.aw-b b{display:block; font-weight:600; color:var(--text-primary); margin-bottom:2px}
+.aw-b b{display:block; font-weight:var(--t-w-strong); color:var(--text-primary); margin-bottom:2px}
 .prog-figs > span{display:flex; flex-direction:column; min-width:0}
-.prog-figs > span b{font-size:16px; line-height:22px; font-weight:600; font-variant-numeric:tabular-nums}
+.prog-figs > span b{font-size:16px; line-height:22px; font-weight:var(--t-w-strong); font-variant-numeric:tabular-nums}
 .prog-figs > span{font-size:12px; line-height:16px; letter-spacing:.2px; color:var(--text-helper)}
 .prog-pct{font-size:34px; line-height:38px; font-weight:600; letter-spacing:-.9px; margin-left:0; font-variant-numeric:tabular-nums}
 .prog-pct small{font-size:16px; font-weight:600; letter-spacing:0}
@@ -942,7 +942,7 @@ svg.arrow,
 .tal-h .nm b{font-size:15px; font-weight:600}
 .tal-h .nm span{font-size:12px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .ai-stream{display:flex; gap:4px; align-items:center; border-left:0; padding-left:0}
-.ai-stream i{width:6px; height:6px; background:var(--accent); animation:blink 1.1s var(--ease-standard) infinite}
+.ai-stream i{width:6px; height:6px; background:var(--accent); border-radius:50%; animation:blink 1.1s var(--ease-standard) infinite}
 .ai-stream i:nth-child(2){animation-delay:.15s}
 .ai-stream i:nth-child(3){animation-delay:.3s}
 @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
@@ -1220,7 +1220,7 @@ textarea.inp,
              background var(--dur-short) var(--ease-standard)}
 .cs button:first-child{padding-left:0}
 .cs button:hover:where(.__nh){color:var(--text-primary); background:var(--overlay-hover)}
-.cs button.on{color:var(--text-primary); font-weight:600; border-bottom-color:var(--brand-primary)}
+.cs button.on{color:var(--text-primary); font-weight:var(--t-w-strong); border-bottom-color:var(--brand-primary)}
 .tal-fab{box-shadow:0 0 0 8px var(--background)}
 
 /* ---- 10-lattice.css ---- */
@@ -2638,7 +2638,7 @@ button{font-family:var(--font-sans)}
 .app .prog-pct{letter-spacing:-.5px}
 
 /* ---- 12-tone.css ---- */
-:root{--surface-2:#f7f7f7; --surface-3:#fbfbfb; --rule-on-2:#ede9e2; --link:#0371a4; --link-hover:#025c86; --tal-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14.4 9.6 22.5 12 14.4 14.4 12 22.5 9.6 14.4 1.5 12 9.6 9.6 12 1.5Z'/%3E%3C/svg%3E"); --sheen:rgba(255,255,255,.42); --sheen-0:rgba(255,255,255,0); --in-progress:#b34d00; --accent-tint:#fde3d4; --accent-on-2:#ae4508; --mk-1:#0f6ba8; --mk-2:#1c7a5e; --mk-3:#7c4bb0; --mk-4:#a83a6b; --surface-ach:#f4fef6}
+:root{--surface-2:#f7f7f7; --surface-3:#fbfbfb; --rule-on-2:var(--rule); --link:#0371a4; --link-hover:#025c86; --tal-star:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 14.4 9.6 22.5 12 14.4 14.4 12 22.5 9.6 14.4 1.5 12 9.6 9.6 12 1.5Z'/%3E%3C/svg%3E"); --sheen:rgba(255,255,255,.42); --sheen-0:rgba(255,255,255,0); --in-progress:#b34d00; --accent-tint:#ffd6d5; --accent-on-2:#b81a17; --mk-1:#0f6ba8; --mk-2:#1c7a5e; --mk-3:#7c4bb0; --mk-4:#a83a6b; --surface-ach:#f4fef6}
 .app .sec.tint,
 .app .sec.flat.tint,
 .app .sec.warm,
@@ -2720,7 +2720,7 @@ button{font-family:var(--font-sans)}
 .app .sec:has(> .tile-stack) .ag:hover:where(.__nh),
 .app .sec:has(> .tile-stack) .ch:hover:where(.__nh),
 .app .sec.flat.bleed .ch:hover:where(.__nh){background-color:var(--overlay-hover)}
-:root{--accent-text-2:#a24007}
+:root{--accent-text-2:#a11714}
 .app .sec.tint .tag.brand,
 .app .sec:has(> .tile-stack) .tag.brand{background-color:var(--brand-primary); border-color:var(--brand-primary); color:var(--on-brand)}
 .app .sec.tint .tag.acc,
@@ -2772,9 +2772,9 @@ button{font-family:var(--font-sans)}
 .app .btn-full.noic{justify-content:center}
 .app .inp,
 .app select.inp,
-.app textarea.inp{border:0; border-bottom:1px solid var(--border-strong-01); padding-left:0; padding-right:var(--s08); background-color:transparent}
+.app textarea.inp{border:0; border-bottom:1px solid var(--rule); padding-left:0; padding-right:var(--s08); background-color:transparent}
 .app .inp:hover:where(.__nh){border-bottom-color:var(--text-primary); background-color:transparent}
-.app .inp:focus{border:0; border-bottom:2px solid var(--brand-primary); padding-bottom:0; background-color:transparent}
+.app .inp:focus{border:0; border-bottom:2px solid #FF3733; padding-bottom:0; background-color:transparent}
 .app .inp[readonly]{border-bottom-style:dashed}
 .app .pw-wrap .inp{padding-right:52px}
 .app .pw-eye{right:0; width:44px; height:44px}
@@ -2892,7 +2892,6 @@ button{font-family:var(--font-sans)}
 .app .sec.flat.bleed .ch:hover:where(.__nh),
 .app a[data-go]:hover:where(.__nh){background-color:transparent}
 .app .acc-h:hover:where(.__nh) .ttl,
-.app .sn-item:hover > span:first-of-type,
 .app .tile.clk:hover:where(.__nh) .gcard-b h3,
 .app .gcard:hover:where(.__nh) .gcard-b h3,
 .app .ag:hover:where(.__nh) .ag-n,
@@ -3102,7 +3101,7 @@ button{font-family:var(--font-sans)}
 }
 .app .tabs{position:relative; display:flex; padding:0; overflow-x:auto; background-color:transparent; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule)}
 .app .tabs button{flex:none; min-height:48px; padding:0 var(--s06); background-color:var(--surface-2); border:0; border-right:1px solid var(--rule); border-radius:0; color:var(--text-secondary); font-weight:400}
-.app .tabs button.on{position:relative; z-index:1; margin-bottom:-1px; padding-bottom:1px; background-color:var(--background); color:var(--text-primary); font-weight:600}
+.app .tabs button.on{position:relative; z-index:1; margin-bottom:-1px; padding-bottom:1px; background-color:var(--background); color:var(--text-primary); font-weight:var(--t-w-strong)}
 .app .sec.flat.bleed,
 .app .sec:has(> .tile-stack.chapters){background-color:transparent}
 .app .sec.flat.bleed .ch{border-bottom-color:var(--rule)}
@@ -3806,8 +3805,8 @@ button{font-family:var(--font-sans)}
 .app .payrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--s02) var(--s05); align-items:baseline; padding:var(--s05) 0; border-bottom:1px solid var(--rule)}
 .app .payrow:last-child{border-bottom:0}
 .app .payhead{display:none}
-.app .pay-n{font-size:14px; line-height:19px; font-weight:600; grid-column:1}
-.app .pay-a{grid-column:2; grid-row:1; text-align:right; font-size:14px; line-height:19px; font-weight:600; font-variant-numeric:tabular-nums}
+.app .pay-n{font-size:14px; line-height:19px; font-weight:var(--t-w-strong); grid-column:1}
+.app .pay-a{grid-column:2; grid-row:1; text-align:right; font-size:14px; line-height:19px; font-weight:var(--t-w-strong); font-variant-numeric:tabular-nums}
 .app .pay-d,
 .app .pay-c{font-size:12.5px; line-height:17px; color:var(--text-secondary)}
 .app .pay-c{display:inline-flex; align-items:center; gap:var(--s03); white-space:nowrap}
@@ -5497,7 +5496,7 @@ button.btn-p:active,
 .app[data-portal="leader"] .tbl td:first-child{font-weight:600}
 .app[data-portal="leader"] .sec.tint .tbl th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .sec.tint .tbl td{border-bottom-color:var(--rule-on-2)}
-.app .flag-t{display:inline-flex; align-items:center; gap:var(--s03); font-weight:600; letter-spacing:.1px; white-space:nowrap}
+.app .flag-t{display:inline-flex; align-items:center; gap:var(--s03); font-weight:var(--t-w-strong); letter-spacing:.1px; white-space:nowrap}
 .app .flag-t svg{width:16px; height:16px; flex:none; fill:currentColor}
 .app .flag-t.quiet{color:var(--text-secondary); font-weight:400}
 .app .flag-t.warn{color:var(--support-attention)}
@@ -5507,6 +5506,8 @@ button.btn-p:active,
 .app[data-portal="leader"] .tbl-flag .flag-t svg{width:14px; height:14px}
 .app[data-portal="leader"] .tbl-flag tr.sev .flag-t{color:var(--danger-ink); background-color:color-mix(in srgb, var(--danger-ink) 12%, var(--layer-01))}
 .app[data-portal="leader"] .tbl-flag tr.mod .flag-t{color:var(--support-attention); background-color:color-mix(in srgb, var(--support-attention) 14%, var(--layer-01))}
+.app .tag.rec-tag{height:20px; padding:0 var(--s03); border-radius:999px}
+.app .tag.rec-tag[style]{color:var(--mk); border-color:transparent; background-color:color-mix(in srgb, var(--mk) 12%, var(--layer-01))}
 .app[data-portal="leader"] .tbl-flag td{border-bottom:0}
 .app[data-portal="leader"] .tbl-flag th{border-bottom-color:var(--rule)}
 .app[data-portal="leader"] .tbl-flag tr:first-child + tr td{padding-top:var(--s06)}
@@ -6107,7 +6108,7 @@ button.btn-p:active,
 /* ---- 41-cal.css ---- */
 .app .cal{position:relative; border:1px solid var(--rule); background:var(--layer-01)}
 .app .cal-top{display:flex; align-items:center; gap:var(--s04); padding:var(--s05) var(--s05); border-bottom:1px solid var(--rule)}
-.app .cal-m{margin:0; flex:1 1 auto; min-width:0; font-size:14px; line-height:20px; font-weight:600; letter-spacing:-.05px}
+.app .cal-m{margin:0; flex:1 1 auto; min-width:0; font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:-.05px}
 .app .cal-tz{flex:none; font-size:11.5px; line-height:16px; color:var(--text-helper); letter-spacing:.15px}
 .app .cal-nav{flex:none; display:flex; gap:var(--s01)}
 .app .cal-b{display:grid; place-items:center; width:32px; height:32px; background:transparent; border:1px solid var(--rule); transition:border-color var(--dur-short) var(--ease-standard)}
@@ -6115,17 +6116,17 @@ button.btn-p:active,
 .app .cal-b:hover:where(.__nh){border-color:var(--text-primary); cursor:pointer}
 .app .cal-b[disabled]{opacity:var(--state-disabled); pointer-events:none}
 .app .cal-grid{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:1px; background:var(--rule)}
-.app .cal-wd{padding:var(--s03) var(--s04); background:var(--layer-02); font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .cal-wd{padding:var(--s03) var(--s04); background:var(--layer-02); font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
 .app .cal-d{position:relative; min-height:84px; padding:var(--s03); display:flex; flex-direction:column; gap:var(--s03); background:var(--background)}
-.app .cal-n{flex:none; font-size:12.5px; line-height:17px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--text-secondary)}
+.app .cal-n{flex:none; font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); font-variant-numeric:tabular-nums; color:var(--text-secondary)}
 .app .cal-we .cal-n{color:var(--text-placeholder)}
 .app .cal-out{background:var(--layer-02)}
 .app .cal-out .cal-n{color:var(--text-placeholder)}
 .app .cal-today .cal-n{display:grid; place-items:center; width:22px; height:22px; margin:-2px 0 0 -3px; border:1.5px solid var(--text-primary); border-radius:50%; color:var(--text-primary)}
 .app .cal-slot{display:flex; flex-direction:column; gap:1px; width:100%; text-align:left; padding:var(--s02) var(--s03); background:transparent; border:1px solid var(--border-subtle-01); transition:border-color var(--dur-short) var(--ease-standard)}
 .app .cal-slot:hover:where(.__nh){border-color:var(--text-primary); cursor:pointer}
-.app .cal-t{font-size:12px; line-height:16px; font-weight:600; letter-spacing:.1px; font-variant-numeric:tabular-nums; color:var(--text-primary); white-space:nowrap}
-.app .cal-s{font-size:10.5px; line-height:14px; letter-spacing:.2px; color:var(--text-helper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.app .cal-t{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:.1px; font-variant-numeric:tabular-nums; color:var(--text-primary); white-space:nowrap}
+.app .cal-s{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); letter-spacing:.2px; color:var(--text-helper); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .app .cal-slot.taken{border-color:var(--accent-tint); background-image:repeating-linear-gradient(45deg,
     color-mix(in srgb, var(--accent) 16%, transparent) 0 2px,
     transparent 2px 6px)}
@@ -6136,7 +6137,7 @@ button.btn-p:active,
 .app .cal-slot.next .cal-s{color:var(--on-accent)}
 .app .cal-slot.next .cal-s{opacity:.88}
 .app .cal-slot.next:hover:where(.__nh){border-color:var(--accent-text)}
-.app .cal-join{margin-top:var(--s02); display:flex; align-items:center; justify-content:center; gap:var(--s02); padding:2px 0; background:var(--pure-white); font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.3px; color:var(--accent-text)}
+.app .cal-join{margin-top:var(--s02); display:flex; align-items:center; justify-content:center; gap:var(--s02); padding:2px 0; background:var(--pure-white); font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:.3px; color:var(--accent-text)}
 .app .cal-join svg{width:12px; height:12px; fill:var(--accent-text); display:block}
 .app .cal-slot.on{border-color:var(--text-primary); box-shadow:inset 0 0 0 1px var(--text-primary)}
 .app .cal-slot.next.on{box-shadow:0 1px 3px var(--accent-shadow),inset 0 0 0 2px var(--on-accent)}
@@ -6150,28 +6151,28 @@ button.btn-p:active,
 .app .cal-pop[data-side="left"]::before{right:-5px}
 .app .cal-pop[data-side="left"]::after{right:-4px}
 .app .cal-pop-h{display:flex; align-items:baseline; gap:var(--s04); margin:0 0 var(--s02)}
-.app .cal-pop-d{flex:1 1 auto; min-width:0; font-size:14px; line-height:20px; font-weight:600; letter-spacing:-.05px; color:var(--text-primary)}
+.app .cal-pop-d{flex:1 1 auto; min-width:0; font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:-.05px; color:var(--text-primary)}
 .app .cal-pop-x{flex:none; display:grid; place-items:center; width:24px; height:24px; margin:-4px -6px 0 0; background:transparent}
 .app .cal-pop-x svg{width:16px; height:16px; fill:var(--icon-secondary); display:block}
 .app .cal-pop-x:hover:where(.__nh){cursor:pointer}
 .app .cal-pop-t{margin:0 0 var(--s05); font-size:12.5px; line-height:17px; letter-spacing:.15px; color:var(--text-helper)}
 .app .cal-row + .cal-row{margin-top:var(--s04)}
-.app .cal-row > .l{display:block; font-size:10.5px; line-height:14px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
-.app .cal-row > .v{display:block; margin-top:1px; font-size:13px; line-height:18px; color:var(--text-primary)}
+.app .cal-row > .l{display:block; font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
+.app .cal-row > .v{display:block; margin-top:1px; font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app .cal-pop-who{display:flex; align-items:center; gap:var(--s04); margin:0 0 var(--s05); padding-bottom:var(--s05); border-bottom:1px solid var(--rule)}
 .app .cal-pop-who .av-ph{flex:none}
 .app .cal-pop-nb{display:flex; flex-direction:column; min-width:0}
-.app .cal-pop-nb > b{font-size:13.5px; line-height:19px; font-weight:600; letter-spacing:.05px}
+.app .cal-pop-nb > b{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:.05px}
 .app .cal-pop-nb > span{font-size:11.5px; line-height:16px; color:var(--text-secondary)}
 .app .cal-pop-a{display:flex; flex-direction:column; gap:var(--s03); margin-top:var(--s05); padding-top:var(--s05); border-top:1px solid var(--rule)}
 .app .cal-pop-a > .btn{width:100%}
 @container app (max-width:599.98px){
   .app .cal-d{min-height:60px; padding:var(--s02); gap:var(--s02)}
-  .app .cal-wd{padding:var(--s02) var(--s03); font-size:9.5px; letter-spacing:.5px}
-  .app .cal-n{font-size:11px; line-height:15px}
+  .app .cal-wd{padding:var(--s02) var(--s03); font-size:var(--t-caption-size); letter-spacing:.5px}
+  .app .cal-n{font-size:var(--t-caption-size); line-height:var(--t-caption-lh)}
   .app .cal-today .cal-n{width:20px; height:20px; margin:-1px 0 0 -2px}
   .app .cal-slot{padding:1px var(--s02); gap:0}
-  .app .cal-t{font-size:10px; line-height:14px}
+  .app .cal-t{font-size:var(--t-caption-size); line-height:var(--t-caption-lh)}
   .app .cal-s,
   .app .cal-join{display:none}
   .app .cal-pop{position:static; width:auto; margin-top:var(--s05); box-shadow:none}
@@ -6733,7 +6734,7 @@ button.btn-p:active,
 }
 
 /* ---- 63-typography.css ---- */
-:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-sec-size:16px; --t-sec-lh:22px; --t-sec-ls:-.15px; --t-sec-lg-size:18px; --t-sec-lg-lh:24px; --t-sec-lg-ls:-.2px; --t-w-book:400; --t-w-strong:600}
+:root{--t-display-size:34px; --t-display-lh:40px; --t-display-ls:-1px; --t-h1-size:24px; --t-h1-lh:30px; --t-h1-ls:-.5px; --t-h1-size-lg:28px; --t-h1-lh-lg:34px; --t-h1-ls-lg:-.7px; --t-h2-size:20px; --t-h2-lh:26px; --t-h2-ls:-.3px; --t-h3-size:17px; --t-h3-lh:23px; --t-h3-ls:-.2px; --t-h4-size:14px; --t-h4-lh:19px; --t-h4-ls:-.02px; --t-body-size:13.5px; --t-body-lh:22px; --t-body-ls:.1px; --t-compact-size:13.5px; --t-compact-lh:19px; --t-compact-ls:.1px; --t-label-size:12.5px; --t-label-lh:17px; --t-label-ls:.1px; --t-desc-size:12.5px; --t-desc-lh:17px; --t-desc-ls:.1px; --t-eyebrow-size:11.5px; --t-eyebrow-lh:16px; --t-eyebrow-ls:.2px; --t-caption-size:11.5px; --t-caption-lh:16px; --t-caption-ls:.1px; --t-sec-size:16px; --t-sec-lh:22px; --t-sec-ls:-.15px; --t-sec-lg-size:18px; --t-sec-lg-lh:24px; --t-sec-lg-ls:-.2px; --t-w-book:400; --t-w-strong:500}
 .app .t-display,
 .app .u-display{font-size:var(--t-display-size); line-height:var(--t-display-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-display-ls); font-variant-numeric:tabular-nums}
 .app .t-h1,
@@ -6774,7 +6775,7 @@ button.btn-p:active,
 .app h1.ttl{font-size:var(--t-h1-size); line-height:var(--t-h1-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h1-ls)}
 .app .auth-card .form-page .ph h1,
 .app .auth-brand .auth-intro h2,
-.app :is(.tal-panel, .ask-thread) .tal-hero h2,
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero h2,
 .app .ask-page .ask-top-t,
 .app .agh-n,
 .app .call-t,
@@ -6846,7 +6847,7 @@ button.btn-p:active,
 .app .bub,
 .app .tal-msg .bb,
 .app .sec > p,
-.app :is(.tal-panel, .ask-thread) .tal-hero p{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls)}
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero p{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls)}
 .app .kv,
 .app .kv .k,
 .app .tbl,
@@ -6982,6 +6983,8 @@ button.btn-p:active,
   .app .lvl-hero .big,
   .app .big{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); letter-spacing:var(--t-h2-ls)}
 }
+.app .btn,
+.app .tw-btn{text-transform:capitalize}
 .app svg text{font-family:var(--font-sans); font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; fill:var(--text-helper)}
 .app .qz-lab,
 .app .chart-lab,
@@ -7167,10 +7170,10 @@ button.btn-p:active,
 .app .stand-v,
 .app .ring-n{font-variant-numeric:tabular-nums; font-feature-settings:'tnum' 1}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:transparent}
-.app .modhead .ai-aura.talsum .ai-body p b{font-weight:var(--t-w-strong); color:#f47113}
+.app .modhead .ai-aura.talsum .ai-body p b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .jrn-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none}
 .app .jrn-lab{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none}
-.app .jrn-pill{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:#f47113}
+.app .jrn-pill{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--accent)}
 .app .jrn-i{color:#515151}
 .app .jrn-i.done{color:#00a43c}
 .app .jrn-i.on{color:#f47113}
@@ -7257,16 +7260,6 @@ button.btn-p:active,
 .app .sig-tag{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--mk)}
 .app .sig-p{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
 .app .stats .stat-top > .l{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls)}
-.app .bks-h > h3{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
-.app .bks-slots > .slot.on{color:var(--accent-text)}
-.app .bkcal-m{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
-.app .bkcal-w > span{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-helper)}
-.app .bkd{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-helper); font-variant-numeric:tabular-nums}
-.app .bkd.day{font-weight:var(--t-w-strong); color:var(--text-primary)}
-.app .bkd.day.on{color:var(--on-accent)}
-.app .bkd.bkd-out{color:color-mix(in srgb, var(--text-helper) 55%, transparent)}
-.app .bks-day > b{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
-.app .bks-cnt{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-secondary)}
 .app .bkc-fl{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
 .app .bkc-fv{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--accent-text); font-variant-numeric:tabular-nums}
 .app .crow-dark .crow-role,
@@ -7304,14 +7297,15 @@ button.btn-p:active,
 .app .qzp-r-tag{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--accent-text)}
 .app .qzp-cta{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--link)}
 .app .dark-card .btn.btn-p[disabled]{color:var(--on-dark-2)}
+.app .plate .btn.btn-p[disabled]{color:var(--on-dark-2)}
 .app .page .pulse .stand .stand-l{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--text-primary)}
 .app .page .pulse .stand .stand-v small{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-secondary)}
 .app .dark-card .eo-fl{color:var(--on-dark)}
 .app .dark-card .eo-fv{color:var(--on-dark-2)}
 .app .dark-card .eo-fv-acc{color:var(--accent-on-dark)}
-.app .dark-card .eo-when{color:var(--on-dark)}
-.app .dark-card .eo-when > b{color:var(--on-dark)}
+.app .dark-card .eo-when{color:var(--on-dark-2)}
+.app .dark-card .eo-when > b{font-weight:var(--t-w-book); color:var(--on-dark-2)}
 .app .certban-t{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .certban-m{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
 .app .gcard-art > i{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-secondary)}
@@ -7329,7 +7323,6 @@ button.btn-p:active,
 .app .lrn-t{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
 .app .skl-h{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary); margin:var(--s07) 0 0}
 .app .skl-c{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
-.app .skl-more{font-size:var(--t-body-size); line-height:18px; font-weight:var(--t-w-strong); letter-spacing:.05px; text-transform:none; color:var(--text-primary)}
 .app .perf-fig{font-size:var(--t-display-size); line-height:var(--t-display-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-display-ls); text-transform:none; color:var(--text-primary); font-variant-numeric:tabular-nums}
 .app .perf-fig small{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls)}
 .app .perf-d{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--support-success-ink); font-variant-numeric:tabular-nums}
@@ -7400,6 +7393,74 @@ button.btn-p:active,
 .app .cardrow .card-del:hover:where(.__nh){color:var(--danger-ink)}
 .app .page .pf-facts .v{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); color:var(--text-primary)}
 .app .page .pf-facts .pf-l{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-secondary)}
+.app .sn-item.on{color:var(--accent)}
+.app .ob-page .ob-step{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
+.app .ob-page .ob-q{font-size:var(--t-h2-size); line-height:var(--t-h2-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h2-ls); color:var(--text-primary)}
+.app .ob-brand .ob-sp span{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-secondary)}
+.app .ob-brand .ob-sp.on span{font-weight:var(--t-w-strong); color:var(--text-primary)}
+.app .ob-brand .ob-sp .ob-sp-m svg{fill:var(--on-accent)}
+.app .ob-page .ob-lowt{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--mk-3)}
+.app .ob-page .ob-hk{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-secondary)}
+.app .ob-page .ob-hv{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-primary)}
+.app .ob-page .ob-hx{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--link)}
+.app .ob-page .ob-rec-n{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); color:var(--text-primary)}
+.app .ob-page .ob-rec-r{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); color:var(--text-secondary)}
+.app .ob-page .ob-fit{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-primary)}
+.app .ob-page .ob-fit b{font-weight:var(--t-w-strong)}
+.app .auth-card .ob-page .btn-p[disabled]{color:var(--text-helper)}
+.app .auth-card .ob-page .btn-p[disabled] svg{fill:var(--text-helper)}
+.app .ob-greet{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); font-weight:var(--t-w-book); letter-spacing:var(--t-h1-ls-lg); text-transform:none; color:var(--text-primary)}
+.app .eo-cdesc{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-secondary)}
+.app .dark-card .eo-cdesc{color:var(--on-dark-2)}
+.app .eo-cname{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); font-weight:var(--t-w-strong); letter-spacing:var(--t-h1-ls-lg); text-transform:none; color:var(--text-primary)}
+.app .dark-card .eo-cname{color:var(--on-dark)}
+.app .eo-chip{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-primary)}
+.app .dark-card .eo-chip{color:var(--on-dark)}
+.app .conf .conf-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
+.app .ob-go{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--accent-text)}
+.app .ob-mode{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
+.app .ob-mode svg{fill:var(--icon-primary)}
+.app .ob-mode.on{color:var(--on-dark)}
+.app .ob-mode.on svg{fill:var(--on-dark)}
+.app .ob-chat-lede{font-size:var(--t-sec-size); line-height:26px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ob-m-t{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ob-m-t b{font-weight:var(--t-w-strong)}
+.app .ob-m-b{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--on-dark)}
+.app .ob-chat-lede > p:first-child{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); font-weight:var(--t-w-book); letter-spacing:var(--t-h1-ls-lg); color:var(--text-primary)}
+.app .ob-mute svg{fill:var(--icon-primary)}
+.app .ob-mute.off svg{fill:var(--text-helper)}
+.app .ob-send svg{fill:var(--on-dark)}
+.app .ob-send[disabled] svg{fill:var(--text-helper)}
+.app .ol-cd{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--accent-text)}
+.app .ring.qa-ring .ring-n{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); letter-spacing:var(--t-caption-ls)}
+.app .ob-q-tal{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-secondary)}
+.app .ob-q-ask{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-strong); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ob-opt{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--accent-text)}
+.app .ob-opt-go{color:var(--on-dark)}
+.app .ob-qp-t{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-strong); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ob-qp-n{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-helper)}
+.app .ob-qp-i{font-size:var(--t-caption-size); line-height:1; font-weight:var(--t-w-strong); letter-spacing:0; color:var(--text-helper)}
+.app .ob-qp-l{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-strong); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
+.app .ob-qp-d{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-secondary)}
+.app .ob-qp-r.on .ob-qp-l{color:var(--accent-text)}
+.app .ob-qp-r .ob-jr-ic{color:#515151}
+.app .ob-qp-r.done .ob-jr-ic{color:#00a43c}
+.app .ob-qp-r.on .ob-jr-ic{color:var(--accent-text)}
+.app .ob-compose.off .ob-in::placeholder{color:var(--text-helper)}
+.app .row-cta{font-size:var(--t-body-size); line-height:18px; font-weight:var(--t-w-strong); letter-spacing:.05px; color:var(--text-primary)}
+.app .tag.rec-tag{font-size:var(--t-caption-size); line-height:1}
+.app .agt-h .agt-c{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
+.app .agt-n,
+.app .agt-fee{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); color:var(--text-primary)}
+.app .agt-v{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-primary)}
+.app .agt-m,
+.app .agt-s{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); color:var(--text-helper)}
+.app .ask-page .tal-hero h2{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); font-weight:var(--t-w-book); letter-spacing:var(--t-h1-ls-lg); color:var(--text-primary)}
+.app .ask-page .tal-hero h2 .askv-q{font-weight:var(--t-w-book); color:var(--text-primary)}
+.app .ask-page .tal-hero p{font-size:var(--t-sec-size); line-height:26px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--text-primary)}
+.app .ask-page .ask-thread .tal-msg.me > .bb{font-size:var(--t-h4-size); line-height:22px; font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); color:var(--on-dark)}
+.app .agt-act .tal-star .lbl{color:transparent}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
