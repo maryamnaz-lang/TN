@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=70451eaa">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=fd33ac50">
 
 <style>
 /* ==========================================================================
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=70451eaa"></script>
+<script src="design-system/talentnext-ds.js?b=fd33ac50"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1431,6 +1431,135 @@ ACTIONS['doreject'] = key => {
   S.mod = 'vetting'; S.sub = 'applications'; S.id = null;
 };
 ACTIONS['verifyemp'] = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'ok'; toast(e.name + ' verified'); } };
+
+/* ======================================================================
+   CANDIDATES
+   ====================================================================== */
+const yn = v => v ? '<span class="tag sm green">Yes</span>' : '<span class="tag sm">No</span>';
+
+PAGESUM['candidates/candidates'] = () => {
+  const b = t => CANDS.filter(c => c.bucket === t).length;
+  return `${CANDS.length} candidates across three buckets — <b>${b('Explorer')} Explorer, ${b('Builder')} Builder, ${b('Trailblazer')} Trailblazer</b>. A level is the reviewer's call off the agent's interview, and you can override any of them.`;
+};
+PAGESUM['candidates/levelling'] = () => {
+  const p = LEVELQ.filter(l => l.rec === 'Promote').length;
+  return `<b>${LEVELQ.length} level reviews</b> are waiting on a decision — ${p} recommended for promotion. The agent recommends off the interview; the reviewer decides to promote or hold.`;
+};
+
+function candidatesAll(){
+  const bf = getFilter('bucket', 'all');
+  const rows = CANDS.filter(c => bf === 'all' ? true : c.bucket === bf);
+  return `
+  <section class="sec">
+    ${aiHead('Candidate directory', 'Everyone taking the course. A row opens the record, its consent and its interviews.')}
+    <div class="mt4">${searchField('Search candidates')}</div>
+    <div class="mt4">${filterTabs('bucket', 'all', [
+      ['all', 'All', CANDS.length],
+      ['Explorer', 'Explorer', CANDS.filter(c => c.bucket === 'Explorer').length],
+      ['Builder', 'Builder', CANDS.filter(c => c.bucket === 'Builder').length],
+      ['Trailblazer', 'Trailblazer', CANDS.filter(c => c.bucket === 'Trailblazer').length]
+    ])}</div>
+    ${table(
+      [{label:'Candidate'}, {label:'Level'}, {label:'Cohort'}, {label:'Agent'}, {label:'Status'}, {label:'Last active'}],
+      rows.map(c => ({go:'candidates/detail/' + c.id, cells:[
+        esc(c.name),
+        `${esc(c.level)} · ${esc(c.bucket)}`,
+        esc(c.cohort),
+        esc(c.agent),
+        tag(c.status),
+        esc(c.last)
+      ]})))}
+  </section>`;
+}
+
+function candidatesDetail(){
+  const c = CAND_BY_ID[S.id] || CANDS[0];
+  DETAIL_LABEL = c.name;
+  const ivs = BOOKINGS.filter(b => b.cand === c.name);
+  const sum = `<b>${esc(c.name)}</b> is ${esc(c.level)} in the ${esc(c.bucket)} bucket, assessed by ${c.agent === '—' ? 'no agent yet' : esc(c.agent)}. As Super Admin your level call wins over the AI and the reviewer, and the change is logged.`;
+  return `
+  ${detailHead('candidates/candidates', sum)}
+  <section class="sec">
+    ${aiHead(esc(c.name), esc(c.level) + ' · ' + esc(c.bucket),
+      `<button class="btn btn-p btn-sm noic" data-act="askoverride:${c.id}">Override Level ${I.arrowRight}</button>`)}
+    <div class="mt4">${kv([
+      ['Level', esc(c.level)],
+      ['Bucket', esc(c.bucket)],
+      ['Cohort', esc(c.cohort)],
+      ['Assessing agent', esc(c.agent)],
+      ['Status', tag(c.status)],
+      ['Last active', esc(c.last)]
+    ])}</div>
+  </section>
+
+  <section class="sec">
+    ${secHead('Consent')}
+    <div>
+      <div class="kv"><span class="k">Interview recording</span><span class="v">${yn(c.consent.video)}</span></div>
+      <div class="kv"><span class="k">AI assessment</span><span class="v">${yn(c.consent.ai)}</span></div>
+      <div class="kv"><span class="k">SCENES shared with employers</span><span class="v">${yn(c.consent.scenes)}</span></div>
+      <div class="kv"><span class="k">Visible in the employer database</span><span class="v">${yn(c.consent.vis)}</span></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    ${secHead('Interviews')}
+    ${ivs.length ? `<div class="tbl-wrap"><table class="tbl">
+      <tr><th>Agent</th><th>Kind</th><th class="num">Fee</th><th>When</th><th>Status</th></tr>
+      ${ivs.map(b => `<tr><td>${esc(b.agent)}</td><td>${esc(b.kind)}</td><td class="num">${b.fee ? money(b.fee) : '—'}</td><td>${esc(b.slot)}</td><td>${tag(b.status)}</td></tr>`).join('')}
+    </table></div>` : emptyState('video', 'No interviews booked', 'This candidate has not booked a marketplace interview yet.')}
+  </section>`;
+}
+
+function candidatesLevelling(){
+  return `
+  <section class="sec">
+    ${aiHead('Levelling & reviews', 'The reviewer queue. Each carries the agent’s recommendation off the interview.')}
+    <div class="tile-stack mt5">
+      ${LEVELQ.length ? LEVELQ.map(l => {
+        const promote = l.rec === 'Promote';
+        return `<div class="cardrow">
+          <span class="cardrow-ic">${ic('route')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(l.name)}
+            <span class="tag sm ${promote ? 'green' : ''}">${esc(l.from)} → ${esc(l.to)}</span></span>
+            <span class="cardrow-d">${esc(l.rec)} · recommended by ${esc(l.agent)} · ${esc(l.when)}</span></span>
+          <span class="cardrow-a"><button class="btn btn-p btn-sm noic" data-act="asklevel:${l.id}">${promote ? 'Promote' : 'Confirm'} ${I.arrowRight}</button></span>
+        </div>`;
+      }).join('') : emptyState('check', 'The review queue is clear', 'No level decisions are waiting.')}
+    </div>
+  </section>`;
+}
+
+V.candidates = () => modView({candidates:candidatesAll, detail:candidatesDetail, levelling:candidatesLevelling});
+
+SHEETS.override = () => {
+  const c = CAND_BY_ID[S.id];
+  const levels = ['E1','E2','E3','B1','B2','B3','T1','T2','T3'];
+  return {title:`Override level — ${c ? c.name : ''}`,
+    body:`<label class="f"><span class="lbl">New level</span>
+        <select class="inp">${levels.map(v => `<option${c && c.level === v ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+      <label class="f"><span class="lbl">Reason</span>
+        <textarea class="inp" placeholder="Required — written to the audit log alongside the change"></textarea></label>
+      <p class="t-desc">Your call wins over the AI score and the reviewer. The change and its reason are logged.</p>`,
+    ok:'Apply Override', act:'dooverride:' + (c ? c.id : '')};
+};
+ACTIONS['askoverride'] = key => { S.id = key.split(':')[1]; S.sheet = 'override'; };
+ACTIONS['dooverride'] = key => { const c = CAND_BY_ID[key.split(':')[1]]; if(c) toast(c.name + '’s level override applied and logged'); };
+ACTIONS['asklevel'] = key => {
+  const l = LR_LEVEL(key.split(':')[1]); if(!l) return;
+  const promote = l.rec === 'Promote';
+  askConfirm({mk:'check', title: promote ? `Promote ${l.name} to ${l.to}?` : `Hold ${l.name} at ${l.from}?`,
+    body: promote
+      ? `The reviewer's decision is applied and ${l.name} moves from ${l.from} to ${l.to}. Written to the audit log.`
+      : `${l.name} stays at ${l.from}. The agent's recommendation is recorded and the review is closed.`,
+    ok: promote ? 'Approve & Promote' : 'Confirm Hold', act:'dolevel:' + l.id});
+};
+ACTIONS['dolevel'] = key => {
+  const id = key.split(':')[1]; const i = LEVELQ.findIndex(l => l.id === id);
+  if(i >= 0){ const l = LEVELQ[i]; LEVELQ.splice(i, 1); toast(l.rec === 'Promote' ? `${l.name} promoted to ${l.to}` : `${l.name} held at ${l.from}`); }
+  S.confirm = null;
+};
+const LR_LEVEL = id => LEVELQ.find(l => l.id === id);
 
 /* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
