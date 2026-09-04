@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=fd33ac50">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=c85d3807">
 
 <style>
 /* ==========================================================================
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=fd33ac50"></script>
+<script src="design-system/talentnext-ds.js?b=c85d3807"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1647,6 +1647,258 @@ function agentsDetail(){
 }
 
 V.agents = () => modView({agents:agentsAll, detail:agentsDetail});
+
+/* ======================================================================
+   COHORT MANAGEMENT
+   ====================================================================== */
+PAGESUM['cohorts/cohorts'] = () => {
+  const active = COHORTS.filter(c => c.status === 'active').length;
+  const unled = COHORTS.filter(c => c.leader === 'Unassigned').length;
+  return `${active} cohorts are running across the Explorer and Builder tracks${unled ? `, and <b>${unled} has no leader yet</b>` : ''}. Every cohort caps at 10 members and runs the 90-day loop.`;
+};
+PAGESUM['cohorts/assign'] = () => {
+  const rec = LEADER_REQS.filter(r => r.stage === 'feedback').length;
+  return `${LEADER_REQS.length} candidates applied to lead, <b>${rec} recommended and ready to allot</b>. A Builder leads Explorer cohorts and a Trailblazer leads Builder — but nobody leads the very first ones.`;
+};
+PAGESUM['cohorts/templates'] = () => `Six reusable blueprints — a course plus a session outline, tagged by level. A template already <b>in use by a cohort can't be deleted</b>; the rest can.`;
+PAGESUM['cohorts/catalogue'] = () => {
+  const live = COURSES.filter(c => c.status === 'live').length;
+  return `${live} of ${COURSES.length} courses are live, from ${money(Math.min(...COURSES.map(c => c.price)))} to ${money(Math.max(...COURSES.map(c => c.price)))}. <b>Explorer 1 is the $100 entry course</b>; more can be imported from the library.`;
+};
+PAGESUM['cohorts/levels'] = () => `Three buckets — Explorer, Builder, Trailblazer — each with three levels. A candidate climbs by re-interviewing, and <b>the bucket decides which cohorts they can lead</b>.`;
+
+function cohortsList(){
+  const sf = getFilter('cstatus', 'all');
+  const rows = COHORTS.filter(c => sf === 'all' ? true : c.status === sf);
+  return `
+  <section class="sec">
+    ${aiHead('Cohorts', 'Every running and draft cohort. A row opens the roster, the leader and the sessions.',
+      '<button class="btn btn-p btn-sm noic" data-sheet="newcohort">' + I.add + ' New Cohort</button>')}
+    <div class="mt4">${filterTabs('cstatus', 'all', [
+      ['all', 'All', COHORTS.length],
+      ['active', 'Active', COHORTS.filter(c => c.status === 'active').length],
+      ['draft', 'Draft', COHORTS.filter(c => c.status === 'draft').length]
+    ])}</div>
+    ${table(
+      [{label:'Cohort'}, {label:'Track'}, {label:'Leader'}, {label:'Progress'}, {label:'Members', num:true}, {label:'Status'}],
+      rows.map(c => ({go:'cohorts/detail/' + c.id, cells:[
+        esc(c.name),
+        `${esc(c.track)} · ${esc(c.level)}`,
+        c.leader === 'Unassigned' ? '<span class="tag sm warn">Unassigned</span>' : esc(c.leader),
+        c.status === 'draft' ? 'Not started' : `Week ${c.week} · day ${c.day}`,
+        `${c.size} / 10`,
+        tag(c.status)
+      ]})))}
+  </section>`;
+}
+
+const LEADER_STAGE_LABEL = {feedback:'Recommended', scheduled:'Interview booked', applied:'Awaiting interview'};
+function cohortsAssign(){
+  const sf = getFilter('lstage', 'feedback');
+  const rows = LEADER_REQS.filter(r => r.stage === sf);
+  return `
+  <section class="sec">
+    ${aiHead('Cohort leaders', 'Candidates applying to lead. Recommended ones are ready to allot to a cohort.')}
+    ${note('warn', 'The bootstrap paradox', 'Builders lead Explorer cohorts, but nobody becomes a Builder without finishing an Explorer cohort — so there is no one to lead the very first ones.')}
+    <div class="mt4">${filterTabs('lstage', 'feedback', [
+      ['feedback', 'Recommended', LEADER_REQS.filter(r => r.stage === 'feedback').length],
+      ['scheduled', 'Interview booked', LEADER_REQS.filter(r => r.stage === 'scheduled').length],
+      ['applied', 'Awaiting interview', LEADER_REQS.filter(r => r.stage === 'applied').length]
+    ])}</div>
+    <div class="tile-stack mt5">
+      ${rows.map(r => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('cohorts')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(r.name)}
+            <span class="tag sm bordered">${esc(r.level)} · ${esc(r.bucket)}</span>
+            ${r.led ? `<span class="tag sm">${r.led} led</span>` : ''}</span>
+            <span class="cardrow-d">Wants to lead ${esc(r.track)} · ${esc(r.pitch)}${
+              r.stage === 'feedback' && r.feedback ? ` — <b>${esc(r.feedback.agent)}:</b> ${esc(r.feedback.note)}`
+              : r.stage === 'scheduled' && r.interview ? ` — vetting call ${esc(r.interview.date)} with ${esc(r.interview.agent)}`
+              : ''}</span></span>
+          <span class="cardrow-a">${r.stage === 'feedback'
+            ? `<button class="btn btn-p btn-sm noic" data-act="askallot:${r.id}">Allot ${I.arrowRight}</button>`
+            : tag(r.stage === 'scheduled' ? 'scheduled' : 'applied', LEADER_STAGE_LABEL[r.stage])}</span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function cohortsTemplates(){
+  return `
+  <section class="sec">
+    ${aiHead('Cohort templates', 'A blueprint is a course plus a session outline. Starting a cohort stamps the clock onto it.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Build a template from a course and a session outline">' + I.add + ' New Template</button>')}
+    <div class="tile-stack">
+      ${CO_TEMPLATES.map(t => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('book')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(t.name)}
+            <span class="tag sm bordered">${esc(t.level)}</span> ${tag(t.status)}</span>
+            <span class="cardrow-d">${esc((COURSE_BY_ID[t.courseId] || {}).name || t.track)} · ${t.sessions.length} sessions · ${t.used ? `used by ${t.used} cohort${t.used === 1 ? '' : 's'}` : 'not yet used'}</span></span>
+          <span class="cardrow-a">${t.used > 0
+            ? '<span class="tag sm">In use</span>'
+            : `<button class="btn btn-g btn-sm" data-act="askdeltpl:${t.id}">${I.delete} Delete</button>`}</span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function cohortsDetail(){
+  const c = COHORT_BY_ID[S.id] || COHORTS[0];
+  DETAIL_LABEL = c.name;
+  const tpl = TPL_BY_ID[c.templateId];
+  const roster = CANDS.filter(x => x.cohort === c.name);
+  const draft = c.status === 'draft';
+  const full = roster.length >= 10;
+  const sum = `<b>${esc(c.name)}</b> is a ${esc(c.track)} cohort at ${esc(c.level)}, led by ${c.leader === 'Unassigned' ? 'nobody yet' : esc(c.leader.replace(/\s*\(.*\)/, ''))}. ${draft ? 'It has not started — starting it begins the 90-day cycle.' : `Week ${c.week} of 13, ${roster.length} of 10 members.`}`;
+  return `
+  ${detailHead('cohorts/cohorts', sum)}
+  <section class="sec">
+    ${aiHead(esc(c.name), esc(c.track) + ' · ' + esc(c.level),
+      draft
+        ? `<button class="btn btn-p btn-sm noic" data-act="askstart:${c.id}">Start Cohort ${I.arrowRight}</button>`
+        : `<span class="tag sm green">Active · week ${c.week}</span>`)}
+    <div class="mt4">${kv([
+      ['Track', esc(c.track)],
+      ['Entry level', esc(c.level)],
+      ['Leader', c.leader === 'Unassigned' ? '<span class="tag sm warn">Unassigned</span>' : esc(c.leader)],
+      ['Template', tpl ? esc(tpl.name) : 'None'],
+      ['Cycle start', esc(c.start)],
+      ['Progress', draft ? 'Not started' : `Week ${c.week} · day ${c.day} of 90`],
+      ['Members', `${roster.length} / 10`]
+    ])}</div>
+  </section>
+
+  <section class="sec">
+    ${aiHead('Roster', full ? 'Cohort full · 10 / 10.' : `${roster.length} of 10 members.`)}
+    ${roster.length ? `<div class="tile-stack">
+      ${roster.map(m => memRow(m.name, `${esc(m.level)} · ${esc(m.bucket)} · last active ${esc(m.last)}`,
+        `<button class="btn btn-g btn-sm" data-act="askremove:${c.id}:${m.id}">${I.delete} Remove</button>`)).join('')}
+    </div>` : emptyState('users', 'No members yet', draft ? 'Members are added once the cohort starts.' : 'This cohort has no candidates on its roster.')}
+  </section>
+
+  ${tpl ? `
+  <section class="sec">
+    ${secHead('Sessions')}
+    <div class="tbl-wrap"><table class="tbl">
+      <tr><th>Session</th><th class="num">Week</th><th class="num">Length</th><th>Mode</th></tr>
+      ${tpl.sessions.map(s => `<tr><td>${esc(s.title)}</td><td class="num">${s.week}</td><td class="num">${s.dur} min</td><td>${esc(s.mode)}</td></tr>`).join('')}
+    </table></div>
+  </section>` : ''}`;
+}
+
+function cohortsCatalogue(){
+  return `
+  <section class="sec">
+    ${aiHead('Course catalogue', 'The courses a cohort can run. A course sets its own price and runs 90 days.',
+      '<button class="btn btn-g btn-sm noic" data-sheet="importcourse">' + I.download + ' Import From Library</button>')}
+    ${table(
+      [{label:'Course'}, {label:'Track'}, {label:'Price', num:true}, {label:'Length'}, {label:'Status'}],
+      COURSES.map(c => ({go:'cohorts/coursedetail/' + c.id, cells:[
+        esc(c.name), esc(c.track), money(c.price), c.days + ' days', tag(c.status)
+      ]})))}
+  </section>`;
+}
+
+function cohortsCourseDetail(){
+  const c = COURSE_BY_ID[S.id] || COURSES[0];
+  DETAIL_LABEL = c.name;
+  const cohortsUsing = COHORTS.filter(x => (TPL_BY_ID[x.templateId] || {}).courseId === c.id);
+  const sum = `<b>${esc(c.name)}</b> is a ${esc(c.track)} course at ${money(c.price)}, over ${c.days} days. It is ${c.status === 'live' ? 'live and bookable' : 'a draft, not yet on sale'}.`;
+  return `
+  ${detailHead('cohorts/catalogue', sum)}
+  <section class="sec">
+    ${aiHead(esc(c.name), esc(c.track) + ' track', tag(c.status))}
+    <div class="mt4">${kv([
+      ['Track', esc(c.track)],
+      ['Price', money(c.price), 'n'],
+      ['Length', c.days + ' days'],
+      ['Status', tag(c.status)],
+      ['Cohorts running it', String(cohortsUsing.length)]
+    ])}</div>
+  </section>`;
+}
+
+function cohortsLevels(){
+  const BUCKETS = [
+    {name:'Explorer', pfx:'E', desc:'The entry bucket. Everyone starts here and levels up by re-interviewing.', can:'Can lead nothing yet.'},
+    {name:'Builder', pfx:'B', desc:'Reached by finishing an Explorer cohort and levelling through the interviews.', can:'A Builder can lead an Explorer cohort.'},
+    {name:'Trailblazer', pfx:'T', desc:'The top bucket. Deep experience across the loop.', can:'A Trailblazer can lead a Builder cohort.'}
+  ];
+  const countAt = lvl => CANDS.filter(c => c.level === lvl).length;
+  return `
+  <section class="sec">
+    ${aiHead('Levels & buckets', 'The levelling system every candidate moves through, and what each bucket may lead.')}
+    ${BUCKETS.map(b => `
+      <div class="mt5">
+        ${aiHead(b.name, b.desc + ' ' + b.can)}
+        ${kv([1, 2, 3].map(n => [`${b.name} ${b.pfx}${n}`, `${countAt(b.pfx + n)} candidates`, 'n']))}
+      </div>`).join('')}
+  </section>`;
+}
+
+V.cohorts = () => modView({cohorts:cohortsList, assign:cohortsAssign, templates:cohortsTemplates,
+  detail:cohortsDetail, catalogue:cohortsCatalogue, coursedetail:cohortsCourseDetail, levels:cohortsLevels});
+
+/* cohort sheets */
+SHEETS.newcohort = {
+  title:'New cohort',
+  body:`<label class="f"><span class="lbl">Cohort name</span><input class="inp" placeholder="e.g. Explorer 16" autocomplete="off"></label>
+    <label class="f"><span class="lbl">Template</span>
+      <select class="inp">${CO_TEMPLATES.filter(t => t.status === 'published').map(t => `<option>${esc(t.name)} · ${esc(t.level)}</option>`).join('')}</select></label>
+    <label class="f"><span class="lbl">Cycle start</span><input class="inp" type="date"></label>
+    <p class="t-desc">The cohort is created as a draft. It caps at 10 members and begins the 90-day loop when you start it.</p>`,
+  ok:'Create Draft', act:'toast:Cohort draft created'
+};
+SHEETS.importcourse = {
+  title:'Import from the library',
+  body:`<label class="f"><span class="lbl">Course</span>
+      <select class="inp">${COURSE_LIB.map(c => `<option>${esc(c.name)} · ${money(c.price)}</option>`).join('')}</select></label>
+    <p class="t-desc">The library course is copied into the catalogue as a draft. Set its price and publish it before a cohort can run it.</p>`,
+  ok:'Import Course', act:'toast:Course imported as a draft'
+};
+SHEETS.allot = () => {
+  const r = LR_BY_ID[S.id];
+  const open = COHORTS.filter(c => c.leader === 'Unassigned' || c.status === 'draft');
+  return {title:`Allot ${r ? r.name : 'this leader'}`,
+    body:`<label class="f"><span class="lbl">Cohort</span>
+        <select class="inp">${open.length ? open.map(c => `<option>${esc(c.name)} · ${esc(c.track)} ${esc(c.level)}</option>`).join('') : '<option>No cohort is waiting for a leader</option>'}</select></label>
+      <p class="t-desc">${r ? esc(r.name) : 'This leader'} is a ${r ? esc(r.bucket) : ''} and can lead a ${r ? esc(r.track) : ''} cohort. The assignment is written to the audit log.</p>`,
+    ok:'Allot As Leader', act:'toast:Leader allotted to the cohort'};
+};
+ACTIONS['askallot'] = key => { S.id = key.split(':')[1]; S.sheet = 'allot'; };
+ACTIONS['askstart'] = key => {
+  const c = COHORT_BY_ID[key.split(':')[1]]; if(!c) return;
+  askConfirm({mk:'check', title:`Start ${c.name}?`,
+    body:`This begins the 90-day cycle and moves ${c.name} from draft to active. Leader: ${c.leader === 'Unassigned' ? 'unassigned' : c.leader.replace(/\s*\(.*\)/, '')} · start ${c.start}.`,
+    ok:'Start Cohort', act:'dostart:' + c.id});
+};
+ACTIONS['dostart'] = key => { const c = COHORT_BY_ID[key.split(':')[1]]; if(c){ c.status = 'active'; c.week = Math.max(1, c.week); toast(c.name + ' started'); } S.confirm = null; };
+ACTIONS['askremove'] = key => {
+  const [, cid, mid] = key.split(':'); const c = COHORT_BY_ID[cid]; const m = CAND_BY_ID[mid];
+  if(!c || !m) return;
+  askConfirm({mk:'warning', title:`Remove ${m.name} from ${c.name}?`,
+    body:'They are returned to no cohort. This can’t be undone from here.',
+    ok:'Remove', danger:true, act:'doremove:' + cid + ':' + mid});
+};
+ACTIONS['doremove'] = key => {
+  const [, , mid] = key.split(':'); const m = CAND_BY_ID[mid];
+  if(m){ m.cohort = '—'; syncCohortSizes(); toast(m.name + ' removed from the cohort'); }
+  S.confirm = null;
+};
+ACTIONS['askdeltpl'] = key => {
+  const t = TPL_BY_ID[key.split(':')[1]]; if(!t) return;
+  if(t.used > 0){ toast(`In use by ${t.used} cohort${t.used === 1 ? '' : 's'} — cannot delete`); return; }
+  askConfirm({mk:'warning', title:`Delete template "${t.name}"?`,
+    body:`This can’t be undone. Its ${t.sessions.length}-session outline is removed.`,
+    ok:'Delete Template', danger:true, act:'dodeltpl:' + t.id});
+};
+ACTIONS['dodeltpl'] = key => {
+  const id = key.split(':')[1]; const i = CO_TEMPLATES.findIndex(t => t.id === id);
+  if(i >= 0){ const nm = CO_TEMPLATES[i].name; CO_TEMPLATES.splice(i, 1); toast(nm + ' deleted'); }
+  S.confirm = null;
+};
 
 /* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
