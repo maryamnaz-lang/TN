@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Super Admin — TalentNext</title>
+<link rel="stylesheet" href="talentnext-ds.css?b=27f2ce4c">
+<style>
+/* ==========================================================================
+   THE SUPER ADMIN PORTAL, DRAWN ENTIRELY BY THE DESIGN SYSTEM
+
+   WHAT THIS PAGE IS AND WHY IT EXISTS. `proof.html` PASTES the candidate
+   portal's real DOM to prove the stylesheet carries the look. This one CALLS
+   the `ds*` builders — so if a component's markup changes upstream this page
+   changes with it, and if a builder breaks this page breaks. That is the only
+   kind of proof worth keeping.
+
+   It began as a component checklist with the call that drew each block printed
+   above it, and Maryam's reaction was "what is this?" — fair: code captions in
+   monospace make a page read as a debug screen rather than as a product. It is
+   now the FRAME as well, because the chrome is what makes a portal legible as
+   a portal (Maryam, 4 Sep 2026: "go for the portal look, it will help me
+   understand that better").
+
+   THERE IS NO COMPONENT MARKUP IN THIS FILE. Every card, row, table, chip and
+   figure cell is one function call. The shell and the rail ARE hand-written,
+   because they are hand-written in every portal — `tn-agent-portal.html`'s
+   `shell()` and `sidenav()` are the reference this copies, class for class.
+
+   NO TAL BAND, which is Maryam's decision of 4 Sep 2026 for this portal: an
+   admin page opens with a title and the trail, not with a summary card over a
+   reconciliation table. So there is no `.modhead` and no warm wash, and
+   `dsPh`'s heading is the page's own rather than something a pass strips.
+
+   THE HOST IS NOT OPTIONAL. Nothing in this system responds to the browser
+   window — every breakpoint is `@container app (min-width:…)` and resolves
+   against this box. Leave `container-type` off and the desktop layout never
+   arrives, at any width, with nothing warning you.
+   ========================================================================== */
+.host{position:relative;width:100%;height:100dvh;
+  container-type:inline-size;container-name:app;
+  overflow:hidden;background:var(--background)}
+
+/* ==========================================================================
+   THE ONE LOCAL PATCH, AND IT BELONGS IN A NUMBERED LAYER RATHER THAN HERE.
+   It is in this file only because `hifi/build/` is being edited by another
+   session and a layer added now would collide.
+
+   `.stat` STARVES ITS OWN LABEL WHEN THE FIGURE IS WIDE AND THE ROW IS 2-UP.
+   §29's cell is `20px mark | text | figure`, the figure is `white-space:
+   nowrap`, and the text column has no floor — so at a 170px cell (which is
+   what `.stats`' 2-column mobile grid gives at 375) a 66px `$18,400` wins the
+   negotiation and the label column collapses to TWENTY pixels. Measured:
+   "Held in escrow" set one character per line and that cell came out 288px
+   tall against "Total users" at 125.
+
+   IT IS ADMIN-SHAPED DATA THAT EXPOSES IT, which is why the candidate portal
+   has never hit it: its figures are "38%", "3", "5 of 13" — short. Admin is
+   full of currency, and Finance is seven screens of it.
+
+   FEWER COLUMNS IS THE FIX, not a floor on the text column: a floor only
+   moves the squeeze onto the figure, and a currency figure that wraps
+   mid-number is worse than a narrow label.
+
+   AND THE FIRST VERSION OF THIS FIX ONLY COVERED THE PHONE, which is trap 3's
+   lesson arriving from the responsive side: `max-width:599px` fixed 375 and
+   left 768 holding FOUR columns at 182px — the identical starvation, two
+   labels crushed on the dashboard and three on Finance, every cell 197px
+   tall. One width tells you a thing is finished when it is not. So the
+   sizing is stated per tier and each was measured:
+
+       375   1 column    cells 341 wide, all 72 tall, labels 191–247
+       768   2 columns   cells 366 wide, all 72 tall, labels 216–272
+       1280  4 columns   the design system's own, and it has the room
+
+   THE 4px `scrollWidth` DIFFERENCE AT 768 IS NOT THIS AND IS NOT A DEFECT:
+   182.25 × 4 plus the grid's 1px gaps rounds to 772 against a 768 client
+   width, and nothing actually renders past the scroller's edge (checked by
+   walking every descendant's `right`). Sub-pixel, not overflow.
+   ========================================================================== */
+@container app (max-width:1099px){
+  .app .stats{grid-template-columns:1fr 1fr}
+}
+@container app (max-width:599px){
+  .app .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="host" id="host"><div id="app"></div></div>
+
+<script src="talentnext-ds.js?b=27f2ce4c"></script>
+<script>
+/* ==========================================================================
+   THE CONTENT IS ADMIN'S OWN, lifted from `tn-admin.html`'s records — the
+   twelve modules, the three flagged Cohort 41 candidates, the role list, the
+   payout figures. Real rows are what make this a preview instead of a swatch:
+   a component that only looks right against "Lorem ipsum" has not been tested.
+
+   THE ICON NAMES ARE ALL CHECKED AGAINST THE SHIPPED SET. Trap 7's failure is
+   silent — `I.<unknown>` returns an EMPTY `<svg>`, so the row draws a blank
+   where its mark should be and nothing throws. The first draft of this page
+   used `I.money`, which does not exist (it is `I.wallet`), and three module
+   rows keyed on 'money' / 'shield' / 'cohorts', none of which are `GC_IC`
+   keys. Both were found by counting `svg:empty` on the rendered page, which is
+   the check worth keeping rather than the assumption worth trusting.
+   ========================================================================== */
+
+/* THE TWELVE MODULES. `tn-admin.html`'s real nav is grouped and collapsible
+   because twelve is a lot of rail; the design system's rail is flat, so a
+   group's SUB-pages become the tab strip inside the module instead — the same
+   information one level down, and what `.cs` is for. Settings sits in the foot
+   beside Log out, as it does in every portal here. */
+const MODULES = [
+  ['home',       'Dashboard',            'dashboard'],
+  ['users',      'Users & Roles',        'group'],
+  ['vetting',    'Vetting & Approvals',  'shield'],
+  ['candidates', 'Candidates',           'user'],
+  ['agents',     'Talent Agents',        'star'],
+  ['cohorts',    'Cohort Management',    'book'],
+  ['market',     'Marketplace',          'video'],
+  ['employers',  'Employers & Hiring',   'location'],
+  ['finance',    'Finance & Settlement', 'wallet'],
+  ['crm',        'CRM & Attribution',    'chart'],
+  ['system',     'System & Audit',       'document']
+];
+
+const SUBS = {
+  users:      [['users', 'All Users'], ['roles', 'Roles & Permissions'], ['import', 'Bulk Import']],
+  finance:    [['overview', 'Overview'], ['payouts', 'Payouts'], ['refunds', 'Refunds & Disputes']],
+  candidates: [['all', 'All Candidates'], ['levelling', 'Levelling & Reviews']]
+};
+
+const FLAGGED = [
+  ['Yuki Tanaka',    'Cohort 41', '9%',  'Inactive 12 days'],
+  ['Chloe Ferreira', 'Cohort 41', '41%', 'Behind pace'],
+  ['James Whitby',   'Cohort 41', '38%', 'Struggling']
+];
+
+const ROLES = [
+  ['Super Admin',   '1',  'Every module, every write'],
+  ['Reviewer',      '4',  'Level decisions and transcripts'],
+  ['Finance',       '2',  'Settlement, payouts, refunds'],
+  ['Cohort Leader', '11', 'Their own cohorts only'],
+  ['Talent Agent',  '38', 'Their own bookings and reports']
+];
+
+const PAYOUTS = [
+  ['Owen Fletcher',  'Held',     '$204', 'Report delivered, releasing Thursday'],
+  ['Priya Nair',     'Held',     '$285', 'Two reports awaiting signature'],
+  ['Samuel Adeyemi', 'Released', '$190', 'Paid 2 September'],
+  ['Lena Fischer',   'Held',     '$95',  'Interview not yet run']
+];
+
+/* ONE STATE OBJECT, and every control is a pure function of it — CLAUDE.md
+   trap 9. The rail, the tab, the notification tray and the account menu all
+   live here rather than as a class somebody toggles, because this page
+   re-renders and a class put on a button by a handler is gone by the next
+   paint. */
+/* `rail` IS READ OFF THE FRAME AT BOOT, AND NEITHER FIXED VALUE WAS RIGHT.
+   The same flag means two different things either side of 900: above it the
+   rail is a column that is either 280px with labels or 72px of icons, below
+   it the identical markup is a drawer over a scrim.
+
+     rail:true  — labels at desktop, which is what an eleven-module portal
+                  needs, AND a phone that opens onto a full-screen list of
+                  eleven modules instead of onto the page.
+     rail:false — a phone that opens on the page, AND a desktop rail collapsed
+                  to icons, so the module names are gone from the one portal
+                  whose names are the hardest to guess from a glyph.
+
+   Both were built and looked at. So it is derived instead: expanded when the
+   frame has room for it. `clientWidth` on the HOST, not `innerWidth` — the
+   breakpoints are container queries and resolve against that box, and
+   `innerWidth` reports 0 whenever the preview pane is hidden, which is the
+   documented reading that looks exactly like a broken layout. */
+const S = {mod: 'home', sub: '', notif: false, acct: false};
+S.rail = (document.getElementById('host').clientWidth || 1280) >= 900;
+
+const modOf  = k => MODULES.find(m => m[0] === k);
+const subsOf = k => SUBS[k] || null;
+
+/* ==========================================================================
+   THE FRAME — hand-written, as every portal writes it. These classes are
+   `tn-agent-portal.html`'s `shell()` and `sidenav()` class for class; the
+   design system styles them and ships the wordmark and the icons.
+   ========================================================================== */
+function shell(){
+  return `
+  <header class="shell">
+    <button class="shell-act nav-t ${S.rail ? 'on' : ''}" data-toggle="rail"
+      aria-label="${S.rail ? 'Collapse' : 'Expand'} navigation">${S.rail ? I.close
+      : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
+
+    ${''/* A BUTTON, NOT AN ANCHOR — an anchor with no href picks up the prose
+           link styling below 900px, and going home is an action rather than a
+           document reference. `LOGO_K` is the real lockup the design system
+           embeds, so no CSS is needed to size a wordmark. */}
+    <button class="shell-logo" data-mod="home" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+
+    <nav class="crumb-bar" aria-label="Breadcrumb"><ol class="crumb-trail">${trail()}</ol></nav>
+
+    <div class="shell-right">
+      <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
+        aria-label="Notifications" aria-expanded="${S.notif}" title="Notifications">
+        ${I.notification}<span class="shell-badge">3</span></button>
+      <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
+        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
+        <span class="shell-avatar"><i>DH</i></span>
+        <svg class="acct-c" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg>
+      </button>
+      ${acctMenu()}
+    </div>
+  </header>`;
+}
+
+/* THE TRAIL IS THE PATH YOU TOOK, not the place you sit — §78's decision. On
+   this page that is the module, then the sub-page, with the tail plain. */
+function trail(){
+  const m = modOf(S.mod);
+  if(!m) return '';
+  const subs = subsOf(S.mod);
+  const cur = subs && subs.find(([k]) => k === S.sub);
+  if(!cur) return `<li class="crumb"><span class="last">${m[1]}</span></li>`;
+  return `<li class="crumb"><a data-mod="${m[0]}">${m[1]}</a><span class="sep">${I.chevRight}</span></li>`
+       + `<li class="crumb"><span class="last">${cur[1]}</span></li>`;
+}
+
+function acctMenu(){
+  return `<div class="acct-menu ${S.acct ? 'on' : ''}" role="menu" aria-label="Account">
+    <button class="acct-i" role="menuitem"><span class="acct-i-mk">${I.settings}</span>
+      <span class="acct-i-t">Profile Settings</span></button>
+    <button class="acct-i" role="menuitem"><span class="acct-i-mk">${I.shield}</span>
+      <span class="acct-i-t">Login &amp; Security</span></button>
+  </div>`;
+}
+
+function sidenav(){
+  const items = MODULES.map(([k, l, ic]) =>
+    `<button class="sn-item ${k === S.mod ? 'on' : ''}" title="${l}" data-mod="${k}"${
+      k === S.mod ? ' aria-current="page"' : ''}>${I[ic]}<span>${l}</span></button>`).join('');
+  return `
+  <div class="scrim ${S.rail ? 'on' : ''}" data-close="rail"></div>
+  <nav class="sidenav ${S.rail ? 'on' : ''}" aria-label="Portal">
+    <div class="sn-main">${items}</div>
+    <div class="sn-foot">
+      <button class="sn-item ${S.mod === 'settings' ? 'on' : ''}" title="Settings" data-mod="settings">${I.settings}<span>Settings</span></button>
+      <button class="sn-item" title="Log out">${I.logout}<span>Log out</span></button>
+    </div>
+  </nav>`;
+}
+
+/* ==========================================================================
+   THE PAGES. Each is a list of `ds*` calls and nothing else.
+   ========================================================================== */
+const sec = (inner, cls) => `<section class="sec${cls ? ' ' + cls : ''}">${inner}</section>`;
+
+function tabStrip(){
+  const subs = subsOf(S.mod);
+  return subs ? dsTabs(subs, S.sub, 'data-sub', modOf(S.mod)[1] + ' sections') : '';
+}
+
+const PAGE = {
+
+  home: () => [
+    dsPh('Dashboard', '1,284 people &middot; 4 cohorts running &middot; 12 payouts pending'),
+    sec(`<div class="stats">
+      ${dsStatCell(I.group,   'Total users', '1,284', 'across every role')}
+      ${dsStatCell(I.shield,  'Awaiting verification', '6', 'vetting queue')}
+      ${dsStatCell(I.wallet,  'Held in escrow', '$18,400', '12 payouts pending')}
+      ${dsStatCell(I.warning, 'Flagged candidates', '3', '1 severe, 2 moderate')}
+    </div>`),
+    sec(dsAiHead({
+      title: 'Needs attention',
+      desc: 'Three candidates are flagged from course activity, not by a leader.',
+      act: '<button class="btn btn-t btn-sm noic" data-mod="candidates">Open the queue</button>'
+    }) + dsTable(['Candidate', 'Cohort', {t: 'Progress', num: true}, 'Flag'],
+      FLAGGED.map(([n, c, p, f]) => [n, c, p, dsTag(f, 'warn')]))),
+    sec(`<div class="tile-stack">
+      ${dsGcard('cohort',      '4 cohorts',  'Cohort Management', 'Leaders, templates and the course catalogue', '', null, 'data-mod="cohorts"')}
+      ${dsGcard('points',      '12 pending', 'Finance & Settlement', 'Transactions, payouts, invoices and refunds', '', null, 'data-mod="finance"')}
+      ${dsGcard('certificate', '3 waiting',  'Vetting & Approvals', 'Agent applications and employer verification', '', null, 'data-mod="vetting"')}
+    </div>`),
+    sec(dsNote('Agent compensation is still unreconciled &mdash; a $100/mo listing fee '
+      + 'against a percentage payout share. Two flows depend on the answer.',
+      'warn', 'Open decision'))
+  ].join(''),
+
+  users: () => {
+    const head = dsPh('Users & Roles', '33 people &middot; 9 roles &middot; 4 awaiting verification') + tabStrip();
+    if(S.sub === 'roles') return head + [
+      sec(`<h2 class="sec-h"><span>This account</span></h2>` +
+        dsKv([['Display name', 'Derek Hale'],
+              ['Role', 'Super Admin'],
+              ['Access level', 'Every module, every write'],
+              ['Last sign-in', 'Today, 06:12']], 'tile')),
+      sec(dsAiHead({
+        title: 'Roles &amp; Permissions',
+        desc: 'One person can hold several stacked roles. The walls are deliberate.',
+        act: '<button class="btn btn-t btn-sm noic">Edit the matrix</button>'
+      }) + dsTable(['Role', {t: 'People', num: true}, 'What it can reach'],
+        /* `green`, NOT `brand` — measured, `.tag.brand` is #111 ink on a #000
+           ground, about 1.1:1. See the gaps note at the foot of this file. */
+        ROLES.map(([r, n, w]) => [dsTag(r, r === 'Super Admin' ? 'green' : 'bordered'), n, w])))
+    ].join('');
+    if(S.sub === 'import') return head + [
+      sec(dsAiHead({title: 'Bulk Import',
+        desc: 'Every row is validated before anything is written.'})
+        + dsTable(['Row', 'Name', 'Email', 'Roles', 'Status'], [])),
+      sec(dsNote('No import is in progress. Upload a CSV to begin.', 'succ'))
+    ].join('');
+    return head + [
+      sec(`<h2 class="sec-h"><span>Account owner</span></h2>` +
+        dsCrow({
+          who: {n: 'Derek Hale', i: 'DH'},
+          role: 'Super Admin &middot; derek@talentnext.io',
+          x: 'Full access across every module',
+          xl: '', v: false,
+          when: 'Today, 6:30 PM', mins: 45, label: 'Session',
+          second: {t: 'Open account', at: 'data-mod="settings"'}
+        }, {when: false, join: false})),
+      sec(dsAiHead({
+        title: 'Everyone in the system',
+        desc: 'One person can hold several stacked roles &mdash; the count is people, not seats.',
+        act: '<button class="btn btn-t btn-sm noic">Add to the platform</button>'
+      }) + dsTable(['Name', 'Roles', 'Cohort', 'Status'], [
+        ['Maryam Naz',         'Candidate',                   'Cohort 41', dsTag('Active', 'green')],
+        ['Priya Nair',         'Talent Agent, Cohort Leader', 'Leads 41',  dsTag('Active', 'green')],
+        ['Owen Fletcher',      'Talent Agent',                '&mdash;',   dsTag('Active', 'green')],
+        ['Derek Hale',         'Super Admin',                 '&mdash;',   dsTag('Active', 'green')],
+        ['Signal Home Office', 'Employer',                    '&mdash;',   dsTag('Unverified', 'warn')]
+      ]))
+    ].join('');
+  },
+
+  finance: () => dsPh('Finance & Settlement',
+      '$18,400 in escrow &middot; 12 payouts pending &middot; 3 refunds open') + tabStrip() + [
+    sec(`<div class="stats">
+      ${dsStatCell(I.wallet,     'Held in escrow', '$18,400', '12 payouts pending')}
+      ${dsStatCell(I.receipt,    'Released this cycle', '$9,240', 'across 31 payouts')}
+      ${dsStatCell(I.warningAlt, 'Refunds open', '3', '2 requested, 1 processing')}
+      ${dsStatCell(I.chart,      'Attributed revenue', '$41,900', 'this quarter')}
+    </div>`),
+    sec(dsAiHead({
+      title: 'In-progress payments &amp; payouts',
+      desc: 'An interview that has not run is already paid for &mdash; the candidate pays into escrow at booking.',
+      act: '<button class="btn btn-t btn-sm noic">Reconciliation</button>'
+    }) + dsTable(['Agent', 'Status', {t: 'Net', num: true}, 'Why'],
+      PAYOUTS.map(([n, st, amt, why]) =>
+        [n, dsTag(st, st === 'Released' ? 'green' : 'warn'), amt, why]))),
+    sec(dsNote('Settlement rules are undefined &mdash; 12 payouts are pending release '
+      + 'until the listing-fee question is settled.', 'warn', 'Blocked'))
+  ].join(''),
+
+  candidates: () => dsPh('Candidates',
+      '40 candidates &middot; 4 cohorts &middot; 6 level decisions waiting') + tabStrip() +
+    sec(dsAiHead({
+      title: S.sub === 'levelling' ? 'Levelling &amp; Reviews' : 'All Candidates',
+      desc: S.sub === 'levelling'
+        ? 'A level decision is a Reviewer&rsquo;s to make. Six are waiting.'
+        : 'Everyone who has taken the quiz and holds a bucket.',
+      act: '<button class="btn btn-t btn-sm noic">Export</button>'
+    }) + dsTable(['Candidate', 'Bucket', {t: 'Progress', num: true}, 'Flag'], [
+      ['Maryam Naz',  'Explorer &ndash; E3', '38%', dsTag('On track', 'green')],
+      ...FLAGGED.map(([n, c, p, f]) => [n, 'Explorer &ndash; E3', p, dsTag(f, 'warn')]),
+      ['Tobias Lang', 'Explorer &ndash; E1', '64%', dsTag('On track', 'green')]
+    ]))
+};
+
+/* A module the preview does not draw yet gets an honest placeholder rather
+   than a blank page — §60's rule that a dead control is worse than a missing
+   one, applied to a rail item. */
+function stub(){
+  const m = modOf(S.mod) || ['settings', 'Settings'];
+  return dsPh(m[1]) + sec(dsAiHead({
+    title: m[1],
+    desc: 'This module is in the plan and not in this preview yet.'
+  }) + dsNote('The four modules drawn so far &mdash; Dashboard, Users &amp; Roles, '
+    + 'Finance and Candidates &mdash; are the shape the remaining eight follow.', 'acc'));
+}
+
+function render(){
+  const subs = subsOf(S.mod);
+  if(subs && !subs.some(([k]) => k === S.sub)) S.sub = subs[0][0];
+  const shown = [S.notif && 'notif', S.acct && 'acct'].filter(Boolean).join(' ');
+  document.getElementById('app').innerHTML = `<div class="app"
+      data-rail="${S.rail ? 'open' : 'shut'}" data-view="${S.mod}"${
+      shown ? ` data-shown="${shown}"` : ''}>
+    ${shell()}
+    <div class="shell-body">
+      ${sidenav()}
+      <div class="view-col">
+        <main class="main"><div class="page">${(PAGE[S.mod] || stub)()}</div></main>
+      </div>
+    </div>
+  </div>`;
+  dsStagger(document.querySelector('.page'));
+}
+
+/* ONE ROUTER, and the click-away for the account menu goes FIRST — before the
+   `if(!t) return` guard. `t` here is a `closest()` over an attribute list, so
+   a press on the page background carries no attribute; put the dismissal
+   after the guard and it never runs and the menu stays standing. That is the
+   agent portal's own note about this exact ordering, and the position is the
+   load-bearing part. */
+document.addEventListener('click', e => {
+  const keepAcct  = !!e.target.closest('.acct-t, .acct-menu');
+  const keepNotif = !!e.target.closest('[data-toggle="notif"]');
+  if(!keepAcct)  S.acct = false;
+  if(!keepNotif) S.notif = false;
+
+  const t = e.target.closest('[data-mod],[data-sub],[data-toggle],[data-close]');
+  if(!t){ render(); return; }
+
+  const tog = t.getAttribute('data-toggle');
+  if(tog === 'rail')  S.rail  = !S.rail;
+  if(tog === 'notif') S.notif = !S.notif;
+  if(tog === 'acct')  S.acct  = !S.acct;
+  if(t.getAttribute('data-close') === 'rail') S.rail = false;
+
+  const mod = t.getAttribute('data-mod');
+  if(mod){ S.mod = mod; S.sub = (subsOf(mod) || [['']])[0][0]; S.acct = false; }
+
+  const sub = t.getAttribute('data-sub');
+  if(sub) S.sub = sub;
+
+  render();
+});
+
+render();
+dsFrame(document.getElementById('host'));
+
+/* ==========================================================================
+   FIVE DESIGN-SYSTEM GAPS THIS PAGE FOUND, each needing one rule in a
+   numbered layer in `hifi/build/` so the fix reaches all four portals:
+
+     1. `.tag.red`   renders GREY. §10.293's `.tag:not(.brand):not(.acc)` is
+                     (0,3,0) — `:not()` carries its argument's specificity —
+                     and beats `.tag.red` at (0,2,0). It is documented in
+                     `gallery.html` as a valid variant and has never worked.
+                     `.tag.succ` fails the same way. Working: `green`,
+                     `warn` / `org`, bare / `bordered`.
+     2. `.tag.brand` is #111 ink on a #000 ground, about 1.1:1.
+     3. `.tbl .num`  states `font-variant-numeric` only, with no
+                     `text-align:right`. Admin's Finance module is seven
+                     screens of money.
+     4. a field LABEL has no general rule — only `.auth-card .f > label`,
+                     `.app .conf .conf-f > label` and `.app .pfe-f > label`.
+                     A form on an ordinary page renders a browser-default
+                     label, which is why there is no `dsField` yet.
+     5. `GC_IC`      holds the candidate portal's eight kinds. Admin needs
+                     marks for finance, vetting, employers, CRM and system;
+                     an unknown key falls back to `document`, silently.
+   ========================================================================== */
+</script>
+</body>
+</html>

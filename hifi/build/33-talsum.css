@@ -175,7 +175,7 @@
     url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
     radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
     radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%);
   background-size:60% 60%,100% 100%,100% 100%,100% 100%;
   background-position:center,center,center,center;
   background-repeat:no-repeat;

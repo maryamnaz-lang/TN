@@ -145,14 +145,35 @@
    THE MARK IS THE SAME 20px BARE GLYPH as the fact band's, in the `--mk` the
    markup states. `margin-top:1px` is `.qa-ic`'s own offset for a 20px glyph
    against a 21px title line (§29, 1 Sep 2026), not a guess. */
+/* ONE SWITCH PER ROW (Maryam, 4 Sep 2026: "the notification should each be in a
+   row"). It was `repeat(auto-fit,minmax(220px,1fr))` — three across a desktop
+   column, which is what put "Occasional, never more than monthly" on two lines
+   in a 220px cell while the switch it belongs to sat 200px away at the card's
+   right edge. A switch and the sentence it acts on are a ROW: the same shape
+   the three `.cardrow`s underneath it already had, and the shape §111.13's rows
+   and every `.tile-stack` in the product use. One column at every width, so
+   nothing about it changes at the breakpoint. */
 .app .page .pf-tgs{
-  display:grid;gap:var(--s05);
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  display:grid;gap:0;
+  grid-template-columns:1fr}
+/* A LIST WITH RULES BETWEEN IT, NOT THREE BOXES (Maryam, 4 Sep 2026: "use
+   dividers between them instead of giving them blocks look"). Each row was a
+   bordered card on `--layer-01` with 20px between them — three panels for three
+   sentences, on a page whose other stacks (`.tile-stack`, the sign-in rows) are
+   rows with a hairline between them.
+
+   BOTH HALVES OF §15's DIVIDER TECHNIQUE GO TOGETHER and that is the trap §72.2
+   records: `gap:0` alone leaves the space the cards were separated by, so the
+   rule and the spacing have to swap in one move — the gap goes to 0, the row
+   keeps its own `--s05` padding, and the line is `border-top` on every row but
+   the first. The ground goes with the frame: a white card on a white page was
+   never visible as a fill, only as its edge. */
 .app .page .pf-tgs > .tg{
   align-items:flex-start;gap:var(--s04);
-  padding:var(--s05);
-  background-color:var(--layer-01);
-  border:1px solid var(--rule);border-radius:var(--radius)}
+  padding:var(--s05) 0;
+  background-color:transparent;
+  border:0;border-radius:var(--radius)}
+.app .page .pf-tgs > .tg + .tg{border-top:1px solid var(--rule)}
 .app .page .pf-tgs > .tg > .tb{flex:1 1 auto;min-width:0}
 .app .page .pf-tgs > .tg > .sw{align-self:center}
 .app .page .pf-tgs .tg-mk{

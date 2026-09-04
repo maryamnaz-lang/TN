@@ -27,11 +27,33 @@
    This is the auth screens' own exception to `--radius:0`; §57 established it
    and this joins it rather than opening a second one.
 
-   TWO ACROSS OR STACKED, WITH NO BREAKPOINT. `repeat(auto-fit,minmax(200px,
-   1fr))` puts them side by side in the 397px form column at desktop and stacks
-   them in the phone's ~358, because two 173px blocks would set "Login as Cohort
-   Leader" on three lines beside a one-line neighbour. 200 is the floor at which
-   the longer of the two labels holds one line.
+   THEY STACK, AND THAT IS THE THIRD ROLE'S DOING (Maryam, 3 Sep 2026 — the ask
+   is quoted over `LOGIN_ROLES`). This block was `repeat(auto-fit,minmax(200px,
+   1fr))`, which put TWO side by side in the form column and stacked them on the
+   phone with no breakpoint. Three does not survive that rule in either mode, so
+   it is one column at every width now.
+
+   THE ARITHMETIC, MEASURED RATHER THAN GUESSED. The widest label is "As Cohort
+   Leader" at 106px in the strong style at 13.5 (112px in Plus Jakarta Sans
+   SemiBold after 4 Sep 2026 — the face is ~6% wider, so the conclusion below
+   holds by more than it did), and the block's chrome is 32 of
+   padding + a 20px ring + the 12px gap beside it = 64, so a block that holds
+   its label on one line is 170px. Three across is 3 x 170 + 24 of gap = 534.
+   The `.role-pick` measures 475 in the form column at a 1280 frame and about
+   524 at `.page`'s own 608px cap — so three across does not fit at ANY width
+   this product is read at, not merely at the narrow ones.
+
+   AND THE FALLBACK IS WORSE THAN THE STACK, WHICH IS WHY `auto-fit` DID NOT
+   SURVIVE WITH A SMALLER FLOOR. At 475 a 170px floor fits two tracks, so the
+   grid wraps 2 + 1 and the third block sits alone in a half-width row under
+   two full ones — a control that reads as two choices and an afterthought.
+   `1fr` is one decision at one width and cannot orphan a row.
+
+   THE LABELS ARE WHY THIS IS CHEAPER THAN IT SOUNDS. The verb came off all
+   three ("As Candidate", not "Login as Candidate"), so each block is a third
+   shorter than it was; three stacked 48px rows plus two 12px gaps is 168px,
+   against the 108 the two-across pair took. 60px on the one screen in the
+   product that has nothing else competing for the fold.
 
    THE HAIRLINE UNDER THE DESCRIPTION GOES, AND §57.4b IS THE ARGUMENT ALREADY
    WRITTEN. §17.6 draws `border-top` on `.sec-rule` — "the one rule in the
@@ -58,7 +80,7 @@
 .app .form-page .sec.sec-role::after{display:none;content:none}
 .app .form-page .role-pick{
   display:grid;gap:12px;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  grid-template-columns:1fr}
 
 /* ---- one block ----
    `align-items:center` RATHER THAN §02.190's `flex-start`, because the block is

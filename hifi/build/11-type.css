@@ -231,69 +231,107 @@
 .app .ch-num{line-height:15px}
 
 /* ==========================================================================
-   TYPEFACE — Söhne Buch
-   Söhne is a commercial face from Klim Type Foundry. It cannot be fetched or
-   embedded here without TalentNext's licence, so the stack below names it
-   first and falls back to an embedded stand-in. To ship the real thing:
-   drop soehne-buch.woff2 next to this file, uncomment the @font-face below,
-   and the stack picks it up with no other change.
+   TYPEFACE — PLUS JAKARTA SANS, AND IT IS TWO STYLES AND ONLY TWO
+   Maryam, 4 Sep 2026: "I need you to change the font of the platform to Plus
+   Jakarta Sans. While applying font, please be consistent, do not use bold or
+   extrabold." Söhne is gone from all three portals; this is the platform face.
 
-   Note for the record: the client's own Vision + Values PDF is set in Inter,
-   which is what §3 of the handover evidences. Söhne overrides that on
-   Maryam's instruction — worth one confirming line to the client.
+   TWO FILES ARE EMBEDDED — **Regular (400) and MEDIUM (500)**.
 
-   @font-face{ font-family:'Söhne'; font-style:normal; font-weight:400;
-               src:url(soehne-buch.woff2) format('woff2'); font-display:block; }
+   IT SHIPPED AS REGULAR + SEMIBOLD FOR ONE BUILD AND THAT WAS WRONG, and the
+   correction is the useful part of this note. "Do not use bold or extrabold"
+   was read as "take the next weight down from Bold", which is SemiBold — and
+   SemiBold is not a quiet second style, it is a display weight. More than half
+   the visible text in this product is the strong role (every heading, label,
+   eyebrow and button), so a SemiBold second file does not read as a heavier
+   version of the page, it reads as a DIFFERENT TYPEFACE from the one that was
+   chosen. Maryam, 4 Sep 2026: "we are mostly using medium or regular." The
+   pair is Regular and Medium. Measured on the same 62-character string at
+   200px: Regular 7456.6px, **Medium 7526.6px**, SemiBold 7596px — so SemiBold
+   was twice as far from Regular as Medium is, in a system where the two
+   weights are supposed to sit close enough to read as one voice.
+
+   The family also ships ExtraLight, Light, SemiBold, Bold and ExtraBold and
+   none of them is loaded: Bold and ExtraBold by instruction, SemiBold by the
+   correction above, the other two because §63's whole argument is that this
+   product has TWO weights and a third is a hierarchy nobody asked for.
+
+   SO A STRAY `600` STILL RENDERS MEDIUM, and that is the same mechanism this
+   build has always relied on rather than a new one. CSS font matching, for a
+   desired weight above 500, looks UP first and then DOWN — with only 400 and
+   500 present, `600`, `700` and `800` all resolve to the 500 file, exactly as
+   `700`/`800` resolved to Kräftig under Söhne. §63 §1's measurement of that
+   ("979 elements at 500 were already rendering as Buch") is the same fact from
+   the other side. `--t-w-strong` is **500** now, so everything §63 owns says
+   what it renders; the ~270 literal `font-weight:600` declarations in earlier
+   layers are left alone and are correct by fallback.
+
+   THREE FILES LEFT WITH SÖHNE and each was already dead or redundant:
+   - `soehne-mono-buch.woff2` — §11's own numeral note retired it ("they were
+     Söhne Mono, which is a third style in a system that has two"). Its
+     @font-face has shipped since with no rule naming the family.
+   - `stand-in.woff2` — the 100–900 grotesk behind Söhne. It existed for ONE
+     reason: Klim's trial file carries 68 glyphs, so `·` `–` `$` `%` `?` `:`
+     `;` and every parenthesis in the interface was silently set in a second
+     typeface. Plus Jakarta Sans carries 721 — every character the product
+     draws — so the fallback is not reached and a face that is never reached
+     is not a fallback, it is 29 KB. The stack falls to `system-ui` instead.
+   - `soehne-buch` / `soehne-kraftig` — the face itself.
+
+   AND THE LICENCE PROBLEM GOES WITH THEM, which is the one non-visual gain:
+   Söhne was here as Klim's *Test* files, evaluation-and-mockup only, with a
+   web licence required before this shipped anywhere public — and it is on
+   Vercel. Plus Jakarta Sans is SIL OFL (Tokotype), embeddable as shipped.
+   The files are kept in build/ rather than deleted so the swap is reversible.
+
+   ONE FACE IS DELIBERATELY NOT THIS ONE: §53's Abhaya Libre, the serif on the
+   chat greeting, which is the one line in the build that is Tal speaking as
+   itself rather than the interface labelling something. It was never the
+   platform face — it was a stated exception to Söhne and it is a stated
+   exception to this. `--tal-greet-face` is the one line that reverses it.
    ========================================================================== */
-/* Söhne Buch, from the trial files Maryam supplied.
-   IMPORTANT: these are Klim's *Test* fonts. Two consequences.
-   1. Licence — trial fonts are for evaluation and mockups only. A web
-      licence from Klim is required before this ships anywhere public.
-   2. Coverage — the trial file carries 68 glyphs: A-Z, a-z, 0-9, comma,
-      hyphen, full stop and O-umlaut. Everything else the interface uses
-      (· – $ % ? : ; parentheses) is absent, so those characters fall
-      through to the stand-in below. Swap in the full licensed file and the
-      fallback stops being reached. */
 @font-face{
-  font-family:'Söhne';
+  font-family:'Plus Jakarta Sans';
   font-style:normal;
   font-weight:400;
   font-display:block;
-  src:url(__SOEHNE__) format('woff2');
+  src:url(__JAKARTA__) format('woff2');
 }
+/* MEDIUM (500) IS THE STRONG ROLE — `--t-w-strong`. Every heading, label,
+   eyebrow and button in the product is this file. */
 @font-face{
-  font-family:'Söhne Mono';
+  font-family:'Plus Jakarta Sans';
   font-style:normal;
-  font-weight:400;
+  font-weight:500;
   font-display:block;
-  src:url(__SOEHNEMONO__) format('woff2');
+  src:url(__JAKARTAMED__) format('woff2');
 }
+/* SEMIBOLD (600) IS LOADED SO THAT 600 MEANS 600. It is not a role — no token
+   points at it and §63 assigns it to nothing — it is here because Maryam
+   supplied all three files (4 Sep 2026) and because ~270 `font-weight:600`
+   declarations survive in the layers before §63. Without this file those
+   silently fell back to the 500 one; with it, a declared 600 renders the
+   SemiBold that was written. Bold (700) and ExtraBold (800) are still not
+   loaded, by instruction, so anything written at those weights resolves here.
+
+   IF THE PAGE EVER LOOKS TOO HEAVY, THIS IS THE FILE TO DELETE and the two
+   remaining ones carry the whole product — that is the state this build ran
+   in for one cycle and it is one line to go back to. */
 @font-face{
-  font-family:'Grotesk Stand-in';
-  font-style:normal;
-  font-weight:100 900;
-  font-display:block;
-  src:url(__STANDIN__) format('woff2');
-}
-/* KRÄFTIG IS THE SECOND STYLE, AND THE ONLY OTHER ONE.
-   Everything at 600 in this product is Söhne Kräftig. The build embeds it
-   if `soehne-kraftig.woff2` is present in build/ and says so on the console
-   when it is not — see the note at the foot of this block. */
-@font-face{
-  font-family:'Söhne';
+  font-family:'Plus Jakarta Sans';
   font-style:normal;
   font-weight:600;
   font-display:block;
-  src:url(__SOEHNEKRAFTIG__) format('woff2');
+  src:url(__JAKARTASEMI__) format('woff2');
 }
 :root{
-  /* TWO STYLES OF ONE FACE. Inter is gone from the stack: it was the
-     fallback, which meant every character Söhne's trial file does not
-     carry was silently set in a different typeface. The stand-in is still
-     here and still reached for those characters, but it is now the ONLY
-     thing behind Söhne rather than one of four. */
-  --font-sans:'Söhne','Soehne','Söhne Buch','Grotesk Stand-in',
-              system-ui,-apple-system,sans-serif;
+  /* TWO STYLES OF ONE FACE, and nothing between the face and the system
+     stack. `'Plus Jakarta Sans'` matches the embedded file AND a local
+     install of the same name, so a machine that has it needs no download;
+     everything after it is the platform's own grotesque, reached only if
+     both fail. There is no stand-in tier any more — see the note above. */
+  --font-sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',
+              Roboto,sans-serif;
 }
 body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sans)}
 

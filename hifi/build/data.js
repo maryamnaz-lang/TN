@@ -13,7 +13,19 @@ const STAGES = [
      the row with nil.js and 30-nil.css. */
   ['nil',     'Next in Leadership run-up','The quiz, the result and the consultant form, before TalentNext.'],
   ['signup',  'Account creation',      'Credentials, consent and email verification.'],
-  /* THE FIRST THING THAT HAPPENS INSIDE THE PRODUCT IS A CONVERSATION.
+  /* THE FIRST THING THAT HAPPENS INSIDE THE PRODUCT IS A CONVERSATION, AND IT
+     IS TAL'S NOW (Maryam, 3 Sep 2026). The row below this one is the same
+     argument with a person in it, and it is the one this replaces: `new` opens
+     by asking a four-second-old member to choose and pay a talent agent, so
+     something has to take the reading first. The consultant did it on a
+     fifteen-minute call; Tal does it on five screens, and keeps the answers.
+
+     IT IS A STAGE RATHER THAN A GATE ON `new`, because the stage picker is
+     this prototype's whole demo mechanism — a screen nobody can walk to is a
+     screen nobody can be shown. ob.js is the flow, §107 draws it, and the row
+     above it is where it is entered from: `verify`'s Verify & Continue. */
+  ['onboard', 'Tal onboarding',        'Account created, quiz carried over. Tal takes the reading the consultant call used to take &mdash; no level set, no agent booked.'],
+  /* THE SAME STEP, WITH A PERSON IN IT — SUPERSEDED BY `onboard` ABOVE.
      `new` used to be the landing stage, and it opens by asking the candidate
      to choose and pay an agent — the biggest decision on the ladder, put to
      someone who has been a member for four seconds. A talent consultant
@@ -140,6 +152,16 @@ const CFG = {
      never draws it. */
   nil:     {nav:'early',  track:'Explorer', pred:true},
   signup:  {nav:'early',  track:'Explorer', pred:true},
+  /* THE ONBOARDING DRAWS NO CHROME EITHER — ob.js takes the whole frame the
+     way the auth card does — but `cfg()` and `setStage()` both read `nav`, so
+     it names the smallest set and never draws it, exactly as `nil` and
+     `signup` do above.
+
+     `pred:true` IS THE FOURTH BOUNDARY IN ob.js's HEAD, EXPRESSED AS DATA.
+     The shell reads it to print "Explorer track" rather than a level, and the
+     one thing this stage must never claim is a level: Tal takes the reading,
+     the agent interview sets the rung. `booked:false` because nothing is. */
+  onboard: {nav:'early',  track:'Explorer', pred:true,  booked:false},
   /* `pred:true` — the shell reads it to print "Explorer track" rather than a
      level, and that is exactly right here: the consultant call sets nothing.
      `booked:false` too, because `booked` means the AGENT interview is booked
@@ -362,14 +384,52 @@ const AV = {
 };
 
 const AGENTS = {
+/* TWO FIELDS THE AGENTS TABLE NEEDS, AND THEY ARE THE REFERENCE'S OWN NUMBERS
+   (Maryam, 3 Sep 2026: "for the agents screen, I want you to use the reference
+   design"). That design draws a six-column table and two of its columns had no
+   record behind them — a row of skill chips and a years-of-experience figure.
+
+   THE REFERENCE WAS DRAWN ON THIS DATA, WHICH IS WHY ALMOST NOTHING IS
+   INVENTED. Its six rows carry OUR interview counts to the number — 210, 164,
+   98, 143, 121, 176 — our ratings, our ranges, our next slots and our prices.
+   So `yrs` and the first three of each `tags` are transcribed from the drawing
+   rather than made up, in the same way §110's chapter list is transcribed from
+   `CH`.
+
+   WHAT IS AUTHORED IS THE OVERFLOW, AND IT IS EIGHT STRINGS. The reference
+   shows three chips and a `+1` (a `+2` for Samuel), so the hidden ones had to
+   be named for the count to be true — a `+1` over a list with nothing in it is
+   the invented figure §74 rules out, one level down. Owen's and Lena's are not
+   authored at all: they are `REC.owen.expertise` and `REC.lena.expertise`
+   verbatim, so the chip a reader uncovers is the phrase the recommendation card
+   already uses for them.
+
+   PRIYA'S IS THE ONE THAT IS NOT, AND THE DISAGREEMENT IS PRE-EXISTING.
+   `REC.priya.expertise` is 'System Architecture' while her bio is "fifteen
+   years running operations teams in logistics" and the reference's three chips
+   for her are Leadership / Strategy / Communication. Following the derivation
+   here would put a fourth voice on her row, so her overflow is 'Operations',
+   which is her bio's word. `REC` is untouched — it has readers in `ai6` and on
+   `V.agent` — and the conflict is flagged rather than settled here.
+
+   `yrs` IS A STRING, NOT A NUMBER, because one of the six is '2.5' and the
+   column prints it verbatim; a number would need formatting logic for one row.
+   The pair reads as a cell — the years over `ivs` — so the two must not
+   disagree in spirit: Lena is the long-serving one with the fewest interviews
+   (4 yrs, 98) and that is the reference's own reading, not an accident. */
   priya:{n:'Priya Nair',i:'PN',img:AV.priya,r:4.8,range:'E1–E3',ivs:210,slot:'Thu, Aug 20 · 6:30 PM',price:'$95',
+    yrs:'3',tags:['Leadership','Strategy','Communication','Operations'],
     bio:'Fifteen years running operations teams in logistics. I assess for judgement under pressure rather than vocabulary, and I will tell you plainly where you are.'},
   owen:{n:'Owen Clarke',i:'OC',img:AV.owen,r:4.6,range:'E2–B1',ivs:164,slot:'Fri, Aug 21 · 5:00 PM',price:'$85',
+    yrs:'2.5',tags:['Technical','Problem Solving','Systems','Retail Operations'],
     bio:'Ex-retail operations. I look for how you decide when the information is incomplete, which is most of the time.'},
   lena:{n:'Lena Fischer',i:'LF',img:AV.lena,r:4.5,range:'E1–E4',ivs:98,slot:'Mon, Aug 24 · 7:00 PM',price:'$80',
+    yrs:'4',tags:['Product','Communication','Leadership','Engineering Management'],
     bio:'I came up through engineering management. Expect a lot of "and then what happened".'},
-  samuel:{n:'Samuel Adeyemi',i:'SA',img:AV.samuel,r:4.4,range:'E3–B2',ivs:143,slot:'Wed, Sep 2 · 6:00 PM',price:'$90',bio:''},
-  hana:{n:'Hana Kim',i:'HK',img:AV.hana,r:4.3,range:'B1–B4',ivs:121,slot:'Thu, Sep 3 · 5:30 PM',price:'$110',bio:''},
+  samuel:{n:'Samuel Adeyemi',i:'SA',img:AV.samuel,r:4.4,range:'E3–B2',ivs:143,slot:'Wed, Sep 2 · 6:00 PM',price:'$90',bio:'',
+    yrs:'2',tags:['Data','Analytics','Problem Solving','Reporting','Forecasting']},
+  hana:{n:'Hana Kim',i:'HK',img:AV.hana,r:4.3,range:'B1–B4',ivs:121,slot:'Thu, Sep 3 · 5:30 PM',price:'$110',bio:'',
+    yrs:'3',tags:['UX Research','Design','Strategy','Research Ops']},
   /* THE SIXTH AGENT EXISTS TO STOP THE GRID REPEATING A FACE (Maryam, 31 Aug
      2026). `.rail-all` is three across and there were five people, so the sixth
      cell was `'priya'` again — the same name, fee and rating printed twice in
@@ -403,7 +463,8 @@ const AGENTS = {
      `REC` row of three more invented strings. `bio:''` for the same reason
      Samuel's and Hana's are empty — a paragraph in her own voice is product
      copy no data here supports. */
-  camila:{n:'Camila Rocha',i:'CR',img:CALL_ART.faceW,r:4.7,range:'E4–B1',ivs:176,slot:'Tue, Aug 25 · 5:30 PM',price:'$100',bio:''}
+  camila:{n:'Camila Rocha',i:'CR',img:CALL_ART.faceW,r:4.7,range:'E4–B1',ivs:176,slot:'Tue, Aug 25 · 5:30 PM',price:'$100',bio:'',
+    yrs:'3',tags:['Product','Growth','Communication','Go-to-Market']}
 };
 
 /* ============================================================

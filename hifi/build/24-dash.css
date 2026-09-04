@@ -54,7 +54,18 @@
    is all the room a card of this width has. The label is not hidden with
    `display` — it animates from zero width, so the button grows into the
    words rather than jumping to a new size. */
-.app .agh-book .tal-star{
+/* THE AGENTS TABLE'S ACTION CELL IS THE SECOND HOST (Maryam, 3 Sep 2026 — the
+   reference screen). §114's row ends in the same pair, and the reference draws
+   the same collapsed square, so the SELECTOR is widened rather than the drawing
+   restated in that layer. Two reasons it has to be this way round: a copy in
+   §114 would be a second set of numbers to keep in step with these — the
+   36px box, the 14px mask, the 80px reveal — and §114 lands after §63, where
+   it may not state the label's size, weight or ink at all. One component, one
+   drawing, two hosts.
+   CLAUDE.md's §108.2 rule read from the other side: check whether the class you
+   are borrowing is stated unscoped BEFORE copying it. This one was scoped, so
+   the fix is to widen the scope. */
+.app :is(.agh-book,.agt-act) .tal-star{
   position:static;display:inline-flex;align-items:center;gap:0;
   height:36px;padding:0 var(--s03);flex:none;
   border:1px solid var(--rule);background:transparent;
@@ -62,18 +73,18 @@
   transition:gap var(--dur-short) var(--ease-standard),
              padding var(--dur-short) var(--ease-standard),
              border-color var(--dur-short) var(--ease-standard)}
-.app .agh-book .tal-star .sk-mark{
+.app :is(.agh-book,.agt-act) .tal-star .sk-mark{
   width:14px;height:14px;flex:none;order:-1;background-color:var(--accent)}
-.app .agh-book .tal-star .lbl{
+.app :is(.agh-book,.agt-act) .tal-star .lbl{
   display:block;overflow:hidden;white-space:nowrap;max-width:0;
   font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px;
   color:var(--text-primary);
   transition:max-width var(--dur-standard) var(--ease-standard)}
-.app .agh-book .tal-star:hover,
-.app .agh-book .tal-star:focus-visible{
+.app :is(.agh-book,.agt-act) .tal-star:hover,
+.app :is(.agh-book,.agt-act) .tal-star:focus-visible{
   gap:var(--s02);padding:0 var(--s04)}
-.app .agh-book .tal-star:hover .lbl,
-.app .agh-book .tal-star:focus-visible .lbl{max-width:80px}
+.app :is(.agh-book,.agt-act) .tal-star:hover .lbl,
+.app :is(.agh-book,.agt-act) .tal-star:focus-visible .lbl{max-width:80px}
 
 /* ------------------------------------------------------------------ 4 ---
    THE STEPPER IS A GLANCE
@@ -252,8 +263,8 @@
    AND THEY SIT ON ONE LINE. A 14px mask centred in an 18px line box lands
    on the box's centre; the word's optical centre is its cap height, about
    a pixel higher. The mark takes that pixel back. */
-.app .agh-book .tal-star .lbl{color:var(--accent);--on-brand-ink:1}
-.app .agh-book .tal-star{align-items:center}
+.app :is(.agh-book,.agt-act) .tal-star .lbl{color:var(--accent);--on-brand-ink:1}
+.app :is(.agh-book,.agt-act) .tal-star{align-items:center}
 
 /* ----------------------------------------------------------------- 12 ---
    THE THREE CARDS PAY THE GUTTER

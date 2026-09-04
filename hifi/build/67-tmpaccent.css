@@ -36,9 +36,13 @@
    itself must be restated in the scope, which is what makes the same button
    paint red. Same for the two state gradients under it.
 
-   THE ACCENT IS `#F95873` AND THE FILL IS A GRADIENT AGAIN — Maryam,
-   31 Aug 2026: "change the accent color in the red accent demo prototype to
-   #F95873", then "for the gradient color use the shades of #F95873 color".
+   THE ACCENT IS `#FF584A` AND THE FILL IS A GRADIENT — Maryam, 31 Aug 2026,
+   over four asks: flat #FF0000, then `#F95873` with "for the gradient color
+   use the shades of #F95873 color", then `#CE0058`, then `#FF584A`. The hue
+   has moved three times and the STRUCTURE has moved once; only the five
+   values below change now, which is the whole point of writing it as a ladder
+   rather than as a set of literals — the gradients, the head band's wash, the
+   AI ramp's wash and the inline highlight all follow with no edit at all.
 
    THAT SECOND SENTENCE REVERSES THE ONE DECISION THIS LAYER USED TO RECORD AS
    A DEPARTURE, and the reversal is worth reading because it puts the trial
@@ -54,16 +58,29 @@
    four values — `--accent` -> `--accent-2` -> `--accent-hover` ->
    `--accent-text` — and defines its three gradients as CONSECUTIVE PAIRS on
    that ladder, which is what makes rest, hover and pressed read as one light
-   moving rather than as three colours. Every rung below is `#F95873` at a
-   lower lightness and a lower saturation, stepped by the same deltas §01's
-   orange ladder uses (measured in HSL off #f57414 / #f0530c / #ae4508 /
-   #b94a09), and the three gradients are copied from §01 verbatim — same
-   104.86deg, same 10.02% / 115.55% stops, same `var()` pairs. Only the four
-   rungs are stated; the shape is not this layer's to invent.
+   moving rather than as three colours. Every rung below is `#FF584A` at a
+   lower lightness and saturation (the block over the values has the
+   measurement and the reason), and the three gradients are copied from §01
+   verbatim — same 104.86deg, same 10.02% / 115.55% stops, same `var()` pairs.
+   Only the four rungs are stated; the shape is not this layer's to invent.
 
-   `#F95873` IS THE TOP RUNG AND NOTHING ELSE IS THAT COLOUR. It is what a
+   `#FF584A` IS THE TOP RUNG AND NOTHING ELSE IS THAT COLOUR. It is what a
    button rests at, what a mark fills with, and the first stop of every ramp;
    the reader sees it and the three below it read as its shadow.
+
+   AND THE INK HAS TO BE A LOWER RUNG AGAIN, which is the one thing that
+   changes between hues rather than between edits. Measured on white:
+   #FF0000 4.00:1, `#F95873` 3.15:1, `#CE0058` 5.58:1, `#FF584A` 3.11:1 — so
+   three of the four fail AA as text and only the magenta did not. That is
+   what the split is FOR, and it is why the ladder is worth keeping even on a
+   hue that happens not to need it: `--accent-text` is a stated rung, so a
+   hue change is five values and never a legibility question.
+
+   WHITE ON THE FILL IS 3.11:1 AND THAT IS THE PRODUCT'S OWN EXCEPTION, not
+   one this trial introduces. §01 carries `--on-brand-fill:1` on the accent
+   button precisely so the contrast sweep reports it as a DECISION rather than
+   a finding, and the orange it flags measures 2.84:1 — worse than this. The
+   flag rides on `--accent-grad`, so it is inherited here with no edit.
 
    AFTER §63 AND ALLOWED TO BE. §63 owns font size, weight, transform and
    text colour, and this layer declares none of the four — it sets custom
@@ -73,13 +90,21 @@
 
 .tmp-accent{
   /* --- THE LADDER. Four shades of one hue, stepping deeper, exactly as §01
-     states the orange. HSL(350, 93%, 66%) is `#F95873` itself; the three
-     below it drop lightness and saturation by §01's own deltas, so the
-     interval between two rungs is the interval a reader already knows from
-     the orange product. --- */
-  --accent:#f95873;
-  --accent-2:#f54e6a;
-  --accent-hover:#b43147;
+     states the orange. HSL(5, 100%, 65%) is `#FF584A` itself, and §01's own
+     deltas apply cleanly again: about 4 points of saturation and 2 of
+     lightness to `--accent-2`, then a long step down to `--accent-hover`.
+
+     WHICH IS A NOTE WORTH KEEPING FROM THE HUE BEFORE IT. `#CE0058` started
+     at 68% saturation and 40% lightness — already dark — so §01's 40-point
+     saturation drop turned the third rung into a muddy maroon-grey and the
+     ladder had to step lightness alone. `#FF584A` starts at 100% and 65%,
+     which is where the orange starts (92% / 52%), so the orange's own deltas
+     land where they were designed to. The rule is not "always follow §01" or
+     "never" — it is that the deltas assume headroom, and a dark or desaturated
+     accent has none. Measure the top rung before copying them. --- */
+  --accent:#ff584a;
+  --accent-2:#fb5141;
+  --accent-hover:#9d2f25;
 
   /* --- and the three gradients are §01's, pair for pair. They HAVE to be
      restated in the scope even though every stop is a `var()`: a custom
@@ -98,29 +123,32 @@
     var(--accent-hover) 10.02%, var(--accent-text) 115.55%);
   /* §01's is a hardcoded rgba, not derived from --accent, so it does not
      follow on its own. Same .18 alpha, this ladder's hover rung. */
-  --accent-shadow:rgba(180,49,71,.18);
+  --accent-shadow:rgba(157,47,37,.18);
 
-  /* --- THE INK IS NOT THE FILL, which is the split §01 already makes for the
-     orange and the one thing about this hue that is not negotiable: `#F95873`
-     is 3.15:1 on white and would FAIL AA as text at any size. So the two ink
-     roles are lower rungs of the same ladder, chosen on measured ratio rather
-     than on hue. On #ffffff (--layer-01) and #f7f7f7 (--layer-02):
-       --accent-text  #b94a09 = 5.19 / 4.85  ->  #c0354c = 5.45 / 5.09
-       --accent-on-2  #ae4508 = 5.75 / 5.37  ->  #b83249 = 5.85 / 5.46
-     Both clear AA comfortably and both are a shade BETTER than the orange
-     they replace, which is the direction to err in. --- */
-  --accent-text:#c0354c;
-  --accent-on-2:#b83249;
+  /* --- THE INK IS NOT THE FILL, and with this hue it cannot be: `#FF584A` is
+     3.11:1 on white. Both roles are lower rungs of the same ladder, chosen on
+     measured ratio. On #ffffff (--layer-01) and #f7f7f7 (--layer-02):
+       --accent-text  #b94a09 = 5.19 / 4.84  ->  #bd2c1f = 5.93 / 5.53
+       --accent-on-2  #ae4508 = 5.75 / 5.36  ->  #b1271b = 6.61 / 6.17
+     Both clear AA comfortably and both are better than the orange they
+     replace, which is the direction to err in. The saturation is held HIGH on
+     both (72% and 74%) rather than taken down with the lightness — at 62% the
+     same two ratios came out identical and the ink read brown rather than as
+     a deep version of the button above it. --- */
+  --accent-text:#bd2c1f;
+  --accent-on-2:#b1271b;
   /* the accent at 8% over white — a chip ground, not a surface (§12) */
-  --accent-tint:#fef2f4;
+  --accent-tint:#fff2f1;
 
   /* §10's accent ink on the black card, and it is the one rung that goes UP
      rather than down: #f68441 is a LIGHTENED orange for exactly this reason,
-     and the same logic applies here. HSL(350, 93%, 70%) — `#F95873` lifted,
-     not deepened — measures 6.74:1 on `--gray-100`, comfortably clear of AA
-     and clearly the same hue as the button beside it. Delete this line to
-     leave the dark card's ink orange. */
-  --accent-on-dark:#fa6b83;
+     and the same logic applies here. HSL(5, 100%, 72%) — `#FF584A` lifted,
+     not deepened — measures 7.53:1 on `--gray-100`. The accent itself already
+     clears AA there at 6.07:1, so the lift is for the reason §01 lifts the
+     orange rather than for contrast: on black the ink and the fill should not
+     be the same value, or a label and a button 40px apart read as one object.
+     Delete this line to leave the dark card's ink orange. */
+  --accent-on-dark:#ff7c70;
 }
 
 /* --------------------------------------------------------------------- 2 ---
@@ -144,8 +172,9 @@
    The file's own fill is pure #ff0000, and when the trial's accent WAS that
    colour the two agreed by coincidence. Writing the stop as `--accent` rather
    than as a second hardcoded hex is what made that a derivation rather than a
-   duplicate — so moving the accent to `#F95873` moved the wash with it, in one
-   edit, and the band cannot be a different hue from the buttons on it. That
+   duplicate — so the accent has moved three times since, through `#F95873`
+   and `#CE0058` to `#FF584A`, and the wash followed every time with no edit
+   at all. The band cannot be a different hue from the buttons on it. That
    is the same discipline `--ai-amber` records in §83 and `--accent-shadow`
    fails one line above: a literal does not follow, a `var()` does.
 

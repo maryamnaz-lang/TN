@@ -425,6 +425,62 @@
    `GLOW_ON` and not this list, and §75.3 cites it by name for exactly that. */
 .app .plate,.app .lvl-hero,.app .cert,
 .app .sec.on-dark,.app .score.on-dark{position:relative;overflow:hidden}
+/* ------------------------------------------------------------------ 21.22a ---
+   THE HAZE IS ONE TOKEN NOW, AND IT RAMPS ACROSS
+
+   Maryam, 4 Sep 2026, with the ellipse's own CSS: "For the blur effect on the
+   top corner of each black card use this — width 702.55px, height 96.85px,
+   `background: linear-gradient(90deg, #FF584A 0%, #F83524 100%)`, `filter:
+   blur(250px)`, `transform: rotate(11.84deg)`."
+
+   WHAT CHANGES IS THAT THE LIGHT HAS TWO COLOURS. It was one radial in
+   `--accent`; the file's is a LEFT-TO-RIGHT RAMP from the accent to its deeper
+   shade, which is the same pair 737:6161 gives the gradient button.
+
+   IT IS TWO ELLIPSES AND NOT A ROTATED BLURRED ELEMENT, and that is a
+   deliberate refusal of the literal spec. A `filter:blur(250px)` on a rotated
+   702×97 div is a real element, which costs §75.3's three extra rules —
+   `position:relative` and `overflow:hidden` on the card so the light cannot
+   escape, plus `z-index` on every child — and §75.3's whole argument for the
+   background-image form is that a background layer is behind all content by
+   definition and needs no pass and no stacking order. `.dark-glow` IS such an
+   element (ai4's `injectGlow` appends it), which is exactly why the list of
+   cards above it exists and why `.ldr-read` once painted a 700px rectangle
+   across a head band. Adding a second one is the wrong direction.
+
+   SO THE RAMP IS DRAWN AS THE TWO STOPS SIDE BY SIDE: the accent's ellipse at
+   66% across and `--accent-2`'s at 96%, both reaching in from above the top
+   edge with the same falloff the single radial had. Left to right that reads as
+   one wide smear going from #FF584A to #F83524 — the file's direction and both
+   its colours — and it is still a flat `background-image` with nothing to
+   clip and nothing to stack.
+
+   AND 19% EACH RATHER THAN 22% ONCE, WHICH IS ARITHMETIC AND NOT A GUESS. The
+   two ellipses overlap, so at either core the other is still contributing. At
+   x=66% the second ellipse is 30% of the width away against a 56% radius whose
+   stop runs out at 64% of it, so it lands at 1 − (30/56)/0.64 = 0.163 of its
+   own alpha; 1 − (1−0.19)(1 − 0.19×0.163) = **0.215**, against the single
+   layer's 0.22. The mid-point between the cores computes to 0.208, which is
+   what a broad smear should do — flat across its middle rather than two lamps.
+   15% each was the first value and measures 0.171: visibly dimmer than the day
+   before, in a change that is about hue and not about brightness.
+
+   THE ALPHA IS IN THE STOPS AND NOT ON THE ELEMENT, which retires an
+   `opacity` on a resting state (trap 2). `.dark-glow` carries no keyframes
+   today, so nothing was broken — but the reason trap 2 exists is that the
+   entrance animations run `fill-mode:both`, and a resting `opacity` is one
+   edit away from fighting one.
+
+   ONE STATEMENT, TWO READERS. §75's `.dark-card` wrote the same radial string
+   out a second time, so "the black card's haze" was two values that happened
+   to agree. It reads the token now.
+   -------------------------------------------------------------------------- */
+.app{
+  --dark-haze:
+    radial-gradient(56% 128% at 66% -8%,
+      color-mix(in srgb, var(--accent) 19%, transparent) 0%, transparent 64%),
+    radial-gradient(56% 128% at 96% -8%,
+      color-mix(in srgb, var(--accent-2) 19%, transparent) 0%, transparent 64%)}
 .app .dark-glow{
   /* A BROAD WARM HAZE OFF THE TOP RIGHT, not a lamp with an edge. The
      earlier version was a small blurred ellipse and it read as a discrete
@@ -433,9 +489,8 @@
      out around two thirds of the way across, which is the only way a glow
      on a black surface looks like light rather than like paint. */
   position:absolute;inset:0;
-  background:radial-gradient(78% 135% at 92% -8%,
-    var(--accent) 0%, transparent 64%);
-  opacity:.22;
+  background-image:var(--dark-haze);
+  background-repeat:no-repeat;
   pointer-events:none;z-index:1}
 /* THE LIGHT IS ALWAYS BEHIND. Three layers, stated: the card's own ground at
    the back, the glow above it, and every piece of content above both. The

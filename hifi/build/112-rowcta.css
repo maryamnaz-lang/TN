@@ -1,0 +1,75 @@
+/* ==========================================================================
+   §112 — THE ARROW GETS A LABEL: `.row-cta`
+
+   Maryam, 2 Sep 2026, twice in one minute: "instead of arrows only, add text on
+   left of the arrow 'Evaluate Candidate'", then "also add text with these
+   arrows 'View Cohort'". Two queues on the leader's dashboard, one class.
+
+   IT IS A `<span>`, AND THAT IS THE WHOLE COMPONENT. The row is already a
+   `<button>` — `gcard` and `faceRow` both wrap everything in one — so a control
+   here would be a nested `<button>`: invalid markup, and two targets inside one
+   target doing the same job. The label names what pressing the ROW does and the
+   arrow goes on saying that it is pressable; neither is a second affordance.
+
+   §63 §47 OWNS ITS SIZE, WEIGHT AND INK. This layer is four declarations of
+   geometry, which is the whole of what a label beside an arrow needs once the
+   row is already a flex line.
+
+   IT TURNS OVER "AN ARROW, NOT A VERB", STATED TWICE IN `lead.js`, AND THE
+   TURNOVER IS NARROWER THAN IT LOOKS. `bookedRow`'s note is the argument: the
+   two words in that slot were "Join" and "Brief", which named the KIND of
+   appointment as much as the action, and neither of them happened on the row —
+   both opened another page — so the row became the target and took the arrow
+   every openable row in this product wears. That is an argument against a verb
+   that LIES about what the row does. "Evaluate Candidate" and "View Cohort" are
+   each the one thing the page behind the row is for, so it does not reach them,
+   and `bookedRow` keeps its bare arrow.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 107.1 ---
+   THE LABEL HOLDS THE RIGHT-HAND END WITH THE ARROW
+
+   `flex:none` BECAUSE THE ROW'S BODY IS `flex:1` AND THE LABEL IS NOT. §02.256
+   gives `.gcard-b` `min-width:0;flex:1`, so the body takes the slack and every
+   other child is content-sized — but a bare `<span>` still carries
+   `flex-shrink:1`, so on a narrow row the label would be the thing that gives,
+   and "View Cohort" would wrap to two lines beside a one-line arrow rather than
+   the title wrapping, which is what should give.
+
+   `white-space:nowrap` IS THE SAME DECISION SAID FOR THE OTHER AXIS. Two words
+   on one line or the label is not a label.
+
+   THE GAP TO THE ARROW IS 8, NOT THE ROW'S 16. §04.12 gives `.tile.clk` /
+   `.tile.gcard` `gap:var(--s05)`, which is the right distance between the
+   picture, the text block and the trailing control — three different objects.
+   The label and the arrow are ONE object (§64's quiet button is the same pair
+   at the same distance), so the arrow is pulled back by the difference. Written
+   as `calc(--s03 - --s05)` rather than as `-8px` so it follows the row if either
+   step ever moves.
+   -------------------------------------------------------------------------- */
+.app .row-cta{flex:none;white-space:nowrap}
+.app .row-cta + .tile-arrow{margin-left:calc(var(--s03) - var(--s05))}
+
+/* ------------------------------------------------------------------ 107.2 ---
+   IT IS OFF ON A PHONE, AND THE ARROW STAYS
+
+   Measured at 390 on the leader's dashboard: the cohort row is a 112px cover, a
+   16px gap, the text block and then this pair. "View Cohort" plus its gaps is
+   ~110px of a 358px row, so the title and its two-line detail lose a third of
+   their measure to a label that says what the arrow already says badly.
+
+   THE ROW LOSES NOTHING BY IT — the arrow is what says "this opens", and it is
+   what every openable row in the product wore before this layer existed. The
+   label is an ENLARGEMENT of that affordance for a width that has room for it,
+   not the affordance itself, which is why this is `display:none` and not a
+   reflow into a second line.
+
+   599, NOT 899. The breakpoint is not §10's container query: at 744 the same row
+   is ~700px wide and the pair costs a seventh of it, which is the width the
+   label was asked for. This is the one place in the build that needs a
+   boundary between "phone" and "everything else" rather than the 900 the label
+   column turns at, so it is stated at the component and named here.
+   -------------------------------------------------------------------------- */
+@container app (max-width:599px){
+  .app .row-cta{display:none}
+}

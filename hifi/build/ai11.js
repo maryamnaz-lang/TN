@@ -201,13 +201,18 @@ function stripPageHead(page){
    phone. Both are answered rather than avoided — `aria-hidden` on the mark,
    and §78.2 hides the whole `<li>` below 600 rather than any part of it.
 
-   AND IT IS `I.chevRight`, NOT A GLYPH AND NOT A MASK. A `content:'›'` would
-   come from the stand-in face, which carries 68 glyphs and not that one — §64
-   records the identical problem with an arrow. §64 then reached for a
+   AND IT IS `I.chevRight`, NOT A GLYPH AND NOT A MASK. §64 reached for a
    `mask-image` because an `<svg>` would have meant editing 88 call sites;
    there is ONE call site here, so the official Material Symbols chevron goes
    in directly and trap 7's "one cut, pasted rather than drawn" holds with
-   nothing to keep in step. */
+   nothing to keep in step. It also sizes and inks like every other mark in
+   the trail rather than like the type around it.
+
+   THE COVERAGE HALF OF THIS IS DEAD AND SAYING SO MATTERS, because it is the
+   sentence somebody will act on: a `content:'›'` used to fall out of Söhne
+   into the stand-in, and after 4 Sep 2026 Plus Jakarta Sans carries `›` and
+   there is no stand-in to fall into. The glyph exists now. Use the icon
+   anyway — §64's rewritten note has the reason that survived. */
 function drawTrail(trail, parts){
   const sep = `<span class="crumb-sep" aria-hidden="true">${I.chevRight}</span>`;
   trail.innerHTML = parts.map((p, i) => {
@@ -289,10 +294,70 @@ function placeTopbar(){
   tidyPh(page);
 }
 
+/* --------------------------------------------------------------------------
+   3. THE PROFILE'S HEAD BLOCK STICKS, AND THE STRIP STICKS UNDER IT
+
+   Maryam, 3 Sep 2026: "make the summary and tabs fix on scroll." Two elements,
+   one under the other, both `position:sticky` — and the second one's `top` is
+   the first one's HEIGHT, which is the only part of this CSS cannot do.
+
+   THE BAND'S HEIGHT IS NOT A CONSTANT. Tal's summary is one line at 1280 and
+   three at 390, and §56 wraps the `.ph`, the wing and the card into the same
+   block — so the offset is between about 90 and 200px depending on the frame
+   and the stage. A number in the stylesheet would be right at one width.
+
+   IT IS MEASURED HERE BECAUSE HERE IS AFTER `placeBand`. That pass (ai5) BUILDS
+   the `.modhead` out of the page's first few children, so anything measuring it
+   has to run after ai5's own render wrapper — and this file is the last pass in
+   the bundle, which is the same reason `tidyPh` lives here. One property on the
+   `.page`, read by §111.10.
+
+   IT IS NOT STATE AND IT COSTS ONE READ. `offsetHeight` on one element per
+   render, only on the page that has the strip; every other page returns at the
+   second line. `--pf-stick` falls back to `0px` in the stylesheet, so a render
+   this pass has not reached yet draws a strip stuck to the top rather than a
+   broken one.
+   -------------------------------------------------------------------------- */
+/* AND IT IS OBSERVED, NOT ONLY MEASURED ONCE PER RENDER. The synchronous read
+   is right whenever the layout is settled and wrong exactly when it is not —
+   §01 puts a `transition` on `.device`'s `max-width`, so a frame change
+   (Mobile / Tablet / Desktop) renders while the column is still animating and
+   the band measures whatever it is mid-way. Caught by measuring: `--pf-stick`
+   came out **2514px** on a band that settles at 97, which parks the strip a
+   screen and a half below the fold — visible as the tabs simply not being
+   there, with nothing thrown.
+
+   A `ResizeObserver` IS THE RIGHT TOOL AND NOT A TIMER. It fires once on
+   `observe` with the current box and again on every change, so the value
+   follows the transition instead of guessing when it ends. The one caveat is
+   trap 17's neighbourhood — delivery is tied to a rendering opportunity, so in
+   a document that never paints the callback may not run; the synchronous write
+   below is what makes that case degrade to "the value from this render" rather
+   than to nothing.
+
+   ONE OBSERVER, RECONNECTED EACH RENDER, because `render()` replaces
+   `device.innerHTML` and the band this is watching is a new element every time.
+   Disconnected at the top so leaving the page does not leave it watching a
+   detached node. */
+let _pfRO = null;
+function placePfStick(){
+  if(_pfRO){ _pfRO.disconnect(); _pfRO = null; }
+  const page = device.querySelector('.view-col .page');
+  if(!page) return;
+  if(!page.querySelector(':scope > .sec.pf-cs')) return;
+  const band = page.querySelector(':scope > .modhead');
+  const write = () => page.style.setProperty('--pf-stick', (band ? band.offsetHeight : 0) + 'px');
+  write();
+  if(!band || typeof ResizeObserver !== 'function') return;
+  _pfRO = new ResizeObserver(write);
+  _pfRO.observe(band);
+}
+
 const _baseTop = render;
 render = function(){
   _baseTop();
   try { placeTopbar(); } catch(e){ console.warn('topbar', e); }
+  try { placePfStick(); } catch(e){ console.warn('pfstick', e); }
 };
 
 /* THE LAST STATEMENT, per CLAUDE.md's trap 8: the boot render is the final

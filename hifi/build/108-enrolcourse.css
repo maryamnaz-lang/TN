@@ -1,0 +1,257 @@
+/* ==========================================================================
+   108 — WHAT THE COURSE IS, ON THE ENROLMENT OFFER'S BLACK CARD
+
+   Maryam, 2 Sep 2026: four rows under the start date — the course name at 20px,
+   its description, "Cohort Leader: {leadername}" with a small image, and how
+   many candidates have already enrolled. `ENROL_COURSE` in views.js is the
+   record and the note over it is why only E3 has one.
+
+   THERE IS NO TYPE IN THIS LAYER AND THAT IS NOT AN ACCIDENT. Every row wears
+   an existing §63 role class — `.t-h2` on the name, `.t-desc` on the other
+   three — so the sizes, the weights and the inks are all §63's, including the
+   two the black card needs (`.dark-card h3` lifts the name to `--on-dark`, and
+   `.dark-card .t-desc` drops the three descriptions to `--on-dark-2` while
+   `.dark-card b` lifts the leader's name back). §63's rule is that no layer
+   after it may set a font size, a font weight, a text-transform or a text
+   colour; this one sets none of the four. What is left is spacing, one box and
+   two icon fills.
+
+   WHY IT IS A LAYER RATHER THAN AN EDIT TO §73 OR §82. Every selector is a
+   class no earlier layer mentions, except two corrections that have to land
+   after what they correct: §09's default `.av-ph` box, and §73.1a's
+   `padding:20px 0 0` on the figure row, whose top space is now paid by the
+   block above it. `build.py`'s note on the ordering is the rule.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------- 108.1 ---
+   THE BLOCK
+
+   12 BETWEEN THE ROWS, WHICH IS `--sec-h-gap` AND IS THE WRONG TOKEN BY NAME
+   AND THE RIGHT VALUE BY ARGUMENT — so it is stated as the value's own token
+   rather than borrowed. Read the two: `--sec-desc-gap` (8) is "a heading and a
+   sentence ABOUT that heading: one object on two lines", and `--sec-h-gap` (12)
+   is "a heading from its CONTENT — different objects". These four rows are the
+   second kind: a name, a paragraph about the course, a person, and a count are
+   four different facts, and at 8 the paragraph closed up against the name badly
+   enough that the pair read as a title with a subtitle.
+
+   AND THE NAME TAKES THE TIGHTER ONE, because the name and its description ARE
+   §38's pair — the reference relationship `--sec-desc-gap` was minted for. So
+   the block runs 8 under the name and 12 under everything else, which is the
+   same two-value rhythm `.rec-b` / `.rec-top` uses beside the recommendation's
+   portrait.
+
+   THE CARD'S OWN 24 IS WHAT SEPARATES THIS FROM THE HEAD. §82.1 gives
+   `.sec.eo.dark-card` `gap:var(--s06)` as a column flex, so this block needs no
+   top margin — stating one would ADD to that gap rather than replace it, which
+   is §79.1's 64px measurement and the mistake §82.2 records avoiding.
+   -------------------------------------------------------------------------- */
+.app .eo-course{
+  display:flex;flex-direction:column;
+  gap:var(--sec-h-gap)}
+.app .eo-cname{margin:0}
+
+/* THE DESCRIPTION IS FULL WIDTH AND WAS CAPPED FOR ONE BUILD (Maryam, 2 Sep
+   2026: "give the course desc full width"). It carried `max-width:var
+   (--measure)` on §05's argument — the one that gives `.ai-body` and `.acc-b`
+   their cap, that a paragraph across 900px is a log file. The cap is off; what
+   is worth keeping is why it was defensible and why the instruction wins.
+
+   THE CAP HELD IT TO 572 OF 894, so it set to three lines with a third of the
+   card empty beside it — and unlike Tal's summary this paragraph has nothing in
+   that space to sit next to. §05's rule is about a MEASURE for reading, and it
+   is the right default; here the card is one column, the block above it is a
+   28px name that runs the full width, and a short paragraph indented to
+   two-thirds under a full-width heading reads as a column that failed to fill.
+   Two lines at 894 rather than three at 572.
+
+   `max-width:none` IS STATED RATHER THAN THE DECLARATION DELETED, because §05's
+   rule is `.ph .lead,.tile > p,.ai-body,.acc-b,…,.sec > p` — and this `<p>` is
+   not on that list today, but §63 §44's own note is that the block crosses into
+   the design system, where a hand-authored page may well put it somewhere §05
+   does reach. Stating it makes the width a property of the component. */
+.app .eo-cdesc{
+  margin:calc(var(--sec-desc-gap) - var(--sec-h-gap)) 0
+         calc(var(--s06) - var(--sec-h-gap));
+  max-width:none}
+
+/* 24 BETWEEN THE DESCRIPTION AND THE LEADER, WHICH IS THE ONE GAP IN THE BLOCK
+   THAT IS NOT 12 (Maryam, 2 Sep 2026: "add some space after desc before you
+   start the leader row"). It is stated as `--s06` minus the column's own gap so
+   the arithmetic is visible and one value still drives it.
+
+   IT IS A GROUP BREAK RATHER THAN A BIGGER GAP. The four rows are two pairs: the
+   name and its description are the COURSE, and the leader and the member count
+   are the COHORT — who runs it and who is in it. At a flat 12 they read as one
+   list of four, which is what made the ask worth making. 24 is the same value
+   §82.1 uses between the card's own blocks, so the break inside the block and
+   the breaks around it are one number. */
+
+/* ------------------------------------------------------------------- 108.2 ---
+   THE LEADER ROW
+
+   THE FACE IS 24px AND THE ROW IS A BASELINE-FREE FLEX LINE. `.av-ph` carries
+   §09's own box and §106's disc, so the only thing stated here is the size and
+   the fact that a 24px mark beside a 19px line has to be centred on it rather
+   than sat on its baseline — `align-items:center` on the row, not a margin,
+   because the row is one line at every width the card has.
+
+   `display:inline-flex` ON THE MARK AND `flex:none`, because the row is a `<p>`
+   and the span would otherwise be an inline box with the image's own baseline
+   gap under it — the classic 4px that makes a 24px disc measure 28.
+
+   IT IS `.av-ph`, WHICH MEANS THE INITIALS FALLBACK COMES FREE. §09 holds the
+   letters and the photograph in one box, so a missing asset degrades to "PN"
+   rather than to a hole — and `crow`'s note is why that matters here: an
+   undefined `src` 404s on every render, which `respcheck` reads as a broken
+   screen. `COHORT_LEAD.img` is `AV.priya`, embedded at build time, so the
+   fallback should never show; it is the shape that is correct rather than the
+   case that is expected.
+   -------------------------------------------------------------------------- */
+.app .eo-lead{
+  display:flex;align-items:center;
+  gap:var(--s03);
+  margin:0}
+.app .eo-lead-ph{
+  flex:none;
+  display:inline-flex;
+  width:24px;height:24px}
+
+/* ------------------------------------------------------------------- 108.3 ---
+   THE SEAT-COUNT ROW WAS HERE AND ITS FIGURE MOVED INTO THE FOURTH CELL
+
+   `.eo-taken` was a fourth row — an `I.group` mark and "6 of 10 candidates have
+   already enrolled". The 2 Sep ask that named the fourth figure cell "Total
+   Members / 8 members till now" with a red seats chip put the same number, its
+   denominator and its urgency in the slot built for figures, so the row went.
+   The note over `enrolFacts` in views.js is the record.
+
+   TWO THINGS FROM IT ARE WORTH KEEPING because the next inline mark on this
+   card will want them: the glyph belongs at **16px, not the 24 the figure cell
+   uses** — that mark opens a two-line cell and is its column, an inline one
+   sits in a 19px line of text where 24 out-sizes the sentence it introduces
+   (§73.1a's `.rec-f` is the row it matched) — and it is filled `--on-dark-2` to
+   match its words, which is §82.2's own measurement ("§73.1a fills them
+   `--text-secondary`, which is 1.5:1 on this ground — the glyphs are simply not
+   there").
+   -------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------- 108.5 ---
+   THE SEATS CHIP AND THE RATING'S STAR
+
+   THE CHIP SITS AT THE END OF THE LABEL LINE, which is what "on the right of
+   Total members" means and is why `.eo-fl` becomes a flex row. `margin-left:
+   auto` rather than `justify-content:space-between`, so a cell WITHOUT a chip
+   is unaffected — the other three labels are the row's only child and an auto
+   margin on a child that does not exist changes nothing. `align-items:center`
+   because the chip is 20px against a 19px label line.
+
+   AND IT WRAPS, WHICH THE FIRST VERSION GOT WRONG AND `respcheck` COULD NOT
+   CATCH. That version stated `flex-wrap:nowrap`, on the reasoning that the four
+   cells are `minmax(0,1fr)` tracks so "Total Members" plus a 78px chip would
+   simply size the widest track. True at desktop and false at the stacked tier:
+   §73.3 puts the row 2 x 2 below 900, so at 390 the cell is 139px and the label
+   box is 103 — measured `scrollWidth - clientWidth = 42`, the chip clipped by
+   42px inside its own line.
+
+   THE FRAME-OVERFLOW TEST CANNOT SEE THIS, WHICH IS THE PART WORTH RECORDING.
+   `respcheck`'s check walks up for a real `overflow-x` and measures the frame;
+   a child clipped inside a `min-width:0` grid item never reaches the frame, so
+   all seven widths passed with the chip half-drawn. The tell was measuring
+   `scrollWidth` on the label box itself. Trap 15's lesson one component over —
+   "measure with `offsetWidth`, not `getBoundingClientRect`" — is the same shape
+   of mistake: the box reports what it was clamped to, not what it holds.
+
+   `space-between` RATHER THAN AN AUTO MARGIN ON THE CHIP IS WHAT MAKES WRAPPING
+   WORK. With `margin-left:auto` a wrapped chip is pushed to the right-hand end
+   of its own line, which reads as a chip that has come loose from its label;
+   `justify-content:space-between` puts two items that fit at opposite ends —
+   the same result the auto margin gave — and a single item, wrapped or not, at
+   the start. THE OTHER THREE CELLS ARE UNAFFECTED: their label line has one
+   child, and `space-between` on one item is `flex-start`.
+
+   THE GROUND IS A FLAT `#ff0000` (Maryam, 2 Sep 2026: "the red chip color will
+   be #FF0000"), AND IT IS A LITERAL BY INSTRUCTION RATHER THAN A TOKEN. §01
+   holds three reds and none of them is this one: `--support-error` (#da1e28) is
+   tuned as a fill, `--danger-ink` (#c21520) is the version that may be text,
+   and `--support-error-bg` (#ffd7d9) is `.tag`'s pale wash. A fourth is not
+   added, because the colour is this chip's and naming it would invite a second
+   caller to inherit a decision that was made about one pill.
+
+   IT SHIPPED AS A 30% MIX FIRST AND THAT ROUND TRIP IS WORTH KEEPING, because
+   the reasoning that produced it is still true of any RE-TINT here. §31's
+   rounded flag chip is `color-mix(in srgb, var(--danger-ink) 12%,
+   var(--layer-01))` — a tint against WHITE paper, where 12% of a dark red is
+   already a clear pink. Against `--gray-100` the same mix is indistinguishable
+   from the card: measured, 12% reads as a rectangle of nothing. 30% was the
+   value that made it unmistakably red while staying quiet beside the accent
+   button. What the instruction asked for is not quiet, and on a card whose
+   subject is a decision with two seats left that is a defensible call — the
+   chip is the only thing on the card competing with the CTA, and it is the only
+   thing on the card with a deadline in it.
+
+   THE WORDS ARE WHITE AND THE CONTRAST IS 4.00:1, WHICH IS SHORT OF AA AND IS
+   RECORDED RATHER THAN SILENT. §67's own note has the arithmetic for this exact
+   colour — "pure `#ff0000` is 4.00:1 on white and would fail AA as text, which
+   is exactly the fill/ink split §01 already makes for the orange" — and white
+   on `#ff0000` is the same 4.00:1 by symmetry. AA wants 4.5 for 12.5px at any
+   weight. Black would pass at 5.25:1 and is not used: a red chip with black
+   text reads as a hazard sticker rather than as a count of seats. This is the
+   same call §63 §10 records for the journey's step states, where the file's own
+   `#00a43c` and `#f47113` read 2.8:1 and 3.1:1 — a named colour wins over the
+   build's AA rule, and the measurement is written down where the colour is.
+
+   FULLY ROUNDED, AND IT IS THE THIRD PLACE THIS SYSTEM ALLOWS A CURVE. `--radius`
+   is `0px` by token; §56 grants the exception to marks, §87.2 argues it for a
+   pill ("999px is not a rounded rectangle, it is a shape whose ends are
+   circles") and §31 draws its flag chip that way by instruction. A literal
+   `999px` rather than a re-pointed token, which is what keeps `--radius` honest.
+
+   THE STAR IS `--star`, #ffcb05, AND IT IS NOT A NEW COLOUR. §01 states it and
+   §15.949 has filled `.stars svg.f` with it since the peek was built — so "our
+   rating star will be yellow just like how we are using" is that token by name.
+   `.eo-fi-star` is a modifier on the existing 24px mark rather than a second
+   mark: the cell has one star and it is the cell's own glyph.
+   -------------------------------------------------------------------------- */
+.app .eo-fl{
+  display:flex;align-items:center;
+  gap:var(--s03);
+  flex-wrap:wrap;justify-content:space-between}
+.app .eo-chip{
+  flex:none;
+  display:inline-flex;align-items:center;
+  padding:var(--s01) var(--s03);
+  border-radius:999px;
+  white-space:nowrap;
+  background-color:#ff0000}
+/* AND THE STAR NEEDS (0,4,1), WHICH IS THE TRAP IN THIS SECTION. §82.2 states
+   `.app .dark-card .eo-fi svg{fill:var(--on-dark-2)}` at (0,3,1) — the rule
+   that rescued the four marks from `--text-secondary` on a black ground — so an
+   `.app .eo-fi-star svg` at (0,2,1) loses to it and the star comes out grey.
+   Landing later is not enough either: a (0,3,1) restatement only wins on ORDER,
+   which is exactly what trap 3's counter-example (§77.6a) cost a build cycle.
+   Both classes on one compound is (0,4,1) and states a structural truth.
+   The unconditional rule is the white-page case the design system ships. */
+.app .eo-fi-star svg{fill:var(--star)}
+.app .dark-card .eo-fi.eo-fi-star svg{fill:var(--star)}
+
+/* ------------------------------------------------------------------- 108.4 ---
+   THE FIGURE ROW'S TOP SPACE IS PAID BY THE BLOCK ABOVE IT NOW
+
+   §82.2 gives `.facts.eo-facts` `padding-top:var(--s06)` and a `border-top`,
+   and its note is careful about which mechanism pays which side: "the space
+   above the rule is the CARD'S GAP (82.1) and the space below is this block's
+   own `padding-top`; it has to be that way round, because a `margin-top` here
+   would ADD to the gap rather than replace it."
+
+   THAT STILL HOLDS AND IS UNTOUCHED. What changed is only what sits above the
+   rule — the head, and now four more rows — and the card's own 24px gap is what
+   separates the block from the rule exactly as it separated the head from it.
+   So there is nothing to restate: this section exists to say that it was
+   checked rather than to change anything, because "the rule moved down the card
+   and its spacing is still 24/24" is the kind of thing a later reader will
+   otherwise re-derive.
+
+   Measured on `assessed` at 1280: 24 from the seat count to the rule, 24 from
+   the rule to the first figure's mark.
+   -------------------------------------------------------------------------- */

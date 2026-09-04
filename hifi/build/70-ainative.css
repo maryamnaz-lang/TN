@@ -68,38 +68,177 @@
    put the amber in a different place on each object.
    ------------------------------------------------------------------------ */
 .app{
-  /* THE FILE'S THREE STOPS, TO THE HEX. §01's `--accent` is #f57414 and the
-     file's is #f47113 — a shade apart, invisible on a button and not invisible
-     here, because these three are also the conic that runs the border and a
-     ramp assembled from two sources drifts the first time either moves. So the
-     AI ramp states its own three and §01's accent stays the product's. */
-  --ai-1:#f47113;
-  --ai-2:#e2a600;
-  --ai-3:#f0530c;
-  --ai-amber:var(--ai-2);
+  /* ==============================================================
+     THE RAMP IS RED INTO PINK AND BACK — 4 Sep 2026
 
-  --ai-grad:linear-gradient(99.54deg,
-    var(--ai-1) 1.04%, var(--ai-2) 39.89%, var(--ai-3) 99.58%);
+     Maryam, with the CSS: "For the tal text that we were using in
+     gradient and the tal stars, use this gradient color —
+     `linear-gradient(90.13deg, rgba(253,78,89,0.7) 0%,
+     rgba(244,128,242,0.7) 50%, rgba(253,78,89,0.7) 100%)`."
+
+     THREE THINGS ABOUT IT ARE NEW AND EACH ONE MATTERS.
+
+     IT IS SYMMETRIC. The old ramp ran orange → amber → deeper
+     orange, three different colours across the object; this one
+     leaves and returns on the same red with the pink in the middle.
+     `--ai-1` and `--ai-3` are therefore the SAME VALUE, which looks
+     like one token too many and is not: both names have their own
+     readers (§70.3's dock glow reads all three, §88 falls back to
+     1 and 3), and keeping three is what lets §83 re-point the ramp
+     for the red demo without rewriting the gradients.
+
+     THE STOPS ARE 0 / 50 / 100 AND THE ANGLE IS 90.13. The old
+     1.04 / 39.89 / 99.58 at 99.54deg were 581:6670's, quoted to the
+     second decimal; these are the new file's, quoted the same way.
+     The four per-surface angles this layer's head note lists are
+     down to two, because a symmetric ramp has no amber to place —
+     which is the one thing that got simpler.
+
+     AND THE TEXT AND THE STARS RUN AT FULL STRENGTH, WHICH IS THE
+     SECOND VERSION OF THE SAME ASK. The first gave the ramp as
+     `rgba(...,0.7)` and shipped that way for one build; clipped to
+     text on white that composites to #FE838B, **2.38:1** against the
+     old #f47113's 2.84, and it was flagged as the one cost of the
+     change with the alpha token named as the one-line reversal.
+     Maryam came back with the same three stops as flat hex ("for tal
+     text and star change the gradient colors opacity to ...
+     `linear-gradient(90.13deg, #FD4E59 0%, #F480F2 50%, #FD4E59
+     100%)`"), so that is the reversal taken: **#FD4E59 is 3.28:1 on
+     white**, better than the orange it replaced, and the same stated
+     §63 §7 exception the family has always had.
+
+     THE ALPHA SURVIVES ON ONE TOKEN AND ONLY ONE — `--ai-line-alpha`,
+     70%, read by `--ai-grad-line` and nothing else. That is not a
+     leftover. The dock's border alpha is MEASURED off 742:6191's own
+     render (the edge composites to (252,131,139), which is 70% of
+     #FD4E59 over white) and the comet's five stops carry `.7` in
+     Maryam's own CSS for them. So the FILLS are full strength and the
+     two 1px LINES are 70%, each because its own source says so. One
+     token for both was the mistake: the name said "the ramp's alpha"
+     when what it meant was "the line's".
+
+     THE STOPS ARE HEX rather than `rgba()` literals because `--ai-1`
+     is also read as a SOLID — the dock's border colour, `.qa-ic`'s
+     fill, `.sumdrop`'s edge — where an alpha would be a second
+     decision nobody made. `color-mix` is how 70% reaches the one
+     gradient that wants it, and this layer already uses it for the
+     send chip's 20%.
+     ============================================================== */
+  /* ==============================================================
+     AND THE RAMP SPLIT IN TWO — 4 Sep 2026, #FF3733
+
+     This is the second re-hue in a day and the first one that is
+     structural: the text/star ramp and the 1px-line ramp are no
+     longer the same three stops.
+
+       TAL'S TEXT AND THE STARS    #FF3733 -> #FF9A96 -> #FF3733
+       THE DOCK BORDER AND THE COMET  #FF3733 -> #CCE7CB -> #FF3733
+
+     A SALMON MIDDLE AND A PALE GREEN MIDDLE, which is not a thing
+     that could be guessed and is the reason both were checked rather
+     than assumed. The text ramp is Maryam's own CSS. The line ramp is
+     MEASURED off 742:6191's render: sampled at 988px and with the 70%
+     divided back out, the top edge reads (254,55,51) at both ends and
+     **(202,229,202) at 60% across** — which is the `rgba(204,231,203)`
+     her moving-line spec gives for the same colour, within two units
+     on each channel. So the dock and the comet share a ramp, and Tal's
+     name is now a different one. Last time all three were one.
+
+     THE GREEN'S OFFSET IS 60% AND THAT WAS FITTED, NOT READ. Her
+     moving line puts its green at 49.04% between reds at 22.6% and
+     75%, and the dock's peak is not there. Interpolating a three-stop
+     `0 / 60 / 100` against the render predicts (236,121,108) at 22.6%,
+     (213,199,175) at 49% and (223,165,146) at 75%; measured, those
+     three are (235,119,106), (212,196,174) and (222,166,146). Every
+     channel within three units, so the dock is three stops with the
+     green at 60 rather than five stops with the whites cropped.
+
+     `--ai-2` IS THE TEXT RAMP'S MIDDLE AND `--ai-line-2` IS THE
+     LINE'S. Two names because they are two colours now; `--ai-1` and
+     `--ai-3` are still the shared ends, and still the same value as
+     each other for the reason the last note gives (both have their own
+     readers, and three names is what lets §83 re-point a ramp without
+     rewriting the gradients).
+
+     `--ai-amber` READS NOTHING AND IS THE ONE DEAD LINE HERE — grepped
+     4 Sep 2026, zero `var(--ai-amber)` in the build. It was the name
+     for the original orange ramp's middle stop, which has now been a
+     magenta and a salmon since. Left rather than deleted in a colour
+     pass, and flagged: it is the "gate nothing writes" tell.
+     ============================================================== */
+  --ai-1:#ff3733;
+  --ai-2:#ff9a96;
+  --ai-3:#ff3733;
+  --ai-line-2:#cce7cb;
+  --ai-amber:var(--ai-2);
+  --ai-line-alpha:70%;
+
+  /* HER ANGLE AND HER FOUR NUMBERS, TO THE SECOND DECIMAL. 136.05deg
+     with the stops at 33.67 / 49.47 / 68.46 — a narrow band, so the
+     first third and the last third of any object painted through it are
+     flat `--accent` and the lift happens across the middle. That is a
+     different shape from the old 0/50/100 and it is what makes the
+     salmon read as a highlight travelling over a red word rather than
+     as a three-colour ramp. */
+  --ai-grad:linear-gradient(136.05deg,
+    var(--ai-1) 33.67%, var(--ai-2) 49.47%, var(--ai-3) 68.46%);
 
   /* the same three stops at the angle 583:6677 gives the "ask for another"
      link — a separate token rather than a second literal, for the reason the
      ramp is one: the two are the same gradient and have to stay so */
   --ai-grad-alt:linear-gradient(113.05deg,
-    var(--ai-1) 1.04%, var(--ai-2) 39.89%, var(--ai-3) 99.58%);
+    var(--ai-1) 33.67%, var(--ai-2) 49.47%, var(--ai-3) 68.46%);
 
-  /* THE PANEL WASH — 578:6047. Three stops at FIVE PER CENT, which is the
-     number that matters: at .05 the panel is a warm cast on white paper
-     rather than a tinted box, so the sentence on it is still the darkest
-     thing in the band. §25.1's corner ellipses are still there underneath and
-     the two do not fight, because this one has no edge anywhere in it. */
+  /* AND THE SAME RAMP AS A HARD LINE, for a 1px border rather than a fill.
+     `--ai-grad-line` is 742:6191 — the ask dock's edge — and it is the same
+     three stops at the same angle and the same alpha as the label's, which is
+     what the file says: sampled off that node's own render, the border reads
+     #FD4E59 at both ends and #F480F2 at the centre once the 70% is divided
+     back out. A separate token only because a `border-image` cannot take a
+     `background-image` one and §70.3a has to say `1` after it. */
+  --ai-grad-line:linear-gradient(90.13deg,
+    color-mix(in srgb, var(--ai-1) var(--ai-line-alpha), transparent) 0%,
+    color-mix(in srgb, var(--ai-line-2) var(--ai-line-alpha), transparent) 60%,
+    color-mix(in srgb, var(--ai-3) var(--ai-line-alpha), transparent) 100%);
+
+  /* THE PANEL WASH — 578:6047, AND IT IS STILL THAT NODE. Maryam pointed at it
+     again on 4 Sep 2026 ("for tal summary section use this kinda gradient") and
+     the node had been redrawn in the new hues; everything else about it is
+     unchanged, which is why this is a two-value edit rather than a rewrite.
+
+     Three stops at FIVE PER CENT, which is the number that matters: at .05 the
+     panel is a cast on white paper rather than a tinted box, so the sentence on
+     it is still the darkest thing in the band. §25.1's corner ellipses are
+     still there underneath and the two do not fight, because this one has no
+     edge anywhere in it.
+
+     THE STOPS ARE MEASURED OFF THE NODE, not assumed from the ramp, and that
+     has now been done twice for the same token. **761:6291** is the 4 Sep
+     version: sampled at 926px the panel is pure white for its first third,
+     turns a faint GREEN across the middle — (252,254,252) from x=541 to x=601,
+     which is `rgba(204,231,203,.05)` over white to the unit — and finishes a
+     faint warm at (252,249,248). So the wash follows the LINE ramp's green
+     rather than the text ramp's salmon, which is the same split §70's token
+     note describes one screen up.
+
+     THE ANGLE, THE THREE OFFSETS AND THE 5% ARE UNTOUCHED THROUGH BOTH
+     RE-HUES. The far stop sits at 114.21%, off the panel's own edge, so full
+     strength is never drawn — which is why the right-hand reading is (252,249,
+     248) and not `rgba(255,55,51,.05)`'s (255,245,245). Predicted from the
+     three stops it is (254,248,248); measured (252,249,248), and the two units
+     of red are §25.1's corner ellipses, which the Figma render also carries. */
   --ai-wash:linear-gradient(107.51deg,
-    rgba(255,255,255,.05) 35.98%, rgba(226,166,0,.05) 66.82%,
-    rgba(240,83,12,.05) 114.21%);
+    rgba(255,255,255,.05) 35.98%, rgba(204,231,203,.05) 66.82%,
+    rgba(255,55,51,.05) 114.21%);
 
   /* THE INLINE HIGHLIGHT behind an accent phrase in Tal's sentence — 581:6664.
      The file draws these as absolutely-placed rectangles behind the words,
      which is Figma's way of saying "a ground on a text run". */
-  --ai-hl-bg:rgba(244,113,19,.05);
+  /* re-hued for the red accent, 4 Sep 2026 — the accent at the same 5%, which
+     is §83's own value for the demo. The BLUE twin four lines down is
+     deliberately untouched: it is the popover's link hue at the same 5%, not
+     the accent's. */
+  --ai-hl-bg:rgba(255,55,51,.05);
 
   /* AND THE SAME WASH IN THE POPOVER'S BLUE — the lead-in on `.sd-read`
      ("What it measured:", "What happens in it:"). §63 §10a is the ink and the
@@ -525,10 +664,20 @@
 /* Below 900 there is one column, so the second one is a block under the
    sentence and pays the page's own gutter. The hairline turns with it — a rule
    on the left of a column that is no longer beside anything is a line down the
-   middle of nothing. */
+   middle of nothing.
+
+   AND IT IS `var(--rule)`, NOT `#d7d5cc`. §39 had already written the argument
+   — "`#d7d5cc` IS `--rule`… the token is used rather than the literal so this
+   hairline keeps moving with every other hairline in the product" — and this
+   layer wrote the literal anyway, three times, with §71.652 making it four.
+   Nothing showed it while the two values were a digit apart. The 3 Sep 2026
+   change to #e9e9e9 is what a literal costs: four structural hairlines on the
+   AI-native dashboards would have stayed warm grey beside 250 neutral ones,
+   and the tell would have been the head band's own column divider not matching
+   the section rule 40px under it. All four read the token now. */
 .app .modhead > .head-col{
   padding:var(--s06) var(--pad-x) var(--s06);
-  border-top:1px solid #d7d5cc}
+  border-top:1px solid var(--rule)}
 
 @container app (min-width:900px){
   .app .modhead:has(> .head-col){
@@ -571,7 +720,7 @@
     margin:0;
     padding:var(--s06) var(--s07);
     border-top:0;
-    border-left:1px solid #d7d5cc;
+    border-left:1px solid var(--rule);
     background:var(--layer-01)}
   /* 57 ON THE LEFT IS THE FILE'S — 587:6742 — AND IT ONLY FITS WHEN THE TRACK
      DOES. In 471 the inset leaves the list 330; the product's track is ~324 at
@@ -772,14 +921,53 @@
   position:absolute;inset:0;
   width:100%;height:100%;object-fit:cover}
 
-/* 16 BETWEEN THE THREE BLOCKS — 581:6463 — and 8 inside the first, which is
-   what keeps the expertise line reading as the second half of the name rather
-   than as the first of the facts (581:6464). */
+/* 8 BETWEEN THE THREE BLOCKS AND 4 INSIDE THE FIRST — Maryam, 2 Sep 2026:
+   "reduce the vertical gaps between each row on the right of priya's image.
+   the image will also be equal to the height of the content on the right."
+
+   THE FILE'S OWN NUMBERS WERE 16 AND 8 (581:6463 / 581:6464) and the argument
+   for the second one is worth keeping because it still holds at 4: the inner
+   gap has to be SMALLER than the outer one, so the row under the name reads as
+   the second half of the name rather than as the first of the facts. What
+   changed is both values, not the relationship — 8 outside and 4 inside keeps
+   the same 2:1 ratio the file states.
+
+   WHAT THE ROWS ACTUALLY ARE IS WHY 8 IS RIGHT AND NOT MERELY SMALLER. The
+   four are the name, its rating, Tal's claim about this person, and the terms
+   of booking them — every one of them a fact about ONE agent, which is
+   `--sec-desc-gap`'s case ("one object on two lines") rather than
+   `--sec-h-gap`'s ("a heading from its content — different objects"). At 16
+   they were four separate blocks that happened to share a portrait; at 8 they
+   are one card about one person. Measured at 1440: the block goes 120 → 100
+   and the four rows read 23 / 4 / 19 / 8 / 19 / 8 / 19.
+
+   THE PORTRAIT FOLLOWS WITH NOTHING RESTATED, WHICH IS THE SECOND HALF OF THE
+   ASK ANSWERED BY §75.3's DESIGN. That layer makes `.rec-ph` `width:auto;
+   height:100%; aspect-ratio:1` in a stretch grid row, so the HEIGHT is the
+   input and the square is derived from it — the image was already exactly the
+   content's height (measured 120 against 120) and it is exactly the content's
+   height after this (100 against 100). Read §75.3's note before touching
+   either: in a FLEX row this collapses to an 18px photograph, which is why
+   `.rec-l` is a grid at 600 and up.
+
+   IT MOVES ALL THREE `.rec-b` CALL SITES AND THAT IS DELIBERATE. `talRec`'s
+   black card is what the instruction names, but `V.agent`'s identity block,
+   `V.booking`'s and the `.rec-busy` skeleton draw the same component with the
+   same rows — and a gap is geometry, not ink, so scoping it to `.rec-dark`
+   the way §77 scopes `.rec-n` / `.rec-r` / `.rec-f` would give one component
+   two row rhythms on two pages. The skeleton in particular MUST follow, per
+   this layer's own note on `.rec-ph`'s phone cap.
+
+   `.rec-ov` KEEPS ITS 16 AND IS NOT AN OVERSIGHT. That is `V.agent`'s overview
+   STACK — the bio, the expertise, the tags — which is genuinely separate
+   blocks under one heading rather than rows of one identity, so it is
+   `--sec-h-gap`'s case and not this one. It is stated on its own line for
+   exactly this reason and that line is unchanged. */
 .app .rec-b{
   flex:1 1 auto;min-width:0;
-  display:flex;flex-direction:column;justify-content:center;gap:var(--s05)}
+  display:flex;flex-direction:column;justify-content:center;gap:var(--s03)}
 .app .rec-b p{margin:0}
-.app .rec-top,.app .rec-ov{display:flex;flex-direction:column;gap:var(--s03)}
+.app .rec-top,.app .rec-ov{display:flex;flex-direction:column;gap:var(--s02)}
 .app .rec-ov{gap:var(--s05)}
 
 /* 4 BETWEEN THE NAME AND THE RATING, 8 INSIDE THE NAME — 581:6465/6466. Two
@@ -798,7 +986,23 @@
 .app .rec-v{display:inline-grid;place-items:center;width:20px;height:20px}
 .app .rec-v svg{width:20px;height:20px;fill:#00a43c}
 .app .rec-r{display:inline-flex;align-items:center;gap:var(--s02)}
-.app .rec-r svg{width:16px;height:16px;fill:#f47113}
+/* THE RATING STAR IS ALWAYS YELLOW (Maryam, 4 Sep 2026: "the rating star will
+   always be yellow"), so it is `--star` and not an accent value at all.
+
+   IT WAS THE ONLY RATING STAR IN THE PRODUCT THAT WAS NOT. §01's `--star`
+   (#ffcb05) is the token for exactly this and §15.960, §44.157 and §108.235
+   all read it — `.stars svg.f` on the agent cards, the peek panel and the
+   course's own rating. This one was `#f47113` because 581:6479 draws it that
+   way, then `--accent` in the 4 Sep re-hue, which made a red star beside four
+   yellow ones on other surfaces. Both were the same category error the journey
+   step states record from the other side: a rating is not the brand, and the
+   value that says "this is a rating" is the one four other call sites use.
+
+   §83's `.app.tmp-accent .rec-r svg{fill:var(--accent)}` IS DELETED with this,
+   not re-pointed. That rule existed to keep the star following the accent
+   through the red demo, and a star that never follows the accent has nothing
+   for a demo to re-point. */
+.app .rec-r svg{width:16px;height:16px;fill:var(--star)}
 
 /* THE THREE FACTS — 581:6476. A wrapping row rather than a grid: the three are
    independent and of very different lengths, and `.facts` would draw its
@@ -863,9 +1067,26 @@
    which is also why the label must keep it rather than relying on the mask:
    the mask is pushed to the far edge and 581:6548 centres the pair. */
 .app .rec-a > .btn.rec-see{
-  color:#f47113;
-  border-color:#f47113}
-.app .rec-a > .btn.rec-see svg{fill:#f47113}
+  /* THE `#f47113` LITERALS HERE ARE TOKENS NOW (4 Sep 2026). They were written
+     as the ramp's own hex because §39's rule held — "#f47113 is NOT --accent",
+     the two being a shade apart — and the re-hue closed that gap from BOTH
+     ends: the accent became #ff584a and the ramp became a red that is not it,
+     so neither literal is the other's colour any longer and the honest
+     statement is which of the two each object belongs to. `.rec-r`'s stars are
+     the ACCENT — a rating is a fill, not Tal's voice.
+
+     AND `.rec-see` MATCHES NOTHING, which is why its pair is left stated rather
+     than argued over. §63 §33's note records it: the button left that group
+     when the card went black and §63 gives it `--on-dark`; no view writes the
+     class at all (grepped, 4 Sep 2026 — `.rec-r` has three call sites and
+     `.rec-see` has none). Re-pointed rather than deleted because deleting it is
+     a change §75.3's own accounting should make along with §15's and §37's dead
+     `.cert-btn` rules, not something a colour pass does on the way past.
+     FLAGGED: if it is ever written again it is on a BLACK card, so the ink is
+     `--accent-on-dark` (7.53:1) and not `--accent-text` (3.19:1 there). */
+  color:var(--accent-on-dark);
+  border-color:var(--accent)}
+.app .rec-a > .btn.rec-see svg{fill:var(--accent-on-dark)}
 
 /* THE WAY TO DISAGREE — 583:6677. A button drawn as a line of text: the ramp
    clipped to the glyphs, underlined, in italics because it is quoted speech —
@@ -1125,7 +1346,7 @@
    join in the build and §75.3 still takes it off under the recommendation. */
 .app .sec-qa{
   padding:var(--s06) var(--pad-x);
-  border-top:1px solid #d7d5cc}
+  border-top:1px solid var(--rule)}
 
 /* AND THE SECTION ABOVE MUST NOT CLOSE ITSELF — the double bottom border
    (Maryam, 31 Aug 2026). This is the only section in the build that draws its
@@ -1251,6 +1472,57 @@
   align-self:center;margin-left:auto}
 .app .qa-go svg{width:16px;height:16px;fill:currentColor}
 
+/* --------------------------------------------------------------------- 6b --
+   A CARD WITH NO DESCRIPTION IS ONE LINE, AND ALL THREE ALIGNMENTS ABOVE
+   ASSUME TWO
+
+   Maryam, 2 Sep 2026, of the talent agent dashboard: "the blocks in quick
+   actions should not show such data, you loose the quick action context there,
+   it should be 2 action items only." So a Quick Action can now be a title and
+   nothing else — two of them are — and that is a state this component had
+   never been drawn in.
+
+   IT DOES NOT DEGRADE, IT BREAKS, and the reason is that every alignment
+   decision above was argued for a two-line card:
+
+     `.qa-c`     `align-items:flex-start` — so two cards whose descriptions run
+                 to different line counts start their titles level
+     `.qa-ic`    `align-self:flex-start` + `margin-top:1px` — "the mark belongs
+                 on the title's line, not in the middle of the two"
+     `.qa-go`    `align-self:center` — "the arrow and the numbers should be
+                 right middle aligned to the block"
+
+   Every one of those is right for the card the file draws and wrong when the
+   content is a single 19px line in a 74px box: the mark and the title sit at
+   the top, the arrow centres 18px below them, and 39px of the card is empty
+   under the words. Measured at 1280 — title 16→35, arrow 29→45. It reads as a
+   card whose second line failed to load rather than as a card that has none.
+
+   SO THE ONE-LINE CARD CENTRES, AND §70.6's ARGUMENT IS NOT REVERSED. That
+   argument is about cards that DISAGREE about how many lines they hold; with no
+   descriptions at all every card in the row is exactly one line, so there is no
+   staggering left for top-alignment to prevent and nothing to hang the slack
+   below. The mark loses its optical `margin-top` with it — that 1px offset
+   answered a 20px glyph against a 21px title line at the top of a box, and
+   centring solves the same thing exactly.
+
+   AND IT KEEPS `min-height:74px`, DELIBERATELY. Letting the card shrink to its
+   content is 51px, which is a Quick Action that is a different SIZE from every
+   other Quick Action in the product — the component is a fixed object in a grid
+   and its height is part of what makes a dashboard's cards read as one set.
+   74 with one line centred in it is a roomy action row; 51 beside the
+   candidate portal's 74 is two components.
+
+   THE GATE IS THE ABSENCE ITSELF, NOT A CLASS THE CALL SITE ADDS. §64's
+   `:not(:has(svg))` is the same idiom and the same reason: the condition is a
+   fact about the markup, so a page that simply omits the line gets the drawing
+   without knowing a class exists. `:has()` carries its argument's specificity —
+   `> .qa-b > span` is (0,1,1) — so these land at (0,4,1) and (0,4,0), which is
+   what they need to beat `.app .qa-ic`'s (0,2,0) rather than merely landing
+   later than it. */
+.app .qa-c:not(:has(> .qa-b > span)){align-items:center}
+.app .qa-c:not(:has(> .qa-b > span)) > .qa-ic{align-self:center;margin-top:0}
+
 /* --------------------------------------------------------------------- 7 ---
    THE ASK DOCK'S SEND CHIP — 581:6588
 
@@ -1305,11 +1577,36 @@
     color-mix(in srgb, var(--ai-3) 20%, transparent) 99.58%)}
 .app .askdock .askline-send svg{width:20px;height:20px;fill:currentColor}
 
-/* THE DOCK'S OWN EDGE IS THE ACCENT — 581:6568. One hairline in `--accent`
-   around the line, which is what the comet runs on. It replaces §21's neutral
-   border rather than sitting inside it: two borders on a 64px field is the
-   double-frame §39 spent a whole section undoing on the widgets. */
-.app .askdock > .askline{border-color:var(--ai-1)}
+/* -------------------------------------------------------------------- 3a ---
+   THE DOCK'S OWN EDGE IS THE RAMP — 742:6191, 4 Sep 2026
+
+   Maryam: "for the bottom tal bar, i have changed the border gradient please
+   follow the gradient only from this." It was 581:6568's flat hairline in
+   `--ai-1`; it is the ramp itself now, so the edge and the comet that runs on
+   it are one colour statement instead of two.
+
+   THE NODE'S OWN RENDER IS WHAT THIS IS BUILT FROM, not the `#fd4e59` its code
+   export prints — that export flattens a gradient stroke to its first stop, and
+   the node's note says "stroke gradient" with no value. Sampled at 988px wide,
+   the top edge composites to (252,131,139) at both ends and (247,165,244) at
+   the centre; dividing the 70% back out of each gives #FD4E59 and #F480F2 —
+   the label's three stops exactly. So the dock's border and Tal's own name are
+   the same gradient, which is what "follow the gradient only from this" turns
+   out to mean.
+
+   `border-image` AND `border-color` TOGETHER, which is §39's construction and
+   its note is the argument: `border-image` needs a style and a width to paint
+   into, and where it does not resolve the declared colour is what shows. The
+   fallback is the ramp's own end rather than `transparent`, so the worst case
+   is a flat red hairline and not an invisible one.
+
+   IT REPLACES §21's NEUTRAL BORDER rather than sitting inside it: two borders
+   on a 64px field is the double-frame §39 spent a whole section undoing on the
+   widgets. And it is safe from `border-radius`, which `border-image` silently
+   ignores — `--radius` is 0 by token and this field is square. */
+.app .askdock > .askline{
+  border-color:var(--ai-1);
+  border-image:var(--ai-grad-line) 1}
 
 /* --------------------------------------------------------------------- 3b ---
    AND A MODULE PAGE KEEPS ITS TITLE ABOVE THE TWO COLUMNS

@@ -133,7 +133,7 @@
    -------------------------------------------------------------------------- */
 .app .tal-panel .tal-body:has(> .tal-hero),
 .app .ask-thread:has(> .tal-hero){justify-content:center}
-.app :is(.tal-panel, .ask-thread) .tal-hero{
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero{
   display:flex;flex-direction:column;align-items:center;text-align:center;
   padding:0 20px;margin:auto 0;position:relative;isolation:isolate}
 /* THE GAP ABOVE THE GREETING EQUALS THE GAP BELOW IT, AND THAT IS WHY THIS
@@ -166,12 +166,12 @@
 
    All three numbers belong to this PNG at this size. If the mark changes,
    or `.tal-mk.lg` stops being 132, re-measure — do not scale this. */
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk{margin-bottom:-6px}
-.app :is(.tal-panel, .ask-thread) .tal-hero h2{
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero .tal-mk{margin-bottom:-6px}
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero h2{
   margin:0;font-size:20px;line-height:28px;font-weight:400;
   letter-spacing:.16px;color:var(--text-primary)}
-.app :is(.tal-panel, .ask-thread) .tal-hero h2 b{font-weight:600}
-.app :is(.tal-panel, .ask-thread) .tal-hero p{
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero h2 b{font-weight:600}
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero p{
   margin:16px 0 0;max-width:299px;
   font-size:13.5px;line-height:19px;color:var(--text-secondary)}
 
@@ -180,7 +180,7 @@
    reaches the text. Two repeating gradients draw the same grid; a radial
    mask does the fading, so the lines stop rather than run into the edge of
    a box. */
-.app :is(.tal-panel, .ask-thread) .tal-hero::before{
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero::before{
   content:'';position:absolute;z-index:-1;pointer-events:none;
   left:50%;top:40px;width:432px;height:309px;transform:translateX(-50%);
   background-image:

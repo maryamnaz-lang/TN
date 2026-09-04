@@ -27,7 +27,15 @@
   --brand-primary-active:#393938;
   --on-brand:#ffffff;
   --brand-tint:#f7f7f7;
-  --brand-tint-2:#fcdbc7;
+  /* THE ACCENT AT ~26%, RE-DERIVED TWICE (4 Sep 2026). #fcdbc7 was #f57414 at
+     25.9% over white; #ffd4d0 was that same 25.9% of #ff584a; this is it of
+     #ff3733. One derivation, applied again — which is the point of writing the
+     percentage down rather than the hex's provenance.
+     THE STRENGTH IS PRESERVED, NOT THE STATED PERCENTAGE — §12's `--accent-tint`
+     calls itself "the accent at 8%" and was measured at 20%, so re-deriving from
+     the comment rather than from the value would have made every chip ground in
+     the product two thirds paler in a change nobody asked for. */
+  --brand-tint-2:#ffccca;
 
   /* --- palette.secondary (the accent) ---
      #ab4fc1 is 4.06:1 on bone: fills only, never text.
@@ -47,20 +55,112 @@
      Accent INK is a different value and stays AA-safe: --accent-text and
      --accent-on-2 are the gradient's hue at a luminance that passes, and
      they are what any accent-coloured TEXT resolves to. */
-  --accent:#f57414;
-  --accent-2:#f0530c;
-  --accent-grad:linear-gradient(104.86deg,
-    var(--accent) 10.02%, var(--accent-2) 115.55%);
+  /* ================================================================
+     THE ACCENT IS RED — #FF584A, 4 Sep 2026
+
+     Maryam: "I want you to change the whole platform accent color to
+     #FF584A. For the gradient button I have another shade that I
+     implemented on figma" (737:6161).
+
+     TWO VALUES AND ONE ANGLE ALL COME FROM THE FILE. 737:6161 is a
+     left-to-right ramp `#FF584A → #F83524`, so `--accent-2` is the
+     file's second shade and the angle is **90deg at 0%/100%** rather
+     than the old 104.86deg at 10.02%/115.55%. That old angle and those
+     old offsets were the Create Account button's, quoted to the second
+     decimal for the same reason this one is: a gradient assembled from
+     a remembered approximation drifts the first time anything moves.
+
+     THE INK VALUES ARE NOT HERS AND ARE NOT GUESSES EITHER — they come
+     out of §67, the red-accent trial that was built on this exact hue on
+     31 Aug 2026 and has been sitting in the build ever since. Every one
+     was picked for a contrast target and re-measured here:
+
+       --accent        #ff584a   3.11:1 on white  — a FILL, never text
+       --accent-2      #f83524   3.80:1           — the ramp's far end
+       --accent-text   #bd2c1f   5.93:1           — was #b94a09 at 5.19
+       --accent-hover  #9d2f25   7.32:1
+       --accent-on-2   #b1271b   6.61:1  (§12)    — was #ae4508 at 5.19
+
+     So the accent INK got SAFER rather than worse, which is worth
+     stating because the fill got brighter: #ff584a is 3.11 on white
+     against #f57414's 2.84, and both are under AA by the same stated
+     decision two paragraphs up. `--on-brand-fill` still flags it.
+
+     WHAT DID NOT CHANGE IS THE RULE. Red is a FILL colour here exactly
+     as orange was; anything accent-coloured that is TEXT still resolves
+     to `--accent-text` / `--accent-on-2`, and §63 §41's one stated
+     exception (the rail's selected label at 2.94:1, Maryam's call on
+     3 Sep 2026) is now 3.11:1 in the new hue — the same exception, one
+     notch better. ================================================ */
+  /* ================================================================
+     AND IT IS #FF3733 NOW, WITH THE BUTTON SOLID — 4 Sep 2026
+
+     Maryam: "I want you to change the whole platform accent color to
+     #FF3733. Change the gradient button to solid color and that will
+     be #FF3733." The second sentence is the structural half.
+
+     THE BRAND IS NO LONGER A GRADIENT, WHICH TURNS OVER THE HEAD OF
+     THIS BLOCK. "THE SECONDARY COLOUR IS THE BRAND GRADIENT" has been
+     true since the Create Account button was quoted out of Figma, and
+     it is what `--accent-grad` exists for; the button is one flat fill
+     now, so all three state ramps are a single stop repeated.
+
+     THEY STAY GRADIENTS RATHER THAN BECOMING `background-color`, and
+     that is deliberate: §19 paints ~60 selectors with
+     `background-image:var(--accent-grad)` — every mark, chip, bar and
+     primary button in the product — so a token that stops being a
+     gradient would need all sixty re-pointed to a different property.
+     Stated as `linear-gradient(<one colour>, <the same colour>)` the
+     change is three lines and every reader is already correct. §107
+     took exactly this shape for the onboarding's own flat accent.
+
+     THE INK RATIOS ARE MATCHED TO THE OLD ONES RATHER THAN RE-PICKED,
+     which is what keeps a re-hue from quietly becoming a legibility
+     change. Each was solved for the ratio its predecessor had:
+
+       --accent        #ff3733   3.59:1 on white  (was 3.11) — a FILL
+       --accent-2      #ee0500   3.96:1           — see below
+       --accent-text   #c51c18   5.91  (was 5.93)
+       --accent-hover  #ab1815   7.31  (was 7.32)
+       --accent-on-2   #b81a17   6.57  (was 6.61, §12)
+       --accent-on-dark #ff7b79  7.52 on --gray-100 (was 7.53, §10)
+
+     SO THE FILL GOT SAFER AGAIN — 3.59 against #ff584a's 3.11 and the
+     original orange's 2.84 — and it is still the stated sub-AA
+     exception the paragraph above describes. `--on-brand-fill` still
+     flags it for the sweep.
+
+     `--accent-2` SURVIVES AND IS THE ONE JUDGEMENT HERE. Eleven rules
+     read it, and only three of them were the button: the black card's
+     haze ramps `--accent` to it (§21.22a), `--askv-stroke-hot` is it,
+     and `--auth-o-2` is it. So it is not the button's second stop any
+     more, it is "the accent one step deeper", and it is derived rather
+     than chosen — #ff584a → #f83524 was ΔL −0.088 in HSL, and the same
+     step from #ff3733 is this. **FLAGGED: if "solid" means the whole
+     accent is ONE colour, `--accent-2:var(--accent)` is one line** and
+     the haze goes back to the single ellipse §21's original note
+     describes. Not assumed, because the two-stop haze was asked for by
+     name on 4 Sep and has not been retracted.
+     ================================================================ */
+  --accent:#ff3733;
+  --accent-2:#ee0500;
+  --accent-grad:linear-gradient(90deg,
+    var(--accent) 0%, var(--accent) 100%);
   /* THE STATES ARE GRADIENTS TOO. There is no solid secondary colour in this
      product, so hover and pressed cannot be one: each is the same gradient
      stepped one stop deeper, which keeps the direction of the light and
      still reads as a state change. */
-  --accent-grad-hover:linear-gradient(104.86deg,
-    var(--accent-2) 10.02%, var(--accent-hover) 115.55%);
-  --accent-grad-active:linear-gradient(104.86deg,
-    var(--accent-hover) 10.02%, var(--accent-text) 115.55%);
-  --accent-text:#b94a09;
-  --accent-hover:#ae4508;
+  /* THE STATES ARE SOLID TOO, which is the other half of "solid colour".
+     A flat button that ramps under the pointer would be the one place in
+     the product where the brand is a gradient, and each state is still one
+     stop deeper than the last — the direction of the light is gone but the
+     direction of the STEP is what a state needs. */
+  --accent-grad-hover:linear-gradient(90deg,
+    var(--accent-hover) 0%, var(--accent-hover) 100%);
+  --accent-grad-active:linear-gradient(90deg,
+    var(--accent-text) 0%, var(--accent-text) 100%);
+  --accent-text:#c51c18;
+  --accent-hover:#ab1815;
   --on-accent:#ffffff;
 
   /* --- palette.auth — the sign-up card, from the Figma file (255:7673 and
@@ -79,10 +179,17 @@
      The gradient itself is the file's, unchanged. White on it reads 2.8:1,
      which is under AA for a 13.5px label — stated here so it is a decision
      and not an oversight. --- */
-  --auth-o-1:#f57414;
-  --auth-o-2:#f0530c;
-  --auth-o-3:#d64708;
-  --auth-o-ink:#c2540a;
+  /* AND THE FRONT DOOR FOLLOWS THE ACCENT (4 Sep 2026). §83's note says these
+     were "left orange so the trial cannot leak into a surface it was not asked
+     for" — that was right for a demo stage and is wrong for a platform re-hue:
+     "the whole platform accent" includes the one screen every reader sees
+     first. `-1` and `-2` are the accent pair; `-3` and the ink keep their own
+     contrast targets in the new hue (5.26 → 5.21, 6.12 → 5.88), so the
+     paragraph above still describes what these values do. */
+  --auth-o-1:#ff3733;
+  --auth-o-2:#ee0500;
+  --auth-o-3:#d51e1a;
+  --auth-o-ink:#c61c18;
   --auth-card-bg:#ffffff;
   --auth-shadow:rgba(149,149,149,.1);
   --auth-rule:rgba(17,17,17,.1);
@@ -120,7 +227,11 @@
      The fill colours are matched against the Figma render by eye, because
      the fill is inside that flattened SVG and this sandbox cannot reach
      figma.com to read it. Two hex values, one line each, when they land. */
-  --auth-wash-1:#f6dcc9;       --auth-wash-1-blur:100px;
+  /* THE WARM POOL IS THE ACCENT'S OWN CAST, so it moved with the accent on
+     4 Sep 2026: #f6dcc9 was #f57414 at 25.2% over white and this is the same
+     25.2% of #ff584a. `--auth-wash-2` is UNCHANGED — it is the mauve pool,
+     which never came out of the accent and is what the pair is contrasting. */
+  --auth-wash-1:#ffcdcc;       --auth-wash-1-blur:100px;
   --auth-wash-2:#ecd3de;       --auth-wash-2-blur:167px;
   --auth-sub:#767676;
 
@@ -155,7 +266,11 @@
      — so the pool is subtler against the warm ground than the blue was. That
      is the value as given; if the wash reads too faint at the top of a
      module, this is the line to deepen. */
-  --tal-chip-1:#f6efe5;
+  /* RE-DERIVED FOR THE RED, at the strength it already had: #f6efe5 is the old
+     accent at 11.5% over white, and this is 11.5% of #ff584a. The paragraph
+     above is unchanged and still the argument — a step lighter than the blue
+     it replaced, and this is the line to deepen if the wash reads too faint. */
+  --tal-chip-1:#ffe8e8;
   --tal-chip-2:#f4fef6;
 
   /* --- palette.background / surface ---
@@ -174,7 +289,20 @@
   --shell-bg:#ffffff;
   --surround:#dcdad3;
 
-  --border-subtle-01:#dcdad3;
+  /* `--border-subtle-01` IS THE HAIRLINE UNDER AN OLDER NAME, AND IT NOW SAYS
+     SO. 48 rules read it — dividers, `.acc` rows, table cells, the notification
+     panel's edge, the rail — and every one of them is the same line §10's
+     `--rule` draws in 253 others. It held #dcdad3 against `--rule`'s #d7d5cd:
+     one step apart, indistinguishable in place, and enough to make "change the
+     hairline" a two-value edit that could half-land. Pointed at the token
+     (Maryam, 3 Sep 2026, #e9e9e9), so there is one hairline in the product.
+
+     THE OTHER TWO KEEP THEIR VALUES AND THAT IS THE LINE. `-02` and
+     `-strong-01` are not separators, they are the EDGE OF A CONTROL — the
+     input, the select, the checkbox and radio box. A control's boundary has to
+     be findable, so it stays in the warm ramp at a weight that reads; the
+     hairline is decoration and is free to be as faint as it was asked to be. */
+  --border-subtle-01:var(--rule);
   --border-subtle-02:#c7c6c3;
   --border-strong-01:#8e8d8a;
 
@@ -331,7 +459,9 @@
   --on-warning-bg:#684e00;
   --error-hover:#b81922;
   --pure-white:#ffffff;
-  --accent-shadow:rgba(200,80,9,.18);
+  /* the accent's own drop shadow, in the new hue — §67's value, which is
+     `--accent-hover` (#9d2f25) at the same .18 the orange used */
+  --accent-shadow:rgba(171,24,21,.18);
   --thumb-scrim:rgba(0,0,0,.7);
 
   /* --- prototype chrome, not the product --- */
@@ -372,9 +502,42 @@ table{border-collapse:collapse;width:100%}
    Class names are Carbon's because the markup already speaks them; the
    values and roles are Material's.
    ========================================================================== */
+/* THE TWO STYLISTIC-SET FEATURES ARE GONE — 4 SEP 2026, AND THIS WAS A REAL
+   DEFECT, not a tidy-up. This rule carried `font-feature-settings:'cv05' 1,
+   'ss03' 1` and had done since the layer was written, when the face was INTER
+   (the note above still says so). They are Inter's alternates — `cv05` is its
+   single-storey `l`, `ss03` its alternate curved forms — and they were chosen
+   for Inter and left behind when the face became Söhne. Söhne's trial file
+   declares neither, so for a year they were inert: a declaration that matched
+   nothing and cost nothing.
+
+   PLUS JAKARTA SANS DECLARES `ss03`, so on 4 Sep 2026 they came back to life
+   and did something nobody asked for. PJS's `ss03` is not a tweak to one
+   letter — it substitutes a whole alternate alphabet:
+
+     a e g h l m n u y  and  G J K Q R
+
+   so every one of those was rendering as `m.ss03`, `a.ss03`, `g.ss03` … The
+   product was serving the right font file and then telling it to use its OTHER
+   letterforms. Maryam spotted it on a single glyph — the `m` in "Maryam" —
+   which is exactly where it is most visible, because `m.ss03` is narrower and
+   has flatter shoulders than the default.
+
+   THE LESSON IS THE GENERAL ONE AND IT IS WORTH THE LINES: `font-feature-
+   settings` NAMES FEATURES BY TAG, AND A TAG MEANS WHATEVER THE CURRENT FACE
+   SAYS IT MEANS. It is the one typographic property that cannot be checked by
+   reading the stylesheet — an inert declaration and a destructive one look
+   identical, and nothing warns when a font swap turns the first into the
+   second. **After changing a typeface, grep for `font-feature-settings` and
+   `font-variant-*` and re-justify every one against the new face's own feature
+   list.** `fontTools` prints it: `{r.FeatureTag for r in
+   font['GSUB'].table.FeatureList.FeatureRecord}`.
+
+   Nothing replaces them. The default forms are what the specimen shows and
+   what was chosen. `tnum` is still set per-component by §11 and §63 on the
+   classes that hold figures, which is a different question and is untouched. */
 body,.app{
   font-family:var(--font-sans);
-  font-feature-settings:'cv05' 1,'ss03' 1;
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;

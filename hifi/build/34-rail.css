@@ -55,11 +55,35 @@
    label to help it. The icon takes the accent too, so the mark and the
    marker say the same thing.
 
-   THE LABEL DOES NOT. At `--drawer-w` the row's text stays in the page's
-   ink at 600 weight: orange type at 13.5px on white is legible but it reads
-   as a link, and nothing else in this product colours a label to mean
-   "selected". The icon is a mark and can take a brand colour; the word is
-   text and keeps the text colour.
+   THE LABEL DOES TOO, AS OF 3 SEP 2026 — Maryam, with a screenshot of the
+   Dashboard row: "the selected module text should also bi orange". The
+   paragraph this replaces is kept below because its second half is still the
+   reason the value is what it is:
+
+     "THE LABEL DOES NOT. At `--drawer-w` the row's text stays in the page's
+      ink at 600 weight: orange type at 13.5px on white is legible but it
+      reads as a link, and nothing else in this product colours a label to
+      mean 'selected'. The icon is a mark and can take a brand colour; the
+      word is text and keeps the text colour."
+
+   BOTH CLAUSES WERE OVERRULED, and the second one took a second message to
+   settle. The label first shipped in `--accent-text` (#b94a09) on §01's stated
+   fill/ink split — "#f57414 … fills only, never text" — and Maryam answered
+   with a second screenshot the same afternoon: "by orange i meant the color
+   using in the icon, the text should be in the same color". So it is
+   `--accent`, the glyph's own value, and the reasoning is that at 13.5px
+   beside a 22px mark the two are read as ONE OBJECT: a rust word next to a
+   bright glyph reads as a label that failed to match its icon, which is worse
+   than either value alone. The AA cost (2.94:1) is a stated exception, written
+   up with its ratio and its mitigations in §63 §41 — that is where the whole
+   argument lives, because that is where the declaration is.
+
+   THE RULE IS NOT HERE, IT IS IN §63. This layer may fill an SVG; it may not
+   set a text colour — that is §63's, wherever the layer sits in the list, and
+   §63 lands last. §63 §41 states it, and the specificity note there is the
+   other half: `.sn-item{color:var(--text-primary)}` in §01 is only (0,1,0),
+   but `.app .sn-item.on` is stated at (0,3,0) anyway so a later `.sn-item.on`
+   rule cannot take it back on order.
    -------------------------------------------------------------------------- */
 .app .sn-item.on svg{fill:var(--accent)}
 

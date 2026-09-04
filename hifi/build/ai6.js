@@ -259,7 +259,55 @@ const PAGESUM = {
        written to prevent. `recKey` and `AGENTS` are views.js's, parsed long
        before this file. It re-types when it changes, which is correct: Tal has
        said something new. */
-    new: () => 'Welcome Back, Maryam! Based on your <b data-sum="quiz">quiz results</b>, you are currently on <b data-sum="track">Explorer track</b>. Your level from E1 - E5 anchors after a 45-minute interview. Considering your strengths I have analyzed the active roster and <b data-sum="match">matched you with ' + AGENTS[recKey()].n + ' below</b> to specifically anchor your growth areas.',
+    /* AND "CONSIDERING YOUR STRENGTHS" NOW HAS SOMETHING BEHIND IT, WHICH IT
+       DID NOT FOR AS LONG AS THIS ENTRY EXISTED.
+
+       The clause claims Tal weighed something about this candidate before
+       picking an agent, and until the `onboard` stage landed the only inputs
+       on this page were a quiz score of 64 and the word Explorer. `REC.priya`
+       then stated `match:'98%'` against a "need for System Design" — a band
+       `SCORES` does not measure. So the sentence was Tal describing reasoning
+       that had not happened, on the page where the product asks for $95.
+
+       THE ONBOARDING IS WHAT MAKES IT TRUE, so the clause is now the
+       candidate's own answer, quoted. `S.ob.why` is the option they pressed on
+       step 3 and `obLabel` reads its label out of `OB_Q`, so this sentence and
+       the read-back they saw one screen earlier cannot word it differently.
+
+       THE OLD CLAUSE IS THE FALLBACK AND IT IS STILL REACHED. `new` is
+       reachable from the stage picker and from a returning log-in without the
+       gate in front of it, and on those arrivals `S.ob.why` is null. Rather
+       than invent a reading, Tal drops to what it can honestly say: the roster
+       was analysed, which is true of a shortlist keyed on level range.
+
+       THE GUARD IS `S.obReady` AND `typeof obLabel === 'function'` IS THE
+       VERSION THAT THROWS. It shipped that way for one build and respcheck
+       caught it on four screens: **`typeof` does not protect against a
+       temporal dead zone.** It is safe on an undeclared name and on a hoisted
+       `function`, and it throws a ReferenceError on a `let` or `const` that
+       has been parsed and not yet evaluated — which is exactly what `const
+       obLabel` in ob.js is on every render before that file runs, and this
+       file's own boot render is one of them. `S.obReady` is a plain property
+       set as ob.js's last statement, so it reads `undefined` instead of
+       throwing. views.js's `onboard` render branch records the same lesson
+       from the other direction.
+
+       `data-sum="match"` STAYS ON THE NAME IN BOTH BRANCHES — §65's dropdown
+       keys on it, and moving the marker would take the working out of the
+       phrase it explains.
+
+       THE ANSWER IS QUOTED RATHER THAN LOWERCASED, for the reason `obFit`
+       records: three of step 3's options open with the pronoun I, so folding
+       one into a sentence with `charAt(0).toLowerCase()` produces "You told me
+       i do not trust the handover". Quotation marks need no case surgery and
+       they mark the words as the reader's own, which is the point. */
+    new: () => {
+      const said = (S.obReady && S.ob && S.ob.why)
+        ? 'You told me &ldquo;<b>' + obLabel('why') + '</b>&rdquo;, so I have gone through the active roster and '
+        : 'Considering your strengths I have analyzed the active roster and ';
+      return 'Welcome Back, Maryam! Based on your <b data-sum="quiz">quiz results</b>, you are currently on <b data-sum="track">Explorer track</b>. Your level from E1 - E5 anchors after a 45-minute interview. '
+        + said + '<b data-sum="match">matched you with ' + AGENTS[recKey()].n + ' below</b> to specifically anchor your growth areas.';
+    },
 
     /* THE SAME SHAPE AS `new`, ONE STEP ON — greeting, then three phrases that
        open. The facts are the ones this entry already carried; what is added is
@@ -420,16 +468,16 @@ const PAGESUM = {
      is that the three track NAMES and the five-per-track count are facts the
      sentence states, not instructions to look at something.
 
-     THE ARROWS FALL OUT OF SÖHNE AND ARE SET BY THE STAND-IN. §11's stack is
-     Söhne then 'Grotesk Stand-in' and nothing else — Inter was removed for
-     exactly this, "every character Söhne's trial file does not carry was
-     silently set in a different typeface" — and §64's note records that the
-     trial file carries 68 glyphs and an arrow is not one of them (which is why
-     the quiet button's arrow is a mask-image). So the two `&rarr;` here are the
-     first rendered arrow characters in the product and they change face
-     mid-sentence. `&middot;` is in the face and is what every fact row in the
-     build already uses; swapping the two characters is the whole fix if the
-     break shows.
+     THE ARROWS USED TO FALL OUT OF THE FACE AND NO LONGER DO — FIXED 4 SEP
+     2026 BY THE PLATFORM FONT CHANGE, and this is kept rather than deleted
+     because it is the one place in the build a defect was closed by a face
+     rather than by an edit. Söhne's trial file carried 68 glyphs, an arrow
+     was not one of them (§64), and §11's stack fell to 'Grotesk Stand-in' —
+     so the two `&rarr;` here were the only rendered arrow characters in the
+     product and they changed typeface mid-sentence. Plus Jakarta Sans carries
+     U+2192 among 721 glyphs and there is no stand-in tier behind it, so both
+     arrows are now set in the same face as the words either side of them.
+     Nothing here changed; the sentence it is a fact about did.
 
      THE THREE `<b>` PHRASES ARE THE SAME THREE WORDS as before — quiz result,
      Explorer track, 45-minute interview — so §70.2's tinted ground still lands

@@ -1,0 +1,500 @@
+/* ==========================================================================
+   114. THE AGENTS LIST IS A TABLE
+   Maryam, 3 Sep 2026, with the screen attached: "for the agents screen, I want
+   you to use the reference design." The markup and the argument for the change
+   of KIND are over `agentsTable` / `agentRow` in views.js; this is the drawing.
+
+   IT IS A GRID AND NOT A `<table>`, and views.js's note is why: every row ends
+   in two controls and the whole thing has to become a stack below 900, neither
+   of which a table does without `display:grid` on all of it anyway.
+
+   THE TRACKS ARE THE REFERENCE'S PROPORTIONS, not six equal columns. Measured
+   off the drawing against its ~1300px content width: agent 380, expertise 380,
+   experience 160, next available 200, rate 90, actions 130. The first two are
+   the only ones that hold a variable amount of text, so they take the `fr`s;
+   the last two are `auto` because a price and a pair of buttons have a natural
+   width and giving them a fraction would stretch the Book button across
+   whatever the frame has spare.
+
+   THE ROWS SHARE ONE GRID VIA `subgrid`, AND STATING THE SAME TRACKS ON EACH
+   ROW IS NOT ENOUGH — that was the first version and it is the failure this
+   layer most needs recorded. Seven sibling grids that each declare
+   `1fr 1fr auto auto auto auto` are seven grids, and an `auto` track is sized
+   from ITS OWN row's content: the head row's "Next available" is wider than
+   "Thu, Aug 20" and its "Expertise" is narrower than four chips, so every
+   column resolved to a different width per row. Measured at 1280 before the
+   fix, the head cells started at 258 / 573 / 889 / 965 / 1056 / 1094 and the
+   first data row's at 258 / 509 / 759 / 851 / 956 / 994 — **up to 116px off**,
+   which is a column head sitting over the wrong column. Nothing warns: every
+   row is a perfectly valid grid.
+
+   SO `.agt` IS THE GRID AND EVERY ROW IS A `subgrid` SPANNING IT. One track
+   resolution for the whole table, taken from all seven rows at once, which is
+   what a table does. The rows stay real boxes — they keep their border and
+   their padding, which is why this is `subgrid` rather than `display:contents`
+   on each row (that dissolves the box and the hairline with it, and the padding
+   would have to move onto all six cells).
+
+   AND THE CELLS ARE PLACED BY LINE NUMBER, NOT BY NAMED AREA. `grid-area:who`
+   expands to four named-line properties; under a subgrid whose parent defines
+   no such names they resolve to nothing and the cell auto-places. Numbers say
+   the same thing in both tiers and cannot half-apply.
+
+   §63 §48 OWNS EVERY SIZE, WEIGHT, CASE AND INK IN HERE. Not one font-size,
+   font-weight, text-transform or text colour is stated in this file.
+   ========================================================================== */
+
+/* ---- the block ----
+   IT PAYS THE PAGE GUTTER ITSELF, because it is a direct child of `.page` and
+   not a `.sec`. The `.rail-wrap` it replaces was §14.496's full-bleed scroller
+   housing, which pulls its child OUT to the column edges by `--pad-x` — right
+   for a rail that runs off the side of the page and wrong for a table, whose
+   head row has to line up with the section heading above it.
+
+   NOT WRAPPED IN A `.sec` EITHER, which would have been the other way to get
+   the gutter: §10.2 closes every section with a full-bleed hairline and tick
+   marks at the rails, and the last row of this table already draws its own
+   rule — that is §14's "TWO 1px rules one pixel apart", which §76 hit from the
+   same direction when three panels became one. */
+.app .agt{padding:0 var(--pad-x)}
+
+/* ---- a row ----
+   STACKED IS THE BASE AND THE TABLE IS THE EXCEPTION, which is the way round
+   this file states everything responsive: the phone gets the simple rule and
+   the container query adds the columns. Four rows of two — the person across
+   the top, the chips under them, the two two-line facts side by side, and the
+   price against the actions.
+
+   `align-items:center` IS ONLY RIGHT AT DESKTOP and is stated there, not here.
+   Stacked, the person block is 48px of avatar against three lines of text and
+   the cells below it are their own height; centring a four-row grid centres
+   each cell in its own row, which is what you want — but the DEFAULT is
+   `stretch`, and stretch on `.agt-who` makes the avatar's flex line as tall as
+   the tallest cell in the row. `center` on the block is stated in that cell
+   instead, where it is a property of the cell rather than of the grid. */
+.app .agt-r{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:var(--s04);
+  padding:var(--s05) 0;
+  border-bottom:1px solid var(--rule)}
+
+.app .agt-who{grid-column:1 / -1;grid-row:1}
+.app .agt-tags{grid-column:1 / -1;grid-row:2}
+.app .agt-exp{grid-column:1;grid-row:3}
+.app .agt-next{grid-column:2;grid-row:3}
+.app .agt-fee{grid-column:1;grid-row:4}
+.app .agt-act{grid-column:2;grid-row:4}
+
+/* THE HEAD ROW IS NOT DRAWN BELOW 900. There is nothing for it to head — the
+   cells are stacked and each one reads as its own line — and six labels over a
+   column of cards is a legend for a table that is not there. It is
+   `aria-hidden` in the markup for the matching reason. */
+.app .agt-h{display:none}
+
+/* ---- the person ---- */
+.app .agt-who{
+  display:flex;align-items:center;gap:var(--s04);min-width:0}
+.app .agt-wb{
+  display:flex;flex-direction:column;gap:2px;min-width:0}
+/* THE NAME AND THE CHIP WRAP AS A PAIR, which is §26.4's `.agh-nn` lesson
+   arriving at a different component. There the name sat in a grid and a chip
+   written beside it auto-placed into row 2 and was squeezed to 18px; here the
+   cell is a flex column, so the two go in one flex ROW that wraps as a unit
+   when the column cannot hold both. */
+.app .agt-n{
+  display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap;min-width:0}
+/* ------------------------------------------------------------------ 114.3a ---
+   THE STARS SIT ON THE DIGIT, AND WHAT WAS MOVING THEM IS A CLASS COLLISION
+
+   Maryam, 4 Sep 2026: "align the stars with the rating digit" and "give the 3
+   rows against the image equal spacing between each other." Two asks, one
+   cause, and the cause is not in this layer.
+
+   `stars()` WRITES `<svg class="f">` FOR A FILLED STAR, AND §02.136 IS
+   `.f{margin-bottom:var(--s05);display:block}` — THE FORM-FIELD RULE. `.f` is
+   §02's class for a labelled field in a form, where 16px under it is the gap to
+   the next field; it is also the flag `stars()` puts on a lit star so §15.960
+   can fill it `--star`. Two meanings, one class, one selector at (0,1,0) that
+   matches both.
+
+   MEASURED: every star glyph is 13px tall and carries `margin-bottom:16px`, so
+   `.stars` measures **29px** for a row of 13px marks. That is both complaints
+   at once. The row's mid-point is genuinely centred on the digit's — 293.5
+   against 293.5 — so nothing was misaligned in the box model; the stars simply
+   sat in the top 13px of a 29px box with 16px of nothing under them, which
+   reads as stars floating above the number. And it is why the three rows looked
+   unevenly spaced when `.agt-wb`'s gap is a flat 2px on both: name→rating
+   measured 2 and looked 2, rating→meta measured 2 and looked 18.
+
+   SO THE FIX IS THE MARGIN, NOT THE ALIGNMENT. `align-items:center` was already
+   right and stays; adding a nudge on top of it would have hidden a 16px phantom
+   under a hand-tuned offset — the §110 mistake in reverse.
+
+   FLAGGED, AND THE GENERAL FIX IS NOT MINE TO MAKE HERE: **every star row in
+   the product has this**, because nothing else answers §02.136 either. §16.381
+   and §16.384 fix the `display` half for `.agid-r` and `.agh-r` and leave the
+   margin; §44.157 and §15.960 only set the fill. The honest repair is one rule
+   — `.app .stars svg{margin:0}` — or renaming one of the two `.f`s, and both
+   reach ~40 call sites that have been laid out around the phantom for months.
+   Scoped here because this is the surface that was asked about. */
+.app .agt-rate{display:flex;align-items:center;gap:var(--s02)}
+.app .agt-rate .stars svg{margin:0;display:block}
+
+/* ---- the chips ----
+   `row-gap` AND `column-gap` ARE THE SAME 4px AND THAT IS DELIBERATE. The
+   reference sets its chips in one row; ours wrap at the narrow end of the
+   desktop range and on the phone, and a wrapped second line 8px below the first
+   reads as two groups of tags rather than one. */
+.app .agt-tags{display:flex;flex-wrap:wrap;gap:var(--s02);min-width:0}
+/* §10.293 turns `.tag`'s fills off and leaves it an outlined chip on `--rule`,
+   which is the reference's own chip — so this states geometry only. `.sm` is
+   NOT used: §02's small box is 24px, which is the size for a chip standing
+   alone in a row, and these sit in a group of four as the cell's whole
+   content. */
+/* ------------------------------------------------------------------ 114.4a ---
+   AN EXPERTISE CHIP HAS ROUND SIDES
+
+   Maryam, 4 Sep 2026: "these expertise should have full round sides not edgy."
+
+   `999px`, A LITERAL, AND IT IS THE SECOND ONE IN THE BUILD. `--radius` is
+   `0px` by token and every `border-radius` in the product resolves through it;
+   §56 grants the one exception to MARKS, on the argument that a disc is a
+   different kind of object from a box. §31.6's flag chip took a second — "the
+   only rounded rectangle in the build and it is by instruction" — and this is
+   the third, by the same instruction and stated the same way.
+
+   THE LITERAL RATHER THAN A RE-POINTED TOKEN, which is §31.6's own reasoning
+   and worth repeating because re-pointing looks tidier: `--radius:999px` on
+   this class would make the token mean two things, and the value of a token
+   that is 0 everywhere is that you can trust it is 0 everywhere. A pill that
+   says `999px` out loud is a stated exception; a token that quietly is not
+   zero is a rule you have to check.
+
+   BOTH THE CHIP AND THE `+N` TAKE IT. `.agt-more` is the same `.tag` in the
+   same row and reads as the last member of the set — a square overflow count
+   beside three pills is the set drawn twice. It is written as one selector for
+   that reason rather than as two rules that could drift.
+
+   IT IS ONLY THIS TABLE'S CHIPS. `.tag` has ~40 call sites and every other one
+   is square by §10.293; the instruction names the expertise cell, and §31.6
+   scoped itself to `.tbl-flag` for exactly this reason ("five filled pills down
+   a column of plain text is the drawing that component replaced"). */
+.app .agt-tag{flex:none;border-radius:999px}
+
+/* ---- the two-line cells ---- */
+.app .agt-exp,.app .agt-next{
+  display:flex;flex-direction:column;gap:2px;min-width:0}
+/* THE DATE LEADS WITH THE CALENDAR MARK AND THE TIME DOES NOT. The reference
+   draws one glyph per cell, against the date — the mark says what KIND of fact
+   the cell holds, and a second one against the time would make the pair read as
+   two facts rather than as one appointment on two lines. 16px to match the
+   line it sits in, `flex:none` so a long date cannot squeeze it. */
+.app .agt-v{display:flex;align-items:center;gap:var(--s02);min-width:0}
+.app .agt-v svg{flex:none;width:16px;height:16px;fill:currentColor;display:block}
+
+/* ---- the actions ----
+   `justify-self:end` RATHER THAN AN AUTO MARGIN. The cell is a grid item in
+   both tiers, so `justify-self` puts it at the end of its own track without
+   caring what the track is — an auto margin would need the cell to be a flex
+   item, which it is at neither width. `.tal-star` is the `+` control and is
+   §27's own component; it needs nothing here. */
+.app .agt-act{
+  display:flex;align-items:center;gap:var(--s03);justify-self:end}
+
+/* ---- the table proper ---- */
+@container app (min-width:900px){
+  .app .agt-h{display:grid}
+  /* FOUR OF THE SIX TRACKS ARE `auto`, AND COPYING THE REFERENCE'S SIX
+     PROPORTIONS IS WHAT DID NOT WORK. That drawing is 1300px wide and its
+     tracks were transcribed as `1.9fr 1.9fr 0.9fr 1.1fr auto auto`; measured on
+     the page, `.page` is **901 at a 1280 frame** — the reference was drawn at
+     1728, where it is ~1216 — so six proportional columns divided 757px of
+     content into 193 / 193 / 91 / 112 / 26 / 142 and BOTH text columns broke:
+     the "Recommended" chip wrapped under the name and made the row 92px tall,
+     and four chips set on three lines.
+
+     A YEAR COUNT, A DATE, A PRICE AND TWO BUTTONS HAVE NO VARIABLE LENGTH, so
+     giving them a FRACTION spends the page's width on cells that cannot use it
+     and starves the two that can. `auto` lets each take exactly what its
+     content needs — measured, about 316px for all four — and the remainder goes
+     to the person and the chips, which are the only cells whose height depends
+     on how much width they get.
+
+     AND THE GAP IS `--s04`, NOT `--s05`. Five gaps at 16 is 80px of the 837 the
+     row has; at 12 it is 60, and those 20px are the difference between "Priya
+     Nair" + the chip fitting on one line at 1280 and wrapping. A table's
+     columns are separated by their own alignment, not by air — §72's inset
+     divider argument, arrived at from the spacing side. */
+  /* ------------------------------------------------------------- 114.2a ---
+     THE PERSON COLUMN IS CONTENT-SIZED AND THE CHIPS TAKE THE SLACK
+
+     Maryam, 4 Sep 2026: "since you are leaving a lot of space after the first
+     column, the other column are looking congested, adjust the space
+     accordingly."
+
+     BOTH `1fr`s WAS THE MISTAKE AND IT IS MEASURABLE. Two equal flexible
+     tracks divide whatever the four `auto` columns leave, and the two cells are
+     nothing like equal: measured on a 1256px table, each took **410px** while
+     the person cell's content — a 56px portrait, a name, a rating and one meta
+     line — wants about 265. So ~145px sat empty after every name while
+     Experience got 79, Next available 99, Rate 34 and the actions 101, all
+     jammed into 313px with 12px between them. Which is exactly the reading:
+     the first column is not too wide because it needs the room, it is too wide
+     because `1fr` gave it the room whether or not it did.
+
+     SO COLUMN 1 IS `auto` AND ONLY THE CHIPS FLEX. An identity cell is
+     content-sized by nature — it is as wide as the widest name, which is a
+     fact about the data — and the expertise cell is the one member of the row
+     that genuinely converts width into information: more of it means fewer
+     chips hidden behind the `+N`. Measured after: person 218, chips 598, and
+     the four on the right unchanged but no longer crowded.
+
+     AND THE GAP GOES TO `--s06`, WHICH REVERSES THE PARAGRAPH ABOVE. That note
+     argued 12 over 16 because "five gaps at 16 is 80px of the 837 the row has"
+     and those 20px decided whether the name and its chip fitted on one line.
+     Column 1 is content-sized now, so the name can no longer be squeezed by a
+     gap — the argument's premise is gone, and the 145px the first column gave
+     back pays for five gaps at 24 (120) with change. That is where the
+     congestion actually was: four labels 12px apart read as one column of
+     mixed figures.
+
+     THE ACTIONS COLUMN IS A STATED WIDTH — see §114.2b, which is the other
+     half of this line and the reason it is not `auto` any more. */
+  /* AND THE SLACK MOVED TO THE END, WHICH IS THE SECOND HALF OF THE SAME ASK
+     (Maryam, 4 Sep 2026: "each column should have equal space from the left
+     side column").
+
+     `1fr` ON THE CHIPS PUT ALL THE LEFTOVER WIDTH IN ONE GAP. Measured, cell
+     content edge to next cell edge: **12, 158, 12, 12, 12**. Column 2 was the
+     only flexible track, so it grew to swallow every pixel the other five did
+     not want — and chips are content-sized objects inside it, so the growth
+     showed up as ~150px of white between the last chip and "Experience" while
+     every other column sat at the stated gap. Which is the reading exactly: one
+     column was not equally spaced from its neighbour.
+
+     SO COLUMN 2 IS `minmax(0,auto)` AND THE FLEX GOES ON COLUMN 6. `auto` sizes
+     the chips to their content, and the `0` floor is what still lets them shrink
+     and wrap at the narrow end of the desktop range rather than pushing the
+     table wide (§114.5's own argument for `min-width:0` on that cell, from the
+     track side). `minmax(var(--agt-act-w),1fr)` gives the actions column its
+     reserved floor AND makes it the one that absorbs the leftover — which costs
+     nothing visible, because §114.2b already pins its pair to the right edge
+     with `justify-content:flex-end`. The slack is now behind the buttons rather
+     than in the middle of the row. Measured after: **12, 12, 12, 12, 12**.
+
+     THE FIRST VERSION OF THIS PARAGRAPH IS BELOW AND IS STILL THE ARGUMENT FOR
+     COLUMN 1 — what changed is only which track flexes. */
+  /* AND THEN NO TRACK FLEXES AT ALL — Maryam, 4 Sep 2026, at a 1728 frame: "why
+     we are not giving the equal space between all columns?"
+
+     THE SLACK HAD TO GO SOMEWHERE AND EVERY PLACE TO PUT IT IS A VOID. That is
+     the whole lesson of this rule's three versions. A `1fr` on the chips put
+     ~150px of white before Experience; a `1fr` on the actions moved the same
+     white to the far right, where the buttons are pinned — measured, cell ink to
+     next cell's ink: **12, 12, 12, 50, 157** at 1280 and **12, 12, 12, 50, 303**
+     at 1728. Both readings are the same complaint, because a track that grows
+     while its content is left- or right-aligned turns its growth into a gap.
+
+     SO THE LEFTOVER GOES INTO THE GAPS THEMSELVES. Every track is intrinsic and
+     `justify-content:space-between` distributes what is left equally between
+     them — which is literally the ask, and it scales: the wider the frame, the
+     wider every gap, all six columns spreading across the column together
+     instead of five huddling at the left of one void. The first and last tracks
+     still touch the page's own edges, so nothing about §114.2b's right-pinned
+     pair or the head row's alignment changes.
+
+     IT WORKS THROUGH `subgrid`, WHICH IS THE ONE THING TO CHECK BEFORE COPYING
+     THIS. The rows do not lay themselves out — they take the parent's LINES —
+     so a distribution applied to the parent's tracks moves every row's cells
+     with it. A row that stated its own six tracks would ignore it and sit at
+     the stated gap, which is the 116px drift §114.2 records from the other side.
+
+     THE ONE GAP THAT IS STILL WIDER IS THE HOVER RESERVATION AND IT IS MEANT TO
+     BE. `--agt-act-w` is 200px for a pair that measures ~124, because the star
+     grows to the left when it is pointed at and Maryam's own earlier ask was
+     that it "should not affect the position of the other columns" — so ~76px of
+     that last cell is deliberately empty. It rides inside the cell rather than
+     in the gap; reclaiming it means giving up the reservation. */
+  .app .agt{
+    display:grid;
+    grid-template-columns:
+      auto minmax(0,auto) auto auto auto var(--agt-act-w);
+    column-gap:var(--s06);
+    justify-content:space-between}
+  /* EVERY ROW SPANS THE WHOLE GRID AND TAKES ITS TRACKS FROM IT. `grid-column:
+     1 / -1` is what puts the row on all six columns; `grid-template-columns:
+     subgrid` is what makes its own children land on the PARENT's lines rather
+     than on six lines of its own. The gaps come from the parent too, so they
+     are not restated. */
+  .app .agt-h,.app .agt-r{
+    grid-column:1 / -1;
+    display:grid;
+    grid-template-columns:subgrid;
+    align-items:center}
+  .app .agt-who{grid-column:1;grid-row:auto}
+  .app .agt-tags{grid-column:2;grid-row:auto}
+  .app .agt-exp{grid-column:3;grid-row:auto}
+  .app .agt-next{grid-column:4;grid-row:auto}
+  .app .agt-fee{grid-column:5;grid-row:auto}
+  .app .agt-act{grid-column:6;grid-row:auto}
+
+  /* THE HEAD ROW CARRIES THE RULE AND NO PADDING ABOVE IT. It is a label strip
+     rather than a row of the table, so it pays half a row's air below and none
+     above — the section heading 24px overhead is what separates it from the
+     page, and a full row's padding here put the labels adrift between the two
+     blocks they belong to. */
+  .app .agt-h{
+    padding:0 0 var(--s03);
+    border-bottom:1px solid var(--rule)}
+
+  /* THE CHIPS DO NOT WRAP AT DESKTOP AND THE OVERFLOW IS WHY THEY DO NOT NEED
+     TO. Three chips and a `+N` in a 1.9fr track is ~380px at the frame this is
+     read at, which is what the reference draws; the count exists precisely so
+     the cell never has to hold the whole list. `min-width:0` on the cell is
+     what lets the track shrink below the chips' intrinsic width at the narrow
+     end of the range rather than pushing the table wide — the chips then wrap
+     to a second line, which is the graceful end of it. */
+  .app .agt-tags{align-content:center}
+
+  /* THE PERSON CELL CENTRES ON ITS OWN CONTENT, not on the row. `align-items`
+     above centres every cell in the row; this cell is a flex CONTAINER, and
+     without this its avatar and text block stretch to the cell's height, which
+     at desktop is the tallest cell in the row (usually the chips at two
+     lines) — so a 48px portrait would sit at the top of a 60px box while the
+     text beside it centred. Both are centred on each other instead. */
+  .app .agt-who{align-items:center}
+
+  /* ------------------------------------------------------------- 114.2b ---
+     THE ACTIONS COLUMN RESERVES THE HOVER, SO NOTHING ELSE MOVES
+
+     Maryam, 4 Sep 2026: "this column should have more width so when i hover on
+     star and the button expands it should not affect the position of the other
+     columns."
+
+     THE CONTROL IS BUILT TO GROW AND THE TRACK WAS BUILT TO FIT IT. §24.68
+     draws `.tal-star` collapsed to its mark — `gap:0`, `padding:0 var(--s03)`,
+     the label at `max-width:0` — and on hover it goes to `gap:var(--s02)`,
+     `padding:0 var(--s04)` and `max-width:80px`, transitioning all three. That
+     is the right animation and it was landing in an `auto` GRID TRACK, so the
+     column grew with it and Rate, Next available and Experience all slid left
+     for as long as the pointer was down on the star. Every row in the table.
+
+     SO THE TRACK IS A LENGTH, AND THE LENGTH IS THE EXPANDED STATE ADDED UP:
+
+       14   the mark (§24.76)
+     +  4   `--s02`, the gap it opens
+     + 80   the label's stated cap (§24.86)
+     + 24   `--s04` twice, the padding it opens to
+     +  2   the 1px border, both sides
+       ---
+       124  the star at full stretch
+     +  8   `--s03`, `.agt-act`'s own gap
+     + 61   "Book" at `.btn-sm` (measured)
+       ---
+       193  ->  200, rounded up for slack
+
+     `--agt-act-w` IS A TOKEN because the number is read twice — the track and
+     the `min-width` the stacked tier does NOT want — and because 61 of it is a
+     measurement rather than a stated value: a longer primary label moves this
+     number, and one place to move it is the whole of the point.
+
+     `justify-self:stretch` REPLACES §114.6's `end` AND IS THE LOAD-BEARING
+     HALF. A fixed track with `justify-self:end` still shrink-wraps the CELL to
+     its content and parks it at the track's right edge — so the star grows the
+     cell leftward inside the track, which looks correct and is, but only by
+     accident: the moment the pair is wider than the track the cell overflows
+     it instead of being clipped by it. Stretched, the cell IS the track and
+     `justify-content:flex-end` holds the pair against the right edge, so the
+     star opens into reserved space and "Book" never moves at all. Verified by
+     measuring Rate's `left` with and without the pointer on the star.
+
+     BELOW 900 IT IS NOT A TRACK. The stacked tier puts the actions in grid
+     column 2 of a two-column card (§114.1), where a 200px floor would be wider
+     than half a 390 frame's row. The token is declared inside this query for
+     that reason. */
+  .app .agt{--agt-act-w:200px}
+  .app .agt-act{justify-self:stretch;justify-content:flex-end}
+}
+
+/* ------------------------------------------------------------------ 114.9 ---
+   THE ASK CONTROL WEARS THE SUMMARY'S STAR, NOT TAL'S BLOB
+
+   Maryam, 4 Sep 2026: "instead of blob I would recommend the star icon we are
+   using with the summary."
+
+   IT WAS THE BLOB BY OMISSION RATHER THAN BY CHOICE. §27.36 points every
+   `.tal-star .sk-mark` at `--tal-mark` — the WebP blob — with `mask:none`, and
+   §27.332 then re-points three surfaces back to the sparkle: `.agh-book`,
+   `.agh` and `.ag`. This table is newer than that list, so `.agt-act` fell
+   through to the blob: a 14px photographic mark inside a bordered control,
+   which is §72's box-in-a-box and §106's "artwork is not a face" arriving from
+   the third direction. Verified before changing it — the computed
+   `background-image` really was `url("data:image/webp;base64,…")` with
+   `mask-image:none`.
+
+   AND IT IS THE **SUMMARY'S** STAR, WHICH IS THE GRADIENT ONE. There are two
+   sparkles in the build and the instruction names one of them: §27.332's is
+   `--tal-star` masked with a FLAT `--accent`, the older chip treatment, and
+   `.aih-mk` / `.ai-label::before` are `--ai-star` painted through `--ai-grad`
+   — which is literally "the star icon we are using with the summary", and is
+   the mark whose ramp Maryam has set by hand twice today. This takes that one,
+   so the control and Tal's own heading are one object.
+
+   THREE DECLARATIONS BECAUSE THREE HAVE TO BE UN-SAID. §27.36 sets
+   `background-image` to the blob, `background-color:transparent` and
+   `mask:none`; §24.76 then sets `background-color:var(--accent)`, which under
+   a mask is what would paint. So the paint has to become the ramp, the colour
+   has to go back to transparent or it fills the box behind the mask, and the
+   mask has to come back. (0,4,0) to clear §24.76's own (0,4,0) on order.
+
+   FLAGGED: `.agh` AND `.ag` STILL WEAR THE FLAT SPARKLE. Those are the agent
+   card and the shortlist row — the same control, one generation back — so the
+   product now draws this mark two ways. Three selectors in §27.332 and it is
+   one edit; left alone because the instruction names the table and because
+   changing the shortlist's mark is a decision about the shortlist. */
+.app .agt-act .tal-star .sk-mark{
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* ----------------------------------------------------------------- 114.9a ---
+   THE MARK IS 12, AND THE WORDS ARE THE RAMP
+
+   Maryam, 4 Sep 2026: "reduce the star size", "ask tal color should be of the
+   star gradient color". (The third of that message — "mid align ask tal with
+   the star" — is §29 §2, because the 4px was `.lbl`'s form-label margin and
+   that list is where it is answered.)
+
+   12 IS §70.2a's SETTLED VALUE AND ITS ARGUMENT TRANSFERS EXACTLY. §24.76 drew
+   this mark at 14 beside a 13.5px label; that layer's note reasons about a
+   sparkle beside a line of type and lands on twelve: "at 12 the mark is smaller
+   than the cap height of the words beside it, so it reads as a bullet
+   introducing the line rather than as a second object competing with it." A
+   14px star against 13.5px words is the second-object case, which is what
+   "reduce the star size" is naming. One value for the sparkle-beside-words, in
+   both places it happens.
+
+   THE LABEL TAKES THE RAMP BY CLIPPING IT, which is the same construction
+   §70.2 uses for Tal's own name and the one place in the build a gradient is
+   allowed to be ink. So the mark and the word are painted out of ONE gradient
+   rather than being an accent glyph beside an accent word — which is what makes
+   them read as one control, and is why the answer is the ramp and not a second
+   flat colour.
+
+   `-webkit-text-fill-color` AS WELL AS THE CLIP, and `color:transparent` is
+   §63 §50's — §115 §1's note has the long version of that split, arrived at
+   from the other direction (un-clipping the ask page's greeting). Here it has
+   to beat §24.266's `color:var(--accent)` at (0,4,0), which is why §63 states
+   it rather than this layer restating a colour it may not set.
+
+   THE CLIP IS SAFE ON AN ANIMATING BOX. `.lbl` is `overflow:hidden` with
+   `max-width` transitioning 0 -> 80, so the gradient is clipped to whatever
+   width is showing; at rest the box is 0 wide and there is nothing to paint. */
+.app .agt-act .tal-star .sk-mark{width:12px;height:12px}
+.app .agt-act .tal-star .lbl{
+  background-image:var(--ai-grad);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent}

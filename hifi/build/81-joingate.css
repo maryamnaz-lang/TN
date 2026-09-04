@@ -76,10 +76,44 @@
    the label together and there is no second place to keep in step. */
 .app .dark-card .btn.btn-p[disabled] svg{fill:currentColor}
 
+/* ------------------------------------------------------------------- 81.2 ---
+   AND THE OTHER BLACK CARD IS `.plate`
+
+   Maryam, 3 Sep 2026: "in cards where the time left in the call is more than a
+   minute, show a grey disabled join call button if it's in orange." That turned
+   `crow`'s gate on by default (its own note is the reversal) and it also reaches
+   the one orange Join outside that component — the `consult` dashboard's
+   consultant-call plate.
+
+   `.plate` IS NOT `.dark-card` AND NEITHER IS A KIND OF THE OTHER. §75 minted
+   `.dark-card` precisely to be a black card that `placeDark` does NOT hoist into
+   the head band; `.plate` is the one it does. So the two share a ground, a haze
+   and an ink register and share no class, which is why every generic rule in
+   this build states both — §63 §6a's note is the same discovery from the ink
+   side ("`.dark-card` carries none of those classes, and that is the whole point
+   of it").
+
+   (0,4,0) AGAINST §19's (0,3,0), WHICH IS THE SAME ONE STEP §81.1 NEEDED.
+   `.app .plate .btn-p` is what paints this button the accent gradient (§19.81,
+   with §15.1893 behind it); naming the state is exactly the step that beats it,
+   and `background-image:none` is again half the rule because both of those
+   layers paint a ramp as well as a colour.
+
+   IT IS STATED ON `.plate` RATHER THAN ON THE CONSULT PAGE, for §75's reason
+   turned round: there are four other plates in the build with actions on them,
+   and the next one to gate an action should get this free rather than discover
+   that a `disabled` button on a plate is invisible.
+   -------------------------------------------------------------------------- */
+.app .plate .btn.btn-p[disabled]{
+  background-color:var(--on-dark-fill);
+  background-image:none;
+  border-color:transparent;
+  --on-brand-fill:0}
+.app .plate .btn.btn-p[disabled] svg{fill:currentColor}
+
 /* AND NOTHING IS STATED FOR A GATED JOIN ON A WHITE GROUND, because §02.108
    already draws one correctly and this is where a reader will look for the
-   omission. `crow`'s three candidate call sites do not pass `{gate:true}` (the
-   note over that function is the argument — their Joins are the prototype's own
-   way into `callScreen`), so no white row has a disabled button today. If one
-   ever does, the grey plate and `--text-disabled` are already right for it:
-   that rule loses on this card and on no other. */
+   omission. Every Join in the product is on one of the two black cards above —
+   `crow`'s four rows and the consultant plate — so no white row has a disabled
+   button today. If one ever does, the grey plate and `--text-disabled` are
+   already right for it: those rules lose on these two cards and on no other. */

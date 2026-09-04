@@ -157,12 +157,46 @@ let _rec = null;
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
       <defs>
+        ${''/* THE COMET'S FIVE STOPS ARE THE FILE'S, RE-GIVEN 4 Sep 2026.
+
+              Maryam, with the CSS: "for the moving line on tal field border,
+              change that line gradient colors to this —
+              `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
+              rgba(253,78,89,0.7) 26.44%, rgba(244,128,242,0.7) 50%,
+              rgba(253,78,89,0.7) 73.56%, rgba(255,255,255,0.7) 100%)`."
+
+              FIVE STOPS IN, FIVE STOPS OUT, and the offsets are hers each
+              time: 0 / .226 / .4904 / .75 / 1 on 4 Sep, against the previous
+              0 / .2644 / .5 / .7356 / 1 and the original 0 / .1952 / .3989 /
+              .7921 / 1. Symmetric white-into-red-and-back through all three.
+
+              WHAT CHANGED ON 4 Sep IS THE MIDDLE, AND IT IS A PALE GREEN —
+              #CCE7CB, where the ramp had been magenta. That is not a stray: the
+              DOCK BORDER measures the same green at 60% across (§70's token
+              note has the sampling), so the light and the edge it travels along
+              are still one colour idea. What is no longer part of it is Tal's
+              TEXT, which took a salmon middle in the same message — the first
+              time in this component's life that the comet and the label are two
+              different ramps.
+
+              THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
+              `stop-color`, and baking the alpha into the hex would need it
+              composited against whatever is behind — which on this element is
+              the dock's own border, not white. Stated as the attribute, the
+              stop is genuinely 70% and the border shows through it, which is
+              what the spec's `rgba` means on a `filter:blur(1px)` line lying
+              over a coloured edge.
+
+              THE WHITE ENDS ARE STILL WHITE and still at 70%, which is the
+              file's. They are what makes the dash fade in and out of its own
+              travel rather than arriving as a hard bar — §70.1's note has the
+              long version, including why the loop has no seam. */}
         <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#ffffff"/>
-          <stop offset="0.1952" stop-color="#f4b413"/>
-          <stop offset="0.3989" stop-color="#e2a600"/>
-          <stop offset="0.7921" stop-color="#f0bf0c"/>
-          <stop offset="1" stop-color="#ffffff"/>
+          <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
+          <stop offset="0.226" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#cce7cb" stop-opacity=".7"/>
+          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
+          <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
         </linearGradient>
       </defs>
       <rect pathLength="1000"/>
@@ -437,7 +471,38 @@ function askView(f){
 placeCapture = function(){};
 
 function placeAsk(){
-  if(S.stage === 'signup') return;
+  /* TWO STAGES HAVE NO DOCK, AND `onboard` IS THE SECOND (3 Sep 2026).
+
+     `signup` returns for the obvious reason: there is nobody signed in yet.
+     The onboarding gate returns for a better one — it is Tal asking the
+     CANDIDATE five questions, and a docked "Ask Tal anything" on the same
+     screen is two conversations with one assistant running side by side. It
+     is also a way out of a gate that is meant not to have one: the answers
+     are what the dashboard's recommendation is built from, so the way on is
+     the last screen's button and nothing else.
+
+     AND IT WAS DRAWING BADLY AS WELL AS WRONGLY. The dock is
+     `position:absolute` against `.view-col`, and this stage has no
+     `.view-col` — so `device.querySelector('.main')` found the auth column's
+     `<main>` and the field was placed against the nearest positioned
+     ancestor it could find, landing 989px from the left of a 1280 frame at
+     704px wide: 413px off the right edge, on every step. A `.main` inside a
+     composition this pass was not written for is the general shape of it, so
+     the guard is a stage test rather than a selector fix.
+
+     `nil` NEEDS NO ENTRY — its own render branch replaces the whole frame and
+     never emits a `.main` for this to find.
+
+     THE ONBOARDING BRIEFLY HAD AN EXCEPTION TO THIS AND IT IS GONE AGAIN
+     (3 Sep 2026). For one build the gate's "Chat" pill opened `askView` here,
+     so the PAGE half of this pass was allowed to run on the stage and
+     `obScreen` emitted an empty `.main` for it to fill. Maryam's answer to
+     seeing it was that this composition is wrong for a first message — a
+     messaging screen where the reference is a centred column with the orb at
+     the top of it — so §107 §0e draws the gate's chat itself and shares only
+     `S.thread`. With nothing here to build, the guard is a plain stage test
+     again: the gate gets neither the page nor the line. */
+  if(S.stage === 'signup' || S.stage === 'onboard') return;
   const main = device.querySelector('.view-col > .main') || device.querySelector('.main');
   if(!main) return;
 

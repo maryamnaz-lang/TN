@@ -38,6 +38,9 @@ import sys
 
 HERE = pathlib.Path(__file__).parent
 SRC = HERE.parent / 'hifi' / 'build'
+# The repo root, for the cache-bust pass: the portals that link this folder
+# from one level up had never been stamped. See the second loop at the foot.
+ROOT = HERE.parent
 
 # The layer order is build.py's, verbatim. It is not alphabetical by accident
 # and it must not be sorted: `05` unsets what `02` sets, `37` corrects `26`.
@@ -855,6 +858,142 @@ LAYERS = [
     # thread and on the profile, which the box drew round yesterday.
     # NO JS AND NO RENDER PASS — one property on classes §09 already ships.
     '106-roundfaces.css',
+    # THE ONBOARDING GATE (§107) — the panel Tal speaks from, the progress
+    # spine, the one-per-row option list, the read-back rows and the free
+    # field. ob.js is the flow and does NOT cross; the drawing does.
+    # IT IS NOT OPTIONAL, AND THAT IS THE INTERESTING HALF. §107 came with
+    # one-token additions to §27, §40, §53 and §63 — `.ob-brand` joined the
+    # `:is(.tal-panel, .ask-thread)` host lists that size, paint and type
+    # Tal's 112px mark — and all four of those layers are in this list. So
+    # dropping this one would ship `.ob-brand` inside fifteen selectors with
+    # no rule anywhere giving that class a box, a ground or a column: Tal's
+    # mark styled for a panel the box does not draw. That is §70's exact
+    # failure (`.jrn-pill`'s ink with no pill) and it is why `check_coverage`
+    # exists. A layer that other layers now NAME cannot be a deliberate
+    # omission.
+    # AND A SECOND PORTAL WANTS THE SHAPE. Everything in it is stated against
+    # `.auth-card`, `.role-c`, `.tile`, `.kv`, `.sec-h` and the spacing scale
+    # — all already in the output — so a hand-authored page that opens with a
+    # question gets the panel, the spine and the option list for nothing.
+    # `.ob-o`'s single column is the one rule a second portal is most likely
+    # to want and least likely to guess: §104's grid is two across, which is
+    # right for two options and wrong for four.
+    # NO RENDER PASS AND NO JS. The steps are `S.obStep` in the portal, and a
+    # hand-authored page holds its own step however it likes — the CSS keys
+    # only on `.done` / `.on` on a spine row and `.on` on an option, which is
+    # §104's own contract one class wider.
+    '107-onboard.css',
+    # WHAT THE COURSE IS (§108) — the four rows on the enrolment offer's black
+    # card. All five classes cross, and the reason is that not one of them
+    # knows anything about a course: `.eo-course` is a 12/8 column, `.eo-lead`
+    # is a 24px face beside a line of text, and `.eo-taken` is a 16px inline
+    # mark beside a figure. A hand-authored page that wants "a name, a
+    # paragraph, a person and a count" inside a `.dark-card` gets the whole
+    # block, and the ROLE CLASSES it depends on (`.t-h2`, `.t-desc`) and the
+    # on-dark inks that answer them (§63 §6a) are already in the output.
+    # THE FACE NEEDS `.av-ph`, WHICH IS §09's AND IS ALSO ALREADY IN — the
+    # markup is the other half of this component and `gallery.html` documents
+    # that span under Rows.
+    '108-enrolcourse.css',
+    # THE SUCCESS CONFIRMATION (§109) — the second hue on §105.6's centred
+    # dialog. It crosses for the same reason §105.6's own rules do: nothing in
+    # either layer knows anything about enrolling. `.conf` + `.conf-ok` is "a
+    # centred dialog whose mark says this worked", and a hand-authored page
+    # that already has a `.modal > .sheet` gets the whole thing by adding one
+    # class.
+    # THE ENTRANCE CROSSES TOO AND IS THE HALF A SECOND PORTAL CANNOT GUESS:
+    # a dialog rendered already carrying `.on` has no previous computed style
+    # for §02.398's transition to run from, so it needs an animation gated on
+    # `data-open` rather than the transition every other sheet relies on. The
+    # gate is `data-open~="enrolOk"`, which a hand-authored page has to stamp
+    # itself — the portal writes it from `OVERLAYS` in views.js — and without
+    # it the dialog is simply there, which is the correct fallback rather than
+    # a broken one.
+    '109-enroldone.css',
+    # THE COURSE OUTLINE (§110) — `.acc.ol` and the two spans in its row. It
+    # crosses for the reason §87 does: nothing in it knows anything about a
+    # course. `.ol` is "a collapse whose rows are a title over a meta line and
+    # whose panels hold blocks rather than prose", which is a shape a second
+    # portal reaches for the moment it lists anything openable.
+    # THE FIVE CORRECTIONS ARE THE PART THAT CANNOT BE GUESSED, and four of
+    # them are rules the box also ships: §05's 68ch cap on `.acc-b`, §87.1c's
+    # divider on the first subhead, §87.1's 24px list margin, and §10.15's
+    # 184px label column on a headed section holding it. A hand-authored page
+    # that writes `.acc` inside a `.sec` with a heading hits the last of those
+    # immediately, and this layer is the answer.
+    # NO JS CROSSES. The open row is `S.outl` in the portal; the CSS keys only
+    # on `.on` on an `.acc-i`, which is §04's own contract.
+    '110-outline.css',
+    # THE PROFILE IN SIX SECTIONS (§111) — and almost all of it crosses,
+    # because almost none of it knows anything about a profile. What a second
+    # portal gets is: a progress ring sized to the text beside it
+    # (`.ring.qa-ring` — a Quick Action whose mark is a FIGURE rather than a
+    # glyph, which is the first of those in the build, plus §111.1a's rule that
+    # spans such a card across the row so its own description cannot wrap into
+    # the mark that is measuring it), a two-column form grid (`.pfe-g`) with a
+    # `Needed` flag on an empty field, a bounded repeated-record block
+    # (`.pfe-e`) for a job or a school, a chip the reader owns (`.pfe-chip-x` on
+    # §87's pill), a two-control form foot, and a tick in `.cs`'s figure slot
+    # for a finished tab.
+    # THE THREE CORRECTIONS ARE THE PART THAT CANNOT BE GUESSED and the box
+    # ships all three: §79's three-across Quick Action grid, §02.136's stacked
+    # `.f` inside a grid, and §105's top margin on `.idhead` when it opens a
+    # headed section rather than a page.
+    # NO JS CROSSES AND NONE IS NEEDED. `S.pfTab` / `S.pfEdit` are the portal's
+    # state and the rules key only on `.on` on a `.cs` button and on which
+    # markup the panel emits, which is §15's own contract. A hand-authored page
+    # writes those classes itself, exactly as it does for `.acc`.
+    '111-pfedit.css',
+    # THE ARROW GETS A LABEL (§112) — `.row-cta`.
+    # IT CROSSES BECAUSE `gcard` DOES. That component is the box's own row and
+    # `tn-agent-portal.html` draws ten of them; the eighth argument is optional,
+    # so those ten are unchanged, and a hand-authored page that wants the label
+    # gets the geometry and the type without writing either.
+    # NO JS AND NO RENDER PASS — the caller decides whether there is a label and
+    # what it says, which is the only decision the component has.
+    '112-rowcta.css',
+    # §113 — THE UPCOMING CALLS ROW. Everything in it crosses, and it is the
+    # kind of layer that has to: `.lcal` is a bordered card with a mark, a
+    # time, a title, a line of detail and one control, laid out in an auto-fit
+    # grid — the shape a hand-authored page reaches for the moment it has more
+    # than one appointment to show, and the box shipped nothing like it. The
+    # black variant is two declarations of ground over `.dark-card`, which the
+    # system already carries, so a second portal gets the pair for free.
+    # NOTHING IN IT IS RENDER-PASS BOUND and nothing keys on `[data-portal]`.
+    # The one thing a hand-authored page has to do itself is the JOIN GATE:
+    # `joinLive` / `joinShut` / `joinArm` are views.js's and do not port (they
+    # read the clock, not the element), so a page that draws the black cell
+    # either states the button's `disabled` itself or leaves it live.
+    '113-leadcalls.css',
+    # §114 — THE AGENTS TABLE. It crosses whole, and it is close to the
+    # definition of a thing the box should ship: a six-column list of one
+    # record, stacking to a card below 900, built from tracks and areas and
+    # nothing else. A second portal listing people — candidates, leaders,
+    # anybody — reaches for exactly this and the design system had only the
+    # `.agh` card, which is the shape this replaced. The five type roles come
+    # with it from §63 §48. `.tag`, `.tal-star` and `avatar()`'s markup are
+    # already in the box, so a hand-authored page can write a row of it
+    # verbatim.
+    '114-agenttable.css',
+    # §115 — TAL'S CHAT IS THE ONBOARDING'S CHAT. Every rule in it is a
+    # SUBTRACTION from `.ask-page`'s thread: the stacked name row, §39's
+    # gradient bubble border, the serif greeting's scale. It has to cross
+    # for the same reason `ask*` came off `EXCLUDE_PREFIXES` in the first
+    # place — "the chat is the one screen every portal wants and the least
+    # like a plain page" — and it has to cross WITH §35, §39, §51 and §53,
+    # all of which are already in this list. Ship those without this and a
+    # hand-authored chat gets the OLD drawing: two boxes, two names, a
+    # 40px serif with no Abhaya behind it (§53 §13's `@font-face` is
+    # deleted), which is the half-shipped stylesheet this file's head note
+    # spends four paragraphs on.
+    '115-talchat.css',
+    # BECOME A COHORT LEADER (§116). Crosses whole, and it is the easiest kind
+    # of layer to cross: a card grid, a pair of bordered panels and one
+    # single-column restatement of §87's `.lrn`, all of it keyed on classes no
+    # render pass touches and none of it dependent on `S`. A hand-authored page
+    # that wants "four things this role does" and "what you get / what it asks"
+    # gets both arrangements by writing the markup.
+    '116-cohortlead.css',
 ]
 
 # ==========================================================================
@@ -1174,11 +1313,26 @@ HOVER_KEEP = _hover_keep()
 # Font placeholders build.py fills. The DS embeds the same faces, so one
 # <link> is the whole dependency — no relative font paths to get wrong.
 FONTS = {
-    '__INTER__': 'inter.woff2',
-    '__SOEHNE__': 'soehne-buch.woff2',
-    '__SOEHNEMONO__': 'soehne-mono-buch.woff2',
-    '__SOEHNEKRAFTIG__': 'soehne-kraftig.woff2',
-    '__STANDIN__': 'stand-in.woff2',
+    # THE PLATFORM FACE, TWO STYLES AND ONLY TWO — Plus Jakarta Sans Regular
+    # (400) and Medium (500), 4 Sep 2026. It was Regular + SemiBold for one
+    # build and that was the wrong second weight; §11 has the correction. §11 carries the argument, including
+    # why Bold, SemiBold and ExtraBold are not here and why the stand-in went
+    # with them. This is the half of the ask `tn-agent-portal.html` gets: that
+    # file is hand-written on this stylesheet, so re-running this build IS its
+    # font change — there is nothing to edit in it.
+    '__JAKARTA__': 'plus-jakarta-regular.woff2',
+    '__JAKARTAMED__': 'plus-jakarta-medium.woff2',
+    '__JAKARTASEMI__': 'plus-jakarta-semibold.woff2',
+    # `__INTER__` IS DELIBERATELY ABSENT AND THAT DROPS 47 KB OF DEAD FACE.
+    # Inter is §30's, the Next in Leadership microsite, and `nil*` is an
+    # EXCLUDE_PREFIXES entry — so every rule that named Inter was already
+    # dropped from this output and the @font-face was shipping 63 KB of base64
+    # nothing could reach. Grepped before removing: the only `font-family:'Inter'`
+    # in the built stylesheet was the @font-face itself. `drop_orphan_fontface`
+    # takes the whole rule out when the token is unfilled, which is exactly the
+    # right behaviour here — the same mechanism that removed Söhne Mono from the
+    # portal in the same pass, for the same reason. Re-add the line if `nil*`
+    # ever leaves EXCLUDE_PREFIXES.
     # The chat greeting's serif (§53.13). Abhaya Libre SemiBold, latin subset,
     # 12.6 KB — SIL OFL, from Google Fonts. It ships for the same reason the
     # other four do: §53 declares the @font-face and the greeting reads it, so
@@ -1655,6 +1809,505 @@ def check_coverage():
     declined = ', '.join(sorted(NOT_IN_DS))
     print(f'layer coverage: {len(listed)} of {len(portal)} portal layers'
           f'{" (declined: " + declined + ")" if declined else ""}')
+
+
+# ==========================================================================
+# THE MARKUP HALF — `ds*` BUILDERS, EXTRACTED FROM `views.js` EVERY BUILD
+#
+# THE CSS IS ONLY HALF A COMPONENT AND THIS FILE USED TO SHIP ONE HALF.
+# `talentnext-ds.css` carried 1,533 classes; `talentnext-ds.js` carried the
+# icon set, the brand assets and nine behaviour helpers, and NOT ONE MARKUP
+# BUILDER. So a portal linking both got every token, every hairline and every
+# type role for free — and had to hand-write the DOM those rules key on.
+#
+# WHAT THAT COST, MEASURED. `tn-agent-portal.html` hand-wrote its own copies
+# of 33 names this file could have given it — `aiHead`, `crow`, `ph`,
+# `statCell`, `avatar`, `stars`, `quickActions`, `shell`, `sidenav`. They were
+# forked once and never re-forked, so they drifted the moment either side
+# moved, and the drift is invisible from either file alone:
+#
+#     views.js      aiHead({mark, title, desc, act, extra, under})
+#     agent portal  aiHead(title, desc, act)
+#
+# That copy CANNOT draw Tal's sparkle — there is no `mark` parameter to pass.
+# Same shape on the call row: `crow(kind, o)` reads `o.gate`, and the agent
+# portal's `crow({av, photo, name, …})` has no `gate`, so the 3 Sep join gate
+# could not reach it. Neither is a styling gap a token can close. The result
+# was 1,227 of those 1,533 classes styled with nothing on the page writing
+# them — the stylesheet arriving complete and the components arriving as
+# decoration, which is §70's half-shipped failure one level up.
+#
+# SO THE TEST IS THE ONE THIS FILE ALREADY STATES FOR BEHAVIOUR: does it need
+# the portal's STATE, or only the arguments you hand it? `dsTypeSummary`
+# crosses because it needs only its element; Tal's thread does not because it
+# needs `S.thread`. Measured against that test, twelve of the fourteen
+# current-generation builders are already pure functions of their arguments —
+# `crow` included, all forty lines of it. They are extracted here rather than
+# copied, for the same reason `icons.js` is copied verbatim rather than
+# re-typed: a copy is a fork with a longer fuse.
+#
+# THE `ds` PREFIX IS NOT TIDINESS, IT IS WHAT MAKES THIS ADDITIVE. Three
+# portals already define bare `crow`, `ph`, `aiHead` and `statCell` at the top
+# level of their own documents. Shipping those names would redeclare them —
+# fatal for a `const`, a silent shadow for a `function` — so every builder is
+# renamed and every internal call site renamed with it. Nothing that renders
+# today changes; a portal migrates one call at a time when it suits.
+# ==========================================================================
+
+# THE TABLES THESE READ. A table maps a label to an icon or a level to a code;
+# it is not a portal's content. `AWARD` and `I` are already in the output, so
+# they are absent here on purpose — see DS_HAVE below.
+#
+# `STEP_IC` IS THE INTERESTING ONE AND ITS OLD ARGUMENT IS REVERSED. That
+# table was deliberately held back so "both portals keep a copy and a step's
+# subject icon cannot differ between them". With two portals that reasoning is
+# sound; with a third, two copies is precisely HOW they differ. One source.
+DS_TABLES = [
+    ('GC_IC',      'views.js'),   # gcard kind -> icon name
+    ('STEP_IC',    'views.js'),   # step label -> icon, first match wins
+    ('STPS_W',     'views.js'),   # step state -> the word for it
+    ('LVL_CODES',  'views.js'),   # the fifteen rungs, E1..T5
+    ('JOIN_NOW',   'views.js'),   # the narrow "joinable" vocabulary
+    ('JOIN_EARLY', 'views.js'),   # minutes a door opens before the hour
+    ('RUNG',       'data.js'),    # level code -> rung index
+    ('BDG',        'data.js'),    # the badge ladder
+    ('RANKS',      'data.js'),    # rank names
+]
+
+# Already in `talentnext-ds.js`, so a builder may reference these freely.
+# `callLeft` ships as `dsCallLeft` and `PLATE_SOON` as `DS_PLATE_SOON`, which
+# is why both appear in DS_RENAME rather than in DS_TABLES.
+DS_HAVE = {'I', 'inner', 'IP', 'PHP', 'P', 'AWARD', 'AV', 'LOGO_K', 'LOGO_W',
+           'LOGO_D', 'TAL_MARK', 'CALL_ART', 'CHEV', 'TN_MARK', 'ARROW_LINE',
+           'TN_CHEVRONS', 'DS_PLATE_SOON', 'dsCallLeft', 'dsCallUrgent'}
+
+# source name -> the name it is emitted under. Applied to the DECLARATION and
+# to every call site inside every extracted body, so the closure stays wired.
+DS_RENAME = {
+    'aiHead': 'dsAiHead', 'crow': 'dsCrow', 'statCell': 'dsStatCell',
+    'standRow': 'dsStandRow', 'stepper': 'dsStepper', 'ladder': 'dsLadder',
+    'gcard': 'dsGcard', 'foundHead': 'dsFoundHead', 'stars': 'dsStars',
+    'avatar': 'dsAvatar', 'ph': 'dsPh', 'phSub': 'dsPhSub',
+    # helpers the above reach for
+    'joinLive': 'dsJoinLive', 'joinShut': 'dsJoinShut',
+    'joinClock': 'dsJoinClock', 'nextBadge': 'dsNextBadge',
+    'stepIcon': 'dsStepIcon', 'rungOf': 'dsRungOf',
+    # already shipped under these names — renamed, never re-emitted
+    'callLeft': 'dsCallLeft', 'PLATE_SOON': 'DS_PLATE_SOON',
+}
+
+# Emitted in this order. Declaration order only matters for the `const` arrows
+# (a `function` is hoisted), and nothing here executes at load, so the order is
+# for reading rather than for correctness.
+DS_BUILDERS = [
+    'phSub', 'ph', 'avatar', 'stars', 'statCell', 'gcard', 'foundHead',
+    'aiHead', 'stepIcon', 'stepper', 'rungOf', 'ladder', 'nextBadge',
+    'standRow', 'joinClock', 'joinLive', 'joinShut', 'crow',
+]
+
+# THE TWO THAT NEEDED AN ARGUMENT, AND WHY EACH IS ONE LINE.
+#   `ph`        calls `bk(backTo)`, and `bk` reads `S.hist` and `railRoots()`
+#               to decide whether the arrow is a history pop or a route. A
+#               hand-authored page has neither, so the DS version takes the
+#               control's TARGET and always emits a route — which is what
+#               `tn-agent-portal.html`'s own `ph(title, sub, backTo)` already
+#               settled for independently.
+#   `foundHead` calls `discOpen(key)`, i.e. `S.disc[key]`. The DS version takes
+#               the boolean. §65's split is unchanged — the class carries the
+#               interaction, the caller's own state survives the next render.
+# Both are applied to the extracted text, so a change upstream still lands and
+# only the named line is re-pointed.
+DS_PATCH = {
+    'ph': [(r'\$\{bk\(backTo\)\}',
+            '${backTo?`<button class="ph-back" data-go="${backTo}">'
+            '${I.arrowLeft}<span class="ph-back-t">Back</span></button>`:""}')],
+    # `foundHead` is an arrow const, not a `function` — the first version of
+    # this patch assumed the latter and DS_PATCH's own guard said so, which is
+    # the guard earning its place on the first run.
+    'foundHead': [(r'\bdiscOpen\(\s*key\s*\)', 'open'),
+                  (r'(const\s+foundHead\s*=\s*\(\s*title\s*,\s*key\s*)\)',
+                   r'\1, open)')],
+    # `crow`'s FIRST ARGUMENT IS EITHER A RECORD OR A KEY INTO `CALL_ROW`, and
+    # `CALL_ROW` is the candidate portal's three appointments — content, not a
+    # table. The object branch already exists and is the one the leader's call
+    # card uses, so the DS keeps that and makes the other branch say what is
+    # wrong instead of returning `undefined` and drawing a row of blanks.
+    'crow': [(r"typeof kind === 'object' && kind \? kind "
+              r":\s*\(CALL_ROW\[kind\] \|\| CALL_ROW\.cohort\)\(\)",
+              "(typeof kind === 'object' && kind) ? kind : dsNoRecord(kind)"),
+             # `c.second` IS REQUIRED IN THE PORTAL AND OPTIONAL HERE, and the
+             # difference is who writes the record. Every `CALL_ROW` entry
+             # carries a secondary action, so `c.second.go` cannot throw there;
+             # a hand-authored page writes its own record and omitting one
+             # field should not be a TypeError from inside a generated file.
+             # Rendering is unchanged wherever `second` is present — and
+             # `{second:false}` was already the way to draw the row without it.
+             (r'\bc\.second\.', '(c.second||{}).')],
+}
+
+
+# ==========================================================================
+# THE AUTHORED BUILDERS — the patterns the portal writes INLINE
+#
+# EVERYTHING ABOVE IS EXTRACTED AND THESE FIVE ARE WRITTEN, and the difference
+# matters enough to keep them in separate blocks.
+#
+# WHY THERE IS NOTHING TO EXTRACT. `.kv`, `.tbl`, `.tag`, `.cs` and `.note`
+# are the highest-volume patterns in the product, and the candidate portal has
+# no functions for them — it writes their markup inline inside page views
+# (`allAgents`, `checkoutPlate`, `pfPanel`, `V.account`). So they are not
+# components in the code, only in the stylesheet and in `gallery.html`. A
+# hand-authored portal has always had to copy them out of the gallery by hand,
+# which is why `tn-admin.html` writes its OWN `kv` 248 times.
+#
+# THE COST OF AUTHORING RATHER THAN EXTRACTING, STATED PLAINLY. An extracted
+# builder cannot drift from the portal, because it IS the portal's function.
+# These can: if `dsTable` emits one DOM and `V.transcript`'s inline table emits
+# another, they diverge — the same failure this whole file exists to stop,
+# pointed the other way. Two mitigations, and the second is the real one:
+# `gallery.html` documents THESE as the recipe (so there is one written
+# answer), and the coverage check reports a family the box styles but nothing
+# writes. The durable fix is for the portal to call them too; that is a change
+# to `views.js` and belongs in its own pass.
+#
+# EVERY STRUCTURE HERE IS TRANSCRIBED, NOT INVENTED — from `gallery.html`
+# where it agrees with the portal, and from the PORTAL where the two disagree.
+# They disagreed once and the gallery was wrong: it documents a field as
+# `<label class="f"><span class="lbl">`, and `.lbl` is styled by ZERO rules,
+# so that recipe has been shipping an unstyled label. The portal writes
+# `<div class="f"><label for=…>` and that is what nine call sites render.
+#
+# `dsField` IS DELIBERATELY ABSENT AND IS NOT AN OVERSIGHT. A field's label is
+# styled by four SCOPED rules only — `.auth-card .f > label`,
+# `.auth-card .sec-id label`, `.app .conf .conf-f > label`, `.app .pfe-f >
+# label` — and by no general one, so a form on an ordinary page renders a
+# browser-default label. Shipping a builder for that would ship the
+# half-component this file keeps refusing. It needs one CSS rule stated in a
+# numbered layer in `hifi/build/` (so it crosses to all three portals), and
+# that is a portal-side edit rather than a design-system one.
+# ==========================================================================
+DS_AUTHORED = r"""
+/* ---- `.kv` — a label/value band. The single most-used pattern in the
+   product and the one a hand-authored portal reinvents first.
+
+   THE WRAPPER IS THE CALLER'S AND IT IS REQUIRED. §10.15's label-column
+   opt-out reaches `.kv` by DESCENDANT rather than by direct child precisely
+   because the band is always wrapped — a `.tile` in the portal, a bare `div`
+   from a hand-authored page. Pass `wrap` to choose; the default bare `div` is
+   what the gallery documents.
+
+       dsKv([['600px','Gutter 24'], ['900px','Permanent rail']])
+       dsKv([{k:'Role', v:'Super Admin'}], 'tile')                            */
+function dsKv(rows, wrap){
+  const body = (rows || []).map(r => {
+    const k = Array.isArray(r) ? r[0] : r.k;
+    const v = Array.isArray(r) ? r[1] : r.v;
+    return `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  }).join('');
+  return `<div${wrap ? ` class="${wrap}"` : ''}>${body}</div>`;
+}
+
+/* ---- `.tbl` — a data table, and `.tbl-wrap` IS NOT OPTIONAL. That wrapper
+   is the only reason a wide table scrolls inside its own box instead of
+   widening the page, and it is the first thing a hand-copied table loses.
+
+   `num:true` MARKS A FIGURE COLUMN, AND WHAT IT DOES TODAY IS TABULAR
+   FIGURES, NOT RIGHT ALIGNMENT — checked on the rendered page rather than
+   assumed, because the assumption was wrong. `.app .tbl .num` states
+   `font-variant-numeric:tabular-nums` and nothing else; the `text-align:right`
+   lives on `.chart-table .num`, `.payhead > .num`, `.bhead > .num` and
+   `.sc-row .num`, none of which a plain `.tbl` is. So digits line up in width
+   (which is the half that matters for scanning a column) and sit left.
+   Marking the column is still worth it: it is one CSS rule away from also
+   being right-aligned, and when that rule lands every caller follows. A
+   portal that needs right-aligned money TODAY should say so — the fix is a
+   numbered layer in `hifi/build/`, not a style attribute here.
+
+   The flag is applied to the header AND every cell in that column, so a
+   column cannot be marked one way in the head and another in the body.
+
+       dsTable(['Chapter', {t:'Score', num:true}],
+               [['Coaching conversations', '94%']])
+       dsTable([{k:'name', t:'Name'}, {k:'avg', t:'Score', num:true}], rows)  */
+function dsTable(cols, rows){
+  const c = (cols || []).map(x => typeof x === 'string' ? {t: x} : x);
+  const head = `<tr>${c.map(x =>
+    `<th${x.num ? ' class="num"' : ''}${x.w ? ` style="width:${x.w}"` : ''}>${x.t}</th>`).join('')}</tr>`;
+  const body = (rows || []).length
+    ? rows.map(r => {
+        const cells = Array.isArray(r) ? r : c.map(x => r[x.k]);
+        return `<tr>${cells.map((v, i) =>
+          `<td${c[i] && c[i].num ? ' class="num"' : ''}>${v == null ? '' : v}</td>`).join('')}</tr>`;
+      }).join('')
+    : `<tr><td colspan="${c.length}">Nothing here yet.</td></tr>`;
+  return `<div class="tbl-wrap"><table class="tbl">${head}${body}</table></div>`;
+}
+
+/* ---- `.tag` — a status word, 32px, square. `sm` is 24px for inside a row.
+   THE VARIANTS ARE THE STYLESHEET'S OWN AND ARE NOT GUESSABLE: `brand`,
+   `acc`, `green`, `warn`, `red`, `bordered`, `sm`. Note §10.293 turns the
+   pale FILLS off, so a bare `.tag.warn` in this build is an outlined chip —
+   §31.6's note is the long version and the reason the leader's flag chip
+   mixes its own ground instead.
+
+       dsTag('On track', 'green')      dsTag('Awaiting review', 'warn sm')    */
+function dsTag(label, kind){
+  return `<span class="tag${kind ? ' ' + kind : ''}">${label}</span>`;
+}
+
+/* ---- `.note` — a bordered aside with a mark. THE VARIANT NAMES ARE
+   `acc` / `succ` / `err` / `warn` / `band`, NOT the `.tag` set: `green` and
+   `red` do nothing here, which is exactly the sort of near-miss that renders
+   as a plain note and reads as the design system missing a state. The mark
+   follows the variant so the glyph and the ground cannot disagree.
+
+       dsNote('Nothing renews automatically.')
+       dsNote('12 payouts are pending release.', 'warn', 'Settlement')        */
+function dsNote(body, kind, title){
+  const IC = {succ: 'checkFilled', err: 'error', warn: 'warning', acc: 'info'};
+  return `<div class="note${kind ? ' ' + kind : ''}"><span>${I[IC[kind] || 'info']}</span>`
+    + `<div class="nb">${title ? `<b>${title}</b>` : ''}${body}</div></div>`;
+}
+
+/* ---- `.cs` — a tab strip, and THE `.sec.sec-cs` WRAPPER IS PART OF IT.
+   §16 zeroes the padding of a section holding a strip and §20 knows the
+   marker, so the strip and the panel under it meet on one line with no rule
+   of their own; written bare, the strip sits in a section that closes itself
+   and draws a hairline the design does not have. This is the one pattern in
+   this block that `gallery.html` did not document at all.
+
+   THE TAB IS STATE, NOT A CLASS MOVE — CLAUDE.md trap 9. A strip that decides
+   which sections a page EMITS cannot be handled by toggling `.on` on the
+   button; keep the current key in your own state and re-render.
+
+       dsTabs([['users','All Users'], ['roles','Roles & Permissions']],
+              tab, 'data-adtab', 'User sections')                             */
+function dsTabs(tabs, current, attr, label){
+  const btn = ([k, t]) => `<button class="${k === current ? 'on' : ''}" role="tab"`
+    + ` aria-selected="${k === current}" ${attr}="${k}">${t}</button>`;
+  return `<div class="sec sec-cs"><div class="cs" role="tablist"`
+    + `${label ? ` aria-label="${label}"` : ''}>${(tabs || []).map(btn).join('')}</div></div>`;
+}
+"""
+
+
+def js_decl(text, name):
+    """The source of one top-level declaration, brace/paren matched.
+
+    NOT "up to the next top-level declaration" — that was the first cut and it
+    swept in whatever followed. `joinShut` is the case that showed it: the very
+    next statement in views.js is `setInterval(joinArm, 20000)`, so a naive
+    grab shipped a timer calling a portal pass that does not exist here, and it
+    would have thrown on load rather than at a call site.
+    """
+    m = re.search(r'^(?:(function)\s+' + name + r'\b|(const|let|var)\s+'
+                  + name + r'\s*=)', text, re.M)
+    if not m:
+        return None
+    start = m.start()
+    if m.group(1):
+        # THE BODY BRACE, NOT THE PARAMETER BRACE. `function aiHead({mark,
+        # title, desc, act, extra, under})` destructures, so the first `{`
+        # after the name opens the PARAMETER LIST — depth-counting from there
+        # closes on the parameter's own `}` and emits a declaration with no
+        # body at all. It shipped `function dsAiHead({mark, title, …}` and the
+        # file stopped parsing at the NEXT declaration, which is where the
+        # error pointed. So: walk the parameter parens out first.
+        i = text.index('(', m.end() - 1)
+        depth = 0
+        while i < len(text):
+            if text[i] == '(':
+                depth += 1
+            elif text[i] == ')':
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        i = text.index('{', i)
+        depth = 0
+        while i < len(text):
+            if text[i] == '{':
+                depth += 1
+            elif text[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    return text[start:i + 1]
+            i += 1
+        return None
+    # const/let/var: to the semicolon at nesting depth zero. Template literals
+    # are tracked because these bodies are almost entirely backtick HTML and a
+    # `;` inside one (`&middot;`, a `style="…;…"`) would end the scan early.
+    i, depth, tick = m.end(), 0, False
+    while i < len(text):
+        c = text[i]
+        if c == '\\':
+            i += 2
+            continue
+        if c == '`':
+            tick = not tick
+        elif not tick:
+            if c in '([{':
+                depth += 1
+            elif c in ')]}':
+                depth -= 1
+            elif c == ';' and depth == 0:
+                return text[start:i + 1]
+        i += 1
+    return None
+
+
+def build_builders():
+    """The `ds*` markup half, extracted from the portal's own view layer."""
+    views = (SRC / 'views.js').read_text()
+    data = (SRC / 'data.js').read_text()
+    srcs = {'views.js': views, 'data.js': data}
+
+    def rename(s):
+        """Rename in JS POSITION ONLY — never inside the markup.
+
+        A WHOLE-WORD RENAME REWRITES CSS CLASS NAMES, because `-` is a word
+        boundary. `\\bph\\b` matched the `ph` in `class="ph-main"` and emitted
+        `class="dsPh-main"`; `gcard` did the same to `gcard-art` and
+        `gcard-b`, `stand` to `stand-c`, `crow` to every one of `crow-when`
+        / `crow-who` / `crow-ph`. Six builders shipped markup keyed on classes
+        the stylesheet has never heard of — which would have rendered as
+        unstyled boxes and looked exactly like the design system missing a
+        component. Caught by running the output, not by reading it.
+
+        So: a table (screaming case, and every class in these bodies is
+        lowercase) is safe as a whole word. A function is renamed only where
+        it is CALLED or DECLARED.
+        """
+        for a, b in sorted(DS_RENAME.items(), key=lambda kv: -len(kv[0])):
+            if a[0].isupper():
+                s = re.sub(r'\b' + re.escape(a) + r'\b', b, s)
+            else:
+                s = re.sub(r'\b' + re.escape(a) + r'(?=\s*\()', b, s)
+                s = re.sub(r'((?:function|const|let|var)\s+)' + re.escape(a)
+                           + r'\b', r'\1' + b, s)
+        return s
+
+    out, emitted, missing = [], [], []
+
+    out.append("""/* `dsCrow` takes the appointment RECORD. The portal's own `crow` accepts a
+   key into `CALL_ROW` as a shorthand for its own three appointments; that
+   table is content and does not cross, so the shorthand says so rather than
+   drawing a row of blanks. */
+function dsNoRecord(k){
+  throw new TypeError('dsCrow(record, opts): expected the appointment record, got '
+    + JSON.stringify(k) + '. The design system ships no CALL_ROW — pass '
+    + '{who:{n,i,img}, role, x, when, mins, label}.');
+}
+
+/* ---- the tables the builders read ---- */""")
+    for name, where in DS_TABLES:
+        seg = js_decl(srcs[where], name)
+        if seg is None:
+            missing.append(f'{name} ({where})')
+            continue
+        out.append(rename(seg))
+        emitted.append(name)
+
+    out.append('\n/* ---- the builders ---- */')
+    for name in DS_BUILDERS:
+        seg = js_decl(views, name)
+        if seg is None:
+            missing.append(name)
+            continue
+        for pat, rep in DS_PATCH.get(name, []):
+            seg2 = re.sub(pat, rep, seg)
+            if seg2 == seg:
+                # A patch that matches nothing is the "gate nothing writes"
+                # tell in the build itself: the upstream line it re-points has
+                # moved, and the builder would ship reading `S`.
+                sys.exit(f'DS_PATCH for {name} matched nothing: {pat}')
+            seg = seg2
+        out.append(rename(seg))
+        emitted.append(DS_RENAME.get(name, name))
+
+    if missing:
+        sys.exit('builder(s) not found in the portal source: '
+                 + ', '.join(missing))
+
+    # The authored block goes through the SAME verify as the extracted ones —
+    # it is the half most likely to name an icon or a variant class that does
+    # not exist, because nothing upstream is holding it honest.
+    out.append('\n/* ---- the authored builders '
+               '(patterns the portal writes inline) ---- */')
+    out.append(DS_AUTHORED.strip())
+    emitted += re.findall(r'^function (ds\w+)', DS_AUTHORED, re.M)
+
+    return '\n\n'.join(out) + '\n', emitted
+
+
+def verify_builders(js):
+    """No emitted builder may reference anything this file does not declare.
+
+    THE CSS HALF HAS HAD `verify_subset` SINCE IT EXISTED AND THE JS HALF HAD
+    NOTHING. A builder that slips through referencing `S`, `CFG` or a portal
+    pass is not a syntax error and not a broken selector — it is a function
+    that throws the first time somebody calls it, in their portal, with the
+    stack pointing at a generated file they did not write. This is the same
+    question `verify_subset` asks of the stylesheet, asked of the script.
+    """
+    src = strip_comments(js)
+    src = re.sub(r'`(?:[^`\\]|\\.)*`', '``', src)          # template bodies
+    src = re.sub(r"'(?:[^'\\]|\\.)*'", "''", src)
+    src = re.sub(r'"(?:[^"\\]|\\.)*"', '""', src)
+
+    declared = set(re.findall(r'\b(?:function|const|let|var)\s+(\w+)', src))
+    declared |= DS_HAVE
+    # every parameter and every locally bound name, however it is bound
+    local = set(re.findall(r'\b(?:const|let|var)\s+(\w+)', src))
+    local |= set(re.findall(r'\(([^()]*)\)\s*=>', src)  and
+                 [w for grp in re.findall(r'\(([^()]*)\)\s*=>', src)
+                  for w in re.findall(r'\w+', grp)] or [])
+    local |= {w for grp in re.findall(r'function\s+\w*\s*\(([^()]*)\)', src)
+              for w in re.findall(r'\w+', grp)}
+    local |= {w for grp in re.findall(r'\{([^{}]*)\}\s*\)', src)
+              for w in re.findall(r'\w+', grp)}
+    local |= set(re.findall(r'\b(\w+)\s*=>', src))
+    local |= set(re.findall(r'for\s*\(\s*(?:const|let|var)\s+\[?([\w,\s]+)', src))
+
+    BUILTIN = set('''if else return const let var function typeof new for while do
+    switch case break default null undefined true false this String Number Object
+    Array Math Date JSON RegExp Boolean Infinity NaN parseInt parseFloat isNaN
+    setTimeout setInterval clearInterval requestAnimationFrame document window
+    console of in instanceof delete void yield await async try catch finally
+    throw class extends super arguments Promise Set Map Symbol
+    Error TypeError RangeError encodeURIComponent decodeURIComponent'''.split())
+
+    # A NAME AFTER A DOT IS A PROPERTY, NOT A BINDING. The first cut of this
+    # matched any identifier before a `(` and reported `.map(`, `.test(`,
+    # `.getHours(` — fourteen method names beside the one real finding
+    # (`CALL_ROW`), which is how a checker gets ignored. `(?<![.\w$])` is the
+    # whole fix: it also excludes `?.` and a name that is part of a longer one.
+    bad = {}
+    for m in re.finditer(r'(?<![.\w$])([A-Za-z_]\w*)\s*(?=[\(\[])', src):
+        n = m.group(1)
+        if n in declared or n in local or n in BUILTIN:
+            continue
+        bad[n] = bad.get(n, 0) + 1
+    # SCREAMING CASE IS CHECKED WHATEVER FOLLOWS IT, because the failure this
+    # is really for is a TABLE read as `RUNG[c]` or `AWARD.points` rather than
+    # called — `CALL_ROW.cohort` is the case that started it.
+    for m in re.finditer(r'(?<![.\w$])([A-Z][A-Z0-9_]{2,})\b', src):
+        n = m.group(1)
+        if n not in declared and n not in BUILTIN and n not in local:
+            bad[n] = bad.get(n, 0) + 1
+
+    if bad:
+        print()
+        print('=' * 70)
+        print('BUILDER(S) REFERENCE SOMETHING THIS FILE DOES NOT DECLARE:')
+        for n, c in sorted(bad.items()):
+            print(f'  {n}  ({c}x)')
+        print()
+        print('Either the name belongs in DS_TABLES (a lookup table), in')
+        print('DS_HAVE (already shipped), or the builder reads portal STATE')
+        print('and needs an argument — see DS_PATCH for the two that did.')
+        print('=' * 70)
+        sys.exit(1)
 
 
 def main():
@@ -2309,10 +2962,64 @@ function dsQuizRose(dims, score){
    ========================================================================== */""")
 
     assets_js = '\n\n'.join(assets) + '\n'
+
+    # ---- the markup half. LAST in the file, after the assets and after the
+    # behaviour helpers, because a builder may reference `AWARD`, `I` and
+    # `dsCallLeft` and only the first of those is a `const`. Nothing here runs
+    # at load, so this is for reading order; the verify below is what actually
+    # holds it together.
+    builders_js, emitted = build_builders()
+    builders_js = """
+
+/* ==========================================================================
+   THE MARKUP HALF — the components as functions
+
+   The stylesheet knows how a component looks; these know what DOM it looks
+   for. Extracted from the portal's own `views.js` on every build, so a
+   component that changes shape there changes shape here — which is the whole
+   point, and the thing this file did not do for its first year.
+
+       el.innerHTML = dsAiHead({mark:true, title:'Who needs attention',
+                                desc:'Six accounts are awaiting review.',
+                                act:'<button class="btn btn-t">Review all</button>'})
+
+       dsStatCell(I.group, 'Total users', '1,284', 'across every role')
+       dsCrow({who:{n:'Priya Nair', i:'PN', img:AV.priya}, role:'Talent Agent',
+               x:'Level interviews', when:'Today, 6:30 PM', mins:45,
+               label:'Level interview'})
+
+   EVERY NAME IS PREFIXED `ds`. Three portals already declare bare `crow`,
+   `ph`, `aiHead` and `statCell` in their own documents, and shipping those
+   names would redeclare them — fatal for a `const`, a silent shadow for a
+   `function`. So adopting these is additive and one call at a time.
+
+   TWO TAKE AN ARGUMENT THE PORTAL READS OFF STATE:
+     dsPh(title, sub, act, backTo, mark)   backTo is a VIEW NAME; the portal's
+                                           own `bk()` reads `S.hist` to decide
+                                           between a history pop and a route,
+                                           and a hand-authored page has no
+                                           history stack.
+     dsFoundHead(title, key, open)         `open` is the boolean the portal
+                                           keeps in `S.disc[key]`. §65's split
+                                           still applies: the DOM class carries
+                                           the click, your state survives the
+                                           next render.
+
+   WHAT IS NOT HERE, AND WILL NOT BE. Anything that needs the portal's `S`:
+   Tal's thread, the recommendation's rotation, the render passes that build
+   the head band (`placeBand`, `placeDark`, `placeTopbar`). A page that wants
+   a head band assembles it — see DESIGN-SYSTEM.md.
+   ========================================================================== */
+""" + builders_js
+
     jsout = HERE / 'talentnext-ds.js'
-    body = js_header + icons + assets_js + js_tail
+    body = js_header + icons + assets_js + js_tail + builders_js
+    verify_builders(builders_js)
     jsout.write_text(body)
     print(f'brand assets embedded: {n_img} images')
+    print(f'markup builders: {len(emitted)} emitted '
+          f'({sum(1 for e in emitted if e.startswith("ds"))} ds* functions, '
+          f'{sum(1 for e in emitted if not e.startswith("ds"))} tables)')
     print(f'{jsout.name}  {len(body)/1024:.0f} KB')
 
     # ======================================================================
@@ -2353,6 +3060,47 @@ function dsQuizRose(dims, score){
         if new_txt != txt:
             f.write_text(new_txt)
             stamped += 1
+
+    # ======================================================================
+    # AND THE PORTALS ONE FOLDER UP, WHICH THIS HAS NEVER STAMPED
+    #
+    # The exclusion above — `(?!design-system/)` — is what separates a live
+    # link from the gallery's copy-paste example. It also, exactly, describes
+    # how a portal at the repo root links these files:
+    #
+    #     <link rel="stylesheet" href="design-system/talentnext-ds.css">
+    #
+    # So `tn-agent-portal.html` has NEVER been cache-busted. Its link carries
+    # no `?b=` at all, and the comment above told the reader to "do the same
+    # in your own portal, or hard-reload" — advice in a generated file nobody
+    # reads, answering a problem the build could just solve.
+    #
+    # WHY THIS MATTERS MORE THAN IT SOUNDS. A stale stylesheet is the most
+    # convincing failure this project has: the page renders, and one component
+    # comes out unstyled, so it reads as the design system MISSING that
+    # component. The note above records 2774 rules loading against a
+    # 3285-rule build and the ask dock arriving as raw text and a giant arrow.
+    # Every hour spent on "the design system doesn't have X" where X was
+    # shipped is this.
+    #
+    # THE PREFIX IS REQUIRED HERE RATHER THAN FORBIDDEN, which is what keeps
+    # the two loops from fighting: in this folder a live link is bare, one
+    # level up a live link is prefixed. A portal in a SUBFOLDER of its own
+    # (`admin/tn-admin-v2.html` -> `../design-system/…`) is matched too.
+    # ======================================================================
+    for f in sorted(ROOT.glob('*.html')) + sorted(ROOT.glob('*/*.html')):
+        if f.parent == HERE:
+            continue                      # the loop above owns this folder
+        txt = f.read_text()
+        new_txt = re.sub(
+            r'((?:href|src)=")((?:\.\./)*design-system/talentnext-ds\.(?:css|js))'
+            r'(?:\?b=[0-9a-f]+)?"',
+            lambda m: f'{m.group(1)}{m.group(2)}?b={stamp}"', txt)
+        if new_txt != txt:
+            f.write_text(new_txt)
+            stamped += 1
+            print(f'  stamped {f.relative_to(ROOT)}')
+
     print(f'cache-bust stamp {stamp} written into {stamped} page(s)')
 
     # ======================================================================

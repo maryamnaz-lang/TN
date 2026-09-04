@@ -33,7 +33,30 @@
    ========================================================================== */
 
 /* ------------------------------------------------------------------ 76.1 ---
-   THE SECTION AND THE TWO RULES
+   THE SECTION AND THE ONE RULE
+
+   IT WAS TWO UNTIL 4 Sep 2026 (Maryam: "remove the divider below the calendly
+   image"). `.bkc`'s `border-top` is gone; `.bkp`'s `border-bottom` — the one
+   ABOVE the scheduler — stays, because that is the one that was asked about and
+   the one that still divides two blocks of the page's own content.
+
+   THE RULE BELOW HAD STOPPED DIVIDING ANYTHING OF OURS, WHICH IS WHY IT READS
+   AS SPARE. When this note was written the middle block was our own picker — a
+   month grid and a list of times — so a hairline under it closed one of three
+   blocks we drew. The middle block is Calendly's iframe now (§76.6), a bounded
+   card with its own edges inside a frame we do not own, so the hairline was
+   sitting a few pixels under somebody else's border: two boundaries at the same
+   place, which is §14's "TWO 1px rules one pixel apart" arriving from across an
+   origin. The checkout row is the last block on the page and closes on §10.2's
+   own section rule anyway.
+
+   THE PADDING STAYS AND IS NOW AIR RATHER THAN A RULE'S CLEARANCE. `--s07`
+   above the checkout row is unchanged, so nothing moves by a pixel; what the
+   paragraph below says about the space being symmetrical around each rule is
+   still true of the one rule that is left. */
+
+/* ------------------------------------------------------------------------
+   (the original note, kept because its three arguments are still the section's)
 
    One `.sec` holding all three, because §10.2 closes every section with a
    full-bleed hairline and a pair of tick marks at the rails — three sections
@@ -57,7 +80,7 @@
   display:flex;flex-direction:column;gap:0}
 .app .bkp{border-bottom:1px solid var(--rule);padding-bottom:var(--s07)}
 .app .bks-w{padding:var(--s07) 0}
-.app .bkc{border-top:1px solid var(--rule);padding-top:var(--s07)}
+.app .bkc{padding-top:var(--s07)}
 
 /* ------------------------------------------------------------------ 76.1b ---
    THE CHOOSING AND THE PAYING ARE A CENTRED COLUMN, NARROWER THAN THE PROFILE
@@ -163,282 +186,57 @@
    phone/desktop padding are written against — and the next thing this block
    gains goes in a second track rather than in a new display type. */
 /* ------------------------------------------------------------------ 76.3 ---
-   THE PICKER — two numbered steps
+   THE PICKER IS A THIRD-PARTY EMBED, AND EVERY RULE THAT DREW ONE IS DELETED
 
-   THE DATE COLUMN IS FIXED AND THE TIME COLUMN TAKES THE REST, which is the
-   reverse of the block above and for the same reason: a seven-across month grid
-   has a natural width and six time cells do not.
+   Maryam, 3 Sep 2026: "i didn't say that i needed the design like calendly, i
+   gave you the image to replace with the choose date and time part since
+   calendly is the iframe we will be using so we do no need this design."
 
-   IT STAYED AT 300 AND THE CALENDAR WAS SIZED TO IT, WHICH IS THE OPPOSITE OF
-   HOW THIS WENT FIRST. The track was widened to 336 for seven 45px cells, and
-   that number was chosen by looking at the calendar alone — at a 900 frame it
-   left the time column 148px of usable grid, so even two time cells came out
-   70 wide against the 81 "11:30 AM" needs, and the labels set on two lines at
-   the narrow end of the desktop range. Back at 300 the cells are 39px, which is
-   within a pixel of the reference's own, and the time column clears 81 at every
-   width. THE TIGHT END IS WHERE THIS HAD TO BE MEASURED: at 1280 both numbers
-   work and nothing shows.
+   SO THE SCHEDULER IS NOT OURS TO DRAW. The dates, the times, the timezone and
+   the whole interaction come from the agent's own Calendly, rendered in an
+   iframe — and an iframe's contents are not styleable from here at all. A
+   hand-built picture of one is worse than a placeholder: it is a screen that
+   promises a layout the product will not ship, and every hour spent tuning its
+   columns is spent on markup that gets deleted at integration.
+
+   WHAT WENT, ALL OF IT: `.bks` and `.bks-c` (the two-column grid and its
+   divider), `.bks-h` / `.bkcv-h` (the headings), `.bks-day` / `.bks-cnt` (the
+   day line and its count chip), `.bks-slots` and the `.slot` overrides,
+   `.bkcal` / `-top` / `-m` / `-nav` / `-b` / `-w` / `-g` / `-tz` (the month
+   block) and `.bkd` with its four states and its selected-day dot. Their
+   arguments went with them rather than being preserved as dead rules — a
+   stylesheet that keeps the drawing for a component nothing writes is the tell
+   CLAUDE.md names, and this is 190 lines of it. The reasoning that outlives the
+   markup is recorded over `V.agent` in views.js, in one place, in prose.
+
+   THREE THINGS ARE WORTH KEEPING IN WORDS, because they are about the PAGE and
+   not about the picker, and a future embed will meet all three:
+
+     THE COLUMN IS CENTRED AND NARROWER THAN THE PROFILE (§76.1, unchanged) —
+     `.bks-w` still pays that padding and still sits inside the same centred
+     measure, so the embed lands where the picker did rather than rail to rail.
+
+     `.slots` AND `.bkcal` BOTH HAD TO GIVE BACK §10.3's BLEED. `.sec > .slots`
+     pulls itself out by `--pad-x` on both sides, which inside a bounded panel
+     hangs the grid over both borders. Trap 10. Anything dropped into this slot
+     that carries a page component's class will do the same thing.
+
+     THE TIMEZONE WAS STATED AND IS NOT ANY MORE. It came off the heading row on
+     31 Aug, came back under the calendar on 3 Sep, and goes now because the
+     embed states its own — Calendly puts the reader's zone at the foot of its
+     widget. `V.booking`'s receipt still names it after the fact.
    ------------------------------------------------------------------------ */
-.app .bks-w{display:flex;flex-direction:column}
-.app .bks{
-  display:grid;grid-template-columns:minmax(0,1fr);
-  gap:var(--s06)}
-.app .bks-c{display:flex;flex-direction:column;gap:var(--s05)}
-.app .bks-c + .bks-c{border-top:1px solid var(--rule);padding-top:var(--s06)}
 
-@container app (min-width:900px){
-  .app .bks{
-    grid-template-columns:minmax(0,300px) minmax(0,1fr);
-    gap:var(--s07)}
-  .app .bks-c + .bks-c{
-    border-top:0;padding-top:0;
-    border-left:1px solid var(--rule);padding-left:var(--s07)}
-}
-
-/* THE STEP NUMERALS ARE GONE AND `.bks-n` WITH THEM (Maryam, 31 Aug 2026).
-   This layer's own note argued the chip well — "the tint is the same hue at the
-   weight §56 uses for 'the step you are on'" — and the reason it goes is not
-   that the drawing was wrong but that the JOB was already done: the two columns
-   sit side by side with a rule between them, the left one names a date the
-   right one then uses, and reading order is the numbering. Two tinted chips
-   restated it, and they were the only two `--brand-tint-2` objects on a page
-   where every other orange means "you chose this".
-   BOTH HALVES DELETED, not hidden — the box here and the ink in §63 §18. A rule
-   gated on a class the view no longer writes is the tell CLAUDE.md names, and a
-   24px chip is exactly the kind that costs nothing to leave and everything to
-   rediscover. */
-.app .bks-h{display:flex;align-items:center;gap:var(--s03)}
-.app .bks-h h3{margin:0;flex:1 1 auto;min-width:0}
-/* `.bks-tz` IS DELETED TOO (Maryam, 31 Aug 2026). "Times in ET" was the second
-   thing on this heading row and the row now holds one; its box here and its ink
-   in §63 both go. The page states no timezone at all now — the closing sentence
-   went in an earlier pass — which is raised at the call site rather than
-   quietly accepted. */
-
-.app .bks-day{margin:0;display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap}
-.app .bks-cnt{
-  flex:none;display:inline-flex;align-items:center;
-  padding:2px 10px;
-  background-color:var(--layer-02)}
-
-/* THE TIMES ARE THREE COLUMNS — the reference's, and what turns six chips into
-   a shape rather than a sentence. `.slots` is `auto-fill minmax(140px,1fr)` by
-   §10.29, which at this block's ~600px would be four and at the phone's ~300
-   would be two; the counts are stated instead, so the grid cannot change shape
-   at a width nobody measured.
-
-   AND THE COUNT IS DERIVED FROM ONE MEASURED NUMBER: 81px. That is `.slot`'s
-   max-content width — "11:30 AM" at 13.5px plus its 12px of side padding — so
-   three across needs 3x81 + 2x8 of gap = 259 and two across needs 170. Every
-   threshold below is that arithmetic against the measured column, not a guess:
-
-     < 600     the phone, one column, ~358 wide          -> TWO (3 would be 74)
-     600-900   stacked but wide, 712 at the tablet frame -> three
-     900-1100  TWO, AND THIS BAND SHIPPED BROKEN. The two-column picker gives
-               the times only what the 336px calendar leaves: 180px at 900,
-               274 at 1024. Three across is 60 and 91, so every label set on
-               two lines — "9:00 / AM" — through the whole of the range the
-               product is actually read at. Two across is 86 and 133, which
-               clears 81 at the tightest point with room.
-     >= 1100   three, where the column reaches 332.
-
-   1100 IS A THIRD BREAKPOINT AND IT IS DELIBERATE. CLAUDE.md's "900 is the
-   portal's only real breakpoint" is about LAYOUT — this is not a layout change,
-   it is one grid's column count, and §63 already states 672 and §70 599.98 for
-   the same kind of reason. The alternative was stacking the picker below 1100,
-   which throws away the calendar-beside-the-times pairing that is the whole
-   point of the two steps, for a problem that is one declaration.
-
-   AND IT MUST GIVE BACK §10'S BLEED. `.sec > .slots` pulls itself out by
-   `--pad-x` on both sides (§10.3's "lists that bleed") and §15 restates the
-   margin; inside a column that hangs the grid over both edges. Trap 10 is the
-   same failure one component along, and it is answered the same way — at the
-   element, not by chasing selectors. */
-/* THE TIMES ARE A LIST — Maryam, 31 Aug 2026, with a reference. Six blocks
-   three-across were six things to COMPARE, and a time is not compared with
-   another time, it is chosen. One row each, a clock at the head, the time, and
-   the radio mark held at the far edge; the eye runs down one column of marks
-   instead of scanning a grid for the filled cell. It also gives this column the
-   vertical mass the calendar beside it has — the two-row grid ended 200px short
-   of it and left the divider running past nothing.
-
-   THE GRID TEMPLATES ARE DELETED, NOT OVERRIDDEN. `.slots` is §10.29's
-   `auto-fill minmax(140px,1fr)` and this layer had three restatements of it
-   (three columns, two below 600, two between 900 and 1100) — every one of them
-   written for a shape that no longer exists. `grid-auto-flow:row` with a single
-   column is what a list is in a grid container, so §10.29's own `gap` and the
-   `margin:0;padding:0` that answers trap 10 both carry over untouched.
-
-   `1fr auto` WOULD PUT THE MARK AGAINST THE TEXT. The row is a flex with the
-   label at `flex:1`, so the free space lands between the words and the mark and
-   the six marks line up on the column's right edge whatever the labels measure
-   — the same reason §70.5 gives for `margin-left:auto` on `.rec-a`.
-
-   48 IS §03'S OWN `min-height` AND IT IS NOT RESTATED. A list row wants the
-   same target size a grid cell did. */
-/* THE ROWS SIT TIGHT AND THE GAP IS ZERO (Maryam, 31 Aug 2026). §10.29 gives
-   `.slots` `gap:var(--s03)` and §03 gives `.slot` `min-height:48px`, which is a
-   56px pitch — right for a grid of chips that have to read as separate targets,
-   and far too loose for four rows in a column, where the 8px of white was the
-   only thing between two lines of the same list. `gap:0` with a 44px row is a
-   list; the rows still clear the 44px touch target every other row in this
-   build keeps.
-
-   AND WITH THE GAP AT ZERO THE SELECTED ROW COULD NOT KEEP A GROUND, which is
-   the same change arriving from the other side. */
-.app .bks-slots{
-  grid-template-columns:minmax(0,1fr);
-  gap:0;
-  margin:0;padding:0}
-.app .bks-slots > .slot{
-  justify-content:flex-start;
-  min-height:44px;
-  gap:var(--s04);
-  padding-left:var(--s05);padding-right:var(--s05)}
-.app .bks-slots > .slot > svg{flex:none;width:18px;height:18px;fill:currentColor}
-.app .slot-t{flex:1 1 auto;min-width:0;text-align:left}
-.app .slot-r{flex:none;display:grid;place-items:center;width:20px;height:20px}
-.app .slot-r svg{width:20px;height:20px;fill:currentColor;display:block}
-/* THE CLOCK AND THE RING ARE QUIET UNTIL THE ROW IS CHOSEN. Both take
-   `currentColor` so §63's one `color` per state draws the words and both marks
-   together; unpicked, the row's ink is the page's and the marks would be as
-   heavy as the time itself, which is what makes a list of six read as a list of
-   eighteen objects. `--text-helper` is §63 §3's floor tier and this is exactly
-   what it is for. The CHOSEN row's marks inherit the accent, so there is no
-   `.on` rule here at all. */
-.app .bks-slots > .slot:not(.on) > svg,
-.app .bks-slots > .slot:not(.on) .slot-r{color:var(--text-helper)}
-
-.app .bks-slots > .slot{border-color:transparent}
-/* THE CHOSEN ROW HAS NO GROUND — Maryam, 31 Aug 2026, and it is the third and
-   last state this cell has had. §03 fills it solid `--brand-primary` with white
-   on it; §76 turned that into a `--brand-tint-2` wash when the grid lost its
-   borders; and now the wash goes too. What is left carrying the selection is
-   the INK and the MARK — `--accent-text` on the words (§63) and the filled ring
-   at the far edge, which is `I.circleDash` against five `I.circle`s. That is
-   enough because it is a list: in a grid of six blocks the fill was the only
-   difference between them, and in a column the eye runs down one line of marks
-   and the filled one is unmissable.
-
-   `background:transparent` AND NOT A DELETION. §03's `.slot.on` fill is
-   (0,1,0) and would simply come back; the ground has to be stated off. Same
-   shape as §64's transparent border — the declaration is the removal. */
-.app .bks-slots > .slot.on{
-  background:transparent;
-  border-color:transparent}
-/* THE TWO NARROW-WIDTH RESTATEMENTS ARE DELETED, and finding them late is the
-   note worth keeping. They dropped the grid to two columns below 600 and again
-   between 900 and 1100, where three cells could not hold "11:30 AM" — real
-   rules for a shape that no longer exists, and they SURVIVED the rewrite above
-   because they sit in their own `@container` blocks rather than beside the rule
-   they were modifying. The list needs none of it: one column is one column at
-   every width, which is half the reason it is the better shape here.
-   The tell was `grid-template-columns` computing to `0px 0px` on a grid that
-   looked right — the second track had nothing in it, so nothing moved. */
-
-/* ------------------------------------------------------------------ 76.3b --
-   THE MONTH GRID — Maryam, 31 Aug 2026, following the reference
-
-   `V.agent`'s note is where the reversal of §76's original refusal is argued
-   and where the data honesty is worked out. This is the drawing. Five things:
-
-   AN OPEN DATE IS A `.day` AND EVERY OTHER CELL IS NOT, so views.js's existing
-   `t.closest('.day')` handler selects one for free and §10.29's accent fill
-   draws it. What §10.29 gives `.day` has to be undone here, though, and all
-   three declarations matter: `min-width:64px` is 448px of row across seven
-   columns, the `1px solid var(--rule)` border turns 42 cells into a spreadsheet,
-   and the `padding` is sized for a two-line chip. A cell is a square with a
-   numeral in it.
-
-   THE SELECTED DATE IS A DISC AND `--radius` IS DELIBERATELY NOT USED. That
-   token is 0px and every `border-radius` in the build resolves through it, so
-   `50%` is stated as a literal exception the way §56 states it for a mark ("a
-   mark is one of the two things this system lets curve"). A square accent fill
-   on one cell of a 7x6 grid reads as a selected spreadsheet cell.
-
-   `aspect-ratio:1` IS WHAT MAKES THE DISC ROUND, and it needs `min-width:0` on
-   the button to work: a `<button>`'s default `min-width:auto` in a grid floors
-   the track at the content's min-content width, and a two-digit tabular numeral
-   is wider than the row's share at 390.
-
-   THE AVAILABILITY DOT IS A PSEUDO-ELEMENT ON THE OPEN CELLS ONLY, which is
-   why `.bkd.day` and not `.bkd` — the gate is the same class that means
-   bookable, so the dot cannot get out of step with what is clickable. It needs
-   `position:relative` on the cell; §10.29 does not give `.day` one.
-
-   ADJACENT-MONTH CELLS ARE DRAWN, NOT BLANKED. The reference greys July's and
-   September's tail rather than leaving holes, and it is right: a 7-column grid
-   with six empty cells in the first row reads as a rendering fault. §63 gives
-   them their ink. */
-/* THE 336 CAP IS NOT A DESKTOP NUMBER REPEATED, IT IS THE ONE THING A MONTH
-   GRID NEEDS THAT A CHIP ROW DID NOT. A calendar cell is `aspect-ratio:1`, so
-   its HEIGHT is a seventh of whatever width the column gives it — and below 900
-   the column is the page. At the tablet frame that is 712px, which made the
-   cells 98px square, the selected disc a 98px orange circle and the grid 600px
-   tall: the month became the page. The strip this replaced had a fixed cell and
-   could not do it. Capped, every width draws the same ~45px cell the desktop
-   column does, and the grid sits at the start of the stack rather than being
-   centred — it is the first control in a numbered step, not a figure. */
-.app .bkcal{display:flex;flex-direction:column;gap:var(--s04);max-width:336px}
-
-/* THE MONTH ROW IS A CONTROL, A LABEL AND A CONTROL — Maryam, 31 Aug 2026.
-   The label stays CENTRED and the two buttons hold the ends, which is the
-   reference's arrangement and is why the row is a three-column grid rather than
-   a flex row with `space-between`: with flex, the label centres between the two
-   buttons rather than in the GRID under it, so a two-character month and a
-   nine-character one would sit at different offsets from the Wednesday column.
-   `1fr` on both edges makes the middle column the grid's own centre whatever
-   the buttons measure.
-
-   32 SQUARE, WHICH IS §41'S `.cal-b` AND NOT A NEW SIZE. That layer draws the
-   only other month navigation in the build; the geometry is copied so the two
-   calendars cannot drift, and the border is the one thing left behind — §41's
-   `.cal-b` is a bordered box because it sits on a bordered panel, and §76 took
-   the frames off these blocks. §64's argument applies unchanged: a drawn
-   rectangle around a 32px glyph is one more edge than a page of hairlines has.
-
-   `:disabled` IS `--state-disabled` AND STAYS IN THE DOM. At each end one arrow
-   is inert, and it holds its column so the month name does not jump 32px
-   sideways when you page. */
-.app .bkcal-top{
-  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:var(--s03)}
-.app .bkcal-m{margin:0;text-align:center;grid-column:2}
-.app .bkcal-b{
-  display:grid;place-items:center;
-  width:32px;height:32px;padding:0;
-  border:0;background:transparent;
-  transition:background var(--dur-short) var(--ease-standard)}
-.app .bkcal-b:first-child{justify-self:start}
-.app .bkcal-b:last-child{justify-self:end}
-.app .bkcal-b svg{width:20px;height:20px;fill:var(--icon-primary);display:block}
-.app .bkcal-b:hover{background:var(--layer-02);cursor:pointer}
-.app .bkcal-b:disabled{opacity:var(--state-disabled);pointer-events:none}
-.app .bkcal-w,.app .bkcal-g{
-  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:var(--s02)}
-.app .bkcal-w > span{display:grid;place-items:center;padding-bottom:var(--s01)}
-
-.app .bkd{
-  min-width:0;aspect-ratio:1;padding:0;
-  display:grid;place-items:center;position:relative;
-  border:0;background:transparent;
-  transition:background var(--dur-short) var(--ease-standard),
-             color var(--dur-short) var(--ease-standard)}
-.app .bkd.day{border:0;border-radius:50%}
-.app .bkd.day:hover{background:var(--layer-02);border-color:transparent}
-.app .bkd.day.on{background:var(--accent);border-radius:50%}
-.app .bkd:disabled{cursor:default}
-
-/* THE DOT UNDER AN OPEN DATE IS GONE (Maryam, 31 Aug 2026). It was drawn under
-   every bookable day so the five were findable before you pressed one, which
-   was a real job when five of 31 cells were live. With two months of weekday
-   availability most of the grid is open, so the dot marked the majority and the
-   thing worth finding became the exception — and thirty 4px discs under thirty
-   numerals is a second mark saying what the enabled/disabled contrast already
-   says louder. `.bkd.day::after` and its `.on` variant are DELETED rather than
-   `content:none`d: a pseudo-element nothing draws is the same dead gate a
-   colour with no element is, and this one carries geometry that would go stale.
-   `position:relative` stays on `.bkd` — the cell is still the box a future mark
-   would be positioned against, and it costs nothing. */
+/* THE PICTURE'S BOX. `display:block` because an `<img>` is inline by default
+   and sits on a text baseline, leaving ~4px of descender under it — which on a
+   block that ends on the checkout row's hairline reads as a misaligned seam.
+   `width:100%` with `height:auto` so the capture scales inside §76.1b's centred
+   830 and keeps its own proportions at every width; a fixed height would crop
+   or stretch a screenshot, which is the one thing a screenshot must not do. */
+.app .bkshot{
+  display:block;
+  width:100%;
+  height:auto}
 
 /* ------------------------------------------------------------------ 76.5 ---
    THE SLOT UNDER THE LIST IS EMPTY, AND TWO BLOCKS HAVE BEEN REMOVED FROM IT

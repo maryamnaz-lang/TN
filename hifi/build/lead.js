@@ -250,6 +250,14 @@ const lbehind = () => lmembers().filter(x => x.m.pc - lpace(x.c) <= -5);
 const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.members.length);
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
+/* THE COURSE A COHORT IS TAKING (Maryam, 2 Sep 2026). `courseOf` and the
+   argument for keying it by LEVEL are in views.js beside `ENROL_COURSE`, which
+   is where two of the four names are read from; this is the leader-side reader,
+   stated beside `lname` and `llevel` because those three are the cohort's
+   identity and every surface that names one names them together.
+   THE DIRECTION IS THE RULE views.js's `COHORT_LEAD` note records: views.js
+   parses first and lead.js reads back, never the other way. */
+const lcourse = c => courseOf(c.level);
 
 /* THE COVER IS KEYED BY LEVEL, NOT BY COHORT ID (Maryam, 1 Sep 2026, with three
    images). `COHORT_ART` is embedded by build.py — its note is the argument for
@@ -323,6 +331,11 @@ const lcall = c => ({
   id:'c' + c.id, co:c.id, ord:c.callOrd, day:c.callDay, time:c.callTime,
   when:c.callDay + ' ' + c.callTime, mins:60,
   week:c.week, level:c.level, seats:c.members.length,
+  /* THE COURSE RIDES THE RECORD, not the card that draws it — `leadCall` builds
+     `crow`'s subject out of `k` alone and the Calls page reads the same object,
+     so a course name resolved at one call site would be a second lookup that
+     could answer differently. Same reason `chapter` is resolved here. */
+  course:courseOf(c.level),
   chapter:CH[Math.min(12, c.week - 1)][0]
 });
 const lcalls = () => LEAD_COHORTS.map(lcall).sort((a,b) => a.ord - b.ord);
@@ -419,12 +432,13 @@ const lpending = () => LEAD_SUMMARIES.filter(s => s.status === 'pending').length
 const lcTitle  = k => 'Cohort ' + k.co + ' call';
 const lcDetail = k => k.mins + ' minutes &middot; week ' + k.week + ' of 13 &middot; ' + k.chapter;
 
-const lbooked = () => lcalls().map(k => ({
-  ...k,
-  t:lcTitle(k),
-  d:k.seats + ' candidates at Explorer &ndash; ' + k.level + ' &middot; ' + lcDetail(k),
-  go:'leadCalls'
-}));
+/* `lbooked` STOOD HERE AND IS DELETED WITH THE LIST IT FED (4 Sep 2026). It
+   was `lcalls()` with three presentation fields glued on — a title, a
+   description and a `go` — for `bookedRow`, and the dashboard's Cohort Calls
+   list was its only reader. The upcoming-calls row (§113) draws the same three
+   appointments out of `lcalls()` directly, so the mapped copy is a second shape
+   of one record with nobody left to hand it to. What it was FOR survives in
+   `lcTitle` / `lcDetail`, which is where those strings were always stated. */
 
 /* --------------------------------------------------------------------------
    THE FOUR CARDS AND THE FOUR SECTIONS ARE ONE LIST
@@ -436,18 +450,31 @@ const lbooked = () => lcalls().map(k => ({
    cards are generated from this array and the sections carry these ids, so the
    only way to reorder either is to reorder this.
 
-   PAGE ORDER FOLLOWS CARD ORDER, left to right. Scrolling then lights the
-   cards in the order they are read, which is what makes the bar legible as a
-   position indicator rather than as four buttons that happen to highlight.
+   PAGE ORDER FOLLOWS CARD ORDER, left to right — AND SINCE 4 SEP 2026 ONE OF
+   THE FOUR IS ABOVE THE STRIP RATHER THAN BELOW IT. The calls section is now
+   the upcoming-calls row directly under Tal's summary (§113), so the document
+   runs calls, attention, waiting, cohorts while the cards still run in the
+   order Maryam set on 1 Sep. `leadStick` therefore reads the live section by
+   DOCUMENT POSITION instead of by this array's order; the note there is the
+   argument, and the coupling this paragraph is about — one array driving the
+   cards, the ids and §31's four hues — is unchanged. -------------------------
    -------------------------------------------------------------------------- */
-/* HOW MANY APPOINTMENTS THE DASHBOARD SHOWS (Maryam, 31 Aug 2026). Three, with
-   "All calls" in the heading row for the rest — the full list is a page of its
-   own and printing it twice made that link a route to the same content. Named
-   rather than a literal at the call site because it is a decision about the
-   DASHBOARD and not a fact about the data: it happens to equal the number of
-   cohorts today, and a fourth cohort must not turn this section into the whole
-   list with a link pointing at itself. `V.leadCalls` slices nothing. */
-const BOOKED_SHOWN = 3;
+/* `BOOKED_SHOWN` STOOD HERE AND IS DELETED WITH THE LIST IT CAPPED (4 Sep
+   2026). Its argument was good and is worth keeping, because the next list on
+   this page will want it: it was three "with 'All calls' in the heading row for
+   the rest — the full list is a page of its own and printing it twice made that
+   link a route to the same content", and it was NAMED rather than written as a
+   literal because it is a decision about the DASHBOARD and not a fact about the
+   data ("it happens to equal the number of cohorts today, and a fourth cohort
+   must not turn this section into the whole list with a link pointing at
+   itself").
+   THE UPCOMING-CALLS ROW SLICES NOTHING, DELIBERATELY. A cap is what a COLUMN
+   of rows needs, because a fourth row makes the page longer; the row is a grid
+   that wraps, so a fourth cohort is a fourth cell in the space already there.
+   `View all sessions` on the heading row is still the way to the full page, and
+   it stops being a route to the same content the moment `V.leadCalls` holds
+   anything this row does not — which it does, since that page draws the brief
+   for each call. */
 
 /* THE ORDER AND THE FOUR WORDS ARE MARYAM'S, 1 SEP 2026, and both halves of
    the note above apply to the change: the cards are generated from this array
@@ -606,22 +633,25 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    it carries the arrow every openable row in this product wears. `go` survives
    on the row data; `cta` does not, because nothing prints it any more.
    -------------------------------------------------------------------------- */
-function bookedRow(b){
-  const mark = `<span class="cardrow-ic">${I.video}</span>`;
-  /* `bk-now` is the whole of "this one is today": §31.5 gives its label full
-     ink and leaves every other day in helper grey. A date column read down
-     needs one mark saying where NOW is, and a weight is the cheapest one. */
-  const now = /^today$/i.test(b.day) ? ' bk-now' : '';
-  return `<button class="cardrow bk-row" data-go="${b.go}">
-    <span class="day bk-day${now}"><div class="d">${b.day}</div><div class="n">${b.time}</div></span>
-    ${mark}
-    <span class="cardrow-b">
-      <span class="cardrow-t">${b.t}</span>
-      <span class="cardrow-d">${b.d}</span>
-    </span>
-    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
-  </button>`;
-}
+/* `bookedRow` IS DELETED (4 Sep 2026) AND EVERY PARAGRAPH ABOVE IS KEPT,
+   because all of them are decisions about how this portal draws an appointment
+   and three of them are cited from other files. What went is the FUNCTION and
+   its one caller — the dashboard's Cohort Calls list, which since §113 draws
+   the same three appointments as cards at the top of the page. `V.leadCalls`
+   has always written its own `.cardrow` markup rather than calling this, so the
+   Calls page is untouched.
+   THE ONE THING THAT DID NOT SURVIVE IS THE DATE CHIP, and it is worth saying
+   which of these paragraphs the new row answers differently: `.day.bk-day` is a
+   fixed-width box holding the word over the figure, and the argument for it —
+   "a diary is scanned down the date and across the detail, and both of those
+   need a straight edge" — is an argument about a COLUMN. §113's cells sit side
+   by side, so there is no column to keep straight and the date is a line of
+   type at the top right of each card. `bk-now`'s full-ink "today" goes with it
+   for the same reason: with three cards abreast, which one is next is said by
+   its being first and by its being the black one.
+   `.day` / `.bk-day` / `.bk-row` ARE NOT DELETED FROM §31 — `.day` is the
+   booking flow's own chip on the candidate portal and the design system ships
+   it; `.bk-*` are §31's and `gallery.html` documents the row. */
 
 /* ==========================================================================
    THE NEXT COHORT CALL IS THE BLACK CALL CARD
@@ -724,7 +754,13 @@ function bookedRow(b){
 const leadCall = (k, second) => ({
   who:{n:'Cohort ' + k.co, i:String(k.co), img:cohortArt(k)},
   cover:true,       /* the mark is a course cover, so the slot is 9:5 — §86 */
-  role:`${k.seats} candidates at Explorer &ndash; ${k.level}`,
+  /* THE COURSE IS ON THIS LINE AND NOT ON THE ONE BELOW IT (2 Sep 2026), and
+     the cover is the reason: `.crow-ph.crow-cover` is the course's own title
+     card, so the name is this picture's caption and belongs on the first line
+     of type beside it. `x` (`lcDetail`) is the appointment — sixty minutes,
+     week five, the chapter — and a course name in it would be a fact about the
+     cohort filed under a fact about the call. */
+  role:`${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${k.course}`,
   x:lcDetail(k),
   xl:'',            /* the line is the appointment, not the cohort */
   v:false,          /* a cohort is not an identity, checked or otherwise */
@@ -744,6 +780,162 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
       second:(o || {}).second === false ? false : undefined})}
   </div>`;
 
+/* ==========================================================================
+   AND ON THE DASHBOARD IT IS A ROW OF THEM — `lcalCard` / `leadCallsSec`, §113
+
+   Maryam, 4 Sep 2026, with a reference screen: "update the cohort dashboard
+   view from showing one call on top to multiple calls, for that I have attached
+   a reference, please follow that for multiple calls."
+
+   THE DASHBOARD SHOWED ONE CALL AND LISTED ALL THREE 1000px LOWER DOWN, which
+   is what makes this a merge rather than an addition. `leadCallCard` above drew
+   `lnext()` under Tal's summary and the Cohort Calls section drew `lcalls()` as
+   `bookedRow`s — and with three cohorts there are three calls, so the page held
+   one list twice. The row IS the Cohort Calls section now: it carries
+   `id="lead-calls"`, the figure cell and the sticky tab still point at it, and
+   the lower section is deleted along with `bookedRow`, `lbooked` and
+   `BOOKED_SHOWN`. Each of those keeps its argument in place.
+
+   `leadCallCard` IS NOT TOUCHED AND STILL HAS TWO CALLERS — `V.leadCohort` (one
+   cohort's own page) and `V.leadCalls` (the Calls page's head). Both are pages
+   ABOUT one appointment, where a full-width black card with the whole record on
+   it is right; this is a dashboard, where the question is "what is coming up".
+
+   WHAT THE REFERENCE DECIDES AND WHAT IT DOES NOT:
+
+     it decides    the shape — a headed band with a sentence and `View all
+                   sessions` at the right end, over a row of appointment cards,
+                   the first black with a Join on it and the rest light with an
+                   arrow. Each card is a mark, a time, a title, a line of
+                   detail, a duration and one control.
+     it does NOT   the visual language. Its cards are rounded with tinted icon
+                   chips; `--radius` is `0px` by token and §72's argument
+                   against a chip inside a bordered card both hold, so these are
+                   square, hairlined, and the mark is the cohort's own course
+                   cover (§86) rather than a glyph — which is also what tells
+                   three cards of the same KIND apart.
+     it does NOT   the contents. The reference's other four cards are a 1:1
+                   check-in, a cohort session, career guidance and an
+                   evaluations review — four kinds of appointment a cohort
+                   leader does not have (1 Sep 2026: "a cohort leader will only
+                   be taking cohort calls, not interviewing the initial
+                   candidates"). Inventing them would be §74's rule broken in
+                   the one place it matters: product copy the rest of the build
+                   contradicts. THE ROW IS `lcalls()`, so it is as long as the
+                   leader has cohorts — three today, five if they take five.
+
+   THE JOIN IS BACK ON THE FIRST CARD AND IT IS GATED, which turns over half of
+   §77's decision and keeps the other half. That note removed the leader's Join
+   because "the card then spent almost all of its life showing a DISABLED
+   primary — §60's dead control on a live surface, arrived at from the other
+   side". What changed since is Maryam's 3 Sep ruling that a shut Join is the
+   right drawing rather than a defect ("in cards where the time left in the call
+   is more than a minute, show a grey disabled join call button"), so §81's
+   unlit treatment on `.dark-card` is now the intended state and not an apology
+   for one. `joinLive` is unchanged and still narrow: the card is live from five
+   minutes before the call until it ends, and `joinShut` states why on the
+   button's `title` for the rest of the day. `joinArm`'s 20-second timer already
+   owns anything carrying `data-joinwhen`, so the button arms itself with no
+   render.
+
+   `data-call="cohort"` IS WIRED, WITH ONE THING FLAGGED. `CALL.cohort` (ai10)
+   builds the room out of `COHORT` — the ten members of Cohort 41, which is the
+   cohort this card draws — so the leader joining it sees the right roster. What
+   is wrong is the "you" tile: `callMe()` reads the member flagged `mine`, who is
+   Maryam the CANDIDATE. A leader-side `CALL` entry is its own piece of work and
+   is not this ask; the alternative was a Join wired to nothing, which is the
+   dead control §60 refuses outright.
+   ========================================================================== */
+const lcalCard = (k, lead) => {
+  const tag = lead ? 'div' : 'button';
+  /* THE LIGHT CARDS OPEN THE COHORT, NOT THE CALLS PAGE. `data-go` alone can
+     only name a view, so the cohort's own id rides beside it as `data-ldrco`
+     and lead2's capture-phase listener sets `S.ldrCo` before `go()` runs —
+     `gcard`'s seventh argument is the same idiom on the Your cohorts rows
+     forty pixels below, and the reason is the one Maryam gave on 1 Sep 2026:
+     a row that opens a LIST of the rows you just pressed is not a route. */
+  const act = lead
+    ? `<button class="btn btn-p btn-sm noic" data-call="cohort" data-joinwhen="${k.when}" data-joinmins="${k.mins}"${
+        joinLive(k.when, k.mins) ? '' : ` disabled title="${joinShut(k.when)}"`}>Join call ${I.arrowRight}</button>`
+    : `<svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>`;
+  /* A `<div>` FOR THE BLACK ONE AND A `<button>` FOR THE REST, because the
+     black card holds a control and a `<button>` inside a `<button>` is invalid
+     markup with two targets doing one job — §112's rule for `.row-cta`. It also
+     reads correctly: on the first card the thing to do is Join, on the others
+     it is to go and look. */
+  return `<${tag} class="lcal${lead ? ' lcal-next dark-card' : ''}"${
+    lead ? '' : ` data-go="leadCohort" data-ldrco="${k.co}"`}>
+    <span class="lcal-h">
+      ${''/* §86's cover verbatim, `<i>` under the `<img>` so a cover that fails
+             to decode leaves the cohort's number rather than an empty box. */}
+      <span class="gcard-art"><i>${k.co}</i><img src="${cohortArt(k)}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+      ${''/* THE DATE IS THE WORD OVER THE FIGURE, WHICH IS `bookedRow`'s OWN
+             CHIP RECOVERED — and it is measured, not preferred. Written the
+             reference's way, as one line reading "Tomorrow &middot; 5:00 PM"
+             with a clock in front of it, the block is 149px against the 110
+             left beside a 112px cover, so the header wrapped in every cell at
+             every width the three-across grid produces. The alternatives were
+             both worse: shrinking the cover to fit puts it at 73 x 41, where a
+             title card's line of type is no longer readable, and letting the
+             text wrap gives two ragged right-aligned lines that break at a
+             different word per card.
+             `.day`'s shape answers it at 62px wide — the widest of "Tomorrow"
+             and "5:00 PM" rather than the sum — and it is what this portal's
+             diary drew for a date until this row replaced it. The clock glyph
+             goes with the merge: a two-line date needs no mark to say it is a
+             date, and the same 16px glyph was the other 20px this row could
+             not afford. */}
+      <span class="lcal-when">
+        <span class="lcal-day t-desc">${k.day}</span>
+        <span class="lcal-tm t-h4">${k.time}</span>
+      </span>
+    </span>
+    <span class="lcal-b">
+      <span class="lcal-t t-h4">${lcTitle(k)}</span>
+      ${''/* THE COURSE IS NOT IN THE WORDS, because the cover 8px above IS the
+             course's title card — §75's own reasoning for putting the name on
+             `.crow-role` beside it, arriving at the opposite answer because
+             here the picture and the line are stacked rather than abreast and
+             the caption would be reading the picture out loud. */}
+      <span class="lcal-d t-desc">${k.seats} candidates &middot; Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
+    </span>
+    ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
+           OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
+           and chapter — were here first and the row wrapped: at the 268px cell
+           this grid produces, "60 minutes &middot; week 5 of 13" is 155 against
+           the 121 left beside a Join, so the button dropped to a second line
+           and the black card came out 44px taller than the two beside it. The
+           week moved up into the description, where it is a fact about the
+           COHORT rather than about the appointment; the chapter is on the
+           cohort's own page, which is what the card opens. */}
+    <span class="lcal-f">
+      <span class="lcal-m t-desc">${k.mins} minutes</span>
+      ${act}
+    </span>
+  </${tag}>`;
+};
+
+/* THE SENTENCE IS DERIVED AND SAYS THE ONE THING THE CARDS DO NOT — that these
+   repeat. Every other fact in the block is on a card; what a row of three
+   cannot say is that it is three because there are three cohorts and each meets
+   once a week. `PAGESUM` owns the head band's summary and this is the section's
+   own opening line, which is §72's split between the two.
+   NO SPARKLE ON THIS HEADING, which is where the reference is not followed:
+   it draws one, and §73's rule is one star per page region — Tal's card is 40px
+   above with `talLabel()`'s mark on it, and a second says the page has stopped
+   attributing and started decorating. `mark:true` is the one-word reversal. */
+const leadCallsSec = () => {
+  const up = lcalls();
+  return `<div class="sec" id="lead-calls">
+    ${aiHead({title:'Your upcoming calls',
+      desc:`One call a week for every cohort you lead, in the order they happen.`,
+      act:up.length ? `<button class="btn btn-g btn-sm noic" data-go="leadCalls">View all sessions</button>` : ''})}
+    ${up.length
+      ? `<div class="lcal-row">${up.map((k, i) => lcalCard(k, i === 0)).join('')}</div>`
+      : `<div class="empty" style="border:0">${I.calendar}<h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
+  </div>`;
+};
+
 /* THE FOURTH ARGUMENT IS A RAW ATTRIBUTE, and it exists because a row in a
    QUEUE has to carry its own subject (Maryam, 1 Sep 2026: "it should not take me
    there instead open the detail view of that awaiting decision even when i click
@@ -758,11 +950,29 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
 
    IT IS OPTIONAL, so the other caller is untouched — `V.leadDash`'s queue is the
    only one that had this problem, because the Evaluations page's own rows have
-   always written `data-ldrsum`. */
-function faceRow(p, detail, go, at){
+   always written `data-ldrsum`.
+
+   AND THE FIFTH IS THE ARROW'S LABEL — `.row-cta`, §112, the same argument and
+   the same class `gcard` takes (Maryam, 2 Sep 2026: "instead of arrows only,
+   add text on left of the arrow 'Evaluate Candidate'").
+
+   IT TURNS OVER "AN ARROW, NOT A VERB", WHICH IS STATED TWICE IN THIS FILE and
+   is worth reading before it is turned back. `bookedRow`'s note makes the case
+   at length: the two words in that slot were "Join" and "Brief", they named the
+   KIND of appointment as much as the action, and neither of them happened on
+   the row — both opened another page — so the row was made the target and given
+   the arrow every openable row in this product wears. **That argument is about
+   a VERB THAT LIES, not about a label as such.** "Evaluate Candidate" is what
+   the page this row opens is for, and it is one destination rather than one of
+   two, so the objection does not reach it. `bookedRow` is untouched.
+
+   A `<span>`, NOT A `<button>` — the row is the control and a `<button>` inside
+   a `<button>` is invalid markup with two targets doing one job. */
+function faceRow(p, detail, go, at, cta){
   return `<button class="tile clk gcard face-row" data-go="${go}"${at ? ' ' + at : ''}>
     <span class="mem-av mem-ph">${avatar({i:p.i, img:AV[p.img]}, 36)}</span>
     <span class="gcard-b"><h3>${p.name}</h3><span class="sub">${detail}</span></span>
+    ${cta ? `<span class="row-cta">${cta}</span>` : ''}
     <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
   </button>`;
 }
@@ -843,7 +1053,11 @@ V.leadDash = () => {
   const shown = severe.slice(0,4).concat(moderate.slice(0,3));
   const rest = att.length - shown.length;
   const c41 = LEAD_COHORTS[0];
-  const booked = lbooked();
+  /* `lcalls()` DIRECTLY, NOT `lbooked()` — that wrapper existed to glue a
+     title, a description and a `go` onto each call for `bookedRow`, and both
+     went with the list on 4 Sep 2026. The figure cell only ever wanted the
+     count and the first call's day and time. */
+  const booked = lcalls();
 
   /* The figure each card carries, keyed by the section it goes to, so the
      numbers cannot drift out of step with `LEAD_JUMPS`. */
@@ -895,7 +1109,17 @@ V.leadDash = () => {
       </div>
     </div>
   </div>
-  ${next ? leadCallCard(next) : ''}
+  ${''/* THE UPCOMING CALLS, ALL OF THEM (Maryam, 4 Sep 2026). This was
+         `leadCallCard(next)` — one black card holding the next appointment —
+         and the Cohort Calls section 1000px below listed the same three. It is
+         one section now, in this slot, carrying `id="lead-calls"`; the long
+         version is over `lcalCard`.
+         IT IS STILL AFTER TAL'S `.sec` AND THAT IS STILL LOAD-BEARING.
+         `placeBand`'s run walks forward from the `.ph` and stops at the first
+         section that is not head furniture, so whatever stands here is what
+         ends the band — written between the `.ph` and Tal's card it would
+         leave the summary in the page body (trap 11's neighbourhood). */}
+  ${leadCallsSec()}
   <div class="sec">
     <div class="stats stats-lead">
       ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1], j.id)).join('')}
@@ -1019,41 +1243,43 @@ V.leadDash = () => {
     ${pend?`<div class="tile-stack">
       ${LEAD_SUMMARIES.filter(s=>s.status==='pending').map(s=>
         faceRow(s, `90-day summary &middot; Cohort ${s.cohort} &middot; sign to close their 90 days`,
-          'leadSum', `data-ldrsum="${s.id}"`)).join('')}
+          'leadSum', `data-ldrsum="${s.id}"`, 'Evaluate Candidate')).join('')}
     </div>`:`<div class="empty" style="border:0">${I.checkFilled}<h3>Nothing outstanding</h3><p>Every 90-day summary is published.</p></div>`}
   </div>
-  <div class="sec" id="lead-calls">
-    ${''/* THE WAY OUT MOVED INTO THE HEADING ROW AND THE SENTENCE CAME OFF
-           (Maryam, 31 Aug 2026). "Interviews and cohort calls, in the order
-           they happen" described the list underneath it, which the list
-           already says — every row names its kind and the dates run down
-           the page. The slot it held is where this section's control
-           belongs, and `Your cohorts` 50 lines up already states that shape
-           (`.sec-h` › `<h2>` + `.btn-g.btn-sm.noic`), so this is the page
-           agreeing with itself rather than a new arrangement.
-           "Your availability" is GONE from the page, not moved — it is a
-           profile setting, reachable from the account menu and from
-           `leadProfile` itself, and it was the second of two buttons under
-           a list whose own action is on every row. */}
-    <div class="sec-h"><h2>Cohort Calls</h2><button class="btn btn-g btn-sm noic" data-go="leadCalls">All sessions ${I.arrowRight}</button></div>
-    ${''/* THE HEADING IS "YOUR CALLS", NOT "BOOKED" (1 Sep 2026). "Booked" was
-           the right word for a diary holding two kinds of thing — an interview
-           somebody else took a slot for and a call that repeats every week —
-           and it was chosen precisely because a leader reading it "is asking
-           about their diary, not about one of the two kinds". With one kind
-           left, the word that named the merge names nothing, and nobody books
-           a cohort leader. The count in the card above it is unchanged.
+  ${''/* THE COHORT CALLS SECTION STOOD HERE AND IS NOW THE ROW AT THE TOP OF
+         THE PAGE (Maryam, 4 Sep 2026), which is a MERGE and not a move: this
+         section listed `lcalls()` as `bookedRow`s while `leadCallCard(lnext())`
+         drew the first of the same three 1000px above it, and with one call per
+         cohort those are the same list. `leadCallsSec` carries `id="lead-calls"`
+         so the figure cell and the sticky tab still have their target.
 
-           `BOOKED_SHOWN` STILL EARNS ITS NAME with three cohorts and three
-           calls, because it is a decision about the DASHBOARD rather than a
-           fact about the data: a fourth cohort is a fourth call, and the day
-           that happens this section must not silently become the whole list
-           again with "All calls" pointing at itself. */}
-    ${booked.length?`<div class="tile-stack">
-      ${booked.slice(0, BOOKED_SHOWN).map(bookedRow).join('')}
-    </div>`:`<div class="empty" style="border:0">${I.calendar}<h3>Nothing this week</h3><p>Every cohort you lead has a weekly call, and they all show up here.</p></div>`}
-  </div>
-  <div class="sec tint" id="lead-cohorts">
+         TWO NOTES FROM IT ARE WORTH KEEPING WHERE A READER OF THIS VIEW WILL
+         LOOK FOR THEM, because both are still live decisions:
+
+         THE WAY OUT BELONGS IN THE HEADING ROW (31 Aug 2026). The section's
+         sentence — "Interviews and cohort calls, in the order they happen" —
+         came off because it described the list underneath it, and its slot is
+         where the section's control goes. `aiHead` puts `View all sessions`
+         there, and `Your cohorts` below still states the plain `.sec-h` version
+         of the same shape.
+
+         "Your availability" IS GONE FROM THE PAGE, NOT MOVED — it is a profile
+         setting, reachable from the account menu and from `leadProfile`, and it
+         was the second of two buttons under a list whose own action is on every
+         row.
+
+         AND THE HEADING WORD: "Cohort Calls" replaced "Booked" on 1 Sep 2026,
+         because nobody books a cohort leader and the word that named a diary of
+         two kinds named nothing once one kind was left. The figure CARD still
+         says Cohort Calls — that label is `LEAD_JUMPS`' and is untouched; the
+         section's own heading is now the reference's "Your upcoming calls",
+         which is what a row of what-is-coming is. */}
+  ${''/* THE GROUND FLIPS TO WHITE AND THAT IS POSITION, NOT SUBJECT. This page
+         alternates white / tint / white / tint down its sections, and with the
+         calls section out of position 3 the two that follow Attention would
+         both have been tinted. `lead-cohorts` takes the white slot the calls
+         section vacated. */}
+  <div class="sec" id="lead-cohorts">
     ${''/* "VIEW ALL COHORTS", NOT "VIEW ALL 3" (Maryam, 1 Sep 2026). The count
            was doing the naming, which works only while the reader can see that
            the three rows under it ARE all of them — and the section's own
@@ -1083,7 +1309,23 @@ V.leadDash = () => {
            `V.leadCohort` is a pure function of it. The heading row's "View all
            3" is still how you reach the list, which is the whole reason a row
            does not have to be it. */
-        return gcard('cohort', lname(c)+' &middot; '+llevel(c), 'Week '+c.week+' of 13',
+        /* THE EYEBROW NAMES THE COURSE BETWEEN THE COHORT AND THE LEVEL (2 Sep
+           2026), which is the reading order a leader scans: WHICH cohort, WHAT
+           they are taking, HOW FAR UP the ladder it is. It goes in the eyebrow
+           rather than the title because the title is "Week 5 of 13" — a
+           position, not a name — and the course is the caption for the cover
+           16px to its left. */
+        /* AND THE ROW ENDS IN A BARE ARROW. It carried `.row-cta` reading "View
+           Cohort" for one build and Maryam took it off the same afternoon
+           ("remove the view cohort"), which is `bookedRow`'s own rule arriving
+           at the row it was written about: three rows in a column, each ending
+           in the same two words, says only "these are the same kind of thing" —
+           and the section's heading row already ends in "View All Cohorts", so
+           the label was that control's words repeated three times underneath it.
+           The Awaiting Evaluations queue keeps its label: one verb, on a queue
+           whose heading row has no control of its own. */
+        return gcard('cohort', lname(c)+' &middot; '+lcourse(c)+' &middot; '+llevel(c),
+          'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
           + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',
           {src:cohortArt(c), i:String(c.id)}, `data-ldrco="${c.id}"`);
@@ -1205,7 +1447,16 @@ function leadStick(){
      the bar's own list is what decides which sections it POINTS at, and tying
      the exit to it would mean a future card added to that list silently moves
      the exit too. The anchor is a judgement about the page's last section. */
-  const stand = device.querySelector('#lead-booked');
+  /* AND THE SELECTOR HAD BEEN DEAD SINCE 1 SEP 2026. This read `#lead-booked`,
+     the id that section carried before it was renamed `lead-calls` with the
+     interviews — so `stand` has been null and `gone` has been permanently false
+     ever since, which is the quiet half of a rename: the rule is still valid,
+     still matches nothing, and the bar simply never left. The page's last
+     section is `lead-cohorts` now (the calls section moved to the top on 4 Sep
+     2026), and it is named as a JUDGEMENT about the page rather than read off
+     `LEAD_JUMPS[LEAD_JUMPS.length-1]` — which would be the clever version and
+     would silently move the exit the next time a card is added to that list. */
+  const stand = device.querySelector('#lead-cohorts');
   const gone = stuck && !!stand && stand.getBoundingClientRect().bottom <= mr.bottom;
   bar.classList.toggle('is-gone', gone);
 
@@ -1222,12 +1473,26 @@ function leadStick(){
      including the last, and it is the better reading of "which section am I
      in" anyway: the active one is the one occupying the place your eye is,
      not the one that just crossed the top edge. */
+  /* AND IT IS READ IN DOCUMENT ORDER, NOT IN `LEAD_JUMPS`' ORDER (4 Sep 2026).
+     This used to walk the array and keep the last match, which is the same
+     thing only while the sections run down the page in the array's order — the
+     coupling that array's own note is about. §113 broke it: the calls section
+     is the row directly under Tal's summary now, ABOVE the strip, while its
+     card stays third in the four. Walked by array order, `lead-calls` was the
+     last id tested after `lead-attention` and its top is always above the
+     reading line, so the strip lit Cohort Calls on every section of the page.
+     Nothing threw and nothing warned — a position indicator that is confidently
+     wrong looks exactly like one that is right.
+
+     Sorting by the measured top answers it wherever a section sits, so the four
+     cards may be ordered independently of the page from here on. */
   const line = mr.top + h + (mr.height - h) * 0.45;
-  let live = LEAD_JUMPS[0] && LEAD_JUMPS[0].id;
-  LEAD_JUMPS.forEach(j => {
-    const s = device.querySelector('#' + j.id);
-    if(s && s.getBoundingClientRect().top <= line) live = j.id;
-  });
+  let live = null;
+  LEAD_JUMPS.map(j => device.querySelector('#' + j.id))
+    .filter(Boolean)
+    .sort((a,b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
+    .forEach(s => { if(s.getBoundingClientRect().top <= line) live = s.id; });
+  live = live || (LEAD_JUMPS[0] && LEAD_JUMPS[0].id);
   bar.querySelectorAll('[data-jump]').forEach(b =>
     b.classList.toggle('on', !gone && b.dataset.jump === live));
 }

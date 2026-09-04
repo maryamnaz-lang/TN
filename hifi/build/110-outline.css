@@ -1,0 +1,276 @@
+/* ==========================================================================
+   110 — THE COURSE OUTLINE — `.acc.ol`
+
+   Maryam, 3 Sep 2026, with a Coursera reference: the Course Enrollment page's
+   generic "What you'll learn" and "Skills you'll gain" become a **Course
+   Outline** whose thirteen chapters each carry their own pair, drawn with "our
+   collapse component", with a "Chapter details" label under the pointer and
+   the certificate closing the list. `outlineSec` (views.js) is the markup and
+   `CH_SYL` is the syllabus; this is the drawing.
+
+   ALL THIRTEEN START SHUT, which is the second half of the same day's ask
+   ("do not open a chapter by default") and reverses the first half. It is
+   `S.outl` in views.js, not a rule here — that state's own note is why.
+
+   ALMOST NOTHING IS NEW, WHICH IS THE LAYER'S POINT. §04.33's `.acc` is the
+   collapse — the hairline over the group, one under each row, the 56px row,
+   the chevron turning 180° on `.on`, the panel revealed by `.acc-i.on .acc-b`.
+   §87's `.lrn` tick list and `.skl` chip row are the two blocks inside it,
+   unchanged. §63 §22 types both. So this layer is EIGHT jobs and six of them
+   are rules the panel has to un-say rather than a new component:
+
+     1   the row is a title over a meta line, so `.ttl` becomes a column
+     1a  the rows sit further apart than §04's 8px of row padding
+     1b  "Chapter details" appears under the pointer, armed in `build.py`
+     1c  the certificate row's own air, which `.acc-i` does not pay
+     2   `.acc-b`'s 68ch measure has to come off, or the two-column list is one
+     3   the panel's FIRST subhead must not draw §87.1c's divider
+     4   the list hangs closer to its own subhead than to a section heading
+     5   the section must not take §10.15's 184px label column (trap 13)
+
+   AND NOT ONE OF THEM IS TYPE. The title takes `.ttl`'s h4 from §63 §4, the
+   meta line wears `.t-desc` in the markup, and the certificate row is a
+   `.cardrow` whose three parts §63 already types — which is §108's discipline
+   ("every row wears an existing §63 role class"). So this layer sets no
+   font-size, no font-weight, no text-transform and no text colour. The ONE
+   family that needed a rule is `.ol-cd`, the hover label, and it is stated in
+   §63 §45a rather than here.
+
+   WHY A LAYER AND NOT AN EDIT TO §87 OR §04. Every selector here is either a
+   class no earlier layer mentions (`.ol`, `.ol-t`, `.ol-m`) or a correction
+   that has to land AFTER the layer it corrects — §04 for `.acc-b`, §05 for the
+   measure, §87 for the divider and the list's margin. §87 in particular is
+   answered rather than edited: its rules are right for `.lrn` and `.skl`
+   standing in a section, which is what the design system still ships them as.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 110.1 ---
+   THE ROW IS A TITLE OVER A META LINE
+
+   The reference draws "SQL Foundations" with "Course 1 • 22 hours" under it;
+   ours is the chapter title over "Chapter 7 · 65 min". §04's `.acc-h .ttl` is
+   `flex:1;min-width:0` — a flex ITEM, with no opinion about its own children —
+   so two spans inside it would set on one line with a space between them. The
+   column is the whole of the change.
+
+   `.acc-h` KEEPS `align-items:center`, WHICH IS RIGHT FOR THE CHEVRON AND WAS
+   CHECKED. With a two-line title the row is ~44px of text in a 56px minimum,
+   so the chevron centres against the PAIR rather than against the title — and
+   that is what it acts on: pressing it opens the row, not the heading. §87.1's
+   own note makes the opposite call for the tick mark, and the difference is
+   that a tick introduces one line while this control owns both.
+
+   2px BETWEEN THEM, NOT A TOKEN. `--s03` is 8 and would read as two stacked
+   rows; the pair is one object on two lines, which is what `.mt3`'s 2px is for
+   everywhere else in the build (`leaderCard`'s role line under a name is the
+   same shape, and §108's `.eo-lead` the same again).
+   -------------------------------------------------------------------------- */
+.app .ol .acc-h .ttl{
+  display:flex;flex-direction:column;align-items:flex-start}
+.app .ol .ol-m{margin-top:2px}
+
+/* ----------------------------------------------------------------- 110.1a ---
+   AND THE ROWS SIT FURTHER APART (Maryam, 3 Sep 2026: "give spaces between
+   each chapters more").
+
+   IT IS THE ROW'S OWN PADDING, NOT A GAP ON THE GROUP. §04's `.acc` is a flex
+   column with no `gap` and the separation between two rows IS the hairline —
+   a gap would put white space between each row and its own bottom border, so
+   the line would stop reading as the boundary between two chapters and start
+   reading as an underline on each. The space has to be inside the row.
+
+   `--s05` AGAINST §04's `--s04`: 8 -> 16 top and bottom, which takes a
+   two-line row from 62px to 76 and the pitch between two chapter titles with
+   it. `min-height` goes 56 -> 72 in step, so a row whose title does NOT wrap
+   (none today, but "Managing Up" is one word from it at 390) keeps the same
+   height as the rest rather than collapsing to the old floor.
+
+   ONLY THE VERTICAL HALF MOVES. §10.900 zeroes `.acc-h`'s left and right
+   padding because §10.898 has already paid the page gutter on `.acc-i` — so
+   this states the two edges it owns and leaves the other two alone, which is
+   §69's "copy what a rule does today" read from the other side.
+   -------------------------------------------------------------------------- */
+.app .ol .acc-h{
+  min-height:72px;
+  padding-top:var(--s05);padding-bottom:var(--s05)}
+
+/* ------------------------------------------------------------------ 110.1b ---
+   "CHAPTER DETAILS" APPEARS UNDER THE POINTER
+   Maryam, 3 Sep 2026: "you see on coursera, on hover the course details button
+   appears." `outlineSec`'s own note is why the label is `display:none` rather
+   than `visibility:hidden` or `opacity:0`, and why the row needs `.ol-row`.
+
+   THE HOVER IS WRITTEN PLAIN AND ARMED IN `build.py` — TRAP 6 AND TRAP 18
+   TOGETHER. Every `:hover` in every layer is rewritten to
+   `:hover:where(.__nh)` and `.__nh` is on no element in the product, so a
+   hover state is inert unless its compound is named in `HOVER_KEEP`. Trap 18
+   is the other half: it must be written PLAIN here anyway — `build-ds.py`
+   refuses to write if an output selector cannot be traced back to a source
+   layer, and a source that already says `:where(.__nh)` is not what it looks
+   for. So: plain here, `'ol-row'` there, and both builds do the rewrite.
+
+   `.ol-row` AND NOT `.acc-h`, WHICH IS THE WHOLE REASON THE CLASS EXISTS.
+   `HOVER_KEEP` matches the compound by `endswith`, so `'acc-h'` would arm
+   §04.53's row wash and §10.711's and §10.762's — every accordion in the
+   product, including the Data use notice and the ladder. One narrow class
+   names one rule.
+
+   IT ALSO SHOWS WHILE THE ROW IS OPEN, which is a STATE and needs no hover at
+   all: the reference draws the label on its open row, and once a panel is
+   showing the label is what says which control closes it. That rule is what
+   makes the feature legible on a touch screen, where there is no pointer.
+   -------------------------------------------------------------------------- */
+.app .ol .ol-cd{display:none;flex:none}
+.app .ol-row:hover .ol-cd{display:inline-flex;align-items:center}
+.app .ol .acc-i.on .ol-cd{display:inline-flex;align-items:center}
+
+/* ------------------------------------------------------------------ 110.1c ---
+   THE CERTIFICATE CLOSES THE LIST
+   Maryam, 3 Sep 2026: "show the certificate at the bottom just like coursera".
+   `outlCert` (views.js) is the markup and the argument for its copy.
+
+   IT NEEDS ALMOST NOTHING, WHICH IS WHY IT IS AN `.acc-i` AND A `.cardrow`.
+   The `.acc-i` supplies the group's left and right gutter (§10.898) and the
+   hairline under it that closes the list; `.cardrow` supplies the mark, the
+   title and the description, at §02.256's own spacing. What is left is the
+   vertical padding, because a `.cardrow` inside an `.acc-i` is the first time
+   either component has met the other — §04 pays the row's air on `.acc-h`,
+   which this row does not have.
+
+   THE SAME `--s05` AS A CHAPTER ROW, so the list's rhythm does not change at
+   the bottom of it. The mark is 40px against a chapter row's 44px of text, so
+   at equal padding the two rows measure within 4px of each other.
+   -------------------------------------------------------------------------- */
+.app .ol .ol-cert{
+  padding-top:var(--s05);padding-bottom:var(--s05)}
+
+/* ----------------------------------------------------------------- 110.1d ---
+   THE CERTIFICATE ROW'S BADGE IS THE REAL ARTWORK, AT ROW SIZE
+   Maryam, 3 Sep 2026: "show a real badge instead of icon". `outlCert` carries
+   the argument for WHICH badge; this is the box it goes in.
+
+   `--crt-art-w/h` RE-POINTED, WHICH IS §96's OWN MECHANISM. That layer states
+   the pair on `:root` at the hero's 70x76 — "the hero's box IS 70x76 and that
+   picture is never resampled" — and re-points them to 120x130 on its grid
+   card; §105 re-points them again for the profile's half-width column. This is
+   the third caller doing the same thing, so nothing new is invented and the
+   `<img>` keeps §96's `width:100%;height:100%`.
+
+   44 x 48 KEEPS THE ARTWORK'S RATIO. 70/76 is 0.9211 and 44/48 is 0.9167 —
+   half a percent, which on a 44px badge is under a quarter of a pixel. Round
+   numbers rather than a `calc` off the tokens, because the pair has to be two
+   lengths for §96's rule to read them.
+
+   WHY 44 AND NOT 40. `.cardrow-ic`'s chip was 40, and matching it was the
+   first version — but this row is a TITLE OVER A DESCRIPTION (§02's
+   `.cardrow-b`), which is ~40px of text, so a 40px badge is exactly as tall as
+   the words and reads as a third line rather than as the row's subject. 48
+   overhangs the pair by four pixels at each end, which is what makes it the
+   thing the row is about.
+
+   `flex:none`, BECAUSE `.crt-art` HAS NO OPINION IN A ROW. §96 draws it inside
+   a fixed-width card where the track sizes it; in `.cardrow`'s flex row an
+   `auto` basis lets a 44px picture shrink against `.cardrow-b`'s `flex:1`.
+   `.cardrow-ic` carried its own `flex:none` and that is what came off with it.
+   -------------------------------------------------------------------------- */
+.app .ol .ol-cert-art{
+  --crt-art-w:44px;--crt-art-h:48px;
+  flex:none}
+
+/* ------------------------------------------------------------------ 110.2 ---
+   THE PANEL GIVES UP THE PROSE MEASURE
+
+   §05.7 caps `.acc-b` at `--measure` (68ch) and it is right for what that
+   component held until today: two paragraphs of a legal notice, where a line
+   longer than about 75 characters stops being readable (§63's own reason).
+   THIS panel holds a two-column grid and a wrapping row of chips, neither of
+   which is a line of prose — measured at 1280 the cap took the panel to 611px
+   inside a 901px column, so §87.1's two columns were 290px each and every tick
+   line wrapped to two.
+
+   `max-width:none` ON THE PANEL, NOT A WIDER `--measure`. That token is read by
+   six other families (`.ai-body`, `.note .nb`, `.lead`, `.sec > p`, `.tile > p`,
+   `.ph .lead`) and widening it to suit a grid would loosen every paragraph in
+   the product. The right statement is that this particular panel is not prose.
+
+   THE `<p>` MEASURE IS UNTOUCHED because there is no `<p>` in here. If a chapter
+   description is ever added to the panel it wants the cap back, on itself —
+   `.app .ol .acc-b > p{max-width:var(--measure)}` — rather than on the panel.
+   -------------------------------------------------------------------------- */
+.app .ol .acc-b{max-width:none}
+
+/* ------------------------------------------------------------------ 110.3 ---
+   THE PANEL'S FIRST SUBHEAD PAYS NO TOP MARGIN
+
+   §63 §22 gives `.skl-h` `margin:var(--s07) 0 0` — 32px, which is right
+   BETWEEN the two subheads and wrong above the first one: `.acc-b` has no top
+   padding and no top border (§04.60), so a first child's top margin collapses
+   THROUGH it and pushes the whole panel 32px down, which reads as a gap
+   between the row you pressed and the answer it opened.
+
+   IT USED TO UN-SAY §87.1c AS WELL, and that block is deleted (Maryam, 3 Sep
+   2026: "remove the divider between the what you'll learn and skills you'll
+   gain"). That rule gave every `.skl-h` a `border-top` with 24 above and 24
+   below, so this selector also had to zero a border and a padding for the
+   first one. With the divider gone there is nothing left to answer but the
+   margin, and §87.1c's note is where the rest of the argument went.
+
+   `:first-child`, NOT A SECOND CLASS. The panel's first element IS the first
+   subhead in every case the markup can produce — `outlSec` emits the heading
+   and its list as one pair, and a chapter with no syllabus emits nothing at
+   all. A `.skl-h.first` would be a class the view has to remember to write.
+   -------------------------------------------------------------------------- */
+.app .ol .acc-b > .skl-h:first-child{margin-top:0}
+
+/* ------------------------------------------------------------------ 110.4 ---
+   THE LIST HANGS FROM ITS SUBHEAD, NOT FROM A SECTION HEADING
+
+   §87.1 gives `.lrn` `margin:var(--s06) 0 0` — 24, which is what a two-column
+   list owes a 16px `.sec-h` above it. Here the thing above it is a 14px h4
+   subhead inside a panel, and the gap between a heading and its own content is
+   `--sec-h-gap` (12) by token — §01's own note is that the 4:1 ratio against
+   the 48px section rhythm is what makes a heading and its content read as one
+   object. The chips take it too: §87.2's `margin-top:var(--s05)` is 16, which
+   is the same argument one step smaller.
+
+   IT IS RE-POINTED HERE RATHER THAN CHANGED IN §87, because §87's values are
+   correct for the shape that layer draws — `.lrn` under a section heading — and
+   that shape still ships in `talentnext-ds.css` for a hand-authored page.
+   -------------------------------------------------------------------------- */
+.app .ol .acc-b .lrn{margin-top:var(--sec-h-gap)}
+.app .ol .acc-b .skl{margin-top:var(--sec-h-gap)}
+
+/* ------------------------------------------------------------------ 110.5 ---
+   THE SECTION MUST NOT TAKE THE 184px LABEL COLUMN — TRAP 13, THIRD TIME ON
+   THIS PAGE
+
+   §10.15 hands any `.sec` with a `.sec-h` a 184px label column at desktop
+   unless its CONTENTS are on an opt-out list, and `.acc` is not on that list.
+   Every existing accordion in the build gets away with it by having no heading
+   over it at all — the Data use notice draws a bare `.acc` under a `.ph`, and
+   "How the ladder works" the same — so this is the first headed one, and
+   without this rule "Course Outline" sets in a 184px gutter with thirteen rows
+   crushed beside it. Nothing warns; it looks like a layout that was always
+   like that.
+
+   IT REPLACES §87.1a, WHICH ANSWERED THE SAME QUESTION FOR THE BLOCK THIS
+   SECTION REPLACED. That rule keyed on `:has(> .lrn)` — a DIRECT child — and
+   `.lrn` is now three levels down inside `.acc > .acc-i > .acc-b`, so it
+   stopped matching the moment the list moved. Which is trap 13 in the third
+   direction the build has now recorded: §69 lost an opt-out by REMOVING
+   content, §65 and §73 by ADDING a wrapper, and this one by moving the content
+   the opt-out was keyed on into a wrapper of its own. The condition to key on
+   is the section's own contents, so it is `.ol`.
+
+   INSIDE THE SAME CONTAINER QUERY, PER TRAP 3, and it copies what §10 DOES
+   rather than what §10 says — the fourth declaration on that rule is
+   `padding:0 var(--pad-x)` on the heading and it is dead (§14.2 zeroes every
+   headed section's `.sec-h` padding at this width). Restating it would set this
+   one heading 32px right of the rows under it, which is §69's lesson and the
+   one §72.1a and §87.1a both had to repeat.
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .sec:has(> .ol){display:block}
+  .app .sec:has(> .ol) > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
+}

@@ -527,7 +527,12 @@ const cohortCard = c => {
       <span class="cco-hd">
         <span class="cco-hb">
           <span class="cco-n">${lname(c)}</span>
-          <span class="cco-d">Week ${c.week} of 13</span>
+          ${''/* THE COURSE LEADS THE DETAIL LINE (2 Sep 2026). The card is a
+                 cover with a name under it, so the first thing under the cohort
+                 number should say what the picture IS; the week is where the
+                 cohort has got to inside it. Same order the dashboard row's
+                 eyebrow takes, one component over. */}
+          <span class="cco-d">${lcourse(c)} &middot; Week ${c.week} of 13</span>
         </span>
         ${''/* THE "of 38%" CAPTION IS GONE (Maryam, 2 Sep 2026: "remove the
                'of n%' from the bottom of each progress circle"). It was the
@@ -927,7 +932,16 @@ const ldrChRow = (i, m, done) => {
              : open     ? `Started &middot; ${mins} min`
              :            `Not started &middot; ${mins} min`;
   return `<div class="ch ${complete ? 'done' : open ? 'open' : ''}">
-    <span class="ch-num">${String(i + 1).padStart(2,'0')}</span>
+    ${''/* THE NUMBER TILE IS REMOVED HERE TOO (Maryam, 3 Sep 2026: "remove the
+           left side count blocks from all chapters rows"), and this is the
+           half that is easy to miss. The ask was made against Course
+           Progress; this row is the LEADER's copy of the same component and
+           the note above says why that matters — "every class here is §15's,
+           so the two portals draw one component". A `.ch-num` left on the
+           leader's member page would be one portal drawing a chapter row two
+           ways, which is the drift the shared component exists to prevent.
+           `chRow` in views.js carries the whole argument, including why
+           `.ch-num`'s rules are kept. `i + 1` is no longer read. */}
     <span class="ch-b">
       <span class="ch-n">${name}${complete ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
       <span class="ch-m">${meta}</span>
@@ -997,7 +1011,13 @@ V.leadMember = () => {
       <span class="av-ph" style="width:72px;height:72px"><i>${m.ini}</i><img src="${AV[m.img]}" alt=""></span>
       <div class="idhead-b">
         <span class="idname">${m.name}</span>
-        <span class="idmeta">${llevel(c)} &middot; ${lname(c)}</span>
+        ${''/* THE COURSE IS THE THIRD FACT ABOUT WHERE THIS PERSON IS (2 Sep
+               2026), and this row is the only place on the page that says it —
+               §78 hides the `.ph` on every leader page, so `ph()`'s fact row
+               above is not drawn and this `.idmeta` IS the candidate's context
+               line. What they are taking matters here for the same reason the
+               level does: the figures underneath are read against a course. */}
+        <span class="idmeta">${llevel(c)} &middot; ${lname(c)} &middot; ${lcourse(c)}</span>
         ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
       </div>
       ${/* MESSAGE FIRST, NOTE SECOND. A message goes TO them and a note is

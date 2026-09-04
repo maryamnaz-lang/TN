@@ -676,16 +676,25 @@
    `.f textarea` is in §02's sizing rule and is left alone: this is about the
    frame, and every textarea in the build carries `.inp`.
    -------------------------------------------------------------------------- */
+/* THE FRAME AND THE FOCUS FOLLOW §12's FIELD (4 Sep 2026). A textarea is a box
+   rather than a baseline here — that is this section's whole point — but the
+   line it is drawn with is still "the line of a field", so the three values
+   move together: `--rule` at rest, #FF3733 on focus. Restated rather than
+   inherited because §37 states the whole frame at (0,2,0) and lands after §12;
+   leaving them behind would give the About field a black focus ring inside a
+   form whose other seven fields go red. The auth card is the one surface that
+   does NOT follow: §17 gives it `--auth-rule` and its own focus ink, which is a
+   different language on a different ground. */
 .app textarea.inp{
-  border:1px solid var(--border-strong-01);
+  border:1px solid var(--rule);
   background-color:var(--pure-white);
   padding:var(--s04) var(--s05)}
 .app textarea.inp:hover{border-color:var(--text-primary);background-color:var(--pure-white)}
 .app textarea.inp:focus{
-  border:2px solid var(--brand-primary);
+  border:2px solid #FF3733;
   padding:calc(var(--s04) - 1px) calc(var(--s05) - 1px);
   background-color:var(--pure-white)}
-.app .sec.tint textarea.inp{border-color:var(--border-strong-01)}
+.app .sec.tint textarea.inp{border-color:var(--rule)}
 
 /* --------------------------------------------------------------------------
    16. THE FACTS AND THE STEPS ARE ONE SECTION NOW

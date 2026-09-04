@@ -125,8 +125,14 @@
   margin:var(--s06) var(--pad-x);
   padding:var(--s07);
   background-color:var(--gray-100);
-  background-image:radial-gradient(78% 135% at 92% -8%,
-    color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 64%);
+  /* THE HAZE IS §21.22a's TOKEN, NOT A SECOND COPY OF IT (4 Sep 2026). This
+     line used to restate §21's radial in full, so "the black card's haze" was
+     two values that happened to agree — and when the file gave the light a
+     left-to-right ramp from `--accent` to `--accent-2`, one of the two would
+     have moved and the other would not. `--dark-haze` is the one statement;
+     §21's note has the whole argument, including why it is two ellipses rather
+     than the rotated blurred ellipse the spec literally describes. */
+  background-image:var(--dark-haze);
   background-repeat:no-repeat}
 
 /* THE SEAM ABOVE AND BELOW IT. A hairline is a line between two white things;
@@ -188,8 +194,16 @@
    `.sec-rec` is a column at 20 — 581:6456's gap between the label and the row
    of content under it — and a heading dropped into that column is 20 off its
    own attribution as well, so the two stop reading as one block. `.rec-hdb` is
-   the pair at 8, which is `.rec-top`'s gap: the same relationship the name and
-   the rating have four rows down, for the same reason.
+   the pair at 8, on the same reasoning the name and the rating four rows down
+   are a pair: a line that qualifies the line above it belongs to it.
+
+   IT WAS "WHICH IS `.rec-top`'s GAP" AND THAT IS NO LONGER LITERALLY TRUE.
+   §70.5 tightened `.rec-top` to 4 and `.rec-b` to 8 on 2 Sep 2026 ("reduce the
+   vertical gaps between each row on the right of priya's image"). The 8 here
+   is stated as its own value and does NOT follow, because it separates an 18px
+   heading from a 13.5px label — which is the same argument the 16/16 below
+   makes against inheriting from `.rec-hdb`'s own 8. The RELATIONSHIP is what
+   this note was pointing at and it survives; the shared number did not.
    ------------------------------------------------------------------------ */
 /* 16 ABOVE THE RULE AND 16 UNDER IT (Maryam, 31 Aug 2026), and the two numbers
    have to be set in two different places because one is padding inside the row

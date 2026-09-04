@@ -1,0 +1,102 @@
+/* ==========================================================================
+   109 — THE CONFIRMATION DIALOG HAS A SECOND HUE
+
+   Maryam, 3 Sep 2026: paying lands on the week 1 dashboard with "a modal of
+   success icon on top and then 'Successfully enrolled' with some description,
+   and a secondary button 'Close'". `enrolSheet` in views.js is the markup and
+   the note over it is the argument; this is everything the drawing needed that
+   §105.6 did not already state, and it comes to one selector.
+
+   THE COMPONENT IS §105.6's AND IT IS REUSED WHOLE. That layer built the
+   centred dialog for "Delete your account?" — `.conf-b`'s centred column,
+   `.conf-mk`'s 48px disc with two hairline rings, `--sec-desc-gap` between the
+   title and its description, no rule above the footer, §64's arrow taken off
+   the action row — and every one of those decisions is one a success dialog
+   wants unchanged. What it hardcoded is the HUE: `--support-error-bg` behind
+   the mark, `--danger-ink` in the rings and the glyph, which is right for the
+   one dialog that existed and is a claim about the WHOLE component's meaning
+   the moment a second one arrives.
+
+   SO THE VARIANT IS A MODIFIER ON THE MARK, NOT A SECOND DIALOG. `.conf-ok` on
+   the sheet re-points three colours and nothing else; both dialogs are the same
+   object at the same size in the same place, which is what makes the mark's
+   colour the only thing that reads as different.
+
+   IT COULD NOT HAVE BEEN DONE BY RE-POINTING A TOKEN. §105 states the two hues
+   as literal token references inside one rule, so there is no per-dialog custom
+   property to reassign — and inventing one (`--conf-hue`) to serve two callers
+   would put the indirection in before the second case has shown what varies.
+   Three declarations, restated. If a third dialog wants a third hue, THAT is
+   when the token earns its keep.
+
+   THE HUES ARE §02.440's, WHICH IS THE PRODUCT'S EXISTING SUCCESS MARK.
+   `--support-success-bg` behind it and `--support-success` in the rings and the
+   glyph — the same pair `.note.succ` has always carried, so the tick in this
+   dialog is the same green as the tick in a success note. NOT
+   `--support-success-ink`: §01 tunes that value for green as TEXT, and §85
+   settles that a mark's `fill` is not text.
+
+   THERE IS NO TYPE IN THIS LAYER. The title is an `h2` and the description a
+   `<p>`, both already sized, weighted and inked by §63 through §105.6's own
+   roles, and the mark's `fill` is not one of §63's four properties. This layer
+   sets a background, a box-shadow and a fill.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 109.1 ---
+   THE SUCCESS MARK
+
+   (0,4,0) against §105.6's (0,3,0), so it wins on weight rather than on the
+   layer order — which matters because `.conf-mk`'s three declarations are the
+   kind a later layer restates, and §63 §7b's trap is exactly this: a rule that
+   only wins on order loses silently the day something lands after it.
+
+   THE RINGS ARE THE SAME 12% AND 24% MIX, and the arithmetic is worth keeping
+   rather than re-deriving: two `0 0 0 Npx` spreads at 12px and 13px draw a
+   12px band and a 1px hairline outside it, so the mark reads as a disc inside
+   two rules and takes no layout — §105.6's note has the reason a `box-shadow`
+   is the right mechanism here and why it is not depth in the sense §02 rules
+   out (no blur, no offset: two concentric hairlines).
+
+   GREEN NEEDS NO ADJUSTMENT AT 12% THE WAY §74's RED DID. That layer mixes its
+   card washes at 5/12/14% and steps the red down because it is the stronger
+   hue; these are 48px rings on a white sheet rather than a 430px card ground,
+   and at that size the two mixes read as the same weight. Checked against the
+   delete dialog side by side.
+   -------------------------------------------------------------------------- */
+.app .conf.conf-ok .conf-mk{
+  background:var(--support-success-bg);
+  box-shadow:0 0 0 12px color-mix(in srgb, var(--support-success) 12%, transparent),
+             0 0 0 13px color-mix(in srgb, var(--support-success) 24%, transparent)}
+.app .conf.conf-ok .conf-mk svg{fill:var(--support-success)}
+
+/* ------------------------------------------------------------------ 109.2 ---
+   IT ARRIVES WITH THE PAGE, SO IT NEEDS AN ENTRANCE OF ITS OWN
+
+   §02.398 draws `.modal` at `opacity:0` and `.modal.on` turns it on, which is a
+   TRANSITION — and a transition needs the element to have existed without the
+   class for a frame. Every other sheet in the build gets that for free: the
+   page is already on screen and a press flips the boolean, so the modal is in
+   the DOM at `opacity:0` and then gains `.on`.
+
+   THIS ONE IS BORN WITH `.on`. It is rendered by the same paint that draws the
+   whole week 1 dashboard — the flag is set and `setStage('week1')` renders once
+   (the handler's note is why that order is the mechanism) — so there is no
+   previous computed style for the transition to run from, and without this rule
+   the dialog is simply already there, at full opacity, in the first frame.
+
+   SO IT IS AN ANIMATION, GATED ON `data-open`, which is §13.2's own pattern for
+   the three sheets that need one and trap 5's rule: `data-open` is a
+   ONE-RENDER marker, so the fade cannot replay on a later repaint. The
+   keyframes and the durations are §13's — nothing new is defined here, and
+   `mo-up` on the sheet against `mo-fade` on the scrim is the pairing that layer
+   already uses for Edit details, the photo picker and the card form.
+
+   REDUCED MOTION NEEDS NOTHING. §13.187 clamps every duration to 1ms, which is
+   the strobe problem only for an INFINITE animation (§21.4, §33.6 and §40 each
+   state their own block for that reason); a one-shot fade at 1ms is the
+   dialog simply being there, which is the correct reduced-motion state.
+   -------------------------------------------------------------------------- */
+.app[data-open~="enrolOk"] .conf-ok{
+  animation:mo-up var(--mo-slow) var(--mo-enter) both}
+.app[data-open~="enrolOk"] .modal:has(> .conf-ok){
+  animation:mo-fade var(--mo-base) var(--mo-standard) both}

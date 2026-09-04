@@ -1,0 +1,950 @@
+/* ==========================================================================
+   §111 — THE PROFILE, IN SIX SECTIONS, EDITED ONE AT A TIME
+   `111-pfedit.css`
+
+   Maryam, 3 Sep 2026, with her LinkedIn profile as the reference: a Quick
+   Action whose mark is a progress circle of how much of the profile is done,
+   and the Profile module redrawn as six sections in tabs — each showing its own
+   data, and each one's Edit control turning that panel into its form in place.
+   views.js carries the record (`PF`), the derivation (`pfDone`) and the markup;
+   this layer draws it.
+
+   IT ARRIVED AS A WHOLE-SCREEN STEPPER AND WAS CUT BACK AN HOUR LATER, and §2
+   below is what that cost and what is worth keeping from it in words.
+
+   ALMOST EVERYTHING HERE IS AN ADAPTER, WHICH IS THE POINT. The chip row is
+   §87's `.skl` with a × on each pill; the entry block is §41's bounded panel;
+   the tab strip is §15's `.cs`, stated by nothing here at all; the read rows are
+   §02's `.cardrow` in a `.tile-stack`; the gap note is §02's `.note`; the ring
+   is §32's, at a smaller box. What is genuinely new is a two-column form grid.
+
+   AFTER §63 AND CLEAN: not one font-size, font-weight, text-transform or text
+   colour. Every family this layer introduces takes a §63 ROLE CLASS in the
+   markup instead — `.t-h2` on the heading, `.t-desc` on the line under it and
+   on a read row's third line, `.t-h4` on an entry's title and an interest
+   group's name, `.t-label` on an entry's numeral — which is §108's move and is
+   what keeps "which file is a text size in" answerable with one word.
+   `.pfe-need` is the same answer once more: it wears no role class and inherits
+   its label's, which is the rank it belongs to.
+
+   TWO FAMILIES COULD NOT BE SAID THAT WAY AND BOTH ARE IN §63 §46 — the small
+   ring's figure, which is a §7-class exception (a 42px box too small for the
+   h3 §3 gives every other ring), and an interest pill's follower count, which
+   is an ink. Neither is here.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE QUICK ACTION'S MARK IS A FIGURE, AND ITS BOX IS THE TEXT BESIDE IT
+
+   Maryam: "instead of the left side icon in the action item I want you to show
+   a progress circle of how much profile is done and what is left, this circle
+   will be of the height of the right side content."
+
+   SO THE HEIGHT IS STATED IN THE TYPE TOKENS, AND §86's `--gcard-art-h` is the
+   same decision with the same working. The right side is `.qa-b`: one h4 line,
+   §70.5's 4px gap, one line of description —
+
+     `--t-h4-lh`       19   "Complete Your Profile"
+     `--s02`            4   §70.5's `.qa-b` gap
+     `--t-compact-lh`  19   "Set how you want to be seen."
+     -----------------------
+                       42
+
+   AND 42 IS WHERE THE SIZE SETTLES RATHER THAN WHERE IT WOULD IDEALLY BE,
+   BECAUSE THE CARD IS 271px WIDE AND THE TWO ARE COUPLED. §111.1a is the
+   width; at it, the text column is 143 and the description takes TWO lines, so
+   the block measures 61 against a 42px mark. Growing the calc to 61 does not
+   fix that: 19px more mark leaves 124px of text, "Complete Your Profile" wraps
+   too, and the block goes to 80. A mark sized to its text also narrows that
+   text, and there is no fixed point in the middle — the only stable value is
+   the one that lets the TITLE hold one line, which is this.
+
+   SO THE MARK CENTRES ON THE PAIR INSTEAD OF TOPPING IT. `align-self:center`,
+   which is the one place this reverses §70.6 (that layer tops a 20px glyph
+   against a 21px title line, correctly, because a glyph belongs on the line it
+   introduces). A 42px disc against a 61px block, top-aligned, reads as a circle
+   that fell 19px short; centred it reads as the row's mark. The instruction is
+   still met in the sense that matters — the mark is the size of the text beside
+   it and not of a card — and the 19px is what three cards across a 837px block
+   costs.
+
+   TWO THINGS THAT LOOK LIKE BETTER ANSWERS AND ARE NOT.
+
+   STRETCHING MEASURES THE WRONG BOX. `.qa-c` is `align-items:flex-start` with
+   `min-height:74px`, so a stretched item takes the FLEX LINE's height — the
+   tallest card in the row, not this card's own text. On this page that is a
+   fact about "Quick-Start Preparation".
+
+   AND `height:100%` + `aspect-ratio` INSIDE A GRID PAIR IS CIRCULAR HERE, which
+   is worth writing down because §75.3 recommends exactly that shape and it is
+   right there. Wrapping the ring and `.qa-b` in a two-column grid and letting
+   the ring take the row's height was built and measured: it settles at 80x80,
+   because the ring's width feeds the `auto` track, which narrows the text,
+   which wraps it to THREE lines, which makes the row taller, which widens the
+   ring. §75.3's portrait escapes the loop because the facts beside it are a
+   fixed number of lines whatever width they get; a wrapping sentence is not.
+   A stated length has no loop to be in.
+
+   THE FIGURE IS `--t-label` AND THAT IS §63 §46a, A §7-CLASS EXCEPTION. At 42px
+   with a 4.3px stroke the drawable inside is 34px; §63 §3 puts `.ring-n` at h3,
+   where "50%" measures ~33 and touches the arc on both sides. This is the only
+   ring in the build small enough for its own figure to be the constraint. */
+.app .ring.qa-ring{
+  --qa-ring:calc(var(--t-h4-lh) + var(--s02) + var(--t-compact-lh));
+  flex:none;width:var(--qa-ring);height:var(--qa-ring);
+  /* CENTRED, WHICH IS THE ONE REVERSAL OF §70.6 HERE — its note and the head of
+     this block are the argument. `margin-top` goes with it: §70's 1px is an
+     optical correction for a glyph sitting on a title's line, and this box is
+     not on a line. */
+  align-self:center;margin-top:0}
+/* THE STROKE THINS WITH THE BOX. §32 draws 6 in a 64 viewBox, which at 42px
+   renders 3.9 — a band nearly a fifth of the radius, which reads as a donut
+   rather than as a measure and leaves the figure 34px. 4.5 renders just under
+   3, and the arc is still unmistakably an arc at 50%. */
+.app .ring.qa-ring circle{stroke-width:4.5}
+/* THE CARD PAYS THE SAME 12 AS EVERY OTHER, so the mark is wider and the gap
+   after it is not — §70.5's "two gaps, 12 and 32" is unchanged and the text
+   column simply starts further in. Nothing else about `.qa-c` moves. */
+.app .qa-c-mk{gap:var(--s04)}
+
+/* ------------------------------------------------------------------- 1a ---
+   ALL THREE CARDS ON ONE LINE — Maryam, 3 Sep 2026
+
+   §79 widens the Quick Action grid to `auto-fit minmax(260px,1fr)` the moment a
+   page draws a THIRD card (its gate is literally `:has(> :nth-child(3))`), and
+   that is what this page now is: three across at 271px each, which is the
+   instruction and is what this block used to override.
+
+   IT SPANNED THE MARK CARD FOR ONE BUILD and the reason is worth keeping,
+   because it is the cost being accepted here. A 42px mark leaves 126px of text
+   column in a 271px card, so BOTH of this card's lines wrap — measured — and
+   the block is 80 against a mark that was sized to be its height. Spanning the
+   card across the row gave the description one line and the mark exactly the
+   pair; the price was a banner over a pair instead of three equal cards, and
+   three equal cards is what was asked for.
+
+   SO THE MARK STAYS AT THE TITLE-PLUS-ONE-LINE HEIGHT AND CENTRES ON THE PAIR.
+   §111.1 has the arithmetic for why it cannot simply be grown to 61: the mark
+   and the text share the card's width, so every pixel of mark is a pixel the
+   sentence has to wrap into, and 61 puts the TITLE on two lines as well. 42 is
+   the largest value at which the title holds one line, and centring is what
+   stops the 19px difference reading as a circle that fell short.
+
+   `.qa-c-mk` KEEPS ITS CLASS AND ITS GAP RULE. It is what §63 §46a and §111.1
+   key on, and it is what a fourth card would carry if it also wanted a drawn
+   mark. Only the two grid rules are gone.
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------- 2 ---
+   THE WHOLE-SCREEN EDITOR STOOD HERE AND IS GONE
+
+   Maryam asked for it — "the back button on top, beneath that the Edit Profile
+   heading then beneath that a stepper" — and then, an hour later, for it to go:
+   "remove this page from here. we have an edit icon with each section on the
+   profile page. on clicking that edit button i suggest allow editing that
+   section only." What this layer lost with `V.profileEdit` was `.pfe-hd` (a
+   three-row head block of back control, heading and completion line) and
+   `.stp-pf` (§56's `.stps` made pressable, plus a phone tier that scrolled the
+   six steps sideways instead of stacking them).
+
+   THREE THINGS FROM IT ARE WORTH KEEPING IN WORDS, because each is a measured
+   answer somebody will want again.
+
+   A PAGE THAT WANTS ITS OWN `<h1>` CANNOT PUT IT IN THE `.ph`. §78's
+   `stripPageHead` removes `.ph h1` unconditionally — that is the whole of that
+   layer — so the heading has to be a page child, and then `placeBand` and
+   `tidyPh` both bail for want of a `.ph` and `pageLabel` falls through to the
+   view's `crumb()` tail. That is four passes' behaviour riding on one decision.
+
+   THE HEAD BLOCK'S PADDING WAS §78's `.ph-backonly` NUMBERS, copied rather than
+   reached for: 16 above the arrow and nothing under it, because that layer had
+   already measured the alternative — a 40px control paying a 26px title's
+   separation is ~100px of white. And `.ph-back` needed `margin-left:-8px` in a
+   block that pays the page gutter itself, because §78.1 gives the control its
+   own side padding for a `.ph` that pays none.
+
+   AND §56's STEPPER RAIL MUST NOT COLOUR A SET THAT IS NOT A SEQUENCE. That
+   layer paints the segment right of a finished step in `--accent`, which is
+   right for four milestones that happen in order — what is behind you is always
+   a prefix, so the rail reads as a filled meter. A profile's sections are
+   finished in whatever order the reader reaches them, so the accent lit the
+   segments after steps 4 and 5 and left the ones after 1 and 3 grey: a meter
+   with holes in it. The fix was `--rule` for every segment, and the deeper
+   answer is the one the second instruction reached — six sections that are not
+   steps should not be drawn as a stepper at all.
+
+   WHAT IS LEFT IS §111.3 ONWARD: the form grid, the entry block, the chip row
+   and the form's foot, all of which a per-section edit needs unchanged.
+   -------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------------- 4 ---
+   THE FORM IS TWO COLUMNS AT DESKTOP AND ONE EVERYWHERE ELSE
+
+   §02.136 draws `.f` as a stacked block with a 16px bottom margin, which is
+   right for a sheet 400px wide and leaves a 1200px page with a column of
+   full-width inputs down its left half. The grid is the whole of what this
+   adds: two tracks, the margin off (the gap is the gap), and `w` for a field
+   that takes the row — a paragraph, a location, a credential.
+
+   `minmax(0,1fr)` AND NOT `1fr`. A `<select>` and an `<input>` both have an
+   intrinsic minimum width, and a `1fr` floor is `auto` — at 900 the two tracks
+   would refuse to shrink and the form would push the page sideways. This is
+   §72's own note about the pulse's standing figures, one component along.
+   -------------------------------------------------------------------------- */
+.app .pfe-g{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  gap:var(--s05) var(--s06)}
+@container app (min-width:700px){
+  .app .pfe-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .app .pfe-g > .pfe-f-w{grid-column:1 / -1}
+}
+.app .pfe-g > .f{margin-bottom:0}
+/* THE LABEL AND ITS FLAG ARE ONE ROW. §02.137 draws `.f > label` as a block, so
+   the word after it would take a line of its own and every empty field would be
+   three rows deep instead of two. */
+.app .pfe-f > label{display:flex;align-items:baseline;gap:var(--s03)}
+/* "NEEDED" IS A WORD, NOT A CHIP AND NOT A COLOUR. The build has a `.tag`
+   family and a red one in it, and a red pill on eleven fields of a six-step
+   form would make the profile look broken rather than unfinished — §74's
+   "three status banners" measured on a smaller object. It takes the label's own
+   size and ink and separates itself with a middot's worth of space, which is
+   what `.all-desc` does under a heading.
+   IT NEEDS NO §63 RULE and that is deliberate: with no role class of its own it
+   inherits `.f > label`'s, which is the rank it belongs to. */
+.app .pfe-need::before{content:'\00b7';margin-right:var(--s03)}
+.app .pfe-note{margin:var(--s05) 0 0}
+
+/* --------------------------------------------------------------------- 5 ---
+   A REPEATED RECORD IS A BOUNDED PANEL WITH A HEAD ROW
+
+   Five roles, one school, two certificates — each a block of fields that has to
+   read as one entry. §41's frame (1px `--rule` on `--layer-01`) is the build's
+   only bounded panel and `V.agent`'s three use it, so a repeated record gets
+   the same edge rather than a new one; `--radius` is 0 by token, so nothing is
+   stated for the corners.
+
+   THE HEAD ROW IS THE ENTRY'S NAME AND THE ONE CONTROL THAT ACTS ON IT —
+   §29.10's rule that an action sits on the thing it acts on, which is also why
+   Remove is here and not at the foot of the section.
+
+   AND THE PANEL HAS NO EDGES LEFT — THREE RULES DELETED ON 4 Sep 2026, all from
+   one message: "on editing, a border comes on the section, remove that",
+   "remove the divider after the job title", "remove the count against each job".
+
+     THE FRAME. §41's `1px solid var(--rule)` on `--layer-01` was taken because
+     it is the build's only bounded panel and `V.agent`'s three use it. What the
+     frame is FOR is separating a panel from a page it sits on; these sit inside
+     a section that is already the entry list, one under another with `--s05`
+     between them, and the fields inside draw their own baselines — so the box
+     was an edge round content that was already grouped. The ground stays: it is
+     `--layer-01`, the same white the page is, so nothing paints differently and
+     the declaration is what §41 would want back if the frame ever returns.
+
+     THE DIVIDER. A 1px rule under a head row that is one title and one control,
+     16px above the first field's own label — a line separating a thing from the
+     thing it names. The 12px `margin-bottom` is what separates them now.
+
+     THE NUMERAL. `.pfe-e-n` was a 24px `--brand-tint-2` disc counting panels a
+     reader can see at once, and it was the only accent-tinted object in the
+     form. `pfEntry` no longer takes the argument.
+
+   WHAT IS LEFT IS `padding`, THE SPACING BETWEEN ENTRIES AND THE HEAD ROW's
+   LAYOUT, which is the honest amount of styling a repeated record needs here.
+   -------------------------------------------------------------------------- */
+.app .pfe-e{
+  padding:var(--s06);
+  background:var(--layer-01)}
+.app .pfe-e + .pfe-e{margin-top:var(--s05)}
+.app .pfe-e-h{
+  display:flex;align-items:center;gap:var(--s04);
+  margin-bottom:var(--s05)}
+.app .pfe-e-t{flex:1 1 auto;min-width:0}
+.app .pfe-e-x{flex:none;margin-left:auto}
+/* `.pfe-add`'s RULE IS DELETED WITH THE BLOCK IT SPACED (Maryam, 4 Sep 2026:
+   "remove add … from experiences", then "give the add button below this section
+   at the top right at the left of the edit button"). The three "Add a …"
+   buttons under the last entry of Experience, Education and Certifications are
+   one mark on each section's heading row now — §111.12 — so nothing writes this
+   class and a rule for it would be the tell this file keeps deleting. */
+
+/* --------------------------------------------------------------------- 6 ---
+   A CHIP THE READER OWNS
+
+   §87's `.skl-c` is a 999px pill on `--layer-02` and its note says it "is a
+   `<span>` and is not a control", because the course outline's chips name what
+   a chapter covers. Here the list is the reader's, so each pill carries the one
+   thing they can do to it — and the ground, the radius and the row's gap are
+   §87's, unchanged. Only the × is new.
+
+   THE × IS 14px AND SITS INSIDE THE PILL'S OWN PADDING, not on its corner. A
+   badge hanging off a 999px shape is §106.3's problem — the disc's edge on the
+   diagonal is nowhere near its bounding box — and a pill has a straight run of
+   ground on the right where a mark can simply stand.
+   -------------------------------------------------------------------------- */
+.app .pfe-chip{gap:var(--s03)}
+.app .pfe-chip-x{
+  display:grid;place-items:center;
+  width:16px;height:16px;margin:0 calc(var(--s02) * -1) 0 var(--s02);
+  padding:0;border:0;background:none;cursor:pointer}
+.app .pfe-chip-x svg{width:14px;height:14px;fill:var(--icon-secondary)}
+.app .pfe-chip-x:focus-visible{outline:2px solid var(--brand-primary);outline-offset:1px}
+/* THE ADD CONTROL IS ON THE ROW, AS ITS LAST ITEM. Under the row it would be a
+   third block in a section that is a heading and a list; on the end of it, it
+   is the next empty slot — which is what it is. §64 gives it the arrow it gives
+   every quiet button, and the arrow is wrong on a control that adds rather than
+   navigates, so the icon in the label is what turns it off (`:not(:has(svg))`
+   is that layer's test). */
+.app .pfe-chips{align-items:center}
+.app .pfe-chip-none{margin:0}
+/* INTERESTS' FOUR RULES ARE DELETED WITH THE SECTION (Maryam, 4 Sep 2026:
+   "remove this whole section"). `.pfe-int` / `.pfe-int-none` were the four
+   headed chip rows, and `.pfe-chip-m` was a follower count riding inside a pill
+   — an `<em>` un-italicised here, because it was a reading rather than a label,
+   with its ink in §63 §46. That rule goes too; this was its only writer. */
+
+/* --------------------------------------------------------------------- 6a --
+   THE TAB STRIP HAS NOTHING UNDER IT
+
+   Maryam, 3 Sep 2026: "remove the divider right after the tab on each tab
+   section, i think the reason that you are keeping the divider space on the
+   profile settings page as well that's why the content starts after quite a lot
+   of space, please remove that as well." Both halves are the same rule and the
+   diagnosis in the second half is exactly right.
+
+   THE DIVIDER IS §10.2's CLOSING HAIRLINE ON THE STRIP'S OWN SECTION. Every
+   `.page > .sec` draws an `::after` at its foot, and `.sec-cs` is a `.sec` — so
+   the strip closed itself 24px under the tabs, one pixel row above the panel's
+   first section, which then opened with 24 of its own. A rule directly under a
+   tab strip is the one place in the build that cannot mean anything: `.cs`
+   already carries a `border-bottom`, so the boundary was drawn twice with 24px
+   of nothing between the two.
+
+   AND THE SPACE WAS THE OTHER 24. `padding-bottom` on the strip's section paid
+   for a rule that should not be there, so taking the rule off and leaving the
+   padding would have left the gap the message describes. Both go; the panel's
+   own `padding-top` is the gap, which is the section rhythm every other page
+   has.
+
+   SCOPED BY A MARKER, NOT BY `.sec-cs`. That class is worn by the Cohort page,
+   `V.leadReports` and `V.leadProfile`, and this is a judgement about how THIS
+   page's strip meets THIS page's panels — §95.124 and §36.664 both answer the
+   same question for their own pages with a `:has(+ …)` gate rather than
+   globally. `pf-cs` is the marker and `pfTabs` is its one writer. */
+.app .page > .sec.pf-cs{padding-bottom:0}
+.app .page > .sec.pf-cs::after{content:none}
+
+/* THE PADDING NEVER ACTUALLY WENT, AND THE `.cs`'s OWN MARGIN WAS A THIRD
+   GAP NOBODY HAD COUNTED (Maryam, 3 Sep 2026: "see there is really something
+   beneath the tabs on My profile page… i think may be there is a row or
+   something that this causing the content go down so please remove that gapped
+   row").
+
+   TWO THINGS WERE UNDER THE TAB ROW AND THE RULE ABOVE ANSWERED NEITHER:
+
+     §20's desktop pair rule handed this section `padding-bottom:var(--s06)`
+     from fourteen classes inside a container query, so the (0,3,0) zero above
+     lost at desktop and won on a phone. Fixed where trap 4 says it has to be
+     — `:not(.pf-cs)` is now in §20's own `:not()` list, with the argument.
+
+     `.cs` CARRIES `margin-bottom:var(--s05)` (§10.4). That is right for a strip
+     standing in the page's flow with a panel below it; this strip's section IS
+     the boundary, so 16px under its border is 16px of white inside the sticky
+     block. One class, so it is answered here.
+
+   AND THE COST WAS NOT SPACING, IT WAS CLIPPING. §111.10 makes this section
+   sticky, so 40px of empty strip is 40px of every scrolled section hidden
+   behind white — the reader's own name was cut in half under the tabs. Measured
+   at 1440: the section was 89px tall against a 49px tab row, and is 49 now. */
+.app .page > .sec.pf-cs > .cs{margin-bottom:0}
+
+/* --------------------------------------------------------------------- 7 ---
+   THE FORM'S FOOT IS TWO CONTROLS AT OPPOSITE ENDS
+
+   Cancel on the left, Save on the right, because that is `.sheet-f`'s own
+   arrangement one surface over and this is the same pair doing the same job on
+   a page instead of in a dialog. The section pays §10's frame like every other,
+   so the row needs no rule above it — §10.2 has already closed the last section
+   of the form.
+   -------------------------------------------------------------------------- */
+.app .pfe-foot{
+  display:flex;align-items:center;gap:var(--s04)}
+.app .pfe-foot > .btn:last-child{margin-left:auto}
+@container app (max-width:599.98px){
+  /* two controls that each say what they do belong on one line until the line
+     cannot hold them; at 390 "Save changes" alone is ~140px, so the pair stacks
+     and each takes the width — §71.3's call for `.crow-a`, and its
+     `margin-left:auto` has to go with it or `100%` measures a shrink-to-fit box
+     (that layer's own second bug, recorded there) */
+  .app .pfe-foot{flex-direction:column;align-items:stretch}
+  .app .pfe-foot > .btn:last-child{margin-left:0}
+}
+
+/* THE PASSWORD FORM SITS INSIDE ITS SECTION, so its grid and its foot pay the
+   air a section gap would have given them. `.pfe-g` is the fields (`--s06` from
+   the row above it, which is the same step §111.5 gives a second entry block)
+   and `.pfe-foot-in` is the pair of controls under them. Neither is a `.sec` —
+   a section inside a section pays §10's frame twice and draws §10.2's closing
+   hairline through the middle of the block. */
+.app .pfe-g + .pfe-foot-in{margin-top:var(--s05)}
+.app .tile-stack + .pfe-g{margin-top:var(--s06)}
+
+/* --------------------------------------------------------------------- 7b --
+   EDITING SWAPS THE HEAD ROW'S CONTROL FOR TWO
+
+   Maryam, 3 Sep 2026: Save Changes on the right, Discard Changes on its left,
+   "not have a button fill just red text with red delete icon on its left".
+
+   THE PAIR IS ONE FLEX ITEM, NOT TWO. §24.132 gives `.sec-h > h2` `flex:1 1
+   auto`, so a second control dropped into that row would be laid out by the
+   heading's own slack and the gap between the two would be whatever was left.
+   `.pfe-acts` is a group with its own 12px, which is what `.dc-hd-r`'s note
+   calls for one component over — "two auto margins would jam together".
+
+   THE BORDER COMES OFF DISCARD AND THE INK DOES NOT. §16.673's `.btn.danger`
+   states `color` AND `border-color` together, which is right for "Delete my
+   account" — a bordered control on a page of prose — and wrong for a control
+   sitting inside a heading row beside a filled black button, where an outline
+   is the third edge in 200px. `border-color` alone, so §16's ink and its `svg`
+   fill both survive; `border:0` would take a pixel out of the box and stand the
+   pair 1px apart in height (§64.1's own note).
+
+   `align-self:center` IS STATED BECAUSE §37.11b SETS `flex-start` ON EVERY
+   CHILD OF A `.sec-h`, and this group is 32px tall against a 22px heading line
+   — the same case §73 records for `aiHead`'s action group, and answered the
+   same way. */
+.app .pfe-acts{
+  display:flex;align-items:center;gap:var(--s04);
+  align-self:center;margin-left:auto}
+/* `.app .btn.pfe-discard` AND NOT `.app .pfe-discard`, WHICH IS §63 §7b's TRAP
+   ONE MORE TIME AND WHICH SHIPPED WRONG FOR A BUILD. §16.673 is
+   `.app .btn.danger` — THREE classes, (0,3,0) — so a (0,2,0) restatement here
+   loses on weight however late the layer lands, and the border stayed red with
+   nothing warning. Measured: `borderColor` read `rgb(194, 21, 32)` with this
+   rule present in the output.
+
+   `border-color`, NOT `border:0` (§64.1): `.btn` carries a transparent 1px in
+   its box model, and removing it makes this control 2px shorter than the filled
+   button beside it. */
+.app .btn.pfe-discard{border-color:transparent;padding-left:var(--s03)}
+
+/* --------------------------------------------------------------------- 7a --
+   THE FIRST TAB CARRIES A COUNT AND STATES NOT ONE RULE
+
+   `.lf-n` is `.cs`'s own figure slot — `V.leadReports` puts a cohort's size in
+   it — so "3/6" beside My Profile is that slot doing its job and needs nothing
+   from this layer.
+
+   A TICK PER TAB STOOD HERE FOR AN HOUR and went with the six-tab strip: with
+   the sections merged into one tab a tick would be true only when all six were
+   finished, which is the state the reader is trying to reach and the least
+   useful thing to tell them on the way. Two rules deleted rather than left as a
+   gate nothing writes. */
+
+/* --------------------------------------------------------------------- 8 ---
+   THE READ SIDE — SIX TABS AND WHAT HANGS UNDER THEM
+
+   The strip itself needs nothing: `.sec.sec-cs` + `.cs` is §15's component,
+   §16 zeroes the section holding it, §15.1496 drops its top rule when it opens
+   the page body, and §20 knows the marker. Six buttons scroll in it because
+   `.cs` is `overflow-x:auto` with the scrollbar hidden — which is the whole
+   reason this is the tab component and not a new one.
+
+   WHAT IS STATED HERE IS THE THREE ARRANGEMENTS THE PANELS ADD.
+   -------------------------------------------------------------------------- */
+/* A READ ROW'S THIRD LINE. `.cardrow-d` is the second; a role also has a place,
+   a mode and a description, and stacking those into `.cardrow-d` would make one
+   run-on line. It hangs under the pair at the description's own rhythm. */
+.app .pfe-row-x{display:block;margin-top:var(--s02)}
+/* THE ABOUT PARAGRAPH TAKES THE WHOLE COLUMN (Maryam, 3 Sep 2026: "this should
+   be full width"). It shipped at `max-width:68ch` — §14's measure for a page's
+   own prose, which is the right rule for a Tal summary or a policy clause and
+   the wrong one here: this paragraph is the reader's own copy about themselves,
+   it sits directly under a band of four cells that span the column, and capped
+   it left ~45% of the row empty beside four lines of text. §63 §5's own note
+   for `.ai-body p` is the case FOR the measure; the case against it is that
+   this block has a full-width neighbour 24px above it. */
+.app .sec > .pfe-about{margin:0;max-width:none}
+
+/* THREE FAMILIES ARE DELETED HERE AND EVERY ONE OF THEM IS A ROW THAT STOPPED
+   BEING DRAWN (4 Sep 2026). `.pfe-end` spaced the endorsement rows under the
+   skill chips ("remove these"); `.pfe-gap`, its `.nb > b` and `.pfe-gap-a` drew
+   the "N still to add" note and the Add on its last line ("remove this", three
+   times, on three sections). Two arguments from those notes are worth keeping
+   because the next block written here will want them:
+
+     A NOTE IN THIS BUILD IS A BLOCK, NOT A FLEX ROW. §02 reads as though `.note`
+     were a flex row with `.nb` at `flex:1`, and **§12.621 sets
+     `.app .note{display:block}`** and has done since long before §111 — so a
+     control given `flex:none` to hold its right-hand end stacks anyway. Draw a
+     block note properly rather than restating `display:flex` for one caller.
+
+     A GAP IN A RECORD TAKES NO TINT AND NO ERROR HUE. Most of a profile being
+     unfinished is the normal state of one somebody is filling in, not a fault —
+     §74's argument against three coloured cards, at a smaller size. */
+
+/* -------------------------------------------------------------------- 14 ---
+   SIGN IN AND SECURITY IS TWO ROWS WITH NOTHING DRAWN AROUND THEM
+
+   Maryam, 4 Sep 2026, in one message: "remove the dividers between these two
+   rows", "instead of these blocked icon please use colored icons without
+   blocks."
+
+   THE MARK IS THE PRODUCT'S BARE 20px GLYPH, which is the move §29 made on the
+   figure cell and §72 on the pulse's columns: no ground, `--mk` stated by the
+   markup so the hue is a fact about the row rather than a position in a cycle.
+   `.cardrow-ic`'s 40px chip is what it replaces — a tinted square holding a
+   22px glyph, which is a box inside a row inside a section.
+
+   AND THE ROW BORDER IS §02.229's, TURNED OFF HERE RATHER THAN LOOSENED THERE.
+   That rule gives every `.cardrow` in the product a bottom hairline and is what
+   makes a `.tile-stack` read as a list; two rows about one subject — the
+   address you sign in with, and the password you sign in with — do not need a
+   line between them, and with the chips gone the rule was the only remaining
+   box-drawing on the block. Scoped to `.pf-sr` so no other stack moves.
+
+   `align-self:flex-start` PLUS THE 1px NUDGE IS §105.4's, not a guess: a 20px
+   glyph against a 21px title line sits 1px low without it. Same value as
+   `.qa-ic` and `.tg-mk`.
+   -------------------------------------------------------------------------- */
+.app .cardrow.pf-sr{border-bottom:0}
+.app .pf-sr-ic{
+  flex:none;display:grid;place-items:center;
+  align-self:flex-start;
+  width:20px;height:20px;margin-top:1px}
+.app .pf-sr-ic svg{width:20px;height:20px;fill:var(--mk,var(--icon-primary))}
+
+/* -------------------------------------------------------------------- 15 ---
+   THE CONFIRMATION'S TICK IS GREEN — §116's tab, `.note.cl-ok`
+
+   §02 marks a `.note` with `I.info` in the information blue and §12 states that
+   ink for every note in the build. A TICK is not a remark: it is the state the
+   press produced, and drawn in the blue it reads as one more piece of guidance
+   in a block made of guidance. `--support-success` is §02.440's own pair and
+   the hue §109 gives the enrolment dialog's ringed tick, so the two
+   confirmations in the product agree.
+
+   THE MARK ONLY — the sentence stays in the note's own ink. A green sentence
+   would make the block a status banner, which is §74's argument against three
+   coloured cards at one-line scale. */
+.app .note.cl-ok > span svg{fill:var(--support-success)}
+
+/* -------------------------------------------------------------------- 12 ---
+   THE HEADING ROW'S CONTROLS ARE MARKS
+
+   Maryam, 4 Sep 2026: "All the edit buttons in each section should have icon
+   only, same goes for the add button if that section has any."
+
+   A SQUARE, NOT A BUTTON WITH ITS WORDS TAKEN OUT. `.btn-sm` is a 32px box
+   built around a label — §89's own note for the leader's icon-only control
+   makes exactly this point — so the padding goes and the width is stated at the
+   height. Two of them side by side then read as a pair of marks at the end of
+   the heading row rather than as two undersized buttons.
+
+   THE BORDER STAYS AND THAT IS THE OPPOSITE OF §64. That layer took the outline
+   off a quiet button because "on a product made of hairlines a drawn rectangle
+   is one more edge than the page has" — true of a button whose LABEL already
+   says it is pressable. With no label the box is the whole affordance, and
+   twelve marks down a page with nothing round them would read as decoration.
+
+   `flex:none`, BECAUSE `.pfe-acts` IS A FLEX ROW and a 32px square in it would
+   otherwise be free to shrink under a long heading at 390. */
+.app .pfe-acts > .btn.pfe-ic{
+  flex:none;width:32px;padding:0;
+  justify-content:center;gap:0}
+.app .pfe-acts > .btn.pfe-ic svg{margin:0}
+
+/* -------------------------------------------------------------------- 13 ---
+   THE ISSUER'S MARK IS AS TALL AS THE ROW'S TEXT
+
+   Maryam, 4 Sep 2026, of the two IBM badges and then the COMSATS crest: "the
+   badge size should be equal to the height of the right side content", "logo
+   should be equal to the height of the right side content".
+
+   IT IS STATED AS A SUM OF THE TYPE ROLES BESIDE IT, WHICH IS §86's TECHNIQUE
+   AND NOT A ROUND NUMBER. A row's text block is `.cardrow-t` (h4) over
+   `.cardrow-d` (desc) over `.pfe-row-x` (desc again), so the box is those three
+   line boxes plus the two steps between them — **§02.261's own 2px on
+   `.cardrow-d`** and §111.8's `--s02` on `.pfe-row-x`. The 2px is a literal
+   because §02 states it as one; it is the difference between 57 and the block's
+   real 59, which is exactly the kind of gap "about right" hides. MEASURED
+   against `.cardrow-b` on the live page rather than derived on paper.
+
+   AND IT CANNOT BE `height:100%` OR `align-self:stretch`, WHICH IS THE TRAP
+   §111.1 AND §86 BOTH RECORD FROM THEIR OWN SIDE. Stretching measures the FLEX
+   LINE — a fact about the tallest thing in the row — and a percentage height
+   needs a definite parent height that a `.cardrow` does not have. §86's cohort
+   cover went the same way: "the height is stated rather than stretched, and
+   that was the cost of the rectangle."
+
+   `align-self:stretch` + `aspect-ratio:1` + `width:auto` WAS TRIED HERE AND
+   MEASURED, because it is the one shape that would track a wrapping title. It
+   does not work and the failure is spectacular rather than subtle: flex
+   resolves the MAIN size first, `width:auto` on a box holding an `<img>` is
+   that image's natural width, and the ratio then drives the cross size UP — so
+   the marks came out **100x100 and 128x128**, the images' own pixel sizes, and
+   the rows grew to 124 and 153. The stated size is not a compromise, it is the
+   only thing that works in this position.
+
+   SQUARE, BECAUSE A BADGE IS A DISC IN A SQUARE BOX and a crest is a square.
+   `object-fit:contain` so a mark of another shape letterboxes rather than being
+   trimmed — §86's reasoning, and here it is load-bearing rather than
+   defensive: these are three files this repo does not draw and cannot predict.
+
+   NO GROUND, NO BORDER AND NO CHIP. §110.1d is the precedent — a certificate's
+   own artwork replaced `.cardrow-ic`'s 40px tinted square there for the same
+   reason, "a tinted square behind photographic artwork is §72's box-in-a-box
+   and §106's artwork-is-not-a-face". §106 keeps this one square for the second
+   half of that rule.
+   -------------------------------------------------------------------------- */
+.app .pfe-art{
+  flex:none;display:block;
+  width:var(--pfe-art-s);height:var(--pfe-art-s)}
+/* TWO SIZES, BECAUSE THE ROWS ARE TWO SHAPES — and the row says which it is by
+   what it CONTAINS. A certification has a third line (the credential) and
+   measures 59; the education row has two and measures 38, and a 59px crest
+   there hangs 21px below the text it is supposed to match. `:has(.pfe-row-x)`
+   is the third line, which is the same "keyed on contents" test §10.15's
+   label-column opt-out uses.
+   MEASURED at 744 / 1280 / 1635: 38 and 59 against blocks of 38 and 59. */
+.app .pfe-row{
+  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh))}
+.app .pfe-row:has(.pfe-row-x){
+  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh) + var(--s02) + var(--t-desc-lh))}
+.app .pfe-art > img{width:100%;height:100%;object-fit:contain;display:block}
+/* THE FALLBACK IS THE ROW'S OLD GLYPH IN ITS OLD CHIP, at the mark's own size
+   so a section with artwork and one without do not indent their text
+   differently. It is what draws when `logos/` has no file for the row — see
+   `pfArt` — and it is `.cardrow-ic`, so §02 and §10 give it the chip. */
+.app .pfe-art-fb{
+  flex:none;
+  width:var(--pfe-art-s);height:var(--pfe-art-s)}
+
+/* THE IDENTITY ROW APPEARS ON TWO SURFACES NOW — the General tab and step 1 of
+   the editor — and on the second of those it is the first thing under a section
+   heading rather than the first thing on a page. §105 gives `.idhead` its own
+   top margin for the page case; inside a headed section that margin is charged
+   on top of `--sec-h-gap`. */
+.app .pfe-id{margin-top:0}
+
+
+/* --------------------------------------------------------------------- 9 ---
+   INTERVIEW SCENES — A ROW OF UPRIGHT CLIPS THAT SCROLLS
+
+   Maryam, 3 Sep 2026: "vertical rectangle of 5-6 scene video cards, two
+   chevrons at the right end of the Interview Scene heading row for scenes
+   scroll." views.js's `pfScenes` is the markup and `SCENES.level` the six.
+
+   THE ROW IS A SCROLLER AND NOT A GRID, which is §73's `.cov-row` one page
+   over: six cards do not divide a 900px column into anything readable, and a
+   set the reader pages through is a row with an edge running off it rather
+   than a wrap that pretends there were only three.
+
+   IT BLEEDS ON THE RIGHT ONLY, AND THE LEFT BLEED WAS A BUG (Maryam, 3 Sep
+   2026: "the interviews should not be attached from the left, i should have
+   page padding from left"). The row was written with §10.3's symmetrical idiom
+   — a negative margin of `--pad-x` on both edges and the same padding back —
+   which is correct for a component standing in a section that pays no gutter
+   to its children.
+
+   IT IS NOT THIS ONE, AND §14.2 IS WHY. That rule zeroes `padding-left` on
+   every non-`.sec-h` child of a headed section on a railed page, at (0,6,0)
+   inside the desktop tier — so the padding half of the idiom was struck off
+   and the negative margin was left standing alone. The first card sat 32px
+   LEFT of its own heading, on the rail. Nothing warned: both halves are still
+   valid rules and the row still scrolled.
+
+   SO THE LEFT SIDE ASKS FOR NOTHING AT ALL — no margin, no padding — and the
+   section's own gutter puts the first card on the spine with the heading above
+   it, at every width and with §14 either applying or not. The RIGHT keeps the
+   negative margin and gives up its padding, which is what makes the last card
+   run under the rail's edge instead of stopping short of it with white beyond:
+   that edge running off the column is what says the set continues.
+
+   THE CARD IS 240 x auto WITH A 3:4 PICTURE, and both numbers are stated.
+   IT WAS 168 UNTIL 3 Sep 2026 (Maryam: "increase the size of the scenes
+   thumbnails, let them scroll if increasing the size cause that, we have arrows
+   for that") — 168 was chosen as "five and a bit across the desktop column",
+   which is a measure of how many fit rather than of how big a clip should be,
+   and at that width the picture is 168 x 224 with three lines of text under it.
+   240 x 320 is a video card; the column holds three and a bit of them, and the
+   chevrons the same ask points at are what the rest is for. 3:4 is unchanged.
+   `aspect-ratio` is safe here in a way §75.3 warns it is not — the box has a
+   stated WIDTH, so the ratio has a definite axis to transfer from, which is
+   exactly the condition that note says is missing when a flex item's main size
+   is unresolved.
+
+   `scroll-snap` ON THE ROW, so a chevron press lands on a card edge rather than
+   part way across one. The step itself is JS (`data-scv`) and reads the card's
+   own width, so neither has a number the other could disagree with.
+
+   THE PLAY MARK IS ON THE PICTURE AND THE TIMESTAMP OPPOSITE IT — the two
+   things that say this is a clip. Both are `position:absolute` inside the
+   frame, so neither is in the card's flow and the text block starts at the
+   picture's foot.
+
+   AFTER §63 AND CLEAN: the three text families wear §63 role classes in the
+   markup (`.t-h4`, `.t-desc`, `.t-caption`), and the agent row borrows §108's
+   `.eo-lead`, which wears `.t-desc` at its own call site; the only colour is the
+   timestamp's, which is on a picture rather than on the page and so is a
+   property of the overlay, not of the type — the same split §85 makes for a
+   mark's `fill`.
+   -------------------------------------------------------------------------- */
+.app .scv-nav{
+  display:flex;align-items:center;gap:var(--s02);
+  align-self:center;margin-left:auto}
+.app .scv-ch{
+  display:grid;place-items:center;
+  width:32px;height:32px;padding:0;
+  border:1px solid var(--rule);background:var(--layer-01);cursor:pointer}
+.app .scv-ch svg{width:18px;height:18px;fill:var(--icon-primary)}
+.app .scv-ch:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+
+/* THE ROW STOPS ON THE PAGE'S OWN RIGHT EDGE AT FULL SCROLL — Maryam, 4 Sep
+   2026: "the moment when i fully scrolled the row the last scene should have
+   the page padding from the right."
+
+   THIS OVERTURNS THE PARAGRAPH ABOVE and the argument it made is worth keeping,
+   because it was right about the state it was reasoning about. The row bleeds
+   right by `-var(--pad-x)` and used to pay NO padding back, so the last card
+   ran under the rail — "that edge running off the column is what says the set
+   continues". True while there is more to come. It is exactly wrong at the END
+   of the scroll, where nothing continues and a card touching the rail reads as
+   a row that has been cut off rather than one that has finished.
+
+   THE FIX IS THE OTHER HALF OF §10.3's IDIOM, GIVEN BACK ON ONE SIDE ONLY.
+   `padding-right:var(--pad-x)` cancels the bleed at the scroll's end while the
+   negative margin still lets a card leave the column mid-scroll, so the row
+   bleeds while there is more and lands on the spine when there is not. The LEFT
+   still asks for nothing — §14.2 would strike a `padding-left` off anyway and
+   the section's gutter already places the first card (the paragraph above).
+
+   IT IS PADDING, NOT AN `::after` SPACER, AND THAT NEEDED CHECKING. Trailing
+   padding on a scroll container was historically dropped from `scrollWidth` by
+   every engine, which is why the spacer idiom exists; it is honoured now, and
+   this is verified rather than assumed — measured at max scroll, the last
+   card's right edge lands on `.page`'s content edge to the pixel at 390 / 744 /
+   1280. If that ever regresses the spacer is `.scv-row::after{content:'';
+   flex:0 0 var(--pad-x)}`, which must NOT carry `scroll-snap-align` or the row
+   gains a seventh snap stop with nothing in it. */
+.app .scv-row{
+  display:flex;gap:var(--s05);
+  margin:var(--s05) calc(var(--pad-x) * -1) 0 0;
+  padding:0 var(--pad-x) 0 0;
+  overflow-x:auto;scrollbar-width:none;
+  scroll-snap-type:x proximity}
+.app .scv-row::-webkit-scrollbar{display:none}
+.app .scv{
+  flex:none;width:240px;
+  display:flex;flex-direction:column;gap:var(--s03);
+  scroll-snap-align:start}
+.app .scv-art{
+  position:relative;display:block;
+  width:100%;aspect-ratio:3 / 4;
+  overflow:hidden;background:var(--layer-02)}
+.app .scv-art > img{width:100%;height:100%;object-fit:cover;display:block}
+/* THE MARK IS A DISC, WHICH IS ONE OF THE TWO CURVES THIS SYSTEM ALLOWS (§56).
+   White on a 44% black wash rather than the accent: the accent means "this is
+   yours to press next", and six of these on one row would be six of them. */
+.app .scv-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:grid;place-items:center;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,.44)}
+.app .scv-play svg{width:20px;height:20px;fill:#fff}
+.app .scv-at{
+  position:absolute;right:var(--s03);bottom:var(--s03);
+  padding:2px var(--s02);
+  background:rgba(0,0,0,.62);color:#fff}
+/* THE TEXT BLOCK HOLDS ONE LINE NOW, AND `.scv-d`'s RULE IS DELETED WITH THE
+   LINE (Maryam, 4 Sep 2026: "remove the desc of scene"). A rule for a class
+   nothing writes is the "gate nothing writes" tell and this layer has already
+   deleted one — `.scv-who`, in §111.9a's note below.
+
+   `.scv-b` STAYS AND ITS 2px GAP IS NOW INERT, WHICH IS DELIBERATE. It is the
+   card's TEXT BLOCK, and what earns it is not the gap: `min-width:0` is what
+   lets a title wrap inside a 240px card rather than setting the card's own
+   min-content width, and keeping the card at three children — picture, text,
+   attribution — is what keeps §111.9a's `margin-top:auto` a statement about the
+   last of three rather than about the second of two. */
+.app .scv-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.app .scv-h{margin:0}
+
+/* ------------------------------------------------------------------ 111.9a ---
+   THE AGENT IS THE LAST LINE AND IT IS §108's LEADER ROW
+
+   Maryam, 3 Sep 2026: "the content beneath each scene should be reordered and
+   improved as: Heading, Desc, Interview with — this needs ui improvement, show
+   this how we are showing the cohort leader, instead of cohort leader the text
+   will be 'Talent Agent:'."
+
+   THE ORDER WAS WRONG AND THE ATTRIBUTION WAS FIRST. "Interview with: Priya
+   Nair" opened all six cards with the same six words, so the row that says what
+   the clip IS — the one field the ask of an hour earlier called "a scene heading
+   that we already have" — was the second line of every card and the six cards
+   read as one repeated label. Heading, description, attribution is what a card
+   is: what it is, what happens in it, whose it is.
+   THE MIDDLE ROW HAS SINCE GONE (Maryam, 4 Sep 2026: "remove the desc of
+   scene"), so the card is heading then attribution — and the ORDER above is
+   what survives the removal rather than what it overturns: the title still
+   opens the card and the six words that are the same on all six still close it.
+   `scenePick` dropped the same sentence on 1 Sep 2026 for the same reason, and
+   the ask under this row is where the copy is said now.
+
+   IT IS `.eo-lead` VERBATIM, NOT A NEW CLASS. §108.2 is the shape the screenshot
+   points at — a 24px `.av-ph` disc, `--s03` to a `.t-desc` line, the name in
+   `<b>` — and it is already the row the enrolment card draws for Priya. Reuse
+   means reuse: the class, its `.eo-lead-ph` box and §106's disc all come across,
+   and the only difference is the two words in front of the name. There is no
+   `.scv-who` any more; its rule is deleted with the class rather than left as
+   the "gate nothing writes" tell.
+   `.eo-lead` IS ALREADY UNSCOPED — §108.2 states it on `.app .eo-lead`, so it
+   needs nothing here to reach a second caller. That is the one thing to check
+   before borrowing a class out of a page layer, and it passed.
+
+   IT IS A SIBLING OF `.scv-b`, NOT A THIRD LINE INSIDE IT, AND THAT IS WHERE
+   THE SPACING COMES FROM. `.scv-b`'s gap is 2px — §110.1's "one object on two
+   lines", right for a title and the sentence belonging to it, and wrong for a
+   24px disc. `.scv` is itself a flex column at `--s03`, the same 8 that already
+   separates the picture from the text block, so the row takes that step for
+   free and this layer states no margin at all. Written inside `.scv-b` it would
+   have needed one, which is the tell that it belongs a level up.
+
+   AND IT IS PINNED TO THE CARD'S FOOT, WHICH IS §72.2's `margin-top:auto`. The
+   text above it runs to one line or two — the six descriptions did when they
+   were drawn, and with them gone the six TITLES still do ("The Friday rhythm"
+   against "Handing over the vendor review", which wraps at 240) — so without it
+   the attributions land at two different heights along the row and the six
+   faces read as a ragged line rather than as the row's last line. The rule
+   survives the description's removal because the ragged input did. `.scv-row` is a flex row at
+   the default `align-items:stretch` and every card is a fixed 240, so the cards
+   are already equal height and there is slack to distribute; `auto` puts it
+   above the row instead of below it. Measured at 1440: six faces on one line. */
+.app .scv .eo-lead{margin-top:auto}
+
+
+/* -------------------------------------------------------------------- 10 ---
+   THE HEAD BLOCK AND THE STRIP STAY ON SCREEN
+
+   Maryam, 3 Sep 2026: "make the summary and tabs fix on scroll." Six sections
+   on one tab is a 6,000px page, and the two things a reader needs at the bottom
+   of it are the one that says where they are (the strip) and the one that says
+   what the page is (Tal's summary).
+
+   TWO STICKY ELEMENTS, AND THE SECOND'S `top` IS THE FIRST'S HEIGHT. That is
+   the whole mechanism and it is why ai11 measures: the band is between ~90 and
+   ~200px depending on the frame, so a number here would be right at one width.
+   `--pf-stick` is written on the `.page` by `placePfStick` and defaults to 0.
+
+   BOTH NEED AN OPAQUE GROUND OR THE PAGE READS THROUGH THEM. `.modhead` paints
+   §25.1's two ellipses as a background IMAGE, which composites over whatever is
+   behind it — on a scrolling page that is the section passing underneath. A
+   flat `--background` under the wash is one declaration and changes nothing at
+   rest. `.pf-cs` is `transparent` by §12.199 and takes the same.
+
+   AND THEY NEED A STACKING ORDER. The band is 4 and the strip 3, so the strip
+   slides under the band rather than over it; anything the page draws over both
+   — Tal's dock, the sheets — is already far higher.
+
+   GATED ON THE STRIP, `:has(> .sec.pf-cs)`, so no other page's band moves. This
+   is a judgement about one long page, exactly as §36's and §95's `:has(+ ...)`
+   gates are about theirs.
+   -------------------------------------------------------------------------- */
+.app .page:has(> .sec.pf-cs) > .modhead{
+  position:sticky;top:0;z-index:4;
+  background-color:var(--background)}
+.app .page > .sec.pf-cs{
+  position:sticky;top:var(--pf-stick,0px);z-index:3;
+  background-color:var(--background)}
+
+/* AND EVERY SECTION ON THE PAGE CLEARS THE TWO STICKY BLOCKS WHEN IT IS
+   SCROLLED TO. `pfScroll` uses `scrollIntoView`, which puts the element's top
+   at the scrollport's top — which is BEHIND the band and the strip, so a
+   section opened for editing arrived with its own heading and its Save control
+   hidden under them. `scroll-margin-top` is the property that exists for
+   exactly this, and it takes the band's measured height plus the strip's own
+   (a stated 49: one row of 48px cells and the `.cs`'s own bottom border, and
+   unlike the band it does not change with the frame) plus a line of air.
+
+   IT WAS 89 UNTIL 3 Sep 2026 AND THAT NUMBER WAS THE BUG, NOT A MEASUREMENT.
+   The strip really did measure 89 — 48 of tabs, 16 of `.cs` margin and 24 of
+   section padding — and the two below it were the "gapped row" the note over
+   §111.6a's second half describes. With both gone the strip is its tab row, so
+   this clearance is too, and a section scrolled to now lands directly under the
+   tabs rather than 40px below them.
+
+   ON EVERY `.sec` OF THIS PAGE, not only the six that are scrolled to, because
+   the property costs nothing where nothing scrolls and a seventh section added
+   later would otherwise have to remember. */
+.app .page:has(> .sec.pf-cs) > .sec{
+  scroll-margin-top:calc(var(--pf-stick,0px) + 49px + var(--s05))}
+
+/* ------------------------------------------------------------------ 111.10a ---
+   AND THE RAILS HAVE TO OUTRANK THEM — THE ONE THING §111.10 TOOK AND DID NOT
+   PUT BACK
+
+   Maryam, 3 Sep 2026: "on the profile module the side borders of the content
+   window are not starting from the top." They were not, and it is this layer's
+   own doing rather than anything about the profile's content.
+
+   §10.1 draws the two rails as `.page::before` / `::after` — absolutely
+   positioned, `top:0;bottom:0`, `z-index:1` — and its note is already the whole
+   argument for what went wrong: "the rails must outrank the rules they cross,
+   or the lattice looks broken where a section happens to end". §111.10 then put
+   two of this page's children at `z-index:4` and `3` AND gave them an opaque
+   `--background`, because a sticky block that the page shows through is not
+   sticky. Those two are `.page`'s own children in `.page`'s stacking context
+   (it is `position:relative` with no `z-index`, so it makes none), and they are
+   the full width of it — so for the height of the band and the strip the rails
+   were painted over. The column looked as though it began at the first panel.
+
+   NOTHING WARNED AND NOTHING ELSE MOVED, which is why it shipped: the rails are
+   still drawn, still 1px, still exactly where they were. Only two blocks of the
+   page's own furniture were in front of them.
+
+   `z-index:5` RATHER THAN TAKING THE STICKY GROUND OFF. The ground is what
+   §111.10 is for. The rails are 1px, `pointer-events:none` and at the column's
+   edge, so there is nothing for them to be in front OF; everything that must
+   cover them — a sheet, the modal, Tal's dock — is `position:fixed` outside
+   `.page` at a far higher level.
+
+   GATED ON THE STRIP, per §111.10's own reasoning: this is a judgement about
+   one page's furniture, so no other page's rails change level. */
+@container app (min-width:760px){
+  .app .page:has(> .sec.pf-cs)::before,
+  .app .page:has(> .sec.pf-cs)::after{z-index:5}
+}
+
+/* -------------------------------------------------------------------- 11 ---
+   THIS PAGE HAS NO LABEL COLUMN, SAID ONCE
+
+   Maryam, 3 Sep 2026: "I do not need any section desc in the settings page."
+   Eleven `.all-desc` sentences came off the Profile module — five over the read
+   sections, five over the forms, one over each of the two settings tabs and one
+   over Interview scenes — and every one of them was doing a second job nobody
+   asked it to do.
+
+   `.all-desc` IS §10.15's OPT-OUT, AND TRAP 13 SAYS SO IN AS MANY WORDS. §16
+   states `.sec:has(> .all-desc){display:block}` at desktop, so a headed section
+   with a description under it never gets the 184px label column. Take the
+   descriptions out and the opt-out goes with them — CLAUDE.md's own phrasing
+   for §69: "Adding a wrapper is not the only way to lose an opt-out — removing
+   content does it too." Four of the eleven sections would have fallen in
+   (Interview scenes, Skills, Interests, Notifications) and each one's heading
+   would have set on three or four lines in 184px beside its own content.
+
+   SO IT IS STATED FOR THE PAGE RATHER THAN FOR THE FOUR. Every section on
+   Profile is a record with an Edit control on its heading row, which is
+   §10.15's own strongest case for the heading going ABOVE — and a page where
+   some headings sit beside their content and some above it is the "random
+   placements" §73's `aiHead` was minted to stop. One gate, `:has(> .sec.pf-cs)`,
+   so a seventh section added later does not have to remember; and the four
+   declarations are §10.15's own for the `.sec-h`, copied for what that rule
+   DOES today rather than for what it says — §69's lesson, so the dead
+   `padding:0 var(--pad-x)` is not restated (§14.2 zeroes both halves of a
+   headed section on a railed page and would win anyway).
+   -------------------------------------------------------------------------- */
+@container app (min-width:900px){
+  .app .page:has(> .sec.pf-cs) > .sec{display:block}
+  .app .page:has(> .sec.pf-cs) > .sec > .sec-h{
+    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
+}

@@ -60,9 +60,22 @@
    why the pair looked subtly out of true rather than obviously broken: one
    of the two members was centred and the other was not.
    -------------------------------------------------------------------------- */
+/* AND `.agt-act` IS THE FOURTH SURFACE, ADDED 4 Sep 2026 (Maryam: "mid align
+   ask tal with the star"). §114's agents table draws the same control and was
+   not on this list, so it had the same 4px that everything above describes —
+   measured: the mark's mid-point at 286 against the label's at 282, with the
+   label's computed margin reading `0px 0px 8px`.
+
+   THE FIX GOES HERE RATHER THAN IN §114 because the bug is not that table's:
+   it is `.lbl` meaning two things, and this is the one place in the build that
+   says so. A fifth surface drawing `.tal-star` needs one more entry, and the
+   real repair — renaming one of the two `.lbl`s — is still the thing that would
+   retire the list. Its sibling is §114.3a's note about `.f`, which is the same
+   collision one class over. */
 .app .agh-book .tal-star .lbl,
 .app .agh .tal-star .lbl,
-.app .ag .tal-star .lbl{margin:0}
+.app .ag .tal-star .lbl,
+.app .agt-act .tal-star .lbl{margin:0}
 
 /* --------------------------------------------------------------------- 3 ---
    THE PLATE AND THE STEPPER ARE ONE COLUMN OF BANDS

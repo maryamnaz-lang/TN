@@ -179,7 +179,20 @@
      24 + 24 + 24 = 72 at desktop and 48 below 900, where this query is not in
      play. §105.9 states the zero and is (0,5,0); this selector is fourteen
      classes, so per trap 4 it can only be excluded here. */
-  .app .page > .sec:not(.cap-sec):not(:has(> .lead-b)):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){
+  /* `:not(.pf-cs)` — THE PROFILE'S STICKY TAB STRIP ENDS AT ITS OWN LAST
+     PIXEL, and this rule was the reason it did not (Maryam, 3 Sep 2026: "there
+     is really something beneath the tabs on My profile page… remove that gapped
+     row"). §111.6a states `padding-bottom:0` on that section and says why — the
+     `.cs` already carries a `border-bottom`, so anything under it is a second
+     boundary with white between the two. That rule is (0,3,0) and this one is
+     fourteen classes inside a container query, so it lost at desktop and held
+     on a phone: the exact half-landing trap 4 exists to warn about.
+     WHAT IT COST IS BIGGER THAN 24px OF PADDING, because §111.10 makes that
+     section STICKY. The 24 here plus the `.cs`'s own 16px margin (also zeroed,
+     in §111.6a) made the stuck strip 40px taller than the tab row, so every
+     section scrolling under it was clipped 40px below the tabs' border — a
+     white band with the top of the next block cut off inside it. */
+  .app .page > .sec:not(.cap-sec):not(.pf-cs):not(:has(> .lead-b)):not(:has(+ .sec > .sec-h)):not(:has(+ .sec > .eyebrow)):not(:has(+ .lvl-hero)):not(:has(+ .acc)):not(:has(+ .tabs)):not(:last-child):not(:is(.dark-card,:has(> .stats:last-child),:has(> .facts:last-child),:has(> .certban:last-child),:has(> .tile:last-child),:has(> .note:last-child)):is(:has(+ .sec.dark-card),:has(+ .sec > .stats:first-child),:has(+ .sec > .facts:first-child),:has(+ .sec > .certban:first-child),:has(+ .sec > .tile:first-child),:has(+ .sec > .note:first-child))):not(:has(> .plate):has(+ .sec.sec-stp)):not(:has(> .plate):has(+ .sec.tint)):not(:has(> .plate):has(+ .sec.sec-cs)):not(:has(> .lvl-hero):has(+ .sec.sec-stp)):not(:has(> .lvl-hero):has(+ .sec.tint)):not(:has(+ .sec > .lead-b)):not(:has(+ .sec.sec-out)):not(:has(+ .sec.ldr-dm-sec)):not(.sec-call):not(.dark-card):not(.sec-band){
     padding-bottom:var(--s06)}
   /* and the block under it pays half at the top. Same condition on the
      PREVIOUS element, which is what the sibling combinator is for. */

@@ -58,8 +58,12 @@
 /* THE SEPARATOR IS A 12px CHEVRON (Maryam, 31 Aug 2026), drawn as a real
    `<svg>` by `drawTrail` (ai11.js) rather than as `content:'/'` on a
    `::before` — that function's note has the argument, and the short version is
-   that the stand-in face carries 68 glyphs and a chevron is not one of them,
-   and that there is a single call site to put a mark into.
+   that there is a single call site to put a mark into, so the official
+   Material Symbols chevron costs nothing to use and stays in step with every
+   other mark in the product. (The other half of that argument was coverage —
+   the old face carried 68 glyphs and `›` was not one — and it expired with
+   the 4 Sep 2026 move to Plus Jakarta Sans, which does carry it. One cut of
+   one icon set is still the reason, and it was always the better one.)
 
    12 AGAINST 16px TYPE, WHICH IS §70.2a's REASONING AGAIN: below the cap
    height of the words a mark reads as punctuation between them, at or above it
@@ -213,8 +217,35 @@
 .app .acct-i{
   display:flex;align-items:center;gap:var(--s04);
   padding:var(--s04) var(--s05);
-  text-align:left;width:100%}
-.app .acct-i + .acct-i{border-top:1px solid var(--rule)}
+  text-align:left;width:100%;position:relative}
+/* THE DIVIDER IS INSET TO THE CONTENT, NOT RAIL TO RAIL (Maryam, 3 Sep 2026:
+   "the dividers should be of content width not wall to wall attached").
+
+   IT WAS `border-top` ON THE ROW, so it ran the menu's full 248px and met the
+   panel's own 1px border at both ends — three lines forming two corners, which
+   reads as a table of rows rather than as one menu with items in it. Inset by
+   the row's own `var(--s05)` the line starts and stops where the words do, and
+   the panel's border is the only thing that closes the block.
+
+   A PSEUDO-ELEMENT, WHICH IS §72.1's TECHNIQUE AND ITS REASON. A border cannot
+   be inset — it is the edge of the box — so the choice is a shorter element or
+   a `background-image` gradient, and §72's own note settles it: an absolutely
+   positioned 1px rule takes no layout, so the row's height and the menu's
+   height are unchanged and nothing had to be re-measured. `left`/`right` read
+   the SAME token the padding does, so the line and the text cannot drift apart
+   if the row's padding changes.
+
+   ON `+ .acct-i` STILL, so the first row has none. A rule above the first item
+   would sit 1px under the panel's own top border — §14's "TWO 1px rules one
+   pixel apart".
+
+   `position:relative` GOES ON `.acct-i` ABOVE, and it is safe: `.acct-i-mk` is
+   the only positioned thing inside the row and it establishes its own
+   containing block for the portrait's `inset:0`. Checked — the face still
+   fills its 24px box. */
+.app .acct-i + .acct-i::before{
+  content:'';position:absolute;top:0;left:var(--s05);right:var(--s05);
+  height:1px;background:var(--rule)}
 .app .acct-i:hover{background-color:var(--overlay-hover);cursor:pointer}
 .app .acct-i-mk{
   flex:none;width:24px;height:24px;

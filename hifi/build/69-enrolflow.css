@@ -86,13 +86,50 @@
    ------------------------------------------------------------------------ */
 .app .sec.tint.found:not(.on):has(> .all-desc){padding-bottom:var(--s06)}
 
-/* AND THE LEDE CLEARS THE HEADING THE SAME WAY IT DOES OPEN OR SHUT.
-   §65 gives `.sec.found > .sec-h` its bottom margin inside the desktop query
-   only, where the section is `display:block`; below 900 the head row is the
-   grid's own child and the sentence sat against it. One margin, both widths,
-   on the lede rather than on the head — the head is shared with the two
-   dashboards and this sentence is not. */
-.app .sec.found > .all-desc{margin-top:var(--s04)}
+/* THE LEDE SITS UNDER THE HEADING'S OWN TEXT, AND CLOSE TO IT (Maryam, 3 Sep
+   2026, of the Cohort 41 record: "the cohort desc should align and close to the
+   'Your Cohort 41 record'").
+
+   TWO THINGS WERE WRONG AND THEY ARE MEASURED, NOT GUESSED. At 1280 the
+   heading's text starts at x=312 and the sentence started at x=284 — 28px out,
+   which is exactly `.found-chev`'s 20px box plus `.found-t`'s own `--s04` gap.
+   And the pair read 12px apart where §01's token for a heading and its
+   description is 8.
+
+   THE GAP IS NOW THE HEADING'S TO GIVE. This rule used to state
+   `margin-top:var(--s04)` and its reason was real: §65 gives `.sec.found >
+   .sec-h` a bottom margin only inside the desktop query, so below 900 the
+   sentence sat against the head row. §16.502 has since stated the pair
+   unconditionally — `.app .page .sec-h:has(+ .all-desc){margin-bottom:
+   var(--sec-desc-gap)}`, at both widths — so the head DOES give the gap now,
+   and this margin was competing with it: sibling margins collapse to the
+   larger, so 12 beat 8 and the token had no effect on any disclosure in the
+   build. `0` lets §16's 8 through. **The old reason expired rather than being
+   wrong**, which is why the rule is re-pointed and not deleted: the selector is
+   still the one place `.found`'s lede is addressed.
+
+   THE INDENT IS `calc(20px + var(--s03))` AND BOTH HALVES ARE READ OFF THE TWO
+   RULES THAT PRODUCE THEM. The 20 is `.found-chev`'s stated box (§65.112) and
+   `--s03` is `.found-t`'s own `gap` (§65.95) — so the sentence stays under the
+   heading's text if either one moves. Written with the literal 20 because that
+   is how §65 states the chevron; there is no token for it.
+
+   IT SHIPPED WITH `--s04` FOR ONE BUILD AND MEASURING IS WHAT CAUGHT IT.
+   `--s04` is 12 and the gap is 8, so the lede landed at x=316 against the
+   heading's 312 — four pixels PAST it, which is the same class of error as
+   being 28 short and is far harder to see. The check is `descLeft === h2Left`,
+   not "does it look about right".
+
+   A `text-indent` WOULD NOT DO: the sentence wraps at this width and only its
+   first line would move.
+
+   BOTH DISCLOSURES THAT DRAW A LEDE MOVE, and that is the point rather than a
+   side effect — `V.enrol`'s "How your cohort works" and this one are one
+   component, and a lede aligned to the chevron on one page and to the heading
+   on the other is the drift this file keeps deleting. */
+.app .sec.found > .all-desc{
+  margin-top:0;
+  margin-left:calc(20px + var(--s03))}
 
 /* ------------------------------------------------------------------ 3 ---
    A SECTION WHOSE CONTENT IS A PERSON OPTS OUT OF THE LABEL COLUMN

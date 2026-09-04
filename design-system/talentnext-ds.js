@@ -313,6 +313,19 @@ microphone:'M480-400q-50 0-85-35t-35-85v-240q0-50 35-85t85-35q50 0 85 35t35 85v2
    across a desk. Outlined, the slash reads BETTER than it did filled: it now
    cuts through an open form instead of across a solid one. */
 micOff:'M672-377q-14-8-18-24.5t4-30.5q7-11 11.5-23.5T676-481q4-17 15.5-28t28.5-11q17 0 28 12t9 29q-3 23-10.5 45T727-392q-8 14-24.5 18.5T672-377ZM480-594Zm0-286q50 0 85 35t35 85v190q0 20-12.5 30T560-530q-15 0-27.5-10.5T520-571v-189q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760v30q0 20-12.5 30T400-690q-15 0-27.5-10.5T360-731v-29q0-50 35-85t85-35Zm-40 720v-83q-92-12-157.5-77.5T203-479q-2-17 9-29t28-12q17 0 29 11.5t15 28.5q14 71 69 115.5T480-320q34 0 64.5-10.5T600-360l57 57q-29 23-63.5 39T520-243v83q0 17-11.5 28.5T480-120q-17 0-28.5-11.5T440-160Zm324 76L84-764q-11-11-11-28t11-28q11-11 28-11t28 11l680 680q11 11 11 28t-11 28q-11 11-28 11t-28-11Z',
+/* TAL'S OWN VOICE, MUTED AND NOT — the onboarding gate's speaker control
+   (§107 §0d), added 3 Sep 2026. Material Symbols Rounded at FILL 0 on the
+   `0 -960 960 960` grid, pasted from
+   `symbols/web/volume_up/materialsymbolsrounded/volume_up_24px.svg` and its
+   `volume_off` sibling rather than drawn, per this file's own rule.
+
+   THEY ARE A PAIR AND THEY ARE NOT A `FILL` PAIR, which is the distinction
+   trap 7 draws. `star`/`starOutline` and `checkFilled`/`checkOutline` are one
+   glyph at two fill values, where the axis carries the state; these are two
+   different glyphs — one has a slash through it — so both sit at FILL 0 and
+   the difference the reader sees is the slash, not the weight. */
+volume:'M760-481q0-83-44-151.5T598-735q-15-7-22-21.5t-2-29.5q6-16 21.5-23t31.5 0q97 43 155 131.5T840-481q0 108-58 196.5T627-153q-16 7-31.5 0T574-176q-5-15 2-29.5t22-21.5q74-34 118-102.5T760-481ZM280-360H160q-17 0-28.5-11.5T120-400v-160q0-17 11.5-28.5T160-600h120l132-132q19-19 43.5-8.5T480-703v446q0 27-24.5 37.5T412-228L280-360Zm380-120q0 42-19 79.5T591-339q-10 6-20.5.5T560-356v-250q0-12 10.5-17.5t20.5.5q31 25 50 63t19 80ZM400-606l-86 86H200v80h114l86 86v-252ZM300-480Z',
+volumeOff:'M671-177q-11 7-22 13t-23 11q-15 7-30.5 0T574-176q-6-15 1.5-29.5T598-227q7-3 13-6.5t12-7.5L480-368v111q0 27-24.5 37.5T412-228L280-360H160q-17 0-28.5-11.5T120-400v-160q0-17 11.5-28.5T160-600h88L84-764q-11-11-11-28t11-28q11-11 28-11t28 11l680 680q11 11 11 28t-11 28q-11 11-28 11t-28-11l-93-93Zm89-304q0-83-44-151.5T598-735q-15-7-22-21.5t-2-29.5q6-16 21.5-23t31.5 0q97 43 155 131t58 197q0 33-6 65.5T817-353q-8 22-24.5 27.5t-30.5.5q-14-5-22.5-18t-.5-30q11-26 16-52.5t5-55.5ZM591-623q33 21 51 63t18 80v10q0 5-1 10-2 13-14 17t-22-6l-51-51q-6-6-9-13.5t-3-15.5v-77q0-12 10.5-17.5t20.5.5Zm-201-59q-6-6-6-14t6-14l22-22q19-19 43.5-8.5T480-703v63q0 14-12 19t-22-5l-56-56Zm10 328v-94l-72-72H200v80h114l86 86Zm-36-130Z',
 videoOff:'m720-540 126-126q10-10 22-5t12 19v344q0 14-12 19t-22-5L720-420q0 17-11.5 28.5T680-380q-17 0-28.5-11.5T640-420v-300H360q-20 0-30-12.5T320-760q0-15 10-27.5t30-12.5h280q33 0 56.5 23.5T720-720v180Zm74 486L54-794q-11-11-11-28t11-28q11-11 28-11t28 11l740 740q11 11 11 28t-11 28q-11 11-28 11t-28-11ZM498-575ZM382-464ZM160-800l80 80h-80v480h480v-80l80 80q0 33-23.5 56.5T640-160H160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800Z',
 screenShare:'M440-487v127q0 17 11.5 28.5T480-320q17 0 28.5-11.5T520-360v-126l36 35q12 11 28 11.5t28-11.5q12-12 12-28.5T612-508L508-612q-12-12-28-12t-28 12L348-508q-12 12-11.5 28t12.5 28q12 11 28 11.5t28-11.5l35-35ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm0 0v-480 480Z',
 raiseHand:'M520-920q17 0 28.5 11.5T560-880v360q0 17-11.5 28.5T520-480q-17 0-28.5-11.5T480-520v-360q0-17 11.5-28.5T520-920Zm-160 40q17 0 28.5 11.5T400-840v320q0 17-11.5 28.5T360-480q-17 0-28.5-11.5T320-520v-320q0-17 11.5-28.5T360-880ZM500-40q-142 0-241-99t-99-241v-380q0-17 11.5-28.5T200-800q17 0 28.5 11.5T240-760v380q0 109 75.5 184.5T500-120q109 0 184.5-75.5T760-380v-140q-17 0-28.5 11.5T720-480v120q0 17-11.5 28.5T680-320h-80q-33 0-56.5 23.5T520-240v40q0 17-11.5 28.5T480-160q-17 0-28.5-11.5T440-200v-40q0-66 47-113t113-47h40v-400q0-17 11.5-28.5T680-840q17 0 28.5 11.5T720-800v207q10-3 19.5-5t20.5-2h40q17 0 28.5 11.5T840-560v180q0 142-99 241T500-40Zm40-320Z',
@@ -1006,4 +1019,444 @@ function dsQuizRose(dims, score){
     + '<text x="' + CX + '" y="' + (CY+14) + '" text-anchor="middle" class="qz-mids">of 100</text>'
     + marks + '</svg>'
     + '<div class="qz-key">' + rows + '</div></div>';
+}
+
+
+/* ==========================================================================
+   THE MARKUP HALF — the components as functions
+
+   The stylesheet knows how a component looks; these know what DOM it looks
+   for. Extracted from the portal's own `views.js` on every build, so a
+   component that changes shape there changes shape here — which is the whole
+   point, and the thing this file did not do for its first year.
+
+       el.innerHTML = dsAiHead({mark:true, title:'Who needs attention',
+                                desc:'Six accounts are awaiting review.',
+                                act:'<button class="btn btn-t">Review all</button>'})
+
+       dsStatCell(I.group, 'Total users', '1,284', 'across every role')
+       dsCrow({who:{n:'Priya Nair', i:'PN', img:AV.priya}, role:'Talent Agent',
+               x:'Level interviews', when:'Today, 6:30 PM', mins:45,
+               label:'Level interview'})
+
+   EVERY NAME IS PREFIXED `ds`. Three portals already declare bare `crow`,
+   `ph`, `aiHead` and `statCell` in their own documents, and shipping those
+   names would redeclare them — fatal for a `const`, a silent shadow for a
+   `function`. So adopting these is additive and one call at a time.
+
+   TWO TAKE AN ARGUMENT THE PORTAL READS OFF STATE:
+     dsPh(title, sub, act, backTo, mark)   backTo is a VIEW NAME; the portal's
+                                           own `bk()` reads `S.hist` to decide
+                                           between a history pop and a route,
+                                           and a hand-authored page has no
+                                           history stack.
+     dsFoundHead(title, key, open)         `open` is the boolean the portal
+                                           keeps in `S.disc[key]`. §65's split
+                                           still applies: the DOM class carries
+                                           the click, your state survives the
+                                           next render.
+
+   WHAT IS NOT HERE, AND WILL NOT BE. Anything that needs the portal's `S`:
+   Tal's thread, the recommendation's rotation, the render passes that build
+   the head band (`placeBand`, `placeDark`, `placeTopbar`). A page that wants
+   a head band assembles it — see DESIGN-SYSTEM.md.
+   ========================================================================== */
+/* `dsCrow` takes the appointment RECORD. The portal's own `crow` accepts a
+   key into `CALL_ROW` as a shorthand for its own three appointments; that
+   table is content and does not cross, so the shorthand says so rather than
+   drawing a row of blanks. */
+function dsNoRecord(k){
+  throw new TypeError('dsCrow(record, opts): expected the appointment record, got '
+    + JSON.stringify(k) + '. The design system ships no CALL_ROW — pass '
+    + '{who:{n,i,img}, role, x, when, mins, label}.');
+}
+
+/* ---- the tables the builders read ---- */
+
+const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'group',
+               points:'trophy', certificate:'certificate', time:'time', community:'chat'};
+
+const STEP_IC = [
+  [/re-?interview|interview/i,                     'video'],
+  [/vetting|background|reference|identity|verif/i,  'shield'],
+  [/quiz/i,                                         'chart'],
+  [/consultant|call/i,                              'chat'],
+  [/level|report|rung|promot|certif/i,              'certificate'],
+  [/enrol|cohort/i,                                 'group'],
+  [/listing|payout|\bpay\b|fee|price|earn/i,        'wallet'],
+  [/training|calibration|module|chapter|course|90/i,'book'],
+  [/account|application|apply|profile|details/i,    'document'],
+  [/book|slot|date|session/i,                       'calendar']
+];
+
+const STPS_W = {done:'Completed', on:'In progress'};
+
+const LVL_CODES = ['E','B','T'].flatMap(b => [1,2,3,4,5].map(n => b + n));
+
+const JOIN_NOW = /\b(now|starting|imminent|in \d+ ?(m|min|mins|minute|minutes)\b)/i;
+
+const JOIN_EARLY = 5;
+
+const RUNG = {E1:1,E2:2,E3:3,E4:4,E5:5};
+
+const BDG = [
+  {n:'Bronze',       d:'Accumulate 2,500 points',   v:200, need:2500,  c:'#8a3800'},
+  {n:'Silver',       d:'Accumulate 5,000 points',   v:300, need:5000,  c:'#6f6f6f'},
+  {n:'Gold',         d:'Accumulate 10,000 points',  v:400, need:10000, c:'#b28600'},
+  {n:'Get Involved', d:'Post in the community',     v:100, need:null,  c:'var(--dv-3)'}
+];
+
+const RANKS = [
+  {n:'1-Star', d:'Everyone who signs up is a 1-Star',              v:250},
+  {n:'2-Star', d:'Earn the Silver badge and the Get Involved badge',v:500},
+  {n:'3-Star', d:'Earn the Gold badge',                             v:1000}
+];
+
+
+/* ---- the builders ---- */
+
+const dsPhSub = sub => {
+  const parts = String(sub).split(/\s*(?:&middot;|·)\s*/).map(s => s.trim()).filter(Boolean);
+  if(parts.length < 2) return `<p>${sub}</p>`;
+  return '';
+};
+
+function dsPh(title,sub,act,backTo,mark){
+  return `<div class="ph${act?' ph-has-act':''}${mark?' ph-you':''}">
+    <div class="ph-main">${mark||''}<div class="ph-top">${backTo?`<button class="ph-back" data-go="${backTo}">${I.arrowLeft}<span class="ph-back-t">Back</span></button>`:""}<h1>${title}</h1></div>${sub?dsPhSub(sub):''}</div>
+    ${act?`<div class="ph-act">${act}</div>`:''}</div>`;
+}
+
+function dsAvatar(a,size){
+  return `<span class="av-ph"${size?` style="width:${size}px;height:${size}px"`:''}>
+    <i>${a.i}</i><img src="${a.img}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`;
+}
+
+function dsStars(n){
+  let out='';
+  /* THE LIT SLOT IS A DIFFERENT GLYPH, NOT THE SAME ONE IN A DIFFERENT COLOUR.
+     Under the filled icon set this printed `star` five times and let the `.f`
+     class carry the whole rating in colour; the set is linear now, so an unlit
+     star and a lit one would differ by hue alone at 12px. `star` is FILL 1 and
+     `starOutline` FILL 0 — see the note over the pair in icons.js. `.f` stays,
+     because the colour is still right and §26 keys on it. */
+  for(let i=1;i<=5;i++) out += `<svg class="${i<=Math.round(n)?'f':''}" viewBox="0 -960 960 960">${inner(i<=Math.round(n)?'star':'starOutline')}</svg>`;
+  return `<span class="stars">${out}</span>`;
+}
+
+function dsStatCell(ic, label, value, note, jump, at){
+  const body = `${ic ? `<span class="stat-ic">${ic}</span>` : ''}
+      <div class="stat-top"><div class="l">${label}</div><div class="n">${value}</div></div>
+      <div class="d">${note}</div>`;
+  if(at)   return `<button class="stat stat-jump" ${at}>${body}</button>`;
+  if(jump) return `<button class="stat stat-jump" data-jump="${jump}">${body}</button>`;
+  return `<div class="stat">${body}</div>`;
+}
+
+const dsGcard = (kind,tag,title,sub,go,art,at) => `<button class="tile clk gcard" data-go="${go}"${at ? ' ' + at : ''}>
+  ${art
+    ? `<span class="gcard-art">${art.i ? `<i>${art.i}</i>` : ''}<img src="${art.src}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
+    : `<span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>`}
+  <span class="gcard-b">
+    ${tag?`<span class="eyebrow">${tag}</span>`:''}
+    <h3>${title}</h3><span class="sub">${sub}</span>
+  </span>
+  <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+</button>`;
+
+const dsFoundHead = (title, key, open) => `<div class="sec-h found-h">
+    <button class="found-t" data-found="${key||'report'}" aria-expanded="${open?'true':'false'}">
+      <span class="found-chev">${I.chevRight}</span><h2>${title}</h2></button>
+  </div>`;
+
+function dsAiHead({mark, title, desc, act, extra, under}){
+  return `<div class="sec-h aih">
+    <div class="aih-b">
+      <h2 class="aih-t">${mark ? '<i class="aih-mk"></i>' : ''}${title}${extra || ''}</h2>
+      ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+      ${under || ''}
+    </div>
+    ${act ? `<div class="aih-a">${act}</div>` : ''}
+  </div>`;
+}
+
+function dsStepIcon(lab){
+  const t = String(lab||'').replace(/&[a-z]+;|&#\d+;/gi,' ');
+  for(const [re,k] of STEP_IC) if(re.test(t)) return I[k];
+  return I.circle;
+}
+
+function dsStepper(steps, title){
+  /* THE MARK KEEPS THE STEP'S SUBJECT AT EVERY STATE, so a column means the
+     same thing whatever has happened to it and the row reads as five subjects
+     rather than as three ticks and two pictures. §33.7b's dropdown swaps the
+     icon for a tick, which is right in a list of five rows where "done" is what
+     the reader came for; here the state is on the mark's own ground and in the
+     word under the label, twice, so the icon is free to say what the step IS.
+     `stepIcon` above is where the subject table and its argument live. */
+  const mark = x => `<span class="stps-m">${dsStepIcon(x.lab)}</span>`;
+  return `<div class="stp stp-open stp-titled">
+    <div class="stp-top"><h2 class="u-h3">${title||'Your journey so far'}</h2></div>
+    <ol class="stps">
+      ${steps.map(x=>`<li class="stps-i ${x.st}"${x.st==='on'?' aria-current="step"':''}>${mark(x)}
+        <span class="stps-b"><span class="pi-lab">${x.lab}</span>
+          <span class="stps-st">${STPS_W[x.st]||'Upcoming'}</span>${
+          x.sec?`<span class="pi-sec">${x.sec}</span>`:''}</span></li>`).join('')}
+    </ol>
+  </div>`;
+}
+
+const dsRungOf  = c => RUNG[c] || 2;
+
+function dsLadder(cur,codes){
+  const r = dsRungOf(cur);
+  return `<div class="ladder">${LVL_CODES.map((c,i)=>
+    `<i class="${i<r-1?'done':(i===r-1?'on':'')}">${codes?`<b>${c}</b>`:''}</i>`).join('')}</div>
+  <div class="ladder-lab"><span>Explorer</span><span>Builder</span><span>Trailblazer</span></div>`;
+}
+
+const dsNextBadge = pts => BDG.filter(b=>b.need && b.need>pts).sort((a,b)=>a.need-b.need)[0] || null;
+
+function dsStandRow(g){
+  const nb = dsNextBadge(g.pts);
+  const bdgArt = ['bronze','silver','gold','involved'][Math.max(0, Math.min(3, g.badges-1))];
+  /* THE LABEL AND THE FIGURE ARE ONE LINE. `.stand-top` is the only structural
+     change: the label used to stack above the figure, which put four things in
+     a column and made each cell read as a little paragraph. Paired on one line
+     — name hard left, number hard right — the three cells line up as a table
+     you can read across, and the note keeps the full width beneath them.
+
+     AND THE THIRD CELL IS THE SAME AS THE OTHER TWO. Points used to carry a
+     progress bar under its note, which made one cell of three a row taller
+     than its neighbours: the box took its height from that cell, and the two
+     without a bar had their content stranded above centre in the space it
+     left. The bar was also saying what the note already says in words —
+     "1,405 to Bronze" is the same fact, and the only one of the two you can
+     read without measuring a stripe. Gone, so all three cells hold two lines,
+     the box is as tall as it needs to be, and every cell's content sits on
+     the same centre line. §29.15 has the rest. */
+  const cell = (art, artOff, label, value, note) => `
+    <button class="stand-c" data-go="rewards">
+      <span class="stand-mk${artOff?' none':''}"><img src="${art}" alt=""></span>
+      <span class="stand-b">
+        <span class="stand-top">
+          <span class="stand-l">${label}</span>
+          <span class="stand-v">${value}</span>
+        </span>
+        <span class="stand-d">${note}</span>
+      </span>
+    </button>`;
+  return `<div class="stand">
+    ${cell(AWARD.points, false, 'Points', g.pts.toLocaleString(),
+      nb ? (nb.need-g.pts).toLocaleString()+' to '+nb.n : 'Every badge earned')}
+    ${cell(AWARD[bdgArt], !g.badges, 'Badges', g.badges+' <small>of 4</small>',
+      g.badges ? BDG[g.badges-1].n+' earned' : 'Bronze at 2,500 points')}
+    ${cell(AWARD['rank'+g.rank], false, 'Rank', RANKS[g.rank-1].n,
+      g.rank<3 ? RANKS[g.rank].d : 'The top of the ladder')}
+  </div>`;
+}
+
+const dsJoinClock = (w) => {
+  const m = /\btoday\b[,\s]+(\d{1,2}):(\d{2})\s*([ap])\.?m\.?/i.exec(String(w || ''));
+  if(!m) return null;
+  let h = +m[1] % 12;
+  if(/p/i.test(m[3])) h += 12;
+  const d = new Date();
+  d.setHours(h, +m[2], 0, 0);
+  return d.getTime();
+};
+
+function dsJoinLive(when, mins){
+  if(JOIN_NOW.test(String(when || ''))) return true;
+  const t = dsJoinClock(when);
+  if(t === null) return false;
+  const now = Date.now();
+  return now >= t - JOIN_EARLY * 60000 && now <= t + (mins || 45) * 60000;
+}
+
+const dsJoinShut = (w) => {
+  const t = dsJoinClock(w);
+  if(t === null) return 'Opens when the call starts';
+  const d = new Date(t - JOIN_EARLY * 60000);
+  const h = d.getHours() % 12 || 12;
+  return `You can join from ${h}:${String(d.getMinutes()).padStart(2,'0')} ${d.getHours() < 12 ? 'AM' : 'PM'}`;
+};
+
+function dsCrow(kind, o){
+  const c = (typeof kind === 'object' && kind) ? kind : dsNoRecord(kind);
+  const p = c.who;
+  const soon = DS_PLATE_SOON.test(c.when);
+  o = o || {};
+  const xl = c.xl === undefined ? 'Expertise:' : c.xl;
+  /* the gate reads the row's own `when`, so the button and the card's heading
+     row are two readings of one string (`bkStamp`'s rule) */
+  const gated = o.gate !== false;
+  const gate = gated && !dsJoinLive(c.when, c.mins);
+  return `<div class="crow${soon ? ' urgent' : ''}">
+      ${o.when === false ? '' : `<div class="crow-when">
+        <b>${dsCallLeft(c.when)}</b>
+        <span>${c.label}</span>
+      </div>`}
+      <div class="crow-who">
+        ${''/* THE `<img>` IS OMITTED WHEN THERE IS NO PHOTOGRAPH, rather than
+               written with an undefined `src`. The leader's weekly call is the
+               first row whose subject is not a person — the mark is the cohort's
+               number — and `src="undefined"` is a real request that 404s: the
+               `onerror` hides the element, so the card LOOKS right and the
+               console carries a failed resource on every render, which is
+               exactly what `respcheck` reads as a broken screen. The `<i>` is
+               the mark in that case (§71 normalises its `font-style`). */}
+        ${''/* `c.cover` MEANS "THIS MARK IS ARTWORK, NOT A FACE", and it is a
+               separate field from `img` because the two are different questions:
+               `img` is whether there is a picture, `cover` is what SHAPE the slot
+               should be. A face wants the 78px square §71.405 draws; a cohort's
+               course cover is a ~1.8:1 title card, and a square crop of one
+               throws away the half that carries the words (§86 is the argument
+               and the ratio). One flag, one class, and the four call sites that
+               draw a person are untouched. */}
+        <span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i}</i>${p.img
+          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
+        <div class="crow-b">
+          <p class="crow-id"><span class="crow-n">${p.n}</span>
+            ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
+          <p class="crow-role">${c.role}</p>
+          <p class="crow-x">${xl ? `<b>${xl}</b> ` : ''}${c.x}</p>
+        </div>
+      </div>
+      ${''/* `o.join === false` DROPS THE PRIMARY AND PROMOTES THE SECONDARY
+             (Maryam, 31 Aug 2026). The leader's card carried a Join that
+             §81 gates shut for twenty-three hours a day, so what the card
+             showed almost always was a dead control beside a live one —
+             and §60's rule is that a dead control on a live surface is
+             worse than a missing one. §81's gate was the honest answer
+             while Join was the card's POINT; it is not the point here, so
+             the button goes rather than being explained.
+             WITH THE PAIR GONE THE SURVIVOR CHANGES SHAPE: it loses its
+             leading subject icon and takes a TRAILING `arrowRight`, which
+             is this product's mark for "this takes you somewhere" and ends
+             forty-odd buttons already. `ic-l` comes off with the icon —
+             that class exists to seat a leading mark. Nothing else in the
+             product passes `join`, so the candidate's three call sites and
+             `callRow` render byte-identically. */}
+      <div class="crow-a${o.join === false ? ' crow-a1' : ''}">
+        ${''/* AND THE SECONDARY'S ATTRIBUTE IS THE RECORD'S, because not every
+               way onward is a `data-go`. The leader's weekly-call card opens the
+               brief SHEET, which is `data-ldrbrief="<id>"` (lead2) — a
+               `data-go="null"` would have been a route into the router with no
+               view behind it. `second.at` is a raw attribute the caller states;
+               `go` still wins when it is there, so the four rows that had one
+               are untouched. */}
+        ${o.second === false ? '' : `<button class="btn btn-sm noic${o.join === false ? '' : ' ic-l'}" ${
+          (c.second||{}).go ? `data-go="${(c.second||{}).go}"` : ((c.second||{}).at || '')}>${
+          o.join === false ? `${(c.second||{}).t} ${I.arrowRight}` : `${(c.second||{}).ic}${(c.second||{}).t}`}</button>`}
+        ${o.join === false ? '' : `<button class="btn btn-p btn-sm noic"${c.kind ? ` data-call="${c.kind}"` : ''}${
+          gated ? ` data-joinwhen="${c.when}" data-joinmins="${c.mins || 45}"` : ''}${
+          gate ? ` disabled title="${dsJoinShut(c.when)}"` : ''}>Join call ${I.arrowRight}</button>`}
+      </div>
+    </div>`;
+}
+
+
+/* ---- the authored builders (patterns the portal writes inline) ---- */
+
+/* ---- `.kv` — a label/value band. The single most-used pattern in the
+   product and the one a hand-authored portal reinvents first.
+
+   THE WRAPPER IS THE CALLER'S AND IT IS REQUIRED. §10.15's label-column
+   opt-out reaches `.kv` by DESCENDANT rather than by direct child precisely
+   because the band is always wrapped — a `.tile` in the portal, a bare `div`
+   from a hand-authored page. Pass `wrap` to choose; the default bare `div` is
+   what the gallery documents.
+
+       dsKv([['600px','Gutter 24'], ['900px','Permanent rail']])
+       dsKv([{k:'Role', v:'Super Admin'}], 'tile')                            */
+function dsKv(rows, wrap){
+  const body = (rows || []).map(r => {
+    const k = Array.isArray(r) ? r[0] : r.k;
+    const v = Array.isArray(r) ? r[1] : r.v;
+    return `<div class="kv"><span class="k">${k}</span><span class="v">${v}</span></div>`;
+  }).join('');
+  return `<div${wrap ? ` class="${wrap}"` : ''}>${body}</div>`;
+}
+
+/* ---- `.tbl` — a data table, and `.tbl-wrap` IS NOT OPTIONAL. That wrapper
+   is the only reason a wide table scrolls inside its own box instead of
+   widening the page, and it is the first thing a hand-copied table loses.
+
+   `num:true` MARKS A FIGURE COLUMN, AND WHAT IT DOES TODAY IS TABULAR
+   FIGURES, NOT RIGHT ALIGNMENT — checked on the rendered page rather than
+   assumed, because the assumption was wrong. `.app .tbl .num` states
+   `font-variant-numeric:tabular-nums` and nothing else; the `text-align:right`
+   lives on `.chart-table .num`, `.payhead > .num`, `.bhead > .num` and
+   `.sc-row .num`, none of which a plain `.tbl` is. So digits line up in width
+   (which is the half that matters for scanning a column) and sit left.
+   Marking the column is still worth it: it is one CSS rule away from also
+   being right-aligned, and when that rule lands every caller follows. A
+   portal that needs right-aligned money TODAY should say so — the fix is a
+   numbered layer in `hifi/build/`, not a style attribute here.
+
+   The flag is applied to the header AND every cell in that column, so a
+   column cannot be marked one way in the head and another in the body.
+
+       dsTable(['Chapter', {t:'Score', num:true}],
+               [['Coaching conversations', '94%']])
+       dsTable([{k:'name', t:'Name'}, {k:'avg', t:'Score', num:true}], rows)  */
+function dsTable(cols, rows){
+  const c = (cols || []).map(x => typeof x === 'string' ? {t: x} : x);
+  const head = `<tr>${c.map(x =>
+    `<th${x.num ? ' class="num"' : ''}${x.w ? ` style="width:${x.w}"` : ''}>${x.t}</th>`).join('')}</tr>`;
+  const body = (rows || []).length
+    ? rows.map(r => {
+        const cells = Array.isArray(r) ? r : c.map(x => r[x.k]);
+        return `<tr>${cells.map((v, i) =>
+          `<td${c[i] && c[i].num ? ' class="num"' : ''}>${v == null ? '' : v}</td>`).join('')}</tr>`;
+      }).join('')
+    : `<tr><td colspan="${c.length}">Nothing here yet.</td></tr>`;
+  return `<div class="tbl-wrap"><table class="tbl">${head}${body}</table></div>`;
+}
+
+/* ---- `.tag` — a status word, 32px, square. `sm` is 24px for inside a row.
+   THE VARIANTS ARE THE STYLESHEET'S OWN AND ARE NOT GUESSABLE: `brand`,
+   `acc`, `green`, `warn`, `red`, `bordered`, `sm`. Note §10.293 turns the
+   pale FILLS off, so a bare `.tag.warn` in this build is an outlined chip —
+   §31.6's note is the long version and the reason the leader's flag chip
+   mixes its own ground instead.
+
+       dsTag('On track', 'green')      dsTag('Awaiting review', 'warn sm')    */
+function dsTag(label, kind){
+  return `<span class="tag${kind ? ' ' + kind : ''}">${label}</span>`;
+}
+
+/* ---- `.note` — a bordered aside with a mark. THE VARIANT NAMES ARE
+   `acc` / `succ` / `err` / `warn` / `band`, NOT the `.tag` set: `green` and
+   `red` do nothing here, which is exactly the sort of near-miss that renders
+   as a plain note and reads as the design system missing a state. The mark
+   follows the variant so the glyph and the ground cannot disagree.
+
+       dsNote('Nothing renews automatically.')
+       dsNote('12 payouts are pending release.', 'warn', 'Settlement')        */
+function dsNote(body, kind, title){
+  const IC = {succ: 'checkFilled', err: 'error', warn: 'warning', acc: 'info'};
+  return `<div class="note${kind ? ' ' + kind : ''}"><span>${I[IC[kind] || 'info']}</span>`
+    + `<div class="nb">${title ? `<b>${title}</b>` : ''}${body}</div></div>`;
+}
+
+/* ---- `.cs` — a tab strip, and THE `.sec.sec-cs` WRAPPER IS PART OF IT.
+   §16 zeroes the padding of a section holding a strip and §20 knows the
+   marker, so the strip and the panel under it meet on one line with no rule
+   of their own; written bare, the strip sits in a section that closes itself
+   and draws a hairline the design does not have. This is the one pattern in
+   this block that `gallery.html` did not document at all.
+
+   THE TAB IS STATE, NOT A CLASS MOVE — CLAUDE.md trap 9. A strip that decides
+   which sections a page EMITS cannot be handled by toggling `.on` on the
+   button; keep the current key in your own state and re-render.
+
+       dsTabs([['users','All Users'], ['roles','Roles & Permissions']],
+              tab, 'data-adtab', 'User sections')                             */
+function dsTabs(tabs, current, attr, label){
+  const btn = ([k, t]) => `<button class="${k === current ? 'on' : ''}" role="tab"`
+    + ` aria-selected="${k === current}" ${attr}="${k}">${t}</button>`;
+  return `<div class="sec sec-cs"><div class="cs" role="tablist"`
+    + `${label ? ` aria-label="${label}"` : ''}>${(tabs || []).map(btn).join('')}</div></div>`;
 }

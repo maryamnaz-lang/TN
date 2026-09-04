@@ -1,0 +1,1918 @@
+/* ==========================================================================
+   107. THE ONBOARDING GATE — Tal takes the reading
+
+   ob.js is the flow and its head is the whole argument. This layer draws one
+   thing: the left panel, which is Tal instead of the marketing copy. Almost
+   everything else on the screen is a component that already exists, and the
+   reuse is the point rather than an economy:
+
+     the split, the card, the button          §57's `.auth-card`, unchanged
+     an option                                §104's `.role-c` radio block
+     what Tal already knows                   §10.5's `.kv` inside a `.tile`
+     the heading and its sentence             `.sec-h` + `.all-desc`, so
+                                              §63 §8b and `--sec-desc-gap`
+                                              both apply with nothing stated
+     the face on the read-back                `avatar()` — a disc by §106
+
+   THE CONTINUITY IS THE REASON `.auth-card` IS REUSED RATHER THAN COPIED. The
+   screen before this one is Verify your email, drawn in that card; a gate that
+   arrived on a different composition would read as a different product. So the
+   reader crosses from signup to onboarding and the frame does not move — only
+   the left half changes, from the brand's artwork to Tal.
+
+   §63 §42 OWNS EVERY SIZE, WEIGHT, CASE AND INK ON THIS SCREEN. Not one
+   font-size, font-weight, text-transform or text colour is stated here.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 0 ---
+   THE SCROLL RULE THAT WAS WRITTEN HERE AND DELETED — READ THIS BEFORE
+   MEASURING THIS SCREEN
+
+   `.app:has(> .ob-card){overflow-y:auto}` stood here for one build, on a
+   diagnosis that was wrong in an instructive way. The rule is gone; the
+   investigation is kept, because the next person to measure a tall auth-shaped
+   screen in this repo will reach the same false conclusion.
+
+   WHAT LOOKED LIKE A BLOCKING BUG. §01.477 gives `.app` `position:absolute;
+   inset:0; overflow:hidden` and §57 hands `.app:has(> .auth-card)` an
+   `overflow:auto` only inside `@container app (min-width:900px)` — so below
+   900 the app box itself cannot scroll. At the mobile preset (390 x 738) the
+   read-back is **1228px** tall against every signup view fitting inside the
+   frame (`create` 676, `login` 641, `verify` 527), so it is the first screen
+   on this composition taller than its own device. `scrollTop = 9999` on `.app`
+   and on `.device` both left both at 0, and "Go to my dashboard" measured
+   456px below the clip. Every one of those numbers is real.
+
+   WHY IT WAS WRONG. The scroller is the `<main>` inside `.auth-col` — it is
+   `flex:1 1 auto` with `overflow-y:auto`, and it reports 587px of scrollable
+   range. Setting ITS `scrollTop` moves the button to 641px inside a 738px
+   device, with `.app` back at `overflow:hidden`. Nothing was ever unreachable.
+
+   AND WHY THE FIRST TEST OF THAT SCROLLER ALSO CAME BACK 0 — TRAP 17, IN A
+   FORM THAT LAYER DOES NOT DESCRIBE. `main` carries `scroll-behavior:smooth`,
+   which is animated, and smooth scrolling is driven by animation frames. The
+   Browser pane is usually HIDDEN while this prototype is measured, and a
+   hidden document never gets a frame — so `scrollTop = n` was accepted,
+   animated nowhere, and read back as 0 even after a 600ms wait. With
+   `scroll-behavior:auto` forced it moves on the same statement.
+   `*{animation:none}` before measuring geometry is already this repo's rule;
+   add `scroll-behavior:auto` to it, or no scroll assignment in a hidden pane
+   can be trusted.
+
+   SO THERE IS NO RULE HERE, and that is deliberate rather than an omission: a
+   declaration that answers no problem is the same dead weight as a gate
+   nothing writes.
+   ------------------------------------------------------------------------ */
+
+/* --------------------------------------------------------------------- 0b --
+   THE INTRO — THE BLOB ARRIVES AND SAYS GOOD MORNING
+
+   Maryam, 3 Sep 2026, with a screen recording. ob.js's `obIntro` note is where
+   the reference is described frame by frame and where the three things this
+   does NOT copy are argued. This is the drawing.
+
+   FIVE MOVES, AND THE ORDER OF THEM IS THE INTERACTION: the ground fades in,
+   the orb scales up from a third of its size with a slight overshoot and
+   settles, two faint rings widen out past it, the greeting rises into place a
+   beat later, and then the orb breathes for as long as the screen is up.
+
+   THE OVERSHOOT IS THE WHOLE CHARACTER OF IT. A plain ease-out scale reads as
+   a panel loading; 1 -> 1.06 -> 1 reads as something arriving under its own
+   weight. Measured off the reference at 3fps: small at 0.7s, largest at 2.7s,
+   settled smaller by 4.7s — so the overshoot is real and it is slow. This
+   compresses that to 1.5s, because the reference is a showreel loop and this
+   is the first screen of a five-step form: the same gesture, at the speed a
+   gate can afford.
+
+   IT IS ONE GROUND AND IT IS WHITE, LIKE THE FIVE STEPS AFTER IT. That
+   continuity is the point and it survived the change of value: the orb moves
+   from the middle of the frame to the top of a column and nothing under it
+   changes. What it is no longer is a TINTED surface — see the note on the
+   declaration below.
+   ------------------------------------------------------------------------ */
+.app .ob-open{
+  /* `relative` IS WHAT THE PILLS RESOLVE AGAINST — see §0c's note on
+     `.ob-modes`. Without it they fall back to `.app`, which is the same box
+     today and would stop being it the first time anything between them gained
+     a transform or a filter. */
+  position:relative;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  box-sizing:border-box;
+  flex:1 1 auto;min-height:100%;
+  padding:var(--s07) var(--s06);
+  /* THE GROUND IS WHITE AND THE WASH SITS ON IT — Maryam, 4 Sep 2026, with a
+     Figma frame (728:6141) and "I have set a background gradient on this figma
+     file, please apply the same". `--layer-01` rather than a literal `#fff` so
+     it moves with the token if white ever stops being white, and the gradient
+     is a `background-image` over it rather than a fourth surface token: the
+     base is still the white the 3 Sep instruction asked for, which is what the
+     four corners of that frame still measure.
+
+     IT IS MATCHED TO THE RENDER, NOT GUESSED. The frame was sampled on a 17x17
+     grid with the orb masked out: white at every edge, a broad horizontally
+     elongated rose haze peaking at **(254, 237, 243)** just above the middle,
+     fading to nothing by y 6% and y 88% and still reading faintly at both side
+     edges. The stops below reproduce that field — measured back off our own
+     page at the same normalised grid, so the two agree rather than merely
+     looking similar.
+
+     THE TINT IS A ROSE AND IS *NOT* THE NEW ACCENT, which is the one thing to
+     know before "simplifying" it into `--accent`. Solving the measured deltas
+     (dR:dG:dB = 1:18:12) for a hue gives roughly `#f54b87` — magenta-leaning,
+     more blue than green. `#ff584a` at any alpha gives the opposite (green
+     above blue): at the alpha that matches the green channel it lands on
+     (255,237,236), a warm peach, and the frame's pink goes out of it. Two
+     different colours doing two different jobs.
+
+     ONE ELLIPSE, NOT TWO. The field is very slightly stronger right of centre
+     (17 against 15) — a difference of two units in 255, which is inside the
+     PNG's own dithering. A second gradient to state it would be a rule nobody
+     could see.
+
+     THE FIVE NUMBERS ARE FITTED, NOT CHOSEN. A search over radius, centre and
+     stop profile against all 250 sampled cells settles on this one: mean
+     absolute error **0.98 units in 255**, worst cell 4. The first guess was
+     `125% 56%` and it was visibly hot — flat across the width, so the side
+     edges read 10 against the frame's 5, and the upper band ran ~5 units
+     heavy. `100% 40%` is what makes the vertical falloff land where the frame
+     puts it: the wash reaches nothing at y 6% and y 86%, which is exactly
+     where the sampled grid does. Re-fit rather than re-taste if the frame
+     changes. */
+  background-color:var(--layer-01);
+  background-image:radial-gradient(100% 40% at 50% 46%,
+    rgba(245,75,135,.10) 0%,
+    rgba(245,75,135,.045) 50%,
+    rgba(245,75,135,0) 100%);
+
+  /* ---- THE GATE'S OWN ACCENT — #FF584A ----
+     Maryam, 4 Sep 2026: "change the primary color on tal prototype to
+     #FF584A". Four tokens re-pointed on the gate's own root, which is §67's
+     technique (`.tmp-accent`) scoped to a stage rather than to a demo — the
+     whole point of the build stating its accent as tokens is that a surface
+     can take a different one without a single component rule being touched.
+
+     IT IS SCOPED TO THE GATE AND THAT IS A READING OF "tal prototype". The
+     candidate portal behind it is still `#f57414`; the gate is the screen
+     under discussion and the screen the new blob and the new wash are for. To
+     take it product-wide, move these four lines into §01 — but read §83 first:
+     `--ai-1/2/3` are stated on `.app` by §70 and would need re-pointing too,
+     which is the half that fails silently.
+
+     >>> `--accent-text` IS ALSO #ff584a, AND THAT REVERSES WHAT SHIPPED FOR
+     ONE BUILD (Maryam, 4 Sep 2026: "i cant see the color implementation
+     anywhere, the let's get started is still in the dark orange as before").
+     She was right and the measurement says why. The fill went to `#ff584a`
+     correctly — the voice bars measured `rgb(255,88,74)` on the live page —
+     but every WORD on the gate was taking a derived ink at `#b82d20`, and
+     `#b82d20` against the orange it replaced (`#b94a09`) is two dark red-browns
+     one hue step apart. The screen genuinely looked unchanged where a reader
+     looks first, which is at the words.
+
+     THE DERIVATION WAS THE MISTAKE, NOT THE VALUE. §01 splits fill from ink
+     because `#f57414` is 2.84:1 and unreadable as text, so `--accent-text`
+     exists to be a legible relative of it. `#ff584a` is 3.11:1 — the same
+     problem — so the same move was applied automatically. But the instruction
+     names ONE colour and the point of naming it is to see it; deriving a
+     second, darker one from it and putting that on all the text hands back a
+     screen that does not show the colour that was asked for.
+
+     SO IT IS A STATED CONTRAST EXCEPTION, written down with its ratio, which
+     is this build's form for exactly this (§63 §41 ships 2.94:1 by
+     instruction; §70's three step states ship at 2.8 and 3.1). **3.11:1 on
+     white.** That clears AA's 3:1 for large text and is under the 4.5:1 for
+     body text, and the three places it lands are all short and none is a
+     paragraph: `.ob-go` at 17/600, `.ob-opt` on the closing pill, and the
+     journey's current-step label. To put a legible ink back it is one line
+     here — `#b82d20`, measured 6.11:1 on white and 4.70:1 on the tint — and
+     the cost is the screen not showing the accent in its own words again.
+
+     `--brand-tint-2` IS THE FILL AT 23% ON WHITE, which is the ratio the
+     product's own `#fcdbc7` is to `#f57414` — so the "you chose this" wash
+     keeps its weight rather than becoming a different strength of a different
+     colour. `--on-accent` is untouched: white on `#ff584a` is 3.11:1, the same
+     register as white on `#f57414` (2.84:1), and it is on marks and discs
+     rather than on body text.
+
+     >>> AND ALL OF IT MOVED AGAIN TO #FF3733 (4 Sep 2026, the platform's second
+     re-hue of the day). These two scoped blocks are the reason it had to be
+     done by hand: they HARDCODE the accent rather than reading §01, so a
+     platform token change reaches every screen in the product EXCEPT the
+     onboarding — which would have shipped the one flow whose chat the ask page
+     had just been made to match, in the previous red. Nothing about the
+     structure changed; every value is the same derivation one hue over
+     (`--accent-hover` #e63d30 -> #e41f1b at the same ΔL, the tint at the same
+     22.8%, the grad still flat).
+
+     AND THE FLAT `--accent-grad` HERE IS NOW WHAT §01 SAYS. This block existed
+     partly because the platform's accent was a two-stop gradient and this flow
+     wanted one colour; the platform button is solid as of the same message, so
+     that half of the reason has expired. The blocks are NOT deleted — the ink
+     is still a real difference (`--accent-text` is the flat accent here against
+     §01's AA-safe #c51c18) — but if this flow should simply inherit, these are
+     the lines to try removing first. */
+  --accent:#ff3733;
+  --accent-text:#ff3733;
+  --brand-tint-2:#ffd1d1;
+  /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
+     colors as well in this message, match them to #FF584A"). The reply Tal
+     gives when it cannot answer was still coming out ORANGE in one word, and
+     the reason is that `--accent-grad` is not a colour — §01 defines it as
+     `linear-gradient(104.86deg, var(--accent) 10%, var(--accent-2) 116%)`.
+     Re-pointing `--accent` moved the first stop and left the second at
+     `#f0530c`, so `.tw-hl`'s clipped text ran coral into orange across its own
+     width. One token missed, one word wrong, and nothing warns — a custom
+     property that keeps its old value is still perfectly valid.
+
+     `--accent-2` IS SET TO THE SAME `#ff584a`, WHICH FLATTENS THE RAMP ON
+     PURPOSE. The instruction names one colour and asks the message to match
+     it; a two-stop coral would still be two colours, and inventing a deeper
+     coral to keep the ramp alive is deriving a value again — the exact move
+     `--accent-text` had to be corrected for an hour ago. Every gradient inside
+     the gate therefore resolves to flat `#ff584a`.
+
+     >>> AND RE-POINTING THE STOPS IS NOT ENOUGH — THE GRADIENTS HAVE TO BE
+     RESTATED. This block first set `--accent-2` alone, on the reasoning that
+     `var()` inside a custom property resolves at the point of USE, so
+     `--accent-grad` would pick the gate's stops up for free. **That is the
+     wrong way round and the page said so**: with `--accent-2` measuring
+     `#ff584a` on the very element that draws it, `background-image` still
+     computed to `linear-gradient(104.86deg, rgb(245,116,20), rgb(240,83,12))`
+     — the portal's orange, in the one word the reply highlights.
+
+     A CUSTOM PROPERTY IS SUBSTITUTED WHERE IT IS DECLARED, NOT WHERE IT IS
+     READ. `--accent-grad` is computed on `:root` — its inner `var(--accent)`
+     is resolved against `:root`'s values at that moment — and descendants
+     inherit the finished string. Nothing downstream can reach back into it.
+     So a token built out of other tokens needs re-declaring in full by any
+     scope that re-points its ingredients, and the failure is silent in both
+     directions: the ingredient really did change, and the compound really did
+     not. Worth knowing before scoping any other token family.
+
+     THEY ARE FLAT, WHICH IS THE INSTRUCTION READ LITERALLY: one colour, so
+     both stops are `#ff584a` and the ramp has nothing to travel. Hover and
+     pressed keep a deeper second stop for §01's reason — a state that cannot
+     be seen has stopped being a state.
+
+     `--accent-hover` KEEPS A DEEPER VALUE, and it is the one exception. §01's
+     note is that "hover and pressed cannot be a solid colour, each is the same
+     gradient stepped one stop deeper" — with all three stops equal, a pressed
+     button would be indistinguishable from a resting one, which is a state
+     that has stopped existing rather than a colour that matches. */
+  --accent-2:#ff3733;
+  --accent-on-2:#ff3733;
+  --accent-hover:#e41f1b;
+  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+
+/* THE QUESTION SCREENS TAKE THE ACCENT AND NOT THE WASH, and the split is what
+   each root is. `obScreen` returns one of two things: `.ob-open`, the gate's
+   own full-bleed composition, and `.auth-card.ob-card`, which is §57's SPLIT —
+   a brand panel beside a form column, with its own ground on both halves. The
+   accent is the gate's colour wherever the gate is drawn, so those screens
+   take the three tokens; the wash is a property of the empty white field the
+   orb sits on, and painting it under a two-column card would put a pink haze
+   behind a form. The tokens are repeated rather than lifted to a shared parent
+   because there is no element that wraps both — `render()` returns one or the
+   other directly. */
+.app .ob-card{
+  --accent:#ff3733;
+  --accent-text:#ff3733;
+  --brand-tint-2:#ffd1d1;
+  /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
+     colors as well in this message, match them to #FF584A"). The reply Tal
+     gives when it cannot answer was still coming out ORANGE in one word, and
+     the reason is that `--accent-grad` is not a colour — §01 defines it as
+     `linear-gradient(104.86deg, var(--accent) 10%, var(--accent-2) 116%)`.
+     Re-pointing `--accent` moved the first stop and left the second at
+     `#f0530c`, so `.tw-hl`'s clipped text ran coral into orange across its own
+     width. One token missed, one word wrong, and nothing warns — a custom
+     property that keeps its old value is still perfectly valid.
+
+     `--accent-2` IS SET TO THE SAME `#ff584a`, WHICH FLATTENS THE RAMP ON
+     PURPOSE. The instruction names one colour and asks the message to match
+     it; a two-stop coral would still be two colours, and inventing a deeper
+     coral to keep the ramp alive is deriving a value again — the exact move
+     `--accent-text` had to be corrected for an hour ago. Every gradient inside
+     the gate therefore resolves to flat `#ff584a`.
+
+     >>> AND RE-POINTING THE STOPS IS NOT ENOUGH — THE GRADIENTS HAVE TO BE
+     RESTATED. This block first set `--accent-2` alone, on the reasoning that
+     `var()` inside a custom property resolves at the point of USE, so
+     `--accent-grad` would pick the gate's stops up for free. **That is the
+     wrong way round and the page said so**: with `--accent-2` measuring
+     `#ff584a` on the very element that draws it, `background-image` still
+     computed to `linear-gradient(104.86deg, rgb(245,116,20), rgb(240,83,12))`
+     — the portal's orange, in the one word the reply highlights.
+
+     A CUSTOM PROPERTY IS SUBSTITUTED WHERE IT IS DECLARED, NOT WHERE IT IS
+     READ. `--accent-grad` is computed on `:root` — its inner `var(--accent)`
+     is resolved against `:root`'s values at that moment — and descendants
+     inherit the finished string. Nothing downstream can reach back into it.
+     So a token built out of other tokens needs re-declaring in full by any
+     scope that re-points its ingredients, and the failure is silent in both
+     directions: the ingredient really did change, and the compound really did
+     not. Worth knowing before scoping any other token family.
+
+     THEY ARE FLAT, WHICH IS THE INSTRUCTION READ LITERALLY: one colour, so
+     both stops are `#ff584a` and the ramp has nothing to travel. Hover and
+     pressed keep a deeper second stop for §01's reason — a state that cannot
+     be seen has stopped being a state.
+
+     `--accent-hover` KEEPS A DEEPER VALUE, and it is the one exception. §01's
+     note is that "hover and pressed cannot be a solid colour, each is the same
+     gradient stepped one stop deeper" — with all three stops equal, a pressed
+     button would be indistinguishable from a resting one, which is a state
+     that has stopped existing rather than a colour that matches. */
+  --accent-2:#ff3733;
+  --accent-on-2:#ff3733;
+  --accent-hover:#e41f1b;
+  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+
+/* THE STAGE IS THE COMPOSITION AND IT GROWS; THE DOCK BELOW IT DOES NOT. That
+   split is what bottom-aligns the dock and keeps the orb centred in the space
+   that is left, and it is why the stage is a flex child with `flex:1` rather
+   than the whole screen.
+
+   IT IS NOT THE CLICK TARGET ANY MORE. `.ob-intro` was `role="button"` over
+   the entire surface, which was right while the screen held three things; the
+   dock now carries a mute toggle and two pills, and a surface-wide target with
+   three holes punched in it is a worse contract than two named ones. The orb
+   and the words each carry their own `data-obgo` (ob.js's note), and each gets
+   its own focus ring below. */
+.app .ob-stage{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1 1 auto;min-height:0;width:100%;
+  animation:ob-in 600ms ease-out both}
+.app .ob-orb[data-obgo]{cursor:pointer}
+.app .ob-orb:focus-visible{
+  outline:2px solid var(--accent);outline-offset:8px;border-radius:50%}
+
+/* ---- the orb ----
+   THE BOX IS `min()` OF THE CONTAINER, NOT A BREAKPOINT — and the unit is
+   `cqw`, NOT `vw`, WHICH IS THE ONE THING TO GET RIGHT HERE. This prototype
+   draws the product inside `#device`, a box the harness resizes to 390, 744 or
+   the pane's width, and `vw` is the BROWSER VIEWPORT — so `min(300px, 62vw)`
+   measured 300px at a 390px phone frame (62% of 1280) and the orb filled 77%
+   of the screen. Measured at all four widths: 300 / 300 / 300 / 300, which is
+   the tell that the unit is reading something other than the frame.
+
+   `cqw` RESOLVES AGAINST `.app`, which carries `container-type:inline-size`
+   and `container-name:app` — the same container every `@container app` query
+   in the build resolves against, so this sizes off exactly the box the rest of
+   the product responds to. 296 at 390, 440 (the cap) from about 579 up.
+
+   THE NUMBERS WENT UP ONCE (Maryam, 3 Sep 2026: "i need you to increase the
+   blob size as well"). 300 / 62cqw was measured against the reference's own
+   proportion, and the reference is a 1440-wide showreel; in a 1728px browser
+   the orb read as a small object in a large empty field. 440 / 76cqw keeps the
+   same shape of rule — a fixed size with a floor — one step louder.
+
+   THE CAP IS WHAT KEEPS IT AN OBJECT. The reference's sphere is roughly a
+   fifth of a wide frame and about a half of a narrow one, which is not one
+   ratio — it is a fixed size with a floor. 300 is that size; 62cqw is the
+   floor, so on a phone the orb takes the room it needs and on a 1280 frame it
+   stays a thing on a ground rather than becoming the ground. */
+.app .ob-orb{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:min(440px, 76cqw);aspect-ratio:1}
+
+/* THE BLOB IS THE ORB'S OWN BOX AND §53's GEOMETRY IS NOT REACHABLE HERE.
+   That layer states `.tal-blobv` as `position:absolute; inset:0` scoped to
+   `.app .ask-page .tal-hero .tal-blobv`, so the five declarations are restated
+   rather than borrowed — ob.js's note on `obBlob` is why the markup does not
+   simply wear `.tal-mk.orb` to inherit them.
+
+   `object-fit:cover` ON A SQUARE CLIP IN A SQUARE BOX CROPS NOTHING, and §53
+   says why it is there anyway: so a future non-square box cannot letterbox the
+   footage. The radius is stated for §53's other reason — `object-fit` is
+   applied before the element's own clipping, so a hairline of the video's edge
+   would otherwise square off the corners of a circular alpha. */
+.app .ob-blob{
+  position:relative;z-index:1;
+  display:block;width:100%;height:100%;
+  animation:ob-orb-in 1500ms cubic-bezier(.22,1,.36,1) both,
+            ob-breathe 6s ease-in-out 1500ms infinite}
+.app .ob-blobv{
+  display:block;width:100%;height:100%;
+  object-fit:cover;border-radius:50%;
+  pointer-events:none}
+
+/* ---- the rings ----
+   MIXED FROM `--accent`, NOT `--rule`. The reference's rings are the same hue
+   as its sphere; ours is warm, and a neutral grey hairline around it reads as
+   a second object rather than as the orb's own field. 18% and 12% of the
+   accent on this ground are 1.1:1 and under — which is right: they are a
+   suggestion of depth, and anything readable would compete with the greeting.
+
+   THEY WIDEN PAST THE ORB AND KEEP GOING. `ob-ring-out` scales 0.8 -> 1.28
+   while fading, so the pair reads as the orb settling into a space rather than
+   as two circles drawn around it. The second is offset by 400ms and a little
+   larger, which is what makes it a drift and not a pulse. */
+.app .ob-ring{
+  position:absolute;z-index:0;
+  inset:0;border-radius:50%;
+  border:1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  pointer-events:none}
+.app .ob-ring-1{animation:ob-ring-out 6s ease-in-out 700ms infinite}
+.app .ob-ring-2{
+  border-color:color-mix(in srgb, var(--accent) 12%, transparent);
+  animation:ob-ring-out 6s ease-in-out 1100ms infinite}
+
+/* ---- the greeting ----
+   IT IS ABOVE THE ORB NOW and ob.js's note is the argument: a greeting is the
+   first thing said, not a caption on the thing above it, which is what the
+   reference's bottom-anchored "TAP TO BEGIN" is.
+
+   IT STILL ARRIVES AFTER THE ORB HAS SETTLED, and that stays deliberate even
+   with the order flipped. The 1200ms delay is what makes the orb the subject
+   of the screen and the line its voice rather than two things fading in at
+   once — the sequence is the interaction, and reversing the layout does not
+   reverse the timing.
+
+   THE GAP MOVED WITH IT: `--s09` below the line rather than above it, so the
+   pair keeps one 48px separation and neither member carries two margins. */
+.app .ob-greet{
+  margin:0 0 var(--s09);text-align:center;
+  animation:ob-greet-in 700ms ease-out 1200ms both}
+
+/* --------------------------------------------------------------------- 0c --
+   THE VOICE BARS, THE FOOT CONTROL AND THE TWO PILLS
+
+   Maryam, 3 Sep 2026, over two messages: voice bars above the blob to show Tal
+   speaking, a clickable "Let's Get Started!" at the foot where the reference
+   has "TAP TO OPEN", and a Voice / Chat pair in the bottom-right corner where
+   it has Voice / Visual. ob.js holds the audio and the arguments; this draws
+   the three.
+
+   THE BARS ARE FIVE 3px COLUMNS AND THEY ONLY MOVE WHEN THE CLIP DOES. `.on`
+   is written from the audio element's own `playing` / `pause` / `ended` events
+   (and re-derived at render from `obAud.paused`), so the indicator cannot say
+   Tal is talking over silence — which matters more than usual here, because
+   the autoplay policy means silence is a state this screen genuinely reaches.
+
+   AT REST THEY ARE NOT HIDDEN, THEY ARE FLAT. A speaking indicator that
+   disappears takes 24px of layout with it and shifts the orb; held at their
+   minimum height the row is always the same size and the difference between
+   speaking and not is movement, which is what the bars are for. That is the
+   same call §72 makes for the pace ticks — the measure is always drawn, only
+   the lit count changes.
+
+   THE FIVE DELAYS ARE UNEVEN ON PURPOSE. Five bars on one clock is a pulse;
+   -0.4 / -0.15 / 0 / -0.3 / -0.05 never lines them up, which is what reads as
+   a voice rather than as a loading spinner. The middle bar is the tallest at
+   rest, so the row has a shape even stopped.
+   ------------------------------------------------------------------------ */
+/* THEY ARE OVER THE BLOB'S CENTRE AND SIZED OFF THE ORB (Maryam, 3 Sep 2026:
+   "i meant that on the blob in the middle, and this voice bars needs to be
+   bigger"). Absolutely centred rather than a flex member, `z-index:2` so they
+   sit above the footage (0) and the gloss (1).
+
+   THE FIRST BUILD READ "above the blob" AS A POSITION IN THE COLUMN and put
+   them between the greeting and the orb. That is a fair reading of the words
+   and the wrong one: the bars say TAL IS SPEAKING and the blob IS Tal, so an
+   indicator floating above it is a label for the thing rather than the thing
+   showing its own state.
+
+   THE SIZES ARE `em` OF A LOCAL FONT SIZE, WHICH IS THE ONE TRICK HERE. The
+   orb is `min(440px, 76cqw)` and the bars have to be a constant FRACTION of
+   whatever that resolves to, or they are right at 440 and enormous at 296.
+   `.ob-orb` sets `font-size` to 3.6% of its own width and every measurement
+   below is in `em` of it — one number scales the whole indicator and the
+   markup stays five bare `<i>`s. `font-size` on a box with no text in it is
+   free, and it is the only unit that does arithmetic on inheritance.
+
+   AT 440 THAT IS 6.3px bars on 6.3px gaps, 15.8px at rest and 79px at full
+   height — about 18% of the orb, which is the proportion the reference gives
+   the mark inside its own sphere.
+
+   THE COLOUR IS `--accent` BECAUSE OF WHAT IS UNDER IT. The blob's middle is a
+   pale peach (measured around #fbeee6), so white disappears into the highlight
+   and the accent holds. On the reference the sphere is saturated blue and its
+   mark is white; ours is the inverse problem. */
+.app .ob-bars{
+  position:absolute;z-index:2;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  gap:.34em;height:4em;
+  margin:0;pointer-events:none}
+.app .ob-orb .ob-bars{font-size:calc(min(440px, 76cqw) * .036)}
+.app .ob-bars > i{
+  display:block;width:.4em;height:1em;border-radius:999px;
+  /* THE SCALE IS ABOUT THE BAR'S MIDDLE, so a bar grows in both directions
+     from the row's centre line. `transform-origin:bottom` would make the row
+     look like a bar chart filling upward, which is a measure rather than a
+     voice — and the container centres its items, so the two have to agree. */
+  transform-origin:center;
+  background:var(--accent)}
+/* THIRTEEN BARS, AND THE RESTING SHAPE IS A CURVE RATHER THAN A FLAT ROW
+   (Maryam, 3 Sep 2026: "add 4 more lines"; 4 Sep: "add more voice bars like 4
+   more"). A flat row with one spike reads as a bug, so the resting heights
+   arch from the ends to the centre — .7 to 1.8 and back. That is what gives
+   the indicator a silhouette when the clip is not playing, which §0c's "at
+   rest they are flat, not hidden" rule requires it to have.
+
+   THE DELAYS ARE DELIBERATELY NOT A RAMP. A linear stagger reads as a wave
+   travelling left to right, which is a loading spinner's gesture; these are
+   scattered so no two neighbours peak together and the row never lines up.
+   Thirteen bars on ONE clock at different phases is a voice; thirteen clocks
+   would be noise.
+
+   >>> AND IT ANIMATES `scaleY`, NOT `height` — 4 Sep 2026: "do not give these
+   much length to the voice bars while tal is talking since the agent is
+   talking calmly but the voice bar has a fast and high pitch bar that does not
+   match with the agent voice."
+
+   THE OLD KEYFRAME WAS THE WHOLE PROBLEM AND IT IS WORTH NAMING WHY. It ran
+   `height:.7em` to `height:5em` — a SEVENFOLD swing — and because it animates
+   `height` directly it OVERRIDES each bar's resting value, so all thirteen
+   travelled the identical extreme distance and the arch above did nothing
+   while the clip played. Thirteen identical 7x pulses at 900ms is a shout, and
+   Tal's clip is a calm read.
+
+   `scaleY` FIXES BOTH HALVES AT ONCE. It multiplies whatever height a bar
+   already has, so the arch survives into the animation — the middle bars move
+   further in absolute pixels than the outer ones, which is what a voice
+   actually looks like — and the amplitude becomes one number.
+
+   >>> AND THE FIRST CORRECTION OVERSHOT, SO THE NUMBERS ARE THE MIDPOINT NOW
+   (Maryam, 4 Sep 2026: "now the bar heights are too short, cant you in
+   somewhere middle? … faster than this but slower then the previous one").
+   Measured at the 440px orb, where the row's `em` is 15.84px:
+
+     was       .7em -> 5em on `height`      tallest bar  11 -> 79px   900ms
+     first fix scaleY .55 -> 1.15           tallest bar  16 -> 33px  1600ms
+     now       scaleY .60 -> 1.90           tallest bar  17 -> 54px  1200ms
+
+   54px is within 2px of the arithmetic midpoint of 79 and 33; 1200ms sits
+   between 900 and 1600. Both are stated as measurements rather than as
+   adjectives because "too high" and "too short" are the two ends of one
+   number, and the next adjustment should move it by a stated amount rather
+   than by feel.
+
+   IT COSTS NOTHING IN LAYOUT, WHICH `height` DID NOT. A transform does not
+   reflow, where the old rule was re-laying out thirteen boxes twice a second
+   inside the orb. The row's own box grows to `4em` to contain the new peak —
+   the tallest bar is 1.8em at 1.9 = 3.42em — which is honesty rather than
+   necessity: nothing clips it, but a box that lies about its contents is what
+   makes the next person's centring arithmetic wrong. */
+.app .ob-bars > i:nth-child(1),
+.app .ob-bars > i:nth-child(13){height:.7em}
+.app .ob-bars > i:nth-child(2),
+.app .ob-bars > i:nth-child(12){height:.9em}
+.app .ob-bars > i:nth-child(3),
+.app .ob-bars > i:nth-child(11){height:1.1em}
+.app .ob-bars > i:nth-child(4),
+.app .ob-bars > i:nth-child(10){height:1.35em}
+.app .ob-bars > i:nth-child(5),
+.app .ob-bars > i:nth-child(9){height:1.55em}
+.app .ob-bars > i:nth-child(6),
+.app .ob-bars > i:nth-child(8){height:1.7em}
+.app .ob-bars > i:nth-child(7){height:1.8em}
+.app .ob-bars.on > i{animation:ob-bar 1200ms ease-in-out infinite}
+.app .ob-bars.on > i:nth-child(1){animation-delay:-930ms}
+.app .ob-bars.on > i:nth-child(2){animation-delay:-285ms}
+.app .ob-bars.on > i:nth-child(3){animation-delay:-675ms}
+.app .ob-bars.on > i:nth-child(4){animation-delay:-128ms}
+.app .ob-bars.on > i:nth-child(5){animation-delay:-1088ms}
+.app .ob-bars.on > i:nth-child(6){animation-delay:-480ms}
+.app .ob-bars.on > i:nth-child(7){animation-delay:-45ms}
+.app .ob-bars.on > i:nth-child(8){animation-delay:-810ms}
+.app .ob-bars.on > i:nth-child(9){animation-delay:-225ms}
+.app .ob-bars.on > i:nth-child(10){animation-delay:-1013ms}
+.app .ob-bars.on > i:nth-child(11){animation-delay:-570ms}
+.app .ob-bars.on > i:nth-child(12){animation-delay:-1140ms}
+.app .ob-bars.on > i:nth-child(13){animation-delay:-863ms}
+@keyframes ob-bar{
+  0%,100%{transform:scaleY(.6)}
+  50%{transform:scaleY(1.9)}}
+
+/* ---- the dock: mute, the way on, the modes ----
+   ONE ROW WITH THREE SLOTS, and ob.js's `obDock` note is the argument for why
+   it is one component rather than three floating controls. What it fixes as
+   well as satisfying "Let's get started need to be bottom aligned": the pills
+   were `position:absolute` in the corner and at 390 they landed on top of the
+   words, which took a whole narrow-tier rule to answer. A flex row with a
+   growing middle cannot collide at any width, so that tier is deleted.
+
+   `margin-top:auto` IS WHAT BOTTOM-ALIGNS IT. `.ob-open` is a column flex, so
+   the row takes the slack and the composition above stays centred in what is
+   left — which is the difference between "at the bottom" and "after the
+   content", and the instruction asked for the first.
+
+   IT IS `.ob-dock`, NOT `.ob-foot`, AND THAT IS NOT A PREFERENCE. `.ob-foot`
+   is already the step panel's reassurance paragraph (§1), scoped
+   `.app .ob-brand .ob-foot` — but a new `.app .ob-foot` at (0,2,0) would match
+   that `<p>` too and hand it `display:flex` and `margin-top:auto`. Two
+   different objects cannot share a class name inside one layer.
+   ------------------------------------------------------------------------ */
+/* IT DOES NOT MAKE AN ENTRANCE, AND THAT WAS A BUG WORTH THE NOTE. The row
+   carried `ob-greet-in` on a 1600ms delay with `fill-mode:both`, copied from
+   the controls it replaced — so on the VOICE screen it faded in politely, and
+   on switching to chat it re-ran from its FROM keyframe and the mute button
+   and both pills were invisible for a second and a half. Which is precisely
+   what the instruction rules out: "do not hide it on chat."
+
+   The general rule underneath: an element that persists across a state change
+   must not carry an entrance, because a mode switch re-renders it and every
+   entrance replays. The orb, the greeting and the chat's own column animate;
+   the controls are simply there, which is also how the reference draws them. */
+/* IT IS A `1fr auto 1fr` GRID, NOT A FLEX ROW, AND THAT IS THE FIX FOR
+   "Let's get started needs to be middle aligned" (Maryam, 3 Sep 2026).
+
+   As a flex row with a growing middle, the words were centred IN THE SLOT and
+   the slot is not centred on the page: it starts after a 40px mute disc and
+   ends before a 191px pair of pills, so its midpoint sits (191 - 40) / 2 =
+   75px left of the frame's. Measured at 1728: the text centred at 912 against
+   a page centre of 1000, which is exactly that arithmetic.
+
+   Three grid columns fix it at the source rather than by nudging: the two
+   `1fr` tracks are equal by definition whatever they contain, so the `auto`
+   track between them is centred on the container no matter how wide the
+   controls in the outer two become. `justify-self` puts each control on its
+   own edge. Nothing needs re-measuring if a pill's label changes. */
+/* THE MIDDLE TRACK IS `auto` FOR A LABEL AND CAPPED FOR A FIELD. `auto` sizes
+   to the words on the voice screen, which is what centres them; a composer
+   given `auto` would size to its own content and collapse to the placeholder's
+   width. `minmax(0, 720px)` on the chat-open dock gives the field the
+   reference's own measure and lets it shrink below that — and because the two
+   outer tracks stay `1fr` they remain equal, so the field is centred on the
+   page rather than in the slack, which is the same arithmetic the label
+   needed. */
+.app .ob-dock{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;gap:var(--s04);
+  width:100%;flex:none;
+  margin-top:auto;padding-top:var(--s06)}
+.app .ob-dock > .ob-mute{justify-self:start}
+.app .ob-dock > .ob-modes{justify-self:end}
+.app .ob-dock-mid{min-width:0;text-align:center}
+/* AND THE CHAT'S MIDDLE IS CAPPED RATHER THAN `auto`, because an `auto` track
+   sizes a field to its placeholder — the one thing about the composer that was
+   not obvious, written down when it was removed and needed again now. */
+.app .ob-open-chat .ob-dock{grid-template-columns:1fr minmax(0,720px) 1fr}
+
+/* THE WAY ON LOOKS LIKE A CONTROL WITHOUT BEING A `<button>` — the orb is the
+   other target and ob.js's note is why neither is nested in the other. What it
+   needs is to look pressable, which is the underline plus a pointer.
+
+   THE UNDERLINE IS `border-bottom`, NOT `text-decoration`, which is §02.56's
+   idiom and the one §78 reaches for on the breadcrumb: a border sits clear of
+   the descenders where an underline cuts through them, and it can take its own
+   colour. */
+.app .ob-go{
+  display:inline-block;cursor:pointer;
+  padding-bottom:3px;
+  border-bottom:1px solid color-mix(in srgb, var(--accent) 45%, transparent)}
+.app .ob-go:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+/* ---- the mute toggle ----
+   A 40px DISC WITH A HAIRLINE — the reference's own bottom-left control, and
+   §02's quiet icon button one step rounder. Same height as a pill so the row
+   has one baseline.
+
+   `off` IS DRAWN ON THE GLYPH, NOT ON THE BUTTON. A muted control that dims
+   its own box reads as disabled, which is the one state it must not read as:
+   the whole point is that it can be pressed again. §63 §45 takes the glyph to
+   the helper tier and leaves the disc alone. */
+.app .ob-mute{
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:none;box-sizing:border-box;
+  width:40px;height:40px;
+  padding:0;border:1px solid var(--rule);border-radius:999px;
+  background:var(--layer-01);cursor:pointer}
+.app .ob-mute svg{width:20px;height:20px}
+
+/* THE DOCK WRAPS INTO TWO ROWS ON A PHONE, AND THE MIDDLE SLOT IS WHY.
+   At 390 the row spends 40 on the mute disc, 191 on the pills and 24 on its
+   two gaps, which leaves the middle 87px — and "Let's Get Started!" is 129
+   wide, so it set on two lines and the dock grew from 64 to 74. A control
+   whose label wraps is §56's tell that a row has run out of room.
+
+   SO THE WORDS TAKE A ROW OF THEIR OWN, ABOVE the two controls, with
+   `order:-1` and a full basis. That keeps the reading order the eye wants —
+   the way on first, the two switches under it — and it keeps the mute button
+   and the pills in the corners they were asked for. Nothing is shrunk and no
+   label is cut, which is the alternative that was available and worse.
+
+   600 IS THE SEAM AND IT IS DERIVED: 40 + 191 + 24 of furniture needs about
+   130 of middle to hold one line, so the row is comfortable from roughly 385
+   + 130. Rounded to the boundary this layer already uses for the read-back's
+   rows, so the gate has one narrow tier rather than three. */
+@container app (max-width:599px){
+  .app .ob-dock{
+    grid-template-columns:auto 1fr;
+    row-gap:var(--s05)}
+  /* THE WORDS TAKE THE FIRST ROW, SPANNING BOTH COLUMNS, and the two controls
+     share the second — which in grid is `grid-column:1 / -1` plus an explicit
+     order rather than flex's `order:-1`. `1 / -1` is what makes it independent
+     of how many columns the tier declares. */
+  .app .ob-dock-mid{grid-column:1 / -1;grid-row:1}
+  .app .ob-dock > .ob-mute{grid-column:1;grid-row:2}
+  .app .ob-dock > .ob-modes{grid-column:2;grid-row:2}
+}
+
+/* ---- the two pills ----
+   BOTTOM RIGHT AND OUT OF THE FLOW, because the intro's three members are
+   centred on the frame and a fourth in that column would push the orb up. The
+   reference has them floating in the corner and that is also what keeps them
+   from being read as part of the composition — they are the room's controls,
+   not the message.
+
+   `absolute` AGAINST `.ob-open`, WHICH HAS TO BE TOLD IT IS THE CONTAINING
+   BLOCK. That element is a plain flex column; without `position:relative` the
+   pills would resolve against `.app` — which is `position:absolute; inset:0`
+   and therefore the same box today, and would silently stop being it the first
+   time anything between them gained a transform. §75.3 records the same trap
+   from the other side.
+
+   THE SELECTED ONE IS FILLED AND THE OTHER IS A HAIRLINE, which is §104's
+   `.role-c` pair one register down — chosen carries a ground, unchosen carries
+   an edge. Not `--brand-tint-2` here: that token is "the candidate's own
+   SELECTION" (§10.29) and a mode switch is not a selection in that sense, so
+   the filled state is `--gray-100` with the ink flipped, the same as any other
+   primary control in the build.
+   ------------------------------------------------------------------------ */
+.app .ob-modes{
+  display:flex;align-items:center;gap:var(--s03);
+  flex:none}
+.app .ob-mode{
+  display:inline-flex;align-items:center;gap:var(--s03);
+  box-sizing:border-box;height:40px;
+  padding:0 var(--s05);
+  border:1px solid var(--rule);border-radius:999px;
+  background:var(--layer-01);
+  cursor:pointer}
+.app .ob-mode svg{width:18px;height:18px}
+.app .ob-mode.on{
+  background:var(--gray-100);border-color:var(--gray-100)}
+
+/* THE PILL'S OWN BARS ARE THE INDICATOR AT A SMALLER SIZE — ob.js's note is
+   why it is these rather than a new icon. They do not animate: the pill is a
+   control, and a moving glyph inside a button competes with the thing it
+   controls 200px above it. */
+.app .ob-mode-bars{
+  display:flex;align-items:center;gap:2px;height:14px}
+.app .ob-mode-bars > i{
+  display:block;width:2px;height:6px;border-radius:999px;
+  background:var(--accent)}
+.app .ob-mode-bars > i:nth-child(2){height:11px}
+.app .ob-mode-bars > i:nth-child(3){height:14px}
+.app .ob-mode-bars > i:nth-child(4){height:9px}
+.app .ob-mode.on .ob-mode-bars > i{background:var(--on-dark)}
+
+/* --------------------------------------------------------------------- 0e --
+   THE CHAT MODE
+
+   Maryam, 3 Sep 2026, with two reference frames: *"when i open the chat, do
+   not show this ui that you are showing, it needs to be better than this"*.
+   ob.js's `obChatScreen` note is the argument for why this is drawn here
+   rather than handed to `askView`, and what the two builds differ on. The
+   short version: that page is a MESSAGING screen — back arrow, titled band,
+   thread against the rail, every turn a bubble — and the reference is a
+   centred column with the orb at the top and the message read as prose.
+
+   THE COLUMN IS 720 AND CENTRED, which is the reference's own measure at its
+   own width, and it is the same box in both modes: `.ob-stage` is shared, so
+   pressing Voice moves the orb from the head of a column back to the middle of
+   the frame with nothing else in the layout changing.
+
+   IT SCROLLS AND THE DOCK DOES NOT, which is what `min-height:0` on the stage
+   buys — a flex child with `overflow-y:auto` needs its automatic minimum size
+   released or it grows instead of scrolling and pushes the dock off-screen.
+   ------------------------------------------------------------------------ */
+/* THE COLUMN IS 460 AND IT IS CENTRED ON BOTH AXES (Maryam, 3 Sep 2026, with
+   the target drawn on a screenshot). Converted off that image at its own
+   scale, the block she marked is **458 x 357 at x 639..1097** in a 1728 frame,
+   whose centre is 868 against the page's 864 — so: centred horizontally,
+   sitting in the middle of the space above the dock rather than pinned to the
+   top of it, and NARROWER than the field below.
+
+   THAT LAST PART IS AN INSTRUCTION AND NOT A CONSEQUENCE: "do not give the
+   content equal width to the bottom type field". Both were 720, which made
+   the message and the composer read as one stacked object of the same width —
+   a form with a label. At 460 against the field's 720 the message is
+   obviously the thing being said and the field is obviously the thing you
+   type in, and the difference in measure is what says so.
+
+   460 IS ALSO A BETTER MEASURE FOR CENTRED PROSE. §63 wants ~75 characters
+   for a reading line and centred text wants fewer, because every line starts
+   at a different x — at 13.5px this is about 48, which is where a centred
+   block stops feeling ragged.
+
+   `justify-content:center` REPLACES `flex-start`, which is what moves the
+   group down. `margin:auto 0` on the head would do the same and would fight
+   the scroll the moment the thread is long; centring the container leaves the
+   overflow behaviour alone. */
+.app .ob-stage-chat{
+  justify-content:center;
+  gap:var(--s07);
+  overflow-y:auto;
+  padding:var(--s06) 0}
+.app .ob-open-chat .ob-stage-chat > *{
+  width:100%;max-width:460px;margin:0 auto}
+
+/* ---- the head: the orb, smaller, over the opening message ----
+   `--ob-orb-sm` IS A TOKEN BECAUSE TWO RULES READ IT — the box here and the
+   voice bars' `em` base in §0c. Stated once so the indicator cannot drift out
+   of proportion with the orb it sits inside. */
+.app .ob-open-chat{--ob-orb-sm:104px}
+/* THE WHOLE BLOCK CENTRES, ORB AND PROSE TOGETHER (Maryam, 3 Sep 2026: "the
+   good morning and the other text should be middle aligned to blob and it
+   should be center aligned on the page"). It shipped left-aligned for one
+   build on the argument that four centred paragraphs are ragged on both edges
+   — which is a real typographic effect and the wrong call here, because this
+   block is not an article: it is Tal introducing itself under its own mark,
+   and the mark is the axis everything hangs from. Left-aligned, the prose ran
+   away from the orb above it and the button below it, and the composition had
+   two spines.
+
+   THE MEASURE IS WHAT MAKES CENTRED PROSE WORK, and it is why the column is
+   capped rather than left to the page: 720 at ~13.5px is about 75 characters,
+   which is §63's own line length, so no paragraph here runs long enough for a
+   ragged left edge to cost the reader the next line. */
+.app .ob-chat-head{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center}
+.app .ob-chat-lede{width:100%}
+
+/* THE BUTTON'S SPACE IS THE MESSAGE'S, NOT ITS OWN. `--s07` under a paragraph
+   block reads as the answer to it rather than as a new section — the same 32
+   the chat column uses between its own members. */
+.app .ob-chat-act{margin-top:var(--s07)}
+.app .ob-orb-sm{
+  width:var(--ob-orb-sm);height:var(--ob-orb-sm);
+  aspect-ratio:auto;margin-bottom:var(--s06)}
+.app .ob-orb-sm .ob-bars{font-size:calc(var(--ob-orb-sm) * .036)}
+
+/* THE OPENING MESSAGE IS PROSE, NOT A BUBBLE — reference 3 draws it as the
+   screen's own copy under the mark, and that is what it is: Tal introducing
+   itself rather than a turn in a conversation that has not started. Its
+   paragraphs come through as `<p>`s from `OB_CHAT`, so the spacing is stated
+   here rather than in the string. */
+.app .ob-chat-lede > p{margin:0 0 var(--s05)}
+.app .ob-chat-lede > p:last-child{margin-bottom:0}
+
+/* ---- the turns after it ----
+   TAL SPEAKS IN PROSE WITH A MARK, THE READER IN A FILLED BUBBLE, which is
+   reference 4 exactly and is the right asymmetry rather than a copied one:
+   Tal is the voice of the screen and its words are the content, while what the
+   reader said is a quoted interjection.
+
+   THE MARK IS THE SAME BLOB AT 28px, not a face and not a glyph — one mark for
+   Tal on this screen, at three sizes (440 on the voice screen, 104 at the head
+   of the chat, 28 beside a turn). */
+.app .ob-msgs{
+  display:flex;flex-direction:column;gap:var(--s06)}
+.app .ob-m-tal{
+  display:flex;align-items:flex-start;gap:var(--s04)}
+.app .ob-m-mk{
+  position:relative;flex:none;
+  display:block;width:28px;height:28px;border-radius:50%;
+  overflow:hidden}
+.app .ob-m-t{min-width:0;flex:1 1 auto}
+/* THE TYPING TURN CENTRES ON THE MARK. `.ob-m-tal` is `align-items:flex-start`
+   because a Tal turn is prose and its first line has to start level with the
+   top of the blob; the typing indicator is a 6px row, so the same rule parked
+   it against the mark's crown with 22px of nothing under it. Giving the CELL
+   the mark's own 28px and centring inside it fixes the one case without
+   touching the alignment every other turn depends on — `align-self:center` on
+   the row would have been the shorter rule and would have re-centred a
+   three-paragraph answer against its mark too. */
+.app .ob-m-typing .ob-m-t{
+  display:flex;align-items:center;min-height:28px}
+.app .ob-m-t > p{margin:0 0 var(--s04)}
+.app .ob-m-t > p:last-child{margin-bottom:0}
+.app .ob-m-me{display:flex;justify-content:flex-end}
+.app .ob-m-b{
+  display:inline-block;max-width:80%;
+  padding:var(--s04) var(--s05);
+  border-radius:16px 16px 4px 16px;
+  background:var(--gray-100)}
+
+/* ---- a question in the thread, and its options ----
+   TAL'S FRAMING LINE AND THE QUESTION ARE TWO PARAGRAPHS, not one, because
+   `OB_Q` already holds them apart — the `tal` field is the reason for the
+   question and the `q` field is the question. §63 §46 ranks them.
+
+   THE OPTIONS ARE PILLS THAT DISAPPEAR ONCE ANSWERED, which is ob.js's own
+   argument: in a form an option waits to be compared, in a conversation it is
+   a thing you SAY. They wrap, they are left-aligned with Tal's words, and they
+   carry the accent hairline rather than a fill — an unchosen option on a white
+   thread is an invitation, and §10.29 keeps the solid accent for a selection
+   that has been made.
+
+   THE CLOSING TURN'S CONTROL SHARES THE PILL. `.ob-opt-go` is the same object
+   filled, because by then it is not one of four things you could say — it is
+   the only way on, and that is exactly the difference a fill states. */
+.app .ob-opts{
+  display:flex;flex-wrap:wrap;gap:var(--s03);
+  margin-top:var(--s05)}
+.app .ob-opt{
+  box-sizing:border-box;
+  padding:9px var(--s05);
+  border:1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius:999px;
+  background:var(--layer-01);cursor:pointer;text-align:left}
+.app .ob-opt-go{
+  background:var(--gray-100);border-color:var(--gray-100)}
+.app .ob-q-tal{margin:0 0 var(--s03)}
+.app .ob-q-ask{margin:0}
+
+/* --------------------------------------------------------------------------
+   §0h — A LIVE QUESTION IS A PANEL
+
+   3 Sep 2026, with a Claude reference. ob.js's `obChatQ` is the argument for
+   why a live question is an object and an answered one is a sentence, and
+   `OB_Q`'s note is where the 23 descriptions came from.
+
+   IT IS SQUARE AND IT IS A HAIRLINE, WHICH IS WHERE IT LEAVES THE REFERENCE.
+   That block has an ~12px radius and a raised fill on a dark ground; `--radius`
+   is `0px` by token and §02's opening note is that "depth is expressed as
+   rhythm and rule weight, nothing else". So the panel is §41's shape — the
+   build's one bounded panel — and §76 reached for the same thing one screen
+   over. Stated as `var(--radius)` rather than omitted, so it follows if the
+   token ever moves.
+
+   THE ROWS ARE SEPARATED BY THE PANEL'S OWN HAIRLINE and the first one is not,
+   because the header row above it already drew that line. `border-top` on
+   `.ob-qp-o + .ob-qp-o` would need the header excluded; keying it on every row
+   AFTER the header is simpler and states the same thing.
+   ------------------------------------------------------------------------ */
+/* >>> IT IS GLASS, NOT A WHITE PANEL — Maryam, 4 Sep 2026, with a reference:
+   "I need you to follow the background type from the reference, do not use
+   that color but use the glass effect so neither we use the solid white nor
+   the questions without any fill… if you see there is a white stroke which
+   improve the look of the card, you need to follow that as well."
+
+   THREE PARTS AND EACH ONE IS DOING A JOB. A translucent white FILL, so the
+   wash behind shows through and the card is neither of the two things the
+   instruction rules out; a `backdrop-filter` BLUR, which is what makes it read
+   as glass rather than as tracing paper — without it a 60% white is just a
+   paler rectangle; and the WHITE STROKE, which is the reference's own and is
+   what gives the top edge its lit rim.
+
+   THE SATURATE IS PART OF THE BLUR, NOT A FLOURISH. Blurring alone averages
+   the wash toward its own mean and the pink goes flat under the card, so the
+   panel reads greyer than the ground it sits on — the opposite of glass.
+   `saturate(1.6)` puts the colour back so what shows through is a softened
+   version of the wash rather than a desaturated one.
+
+   AND IT NEEDS A SHADOW, WHICH IS A REAL DEPARTURE FROM §02 AND IS WHY THIS
+   NOTE IS LONG. That layer's opening line is that "depth is expressed as
+   rhythm and rule weight, nothing else", and no other component in this build
+   casts one. The reference's card is glass on a SATURATED ground, where a
+   white stroke alone defines the edge; ours sits on a wash that peaks at ~10%
+   pink and is white at the sides, so a white stroke there has nothing to
+   contrast against and the card would lose its own outline exactly where the
+   ground is palest. Two very soft shadows are what carry the edge in that
+   case. Confined to this one component, on the one surface in the product with
+   a coloured ground — if it spreads, that is the rule this build does not
+   want.
+
+   `--radius` STAYS 0 AND THE REFERENCE'S CORNERS ARE NOT TAKEN. The
+   instruction names the fill and the stroke; the radius is a token this build
+   holds at zero everywhere but one instructed exception (§31's flag chip), and
+   taking it here would make the question panel the only curved rectangle on
+   the gate. One line if it should be curved.
+
+   THE INTERNAL RULES GO NEUTRAL-TRANSLUCENT. `--rule` is opaque, so it drew a
+   grey line across glass; a white one is invisible on a white fill. A 7% black
+   reads on both, and lets the wash through like everything else in the card. */
+/* >>> AND THE FIRST ATTEMPT WAS STILL A WHITE CARD — corrected 4 Sep 2026
+   ("do not you think the questions are still solid white?"). It was, and the
+   arithmetic says so rather than an opinion: a 55% WHITE fill over a ground of
+   `(254,237,243)` composites to **(255,247,250)** — nine units WHITER in green
+   than the thing it is lying on. Blur cannot rescue that, because blurring a
+   near-white field returns a near-white field; the `backdrop-filter` was doing
+   real work and there was nothing behind it to show.
+
+   THE MISTAKE WAS TAKING THE REFERENCE'S ALPHA INSTEAD OF ITS RELATIONSHIP.
+   That card is white-ish over a SATURATED pink-purple, so a white fill lets a
+   lot of colour through and reads as frosted. Ours sits on a wash that peaks
+   at 7% pink. At those levels "white at 55%" and "white" are the same colour,
+   and the only honest way to keep the relationship is to let the panel carry
+   the colour itself.
+
+   SO THE FILL IS TWO GRADIENTS: a rose tint underneath, and a white SHEEN over
+   it that is strong at the top-left and thin at the bottom-right. Composited
+   over the wash that is (254,232,240) at the lit corner and (253,213,227) at
+   the far one — a card that is unmistakably pink, unmistakably lighter where
+   the light falls, and 5 to 24 units of green away from its own ground at
+   every point. Not white, and not absent.
+
+   THE ROSE IS THE WASH'S OWN `rgba(245,75,135)`, NOT A NEW COLOUR, which is
+   what keeps this glass rather than a pink box: the panel is showing you more
+   of the thing behind it, so a hue of its own would read as a sticker.
+
+   THE SHEEN RUNS 155deg AND IS WHY THE CARD HAS A FORM. A flat translucent
+   fill at any alpha is a rectangle of one colour; the gradient is what says a
+   surface is catching light across it, and it is the half of the reference
+   that is easiest to miss because it is subtle there too.
+
+   >>> AND ALL OF THAT IS SUPERSEDED — Maryam gave the fill and the stroke as a
+   Figma node on 4 Sep 2026 (736:6148, "copy this border and fill for the tal
+   question border"). The rose tint above was mine, invented to make glass read
+   on a pale ground; a stated value beats a derived one, so it goes.
+
+   THE TWO VALUES ARE MEASURED OFF THE NODE, NOT EYEBALLED. It renders 1:1 on
+   Figma's own `#1e1e1e` canvas, so both solve exactly: the fill composites to
+   `(120,120,120)`, and `120 = 255a + 30(1-a)` gives **a = 0.40** — white at
+   40%. The 1px stroke peaks at 254 against that same canvas, which is opaque
+   white. Her own corner radius measures ~10px and is deliberately NOT taken —
+   see the radius note below.
+
+   WHAT THIS COSTS, STATED RATHER THAN DISCOVERED: at 40% over our wash the
+   card composites to `(254,244,248)`, which is **7 units whiter in green than
+   the ground it sits on** — the same direction as the 55% version she called
+   solid white. What is different is everything around the fill. That version
+   had a stroke at 85% white (invisible on a near-white card), square corners
+   and nothing else; this one has an OPAQUE white rim, the user bubble's
+   radius and a shadow, so the card is read by its edge rather than by its
+   fill. That is how glass works at low contrast and it is the reference's own
+   construction. If it still reads as white paper, the answer is the ground —
+   the wash peaks at 7% pink, and no fill alpha can make glass out of white on
+   white.
+
+   THE BLUR AND THE SHADOW ARE KEPT AND ARE NOT PART OF THE COPIED SPEC. A
+   node's fill and stroke are static values; "glass effect" was the earlier
+   instruction and `backdrop-filter` is the only thing that delivers it. The
+   saturate stays at 1.6 for the reason above — pushed higher it pulls the
+   backdrop pink up until the card matches its ground, which is the "no fill"
+   the same instruction rules out. */
+.app .ob-qp{
+  margin-top:var(--s05);
+  border:1px solid #fff;
+  /* THE RADIUS IS THE USER BUBBLE'S, MIRRORED, AND THAT IS THE INSTRUCTION
+     ("i try to gave it a corner radius as well just like you have on the user
+     message but you use those values for tal question section as well, do not
+     use mine"). `.ob-m-b` is `16px 16px 4px 16px` — three round corners and a
+     4px notch at the trailing edge, bottom-RIGHT, because that bubble is
+     right-aligned. Tal's card is left-aligned and its mark sits on the left,
+     so the same two values mirror to put the notch bottom-LEFT. Taken
+     literally the notch would land on the far side from the speaker, which is
+     the one corner of the four that means something. One swap if the literal
+     reading was meant. */
+  border-radius:16px 16px 16px 4px;
+  background:rgba(255,255,255,.40);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  backdrop-filter:blur(20px) saturate(1.6);
+  box-shadow:0 1px 2px rgba(17,17,17,.04), 0 8px 20px rgba(17,17,17,.06);
+  overflow:hidden}
+.app .ob-qp-h{
+  display:flex;align-items:baseline;gap:var(--s05);
+  padding:var(--s05);
+  border-bottom:1px solid rgba(17,17,17,.07)}
+/* THE COUNT IS PINNED RIGHT AND NEVER WRAPS. It is three characters against a
+   question that can run to two lines, so the auto margin does the work and
+   `flex:none` stops the heading squeezing it into "1 of\n5". */
+.app .ob-qp-t{flex:1 1 auto;min-width:0;margin:0}
+.app .ob-qp-n{flex:none;margin-left:auto;white-space:nowrap}
+
+/* A ROW IS A NUMERAL AND A TWO-LINE BLOCK. `align-items:flex-start` rather
+   than centre, because a description that wraps to two lines would otherwise
+   drag the numeral down off the label it belongs to — §70's `.qa-c` records
+   the same correction. */
+.app .ob-qp-o{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  box-sizing:border-box;width:100%;
+  padding:var(--s04) var(--s05);
+  border:0;border-top:1px solid rgba(17,17,17,.07);
+  background:none;cursor:pointer;text-align:left}
+.app .ob-qp-o:first-of-type{border-top:0}
+
+/* THE PLAN'S ROWS ARE THE SAME ROW WITH THE BUTTON TAKEN OUT — `obPlan`'s note
+   is why the closing turn reuses this shape. Only the three declarations a
+   `<button>` needed and a `<div>` does not are dropped, so a step and an
+   option cannot come to look different.
+
+   ITS FIRST ROW IS KEYED ON THE HEADER, NOT ON `:first-of-type`, AND THAT IS
+   THE TRAP. `:first-of-type` matches by ELEMENT type: `.ob-qp-o` is a
+   `<button>` and the header is a `<div>`, so the first option really is the
+   first button — but `.ob-qp-r` is a `<div>` too, and the header gets there
+   first, so no row would ever match and the first step would draw its own line
+   one pixel under the header's. `.ob-qp-h + .ob-qp-r` states the relationship
+   that is actually meant. */
+.app .ob-qp-r{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  box-sizing:border-box;width:100%;
+  padding:var(--s04) var(--s05);
+  border-top:1px solid rgba(17,17,17,.07)}
+.app .ob-qp-h + .ob-qp-r{border-top:0}
+
+/* >>> THE JOURNEY'S MARK IS A BARE STATE GLYPH — `jrnList`'s own three, ported
+   4 Sep 2026 (ob.js's `OB_JRN_IC` is the argument). The three chip rules that
+   stood here are DELETED with the numerals they were built for: `done` filled
+   the chip with the accent and `on` tinted it, which was a state said twice
+   once the mark itself carries it, and a coloured glyph inside a coloured chip
+   is §72's box-in-a-box.
+
+   IT KEEPS THE CHIP'S 22px COLUMN so the option rows and the journey rows
+   start their text at the same x — one panel, one left edge, whichever kind of
+   row is in it. The glyph is 20px inside that, which is the product's one bare
+   mark size (§29's `.stat-ic`, §72's `.pulse-ic`, §70's `.qa-ic`) rather than
+   the dashboard's 16: these rows are 14/22 where `.jrn-i` is compact, so a
+   16px mark would sit small against its own label.
+
+   `fill:currentColor` IS WHAT LETS §63 STATE THE THREE STATES AS *ink* — one
+   property per state instead of three fills, and the same shape §70.727 uses
+   for `.jrn-ic`. */
+.app .ob-jr-ic{
+  flex:none;display:grid;place-items:center;
+  width:22px;height:22px;margin-top:1px}
+.app .ob-jr-ic svg{width:20px;height:20px;fill:currentColor}
+
+/* >>> `.ob-qp-skip` IS DELETED WITH QUESTION 5 (3 Sep 2026) — a rule keyed on
+   a class nothing writes is the "gate nothing writes" tell. Its one line is
+   worth keeping as a note: `.ob-qp-i` is a 22px box built around a NUMERAL's
+   line box, so any non-numeric glyph in it (an em-dash, an icon) rides high
+   against the 19px label beside it and needs its own `line-height`. §107 §0h's
+   `.ob-qp-r.done` svg sizing is the same fact from the other direction. */
+
+/* A PARAGRAPH AFTER A PANEL PAYS THE PANEL'S OWN SPACING. `.ob-m-t > p` states
+   a bottom margin only (§107's turn), which is right while a turn is prose all
+   the way down; the closing turn puts a bordered block in the middle of one,
+   and the sentence under it was landing hard against the border. */
+.app .ob-qp + p{margin-top:var(--s05)}
+/* THE NUMERAL IS NEUTRAL, NOT ACCENT, AND THAT REVERSES §76's FIRST DRAFT.
+   That layer put `--brand-tint-2` on a step numeral and then deleted it, on
+   the grounds that it was "the only --brand-tint-2 object on a page where
+   orange means you chose this" (§10.29). Four tinted chips in a list of four
+   unchosen options is that mistake times four. The chip is a reading order,
+   which is a neutral job; what says the row is pressable is the row — the
+   hairlines, the pointer and the hover below. */
+.app .ob-qp-i{
+  display:flex;align-items:center;justify-content:center;
+  flex:none;box-sizing:border-box;
+  width:22px;height:22px;margin-top:1px;
+  border-radius:var(--radius);
+  /* TRANSLUCENT, NOT `--layer-02`. That token is an opaque grey and on a glass
+     card it reads as a hole punched through the panel — the one thing inside
+     it that the wash does not reach. A 6% black is the same weight against
+     white and lets the ground through like the fill around it. */
+  background:rgba(17,17,17,.06)}
+.app .ob-qp-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+/* THE HOVER IS ARMED IN `build.py` AND THE CLASS EXISTS TO BE NARROW. Trap 6
+   rewrites every `:hover` to `:hover:where(.__nh)` unless the compound is in
+   `HOVER_KEEP`, and that list matches by `endswith` — so the entry is
+   `ob-qp-o`, a class nothing else in the build writes. Written PLAIN here per
+   trap 18: pre-disarming it myself is what makes `build-ds.py` refuse to
+   write. */
+.app .ob-qp-o:hover{background:var(--overlay-hover)}
+.app .ob-qp-o:focus-visible{
+  outline:2px solid var(--accent);outline-offset:-2px}
+
+/* ---- the composer ----
+   IT IS THE DOCK'S MIDDLE CELL, so it takes the cell's width rather than
+   centring itself in a row of its own — ob.js's `obCompose` note is the
+   argument, and the dock's chat-mode track below is what caps it.
+
+   `off` IS A BOUNDED RANGE, NOT A DEAD CONTROL. While a tap question is live
+   the field cannot answer it, and the placeholder says so; §76's month
+   chevrons make the same distinction and §60's rule is about controls that can
+   NEVER do anything. The ground goes to `--layer-02` — "available" — rather
+   than the field dimming itself, so it reads as a field waiting its turn
+   rather than as one that has failed. */
+.app .ob-compose{
+  display:flex;align-items:center;gap:var(--s03);
+  box-sizing:border-box;width:100%;
+  padding:var(--s03) var(--s03) var(--s03) var(--s05);
+  border:1px solid var(--rule);border-radius:28px;
+  background:var(--layer-01)}
+.app .ob-compose.off{background:var(--layer-02)}
+.app .ob-in{
+  flex:1 1 auto;min-width:0;
+  padding:var(--s03) 0;
+  border:0;background:none;outline:none}
+.app .ob-send{
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:none;width:40px;height:40px;
+  padding:0;border:0;border-radius:50%;
+  background:var(--gray-100);cursor:pointer}
+.app .ob-send svg{width:20px;height:20px}
+.app .ob-send[disabled]{background:var(--rule);cursor:not-allowed}
+
+/* ---- the field's earlier life ----
+   ob.js's own note is the record. What stood here was `.ob-compose`, `.ob-in`
+   and `.ob-send` — a rounded field in the dock's middle slot — and all three
+   rules are deleted rather than left unwritten, along with their two type
+   rules in §63 §45: a selector nothing emits is the same dead weight as a gate
+   nothing writes, and this layer has already had to delete one.
+
+   THE ONE RULE THAT WOULD HAVE TO COME BACK WITH IT is the dock's chat-mode
+   track: `grid-template-columns:1fr minmax(0,720px) 1fr`, because an `auto`
+   middle sizes a field to its placeholder. That is the only thing about the
+   field that was not obvious, so it is the only thing worth writing down. */
+
+/* --------------------------------------------------------------------------
+   §0f — THE CONVERSATION, ONCE IT HAS STARTED
+
+   Maryam, 3 Sep 2026: *"these are two different screen interactions merged"*,
+   and of the third screen: *"this screen will not have a top blob good morning
+   or any welcome message. This screen will initiate with asking the user first
+   question, this question placement is right above the type field and left
+   aligned with the type field."*
+
+   SO THERE IS NO `.ob-stage` IN THIS STATE — ob.js does not render one. The
+   dock IS the screen: the thread in its middle column, the field under the
+   thread in the same column, the mute disc and the two pills in the corners
+   they have held on all three screens. Everything the reader can press is
+   where it was; only the composition above it changed.
+
+   THE ALIGNMENT IS THE GRID AND THAT IS THE WHOLE POINT OF PUTTING IT HERE.
+   A `max-width:720px; margin:0 auto` column beside the dock agrees with the
+   field only while the dock's middle track is at its 720 cap. Below about a
+   1118px frame it is not: the two `1fr` tracks are forced wide by the pills
+   (191) and the mute disc (40), the field is squeezed, and a free column is
+   not. Measured at a 744 frame the two disagreed by ~200px. As `grid-column:2`
+   there is no second measure to keep in step — a longer pill label moves the
+   thread and the field together or moves neither.
+
+   `minmax(0,1fr)` ON THE THREAD ROW, NOT `1fr`. A grid row's automatic minimum
+   is its content's min-content size, so a `1fr` row holding a long thread
+   grows past the dock instead of scrolling it and pushes the field off the
+   frame. The `0` floor is what releases it — the same release `min-height:0`
+   gives a flex child, and §107 already needed it once on `.ob-stage`.
+   ------------------------------------------------------------------------ */
+.app .ob-open-live .ob-dock{
+  /* THE DOCK TAKES THE SLACK NOW INSTEAD OF SITTING IN IT. `margin-top:auto`
+     bottom-aligns a `flex:none` row against a stage that grows; with no stage
+     to grow there is nothing to be pushed by, so the row becomes the flexible
+     child and the auto margin is redundant. Both are restated rather than left
+     to inherit, because `flex:none` and `flex:1 1 auto` disagreeing with the
+     margin is exactly the kind of half-applied change that renders as a screen
+     stuck to the top of the frame. */
+  flex:1 1 auto;min-height:0;margin-top:0;
+  grid-template-rows:minmax(0,1fr) auto}
+/* THE COLUMNS ARE NAMED IN CHAT MODE BECAUSE THE MUTE IS GONE FROM IT
+   (Maryam, 3 Sep 2026: "the chat screen should not have the volume icon";
+   `obDock`'s note is why the control cannot do anything there). With the disc
+   not emitted, AUTO-PLACEMENT would slide the field into column 1 and the
+   pills into column 2 — the two controls the reader has been looking at would
+   jump left on the one press that is supposed to be a mode change and not a
+   layout change. Named columns leave track 1 empty instead, and because two
+   `1fr` tracks are equal by definition whatever they hold, the field stays
+   centred on the page to the pixel. */
+.app .ob-open-chat .ob-dock > .ob-dock-mid{grid-column:2}
+.app .ob-open-chat .ob-dock > .ob-modes{grid-column:3}
+.app .ob-open-live .ob-dock > .ob-mute{grid-column:1;grid-row:2}
+.app .ob-open-live .ob-dock > .ob-dock-mid{grid-column:2;grid-row:2}
+.app .ob-open-live .ob-dock > .ob-modes{grid-column:3;grid-row:2}
+
+/* IT SCROLLS `column-reverse`, AND THAT IS NOT A STYLE CHOICE. Two things have
+   to be true at once: the newest turn rests against the field, and the oldest
+   stays reachable. `justify-content:flex-end` gives the first and loses the
+   second — an overflowing flex-end column puts its own head above the scroll
+   origin, where no scrollbar can reach it. A REVERSED column with exactly one
+   child gives both: short, the block sits on the bottom edge; long, it scrolls
+   from the bottom with the top still in the scrollable region. `.ob-msgs` is
+   that one child and keeps its own normal order inside, so nothing about the
+   turns is reversed — only the box they sit in. */
+/* `align-self:stretch` IS NOT REDUNDANT AND IT SHIPPED WITHOUT IT FOR ONE
+   BUILD. `.ob-dock` carries `align-items:center` — correct for the controls
+   row, where a 40px disc and a 58px field share a line — and it reaches this
+   cell too, so the thread was sized to its content and CENTRED in the row it
+   was supposed to fill. Measured at 1280: the block ended 206px above the
+   field with the column-reverse doing nothing, because there was no free
+   space inside the box for it to push against. Stretch is what gives the
+   scroller the row to work in. */
+/* THE SCROLLBAR IS HIDDEN (Maryam, 3 Sep 2026: "hide the grey scroller, it is
+   looking bad"), and this is the one place in the gate where that is the right
+   call rather than a hazard. A hidden scrollbar normally costs the reader the
+   only signal that there is more above — here the thread is a CONVERSATION
+   they scrolled into themselves, one turn at a time, and every new turn moves
+   the box under their eyes. The bar was also drawing over the question's own
+   right edge on a surface whose whole composition is white space.
+
+   BOTH SPELLINGS, because they cover different browsers and neither is
+   sufficient: `scrollbar-width` is the standard property (Firefox, and Chrome
+   from 121), `::-webkit-scrollbar` is what older WebKit and Chrome read. The
+   element still scrolls — this hides the furniture, it does not clip. */
+/* >>> AND IT HAS TO LEAVE ROOM FOR THE PANEL'S SHADOW — Maryam, 4 Sep 2026:
+   "if you are trying to give a shadow then do not cut it from bottom and right
+   side." It was cut on exactly those two sides, and the reason is a rule that
+   is easy to forget:
+
+   `overflow-y:auto` SILENTLY MAKES `overflow-x` AUTO AS WELL. `visible` on one
+   axis is not a legal pair with anything else, so the computed value of the
+   other axis becomes `auto` — this box only ever asked to scroll vertically
+   and it clips horizontally too. Nothing in the CSS says so.
+
+   WHY THOSE TWO SIDES AND NOT THE OTHER TWO. The panel's LEFT edge is already
+   inset 40px by Tal's mark, so its shadow had room; the RIGHT edge is flush
+   with the scroller, so the sideways spread was sliced off at the clip. And
+   the bottom: `column-reverse` anchors the newest turn against the bottom of
+   the box, so the panel's lower edge sits exactly one padding away from the
+   clip and a 30px blur offset 10px down needs about 25.
+
+   THE ROOM IS BOUGHT WITH A NEGATIVE MARGIN AND EQUAL PADDING, so nothing
+   moves. `margin:0 -14px` widens the border box 14px into the empty grid
+   tracks either side and `padding:0 14px` insets the content box back to
+   exactly where it was — the thread's left edge still lines up with the
+   composer's to the pixel, which is the whole point of §0f. Plain padding
+   would have shrunk the measure and broken that alignment; a wider grid track
+   would have moved the field.
+
+   THE SHADOW IS TIGHTENED TO MEET IT HALF WAY. `0 10px 30px` reaches ~25px
+   below and ~15 sideways, which would need 25px of bottom padding and push the
+   thread visibly off the composer. At `0 8px 20px` it reaches ~18 and ~10, so
+   14px of side room and 22px below contain it with margin to spare, and the
+   gap to the field grows by 6px rather than by 14. */
+.app .ob-dock-thread{
+  grid-column:2;grid-row:1;align-self:stretch;
+  display:flex;flex-direction:column-reverse;
+  min-height:0;overflow-y:auto;
+  scrollbar-width:none;
+  margin:0 -14px;
+  padding:0 14px 22px}
+.app .ob-dock-thread::-webkit-scrollbar{width:0;height:0;display:none}
+
+/* THE NARROW TIER IS RESTATED HERE AND NOT ABOVE — TRAP 3, ON ORDER RATHER
+   THAN ON WEIGHT. §107's own `@container app (max-width:599px)` block sits
+   ~200 lines earlier in this file, so a rule written into it would lose to the
+   unconditional ones above at equal specificity. A container query adds no
+   specificity; only the layer order decides, so the phone's version of a rule
+   stated here has to be stated after it.
+
+   WHAT THE PHONE DOES: the dock is already `auto 1fr` with the field spanning
+   both columns on its own row, so the thread spans both columns too and the
+   whole screen is one measure. Three rows rather than two. */
+@container app (max-width:599px){
+  .app .ob-open-live .ob-dock{grid-template-rows:minmax(0,1fr) auto auto}
+  .app .ob-dock-thread{grid-column:1 / -1;grid-row:1}
+  .app .ob-open-live .ob-dock > .ob-dock-mid{grid-column:1 / -1;grid-row:2}
+  .app .ob-open-live .ob-dock > .ob-mute{grid-column:1;grid-row:3}
+  .app .ob-open-live .ob-dock > .ob-modes{grid-column:2;grid-row:3}
+}
+
+/* --------------------------------------------------------------------------
+   §0g — THE PLATFORM'S NAME, AND THE TWO MOTIONS
+
+   *"on the top their should be a TALENTnext header"*, and *"no nice
+   interaction like tal typing, or a smooth message send, or a smooth
+   transition from the welcome screen to the chat screen"* (Maryam, 3 Sep
+   2026). ob.js's `obHead`, `obSay` and the `data-obstart` handler are the
+   other halves.
+   ------------------------------------------------------------------------ */
+/* THE HEADER IS A ROW AT THE TOP AND IT TAKES NO SPACE FROM THE COMPOSITION.
+   `.ob-open` is a centred column flex, so the header is `flex:none` at the top
+   and the stage below it still centres in what is left — the orb does not move
+   by half the header's height, which is what would happen if the row were part
+   of the centred group.
+
+   THE WORDMARK IS ON THE PAGE'S OWN GUTTER, which is what puts it in line with
+   the mute disc at the foot: both sit on `.ob-open`'s `--s06` padding, so the
+   screen has one left edge from the name to the control. */
+.app .ob-head{
+  display:flex;align-items:center;
+  flex:none;width:100%;
+  padding-bottom:var(--s06)}
+.app .ob-logo{display:flex;align-items:center}
+.app .ob-logo img{display:block;height:24px;width:auto}
+@container app (min-width:900px){.app .ob-logo img{height:26px}}
+
+/* A MESSAGE ARRIVES, IT DOES NOT APPEAR. 14px of lift over 260ms — far enough
+   to read as movement, short enough that a reader answering four questions in
+   a row is never waiting on it.
+
+   IT IS KEYED ON `:last-child`, WHICH IS THE WHOLE MECHANISM AND IS WORTH
+   READING BEFORE CHANGING. `render()` rebuilds every turn on every paint, so
+   an entrance on `.ob-m` would replay the entire thread each time — the
+   animation trap, one component along. `:last-child` is the only turn that is
+   NEW on any given paint, and the beat is what guarantees it: answering
+   paints once with the reader's bubble last, then again 1.4s later with Tal's
+   reply last. Each animates exactly once, on the paint that introduced it.
+
+   THE TYPING DOTS ARE A TURN TOO and take the same entrance, because they
+   occupy the same slot Tal's reply is about to. */
+.app .ob-msgs > .ob-m:last-child{
+  animation:ob-msg-in 260ms cubic-bezier(.22,1,.36,1) both}
+
+/* AND THE WELCOME LEAVES BEFORE THE CONVERSATION ARRIVES. `.ob-leave` is put
+   on the stage by the press and the state change waits `OB_LEAVE` for it —
+   ob.js's note is why an exit cannot be done by `render()` alone. It lifts the
+   opposite way to a message arriving, so the two halves read as one movement
+   up the screen rather than as a dissolve.
+
+   `forwards` RATHER THAN `both`, and `pointer-events:none` with it: the block
+   is on its way out and must not take a second press on the words that are
+   fading. */
+.app .ob-stage.ob-leave{
+  animation:ob-leave 220ms ease-in forwards;
+  pointer-events:none}
+
+@keyframes ob-msg-in{
+  from{opacity:0;transform:translateY(14px)}
+  to{opacity:1;transform:none}}
+@keyframes ob-leave{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateY(-12px)}}
+
+/* REDUCED MOTION TAKES ITS OWN BLOCK, per §21/§27/§33/§40's rule — §13.187
+   clamps every duration to 1ms, which is right for a one-shot entrance and
+   would leave `.ob-leave` finishing before the 220ms timer that is waiting on
+   it. Stated `none`, so the welcome simply goes and the turns simply appear;
+   `OB_LEAVE` still runs, which is a fifth of a second of a still screen and
+   the honest cost of doing this in one place. */
+@media (prefers-reduced-motion:reduce){
+  .app .ob-msgs > .ob-m:last-child,
+  .app .ob-stage.ob-leave{animation:none}
+  .app .ob-stage.ob-leave{opacity:0}
+}
+
+@keyframes ob-in{from{opacity:0}to{opacity:1}}
+@keyframes ob-orb-in{
+  0%{opacity:0;transform:scale(.34)}
+  55%{opacity:1}
+  72%{transform:scale(1.06)}
+  100%{opacity:1;transform:scale(1)}}
+@keyframes ob-breathe{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.03)}}
+@keyframes ob-ring-out{
+  0%{opacity:0;transform:scale(.8)}
+  35%{opacity:1}
+  100%{opacity:0;transform:scale(1.28)}}
+@keyframes ob-greet-in{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}}
+
+/* REDUCED MOTION NEEDS ITS OWN BLOCK, and §21.4, §27.8, §33.6 and §40 each
+   have one for exactly this reason: §13.187 clamps every duration to 1ms, and
+   1ms on an INFINITE animation is a strobe rather than "off". So the three
+   loops are turned off by name and the three entrances are parked at their
+   final frame — the orb at full size, the greeting in place, the rings at
+   their resting width and visible. ai4's `reduce()` has already withheld the
+   video's `autoplay` by then, so that reader gets the poster: frame 0, same
+   size, same circular alpha, standing still. */
+@media (prefers-reduced-motion: reduce){
+  .app .ob-stage,
+  .app .ob-dock,
+  .app .ob-greet{animation:none;opacity:1;transform:none}
+  .app .ob-blob{animation:none;opacity:1;transform:none}
+  .app .ob-ring{animation:none;opacity:1;transform:scale(1.12)}
+}
+
+/* --------------------------------------------------------------------- 1 ---
+   THE PANEL EXISTS AT EVERY WIDTH, AND THAT IS THE ONE THING §17 HAD TO BE
+   TOLD
+
+   `.auth-brand,.auth-mark{display:none}` is §17.28, unconditional, and §57
+   only switches the panel back on inside `@container app (min-width:900px)`.
+   That is exactly right for what it was written for — the signup panel is
+   three paragraphs of marketing and a logo, so a phone is better off without
+   it — and it is wrong here, because this panel holds two things a reader
+   needs: TAL'S LINE FOR THIS STEP, which is the question's whole framing, and
+   THE SPINE, which is the only progress indication on the screen. Hidden on a
+   phone, the onboarding becomes five unexplained radio lists.
+
+   SO BELOW 900 IT IS A BAND ABOVE THE CARD, NOT A COLUMN BESIDE IT. §17 makes
+   `.auth-card` `display:contents`, so the panel and the column are already
+   siblings in the app's own column flow — which means the stacked layout needs
+   no order property and no grid: the panel is simply first in the markup and
+   `display:flex` is the whole of the change.
+
+   IT IS KEYED ON `.ob-brand`, so the signup panel keeps §17's behaviour
+   exactly. This is one screen's exception, stated on the class that screen
+   mints, rather than a change to a rule five auth views depend on.
+   ------------------------------------------------------------------------ */
+.app .auth-card > .ob-brand{
+  display:flex;flex-direction:column;align-items:center;
+  box-sizing:border-box;
+  padding:var(--s07) var(--s06);
+  /* THE GROUND IS §53's ASK-SCREEN IVORY, AND IT TOOK TWO TRIES — the first
+     one is worth writing down because it looked correct in the source and
+     failed on the screen.
+
+     §57 paints `.auth-brand` with `__AUTHART__`, a soft painterly gradient
+     with no subject, and that has to come off: this panel's job is to hold
+     TAL'S MARK at 112px, and §53 draws that mark as `--tal-mark` — an orange
+     blob with a soft edge. A soft orange mark on a painterly orange-pink wash
+     has no edge left.
+
+     SO IT WENT TO `--auth-wash-1` FIRST, the asset's own top-left value, on
+     the reasoning that a flat field would give the mark its edge back. It does
+     not, and the reason is arithmetic rather than judgement: #f6dcc9 IS the
+     accent at about a tenth, so that put Tal's orange on Tal's orange and the
+     mark came out a pale peach disc on pale peach paper. Flattening a wash
+     does not add contrast to it.
+
+     `--askv-ground-wash` IS THE ANSWER BECAUSE IT IS ALREADY THE ANSWER
+     SOMEWHERE ELSE. §53 mints it for `.ask-page` — Tal at full screen — as two
+     ivory radials at 22% and under, and that is the one surface in this
+     product where Tal's mark is drawn LARGE and reads. Two things follow: the
+     panel keeps the warmth that makes it continuous with the screen before it,
+     and it is the product's own "Tal is speaking here" ground rather than a
+     colour picked to solve one composition. §53's own note is that naming the
+     gradient once is "what makes the margins and the column one surface".
+
+     AND THEN THE WHOLE GATE WENT WHITE (Maryam, 3 Sep 2026: "the background
+     color throughout the tal onboarding should be white"). Both paragraphs
+     above are kept because the half of the argument that still holds is the
+     half about what NOT to use: if this panel is ever tinted again,
+     `--auth-wash-1` is the value that fails and §53's ivory is the one that
+     works. What the instruction settles is the question neither paragraph
+     asked — whether the panel should carry a ground at all.
+
+     SO THE SPLIT IS DRAWN BY THE CARD, NOT BY THE PANEL. With both halves
+     white the only edge left in the composition is §57.181's own
+     `1px solid var(--auth-card-line)` around the form card, which is what now
+     separates Tal's column from the question — one hairline instead of a
+     change of ground, which is §02's opening principle ("depth is expressed as
+     rhythm and rule weight, nothing else") rather than a compromise.
+
+     `--layer-01` RATHER THAN `#fff`, so it moves with the token, and
+     `background-image:none` is half the rule because §57.116 paints
+     `__AUTHART__` as a `background-image` and a colour alone would sit under
+     it. */
+  background-color:var(--layer-01);
+  background-image:none;
+  border-right:0}
+
+/* AND THE LATTICE GOES, WHICH §51.9 ALREADY HAD TO DO FOR THE ASK PAGE. §27.4
+   draws thirteen hairlines behind the mark at a FIXED `width:432px` with
+   `translateX(-50%)`, so in any container narrower than 432 it overflows both
+   edges — 37px of horizontal scroll at 360, which CLAUDE.md records as a live
+   bug on the chat surface. This panel is 358 wide on a phone and ~500 at
+   1280, so it is narrower than the lattice at every width the product is read
+   at. `content:none` rather than `overflow:hidden`, because clipping it would
+   leave half a rhombus grid cut off at both sides of the panel. */
+.app .ob-brand .tal-hero::before{content:none}
+
+/* THE HERO STOPS CENTRING ITSELF VERTICALLY. §27.4 gives it `margin:auto 0`,
+   which is what floats it in the middle of a tall empty chat panel. Here it is
+   the first of three stacked members, so it sits at the top of them. */
+.app .ob-brand .tal-hero{margin:0;padding:0;width:100%}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE SPINE
+
+   Five rows, one per question, in the three states §56 gives the journey's
+   marks — done, on, ahead. Two of the three are §56's own grounds, so the
+   vocabulary is the product's rather than this screen's: flat `--accent` for a
+   step behind you and `--brand-tint-2` for the one you are on. The third is
+   NOT §56's, and the note over the mark below is why. Discs, because §56
+   grants marks the one curve this system allows.
+
+   IT IS NOT §56's `.stps`. That component is the ninety-day journey — four
+   stages, each with a state word under it — and it is placed into a head band
+   by a render pass that does not run on this stage. A progress spine for one
+   sitting is a different object with the same colour language.
+
+   `list-style:none` AND `padding-left:0`, because it is an `<ol>`: the numeral
+   is the mark, and a UA marker beside it would number the rows twice.
+   ------------------------------------------------------------------------ */
+.app .ob-brand .ob-spine{
+  display:flex;flex-direction:column;gap:var(--s04);
+  list-style:none;margin:var(--s07) 0 0;padding:0;
+  width:100%;max-width:260px}
+.app .ob-brand .ob-sp{
+  display:flex;align-items:center;gap:var(--s04);
+  /* A ROW AHEAD OF YOU IS DIMMED AND IT IS NOT DONE WITH `opacity` — trap 2.
+     The entrance animations run `fill-mode:both`, so a resting state expressed
+     as opacity is competing with a keyframe's final frame. §63 §42 inks the
+     label instead, and the mark carries its own ground. */
+  min-height:24px}
+/* A STEP AHEAD OF YOU IS A RING, NOT A FILL, AND THAT IS A CORRECTION.
+   §56's three journey marks are all FILLS — flat `--accent` for done,
+   `--brand-tint-2` for the step you are on, `--layer-02` for one ahead — and
+   the third of those is right on the ground §56 draws it on and invisible on
+   this one. `--layer-02` is #f7f7f7 and the panel was #fbfbfb at the time:
+   four units apart, so all five marks vanished and the spine was five gaps in
+   a row. The panel is white now, which makes that fill four units of contrast
+   in the other direction — still nothing — so the ring is the right answer at
+   either value. The ground changed under a borrowed value, which is the same shape as
+   CLAUDE.md's warning about `.plate-quiet` — a token that means "available"
+   on white does not mean it on near-white.
+
+   SO THE UNREACHED STATE IS §104's RING INSTEAD, and that is a vocabulary
+   this product already has: `.role-c input:not(:checked) + .box` is
+   `background:transparent` on a 1px edge, for exactly this reason ("white on
+   `--layer-02` reads as a filled white dot rather than an empty ring, i.e. as
+   a third state"). Here it is the same problem with the grounds swapped.
+   `--rule` is the build's one hairline and 1.13:1 on white is faint by
+   design — but a 24px ring of it is a shape, where a 4-unit fill is nothing.
+
+   THE OTHER TWO KEEP THEIR FILLS and gain a matching edge, because a filled
+   disc that is 1px smaller than the ring beside it makes the row jitter. */
+.app .ob-brand .ob-sp-m{
+  display:flex;align-items:center;justify-content:center;
+  flex:none;box-sizing:border-box;
+  width:24px;height:24px;border-radius:50%;
+  background-color:transparent;
+  border:1px solid var(--rule)}
+.app .ob-brand .ob-sp-m svg{width:14px;height:14px}
+.app .ob-brand .ob-sp.on .ob-sp-m{
+  background-color:var(--brand-tint-2);border-color:var(--accent)}
+.app .ob-brand .ob-sp.done .ob-sp-m{
+  background-color:var(--accent);border-color:var(--accent)}
+
+/* THE REASSURANCE SITS UNDER THE SPINE AND IS NOT PUSHED TO THE FOOT. §57.151
+   gives `.auth-foot` `margin:24px 0 0` and §57.137 pins the copy above it with
+   `margin-top:auto`; there is no `.auth-intro` here, so nothing is pinned and
+   the three members read top to bottom. Capped at the spine's own measure so
+   the panel has one text column rather than two. */
+.app .ob-brand .ob-foot{
+  margin:var(--s06) 0 0;max-width:320px;text-align:center}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE PANEL AT 900 AND UP
+
+   Now it is the left half. §57 states the 52.6% and the padding for
+   `.auth-brand` inside this tier, so both have to be answered here rather than
+   above it — per trap 3, and the ORDER matters as well as the tier: this file
+   is layer 107 and §57 is layer 57, so an equal-weight rule in the same tier
+   wins on position. Checked rather than assumed.
+
+   THE COLUMN IS NARROWER THAN THE BRAND PANEL'S 52.6%. That share is right for
+   a 719px measure of marketing copy; this panel holds a 112px mark, one short
+   sentence and a 260px spine, and at 52.6% of 1280 the sentence sets to 40
+   characters in the middle of 673px of cream. 40% gives the card the room
+   instead, which is where the reader is working.
+
+   `justify-content:center` IS WHAT PUTS THE THREE MEMBERS IN THE MIDDLE of a
+   half-screen column, and it is stated here rather than in §1 because on a
+   phone the band is exactly its own content's height and centring is a no-op
+   there. Both columns are top-aligned in §57's own composition; this one is
+   centred because it is not a form.
+   ------------------------------------------------------------------------ */
+@container app (min-width:900px){
+  .app .auth-card > .ob-brand{
+    flex:0 0 40%;min-width:0;
+    justify-content:center;
+    padding:var(--s09) var(--s07)}
+  .app .ob-brand .ob-spine{margin-top:var(--s08)}
+}
+
+/* --------------------------------------------------------------------- 3b --
+   THE PANEL ON A PHONE IS A HEADER, NOT A SCREEN — AND THIS WAS MEASURED
+
+   §1 turns the panel into a band above the card and that is the right shape;
+   the first build of it was the right shape at the wrong SIZE. At 390 x 844 it
+   measured **550px tall**, which put the question at y=626, the fourth option
+   at 864 and the Back/Next row at 928 — so every one of the five steps needed
+   a scroll to see its last option and a second scroll to reach the button that
+   leaves it. On a five-step gate that is five scrolls of tax on the one
+   interaction the screen exists for.
+
+   THE 168px SPINE WAS TWO THIRDS OF IT, and it is the member that loses least
+   by turning. Stacked, five labelled rows are a table of contents for a form
+   that is four taps long; laid on their side with the labels off they are the
+   same position indicator in 24px. What the words were carrying is carried
+   twice over in the card — `.ob-step` prints "Question 2 of 5" directly above
+   the question — which is §41's "the label is never the only carrier" running
+   the other way: here the label is the part that can go, because the count and
+   the marks both survive.
+
+   AND THE MARK STEPS 112 -> 72. §40's size is written for the chat's empty
+   state, where the mark IS the screen; here it is one member of a header. The
+   restatement is (0,5,0) against §40's (0,4,0) and it is safe to resize
+   because §53 has already replaced that sphere with `--tal-mark` as a
+   `background-size:contain` image and turned its four pixel-length shadows
+   off — §40's own note warns that the shadows do not scale, and there are
+   none left to scale. §27.4's -6px optical margin is left alone: it was
+   measured for the PNG's falloff at 132 and is a nudge rather than a layout
+   number at any size.
+
+   MEASURED AFTER: the panel is 318, the question is at 394, the last option at
+   632 and the action row at 696 — the whole step inside an 844 viewport with
+   148px to spare, and no scroll on any of the five.
+   ------------------------------------------------------------------------ */
+@container app (max-width:899px){
+  .app .auth-card > .ob-brand{padding:var(--s06) var(--s05)}
+
+  .app .ob-card .ob-brand .tal-hero .tal-mk.orb{
+    width:72px;height:72px}
+
+  /* THE SPINE TURNS. `max-width:none` is half the rule — §2 caps it at 260 for
+     a column, and a row of five marks needs the width it is given so the
+     `gap` can space them evenly rather than bunching them at the left. */
+  .app .ob-brand .ob-spine{
+    flex-direction:row;justify-content:center;
+    gap:var(--s03);
+    margin-top:var(--s05);max-width:none}
+
+  /* THE LABEL GOES AND THE MARK STAYS. `display:none` on the span rather than
+     a smaller size, because five 12px words in 358px is four of them wrapped
+     and one on its own line — which is taller than the column it replaced. */
+  .app .ob-brand .ob-sp{min-height:0}
+  .app .ob-brand .ob-sp > span{display:none}
+
+  /* A MARK ON ITS OWN NEEDS TO BE FINDABLE, so it takes back the two pixels
+     the row's gap saved. 20 rather than 24 because there is no label beside it
+     to set the row's height, and five 24px discs with 8px gaps read as a
+     control strip rather than as progress. */
+  .app .ob-brand .ob-sp-m{width:20px;height:20px}
+  .app .ob-brand .ob-sp-m svg{width:12px;height:12px}
+
+  .app .ob-brand .ob-foot{margin-top:var(--s05)}
+}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE OPTIONS ARE ONE PER ROW
+
+   §104's `.role-pick` is `repeat(auto-fit,minmax(200px,1fr))` — two across in
+   the auth column — and that is right for the two it was written for and wrong
+   for four. Two by two, the four options read as a 2x2 matrix with an implied
+   pairing that is not in the data ("In a role" beside "Between roles" as if
+   they were one axis), and the longest label — "Neither — it is something
+   else" — wraps to two lines beside a one-line neighbour, so the grid draws
+   two rows of unequal height.
+
+   A single column also makes the list SCANNABLE IN ONE DIRECTION, which is
+   what a question with one answer wants: §76 reached the same shape for the
+   booking page's times ("the six outlined time cells were the heaviest object
+   on a page whose own three blocks had just lost their frames") and for the
+   same reason — a list of alternatives is read down, not across.
+
+   `.ob-pick` RATHER THAN A RE-POINT OF `.role-pick`, so the login screen's
+   pair is untouched. One extra class on the wrapper against a rule that would
+   have had to exclude the one screen it was written for.
+   ------------------------------------------------------------------------ */
+.app .form-page .role-pick.ob-pick{grid-template-columns:minmax(0,1fr)}
+
+/* AN OPTION IS TALLER THAN A LOGIN ROLE, AND THAT IS THE LABEL'S DOING. §104
+   gives `.role-c` `padding:14px 16px` for a single 19px line; two of these
+   labels wrap at 390, and a block whose text wraps needs its own leading
+   rather than a line's. `align-items:flex-start` with the ring nudged down,
+   for §73's reason on `.aih` — a control centred against a two-line text block
+   floats in the middle of it, and the ring belongs beside the FIRST line,
+   which is where the eye enters the row. */
+.app .form-page .role-c.ob-o{
+  align-items:flex-start;
+  padding:var(--s04) var(--s05);
+  min-height:48px}
+.app .form-page .role-c.ob-o > .box{margin-top:2px}
+
+/* --------------------------------------------------------------------- 5 ---
+   THE SECTIONS INSIDE THE CARD
+
+   §17 flattens `.page` to a bare column inside the auth card and takes the
+   section rules off, so a `.sec` here pays only its own vertical padding. What
+   it does NOT do is close the gap between two of them: §10's base is
+   `padding:var(--s06)` top and bottom, which is 48 between two sections — the
+   product's own rhythm, and far too loose inside a 526px card where the whole
+   screen is a heading, a list and two buttons.
+
+   `--s05` EACH SIDE, SO 32 BETWEEN TWO SECTIONS. That is `--s07`, the card's
+   own frame, which is the value §75 uses for the inside of a black card and
+   what `.auth-card > .auth-col .page` already pays at its edges. The screen
+   then has one spacing value in it.
+   ------------------------------------------------------------------------ */
+.app .auth-card .ob-page > .sec.ob-sec{
+  padding-top:var(--s05);padding-bottom:var(--s05)}
+.app .auth-card .ob-page > .sec.ob-sec:first-child{padding-top:0}
+.app .auth-card .ob-page > .sec.ob-sec:last-child{padding-bottom:0}
+
+/* THE QUESTION'S NUMBER SITS TIGHT TO THE QUESTION, which is
+   `--sec-desc-gap`'s job one way up: the figure and the heading under it are
+   one object on two lines, and 8 is the value that pair takes everywhere in
+   the product. The heading pays nothing below it because the option list is
+   the next section and pays its own 16. */
+.app .ob-page .ob-step{margin:0 0 var(--sec-desc-gap)}
+.app .ob-page .ob-q{margin:0}
+
+/* THE WELCOME'S SENTENCE HAS NO HEADING ABOVE IT, WHICH IS WHY IT NEEDS A
+   MARGIN OF ITS OWN. `--sec-desc-gap` is stated on `.sec-h:has(+ .all-desc)`
+   — the HEADING pays the gap, not the sentence — so an `.all-desc` that opens
+   its section has nothing setting its top and inherits whatever `p` carries.
+   ob.js's note is the argument for the heading being gone. */
+.app .ob-page .ob-lede{margin:0 0 var(--s04)}
+
+/* --------------------------------------------------------------------- 6 ---
+   THE ACTION ROW
+
+   Back and Next on one line, Next on the right. `margin-left:auto` on the
+   accent button rather than `justify-content:space-between`, because on the
+   two screens with only ONE control — the welcome's Start and, if the note is
+   empty, nothing else — space-between would leave a lone button pinned left
+   while every other step's primary sits right.
+
+   AND IT WRAPS RATHER THAN SHRINKING. At 390 the card is ~326 wide inside its
+   padding and the pair measures ~250, so it holds; "See what I heard" pushes
+   it to ~290 and still holds. `flex-wrap` is the safety valve for the width
+   where it does not, and §56's rule is why it matters: a `.btn` label on two
+   lines is the tell that a row has run out of room.
+   ------------------------------------------------------------------------ */
+.app .ob-page > .sec.ob-act{
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--s04)}
+.app .ob-page > .sec.ob-act > .btn-p{margin-left:auto}
+
+/* A DISABLED NEXT NEEDED ITS OWN RULE, AND §81 IS THE SAME COLLISION ONE
+   SURFACE OVER. §57.399 gives `.app .auth-card .btn-p` a flat
+   `--brand-primary` ground at (0,3,0) — the auth surface's primary is BLACK,
+   with the accent kept for hover — and that beats §02.108's whole disabled
+   treatment at (0,2,0). So Next stayed solid black with white ink while
+   `disabled`: a control that looks live and is not, which reads as a broken
+   page rather than a closed door. The attribute selector makes this (0,3,1).
+   `background-image:none` rides along because §02's disabled state does not
+   assume a gradient is absent and a later restatement of the auth button may
+   paint one. Not `opacity` — trap 2. §63 §42 inks the label. */
+.app .auth-card .ob-page .btn-p[disabled]{
+  background-color:var(--layer-02);
+  background-image:none;
+  border-color:transparent;
+  cursor:not-allowed}
+
+/* --------------------------------------------------------------------- 7 ---
+   WHAT TAL ALREADY KNOWS
+
+   A `.kv` band inside a `.tile`, which is §10.5's own shape and needs almost
+   nothing — the seven rows, the hairlines and the label column are all there.
+   Two things:
+
+   THE TILE PAYS NO SIDE PADDING INSIDE THE CARD. §17 already zeroes a `.sec`'s
+   gutter here, and a `.tile` that indented itself would sit inset from the
+   heading above it — trap 10, answered at the element the way §69.4 and §76.5
+   both answer it.
+
+   AND THE TWO LOWEST BANDS ARE NAMED IN THE ROW RATHER THAN RE-SORTED. The
+   chip says "lowest" beside its figure, so the reader can see WHY Tal is about
+   to ask about those two — and the rows stay in `SCORES`' own order, because
+   re-sorting them would make the band list disagree with the rose on
+   `V.result`, which draws the same five in the same order. */
+.app .auth-card .ob-page .ob-know{padding:var(--s05)}
+.app .ob-page .ob-know .kv{margin:0}
+.app .ob-page .ob-lowt{
+  display:inline-block;margin-left:var(--s03);
+  padding:1px var(--s03);border-radius:999px;
+  background-color:color-mix(in srgb, var(--mk-3) 14%, transparent)}
+
+/* --------------------------------------------------------------------- 8 ---
+   THE READ-BACK
+
+   Four rows of label, answer and a way back to the question that set it. It is
+   a `.tile` with its own rows rather than a `.kv`, because a kv row is a pair
+   and this is a triple — and the third member is a CONTROL, which a `.kv`'s
+   two-column grid has nowhere to put.
+
+   THE HAIRLINE IS BETWEEN ROWS AND NOT AROUND THEM, so the block reads as one
+   object with four parts. `border-top` on every row but the first, which is
+   §02's idiom rather than `.kv`'s grid-gap trick — that one paints the rule
+   colour as the GROUND behind the cells and needs the row count to be right
+   (CLAUDE.md's `.stats` / `.facts` trap), and here the count changes with
+   whether the note was filled in.
+
+   THE ANSWER IS ALLOWED TO WRAP AND THE CONTROL IS NOT. `1fr` on the middle
+   column with `min-width:0`, `auto` on the other two — so a long quoted note
+   sets to as many lines as it needs and Change stays on the first one.
+   ------------------------------------------------------------------------ */
+.app .auth-card .ob-page .ob-heard{padding:0}
+.app .ob-page .ob-hr{
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:start;gap:var(--s04);
+  padding:var(--s04) var(--s05)}
+.app .ob-page .ob-hr + .ob-hr{border-top:1px solid var(--rule)}
+.app .ob-page .ob-hk{white-space:nowrap}
+.app .ob-page .ob-hx{
+  border:0;background:none;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;
+  white-space:nowrap}
+
+/* THE LABEL COLUMN STACKS ON A PHONE. Three columns in 326px gives the answer
+   ~120px between a 100px label and a 55px control, so "Deciding without enough
+   information" sets to four lines in a row 60px tall. Below 600 the label goes
+   above the answer and Change keeps the right edge, which is the same move
+   §72.4 makes for the standing note ("the note runs full width under the pair,
+   and that is a correction to the file"). 600 rather than 900 because the card
+   is 526 wide from 900 down to about 590, so the seam is where the CARD
+   narrows, not where the product's own breakpoint is. */
+@container app (max-width:599px){
+  .app .ob-page .ob-hr{
+    grid-template-columns:minmax(0,1fr) auto;
+    row-gap:var(--s02)}
+  .app .ob-page .ob-hk{grid-column:1 / -1}
+}
+
+/* --------------------------------------------------------------------- 9 ---
+   THE AGENT, AND THE ONE SENTENCE UNDER THE NAME
+
+   A face, a name, the three purchase facts on one line and the fit sentence.
+   It is deliberately NOT `talRec`'s black card (§75.3): that component is a
+   page's next STEP and this screen is not offering a booking — ob.js's own
+   note says so in the helper line under it. A `.tile` is the register for
+   "here is a thing you will act on later".
+   ------------------------------------------------------------------------ */
+.app .auth-card .ob-page .ob-rec{
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s05)}
+.app .ob-page .ob-rec-b{
+  display:flex;flex-direction:column;min-width:0;flex:1 1 auto}
+.app .ob-page .ob-rec-r{margin-top:2px}
+.app .ob-page .ob-fit{margin:var(--s03) 0 0}
+.app .ob-page .ob-hint{margin:var(--s04) 0 0}
+
+/* --------------------------------------------------------------------- 10 --
+   >>> THE FREE FIELD IS DELETED (Maryam, 3 Sep 2026 — question 5 is out of the
+   flow) AND ITS THREE DECLARATIONS ARE THE ARGUMENT WORTH KEEPING, because
+   they are what §02's `.inp` does NOT give a `<textarea>`: the resize handle
+   off (a card with a draggable corner is a control that can be dragged out of
+   its own column), a `height` from `rows` rather than the input's fixed one,
+   and `font:inherit` — a `<textarea>` takes the UA's monospace otherwise, and
+   §63 cannot fix that, because inheriting the FAMILY is not one of the four
+   properties that layer owns. The next multi-line field in this build needs
+   all three. */

@@ -36,10 +36,31 @@
    correction to all three and can only land after them. Nothing in it names
    a selector §36, §37 or §38 mentions.
 
-   SCOPED TO THE BUBBLE, not written as a bare `.tw`. Every `.tw` in the
+   SCOPED TO THE BUBBLE, not written as a bare `.tw`. A widget dropped on a
+   PAGE has no frame around it and would need its own, and this way it keeps
+   one.
+
+   AND THE ONBOARDING THREAD IS THE SECOND HOST — `:is(.tal-msg > .bb,
+   .ob-m-t)`, 3 Sep 2026. That sentence used to read "every `.tw` in the
    product today is printed by `talReply` into a `.tal-msg > .bb`, so the
-   scope changes nothing now — but a widget dropped on a PAGE has no frame
-   around it and would need its own, and this way it keeps one.
+   scope changes nothing now"; ob.js's chat made it false the moment the
+   composer went live during the questions, because §107's turns are `.ob-m-t`
+   and nothing about them is a `.bb`. The failure was not subtle and was not
+   the missing frame: §7's `.tw-ic svg` sizing lives in this file, so an
+   unsized `<svg>` filled its container and the support card's headset drew
+   **780px tall** inside a 720px thread. Everything else in `.tw` fell back to
+   §03's uncorrected base at the same time — the second frame, the 8px gap,
+   `.tw-a`'s auto margin, all of it.
+
+   `:is()` RATHER THAN A SECOND SELECTOR ON EVERY RULE, and that is the whole
+   reason it is safe to do in one pass. `:is()` takes the specificity of its
+   MOST specific argument, so `:is(.tal-msg > .bb, .ob-m-t)` is (0,2,0) — what
+   `.tal-msg > .bb` already was — and all 28 rules keep the exact weight they
+   were written with. A comma-separated `.app .ob-m-t .tw` would have been
+   (0,3,0) against the original's (0,4,0) and would have lost, silently, to
+   whichever §03 rule each one was correcting. §40 makes the same move for
+   `.ob-brand` on §27's and §53's host lists; CLAUDE.md's note on un-scoping is
+   why the host is ADDED to the list rather than taken out of it.
    ========================================================================== */
 
 /* ------------------------------------------------------------------ 1 ---
@@ -54,7 +75,7 @@
    the table and the action row IS the grouping, and at 8px the three read as
    one undifferentiated stack.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw{
   background:transparent;border:0;padding:0;
   margin-top:var(--s05);gap:var(--s05)}
 
@@ -64,7 +85,7 @@
    the sides. `.tw-top` is stamped by `twTop` in ai8.js — the note there
    explains why this cannot be `:first-child`: leading prose is a text node,
    so the widget is the first ELEMENT either way. */
-.app .tal-msg > .bb .tw.tw-top{margin-top:0}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw.tw-top{margin-top:0}
 
 /* TWO WIDGETS IN ONE TURN NEED A LINE BETWEEN THEM, and several answers are
    built that way: `wRefund` and `wPause` both end by appending `wSupport`, so
@@ -75,7 +96,7 @@
 
    `--rule-on-2` rather than `--rule`: §12.14 tunes it one step darker for the
    panel ground, and the bubble is `--layer-01`, which is that ground. */
-.app .tal-msg > .bb .tw + .tw{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw + .tw{
   margin-top:var(--s05);padding-top:var(--s05);
   border-top:1px solid var(--rule-on-2)}
 
@@ -98,7 +119,7 @@
    §03.363's 600 was for `.tw-def`'s value, and on a button it made the quiet
    action as loud as the primary one.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-a{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-a{
   display:flex;align-items:center;flex-wrap:wrap;
   gap:var(--s04);margin-left:0;font-weight:400}
 
@@ -154,17 +175,17 @@
    border its own rule had switched off. A fill would be a worse version of
    the same mistake, so the selector excludes the variant rather than relying
    on a later rule to undo it. */
-.app .tal-msg > .bb .tw-btn{border-color:var(--rule-on-2)}
-.app .tal-msg > .bb .tw-btn:not(.ghost){
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn{border-color:var(--rule-on-2)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn:not(.ghost){
   background-color:var(--accent);
   border-color:var(--accent);
   color:var(--on-accent);
   --on-brand-fill:1}
-.app .tal-msg > .bb .tw-btn:not(.ghost) svg{fill:currentColor}
-.app .tal-msg > .bb .tw-btn.ghost{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn:not(.ghost) svg{fill:currentColor}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn.ghost{
   color:var(--accent-on-2);border-color:var(--rule-on-2);
   padding-left:var(--s04);padding-right:var(--s04)}
-.app .tal-msg > .bb .tw-btn.ghost svg{fill:currentColor}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn.ghost svg{fill:currentColor}
 
 /* ------------------------------------------------------------------ 3 ---
    THE HEADLINE IS A LINE, NOT A LIST OF ONE
@@ -183,7 +204,7 @@
    sentence, about forty-five words — so it carries a measure. Everything
    above it in the widget is a grid and grids do not need one; a sentence set
    across 584px does. */
-.app .tal-msg > .bb .tw-lede{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-lede{
   font-size:14px;line-height:21px;font-weight:500;max-width:56ch;
   letter-spacing:.05px;color:var(--text-primary)}
 
@@ -201,22 +222,22 @@
    12px is the smallest gap that is bigger than the 17px line box's own
    leading gap, which is the only thing that has to be true.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-list,
-.app .tal-msg > .bb .tw-check,
-.app .tal-msg > .bb .tw-lines{gap:var(--s04)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-list,
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-check,
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-lines{gap:var(--s04)}
 
 /* THE BULLET IS TAL'S COLOUR NOW. It was `--dv-3`, one of the four data-viz
    hues, which is the palette the charts allocate from — a series colour on a
    list of three statements is a colour that means "series 3" being used to
    mean nothing. Accent is what marks Tal everywhere else in the product: the
    sparkle on a chip, the mark beside the name above the bubble. */
-.app .tal-msg > .bb .tw-list > span::before{background:var(--accent-on-2)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-list > span::before{background:var(--accent-on-2)}
 
 /* the label column sits on the same baseline as the first line of its value.
    §03.378's `min-width:58px` stays — it is what makes a column out of the
    labels — but a wrapped value used to leave the label floating against a
    block of text with no alignment to anything. */
-.app .tal-msg > .bb .tw-lines > span{align-items:baseline}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-lines > span{align-items:baseline}
 
 /* ------------------------------------------------------------------ 5 ---
    TWO PEOPLE IN ONE WIDGET ARE TWO ROWS, NOT ONE BLOCK
@@ -226,7 +247,7 @@
    line than that line sits to its own name. The hairline is the same one §1
    puts between two widgets, for the same reason.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-ag + .tw-ag{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-ag + .tw-ag{
   padding-top:var(--s04);border-top:1px solid var(--rule-on-2)}
 
 /* ------------------------------------------------------------------ 6 ---
@@ -238,8 +259,8 @@
    looking like another row of it. They are the next question, not part of
    the answer.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw + .tw-chips,
-.app .tal-msg > .bb .tw-k + .tw-chips{margin-top:var(--s05)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw + .tw-chips,
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-k + .tw-chips{margin-top:var(--s05)}
 
 /* ------------------------------------------------------------------ 7 ---
    THE QUIET CLOSING LINE
@@ -251,7 +272,7 @@
    from §1's 16px gap; this states the measure so the sentence does not run
    the full width of a 584px widget when the rows above it are a grid.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw > .tw-k{max-width:62ch;line-height:19px}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw > .tw-k{max-width:62ch;line-height:19px}
 
 
 /* ------------------------------------------------------------------ 8 ---
@@ -281,10 +302,10 @@
    §03.363's `font-weight:600` applied to the whole block — it was meant for
    the term, and on the definition it made the entire widget bold.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-def{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-def{
   margin-left:0;font-weight:400;
   font-size:12.5px;line-height:17px;color:var(--text-secondary)}
-.app .tal-msg > .bb .tw-def b{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-def b{
   display:block;font-weight:600;color:var(--text-primary)}
 
 /* ------------------------------------------------------------------ 9 ---
@@ -316,7 +337,7 @@
    this layer exists to remove. What still marks it as generated is what §16
    says marks it: the header strip and the source line, in words.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .gen{
+.app :is(.tal-msg > .bb, .ob-m-t) .gen{
   --pad-x:0px;
   background-color:transparent;
   margin-left:0;margin-right:0;padding:0}
@@ -379,10 +400,20 @@
 .app .tal-panel .tal-msg:not(.me) > .bb{
   background-color:#ffffff;
   background-image:none;
-  border:1px solid #f47113;
+  /* RE-HUED FOR THE RED ACCENT (4 Sep 2026). The three stops keep their jobs:
+     the accent at the near corner, its own tint in the middle, and the violet
+     `#cb8dd7` at the far one — the violet is UNCHANGED because it never came
+     out of the accent, it is what the ramp is travelling towards. The middle
+     is #ffdabf's own strength in the new hue (the old accent at 26.6% over
+     white, so this is 26.6% of #ff584a), which is `--brand-tint-2` to within a
+     digit. §83's demo version of this rule reached the same three by hand.
+     `#f47113` was a literal on both lines and both are now `--accent`: §39's
+     own note that "#f47113 is NOT --accent" was true while the ramp's hue and
+     the brand's were a shade apart, and the 4 Sep re-hue closed that gap. */
+  border:1px solid var(--accent);
   border-image:linear-gradient(135deg,
-    #f47113 0%, #ffdabf 50%, #cb8dd7 100%) 1;
-  box-shadow:0 0 10px rgba(255,192,146,.15)}
+    var(--accent) 0%, #ffcac9 50%, #cb8dd7 100%) 1;
+  box-shadow:0 0 10px rgba(255,146,138,.15)}
 
 /* THE CANDIDATE'S OWN TURN. `background-image` carries the gradient and
    `background-color` is the white it sits on — both halves are 50% alpha in
@@ -469,12 +500,12 @@
    The base rule is therefore solid AA-safe ink, and the gradient is layered
    on only where it can actually be clipped.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-hl{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-hl{
   font-weight:600;
   color:var(--accent-on-2)}
 
 @supports ((background-clip:text) or (-webkit-background-clip:text)){
-  .app .tal-msg > .bb .tw-hl{
+  .app :is(.tal-msg > .bb, .ob-m-t) .tw-hl{
     background-image:var(--accent-grad);
     -webkit-background-clip:text;background-clip:text;
     color:transparent;
@@ -522,11 +553,11 @@
    icon; `align-items:center` because the label is uppercase and its optical
    centre sits above its baseline.
    ------------------------------------------------------------------------ */
-.app .tal-msg > .bb .tw-h{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-h{
   display:flex;align-items:center;gap:var(--s03)}
-.app .tal-msg > .bb .tw-ic{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-ic{
   display:inline-flex;flex:none;line-height:0}
-.app .tal-msg > .bb .tw-ic svg{
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-ic svg{
   width:16px;height:16px;display:block;
   fill:var(--icon-secondary)}
-.app .tal-msg > .bb .tw-ic.acc svg{fill:var(--accent-text)}
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-ic.acc svg{fill:var(--accent-text)}

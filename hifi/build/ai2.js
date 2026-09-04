@@ -54,10 +54,72 @@ const NEVER = [
 
 const MEMO_IC = {interview:'video', report:'document', course:'book', note:'edit'};
 
+/* ==========================================================================
+   WHAT THE ONBOARDING TOLD TAL IS HELD HERE TOO, AND THAT IS THE POINT OF IT
+
+   3 Sep 2026. The `onboard` gate replaced a fifteen-minute call with a talent
+   consultant, and the one thing it can do that the call could not is KEEP the
+   answers. A call's went into one person's head; these are four things the
+   candidate said, each traceable to the question that produced it, on the page
+   that promises "Mark anything wrong and I will stop using it".
+
+   THEY ARE DERIVED, NOT PUSHED. `obMemo()` reads `S.ob` on every render rather
+   than appending to `MEMO` when the gate is left — three reasons, and the
+   first is the one that bites: a push would double the rows every time the
+   reader walked the gate again from the stage picker, which is a thing this
+   prototype invites. The second is that a derived row cannot disagree with the
+   read-back the candidate approved. The third is that `MEMO`'s own entries are
+   a hand-written record of one candidate's ninety days, and mixing generated
+   rows into it would make that list two kinds of thing.
+
+   THEY GO AT THE END, WHICH IS BOTH CORRECT AND NECESSARY. Correct, because
+   the section says "Newest first" and these are the oldest things Tal knows —
+   they predate the interview by three weeks. Necessary, because `S.memDrop`
+   and `S.memWrong` hold INDICES into this list: rows added at the front would
+   silently shift every existing index by four, so "Forget this" on the vendor
+   review would forget something else.
+
+   `kind:'note'` REUSES `MEMO_IC`'s EXISTING GLYPH rather than adding a fifth.
+   Its mark is `I.edit` and its meaning in that table is "you wrote this", which
+   is exactly what these are — the only rows in the list whose source is the
+   candidate saying something rather than a recording, a report or an activity
+   log. `src` names the screen so the provenance reads honestly.
+
+   NO `at` AND NO `iv`, so `V.mem` draws the flat `.memo-src` span rather than
+   the button that opens an interview at a timestamp. There is no recording to
+   open, and a control that navigates nowhere is §60's dead control.
+   ========================================================================== */
+const OB_MEMO_WHEN = '4 Aug';
+function obMemo(){
+  if(!S.obReady || !S.ob || !S.ob.why) return [];
+  const rows = [
+    ['where', 'Where you were when you joined: ' + obLabel('where').toLowerCase() + '.',
+     'You told me on the first screen, before anything was assessed.'],
+    ['why',   'You said this is the hard part: &ldquo;' + obLabel('why') + '&rdquo;',
+     'Your own words, about the band your quiz put lowest.'],
+    ['want',  'What you want out of the 90 days: ' + obLabel('want').toLowerCase() + '.',
+     'You chose it from four, on the way in.']
+  ].map(([k, key, why]) => ({k:key, why, src:'What you told me', kind:'note', when:OB_MEMO_WHEN}));
+
+  /* THE NOTE TO THE AGENT IS ONLY HELD IF IT WAS WRITTEN, and it is quoted
+     verbatim — ob.js's rule is that Tal repeats that string and never
+     interprets it, and a `MEMO` row is Tal stating what it holds, so the same
+     rule applies here. It is escaped for the same reason ob.js escapes it. */
+  if(S.ob.note) rows.push({
+    k:'What you wanted your agent to know: &ldquo;' + obEsc(S.ob.note) + '&rdquo;',
+    why:'You wrote it yourself, for whoever interviews you.',
+    src:'What you told me', kind:'note', when:OB_MEMO_WHEN});
+  return rows;
+}
+
 V.mem = (f) => {
   const dropped = S.memDrop || [];
   const wrong = S.memWrong || [];
-  const live = MEMO.filter((m,i) => !dropped.includes(i));
+  /* ONE LIST FROM TWO SOURCES, BUILT ONCE AND USED THREE TIMES BELOW — the
+     `live` count, the `map` and the indices all have to be reading the same
+     array or "Forget this" points at the wrong row. */
+  const HELD = MEMO.concat(obMemo());
+  const live = HELD.filter((m,i) => !dropped.includes(i));
   return `<main class="main"><div class="page">
   ${crumb(['Profile','account'],'What Tal knows')}
   ${''/* NO DESCRIPTION. This said "N things, each drawn from something you
@@ -72,7 +134,7 @@ V.mem = (f) => {
   <div class="sec">
     <div class="sec-h"><h2>Held about you</h2><span class="t-helper-01">Newest first</span></div>
     <div class="memo">
-      ${live.length ? MEMO.map((m,i) => dropped.includes(i) ? '' : `
+      ${live.length ? HELD.map((m,i) => dropped.includes(i) ? '' : `
         <div class="memo-r${wrong.includes(i)?' wrong':''}">
           <div class="memo-k">${m.k}</div>
           <div class="memo-w">${m.why}</div>

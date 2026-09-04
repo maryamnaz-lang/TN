@@ -1,0 +1,220 @@
+/* ==========================================================================
+   §115 — TAL'S CHAT IS THE ONBOARDING'S CHAT
+   `115-talchat.css`
+
+   Maryam, 4 Sep 2026: *"I want our current tal experience on dashboard to be
+   like the one we have created on the tal onboarding. I am talking about the
+   chat ui, copy the font, the message styling, the welcome message also should
+   have the look of the one we are using on onboarding."*
+
+   TWO SURFACES DREW ONE CONVERSATION IN TWO LANGUAGES. `.ask-page` is the
+   product's Tal — the dock at the foot of every page opens it — and §107's
+   `.ob-*` is the onboarding's, built four days later against a newer set of
+   references. Read side by side they disagree about four things: the face the
+   greeting is set in, whether Tal's turn has a box around it, whether either
+   speaker is labelled by name, and what the reader's own turn is filled with.
+   This layer makes the older one the newer one.
+
+   IT RESTYLES `.tal-msg` / `.bb` RATHER THAN EMITTING `.ob-m` — AND THAT IS
+   THE ONE DECISION HERE WORTH ARGUING WITH. Reusing the onboarding's classes
+   outright is what "reuse means reuse" asks for, and §108's `.eo-lead` is the
+   worked example of borrowing one out of a page layer (checked first: every
+   `.ob-m*` rule really is unscoped, `.app` plus the class). It was the first
+   build and it strands the answers:
+
+     §35 §2 caps the bubble by what it HOLDS — `.bb:has(.bkw)`, `:has(.tw)`,
+     `:has(.gen)` — because a widget takes every pixel it is given and a
+     paragraph must not (trap 15). Four rules, all keyed on `.bb`.
+     §53 §14 takes the shadow off `> .bb *` and flattens the fills of every
+     page component borrowed into a reply. Seven rules, all keyed on `.bb`.
+
+   Neither has an `.ob-m-t` twin, so a markup swap would have shipped Tal's
+   answers with their widgets uncapped and their panels still filled — visible
+   only on the replies that draw one, which is most of the interesting ones.
+   §39 is the counter-example and the reason this is close: that layer already
+   writes `:is(.tal-msg > .bb, .ob-m-t)` on twenty-eight selectors, so every
+   widget rule was ALREADY dual. If §35 and §53 are ever given the same
+   treatment, the markup swap becomes the right change and this layer's §2 and
+   §3 can be deleted rather than re-pointed.
+
+   THE TYPE IS IN §63, NOT HERE — the house rule, and it is why this layer sets
+   not one font size, weight, case or colour. §63 §48 is the other half of this
+   change: the greeting's face and rank, the lede, and both speakers' ink.
+
+   AND THE GREETING'S FACE IS TURNED OVER IN §53 §13, IN PLACE. `font-family`
+   is not one of §63's four, and the Abhaya Libre rule is that layer's own — so
+   the reversal belongs beside the argument it reverses rather than as a fifth
+   restatement here.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE WELCOME IS THE ONBOARDING'S HEAD BLOCK
+
+   `.ob-chat-head` is an orb, a block of centred prose and one control, and
+   `.tal-hero` is already that shape — centred column, centred text, the mark
+   above the words (§27.136). What differs is scale, and both numbers are
+   §107's rather than eased toward it:
+
+     the orb        104px, `--ob-orb-sm` under `.ob-open-chat`, was 120 (§51.183)
+     under the orb  `--s06`, `.ob-orb-sm`'s own margin, was `--s07`
+
+   THE MEASURE IS 720 AND IT IS THE ONBOARDING'S OWN. §107's note: "720 at
+   ~13.5px is about 75 characters, which is §63's own line length, so no
+   paragraph here runs long enough for a ragged left edge to cost the reader
+   the next line." §51.204 had this line at **246px**, which was right for a
+   14px sentence under a 40px serif and is a column two words wide once the
+   lede is 16px. The ask page's helper is one sentence, so at 720 it sits on
+   one line — which is what the onboarding's own last line does.
+
+   THE LATTICE STAYS OFF. §27.183 draws a 432px diamond grid behind the hero
+   and §51.182 already says `content:none` for this page; the onboarding has no
+   equivalent and this is not the layer to bring one back.
+   -------------------------------------------------------------------------- */
+.app .ask-page .tal-hero .tal-mk.lg{
+  width:104px;height:104px;
+  margin-bottom:var(--s06)}
+.app .ask-page .tal-hero p{max-width:720px}
+
+/* THE GRADIENT COMES OFF THE SECOND LINE, and this is the half of the greeting
+   that is not a font change. §51.4 clips a black-to-`--accent-2` ramp to
+   "What's going on?" and §53 §13 carried it up to Abhaya at 40px; the
+   onboarding's greeting is one weight of flat ink and nothing else, so a
+   two-tone second line is the most visible thing this change has to remove.
+
+   `-webkit-text-fill-color` HAS TO BE SAID AS WELL AS `background-image`, and
+   that is the trap in un-clipping text. §51.199 sets BOTH it and `color` to
+   transparent — belt and braces, because `background-clip:text` needs one of
+   them and browsers disagree about which. Reset only the gradient and the
+   words stay invisible on a face that now has no ramp under it at all: a
+   greeting that renders as blank space. `currentColor` rather than a value,
+   so §63 §48 owns the ink and this line owns the mechanism.
+
+   `.askv-q` AND ITS `<br>` BOTH SURVIVE. The span is what puts the second line
+   on its own row without making it a block — §53 §13's note has the reason
+   (an inline box is what kept the ramp finishing on the last glyph) and the
+   ramp is gone, but the line break is still the file's and is still markup
+   `askView` prints. A `display:block` here would be a third statement of a
+   thing the `<br>` already does. */
+.app .ask-page .tal-hero h2 .askv-q{
+  background-image:none;
+  -webkit-text-fill-color:currentColor}
+
+/* --------------------------------------------------------------------- 2 ---
+   TAL'S TURN IS A MARK AND PROSE — NO BOX, NO NAME
+
+   §107: "Tal speaks in prose with a mark, the reader in a filled bubble, which
+   is reference 4 exactly and is the right asymmetry rather than a copied one:
+   Tal is the voice of the screen and its words are the content, while what the
+   reader said is a quoted interjection."
+
+   THREE THINGS GO. The stacked layout — §27.277 makes `.tal-msg` a COLUMN with
+   a 16px gap, so the name row sits above the answer; the word "Tal" itself,
+   which the band at the top of the page already says once; and §39's gradient
+   border, which is the box §107 does not draw.
+
+   THE MARK IS ALREADY THE RIGHT SIZE. §51.232 gives `.tal-msg .tal-mk.sm`
+   28px, which is `.ob-m-mk`'s own — so the row needs no size and gets the
+   same sphere §50 draws at every other scale, rather than the onboarding's
+   separate blob. One mark for Tal on this screen too.
+
+   `flex:1 1 auto` AND `min-width:0` ON THE ANSWER, because it is a flex item
+   now rather than a block in a column.
+
+   AND THE MEASURE IS SAID ON A `:not(:has())` RATHER THAN ON THE BASE RULE,
+   WHICH IS THE ONE THING THIS LAYER GOT WRONG FIRST AND IS WORTH THE PARAGRAPH.
+   The base rule shipped `max-width:none` — to un-say §27.302's `min(55%,620px)`,
+   which was a cap on a paragraph inside a box and is too tight for prose that
+   is now the page's own text. It is (0,6,0), and §35 §2's caps are `:has()`
+   rules at (0,5,0): so `max-width:none` **beat every one of them** and a reply
+   holding a widget ran the full width of the thread. Measured: 797px against
+   §35's stated `min(100%,620px)`. That is trap 15's failure exactly — "`.tw` is
+   a grid that takes every pixel it is given" — reached from the other side, by
+   a later layer being heavier rather than by a bubble being too narrow.
+
+   SO THE PROSE CASE IS KEYED THE WAY §35 KEYS THE WIDGET CASES: whatever the
+   turn does NOT hold. `:not(:has(.tw,.bkw,.gen,.bk-list))` is the exact inverse
+   of that layer's four selectors, so the two cannot both match and neither has
+   to outrank the other. 720px is the onboarding's own measure (§107: "720 at
+   ~13.5px is about 75 characters, which is §63's own line length"), which is
+   what makes this the same column of prose as that screen rather than a wider
+   one. A LIST INSIDE `:has()` INSIDE `:not()` IS VALID — §20's warning is about
+   `:has()` inside `:has()`, and §14 already writes `:not(:has(...))` — and the
+   whole compound is still (0,6,0), because `:not()` takes its most specific
+   argument and `:has(.tw,…)` is one class.
+   -------------------------------------------------------------------------- */
+.app .ask-page .ask-thread .tal-msg{
+  flex-direction:row;align-items:flex-start;
+  gap:var(--s04)}
+.app .ask-page .ask-thread .tal-msg > .tal-who{align-self:flex-start}
+.app .ask-page .ask-thread .tal-msg .tal-who-n{display:none}
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb{
+  flex:1 1 auto;min-width:0;
+  margin:0;padding:0;
+  background-color:transparent;background-image:none;
+  border:0;border-image:none;
+  box-shadow:none}
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb:not(:has(.tw,.bkw,.gen,.bk-list)){
+  max-width:720px}
+
+/* THE TYPING TURN CENTRES ON THE MARK, and §107's note is the whole argument
+   arrived at from the same direction: "`.ob-m-tal` is `align-items:flex-start`
+   because a Tal turn is prose and its first line has to start level with the
+   top of the blob; the typing indicator is a 6px row, so the same rule parked
+   it against the mark's crown with 22px of nothing under it."
+
+   THE FIX IS ON THE CELL, NOT THE ROW — also §107's. `align-self:center` on
+   `.tal-msg > .bb` would have been the shorter rule and would re-centre a
+   three-paragraph answer against its mark too. Giving the answer the mark's
+   own 28px and centring inside it fixes the one case and touches nothing else.
+
+   `:has(> .ai-stream)` RATHER THAN A CLASS, because the typing turn is
+   `askBubble('tal', …)` with the stream as its whole body — there is no
+   `.ob-m-typing` equivalent to key on and minting one would mean a second
+   writer for a state the markup already states by what it contains. */
+.app .ask-page .ask-thread .tal-msg:not(.me) > .bb:has(> .ai-stream){
+  display:flex;align-items:center;min-height:28px}
+
+/* --------------------------------------------------------------------- 3 ---
+   THE READER'S TURN IS A FILLED BUBBLE, RIGHT, WITH NO FACE ON IT
+
+   `.ob-m-b`, to the declaration: `--gray-100` ground, 80% cap, `--s04 --s05`
+   of padding and **`border-radius:16px 16px 4px 16px`** — the one square
+   corner pointing at the speaker, which is the only tail this system draws.
+
+   THE RADIUS IS A LITERAL AND NOT `--radius`. That token is `0px` by design
+   and §56 grants the one curve exception to MARKS; §107 took a second for this
+   bubble and stated it as four lengths, so this reads the same four rather
+   than minting a token whose two readers would be one component in two files.
+
+   THE FACE AND THE WORD "You" BOTH GO. §27.292 draws a 36px avatar in the
+   name row and §39.422 fills the bubble with a warm-to-cool wash on white with
+   a `--rule` border — a pale box with a portrait beside it, which is the
+   product labelling its own reader. A right-aligned black bubble says the same
+   thing with the position and the fill, which is what every chat does and what
+   the onboarding does.
+
+   `justify-content:flex-end` RATHER THAN §03.334's `row-reverse`. Both put one
+   child at the right end; reverse does it by flipping an axis, which then has
+   to be reasoned about again the moment the turn has two children. §27.280's
+   `align-items:flex-end` is left alone and is inert on a single item.
+   -------------------------------------------------------------------------- */
+.app .ask-page .ask-thread .tal-msg.me{
+  flex-direction:row;justify-content:flex-end}
+.app .ask-page .ask-thread .tal-msg.me > .tal-who{display:none}
+.app .ask-page .ask-thread .tal-msg.me > .bb{
+  max-width:80%;
+  margin:0;padding:var(--s04) var(--s05);
+  border:0;border-radius:16px 16px 4px 16px;
+  background-color:var(--gray-100);background-image:none;
+  box-shadow:none}
+
+/* --------------------------------------------------------------------- 4 ---
+   AND THE TURNS SIT 24 APART
+
+   `.ob-msgs` is `gap:var(--s06)`; §21.347 had the thread at `--s05`. 16 was
+   right while every turn wore a box — the boxes were the separation and the
+   gap was the space between two frames. With Tal's box gone the gap IS the
+   separation between one speaker and the next, and 16 against the 22px line
+   inside a two-line answer reads as one block of prose with a bubble in it.
+   -------------------------------------------------------------------------- */
+.app .ask-page .ask-thread{gap:var(--s06)}

@@ -1,0 +1,179 @@
+/* ==========================================================================
+   113. THE UPCOMING CALLS ROW — `.lcal`, and the leader's dashboard stops
+        drawing one appointment twice
+
+   Maryam, 4 Sep 2026, with a reference screen: "update the cohort dashboard
+   view from showing one call on top to multiple calls, for that I have
+   attached a reference, please follow that for multiple calls."
+
+   WHAT THE REFERENCE IS AND WHAT IT IS NOT. It draws a headed band — a title,
+   a sentence under it and `View all sessions` at the right end of the row —
+   over a horizontal row of appointment cards, the first of them black with a
+   Join on it and the rest light with an arrow. That STRUCTURE is what this
+   layer takes. The drawing is ours: square corners (`--radius` is `0px` by
+   token and §02's opening note is that "depth is expressed as rhythm and rule
+   weight, nothing else"), `--rule` hairlines, §63's roles in the markup, and
+   §75's black card for the first cell rather than a rounded dark tile.
+
+   THE SECTION IS `lead-calls`, WHICH IS THE POINT AND NOT A DETAIL. The
+   dashboard already had a Cohort Calls section 1000px further down drawing the
+   SAME three appointments as `bookedRow`s, and there are exactly three cohorts
+   — so a row of "the upcoming calls" at the top and a list of "the upcoming
+   calls" below it is one list drawn twice on one page. That is the failure
+   this portal keeps deleting (`V.leadCohorts` gave its own call list UP to the
+   Calls page on 1 Sep 2026 for the same reason), so the lower section is gone
+   and its id is on this one. The four figure cells and the sticky strip still
+   have four sections to point at; `leadStick`'s live-section test had to learn
+   document order, which is written where that function is.
+
+   THREE THINGS IT NEEDED THAT THE BUILD ALREADY HAD, and they are why this
+   layer is short:
+
+     the black cell   `.dark-card` WITHOUT `.sec`. §75's geometry rule is
+                      `.app .sec.dark-card` — the frame, the inset margin and
+                      the 32px padding, all of which are a full-width section
+                      card's and all of which would have to be un-said inside a
+                      grid cell. Every OTHER rule the build writes for a black
+                      card keys on `.dark-card` alone: §63 §6a's ink pair, §75.5's
+                      seams, §81's disabled Join. So the class is worn for the
+                      ink and this layer states the two lines of ground itself.
+                      `.dark-card` is in no pass's list (§75's whole point), so
+                      nothing hoists the cell out of the row.
+     the cover        `.gcard-art` verbatim — §86's 9:5 box, its own `--gcard-art-w/h`
+                      calc, `object-fit:contain` and the `<i>` fallback under the
+                      `<img>`. It is the same object `Your cohorts` puts on every
+                      row and `crow-cover` puts on the black card, so a cohort's
+                      course is drawn one way on this page.
+     the type         §63's role classes in the markup (`.t-h4`, `.t-desc`,
+                      `.t-compact`), which is §111's discipline: not one
+                      font-size, font-weight, text-transform or text colour is
+                      set here. `.t-compact` and `.t-h4` state no colour at all,
+                      so they inherit `--text-primary` on the light cells and
+                      §63 §6a's `--on-dark` on the black one — one markup, two
+                      grounds, no restatement.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ 113.1 ---
+   THE ROW
+
+   `auto-fit` AND NOT A SCROLLER. §73's `.cov-row` is the build's other card
+   row and it scrolls, because it holds thirteen chapters and the number is
+   fixed by the syllabus. This holds one cell per cohort the leader runs —
+   three today, and the count is the thing the figure cell above it is
+   counting. A grid fills the column at any count, stacks itself on a phone and
+   needs no chevrons; a scroller with three cards in a 1400px column is a
+   scroller that never scrolls, which is §60's dead control wearing a different
+   hat.
+
+   260 IS THE FLOOR, NOT THE WIDTH. At 1440 the page column is ~1030 and three
+   cells come out ~330 each; at 744 the grid wraps to two and at 390 to one.
+   The floor is set by the widest thing a cell must hold on one line — the
+   cover (112) plus the gap plus "Today &middot; 6:00 PM" (~104) is 232, and 260
+   leaves the header row from wrapping at the narrowest cell the grid will
+   ever make. */
+.app .lcal-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:var(--s05)}
+
+/* TRAP 13 — THE LABEL COLUMN, AND THIS SECTION HAS NO ROUTE OUT OF IT.
+   §10.4 gives any `.sec` with a `.sec-h` a 184px left column at desktop unless
+   it CONTAINS one of the row components §16 names (`.tile-stack`, `.stats`,
+   `.tbl-wrap`, `.facts`, `.cardrow`, `.gcard`, `.kv`). `.lcal-row` is none of
+   them, so the heading, its sentence and `View all sessions` would set inside
+   184px beside the cards. §72.1a and §73.1b are the same restatement for the
+   same reason and this is copied from them: INSIDE the container query per
+   trap 3 — a later layer cannot outweigh that tier from outside it — and
+   `display:block` alone, because §14.2 already zeroes the `padding-left` §10
+   hands every non-heading child at this width (§69's lesson: copy what a rule
+   DOES today, not what its source says). */
+@container app (min-width:900px){
+  .app .sec:has(> .lcal-row){display:block}
+}
+
+/* ------------------------------------------------------------------ 113.2 ---
+   THE CELL
+
+   A COLUMN WITH THE FOOT PINNED, which is §72.2's idiom: `margin-top:auto` on
+   the last block means the duration and the action land on one line across all
+   three cells whatever their descriptions do. The alternative — a fixed height
+   — is a number that has to be re-derived every time a cohort's name gets
+   longer, which is trap 20's whole complaint.
+
+   NO HOVER. `.qa-c` states one and it has never fired: trap 6 rewrites every
+   `:hover` to `:hover:where(.__nh)` and this card is not in `HOVER_KEEP`. A
+   rule that cannot match is the "gate nothing writes" tell, so there is not
+   one — the arrow is what says the cell is pressable, which is what it says on
+   every other openable row in this product. */
+.app .lcal{
+  appearance:none;-webkit-appearance:none;
+  display:flex;flex-direction:column;align-items:stretch;
+  gap:var(--s04);
+  width:100%;margin:0;
+  padding:var(--s05);
+  border:1px solid var(--rule);
+  background-color:var(--layer-01);
+  text-align:left}
+.app button.lcal{cursor:pointer}
+.app button.lcal:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
+
+/* THE HEADER ROW — the cover at the left, the date at the right on an auto
+   margin, and NO `flex-wrap` on it, which is the whole reason the date is two
+   lines. Measured at the three-across width this grid actually produces (a 268
+   cell, 234 inside it): a one-line "Tomorrow &middot; 5:00 PM" with a clock in
+   front is 149 against the 110 left beside the cover, so the row wrapped in
+   every cell. The date is `.day`'s word-over-figure instead — 62 wide, the
+   WIDER of its two lines rather than the sum — and the row cannot wrap because
+   there is nothing left in it that does not fit. `lcalCard`'s note has the two
+   alternatives and why each is worse.
+
+   `align-items:center` puts the pair on the cover's own middle, which is what
+   `.gcard-art`'s own `align-self:center` already asks for and is right for a
+   40px block beside a 62px picture. */
+.app .lcal-h{display:flex;align-items:center;gap:var(--s04)}
+.app .lcal-when{
+  margin-left:auto;flex:none;
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+  text-align:right;white-space:nowrap}
+
+.app .lcal-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+
+.app .lcal-f{
+  margin-top:auto;
+  display:flex;align-items:center;gap:var(--s04);flex-wrap:wrap;
+  padding-top:var(--s03)}
+.app .lcal-m{flex:1 1 auto;min-width:0}
+.app .lcal-f > .btn,
+.app .lcal-f > .tile-arrow{flex:none;margin-left:auto}
+/* §02 sizes `.tile-arrow` for a `.tile`; in a footer row it is a bare svg with
+   no row to inherit a box from. 16 is the size `.qa-go` uses for the same mark
+   in the same position on the Quick Action card. */
+.app .lcal-f > .tile-arrow{width:16px;height:16px}
+
+/* ------------------------------------------------------------------ 113.3 ---
+   THE FIRST CELL IS THE BLACK ONE
+
+   THE GROUND IS TWO DECLARATIONS AND THE HAZE IS §21.22a's TOKEN, not a second
+   copy of the radial — §75's own correction, and the reason is that a light
+   given a different ramp in one place and not the other is two values that
+   happen to agree until somebody edits one. Everything else black about this
+   cell — the ink pair, the seams on anything it holds, the white quiet button,
+   §81's unlit disabled Join — arrives from the `.dark-card` class alone.
+
+   THE BORDER GOES TRANSPARENT, IT IS NOT REMOVED. §64's rule, one component
+   over: `.lcal` declares `1px solid var(--rule)` and every cell in the row is
+   in the same grid track, so `border:0` here makes the black cell 2px shorter
+   than the two beside it. */
+.app .lcal.lcal-next{
+  border-color:transparent;
+  background-color:var(--gray-100);
+  background-image:var(--dark-haze);
+  background-repeat:no-repeat}
+
+/* AND THE COVER'S LETTERBOX GROUND FOLLOWS THE CARD. §86 gives `.gcard-art`
+   `--layer-02` because it sits on white rows, and §86.2 gives `.crow-cover`
+   `--on-dark-fill` for exactly this reason on exactly this artwork: `contain`
+   fills the width and bars the height, so on a black cell a pale bar would read
+   as a gap under the picture rather than as part of the slot. It is also what
+   the `<i>` fallback stands on when a cover fails to decode. */
+.app .lcal.lcal-next .gcard-art{background:var(--on-dark-fill)}

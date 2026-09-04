@@ -14,7 +14,33 @@
    ========================================================================== */
 
 :root{
-  --rule:#d7d5cd;              /* the hairline. one weight, used everywhere. */
+  /* THE HAIRLINE. ONE WEIGHT AND NOW ONE VALUE, USED EVERYWHERE.
+     #e9e9e9 (Maryam, 3 Sep 2026: "the strokes/border that we are using right
+     now everywhere needs to be of E9E9E9 color now"). It was #d7d5cd — a warm
+     grey, part of the bone ramp §01 casts at b* +2.0, and the reason two other
+     hairline tokens existed at all: `--border-subtle-01` (#dcdad3) was the
+     same line under an older name, and `--rule-on-2` (#ede9e2) was #d7d5cd
+     re-tuned to sit off the #f7f7f7 panel. Both now READ this token rather
+     than restating a value, so there is one hairline in the product and the
+     next adjustment is this line.
+
+     IT IS NEUTRAL, WHICH IS THE PART THAT IS NOT JUST A LIGHTENING. The whole
+     grey ramp is warm by §01's decision ("pure-neutral greys read blue on
+     bone"), and that decision stands for INK and for GROUNDS — it is the rule
+     that has come off it. Two namespaced hairlines are deliberately NOT
+     changed and both draw on a non-white ground: `--askv-rule` (§51, the ask
+     screen's ivory — its note is explicitly "on ivory the cool one reads as a
+     grey line drawn on a cream page") and `--auth-card-line` (§17/§01, the
+     sign-up card). Raise those separately if the neutral is wanted there too.
+
+     IT IS FAINTER THAN WHAT IT REPLACES — 1.13:1 on white against #d7d5cd's
+     1.42:1. That is the ask and it is safe for what this token draws, which is
+     section separators and the content rails: decoration, not a UI component's
+     edge. The two tokens that DO edge a control — `--border-subtle-02`
+     (#c7c6c3) and `--border-strong-01` (#8e8d8a), the input and checkbox
+     strokes — keep their values for exactly that reason. An input whose edge
+     is #e9e9e9 is a field you cannot find. */
+  --rule:#e9e9e9;
   --rule-ink:#111111;
   --rail-w:1px;
   --label-col:184px;           /* the narrow left column at desktop */
@@ -1055,7 +1081,14 @@ button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparen
 /* c. The accent is 4.15:1 on the inverted panel — under AA. Accent-coloured
    text on dark needs its own lighter value, the same way --accent-text
    exists for the bone ground. */
-:root{--accent-on-dark:#f68441}
+/* THE ACCENT ON BLACK, IN THE RED (4 Sep 2026) — §67's value, matched on
+   contrast rather than on hue arithmetic: #f68441 read 7.46:1 on `--gray-100`
+   and #ff7c70 reads 7.53, so every on-dark accent string in the build keeps
+   the legibility it was tuned for. §63 §29 and §63 §33 both cite this token by
+   value; the number in those notes is the one that moved. */
+/* re-derived for #ff3733, 4 Sep 2026, on contrast rather than on hue
+   arithmetic: #ff7c70 read 7.53:1 on `--gray-100` and #ff7b79 reads 7.52. */
+:root{--accent-on-dark:#ff7b79}
 .path-you,.lvl-hero .acc-h,.on-dark .accent-text{color:var(--accent-on-dark)}
 
 /* d. Facts and step lists for the rewritten Interviews page */

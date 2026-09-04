@@ -25,6 +25,54 @@
    each chevron keeps the position the logo gives it and only its transform is
    this layer's business.
 
+   THE SPHERE IS RED NOW AND ITS RAMP IS RE-DERIVED, NOT RE-PICKED (4 Sep 2026)
+
+   Maryam changed the platform accent to #FF584A and named six things
+   specifically; the sphere is not one of them, and it had to move anyway. It is
+   the most accent-coloured object the product draws, it sits 12px from the ask
+   dock whose border went red in the same pass, and an orange ball beside a red
+   field reads as a component that failed to update rather than as a decision.
+   "The whole platform accent" is the umbrella and this is under it.
+
+   THE METHOD IS §83's, WRITTEN DOWN THERE FOR THE RED DEMO AND RIGHT HERE TOO:
+   "a red ramp is three shades of one hue, not #ff0000 three times... each keeps
+   its lightness arc and changes hue." The old three were #F6DC92 / #F47113 /
+   #E85D0F — a light warm highlight, the accent, a deeper stop — at relative
+   luminance .729 / .311 / .250. The new three hold that arc's SHAPE with the
+   accent pair at the bottom of it:
+
+     #FFD0CC   the highlight — `--accent` at 26% over white, which is the same
+               strength §01's `--brand-tint-2` takes, so the ball's lit face and
+               the product's accent tint are one value
+     #FF584A   `--accent`
+     #F83524   `--accent-2`, 737:6161's own second shade
+
+   The arc sits lighter overall than the orange one did, and that is inherent
+   rather than chosen: #FF584A is a lighter colour than #F47113 (.645 against
+   .516 in HSL lightness), so any ramp built on it is.
+
+   AND THE SAME DERIVATION RAN AGAIN FOR #FF3733, later the same day, which is
+   the point of writing the METHOD down rather than the values. The accent moved
+   a second time and the three stops fell out of it with no new decision:
+
+     #FFC8C6   the highlight — `--accent` at 26% over white, still the same
+               strength as §01's `--brand-tint-2`
+     #FF3733   `--accent`
+     #EE0500   `--accent-2`, which is now "the accent one step deeper" rather
+               than a Figma button's second stop — §01's note has why it
+               survived the button going solid
+
+   Solved for the arc rather than eyeballed: the old three sat at luminance
+   .707 / .287 / .226 and the new three land within .003 of each of those.
+
+   THE LITERALS STAY LITERALS. Writing this as `var(--accent)` / `var(--accent-2)`
+   was the obvious tidy and is the wrong one for the same reason §70's note gives
+   for the AI ramp: these three are also the ball's specular arrangement, and a
+   ramp assembled from tokens another layer may re-point for a demo drifts the
+   first time anything does. All SIX sites take the same string — §33 once, §40
+   twice, this layer three times — so a change is one find-and-replace and the
+   three sizes of one object cannot disagree.
+
    LAST of the two sphere layers: §33 and §40 state these backgrounds as plain
    declarations four and five classes deep, so subtracting from them is only
    possible from later.
@@ -48,7 +96,7 @@
   background-image:
     radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
     radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%);
   background-size:100% 100%,100% 100%,100% 100%}
 
 /* ------------------------------------------------------------------ 2 ---
@@ -61,7 +109,7 @@
   background-image:
     radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
     radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%);
   background-size:100% 100%,100% 100%,100% 100%}
 
 /* ------------------------------------------------------------------ 3 ---
@@ -80,7 +128,7 @@
   background-image:
     radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
     radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#F6DC92 0%,#F47113 50%,#E85D0F 100%);
+    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%);
   background-size:100% 100%,100% 100%,100% 100%}
 
 /* THE CHEVRONS' BOX IS THE LOGO'S BOX, not the sphere's. The supplied SVG is

@@ -26,11 +26,21 @@
    2. THE ARROW IS A MASK, NOT A CHARACTER AND NOT AN `<svg>`. It has to take
       `currentColor`, because these buttons are `--text-primary` on a page,
       `--on-dark` inside `.sec.on-dark`, and `--accent-text` where §19 tints
-      them. A `content:'→'` glyph would come from the stand-in face (Söhne's
-      trial file carries 68 glyphs and an arrow is not one of them — §11's
-      note), and an inline `<svg>` would mean editing 88 call sites in the
-      views and would still not reach a hand-authored page. A mask-image with
+      them. An inline `<svg>` would mean editing 88 call sites in the views
+      and would still not reach a hand-authored page. A mask-image with
       `background:currentColor` follows the ink for free, everywhere.
+
+      HALF OF THIS ARGUMENT EXPIRED ON 4 SEP 2026 AND THE RULE DOES NOT MOVE.
+      It used to open with coverage: a `content:'→'` would fall out of Söhne's
+      68-glyph trial file into the stand-in, so the arrow would be a different
+      typeface from its own label. Plus Jakarta Sans carries U+2192, there is
+      no stand-in tier left, and that objection is simply gone. What is left
+      is the one that always did the work — `currentColor`. A `::after`
+      character takes `color`, which is the same property the LABEL takes, so
+      it can never be inked separately; more to the point, a glyph is drawn at
+      the face's own optical weight and this arrow has to sit against 400 and
+      600 labels at four sizes on three grounds. The mask is a shape the CSS
+      controls. Do not "simplify" it to a character now that the glyph exists.
 
    3. IT ONLY APPEARS WHERE THERE IS NO ICON ALREADY, and the test is
       `:not(:has(svg))` rather than `.noic`. `.noic` looks like the right

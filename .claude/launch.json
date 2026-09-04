@@ -2,6 +2,18 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "tn19",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8993",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8993
+    },
+    {
       "name": "tn",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
@@ -146,6 +158,54 @@
       "port": 8917
     },
     {
+      "name": "tn14",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8929",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8929
+    },
+    {
+      "name": "tn15",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8941",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8941
+    },
+    {
+      "name": "tn16",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8953",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8953
+    },
+    {
+      "name": "tn17",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8967",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8967
+    },
+    {
       "name": "tn12",
       "runtimeExecutable": "python3",
       "runtimeArgs": [
@@ -156,6 +216,30 @@
         "127.0.0.1"
       ],
       "port": 8903
+    },
+    {
+      "name": "tn17",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8965",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8965
+    },
+    {
+      "name": "tn18",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8981",
+        "--bind",
+        "127.0.0.1"
+      ],
+      "port": 8981
     }
   ]
 }

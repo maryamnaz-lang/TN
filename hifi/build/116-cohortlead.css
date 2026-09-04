@@ -1,0 +1,121 @@
+/* ==========================================================================
+   §116 — BECOME A COHORT LEADER, AS THE PROFILE'S FOURTH TAB
+
+   Maryam, 4 Sep 2026, with the screen attached: "on the right of privacy
+   settings add another tab of 'Become a Cohort Leader'. This section should
+   have the content I have attached as a reference."
+
+   THE TAB IS THE LONG VERSION OF A CARD THE PAGE ALREADY DREW. `leadSec`'s
+   black wall has invited the candidate to lead since this page existed — one
+   heading, one sentence, three condition tags and an Apply — and every question
+   a reader would ask before pressing it ("what would I actually do?", "what do
+   I get?", "what am I committing to?", "am I even eligible?") had no answer
+   anywhere in the product. This panel is those four answers, and it presses the
+   SAME control: `data-leadapply`, `S.ledApplied`, the same "Request sent" state.
+   One application, two doors.
+
+   AND THE CARD DOES NOT DRAW ON THIS TAB. `V.account` emits `leadSec` under the
+   strip on every tab, so on this one the page would carry two "Apply to lead a
+   cohort" buttons 900px apart — §112's duplicate, which that layer deleted from
+   the leader's dashboard for the same reason. The card stays on the other three
+   as what points here.
+
+   THREE BLOCKS AND EVERY ONE OF THEM IS A COMPONENT THIS BUILD ALREADY SHIPS:
+   `aiHead` for the heading, its sentence and the accent CTA centred against the
+   pair (§73.1); §41's bounded panel for the four cards and the two lists; §87's
+   `.lrn` tick list inside them; §02's `.note` for the eligibility line. What is
+   stated here is the two ARRANGEMENTS — a four-across card grid and a pair of
+   panels — plus the one thing `.lrn` cannot know, which is that it is in a
+   half-width column now.
+
+   NO TYPE IN THIS LAYER. It lands after §63, so every string wears a role class
+   in the markup (`t-h4`, `t-desc`) rather than being sized here — the same
+   discipline §112 and §114 follow, and the reason neither needed a §63 entry of
+   its own beyond one restatement.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------- 1 ---
+   THE FOUR CARDS
+
+   `repeat(auto-fit,minmax(210px,1fr))` rather than four stated columns, so the
+   row goes 4 / 2 / 1 with no breakpoint of its own — the reference draws four
+   across a 1216px column and they are 218 wide there, which is where the floor
+   comes from. §73's `.cov-row` is a scroller because its cards are pictures
+   with a fixed aspect; these are text, so they wrap.
+
+   THE MARK IS A BARE 20px GLYPH, WHICH IS THE PRODUCT'S RULE AND NOT THE
+   REFERENCE'S. That drawing puts each icon in a tinted disc; §29 took exactly
+   that chip off the figure cell on 1 Sep 2026 ("the icons should not have the
+   background … increase the size of the icons"), §72 took it off the pulse's
+   columns and §70.6's `.qa-ic` is 20px bare. A disc here would be the only one
+   in the product.
+
+   THE HUES ARE NAMED, NOT CYCLED — `--mk` written inline per card, §72's
+   `pulseCol` idiom. An `nth-child` cycle would repaint every card the day a
+   fifth is added or one is removed.
+   -------------------------------------------------------------------------- */
+.app .cl-do{
+  display:grid;gap:var(--s05);
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.app .cl-c{
+  display:flex;flex-direction:column;gap:var(--s03);
+  padding:var(--s06);
+  border:1px solid var(--rule);
+  background:var(--layer-01)}
+.app .cl-ic{width:20px;height:20px;flex:none}
+.app .cl-ic svg{width:20px;height:20px;fill:var(--mk,var(--icon-primary))}
+/* THE TITLE AND ITS SENTENCE ARE ONE OBJECT AT 8, the card's own gap; the mark
+   is a third thing and pays 12 under itself, which is the step §111.13's row
+   and §70.6's card both take between a mark and the text it introduces. */
+.app .cl-c > .cl-ic{margin-bottom:var(--s03)}
+.app .cl-t,.app .cl-d{margin:0}
+
+/* --------------------------------------------------------------------- 2 ---
+   THE TWO LISTS
+
+   A pair at desktop and a stack below 900, which is the container query this
+   product turns at and the only breakpoint it has. Stated as two `1fr`s rather
+   than `auto-fit`, because these two panels are a PAIR — what is in it for you
+   against what it asks of you — and a row that silently becomes one column at
+   some intermediate width would break the comparison the pair exists to make.
+
+   `.lrn` IS ONE COLUMN IN HERE. §87.75 lays it out as two at desktop, which is
+   right across a full-width section and wrong inside a half-width panel: five
+   items in two columns of ~230px set every one of them on two lines with a
+   ragged tail. Restated INSIDE the same container tier per trap 3.
+
+   THE ILLUSTRATIONS ARE THE ONE THING REFUSED FROM THE REFERENCE. Each panel
+   carries a pink line drawing behind its list there — a rosette and a clipboard
+   — and this build has no such artwork and does not draw any. §74's rule is
+   about inventing claims; this is its quieter half: a picture nobody has is not
+   a thing to approximate, and the Calendly round trip is what tracing one costs.
+   -------------------------------------------------------------------------- */
+.app .cl-pair{display:grid;gap:var(--s05);grid-template-columns:1fr}
+.app .cl-p{
+  padding:var(--s06);
+  border:1px solid var(--rule);
+  background:var(--layer-01)}
+.app .cl-p > h3{margin:0 0 var(--sec-h-gap)}
+.app .cl-p .lrn{grid-template-columns:1fr}
+@container app (min-width:900px){
+  .app .cl-pair{grid-template-columns:1fr 1fr}
+  .app .cl-p .lrn{grid-template-columns:1fr}
+}
+
+/* --------------------------------------------------------------------- 3 ---
+   WHO CAN APPLY — BUILT AND REMOVED THE SAME HOUR, AND `.cl-who` GOES WITH IT
+
+   Maryam, 4 Sep 2026: "remove this." It was the reference's closing block —
+   §02's `.note`, the bordered aside this build draws for "read this before you
+   act", carrying "Graduates who have completed their 90-day journey and are
+   currently at or above Explorer – E3 level". One rule, `margin-top`, and it is
+   deleted rather than left as a gate nothing writes.
+
+   TWO DECISIONS ARE WORTH KEEPING IF IT COMES BACK. It took NO tint: the
+   reference washes it the accent at a few per cent, and §111's deleted
+   `.pfe-gap` made the same call — a condition is not a fault, and a tinted box
+   on a page of white panels is the loudest thing on it. And the level in it was
+   a STRING, not `lvlName(f.level)`: every other level in the product is read off
+   the record because it describes the person reading it, while this one is the
+   threshold an application is judged against and does not move when they are
+   promoted. */

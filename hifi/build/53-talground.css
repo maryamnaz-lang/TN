@@ -145,7 +145,11 @@
 
      `--accent-2` is #f0530c and this is the same orange, so the hot end is
      the token rather than a second copy of the brand colour. */
-  --askv-stroke:#FFC092;
+  /* re-hued for the red accent, 4 Sep 2026: #FFC092 is the old accent at 45.3%
+     over white and this is the same 45.3% of #ff584a. The paragraph above is
+     unchanged — the shape of the gradient, its hot spot and its 16% ramp are
+     what that note describes and none of them moved. */
+  --askv-stroke:#ffa4a2;
   --askv-stroke-hot:var(--accent-2);
   --askv-stroke-ramp:16%;
 
@@ -153,7 +157,13 @@
      the file at every one of them. Not `--accent-2` and not the composer's
      cold end: it is one step in from the brand orange, which is what lets a
      row of five pills sit under the composer without competing with it. */
-  --askv-chip-line:#F57414;
+  /* AND THE THIRD ORANGE IS NOW THE ACCENT ITSELF. That note is turned over by
+     the 4 Sep re-hue: it was "one step in from the brand orange" because the
+     brand orange was #f57414's deeper sibling #f0530c, and the new pair is
+     #ff584a / #f83524 — so "one step in from `--accent-2`" IS `--accent`, and
+     the value that was a third copy of a colour is the token. §83 reached the
+     same answer for the demo. */
+  --askv-chip-line:var(--accent);
 
   /* THE GLOW'S DIMMER, and it is a token because the file's own value is too
      strong here. §15b's five stops are the ellipse's measured falloff at its
@@ -441,7 +451,7 @@
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
 
 /* b — the chat's empty state, 112/120 (§40.1, restated §50.3) */
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::before{
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero .tal-mk.orb::before{
   background-color:transparent;
   background-image:var(--tal-mark);
   background-size:contain;
@@ -449,7 +459,7 @@
   background-repeat:no-repeat;
   box-shadow:none;
   animation:none}
-.app :is(.tal-panel, .ask-thread) .tal-hero .tal-mk.orb::after{content:none}
+.app :is(.tal-panel, .ask-thread, .ob-brand) .tal-hero .tal-mk.orb::after{content:none}
 
 /* c — the ask dock, 32px (§40.4, restated §50.2) */
 .app .askdock .askline-mark .tal-mk::before{
@@ -635,32 +645,43 @@
    inheriting a number that was measured for a different face at a third the
    size.
    ------------------------------------------------------------------------ */
-@font-face{
-  font-family:'Abhaya Libre';
-  font-style:normal;
-  font-weight:600;
-  font-display:swap;
-  src:url(__ABHAYA__) format('woff2');
-}
+/* AND ALL OF IT IS REVERSED — 4 Sep 2026. Maryam: "I want our current tal
+   experience on dashboard to be like the one we have created on the tal
+   onboarding... copy the font." §107's chat sets its greeting in the platform
+   sans at `--t-h1-size-lg`, and the ask page is being made that screen, so
+   the serif goes and everything above is the argument it is being weighed
+   against rather than a description of what ships.
 
-:root{
-  --tal-greet-face:'Abhaya Libre','Abhaya Libre SemiBold',
-    'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
-}
+   WHAT IS ACTUALLY LOST IS WORTH NAMING, because the paragraphs above are
+   right about it: the greeting WAS the only line in the product with a face of
+   its own, and a display serif on the one screen that is a conversation rather
+   than a page is a real idea. What overrules it is that the product now has
+   TWO Tal conversations and they were set in two faces — which is the state
+   §115's head note describes and the thing the instruction is about. One
+   conversation, one face; if the serif comes back it comes back on both.
 
-.app .ask-page .tal-hero h2{
-  font-family:var(--tal-greet-face);
-  font-size:34px;
-  font-weight:600;
-  line-height:normal;
-  letter-spacing:normal;
-  margin:0 0 var(--s04)}
-.app .ask-page .tal-hero h2 .askv-q{
-  font-family:inherit;
-  font-weight:600}
+   THE `@font-face` AND `--tal-greet-face` GO WITH THE RULE, not after it. A
+   face with no rule naming the family is the "gate nothing writes" tell, and
+   §11's own note already records `soehne-mono-buch.woff2` being retired for
+   exactly that reason in the Plus Jakarta swap. Checked before deleting:
+   `--tal-greet-face` had one reader and it was this rule.
+
+   `build.py`'s `__ABHAYA__` BLOCK IS NOW INERT AND IS DELIBERATELY LEFT. That
+   token no longer appears in any layer, so `css.replace` is a no-op and the
+   12.6 KB never reaches the output — the embed costs a file read at build time
+   and nothing in the bundle. It is left because that file is being edited in
+   another session as this lands; **it is three lines to delete** (the
+   `abhaya = base64...` read, the `css.replace` and the note above them) and
+   that is the tidy-up, not a behaviour change.
+
+   THE `margin` SURVIVES AS §63 §49's NEIGHBOUR RATHER THAN HERE. §51.185
+   already states `margin:0 0 var(--s04)` on this heading at the same (0,4,0)
+   and lands earlier, so deleting this rule hands the greeting back to it —
+   which is the value both rules were saying. Verified rather than assumed. */
 
 @container app (min-width:900px){
-  .app .ask-page .tal-hero h2{font-size:40px}
+  /* §51.4's own desktop step is gone with the serif: 34 → 40 was Abhaya's
+     scale, and `--t-h1-size-lg` is one rank at every width. */
 }
 
 /* ----------------------------------------------------------------- 14 ---
@@ -862,7 +883,10 @@
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  background-image:linear-gradient(180deg,#FBB2D4 0%,#E98B46 100%);
+  /* THE STAR'S OWN PINK-TO-ACCENT RAMP, re-hued 4 Sep 2026: the pink top stop
+     is the file's and stays, the bottom one was the accent's warm sibling
+     #E98B46 and is `--accent` now. §83 reached the same pair for the demo. */
+  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;

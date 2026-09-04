@@ -267,15 +267,61 @@ V.leadEvals = () => {
      it stayed a build too long. It is the "gate nothing writes" test applied to
      COPY rather than CSS — a word that is true of every row in a list is the
      list's heading, not the row's. */
+  /* A PUBLISHED ROW SAYS THE RECOMMENDATION IN A CHIP AND THE SCORE IN WORDS
+     (Maryam, 2 Sep 2026: "against each evaluated user next to their name their
+     should be a chips that tell their recommendation … instead of the bottom
+     cohort name, show the score of the candidate").
+
+     THE CHIP GOES INSIDE THE `<h3>`, WHICH IS THE PRODUCT'S OWN IDIOM FOR THIS
+     — `V.leadReports`' roster writes `${m.name} ${lflagTag(m.flag)}` into a
+     `.cardrow-t` and `V.leadMember`'s identity row does the same one level
+     down. No new class and no new rule: `.tag` is `inline-flex` and §63 §14
+     types it at `--t-label` wherever it lands, so it keeps its own rank inside
+     a heading rather than inheriting the name's.
+
+     "you recommended:" CAME OFF WITH THE COHORT NAME, and that is the half the
+     instruction does not name but follows from it. The chip IS the
+     recommendation, so the words would be the same verdict twice sixteen
+     pixels apart — §60's test applied to copy, which is the reason the
+     "Published" tag was deleted from this very list on 1 Sep.
+
+     THE SCORE IS `m.avg`, THE ASSESSMENT AVERAGE, and it is read off the roster
+     rather than stored on the summary — `lmemOf` is already how this page and
+     `V.leadSum` get every other figure, and this note's own file records why:
+     "the wireframe's `SUMMARIES` carried its own `pc`, `avg`, `mins` and
+     `calls`, which is the same candidate's numbers written down twice".
+
+     IT IS WORDED "Scored 79%" AND THAT IS THE PAGE'S OWN WORD (Maryam, 2 Sep
+     2026: "not assessment score, just 'Scored 78%'"). It shipped for one build
+     as "Assessment score 79%", which named the FIGURE — and the black card 200px
+     above this list already labels the same number under its ring with the
+     single word "Scored". One word, one meaning, twice on one page.
+
+     THE COHORT IS NOT LOST. Every row in this list is opened into `V.leadSum`,
+     whose crumb and header both name the cohort, and the page above this
+     section is already filtered to the leader's own three. */
   const sumRow = s => {
     const c = lcoOf(s.cohort);
     const m = lmemOf(c, s.name);
+    const done = s.status === 'done';
     return `<button class="tile clk gcard face-row" data-ldrsum="${s.id}" data-go="leadSum">
       <span class="mem-av mem-ph">${avatar({i:s.i, img:AV[s.img]}, 36)}</span>
-      <span class="gcard-b"><h3>${s.name}</h3>
-        <span class="sub">${s.status === 'done'
-          ? `${lname(c)} &middot; you recommended: ${s.rec}`
+      <span class="gcard-b"><h3>${s.name}${done ? ' ' + ldrRecTag(s.rec) : ''}</h3>
+        <span class="sub">${done
+          ? `Scored ${m.avg}%`
           : `${lname(c)} &middot; ${m.pc}% complete &middot; assessments ${m.avg}% &middot; sign to close their 90 days`}</span></span>
+      ${''/* THE ARROW'S LABEL — `.row-cta`, §112 (Maryam, 2 Sep 2026: "with
+             right side arrows, give text 'View Evaluation' on the left of the
+             arrow"). Written here rather than through `faceRow`'s fifth
+             argument because this row is `sumRow`'s own markup: the two
+             functions draw the same shape and only this one puts a chip in the
+             heading.
+             ON THE PUBLISHED ROWS ONLY, which is what "View" means. A waiting
+             row opens the same page to WRITE the recommendation, and the black
+             card at the top of this page already labels that action "Evaluate
+             Candidate" — one verb per state, and the two must not both be on
+             screen saying different things about the same button. */}
+      ${done ? '<span class="row-cta">View Evaluation</span>' : ''}
       <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
     </button>`;
   };
@@ -487,13 +533,56 @@ V.leadEvals = () => {
    upwards, and the two downwards.
    THE THIRD FIELD IS OPTIONAL BY POSITION, so `LDR_RECS.map(([k,l]) => …)` at any
    other call site keeps working — `ldrDraftRead`'s publish handler reads `r[1]`
-   by index and is untouched. */
+   by index and is untouched.
+
+   AND THE FOURTH IS THE CHIP'S HUE (Maryam, 2 Sep 2026: "against each evaluated
+   user next to their name their should be a chips that tell their recommendation
+   … the chip color should be based on the recommendation"). It is a TOKEN NAME,
+   so the five decisions are stated once here rather than as a `switch` inside
+   whatever draws them — the same reason the label and the line live on this row,
+   and the same shape §72's `pulseCol` uses to name a hue per instance.
+
+   THREE HUES FOR FIVE ROWS, AND THE PAIRING IS THE DECISION. The question a
+   colour answers here is "what KIND of news is this", not "how far up or down":
+   **green** for the two that move a candidate UP (the end the 90 days are built
+   for), **amber** for a hold — another 90 days at the same level is a delay, not
+   a failure — and **red** for a move down, which is the only one that takes
+   something away.
+
+   THEY ARE §31's THREE INKS AND NOT `.tag`'s OWN, which is what keeps this
+   portal speaking one language. `.tag.green` / `.red` / `.warn` carry
+   `--on-success-bg` / `--on-error-bg` / `--on-warning-bg`, inks tuned to sit on
+   §02's pale FILLS — and §10.293 turns those fills off, so a `.tag.warn` in this
+   build is an outlined chip with `--on-warning-bg` words and a neutral `--rule`
+   border. Three of those in a column read as three grey outlines that happen to
+   have differently-coloured text. The leader already has a chip that does this
+   properly: §31's attention-table flags, which Maryam asked for by name ("round
+   chips, the red item will have a light red chip bg"). This reuses that
+   formula and its three tokens, so a red on the Evaluations page is the red on
+   the dashboard's queue.
+
+   `notready` IS DELIBERATELY UNTONED and keeps §10's outlined chip. It is not a
+   verdict on the candidate at all — its line says "not enough here to assess
+   yet" — and giving it a hue would sort it beside one of the four that are.
+   The empty string is what `ldrRecTag` reads, so no `--mk` is written and
+   nothing in §31.6 matches. */
 const LDR_RECS = [
-  ['promote',  'Ready to promote',        'The end 90 days are built for.'],
-  ['promote2', 'Promote two levels',      'More than 90 days can normally move.'],
-  ['hold',     'Hold at this level',      'Another 90 days at the same level.'],
-  ['down',     'Move down a level',       'The level was set too high.'],
-  ['notready', 'Not ready to re-interview','Not enough here to assess yet.']];
+  ['promote',  'Ready to promote',        'The end 90 days are built for.',        '--support-success-ink'],
+  ['promote2', 'Promote two levels',      'More than 90 days can normally move.',  '--support-success-ink'],
+  ['hold',     'Hold at this level',      'Another 90 days at the same level.',    '--support-attention'],
+  ['down',     'Move down a level',       'The level was set too high.',           '--danger-ink'],
+  ['notready', 'Not ready to re-interview','Not enough here to assess yet.',       '']];
+
+/* THE CHIP, KEYED ON THE LABEL BECAUSE THAT IS WHAT THE RECORD HOLDS.
+   `LEAD_SUMMARIES[].rec` is the string a leader chose ("Ready to promote"),
+   not the key — `ldrDraftRead` writes `r[1]` — so the lookup runs the other
+   way. An unknown string falls through to the untoned chip rather than to
+   `undefined`, which is the shape `cohortArt` and `courseOf` both take: a
+   record that grows a sixth recommendation draws a plain chip, never a broken
+   one. */
+const ldrRecHue = rec => (LDR_RECS.filter(r => r[1] === rec)[0] || [])[3] || '';
+const ldrRecTag = rec => { const h = ldrRecHue(rec);
+  return `<span class="tag sm rec-tag"${h ? ` style="--mk:var(${h})"` : ''}>${rec}</span>`; };
 
 V.leadSum = () => {
   const s = ldrSumOf(S.ldrSum);

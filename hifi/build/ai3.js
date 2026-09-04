@@ -373,8 +373,8 @@ function scrollThread(){
     }
   }
   requestAnimationFrame(pin);
-  /* and once more when the webfonts land, for the same reason: Inter and
-     Söhne are base64 in the bundle but still load asynchronously, and text
+  /* and once more when the webfonts land, for the same reason: Plus Jakarta
+     Sans and Inter are base64 in the bundle but still load asynchronously, and text
      re-set in the real face is a different height than text set in the
      fallback. `.then` on an already-resolved `fonts.ready` is a microtask, so
      this costs nothing on every render after the first. */

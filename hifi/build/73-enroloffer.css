@@ -174,8 +174,32 @@
   border-color:transparent;
   --on-brand-fill:1}
 /* 185 x 40 — 613:7990, which is also §71.2's box for `.crow-a`, so the two
-   AI-native surfaces put their actions in one rectangle. */
-.app .sec.eo .aih-a > .btn{width:185px;min-height:40px;justify-content:center}
+   AI-native surfaces put their actions in one rectangle.
+
+   IT IS A `min-width`, NOT A `width`, AND THAT CHANGED ON 4 SEP 2026 WITH THE
+   FACE. The rectangle is the file's and is still the rectangle: 185 is what
+   every label in this slot gets, and the two surfaces still agree. What it may
+   no longer do is CLAMP. Plus Jakarta Sans is ~6% wider than Söhne, and "Continue
+   to payment" — the only label `enrolOffer`'s caller has ever passed — went from
+   149.7px of text to 161.8. The content box here is 185 - 12 - 12 = 161, and the
+   label needs 161.8 + a 4px gap + an 18px arrow, so it broke across two lines:
+   §56's "one 32px row of actions rather than a 38px row of broken phrases",
+   arrived at from the type side rather than from the copy side.
+
+   THE ALTERNATIVE WAS TO CUT THE LABEL AND IT IS THE WRONG ONE HERE. §56 cut six
+   labels on 28 Aug 2026 for exactly this failure, and it was right there because
+   a plate divides ~250px between TWO buttons — the constraint is real and the
+   copy has to live inside it. This slot holds ONE button in a head row with a
+   whole section's width behind it; there is no second control it has to stay
+   level with, so 23px is available for the asking and "Continue to payment" is
+   the sentence the page has been making since §69. A width stated as a fact
+   about a Figma frame should not be able to break a label that would otherwise
+   fit — `min-width` states the frame and lets the words win when they disagree.
+
+   MEASURED, NOT ASSUMED: `respcheck --edge` reports this label on one line at
+   all seven widths, and every other button in the build is unchanged, because
+   nothing else in this slot exceeds 161px of content. */
+.app .sec.eo .aih-a > .btn{min-width:185px;min-height:40px;justify-content:center}
 
 /* THE DATE IS A TINTED CHIP, NOT A `.note acc`. `enrolPlate` uses the accent
    note — a mark and two lines in a filled box — which is right inside a card and

@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=ca495aaf">
+<link rel="stylesheet" href="talentnext-ds.css?b=27f2ce4c">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=ca495aaf"></script>
+<script src="talentnext-ds.js?b=27f2ce4c"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -1196,13 +1196,20 @@ SECTIONS.push({id:'colour', nav:'Colour', icon:'view', build: () => `
       ${swatch('--brand-tint-2','#fcdbc7')}
     </div>
   `, true)}
-  ${ex('Surfaces', 'Two tones and the base is white. The canvas, the app bar and the rail are all #FFFFFF — one sheet separated by hairlines, which is what the lattice is for. <code>--layer-02</code> is what a supporting block sits on. There is no third.', `
+  ${ex('Surfaces', 'The base is white. The canvas, the app bar and the rail are all #FFFFFF — one sheet separated by hairlines, which is what the lattice is for. <code>--layer-02</code> is what a supporting block sits on; <code>--surface-3</code> is a half-step quieter and is the ground <em>under</em> the sheet — the page margins above 900, and a section that is reference rather than work.', `
     <div class="sw-grid">
       ${swatch('--background','#ffffff')}
-      ${swatch('--layer-02','#f7f7f7')}
+      ${swatch('--surface-3','#fbfbfb','the margin / quiet panel')}
+      ${swatch('--layer-02','#f7f7f7','the panel')}
       ${swatch('--surface-dark','#111111')}
-      ${swatch('--border-subtle-01','#dcdad3')}
-      ${swatch('--border-strong-01','#8e8d8a')}
+    </div>
+  `, true)}
+  ${ex('Strokes', 'One hairline, one value. <code>--rule</code> is every separator, rail and card edge in the product, and <code>--border-subtle-01</code> and <code>--rule-on-2</code> both read it rather than restating a hex — so changing the hairline is one line. The two below it are a different job: they are the edge of a <em>control</em> (input, select, checkbox), which has to be findable, so they stay in the warm ramp at a weight that reads.', `
+    <div class="sw-grid">
+      ${swatch('--rule','#e9e9e9','the hairline — everywhere')}
+      ${swatch('--border-subtle-01','#e9e9e9','= --rule, older name')}
+      ${swatch('--border-subtle-02','#c7c6c3','a control edge')}
+      ${swatch('--border-strong-01','#8e8d8a','a control edge')}
     </div>
   `, true)}
   ${ex('Ink', 'Four values, and they are ordered by how much attention the text is asking for.', `
@@ -1237,7 +1244,7 @@ SECTIONS.push({id:'colour', nav:'Colour', icon:'view', build: () => `
    the role class it names, so the specimen cannot drift from the rule — if a
    row here looks wrong, the layer is wrong, not the page. */
 SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
-  ${ex('Eight sizes, eleven roles', 'Söhne in two styles. Each row is set by the class it names — nothing here is hand-sized. Three pairs share a size and are told apart by weight and ink: body/compact by line-height, label/description by both, eyebrow/caption by both.', `
+  ${ex('Eight sizes, eleven roles', 'Plus Jakarta Sans in two styles. Each row is set by the class it names — nothing here is hand-sized. Three pairs share a size and are told apart by weight and ink: body/compact by line-height, label/description by both, eyebrow/caption by both.', `
     <div>
       <p class="t-display">Display &mdash; 34/40, 600</p>
       <p class="t-h1">Heading 1 &mdash; 24/30, 600 &middot; 28/34 at 900 and up</p>
@@ -1262,11 +1269,20 @@ SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
     </div>
   `)}
 
-  ${ex('Two weights, because the face has two', 'Söhne is embedded at 400 (Buch) and 600 (Kräftig) and at nothing else. A 40px string measures 280.9px at both 400 and 500, and 282.9px at 600, 700 and 800 — so 500 renders as Buch and 700/800 render as Kräftig. Writing any of those three is a declaration that will not do what it says.', `
+  ${ex('The face is Plus Jakarta Sans', 'Two styles, embedded in the stylesheet, so linking talentnext-ds.css is the whole dependency — there is no font to host and no relative path to get wrong. It carries 721 glyphs, which is why the stack behind it is just system-ui: every character the interface draws is in the face, so nothing falls through to a second one. SIL OFL.', `
     <div class="kv">
-      <div class="k">400 &mdash; Söhne Buch</div><div class="v" style="font-weight:400">Every prose role, and every description</div>
-      <div class="k">600 &mdash; Söhne Kräftig</div><div class="v" style="font-weight:600">Every heading, every label, every eyebrow, every button</div>
-      <div class="k">500 / 700 / 800</div><div class="v">Not available. They silently round to one of the two above</div>
+      <div class="k">Family</div><div class="v">Plus Jakarta Sans</div>
+      <div class="k">Loaded</div><div class="v">Regular (400), Medium (500), SemiBold (600). No Bold, no ExtraBold</div>
+      <div class="k">Stack</div><div class="v">'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif</div>
+    </div>
+  `)}
+
+  ${ex('Two weights carry the product', 'Regular for prose, Medium for everything strong. SemiBold is loaded so a declared 600 renders a real 600, but no role uses it. Bold and ExtraBold are not loaded at all, so anything written at 700 or 800 resolves to 600 — a declaration that does not do what it says.', `
+    <div class="kv">
+      <div class="k">400 &mdash; Regular</div><div class="v" style="font-weight:400">Every prose role, and every description</div>
+      <div class="k">500 &mdash; Medium</div><div class="v" style="font-weight:500">Every heading, every label, every eyebrow, every button</div>
+      <div class="k">600 &mdash; SemiBold</div><div class="v" style="font-weight:600">Loaded, but no role points at it</div>
+      <div class="k">700 / 800</div><div class="v">Not available. They round down to 600</div>
     </div>
   `)}
 
@@ -1302,7 +1318,7 @@ SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
     </div>
   `)}
 
-  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face — Söhne Mono was a third style in a system that has two. The cell’s own anatomy is under <b>Figures</b>: it is a named grid and needs all three parts.', `
+  ${ex('Figures', 'Tabular by default everywhere, so a column of numbers lines up without a monospaced face — a mono cut would be a third style in a system that has two, and the one this build shipped was retired for exactly that. The cell’s own anatomy is under <b>Figures</b>: it is a named grid and needs all three parts.', `
     <div class="facts">
       <div><div class="l">Fee</div><div class="v">$595</div></div>
       <div><div class="l">Held for you</div><div class="v">$204</div></div>
@@ -1464,7 +1480,7 @@ SECTIONS.push({id:'fields', nav:'Fields', icon:'edit', build: () => `
 
 /* --------------------------------------------------------------------- rows */
 SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
-  ${ex('Navigation row', 'This replaces every card. Full-bleed, a hairline between, a leading icon slot and a trailing chevron. <code>.clk</code> is what makes it a target.', `
+  ${ex('Navigation row', 'This replaces every card. Full-bleed, a hairline between, a leading icon slot and a trailing chevron. <code>.clk</code> is what makes it a target. <b>Add <code>.row-cta</code> before the arrow when the row has one obvious verb</b> — the second row here does. It is a <code>&lt;span&gt;</code> and never a <code>&lt;button&gt;</code>: the row is already the control, so a button inside it would be invalid markup and a second target doing one job. The label names what pressing the row does and the arrow goes on saying that it is pressable; it is 8px from the arrow rather than the row&rsquo;s own 16 because the two are one object, and it is <b>off below 600px</b>, where it would take a third of the measure to repeat what the arrow says. Skip it on a row whose verb would be vague or would name the KIND of thing rather than the action.', `
     <div class="tile-stack">
       <button class="tile clk gcard">
         <span class="cardrow-ic">{{book}}</span>
@@ -1476,6 +1492,7 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
         <span class="cardrow-ic">{{chart}}</span>
         <span class="gcard-b"><h3>Your assessment</h3>
           <span class="sub">Average 92% across thirteen</span></span>
+        <span class="row-cta">View results</span>
         {{arrowRight|tile-arrow}}
       </button>
     </div>
@@ -1493,6 +1510,52 @@ SECTIONS.push({id:'rows', nav:'Rows', icon:'group', build: () => `
         <span class="gcard-b"><span class="eyebrow">Cohort 33 &middot; Explorer &ndash; E1</span>
           <h3>Week 11 of 13</h3><span class="sub">The fallback, with no cover behind it</span></span>
         {{arrowRight|tile-arrow}}
+      </button>
+    </div>
+  `)}
+  ${ex('Upcoming cards', 'A row of <b>appointments</b>, one card each, in an <code>auto-fit</code> grid that fills the column at any count and stacks itself on a phone — three across at desktop, two at tablet, one at 390. Each card is <code>.lcal-h</code> (a mark and the date), <code>.lcal-b</code> (the title and one line of detail) and <code>.lcal-f</code>, which carries <code>margin-top:auto</code> so every foot in the row lands on one line whatever the descriptions do. <b>The date is two lines, the word over the figure.</b> Written as one line with a glyph in front it is ~150px wide and the header wraps in every cell the grid makes; stacked it is the wider of its two lines, about 62. <b>Mark the first card <code>.lcal-next</code> and <code>.dark-card</code> together</b> — the first is two declarations of ground, the second is where the whole on-dark ink pair, the seams and the unlit disabled button come from, and it is deliberately worn <i>without</i> <code>.sec</code> so the black card&rsquo;s section geometry never applies inside a grid cell. The gate on the Join is the portal&rsquo;s: this stylesheet has no clock, so a hand-authored page writes <code>disabled</code> itself.', `
+    <div class="lcal-row">
+      <div class="lcal lcal-next dark-card">
+        <span class="lcal-h">
+          <span class="gcard-art"><i>41</i><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzJmNmZlMCIvPjxjaXJjbGUgY3g9IjEwMCIgY3k9Ijg0IiByPSI0NiIgZmlsbD0iIzEyMmM1YyIvPjxyZWN0IHg9IjM4IiB5PSIxNTAiIHdpZHRoPSIxMjQiIGhlaWdodD0iMTIiIHJ4PSI2IiBmaWxsPSIjOGZiNmYyIi8+PC9zdmc+" alt=""></span>
+          <span class="lcal-when"><span class="lcal-day t-desc">Today</span><span class="lcal-tm t-h4">6:00 PM</span></span>
+        </span>
+        <span class="lcal-b">
+          <span class="lcal-t t-h4">Cohort 41 call</span>
+          <span class="lcal-d t-desc">10 candidates &middot; Explorer &ndash; E3 &middot; week 5 of 13</span>
+        </span>
+        <span class="lcal-f">
+          <span class="lcal-m t-desc">60 minutes</span>
+          <button class="btn btn-p btn-sm noic" disabled title="You can join from 5:55 PM">Join call {{arrowRight}}</button>
+        </span>
+      </div>
+      <button class="lcal">
+        <span class="lcal-h">
+          <span class="gcard-art"><i>33</i><img src="" alt=""></span>
+          <span class="lcal-when"><span class="lcal-day t-desc">Tomorrow</span><span class="lcal-tm t-h4">5:00 PM</span></span>
+        </span>
+        <span class="lcal-b">
+          <span class="lcal-t t-h4">Cohort 33 call</span>
+          <span class="lcal-d t-desc">8 candidates &middot; Explorer &ndash; E1 &middot; week 11 of 13</span>
+        </span>
+        <span class="lcal-f">
+          <span class="lcal-m t-desc">60 minutes</span>
+          {{arrowRight|tile-arrow}}
+        </span>
+      </button>
+      <button class="lcal">
+        <span class="lcal-h">
+          <span class="gcard-art"><i>47</i><img src="" alt=""></span>
+          <span class="lcal-when"><span class="lcal-day t-desc">Mon</span><span class="lcal-tm t-h4">6:00 PM</span></span>
+        </span>
+        <span class="lcal-b">
+          <span class="lcal-t t-h4">Cohort 47 call</span>
+          <span class="lcal-d t-desc">10 candidates &middot; Explorer &ndash; E2 &middot; week 1 of 13</span>
+        </span>
+        <span class="lcal-f">
+          <span class="lcal-m t-desc">60 minutes</span>
+          {{arrowRight|tile-arrow}}
+        </span>
       </button>
     </div>
   `)}
@@ -1670,8 +1733,100 @@ SECTIONS.push({id:'nav', nav:'Navigation', icon:'view', build: () => `
           moves with the result.</p></div></div>
     </div>
   `)}
+  ${''/* THE OUTLINE IS THE ACCORDION WITH FOUR THINGS ADDED, and it is here
+        because §87's two families had no recipe on this page at all: the box
+        shipped `.lrn` and `.skl` for two days with nothing writing either, and
+        `.ol` is the shape that writes both. Live, so the hover works — that is
+        the one part of it a snippet cannot show. */}
+  ${ex('Outline', 'The accordion as a list of openable things: a title over a meta line, a hover label, panels that hold <b>blocks</b> rather than prose, and a closing row that does not open. <b>Point at a row</b> — <code>.ol-row:hover</code> is one of the eleven hovers <code>build.py</code> leaves armed, and the label is <code>display:none</code> rather than <code>visibility:hidden</code> so the chevron does not sit behind a phantom gap. Four things to copy: <code>.ol</code> releases <code>.acc-b</code>’s 68ch prose measure, the panel’s <b>first</b> <code>.skl-h</code> drops §87.1c’s divider, and a headed <code>.sec</code> holding one needs §110.5’s label-column opt-out or the heading sets in a 184px gutter.', `
+    <div class="acc ol" id="demoOl">
+      <div class="acc-i on">
+        <button class="acc-h ol-row" aria-expanded="true">
+          <span class="ttl"><span class="ol-t">Why We Exist</span><span class="ol-m t-desc">Chapter 1 &middot; 45 min</span></span>
+          <span class="ol-cd">Chapter details</span>
+          {{chevDown|chev}}</button>
+        <div class="acc-b">
+          <h3 class="skl-h">What you&rsquo;ll learn</h3>
+          <ul class="lrn">
+            <li class="lrn-i"><span class="lrn-tk">{{check}}</span><span class="lrn-t">Say what the business is for in one sentence other people repeat</span></li>
+            <li class="lrn-i"><span class="lrn-tk">{{check}}</span><span class="lrn-t">Trace your own work back to the outcome it is paid for</span></li>
+          </ul>
+          <h3 class="skl-h">Skills you&rsquo;ll gain</h3>
+          <div class="skl">
+            <span class="skl-c">Purpose</span>
+            <span class="skl-c">Business literacy</span>
+            <span class="skl-c">Strategic context</span>
+          </div>
+        </div>
+      </div>
+      <div class="acc-i">
+        <button class="acc-h ol-row" aria-expanded="false">
+          <span class="ttl"><span class="ol-t">The Operator Mindset</span><span class="ol-m t-desc">Chapter 2 &middot; 60 min</span></span>
+          <span class="ol-cd">Chapter details</span>
+          {{chevDown|chev}}</button>
+        <div class="acc-b"></div>
+      </div>
+      <div class="acc-i ol-cert">
+        <div class="cardrow">
+          <span class="cardrow-ic">{{certificate}}</span>
+          <span class="cardrow-b">
+            <span class="cardrow-t">Earn your certificate</span>
+            <span class="cardrow-d">A row with no <code>.acc-h</code> in it does not open, so it needs no chevron.</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  `)}
   ${ex('Sheet', 'Rises from the bottom on a phone, centres at 600px and up.', `
     <button class="btn btn-s noic" id="openSheet">Open the sheet</button>
+  `)}
+  ${''/* THE CONFIRMATION IS A SECOND SHAPE OF THE SAME COMPONENT, and it was
+        missing from this page for two callers — §105.6 drew it for "Delete
+        your account?" and §109 for "Successfully enrolled", and until now the
+        box shipped every `.conf-*` rule with nothing here writing one. That is
+        the "gate nothing writes" tell read from the gallery's side: the CSS
+        crossed, the recipe did not, so a hand-authored page had no way to know
+        the shape existed.
+
+        THE `.modal on` WRAPPER IS THE ONE LINE THE GALLERY OWNS. In a product
+        the modal is `position:absolute; inset:0` over the app with a scrim
+        behind it — the Sheet example above shows that for real. Here it is
+        `position:static` so the dialog can stand in the page and be read; the
+        `.sheet.conf` inside it is the component, unchanged. */}
+  ${ex('Confirmation — something worked', 'The centred dialog, and the only difference from the destructive one below it is <code>.conf-ok</code> on the sheet: the mark takes <code>--support-success</code>. Everything else — the 48px disc, its two hairline rings, the 16px title, the sentence at <code>--sec-desc-gap</code> under it, no rule above the footer, no trailing arrow on the action — is the component. One action, because there is nothing to decide.', `
+    <div class="modal on" style="position:static">
+      <div class="sheet conf conf-ok" role="dialog" aria-modal="true" aria-label="Successfully enrolled">
+        <div class="sheet-b conf-b">
+          <span class="conf-mk">{{checkFilled}}</span>
+          <h2 class="conf-t">Successfully enrolled</h2>
+          <p class="conf-x">$595 paid on your Visa ending 4242, and Cohort 41 is
+            yours for the 90 days.</p>
+        </div>
+        <div class="sheet-f conf-a">
+          <button class="btn btn-s noic">Close</button>
+        </div>
+      </div>
+    </div>
+  `)}
+  ${ex('Confirmation — something is about to be destroyed', 'Same object without <code>.conf-ok</code>. Two equal halves in the footer, the safe exit first, and <b>no × in the corner</b> — a dialog whose point is a deliberate choice does not get a third, quietest way out. The friction field is <code>.conf-f</code>, which takes §41’s bounded box rather than the product’s underline: a grey word hard-left under a centred heading reads as a value already typed.', `
+    <div class="modal on" style="position:static">
+      <div class="sheet conf" role="dialog" aria-modal="true" aria-label="Delete your account">
+        <div class="sheet-b conf-b">
+          <span class="conf-mk">{{warning}}</span>
+          <h2 class="conf-t">Delete your account?</h2>
+          <p class="conf-x">Your profile, your notes and every interview recording
+            are deleted. This cannot be undone.</p>
+          <div class="f conf-f">
+            <label for="galdelc">Type Delete to confirm</label>
+            <input class="inp" id="galdelc" placeholder="Delete" autocomplete="off">
+          </div>
+        </div>
+        <div class="sheet-f conf-a">
+          <button class="btn btn-s noic">Keep my account</button>
+          <button class="btn btn-p noic danger">Delete Account</button>
+        </div>
+      </div>
+    </div>
   `)}
 `});
 
@@ -1820,6 +1975,18 @@ document.querySelectorAll('#demoTabs, #demoSeg').forEach(g => g.onclick = e => {
 document.getElementById('demoAcc').onclick = e => {
   const h = e.target.closest('.acc-h');
   if(h) h.parentElement.classList.toggle('on');
+};
+/* THE OUTLINE DEMO OPENS ONE ROW AT A TIME, which is what the portal's own
+   `data-outl` handler does — and the portal keeps the open row in `S.outl` as
+   well, because its page re-renders under the reader (§65's split). A
+   hand-authored page that never re-renders needs only this. */
+document.getElementById('demoOl').onclick = e => {
+  const h = e.target.closest('.ol-row');
+  if(!h) return;
+  const item = h.parentElement, was = item.classList.contains('on');
+  document.getElementById('demoOl').querySelectorAll('.acc-i.on')
+    .forEach(x => { x.classList.remove('on'); x.querySelector('.ol-row')?.setAttribute('aria-expanded','false'); });
+  if(!was){ item.classList.add('on'); h.setAttribute('aria-expanded','true'); }
 };
 const modal = document.getElementById('sheetModal');
 function sheet(open){

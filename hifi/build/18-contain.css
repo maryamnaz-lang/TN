@@ -58,9 +58,26 @@
 
    Only above 900. Below it the page IS the frame and there are no margins
    to fill.
+
+   AND THE SECOND TONE IS `--surface-3`, NOT `--surface-2` — #fbfbfb (Maryam,
+   3 Sep 2026: "the color of margins of the page which is f7f7f7 right now, i
+   want those to be fbfbfb"). The paragraph above is unchanged and still the
+   argument; what changed is WHICH tone, and it is the difference between the
+   surface a sheet lies on and a block on the sheet. At #f7f7f7 the margin was
+   the SAME value as `.sec.tint`, so a tinted section — which bleeds past the
+   rails by §10.2 — met the margin edge to edge and the two became one field of
+   grey with the rails suspended in the middle of it. The rails are the whole
+   point of §10, so the ground behind them has to be quieter than anything
+   drawn on the page. `--surface-3` already existed for exactly this reading
+   (§12: "still a tone rather than a colour… it recedes instead of arriving");
+   it is read here rather than a fourth value minted.
+
+   `> .page` KEEPS `--background`. The column is still white on top of the
+   margin — the pair is what makes it a sheet, and taking the page's own fill
+   off would let the margin tone run under the content.
    ========================================================================== */
 @container app (min-width:900px){
-  .app .view-col > .main{background-color:var(--surface-2)}
+  .app .view-col > .main{background-color:var(--surface-3)}
   .app .view-col > .main > .page{background-color:var(--background)}
 }
 

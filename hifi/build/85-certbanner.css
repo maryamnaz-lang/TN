@@ -12,8 +12,9 @@
      85.1b `.dark-card` no closing hairline on the section above a black card,
                         narrow tier. The desktop half is an entry in §14's
                         `:not()` list, per trap 4.
-     85.2  `.sec-pulse` the head row's action, top-aligned and at the primary
-                        button's own height.
+     85.2  `.sec-pulse` the head row's action, held at the primary button's own
+                        height. Its top alignment was REVERSED on 4 Sep 2026 and
+                        the action is centred again — see the note.
      85.3  `.pnc-when`  the countdown, bottom-aligned instead of centred.
      85.4  `.head-col`  the band's second-column tenant fills its column.
 
@@ -255,8 +256,22 @@
    as different sizes of the same button on two dashboards. Stated as
    `min-height` rather than `height` so a wrapped label can still grow the box
    instead of clipping (§56's safety valve, one component along).
-   -------------------------------------------------------------------------- */
-.app .page .sec.sec-pulse > .sec-h.aih > .aih-a{align-self:flex-start}
+
+   AND THE TOP ALIGNMENT IS REVERSED — Maryam, 4 Sep 2026, of this card: "right
+   center align button." The `align-self:flex-start` above is DELETED rather
+   than re-pointed, because §73.1's default is exactly what the instruction asks
+   for: `align-self:center` on both children of `.aih`, stated at (0,6,0), whose
+   own note is a long argument for centring the action against the title-and-
+   description PAIR rather than against the title. Nothing is restated here.
+
+   THE ARGUMENT ABOVE IS KEPT BECAUSE IT IS STILL TRUE OF WHAT IT MEASURED: the
+   lede wraps to two lines at every real width, so centred, the button sits
+   beside the second line with the heading above it. That reading is what the
+   instruction overrules — the block is a heading and its sentence, one object,
+   and the control belongs to the middle of it. The horizontal half needed
+   nothing: `.aih-a` is already at the row's right end, which is `aiHead`'s own
+   `margin-left:auto`. §85.3's `.sec.eo` correction is untouched; this is a
+   judgement about one card, which is how that one was made too. */
 .app .page .sec.sec-pulse > .sec-h.aih > .aih-a > .btn{min-height:40px}
 
 /* ------------------------------------------------------------------- 85.3 ---

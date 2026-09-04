@@ -88,69 +88,72 @@
 .app .lrn-t{min-width:0}
 
 /* ------------------------------------------------------------------ 87.1a ---
-   THE SECTION MUST NOT TAKE THE 184px LABEL COLUMN — TRAP 13
+   THE LABEL-COLUMN OPT-OUT MOVED TO §110.5 — TRAP 13, AND THE ARGUMENT IS
+   KEPT BECAUSE THE TRAP CAUGHT THIS SECTION TWICE
 
-   IT USED TO OPT OUT THROUGH ITS LEDE AND THE LEDE IS GONE (Maryam, 1 Sep
-   2026: "remove the desc of what you'll learn"). §10.15 hands any `.sec` with
-   a `.sec-h` a 184px label column at desktop unless its CONTENTS are on an
-   opt-out list; neither `.lrn` nor `.skl` is on that list, so the one thing
-   keeping this section full width was the `.all-desc` paragraph — `learnSec`'s
-   own note said so, which is what made the deletion cheap to get wrong. This
-   is §69's sentence exactly: "Adding a wrapper is not the only way to lose an
-   opt-out — removing content does it too."
+   §10.15 hands any `.sec` with a `.sec-h` a 184px label column at desktop
+   unless its CONTENTS are on an opt-out list, and neither `.lrn` nor `.skl` is
+   on it. This section has now lost that opt-out twice, in two different
+   directions, and neither failure warned:
 
-   AND NOTHING WARNS. The failure is not an error, it is "What you'll learn"
-   set to three lines in a 184px gutter with a two-column list crushed beside
-   it, which looks like a layout that was always like that.
+     1 Sep 2026  the lede was deleted ("remove the desc of what you'll learn")
+                 and `.all-desc` was the only thing on the opt-out list the
+                 section contained. §69's sentence exactly — "adding a wrapper
+                 is not the only way to lose an opt-out, removing content does
+                 it too." Answered here, on `:has(> .lrn)`.
+     3 Sep 2026  the tick list moved INSIDE a collapse panel, three levels down
+                 (`.acc > .acc-i > .acc-b`), so a DIRECT-child selector stopped
+                 matching. The section is the Course Outline now and §110.5
+                 states the opt-out on `:has(> .ol)`.
 
-   INSIDE THE SAME CONTAINER QUERY, PER TRAP 3. §10.15's rules live in
-   `@container app (min-width:900px)`, which is its own cascade tier — a rule of
-   equal weight outside it cannot answer it whatever its layer number.
+   SO THE RULE IS THERE AND NOT HERE, and this note is the reason rather than
+   the leftover: keeping a dead `:has(> .lrn)` here would be a gate nothing
+   writes — the portal has no `.sec > .lrn` any more. **A hand-authored page
+   that puts a `.lrn` straight into a headed section will hit this**, and the
+   fix is one rule copied out of §110.5 with `.ol` swapped for `.lrn`; the
+   design system ships both families and `gallery.html` documents the shape.
 
-   AND IT COPIES WHAT §10 DOES, NOT WHAT §10 SAYS. That rule's fourth
-   declaration is `padding:0 var(--pad-x)` on the heading and it is DEAD: §14.2
-   zeroes every headed section's `.sec-h` padding at this width. Restating it
-   would un-do §14 and set this one heading 24px right of the list under it —
-   §69's lesson, which §72.1a repeats for the same reason.
+   AND WHATEVER RESTATES IT MUST COPY WHAT §10 DOES, NOT WHAT §10 SAYS. That
+   rule's fourth declaration is `padding:0 var(--pad-x)` on the heading and it
+   is DEAD — §14.2 zeroes every headed section's `.sec-h` padding at this width
+   — so restating it un-does §14 and sets the heading 24px right of its own
+   content. §69's lesson, which §72.1a and §110.5 both repeat.
    -------------------------------------------------------------------------- */
-@container app (min-width:900px){
-  .app .sec:has(> .lrn){display:block}
-  .app .sec:has(> .lrn) > .sec-h{
-    border-right:0;min-height:0;margin-bottom:var(--sec-h-gap)}
-}
 
 /* ------------------------------------------------------------------ 87.1c ---
-   THE TWO HALVES OF THE SECTION ARE SEPARATED BY A RULE
-   Maryam, 1 Sep 2026: "add a divider after the What you'll learn section
-   before Skills you'll gain."
+   §87.1c IS DELETED — THE DIVIDER BETWEEN THE TWO HALVES IS OFF
 
-   ONE `.sec` WITH TWO BLOCKS IN IT, WHICH IS WHY THIS IS A BORDER AND NOT A
-   SECTION BOUNDARY. `learnSec` is deliberately a single section — the outcomes
-   and the chips are two answers to "what is on this course", and splitting them
-   would give the chips a `.sec-h` of their own and pull both into §10.15's
-   184px label column (trap 13; the lede's `.all-desc` is the only thing keeping
-   this one out). So the separation is drawn INSIDE the section, on the element
-   that starts the second half.
+   Maryam, 3 Sep 2026: "remove the divider between the what you'll learn and
+   skills you'll gain." It was hers on 1 Sep ("add a divider after the What
+   you'll learn section before Skills you'll gain") and the block it was drawn
+   for no longer exists — `learnSec` was ONE section with the two lists stacked
+   in it, where a rule was the only thing saying they were two halves of one
+   answer rather than one long list.
 
-   `border-top` ON `.skl-h`, WHICH IS §74.6's TECHNIQUE AND ITS REASON.
-   `.signed` takes a rule the same way — a border on the block "starts and ends
-   exactly where the content under it does, no negative margin, no second value
-   to keep in step with the gutter when the gutter changes at 900". §10.2's
-   section rule is full-bleed and would run past the list on both sides, which
-   is right for a boundary between sections and wrong for a join inside one.
+   THE OUTLINE IS WHAT MADE IT REDUNDANT RATHER THAN JUST UNWANTED. §110's
+   panel already sits inside an `.acc-i` with a hairline above it and one
+   below, so the pair had THREE rules around and between it in 300px — and
+   `outlineSec` is now the only thing in either the portal or the design system
+   that writes `.skl-h`, so nothing is left for this rule to serve. Deleted
+   rather than scoped away in §110: a rule nothing renders is the same dead
+   weight as a class nothing styles (§106's `.idphoto-round`).
 
-   24 ABOVE AND 24 BELOW, WHICH REPLACES §63's 32. That layer states
-   `margin:var(--s07) 0 0` on this heading — a spacing declaration in the type
-   layer, which is why it is answered here rather than edited there: §87 lands
-   after §63 and both are (0,2,0), so this wins on order. Splitting the old 32
-   into an even 24/24 keeps the two halves the same distance apart as they were
-   while giving the rule its own air on both sides; an unequal pair would tie
-   the line to one half or the other.
+   WHAT SEPARATES THEM NOW IS §63 §22's OWN 32px, which this rule used to
+   override with an even 24/24 either side of the line. With no line to give
+   air to, the larger single gap is the correct one — it is all that groups a
+   heading with the list above it against the one below, and it reads against
+   §110.4's 12px heading-to-content as the same 8/12/32 rhythm the rest of the
+   product uses. §110.3 still zeroes it on the panel's FIRST subhead, which is
+   now its only job there.
+
+   THE TECHNIQUE IS WORTH KEEPING FOR THE NEXT JOIN INSIDE A SECTION.
+   `border-top` on the element that STARTS the second half is §74.6's move and
+   its reason: the rule "starts and ends exactly where the content under it
+   does, no negative margin, no second value to keep in step with the gutter
+   when the gutter changes at 900". §10.2's section rule is full-bleed and
+   would run past the content on both sides — right for a boundary between
+   sections, wrong for a join inside one.
    -------------------------------------------------------------------------- */
-.app .skl-h{
-  margin-top:var(--s06);
-  padding-top:var(--s06);
-  border-top:1px solid var(--rule)}
 
 /* ------------------------------------------------------------------- 87.2 ---
    THE CHIP ROW
@@ -190,32 +193,29 @@
   border-radius:999px;
   background:var(--layer-02)}
 
-/* "SHOW ALL" IS A TEXT CONTROL ON THE END OF THE ROW, NOT A CHIP. It is the one
-   pressable thing here, so it must not wear the chips' ground — a fourteenth
-   pill that happens to be clickable is the affordance failure §60 is about. An
-   underline and the page's own ink is what the reference draws and what §12's
-   `.lk` idiom already means in this product.
+/* "SHOW ALL" IS DELETED, AND `.skl-more` AND `.skl-full` WITH IT (Maryam,
+   3 Sep 2026 — the outline). The chip row used to be ten of the thirteen
+   chapter titles with a text control on the end that opened §02.14's dialog on
+   all thirteen; a chapter's own panel carries FOUR skills, which is one line,
+   so there is nothing to truncate and nothing for a control to reveal — §60's
+   test for whether a control may exist at all. `skillsSheet`, `S.sklAll` and
+   both click branches went from views.js in the same pass.
 
-   NO `margin-left:auto`. The link belongs to the END OF THE LIST, not to the
-   right-hand edge of the section: with an auto margin it would sit alone at the
-   far side of whatever line the chips stopped on, which at some widths is a
-   different line entirely. Left where the flow puts it, it reads as the last
-   item — which is what it is. */
-.app .skl-more{
-  display:inline-flex;align-items:center;
-  padding:var(--s03) 0;
-  background:transparent;border:0;cursor:pointer;
-  text-decoration:underline;text-underline-offset:3px}
+   THE TWO DECISIONS ARE KEPT BECAUSE THE NEXT ROW-WITH-AN-OVERFLOW WANTS THEM.
+   It was NOT a chip: it was the one pressable thing in the row, so wearing the
+   chips' ground would have made it a fourteenth pill that happens to be
+   clickable, which is the affordance failure §60 is about — an underline and
+   the page's own ink is what §12's `.lk` idiom already means here. And it had
+   NO `margin-left:auto`: the link belonged to the end of the LIST, not to the
+   right-hand edge of the section, which at some widths is a different line
+   entirely.
+   -------------------------------------------------------------------------- */
 
 /* ------------------------------------------------------------------- 87.3 ---
-   THE FULL LIST IN THE DIALOG
-
-   §02.14 draws the sheet and this states one thing: the chip row inside it wraps
-   in the sheet's own measure with nothing else to compete with, so it needs no
-   top margin. `.sheet-b` has already paid `--s06` on all four sides.
-
-   THE SHEET IS CENTRED FROM 600 BY §02.422 — "a little modal on page mid" — and
-   bottom-anchored below that, which is the same dialog the profile and photo
-   sheets use. Nothing about the centring is stated here.
+   §87.3 WAS `.skl-full` — the chip row inside the "Show all" dialog, at
+   `margin-top:0` because `.sheet-b` had already paid `--s06` on all four
+   sides. Deleted with the dialog (see above). Nothing else in the build writes
+   that class, and the one thing worth carrying forward is the reason it needed
+   a rule at all: a component with its own top margin lands inside a sheet that
+   has already paid for its own frame.
    -------------------------------------------------------------------------- */
-.app .skl-full{margin-top:0}

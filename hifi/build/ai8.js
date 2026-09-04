@@ -163,13 +163,31 @@ function wSupport(askFor){
    — a dead end with no way out is how somebody decides the assistant is
    decorative, and the chips are the way out. They come from `TALCTX` so they
    are the questions for the page the person is actually on. */
+/* >>> AND THE GATE GETS NO CHIPS — Maryam, 4 Sep 2026: "in the i dont have an
+   answer response, remove the chips."
+
+   THE ARGUMENT ABOVE STILL HOLDS EVERYWHERE ELSE, WHICH IS WHY THIS IS A
+   BRANCH AND NOT A DELETION. On the ask page the chips genuinely are the way
+   out of a dead end — that surface has a thread, a dock and no other prompt,
+   and `TALCTX` makes them the questions for the page the reader is on.
+
+   ON THE ONBOARDING THEY ARE THE WRONG OFFER TWICE OVER. That screen is a
+   five-question flow with its OWN live options 100px above and a composer
+   directly below, so "here is what I can answer" competes with the question
+   Tal has just asked — three chips about the dashboard, on a stage the reader
+   has not reached. The way out is the panel they were already looking at.
+
+   THE LEAD-IN SENTENCE GOES WITH THEM. "Here is what I can answer from where
+   you are" is the chips' own introduction; kept without them it promises a
+   list that never arrives, which is the "gate nothing writes" tell in copy. */
 function talNoAnswer(){
+  const bare = S.stage === 'onboard';
   const ctx = (isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL.ctx : TALCTX);
   const set = ctx[S.view] || ctx[isLead() ? 'leadDash' : 'dashboard'];
   return `I ${hl('do not have an answer')} for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
     + wSupport('this question, worded exactly as you asked me &mdash; they will have your account open')
-    + `<span class="tw-k">Here is what I can answer from where you are.</span>`
-    + twChips(set);
+    + (bare ? '' : `<span class="tw-k">Here is what I can answer from where you are.</span>`
+        + twChips(set));
 }
 
 /* NOT EVERYTHING IS A SUPPORT TICKET. `talOff` is the reply for a question
@@ -865,7 +883,7 @@ const CH_ONE  = /chapters?\s*(1[0-3]|[235-9])\b(?!\d)/i;
 
    THE REASONING IS THE SIX DESCRIPTIONS THAT CAME OFF THE CARDS. `SCENES`
    holds `[title, why, from, length]` and the second field is exactly the line
-   each card used to print — "Where you changed your mind after listening". So
+   each card used to print — "Where you changed your mind". So
    nothing is written here: the copy moved from the strip into the reply, and
    `SCENES` stays the one record it was, which is the `bkStamp` rule (one
    place, many readers) applied to six sentences. Editing a scene's `why`

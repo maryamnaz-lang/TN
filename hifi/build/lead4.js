@@ -354,7 +354,10 @@ V.leadCerts = () => {
   ${''/* Three blocks in a row were explaining this page: this line, Tal's
         summary, and a 44-word `.note` about the volunteer role. The stat
         cells below state the four figures, Tal reads them, and the note
-        makes the one point neither can. This line was the redundant third. */}
+        makes the one point neither can. This line was the redundant third.
+        THE NOTE IS NOW GONE TOO (Maryam, 2 Sep 2026 — "remove the 'Leading is
+        a volunteer role' part"), so of the three only Tal's summary is left,
+        which is where a page's own reading belongs. */}
   ${ph('Certifications')}
   ${ldrCertHero(LDR_CERTS[LDR_CERTS.length - 1])}
   <div class="sec">
@@ -365,9 +368,29 @@ V.leadCerts = () => {
       ${statCell(I.time, 'Training hours', hours, 'this year')}
     </div>
   </div>
-  <div class="sec">
-    <div class="note"><span>${I.info}</span><div class="nb"><b>Leading is a volunteer role</b>There are no fees and no settlements on this side of TalentNext. What the time earns is recognised in certifications, and in the training that leads to them.</div></div>
-  </div>
+  ${''/* THE VOLUNTEER NOTE STOOD HERE AND IS DELETED (Maryam, 2 Sep 2026:
+         "remove the 'Leading is a volunteer role' part") — a `.note` with
+         `I.info`, a bold lead-in and 44 words about there being no fees and no
+         settlements on this side of TalentNext.
+
+         WHY IT WAS HERE, so it is not rebuilt by accident: this page replaced
+         an Earnings page, and the note was the replacement's explanation of
+         itself. "No money anywhere" is one of the four rules the wireframe
+         settled for this portal, and a page of certifications standing where a
+         balance used to stand is the one place a reader might ask where the
+         money went.
+
+         WHY IT CAN GO. Nothing on this portal has said anything about a fee
+         for two builds — there is no Earnings slot in the rail, no figure with
+         a currency on any leader page — so the note was answering a question
+         the product no longer prompts. What it actually asserted survives in
+         two places that are not explanations: `V.leadProfile`'s Role row reads
+         "Volunteer cohort leader · unpaid", and the figure cell 40px above this
+         said "as a volunteer" under Cohorts led. A fact stated in a record beats
+         the same fact stated in a panel about the record.
+
+         THE `.note` COMPONENT IS UNTOUCHED and has readers on both portals —
+         this is one caller, not the class. */}
   ${''/* "EARNED" IS "ALL CERTIFICATIONS" AND ITS ROWS ARE CARDS. The list was
          a `.tile-stack` of `.cardrow`s — a 40px glyph, the name with an
          "Active" tag, the track and date, and a "Certificate" button at the far

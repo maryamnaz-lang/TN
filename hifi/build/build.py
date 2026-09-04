@@ -1119,7 +1119,170 @@ css = '\n'.join((here / f).read_text() for f in
                  # and §11.194/195's `border-radius:0` is answered at source
                  # rather than out-weighted because nothing at the component's
                  # weight could reach §27's (0,4,0) copy either.
-                 '106-roundfaces.css'])
+                 '106-roundfaces.css',
+                 # THE ONBOARDING GATE (§107) — the `onboard` stage's left
+                 # panel, its option list, its read-back and its free field.
+                 # ob.js is the flow; that file's head is the argument.
+                 # ALMOST NOTHING IS NEW, WHICH IS THE LAYER'S POINT: the
+                 # split, the card and the accent button are §57's
+                 # `.auth-card`, an option is §104's `.role-c`, the heading
+                 # and its sentence are `.sec-h` + `.all-desc`, and Tal's
+                 # mark is §40's — `.ob-brand` was added to that layer's
+                 # `:is()` host list rather than given a copy.
+                 # LATE FOR ONE CASCADE REASON. It has to answer §17.28's
+                 # unconditional `.auth-brand{display:none}` and §57's own
+                 # 52.6% column INSIDE `@container app (min-width:900px)`,
+                 # and per trap 3 the tier is only half of it — an
+                 # equal-weight rule in the same tier wins on ORDER, so the
+                 # layer has to sit after 57 as well as restate inside it.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour. §63 §42 is the type.
+                 '107-onboard.css',
+                 # WHAT THE COURSE IS (§108) — four rows on the enrolment
+                 # offer's black card: the name at 20px, the description, the
+                 # cohort leader and how many places are taken.
+                 # `ENROL_COURSE` in views.js is the record.
+                 # NOTHING NEW EXCEPT SPACING, which is the layer's own point:
+                 # every row wears a §63 role class (`.t-h2`, `.t-desc`) so
+                 # the sizes and the on-dark inks are §63 §6a's already, the
+                 # face is §09's `.av-ph` rounded by §106, and the seat mark is
+                 # the same `I.group` the "Cohort of 10" cell carries.
+                 # LATE FOR TWO CORRECTIONS: §09's default `.av-ph` box, and
+                 # the note that §82.2's rule placement still holds now that
+                 # four rows sit above it rather than none.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour.
+                 '108-enrolcourse.css',
+                 # THE ENROLMENT RECEIPT (§109) — paying now lands on the week 1
+                 # dashboard and `enrolSheet` arrives on top of it. §105.6's
+                 # confirmation dialog is reused whole; the only thing that
+                 # differs is the hue, so this is one selector re-pointing the
+                 # mark's three colours to §02.440's success pair, plus the
+                 # entrance the other sheets get from §13.
+                 # LATE FOR TWO REASONS, both about weight rather than order.
+                 # §105.6 states `.conf-mk` at (0,3,0), so the variant has to
+                 # be (0,4,0) — §63 §7b's trap, answered by weight so a future
+                 # layer landing after this one cannot silently take it back.
+                 # And the fade is gated on `data-open`, which §13 owns: the
+                 # rule is stated here rather than added to that layer's list
+                 # because the class it draws does not exist until this one.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour. A mark's `fill` is not text
+                 # (§85), and the title and the description wear §105.6's own
+                 # roles, which §63 already sizes and inks.
+                 '109-enroldone.css',
+                 # THE COURSE OUTLINE (§110) — the Course Enrollment page's
+                 # generic "What you'll learn" / "Skills you'll gain" pair
+                 # becomes thirteen collapse rows, one per chapter, each with
+                 # its own pair. `outlineSec` / `CH_SYL` (views.js) are the
+                 # markup and the syllabus.
+                 # ALMOST NOTHING IS NEW: §04.33's `.acc` is the collapse and
+                 # §87's `.lrn` / `.skl` are the two blocks inside it,
+                 # unchanged. This layer is five corrections — the row's
+                 # two-line title, `.acc-b`'s prose measure coming off, the
+                 # first subhead not drawing §87.1c's divider, the list
+                 # hanging at `--sec-h-gap`, and §10.15's label column.
+                 # LATE FOR FOUR OF THOSE FIVE, all of them rules it has to
+                 # un-say: §04 states `.acc-b`, §05 the 68ch measure, §87 the
+                 # divider and the list's margin. The label column is inside
+                 # §10.15's container query and is restated per trap 3.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour. The row title takes `.ttl`'s
+                 # h4 and the meta line wears `.t-desc` in the markup.
+                 '110-outline.css',
+                 # THE PROFILE IN SIX SECTIONS (§111) — a Quick Action whose
+                 # mark is a progress circle of how much of the profile is
+                 # done, and the Profile module redrawn as six sections in
+                 # tabs, each one's Edit control turning that panel into its
+                 # form in place. `PF` / `pfDone` / `pfPanel` (views.js) are
+                 # the record and the markup.
+                 # IT ARRIVED AS A WHOLE-SCREEN STEPPER AND WAS CUT BACK AN
+                 # HOUR LATER on Maryam's second message; §111.2 keeps what
+                 # that cost in words rather than in rules, including the two
+                 # measurements worth having again (a page that wants its own
+                 # `<h1>` cannot put it in the `.ph`, and §56's rail must not
+                 # colour a set that is not a sequence).
+                 # ALMOST EVERY RULE IS AN ADAPTER, which is why the layer is
+                 # short: the chip row is §87's `.skl` with a x on each pill,
+                 # the entry block is §41's bounded panel, the tab strip is
+                 # §15's `.cs` and is stated by nothing here at all, the gap
+                 # note is §02's `.note`, and the ring is §32's at a smaller
+                 # box. What is new is a two-column form grid.
+                 # LATE FOR THREE CORRECTIONS, all of them rules it has to
+                 # un-say: §79's three-across Quick Action grid (it spans the
+                 # ring card, and restates the phone tier per trap 3 because
+                 # §79's is inside a container query), §02.136's stacked `.f`
+                 # inside a grid, and §105's own top margin on `.idhead`.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour. Every family it introduces
+                 # wears a §63 role class in the markup; the two that could not
+                 # are §63 §46.
+                 '111-pfedit.css',
+                 # THE ARROW GETS A LABEL (§112) — `.row-cta`, the `<span>` that
+                 # names what pressing a row does, beside the arrow that says it
+                 # is pressable. Two callers, `gcard` and `faceRow`, each by an
+                 # optional trailing argument, so every other row in both
+                 # portals emits byte-identical markup.
+                 # AFTER §63 AND CLEAN: `flex`, `white-space`, one negative
+                 # `margin-left` and a phone tier. Not one font-size,
+                 # font-weight, text-transform or text colour — §63 §47.
+                 # LATE FOR A CASCADE REASON: `.row-cta + .tile-arrow` re-points
+                 # the 16px gap §04.12 sets on `.tile.clk` / `.tile.gcard`, and
+                 # the phone tier has to land after §14's own rules for a row.
+                 '112-rowcta.css',
+                 # THE UPCOMING CALLS ROW (§113) — `.lcal`, the cohort leader's
+                 # dashboard drawing every call it holds instead of one, and the
+                 # Cohort Calls list it merges with. One grid, one card, one
+                 # black variant; the cover is §86's `.gcard-art` verbatim and
+                 # the ink on the black cell is §63 §6a's, reached by wearing
+                 # `.dark-card` WITHOUT `.sec` so §75's section geometry (the
+                 # inset margin, the 32px frame) never applies and needs no
+                 # un-saying.
+                 # AFTER §63 AND CLEAN: not one font-size, font-weight,
+                 # text-transform or text colour. Every string in the card wears
+                 # a §63 role class in the markup, and the two that carry no
+                 # colour of their own (`.t-h4`, `.t-compact`) are what let one
+                 # markup sit on white and on black.
+                 # LATE FOR TRAP 13: the label-column opt-out has to be restated
+                 # inside `@container app (min-width:900px)`, and a rule that
+                 # answers §10.4's tier cannot be written from outside it.
+                 '113-leadcalls.css',
+                 # THE AGENTS LIST IS A TABLE (§114) — six columns of one
+                 # record where there were six cards two across. A directory of
+                 # twenty-four is a thing you SCAN, one column at a time, and
+                 # every column the reference adds is a comparison the card
+                 # made impossible: rate against rate, next slot against next
+                 # slot, years against years. Nothing but geometry is in here —
+                 # §63 §48 owns all five of its type roles, including the
+                 # decision NOT to set the column heads in capitals the way the
+                 # reference does.
+                 # AFTER §63 AND ALLOWED TO BE: it states grid tracks, areas,
+                 # gaps, one border and two icon sizes, and no font-size, no
+                 # font-weight, no text-transform and no colour.
+                 '114-agenttable.css',
+                 # TAL'S CHAT IS THE ONBOARDING'S CHAT (§115) — `.ask-page`'s
+                 # thread and welcome restyled to §107's, which is the whole
+                 # of Maryam's 4 Sep ask ("I am talking about the chat ui,
+                 # copy the font, the message styling, the welcome message
+                 # also should have the look of the one we are using on
+                 # onboarding"). LAST, and it has to be: every rule in it
+                 # subtracts from §27's stacked layout, §39's gradient border
+                 # or §51's serif greeting, and each of those is four or five
+                 # classes deep. Its TYPE half is §63 §49 rather than here,
+                 # per the no-type-after-§63 rule, and the greeting's
+                 # `font-family` is turned over inside §53 §13 where the
+                 # Abhaya rule was stated.
+                 '115-talchat.css',
+                 # BECOME A COHORT LEADER (§116) — the Profile page's fourth
+                 # tab, Maryam 4 Sep 2026 with the screen attached. Two
+                 # arrangements and nothing else: a four-across card grid and
+                 # a pair of bordered lists, both on §41's panel, with §73's
+                 # `aiHead` over them and §02's `.note` under. It lands after
+                 # §115 for no reason stronger than being the newest block —
+                 # it states no selector any earlier layer also states, and
+                 # its one restatement (`.lrn` to a single column inside a
+                 # half-width panel) has to follow §87.
+                 '116-cohortlead.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1167,9 +1330,26 @@ css = '\n'.join((here / f).read_text() for f in
 #                     like the read-only figure cells everywhere else in the
 #                     product, and unlike those they scroll the page. The
 #                     pointer state is the only thing on the card that says so.
+#   .ol-row       — the Course Outline's chapter row. §110.1b reveals a
+#                     "Chapter details" label under the pointer, which is the
+#                     reference's own affordance and the one thing on that row
+#                     that says the whole row is a control (Maryam, 3 Sep
+#                     2026). Disarmed, the label can never appear — the state
+#                     rule on `.acc-i.on` is what carries it on a touch screen.
+#                     It is `.ol-row` and NOT `.acc-h` precisely because this
+#                     list matches by `endswith`: `'acc-h'` would arm §04.53's
+#                     row wash and §10.711's for every accordion in the
+#                     product, which is a state layer nobody asked for.
 HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               'nil-btn', 'nil-fbtn', 'nil-step.live', 'nil-btn.ghost',
-              'psw-t', 'nav-t', 'stat-jump')
+              'psw-t', 'nav-t', 'stat-jump', 'ol-row',
+              # §107 §0h — the onboarding question panel's option rows. The
+              # row IS the control (the numeral is deliberately neutral, so
+              # nothing else on it says pressable) and a list of four with no
+              # hover reads as a table. `ob-qp-o` is minted for this and is
+              # written nowhere else, which is what the `endswith` match
+              # needs: `ob-qp` would arm the panel itself as well.
+              'ob-qp-o')
 _hover_n = 0
 
 def _disarm(m):
@@ -1228,16 +1408,28 @@ if _stray:
         '  The rule that follows it is being eaten. Move the prose inside the '
         'comment.')
 
+# ==========================================================================
+# THE PLATFORM FACE IS PLUS JAKARTA SANS, AND IT IS TWO FILES
+# Maryam, 4 Sep 2026. §11's block is the whole argument; what matters here is
+# that THREE embeds went with the swap and none of them was a judgement call:
+# `stand-in.woff2` was the fallback under Söhne's 68-glyph trial file and Plus
+# Jakarta Sans carries 721, so nothing reaches it; `soehne-mono-buch.woff2`'s
+# @font-face had no rule naming the family (§11's numeral note retired it);
+# and Söhne itself is gone. That is 47 KB of woff2 out for 59 KB in.
+#
+# `inter.woff2` STAYS and is NOT the platform face — it is §30's, the Next in
+# Leadership microsite, which is a separate visual language, `nil*`-excluded
+# from the design system and marked temporary in this file's own layer list.
+# Grep before assuming a font file here is the product's.
+# ==========================================================================
 inter = base64.b64encode((here / 'inter.woff2').read_bytes()).decode()
 css = css.replace('__INTER__', f'data:font/woff2;base64,{inter}')
-standin = base64.b64encode((here / 'stand-in.woff2').read_bytes()).decode()
-css = css.replace('__STANDIN__', f'data:font/woff2;base64,{standin}')
-soehne = base64.b64encode((here / 'soehne-buch.woff2').read_bytes()).decode()
-css = css.replace('__SOEHNE__', f'data:font/woff2;base64,{soehne}')
-soehnemono = base64.b64encode((here / 'soehne-mono-buch.woff2').read_bytes()).decode()
-css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
+jakarta = base64.b64encode((here / 'plus-jakarta-regular.woff2').read_bytes()).decode()
+css = css.replace('__JAKARTA__', f'data:font/woff2;base64,{jakarta}')
 
-# THE CHAT GREETING'S SERIF, AND IT IS THE ONE FACE HERE THAT IS NOT SÖHNE.
+# THE CHAT GREETING'S SERIF, AND IT IS THE ONE FACE HERE THAT IS NOT THE
+# PLATFORM'S. It was the one face that was not Söhne, and it is a stated
+# exception to Plus Jakarta Sans on exactly the same grounds — §11's note.
 # Figma 446:402 sets "Hey, Derek! / What's going on?" in Abhaya Libre SemiBold
 # at 40px — a serif, against a product that is otherwise two styles of one
 # grotesque. That is the point of it: the greeting is the only line in the
@@ -1251,10 +1443,10 @@ css = css.replace('__SOEHNEMONO__', f'data:font/woff2;base64,{soehnemono}')
 abhaya = base64.b64encode((here / 'abhaya-libre-semibold.woff2').read_bytes()).decode()
 css = css.replace('__ABHAYA__', f'data:font/woff2;base64,{abhaya}')
 
-# SÖHNE KRÄFTIG. The system is two styles of one face, and this is the
-# second. If the file is not here the @font-face is dropped rather than left
-# pointing at nothing — the browser then synthesises 600 from Buch, which is
-# worse than Kräftig and better than a second typeface.
+# The second style of the platform face is embedded further up, beside the
+# first — see the Plus Jakarta Sans block above. This used to be Söhne
+# Kräftig and used to be embedded down here, away from Buch; keeping the pair
+# together is what makes "two styles and only two" readable in one place.
 # ==========================================================================
 # TAL'S MARK IS A GRADIENT CIRCLE
 # The four-pointed star was the product's own drawing of "AI". Maryam
@@ -1344,14 +1536,28 @@ css = css.replace('__ASKMESH__',
     'data:image/webp;base64,' + base64.b64encode(_mesh.read_bytes()).decode())
 print(f'ask mesh embedded: {_mesh.stat().st_size/1024:.0f} KB')
 
-_kr = here / 'soehne-kraftig.woff2'
-if _kr.exists():
-    kraftig = base64.b64encode(_kr.read_bytes()).decode()
-    css = css.replace('__SOEHNEKRAFTIG__', f'data:font/woff2;base64,{kraftig}')
-    print('Söhne Kräftig embedded')
-else:
-    css = re.sub(r'@font-face\{[^}]*__SOEHNEKRAFTIG__[^}]*\}', '', css)
-    print('Söhne Kräftig MISSING — 600 falls to the stand-in')
+# THE SECOND STYLE, AND THE ONLY OTHER ONE. Kept conditional the way Söhne
+# Kräftig was: a missing file drops the @font-face rather than pointing the
+# browser at the literal string `__JAKARTASEMI__`. With no stand-in tier left
+# the browser then synthesises 600 from Regular, which is a fake SemiBold of
+# the right face rather than a real one of the wrong face — so the failure
+# mode is better than it used to be, and it still says so on the console.
+# The other two styles. Kept conditional the way Söhne Kräftig was: a missing
+# file drops its @font-face rather than pointing the browser at the literal
+# token. Medium is the strong ROLE; SemiBold is loaded so that a declared 600
+# renders a real 600 rather than falling back to Medium.
+_have = []
+for token, fname, label in (('__JAKARTAMED__',  'plus-jakarta-medium.woff2',   'Medium (500)'),
+                            ('__JAKARTASEMI__', 'plus-jakarta-semibold.woff2', 'SemiBold (600)')):
+    _f = here / fname
+    if _f.exists():
+        css = css.replace(token, 'data:font/woff2;base64,' +
+                          base64.b64encode(_f.read_bytes()).decode())
+        _have.append(label)
+    else:
+        css = re.sub(r'@font-face\{[^}]*' + token + r'[^}]*\}', '', css)
+        print(f'  ! {fname} missing — its @font-face is dropped')
+print('Plus Jakarta Sans embedded: Regular (400), ' + ', '.join(_have))
 
 # ==========================================================================
 # THE SIGN-UP ARTWORK, AND IT IS A DIFFERENT FILE NOW — 11 KB INSTEAD OF 235.
@@ -1518,6 +1724,49 @@ cert_js = 'const CERT_ART = {\n  ' + _ct + '\n};\n'
 print(f'certification badges embedded: {len(CERT_ART)} files, '
       f'{sum((here / "certs" / (k + ".webp")).stat().st_size for k in CERT_ART)/1024:.0f} KB')
 
+# ==========================================================================
+# THE PROFILE'S THREE ISSUER MARKS — AND THIS BLOCK IS OPTIONAL BY DESIGN
+#
+# Maryam, 4 Sep 2026, twice: the certification rows should carry the two IBM
+# badges instead of a 1 and a 2, and the Education row the COMSATS crest — each
+# "equal to the height of the right side content". These are somebody else's
+# marks, so they are FILES rather than anything this build draws: the Calendly
+# round trip is the standing lesson (a third party's artwork is not a thing to
+# translate, placeholder or trace, and the only correct answer is the real
+# asset). Drop them in `logos/` under these stems, in any of the four
+# extensions, and rebuild.
+#
+# EVERY FILE IS OPTIONAL AND A MISSING ONE IS NOT AN ERROR. `PF_ART` simply has
+# no key for it, and `pfArt` (views.js) falls back to the glyph chip the row
+# drew before — `crow`'s rule, which is that a portrait with no picture behind
+# it must not be an `<img>` with a broken `src`, because a 404 on every render
+# reads as a broken screen. So the page is correct with none of the three
+# present, better with all three, and the build prints which it found.
+#
+# NOT RE-ENCODED, WHICH IS WHY THE EXTENSION IS READ RATHER THAN ASSUMED. The
+# other four art blocks all embed WebP this repo converted itself; these arrive
+# as whatever the issuer publishes (IBM's badges are PNG with transparency,
+# a crest may be an SVG), and re-encoding somebody's mark to save a few KB is
+# how a red ring becomes a grey smear — §96's own argument for lossless.
+# ==========================================================================
+PF_ART = ['ibmco', 'ibmpr', 'comsats']
+_PF_MIME = {'.png':'image/png', '.webp':'image/webp', '.jpg':'image/jpeg',
+            '.jpeg':'image/jpeg', '.svg':'image/svg+xml'}
+_pf_found, _pf_miss = [], []
+for _k in PF_ART:
+    _hit = next((p for e in ('.png', '.webp', '.jpg', '.jpeg', '.svg')
+                 for p in [here / 'logos' / (_k + e)] if p.exists()), None)
+    (_pf_found if _hit else _pf_miss).append((_k, _hit))
+_pfa = ',\n  '.join(
+    "%s:'data:%s;base64,%s'" % (k, _PF_MIME[p.suffix.lower()],
+                                base64.b64encode(p.read_bytes()).decode())
+    for k, p in _pf_found)
+pfart_js = 'const PF_ART = {\n  ' + _pfa + '\n};\n'
+print('profile issuer marks embedded: %d of %d%s' % (
+    len(_pf_found), len(PF_ART),
+    '' if not _pf_miss else '  (missing, drop into hifi/build/logos/: ' +
+    ', '.join(k + '.png' for k, _ in _pf_miss) + ')'))
+
 AWARDS = ['points', 'bronze', 'silver', 'gold', 'involved', 'rank1', 'rank2', 'rank3']
 _aw = ',\n  '.join(
     "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'awards' / (k + '.webp')).read_bytes()).decode())
@@ -1570,6 +1819,43 @@ blob_js = (
 print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
       f' + {_blobp.stat().st_size/1024:.0f} KB poster')
 
+# ==========================================================================
+# AND TAL SPEAKS ON THE ONBOARDING GATE — ONE CLIP, 16 SECONDS
+#
+# Maryam, 3 Sep 2026, with an ElevenLabs render of the greeting: "i want this
+# screen to speak as well after it get's loaded". §107 §0c draws the voice
+# bars and ob.js holds the element; this is the asset.
+#
+# IT IS RE-ENCODED, AND HALVING IT COST NOTHING AUDIBLE. The source is 16.38s
+# of mono speech at 32 kHz, written out at 128 kbps — 256 KB, which is 341 KB
+# once base64 has added its third. Mono speech at that sample rate is
+# transparent well below 128: at 64 kbps the file is 128 KB and embeds at 171,
+# so the bundle pays 170 KB rather than 341 for a clip nobody will A/B. 48
+# kbps was measured too (96 KB / 128 embedded) and is where a voice starts to
+# sound like a telephone, which is the wrong impression for the one thing on
+# this screen that is meant to feel like a person.
+#
+#   ffmpeg -i <source>.mp3 -c:a libmp3lame -b:a 64k -ac 1 -ar 32000 \
+#          tal-greeting.mp3
+#
+# THERE IS NO POSTER EQUIVALENT AND NOTHING TO FALL BACK TO, which is the one
+# way this is not like the blob above. A `<video>` that cannot autoplay still
+# paints its poster; audio that cannot autoplay is simply silent, and browsers
+# BLOCK audio autoplay until the document has been interacted with. ob.js's
+# `obSpeak` is where that is handled — it attempts playback and, if the
+# promise rejects, arms the first gesture in the document to start it — and
+# the voice bars are gated on the element's own `playing` state rather than on
+# the attempt, so the screen never claims Tal is talking when it is not.
+#
+# IT IS NOT IN `build-ds.py`, deliberately. The design system ships CSS and
+# markup recipes; a 170 KB voice clip of one person's greeting is content, and
+# a second portal wanting a speaking gate wants its own words.
+# ==========================================================================
+_speech = here / 'tal-greeting.mp3'
+speech_js = ("const TAL_SPEECH = 'data:audio/mpeg;base64,"
+             + base64.b64encode(_speech.read_bytes()).decode() + "';\n")
+print(f'Tal greeting audio embedded: {_speech.stat().st_size/1024:.0f} KB')
+
 # TEMPORARY — nil.js is LAST, and that is load-bearing. It declares `const
 # NIL`, which render() reads inside the `S.stage==='nil'` branch; a const is
 # in its temporal dead zone until its own statement runs, so the boot render
@@ -1583,7 +1869,7 @@ print(f'Tal blob video embedded: {_blob.stat().st_size/1024:.0f} KB'
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + blob_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)
@@ -1690,7 +1976,29 @@ js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n
                                                         # outermost one and the class is decided after
                                                         # every other pass has finished with `.app`. It
                                                         # reads only `S.stage`, `S.view` and `S.call`.
-                                                        'tmpaccent.js'])
+                                                        'tmpaccent.js',
+                                                        # TAL TAKES THE READING THE CONSULTANT CALL USED TO
+                                                        # TAKE — the `onboard` stage, five questions and a
+                                                        # read-back between account creation and the
+                                                        # dashboard. §107 draws it and ob.js's own head is
+                                                        # the argument, including why the steps are a number
+                                                        # in `S` rather than seven view keys.
+                                                        # LAST, AND THE POSITION IS THE CHEAP HALF OF TWO
+                                                        # DECISIONS. views.js's `onboard` render branch is
+                                                        # `typeof`-guarded on `obScreen` exactly as its call
+                                                        # branch is on `callScreen`, so this file may land
+                                                        # anywhere after views.js; it goes last because its
+                                                        # click listener is registered in the CAPTURE phase
+                                                        # and returns immediately on any other stage, and a
+                                                        # capture listener added last is the one furthest
+                                                        # from the target — which is what lets it stop a
+                                                        # `<label>`'s synthetic second click before views.js
+                                                        # and §104's `[data-lrole]` branch ever see it.
+                                                        # It reads `qzLow`, `SCORES`, `REC`, `REC_ORDER`,
+                                                        # `AGENTS`, `avatar` and `setStage` from views.js and
+                                                        # data.js, and declares `S.ob` / `S.obStep` — the
+                                                        # second of which `setStage` resets on arrival.
+                                                        'ob.js'])
 # same argument as the stylesheet: the reasoning lives in build/*.js, which is
 # where it is written and where it survives. Verified safe by scan — no `/*`
 # or `*/` appears inside a string or a regex literal anywhere in the sources.
