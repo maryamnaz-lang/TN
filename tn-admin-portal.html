@@ -955,6 +955,21 @@ const ACTIONS = {
    crumb. Declared up here so `render()` can always clear it. */
 let DETAIL_LABEL = null;
 
+/* THE EDITING SHEETS — declared here for the same reason as ACTIONS: modules
+   register their own (e.g. the reject-with-reason sheet). An entry is an object,
+   or a function of `S.id` for a record-specific one. Rendered by `sheetView`. */
+const SHEETS = {
+  adduser: {
+    title:'Add a user',
+    body:`<label class="f"><span class="lbl">Email address</span>
+        <input class="inp" placeholder="name@company.com" autocomplete="off"></label>
+      <label class="f"><span class="lbl">Role</span>
+        <select class="inp">${ROLES.filter(r => r.k !== 'admin').map(r => `<option>${esc(r.name)}</option>`).join('')}</select></label>
+      <p class="t-desc">An invite email is sent to the address; the account is created when they accept. A role can also be added to an account that already exists.</p>`,
+    ok:'Send Invite', act:'toast:Invitation sent'
+  }
+};
+
 /* ======================================================================
    THE VIEWS — one function per module, returning the page inside `.page`.
    A module page is: the head band, the sub-tabs, then the current sub's
@@ -1267,6 +1282,157 @@ ACTIONS['delrole'] = key => {
 };
 
 /* ======================================================================
+   VETTING & APPROVALS
+   ====================================================================== */
+/* a background/safeguarding/reference check result as a tag */
+const CHECK_LABEL = {clear:'Clear', flagged:'Flagged', flag:'Flagged', pending:'Pending', 'n/a':'Not required', confirmed:'Confirmed'};
+const CHECK_V = {clear:'green', flagged:'red', flag:'red', pending:'warn', 'n/a':'', confirmed:'green'};
+const checkTag = v => `<span class="tag sm${CHECK_V[v] ? ' ' + CHECK_V[v] : ''}">${esc(CHECK_LABEL[v] || cap(v))}</span>`;
+
+PAGESUM['vetting/applications'] = () => {
+  const rev = APPLICATIONS.filter(a => a.status === 'review').length;
+  const flag = APPLICATIONS.filter(a => a.safeguarding === 'flagged').length;
+  return `${APPLICATIONS.length} agents are in the queue, ${rev} ready to decide. Agents run recorded 1:1 interviews with 18–24 year-olds, so <b>${flag} need an enhanced safeguarding check</b> before they can go live.`;
+};
+PAGESUM['vetting/empverify'] = () => {
+  const n = EMPLOYERS.filter(e => e.verify !== 'ok').length;
+  return `<b>${n} employer ${n === 1 ? 'account is' : 'accounts are'} not yet verified.</b> An employer is verified before it can unlock candidate interviews or make a hire, so the queue is the gate on the hiring side.`;
+};
+
+function vettingApplications(){
+  const sf = getFilter('safe', 'all');
+  const rows = APPLICATIONS.filter(a => a.status !== 'approved' && a.status !== 'rejected')
+    .filter(a => sf === 'all' ? true : sf === 'flagged' ? a.safeguarding === 'flagged' : a.safeguarding !== 'flagged');
+  return `
+  <section class="sec">
+    ${aiHead('Agent applications', 'Everyone who applied to conduct interviews. Open one to see the checks and decide.')}
+    <div class="mt4">${filterTabs('safe', 'all', [
+      ['all', 'All', APPLICATIONS.filter(a => a.status !== 'approved').length],
+      ['flagged', 'Enhanced check', APPLICATIONS.filter(a => a.safeguarding === 'flagged').length],
+      ['clear', 'Cleared or n/a', APPLICATIONS.filter(a => a.safeguarding !== 'flagged').length]
+    ])}</div>
+    ${rows.length ? table(
+      [{label:'Applicant'}, {label:'Experience'}, {label:'Fee', num:true}, {label:'Safeguarding'}, {label:'Stage'}, {label:'Applied'}],
+      rows.map(a => ({go:'vetting/appdetail/' + a.id, cells:[
+        idCell(a.name, a.email),
+        esc(a.role),
+        money(a.fee),
+        checkTag(a.safeguarding),
+        tag(a.stage === 'interview' ? 'scheduled' : 'review', a.stage === 'interview' ? 'Vetting call' : 'In checks'),
+        esc(a.when)
+      ]})))
+      : emptyState('shield', 'The queue is clear', 'No applications are waiting on a decision.')}
+  </section>`;
+}
+
+function vettingAppDetail(){
+  const a = APP_BY_ID[S.id] || APPLICATIONS[0];
+  DETAIL_LABEL = a.name;
+  const sum = `<b>${esc(a.name)}</b> — ${esc(a.role)}, ${esc(a.location)}. ${a.years} years and ${a.priorInterviews} prior interviews, at ${money(a.fee)}. ${a.safeguarding === 'flagged' ? 'An enhanced safeguarding check is required before going live.' : a.bg === 'flag' ? 'The background check returned an adverse item to review.' : 'Checks are clear.'}`;
+  return `
+  ${detailHead('vetting/applications', sum)}
+  <section class="sec">
+    ${aiHead(esc(a.name), esc(a.role) + ' · ' + esc(a.location),
+      `<button class="btn btn-g btn-sm" data-act="askreject:${a.id}">${I.close} Reject</button>
+       <button class="btn btn-p btn-sm noic" data-act="apphire:${a.id}">Approve &amp; Hire ${I.arrowRight}</button>`)}
+    <div class="mt4">${kv([
+      ['Email', esc(a.email)],
+      ['Phone', esc(a.phone)],
+      ['Current role', esc(a.role)],
+      ['Experience', a.years + ' years · ' + a.priorInterviews + ' prior interviews'],
+      ['Requested fee', money(a.fee), 'n'],
+      ['Availability', esc(a.availability)],
+      ['LinkedIn', esc(a.linkedin)]
+    ])}</div>
+  </section>
+
+  <section class="sec">
+    ${secHead('Checks')}
+    <div>
+      <div class="kv"><span class="k">Background check</span><span class="v">${checkTag(a.bg)}</span></div>
+      <div class="kv"><span class="k">Safeguarding (18–24 interviews)</span><span class="v">${checkTag(a.safeguarding)}</span></div>
+      <div class="kv"><span class="k">Identity — ${esc(a.idDoc)} via ${esc(a.idVendor)}</span><span class="v">${checkTag(a.identity)}</span></div>
+      <div class="kv"><span class="k">Reference check</span><span class="v">${checkTag(a.refcheck)}</span></div>
+    </div>
+    ${a.safeguarding === 'flagged' ? note('warn', 'Enhanced safeguarding required', 'This agent would interview 18–24 year-olds. The enhanced check must clear before the account can go live.') : ''}
+    ${a.bg === 'flag' ? note('err', 'Adverse item on the background check', 'The vendor returned an item that needs manual review before any decision.') : ''}
+  </section>
+
+  <section class="sec">
+    ${secHead('References')}
+    <div class="tile-stack">
+      ${a.refs.map(r => memRow(r.name, esc(r.rel), checkTag(r.status))).join('')}
+    </div>
+  </section>
+
+  ${a.interview ? `
+  <section class="sec">
+    ${secHead('Vetting call')}
+    ${kv([
+      ['Interviewer', esc(a.interview.interviewer)],
+      ['Scheduled', esc(a.interview.date) + ' at ' + esc(a.interview.time)],
+      ['Length', a.interview.dur + ' minutes'],
+      ['Outcome', a.interview.done ? 'Complete' : '<span class="tag sm warn">Not yet held</span>']
+    ])}
+  </section>` : ''}
+
+  <section class="sec">
+    ${secHead('Reviewer note')}
+    ${note('', '', esc(a.note))}
+  </section>`;
+}
+
+function vettingEmpVerify(){
+  const rows = EMPLOYERS.filter(e => e.verify !== 'ok');
+  const done = EMPLOYERS.filter(e => e.verify === 'ok').length;
+  return `
+  <section class="sec">
+    ${aiHead('Employer verification', 'Accounts waiting to be verified before they can unlock interviews or hire.')}
+    ${stats([
+      ['shield', 'To verify', String(rows.length), 'in the queue'],
+      ['check', 'Verified', String(done), 'cleared to hire'],
+      ['store', 'Employers', String(EMPLOYERS.length), 'total accounts'],
+      ['flag', 'Under review', String(EMPLOYERS.filter(e => e.verify === 'review').length), 'awaiting evidence']
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('Verification queue')}
+    ${rows.length ? `<div class="tile-stack">
+      ${rows.map(e => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('store')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(e.name)} ${tag(e.verify, e.verify === 'review' ? 'Under review' : 'Unverified')}</span>
+            <span class="cardrow-d">${esc(e.industry)} · ${esc(e.location)} · ${esc(e.type)} · ${esc(e.domain)}</span></span>
+          <span class="cardrow-a"><button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button></span>
+        </div>`).join('')}
+    </div>` : emptyState('check', 'Every employer is verified', 'Nothing is waiting in the verification queue.')}
+  </section>`;
+}
+
+V.vetting = () => modView({applications:vettingApplications, appdetail:vettingAppDetail, empverify:vettingEmpVerify});
+
+SHEETS.reject = () => {
+  const a = APP_BY_ID[S.id];
+  return {title:`Reject ${a ? a.name : 'this application'}?`,
+    body:`<label class="f"><span class="lbl">Reason</span>
+        <textarea class="inp" placeholder="Recorded on the application and shared with the applicant"></textarea></label>
+      <p class="t-desc">The applicant is notified and the decision is written to the audit log. This can’t be undone from here.</p>`,
+    ok:'Reject application', danger:true, act:'doreject:' + (a ? a.id : '')};
+};
+ACTIONS['apphire'] = key => {
+  const a = APP_BY_ID[key.split(':')[1]]; if(!a) return;
+  a.status = 'approved'; a.decision = 'hired';
+  toast(a.name + ' approved as a Talent Agent');
+  S.mod = 'vetting'; S.sub = 'applications'; S.id = null;
+};
+ACTIONS['askreject'] = key => { S.id = key.split(':')[1]; S.sheet = 'reject'; };
+ACTIONS['doreject'] = key => {
+  const a = APP_BY_ID[key.split(':')[1]]; if(a){ a.status = 'rejected'; a.decision = 'rejected'; toast(a.name + '’s application rejected'); }
+  S.mod = 'vetting'; S.sub = 'applications'; S.id = null;
+};
+ACTIONS['verifyemp'] = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'ok'; toast(e.name + ' verified'); } };
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
@@ -1368,21 +1534,12 @@ function confirmSheet(){
    names the action to run. Modules register their openers in `ACTIONS`. */
 function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
 
-/* THE EDITING SHEETS — the design system's bottom `.sheet`. One frame, a title
-   and a body per entry; the primary control names an action. */
-const SHEETS = {
-  adduser: {
-    title:'Add a user',
-    body:`<label class="f"><span class="lbl">Email address</span>
-        <input class="inp" placeholder="name@company.com" autocomplete="off"></label>
-      <label class="f"><span class="lbl">Role</span>
-        <select class="inp">${ROLES.filter(r => r.k !== 'admin').map(r => `<option>${esc(r.name)}</option>`).join('')}</select></label>
-      <p class="t-desc">An invite email is sent to the address; the account is created when they accept. A role can also be added to an account that already exists.</p>`,
-    ok:'Send Invite', act:'toast:Invitation sent'
-  }
-};
+/* THE EDITING SHEETS — the design system's bottom `.sheet`. `SHEETS` is declared
+   up near the page summaries so modules can register into it; an entry is an
+   object or a function of `S.id`. */
 function sheetView(){
-  const s = SHEETS[S.sheet];
+  let s = SHEETS[S.sheet];
+  if(typeof s === 'function') s = s();     /* a record-specific sheet reads S.id */
   return `<div class="modal ${S.sheet ? 'on' : ''}" data-close="sheet">
     <div class="sheet" role="dialog" aria-modal="true" aria-label="${s ? esc(s.title) : ''}">
       <div class="sheet-h"><h2>${s ? esc(s.title) : ''}</h2>
@@ -1390,7 +1547,7 @@ function sheetView(){
       <div class="sheet-b">${s ? s.body : ''}</div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-close="sheet">Cancel</button>
-        <button class="btn btn-p noic" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>
+        <button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>
       </div>
     </div>
   </div>`;
