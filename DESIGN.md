@@ -15,7 +15,7 @@ its `hifi/build/` layer.
 | Candidate | `hifi/` (compiled from `hifi/build/`) | source of it | `cd hifi/build && python3 build.py` |
 | Cohort Leader | `hifi/` — same renderer, `S.portal='leader'`, `lead*.js` | source of it | same |
 | Talent Agent | `tn-agent-portal.html`, hand-written | yes — links `design-system/talentnext-ds.css` + `.js` | `cd design-system && python3 build-ds.py` |
-| Super Admin | `tn-admin.html`, hand-written | **no** — own inline styles; rules apply by hand | edit the file |
+| Super Admin | `tn-admin-portal.html`, hand-written | yes — links `design-system/talentnext-ds.css` + `.js` | `cd design-system && python3 build-ds.py` |
 
 Collisions: "candidate portal" = `hifi/` unless "wireframe"/"early prototype" is said; "agent"
 in `hifi/` is somebody the candidate books, in `tn-agent-portal.html` it is the signed-in user.
@@ -162,5 +162,6 @@ motion off, using `offsetWidth`. `/design-check <portal>` runs the computed rule
 
 E1 course name is a placeholder · `CH_SYL` is authored copy · the Calendly URL 404s · `V.welcome`
 is reached by nothing · data-use clause 6 names switches Profile no longer holds · `reddemo`
-previews the previous accent · `--ai-amber`, `.cert-btn` read by nothing · `tn-admin.html` and
-`tn-portals.html` are not on the design system.
+previews the previous accent · `--ai-amber`, `.cert-btn` read by nothing · `tn-portals.html` and
+the frozen `tn-admin.html` are not on the design system (`tn-admin-portal.html`, the hi-fi Super
+Admin portal, is).

@@ -16,8 +16,9 @@ check this table before editing anything.
 | `hifi/` | High-fidelity candidate portal, **compiled** from `hifi/build/` | **ACTIVE — work here** |
 | `design-system/` | The portal's design language as two linkable files, **extracted** from `hifi/build/` | **ACTIVE — for new pages** |
 | `tn-agent-portal.html` | **Talent Agent portal**, hand-written on `design-system/` | **ACTIVE** |
+| `tn-admin-portal.html` | **Super Admin portal**, hand-written on `design-system/` | **ACTIVE** |
 | `tn-portals.html` | Candidate + Cohort Leader portals, hand-written | Prototype, still live |
-| `tn-admin.html` | Super Admin panel, hand-written | Prototype, still live |
+| `tn-admin.html` | *Early* Super Admin panel + the seed data/flows | **Frozen data ref for `tn-admin-portal.html`** |
 | `tn-portals.css` | Stylesheet extracted from `tn-portals.html` | Supports the above |
 | `talentnext-wireframes.html` | **The wireframes** (TalentNext × LightspeedVT) | Frozen reference |
 | `tn-candidate-portal.html` | *Early* candidate portal prototype | **Superseded by `hifi/`** |
