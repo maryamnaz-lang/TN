@@ -1901,6 +1901,68 @@ ACTIONS['dodeltpl'] = key => {
 };
 
 /* ======================================================================
+   MARKETPLACE & INTERVIEWS
+   ====================================================================== */
+const escrowTag = e => e === 'held' ? '<span class="tag sm green">Held</span>' : '<span class="tag sm">n/a</span>';
+
+PAGESUM['market/bookings'] = () => {
+  const conf = BOOKINGS.filter(b => b.status === 'active').length;
+  const val = BOOKINGS.filter(b => b.escrow === 'held').reduce((n, b) => n + b.fee, 0);
+  return `${BOOKINGS.length} interviews are booked, <b>${conf} confirmed</b> and ${money(val)} paid into escrow. A candidate's first interview is free; a re-interview is the agent's own rate.`;
+};
+PAGESUM['market/recordings'] = () => `Every 1:1 interview is recorded for review and levelling. <b>Recordings are kept 24 months</b>, and a highlight reel reaches an employer only when the candidate has consented.`;
+
+function marketBookings(){
+  const sf = getFilter('bkstatus', 'all');
+  const rows = BOOKINGS.filter(b => sf === 'all' ? true : b.status === sf);
+  const val = BOOKINGS.filter(b => b.escrow === 'held').reduce((n, b) => n + b.fee, 0);
+  const paid = BOOKINGS.filter(b => b.fee).map(b => b.fee);
+  const avg = paid.length ? Math.round(paid.reduce((n, f) => n + f, 0) / paid.length) : 0;
+  return `
+  <section class="sec">
+    ${aiHead('Bookings', 'Every marketplace interview on the platform, and where its money sits.')}
+    ${stats([
+      ['video', 'Confirmed', String(BOOKINGS.filter(b => b.status === 'active').length), 'paid and scheduled'],
+      ['time', 'Awaiting pay', String(BOOKINGS.filter(b => b.status === 'pending').length), 'not yet in escrow'],
+      ['bank', 'Booked value', money(val), 'held in escrow'],
+      ['wallet', 'Average fee', money(avg), 'across paid bookings']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('All bookings', 'Filter by whether the interview is confirmed or waiting on payment.')}
+    <div class="mt4">${filterTabs('bkstatus', 'all', [
+      ['all', 'All', BOOKINGS.length],
+      ['active', 'Confirmed', BOOKINGS.filter(b => b.status === 'active').length],
+      ['pending', 'Awaiting pay', BOOKINGS.filter(b => b.status === 'pending').length]
+    ])}</div>
+    ${table(
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Kind'}, {label:'When'}, {label:'Fee', num:true}, {label:'Escrow'}, {label:'Status'}],
+      rows.map(b => ({cells:[
+        esc(b.cand), esc(b.agent), esc(b.kind), esc(b.slot),
+        b.fee ? money(b.fee) : 'Free', escrowTag(b.escrow), tag(b.status)
+      ]})))}
+  </section>`;
+}
+
+function marketRecordings(){
+  const recs = BOOKINGS.filter(b => b.status === 'active');
+  return `
+  <section class="sec">
+    ${aiHead('Recordings & transcripts', 'Recorded 1:1 interviews, held for review and levelling.')}
+    ${note('', 'Consent and retention', 'A recording is captured only with the candidate’s consent at booking, kept for 24 months, and shared with an employer as a highlight reel only when the candidate has agreed to SCENES.')}
+    ${table(
+      [{label:'Candidate'}, {label:'Agent'}, {label:'Kind'}, {label:'When'}, {label:'Recording'}, {label:'Transcript'}],
+      recs.map(b => ({cells:[
+        esc(b.cand), esc(b.agent), esc(b.kind), esc(b.slot),
+        `<button class="btn btn-g btn-sm" data-act="toast:Playing the recording (prototype)">${I.play} Play</button>`,
+        `<button class="btn btn-g btn-sm" data-act="toast:Transcript downloaded (prototype)">${I.download} Transcript</button>`
+      ]})))}
+  </section>`;
+}
+
+V.market = () => modView({bookings:marketBookings, recordings:marketRecordings});
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
