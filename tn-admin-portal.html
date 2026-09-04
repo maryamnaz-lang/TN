@@ -1562,6 +1562,93 @@ ACTIONS['dolevel'] = key => {
 const LR_LEVEL = id => LEVELQ.find(l => l.id === id);
 
 /* ======================================================================
+   TALENT AGENTS
+   ====================================================================== */
+const AGENTS = () => USERS.filter(u => u.roles.includes('agent'));
+const starMark = `<svg viewBox="0 -960 960 960" width="15" height="15" style="fill:var(--star);vertical-align:-2px" aria-hidden="true">${inner('star')}</svg>`;
+const ratingCell = r => `<span style="white-space:nowrap">${r} ${starMark}</span>`;
+/* ranking: rating first, then interviews conducted */
+const agentRanking = () => AGENTS().slice().sort((a, b) => b.rating - a.rating || b.interviewed - a.interviewed);
+
+PAGESUM['agents/agents'] = () => {
+  const a = AGENTS();
+  const fees = a.map(x => x.fee).filter(Boolean);
+  const top = agentRanking()[0];
+  return `${a.length} agents list on the marketplace and set their own fee, from ${money(Math.min(...fees))} to ${money(Math.max(...fees))}. Ranking is computed from rating, then interviews conducted — <b>${esc(top.name)} leads</b>.`;
+};
+
+function agentsAll(){
+  const list = AGENTS();
+  const rank = agentRanking().slice(0, 5);
+  return `
+  <section class="sec">
+    ${aiHead('Marketplace listings', 'Every agent a candidate can book. They set their own fee; a candidate’s first interview is free.')}
+    ${table(
+      [{label:'Agent'}, {label:'Current role'}, {label:'Rating', num:true}, {label:'Interviewed', num:true}, {label:'Own fee', num:true}],
+      list.map(a => ({go:'agents/detail/' + a.id, cells:[
+        esc(a.name),
+        esc(a.job || '—'),
+        ratingCell(a.rating),
+        String(a.interviewed),
+        a.fee ? money(a.fee) : 'Free first'
+      ]})))}
+  </section>
+
+  <section class="sec">
+    ${aiHead('Agent ranking · top 5', 'Computed from rating, then interviews conducted. Recalculated weekly.')}
+    <div class="tile-stack">
+      ${rank.map((a, i) => `
+        <button class="mem clk" data-go="agents/detail/${a.id}">
+          <span class="av mem-av">${i + 1}</span>
+          <span class="mem-b"><span class="mem-n">${esc(a.name)}</span>
+            <span class="mem-m">${ratingCell(a.rating)} · ${a.interviewed} interviewed · ${a.fee ? money(a.fee) : 'free first'}</span></span>
+          <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+        </button>`).join('')}
+    </div>
+  </section>`;
+}
+
+function agentsDetail(){
+  const a = USER_BY_ID[S.id] || AGENTS()[0];
+  DETAIL_LABEL = a.name;
+  const pay = PAYOUTS.filter(p => p.agent === a.name);
+  const settled = pay.filter(p => p.status === 'settled').reduce((n, p) => n + p.net, 0);
+  const held = pay.filter(p => p.status !== 'settled').reduce((n, p) => n + p.net, 0);
+  const books = BOOKINGS.filter(b => b.agent === a.name);
+  const rankIx = agentRanking().findIndex(x => x.id === a.id) + 1;
+  const sum = `<b>${esc(a.name)}</b> is rated ${a.rating} over ${a.interviewed} interviews, ranked ${rankIx} of ${AGENTS().length}, at ${money(a.fee)} a session. ${money2(held)} sits in escrow and ${money2(settled)} has settled.`;
+  return `
+  ${detailHead('agents/agents', sum)}
+  <section class="sec">
+    ${aiHead(esc(a.name), esc(a.job || 'Talent Agent'), `<span class="tag sm">Rank ${rankIx} of ${AGENTS().length}</span>`)}
+    ${stats([
+      ['star', 'Rating', ratingCell(a.rating), 'candidate reviews'],
+      ['video', 'Interviewed', String(a.interviewed), 'sessions conducted'],
+      ['wallet', 'Own fee', money(a.fee), 'per interview'],
+      ['bank', 'In escrow', money2(held), 'held, not yet settled']
+    ])}
+  </section>
+
+  <section class="sec">
+    ${secHead('Payouts')}
+    ${pay.length ? `<div class="tbl-wrap"><table class="tbl">
+      <tr><th>Reference</th><th>Period</th><th class="num">Net</th><th>Status</th><th>When</th></tr>
+      ${pay.map(p => `<tr><td>${esc(p.ref)}</td><td>${esc(p.period)}</td><td class="num">${p.net ? money(p.net) : '—'}</td><td>${tag(p.status)}</td><td>${esc(p.when)}</td></tr>`).join('')}
+    </table></div>` : emptyState('wallet', 'No payouts yet', 'This agent has no settled or held payouts in this window.')}
+  </section>
+
+  <section class="sec">
+    ${secHead('Booked interviews')}
+    ${books.length ? `<div class="tbl-wrap"><table class="tbl">
+      <tr><th>Candidate</th><th>Kind</th><th class="num">Fee</th><th>When</th><th>Status</th></tr>
+      ${books.map(b => `<tr><td>${esc(b.cand)}</td><td>${esc(b.kind)}</td><td class="num">${b.fee ? money(b.fee) : '—'}</td><td>${esc(b.slot)}</td><td>${tag(b.status)}</td></tr>`).join('')}
+    </table></div>` : emptyState('video', 'Nothing booked', 'No interviews are on this agent’s diary right now.')}
+  </section>`;
+}
+
+V.agents = () => modView({agents:agentsAll, detail:agentsDetail});
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
@@ -1691,9 +1778,10 @@ function trailParts(){
   const sub = m._sub[S.sub];
   const out = [{label:m.t, go:m.k + '/' + firstSub(m)}];
   if(sub && sub.hidden){
-    /* a detail page: name the list it came from, then the record */
+    /* a detail page: name the list it came from, then the record. Skip the
+       list crumb when its label just repeats the module's (Talent Agents). */
     const list = detailListSub(m);
-    if(list) out.push({label:list.t, go:m.k + '/' + list.k});
+    if(list && list.t !== m.t) out.push({label:list.t, go:m.k + '/' + list.k});
     const rec = detailRecordLabel();
     out.push({label:rec || sub.t});
   } else if(sub && S.sub !== firstSub(m)){
