@@ -994,6 +994,12 @@ LAYERS = [
     # that wants "four things this role does" and "what you get / what it asks"
     # gets both arrangements by writing the markup.
     '116-cohortlead.css',
+    # THE TAL DOCK AS A PILL (§117). Crosses whole: it is the dock's shape and
+    # the bare glyphs of its two controls, keyed on `.askdock` / `.askline-*` /
+    # `.ai-run`, which the agent portal writes by hand. Without this entry the
+    # box would ship §70's square border-image dock while the portals draw a
+    # pill — exactly the two-generations failure CLAUDE.md records.
+    '117-askpill.css',
 ]
 
 # ==========================================================================

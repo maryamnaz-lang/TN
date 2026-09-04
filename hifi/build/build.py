@@ -1282,7 +1282,11 @@ css = '\n'.join((here / f).read_text() for f in
                  # it states no selector any earlier layer also states, and
                  # its one restatement (`.lrn` to a single column inside a
                  # half-width panel) has to follow §87.
-                 '116-cohortlead.css',])
+                 '116-cohortlead.css',
+                 # THE TAL DOCK AS A PILL (§117) — Maryam, 4 Sep 2026. It has
+                 # to un-say §70's border-image, §21/§70's send chip and §105's
+                 # mic ring, so it lands after all three; it states no type.
+                 '117-askpill.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
