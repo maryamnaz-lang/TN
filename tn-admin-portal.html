@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3e9b4974">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=70451eaa">
 
 <style>
 /* ==========================================================================
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=3e9b4974"></script>
+<script src="design-system/talentnext-ds.js?b=70451eaa"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -771,7 +771,7 @@ const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
 const S = {
   mod:'home', sub:'home', id:null,        /* where you are */
   nav:false, notif:false, acct:false,     /* overlays */
-  confirm:null, sheet:null,               /* dialogs */
+  confirm:null, _confirm:null, sheet:null,/* dialogs */
   signedIn:true,                          /* the gate */
   read:[],                                /* notifications marked read */
   tab:{}, filter:{}                       /* per-page substate, keyed by mod/sub */
@@ -943,6 +943,18 @@ function pageSummary(){
   return e || '';
 }
 
+/* THE ACTIONS TABLE — declared here, before the module views, because each
+   module registers its gated/destructive actions into it (`ACTIONS['deact']
+   = …`). Every action funnels through `doAction`; the confirmation sheet's
+   button carries `data-do`, a plain control `data-act`. Cosmetic actions
+   toast; state-changing ones mutate a record and re-render. */
+const ACTIONS = {
+  logout: () => { S.confirm = null; S.signedIn = false; toast('Signed out (prototype) — reload to sign back in'); }
+};
+/* DETAIL_LABEL — the record name a detail page puts in the last breadcrumb
+   crumb. Declared up here so `render()` can always clear it. */
+let DETAIL_LABEL = null;
+
 /* ======================================================================
    THE VIEWS — one function per module, returning the page inside `.page`.
    A module page is: the head band, the sub-tabs, then the current sub's
@@ -1049,6 +1061,211 @@ V.home = () => {
   </section>`;
 };
 
+/* A MODULE DISPATCHER — a module view renders the head band + sub-tabs for a
+   list/config sub, or hands straight to a detail sub which draws its own head.
+   `subs` maps a sub key to its renderer. */
+function modView(subs){
+  const m = MOD_BY_K[S.mod];
+  const sub = m._sub[S.sub] || m._sub[firstSub(m)];
+  const fn = subs[S.sub] || subs[firstSub(m)];
+  if(sub.hidden) return fn();                         /* detail: its own head */
+  return head(pageSummary()) + subTabs() + fn();
+}
+
+/* ROLE CHIPS — a role as a small tag; an internal role is outlined so it reads
+   as staff without a second fill colour competing with the status tags. */
+const roleChips = roles => roles.map(r => {
+  const R = ROLE_BY_K[r]; const int = R && R.kind === 'internal';
+  return `<span class="tag sm${int ? ' bordered' : ''}">${esc(R ? R.short : r)}</span>`;
+}).join(' ');
+
+/* A TWO-LINE TABLE IDENTITY CELL — a name over a caption (email, ref…). */
+const idCell = (name, sub) => `<div>${esc(name)}</div>${sub ? `<div class="t-caption">${esc(sub)}</div>` : ''}`;
+
+/* A GRANTED / NOT-GRANTED MARK — the icon proxy returns a full <svg> with no
+   size, so a matrix cell needs its own sized wrapper; the fill is a token. */
+const yesMark = `<svg viewBox="0 -960 960 960" width="17" height="17" style="fill:var(--text-primary);vertical-align:-3px" aria-label="Yes">${inner('check')}</svg>`;
+const noMark = '<span class="t-caption" aria-hidden="true">—</span>';
+
+/* A FILTER STRIP — the design system's `.tabs`, used as an in-page filter with
+   live counts. `name` is the filter key; `opts` are [value, label, count]. */
+function filterTabs(name, def, opts){
+  const cur = getFilter(name, def);
+  return `<div class="tabs">${opts.map(([v, l, c]) =>
+    `<button class="${v === cur ? 'on' : ''}" data-filter="${name}:${v}">${esc(l)}${c != null ? ` (${c})` : ''}</button>`).join('')}</div>`;
+}
+
+/* ======================================================================
+   USERS & ROLES
+   ====================================================================== */
+PAGESUM['users/users'] = () => {
+  const int = USERS.filter(u => u.internal).length;
+  return `The platform has <b>${USERS.length} accounts</b> — ${USERS.filter(u => u.roles.includes('candidate')).length} candidates, ${USERS.filter(u => u.roles.includes('agent')).length} agents, ${EMPLOYERS.length} employers and ${int} internal. Roles stack, so one person can be both a candidate and a cohort leader.`;
+};
+PAGESUM['users/roles'] = () => `Nine roles, and the walls between them are deliberate — only a <b>Reviewer sees the AI raw score</b>, and a full-access role can hold no other. Edit a role's permissions here; the Super Admin cannot be deleted.`;
+PAGESUM['users/import'] = () => `Invite people in bulk from a CSV, or add roles to accounts that already exist. Rows are matched to roles before anything is created, so a bad column is caught before it lands.`;
+
+const ROLE_FILTERS = () => [
+  ['all', 'All', USERS.length],
+  ['candidate', 'Candidates', USERS.filter(u => u.roles.includes('candidate')).length],
+  ['agent', 'Agents', USERS.filter(u => u.roles.includes('agent')).length],
+  ['employer', 'Employers', USERS.filter(u => u.roles.includes('employer')).length],
+  ['leader', 'Cohort leaders', USERS.filter(u => u.roles.includes('leader')).length],
+  ['internal', 'Internal', USERS.filter(u => u.internal).length]
+];
+function usersAll(){
+  const rf = getFilter('role', 'all');
+  const rows = USERS.filter(u => rf === 'all' ? true : (rf === 'internal' ? u.internal : u.roles.includes(rf)));
+  const detailOf = u => u.job || (u.level !== '—' ? u.level : '') || u.company || '—';
+  return `
+  <section class="sec">
+    ${aiHead('All users', 'Every account on the platform. A row opens the full record.',
+      `<button class="btn btn-g btn-sm noic" data-act="toast:Download the CSV template, fill it and load it here">${I.download} Bulk Import</button>
+       <button class="btn btn-p btn-sm noic" data-sheet="adduser">Add User</button>`)}
+    <div class="mt4">${searchField('Search by name or email')}</div>
+    <div class="mt4">${filterTabs('role', 'all', ROLE_FILTERS())}</div>
+    ${table(
+      [{label:'User'}, {label:'Roles'}, {label:'Detail'}, {label:'Status'}, {label:'Joined'}, {label:'Last active'}],
+      rows.map(u => ({go:'users/staffdetail/' + u.id, cells:[
+        idCell(u.name, u.email),
+        roleChips(u.roles),
+        esc(detailOf(u)),
+        tag(u.status === 'ok' ? 'active' : u.status),
+        esc(u.joined),
+        esc(u.last)
+      ]})))}
+  </section>`;
+}
+
+function usersRoles(){
+  const kind = getFilter('kind', 'external');
+  const roles = ROLES.filter(r => r.kind === kind);
+  const usersWith = k => USERS.filter(u => u.roles.includes(k)).length;
+  const matrixCols = roles;
+  return `
+  <section class="sec">
+    ${aiHead('Roles', 'What each role can do. External roles are the product; internal roles run it.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Define a new role in the permission matrix">' + I.add + ' New Role</button>')}
+    <div class="mt4"><div class="tg">
+      <button class="${kind === 'external' ? 'on' : ''}" data-filter="kind:external">External</button>
+      <button class="${kind === 'internal' ? 'on' : ''}" data-filter="kind:internal">Internal</button>
+    </div></div>
+    <div class="tile-stack mt5">
+      ${roles.map(r => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic(isFullAccess(r.k) ? 'lock' : 'account')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(r.name)}
+            ${isFullAccess(r.k) ? '<span class="tag sm brand">Full access</span>' : ''}</span>
+            <span class="cardrow-d">${esc(r.desc)} · ${usersWith(r.k)} ${usersWith(r.k) === 1 ? 'account' : 'accounts'}</span></span>
+          <span class="cardrow-a">${r.k === 'admin'
+            ? '<span class="tag sm">Protected</span>'
+            : `<button class="btn btn-g btn-sm" data-act="askdelrole:${r.k}">${I.delete} Delete</button>`}</span>
+        </div>`).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    ${aiHead('Permission matrix', `Who holds each capability, across the ${kind} roles. The gaps are the walls.`,
+      '<button class="btn btn-g btn-sm noic" data-act="toast:Toggle a capability in the matrix (prototype)">' + I.settings + ' Edit Permissions</button>')}
+    <div class="tbl-wrap"><table class="tbl">
+      <tr><th>Capability</th>${matrixCols.map(r => `<th class="num">${esc(r.short)}</th>`).join('')}</tr>
+      ${CAPS.map(c => `<tr><td>${esc(c.t)}</td>${matrixCols.map(r =>
+        `<td class="num">${MATRIX[r.k] && MATRIX[r.k][c.k] ? yesMark : noMark}</td>`).join('')}</tr>`).join('')}
+    </table></div>
+    ${note('', 'Only a Reviewer sees the raw score', 'The AI raw score is walled to Reviewers by design — a Manager can conduct interviews and still not see it.')}
+  </section>`;
+}
+
+function usersImport(){
+  return `
+  ${detailHead('users/users', pageSummary())}
+  <section class="sec">
+    ${aiHead('Import from a CSV', 'Four steps, and every row is matched to a role before anything is created.')}
+    <ol class="steps">
+      <li><span class="s-n">1</span><span class="s-b"><b>Download the template</b>
+        Name, email and role columns, with the accepted role keys listed.</span></li>
+      <li><span class="s-n">2</span><span class="s-b"><b>Load your file</b>
+        Or load the sample data to see the matcher run against real rows.</span></li>
+      <li><span class="s-n">3</span><span class="s-b"><b>Match roles</b>
+        Each row's role column is checked against the nine roles; a bad key is flagged.</span></li>
+      <li><span class="s-n">4</span><span class="s-b"><b>Import</b>
+        Confirmed rows become accounts, and an invite email goes to each new address.</span></li>
+    </ol>
+    <div class="btn-row mt5">
+      <button class="btn btn-g noic" data-act="toast:Template downloaded (prototype)">${I.download} Download template</button>
+      <button class="btn btn-s noic" data-act="toast:Sample data loaded — 6 rows matched">Load sample data</button>
+      <button class="btn btn-p noic" data-act="toast:6 users imported and invited">Import 6 users ${I.arrowRight}</button>
+    </div>
+  </section>`;
+}
+
+function usersStaffDetail(){
+  const u = USER_BY_ID[S.id] || USERS[0];
+  DETAIL_LABEL = u.name;
+  const isActive = u.status === 'active' || u.status === 'ok';
+  const sum = `<b>${esc(u.name)}</b> holds ${u.roles.length === 1 ? 'one role' : u.roles.length + ' roles'} — ${u.roles.map(r => (ROLE_BY_K[r] || {}).short || r).join(', ')} — and joined ${esc(u.joined)}. ${u.internal ? 'An internal account.' : 'A product account, matched to the marketplace records.'}`;
+  return `
+  ${detailHead('users/users', sum)}
+  <section class="sec">
+    ${aiHead(esc(u.name), esc(u.email),
+      u.id === 'u9'
+        ? '<span class="tag sm brand">Super Admin — protected</span>'
+        : isActive
+          ? `<button class="btn btn-g btn-sm noic" data-act="askdeact:${u.id}">Deactivate</button>`
+          : `<button class="btn btn-p btn-sm noic" data-act="react:${u.id}">Reactivate ${I.arrowRight}</button>`)}
+    <div class="mt4">${kv([
+      ['Roles', roleChips(u.roles)],
+      ['Status', tag(u.status === 'ok' ? 'active' : u.status)],
+      ['Origin', esc(cap(u.origin))],
+      ['Joined', esc(u.joined)],
+      ['Last active', esc(u.last)],
+      ...(u.job ? [['Role', esc(u.job)]] : []),
+      ...(u.level && u.level !== '—' ? [['Level', esc(u.level)]] : []),
+      ...(u.fee ? [['Interview fee', money(u.fee), 'n']] : []),
+      ...(u.rating ? [['Rating', u.rating + ' ★ · ' + u.interviewed + ' interviewed']] : []),
+      ...(u.company ? [['Company', esc(u.company)]] : []),
+      ...(u.cohorts ? [['Cohorts', u.cohorts.map(esc).join(' · ')]] : [])
+    ])}</div>
+  </section>
+
+  <section class="sec">
+    ${secHead('On the audit log')}
+    <div class="tile-stack">
+      ${AUDIT.filter(a => a.who === u.name || a.obj.indexOf(u.name.split(' ')[0]) === 0).slice(0, 4).map(a =>
+        memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, `<span class="t-caption">${esc(a.when)}</span>`)).join('')
+        || emptyState('doc', 'No audit lines yet', 'Nothing on this account has been logged in this window.')}
+    </div>
+  </section>`;
+}
+
+V.users = () => modView({users:usersAll, roles:usersRoles, import:usersImport, staffdetail:usersStaffDetail});
+
+/* users actions */
+ACTIONS['askdeact'] = key => {
+  const u = USER_BY_ID[key.split(':')[1]];
+  if(!u) return;
+  if(u.id === 'u9'){ toast('The Super Admin account can’t be deactivated'); return; }
+  askConfirm({mk:'warning', title:`Deactivate ${u.name}?`,
+    body:'They’ll be signed out and lose access until reactivated. Their data, roles and history are kept.',
+    ok:'Deactivate', danger:true, act:'deact:' + u.id});
+};
+ACTIONS['deact'] = key => { const u = USER_BY_ID[key.split(':')[1]]; if(u){ u.status = 'inactive'; toast(u.name + ' deactivated'); } S.confirm = null; };
+ACTIONS['react'] = key => { const u = USER_BY_ID[key.split(':')[1]]; if(u){ u.status = 'active'; toast(u.name + ' reactivated'); } };
+ACTIONS['askdelrole'] = key => {
+  const k = key.split(':')[1]; const r = ROLE_BY_K[k];
+  if(!r) return;
+  if(k === 'admin'){ toast('The Super Admin role can’t be deleted'); return; }
+  const n = USERS.filter(u => u.roles.includes(k)).length;
+  askConfirm({mk:'warning', title:`Delete the "${r.name}" role?`,
+    body:`This can’t be undone. Its permissions are removed${n ? ` and the role is stripped from ${n} ${n === 1 ? 'account' : 'accounts'}` : ''}.`,
+    ok:'Delete role', danger:true, act:'delrole:' + k});
+};
+ACTIONS['delrole'] = key => {
+  const k = key.split(':')[1]; const i = ROLES.findIndex(r => r.k === k);
+  if(i >= 0){ const nm = ROLES[i].name; ROLES.splice(i, 1); toast(nm + ' role deleted'); }
+  S.confirm = null;
+};
+
 /* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
@@ -1146,6 +1363,38 @@ function confirmSheet(){
     </div>
   </div>`;
 }
+/* DYNAMIC CONFIRMATIONS — a record-specific dialog is built at the call site and
+   held in `S._confirm`; `S.confirm='_dyn'` opens it. The button's `data-do`
+   names the action to run. Modules register their openers in `ACTIONS`. */
+function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
+
+/* THE EDITING SHEETS — the design system's bottom `.sheet`. One frame, a title
+   and a body per entry; the primary control names an action. */
+const SHEETS = {
+  adduser: {
+    title:'Add a user',
+    body:`<label class="f"><span class="lbl">Email address</span>
+        <input class="inp" placeholder="name@company.com" autocomplete="off"></label>
+      <label class="f"><span class="lbl">Role</span>
+        <select class="inp">${ROLES.filter(r => r.k !== 'admin').map(r => `<option>${esc(r.name)}</option>`).join('')}</select></label>
+      <p class="t-desc">An invite email is sent to the address; the account is created when they accept. A role can also be added to an account that already exists.</p>`,
+    ok:'Send Invite', act:'toast:Invitation sent'
+  }
+};
+function sheetView(){
+  const s = SHEETS[S.sheet];
+  return `<div class="modal ${S.sheet ? 'on' : ''}" data-close="sheet">
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="${s ? esc(s.title) : ''}">
+      <div class="sheet-h"><h2>${s ? esc(s.title) : ''}</h2>
+        <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
+      <div class="sheet-b">${s ? s.body : ''}</div>
+      <div class="sheet-f">
+        <button class="btn btn-s noic" data-close="sheet">Cancel</button>
+        <button class="btn btn-p noic" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>
+      </div>
+    </div>
+  </div>`;
+}
 
 /* ======================================================================
    THE BREADCRUMB TRAIL — §78, filled by a pass after the page renders.
@@ -1175,8 +1424,7 @@ function detailListSub(m){
   const k = dmap[S.sub] || map[m.k];
   return m._sub[k] || null;
 }
-/* the record's own name for the last crumb — overridden per detail page */
-let DETAIL_LABEL = null;
+/* the record's own name for the last crumb — `DETAIL_LABEL` is declared up top */
 function detailRecordLabel(){ return DETAIL_LABEL; }
 
 function drawTrail(){
@@ -1249,6 +1497,7 @@ function render(){
       </div>
       ${notifPanel()}
       ${confirmSheet()}
+      ${sheetView()}
     </div>
     <div class="pt-toasts" id="toasts"></div>
   </div>`;
@@ -1339,20 +1588,16 @@ device.addEventListener('click', e => {
     const [name, val] = d.filter.split(':');
     setFilter(name, val); return render();
   }
+  if(d.sheet !== undefined){ S.sheet = d.sheet; return render(); }
   if(d.act !== undefined){ return doAction(d.act, t); }
   if(d.read && !S.read.includes(d.read)) S.read.push(d.read);
   if(d.go !== undefined){ return go(d.go); }
 });
 
-/* THE ACTIONS — every gated/destructive action funnels through here. The
-   confirmation sheet's confirm button carries `data-do`; a plain control may
-   carry `data-act`. Cosmetic actions raise a toast; state-changing ones mutate
-   a record and re-render so the change is visible. Each module adds its own
-   branches to `ACTIONS`. */
-const ACTIONS = {
-  logout: () => { S.confirm = null; S.signedIn = false; toast('Signed out (prototype) — reload to sign back in'); }
-};
+/* Every gated/destructive action funnels through `doAction`; `ACTIONS` is
+   declared up near the page summaries, and each module registers its own. */
 function doAction(key, el){
+  S.sheet = null;                          /* any action dismisses an open sheet */
   const name = key.split(':')[0];
   const fn = ACTIONS[key] || ACTIONS[name];
   if(fn){ fn(key, el); render(); return; }
