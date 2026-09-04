@@ -74,7 +74,7 @@ Colour and line
 - All cards and containers have a white fill; grey only for intentional tracks and hover. (memory, admin)
 
 Shape and rhythm
-- Radius 0. Round things: marks/discs, `.agt-tag`, the `.tbl-flag` chip (literal `999px`), and a chat bubble's `16 16 4 16`. (§56, §31.6, §114, §115)
+- Radius 0. Round things: marks/discs, `.agt-tag`, the `.tbl-flag` chip, the Tal dock (all a literal `999px`), and a chat bubble's `16 16 4 16`. (§56, §31.6, §114, §117, §115)
 - Sections are 48 apart; heading to content 12; heading to description 8. (§10, §01)
 - A mark is a bare 20px glyph in a named hue, no tinted chip — `.stat-ic`, `.qa-ic`, `.pulse-ic`, `.pf-sr`. (§29, §72)
 - `.stat` and `.qa-c` are one shape: title `--t-h4`, content hangs from the top, the figure/arrow centred on the block's right. (§29, §70)

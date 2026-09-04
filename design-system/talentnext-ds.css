@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5507.  Rules dropped as product-specific: 186.
+   Rules kept: 5512.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -9105,3 +9105,15 @@ button.btn-p:active,
   .app .cl-pair{grid-template-columns:1fr 1fr}
   .app .cl-p .lrn{grid-template-columns:1fr}
 }
+
+/* ---- 117-askpill.css ---- */
+.app .askdock > .askline{border-radius:999px; border-image:none; border-color:transparent; background-color:transparent; background-image:
+    linear-gradient(var(--background), var(--background)),
+    var(--ai-grad-line); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
+.app .askdock > .askline:active{background-image:
+    linear-gradient(var(--background), var(--background)),
+    linear-gradient(var(--text-primary), var(--text-primary))}
+.app .ai-run rect{rx:31px}
+.app .askdock .askline-send,
+.app .askdock .askline-mic{width:auto; height:auto; border:0; border-radius:0; background:transparent; background-image:none}
+.app .askdock .askline-mic + .askline-send{margin-left:calc(var(--s05) - 20px)}

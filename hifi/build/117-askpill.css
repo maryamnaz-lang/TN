@@ -1,0 +1,78 @@
+/* ==========================================================================
+   117. THE TAL DOCK IS A PILL, AND ITS TWO CONTROLS ARE BARE GLYPHS
+
+   Maryam, 4 Sep 2026, with the dock attached: "change the tal floating field
+   to a full round field instead of edgy, also remove the blocks of both voice
+   icon and send icon, also make those icon spacing 16px in between."
+
+   THREE THINGS, AND THE FIRST ONE COSTS THE MOST. Rounding the field is one
+   `border-radius`, EXCEPT that §70.1607 draws the dock's edge as a
+   `border-image` — and `border-image` silently ignores `border-radius`. §70's
+   own note says so ("it is safe from `border-radius`… this field is square"),
+   which is the sentence this instruction overturns. So the ramp moves off the
+   border and into the BACKGROUND: two layers, the page ground painted to the
+   padding box over `--ai-grad-line` painted to the border box, with the border
+   itself 1px transparent. The 1px ring that shows between the two clips IS the
+   gradient border, and a background follows the radius. Same token, same
+   angle, same 70% — §70's sampling of 742:6191 is untouched; only the property
+   that carries it changed.
+
+   THE TRAVELLING LIGHT HAS TO TURN THE CORNER TOO. §70.362 draws it as a
+   stroked `<rect>` inset by 1px, and a rectangle running inside a pill would
+   cut across both ends. `rx` is a CSS geometry property on an SVG rect (SVG2,
+   every browser this prototype targets), so the rect takes the field's own
+   radius: the row is 64px (§70.1553's `min-height`), the rect is inset 1, so
+   31px is a full semicircle at each end. If the row ever grows, the corners
+   go a little less than full rather than breaking — stated here so the next
+   height change knows to move this number with it.
+
+   THE CHIPS COME OFF AND THE GLYPHS STAY. §21.220 gave the send a 32px wash,
+   §70.1568 made it the accent ramp at 20%, §105.454/455 rounded it and gave the
+   mic the outlined half of the pair. All of that is a box round a mark, and
+   §29's 1 Sep 2026 decision ("the icons should not have the background")
+   reaches this row now: no ground, no border, the box is the glyph. Sizes are
+   §70's 20 for the arrow and §105's 16 for the mic, unchanged — asked for was
+   the block, not the mark.
+
+   16 BETWEEN THEM, MEASURED GLYPH EDGE TO GLYPH EDGE — AND THE ROW ALREADY
+   PAYS 20. §70.1553 gives the whole row `gap:20px` (the file's spacing between
+   the mark, the prompt and the example), and a margin on the send ADDS to it:
+   the first build stated `--s05` and measured 36. So the pair's 16 is written
+   as the difference from the row's gap, `calc(var(--s05) - 20px)`, which reads
+   as the odd negative it is rather than as a magic -4. On the `+` pair, so a
+   row with no mic (the agent portal has no dictation and draws none) keeps
+   its send where §21 put it.
+
+   IT IS A NEW LAYER, NOT AN EDIT TO §70 AND §105, because it has to un-say a
+   declaration in each of three earlier layers and land after all of them; and
+   it states no type, so it is free to sit after §63.
+
+   AND IT IS THE FOURTH STATED RADIUS EXCEPTION (DESIGN.md §3): marks, `.agt-tag`,
+   the `.tbl-flag` chip, and now this field — a literal `999px`, per §31.6's
+   reason, so `--radius:0` stays a token you can trust.
+   ========================================================================== */
+.app .askdock > .askline{
+  border-radius:999px;
+  border-image:none;
+  border-color:transparent;
+  background-color:transparent;
+  background-image:
+    linear-gradient(var(--background), var(--background)),
+    var(--ai-grad-line);
+  background-origin:padding-box, border-box;
+  background-clip:padding-box, border-box}
+/* pressed, the edge comes back — §21.155's rule, restated for the two-layer
+   construction: the border is transparent, so the pressed ink has to arrive
+   as the outer layer rather than as a border-color */
+.app .askdock > .askline:active{
+  background-image:
+    linear-gradient(var(--background), var(--background)),
+    linear-gradient(var(--text-primary), var(--text-primary))}
+.app .ai-run rect{rx:31px}
+
+.app .askdock .askline-send,
+.app .askdock .askline-mic{
+  width:auto;height:auto;
+  border:0;border-radius:0;
+  background:transparent;background-image:none}
+.app .askdock .askline-mic + .askline-send{margin-left:calc(var(--s05) - 20px)}
