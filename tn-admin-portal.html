@@ -1963,6 +1963,163 @@ function marketRecordings(){
 V.market = () => modView({bookings:marketBookings, recordings:marketRecordings});
 
 /* ======================================================================
+   EMPLOYERS & HIRING
+   ====================================================================== */
+const verifyTag = v => v === 'ok' ? '<span class="tag sm green">Verified</span>'
+  : v === 'review' ? '<span class="tag sm warn">Under review</span>'
+  : '<span class="tag sm red">Unverified</span>';
+const empSpend = e => e.unlocks * 40 + PLACEMENTS.filter(p => p.empId === e.id && p.feeState === 'paid').reduce((n, p) => n + p.fee, 0);
+
+PAGESUM['employers/employers'] = () => {
+  const v = EMPLOYERS.filter(e => e.verify === 'ok').length;
+  return `${EMPLOYERS.length} employers, <b>${v} verified</b>. They pay $40 to unlock a full interview and a placement fee on a hire — Hiring and Sponsoring are two different tracks.`;
+};
+PAGESUM['employers/unlocks'] = () => `An employer pays <b>$40 to unlock a candidate's full interview</b> beyond the free highlight clip. ${UNLOCKS.length} unlocks so far — and this is exactly what an unlock reveals.`;
+PAGESUM['employers/placements'] = () => {
+  const draft = INVOICES.filter(i => i.type === 'Placement fee' && i.status === 'draft').length;
+  return `${PLACEMENTS.length} confirmed hires. The placement fee is the platform's largest revenue line and the <b>one fee with no agreed basis</b>, so ${draft} invoices sit blocked in draft.`;
+};
+
+function employersAll(){
+  const tf = getFilter('etype', 'all');
+  const rows = EMPLOYERS.filter(e => tf === 'all' ? true : tf === 'unverified' ? e.verify !== 'ok' : e.type.toLowerCase() === tf);
+  const top = EMPLOYERS.slice().sort((a, b) => empSpend(b) - empSpend(a)).slice(0, 3);
+  return `
+  <section class="sec">
+    ${aiHead('All employers', 'Every hiring and sponsoring account. A row opens its unlocks and hires.')}
+    ${stats([
+      ['store', 'Employers', String(EMPLOYERS.length), 'total accounts'],
+      ['check', 'Verified', String(EMPLOYERS.filter(e => e.verify === 'ok').length), 'cleared to hire'],
+      ['users', 'Hiring', String(EMPLOYERS.filter(e => e.type === 'Hiring').length), 'direct hirers'],
+      ['spark', 'Sponsoring', String(EMPLOYERS.filter(e => e.type === 'Sponsoring').length), 'partner track']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Directory', 'Filter by track, or the accounts still to verify.')}
+    <div class="mt4">${filterTabs('etype', 'all', [
+      ['all', 'All', EMPLOYERS.length],
+      ['hiring', 'Hiring', EMPLOYERS.filter(e => e.type === 'Hiring').length],
+      ['sponsoring', 'Sponsoring', EMPLOYERS.filter(e => e.type === 'Sponsoring').length],
+      ['unverified', 'To verify', EMPLOYERS.filter(e => e.verify !== 'ok').length]
+    ])}</div>
+    ${table(
+      [{label:'Employer'}, {label:'Industry'}, {label:'Track'}, {label:'Unlocks', num:true}, {label:'Hires', num:true}, {label:'Verified'}],
+      rows.map(e => ({go:'employers/empdetail/' + e.id, cells:[
+        idCell(e.name, e.domain),
+        `${esc(e.industry)} · ${esc(e.location)}`,
+        esc(e.type),
+        String(e.unlocks),
+        String(e.placements),
+        verifyTag(e.verify)
+      ]})))}
+  </section>
+  <section class="sec">
+    ${aiHead('Top spenders', 'Unlock fees plus paid placement fees, this window.')}
+    <div class="tile-stack">
+      ${top.map(e => memRow(e.name, `${e.unlocks} unlocks · ${e.placements} hires`, `<span class="v n">${money(empSpend(e))}</span>`, 'employers/empdetail/' + e.id)).join('')}
+    </div>
+  </section>`;
+}
+
+function employersDetail(){
+  const e = EMP_BY_ID[S.id] || EMPLOYERS[0];
+  DETAIL_LABEL = e.name;
+  const unlocks = UNLOCKS.filter(u => u.empId === e.id);
+  const placements = PLACEMENTS.filter(p => p.empId === e.id);
+  const sum = `<b>${esc(e.name)}</b> is a ${esc(e.type.toLowerCase())} employer in ${esc(e.industry)}, ${e.verify === 'ok' ? 'verified' : 'not yet verified'}. ${unlocks.length} unlocks and ${placements.length} hires, ${money(empSpend(e))} spent.`;
+  return `
+  ${detailHead('employers/employers', sum)}
+  <section class="sec">
+    ${aiHead(esc(e.name), esc(e.industry) + ' · ' + esc(e.location),
+      e.verify === 'ok' ? verifyTag(e.verify)
+        : `<button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button>`)}
+    <div class="mt4">${kv([
+      ['Signer', esc(e.signer)],
+      ['Domain', esc(e.domain)],
+      ['Track', esc(e.type)],
+      ['Organisation', esc(e.org)],
+      ['Industry', esc(e.industry)],
+      ['Location', esc(e.location)],
+      ['Company size', esc(e.size)],
+      ['Joined', esc(e.joined)],
+      ['Open roles', String(e.openRoles)]
+    ])}</div>
+  </section>
+
+  <section class="sec">
+    ${secHead('Unlocks')}
+    ${unlocks.length ? `<div class="tbl-wrap"><table class="tbl">
+      <tr><th>Candidate</th><th>Level</th><th>Role</th><th>Outcome</th><th>When</th></tr>
+      ${unlocks.map(u => `<tr><td>${esc(u.cand)}</td><td>${esc(u.level)} · ${esc(u.bucket)}</td><td>${esc(u.role)}</td><td>${tag(u.outcome)}</td><td>${esc(u.when)}</td></tr>`).join('')}
+    </table></div>` : emptyState('eye', 'No unlocks', 'This employer has not unlocked any interviews yet.')}
+  </section>
+
+  <section class="sec">
+    ${secHead('Placements')}
+    ${placements.length ? `<div class="tbl-wrap"><table class="tbl">
+      <tr><th>Candidate</th><th>Role</th><th class="num">Salary</th><th class="num">Fee</th><th>Fee state</th></tr>
+      ${placements.map(p => `<tr><td>${esc(p.cand)}</td><td>${esc(p.role)}</td><td class="num">${money(p.salary)}</td><td class="num">${money(p.fee)}</td><td>${tag(p.feeState)}</td></tr>`).join('')}
+    </table></div>` : emptyState('users', 'No hires', 'This employer has not confirmed a hire yet.')}
+  </section>`;
+}
+
+function employersUnlocks(){
+  return `
+  <section class="sec">
+    ${aiHead('Unlocks & DB access', 'What an employer can see, and what the $40 unlock adds.')}
+    <div>
+      <div class="kv"><span class="k">Level &amp; bucket</span><span class="v">${yn(1)}</span></div>
+      <div class="kv"><span class="k">Interview summary</span><span class="v">${yn(1)}</span></div>
+      <div class="kv"><span class="k">SCENES highlight reel</span><span class="v"><span class="tag sm warn">If consented</span></span></div>
+      <div class="kv"><span class="k">Verified competencies</span><span class="v">${yn(1)}</span></div>
+      <div class="kv"><span class="k">Full interview recording</span><span class="v"><span class="tag sm">After $40 unlock</span></span></div>
+    </div>
+    ${note('', 'The unlock', 'The free highlight clip is open to any verified employer. The $40 unlock adds the full recording and transcript for one candidate.')}
+  </section>
+  <section class="sec">
+    ${secHead('Recent unlocks')}
+    ${table(
+      [{label:'Candidate'}, {label:'Level'}, {label:'Role'}, {label:'Employer'}, {label:'Outcome'}, {label:'When'}],
+      UNLOCKS.map(u => ({cells:[
+        esc(u.cand), `${esc(u.level)} · ${esc(u.bucket)}`, esc(u.role),
+        esc((EMP_BY_ID[u.empId] || {}).name || '—'), tag(u.outcome), esc(u.when)
+      ]})))}
+  </section>`;
+}
+
+function employersPlacements(){
+  const totalSalary = PLACEMENTS.reduce((n, p) => n + p.salary, 0);
+  const totalFee = PLACEMENTS.reduce((n, p) => n + p.fee, 0);
+  const paidFee = PLACEMENTS.filter(p => p.feeState === 'paid').reduce((n, p) => n + p.fee, 0);
+  return `
+  ${darkCard({
+    title:'The placement fee is undecided',
+    act:{label:'Open Fee Configuration', accent:true, attr:'data-go="finance/feeconfig"'},
+    body:`<div class="dc-lines"><p class="t-body-02">Placement fees are the platform's largest revenue line, and the fee has no agreed basis, trigger or detection. Two invoices are blocked in draft until it is set.</p></div>`
+  })}
+  <section class="sec">
+    ${secHead('Hires this window')}
+    ${stats([
+      ['users', 'Confirmed hires', String(PLACEMENTS.length), 'on-platform'],
+      ['wallet', 'Placed salary', money(totalSalary), 'combined'],
+      ['money', 'Fees recorded', money(totalFee), '12% of salary'],
+      ['bank', 'Fees paid', money(paidFee), 'collected']
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('Placements')}
+    ${table(
+      [{label:'Candidate'}, {label:'Role'}, {label:'Employer'}, {label:'Salary', num:true}, {label:'Fee', num:true}, {label:'Fee state'}],
+      PLACEMENTS.map(p => ({cells:[
+        esc(p.cand), esc(p.role), esc((EMP_BY_ID[p.empId] || {}).name || '—'),
+        money(p.salary), money(p.fee), tag(p.feeState)
+      ]})))}
+  </section>`;
+}
+
+V.employers = () => modView({employers:employersAll, empdetail:employersDetail, unlocks:employersUnlocks, placements:employersPlacements});
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
