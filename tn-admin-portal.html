@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TalentNext — Super Admin portal</title>
+
+<!-- ==========================================================================
+     THE DESIGN SYSTEM. Two files, fonts embedded in the first, so this is the
+     whole dependency — the same link the Talent Agent portal carries. Serve
+     over http (a browser blocks a linked stylesheet on file://):
+         python3 -m http.server 8802 --bind 127.0.0.1
+     Every class used below is a real class from design-system/gallery.html.
+     The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
+     the viewport picker, the wordmark size, a toast host) — no product rule.
+     ========================================================================== -->
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3e9b4974">
+
+<style>
+/* ==========================================================================
+   PROTOTYPE CHROME ONLY — not product design.
+
+   `.pt-bar`, `.pt-stage`, `.pt-fit` and `.device` all come from the design
+   system, including `container-type:inline-size; container-name:app` on
+   `.device`, which is the host requirement — nothing in this system responds
+   to the browser window, every breakpoint is `@container app (min-width:…)`.
+
+   The mark: `TN_MARK` carries a viewBox and no size, so the bar says how big.
+   The admin portal has no stage picker — a super admin sees one live platform,
+   not a set of onboarding snapshots the way the agent portal does — so the bar
+   holds the frame (viewport) picker and the Reset button only.
+   ========================================================================== */
+.pt-bar img{height:18px;width:auto;flex:none}
+
+/* THE STAGE FOOT ROOM GOES WITH THE STAGE PICKER THIS FILE DOES NOT HAVE.
+   `.pt-stage` is `padding:var(--s06) var(--s05) var(--s10)` in the design
+   system — 64px at the foot for a caption row, plus a 16px flex gap. This file
+   prints neither, so both reserved space for elements that are not here. Set to
+   an even margin, same as the agent portal's chrome states for the same reason. */
+.pt-stage{padding-bottom:var(--s05);gap:0}
+
+/* THE TOAST HOST is prototype chrome: a fixed layer for the transient
+   confirmations the source portal shows on cosmetic actions (reminder sent,
+   receipt downloaded). Each toast is the design system's own `.note` component —
+   no colour or type is stated here, only where the stack sits. It is appended
+   inside `.device`, whose `container-type` makes it the containing block for a
+   fixed child, so a toast is clipped to the frame it belongs to (the same
+   mechanism the agent portal's steps popup note records). */
+.pt-toasts{position:fixed;left:50%;bottom:var(--s06);transform:translateX(-50%);
+  z-index:60;display:flex;flex-direction:column;gap:var(--s03);width:min(360px,86%);
+  pointer-events:none}
+.pt-toasts .note{margin:0;box-shadow:0 6px 24px rgba(17,17,17,.12);background:var(--pure-white,#fff)}
+</style>
+</head>
+<body>
+
+<!-- prototype chrome — not part of the product -->
+<div class="pt-bar">
+  <span id="ptLogo"></span>
+  <span class="dot"></span>
+  <span class="pt-meta">Super Admin portal &middot; v1 &middot; built on the TalentNext design system</span>
+  <div class="pt-vp" id="vp" role="group" aria-label="Viewport">
+    <button data-vp="mobile">Mobile</button>
+    <button data-vp="tablet">Tablet</button>
+    <button data-vp="fluid" class="on">Desktop</button>
+    <span class="pt-scale" id="vpscale">100%</span>
+  </div>
+  <div class="pt-nav">
+    <button id="reset" title="Reset the prototype" aria-label="Reset the prototype">
+      <svg viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="pt-stage">
+  <div class="pt-fit" id="fit">
+    <div class="device" id="device" data-vp="fluid"></div>
+  </div>
+</div>
+
+<script src="design-system/talentnext-ds.js?b=3e9b4974"></script>
+<script>
+/* ==========================================================================
+   THE SUPER ADMIN PORTAL
+
+   A FOURTH SIGNED-IN USER, IN A FILE OF ITS OWN, on the same design system the
+   Talent Agent portal is built on. The candidate and cohort leader share
+   `hifi/` because a demo walks between them; the agent and the admin are each
+   a separate application and a separate signed-in person, so each is a
+   hand-written file linking `design-system/`.
+
+   WHO IS SIGNED IN: Derek Sole, Super Admin (u9 in the record). The portal has
+   full control across every module — users, vetting, cohorts, the marketplace
+   and settlement — with override on any level or setting.
+
+   WHERE THE DATA COMES FROM: verbatim from `tn-admin.html`, the frozen data and
+   flow reference. Every user, application, cohort, booking, payout, refund,
+   settlement, lead, campaign, feature flag, decision and audit line below is
+   copied from that file's seed block (its lines 3077–3592 and 6772–6836). No
+   record, number or copy is invented here — the frozen file is the source of
+   truth and this file is only its hi-fi skin.
+
+   WHERE THE DESIGN COMES FROM: the other three portals only. The head band with
+   Tal's page summary (`dsTypeSummary`), §78's top bar with the breadcrumb trail
+   and the account menu, the rail, `aiHead` for a heading that carries a
+   sentence, `.dark-card` for the one loud thing on a page, `.stat`/`.qa-c`
+   figure cells, the design system's data table, §65 disclosures, and the
+   `.conf` dialog for every destructive action and log-out. No component is
+   invented; where the admin needs one the box does not ship, it is composed
+   from ones it does.
+
+   TWO ADMIN RULES STATED BY THE BRIEF AND KEPT HERE:
+     - DATA OVER DECORATIVE CHARTS. The frozen file draws bar, donut, funnel and
+       line charts on its dashboards; this portal reads the same figures as
+       `.stats`, `.kv` bands and tables, which is the standing admin preference
+       (DESIGN.md §3) and also keeps every surface on the design system with no
+       chart CSS to invent.
+     - THE FEE SPLIT IS CONFIGURATION, NOT COPY. The 20% platform share appears
+       once, in Fee Configuration, and nowhere in a sentence — an admin-set
+       number does not belong in prose.
+
+   NAVIGATION IS `mod/sub[/id]`, and that is the whole of the router. The rail
+   is the twelve modules; a module opens on its first sub-page; the sub-pages of
+   a module are a `.tabs` strip; a table row drills into a hidden detail sub
+   with a record id. The hash is `#mod/sub[/id]`, written with `replaceState`
+   and read back on load, so a reload comes back to the screen you were on — the
+   same three parts `hifi/` and the agent portal keep.
+   ========================================================================== */
+
+/* ---- small utilities ---------------------------------------------------- */
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money = n => '$' + Number(n).toLocaleString('en-US');
+const money2 = n => '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+/* THE ICON MAP. The admin data names icons in its own vocabulary (`agent`,
+   `cohorts`, `spark`, `store`, `route`, `dl`, `dots`, `sliders`, `bank`,
+   `scale`…). This maps each onto the design system's Material Symbols set —
+   `Object.keys(IP)` is the whole list — so a call site names the meaning and
+   gets the official mark. A name already in the set passes through. */
+const IMAP = {
+  home:'dashboard', users:'group', vetting:'shield', candidates:'user',
+  agents:'verified', cohorts:'growth', market:'video', employers:'launch',
+  finance:'wallet', crm:'chart', system:'settings', settings:'settings',
+  profile:'user', agent:'verified', store:'launch', spark:'lightning',
+  money:'wallet', bank:'wallet', alert:'warning', route:'link', account:'user',
+  lock:'locked', node:'link', eye:'view', scale:'renew', doc:'document',
+  clock:'time', plus:'add', dots:'overflow', sliders:'settings', dl:'download',
+  gear:'settings', flag:'flag', shield:'shield', video:'video', wallet:'wallet',
+  chart:'chart', link:'link', group:'group', calendar:'calendar', book:'book',
+  growth:'growth', receipt:'receipt', check:'check', star:'star', time:'time',
+  filter:'filter', search:'search', user:'user', verified:'verified',
+  location:'location', ticket:'ticket', document:'document', notification:'notification'
+};
+const ic = name => I[IMAP[name] || name] || '';
+
+/* A STATUS WORD IS A `.tag`, AND ITS HUE IS A SET, NOT THE ACCENT (DESIGN.md
+   §3). This maps every status string the records carry onto the design system's
+   tag variants — green for done/good, warn for waiting, red for a problem —
+   with the word the source shows. Anything unmapped renders as a plain tag with
+   its own text title-cased. */
+const TAGV = {
+  /* good */ active:'green', settled:'green', paid:'green', live:'green', ok:'green',
+  approved:'green', won:'green', reconciled:'green', placed:'green', confirmed:'green',
+  published:'green', completed:'green', verified:'green',
+  /* waiting */ held:'warn', pending:'warn', review:'warn', requested:'warn',
+  processing:'warn', sent:'warn', overdue:'warn', unmatched:'warn', shortlisted:'warn',
+  reviewing:'warn', scheduled:'warn', draft:'warn', degraded:'warn', 'in progress':'warn',
+  /* problem */ blocked:'red', declined:'red', lost:'red', unverified:'red',
+  inactive:'red', rejected:'red', down:'red', open:'red', flagged:'red', passed:'',
+  /* neutral-ish */ applied:'', feedback:'green', 'n/a':''
+};
+const TAGLABEL = {'n/a':'n/a', ok:'Verified'};
+const cap = s => String(s || '').replace(/^\w/, c => c.toUpperCase());
+const tag = (status, label) => {
+  const key = String(status || '').toLowerCase();
+  const v = TAGV[key] === undefined ? '' : TAGV[key];
+  const txt = label != null ? label : (TAGLABEL[key] || cap(status));
+  return `<span class="tag sm${v ? ' ' + v : ''}">${esc(txt)}</span>`;
+};
+
+/* A FACE IS A DISC OF INITIALS. The five embedded portraits in the design
+   system belong to named people who are not these thirty-two accounts, so admin
+   rows carry initials on a disc — the design system's own `.av`/`.mem-av`, round
+   since §106 — rather than a photograph that would claim an identity. */
+const initials = name => String(name || '?').trim().split(/\s+/).slice(0, 2)
+  .map(w => w[0]).join('').toUpperCase();
+const av = (name, size) => `<span class="av${size ? ' ' + size : ''} mem-av">${esc(initials(name))}</span>`;
+
+/* ======================================================================
+   SEED DATABASE — verbatim from tn-admin.html:3077–3592 and 6772–6836.
+   Data is data; these object literals are carried across unchanged so the
+   hi-fi portal and the frozen reference cannot disagree on a record.
+   ====================================================================== */
+const ROLES=[
+ {k:'candidate', name:'Candidate', short:'Candidate', kind:'external', desc:'Takes the quiz, gets levelled, joins cohorts and books interviews.'},
+ {k:'agent',     name:'Talent Agent', short:'Agent', kind:'external', desc:'Interviews candidates, sets own fee, holds a public marketplace listing.'},
+ {k:'leader',    name:'Cohort Leader', short:'Cohort Leader', kind:'external', desc:'A Builder who volunteers to lead an Explorer cohort through the 90-day loop.'},
+ {k:'employer',  name:'Employer', short:'Employer', kind:'external', desc:'Searches the candidate database, unlocks interviews, makes hires.'},
+ {k:'reviewer',  name:'Reviewer', short:'Reviewer', kind:'internal', desc:'Owns candidate level decisions. Can see the AI raw score — no one else can.'},
+ {k:'manager',   name:'Manager of Agents', short:'Manager', kind:'internal', desc:'Oversees a book of agents; handles calibration and escalations.'},
+ {k:'supervisor',name:'Supervisor', short:'Supervisor', kind:'internal', desc:'Reviews agents above the manager line; adjusts an agent’s own level and ranking.'},
+ {k:'admin2',    name:'Admin', short:'Admin', kind:'internal', desc:'Full platform access across every module, working alongside the Super Admin.'},
+ {k:'admin',     name:'Super Admin', short:'Super Admin', kind:'internal', desc:'Full control across every module, with override on any level or setting.'}
+];
+const ROLE_BY_K={}; ROLES.forEach(r => ROLE_BY_K[r.k]=r);
+const CAPS=[
+ {k:'takequiz', t:'Take quiz / be interviewed'},
+ {k:'setfee',   t:'Set own interview fee'},
+ {k:'conduct',  t:'Conduct interviews'},
+ {k:'decidelvl',t:'Decide candidate level'},
+ {k:'lead',     t:'Lead a cohort'},
+ {k:'searchdb', t:'Search candidate database'},
+ {k:'rawscore', t:'View AI raw score'},
+ {k:'payouts',  t:'Manage payouts & in-progress payments'},
+ {k:'usersroles',t:'Manage users & roles'},
+ {k:'fees',     t:'Configure fees & payouts'},
+ {k:'system',   t:'System settings & override'}
+];
+const MATRIX={
+ candidate:{takequiz:1},
+ agent:{conduct:1,setfee:1},
+ leader:{lead:1,takequiz:1},
+ employer:{searchdb:1},
+ reviewer:{decidelvl:1,rawscore:1},
+ manager:{conduct:1,rawscore:1},
+ supervisor:{rawscore:1,decidelvl:1},
+ admin2:{takequiz:1,setfee:1,conduct:1,decidelvl:1,lead:1,searchdb:1,rawscore:1,payouts:1,usersroles:1,fees:1,system:1},
+ admin:{takequiz:1,setfee:1,conduct:1,decidelvl:1,lead:1,searchdb:1,rawscore:1,payouts:1,usersroles:1,fees:1,system:1}
+};
+const isFullAccess = k => { const m = MATRIX[k]; return m ? CAPS.every(c => m[c.k]) : false; };
+
+const USERS=[
+ {id:'u1', name:'Dana Whitfield', email:'dana@talentnext.io', roles:['agent'], level:'—', job:'Engineering Manager, Stripe', rating:4.9, interviewed:64, status:'active', joined:'03-12-2026', origin:'individual', last:'2h ago', fee:180, cohorts:['Explorer 12']},
+ {id:'u2', name:'Marcus Ozoro', email:'marcus@northgate.health', roles:['agent'], level:'—', job:'Clinical Lead, Northgate Health', rating:4.6, interviewed:28, status:'active', joined:'02-04-2026', origin:'individual', last:'1d ago', fee:160},
+ {id:'u3', name:'Priya Raman', email:'priya@talentnext.io', roles:['agent','reviewer'], level:'—', job:'Product Director, Atlassian', rating:4.8, interviewed:52, status:'active', joined:'01-21-2026', origin:'individual', last:'20m ago', fee:225},
+ {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)']},
+ {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)']},
+ {id:'u5', name:'Jordan Vale', email:'jordan@vale.co', roles:['candidate'], level:'B1 · Builder', status:'active', joined:'04-02-2026', origin:'signal', last:'3d ago'},
+ {id:'u6', name:'Amara Okafor', email:'amara@brightpath.io', roles:['employer'], level:'—', status:'ok', joined:'03-18-2026', origin:'individual', last:'5h ago', company:'BrightPath'},
+ {id:'u7', name:'Tom Reeves', email:'tom@filtergo.com', roles:['candidate'], level:'Explorer', status:'active', joined:'03-29-2026', origin:'filtergo', last:'6d ago'},
+ {id:'u8', name:'Nadia Haddad', email:'nadia@talentnext.io', roles:['admin2'], level:'—', status:'active', joined:'01-10-2026', origin:'internal', last:'40m ago', internal:true},
+ {id:'u9', name:'Derek Sole', email:'derek@talentnext.io', roles:['admin'], level:'—', status:'active', joined:'01-02-2026', origin:'internal', last:'just now', internal:true},
+ {id:'u10', name:'Lena Fisher', email:'lena@signal.co', roles:['employer'], level:'—', status:'ok', joined:'03-22-2026', origin:'individual', last:'2d ago', company:'Signal (sponsoring)'},
+ {id:'u11', name:'Chris Boone', email:'chris@boone.dev', roles:['candidate'], level:'Explorer', status:'active', joined:'04-01-2026', origin:'individual', last:'12d ago'},
+ {id:'u12', name:'Sofia Marchetti', email:'sofia@talentnext.io', roles:['admin2'], level:'—', status:'active', joined:'01-15-2026', origin:'internal', last:'25m ago', internal:true},
+ {id:'u13', name:'Owen Blake', email:'owen@blake.io', roles:['agent'], level:'—', job:'Startup Founder & Ex-VC', rating:4.5, interviewed:19, status:'active', joined:'02-08-2026', origin:'individual', last:'4h ago', fee:150},
+ {id:'u14', name:'Naomi Frost', email:'naomi@frost.co', roles:['agent'], level:'—', job:'Design Lead, Figma', rating:4.7, interviewed:37, status:'active', joined:'01-19-2026', origin:'individual', last:'1h ago', fee:200},
+ {id:'u15', name:'Victor Huang', email:'victor@nimbus.io', roles:['employer'], level:'—', status:'ok', joined:'03-25-2026', origin:'individual', last:'1d ago', company:'Nimbus Labs'},
+ {id:'u16', name:'Elena Ruiz', email:'elena@corewell.health', roles:['employer'], level:'—', status:'ok', joined:'03-27-2026', origin:'individual', last:'3d ago', company:'Corewell'},
+ {id:'u17', name:'Aisha Bello', email:'aisha@bello.io', roles:['candidate'], level:'E1', status:'active', joined:'03-30-2026', origin:'individual', last:'2h ago'},
+ {id:'u18', name:'Leo Martins', email:'leo@martins.br', roles:['candidate'], level:'E2', status:'active', joined:'03-14-2026', origin:'signal', last:'1d ago'},
+ {id:'u19', name:'Hana Sato', email:'hana@sato.jp', roles:['candidate'], level:'B2', status:'active', joined:'02-20-2026', origin:'individual', last:'5h ago'},
+ {id:'u20', name:'Omar Haddad', email:'omar@haddad.me', roles:['candidate'], level:'E1', status:'active', joined:'04-02-2026', origin:'filtergo', last:'8d ago'},
+ {id:'u21', name:'Grace Kim', email:'grace.kim@kim.co', roles:['candidate'], level:'E3', status:'active', joined:'03-11-2026', origin:'individual', last:'30m ago'},
+ {id:'u22', name:'Diego Alvarez', email:'diego@alvarez.mx', roles:['candidate'], level:'B1', status:'active', joined:'02-06-2026', origin:'individual', last:'2d ago'},
+ {id:'u23', name:'Fatima Noor', email:'fatima@noor.io', roles:['candidate'], level:'E1', status:'active', joined:'04-01-2026', origin:'signal', last:'9d ago'},
+ {id:'u24', name:'Sam Whitfield', email:'sam@whitfield.co', roles:['candidate'], level:'E2', status:'active', joined:'03-17-2026', origin:'individual', last:'6h ago'},
+ {id:'u25', name:'Yuki Tanaka', email:'yuki@tanaka.jp', roles:['candidate'], level:'T1', status:'active', joined:'01-22-2026', origin:'individual', last:'1d ago'},
+ {id:'u26', name:'Noah Bright', email:'noah@bright.io', roles:['candidate'], level:'E1', status:'active', joined:'04-03-2026', origin:'individual', last:'just now'},
+ {id:'u27', name:'Zara Ahmed', email:'zara@ahmed.io', roles:['candidate'], level:'B2', status:'active', joined:'02-09-2026', origin:'filtergo', last:'4d ago'},
+ {id:'u28', name:'Ethan Cole', email:'ethan@cole.dev', roles:['candidate'], level:'E2', status:'inactive', joined:'03-13-2026', origin:'individual', last:'21d ago'},
+ {id:'u29', name:'Mia Rossi', email:'mia@rossi.it', roles:['candidate'], level:'E1', status:'active', joined:'03-31-2026', origin:'individual', last:'3h ago'},
+ {id:'u30', name:'Kofi Mensah', email:'kofi@mensah.gh', roles:['candidate'], level:'B1', status:'active', joined:'02-28-2026', origin:'signal', last:'2d ago'},
+ {id:'u31', name:'Lucia Moretti', email:'lucia@moretti.it', roles:['candidate'], level:'E2', status:'active', joined:'03-16-2026', origin:'individual', last:'5h ago'},
+ {id:'u32', name:'Aaron Feld', email:'aaron@feld.io', roles:['candidate'], level:'E1', status:'active', joined:'04-02-2026', origin:'individual', last:'7d ago'}
+];
+const USER_BY_ID={}; USERS.forEach(u => USER_BY_ID[u.id]=u);
+const ME = USER_BY_ID.u9;   /* signed in as Derek Sole, Super Admin */
+
+const APPLICATIONS=[
+ {id:'ap1', name:'Ben Carto', email:'ben@carto.io', phone:'+1 (415) 555-0142', location:'San Francisco, CA',
+   bg:'clear', safeguarding:'flagged', identity:'clear', refcheck:'clear', idDoc:'Passport', idVendor:'Onfido',
+   role:'Engineering Manager, Loom', years:9, priorInterviews:120, fee:180, availability:'Weekday evenings & weekends',
+   linkedin:'linkedin.com/in/bencarto',
+   why:'I mentor early-career engineers and want to help 18–24 year-olds break into AI-native roles. I’ve run 100+ structured interviews and know how to put nervous candidates at ease.',
+   refs:[{name:'Dana Whitfield', rel:'Former manager', status:'confirmed'},{name:'Priya Raman', rel:'Peer agent', status:'confirmed'}],
+   note:'Would interview 18–24 candidates — enhanced safeguarding check required before going live.',
+   when:'2 days ago', stage:'checks', interview:null, decision:null, status:'review'},
+ {id:'ap2', name:'Ivy Chen', email:'ivy@chen.co', phone:'+1 (206) 555-0110', location:'Seattle, WA',
+   bg:'pending', safeguarding:'n/a', identity:'clear', refcheck:'pending', idDoc:'Driver’s license', idVendor:'Persona',
+   role:'Senior PM, Convex', years:7, priorInterviews:60, fee:170, availability:'Weekday mornings',
+   linkedin:'linkedin.com/in/ivychen',
+   why:'Product leader who has hired and coached dozens of juniors. Keen to give structured feedback that actually helps candidates level up.',
+   refs:[{name:'Owen Blake', rel:'Peer', status:'pending'}],
+   note:'Background check in progress with the vendor — can’t schedule the vetting call until it clears.',
+   when:'4 days ago', stage:'checks', interview:null, decision:null, status:'pending'},
+ {id:'ap3', name:'Raul Mendez', email:'raul@mendez.mx', phone:'+52 55 5555 0199', location:'Mexico City, MX',
+   bg:'clear', safeguarding:'clear', identity:'clear', refcheck:'clear', idDoc:'Passport', idVendor:'Onfido',
+   role:'Staff Engineer, Kavak', years:11, priorInterviews:200, fee:190, availability:'Flexible',
+   linkedin:'linkedin.com/in/raulmendez',
+   why:'Referred by Marcus Ozoro. I’ve interviewed across three continents and want to widen access for Latin-American candidates.',
+   refs:[{name:'Marcus Ozoro', rel:'Referrer · agent', status:'confirmed'},{name:'Naomi Frost', rel:'Former colleague', status:'confirmed'}],
+   note:'All checks clear. Vetting call scheduled — confirm fit, then decide.',
+   when:'1 day ago', stage:'interview', interview:{date:'2026-08-15', time:'14:00', dur:45, interviewer:'Priya Raman', done:false}, decision:null, status:'review'},
+ {id:'ap4', name:'Grace Lin', email:'grace@lin.io', phone:'+1 (312) 555-0177', location:'Chicago, IL',
+   bg:'flag', safeguarding:'flagged', identity:'clear', refcheck:'clear', idDoc:'National ID', idVendor:'Onfido',
+   role:'Design Director, Freelance', years:8, priorInterviews:40, fee:165, availability:'Weekends',
+   linkedin:'linkedin.com/in/gracelin',
+   why:'Design leader focused on portfolio coaching. I want to help candidates present their work with confidence.',
+   refs:[{name:'Elena Ruiz', rel:'Client', status:'confirmed'}],
+   note:'Vendor returned an adverse item on the background check — needs manual review before anything else.',
+   when:'6 days ago', stage:'checks', interview:null, decision:null, status:'review'}
+];
+const APP_BY_ID={}; APPLICATIONS.forEach(a => APP_BY_ID[a.id]=a);
+
+const EMPLOYERS=[
+ {id:'e1', name:'BrightPath', signer:'Amara Okafor', domain:'brightpath.io', type:'Hiring', verify:'ok', org:'Independent', industry:'EdTech', location:'Austin, TX', size:'50–200', joined:'Jan 2026', openRoles:3},
+ {id:'e2', name:'Signal', signer:'Lena Fisher', domain:'signal.co', type:'Sponsoring', verify:'ok', org:'Parent · Signal Home Office', industry:'Telecom', location:'London, UK', size:'500–1k', joined:'Dec 2025', openRoles:0},
+ {id:'e3', name:'Northgate Health', signer:'—', domain:'northgate.health', type:'Hiring', verify:'unverified', org:'Independent', industry:'Healthcare', location:'Manchester, UK', size:'200–500', joined:'Feb 2026', openRoles:2},
+ {id:'e4', name:'Filter Go', signer:'—', domain:'filtergo.com', type:'Sponsoring', verify:'review', org:'Franchise · FAS', industry:'Consumer Apps', location:'Berlin, DE', size:'50–200', joined:'Feb 2026', openRoles:0},
+ {id:'e5', name:'Kestrel Labs', signer:'Ruth Salazar', domain:'kestrel.ai', type:'Hiring', verify:'ok', org:'Independent', industry:'AI / ML', location:'San Francisco, CA', size:'10–50', joined:'Nov 2025', openRoles:5},
+ {id:'e6', name:'Meridian Bank', signer:'David Cho', domain:'meridian.com', type:'Hiring', verify:'ok', org:'Independent', industry:'FinTech', location:'New York, NY', size:'1k–5k', joined:'Oct 2025', openRoles:4},
+ {id:'e7', name:'Orbit Retail', signer:'Priya Menon', domain:'orbitretail.com', type:'Sponsoring', verify:'ok', org:'Parent · Orbit Group', industry:'Retail', location:'Chicago, IL', size:'1k–5k', joined:'Jan 2026', openRoles:1},
+ {id:'e8', name:'Vantage Media', signer:'—', domain:'vantage.media', type:'Hiring', verify:'review', org:'Independent', industry:'Media', location:'Toronto, CA', size:'50–200', joined:'Mar 2026', openRoles:2},
+ {id:'e9', name:'Cedar & Co', signer:'—', domain:'cedarco.com', type:'Hiring', verify:'unverified', org:'Independent', industry:'Professional Services', location:'Boston, MA', size:'10–50', joined:'Mar 2026', openRoles:1}
+];
+const EMP_BY_ID={}; EMPLOYERS.forEach(e => EMP_BY_ID[e.id]=e);
+const UNLOCKS=[
+ {id:'ul1',  empId:'e1', cand:'Maryam Naz',    level:'E2', bucket:'Explorer',   role:'AI Support Specialist', when:'2d ago',  outcome:'placed'},
+ {id:'ul2',  empId:'e1', cand:'Grace Kim',     level:'E3', bucket:'Explorer',   role:'AI Support Specialist', when:'4d ago',  outcome:'shortlisted'},
+ {id:'ul3',  empId:'e1', cand:'Tom Reeves',    level:'E1', bucket:'Explorer',   role:'Onboarding Associate',  when:'6d ago',  outcome:'passed'},
+ {id:'ul4',  empId:'e1', cand:'Owen Clarke',   level:'E2', bucket:'Explorer',   role:'AI Support Specialist', when:'8d ago',  outcome:'reviewing'},
+ {id:'ul5',  empId:'e3', cand:'Jordan Vale',   level:'B1', bucket:'Builder',    role:'Care Ops Analyst',      when:'1d ago',  outcome:'reviewing'},
+ {id:'ul6',  empId:'e3', cand:'Hana Sato',     level:'B2', bucket:'Builder',    role:'Care Ops Analyst',      when:'5d ago',  outcome:'shortlisted'},
+ {id:'ul7',  empId:'e5', cand:'Yuki Tanaka',   level:'T1', bucket:'Trailblazer',role:'Senior AI Engineer',    when:'3d ago',  outcome:'placed'},
+ {id:'ul8',  empId:'e5', cand:'Diego Alvarez', level:'B1', bucket:'Builder',    role:'AI Workflow Builder',   when:'3d ago',  outcome:'placed'},
+ {id:'ul9',  empId:'e5', cand:'Hana Sato',     level:'B2', bucket:'Builder',    role:'AI Workflow Builder',   when:'7d ago',  outcome:'reviewing'},
+ {id:'ul10', empId:'e5', cand:'Priya Nair',    level:'E2', bucket:'Explorer',   role:'ML Support Engineer',   when:'9d ago',  outcome:'shortlisted'},
+ {id:'ul11', empId:'e5', cand:'Marcus Lee',    level:'B3', bucket:'Builder',    role:'Senior AI Engineer',    when:'10d ago', outcome:'passed'},
+ {id:'ul12', empId:'e5', cand:'Ada Verma',     level:'T1', bucket:'Trailblazer',role:'Senior AI Engineer',    when:'12d ago', outcome:'reviewing'},
+ {id:'ul13', empId:'e6', cand:'Jordan Vale',   level:'B1', bucket:'Builder',    role:'Automation Analyst',    when:'2d ago',  outcome:'placed'},
+ {id:'ul14', empId:'e6', cand:'Nadia Rahman',  level:'B2', bucket:'Builder',    role:'AI Operations Lead',    when:'4d ago',  outcome:'placed'},
+ {id:'ul15', empId:'e6', cand:'Chris Boone',   level:'E1', bucket:'Explorer',   role:'Automation Analyst',    when:'6d ago',  outcome:'passed'},
+ {id:'ul16', empId:'e6', cand:'Leah Wong',     level:'B1', bucket:'Builder',    role:'Automation Analyst',    when:'8d ago',  outcome:'reviewing'},
+ {id:'ul17', empId:'e6', cand:'Owen Clarke',   level:'E2', bucket:'Explorer',   role:'Ops Support Analyst',   when:'11d ago', outcome:'reviewing'},
+ {id:'ul18', empId:'e7', cand:'Grace Kim',     level:'E3', bucket:'Explorer',   role:'Customer AI Associate', when:'3d ago',  outcome:'placed'},
+ {id:'ul19', empId:'e7', cand:'Tom Reeves',    level:'E1', bucket:'Explorer',   role:'Customer AI Associate', when:'9d ago',  outcome:'reviewing'},
+ {id:'ul20', empId:'e8', cand:'Priya Nair',    level:'E2', bucket:'Explorer',   role:'Content AI Assistant',  when:'5d ago',  outcome:'reviewing'}
+];
+const PLACEMENTS=[
+ {id:'pl1',  empId:'e1', cand:'Maryam Naz',    level:'E2', bucket:'Explorer',   role:'AI Support Specialist', salary:62000,  fee:7440,  feeState:'paid',     days:2,  when:'2d ago'},
+ {id:'pl2',  empId:'e5', cand:'Yuki Tanaka',   level:'T1', bucket:'Trailblazer',role:'Senior AI Engineer',    salary:145000, fee:17400, feeState:'paid',     days:5,  when:'5d ago'},
+ {id:'pl3',  empId:'e5', cand:'Diego Alvarez', level:'B1', bucket:'Builder',    role:'AI Workflow Builder',   salary:88000,  fee:10560, feeState:'invoiced', days:9,  when:'9d ago'},
+ {id:'pl4',  empId:'e6', cand:'Jordan Vale',   level:'B1', bucket:'Builder',    role:'Automation Analyst',    salary:92000,  fee:11040, feeState:'paid',     days:16, when:'2w ago'},
+ {id:'pl5',  empId:'e6', cand:'Nadia Rahman',  level:'B2', bucket:'Builder',    role:'AI Operations Lead',    salary:110000, fee:13200, feeState:'pending',  days:23, when:'3w ago'},
+ {id:'pl6',  empId:'e7', cand:'Grace Kim',     level:'E3', bucket:'Explorer',   role:'Customer AI Associate', salary:58000,  fee:6960,  feeState:'invoiced', days:27, when:'4w ago'},
+ {id:'pl7',  empId:'e5', cand:'Ada Verma',     level:'T1', bucket:'Trailblazer',role:'Senior AI Engineer',    salary:150000, fee:18000, feeState:'paid',     days:34, when:'5w ago'},
+ {id:'pl8',  empId:'e6', cand:'Leah Wong',     level:'B1', bucket:'Builder',    role:'Automation Analyst',    salary:90000,  fee:10800, feeState:'paid',     days:45, when:'6w ago'},
+ {id:'pl9',  empId:'e1', cand:'Owen Clarke',   level:'E2', bucket:'Explorer',   role:'AI Support Specialist', salary:60000,  fee:7200,  feeState:'paid',     days:58, when:'8w ago'},
+ {id:'pl10', empId:'e7', cand:'Tom Reeves',    level:'E1', bucket:'Explorer',   role:'Customer AI Associate', salary:55000,  fee:6600,  feeState:'invoiced', days:72, when:'10w ago'}
+];
+EMPLOYERS.forEach(e => {
+  e.unlocks = UNLOCKS.filter(u => u.empId === e.id).length;
+  e.placements = PLACEMENTS.filter(p => p.empId === e.id).length;
+});
+const CANDS=[
+ {id:'u4', name:'Maryam Naz', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'just now'},
+ {id:'u5', name:'Jordan Vale', bucket:'Builder', level:'B1', cohort:'Builder 3', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3d ago'},
+ {id:'u7', name:'Tom Reeves', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'6d ago'},
+ {id:'u11', name:'Chris Boone', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'12d ago'},
+ {id:'u17', name:'Aisha Bello', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2h ago'},
+ {id:'u18', name:'Leo Martins', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Priya Raman', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'1d ago'},
+ {id:'u19', name:'Hana Sato', bucket:'Builder', level:'B2', cohort:'Builder 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
+ {id:'u20', name:'Omar Haddad', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'8d ago'},
+ {id:'u21', name:'Grace Kim', bucket:'Explorer', level:'E3', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'30m ago'},
+ {id:'u22', name:'Diego Alvarez', bucket:'Builder', level:'B1', cohort:'Builder 3', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'2d ago'},
+ {id:'u23', name:'Fatima Noor', bucket:'Explorer', level:'E1', cohort:'Explorer 14', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'9d ago'},
+ {id:'u24', name:'Sam Whitfield', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Owen Blake', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'6h ago'},
+ {id:'u25', name:'Yuki Tanaka', bucket:'Trailblazer', level:'T1', cohort:'—', agent:'Priya Raman', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'1d ago'},
+ {id:'u26', name:'Noah Bright', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'just now'},
+ {id:'u27', name:'Zara Ahmed', bucket:'Builder', level:'B2', cohort:'Builder 3', agent:'Marcus Ozoro', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'4d ago'},
+ {id:'u28', name:'Ethan Cole', bucket:'Explorer', level:'E2', cohort:'Explorer 12', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:0,vis:0}, status:'inactive', last:'21d ago'},
+ {id:'u29', name:'Mia Rossi', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:1}, status:'active', last:'3h ago'},
+ {id:'u30', name:'Kofi Mensah', bucket:'Builder', level:'B1', cohort:'Builder 4', agent:'Naomi Frost', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'2d ago'},
+ {id:'u31', name:'Lucia Moretti', bucket:'Explorer', level:'E2', cohort:'Explorer 14', agent:'Dana Whitfield', consent:{video:1,ai:1,scenes:1,vis:1}, status:'active', last:'5h ago'},
+ {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'}
+];
+const CAND_BY_ID={}; CANDS.forEach(c => CAND_BY_ID[c.id]=c);
+const LEVELQ=[
+ {id:'l1', name:'Maryam Naz', from:'E1', to:'E2', agent:'Priya Raman', rec:'Promote', when:'Yesterday', status:'pending'},
+ {id:'l2', name:'Jordan Vale', from:'B1', to:'B1', agent:'Priya Raman', rec:'Hold at level', when:'2 days ago', status:'pending'},
+ {id:'l3', name:'Chris Boone', from:'E1', to:'E1', agent:'Dana Whitfield', rec:'Not ready to re-interview', when:'4 days ago', status:'pending'},
+ {id:'l4', name:'Hana Sato', from:'B1', to:'B2', agent:'Marcus Ozoro', rec:'Promote', when:'Today', status:'pending'},
+ {id:'l5', name:'Grace Kim', from:'E2', to:'E3', agent:'Dana Whitfield', rec:'Promote', when:'Yesterday', status:'pending'},
+ {id:'l6', name:'Diego Alvarez', from:'B1', to:'B1', agent:'Naomi Frost', rec:'Hold at level', when:'3 days ago', status:'pending'}
+];
+const COHORTS=[
+ {id:'ch1', name:'Explorer 12', track:'Explorer', level:'E1', templateId:'tpl1', leader:'Maryam Naz (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active'},
+ {id:'ch2', name:'Explorer 14', track:'Explorer', level:'E1', templateId:'tpl1', leader:'Unassigned', size:7, week:1, day:3, start:'2026-08-07', status:'active'},
+ {id:'ch3', name:'Builder 3', track:'Builder', level:'B1', templateId:'', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active'},
+ {id:'ch4', name:'Explorer 15', track:'Explorer', level:'E3', templateId:'tpl2', leader:'Grace Kim (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft'}
+];
+function syncCohortSizes(){ COHORTS.forEach(c => { c.size = CANDS.filter(x => x.cohort === c.name).length; }); }
+syncCohortSizes();
+const COHORT_BY_ID={}; COHORTS.forEach(c => COHORT_BY_ID[c.id]=c);
+const COURSES=[
+ {id:'co1', name:'Explorer 1', track:'Explorer', price:100, days:90, status:'live'},
+ {id:'co2', name:'Builder 1', track:'Builder', price:180, days:90, status:'live'},
+ {id:'co3', name:'Trailblazer 1', track:'Trailblazer', price:260, days:90, status:'draft'},
+ {id:'co4', name:'Explorer 2', track:'Explorer', price:120, days:90, status:'live'},
+ {id:'co5', name:'Builder 2', track:'Builder', price:200, days:90, status:'live'},
+ {id:'co6', name:'Communication Essentials', track:'Explorer', price:90, days:90, status:'live'},
+ {id:'co7', name:'Team Leadership', track:'Builder', price:210, days:90, status:'live'},
+ {id:'co8', name:'Trailblazer 2', track:'Trailblazer', price:280, days:90, status:'draft'}
+];
+const COURSE_BY_ID={}; COURSES.forEach(c => COURSE_BY_ID[c.id]=c);
+const COURSE_LIB=[
+ {id:'lc1', name:'Leadership Foundations', track:'Explorer', price:90},
+ {id:'lc2', name:'Communication & Influence', track:'Explorer', price:110},
+ {id:'lc3', name:'Team Dynamics', track:'Builder', price:170},
+ {id:'lc4', name:'Coaching for Performance', track:'Builder', price:190},
+ {id:'lc5', name:'Strategic Thinking', track:'Trailblazer', price:240},
+ {id:'lc6', name:'Change Leadership', track:'Trailblazer', price:270},
+ {id:'lc7', name:'Decision-Making Under Uncertainty', track:'Builder', price:180},
+ {id:'lc8', name:'Executive Presence', track:'Trailblazer', price:250}
+];
+const CO_TEMPLATES=[
+ {id:'tpl1', name:'Explorer Foundations', track:'Explorer', level:'E1', courseId:'co1', status:'published', used:2,
+  sessions:[
+   {id:'ts11', title:'Kickoff & cohort norms', week:1, dur:60, mode:'Live'},
+   {id:'ts12', title:'Discovering your TALENT profile', week:2, dur:90, mode:'Live'},
+   {id:'ts13', title:'Workshop — first project brief', week:4, dur:90, mode:'Live'},
+   {id:'ts14', title:'Mid-cycle levelling check-in', week:7, dur:60, mode:'Live'},
+   {id:'ts15', title:'Demo day & retrospective', week:12, dur:120, mode:'Live'}
+  ]},
+ {id:'tpl2', name:'Explorer Advanced', track:'Explorer', level:'E3', courseId:'co1', status:'published', used:1,
+  sessions:[
+   {id:'ts21', title:'Advanced kickoff & stretch goals', week:1, dur:60, mode:'Live'},
+   {id:'ts22', title:'Deep-dive workshop I', week:3, dur:90, mode:'Live'},
+   {id:'ts23', title:'Deep-dive workshop II', week:6, dur:90, mode:'Live'},
+   {id:'ts24', title:'Portfolio review', week:9, dur:75, mode:'Live'},
+   {id:'ts25', title:'Demo day & levelling', week:12, dur:120, mode:'Live'}
+  ]},
+ {id:'tpl5', name:'Explorer Kickstart', track:'Explorer', level:'E2', courseId:'co1', status:'published', used:0,
+  sessions:[
+   {id:'ts51', title:'Fast-start orientation', week:1, dur:60, mode:'Live'},
+   {id:'ts52', title:'Skills sprint workshop', week:3, dur:90, mode:'Workshop'},
+   {id:'ts53', title:'Peer review & feedback', week:6, dur:60, mode:'Live'},
+   {id:'ts54', title:'Demo day & levelling', week:12, dur:120, mode:'Live'}
+  ]},
+ {id:'tpl4', name:'Trailblazer Mastery', track:'Trailblazer', level:'T1', courseId:'co3', status:'draft', used:0,
+  sessions:[
+   {id:'ts41', title:'Mastery kickoff', week:1, dur:75, mode:'Live'},
+   {id:'ts42', title:'Programme design workshop', week:4, dur:120, mode:'Workshop'},
+   {id:'ts43', title:'Capstone & demo day', week:12, dur:120, mode:'Live'}
+  ]},
+ {id:'tpl6', name:'Trailblazer Leadership', track:'Trailblazer', level:'T2', courseId:'co3', status:'published', used:0,
+  sessions:[
+   {id:'ts61', title:'Leadership kickoff', week:1, dur:75, mode:'Live'},
+   {id:'ts62', title:'Mentoring & coaching clinic', week:4, dur:90, mode:'Live'},
+   {id:'ts63', title:'Programme leadership sprint', week:8, dur:120, mode:'Workshop'},
+   {id:'ts64', title:'Capstone & demo day', week:12, dur:120, mode:'Live'}
+  ]}
+];
+const TPL_BY_ID={}; CO_TEMPLATES.forEach(t => TPL_BY_ID[t.id]=t);
+const LEADER_REQS=[
+ {id:'lr1', name:'Bruno Sella', bucket:'Builder', level:'B3', track:'Explorer', led:2, rating:4.8, when:'2 days ago', pitch:'Led Explorer 9 to a 92% completion rate — I want to take another Explorer cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-08', time:'11:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Structured, calm answers on delegation and recovery. Ready to lead.'}},
+ {id:'lr2', name:'Dana Whitfield', bucket:'Trailblazer', level:'T3', track:'Builder', led:2, rating:4.9, when:'3 days ago', pitch:'Two Builder cohorts led already — happy to take another Builder group.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-07', time:'10:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Two cohorts led already; clear and steady. Recommend.'}},
+ {id:'lr3', name:'Marcus Reyes', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.7, when:'4 days ago', pitch:'Strong on group dynamics; ready to mentor an Explorer cohort.', stage:'feedback', interview:{agent:'Marcus Ozoro', date:'2026-08-06', time:'14:00'}, feedback:{rec:'recommend', agent:'Marcus Ozoro', note:'Handles group dynamics well; a strong pick.'}},
+ {id:'lr4', name:'Elena Fischer', bucket:'Trailblazer', level:'T2', track:'Builder', led:1, rating:4.6, when:'5 days ago', pitch:'Calm and structured — I want to lead a Builder cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-05', time:'09:30'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Calm, structured and good with feedback.'}},
+ {id:'lr5', name:'Omar Haddad', bucket:'Builder', level:'B3', track:'Explorer', led:0, when:'6 days ago', pitch:'First-time leader, but confident I can carry an Explorer cohort.', stage:'feedback', interview:{agent:'Marcus Ozoro', date:'2026-08-09', time:'15:30'}, feedback:{rec:'recommend', agent:'Marcus Ozoro', note:'First-time leader but interviewed exceptionally well.'}},
+ {id:'lr6', name:'Priya Nair', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.5, when:'1 week ago', pitch:'Consistent and dependable — happy to take any Explorer group.', stage:'feedback', interview:{agent:'Dana Whitfield', date:'2026-08-04', time:'13:00'}, feedback:{rec:'recommend', agent:'Dana Whitfield', note:'Consistent and dependable; recommend.'}},
+ {id:'lr7', name:'Tomas Vidal', bucket:'Trailblazer', level:'T3', track:'Builder', led:3, rating:4.9, when:'1 week ago', pitch:'Veteran leader — ready for another Builder cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-03', time:'11:30'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Veteran leader; excellent throughout.'}},
+ {id:'lr8', name:'Grace Kim', bucket:'Builder', level:'B2', track:'Explorer', led:0, when:'4 days ago', pitch:'Finished Explorer top of my cohort. Ready to lead and mentor the next group.', stage:'scheduled', interview:{agent:'Marcus Ozoro', date:'2026-08-15', time:'14:30'}, feedback:null},
+ {id:'lr9', name:'Diego Alvarez', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'1 week ago', pitch:'Strong on delegation and feedback — keen to lead my first Explorer cohort.', stage:'scheduled', interview:{agent:'Priya Raman', date:'2026-08-16', time:'10:00'}, feedback:null},
+ {id:'lr10', name:'Hana Sato', bucket:'Trailblazer', level:'T2', track:'Builder', led:1, rating:4.4, when:'3 days ago', pitch:'Led one Builder cohort; ready for another.', stage:'scheduled', interview:{agent:'Marcus Ozoro', date:'2026-08-15', time:'16:00'}, feedback:null},
+ {id:'lr11', name:'Leo Martins', bucket:'Builder', level:'B2', track:'Explorer', led:0, when:'5 days ago', pitch:'Calm under pressure, keen to mentor an Explorer group.', stage:'scheduled', interview:{agent:'Dana Whitfield', date:'2026-08-17', time:'09:00'}, feedback:null},
+ {id:'lr12', name:'Aisha Bello', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'6 days ago', pitch:'Want to give back by leading my first Explorer cohort.', stage:'scheduled', interview:{agent:'Priya Raman', date:'2026-08-18', time:'13:30'}, feedback:null},
+ {id:'lr13', name:'Kofi Mensah', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'1 week ago', pitch:'Reliable and steady — ready to lead.', stage:'scheduled', interview:{agent:'Marcus Ozoro', date:'2026-08-18', time:'11:00'}, feedback:null},
+ {id:'lr14', name:'Yuki Tanaka', bucket:'Trailblazer', level:'T1', track:'Builder', led:0, when:'5 days ago', pitch:'Recently reached Trailblazer and want to start leading Builder cohorts.', stage:'scheduled', interview:{agent:'Priya Raman', date:'2026-08-19', time:'15:00'}, feedback:null},
+ {id:'lr15', name:'Zara Ahmed', bucket:'Builder', level:'B2', track:'Explorer', led:0, when:'1 week ago', pitch:'Consistent weekly rhythm and calm under pressure. Happy to take any Explorer group.', stage:'applied', interview:null, feedback:null},
+ {id:'lr16', name:'Sofia Marin', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'3 days ago', pitch:'Keen to mentor first-timers through their 90 days.', stage:'applied', interview:null, feedback:null},
+ {id:'lr17', name:'Ethan Cole', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.3, when:'2 days ago', pitch:'Led one cohort already; ready for another Explorer group.', stage:'applied', interview:null, feedback:null},
+ {id:'lr18', name:'Lucia Moretti', bucket:'Builder', level:'B2', track:'Explorer', led:0, when:'4 days ago', pitch:'Strong on decisive calls — I want to lead an Explorer cohort.', stage:'applied', interview:null, feedback:null},
+ {id:'lr19', name:'Noah Bright', bucket:'Builder', level:'B1', track:'Explorer', led:0, when:'5 days ago', pitch:'Enthusiastic first-time leader, ready to put the work in.', stage:'applied', interview:null, feedback:null},
+ {id:'lr20', name:'Zoe Park', bucket:'Trailblazer', level:'T1', track:'Builder', led:0, when:'6 days ago', pitch:'Recently a Trailblazer — ready to lead a Builder cohort.', stage:'applied', interview:null, feedback:null},
+ {id:'lr21', name:'Sam Whitfield', bucket:'Builder', level:'B2', track:'Explorer', led:1, rating:4.5, when:'1 week ago', pitch:'Led Explorer 7 last cycle; happy to take another.', stage:'applied', interview:null, feedback:null}
+];
+const LR_BY_ID={}; LEADER_REQS.forEach(r => LR_BY_ID[r.id]=r);
+const BOOKINGS=[
+ {id:'bk1', cand:'Maryam Naz', agent:'Dana Whitfield', slot:'Thu 14:00', date:'2026-08-13', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active'},
+ {id:'bk2', cand:'Jordan Vale', agent:'Priya Raman', slot:'Wed 16:00', date:'2026-08-12', fee:225, escrow:'held', paid:true, kind:'Interview', status:'active'},
+ {id:'bk3', cand:'Chris Boone', agent:'Marcus Ozoro', slot:'Fri 09:00', date:'2026-08-14', fee:0, escrow:'n/a', paid:false, kind:'First (discounted)', status:'pending'},
+ {id:'bk4', cand:'Ava Stone', agent:'Dana Whitfield', slot:'Mon 10:00', date:'2026-08-10', fee:180, escrow:'held', paid:true, kind:'Interview', status:'active'},
+ {id:'bk5', cand:'Liam Fletcher', agent:'Priya Raman', slot:'Mon 13:30', date:'2026-08-10', fee:200, escrow:'held', paid:true, kind:'Interview', status:'active'},
+ {id:'bk6', cand:'Noah Kim', agent:'Marcus Ozoro', slot:'Tue 11:00', date:'2026-08-11', fee:0, escrow:'n/a', paid:false, kind:'First (discounted)', status:'pending'},
+ {id:'bk7', cand:'Sofia Marin', agent:'Dana Whitfield', slot:'Tue 15:00', date:'2026-08-11', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active'},
+ {id:'bk8', cand:'Ethan Cole', agent:'Marcus Ozoro', slot:'Wed 09:30', date:'2026-08-12', fee:210, escrow:'n/a', paid:false, kind:'Interview', status:'pending'},
+ {id:'bk9', cand:'Maya Patel', agent:'Priya Raman', slot:'Wed 14:00', date:'2026-08-12', fee:225, escrow:'held', paid:true, kind:'Interview', status:'active'},
+ {id:'bk10', cand:'Lucas Ferreira', agent:'Marcus Ozoro', slot:'Thu 10:30', date:'2026-08-13', fee:0, escrow:'n/a', paid:false, kind:'First (discounted)', status:'pending'},
+ {id:'bk11', cand:'Emma Novak', agent:'Dana Whitfield', slot:'Thu 16:30', date:'2026-08-13', fee:180, escrow:'held', paid:true, kind:'Re-interview', status:'active'},
+ {id:'bk12', cand:'Oliver Grant', agent:'Dana Whitfield', slot:'Fri 11:30', date:'2026-08-14', fee:195, escrow:'held', paid:true, kind:'Interview', status:'active'},
+ {id:'bk13', cand:'Isla Bennett', agent:'Priya Raman', slot:'Fri 15:30', date:'2026-08-14', fee:225, escrow:'n/a', paid:false, kind:'Interview', status:'pending'}
+];
+const TXNS=[
+ {id:'t1',  ref:'TXN-8841', when:'Today 09:12', date:'2026-08-12', who:'Maryam Naz',     party:'Candidate', kind:'Course — Explorer 1',            cat:'course',    amt:100, dir:'in',  method:'Visa •4242',       fee:3.20, rail:'Stripe → In progress', status:'settled'},
+ {id:'t2',  ref:'TXN-8840', when:'Today 08:40', date:'2026-08-12', who:'Jordan Vale',     party:'Candidate', kind:'Interview — Priya Raman',        cat:'interview', amt:225, dir:'in',  method:'Visa •1180',       fee:6.83, rail:'Stripe → In progress', status:'held'},
+ {id:'t3',  ref:'TXN-8839', when:'Today 08:05', date:'2026-08-12', who:'BrightPath',      party:'Employer',  kind:'Interview unlock — E. Novak',    cat:'unlock',    amt:40,  dir:'in',  method:'Visa •9002',       fee:1.46, rail:'Stripe → In progress', status:'held'},
+ {id:'t4',  ref:'TXN-8836', when:'Yest 18:03',  date:'2026-08-11', who:'Ava Thompson',    party:'Candidate', kind:'Course — Explorer 1',            cat:'course',    amt:100, dir:'in',  method:'Mastercard •5100', fee:3.20, rail:'Stripe → In progress', status:'held'},
+ {id:'t5',  ref:'TXN-8834', when:'Yest 15:22',  date:'2026-08-11', who:'Emma Novak',      party:'Candidate', kind:'Re-interview — Dana Whitfield',  cat:'interview', amt:180, dir:'in',  method:'Amex •3007',       fee:5.52, rail:'Stripe → In progress', status:'held'},
+ {id:'t6',  ref:'TXN-8830', when:'Yest 12:03',  date:'2026-08-11', who:'Dana Whitfield',  party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:144, dir:'out', method:'Bank ••6789',      fee:0,    rail:'In progress → Bank',   status:'settled'},
+ {id:'t7',  ref:'TXN-8827', when:'Yest 10:41',  date:'2026-08-11', who:'Meridian Labs',   party:'Employer',  kind:'Interview unlock ×3',            cat:'unlock',    amt:120, dir:'in',  method:'Visa •7781',       fee:3.78, rail:'Stripe → In progress', status:'settled'},
+ {id:'t8',  ref:'TXN-8822', when:'10 Aug',      date:'2026-08-10', who:'Oliver Grant',    party:'Candidate', kind:'Interview — Dana Whitfield',    cat:'interview', amt:195, dir:'in',  method:'Visa •4242',       fee:5.96, rail:'Stripe → In progress', status:'held'},
+ {id:'t9',  ref:'TXN-8818', when:'10 Aug',      date:'2026-08-10', who:'Marcus Ozoro',    party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:120, dir:'out', method:'Bank ••2231',      fee:0,    rail:'In progress → Bank',   status:'settled'},
+ {id:'t10', ref:'TXN-8814', when:'9 Aug',       date:'2026-08-09', who:'Sophia Ali',      party:'Candidate', kind:'Interview — Marcus Ozoro',      cat:'interview', amt:150, dir:'in',  method:'Mastercard •6621', fee:4.65, rail:'Stripe → In progress', status:'settled'},
+ {id:'t11', ref:'TXN-8809', when:'9 Aug',       date:'2026-08-09', who:'NovaHealth',      party:'Employer',  kind:'Interview unlock — S. Ali',      cat:'unlock',    amt:40,  dir:'in',  method:'ACH ••4410',       fee:0.40, rail:'Stripe → In progress', status:'settled'},
+ {id:'t12', ref:'TXN-8802', when:'8 Aug',       date:'2026-08-08', who:'Priya Raman',     party:'Talent agent', kind:'Agent payout',         cat:'payout',    amt:180, dir:'out', method:'Bank ••5540',      fee:0,    rail:'In progress → Bank',   status:'held'},
+ {id:'t13', ref:'TXN-8797', when:'8 Aug',       date:'2026-08-08', who:'Liam Chen',       party:'Candidate', kind:'Course — Explorer 1',            cat:'course',    amt:100, dir:'in',  method:'Visa •8823',       fee:3.20, rail:'Stripe → In progress', status:'settled'},
+ {id:'t14', ref:'TXN-8790', when:'7 Aug',       date:'2026-08-07', who:'Ava Thompson',    party:'Candidate', kind:'Course refund (partial)',        cat:'refund',    amt:50,  dir:'out', method:'Visa •5100',       fee:0,    rail:'Stripe → Card',        status:'refunded'},
+ {id:'t15', ref:'TXN-8781', when:'6 Aug',       date:'2026-08-06', who:'Meridian Labs',   party:'Employer',  kind:'Placement fee — R. Osei',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'},
+ {id:'t16', ref:'TXN-8779', when:'6 Aug',       date:'2026-08-06', who:'BrightPath',      party:'Employer',  kind:'Placement fee — J. Vale',        cat:'placement', amt:0,   dir:'in',  method:'—',                fee:0,    rail:'—',                    status:'blocked'}
+];
+const PAYOUTS=[
+ {id:'p1', ref:'PO-2201', agent:'Dana Whitfield', period:'Aug 4–10', interviews:1, gross:180, split:'20/80', net:144, method:'Bank ••6789', when:'Released', date:'2026-08-11', status:'settled'},
+ {id:'p2', ref:'PO-2202', agent:'Priya Raman',    period:'Aug 4–10', interviews:1, gross:225, split:'20/80', net:180, method:'Bank ••5540', when:'Awaiting settlement', date:'2026-08-14', status:'held'},
+ {id:'p3', ref:'PO-2203', agent:'Marcus Ozoro',   period:'Aug 4–10', interviews:1, gross:150, split:'20/80', net:120, method:'Bank ••2231', when:'Released', date:'2026-08-10', status:'settled'},
+ {id:'p4', ref:'PO-2204', agent:'Dana Whitfield', period:'Aug 11–17', interviews:1, gross:195, split:'20/80', net:156, method:'Bank ••6789', when:'Scheduled Aug 18', date:'2026-08-18', status:'held'},
+ {id:'p5', ref:'PO-2205', agent:'Sofia Reyes',    period:'Aug 11–17', interviews:2, gross:330, split:'20/80', net:264, method:'Bank ••7712', when:'Awaiting settlement', date:'2026-08-18', status:'held'},
+ {id:'p6', ref:'PO-2206', agent:'Marcus Ozoro',   period:'Aug 11–17', interviews:1, gross:0,   split:'—',     net:0,   method:'—',           when:'First-interview discount', date:'—', status:'review'},
+ {id:'p7', ref:'PO-2207', agent:'Liam Foster',    period:'Aug 4–10', interviews:1, gross:165, split:'20/80', net:132, method:'Bank ••3390', when:'Released', date:'2026-08-11', status:'settled'},
+ {id:'p8', ref:'PO-2208', agent:'Priya Raman',    period:'Aug 11–17', interviews:1, gross:180, split:'20/80', net:144, method:'Bank ••5540', when:'On hold — under dispute', date:'—', status:'review'}
+];
+const FEES=[
+ {k:'course',    t:'Course fee',           v:'$100',      unit:'per cycle',   note:'Explorer 1, upfront for the 90-day cycle',         state:'set',  effective:'2026-06-01', by:'Umair'},
+ {k:'platform',  t:'Platform fee',         v:'$10/mo',    unit:'per month',   note:'Bundled into the course fee',                      state:'set',  effective:'2026-06-01', by:'Umair'},
+ {k:'unlock',    t:'Interview unlock',     v:'$40',       unit:'per unlock',  note:'Per interview, beyond the free highlight clip',    state:'set',  effective:'2026-06-01', by:'Umair'},
+ {k:'reinterview',t:'Re-interview fee',    v:'Agent-set', unit:'per booking', note:'Agent names their own rate for a repeat interview',  state:'set',  effective:'2026-06-01', by:'Umair'},
+ {k:'placement', t:'Placement fee',        v:'Not set',   unit:'per hire',    note:'Charged when an employer confirms a hire',         state:'open', effective:'—',          by:'—'},
+ {k:'split',     t:'Platform fee share',   v:'20%',       unit:'per interview', note:'The platform’s share of each interview payment; the balance is the agent’s payout', state:'set', effective:'2026-07-30', by:'Reed'},
+ {k:'refundwin', t:'Refund window',        v:'14 days',   unit:'from purchase', note:'Course fee refundable before cohort start',      state:'set',  effective:'2026-06-01', by:'Umair'}
+];
+const FEE_HISTORY=[
+ {when:'30 Jul', who:'Reed Castellano', what:'Set platform fee share', detail:'20% of each interview payment'},
+ {when:'27 Jul', who:'Umair Khan',      what:'Proposed listing fee',    detail:'$100/mo flat — later replaced by a percentage fee'},
+ {when:'1 Jun',  who:'Umair Khan',      what:'Set course fee',          detail:'$100 upfront per 90-day cycle'},
+ {when:'1 Jun',  who:'Umair Khan',      what:'Set interview unlock',    detail:'$40 per full-interview unlock'}
+];
+const INVOICES=[
+ {id:'iv1', num:'INV-2026-0142', party:'Meridian Labs', partyType:'Employer',  type:'Interview unlocks', qty:3, amount:120, issued:'2026-08-11', due:'2026-08-25', status:'sent',    method:'Invoice / ACH'},
+ {id:'iv2', num:'INV-2026-0141', party:'BrightPath',    partyType:'Employer',  type:'Interview unlocks', qty:1, amount:40,  issued:'2026-08-05', due:'2026-08-19', status:'paid',    method:'Visa •9002'},
+ {id:'iv3', num:'INV-2026-0138', party:'NovaHealth',    partyType:'Employer',  type:'Interview unlocks', qty:1, amount:40,  issued:'2026-07-28', due:'2026-08-11', status:'paid',    method:'ACH ••4410'},
+ {id:'iv4', num:'INV-2026-0133', party:'Apex Robotics', partyType:'Employer',  type:'Interview unlocks', qty:5, amount:200, issued:'2026-07-10', due:'2026-07-24', status:'overdue', method:'Invoice / ACH'},
+ {id:'iv5', num:'INV-2026-0130', party:'Meridian Labs', partyType:'Employer',  type:'Placement fee',     qty:1, amount:0,   issued:'2026-08-06', due:'—',          status:'draft',   method:'—'},
+ {id:'iv6', num:'INV-2026-0128', party:'Maryam Naz',    partyType:'Candidate', type:'Course — Explorer 1', qty:1, amount:100, issued:'2026-08-12', due:'2026-08-12', status:'paid',  method:'Visa •4242'},
+ {id:'iv7', num:'INV-2026-0125', party:'Apex Robotics', partyType:'Employer',  type:'Interview unlocks', qty:2, amount:80,  issued:'2026-06-30', due:'2026-07-14', status:'overdue', method:'Invoice / ACH'},
+ {id:'iv8', num:'INV-2026-0121', party:'BrightPath',    partyType:'Employer',  type:'Placement fee',     qty:1, amount:0,   issued:'2026-08-06', due:'—',          status:'draft',   method:'—'}
+];
+const REFUNDS=[
+ {id:'rf1', party:'Ava Thompson', partyType:'Candidate', txnRef:'TXN-8790', type:'Refund',     amount:50,  reason:'Withdrew before cohort start — partial per 14-day window', status:'approved',   when:'7 Aug',  date:'2026-08-07'},
+ {id:'rf2', party:'Kai Andersen', partyType:'Candidate', txnRef:'TXN-8654', type:'Refund',     amount:100, reason:'Duplicate course charge',                                  status:'requested',  when:'Today',  date:'2026-08-12'},
+ {id:'rf3', party:'Apex Robotics',partyType:'Employer',  txnRef:'TXN-8501', type:'Dispute',    amount:40,  reason:'Chargeback — “unrecognised charge” on unlock',             status:'processing', when:'Yest',   date:'2026-08-11'},
+ {id:'rf4', party:'DeltaWorks',   partyType:'Employer',  txnRef:'TXN-8388', type:'Chargeback', amount:40,  reason:'Card issuer chargeback — unlock disputed',                 status:'won',        when:'2 Aug',  date:'2026-08-02'},
+ {id:'rf5', party:'Noor Adib',    partyType:'Candidate', txnRef:'TXN-8299', type:'Refund',     amount:100, reason:'Requested outside the 14-day window',                      status:'declined',   when:'28 Jul', date:'2026-07-28'},
+ {id:'rf6', party:'OrbitalHR',    partyType:'Employer',  txnRef:'TXN-8102', type:'Chargeback', amount:40,  reason:'Card issuer chargeback — no evidence supplied in time',    status:'lost',       when:'18 Jul', date:'2026-07-18'}
+];
+const FIN_BALANCE={available:1284, inTransit:588, reserved:1140, pendingIn:405};
+const SETTLEMENTS=[
+ {id:'st1', ref:'po_1Qk8', when:'11 Aug', date:'2026-08-11', gross:340, fees:10.31, net:329.69, count:4, method:'Bank ••1120', status:'reconciled'},
+ {id:'st2', ref:'po_1Qj4', when:'8 Aug',  date:'2026-08-08', gross:260, fees:7.85,  net:252.15, count:3, method:'Bank ••1120', status:'reconciled'},
+ {id:'st3', ref:'po_1Qh9', when:'6 Aug',  date:'2026-08-06', gross:190, fees:5.91,  net:184.09, count:2, method:'Bank ••1120', status:'pending'},
+ {id:'st4', ref:'po_1Qg2', when:'4 Aug',  date:'2026-08-04', gross:225, fees:6.98,  net:218.02, count:3, method:'Bank ••1120', status:'unmatched'}
+];
+const LEAD_STAGES=['Landing','Quiz started','Quiz done','Result revealed','Contact captured','Converted'];
+const leadStageIx = s => { const i = LEAD_STAGES.indexOf(s); return i < 0 ? 0 : i; };
+const LEADS=[
+ {id:'ld1', name:'Alex Rivera', email:'alex.rivera@gmail.com', region:'Austin, US', source:'NIL campaign', campaign:'Summer-Leadership', agent:'Dana Whitfield', bucket:'Explorer', level:'E2', stage:'Contact captured', score:78, device:'Mobile', touches:4, created:'2026-08-11', when:'1h ago', last:'1h ago', path:['Social','NIL campaign','Talent-agent link','NIL campaign'], accountId:null},
+ {id:'ld2', name:'Kim Park', email:'kim.park@outlook.com', region:'Seoul, KR', source:'QR code', campaign:'Campus-Q2', agent:'—', bucket:'Builder', level:'B1', stage:'Result revealed', score:71, device:'Mobile', touches:2, created:'2026-08-12', when:'3h ago', last:'3h ago', path:['QR code','QR code'], accountId:null},
+ {id:'ld3', name:'Sam Doyle', email:'—', region:'Dublin, IE', source:'Referral', campaign:'Referral-Program', agent:'Marcus Ozoro', bucket:'—', level:'—', stage:'Landing', score:null, device:'Desktop', touches:1, created:'2026-08-11', when:'1d ago', last:'1d ago', path:['Referral'], accountId:null},
+ {id:'ld4', name:'Noor Adib', email:'noor.adib@gmail.com', region:'Amman, JO', source:'Talent-agent link', campaign:'—', agent:'Priya Raman', bucket:'Explorer', level:'E1', stage:'Contact captured', score:69, device:'Mobile', touches:3, created:'2026-08-10', when:'2d ago', last:'6h ago', path:['Talent-agent link','Talent-agent link','Talent-agent link'], accountId:null},
+ {id:'ld5', name:'Diego Herrera', email:'diego.h@proton.me', region:'Bogotá, CO', source:'NIL campaign', campaign:'Summer-Leadership', agent:'—', bucket:'Explorer', level:'E1', stage:'Converted', score:82, device:'Mobile', touches:5, created:'2026-08-06', when:'6d ago', last:'2d ago', path:['NIL campaign','Social','NIL campaign','Talent-agent link','NIL campaign'], accountId:'u4'},
+ {id:'ld6', name:'Wei Chen', email:'wei.chen@gmail.com', region:'Singapore, SG', source:'NIL campaign', campaign:'NIL-Launch', agent:'—', bucket:'Trailblazer', level:'T1', stage:'Quiz done', score:88, device:'Desktop', touches:2, created:'2026-08-12', when:'5h ago', last:'5h ago', path:['Social','NIL campaign'], accountId:null},
+ {id:'ld7', name:'Fatima Zahra', email:'fatima.z@gmail.com', region:'Casablanca, MA', source:'University', campaign:'Open-Day-Tour', agent:'—', bucket:'Explorer', level:'E2', stage:'Result revealed', score:74, device:'Tablet', touches:2, created:'2026-08-09', when:'3d ago', last:'3d ago', path:['University','University'], accountId:null},
+ {id:'ld8', name:'Jonah Blake', email:'jonah.blake@gmail.com', region:'Manchester, UK', source:'Talent-agent link', campaign:'—', agent:'Dana Whitfield', bucket:'Builder', level:'B1', stage:'Converted', score:80, device:'Mobile', touches:4, created:'2026-08-04', when:'8d ago', last:'1d ago', path:['Talent-agent link','NIL campaign','Talent-agent link','Talent-agent link'], accountId:'u5'},
+ {id:'ld9', name:'Priyanka Shah', email:'priyanka.shah@gmail.com', region:'Mumbai, IN', source:'QR code', campaign:'Campus-Q2', agent:'—', bucket:'Explorer', level:'E1', stage:'Quiz started', score:null, device:'Mobile', touches:1, created:'2026-08-12', when:'2h ago', last:'2h ago', path:['QR code'], accountId:null},
+ {id:'ld10', name:'Tom Fischer', email:'—', region:'Berlin, DE', source:'Social', campaign:'NIL-Launch', agent:'—', bucket:'—', level:'—', stage:'Landing', score:null, device:'Desktop', touches:1, created:'2026-08-12', when:'4h ago', last:'4h ago', path:['Social'], accountId:null},
+ {id:'ld11', name:'Grace Okonkwo', email:'grace.ok@gmail.com', region:'Lagos, NG', source:'NIL campaign', campaign:'Summer-Leadership', agent:'Marcus Ozoro', bucket:'Explorer', level:'E2', stage:'Contact captured', score:76, device:'Mobile', touches:3, created:'2026-08-08', when:'4d ago', last:'1d ago', path:['NIL campaign','Talent-agent link','NIL campaign'], accountId:null},
+ {id:'ld12', name:'Luca Bianchi', email:'luca.bianchi@gmail.com', region:'Milan, IT', source:'NIL campaign', campaign:'Summer-Leadership', agent:'—', bucket:'Builder', level:'B2', stage:'Converted', score:85, device:'Desktop', touches:6, created:'2026-08-02', when:'10d ago', last:'3d ago', path:['NIL campaign','Social','NIL campaign','University','NIL campaign','NIL campaign'], accountId:'u19'},
+ {id:'ld13', name:'Sara Nilsson', email:'sara.n@gmail.com', region:'Stockholm, SE', source:'Referral', campaign:'Referral-Program', agent:'Priya Raman', bucket:'Explorer', level:'E1', stage:'Result revealed', score:72, device:'Mobile', touches:2, created:'2026-08-10', when:'2d ago', last:'2d ago', path:['Referral','Referral'], accountId:null},
+ {id:'ld14', name:'Omar Farouk', email:'omar.farouk@gmail.com', region:'Cairo, EG', source:'QR code', campaign:'Campus-Q2', agent:'—', bucket:'Explorer', level:'E1', stage:'Quiz done', score:67, device:'Mobile', touches:2, created:'2026-08-11', when:'1d ago', last:'1d ago', path:['QR code','QR code'], accountId:null},
+ {id:'ld15', name:'Emily Carter', email:'emily.carter@gmail.com', region:'Toronto, CA', source:'NIL campaign', campaign:'NIL-Launch', agent:'—', bucket:'Trailblazer', level:'T1', stage:'Contact captured', score:90, device:'Desktop', touches:4, created:'2026-08-07', when:'5d ago', last:'8h ago', path:['Social','NIL campaign','NIL campaign','NIL campaign'], accountId:null},
+ {id:'ld16', name:'Kwame Mensah', email:'—', region:'Accra, GH', source:'Social', campaign:'NIL-Launch', agent:'—', bucket:'Explorer', level:'E1', stage:'Quiz started', score:null, device:'Mobile', touches:1, created:'2026-08-12', when:'6h ago', last:'6h ago', path:['Social'], accountId:null},
+ {id:'ld17', name:'Hannah Weiss', email:'hannah.weiss@gmail.com', region:'Vienna, AT', source:'Talent-agent link', campaign:'—', agent:'Dana Whitfield', bucket:'Builder', level:'B1', stage:'Result revealed', score:79, device:'Desktop', touches:3, created:'2026-08-09', when:'3d ago', last:'2d ago', path:['Talent-agent link','NIL campaign','Talent-agent link'], accountId:null},
+ {id:'ld18', name:'Rahul Mehta', email:'rahul.mehta@gmail.com', region:'Bengaluru, IN', source:'NIL campaign', campaign:'Summer-Leadership', agent:'—', bucket:'Explorer', level:'E2', stage:'Lost', score:64, device:'Mobile', touches:2, created:'2026-07-28', when:'15d ago', last:'12d ago', path:['NIL campaign','NIL campaign'], accountId:null},
+ {id:'ld19', name:'Sofia Ramos', email:'sofia.ramos@gmail.com', region:'Lisbon, PT', source:'University', campaign:'Open-Day-Tour', agent:'—', bucket:'Explorer', level:'E1', stage:'Quiz done', score:70, device:'Tablet', touches:1, created:'2026-08-11', when:'1d ago', last:'1d ago', path:['University'], accountId:null},
+ {id:'ld20', name:'Nathan Brooks', email:'nathan.brooks@gmail.com', region:'Sydney, AU', source:'Referral', campaign:'Referral-Program', agent:'Marcus Ozoro', bucket:'Builder', level:'B1', stage:'Converted', score:83, device:'Desktop', touches:4, created:'2026-08-03', when:'9d ago', last:'2d ago', path:['Referral','NIL campaign','Referral','Referral'], accountId:'u27'},
+ {id:'ld21', name:'Aya Suzuki', email:'aya.suzuki@gmail.com', region:'Tokyo, JP', source:'NIL campaign', campaign:'Summer-Leadership', agent:'—', bucket:'Explorer', level:'E1', stage:'Contact captured', score:75, device:'Mobile', touches:3, created:'2026-08-08', when:'4d ago', last:'1d ago', path:['NIL campaign','Social','NIL campaign'], accountId:null},
+ {id:'ld22', name:'Marco Silva', email:'—', region:'São Paulo, BR', source:'QR code', campaign:'Campus-Q2', agent:'—', bucket:'—', level:'—', stage:'Landing', score:null, device:'Mobile', touches:1, created:'2026-08-12', when:'1h ago', last:'1h ago', path:['QR code'], accountId:null},
+ {id:'ld23', name:'Ingrid Larsen', email:'ingrid.l@gmail.com', region:'Oslo, NO', source:'NIL campaign', campaign:'NIL-Launch', agent:'—', bucket:'Trailblazer', level:'T1', stage:'Quiz done', score:87, device:'Desktop', touches:2, created:'2026-08-10', when:'2d ago', last:'2d ago', path:['Social','NIL campaign'], accountId:null},
+ {id:'ld24', name:'Yusuf Demir', email:'yusuf.demir@gmail.com', region:'Istanbul, TR', source:'Talent-agent link', campaign:'—', agent:'Priya Raman', bucket:'Explorer', level:'E2', stage:'Lost', score:66, device:'Mobile', touches:2, created:'2026-07-30', when:'13d ago', last:'11d ago', path:['Talent-agent link','Talent-agent link'], accountId:null}
+];
+const LEAD_BY_ID={}; LEADS.forEach(l => LEAD_BY_ID[l.id]=l);
+const CAMPAIGNS=[
+ {id:'cmp1', name:'Summer-Leadership', channel:'NIL campaign', status:'active', start:'2026-06-01', end:'2026-08-31', budget:5000, spend:3200, leads:42, conv:14, owner:'Nadia Haddad'},
+ {id:'cmp2', name:'Campus-Q2', channel:'QR code', status:'active', start:'2026-05-15', end:'2026-08-15', budget:2500, spend:1800, leads:20, conv:6, owner:'Nadia Haddad'},
+ {id:'cmp3', name:'NIL-Launch', channel:'Social', status:'active', start:'2026-07-01', end:'2026-09-30', budget:3000, spend:2100, leads:18, conv:5, owner:'Sofia Marchetti'},
+ {id:'cmp4', name:'Referral-Program', channel:'Referral', status:'active', start:'2026-04-01', end:'2026-12-31', budget:1500, spend:900, leads:12, conv:5, owner:'Derek Sole'},
+ {id:'cmp5', name:'Open-Day-Tour', channel:'University', status:'ended', start:'2026-03-01', end:'2026-06-30', budget:1200, spend:1200, leads:8, conv:2, owner:'Sofia Marchetti'},
+ {id:'cmp6', name:'Autumn-Push', channel:'Social', status:'draft', start:'2026-09-01', end:'2026-11-30', budget:2000, spend:0, leads:0, conv:0, owner:'Nadia Haddad'}
+];
+const CMP_BY_ID={}; CAMPAIGNS.forEach(c => CMP_BY_ID[c.id]=c);
+const CHANNELS=[
+ {k:'NIL campaign', label:'NIL campaign', icon:'spark', arrivals:420, quizDone:300, converted:96, spend:3200, ft:104, lt:88, mt:96},
+ {k:'QR code', label:'QR code', icon:'node', arrivals:200, quizDone:150, converted:44, spend:1800, ft:40, lt:48, mt:44},
+ {k:'Referral', label:'Referral', icon:'link', arrivals:140, quizDone:110, converted:40, spend:900, ft:36, lt:44, mt:41},
+ {k:'Talent-agent link', label:'Talent-agent link', icon:'agent', arrivals:120, quizDone:96, converted:38, spend:0, ft:44, lt:34, mt:39},
+ {k:'Social', label:'Social', icon:'eye', arrivals:80, quizDone:52, converted:14, spend:2100, ft:22, lt:8, mt:14},
+ {k:'University', label:'University', icon:'store', arrivals:40, quizDone:30, converted:9, spend:1200, ft:6, lt:10, mt:8}
+];
+const REFERRERS=[
+ {agent:'Dana Whitfield', slug:'dana', clicks:210, leads:18, conv:7, rev:2800},
+ {agent:'Priya Raman', slug:'priya', clicks:140, leads:11, conv:5, rev:2000},
+ {agent:'Marcus Ozoro', slug:'marcus', clicks:96, leads:7, conv:3, rev:1200}
+];
+const CRM_VALUE=400;   /* avg first-year value per converted account */
+const DECISIONS=[
+ {t:'Agent compensation model is contradictory', d:'A flat <b>$100/mo listing fee</b> (27 Jul) and a <b>percentage payout share</b> (30 Jul) are both on record and neither was withdrawn.', area:'Finance', owner:'Umair', src:'Money flow · Agent flow #8', ic:'money', go:'finance/feeconfig', sev:'high'},
+ {t:'Placement fee has no basis, trigger or detection', d:'The single largest revenue line. % of salary / flat / tiered all floated; no enforcement to detect an off-platform hire.', area:'Finance', owner:'Umair', src:'Employer flow #8', ic:'alert', go:'employers/placements', sev:'high'},
+ {t:'Settlement mechanics are a deliberate black box', d:'Who gets paid what, and when, was explicitly parked on 30 Jul. Payment release timing still undefined.', area:'Finance', owner:'Reed', src:'Money flow', ic:'bank', go:'finance/payouts', sev:'high'},
+ {t:'Cohort-leader bootstrap paradox', d:'Builders lead Explorer cohorts, but nobody becomes a Builder without finishing an Explorer cohort. There is no one to lead the first ones.', area:'Cohorts', owner:'Derek', src:'Cohort-leader flow #1', ic:'route', go:'cohorts/assign', sev:'high'},
+ {t:'Contact enforcement is unspecified', d:'Contact must happen on-platform, but no enforcement exists. Leakage accepted as inevitable — no design followed.', area:'Employers', owner:'Umair', src:'Employer flow #6', ic:'link', go:'employers/placements', sev:'med'},
+ {t:'Safeguarding for 18–24 interviews undefined', d:'Agents conduct recorded 1:1 video interviews with 18–24 year-olds. Background checking is a safeguarding question, and no vetting bar is set.', area:'Vetting', owner:'—', src:'Agent flow, Stage 1', ic:'shield', go:'vetting/applications', sev:'high'},
+ {t:'Sponsoring-employer track is out of MVP scope', d:'Org hierarchy (parent/child/franchise), employer billing and defaulted-off visibility are structurally required later but explicitly deferred.', area:'Employers', owner:'Umair', src:'Employer flow, Stage 1', ic:'store', go:'employers/employers', sev:'med'},
+ {t:'Cohort-leader account & portal never designed', d:'No leader-specific account or portal was ever described — the same gap Derek raised for agent accounts, never extended to leaders.', area:'Users', owner:'Derek', src:'Cohort-leader flow #4', ic:'account', go:'users/roles', sev:'med'},
+ {t:'Auth method for account creation unspecified', d:'Password, magic link or social? No age gate defined. First point of real commitment in the candidate flow.', area:'System', owner:'Umair/Derek', src:'Candidate flow #7', ic:'lock', go:'system/overview', sev:'med'}
+];
+const AUDIT=[
+ {when:'Today 09:41', who:'Nadia Haddad', role:'Reviewer', obj:'Maryam Naz — E1 → E2', act:'Promoted candidate', mod:'Candidates', cat:'Level change', sev:'notice', ip:'10.2.14.7'},
+ {when:'Today 09:12', who:'System', role:'Automated', obj:'Course — Explorer 1 ($100)', act:'Payment settled', mod:'Finance', cat:'Payment', sev:'info', ip:'—'},
+ {when:'Today 08:55', who:'Sofia Marchetti', role:'Supervisor', obj:'Raul Mendez', act:'Approved agent', mod:'Vetting', cat:'Approval', sev:'notice', ip:'10.2.14.31'},
+ {when:'Today 08:20', who:'System', role:'Automated', obj:'Maryam Naz — full account export', act:'Data export requested', mod:'System', cat:'Data rights', sev:'high', ip:'—'},
+ {when:'Today 07:48', who:'Derek Sole', role:'Super Admin', obj:'SCENES to employers → on', act:'Changed feature flag', mod:'System', cat:'Configuration', sev:'high', ip:'10.2.14.2'},
+ {when:'Yest 18:22', who:'System', role:'Automated', obj:'BrightPath ($40)', act:'Interview unlock', mod:'Employers', cat:'Payment', sev:'info', ip:'—'},
+ {when:'Yest 16:10', who:'Derek Sole', role:'Super Admin', obj:'Marcus Ozoro — $160 released early', act:'Released payout', mod:'Finance', cat:'Payout', sev:'high', ip:'10.2.14.2'},
+ {when:'Yest 14:03', who:'Derek Sole', role:'Super Admin', obj:'Marcus Ozoro → T3', act:'Adjusted agent level', mod:'Talent Agents', cat:'Level change', sev:'high', ip:'10.2.14.2'},
+ {when:'Yest 12:39', who:'Priya Raman', role:'Admin', obj:'Learning platform', act:'Rotated API key', mod:'System', cat:'Security', sev:'high', ip:'10.2.14.19'},
+ {when:'Yest 11:20', who:'Nadia Haddad', role:'Reviewer', obj:'Maryam Naz → Explorer 14', act:'Assigned cohort leader', mod:'Cohorts', cat:'Assignment', sev:'notice', ip:'10.2.14.7'},
+ {when:'Yest 09:05', who:'System', role:'Automated', obj:'Raul Mendez — enhanced check', act:'Background check cleared', mod:'Vetting', cat:'Safeguarding', sev:'notice', ip:'—'},
+ {when:'10 Aug 17:44', who:'Sofia Marchetti', role:'Supervisor', obj:'Reviewer role — +AI raw score', act:'Edited role permissions', mod:'Users & Roles', cat:'Configuration', sev:'high', ip:'10.2.14.31'},
+ {when:'10 Aug 15:02', who:'System', role:'Automated', obj:'Course refund — 14-day window ($100)', act:'Refund approved', mod:'Finance', cat:'Refund', sev:'notice', ip:'—'},
+ {when:'10 Aug 10:31', who:'Derek Sole', role:'Super Admin', obj:'Employer account — policy breach', act:'Suspended account', mod:'Employers', cat:'Account', sev:'high', ip:'10.2.14.2'},
+ {when:'09 Aug 14:15', who:'Priya Raman', role:'Admin', obj:'Priya Raman — email corrected', act:'Corrected candidate data', mod:'System', cat:'Data rights', sev:'notice', ip:'10.2.14.19'},
+ {when:'09 Aug 09:50', who:'System', role:'Automated', obj:'Grace Mwangi — SCENES consent', act:'Consent withdrawn', mod:'System', cat:'Data rights', sev:'notice', ip:'—'}
+];
+const QUIZ=[
+ 'When a plan fails at the last minute, what’s your first move?',
+ 'You disagree with a decision your team has already committed to. What do you do?',
+ 'How do you respond when someone more junior outperforms you?',
+ 'A teammate is struggling and it’s affecting the group. How do you handle it?',
+ 'What do you do with feedback you think is wrong?',
+ 'How do you decide what to work on when everything feels urgent?',
+ 'When did you last change your mind about something important?',
+ 'How do you react when credit for your work goes to someone else?',
+ 'What’s your instinct when a project has no clear owner?',
+ 'How do you handle a deadline you know you’ll miss?',
+ 'What do you do when you don’t know the answer in front of others?',
+ 'How do you rebuild trust after letting someone down?'
+];
+/* --- system & audit datasets (tn-admin.html:6772–6836) --- */
+const SVC_HEALTH=[
+ {name:'Web app & portals', detail:'candidate · agent · employer · admin', state:'live', uptime:'99.98%', latency:'182ms'},
+ {name:'API gateway', detail:'REST · GraphQL', state:'live', uptime:'99.99%', latency:'46ms'},
+ {name:'Payments (Stripe)', detail:'charges · escrow · payouts', state:'live', uptime:'100%', latency:'—'},
+ {name:'Learning platform', detail:'courses · assessments', state:'live', uptime:'99.95%', latency:'210ms'},
+ {name:'Video & recording', detail:'1:1 interviews · SCENES', state:'degraded', uptime:'99.42%', latency:'—'},
+ {name:'AI assessment', detail:'quiz scoring · levelling', state:'live', uptime:'99.90%', latency:'1.2s'},
+ {name:'Email / CRM', detail:'transactional · attribution', state:'live', uptime:'99.97%', latency:'—'},
+ {name:'Database & storage', detail:'primary + read replica', state:'live', uptime:'100%', latency:'12ms'}
+];
+const FEATURE_FLAGS=[
+ {k:'Sponsoring-employer track', d:'Parent / child org hierarchy & employer billing', on:false, scope:'Deferred — post-MVP'},
+ {k:'SCENES to employers', d:'Share interview highlight reels with unlockers', on:true, scope:'All employers'},
+ {k:'Placement billing', d:'Auto-invoice the placement fee on a confirmed hire', on:false, scope:'Blocked — fee undefined'},
+ {k:'AI raw-score visibility', d:'Reviewers can see the underlying AI score', on:true, scope:'Reviewers only'},
+ {k:'Weekly payout auto-release', d:'Release held agent payouts on the Mon–Sun cycle', on:true, scope:'Agents'},
+ {k:'Off-platform contact detection', d:'Flag contact details exchanged in interviews', on:false, scope:'Not designed'}
+];
+const AUTH_CFG=[
+ ['Sign-in method','Email + password'],
+ ['Single sign-on','NIL parent (guardian-linked under 18)'],
+ ['Age gate','18+ to create an account'],
+ ['Session length','30 days · refresh on activity'],
+ ['Two-factor','Required for internal staff'],
+ ['Password policy','12+ chars · breach-checked']
+];
+const INTEGRATIONS=[
+ {id:'stripe', name:'Stripe', cat:'Payments', detail:'Charges, escrow holds and agent payouts', state:'live', env:'Live mode', sync:'Real-time', account:'acct_1TN…9c', owner:'Finance', webhooks:6, events:'2,481', keyAge:'Rotated 20 Jul'},
+ {id:'stripe_ip', name:'In-progress payments', cat:'Payments', detail:'Held-then-settled flow for interviews', state:'live', env:'Live mode', sync:'Real-time', account:'via Stripe', owner:'Finance', webhooks:3, events:'640', keyAge:'—'},
+ {id:'learn', name:'Learning platform', cat:'Learning', detail:'Course delivery, assessments and progress', state:'live', env:'Production', sync:'Every 5 min', account:'tnx-prod', owner:'Product', webhooks:4, events:'1,120', keyAge:'Rotated 02 Aug'},
+ {id:'video', name:'Video & recording', cat:'Media', detail:'1:1 interviews, transcripts and SCENES', state:'degraded', env:'Production', sync:'Real-time', account:'tnx-media', owner:'Product', webhooks:5, events:'318', keyAge:'Rotated 11 Jul'},
+ {id:'ai', name:'AI assessment', cat:'Intelligence', detail:'Quiz scoring and levelling signals', state:'live', env:'Production', sync:'On submit', account:'tnx-ai', owner:'Data', webhooks:2, events:'204', keyAge:'Rotated 28 Jul'},
+ {id:'crm', name:'Email / CRM', cat:'Growth', detail:'Transactional email and lead attribution', state:'live', env:'Production', sync:'Every 15 min', account:'tnx-crm', owner:'Growth', webhooks:3, events:'1,905', keyAge:'Rotated 15 Jul'},
+ {id:'db', name:'Database & storage', cat:'Infrastructure', detail:'Primary Postgres + object storage', state:'live', env:'Managed', sync:'Continuous', account:'tnx-core', owner:'Platform', webhooks:0, events:'—', keyAge:'Managed'}
+];
+const INTG_BY_ID={}; INTEGRATIONS.forEach(i => INTG_BY_ID[i.id]=i);
+const SAFEGUARD=[
+ {check:'Enhanced background check', who:'Agents interviewing 18–24s', status:'42 clear · 3 pending', state:'wa'},
+ {check:'Identity verification', who:'All agents & employers', status:'Enforced at signup', state:'ok'},
+ {check:'Safeguarding training', who:'Agents & cohort leaders', status:'38 complete · 7 due', state:'wa'},
+ {check:'Recording consent capture', who:'Every interview booking', status:'Blocking — required to book', state:'ok'},
+ {check:'Age verification', who:'Candidates at signup', status:'18+ gate active', state:'ok'}
+];
+const CONSENT=[
+ {p:'Interview recording', d:'1:1 video interviews are recorded for review and levelling.', when:'At interview booking', rate:98, basis:'Explicit consent'},
+ {p:'AI assessment', d:'Quiz and assessment responses are scored by AI to inform levelling.', when:'Before the quiz', rate:100, basis:'Explicit consent'},
+ {p:'SCENES to employers', d:'Interview highlight reels are shared with unlocking employers.', when:'Before an employer sees it', rate:74, basis:'Explicit consent'},
+ {p:'Marketing & updates', d:'Product updates and opportunity alerts by email.', when:'On sign-up (opt-in)', rate:61, basis:'Opt-in'}
+];
+const RETENTION=[
+ {data:'Interview recordings & transcripts', keep:'24 months', basis:'Levelling & dispute window', enc:'AES-256'},
+ {data:'Assessment responses & AI scores', keep:'36 months', basis:'Levelling history', enc:'AES-256'},
+ {data:'Payment receipts & invoices', keep:'7 years', basis:'Accounting / tax', enc:'AES-256'},
+ {data:'Identity & background checks', keep:'Engagement + 12 months', basis:'Safeguarding', enc:'AES-256'},
+ {data:'Account & profile data', keep:'Until deletion request', basis:'Service provision', enc:'AES-256'},
+ {data:'Audit log', keep:'Indefinite (immutable)', basis:'Compliance', enc:'WORM store'}
+];
+const DSARS=[
+ {id:'dsr1', who:'Maryam Naz', role:'Candidate', type:'Data export', when:'Today 08:20', due:'26 Aug', status:'in progress', note:'Full account export — profile, assessments, recordings and receipts.'},
+ {id:'dsr2', who:'Callum Reid', role:'Candidate', type:'Account deletion', when:'Yesterday', due:'25 Aug', status:'in progress', note:'Erasure request. Payment receipts retained under the 7-year accounting basis; everything else purged.'},
+ {id:'dsr3', who:'BrightPath', role:'Employer', type:'Data export', when:'10 Aug', due:'24 Aug', status:'completed', note:'Unlock history and placement records exported and delivered.'},
+ {id:'dsr4', who:'Priya Raman', role:'Agent', type:'Correction', when:'09 Aug', due:'23 Aug', status:'completed', note:'Corrected email on file.'},
+ {id:'dsr5', who:'Grace Mwangi', role:'Candidate', type:'Consent withdrawal', when:'08 Aug', due:'22 Aug', status:'completed', note:'Withdrew SCENES sharing consent; reels pulled from employer visibility.'}
+];
+
+/* admin-context notifications (tn-admin.html:3641) */
+const ADMIN_NOTIF=[
+ {ic:'flag',  h:'Vetting queue',       t:'3 talent agents are awaiting approval before they can take interviews.', w:'12m ago', rd:false, go:'vetting/applications'},
+ {ic:'alert', h:'Open decision',       t:'Agent compensation is still unreconciled — $100/mo listing fee vs a percentage payout share.', w:'1h ago', rd:false, go:'finance/feeconfig'},
+ {ic:'money', h:'Finance & settlement',t:'Payment settlement rules are undefined — 12 payouts are pending release.', w:'3h ago', rd:false, go:'finance/payouts'},
+ {ic:'users', h:'New account',         t:'Employer account created — Signal Home Office. Verification not yet run.', w:'Yesterday', rd:true, go:'employers/empverify'},
+ {ic:'route', h:'Cohorts',             t:'Bootstrap gap: no Builders are available to lead the first Explorer cohorts.', w:'Yesterday', rd:true, go:'cohorts/assign'}
+];
+
+/* ======================================================================
+   MODULE MAP — rail + sub-page structure, verbatim from tn-admin.html:3597.
+   The RAIL only draws modules whose renderer exists in `V`, so every commit
+   is self-consistent; the full map is present for cross-module links and the
+   breadcrumb.
+   ====================================================================== */
+const MODULES=[
+ {k:'home', t:'Dashboard', ic:'home', subs:[{k:'home', t:'Overview'}]},
+ {k:'users', t:'Users & Roles', ic:'users', subs:[
+   {k:'users', t:'All Users'}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
+ {k:'vetting', t:'Vetting & Approvals', ic:'vetting', subs:[
+   {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}]},
+ {k:'candidates', t:'Candidates', ic:'candidates', subs:[
+   {k:'candidates', t:'All Candidates'}, {k:'levelling', t:'Levelling & Reviews'}, {k:'detail', t:'Candidate', hidden:true}]},
+ {k:'agents', t:'Talent Agents', ic:'agents', subs:[
+   {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}]},
+ {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
+   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'templates', t:'Cohort Templates'}, {k:'detail', t:'Cohort', hidden:true}, {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}, {k:'levels', t:'Levels & Buckets'}]},
+ {k:'market', t:'Marketplace & Interviews', ic:'market', subs:[
+   {k:'bookings', t:'Bookings'}, {k:'recordings', t:'Recordings & Transcripts'}]},
+ {k:'employers', t:'Employers & Hiring', ic:'employers', subs:[
+   {k:'employers', t:'All Employers'}, {k:'empdetail', t:'Employer', hidden:true}, {k:'unlocks', t:'Unlocks & DB Access'}, {k:'placements', t:'Placements'}]},
+ {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
+   {k:'overview', t:'Overview'}, {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'invoices', t:'Invoices & Billing'}, {k:'refunds', t:'Refunds & Disputes'}, {k:'reconciliation', t:'Reconciliation'}, {k:'feeconfig', t:'Fee Configuration'}]},
+ {k:'crm', t:'CRM & Attribution', ic:'crm', subs:[
+   {k:'overview', t:'Overview'}, {k:'leads', t:'Leads'}, {k:'leaddetail', t:'Lead', hidden:true}, {k:'campaigns', t:'Campaigns'}, {k:'campaigndetail', t:'Campaign', hidden:true}, {k:'attribution', t:'Source & Attribution'}, {k:'referrals', t:'Referrals & Agents'}]},
+ {k:'system', t:'System & Audit', ic:'system', subs:[
+   {k:'overview', t:'System Health'}, {k:'integrations', t:'Integrations'}, {k:'audit', t:'Audit Log'}, {k:'compliance', t:'Compliance & Safeguarding'}]},
+ {k:'settings', t:'Settings', ic:'settings', footer:true, subs:[
+   {k:'general', t:'General'}, {k:'profile', t:'My Profile'}, {k:'notifications', t:'Notifications'}, {k:'security', t:'Login & Security'}, {k:'payments', t:'Payments & Cards'}]}
+];
+const MOD_BY_K={}; MODULES.forEach(m => { MOD_BY_K[m.k]=m; m._sub={}; m.subs.forEach(s => m._sub[s.k]=s); });
+const firstSub = m => (m.subs.find(s => !s.hidden) || m.subs[0]).k;
+
+/* ======================================================================
+   STATE
+   ====================================================================== */
+const S = {
+  mod:'home', sub:'home', id:null,        /* where you are */
+  nav:false, notif:false, acct:false,     /* overlays */
+  confirm:null, sheet:null,               /* dialogs */
+  signedIn:true,                          /* the gate */
+  read:[],                                /* notifications marked read */
+  tab:{}, filter:{}                       /* per-page substate, keyed by mod/sub */
+};
+/* per-page tab/filter helpers — namespaced by the page so two pages never
+   collide on one key (the agent portal's `pfTab` vs `tab` lesson, generalised). */
+const pageKey = () => S.mod + '/' + S.sub;
+const getTab = (def) => S.tab[pageKey()] || def;
+const setTab = (v) => { S.tab[pageKey()] = v; };
+const getFilter = (name, def) => { const f = S.filter[pageKey()] || {}; return f[name] === undefined ? def : f[name]; };
+const setFilter = (name, v) => { const k = pageKey(); (S.filter[k] = S.filter[k] || {})[name] = v; };
+
+/* ======================================================================
+   COMPONENT HELPERS — every one is a design-system recipe from gallery.html
+   ====================================================================== */
+
+/* THE HEAD BAND — §70/§78. A page opens with `.modhead` (the warm-to-green
+   wash), a bare `.ph` (the breadcrumb carries the page name now, §78), and
+   Tal's page summary in the band. `dsTypeSummary` types the sentence. */
+function head(sum){
+  return `<div class="modhead">
+    <div class="ph ph-bare"></div>
+    ${sum ? `<div class="sec">
+      <div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Tal</span></div>
+        <div class="ai-body"><p>${sum}</p></div>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+/* A DETAIL PAGE HEAD — a real `.ph` with a back arrow to the list it came from.
+   The breadcrumb pass keeps the arrow and drops the (empty) heading, §78. */
+function detailHead(backTo, sum){
+  return `<div class="modhead">
+    <div class="ph"><div class="ph-main"><div class="ph-top">
+      <button class="ph-back" data-go="${esc(backTo)}" aria-label="Back">${I.arrowLeft}</button></div></div></div>
+    ${sum ? `<div class="sec">
+      <div class="ai-aura tile tight talsum">
+        <div class="ai-head"><span class="ai-label">Tal</span></div>
+        <div class="ai-body"><p>${sum}</p></div>
+      </div>
+    </div>` : ''}
+  </div>`;
+}
+
+/* THE SUB-PAGE TABS — a module's visible sub-pages as a `.tabs` strip. Drawn
+   only when a module has more than one visible sub. */
+function subTabs(){
+  const m = MOD_BY_K[S.mod];
+  const vis = m.subs.filter(s => !s.hidden);
+  if(vis.length < 2) return '';
+  return `<section class="sec"><div class="tabs">${vis.map(s =>
+    `<button class="${s.k === S.sub ? 'on' : ''}" data-go="${m.k}/${s.k}">${esc(s.t)}</button>`).join('')}</div></section>`;
+}
+
+/* §73's aiHead — a heading, its one-line description and the row's actions as
+   one block. No mark (§73's one-star-per-page: the band already has Tal's). */
+const aiHead = (title, desc, act) => `
+  <div class="sec-h aih">
+    <div class="aih-b">
+      <h2 class="aih-t">${title}</h2>
+      ${desc ? `<p class="aih-d">${desc}</p>` : ''}
+    </div>
+    ${act ? `<div class="aih-a">${act}</div>` : ''}`.replace(/\s+$/, '') + `
+  </div>`;
+const secHead = title => `<div class="sec-h"><h2>${esc(title)}</h2></div>`;
+
+/* THE FIGURE CELL — §29/§24. Four parts, four cells per `.stats`, the mark's
+   hue cycles by position. `small` in the value is the design system's `<small>`. */
+const statCell = (icon, label, value, note) => `
+  <div class="stat">
+    <span class="stat-ic">${ic(icon)}</span>
+    <div class="stat-top"><div class="l">${esc(label)}</div><div class="n">${value}</div></div>
+    ${note ? `<div class="d">${note}</div>` : ''}
+  </div>`;
+const stats = cells => `<div class="stats">${cells.map(c => statCell(c[0], c[1], c[2], c[3])).join('')}</div>`;
+
+/* A HAIRLINE KEY/VALUE LIST — the safe band at any width (DESIGN.md §3). */
+const kv = rows => `<div>${rows.map(([k, v, cls]) =>
+  `<div class="kv"><span class="k">${k}</span><span class="v${cls ? ' ' + cls : ''}">${v}</span></div>`).join('')}</div>`;
+
+/* THE DATA TABLE — always inside `.tbl-wrap`, the one component that scrolls
+   sideways. `cols` are [label, {num?}] and `rows` are arrays of cells. */
+function table(cols, rows, opts){
+  opts = opts || {};
+  const head = cols.map(c => `<th${c.num ? ' class="num"' : ''}>${esc(c.label)}</th>`).join('');
+  const body = rows.map(r => `<tr${r.go ? ` class="clk" data-go="${esc(r.go)}"` : ''}>${
+    r.cells.map((c, i) => `<td${cols[i] && cols[i].num ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('');
+  return `<div class="tbl-wrap"><table class="tbl"><tr>${head}</tr>${body}</table></div>`;
+}
+
+/* THE BLACK CARD — §75. Adding `.dark-card` to a `.sec` is the whole
+   conversion. The head row takes EITHER a `.dc-when` time OR a `.dc-act`/accent
+   control, never both. Its CTA (a plain `.btn.btn-p`) comes out accent. */
+const darkCard = ({title, when, act, body, actions, cls}) => `
+  <section class="sec dark-card${cls ? ' ' + cls : ''}">
+    <div class="dc-hd">
+      <div class="dc-hd-r"><h2 class="dc-t">${title}</h2>
+        ${when ? `<span class="dc-when">${ic('time')}${when}</span>`
+          : act ? (act.accent
+            ? `<button class="btn btn-p btn-sm noic" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`
+            : `<button class="btn btn-sm noic dc-act" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`)
+          : ''}</div>
+    </div>
+    ${actions
+      ? `<div class="dc-b">${body || ''}<div class="dc-a">${actions}</div></div>`
+      : (body || '')}
+  </section>`;
+
+const note = (kind, title, body) => `<div class="note${kind ? ' ' + kind : ''}"><span>${
+  kind === 'warn' ? I.warning : kind === 'err' ? I.error : kind === 'succ' ? I.checkFilled : kind === 'acc' ? I.star : I.info
+  }</span><div class="nb">${title ? `<b>${title}</b>` : ''}${body}</div></div>`;
+
+const emptyState = (icon, title, sub) => `<div class="empty">${ic(icon)}<span class="t">${esc(title)}</span>${sub ? `<span class="s">${esc(sub)}</span>` : ''}</div>`;
+
+/* A PERSON ROW — the design system's `.mem`, an initials disc, a name and a
+   line under it, an optional trailing tag. */
+const memRow = (name, sub, trail, go) => `
+  <${go ? 'button' : 'div'} class="mem${go ? ' clk' : ''}"${go ? ` data-go="${esc(go)}"` : ''}>${av(name)}
+    <span class="mem-b"><span class="mem-n">${esc(name)}</span><span class="mem-m">${sub}</span></span>
+    ${trail || ''}
+  </${go ? 'button' : 'div'}>`;
+
+/* A NAVIGATION ROW — the design system's `.tile.clk.gcard`, a leading icon, a
+   title with a sub-line, and the GO arrow. */
+const navRow = (icon, title, sub, go, cta) => `
+  <button class="tile clk gcard" data-go="${esc(go)}">
+    <span class="cardrow-ic">${ic(icon)}</span>
+    <span class="gcard-b"><h3>${esc(title)}</h3><span class="sub">${sub}</span></span>
+    ${cta ? `<span class="row-cta">${esc(cta)}</span>` : ''}
+    <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+  </button>`;
+
+/* A search field — the design system's `.srch`. Cosmetic in the prototype:
+   the rows are already shown; the field says the page is searchable. */
+const searchField = ph => `<div class="srch">${I.search}<input class="inp" placeholder="${esc(ph)}" aria-label="${esc(ph)}"></div>`;
+
+/* A TOAST — the transient confirmations the source shows on cosmetic actions.
+   Built from the design system's `.note`; positioned by the chrome host. */
+function toast(msg, kind){
+  const host = device.querySelector('#toasts');
+  if(!host) return;
+  const el = document.createElement('div');
+  el.innerHTML = note(kind === 'ok' ? 'succ' : kind || 'succ', '', esc(msg));
+  const node = el.firstElementChild;
+  host.appendChild(node);
+  setTimeout(() => { node.style.transition = 'opacity .3s'; node.style.opacity = '0';
+    setTimeout(() => node.remove(), 300); }, 2400);
+}
+
+/* ======================================================================
+   THE PAGE SUMMARIES — Tal's reading of each page. Two sentences, real
+   figures off the records, `<b>` on the actionable phrase. Keyed `mod/sub`.
+   Values may be a function so they read live counts.
+   ====================================================================== */
+const countActive = arr => arr.filter(x => x.status === 'active').length;
+const heldPayouts = () => PAYOUTS.filter(p => p.status === 'held' && p.net).length;
+const openApps = () => APPLICATIONS.filter(a => a.status !== 'approved').length;
+const grossProcessed = () => TXNS.filter(t => t.dir === 'in' && t.amt).reduce((n, t) => n + t.amt, 0);
+const inProgress = () => TXNS.filter(t => t.status === 'held').reduce((n, t) => n + t.amt, 0);
+
+const PAGESUM = {
+  'home/home': () => `You have <b>${openApps()} agents to vet</b> and <b>${heldPayouts()} payouts to release</b>. Two high-severity decisions — agent pay and the placement fee — are still open across the platform.`
+};
+function pageSummary(){
+  let e = PAGESUM[pageKey()];
+  if(typeof e === 'function') e = e();
+  return e || '';
+}
+
+/* ======================================================================
+   THE VIEWS — one function per module, returning the page inside `.page`.
+   A module page is: the head band, the sub-tabs, then the current sub's
+   sections. The rail only shows a module once its renderer is registered.
+   ====================================================================== */
+const V = {};
+
+/* ------------------------------------------------------------ DASHBOARD --- */
+V.home = () => {
+  const totalUsers = USERS.length;
+  const activeUsers = countActive(USERS);
+  const activeCands = countActive(CANDS);
+  const agentCount = USERS.filter(u => u.roles.includes('agent')).length;
+  const empCount = EMPLOYERS.length;
+  const activeCohorts = COHORTS.filter(c => c.status === 'active').length;
+  const gross = grossProcessed();
+  const inprog = inProgress();
+  const highDec = DECISIONS.filter(d => d.sev === 'high').length;
+  const medDec = DECISIONS.filter(d => d.sev === 'med').length;
+  const levelling = LEVELQ.length;
+
+  /* revenue by fee line — the frozen file's dashboard chart, read as data */
+  const courseRev = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+  const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+  const unlockRev = TXNS.filter(t => t.cat === 'unlock' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+
+  return `
+  ${head(pageSummary())}
+
+  <section class="sec">
+    ${secHead('Platform at a glance')}
+    ${stats([
+      ['users', 'Users', String(totalUsers), `${activeUsers} active`],
+      ['candidates', 'Candidates', String(activeCands), `active, across ${activeCohorts} cohorts`],
+      ['agents', 'Agents', String(agentCount), 'setting their own fee'],
+      ['employers', 'Employers', String(empCount), `${EMPLOYERS.filter(e => e.verify === 'ok').length} verified`]
+    ])}
+  </section>
+
+  <section class="sec">
+    ${secHead('Money at a glance')}
+    ${stats([
+      ['money', 'Gross', money(gross), 'processed this window'],
+      ['bank', 'In progress', money(inprog), 'held, not yet settled'],
+      ['cohorts', 'Cohorts', String(activeCohorts), `active, ${COHORTS.filter(c => c.status === 'draft').length} in draft`],
+      ['market', 'Bookings', String(BOOKINGS.length), `${BOOKINGS.filter(b => b.status === 'active').length} confirmed`]
+    ])}
+  </section>
+
+  ${darkCard({
+    title:'Needs your attention',
+    act:{label:'Open the vetting queue', accent:true, attr:'data-go="vetting/applications"'},
+    cls:'crow-dark',
+    body:`<div class="dc-lines">${kv([
+      ['Talent agents awaiting approval', `<b>${openApps()}</b>`],
+      ['Payouts pending release', `<b>${heldPayouts()}</b>`],
+      ['Level reviews to sign off', `<b>${levelling}</b>`],
+      ['Employers not yet verified', `<b>${EMPLOYERS.filter(e => e.verify !== 'ok').length}</b>`]
+    ])}</div>`
+  })}
+
+  <section class="sec">
+    ${aiHead('Revenue by line', 'This window, across the four fee lines the platform charges.',
+      '<button class="btn btn-g btn-sm noic" data-go="finance/overview">Open Finance</button>')}
+    ${kv([
+      ['Course fees', `<b>${money(courseRev)}</b>`, 'n'],
+      ['Interview fees', `<b>${money(interviewRev)}</b>`, 'n'],
+      ['Employer unlocks', `<b>${money(unlockRev)}</b>`, 'n'],
+      ['Placement fees', 'Not set', 'n']
+    ])}
+    ${note('warn', 'Placement fee undefined', 'The single largest revenue line has no basis, trigger or detection — two placement invoices are stuck in draft.')}
+  </section>
+
+  <section class="sec">
+    ${secHead('Where users come from')}
+    ${stats([
+      ['route', 'Individual', String(USERS.filter(u => u.origin === 'individual').length), 'direct sign-ups'],
+      ['spark', 'Signal', String(USERS.filter(u => u.origin === 'signal').length), 'sponsoring employer'],
+      ['link', 'Filter Go', String(USERS.filter(u => u.origin === 'filtergo').length), 'franchise partner'],
+      ['lock', 'Internal', String(USERS.filter(u => u.origin === 'internal').length), 'staff accounts']
+    ])}
+  </section>
+
+  <section class="sec">
+    ${aiHead(`Open decisions and risks`, `${highDec} high · ${medDec} medium — strategic decisions awaiting your direction.`)}
+    <div class="tile-stack">
+      ${DECISIONS.map(d => `
+        <button class="tile clk gcard" data-go="${d.go}">
+          <span class="cardrow-ic">${ic(d.ic)}</span>
+          <span class="gcard-b"><span class="eyebrow">${esc(d.area)} · ${esc(d.src)}</span>
+            <h3>${esc(d.t)}</h3><span class="sub">${d.d}</span></span>
+          <span class="cardrow-a">${tag(d.sev === 'high' ? 'flagged' : 'requested', d.sev === 'high' ? 'High' : 'Medium')}</span>
+          <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg>
+        </button>`).join('')}
+    </div>
+  </section>
+
+  <section class="sec">
+    ${aiHead('Recent activity', 'The newest lines from the immutable audit log.',
+      '<button class="btn btn-g btn-sm noic" data-go="system/audit">Open the audit log</button>')}
+    <div class="tile-stack">
+      ${AUDIT.slice(0, 6).map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, a.sev === 'high' ? 'High' : a.sev === 'notice' ? 'Notice' : 'Info'))).join('')}
+    </div>
+  </section>`;
+};
+
+/* ======================================================================
+   THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
+   trail (filled by a pass), the notification bell and the account menu.
+   ====================================================================== */
+function acctMenu(){
+  return `<div class="acct-menu ${S.acct ? 'on' : ''}" role="menu" aria-label="Account">
+    <button class="acct-i" role="menuitem" data-go="settings/profile">
+      <span class="acct-i-mk">${I.user}</span><span class="acct-i-t">My Profile</span></button>
+    <button class="acct-i" role="menuitem" data-go="settings/general">
+      <span class="acct-i-mk">${I.settings}</span><span class="acct-i-t">General Settings</span></button>
+    <button class="acct-i" role="menuitem" data-confirm="logout">
+      <span class="acct-i-mk">${I.logout}</span><span class="acct-i-t">Log out</span></button>
+  </div>`;
+}
+
+const crumbBar = () => `<nav class="crumb-bar" aria-label="Breadcrumb"><ol class="crumb-trail"></ol></nav>`;
+
+function shell(){
+  return `
+  <header class="shell">
+    <button class="shell-act nav-t ${S.nav ? 'on' : ''}" data-toggle="nav"
+      aria-label="${S.nav ? 'Collapse' : 'Expand'} navigation">${S.nav ? I.close
+      : `<span class="nav-t-mark">${TN_MARK}</span><span class="nav-t-menu">${I.menu}</span>`}</button>
+    <button class="shell-logo" data-go="home/home" aria-label="TalentNext home"><img src="${LOGO_K}" alt="TalentNext"></button>
+    ${crumbBar()}
+    <div class="shell-right">
+      <button class="shell-act ${S.notif ? 'on' : ''}" data-toggle="notif"
+        aria-label="Notifications" aria-expanded="${S.notif}" title="Notifications">${I.notification}${unreadCount()
+          ? `<span class="shell-badge">${unreadCount()}</span>` : ''}</button>
+      <button class="shell-act acct-t ${S.acct ? 'on' : ''}" data-toggle="acct"
+        aria-label="Account" aria-haspopup="menu" aria-expanded="${S.acct ? 'true' : 'false'}">
+        <span class="shell-avatar av-ph"><i>${esc(initials(ME.name))}</i></span>
+        <svg class="acct-c" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg>
+      </button>
+      ${acctMenu()}
+    </div>
+  </header>`;
+}
+
+function sidenav(){
+  const main = MODULES.filter(m => !m.footer && V[m.k]);
+  const foot = MODULES.filter(m => m.footer && V[m.k]);
+  const item = m => `<button class="sn-item ${m.k === S.mod ? 'on' : ''}" title="${esc(m.t)}" data-go="${m.k}/${firstSub(m)}"${m.k === S.mod ? ' aria-current="page"' : ''}>${ic(m.ic)}<span>${esc(m.t)}</span></button>`;
+  return `
+  <div class="scrim ${S.nav ? 'on' : ''}" data-close="nav"></div>
+  <nav class="sidenav ${S.nav ? 'on' : ''}" aria-label="Portal">
+    <div class="sn-main">${main.map(item).join('')}</div>
+    <div class="sn-foot">
+      ${foot.map(item).join('')}
+      <button class="sn-item" title="Log out" data-confirm="logout">${I.logout}<span>Log out</span></button>
+    </div>
+  </nav>`;
+}
+
+/* THE NOTIFICATION PANEL — §27, the admin-context feed. */
+const unreadCount = () => ADMIN_NOTIF.filter(n => !n.rd && !S.read.includes(n.h)).length;
+function notifPanel(){
+  const isRead = n => n.rd || S.read.includes(n.h);
+  return `<aside class="notif ${S.notif ? 'on' : ''}" aria-label="Notifications">
+    <div class="notif-h"><h2>Notifications</h2>
+      <div class="notif-h-a">
+        ${unreadCount() ? '<button class="btn btn-g btn-sm noic" data-readall="1">Mark all read</button>' : ''}
+        <button class="x" data-close="notif" aria-label="Close">${I.close}</button></div></div>
+    <div class="notif-b">
+      ${ADMIN_NOTIF.map(n => `
+        <button class="nrow ${isRead(n) ? '' : 'un'}" data-go="${esc(n.go)}" data-read="${esc(n.h)}">
+          <span class="nrow-ic">${ic(n.ic)}</span>
+          <span class="nrow-b"><span class="nrow-t">${esc(n.h)}</span>
+            <span class="nrow-d">${esc(n.t)}</span><span class="nrow-w">${esc(n.w)}</span></span>
+          ${isRead(n) ? '' : '<span class="dot on"></span>'}
+        </button>`).join('')}
+    </div>
+  </aside>`;
+}
+
+/* THE CONFIRMATION DIALOG — the `.conf` sheet, for every destructive action
+   and log-out (DESIGN.md §3). `data-do` on the confirm button names the action
+   the router runs; a `.danger` fill on anything that destroys. */
+const CONFIRMS = {
+  logout: {mk:'warning', title:'Log out?', body:'You will need your password to sign back in to the admin.', ok:'Log out', danger:false, act:'logout'}
+};
+function confirmSheet(){
+  const c = CONFIRMS[S.confirm] || S._confirm || null;
+  return `<div class="modal ${S.confirm ? 'on' : ''}" data-close="confirm">
+    <div class="sheet conf" role="dialog" aria-modal="true" aria-label="${c ? esc(c.title) : ''}">
+      <div class="sheet-b conf-b">
+        <span class="conf-mk">${c && c.mk === 'check' ? I.checkFilled : I.warning}</span>
+        <h2 class="conf-t">${c ? esc(c.title) : ''}</h2>
+        <p class="conf-x">${c ? c.body : ''}</p>
+      </div>
+      <div class="sheet-f conf-a">
+        <button class="btn btn-s noic" data-close="confirm">${c && c.cancel ? esc(c.cancel) : 'Cancel'}</button>
+        <button class="btn btn-p noic${c && c.danger ? ' danger' : ''}" data-do="${c ? esc(c.act) : ''}">${c ? esc(c.ok) : ''}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ======================================================================
+   THE BREADCRUMB TRAIL — §78, filled by a pass after the page renders.
+   Module > sub-page, and Module > list > record on a detail page.
+   ====================================================================== */
+function trailParts(){
+  const m = MOD_BY_K[S.mod];
+  const sub = m._sub[S.sub];
+  const out = [{label:m.t, go:m.k + '/' + firstSub(m)}];
+  if(sub && sub.hidden){
+    /* a detail page: name the list it came from, then the record */
+    const list = detailListSub(m);
+    if(list) out.push({label:list.t, go:m.k + '/' + list.k});
+    const rec = detailRecordLabel();
+    out.push({label:rec || sub.t});
+  } else if(sub && S.sub !== firstSub(m)){
+    out.push({label:sub.t});
+  }
+  return out;
+}
+/* which visible sub a hidden detail belongs under (its list) */
+function detailListSub(m){
+  const map = {users:'users', vetting:'applications', candidates:'candidates', agents:'agents',
+    cohorts:'cohorts', employers:'employers', crm:'leads'};
+  const dmap = {appdetail:'applications', staffdetail:'users', coursedetail:'catalogue',
+    leaddetail:'leads', campaigndetail:'campaigns'};
+  const k = dmap[S.sub] || map[m.k];
+  return m._sub[k] || null;
+}
+/* the record's own name for the last crumb — overridden per detail page */
+let DETAIL_LABEL = null;
+function detailRecordLabel(){ return DETAIL_LABEL; }
+
+function drawTrail(){
+  const trail = device.querySelector('.shell .crumb-trail');
+  if(!trail) return;
+  const parts = trailParts();
+  const sep = `<span class="crumb-sep" aria-hidden="true">${I.chevRight}</span>`;
+  trail.innerHTML = parts.map((p, i) => {
+    const now = i === parts.length - 1;
+    return `<li class="crumb-i${now ? ' crumb-now' : ''}">${i ? sep : ''}${now
+      ? `<span class="crumb-l" aria-current="page">${esc(p.label)}</span>`
+      : `<a class="crumb-l" data-go="${esc(p.go)}">${esc(p.label)}</a>`}</li>`;
+  }).join('');
+}
+/* the bare `.ph` still pays its margins; tidy it the way §78 does */
+function tidyPh(){
+  const page = device.querySelector('.main .page');
+  if(!page) return;
+  const ph = page.querySelector('.ph');
+  if(!ph) return;
+  const top = ph.querySelector('.ph-top');
+  if(top && !top.firstElementChild) top.remove();
+  const main = ph.querySelector('.ph-main');
+  if(main && !main.firstElementChild) main.remove();
+  ph.classList.toggle('ph-bare', !ph.firstElementChild);
+  ph.classList.toggle('ph-backonly',
+    !!ph.querySelector('.ph-back') &&
+    ph.querySelectorAll('.ph-main > *, .ph > *:not(.ph-main)').length === 1 &&
+    ph.querySelectorAll('.ph-top > *').length === 1);
+}
+function placeTopbar(){
+  try { drawTrail(); tidyPh(); } catch(e){ console.warn('topbar', e); }
+}
+
+/* ======================================================================
+   RENDER
+   ====================================================================== */
+const device = document.getElementById('device');
+const MO = {key:'', open:{}};
+
+function render(){
+  /* guard: an unknown module or a module with no renderer falls to the
+     dashboard; a sub the module does not have falls to its first sub. */
+  if(!MOD_BY_K[S.mod] || !V[S.mod]){ S.mod = 'home'; S.sub = 'home'; }
+  const m = MOD_BY_K[S.mod];
+  if(!m._sub[S.sub]) S.sub = firstSub(m);
+  DETAIL_LABEL = null;
+
+  const view = V[S.mod];
+  const key = S.mod + '/' + S.sub + '/' + (S.id || '');
+  const entered = MO.key !== '' && key !== MO.key;
+  MO.key = key;
+
+  const OVER = ['nav', 'notif', 'confirm', 'sheet'];
+  const opened = OVER.filter(k => S[k] && !MO.open[k]);
+  const shown = OVER.filter(k => S[k]);
+  for(const k of OVER) MO.open[k] = !!S[k];
+
+  const at = ` data-rail="${S.nav ? 'open' : 'shut'}" data-view="${S.mod}"`
+    + (entered ? ' data-enter' : '')
+    + (opened.length ? ` data-open="${opened.join(' ')}"` : '')
+    + (shown.length ? ` data-shown="${shown.join(' ')}"` : '');
+
+  device.innerHTML = `<div class="app"${at}>
+    ${shell()}
+    <div class="shell-body">
+      ${sidenav()}
+      <div class="view-col">
+        <main class="main"><div class="page">${view()}</div></main>
+      </div>
+      ${notifPanel()}
+      ${confirmSheet()}
+    </div>
+    <div class="pt-toasts" id="toasts"></div>
+  </div>`;
+
+  const app = device.querySelector('.app');
+  if(app.hasAttribute('data-enter')){
+    device.querySelectorAll('.page > .modhead, .page > .sec, .page > .ph, .page > .tabs')
+      .forEach((el, i) => el.style.setProperty('--i', Math.min(i, 7)));
+  }
+  dsStagger(device.querySelector('.page'));
+
+  placeTopbar();
+
+  /* Tal's summary types itself — last, after the topbar pass, per the design
+     system's contract. Wrapped: a throw in a nicety must not take the render. */
+  try {
+    if(typeof dsTypeSummary === 'function'){
+      dsTypeSummary(device.querySelector('.modhead .ai-aura.talsum > .ai-body > p'), key);
+    }
+  } catch(e){ console.warn('talsum', e); }
+
+  writeHash();
+}
+
+/* ======================================================================
+   THE URL IS WHERE YOU ARE — hash `#mod/sub[/id]`, `replaceState` out,
+   read back on load and on the back button.
+   ====================================================================== */
+function writeHash(){
+  const parts = [S.mod, S.sub];
+  if(S.id) parts.push(S.id);
+  try { history.replaceState(null, '', '#' + parts.join('/')); } catch(e){}
+}
+function readHash(){
+  const p = location.hash.slice(1).split('/').filter(Boolean);
+  if(!p.length) return false;
+  if(!MOD_BY_K[p[0]] || !V[p[0]]) return false;
+  S.mod = p[0];
+  S.sub = (p[1] && MOD_BY_K[p[0]]._sub[p[1]]) ? p[1] : firstSub(MOD_BY_K[p[0]]);
+  S.id = p[2] || null;
+  return true;
+}
+window.addEventListener('hashchange', () => {
+  if(!readHash()) return;
+  S.nav = S.notif = S.acct = false; S.confirm = null; S.sheet = null;
+  render();
+});
+
+/* ======================================================================
+   NAVIGATION — one delegated listener on `#device`, which outlives every
+   render. `data-go` carries `mod/sub[/id]`; everything else is a flag.
+   ====================================================================== */
+function go(dest){
+  const p = String(dest).split('/');
+  const mod = p[0], sub = p[1], id = p[2];
+  if(!MOD_BY_K[mod] || !V[mod]) return;                 /* unbuilt module */
+  S.mod = mod;
+  S.sub = (sub && MOD_BY_K[mod]._sub[sub]) ? sub : firstSub(MOD_BY_K[mod]);
+  S.id = id || null;
+  S.nav = false; S.notif = false; S.acct = false;
+  render();
+  const main = device.querySelector('.main');
+  if(main) main.scrollTop = 0;
+}
+
+device.addEventListener('click', e => {
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet]');
+
+  /* a click outside the account menu shuts it — answered before the guard */
+  if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
+  if(!t) return;
+  const d = t.dataset;
+
+  if(d.close !== undefined){
+    if(t.classList.contains('modal') && e.target !== t) return;
+    S[d.close] = d.close === 'confirm' || d.close === 'sheet' ? null : false;
+    return render();
+  }
+  if(d.readall){
+    ADMIN_NOTIF.forEach(n => { if(!n.rd && !S.read.includes(n.h)) S.read.push(n.h); });
+    return render();
+  }
+  if(d.confirm !== undefined){ S.confirm = d.confirm; return render(); }
+  if(d.do !== undefined){ return doAction(d.do, t); }
+  if(d.toggle){ S[d.toggle] = !S[d.toggle]; return render(); }
+  if(d.tab !== undefined){ setTab(d.tab); return render(); }
+  if(d.filter !== undefined){
+    const [name, val] = d.filter.split(':');
+    setFilter(name, val); return render();
+  }
+  if(d.act !== undefined){ return doAction(d.act, t); }
+  if(d.read && !S.read.includes(d.read)) S.read.push(d.read);
+  if(d.go !== undefined){ return go(d.go); }
+});
+
+/* THE ACTIONS — every gated/destructive action funnels through here. The
+   confirmation sheet's confirm button carries `data-do`; a plain control may
+   carry `data-act`. Cosmetic actions raise a toast; state-changing ones mutate
+   a record and re-render so the change is visible. Each module adds its own
+   branches to `ACTIONS`. */
+const ACTIONS = {
+  logout: () => { S.confirm = null; S.signedIn = false; toast('Signed out (prototype) — reload to sign back in'); }
+};
+function doAction(key, el){
+  const name = key.split(':')[0];
+  const fn = ACTIONS[key] || ACTIONS[name];
+  if(fn){ fn(key, el); render(); return; }
+  /* a bare `toast:Message` action just shows the message */
+  if(name === 'toast'){ toast(key.slice(6)); render(); return; }
+  /* unknown: close any dialog and re-render, never throw */
+  S.confirm = null; render();
+}
+
+/* ======================================================================
+   THE VIEWPORT (frame) PICKER — prototype chrome. One document, three sizes,
+   each keeping its true pixel width so the container queries resolve honestly.
+   ====================================================================== */
+const VP_SIZE = {mobile:[390, 844], tablet:[744, 1133], fluid:[1440, 900]};
+const fitBox = document.getElementById('fit');
+function fitFrame(){
+  const vp = device.dataset.vp;
+  const stage = fitBox.parentElement;
+  const pct = document.getElementById('vpscale');
+  if(vp === 'fluid'){
+    device.style.transform = 'none';
+    device.style.width = '100%';
+    device.style.height = Math.max(520, window.innerHeight - stage.getBoundingClientRect().top) + 'px';
+    fitBox.style.width = '100%';
+    fitBox.style.height = device.style.height;
+    if(pct) pct.textContent = Math.round(stage.clientWidth) + 'px';
+    return;
+  }
+  const [w, h] = VP_SIZE[vp] || VP_SIZE.mobile;
+  device.style.width = w + 'px';
+  device.style.height = Math.min(h, Math.round(window.innerHeight * 0.8)) + 'px';
+  const avail = stage.clientWidth - 8;
+  const scale = Math.min(1, avail / w);
+  device.style.transform = scale < 1 ? `scale(${scale})` : 'none';
+  fitBox.style.width = Math.round(w * scale) + 'px';
+  fitBox.style.height = Math.round(parseFloat(device.style.height) * scale) + 'px';
+  if(pct) pct.textContent = scale < 1 ? Math.round(scale * 100) + '%' : '100%';
+}
+document.getElementById('vp').addEventListener('click', e => {
+  const b = e.target.closest('button[data-vp]');
+  if(!b) return;
+  document.querySelectorAll('#vp button').forEach(x => x.classList.toggle('on', x === b));
+  device.dataset.vp = b.dataset.vp;
+  S.nav = false;
+  render();
+  fitFrame();
+});
+window.addEventListener('resize', fitFrame);
+document.getElementById('reset').onclick = () => {
+  S.mod = 'home'; S.sub = 'home'; S.id = null;
+  S.nav = S.notif = S.acct = false; S.confirm = null; S.sheet = null;
+  S.read = []; S.tab = {}; S.filter = {};
+  render();
+};
+
+/* the prototype-bar wordmark (a black mark scaled by the chrome) */
+document.getElementById('ptLogo').innerHTML = `<img src="${LOGO_K}" alt="TalentNext">`;
+
+/* ---- boot ---- */
+readHash();
+render();
+fitFrame();
+</script>
+</body>
+</html>
