@@ -2355,6 +2355,191 @@ ACTIONS['askrefdecl'] = key => {
 ACTIONS['dorefdecl'] = key => { const r = REFUNDS.find(x => x.id === key.split(':')[1]); if(r){ r.status = 'declined'; toast(r.party + '’s refund declined'); } S.confirm = null; };
 
 /* ======================================================================
+   CRM & ATTRIBUTION
+   ====================================================================== */
+const chArrivals = () => CHANNELS.reduce((n, c) => n + c.arrivals, 0);
+const chQuiz = () => CHANNELS.reduce((n, c) => n + c.quizDone, 0);
+const chConverted = () => CHANNELS.reduce((n, c) => n + c.converted, 0);
+const cpa = c => c.conv ? '$' + Math.round(c.spend / c.conv) : '—';
+const roi = c => { if(!c.spend) return '∞'; const r = Math.round(((c.conv * CRM_VALUE - c.spend) / c.spend) * 100); return (r >= 0 ? '+' : '') + r + '%'; };
+const leadStageTag = s => {
+  const v = s === 'Converted' ? 'green' : s === 'Lost' ? 'red' : s === 'Contact captured' ? 'warn' : '';
+  return `<span class="tag sm${v ? ' ' + v : ''}">${esc(s)}</span>`;
+};
+
+PAGESUM['crm/overview'] = () => {
+  const conv = chConverted(); const arr = chArrivals();
+  return `${arr.toLocaleString()} tracked arrivals became <b>${conv} accounts</b> — a ${Math.round(conv / arr * 100)}% conversion, worth about ${money(conv * CRM_VALUE)} in first-year value. NIL campaign is the largest channel by far.`;
+};
+PAGESUM['crm/leads'] = () => {
+  const cc = LEADS.filter(l => l.stage === 'Contact captured').length;
+  return `${LEADS.length} leads in the recent window, from first landing to converted. A lead becomes an account when it converts; <b>${cc} have left a contact</b> and are ready to nurture.`;
+};
+PAGESUM['crm/campaigns'] = () => `${CAMPAIGNS.length} campaigns across five channels. <b>Summer-Leadership drives the most leads</b>; each shows its cost per acquisition and its return on spend.`;
+PAGESUM['crm/attribution'] = () => `The same ${chConverted()} conversions, read three ways — <b>first-touch, last-touch and even multi-touch</b> — because a journey has several steps and each model credits them differently.`;
+PAGESUM['crm/referrals'] = () => `Agents share their own NIL link and are credited the leads it drives. Three are active; <b>Dana Whitfield's link leads</b> on clicks and revenue.`;
+
+function crmOverview(){
+  const conv = chConverted();
+  return `
+  <section class="sec">
+    ${secHead('Acquisition at a glance')}
+    ${stats([
+      ['eye', 'Tracked arrivals', chArrivals().toLocaleString(), 'lifetime'],
+      ['spark', 'Recent leads', String(LEADS.length), 'this window'],
+      ['check', 'Converted', String(conv), `${Math.round(conv / chArrivals() * 100)}% of arrivals`],
+      ['money', 'Attributed revenue', money(conv * CRM_VALUE), `at ${money(CRM_VALUE)} each`]
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Quiz-to-account funnel', 'How a lifetime of arrivals narrows to an account.')}
+    ${kv([
+      ['Landed', chArrivals().toLocaleString(), 'n'],
+      ['Finished the quiz', chQuiz().toLocaleString(), 'n'],
+      ['Converted to an account', String(conv), 'n']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Channels', 'Lifetime arrivals and how each channel converts.',
+      '<button class="btn btn-g btn-sm noic" data-go="crm/attribution">Attribution</button>')}
+    ${table(
+      [{label:'Channel'}, {label:'Arrivals', num:true}, {label:'Quiz done', num:true}, {label:'Converted', num:true}, {label:'Spend', num:true}],
+      CHANNELS.map(c => ({cells:[esc(c.label), c.arrivals.toLocaleString(), String(c.quizDone), String(c.converted), c.spend ? money(c.spend) : 'Free']})))}
+  </section>
+  <section class="sec">
+    ${aiHead('Top campaigns', 'By leads driven, with cost per acquisition and return.',
+      '<button class="btn btn-g btn-sm noic" data-go="crm/campaigns">All campaigns</button>')}
+    <div class="tile-stack">
+      ${CAMPAIGNS.slice().sort((a, b) => b.leads - a.leads).slice(0, 3).map(c =>
+        memRow(c.name, `${esc(c.channel)} · ${c.leads} leads · ${c.conv} converted · CPA ${cpa(c)}`, `<span class="tag sm ${c.status === 'active' ? 'green' : ''}">${esc(cap(c.status))}</span>`, 'crm/campaigndetail/' + c.id)).join('')}
+    </div>
+  </section>
+  <section class="sec">
+    ${secHead('Newest leads')}
+    <div class="tile-stack">
+      ${LEADS.slice(0, 5).map(l => memRow(l.name, `${esc(l.source)} · ${esc(l.region)} · ${esc(l.when)}`, leadStageTag(l.stage), 'crm/leaddetail/' + l.id)).join('')}
+    </div>
+  </section>`;
+}
+
+function crmLeads(){
+  const sf = getFilter('lstage2', 'all');
+  const rows = LEADS.filter(l => sf === 'all' ? true : sf === 'contact' ? l.stage === 'Contact captured' : sf === 'converted' ? l.stage === 'Converted' : l.stage !== 'Converted' && l.stage !== 'Lost');
+  return `
+  <section class="sec">
+    ${aiHead('Leads', 'Anonymous-to-known arrivals before an account exists. A row opens the touch path.')}
+    <div class="mt4">${filterTabs('lstage2', 'all', [
+      ['all', 'All', LEADS.length],
+      ['open', 'In pipeline', LEADS.filter(l => l.stage !== 'Converted' && l.stage !== 'Lost').length],
+      ['contact', 'Contact captured', LEADS.filter(l => l.stage === 'Contact captured').length],
+      ['converted', 'Converted', LEADS.filter(l => l.stage === 'Converted').length]
+    ])}</div>
+    ${table(
+      [{label:'Lead'}, {label:'Source'}, {label:'Campaign'}, {label:'Stage'}, {label:'Score', num:true}, {label:'Last'}],
+      rows.map(l => ({go:'crm/leaddetail/' + l.id, cells:[
+        idCell(l.name, l.region),
+        esc(l.source),
+        esc(l.campaign),
+        leadStageTag(l.stage),
+        l.score != null ? String(l.score) : '—',
+        esc(l.last)
+      ]})))}
+  </section>`;
+}
+
+function crmLeadDetail(){
+  const l = LEAD_BY_ID[S.id] || LEADS[0];
+  DETAIL_LABEL = l.name;
+  const acct = l.accountId ? USER_BY_ID[l.accountId] : null;
+  const sum = `<b>${esc(l.name)}</b> arrived via ${esc(l.source)} and reached <b>${esc(l.stage)}</b> over ${l.touches} touch${l.touches === 1 ? '' : 'es'}. ${acct ? 'Converted to an account.' : l.score != null ? `Quiz score ${l.score}.` : 'No quiz score yet.'}`;
+  return `
+  ${detailHead('crm/leads', sum)}
+  <section class="sec">
+    ${aiHead(esc(l.name), esc(l.region), leadStageTag(l.stage))}
+    <div class="mt4">${kv([
+      ['Email', esc(l.email)],
+      ['Source', esc(l.source)],
+      ['Campaign', esc(l.campaign)],
+      ['Agent link', esc(l.agent)],
+      ['Predicted level', l.level !== '—' ? `${esc(l.level)} · ${esc(l.bucket)}` : 'Not yet'],
+      ['Quiz score', l.score != null ? String(l.score) : '—'],
+      ['Device', esc(l.device)],
+      ['First seen', esc(l.created)],
+      ['Account', acct ? esc(acct.name) : 'Not converted']
+    ])}</div>
+  </section>
+  <section class="sec">
+    ${secHead('Touch path')}
+    <ol class="steps">
+      ${l.path.map((p, i) => `<li><span class="s-n">${i + 1}</span><span class="s-b"><b>${esc(p)}</b>${i === l.path.length - 1 ? ' Latest touch' : ''}</span></li>`).join('')}
+    </ol>
+  </section>`;
+}
+
+function crmCampaigns(){
+  return `
+  <section class="sec">
+    ${aiHead('Campaigns', 'Each runs on one channel with a budget, and is credited the leads and conversions it drove.',
+      '<button class="btn btn-p btn-sm noic" data-act="toast:Create a campaign on a channel with a budget">' + I.add + ' New Campaign</button>')}
+    ${table(
+      [{label:'Campaign'}, {label:'Channel'}, {label:'Spend', num:true}, {label:'Leads', num:true}, {label:'Conv.', num:true}, {label:'CPA', num:true}, {label:'ROI', num:true}, {label:'Status'}],
+      CAMPAIGNS.map(c => ({go:'crm/campaigndetail/' + c.id, cells:[
+        esc(c.name), esc(c.channel), money(c.spend), String(c.leads), String(c.conv), cpa(c), roi(c), tag(c.status)
+      ]})))}
+  </section>`;
+}
+
+function crmCampaignDetail(){
+  const c = CMP_BY_ID[S.id] || CAMPAIGNS[0];
+  DETAIL_LABEL = c.name;
+  const leads = LEADS.filter(l => l.campaign === c.name);
+  const sum = `<b>${esc(c.name)}</b> runs on ${esc(c.channel)} with a ${money(c.budget)} budget, ${money(c.spend)} spent. ${c.leads} leads, ${c.conv} converted — a cost per acquisition of ${cpa(c)}.`;
+  return `
+  ${detailHead('crm/campaigns', sum)}
+  <section class="sec">
+    ${aiHead(esc(c.name), esc(c.channel) + ' · owned by ' + esc(c.owner), tag(c.status))}
+    ${stats([
+      ['money', 'Spend', money(c.spend), `of ${money(c.budget)} budget`],
+      ['spark', 'Leads', String(c.leads), 'driven'],
+      ['check', 'Converted', String(c.conv), 'to accounts'],
+      ['chart', 'CPA', cpa(c), 'cost per account']
+    ])}
+  </section>
+  <section class="sec">
+    ${secHead('Leads from this campaign')}
+    ${leads.length ? `<div class="tile-stack">
+      ${leads.map(l => memRow(l.name, `${esc(l.region)} · ${esc(l.when)}`, leadStageTag(l.stage), 'crm/leaddetail/' + l.id)).join('')}
+    </div>` : emptyState('spark', 'No leads recorded', 'No leads in the recent window are attributed to this campaign.')}
+  </section>`;
+}
+
+function crmAttribution(){
+  return `
+  <section class="sec">
+    ${aiHead('Source & attribution', 'The same conversions, credited three ways. A journey has several touches; each model splits the credit differently.')}
+    ${note('', 'Three models', 'First-touch credits the channel that brought someone in. Last-touch credits the channel that closed them. Multi-touch splits the credit evenly across the path.')}
+    ${table(
+      [{label:'Channel'}, {label:'First-touch', num:true}, {label:'Last-touch', num:true}, {label:'Multi-touch', num:true}, {label:'Spend', num:true}],
+      CHANNELS.map(c => ({cells:[esc(c.label), String(c.ft), String(c.lt), String(c.mt), c.spend ? money(c.spend) : 'Free']})))}
+  </section>`;
+}
+
+function crmReferrals(){
+  return `
+  <section class="sec">
+    ${aiHead('Referrals & agents', 'Every agent has a NIL link and is credited the leads and revenue it drives.')}
+    ${table(
+      [{label:'Agent'}, {label:'Link'}, {label:'Clicks', num:true}, {label:'Leads', num:true}, {label:'Converted', num:true}, {label:'Revenue', num:true}],
+      REFERRERS.map(r => ({cells:[
+        esc(r.agent), `/${esc(r.slug)}`, String(r.clicks), String(r.leads), String(r.conv), money(r.rev)
+      ]})))}
+  </section>`;
+}
+
+V.crm = () => modView({overview:crmOverview, leads:crmLeads, leaddetail:crmLeadDetail,
+  campaigns:crmCampaigns, campaigndetail:crmCampaignDetail, attribution:crmAttribution, referrals:crmReferrals});
+
+/* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
    trail (filled by a pass), the notification bell and the account menu.
    ====================================================================== */
