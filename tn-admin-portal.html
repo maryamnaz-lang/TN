@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=c85d3807">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=ab729a2e">
 
 <style>
 /* ==========================================================================
@@ -78,7 +78,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=c85d3807"></script>
+<script src="design-system/talentnext-ds.js?b=ab729a2e"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2538,6 +2538,153 @@ function crmReferrals(){
 
 V.crm = () => modView({overview:crmOverview, leads:crmLeads, leaddetail:crmLeadDetail,
   campaigns:crmCampaigns, campaigndetail:crmCampaignDetail, attribution:crmAttribution, referrals:crmReferrals});
+
+/* ======================================================================
+   SYSTEM & AUDIT
+   ====================================================================== */
+const svcTag = s => s === 'live' ? '<span class="tag sm green">Operational</span>'
+  : s === 'degraded' ? '<span class="tag sm warn">Degraded</span>'
+  : s === 'down' ? '<span class="tag sm red">Outage</span>' : '<span class="tag sm">—</span>';
+const sevTag = s => s === 'high' ? '<span class="tag sm red">High</span>'
+  : s === 'notice' ? '<span class="tag sm warn">Notice</span>' : '<span class="tag sm">Info</span>';
+const flagsOn = () => FEATURE_FLAGS.filter(f => f.on).length;
+
+PAGESUM['system/overview'] = () => {
+  const deg = SVC_HEALTH.filter(s => s.state !== 'live').length;
+  return `Every service is live${deg ? ` except ${deg} — video &amp; recording is degraded` : ''}. <b>${flagsOn()} of ${FEATURE_FLAGS.length} feature flags are on</b>, and sign-in is email and password behind an 18+ age gate.`;
+};
+PAGESUM['system/integrations'] = () => `Eight external services run the platform. <b>Video &amp; recording is degraded</b>; Stripe is live in production, handling charges, escrow and payouts.`;
+PAGESUM['system/audit'] = () => `The immutable record of every consequential action — a level change, a released payout, a flag flip. It is <b>retained indefinitely in a WORM store</b> and cannot be edited.`;
+PAGESUM['system/compliance'] = () => {
+  const open = DSARS.filter(d => d.status === 'in progress').length;
+  return `Safeguarding, consent and data rights in one place. Enhanced checks gate agents who interview 18–24s, and <b>${open} data requests are open</b> against the 30-day clock.`;
+};
+
+function systemOverview(){
+  return `
+  <section class="sec">
+    ${secHead('At a glance')}
+    ${stats([
+      ['check', 'Services live', `${SVC_HEALTH.filter(s => s.state === 'live').length}<small>/${SVC_HEALTH.length}</small>`, '1 degraded'],
+      ['gear', 'Flags on', `${flagsOn()}<small>/${FEATURE_FLAGS.length}</small>`, 'feature toggles'],
+      ['link', 'Integrations', String(INTEGRATIONS.length), 'external services'],
+      ['lock', 'Two-factor', 'On', 'required for staff']
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Service health', 'Uptime and latency across the platform’s services.',
+      '<button class="btn btn-g btn-sm noic" data-go="system/integrations">Integrations</button>')}
+    ${table(
+      [{label:'Service'}, {label:'Status'}, {label:'Uptime', num:true}, {label:'Latency', num:true}],
+      SVC_HEALTH.map(s => ({cells:[idCell(s.name, s.detail), svcTag(s.state), esc(s.uptime), esc(s.latency)]})))}
+  </section>
+  <section class="sec">
+    ${aiHead('Feature flags', `${flagsOn()} of ${FEATURE_FLAGS.length} on. A flag flip changes platform behaviour and is written to the audit log.`)}
+    <div class="tile-stack">
+      ${FEATURE_FLAGS.map((f, i) => {
+        const blocked = /Blocked/i.test(f.scope);
+        return `<div class="cardrow">
+          <span class="cardrow-ic">${ic('gear')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(f.k)} ${f.on ? '<span class="tag sm green">On</span>' : '<span class="tag sm">Off</span>'}</span>
+            <span class="cardrow-d">${esc(f.d)} · ${esc(f.scope)}</span></span>
+          <span class="cardrow-a">${blocked
+            ? '<span class="tag sm">Blocked</span>'
+            : `<button class="btn btn-g btn-sm noic" data-act="toggleflag:${i}">${f.on ? 'Turn off' : 'Turn on'}</button>`}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('Sign-in & access', 'How an account is authenticated.')}
+    ${kv(AUTH_CFG.map(([k, v]) => [esc(k), esc(v)]))}
+  </section>`;
+}
+
+function systemIntegrations(){
+  return `
+  <section class="sec">
+    ${aiHead('Integrations', 'The external services the platform runs on. Keys are rotated on a schedule.')}
+    <div class="tile-stack">
+      ${INTEGRATIONS.map(g => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('link')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(g.name)} ${svcTag(g.state)}</span>
+            <span class="cardrow-d">${esc(g.cat)} · ${esc(g.detail)} · ${esc(g.env)} · ${g.webhooks} webhooks · ${esc(g.events)} events · ${esc(g.keyAge)}</span></span>
+          <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-act="toast:Manage ${esc(g.name)} in its provider console">Manage</button></span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+function systemAudit(){
+  const sf = getFilter('audsev', 'all');
+  const rows = AUDIT.filter(a => sf === 'all' ? true : (a.sev || 'info') === sf);
+  return `
+  <section class="sec">
+    ${aiHead('Audit log', 'Every consequential action, in order. Immutable and retained for compliance.')}
+    <div class="mt4">${filterTabs('audsev', 'all', [
+      ['all', 'All', AUDIT.length],
+      ['high', 'High', AUDIT.filter(a => a.sev === 'high').length],
+      ['notice', 'Notice', AUDIT.filter(a => a.sev === 'notice').length]
+    ])}</div>
+    ${table(
+      [{label:'When'}, {label:'Actor'}, {label:'Action'}, {label:'Module'}, {label:'Severity'}, {label:'IP'}],
+      rows.map(a => ({cells:[
+        esc(a.when),
+        idCell(a.who, a.role),
+        idCell(a.act, a.obj),
+        esc(a.mod),
+        sevTag(a.sev),
+        esc(a.ip)
+      ]})))}
+  </section>`;
+}
+
+function systemCompliance(){
+  return `
+  <section class="sec">
+    ${aiHead('Compliance & safeguarding', 'The checks, consents and data rights that keep the platform lawful.')}
+    <div class="tile-stack">
+      ${SAFEGUARD.map(s => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('shield')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(s.check)}
+            <span class="tag sm ${s.state === 'ok' ? 'green' : 'warn'}">${esc(s.status)}</span></span>
+            <span class="cardrow-d">${esc(s.who)}</span></span>
+        </div>`).join('')}
+    </div>
+  </section>
+  <section class="sec">
+    ${aiHead('Consent capture', 'What candidates have agreed to, and the rate across accounts.')}
+    ${kv(CONSENT.map(c => [`${esc(c.p)} <span class="t-caption">— ${esc(c.basis)}, ${esc(c.when)}</span>`, `<b>${c.rate}%</b>`, 'n']))}
+  </section>
+  <section class="sec">
+    ${aiHead('Retention', 'How long each kind of data is kept, and why.')}
+    ${table(
+      [{label:'Data'}, {label:'Kept'}, {label:'Basis'}, {label:'Encryption'}],
+      RETENTION.map(r => ({cells:[esc(r.data), esc(r.keep), esc(r.basis), esc(r.enc)]})))}
+  </section>
+  <section class="sec">
+    ${aiHead('Data-subject requests', 'Exports, deletions and corrections, against the 30-day clock.')}
+    <div class="tile-stack">
+      ${DSARS.map(d => `
+        <div class="cardrow">
+          <span class="cardrow-ic">${ic('doc')}</span>
+          <span class="cardrow-b"><span class="cardrow-t">${esc(d.who)}
+            <span class="tag sm bordered">${esc(d.type)}</span> ${tag(d.status, cap(d.status))}</span>
+            <span class="cardrow-d">${esc(d.role)} · due ${esc(d.due)} · ${esc(d.note)}</span></span>
+        </div>`).join('')}
+    </div>
+  </section>`;
+}
+
+V.system = () => modView({overview:systemOverview, integrations:systemIntegrations, audit:systemAudit, compliance:systemCompliance});
+
+ACTIONS['toggleflag'] = key => {
+  const f = FEATURE_FLAGS[+key.split(':')[1]]; if(!f) return;
+  f.on = !f.on;
+  toast(`${f.k} turned ${f.on ? 'on' : 'off'} · logged`);
+};
 
 /* ======================================================================
    THE SHELL — §78. App bar with the nav toggle, the wordmark, the breadcrumb
