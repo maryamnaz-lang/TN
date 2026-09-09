@@ -95,8 +95,16 @@ S.obStep = 0;
 S.obSpoken = false;
 /* WHICH MODE THE GATE'S FIRST SCREEN IS IN — `'voice'` or `'chat'`. The two
    pills at the foot switch it and `obChatScreen`'s note is why it is a word of
-   its own rather than a reuse of `S.askOpen`. */
-S.obMode = 'voice';
+   its own rather than a reuse of `S.askOpen`.
+
+   THE VOICE FLOW IS HIDDEN (Maryam, 9 Sep 2026: "hide the voice flow on the tal
+   onboarding, that means we will land user on the chat side directly"). So the
+   door opens on chat rather than voice, and `obModes` draws no Voice/Chat pair —
+   there is one mode now, so a switch between two would be §60's dead control.
+   The voice machinery (`obSpeak`/`obReplay`/`obChat`, the mode handlers) is left
+   in place, just no longer reachable, so restoring the pair is a one-line
+   reversal of both this default and `obModes`. */
+S.obMode = 'chat';
 /* AND WHETHER THE CONVERSATION HAS BEGUN. The chat opens on Tal's message and
    a button; the left/right turns and the composer arrive when that button is
    pressed (Maryam, 3 Sep 2026: "the chat left right messages will initiate
@@ -791,6 +799,11 @@ const obHead = () => `
    a screen reader, which is what makes the pair a switch rather than two
    buttons that happen to sit together. */
 const obModes = () => {
+  /* HIDDEN — the voice flow is off (Maryam, 9 Sep 2026), so the switch between
+     two modes has only one mode to point at and is not drawn. §107 places the
+     dock's middle and pill columns by name, so an empty `.ob-modes` slot leaves
+     the composer centred rather than sliding it. Restore by deleting this line. */
+  return '';
   const m = S.obMode === 'chat' ? 'chat' : 'voice';
   return `
   <div class="ob-modes" role="group" aria-label="How Tal talks to you">

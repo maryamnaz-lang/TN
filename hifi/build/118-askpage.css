@@ -57,6 +57,13 @@
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat}
 
+/* THE CHAT FIELD'S RESTING EDGE IS THE PLAIN HAIRLINE, LIKE THE FLOATING FIELD
+   (Maryam, 9 Sep 2026: "the default view of the tal field inside the tal chat
+   should be just like outside floating tal field but without a shadow and moving
+   gradient line"). It already carries no shadow and no `.ai-run` comet; the last
+   difference was this border, which was the `--ai-grad-line` gradient. It is a
+   flat `--rule` #efefef now, matching §117's floating pill. `:focus-within` still
+   swaps to the hot stroke below — that is the typing state, not the default. */
 .app .ask-page .askfield,
 .app .ask-page .askfield:focus-within{
   border-radius:999px;
@@ -65,13 +72,19 @@
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line);
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
+/* TYPING (focus) SWAPS THE EDGE TO THE GRADIENT (Maryam, 9 Sep 2026, off Figma
+   875:6625: "we changed the border color to the gradient, and the send icon is
+   now active with accent color frame"). The default edge is the plain #efefef
+   hairline above; on `:focus-within` it becomes `--ai-grad-line`, the ask ramp
+   — the one moment the chat field wears the colour. The send disc (the "accent
+   color frame") is armed separately by `askSendArm` (`:not(:disabled)` above). */
 .app .ask-page .askfield:focus-within{
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--askv-stroke-hot), var(--askv-stroke-hot))}
+    var(--ai-grad-line)}
 .app .ask-page .askfield::before,
 .app .ask-page .askfield:focus-within::before{content:none}
 
@@ -81,11 +94,31 @@
   border:0;border-radius:0;
   background:transparent;background-image:none}
 .app .ask-page .askfield-send svg{fill:var(--text-primary)}
+/* THE GLYPHS MATCH THE FLOATING FIELD AT 22px (Maryam, 9 Sep 2026: "follow the
+   icon sizes as well"). §105 draws the chat mic and send svg at 18; the dock's
+   are 22 (§117.91), so they are restated here — a later layer at the same
+   (0,3,0) wins. */
+.app .ask-page .askfield-mic svg,
+.app .ask-page .askfield-send svg{width:22px;height:22px}
 /* §105.438's disabled state paints `--layer-accent-01` as a DISC ground at
    (0,5,0); with the disc gone the ground has to go with it, and the placeholder
    ink §105.441 gives the glyph is the whole of "off" now. */
 .app .ask-page .askfield-send:disabled,
 .app .askfield-send:disabled{background:transparent;background-image:none}
+/* THE SEND IS A FILLED ACCENT CIRCLE ONCE THERE IS SOMETHING TO SEND (Maryam,
+   9 Sep 2026, off Figma 875:6625, the typing state): armed, it is a round
+   `--accent` disc with a white arrow; empty it stays the bare grey glyph above
+   (the resting state, Figma 882:6875). `askSendArm` toggles the `disabled`
+   attribute on the field's `input` event, so `:not(:disabled)` is the typing
+   state and this swap needs no JS of its own. (0,3,1) beats the (0,3,0) resting
+   rule. The `.rec` recorder hides this send entirely (§121.51), so it never
+   shows the disc mid-take. */
+.app .ask-page .askfield-send:not(:disabled){
+  width:36px;height:36px;flex:0 0 36px;
+  border-radius:999px;
+  background:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center}
+.app .ask-page .askfield-send:not(:disabled) svg{fill:var(--on-accent)}
 .app .ask-page .askfield-mic.on{background:transparent;border:0}
 .app .ask-page .askfield-mic.on svg{fill:var(--danger-ink)}
 .app .ask-page .askfield-mic + .askfield-send{margin-left:calc(var(--s05) - var(--s03))}

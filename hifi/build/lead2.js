@@ -212,7 +212,6 @@ const ldrNoteRow = (n, name, i) => {
   const k = NOTE_K[n.k] || NOTE_K.general;
   return `<div class="note-row" data-note-i="${i}" data-note-k="${n.k || 'general'}"
        style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
-    <span class="note-mk">${I.edit}<i class="note-dot"></i></span>
     <span class="note-b">
       <span class="note-t">${n.t}</span>
       ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
@@ -235,8 +234,8 @@ const ldrNoteRow = (n, name, i) => {
            one thing that file forbids. The × is what this row already used and
            what every sheet in the build dismisses with. */}
     <span class="note-a">
-      <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}">${I.edit} Edit</button>
-      <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}">${I.close} Delete</button>
+      <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}" aria-label="Edit note" title="Edit">${I.edit}</button>
+      <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}" aria-label="Delete note" title="Delete">${I.delete}</button>
     </span>
   </div>`;
 };
@@ -518,9 +517,13 @@ const cohortCard = c => {
       <span class="cco-v">${val}</span>
     </span>`;
   return `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
+    ${''/* NO COURSE COVER (Client, 9 Sep 2026: "since the cohorts are now not
+          dependant on course so remove the course images from cohorts"). The
+          `<img>` was `cohortArt(c)`, a course cover keyed by level; with cohorts
+          decoupled from courses the cover leaves and the cohort's own number
+          (`<i>`, already the fail-to-decode fallback) is the mark. */}
     <span class="cco-art">
       <i>${c.id}</i>
-      <img src="${cohortArt(c)}" alt="" loading="lazy" onerror="this.style.display='none'">
       <span class="cco-pill" style="--pill:var(${pill})">${c.members.length} Candidates</span>
     </span>
     <span class="cco-b">
@@ -943,10 +946,17 @@ const ldrChRow = (i, m, done) => {
            `chRow` in views.js carries the whole argument, including why
            `.ch-num`'s rules are kept. `i + 1` is no longer read. */}
     <span class="ch-b">
-      <span class="ch-n">${name}${complete ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
+      <span class="ch-n">${name}</span>
       <span class="ch-m">${meta}</span>
     </span>
-    ${complete ? '' : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`}
+    ${''/* THE STATUS MARK IS ON THE RIGHT FOR EVERY ROW — Maryam, 9 Sep 2026:
+           "take the completed tick icon on the right side just like the circle
+           icons we have on the other chapter rows." The finished chapter's tick
+           used to sit inline after the name (`.ch-tick`) while the unfinished
+           rows carried a ring in the trailing `.ch-ic`; now the tick joins them
+           there, so the whole column reads down as one status track — a green
+           `checkFilled` for done, a grey ring for the rest (coloured in §15). */}
+    <span class="ch-ic">${complete ? I.checkFilled : I.circle}</span>
   </div>`;
 };
 

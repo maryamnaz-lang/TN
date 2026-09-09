@@ -539,8 +539,17 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <span class="idphoto"><span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span><i class="av-on" aria-hidden="true"></i></span>
       <div class="idhead-b">
         <span class="idname">${LEADER.n}</span>
-        <span class="idmeta">Volunteer cohort leader &middot; leading since ${LEADER.since}</span>
-        <span class="tag sm">Assesses ${LEADER.range}</span>
+        ${''/* "Leading since …" ALONE (Maryam, 9 Sep 2026: "remove the line
+              'Volunteer cohort leader · ' and make the next word 'Leading' L
+              capital"). The unpaid/volunteer fact lives elsewhere; the sub-line
+              is the tenure. */}
+        <span class="idmeta">Leading since ${LEADER.since}</span>
+        ${''/* THE ASSESS RANGE IS A BORDERLESS LINE, LEFT-ALIGNED WITH THE NAME
+              (Maryam, 9 Sep 2026: "remove the border of Assesses E1–E3 and align
+              it with other above content"). It was a `.tag sm` chip, indented by
+              its own border and padding; a plain `.idmeta` line sits at the same
+              left edge as the name and the tenure. */}
+        <span class="idmeta">Assesses ${LEADER.range}</span>
       </div>
       <div class="idhead-a"><button class="btn btn-g" data-ldrprof="1">Edit details ${I.edit}</button></div>
     </div>
@@ -557,33 +566,48 @@ V.leadProfile = () => `<main class="main"><div class="page">
   </div>` : ''}
 
   ${S.ldrPfTab === 'public' ? `
-  ${''/* PUBLIC — the listing. The identity now has the 72px photo and the STARS
-        AND RATING on their own line under the name (Maryam, 7 Sep 2026), with the
-        cohorts led and range on the helper line below it. `stars()` renders inline
-        in the idmeta the way it does everywhere a rating shows star-first. */}
-  <div class="sec tint">
-    <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span>
-      <button class="btn btn-t btn-sm ic-l" data-ldrprof="1">${I.edit}Edit listing</button></div>
-    <div class="tile">
-      <div class="idhead" style="padding-top:0">
-        <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
-        <div class="idhead-b">
-          <span class="idname">${LEADER.n}</span>
-          <span class="idmeta">${stars(4.9)} 4.9</span>
-          <span class="t-helper-01">8 cohorts led &middot; Assesses ${LEADER.range}</span>
-        </div>
+  ${''/* PUBLIC — REBUILT ON THE TALENT AGENT'S PUBLIC PROFILE (Maryam, 9 Sep 2026:
+        "improve the cohort leader public profile just like talent agent public
+        profile"). The agent's tab is: a large 72px identity with the rating and
+        assess range on one `.idmeta` line, a four-cell figure band, an About me
+        paragraph and a Specialities chip cloud — no "public profile" heading, no
+        description and no edit button (editing lives one tab over, on General's
+        "Edit details"). This tab now reads the same, with the leader's own facts.
+
+        THE FOUR CELLS are the leader's, not the agent's: the agent's Interview
+        Fee / Availability / Evaluation Time / Experience become Cohorts led /
+        Call length / Cadence / Leading since — a cohort leader is unpaid and
+        nobody books them from this card (the old disclaimer's point), so there is
+        no fee cell; the rating and range stay in the `.idmeta` line, so the cells
+        do not repeat them. The old "Your listing" kv (Specialism / Assessing
+        range / Call length) is folded in: range to the idmeta, call length to a
+        cell, and Specialism becomes the chip cloud (`LEADER.specs`).
+
+        `.sec-noline` on the first two so identity, figures, About and
+        Specialities read as ONE band, exactly as the agent's do; no `.av-on` dot
+        — the green marker is the owner's own view, not the listing (§09). */}
+  <div class="sec sec-noline">
+    <div class="idhead">
+      <span class="idphoto"><span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span></span>
+      <div class="idhead-b">
+        <span class="idname">${LEADER.n}</span>
+        <span class="idmeta"><span style="color:var(--star)">&#9733;</span> 4.9 &middot; Assesses ${LEADER.range}</span>
       </div>
-      <p class="t-helper-01">&ldquo;${LEADER.bio}&rdquo;</p>
     </div>
-    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
+    <div class="facts pf-facts">
+      ${pfFact(I.group, '--mk-1', 'Cohorts led', '8')}
+      ${pfFact(I.time, '--mk-2', 'Call length', '60 min')}
+      ${pfFact(I.calendar, '--mk-3', 'Cadence', 'Weekly')}
+      ${pfFact(I.shield, '--mk-4', 'Leading since', LEADER.since)}
+    </div>
+  </div>
+  <div class="sec sec-noline">
+    <div class="sec-h"><h2>About</h2></div>
+    <p class="t-body pfe-about">${LEADER.bio}</p>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Your listing</h2><span class="t-helper-01">What the card above is built from</span></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
-      <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
-      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
-    </div>
+    <div class="sec-h"><h2>Specialities</h2></div>
+    <div class="skl">${LEADER.specs.map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
   </div>` : ''}
 
   ${S.ldrPfTab === 'notif' ? `

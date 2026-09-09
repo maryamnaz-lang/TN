@@ -108,8 +108,11 @@
    first note as well; `+` draws one only where two rows meet, so a single note
    has none and a second one brings its own. The rows pay no side padding either
    — with the panel gone the section's gutter is the only inset there is. */
+/* NO LEADING MARK (Maryam 9 Sep 2026, "remove the icon on the left of the
+   note, note should not have an icon"): the row was mark / body / actions;
+   `.note-mk` is gone from the markup, so the grid is body / actions. */
 .app .note-row{
-  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
   gap:var(--s05);align-items:start;
   padding:var(--s05) 0}
 .app .note-row + .note-row{border-top:1px solid var(--rule)}
@@ -123,8 +126,9 @@
 .app .note-tag{
   display:inline-flex;align-items:center;
   padding:2px var(--s03);border-radius:999px;
-  background:var(--note-bg)}
-.app .note-a{display:flex;align-items:center;gap:var(--s02);flex:none}
+  /* light accent wash, not the category `--note-bg` (Maryam 9 Sep 2026) */
+  background:color-mix(in srgb, var(--accent) 10%, var(--layer-01))}
+.app .note-a{display:flex;align-items:center;gap:var(--s03);flex:none}
 .app .note-a .ic svg{width:16px;height:16px}
 
 /* ------------------------------------------------------------------ 99.4 ---
@@ -166,8 +170,8 @@
    clipped select.
    -------------------------------------------------------------------------- */
 @container app (max-width:899.98px){
-  .app .note-row{grid-template-columns:auto minmax(0,1fr)}
-  .app .note-a{grid-column:2;margin-top:var(--s03)}
+  .app .note-row{grid-template-columns:minmax(0,1fr)}
+  .app .note-a{grid-column:1;margin-top:var(--s03)}
   .app .note-bar-a{margin-left:0;width:100%}
   .app .note-srch{flex:1 1 auto}
   .app .note-srch .inp{width:100%}

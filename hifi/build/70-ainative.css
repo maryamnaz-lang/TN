@@ -596,16 +596,14 @@
    argument: a 4s glow on an 18px disc is a flicker. What moves on this page is
    the comet, which is one moving thing where there had been two.
    ------------------------------------------------------------------------ */
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
-.app .ai-label.bare.rec-lab::before{
-  content:'';
-  /* 12, AND THAT IS BELOW THE FILE'S RATIO ON PURPOSE (Maryam, 30 Aug 2026).
+/* THE "TAL RECOMMENDS" MARK keeps the 12px sparkle (Maryam, 30 Aug 2026):
      581:6669 sets the star at 18 against a 16px label; §63 maps that label to
      `--t-h4`, which is 14, so carrying the file's proportion across gives 15 —
-     which is what shipped first and was still too heavy. At 12 the mark is
-     smaller than the cap height of the words beside it, so it reads as a
-     bullet introducing the line rather than as a second object competing with
-     it. The 6px gap is unchanged, which is what keeps the pair tight. */
+     still too heavy. At 12 the mark is smaller than the cap height of the words
+     beside it, so it reads as a bullet introducing the line rather than a
+     second object. The 6px gap is unchanged, which keeps the pair tight. */
+.app .ai-label.bare.rec-lab::before{
+  content:'';
   width:12px;height:12px;flex:none;
   border-radius:0;
   background-color:transparent;
@@ -613,6 +611,24 @@
   background-size:100% 100%;background-position:center;background-repeat:no-repeat;
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat;
+  box-shadow:none;
+  animation:none}
+
+/* THE SUMMARY MARK IS THE BLOB (Maryam 9 Sep 2026, "change that star to this
+   blob as well"). The head-of-page "Summary by Tal" star is now the same warm
+   blob artwork `--tal-mark` every other Tal mark paints, at 28px so the shape
+   reads, its own clip carrying the motion — NOT the sparkle the "Tal
+   recommends" label keeps, so the two are split out of §70.2's shared rule.
+   §33 §7's glossy logo-sphere and §33 §2's 16px stayed behind this rule; this
+   is the winning layer, so the change lands here. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  content:'';
+  width:28px;height:28px;flex:none;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
   box-shadow:none;
   animation:none}
 /* §33.6 draws the sphere's turning highlight as a second pseudo-element and it

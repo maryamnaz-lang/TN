@@ -3440,6 +3440,7 @@ body,.app,.pt-bar,.pt-sel,input,select,textarea,button{font-family:var(--font-sa
 .app .ch-tick{display:inline-flex;flex:none}
 .app .ch-tick svg{
   display:block;width:15px;height:15px;fill:var(--support-success)}
+.app .ch:not(.done):not(.locked) .ch-ic svg{fill:var(--gray-20)}
 .app .ch-act{
   flex:none;white-space:nowrap;
   font-size:12.5px;line-height:17px;font-weight:600;
@@ -6819,25 +6820,17 @@ button.btn-p:active,
   display:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
   width:32px;height:32px;
-  border-radius:50%;
+  border-radius:0;
   background-color:transparent;
-  background-image:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
-    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%);
-  background-size:60% 60%,100% 100%,100% 100%,100% 100%;
-  background-position:center,center,center,center;
+  background-image:var(--tal-mark);
+  background-size:contain;
+  background-position:center;
   background-repeat:no-repeat;
   -webkit-mask:none;mask:none;
-  box-shadow:
-    0 0 8px 1px rgba(244,113,19,0.35),
-    0 0 16px 3px rgba(244,113,19,0.15),
-    inset 0 -2px 5px rgba(0,0,0,0.12),
-    inset 0 2px 5px rgba(246,220,146,0.25);
-  animation:tal-sphere-glow 4s ease-in-out infinite}
+  box-shadow:none;
+  animation:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{
-  content:'';
+  content:none;
   position:absolute;left:-2px;top:50%;
   width:36px;height:36px;
   margin-top:-18px;
@@ -7162,7 +7155,7 @@ button.btn-p:active,
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px}
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
-  padding:var(--s04) var(--s05);
+  padding:var(--s05) var(--s05);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
@@ -7216,7 +7209,9 @@ button.btn-p:active,
   .app .ldr-dm-back{display:none}
 }
 .app .ldr-dm-back{flex:none;margin-right:var(--s02)}
-.app .main:has(> .msg-mod){display:flex;flex-direction:column;flex:1;min-height:0}
+.app .main:has(> .msg-mod){
+  display:flex;flex-direction:column;flex:1;min-height:0;
+  padding-left:0;padding-right:0}
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;
@@ -10071,9 +10066,9 @@ button.btn-p:active,
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none}
-.app .chip-msg,.app .chip-edit{color:var(--link)}
-.app .chip-note{color:var(--support-warning-ic)}
-.app .chip-del{color:var(--danger-ink)}
+.app .chip-msg,.app .chip-edit{color:var(--icon-primary)}
+.app .chip-note{color:var(--icon-primary)}
+.app .chip-del{color:var(--icon-primary)}
 .app .note-t,.app .note-empty > h3{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
@@ -10085,7 +10080,7 @@ button.btn-p:active,
 .app .note-tag{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
-  text-transform:none;color:var(--note-ink)}
+  text-transform:none;color:var(--accent-text)}
 .app .note-w{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
@@ -10179,8 +10174,8 @@ button.btn-p:active,
   text-transform:none;color:var(--text-primary)}
 .app .dark-card .eo-cname{color:var(--on-dark)}
 .app .eo-chip{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
   text-transform:none;color:var(--text-primary)}
 .app .dark-card .eo-chip{color:var(--on-dark)}
 .app .conf .conf-t{
@@ -10580,7 +10575,6 @@ button.btn-p:active,
   background-image:none;
   -webkit-background-clip:border-box;background-clip:border-box;
   gap:6px}
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
 .app .ai-label.bare.rec-lab::before{
   content:'';
   width:12px;height:12px;flex:none;
@@ -10590,6 +10584,16 @@ button.btn-p:active,
   background-size:100% 100%;background-position:center;background-repeat:no-repeat;
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat;
+  box-shadow:none;
+  animation:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  content:'';
+  width:28px;height:28px;flex:none;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
   box-shadow:none;
   animation:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
@@ -11979,9 +11983,9 @@ button.btn-p:active,
 .app .page > .sec.sec-cs:has(+ .sec.dark-card){padding-bottom:0}
 .app .ldr-chip{
   display:inline-flex;align-items:center;gap:var(--s02);
-  height:32px;padding:0 var(--s05);
-  border:0;border-radius:999px;cursor:pointer;
-  background-color:var(--chip-bg)}
+  height:32px;padding:0 var(--s02);
+  border:0;border-radius:0;cursor:pointer;
+  background:transparent}
 .app .ldr-chip svg{width:16px;height:16px;flex:none;fill:currentColor}
 .app .chip-msg,.app .chip-edit{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
 .app .chip-note{--chip-bg:color-mix(in srgb, var(--support-warning-ic) 14%, var(--layer-01))}
@@ -12094,7 +12098,7 @@ button.btn-p:active,
 .app .note-sel{width:auto}
 .app .note-list{display:flex;flex-direction:column}
 .app .note-row{
-  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
   gap:var(--s05);align-items:start;
   padding:var(--s05) 0}
 .app .note-row + .note-row{border-top:1px solid var(--rule)}
@@ -12104,8 +12108,8 @@ button.btn-p:active,
 .app .note-tag{
   display:inline-flex;align-items:center;
   padding:2px var(--s03);border-radius:999px;
-  background:var(--note-bg)}
-.app .note-a{display:flex;align-items:center;gap:var(--s02);flex:none}
+  background:color-mix(in srgb, var(--accent) 10%, var(--layer-01))}
+.app .note-a{display:flex;align-items:center;gap:var(--s03);flex:none}
 .app .note-a .ic svg{width:16px;height:16px}
 .app .note-box{
   display:grid;grid-template-columns:auto minmax(0,1fr);
@@ -12117,8 +12121,8 @@ button.btn-p:active,
 .app .note-form-a{display:flex;align-items:center;gap:var(--s03);flex-wrap:wrap}
 .app .note-form-b{display:flex;align-items:center;gap:var(--s03);margin-left:auto}
 @container app (max-width:899.98px){
-  .app .note-row{grid-template-columns:auto minmax(0,1fr)}
-  .app .note-a{grid-column:2;margin-top:var(--s03)}
+  .app .note-row{grid-template-columns:minmax(0,1fr)}
+  .app .note-a{grid-column:1;margin-top:var(--s03)}
   .app .note-bar-a{margin-left:0;width:100%}
   .app .note-srch{flex:1 1 auto}
   .app .note-srch .inp{width:100%}
@@ -12806,10 +12810,20 @@ button.btn-p:active,
 .app .eo-chip{
   flex:none;
   display:inline-flex;align-items:center;
-  padding:var(--s01) var(--s03);
+  padding:1px var(--s03);
   border-radius:999px;
   white-space:nowrap;
   background-color:#ff0000}
+.app .page .facts.eo-facts > .eo-cta::before{content:none}
+@container app (min-width:900px) and (max-width:1300px){
+  .app .page .facts.eo-facts:has(> .eo-cta){
+    grid-auto-flow:row;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--s06) var(--s05)}
+  .app .page .facts.eo-facts:has(> .eo-cta) > div + div::before{content:none}
+  .app .page .facts.eo-facts > .eo-cta{grid-column:1 / -1;margin-left:0}
+  .app .page .facts.eo-facts > .eo-cta .btn{width:100%}
+}
 .app .eo-fi-star svg{fill:var(--star)}
 .app .dark-card .eo-fi.eo-fi-star svg{fill:var(--star)}
 .app .conf.conf-ok .conf-mk{
@@ -13158,7 +13172,7 @@ button.btn-p:active,
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line);
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 .app .askdock > .askline:active{
@@ -13193,13 +13207,13 @@ button.btn-p:active,
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line);
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 .app .ask-page .askfield:focus-within{
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--askv-stroke-hot), var(--askv-stroke-hot))}
+    var(--ai-grad-line)}
 .app .ask-page .askfield::before,
 .app .ask-page .askfield:focus-within::before{content:none}
 .app .ask-page .askfield-send,
@@ -13208,8 +13222,16 @@ button.btn-p:active,
   border:0;border-radius:0;
   background:transparent;background-image:none}
 .app .ask-page .askfield-send svg{fill:var(--text-primary)}
+.app .ask-page .askfield-mic svg,
+.app .ask-page .askfield-send svg{width:22px;height:22px}
 .app .ask-page .askfield-send:disabled,
 .app .askfield-send:disabled{background:transparent;background-image:none}
+.app .ask-page .askfield-send:not(:disabled){
+  width:36px;height:36px;flex:0 0 36px;
+  border-radius:999px;
+  background:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center}
+.app .ask-page .askfield-send:not(:disabled) svg{fill:var(--on-accent)}
 .app .ask-page .askfield-mic.on{background:transparent;border:0}
 .app .ask-page .askfield-mic.on svg{fill:var(--danger-ink)}
 .app .ask-page .askfield-mic + .askfield-send{margin-left:calc(var(--s05) - var(--s03))}
@@ -15707,7 +15729,7 @@ const enrolFacts = lvl => {
     [I.book,   'Chapters',   '13, one a week', {}],
     c ? [I.star,  String(c.rating), `${c.reviews} user reviews`, {star:1}]
       : [I.chart, 'Assessments', '13, one per chapter', {}],
-    c ? [I.group, 'Total Members', `${c.taken} members till now`,
+    c ? [I.group, 'Members', `${c.taken} members till now`,
          {chip:`${COHORT_SIZE - c.taken} seats left`}]
       : [I.group, `Cohort of ${COHORT_SIZE}`, 'live calls with your leader', {}]
   ];
@@ -15715,23 +15737,81 @@ const enrolFacts = lvl => {
 
 
 
-function courseBrowse(lvl){
-  const cur = String(lvl || 'E3').toUpperCase();
-  return `<div class="sec">
-    ${''/* THE DESCRIPTION IS A SIBLING OF `.sec-h`, NOT A CHILD — `.sec-h` is a
-          flex row, so a `<p>` inside it squeezes the heading to min-content at
-          mobile (no section in the build puts a description inside `.sec-h`). */}
-    <div class="sec-h"><h2>Courses in your track</h2></div>
-    <p class="t-desc" style="margin-bottom:var(--s05)">One recommended for you now; the rest are the track&rsquo;s behavioural curriculum.</p>
-    <div class="tile-stack">
-      ${Object.keys(ENROL_COURSE).map(l => {
-        const c = ENROL_COURSE[l];
-        const tag = l === cur ? 'Recommended' : 'In your track';
-        return gcard('course', tag, c.name, `Rated ${c.rating.toFixed(1)} &middot; ${c.reviews} reviews`, 'enrol');
-      }).join('')}
-    </div>
+const courseArt = lvl => COHORT_ART[String(lvl).toLowerCase()] || COHORT_ART.e3;
+const COURSE_TOPICS = {
+  E1:['Communication','Teamwork','Time management'],
+  E2:['Tools','Productivity','Collaboration'],
+  E3:['Strategy','Operations','Finance'],
+  E4:['Leadership','Decisions','Ownership']
+};
+const courseTags = lvl => (COURSE_TOPICS[lvl] || []).map(t => `<span class="tag agt-tag">${t}</span>`).join('');
+const COURSE_LEVELS = ['E1','E2','E3','E4'];
+
+const COURSE_RATE_PH = { E1:[4.6,210], E2:[4.4,176] };   // placeholder, no seed record
+const courseRating = lvl => {
+  const c = ENROL_COURSE[lvl];
+  return c ? [c.rating, c.reviews] : (COURSE_RATE_PH[lvl] || [4.5, 0]);
+};
+
+function courseRow(lvl, cur){
+  const rec = lvl === cur ? '<span class="ag-rec">Recommended</span>' : '';
+  const [rating, reviews] = courseRating(lvl);
+  return `<div class="agt-r draw">
+    <span class="agt-c agt-who">
+      <img src="${courseArt(lvl)}" alt="" loading="lazy" onerror="this.style.display='none'"
+        style="width:56px;height:38px;object-fit:cover;flex:0 0 56px;border:1px solid var(--rule)">
+      <span class="agt-wb">
+        <span class="agt-n">${COURSE_NAME[lvl]}${rec}</span>
+        <span class="agt-rate">${stars(rating)}<span class="num">${rating.toFixed(1)}</span></span>
+        <span class="agt-m">${reviews} reviews</span>
+      </span>
+    </span>
+    <span class="agt-c agt-tags">${courseTags(lvl)}</span>
+    <span class="agt-c agt-exp"><span class="agt-v">13 chapters</span></span>
+    <span class="agt-c agt-next"><span class="agt-v">One a week</span></span>
+    <span class="agt-c agt-fee">$690</span>
+    <span class="agt-c agt-act">
+      <button class="btn btn-p btn-sm noic" data-go="enrol">View Course</button>
+    </span>
   </div>`;
 }
+
+const allCourses = (f) => {
+  const cur = String((f && f.level) || 'E3').toUpperCase();
+  return `
+  <div class="sec">
+    <div class="hd-srch">
+      <div class="hd-srch-t">
+        <div class="sec-h"><h2>Choose a course</h2></div>
+        <p class="all-desc">Every course in your track. The one recommended for you now is marked.</p>
+      </div>
+      <div class="srch all-srch">
+        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
+        <input class="inp" placeholder="Search all ${COURSE_LEVELS.length} courses" aria-label="Search courses">
+      </div>
+    </div>
+  </div>
+  ${''/* THE TABLE IS A BARE `.agt` SIBLING OF THE HEADING SEC, exactly as
+        `allAgents` places `agentsTable()` (Maryam, 9 Sep 2026: "follow the
+        organized ui we have on the all agents screen"). It used to live INSIDE
+        the `.sec`, which pays a 32px inset each side, so the table was 64px
+        narrower than the agent list — and the whole shortfall came off the one
+        flexible column (`.agt-tags`), squeezing "What it covers" to ~173px so
+        every topic pill wrapped onto its own line. Out here the table takes the
+        full page width the agent list gets, and the topics group the way the
+        expertise column does. */}
+  <div class="agt">
+    <div class="agt-h" aria-hidden="true">
+      <span class="agt-c">Course</span>
+      <span class="agt-c">What it covers</span>
+      <span class="agt-c">Length</span>
+      <span class="agt-c">Cadence</span>
+      <span class="agt-c">Fee</span>
+      <span class="agt-c"></span>
+    </div>
+    ${COURSE_LEVELS.filter(l => COURSE_NAME[l]).map(l => courseRow(l, cur)).join('')}
+  </div>`;
+};
 const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
       ${aiHead({
         mark:false,
@@ -15739,7 +15819,7 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
         desc:ENROL_COURSE[lvl] ? ''
           : `${ENROL_DESC[lvl]}${ENROL_OPENS[lvl][1] ? ' ' + ENROL_OPENS[lvl][1] : ''}`,
         under:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>`,
-        act:act || `<button class="btn btn-p btn-sm noic" data-go="enrol">View Course ${I.arrowRight}</button>`
+        act:act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -15930,6 +16010,22 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
             o.chip ? `<span class="eo-chip">${o.chip}</span>` : ''}</span>
             <span class="eo-fv${o.acc ? ' eo-fv-acc' : ''}">${val}</span></span>
         </div>`).join('')}
+        ${''/* "View Course" JOINS THE STAT ROW (Maryam, 9 Sep 2026: "take the view
+              course button at bottom in the same row of the other stats"). It is
+              the card's own action, so it stays `btn-p`; it rides the far end of
+              the `.facts` row (`margin-left:auto`), which is the "adjust that row
+              spacing accordingly" — the four figures keep their cells and the
+              button takes the slack on the right. Dashboard only (`!act`); on
+              `V.enrol` the action is the passed "Continue to payment".
+
+              FULL HEIGHT, NOT `btn-sm` (Maryam, 9 Sep 2026: "why the size of view
+              course button is not matching with our other buttons"). §10.299
+              makes `.btn-sm` 32px at desktop while the standard `.btn` is 40px
+              (§10.298), so a `btn-sm` CTA read a step short of the card's own
+              "View Other Courses" and every other button. Dropped to the plain
+              `.btn` height so it matches. */}
+        ${!act ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
+          <button class="btn btn-p noic" data-go="enrol" style="white-space:nowrap">View Course ${I.arrowRight}</button></div>` : ''}
       </div>
     </div>`;
 
@@ -17027,7 +17123,6 @@ V.dashboard = (f) => {
           block rather than a card in the head band's column. `promoted` keeps
           the plate, where the offer sits beside a certificate. */}
     ${enrolOffer('E3')}
-    ${courseBrowse('E3')}
     ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
           moved down: `placeDark` (ai5) hoists any dark card on the page into the
           head band wherever the view puts it, so "further down" is not a place a
@@ -17207,7 +17302,6 @@ V.dashboard = (f) => {
           §75's whole point and the reason the offer can be a page child at all.
           `certBanner`'s own note is the rest of the argument. */}
     ${enrolOffer('E4')}
-    ${courseBrowse('E4')}
     ${certBanner(f, {close:true, key:'dash'})}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
@@ -17824,11 +17918,32 @@ V.report = (f) => `<main class="main"><div class="page">
         you could actually watch at the foot, under a recording block. There
         is no recording block any more (see `ivRow`), and the three scenes are
         the only thing here that shows the interview rather than describing
-        it, so they go where the eye lands. */}
-  <div class="sec sec-scene">
+        it, so they go where the eye lands.
+
+        AND THE CHOOSER IS HERE TOO NOW (Maryam, 9 Sep 2026: "take the choose
+        your scenes flow inside the interview it is related to"). It used to
+        open the Interviews module; this is the same move the strengths/growth
+        block made on 1 Sep, one level lower — the flow that picks THIS
+        interview's three scenes belongs on the page about THIS interview.
+        Gated on `sceneDone`: while nothing is committed the section IS the
+        chooser, and the moment three are saved it becomes the kept row. That
+        gate answers the old module note's worry — the chooser is not re-offered
+        on a report already settled, because `sceneDone` is true by then. `S.iv`
+        (or `level` as the default) is the interview, the same key the hero and
+        the write-up below read, so all three name one interview. */}
+  ${(() => { const k = S.iv === 're' ? 're' : 'level';
+    return sceneDone(k)
+    ? `<div class="sec sec-scene">
     <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
-    ${sceneRow(S.iv === 're' ? 're' : 'level')}
-  </div>
+    ${sceneRow(k)}
+  </div>`
+    : `<div class="sec">
+    <div class="sec-h"><div class="scene-hb"><h2>Choose your scenes</h2>
+    <p class="scene-lede">Six moments were cut from your interview. Keep the three you would be happy for someone to watch.</p>
+    </div>${sceneSave(k)}</div>
+    ${scenePick(k)}
+  </div>`;
+  })()}
   ${''/* WHAT THE INTERVIEW FOUND — MOVED HERE FROM THE INTERVIEWS MODULE
         (Maryam, 1 Sep 2026: "the strengths and growth section should show
         inside interview details, remove from here and add in the interview
@@ -17937,76 +18052,15 @@ V.interviews = (f) => {
         conversation with one of six people, and the chip points at the same one
         for both stages. */}
   ${due?allAgents():''}
-  ${''/* CHOOSING THE SCENES IS THE FIRST THING IN THE MODULE, AND ONLY ONCE.
-        The level interview is done, six scenes are cut from it, and the
-        candidate keeps three. It opens the module rather than sitting below
-        the history because it is the one thing on this page that is waiting
-        on them — and it disappears the moment they save, which is why
-        `sceneDone` and not the stage is the condition. Everything else on the
-        module is still underneath it; nothing is hidden while choosing.
-
-        NOTHING HERE SAYS WHERE THE SIX CAME FROM. Not the agent, not the
-        platform. The moment the copy names a sender, the choice reads as
-        approving somebody else's shortlist rather than picking your own
-        three, and the sentence a person needs is the one about what happens
-        to the three — see the note over `SCENES`. */}
-  ${(f.enrolled||f.complete||!f.pred) && !sceneDone('level')?`
-  <div class="sec">
-    ${''/* THE HEADING AND ITS DESCRIPTION ARE ONE BLOCK, AND THE SAVE IS
-          CENTRED AGAINST THE PAIR (Maryam, 1 Sep 2026: "the desc should be
-          close to the heading not with the bottom scenes… the save scenes
-          button should be middle aligned with the heading and desc row").
-          `.scene-hb` is what makes both true at once — the description was a
-          SIBLING of the `.sec-h`, so it paid §10.212's 16px heading margin on
-          top and its own `.mb5` underneath, which put it exactly half way
-          between the title and the grid, and it left the button with nothing
-          but the `<h2>` to centre against.
-
-          IT IS `.sec-h` AND NOT `aiHead`, WHICH IS THE ONE CALL WORTH
-          RECORDING. §73's note says to read it before adding a fourth caller
-          and that it "needs no new class and no new type rule", and both are
-          true — the component is exactly this shape. What stops it is its own
-          measure: `.aih-b` is capped at 60% so a description wraps clear of
-          the action, and 60% of this row is 483px against a sentence that
-          measures 610. The cap is right for the three sections it was written
-          for, whose descriptions are two lines by design; here it would undo
-          the "keep the desc one liner" instruction from the same afternoon.
-          Overriding a component's defining measure at one call site is worse
-          than not using it, so this states the two rules it actually needs.
-
-          THE CENTRING IS §24.6's, ALREADY THERE. `.sec-h` is a flex row with
-          `align-items:center`, and §37.11b's `align-self:flex-start` on every
-          child excludes a row holding a `> .btn` — for this exact reason,
-          written when the only such rows were one line tall. With the pair in
-          one child the button centres against both lines with nothing added. */}
-    <div class="sec-h"><div class="scene-hb"><h2>Choose your scenes</h2>
-    ${''/* ONE LINE, AND THE SENTENCE WAS CUT TO MAKE IT ONE (Maryam, 1 Sep
-          2026: "keep the desc one liner, do not let it go to two or three
-          lines"). Two clauses came off — "they are what shows on your
-          interview from now on, and you can play any of them first" — and
-          both are said better elsewhere: the first is what the section is
-          FOR, which its heading and the six checkboxes already say, and the
-          second is a description of a control the card itself draws (a play
-          mark on every still). That is `PAGESUM`'s third content ban,
-          "no pointing at the UI", applied to a section lede.
-
-          CUTTING IT WAS NOT ENOUGH ON ITS OWN — §14.3 caps `.sec > p` at
-          68ch at desktop, which is ~660px of a 1380px column, so the short
-          sentence still broke at "someone to". `.scene-lede` uncaps it in
-          §38.5, which is §70's move on Tal's summary ("a measure stated in a
-          frame whose right-hand side is occupied; applied to a band with no
-          second column it is not a measure but a ragged right edge"). Same
-          here: there is nothing to the right of this line, and the grid
-          under it is laid out against the full column. */}
-    ${''/* THE INLINE `color` AND THE `t-body-01 mb5` UTILITIES CAME OFF WITH
-          THE WRAPPER. The colour was trap 1 waiting to happen — an inline
-          declaration no layer can answer — and §63 owns ink; `.mb5` was the
-          gap to the grid, which is `.sec-h`'s own margin now that the
-          paragraph is inside it. §63 §22 states the size and the ink. */}
-    <p class="scene-lede">Six moments were cut from your interview. Keep the three you would be happy for someone to watch.</p>
-    </div>${sceneSave('level')}</div>
-    ${scenePick('level')}
-  </div>`:''}
+  ${''/* THE SCENE CHOOSER MOVED TO THE INTERVIEW DETAIL (Maryam, 9 Sep 2026:
+        "take the choose your scenes flow inside the interview it is related
+        to"). It used to open this module \u2014 the argument was that it is the one
+        thing on the page waiting on the candidate and it happens once. The ask
+        draws the line one level lower, the same move the strengths/growth block
+        made on 1 Sep: the flow that picks an interview's three scenes belongs on
+        the page about that interview. It is on `V.report` now, gated on
+        `sceneDone` so the report shows the chooser until three are saved and the
+        kept row after. `scenePick` / `sceneSave` / the copy went with it. */}
   ${''/* PAST INTERVIEWS IS A VERTICAL BLOCK. §10.15 gives a `.sec` with a
         `.sec-h` a 184px label column at desktop, which put "Past interviews /
         Kept for 24 months" in a narrow gutter beside the rows and set the
@@ -18258,6 +18312,11 @@ const allAgents = () => `
         have to line up with the section heading above them. The table pays the
         page gutter like an ordinary section child. */}
   ${agentsTable()}`;
+
+V.courses = (f) => `<main class="main"><div class="page">
+  ${crumb('All courses')}
+  ${allCourses(f)}
+</div></main>`;
 
 V.agents = (f) => `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],'All agents')}
@@ -21272,7 +21331,7 @@ function setStage(k,keepView){
     S.view = DEFAULT_VIEW[k] || 'dashboard';
     S.ch = f.open;
   }
-  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem']);
+  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','courses','booking','payment','chapter','terms','rewards','ivt','mem']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
   S.scenes = {
@@ -22945,9 +23004,15 @@ const AI_RUN = `<span class="ai-run" aria-hidden="true">
               `filter:blur(1px)` line lying over a coloured edge. The white ends
               at 70% are what make the dash fade in and out of its travel; §70.1's
               note has the long version, including why the loop has no seam. */}
+        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
+              white → orange → red → white, four stops, off the updated node —
+              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
+              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
+              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
+              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
+              warms straight from white into orange with no purple lead-in. */}
         <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.226" stop-color="#d551d7" stop-opacity=".7"/>
           <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
           <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
           <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
@@ -23104,7 +23169,12 @@ function askView(f){
                it on is `askSendArm`, from the field's own `input` event and from
                dictation's `onresult` — neither of which re-renders, for the
                caret reason ai4's own trap records. */}
-        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.send}</button>
+        ${''/* THE SEND IS THE ARROW, LIKE THE FLOATING FIELD (Maryam, 9 Sep 2026:
+               "the voice and send icon should also be like the ones we have on
+               the floating field"). The dock's `.askline-send` is `I.arrowRight`;
+               this was `I.send` (a paper plane). The mic is already `I.microphone`
+               on both, so only the send changes. */}
+        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -23989,7 +24059,8 @@ render();
 const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
   range:COHORT_LEAD.range, since:COHORT_LEAD.since,
   email:'priya.nair@nextinleadership.org',
-  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.'};
+  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.',
+  specs:['Operations teams','First-line leadership','Delegation','Prioritisation','Stakeholder management','Coaching for growth','Remote and hybrid teams']};
 
 
 const lmem = (name,ini,img,pc,avg,att,last,pts) => ({name,ini,img,pc,avg,att,last,pts,flag:null});
@@ -24148,8 +24219,8 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
 
 
 const leadCall = (k, second) => ({
-  who:{n:'Cohort ' + k.co, i:String(k.co), img:cohortArt(k)},
-  cover:true,       /* the mark is a course cover, so the slot is 9:5 — §86 */
+  who:{n:'Cohort ' + k.co, i:String(k.co)},
+  cover:false,
   role:`${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${k.course}`,
   x:lcDetail(k),
   xl:'',            /* the line is the appointment, not the cohort */
@@ -24180,7 +24251,7 @@ const lcalCard = (k, lead) => {
     <span class="lcal-h">
       ${''/* §86's cover verbatim, `<i>` under the `<img>` so a cover that fails
              to decode leaves the cohort's number rather than an empty box. */}
-      <span class="gcard-art"><i>${k.co}</i><img src="${cohortArt(k)}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+      <span class="gcard-art"><i>${k.co}</i></span>${''/* course cover removed 9 Sep 2026 — cohorts are not courses; the `<i>` number is the mark */}
       ${''/* THE DATE IS THE WORD OVER THE FIGURE, WHICH IS `bookedRow`'s OWN
              CHIP RECOVERED — and it is measured, not preferred. Written the
              reference's way, as one line reading "Tomorrow &middot; 5:00 PM"
@@ -24494,7 +24565,7 @@ V.leadDash = () => {
           'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
           + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',
-          {src:cohortArt(c), i:String(c.id)}, `data-ldrco="${c.id}"`);
+          null /* course cover removed 9 Sep 2026 — cohorts are not courses; the cohort's own 'group' mark shows */, `data-ldrco="${c.id}"`);
       }).join('')}
     </div>
   </div>
@@ -24625,7 +24696,6 @@ const ldrNoteRow = (n, name, i) => {
   const k = NOTE_K[n.k] || NOTE_K.general;
   return `<div class="note-row" data-note-i="${i}" data-note-k="${n.k || 'general'}"
        style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
-    <span class="note-mk">${I.edit}<i class="note-dot"></i></span>
     <span class="note-b">
       <span class="note-t">${n.t}</span>
       ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
@@ -24648,8 +24718,8 @@ const ldrNoteRow = (n, name, i) => {
            one thing that file forbids. The × is what this row already used and
            what every sheet in the build dismisses with. */}
     <span class="note-a">
-      <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}">${I.edit} Edit</button>
-      <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}">${I.close} Delete</button>
+      <button class="ldr-chip chip-edit" data-ldrnoteedit="${name}:${i}" aria-label="Edit note" title="Edit">${I.edit}</button>
+      <button class="ldr-chip chip-del" data-ldrnotedel="${name}:${i}" aria-label="Delete note" title="Delete">${I.delete}</button>
     </span>
   </div>`;
 };
@@ -24759,9 +24829,13 @@ const cohortCard = c => {
       <span class="cco-v">${val}</span>
     </span>`;
   return `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
+    ${''/* NO COURSE COVER (Client, 9 Sep 2026: "since the cohorts are now not
+          dependant on course so remove the course images from cohorts"). The
+          `<img>` was `cohortArt(c)`, a course cover keyed by level; with cohorts
+          decoupled from courses the cover leaves and the cohort's own number
+          (`<i>`, already the fail-to-decode fallback) is the mark. */}
     <span class="cco-art">
       <i>${c.id}</i>
-      <img src="${cohortArt(c)}" alt="" loading="lazy" onerror="this.style.display='none'">
       <span class="cco-pill" style="--pill:var(${pill})">${c.members.length} Candidates</span>
     </span>
     <span class="cco-b">
@@ -25073,10 +25147,17 @@ const ldrChRow = (i, m, done) => {
            `chRow` in views.js carries the whole argument, including why
            `.ch-num`'s rules are kept. `i + 1` is no longer read. */}
     <span class="ch-b">
-      <span class="ch-n">${name}${complete ? `<span class="ch-tick">${I.checkFilled}</span>` : ''}</span>
+      <span class="ch-n">${name}</span>
       <span class="ch-m">${meta}</span>
     </span>
-    ${complete ? '' : `<span class="ch-ic"><span style="fill:var(--gray-40)">${I.circle}</span></span>`}
+    ${''/* THE STATUS MARK IS ON THE RIGHT FOR EVERY ROW — Maryam, 9 Sep 2026:
+           "take the completed tick icon on the right side just like the circle
+           icons we have on the other chapter rows." The finished chapter's tick
+           used to sit inline after the name (`.ch-tick`) while the unfinished
+           rows carried a ring in the trailing `.ch-ic`; now the tick joins them
+           there, so the whole column reads down as one status track — a green
+           `checkFilled` for done, a grey ring for the rest (coloured in §15). */}
+    <span class="ch-ic">${complete ? I.checkFilled : I.circle}</span>
   </div>`;
 };
 
@@ -26531,8 +26612,17 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <span class="idphoto"><span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span><i class="av-on" aria-hidden="true"></i></span>
       <div class="idhead-b">
         <span class="idname">${LEADER.n}</span>
-        <span class="idmeta">Volunteer cohort leader &middot; leading since ${LEADER.since}</span>
-        <span class="tag sm">Assesses ${LEADER.range}</span>
+        ${''/* "Leading since …" ALONE (Maryam, 9 Sep 2026: "remove the line
+              'Volunteer cohort leader · ' and make the next word 'Leading' L
+              capital"). The unpaid/volunteer fact lives elsewhere; the sub-line
+              is the tenure. */}
+        <span class="idmeta">Leading since ${LEADER.since}</span>
+        ${''/* THE ASSESS RANGE IS A BORDERLESS LINE, LEFT-ALIGNED WITH THE NAME
+              (Maryam, 9 Sep 2026: "remove the border of Assesses E1–E3 and align
+              it with other above content"). It was a `.tag sm` chip, indented by
+              its own border and padding; a plain `.idmeta` line sits at the same
+              left edge as the name and the tenure. */}
+        <span class="idmeta">Assesses ${LEADER.range}</span>
       </div>
       <div class="idhead-a"><button class="btn btn-g" data-ldrprof="1">Edit details ${I.edit}</button></div>
     </div>
@@ -26549,33 +26639,48 @@ V.leadProfile = () => `<main class="main"><div class="page">
   </div>` : ''}
 
   ${S.ldrPfTab === 'public' ? `
-  ${''/* PUBLIC — the listing. The identity now has the 72px photo and the STARS
-        AND RATING on their own line under the name (Maryam, 7 Sep 2026), with the
-        cohorts led and range on the helper line below it. `stars()` renders inline
-        in the idmeta the way it does everywhere a rating shows star-first. */}
-  <div class="sec tint">
-    <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span>
-      <button class="btn btn-t btn-sm ic-l" data-ldrprof="1">${I.edit}Edit listing</button></div>
-    <div class="tile">
-      <div class="idhead" style="padding-top:0">
-        <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
-        <div class="idhead-b">
-          <span class="idname">${LEADER.n}</span>
-          <span class="idmeta">${stars(4.9)} 4.9</span>
-          <span class="t-helper-01">8 cohorts led &middot; Assesses ${LEADER.range}</span>
-        </div>
+  ${''/* PUBLIC — REBUILT ON THE TALENT AGENT'S PUBLIC PROFILE (Maryam, 9 Sep 2026:
+        "improve the cohort leader public profile just like talent agent public
+        profile"). The agent's tab is: a large 72px identity with the rating and
+        assess range on one `.idmeta` line, a four-cell figure band, an About me
+        paragraph and a Specialities chip cloud — no "public profile" heading, no
+        description and no edit button (editing lives one tab over, on General's
+        "Edit details"). This tab now reads the same, with the leader's own facts.
+
+        THE FOUR CELLS are the leader's, not the agent's: the agent's Interview
+        Fee / Availability / Evaluation Time / Experience become Cohorts led /
+        Call length / Cadence / Leading since — a cohort leader is unpaid and
+        nobody books them from this card (the old disclaimer's point), so there is
+        no fee cell; the rating and range stay in the `.idmeta` line, so the cells
+        do not repeat them. The old "Your listing" kv (Specialism / Assessing
+        range / Call length) is folded in: range to the idmeta, call length to a
+        cell, and Specialism becomes the chip cloud (`LEADER.specs`).
+
+        `.sec-noline` on the first two so identity, figures, About and
+        Specialities read as ONE band, exactly as the agent's do; no `.av-on` dot
+        — the green marker is the owner's own view, not the listing (§09). */}
+  <div class="sec sec-noline">
+    <div class="idhead">
+      <span class="idphoto"><span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span></span>
+      <div class="idhead-b">
+        <span class="idname">${LEADER.n}</span>
+        <span class="idmeta"><span style="color:var(--star)">&#9733;</span> 4.9 &middot; Assesses ${LEADER.range}</span>
       </div>
-      <p class="t-helper-01">&ldquo;${LEADER.bio}&rdquo;</p>
     </div>
-    <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
+    <div class="facts pf-facts">
+      ${pfFact(I.group, '--mk-1', 'Cohorts led', '8')}
+      ${pfFact(I.time, '--mk-2', 'Call length', '60 min')}
+      ${pfFact(I.calendar, '--mk-3', 'Cadence', 'Weekly')}
+      ${pfFact(I.shield, '--mk-4', 'Leading since', LEADER.since)}
+    </div>
+  </div>
+  <div class="sec sec-noline">
+    <div class="sec-h"><h2>About</h2></div>
+    <p class="t-body pfe-about">${LEADER.bio}</p>
   </div>
   <div class="sec">
-    <div class="sec-h"><h2>Your listing</h2><span class="t-helper-01">What the card above is built from</span></div>
-    <div class="tile">
-      <div class="kv"><span class="k">Specialism</span><span class="v n">Operations teams, first-line leadership</span></div>
-      <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
-      <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
-    </div>
+    <div class="sec-h"><h2>Specialities</h2></div>
+    <div class="skl">${LEADER.specs.map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
   </div>` : ''}
 
   ${S.ldrPfTab === 'notif' ? `
@@ -29068,7 +29173,7 @@ render();
 S.ob = {where:null, band:null, why:null, want:null};
 S.obStep = 0;
 S.obSpoken = false;
-S.obMode = 'voice';
+S.obMode = 'chat';
 S.obChatOpen = false;
 S.obQi = 0;
 
@@ -29280,6 +29385,7 @@ const obHead = () => `
   </header>`;
 
 const obModes = () => {
+  return '';
   const m = S.obMode === 'chat' ? 'chat' : 'voice';
   return `
   <div class="ob-modes" role="group" aria-label="How Tal talks to you">

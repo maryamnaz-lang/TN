@@ -579,7 +579,10 @@
    portal is disarmed anyway (`build.py`, `HOVER_KEEP`). */
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
-  padding:var(--s04) var(--s05);
+  /* --s05 top/bottom, up from --s04: the row holds a 36px face beside two
+     lines, and 12px of vertical padding read congested against the next row's
+     face (Maryam 9 Sep 2026). 16px gives each conversation its own air. */
+  padding:var(--s05) var(--s05);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
@@ -768,7 +771,17 @@
    leaves the pane's closing hairline a section's worth of air below it, which
    is what "with bottom page padding" asks for, and is the same number §16.680
    pays under the candidate's composer. */
-.app .main:has(> .msg-mod){display:flex;flex-direction:column;flex:1;min-height:0}
+/* FULL-BLEED, NO PAGE GUTTER (Maryam 9 Sep 2026, "give these messages full
+   width ... no margins on this page of cohort leaders messages"). Every other
+   page sits in `.main`'s `clamp(--s06,12cqw,200px)` side gutter — ~154px each
+   side at desktop — which centres the ~900px column. The inbox is a two-pane
+   app surface (list rail + thread), not a reading column, so it takes the whole
+   width from the nav rail to the frame edge: the gutter is zeroed only while
+   `.main` holds the `.msg-mod` page, so no other page moves. The panes keep
+   their own `--pad-x` inner padding; this removes the OUTER margin only. */
+.app .main:has(> .msg-mod){
+  display:flex;flex-direction:column;flex:1;min-height:0;
+  padding-left:0;padding-right:0}
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;

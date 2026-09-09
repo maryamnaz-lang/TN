@@ -3820,7 +3820,7 @@ const enrolFacts = lvl => {
        figure is still `c.reviews`; only the words around it changed. */
     c ? [I.star,  String(c.rating), `${c.reviews} user reviews`, {star:1}]
       : [I.chart, 'Assessments', '13, one per chapter', {}],
-    c ? [I.group, 'Total Members', `${c.taken} members till now`,
+    c ? [I.group, 'Members', `${c.taken} members till now`,
          {chip:`${COHORT_SIZE - c.taken} seats left`}]
       : [I.group, `Cohort of ${COHORT_SIZE}`, 'live calls with your leader', {}]
   ];
@@ -3906,37 +3906,109 @@ const enrolFacts = lvl => {
    at the one call site that used to be its main reader. `aiHead`'s `mark` is
    still live: the pulse's "Your learning pulse" is the other caller. */
 
-/* COURSES ARE RECOMMENDED-PLUS-CHOOSEABLE (Client, 9 Sep 2026), the agent-card
-   pattern applied to the course on the dashboard: recommend one and let the
-   reader view the others. It REUSES the existing course records — `ENROL_COURSE`
-   is the track's real courses — and does NOT invent a catalog (MVP is one
-   behavioural curriculum per intent track; the client ruled out a course/domain
-   matcher). The candidate's current course carries the "Recommended" eyebrow; the
-   rest are the track. Each card opens the course page (`V.enrol`); the prototype's
-   enrol page is level-locked to the candidate's own course, so the cards preview
-   the course rather than opening four distinct curricula. `.tile-stack` is a
-   §10.15 label-column opt-out, so the heading keeps the page spine (trap 13). */
-function courseBrowse(lvl){
-  const cur = String(lvl || 'E3').toUpperCase();
-  return `<div class="sec">
-    ${''/* THE DESCRIPTION IS A SIBLING OF `.sec-h`, NOT A CHILD — `.sec-h` is a
-          flex row, so a `<p>` inside it squeezes the heading to min-content at
-          mobile (no section in the build puts a description inside `.sec-h`). */}
-    <div class="sec-h"><h2>Courses in your track</h2></div>
-    <p class="t-desc" style="margin-bottom:var(--s05)">One recommended for you now; the rest are the track&rsquo;s behavioural curriculum.</p>
-    <div class="tile-stack">
-      ${Object.keys(ENROL_COURSE).map(l => {
-        const c = ENROL_COURSE[l];
-        const tag = l === cur ? 'Recommended' : 'In your track';
-        /* NO `I.star` IN THE SUB — an icon SVG in `.sub` (a plain text cell) has
-           no size rule there and renders at its intrinsic size, filling the page
-           (trap 7's sibling). The rating is plain text; the card row is the
-           ground the reader scans. */
-        return gcard('course', tag, c.name, `Rated ${c.rating.toFixed(1)} &middot; ${c.reviews} reviews`, 'enrol');
-      }).join('')}
-    </div>
+/* ==========================================================================
+   THE ALL-COURSES PAGE IS THE AGENTS LIST, FOR COURSES (Client, 9 Sep 2026:
+   "follow this kinda ui for other courses as well, but the difference will be of
+   the content"). Same `.agt` subgrid table and `.hd-srch` header; the six
+   columns carry course facts. Reached from "View other courses" on the enrolment
+   card (`data-go="courses"`), and it is where the covers that came off the
+   cohorts live now — they were course art all along. The candidate's current
+   course wears the `.ag-rec` "Recommended" tag, exactly as the agent list marks
+   Tal's pick. The old dashboard `courseBrowse` section is gone (the courses live
+   here now).
+   ========================================================================== */
+/* the course cover — `COHORT_ART`, keyed by level, off the cohorts and onto the
+   courses; falls back to E3's the way `cohortArt` did. */
+const courseArt = lvl => COHORT_ART[String(lvl).toLowerCase()] || COHORT_ART.e3;
+/* a course's topics — AUTHORED PLACEHOLDER (the seed has no course taxonomy),
+   the behavioural themes each level's curriculum works on. Flagged, like `CH_SYL`. */
+const COURSE_TOPICS = {
+  E1:['Communication','Teamwork','Time management'],
+  E2:['Tools','Productivity','Collaboration'],
+  E3:['Strategy','Operations','Finance'],
+  E4:['Leadership','Decisions','Ownership']
+};
+const courseTags = lvl => (COURSE_TOPICS[lvl] || []).map(t => `<span class="tag agt-tag">${t}</span>`).join('');
+const COURSE_LEVELS = ['E1','E2','E3','E4'];
+
+/* EVERY COURSE CARRIES A RATING, so the identity cell is the SAME three lines on
+   every row — name, stars, reviews — exactly as the agent list always shows a
+   rating. Two rows with a rating and two without (E3/E4 had a record, E1/E2 fell
+   back to a bare "Behavioural curriculum" line) was half of the "structure is
+   broken, follow the agents screen" report (Maryam, 9 Sep 2026): a 2-line cell
+   next to a 3-line one makes the rows different heights and the first column
+   ragged, which the agent list never is. E3/E4 read their real figures off
+   `ENROL_COURSE` (stated once there, the enrolment card's own two numbers, so
+   they cannot drift); E1/E2 have no seed record, so their rating and review
+   count are AUTHORED PLACEHOLDERS, flagged like `COURSE_TOPICS` above. */
+const COURSE_RATE_PH = { E1:[4.6,210], E2:[4.4,176] };   // placeholder, no seed record
+const courseRating = lvl => {
+  const c = ENROL_COURSE[lvl];
+  return c ? [c.rating, c.reviews] : (COURSE_RATE_PH[lvl] || [4.5, 0]);
+};
+
+/* one course as an `.agt` row — the agent row's six cells, course content. The
+   cover thumbnail carries an inline size (a lone image, not a section — trap 1
+   is about section padding) so the page needs no new layer. */
+function courseRow(lvl, cur){
+  const rec = lvl === cur ? '<span class="ag-rec">Recommended</span>' : '';
+  const [rating, reviews] = courseRating(lvl);
+  return `<div class="agt-r draw">
+    <span class="agt-c agt-who">
+      <img src="${courseArt(lvl)}" alt="" loading="lazy" onerror="this.style.display='none'"
+        style="width:56px;height:38px;object-fit:cover;flex:0 0 56px;border:1px solid var(--rule)">
+      <span class="agt-wb">
+        <span class="agt-n">${COURSE_NAME[lvl]}${rec}</span>
+        <span class="agt-rate">${stars(rating)}<span class="num">${rating.toFixed(1)}</span></span>
+        <span class="agt-m">${reviews} reviews</span>
+      </span>
+    </span>
+    <span class="agt-c agt-tags">${courseTags(lvl)}</span>
+    <span class="agt-c agt-exp"><span class="agt-v">13 chapters</span></span>
+    <span class="agt-c agt-next"><span class="agt-v">One a week</span></span>
+    <span class="agt-c agt-fee">$690</span>
+    <span class="agt-c agt-act">
+      <button class="btn btn-p btn-sm noic" data-go="enrol">View Course</button>
+    </span>
   </div>`;
 }
+
+const allCourses = (f) => {
+  const cur = String((f && f.level) || 'E3').toUpperCase();
+  return `
+  <div class="sec">
+    <div class="hd-srch">
+      <div class="hd-srch-t">
+        <div class="sec-h"><h2>Choose a course</h2></div>
+        <p class="all-desc">Every course in your track. The one recommended for you now is marked.</p>
+      </div>
+      <div class="srch all-srch">
+        <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
+        <input class="inp" placeholder="Search all ${COURSE_LEVELS.length} courses" aria-label="Search courses">
+      </div>
+    </div>
+  </div>
+  ${''/* THE TABLE IS A BARE `.agt` SIBLING OF THE HEADING SEC, exactly as
+        `allAgents` places `agentsTable()` (Maryam, 9 Sep 2026: "follow the
+        organized ui we have on the all agents screen"). It used to live INSIDE
+        the `.sec`, which pays a 32px inset each side, so the table was 64px
+        narrower than the agent list — and the whole shortfall came off the one
+        flexible column (`.agt-tags`), squeezing "What it covers" to ~173px so
+        every topic pill wrapped onto its own line. Out here the table takes the
+        full page width the agent list gets, and the topics group the way the
+        expertise column does. */}
+  <div class="agt">
+    <div class="agt-h" aria-hidden="true">
+      <span class="agt-c">Course</span>
+      <span class="agt-c">What it covers</span>
+      <span class="agt-c">Length</span>
+      <span class="agt-c">Cadence</span>
+      <span class="agt-c">Fee</span>
+      <span class="agt-c"></span>
+    </div>
+    ${COURSE_LEVELS.filter(l => COURSE_NAME[l]).map(l => courseRow(l, cur)).join('')}
+  </div>`;
+};
 const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
       ${aiHead({
         mark:false,
@@ -4002,7 +4074,12 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
            one is untouched: the card there says Continue to payment. One
            component, two labels, and the label matches the destination at both
            call sites — which is the whole reason `act` is a parameter. */
-        act:act || `<button class="btn btn-p btn-sm noic" data-go="enrol">View Course ${I.arrowRight}</button>`
+        /* TOP-RIGHT IS "View Other Courses", LIKE THE AGENT CARD'S "View All
+           Agents" (Maryam, 9 Sep 2026): the way OUT of the card to the all-courses
+           list (data-go=courses), the quiet btn-s. "View Course" (the card's own
+           action) moved down into the stat row. On V.enrol act is passed
+           ("Continue to payment"), so this default is the dashboard's alone. */
+        act:act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -4197,6 +4274,22 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
             o.chip ? `<span class="eo-chip">${o.chip}</span>` : ''}</span>
             <span class="eo-fv${o.acc ? ' eo-fv-acc' : ''}">${val}</span></span>
         </div>`).join('')}
+        ${''/* "View Course" JOINS THE STAT ROW (Maryam, 9 Sep 2026: "take the view
+              course button at bottom in the same row of the other stats"). It is
+              the card's own action, so it stays `btn-p`; it rides the far end of
+              the `.facts` row (`margin-left:auto`), which is the "adjust that row
+              spacing accordingly" — the four figures keep their cells and the
+              button takes the slack on the right. Dashboard only (`!act`); on
+              `V.enrol` the action is the passed "Continue to payment".
+
+              FULL HEIGHT, NOT `btn-sm` (Maryam, 9 Sep 2026: "why the size of view
+              course button is not matching with our other buttons"). §10.299
+              makes `.btn-sm` 32px at desktop while the standard `.btn` is 40px
+              (§10.298), so a `btn-sm` CTA read a step short of the card's own
+              "View Other Courses" and every other button. Dropped to the plain
+              `.btn` height so it matches. */}
+        ${!act ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
+          <button class="btn btn-p noic" data-go="enrol" style="white-space:nowrap">View Course ${I.arrowRight}</button></div>` : ''}
       </div>
     </div>`;
 
@@ -6311,7 +6404,6 @@ V.dashboard = (f) => {
           block rather than a card in the head band's column. `promoted` keeps
           the plate, where the offer sits beside a certificate. */}
     ${enrolOffer('E3')}
-    ${courseBrowse('E3')}
     ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
           moved down: `placeDark` (ai5) hoists any dark card on the page into the
           head band wherever the view puts it, so "further down" is not a place a
@@ -6497,7 +6589,6 @@ V.dashboard = (f) => {
           §75's whole point and the reason the offer can be a page child at all.
           `certBanner`'s own note is the rest of the argument. */}
     ${enrolOffer('E4')}
-    ${courseBrowse('E4')}
     ${certBanner(f, {close:true, key:'dash'})}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
@@ -7368,11 +7459,32 @@ V.report = (f) => `<main class="main"><div class="page">
         you could actually watch at the foot, under a recording block. There
         is no recording block any more (see `ivRow`), and the three scenes are
         the only thing here that shows the interview rather than describing
-        it, so they go where the eye lands. */}
-  <div class="sec sec-scene">
+        it, so they go where the eye lands.
+
+        AND THE CHOOSER IS HERE TOO NOW (Maryam, 9 Sep 2026: "take the choose
+        your scenes flow inside the interview it is related to"). It used to
+        open the Interviews module; this is the same move the strengths/growth
+        block made on 1 Sep, one level lower — the flow that picks THIS
+        interview's three scenes belongs on the page about THIS interview.
+        Gated on `sceneDone`: while nothing is committed the section IS the
+        chooser, and the moment three are saved it becomes the kept row. That
+        gate answers the old module note's worry — the chooser is not re-offered
+        on a report already settled, because `sceneDone` is true by then. `S.iv`
+        (or `level` as the default) is the interview, the same key the hero and
+        the write-up below read, so all three name one interview. */}
+  ${(() => { const k = S.iv === 're' ? 're' : 'level';
+    return sceneDone(k)
+    ? `<div class="sec sec-scene">
     <div class="sec-h"><h2>Scenes</h2><span class="t-helper-01">The three you kept</span></div>
-    ${sceneRow(S.iv === 're' ? 're' : 'level')}
-  </div>
+    ${sceneRow(k)}
+  </div>`
+    : `<div class="sec">
+    <div class="sec-h"><div class="scene-hb"><h2>Choose your scenes</h2>
+    <p class="scene-lede">Six moments were cut from your interview. Keep the three you would be happy for someone to watch.</p>
+    </div>${sceneSave(k)}</div>
+    ${scenePick(k)}
+  </div>`;
+  })()}
   ${''/* WHAT THE INTERVIEW FOUND — MOVED HERE FROM THE INTERVIEWS MODULE
         (Maryam, 1 Sep 2026: "the strengths and growth section should show
         inside interview details, remove from here and add in the interview
@@ -7513,76 +7625,15 @@ V.interviews = (f) => {
         conversation with one of six people, and the chip points at the same one
         for both stages. */}
   ${due?allAgents():''}
-  ${''/* CHOOSING THE SCENES IS THE FIRST THING IN THE MODULE, AND ONLY ONCE.
-        The level interview is done, six scenes are cut from it, and the
-        candidate keeps three. It opens the module rather than sitting below
-        the history because it is the one thing on this page that is waiting
-        on them — and it disappears the moment they save, which is why
-        `sceneDone` and not the stage is the condition. Everything else on the
-        module is still underneath it; nothing is hidden while choosing.
-
-        NOTHING HERE SAYS WHERE THE SIX CAME FROM. Not the agent, not the
-        platform. The moment the copy names a sender, the choice reads as
-        approving somebody else's shortlist rather than picking your own
-        three, and the sentence a person needs is the one about what happens
-        to the three — see the note over `SCENES`. */}
-  ${(f.enrolled||f.complete||!f.pred) && !sceneDone('level')?`
-  <div class="sec">
-    ${''/* THE HEADING AND ITS DESCRIPTION ARE ONE BLOCK, AND THE SAVE IS
-          CENTRED AGAINST THE PAIR (Maryam, 1 Sep 2026: "the desc should be
-          close to the heading not with the bottom scenes… the save scenes
-          button should be middle aligned with the heading and desc row").
-          `.scene-hb` is what makes both true at once — the description was a
-          SIBLING of the `.sec-h`, so it paid §10.212's 16px heading margin on
-          top and its own `.mb5` underneath, which put it exactly half way
-          between the title and the grid, and it left the button with nothing
-          but the `<h2>` to centre against.
-
-          IT IS `.sec-h` AND NOT `aiHead`, WHICH IS THE ONE CALL WORTH
-          RECORDING. §73's note says to read it before adding a fourth caller
-          and that it "needs no new class and no new type rule", and both are
-          true — the component is exactly this shape. What stops it is its own
-          measure: `.aih-b` is capped at 60% so a description wraps clear of
-          the action, and 60% of this row is 483px against a sentence that
-          measures 610. The cap is right for the three sections it was written
-          for, whose descriptions are two lines by design; here it would undo
-          the "keep the desc one liner" instruction from the same afternoon.
-          Overriding a component's defining measure at one call site is worse
-          than not using it, so this states the two rules it actually needs.
-
-          THE CENTRING IS §24.6's, ALREADY THERE. `.sec-h` is a flex row with
-          `align-items:center`, and §37.11b's `align-self:flex-start` on every
-          child excludes a row holding a `> .btn` — for this exact reason,
-          written when the only such rows were one line tall. With the pair in
-          one child the button centres against both lines with nothing added. */}
-    <div class="sec-h"><div class="scene-hb"><h2>Choose your scenes</h2>
-    ${''/* ONE LINE, AND THE SENTENCE WAS CUT TO MAKE IT ONE (Maryam, 1 Sep
-          2026: "keep the desc one liner, do not let it go to two or three
-          lines"). Two clauses came off — "they are what shows on your
-          interview from now on, and you can play any of them first" — and
-          both are said better elsewhere: the first is what the section is
-          FOR, which its heading and the six checkboxes already say, and the
-          second is a description of a control the card itself draws (a play
-          mark on every still). That is `PAGESUM`'s third content ban,
-          "no pointing at the UI", applied to a section lede.
-
-          CUTTING IT WAS NOT ENOUGH ON ITS OWN — §14.3 caps `.sec > p` at
-          68ch at desktop, which is ~660px of a 1380px column, so the short
-          sentence still broke at "someone to". `.scene-lede` uncaps it in
-          §38.5, which is §70's move on Tal's summary ("a measure stated in a
-          frame whose right-hand side is occupied; applied to a band with no
-          second column it is not a measure but a ragged right edge"). Same
-          here: there is nothing to the right of this line, and the grid
-          under it is laid out against the full column. */}
-    ${''/* THE INLINE `color` AND THE `t-body-01 mb5` UTILITIES CAME OFF WITH
-          THE WRAPPER. The colour was trap 1 waiting to happen — an inline
-          declaration no layer can answer — and §63 owns ink; `.mb5` was the
-          gap to the grid, which is `.sec-h`'s own margin now that the
-          paragraph is inside it. §63 §22 states the size and the ink. */}
-    <p class="scene-lede">Six moments were cut from your interview. Keep the three you would be happy for someone to watch.</p>
-    </div>${sceneSave('level')}</div>
-    ${scenePick('level')}
-  </div>`:''}
+  ${''/* THE SCENE CHOOSER MOVED TO THE INTERVIEW DETAIL (Maryam, 9 Sep 2026:
+        "take the choose your scenes flow inside the interview it is related
+        to"). It used to open this module \u2014 the argument was that it is the one
+        thing on the page waiting on the candidate and it happens once. The ask
+        draws the line one level lower, the same move the strengths/growth block
+        made on 1 Sep: the flow that picks an interview's three scenes belongs on
+        the page about that interview. It is on `V.report` now, gated on
+        `sceneDone` so the report shows the chooser until three are saved and the
+        kept row after. `scenePick` / `sceneSave` / the copy went with it. */}
   ${''/* PAST INTERVIEWS IS A VERTICAL BLOCK. §10.15 gives a `.sec` with a
         `.sec-h` a 184px label column at desktop, which put "Past interviews /
         Kept for 24 months" in a narrow gutter beside the rows and set the
@@ -7858,6 +7909,14 @@ const allAgents = () => `
         have to line up with the section heading above them. The table pays the
         page gutter like an ordinary section child. */}
   ${agentsTable()}`;
+
+/* THE ALL-COURSES PAGE — mirrors `V.agents` (Client, 9 Sep 2026). `allCourses`
+   is defined beside `enrolOffer`; the page is the crumb + that list. Opened by
+   "View other courses" on the enrolment card. */
+V.courses = (f) => `<main class="main"><div class="page">
+  ${crumb('All courses')}
+  ${allCourses(f)}
+</div></main>`;
 
 V.agents = (f) => `<main class="main"><div class="page">
   ${crumb(['Interviews','interviews'],'All agents')}
@@ -12944,7 +13003,7 @@ function setStage(k,keepView){
     S.ch = f.open;
   }
   /* if the current view is not reachable at this stage, fall back */
-  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem']);
+  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','courses','booking','payment','chapter','terms','rewards','ivt','mem']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
   /* THE SCENES A STAGE ARRIVES WITH.

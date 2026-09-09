@@ -4066,11 +4066,14 @@
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none}
-.app .chip-msg,.app .chip-edit{color:var(--link)}
-.app .chip-note{color:var(--support-warning-ic)}
+/* DE-COLOURED: the row's action chips are bare black now, not blue/amber/red
+   pills (Maryam 9 Sep 2026, "remove the backgrounds ... the icons in black are
+   fine"). One ink for all four; 95.4 drops their washes. */
+.app .chip-msg,.app .chip-edit{color:var(--icon-primary)}
+.app .chip-note{color:var(--icon-primary)}
 /* The note row's Delete, added 2 Sep 2026. `--danger-ink` on its own 12% wash
    is 5.9:1 — §31 measures the same pair for the attention queue's severe chip. */
-.app .chip-del{color:var(--danger-ink)}
+.app .chip-del{color:var(--icon-primary)}
 
 /* =========================================================================
    28 — YOUR PRIVATE NOTES (§99's three states)
@@ -4116,7 +4119,10 @@
 .app .note-tag{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
-  text-transform:none;color:var(--note-ink)}
+  /* ACCENT INK on a light accent wash (Maryam 9 Sep 2026, "accent color text
+     and light accent color bg") — every note tag, whatever its category, not the
+     per-category `--note-ink` it was. The category vars go unread. */
+  text-transform:none;color:var(--accent-text)}
 .app .note-w{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
@@ -4588,9 +4594,14 @@
    before copying its recipe: that mix is against `--layer-01`, white paper, so
    12% red reads clearly. Against black, 12% is invisible and the chip becomes a
    rectangle of nothing. §108.5 states the value it needs and why. */
+/* CAPTION, NOT LABEL (Maryam, 9 Sep 2026: "make the 2 seats left chip smaller").
+   The chip was `--t-label` 12.5px; `--t-caption` 11.5 is the floor role and the
+   smaller footprint the ask wants. Its shorter 16px line height also sits it
+   cleanly on the "Total Members" heading line — §108.5's `align-items:center`
+   centres it there. The vertical padding comes down with it in §108. */
 .app .eo-chip{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
   text-transform:none;color:var(--text-primary)}
 .app .dark-card .eo-chip{color:var(--on-dark)}
 

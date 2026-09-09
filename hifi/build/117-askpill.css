@@ -51,6 +51,13 @@
    the `.tbl-flag` chip, and now this field — a literal `999px`, per §31.6's
    reason, so `--radius:0` stays a token you can trust.
    ========================================================================== */
+/* THE STATIC EDGE IS A SOLID HAIRLINE (Maryam, 9 Sep 2026: "please use #efefef
+   border color for the tal floating field", reversing the same day's #828282).
+   The pill kept a gradient border (`--ai-grad-line`) drawn through the two-layer
+   background-clip trick; the border-box layer is a flat `--rule` #efefef instead
+   — the platform's one hairline. The construction stays (so `:active` still swaps
+   the outer layer for the pressed ink), and the ANIMATING COMET (`.ai-run`) rides
+   over this edge, so the colour is the moving line, not the resting border. */
 .app .askdock > .askline{
   border-radius:999px;
   border-image:none;
@@ -58,7 +65,7 @@
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line);
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 /* pressed, the edge comes back — §21.155's rule, restated for the two-layer

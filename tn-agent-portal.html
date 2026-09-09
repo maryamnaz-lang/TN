@@ -36,7 +36,7 @@
      rule sweep clean on 21 screens, 84 screen-width combos with no overflow,
      zero thrown errors.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=bedace0e">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=fc5be6a5">
 
 <style>
 /* ==========================================================================
@@ -131,7 +131,7 @@
        somebody choosing a stage would want it. -->
 </div>
 
-<script src="design-system/talentnext-ds.js?b=bedace0e"></script>
+<script src="design-system/talentnext-ds.js?b=fc5be6a5"></script>
 <script>
 /* ==========================================================================
    THE TALENT AGENT PORTAL
@@ -3226,8 +3226,8 @@ const AI_RUN = `<span class="ai-run" aria-hidden="true">
              same ramp every portal now runs: white into magenta, orange, red and
              back to white, at 70%. Horizontal (x2=1 y2=0), the node's 90.13deg. -->
         <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
+          ${''/* magenta #d551d7 stop dropped 9 Sep 2026 — white → orange → red → white */}
           <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.226" stop-color="#d551d7" stop-opacity=".7"/>
           <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
           <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
           <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
@@ -4341,36 +4341,6 @@ V.training = v => {
           : `<span class="cardrow-a"><span class="tag sm bordered" style="border-radius:999px">${I.locked}Locked</span></span>`}
       </div>`).join('')}
     </div>`}
-  </section>
-
-  ${/* PRACTISE WITH TAL — THE AI ROLEPLAY MOVED HERE FROM THE CANDIDATE (Client,
-        9 Sep 2026). Candidates practise through their real week; the agent
-        practises interviewing, with Tal playing a candidate, before the live
-        calibration. The `.sec-h` holds a `.tile-stack`, a §10.15 opt-out, so the
-        heading keeps the page spine; each row opens the practice preview
-        (`SHEETS.practice`). No trailing arrow — it opens a dialog, not a page
-        (§64). */''}
-  <section class="sec">
-    ${''/* THE DESCRIPTION IS A SIBLING OF `.sec-h`, NOT A CHILD: `.sec-h` is a flex
-          row (heading + optional right-aligned action), so a `<p>` inside it
-          becomes a second flex item and squeezes the heading to min-content at
-          mobile. No section in the build puts a description inside `.sec-h`. */}
-    <div class="sec-h"><h2>Practise with Tal</h2></div>
-    <p class="t-desc" style="margin-bottom:var(--s05)">Tal plays a candidate so you can rehearse drawing out a story before you run a real interview. The AI roleplay lives here in training &mdash; the calibration itself is with Derek, and nothing here is assessed.</p>
-    <div class="tile-stack">
-      <div class="cardrow">
-        <span class="cardrow-b">
-          <span class="cardrow-t">The candidate who under-sells their wins</span>
-          <span class="cardrow-d">Practise getting a concrete story out of a modest answer.</span></span>
-        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="practice">Start practice</button></span>
-      </div>
-      <div class="cardrow">
-        <span class="cardrow-b">
-          <span class="cardrow-t">The candidate who negotiates the level in the room</span>
-          <span class="cardrow-d">Hold the line, and point them to the review route.</span></span>
-        <span class="cardrow-a"><button class="btn btn-g btn-sm noic" data-sheet="practice">Start practice</button></span>
-      </div>
-    </div>
   </section>
 
   ${/* THE CALIBRATION SECTION IS GONE AND ITS FOUR CELLS ARE THE PROGRESS BAND
@@ -6705,25 +6675,6 @@ const SHEETS = {
       <input class="inp" value="$85"></label>
     <div class="kv"><span class="k">You would be paid</span><span class="v">$68</span></div>
     <p class="help">A new fee applies to new bookings. Anything in escrow settles at the rate it was booked at.</p>`],
-  /* PRACTICE — THE AI ROLEPLAY, WHICH LIVES IN AGENT TRAINING (Client, 9 Sep
-     2026). Roleplay was moved off the candidate (they practise through their real
-     week) and onto the agent, where Tal plays a candidate so the agent can
-     rehearse drawing out a story before the live calibration with Derek. This is
-     the practice preview: the candidate's modest opening and two good next moves.
-     A modal rather than a full engine — the point is that the capability is here,
-     in training, and it is not assessed and does not touch the calibration. */
-  practice: ['Practice interview with Tal', `
-    <p class="help">Tal is playing the candidate. This is practice only &mdash; nothing here is assessed, and it does not touch your calibration with Derek.</p>
-    <div class="cardrow" style="margin-top:var(--s04)">
-      <span class="cardrow-b">
-        <span class="cardrow-t">Tal, as the candidate</span>
-        <span class="cardrow-d">&ldquo;I handed the vendor review to my report and it went fine, pretty much.&rdquo;</span></span>
-    </div>
-    <p class="lbl" style="margin-top:var(--s05)">A good next move</p>
-    <div class="tile-stack">
-      <div class="cardrow"><span class="cardrow-b"><span class="cardrow-t">&ldquo;Pretty much &mdash; so what part didn&rsquo;t go fine?&rdquo;</span><span class="cardrow-d">Opens the gap the modest answer is hiding.</span></span></div>
-      <div class="cardrow"><span class="cardrow-b"><span class="cardrow-t">&ldquo;Walk me through the handover, step by step.&rdquo;</span><span class="cardrow-d">Gets the concrete story a level can point at.</span></span></div>
-    </div>`, 'Done'],
   /* ADD A SLOT — a day and a time range, all three OUR dropdown (§123), no
      native `<select>`. The day is a WEEKDAY only ("Monday", not "Monday 31
      August") — Maryam, 6 Sep 2026 — and the time is two side-by-side fields,

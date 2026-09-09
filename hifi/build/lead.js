@@ -81,7 +81,15 @@ const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
      bio was inline in two places on the old page; it is here now so the card and
      the About cannot drift. */
   email:'priya.nair@nextinleadership.org',
-  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.'};
+  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.',
+  /* SPECIALITIES — the chip cloud on the Public Profile listing (9 Sep 2026:
+     "improve the cohort leader public profile just like talent agent public
+     profile"). AUTHORED PLACEHOLDER copy, the same status as the agent's
+     `SPECIALISMS`: the seed has no per-leader speciality list, so these stand in
+     from her operations / first-line-leadership domain (the old single
+     "Specialism" line said "Operations teams, first-line leadership"). Flagged,
+     not real. */
+  specs:['Operations teams','First-line leadership','Delegation','Prioritisation','Stakeholder management','Coaching for growth','Remote and hybrid teams']};
 
 /* THE ATTENTION QUEUE'S TWO CONTROLS ARE DELETED (1 Sep 2026) and so is their
    state. `S.leadQ` and `S.leadFilter` were on `S` rather than in a closure so a
@@ -772,14 +780,12 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    the dashboard and on Calls alike, and the parameter survives for a caller that
    genuinely has nothing to offer. */
 const leadCall = (k, second) => ({
-  who:{n:'Cohort ' + k.co, i:String(k.co), img:cohortArt(k)},
-  cover:true,       /* the mark is a course cover, so the slot is 9:5 — §86 */
-  /* THE COURSE IS ON THIS LINE AND NOT ON THE ONE BELOW IT (2 Sep 2026), and
-     the cover is the reason: `.crow-ph.crow-cover` is the course's own title
-     card, so the name is this picture's caption and belongs on the first line
-     of type beside it. `x` (`lcDetail`) is the appointment — sixty minutes,
-     week five, the chapter — and a course name in it would be a fact about the
-     cohort filed under a fact about the call. */
+  /* NO COURSE COVER ON A COHORT (Client, 9 Sep 2026: "remove the course images
+     from cohorts"). `img` was `cohortArt(k)`, a course cover; the crow renders
+     the cohort's own number (`<i>`) as the mark instead, and `cover:false` drops
+     the 9:5 course-title slot for a plain avatar disc. */
+  who:{n:'Cohort ' + k.co, i:String(k.co)},
+  cover:false,
   role:`${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${k.course}`,
   x:lcDetail(k),
   xl:'',            /* the line is the appointment, not the cohort */
@@ -888,7 +894,7 @@ const lcalCard = (k, lead) => {
     <span class="lcal-h">
       ${''/* §86's cover verbatim, `<i>` under the `<img>` so a cover that fails
              to decode leaves the cohort's number rather than an empty box. */}
-      <span class="gcard-art"><i>${k.co}</i><img src="${cohortArt(k)}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
+      <span class="gcard-art"><i>${k.co}</i></span>${''/* course cover removed 9 Sep 2026 — cohorts are not courses; the `<i>` number is the mark */}
       ${''/* THE DATE IS THE WORD OVER THE FIGURE, WHICH IS `bookedRow`'s OWN
              CHIP RECOVERED — and it is measured, not preferred. Written the
              reference's way, as one line reading "Tomorrow &middot; 5:00 PM"
@@ -1348,7 +1354,7 @@ V.leadDash = () => {
           'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
           + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',
-          {src:cohortArt(c), i:String(c.id)}, `data-ldrco="${c.id}"`);
+          null /* course cover removed 9 Sep 2026 — cohorts are not courses; the cohort's own 'group' mark shows */, `data-ldrco="${c.id}"`);
       }).join('')}
     </div>
   </div>

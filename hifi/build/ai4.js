@@ -184,9 +184,15 @@ const AI_RUN = `<span class="ai-run" aria-hidden="true">
               `filter:blur(1px)` line lying over a coloured edge. The white ends
               at 70% are what make the dash fade in and out of its travel; §70.1's
               note has the long version, including why the loop has no seam. */}
+        ${''/* THE MAGENTA STOP IS DROPPED (Maryam, 9 Sep 2026): the comet is now
+              white → orange → red → white, four stops, off the updated node —
+              `linear-gradient(90.13deg, rgba(255,255,255,.7) 0%,
+              rgba(255,110,36,.7) 49.04%, rgba(255,55,51,.7) 75%,
+              rgba(255,255,255,.7) 100%)`. The offsets that remain are unchanged
+              (0 / .4904 / .75 / 1); only #d551d7 at .226 came out, so the light
+              warms straight from white into orange with no purple lead-in. */}
         <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.226" stop-color="#d551d7" stop-opacity=".7"/>
           <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
           <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
           <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
@@ -459,7 +465,12 @@ function askView(f){
                it on is `askSendArm`, from the field's own `input` event and from
                dictation's `onresult` — neither of which re-renders, for the
                caret reason ai4's own trap records. */}
-        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.send}</button>
+        ${''/* THE SEND IS THE ARROW, LIKE THE FLOATING FIELD (Maryam, 9 Sep 2026:
+               "the voice and send icon should also be like the ones we have on
+               the floating field"). The dock's `.askline-send` is `I.arrowRight`;
+               this was `I.send` (a paper plane). The mic is already `I.microphone`
+               on both, so only the send changes. */}
+        <button class="askfield-send" data-asksend="1" aria-label="Send" disabled>${I.arrowRight}</button>
       </div>
     </div>
   </div>`;

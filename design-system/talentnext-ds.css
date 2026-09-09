@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5831.  Rules dropped as product-specific: 186.
+   Rules kept: 5841.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -3560,6 +3560,7 @@ button{font-family:var(--font-sans)}
 .app .ch-n{display:inline-flex; align-items:center; gap:var(--s03)}
 .app .ch-tick{display:inline-flex; flex:none}
 .app .ch-tick svg{display:block; width:15px; height:15px; fill:var(--support-success)}
+.app .ch:not(.done):not(.locked) .ch-ic svg{fill:var(--gray-20)}
 .app .ch-act{flex:none; white-space:nowrap; font-size:12.5px; line-height:17px; font-weight:600; color:var(--text-primary); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
 .app .ch-act.resume{color:var(--support-attention)}
 .app .chart-line path{stroke:var(--dv-3)}
@@ -5626,16 +5627,8 @@ button.btn-p:active,
 .app .modhead:not(:has(> .ph)) > .sec:has(> .ai-aura.talsum){padding-top:var(--s06)}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{position:relative; overflow:visible}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label > .sk-mark{display:none}
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{width:32px; height:32px; border-radius:50%; background-color:transparent; background-image:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 559 559' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M104.015 128.327H166.308L299.699 279.673L75.2133 533.824H14.0996L238.586 279.673L104.015 128.327Z' fill='white'/%3E%3Cpath d='M350.022 197.67L422.299 279.673L197.813 533.824H136.699L361.185 279.673L288.275 197.67H350.022Z' fill='white'/%3E%3Cpath d='M362.423 418.329H424.716L544.872 280.191L321.278 25.2051H260.164L483.758 280.191L362.423 418.329Z' fill='white'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 30% 28%,rgba(255,255,255,0.45) 0%,rgba(255,255,255,0.08) 35%,transparent 55%),
-    radial-gradient(circle at 70% 75%,rgba(0,0,0,0.12) 0%,transparent 45%),
-    linear-gradient(155deg,#FFC8C6 0%,#FF3733 50%,#EE0500 100%); background-size:60% 60%,100% 100%,100% 100%,100% 100%; background-position:center,center,center,center; background-repeat:no-repeat; -webkit-mask:none; mask:none; box-shadow:
-    0 0 8px 1px rgba(244,113,19,0.35),
-    0 0 16px 3px rgba(244,113,19,0.15),
-    inset 0 -2px 5px rgba(0,0,0,0.12),
-    inset 0 2px 5px rgba(246,220,146,0.25); animation:tal-sphere-glow 4s ease-in-out infinite}
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:''; position:absolute; left:-2px; top:50%; width:36px; height:36px; margin-top:-18px; border-radius:50%; pointer-events:none; background:conic-gradient(
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{width:32px; height:32px; border-radius:0; background-color:transparent; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; -webkit-mask:none; mask:none; box-shadow:none; animation:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none; position:absolute; left:-2px; top:50%; width:36px; height:36px; margin-top:-18px; border-radius:50%; pointer-events:none; background:conic-gradient(
     from 0deg,
     transparent 0%,
     rgba(255,255,255,0.45) 4%,
@@ -5822,7 +5815,7 @@ button.btn-p:active,
 .app .ldr-dm-thread{display:flex; flex-direction:column; min-width:0}
 .app .ldr-dm-list{display:flex; flex-direction:column; min-width:0}
 .app .ldr-dm-lh{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s04); padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule); font-size:13px; line-height:18px; font-weight:600; letter-spacing:.1px}
-.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s04) var(--s05); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
+.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s05) var(--s05); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
 .app .ldr-dm-t:last-child{border-bottom:0}
 .app .ldr-dm-t.on{background-color:var(--surface-2); box-shadow:inset 2px 0 0 var(--text-primary)}
 .app .ldr-dm-t > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
@@ -5853,7 +5846,7 @@ button.btn-p:active,
   .app .ldr-dm-back{display:none}
 }
 .app .ldr-dm-back{flex:none; margin-right:var(--s02)}
-.app .main:has(> .msg-mod){display:flex; flex-direction:column; flex:1; min-height:0}
+.app .main:has(> .msg-mod){display:flex; flex-direction:column; flex:1; min-height:0; padding-left:0; padding-right:0}
 .app .page.msg-mod{display:flex; flex-direction:column; flex:1 1 auto; min-height:0; width:100%; max-width:100%; box-sizing:border-box; padding-bottom:var(--s06)}
 .app .page.msg-mod > .sec.ldr-dm-sec{display:flex; flex-direction:column; flex:1 1 auto; min-height:0}
 .app .page.msg-mod > .sec.ldr-dm-sec > .ldr-dm{flex:1 1 auto; min-height:0}
@@ -7448,14 +7441,14 @@ button.btn-p:active,
 .app .dark-card .wing-lvl .prog-dn small{color:var(--on-dark-2)}
 .app .ldr-chip{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none}
 .app .chip-msg,
-.app .chip-edit{color:var(--link)}
-.app .chip-note{color:var(--support-warning-ic)}
-.app .chip-del{color:var(--danger-ink)}
+.app .chip-edit{color:var(--icon-primary)}
+.app .chip-note{color:var(--icon-primary)}
+.app .chip-del{color:var(--icon-primary)}
 .app .note-t,
 .app .note-empty > h3{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .note-x,
 .app .note-empty > p{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
-.app .note-tag{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--note-ink)}
+.app .note-tag{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--accent-text)}
 .app .note-w{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-helper)}
 .app .mhead-n{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .mhead-s{font-size:var(--t-desc-size); line-height:var(--t-desc-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-desc-ls); text-transform:none; color:var(--text-secondary)}
@@ -7487,7 +7480,7 @@ button.btn-p:active,
 .app .dark-card .eo-cdesc{color:var(--on-dark-2)}
 .app .eo-cname{font-size:var(--t-h1-size-lg); line-height:var(--t-h1-lh-lg); font-weight:var(--t-w-strong); letter-spacing:var(--t-h1-ls-lg); text-transform:none; color:var(--text-primary)}
 .app .dark-card .eo-cname{color:var(--on-dark)}
-.app .eo-chip{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--text-primary)}
+.app .eo-chip{font-size:var(--t-caption-size); line-height:var(--t-caption-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-caption-ls); text-transform:none; color:var(--text-primary)}
 .app .dark-card .eo-chip{color:var(--on-dark)}
 .app .conf .conf-t{font-size:var(--t-sec-size); line-height:var(--t-sec-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-ls); text-transform:none; color:var(--text-primary)}
 .app .ob-go{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--accent-text)}
@@ -7702,8 +7695,8 @@ button.btn-p:active,
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body p{max-width:733px}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{background-image:none; -webkit-background-clip:border-box; background-clip:border-box; gap:6px}
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
 .app .ai-label.bare.rec-lab::before{content:''; width:12px; height:12px; flex:none; border-radius:0; background-color:transparent; background-image:var(--ai-grad); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat; box-shadow:none; animation:none}
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{content:''; width:28px; height:28px; flex:none; border-radius:0; background-color:transparent; background-image:var(--tal-mark); background-size:contain; background-position:center; background-repeat:no-repeat; -webkit-mask:none; mask:none; box-shadow:none; animation:none}
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label::after{content:none}
 .app .modhead:has(> .head-col) > .ph.ph-you{position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; clip-path:inset(50%); overflow:hidden; white-space:nowrap}
 .app .modhead > .head-col{padding:var(--s06) var(--pad-x) var(--s06); border-top:1px solid var(--rule)}
@@ -8529,7 +8522,7 @@ button.btn-p:active,
 .app .ldr-view{display:inline-flex; align-items:center; gap:var(--s02)}
 .app .ldr-tr .ldr-go .ldr-view svg{width:16px; height:16px; flex:none; fill:currentColor}
 .app .page > .sec.sec-cs:has(+ .sec.dark-card){padding-bottom:0}
-.app .ldr-chip{display:inline-flex; align-items:center; gap:var(--s02); height:32px; padding:0 var(--s05); border:0; border-radius:999px; cursor:pointer; background-color:var(--chip-bg)}
+.app .ldr-chip{display:inline-flex; align-items:center; gap:var(--s02); height:32px; padding:0 var(--s02); border:0; border-radius:0; cursor:pointer; background:transparent}
 .app .ldr-chip svg{width:16px; height:16px; flex:none; fill:currentColor}
 .app .chip-msg,
 .app .chip-edit{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
@@ -8607,13 +8600,13 @@ button.btn-p:active,
 .app .note-srch .inp{width:180px; padding-left:calc(var(--s03) * 2 + 16px)}
 .app .note-sel{width:auto}
 .app .note-list{display:flex; flex-direction:column}
-.app .note-row{display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:var(--s05); align-items:start; padding:var(--s05) 0}
+.app .note-row{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--s05); align-items:start; padding:var(--s05) 0}
 .app .note-row + .note-row{border-top:1px solid var(--rule)}
 .app .note-row.is-off{display:none}
 .app .note-b{display:flex; flex-direction:column; gap:2px; min-width:0}
 .app .note-f{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s03)}
-.app .note-tag{display:inline-flex; align-items:center; padding:2px var(--s03); border-radius:999px; background:var(--note-bg)}
-.app .note-a{display:flex; align-items:center; gap:var(--s02); flex:none}
+.app .note-tag{display:inline-flex; align-items:center; padding:2px var(--s03); border-radius:999px; background:color-mix(in srgb, var(--accent) 10%, var(--layer-01))}
+.app .note-a{display:flex; align-items:center; gap:var(--s03); flex:none}
 .app .note-a .ic svg{width:16px; height:16px}
 .app .note-box{display:grid; grid-template-columns:auto minmax(0,1fr); gap:var(--s05); align-items:start; padding:var(--s05) 0}
 .app .note-mk-w{background:var(--layer-02)}
@@ -8623,8 +8616,8 @@ button.btn-p:active,
 .app .note-form-a{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
 .app .note-form-b{display:flex; align-items:center; gap:var(--s03); margin-left:auto}
 @container app (max-width:899.98px){
-  .app .note-row{grid-template-columns:auto minmax(0,1fr)}
-  .app .note-a{grid-column:2; margin-top:var(--s03)}
+  .app .note-row{grid-template-columns:minmax(0,1fr)}
+  .app .note-a{grid-column:1; margin-top:var(--s03)}
   .app .note-bar-a{margin-left:0; width:100%}
   .app .note-srch{flex:1 1 auto}
   .app .note-srch .inp{width:100%}
@@ -8998,7 +8991,14 @@ button.btn-p:active,
 .app .eo-lead{display:flex; align-items:center; gap:var(--s03); margin:0}
 .app .eo-lead-ph{flex:none; display:inline-flex; width:24px; height:24px}
 .app .eo-fl{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap; justify-content:space-between}
-.app .eo-chip{flex:none; display:inline-flex; align-items:center; padding:var(--s01) var(--s03); border-radius:999px; white-space:nowrap; background-color:#ff0000}
+.app .eo-chip{flex:none; display:inline-flex; align-items:center; padding:1px var(--s03); border-radius:999px; white-space:nowrap; background-color:#ff0000}
+.app .page .facts.eo-facts > .eo-cta::before{content:none}
+@container app (min-width:900px) and (max-width:1300px){
+  .app .page .facts.eo-facts:has(> .eo-cta){grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); gap:var(--s06) var(--s05)}
+  .app .page .facts.eo-facts:has(> .eo-cta) > div + div::before{content:none}
+  .app .page .facts.eo-facts > .eo-cta{grid-column:1 / -1; margin-left:0}
+  .app .page .facts.eo-facts > .eo-cta .btn{width:100%}
+}
 .app .eo-fi-star svg{fill:var(--star)}
 .app .dark-card .eo-fi.eo-fi-star svg{fill:var(--star)}
 
@@ -9213,7 +9213,7 @@ button.btn-p:active,
 /* ---- 117-askpill.css ---- */
 .app .askdock > .askline{border-radius:999px; border-image:none; border-color:transparent; background-color:transparent; background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
+    linear-gradient(var(--rule), var(--rule)); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
 .app .askdock > .askline:active{background-image:
     linear-gradient(var(--background), var(--background)),
     linear-gradient(var(--text-primary), var(--text-primary))}
@@ -9233,17 +9233,21 @@ button.btn-p:active,
 .app .ask-page .askfield,
 .app .ask-page .askfield:focus-within{border-radius:999px; border-color:transparent; padding:0 var(--s06); background-color:transparent; background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
+    linear-gradient(var(--rule), var(--rule)); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
 .app .ask-page .askfield:focus-within{background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--askv-stroke-hot), var(--askv-stroke-hot))}
+    var(--ai-grad-line)}
 .app .ask-page .askfield::before,
 .app .ask-page .askfield:focus-within::before{content:none}
 .app .ask-page .askfield-send,
 .app .ask-page .askfield-mic{width:auto; height:auto; border:0; border-radius:0; background:transparent; background-image:none}
 .app .ask-page .askfield-send svg{fill:var(--text-primary)}
+.app .ask-page .askfield-mic svg,
+.app .ask-page .askfield-send svg{width:22px; height:22px}
 .app .ask-page .askfield-send:disabled,
 .app .askfield-send:disabled{background:transparent; background-image:none}
+.app .ask-page .askfield-send:not(:disabled){width:36px; height:36px; flex:0 0 36px; border-radius:999px; background:var(--accent); display:inline-flex; align-items:center; justify-content:center}
+.app .ask-page .askfield-send:not(:disabled) svg{fill:var(--on-accent)}
 .app .ask-page .askfield-mic.on{background:transparent; border:0}
 .app .ask-page .askfield-mic.on svg{fill:var(--danger-ink)}
 .app .ask-page .askfield-mic + .askfield-send{margin-left:calc(var(--s05) - var(--s03))}
