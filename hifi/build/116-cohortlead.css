@@ -63,7 +63,7 @@
   border:1px solid var(--rule);
   background:var(--layer-01)}
 .app .cl-ic{width:20px;height:20px;flex:none}
-.app .cl-ic svg{width:20px;height:20px;fill:var(--mk,var(--icon-primary))}
+.app .cl-ic svg{width:20px;height:20px;fill:var(--icon-primary)}
 /* THE TITLE AND ITS SENTENCE ARE ONE OBJECT AT 8, the card's own gap; the mark
    is a third thing and pays 12 under itself, which is the step §111.13's row
    and §70.6's card both take between a mark and the text it introduces. */

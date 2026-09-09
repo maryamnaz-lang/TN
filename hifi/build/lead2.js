@@ -532,7 +532,7 @@ const cohortCard = c => {
                  number should say what the picture IS; the week is where the
                  cohort has got to inside it. Same order the dashboard row's
                  eyebrow takes, one component over. */}
-          <span class="cco-d">${lcourse(c)} &middot; Week ${c.week} of 13</span>
+          <span class="cco-d">${lintent(c)} &middot; Week ${c.week} of 13</span>
         </span>
         ${''/* THE "of 38%" CAPTION IS GONE (Maryam, 2 Sep 2026: "remove the
                'of n%' from the bottom of each progress circle"). It was the
@@ -1017,7 +1017,7 @@ V.leadMember = () => {
                above is not drawn and this `.idmeta` IS the candidate's context
                line. What they are taking matters here for the same reason the
                level does: the figures underneath are read against a course. */}
-        <span class="idmeta">${llevel(c)} &middot; ${lname(c)} &middot; ${lcourse(c)}</span>
+        <span class="idmeta">${llevel(c)} &middot; ${lname(c)} &middot; ${lintent(c)}</span>
         ${m.flag ? lflagTag(m.flag) : '<span class="tag green sm">On track</span>'}
       </div>
       ${/* MESSAGE FIRST, NOTE SECOND. A message goes TO them and a note is

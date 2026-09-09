@@ -168,7 +168,7 @@ const OB_LOW = () => qzLow(2);
 const OB_Q = [
   {k:'where',
    q:'Where are you right now?',
-   tal:'Before I point you at anybody, I need four things a quiz cannot tell me.',
+   tal:'Before I point you at anybody, I need a few things a quiz cannot tell me.',
    o:[['role','In a role','Employed and leading, or on your way to it.'],
       ['between','Between roles','Out of a role and looking for the next one.'],
       ['school','In school','Studying, with the first role still ahead.'],
@@ -211,11 +211,49 @@ const OB_Q = [
 
   {k:'want',
    q:'What do you want out of the next 90 days?',
-   tal:'Last one of the four. It decides what I put in front of you first.',
+   tal:'This one decides what I put in front of you first.',
    o:[['record','A level on record','Something verified you can put in front of somebody.'],
       ['up','To move up where I am','The next title, in the organisation you are already in.'],
       ['change','To change direction','A different function, industry, or kind of work.'],
-      ['stand','To find out where I stand','An honest read before you decide anything.']]}
+      ['stand','To find out where I stand','An honest read before you decide anything.']]},
+
+  /* THE THREE CLIENT PROFILE FIELDS AS ONBOARDING QUESTIONS (Client, 9 Sep
+     2026). Industry, Years of experience and Intent are captured here and
+     written onto `PF.general` on the way out (`data-obdone`), so what you pick
+     shows on your profile. Current role and the student flag are already the
+     `where` question (In a role / In school / …) plus the editable profile; the
+     exact role title and degree live on the profile — a free-text field is not
+     an option in this flow (it was deleted for the render/caret trap, see
+     `obFree`). Intent is the primary COHORT grouping axis (Point 1): its options
+     ARE `INTENTS`, built from that one list so the words match the profile
+     select exactly. It is deliberately last — the aspiration is the note the
+     flow ends on. */
+  {k:'industry',
+   q:'What industry are you in?',
+   tal:'A couple more, so your profile is set up before you walk in.',
+   o:[['software','Software','Product, platforms, SaaS.'],
+      ['finance','Finance','Banking, insurance, fintech.'],
+      ['healthcare','Healthcare','Care, life sciences, medtech.'],
+      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
+      ['education','Education','Schools, training, ed-tech.'],
+      ['other','Something else','Tell me on your profile later.']]},
+
+  {k:'years',
+   q:'How long have you been working?',
+   tal:'Roughly is fine — it helps me read where you are.',
+   o:[['0','Less than a year','Just getting started.'],
+      ['1','1 to 3 years','Finding your feet.'],
+      ['3','3 to 5 years','Into your stride.'],
+      ['5','5 to 10 years','Experienced.'],
+      ['10','More than 10 years','A long way in.']]},
+
+  {k:'intent',
+   q:'Where are you trying to go?',
+   tal:'Last one, and it is the one that groups you with the right people. It does not depend on your level.',
+   o:INTENTS.map((s,i) => [['now','next','own'][i], s,
+     ['Go further in the seat you are in.',
+      'Move toward a different kind of role.',
+      'Build or run something of your own.'][i]])}
 
   /* >>> THE FIFTH QUESTION IS DELETED — Maryam, 3 Sep 2026: "remove this
      question from the flow. we do not need that."
@@ -296,7 +334,7 @@ function obReady(){
    spine is a narrow column, so each row is the SUBJECT of its question —
    which is also what makes a completed row readable as a thing that is now
    known rather than as a sentence that has been said. */
-const OB_SPINE = ['Where you are','What is low','Why it is hard','What you want'];
+const OB_SPINE = ['Where you are','What is low','Why it is hard','What you want','Your industry','Your experience','Where you are heading'];
 
 function obPanel(){
   const step = S.obStep;
@@ -1526,7 +1564,13 @@ const obHeard = () => [
     ? 'Neither of the two the quiz found'
     : obLabel('band'), 2],
   ['Why it is hard', obLabel('why'), 3],
-  ['What you want', obLabel('want'), 4]
+  ['What you want', obLabel('want'), 4],
+  /* THE THREE CLIENT FIELDS join the read-back at their own steps (5/6/7), so
+     each is correctable by the same "Change" button and reads its label out of
+     `OB_Q` like the four above. */
+  ['Your industry', obLabel('industry'), 5],
+  ['Your experience', obLabel('years'), 6],
+  ['Where you are heading', obLabel('intent'), 7]
 ];
 
 function obReadback(){
@@ -1869,6 +1913,18 @@ device.addEventListener('click', e => {
   const d = t.closest('[data-obdone]');
   if(d){
     S.recKey = obAgent();
+    /* THE THREE ONBOARDING FIELDS LAND ON THE PROFILE (Client, 9 Sep 2026),
+       written once on the way out exactly like `S.recKey` above, so what the
+       candidate picked in the flow is what their profile shows. Guarded on a
+       real answer so a deep-link that skipped the flow keeps the seeded values.
+       Labels come off `OB_Q` via `obLabel`, and intent's label is an `INTENTS`
+       string, so the profile's own intent select opens on the same option. The
+       student flag is the `where` answer — "In school" makes Current role read
+       "Student"; the exact role title and degree stay editable on the profile. */
+    if(S.ob.intent)   PF.general.intent   = obLabel('intent');
+    if(S.ob.industry) PF.general.industry = obLabel('industry');
+    if(S.ob.years)    PF.general.years    = obLabel('years');
+    if(S.ob.where === 'school') PF.general.role = 'Student';
     e.preventDefault(); e.stopPropagation();
     /* THE GATE'S CONVERSATION STAYS AT THE GATE — Maryam, 4 Sep 2026: "it
        shows that convo I had at the onboarding time, it should not show here."

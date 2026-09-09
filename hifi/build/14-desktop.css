@@ -57,6 +57,17 @@
     background:var(--rule);z-index:41;pointer-events:none;
     transition:left var(--mo-base) var(--mo-standard)}
   .app[data-rail="open"]::after{left:var(--drawer-w)}
+  /* NO DIVIDER ON A FULL-BLEED SCENE — Maryam, 9 Sep 2026. Account creation, the
+     Tal onboarding intro and the Next-in-Leadership run-up each REPLACE the app
+     frame: each is a direct child of `.app` with no rail beside it, so the rail's
+     divider was a 1px line drawn down an otherwise empty page. `.auth-card`
+     matches the sign-up AND the onboarding SPLIT steps (`.ob-card` wears it);
+     `.ob-open` is the intro's own full-bleed composition; `.nil` wraps the
+     microsite (views.js). `content:none` removes the pseudo outright, and each
+     `:has()` outweighs the base so it wins wherever the divider would draw. */
+  .app:has(> .auth-card)::after,
+  .app:has(> .ob-open)::after,
+  .app:has(> .nil)::after{content:none}
   .app .sn-item{
     min-height:48px;padding:0;gap:0;justify-content:center;
     border-top:0;position:relative}

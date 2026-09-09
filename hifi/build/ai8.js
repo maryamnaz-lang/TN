@@ -404,7 +404,7 @@ function wEnd(){
        <span>Everything you earned along the way: your points, your badges and your rank stay on the account.</span>
      </span>
      <span class="tw-k">Deleting your account later ${hl('does not')} take a signed summary off you.</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* WHAT THE 90-DAY SUMMARY IS. Its own route because `V.transcript` calls it a
@@ -422,7 +422,7 @@ function wSummary(){
         : f.finished
           ? 'Yours is written. Priya signs it once you book the re-interview, and whoever you pick reads it before the call.'
           : 'Yours is being assembled as you go. It is signed at day 90.'}</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* ANY CHAPTER, FROM THE DATA. data.js answers chapters 1 and 4 in prose and
@@ -501,7 +501,7 @@ function wStanding(){
           : f.avg
             ? 'Comfortably above the cohort on the work you have finished. Pace is the open question, not quality.'
             : 'Too early to say anything about scores. Nothing this week is assessed.'}</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* HOW FAR BEHIND, AND THE PRODUCT ALREADY HAD THE SENTENCE. `WEEKLY[stage].tal`
@@ -572,7 +572,7 @@ function wMoveUp(){
        <span>The re-interview at day 91. It is the same 45 minutes and the same questions, and what is assessed is whether the answers changed.</span>
      </span>
      <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched ${hl('holds you at ' + f.level)}.</span>`,
-    `${twBtn('Open My Level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
+    `${twBtn('Open my level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
 }
 
 /* WHEN IT ENDS, in days rather than in a date. The prototype has one calendar
@@ -594,7 +594,7 @@ function wFinish(){
        <span><b>Day 91</b>the re-interview, which is the last thing in the course</span>
      </span>
      <span class="tw-k">Your cohort finishes together. The ten of you started on the same day and the calls stop on the same week.</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* PAUSING, EXTENDING, LEAVING. All three are one answer, because all three
@@ -644,8 +644,9 @@ function wNoQuestions(){
          <span>One story where you handed work over and it went wrong</span>
          <span>What you would do differently, in one sentence</span>
          <span>One decision you changed after listening to someone</span>
-       </span>`,
-      twBtn('Practise it with me','rp'));
+       </span>`);
+      /* the "Practise it with me" button opened candidate AI roleplay — removed
+         9 Sep 2026; the prep list stands on its own. */
 }
 
 /* WHAT NOT TO DO. Four things, and each is a real failure mode from the
@@ -661,8 +662,9 @@ function wNotDo(){
        <span>Do not answer in the abstract. &ldquo;I would usually&rdquo; cannot be assessed; &ldquo;in March I&rdquo; can.</span>
        <span>Do not negotiate the level in the room. The report comes 24 hours later and there is a proper route to a review.</span>
      </span>
-     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`,
-    twBtn('Practise one','rp'));
+     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`);
+    /* the "Practise one" button opened candidate AI roleplay — removed 9 Sep
+       2026; the list stands on its own. */
 }
 
 /* WHEN THE LEVEL LANDS. `wAgent` already promises a report inside 24 hours in

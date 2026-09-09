@@ -88,6 +88,14 @@
 .app .bks-w{padding:var(--s07) 0 var(--s04)}
 .app .bkc{padding-top:var(--s04)}
 
+/* THE CHECKOUT SHARES THE CALENDLY CARD'S COLUMN — Maryam, 9 Sep 2026. §76.1b
+   centres `.bks-w` at 830; `V.checkout` reuses that same wrapper for "Pay with"
+   and the card picker so the payment page does not expand out of the width the
+   Calendly card set on the page before it. The pay button lives inside `.bks-w`
+   (not `.bkc`, whose `margin-left:auto` pushes it to the far right), a section's
+   air under the picker so it reads as the act the picker leads to. */
+.app .bkpay-go{margin-top:var(--s06)}
+
 /* ------------------------------------------------------------------ 76.1b ---
    THE CHOOSING AND THE PAYING ARE A CENTRED COLUMN, NARROWER THAN THE PROFILE
    Maryam, 31 Aug 2026, with the frame marked: "set the date time and bottom

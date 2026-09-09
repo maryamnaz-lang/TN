@@ -614,10 +614,14 @@ function agentRow(key){
           of the social-proof row. The count stays where it identifies the
           agent; the column keeps the fact it is named after. */}
     <span class="agt-c agt-exp"><span class="agt-v">${a.yrs} yrs</span></span>
-    ${''/* AND NEXT AVAILABLE IS THE DAY. `parts[1]` — the hour — is dropped;
-          the note over the split has the argument. */}
+    ${''/* AND NEXT AVAILABLE IS THE DAY, WITH NO CALENDAR MARK. `parts[1]` — the
+          hour — is dropped (the note over the split has the argument), and the
+          leading `I.calendar` came off too (Maryam, 9 Sep 2026: "remove the
+          calendar icons from this column items"). The column header already
+          names it "Next available", so a glyph on every one of six date rows
+          was label repeated as decoration; the date stands on its own. */}
     <span class="agt-c agt-next">
-      <span class="agt-v">${I.calendar}${parts[0]}</span>
+      <span class="agt-v">${parts[0]}</span>
     </span>
     <span class="agt-c agt-fee">${a.price}</span>
     <span class="agt-c agt-act">
@@ -1074,10 +1078,12 @@ const twIc = (name, tone) => `<span class="tw-ic${tone ? ' ' + tone : ''}">${I[n
 const tw = (title,body,action) => `<span class="tw">
   ${title?`<span class="tw-h">${title}</span>`:''}${body}
   ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
-/* NO TRAILING ARROW — the button follows §107's "Find an Agent" pill, which
-   carries none (Maryam, 8 Sep 2026). §39 gives it the pill shape and the
-   accent fill; here it is just the label. */
-const twBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}</button>`;
+/* TRAILING ARROW — Maryam, 9 Sep 2026, off Figma 882:6701: the action is a
+   LINK now ("red text and just an arrow, no fill"), not the 8 Sep pill. §39
+   strips the fill and pill; the arrow is the link's affordance and comes back
+   here. The two hand-written portals (`tn-agent-portal.html`,
+   `tn-admin-portal.html`) never lost it, so this only re-aligns hifi with them. */
+const twBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}${I.arrowRight}</button>`;
 const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${q}</button>`).join('')}</span>`;
 
 function wChapter(i){
@@ -1109,8 +1115,15 @@ function wLadder(){
      drawings now read. The list changes with it — "finish the chapters" is
      advice for somebody enrolled, not for somebody four days in. */
   const cur = f.pred ? null : f.level;
+  /* THREE STATES, off Figma 882:6701 (9 Sep 2026): the rungs BELOW the current
+     level are passed (`.done`, black), the current one is `.on` (accent), the
+     rest are the empty future. Before the interview `cur` is null, so `ci` is
+     -1 and nothing is `.done` — the whole ladder reads as future, which is what
+     `f.pred` already meant. */
+  const RUNGS = ['E1','E2','E3','E4','E5'];
+  const ci = cur ? RUNGS.indexOf(cur) : -1;
   return tw(twIc('growth') + 'The Explorer track',
-    `<span class="tw-rungs">${['E1','E2','E3','E4','E5'].map(r=>`<i class="${r===cur?'on':''}">${r}</i>`).join('')}</span>
+    `<span class="tw-rungs">${RUNGS.map((r,idx)=>`<i class="${r===cur?'on':(ci>=0&&idx<ci?'done':'')}">${r}</i>`).join('')}</span>
      <span class="tw-list">
        ${f.pred
          ? `<span>An interview with a talent agent confirms which level you are on</span>
@@ -1141,10 +1154,10 @@ function wPrep(){
       <span>One story where you handed work over and it went wrong</span>
       <span>What you would do differently, in one sentence</span>
       <span>One decision you changed after listening to someone</span>
-     </span>`,
-    /* opens Practice ('rp'), the same destination K-26/K-27 use — the button
-       had no target and dead-ended the prep checklist (doc §7). */
-    twBtn('Start the practice run','rp'));
+     </span>`);
+    /* THE "Start the practice run" BUTTON IS GONE (Client, 9 Sep 2026) — it
+       opened the candidate AI roleplay, which is removed; the prep checklist
+       stands on its own. */
 }
 function wAgent(){
   const a = AGENTS[S.agent||'priya'];
@@ -3892,6 +3905,38 @@ const enrolFacts = lvl => {
    `mark:false` RATHER THAN DROPPING THE KEY, so the option is visibly declined
    at the one call site that used to be its main reader. `aiHead`'s `mark` is
    still live: the pulse's "Your learning pulse" is the other caller. */
+
+/* COURSES ARE RECOMMENDED-PLUS-CHOOSEABLE (Client, 9 Sep 2026), the agent-card
+   pattern applied to the course on the dashboard: recommend one and let the
+   reader view the others. It REUSES the existing course records — `ENROL_COURSE`
+   is the track's real courses — and does NOT invent a catalog (MVP is one
+   behavioural curriculum per intent track; the client ruled out a course/domain
+   matcher). The candidate's current course carries the "Recommended" eyebrow; the
+   rest are the track. Each card opens the course page (`V.enrol`); the prototype's
+   enrol page is level-locked to the candidate's own course, so the cards preview
+   the course rather than opening four distinct curricula. `.tile-stack` is a
+   §10.15 label-column opt-out, so the heading keeps the page spine (trap 13). */
+function courseBrowse(lvl){
+  const cur = String(lvl || 'E3').toUpperCase();
+  return `<div class="sec">
+    ${''/* THE DESCRIPTION IS A SIBLING OF `.sec-h`, NOT A CHILD — `.sec-h` is a
+          flex row, so a `<p>` inside it squeezes the heading to min-content at
+          mobile (no section in the build puts a description inside `.sec-h`). */}
+    <div class="sec-h"><h2>Courses in your track</h2></div>
+    <p class="t-desc" style="margin-bottom:var(--s05)">One recommended for you now; the rest are the track&rsquo;s behavioural curriculum.</p>
+    <div class="tile-stack">
+      ${Object.keys(ENROL_COURSE).map(l => {
+        const c = ENROL_COURSE[l];
+        const tag = l === cur ? 'Recommended' : 'In your track';
+        /* NO `I.star` IN THE SUB — an icon SVG in `.sub` (a plain text cell) has
+           no size rule there and renders at its intrinsic size, filling the page
+           (trap 7's sibling). The rating is plain text; the card row is the
+           ground the reader scans. */
+        return gcard('course', tag, c.name, `Rated ${c.rating.toFixed(1)} &middot; ${c.reviews} reviews`, 'enrol');
+      }).join('')}
+    </div>
+  </div>`;
+}
 const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
       ${aiHead({
         mark:false,
@@ -5259,7 +5304,7 @@ function recSkeleton(){
         </div>
       </div>
       <div class="rec-a">
-        <button class="btn btn-p btn-sm noic rec-off" disabled>Book ${first} Now ${I.arrowRight}</button>
+        <button class="btn btn-p btn-sm noic rec-off" disabled>Book call with ${first} ${I.arrowRight}</button>
         <span class="rec-alt rec-finding">Finding another agent</span>
       </div>
     </div>
@@ -5468,7 +5513,7 @@ function talRec(title){
             then none, which is the "mode nobody asks for" CLAUDE.md warns about.
             Both buttons are unconditional again. */}
       <div class="rec-a">
-        <button class="btn btn-p btn-sm noic" data-go="agent:${recKey()}">Book ${first} Now ${I.arrowRight}</button>
+        <button class="btn btn-p btn-sm noic" data-go="agent:${recKey()}">Book call with ${first} ${I.arrowRight}</button>
       </div>
     </div>
   </div>`;
@@ -6266,6 +6311,7 @@ V.dashboard = (f) => {
           block rather than a card in the head band's column. `promoted` keeps
           the plate, where the offer sits beside a certificate. */}
     ${enrolOffer('E3')}
+    ${courseBrowse('E3')}
     ${''/* THE BLACK LEVEL CARD IS GONE FROM THIS PAGE, and it could not simply be
           moved down: `placeDark` (ai5) hoists any dark card on the page into the
           head band wherever the view puts it, so "further down" is not a place a
@@ -6451,6 +6497,7 @@ V.dashboard = (f) => {
           §75's whole point and the reason the offer can be a page child at all.
           `certBanner`'s own note is the rest of the argument. */}
     ${enrolOffer('E4')}
+    ${courseBrowse('E4')}
     ${certBanner(f, {close:true, key:'dash'})}
     ${''/* AND THE TWO READING BLOCKS ARE THE SAME PAIR OF QUICK ACTIONS
           `assessed` DRAWS, one level up — §79's move, and the note on that
@@ -8258,18 +8305,45 @@ V.agent = (f) => {
    `PAGESUM.checkout`, so the pass adds no Tal band — a focused checkout. */
 V.checkout = (f) => {
   const a = AGENTS[S.agent||'priya'];
+  const rec = REC[S.agent||'priya'];
   return `<main class="main"><div class="page">
   ${ph('Payment', null, null, 'agent')}
-  ${''/* ADD A CARD RIDES THE HEADING, THE FEE TILE AND THE PROCESSOR NOTE ARE
-        GONE (Maryam, 7 Sep 2026). The price is already on the pay button, and the
-        card row states where the money goes; the tile and the note were saying a
-        third and fourth time what the button and the picker already carry. */}
-  <div class="sec">
-    <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
-    ${cardPicker()}
-  </div>
-  <div class="sec">
-    <div><button class="btn btn-p" data-go="stage:booked">Pay ${a.price} and book ${I.arrowRight}</button></div>
+  ${''/* THE PAYMENT PAGE KEEPS THE BOOKING PAGE'S SHAPE — Maryam, 9 Sep 2026:
+        "the payment page comes after the calendly page ... keep the previous
+        calendly page's agent section on top ... we only change the calendly ui
+        moving on the next page." So this MIRRORS V.agent's `.sec-bk`: the same
+        `.bkp` profile head (full width, its own hairline below), then the payment
+        content in the SAME 830px centred column the calendly card sat in
+        (`.bks-w`, §76.1b) rather than rail-to-rail — the checkout no longer
+        expands out of the picker's measure, so moving from the Calendly card to
+        this page only swaps the card, not the width.
+
+        THE FEE TILE AND PROCESSOR NOTE STAY GONE (Maryam, 7 Sep 2026): the price
+        is on the pay button and the card row states where the money goes. ADD A
+        CARD still rides the heading. The `.bkp` markup mirrors V.agent's — it
+        reads the same records, so only the template is repeated, not any figure.
+        The pay button sits inside `.bks-w` (left, under the picker) rather than
+        in `.bkc`, whose `margin-left:auto` would push it to the far right. */}
+  <div class="sec sec-bk">
+    <div class="bkp">
+      <div class="agid">
+        ${avatar(a,96)}
+        <div class="rec-b">
+          <div class="rec-top">
+            <p class="rec-id"><span class="rec-who"><span class="rec-n">${a.n}</span>
+                <span class="rec-v">${I.verified}</span></span></p>
+            <p class="rec-r">${I.star}${a.r.toFixed(1)} &middot; ${a.ivs} interviews</p>
+          </div>
+          <p class="rec-f"><span>${I.wallet}${a.price} Interview Fee</span>
+            <span>${I.video}${(rec||{}).mins||'45 mins call'}</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="bks-w bkpay">
+      <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
+      ${cardPicker()}
+      <div class="bkpay-go"><button class="btn btn-p" data-go="stage:booked">Pay ${a.price} and book ${I.arrowRight}</button></div>
+    </div>
   </div>
   </div></main>`;
 };
@@ -9375,8 +9449,12 @@ PARKED.chapter = (f) => {
       </div>
       <div class="kv"><span class="k">Video</span><span class="v n">${done?'6 of 6 watched':inprog?'4 of 6 watched':'Not started'}</span></div>
       <div class="kv"><span class="k">Reading</span><span class="v n">${done?'Complete':'Not opened'}</span></div>
-      <div class="kv"><span class="k">Roleplay</span><span class="v n"><button class="lnk" data-go="rp">${done?'Complete &middot; run it again':'Practice with Tal'}</button></span></div>
-      <div class="kv"><span class="k">Assessment</span><span class="v n">${done?SCORE[i]+'%':'Locked until the roleplay is done'}</span></div>
+      ${''/* THE ROLEPLAY STAGE IS GONE (Client, 9 Sep 2026): a chapter is Video →
+            Reading → Assessment, and the assessment is no longer gated behind an
+            AI roleplay — candidates practise through their real week, not a Tal
+            partner. The sequential CHAPTER lock (finish a chapter to open the
+            next) is a different mechanism and is untouched. */}
+      <div class="kv"><span class="k">Assessment</span><span class="v n">${done?SCORE[i]+'%':'Not started'}</span></div>
     </div>
   </div>
   <div class="sec lsvt-sec">
@@ -11124,6 +11202,13 @@ const pfFact = (ic, mk, label, val) => `<div style="--mk:var(${mk})">
    every build since it existed, and two addresses for one person on one page is
    the drift this file spends its comments on. One field, the account's.
    ========================================================================== */
+/* THE THREE INTENTS, ONE SOURCE. Client, 9 Sep 2026: every candidate at any
+   level picks one of three — where they are trying to go. Intent is the PRIMARY
+   cohort grouping axis (Point 1) and one of the five profile fields captured at
+   onboarding (Point 4, the "intent aspiration"). It is a SINGLE field: the
+   profile select, the onboarding step and cohort formation all read this list,
+   so the words are stated once. Order is the client's own. */
+const INTENTS = ['Develop in my current role','Develop for another role','Develop for ownership'];
 const PF = {
   general: {
     name:'Maryam Naz',
@@ -11131,6 +11216,16 @@ const PF = {
        user name)". A short name others can call you, distinct from the legal
        name above; the edit form takes it as the second field. */
     nickname:'@maryamsss',
+    /* THE FIVE ONBOARDING FIELDS live here (Client, 9 Sep 2026) — Current role,
+       Industry, Years of experience and the Intent aspiration (`intent`, one of
+       `INTENTS`) on General; the student flag is Current role = "student" and the
+       degree program is Education's `degree`. Captured at onboarding, editable in
+       the General form. Seeded to this candidate (an Explorer operations lead) so
+       the completeness ring stays whole. */
+    role:'Operations Lead',
+    industry:'Software',
+    years:'5 years',
+    intent:'Develop in my current role',
     headline:'Senior UX/UI Designer',
     company:'Tkxel',
     /* LOCATION, PHONE AND TIME ZONE ARE RETAINED DATA, NO LONGER SURFACED.
@@ -11302,7 +11397,9 @@ function pfMiss(k){
        Company, Location, Phone and Time zone the moment those came off the form:
        a completeness figure that tests a field the reader cannot edit can report
        a gap with no way to close it. */
-    [['name','Your name'],['nickname','Nickname'],['email','Email'],['about','About']]
+    [['name','Your name'],['nickname','Nickname'],['role','Current role'],
+     ['industry','Industry'],['years','Years of experience'],['intent','Intent aspiration'],
+     ['email','Email'],['about','About']]
       .forEach(([f,l]) => { if(!g[f]) out.push(l); });
   }
   if(k === 'edu') PF.education.forEach(e => {
@@ -11552,10 +11649,22 @@ const pfFormGeneral = () => {
           nickname". `.pfe-g3` puts Name / Nickname / Email on one row; About is
           `w:1` (`.pfe-f-w`), which spans `1 / -1` — all three columns — so it sits
           full width under them. Email is `ro`: read and not change. */}
+    ${''/* THE FIVE ONBOARDING FIELDS join the form (Client, 9 Sep 2026). Name /
+          Nickname / Email fill row 1; Current role / Industry / Years of
+          experience fill row 2; Intent aspiration is a `sel` over `INTENTS` and
+          sits alone on row 3 (a single control, not full-width); About stays
+          `w:1` full width last. The `.pfe-g3` grid still collapses to one column
+          below 700, so every field stacks on a phone. Current role doubles as
+          the student flag — "Student" here is what makes them a student, and the
+          degree program is the Education section's own field. */}
     ${pfFields('gen', [
       ['name','Name', g.name],
       ['nickname','Nickname', g.nickname, {ph:'A short name others can call you'}],
       ['email','Email', g.email, {ro:true}],
+      ['role','Current role', g.role, {ph:'e.g. Operations Lead — or Student'}],
+      ['industry','Industry', g.industry, {ph:'e.g. Software'}],
+      ['years','Years of experience', g.years, {ph:'e.g. 5 years'}],
+      ['intent','Intent aspiration', g.intent, {t:'sel', o:INTENTS}],
       ['about','About', g.about, {t:'area', w:1,
         ph:'Two or three sentences on what you do and what you are good at.'}]
     ], 'pfe-g3')}
@@ -12238,11 +12347,22 @@ const pfSecView = {
             "No level yet" IS THE PRODUCT'S OWN PHRASE for the pre-interview
             state, not new copy: `dashPh` prints it on `new` and on `booked` in
             the fact row under the greeting. */}
+      ${''/* THE FIVE ONBOARDING FIELDS READ HERE (Client, 9 Sep 2026). Current
+            role, Industry, Years of experience and the Intent aspiration append
+            to the same headingless `.facts` band under the name — `.facts` is a
+            §10.15 label-column opt-out and auto-fits, so the row simply wraps to
+            more lines as it grows and no breakpoint work is needed. Degree/
+            student read in the Education tab. Icons are all real `IP` names
+            (trap 7): user / skill / time / flag. */}
       <div class="facts pf-facts">
         ${pfFact(I.growth, '--mk-4', 'My track', f.track + ' track')}
         ${pfFact(I.chart, '--mk-3', 'My level', f.pred ? 'No level yet' : lvlName(f.level))}
         ${pfFact(I.trophy, '--mk-2', 'Points', (GAME[S.stage] ? GAME[S.stage].pts : 0).toLocaleString())}
         ${pfFact(I.book, '--mk-1', 'Total courses taken', String(pfCourses()))}
+        ${pfFact(I.user, '--mk-1', 'Current role', g.role)}
+        ${pfFact(I.skill, '--mk-2', 'Industry', g.industry)}
+        ${pfFact(I.time, '--mk-3', 'Years of experience', g.years)}
+        ${pfFact(I.flag, '--mk-4', 'Aspiration', g.intent)}
       </div>
     </div>
     <div class="sec">
@@ -12824,7 +12944,7 @@ function setStage(k,keepView){
     S.ch = f.open;
   }
   /* if the current view is not reachable at this stage, fall back */
-  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem','rp']);
+  const reachable = NAVSETS[f.nav].map(n=>n[0]).concat(['account','report','agents','agent','booking','payment','chapter','terms','rewards','ivt','mem']);
   if(!DEFAULT_VIEW[k] && !reachable.includes(PARENT[S.view]||S.view)) S.view='dashboard';
   if(DEFAULT_VIEW[k]) S.view = DEFAULT_VIEW[k];
   /* THE SCENES A STAGE ARRIVES WITH.

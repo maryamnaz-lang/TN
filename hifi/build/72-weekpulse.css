@@ -282,7 +282,7 @@
 .app .pulse-ic{
   flex:none;display:grid;place-items:center;
   width:20px;height:20px;
-  color:var(--mk);
+  color:var(--icon-primary);
   background:none}
 .app .pulse-ic svg{width:20px;height:20px;fill:currentColor}
 

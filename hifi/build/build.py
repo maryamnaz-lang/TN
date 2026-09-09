@@ -1442,7 +1442,19 @@ HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               # is on the parent wrapper so the panel stays open as the pointer
               # crosses from the icon to it; `sn-node` is minted for this and
               # written nowhere else, which is what the `endswith` match needs.
-              'sn-node')
+              'sn-node',
+              # Maryam, 9 Sep 2026 — a clickable block lights its now-ink
+              # decorative mark `--accent` on hover, and NOTHING ELSE moves ("do
+              # not make the border black on hover"). The hover is on the CARD, so
+              # the trigger class is the card's, and each is the whole control:
+              # `qa-c` the quick-action button, `cco` the cohort card, `qzp-r`
+              # the quiz-peek row. Each card's own pre-existing (disarmed)
+              # border/background hover was deleted at its source so arming these
+              # classes revives only the mark's colour, not a card-chrome hover.
+              # None end another selector's pre-hover compound (`.qa-c-mk`,
+              # `.cco-ic`, `.qzp-r-ic` all end differently), so the `endswith`
+              # match arms only these three cards.
+              'qa-c', 'cco', 'qzp-r')
 _hover_n = 0
 
 def _disarm(m):

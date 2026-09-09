@@ -1061,8 +1061,14 @@
   flex:none;margin-left:auto;
   display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;
   gap:var(--s04);width:382px}
+/* MIN-WIDTH, NOT WIDTH — Maryam, 9 Sep 2026. "Book call with Priya" is longer
+   than "Book Priya Now", and a fixed 185 wrapped it to two lines (respcheck
+   caught it at 744/1024/1280). §71.2's `.crow-a` is the pattern: a 185 FLOOR
+   plus `white-space:nowrap`, so the pair stays even at their shortest and a long
+   label grows to one line inside `.rec-a`'s 382 rather than wrapping. Below 900
+   §70's own rule takes it full-width, where nowrap still holds. */
 .app .rec-a > .btn{
-  width:185px;min-height:40px;
+  min-width:185px;white-space:nowrap;min-height:40px;
   justify-content:center;gap:var(--s03);
   padding-left:20px;padding-right:var(--s05)}
 
@@ -1280,8 +1286,14 @@
   display:flex;flex-direction:column;gap:20px;align-items:flex-start;
   padding:20px;
   background:var(--layer-01);
-  border:1px solid var(--ai-1);
-  border-radius:8px;
+  /* THE EDGE IS THE ONE HAIRLINE AND THE CORNER IS THE PLATFORM'S — Maryam,
+     9 Sep 2026, Figma 875:6570. The callout used to carry an --ai-1 (accent)
+     edge at an 8px radius to read as a distinct floating card; the Figma gives
+     it the neutral #efefef hairline every other border takes and the radius-0
+     corner the rest of the product uses, so it reads as a page card that
+     happens to float, not a second visual language. */
+  border:1px solid var(--rule);
+  border-radius:var(--radius);
   box-shadow:0 0 100px 0 rgba(128,128,128,.06),
              -40px 40px 40px 0 rgba(0,0,0,.04)}
 
@@ -1308,7 +1320,7 @@
   background-image:var(--ai-grad-alt);
   -webkit-background-clip:text;background-clip:text}
 .app .sumdrop .sd-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
-.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--ai-1)}
+.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
 
 /* THE PHRASE IS A CONTROL NOW. `<b data-sum>` keeps §70.2's ground and ink and
    gains a pointer and a focus ring; `all:unset` is not used because the ground,
@@ -1444,11 +1456,15 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   width:100%;margin:0;min-height:74px;
   padding:var(--s05) var(--s06) var(--s05) 20px;
-  border:1px solid rgba(0,0,0,.1);
+  border:1px solid var(--rule);
   background-color:#fdfdfd;
-  text-align:left;cursor:pointer;
-  transition:border-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
-.app .qa-c:hover{border-color:var(--text-primary)}
+  text-align:left;cursor:pointer}
+/* THE CARD BORDER DOES NOT MOVE ON HOVER (Maryam, 9 Sep 2026: "do not make the
+   border black on hover"). §70's old `.qa-c:hover{border-color:--text-primary}`
+   was globally disarmed and dead; arming `qa-c` for the icon-red hover would
+   have revived it. It is DELETED, not re-disarmed — the only hover feedback on a
+   quick action is the mark turning `--accent` (below). The border-color
+   transition went with it; the mark's own `transition:fill` gives the fade. */
 .app .qa-c:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
 
 /* 20px, MATCHING THE FIGURE CELL'S BARE GLYPH (Maryam, 1 Sep 2026: "the icon
@@ -1481,9 +1497,25 @@
    the journey's done-step green (§63 §10) and #0488C5 is the match figure and
    the blue overlap tag. So the page has three greens and three blues that are
    the same three, not six near-misses. */
-.app .qa-ic svg{width:20px;height:20px;fill:var(--ai-1)}
-.app .qa-ic.ic-quiz svg{fill:#00a43c}
-.app .qa-ic.ic-prep svg{fill:#0488c5}
+/* THE MARK IS INK, NOT A CATEGORY HUE (Maryam, 9 Sep 2026: "change the coloured
+   icons to black colour"). Every bare decorative glyph on the platform is
+   `--icon-primary` now — the quick-action mark, the stat/pulse/facts/prog marks,
+   the profile and cohort marks. A hue on a bare glyph read as a status it did
+   not have; the WORDS say what the card is. State/subject marks are the
+   exception and keep their colour (the green done tick, the star, the journey
+   states) — those signal, they do not categorise. All hue variants below fold
+   to the same ink; the class stays so the markup and the recipe are unchanged. */
+.app .qa-ic svg{width:20px;height:20px;fill:var(--icon-primary);
+  transition:fill 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .qa-ic.ic-quiz svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-prep svg{fill:var(--icon-primary)}
+/* A CLICKABLE block lights its MARK — and only its mark — on hover (Maryam, same
+   day: "if it is a quick action block or something that has a click then turn
+   the black icon colour to #bd2a2a on hover", and "do not make the border black
+   on hover"). The card is the control, so the hover is on `.qa-c`; `qa-c` is
+   armed in HOVER_KEEP. The card's old border-darken hover was deleted above so
+   nothing but the mark changes. */
+.app .qa-c:hover .qa-ic svg{fill:var(--accent)}
 
 .app .qa-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
 /* THE ARROW IS RIGHT AND MIDDLE OF THE CARD — Maryam, 1 Sep 2026: "the arrow

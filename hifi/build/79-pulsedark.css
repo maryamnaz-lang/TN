@@ -206,9 +206,17 @@
    absent and the other two keep their hues, which is the failure a cycle would
    have.
    ------------------------------------------------------------------------ */
-.app .qa-ic.ic-focus svg{fill:var(--mk-1)}
-.app .qa-ic.ic-pace  svg{fill:var(--mk-2)}
-.app .qa-ic.ic-stand svg{fill:var(--mk-3)}
+.app .qa-ic.ic-focus svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-pace  svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-stand svg{fill:var(--icon-primary)}
+
+/* THE PULSE MARK IS INK ON DARK TOO — §72 blackened `.pulse-ic` (color, driving
+   its `currentColor` fill) to `--icon-primary`, which is #111. The dashboard
+   pulse is `.sec-pulse.dark-card`, so on that ground #111 is a glyph nobody can
+   see. `--on-dark` (white) is the ink's dark-card equivalent, the same flip §75
+   makes for every other mark on this card. This is the ONLY decorative mark that
+   shares one class across a light and a dark ground; the rest are light-only. */
+.app .dark-card .pulse-ic{color:var(--on-dark)}
 
 /* AND A ROW OF THREE NEEDS THE FULL WIDTH AND A SMALLER FLOOR — §70.6's grid
    was sized for exactly two and both of its numbers say so. `.qa` is

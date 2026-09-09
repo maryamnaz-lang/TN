@@ -36,7 +36,7 @@
 .app .page .pf-facts .pf-l{
   display:flex;align-items:center;gap:var(--s03)}
 .app .page .pf-facts .pf-l svg{
-  flex:none;width:20px;height:20px;fill:var(--mk)}
+  flex:none;width:20px;height:20px;fill:var(--icon-primary)}
 /* THE VALUE SITS `--s03` UNDER ITS LABEL — a heading over a value, not two
    lines of one statement, which is §01's `--sec-desc-gap` argument at the scale
    of a cell.
@@ -179,7 +179,7 @@
 .app .page .pf-tgs .tg-mk{
   flex:none;display:grid;place-items:center;
   width:20px;height:20px;margin-top:1px}
-.app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--mk)}
+.app .page .pf-tgs .tg-mk svg{width:20px;height:20px;fill:var(--icon-primary)}
 
 /* ------------------------------------------------------------------ 105.5 ---
    THE SAVED CARD ROW — a radio on the spine and a red Remove

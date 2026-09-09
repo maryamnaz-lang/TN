@@ -157,44 +157,37 @@ const SPEECH_OK = !!SPEECH;
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
       <defs>
-        ${''/* THE COMET'S FIVE STOPS ARE THE FILE'S, RE-GIVEN 4 Sep 2026.
-
-              Maryam, with the CSS: "for the moving line on tal field border,
-              change that line gradient colors to this —
+        ${''/* THE COMET'S FIVE STOPS — Maryam, 9 Sep 2026, off Figma 875:6598,
+              given as the exact CSS to follow:
               `linear-gradient(90.13deg, rgba(255,255,255,0.7) 0%,
-              rgba(253,78,89,0.7) 26.44%, rgba(244,128,242,0.7) 50%,
-              rgba(253,78,89,0.7) 73.56%, rgba(255,255,255,0.7) 100%)`."
+              rgba(213,81,215,0.7) 22.6%, rgba(255,110,36,0.7) 49.04%,
+              rgba(255,55,51,0.7) 75%, rgba(255,255,255,0.7) 100%)`.
 
-              FIVE STOPS IN, FIVE STOPS OUT, and the offsets are hers each
-              time: 0 / .226 / .4904 / .75 / 1 on 4 Sep, against the previous
-              0 / .2644 / .5 / .7356 / 1 and the original 0 / .1952 / .3989 /
-              .7921 / 1. Symmetric white-into-red-and-back through all three.
+              WHITE INTO MAGENTA, ORANGE, RED AND BACK TO WHITE. The offsets are
+              unchanged from the 4 Sep set (0 / .226 / .4904 / .75 / 1); the
+              THREE middle colours are new — #d551d7 (magenta), #ff6e24 (orange)
+              and #ff3733 (red), where the ramp had been red / pale-green / red.
+              So the light is no longer symmetric: it warms across rather than
+              mirroring, which is the node's own gradient.
 
-              WHAT CHANGED ON 4 Sep IS THE MIDDLE, AND IT IS A PALE GREEN —
-              #CCE7CB, where the ramp had been magenta. That is not a stray: the
-              DOCK BORDER measures the same green at 60% across (§70's token
-              note has the sampling), so the light and the edge it travels along
-              are still one colour idea. What is no longer part of it is Tal's
-              TEXT, which took a salmon middle in the same message — the first
-              time in this component's life that the comet and the label are two
-              different ramps.
+              90.13deg IS HORIZONTAL, so the SVG gradient is `x2=1 y2=0` now,
+              not the corner-to-corner `y2=1` §70.3a's note argued for. On a wide,
+              short field the ramp lives on the top and bottom edges and the white
+              ends fall on the short sides — which is where the file draws them —
+              so the comet fades through the corners rather than at mid-edge.
 
               THE .7 IS `stop-opacity`, NOT A COLOUR. SVG has no `rgba()` in
               `stop-color`, and baking the alpha into the hex would need it
-              composited against whatever is behind — which on this element is
-              the dock's own border, not white. Stated as the attribute, the
-              stop is genuinely 70% and the border shows through it, which is
-              what the spec's `rgba` means on a `filter:blur(1px)` line lying
-              over a coloured edge.
-
-              THE WHITE ENDS ARE STILL WHITE and still at 70%, which is the
-              file's. They are what makes the dash fade in and out of its own
-              travel rather than arriving as a hard bar — §70.1's note has the
-              long version, including why the loop has no seam. */}
-        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="1">
+              composited against whatever is behind — the dock's own border, not
+              white. Stated as the attribute the stop is genuinely 70% and the
+              border shows through it, which is what the spec's `rgba` means on a
+              `filter:blur(1px)` line lying over a coloured edge. The white ends
+              at 70% are what make the dash fade in and out of its travel; §70.1's
+              note has the long version, including why the loop has no seam. */}
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.226" stop-color="#ff3733" stop-opacity=".7"/>
-          <stop offset="0.4904" stop-color="#cce7cb" stop-opacity=".7"/>
+          <stop offset="0.226" stop-color="#d551d7" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
           <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
           <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
         </linearGradient>
@@ -208,7 +201,10 @@ function askBar(){
   return `<button class="askline" data-askopen="1" aria-label="Ask Tal anything">
     ${AI_RUN}
     <span class="askline-mark"><span class="tal-mk"></span></span>
-    <span class="askline-t">Ask Tal anything</span>
+    ${''/* "Ask Tal", not "Ask Tal anything" — Figma 875:6598, 9 Sep 2026. The
+          example question beside it carries the "…anything" sense; the label is
+          the shorter of the two now. The aria-label keeps the full phrase. */}
+    <span class="askline-t">Ask Tal</span>
     <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + q + '&rdquo;' : ''}</span>
     ${''/* ARROW-RIGHT, NOT ARROW-UP — Figma 578:5966 (581:6589), and it agrees
           with the note above about the control being drawn OFF. Up is the chat

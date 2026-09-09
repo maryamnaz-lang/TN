@@ -172,8 +172,15 @@ const lbadge = pts => BDG.filter(b => b.need && pts >= b.need).pop() || null;
                            week that ended.
    Yuki keeps her 12 days and her 9%, so `LEAD_NOTIF`'s row and her own thread
    are untouched — she is the one person this rearrangement had to leave alone. */
+/* A COHORT IS AN INTENT GROUP, NOT A COURSE INSTANCE (Client, 9 Sep 2026).
+   `intent` is the PRIMARY grouping axis — one of the three `INTENTS`, the same
+   list the candidate profile and onboarding read. `level` stays (a cohort is
+   still one band, so Trailblazers never sit with Explorers), but it no longer
+   IDENTIFIES the cohort and the course no longer does either: `lcourse` is off
+   the identity line (see its note). One cohort per intent here so the demo shows
+   the axis clearly. */
 const LEAD_COHORTS = [
-  {id:41, level:'E3', week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', members:[
+  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', members:[
     lmem('Maryam Naz','MN','hana',46,84,1.3,'Today',1760),
     lmem('Aisha Bello','AB','priya',71,94,1.0,'Today',2610),
     lmem('Daniel Kerr','DK','owen',58,88,1.2,'Today',2140),
@@ -184,7 +191,7 @@ const LEAD_COHORTS = [
     lmem('Chloe Ferreira','CF','priya',28,77,1.0,'5d ago',1005),
     lmem('Tobias Mensah','TM','samuel',35,61,1.4,'2d ago',1240),
     lmem('Yuki Tanaka','YT','hana',9,0,0,'12d ago',285)]},
-  {id:33, level:'E1', week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', members:[
+  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', members:[
     /* COHORT 33 IS THE ONE THESE FIGURES ARE READ ON — week 11, and the two at
        the top are the ones the Evaluations card draws. Owen clears Silver
        (5,000) and Lena does not, which is deliberate: the card shows a badge per
@@ -198,7 +205,7 @@ const LEAD_COHORTS = [
     lmem('Grace Mwangi','GM','priya',80,88,1.0,'Today',4265),
     lmem('Ivan Petrov','IP','samuel',80,70,1.7,'3d ago',3780),
     lmem('Zoe Bennett','ZB','lena',80,66,1.6,'2d ago',3410)]},
-  {id:47, level:'E2', week:1, day:4, call:'Monday 6:00 PM', callDay:'Mon', callTime:'6:00 PM', callOrd:5, starts:'', members:[
+  {id:47, level:'E2', intent:INTENTS[1], week:1, day:4, call:'Monday 6:00 PM', callDay:'Mon', callTime:'6:00 PM', callOrd:5, starts:'', members:[
     /* COHORT 47 IS FOUR DAYS OLD, so every total here is one or two chapters'
        worth at 25 a chapter plus a post or two — the four on 0% have signed in
        and done nothing, which is 0 points earned rather than a missing figure. */
@@ -257,11 +264,17 @@ const lbehind = () => lmembers().filter(x => x.m.pc - lpace(x.c) <= -5);
 const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.members.length);
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
-/* THE COURSE A COHORT IS TAKING (Maryam, 2 Sep 2026). `courseOf` and the
-   argument for keying it by LEVEL are in views.js beside `ENROL_COURSE`, which
-   is where two of the four names are read from; this is the leader-side reader,
-   stated beside `lname` and `llevel` because those three are the cohort's
-   identity and every surface that names one names them together.
+/* THE COHORT'S INTENT — its GROUPING (Client, 9 Sep 2026). This replaces the
+   course on the identity line: a cohort is the people following one intent
+   track, so `lname · lintent · llevel` is the identity every surface prints
+   together now, and `lintent` sits beside `lname`/`llevel` for that reason. */
+const lintent = c => c.intent;
+/* THE COURSE A COHORT'S TRACK CURRENTLY RUNS — NO LONGER THE COHORT'S IDENTITY
+   (Client, 9 Sep 2026). The cohort is not a course instance, so `lcourse` came
+   off the `lname · … · llevel` line (replaced by `lintent`). It is retained as
+   the reader for the course-as-content surface — a course is recommended and
+   chooseable inside a track (Point 3), the candidate dashboard draws that — and
+   `courseOf`/the key-by-LEVEL argument are in views.js beside `ENROL_COURSE`.
    THE DIRECTION IS THE RULE views.js's `COHORT_LEAD` note records: views.js
    parses first and lead.js reads back, never the other way. */
 const lcourse = c => courseOf(c.level);
@@ -1331,7 +1344,7 @@ V.leadDash = () => {
            the label was that control's words repeated three times underneath it.
            The Awaiting Evaluations queue keeps its label: one verb, on a queue
            whose heading row has no control of its own. */
-        return gcard('cohort', lname(c)+' &middot; '+lcourse(c)+' &middot; '+llevel(c),
+        return gcard('cohort', lname(c)+' &middot; '+lintent(c)+' &middot; '+llevel(c),
           'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
           + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',

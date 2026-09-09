@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=3daf5f0b">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=bedace0e">
 
 <style>
 /* ==========================================================================
@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=3daf5f0b"></script>
+<script src="design-system/talentnext-ds.js?b=bedace0e"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1659,11 +1659,14 @@ function askRotate(){
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
       <defs>
-        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="1">
+        <!-- The comet's five stops, off Figma 875:6598 (Maryam 9 Sep 2026), the
+             same ramp every portal now runs: white into magenta, orange, red and
+             back to white, at 70%. Horizontal (x2=1 y2=0), the node's 90.13deg. -->
+        <linearGradient id="aiRunGrad" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stop-color="#ffffff" stop-opacity=".7"/>
-          <stop offset="0.226" stop-color="#bd2a2a" stop-opacity=".7"/>
-          <stop offset="0.4904" stop-color="#cce7cb" stop-opacity=".7"/>
-          <stop offset="0.75" stop-color="#bd2a2a" stop-opacity=".7"/>
+          <stop offset="0.226" stop-color="#d551d7" stop-opacity=".7"/>
+          <stop offset="0.4904" stop-color="#ff6e24" stop-opacity=".7"/>
+          <stop offset="0.75" stop-color="#ff3733" stop-opacity=".7"/>
           <stop offset="1" stop-color="#ffffff" stop-opacity=".7"/>
         </linearGradient>
       </defs>
@@ -1676,7 +1679,7 @@ function askDock(){
     <button class="askline" data-askopen="1" aria-label="Ask Tal anything">
       ${AI_RUN}
       <span class="askline-mark"><span class="tal-mk"></span></span>
-      <span class="askline-t">Ask Tal anything</span>
+      <span class="askline-t">Ask Tal</span>
       <span class="askline-q" aria-hidden="true">${q ? '&ldquo;' + esc(q) + '&rdquo;' : ''}</span>
       <span class="askline-send" aria-hidden="true">${I.arrowRight}</span>
     </button>

@@ -192,6 +192,11 @@
   --auth-o-ink:#a52323;
   --auth-card-bg:#ffffff;
   --auth-shadow:rgba(149,149,149,.1);
+  /* --auth-rule now backs the auth FIELD underlines only. The auth SECTION
+     dividers it used to draw (the split panel's border-right, the footer's
+     border-top, the .sec-rule bar) moved to var(--rule) — every section
+     divider is the one #efefef hairline (Maryam 9 Sep 2026). A field keeps its
+     own darker line so it stays findable, so this token stays as it is. */
   --auth-rule:rgba(17,17,17,.1);
   /* THE 2026 FRAME (Figma 483:976). The front door was redrawn as a full-bleed
      split — artwork to the frame edge on the left, the form in a bordered card
@@ -209,7 +214,7 @@
                           amount, which is what makes the panel read as a
                           child of the card rather than a different material.
                           Measured: fill reaches the edge by 6px on both. */
-  --auth-card-line:#f0f0f0;
+  --auth-card-line:var(--rule);
   --auth-r:8px;
   /* THE TWO BLURRED ELLIPSES.
      Geometry is the file's exactly: Ellipse 42 is 2132 x 128 at top -30,

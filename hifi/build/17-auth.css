@@ -140,7 +140,7 @@
     display:flex;flex-direction:column;position:relative;z-index:3;
     flex:0 1 511px;min-width:0;box-sizing:border-box;
     padding:60px 50px 0 0;
-    border-right:1px solid var(--auth-rule)}
+    border-right:1px solid var(--rule)}
   .auth-brand .auth-logo{display:block;margin:0}
   .auth-brand .auth-logo img{display:block;width:173px;height:auto}
   .auth-brand .auth-intro{margin-top:40px;padding:12px 0;max-width:min(421px,100%)}
@@ -262,7 +262,7 @@
      24 above and below, 16 under its heading.
      ------------------------------------------------------------------------ */
   .app .auth-card .page > .sec.sec-rule{
-    padding-top:24px;padding-bottom:24px;border-top:1px solid var(--auth-rule)}
+    padding-top:24px;padding-bottom:24px;border-top:1px solid var(--rule)}
   .auth-card .sec-rule > .sec-h{margin-bottom:var(--sec-h-gap);min-height:0;padding:0}
   .auth-card .sec-rule > .sec-h h2{margin:0}
 
@@ -402,7 +402,7 @@
     border-top:0;position:relative}
   .app .auth-card .page > .sec.sec-rule::before{
     content:'';position:absolute;top:0;left:var(--pad-x);right:var(--pad-x);
-    height:1px;background:var(--auth-rule)}
+    height:1px;background:var(--rule)}
 
   /* THE CLOSING ROW STACKS, AND THE WAY OUT GOES ON TOP.
      292:512 puts Resend above Verify at 12 apart, both the full width of the

@@ -111,15 +111,21 @@
    own wash runs the whole column. `p` is named as well as the wrapper
    because §05 caps `.ai-body` and `.ai-body p` separately.
 
-   TRUE BLACK, NOT THE PAGE'S INK. `--text-primary` is #111 — correct for
-   the twenty other places a paragraph appears, and against this band's warm
-   wash still one step back from the front. #000 is stated flat because this
-   line is meant to be the first thing read on the page.
+   THE DESCRIPTION IS --text-secondary (#828282), NOT BLACK — Maryam, 9 Sep
+   2026, Figma 871:6425 ("the description color to be #828282, follow the font
+   colour and weight from figma"). This REVERSES the "TRUE BLACK" call this
+   note used to make: the body was set flat #000 to be the first thing read,
+   one step in front of the #111 the rest of the page uses. The Figma sets it
+   as a description grey instead — the same #828282 every other description
+   takes — so the band's `<b>` accent phrases carry the emphasis and the body
+   reads as the supporting line it is. Weight stays --t-w-book (400), the
+   Figma's Regular; the `<b>` keeps --accent-text (§63). Only the body colour
+   moves, and `.ai-body p` inherits it.
    -------------------------------------------------------------------------- */
 .app .modhead .ai-aura.talsum > .ai-body{
   grid-area:body;margin:var(--s03) 0 0;
   max-width:none;
-  color:#000}
+  color:var(--text-secondary)}
 .app .modhead .ai-aura.talsum > .ai-body p{color:inherit;max-width:none}
 
 /* --------------------------------------------------------------------------

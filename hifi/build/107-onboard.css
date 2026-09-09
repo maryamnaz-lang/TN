@@ -1083,7 +1083,7 @@
 .app .ob-qp-h{
   display:flex;align-items:baseline;gap:var(--s05);
   padding:var(--s05);
-  border-bottom:1px solid rgba(17,17,17,.07)}
+  border-bottom:1px solid var(--rule)}
 /* THE COUNT IS PINNED RIGHT AND NEVER WRAPS. It is three characters against a
    question that can run to two lines, so the auto margin does the work and
    `flex:none` stops the heading squeezing it into "1 of\n5". */
@@ -1098,7 +1098,7 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   box-sizing:border-box;width:100%;
   padding:var(--s04) var(--s05);
-  border:0;border-top:1px solid rgba(17,17,17,.07);
+  border:0;border-top:1px solid var(--rule);
   background:none;cursor:pointer;text-align:left}
 .app .ob-qp-o:first-of-type{border-top:0}
 
@@ -1118,7 +1118,7 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   box-sizing:border-box;width:100%;
   padding:var(--s04) var(--s05);
-  border-top:1px solid rgba(17,17,17,.07)}
+  border-top:1px solid var(--rule)}
 .app .ob-qp-h + .ob-qp-r{border-top:0}
 
 /* >>> THE JOURNEY'S MARK IS A BARE STATE GLYPH — `jrnList`'s own three, ported

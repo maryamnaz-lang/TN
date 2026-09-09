@@ -182,7 +182,7 @@
   display:grid;place-items:center;flex:none;
   width:28px;height:28px;
   background-color:color-mix(in srgb, var(--mk) 13%, var(--background))}
-.app .prog-ic svg{width:16px;height:16px;fill:var(--mk)}
+.app .prog-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
 .app .prog-figs > span:nth-child(1){--mk:var(--mk-1)}
 .app .prog-figs > span:nth-child(2){--mk:var(--mk-2)}
 .app .prog-figs > span:nth-child(3){--mk:var(--mk-3)}

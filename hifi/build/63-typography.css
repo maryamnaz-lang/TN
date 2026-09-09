@@ -495,7 +495,7 @@
 .app .eyebrow,.app .stats .l,.app .stats .k,.app .stat .k,.app .facts .l,
 .app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
 .app .sn-cap,.app .pt-lab,.app .lvl-hero .eb,.app .ladder-lab,
-.app .tbl th,.app .chart-table th,.app .tw-h,.app .cert-eb,.app .plate-eb,
+.app .tbl th,.app .chart-table th,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
 .app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
@@ -634,9 +634,12 @@
    places. If she wants the publishers' form, that is the moment this becomes a
    markup change and this rule goes.
 
-   THE FIVE FAMILIES ARE THE ONES THAT ARE BUTTONS. `.btn` is the component and
-   its eight variants; `.tw-btn` is the button inside one of Tal's widgets, which
-   carries no `.btn` of its own. `.nil-btn` / `.nil-cta` are the microsite's, and
+   THE FAMILIES ARE THE ONES THAT ARE BUTTONS. `.btn` is the component and its
+   eight variants. `.tw-btn` USED TO BE HERE — the button inside Tal's widgets —
+   and came OUT on 9 Sep 2026: Figma 882:6701 makes it a sentence-case LINK
+   ("Open my course progress →"), not a Title-Case button, so capitalising it now
+   fights the reference. §39 draws that link (no fill, red text, an arrow); its
+   words are authored in sentence case and left alone. `.nil-btn` / `.nil-cta` are the microsite's, and
    they are here on §4's own precedent — that block reaches into `nil` because it
    "is still a screen inside this product" while leaving its face and colour
    alone. What is deliberately NOT here is everything else in §3's button TIER:
@@ -657,8 +660,13 @@
    excluded from the design system, which is why the two microsite selectors are
    written apart from the `.app` one rather than folded into it.
    ------------------------------------------------------------------------ */
-.app .btn,.app .tw-btn{text-transform:capitalize}
+.app .btn{text-transform:capitalize}
 .nil .nil-btn,.nil .nil-cta{text-transform:capitalize}
+/* THE TAL REPLY ACTION LINK'S INK — accent, off Figma 882:6701 (9 Sep 2026).
+   §39 strips its box; the colour is stated here where colour is owned. Both the
+   primary link and the quiet ghost take `--accent-text`, the AA-safe accent ink
+   §01 keeps for words; the arrow is `fill:currentColor` so it follows. */
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn{color:var(--accent-text)}
 
 /* ------------------------------------------------------------------ 5 ---
    SVG TEXT
@@ -1005,11 +1013,26 @@
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong)}
 
+/* TAL WIDGET TITLE — off Figma 882:6701 (9 Sep 2026). §5's eyebrow group set
+   this as the small grey uppercase label; the node sets it in Medium black
+   sentence case at the body size, so it leaves the group and takes the body
+   role in `--t-w-strong` and `--text-primary`. Unscoped `.app .tw-h` so the
+   gallery's copy moves with the chat's rather than reverting to §03's raw
+   uppercase 600. The node's Medium is the platform's one strong weight — the
+   two-weight rule holds. */
+.app .tw-h{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+
 /* 0,2,0 — the widget's figure column and the agent row inside a Tal bubble.
    §39's note on `.tw-lines` is why the label column is 58px; the size it
-   was set at was not part of that measurement. */
+   was set at was not part of that measurement. The label `<b>` is the node's
+   SemiBold, i.e. the strong weight (§11 loads two, so SemiBold reads as Medium);
+   the value column stays `--text-secondary` from §03. */
 .app .tw-lines b,.app .tw-ag b,.app .tw-lines > span{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+.app .tw-lines b{font-weight:var(--t-w-strong)}
 
 /* 0,3,0 — the certificate's meta line, on the dark ground. §37 shrinks it
    again inside a max-width query, so per trap 3 that one needs the query. */
@@ -1552,7 +1575,14 @@
    the reader is meant to find — came out a brown that did not match the accent
    anywhere else on the screen. The design wins; the two ratios are the known
    price and are worth re-testing if this ever leaves prototype. */
-.app .jrn-i{color:#515151}
+/* THE UPCOMING STEP IS THE DESCRIPTION GREY — Maryam, 9 Sep 2026: "i want the
+   desc color to be #828282, i want it everywhere". A pending journey step is a
+   supporting line, so it reads --text-secondary like every other description
+   (was a flat #515151). The `.done` green and `.on` accent states below still
+   override it; only the upcoming grey moves, and it moves onto the token. This
+   lightens it from the contrast the note above weighed — the description grey
+   is the product-wide value now. */
+.app .jrn-i{color:var(--text-secondary)}
 .app .jrn-i.done{color:#00a43c}
 /* AND `.jrn-i.on` IS ORANGE AGAIN — 4 Sep 2026, and it is the accent re-hue
    being told where it does NOT reach (Maryam: "some places had to have the
@@ -1626,7 +1656,7 @@
 .app .rec-f{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#414141}
+  color:var(--text-secondary)}
 .app .rec-tag{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -1692,7 +1722,7 @@
 .app .qa-b > span{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#717171}
+  color:var(--text-secondary)}
 
 /* "TAL'S RECOMMENDS" IS BLACK, AND THAT IS THE FILE BEING DELIBERATE —
    581:6670 sets "Summary by Tal" in the gradient and 584:6692 sets this one in
@@ -1805,18 +1835,21 @@
    Nothing replaces it: §8b's default is the heaviest rule left on this
    heading, which the sweep confirms rather than the arithmetic. */
 
-/* THE ASK LINE — 581:6571/6586. The offer is at body size in full ink and the
-   example question one step down in the helper tier, which is the distinction
-   §21's own note draws in words ("this is the line's own voice" against "an
-   example of what you could type") and had been drawing with colour alone. */
+/* THE ASK LINE — off Figma 875:6598 (9 Sep 2026, "follow this ui completely").
+   The node INVERTS the old emphasis: the label "Ask Tal" is the quiet one now —
+   14px Regular in `--text-secondary` grey — and the example question beside it
+   is the darker, heavier line (14px SemiBold, #626262). Both move up to the h4
+   size (14) the node sets, and the example's #626262 is its own ink, a shade
+   under the label's grey, kept as a literal the way §21's #474747 was (the dock
+   has always carried its own inks). SemiBold is the platform's strong weight. */
 .app .askdock .askline-t{
-  font-size:var(--t-body-size);line-height:var(--t-body-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h4-ls);
+  color:var(--text-secondary)}
 .app .askdock .askline-q{
-  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#474747}
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:#626262}
 
 /* THE "FINDING ANOTHER AGENT" STATUS — 588:6864. It shares `.rec-alt` with the
    offer it replaces, so it inherits the size, the ramp and the underline; what
@@ -1836,12 +1869,18 @@
    tag — and that is the point of it: the accent is Tal's own voice all over
    this band, so a second accent phrase inside a card that IS Tal talking says
    nothing. The blue marks it as a named reading rather than as emphasis. */
+/* THE POPOVER BODY IS --text-secondary (#828282), NOT THE PAGE INK — Maryam,
+   9 Sep 2026, Figma 875:6570. The card's prose (the two reads and the next-step
+   line) is a description, so it takes the description grey the whole product
+   uses, not #111. Weight stays --t-w-book (400), the Figma's Regular. The blue
+   lead-in `.sd-read b` (§10a below) and the "Your Next Step" label `.sd-nt`
+   (black) keep their own colours — only the running prose moves. */
 .app .sumdrop .sd-lead,
 .app .sumdrop .sd-read,
 .app .sumdrop .sd-nb{
   font-size:var(--t-compact-size);line-height:1.8;
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:var(--text-primary)}
+  color:var(--text-secondary)}
 /* THIS RULE IS (0,3,1) AND IT NEVER WON — kept for the weight, which nothing
    contests, and answered below for the colour. See §10a. */
 .app .sumdrop .sd-read b{font-weight:var(--t-w-strong);color:#0488c5}
@@ -1883,6 +1922,15 @@
    reason it is not orange on every other one. Seven classes settle both.
    §70 states the matching 5% ground on the identical selector. */
 .app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{color:#0488c5}
+
+/* THE "YOUR NEXT STEP" LABEL STAYS BLACK, and it needs the same out-specifying
+   the blue lead-in did. `placeSumDrop` appends the card into `.ai-body`, so
+   §33:123 `.ai-aura.talsum > .ai-body p{color:inherit}` (0,5,1) reaches every
+   `<p>` in it — the reads and the next-step line ride it down to the body's
+   #828282 (correct, Figma 875:6570), but `.sd-nt` is a heading and the Figma
+   sets it black. `.app .sumdrop .sd-nt` (0,3,0) loses to that inherit, so it is
+   restated here at (0,6,0). Maryam, 9 Sep 2026. */
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-nt{color:var(--text-primary)}
 
 /* ------------------------------------------------------------------ 11 ---
    THE COURSE HEAD — §71's families
@@ -4998,7 +5046,7 @@
    `--on-accent` ON THE TICK IS DELETED with the chip it sat in: the mark is
    bare now, so the tick is the green itself rather than white on a fill. */
 .app .ob-qp-r.on .ob-qp-l{color:var(--accent-text)}
-.app .ob-qp-r .ob-jr-ic{color:#515151}
+.app .ob-qp-r .ob-jr-ic{color:var(--text-secondary)}
 .app .ob-qp-r.done .ob-jr-ic{color:#00a43c}
 .app .ob-qp-r.on .ob-jr-ic{color:var(--accent-text)}
 .app .ob-compose.off .ob-in::placeholder{color:var(--text-helper)}
