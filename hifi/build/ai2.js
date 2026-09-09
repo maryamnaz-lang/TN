@@ -160,7 +160,7 @@ V.mem = (f) => {
     <ul class="never">
       ${NEVER.map(n => `<li>${I.viewOff}<span>${n}</span></li>`).join('')}
     </ul>
-    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Forgetting a line here removes it from what I use. It does not delete the interview recording or the note it came from &mdash; those are yours and they are managed in Profile.</p>
+    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Forgetting a line here removes it from what I use. It does not delete the interview recording or the note it came from. Those are yours and they are managed in Profile.</p>
   </div>
 </div></main>`;
 };

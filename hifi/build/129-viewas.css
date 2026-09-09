@@ -1,0 +1,55 @@
+/* ==========================================================================
+   129. THE VIEW-AS BAR — SA-11, the Super Admin journey (7 Sep 2026)
+
+   The Super Admin journey (Draft v1.0, 6 Sep 2026) names impersonation as
+   use case SA-11 and leaves its three alternatives open: read-only against
+   write-enabled, consent-gated against unilateral, scoped to exclude
+   interview video. Maryam's rule for the whole journey (7 Sep 2026): draw
+   each case's SURFACE with its primary alternative and put every open branch
+   on the Rulings Register rather than inventing a control. The surface here
+   is one bar.
+
+   WHAT IT IS. While an admin has a View As session open (`S.viewAs` in
+   tn-admin-portal.html), a bar sits UNDER THE APP BAR and ABOVE THE PAGE,
+   naming who is being viewed, the scope (read-only unless the open ruling was
+   taken), that interview video is excluded, when the session began, and one
+   button that ends it. The page scrolls under it; the Tal dock is unaffected,
+   because the bar is a flex child of `.view-col` before `.main` and `.main`
+   keeps `flex:1`.
+
+   WHY A LAYER AND NOT `.note`. A `.note` is a paragraph inside a section and
+   scrolls away with the page; a mode the whole console is in has to stay in
+   view on every page, which is what a bar in the column above the scroller
+   does. It is the same reasoning as the candidate portal's `.crow-due` timer
+   (§119): a state the reader must not lose sight of is not content.
+
+   THE GROUND IS `--brand-tint-2`, the light accent §104's chosen role card
+   uses — the one tinted ground the platform already reads as "this one is
+   on" — with a `--rule` hairline under it so it closes against the page the
+   way every other band does. Nothing here states a size, a weight or an ink:
+   §63 §57 does (the bar's line is `--t-compact`, the name is strong in
+   `--accent-text`). The mark is 20px, a bare glyph in a named hue — the same
+   rule `.stat-ic` and `.qa-ic` follow (DESIGN.md §3) — and an icon's fill is
+   not text colour, so it is stated here.
+
+   RESPONSIVE. Below 600 the bar wraps and the button takes the full width
+   under the sentence, so a 390px phone never sets the label on two lines
+   beside a button (DESIGN.md §3: a button label on two lines is a bug). At
+   900 and up the bar's side padding matches `.main`'s clamp so its words line
+   up with the page's left edge.
+   ========================================================================== */
+.app .viewas{
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--s03) var(--s04);
+  flex:none; min-height:44px; padding:var(--s03) var(--s05);
+  background:var(--brand-tint-2); border-bottom:1px solid var(--rule)}
+.app .viewas-mk{display:inline-flex; flex:none; width:20px; height:20px}
+.app .viewas-mk svg{display:block; width:20px; height:20px; fill:var(--accent-text)}
+.app .viewas-t{flex:1 1 240px; min-width:0}
+.app .viewas-end{flex:none; margin-left:auto; white-space:nowrap}
+
+@container app (max-width:599px){
+  .app .viewas-end{flex:1 1 100%; margin-left:0}
+}
+@container app (min-width:900px){
+  .app .viewas{padding-left:clamp(var(--s06), 12cqw, 200px); padding-right:clamp(var(--s06), 12cqw, 200px)}
+}

@@ -138,12 +138,29 @@
      heavy. `100% 40%` is what makes the vertical falloff land where the frame
      puts it: the wash reaches nothing at y 6% and y 86%, which is exactly
      where the sampled grid does. Re-fit rather than re-taste if the frame
-     changes. */
+     changes.
+
+     SUPERSEDED 9 Sep 2026 — the rose ellipse above is replaced by the top/bottom
+     accent bands stated at the declaration just below (Figma 892:7220). This
+     note is kept as the record of the old fit. */
   background-color:var(--layer-01);
-  background-image:radial-gradient(100% 40% at 50% 46%,
-    rgba(245,75,135,.10) 0%,
-    rgba(245,75,135,.045) 50%,
-    rgba(245,75,135,0) 100%);
+  /* TWO BANDS, TOP AND BOTTOM — Figma 892:7220 (Maryam, 9 Sep 2026: "remove the
+     background gradient from this screen and the tal onboarding as well, and add
+     a top and bottom gradient just like i have in this figma, please follow the
+     same values"). This supersedes the centred rose ellipse the note above fits:
+     the ground is now --accent at 5% bleeding DOWN from the top edge and UP from
+     the bottom, white between — the same fill the Tal chat ground (§53) now
+     carries from the same frame. Both bands are the frame's one fill,
+     linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%,
+     rgba(255,255,255,.05) 52.274%); the bottom is that mirrored vertically, the
+     supplementary angle 353.385 (= 180 minus 186.615). 189,42,42 is --accent;
+     the stops, angle and 590px band height are the frame's own. */
+  background-image:
+    linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
+    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%);
+  background-position:top,bottom;
+  background-size:100% 590px;
+  background-repeat:no-repeat;
 
   /* ---- THE GATE'S OWN ACCENT — #FF584A ----
      Maryam, 4 Sep 2026: "change the primary color on tal prototype to
@@ -194,14 +211,14 @@
      register as white on `#f57414` (2.84:1), and it is on marks and discs
      rather than on body text.
 
-     >>> AND ALL OF IT MOVED AGAIN TO #FF3733 (4 Sep 2026, the platform's second
+     >>> AND ALL OF IT MOVED AGAIN TO #bd2a2a (4 Sep 2026, the platform's second
      re-hue of the day). These two scoped blocks are the reason it had to be
      done by hand: they HARDCODE the accent rather than reading §01, so a
      platform token change reaches every screen in the product EXCEPT the
      onboarding — which would have shipped the one flow whose chat the ask page
      had just been made to match, in the previous red. Nothing about the
      structure changed; every value is the same derivation one hue over
-     (`--accent-hover` #e63d30 -> #e41f1b at the same ΔL, the tint at the same
+     (`--accent-hover` #e63d30 -> #9e2020 at the same ΔL, the tint at the same
      22.8%, the grad still flat).
 
      AND THE FLAT `--accent-grad` HERE IS NOW WHAT §01 SAYS. This block existed
@@ -211,9 +228,9 @@
      is still a real difference (`--accent-text` is the flat accent here against
      §01's AA-safe #c51c18) — but if this flow should simply inherit, these are
      the lines to try removing first. */
-  --accent:#ff3733;
-  --accent-text:#ff3733;
-  --brand-tint-2:#ffd1d1;
+  --accent:#bd2a2a;
+  --accent-text:#bd2a2a;
+  --brand-tint-2:#f0cece;
   /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
      colors as well in this message, match them to #FF584A"). The reply Tal
      gives when it cannot answer was still coming out ORANGE in one word, and
@@ -259,12 +276,12 @@
      gradient stepped one stop deeper" — with all three stops equal, a pressed
      button would be indistinguishable from a resting one, which is a state
      that has stopped existing rather than a colour that matches. */
-  --accent-2:#ff3733;
-  --accent-on-2:#ff3733;
-  --accent-hover:#e41f1b;
-  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
-  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
-  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+  --accent-2:#bd2a2a;
+  --accent-on-2:#bd2a2a;
+  --accent-hover:#9e2020;
+  --accent-grad:linear-gradient(104.86deg,#bd2a2a 10.02%,#bd2a2a 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#bd2a2a 10.02%,#9e2020 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#9e2020 10.02%,#bb2522 115.55%)}
 
 /* THE QUESTION SCREENS TAKE THE ACCENT AND NOT THE WASH, and the split is what
    each root is. `obScreen` returns one of two things: `.ob-open`, the gate's
@@ -277,9 +294,9 @@
    because there is no element that wraps both — `render()` returns one or the
    other directly. */
 .app .ob-card{
-  --accent:#ff3733;
-  --accent-text:#ff3733;
-  --brand-tint-2:#ffd1d1;
+  --accent:#bd2a2a;
+  --accent-text:#bd2a2a;
+  --brand-tint-2:#f0cece;
   /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
      colors as well in this message, match them to #FF584A"). The reply Tal
      gives when it cannot answer was still coming out ORANGE in one word, and
@@ -325,12 +342,12 @@
      gradient stepped one stop deeper" — with all three stops equal, a pressed
      button would be indistinguishable from a resting one, which is a state
      that has stopped existing rather than a colour that matches. */
-  --accent-2:#ff3733;
-  --accent-on-2:#ff3733;
-  --accent-hover:#e41f1b;
-  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
-  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
-  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+  --accent-2:#bd2a2a;
+  --accent-on-2:#bd2a2a;
+  --accent-hover:#9e2020;
+  --accent-grad:linear-gradient(104.86deg,#bd2a2a 10.02%,#bd2a2a 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#bd2a2a 10.02%,#9e2020 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#9e2020 10.02%,#bb2522 115.55%)}
 
 /* THE STAGE IS THE COMPOSITION AND IT GROWS; THE DOCK BELOW IT DOES NOT. That
    split is what bottom-aligns the dock and keeps the orb centred in the space

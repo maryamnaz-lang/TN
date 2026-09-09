@@ -3694,3 +3694,155 @@ stays a plain view name and `go()` needs no colon-splitting branch (the wirefram
 `data-ag="member:41:Maryam Naz"` is what that avoids). The wireframe's client-facing
 annotations ("Open question — client decision") deliberately do **not** cross into hi-fi:
 `.note` here is product copy, read by Priya.
+
+
+## §120 — The Super Admin portal's second pass (4 Sep 2026)
+
+Maryam reviewed the first hi-fi Super Admin portal with four screens attached: *"tal is missing,
+the tabs on pages have margins, the black card has no fine content structuring, there is an odd
+blue bar fixed at the bottom of the portal, no sub modules have been added like we had on the
+wireframes tn-admin.html file, no filters on tables, unnecessary lines/dividers, tabs have page
+margins and top section spacing, since it is super admin then there should have been crud
+operations, it's like data were just added."*
+
+- **Tal was the head-band summary only.** The floating ask dock and the full-height chat that
+  the other three portals carry were not there. Both are ported from the agent portal as written
+  (`askDock`, `askView`, `ask`, the `ASK_FOCUS` caret rule, the three-second rotation), with an
+  admin question table (`talq()`) that reads the live records so Tal and the table can never
+  disagree on a figure.
+- **The tabs were the older `.tabs` inside a padded `.sec`**, so they paid the section's spacing
+  and drew a hairline box inside the gutter. They are `.sec.sec-cs > .cs` now, the strip every
+  other portal draws, with queue counts in `.lf-n`. The in-table filters are the same strip
+  under the heading (`.cs.lst-filt`), and the search moved beside the heading in §24's
+  `.hd-srch`, which took one hairline out of the stack.
+- **The black card wrapped its rows in `.dc-lines`, a class no layer states.** It follows the
+  gallery recipe now: `.dc-hd`, `.kv` rows as direct children, a `.btn-row` at the foot. Labels
+  were shortened so none wraps in the 184px label column.
+- **The rail is a tree**, as `tn-admin.html:3692` drew it: sub-pages under the open module,
+  queue counts on module and sub-page. It needed a layer (`120-admin.css`) and a §63 entry (§51)
+  because the box's rail is one level deep. The render gates the sub-rows on `S.nav` — a shut
+  72px rail hides every label, so a CSS-only sub-row would be a blank strip.
+- **CRUD is one engine, not a sheet per module.** `KINDS[kind]` declares fields and how a form
+  becomes a record; `rec:<kind>:<id>` opens the sheet blank or filled, `save:` reads the form off
+  the DOM before the render that would replace it, `askdel:` and `askstatus:` gate through the
+  `.conf` dialog. Eighteen kinds. Every change writes a line to `AUDIT`, so System & Audit shows
+  the session's own work.
+- **§73's `aiHead` rules are all `.sec > .sec-h.aih` direct-child selectors** and none matched
+  inside `.hd-srch-t`; the action buttons fell to block and stacked. §120.4a restates them for
+  that nesting — found on the first list page, the kind of thing only a screenshot shows.
+- **The blue bar could not be reproduced.** The page paints nothing blue (a computed sweep of
+  every element's background and border found none) and the preview pane shows no strip; it is
+  most likely browser or extension chrome outside the document. Left open.
+- **The `.tbl-act` rules are scoped off `.tbl-flag`** so the leader's attention queue keeps its
+  own 24px control and alignment — "reuse means reuse" runs both ways.
+
+## §129 — The Super Admin journey pass (7 Sep 2026)
+
+Maryam attached the Super Admin journey (Draft v1.0 for design review, 6 Sep 2026: *"Sixteen use
+cases, 51 alternative flows and 37 exception flows. Colour marks decision status, not build
+priority. Nine of the sixteen cannot be wireframed until the underlying ruling lands, so please do
+not read open or blocked items as agreed scope."* Owners: Umair for role scope, ACL and portal
+architecture; Derek for override authority and who holds the role; Reed for pricing and
+settlement) and asked how far the portal was from it, then to build.
+
+**The gap, measured before building.** Roughly 60% of the sixteen had a surface: five needed
+little (SA-03 console, SA-07 payouts, SA-10 roles, SA-13 mapping, SA-14 system), seven needed an
+existing sheet extended (SA-04, SA-06, SA-08, SA-09, SA-12, SA-15, SA-16) and four had no trace
+(SA-01 grant, SA-02 sign in, SA-05 score override, SA-11 impersonation). The one decision put to
+Maryam: honour the document's "not agreed scope" by building only the three specifiable cases, or
+build every surface and put the undecided branches somewhere honest. She chose the second.
+
+**The rule that fell out, and it is the whole design of this pass:** every case gets its surface
+with its primary alternative drawn; every open or blocked branch becomes a line on a **Rulings
+Register** — owner, source, what it blocks — rather than an invented control. §60 already said a
+dead control on a live surface is worse than a missing one; a *guessed ruling* is worse than
+either, because it looks like a decision. The register is the dashboard's decisions register
+grown up: the nine seed lines are tagged where they map to a case (`sa`, `kind`), fourteen new
+lines carry the journey's branches, `SA_CASES` holds the sixteen with the document's own
+alternative and exception text, and `home/rulings` draws it all — four figures, the case table,
+the lines filtered by kind. `ruling('SA-nn')` puts one note on the page that waits, at most one
+per page; Tal's summary names the ruling.
+
+**Owners are first names.** The seed spells them Umair Khan, Reed Castellano, Derek Sole; the
+journey spells them Umair Bashir, Derek Branch. The portal picks neither; the discrepancy is
+flagged in DESIGN.md §8 rather than resolved by a guess.
+
+What was built, case by case, and what each refused to guess:
+
+- **SA-01 / SA-16 grant and revocation.** A grant is time-boxed by default (30/90 days or
+  permanent), needs a second approver and a reason, refuses self-escalation and a holder who is
+  also an agent or leader (the roles page's own "a full-access role can hold no other"), and
+  with one holder is logged single-approver at high severity — E1 stated, not solved.
+  `expireGrants()` runs at the top of every render so auto-expiry is a behaviour, not a word on
+  a card. Revocation names its kind (planned / emergency / expiry), refuses the last holder
+  (SA-16 E1) and flags a holder who co-signed a running grant (E2). Derek's own grant is the
+  bootstrap A1 describes, with no approver because there was nobody to be one.
+- **SA-02 sign in.** The portal had no sign-in at all — `signedIn` was hardcoded and log-out
+  toasted "reload". It now opens on the design system's auth composition (email + password,
+  then the authenticator code `AUTH_CFG` already required of staff), unless a hash deep-links to
+  a page. Step-up at the point of action (A1) is real on four actions: `askConfirm({stepup:true})`
+  adds a code field and the router refuses the confirm without six digits; the switch is in
+  Login & Security and is logged high. No role picker, because Derek holds one role — a control
+  with one option. Lost device, SSO outage and anomalous sign-in are stated on the code step as
+  open rulings; there is no "can't use your authenticator" link because it would lead nowhere.
+  **`.auth-card` must be a CHILD of `.app`** — the first cut put both classes on one element and
+  the split never fired.
+- **SA-03 console.** Structure unchanged; the register line says the figures are read off the
+  seed and are not signed-off KPIs (E1). The dashboard's decisions section now shows only the
+  *blocked* lines and points at the register.
+- **SA-04 level override (confirmed).** The sheet offers MVP levels only (`levelOpts` — T1–T3
+  stay in the data model, off every picker, E4), asks a downward move a second time (A2, "sits
+  against two live rulings"), records the disclosure choice (E1 — whether it notifies anyone is
+  the ruling), says when it lands mid-cohort (E3), keeps a per-record history built lazily from
+  the seed's one promotion line, and reverses an override by writing a new one back with both
+  kept (A5). Bulk correction is its own sheet (A4); the queue offers "Override ahead of review"
+  (A3).
+- **SA-05 score override (blocked).** Void an interview's score with a free re-interview or
+  without penalising the agent share; batch recalibration on a model version. The blinded /
+  unblinded view is stated in the sheet as the blocked ruling; a recording past 24 months is
+  checked off the booking date.
+- **SA-06 refunds (blocked).** The refund record carries its kind (interview / cohort pro-rata /
+  sponsored employer pays / goodwill credit) and shows its source on the card. Approval is
+  *refused* while a chargeback is in flight on the same charge (E2, would pay twice), *warns*
+  when the agent's payout has already settled (E3, clawback carried to the next payout), and
+  says that with no threshold set every refund is the Super Admin's (E1). A fee line "Refund
+  approval threshold — Not set" exists so the register has something to point at.
+- **SA-07 payouts.** Already whole; the page carries the ruling note. Release-all is step-up.
+- **SA-08 pricing.** Three fee lines named by the document and unset there ("Cohort price by
+  intent", "Sponsored pricing", the threshold) read "Not set"; the first-interview discount is
+  written as the 100% the seed already lives by. The page states E1–E3 (Reed decides, no
+  retro-billing, USD-only unconfirmed).
+- **SA-09 account actions.** Deactivating states its role-specific consequences before the press
+  and applies them: an agent's in-flight interviews go to `reassign`, a leader's cohorts to
+  Unassigned, a mid-flight payment is named. Merge is a sheet; hard delete keeps receipts and
+  lets a recording run out its retention (E2 stated).
+- **SA-10 roles (confirmed).** The Program / Business wall is `CAP_SIDE`; a grant across it is
+  warned and asked, not refused — the refusal is the open ruling.
+- **SA-11 impersonation.** View As: read-only by default (write-enabled offered as the open
+  ruling it is, logged high), interview video always excluded, a reason, and a recorded
+  "tell the user afterwards" switch (E3). Another admin and a user with an interview today are
+  refused (E1, E2). The session is `S.viewAs`; **§129's `.viewas` bar** sits in `.view-col`
+  above `.main`; the router refuses every write in one place; both ends are audited and every
+  line in between says whose name the admin acted under. Consent-gated against unilateral is
+  stated in the sheet, not faked with a wait.
+- **SA-12 cohort intervention.** Extend or reschedule (12 versus 13 weeks offered, both
+  logged), merge into a same-track cohort with room, dissolve, move a member, and force-add
+  past eligibility from the existing Add Member sheet (logged high).
+- **SA-13 mapping (blocked).** The course record carries `levels`, derived from the track until
+  overridden; the detail says the content stays in the LMS console.
+- **SA-14 system.** A "Quiz, Tal and notification routing" section states the product inputs as
+  they stand (Tal's standing scope, never the billing ledger); the frequency cap reads "Not set".
+- **SA-15 audit (blocked).** `audit()` carries `{from, to}`; every changed-value caller passes
+  it; the log has a date facet and a read-only line sheet — `sheetView` draws no save button
+  when a sheet has no `ok`, and its Cancel reads Close (E3 made structural).
+
+**Two mechanics that made the two-step flows possible.** A sheet key may carry an id after the
+name (`grant:u3`) — `sheetView` splits on the first `:` and passes it, so a sheet opened from a
+list row no longer has to write `S.id`, the page's record. And a sheet that ends in a
+confirmation carries its form in `S._pending`, because by the time the confirm runs the sheet is
+gone. `sacase` shipped reading `S.id` and rendered empty; the 60-page, 19-sheet sweep found it.
+
+**Verification.** All 60 module/sub/detail pages and 19 sheets rendered with no thrown error, no
+`console.warn` and no horizontal overflow at 390, 744 and 1280; the View As bar wraps its button
+under the sentence below 600; the auth split fires at 1280. Both builds pass with the new layer
+(`layer coverage: 126 of 128`, the two declined as before).

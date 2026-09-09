@@ -173,7 +173,7 @@ if(!live){ console.error('respcheck: the page reports innerWidth 0 — nothing c
    a `data-go` rather than by the rail. */
 const combos = await page.evaluate(() => {
   const out = [];
-  const SUB = ['account', 'report', 'result', 'agents', 'agent', 'booking',
+  const SUB = ['account', 'report', 'result', 'agents', 'agent', 'booking', 'checkout',
                'payment', 'welcome', 'chapter', 'terms', 'rewards', 'ivt', 'mem', 'rp'];
   for(const [stage] of STAGES){
     if(stage === 'signup'){

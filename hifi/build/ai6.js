@@ -215,7 +215,7 @@ const PAGESUM = {
      is built on it. This is the candidate portal choosing the other shape, not
      the shape being withdrawn. */
   dashboard: {
-    consult: 'Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes &mdash; nothing to prepare, and it doesn&rsquo;t set your level.',
+    consult: 'Your quiz put you on the Explorer track from a score of 64. Jordan Blake calls on Thursday at 2:00 PM ET for fifteen minutes. Nothing to prepare, and it doesn&rsquo;t set your level.',
 
     /* THE ONE ENTRY THAT OPENS ON A GREETING AGAIN, AND THE ONE THAT RUNS LONG.
        578:5966 makes Tal's sentence the whole left column of the band — there is
@@ -414,7 +414,7 @@ const PAGESUM = {
        `V.level`'s "Moving up" accordion verbatim, and this table's second
        content ban is policy. "Decides whether your level moves" is the fact;
        which way it can move is a page away. */
-    day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b> &mdash; and you passed both.<br>The re-interview is what decides whether your level moves, so I have been over the roster and <b>matched you with ${AGENTS[recKey()].n} below</b>.`,
+    day90: f => `${_greet()}, Maryam! <b>All 13 chapters</b> are done in 90 days, ${f.avg}% average, ${_n(f.mins)} minutes total. Your growth areas were <b>chapters 4 and 12</b>, and you passed both.<br>The re-interview is what decides whether your level moves, so I have been over the roster and <b>matched you with ${AGENTS[recKey()].n} below</b>.`,
 
     /* THE DATE CAME OFF THIS LINE, AND IT IS THE CARD THAT HAS IT NOW. The
        sentence used to close on "E4 opens December 1, and at this level you can
@@ -424,7 +424,7 @@ const PAGESUM = {
        inside one head band is the duplication this whole table exists to stop.
        Tal keeps the consequence of the level, which is the half the card cannot
        say: 26 words, and the two figures are still `f`'s. */
-    promoted: f => `You moved from E3 to E4 in 90 days &mdash; 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. At this level you can also volunteer to lead a cohort.`,
+    promoted: f => `You moved from E3 to E4 in 90 days: 13 chapters, ${f.avg}% average, ${_n(f.mins)} minutes of coursework. At this level you can also volunteer to lead a cohort.`,
 
     _: 'Where you stand right now, and anything waiting on you today.'
   },
@@ -503,12 +503,12 @@ const PAGESUM = {
          render time however much later ai7 parses. Not done here: it is a
          change to what the entry IS, not to what it says. */
       booked: 'Your interview is booked for <b data-sum="interview">20 August</b>, but your exact level is still to be determined. Your quiz placed you on the <b data-sum="track">Explorer track (E1&ndash;E5)</b>, and the interview will establish where you land on the ladder.',
-      promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview &mdash; one up from where the 90 days started. Another course and re-interview moves it again.',
+      promoted: 'E4, level 4 of 15, signed on 21 November after your re-interview, one up from where the 90 days started. Another course and re-interview moves it again.',
       _: 'E3, level 3 of 15 on the Explorer track, confirmed by Priya on 21 August. Only a re-interview at the end of a course moves it.'
     };
   })(),
 
-  report: 'Priya&rsquo;s write-up of the 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas &mdash; both are chapters on your course.',
+  report: 'Priya&rsquo;s write-up of the 20 August interview, confirming Explorer &ndash; E3. Delegation and hard conversations are the growth areas. Both are chapters on your course.',
 
   /* THE BREAKDOWN'S READING, AND IT IS TWO FIGURES THE PAGE DRAWS RATHER THAN
      LISTS. The rose is five wedges and five numbers; what a person wants said
@@ -567,16 +567,28 @@ const PAGESUM = {
        Priya is who the prototype books by default and she is who the demo
        walks; "They'll" is the fix if a second agent is ever demoed.
 
-       TWO ACCENT PHRASES, THE ACTIONABLE PAIR: the appointment, and the fact
-       that it can be joined now. The assessment detail and the consequence are
-       what the sentence explains, not what it asks you to do.
+       ONE ACCENT PHRASE, THE APPOINTMENT — AND THE TIME IS STATED, NOT
+       "ready to join" (doc §7, candidate Tal scenarios, 8 Sep 2026). This line
+       ended "scheduled and ready to join", a second pressable phrase, while the
+       interview is a FUTURE date: the dashboard summary (`PAGESUM.dashboard
+       .booked`), `bkStamp` and the hard-coded picker all say Thursday, 20 August
+       at 6:30 PM ET. "Ready to join" was therefore false on the Interviews page
+       the same way it would be on the dashboard. The gap's ruling is that the
+       summary follows the booking's real TIME and only says "ready to join"
+       inside the final minute — which this static demo never reaches for the
+       interview — so the phrase is the time now, matching line 326's wording so
+       the two booked summaries agree. `SUMDROP.join` is kept as the designed
+       final-minute "Join the interview" popover (doc 3.10), dormant until a live
+       gate triggers it, rather than deleted with the phrase.
 
-       IT IS 34 WORDS, six over the ceiling this table's head sets. */
+       THE TIME IS A LITERAL, LIKE LINE 326's — `bkStamp` does not reach the date
+       (its own note, above), and the picker is Thursday 20 at 6:30 whoever is
+       booked, so the literal is safe and is the same string the dashboard uses. */
     if(f.booked){
       const c = CALL_ROW.iv();
       const ex = String(c.x || '').split(', assesses ')[0] || 'your';
       const rng = (c.who && c.who.range) || 'E1&ndash;E3';
-      return `Your <b data-sum="interview">45-minute interview with ${c.who.n}</b> is scheduled and <b data-sum="join">ready to join</b>. `
+      return `Your <b data-sum="interview">45-minute interview with ${c.who.n}</b> is scheduled for Thursday, August 20 at 6:30 PM ET. `
         + `She&rsquo;ll assess your ${ex} skills across the ${rng} levels, and your final level `
         + `and report will be based on this conversation.`;
     }
@@ -673,7 +685,10 @@ const PAGESUM = {
      `V.enrol`. */
   enrol: 'About an hour a week on the chapter, plus the 60-minute call. People who keep to that finish all 13 and average above 85%.',
 
-  payment: 'One charge of $595 and the 90 days are yours &mdash; nothing renews and there is nothing to cancel. Your cohort is assigned as soon as it clears.',
+  /* NO TAL BAND ON THE PAYMENT SCREEN (Maryam, 7 Sep 2026: "remove the summary
+     from paying screen"). With no `payment` key, `pageSummary()` returns falsy for
+     the view and `placeSummaryPass` adds no band — the page is the card picker and
+     the pay button. */
 
   /* THE CONFIRMATION'S JOB IS TO SAY THAT NOTHING IS DUE FROM YOU.
      The page's own blocks carry the receipt, the leader and the three things
@@ -695,14 +710,14 @@ const PAGESUM = {
      same clause on all four stages, still being explained on day 90. */
   coursework: f => {
     const cur = CH[f.open];
-    if(f.done >= 13) return `All 13 chapters finished at ${f.avg}%. Nothing left to unlock &mdash; the re-interview is what turns the record into a level.`;
+    if(f.done >= 13) return `All 13 chapters finished at ${f.avg}%. Nothing left to unlock. The re-interview is what turns the record into a level.`;
     if(!f.done) return `None of the 13 finished yet${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open` : ''}. They&rsquo;re 45 to 70 minutes each and one unlocks a week.`;
-    return `${f.done} of 13 chapters done at ${f.avg}%${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open &mdash; ${cur[1]} minutes` : ''}. One more unlocks each week.`;
+    return `${f.done} of 13 chapters done at ${f.avg}%${cur ? `, and chapter ${f.open + 1}, ${cur[0]}, is open, ${cur[1]} minutes` : ''}. One more unlocks each week.`;
   },
 
   chapter: () => {
     const i = cfg(S.stage).open, cur = CH[i];
-    return `${cur ? `Chapter ${i + 1}, ${cur[0]} &mdash; ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment &mdash; only the assessment counts towards your average.`;
+    return `${cur ? `Chapter ${i + 1}, ${cur[0]}: ${cur[1]} minutes.` : 'You&rsquo;re inside a chapter.'} Video, reading, a roleplay, then an assessment. Only the assessment counts towards your average.`;
   },
 
   /* THE THIRD BRANCH IS `promoted`, AND WITHOUT IT THE SENTENCE WAS STALE
@@ -722,10 +737,10 @@ const PAGESUM = {
      different cohorts. Both are views.js consts and views.js is concatenated
      first, so they are in scope by the time a summary is asked for. */
   transcript: f => f.complete
-    ? `${certsFor(f).slice(-1)[0].cohort} is closed &mdash; ${f.done} chapters at ${f.avg}%, about ${_hrs(f.mins)} hours of coursework. Nothing lands on this record again until you enroll at ${f.level}.`
+    ? `${certsFor(f).slice(-1)[0].cohort} is closed: ${f.done} chapters at ${f.avg}%, about ${_hrs(f.mins)} hours of coursework. Nothing lands on this record again until you enroll at ${f.level}.`
     : f.done
     ? `${f.done} of 13 chapters at ${f.avg}%, about ${_hrs(f.mins)} hours in. This is the record an agent reads before your re-interview.`
-    : 'Nothing on the record yet &mdash; the 90 days only started this week.',
+    : 'Nothing on the record yet. The 90 days only started this week.',
 
   /* THE PAGE DESCRIPTION HELD THE SAME SENTENCE ("Points, badges and rank
      come from your activity across the course and the community") and is now
@@ -735,11 +750,11 @@ const PAGESUM = {
      purpose: it is the answer to the only question this page raises. */
   rewards: () => {
     const g = GAME[S.stage];
-    if(!g) return 'Points start when you enroll &mdash; 10 for signing in, 25 a chapter, Bronze at 2,500. None of it affects your level.';
+    if(!g) return 'Points start when you enroll: 10 for signing in, 25 a chapter, Bronze at 2,500. None of it affects your level.';
     const toB = 2500 - g.pts;
     return `${_n(g.pts)} points at ${RANKS[g.rank - 1].n}, ${toB > 0
       ? `${_n(toB)} short of the Bronze badge at 2,500`
-      : `with Bronze earned and Silver at 5,000`}. Points come from signing in, chapters and cohort posts &mdash; none of it touches your level.`;
+      : `with Bronze earned and Silver at 5,000`}. Points come from signing in, chapters and cohort posts. None of it touches your level.`;
   },
 
   /* "Ten of you at E3 with Priya leading, week 5 of 13" was the page
@@ -796,50 +811,29 @@ const PAGESUM = {
 
      THE VIEW DRAWS NO TAL CARD, so this is an entry and nothing else — trap 11
      only bites where a card is hand-authored (see `agents` above). */
-  /* REPLACED WITH MARYAM'S COPY, 2 Sep 2026 — AND IT REVERSES THE RULE THE
-     THREE PARAGRAPHS ABOVE ARGUE FOR. Tal now reads the ledger out loud: the
-     charge, its amount, the three saved cards and which one is default. The
-     argument above is kept in full rather than deleted, because it is the
-     record of what this line used to be for and of the three surfaces it was
-     keeping honest.
+  /* THE LEDGER RECITAL IS GONE, AND THAT RESTORES THE RULE THE THREE PARAGRAPHS
+     ABOVE ARGUE FOR (doc §7, candidate Tal scenarios, 8 Sep 2026). Between 2 Sep
+     and now this line read out the ledger — "$490 charge for Explorer Track E2 …
+     default Visa ending 4242" — which the 2 Sep note flagged as contradicting
+     three surfaces that all say Tal never sees billing: `NEVER[2]` (clause 4 of
+     the Data use notice), `wLedger` (declines "what have I paid" and links here),
+     and the dock placeholder "Is my card stored?". The scenario doc's ruling is
+     that the band NAMES THE CARDS ON FILE AND THE REFUND WINDOWS and leaves the
+     charge to the "Previous Transactions" table beneath (which prints `PAY_E2`
+     already). So it does, and the three surfaces agree again with no further
+     edit — a popover is still Tal explaining, so `defcard` and the new `refund`
+     card stay inside Tal's six subjects and read no figure off the ledger.
 
-     THREE SURFACES NOW DISAGREE WITH IT, and all three are one edit each:
-
-       1. `NEVER[2]` (ai2.js) — "Your card details and billing history." That
-          array is clause 4 of the Data use notice on `V.account`, rendered as
-          an eye-off row, so the product tells the reader on that page that Tal
-          cannot see exactly what it has just recited here.
-       2. `wLedger` (ai8.js) — the route for "What have I paid so far?"
-          DECLINES and links this page. Ask Tal the question this summary now
-          answers and Tal says it cannot answer it.
-       3. The ask dock's placeholder on this view is "Is my card stored?",
-          which was written to pair with the old line's offer.
-
-     ai8's own note calls this the worst kind of wrong answer — "the product
-     says so on two other screens" — so if the new reading is the one to keep,
-     those three go with it. Left alone deliberately: changing Tal's stated
-     access to billing is a product decision, not a copy edit, and it is not
-     what was asked for.
-
-     THREE ACCENT PHRASES, THE ACTIONABLE ONES (Maryam, 2 Sep 2026): the
-     amount, what it bought, and the card that will be charged next. The two
-     non-default cards stay in ink — they are context for the default, and
-     lighting all three would put the wash on most of the sentence.
-
-     EVERY FIGURE IN IT IS PRINTED BELOW — $490, Explorer Track &ndash; E2, the
-     three card rows and the Default chip are the table and the card list this
-     summary sits on top of. That is the `agents` objection ("a summary of a
-     directory is the directory read aloud") on a third page; noted, not acted
-     on. Worth knowing if it is ever revisited: the ONE fact on this page no
-     row states is that the E2 charge went to the Mastercard, not to the
-     default Visa. */
-  billing: 'Your payment history shows a <b data-sum="charge">$490 charge</b> for <b data-sum="tracke2">Explorer Track &ndash; E2</b>, with your saved Visa, Mastercard, and Amex cards available for future payments. Your default card is currently set to <b data-sum="defcard">Visa ending 4242</b>.',
+     TWO ACCENT PHRASES, BOTH ALLOWED: the default card, and the refund windows.
+     The charge and the E2 purchase are no longer lit because they are not things
+     Tal reads — they are rows in the table, with their own receipts. */
+  billing: 'Your saved Visa, Mastercard and Amex cards are on file for future payments, with your default set to <b data-sum="defcard">Visa ending 4242</b>. A course and an interview have <b data-sum="refund">different refund windows</b>, and I can state both. Every charge keeps its own receipt in the table below.',
 
   /* The page description said "Your details, your preferences, and what Tal
      is allowed to do" and this said the same three nouns back. The
      description is gone and this says the one thing worth opening the page
      for, which on an AI-native product is the permissions. */
-  account: 'Everything here saves as you go. The block worth a look is the last one &mdash; what I&rsquo;m allowed to remember, and what I can do without asking.',
+  account: 'Everything here saves as you go. The block worth a look is the last one, what I&rsquo;m allowed to remember, and what I can do without asking.',
 
   /* --- Tal's own pages --------------------------------------------------- */
   mem: () => {
@@ -847,7 +841,7 @@ const PAGESUM = {
     return `${_W(live)} things I&rsquo;ve learned about you, each traced back to where it came from. Mark anything wrong and I&rsquo;ll stop using it.`;
   },
 
-  rp: 'Rehearse a hard conversation before you have it for real. I play the other person, briefed from your interview &mdash; nothing is recorded or scored.',
+  rp: 'Rehearse a hard conversation before you have it for real. I play the other person, briefed from your interview. Nothing is recorded or scored.',
 
   /* The date, the length and the outcome are the page description's `·` row
      directly above, so naming them again was the duplication this rewrite
@@ -871,7 +865,19 @@ const PAGESUM = {
        does not interview, so no level decision reaches this portal; the clause
        about enrolling went with it, because what a summary blocks is the far end
        of the 90 days rather than the near one. */
-    return `${_W(pend)} 90-day ${pend === 1 ? 'summary is' : 'summaries are'} waiting on your signature, and nothing reaches those candidates&rsquo; next agent until you publish. ${_W(att.length)} candidates need a look, ${_w(bad)} of them seriously.`;
+    /* ZERO-PENDING LEADS WITH THE QUEUE (doc §7, 8 Sep 2026). The one string
+       used to run `${_W(pend)}` through the pending template for every count,
+       so pend===0 rendered "No 90-day summaries are waiting … and nothing
+       reaches those candidates' next agent until you publish" — a consequence
+       promised for zero work, over a possessive ("those candidates'") that has
+       no candidates behind it. Now zero opens on the queue and names the next
+       call; one and two keep the signature lead, with the possessive agreeing
+       (that candidate's / those candidates'). */
+    const nx = lcalls()[0];
+    const look = `${_W(att.length)} candidate${att.length === 1 ? '' : 's'} need${att.length === 1 ? 's' : ''} a look, ${_w(bad)} of them seriously`;
+    if(pend === 0)
+      return `Nothing is waiting on your signature. ${look}${nx ? `, and Cohort ${nx.co} meets ${nx.day.toLowerCase()} at ${nx.time}` : ''}.`;
+    return `${_W(pend)} 90-day ${pend === 1 ? 'summary is' : 'summaries are'} waiting on your signature, and nothing reaches ${pend === 1 ? 'that candidate&rsquo;s' : 'those candidates&rsquo;'} next agent until you publish. ${look}.`;
   },
 
   /* THE SEVEN MODULES, AND THE THREE PAGES UNDER THEM.
@@ -893,13 +899,13 @@ const PAGESUM = {
     const run = LEAD_RUN.length;
     const seats = LEAD_RUN.reduce((s,r) => s + lcoOf(r.co).members.length, 0);
     const came = LEAD_RUN.reduce((s,r) => s + r.attended, 0);
-    return `${_W(up.length)} calls this week${nx ? `, Cohort ${nx.co} first at ${nx.time.toLowerCase()} ${nx.day.toLowerCase()}` : ''}. ${run ? `Across the ${_w(run)} behind you, ${came} of ${seats} seats were filled &mdash; the brief reads from where each cohort actually is.` : 'Your first cohort call is this week.'}`;
+    return `${_W(up.length)} calls this week${nx ? `, Cohort ${nx.co} first at ${nx.time.toLowerCase()} ${nx.day.toLowerCase()}` : ''}. ${run ? `Across the ${_w(run)} behind you, ${came} of ${seats} seats were filled. The brief reads from where each cohort actually is.` : 'Your first cohort call is this week.'}`;
   },
 
   leadEvals: () => {
     const ps = LEAD_SUMMARIES.filter(s => s.status === 'pending');
     const s0 = ps[0];
-    if(!ps.length) return 'Nothing is waiting on your signature &mdash; every 90-day summary is published.';
+    if(!ps.length) return 'Nothing is waiting on your signature. Every 90-day summary is published.';
     /* THE SENTENCE NAMES THE COHORT'S SIZE NOW, because the page under it holds
        the whole roster in two lists (1 Sep 2026) and "two are waiting" over
        eight rows read as a count of the page rather than of the work. `two of
@@ -912,7 +918,11 @@ const PAGESUM = {
        which is three numbers in five characters. `_w` is the lowercase half of
        the pair the leader's other summaries already use for this. */
     const size = _w(lcoOf(s0.cohort).members.length);
-    return `${_W(ps.length)} of Cohort ${s0.cohort}&rsquo;s ${size} 90-day ${ps.length === 1 ? 'summary is' : 'summaries are'} still waiting on you. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
+    /* THE NOUN IS ALWAYS PLURAL — it names the cohort's roster of summaries
+       ("eight 90-day summaries"), and only the VERB agrees with the pending
+       count. The old form toggled both, so one pending read "eight 90-day
+       summary is" (doc §7). */
+    return `${_W(ps.length)} of Cohort ${s0.cohort}&rsquo;s ${size} 90-day summaries ${ps.length === 1 ? 'is' : 'are'} still waiting on you. ${s0.name}&rsquo;s numbers are the argument; the recommendation is the part only you can write.`;
   },
 
   leadSum: () => {
@@ -929,7 +939,15 @@ const PAGESUM = {
   leadCohorts: () => {
     const flagged = lmembers().filter(x => x.m.flag);
     const worst = LEAD_COHORTS.slice().sort((a,b) => (lavg(a,'pc') - lpace(a)) - (lavg(b,'pc') - lpace(b)))[0];
-    return `Cohort ${worst.id} is ${lpace(worst) - lavg(worst,'pc')} points behind pace, the widest gap of the ${_w(LEAD_COHORTS.length)}. ${flagged.length} of the ${lmembers().length} candidates are flagged, and every cohort has its call this week.`;
+    /* THREE FORMS, "one" SPELT (doc §7). The old string hard-coded "N points
+       behind pace", which printed "1 points behind" at the current data and
+       "0 points behind" / "-1 points behind" the moment a cohort caught up or
+       pulled ahead. `g` is signed (+ ahead), the word is spelt and "point" is
+       pluralised, and the "widest gap" tail only rides the behind case. */
+    const g = lavg(worst,'pc') - lpace(worst), gp = Math.abs(g);
+    const pace = g === 0 ? 'on pace' : `${_w(gp)} point${gp === 1 ? '' : 's'} ${g < 0 ? 'behind' : 'ahead of'} pace`;
+    const tail = g < 0 ? `, the widest gap of the ${_w(LEAD_COHORTS.length)}` : '';
+    return `Cohort ${worst.id} is ${pace}${tail}. ${flagged.length} of the ${lmembers().length} candidates are flagged, and every cohort has its call this week.`;
   },
 
   /* "10 candidates at Explorer – E3, week 5 of 13" was the page description
@@ -941,7 +959,18 @@ const PAGESUM = {
     const c = lcoOf(S.ldrCo);
     const gap = lavg(c,'pc') - lpace(c);
     const bad = c.members.filter(m => m.flag && m.flag.k === 'bad').length;
-    return `Averaging ${lavg(c,'pc')}% against ${lpace(c)}% expected &mdash; ${gap === 0 ? 'exactly on pace' : gap > 0 ? `${gap} points ahead` : `${Math.abs(gap)} points behind`} &mdash; with assessments at ${lavg(c,'avg')}%. ${bad ? `${_W(bad)} candidate${bad === 1 ? '' : 's'} ${bad === 1 ? 'is' : 'are'} at risk.` : 'Nobody is at risk this week.'}`;
+    /* ASSESSMENTS READ `lassess`, NOT `lavg(c,'avg')` (doc §7). `lavg` divides
+       by every member, so Cohort 47 — three assessed in week 1 — reported 26%,
+       an absent score read as a low one. `lassess` (assessed-only) is what the
+       cohort page's own stat cell prints (lead2.js), so the band and the page
+       now agree: 41 at 78, 33 at 80, 47 at 88; the ternary shows "nothing
+       assessed yet" only when nobody at all has a score. */
+    const assess = lassess(c) ? `assessments at ${lassess(c)}%` : 'nothing assessed yet';
+    /* the gap is spelt and "point" is pluralised, the same fix as `leadCohorts`
+       — it printed "1 points ahead" before (doc §7). */
+    const ga = Math.abs(gap);
+    const pace = gap === 0 ? 'exactly on pace' : `${_w(ga)} point${ga === 1 ? '' : 's'} ${gap > 0 ? 'ahead' : 'behind'}`;
+    return `Averaging ${lavg(c,'pc')}% against ${lpace(c)}% expected, ${pace}, with ${assess}. ${bad ? `${_W(bad)} candidate${bad === 1 ? '' : 's'} ${bad === 1 ? 'is' : 'are'} at risk.` : 'Nobody is at risk this week.'}`;
   },
 
   leadMember: () => {
@@ -987,14 +1016,16 @@ const PAGESUM = {
     return `${waiting ? `${_W(waiting)} direct thread${waiting === 1 ? '' : 's'} ${waiting === 1 ? 'is' : 'are'} waiting on a reply` : 'Nothing is waiting on a reply'}, out of ${_w(LDR_THREADS.length)} you have open. Everything here is private to you and the candidate.`;
   },
 
-  leadCerts: () => `${_W(LDR_CERTS.length)} earned and one in progress, off eight cohorts led and 62 interviews run. Candidate Mentoring is the open one, and it opens the Builder band.`,
+  /* "and 62 interviews run" DROPPED (doc §7): an agent's number on a volunteer's
+     page — a cohort leader takes cohort calls and interviews nobody (1 Sep). */
+  leadCerts: () => `${_W(LDR_CERTS.length)} earned and one in progress, off eight cohorts led. Candidate Mentoring is the open one, and it opens the Builder band.`,
 
   /* IT COVERS BOTH TABS SINCE 2 SEP 2026 and does NOT name them — `PAGESUM`'s
      third content ban is pointing at the UI, so the sentence says what the two
      halves HOLD rather than that there are two of them. First clause is the
      listing (the Public tab's whole subject), second is everything a candidate
      never sees. */
-  leadProfile: 'Your listing is what candidates read when they choose you &mdash; the bio is yours to write, the assessing range comes from your certifications. The rest is the account behind it.'
+  leadProfile: 'Your listing is what candidates read when they choose you. The bio is yours to write, the assessing range comes from your certifications. The rest is the account behind it.'
 };
 
 function pageSummary(){
@@ -1550,7 +1581,7 @@ const SUMDROP = {
     return {
       lead: `You scored 64 of 100 on the Next in Leadership quiz on ${qzTaken()}, across five bands.`,
       label: 'What it measured:',
-      read: `${hiN} came out highest at ${hiV}, and ${low[0][0]} lowest at ${low[0][1]}. A quiz sets the track, not the level &mdash; it is the interview that decides which of E1 to E5 you sit on.`,
+      read: `${hiN} came out highest at ${hiV}, and ${low[0][0]} lowest at ${low[0][1]}. A quiz sets the track, not the level. It is the interview that decides which of E1 to E5 you sit on.`,
       next: 'Open the full breakdown to see all five bands scored, and the two chapters built on the ones you scored lowest.',
       act: {ic: I.trophy, go: 'result', t: 'Open your quiz results'}
     };
@@ -1571,7 +1602,7 @@ const SUMDROP = {
   track: () => ({
     lead: 'According to the Next in leadership quiz, you are evaluated as an Explorer.',
     label: 'Discovering your direction:',
-    read: 'You&rsquo;re exploring what fits you best&mdash;and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.',
+    read: 'You&rsquo;re exploring what fits you best, and that&rsquo;s a strength. Stay curious, ask questions, and keep trying new experiences.',
     next: 'Connect with Talent Next Agent to get yourself evaluated and get a level. Your level anchors after a 45-minute interview.',
     act: _bookedAct()
   }),
@@ -1584,7 +1615,7 @@ const SUMDROP = {
     return {
       lead: `${a.n} assesses ${a.range} and has run ${a.ivs} interviews, rated ${a.r.toFixed(1)}.`,
       label: 'Why this pair:',
-      read: `Your growth area is ${r.need.toLowerCase()} and their strength is ${r.strength.toLowerCase()} &mdash; ${r.match} of what your quiz surfaced overlaps with what they assess.`,
+      read: `Your growth area is ${r.need.toLowerCase()} and their strength is ${r.strength.toLowerCase()}. ${r.match} of what your quiz surfaced overlaps with what they assess.`,
       next: `Their next opening is ${a.slot}, 45 minutes, ${a.price}. Nothing is charged until you confirm the slot.`,
       act: {ic: I.calendar, go: 'agent:' + k, t: 'Book your interview with ' + a.n}
     };
@@ -1628,7 +1659,7 @@ const SUMDROP = {
     return {
       lead: `${d[0]} is the question Priya asks most often, and it is one of your two lowest quiz bands at ${d[1]}.`,
       label: 'How to spend ten minutes:',
-      read: 'Have one real example ready &mdash; something you handed over, what actually happened, and what you would do differently. She is assessing judgement, not vocabulary.',
+      read: 'Have one real example ready: something you handed over, what actually happened, and what you would do differently. She is assessing judgement, not vocabulary.',
       next: 'Tal can run a mock interview on it whenever you want one, and it does not go on your record.',
       act: {ic: I.chat, ask: 'Run a mock interview on delegation', t: 'Run a mock interview'}
     };
@@ -1638,7 +1669,7 @@ const SUMDROP = {
   level: () => ({
     lead: 'Priya confirmed you at Explorer &ndash; E3 on 21 August, rung 3 of the fifteen-rung ladder.',
     label: 'What a level is:',
-    read: 'Explorer is rungs 1 to 5 of 15, and the interview is the only thing that sets one &mdash; a quiz cannot. E3 opens the course built for E3, and 90 days later you re-interview.',
+    read: 'Explorer is rungs 1 to 5 of 15, and the interview is the only thing that sets one. A quiz cannot. E3 opens the course built for E3, and 90 days later you re-interview.',
     next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',
     act: {ic: I.certificate, go: 'level', t: 'See where you are on the ladder'}
   }),
@@ -1697,7 +1728,7 @@ const SUMDROP = {
   ivwhat: () => ({
     lead: 'A level interview is 45 minutes with a talent agent, video-recorded, and it is the only thing that sets a level.',
     label: 'What happens in it:',
-    read: 'Real situations rather than hypotheticals. The agent decides which of E1 to E5 you sit on and signs a report you keep &mdash; a quiz can predict the track, but it cannot set the rung.',
+    read: 'Real situations rather than hypotheticals. The agent decides which of E1 to E5 you sit on and signs a report you keep. A quiz can predict the track, but it cannot set the rung.',
     next: 'Any agent whose range covers your track can run it. Nothing is charged until you confirm a slot.',
     act: _bookedAct()
   }),
@@ -1715,51 +1746,37 @@ const SUMDROP = {
     const ps = ks.map(k => Number(String(AGENTS[k].price).replace(/[^0-9.]/g, ''))).filter(Boolean);
     const rs = ks.map(k => AGENTS[k].r);
     return {
-      lead: `Every agent sets their own fee and assesses their own band of levels &mdash; $${Math.min(...ps)} to $${Math.max(...ps)} here, rated ${Math.min(...rs).toFixed(1)} to ${Math.max(...rs).toFixed(1)}.`,
+      lead: `Every agent sets their own fee and assesses their own band of levels: $${Math.min(...ps)} to $${Math.max(...ps)} here, rated ${Math.min(...rs).toFixed(1)} to ${Math.max(...rs).toFixed(1)}.`,
       label: 'What has to match:',
-      read: 'The range, and only the range &mdash; an agent assesses a band of the fifteen rungs, and yours has to sit inside it. Fee, rating and what they assess for are yours to weigh after that.',
+      read: 'The range, and only the range. An agent assesses a band of the fifteen rungs, and yours has to sit inside it. Fee, rating and what they assess for are yours to weigh after that.',
       next: 'Tal already has a pick, on the strength of what your quiz surfaced.',
       act: _bookedAct()
     };
   },
 
   /* --- Payments -----------------------------------------------------------
-     ALL THREE OF THESE POINT AT SOMETHING TAL IS ALLOWED TO KNOW, AND THAT IS
-     THE ONE DESIGN CONSTRAINT ON THIS PAGE. `NEVER` (ai2) and clause 4 of the
-     Data use notice both say Tal has never seen billing, and `wLedger` (ai8)
-     declines a "what have I paid" question outright. `PAGESUM.billing` now
-     recites the ledger anyway, which is Maryam's call and is flagged over that
-     entry — but a popover is Tal EXPLAINING, so these three are written about
-     the ladder, the refund windows and how a card is held, every one of which
-     is inside Tal's six subjects. Two of the three actions are real routed
-     questions (`wRefund`, and the card-storage route at ai8:956).
+     BOTH OF THESE POINT AT SOMETHING TAL IS ALLOWED TO KNOW, AND THAT IS THE ONE
+     DESIGN CONSTRAINT ON THIS PAGE. `NEVER` (ai2) and clause 4 of the Data use
+     notice both say Tal has never seen billing, and `wLedger` (ai8) declines a
+     "what have I paid" question outright. `PAGESUM.billing` no longer recites
+     the ledger either (its own note above, and doc §7, 8 Sep 2026), so the page
+     is honest end to end — and a popover is Tal EXPLAINING, so these two are
+     written about the refund windows and how a card is held, both inside Tal's
+     six subjects. `refund`'s action is a real routed question (`wRefund`);
+     `defcard` reads `S.cards`, not the ledger.
 
-     NONE OF THEM ADDS A FIGURE THE TABLE DOES NOT ALREADY PRINT, and the
-     charge card reads `PAY_E2` (views.js) rather than retyping its five
-     fields — the row was lifted to a const for exactly these readers. */
+     THE `charge` AND `tracke2` POPOVERS ARE GONE with the phrases that opened
+     them — `charge` read out `PAY_E2`'s five fields (the ledger, aloud) and
+     `tracke2` hung off "Explorer Track E2", a purchase the band no longer names.
+     The charge lives in the "Previous Transactions" table, which is where the
+     doc puts it. */
 
-  charge: () => {
-    const [what, when, amt, brand, last] = PAY_E2;
-    return {
-      lead: `${amt} on ${when} for ${what}, charged to the ${brand} ending ${last}.`,
-      label: 'What a row is:',
-      read: 'A course purchase rather than an interview fee &mdash; the two are always separate rows, and each one keeps its own receipt for as long as the account is open.',
-      next: 'A course and an interview have different refund windows, and Tal can state both.',
-      act: {ic: I.time, ask: 'What is the refund window?', t: 'Ask about the refund windows'}
-    };
-  },
-
-  /* WHAT E2 IS. Keyed on the ladder rather than on the purchase, because the
-     charge card beside it already owns the money. Its `next` must be true at
-     EVERY stage — `PAGESUM.billing` is one string for all seven, so a phrase
-     in it is pressable on all seven, and "your level is not set yet" would be
-     false from `assessed` on. The ladder is the answer that never expires. */
-  tracke2: () => ({
-    lead: 'E2 is rung 2 of the fifteen-rung ladder, inside the Explorer track.',
-    label: 'How the ladder reads:',
-    read: 'Explorer is rungs 1 to 5 of 15, then Builder, then Trailblazer. A course is bought for the rung you are on, and an interview is the only thing that moves you up one.',
-    next: 'The ladder shows all fifteen rungs and the three tracks they sit in.',
-    act: {ic: I.certificate, go: 'level', t: 'See where you are on the ladder'}
+  refund: () => ({
+    lead: 'A course and an interview are refunded on different clocks.',
+    label: 'Two windows, not one:',
+    read: 'A course purchase and an interview fee are always separate rows, and each keeps its own receipt and its own refund window for as long as the account is open.',
+    next: 'Tal can state both windows against your charges. The figures come from the terms, not from a billing ledger Tal cannot see.',
+    act: {ic: I.time, ask: 'What is the refund window?', t: 'Ask about the refund windows'}
   }),
 
   /* THE DEFAULT CARD. Every figure is `S.cards`, which is also what the list
@@ -1778,7 +1795,7 @@ const SUMDROP = {
     return {
       lead: `${def.brand} ending ${def.last} is your default card, expiring ${def.exp}.`,
       label: 'What default means:',
-      read: 'It is the card a new charge is offered against first, and it is a preference rather than a commitment &mdash; you can switch it, or take a card off, without touching anything already paid.',
+      read: 'It is the card a new charge is offered against first, and it is a preference rather than a commitment. You can switch it, or take a card off, without touching anything already paid.',
       next: others
         ? `The other ${others === 1 ? 'one is' : _w(others) + ' are'} on file for later, and each can be made the default from the list below.`
         : 'It is the only card on file.',
@@ -1801,7 +1818,7 @@ const SUMDROP = {
   join: () => ({
     lead: `The call opens ${_w(JOIN_EARLY)} minutes before the start and stays open until the session ends.`,
     label: 'What you are joining:',
-    read: 'A video call in the browser &mdash; camera, microphone, screen share and captions. It is recorded, and the recording goes to your agent rather than to Tal.',
+    read: 'A video call in the browser: camera, microphone, screen share and captions. It is recorded, and the recording goes to your agent rather than to Tal.',
     next: 'Nothing has to be prepared. If the time no longer works, reschedule from the card below.',
     act: {ic: I.video, call: 'iv', t: 'Join the interview'}
   })

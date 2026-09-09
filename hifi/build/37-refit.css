@@ -691,7 +691,7 @@
   padding:var(--s04) var(--s05)}
 .app textarea.inp:hover{border-color:var(--text-primary);background-color:var(--pure-white)}
 .app textarea.inp:focus{
-  border:2px solid #FF3733;
+  border:2px solid #bd2a2a;
   padding:calc(var(--s04) - 1px) calc(var(--s05) - 1px);
   background-color:var(--pure-white)}
 .app .sec.tint textarea.inp{border-color:var(--rule)}

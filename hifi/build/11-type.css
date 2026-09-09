@@ -198,17 +198,30 @@
    component from four layers back; the argument they carried ("a square photo
    with a square tab reads as one object") is answered below rather than lost. */
 .idphoto{position:relative;flex:none;display:block}
-/* the badge sits in the photograph's corner, not hanging off it. z-index
-   because the <img> is itself absolutely positioned and would otherwise paint
-   over it. WITH A ROUND PHOTO the corner is outside the disc — which is why
-   §106.3 moves the picker's tick to bottom centre; this badge is not drawn on
-   any screen in the product today (the profile page renders `.idphoto` with no
-   `.idphoto-edit` child), so it is left stated rather than re-placed blind. */
+/* the badge sits ON the photograph's lower-right, not hanging off its square
+   corner. z-index because the <img> is itself absolutely positioned and would
+   otherwise paint over it. WITH A ROUND PHOTO the square corner is empty space
+   outside the disc, so `right/bottom:0` would float the badge in the void; the
+   small positive inset pulls it back onto the disc's 45° edge, where an avatar's
+   edit control sits. The `--background` ring separates the chip from the face
+   under it. NOW DRAWN — Maryam, 7 Sep 2026, put it on the General edit form's
+   photo and took the right-hand "Change photo" button off (`pfFormGeneral`); it
+   reverses §105's removal of the same badge, whose whole reason (two controls
+   40px apart) the removal of that button undoes. The read view's `.idphoto` has
+   no `.idphoto-edit` child, so this is edit-state only. */
+/* ROUND AND BLUE — Maryam, 7 Sep 2026: "the edit icon on picture needs to have
+   round frame rather than edgy, and use blue color instead of black". The badge
+   is a circle (a `999px` literal, the one curve §56 grants a mark, the same call
+   the round photo makes) on `--link`, this build's blue, deepening to
+   `--link-hover` on hover — not `--brand-primary`, and the one place a mark is
+   not the platform's radius-0. The `--background` ring still separates it from
+   the face. */
 .idphoto-edit{
-  position:absolute;right:0;bottom:0;z-index:2;width:26px;height:26px;
-  display:grid;place-items:center;background:var(--brand-primary)}
+  position:absolute;right:2px;bottom:2px;z-index:2;width:26px;height:26px;
+  display:grid;place-items:center;border-radius:999px;background:var(--link);
+  box-shadow:0 0 0 2px var(--background)}
 .idphoto-edit svg{width:14px;height:14px;fill:var(--on-brand)}
-.idphoto:hover .idphoto-edit{background:var(--accent)}
+.idphoto:hover .idphoto-edit{background:var(--link-hover)}
 .idhead-b{display:flex;flex-direction:column;gap:3px;min-width:0;align-items:flex-start}
 .app .idname{font-size:17px;line-height:23px;font-weight:600;letter-spacing:-.2px}
 .app .idmeta{font-size:12.5px;line-height:17px;font-weight:400;

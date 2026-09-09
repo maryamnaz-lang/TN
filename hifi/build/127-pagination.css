@@ -1,0 +1,70 @@
+/* ==========================================================================
+   127. TABLE PAGINATION — Maryam, 7 Sep 2026
+
+   "implement pagination on tables, do not give everything a block, add a nice
+   pagination, a table at a time can have 5 rows by default and the rows count
+   could also be updated." So the admin's `table()` shows one page at a time —
+   five rows to start — and this bar sits under the table (outside `.tbl-wrap`,
+   so it never rides the table's sideways scroll): rows-per-page on the left, the
+   range in the middle, prev / page-numbers / next on the right.
+
+   THE CONTROLS ARE `.btn`, SO §63 OWNS THEIR TYPE — a size, a page number, an
+   arrow are all buttons; the active one is `.btn-p` (filled), the rest `.btn-g`
+   (quiet), and this layer only lays them out and makes them compact squares.
+   The two bits of prose — the "Rows per page" label and the "1–5 of 33" range —
+   take their ink from §63 §54 (the floor grey), not here. The bar wraps on a
+   narrow frame: the size group drops under the nav rather than overflowing.
+   ========================================================================== */
+
+.app .pgn{
+  display:flex; align-items:center; flex-wrap:wrap;
+  justify-content:space-between; gap:var(--s04) var(--s06);
+  padding-top:var(--s05); margin-top:var(--s05);
+  border-top:1px solid var(--rule)}
+.app .pgn-size{display:flex; align-items:center; gap:var(--s03); flex-wrap:wrap}
+.app .pgn-nav{display:flex; align-items:center; gap:var(--s02); margin-left:auto}
+
+/* ---- rows-per-page: OUR dropdown, never a native <select> ----------------
+   The trigger is a small bordered field with a rotating chevron; the menu opens
+   UPWARD (the bar is at the table's foot) and overlays the rows above. */
+.app .pgn-dd{position:relative}
+.app .pgn-dd-t{display:inline-flex; align-items:center; gap:var(--s02);
+  min-height:32px; padding:0 var(--s03); background:var(--layer-01);
+  border:1px solid var(--rule); cursor:pointer}
+.app .pgn-dd-cx{flex:none; width:16px; height:16px; fill:var(--icon-secondary);
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .pgn-dd.on .pgn-dd-cx{transform:rotate(180deg)}
+.app .pgn-dd-menu{
+  position:absolute; bottom:calc(100% + var(--s02)); left:0; z-index:30;
+  min-width:100%; display:flex; flex-direction:column;
+  background:var(--layer-01); border:1px solid var(--rule);
+  opacity:0; visibility:hidden; transform:translateY(4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.app .pgn-dd.on .pgn-dd-menu{opacity:1; visibility:visible; transform:translateY(0)}
+.app .pgn-dd-opt{padding:var(--s03) var(--s04); text-align:left; cursor:pointer; white-space:nowrap}
+.app .pgn-dd-opt.on{background:var(--overlay-selected)}
+/* the one armed hover (build.py HOVER_KEEP) — the row IS the control */
+.app .pgn-dd-opt:hover{background:var(--overlay-hover)}
+.app .pgn-nums{display:flex; align-items:center; gap:var(--s02)}
+.app .pgn-gap{padding:0 var(--s01)}
+
+/* compact ROUND controls (Maryam, 7 Sep 2026: "smaller and round"). §64 gives a
+   quiet button with no icon a trailing arrow ("takes you to a page"); a page
+   number is not that, so suppress it — the same opt-out §64 gives a dialog
+   footer. */
+.app .pgn .btn{min-width:28px; min-height:28px; padding:0 var(--s02); border-radius:999px; justify-content:center}
+.app .pgn .btn::after{content:none}
+/* THE ACTIVE PAGE / SIZE IS THE ACCENT, not the black primary (Maryam, 7 Sep
+   2026: "the black boxes needs to be red"). A red circle, like the rail's count
+   badges; `.btn-p` already carries the white ink, so only the fill changes. */
+.app .pgn .btn-p{background:var(--accent); border-color:var(--accent)}
+.app .pgn-arrow{padding:0 var(--s02)}
+.app .pgn-arrow svg{width:18px; height:18px}
+
+/* on a narrow frame the size group sits on its own line above the nav */
+@container app (max-width:599.98px){
+  .app .pgn{justify-content:flex-start}
+  .app .pgn-nav{margin-left:0; width:100%; flex-wrap:wrap}
+}

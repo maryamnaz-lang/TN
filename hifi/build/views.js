@@ -24,6 +24,13 @@ const cfg = k => Object.assign({}, CFG_BASE, CFG[k]);
    leaves the stage untouched so you come back to where you were. */
 const S = {stage:'new', view:'dashboard', portal:'candidate', tal:false, talQ:null, nav:false, notif:false, acct:false, peek:null, read:[], rtab:'points', crtMenu:null, ctab:'discussion', hist:[], thread:[], typing:false,
   addCard:false, editPhoto:false, stg:0, notes:false, iv:'level',
+  /* THE STRIPE MODAL'S OPEN TAB — 'card' | 'bank' — shared by `payForm` (the
+     add-a-card modal) and the booking card-picker's own Add-card. */
+  payTab:'card',
+  /* WHICH SAVED CARD THE CANDIDATE IS PAYING WITH — an index into `S.cards`, or
+     null to mean "the default" (`payWithIdx()` resolves it). Used by the course
+     payment and the booking checkout. */
+  payWith:null,
   /* WHICH ACCOUNT THE LOG IN SCREEN IS SIGNING INTO — `candidate` or `leader`
      (Maryam, 2 Sep 2026). It is `S` and not a DOM class for trap 9's reason:
      `render()` replaces `device.innerHTML`, so a natively-checked radio is
@@ -1067,7 +1074,10 @@ const twIc = (name, tone) => `<span class="tw-ic${tone ? ' ' + tone : ''}">${I[n
 const tw = (title,body,action) => `<span class="tw">
   ${title?`<span class="tw-h">${title}</span>`:''}${body}
   ${action?`<span class="tw-a">${action}</span>`:''}</span>`;
-const twBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}${I.arrowRight}</button>`;
+/* NO TRAILING ARROW — the button follows §107's "Find an Agent" pill, which
+   carries none (Maryam, 8 Sep 2026). §39 gives it the pill shape and the
+   accent fill; here it is just the label. */
+const twBtn = (label,go) => `<button class="tw-btn"${go?` data-go="${go}"`:''}>${label}</button>`;
 const twChips = (qs) => `<span class="tw-chips">${qs.map(q=>`<button class="chip-tal" data-ask="1"><span class="sk-mark xs"></span>${q}</button>`).join('')}</span>`;
 
 function wChapter(i){
@@ -1132,7 +1142,9 @@ function wPrep(){
       <span>What you would do differently, in one sentence</span>
       <span>One decision you changed after listening to someone</span>
      </span>`,
-    twBtn('Start the practice run'));
+    /* opens Practice ('rp'), the same destination K-26/K-27 use — the button
+       had no target and dead-ended the prep checklist (doc §7). */
+    twBtn('Start the practice run','rp'));
 }
 function wAgent(){
   const a = AGENTS[S.agent||'priya'];
@@ -2291,7 +2303,7 @@ function pulseCol(mk, ic, label, body, cls){
 function pulseLede(f, g, p){
   if(f.finished){
     const n = g.weeks.length;
-    return `All <b>13 chapters</b> are done &mdash; ${p.figs[0][0]} across ${n} weeks, ${p.figs[2][0]} of the ${WEEK_TARGET} min weekly target. Booking the re-interview is the only thing left.`;
+    return `All <b>13 chapters</b> are done: ${p.figs[0][0]} across ${n} weeks, ${p.figs[2][0]} of the ${WEEK_TARGET} min weekly target. Booking the re-interview is the only thing left.`;
   }
   const i = f.open, mins = CH[i][1];
   const did = isDay34(S.stage) ? 12 : 0;
@@ -3566,18 +3578,24 @@ const ENROL_COURSE = {
        says "Business Foundations" under a card headed "Business Leadership"
        would be the drift §86 keyed its covers by LEVEL to avoid. */
     name: 'Business Leadership',
-    /* THE SAME REGISTER AS E3's AND THE SAME LENGTH, because §63 §44 measured
-       that paragraph at two lines across the card's 894px and a third line is
-       the tell that a rewrite has drifted. 40 words against E3's 44.
+    /* A DEFINITION OF THE COURSE, NOT THE JOURNEY (Maryam, 7 Sep 2026: "the desc
+       with the course names needs to be a definition of the course not this kind
+       of desc"). It used to describe the FORMAT — "take the same thirteen chapters
+       further… close the 90 days ready for the re-interview" — which is the shape
+       of the path, not what the course teaches. Now it defines the subject the way
+       E3's desc defines Business Fundamentals: what you learn and what it is for.
 
-       EVERY CLAUSE POINTS AT SOMETHING THE BUILD HOLDS: the thirteen chapters
-       are `CH`, the four named subjects are `CH_SYL`'s own chapters 4, 5, 12
-       and 13, the cohort that has done it once is what `promoted` means, and
-       the re-interview at the end is `ENROL_DESC.E4`'s second clause. */
-    desc: 'Take the same thirteen chapters further, with harder calls to make '
-        + 'and a cohort that has been through them once. Practise delegation, '
-        + 'hard conversations, coaching and leading change on real work, and '
-        + 'close the 90 days ready for the re-interview.',
+       STILL THE SAME REGISTER AND LENGTH as E3's (§63 §44 measures the paragraph
+       at two lines across the card's 894px; a third line is drift) — 36 words
+       against E3's 44 — and the four named skills are still `CH_SYL`'s own
+       chapters 4, 5, 12 and 13, so every subject it names is one the build holds.
+       The journey (the cohort that has done it once, the re-interview at the end)
+       is stated elsewhere — `ENROL_DESC.E4`, the stat cells, the crumb — so the
+       card's headline paragraph is free to say what the course IS. */
+    desc: 'Build the capabilities that define effective leadership. Learn to '
+        + 'delegate with trust, navigate difficult conversations, coach and '
+        + 'develop others, and lead through change &mdash; turning strong '
+        + 'fundamentals into the judgment and presence that leading people demands.',
     /* THE LEADER IS LENA FISCHER, AND SHE IS THE ANSWER TO §69's OBJECTION
        RATHER THAN AN OVERRIDE OF IT (Maryam, 4 Sep 2026: "on this black card
        why we are not showing 'Cohort Leader' row? Like the one we have on the
@@ -5941,8 +5959,8 @@ V.dashboard = (f) => {
     ${dashPh('Hi Maryam','Explorer track &middot; quiz 64 of 100 &middot; no level yet')}
     <div class="sec">
       <div class="ai-aura tile">
-        <div class="ai-head">${talLabel()}<h3>Welcome in &mdash; your result is saved</h3></div>
-        <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in &mdash; peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
+        <div class="ai-head">${talLabel()}<h3>Welcome in, your result is saved</h3></div>
+        <div class="ai-body"><p>Your quiz put you on the <b>Explorer track</b> from a score of 64. Jordan&rsquo;s call on Thursday is a 15-minute check-in, peer to peer, not an assessment. Nothing to prepare, and it does not set your level.</p></div>
         <div class="stp-wing">
           ${wingBlock()}
         </div>
@@ -6066,7 +6084,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet &mdash; that comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
+        <div class="ai-body"><p>You&rsquo;re on the <b>Explorer track</b> from a quiz score of 64, but you have no level yet. That comes from a 45-minute interview. Three agents have a slot this week, $80 to $95.</p></div>
       </div>
     </div>
     ${talRec()}
@@ -6078,7 +6096,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often &mdash; ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
+        <div class="ai-body"><p>Your interview with <b>Priya</b> is in 6 days. Delegation is the question she asks most often. Ten minutes of practice is usually enough. Your quiz scored 64; the interview is what sets your actual rung.</p></div>
       </div>
     </div>
     ${''/* THE INTERVIEW IS THE SAME ROW THE WEEKLY CALL DRAWS — see `CALL_ROW`.
@@ -6208,7 +6226,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>Priya confirmed you at <b>E3 &mdash; rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
+        <div class="ai-body"><p>Priya confirmed you at <b>E3, rung 3 of 15</b>. Your growth areas are chapters 4 and 12. The next cohort starts within two weeks; enrolling locks in your spot and your price.</p></div>
       </div>
     </div>
     ${''/* THE CARD IN THE HEAD BAND'S COLUMN IS THE ENROLMENT, NOT THE LEVEL.
@@ -6358,7 +6376,7 @@ V.dashboard = (f) => {
     <div class="sec">
       <div class="ai-aura tile">
         <div class="ai-head">${talLabel()}<h3>Your next step</h3></div>
-        <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days &mdash; 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
+        <div class="ai-body"><p>You moved from <b>E3 to E4</b> in 90 days: 13 chapters, ${f.avg}% average, ${f.mins.toLocaleString()} minutes of coursework. E4 opens December 1 with a new cohort. Delegation and coaching, your two growth areas, are chapters 3 and 9.</p></div>
         ${''/* THE LADDER WING CAME OUT OF TAL'S CARD (Maryam, 1 Sep 2026:
                "remove the where you are on the ladder section from the tal
                summary section"). It was `<div class="stp-wing">${'$'}{wingBlock()}
@@ -6600,9 +6618,9 @@ V.dashboard = (f) => {
       <div class="ai-aura tile tight">
         <div class="ai-head">${talLabel()}<h3>${stalling?'Where you are stuck':dueRe?'Before your re-interview':'Getting started'}</h3></div>
         <div class="ai-body"><p>${stalling
-          ?`Day ${f.day} of 90, week ${f.week}. You&rsquo;ve finished ${f.done} of 13 chapters, averaging ${f.avg}% &mdash; ${f.mins.toLocaleString()} minutes so far. But chapter 4 has been opened four times without finishing. The three furthest ahead in Cohort 41 had it done by now.`
-          :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12 &mdash; and you passed both. Book your re-interview to have Priya assess whether you move up.`
-          :`Day ${f.day} of 90. Chapter 1 &mdash; ${CH[0][0]} &mdash; unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
+          ?`Day ${f.day} of 90, week ${f.week}. You&rsquo;ve finished ${f.done} of 13 chapters, averaging ${f.avg}%, ${f.mins.toLocaleString()} minutes so far. But chapter 4 has been opened four times without finishing. The three furthest ahead in Cohort 41 had it done by now.`
+          :dueRe?`All 13 chapters done in 90 days, ${f.avg}% average, ${f.mins.toLocaleString()} minutes total. Your growth areas were chapters 4 and 12, and you passed both. Book your re-interview to have Priya assess whether you move up.`
+          :`Day ${f.day} of 90. Chapter 1 (${CH[0][0]}) unlocked today, ${CH[0][1]} minutes. Four of the ten in your cohort have already finished it. Nothing is assessed this week, so you can take it at your own pace.`}</p></div>
         <div class="ai-foot">${askChip(stalling?'Walk me through chapter 4':dueRe?'Prepare me for the re-interview':'What is chapter 1 about?',
           stalling?'Walk me through it':dueRe?'Prepare me':'Tell me more')}</div>
       </div>
@@ -8219,10 +8237,41 @@ V.agent = (f) => {
            `#<stage>/booking`, and `bkStamp` (ai7) still fills it from the real
            choice — but if it is not wanted, that view and its `PARENT` entry go
            together. Recorded here rather than left for a grep. */}
-    <button class="btn btn-p" data-go="stage:booked">Proceed to pay ${a.price} ${I.arrowRight}</button>
+    ${''/* PROCEED NOW LANDS ON THE CHECKOUT (`V.checkout`), NOT STRAIGHT ON THE
+           BOOKED DASHBOARD (Maryam, 6 Sep 2026: "we need to show the saved cards
+           on the next screen for the user to select the card for payment"). That
+           screen carries the card-picker and its own "Pay" button, which is what
+           now carries `stage:booked` — so the commit point moved one screen on,
+           and the destination did not. */}
+    <button class="btn btn-p" data-go="checkout">Proceed to pay ${a.price} ${I.arrowRight}</button>
   </div>
   </div>
 </div></main>`;
+};
+
+/* THE BOOKING CHECKOUT — Maryam, 6 Sep 2026. "Proceed to pay" lands here to
+   CHOOSE which saved card pays: the same `cardPicker` the course payment uses,
+   the default selected, "Add a card" opening the shared Stripe modal. Confirming
+   books — the button carries `stage:booked`, exactly where the old Proceed
+   button went, so a card choice is inserted between the click and the commit
+   without moving the destination. Back returns to the agent's booking page. No
+   `PAGESUM.checkout`, so the pass adds no Tal band — a focused checkout. */
+V.checkout = (f) => {
+  const a = AGENTS[S.agent||'priya'];
+  return `<main class="main"><div class="page">
+  ${ph('Payment', null, null, 'agent')}
+  ${''/* ADD A CARD RIDES THE HEADING, THE FEE TILE AND THE PROCESSOR NOTE ARE
+        GONE (Maryam, 7 Sep 2026). The price is already on the pay button, and the
+        card row states where the money goes; the tile and the note were saying a
+        third and fourth time what the button and the picker already carry. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
+    ${cardPicker()}
+  </div>
+  <div class="sec">
+    <div><button class="btn btn-p" data-go="stage:booked">Pay ${a.price} and book ${I.arrowRight}</button></div>
+  </div>
+  </div></main>`;
 };
 
 /* `.stickybar` IS NOW DRAWN BY NOTHING IN THIS PORTAL, AND ITS RULES STAY.
@@ -9026,23 +9075,23 @@ V.payment = (f) => `<main class="main"><div class="page">
         borrowed facts come off this page has none left that the block under the
         heading does not already carry. Tal's summary is the opening line. */}
   ${ph('Payment')}
+  ${''/* PAY FROM A SAVED CARD, NOT A RE-TYPED ONE (Maryam, 6 Sep 2026: "we need
+        to show the saved cards here as well"). The hand-drawn card form (number,
+        name, expiry, CVC, ZIP, "save this card") is gone — `cardPicker` lists the
+        cards on file with the default selected, and "Add a card" opens the shared
+        Stripe modal. A `.tile-stack` opts the headed section out of §10.15's
+        label column. */}
+  ${''/* THE PAGE IS THE CARD PICKER AND THE PAY BUTTON, NOTHING ELSE (Maryam,
+        7 Sep 2026: "remove the summary from paying screen", "remove the … Total
+        $595 section", "remove the Full refund … line"). The Tal band is gone
+        (its `PAGESUM.payment` entry removed), the order breakdown is gone, and
+        the refund line is gone. "Add a card" rides the heading; the price is on
+        the button. */}
   <div class="sec">
-    <div class="f"><label for="cn">Card number</label><input class="inp" id="cn" inputmode="numeric" placeholder="1234 5678 9012 3456"></div>
-    <div class="f"><label for="cnm">Name on card</label><input class="inp" id="cnm" placeholder="Maryam Naz"></div>
-    <div style="display:flex;gap:var(--s05)">
-      <div class="f" style="flex:1"><label for="cx">Expiry</label><input class="inp" id="cx" placeholder="MM/YY"></div>
-      <div class="f" style="flex:1"><label for="cv">Security code</label><input class="inp" id="cv" placeholder="123"></div>
-    </div>
-    <div class="f"><label for="cz">Billing ZIP code</label><input class="inp" id="cz" placeholder="10018"></div>
-    <label class="cbx"><input type="checkbox" checked><span class="box">${I.check}</span><span class="txt">Save this card for future courses</span></label>
+    <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
+    ${cardPicker()}
   </div>
   <div class="sec">
-    <div class="tile">
-      <div class="kv"><span class="k">Explorer Track &ndash; E3</span><span class="v n">$690</span></div>
-      <div class="kv"><span class="k">Interview credit</span><span class="v n">&minus;$95</span></div>
-      <div class="kv"><span class="k" style="color:var(--text-primary);font-weight:600">Total</span><span class="v">$595</span></div>
-    </div>
-    <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
     ${''/* PAYING LANDS ON WEEK 1 WITH THE RECEIPT AS A DIALOG OVER IT
           (Maryam, 3 Sep 2026: "instead of this screen, i want you to take the
           user on the next prototype that is Week 1 but on that view, a modal
@@ -9075,8 +9124,7 @@ V.payment = (f) => `<main class="main"><div class="page">
           rows in `PARENT` / `TALCTX` / ai4's crumb table and two entries in
           `respcheck.mjs` with it — a screen's worth of deletion that this ask
           does not name. */}
-    <div class="mt5"><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
-    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Full refund up to 7 days after your cohort starts, provided you have not completed more than one chapter.</p>
+    <div><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
   </div>
 </div></main>`;
 
@@ -9897,7 +9945,7 @@ const courseStats = (f, pct, hrs) => `<div class="stats">
    about inventing product copy. What is true is which two the report names. */
 const pastInsight = (f) => {
   const [g1, g2] = RPT_GROWTH;
-  return `${perfInsight(f)} ${CH[g1][0]} and ${CH[g2][0]} &mdash; chapters ${g1+1} and ${g2+1} &mdash; are the two your report names as growth areas.`;
+  return `${perfInsight(f)} ${CH[g1][0]} and ${CH[g2][0]} (chapters ${g1+1} and ${g2+1}) are the two your report names as growth areas.`;
 };
 
 /* ==========================================================================
@@ -10476,7 +10524,7 @@ V.messages = (f) => {
           that is trap 1: the header's face steps down on a phone and an inline
           declaration cannot be answered from a layer. §62's `youMark` refuses
           the helper's size for exactly this reason and states both in CSS. */}
-    <span class="mhead-av">${avatar(her)}<i class="mhead-on" aria-hidden="true"></i></span>
+    <span class="mhead-av">${avatar(her)}<i class="av-on" aria-hidden="true"></i></span>
     <span class="mhead-b">
       <span class="mhead-n">Priya Nair<i class="mhead-dot" aria-hidden="true"></i></span>
       <span class="mhead-s">Cohort leader &middot; private, and it stays after the cohort closes</span>
@@ -10638,7 +10686,7 @@ V.billing = (f) => {
           is near", and there is no ceiling left to count against. The other
           three notes stand: the control is still text with a leading plus
           rather than a black button, for the reasons written there. */}
-    <div class="sec-h"><h2>Saved cards</h2><button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button></div>
+    <div class="sec-h"><h2>Your Cards</h2><button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button></div>
     ${''/* THE DEFAULT IS A RADIO ON THE LEFT, NOT A "Make default" LINK ON THE
           RIGHT (Maryam, 2 Sep 2026: "instead of the make default text, add a
           radio button on the left side of each card row, the one with default
@@ -10748,30 +10796,73 @@ function photoSheet(){
   </div>`;
 }
 
-function cardSheet(){
-  return `<div class="modal ${S.addCard?'on':''}">
-    <div class="sheet">
-      <div class="sheet-h"><h2>Add a card</h2><button class="x" data-addcard="0" aria-label="Close">${I.close}</button></div>
-      <div class="sheet-b">
-        <div class="f"><label for="nc">Card number</label>
-          <div class="inp-mk"><input class="inp" id="nc" inputmode="numeric" autocomplete="cc-number" maxlength="23" placeholder="1234 5678 9012 3456">
-            <span class="bmk lg" id="ncb">${BMK.card}</span></div>
-          <div class="bmk-row mt3"><span class="lab">We accept</span>
-            ${['Visa','Mastercard','Amex','Discover'].map(b=>bmk(b)).join('')}</div></div>
-        <div class="f"><label for="nn">Name on card</label><input class="inp" id="nn" placeholder="Maryam Naz"></div>
-        <div style="display:flex;gap:var(--s05)">
-          <div class="f" style="flex:1"><label for="nx">Expiry</label><input class="inp" id="nx" placeholder="MM/YY"></div>
-          <div class="f" style="flex:1"><label for="nv">Security code</label><input class="inp" id="nv" placeholder="123"></div>
-        </div>
-        <div class="f"><label for="nz">Billing ZIP code</label><input class="inp" id="nz" placeholder="10018"></div>
-        <label class="cbx"><input type="checkbox"><span class="box">${I.check}</span><span class="txt">Make this my default card</span></label>
-        <div class="note mt5 band"><span style="fill:var(--icon-secondary)">${I.shield}</span><div class="nb">Card details go straight to our payment processor. TalentNext never stores them.</div></div>
-      </div>
-      <div class="sheet-f">
-        <button class="btn btn-s noic" data-addcard="0" style="justify-content:center">Cancel</button>
-        <button class="btn btn-p noic" data-savecard="1" style="justify-content:center">Add card</button>
-      </div>
+/* THE SHARED "ADD PAYMENT METHOD" MODAL (Maryam, 6 Sep 2026, "the same stripe
+   images in the modal form" on every portal). Stripe's own hosted form is a
+   third-party product, so it is EMBEDDED as a picture rather than redrawn — the
+   Calendly rule — and one modal draws it everywhere: this portal's `cardSheet`,
+   the agent's payout setup and the admin's add-card sheet all open `payForm`.
+
+   `PAY_ART` holds the two states Stripe draws (Card / US bank account); `tab`
+   picks which and `open` toggles `.on`. The tabs, the Save/Cancel row and the
+   card art are all painted INTO the picture, so three transparent buttons sit
+   over them: two switch the state (`data-paytab`), one closes (`data-payclose`,
+   over the Save/Cancel row), and the backdrop closes too. Both pictures put the
+   tab row at the same pixels but are different heights, so the band's top/height
+   is a percentage of each image's own height; the close row the same.
+
+   A PURE FUNCTION OF ITS TWO ARGUMENTS, so it crosses to the design system as
+   `dsPayForm` (DS_RENAME) and the hand-written portals call that. It reads
+   `PAY_ART`, which `build-ds.py` re-embeds and lists in DS_HAVE. */
+function payForm(tab, open){
+  const card = tab !== 'bank';
+  const tabTop = card ? '7.75%' : '9.70%', tabH = card ? '8.70%' : '10.89%';
+  const clsTop = card ? '93%' : '91.3%', clsH = card ? '6%' : '7%';
+  const z = 'position:absolute;background:transparent;border:0;cursor:pointer';
+  return `<div class="modal pay-modal ${open?'on':''}" data-payclose style="align-items:center;padding:var(--s06)">
+    <div class="pay-embed" style="position:relative;width:100%;max-width:460px;max-height:100%;overflow:auto;margin:auto">
+      <img src="${card?PAY_ART.card:PAY_ART.bank}" alt="Add a payment method" style="display:block;width:100%">
+      <button data-paytab="card" aria-label="Pay by card" style="${z};top:${tabTop};height:${tabH};left:3.5%;width:46%"></button>
+      <button data-paytab="bank" aria-label="Pay by US bank account" style="${z};top:${tabTop};height:${tabH};left:50.4%;width:46%"></button>
+      <button data-payclose aria-label="Close" style="${z};top:${clsTop};height:${clsH};left:48%;width:50%"></button>
     </div>
+  </div>`;
+}
+
+/* `cardSheet` IS NOW JUST THE SHARED MODAL, opened by `S.addCard` and showing
+   `S.payTab`. The old hand-drawn card form (number, name, expiry, CVC, ZIP) is
+   gone — Stripe's hosted form is the one place a card is entered. `data-savecard`
+   is no longer written; a saved card is what comes back from Stripe, and the
+   picture's own Save/Cancel close the modal. */
+function cardSheet(){ return payForm(S.payTab, S.addCard); }
+
+/* THE SAVED-CARDS PICKER — Maryam, 6 Sep 2026. Wherever a candidate pays (the
+   course-enrolment `V.payment`, the interview-booking checkout `V.checkout`)
+   they choose from the cards already on file rather than re-typing one; the
+   default is selected, and "Add a card" opens the shared Stripe modal. One list,
+   `S.cards` + `BMK`, the same `.cardrow` the Payments page draws minus its Remove
+   action — the row IS the control, so it carries `data-paypick`. `S.payWith` is
+   the chosen index; `payWithIdx()` falls back to the default card when nothing
+   has been picked, so a page can read the selection without seeding state.
+   "Add a card" is NOT in here — it rides the "Pay with" heading row as a
+   `.sec-h-act` (Maryam, 7 Sep 2026), the same place the Payments page puts it,
+   so each caller emits it beside its own heading. */
+function payWithIdx(){
+  const s = S.payWith;
+  if(s != null && S.cards[s]) return s;
+  const d = S.cards.findIndex(c => c.def);
+  return d < 0 ? 0 : d;
+}
+const addCardAct = `<button class="btn btn-t btn-sm noic ic-l sec-h-act" data-addcard="1">${I.add}Add a card</button>`;
+function cardPicker(){
+  const sel = payWithIdx();
+  return `<div class="tile-stack">
+    ${S.cards.map((c, i) => `<div class="cardrow" data-paypick="${i}" style="cursor:pointer">
+      <span class="rad card-rad"><input type="radio" name="paywith"${i === sel ? ' checked' : ''} tabindex="-1"><span class="box"></span></span>
+      <span class="cardrow-ic">${BMK[c.brand] || BMK.card}</span>
+      <span class="cardrow-b">
+        <span class="cardrow-t">${c.brand} ending ${c.last}${c.def ? ' <span class="pill-def">Default</span>' : ''}</span>
+        <span class="cardrow-d">Expires ${c.exp}</span></span>
+    </div>`).join('')}
   </div>`;
 }
 
@@ -11036,8 +11127,18 @@ const pfFact = (ic, mk, label, val) => `<div style="--mk:var(${mk})">
 const PF = {
   general: {
     name:'Maryam Naz',
+    /* NICKNAME IS A HANDLE — Maryam, 7 Sep 2026: "Nickname (which is kind of a
+       user name)". A short name others can call you, distinct from the legal
+       name above; the edit form takes it as the second field. */
+    nickname:'@maryamsss',
     headline:'Senior UX/UI Designer',
     company:'Tkxel',
+    /* LOCATION, PHONE AND TIME ZONE ARE RETAINED DATA, NO LONGER SURFACED.
+       Maryam, 7 Sep 2026 cut the General edit form back to Name / Nickname /
+       Email / About ("Remove all the other details"), so nothing reads these
+       three any more; `headline` and `company` stay live because the edit form's
+       identity row still prints "<headline> at <company>". Flagged rather than
+       deleted — if the form ever grows a field back, the value is here. */
     location:'Lahore, Punjab, Pakistan',
     email:'maryam.naz@tkxel.io',
     phone:'0305-4672294',
@@ -11196,9 +11297,12 @@ function pfMiss(k){
   const out = [];
   if(k === 'general'){
     const g = PF.general;
-    [['name','Your name'],['headline','Headline'],['company','Current company'],
-     ['location','Location'],['email','Email'],['phone','Phone'],
-     ['tz','Time zone'],['about','About']]
+    /* THE GENERAL SECTION IS THE FOUR FIELDS THE FORM NOW HAS (Maryam, 7 Sep
+       2026) — Name, Nickname, Email, About. It stopped counting Headline,
+       Company, Location, Phone and Time zone the moment those came off the form:
+       a completeness figure that tests a field the reader cannot edit can report
+       a gap with no way to close it. */
+    [['name','Your name'],['nickname','Nickname'],['email','Email'],['about','About']]
       .forEach(([f,l]) => { if(!g[f]) out.push(l); });
   }
   if(k === 'edu') PF.education.forEach(e => {
@@ -11338,17 +11442,24 @@ function pfField(id, [k, lab, v, o]){
          call site — see `pfSecurity`. */
       : opt.t === 'pw'
         ? `<input class="inp" id="${fid}" type="password" autocomplete="${opt.ac || 'new-password'}" placeholder="${opt.ph || ''}">`
+        /* `ro` IS A FIELD YOU CAN READ AND NOT CHANGE — Maryam, 7 Sep 2026, of
+           the email: "which will not be editable". `readonly` (not `disabled`)
+           so the value is still selectable and the label reads normally; `.pfe-ro`
+           mutes it so the lock is legible at a glance. It never shows the "Needed"
+           flag — a field the reader cannot fill is not a gap they can close. */
+        : opt.ro
+          ? `<input class="inp pfe-ro" id="${fid}" value="${v || ''}" readonly aria-readonly="true">`
         : `<input class="inp" id="${fid}" value="${v || ''}" placeholder="${opt.ph || ''}">`;
   /* `.pfe-need` IS ON THE FIELD, NOT ON A BANNER AT THE TOP OF THE STEP. The
      step already says how many things are missing; what the reader needs at the
      control is which ONE, and a list of names above a form is a second index
      into the same fields. §111 draws it as a word after the label. */
   return `<div class="f pfe-f${opt.w ? ' pfe-f-w' : ''}">
-    <label for="${fid}">${lab}${v ? '' : '<span class="pfe-need">Needed</span>'}</label>
+    <label for="${fid}">${lab}${(v || opt.ro) ? '' : '<span class="pfe-need">Needed</span>'}</label>
     ${body}
   </div>`;
 }
-const pfFields = (id, rows) => `<div class="pfe-g">${rows.map(r => pfField(id, r)).join('')}</div>`;
+const pfFields = (id, rows, cls) => `<div class="pfe-g${cls ? ' ' + cls : ''}">${rows.map(r => pfField(id, r)).join('')}</div>`;
 
 /* AN ENTRY IS A BORDERED BLOCK WITH ITS OWN HEAD ROW — one job, one school, one
    certificate. §41's frame (1px on `--layer-01`) is the build's only bounded
@@ -11409,33 +11520,50 @@ const pfFormGeneral = () => {
         the first thing inside the one section instead. */}
   <div class="sec" data-pfsec="general">
     ${pfHead('general','General details')}
+    ${''/* THE PHOTO CARRIES ITS OWN EDIT CONTROL NOW — Maryam, 7 Sep 2026: "the
+          change photo should not come on the right, an edit icon could appear on
+          the image bottom right in edit view". The right-hand "Change photo"
+          button (`.idhead-a`) is gone; `.idphoto-edit` is the pencil badge on the
+          photograph's lower-right, which §11 places on the round disc's edge. This
+          REVERSES §105 — it took the badge off the photo because there were "two
+          controls doing one job 40px apart"; with the right button removed the
+          badge is the one control, so the argument that ended it is what brings it
+          back. The badge is drawn only in this edit state; the read view's photo
+          stays a plain disc. */}
     <div class="idhead pfe-id">
       <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
         <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
+        <span class="idphoto-edit">${I.edit}</span>
       </button>
       <div class="idhead-b">
         <span class="idname">${g.name}</span>
-        <span class="idmeta">${g.headline} at ${g.company}</span>
+        ${''/* THE SUB-LINE IS THE NICKNAME, NOT THE HEADLINE — Maryam, 7 Sep
+              2026: "in place of the Senior UX/UI Designer at Tkxel beneath name
+              I need you to show the nickname". The read view says the same thing
+              now (`pfSecView.general`), so both states of this row read name +
+              handle. `headline`/`company` are no longer printed anywhere; they
+              stay on the record, flagged. */}
+        <span class="idmeta">${g.nickname}</span>
       </div>
-      <div class="idhead-a"><button class="btn btn-g" data-editphoto="1">Change photo ${I.edit}</button></div>
     </div>
+    ${''/* FOUR FIELDS, THREE ACROSS — Maryam, 7 Sep 2026: "Name, Nickname (which
+          is kind of a user name), Email address (which will not be editable),
+          About", then "email could also come in the same row of the name and
+          nickname". `.pfe-g3` puts Name / Nickname / Email on one row; About is
+          `w:1` (`.pfe-f-w`), which spans `1 / -1` — all three columns — so it sits
+          full width under them. Email is `ro`: read and not change. */}
     ${pfFields('gen', [
       ['name','Name', g.name],
-      ['headline','Headline', g.headline, {ph:'Senior UX/UI Designer'}],
-      ['company','Current company', g.company],
-      ['location','Location', g.location],
-      ['email','Email', g.email],
-      ['phone','Phone', g.phone],
-      ['tz','Time zone', g.tz, {t:'sel', o:[
-        'Eastern Time (ET)','Central Time (CT)','Mountain Time (MT)',
-        'Pacific Time (PT)','Pakistan Standard Time (PKT)']}],
+      ['nickname','Nickname', g.nickname, {ph:'A short name others can call you'}],
+      ['email','Email', g.email, {ro:true}],
       ['about','About', g.about, {t:'area', w:1,
         ph:'Two or three sentences on what you do and what you are good at.'}]
-    ])}
-    ${''/* THE LEVEL IS NOT A FIELD AND THE MODAL SAID SO IN THE SAME WORDS. It
-          is set by the agent at the interview, so a control for it here would
-          be a promise the product breaks one screen later. */}
-    <p class="t-helper-01 pfe-note">Your level and your track are set by your agent at the interview and cannot be edited here.</p>
+    ], 'pfe-g3')}
+    ${''/* THE LEVEL/TRACK NOTE IS GONE (Maryam, 7 Sep 2026: "remove the Your
+          level and your track … line"). It read "Your level and your track are
+          set by your agent at the interview and cannot be edited here" — true,
+          and no longer needed on a form that no longer even hints at a level
+          control. The fact still holds: nothing here edits a level. */}
   </div>`;
 };
 
@@ -12076,7 +12204,13 @@ const pfSecView = {
         </button>
         <div class="idhead-b">
           <span class="idname">${g.name}</span>
-          <span class="idmeta">${g.email}</span>
+          ${''/* THE SUB-LINE IS THE NICKNAME (Maryam, 7 Sep 2026: "in place of the
+                saved view, the nickname should be shown instead of the email").
+                The email is a field on the form one press away, and the head band
+                above already reads off the account — so the handle is the one
+                identity fact this row was not already saying twice. The edit
+                form's own idhead matches it. */}
+          <span class="idmeta">${g.nickname}</span>
         </div>
         <div class="idhead-a"><button class="btn btn-g" data-pfedit="general">Edit details ${I.edit}</button></div>
       </div>
@@ -12114,8 +12248,15 @@ const pfSecView = {
     <div class="sec">
       <div class="sec-h"><h2>About</h2></div>
       <p class="t-body pfe-about">${g.about}</p>
-    </div>
-    ${pfScenes()}`;
+    </div>`;
+    /* INTERVIEW SCENES IS NOT APPENDED HERE ANY MORE — it moved to `pfPanel`,
+       which renders it after the general section in BOTH states (Maryam, 7 Sep
+       2026: "in edit view of general settings the bottom interview sections
+       disappears … editing a section is not affecting any other section"). It
+       was appended to this read view, so opening the general FORM — which
+       replaces this whole return with `pfFormGeneral` — dropped it. The scenes
+       are display-only and nothing on the general form edits them, so they
+       belong outside the edit swap. */
   },
 
   /* THE "N STILL TO ADD" NOTE IS GONE FROM ALL FOUR (Maryam, 4 Sep 2026,
@@ -12409,10 +12550,18 @@ function pfPanel(f){
   /* THE SIX IN ORDER, WITH THE ONE BEING EDITED SWAPPED FOR ITS FORM. Flat, per
      the note at the head of this block — a wrapper per section would take every
      `.sec` out of `.page`'s direct children and §10, §14 and §20 all key on
-     that. */
-  return PF_SEC.map(s => S.pfEdit === s.k
-    ? PF_FORM[s.k]()
-    : pfSecView[s.k](f)).join('');
+     that.
+
+     INTERVIEW SCENES RIDES AFTER THE GENERAL SECTION IN BOTH STATES (Maryam, 7
+     Sep 2026: "editing a section is not affecting any other section"). It used
+     to be appended inside `pfSecView.general`, so opening the general form —
+     which swaps that whole return for `pfFormGeneral` — dropped it. It is
+     display-only and nothing on any form edits it, so it renders here regardless
+     of `S.pfEdit`, in the same slot (right after general) it read from before. */
+  return PF_SEC.map(s => {
+    const body = S.pfEdit === s.k ? PF_FORM[s.k]() : pfSecView[s.k](f);
+    return s.k === 'general' ? body + pfScenes() : body;
+  }).join('');
 }
 
 V.account = (f) => `<main class="main"><div class="page">
@@ -13966,7 +14115,7 @@ function render(){
        and dimmed. It is `typeof`-guarded nowhere because `peekPanel` is a
        function declaration in this file, hoisted above this line. */
     html = shell() + '<div class="shell-body">' + sidenav(f) + '<div class="view-col">' + view(f) + '</div>' + peekPanel(f) + '</div>' + (NO_FAB.includes(S.view)?'':talFab())
-         + talPanel(f) + notifPanel() + (S.view==='billing'?cardSheet():'')
+         + talPanel(f) + notifPanel() + (['billing','payment','checkout'].includes(S.view)?cardSheet():'')
          + (S.view==='account'?photoSheet():'')
          /* THE ENROL PAGE'S SKILLS DIALOG WAS HERE and is deleted with the
             generic chip row that opened it — the note over `outlineSec` is the
@@ -14195,18 +14344,22 @@ device.addEventListener('click', e => {
     pk.classList.add('on'); return; }
 
   const ac = t.closest('[data-addcard]');
-  if(ac){ S.addCard = ac.dataset.addcard==='1'; render(); return; }
-  if(t.closest('[data-savecard]')){
-    const num = (document.getElementById('nc')||{}).value || '';
-    const dig = num.replace(/\D/g,'');
-    const def = !!(document.querySelector('.sheet .cbx input')||{}).checked;
-    const exp = ((document.getElementById('nx')||{}).value || '').trim();
-    if(def) S.cards.forEach(c=>c.def=false);
-    S.cards.push({brand: brandOf(dig) || 'Mastercard',
-      last: dig.length>=4 ? dig.slice(-4) : '8210',
-      exp: /^\d\d\/\d\d$/.test(exp) ? exp : '04/30', def});
-    S.addCard=false; render(); return;
-  }
+  if(ac){ S.addCard = ac.dataset.addcard==='1'; if(S.addCard) S.payTab='card'; render(); return; }
+  /* THE STRIPE MODAL (`payForm`) — its Card / US-bank tabs and its close, shared
+     with every portal. `data-paytab` swaps the picture; `data-payclose` shuts the
+     modal, and on the backdrop only when the backdrop itself is the click target
+     (a press on the picture must not close it). The old hand-drawn form's
+     `data-savecard` is gone — a card comes back from Stripe, not from a field. */
+  const pt = t.closest('[data-paytab]');
+  if(pt){ S.payTab = pt.dataset.paytab; render(); return; }
+  const px = t.closest('[data-payclose]');
+  if(px){ if(px.classList.contains('modal') && e.target !== px) return; S.addCard=false; render(); return; }
+  /* CHOOSING WHICH SAVED CARD TO PAY WITH (the card-picker on the course payment
+     and the booking checkout). `data-paypick` sets the index; `data-setdef` below
+     is a different thing — it changes the account's DEFAULT card on the Payments
+     page, not the card for this one transaction. */
+  const pp = t.closest('[data-paypick]');
+  if(pp){ S.payWith = +pp.dataset.paypick; render(); return; }
   const sd = t.closest('[data-setdef]');
   if(sd){ S.cards.forEach((c,i)=>c.def = i===+sd.dataset.setdef); render(); return; }
   const dc = t.closest('[data-delcard]');

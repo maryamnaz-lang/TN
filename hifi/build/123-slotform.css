@@ -1,0 +1,145 @@
+/* ==========================================================================
+   123. THE ADD-SLOT FORM — Maryam, 6 Sep 2026, with a reference
+
+   The agent portal's "Add a slot" sheet had two native `<select>`s. On a click
+   each opened the OPERATING SYSTEM'S list — the blue macOS popup in the ask —
+   which is the one control on the page that is not ours: it ignores the radius,
+   the hairline and the type, and looks like a different product spliced in. This
+   layer is the field and the popup drawn in OUR language so the whole sheet is
+   one surface.
+
+   THE TRIGGER IS AN `.inp`. It borrows the input's whole look — the 48px height,
+   the `--layer-02` ground, the single bottom hairline, radius 0 — so a closed
+   dropdown is indistinguishable from a text field on the same form. This layer
+   adds only what a `<select>` cannot be: a real chevron that rotates when the
+   list is open, and, on the time variant, a leading clock.
+
+   THE POPUP IS `.acct-menu`'s RECIPE. `--layer-01` inside `1px solid var(--rule)`,
+   arriving on `opacity`/`visibility`/`transform` rather than `display` so it can
+   transition at all — the same three declarations §78 gives the account menu and
+   §41 the calendar popover. It is absolutely positioned and takes no layout, so
+   opening one never reflows the sheet under it.
+
+   THE OPTION ROW IS THE CONTROL, so it carries the one armed hover in this layer
+   (`dd-opt` is in `build.py`'s HOVER_KEEP, a class minted for nothing else — the
+   §107 `ob-qp-o` precedent). Selection is a tick and a held ground, never type:
+   §63 owns size, weight, case and text colour, so this layer sets grounds,
+   borders, fills and geometry and NOT ONE of those four. Every string in the
+   markup wears its own role class.
+
+   THE TIME IS TWO FIELDS. The reference sets a start and an end side by side with
+   a "to" between them, and that is `.tm-row`: a three-track grid, each field a
+   dropdown of 12-hour times (AM and PM), the "to" centred on the pair. It is a
+   grid rather than three floats so the middle word stays put while the fields
+   flex, and the fields are `min-width:0` so the row never overflows a narrow
+   sheet — it holds side by side at every width the modal reaches.
+
+   AGENT-PORTAL ONLY, BUT IT LIVES HERE, like §41 and §122: only
+   `tn-agent-portal.html` draws this sheet, but that portal is on the design
+   system, so the shape has to cross to the box. It is in `build-ds.py`'s LAYERS.
+   The markup (`dd()` and the `slot` sheet) is the portal's; this is its shape.
+   ========================================================================== */
+.dd{position:relative}
+
+/* THE TRIGGER. It is `.inp.dd-btn` in the markup, so everything but these lines
+   comes from §02's input rule. `display:flex` overrides the input's `block` to
+   lay the optional clock, the value and the chevron on one baseline; the value
+   takes the row and truncates rather than pushing the chevron off the edge. */
+.dd-btn{
+  display:flex; align-items:center; gap:var(--s03);
+  text-align:left; cursor:pointer}
+/* THE CHEVRON SITS AT THE FIELD'S END (Maryam, 6 Sep 2026: "the chevrons needs
+   to go on their row end"). §07's `.app .inp` reserves `--s08` (40) of right
+   padding for a trailing affordance masked in the corner — right for a text
+   field, wrong here, where the chevron is a real flex child that the 40px then
+   pushes an extra `--s07` in from the edge. Back to `--s05`, level with the
+   value's own left inset. `.dd .dd-btn` (0,2,0) lands after that rule, so it
+   wins on order. */
+.dd .dd-btn{padding-right:var(--s05)}
+.dd-btn .dd-val{flex:1; min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* THE CHEVRON A `<select>` COULD NOT ROTATE. §02 draws the native select's caret
+   as a static CSS triangle; here it is the real `chevDown` mark, and it turns
+   over when the list is open so the field says its own state. 20px to match
+   `.btn svg` and `.dd-ic`. */
+.dd-cx{flex:none; width:20px; height:20px; fill:var(--icon-primary);
+  transition:transform var(--dur-short) var(--ease-standard)}
+.dd.on .dd-cx{transform:rotate(180deg)}
+
+/* THE LEADING CLOCK on the time variant, one step quieter than the chevron
+   because it is a label for the field, not a control. */
+.dd-ic{flex:none; width:20px; height:20px; fill:var(--icon-secondary)}
+
+/* ------------------------------------------------------------------ 123.2 ---
+   THE POPUP — .acct-menu's recipe, spanning the field it hangs from. */
+.dd-menu{
+  position:absolute; top:calc(100% + var(--s02)); left:0; right:0; z-index:30;
+  max-height:240px; overflow-y:auto;
+  display:flex; flex-direction:column;
+  background:var(--layer-01); border:1px solid var(--rule);
+  opacity:0; visibility:hidden; transform:translateY(-4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.dd.on .dd-menu{opacity:1; visibility:visible; transform:translateY(0)}
+/* EVERY MENU OPENS BENEATH ITS FIELD (Maryam, 6 Sep 2026: "the dropdown should
+   open beneath the field, not above it"). The time fields used to flip upward to
+   dodge the sheet body's clip; §123.4 lifts that clip instead (the body goes
+   `overflow:visible` above the footer while a dropdown is open), so a downward
+   menu now overlays the footer and whatever is below rather than being cut, and
+   all three fields open the same way. */
+
+/* AN OPTION IS A ROW OF ONE LABEL AND, WHEN CHOSEN, A TICK. `text-align:left`
+   because a `<button>` centres its content and these are rows. The tick reserves
+   its box with `visibility` so the label does not shift when selection moves. */
+.dd-opt{
+  display:flex; align-items:center; gap:var(--s03);
+  padding:var(--s04) var(--s05); width:100%; text-align:left;
+  cursor:pointer}
+.dd-opt .dd-opt-t{flex:1; min-width:0}
+/* THE SELECTED ROW'S TICK IS THE ACCENT (Maryam, 6 Sep 2026: "its text and tick
+   should be in accent color"). `--accent-text` — the accent as ink, 5.9:1 — so
+   the tick matches the row's accent WORDS, which §63 §7 colours the same, rather
+   than the hotter `--accent` mark red sitting next to a deeper-red word. */
+.dd-opt .dd-tick{flex:none; width:18px; height:18px;
+  fill:var(--accent-text); visibility:hidden}
+.dd-opt.on .dd-tick{visibility:visible}
+/* THE SELECTED ROW HOLDS A GROUND under the accent text — the same overlay the
+   rail's selected item takes. The ink is §63 §7's, not this layer's. */
+.dd-opt.on{background:var(--overlay-selected)}
+/* THE ONE ARMED HOVER (build.py HOVER_KEEP). The row IS the control, and a list
+   of options with no hover reads as a table, not a menu. */
+.dd-opt:hover{background:var(--overlay-hover)}
+
+/* ------------------------------------------------------------------ 123.3 ---
+   THE TIME RANGE — two dropdowns and a "to", side by side at every width. */
+.tm-row{
+  display:grid; grid-template-columns:1fr auto 1fr;
+  align-items:center; gap:var(--s04)}
+.tm-to{flex:none; text-align:center}
+/* The two time fields share the popup recipe but sit in a grid track, so each
+   must be free to shrink to its column rather than to its content. */
+.tm-row .dd{min-width:0}
+
+/* ------------------------------------------------------------------ 123.4 ---
+   THE OPEN MENU OVERLAYS EVERYTHING — Maryam, 6 Sep 2026: "the dropdown should
+   be on top of anything and should not be part of the modal content scroll".
+
+   `.sheet-b` is `overflow-y:auto` (§02), which clips any absolutely positioned
+   child that runs past its box — so the menu was cut at the body's edge and, if
+   the body ever scrolled, would move with the content. While a dropdown is open
+   the body opts out of clipping and lifts into its own stacking context above
+   the footer, so the menu floats over the field, the footer, whatever is below.
+   The class is set by `editSheet` only while `S.dd` is truthy — i.e. only on the
+   one sheet that has dropdowns, and only while one is open — so a long sheet's
+   scroll is untouched the rest of the time. The menu's own `z-index:30` (123.2)
+   then wins inside this context. */
+.sheet-b.dd-open{overflow:visible; position:relative; z-index:2}
+
+/* THE CHEVRONS LINE UP ON THE RIGHT (same ask). Each `.dd-btn` is `width:100%`
+   of its field, so the trailing chevron already sits one `--s05` from the field
+   edge; stating it as a fixed trailing box (not a flexed one) keeps the day
+   field's mark and both time fields' marks on the same right inset, whatever the
+   value width. */
+.dd-cx{margin-left:auto}

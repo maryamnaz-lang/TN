@@ -442,7 +442,7 @@ function bkBooked(){
   S.view = 'dashboard';
   S.hist = [];
   bkTurn(bkLong(),
-    `Done &mdash; your interview is booked.`
+    `Done. Your interview is booked.`
     + bkFrozen(bkDone()));
 }
 

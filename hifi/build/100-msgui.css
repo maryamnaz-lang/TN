@@ -28,11 +28,13 @@
    puts in a 76px band.
 
    THE PRESENCE DOT IS DRAWN TWICE AND THAT IS DELIBERATE, because the two say
-   different things at different distances. `.mhead-on` is the 12px dot ON the
-   face — the thing you see first — and `.mhead-dot` is the 8px one after the
-   name, which is what a reader checks when they are already reading the name.
-   The reference draws both. `--support-success` for the same reason `.tag
-   green` uses it: available is the product's one green.
+   different things at different distances. The dot ON the face — the thing you
+   see first — is now the shared `.av-on` (§09), which every profile photo uses
+   too and which draws ABOVE the picture rather than behind it (its own note has
+   the z-index story); `.mhead-dot` is the 8px one after the name, which is what
+   a reader checks when they are already reading the name. The reference draws
+   both. `--support-success` for the same reason `.tag green` uses it: available
+   is the product's one green.
 
    THE FOUR CONTROLS ARE 40px HIT TARGETS WITH A 20px GLYPH, which is the
    product's bare-mark size (§29, §72, §94) rather than a `.btn`. A `.btn` would
@@ -58,10 +60,9 @@
   border-bottom:1px solid var(--rule)}
 .app .mhead-av{position:relative;flex:none;display:block}
 .app .mhead-av .av-ph{width:44px;height:44px}
-.app .mhead-on{
-  position:absolute;right:-1px;bottom:-1px;
-  width:12px;height:12px;border-radius:999px;
-  background:var(--support-success);border:2px solid var(--layer-01)}
+/* `.mhead-on` IS GONE — the on-face dot is the shared `.av-on` (§09) now, drawn
+   above the photo. What was here (12px, `right/bottom:-1px`, a `--layer-01`
+   ring) is what `.av-on` states in per-cent for every avatar size. */
 .app .mhead-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}
 .app .mhead-n{display:flex;align-items:center;gap:var(--s03)}
 .app .mhead-dot{

@@ -1202,7 +1202,7 @@ const obJourney = () => {
    ========================================================================== */
 const obChatDone = () => `
   <p>That is everything I needed. I have enough now to understand what you are after and where it is getting stuck.</p>
-  <p>From here it is the platform's turn &mdash; and you are already on step two.</p>
+  <p>From here it is the platform's turn, and you are already on step two.</p>
   ${obJourney()}
   <div class="ob-opts"><button class="ob-opt ob-opt-go" data-obdone="1">Find an Agent</button></div>`;
 
@@ -1534,7 +1534,7 @@ function obReadback(){
   return `
   <div class="sec ob-sec">
     <div class="sec-h"><h2>What I heard</h2></div>
-    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you &mdash; and you can drop any of them later from Profile.</p>
+    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you, and you can drop any of them later from Profile.</p>
     <div class="tile ob-heard">
       ${obHeard().map(([l,v,st]) => `
         <div class="ob-hr">
@@ -1608,7 +1608,7 @@ const OB_FIT = {
    candidate's own words being read back. */
 function obFit(){
   const k = obAgent();
-  return `You said &ldquo;<b>${obHeard()[2][1]}</b>&rdquo; &mdash; and ${
+  return `You said &ldquo;<b>${obHeard()[2][1]}</b>&rdquo;, and ${
     AGENTS[k].n} ${OB_FIT[k]}.`;
 }
 
@@ -1870,6 +1870,14 @@ device.addEventListener('click', e => {
   if(d){
     S.recKey = obAgent();
     e.preventDefault(); e.stopPropagation();
+    /* THE GATE'S CONVERSATION STAYS AT THE GATE — Maryam, 4 Sep 2026: "it
+       shows that convo I had at the onboarding time, it should not show here."
+       §107 shares `S.thread` with the ask page, and its messages are the gate's
+       shape (`{who:'tal', q:i}`, `{who:'tal', done:true}`) which `askBubble`
+       prints as "undefined". `talReset()` rather than `S.thread = []` — the
+       thread has a timer (views.js's note). And the ask page itself is closed:
+       the dashboard is the destination, not the chat over it. */
+    talReset(); S.askOpen = false; S.tal = false;
     setStage('new'); render(); return;
   }
 }, true);

@@ -504,27 +504,39 @@ V.leadCerts = () => {
    ========================================================================== */
 V.leadProfile = () => `<main class="main"><div class="page">
   ${crumb(['Dashboard','leadDash'],'Your profile')}
-  ${''/* Tal's summary is now this sentence done properly — "your listing is
-        what candidates read when they choose you" — so the line above it
-        went rather than the line below. */}
   ${ph('Your profile',`${LEADER.range} &middot; leading since ${LEADER.since}`)}
-  ${''/* TWO WORDS EACH AND NO COUNT. `V.leadReports`' strip carries a `.lf-n`
-        because its four tabs are four cohorts of different sizes and the size is
-        the reason you pick one. These two are not quantities of anything, and a
-        number in a `.lf-n` beside "Public Profile" would have to be a number OF
-        something. */}
+
+  ${''/* FOUR TABS, THE CANDIDATE'S PROFILE MODULE MIRRORED (Maryam, 7 Sep 2026:
+        "the cohort leader profile module needs to be same as the candidate profile
+        module", then "notifications will be a different tab, add privacy settings
+        tab as well"). General is the candidate's My Profile shape — a 72px idhead,
+        a four-fact band and an About paragraph, with the four figures and the bio
+        made leader-appropriate. Notifications and Privacy Settings are their own
+        tabs now; Privacy is the candidate's `pfPrivacy` composition (Sign in and
+        security over Closing your account), reusing `S.pfPw`/`data-pfpw` and the
+        shared delete confirm. */}
   <div class="sec sec-cs">
     <div class="cs" role="tablist" aria-label="Profile sections">
       <button class="${S.ldrPfTab === 'general' ? 'on' : ''}" role="tab"
         aria-selected="${S.ldrPfTab === 'general'}" data-ldrpf="general">General Profile</button>
       <button class="${S.ldrPfTab === 'public' ? 'on' : ''}" role="tab"
         aria-selected="${S.ldrPfTab === 'public'}" data-ldrpf="public">Public Profile</button>
+      <button class="${S.ldrPfTab === 'notif' ? 'on' : ''}" role="tab"
+        aria-selected="${S.ldrPfTab === 'notif'}" data-ldrpf="notif">Notifications</button>
+      <button class="${S.ldrPfTab === 'privacy' ? 'on' : ''}" role="tab"
+        aria-selected="${S.ldrPfTab === 'privacy'}" data-ldrpf="privacy">Privacy Settings</button>
     </div>
   </div>
+
   ${S.ldrPfTab === 'general' ? `
+  ${''/* GENERAL — idhead + four facts + About, the candidate's `pfSecView.general`
+        shape. The four are the leader's standing (candidate rating, cohorts led,
+        completion, level movement) — the figures that used to sit under "Your
+        standing" on the Public tab; here they are the reader's own dashboard, and
+        the Public card keeps the two a candidate reads (rating and cohorts). */}
   <div class="sec">
     <div class="idhead">
-      <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
+      <span class="idphoto"><span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span><i class="av-on" aria-hidden="true"></i></span>
       <div class="idhead-b">
         <span class="idname">${LEADER.n}</span>
         <span class="idmeta">Volunteer cohort leader &middot; leading since ${LEADER.since}</span>
@@ -532,50 +544,39 @@ V.leadProfile = () => `<main class="main"><div class="page">
       </div>
       <div class="idhead-a"><button class="btn btn-g" data-ldrprof="1">Edit details ${I.edit}</button></div>
     </div>
-    ${''/* THE `.kv` TILE IS GONE (Maryam, 2 Sep 2026 — "remove all the content in
-           the red box on general profile"). Three of its five rows had just
-           moved to the Public tab as listing copy; the two left, Display name
-           and Role, are both said by the `.idhead` directly above — `LEADER.n`
-           is the `.idname` and "Volunteer cohort leader" is the `.idmeta`. A
-           label column restating the two lines above it is a table of the
-           header, which is what made the block worth removing rather than
-           re-pointing. */}
-  </div>` : `
+    <div class="facts pf-facts">
+      ${pfFact(I.star, '--mk-2', 'Candidate rating', '4.9')}
+      ${pfFact(I.group, '--mk-1', 'Cohorts led', '8')}
+      ${pfFact(I.chart, '--mk-3', 'Completion rate', '84%')}
+      ${pfFact(I.growth, '--mk-4', 'Level movement', '+0.8 levels')}
+    </div>
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>About</h2></div>
+    <p class="t-body pfe-about">${LEADER.bio}</p>
+  </div>` : ''}
+
+  ${S.ldrPfTab === 'public' ? `
+  ${''/* PUBLIC — the listing. The identity now has the 72px photo and the STARS
+        AND RATING on their own line under the name (Maryam, 7 Sep 2026), with the
+        cohorts led and range on the helper line below it. `stars()` renders inline
+        in the idmeta the way it does everywhere a rating shows star-first. */}
   <div class="sec tint">
-    ${''/* THE EDIT CONTROL IS ON THIS ROW AND NOWHERE ELSE ON THE TAB. One per
-           tab, at the top, is what General already does with "Edit details" on
-           the identity row — §29.10's rule that an action sits on the thing it
-           acts on. It goes on the CARD rather than on the field list below it,
-           because a reader who wants to change the bio looks at the bio; the
-           fields are the same record and the same sheet, so one control covers
-           both blocks and two would be two doors to one form. */}
     <div class="sec-h"><h2>What candidates see</h2><span class="t-helper-01">Your card in the agent list</span>
       <button class="btn btn-t btn-sm ic-l" data-ldrprof="1">${I.edit}Edit listing</button></div>
     <div class="tile">
       <div class="idhead" style="padding-top:0">
-        <span class="av-ph" style="width:56px;height:56px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
+        <span class="av-ph" style="width:72px;height:72px"><i>${LEADER.i}</i><img src="${LEADER.img}" alt=""></span>
         <div class="idhead-b">
           <span class="idname">${LEADER.n}</span>
-          <span class="idmeta">${stars(4.9)} 4.9 &middot; 8 cohorts led &middot; ${LEADER.range}</span>
+          <span class="idmeta">${stars(4.9)} 4.9</span>
+          <span class="t-helper-01">8 cohorts led &middot; Assesses ${LEADER.range}</span>
         </div>
       </div>
-      <p class="t-helper-01">&ldquo;Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback &mdash; if something is not working I will say so in the first ten minutes.&rdquo;</p>
+      <p class="t-helper-01">&ldquo;${LEADER.bio}&rdquo;</p>
     </div>
     <p class="t-helper-01 mt4">This is your listing as a cohort leader. Interviews and their fees belong to your agent listing and are set there, not here &mdash; leading a cohort is unpaid, and nobody books you from this card.</p>
   </div>
-  ${''/* THE THREE FIELDS THAT MAKE THE CARD, DIRECTLY UNDER IT. They were rows
-         two to four of the identity tile on the old single-column page, where
-         they sat 400px above the card they describe and read as account
-         settings. Here the heading says what they are for and the Edit control
-         is the same sheet the card's bio is written in, so the block a reader
-         is looking at and the control that changes it are one object.
-
-         THE SHEET IS ONE FORM FOR BOTH TABS AND STAYS THAT WAY.
-         `ldrProfileSheet` holds the display name AND the listing fields, so
-         "Edit details" on General and "Edit listing" on Public open the same
-         record — splitting it would be two forms writing one `LEADER`. That is
-         also why this block has no control of its own: the card above it is one
-         press away and does this block's job too. */}
   <div class="sec">
     <div class="sec-h"><h2>Your listing</h2><span class="t-helper-01">What the card above is built from</span></div>
     <div class="tile">
@@ -583,56 +584,54 @@ V.leadProfile = () => `<main class="main"><div class="page">
       <div class="kv"><span class="k">Assessing range</span><span class="v n">${LEADER.range} &middot; set by your certifications</span></div>
       <div class="kv"><span class="k">Call length</span><span class="v n">60 minutes, weekly</span></div>
     </div>
-  </div>
-  <div class="sec">
-    <div class="sec-h"><h2>Your standing</h2><span class="t-helper-01">Read-only &middot; across every cohort you have closed</span></div>
-    <div class="facts">
-      <div><span class="l">Candidate rating</span><span class="v stand-rate">${stars(4.9)}4.9</span></div>
-      <div><span class="l">Cohorts led</span><span class="v">8</span></div>
-      <div><span class="l">Completion rate</span><span class="v">84%</span></div>
-      <div><span class="l">Level movement</span><span class="v">+0.8 levels</span></div>
-    </div>
-    <p class="t-helper-01 mt4">Completion rate is the one of the four you cannot improve by being generous at evaluation &mdash; recommending a promotion somebody is not ready for comes back later as a candidate who does not finish the next 90 days.</p>
-  </div>`}
-  ${''/* THE GENERAL TAB IS THE IDENTITY ROW AND NOTIFICATIONS, AND NOTHING ELSE
-         (Maryam, 2 Sep 2026 — "remove all the content in the red box on general
-         profile of a cohort leader", drawn round everything between the two).
-         Three blocks went, and the arguments are kept because two of them are
-         about the PRODUCT rather than about this page:
+  </div>` : ''}
 
-         WHEN YOU ARE ON — "Your cohort calls" (the three hours, read off
-         `LEAD_COHORTS`) and "Calls already run" with its route to the Calls
-         page. It had already lost its Manage control the same day the
-         reschedule flow went, which left a heading, a helper line and two rows
-         that only READ; the diary itself is a rail slot one click away and
-         states all of it in context. This is the second half of that
-         subtraction rather than a new decision: a fact about your week is a
-         page, not a settings row.
-
-         WHO REVIEWS YOU — four `.kv` rows about the chain above this person.
-         True, and not a thing a leader does anything about from here; it is the
-         kind of policy line `PAGESUM`'s own content bans keep off a page.
-
-         THE `.kv` TILE — see the note in the identity section above; both its
-         surviving rows were the two lines of the header restated as a table.
-
-         `LEAD_RUN` KEEPS ITS ONE READER, `PAGESUM.leadCalls`, which sums seats
-         across it ("across the four behind you, 32 of 36 seats were filled").
-         That was already the only place attendance is stated in the product and
-         it is untouched — nothing here was the last reader of any record, which
-         is what makes this a subtraction and not a deletion.
-
-         YOUR STANDING ALSO STOOD IN THIS RUN and is on the Public tab rather
-         than removed: 4.9 and "8 cohorts led" are printed on the card there, so
-         those four figures are the working behind two numbers a candidate
-         already reads. */}
-  ${S.ldrPfTab === 'general' ? `
+  ${S.ldrPfTab === 'notif' ? `
   <div class="sec">
     <div class="sec-h"><h2>Notifications</h2></div>
     <label class="tg"><div class="tb"><b>A candidate goes quiet</b><span>After four days without a sign-in</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>A cohort call is an hour away</b><span>One reminder, on the day</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Posts on a cohort board</b><span>A daily digest rather than each one</span></div><input type="checkbox" checked><span class="sw"></span></label>
     <label class="tg"><div class="tb"><b>Summary reminders</b><span>A week before a cohort reaches day 90</span></div><input type="checkbox"><span class="sw"></span></label>
+  </div>` : ''}
+
+  ${S.ldrPfTab === 'privacy' ? `
+  <div class="sec">
+    <div class="sec-h"><h2>Sign in and security</h2></div>
+    <div class="tile-stack">
+      <div class="cardrow pfe-row pf-sr">
+        <span class="pf-sr-ic" style="--mk:var(--mk-1)">${I.email}</span>
+        <span class="cardrow-b"><span class="cardrow-t">${LEADER.email}</span>
+          <span class="cardrow-d">The address you sign in with &middot; change it under General Profile</span></span>
+      </div>
+      <div class="cardrow pfe-row pf-sr">
+        <span class="pf-sr-ic" style="--mk:var(--mk-3)">${I.locked}</span>
+        <span class="cardrow-b"><span class="cardrow-t">Password</span>
+          <span class="cardrow-d">Last changed ${PF_PW_SET}</span></span>
+        ${S.pfPw
+          ? `<button class="btn btn-g btn-sm" data-pfpw="0">Cancel ${I.close}</button>`
+          : `<button class="btn btn-g btn-sm" data-pfpw="1">Reset password ${I.renew}</button>`}
+      </div>
+    </div>
+    ${S.pfPw ? `
+    ${pfFields('pw', [
+      ['cur','Current password','x',{t:'pw', ac:'current-password', w:1, ph:'The one you use now'}],
+      ['new','New password','x',{t:'pw', ph:'At least 12 characters'}],
+      ['rep','Repeat new password','x',{t:'pw', ph:'The same again'}]
+    ])}
+    <div class="pfe-foot pfe-foot-in">
+      <button class="btn btn-g" data-pfpw="0">Cancel ${I.close}</button>
+      <button class="btn btn-p noic" data-pfpw="0">Update password ${I.check}</button>
+    </div>` : ''}
+  </div>
+  <div class="sec">
+    <div class="sec-h"><h2>Closing your account</h2></div>
+    <div class="close-b">
+      <p class="t-body close-x">Deleting your account removes your profile, your cohort notes and the record of everything you have led. Certificates you have already earned stay valid and stay downloadable.</p>
+      <div class="close-a">
+        <button class="btn btn-t danger" data-del="1">Delete my account ${I.misuse}</button>
+      </div>
+    </div>
   </div>` : ''}
 </div></main>`;
 

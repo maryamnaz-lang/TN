@@ -151,8 +151,8 @@ let ASK_FRESH = false;
    `notifList` the guard against it. */
 const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
 const SPEECH_OK = !!SPEECH;
-/* the live recogniser, or null. Not in `S`: see the note over `askMic`. */
-let _rec = null;
+/* the live recogniser lives with the recorder now — see `_vrec` over
+   `askRecStart`, which replaced the dictation this const used to hold. */
 
 const AI_RUN = `<span class="ai-run" aria-hidden="true">
     <svg preserveAspectRatio="none">
@@ -227,9 +227,11 @@ function askBar(){
            IT IS NOT A DEAD CONTROL EITHER, which is the other half. §60's rule
            would refuse a decorative mic, so pressing it does the one thing it
            can honestly mean on a collapsed line: it opens the conversation AND
-           starts dictating, in that order. `data-askmicopen` is read before
-           `data-askopen` in the click handler, so the mark is a shortcut into
-           the same surface rather than a second destination.
+           starts recording, in that order (Maryam, 6 Sep 2026: recording is not
+           offered on the floating bar itself — pressing the bar's mic opens the
+           chat and begins the take there, with no second press). `data-askmicopen`
+           is read before `data-askopen` in the click handler, so the mark is a
+           shortcut into the same surface rather than a second destination.
 
            AND IT IS DRAWN ONLY WHERE DICTATION EXISTS — `SPEECH_OK`, the same
            constructor test the chat's field uses. A browser with no Web Speech
@@ -327,11 +329,13 @@ function askView(f){
   const lead = isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL : null;
   const where = (lead ? lead.where[S.askFrom] : ASK_WHERE[S.askFrom]) || 'TalentNext';
   const ctx = (lead ? (lead.ctx[S.askFrom] || lead.ctx.leadDash) : (TALCTX[S.askFrom] || TALCTX.dashboard));
-  const state = lead ? lead.state()
-    : f.complete ? lvlName(f.level)+', cohort complete'
-    : f.enrolled ? lvlName(f.level)+', day '+f.day+' of 90'
-    : f.pred ? f.track+' track, level not set yet'
-    : lvlName(f.level)+' confirmed, not enrolled';
+  /* THE STATUS LINE IS GONE FROM THE HEADER — Maryam, 4 Sep 2026: "remove the
+     right side text on the tal top header … do not show this in any portal."
+     It read `Explorer track, level not set yet` / `Explorer – E3, day 34 of
+     90` / the leader's `LEAD_TAL.state()`, and every one of those is the
+     band's fact row said again on a screen whose header is Tal's name. The
+     four-way branch that composed it is deleted with the `.ask-top-s` span
+     and §21's rule for it; `LEAD_TAL.state` keeps its other readers. */
 
   /* THE EMPTY STATE IS THE PANEL'S EMPTY STATE
      Tal used to speak first here, in a bubble: "you are on dashboard, I can
@@ -386,7 +390,7 @@ function askView(f){
     + ` loop muted playsinline preload="auto" aria-hidden="true"></video>`;
   const hero = `<div class="tal-hero">
       <span class="tal-mk lg orb tnlogo">${blob}${TN_CHEVRONS}</span>
-      <h2>Hey, ${isLead()?'Priya':'Maryam'}!<br><span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
+      <h2>Hey, ${isLead()?'Priya':'Maryam'}! <span class="askv-q">${isLead()?'What do you need?':'What&rsquo;s going on?'}</span></h2>
       <p>${isLead()?'I can read your cohorts, your evaluations and where people are stuck.':'I am here to assist you with anything you need help with.'}</p>
     </div>`;
   const thread = (opened ? '' : hero)
@@ -400,8 +404,8 @@ function askView(f){
      which page you came from the moment you leave. A screen reader cannot, so
      the sentence stays where it was already being said.
 
-     `.ask-top-s` stays on the right. The file puts a second arrow-right there
-     with nowhere to go; §51.2 has the argument.
+     `.ask-top-s` used to stay on the right (§51.2 argued it against the
+     file's second arrow); it is gone since 4 Sep 2026 — see `state`'s note.
 
      THE BACK ARROW IS MUI's `arrow_back`, NOT THE FILE'S MIRRORED LINE ARROW.
      §51.2 built it by taking the file's `arrow-right` and flipping it with
@@ -419,7 +423,6 @@ function askView(f){
         <span class="tal-mk"></span>
         <span class="ask-top-t">Tal</span>
       </span>
-      <span class="ask-top-s">${state}</span>
     </div>
     <div class="ask-thread" id="askThread">${thread}</div>
     <div class="ask-foot">
@@ -435,13 +438,16 @@ function askView(f){
                somewhere to go. `SPEECH_OK` is the constructor test, so in a
                browser with no Web Speech API the field is exactly what it was.
 
-               IT IS DICTATION, NOT A RECORDING. `.composer`'s mic in Messages
-               is "record a voice message" and sends audio; this one writes into
-               the field you are already typing in, which is why it sits beside
-               the send rather than at the far end with the clip. */}
+               IT IS A VOICE MESSAGE, NOT DICTATION (Maryam, 6 Sep 2026). It
+               used to write the Web Speech transcript straight into this input;
+               pressing it now turns the whole field into the §121 recorder —
+               `askRecStart` adds `.rec` and the `.askrec` row. It still sits
+               beside the send because it is the field's own control, and it is
+               still drawn only where the recogniser exists (`SPEECH_OK`), so a
+               browser with no Web Speech keeps the field it always had. */}
         ${SPEECH_OK ? `<button class="askfield-mic" data-askmic="1"
-          aria-label="Dictate your question" aria-pressed="false"
-          title="Dictate your question">${I.microphone}</button>` : ''}
+          aria-label="Record a voice message"
+          title="Record a voice message">${I.microphone}</button>` : ''}
         ${''/* THE SEND IS OFF UNTIL THERE IS SOMETHING TO SEND (Maryam, 2 Sep
                2026: "keep the send arrow circle little disable until nothing has
                been written or no voice has been recorded yet"). It is the real
@@ -641,17 +647,24 @@ const reduce = () => window.matchMedia
    And it does not focus the field when it was handed a question: the caret
    belongs where your attention is, and your attention is on the answer
    arriving, not on typing the next thing. */
-function askOpen(q){
-  if(S.askOpen){ if(q) ask(q); return; }
+/* `then` RUNS ONCE THE ASK PAGE EXISTS, and it is what the dock's mic needs.
+   `askOpen` may render immediately (reduced motion, or already on the ask page)
+   or after the 170ms page-out, so a caller that wants to touch the built field
+   — the floating bar starting a recording the moment the chat opens — cannot
+   just call the next line itself. It hands the work here, and `go2` runs it
+   after `render()` has built the field, in both timing branches. */
+function askOpen(q, then){
+  if(S.askOpen){ if(q) ask(q); if(then) then(); return; }
   const go2 = () => {
     S.askFrom = S.view;
     S.askOpen = true;
     ASK_FRESH = true;
     S.nav = false; S.notif = false; S.acct = false; S.tal = false;
     render();
-    if(q) return ask(q);
+    if(q){ ask(q); if(then) then(); return; }
     const el = device.querySelector('#askIn');
     if(el) el.focus();
+    if(then) then();
   };
   const pg = device.querySelector('.view-col .page');
   if(!pg || reduce()) return go2();
@@ -680,42 +693,37 @@ function askClose(){
 device.addEventListener('click', e => {
   /* BEFORE `data-askopen`, AND IT HAS TO BE: the dock's mic is a `<span>` INSIDE
      the row's own button, so both attributes match the same press and the
-     handler that runs is whichever is tested first. It opens the conversation
-     and then dictates into it — `askOpen` renders, so the mic has to be armed
-     after that paint or it would be reaching for a field that does not exist
-     yet. One frame is enough and `setTimeout(…, 0)` is the whole of it; there is
-     no rAF here for trap 17's reason. */
-  if(e.target.closest('[data-askmicopen]')){ askOpen(); setTimeout(askMic, 0); return; }
+     handler that runs is whichever is tested first. Recording is NOT offered on
+     the floating bar (Maryam, 6 Sep 2026); pressing its mic opens the chat and
+     starts the take there, once the ask page exists. `then` is the whole of
+     that timing — `askOpen` may render now or after the 170ms page-out, and
+     `askRecStart` needs the built field either way. */
+  if(e.target.closest('[data-askmicopen]')){ askOpen(undefined, askRecStart); return; }
   if(e.target.closest('[data-askopen]')){ askOpen(); return; }
   if(e.target.closest('[data-askback]')){ askClose(); return; }
-  /* DICTATION, AND IT IS REAL (Maryam, 2 Sep 2026: "this voice icon should be
-     functional"). The Web Speech API writes into the field the reader is
-     already typing in; there is no fake waveform and no timer pretending to
-     listen, because the one thing a voice control must not do is look like it
-     heard you when it did not.
+  /* THE VOICE MESSAGE, AND IT IS REAL (Maryam, 6 Sep 2026: the field should
+     become the recorder in the reference, stop should hand the words back to
+     edit, and send should post the take straight away). Pressing the field's
+     mic opens the §121 recorder in place; the three controls it draws are the
+     three exits.
 
-     NOTHING ABOUT IT IS IN `S` AND THAT IS DELIBERATE — §65's split, stated
-     there in as many words: "the class goes on the element for THIS
-     interaction". `placeAsk` rebuilds the whole `.ask-page` from `S.thread` on
-     every render, and ai4's own trap is that a render destroys the `<input>`
-     and takes the caret with it — so a dictation that survived a render would
-     be writing into an element that no longer exists. The recogniser is closed
-     over instead, the button's `.on` and `aria-pressed` are written in place
-     (`joinArm`'s pattern), and a render simply ends the session.
+     NOTHING ABOUT IT IS IN `S` AND THAT IS DELIBERATE — §65's split. But note
+     the recorder is only ever open while the reader is holding it, and nothing
+     re-renders in that window (no `ask()` runs until they send), so the
+     `.askrec` row survives on the same `.askfield` node the whole take. The
+     recogniser is closed over in `_vrec`, exactly as the dictation it replaces
+     was, and every exit stops it.
 
-     `onresult` APPENDS RATHER THAN REPLACES, so speaking after typing adds to
-     what is there — the field is one sentence being composed, not two. And
-     `interimResults` is on: the words appear as they are recognised, which is
-     the only feedback that distinguishes "listening" from "stuck".
-
-     EVERY EXIT CLEARS THE STATE, which is three of them: `onend` (the reader
-     stopped talking), `onerror` (no permission, no network, no microphone) and
-     a second press. A listening state with no way out of it is the failure this
-     control has most of, and `onerror` is the common one — the built file is
-     usually read from `file://`, which is not a secure context, so the API
-     starts and immediately reports `not-allowed`. That is the honest behaviour:
-     the button lights, fails, and goes out. */
-  if(e.target.closest('[data-askmic]')){ askMic(); return; }
+     THE TRANSCRIPT IS THE HONEST HALF. The waveform is synthetic (§121 says so
+     by moving rather than claiming an amplitude it cannot read from `file://`),
+     but the words are the real recogniser's — captured when the browser has one
+     and simply empty when it does not, the same failure mode dictation had: on
+     `file://` the API reports `not-allowed`, the take yields no words, and stop
+     lands an empty field rather than a made-up sentence. */
+  if(e.target.closest('[data-askmic]')){ askRecStart(); return; }
+  if(e.target.closest('[data-askreccancel]')){ askRecCancel(); return; }
+  if(e.target.closest('[data-askrecstop]')){ askRecToField(); return; }
+  if(e.target.closest('[data-askrecsend]')){ askRecSend(); return; }
   if(e.target.closest('[data-asksend]')){
     const el = device.querySelector('#askIn');
     const v = el && el.value.trim();
@@ -735,42 +743,249 @@ function askSendArm(){
 }
 device.addEventListener('input', e => { if(e.target.id === 'askIn') askSendArm(); });
 
-function askMicOff(){
-  const b = device.querySelector('[data-askmic]');
-  if(b){ b.classList.remove('on'); b.setAttribute('aria-pressed', 'false'); }
-  _rec = null;
+/* ==========================================================================
+   THE VOICE MESSAGE RECORDER (§121) — built to Maryam's ChatGPT recording,
+   6 Sep 2026.
+
+   The field's mic opens this in place: `.askfield` takes `.rec`, one `.askrec`
+   row is appended. Two real things run behind it, and both are the point:
+
+     the waveform is the LIVE MICROPHONE. `getUserMedia` + a Web Audio
+       `AnalyserNode` give an amplitude every ~55ms; the bars are that reading,
+       newest flush right, the quiet past trailing left as dots — the reference,
+       not the flat tally marks the first cut drew.
+     the transcript is the REAL recogniser. Web Speech runs continuous, and
+       `_vtxt` is the whole take. Stop transcribes it into the field to edit;
+       send transcribes and posts it. Between the press and the words there is a
+       `.rectx` "Transcribing…" beat, the reference's own.
+
+   WHY IT CAN FAIL, AND WHY THAT IS A STATE AND NOT A NO-OP. Both halves need
+   the mic, and the mic needs a secure, permitted origin. Served over http/https
+   (localhost or the deployed portal) they work; opened from `file://` the
+   browser blocks them. The first cut answered that by doing nothing — you
+   pressed stop and the field stayed empty — which read as broken. So a take
+   that reaches the mic but comes back with no words, or a mic that never opens,
+   lands in `.recerr` with a note that says what happened and how to fix it, and
+   only the cancel disc stays. The control always says something true.
+
+   NOTHING IS IN `S`: the recorder lives entirely between one press and the next
+   and no `ask()` runs inside that window, so the `.askrec` row survives on the
+   same node the whole take. The stream, analyser, tick and recogniser are all
+   closed over here and every exit tears them down.
+   ========================================================================== */
+let _vrec = null;        /* the live recogniser, or null */
+let _vtxt = '';          /* the transcript so far */
+let _vstream = null;     /* the getUserMedia stream feeding the waveform */
+let _vac = null;         /* the AudioContext, closed on teardown */
+let _vanal = null;       /* the AnalyserNode read each tick */
+let _vtick = null;       /* the waveform setTimeout handle */
+let _vbars = [];         /* the bar elements, left → right */
+let _vsamples = [];      /* amplitudes, oldest → newest, capped at _vbars.length */
+let _vactive = false;    /* true while a take is open (for the recogniser restart) */
+let _vpending = null;    /* 'field' | 'send' — what to do when the take finalises */
+let _vfatal = false;     /* the recogniser hit a permission/network wall — do not restart it */
+let _vsyn = null;        /* the smoothed value the synthetic meter walks when there is no mic */
+
+/* the ask page's field, or null off it */
+const askField = () => device.querySelector('.ask-page .askfield');
+
+/* one of Tal's own suggested questions, to stand in when a take comes back with
+   no words (Maryam, 6 Sep 2026) — the same chips the ask page offers above the
+   field, so the demo always lands a real, in-context, sendable message rather
+   than a dead end. `askCtx` is this file's own per-view suggestion set. */
+function askRecFallback(){
+  const list = askCtx(S.askFrom || S.view) || [];
+  return list.length ? list[Math.floor(Math.random() * list.length)] : '';
 }
-function askMic(){
-  if(!SPEECH_OK) return;
-  if(_rec){ try{ _rec.stop(); }catch(err){} askMicOff(); return; }
-  const b = device.querySelector('[data-askmic]');
+
+/* stop the microphone, the meter and the recogniser — everything but the DOM */
+function askRecTeardown(){
+  _vactive = false;
+  if(_vtick){ clearTimeout(_vtick); _vtick = null; }
+  if(_vrec){ try{ _vrec.stop(); }catch(err){} _vrec = null; }
+  if(_vstream){ try{ _vstream.getTracks().forEach(t => t.stop()); }catch(err){} _vstream = null; }
+  if(_vac){ try{ _vac.close(); }catch(err){} _vac = null; }
+  _vanal = null; _vsamples = []; _vbars = [];
+}
+
+/* take the recorder skin off the field and drop the row */
+function askRecClear(){
+  askRecTeardown();
+  _vtxt = ''; _vpending = null;
+  const fld = askField();
+  if(!fld) return;
+  fld.classList.remove('rec', 'rectx', 'recerr');
+  const row = fld.querySelector('.askrec');
+  if(row) row.remove();
+}
+
+/* the meter loop — one amplitude per tick, pushed on the right; `setTimeout`
+   not rAF, because a backgrounded tab freezes rAF (trap 17) and a recorder that
+   stops painting reads as a hang. It reads the REAL amplitude when the mic gave
+   us an analyser, and walks a smoothed random value when it did not (the mic was
+   denied) so the row still reads as alive — the take's honesty is the transcript
+   underneath, not the bars. */
+function askRecTick(){
+  if(!_vbars.length){ return; }
+  let amp;
+  if(_vanal){
+    const buf = new Uint8Array(_vanal.fftSize);
+    _vanal.getByteTimeDomainData(buf);
+    let sum = 0;
+    for(let i = 0; i < buf.length; i++){ const v = (buf[i] - 128) / 128; sum += v * v; }
+    amp = Math.min(1, Math.sqrt(sum / buf.length) * 3.4);
+  }else{
+    _vsyn = (_vsyn == null ? 0.4 : _vsyn) * 0.7 + (0.15 + Math.random() * 0.7) * 0.3;
+    amp = _vsyn;
+  }
+  _vsamples.push(amp);
+  if(_vsamples.length > _vbars.length) _vsamples.shift();
+  const off = _vbars.length - _vsamples.length;
+  for(let i = 0; i < _vbars.length; i++){
+    const s = i >= off ? _vsamples[i - off] : 0;
+    _vbars[i].style.height = (3 + s * 33).toFixed(1) + 'px';   /* 3px dot → 36px peak in a 40px row */
+  }
+  _vtick = setTimeout(askRecTick, 55);
+}
+
+/* swap the waveform for a note, in one of the two off-states */
+function askRecNote(state, msg){
+  const fld = askField();
+  if(!fld) return;
+  fld.classList.remove('rectx', 'recerr');
+  fld.classList.add(state);
+  const n = fld.querySelector('.askrec-note');
+  if(n) n.textContent = msg;
+}
+
+async function askRecStart(){
+  const fld = askField();
+  if(!fld || fld.classList.contains('rec')) return;
+  askRecClear();
+  _vtxt = ''; _vpending = null; _vactive = true; _vfatal = false; _vsyn = null;
+  const row = document.createElement('div');
+  row.className = 'askrec';
+  row.setAttribute('role', 'group');
+  row.setAttribute('aria-label', 'Recording a voice message');
+  row.innerHTML =
+    `<button class="askrec-x" data-askreccancel="1" aria-label="Cancel recording">${I.close}</button>`
+    + `<div class="askrec-body">`
+    +   `<div class="askrec-wave" aria-hidden="true"></div>`
+    +   `<span class="askrec-note t-caption"></span>`
+    + `</div>`
+    + `<button class="askrec-stop" data-askrecstop="1" aria-label="Stop and edit"><span class="askrec-sq"></span></button>`
+    + `<button class="askrec-send" data-askrecsend="1" aria-label="Send voice message">${I.arrowUp}</button>`;
+  fld.classList.add('rec');
+  fld.appendChild(row);
+
+  /* THE MICROPHONE. `getUserMedia` resolves on a secure, permitted origin and
+     rejects on `file://` or a denied prompt. Its stream drives the REAL meter;
+     a rejection is not a dead end — the recorder still opens and the meter runs
+     synthetically, because the take's honest half is the transcript, not the
+     bars, and the fallback question covers the case where that comes back empty. */
+  try{
+    _vstream = await navigator.mediaDevices.getUserMedia({audio:true});
+  }catch(err){
+    _vstream = null;
+  }
+  /* the reader may have cancelled during the permission prompt */
+  const fld2 = askField();
+  if(!fld2 || !fld2.classList.contains('rec')){ askRecTeardown(); return; }
+
+  /* build exactly the bars that fill the measured wave, then run the meter —
+     real amplitude if the mic opened, a smoothed random walk if it did not */
+  const wave = fld2.querySelector('.askrec-wave');
+  const w = wave ? wave.offsetWidth : 0;
+  const n = Math.max(8, Math.floor((w || 240) / 6));   /* 3px bar + 3px gap = 6px pitch */
+  wave.innerHTML = Array.from({length:n}, () => '<i></i>').join('');
+  _vbars = [...wave.querySelectorAll('i')];
+  _vsamples = [];
+  if(_vstream){
+    try{
+      _vac = new (window.AudioContext || window.webkitAudioContext)();
+      const src = _vac.createMediaStreamSource(_vstream);
+      _vanal = _vac.createAnalyser();
+      _vanal.fftSize = 512;
+      src.connect(_vanal);
+    }catch(err){ _vanal = null; }
+  }
+  askRecTick();
+
+  /* THE TRANSCRIPT. Runs alongside the meter; `onresult` rebuilds the whole
+     take each event so `_vtxt` is always current. It restarts itself if the
+     service ends the session early while the take is still open. */
+  /* the constructor is read HERE, not closed over from load — so a browser that
+     gains the API after boot is picked up, and the recorder has one honest
+     source of truth for "can I transcribe". `SPEECH_OK` still gates whether the
+     mic is drawn at all. */
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(SR){
+    const r = new SR();
+    r.lang = 'en-US';
+    r.interimResults = true;
+    r.continuous = true;
+    r.onresult = ev => {
+      let full = '';
+      for(let i = 0; i < ev.results.length; i++) full += ev.results[i][0].transcript;
+      _vtxt = full.trim();
+    };
+    /* a permission/network wall is fatal — restarting it just spins error→end
+       forever (which is exactly what `file://` and a blocked pane do). Mark it
+       so `onend` stops, and let the note on finalise carry the failure. */
+    r.onerror = ev => {
+      if(/not-allowed|service-not-allowed|audio-capture|network/.test(ev.error || '')) _vfatal = true;
+    };
+    r.onend = () => {
+      if(_vpending){ const m = _vpending; _vpending = null; _vrec = null; askRecDeliver(m); return; }
+      if(_vactive && !_vfatal){ try{ r.start(); }catch(err){ _vrec = null; } }
+      else _vrec = null;
+    };
+    try{ r.start(); _vrec = r; }catch(err){ _vrec = null; }
+  }
+}
+
+/* land the take, once the recogniser has given up its last words */
+function askRecDeliver(mode){
+  /* the reader's own words where the mic and speech service were reachable; one
+     of Tal's suggested questions standing in where they were not, so the take
+     always becomes a real message rather than an empty field */
+  const txt = (_vtxt || '').trim() || askRecFallback();
+  if(!txt){ askRecClear(); return; }   /* nothing, and no suggestion to stand in — just close */
+  if(mode === 'send'){ askRecClear(); ask(txt); return; }
+  /* 'field' — drop the message in to edit, arm the send, leave the caret there */
+  askRecClear();
   const el = device.querySelector('#askIn');
-  if(!b || !el) return;
-  const r = new SPEECH();
-  r.lang = 'en-US';
-  r.interimResults = true;
-  r.continuous = false;
-  /* THE BASE IS READ ONCE, AT THE START. `onresult` hands back the whole
-     session's transcript every time, so appending the latest result to the
-     field's CURRENT value would repeat the sentence on each interim event. */
-  const base = el.value ? el.value.replace(/\s+$/, '') + ' ' : '';
-  r.onresult = ev => {
-    let said = '';
-    for(let i = 0; i < ev.results.length; i++) said += ev.results[i][0].transcript;
-    el.value = base + said.trim();
-    /* PROGRAMMATIC WRITES FIRE NO `input` EVENT, so the send has to be armed by
-       hand here — this is the "no voice has been recorded yet" half of the ask,
-       and without it dictating a whole question would leave the control off. */
-    askSendArm();
-  };
-  r.onerror = askMicOff;
-  r.onend = askMicOff;
-  try{ r.start(); }catch(err){ askMicOff(); return; }
-  _rec = r;
-  b.classList.add('on');
-  b.setAttribute('aria-pressed', 'true');
-  el.focus();
+  if(el){ el.value = txt; askSendArm(); el.focus(); }
 }
+
+/* stop the meter and show the transcribing beat, then wait for the recogniser's
+   `onend` (or deliver now if it has already stopped) */
+function askRecFinish(mode){
+  const fld = askField();
+  if(!fld || !fld.classList.contains('rec')) return;
+  if(fld.classList.contains('recerr') || fld.classList.contains('rectx')) return;
+  _vactive = false;
+  if(_vtick){ clearTimeout(_vtick); _vtick = null; }
+  if(_vstream){ try{ _vstream.getTracks().forEach(t => t.stop()); }catch(err){} _vstream = null; }
+  askRecNote('rectx', 'Transcribing…');
+  if(_vrec){
+    _vpending = mode;
+    try{ _vrec.stop(); }
+    catch(err){ _vpending = null; _vrec = null; setTimeout(() => askRecDeliver(mode), 450); }
+  }else{
+    /* no live recogniser to wait on (the browser has none, or it already hit a
+       wall) — hold the transcribing beat briefly so the fallback does not snap
+       in, then land the message */
+    setTimeout(() => askRecDeliver(mode), 450);
+  }
+}
+
+/* THE X — throw the take away and return to the empty field */
+function askRecCancel(){ askRecClear(); }
+/* THE STOP SQUARE — transcribe into the input to edit and send when ready */
+function askRecToField(){ askRecFinish('field'); }
+/* THE SEND ARROW — transcribe and post the take straight to Tal */
+function askRecSend(){ askRecFinish('send'); }
 
 device.addEventListener('keydown', e => {
   if(e.target.id === 'askIn' && e.key === 'Enter'){

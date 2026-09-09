@@ -176,10 +176,19 @@
    the same mistake, so the selector excludes the variant rather than relying
    on a later rule to undo it. */
 .app :is(.tal-msg > .bb, .ob-m-t) .tw-btn{border-color:var(--rule-on-2)}
+/* THE PRIMARY IS THE ONBOARDING PILL, IN ACCENT — Maryam, 8 Sep 2026: "the
+   Find an Agent button is the one to follow in the chat too, but in accent
+   colour." §107's `.ob-opt-go` is a 999px pill at `9px var(--s05)`, filled —
+   the same object in `--accent` rather than `--gray-100`. So Tal's action
+   button stops being the sharp red rectangle and takes that shape and padding;
+   the fill was already the accent. The trailing arrow came off `twBtn`
+   (views.js) at the same time — the reference pill carries none. */
 .app :is(.tal-msg > .bb, .ob-m-t) .tw-btn:not(.ghost){
   background-color:var(--accent);
   border-color:var(--accent);
   color:var(--on-accent);
+  border-radius:999px;
+  padding:9px var(--s05);
   --on-brand-fill:1}
 .app :is(.tal-msg > .bb, .ob-m-t) .tw-btn:not(.ghost) svg{fill:currentColor}
 .app :is(.tal-msg > .bb, .ob-m-t) .tw-btn.ghost{

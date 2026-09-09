@@ -321,7 +321,27 @@
     grid-template-columns:
       auto minmax(0,auto) auto auto auto var(--agt-act-w);
     column-gap:var(--s06);
-    justify-content:space-between}
+    /* `stretch`, NOT `space-between` — 4 Sep 2026 (Maryam: "the table
+       component needs to give equal spacing in between all columns and the
+       column header should be left align with their column items"). The
+       argument above for `space-between` is right about what it MEANS and wrong
+       about what Chrome DRAWS through a subgrid: measured at 1728, the head's
+       cells sat on the distributed lines (gaps 53 / 53 / 54 / 53 / 53) and every
+       body row's cells did not — 212 / 337 / 64 / 87 / 26 / 200 against
+       232 / 379 / 105 / 128 / 67 / 221, the label 21px right of its column.
+       Two causes, one per property. §114.75's phone-tier `gap:var(--s04)` was
+       still on the row at desktop, and a subgrid's own gap OVERRIDES the
+       parent's gutter — so each row cell grew into the parent's 24px gutters by
+       half the 12px difference per side (+6 at the ends, +12 in the middle),
+       exactly the pattern measured. And the parent's `justify-content` moves
+       the parent's LINES, which Chrome does not carry into the subgridded rows
+       the way it does the auto-placed head. `stretch` puts the same leftover
+       INTO the auto tracks instead, and a track is a track for head and rows
+       alike: measured after, head and every row at 32 / 295 / 690 / 800 /
+       944 / 1024 to the pixel. Every column's share is equal, the labels start
+       where their cells start, and the gap between columns is the same 24 plus
+       an equal share at every seam. */
+    justify-content:stretch}
   /* EVERY ROW SPANS THE WHOLE GRID AND TAKES ITS TRACKS FROM IT. `grid-column:
      1 / -1` is what puts the row on all six columns; `grid-template-columns:
      subgrid` is what makes its own children land on the PARENT's lines rather
@@ -331,6 +351,10 @@
     grid-column:1 / -1;
     display:grid;
     grid-template-columns:subgrid;
+    /* the row's gap is the PARENT's at this width — §114.75's `--s04` is the
+       stacked card's, and left in place it overrides the inherited gutter (see
+       the note on `justify-content` above for the measurement) */
+    column-gap:var(--s06);
     align-items:center}
   .app .agt-who{grid-column:1;grid-row:auto}
   .app .agt-tags{grid-column:2;grid-row:auto}

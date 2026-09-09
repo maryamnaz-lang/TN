@@ -26,7 +26,7 @@
   --brand-primary-hover:#262625;
   --brand-primary-active:#393938;
   --on-brand:#ffffff;
-  --brand-tint:#f7f7f7;
+  --brand-tint:#fcfcfc;
   /* THE ACCENT AT ~26%, RE-DERIVED TWICE (4 Sep 2026). #fcdbc7 was #f57414 at
      25.9% over white; #ffd4d0 was that same 25.9% of #ff584a; this is it of
      #ff3733. One derivation, applied again — which is the point of writing the
@@ -35,7 +35,7 @@
      calls itself "the accent at 8%" and was measured at 20%, so re-deriving from
      the comment rather than from the value would have made every chip ground in
      the product two thirds paler in a change nobody asked for. */
-  --brand-tint-2:#ffccca;
+  --brand-tint-2:#f0cece;
 
   /* --- palette.secondary (the accent) ---
      #ab4fc1 is 4.06:1 on bone: fills only, never text.
@@ -142,8 +142,8 @@
      describes. Not assumed, because the two-stop haze was asked for by
      name on 4 Sep and has not been retracted.
      ================================================================ */
-  --accent:#ff3733;
-  --accent-2:#ee0500;
+  --accent:#bd2a2a;
+  --accent-2:#9e2020;
   --accent-grad:linear-gradient(90deg,
     var(--accent) 0%, var(--accent) 100%);
   /* THE STATES ARE GRADIENTS TOO. There is no solid secondary colour in this
@@ -159,8 +159,8 @@
     var(--accent-hover) 0%, var(--accent-hover) 100%);
   --accent-grad-active:linear-gradient(90deg,
     var(--accent-text) 0%, var(--accent-text) 100%);
-  --accent-text:#c51c18;
-  --accent-hover:#ab1815;
+  --accent-text:#a52323;
+  --accent-hover:#a01f1f;
   --on-accent:#ffffff;
 
   /* --- palette.auth — the sign-up card, from the Figma file (255:7673 and
@@ -186,10 +186,10 @@
      first. `-1` and `-2` are the accent pair; `-3` and the ink keep their own
      contrast targets in the new hue (5.26 → 5.21, 6.12 → 5.88), so the
      paragraph above still describes what these values do. */
-  --auth-o-1:#ff3733;
-  --auth-o-2:#ee0500;
-  --auth-o-3:#d51e1a;
-  --auth-o-ink:#c61c18;
+  --auth-o-1:#bd2a2a;
+  --auth-o-2:#9e2020;
+  --auth-o-3:#c02c2c;
+  --auth-o-ink:#a52323;
   --auth-card-bg:#ffffff;
   --auth-shadow:rgba(149,149,149,.1);
   --auth-rule:rgba(17,17,17,.1);
@@ -295,7 +295,7 @@
      `--rule` draws in 253 others. It held #dcdad3 against `--rule`'s #d7d5cd:
      one step apart, indistinguishable in place, and enough to make "change the
      hairline" a two-value edit that could half-land. Pointed at the token
-     (Maryam, 3 Sep 2026, #e9e9e9), so there is one hairline in the product.
+     (Maryam, 3 Sep 2026, #e9e9e9; relit to #efefef 7 Sep 2026), so there is one hairline in the product.
 
      THE OTHER TWO KEEP THEIR VALUES AND THAT IS THE LINE. `-02` and
      `-strong-01` are not separators, they are the EDGE OF A CONTROL — the
@@ -311,7 +311,7 @@
   --gray-90:#262625;  --gray-100:#111111;
 
   --text-primary:#111111;
-  --text-secondary:#525250;
+  --text-secondary:#828282;
   --text-helper:#666563;
   --text-placeholder:#a9a8a5;
   --text-disabled:#a9a8a5;
@@ -359,6 +359,29 @@
   --support-info:#111111;     --support-info-bg:#f7f7f7;
   --support-info-ic:#0371a4;
   --support-orange-bg:#ffd9be;
+
+  /* CALENDAR BOOKING FILLS — a SET keyed to interview TYPE, not to the accent
+     (Maryam, 6 Sep 2026, of the agent portal's Availability calendar: "for
+     interview booking blocks use CCE7CB, for re-interview booking blocks use
+     E0C0FF"). §41 filled exactly one block — the next call, in the accent —
+     and hatched the rest; the reference she gave colours every booking by what
+     it is, so these two are the fills and §41 reads them by a kind class. They
+     are a state SET like the journey's green/orange/grey and the rating star:
+     they do NOT track the rebrand, because the whole point is that a first
+     interview and a re-interview are told apart at a glance regardless of the
+     brand red. `--cal-iv` is the same value as `--ai-line-2` and is a SEPARATE
+     token on purpose — one meaning per token, so Tal's dock line and a calendar
+     booking can never be moved by one edit meant for the other. Both are light
+     enough to carry `--text-primary` well past AA; §41 derives the darker left
+     edge from each by a `color-mix` toward black rather than a fifth hex. */
+  --cal-iv:#cce7cb;
+  --cal-reiv:#e0c0ff;
+  /* the OPEN slot's fill (Maryam, 6 Sep 2026: "the open slots blocks should also
+     be like the other slots with E9DEDC color"). A warm neutral, so booked and
+     open read as one family of solid blocks told apart by hue — the type greens
+     and violet against this grey. Third of the calendar SET, same rules: it is
+     not the accent and does not track the rebrand. */
+  --cal-open:#e9dedc;
 
   /* --- data viz — a green ramp, monotonic in L*.
      It is deliberately NOT drawn out of the accent. Purple is the product's
@@ -461,7 +484,7 @@
   --pure-white:#ffffff;
   /* the accent's own drop shadow, in the new hue — §67's value, which is
      `--accent-hover` (#9d2f25) at the same .18 the orange used */
-  --accent-shadow:rgba(171,24,21,.18);
+  --accent-shadow:rgba(160,31,31,.18);
   --thumb-scrim:rgba(0,0,0,.7);
 
   /* --- prototype chrome, not the product --- */
@@ -672,10 +695,10 @@ body{background:var(--surround);color:var(--text-primary);
 .sn-item{
   display:flex;align-items:center;gap:var(--s05);
   width:100%;min-height:48px;padding:0 var(--s05);
-  position:relative;color:var(--text-primary);
+  position:relative;color:#828282;
   font-size:14px;font-weight:400;letter-spacing:.1px;
   transition:background var(--dur-short) var(--ease-standard)}
-.sn-item svg{width:22px;height:22px;fill:var(--icon-secondary);flex:none;
+.sn-item svg{width:22px;height:22px;fill:#828282;flex:none;
   transition:fill var(--dur-short) var(--ease-standard)}
 .sn-item:hover{background:var(--overlay-hover)}
 .sn-item:active{background:var(--overlay-pressed)}

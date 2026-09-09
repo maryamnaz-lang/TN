@@ -75,4 +75,22 @@
   width:auto;height:auto;
   border:0;border-radius:0;
   background:transparent;background-image:none}
-.app .askdock .askline-mic + .askline-send{margin-left:calc(var(--s05) - 20px)}
+.app .askdock .askline-mic + .askline-send{margin-left:calc(var(--s05) - var(--s05))}
+
+/* ------------------------------------------------------------------ 117.2 ---
+   THE THREE THINGS ON THE LINE SIT 16 APART — Maryam, 4 Sep 2026, with the
+   dock attached: "reduce the gap between all three things a little bit."
+
+   §70.1553 set the row at 581:6588's own numbers — `gap:20px`, the mark pulled
+   back 8 and the prompt pushed 12 — which read as 24 from the mark to "Ask Tal
+   anything" and 20 from that to the example question. One step down on the
+   scale is `--s05`: the row's gap goes 20 → 16 and the mark's pull-back becomes
+   the difference (-12) so the mark-to-prompt distance is the same 16 rather
+   than 20. Two measures, one value, and it is the same 16 the two glyphs at the
+   far end already keep (§117 above) — so the whole line is on one step.
+
+   THE PAIR'S MARGIN ABOVE FOLLOWS: it was `--s05 - 20px` because the row paid
+   20; with the row at `--s05` the difference is zero, written as the
+   subtraction so the arithmetic stays visible if either side moves again. */
+.app .askdock > .askline{gap:var(--s05)}
+.app .askdock .askline-mark{margin-right:-12px}

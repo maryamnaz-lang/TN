@@ -18,26 +18,25 @@
    a grid that silently omits two days cannot answer that. They are drawn quiet
    (`.cal-we`), not absent.
 
-   THREE STATES, AND ONLY ONE OF THEM IS FILLED
-   The old chip used `.slot.sel` for a taken slot, which is a solid black fill —
-   `.sel` means "this is the one you picked" in the picker it came from, and
-   borrowed here it made a booking look like a selection, in the loudest ink on
-   the page. Worse, on this page it was drawn in the accent, so two slots taken
-   out of eight made the calendar read as mostly orange.
+   THE STATES, AND WHAT EACH ONE'S FILL SAYS
+   This was "three states and only one filled" until 6 Sep 2026, when the fill
+   stopped being emphasis and became a CATEGORY — see §41.3's note for the full
+   turn and the reference behind it. The short version:
 
      open        a plain bordered block. The default, and the most common, so it
                  is the one that gets no decoration at all.
-     taken       DIAGONAL HATCH in the accent at low opacity. A fill says "this
-                 is the important one"; a hatch says "this is spoken for", which
-                 is what the mark means in every printed timetable and Gantt
-                 chart there has ever been. It reads as texture at a glance and
-                 resolves into a booking when you look at it, which is the right
-                 order for something you cannot act on.
-     next        the ONE upcoming call takes the accent gradient — the same
-                 `--accent-grad` the primary button carries, and the only fill on
-                 the grid. There is exactly one of these by definition, so the
-                 gradient marks a singular thing rather than a category, and it
-                 carries the one action a calendar can offer: Join.
+     taken       A SOLID FILL COLOURED BY THE INTERVIEW'S TYPE — `--cal-iv`
+                 (green) for a first interview, `--cal-reiv` (violet) for a
+                 re-interview — with a darker left edge of the same hue. The
+                 colour is the category, so many blocks being filled is the
+                 point: the month's shape (which days hold what) is legible at a
+                 glance. This replaced a diagonal accent hatch, whose argument
+                 (a hatch for "spoken for", one fill for "the important one") the
+                 §41.3 note keeps now that it is overruled.
+     next        the ONE upcoming call keeps its TYPE fill like any booking and
+                 marks itself the actionable one with the Join chip and a small
+                 lift — not a second colour. The chip is the one action a
+                 calendar can offer, and it is the only block that carries it.
 
    THE CARD IS A POPOVER, NOT A MODAL, AND THERE IS NO SCRIM. Pressing a day is
    asking "what is this one" about a block you can see; a scrim would take the
@@ -71,19 +70,28 @@
   display:flex;align-items:center;gap:var(--s04);
   padding:var(--s05) var(--s05);
   border-bottom:1px solid var(--rule)}
+/* GOOGLE'S HEADER (Maryam, 6 Sep 2026: "use google's kind of Day and month
+   section ui"). A large, regular-weight period label; an OUTLINED PILL for Today
+   with no arrow; and BORDERLESS chevrons that wear a round hover ground instead
+   of a box. The month label is `--t-h2` at book weight — Google's is big and
+   light, not the small medium heading it was. */
 .app .cal-m{
   margin:0;flex:1 1 auto;min-width:0;
-  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);font-weight:var(--t-w-strong);letter-spacing:-.05px}
-.app .cal-tz{
-  flex:none;font-size:11.5px;line-height:16px;color:var(--text-helper);
-  letter-spacing:.15px}
+  font-size:var(--t-h2-size);line-height:var(--t-h2-lh);font-weight:var(--t-w-book);letter-spacing:-.3px}
+.app .cal-todaybtn{
+  flex:none;padding:7px var(--s05);
+  background:transparent;border:1px solid var(--border-strong-01);border-radius:999px;
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);font-weight:var(--t-w-strong);
+  color:var(--text-primary)}
+.app .cal-todaybtn:hover{background:var(--overlay-hover);cursor:pointer}
 .app .cal-nav{flex:none;display:flex;gap:var(--s01)}
 .app .cal-b{
-  display:grid;place-items:center;width:32px;height:32px;
-  background:transparent;border:1px solid var(--rule);
-  transition:border-color var(--dur-short) var(--ease-standard)}
-.app .cal-b svg{width:18px;height:18px;fill:var(--icon-primary);display:block}
-.app .cal-b:hover{border-color:var(--text-primary);cursor:pointer}
+  display:grid;place-items:center;width:36px;height:36px;
+  background:transparent;border:0;border-radius:999px}
+.app .cal-b svg{width:22px;height:22px;fill:var(--icon-primary);display:block}
+/* one chevron glyph, flipped for the previous control */
+.app .cal-b-prev svg{transform:scaleX(-1)}
+.app .cal-b:hover{background:var(--overlay-hover);cursor:pointer}
 .app .cal-b[disabled]{opacity:var(--state-disabled);pointer-events:none}
 
 /* --------------------------------------------------------------------------
@@ -106,8 +114,8 @@
    calendar's height jump by a fifth between two adjacent months. */
 .app .cal-d{
   position:relative;
-  min-height:84px;padding:var(--s03);
-  display:flex;flex-direction:column;gap:var(--s03);
+  min-height:112px;padding:var(--s02);
+  display:flex;flex-direction:column;gap:2px;
   background:var(--background)}
 .app .cal-n{
   flex:none;
@@ -118,79 +126,70 @@
 .app .cal-we .cal-n{color:var(--text-placeholder)}
 .app .cal-out{background:var(--layer-02)}
 .app .cal-out .cal-n{color:var(--text-placeholder)}
-/* TODAY IS A RING ON THE FIGURE, NOT A FILL ON THE CELL. A filled cell competes
-   with the one filled BLOCK the grid is allowed to have (`.next`), and today is
-   a reference point rather than a thing to act on. */
+/* TODAY IS A FILLED ACCENT DISC (Maryam, 6 Sep 2026: "the current date should
+   not have border but filled color of our accent color without border, the text
+   inside will be white then"). This reverses the earlier "ring, not a fill"
+   note, whose reason has expired: that fill was avoided because it competed with
+   the one FILLED block the month grid used to allow — and the month no longer
+   fills anything (its events are dot-rows now), so a solid today marker is the
+   clearest reference point with nothing to compete against. `--on-accent` is the
+   white ink the accent carries its text in everywhere else. */
 .app .cal-today .cal-n{
   display:grid;place-items:center;
   width:22px;height:22px;margin:-2px 0 0 -3px;
-  border:1.5px solid var(--text-primary);border-radius:50%;
-  color:var(--text-primary)}
+  background:var(--accent);border-radius:50%;
+  color:var(--on-accent)}
 
 /* --------------------------------------------------------------------------
    3. A BLOCK IN A DAY
    -------------------------------------------------------------------------- */
+/* THE MONTH VIEW READS LIKE GOOGLE CALENDAR'S — A DOT AND A LINE, NOT A FILL.
+   Maryam, 6 Sep 2026, with a Google Calendar month grid: "for the monthly
+   calendar view, use this kind of ui." Google's month cell lists each event as
+   a compact one-line row — a small colour dot, then the time and title — rather
+   than a filled block, which is what lets a busy day show five events instead of
+   one. So the month block is now that row, and the FILLED block she designed
+   earlier lives on in the WEEKLY/DAILY time-grid (`.calw-ev`, §42), where a
+   block sized to its duration is the whole point. The two views deliberately
+   diverge: a month answers "what is this month's shape", a week answers "when in
+   the day", and the same booking wears the shape that answers the question.
+
+   THE ROW IS FILLED IN THE TYPE'S COLOUR — NO DOT (Maryam, 6 Sep 2026: "Instead
+   of giving colored dots, remove the dots and give the background to each row
+   with the relevant color"). This walks the marker back into a fill: the whole
+   one-line row is the block now, `--cal-iv` green / `--cal-reiv` violet /
+   `--cal-open` neutral, which is the reference's colored event chip and matches
+   the filled block the same booking wears in the week view. `--cal-fill` still
+   cascades from the `k-*` class; the dot is gone. The time is the medium-weight
+   lead-in, the name the rest, on one ellipsised line, both dark enough to clear
+   AA on all three pastels. 6px radius — a touch tighter than the time-grid
+   block's 8px because a ~20px chip reads over-rounded at 8. No border, no
+   button; the row opens the card. */
 .app .cal-slot{
-  display:flex;flex-direction:column;gap:1px;
+  --cal-fill:var(--cal-open);
+  display:flex;align-items:center;gap:var(--s02);
   width:100%;text-align:left;
-  padding:var(--s02) var(--s03);
-  background:transparent;border:1px solid var(--border-subtle-01);
-  transition:border-color var(--dur-short) var(--ease-standard)}
-.app .cal-slot:hover{border-color:var(--text-primary);cursor:pointer}
-.app .cal-t{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);font-weight:var(--t-w-strong);letter-spacing:.1px;
-  font-variant-numeric:tabular-nums;color:var(--text-primary);
-  white-space:nowrap}
-.app .cal-s{
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);letter-spacing:.2px;
-  color:var(--text-helper);
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  padding:2px var(--s03);
+  background-color:var(--cal-fill);border:0;border-radius:6px}
+.app .cal-slot:hover{cursor:pointer}
+.app .cal-slot.k-iv{--cal-fill:var(--cal-iv)}
+.app .cal-slot.k-reiv{--cal-fill:var(--cal-reiv)}
+.app .cal-el{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);color:var(--text-primary)}
+.app .cal-et{font-weight:var(--t-w-strong);color:var(--text-secondary)}
 
-/* TAKEN — THE HATCH.
-   `repeating-linear-gradient` rather than an SVG or a border pattern: it is one
-   declaration, it scales with the box, and the angle and pitch are stated here
-   where they can be read. 45°, a 2px stripe every 6px, the accent at 16% — dense
-   enough to read as texture on a 40px block and light enough that the time on
-   top of it holds AA. The block keeps the accent's own rule colour so the hatch
-   has an edge; without it the stripes fade out against the cell.
-   ON A DARK OR TINTED GROUND NOTHING CHANGES, because the stripe is a colour-mix
-   against `transparent` rather than against the cell's background. */
-.app .cal-slot.taken{
-  border-color:var(--accent-tint);
-  background-image:repeating-linear-gradient(45deg,
-    color-mix(in srgb, var(--accent) 16%, transparent) 0 2px,
-    transparent 2px 6px)}
-.app .cal-slot.taken .cal-s{color:var(--accent-text)}
-.app .cal-slot.taken:hover{border-color:var(--accent-text)}
-
-/* THE NEXT CALL — THE ONE FILL.
-   `--on-brand-fill:1` is the flag §19 keys a button's on-accent ink on, set here
-   so a `.btn` inside the block inherits the right ink without being told. */
-.app .cal-slot.next{
-  --on-brand-fill:1;
-  background-image:var(--accent-grad);
-  background-color:var(--accent);
-  border-color:transparent;
-  box-shadow:0 1px 3px var(--accent-shadow)}
-.app .cal-slot.next .cal-t,
-.app .cal-slot.next .cal-s{color:var(--on-accent)}
-.app .cal-slot.next .cal-s{opacity:.88}
-.app .cal-slot.next:hover{border-color:var(--accent-text)}
-/* the Join control on the block is a chip, not a `.btn`: a 28px button inside a
-   40px block would be the block. It says the word and takes the whole width. */
-.app .cal-join{
-  margin-top:var(--s02);
-  display:flex;align-items:center;justify-content:center;gap:var(--s02);
-  padding:2px 0;
-  background:var(--pure-white);
-  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);font-weight:var(--t-w-strong);letter-spacing:.3px;
-  color:var(--accent-text)}
-.app .cal-join svg{width:12px;height:12px;fill:var(--accent-text);display:block}
-
-/* the pressed block is the one the card is about, and it says so with the ink
-   §12 gives a chosen row — NOT with a fill, which is `.next`'s alone */
-.app .cal-slot.on{border-color:var(--text-primary);box-shadow:inset 0 0 0 1px var(--text-primary)}
-.app .cal-slot.next.on{box-shadow:0 1px 3px var(--accent-shadow),inset 0 0 0 2px var(--on-accent)}
+/* the pressed row is the one the card is about — the chosen-row ink (§12) as an
+   inset ring, which sits inside the 6px radius over whatever fill the type gave */
+.app .cal-slot.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}
+/* "+N more" — Google's overflow control: quiet helper text, no dot, no fill, so
+   it reads as a count rather than another event. It opens the day view. */
+.app .cal-more{
+  align-self:flex-start;
+  padding:1px var(--s02);text-align:left;background:transparent;border:0;border-radius:6px;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);font-weight:var(--t-w-strong);
+  color:var(--text-secondary)}
+.app .cal-more:hover{background:var(--overlay-hover);color:var(--text-primary);cursor:pointer}
 
 /* --------------------------------------------------------------------------
    4. THE CARD THAT OPENS BESIDE IT
@@ -207,10 +206,12 @@
   box-shadow:0 12px 32px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.06)}
 /* the arrow. Two stacked squares rotated 45°: the back one is the border, the
    front one the ground, offset by 1px so it covers the border's inner edge and
-   the card's own rule appears to run behind it. */
+   the card's own rule appears to run behind it. `--cal-arrow` is set by the pass
+   to the clicked block's centre within the card (§41 `placeCal`); the `--s06`
+   fallback is the resting position before the pass runs. */
 .app .cal-pop::before,
 .app .cal-pop::after{
-  content:'';position:absolute;top:var(--s06);
+  content:'';position:absolute;top:var(--cal-arrow, var(--s06));
   width:8px;height:8px;transform:rotate(45deg)}
 .app .cal-pop::before{background:var(--rule)}
 .app .cal-pop::after{background:var(--layer-01)}
@@ -263,6 +264,14 @@
   margin-top:var(--s05);padding-top:var(--s05);
   border-top:1px solid var(--rule)}
 .app .cal-pop-a > .btn{width:100%}
+/* JOIN IS THE ACCENT BY DEFAULT (Maryam, 6 Sep 2026: "the join call button
+   should be of accent color by default"). The design system's `.btn-p` is the
+   black primary; here the one primary action is joining the call, and she wants
+   it in the brand red. Scoped to the popover's own primary so the platform's
+   black button is untouched everywhere else. The label and icon are already the
+   on-primary white, which reads on the accent as it did on black. */
+.app .cal-pop-a > .btn-p{background-color:var(--accent);border-color:var(--accent)}
+.app .cal-pop-a > .btn-p:hover{background-color:var(--accent-2);border-color:var(--accent-2)}
 
 /* --------------------------------------------------------------------------
    5. THE PHONE
@@ -275,17 +284,177 @@
    layout facts belong.
    -------------------------------------------------------------------------- */
 @container app (max-width:599.98px){
-  .app .cal-d{min-height:60px;padding:var(--s02);gap:var(--s02)}
+  .app .cal-d{min-height:76px;padding:3px;gap:2px}
   .app .cal-wd{padding:var(--s02) var(--s03);font-size:var(--t-caption-size);letter-spacing:.5px}
   .app .cal-n{font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
   .app .cal-today .cal-n{width:20px;height:20px;margin:-1px 0 0 -2px}
-  .app .cal-slot{padding:1px var(--s02);gap:0}
-  .app .cal-t{font-size:var(--t-caption-size);line-height:var(--t-caption-lh)}
-  .app .cal-s,.app .cal-join{display:none}
+  /* a 47px cell cannot hold the row's text, so the month collapses to Google's
+     own mobile month: a slim colour BAR per event, its type carried by the fill
+     the row already has. The card that opens on a press is where the words are.
+     A `min-height` keeps the bar visible once its text is gone. */
+  .app .cal-slot{padding:0;min-height:8px}
+  .app .cal-el{display:none}
   .app .cal-pop{
     position:static;width:auto;margin-top:var(--s05);
     box-shadow:none}
   .app .cal-pop::before,.app .cal-pop::after{display:none}
+}
+
+/* ==========================================================================
+   42. THE TIME-GRID — the reference's Weekly and Daily views
+   Maryam, 6 Sep 2026: "achieve the reference kind of ui for our calendar."
+   The reference is a weekly time-grid — an hour axis down the left, a column
+   per day, and each booking placed and sized by its time. §41's month grid was
+   kept (it is the Monthly toggle); this is the other two views the switch
+   reaches, and they share §41's header, popover, type colours and states.
+
+   ONE RESPONSIVE TRICK AND NO SECOND BREAKPOINT: the day columns are
+   `minmax(96px,1fr)`, so they grow to fill a desktop and hold 96px on a phone,
+   where `.calw` scrolls sideways rather than crushing a booking to nothing. A
+   time-grid cannot stack — the whole point is the vertical time axis — so a
+   horizontal scroll is the honest small-screen answer, not a re-layout.
+   ========================================================================== */
+
+/* the header carries two more members now — Today on the left, the view switch
+   on the right — and §41's `.cal-m` already grows to take the slack between */
+.app .cal-todaybtn{flex:none}
+.app .cal-seg{
+  flex:none;display:flex;
+  border:1px solid var(--rule);background:var(--layer-02)}
+.app .cal-seg button{
+  padding:6px var(--s04);
+  background:transparent;border:0;border-right:1px solid var(--rule);
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  color:var(--text-secondary);white-space:nowrap}
+.app .cal-seg button:last-child{border-right:0}
+.app .cal-seg button.on{
+  background:var(--background);color:var(--text-primary);font-weight:var(--t-w-strong)}
+.app .cal-seg button:hover{color:var(--text-primary);cursor:pointer}
+
+/* the day-of-week header row, one grid, same columns as the body below it so a
+   booking sits under its own weekday. A 56px time gutter, then the days. */
+/* NO INTERNAL SCROLL ON DESKTOP (Maryam, 6 Sep 2026: "I do not need a weekly
+   scroll in the section, just the page scroll is fine"). `overflow-x:auto` here
+   forced `overflow-y` to `auto` too (the CSS one-axis rule), which turned the
+   grid into its own scroll box; removed, the grid is its full natural height and
+   the page scroll shows all of it. The horizontal scroller is kept ONLY on the
+   phone (§5), where seven columns genuinely cannot fit. The column floor is 72px
+   so the seven of them plus the 56px gutter (560px) fit inside the ≥600px range
+   where there is no scroller, leaving no width that overflows the frame. */
+.app .calw{scrollbar-width:thin}
+.app .calw-head,
+.app .calw-body{
+  display:grid;grid-template-columns:56px repeat(7,minmax(72px,1fr))}
+.app .calw-day .calw-head,
+.app .calw-day .calw-body{grid-template-columns:56px minmax(72px,1fr)}
+.app .calw-head{border-bottom:1px solid var(--rule);background:var(--layer-02)}
+.app .calw-corner{
+  display:flex;align-items:center;justify-content:flex-end;
+  padding-right:var(--s03);border-right:1px solid var(--rule);
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  letter-spacing:.15px;color:var(--text-helper)}
+/* DAY ABOVE, DATE BELOW, CENTRED — Google Calendar's column head (Maryam, 6 Sep
+   2026: "implement google calendar date and day middle alignment, day above date
+   below"). A centred column instead of the baseline row it was, so a day reads
+   top-down over its column. Today's DATE is the same filled accent disc the month
+   grid gives today, which is Google's week head too — one today marker across
+   both views. */
+.app .calw-dh{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:var(--s03) var(--s04);border-left:1px solid var(--rule)}
+.app .calw-dw{
+  font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);font-weight:var(--t-w-strong);
+  letter-spacing:.8px;text-transform:uppercase;color:var(--text-helper)}
+.app .calw-dn{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);font-weight:var(--t-w-strong);
+  font-variant-numeric:tabular-nums;color:var(--text-primary)}
+.app .calw-dh.today .calw-dw{color:var(--accent-text)}
+.app .calw-dh.today .calw-dn{
+  display:grid;place-items:center;min-width:26px;height:26px;padding:0 5px;
+  background:var(--accent);border-radius:999px;color:var(--on-accent)}
+
+/* the body. `--row` is one hour's height; `--rows` (inline) is how many hours
+   the axis draws. The whole grid's geometry — axis labels, gridlines, and every
+   block's top and height — is these two numbers, so nothing can drift. */
+.app .calw-body{
+  --row:88px;
+  position:relative;height:calc(var(--rows) * var(--row));
+  background:var(--layer-01)}
+.app .calw-axis{position:relative;border-right:1px solid var(--rule)}
+.app .calw-h{
+  display:block;height:var(--row);
+  padding:0 var(--s03) 0 0;text-align:right;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  color:var(--text-helper);transform:translateY(-8px)}
+.app .calw-col{position:relative;border-left:1px solid var(--rule)}
+.app .calw-col.today{background:var(--surface-3)}
+.app .calw-cell{display:block;height:var(--row);border-top:1px solid var(--rule)}
+.app .calw-cell:first-child{border-top:0}
+
+/* a booking, placed by its start (`--top` rows) and its 45 minutes (`--dur`
+   rows) tall. `min-height`, not `height`: a booking can carry an avatar row and
+   a day holds one slot, so there is room to grow down. A SOLID ROUNDED FILL WITH
+   NO BORDER — booked in its type colour, open in `--cal-open` — per the 6 Sep
+   asks (see §41.3's note for the four of them). The 8px radius is a stated
+   exception to radius:0.
+
+   A 3px GAP OFF THE HOUR LINE (Maryam, 6 Sep 2026: "Add block padding from top
+   as well, do not join it from top"). The block's `top` is the exact start
+   minute, which butted its top edge against the gridline above it; nudging it
+   down 3px and taking those 3px back off `min-height` sits it INSIDE its slot
+   with air on every side — the 4px it already had left and right, now matched
+   top and bottom — so a block reads as a card in the hour rather than a fill of
+   it. The nudge is small enough that the block still lands unmistakably on its
+   own hour line. */
+.app .calw-ev{
+  --cal-fill:var(--cal-open);
+  position:absolute;left:4px;right:4px;
+  top:calc(var(--top) * var(--row) + 3px);
+  min-height:calc(var(--dur) * var(--row) - 6px);
+  display:flex;flex-direction:column;gap:2px;
+  padding:var(--s03);text-align:left;overflow:hidden;
+  background-color:var(--cal-fill);border:0;border-radius:8px}
+.app .calw-ev.k-iv{--cal-fill:var(--cal-iv)}
+.app .calw-ev.k-reiv{--cal-fill:var(--cal-reiv)}
+.app .calw-ev.on{box-shadow:inset 0 0 0 1.5px var(--text-primary)}
+.app .calw-ev:hover{cursor:pointer}
+.app .calw-ev-t{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);font-weight:var(--t-w-strong);
+  color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .calw-ev-r{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.app .calw-ev-who{
+  display:flex;align-items:center;gap:var(--s02);margin-top:auto;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);color:var(--text-primary);
+  white-space:nowrap;overflow:hidden}
+.app .calw-ev-who > span{overflow:hidden;text-overflow:ellipsis}
+.app .calw-ev-who .av-ph{flex:none}
+
+/* the now-line: a rule across the day columns at `--at` rows, a time pill in the
+   gutter. The portal draws it only in the view that holds today. */
+.app .calw-now{
+  position:absolute;left:56px;right:0;top:calc(var(--at) * var(--row));
+  height:0;border-top:2px solid var(--accent);z-index:6;pointer-events:none}
+/* the pill is FULLY ROUNDED (Maryam, 6 Sep 2026: "this should be completely
+   rounded") — a 999px capsule, the same literal the marks and the Tal dock use,
+   so the now-time reads as a floating tag on the line rather than a square label
+   nailed to it. Its horizontal padding opens up to match the rounder shape. */
+.app .calw-now-t{
+  position:absolute;left:-54px;top:-9px;padding:1px 7px;
+  background:var(--gray-100);color:var(--on-dark);border-radius:999px;
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);font-weight:var(--t-w-strong);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* the phone: the header's members would collide on one line, so let it wrap; and
+   the grid scrolls SIDEWAYS here (and only here) rather than re-laying-out —
+   seven columns do not fit a 390px screen. This is the one place the horizontal
+   scroller lives now that desktop has none. */
+@container app (max-width:599.98px){
+  .app .cal-top{flex-wrap:wrap}
+  .app .cal-seg button{padding:5px var(--s03)}
+  .app .calw{overflow-x:auto}
+  .app .calw-body{--row:76px}
 }
 
 /* --------------------------------------------------------------------------

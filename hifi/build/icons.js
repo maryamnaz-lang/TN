@@ -454,8 +454,14 @@ const ARROW_LINE = '<svg viewBox="0 0 20 20" aria-hidden="true" fill="none">' +
   'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
   '</svg>';
 
+/* `arrowRight` is the product's GO mark and it TRAILS a "go somewhere" button
+   (`${label} ${I.arrowRight}`), so its svg carries `.i-go`. That class is the
+   one CSS-visible signal that tells a TRAILING-icon button from a LEADING one:
+   both render a single <svg> element child (the label is an unwrapped text
+   node, so `:first-child`/`:last-child` cannot separate them), and §02's
+   leading-icon right-padding bump keys its exclusion on `.i-go`. */
 const I = new Proxy({}, {
-  get: (_, k) => `<svg viewBox="0 -960 960 960" aria-hidden="true">${IP[k] ? `<path d="${IP[k]}"/>` : ''}</svg>`
+  get: (_, k) => `<svg viewBox="0 -960 960 960" aria-hidden="true"${k === 'arrowRight' ? ' class="i-go"' : ''}>${IP[k] ? `<path d="${IP[k]}"/>` : ''}</svg>`
 });
 const inner = n => IP[n] ? `<path d="${IP[n]}"/>` : '';
 

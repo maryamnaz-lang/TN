@@ -1,0 +1,135 @@
+/* ==========================================================================
+   118. THE ASK PAGE FOLLOWS THE DOCK — Maryam, 4 Sep 2026
+
+   Four asks on the Tal screen, in one message, with the screen attached. Two
+   of them are type or markup and live where those live (§63 §49's sentence,
+   `askView`'s greeting and header); the two below are shape and belong here.
+
+   THE CHIPS' STAR IS THE SUMMARY'S STAR, SMALLER. "The star in the chips should
+   be the one we have with the tal summaries, but in smaller size here." §12.507
+   drew `.chip-tal .sk-mark` as `--tal-star` masked out of the flat accent at
+   13px; the summary's mark is `--ai-star` painted with `--ai-grad` (§70.2a,
+   §114 for the table's control). Same construction here, at 10 — below the
+   summary's 12 because these words are 11.5px chips and §70.2a's own rule is
+   that the mark sits under the cap height of the words beside it. Scoped to
+   the suggestion row: the agent portal writes the same `askChip`, so it moves
+   with this; `.chip-tal` elsewhere is untouched.
+
+   THE FIELD IS THE DOCK WITHOUT THE COMET. "The tal field should follow the
+   floating component we have on each page, but do not add the moving line on
+   the border." So it takes §117 exactly — pill, the ramp as a two-layer
+   background because `border-image` ignores radius, bare glyphs 16 apart — and
+   NOT §70's `.ai-run`, which `askView` does not emit anyway. What it gives up
+   is §53's OWN moving stroke: that layer painted a walking hot spot round the
+   field's edge as the resting invitation (`askv-stroke-walk`) and held the
+   ring still in the accent on focus. The walk is the moving line the ask names,
+   so the `::before` goes (`content:none`, both states); the focus answer stays
+   and moves onto the same two-layer construction — the outer layer becomes
+   §53's `--askv-stroke-hot`, held still, for the reason that note gives
+   (black on a warm stroke reads as disabled, not active).
+
+   NO SHADOW. §21's three-layer shadow is "a stated exception to elevation 0"
+   for a control suspended over moving content. This field ends the page on
+   the page's own ground; nothing moves under it, so it takes the dock's shape
+   and edge and not its lift. If the two should match in that too, it is the
+   three `--dock-shadow-*` layers on `.ask-page .askfield` and nothing else.
+
+   THE GLYPHS: §105 gave the send a 40px accent disc and the mic a 40px ring,
+   the pair the dock had until §117. Both come off the same way — the box is
+   the glyph — and the send's ink has to be stated because §105's white was
+   for a disc that is no longer there. Disabled keeps §105.441's placeholder
+   ink (heavier selector, untouched); the mic's `.on` was a filled red disc
+   and is the glyph in that red now. 16 between them is `--s05` less the
+   field's own `--s03` gap, §117's arithmetic one component over.
+   ========================================================================== */
+/* (0,5,0), NOT (0,4,0): §51.374 and §53.832 state `.app .ask-page .ask-sugg
+   .chip-tal .sk-mark` and the bubble's twin at 16px in a pink→accent ramp, and
+   a lighter restatement here lost silently — measured 16 with the right mask
+   and the wrong size. Both hosts named, so a chip in a reply matches a chip in
+   the suggestion row. */
+.app .ask-page .ask-sugg .chip-tal .sk-mark,
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark,
+.app .ask-sugg .chip-tal .sk-mark{
+  width:10px;height:10px;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+.app .ask-page .askfield,
+.app .ask-page .askfield:focus-within{
+  border-radius:999px;
+  border-color:transparent;
+  padding:0 var(--s06);
+  background-color:transparent;
+  background-image:
+    linear-gradient(var(--background), var(--background)),
+    var(--ai-grad-line);
+  background-origin:padding-box, border-box;
+  background-clip:padding-box, border-box}
+.app .ask-page .askfield:focus-within{
+  background-image:
+    linear-gradient(var(--background), var(--background)),
+    linear-gradient(var(--askv-stroke-hot), var(--askv-stroke-hot))}
+.app .ask-page .askfield::before,
+.app .ask-page .askfield:focus-within::before{content:none}
+
+.app .ask-page .askfield-send,
+.app .ask-page .askfield-mic{
+  width:auto;height:auto;
+  border:0;border-radius:0;
+  background:transparent;background-image:none}
+.app .ask-page .askfield-send svg{fill:var(--text-primary)}
+/* §105.438's disabled state paints `--layer-accent-01` as a DISC ground at
+   (0,5,0); with the disc gone the ground has to go with it, and the placeholder
+   ink §105.441 gives the glyph is the whole of "off" now. */
+.app .ask-page .askfield-send:disabled,
+.app .askfield-send:disabled{background:transparent;background-image:none}
+.app .ask-page .askfield-mic.on{background:transparent;border:0}
+.app .ask-page .askfield-mic.on svg{fill:var(--danger-ink)}
+.app .ask-page .askfield-mic + .askfield-send{margin-left:calc(var(--s05) - var(--s03))}
+
+/* ------------------------------------------------------------------ 118.2 ---
+   THE ONBOARDING'S FIELD IS THE SAME FIELD — Maryam, 4 Sep 2026, with the
+   gate's first screen attached: "use the same tal field here that you used on
+   the portals."
+
+   §107.1180 drew `.ob-compose` as its own object: a 28px-radius box on `--rule`,
+   8px of padding round a 40px black send disc, grey when `.off`. Every one of
+   those is a decision the dock has since made differently (§117), so it takes
+   the dock's: the pill, the ramp as the two-layer border, 64px, the row's
+   `--s06` gutter, the send as a bare 20px glyph. `.off` keeps its meaning — the
+   field is not yet live — and says it the way the dock's disabled glyph does:
+   the INNER layer goes to `--layer-02` (§107's own grey) and the send to §63's
+   helper ink, so the ramp still frames it and nothing looks broken. The Voice
+   and Chat pills beside it are §107's controls, not this field, and are not
+   touched.
+
+   No `.ai-run`: `obCompose` does not emit it and the ask names the field, not
+   the comet. The send's ink is stated here because §63:4642's white was for a
+   black disc that is no longer there — same reason as `.askfield-send` above. */
+.app .ob-compose,
+.app .ob-compose.off{
+  min-height:64px;
+  padding:0 var(--s06);
+  gap:var(--s03);
+  border-radius:999px;
+  border-color:transparent;
+  background-color:transparent;
+  background-image:
+    linear-gradient(var(--layer-01), var(--layer-01)),
+    var(--ai-grad-line);
+  background-origin:padding-box, border-box;
+  background-clip:padding-box, border-box}
+.app .ob-compose.off{
+  background-image:
+    linear-gradient(var(--layer-02), var(--layer-02)),
+    var(--ai-grad-line)}
+.app .ob-send,
+.app .ob-send[disabled]{
+  width:auto;height:auto;
+  border:0;border-radius:0;
+  background:transparent;background-image:none}
+.app .ob-send svg{fill:var(--text-primary)}
+.app .ob-send[disabled] svg{fill:var(--text-helper)}

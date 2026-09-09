@@ -1,0 +1,159 @@
+/* ==========================================================================
+   124. THE EVALUATION UI — Maryam, 6 Sep 2026, with references
+
+   The agent portal's evaluation page (V.interview, st:'report'). Three things
+   live here, all of them layout, ground and geometry — §63 owns every size,
+   weight and colour, as it does for every other component.
+
+   AGENT-PORTAL ONLY, BUT IT LIVES HERE, like §41/§122/§123: the component is one
+   only `tn-agent-portal.html` draws, but that portal is on the design system, so
+   the CSS crosses to the box. In `build-ds.py`'s LAYERS, not NOT_IN_DS.
+   ========================================================================== */
+
+/* --- 1. TAL'S EVALUATION CARD STACKS, AND ITS HIGHLIGHTS ARE THE SUMMARY'S ----
+   Maryam: "take the evaluation beneath the heading, not on the right" and "i need
+   that kinda highlights in the evaluation by tal section." §24 lays `.ai-aura`
+   out as two columns — label left, body right — which is right for the head band
+   and wrong here: this is a full page card, so the label goes on TOP and the read
+   below it, the way the module summary reads. `display:block` collapses the grid;
+   `.ai-head` is `display:contents` (§24), so its label and the body fall into
+   block flow and stack, and §24's `.ai-body` top margin still spaces them. */
+.app .tal-eval{display:block}
+.app .tal-eval > .ai-head > .ai-label{display:inline-flex}
+
+/* THE HIGHLIGHT GROUND — §70's summary treatment, ported. §70.466 gives the
+   summary's `<b>` the `--ai-hl-bg` wash, 4px of radius and a clone box-decoration
+   so a phrase that wraps keeps its ground; that rule is scoped to the `.talsum`
+   head band, so the body card needs its own. §63 owns the ink (`--accent-text`,
+   beside the summary's own rule). */
+.app .tal-eval .ai-body p b{
+  background-color:var(--ai-hl-bg);
+  border-radius:4px;
+  padding:1px 4px;margin:0 -1px;
+  -webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* --- 1b. THE EVAL'S FOUR FACTS STACK THE VALUE UNDER THE LABEL --------------
+   §29 lays a `.page .stats` cell out as `'ic top n'` — label in the middle
+   column, value in a content-sized RIGHT column — which is right for a short
+   figure ($204, 4.4) and wrong for these: "18 Aug · 5:00 PM" and "Today 6:00 PM"
+   are wide, so the right column eats the row and the label letter-wraps ("H/e/l/
+   d"). `.eval-stats` puts the value BACK under the label (the base cell's own
+   `'ic l' 'ic n'`), full column width, so the text wraps as text and the label
+   never does. Left-aligned, undoing §29's right justify for the figure. */
+.app .page .eval-stats > .stat{
+  grid-template-columns:auto minmax(0,1fr);
+  grid-template-areas:'ic l' 'ic n';
+  grid-template-rows:auto auto}
+.app .page .eval-stats .stat-top > .l{grid-area:l}
+.app .page .eval-stats .stat-top > .n{
+  grid-area:n;justify-self:start;text-align:left;margin-top:2px}
+
+/* --- 2. THE TRANSCRIPT LINK IN A STAT VALUE ---------------------------------
+   "Ready" carries an arrow to the transcript (Maryam: "add an arrow next to the
+   Ready word and make it clickable"). It is a link inside the `.stat` value, so
+   it inherits the figure's size from §63 and only needs to sit inline with the
+   word and turn its arrow. */
+.app .stat-link{display:inline-flex;align-items:center;gap:2px;cursor:pointer}
+.app .stat-link svg{width:16px;height:16px;fill:currentColor;flex:none}
+
+/* --- 3. THE LEVEL LADDER PICKER --------------------------------------------
+   Maryam, 6 Sep 2026, with a reference: the fifteen rungs E1–T5 as blocks, the
+   agent picks one, Tal's suggestion carries a "Tal recommends" flag above it. It
+   is the candidate portal's `.ladder` idea made INTERACTIVE and on white — a
+   fixed 15-column grid so the three tracks divide five and five and five, the
+   blocks filled up to the pick (`--accent`) with the pick itself a shade deeper
+   (`--accent-2`), the rest the tinted panel. The group labels sit under their
+   five, centred, in a matching three-column grid. */
+.lvlpick{margin-top:var(--s05)}
+.lvl-lad{
+  display:grid;grid-template-columns:repeat(15,1fr);gap:3px;
+  margin-top:26px}
+.lvl-blk{
+  position:relative;height:46px;border:0;padding:0;cursor:pointer;
+  background:var(--surface-2);display:grid;place-items:center;
+  transition:background var(--dur-standard) var(--ease-standard)}
+.lvl-blk.done{background:var(--accent)}
+.lvl-blk.on{background:var(--accent-2)}
+/* THE "TAL RECOMMENDS" FLAG floats above its block, a pill with a small pointer
+   down to the rung it names. Absolutely positioned so it never widens the block;
+   the ladder's 26px top margin is the room it sits in. */
+.lvl-rec{
+  position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);
+  white-space:nowrap;background:var(--ai-hl-bg);
+  border-radius:999px;padding:2px var(--s03);pointer-events:none}
+.lvl-rec::after{
+  content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:4px solid transparent;border-top-color:var(--ai-hl-bg)}
+.lvl-lab{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  margin-top:var(--s03)}
+.lvl-lab span{text-align:center}
+
+@container app (max-width:560px){
+  /* the codes stop fitting three-per-track on a phone; the blocks stay, the
+     labels inside them go, and the track names under still say where you are. */
+  .lvl-blk b{display:none}
+  .lvl-lad{margin-top:24px}
+}
+
+/* --- 4. THE TRANSCRIPT PAGE (V.transcript) ---------------------------------
+   The candidate portal's `.ivt-*`/`.tq` reborn in the current rules: a search
+   field, ROUND topic-filter chips (§DESIGN "chips are round"), and a line-by-line
+   grid — a timestamp column against the speaker and their words, one hairline
+   between lines, radius 0. The agent's own lines carry `.me`; §63 inks that and
+   all the type. The scene badge and the search `<mark>` take state hues. */
+.tx-srch{position:relative;display:flex;align-items:center;margin-bottom:var(--s05)}
+.tx-srch svg{
+  position:absolute;left:var(--s04);width:18px;height:18px;
+  fill:var(--text-helper);pointer-events:none}
+.tx-srch .inp{padding-left:var(--s08)}
+.tx-filters{display:flex;flex-wrap:wrap;gap:var(--s03);margin-bottom:var(--s05)}
+.tx-f{
+  min-height:32px;padding:0 var(--s05);border-radius:999px;
+  border:1px solid var(--rule);background-color:transparent;cursor:pointer}
+.tx-f.on{background-color:var(--accent);border-color:var(--accent)}
+
+.tx-lines{border-top:1px solid var(--rule)}
+.tx-line{
+  display:grid;grid-template-columns:56px minmax(0,1fr);
+  gap:var(--s04);align-items:baseline;
+  padding:var(--s05) 0;border-bottom:1px solid var(--rule)}
+/* NO CLOSING RULE UNDER THE LAST LINE (Maryam, 7 Sep 2026) — the list opens on
+   `.tx-lines`' top hairline and ends on the last line's words, not a divider. */
+.tx-lines .tx-line:last-child{border-bottom:0}
+.tx-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+.tx-w{display:flex;align-items:center;gap:var(--s03)}
+.tx-scene{display:inline-flex;align-items:center;gap:var(--s02)}
+.tx-scene svg{width:14px;height:14px;fill:var(--support-attention);display:block}
+.tx-x{overflow-wrap:anywhere}
+.tx-x mark{background-color:var(--accent-tint);color:inherit}
+
+@container app (min-width:900px){
+  .tx-line{grid-template-columns:72px minmax(0,1fr)}
+  .tx-x{max-width:76ch}
+}
+
+/* --- 5. THE PROFILE-COMPLETION RING (dashboard black card) -----------------
+   Maryam, 7 Sep 2026: the public-profile next-step card drops the stepper for a
+   round avatar inside a completion ring, with the agent's name, the range they
+   assess and their join date beside it. The ring is the DS `.ring` (two circles,
+   `--arc`) at 76px, re-inked for the black ground — a dim on-dark track, a GREEN
+   arc — and the avatar sits in the ring's centre cell (§ `.ring`
+   is `place-items:center`, the svg is absolute, so the avatar lands on top).
+
+   THE ARC IS GREEN AND THINNER THAN THE DEFAULT RING (Maryam, 7 Sep 2026: "the
+   progress around the image needs to be green and thinner than the current
+   width"). Green because this reads as growth toward a done state, not the
+   accent's "this is yours" — `--support-success` is the green tuned as a FILL
+   (§01), which is what a stroke is, so it holds on the black ground where the
+   ink green would not. And thinner: the generic ring is `stroke-width:6` (§32);
+   this one drops to 3 so the ring reads as a slim progress hoop around the face
+   rather than a heavy collar. Scoped to `.pf-ring` so every other ring in the
+   product keeps its 6 — the same narrowing §111 states for `.qa-ring`. */
+.pf-ring-row{display:flex; align-items:center; gap:var(--s05)}
+.pf-ring.ring{width:76px; height:76px}
+.app .pf-ring.ring circle{stroke-width:3}
+.app .dark-card .pf-ring .ring-t{stroke:var(--on-dark-rule)}
+.app .dark-card .pf-ring .ring-f{stroke:var(--support-success)}
+.pf-ring-b{display:flex; flex-direction:column; gap:2px; min-width:0}
+.pf-ring-b h3{margin:0}

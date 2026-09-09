@@ -869,16 +869,16 @@ function ldrRead(m,c){
   const first = m.name.split(' ')[0];
   const done = lchDone(m);
   if(m.last === 'Never')
-    return `${first} has never signed in &mdash; no chapter opened, no assessment, no time on the course at all. Act on this before any of the behind-pace names: a cohort place is being held open.`;
+    return `${first} has never signed in: no chapter opened, no assessment, no time on the course at all. Act on this before any of the behind-pace names: a cohort place is being held open.`;
   if(lidle(m) >= 7)
-    return `${first} stopped ${lidle(m)} days ago at ${m.pc}% &mdash; ${done} of 13 chapters, then nothing. Worth a direct message rather than a mention on the call; people who stop mid-course rarely restart unasked.`;
+    return `${first} stopped ${lidle(m)} days ago at ${m.pc}%: ${done} of 13 chapters, then nothing. Worth a direct message rather than a mention on the call; people who stop mid-course rarely restart unasked.`;
   if(m.att >= 2.0 && m.avg < 75)
-    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. The material is landing badly rather than the effort being missing &mdash; this is the pattern that gets worse if you push harder.`;
+    return `${first} is trying, not absorbing: ${m.att.toFixed(1)} attempts on average against a ${m.avg}% assessment score. The material is landing badly rather than the effort being missing. This is the pattern that gets worse if you push harder.`;
   if(d <= -15)
-    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments hold up at ${m.avg}%, so this is time rather than comprehension &mdash; worth direct outreach before the next call.`;
+    return `${first} is well behind pace at ${m.pc}% against ${lpace(c)}% expected on day ${c.day}. Assessments hold up at ${m.avg}%, so this is time rather than comprehension, worth direct outreach before the next call.`;
   if(d <= -5)
-    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own &mdash; worth watching rather than intervening.`;
-  return `Nothing alarming in ${first}&rsquo;s numbers &mdash; ${m.pc}% against ${lpace(c)}% expected, assessments at ${m.avg}%, ${done} of 13 chapters. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some, which at this score is thoroughness.'}`;
+    return `${first} is ${Math.abs(d)} points behind pace, ${m.pc}% against ${lpace(c)}% expected, with assessments at ${m.avg}%. A gap this size usually recovers on its own, worth watching rather than intervening.`;
+  return `Nothing alarming in ${first}&rsquo;s numbers: ${m.pc}% against ${lpace(c)}% expected, assessments at ${m.avg}%, ${done} of 13 chapters. ${m.att <= 1.2 ? 'First-time passes on almost everything.' : 'A second pass on some, which at this score is thoroughness.'}`;
 }
 
 /* ==========================================================================
@@ -1445,9 +1445,9 @@ function ldrBriefSheet(){
         </div>
         <ol class="steps mb6">
           <li><span class="s-n">1</span><span class="s-b"><b>Open on ${chapter[0]}</b>
-            It is this week's chapter and the one carrying the cohort's lowest scores${weakest ? ` &mdash; ${weakest.name.split(' ')[0]} is at ${weakest.avg}%` : ''}.</span></li>
+            It is this week's chapter and the one carrying the cohort's lowest scores${weakest ? `, ${weakest.name.split(' ')[0]} is at ${weakest.avg}%` : ''}.</span></li>
           <li><span class="s-n">2</span><span class="s-b"><b>Skip what is already landing</b>
-            Anything with near-universal completion and scores above 85% does not need the hour. ${lavg(c,'avg')}% is the cohort average.</span></li>
+            Anything with near-universal completion and scores above 85% does not need the hour. ${lassess(c) ? `${lassess(c)}% is the cohort average` : 'nothing is assessed yet'}.</span></li>
           <li><span class="s-n">3</span><span class="s-b"><b>Ask for a real example, not a hypothetical</b>
             ${behind} of ${c.members.length} are behind pace, which is usually time rather than comprehension. A concrete example from their own week gets further than more material.</span></li>
           <li><span class="s-n">4</span><span class="s-b"><b>Raise ${severe.length ? 'the ' + severe.length + ' at risk privately' : 'nothing privately this week'}</b>
@@ -1474,7 +1474,7 @@ function ldrBriefSheet(){
             </span>
           </div>`).join('')}
         </div>` : ''}
-        <p class="t-helper-01 mt5">Everything above is computed from course activity &mdash; progress, scores, attempts and timing. Nothing in it reads their written answers, so it cannot tell you how well they are thinking.</p>
+        <p class="t-helper-01 mt5">Everything above is computed from course activity: progress, scores, attempts and timing. Nothing in it reads their written answers, so it cannot tell you how well they are thinking.</p>
       </div>
       <div class="sheet-f">
         <button class="btn btn-s noic" data-ldrclose="brief">Close</button>

@@ -74,7 +74,14 @@
    its own avatar fallback in five places, and `img` because `AV` is the
    dictionary both sides read anyway. */
 const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
-  range:COHORT_LEAD.range, since:COHORT_LEAD.since};
+  range:COHORT_LEAD.range, since:COHORT_LEAD.since,
+  /* `email` and `bio` added 7 Sep 2026 for `V.leadProfile`'s four-tab rebuild —
+     the account address the Privacy tab reads, and the leader's own words the
+     General "About" and the Public listing both draw (one string, not two). The
+     bio was inline in two places on the old page; it is here now so the card and
+     the About cannot drift. */
+  email:'priya.nair@nextinleadership.org',
+  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.'};
 
 /* THE ATTENTION QUEUE'S TWO CONTROLS ARE DELETED (1 Sep 2026) and so is their
    state. `S.leadQ` and `S.leadFilter` were on `S` rather than in a closure so a

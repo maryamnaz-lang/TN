@@ -54,3 +54,67 @@
 /* ---- 2. the highlighted row ---- */
 .app .brow.mine{border-bottom:0}
 .app .brow:has(+ .brow.mine){border-bottom:0}
+
+/* --------------------------------------------------------------------- 3 ---
+   NO CLOSING HAIRLINE UNDER A TAB STRIP — ANY OF THEM
+   Maryam, 4 Sep 2026: "remove the divider after the tabs from all tabs
+   content." Of the agent portal's Interviews strip, whose three tabs (New
+   Requests / Coming up / Finished) each drew the same line under the strip.
+
+   THE DIVIDER IS §10.2's CLOSING `::after` ON THE STRIP'S OWN `.sec`, and it is
+   the second line, not the first. `.cs` already carries a `border-bottom` (the
+   tab track, directly under the labels), so the section's own foot hairline —
+   ~24px lower, past the strip's padding — draws the boundary a SECOND time with
+   a band of white between the two. §111.6 made exactly this argument for the
+   Profile page ("the one place in the build that cannot mean anything") and
+   removed it with the `pf-cs` marker; this is the same removal without the
+   marker, because her instruction generalises it to every strip and the
+   argument was never page-specific — the track line stays, so no page loses its
+   visual tab boundary, it loses a redundant echo of it.
+
+   ONLY THE `::after` — THE SPACE STAYS. §98.1 above is the deliberate air under
+   a pressable heading and she is not asking for it back here; a `.cs` strip's
+   content keeps the section rhythm it had, now with nothing ruled across it.
+   `pf-cs`'s own `content:none` at §111.6 becomes a harmless duplicate of this.
+
+   SCOPED TO A STRIP-ONLY SECTION — `:not(:has(> .cs + *))` — AND THAT GATE IS
+   LOAD-BEARING, NOT CAUTION. The two `.sec-cs` shapes in this build put the
+   content in DIFFERENT places, so the section's `::after` means two different
+   things:
+     · Strip-only (`V.interviews`, `V.profile` in the agent portal, and every
+       hand page that emits the strip as its own section): the `.sec-cs` holds
+       nothing but `.cs`, so its foot hairline sits directly under the tabs —
+       this is the redundant after-tabs divider, and it goes.
+     · Strip-plus-content (`leadCohort`, `leadReports`, the leader/candidate
+       Profile): the `.cs` and the tab content are SIBLINGS in one `.sec-cs`, so
+       the section's `::after` is the separator at the FOOT of the content, a
+       real section boundary. It must stay.
+   `.cs + *` is exactly the tell §98.1 already keys on — content following the
+   strip inside the section — so `:not(:has(> .cs + *))` is true only for the
+   strip-only shape. An unscoped `.sec-cs::after` removal deletes the leader
+   Cohort's content-foot line, which is the regression §111.6's marker warned a
+   global rule would cause; this gate is why the rule can be global in spirit
+   without it.
+
+   (0,5,1) — `.app .page .sec .sec-cs` + the `:not(:has(.cs))` argument's `.cs`
+   + `::after` — so it outweighs the base `.sec::after` (0,1,1) and the
+   `.app .sec::after` edge-bleed rules, and §98 lands after all of them. */
+.app .page > .sec.sec-cs:not(:has(> .cs + *))::after{content:none}
+
+/* --------------------------------------------------------------------- 4 ---
+   THE STRIP-ONLY SHAPE PAID THE GAP TWICE — Maryam, 6 Sep 2026: "there is an
+   odd space after the tabs … remove the extra space and give it the usual
+   space." (The agent portal's Interviews strip.)
+
+   §98.1 gives the strip-PLUS-content shape one `--s06` between the track line
+   and the content (`.cs + *`). The strip-ONLY shape never went through that
+   rule: its content is the NEXT SECTION, so the distance is the sum of three
+   independent steps — the `.cs`'s own `margin-bottom` (§15's `--s05`), the
+   strip section's `padding-bottom` (`--s06`), and the content section's
+   `padding-top` (`--s06`) — ~64px, where the intent §98.1 states is one
+   `--s06` (24). The content section's `padding-top` is the keeper (it is the
+   §10 section rhythm and already lands `--s06`); the strip's own two steps are
+   the double, so they come off. Scoped with §98.3's exact gate, so the
+   strip-plus-content shape (leader Cohort/Reports, the Profiles) is untouched. */
+.app .page > .sec.sec-cs:not(:has(> .cs + *)){padding-bottom:0}
+.app .page > .sec.sec-cs:not(:has(> .cs + *)) > .cs{margin-bottom:0}

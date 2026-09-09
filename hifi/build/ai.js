@@ -163,7 +163,7 @@ TAL_ROUTES.unshift(
     </div>`;
   }],
   [IVT_MEANS, () => ivtAnswer(
-    'Priya wrote that you talk cautiously. She was not describing your manner &mdash; she was describing a habit in the answers themselves. You qualify a thing at the moment you say it.',
+    'Priya wrote that you talk cautiously. She was not describing your manner. She was describing a habit in the answers themselves. You qualify a thing at the moment you say it.',
     ivtFind('level','caution'), 'level')],
   [/transcript|recording|what did i say|interview said|in my interview/i, () => `<div class="gen">
     <div class="gen-h">${talLabel()}<span class="gen-src">Your interviews</span></div>

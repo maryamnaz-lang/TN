@@ -125,14 +125,14 @@
      send chip's 20%.
      ============================================================== */
   /* ==============================================================
-     AND THE RAMP SPLIT IN TWO — 4 Sep 2026, #FF3733
+     AND THE RAMP SPLIT IN TWO — 4 Sep 2026, #bd2a2a
 
      This is the second re-hue in a day and the first one that is
      structural: the text/star ramp and the 1px-line ramp are no
      longer the same three stops.
 
-       TAL'S TEXT AND THE STARS    #FF3733 -> #FF9A96 -> #FF3733
-       THE DOCK BORDER AND THE COMET  #FF3733 -> #CCE7CB -> #FF3733
+       TAL'S TEXT AND THE STARS    #bd2a2a -> #FF9A96 -> #bd2a2a
+       THE DOCK BORDER AND THE COMET  #bd2a2a -> #CCE7CB -> #bd2a2a
 
      A SALMON MIDDLE AND A PALE GREEN MIDDLE, which is not a thing
      that could be guessed and is the reason both were checked rather
@@ -166,9 +166,9 @@
      magenta and a salmon since. Left rather than deleted in a colour
      pass, and flagged: it is the "gate nothing writes" tell.
      ============================================================== */
-  --ai-1:#ff3733;
-  --ai-2:#ff9a96;
-  --ai-3:#ff3733;
+  --ai-1:#bd2a2a;
+  --ai-2:#dd8080;
+  --ai-3:#bd2a2a;
   --ai-line-2:#cce7cb;
   --ai-amber:var(--ai-2);
   --ai-line-alpha:70%;
@@ -226,10 +226,20 @@
      strength is never drawn — which is why the right-hand reading is (252,249,
      248) and not `rgba(255,55,51,.05)`'s (255,245,245). Predicted from the
      three stops it is (254,248,248); measured (252,249,248), and the two units
-     of red are §25.1's corner ellipses, which the Figma render also carries. */
-  --ai-wash:linear-gradient(107.51deg,
-    rgba(255,255,255,.05) 35.98%, rgba(204,231,203,.05) 66.82%,
-    rgba(255,55,51,.05) 114.21%);
+     of red are §25.1's corner ellipses, which the Figma render also carries.
+
+     REDRAWN AGAIN — 871:6425, Maryam 9 Sep 2026 ("use the gradient value and
+     positioning from this Figma selection"). The node is no longer the green-
+     through-warm HORIZONTAL ramp above; it is a VERTICAL two-stop wash that
+     runs the new accent down into white — read straight off the node's own
+     `linear-gradient(183.76deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,
+     .05) 52.274%)`. So the tint now sits along the TOP edge of the band (183.76
+     ≈ "to bottom") in `--accent` #bd2a2a at the same 5%, fades to white by the
+     panel's middle, and carries no green. The 5% is unchanged — still a cast on
+     white paper, not a tinted box — and §25.1's corner ellipses still sit under
+     it. Two stops replace three; the offsets are the node's. */
+  --ai-wash:linear-gradient(183.76deg,
+    rgba(189,42,42,.05) 11.02%, rgba(255,255,255,.05) 52.27%);
 
   /* THE INLINE HIGHLIGHT behind an accent phrase in Tal's sentence — 581:6664.
      The file draws these as absolutely-placed rectangles behind the words,
@@ -546,14 +556,17 @@
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body p{max-width:733px}
 
-/* TAL'S NAME IN THE RAMP — 581:6670. The gradient is clipped to the glyphs,
-   which is the same construction §51.4 uses for the ask page's "What's going
-   on?" and the one place in the build a gradient is allowed to be ink. §63 §10
-   states the `color:transparent` that makes the clip visible; without it the
-   words paint over their own gradient and nothing appears to have changed. */
+/* TAL'S NAME IS A FLAT BLACK LABEL — Maryam, 9 Sep 2026, off 871:6425: "the
+   heading 'Summary by Tal' needs to be black and semibold ... remove the
+   gradient from this text." 581:6670 had clipped `--ai-grad` to the glyphs
+   (the one place in the build a gradient was allowed to be ink); the node now
+   sets the words in flat black SemiBold, so the clip comes off here and §63 §10
+   carries the ink and the 600 weight. The MARK beside it is untouched — the
+   `::before` sparkle keeps its own ramp (that is not "this text"). Only `gap`
+   survives from the old rule. */
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{
-  background-image:var(--ai-grad);
-  -webkit-background-clip:text;background-clip:text;
+  background-image:none;
+  -webkit-background-clip:border-box;background-clip:border-box;
   gap:6px}
 
 /* --------------------------------------------------------------------- 2a --
@@ -1396,6 +1409,20 @@
   display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
   gap:var(--s04);
   max-width:784px}
+
+/* A ROW OF FOUR QUICK-ACTION CARDS — Maryam, 8 Sep 2026, of the admin
+   dashboard: "these 4 quick actions should be in a row of 4 cards like the
+   other quick actions we are using on other platforms." The base `.qa` grid
+   caps at 784px / two columns, which is right for the candidate and agent
+   dashboards (two or three cards). The admin runs FOUR and wants them across,
+   so `.qa-4` lifts the cap and lays a fixed row that steps 4 → 2 → 1 as the
+   container narrows — the same rhythm the dashboard's `.stats` rows keep beside
+   it (four at ≥900, two below, one on a phone). Cards stay the shared `.qa-c`,
+   so this is layout only; the copy is kept to one line each (§98.3) to hold the
+   74px card height at the narrower 4-up width. */
+.app .qa.qa-4{grid-template-columns:1fr;max-width:none}
+@container app (min-width:600px){.app .qa.qa-4{grid-template-columns:repeat(2,1fr)}}
+@container app (min-width:900px){.app .qa.qa-4{grid-template-columns:repeat(4,1fr)}}
 
 /* TWO GAPS, 12 AND 32, AND FLATTENING THEM TO ONE COSTS A LINE. 581:6617 nests
    the icon and the text at gap 12 inside a frame the arrow sits 32 from; one

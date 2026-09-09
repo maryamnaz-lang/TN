@@ -197,6 +197,14 @@
 @container app (min-width:700px){
   .app .pfe-g{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .app .pfe-g > .pfe-f-w{grid-column:1 / -1}
+  /* THREE ACROSS — the General form's Name / Nickname / Email (Maryam, 7 Sep
+     2026: "email could also come in the same row of the name and nickname").
+     `.pfe-g3` overrides the two-column default; it must land AFTER it since both
+     are `.app .pfe-g*` at equal weight. About is still `.pfe-f-w`, which spans
+     `1 / -1` here — all three tracks — so it sits full width beneath the row. The
+     `minmax(0,1fr)` floor is §111's own note: a fixed floor would refuse to shrink
+     at 700 and push the page sideways. */
+  .app .pfe-g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 .app .pfe-g > .f{margin-bottom:0}
 /* THE LABEL AND ITS FLAG ARE ONE ROW. §02.137 draws `.f > label` as a block, so
@@ -465,6 +473,18 @@
    this block has a full-width neighbour 24px above it. */
 .app .sec > .pfe-about{margin:0;max-width:none}
 
+/* A READ-ONLY FIELD DOES NOT ARM ON FOCUS — the General form's email (Maryam,
+   7 Sep 2026: "which will not be editable"). §12.621 already draws `[readonly]`
+   with a dashed underline, which is the lock; what it does not stop is
+   `.app .inp:focus` repainting that line as the 2px accent when the reader taps
+   the field, which would say "editable now" about a control that never is. This
+   holds the dashed rule through focus. Scoped to `.pfe-ro` (0,4,0 beats §12's
+   `.app .inp:focus`) so it touches only the field marked read-only here, and it
+   sets border and cursor — never a font size, weight, case or text colour, which
+   are §63's — so the value stays legible in the same ink. */
+.app .inp.pfe-ro{cursor:default}
+.app .inp.pfe-ro:focus{border-bottom:1px dashed var(--rule);padding-bottom:0}
+
 /* THREE FAMILIES ARE DELETED HERE AND EVERY ONE OF THEM IS A ROW THAT STOPPED
    BEING DRAWN (4 Sep 2026). `.pfe-end` spaced the endorsement rows under the
    skill chips ("remove these"); `.pfe-gap`, its `.nb > b` and `.pfe-gap-a` drew
@@ -605,11 +625,17 @@
    there hangs 21px below the text it is supposed to match. `:has(.pfe-row-x)`
    is the third line, which is the same "keyed on contents" test §10.15's
    label-column opt-out uses.
-   MEASURED at 744 / 1280 / 1635: 38 and 59 against blocks of 38 and 59. */
+   MEASURED at 744 / 1280 / 1635: 38 and 59 against blocks of 38 and 59.
+   THE DESCRIPTION'S LEADING IS READ AS `--t-desc-lh-len`, NOT `--t-desc-lh`:
+   since 8 Sep 2026 the description role's line-height is `normal` (Maryam),
+   which is not a length and makes a `calc()` invalid — the declaration would
+   be silently dropped and the crest would fall to `--pfe-art-s`'s absence. §63
+   §1 states what `normal` resolves to for this face (17px at 13.5), which is
+   the same 17 this sum was written against, so 38 and 59 are unchanged. */
 .app .pfe-row{
-  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh))}
+  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh-len))}
 .app .pfe-row:has(.pfe-row-x){
-  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh) + var(--s02) + var(--t-desc-lh))}
+  --pfe-art-s:calc(var(--t-h4-lh) + 2px + var(--t-desc-lh-len) + var(--s02) + var(--t-desc-lh-len))}
 .app .pfe-art > img{width:100%;height:100%;object-fit:contain;display:block}
 /* THE FALLBACK IS THE ROW'S OLD GLYPH IN ITS OLD CHIP, at the mark's own size
    so a section with artwork and one without do not indent their text

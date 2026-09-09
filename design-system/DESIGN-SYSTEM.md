@@ -385,7 +385,7 @@ weights in a face that ships two**, **1283 elements set in uppercase**, and
 | Body | `.t-body` | 13.5 / 22 | 400 | 0.1px | primary |
 | Body compact | `.t-compact` | 13.5 / 19 | 400 | 0.1px | primary |
 | Label | `.t-label` | 12.5 / 17 | 500 | 0.1px | primary |
-| **Description** | `.t-desc` | 12.5 / 17 | 400 | 0.1px | **secondary** |
+| **Description** | `.t-desc` | 13.5 / auto | 400 | 0.1px | **secondary** |
 | Eyebrow | `.t-eyebrow` | 11.5 / 16 | 500 | 0.2px | **secondary** |
 | Caption | `.t-caption` | 11.5 / 16 | 400 | 0.1px | helper |
 

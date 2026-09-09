@@ -79,8 +79,14 @@
 .app .sec-bk{
   display:flex;flex-direction:column;gap:0}
 .app .bkp{border-bottom:1px solid var(--rule);padding-bottom:var(--s07)}
-.app .bks-w{padding:var(--s07) 0}
-.app .bkc{padding-top:var(--s07)}
+/* THE IMAGE-TO-CHECKOUT GAP IS TIGHTER (Maryam, 7 Sep 2026: "reduce the gap
+   between the calendly iframe and the bottom row"). It was `--s07` under the
+   image plus `--s07` over the row — 64px of white with no hairline between them
+   since 76.1c took `.bkc`'s border off. Both drop to `--s04`, so the picker and
+   its checkout read as one act. The image's TOP padding is untouched — that gap
+   is to the profile above and is not what the ask names. */
+.app .bks-w{padding:var(--s07) 0 var(--s04)}
+.app .bkc{padding-top:var(--s04)}
 
 /* ------------------------------------------------------------------ 76.1b ---
    THE CHOOSING AND THE PAYING ARE A CENTRED COLUMN, NARROWER THAN THE PROFILE

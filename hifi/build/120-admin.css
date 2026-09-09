@@ -1,0 +1,256 @@
+/* ==========================================================================
+   120. THE SUPER ADMIN'S RAIL TREE AND LIST TOOLS — Maryam, 4 Sep 2026
+
+   Maryam, on the first hi-fi Super Admin portal, with four screens attached:
+   "no sub modules have been added like we had on the wireframes tn-admin.html
+   file, no filters on tables … since it is super admin then there should have
+   been crud operations". Three shapes fall out of that and none of them is a
+   class the box already ships, so they are stated here — geometry only, and
+   §63 §51 states the one piece of type (`.sn-sub`).
+
+   1. THE RAIL IS A TREE. `tn-admin.html:3692` draws every module with its
+      sub-modules indented under it and a red count on the queues. The design
+      system's rail (`.sn-item`, §01/§34) is one level deep because the two
+      hifi portals have nothing under a module. The admin has 44 sub-pages
+      across 12 modules, so the open module lists its visible subs as
+      `.sn-item.sn-sub` rows inside a `.sn-subs` block, indented to the label
+      of the row above. THE RENDER GATES IT, NOT THE CSS: the admin only emits
+      the block while the rail is open (`S.nav`), because a shut 72px rail has
+      no room for a second level and §34 visually hides every label in it — a
+      sub-row there would be a blank 36px strip. So there is no shut-state
+      rule below; there is nothing to hide.
+
+      THE INDENT IS THE LABEL'S X, DERIVED, NOT A NUMBER. Below 900 the drawer
+      row is `0 var(--pad-x)` padding, a 20px mark and a `--s05` gap (§02.1624);
+      at 900+ the open rail is `0 var(--s05)`, 22px, `--s05` (§14.3231). The
+      sub-row's left padding is that sum in each tier, so it moves with the
+      row if either ever changes.
+
+      ONE BAR, NOT TWO. `.sn-item.on::before` is the 2px accent bar; the module
+      row keeps it (`m.k === S.mod` is still true on a sub) and the sub-row's is
+      switched off, so the bar reads as "you are in this module" and the
+      sub-row's accent ink (§63 §51) reads as "on this page".
+
+   2. A COLUMN HEAD YOU CAN PRESS SORTS THE TABLE. `th[data-sort]` is the hook
+      the admin's `table()` writes on every sortable column; the active one
+      carries a 14px chevron in `currentColor`. Pointer and no text selection
+      are the whole of the affordance — §63's uppercase-free head is already the
+      quiet grey a control in a table head should be, and a hover wash would be
+      the state layer §build.py disarms everywhere else.
+
+   3. THE ROW'S ACTIONS ARE THE LAST CELL, RIGHT-ALIGNED, AND DO NOT WRAP.
+      `td.tbl-act` — the leader's attention queue already names the cell
+      (§31.6), scoped to `[data-portal="leader"] .tbl-flag`; this is the same
+      cell for every portal on the box — EXCEPT that one: the leader's table
+      keeps its own 24px control and its own alignment, so these rules are
+      scoped off `.tbl-flag` rather than re-deciding a surface nobody asked
+      about (memory: "reuse means reuse"). §14.5939 makes the LAST column
+      left-aligned (a table's last column is usually a word); an action cell is
+      the exception, and it takes a little less vertical padding so a 32px
+      quiet button does not grow the row. The row itself is `tr.clk` and opens
+      the record; the buttons sit nearer in the router's `closest`, so a press
+      on one never also opens the row.
+
+   4. THE FILTER STRIP UNDER A HEADING WITH A SEARCH. `.hd-srch` (§24.353) is
+      the box's "heading with a search field beside it"; the admin puts §15's
+      `.cs` strip under it with live counts in `.lf-n` (the leader's own count
+      slot, §36) and the table after that. `.cs.lst-filt` is the spacing for
+      that stack and nothing else — the strip's own top and bottom hairlines
+      are §15's.
+   ========================================================================== */
+
+/* ---- 1. the rail tree ---------------------------------------------------- */
+.app .sn-subs{display:flex; flex-direction:column; padding-bottom:var(--s02)}
+.app .sn-item.sn-sub{min-height:36px; padding-left:calc(var(--pad-x) + 20px + var(--s05))}
+.app .sn-item.sn-sub.on::before{content:none}
+.app .sn-item.sn-sub .badge{margin-left:auto}
+@container app (min-width:900px){
+  .app[data-rail="open"] .sn-item.sn-sub{min-height:36px; padding-left:calc(var(--s05) + 22px + var(--s05))}
+}
+
+/* ---- 1a. the sub-module chevron (Maryam, 7 Sep 2026) ---------------------
+   A module that HAS sub-pages carries a chevron at the row's end, so you can
+   see it opens a tree; its queue count sits to the chevron's LEFT. The two ride
+   in a `.sn-trail` group pushed to the row's end (the count keeps its accent
+   circle, the chevron is a quiet mark). The chevron flips down→up when the
+   module is expanded (`aria-expanded`, `.sn-chev.open`). It shows only where
+   the labels do — hidden in the collapsed 72px desktop rail, where there is no
+   room and no label to hang it off; the count keeps floating on the icon there,
+   unchanged. */
+/* a `<div>`, held content-width (`flex:none`) and pushed to the row's end, so
+   the count and chevron sit flush right on any row — including a wrapped two-line
+   label (Maryam, 7 Sep 2026). */
+.app .sn-trail{flex:none; margin-left:auto; display:flex; align-items:center; gap:var(--s03)}
+.app .sn-trail .badge{margin-left:0}
+/* `.sn-item .sn-chev` (0,3,0), not `.sn-chev` (0,2,0), because the mobile rail
+   hides every `.sn-item svg` (labels only) with a rule that carries the `svg`
+   type (0,2,1) — the chevron is the exception and must outweigh it to show
+   wherever the labels do. */
+.app .sn-item .sn-chev{display:block; width:18px; height:18px; flex:none; fill:var(--icon-secondary);
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .sn-chev.open{transform:rotate(180deg)}
+@container app (min-width:900px){
+  .app[data-rail="shut"] .sn-chev{display:none}
+  /* THE COLLAPSED 72px RAIL IS UNTOUCHED. `display:contents` dissolves the
+     `.sn-trail` box there, so its count floats top-right on the icon exactly as
+     a bare badge did (§14's `.sn-item .badge{position:absolute}`) and the hidden
+     chevron adds nothing — the wrapper exists only for the open rail's layout. */
+  .app[data-rail="shut"] .sn-trail{display:contents}
+  .app[data-rail="open"] .sn-trail .badge{margin-left:0}
+}
+
+/* ---- 1c. THE COLLAPSED-RAIL FLYOUT (Maryam, 7 Sep 2026) ------------------
+   "on hover to a collapsed navbar module icon which has further sub-modules I
+   want you to show the sub modules dropdown on hover." §120.1 kept the second
+   level out of the shut 72px rail because there is no room for it inline; this
+   is the answer — the subs float BESIDE the icon as a hover flyout, so the room
+   problem goes away. The sub-block now renders for EVERY parent (the admin's
+   `sidenav()` drops the old `on && S.nav` gate), and the CSS routes it:
+     · open rail / mobile drawer — inline, and only under the CURRENT module;
+     · collapsed rail — a hover-only flyout, for ANY module.
+   `.sn-node` (the parent's wrapper) is the hover region so the panel stays open
+   as the pointer crosses from the icon to it, and it is armed in build.py's
+   HOVER_KEEP — the hand-written portals never set `.__nh`, so an un-armed
+   `:hover` here would be dead. No module-name header on the panel (Maryam,
+   7 Sep 2026: "the submodules are enough") — the sub-list names itself. */
+.app .sn-node{position:relative}
+/* a parent's subs are inline ONLY under the current module; every other parent's
+   block is in the DOM (it feeds that module's flyout) but out of the flow. */
+.app .sn-node:not(.on) > .sn-subs{display:none}
+
+@container app (min-width:900px){
+  /* the collapsed rail must stop clipping horizontally or the flyout is cut off
+     at 72px. `overflow-y:auto` forces `overflow-x` to `auto` too (they cannot
+     differ once one is non-visible), so the whole shut rail goes `visible`; its
+     icon column fits the viewport height, so nothing needed the scroll. The open
+     rail keeps its own overflow (it can be taller than the frame). */
+  .app[data-rail="shut"] .sidenav{overflow:visible}
+  /* the flyout: a parent's subs leave the flow and float clear of the rail's
+     right edge and its `.app::after` divider (z 41), hidden until the node is
+     hovered. A `.sn-node`-wide hover region plus an invisible bridge across the
+     gap keep it open while the pointer travels to it. */
+  .app[data-rail="shut"] .sn-node > .sn-subs{
+    position:absolute; top:calc(-1 * var(--s02)); left:calc(100% + var(--s03));
+    display:flex; min-width:212px; padding:var(--s03) 0;
+    background:var(--layer-01); border:1px solid var(--rule);
+    box-shadow:0 8px 24px rgba(17,17,17,.12);
+    opacity:0; visibility:hidden; pointer-events:none; transform:translateX(-4px);
+    transition:opacity var(--dur-short) var(--ease-standard),
+               transform var(--dur-short) var(--ease-standard),
+               visibility var(--dur-short);
+    z-index:60}
+  .app[data-rail="shut"] .sn-node:hover > .sn-subs{
+    opacity:1; visibility:visible; pointer-events:auto; transform:none}
+  .app[data-rail="shut"] .sn-node > .sn-subs::before{
+    content:''; position:absolute; top:0; bottom:0;
+    left:calc(-1 * var(--s03)); width:var(--s03)}
+  /* inside the flyout the rows are plain left-aligned menu items: the collapsed
+     rail's label-clip (§14) and the tree indent (§120.1) are both undone here —
+     geometry only, the type stays §63's. */
+  .app[data-rail="shut"] .sn-node > .sn-subs .sn-item.sn-sub{
+    justify-content:flex-start; min-height:36px; padding:0 var(--s05); gap:var(--s03)}
+  .app[data-rail="shut"] .sn-node > .sn-subs .sn-item.sn-sub > span:not(.badge){
+    position:static; width:auto; height:auto; overflow:visible; clip-path:none;
+    flex:1; min-width:0}
+  .app[data-rail="shut"] .sn-node > .sn-subs .sn-item.sn-sub .badge{
+    position:static; top:auto; right:auto; margin:0 0 0 auto}
+}
+
+/* ---- 1e. THE DASHBOARD GRID — data blocks SIDE BY SIDE (Maryam, 8 Sep 2026)
+   "the side by side graphical interaction would be better at some of the places
+   rather than putting everything in a different row." The frozen file's
+   dashboard set related blocks beside each other (`g-fin` / `g-3` / `g-2`); the
+   first hi-fi pass stacked every one full-width, which read as one endless
+   column. `.dgrid` puts the short key/value blocks back side by side — each
+   `.dcol` is a headed `.kv`, no card chrome (the linear-band aesthetic holds,
+   §07), stacking to one column below 900 where there is no room across. Inside
+   a column the `.kv` drops the 184px label spine §10.5 gives it — a narrow cell
+   has no room for it — and reads label-left / value-right instead, which is the
+   compact form a dashboard tile wants. The wide stat rows and the cohort table
+   keep the full width; only the lists pair up. */
+.app .dgrid{display:grid; gap:var(--s07)}
+.app .dcol > .sec-h{margin-bottom:var(--sec-h-gap)}
+.app .dcol .kv{grid-template-columns:minmax(0,1fr) auto; gap:var(--s04)}
+.app .dcol .kv .v{text-align:right}
+@container app (min-width:900px){
+  .app .dgrid-2{grid-template-columns:1fr 1fr; gap:var(--s07) var(--s08)}
+  .app .dgrid-3{grid-template-columns:1fr 1fr 1fr; gap:var(--s06) var(--s07)}
+}
+
+/* ---- 1f. DASHBOARD CHARTS — a proportion gets a graph (Maryam, 8 Sep 2026,
+   "what about the graphs?"). A dashboard is the one place "data over decorative
+   charts" (DESIGN §5) turns over: a proportion or a funnel reads faster as a
+   shape than a column of figures. Two shapes only — a DONUT for a 2–4 slice
+   split, horizontal BARS for a ranked list or a funnel — both drawn from the
+   `--dv-*` data-viz ramp (a green scale, deliberately NOT the brand red:
+   categorical data-viz never rides the brand colour). The figure stays in the
+   legend / bar label, so the graph ADDS the shape without losing the number.
+   Geometry and the data-viz fills only; §63 owns the type (the labels take role
+   classes), and the label grey is `--text-secondary`, the same token §10 gives
+   a `.kv` key. */
+.app .donut-wrap{display:flex; align-items:center; gap:var(--s06); flex-wrap:wrap}
+.app .donut{position:relative; width:116px; height:116px; flex:none}
+.app .donut > svg{width:116px; height:116px; display:block; transform:rotate(-90deg)}
+.app .donut-c{position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px; line-height:1}
+.app .donut-c .t-caption{color:var(--text-helper)}
+.app .donut-leg{display:flex; flex-direction:column; gap:var(--s03); flex:1 1 130px; min-width:0}
+.app .leg-row{display:flex; align-items:center; gap:var(--s03)}
+.app .leg-sw{width:10px; height:10px; border-radius:999px; flex:none}
+.app .leg-l{flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; color:var(--text-secondary)}
+.app .leg-v{flex:none}
+.app .hbars{display:flex; flex-direction:column; gap:var(--s05)}
+.app .hbar-top{display:flex; align-items:baseline; justify-content:space-between;
+  gap:var(--s03); margin-bottom:var(--s02)}
+.app .hbar-l{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  color:var(--text-secondary)}
+.app .hbar-v{flex:none}
+.app .hbar-track{height:8px; background:var(--layer-02); border-radius:999px; overflow:hidden}
+.app .hbar-track > i{display:block; height:100%; background:var(--dv-3); border-radius:999px}
+
+/* ---- 1b. a WIDER open drawer, ADMIN ONLY (Maryam, 7 Sep 2026) ------------
+   The admin's module names are long ("Marketplace & Interviews", "Finance &
+   Settlement") and wrapped to two lines in the box's 260px drawer. Widening
+   `--drawer-w` for this portal only lets the longest fit on one line — the
+   candidate / leader / agent rails keep 260/280 (their labels are short). The
+   token drives the sidenav, the wordmark column and §34's calc together, so
+   overriding it keeps them aligned rather than sizing the sidenav alone. The
+   open-rail count is also brought down a size — smaller circle, same accent. */
+.app[data-portal="admin"]{--drawer-w:310px}
+.app[data-portal="admin"][data-rail="open"] .sn-item .badge{min-width:18px; height:18px; padding:0 var(--s02)}
+
+/* ---- 2. sortable heads --------------------------------------------------- */
+.app .tbl th[data-sort]{cursor:pointer; user-select:none; white-space:nowrap}
+.app .tbl th[data-sort] svg{width:14px; height:14px; vertical-align:-3px; margin-left:var(--s01); fill:currentColor}
+
+/* ---- 3. the action cell -------------------------------------------------- */
+.app .tbl:not(.tbl-flag) td.tbl-act,
+.app .tbl:not(.tbl-flag) th.tbl-act{text-align:right; white-space:nowrap}
+.app .tbl:not(.tbl-flag) td.tbl-act{padding-top:var(--s02); padding-bottom:var(--s02); vertical-align:middle}
+.app .tbl:not(.tbl-flag) td.tbl-act .btn{min-height:32px; padding-left:var(--s03); padding-right:var(--s03)}
+.app .tbl:not(.tbl-flag) td.tbl-act .btn svg{width:18px; height:18px}
+.app .tbl:not(.tbl-flag) td.tbl-act .btn + .btn{margin-left:var(--s02)}
+
+/* ---- 4. the filter strip under a searched heading ------------------------ */
+.app .cs.lst-filt{margin-top:var(--s05)}
+.app .cs.lst-filt + *{margin-top:var(--s05)}
+
+/* ---- 4a. aiHead INSIDE the searched heading -----------------------------
+   §73's `aiHead` rules are all `.app .page .sec > .sec-h.aih > …` — direct
+   children of the section. Inside `.hd-srch > .hd-srch-t` the head is two
+   levels down and NOT ONE of them matched: `.aih-a` fell back to a block and
+   its two buttons stacked in the middle of the row (found on the first admin
+   list page, 4 Sep 2026). §73's declarations restated for this nesting, with
+   two differences the narrower column needs: the text block's basis is 220
+   rather than 340 and it has no 60% cap, because the search already holds the
+   right third of the row. The head's own bottom margin comes off — the strip
+   under it (§120.4) brings the 16px. */
+.app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-bottom:0; border-right:0; min-height:0}
+.app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b{flex:1 1 220px; min-width:0; max-width:none; align-self:center; display:flex; flex-direction:column; gap:var(--sec-desc-gap)}
+.app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b > h2.aih-t{display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:0; flex:none; min-width:0}
+.app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b > .aih-d{margin:0}
+.app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a{flex:none; margin-left:auto; align-self:center; display:flex; align-items:center; flex-wrap:wrap; gap:var(--s03)}
+@container app (max-width:899.98px){
+  .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a{flex-direction:column; align-items:stretch; width:100%; margin-left:0}
+}

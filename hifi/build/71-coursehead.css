@@ -438,8 +438,16 @@
 .app .crow-a{
   flex:none;margin-left:auto;
   display:flex;align-items:center;gap:var(--s03)}
+/* THE 185 IS A FLOOR, NOT A CAP, AND THE LABEL NEVER WRAPS (Maryam, 6 Sep 2026:
+   "the view candidate profile button text should be in one line"). It was a
+   fixed `width:185px`, which is right for the short pair the candidate portal
+   draws ("Open the report") but too narrow for the agent card's "View candidate
+   profile", so that label broke to two lines. `min-width` keeps the short
+   buttons equal at 185 and lets a longer label grow to fit; `white-space:nowrap`
+   is what holds it to one line as it grows. The mobile rule's `width:100%`
+   (§71.3, max-width:899.98) still overrides for the stacked full-width case. */
 .app .crow-a > .btn{
-  width:185px;min-height:40px;
+  min-width:185px;min-height:40px;white-space:nowrap;
   justify-content:center;gap:var(--s03)}
 /* THE FILE'S SIDE PADDINGS ARE ASYMMETRIC AND THEY ARE THE SAME 16/20 MIRRORED
    — 600:7750 is `pl-16 pr-20` with the mark leading, 600:7737 is `pl-20 pr-16`
