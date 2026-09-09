@@ -85,10 +85,19 @@ S.ldrNote = null;
    the third is what a note that is neither has to be — most of these are
    neither, and forcing a leader to call an escalation a strength or a weakness
    would be the form filling in the reader. */
+/* Owen Clarke and Lena Fischer are the two candidates on the Awaiting
+   Evaluations queue (`LEAD_SUMMARIES`), so their notes are AUTHORED PLACEHOLDERS
+   the same status as the two above — the seed has no note store, and the 90-day
+   summary screen needs the leader's own notes on the candidate to show (Maryam,
+   9 Sep 2026: "there needs to be a section of the notes taken by the cohort
+   leader about this candidate on this evaluation screen"). Flagged, not real. */
 S.ldrNotes = {
   'Yuki Tanaka':[{k:'develop', t:'Twelve days without a sign-in', b:'Emailed the address on file and got no bounce, so it is being read. Trying the cohort board next before I escalate.', w:'2 days ago'}],
   'James Whitby':[{k:'develop', t:'Re-taking assessments rather than moving on', b:'Told him on the call to leave three and four at 65 and come back after chapter 6 — the material builds, the score does not.', w:'Last week'},
-                  {k:'general', t:'Asked for the handover framework twice', b:'Sent it. Worth checking he used it.', w:'Earlier'}]
+                  {k:'general', t:'Asked for the handover framework twice', b:'Sent it. Worth checking he used it.', w:'Earlier'}],
+  'Owen Clarke':[{k:'strength', t:'Ran the Thursday call twice when I was out', b:'Stepped in without being asked and kept the group on the agenda both times. The cohort listens to him.', w:'Week 6'},
+                 {k:'develop', t:'Writes the answer before the working', b:'Strong instincts, but the report skips how he got there. Asked him to show the steps so the next reader can follow the decision.', w:'Last week'}],
+  'Lena Fischer':[{k:'general', t:'Quiet on calls, thorough on the board', b:'Rarely speaks up live, but her written feedback to peers is the most detailed in the cohort. Worth drawing out in the room.', w:'2 weeks ago'}]
 };
 
 /* The composer's state. `S.ldrNoteAt` is null when it is shut, `-1` while a new

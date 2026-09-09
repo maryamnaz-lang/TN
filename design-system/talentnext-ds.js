@@ -1165,9 +1165,16 @@ function dsStatCell(ic, label, value, note, jump, at){
 }
 
 const dsGcard = (kind,tag,title,sub,go,art,at) => `<button class="tile clk gcard" data-go="${go}"${at ? ' ' + at : ''}>
+  ${''/* NO LEFT ICON WHEN THERE IS NO COVER (Maryam, 9 Sep 2026: "remove the left
+         side cohort icons"). The fallback used to draw a `.cardrow-ic` mark
+         (`GC_IC[kind]`, the cohort's `group` glyph) when no `art` was passed;
+         the cohort rows pass `null` art, so that mark was the icon on every row.
+         Only the real cover (`art.src`, when a caller gives one) draws now; with
+         no cover the row is the text and the arrow. `kind`/`GC_IC` stay for a
+         caller that passes a cover. */}
   ${art
     ? `<span class="gcard-art">${art.i ? `<i>${art.i}</i>` : ''}<img src="${art.src}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
-    : `<span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>`}
+    : ''}
   <span class="gcard-b">
     ${tag?`<span class="eyebrow">${tag}</span>`:''}
     <h3>${title}</h3><span class="sub">${sub}</span>
@@ -1325,8 +1332,14 @@ function dsCrow(kind, o){
                throws away the half that carries the words (§86 is the argument
                and the ratio). One flag, one class, and the four call sites that
                draw a person are untouched. */}
-        <span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i}</i>${p.img
-          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
+        ${''/* NO MARK AT ALL WHEN THE RECORD HAS NEITHER INITIALS NOR A PHOTO
+               (Maryam, 9 Sep 2026: "remove the circle 41 from the black card").
+               The leader's weekly call set `who.i` to the cohort number, which
+               drew a disc reading "41"; dropping `i` from the record now drops
+               the whole `.crow-ph`, so the detail sits flush left. Every person
+               row still carries `i`/`img`, so their avatar is untouched. */}
+        ${(p.i || p.img) ? `<span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i || ''}</i>${p.img
+          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>` : ''}
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
             ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>

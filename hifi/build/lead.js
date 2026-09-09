@@ -780,11 +780,12 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    the dashboard and on Calls alike, and the parameter survives for a caller that
    genuinely has nothing to offer. */
 const leadCall = (k, second) => ({
-  /* NO COURSE COVER ON A COHORT (Client, 9 Sep 2026: "remove the course images
-     from cohorts"). `img` was `cohortArt(k)`, a course cover; the crow renders
-     the cohort's own number (`<i>`) as the mark instead, and `cover:false` drops
-     the 9:5 course-title slot for a plain avatar disc. */
-  who:{n:'Cohort ' + k.co, i:String(k.co)},
+  /* NO MARK AT ALL ON A COHORT (Client, 9 Sep 2026: first "remove the course
+     images from cohorts", then "remove the circle 41 from the black card"). `img`
+     was `cohortArt(k)`, a course cover; then the crow drew the cohort NUMBER as a
+     disc; now there is no `i` either, so `crow` draws no `.crow-ph` and the detail
+     sits flush left. The record is the appointment, named in `who.n`. */
+  who:{n:'Cohort ' + k.co},
   cover:false,
   role:`${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${k.course}`,
   x:lcDetail(k),
@@ -802,8 +803,13 @@ const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
       <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
-    ${crow(leadCall(k, (o || {}).second), {when:false, join:false,
-      second:(o || {}).second === false ? false : undefined})}
+    ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
+           "instead of generate brief show Join Call button but disabled"). The
+           card now draws `crow`'s primary Join and no secondary (`second:false`);
+           §81/§119 gate it, so it is the disabled grey Join while the call is more
+           than a minute away — which is the state a leader reads it in. The `o`
+           param (the caller's brief action) is no longer used by this card. */}
+    ${crow(leadCall(k, false), {when:false, second:false})}
   </div>`;
 
 /* ==========================================================================
@@ -891,39 +897,27 @@ const lcalCard = (k, lead) => {
      it is to go and look. */
   return `<${tag} class="lcal${lead ? ' lcal-next dark-card' : ''}"${
     lead ? '' : ` data-go="leadCohort" data-ldrco="${k.co}"`}>
+    ${''/* THE TITLE LEADS THE HEADER ROW NOW, AND THE COHORT-NUMBER COVER IS GONE
+           (Maryam, 9 Sep 2026: "remove the cohort number from the all cards top
+           left and take the lower content like 'Cohort 41 call' part on top
+           left"). The `.gcard-art` badge sat where the title now sits; the title
+           came up out of `.lcal-b` into the header, opposite the date. The date
+           stays the word-over-figure block (`.lcal-when`) — measured at 62px, the
+           wider of "Tomorrow" and "5:00 PM" rather than their sum, so the header
+           does not wrap. §113.3's dead `.gcard-art` ground rule went with it. */}
     <span class="lcal-h">
-      ${''/* §86's cover verbatim, `<i>` under the `<img>` so a cover that fails
-             to decode leaves the cohort's number rather than an empty box. */}
-      <span class="gcard-art"><i>${k.co}</i></span>${''/* course cover removed 9 Sep 2026 — cohorts are not courses; the `<i>` number is the mark */}
-      ${''/* THE DATE IS THE WORD OVER THE FIGURE, WHICH IS `bookedRow`'s OWN
-             CHIP RECOVERED — and it is measured, not preferred. Written the
-             reference's way, as one line reading "Tomorrow &middot; 5:00 PM"
-             with a clock in front of it, the block is 149px against the 110
-             left beside a 112px cover, so the header wrapped in every cell at
-             every width the three-across grid produces. The alternatives were
-             both worse: shrinking the cover to fit puts it at 73 x 41, where a
-             title card's line of type is no longer readable, and letting the
-             text wrap gives two ragged right-aligned lines that break at a
-             different word per card.
-             `.day`'s shape answers it at 62px wide — the widest of "Tomorrow"
-             and "5:00 PM" rather than the sum — and it is what this portal's
-             diary drew for a date until this row replaced it. The clock glyph
-             goes with the merge: a two-line date needs no mark to say it is a
-             date, and the same 16px glyph was the other 20px this row could
-             not afford. */}
+      <span class="lcal-t t-h4">${lcTitle(k)}</span>
       <span class="lcal-when">
         <span class="lcal-day t-desc">${k.day}</span>
         <span class="lcal-tm t-h4">${k.time}</span>
       </span>
     </span>
     <span class="lcal-b">
-      <span class="lcal-t t-h4">${lcTitle(k)}</span>
-      ${''/* THE COURSE IS NOT IN THE WORDS, because the cover 8px above IS the
-             course's title card — §75's own reasoning for putting the name on
-             `.crow-role` beside it, arriving at the opposite answer because
-             here the picture and the line are stacked rather than abreast and
-             the caption would be reading the picture out loud. */}
-      <span class="lcal-d t-desc">${k.seats} candidates &middot; Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
+      ${''/* THE CANDIDATE COUNT CAME OFF (Maryam, 9 Sep 2026: "remove the
+             candidate count from each card like '10 Candidates'"). `k.seats` is
+             still on the record and the figure bar above still counts it; the
+             card's line is now just the track and the week. */}
+      <span class="lcal-d t-desc">Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
     </span>
     ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
            OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
@@ -953,8 +947,11 @@ const lcalCard = (k, lead) => {
 const leadCallsSec = () => {
   const up = lcalls();
   return `<div class="sec" id="lead-calls">
+    ${''/* NO DESCRIPTION (Maryam, 9 Sep 2026: "remove the desc of this"). The
+           section title and the cards say what this is; the one-line lede came
+           off the same way §72/§73 took the repeated ledes off the candidate
+           dashboard. */}
     ${aiHead({title:'Your upcoming calls',
-      desc:`One call a week for every cohort you lead, in the order they happen.`,
       act:up.length ? `<button class="btn btn-g btn-sm noic" data-go="leadCalls">View all sessions</button>` : ''})}
     ${up.length
       ? `<div class="lcal-row">${up.map((k, i) => lcalCard(k, i === 0)).join('')}</div>`
@@ -1146,15 +1143,18 @@ V.leadDash = () => {
          ends the band — written between the `.ph` and Tal's card it would
          leave the summary in the page body (trap 11's neighbourhood). */}
   ${leadCallsSec()}
+  ${''/* THE FIGURE BAND IS PLAIN STAT CELLS, NOT A STICKY SCROLL-SPY (Maryam,
+         9 Sep 2026: "hide the fix tabs interaction, go with the generic scroll
+         just like other pages"). The cells used to be `data-jump` buttons that
+         scrolled to their section, and a second `.lead-bar` strip stuck to the
+         top of the scroller as a tab navigator lighting the section you were in.
+         Both are gone: the cells are static figures like every other dashboard's
+         and the page scrolls normally. `leadStick`, its scroll/resize listeners
+         and the click-to-jump handler went with them. The four sections keep
+         their ids — the figure counts still read `FIG[id]`. */}
   <div class="sec">
     <div class="stats stats-lead">
-      ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1], j.id)).join('')}
-    </div>
-  </div>
-  <div class="sec lead-bar" id="leadBar">
-    <div class="cs lead-tabs" role="tablist" aria-label="Sections of this page">
-      ${LEAD_JUMPS.map(j =>
-        `<button data-jump="${j.id}" role="tab">${j.l}<span class="lf-n">${FIG[j.id][0]}</span></button>`).join('')}
+      ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1])).join('')}
     </div>
   </div>
   ${''/* THE PLATE STOOD HERE AND IS NOW `leadCallCard(next)`, 60 lines up the
@@ -1395,163 +1395,19 @@ V.leadDash = () => {
    ========================================================================== */
 
 /* ==========================================================================
-   THE FIGURE BAND BECOMES A POSITION INDICATOR
-
-   Four cards that count four sections of the page they are on. Read as
-   headings, they are a summary; pressed, they are navigation; and once the page
-   has scrolled past them they are the only thing on screen that still says
-   where in the page you are. So the band sticks to the top of the scroller and
-   keeps all three jobs.
-
-   THE BAND IS THE `.sec`, NOT THE `.stats` INSIDE IT. A sticky element can only
-   travel inside its own containing block, and the section wrapping the grid is
-   exactly as tall as the grid — stuck to its own top, it would not move at all.
-   The section's containing block is `.page`, which runs the length of the
-   document, so sticking the section gives it the whole page to travel.
-
-   IT STAYS IN THE CONTENT COLUMN. It spans what the resting card row spans and
-   no more. An earlier version measured `.main`'s side padding and pulled the
-   stuck bar out over it, on the argument that chrome runs to the frame edge —
-   but this is not the frame, it is the top of a page, and a strip that runs
-   under the rail and past the right edge of every section it names has stopped
-   belonging to them. §31 draws the states; neither needs a measurement.
-
-   IT LEAVES AT "YOUR STANDING". Your standing is the one section on the page no
-   card counts — it is the leader's own record, not a queue — so once it reaches
-   the bar there is nothing left for the bar to point at, and a position
-   indicator pointing at nothing is furniture. It hides by transform and
-   `visibility`, never `display`: a sticky element still occupies its flow box,
-   and removing that box would shift the page under a reader mid-scroll.
-
-   ONE SCROLL LISTENER, ON `device`, IN CAPTURE. `render()` replaces `.main` on
-   every render, so a listener bound to the scroller would leak one copy per
-   render. Scroll events do not bubble, but they are delivered to capturing
-   listeners on ancestors — so a single capture-phase listener on `device`
-   survives every render and sees the new scroller for free.
+   THE STICKY POSITION-INDICATOR IS GONE (Maryam, 9 Sep 2026: "hide the fix
+   tabs interaction, go with the generic scroll just like other pages").
+   `leadStick` made the figure band stick to the top of the scroller and turn
+   into a tab strip that lit the section you were in, and a capture-phase scroll
+   listener on `device` drove it; a click handler scrolled to a pressed card's
+   section. All of it is removed — the four figures are now plain stat cells and
+   the page scrolls like every other dashboard. The `.lead-bar` markup and the
+   `data-jump` cells went with it in `V.leadDash`; the section ids stay for the
+   figure counts. §31.4's `.lead-bar` / `.lead-tabs` / `.is-stuck` / `.is-gone`
+   CSS is now dead — left in place because it is interleaved with `.stat-jump`,
+   which lead2's "Next call" cell still uses (statCell's `at` arg), and the
+   `.lead-bar` rules match nothing so they are harmless. A tidy-up can lift them.
    ========================================================================== */
-function leadStick(){
-  const app = device.querySelector('.app');
-  if(!app) return;
-  const bar = device.querySelector('#leadBar');
-  const main = device.querySelector('.view-col > .main') || device.querySelector('.main');
-  if(!bar || !main) return;
-
-  /* NOTHING IS MEASURED FOR WIDTH ANY MORE. This used to publish the distance
-     from the scroller's edge to the page's so the stuck bar could pull itself
-     out over `.main`'s padding — which put the strip under the rail and past
-     the right edge of the sections it labels. The bar belongs in the content
-     column, and the column's own width is something CSS already knows. */
-  const mr = main.getBoundingClientRect();
-  const h = bar.getBoundingClientRect().height;
-  const stuck = bar.getBoundingClientRect().top <= mr.top + 2;
-  bar.classList.toggle('is-stuck', stuck);
-
-  /* THE BAR LEAVES WHEN THE LAST COUNTED SECTION IS FULLY ON SCREEN.
-
-     THE ANCHOR USED TO BE "YOUR STANDING" AND THAT SECTION IS GONE (Maryam,
-     31 Aug 2026). The rule it encoded still holds — the bar goes when it has
-     nothing left to point at — but the thing that made Your standing the right
-     anchor was that no card counted it: it sat AFTER the last queue, so
-     reaching it meant the queues were behind you. With it removed, Booked is
-     both the last queue and the end of the page, so the anchor is Booked
-     itself. The reading is the same one step earlier: once the final queue is
-     fully on screen, the bar is pointing at what you are already looking at.
-
-     "Fully visible" rather than "has reached the bar", and that is the half of
-     this worth keeping: the anchor is the LAST thing on the page, so at the
-     very bottom of the scroll its top is still well down the window. A trigger
-     waiting for it to reach the top is one the page can never reach, and the
-     first version of this never fired once. `bottom <= mr.bottom` is what
-     makes it reachable, and it is why this survived the anchor moving.
-
-     Gated on `stuck` because on a window tall enough to show the whole page at
-     once, every section is always fully visible — and an unstuck bar sitting in
-     its own flow position must not hide, or the page has a hole where its
-     figures should be.
-
-     NOT `LEAD_JUMPS[LEAD_JUMPS.length-1]`, which would be the clever version:
-     the bar's own list is what decides which sections it POINTS at, and tying
-     the exit to it would mean a future card added to that list silently moves
-     the exit too. The anchor is a judgement about the page's last section. */
-  /* AND THE SELECTOR HAD BEEN DEAD SINCE 1 SEP 2026. This read `#lead-booked`,
-     the id that section carried before it was renamed `lead-calls` with the
-     interviews — so `stand` has been null and `gone` has been permanently false
-     ever since, which is the quiet half of a rename: the rule is still valid,
-     still matches nothing, and the bar simply never left. The page's last
-     section is `lead-cohorts` now (the calls section moved to the top on 4 Sep
-     2026), and it is named as a JUDGEMENT about the page rather than read off
-     `LEAD_JUMPS[LEAD_JUMPS.length-1]` — which would be the clever version and
-     would silently move the exit the next time a card is added to that list. */
-  const stand = device.querySelector('#lead-cohorts');
-  const gone = stuck && !!stand && stand.getBoundingClientRect().bottom <= mr.bottom;
-  bar.classList.toggle('is-gone', gone);
-
-  /* THE READING LINE IS 45% DOWN, NOT AT THE BAR'S EDGE.
-
-     "The last section whose top has passed under the bar" is the obvious rule
-     and it is wrong here, for a reason particular to the last card: Booked is
-     the final counted section, so its top only reaches the bar at the very
-     bottom of the scroll — by which point Your standing is visible and the bar
-     has already gone. The Booked card could never light up, which made it the
-     one card that looked broken.
-
-     Measuring at 45% of the space below the bar gives every section a window,
-     including the last, and it is the better reading of "which section am I
-     in" anyway: the active one is the one occupying the place your eye is,
-     not the one that just crossed the top edge. */
-  /* AND IT IS READ IN DOCUMENT ORDER, NOT IN `LEAD_JUMPS`' ORDER (4 Sep 2026).
-     This used to walk the array and keep the last match, which is the same
-     thing only while the sections run down the page in the array's order — the
-     coupling that array's own note is about. §113 broke it: the calls section
-     is the row directly under Tal's summary now, ABOVE the strip, while its
-     card stays third in the four. Walked by array order, `lead-calls` was the
-     last id tested after `lead-attention` and its top is always above the
-     reading line, so the strip lit Cohort Calls on every section of the page.
-     Nothing threw and nothing warned — a position indicator that is confidently
-     wrong looks exactly like one that is right.
-
-     Sorting by the measured top answers it wherever a section sits, so the four
-     cards may be ordered independently of the page from here on. */
-  const line = mr.top + h + (mr.height - h) * 0.45;
-  let live = null;
-  LEAD_JUMPS.map(j => device.querySelector('#' + j.id))
-    .filter(Boolean)
-    .sort((a,b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
-    .forEach(s => { if(s.getBoundingClientRect().top <= line) live = s.id; });
-  live = live || (LEAD_JUMPS[0] && LEAD_JUMPS[0].id);
-  bar.querySelectorAll('[data-jump]').forEach(b =>
-    b.classList.toggle('on', !gone && b.dataset.jump === live));
-}
-
-let LEAD_RAF = false;
-device.addEventListener('scroll', () => {
-  if(LEAD_RAF) return;
-  LEAD_RAF = true;
-  requestAnimationFrame(() => { LEAD_RAF = false; try { leadStick(); } catch(e){} });
-}, true);
-window.addEventListener('resize', () => { try { leadStick(); } catch(e){} });
-
-/* PRESSING A CARD SCROLLS, IT DOES NOT NAVIGATE. `data-go` would open another
-   page; these four are sections of THIS page, and the difference matters — the
-   count on the card is a count of what is a few hundred pixels below it, and
-   replacing the page to show it would lose the three other counts.
-
-   `scrollIntoView`, NOT ARITHMETIC. The first version worked out the target
-   itself and subtracted the bar's height, and it could not be right: the height
-   it measured was the RESTING bar, four cards tall, and the height that ends up
-   covering the heading is the STUCK bar, one strip tall. Every jump landed with
-   the heading tucked behind the strip.
-
-   The offset a sticky header needs is what `scroll-margin-top` is for, and the
-   four sections declare it in §31. `scrollIntoView` honours it, `scrollTo` does
-   not — so the browser does the arithmetic, the value lives next to the bar it
-   is compensating for, and this handler has none of it. */
-device.addEventListener('click', e => {
-  const j = e.target.closest('[data-jump]');
-  if(!j) return;
-  const sec = device.querySelector('#' + j.dataset.jump);
-  if(sec) sec.scrollIntoView({block:'start', behavior:'smooth'});
-});
 
 /* ==========================================================================
    SEARCH AND FILTER — DELETED 1 SEP 2026, AND THE ONE IDEA WORTH KEEPING
@@ -1605,10 +1461,9 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
-    /* the bar's stuck state, its bleed and its live card are all read off
-       geometry, and the geometry is new on every render — a nav click, Tal
-       opening, the viewport switcher. Measured after the paint, not before it. */
-    leadStick();
+    /* `leadStick()` was called here to drive the sticky position-indicator; the
+       bar and its scroll-spy were removed 9 Sep 2026 (see the note above), so the
+       wrapper now only stamps `data-portal`, which both stylesheets scope on. */
   } catch(e){ console.warn('portal stamp', e); }
 };
 

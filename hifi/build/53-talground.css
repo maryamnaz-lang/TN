@@ -257,19 +257,24 @@
    state — nothing behind the bar — just reads as white, as it did before.
    ------------------------------------------------------------------------ */
 .app .ask-page{position:relative}
+/* THE FROST IS LIGHTER NOW (Maryam, 9 Sep 2026: "lighten the tal row white
+   blur"). The band's white drops from .72 to .55 and its blur from 12 to 8, and
+   the fade below it from .72 to .4 with a 6px blur, so the header whitens the
+   conversation less as it scrolls behind — a softer veil rather than a solid
+   wash. The greeting state (nothing behind the bar) still reads white. */
 .app .ask-page .ask-top{
   position:absolute;top:0;left:0;right:0;z-index:5;
   border-top:0;border-bottom:0;
-  background:rgba(255,255,255,.72);
-  -webkit-backdrop-filter:blur(12px);
-          backdrop-filter:blur(12px)}
+  background:rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(8px);
+          backdrop-filter:blur(8px)}
 .app .ask-page .ask-top::after{
   content:'';position:absolute;top:100%;left:0;right:0;height:28px;
   pointer-events:none;
   background:linear-gradient(to bottom,
-    rgba(255,255,255,.72), rgba(255,255,255,0));
-  -webkit-backdrop-filter:blur(9px);
-          backdrop-filter:blur(9px);
+    rgba(255,255,255,.4), rgba(255,255,255,0));
+  -webkit-backdrop-filter:blur(6px);
+          backdrop-filter:blur(6px);
   -webkit-mask-image:linear-gradient(to bottom,#000,transparent);
           mask-image:linear-gradient(to bottom,#000,transparent)}
 /* the thread scrolls behind the band, so it opens below band + fade */

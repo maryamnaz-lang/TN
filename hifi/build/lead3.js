@@ -689,11 +689,15 @@ V.leadSum = () => {
         <span class="idmeta">${lname(c)} &middot; 90 days complete</span>
         <span class="tag sm">${llevel(c)}</span>
       </div>
-      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">Their full record ${I.arrowRight}</button></div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidate Progress ${I.arrowRight}</button></div>
     </div>
   </div>
-  <div class="sec">
-    <div class="sec-h"><h2>What the 90 days produced</h2><span class="t-helper-01">From the course platform &middot; read-only</span></div>
+  ${''/* NO "read-only" HELPER AND NO FOOT DIVIDER (Maryam, 9 Sep 2026: "remove
+         these lines" for the two `.t-helper-01` captions, and "remove divider
+         below 4 cards"). `sec-noline` drops §10.2's foot hairline so the figures
+         run straight into "Your recommendation". */}
+  <div class="sec sec-noline">
+    <div class="sec-h"><h2>What the 90 days produced</h2></div>
     <div class="stats">
       ${statCell(I.book,  'Chapters', lchDone(m) + '<small> of 13</small>', m.pc + '% complete')}
       ${statCell(I.chart, 'Assessment average', m.avg + '<small>%</small>', m.avg >= 85 ? 'well above the pass mark' : 'above the pass mark')}
@@ -701,6 +705,29 @@ V.leadSum = () => {
       ${statCell(I.renew, 'Chapters retaken', retakes, m.att.toFixed(1) + ' attempts on average')}
     </div>
   </div>
+  ${''/* THE LEADER'S OWN NOTES ON THIS CANDIDATE (Maryam, 9 Sep 2026: "there
+         needs to be a section of the notes taken by the cohort leader about this
+         candidate on this evaluation screen"). The same `S.ldrNotes` store and
+         `.note-list` / `.note-row` styling the cohort page writes, drawn READ-ONLY
+         here — no edit/delete chips, because this page has no composer to open (a
+         chip would set state nothing on this page renders). It sits between the
+         figures the leader reads and the recommendation they write, which is the
+         order the note at 769 already assumes ("the numbers above" and the
+         private notes). Nothing when the candidate has no notes yet. */}
+  ${lnotes(s.name).length ? `
+  <div class="sec">
+    <div class="sec-h"><h2>Your notes on ${first}</h2></div>
+    <div class="note-list">
+      ${lnotes(s.name).map(n => { const k = NOTE_K[n.k] || NOTE_K.general;
+        return `<div class="note-row note-ro" data-note-k="${n.k || 'general'}" style="--note-ink:var(${k.ink});--note-bg:color-mix(in srgb, var(${k.ink}) ${k.mix}, var(--layer-01))">
+          <span class="note-b">
+            <span class="note-t">${n.t}</span>
+            ${n.b ? `<span class="note-x">${n.b}</span>` : ''}
+            <span class="note-f"><span class="note-tag">${k.t}</span><span class="note-w">Added by you &middot; ${n.w}</span></span>
+          </span>
+        </div>`; }).join('')}
+    </div>
+  </div>` : ''}
   ${/* ONE BAND OF FIGURES, NOT TWO. A `.facts` row of four sat directly under
         the `.stats` row of four — the same object twice, one with an icon and
         a sub-line and one without, and nothing said why "calls attended"
@@ -724,7 +751,7 @@ V.leadSum = () => {
         tint either, so the two states of this page now stand on the same
         ground. */''}
   <div class="sec">
-    <div class="sec-h"><h2>Your recommendation</h2><span class="t-helper-01">This is what the next agent reads</span></div>
+    <div class="sec-h"><h2>Your recommendation</h2></div>
     <div class="tile">
       ${/* THE CHOICE IS A RADIO LIST, NOT A BUTTON STRIP (Maryam, 2 Sep 2026:
             "instead of arrows and full button type selection, give radio buttons
@@ -782,7 +809,7 @@ V.leadSum = () => {
           drawn. `.btn-set` stays on the wrapper for the spacing even with one
           child, which is what `.mt5` is measured against. */''}
     <div class="btn-set mt5">
-      <button class="btn btn-p" data-ldrpub="${s.id}">Send Recommendation ${I.checkFilled}</button>
+      <button class="btn btn-p" data-ldrpub="${s.id}">Send Recommendation</button>
     </div>
   </div>
 </div></main>`;

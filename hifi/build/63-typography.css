@@ -4731,7 +4731,11 @@
 .app .ob-chat-lede{
   font-size:var(--t-sec-size);line-height:26px;
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
+  /* THE LEDE IS A DESCRIPTION, so it is `--text-secondary` #828282 (Maryam,
+     9 Sep 2026: "change the desc color to #828282"), the platform's one
+     description grey (§63 §1). The greeting on top (`:first-child`, below) keeps
+     `--text-primary` — it is the heading, not a description. */
+  color:var(--text-secondary)}
 
 /* THE CONVERSATION IS 14px — Maryam, 3 Sep 2026: "use 14px font size for the
    questions and the responses send by the user."
@@ -5263,14 +5267,17 @@
 .app .ask-page .tal-hero h2 .askv-q{
   font-weight:var(--t-w-book);
   color:var(--text-primary)}
-/* THE SENTENCE UNDER THE GREETING IS A DESCRIPTION — Maryam, 4 Sep 2026:
-   "should follow the font size of other desc font sizes." §49 had it at the
-   16px section rank in primary ink, which is §107's onboarding size for a
-   line that there opens a five-question gate; here it is one supporting line
-   under a 28px greeting, which is the description role by §3's own test. */
+/* THE SENTENCE UNDER THE GREETING FOLLOWS THE ONBOARDING LEDE'S SIZE — Maryam,
+   9 Sep 2026: "the font size of desc of tal onboarding should be followed in tal
+   chat as well." So it is `--t-sec-size` / 26 in `--text-secondary`, the same
+   rank `.ob-chat-lede` takes under its own greeting. This REVERSES the 4 Sep
+   call recorded here before (drop it to `--t-desc-size` as one supporting line
+   under a 28px greeting); the two greeting-plus-lede screens read at one size
+   now, which is what the newest ask wants. Still a description, so still
+   `--text-secondary`. */
 .app .ask-page .tal-hero p{
-  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  font-size:var(--t-sec-size);line-height:26px;
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
   color:var(--text-secondary)}
 .app .ask-page .ask-thread .tal-msg:not(.me) > .bb{
   font-size:var(--t-h4-size);line-height:22px;

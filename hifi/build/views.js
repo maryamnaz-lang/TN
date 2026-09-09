@@ -1389,9 +1389,16 @@ const GC_IC = {track:'growth', course:'courseCard', interview:'video', cohort:'g
    from here. A page that wants the label writes the `<span>` itself, between
    `.gcard-b` and the arrow. */
 const gcard = (kind,tag,title,sub,go,art,at) => `<button class="tile clk gcard" data-go="${go}"${at ? ' ' + at : ''}>
+  ${''/* NO LEFT ICON WHEN THERE IS NO COVER (Maryam, 9 Sep 2026: "remove the left
+         side cohort icons"). The fallback used to draw a `.cardrow-ic` mark
+         (`GC_IC[kind]`, the cohort's `group` glyph) when no `art` was passed;
+         the cohort rows pass `null` art, so that mark was the icon on every row.
+         Only the real cover (`art.src`, when a caller gives one) draws now; with
+         no cover the row is the text and the arrow. `kind`/`GC_IC` stay for a
+         caller that passes a cover. */}
   ${art
     ? `<span class="gcard-art">${art.i ? `<i>${art.i}</i>` : ''}<img src="${art.src}" alt="" loading="lazy" onerror="this.style.display='none'"></span>`
-    : `<span class="cardrow-ic">${I[GC_IC[kind]||'document']}</span>`}
+    : ''}
   <span class="gcard-b">
     ${tag?`<span class="eyebrow">${tag}</span>`:''}
     <h3>${title}</h3><span class="sub">${sub}</span>
@@ -4978,8 +4985,14 @@ function crow(kind, o){
                throws away the half that carries the words (§86 is the argument
                and the ratio). One flag, one class, and the four call sites that
                draw a person are untouched. */}
-        <span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i}</i>${p.img
-          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>
+        ${''/* NO MARK AT ALL WHEN THE RECORD HAS NEITHER INITIALS NOR A PHOTO
+               (Maryam, 9 Sep 2026: "remove the circle 41 from the black card").
+               The leader's weekly call set `who.i` to the cohort number, which
+               drew a disc reading "41"; dropping `i` from the record now drops
+               the whole `.crow-ph`, so the detail sits flush left. Every person
+               row still carries `i`/`img`, so their avatar is untouched. */}
+        ${(p.i || p.img) ? `<span class="crow-ph${c.cover ? ' crow-cover' : ''}"><i>${p.i || ''}</i>${p.img
+          ? `<img src="${p.img}" alt="" loading="lazy" onerror="this.style.display='none'">` : ''}</span>` : ''}
         <div class="crow-b">
           <p class="crow-id"><span class="crow-n">${p.n}</span>
             ${c.v === false ? '' : `<span class="crow-v">${I.checkFilled}</span>`}</p>
@@ -11572,12 +11585,48 @@ function pfRing(){
    are both about a record that has no stage in it. */
 S.pfEdit = null;
 
+/* THE OPEN CUSTOM DROPDOWN, OR `null`, AND THE VALUES IT HAS SET. Our own
+   dropdown (`dd()` below, §123) rather than a native `<select>` whose open list
+   is the operating system's (Maryam, 9 Sep 2026, of the Intent aspiration field:
+   "this dropdown should not be system dropdown but of our ui"). §123's `.dd*`
+   CSS already ships in this build for the agent portal's slot form; only the
+   markup and state were the agent portal's, so this is that half brought over.
+   `S.dd` is the open key (one at a time, like the agent portal's), `S.ddVal` maps
+   a field key to the value chosen on it — both pure state the render reads, so
+   nothing about the control lives in the DOM (trap 9). */
+S.dd = null;
+S.ddVal = {};
+
 /* THE FIRST SECTION WITH SOMETHING MISSING — what "Complete Your Profile"
    opens. Falls back to the first section when nothing is missing, because a
    card that says the profile is 100% complete is not drawn with anywhere else
    to send you and landing on General Details is landing at the top. */
 const pfFirstGap = () => (PF_SEC.find(s => !pfSecDone(s.k)) || PF_SEC[0]).k;
 
+
+/* OUR DROPDOWN, DRAWN IN THE PLATFORM'S OWN LANGUAGE — the trigger is an `.inp`
+   so a closed one is indistinguishable from a text field, and the popup is
+   `.acct-menu`'s recipe; §123 styles both. It is the agent portal's `dd()`
+   ported (that file hand-wrote it on this same layer, which already ships here);
+   `key` names the open state in `S.dd` and the chosen value in `S.ddVal`, so
+   pressing the trigger, choosing a row and clicking away are all state the
+   render reads back (trap 9). `check` and `chevDown` are both in `icons.js`. */
+function dd(key, opts, val){
+  const open = S.dd === key, cur = val || opts[0];
+  return `<div class="dd${open ? ' on' : ''}" data-dd="${key}">
+    <button type="button" class="inp dd-btn" data-ddtoggle="${key}"
+      aria-haspopup="listbox" aria-expanded="${open}">
+      <span class="dd-val t-body">${cur}</span>
+      <svg class="dd-cx" viewBox="0 -960 960 960">${inner('chevDown')}</svg>
+    </button>
+    <div class="dd-menu" role="listbox">
+      ${opts.map(o => `<button type="button" class="dd-opt${o === cur ? ' on' : ''}"
+        role="option" aria-selected="${o === cur}" data-ddset="${key}:${o}">
+        <span class="dd-opt-t t-body">${o}</span>
+        <svg class="dd-tick" viewBox="0 -960 960 960">${inner('check')}</svg></button>`).join('')}
+    </div>
+  </div>`;
+}
 
 /* A FIELD IS `[key, label, value, opts]` AND THE FOURTH IS EVERY VARIANT.
    `w` spans both columns, `t` picks the control, `o` is a select's options and
@@ -11588,6 +11637,13 @@ function pfField(id, [k, lab, v, o]){
   const fid = `pf-${id}-${k}`;
   const body = opt.t === 'area'
     ? `<textarea class="inp" id="${fid}" rows="4" placeholder="${opt.ph || ''}">${v || ''}</textarea>`
+    : opt.t === 'dd'
+      /* OUR DROPDOWN, NOT A NATIVE `<select>` (Maryam, 9 Sep 2026). The chosen
+         value is `S.ddVal[fid]` once the reader has picked one, else the record's
+         `v`. The field is a prototype that does not persist on Save (`data-pfedit`
+         only closes it), so the pick lives in `S.ddVal` for the session and needs
+         no form-collect step. */
+      ? dd(fid, opt.o, S.ddVal[fid] || v)
     : opt.t === 'sel'
       ? `<select class="inp" id="${fid}">${opt.o.map(x =>
           `<option${x === v ? ' selected' : ''}>${x}</option>`).join('')}</select>`
@@ -11723,7 +11779,7 @@ const pfFormGeneral = () => {
       ['role','Current role', g.role, {ph:'e.g. Operations Lead — or Student'}],
       ['industry','Industry', g.industry, {ph:'e.g. Software'}],
       ['years','Years of experience', g.years, {ph:'e.g. 5 years'}],
-      ['intent','Intent aspiration', g.intent, {t:'sel', o:INTENTS}],
+      ['intent','Intent aspiration', g.intent, {t:'dd', o:INTENTS}],
       ['about','About', g.about, {t:'area', w:1,
         ph:'Two or three sentences on what you do and what you are good at.'}]
     ], 'pfe-g3')}
@@ -13050,7 +13106,16 @@ function setStage(k,keepView){
      It is hoisted, so calling it from here needs nothing moved. */
   if(k === 'onboard'){
     S.obStep = 0; S.obSpoken = false;
-    S.obMode = 'voice'; S.obChatOpen = false; S.obQi = 0;
+    /* `'chat'`, NOT `'voice'` — the reader lands on the chat side directly
+       (Maryam, 9 Sep 2026: "hide this screen [the spoken voice intro], the user
+       will directly land on the chat screen"). ob.js's default (`S.obMode =
+       'chat'`) already hides the voice flow on a boot/deep-link arrival, but
+       THIS reset was still forcing `'voice'`, so entering the stage through the
+       STAGE picker walked straight back into the spoken orb the 9 Sep change
+       was meant to retire. The voice machinery stays in place and unreachable,
+       exactly as ob.js's note records; this is the second half of that same
+       one-line reversal. */
+    S.obMode = 'chat'; S.obChatOpen = false; S.obQi = 0;
     talReset();
   }
   S.hist = [];
@@ -14441,6 +14506,29 @@ device.addEventListener('click', e => {
   /* the certificate menu closes the same way and for the same reason — a press
      anywhere that is not the toggle or the panel itself */
   if(S.crtMenu !== null && !t.closest('.crt-menu, .crt-pop')){ S.crtMenu = null; render(); }
+  /* and OUR dropdown (`dd()`, the Intent field) — a press outside `.dd` closes
+     the open one, the agent portal's own click-away for `S.dd` */
+  if(S.dd && !t.closest('.dd')){ S.dd = null; render(); }
+
+  /* THE DROPDOWN'S OWN TWO PRESSES. The trigger toggles `S.dd` (opening a second
+     closes the first — one key), a row writes `S.ddVal` and closes. `data-ddset`
+     is `key:value` split on the FIRST `:` so a value may contain one. Both are
+     the agent portal's handlers, and they sit above the generic branches because
+     the trigger is an `.inp` and the option a `<button>` that other handlers
+     would otherwise reach. */
+  const ddt = t.closest('[data-ddtoggle]');
+  if(ddt){
+    const key = ddt.dataset.ddtoggle;
+    S.dd = S.dd === key ? null : key;
+    e.preventDefault(); render(); return;
+  }
+  const dds = t.closest('[data-ddset]');
+  if(dds){
+    const raw = dds.dataset.ddset, i = raw.indexOf(':');
+    S.ddVal[raw.slice(0, i)] = raw.slice(i + 1);
+    S.dd = null;
+    e.preventDefault(); render(); return;
+  }
 
   /* EVERY ASK OPENS THE SAME SURFACE.
      This used to be `S.tal = true; ask(q)` — the question went into the side
@@ -14749,7 +14837,7 @@ device.addEventListener('click', e => {
      and which the `[data-go]` branch above fires as well. */
   const pfe = t.closest('[data-pfedit]');
   if(pfe){ const k = pfe.dataset.pfedit;
-    S.pfEdit = k || null; if(k) S.pfTab = 'me'; render(); pfScroll(k); return; }
+    S.pfEdit = k || null; S.dd = null; if(k) S.pfTab = 'me'; render(); pfScroll(k); return; }
 
   /* THE PASSWORD FORM IS ITS OWN FLAG, NOT A SEVENTH `S.pfEdit` KEY, and the
      reason is what the two attributes mean. `S.pfEdit` names one of `PF_SEC`'s

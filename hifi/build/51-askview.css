@@ -203,7 +203,10 @@
   -webkit-text-fill-color:transparent;color:transparent}
 .app .ask-page .tal-hero p{
   margin:0;max-width:246px;
-  font-size:14px;line-height:20px;letter-spacing:.16px;
+  /* §63 §5275 owns this line's size (it follows the onboarding lede at
+     `--t-sec-size` / 26, Maryam 9 Sep 2026); the size/lh here would be dead
+     under it, so only the box and colour stay. */
+  letter-spacing:.16px;
   color:var(--askv-sub)}
 
 @container app (min-width:900px){

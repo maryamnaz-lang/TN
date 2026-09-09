@@ -1392,6 +1392,32 @@
 .app .ob-logo img{display:block;height:24px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:26px}}
 
+/* ------------------------------------------------------------------ 107.p ---
+   THE PROGRESS BAR — Maryam, 9 Sep 2026, with a reference
+
+   It sits at the top of the live chat, under the wordmark and above the
+   conversation, centred on the SAME `minmax(0,720px)` column the thread and the
+   field use (§107's dock) so the three read as one column. The h3 is
+   left-aligned to the bar's left edge — the flex column stacks them and neither
+   is centred within it, so the heading starts where the first segment starts.
+
+   THE SEGMENTS ARE THE ASK, STATED IN TOKENS. A filled one is `--accent`; the
+   rest are a plain `--rule` (#efefef) fill with NO border (Maryam, 9 Sep 2026:
+   "the next step progress bars should be of no border and their color should be
+   #efefef" — reversing the earlier #fcfcfc fill + #efefef hairline). Read as a
+   token, not the hex. The 999px is the reference's pill and joins §56's short
+   list of stated curves; a progress segment is a mark, not a box. §63 owns the
+   h3's type; this layer sets layout and fills only. */
+.app .ob-prog{
+  width:100%;max-width:720px;flex:none;
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--s04)}
+.app .ob-prog-h{margin:0}
+.app .ob-prog-bar{display:flex;gap:var(--s03);width:100%}
+.app .ob-prog-seg{
+  flex:1;min-width:0;height:6px;border-radius:999px;
+  background:var(--rule)}
+.app .ob-prog-seg.on{background:var(--accent)}
+
 /* A MESSAGE ARRIVES, IT DOES NOT APPEAR. 14px of lift over 260ms — far enough
    to read as movement, short enough that a reader answering four questions in
    a row is never waiting on it.

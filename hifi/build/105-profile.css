@@ -49,6 +49,27 @@
    §63 still types `.facts .d` — that role has readers elsewhere. */
 .app .page .pf-facts .v{display:block;margin-top:var(--s03)}
 
+/* ------------------------------------------------------------------ 105.1a ---
+   FOUR CELLS TO A ROW, so the candidate's eight facts read as two tidy rows of
+   four rather than one long row of eight (Maryam, 9 Sep 2026: "divide these 8
+   cards in 2 rows means 4 cards in each row, all will be attached, just like a
+   grid"). `.facts` (§10) is `repeat(auto-fit, minmax(140px, 1fr))` — right for a
+   four-fact band, but at the profile's width eight cells fit on one line. Fixing
+   four columns makes 8 → 4 + 4, and the band's own `gap:1px` on the `--rule`
+   ground paints the hairline between the two rows exactly as it does between the
+   columns, so it reads as one attached grid. A four-fact band (the leader and
+   agent public profiles) stays a single row of four — the same layout auto-fit
+   already gave it, so nothing there moves.
+
+   INSIDE THE 900 QUERY (trap 3): below it the base auto-fit stands, which drops
+   to two columns on a phone (eight facts as four rows of two) — four fixed
+   columns would crush a 90px cell there. The container query adds no
+   specificity, and this rule (0,3,0) already outweighs `.facts` (0,1,0), but it
+   must not fire below 900, so it is stated in the tier that should hold it. */
+@container app (min-width:900px){
+  .app .page .pf-facts{grid-template-columns:repeat(4, 1fr)}
+}
+
 /* ---- the photograph ----
    ROUND, WHICH IS §103's DECISION ON THE THREAD'S FACES AND §89.2's ON THE
    COHORT LISTS (Maryam, 2 Sep 2026: "make the profile picture circle"). A face
