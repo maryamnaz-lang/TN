@@ -209,7 +209,7 @@ function bkProfile(key){
     <div class="bk-a">
       ${done
         ? `<span class="bk-flag">${I.checkFilled}Booked for ${bkDate()}</span>`
-        : `<button class="btn btn-p btn-sm" data-bkbook="${key}">Book ${a.n.split(' ')[0]} ${I.arrowRight}</button>`}
+        : `<button class="btn btn-p btn-sm" data-bkbook="${key}">Book call with ${a.n.split(' ')[0]} ${I.arrowRight}</button>`}
     </div>
   </div>`;
 }
@@ -442,7 +442,7 @@ function bkBooked(){
   S.view = 'dashboard';
   S.hist = [];
   bkTurn(bkLong(),
-    `Done &mdash; your interview is booked.`
+    `Done. Your interview is booked.`
     + bkFrozen(bkDone()));
 }
 

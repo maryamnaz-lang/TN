@@ -534,7 +534,7 @@ const TALCTX = {
 const TAL_ROUTES = [
   [/consultant|screening|jordan/i, () => 'Fifteen minutes with Jordan Blake, and nothing in it is assessed. He asks where you are now and what you want next, then points you at the agents whose range fits. There is nothing to prepare and it sets no level.'
     + twChips(['How is that different from the agent interview?','What happens in the interview?'])],
-  [/quiz result|my quiz|quiz score|title given|which track am i/i, () => 'You scored 64 out of 100, which puts you on the Explorer track &mdash; the first of three. That is a TITLE, not a level: the five levels inside it are set by an interview with a talent agent, and the quiz cannot do it.'
+  [/quiz result|my quiz|quiz score|title given|which track am i/i, () => 'You scored 64 out of 100, which puts you on the Explorer track, the first of three. That is a TITLE, not a level: the five levels inside it are set by an interview with a talent agent, and the quiz cannot do it.'
     + wLadder() + twChips(['What is the Explorer track?','How do I get my level?'])],
   [/key terms|two terms/i, () => 'Chapter 4 turns on two ideas.' + wTerms() + twChips(['Explain the chapter in 60 seconds','What does the roleplay ask for?'])],
   [/chapter 4|walk me through|stuck|60 seconds|explain this chapter|roleplay/i,

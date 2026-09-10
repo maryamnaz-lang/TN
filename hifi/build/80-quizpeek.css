@@ -148,12 +148,18 @@
   border-top:1px solid var(--rule);
   text-align:left;width:100%}
 .app .qzp-r:last-child{border-bottom:1px solid var(--rule)}
-.app .qzp-r:hover{background-color:var(--overlay-hover);cursor:pointer}
+.app .qzp-r:hover{cursor:pointer}
 .app .qzp-r-ic{
   flex:none;width:28px;height:28px;
   display:grid;place-items:center;
   background-color:color-mix(in srgb, var(--mk-1) 12%, #fff)}
-.app .qzp-r-ic svg{width:16px;height:16px;fill:var(--mk-1)}
+.app .qzp-r-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
+/* The row is a `<button class="qzp-r" data-go>`, so its ink mark lights
+   `--accent` on hover — the clickable-block rule. `qzp-r` is armed in
+   HOVER_KEEP; only the mark and the pointer cursor react. §80's old row
+   background wash was dropped from the hover above (Maryam, 9 Sep 2026: nothing
+   but the icon changes on hover — "do not make the border black"). */
+.app .qzp-r:hover .qzp-r-ic svg{fill:var(--accent)}
 .app .qzp-r-b{
   flex:1 1 auto;min-width:0;
   display:flex;flex-direction:column;gap:var(--s01);align-items:flex-start}

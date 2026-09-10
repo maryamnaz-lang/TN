@@ -95,8 +95,16 @@ S.obStep = 0;
 S.obSpoken = false;
 /* WHICH MODE THE GATE'S FIRST SCREEN IS IN — `'voice'` or `'chat'`. The two
    pills at the foot switch it and `obChatScreen`'s note is why it is a word of
-   its own rather than a reuse of `S.askOpen`. */
-S.obMode = 'voice';
+   its own rather than a reuse of `S.askOpen`.
+
+   THE VOICE FLOW IS HIDDEN (Maryam, 9 Sep 2026: "hide the voice flow on the tal
+   onboarding, that means we will land user on the chat side directly"). So the
+   door opens on chat rather than voice, and `obModes` draws no Voice/Chat pair —
+   there is one mode now, so a switch between two would be §60's dead control.
+   The voice machinery (`obSpeak`/`obReplay`/`obChat`, the mode handlers) is left
+   in place, just no longer reachable, so restoring the pair is a one-line
+   reversal of both this default and `obModes`. */
+S.obMode = 'chat';
 /* AND WHETHER THE CONVERSATION HAS BEGUN. The chat opens on Tal's message and
    a button; the left/right turns and the composer arrive when that button is
    pressed (Maryam, 3 Sep 2026: "the chat left right messages will initiate
@@ -168,11 +176,36 @@ const OB_LOW = () => qzLow(2);
 const OB_Q = [
   {k:'where',
    q:'Where are you right now?',
-   tal:'Before I point you at anybody, I need four things a quiz cannot tell me.',
+   tal:'Before I point you at anybody, I need a few things a quiz cannot tell me.',
    o:[['role','In a role','Employed and leading, or on your way to it.'],
       ['between','Between roles','Out of a role and looking for the next one.'],
       ['school','In school','Studying, with the first role still ahead.'],
       ['own','Running my own thing','Founder, freelance, or your own small team.']]},
+
+  /* INDUSTRY asks SECOND and EXPERIENCE THIRD, right after where (Maryam, 9 Sep
+     2026: "the question What industry are you in? should come right after the
+     Where are you right now? question and then the experience will come after
+     the industry question"). Both moved up from their old places; their tal and
+     options are untouched. The count, the spine and the read-back all derive
+     their order from `OB_Q`, so moving the blocks is the whole change. */
+  {k:'industry',
+   q:'What industry are you in?',
+   tal:'A couple more, so your profile is set up before you walk in.',
+   o:[['software','Software','Product, platforms, SaaS.'],
+      ['finance','Finance','Banking, insurance, fintech.'],
+      ['healthcare','Healthcare','Care, life sciences, medtech.'],
+      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
+      ['education','Education','Schools, training, ed-tech.'],
+      ['other','Something else','Tell me on your profile later.']]},
+
+  {k:'years',
+   q:'How long have you been working?',
+   tal:'Roughly is fine — it helps me read where you are.',
+   o:[['0','Less than a year','Just getting started.'],
+      ['1','1 to 3 years','Finding your feet.'],
+      ['3','3 to 5 years','Into your stride.'],
+      ['5','5 to 10 years','Experienced.'],
+      ['10','More than 10 years','A long way in.']]},
 
   /* THE ONE QUESTION THAT OPENS WITH DATA. The heading is assembled from
      `OB_LOW()` so the two names, their two figures and the order they are in
@@ -209,13 +242,36 @@ const OB_Q = [
              ['ahead','Planning further ahead than this week','Everything is this week, so nothing is next quarter.'],
              ['up','Managing the people above me','The work is fine; the direction from above is not.']]}},
 
-  {k:'want',
-   q:'What do you want out of the next 90 days?',
-   tal:'Last one of the four. It decides what I put in front of you first.',
-   o:[['record','A level on record','Something verified you can put in front of somebody.'],
-      ['up','To move up where I am','The next title, in the organisation you are already in.'],
-      ['change','To change direction','A different function, industry, or kind of work.'],
-      ['stand','To find out where I stand','An honest read before you decide anything.']]}
+  /* THE "What do you want out of the next 90 days?" QUESTION WAS HERE AND IS
+     REMOVED (Maryam, 9 Sep 2026: "remove the What do you want out of the next 90
+     days? question that we have right now"). Its phrasing moved onto the intent
+     question below, which now asks it and reads the answer into the course
+     category. `want`'s readers went with it: the `obMemo` want row (ai2.js), the
+     `obHeard` want row and the `OB_SPINE` "What you want" label. */
+  /* THE THREE CLIENT PROFILE FIELDS AS ONBOARDING QUESTIONS (Client, 9 Sep
+     2026). Industry, Years of experience and Intent are captured here and
+     written onto `PF.general` on the way out (`data-obdone`), so what you pick
+     shows on your profile. Current role and the student flag are already the
+     `where` question (In a role / In school / …) plus the editable profile; the
+     exact role title and degree live on the profile — a free-text field is not
+     an option in this flow (it was deleted for the render/caret trap, see
+     `obFree`). Intent is the primary COHORT grouping axis (Point 1): its options
+     ARE `INTENTS`, built from that one list so the words match the profile
+     select exactly. It is deliberately last — the aspiration is the note the
+     flow ends on. (Industry and experience moved up to second and third, right
+     after `where` — see the note there; only intent stays here.) */
+  /* THE INTENT QUESTION NOW ASKS THE 90-DAY QUESTION (Maryam, 9 Sep 2026:
+     change "Where are you trying to go?" to "What do you want out of the next 90
+     days? This will help choose you your course category."). It keeps its
+     `INTENTS` options and its cohort/course-category reader — only the heading
+     changed, taking over the phrasing of the removed `want` question above. */
+  {k:'intent',
+   q:'What do you want out of the next 90 days? This will help choose you your course category.',
+   tal:'Last one, and it is the one that groups you with the right people. It does not depend on your level.',
+   o:INTENTS.map((s,i) => [['now','next','own'][i], s,
+     ['Go further in the seat you are in.',
+      'Move toward a different kind of role.',
+      'Build or run something of your own.'][i]])}
 
   /* >>> THE FIFTH QUESTION IS DELETED — Maryam, 3 Sep 2026: "remove this
      question from the flow. we do not need that."
@@ -296,7 +352,9 @@ function obReady(){
    spine is a narrow column, so each row is the SUBJECT of its question —
    which is also what makes a completed row readable as a thing that is now
    known rather than as a sentence that has been said. */
-const OB_SPINE = ['Where you are','What is low','Why it is hard','What you want'];
+/* IN THE NEW ORDER — where, industry, years, band, why, intent (Maryam, 9 Sep
+   2026). One label per question, positional, so it moves with `OB_Q`. */
+const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
 
 function obPanel(){
   const step = S.obStep;
@@ -676,6 +734,38 @@ const obDock = (mid, top) => `
   </div>`;
 
 /* ==========================================================================
+   THE PROGRESS BAR — Maryam, 9 Sep 2026, with a reference
+
+   A segmented bar in the top middle of the LIVE chat, with an h3 left-aligned
+   above it. One segment per question (`OB_N`), filled up to the one on screen
+   (`S.obQi`) — so it fills a segment as each question arrives and is all accent
+   once the read-back is reached. §107.p states the drawing: a filled segment is
+   the accent, the rest are `--surface-2` (#fcfcfc) inside a `--rule` (#efefef)
+   hairline, both read as tokens per §63 §14 rather than the hexes typed here.
+
+   LIVE ONLY. The welcome has no question on screen yet, so a bar counting them
+   has nothing to show; it arrives with the thread the moment the chat opens. */
+function obProgress(){
+  /* THE BAR DOES NOT DROP TO ZERO WHILE TAL TYPES THE NEXT QUESTION (Maryam,
+     9 Sep 2026: "while tal loads the next question the top progress bar goes to
+     zero, this should not happen"). `obAnswer` sets `S.obQi = 0` for the length
+     of the typing beat, so a bar keyed on `S.obQi` alone empties in that gap.
+     `done` is the greater of the ANSWERED count (which only ever grows) and the
+     question currently on screen — so it holds through the beat and still lights
+     the live question's segment the moment it arrives. */
+  const answered = OB_Q.filter(q => S.ob[q.k] != null && S.ob[q.k] !== '').length;
+  const done = Math.min(OB_N, Math.max(answered, S.obQi));
+  return `<div class="ob-prog">
+    <h3 class="ob-prog-h t-h3">You&rsquo;re almost there!</h3>
+    <div class="ob-prog-bar" role="progressbar"
+      aria-valuenow="${done}" aria-valuemin="0" aria-valuemax="${OB_N}">
+      ${Array.from({length: OB_N}, (_, i) =>
+        `<span class="ob-prog-seg${i < done ? ' on' : ''}"></span>`).join('')}
+    </div>
+  </div>`;
+}
+
+/* ==========================================================================
    THE PLATFORM SAYS ITS OWN NAME — Maryam, 3 Sep 2026
 
    *"on the top their should be a TALENTnext header to have a feel that the
@@ -753,6 +843,11 @@ const obHead = () => `
    a screen reader, which is what makes the pair a switch rather than two
    buttons that happen to sit together. */
 const obModes = () => {
+  /* HIDDEN — the voice flow is off (Maryam, 9 Sep 2026), so the switch between
+     two modes has only one mode to point at and is not drawn. §107 places the
+     dock's middle and pill columns by name, so an empty `.ob-modes` slot leaves
+     the composer centred rather than sliding it. Restore by deleting this line. */
+  return '';
   const m = S.obMode === 'chat' ? 'chat' : 'voice';
   return `
   <div class="ob-modes" role="group" aria-label="How Tal talks to you">
@@ -787,7 +882,11 @@ const obModes = () => {
    brief it was written from. Worth deciding once and applying to both.
    ========================================================================== */
 const OB_CHAT = [
-  'Good morning, Maryam!',
+  /* "Welcome to TALENTnext, Maryam!" (Maryam, 9 Sep 2026), replacing "Good
+     morning, Maryam!". Kept EXACTLY as supplied — the wordmark casing is hers,
+     and the note above is explicit that supplied copy is not silently
+     normalised (that is how a demo comes to disagree with its brief). */
+  'Welcome to TALENTnext, Maryam!',
   'I&rsquo;m Tal, and I&rsquo;ll be your companion throughout your TalentNext journey.',
   'Before we dive into the experience, let&rsquo;s start with a few quick questions about you. Nothing too complicated, just a chance for us to get to know you better.'
 ];
@@ -1202,7 +1301,7 @@ const obJourney = () => {
    ========================================================================== */
 const obChatDone = () => `
   <p>That is everything I needed. I have enough now to understand what you are after and where it is getting stuck.</p>
-  <p>From here it is the platform's turn &mdash; and you are already on step two.</p>
+  <p>From here it is the platform's turn, and you are already on step two.</p>
   ${obJourney()}
   <div class="ob-opts"><button class="ob-opt ob-opt-go" data-obdone="1">Find an Agent</button></div>`;
 
@@ -1520,13 +1619,18 @@ const obLabel = (k) => {
 };
 
 /* the four answers as label / value / the step that set it */
+/* THE READ-BACK ROWS, IN `OB_Q`'S NEW ORDER, and each `st` is that question's
+   1-based step so the "Change" button lands on the right screen (Maryam, 9 Sep
+   2026 reorder). `want` is gone; `intent` carries the "What you want" row now. */
 const obHeard = () => [
   ['Where you are', obLabel('where'), 1],
+  ['Your industry', obLabel('industry'), 2],
+  ['Your experience', obLabel('years'), 3],
   ['What is low', S.ob.band === 'other'
     ? 'Neither of the two the quiz found'
-    : obLabel('band'), 2],
-  ['Why it is hard', obLabel('why'), 3],
-  ['What you want', obLabel('want'), 4]
+    : obLabel('band'), 4],
+  ['Why it is hard', obLabel('why'), 5],
+  ['What you want', obLabel('intent'), 6]
 ];
 
 function obReadback(){
@@ -1534,7 +1638,7 @@ function obReadback(){
   return `
   <div class="sec ob-sec">
     <div class="sec-h"><h2>What I heard</h2></div>
-    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you &mdash; and you can drop any of them later from Profile.</p>
+    <p class="all-desc">Change anything that is wrong. Once you go through, these become part of what I hold about you, and you can drop any of them later from Profile.</p>
     <div class="tile ob-heard">
       ${obHeard().map(([l,v,st]) => `
         <div class="ob-hr">
@@ -1608,7 +1712,11 @@ const OB_FIT = {
    candidate's own words being read back. */
 function obFit(){
   const k = obAgent();
-  return `You said &ldquo;<b>${obHeard()[2][1]}</b>&rdquo; &mdash; and ${
+  /* QUOTE THE `why` ANSWER BY KEY, not by a read-back index. It used to read
+     `obHeard()[2][1]` — the third row, which was `why` — but the 9 Sep reorder
+     put `band` third, so the index would now quote the wrong answer. `obLabel`
+     is the same value the row prints and cannot drift with the order. */
+  return `You said &ldquo;<b>${obLabel('why')}</b>&rdquo;, and ${
     AGENTS[k].n} ${OB_FIT[k]}.`;
 }
 
@@ -1657,11 +1765,24 @@ function obScreen(){
   if(step === 0){
     const chat = S.obMode === 'chat';
     const live = chat && S.obChatOpen;
+    /* THE CHAT WELCOME CARRIES NO FIELD AT THE FOOT (Maryam, 9 Sep 2026: "remove
+       the bottom field from this screen only ... once the user will click on get
+       started then the chat field appears with the list of questions"). The
+       disabled composer used to sit in the dock on this screen too, saying
+       "Press Let's Get Started to begin" — but the way forward here is the
+       "Let's Get Started!" button in the body, and a dead field under it is the
+       §60 dead control. So the welcome (chat, not yet started) draws NO dock at
+       all; the composer and the thread arrive together the moment the button
+       opens the conversation (`live`), which is exactly the ask. Voice keeps its
+       dock (the orb's own control lives there). */
     const mid = chat ? obCompose()
       : `<span class="ob-go" data-obstart="1" role="button" tabindex="0">Let&rsquo;s Get Started!</span>`;
+    const welcome = chat && !live;
     return `<div class="ob-open${chat ? ' ob-open-chat' : ''}${live ? ' ob-open-live' : ''}">${
       obHead()}${
-      live ? '' : chat ? obChatScreen() : obIntro()}${obDock(mid, live ? obThread() : '')}</div>`;
+      live ? obProgress() : ''}${
+      live ? '' : chat ? obChatScreen() : obIntro()}${
+      welcome ? '' : obDock(mid, live ? obThread() : '')}</div>`;
   }
 
   const body = step > OB_N ? obReadback() : obQuestion();
@@ -1869,7 +1990,27 @@ device.addEventListener('click', e => {
   const d = t.closest('[data-obdone]');
   if(d){
     S.recKey = obAgent();
+    /* THE THREE ONBOARDING FIELDS LAND ON THE PROFILE (Client, 9 Sep 2026),
+       written once on the way out exactly like `S.recKey` above, so what the
+       candidate picked in the flow is what their profile shows. Guarded on a
+       real answer so a deep-link that skipped the flow keeps the seeded values.
+       Labels come off `OB_Q` via `obLabel`, and intent's label is an `INTENTS`
+       string, so the profile's own intent select opens on the same option. The
+       student flag is the `where` answer — "In school" makes Current role read
+       "Student"; the exact role title and degree stay editable on the profile. */
+    if(S.ob.intent)   PF.general.intent   = obLabel('intent');
+    if(S.ob.industry) PF.general.industry = obLabel('industry');
+    if(S.ob.years)    PF.general.years    = obLabel('years');
+    if(S.ob.where === 'school') PF.general.role = 'Student';
     e.preventDefault(); e.stopPropagation();
+    /* THE GATE'S CONVERSATION STAYS AT THE GATE — Maryam, 4 Sep 2026: "it
+       shows that convo I had at the onboarding time, it should not show here."
+       §107 shares `S.thread` with the ask page, and its messages are the gate's
+       shape (`{who:'tal', q:i}`, `{who:'tal', done:true}`) which `askBubble`
+       prints as "undefined". `talReset()` rather than `S.thread = []` — the
+       thread has a timer (views.js's note). And the ask page itself is closed:
+       the dashboard is the destination, not the chat over it. */
+    talReset(); S.askOpen = false; S.tal = false;
     setStage('new'); render(); return;
   }
 }, true);

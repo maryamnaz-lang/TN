@@ -152,11 +152,15 @@
    is 4.6:1 and `--support-warning-ic` on its 14% is 4.6:1, both AA at label
    size.
    -------------------------------------------------------------------------- */
+/* BARE, NO PILL WASH (Maryam 9 Sep 2026): the row's chips lose their tinted
+   grounds and read as plain icon+label buttons, ink black (63.27). The
+   `--chip-bg` variant vars below go unread. Padding drops to --s02 so an
+   icon-only Edit/Delete is a tight target, not a floating glyph. */
 .app .ldr-chip{
   display:inline-flex;align-items:center;gap:var(--s02);
-  height:32px;padding:0 var(--s05);
-  border:0;border-radius:999px;cursor:pointer;
-  background-color:var(--chip-bg)}
+  height:32px;padding:0 var(--s02);
+  border:0;border-radius:0;cursor:pointer;
+  background:transparent}
 .app .ldr-chip svg{width:16px;height:16px;flex:none;fill:currentColor}
 .app .chip-msg,.app .chip-edit{--chip-bg:color-mix(in srgb, var(--link) 10%, var(--layer-01))}
 .app .chip-note{--chip-bg:color-mix(in srgb, var(--support-warning-ic) 14%, var(--layer-01))}

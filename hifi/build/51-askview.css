@@ -46,7 +46,7 @@
   /* the file's hairline, and it is not `--rule`. #d7d5cc is warm and #e0e0e0
      is not; on ivory the cool one reads as a grey line drawn on a cream page.
      Used on the foot, the field and the chips — every edge on this screen. */
-  --askv-rule:#d7d5cc;
+  --askv-rule:var(--rule);         /* the one hairline #efefef — was the taupe #d7d5cc of the old cream/rose ground; a section divider is --rule everywhere (Maryam 9 Sep 2026) */
   --askv-ink:#363636;      /* Tal's prose */
   --askv-ink-2:#474747;    /* the placeholder and the chip labels */
   --askv-sub:#535353;      /* the one line under the greeting */
@@ -95,7 +95,7 @@
    ------------------------------------------------------------------------ */
 .app .ask-page .ask-top{
   padding:var(--s05) var(--pad-x);
-  border-bottom:1px solid rgba(0,0,0,.1);
+  border-bottom:1px solid var(--rule);
   background:transparent;
   gap:var(--s04)}
 /* THE 20x20 BOX CAME OFF AND THE ARROW WAS BEING CRUSHED TO 8px WIDE (Maryam,
@@ -181,7 +181,7 @@
    ------------------------------------------------------------------------ */
 .app .ask-page .tal-hero::before{content:none}
 .app .ask-page .tal-hero .tal-mk.lg{
-  width:120px;height:120px;margin-bottom:var(--s07)}
+  width:132px;height:132px;margin-bottom:var(--s07)}
 .app .ask-page .tal-hero h2{
   margin:0 0 var(--s04);
   font-size:26px;line-height:1.15;font-weight:400;letter-spacing:.16px;
@@ -203,7 +203,10 @@
   -webkit-text-fill-color:transparent;color:transparent}
 .app .ask-page .tal-hero p{
   margin:0;max-width:246px;
-  font-size:14px;line-height:20px;letter-spacing:.16px;
+  /* §63 §5275 owns this line's size (it follows the onboarding lede at
+     `--t-sec-size` / 26, Maryam 9 Sep 2026); the size/lh here would be dead
+     under it, so only the box and colour stay. */
+  letter-spacing:.16px;
   color:var(--askv-sub)}
 
 @container app (min-width:900px){
@@ -238,7 +241,7 @@
 /* the file sets 20 between the parts of an answer — the opening line, the
    label, the figure list, the closing line — where §39 sets 12 for a widget
    read inside a frame. Without the frame the parts need the larger step. */
-.app .ask-page .ask-thread .tal-msg > .bb > * + *{margin-top:var(--s06)}
+.app .ask-page .ask-thread .tal-msg > .bb > * + *{margin-top:20px}
 /* AND THE WIDGET NEEDS ITS OWN RULE, because the sentence above it is a TEXT
    NODE — the reply is a string assigned to `innerHTML`, so `* + *` never sees
    the prose and the widget is `:first-child` whether or not anything precedes
@@ -246,7 +249,7 @@
    stamps `.tw-top` from an anchored prefix test on the reply string. So the
    margin is stated for every widget and taken back for the one that opens its
    bubble, which is the only case `:first-child` cannot distinguish. */
-.app .ask-page .ask-thread .tal-msg > .bb .tw{margin-top:var(--s06)}
+.app .ask-page .ask-thread .tal-msg > .bb .tw{margin-top:20px}
 .app .ask-page .ask-thread .tal-msg > .bb .tw.tw-top{margin-top:0}
 
 /* THE LABEL COLUMN IS 50 + 20, which is the file's, and it is stated here
@@ -255,7 +258,7 @@
    same column on an unframed answer at a different type size; restating it
    here leaves that argument where it was made. */
 .app .ask-page .ask-thread .tal-msg > .bb .tw-lines > span{
-  gap:var(--s06)}
+  gap:20px}
 .app .ask-page .ask-thread .tal-msg > .bb .tw-lines > span > :first-child{
   width:50px;flex:none}
 
@@ -380,10 +383,12 @@
 .app .ask-page .ask-sugg .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  /* THE STAR'S OWN PINK-TO-ACCENT RAMP, re-hued 4 Sep 2026: the pink top stop
-     is the file's and stays, the bottom one was the accent's warm sibling
-     #E98B46 and is `--accent` now. §83 reached the same pair for the demo. */
-  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
+  /* THE STAR IS SOLID ACCENT NOW — Maryam, 9 Sep 2026 ("please use solid accent
+     colour in the stars as well"). The pink-to-accent ramp (#FBB2D4 -> --accent)
+     is dropped; the mark is one flat `--accent`, kept as a `linear-gradient` of
+     one colour so the masked-background mechanism (the `--tal-star` mask needs a
+     paintable background) is untouched. */
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;

@@ -213,17 +213,60 @@
    `.eo-fi-star` is a modifier on the existing 24px mark rather than a second
    mark: the cell has one star and it is the cell's own glyph.
    -------------------------------------------------------------------------- */
+/* THE CHIP SITS ON THE HEADING'S RIGHT (Maryam, 9 Sep 2026: "take 2 seats left
+   on the right side of the total members heading"). `space-between` pins "Total
+   Members" left and the chip right on ONE line; the smaller caption chip above
+   is what makes it fit there — measured, it sits on the heading line at the
+   desktop widths (744 and the 1728 the card is read at). `flex-wrap:wrap` is
+   KEPT rather than forced to nowrap: at the narrow 4-across tier (≈1024–1280)
+   and the 2×2 phone tier the cell is only 90–139px and "Total Members" plus a
+   77px chip cannot share a line — nowrap CLIPPED the chip by 40–90px there
+   (measured), which is worse than a wrap. So the chip drops below the heading
+   only where nothing could hold it beside it, and rides its right everywhere
+   there is room. §108.3's `flex:none` keeps the chip whole; the label shrinks. */
 .app .eo-fl{
   display:flex;align-items:center;
   gap:var(--s03);
   flex-wrap:wrap;justify-content:space-between}
+/* SMALLER, TO MATCH §63'S CAPTION TYPE (Maryam, 9 Sep 2026). The vertical
+   padding drops to 1px so the pill is shorter and sits on the "Total Members"
+   heading line rather than standing taller than it; the horizontal stays --s03
+   so "2 seats left" keeps its air inside the 999px ends. */
 .app .eo-chip{
   flex:none;
   display:inline-flex;align-items:center;
-  padding:var(--s01) var(--s03);
+  padding:1px var(--s03);
   border-radius:999px;
   white-space:nowrap;
   background-color:#ff0000}
+/* NO DIVIDER BEFORE "View Course" (Maryam, 9 Sep 2026: "remove the vertical line
+   before the view course button"). §73.1a draws a `::before` hairline on every
+   `.facts.eo-facts > div + div`, and the CTA joined the row as a trailing `div`
+   (§108 note above), so it inherited the line at its left. The button is the
+   card's action, not a fifth figure, so the separator does not belong before it.
+   (0,4,1) beats §73's (0,3,0); suppressing `content` covers the dark ground too,
+   where §82.2 only recolours the same `::before`. */
+.app .page .facts.eo-facts > .eo-cta::before{content:none}
+/* THE IN-ROW BUTTON DROPS BELOW THE FIGURES IN THE TIGHT DESKTOP BAND (Maryam,
+   9 Sep 2026, found while fixing the seats chip). §73 lays the figures out as
+   four columns above 900; the dashboard adds the CTA as a FIFTH column, which
+   between 900 and ~1300 crushes every cell to ~90px — measured, the value text
+   broke mid-word ("membe rs") and the button overlapped the Members cell. So
+   WHILE THE ROW ALSO HOLDS A `.eo-cta`, the figures go 2x2 and the button spans
+   its own full-width line under them, until there is room for all five across
+   (§73's own 2x2 recipe, gated on `:has(> .eo-cta)` so `V.enrol` — four cells,
+   no button — keeps its four-across at these widths). (0,4,0) with `:has` beats
+   §73's (0,3,0) desktop rule; the dividers go off with the single-row grid, as
+   §73.3 and §72.5 require for the placed pseudo-elements. */
+@container app (min-width:900px) and (max-width:1300px){
+  .app .page .facts.eo-facts:has(> .eo-cta){
+    grid-auto-flow:row;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--s06) var(--s05)}
+  .app .page .facts.eo-facts:has(> .eo-cta) > div + div::before{content:none}
+  .app .page .facts.eo-facts > .eo-cta{grid-column:1 / -1;margin-left:0}
+  .app .page .facts.eo-facts > .eo-cta .btn{width:100%}
+}
 /* AND THE STAR NEEDS (0,4,1), WHICH IS THE TRAP IN THIS SECTION. §82.2 states
    `.app .dark-card .eo-fi svg{fill:var(--on-dark-2)}` at (0,3,1) — the rule
    that rescued the four marks from `--text-secondary` on a black ground — so an

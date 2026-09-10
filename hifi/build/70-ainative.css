@@ -125,14 +125,14 @@
      send chip's 20%.
      ============================================================== */
   /* ==============================================================
-     AND THE RAMP SPLIT IN TWO — 4 Sep 2026, #FF3733
+     AND THE RAMP SPLIT IN TWO — 4 Sep 2026, #bd2a2a
 
      This is the second re-hue in a day and the first one that is
      structural: the text/star ramp and the 1px-line ramp are no
      longer the same three stops.
 
-       TAL'S TEXT AND THE STARS    #FF3733 -> #FF9A96 -> #FF3733
-       THE DOCK BORDER AND THE COMET  #FF3733 -> #CCE7CB -> #FF3733
+       TAL'S TEXT AND THE STARS    #bd2a2a -> #FF9A96 -> #bd2a2a
+       THE DOCK BORDER AND THE COMET  #bd2a2a -> #CCE7CB -> #bd2a2a
 
      A SALMON MIDDLE AND A PALE GREEN MIDDLE, which is not a thing
      that could be guessed and is the reason both were checked rather
@@ -166,9 +166,17 @@
      magenta and a salmon since. Left rather than deleted in a colour
      pass, and flagged: it is the "gate nothing writes" tell.
      ============================================================== */
-  --ai-1:#ff3733;
-  --ai-2:#ff9a96;
-  --ai-3:#ff3733;
+  /* THE RAMP'S ACCENT STOPS ARE THE NEW ACCENT — Maryam, 9 Sep 2026 ("change
+     these gradient values and borders as well, just update the accent colour and
+     keep the other values same"). `--ai-1` / `--ai-3` were the old #bd2a2a and
+     are the platform accent #F9423A now, which carries every gradient built from
+     them — `--ai-grad` (Tal's text ramp), `--ai-grad-alt` and `--ai-grad-line`
+     (the ask-dock edge and the chat field's focus border). The light middle
+     `--ai-2` (#dd8080) and the green line middle `--ai-line-2` (#cce7cb) are the
+     "other values" and are untouched, so only the accent hue moved. */
+  --ai-1:#f9423a;
+  --ai-2:#dd8080;
+  --ai-3:#f9423a;
   --ai-line-2:#cce7cb;
   --ai-amber:var(--ai-2);
   --ai-line-alpha:70%;
@@ -226,10 +234,20 @@
      strength is never drawn — which is why the right-hand reading is (252,249,
      248) and not `rgba(255,55,51,.05)`'s (255,245,245). Predicted from the
      three stops it is (254,248,248); measured (252,249,248), and the two units
-     of red are §25.1's corner ellipses, which the Figma render also carries. */
-  --ai-wash:linear-gradient(107.51deg,
-    rgba(255,255,255,.05) 35.98%, rgba(204,231,203,.05) 66.82%,
-    rgba(255,55,51,.05) 114.21%);
+     of red are §25.1's corner ellipses, which the Figma render also carries.
+
+     REDRAWN AGAIN — 871:6425, Maryam 9 Sep 2026 ("use the gradient value and
+     positioning from this Figma selection"). The node is no longer the green-
+     through-warm HORIZONTAL ramp above; it is a VERTICAL two-stop wash that
+     runs the new accent down into white — read straight off the node's own
+     `linear-gradient(183.76deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,
+     .05) 52.274%)`. So the tint now sits along the TOP edge of the band (183.76
+     ≈ "to bottom") in `--accent` #bd2a2a at the same 5%, fades to white by the
+     panel's middle, and carries no green. The 5% is unchanged — still a cast on
+     white paper, not a tinted box — and §25.1's corner ellipses still sit under
+     it. Two stops replace three; the offsets are the node's. */
+  --ai-wash:linear-gradient(183.76deg,
+    rgba(189,42,42,.05) 11.02%, rgba(255,255,255,.05) 52.27%);
 
   /* THE INLINE HIGHLIGHT behind an accent phrase in Tal's sentence — 581:6664.
      The file draws these as absolutely-placed rectangles behind the words,
@@ -546,14 +564,17 @@
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body,
 .app .modhead:has(> .sec-dark .plate) .ai-aura.talsum > .ai-body p{max-width:733px}
 
-/* TAL'S NAME IN THE RAMP — 581:6670. The gradient is clipped to the glyphs,
-   which is the same construction §51.4 uses for the ask page's "What's going
-   on?" and the one place in the build a gradient is allowed to be ink. §63 §10
-   states the `color:transparent` that makes the clip visible; without it the
-   words paint over their own gradient and nothing appears to have changed. */
+/* TAL'S NAME IS A FLAT BLACK LABEL — Maryam, 9 Sep 2026, off 871:6425: "the
+   heading 'Summary by Tal' needs to be black and semibold ... remove the
+   gradient from this text." 581:6670 had clipped `--ai-grad` to the glyphs
+   (the one place in the build a gradient was allowed to be ink); the node now
+   sets the words in flat black SemiBold, so the clip comes off here and §63 §10
+   carries the ink and the 600 weight. The MARK beside it is untouched — the
+   `::before` sparkle keeps its own ramp (that is not "this text"). Only `gap`
+   survives from the old rule. */
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{
-  background-image:var(--ai-grad);
-  -webkit-background-clip:text;background-clip:text;
+  background-image:none;
+  -webkit-background-clip:border-box;background-clip:border-box;
   gap:6px}
 
 /* --------------------------------------------------------------------- 2a --
@@ -583,16 +604,14 @@
    argument: a 4s glow on an 18px disc is a flicker. What moves on this page is
    the comet, which is one moving thing where there had been two.
    ------------------------------------------------------------------------ */
-.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before,
-.app .ai-label.bare.rec-lab::before{
-  content:'';
-  /* 12, AND THAT IS BELOW THE FILE'S RATIO ON PURPOSE (Maryam, 30 Aug 2026).
+/* THE "TAL RECOMMENDS" MARK keeps the 12px sparkle (Maryam, 30 Aug 2026):
      581:6669 sets the star at 18 against a 16px label; §63 maps that label to
      `--t-h4`, which is 14, so carrying the file's proportion across gives 15 —
-     which is what shipped first and was still too heavy. At 12 the mark is
-     smaller than the cap height of the words beside it, so it reads as a
-     bullet introducing the line rather than as a second object competing with
-     it. The 6px gap is unchanged, which is what keeps the pair tight. */
+     still too heavy. At 12 the mark is smaller than the cap height of the words
+     beside it, so it reads as a bullet introducing the line rather than a
+     second object. The 6px gap is unchanged, which keeps the pair tight. */
+.app .ai-label.bare.rec-lab::before{
+  content:'';
   width:12px;height:12px;flex:none;
   border-radius:0;
   background-color:transparent;
@@ -600,6 +619,24 @@
   background-size:100% 100%;background-position:center;background-repeat:no-repeat;
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat;
+  box-shadow:none;
+  animation:none}
+
+/* THE SUMMARY MARK IS THE BLOB (Maryam 9 Sep 2026, "change that star to this
+   blob as well"). The head-of-page "Summary by Tal" star is now the same warm
+   blob artwork `--tal-mark` every other Tal mark paints, at 28px so the shape
+   reads, its own clip carrying the motion — NOT the sparkle the "Tal
+   recommends" label keeps, so the two are split out of §70.2's shared rule.
+   §33 §7's glossy logo-sphere and §33 §2's 16px stayed behind this rule; this
+   is the winning layer, so the change lands here. */
+.app .modhead .ai-aura.talsum > .ai-head > .ai-label::before{
+  content:'';
+  width:28px;height:28px;flex:none;
+  border-radius:0;
+  background-color:transparent;
+  background-image:var(--tal-mark);
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  -webkit-mask:none;mask:none;
   box-shadow:none;
   animation:none}
 /* §33.6 draws the sphere's turning highlight as a second pseudo-element and it
@@ -1048,8 +1085,14 @@
   flex:none;margin-left:auto;
   display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;
   gap:var(--s04);width:382px}
+/* MIN-WIDTH, NOT WIDTH — Maryam, 9 Sep 2026. "Book call with Priya" is longer
+   than "Book Priya Now", and a fixed 185 wrapped it to two lines (respcheck
+   caught it at 744/1024/1280). §71.2's `.crow-a` is the pattern: a 185 FLOOR
+   plus `white-space:nowrap`, so the pair stays even at their shortest and a long
+   label grows to one line inside `.rec-a`'s 382 rather than wrapping. Below 900
+   §70's own rule takes it full-width, where nowrap still holds. */
 .app .rec-a > .btn{
-  width:185px;min-height:40px;
+  min-width:185px;white-space:nowrap;min-height:40px;
   justify-content:center;gap:var(--s03);
   padding-left:20px;padding-right:var(--s05)}
 
@@ -1267,8 +1310,14 @@
   display:flex;flex-direction:column;gap:20px;align-items:flex-start;
   padding:20px;
   background:var(--layer-01);
-  border:1px solid var(--ai-1);
-  border-radius:8px;
+  /* THE EDGE IS THE ONE HAIRLINE AND THE CORNER IS THE PLATFORM'S — Maryam,
+     9 Sep 2026, Figma 875:6570. The callout used to carry an --ai-1 (accent)
+     edge at an 8px radius to read as a distinct floating card; the Figma gives
+     it the neutral #efefef hairline every other border takes and the radius-0
+     corner the rest of the product uses, so it reads as a page card that
+     happens to float, not a second visual language. */
+  border:1px solid var(--rule);
+  border-radius:var(--radius);
   box-shadow:0 0 100px 0 rgba(128,128,128,.06),
              -40px 40px 40px 0 rgba(0,0,0,.04)}
 
@@ -1295,7 +1344,7 @@
   background-image:var(--ai-grad-alt);
   -webkit-background-clip:text;background-clip:text}
 .app .sumdrop .sd-ic{flex:none;display:grid;place-items:center;width:16px;height:16px}
-.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--ai-1)}
+.app .sumdrop .sd-ic svg{width:16px;height:16px;fill:var(--icon-primary)}
 
 /* THE PHRASE IS A CONTROL NOW. `<b data-sum>` keeps §70.2's ground and ink and
    gains a pointer and a focus ring; `all:unset` is not used because the ground,
@@ -1397,6 +1446,20 @@
   gap:var(--s04);
   max-width:784px}
 
+/* A ROW OF FOUR QUICK-ACTION CARDS — Maryam, 8 Sep 2026, of the admin
+   dashboard: "these 4 quick actions should be in a row of 4 cards like the
+   other quick actions we are using on other platforms." The base `.qa` grid
+   caps at 784px / two columns, which is right for the candidate and agent
+   dashboards (two or three cards). The admin runs FOUR and wants them across,
+   so `.qa-4` lifts the cap and lays a fixed row that steps 4 → 2 → 1 as the
+   container narrows — the same rhythm the dashboard's `.stats` rows keep beside
+   it (four at ≥900, two below, one on a phone). Cards stay the shared `.qa-c`,
+   so this is layout only; the copy is kept to one line each (§98.3) to hold the
+   74px card height at the narrower 4-up width. */
+.app .qa.qa-4{grid-template-columns:1fr;max-width:none}
+@container app (min-width:600px){.app .qa.qa-4{grid-template-columns:repeat(2,1fr)}}
+@container app (min-width:900px){.app .qa.qa-4{grid-template-columns:repeat(4,1fr)}}
+
 /* TWO GAPS, 12 AND 32, AND FLATTENING THEM TO ONE COSTS A LINE. 581:6617 nests
    the icon and the text at gap 12 inside a frame the arrow sits 32 from; one
    32 across all three took 20px off the text column, which is exactly enough
@@ -1417,11 +1480,15 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   width:100%;margin:0;min-height:74px;
   padding:var(--s05) var(--s06) var(--s05) 20px;
-  border:1px solid rgba(0,0,0,.1);
+  border:1px solid var(--rule);
   background-color:#fdfdfd;
-  text-align:left;cursor:pointer;
-  transition:border-color 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
-.app .qa-c:hover{border-color:var(--text-primary)}
+  text-align:left;cursor:pointer}
+/* THE CARD BORDER DOES NOT MOVE ON HOVER (Maryam, 9 Sep 2026: "do not make the
+   border black on hover"). §70's old `.qa-c:hover{border-color:--text-primary}`
+   was globally disarmed and dead; arming `qa-c` for the icon-red hover would
+   have revived it. It is DELETED, not re-disarmed — the only hover feedback on a
+   quick action is the mark turning `--accent` (below). The border-color
+   transition went with it; the mark's own `transition:fill` gives the fade. */
 .app .qa-c:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
 
 /* 20px, MATCHING THE FIGURE CELL'S BARE GLYPH (Maryam, 1 Sep 2026: "the icon
@@ -1454,9 +1521,25 @@
    the journey's done-step green (§63 §10) and #0488C5 is the match figure and
    the blue overlap tag. So the page has three greens and three blues that are
    the same three, not six near-misses. */
-.app .qa-ic svg{width:20px;height:20px;fill:var(--ai-1)}
-.app .qa-ic.ic-quiz svg{fill:#00a43c}
-.app .qa-ic.ic-prep svg{fill:#0488c5}
+/* THE MARK IS INK, NOT A CATEGORY HUE (Maryam, 9 Sep 2026: "change the coloured
+   icons to black colour"). Every bare decorative glyph on the platform is
+   `--icon-primary` now — the quick-action mark, the stat/pulse/facts/prog marks,
+   the profile and cohort marks. A hue on a bare glyph read as a status it did
+   not have; the WORDS say what the card is. State/subject marks are the
+   exception and keep their colour (the green done tick, the star, the journey
+   states) — those signal, they do not categorise. All hue variants below fold
+   to the same ink; the class stays so the markup and the recipe are unchanged. */
+.app .qa-ic svg{width:20px;height:20px;fill:var(--icon-primary);
+  transition:fill 140ms var(--mo-standard, cubic-bezier(.4,0,.2,1))}
+.app .qa-ic.ic-quiz svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-prep svg{fill:var(--icon-primary)}
+/* A CLICKABLE block lights its MARK — and only its mark — on hover (Maryam, same
+   day: "if it is a quick action block or something that has a click then turn
+   the black icon colour to #bd2a2a on hover", and "do not make the border black
+   on hover"). The card is the control, so the hover is on `.qa-c`; `qa-c` is
+   armed in HOVER_KEEP. The card's old border-darken hover was deleted above so
+   nothing but the mark changes. */
+.app .qa-c:hover .qa-ic svg{fill:var(--accent)}
 
 .app .qa-b{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--s02)}
 /* THE ARROW IS RIGHT AND MIDDLE OF THE CARD — Maryam, 1 Sep 2026: "the arrow

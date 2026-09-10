@@ -187,8 +187,8 @@
    for "Curated for your growth" and its note explains why the course preview is
    not allowed the accent. Blue is §74's third finding card, Priya's own note,
    which is the half of "what the interview found" a reader remembers. */
-.app .qa-ic.ic-cover svg{fill:var(--mk-3)}
-.app .qa-ic.ic-found svg{fill:var(--mk-1)}
+.app .qa-ic.ic-cover svg{fill:var(--icon-primary)}
+.app .qa-ic.ic-found svg{fill:var(--icon-primary)}
 
 /* ------------------------------------------------------------------ 82.5 ---
    THE `.keep-place` CLOSING-RULE FIX IS DELETED, AND THE NOTE IS THE POINT

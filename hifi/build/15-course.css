@@ -471,6 +471,23 @@
 .app .ch-tick svg{
   display:block;width:15px;height:15px;fill:var(--support-success)}
 
+/* THE CHAPTER RING IS A QUIET GREY — Maryam, 9 Sep 2026: "for the circle icons
+   use a very light grey like #828282." On the cohort leader's member page every
+   unfinished chapter carries a ring in the trailing `.ch-ic` (`ldrChRow`, with
+   the finished chapter's tick beside them now); the ring was `--icon-primary`
+   for a not-started row (§02.278) and `--in-progress` orange for the started one
+   (§12.2). Both take the description grey `--text-secondary` (#828282), so the
+   status column reads as one green tick against quiet grey rings. `:not(.done)`
+   keeps the tick's green; `:not(.locked)` leaves the candidate's padlock its own
+   ink. Lands after §12, whose open/done fills it answers, at the same weight.
+
+   LIGHTER, ACTUALLY LIGHT NOW (Maryam 9 Sep 2026, "they should be very light in
+   grey"): #828282 (`--text-secondary`) was named "very light" but is a MID grey,
+   and against the green tick the empty rings still pulled the eye. `--gray-20`
+   (#e1e0dc) is the light end of the neutral ramp — the ring reads as an absence
+   waiting to be filled rather than a mark competing with the one that is. */
+.app .ch:not(.done):not(.locked) .ch-ic svg{fill:var(--gray-20)}
+
 /* and one named action closes the row */
 .app .ch-act{
   flex:none;white-space:nowrap;

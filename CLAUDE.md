@@ -16,8 +16,9 @@ check this table before editing anything.
 | `hifi/` | High-fidelity candidate portal, **compiled** from `hifi/build/` | **ACTIVE — work here** |
 | `design-system/` | The portal's design language as two linkable files, **extracted** from `hifi/build/` | **ACTIVE — for new pages** |
 | `tn-agent-portal.html` | **Talent Agent portal**, hand-written on `design-system/` | **ACTIVE** |
+| `tn-admin-portal.html` | **Super Admin portal**, hand-written on `design-system/` | **ACTIVE** |
 | `tn-portals.html` | Candidate + Cohort Leader portals, hand-written | Prototype, still live |
-| `tn-admin.html` | Super Admin panel, hand-written | Prototype, still live |
+| `tn-admin.html` | *Early* Super Admin panel + the seed data/flows | **Frozen data ref for `tn-admin-portal.html`** |
 | `tn-portals.css` | Stylesheet extracted from `tn-portals.html` | Supports the above |
 | `talentnext-wireframes.html` | **The wireframes** (TalentNext × LightspeedVT) | Frozen reference |
 | `tn-candidate-portal.html` | *Early* candidate portal prototype | **Superseded by `hifi/`** |
@@ -297,8 +298,55 @@ every key is prefixed `lead`.
 | `lead2.js` | `leadCohorts`, `leadCohort`, `leadMember`, `leadReports`, the brief and note sheets, `LDR_SHEETS` |
 | `lead3.js` | `leadCalls`, `leadEvals`, `leadSum` — and the one signature flow |
 | `lead4.js` | `leadMessages`, `leadCerts`, `leadProfile`, the profile and availability sheets |
+| `lead5.js` | **the leader CHAT router** — loads AFTER ai8 (not with lead1-4) so it wraps `talReply`; a `S.portal==='leader'`-gated `LEAD_ROUTES` answering L-01…L-24 with leader widgets, deferring refusals to the shared chain. Spec: `docs/tal-scenarios/02-…md` §4 |
 
 *The 1 Sep 2026 cohort-leader correction and the leader sub-sections are in `docs/HISTORY.md` under the same heading; the rules they state are in `DESIGN.md`.*
+
+### The Super Admin portal — `tn-admin-portal.html` — IS BUILT AGAINST THE SUPER ADMIN JOURNEY
+
+The journey document (Draft v1.0 for design review, 6 Sep 2026) is **sixteen use cases SA-01 to
+SA-16** with 51 alternative flows and 37 exceptions, coloured by decision status: 2 confirmed,
+7 open, 5 blocked. It says nine of the sixteen cannot be wireframed until a ruling lands and not to
+read open or blocked items as agreed scope. **The rule the portal follows (Maryam, 7 Sep 2026):
+every case gets its SURFACE with its primary alternative drawn; every open or blocked branch is a
+line on the Rulings Register, never an invented control.** The data is `SA_CASES` (the sixteen, with
+the document's own alternative and exception lines) and `DECISIONS` (each line tagged `sa`, `kind`
+blocked|open, `blocks`); the page is `home/rulings`; `ruling('SA-06')` draws a page's one note;
+Tal's summary on such a page names the ruling. The argument and the gap table are in
+`docs/HISTORY.md` §129; the rules are in `DESIGN.md` §3.
+
+| Case | Where it lives | Case | Where it lives |
+|---|---|---|---|
+| SA-01 Grant | `users/roles` holders, `SHEETS.grant` | SA-09 Account actions | `KINDS.user.status`, `SHEETS.merge` |
+| SA-02 Sign in | `authView()`, `askConfirm({stepup})` | SA-10 Roles | `toggleperm` + `CAP_SIDE` wall |
+| SA-03 Console | `homeOverview` (figures off the seed) | SA-11 Impersonation | `askviewas` → `S.viewAs`, `.viewas` (§129) |
+| SA-04 Level override | `SHEETS.override`, `levelHistory`, `bulklevel` | SA-12 Cohort intervention | `extend` / `mergeco` / `moveco` / `askdissolve`, force add |
+| SA-05 Score override | `SHEETS.voidscore`, `recal` | SA-13 Mapping | `courseLevels`, the course record's `levels` |
+| SA-06 Refunds | `KINDS.refund.rtype`, `askrefappr` guards | SA-14 System | `ROUTING`, flags, `askrotate` |
+| SA-07 Payouts | already there; `ruling('SA-07')` | SA-15 Audit | `audit(…, {from,to})`, `SHEETS.auditline`, `audWhen` |
+| SA-08 Pricing | four `FEES` lines, three read “Not set” | SA-16 Revocation | `SHEETS.revokeadmin`, `expireGrants()` |
+
+Six things in that file that bite:
+
+- **A sheet key may carry an id: `grant:u3`, `sacase:SA-01`.** `sheetView` splits on the first
+  `:` and passes the rest to the sheet function; older sheets read `S.id` (the PAGE's record)
+  and ignore the argument. A sheet opened from a list row must take the argument — `sacase`
+  shipped reading `S.id` and rendered empty.
+- **A two-step action carries its form in `S._pending`.** The sheet's action reads the form,
+  stores it, opens `askConfirm`; the `do*` handler consumes `S._pending` and clears it. Reading
+  the form from the confirmation is impossible — the sheet is gone by then.
+- **`askConfirm({stepup:true})`** adds a code field to the `.conf`; the router refuses
+  `data-do` without six digits while `SEC.stepup !== false`. It is on grant, revoke, View As
+  and release-all — and nowhere else on purpose.
+- **The read-only lock is in the router, not the handlers.** While `S.viewAs.scope === 'read'`,
+  every `data-sheet`, `data-do` and `data-act` (bar `endviewas` and `toast:`) is refused with
+  one toast. Do not add a per-handler check.
+- **`.auth-card` is a CHILD of `.app`.** §17/§57 key on `.app:has(> .auth-card)` and
+  `.auth-card > .auth-col`; one element wearing both classes matched neither and the split
+  never fired.
+- **`expireGrants()` runs at the top of `render()`**, so a time-boxed grant past its date is
+  revoked with its own audit line before the page is drawn. `S.signedIn` is `!!location.hash`
+  at boot: a deep link lands on the page, a bare open lands on the sign-in scene.
 
 ### Traps that cost real time here
 

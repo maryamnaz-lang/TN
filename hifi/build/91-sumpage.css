@@ -120,7 +120,7 @@
    `fill:var(--mk)` rather than `currentColor`, per §29's note: the row sets no
    `color` of its own, so there is nothing for the glyph to inherit. */
 .app .sump-fi{flex:none;width:20px;height:20px;display:grid;place-items:center}
-.app .sump-fi svg{width:20px;height:20px;fill:var(--mk)}
+.app .sump-fi svg{width:20px;height:20px;fill:var(--icon-primary)}
 .app .sump-fl{flex:1;min-width:0}
 .app .sump-fv{flex:none;font-variant-numeric:tabular-nums}
 /* the button closes the column and is the width of its words — a 280px

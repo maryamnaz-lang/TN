@@ -6,7 +6,7 @@
 <title>TalentNext Design System — reference</title>
 
 <!-- THE WHOLE DEPENDENCY. Two files, and the fonts are inside the first. -->
-<link rel="stylesheet" href="talentnext-ds.css?b=70451eaa">
+<link rel="stylesheet" href="talentnext-ds.css?b=a518e571">
 
 <style>
 /* ==========================================================================
@@ -202,7 +202,7 @@
   </div>
 </div>
 
-<script src="talentnext-ds.js?b=70451eaa"></script>
+<script src="talentnext-ds.js?b=a518e571"></script>
 <script>
 /* ==========================================================================
    THE PAGE IS BUILT FROM A SPEC, so every example is written once and shows
@@ -826,8 +826,7 @@ SECTIONS.push({id:'signature', nav:'Signature', icon:'star', build: () => `
     <div class="page ask-page ask-in" style="height:520px">
       <div class="ask-top">
         <button class="ph-back" aria-label="Back to Dashboard">{{arrowLeft}}</button>
-        <span class="ask-top-t">Back to Dashboard</span>
-        <span class="ask-top-s">Explorer – E3, day 34 of 90</span>
+        <span class="ask-top-id"><span class="tal-mk"></span><span class="ask-top-t">Tal</span></span>
       </div>
       <div class="ask-thread" data-n="0">
         <div class="tal-hero">
@@ -1254,7 +1253,7 @@ SECTIONS.push({id:'type', nav:'Type', icon:'edit', build: () => `
       <p class="t-body">Body &mdash; 13.5/22, 400. Prose you read in sentences, and the only role with a line-height built for a paragraph rather than a row.</p>
       <p class="t-compact">Body compact &mdash; 13.5/19, 400. The same size in a list, a cell or a field, where 22 would open the rows up.</p>
       <p class="t-label">Label &mdash; 12.5/17, 600. A chip, a tag, a field label, a small value.</p>
-      <p class="t-desc">Description &mdash; 12.5/17, 400, and always this grey.</p>
+      <p class="t-desc">Description &mdash; 13.5, auto leading, 400, and always this grey.</p>
       <p class="t-eyebrow">Eyebrow &mdash; 11.5/16, 600. The small strong line over a figure or a block.</p>
       <p class="t-caption">Caption &mdash; 11.5/16, 400. Timestamps, legal, chart axes.</p>
     </div>
@@ -1685,6 +1684,23 @@ SECTIONS.push({id:'tables', nav:'Tables', icon:'document', build: () => `
       </table>
     </div>
   `)}
+  ${ex('A table you can sort and act on', 'The Super Admin\'s list table (§120). A column head with <code>data-sort</code> is pressable — pointer, no wash — and the active one carries a 14px chevron in <code>currentColor</code>; the page\'s router flips asc → desc → off. The last cell is <code>td.tbl-act</code>: right-aligned, never wraps, and holds quiet icon buttons at 32px. The row itself is <code>tr.clk</code> and opens the record; the buttons sit nearer in the router\'s <code>closest</code>, so a press on one never also opens the row. Scoped off the leader\'s <code>.tbl-flag</code>, which keeps its own 24px control.', `
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <tr><th data-sort="0" aria-sort="ascending">User<svg viewBox="0 -960 960 960">{{chevUp}}</svg></th><th data-sort="1">Roles</th><th data-sort="2">Joined</th><th class="tbl-act"></th></tr>
+        <tr class="clk"><td>Dana Whitfield</td><td><span class="tag sm">Agent</span></td><td>03-12-2026</td>
+          <td class="tbl-act"><button class="btn btn-g btn-sm" aria-label="Edit">{{edit}}</button><button class="btn btn-g btn-sm" aria-label="Deactivate">{{pause}}</button><button class="btn btn-g btn-sm" aria-label="Delete">{{delete}}</button></td></tr>
+        <tr class="clk"><td>Marcus Ozoro</td><td><span class="tag sm">Agent</span></td><td>02-04-2026</td>
+          <td class="tbl-act"><button class="btn btn-g btn-sm" aria-label="Edit">{{edit}}</button><button class="btn btn-g btn-sm" aria-label="Deactivate">{{pause}}</button><button class="btn btn-g btn-sm" aria-label="Delete">{{delete}}</button></td></tr>
+      </table>
+    </div>
+  `)}
+  ${ex('The filter strip under a searched heading', 'What sits between <code>.hd-srch</code> (the heading with its search field) and the table: §15\'s <code>.cs</code> strip wearing <code>.lst-filt</code>, each tab a filter with its live count in <code>.lf-n</code>, the leader\'s count slot. §120.4 is only the 16px above and below; the hairlines are the strip\'s own.', `
+    <div class="cs lst-filt" role="tablist">
+      <button role="tab" class="on">All<span class="lf-n">33</span></button><button role="tab">Candidates<span class="lf-n">21</span></button>
+      <button role="tab">Agents<span class="lf-n">5</span></button><button role="tab">Deactivated<span class="lf-n">1</span></button>
+    </div>
+  `)}
 `});
 
 /* -------------------------------------------------------------------- chips */
@@ -1827,6 +1843,19 @@ SECTIONS.push({id:'nav', nav:'Navigation', icon:'view', build: () => `
         </div>
       </div>
     </div>
+  `)}
+  ${ex('The rail as a tree', 'The Super Admin\'s rail (§120.1): a module row carries the sum of its queue counts in the rail\'s own <code>.badge</code>, and while the rail is open the module you are in lists its sub-pages as <code>.sn-item.sn-sub</code> rows inside <code>.sn-subs</code>, indented to the label above. <b>The render gates the block, not the CSS</b> — a shut 72px rail hides every label, so the sub-rows are only emitted while the rail is open. One accent bar: the module keeps it, the sub-row\'s is off and its accent ink (§63 §51) says which page you are on.', `
+    <nav class="sidenav on" style="position:static;transform:none;width:260px;height:auto">
+      <div class="sn-main">
+        <button class="sn-item">{{dashboard}}<span>Dashboard</span></button>
+        <button class="sn-item on">{{group}}<span>Users &amp; Roles</span></button>
+        <div class="sn-subs">
+          <button class="sn-item sn-sub"><span>All Users</span></button>
+          <button class="sn-item sn-sub on"><span>Roles &amp; Permissions</span></button>
+        </div>
+        <button class="sn-item">{{shield}}<span>Vetting &amp; Approvals</span><span class="badge">8</span></button>
+      </div>
+    </nav>
   `)}
 `});
 

@@ -31,8 +31,43 @@
   .app .sidenav{
     width:var(--rail-w-nav);flex:none;padding:var(--s04) 0;
     background-color:var(--background);
-    border-right:1px solid var(--rule);
+    border-right:0;
     transition:width var(--mo-base) var(--mo-standard)}
+
+  /* ONE divider for the nav column, full height, owned by a single element.
+     The rail's right edge used to be drawn TWICE: once by the app-bar cell
+     above the drawer (§34's `border-right` on `.shell-act.nav-t`) and once by
+     the drawer itself (the `border-right` on `.sidenav`, just above). The two
+     were meant to line up into a single rule, and at 1x they nearly do — but
+     they are two independently-rounded 1px borders on two stacked boxes, so on
+     a fractional-DPR display (most external monitors, any browser zoom) they
+     land a hair apart and read as a DOUBLE line. Maryam, 7 Sep 2026: use one
+     border, full height. So both borders are off (nav-t in §34, the drawer
+     right above) and the divider is drawn once here, on `.app`, running the
+     whole height across the app bar and the drawer alike.
+     It sits at the nav column's right edge — `--rail-w-nav` (72) collapsed,
+     `--drawer-w` when open — and shares the drawer's width-transition timing so
+     the line tracks the edge as the rail expands rather than jumping. `.app` is
+     `position:absolute` and full height in every portal, so the pseudo has a
+     containing block; `z-index` clears the app bar (30) and the static desktop
+     drawer. Below 900 the menu is full-width with no rule (§12), so this lives
+     inside the permanent-drawer query and never paints there. */
+  .app::after{
+    content:'';position:absolute;top:0;bottom:0;left:var(--rail-w-nav);width:1px;
+    background:var(--rule);z-index:41;pointer-events:none;
+    transition:left var(--mo-base) var(--mo-standard)}
+  .app[data-rail="open"]::after{left:var(--drawer-w)}
+  /* NO DIVIDER ON A FULL-BLEED SCENE — Maryam, 9 Sep 2026. Account creation, the
+     Tal onboarding intro and the Next-in-Leadership run-up each REPLACE the app
+     frame: each is a direct child of `.app` with no rail beside it, so the rail's
+     divider was a 1px line drawn down an otherwise empty page. `.auth-card`
+     matches the sign-up AND the onboarding SPLIT steps (`.ob-card` wears it);
+     `.ob-open` is the intro's own full-bleed composition; `.nil` wraps the
+     microsite (views.js). `content:none` removes the pseudo outright, and each
+     `:has()` outweighs the base so it wins wherever the divider would draw. */
+  .app:has(> .auth-card)::after,
+  .app:has(> .ob-open)::after,
+  .app:has(> .nil)::after{content:none}
   .app .sn-item{
     min-height:48px;padding:0;gap:0;justify-content:center;
     border-top:0;position:relative}

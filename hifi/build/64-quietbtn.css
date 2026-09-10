@@ -95,6 +95,17 @@
 .app :is(.btn-s,.btn-t,.btn-g).btn-sm:not(:has(svg))::after{
   width:18px;height:18px}
 
+/* A DIALOG FOOTER ACTION IS NOT A LINK, so it grows no arrow (Maryam, 6 Sep
+   2026: "remove the arrows icon from the cancel button on modal"). The arrow
+   above says "this quiet button takes you somewhere" — right for a `.btn-g` that
+   opens a page, wrong for the Cancel/Close that ends a `.sheet` or a `.conf`,
+   which is one of a pair of answers next to a `.btn-p` Save that never carried
+   one. Keyed to `.sheet-f`/`.conf-f` so it is the modal footer that opts out,
+   not every quiet button. Higher specificity than the rule above (0,3,1 vs its
+   0,2,2), so it wins from here regardless of layer order. The footer's buttons
+   are `.noic` and already centre, so no §64.3 companion is needed. */
+.app .sheet-f .btn::after,.app .conf-f .btn::after{content:none}
+
 :root{
   --btn-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'/%3E%3C/svg%3E")}
 

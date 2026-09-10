@@ -39,8 +39,11 @@
      edge. The two tokens that DO edge a control — `--border-subtle-02`
      (#c7c6c3) and `--border-strong-01` (#8e8d8a), the input and checkbox
      strokes — keep their values for exactly that reason. An input whose edge
-     is #e9e9e9 is a field you cannot find. */
-  --rule:#e9e9e9;
+     is #efefef is a field you cannot find. */
+  /* #efefef — the one hairline colour for every separator, card edge and
+     table line on all four portals (Maryam, 7 Sep 2026). Was #e9e9e9; nudged
+     lighter. The control-edge tokens below stay their darker values. */
+  --rule:#efefef;
   --rule-ink:#111111;
   --rail-w:1px;
   --label-col:184px;           /* the narrow left column at desktop */
@@ -91,6 +94,16 @@
   background:var(--rule);pointer-events:none}
 .sec:last-child::after{background:var(--rule)}
 .page > :last-child::after{opacity:1}
+
+/* A SECTION THAT DRAWS NO FOOT RULE. Every `.sec` closes with one hairline (§2
+   above); `.sec-noline` opts a single section out, for where two or more
+   sections should read as ONE continuous band with only spacing between them and
+   no divider — the agent Public Profile's identity + figures flowing into About
+   me and Specialities (Maryam, 7 Sep 2026: "remove divider above about me and
+   above specialities"). Specificity is `.app .sec.sec-noline::after` (0,3,1) so
+   it beats both the base `.sec::after` and the later layers that only reposition
+   the pseudo's left/right; `content:none` drops it outright. */
+.app .sec.sec-noline::after{content:none}
 
 /* the tick marks where a rule crosses a rail. small, and desktop only —
    at phone width the rails sit on the frame edge and there is nothing to mark. */
@@ -372,7 +385,12 @@ textarea.inp{min-height:88px}
 .lvl-hero{padding:var(--s08) var(--pad-x)}
 .tabs,.cs{padding-left:var(--pad-x);padding-right:var(--pad-x)}
 .composer{padding-left:var(--pad-x);padding-right:var(--pad-x)}
-.notif-h,.tal-h,.sheet-h{padding-left:var(--pad-x)}
+/* `.sheet-h` DROPPED FROM THIS LIST (Maryam, 6 Sep 2026). The modal header
+   takes one uniform `--s06` inset now (§02), equal to its body and footer; the
+   page-gutter `--pad-x` (which grows to 32 at ≥1200) would put the title left of
+   where the fields sit. The notification and Tal panel headers keep it — those
+   are page-aligned surfaces, not a centred dialog. */
+.notif-h,.tal-h{padding-left:var(--pad-x)}
 .tal-body,.tal-sugg,.tal-legal{padding-left:var(--pad-x);padding-right:var(--pad-x)}
 @container app (min-width:900px){
   .sec,.sec.tight{padding-top:var(--s06);padding-bottom:var(--s06)}
@@ -497,7 +515,47 @@ textarea.inp{min-height:88px}
      the card — the one component here where the label column would change
      behaviour and not just measurements. The heading goes above, where a
      calendar's month label goes in every calendar. */
+  /* `.rqc-list` JOINS THEM (§122, 6 Sep 2026), for the `.tile-stack` reason: it
+     is a full-width column of cards, and the request card is itself a
+     three-track grid whose middle and right zones are sized against each other —
+     hand 184px of the row to a label column and the card's own columns lose it.
+     It is the wrapper the agent's Requests tab uses in place of `.tile-stack`
+     (which would pad each bordered card by `--pad-x` inside its own border), so
+     without this entry the "Waiting for your answer" head-band drops into the
+     184px column and the cards float in the right two-thirds. `> .rqc-list`, a
+     direct child of the section like every other bleed-free member here. */
+  /* `.eval-form` JOINS THEM (§122-adjacent, agent portal, 6 Sep 2026): the
+     evaluation's "Your Decision" section is a stack of full-width form fields — a
+     level dropdown, a reasoning box, strengths, growth and extra notes — and a
+     form's controls read top-to-bottom under their heading, not squeezed into the
+     right two-thirds with the heading in a 184px column. It is the one headed
+     in-page FORM the product has; a `.f` field is not on the opt-out list because
+     every other form lives in a sheet, where there is no label column. */
+  /* `.tx-lines` JOINS THEM (§124, agent portal): the transcript is a full-width
+     line-by-line list under a heading, its own timestamp/speaker columns sized
+     against each other — a 184px label column would take that width out of the
+     lines, so the heading (and the search and filters above the list) sit on top. */
+  /* `.skl`, `.pfe-about` AND `.tg` JOIN THEM (Maryam, 7 Sep 2026: "in candidate
+     profile we are not using the side by side content placement anywhere. please
+     improve the sections accordingly"). The candidate Profile stacks EVERY
+     heading — it is a `.pf-cs` page, which sets `display:block` on all its
+     sections — so a hand-built portal following that module (the agent Profile)
+     must stack its About paragraph, its skills pills and its visibility toggle
+     the same way rather than dropping each heading into a 184px spine. Each is
+     a DIRECT child (`> `) so the entries stay narrow: the course outline's
+     nested `.acc-b .skl` and the candidate's wrapped `.pf-tgs > .tg` do not
+     match, and neither does anything but a section built as heading-then-body.
+     `.pfe-about` also carried this job for the candidate as §16's own opt-out;
+     stating it here puts all three where the list is decided. */
   .sec:has(> .stand),.sec:has(> .paytbl),.sec:has(> .cal),
+  .sec:has(> .rqc-list),.sec:has(> .eval-form),.sec:has(.tx-lines),
+  .sec:has(> .skl),.sec:has(> .pfe-about),.sec:has(> .tg),
+  /* `.qa` JOINS THEM (Maryam, 8 Sep 2026, of the admin dashboard's quick
+     actions as a `.qa-4` row): the quick-actions grid is a full-width row of
+     cards — `.tile-stack`'s argument exactly — so its heading sits above it,
+     not in a 184px spine that would take the width out of the card row. `> .qa`,
+     a direct child like the other bleed-free members. */
+  .sec:has(> .qa),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
@@ -505,6 +563,10 @@ textarea.inp{min-height:88px}
   .sec:has(> .stats) > .sec-h,.sec:has(> .tbl-wrap) > .sec-h,
   .sec:has(> .facts) > .sec-h,.sec:has(> .stand) > .sec-h,
   .sec:has(> .paytbl) > .sec-h,.sec:has(> .cal) > .sec-h,
+  .sec:has(> .rqc-list) > .sec-h,.sec:has(> .eval-form) > .sec-h,
+  .sec:has(.tx-lines) > .sec-h,
+  .sec:has(> .skl) > .sec-h,.sec:has(> .pfe-about) > .sec-h,.sec:has(> .tg) > .sec-h,
+  .sec:has(> .qa) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}
@@ -602,8 +664,8 @@ textarea.inp{min-height:88px}
   z-index:40}
 .sn-item{
   min-height:48px;padding:0 var(--pad-x);gap:var(--s05);
-  font-size:14px;letter-spacing:.1px;color:var(--text-primary)}
-.sn-item svg{width:20px;height:20px;flex:none;fill:var(--icon-secondary)}
+  font-size:14px;letter-spacing:.1px;color:#828282}
+.sn-item svg{width:20px;height:20px;flex:none;fill:#828282}
 .sn-item > span{flex:1;min-width:0}
 .sn-item:hover{background:var(--overlay-hover)}
 .sn-item.on{background:transparent;font-weight:600}
@@ -1088,7 +1150,7 @@ button[data-toggle]:hover,button[data-addcard]:hover{background-color:transparen
    value; the number in those notes is the one that moved. */
 /* re-derived for #ff3733, 4 Sep 2026, on contrast rather than on hue
    arithmetic: #ff7c70 read 7.53:1 on `--gray-100` and #ff7b79 reads 7.52. */
-:root{--accent-on-dark:#ff7b79}
+:root{--accent-on-dark:#dd7a7a}
 .path-you,.lvl-hero .acc-h,.on-dark .accent-text{color:var(--accent-on-dark)}
 
 /* d. Facts and step lists for the rewritten Interviews page */

@@ -1,0 +1,28 @@
+/* ==========================================================================
+   126. THE ADMIN'S STATUS IS TEXT, ITS LABELS ARE ROUND CHIPS — Maryam, 7 Sep 2026
+
+   Two asks on the Super Admin portal, back to back:
+
+   "never add status in tags, this is a universal change on admin portal" — a
+   record's state (Active / Inactive / Paused / Approved / Pending / Listed …)
+   is now plain text, not a bordered chip. The admin's `tag()` helper stamps
+   `.statw` instead of `.tag`, so every Status / Listing / verify / outcome cell
+   changes at once. The good/waiting/problem COLOUR stays — it is the meaning, a
+   SET, not the accent (DESIGN.md §3) — but §63 owns text colour, so the `.statw`
+   inks are stated in §63 §7c, not here; this layer only lays it out.
+
+   "and other such ui's should be round chips" — the categorical LABEL chips
+   that remain (a role, a level, a track: `.tag`, `.tag.bordered`) go from the
+   platform's square (radius 0) to a pill. THIS IS ADMIN-ONLY. The radius-0 rule
+   is the platform's, and the candidate / leader / agent portals keep it — so
+   both rules here are scoped to `[data-portal="admin"]`, the marker the admin's
+   render stamps on `.app` (the leader's own rules scope the same way, §31). The
+   design system ships them because the admin is on the box, but only that
+   portal's marker turns them on.
+   ========================================================================== */
+
+/* ---- status as plain text (colour is §63 §7c) ---------------------------- */
+.app[data-portal="admin"] .statw{display:inline; white-space:nowrap}
+
+/* ---- the remaining label chips become round ------------------------------ */
+.app[data-portal="admin"] .tag{border-radius:999px}

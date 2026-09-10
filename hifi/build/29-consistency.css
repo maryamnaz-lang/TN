@@ -1042,7 +1042,7 @@
   background-color:transparent;
   background-image:none}
 .app .page .stats > .stat > .stat-ic svg{
-  width:20px;height:20px;fill:var(--mk)}
+  width:20px;height:20px;fill:var(--icon-primary)}
 
 /* one hue per cell, by position. `--mk` is inherited by the chip and the
    glyph from the cell, so the wash and the mark can only ever agree. */

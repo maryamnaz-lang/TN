@@ -1000,6 +1000,54 @@ LAYERS = [
     # box would ship §70's square border-image dock while the portals draw a
     # pill — exactly the two-generations failure CLAUDE.md records.
     '117-askpill.css',
+    # THE ASK PAGE FOLLOWS THE DOCK (§118). Crosses whole — `.ask-sugg`,
+    # `.askfield*` — the agent portal writes both by hand.
+    '118-askpage.css',
+    # THE COUNTDOWN ON THE CALL ROW'S NAME LINE (§119). Crosses whole — the
+    # agent portal is its first writer and `crow` is the box's component.
+    '119-crowdue.css',
+    # THE SUPER ADMIN'S RAIL TREE AND LIST TOOLS (§120). Crosses whole — the
+    # admin portal is its first writer and is on the box, not in hifi/; the
+    # portal build carries it only so one source states it.
+    '120-admin.css',
+    # THE INTERVIEW REQUEST CARD (§122). Crosses whole — agent-portal-only
+    # (like §49/§41's shape), but that portal is on the box, so its layout has
+    # to ship; §63 owns the type, this is only the card's grid and hairlines.
+    '122-reqcard.css',
+    # THE ADD-SLOT FORM (§123). Crosses whole — the custom day/time dropdowns
+    # (`.dd*`) and the two-field time range (`.tm-row`) that replace the native
+    # `<select>`s. Agent-portal-only (like §41/§122), but that portal is on the
+    # box; §63 owns the type, this is only the field, the popup and the grid.
+    '123-slotform.css',
+    # THE EVALUATION UI (§124). Crosses whole — agent-portal-only (like §122/§123),
+    # but that portal is on the box. Tal's card stacking + highlight wash, the
+    # transcript stat-link, and the fifteen-rung `.lvl-*` picker; §63 owns the type.
+    '124-eval.css',
+    # THE ROW ACTION MENU (§125). Crosses whole — the Super Admin portal is on
+    # the box and is its writer: the per-row icon strip collapses into one kebab
+    # opening a menu of the same actions. §123's `.dd-menu` re-cut for an icon
+    # trigger; §63 owns the type, this is only the wrapper, the popup and the
+    # item row (`.rowmenu*`). `rowmenu-i`'s armed hover crosses via the parsed
+    # HOVER_KEEP.
+    '125-rowmenu.css',
+    # THE ADMIN'S STATUS-AS-TEXT + ROUND LABEL CHIPS (§126). Crosses whole — the
+    # admin portal is on the box and is its writer. Both rules are scoped to
+    # `[data-portal="admin"]`, so the platform's radius-0 label chips hold on the
+    # candidate/leader/agent portals; §63 §53 carries the `.statw` inks.
+    '126-adminchip.css',
+    # TABLE PAGINATION (§127). Crosses whole — the admin's `table()` emits the
+    # `.pgn` bar and the admin is on the box. Controls are `.btn`; the prose ink
+    # is §63 §54; this layer is layout only.
+    '127-pagination.css',
+    # THE SUPER ADMIN LIST PAGE (§128). Crosses whole — the admin is on the box
+    # and is its writer. Leader-style table, tab top border, heading air, and the
+    # search/filters toolbar (`.lst-tools`, `.fdd`); admin-scoped where it
+    # re-decides a shared surface, §63 owns the type.
+    '128-adminlist.css',
+    # THE VIEW-AS BAR (§129). Crosses whole — the admin portal is on the box and
+    # is its only writer: the bar that names an open View As session (SA-11).
+    # Ground, hairline and geometry; §63 §57 carries the line's type.
+    '129-viewas.css',
 ]
 
 # ==========================================================================
@@ -1304,7 +1352,17 @@ def _hover_keep():
     if not src.exists():
         sys.exit('build-ds: cannot read build.py to take its HOVER_KEEP — '
                  'the two hover treatments would silently diverge.')
-    m = re.search(r'^HOVER_KEEP\s*=\s*\((.*?)\)', src.read_text(), re.S | re.M)
+    # STRIP PYTHON COMMENTS BEFORE MATCHING (§125, 7 Sep 2026). The tuple is
+    # heavily commented, and the `.*?\)` below is non-greedy, so a `)` inside a
+    # comment — `pressable)` in §107's note — closed the match early and
+    # truncated the parsed list: `ob-qp-o`, `dd-opt` and every later entry were
+    # dropped and shipped DISARMED here, the exact silent drift this reader was
+    # written to end (it moved the failure from a hand-typed copy to a fragile
+    # regex, but a failure all the same). Entries are quoted class names with no
+    # `#`, so removing `#…` to end-of-line is safe and leaves the tuple's only
+    # parens the ones that bound it.
+    text = re.sub(r'#[^\n]*', '', src.read_text())
+    m = re.search(r'^HOVER_KEEP\s*=\s*\((.*?)\)', text, re.S | re.M)
     if not m:
         sys.exit('build-ds: build.py no longer declares HOVER_KEEP as a plain '
                  'tuple literal — this reader needs updating with it.')
@@ -1767,6 +1825,15 @@ NOT_IN_DS = {
     # portal's rating rows. Nothing else in the file is at stake — the gold is
     # §01's token and §15.949's fill, both of which cross already.
     '49-agentstar.css': "one portal's star sizing, not a component — see the layer's own note",
+    # §121 is the recorder the mic opens in the candidate/leader chat, and it is
+    # inseparable from ai4.js: the `.askrec` row and the `.askfield.rec` state
+    # exist only where that pass builds them, and the agent and admin portals
+    # have no Web Speech and draw no mic at all. Shipping the CSS to the box
+    # would put a recorder's skin on portals that can never record — exactly the
+    # half-a-component failure the include-by-default note warns against, which
+    # is the one case that argues for OUT. If the recording behaviour is ever
+    # ported into talentnext-ds.js, this entry moves to LAYERS.
+    '121-askvoice.css': "the recorder is ai4.js behaviour; the agent/admin portals have no mic — see the layer's note",
 }
 
 
@@ -1885,7 +1952,8 @@ DS_TABLES = [
 # is why both appear in DS_RENAME rather than in DS_TABLES.
 DS_HAVE = {'I', 'inner', 'IP', 'PHP', 'P', 'AWARD', 'AV', 'LOGO_K', 'LOGO_W',
            'LOGO_D', 'TAL_MARK', 'CALL_ART', 'CHEV', 'TN_MARK', 'ARROW_LINE',
-           'TN_CHEVRONS', 'DS_PLATE_SOON', 'dsCallLeft', 'dsCallUrgent'}
+           'TN_CHEVRONS', 'DS_PLATE_SOON', 'dsCallLeft', 'dsCallUrgent',
+           'PAY_ART'}
 
 # source name -> the name it is emitted under. Applied to the DECLARATION and
 # to every call site inside every extracted body, so the closure stays wired.
@@ -1894,6 +1962,9 @@ DS_RENAME = {
     'standRow': 'dsStandRow', 'stepper': 'dsStepper', 'ladder': 'dsLadder',
     'gcard': 'dsGcard', 'foundHead': 'dsFoundHead', 'stars': 'dsStars',
     'avatar': 'dsAvatar', 'ph': 'dsPh', 'phSub': 'dsPhSub',
+    # the shared Stripe "Add Payment Method" modal (§payForm). A pure function
+    # of (tab, open) over `PAY_ART` — the agent and admin portals open it.
+    'payForm': 'dsPayForm',
     # helpers the above reach for
     'joinLive': 'dsJoinLive', 'joinShut': 'dsJoinShut',
     'joinClock': 'dsJoinClock', 'nextBadge': 'dsNextBadge',
@@ -1908,7 +1979,7 @@ DS_RENAME = {
 DS_BUILDERS = [
     'phSub', 'ph', 'avatar', 'stars', 'statCell', 'gcard', 'foundHead',
     'aiHead', 'stepIcon', 'stepper', 'rungOf', 'ladder', 'nextBadge',
-    'standRow', 'joinClock', 'joinLive', 'joinShut', 'crow',
+    'standRow', 'joinClock', 'joinLive', 'joinShut', 'crow', 'payForm',
 ]
 
 # THE TWO THAT NEEDED AN ARGUMENT, AND WHY EACH IS ONE LINE.
@@ -2948,6 +3019,20 @@ function dsQuizRose(dims, score){
             n_img += 1
     if ca_pairs:
         assets.append('const CALL_ART = {\n  ' + ',\n  '.join(ca_pairs) + '\n};')
+
+    # THE STRIPE "ADD PAYMENT METHOD" PICTURES, re-embedded off the same two WebP
+    # files `build.py` uses, so `dsPayForm` (extracted below) draws the same modal
+    # in the agent and admin portals. In DS_HAVE, so the builder may reference it.
+    PAY_ART = {'card': 'pay-card.webp', 'bank': 'pay-bank.webp'}
+    pa_pairs = []
+    for k, fn in PAY_ART.items():
+        f = SRC / fn
+        if f.exists():
+            pa_pairs.append("%s:'data:image/webp;base64,%s'"
+                            % (k, base64.b64encode(f.read_bytes()).decode()))
+            n_img += 1
+    if pa_pairs:
+        assets.append('const PAY_ART = {\n  ' + ',\n  '.join(pa_pairs) + '\n};')
 
     assets.append("""
 /* ==========================================================================

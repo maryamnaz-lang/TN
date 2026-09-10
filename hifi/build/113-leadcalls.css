@@ -105,6 +105,15 @@
    rule that cannot match is the "gate nothing writes" tell, so there is not
    one — the arrow is what says the cell is pressable, which is what it says on
    every other openable row in this product. */
+/* A `--surface-2` GREY FILL WITH A `--rule` HAIRLINE (Maryam, 9 Sep 2026, in
+   three steps the same day: no border + #efefef fill; then #fcfcfc fill; then
+   "give the grey call cards border of #efefef color"). So the light cells are
+   now #fcfcfc (`--surface-2`, the tinted panel) inside a #efefef (`--rule`)
+   1px border — both read the token, never the hex. The black cell keeps its
+   border transparent (§113.3), so the 1px width is shared across the grid track
+   and the three cells stay the same height. This is a deliberate exception to
+   the "cards are a white fill, grey only for tracks and hover" rule, by
+   instruction. */
 .app .lcal{
   appearance:none;-webkit-appearance:none;
   display:flex;flex-direction:column;align-items:stretch;
@@ -112,7 +121,7 @@
   width:100%;margin:0;
   padding:var(--s05);
   border:1px solid var(--rule);
-  background-color:var(--layer-01);
+  background-color:var(--surface-2);
   text-align:left}
 .app button.lcal{cursor:pointer}
 .app button.lcal:focus-visible{outline:2px solid var(--brand-primary);outline-offset:2px}
@@ -131,6 +140,9 @@
    `.gcard-art`'s own `align-self:center` already asks for and is right for a
    40px block beside a 62px picture. */
 .app .lcal-h{display:flex;align-items:center;gap:var(--s04)}
+/* THE TITLE LEADS THE HEADER NOW (9 Sep 2026) — it takes the space left of the
+   `flex:none` date and shrinks rather than pushing the date off the row. */
+.app .lcal-h > .lcal-t{flex:1 1 auto;min-width:0}
 .app .lcal-when{
   margin-left:auto;flex:none;
   display:flex;flex-direction:column;align-items:flex-end;gap:2px;
@@ -160,20 +172,13 @@
    cell — the ink pair, the seams on anything it holds, the white quiet button,
    §81's unlit disabled Join — arrives from the `.dark-card` class alone.
 
-   THE BORDER GOES TRANSPARENT, IT IS NOT REMOVED. §64's rule, one component
-   over: `.lcal` declares `1px solid var(--rule)` and every cell in the row is
-   in the same grid track, so `border:0` here makes the black cell 2px shorter
-   than the two beside it. */
+   THE BORDER GOES TRANSPARENT, IT IS NOT REMOVED. The base `.lcal` carries a
+   `1px solid var(--rule)` hairline on the light cells; every cell is in the
+   same grid track, so `border:0` here would make the black cell 2px shorter
+   than the two beside it. `border-color:transparent` keeps the width and drops
+   the line, so the black cell has no visible edge and stays the same height. */
 .app .lcal.lcal-next{
   border-color:transparent;
   background-color:var(--gray-100);
   background-image:var(--dark-haze);
   background-repeat:no-repeat}
-
-/* AND THE COVER'S LETTERBOX GROUND FOLLOWS THE CARD. §86 gives `.gcard-art`
-   `--layer-02` because it sits on white rows, and §86.2 gives `.crow-cover`
-   `--on-dark-fill` for exactly this reason on exactly this artwork: `contain`
-   fills the width and bars the height, so on a black cell a pale bar would read
-   as a gap under the picture rather than as part of the slot. It is also what
-   the `<i>` fallback stands on when a cover fails to decode. */
-.app .lcal.lcal-next .gcard-art{background:var(--on-dark-fill)}

@@ -74,7 +74,22 @@
    its own avatar fallback in five places, and `img` because `AV` is the
    dictionary both sides read anyway. */
 const LEADER = {n:COHORT_LEAD.n, i:'PN', img:AV.priya,
-  range:COHORT_LEAD.range, since:COHORT_LEAD.since};
+  range:COHORT_LEAD.range, since:COHORT_LEAD.since,
+  /* `email` and `bio` added 7 Sep 2026 for `V.leadProfile`'s four-tab rebuild —
+     the account address the Privacy tab reads, and the leader's own words the
+     General "About" and the Public listing both draw (one string, not two). The
+     bio was inline in two places on the old page; it is here now so the card and
+     the About cannot drift. */
+  email:'priya.nair@nextinleadership.org',
+  bio:'Fifteen years running operations teams. I am direct, I move quickly, and I do not pad feedback — if something is not working I will say so in the first ten minutes.',
+  /* SPECIALITIES — the chip cloud on the Public Profile listing (9 Sep 2026:
+     "improve the cohort leader public profile just like talent agent public
+     profile"). AUTHORED PLACEHOLDER copy, the same status as the agent's
+     `SPECIALISMS`: the seed has no per-leader speciality list, so these stand in
+     from her operations / first-line-leadership domain (the old single
+     "Specialism" line said "Operations teams, first-line leadership"). Flagged,
+     not real. */
+  specs:['Operations teams','First-line leadership','Delegation','Prioritisation','Stakeholder management','Coaching for growth','Remote and hybrid teams']};
 
 /* THE ATTENTION QUEUE'S TWO CONTROLS ARE DELETED (1 Sep 2026) and so is their
    state. `S.leadQ` and `S.leadFilter` were on `S` rather than in a closure so a
@@ -165,8 +180,15 @@ const lbadge = pts => BDG.filter(b => b.need && pts >= b.need).pop() || null;
                            week that ended.
    Yuki keeps her 12 days and her 9%, so `LEAD_NOTIF`'s row and her own thread
    are untouched — she is the one person this rearrangement had to leave alone. */
+/* A COHORT IS AN INTENT GROUP, NOT A COURSE INSTANCE (Client, 9 Sep 2026).
+   `intent` is the PRIMARY grouping axis — one of the three `INTENTS`, the same
+   list the candidate profile and onboarding read. `level` stays (a cohort is
+   still one band, so Trailblazers never sit with Explorers), but it no longer
+   IDENTIFIES the cohort and the course no longer does either: `lcourse` is off
+   the identity line (see its note). One cohort per intent here so the demo shows
+   the axis clearly. */
 const LEAD_COHORTS = [
-  {id:41, level:'E3', week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', members:[
+  {id:41, level:'E3', intent:INTENTS[2], week:5, day:34, call:'Thursday 6:00 PM', callDay:'Today', callTime:'6:00 PM', callOrd:2, starts:'', members:[
     lmem('Maryam Naz','MN','hana',46,84,1.3,'Today',1760),
     lmem('Aisha Bello','AB','priya',71,94,1.0,'Today',2610),
     lmem('Daniel Kerr','DK','owen',58,88,1.2,'Today',2140),
@@ -177,7 +199,7 @@ const LEAD_COHORTS = [
     lmem('Chloe Ferreira','CF','priya',28,77,1.0,'5d ago',1005),
     lmem('Tobias Mensah','TM','samuel',35,61,1.4,'2d ago',1240),
     lmem('Yuki Tanaka','YT','hana',9,0,0,'12d ago',285)]},
-  {id:33, level:'E1', week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', members:[
+  {id:33, level:'E1', intent:INTENTS[0], week:11, day:76, call:'Friday 5:00 PM', callDay:'Tomorrow', callTime:'5:00 PM', callOrd:4, starts:'', members:[
     /* COHORT 33 IS THE ONE THESE FIGURES ARE READ ON — week 11, and the two at
        the top are the ones the Evaluations card draws. Owen clears Silver
        (5,000) and Lena does not, which is deliberate: the card shows a badge per
@@ -191,7 +213,7 @@ const LEAD_COHORTS = [
     lmem('Grace Mwangi','GM','priya',80,88,1.0,'Today',4265),
     lmem('Ivan Petrov','IP','samuel',80,70,1.7,'3d ago',3780),
     lmem('Zoe Bennett','ZB','lena',80,66,1.6,'2d ago',3410)]},
-  {id:47, level:'E2', week:1, day:4, call:'Monday 6:00 PM', callDay:'Mon', callTime:'6:00 PM', callOrd:5, starts:'', members:[
+  {id:47, level:'E2', intent:INTENTS[1], week:1, day:4, call:'Monday 6:00 PM', callDay:'Mon', callTime:'6:00 PM', callOrd:5, starts:'', members:[
     /* COHORT 47 IS FOUR DAYS OLD, so every total here is one or two chapters'
        worth at 25 a chapter plus a post or two — the four on 0% have signed in
        and done nothing, which is 0 points earned rather than a missing figure. */
@@ -250,14 +272,44 @@ const lbehind = () => lmembers().filter(x => x.m.pc - lpace(x.c) <= -5);
 const lavg = (c,k) => Math.round(c.members.reduce((s,m) => s + m[k], 0) / c.members.length);
 const lname = c => 'Cohort ' + c.id;
 const llevel = c => 'Explorer &ndash; ' + c.level;
-/* THE COURSE A COHORT IS TAKING (Maryam, 2 Sep 2026). `courseOf` and the
-   argument for keying it by LEVEL are in views.js beside `ENROL_COURSE`, which
-   is where two of the four names are read from; this is the leader-side reader,
-   stated beside `lname` and `llevel` because those three are the cohort's
-   identity and every surface that names one names them together.
+/* THE COHORT'S INTENT — its GROUPING (Client, 9 Sep 2026). This replaces the
+   course on the identity line: a cohort is the people following one intent
+   track, so `lname · lintent · llevel` is the identity every surface prints
+   together now, and `lintent` sits beside `lname`/`llevel` for that reason. */
+const lintent = c => c.intent;
+/* THE COURSE A COHORT'S TRACK CURRENTLY RUNS — NO LONGER THE COHORT'S IDENTITY
+   (Client, 9 Sep 2026). The cohort is not a course instance, so `lcourse` came
+   off the `lname · … · llevel` line (replaced by `lintent`). It is retained as
+   the reader for the course-as-content surface — a course is recommended and
+   chooseable inside a track (Point 3), the candidate dashboard draws that — and
+   `courseOf`/the key-by-LEVEL argument are in views.js beside `ENROL_COURSE`.
    THE DIRECTION IS THE RULE views.js's `COHORT_LEAD` note records: views.js
    parses first and lead.js reads back, never the other way. */
 const lcourse = c => courseOf(c.level);
+
+/* PER-CANDIDATE COURSE, BECAUSE CANDIDATES IN A COHORT NEED NOT SHARE ONE
+   (Maryam, 9 Sep 2026: "the candidates could be taking different courses so
+   please show different course names"). `lcourse(c)` is the cohort's own track
+   course and every member shared it, so the reports table's Course column read
+   the same name on every row. The seed has no per-member course, so `mcourse`
+   spreads the four catalog courses (`COURSE_NAME`, in views.js) across members
+   by a stable hash of the name — AUTHORED variety, flagged the same as the note
+   copy, not a real enrolment. Stable so a candidate keeps one course across
+   renders and both tables. */
+const LDR_LEVELS = ['E1', 'E2', 'E3', 'E4'];
+const mlevel = m => LDR_LEVELS[[...m.name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % LDR_LEVELS.length];
+const mcourse = m => courseOf(mlevel(m));
+
+/* THE COURSE'S OWN DESCRIPTION, for the member page's course card (Maryam, 9 Sep
+   2026: "show the course image, name and its desc that we are showing on the
+   black card while enrolling"). ENROL_COURSE carries name + desc for E3/E4; E1
+   and E2 are names in COURSE_NAME only, so their descriptions are AUTHORED
+   PLACEHOLDERS here, flagged the same as the rest of the leader copy. */
+const COURSE_DESC = {
+  E1: 'The everyday foundations of working in a business — how teams organise, how work moves through them, and the basic tools that keep it running. The first step before the deeper courses.',
+  E2: 'The software and working habits that make a modern team fast: documents, spreadsheets, planning and communication tools, and how to use them well together rather than one at a time.'
+};
+const courseDesc = lvl => (ENROL_COURSE[lvl] && ENROL_COURSE[lvl].desc) || COURSE_DESC[lvl] || '';
 
 /* THE COVER IS KEYED BY LEVEL, NOT BY COHORT ID (Maryam, 1 Sep 2026, with three
    images). `COHORT_ART` is embedded by build.py — its note is the argument for
@@ -752,14 +804,13 @@ var LEAD_TAL = {   /* `var` for the reason given above LEAD_NOTIF */
    the dashboard and on Calls alike, and the parameter survives for a caller that
    genuinely has nothing to offer. */
 const leadCall = (k, second) => ({
-  who:{n:'Cohort ' + k.co, i:String(k.co), img:cohortArt(k)},
-  cover:true,       /* the mark is a course cover, so the slot is 9:5 — §86 */
-  /* THE COURSE IS ON THIS LINE AND NOT ON THE ONE BELOW IT (2 Sep 2026), and
-     the cover is the reason: `.crow-ph.crow-cover` is the course's own title
-     card, so the name is this picture's caption and belongs on the first line
-     of type beside it. `x` (`lcDetail`) is the appointment — sixty minutes,
-     week five, the chapter — and a course name in it would be a fact about the
-     cohort filed under a fact about the call. */
+  /* NO MARK AT ALL ON A COHORT (Client, 9 Sep 2026: first "remove the course
+     images from cohorts", then "remove the circle 41 from the black card"). `img`
+     was `cohortArt(k)`, a course cover; then the crow drew the cohort NUMBER as a
+     disc; now there is no `i` either, so `crow` draws no `.crow-ph` and the detail
+     sits flush left. The record is the appointment, named in `who.n`. */
+  who:{n:'Cohort ' + k.co},
+  cover:false,
   role:`${k.seats} candidates at Explorer &ndash; ${k.level} &middot; ${k.course}`,
   x:lcDetail(k),
   xl:'',            /* the line is the appointment, not the cohort */
@@ -773,11 +824,22 @@ const leadCall = (k, second) => ({
 
 const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
+      ${''/* THE HEADER IS "Upcoming Cohort Session", NOT "Cohort 41 call" (Maryam,
+             9 Sep 2026: "in black cohort call cards, change the 'Cohort 41 call'
+             title to 'Upcoming Cohort Session'"). The crow below still names the
+             cohort ("Cohort 41" + the detail), so the header can be the generic
+             kind of appointment. `lcTitle` is untouched — the dashboard's
+             upcoming-calls cards still title themselves "Cohort N call". */}
+      <div class="dc-hd-r"><h2 class="dc-t">Upcoming Cohort Session</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
-    ${crow(leadCall(k, (o || {}).second), {when:false, join:false,
-      second:(o || {}).second === false ? false : undefined})}
+    ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
+           "instead of generate brief show Join Call button but disabled"). The
+           card now draws `crow`'s primary Join and no secondary (`second:false`);
+           §81/§119 gate it, so it is the disabled grey Join while the call is more
+           than a minute away — which is the state a leader reads it in. The `o`
+           param (the caller's brief action) is no longer used by this card. */}
+    ${crow(leadCall(k, false), {when:false, second:false})}
   </div>`;
 
 /* ==========================================================================
@@ -865,39 +927,27 @@ const lcalCard = (k, lead) => {
      it is to go and look. */
   return `<${tag} class="lcal${lead ? ' lcal-next dark-card' : ''}"${
     lead ? '' : ` data-go="leadCohort" data-ldrco="${k.co}"`}>
+    ${''/* THE TITLE LEADS THE HEADER ROW NOW, AND THE COHORT-NUMBER COVER IS GONE
+           (Maryam, 9 Sep 2026: "remove the cohort number from the all cards top
+           left and take the lower content like 'Cohort 41 call' part on top
+           left"). The `.gcard-art` badge sat where the title now sits; the title
+           came up out of `.lcal-b` into the header, opposite the date. The date
+           stays the word-over-figure block (`.lcal-when`) — measured at 62px, the
+           wider of "Tomorrow" and "5:00 PM" rather than their sum, so the header
+           does not wrap. §113.3's dead `.gcard-art` ground rule went with it. */}
     <span class="lcal-h">
-      ${''/* §86's cover verbatim, `<i>` under the `<img>` so a cover that fails
-             to decode leaves the cohort's number rather than an empty box. */}
-      <span class="gcard-art"><i>${k.co}</i><img src="${cohortArt(k)}" alt="" loading="lazy" onerror="this.style.display='none'"></span>
-      ${''/* THE DATE IS THE WORD OVER THE FIGURE, WHICH IS `bookedRow`'s OWN
-             CHIP RECOVERED — and it is measured, not preferred. Written the
-             reference's way, as one line reading "Tomorrow &middot; 5:00 PM"
-             with a clock in front of it, the block is 149px against the 110
-             left beside a 112px cover, so the header wrapped in every cell at
-             every width the three-across grid produces. The alternatives were
-             both worse: shrinking the cover to fit puts it at 73 x 41, where a
-             title card's line of type is no longer readable, and letting the
-             text wrap gives two ragged right-aligned lines that break at a
-             different word per card.
-             `.day`'s shape answers it at 62px wide — the widest of "Tomorrow"
-             and "5:00 PM" rather than the sum — and it is what this portal's
-             diary drew for a date until this row replaced it. The clock glyph
-             goes with the merge: a two-line date needs no mark to say it is a
-             date, and the same 16px glyph was the other 20px this row could
-             not afford. */}
+      <span class="lcal-t t-h4">${lcTitle(k)}</span>
       <span class="lcal-when">
         <span class="lcal-day t-desc">${k.day}</span>
         <span class="lcal-tm t-h4">${k.time}</span>
       </span>
     </span>
     <span class="lcal-b">
-      <span class="lcal-t t-h4">${lcTitle(k)}</span>
-      ${''/* THE COURSE IS NOT IN THE WORDS, because the cover 8px above IS the
-             course's title card — §75's own reasoning for putting the name on
-             `.crow-role` beside it, arriving at the opposite answer because
-             here the picture and the line are stacked rather than abreast and
-             the caption would be reading the picture out loud. */}
-      <span class="lcal-d t-desc">${k.seats} candidates &middot; Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
+      ${''/* THE CANDIDATE COUNT CAME OFF (Maryam, 9 Sep 2026: "remove the
+             candidate count from each card like '10 Candidates'"). `k.seats` is
+             still on the record and the figure bar above still counts it; the
+             card's line is now just the track and the week. */}
+      <span class="lcal-d t-desc">Explorer &ndash; ${k.level} &middot; week ${k.week} of 13</span>
     </span>
     ${''/* THE FOOT IS THE DURATION AND ONE CONTROL, WHICH IS THE REFERENCE'S
            OWN ROW AND ALSO WHAT FITS. `lcDetail`'s three facts — minutes, week
@@ -927,8 +977,11 @@ const lcalCard = (k, lead) => {
 const leadCallsSec = () => {
   const up = lcalls();
   return `<div class="sec" id="lead-calls">
+    ${''/* NO DESCRIPTION (Maryam, 9 Sep 2026: "remove the desc of this"). The
+           section title and the cards say what this is; the one-line lede came
+           off the same way §72/§73 took the repeated ledes off the candidate
+           dashboard. */}
     ${aiHead({title:'Your upcoming calls',
-      desc:`One call a week for every cohort you lead, in the order they happen.`,
       act:up.length ? `<button class="btn btn-g btn-sm noic" data-go="leadCalls">View all sessions</button>` : ''})}
     ${up.length
       ? `<div class="lcal-row">${up.map((k, i) => lcalCard(k, i === 0)).join('')}</div>`
@@ -1038,6 +1091,30 @@ function faceRow(p, detail, go, at, cta){
    "(intermediate value).tile is not a function", nowhere near the comment.
    Reasoning about a view belongs in a block like this one, above it.
    ========================================================================== */
+/* THE CERTIFIED-COHORT-LEADER BADGE — the candidate's completion banner
+   (`certBanner` / `.certban`, views.js) brought to the leader dashboard, after
+   the call cards (Maryam, 9 Sep 2026: "just like how we show the badge on
+   candidate portal ... show on the cohort leader dashboard after the call cards
+   ... this badge will be mostly about the Certified Cohort Leader badge"). The
+   `.certban` shape ships in the design system, so this is only the leader's copy
+   of it — the mark, the two lines and the View button, no dismiss (it is a
+   standing credential, not a one-off notice). `CERT_ART.explorer` is the
+   platform's certification-badge art, reused as a PLACEHOLDER because the seed
+   holds no Certified-Cohort-Leader asset (§74; a real badge WebP is the file to
+   drop in). "View" opens the leader profile, where the credential lives. */
+const leadCertBanner = () => `<div class="sec">
+  <div class="certban">
+    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
+    <span class="certban-b">
+      <span class="certban-t">Certified Cohort Leader</span>
+      <span class="certban-m">Verified by TalentNext &middot; Volunteer cohort leader</span>
+    </span>
+    <span class="certban-a">
+      <button class="btn btn-p btn-sm" data-go="leadProfile">View</button>
+    </span>
+  </div>
+</div>`;
+
 V.leadDash = () => {
   const att = lattention(), next = lnext(), pend = lpending();
   const severe = att.filter(x => x.m.flag.k === 'bad');
@@ -1120,15 +1197,21 @@ V.leadDash = () => {
          ends the band — written between the `.ph` and Tal's card it would
          leave the summary in the page body (trap 11's neighbourhood). */}
   ${leadCallsSec()}
+  ${''/* THE CERTIFIED COHORT LEADER BADGE sits right after the calls (Maryam,
+         9 Sep 2026) — `leadCertBanner` above. */}
+  ${leadCertBanner()}
+  ${''/* THE FIGURE BAND IS PLAIN STAT CELLS, NOT A STICKY SCROLL-SPY (Maryam,
+         9 Sep 2026: "hide the fix tabs interaction, go with the generic scroll
+         just like other pages"). The cells used to be `data-jump` buttons that
+         scrolled to their section, and a second `.lead-bar` strip stuck to the
+         top of the scroller as a tab navigator lighting the section you were in.
+         Both are gone: the cells are static figures like every other dashboard's
+         and the page scrolls normally. `leadStick`, its scroll/resize listeners
+         and the click-to-jump handler went with them. The four sections keep
+         their ids — the figure counts still read `FIG[id]`. */}
   <div class="sec">
     <div class="stats stats-lead">
-      ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1], j.id)).join('')}
-    </div>
-  </div>
-  <div class="sec lead-bar" id="leadBar">
-    <div class="cs lead-tabs" role="tablist" aria-label="Sections of this page">
-      ${LEAD_JUMPS.map(j =>
-        `<button data-jump="${j.id}" role="tab">${j.l}<span class="lf-n">${FIG[j.id][0]}</span></button>`).join('')}
+      ${LEAD_JUMPS.map(j => statCell(I[j.ic], j.l, FIG[j.id][0], FIG[j.id][1])).join('')}
     </div>
   </div>
   ${''/* THE PLATE STOOD HERE AND IS NOW `leadCallCard(next)`, 60 lines up the
@@ -1324,11 +1407,11 @@ V.leadDash = () => {
            the label was that control's words repeated three times underneath it.
            The Awaiting Evaluations queue keeps its label: one verb, on a queue
            whose heading row has no control of its own. */
-        return gcard('cohort', lname(c)+' &middot; '+lcourse(c)+' &middot; '+llevel(c),
+        return gcard('cohort', lname(c)+' &middot; '+lintent(c)+' &middot; '+llevel(c),
           'Week '+c.week+' of 13',
           `${c.call} &middot; ${lavg(c,'pc')}% average progress against ${lpace(c)}% expected`
           + (b?` &middot; ${b} at risk`:ahead?' &middot; on pace':''), 'leadCohort',
-          {src:cohortArt(c), i:String(c.id)}, `data-ldrco="${c.id}"`);
+          null /* course cover removed 9 Sep 2026 — cohorts are not courses; the cohort's own 'group' mark shows */, `data-ldrco="${c.id}"`);
       }).join('')}
     </div>
   </div>
@@ -1369,163 +1452,19 @@ V.leadDash = () => {
    ========================================================================== */
 
 /* ==========================================================================
-   THE FIGURE BAND BECOMES A POSITION INDICATOR
-
-   Four cards that count four sections of the page they are on. Read as
-   headings, they are a summary; pressed, they are navigation; and once the page
-   has scrolled past them they are the only thing on screen that still says
-   where in the page you are. So the band sticks to the top of the scroller and
-   keeps all three jobs.
-
-   THE BAND IS THE `.sec`, NOT THE `.stats` INSIDE IT. A sticky element can only
-   travel inside its own containing block, and the section wrapping the grid is
-   exactly as tall as the grid — stuck to its own top, it would not move at all.
-   The section's containing block is `.page`, which runs the length of the
-   document, so sticking the section gives it the whole page to travel.
-
-   IT STAYS IN THE CONTENT COLUMN. It spans what the resting card row spans and
-   no more. An earlier version measured `.main`'s side padding and pulled the
-   stuck bar out over it, on the argument that chrome runs to the frame edge —
-   but this is not the frame, it is the top of a page, and a strip that runs
-   under the rail and past the right edge of every section it names has stopped
-   belonging to them. §31 draws the states; neither needs a measurement.
-
-   IT LEAVES AT "YOUR STANDING". Your standing is the one section on the page no
-   card counts — it is the leader's own record, not a queue — so once it reaches
-   the bar there is nothing left for the bar to point at, and a position
-   indicator pointing at nothing is furniture. It hides by transform and
-   `visibility`, never `display`: a sticky element still occupies its flow box,
-   and removing that box would shift the page under a reader mid-scroll.
-
-   ONE SCROLL LISTENER, ON `device`, IN CAPTURE. `render()` replaces `.main` on
-   every render, so a listener bound to the scroller would leak one copy per
-   render. Scroll events do not bubble, but they are delivered to capturing
-   listeners on ancestors — so a single capture-phase listener on `device`
-   survives every render and sees the new scroller for free.
+   THE STICKY POSITION-INDICATOR IS GONE (Maryam, 9 Sep 2026: "hide the fix
+   tabs interaction, go with the generic scroll just like other pages").
+   `leadStick` made the figure band stick to the top of the scroller and turn
+   into a tab strip that lit the section you were in, and a capture-phase scroll
+   listener on `device` drove it; a click handler scrolled to a pressed card's
+   section. All of it is removed — the four figures are now plain stat cells and
+   the page scrolls like every other dashboard. The `.lead-bar` markup and the
+   `data-jump` cells went with it in `V.leadDash`; the section ids stay for the
+   figure counts. §31.4's `.lead-bar` / `.lead-tabs` / `.is-stuck` / `.is-gone`
+   CSS is now dead — left in place because it is interleaved with `.stat-jump`,
+   which lead2's "Next call" cell still uses (statCell's `at` arg), and the
+   `.lead-bar` rules match nothing so they are harmless. A tidy-up can lift them.
    ========================================================================== */
-function leadStick(){
-  const app = device.querySelector('.app');
-  if(!app) return;
-  const bar = device.querySelector('#leadBar');
-  const main = device.querySelector('.view-col > .main') || device.querySelector('.main');
-  if(!bar || !main) return;
-
-  /* NOTHING IS MEASURED FOR WIDTH ANY MORE. This used to publish the distance
-     from the scroller's edge to the page's so the stuck bar could pull itself
-     out over `.main`'s padding — which put the strip under the rail and past
-     the right edge of the sections it labels. The bar belongs in the content
-     column, and the column's own width is something CSS already knows. */
-  const mr = main.getBoundingClientRect();
-  const h = bar.getBoundingClientRect().height;
-  const stuck = bar.getBoundingClientRect().top <= mr.top + 2;
-  bar.classList.toggle('is-stuck', stuck);
-
-  /* THE BAR LEAVES WHEN THE LAST COUNTED SECTION IS FULLY ON SCREEN.
-
-     THE ANCHOR USED TO BE "YOUR STANDING" AND THAT SECTION IS GONE (Maryam,
-     31 Aug 2026). The rule it encoded still holds — the bar goes when it has
-     nothing left to point at — but the thing that made Your standing the right
-     anchor was that no card counted it: it sat AFTER the last queue, so
-     reaching it meant the queues were behind you. With it removed, Booked is
-     both the last queue and the end of the page, so the anchor is Booked
-     itself. The reading is the same one step earlier: once the final queue is
-     fully on screen, the bar is pointing at what you are already looking at.
-
-     "Fully visible" rather than "has reached the bar", and that is the half of
-     this worth keeping: the anchor is the LAST thing on the page, so at the
-     very bottom of the scroll its top is still well down the window. A trigger
-     waiting for it to reach the top is one the page can never reach, and the
-     first version of this never fired once. `bottom <= mr.bottom` is what
-     makes it reachable, and it is why this survived the anchor moving.
-
-     Gated on `stuck` because on a window tall enough to show the whole page at
-     once, every section is always fully visible — and an unstuck bar sitting in
-     its own flow position must not hide, or the page has a hole where its
-     figures should be.
-
-     NOT `LEAD_JUMPS[LEAD_JUMPS.length-1]`, which would be the clever version:
-     the bar's own list is what decides which sections it POINTS at, and tying
-     the exit to it would mean a future card added to that list silently moves
-     the exit too. The anchor is a judgement about the page's last section. */
-  /* AND THE SELECTOR HAD BEEN DEAD SINCE 1 SEP 2026. This read `#lead-booked`,
-     the id that section carried before it was renamed `lead-calls` with the
-     interviews — so `stand` has been null and `gone` has been permanently false
-     ever since, which is the quiet half of a rename: the rule is still valid,
-     still matches nothing, and the bar simply never left. The page's last
-     section is `lead-cohorts` now (the calls section moved to the top on 4 Sep
-     2026), and it is named as a JUDGEMENT about the page rather than read off
-     `LEAD_JUMPS[LEAD_JUMPS.length-1]` — which would be the clever version and
-     would silently move the exit the next time a card is added to that list. */
-  const stand = device.querySelector('#lead-cohorts');
-  const gone = stuck && !!stand && stand.getBoundingClientRect().bottom <= mr.bottom;
-  bar.classList.toggle('is-gone', gone);
-
-  /* THE READING LINE IS 45% DOWN, NOT AT THE BAR'S EDGE.
-
-     "The last section whose top has passed under the bar" is the obvious rule
-     and it is wrong here, for a reason particular to the last card: Booked is
-     the final counted section, so its top only reaches the bar at the very
-     bottom of the scroll — by which point Your standing is visible and the bar
-     has already gone. The Booked card could never light up, which made it the
-     one card that looked broken.
-
-     Measuring at 45% of the space below the bar gives every section a window,
-     including the last, and it is the better reading of "which section am I
-     in" anyway: the active one is the one occupying the place your eye is,
-     not the one that just crossed the top edge. */
-  /* AND IT IS READ IN DOCUMENT ORDER, NOT IN `LEAD_JUMPS`' ORDER (4 Sep 2026).
-     This used to walk the array and keep the last match, which is the same
-     thing only while the sections run down the page in the array's order — the
-     coupling that array's own note is about. §113 broke it: the calls section
-     is the row directly under Tal's summary now, ABOVE the strip, while its
-     card stays third in the four. Walked by array order, `lead-calls` was the
-     last id tested after `lead-attention` and its top is always above the
-     reading line, so the strip lit Cohort Calls on every section of the page.
-     Nothing threw and nothing warned — a position indicator that is confidently
-     wrong looks exactly like one that is right.
-
-     Sorting by the measured top answers it wherever a section sits, so the four
-     cards may be ordered independently of the page from here on. */
-  const line = mr.top + h + (mr.height - h) * 0.45;
-  let live = null;
-  LEAD_JUMPS.map(j => device.querySelector('#' + j.id))
-    .filter(Boolean)
-    .sort((a,b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top)
-    .forEach(s => { if(s.getBoundingClientRect().top <= line) live = s.id; });
-  live = live || (LEAD_JUMPS[0] && LEAD_JUMPS[0].id);
-  bar.querySelectorAll('[data-jump]').forEach(b =>
-    b.classList.toggle('on', !gone && b.dataset.jump === live));
-}
-
-let LEAD_RAF = false;
-device.addEventListener('scroll', () => {
-  if(LEAD_RAF) return;
-  LEAD_RAF = true;
-  requestAnimationFrame(() => { LEAD_RAF = false; try { leadStick(); } catch(e){} });
-}, true);
-window.addEventListener('resize', () => { try { leadStick(); } catch(e){} });
-
-/* PRESSING A CARD SCROLLS, IT DOES NOT NAVIGATE. `data-go` would open another
-   page; these four are sections of THIS page, and the difference matters — the
-   count on the card is a count of what is a few hundred pixels below it, and
-   replacing the page to show it would lose the three other counts.
-
-   `scrollIntoView`, NOT ARITHMETIC. The first version worked out the target
-   itself and subtracted the bar's height, and it could not be right: the height
-   it measured was the RESTING bar, four cards tall, and the height that ends up
-   covering the heading is the STUCK bar, one strip tall. Every jump landed with
-   the heading tucked behind the strip.
-
-   The offset a sticky header needs is what `scroll-margin-top` is for, and the
-   four sections declare it in §31. `scrollIntoView` honours it, `scrollTo` does
-   not — so the browser does the arithmetic, the value lives next to the bar it
-   is compensating for, and this handler has none of it. */
-device.addEventListener('click', e => {
-  const j = e.target.closest('[data-jump]');
-  if(!j) return;
-  const sec = device.querySelector('#' + j.dataset.jump);
-  if(sec) sec.scrollIntoView({block:'start', behavior:'smooth'});
-});
 
 /* ==========================================================================
    SEARCH AND FILTER — DELETED 1 SEP 2026, AND THE ONE IDEA WORTH KEEPING
@@ -1579,10 +1518,9 @@ render = function(){
   try {
     const app = device.querySelector('.app');
     if(app) app.dataset.portal = S.portal || 'candidate';
-    /* the bar's stuck state, its bleed and its live card are all read off
-       geometry, and the geometry is new on every render — a nav click, Tal
-       opening, the viewport switcher. Measured after the paint, not before it. */
-    leadStick();
+    /* `leadStick()` was called here to drive the sticky position-indicator; the
+       bar and its scroll-spy were removed 9 Sep 2026 (see the note above), so the
+       wrapper now only stamps `data-portal`, which both stylesheets scope on. */
   } catch(e){ console.warn('portal stamp', e); }
 };
 

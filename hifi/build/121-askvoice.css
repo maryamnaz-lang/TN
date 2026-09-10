@@ -1,0 +1,117 @@
+/* ==========================================================================
+   121. THE VOICE MESSAGE — THE TAL FIELD BECOMES A RECORDER — Maryam, 6 Sep 2026
+
+   The chat field's mic used to DICTATE (§21/ai4's own note). The ask is the
+   ChatGPT voice composer: pressing the mic turns the whole field into a
+   recorder — a cancel disc on the left, a LIVE waveform across the middle, and
+   two ways out on the right, a STOP that transcribes the take into the field to
+   edit and a SEND that transcribes and posts it. Built to the reference
+   (Maryam's screen recording, 6 Sep): the row of rounded, vertically-centred
+   bars is driven by the REAL microphone amplitude, newest bar on the right, the
+   quiet past trailing left as a dotted baseline — not the flat tally marks the
+   first cut drew.
+
+   THE RECORDER REPLACES THE FIELD'S CONTENTS, not sits beside them: ai4 adds
+   `.rec` to the same `.askfield` node and appends one `.askrec` row, so the
+   pill, its ramp border (§117/§118) and its height are the field's own. The
+   four resting children go dark while `.rec` holds.
+
+   ONE STATE BEYOND RECORDING. `.rectx` (transcribing) swaps the waveform for a
+   note while the recogniser finalises — the reference's "Transcribing…". There
+   is no dead-end: when the take comes back with no words (the browser has no
+   speech service, or the page is on `file://` where it is blocked), ai4 stands
+   in one of Tal's own suggested questions so stop and send always land a real,
+   sendable message rather than nothing (Maryam, 6 Sep 2026). A voice control
+   that silently does nothing is the one thing this must not be. Where the mic
+   and the speech service are reachable (http/https), the words are the reader's.
+
+   ITS OWN LAYER, CANDIDATE/LEADER ONLY. It states no type (free after §63) and
+   un-says nothing — only the `.rec*` states and the `.askrec` row, classes no
+   earlier layer names. The recorder is ai4.js behaviour and the agent/admin
+   portals have no mic, so it is declined from the design system (NOT_IN_DS) for
+   the reason CLAUDE.md gives — a behaviour component's CSS with no behaviour
+   under it is worse than leaving it out.
+
+   THE THREE DISCS ARE MARKS (DESIGN.md §3's round exception): cancel and stop on
+   the quiet `--surface-2`, send on the accent. The stop's square is a CSS box
+   rather than a glyph — the icon set has no square `stop` (its `stopFilled` is a
+   disc, FILL-1 for "a solid dot") and a stop control's mark is a square, so it
+   is drawn rather than borrowed.
+   ========================================================================== */
+
+/* the recorder owns the pill while it holds: tighter, symmetric gutters so the
+   discs sit near the field's ends, and the four resting children hidden.
+   (0,4,0) beats §118's (0,3,0) field rule. */
+.app .ask-page .askfield.rec{
+  padding:0 8px;
+  gap:var(--s03)}
+.app .ask-page .askfield.rec > .askv-clip,
+.app .ask-page .askfield.rec > .inp,
+.app .ask-page .askfield.rec > .askfield-mic,
+.app .ask-page .askfield.rec > .askfield-send{display:none}
+
+.app .ask-page .askrec{
+  flex:1 1 auto;min-width:0;align-self:center;
+  display:flex;align-items:center;gap:var(--s03)}
+
+/* --- the two secondary discs: cancel (left) and stop (right) ------------ */
+.app .ask-page .askrec-x,
+.app .ask-page .askrec-stop{
+  flex:none;width:34px;height:34px;
+  display:grid;place-items:center;
+  border:0;border-radius:999px;
+  background:var(--surface-2);cursor:pointer}
+.app .ask-page .askrec-x:active,
+.app .ask-page .askrec-stop:active{background:var(--surface-3)}
+.app .ask-page .askrec-x svg{width:20px;height:20px;fill:var(--text-secondary);display:block}
+.app .ask-page .askrec-stop .askrec-sq{
+  width:13px;height:13px;border-radius:3px;background:var(--text-primary)}
+
+/* --- the send disc: accent, primary, the reference's up-arrow ----------- */
+.app .ask-page .askrec-send{
+  flex:none;width:40px;height:40px;
+  display:grid;place-items:center;
+  border:0;border-radius:999px;
+  background-image:var(--accent-grad);background-color:var(--accent);
+  cursor:pointer;--on-brand-fill:1}
+.app .ask-page .askrec-send:active{background-color:var(--accent-2)}
+.app .ask-page .askrec-send svg{width:22px;height:22px;fill:var(--on-accent);display:block}
+
+/* while transcribing, the send disc is busy — a quiet spinner over the arrow,
+   the reference's own "working" state; the arrow is hidden under it */
+.app .ask-page .askfield.rectx .askrec-send{
+  background-image:none;background-color:var(--surface-2)}
+.app .ask-page .askfield.rectx .askrec-send svg{display:none}
+.app .ask-page .askfield.rectx .askrec-send::after{
+  content:"";width:16px;height:16px;border-radius:999px;
+  border:2px solid var(--rule);border-top-color:var(--text-secondary);
+  animation:askspin .7s linear infinite}
+@keyframes askspin{to{transform:rotate(360deg)}}
+
+/* --- the body: the waveform, or a note in the two off-states ------------ */
+.app .ask-page .askrec-body{
+  flex:1 1 auto;min-width:0;height:40px;
+  display:flex;align-items:center;overflow:hidden}
+.app .ask-page .askrec-note{
+  flex:1 1 auto;min-width:0;align-self:center;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* THE WAVEFORM. Fixed 3px rounded bars, a 3px gap, newest flush RIGHT so the
+   take grows leftward the way the reference draws it; ai4 builds exactly the
+   number that fills the measured width and sets each bar's height from the live
+   amplitude (3px = a quiet dot, up to the row's full height on a peak). Centred,
+   so the row mirrors about its middle. */
+.app .ask-page .askrec-wave{
+  flex:1 1 auto;min-width:0;height:40px;
+  display:flex;align-items:center;justify-content:flex-end;gap:3px;
+  overflow:hidden}
+.app .ask-page .askrec-wave i{
+  flex:none;width:3px;height:3px;border-radius:999px;align-self:center;
+  background:var(--text-helper);
+  transition:height .09s linear}
+
+/* the note swaps in for the waveform only while transcribing; §63 owns the
+   caption type and its helper ink, so `.t-caption` carries both and this layer
+   sets no colour */
+.app .ask-page .askfield:not(.rectx) .askrec-note{display:none}
+.app .ask-page .askfield.rectx .askrec-wave{display:none}

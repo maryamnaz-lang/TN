@@ -337,9 +337,11 @@
 .app .ask-top .ph-back svg{width:20px;height:20px;fill:var(--icon-primary)}
 .app .ask-top-t{
   font-size:13.5px;line-height:18px;font-weight:600;letter-spacing:.05px}
-.app .ask-top-s{
-  margin-left:auto;color:var(--text-secondary);
-  font-size:11.5px;line-height:16px;font-weight:400;letter-spacing:.15px}
+/* `.ask-top-s` — the header's right-hand status line — was stated here
+   (auto margin, secondary ink, 11.5/16) until 4 Sep 2026, when Maryam removed
+   it from every portal: it repeated the band's fact row on a screen whose
+   header is Tal's name. Nothing writes the class now; the rule is deleted so
+   the box does not ship a gate nothing writes. */
 
 /* ------------------------------------------------------------------ 3 ---
    THE THREAD

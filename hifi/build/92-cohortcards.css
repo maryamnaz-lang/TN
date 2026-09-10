@@ -295,7 +295,11 @@
 .app .cco-ic{
   display:grid;place-items:center;justify-self:start;
   width:20px;height:20px}
-.app .cco-ic svg{width:20px;height:20px;fill:var(--mk)}
+.app .cco-ic svg{width:20px;height:20px;fill:var(--icon-primary)}
+/* The whole card is a `<button class="cco clk">`, so its now-ink mark lights
+   `--accent` on hover — the clickable-block rule. `cco` is armed in HOVER_KEEP
+   (there is no other `.cco:hover` to revive). (Maryam, 9 Sep 2026) */
+.app .cco:hover .cco-ic svg{fill:var(--accent)}
 .app .cco-v{text-align:right}
 /* A flag cell holds chips rather than a figure, so it gives up the right
    alignment the other two share: two `.tag`s pushed to the far edge and

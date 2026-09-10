@@ -1,0 +1,128 @@
+/* ==========================================================================
+   122. THE INTERVIEW REQUEST CARD — Maryam, 6 Sep 2026, with a reference
+
+   The agent portal's "Requests" tab used to draw each waiting request as a thin
+   `.cardrow`: a face, one detail line, two buttons. The reference is a richer,
+   three-zone card — who / when / the decision — and this is that card, built in
+   OUR language (radius 0, the one hairline, the accent spent on Accept, §63's
+   type roles) rather than the reference's rounded, violet one, and only from the
+   data this portal actually holds. What the reference has and we do not — a role
+   title, a location, skill tags, a named requester, a "..." overflow — is left
+   out rather than invented, per the ask.
+
+   THREE ZONES, DIVIDED BY THE HAIRLINE. Who (face, name, the candidate's band,
+   the interview type as a pill); when (date, time and length, that it is
+   recorded, and the one line they asked to talk about, as a quote); and the
+   decision (how long it has waited, then Decline / Accept). At desktop the three
+   are a grid split by vertical `--rule` lines the way the reference draws them;
+   below 900 they stack and the split becomes a top border, so nothing is ever a
+   fixed-px column in a narrow card.
+
+   AGENT-PORTAL ONLY, BUT IT LIVES HERE. Like `41-cal.css`, this is a component
+   only `tn-agent-portal.html` draws, but that portal is on the design system, so
+   the CSS has to cross to the box — it is in `build-ds.py`'s LAYERS, not
+   NOT_IN_DS. The markup (`reqRow`) is the portal's; this is only its shape.
+
+   NO TYPE HERE — §63 OWNS IT. Every string in the card wears a role class in the
+   markup (`.t-h4` name, `.t-desc` the band, the meta and the quote, `.t-caption`
+   the pill and the waited-for line); this layer sets layout, grounds, borders
+   and the meta marks' `fill`, and not one size, weight or text colour.
+   ========================================================================== */
+/* THE DIVIDER IS ITS OWN ELEMENT, FLOATING BETWEEN ROWS, TOUCHING NEITHER —
+   Maryam, 6 Sep 2026: "separate the dividers from everything, do not attach it."
+   A border on a row (top or bottom) is part of that row's box and always reads as
+   glued to it. So the hairline is a real `.rqc-sep` element the markup puts
+   BETWEEN rows, and the list's flex `gap` sits on BOTH sides of it equally — the
+   separator has `--s05` of air above and below, belongs to no row, and there is
+   none before the first row or after the last. */
+.rqc-list{display:flex; flex-direction:column; gap:var(--s05)}
+.rqc-sep{flex:none; align-self:stretch; height:1px; background:var(--rule)}
+
+/* NOT A BOX PER REQUEST — ROWS WITH A DIVIDER BETWEEN THEM. Maryam, 6 Sep 2026:
+   "instead of showing these in blocks, use divider after each call row", then
+   "the dividers should not be attached with any row from bottom … a divider after
+   the last call row is not required." The per-card `--layer-01` fill and 1px
+   `--rule` frame come off; the hairline is a SEPARATOR BETWEEN rows — a top rule
+   on every row but the first (`.rqc + .rqc`), so it floats in the `--s06` gap
+   above the next row rather than hugging the previous row's foot, and the last
+   row has none. The three-zone split survives as the DESKTOP vertical dividers
+   below (`.rqc-col + .rqc-col` border-left); stacked, the zones carry no internal
+   rule — with no box around them a second hairline read as another row. */
+.rqc{display:flex; flex-direction:column}
+.rqc-col{
+  display:flex; flex-direction:column; gap:var(--s04);
+  padding:var(--s05); min-width:0}
+
+/* ---- zone 1: who ---- */
+.rqc-who{display:flex; gap:var(--s04); align-items:flex-start; min-width:0}
+.rqc .rqc-av{width:44px; height:44px; flex:none}
+.rqc-id{display:flex; flex-direction:column; gap:var(--s02); min-width:0}
+.rqc-tags{display:flex; flex-wrap:wrap; gap:var(--s02); margin-top:var(--s02)}
+.rqc-tag{
+  display:inline-flex; align-items:center;
+  padding:2px var(--s04); border-radius:999px;
+  background:var(--surface-2)}
+
+/* ---- zone 2: when + what ---- */
+.rqc-meta{gap:var(--s03)}
+.rqc-m{display:flex; gap:var(--s03); min-width:0; align-items:center}
+
+/* THE QUOTE IS A ROUND TAL CHIP — Maryam, 6 Sep 2026: "make these into round
+   chips". The one line the candidate asked to talk about now reads as a pill Tal
+   surfaced rather than a bare line: a 999px chip on the soft accent tint
+   (`--ai-hl-bg`, the same wash §70 paints behind Tal's highlights), the summary's
+   gradient star at its head, the words in the accent (§63 §7). It hugs its
+   content — `align-self:flex-start` keeps it left in the meta column — and wraps
+   inside that column at narrow widths; the star holds to the top line. */
+.rqc-note{
+  display:inline-flex; align-items:flex-start; gap:var(--s02);
+  align-self:flex-start; max-width:100%;
+  padding:var(--s02) var(--s04);
+  border-radius:999px;
+  background:var(--ai-hl-bg)}
+.rqc-ic{flex:none; width:16px; height:16px; display:grid; place-items:center}
+.rqc-ic svg{width:16px; height:16px; fill:var(--text-secondary); display:block}
+
+/* THE QUOTE'S MARK IS THE SUMMARY'S STAR — Maryam, 6 Sep 2026: "the star with
+   the tal summary … in place of the call card star, same size same colors". The
+   soft `--ai-star` sparkle painted THROUGH `--ai-grad` — the summary's own
+   construction (§70.2a, §114 for the table's control, §118 for the chips), not
+   §122's first flat `--accent` fill. 10px — the §118 chip-star size, a step below
+   the summary's 12 (Maryam 6 Sep 2026 first matched them, then "reduce the star
+   icon size more"): in the pill beside `.t-desc` words the smaller mark sits
+   under their cap height rather than crowding the quote. A mark's ground, not
+   text colour, so it is §122's to set; the words take the accent in §63 §7. */
+.rqc-star{
+  flex:none; width:10px; height:10px; margin-top:3px;
+  background-color:transparent;
+  background-image:var(--ai-grad);
+  background-size:100% 100%; background-position:center; background-repeat:no-repeat;
+  -webkit-mask:var(--ai-star) center/contain no-repeat;
+          mask:var(--ai-star) center/contain no-repeat}
+
+/* ---- zone 3: the decision ---- */
+.rqc-side{gap:var(--s05); justify-content:space-between}
+/* THE WAITED-FOR LINE SITS RIGHT — Maryam, 6 Sep 2026: "the asked … texts on the
+   right side aligned". It is the quiet corner note of the decision column, so it
+   reads from the edge the card is answered from; the actions below keep their
+   own row. */
+.rqc-when{align-self:flex-end; text-align:right}
+.rqc-acts{display:flex; flex-wrap:wrap; gap:var(--s03)}
+
+/* DECLINE WEARS `.danger`'S RED INK AND CROSS (§16) BUT NOT A RED BOX — the ghost
+   button's border comes off so it is a red mark and word, the way the reference
+   draws it. ACCEPT KEEPS `.btn-p`'S WHITE INK AND GAINS A GREEN GROUND: the
+   background is layout, so it is §122's; the white text and tick are `.btn-p`'s,
+   untouched. `.ok` is the green counterpart to `.danger`, scoped to this card. */
+.rqc .btn.danger{background:transparent; border-color:transparent}
+.rqc .btn-p.ok{background:var(--support-success); background-image:none}
+.rqc .btn-p.ok svg{fill:var(--on-brand)}
+
+/* ---- desktop: three columns divided by the hairline ---- */
+@container app (min-width:900px){
+  .rqc{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.05fr) minmax(230px,auto);
+    align-items:stretch}
+  .rqc-col + .rqc-col{border-left:1px solid var(--rule)}
+}

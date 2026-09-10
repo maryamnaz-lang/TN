@@ -51,6 +51,13 @@
    the `.tbl-flag` chip, and now this field — a literal `999px`, per §31.6's
    reason, so `--radius:0` stays a token you can trust.
    ========================================================================== */
+/* THE STATIC EDGE IS A SOLID HAIRLINE (Maryam, 9 Sep 2026: "please use #efefef
+   border color for the tal floating field", reversing the same day's #828282).
+   The pill kept a gradient border (`--ai-grad-line`) drawn through the two-layer
+   background-clip trick; the border-box layer is a flat `--rule` #efefef instead
+   — the platform's one hairline. The construction stays (so `:active` still swaps
+   the outer layer for the pressed ink), and the ANIMATING COMET (`.ai-run`) rides
+   over this edge, so the colour is the moving line, not the resting border. */
 .app .askdock > .askline{
   border-radius:999px;
   border-image:none;
@@ -58,7 +65,7 @@
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    var(--ai-grad-line);
+    linear-gradient(var(--rule), var(--rule));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 /* pressed, the edge comes back — §21.155's rule, restated for the two-layer
@@ -75,4 +82,39 @@
   width:auto;height:auto;
   border:0;border-radius:0;
   background:transparent;background-image:none}
-.app .askdock .askline-mic + .askline-send{margin-left:calc(var(--s05) - 20px)}
+/* THE GLYPHS ARE A LITTLE LARGER — Maryam, 9 Sep 2026, off Figma 875:6598 ("keep
+   the icon sizes a little larger than they are right now"). The mic was 16
+   (§105) and the arrow 20 (§70); both go to 22, a step over the node's own 20 as
+   asked, and matched to each other as the node draws them. `fill:currentColor` on
+   the send follows §70's ink; the mic keeps §105's `--icon-secondary`. */
+.app .askdock .askline-mic svg,
+.app .askdock .askline-send svg{width:22px;height:22px}
+/* THE ICON PAIR SITS 16 APART (the node's right-group gap). The row gap is 12
+   below (§117.2), so the pair adds 4 back — the mark/label/example run at 12 and
+   the two controls at 16, both the node's numbers. */
+.app .askdock .askline-mic + .askline-send{margin-left:var(--s02)}
+
+/* ------------------------------------------------------------------ 117.2 ---
+   THE THREE THINGS ON THE LINE SIT 16 APART — Maryam, 4 Sep 2026, with the
+   dock attached: "reduce the gap between all three things a little bit."
+
+   §70.1553 set the row at 581:6588's own numbers — `gap:20px`, the mark pulled
+   back 8 and the prompt pushed 12 — which read as 24 from the mark to "Ask Tal
+   anything" and 20 from that to the example question. One step down on the
+   scale is `--s05`: the row's gap goes 20 → 16 and the mark's pull-back becomes
+   the difference (-12) so the mark-to-prompt distance is the same 16 rather
+   than 20. Two measures, one value, and it is the same 16 the two glyphs at the
+   far end already keep (§117 above) — so the whole line is on one step.
+
+   THE PAIR'S MARGIN ABOVE FOLLOWS: it was `--s05 - 20px` because the row paid
+   20; with the row at `--s05` the difference is zero, written as the
+   subtraction so the arithmetic stays visible if either side moves again.
+
+   9 Sep 2026, off Figma 875:6598: the left group is `--s04` (12) now, not 16 —
+   the node runs the mark, "Ask Tal" and the example 12 apart. The mark's -12
+   and §70's +12 on the prompt still cancel, so mark-to-prompt is the row gap;
+   at `--s04` that is the 12 the node draws. The icon pair keeps its own 16 (the
+   `+ .askline-send` margin above adds 4 back), which is the node's right-group
+   gap — two groups, two numbers, both the file's. */
+.app .askdock > .askline{gap:var(--s04)}
+.app .askdock .askline-mark{margin-right:-12px}

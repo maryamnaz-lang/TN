@@ -1,0 +1,36 @@
+/* ==========================================================================
+   119. THE COUNTDOWN ON THE CALL ROW'S NAME LINE — `.crow-due`
+
+   Maryam, 4 Sep 2026, on the agent portal's two black cards with the chip
+   attached (a clock and "In 2 days"): "the time/days left in the call. this
+   needs to be aligned with the top right of the agent name and on the right
+   end of the row."
+
+   IT IS NOT `.dc-when` AND NOT `.crow-when`, and the difference is the line it
+   sits on. §77's `.dc-when` is the card's heading row, which is where the
+   candidate's booked interview says how long is left; §71's `.crow-when` is a
+   182px tinted cell on a white page. This one is asked for on the NAME's line,
+   so it is a child of `.crow-id` — the name's own flex row — with an auto
+   margin: the row's centring keeps it level with the name, the margin puts it
+   at the far end, and it needs no vertical arithmetic against the portrait.
+
+   TWO THINGS MAKE THE FAR END THE CARD'S EDGE. `.crow-b` is `min-width:0` with
+   no grow in §71, so its lines stop at their content; here it grows to the row.
+   And `crow` always emits `.crow-a`, so a row with no actions still carried an
+   empty flex item at the right — `:empty` takes it out of the layout, which is
+   also what §77.8's "single action sizes to its content" wanted for the
+   no-action case and never had. On the card that DOES carry actions (the
+   Training module while lessons are under way) the chip ends where the text
+   block ends, left of the buttons — the row's right end is the buttons there.
+
+   THE MARK AND THE TEXT ARE §75.2's `.dc-when` PAIR — 16px clock in
+   currentColor, `--s02` between — so the same fact reads the same way whether a
+   card states it in its heading or on its row. Type is §63 §17's, stated there.
+   ========================================================================== */
+.app .crow-dark .crow-b{flex:1 1 auto}
+.app .crow-due{
+  flex:none;margin-left:auto;
+  display:inline-flex;align-items:center;gap:var(--s02);
+  white-space:nowrap}
+.app .crow-due svg{flex:none;width:16px;height:16px;fill:currentColor;display:block}
+.app .crow-a:empty{display:none}

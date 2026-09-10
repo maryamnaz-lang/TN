@@ -1286,7 +1286,76 @@ css = '\n'.join((here / f).read_text() for f in
                  # THE TAL DOCK AS A PILL (§117) — Maryam, 4 Sep 2026. It has
                  # to un-say §70's border-image, §21/§70's send chip and §105's
                  # mic ring, so it lands after all three; it states no type.
-                 '117-askpill.css',])
+                 '117-askpill.css',
+                 # THE ASK PAGE FOLLOWS THE DOCK (§118) — the chips' star and the
+                 # field as a pill with bare glyphs, no moving stroke. Un-says
+                 # §12's star, §53's ring and §105's discs, so it lands after them.
+                 '118-askpage.css',
+                 # THE COUNTDOWN ON THE CALL ROW'S NAME LINE (§119) — `.crow-due`,
+                 # and `.crow-a:empty` off. Layout only; §63 §17 states its type.
+                 '119-crowdue.css',
+                 # THE SUPER ADMIN'S RAIL TREE AND LIST TOOLS (§120) — `.sn-subs`
+                 # / `.sn-sub`, `th[data-sort]`, `td.tbl-act`, `.cs.lst-filt`.
+                 # Layout only; §63 §51 states the sub-row's type. New classes
+                 # and one correction to §14's last-column alignment, so last.
+                 '120-admin.css',
+                 # THE TAL FIELD BECOMES A VOICE RECORDER (§121) — Maryam,
+                 # 6 Sep 2026. Adds the `.askfield.rec` state and the `.askrec`
+                 # row (cancel disc, waveform, stop, send); un-says nothing and
+                 # states no type, so it lands last. Candidate/leader only —
+                 # the behaviour is ai4.js, so it is declined from the DS.
+                 '121-askvoice.css',
+                 # THE INTERVIEW REQUEST CARD (§122) — Maryam, 6 Sep 2026.
+                 # Agent-portal-only component (like §41-cal), three-zone card;
+                 # layout/borders only, §63 owns its type. Crosses to the DS.
+                 '122-reqcard.css',
+                 # THE ADD-SLOT FORM (§123) — Maryam, 6 Sep 2026. The custom
+                 # day/time dropdowns and the two-field time range that replace
+                 # the native `<select>`s in the agent portal's "Add a slot"
+                 # sheet. Agent-portal-only (like §41/§122), layout/grounds/fills
+                 # only — §63 owns the type. Crosses to the DS.
+                 '123-slotform.css',
+                 # THE EVALUATION UI (§124) — Maryam, 6 Sep 2026. The agent's
+                 # evaluation page: Tal's read stacked with the summary's
+                 # highlight wash, the transcript link in a stat value, and the
+                 # fifteen-rung level ladder the agent picks a level from with
+                 # Tal's suggestion flagged. Agent-portal-only, layout/grounds
+                 # only — §63 owns the type. Crosses to the DS.
+                 '124-eval.css',
+                 # THE ROW ACTION MENU (§125) — Maryam, 7 Sep 2026. The Super
+                 # Admin list tables' per-row icon strip (§120.3) collapses into
+                 # one `overflow` kebab that opens a menu of the same actions;
+                 # the action column head reads "Actions". §123's `.dd-menu`
+                 # re-cut for an icon trigger (right-anchored, icon+label rows);
+                 # layout/grounds/fills only — §63 owns the type. Crosses to the
+                 # DS (the admin portal is on the box).
+                 '125-rowmenu.css',
+                 # THE ADMIN'S STATUS-AS-TEXT + ROUND LABEL CHIPS (§126) —
+                 # Maryam, 7 Sep 2026. `tag()` became plain `.statw` text (inks
+                 # in §63 §53) and the remaining `.tag` label chips go round —
+                 # both scoped to `[data-portal="admin"]`, so the platform's
+                 # radius-0 holds on the other three portals. Crosses to the DS
+                 # (the admin is on the box); geometry only, §63 owns the type.
+                 '126-adminchip.css',
+                 # TABLE PAGINATION (§127) — Maryam, 7 Sep 2026. The admin's
+                 # `table()` shows one page at a time (5 rows default, resizable);
+                 # this is the bar under it — controls are `.btn` (§63 owns their
+                 # type), the prose is §63 §54, this is layout only. Crosses to
+                 # the DS (the admin is on the box).
+                 '127-pagination.css',
+                 # THE SUPER ADMIN LIST PAGE (§128) — Maryam, 7 Sep 2026. The
+                 # list-page reshape: leader-style table (light header divider,
+                 # cells centred), tabs keep their top border, the heading row's
+                 # equal air, and search-left/filters-right under the tabs
+                 # (`.lst-tools`, `.fdd`). Admin-scoped where it re-decides a
+                 # shared surface; layout/grounds only, §63 owns the type.
+                 '128-adminlist.css',
+                 # THE VIEW-AS BAR (§129) — the Super Admin journey's SA-11, 7 Sep
+                 # 2026. The bar under the app bar while an admin views the
+                 # platform as another account: ground, hairline, geometry and the
+                 # 20px mark only — §63 §57 states its type. New class, nothing
+                 # un-said, so last. Crosses to the DS (the admin is on the box).
+                 '129-viewas.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a
@@ -1353,7 +1422,39 @@ HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               # hover reads as a table. `ob-qp-o` is minted for this and is
               # written nowhere else, which is what the `endswith` match
               # needs: `ob-qp` would arm the panel itself as well.
-              'ob-qp-o')
+              'ob-qp-o',
+              # §123 — the add-slot form's dropdown option row. Same argument as
+              # `ob-qp-o`: the row IS the control, and a list of options with no
+              # hover reads as a table, not a menu. `dd-opt` is minted for this
+              # and written nowhere else — what the `endswith` match needs.
+              'dd-opt',
+              # §125 — the row action menu's item row. Same argument again: the
+              # row IS the control and a list with no hover reads as a table.
+              # `rowmenu-i` is minted for this and written nowhere else.
+              'rowmenu-i',
+              # §127 — the rows-per-page dropdown's option row. Same argument;
+              # `pgn-dd-opt` is minted for this and written nowhere else.
+              'pgn-dd-opt',
+              # §128 — the list-page filter dropdown's option row. Same argument;
+              # `fdd-opt` is minted for this and written nowhere else.
+              'fdd-opt',
+              # §120.1c — the collapsed admin rail's sub-module flyout. The hover
+              # is on the parent wrapper so the panel stays open as the pointer
+              # crosses from the icon to it; `sn-node` is minted for this and
+              # written nowhere else, which is what the `endswith` match needs.
+              'sn-node',
+              # Maryam, 9 Sep 2026 — a clickable block lights its now-ink
+              # decorative mark `--accent` on hover, and NOTHING ELSE moves ("do
+              # not make the border black on hover"). The hover is on the CARD, so
+              # the trigger class is the card's, and each is the whole control:
+              # `qa-c` the quick-action button, `cco` the cohort card, `qzp-r`
+              # the quiz-peek row. Each card's own pre-existing (disarmed)
+              # border/background hover was deleted at its source so arming these
+              # classes revives only the mark's colour, not a card-chrome hover.
+              # None end another selector's pre-hover compound (`.qa-c-mk`,
+              # `.cco-ic`, `.qzp-r-ic` all end differently), so the `endswith`
+              # match arms only these three cards.
+              'qa-c', 'cco', 'qzp-r')
 _hover_n = 0
 
 def _disarm(m):
@@ -1778,6 +1879,20 @@ _aw = ',\n  '.join(
 award_js = 'const AWARD = {\n  ' + _aw + '\n};\n'
 print(f'award artwork embedded: {len(AWARDS)} marks, {len(award_js)/1024:.0f} KB')
 
+# THE STRIPE "ADD PAYMENT METHOD" FORM, TWO STATES (Maryam, 6 Sep 2026). The
+# Card and US-bank views of Stripe's hosted form, embedded as pictures because a
+# third-party product is embedded rather than redrawn (DESIGN, the Calendly
+# rule). `payForm(tab)` in views.js draws the shared modal over them; every
+# portal opens the same one. WebP off the PNGs Maryam added (`image 183/184`),
+# and `build-ds.py` re-embeds the same two files so the agent and admin portals
+# see `PAY_ART` through `talentnext-ds.js`.
+PAY_ART = {'card': 'pay-card.webp', 'bank': 'pay-bank.webp'}
+_pa = ',\n  '.join(
+    "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / f).read_bytes()).decode())
+    for k, f in PAY_ART.items())
+payart_js = 'const PAY_ART = {\n  ' + _pa + '\n};\n'
+print(f'payment form artwork embedded: {len(PAY_ART)} states, {len(payart_js)/1024:.0f} KB')
+
 # ==========================================================================
 # THE 120px MARK IS A VIDEO, AND THE OTHER SEVEN SIZES ARE NOT
 #
@@ -1813,10 +1928,23 @@ print(f'award artwork embedded: {len(AWARDS)} marks, {len(award_js)/1024:.0f} KB
 # thing `askView` withholds there and a paused `<video>` with no poster paints
 # nothing at all.
 # ==========================================================================
-_blob = here / 'tal-blob.mp4'
+# IT IS A VP9-ALPHA WEBM NOW, NOT H.264. Maryam supplied a new blob (the
+# recolored red clip) and asked for it "cropped and no white background" — and
+# the old asset got away with H.264 only because the pink bubble FILLED the
+# frame, so `border-radius:50%` cut a clean disc with no ground to show. The
+# new blob does NOT fill the frame; it floats with margin, so the white has to
+# be a real alpha channel, which mp4 cannot carry. §53.10's `.tal-blobv` rule
+# already anticipated this ("the alpha channel is doing the work the blend
+# mode was doing") and killed the sphere `::before` under it, so the switch is
+# just the asset + the mime. VP9 with `yuva420p` carries the alpha; the clip is
+# a 384² seamless boomerang, 60 KB — smaller than the 189 KB H.264 it replaces,
+# because the keyed frame is mostly transparent and VP9 spends nothing on it.
+# `tal-blob.mp4` stays on disk as the white-ground master the WebP/WebM derive
+# from, embedded by nothing — the same role tal-blob-source.mp4 had.
+_blob = here / 'tal-blob.webm'
 _blobp = here / 'tal-blob-poster.webp'
 blob_js = (
-    "const TAL_BLOB = 'data:video/mp4;base64,"
+    "const TAL_BLOB = 'data:video/webm;base64,"
     + base64.b64encode(_blob.read_bytes()).decode() + "';\n"
     "const TAL_BLOB_POSTER = 'data:image/webp;base64,"
     + base64.b64encode(_blobp.read_bytes()).decode() + "';\n")
@@ -1873,7 +2001,7 @@ print(f'Tal greeting audio embedded: {_speech.stat().st_size/1024:.0f} KB')
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + payart_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)
@@ -1926,6 +2054,17 @@ js = award_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n
                                                         # ones guarded by typeof because the leader portal never
                                                         # reaches that route.
                                                         'ai8.js',
+                                                        # THE COHORT-LEADER CHAT ROUTER. AFTER ai8, and that is the
+                                                        # whole reason it is here and not with lead1-4 (which parse
+                                                        # before ai6): it wraps ai8's `talReply` so a leader gets
+                                                        # LEAD_ROUTES first and defers to the candidate chain — which
+                                                        # already owns the leader's refusals (cand()->leadNA, the
+                                                        # off-topic route, the support catch-all) — only when nothing
+                                                        # leader-specific matches. Reads the LEAD_* data/helpers from
+                                                        # lead.js-lead4.js, `tw`/`twChips`/`twIc`/`avatar`/`I`/`CH`/`AV`
+                                                        # from views.js, and `_w`/`_W`/`twTop` from ai6/ai8. Its file
+                                                        # header is the argument.
+                                                        'lead5.js',
                                                         # ONLY THE LAST ANSWER KEEPS ITS CHIPS. `twChips`
                                                         # puts follow-up questions at the foot of a reply
                                                         # and they stayed pressable forever — ten exchanges

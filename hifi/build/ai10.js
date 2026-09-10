@@ -199,7 +199,7 @@ function callIv(f, re){
         ['Scheduled',  bkShort()]
       ], 'The recording and transcript are what your report is built from. Nothing here is shared with an employer.'],
       re
-        ? ['Bring what changed', null, 'One thing you do differently since the last report, and the situation that changed it. The 90 days are the evidence &mdash; this is you saying what they did.']
+        ? ['Bring what changed', null, 'One thing you do differently since the last report, and the situation that changed it. The 90 days are the evidence. This is you saying what they did.']
         : ['Bring one example',  null, 'A real leadership situation from the last three months. That single story moves your level more than anything else in the conversation.']
     ],
     phase: [

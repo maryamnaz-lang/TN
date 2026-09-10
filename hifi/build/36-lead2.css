@@ -579,6 +579,11 @@
    portal is disarmed anyway (`build.py`, `HOVER_KEEP`). */
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
+  /* --s04 top/bottom, to MATCH the thread header `.ldr-dm-h` (Maryam 9 Sep 2026:
+     "the direct message row height should be equal to the right side name row of
+     the candidate"). It briefly ran at --s05 for more air between rows; the ask
+     is that a list row and the header of the thread it opens be the same height,
+     so both are `--s04 --s05` now and both come out ~61px. */
   padding:var(--s04) var(--s05);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
@@ -631,6 +636,14 @@
    only where it sits: a margin rather than a padded row, because the panel's
    own foot is the boundary and the field is an object inside it. */
 .app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05) var(--s05)}
+
+/* THE MEMBER PAGE'S COURSE CARD (Maryam, 9 Sep 2026) — the candidate's course
+   name over its description, in a tile. A column with a small gap so the name
+   and the description are two clear lines rather than one block; left-aligned,
+   like the enrolment card it echoes (the `.tile`'s own default centres a lone
+   heading). */
+.app .crs-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s03);text-align:left}
+.app .crs-card > .crs-name,.app .crs-card > .crs-desc{text-align:left;width:100%;margin:0}
 
 /* --------------------------------------------------------------------------
    THE INBOX HAS NO GUTTER OF ITS OWN
@@ -768,7 +781,17 @@
    leaves the pane's closing hairline a section's worth of air below it, which
    is what "with bottom page padding" asks for, and is the same number §16.680
    pays under the candidate's composer. */
-.app .main:has(> .msg-mod){display:flex;flex-direction:column;flex:1;min-height:0}
+/* FULL-BLEED, NO PAGE GUTTER (Maryam 9 Sep 2026, "give these messages full
+   width ... no margins on this page of cohort leaders messages"). Every other
+   page sits in `.main`'s `clamp(--s06,12cqw,200px)` side gutter — ~154px each
+   side at desktop — which centres the ~900px column. The inbox is a two-pane
+   app surface (list rail + thread), not a reading column, so it takes the whole
+   width from the nav rail to the frame edge: the gutter is zeroed only while
+   `.main` holds the `.msg-mod` page, so no other page moves. The panes keep
+   their own `--pad-x` inner padding; this removes the OUTER margin only. */
+.app .main:has(> .msg-mod){
+  display:flex;flex-direction:column;flex:1;min-height:0;
+  padding-left:0;padding-right:0}
 .app .page.msg-mod{
   display:flex;flex-direction:column;flex:1 1 auto;min-height:0;
   width:100%;max-width:100%;box-sizing:border-box;

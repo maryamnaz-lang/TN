@@ -10,8 +10,8 @@
    colour change, and far enough to be legible on a laptop screen.
    ========================================================================== */
 :root{
-  --surface-2:#f7f7f7;      /* the panel. One step off white, same warm hue. */
-  --surface-3:#fbfbfb;      /* the QUIET panel, and the reason it is a third
+  --surface-2:#fcfcfc;      /* the panel. One step off white, same warm hue. */
+  --surface-3:#fcfcfc;      /* the QUIET panel, and the reason it is a third
                                value in a block whose note says "two values
                                only": `--surface-2` marks a section the reader is
                                meant to act on — the attention queue, the week's
@@ -345,7 +345,7 @@
   border:0;border-bottom:1px solid var(--rule);
   padding-left:0;padding-right:var(--s08);background-color:transparent}
 .app .inp:hover{border-bottom-color:var(--text-primary);background-color:transparent}
-.app .inp:focus{border:0;border-bottom:2px solid #FF3733;
+.app .inp:focus{border:0;border-bottom:2px solid #bd2a2a;
   padding-bottom:0;background-color:transparent}
 .app .inp[readonly]{border-bottom-style:dashed}
 .app .pw-wrap .inp{padding-right:52px}

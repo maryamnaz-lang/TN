@@ -155,7 +155,21 @@ function wSupport(askFor){
        <span><b>Phone</b>${SUPPORT.phone}</span>
        <span><b>Hours</b>${SUPPORT.hours}</span>
      </span>
-     <span class="tw-k">They answer inside one working day. Quote your cohort number &mdash; Cohort 41.</span>`);
+     <span class="tw-k">They answer inside one working day. ${supportCohortLine()}</span>`);
+}
+/* THE COHORT LINE FOLLOWS THE READER (doc §7). A leader leads three cohorts, so
+   "Quote your cohort number — Cohort 41" was a candidate's line on the leader's
+   support card. A leader gets all three of their cohort ids; a candidate keeps
+   the one they are in. */
+function supportCohortLine(){
+  if(typeof isLead === 'function' && isLead() && typeof LEAD_COHORTS !== 'undefined'){
+    const ids = LEAD_COHORTS.map(c => c.id);
+    const list = ids.length > 1
+      ? ids.slice(0, -1).join(', ') + ' and ' + ids[ids.length - 1]
+      : String(ids[0]);
+    return `Say you lead Cohort${ids.length > 1 ? 's' : ''} ${list}.`;
+  }
+  return 'Quote your cohort number, Cohort 41.';
 }
 
 /* THE LAST RESORT, AND IT IS ALLOWED TO BE SHORT. Three sentences: I do not
@@ -185,7 +199,7 @@ function talNoAnswer(){
   const ctx = (isLead() && typeof LEAD_TAL !== 'undefined' ? LEAD_TAL.ctx : TALCTX);
   const set = ctx[S.view] || ctx[isLead() ? 'leadDash' : 'dashboard'];
   return `I ${hl('do not have an answer')} for that one, and I would rather say so than guess at it. Anyone on the support desk can pick it up.`
-    + wSupport('this question, worded exactly as you asked me &mdash; they will have your account open')
+    + wSupport('this question, worded exactly as you asked me. They will have your account open')
     + (bare ? '' : `<span class="tw-k">Here is what I can answer from where you are.</span>`
         + twChips(set));
 }
@@ -218,7 +232,7 @@ function talOff(sentence, near){
    differently to somebody who has not enrolled — because a list of five
    things where two do not apply yet is a list somebody has to filter. */
 function wScope(){
-  if(isLead()) return `I read your side of the product: your cohorts and where each person is, your sessions, your evaluations and the reports. I can tell you who needs attention and why, and draft a note or a brief for you &mdash; nothing I write is sent until you send it.`
+  if(isLead()) return `I read your side of the product: your cohorts and where each person is, your sessions, your evaluations and the reports. I can tell you who needs attention and why, and draft a note or a brief for you. Nothing I write is sent until you send it.`
     + twChips((typeof LEAD_TAL !== 'undefined' && LEAD_TAL.ctx.leadDash) || ['How are my cohorts doing?']);
   const f = cfg(S.stage);
   const on = f.enrolled || f.complete;
@@ -232,7 +246,7 @@ function wScope(){
        <span><b>Cohort</b>the Thursday call, who leads it, and the board</span>
        <span><b>Me</b>everything I hold about you, where each line came from, and how to correct it or switch me off</span>
      </span>
-     <span class="tw-k">What I will not do is ${hl('guess')}. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call &mdash; and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
+     <span class="tw-k">What I will not do is ${hl('guess')}. I cannot see your payments, your one-to-one messages with Priya, or anything said on a cohort call, and where I do not have an answer I will say so and give you the support desk rather than invent one.</span>`,
     `${twBtn('See what I hold about you','mem')}<button class="tw-btn ghost" data-ask="1">What should I do next?</button>`);
 }
 
@@ -242,7 +256,7 @@ function wScope(){
    no level and no chapter of their own, and the leader portal shows no money
    anywhere by design, so wrapping those routes is what stops Tal quoting a
    course fee to the volunteer teaching it. */
-const leadNA = (what) => `That is a candidate question &mdash; ${what} is not part of the cohort-leader role. I can read your cohorts, your sessions and your evaluations.`
+const leadNA = (what) => `That is a candidate question: ${what} is not part of the cohort-leader role. I can read your cohorts, your sessions and your evaluations.`
   + twChips((typeof LEAD_TAL !== 'undefined' && LEAD_TAL.ctx.leadDash) || ['How are my cohorts doing?']);
 const cand = (re, fn, what) => [re, () => isLead() ? leadNA(what) : fn()];
 
@@ -271,7 +285,7 @@ function wCost(){
        <span><b>&minus;$95</b>your interview, credited against it</span>
        <span><b>$595</b>due when you enroll</span>
      </span>
-     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies &mdash; $80 to $110 across the twenty-four.</span>`,
+     <span class="tw-k">${hl('One payment')}. Nothing recurs, no card is kept on file by us, and the re-interview at day 91 is included. The agent&rsquo;s fee is theirs and it varies: $80 to $110 across the twenty-four.</span>`,
     twBtn('Open Enroll','enrol'));
 }
 
@@ -294,7 +308,7 @@ function wRefund(){
        <span><b>Interview</b>free to move or cancel up to 24 hours before. Inside 24 hours the fee is not refundable.</span>
        <span><b>Course</b>full refund up to 7 days after your cohort starts, as long as you have not finished more than one chapter.</span>
      </span>
-     <span class="tw-k">Both are decided by ${hl('the support desk')}, not by me &mdash; I can tell you which window you are in, and they are the ones who action it.</span>`)
+     <span class="tw-k">Both are decided by ${hl('the support desk')}, not by me. I can tell you which window you are in, and they are the ones who action it.</span>`)
     + wSupport('a refund, and say which of the two windows it falls in');
 }
 
@@ -308,7 +322,7 @@ function wCard(){
   return tw(twIc('shield') + 'Where your card actually is',
     `<span class="tw-list">
        <span>The number goes straight to our payment processor. It never reaches a TalentNext server.</span>
-       <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again &mdash; not something we could charge on our own.</span>
+       <span>We keep the brand and the last four digits, so a saved card is something you can recognise and choose again, not something we could charge on our own.</span>
        ${''/* THE CAP CAME OFF THE PRODUCT, SO IT CAME OFF THIS ANSWER (2 Sep
               2026). This read "Three saved cards is the maximum, and you can
               remove any of them from Payments" — and `V.billing` no longer
@@ -354,7 +368,7 @@ function wLedger(){
    the date and the last four digits costs another day. */
 function wBillingProblem(){
   return `That one ${hl('needs a person')}, and quickly. I cannot see charges and I cannot reverse one, so there is nothing I can check first that would save you the message.`
-    + wSupport('a charge to be checked &mdash; give them the amount, the date and the last four digits, and attach the receipt from Payments')
+    + wSupport('a charge to be checked. Give them the amount, the date and the last four digits, and attach the receipt from Payments')
     + twChips(['What is the refund window?','Is my card stored?']);
 }
 
@@ -386,11 +400,11 @@ function wEnd(){
   return tw(twIc('certificate') + 'What you have at the end',
     `<span class="tw-list">
        <span>A confirmed level, decided at the re-interview and signed by an agent.</span>
-       <span>Your 90-day summary &mdash; the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
+       <span>Your 90-day summary: the signed record of the 13 chapters, your assessment scores and what your leader wrote. It is yours to read and to share.</span>
        <span>Everything you earned along the way: your points, your badges and your rank stay on the account.</span>
      </span>
      <span class="tw-k">Deleting your account later ${hl('does not')} take a signed summary off you.</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* WHAT THE 90-DAY SUMMARY IS. Its own route because `V.transcript` calls it a
@@ -408,7 +422,7 @@ function wSummary(){
         : f.finished
           ? 'Yours is written. Priya signs it once you book the re-interview, and whoever you pick reads it before the call.'
           : 'Yours is being assembled as you go. It is signed at day 90.'}</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* ANY CHAPTER, FROM THE DATA. data.js answers chapters 1 and 4 in prose and
@@ -464,7 +478,7 @@ function wLowest(){
        <span><b>${f.avg}%</b>your average across ${f.done} assessed</span>
        <span><b>79%</b>the cohort average</span>
      </span>
-     <span class="tw-k">${lo}% is still above the cohort average, so it is not a failed chapter &mdash; it is the one with the most left in it${GROWTH.includes(i) ? ', and your report names it as a growth area' : ''}.</span>`,
+     <span class="tw-k">${lo}% is below the cohort average and well below your own, so it is the one with the most left in it${GROWTH.includes(i) ? ', and your report names it as a growth area' : ''}. Finishing it properly is worth more than any other hour this week.</span>`,
     twBtn('Open chapter ' + (i + 1), 'chapter:' + i));
 }
 
@@ -472,7 +486,7 @@ function wLowest(){
    answer that lists nine is a report and the person asked a question. */
 function wStanding(){
   const f = cfg(S.stage);
-  if(!f.enrolled && !f.complete) return `You are not on a course yet, so there is nothing to be doing well or badly at. What is decided so far is your track &mdash; Explorer, from the quiz &mdash; and the next thing that moves is your level.`
+  if(!f.enrolled && !f.complete) return `You are not on a course yet, so there is nothing to be doing well or badly at. What is decided so far is your track (Explorer, from the quiz) and the next thing that moves is your level.`
     + twChips(['What should I do next?','How does the ladder work?']);
   return tw(twIc('growth') + 'Where you are',
     `<span class="tw-lines">
@@ -487,7 +501,7 @@ function wStanding(){
           : f.avg
             ? 'Comfortably above the cohort on the work you have finished. Pace is the open question, not quality.'
             : 'Too early to say anything about scores. Nothing this week is assessed.'}</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* HOW FAR BEHIND, AND THE PRODUCT ALREADY HAD THE SENTENCE. `WEEKLY[stage].tal`
@@ -498,9 +512,9 @@ function wStanding(){
 function wPace(){
   const f = cfg(S.stage);
   const w = WEEKLY[S.stage];
-  if(!f.enrolled) return `There is no pace to be behind yet &mdash; the 90 days start when your cohort does.`
+  if(!f.enrolled) return `There is no pace to be behind yet. The 90 days start when your cohort does.`
     + twChips(['What should I do next?','Explain the 90-day cycle']);
-  if(f.finished || f.complete) return `You are not behind &mdash; all 13 chapters are done and the 90 days are finished. What is outstanding is the re-interview, and that is a booking rather than a backlog.`
+  if(f.finished || f.complete) return `You are not behind. All 13 chapters are done and the 90 days are finished. What is outstanding is the re-interview, and that is a booking rather than a backlog.`
     + twChips(['What happens at the re-interview?','What is in the 90-day summary?']);
   if(!w) return '';
   return tw(twIc('time','acc') + 'Against your cohort',
@@ -517,7 +531,7 @@ const NEXT = {
   consult:  ['Nothing, and that is the point', 'Your call with Jordan Blake is Thursday, August 13 at 2:00 PM ET. Fifteen minutes, nothing assessed, nothing to prepare. He points you at the agents whose range fits, and you book after that.', 'What happens on the consultant call?', 'interviews'],
   new:      ['Book the interview that sets your level', 'Your quiz put you on the Explorer track, and that is a title rather than a level. Forty-five minutes with an agent is what turns it into E1 to E5, and the course you can enroll on follows from it.', 'Book an interview with a top agent', 'agents'],
   booked:   ['Spend ten minutes preparing', 'Priya Nair, Thursday 20 August, 6:30 PM ET. She opens with a situation from your own answers, so the useful preparation is one story you can actually tell, not revision. I can run it with you now.', 'Run a mock interview with me', 'interviews'],
-  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does &mdash; $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
+  assessed: ['Enroll in the Explorer &ndash; E3 course', 'Your report is signed and E3 is confirmed. The cohort is assigned for you and the 90 days start when it does, $595 with your interview credited.', 'What do the 90 days ask of me?', 'enrol'],
   week1:    ['Finish chapter 1', 'Forty-five minutes, and nothing this week is assessed. Four of the ten in Cohort 41 have already done it, so the only thing between you and their pace is the chapter itself.', 'What is next week about?', 'coursework'],
   day34:    ['Finish chapter 4', 'You are 12 minutes into it after four opens, it is 70 minutes long, and it is the growth area Priya named in your report. It is the one place extra time changes your level rather than your average.', 'How do I catch up?', 'chapter:3'],
   day90:    ['Book the re-interview', 'All 13 chapters are done at 83% and your 90-day summary is written. Priya signs it once the re-interview is booked, and whoever you pick reads it before the call. There is nothing further to pay.', 'What happens at the re-interview?', 'interviews'],
@@ -547,9 +561,9 @@ function wNext(){
    three other screens. */
 function wMoveUp(){
   const f = cfg(S.stage);
-  if(f.pred) return `Nothing yet, because you are not on the ladder. The quiz gave you a track and an interview gives you a level &mdash; E1 to E5 &mdash; and until an agent has done that there is no rung to move off.`
+  if(f.pred) return `Nothing yet, because you are not on the ladder. The quiz gave you a track and an interview gives you a level (E1 to E5) and until an agent has done that there is no rung to move off.`
     + twChips(['What happens in the 45 minutes?', 'How does the ladder work?']);
-  if(f.complete) return `You moved on November 21. E5 is the top of the Explorer track and the next 90 days are what decide it; the shape is the same &mdash; the chapters, the leader&rsquo;s recommendation, the re-interview.`
+  if(f.complete) return `You moved on November 21. E5 is the top of the Explorer track and the next 90 days are what decide it; the shape is the same: the chapters, the leader&rsquo;s recommendation, the re-interview.`
     + twChips(['What is different about E4?', 'What is in the 90-day summary?']);
   return tw(twIc('growth','acc') + 'What moves you from ' + f.level + ' to E4',
     `<span class="tw-list">
@@ -558,7 +572,7 @@ function wMoveUp(){
        <span>The re-interview at day 91. It is the same 45 minutes and the same questions, and what is assessed is whether the answers changed.</span>
      </span>
      <span class="tw-k">${f.avg ? 'Your average is ' + f.avg + '% against a cohort average of 79%, so scores are not what is holding you. ' : ''}A high average with the growth areas untouched ${hl('holds you at ' + f.level)}.</span>`,
-    `${twBtn('Open My Level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
+    `${twBtn('Open my level','level')}<button class="tw-btn ghost" data-go="report">Read the report</button>`);
 }
 
 /* WHEN IT ENDS, in days rather than in a date. The prototype has one calendar
@@ -571,16 +585,16 @@ function wFinish(){
   const f = cfg(S.stage);
   if(!f.enrolled && !f.complete) return `Ninety days from the day your cohort starts, and the cohort starts when it is full. The re-interview is day 91.`
     + twChips(['Explain the 90-day cycle', 'What should I do next?']);
-  if(f.complete) return `It is finished. All 13 chapters, the summary signed on November 21, and the re-interview decided &mdash; you moved to E4. What is open now is the next course, not this one.`
+  if(f.complete) return `It is finished. All 13 chapters, the summary signed on November 21, and the re-interview decided. You moved to E4. What is open now is the next course, not this one.`
     + twChips(['What is different about E4?', 'What do I have at the end?']);
   return tw(twIc('calendar') + 'What is left',
     `<span class="tw-lines">
-       <span><b>Day ${f.day}</b>of 90 &mdash; ${90 - f.day} days to go</span>
-       <span><b>Week ${f.week}</b>of 13 &mdash; ${13 - f.week} chapters still to open</span>
+       <span><b>Day ${f.day}</b>of 90, ${90 - f.day} days to go</span>
+       <span><b>Week ${f.week}</b>of 13, ${13 - f.week} chapters still to open</span>
        <span><b>Day 91</b>the re-interview, which is the last thing in the course</span>
      </span>
      <span class="tw-k">Your cohort finishes together. The ten of you started on the same day and the calls stop on the same week.</span>`,
-    twBtn('Open Course Progress','transcript'));
+    twBtn('Open course progress','transcript'));
 }
 
 /* PAUSING, EXTENDING, LEAVING. All three are one answer, because all three
@@ -592,7 +606,7 @@ function wPause(){
   return tw(twIc('pause') + 'Pausing, or moving cohort',
     `<span class="tw-list">
        <span>A cohort is a fixed ten moving together for 90 days, with one live call a week. There is no self-service pause, because pausing means leaving the group you are in.</span>
-       <span>Your cohort leader can carry you through a bad fortnight &mdash; that is what the flag on their dashboard is for, and it clears itself when you come back.</span>
+       <span>Your cohort leader can carry you through a bad fortnight. That is what the flag on their dashboard is for, and it clears itself when you come back.</span>
        <span>Anything longer than that is a transfer to a later cohort, and the support desk decides those case by case.</span>
      </span>
      <span class="tw-k">${hl('Tell your leader')} first. Most of what people ask a pause for, a leader can just absorb.</span>`,
@@ -614,7 +628,7 @@ function wMove(){
        <span><b>Inside 24h</b>you can still move it, but the fee is not refundable</span>
        <span><b>No-show</b>treated as inside 24 hours</span>
      </span>
-     <span class="tw-k">Rescheduling is on the booking itself &mdash; it ${hl('does not need a person')}, and it does not go back to the start of the queue.</span>`,
+     <span class="tw-k">Rescheduling is on the booking itself. It ${hl('does not need a person')}, and it does not go back to the start of the queue.</span>`,
     twBtn('Open Interviews','interviews'));
 }
 
@@ -624,14 +638,15 @@ function wMove(){
    sounds like a policy; answering it with the reason sounds like the truth,
    and it also happens to tell the person how to prepare. */
 function wNoQuestions(){
-  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half &mdash; ${hl('nobody')} has the questions in advance, including them.`
+  return `There is no list to send you, and that is deliberate rather than cagey. The agent opens on something from your own first few answers and follows it, so the second half of the interview is built out of the first half: ${hl('nobody')} has the questions in advance, including them.`
     + tw(twIc('checkOutline') + 'So preparation is three things, not revision',
       `<span class="tw-check">
          <span>One story where you handed work over and it went wrong</span>
          <span>What you would do differently, in one sentence</span>
          <span>One decision you changed after listening to someone</span>
-       </span>`,
-      twBtn('Practise it with me','rp'));
+       </span>`);
+      /* the "Practise it with me" button opened candidate AI roleplay — removed
+         9 Sep 2026; the prep list stands on its own. */
 }
 
 /* WHAT NOT TO DO. Four things, and each is a real failure mode from the
@@ -643,19 +658,20 @@ function wNotDo(){
   return tw(twIc('warningAlt','acc') + 'The four that cost people most',
     `<span class="tw-list">
        <span>Do not qualify your answer while you are giving it. Say the thing, then say what you would change.</span>
-       <span>Do not bring the story where you were right. Bring the one that went wrong &mdash; the judgement is in what you did next.</span>
+       <span>Do not bring the story where you were right. Bring the one that went wrong. The judgement is in what you did next.</span>
        <span>Do not answer in the abstract. &ldquo;I would usually&rdquo; cannot be assessed; &ldquo;in March I&rdquo; can.</span>
        <span>Do not negotiate the level in the room. The report comes 24 hours later and there is a proper route to a review.</span>
      </span>
-     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`,
-    twBtn('Practise one','rp'));
+     <span class="tw-k">None of this is about polish. Priya assesses ${hl('judgement under pressure')} rather than vocabulary, and she says so on her profile.</span>`);
+    /* the "Practise one" button opened candidate AI roleplay — removed 9 Sep
+       2026; the list stands on its own. */
 }
 
 /* WHEN THE LEVEL LANDS. `wAgent` already promises a report inside 24 hours in
    a list item; the question deserves the sentence rather than the bullet,
    and it was matching the ladder route instead. */
 function wWhenLevel(){
-  return `${hl('Inside 24 hours')}. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it &mdash; there is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
+  return `${hl('Inside 24 hours')}. The agent writes the report after the call rather than during it, and your level appears on My Level the moment they sign it. There is no panel and no waiting list. If you disagree with what they set, you can ask for a review by a second agent.`
     + twChips(['What is on my report?','How do I ask for a review?']);
 }
 
@@ -673,7 +689,7 @@ function wRank(){
        <span><b>E1&ndash;E3</b>the levels she is certified to assess, not the levels she tends to give</span>
        <span><b>210</b>interviews conducted</span>
      </span>
-     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. ${hl('Neither one predicts')} the level you will get &mdash; that comes out of your own 45 minutes.</span>`,
+     <span class="tw-k">The shortlist itself is ordered by how each agent&rsquo;s past candidates went on to progress, which is a different measure from the rating. ${hl('Neither one predicts')} the level you will get. That comes out of your own 45 minutes.</span>`,
     twBtn('See the agents','agents'));
 }
 
@@ -689,7 +705,7 @@ function wPrice(){
        <span><b>$95</b>Priya Nair &middot; 4.8 &middot; E1&ndash;E3</span>
        <span><b>$110</b>Hana Kim &middot; 4.3 &middot; B1&ndash;B4</span>
      </span>
-     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking &mdash; it is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, ${hl('never a different level')}. The level comes out of the 45 minutes.</span>`,
+     <span class="tw-k">The dearest of the three is the lowest rated and the cheapest is not the worst, so price is not a quality ranking. It is the agent&rsquo;s own rate, and it tracks the level band they assess and how booked they are. It buys you a different person, ${hl('never a different level')}. The level comes out of the 45 minutes.</span>`,
     twBtn('Compare the agents','agents'));
 }
 
@@ -708,7 +724,7 @@ function wAgentPair(){
      <span class="tw-ag">${avatar(b, 40)}<span><b>${b.n}</b><span class="tw-k">${b.range} &middot; ${b.r.toFixed(1)} &middot; ${b.ivs} interviews &middot; ${b.price}</span></span></span>
      <span class="tw-list">
        <span>${a.n.split(' ')[0]} pushes hardest on how you decide under pressure and will tell you plainly where you are.</span>
-       <span>${b.n.split(' ')[0]} works on incomplete information &mdash; expect &ldquo;and then what happened&rdquo; more than once.</span>
+       <span>${b.n.split(' ')[0]} works on incomplete information. Expect &ldquo;and then what happened&rdquo; more than once.</span>
      </span>
      <span class="tw-k">Both assess Explorer candidates and both report inside 24 hours. The difference you will feel is the register, not the standard.</span>`,
     twBtn('See both profiles','agents'));
@@ -731,7 +747,7 @@ function wLeader(){
     `<span class="tw-ag">${avatar(p, 40)}<span><b>Priya Nair</b><span class="tw-k">Cohort leader, Cohort 41 &middot; leading since March 2024</span></span></span>
      <span class="tw-list">
        <span>She runs the Thursday call, reads your weekly tasks and writes the recommendation at day 90.</span>
-       <span>She is also the agent who interviewed you and set your level at E3 &mdash; the same person in two roles, which is common but not required.</span>
+       <span>She is also the agent who interviewed you and set your level at E3, the same person in two roles, which is common but not required.</span>
        <span>It is a ${hl('volunteer role')}. Cohort leaders are unpaid; what they earn is the cohort-leader certification.</span>
      </span>
      <span class="tw-k">She can only lead cohorts below her own level, so she is always a step ahead of the ten of you.</span>`,
@@ -748,7 +764,7 @@ function wCallLogistics(){
     `<span class="tw-lines">
        <span><b>When</b>Thursday, 6:00 PM ET, every week for 13 weeks</span>
        <span><b>Long</b>60 minutes, video, you and the other nine</span>
-       <span><b>Missed</b>tell your leader beforehand and it is fine. It is not recorded, so there is nothing to catch up on afterwards &mdash; ask on the board instead</span>
+       <span><b>Missed</b>tell your leader beforehand and it is fine. It is not recorded, so there is nothing to catch up on afterwards. Ask on the board instead</span>
      </span>
      <span class="tw-k">Times follow the time zone on your profile, which is Eastern. Reminders go out 24 hours and 1 hour before unless you have turned them off.</span>`,
     `${twBtn('Open Cohort 41','cohort')}<button class="tw-btn ghost" data-go="account">Change your time zone</button>`);
@@ -760,7 +776,7 @@ function wCallLogistics(){
    Kept separate so the pre-enrolment version does not open with advice about
    telling a leader you do not have yet. */
 function wSwitch(){
-  return `${hl('Not once it has started')}. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for &mdash; so it is assigned for you and it is fixed for the 90 days.`
+  return `${hl('Not once it has started')}. Your cohort is ten people at the same level moving through the same 13 weeks together, and the group is a large part of what you are paying for, so it is assigned for you and it is fixed for the 90 days.`
     + tw('What can change',
       `<span class="tw-list">
          <span>Before your cohort starts, the support desk can move you to a later intake.</span>
@@ -804,7 +820,7 @@ function wTalScope(){
        <span><b>I see</b>your course progress, your chapter notes, your points, your interview transcripts and your report</span>
        <span><b>I never</b>${(typeof NEVER !== 'undefined' ? NEVER : []).map(n => n.replace(/\.$/, '')).join('; ') || 'see your messages, your calls or your card'}</span>
      </span>
-     <span class="tw-k">${live} things are held about you right now and every one of them opens the thing it came from. Mark a line wrong and I stop using it; forget it and it is gone. Profile is where you pause me altogether &mdash; nothing breaks, the pages just stop carrying my summaries.</span>`,
+     <span class="tw-k">${live} things are held about you right now and every one of them opens the thing it came from. Mark a line wrong and I stop using it; forget it and it is gone. Profile is where you pause me altogether. Nothing breaks, the pages just stop carrying my summaries.</span>`,
     `${twBtn('See everything I hold','mem')}<button class="tw-btn ghost" data-go="account">Open Profile</button>`);
 }
 
@@ -834,12 +850,12 @@ function wClose(){
 function wBroken(){
   const q = TAL_Q;
   if(/verif|confirmation email|activation|did ?n.?t get the email|no email/i.test(q))
-    return `Give it a minute and then look in your spam folder &mdash; the sender is hello@talentnext.com. If it is not there after five minutes, the address on the account is usually the reason, and support can check it and resend.`
+    return `Give it a minute and then look in your spam folder. The sender is hello@talentnext.com. If it is not there after five minutes, the address on the account is usually the reason, and support can check it and resend.`
     + wSupport('the verification email again, with the address you signed up with');
   if(/sign ?in|log ?in|password|locked out|cannot get in/i.test(q))
-    return `I cannot see anything to do with signing in &mdash; I only exist once you are already inside. Reset the password from the log-in screen first; that clears most of these, and it does not touch your course record.`
+    return `I cannot see anything to do with signing in. I only exist once you are already inside. Reset the password from the log-in screen first; that clears most of these, and it does not touch your course record.`
     + wSupport('a password reset by hand, if the reset email does not arrive either. Give them the address you signed up with');
-  return `That is not something I can see from in here &mdash; I have your course and your interviews, not your browser or the video player.`
+  return `That is not something I can see from in here. I have your course and your interviews, not your browser or the video player.`
     + tw(twIc('renew') + 'Worth trying once',
       `<span class="tw-list">
          <span>${hl('Reload the page')}. Coursework runs inside LightspeedVT, and it is usually the frame rather than the course.</span>
@@ -853,7 +869,7 @@ function wBroken(){
    reply declines in one clause and then offers the thing they actually
    needed. */
 function wNoAnswers(){
-  return talOff(`I ${hl('will not')} do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false &mdash; it comes out of your level at the re-interview, not out of a mark.`
+  return talOff(`I ${hl('will not')} do that one. The assessment is what tells your leader where you are, and an answer I handed you tells them something false. It comes out of your level at the re-interview, not out of a mark.`
     + `<span class="tw-k">If it is the time rather than the material, say so and I will tell you the shortest honest route through this week.</span>`,
     ['How do I catch up?', 'Explain this chapter in 60 seconds', 'I am stuck, ask me a question instead']);
 }
@@ -917,7 +933,7 @@ function wScenes(){
   const which = kind === 're' ? 're-interview' : 'level interview';
   return tw(twIc('play') + `The six moments from your ${which}`,
     `<span class="tw-lede">Each one is a stretch of the recording where you were doing
-       something the interview was looking for &mdash; not a highlight, and not a
+       something the interview was looking for, not a highlight, and not a
        verdict.</span>
      <span class="tw-list">
        ${set.map(s => `<span><b>${s[0]}</b><br>${s[1]} &middot; ${s[3]}</span>`).join('')}
@@ -925,7 +941,7 @@ function wScenes(){
      <span class="tw-k">${kept
         ? 'You kept ' + kept.map(i => set[i][0]).join(', ') + '. Those three are what shows on your interview; the other three are not published anywhere.'
         : picked.length
-          ? 'You have ' + picked.length + ' of three chosen. Save them and those three are what shows on your interview from now on &mdash; the other three are not published anywhere.'
+          ? 'You have ' + picked.length + ' of three chosen. Save them and those three are what shows on your interview from now on. The other three are not published anywhere.'
           : 'Keep three of the six. Those three are what shows on your interview from now on, and the other three are not published anywhere.'}</span>`,
     twBtn('Open Interviews','interviews'));
 }
@@ -949,11 +965,11 @@ TAL_ROUTES.unshift(
   [/\b(answers?|solutions?)\b[^.?!]{0,25}\b(assessment|quiz|test|chapter)\b|\b(assessment|quiz|test)\b[^.?!]{0,25}\banswers?\b|do (it|the assessment) for me|pass it for me/i, wNoAnswers],
 
   [/\b(salary|salaries|earn|pay(ing)? me|paid|worth|market rate|compensation)\b[^.?!]{0,30}\b(e[1-5]|b[1-4]|level|explorer|promotion)\b|\b(e[1-5]|level|explorer)\b[^.?!]{0,25}\b(salary|worth|earn|pays?)\b/i,
-    () => talOff(`I do not have that, and TalentNext does not publish it. A level is an assessment of how you operate, made by an agent inside this product &mdash; it is not a pay band and it is not benchmarked against a market. Anyone who told you an E4 is worth a number would be making it up, and so would I.`,
+    () => talOff(`I do not have that, and TalentNext does not publish it. A level is an assessment of how you operate, made by an agent inside this product. It is not a pay band and it is not benchmarked against a market. Anyone who told you an E4 is worth a number would be making it up, and so would I.`,
       ['What would move me to E4?', 'What is on my report?'])],
 
   [/\bget me a job\b|find me a (job|role|position)|place me|do you place|recruit|hiring|apply for (a )?(job|role)|introduce me to (an )?employer/i,
-    () => talOff(`TalentNext does not place people. It assesses how you operate and gives you a level and a record you can show &mdash; what you do with that is yours. There is no job board in here and I cannot introduce you to anyone.`,
+    () => talOff(`TalentNext does not place people. It assesses how you operate and gives you a level and a record you can show. What you do with that is yours. There is no job board in here and I cannot introduce you to anyone.`,
       ['What is in the 90-day summary?', 'What do I have at the end?'])],
 
   /* PERFORMANCE REVIEWS SIT JUST OUTSIDE, and the line is worth drawing
@@ -963,11 +979,11 @@ TAL_ROUTES.unshift(
      system off the back of a judgement Tal has no part of, so the answer names
      the two it will write rather than just refusing. */
   [/performance review|appraisal|write (my|a) review|review for (my|one of my)|\b1:1 (notes|doc)\b|write up my (report|team)/i,
-    () => talOff(`Not that one. I write about your work on this course &mdash; a reply in the messages thread, or your chapter note turned into a proper reflection. A review of somebody on your team is a judgement I have no part of and a document I have never seen the shape of.`,
+    () => talOff(`Not that one. I write about your work on this course: a reply in the messages thread, or your chapter note turned into a proper reflection. A review of somebody on your team is a judgement I have no part of and a document I have never seen the shape of.`,
       ['Help me word a reply', 'Turn my note into a reflection'])],
 
   [/\b(joke|weather|football|recipe|who won|your favourite|favorite)\b|what do you think of (my|the) (boss|manager|company|employer)|should i (quit|resign|leave my job)|\b(is|are) my (boss|manager) \b/i,
-    () => talOff(`That is outside what I am for. I am the assistant inside your course &mdash; the 13 chapters, your level, your interviews, your cohort and what I hold about you. I am not the one to ask about your job or the people in it, and I would rather say so than have an opinion.`,
+    () => talOff(`That is outside what I am for. I am the assistant inside your course: the 13 chapters, your level, your interviews, your cohort and what I hold about you. I am not the one to ask about your job or the people in it, and I would rather say so than have an opinion.`,
       ['What should I do next?', 'How am I doing overall?'])],
 
   /* --- something is broken -------------------------------------------- */

@@ -54,83 +54,45 @@
 
 :root{
   /* ---------------------------------------------------------------------
-     THE TWO WASHES, READ OFF THE FILE.
+     THE WASH IS THE ONBOARDING GROUND — Maryam, 8 Sep 2026: the Tal chat's
+     background should be the gradient the onboarding gate uses, not the cream
+     two-ellipse wash 446:347 carried.
 
-     446:347 has THREE ellipses at frame level. Two of them draw, and they
-     are now the SAME COLOUR — which was Maryam's edit to the file, not a
-     simplification made here:
+     So the field this layer paints is now §107's, verbatim: one broad rose
+     ellipse (245,75,135) sitting low over a white base, peaking a touch above
+     the middle and fading to nothing at the top and bottom edges. §107's own
+     note (107-onboard.css, `.ob-open`) is where that gradient is fitted to
+     its Figma frame (728:6141) and where the rose-is-NOT-the-accent argument
+     lives — `#f54b87` is magenta-leaning and would not fall out of `#ff584a`
+     at any alpha. It is COPIED here, not shared through a token, because the
+     two screens are different frames and either may be re-fitted without the
+     other; if they diverge, that is a re-fit, not a bug.
 
-       Ellipse 43  #FFF3DB at fill-opacity .5, rx 693.45 ry 310.61, centred
-                   (1946.47, -1.39) — off the top-right corner. It was
-                   #F1BDD5, a pink; the file now gives it the cream the
-                   bottom-left corner already had.
-       Ellipse 45  #FFF3DB at .5, the same rx/ry, centred (191.47, 949.6) —
-                   off the bottom-left corner.
-
-     SO ONE COLOUR AND TWO PLACEMENTS, and it is stated that way: `--askv-wash`
-     is named once and both gradients read it. Two tokens holding the same hex
-     is how they drift back apart.
-
-     Ellipse 44 is the third and it is NOT stated here. It is a 2073 x 381
-     band across the middle of the frame and its export is an empty `<g>`:
-     the file draws nothing for it. §51.9 makes the same call about the chip
-     glow, for the same reason — reproducing a shape that is invisible in the
-     source is copying the mistake rather than the design.
-
-     BOTH ARE HEAVILY BLURRED, and the blur is what the numbers below are.
-     The export puts a Gaussian at stdDeviation 340.55 on each, then stretches
-     the filter region non-uniformly into the node's box — 1.033x across and
-     1.726x down — so what lands on the page is anisotropic: about 352
-     sideways and 588 down. Modelling that from first principles gives a peak
-     alpha of .164; the file's own render says .215 (the pink) and .225 (the
-     cream), measured by solving `px = 255 + (colour - 255) * a` along both
-     axes out from each centre. The render is what the design looks like, so
-     the render is what is stated: **.22**.
-
-     AND THE STOPS ARE THAT MEASURED CURVE, normalised. Alpha reaches zero at
-     about 1020 frame-units sideways and 720 down — which is what the two
-     radii below are — and between the centre and there the readings run
-
-       r      0     .26    .50    .68    .85    1.00
-       a/peak 1.00  .83    .60    .35    .14    0
-
-     which is exactly the five stops. CSS interpolates linearly between stops,
-     so a piecewise-linear fit of a measured curve IS the curve.
-
-     PERCENTAGES, not pixels, for §51.1's reason: this is the page's own
-     temperature and it has to go on scaling down to a phone, where 1020px of
-     ellipse would be a flat tint over the whole screen. They are percentages
-     of `.view-col > .main`, which is the file's frame minus its 80px rail —
-     1840 x 974 — because that rail is opaque white artwork sitting ON the
-     ellipses (`446:348`), not a thing they reach.
+     WHAT THIS REPLACED. 446:347's ground was #FFF3DB at .22 in two corner
+     ellipses (top-right and bottom-left), sized as percentages of
+     `.view-col > .main`. That drawing and its measurement are gone with the
+     instruction, and the position tokens it needed (`--askv-wash-rx/-ry` and
+     the two `-at` centres) went with it — nothing else read them. `--askv-wash`
+     survives as the wash COLOUR, now the rose rather than the cream.
      --------------------------------------------------------------------- */
-  --askv-wash:255,243,219;        /* #FFF3DB, Ellipse 43 AND Ellipse 45 */
-  --askv-wash-rx:55.4%;           /* 1020 of 1840 */
-  --askv-wash-ry:73.9%;           /*  720 of  974 */
-  /* the centres, as percentages of the same box. Both sit OUTSIDE it — that
-     is the file's placement, and it is why only a quadrant of each is ever
-     on screen. */
-  --askv-wash-tr-at:101.4% -0.1%;
-  --askv-wash-bl-at:6.1% 97.5%;
+  --askv-wash:245,75,135;         /* the onboarding rose, §107's #f54b87 as rgb */
 
-  /* ONE GRADIENT, NAMED ONCE, and §1/§3 both read it — which is the whole of
-     what makes the margins and the column one surface rather than two that
-     agree for a while. */
+  /* TWO BANDS, TOP AND BOTTOM — Figma 892:7220 (Maryam, 9 Sep 2026: "remove the
+     background gradient from this screen and the tal onboarding as well, and add
+     a top and bottom gradient just like i have in this figma, please follow the
+     same values"). The centred rose ellipse (§107's, read through --askv-wash)
+     is gone; the ground is now --accent at 5% bleeding DOWN from the top edge
+     and UP from the bottom, white between. Both bands are the frame's one fill,
+     linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%,
+     rgba(255,255,255,.05) 52.274%); the bottom is that mirrored vertically, the
+     supplementary angle 353.385 (= 180 minus 186.615). 189,42,42 is --accent;
+     the stops, angle and 590px band height are the frame's own, not re-tasted.
+     §1/§3 place the bands (top / bottom, each 100% by 590px, no-repeat); this
+     token is just the two images. --askv-wash is left defined (§51 still reads
+     it) but is no longer drawn here. */
   --askv-ground-wash:
-    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-tr-at),
-      rgba(var(--askv-wash),.22)  0%,
-      rgba(var(--askv-wash),.183) 26%,
-      rgba(var(--askv-wash),.132) 50%,
-      rgba(var(--askv-wash),.077) 68%,
-      rgba(var(--askv-wash),.031) 85%,
-      rgba(var(--askv-wash),0)    100%),
-    radial-gradient(var(--askv-wash-rx) var(--askv-wash-ry) at var(--askv-wash-bl-at),
-      rgba(var(--askv-wash),.22)  0%,
-      rgba(var(--askv-wash),.183) 26%,
-      rgba(var(--askv-wash),.132) 50%,
-      rgba(var(--askv-wash),.077) 68%,
-      rgba(var(--askv-wash),.031) 85%,
-      rgba(var(--askv-wash),0)    100%);
+    linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
+    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%);
 
   /* THE COMPOSER'S STROKE, MEASURED AT 1:1 rather than read off the codegen.
      `get_design_context` flattens 451:904's stroke to `border-[#ffc092]`,
@@ -145,11 +107,14 @@
 
      `--accent-2` is #f0530c and this is the same orange, so the hot end is
      the token rather than a second copy of the brand colour. */
-  /* re-hued for the red accent, 4 Sep 2026: #FFC092 is the old accent at 45.3%
-     over white and this is the same 45.3% of #ff584a. The paragraph above is
-     unchanged — the shape of the gradient, its hot spot and its 16% ramp are
-     what that note describes and none of them moved. */
-  --askv-stroke:#ffa4a2;
+  /* THE STROKE IS THE ACCENT ITSELF NOW — Maryam, 9 Sep 2026 ("this border
+     should also be of accent colour"). It was a pale 45.3% tint of the accent
+     (#ffa4a2), so the composer's resting border read paler than the chips
+     beside it; reading `--accent` makes the whole field border the platform
+     accent, with `--askv-stroke-hot` (--accent-2, one step deeper) still walking
+     through it as the hot spot. The gradient's shape, its hot spot and its 16%
+     ramp are unchanged — only the cold stop's colour. */
+  --askv-stroke:var(--accent);
   --askv-stroke-hot:var(--accent-2);
   --askv-stroke-ramp:16%;
 
@@ -194,12 +159,24 @@
    `.app:has(.ask-page)` scopes it: this is the chat's ground and no other
    page's, and keying on the page rather than on `S.view` means it arrives and
    leaves with the thing it belongs to.
+
+   THE CONTENT KEEPS ITS MARGINS — Maryam, 8 Sep 2026. A first pass zeroed
+   `.main`'s side padding here so the header, thread and foot spanned edge to
+   edge; she reversed it on seeing it ("keep the inner content just as before,
+   do not give full width to the content"). So §14's `clamp(--s06, 12cqw,
+   200px)` gutter stays and the column reads at the same width as every other
+   page. Only the WASH is full-bleed — it always was, because it is painted on
+   `.main` under the margins, not on the inset column. The margin-removal
+   declaration is gone rather than commented out: a reversed instruction is a
+   deletion, and the wash reaching the frame edge was never the padding's job.
    ------------------------------------------------------------------------ */
 :root{--askv-ground:#ffffff}
 
 .app:has(.ask-page) .view-col > .main{
   background-color:var(--askv-ground);
   background-image:var(--askv-ground-wash);
+  background-position:top,bottom;
+  background-size:100% 590px;
   background-repeat:no-repeat}
 
 /* ------------------------------------------------------------------ 2 ---
@@ -231,6 +208,8 @@
   .app:has(.ask-page) .view-col > .main{
     background-color:var(--askv-ground);
     background-image:var(--askv-ground-wash);
+    background-position:top,bottom;
+    background-size:100% 590px;
     background-repeat:no-repeat}
   .app .view-col > .main > .page.ask-page{background:transparent}
 }
@@ -252,6 +231,57 @@
 .app .ask-page .ask-foot{
   background:transparent;
   border-top:0}
+
+/* ----------------------------------------------------------------- 4b ---
+   THE HEAD BAND IS FROSTED, AND THE CONVERSATION DISSOLVES UNDER IT
+
+   Maryam, 8 Sep 2026: "instead of a solid line where the content goes behind,
+   I would like a blur interaction here." §51.2's hairline is already off — a
+   seam on one continuous wash — and this replaces the HARD CLIP at the top of
+   the thread (content vanishing on a line) with a frosted bar the conversation
+   blurs into.
+
+   THE BAND OVERLAYS THE THREAD, WHICH IS THE WHOLE MECHANISM. §51 built the
+   head row as a flow child, so the thread was clipped at its own top edge and
+   a line rising past it simply disappeared. Made `position:absolute` over the
+   top of the page (`.ask-page` is `relative` for it to anchor to), it becomes
+   a plane the thread scrolls BEHIND — and a `backdrop-filter` only has
+   something to blur once there is content behind the thing carrying it. The
+   thread gets that 64px back as `padding-top` (plus the fade) so the first
+   message opens clear of the bar, not under it.
+
+   TWO PARTS, AND THE SPLIT IS ABOUT THE TEXT. The 64px band carries a
+   translucent white and the blur with its arrow and name SHARP on top — no
+   mask on the band, or the name would fade with it. Its `::after` is the 28px
+   fade below: the same blur under a downward mask, so a line rising into it
+   softens and whitens before it reaches the solid band rather than cutting
+   off. `pointer-events:none` on the fade; the band keeps its clicks.
+   `--askv-ground` is #ffffff, so `.72` of it is the frost and the greeting
+   state — nothing behind the bar — just reads as white, as it did before.
+   ------------------------------------------------------------------------ */
+.app .ask-page{position:relative}
+/* THE FROST IS LIGHTER NOW (Maryam, 9 Sep 2026: "lighten the tal row white
+   blur"). The band's white drops from .72 to .55 and its blur from 12 to 8, and
+   the fade below it from .72 to .4 with a 6px blur, so the header whitens the
+   conversation less as it scrolls behind — a softer veil rather than a solid
+   wash. The greeting state (nothing behind the bar) still reads white. */
+.app .ask-page .ask-top{
+  position:absolute;top:0;left:0;right:0;z-index:5;
+  border-top:0;border-bottom:0;
+  background:rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(8px);
+          backdrop-filter:blur(8px)}
+.app .ask-page .ask-top::after{
+  content:'';position:absolute;top:100%;left:0;right:0;height:28px;
+  pointer-events:none;
+  background:linear-gradient(to bottom,
+    rgba(255,255,255,.4), rgba(255,255,255,0));
+  -webkit-backdrop-filter:blur(6px);
+          backdrop-filter:blur(6px);
+  -webkit-mask-image:linear-gradient(to bottom,#000,transparent);
+          mask-image:linear-gradient(to bottom,#000,transparent)}
+/* the thread scrolls behind the band, so it opens below band + fade */
+.app .ask-page .ask-thread{padding-top:92px}
 
 /* ------------------------------------------------------------------ 5 ---
    THE COMPOSER'S STROKE TRAVELS
@@ -536,8 +566,19 @@
    and the isolation is left alone — unlike the earlier draft, nothing here
    needs to blend with the page, because the alpha channel is doing the work
    the blend mode was doing.
+
+   AND IT IS GATED ON THE VIDEO ACTUALLY BEING THERE (`:has(> .tal-blobv)`),
+   because this layer crosses into the design system and the hand-written
+   agent and admin portals reach the same `.ask-page .tal-hero .tal-mk.orb` —
+   but they emit NO `<video>`, only the orb span, so an unconditional
+   `content:none` blanked the sphere AND left nothing in its place: an empty
+   hero. `askView` in hifi puts the `.tal-blobv` as a direct child, so the
+   gate matches here and the sphere is still suppressed under the footage;
+   where there is no clip, the `::before` keeps painting `--tal-mark` (the
+   same blob, as a background-image) and the hero is the artwork rather than a
+   hole. One selector serves both surfaces.
    ------------------------------------------------------------------------ */
-.app .ask-page .tal-hero .tal-mk.orb::before{content:none}
+.app .ask-page .tal-hero .tal-mk.orb:has(> .tal-blobv)::before{content:none}
 .app .ask-page .tal-hero .tal-blobv{
   position:absolute;inset:0;z-index:0;
   display:block;width:100%;height:100%;
@@ -855,13 +896,18 @@
      about how loud it should be. At .5 the peak is 9% of one orange over
      white, which is about as far down as it can go and still be a glow rather
      than a rendering artefact. */
+  /* THE GLOW'S HUE IS THE NEW ACCENT — Maryam, 9 Sep 2026 ("change these
+     gradient values and borders as well, just update the accent colour and keep
+     the other values same"). The five measured alphas, the ellipse geometry and
+     the `--askv-chip-glow` dimmer are all unchanged; only the orange 240 83 12
+     (#F0530C) becomes #F9423A = 249 66 58, the platform accent. */
   background-image:radial-gradient(115% 338% at 80% -128%,
-    rgb(240 83 12 / calc(.183 * var(--askv-chip-glow))) 0%,
-    rgb(240 83 12 / calc(.124 * var(--askv-chip-glow))) 39%,
-    rgb(240 83 12 / calc(.056 * var(--askv-chip-glow))) 68%,
-    rgb(240 83 12 / calc(.021 * var(--askv-chip-glow))) 85%,
-    rgb(240 83 12 / calc(.006 * var(--askv-chip-glow))) 100%,
-    rgb(240 83 12 / 0) 115%);
+    rgb(249 66 58 / calc(.183 * var(--askv-chip-glow))) 0%,
+    rgb(249 66 58 / calc(.124 * var(--askv-chip-glow))) 39%,
+    rgb(249 66 58 / calc(.056 * var(--askv-chip-glow))) 68%,
+    rgb(249 66 58 / calc(.021 * var(--askv-chip-glow))) 85%,
+    rgb(249 66 58 / calc(.006 * var(--askv-chip-glow))) 100%,
+    rgb(249 66 58 / 0) 115%);
   background-repeat:no-repeat;
   font-size:12px;line-height:18px;letter-spacing:.16px;
   color:var(--askv-ink-2);white-space:nowrap}
@@ -883,10 +929,11 @@
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  /* THE STAR'S OWN PINK-TO-ACCENT RAMP, re-hued 4 Sep 2026: the pink top stop
-     is the file's and stays, the bottom one was the accent's warm sibling
-     #E98B46 and is `--accent` now. §83 reached the same pair for the demo. */
-  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
+  /* SOLID ACCENT — Maryam, 9 Sep 2026 ("use solid accent colour in the stars as
+     well"). Was the #FBB2D4 -> --accent ramp; now one flat `--accent`, written
+     as a one-colour gradient so the `--tal-star` mask still has a background to
+     clip. Matches the suggestion-chip star in §51. */
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;

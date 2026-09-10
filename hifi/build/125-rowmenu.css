@@ -1,0 +1,73 @@
+/* ==========================================================================
+   125. THE ROW ACTION MENU — one kebab, a dropdown of actions — Maryam, 7 Sep 2026
+
+   Maryam, on the Super Admin portal's list tables: "instead of these separate
+   icons placed we will give this column name 'Actions' and will give a one
+   3 dots menu icon and on click to that icon we could see these actions in the
+   dropdown". So §120.3's row of quiet icon buttons (edit / pause / delete, one
+   per action, right-aligned in `td.tbl-act`) becomes ONE `overflow` kebab that
+   opens a menu of the same actions, each a labelled row. The column head, blank
+   before, now reads "Actions" — the admin's `ACT_COL` label.
+
+   WHY THIS AND NOT MORE ICONS. Three bare glyphs read as three unrelated
+   controls and force the reader to decode each mark; a kebab says "there are
+   actions here" in one stroke and the menu spells them out in words. It also
+   scales: a row with five actions (the candidate table's edit / override /
+   suspend / … ) fits in one 32px cell instead of a five-icon strip that pushed
+   the table wide.
+
+   THE MENU IS §123's `.dd-menu` RE-CUT FOR AN ICON TRIGGER — the item is an
+   icon + a label in words, the account menu's shape (`.acct-i`), not the slot
+   form's label-and-tick. Ground, border, overlay and the open transition are
+   the box's menu tokens, unchanged.
+
+   POSITIONED IN JS, NOT CLIPPED BY THE TABLE. `.tbl-wrap` is the one component
+   that scrolls sideways (`overflow-x:auto`), which per spec clips the other
+   axis too — so an absolutely-positioned menu inside it is cut at the cell's
+   foot, and making the wrap `overflow:visible` breaks worse on a phone (a
+   sideways-scrolled wide table resets its scrollLeft the instant it stops
+   scrolling, throwing the kebab off the frame). `position:fixed` is no escape
+   either: the prototype frame's fit-to-pane transform is toggled between
+   `none` and `scale()`, and a fixed child's containing block flips with it. So
+   the open menu is MOVED out of the wrap into `.main` (the scroll container,
+   which clips nothing sideways) and placed there by `placeRowMenu` in the
+   admin's own JS, at the trigger's position, opening up or down by the room
+   below and clamped inside the frame. This layer only dresses it; the base
+   `position:absolute` here is the in-cell fallback for the closed menus, which
+   are hidden and never seen. §63 owns the type — no size, weight, case or ink
+   here; the one colour is the icon FILL, as §123's `.dd-ic`. The one armed
+   hover is `.rowmenu-i` (build.py HOVER_KEEP): the row IS the control and a
+   list with no hover reads as a table, the argument `.dd-opt`/`.ob-qp-o` make.
+   ========================================================================== */
+
+/* ---- the wrapper and its kebab trigger ----------------------------------- */
+.app .rowmenu{position:relative; display:inline-block}
+/* the trigger is a quiet icon button (`.btn.btn-g.btn-sm`), sized by §120.3 */
+
+/* ---- the dropdown -------------------------------------------------------- */
+/* The `.on` state is on the LIST, not the wrapper, because `placeRowMenu` moves
+   the open list out of `.rowmenu` into `.main` — a `.rowmenu.on .rowmenu-list`
+   rule would stop matching the moment it moved. Closed lists keep the in-cell
+   anchor below; the open one is repositioned inline. */
+.app .rowmenu-list{
+  position:absolute; top:calc(100% + var(--s02)); right:0; z-index:60;
+  min-width:190px; max-height:280px; overflow-y:auto;
+  display:flex; flex-direction:column;
+  background:var(--layer-01); border:1px solid var(--rule);
+  opacity:0; visibility:hidden; transform:translateY(-4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.app .rowmenu-list.on{opacity:1; visibility:visible; transform:translateY(0)}
+
+/* AN ACTION IS AN ICON AND A LABEL IN WORDS — the account menu's row. Left
+   aligned because a `<button>` centres its content and these are rows; nowrap so
+   a two-word label ("Override level") stays on one line. Type is §63's. */
+.app .rowmenu-i{
+  display:flex; align-items:center; gap:var(--s03);
+  padding:var(--s04) var(--s05); width:100%; text-align:left;
+  white-space:nowrap; cursor:pointer}
+.app .rowmenu-ic{flex:none; width:18px; height:18px; fill:var(--icon-secondary)}
+/* THE ONE ARMED HOVER (build.py HOVER_KEEP). Written nowhere else, which is what
+   the `endswith` match needs. */
+.app .rowmenu-i:hover{background:var(--overlay-hover)}

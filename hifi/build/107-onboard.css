@@ -138,12 +138,29 @@
      heavy. `100% 40%` is what makes the vertical falloff land where the frame
      puts it: the wash reaches nothing at y 6% and y 86%, which is exactly
      where the sampled grid does. Re-fit rather than re-taste if the frame
-     changes. */
+     changes.
+
+     SUPERSEDED 9 Sep 2026 — the rose ellipse above is replaced by the top/bottom
+     accent bands stated at the declaration just below (Figma 892:7220). This
+     note is kept as the record of the old fit. */
   background-color:var(--layer-01);
-  background-image:radial-gradient(100% 40% at 50% 46%,
-    rgba(245,75,135,.10) 0%,
-    rgba(245,75,135,.045) 50%,
-    rgba(245,75,135,0) 100%);
+  /* TWO BANDS, TOP AND BOTTOM — Figma 892:7220 (Maryam, 9 Sep 2026: "remove the
+     background gradient from this screen and the tal onboarding as well, and add
+     a top and bottom gradient just like i have in this figma, please follow the
+     same values"). This supersedes the centred rose ellipse the note above fits:
+     the ground is now --accent at 5% bleeding DOWN from the top edge and UP from
+     the bottom, white between — the same fill the Tal chat ground (§53) now
+     carries from the same frame. Both bands are the frame's one fill,
+     linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%,
+     rgba(255,255,255,.05) 52.274%); the bottom is that mirrored vertically, the
+     supplementary angle 353.385 (= 180 minus 186.615). 189,42,42 is --accent;
+     the stops, angle and 590px band height are the frame's own. */
+  background-image:
+    linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
+    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%);
+  background-position:top,bottom;
+  background-size:100% 590px;
+  background-repeat:no-repeat;
 
   /* ---- THE GATE'S OWN ACCENT — #FF584A ----
      Maryam, 4 Sep 2026: "change the primary color on tal prototype to
@@ -194,14 +211,14 @@
      register as white on `#f57414` (2.84:1), and it is on marks and discs
      rather than on body text.
 
-     >>> AND ALL OF IT MOVED AGAIN TO #FF3733 (4 Sep 2026, the platform's second
+     >>> AND ALL OF IT MOVED AGAIN TO #bd2a2a (4 Sep 2026, the platform's second
      re-hue of the day). These two scoped blocks are the reason it had to be
      done by hand: they HARDCODE the accent rather than reading §01, so a
      platform token change reaches every screen in the product EXCEPT the
      onboarding — which would have shipped the one flow whose chat the ask page
      had just been made to match, in the previous red. Nothing about the
      structure changed; every value is the same derivation one hue over
-     (`--accent-hover` #e63d30 -> #e41f1b at the same ΔL, the tint at the same
+     (`--accent-hover` #e63d30 -> #9e2020 at the same ΔL, the tint at the same
      22.8%, the grad still flat).
 
      AND THE FLAT `--accent-grad` HERE IS NOW WHAT §01 SAYS. This block existed
@@ -211,9 +228,9 @@
      is still a real difference (`--accent-text` is the flat accent here against
      §01's AA-safe #c51c18) — but if this flow should simply inherit, these are
      the lines to try removing first. */
-  --accent:#ff3733;
-  --accent-text:#ff3733;
-  --brand-tint-2:#ffd1d1;
+  --accent:#bd2a2a;
+  --accent-text:#bd2a2a;
+  --brand-tint-2:#f0cece;
   /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
      colors as well in this message, match them to #FF584A"). The reply Tal
      gives when it cannot answer was still coming out ORANGE in one word, and
@@ -259,12 +276,12 @@
      gradient stepped one stop deeper" — with all three stops equal, a pressed
      button would be indistinguishable from a resting one, which is a state
      that has stopped existing rather than a colour that matches. */
-  --accent-2:#ff3733;
-  --accent-on-2:#ff3733;
-  --accent-hover:#e41f1b;
-  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
-  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
-  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+  --accent-2:#bd2a2a;
+  --accent-on-2:#bd2a2a;
+  --accent-hover:#9e2020;
+  --accent-grad:linear-gradient(104.86deg,#bd2a2a 10.02%,#bd2a2a 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#bd2a2a 10.02%,#9e2020 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#9e2020 10.02%,#bb2522 115.55%)}
 
 /* THE QUESTION SCREENS TAKE THE ACCENT AND NOT THE WASH, and the split is what
    each root is. `obScreen` returns one of two things: `.ob-open`, the gate's
@@ -277,9 +294,9 @@
    because there is no element that wraps both — `render()` returns one or the
    other directly. */
 .app .ob-card{
-  --accent:#ff3733;
-  --accent-text:#ff3733;
-  --brand-tint-2:#ffd1d1;
+  --accent:#bd2a2a;
+  --accent-text:#bd2a2a;
+  --brand-tint-2:#f0cece;
   /* >>> THE SECOND STOP AND THE INK-ON-IT, ADDED 4 Sep 2026 ("For the other
      colors as well in this message, match them to #FF584A"). The reply Tal
      gives when it cannot answer was still coming out ORANGE in one word, and
@@ -325,12 +342,12 @@
      gradient stepped one stop deeper" — with all three stops equal, a pressed
      button would be indistinguishable from a resting one, which is a state
      that has stopped existing rather than a colour that matches. */
-  --accent-2:#ff3733;
-  --accent-on-2:#ff3733;
-  --accent-hover:#e41f1b;
-  --accent-grad:linear-gradient(104.86deg,#ff3733 10.02%,#ff3733 115.55%);
-  --accent-grad-hover:linear-gradient(104.86deg,#ff3733 10.02%,#e41f1b 115.55%);
-  --accent-grad-active:linear-gradient(104.86deg,#e41f1b 10.02%,#bb2522 115.55%)}
+  --accent-2:#bd2a2a;
+  --accent-on-2:#bd2a2a;
+  --accent-hover:#9e2020;
+  --accent-grad:linear-gradient(104.86deg,#bd2a2a 10.02%,#bd2a2a 115.55%);
+  --accent-grad-hover:linear-gradient(104.86deg,#bd2a2a 10.02%,#9e2020 115.55%);
+  --accent-grad-active:linear-gradient(104.86deg,#9e2020 10.02%,#bb2522 115.55%)}
 
 /* THE STAGE IS THE COMPOSITION AND IT GROWS; THE DOCK BELOW IT DOES NOT. That
    split is what bottom-aligns the dock and keeps the orb centred in the space
@@ -1066,7 +1083,7 @@
 .app .ob-qp-h{
   display:flex;align-items:baseline;gap:var(--s05);
   padding:var(--s05);
-  border-bottom:1px solid rgba(17,17,17,.07)}
+  border-bottom:1px solid var(--rule)}
 /* THE COUNT IS PINNED RIGHT AND NEVER WRAPS. It is three characters against a
    question that can run to two lines, so the auto margin does the work and
    `flex:none` stops the heading squeezing it into "1 of\n5". */
@@ -1081,7 +1098,7 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   box-sizing:border-box;width:100%;
   padding:var(--s04) var(--s05);
-  border:0;border-top:1px solid rgba(17,17,17,.07);
+  border:0;border-top:1px solid var(--rule);
   background:none;cursor:pointer;text-align:left}
 .app .ob-qp-o:first-of-type{border-top:0}
 
@@ -1101,7 +1118,7 @@
   display:flex;align-items:flex-start;gap:var(--s04);
   box-sizing:border-box;width:100%;
   padding:var(--s04) var(--s05);
-  border-top:1px solid rgba(17,17,17,.07)}
+  border-top:1px solid var(--rule)}
 .app .ob-qp-h + .ob-qp-r{border-top:0}
 
 /* >>> THE JOURNEY'S MARK IS A BARE STATE GLYPH — `jrnList`'s own three, ported
@@ -1375,6 +1392,32 @@
 .app .ob-logo img{display:block;height:24px;width:auto}
 @container app (min-width:900px){.app .ob-logo img{height:26px}}
 
+/* ------------------------------------------------------------------ 107.p ---
+   THE PROGRESS BAR — Maryam, 9 Sep 2026, with a reference
+
+   It sits at the top of the live chat, under the wordmark and above the
+   conversation, centred on the SAME `minmax(0,720px)` column the thread and the
+   field use (§107's dock) so the three read as one column. The h3 is
+   left-aligned to the bar's left edge — the flex column stacks them and neither
+   is centred within it, so the heading starts where the first segment starts.
+
+   THE SEGMENTS ARE THE ASK, STATED IN TOKENS. A filled one is `--accent`; the
+   rest are a plain `--rule` (#efefef) fill with NO border (Maryam, 9 Sep 2026:
+   "the next step progress bars should be of no border and their color should be
+   #efefef" — reversing the earlier #fcfcfc fill + #efefef hairline). Read as a
+   token, not the hex. The 999px is the reference's pill and joins §56's short
+   list of stated curves; a progress segment is a mark, not a box. §63 owns the
+   h3's type; this layer sets layout and fills only. */
+.app .ob-prog{
+  width:100%;max-width:720px;flex:none;
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--s04)}
+.app .ob-prog-h{margin:0}
+.app .ob-prog-bar{display:flex;gap:var(--s03);width:100%}
+.app .ob-prog-seg{
+  flex:1;min-width:0;height:6px;border-radius:999px;
+  background:var(--rule)}
+.app .ob-prog-seg.on{background:var(--accent)}
+
 /* A MESSAGE ARRIVES, IT DOES NOT APPEAR. 14px of lift over 260ms — far enough
    to read as movement, short enough that a reader answering four questions in
    a row is never waiting on it.
@@ -1390,7 +1433,23 @@
    THE TYPING DOTS ARE A TURN TOO and take the same entrance, because they
    occupy the same slot Tal's reply is about to. */
 .app .ob-msgs > .ob-m:last-child{
-  animation:ob-msg-in 260ms cubic-bezier(.22,1,.36,1) both}
+  animation:ob-msg-in 300ms cubic-bezier(.22,1,.36,1) both}
+
+/* AND ITS CONTENT UNFOLDS ITS HEIGHT, so a tall question card does not pop
+   (Maryam, 9 Sep 2026: "the new question needs to smoothly appear not a jerk").
+   The fade+lift above moved the turn but a tall card still took its full height
+   in one frame, shoving the conversation above it up on the same paint — the
+   jerk. The turn's content cell now grows from zero over the same beat, so the
+   push is gradual and reads as one motion with the fade. `max-height` with a
+   ceiling above the tallest card (a six-option list is well under 700), NOT a
+   grid `0fr` collapse — `.ob-m-t` holds two children (the framing line and the
+   card) and the collapse wants one, and a wrapper to give it one would break
+   `.ob-m-t > p`'s spacing. `overflow:hidden` clips the growing box; it persists
+   on the resting last turn, which is harmless (the card fits). The typing dots
+   are excluded — one short row that only needs the fade. */
+.app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{
+  overflow:hidden;
+  animation:ob-unfold 300ms cubic-bezier(.22,1,.36,1) both}
 
 /* AND THE WELCOME LEAVES BEFORE THE CONVERSATION ARRIVES. `.ob-leave` is put
    on the stage by the press and the state change waits `OB_LEAVE` for it —
@@ -1408,6 +1467,9 @@
 @keyframes ob-msg-in{
   from{opacity:0;transform:translateY(14px)}
   to{opacity:1;transform:none}}
+@keyframes ob-unfold{
+  from{max-height:0}
+  to{max-height:700px}}
 @keyframes ob-leave{
   from{opacity:1;transform:none}
   to{opacity:0;transform:translateY(-12px)}}
@@ -1420,7 +1482,9 @@
    the honest cost of doing this in one place. */
 @media (prefers-reduced-motion:reduce){
   .app .ob-msgs > .ob-m:last-child,
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t,
   .app .ob-stage.ob-leave{animation:none}
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{overflow:visible}
   .app .ob-stage.ob-leave{opacity:0}
 }
 

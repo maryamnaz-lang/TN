@@ -17,9 +17,12 @@ cd hifi && node respcheck.mjs --quick && node designcheck.mjs
 # talent agent
 node hifi/designcheck.mjs --url=tn-agent-portal.html
 
-# super admin (expected to report gaps — it is not on the design system yet)
-node hifi/designcheck.mjs --url=tn-admin.html
+# super admin (hand-written on the design system, like the agent portal)
+node hifi/designcheck.mjs --url=tn-admin-portal.html
 ```
+
+`admin` is `tn-admin-portal.html` — the hi-fi Super Admin portal on the design system.
+`tn-admin.html` is the frozen data/flow reference it was built from, not a target for this check.
 
 Add `--widths=390,1280` to narrow, `--quiet` for three examples per rule.
 
@@ -36,8 +39,10 @@ scale), `transform` / `caps-text` (capitals), `border` (a line colour that is no
    or the built HTML (DESIGN.md §6). Type, weight, case and ink belong in `63-typography.css`.
 2. For `tn-agent-portal.html`, a `border` or `radius` finding on a class the design system ships
    is a layer fix; one on a class only that file writes is a markup fix in the file.
-3. For `tn-admin.html`, the report is the migration list; fixing it by hand is the deferred
-   admin migration task, not this skill.
+3. For `tn-admin-portal.html`, treat it like the agent portal: a `border`/`radius` finding on a
+   class the design system ships is a layer fix; one on a class only that file writes is a markup
+   fix in the file. (The single expected `radius` hit is the design system's own Tal-summary `<b>`
+   highlight — not a defect.)
 4. Rebuild both (`cd hifi/build && python3 build.py`, `cd design-system && python3 build-ds.py`),
    re-run the check, and report the before/after counts per rule.
 

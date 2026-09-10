@@ -1,0 +1,73 @@
+/* ==========================================================================
+   128. THE SUPER ADMIN LIST PAGE — Maryam, 7 Sep 2026
+
+   A batch of asks that reshape every admin list page:
+
+   1. THE HEADING ROW gets equal air above and below (its foot was tighter than
+      its head). The section that holds the heading takes `--s07` top, and the
+      tab strip under it takes the same `--s07` — one rhythm, both sides.
+
+   2. SEARCH MOVES OUT of the heading row and UNDER the tabs, on the left; the
+      table's own filters sit on the right (`.lst-tools`). With the field gone,
+      the heading's buttons own the right end of the heading row (they already
+      did — §120.4a floats `.aih-a` right).
+
+   3. THE TABS KEEP THEIR TOP BORDER. `.modhead + .sec > .cs` (§15) drops it
+      when a strip opens the page body right under the Tal band; here the heading
+      sits between the band and the tabs, so the line IS wanted — restored.
+
+   4. THE TABLE FOLLOWS THE COHORT LEADER'S (Maryam: "the header divider color,
+      the other alignments … follow that"). The leader's header divider is the
+      light `--rule`, not the base `--rule-ink`; cells centre vertically. Both
+      taken here for the admin.
+   ========================================================================== */
+
+/* ---- 4. the table, leader-style (§31) ------------------------------------
+   The cohort leader's table, taken whole for the admin:
+   • the header divider is the light `--rule`, the one structural line;
+   • NO hairlines between rows — rows are separated by air, not a grid drawn
+     over the data (§31: "seven rows of a rule too dark reads as a grid");
+   • the first data row stands off the header rule by `--s06`, the same space a
+     pair of rows already has, so the head is not sitting on the body;
+   • cells centre vertically (every admin row is effectively one line).
+   The first column's weight is §31's too but is §63's to set — see §63 §56. */
+.app[data-portal="admin"] .tbl th{border-bottom-color:var(--rule)}
+.app[data-portal="admin"] .tbl td{vertical-align:middle; border-bottom:0}
+.app[data-portal="admin"] .tbl tr:first-child + tr td{padding-top:var(--s06)}
+
+/* ---- 3. the tabs keep their top border ----------------------------------- */
+.app[data-portal="admin"] .page > .modhead + .sec > .cs{border-top:1px solid var(--rule)}
+
+/* ---- 1. the heading row's equal air -------------------------------------- */
+.app[data-portal="admin"] .page > .sec:has(> .hd-srch){padding-top:var(--s07)}
+.app[data-portal="admin"] .page .sec > .hd-srch{margin-bottom:var(--s07)}
+
+/* ---- 2. search left, filters right, under the tabs ----------------------- */
+.app .lst-tools{
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05);
+  margin-top:var(--s05); margin-bottom:var(--s05)}
+.app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
+.app .lst-tools > .lst-filters{display:flex; align-items:center; flex-wrap:wrap;
+  gap:var(--s03); margin-left:auto}
+
+/* ---- a filter dropdown (opens DOWNWARD; the toolbar is above the table) --- */
+.app .fdd{position:relative}
+.app .fdd-t{display:inline-flex; align-items:center; gap:var(--s02);
+  min-height:36px; padding:0 var(--s04); background:var(--layer-01);
+  border:1px solid var(--rule); cursor:pointer; white-space:nowrap}
+.app .fdd-cx{flex:none; width:16px; height:16px; fill:var(--icon-secondary);
+  transition:transform var(--dur-short) var(--ease-standard)}
+.app .fdd.on .fdd-cx{transform:rotate(180deg)}
+.app .fdd-menu{
+  position:absolute; top:calc(100% + var(--s02)); right:0; z-index:30;
+  min-width:100%; display:flex; flex-direction:column;
+  background:var(--layer-01); border:1px solid var(--rule);
+  opacity:0; visibility:hidden; transform:translateY(-4px);
+  transition:opacity var(--dur-short) var(--ease-standard),
+             transform var(--dur-short) var(--ease-standard),
+             visibility var(--dur-short)}
+.app .fdd.on .fdd-menu{opacity:1; visibility:visible; transform:translateY(0)}
+.app .fdd-opt{padding:var(--s03) var(--s04); text-align:left; cursor:pointer; white-space:nowrap}
+.app .fdd-opt.on{background:var(--overlay-selected)}
+/* the one armed hover (build.py HOVER_KEEP) — the row IS the control */
+.app .fdd-opt:hover{background:var(--overlay-hover)}

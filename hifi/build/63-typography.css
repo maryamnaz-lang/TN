@@ -146,7 +146,26 @@
   --t-body-size:13.5px;       --t-body-lh:22px;         --t-body-ls:.1px;
   --t-compact-size:13.5px;    --t-compact-lh:19px;      --t-compact-ls:.1px;
   --t-label-size:12.5px;      --t-label-lh:17px;        --t-label-ls:.1px;
-  --t-desc-size:12.5px;       --t-desc-lh:17px;         --t-desc-ls:.1px;
+  /* A DESCRIPTION IS 13.5 WITH AN AUTO LINE HEIGHT, NOT THE LABEL'S 12.5 / 17
+     (Maryam, 8 Sep 2026, both by name: "13.5", "the line height should be
+     AUTO"). It shipped at the label size because the two were minted
+     together; the difference was only weight. A description is a sentence
+     somebody READS and a label is a word somebody scans. `normal` is the
+     face's own leading (Plus Jakarta Sans resolves it near 1.26, ~17px),
+     and it is the ONE role in this scale without a stated px leading — that
+     is the ask, not an omission; do not "fix" it to a number. Size 19 was
+     tried for one edit and sent back the same minute. Letter-spacing
+     unchanged. */
+  --t-desc-size:13.5px;       --t-desc-lh:normal;       --t-desc-ls:.1px;
+  /* `normal` IS NOT A LENGTH, and one layer needs the description's leading
+     AS a length: §111 sizes a crest to the two text lines beside it inside a
+     `calc()`, and `calc(19px + 2px + normal)` is invalid — the whole
+     declaration is dropped and nothing warns. This is what `normal`
+     RESOLVES to for Plus Jakarta Sans: measured in Chrome at 1350px the line
+     box is 1701px, a ratio of exactly 1.26, so 13.5 × 1.26 = 17.01. It is a
+     measurement, not a leading — if the face or the desc size changes,
+     re-measure it; never read it for `line-height`, read `--t-desc-lh`. */
+  --t-desc-lh-len:17px;
   --t-eyebrow-size:11.5px;    --t-eyebrow-lh:16px;      --t-eyebrow-ls:.2px;
   --t-caption-size:11.5px;    --t-caption-lh:16px;      --t-caption-ls:.1px;
 
@@ -476,7 +495,7 @@
 .app .eyebrow,.app .stats .l,.app .stats .k,.app .stat .k,.app .facts .l,
 .app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
 .app .sn-cap,.app .pt-lab,.app .lvl-hero .eb,.app .ladder-lab,
-.app .tbl th,.app .chart-table th,.app .tw-h,.app .cert-eb,.app .plate-eb,
+.app .tbl th,.app .chart-table th,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
 .app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
@@ -615,9 +634,12 @@
    places. If she wants the publishers' form, that is the moment this becomes a
    markup change and this rule goes.
 
-   THE FIVE FAMILIES ARE THE ONES THAT ARE BUTTONS. `.btn` is the component and
-   its eight variants; `.tw-btn` is the button inside one of Tal's widgets, which
-   carries no `.btn` of its own. `.nil-btn` / `.nil-cta` are the microsite's, and
+   THE FAMILIES ARE THE ONES THAT ARE BUTTONS. `.btn` is the component and its
+   eight variants. `.tw-btn` USED TO BE HERE — the button inside Tal's widgets —
+   and came OUT on 9 Sep 2026: Figma 882:6701 makes it a sentence-case LINK
+   ("Open my course progress →"), not a Title-Case button, so capitalising it now
+   fights the reference. §39 draws that link (no fill, red text, an arrow); its
+   words are authored in sentence case and left alone. `.nil-btn` / `.nil-cta` are the microsite's, and
    they are here on §4's own precedent — that block reaches into `nil` because it
    "is still a screen inside this product" while leaving its face and colour
    alone. What is deliberately NOT here is everything else in §3's button TIER:
@@ -638,8 +660,13 @@
    excluded from the design system, which is why the two microsite selectors are
    written apart from the `.app` one rather than folded into it.
    ------------------------------------------------------------------------ */
-.app .btn,.app .tw-btn{text-transform:capitalize}
+.app .btn{text-transform:capitalize}
 .nil .nil-btn,.nil .nil-cta{text-transform:capitalize}
+/* THE TAL REPLY ACTION LINK'S INK — accent, off Figma 882:6701 (9 Sep 2026).
+   §39 strips its box; the colour is stated here where colour is owned. Both the
+   primary link and the quiet ghost take `--accent-text`, the AA-safe accent ink
+   §01 keeps for words; the arrow is `fill:currentColor` so it follows. */
+.app :is(.tal-msg > .bb, .ob-m-t) .tw-btn{color:var(--accent-text)}
 
 /* ------------------------------------------------------------------ 5 ---
    SVG TEXT
@@ -986,11 +1013,26 @@
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong)}
 
+/* TAL WIDGET TITLE — off Figma 882:6701 (9 Sep 2026). §5's eyebrow group set
+   this as the small grey uppercase label; the node sets it in Medium black
+   sentence case at the body size, so it leaves the group and takes the body
+   role in `--t-w-strong` and `--text-primary`. Unscoped `.app .tw-h` so the
+   gallery's copy moves with the chat's rather than reverting to §03's raw
+   uppercase 600. The node's Medium is the platform's one strong weight — the
+   two-weight rule holds. */
+.app .tw-h{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-body-ls);
+  text-transform:none;color:var(--text-primary)}
+
 /* 0,2,0 — the widget's figure column and the agent row inside a Tal bubble.
    §39's note on `.tw-lines` is why the label column is 58px; the size it
-   was set at was not part of that measurement. */
+   was set at was not part of that measurement. The label `<b>` is the node's
+   SemiBold, i.e. the strong weight (§11 loads two, so SemiBold reads as Medium);
+   the value column stays `--text-secondary` from §03. */
 .app .tw-lines b,.app .tw-ag b,.app .tw-lines > span{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh)}
+.app .tw-lines b{font-weight:var(--t-w-strong)}
 
 /* 0,3,0 — the certificate's meta line, on the dark ground. §37 shrinks it
    again inside a max-width query, so per trap 3 that one needs the query. */
@@ -1306,17 +1348,26 @@
    pair does.
    ------------------------------------------------------------------------ */
 
-/* TAL'S NAME, AND THE INK THAT IS NOT AN INK. §70 clips `--ai-grad` to these
-   glyphs; the clip is only visible through a transparent foreground, so this
-   declaration is the other half of that rule and not a colour decision. It has
-   to be `.app .modhead .ai-aura.talsum > .ai-head > .ai-label` exactly — §33.2
-   sets `--accent-text` on that same selector at (0,6,0), so anything shorter
-   loses on specificity however late it lands. */
+/* TAL'S NAME IS FLAT BLACK SEMIBOLD — Maryam, 9 Sep 2026, off 871:6425 ("black
+   and semibold just like the figma ... remove the gradient from this text").
+   This was a transparent ink under §70's `--ai-grad` clip; §70.2 has dropped
+   the clip, so the ink is now real. It has to be
+   `.app .modhead .ai-aura.talsum > .ai-head > .ai-label` exactly — §33.2 sets
+   `--accent-text` on that same selector at (0,6,0), so anything shorter loses
+   on specificity however late it lands.
+
+   600 IS A STATED EXCEPTION TO THE TWO-WEIGHT RULE. This file's head owns "two
+   weights, 400 and 500, never 600+"; the node sets this one label in SemiBold
+   and Maryam asked for it by name, so it is the exception rather than a drift.
+   `600` is a literal, not `--t-w-strong`, precisely so it reads as the opt-out
+   it is — and §11's SemiBold face (`__JAKARTASEMI__`) is loaded, so 600 renders
+   the real cut rather than falling back to Medium. The one other label in the
+   band, "Your journey so far", is not this selector and stays on the roles. */
 .app .modhead .ai-aura.talsum > .ai-head > .ai-label{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  font-weight:600;letter-spacing:var(--t-h4-ls);
   text-transform:none;
-  color:transparent}
+  color:var(--text-primary)}
 
 /* AND THE SUMMARY PARAGRAPH IS DELIBERATELY NOT SIZED HERE. It falls through
    to §2's body role at 13.5, and that is the answer rather than an omission —
@@ -1365,6 +1416,64 @@
 .app .modhead .ai-aura.talsum .ai-body p b{
   font-weight:var(--t-w-strong);
   color:var(--accent-text)}
+/* THE EVALUATION CARD'S HIGHLIGHTS ARE THE SAME RED (agent portal, 6 Sep 2026).
+   `.tal-eval` is Tal's read on the report page — a body-position `.ai-aura`, not
+   the `.talsum` head band, so the rule above does not reach it. Its `<b>` are the
+   structured lead-ins ("What earns E3:") Tal points the agent at, the same "Tal
+   pointing at a phrase" the summary's are, so they take `--accent-text` too. */
+.app .tal-eval .ai-body p b{
+  font-weight:var(--t-w-strong);
+  color:var(--accent-text)}
+
+/* THE EVALUATION'S OTHER TYPE (§124, agent portal, 6 Sep 2026) — §124 draws the
+   shapes, this states every size, weight and ink they carry. The level-ladder
+   block code is a small book label, white on a filled rung and secondary on an
+   empty one; the "Tal recommends" flag is the accent ink; the three track names
+   are the caption's floor grey. The transcript link in the stat value is the
+   product's link blue, its arrow following. */
+.app .lvl-blk b{
+  font-size:var(--t-desc-size);line-height:var(--t-desc-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-desc-ls);
+  color:var(--text-secondary)}
+.app .lvl-blk.done b,.app .lvl-blk.on b{color:var(--on-brand)}
+.app .lvl-rec{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
+  color:var(--accent-text)}
+.app .lvl-lab span{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper)}
+.app .stat-link{color:var(--link)}
+
+/* THE TRANSCRIPT PAGE'S TYPE (§124). The candidate portal's `.tq-w` speaker is
+   11px, 600-weight and UPPERCASE — three things §63 ended; this states the same
+   parts in the current system. Filter chip: caption, book, secondary — white on
+   the selected accent. Timestamp: caption, helper, tabular. Speaker: the label
+   role in Medium, secondary — the agent's own line (`.me`) in the accent ink.
+   Scene badge: caption in the attention hue. The line's words: body. */
+.app .tx-f{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-secondary)}
+.app .tx-f.on{color:var(--on-brand)}
+.app .tx-t{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--text-helper);font-variant-numeric:tabular-nums}
+.app .tx-w{
+  font-size:var(--t-label-size);line-height:var(--t-label-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  color:var(--text-secondary)}
+.app .tx-line.me .tx-w{color:var(--accent-text)}
+.app .tx-scene{
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
+  color:var(--support-attention)}
+.app .tx-x{
+  font-size:var(--t-body-size);line-height:var(--t-body-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
+  color:var(--text-primary)}
 
 /* THE JOURNEY COLUMN — 587:6741, AND THE BAND IS READ AS TWO COLUMNS RATHER
    THAN AS ONE FRAME. The file sets every text node in the band at 16: the
@@ -1466,7 +1575,14 @@
    the reader is meant to find — came out a brown that did not match the accent
    anywhere else on the screen. The design wins; the two ratios are the known
    price and are worth re-testing if this ever leaves prototype. */
-.app .jrn-i{color:#515151}
+/* THE UPCOMING STEP IS THE DESCRIPTION GREY — Maryam, 9 Sep 2026: "i want the
+   desc color to be #828282, i want it everywhere". A pending journey step is a
+   supporting line, so it reads --text-secondary like every other description
+   (was a flat #515151). The `.done` green and `.on` accent states below still
+   override it; only the upcoming grey moves, and it moves onto the token. This
+   lightens it from the contrast the note above weighed — the description grey
+   is the product-wide value now. */
+.app .jrn-i{color:var(--text-secondary)}
 .app .jrn-i.done{color:#00a43c}
 /* AND `.jrn-i.on` IS ORANGE AGAIN — 4 Sep 2026, and it is the accent re-hue
    being told where it does NOT reach (Maryam: "some places had to have the
@@ -1540,7 +1656,7 @@
 .app .rec-f{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#414141}
+  color:var(--text-secondary)}
 .app .rec-tag{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
@@ -1606,7 +1722,7 @@
 .app .qa-b > span{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#717171}
+  color:var(--text-secondary)}
 
 /* "TAL'S RECOMMENDS" IS BLACK, AND THAT IS THE FILE BEING DELIBERATE —
    581:6670 sets "Summary by Tal" in the gradient and 584:6692 sets this one in
@@ -1661,7 +1777,14 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls);
   text-transform:none;
   color:var(--on-dark)}
-.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+/* AND `.dark-card` TOO, not only `.rec-dark` (Maryam, 9 Sep 2026: "tal
+   recommends text is missing with the star"). The enrolment black card is a
+   `.dark-card` and now wears the same `.rec-lab` label; without this its words
+   kept the base `--text-primary` and set black on black, so only the accent
+   sparkle showed. Both selectors are (0,5,0), which beats the base (0,4,0) the
+   note above flags. */
+.app .rec-dark .ai-label.bare.rec-lab,
+.app .dark-card .ai-label.bare.rec-lab{color:var(--on-dark)}
 .app .rec-dark .rec-n{color:var(--on-dark)}
 /* THE WAY OUT OF THE SECTION IS WHITE (Maryam, 31 Aug 2026), and this ink has
    moved three times. §70.5 set 581:6548's #f47113 when the button was the quiet
@@ -1719,18 +1842,21 @@
    Nothing replaces it: §8b's default is the heaviest rule left on this
    heading, which the sweep confirms rather than the arithmetic. */
 
-/* THE ASK LINE — 581:6571/6586. The offer is at body size in full ink and the
-   example question one step down in the helper tier, which is the distinction
-   §21's own note draws in words ("this is the line's own voice" against "an
-   example of what you could type") and had been drawing with colour alone. */
+/* THE ASK LINE — off Figma 875:6598 (9 Sep 2026, "follow this ui completely").
+   The node INVERTS the old emphasis: the label "Ask Tal" is the quiet one now —
+   14px Regular in `--text-secondary` grey — and the example question beside it
+   is the darker, heavier line (14px SemiBold, #626262). Both move up to the h4
+   size (14) the node sets, and the example's #626262 is its own ink, a shade
+   under the label's grey, kept as a literal the way §21's #474747 was (the dock
+   has always carried its own inks). SemiBold is the platform's strong weight. */
 .app .askdock .askline-t{
-  font-size:var(--t-body-size);line-height:var(--t-body-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-h4-ls);
+  color:var(--text-secondary)}
 .app .askdock .askline-q{
-  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
-  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:#474747}
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  color:#626262}
 
 /* THE "FINDING ANOTHER AGENT" STATUS — 588:6864. It shares `.rec-alt` with the
    offer it replaces, so it inherits the size, the ramp and the underline; what
@@ -1750,12 +1876,18 @@
    tag — and that is the point of it: the accent is Tal's own voice all over
    this band, so a second accent phrase inside a card that IS Tal talking says
    nothing. The blue marks it as a named reading rather than as emphasis. */
+/* THE POPOVER BODY IS --text-secondary (#828282), NOT THE PAGE INK — Maryam,
+   9 Sep 2026, Figma 875:6570. The card's prose (the two reads and the next-step
+   line) is a description, so it takes the description grey the whole product
+   uses, not #111. Weight stays --t-w-book (400), the Figma's Regular. The blue
+   lead-in `.sd-read b` (§10a below) and the "Your Next Step" label `.sd-nt`
+   (black) keep their own colours — only the running prose moves. */
 .app .sumdrop .sd-lead,
 .app .sumdrop .sd-read,
 .app .sumdrop .sd-nb{
   font-size:var(--t-compact-size);line-height:1.8;
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
-  color:var(--text-primary)}
+  color:var(--text-secondary)}
 /* THIS RULE IS (0,3,1) AND IT NEVER WON — kept for the weight, which nothing
    contests, and answered below for the colour. See §10a. */
 .app .sumdrop .sd-read b{font-weight:var(--t-w-strong);color:#0488c5}
@@ -1797,6 +1929,15 @@
    reason it is not orange on every other one. Seven classes settle both.
    §70 states the matching 5% ground on the identical selector. */
 .app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-read b{color:#0488c5}
+
+/* THE "YOUR NEXT STEP" LABEL STAYS BLACK, and it needs the same out-specifying
+   the blue lead-in did. `placeSumDrop` appends the card into `.ai-body`, so
+   §33:123 `.ai-aura.talsum > .ai-body p{color:inherit}` (0,5,1) reaches every
+   `<p>` in it — the reads and the next-step line ride it down to the body's
+   #828282 (correct, Figma 875:6570), but `.sd-nt` is a heading and the Figma
+   sets it black. `.app .sumdrop .sd-nt` (0,3,0) loses to that inherit, so it is
+   restated here at (0,6,0). Maryam, 9 Sep 2026. */
+.app .modhead .ai-aura.talsum .ai-body .sumdrop .sd-nt{color:var(--text-primary)}
 
 /* ------------------------------------------------------------------ 11 ---
    THE COURSE HEAD — §71's families
@@ -2389,6 +2530,15 @@
 .app .stats .stat-top > .l{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+/* THE FIGURE-CARD TITLE IS BLACK, NOT THE GREY EYEBROW (Maryam, 9 Sep 2026: "the
+   four card titles should be black always, please revise the 4 cards structure
+   everywhere"). §7's eyebrow rule sets `.stats .l` / `.facts .l` / `.pf-facts
+   .pf-l` to `--text-secondary`; the card TITLE is read, not scanned, so it takes
+   `--text-primary` while keeping the size and weight set above. The sub-line
+   (`.d`) under it stays `--text-secondary`, so the title/description split holds.
+   The dark-card ink rule (§6a, later) still wins on a black ground, so a figure
+   band on a dark card keeps `--on-dark`. All portals via the DS. */
+.app .stats .l,.app .facts .l,.app .page .pf-facts .pf-l{color:var(--text-primary)}
 
 /* THE BOOKING PICKER'S TYPE IS DELETED WITH THE PICKER (Maryam, 3 Sep 2026 —
    "calendly is the iframe we will be using so we do no need this design").
@@ -2484,6 +2634,13 @@
 .app .crow-dark .crow-role,
 .app .crow-dark .crow-x{color:var(--on-dark-2)}
 .app .crow-dark .crow-n{color:var(--on-dark)}
+/* `.crow-due` — the countdown on the name line (§119) — is `.dc-when`'s type
+   to the token: h4 / strong / on-dark. One fact, one rank, wherever the card
+   puts it. Stated on `.crow-dark` because the row only draws it on black. */
+.app .crow-dark .crow-due{
+  font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls);
+  text-transform:none;color:var(--on-dark)}
 
 /* THREE RULES CAME OUT OF THIS BLOCK AND TWO OF THEM CAME BACK THE SAME DAY.
    `.crow-dark .crow-when > span` was the session line inside the tinted cell,
@@ -2782,6 +2939,22 @@
   text-transform:none;color:var(--text-primary)}
 .app .qzp-t.ok{color:var(--mk-2)}
 .app .qzp-t.acc{color:var(--accent-text)}
+/* THE REQUEST CARD'S QUOTE READS IN THE ACCENT (§122, agent portal) — Maryam,
+   6 Sep 2026. The one line the card surfaces from the candidate's request wears
+   the Tal star (§122 draws the mark) and the accent, so it is a stated exception
+   here rather than a colour set in a layer after this one. It is the BRIGHT
+   `--accent` (#ff3733), not the `--accent-text` ink — Maryam, same day: "the
+   text color is also not the accent color, change it to the accent color", so it
+   matches the `✦ Tal` head label rather than the muted ink, a deliberate step
+   past the accent-on-words rule for this one Tal-framed line. */
+.app .rqc-q{color:var(--accent)}
+/* THE 90-DAY COURSE NAME IS BLUE AND A STEP HEAVIER (§122's re-interview line) —
+   Maryam, 6 Sep 2026: "the course name should be blue and little more in weight".
+   `--link` is the platform's AA-safe blue (#0371a4, the same hue §12/§63 use for a
+   real link), and `--t-w-strong` is the Medium — the only step up the two-weight
+   face allows. It lifts the course out of the grey `scored 88%` beside it. Colour
+   and weight, so it is §63's; the surrounding line stays `.t-caption` helper. */
+.app .rqc-course{color:var(--link); font-weight:var(--t-w-strong)}
 .app .qzp-l li{
   font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
@@ -3909,11 +4082,14 @@
   font-size:var(--t-label-size);line-height:var(--t-label-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
   text-transform:none}
-.app .chip-msg,.app .chip-edit{color:var(--link)}
-.app .chip-note{color:var(--support-warning-ic)}
+/* DE-COLOURED: the row's action chips are bare black now, not blue/amber/red
+   pills (Maryam 9 Sep 2026, "remove the backgrounds ... the icons in black are
+   fine"). One ink for all four; 95.4 drops their washes. */
+.app .chip-msg,.app .chip-edit{color:var(--icon-primary)}
+.app .chip-note{color:var(--icon-primary)}
 /* The note row's Delete, added 2 Sep 2026. `--danger-ink` on its own 12% wash
    is 5.9:1 — §31 measures the same pair for the attention queue's severe chip. */
-.app .chip-del{color:var(--danger-ink)}
+.app .chip-del{color:var(--icon-primary)}
 
 /* =========================================================================
    28 — YOUR PRIVATE NOTES (§99's three states)
@@ -3959,7 +4135,10 @@
 .app .note-tag{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
-  text-transform:none;color:var(--note-ink)}
+  /* ACCENT INK on a light accent wash (Maryam 9 Sep 2026, "accent color text
+     and light accent color bg") — every note tag, whatever its category, not the
+     per-category `--note-ink` it was. The category vars go unread. */
+  text-transform:none;color:var(--accent-text)}
 .app .note-w{
   font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-caption-ls);
@@ -4431,9 +4610,14 @@
    before copying its recipe: that mix is against `--layer-01`, white paper, so
    12% red reads clearly. Against black, 12% is invisible and the chip becomes a
    rectangle of nothing. §108.5 states the value it needs and why. */
+/* CAPTION, NOT LABEL (Maryam, 9 Sep 2026: "make the 2 seats left chip smaller").
+   The chip was `--t-label` 12.5px; `--t-caption` 11.5 is the floor role and the
+   smaller footprint the ask wants. Its shorter 16px line height also sits it
+   cleanly on the "Total Members" heading line — §108.5's `align-items:center`
+   centres it there. The vertical padding comes down with it in §108. */
 .app .eo-chip{
-  font-size:var(--t-label-size);line-height:var(--t-label-lh);
-  font-weight:var(--t-w-strong);letter-spacing:var(--t-label-ls);
+  font-size:var(--t-caption-size);line-height:var(--t-caption-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-caption-ls);
   text-transform:none;color:var(--text-primary)}
 .app .dark-card .eo-chip{color:var(--on-dark)}
 
@@ -4563,7 +4747,11 @@
 .app .ob-chat-lede{
   font-size:var(--t-sec-size);line-height:26px;
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
+  /* THE LEDE IS A DESCRIPTION, so it is `--text-secondary` #828282 (Maryam,
+     9 Sep 2026: "change the desc color to #828282"), the platform's one
+     description grey (§63 §1). The greeting on top (`:first-child`, below) keeps
+     `--text-primary` — it is the heading, not a description. */
+  color:var(--text-secondary)}
 
 /* THE CONVERSATION IS 14px — Maryam, 3 Sep 2026: "use 14px font size for the
    questions and the responses send by the user."
@@ -4889,7 +5077,7 @@
    `--on-accent` ON THE TICK IS DELETED with the chip it sat in: the mark is
    bare now, so the tick is the green itself rather than white on a fill. */
 .app .ob-qp-r.on .ob-qp-l{color:var(--accent-text)}
-.app .ob-qp-r .ob-jr-ic{color:#515151}
+.app .ob-qp-r .ob-jr-ic{color:var(--text-secondary)}
 .app .ob-qp-r.done .ob-jr-ic{color:#00a43c}
 .app .ob-qp-r.on .ob-jr-ic{color:var(--accent-text)}
 .app .ob-compose.off .ob-in::placeholder{color:var(--text-helper)}
@@ -5095,10 +5283,18 @@
 .app .ask-page .tal-hero h2 .askv-q{
   font-weight:var(--t-w-book);
   color:var(--text-primary)}
+/* THE SENTENCE UNDER THE GREETING FOLLOWS THE ONBOARDING LEDE'S SIZE — Maryam,
+   9 Sep 2026: "the font size of desc of tal onboarding should be followed in tal
+   chat as well." So it is `--t-sec-size` / 26 in `--text-secondary`, the same
+   rank `.ob-chat-lede` takes under its own greeting. This REVERSES the 4 Sep
+   call recorded here before (drop it to `--t-desc-size` as one supporting line
+   under a 28px greeting); the two greeting-plus-lede screens read at one size
+   now, which is what the newest ask wants. Still a description, so still
+   `--text-secondary`. */
 .app .ask-page .tal-hero p{
   font-size:var(--t-sec-size);line-height:26px;
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
-  color:var(--text-primary)}
+  color:var(--text-secondary)}
 .app .ask-page .ask-thread .tal-msg:not(.me) > .bb{
   font-size:var(--t-h4-size);line-height:22px;
   font-weight:var(--t-w-book);letter-spacing:var(--t-body-ls);
@@ -5149,3 +5345,105 @@
    literal to the token, and state `.app b,.app strong`" — and it is Maryam's,
    because it changes the weight of most emphasised text in the product at once.
    ========================================================================== */
+
+/* ==========================================================================
+   51. THE RAIL'S SECOND LEVEL — §120's `.sn-sub` (Super Admin, 4 Sep 2026)
+
+   §120 draws the admin's sub-modules as `.sn-item.sn-sub` rows under the open
+   module and states no type. A sub-row is one step under the module label —
+   `.sn-item` is the body size at the strong weight (§0 above, "a button is the
+   h4 tier at the body size") — so it takes COMPACT at the book weight in the
+   secondary grey, and the one you are on takes the strong weight in the accent,
+   which is §34's rule for the selected rail label (`.app .sn-item.on`, §44
+   above) carried down a level. (0,3,0) against §0's (0,2,0) and §44's (0,3,0),
+   later in the file, so it wins on weight for the first and on order for the
+   second — §7b's rule.
+   ========================================================================== */
+.app .sn-item.sn-sub{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-book);letter-spacing:var(--t-compact-ls);
+  color:#828282}
+.app .sn-item.sn-sub.on{font-weight:var(--t-w-strong);color:var(--accent)}
+
+/* ==========================================================================
+   52. THE SELECTED DROPDOWN OPTION — §123's `.dd-opt.on` (agent, 6 Sep 2026)
+
+   §123's custom dropdown marks the chosen row with a tick and a ground; Maryam
+   asked for its WORDS in the accent too ("its text and tick should be in accent
+   color"). `--accent-text` — the accent as ink, the AA-safe value §7's
+   `.plate-v` and §10's Tal highlights already take on white — so the selected
+   label and its tick (§123 fills the tick to the same value) read as one accent
+   object. The unselected rows keep the body ink. (0,4,0) against `.t-body`'s
+   (0,2,0) on the same span, and last in the file, so it wins on both counts —
+   §7b's rule.
+   ========================================================================== */
+.app .dd-opt.on .dd-opt-t{color:var(--accent-text)}
+
+/* ==========================================================================
+   53. THE ADMIN'S STATUS-AS-TEXT INKS — §126 (admin, 7 Sep 2026)
+
+   Maryam: "never add status in tags". The admin's `tag()` helper now stamps
+   `.statw` — plain text, no chip (the layout is §126). Its colour is the
+   good / waiting / problem SET (§14): the same inks the chip carried, now on
+   the word itself. Stated HERE because §63 owns text colour and a later layer
+   may not set it — the size and weight are the cell's own (a status inherits
+   the table body, so this states no size, keeping §1 the only scale). The
+   neutral state (no colour class) is `--text-secondary`, the description grey.
+   Admin-scoped: only that portal writes `.statw`.
+   ========================================================================== */
+.app[data-portal="admin"] .statw{color:var(--text-secondary)}
+.app[data-portal="admin"] .statw.green{color:var(--support-success-ink)}
+.app[data-portal="admin"] .statw.warn{color:var(--support-attention)}
+.app[data-portal="admin"] .statw.red{color:var(--support-error)}
+
+/* ==========================================================================
+   54. THE PAGINATION PROSE IS THE FLOOR GREY — §127 (Maryam, 7 Sep 2026)
+
+   §127's bar reuses `.btn` for its controls (their type is §63's already), and
+   its only free-standing words are the "Rows per page" label and the "1–5 of 33"
+   range — a caption tier, so `--text-helper` (the floor: counts and metadata),
+   stated here because §63 owns text colour. The "…" gap between page numbers
+   takes the same grey.
+   ========================================================================== */
+.app .pgn-lbl,.app .pgn-info,.app .pgn-gap{color:var(--text-helper)}
+
+/* ==========================================================================
+   55. THE ADMIN'S OPEN-RAIL COUNT IS A SIZE SMALLER — §120.1b (7 Sep 2026)
+
+   Maryam: "the count circle needs to be smaller as well." §120.1b brings the
+   open-rail badge's box down (18px); its number comes down with it, from §14's
+   11px to 10px — stated here because §63 owns font size. Admin-scoped and
+   open-rail-only; the collapsed rail's 9.5px badge (§11) is untouched.
+   ========================================================================== */
+.app[data-portal="admin"][data-rail="open"] .sn-item .badge{font-size:10px}
+
+/* ==========================================================================
+   56. THE ADMIN TABLE'S FIRST COLUMN IS MEDIUM — §128 / §31 (7 Sep 2026)
+
+   The cohort leader's table sets its first cell `font-weight:600` (§31.5) so the
+   name is the thing the eye lands on. The admin follows it, at the platform's
+   `--t-w-strong` (500, not 600 — two weights only, §63). Stated here because §63
+   owns weight. The two-line identity cell (`idCell`) keeps its caption sub-line
+   at book weight so only the name carries it. Admin-scoped.
+   ========================================================================== */
+.app[data-portal="admin"] .tbl td:first-child{font-weight:var(--t-w-strong)}
+.app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
+
+/* ==========================================================================
+   57. THE VIEW-AS BAR'S LINE — §129 (SA-11, 7 Sep 2026)
+
+   §129 lays the bar out and states no type. Its one sentence is `--t-compact`
+   — a status line, not body copy — in the primary ink; the viewed account's
+   NAME is the strong weight in `--accent-text`, the accent as ink (DESIGN.md
+   §3), so the eye lands on whose name the admin is acting under before it
+   reads anything else. Stated here because §63 owns size, weight and text
+   colour. Admin-scoped: only that portal writes `.viewas`.
+   ========================================================================== */
+.app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
+.app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
+
+/* THE RANK CHIP IS RED ACCENT INK (Maryam, 9 Sep 2026: "light red with red
+   accent text"). It carries `.t-label` for its size; §63 owns the colour, so it
+   is set here — `--accent-text`, the accent as ink, over §105's light-red pill.
+   `.t-label` inked `--text-secondary`, and this (0,2,0, later) overrides it. */
+.app .rank-chip{color:var(--accent-text)}

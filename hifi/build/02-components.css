@@ -115,6 +115,31 @@
   .btn:not(.noic){padding-right:var(--s05)}
 }
 
+/* A LEADING-ICON BUTTON GETS A TOUCH MORE RIGHT PADDING — Maryam, 7 Sep 2026:
+   "if a button has [an] icon on the left then increase the right side padding of
+   that button a little bit." A centred button whose mark sits BEFORE the label
+   (`<svg> Add User`) reads right-tight: the icon carries its own left air, so
+   the whole group feels pushed against the trailing wall. The wall gains +--s02
+   (4px), which nudges the centred group back left to sit optically even.
+   Universal, one rule in the shared button layer, so every portal inherits it.
+   ONLY the leading case is touched:
+   - the GO arrow (`I.arrowRight`, tagged `.i-go`) TRAILS a button, so a button
+     that contains it is excluded — that is what separates leading from trailing
+     (both are a lone <svg> child, indistinguishable structurally, §icons);
+   - `.ic-l` already ends its box at the words (§24) and opts out;
+   - AN ICON-ONLY BUTTON (a lone svg with NO label — the `.pfe-ic` edit pencil)
+     is excluded by `:not(:has(> svg:only-child))`. The +4px exists to un-tight a
+     group of icon-then-WORDS; with no words there is no group, and on a
+     fixed-width icon button (`.pfe-ic` is 32px) the extra right padding instead
+     squeezes the centred glyph — a 20px pencil rendered 10px wide until this
+     opt-out. "Leading icon" means an icon leading something;
+   - the `:not(.noic)` space-between model puts the icon on the right and opts
+     out; `.ghost` keeps its own tighter frame. */
+.app .btn.noic:not(.ghost):has(> svg:first-child):not(:has(> svg:only-child)):not(:has(svg.i-go)):not(.ic-l){
+  padding-right:calc(var(--s05) + var(--s02))}
+.app .btn-sm.noic:not(.ghost):has(> svg:first-child):not(:has(> svg:only-child)):not(:has(svg.i-go)):not(.ic-l){
+  padding-right:calc(var(--s04) + var(--s02))}
+
 /* text link */
 .lk,.lnk,.score-link{
   display:inline-flex;align-items:center;gap:var(--s02);
@@ -406,17 +431,39 @@ svg.arrow,.tile-arrow,.card-go{
   transform:translateY(16px);
   transition:transform var(--dur-standard) var(--ease-decelerate)}
 .modal.on .sheet{transform:translateY(0)}
+/* THE HEADER PADDING MATCHES THE BODY AND THE FOOTER — one inset all round the
+   modal (Maryam, 6 Sep 2026: "the padding should be equal for the heading and
+   the bottom content"). It used to be `var(--s05)` top/bottom (16) against the
+   body's `var(--s06)` (24), so the title sat tighter to the walls than the
+   fields did. Now `var(--s06)` on three sides; the right stays `var(--s05)`
+   because the 44px `.x` close target already carries its own visual inset, so a
+   full 24 there would push the mark too far in. `position:relative` for the
+   inset divider below. The `padding-left` override in §10.375 is dropped for
+   `.sheet-h` in the same edit so this shorthand is not re-overridden. */
 .sheet-h{
   flex:none;display:flex;align-items:center;gap:var(--s04);
-  padding:var(--s05) var(--s05) var(--s05) var(--s06);
-  border-bottom:1px solid var(--border-subtle-01)}
+  padding:var(--s06) var(--s05) var(--s06) var(--s06);
+  position:relative}
+/* THE HEADER DIVIDER IS INSET, not attached to the walls (same ask). A
+   `border-bottom` runs the sheet's full width and meets the sheet's own 1px
+   border at both ends; an absolutely positioned rule inset by the header's own
+   `--s06` padding starts and stops where the content does — §78's account-menu
+   divider technique, and it takes no layout so the header height is unchanged. */
+.sheet-h::after{content:'';position:absolute;left:var(--s06);right:var(--s06);
+  bottom:0;height:1px;background:var(--border-subtle-01)}
 .sheet-h h2{font-size:18px;line-height:24px;font-weight:600;letter-spacing:-.2px}
 .sheet-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;flex:none}
 .sheet-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
 .sheet-h .x:hover{background:var(--overlay-hover)}
 .sheet-b{flex:1;overflow-y:auto;padding:var(--s06)}
-.sheet-f{flex:none;display:flex;gap:var(--s04);padding:var(--s05) var(--s06);
-  border-top:1px solid var(--border-subtle-01)}
+/* NO RULE ABOVE THE BUTTONS (Maryam, 6 Sep 2026: "remove the divider above the
+   buttons row"). §02 used to give the footer a `border-top` to separate a fixed
+   action bar from a scrolling body; the modal reads cleaner without it, the body
+   still owns the `--s06` gap above, and §64's footer-arrow opt-out and §105's
+   `.conf` variant already treated this line as removable. Padding is `var(--s06)`
+   all round, equal to the header, so the buttons sit the same inset from the
+   walls as the title does. */
+.sheet-f{flex:none;display:flex;gap:var(--s04);padding:var(--s06)}
 .sheet-f .btn{flex:1}
 @container app (min-width:600px){
   .modal{align-items:center}

@@ -97,8 +97,11 @@ function obMemo(){
      'You told me on the first screen, before anything was assessed.'],
     ['why',   'You said this is the hard part: &ldquo;' + obLabel('why') + '&rdquo;',
      'Your own words, about the band your quiz put lowest.'],
-    ['want',  'What you want out of the 90 days: ' + obLabel('want').toLowerCase() + '.',
-     'You chose it from four, on the way in.']
+    /* THE 90-DAY ROW READS `intent` NOW, not the removed `want` question
+       (Maryam, 9 Sep 2026) — the intent question took over that phrasing, so the
+       note is unchanged in words and only its source key moved. */
+    ['intent', 'What you want out of the 90 days: ' + obLabel('intent').toLowerCase() + '.',
+     'You chose it on the way in.']
   ].map(([k, key, why]) => ({k:key, why, src:'What you told me', kind:'note', when:OB_MEMO_WHEN}));
 
   /* THE NOTE TO THE AGENT IS ONLY HELD IF IT WAS WRITTEN, and it is quoted
@@ -160,7 +163,7 @@ V.mem = (f) => {
     <ul class="never">
       ${NEVER.map(n => `<li>${I.viewOff}<span>${n}</span></li>`).join('')}
     </ul>
-    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Forgetting a line here removes it from what I use. It does not delete the interview recording or the note it came from &mdash; those are yours and they are managed in Profile.</p>
+    <p class="t-legal-01 mt5" style="color:var(--text-helper)">Forgetting a line here removes it from what I use. It does not delete the interview recording or the note it came from. Those are yours and they are managed in Profile.</p>
   </div>
 </div></main>`;
 };
