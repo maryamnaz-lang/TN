@@ -266,8 +266,8 @@ const USERS=[
  {id:'u1', name:'Dana Whitfield', email:'dana@talentnext.io', roles:['agent'], level:'—', job:'Engineering Manager, Stripe', rating:4.9, interviewed:64, status:'active', joined:'03-12-2026', origin:'individual', last:'2h ago', fee:180, cohorts:['Explorer 12']},
  {id:'u2', name:'Marcus Ozoro', email:'marcus@northgate.health', roles:['agent'], level:'—', job:'Clinical Lead, Northgate Health', rating:4.6, interviewed:28, status:'active', joined:'02-04-2026', origin:'individual', last:'1d ago', fee:160},
  {id:'u3', name:'Priya Raman', email:'priya@talentnext.io', roles:['agent','reviewer'], level:'—', job:'Product Director, Atlassian', rating:4.8, interviewed:52, status:'active', joined:'01-21-2026', origin:'individual', last:'20m ago', fee:225},
- {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)']},
- {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)']},
+ {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)'], volunteer:false},
+ {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)'], volunteer:true},
  {id:'u5', name:'Jordan Vale', email:'jordan@vale.co', roles:['candidate'], level:'B1 · Builder', status:'active', joined:'04-02-2026', origin:'signal', last:'3d ago'},
  {id:'u6', name:'Amara Okafor', email:'amara@brightpath.io', roles:['employer'], level:'—', status:'ok', joined:'03-18-2026', origin:'individual', last:'5h ago', company:'BrightPath'},
  {id:'u7', name:'Tom Reeves', email:'tom@filtergo.com', roles:['candidate'], level:'Explorer', status:'active', joined:'03-29-2026', origin:'filtergo', last:'6d ago'},
@@ -409,19 +409,23 @@ const CANDS=[
  {id:'u32', name:'Aaron Feld', bucket:'Explorer', level:'E1', cohort:'Explorer 15', agent:'—', consent:{video:1,ai:1,scenes:0,vis:0}, status:'active', last:'7d ago'}
 ];
 const CAND_BY_ID={}; CANDS.forEach(c => CAND_BY_ID[c.id]=c);
+/* NEW (flow review, 11 Sep 2026): the levelling chain is Tal (AI) -> agent -> admin.
+   Each review now carries `talTo`, the level Tal recommended off the interview, so the
+   queue can show the full chain and flag where the agent OVERRODE Tal (talTo !== to).
+   The admin still makes the final call (sign off, hold, send back, or override). */
 const LEVELQ=[
- {id:'l1', name:'Maryam Naz', from:'E1', to:'E2', agent:'Priya Raman', rec:'Promote', when:'Yesterday', status:'pending'},
- {id:'l2', name:'Jordan Vale', from:'B1', to:'B1', agent:'Priya Raman', rec:'Hold at level', when:'2 days ago', status:'pending'},
- {id:'l3', name:'Chris Boone', from:'E1', to:'E1', agent:'Dana Whitfield', rec:'Not ready to re-interview', when:'4 days ago', status:'pending'},
- {id:'l4', name:'Hana Sato', from:'B1', to:'B2', agent:'Marcus Ozoro', rec:'Promote', when:'Today', status:'pending'},
- {id:'l5', name:'Grace Kim', from:'E2', to:'E3', agent:'Dana Whitfield', rec:'Promote', when:'Yesterday', status:'pending'},
- {id:'l6', name:'Diego Alvarez', from:'B1', to:'B1', agent:'Naomi Frost', rec:'Hold at level', when:'3 days ago', status:'pending'}
+ {id:'l1', name:'Maryam Naz', from:'E1', to:'E2', talTo:'E2', agent:'Priya Raman', rec:'Promote', when:'Yesterday', status:'pending'},
+ {id:'l2', name:'Jordan Vale', from:'B1', to:'B1', talTo:'B2', agent:'Priya Raman', rec:'Hold at level', when:'2 days ago', status:'pending'},
+ {id:'l3', name:'Chris Boone', from:'E1', to:'E1', talTo:'E1', agent:'Dana Whitfield', rec:'Not ready to re-interview', when:'4 days ago', status:'pending'},
+ {id:'l4', name:'Hana Sato', from:'B1', to:'B2', talTo:'B2', agent:'Marcus Ozoro', rec:'Promote', when:'Today', status:'pending'},
+ {id:'l5', name:'Grace Kim', from:'E2', to:'E3', talTo:'E2', agent:'Dana Whitfield', rec:'Promote', when:'Yesterday', status:'pending'},
+ {id:'l6', name:'Diego Alvarez', from:'B1', to:'B1', talTo:'B1', agent:'Naomi Frost', rec:'Hold at level', when:'3 days ago', status:'pending'}
 ];
 const COHORTS=[
- {id:'ch1', name:'Explorer 12', track:'Explorer', level:'E1', templateId:'tpl1', leader:'Maryam Naz (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active'},
- {id:'ch2', name:'Explorer 14', track:'Explorer', level:'E1', templateId:'tpl1', leader:'Unassigned', size:7, week:1, day:3, start:'2026-08-07', status:'active'},
- {id:'ch3', name:'Builder 3', track:'Builder', level:'B1', templateId:'', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active'},
- {id:'ch4', name:'Explorer 15', track:'Explorer', level:'E3', templateId:'tpl2', leader:'Grace Kim (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft'}
+ {id:'ch1', name:'Explorer 12', track:'Explorer', leader:'Maryam Naz (Builder)', size:10, week:12, day:84, start:'2026-05-19', status:'active', sessions:[{id:'ch1s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch1s2', title:'Mid-cycle levelling check-in', week:6, dur:45, mode:'Live'}, {id:'ch1s3', title:'Portfolio workshop', week:9, dur:90, mode:'Workshop'}]},
+ {id:'ch2', name:'Explorer 14', track:'Explorer', leader:'Unassigned', size:7, week:1, day:3, start:'2026-08-07', status:'active', sessions:[{id:'ch2s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch2s2', title:'Interview prep clinic', week:4, dur:60, mode:'Workshop'}]},
+ {id:'ch3', name:'Builder 3', track:'Builder', leader:'Dana Whitfield (Trailblazer)', size:6, week:5, day:32, start:'2026-07-08', status:'active', sessions:[{id:'ch3s1', title:'Kick-off and goals', week:1, dur:60, mode:'Live'}, {id:'ch3s2', title:'Systems design deep-dive', week:5, dur:90, mode:'Workshop'}, {id:'ch3s3', title:'Async retro', week:8, dur:30, mode:'Async'}]},
+ {id:'ch4', name:'Explorer 15', track:'Explorer', leader:'Grace Kim (Builder)', size:0, week:0, day:0, start:'2026-08-18', status:'draft', sessions:[]}
 ];
 function syncCohortSizes(){ COHORTS.forEach(c => { c.size = CANDS.filter(x => x.cohort === c.name).length; }); }
 syncCohortSizes();
@@ -447,45 +451,8 @@ const COURSE_LIB=[
  {id:'lc7', name:'Decision-Making Under Uncertainty', track:'Builder', price:180},
  {id:'lc8', name:'Executive Presence', track:'Trailblazer', price:250}
 ];
-const CO_TEMPLATES=[
- {id:'tpl1', name:'Explorer Foundations', track:'Explorer', level:'E1', courseId:'co1', status:'published', used:2,
-  sessions:[
-   {id:'ts11', title:'Kickoff & cohort norms', week:1, dur:60, mode:'Live'},
-   {id:'ts12', title:'Discovering your TALENT profile', week:2, dur:90, mode:'Live'},
-   {id:'ts13', title:'Workshop — first project brief', week:4, dur:90, mode:'Live'},
-   {id:'ts14', title:'Mid-cycle levelling check-in', week:7, dur:60, mode:'Live'},
-   {id:'ts15', title:'Demo day & retrospective', week:12, dur:120, mode:'Live'}
-  ]},
- {id:'tpl2', name:'Explorer Advanced', track:'Explorer', level:'E3', courseId:'co1', status:'published', used:1,
-  sessions:[
-   {id:'ts21', title:'Advanced kickoff & stretch goals', week:1, dur:60, mode:'Live'},
-   {id:'ts22', title:'Deep-dive workshop I', week:3, dur:90, mode:'Live'},
-   {id:'ts23', title:'Deep-dive workshop II', week:6, dur:90, mode:'Live'},
-   {id:'ts24', title:'Portfolio review', week:9, dur:75, mode:'Live'},
-   {id:'ts25', title:'Demo day & levelling', week:12, dur:120, mode:'Live'}
-  ]},
- {id:'tpl5', name:'Explorer Kickstart', track:'Explorer', level:'E2', courseId:'co1', status:'published', used:0,
-  sessions:[
-   {id:'ts51', title:'Fast-start orientation', week:1, dur:60, mode:'Live'},
-   {id:'ts52', title:'Skills sprint workshop', week:3, dur:90, mode:'Workshop'},
-   {id:'ts53', title:'Peer review & feedback', week:6, dur:60, mode:'Live'},
-   {id:'ts54', title:'Demo day & levelling', week:12, dur:120, mode:'Live'}
-  ]},
- {id:'tpl4', name:'Trailblazer Mastery', track:'Trailblazer', level:'T1', courseId:'co3', status:'draft', used:0,
-  sessions:[
-   {id:'ts41', title:'Mastery kickoff', week:1, dur:75, mode:'Live'},
-   {id:'ts42', title:'Programme design workshop', week:4, dur:120, mode:'Workshop'},
-   {id:'ts43', title:'Capstone & demo day', week:12, dur:120, mode:'Live'}
-  ]},
- {id:'tpl6', name:'Trailblazer Leadership', track:'Trailblazer', level:'T2', courseId:'co3', status:'published', used:0,
-  sessions:[
-   {id:'ts61', title:'Leadership kickoff', week:1, dur:75, mode:'Live'},
-   {id:'ts62', title:'Mentoring & coaching clinic', week:4, dur:90, mode:'Live'},
-   {id:'ts63', title:'Programme leadership sprint', week:8, dur:120, mode:'Workshop'},
-   {id:'ts64', title:'Capstone & demo day', week:12, dur:120, mode:'Live'}
-  ]}
-];
-const TPL_BY_ID={}; CO_TEMPLATES.forEach(t => TPL_BY_ID[t.id]=t);
+/* REMOVED (flow review, 11 Sep 2026): CO_TEMPLATES / TPL_BY_ID — Cohort Templates is
+   gone. Cohorts own their own `sessions` (see the COHORTS seed and KINDS.cohort). */
 const LEADER_REQS=[
  {id:'lr1', name:'Bruno Sella', bucket:'Builder', level:'B3', track:'Explorer', led:2, rating:4.8, when:'2 days ago', pitch:'Led Explorer 9 to a 92% completion rate — I want to take another Explorer cohort.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-08', time:'11:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Structured, calm answers on delegation and recovery. Ready to lead.'}},
  {id:'lr2', name:'Dana Whitfield', bucket:'Trailblazer', level:'T3', track:'Builder', led:2, rating:4.9, when:'3 days ago', pitch:'Two Builder cohorts led already — happy to take another Builder group.', stage:'feedback', interview:{agent:'Priya Raman', date:'2026-08-07', time:'10:00'}, feedback:{rec:'recommend', agent:'Priya Raman', note:'Two cohorts led already; clear and steady. Recommend.'}},
@@ -852,13 +819,13 @@ const MODULES=[
  {k:'users', t:'Users & Roles', ic:'users', subs:[
    {k:'users', t:'All Users'}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
  {k:'vetting', t:'Vetting & Approvals', ic:'vetting', subs:[
-   {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}]},
+   {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}, {k:'empverifydetail', t:'Employer', hidden:true}]},
  {k:'candidates', t:'Candidates', ic:'candidates', subs:[
    {k:'candidates', t:'All Candidates'}, {k:'levelling', t:'Levelling & Reviews'}, {k:'detail', t:'Candidate', hidden:true}]},
  {k:'agents', t:'Talent Agents', ic:'agents', subs:[
    {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}]},
  {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
-   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'templates', t:'Cohort Templates'}, {k:'detail', t:'Cohort', hidden:true}, {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}, {k:'levels', t:'Levels & Buckets'}]},
+   {k:'cohorts', t:'Cohorts'}, {k:'assign', t:'Cohort Leaders'}, {k:'detail', t:'Cohort', hidden:true}, {k:'catalogue', t:'Course Catalogue'}, {k:'coursedetail', t:'Course', hidden:true}, {k:'levels', t:'Levels & Buckets'}]},
  {k:'market', t:'Marketplace & Interviews', ic:'market', subs:[
    {k:'bookings', t:'Bookings'}, {k:'recordings', t:'Recordings & Transcripts'}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
@@ -1742,12 +1709,23 @@ const V = {};
 
 /* ------------------------------------------------------------ DASHBOARD --- */
 function homeOverview(){
-  const totalUsers = USERS.length;
-  const activeUsers = countActive(USERS);
   const activeCands = countActive(CANDS);
   const agentCount = USERS.filter(u => u.roles.includes('agent')).length;
-  const empCount = EMPLOYERS.length;
+  /* COHORT LEADERS vs MODERATORS (Maryam, 11 Sep 2026). A cohort leader who
+     VOLUNTEERED is a "Cohort Leader"; one the Super Admin ADDED on their own —
+     who did not volunteer — is a "Moderator". The seed carries no moderator
+     flag, so `u.volunteer` splits the two leader-role accounts by the signal
+     that is already in the data: u4 (Maryam) was ASSIGNED to Explorer 14 by a
+     reviewer (the audit line "Assigned cohort leader"), so `volunteer:false`,
+     a moderator; u40 (Bruno) leads Explorer 12 with no assignment, a volunteer.
+     Authored placeholder split — the dashboard figure is read off the seed, not
+     a signed-off KPI (SA-03 E1). */
+  const leaders = USERS.filter(u => u.roles.includes('leader'));
+  const cohortLeaderCount = leaders.filter(u => u.volunteer !== false).length;
+  const moderatorCount = leaders.filter(u => u.volunteer === false).length;
   const activeCohorts = COHORTS.filter(c => c.status === 'active').length;
+  const liveCourses = COURSES.filter(c => c.status === 'live').length;
+  const draftCourses = COURSES.filter(c => c.status === 'draft').length;
   const gross = grossProcessed();
   const inprog = inProgress();
   const highDec = DECISIONS.filter(d => d.sev === 'high').length;
@@ -1801,23 +1779,23 @@ function homeOverview(){
   const liveCohorts = COHORTS.filter(c => c.status === 'active');
 
   return `
+  ${/* ONE ATTACHED 2×4 GRID (Maryam, 11 Sep 2026): "remove the money at glance
+        heading, remove the divider between both sections, join both card rows".
+        The two `.stats` bands become a single eight-cell `.stats` under the one
+        "Platform at a glance" heading — `.stats` is a fixed four-column grid
+        whose 1px gap paints the hairline, so eight cells read as two attached
+        rows of four (the profile's §105 pf-facts pattern). */''}
   <section class="sec">
     ${secHead('Platform at a glance')}
     ${stats([
-      ['users', 'Users', String(totalUsers), `${activeUsers} active`],
       ['candidates', 'Candidates', String(activeCands), `active, across ${activeCohorts} cohorts`],
-      ['agents', 'Agents', String(agentCount), 'setting their own fee'],
-      ['employers', 'Employers', String(empCount), `${EMPLOYERS.filter(e => e.verify === 'ok').length} verified`]
-    ])}
-  </section>
-
-  <section class="sec">
-    ${secHead('Money at a glance')}
-    ${stats([
-      ['money', 'Gross', money(gross), 'processed this window'],
-      ['bank', 'In progress', money(inprog), 'held, not yet settled'],
+      ['group', 'Cohort leaders', String(cohortLeaderCount), 'volunteered to lead'],
+      ['shield', 'Moderators', String(moderatorCount), 'added by an admin'],
+      ['agents', 'Talent agents', String(agentCount), 'setting their own fee'],
       ['cohorts', 'Cohorts', String(activeCohorts), `active, ${COHORTS.filter(c => c.status === 'draft').length} in draft`],
-      ['market', 'Bookings', String(BOOKINGS.length), `${BOOKINGS.filter(b => b.status === 'active').length} confirmed`]
+      ['book', 'Courses', String(COURSES.length), `${liveCourses} live, ${draftCourses} in draft`],
+      ['money', 'Gross payment', money(gross), 'processed this window'],
+      ['bank', 'Payment in progress', money(inprog), 'held, not yet settled']
     ])}
   </section>
 
@@ -2706,13 +2684,55 @@ function vettingEmpVerify(){
       ${rows.map(e => cardRow('store',
         `${esc(e.name)} ${tag(e.verify, e.verify === 'review' ? 'Under review' : 'Unverified')}`,
         `${esc(e.industry)} · ${esc(e.location)} · ${esc(e.type)} · ${esc(e.domain)}`,
-        `<button class="btn btn-g btn-sm noic" data-act="askdecline:${e.id}">Decline</button>
-         <button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button>`)).join('')}
+        `<button class="btn btn-g btn-sm noic" data-go="vetting/empverifydetail/${e.id}">Review Evidence ${I.arrowRight}</button>`)).join('')}
     </div>` : emptyState('check', 'Every employer is verified', 'Nothing is waiting in the verification queue.')}
   </section>`;
 }
 
-V.vetting = () => modView({applications:vettingApplications, appdetail:vettingAppDetail, empverify:vettingEmpVerify});
+/* NEW (flow review, 11 Sep 2026): an employer detail so the decision is made after
+   reviewing the evidence, not blind from the list. Verify / Decline move here; the
+   queue row now opens this page. Evidence checks are derived placeholders (the seed has
+   no verification-vendor data). */
+function vettingEmpDetail(){
+  const e = EMP_BY_ID[S.id] || EMPLOYERS.find(x => x.verify !== 'ok') || EMPLOYERS[0];
+  DETAIL_LABEL = e.name;
+  const decided = e.verify === 'ok';
+  const hasContact = e.signer && e.signer !== '—';
+  const reg = hasContact ? 'confirmed' : 'pending';
+  const contact = hasContact ? 'confirmed' : 'pending';
+  const sum = `<b>${esc(e.name)}</b> is a ${esc(e.industry)} employer in ${esc(e.location)}. ${decided ? 'This employer is verified and cleared to hire.' : 'Review the evidence below, then verify or decline. An employer must be verified before it can unlock candidates or hire.'}`;
+  return `
+  ${detailHead('vetting/empverify', sum)}
+  <section class="sec">
+    ${aiHead(esc(e.name), esc(e.industry) + ' · ' + esc(e.location),
+      decided ? tag('ok', 'Verified')
+      : `<button class="btn btn-g btn-sm" data-act="askdecline:${e.id}">${I.close} Decline</button>
+         <button class="btn btn-p btn-sm noic" data-act="verifyemp:${e.id}">Verify ${I.arrowRight}</button>`)}
+    ${kv([
+      ['Legal name', esc(e.name)],
+      ['Industry', esc(e.industry)],
+      ['Location', esc(e.location)],
+      ['Company size', esc(e.size)],
+      ['Type', esc(e.type)],
+      ['Ownership', esc(e.org)],
+      ['Primary contact', hasContact ? esc(e.signer) : '<span class="tag sm warn">Missing</span>'],
+      ['Work domain', esc(e.domain)],
+      ['Member since', esc(e.joined)]
+    ])}
+  </section>
+  <section class="sec">
+    ${aiHead('Verification evidence', 'What must clear before an employer can unlock candidates or hire.')}
+    ${kv([
+      ['Company registration', checkTag(reg)],
+      [`Domain ownership — ${esc(e.domain)}`, checkTag('confirmed')],
+      ['Primary contact confirmed', checkTag(contact)],
+      ['Sanctions and adverse media', checkTag('confirmed')]
+    ])}
+    ${e.verify === 'review' ? note('warn', 'Under review', 'Evidence was requested and the employer is gathering it. Verify once the outstanding items clear.') : ''}
+    ${!decided && !hasContact ? note('warn', 'No named contact', 'No primary contact is on the account. Ask for one before verifying.') : ''}
+  </section>`;
+}
+V.vetting = () => modView({applications:vettingApplications, appdetail:vettingAppDetail, empverify:vettingEmpVerify, empverifydetail:vettingEmpDetail});
 
 SHEETS.reject = () => {
   const a = APP_BY_ID[S.id];
@@ -2783,12 +2803,12 @@ ACTIONS.dovetcall = key => {
   toast(`Vetting call scheduled with ${v.who}`);
 };
 ACTIONS.rerun = key => { const a = APP_BY_ID[key.split(':')[1]]; if(a){ audit('Re-ran checks', a.name, 'Vetting', 'info'); toast('Checks re-requested from the vendors — results land here'); } };
-ACTIONS.verifyemp = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'ok'; audit('Verified employer', e.name, 'Vetting', 'notice'); toast(e.name + ' verified'); } };
+ACTIONS.verifyemp = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'ok'; audit('Verified employer', e.name, 'Vetting', 'notice'); toast(e.name + ' verified'); } if(S.sub === 'empverifydetail'){ S.sub = 'empverify'; S.id = null; } };
 ACTIONS.askdecline = key => {
   const e = EMP_BY_ID[key.split(':')[1]]; if(!e) return;
   askConfirm({mk:'warning', title:`Decline ${e.name}?`, body:'The account stays unverified and cannot unlock interviews or hire. The signer is told what evidence is missing.', ok:'Decline', danger:true, act:'dodecline:' + e.id});
 };
-ACTIONS.dodecline = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'unverified'; audit('Declined employer verification', e.name, 'Vetting', 'notice'); toast(e.name + ' declined — evidence requested'); } S.confirm = null; };
+ACTIONS.dodecline = key => { const e = EMP_BY_ID[key.split(':')[1]]; if(e){ e.verify = 'unverified'; audit('Declined employer verification', e.name, 'Vetting', 'notice'); toast(e.name + ' declined — evidence requested'); } S.confirm = null; if(S.sub === 'empverifydetail'){ S.sub = 'empverify'; S.id = null; } };
 
 /* ======================================================================
    CANDIDATES
@@ -2811,7 +2831,8 @@ PAGESUM['candidates/candidates'] = () => {
 };
 PAGESUM['candidates/levelling'] = () => {
   const p = LEVELQ.filter(l => l.rec === 'Promote').length;
-  return `<b>${LEVELQ.length} level reviews</b> are waiting on a decision — ${p} recommended for promotion. The agent recommends off the interview; the reviewer decides to promote or hold.`;
+  const d = LEVELQ.filter(l => l.talTo && l.talTo !== l.to).length;
+  return `<b>${LEVELQ.length} level reviews</b> are waiting on your sign-off, ${p} recommended for promotion. Tal recommends off the interview, the agent decides, and your call is final. <b>${d} where the agent overrode Tal</b> are worth a closer look.`;
 };
 
 KINDS.cand = {
@@ -2950,23 +2971,29 @@ function candidatesDetail(){
 
 function candidatesLevelling(){
   const q = getFilter('q', ''), rf = getFilter('rec', 'all');
-  const rows = LEVELQ.filter(l => rf === 'all' ? true : rf === 'promote' ? l.rec === 'Promote' : l.rec !== 'Promote').filter(l => hit(q, l.name, l.agent, l.from, l.to));
+  const rows = LEVELQ.filter(l => rf === 'all' ? true : rf === 'promote' ? l.rec === 'Promote' : rf === 'diverged' ? (l.talTo && l.talTo !== l.to) : l.rec !== 'Promote').filter(l => hit(q, l.name, l.agent, l.from, l.to));
   return `
   <section class="sec">
-    ${searchHead('Levelling & reviews', 'The reviewer queue. Each carries the agent’s recommendation off the interview.',
+    ${searchHead('Levelling & reviews', 'Tal recommends off the interview, the agent decides, and you make the final call.',
       `<button class="btn btn-g btn-sm noic" data-sheet="recal">${I.renew} Recalibrate Scores</button>
        ${LEVELQ.filter(l => l.rec === 'Promote').length ? `<button class="btn btn-g btn-sm noic" data-act="askpromoteall">Approve All Promotions</button>` : ''}`, 'Search the queue')}
     ${filterStrip('rec', 'all', [
       ['all', 'All', LEVELQ.length],
       ['promote', 'Promote', LEVELQ.filter(l => l.rec === 'Promote').length],
-      ['hold', 'Hold', LEVELQ.filter(l => l.rec !== 'Promote').length]
+      ['hold', 'Hold', LEVELQ.filter(l => l.rec !== 'Promote').length],
+      ['diverged', 'Agent ≠ Tal', LEVELQ.filter(l => l.talTo && l.talTo !== l.to).length]
     ])}
     <div class="tile-stack">
       ${rows.length ? rows.map(l => {
         const promote = l.rec === 'Promote';
+        /* NEW: the Tal -> agent chain. `talLabel` is Tal's read off the interview;
+           `agreed` is false when the agent moved the candidate somewhere other than
+           where Tal recommended, and the card flags that for the admin to scrutinise. */
+        const talLabel = l.talTo ? (l.talTo !== l.from ? `promote to ${esc(l.talTo)}` : `hold at ${esc(l.from)}`) : '';
+        const agreed = !l.talTo || l.talTo === l.to;
         return cardRow('route',
-          `${esc(l.name)} <span class="tag sm ${promote ? 'green' : ''}">${esc(l.from)} → ${esc(l.to)}</span>`,
-          `${esc(l.rec)} · recommended by ${esc(l.agent)} · ${esc(l.when)}`,
+          `${esc(l.name)} <span class="tag sm ${promote ? 'green' : ''}">${esc(l.from)} → ${esc(l.to)}</span>${agreed ? '' : ' <span class="tag sm warn">Agent overrode Tal</span>'}`,
+          `${l.talTo ? `Tal: ${talLabel} · ` : ''}${esc(l.agent)}: ${esc(l.rec)}${agreed ? '' : ' (overrode Tal)'} · ${esc(l.when)}`,
           `${rowActs([['route', 'Override ahead of review', `data-act="askoverride:${(CANDS.find(x => x.name === l.name) || {}).id || ''}"`]])}
            <button class="btn btn-g btn-sm noic" data-act="asksendback:${l.id}">Send Back</button>
            <button class="btn btn-p btn-sm noic" data-act="asklevel:${l.id}">${promote ? 'Promote' : 'Confirm Hold'} ${I.arrowRight}</button>`);
@@ -3218,9 +3245,11 @@ function agentsAll(){
       : emptyState('agents', 'No agents match', 'Nothing in this filter yet.')}
   </section>
 
+  ${/* REMOVED (flow review, 11 Sep 2026): the "Recalculate Now" button was a no-op
+       (audit + toast, no state change). Ranking is derived from live ratings and is
+       already recomputed on every render, so a manual button was noise. */''}
   <section class="sec">
-    ${aiHead('Agent ranking · top 5', 'Computed from rating, then interviews conducted. Recalculated weekly.',
-      `<button class="btn btn-g btn-sm noic" data-act="recalc">${I.renew} Recalculate Now</button>`)}
+    ${aiHead('Agent ranking · top 5', 'Computed from rating, then interviews conducted. Recalculated weekly.')}
     <div class="tile-stack">
       ${rank.map((a, i) => `
         <button class="mem clk" data-go="agents/detail/${a.id}">
@@ -3232,7 +3261,6 @@ function agentsAll(){
     </div>
   </section>`;
 }
-ACTIONS.recalc = () => { audit('Recalculated agent ranking', 'Marketplace', 'Talent Agents', 'info'); toast('Ranking recalculated from the latest ratings'); };
 
 function agentsDetail(){
   const a = USER_BY_ID[S.id] || AGENTS()[0];
@@ -3295,7 +3323,6 @@ PAGESUM['cohorts/assign'] = () => {
   const rec = LEADER_REQS.filter(r => r.stage === 'feedback').length;
   return `${LEADER_REQS.length} candidates applied to lead, <b>${rec} recommended and ready to allot</b>. A Builder leads Explorer cohorts and a Trailblazer leads Builder — but nobody leads the very first ones.`;
 };
-PAGESUM['cohorts/templates'] = () => `${CO_TEMPLATES.length} reusable blueprints — a course plus a session outline, tagged by level. A template already <b>in use by a cohort can't be deleted</b>; the rest can.`;
 PAGESUM['cohorts/catalogue'] = () => {
   const live = COURSES.filter(c => c.status === 'live').length;
   return `${live} of ${COURSES.length} courses are live, from ${money(Math.min(...COURSES.map(c => c.price)))} to ${money(Math.max(...COURSES.map(c => c.price)))}. <b>Explorer 1 is the $100 entry course</b>; more can be imported from the library.`;
@@ -3306,19 +3333,21 @@ const leaderOpts = () => [['Unassigned', 'Unassigned'], ...USERS.filter(u => u.r
 KINDS.cohort = {
   label:'cohort', mod:'Cohort Management', after:'cohorts/cohorts',
   find: id => COHORT_BY_ID[id], name: c => c.name, detail: c => 'cohorts/detail/' + c.id,
+  /* NEW (flow review, 11 Sep 2026): a cohort is grouped by TRACK, not a course/level
+     template. It owns its own `sessions` outline, empty on create and built on the
+     detail. Template select, entry level and the `used` bookkeeping are gone. */
   fields: c => [
     {k:'name', l:'Cohort name', t:'text', req:1, ph:'e.g. Explorer 16'},
-    {k:'templateId', l:'Template', t:'select', opts:[['', 'No template'], ...CO_TEMPLATES.filter(t => t.status === 'published').map(t => [t.id, `${t.name} · ${t.level}`])]},
+    {k:'track', l:'Track', t:'select', opts:[['Explorer', 'Explorer'], ['Builder', 'Builder'], ['Trailblazer', 'Trailblazer']], def:'Explorer'},
     {k:'leader', l:'Leader', t:'select', opts:leaderOpts(), def:'Unassigned'},
     {k:'start', l:'Cycle start', t:'date', req:1}
   ],
-  help:'A new cohort is created as a draft. It caps at 10 members and begins the 90-day loop when you start it.',
+  help:'A new cohort is created as a draft. Pick its track, then build its session outline on the cohort before you start it. It caps at 10 members and begins the 90-day loop when you start it.',
   okNew:'Create Draft',
-  create: v => { const t = TPL_BY_ID[v.templateId]; const c = {id:newId('ch', COHORTS), name:v.name, track:t ? t.track : 'Explorer', level:t ? t.level : 'E1', templateId:v.templateId, leader:v.leader, size:0, week:0, day:0, start:v.start, status:'draft'};
-    COHORTS.push(c); COHORT_BY_ID[c.id] = c; if(t) t.used++; return c; },
-  update: (c, v) => { const old = TPL_BY_ID[c.templateId], t = TPL_BY_ID[v.templateId]; if(old !== t){ if(old) old.used = Math.max(0, old.used - 1); if(t) t.used++; }
-    CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; c.templateId = v.templateId; c.leader = v.leader; c.start = v.start; if(t){ c.track = t.track; c.level = t.level; } },
-  remove: c => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); const t = TPL_BY_ID[c.templateId]; if(t) t.used = Math.max(0, t.used - 1); COHORTS.splice(COHORTS.indexOf(c), 1); delete COHORT_BY_ID[c.id]; },
+  create: v => { const c = {id:newId('ch', COHORTS), name:v.name, track:v.track || 'Explorer', leader:v.leader, size:0, week:0, day:0, start:v.start, status:'draft', sessions:[]};
+    COHORTS.push(c); COHORT_BY_ID[c.id] = c; return c; },
+  update: (c, v) => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = v.name; }); c.name = v.name; c.track = v.track; c.leader = v.leader; c.start = v.start; },
+  remove: c => { CANDS.forEach(x => { if(x.cohort === c.name) x.cohort = '—'; }); COHORTS.splice(COHORTS.indexOf(c), 1); delete COHORT_BY_ID[c.id]; },
   guard: c => c.status === 'active' && c.size ? `${c.name} is running with ${c.size} members — archive it instead` : null,
   delWarn: c => `${c.name} is removed and its ${c.size} member${c.size === 1 ? '' : 's'} return to no cohort.`,
   status: (c, val) => val === 'archived'
@@ -3345,7 +3374,7 @@ function cohortsList(){
       [{label:'Cohort'}, {label:'Track'}, {label:'Leader'}, {label:'Progress'}, {label:'Members', num:true}, {label:'Status'}, ACT_COL],
       rows.map(c => ({go:'cohorts/detail/' + c.id, sv:[, , , c.day], cells:[
         esc(c.name),
-        `${esc(c.track)} · ${esc(c.level)}`,
+        esc(c.track),
         c.leader === 'Unassigned' ? '<span class="tag sm warn">Unassigned</span>' : esc(c.leader),
         c.status === 'draft' ? 'Not started' : c.status === 'archived' ? `Ended week ${c.week}` : `Week ${c.week} · day ${c.day}`,
         `${c.size} / 10`,
@@ -3390,71 +3419,40 @@ function cohortsAssign(){
   </section>`;
 }
 
-KINDS.tpl = {
-  label:'template', mod:'Cohort Management', after:'cohorts/templates',
-  find: id => TPL_BY_ID[id], name: t => t.name,
-  fields: [
-    {k:'name', l:'Template name', t:'text', req:1, ph:'e.g. Builder Foundations'},
-    {k:'courseId', l:'Course', t:'select', opts: () => COURSES.map(c => [c.id, `${c.name} · ${c.track}`])},
-    {k:'level', l:'Entry level', t:'select', opts:LEVELS, def:'E1'},
-    {k:'status', l:'Status', t:'select', opts:[['draft', 'Draft'], ['published', 'Published']], def:'draft'}
-  ],
-  help:'A template is a course plus a session outline. Sessions are added on the template once it exists; a published one can be picked when a cohort is created.',
-  okNew:'Create Template',
-  create: v => { const co = COURSE_BY_ID[v.courseId]; const t = {id:newId('tpl', CO_TEMPLATES), name:v.name, track:co ? co.track : bucketOf(v.level), level:v.level, courseId:v.courseId, status:v.status, used:0, sessions:[]}; CO_TEMPLATES.push(t); TPL_BY_ID[t.id] = t; return t; },
-  update: (t, v) => { const co = COURSE_BY_ID[v.courseId]; t.name = v.name; t.courseId = v.courseId; t.level = v.level; t.status = v.status; if(co) t.track = co.track; },
-  remove: t => { CO_TEMPLATES.splice(CO_TEMPLATES.indexOf(t), 1); delete TPL_BY_ID[t.id]; },
-  guard: t => t.used > 0 ? `In use by ${t.used} cohort${t.used === 1 ? '' : 's'} — cannot delete` : null,
-  delWarn: t => `Its ${t.sessions.length}-session outline is removed.`
-};
-function cohortsTemplates(){
-  const q = getFilter('q', '');
-  const rows = CO_TEMPLATES.filter(t => hit(q, t.name, t.level, t.track, (COURSE_BY_ID[t.courseId] || {}).name));
-  return `
-  <section class="sec">
-    ${searchHead('Cohort templates', 'A blueprint is a course plus a session outline. Starting a cohort stamps the clock onto it.',
-      addBtn('tpl', 'New Template'), 'Search templates')}
-    <div class="tile-stack mt5">
-      ${rows.length ? rows.map(t => cardRow('book',
-        `${esc(t.name)} <span class="tag sm bordered">${esc(t.level)}</span> ${tag(t.status)}`,
-        `${esc((COURSE_BY_ID[t.courseId] || {}).name || t.track)} · ${t.sessions.length} session${t.sessions.length === 1 ? '' : 's'} · ${t.used ? `used by ${t.used} cohort${t.used === 1 ? '' : 's'}` : 'not yet used'}`,
-        rowActs([editBtn('tpl', t.id), ['copy', 'Duplicate', `data-act="duptpl:${t.id}"`], ['add', 'Add session', `data-act="addsess:${t.id}"`],
-          ...(t.used > 0 ? [] : [delBtn('tpl', t.id)])]))).join('')
-        : emptyState('book', 'No templates match', 'Nothing matches that search.')}
-    </div>
-  </section>`;
-}
-ACTIONS.duptpl = key => { const t = TPL_BY_ID[key.split(':')[1]]; if(!t) return;
-  const c = JSON.parse(JSON.stringify(t)); c.id = newId('tpl', CO_TEMPLATES); c.name = t.name + ' (copy)'; c.status = 'draft'; c.used = 0; c.sessions.forEach((s, i) => s.id = c.id + 's' + i);
-  CO_TEMPLATES.push(c); TPL_BY_ID[c.id] = c; audit('Duplicated template', c.name, 'Cohort Management', 'info'); toast(`${c.name} created as a draft`); };
+/* REMOVED (flow review, 11 Sep 2026): KINDS.tpl, cohortsTemplates and duptpl.
+   Cohort Templates is gone — a cohort was never really a course + level, it is a
+   track-based peer group, so it owns its own session outline (KINDS.cohort +
+   cohortsDetail). The add/remove-session sheet below now targets the COHORT. */
 SHEETS.addsess = () => {
-  const t = TPL_BY_ID[S.id];
-  return {title:`Add a session to ${t ? t.name : 'the template'}`,
+  const c = COHORT_BY_ID[S.id];
+  return {title:`Add a session to ${c ? c.name : 'the cohort'}`,
     body:`${fieldHtml({k:'title', l:'Session title', t:'text', ph:'e.g. Mid-cycle levelling check-in'})}
       ${fieldHtml({k:'week', l:'Week', t:'number', def:1})}
       ${fieldHtml({k:'dur', l:'Length (minutes)', t:'number', def:60})}
       ${fieldHtml({k:'mode', l:'Mode', t:'select', opts:['Live', 'Workshop', 'Async']}, 'Live')}
-      <p class="t-desc">The session appears in the outline of every cohort that runs this template from its next cycle.</p>`,
-    ok:'Add Session', act:'doaddsess:' + (t ? t.id : '')};
+      <p class="t-desc">The session is added to this cohort’s outline.</p>`,
+    ok:'Add Session', act:'doaddsess:' + (c ? c.id : '')};
 };
 ACTIONS.addsess = key => { S.id = key.split(':')[1]; S.sheet = 'addsess'; };
-ACTIONS.doaddsess = key => { const t = TPL_BY_ID[key.split(':')[1]]; if(!t) return; const v = readForm(); if(!v.title){ toast('Give the session a title', 'warn'); return 'keep'; }
-  t.sessions.push({id:t.id + 's' + (t.sessions.length + 1), title:v.title, week:Number(v.week) || 1, dur:Number(v.dur) || 60, mode:v.mode}); t.sessions.sort((a, b) => a.week - b.week);
-  audit('Added session to template', `${t.name} — ${v.title}`, 'Cohort Management', 'info'); toast('Session added'); };
-ACTIONS.delsess = key => { const [, tid, sid] = key.split(':'); const t = TPL_BY_ID[tid]; if(!t) return; const i = t.sessions.findIndex(s => s.id === sid); if(i >= 0){ const nm = t.sessions[i].title; t.sessions.splice(i, 1); audit('Removed session', `${t.name} — ${nm}`, 'Cohort Management', 'info'); toast('Session removed'); } };
+ACTIONS.doaddsess = key => { const c = COHORT_BY_ID[key.split(':')[1]]; if(!c) return; const v = readForm(); if(!v.title){ toast('Give the session a title', 'warn'); return 'keep'; }
+  if(!c.sessions) c.sessions = []; c.sessions.push({id:c.id + 's' + (c.sessions.length + 1), title:v.title, week:Number(v.week) || 1, dur:Number(v.dur) || 60, mode:v.mode}); c.sessions.sort((a, b) => a.week - b.week);
+  audit('Added session to cohort', `${c.name} — ${v.title}`, 'Cohort Management', 'info'); toast('Session added'); };
+ACTIONS.delsess = key => { const [, cid, sid] = key.split(':'); const c = COHORT_BY_ID[cid]; if(!c || !c.sessions) return; const i = c.sessions.findIndex(s => s.id === sid); if(i >= 0){ const nm = c.sessions[i].title; c.sessions.splice(i, 1); audit('Removed session', `${c.name} — ${nm}`, 'Cohort Management', 'info'); toast('Session removed'); } };
 
 function cohortsDetail(){
   const c = COHORT_BY_ID[S.id] || COHORTS[0];
   DETAIL_LABEL = c.name;
-  const tpl = TPL_BY_ID[c.templateId];
+  /* NEW (flow review, 11 Sep 2026): a cohort is a TRACK-based peer group and owns its
+     own `sessions` outline (built at creation, edited here). It is no longer tied to a
+     course/level via a template — Cohort Templates was removed. */
   const roster = CANDS.filter(x => x.cohort === c.name);
   const draft = c.status === 'draft';
   const full = roster.length >= 10;
-  const sum = `<b>${esc(c.name)}</b> is a ${esc(c.track)} cohort at ${esc(c.level)}, led by ${c.leader === 'Unassigned' ? 'nobody yet' : esc(c.leader.replace(/\s*\(.*\)/, ''))}. ${draft ? 'It has not started — starting it begins the 90-day cycle.' : c.status === 'archived' ? `It ended at week ${c.week}.` : `Week ${c.week} of 13, ${roster.length} of 10 members.`}`;
+  const sum = `<b>${esc(c.name)}</b> is ${/^[aeiou]/i.test(c.track) ? 'an' : 'a'} ${esc(c.track)} cohort, led by ${c.leader === 'Unassigned' ? 'nobody yet' : esc(c.leader.replace(/\s*\(.*\)/, ''))}. ${draft ? 'It has not started. Starting it begins the 90-day cycle.' : c.status === 'archived' ? `It ended at week ${c.week}.` : `Week ${c.week} of 13, ${roster.length} of 10 members.`}`;
   return `
   ${detailHead('cohorts/cohorts', sum)}
   <section class="sec">
-    ${aiHead(esc(c.name), esc(c.track) + ' · ' + esc(c.level),
+    ${aiHead(esc(c.name), esc(c.track) + ' cohort',
       `<button class="btn btn-g btn-sm noic" data-sheet="rec:cohort:${c.id}">${I.edit} Edit</button>
        ${draft
         ? `<button class="btn btn-g btn-sm noic" data-act="askdel:cohort:${c.id}">${I.delete} Delete</button>
@@ -3464,9 +3462,7 @@ function cohortsDetail(){
            <span class="tag sm green">Active · week ${c.week}</span>`}`)}
     ${kv([
       ['Track', esc(c.track)],
-      ['Entry level', esc(c.level)],
       ['Leader', c.leader === 'Unassigned' ? '<span class="tag sm warn">Unassigned</span>' : esc(c.leader)],
-      ['Template', tpl ? esc(tpl.name) : 'None'],
       ['Cycle start', esc(c.start)],
       ['Length', `${c.weeks || 12} weeks${c.weeks === 13 ? ' <span class="t-caption">— extended</span>' : ''}`],
       ['Progress', draft ? 'Not started' : `Week ${c.week} · day ${c.day} of ${(c.weeks || 12) * 7 + 6}`],
@@ -3497,15 +3493,14 @@ function cohortsDetail(){
     </div>` : emptyState('users', 'No members yet', 'Add candidates to the roster; the cohort caps at 10.')}
   </section>
 
-  ${tpl ? `
   <section class="sec">
-    ${aiHead('Sessions', `From the ${esc(tpl.name)} template. Add or remove a session here and every cohort on the template follows from its next cycle.`,
-      `<button class="btn btn-g btn-sm noic" data-act="addsess:${tpl.id}">${I.add} Add Session</button>`)}
-    ${tpl.sessions.length ? table(
+    ${aiHead('Sessions', 'The group sessions this cohort runs across the 90-day cycle. Add or remove one at any time.',
+      `<button class="btn btn-g btn-sm noic" data-act="addsess:${c.id}">${I.add} Add Session</button>`)}
+    ${(c.sessions && c.sessions.length) ? table(
       [{label:'Session'}, {label:'Week', num:true}, {label:'Length', num:true}, {label:'Mode'}, ACT_COL],
-      tpl.sessions.map(s => ({cells:[esc(s.title), String(s.week), s.dur + ' min', esc(s.mode), rowActs([['delete', 'Remove session', `data-act="delsess:${tpl.id}:${s.id}"`]])]})))
-      : emptyState('calendar', 'No sessions yet', 'Add the first session to the template.')}
-  </section>` : ''}`;
+      c.sessions.map(s => ({cells:[esc(s.title), String(s.week), s.dur + ' min', esc(s.mode), rowActs([['delete', 'Remove session', `data-act="delsess:${c.id}:${s.id}"`]])]})))
+      : emptyState('calendar', 'No sessions yet', draft ? 'Build the session outline before you start the cohort.' : 'Add the first session to this cohort.')}
+  </section>`;
 }
 SHEETS.addmember = () => {
   const c = COHORT_BY_ID[S.id];
@@ -3584,16 +3579,15 @@ KINDS.course = {
     {k:'levels', l:'Maps to levels', t:'checks', opts: LEVELS_MVP, get: c => courseLevels(c)},
     {k:'status', l:'Status', t:'select', opts:[['draft', 'Draft — not on sale'], ['live', 'Live — bookable']], def:'draft'}
   ],
-  help:'A course sets its own price and runs 90 days. It is a template’s course before it is a cohort’s. The level mapping is the admin’s to override (SA-13 A1); the content itself stays in the LMS vendor’s console and is not edited here.',
+  help:'A course sets its own price and runs 90 days. Candidates enrol in it individually. The level mapping is the admin’s to override (SA-13 A1); the content itself stays in the LMS vendor’s console and is not edited here.',
   okNew:'Add Course',
   create: v => { const c = {id:newId('co', COURSES), name:v.name, track:v.track, price:v.price, days:Number(v.days) || 90, status:v.status, levels: Array.isArray(v.levels) && v.levels.length ? v.levels : undefined}; COURSES.push(c); COURSE_BY_ID[c.id] = c; return c; },
   update: (c, v) => { const from = courseLevels(c).join(', '); c.name = v.name; c.track = v.track; c.price = v.price; c.days = Number(v.days) || 90; c.status = v.status;
     if(Array.isArray(v.levels) && v.levels.length && v.levels.join(',') !== courseLevels(c).join(',')){ c.levels = v.levels; audit('Overrode course-to-level mapping', c.name, 'Cohort Management', 'high', {from, to: v.levels.join(', ')}); } },
   remove: c => { COURSES.splice(COURSES.indexOf(c), 1); delete COURSE_BY_ID[c.id]; },
-  guard: c => { const n = CO_TEMPLATES.filter(t => t.courseId === c.id).length; return n ? `${n} template${n === 1 ? '' : 's'} run this course — retire it instead` : null; },
   delWarn: c => `${c.name} leaves the catalogue.`,
   status: (c, val) => val === 'live'
-    ? {title:`Publish ${c.name}?`, body:`The course goes on sale at ${money(c.price)} and can be picked by a template.`, ok:'Publish', log:'Published course', done:`${c.name} is live`}
+    ? {title:`Publish ${c.name}?`, body:`The course goes on sale at ${money(c.price)} and can be enrolled in.`, ok:'Publish', log:'Published course', done:`${c.name} is live`}
     : {title:`Retire ${c.name}?`, body:'No new cohort can run it. Cohorts already running it finish their cycle.', ok:'Retire', danger:true, log:'Retired course', done:`${c.name} retired`, apply: x => { x.status = 'draft'; }}
 };
 function cohortsCatalogue(){
@@ -3619,8 +3613,6 @@ function cohortsCatalogue(){
 function cohortsCourseDetail(){
   const c = COURSE_BY_ID[S.id] || COURSES[0];
   DETAIL_LABEL = c.name;
-  const tpls = CO_TEMPLATES.filter(t => t.courseId === c.id);
-  const cohortsUsing = COHORTS.filter(x => (TPL_BY_ID[x.templateId] || {}).courseId === c.id);
   const sum = `<b>${esc(c.name)}</b> is a ${esc(c.track)} course at ${money(c.price)}, over ${c.days} days. It is ${c.status === 'live' ? 'live and bookable' : 'a draft, not yet on sale'}.`;
   return `
   ${detailHead('cohorts/catalogue', sum)}
@@ -3637,17 +3629,8 @@ function cohortsCourseDetail(){
       ['Length', c.days + ' days'],
       ['Maps to levels', courseLevels(c).map(l => `<span class="tag sm bordered">${esc(l)}</span>`).join(' ') + (c.levels ? ' <span class="t-caption">— overridden</span>' : ' <span class="t-caption">— from the track</span>')],
       ['Content', 'In the LMS vendor console — not edited here'],
-      ['Status', tag(c.status)],
-      ['Templates on it', String(tpls.length)],
-      ['Cohorts running it', String(cohortsUsing.length)]
+      ['Status', tag(c.status)]
     ])}
-  </section>
-  <section class="sec">
-    ${aiHead('Templates on this course', 'Each blueprint that delivers it.', `<button class="btn btn-g btn-sm noic" data-go="cohorts/templates">All Templates</button>`)}
-    <div class="tile-stack">
-      ${tpls.length ? tpls.map(t => cardRow('book', `${esc(t.name)} <span class="tag sm bordered">${esc(t.level)}</span> ${tag(t.status)}`, `${t.sessions.length} sessions · ${t.used ? `used by ${t.used}` : 'not yet used'}`, rowActs([editBtn('tpl', t.id)]))).join('')
-        : emptyState('book', 'No template yet', 'Create a template on this course to run a cohort.')}
-    </div>
   </section>`;
 }
 
@@ -3677,7 +3660,7 @@ SHEETS.editbuckets = () => ({title:'Bucket descriptions',
   ok:'Save', act:'dobuckets'});
 ACTIONS.dobuckets = () => { const v = readForm(); BUCKETS.forEach((b, i) => { if(v['d' + i]) b.desc = v['d' + i]; }); audit('Edited bucket descriptions', 'Levels & buckets', 'Cohort Management', 'info'); toast('Descriptions saved'); };
 
-V.cohorts = () => modView({cohorts:cohortsList, assign:cohortsAssign, templates:cohortsTemplates,
+V.cohorts = () => modView({cohorts:cohortsList, assign:cohortsAssign,
   detail:cohortsDetail, catalogue:cohortsCatalogue, coursedetail:cohortsCourseDetail, levels:cohortsLevels});
 
 SHEETS.importcourse = () => ({
@@ -3816,7 +3799,7 @@ function marketRecordings(){
       [{label:'Candidate'}, {label:'Agent'}, {label:'Kind'}, {label:'When'}, ACT_COL],
       recs.map(b => ({cells:[
         esc(b.cand), esc(b.agent), esc(b.kind), esc(b.slot),
-        rowActs([['play', 'Play recording', `data-act="toast:Playing the recording (prototype)"`], ['download', 'Download transcript', `data-act="toast:Transcript downloaded (prototype)"`], ['delete', 'Delete recording', `data-act="askdelrec:${b.id}"`]])
+        rowActs([['play', 'Play recording', `data-sheet="recording:${b.id}"`], ['download', 'Download transcript', `data-act="dltranscript:${b.id}"`], ['delete', 'Delete recording', `data-act="askdelrec:${b.id}"`]])
       ]})))
       : emptyState('video', 'No recordings match', 'Nothing in this filter yet.')}
   </section>`;
@@ -3824,6 +3807,52 @@ function marketRecordings(){
 ACTIONS.askdelrec = key => { const b = BOOKINGS.find(x => x.id === key.split(':')[1]); if(!b) return;
   askConfirm({mk:'warning', title:`Delete the recording of ${b.cand} with ${b.agent}?`, body:'The video and transcript are erased ahead of the 24-month retention. The level decision already made from it stands. This can’t be undone.', ok:'Delete Recording', danger:true, act:'dodelrec:' + b.id}); };
 ACTIONS.dodelrec = key => { const b = BOOKINGS.find(x => x.id === key.split(':')[1]); if(b){ b.recDeleted = true; audit('Deleted interview recording', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'high'); toast('Recording deleted'); } S.confirm = null; };
+
+/* NEW (flow review, 11 Sep 2026): Play recording and Download transcript were toast
+   no-ops. Play now opens a prototype player + transcript sheet; Download writes a real
+   .txt file (a Blob download). The transcript body is authored placeholder copy — the
+   seed has no real transcripts. */
+function recTranscript(b){
+  return [
+    `TalentNext interview transcript (prototype)`,
+    `${b.cand} with ${b.agent} — ${b.kind} — ${b.slot}`,
+    ``,
+    `[00:00] ${b.agent}: Thanks for making the time. Tell me about something you have shipped recently.`,
+    `[00:14] ${b.cand}: I led a small team on a payments feature, from the first spec to release.`,
+    `[02:38] ${b.agent}: Walk me through a decision you later reversed, and what changed your mind.`,
+    `[03:02] ${b.cand}: We started on a message queue, then moved to a simpler scheduled job once we knew the real load.`,
+    `[07:51] ${b.agent}: Good. That is the kind of judgement I was looking for at this level.`,
+    ``,
+    `Note: authored placeholder transcript for the prototype; no real recording is stored.`
+  ].join('\n');
+}
+SHEETS.recording = id => {
+  const b = BOOKINGS.find(x => x.id === id);
+  if(!b) return {title:'Recording', body:'This recording is no longer available.', ok:''};
+  return {title:`${b.cand} with ${b.agent}`, ok:'Download Transcript', act:'dltranscript:' + b.id,
+    body:`<div style="position:relative;aspect-ratio:16/9;background:#111;display:flex;align-items:center;justify-content:center;overflow:hidden">
+        <div style="width:56px;height:56px;border-radius:999px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 -960 960 960" width="26" height="26" fill="#fff">${inner('play')}</svg>
+        </div>
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:8px 12px;background:linear-gradient(transparent,rgba(0,0,0,.6));color:#fff;font-size:12px;display:flex;gap:8px;align-items:center">
+          <span>0:00</span><div style="flex:1;height:3px;background:rgba(255,255,255,.3);border-radius:999px"><div style="width:22%;height:100%;background:#fff;border-radius:999px"></div></div><span>${esc(b.kind)}</span>
+        </div>
+      </div>
+      <p class="t-desc">Prototype player — video streaming is not wired in this build.</p>
+      ${kv([['Candidate', esc(b.cand)], ['Agent', esc(b.agent)], ['Kind', esc(b.kind)], ['When', esc(b.slot)]])}
+      ${secHead('Transcript')}
+      <div style="max-height:220px;overflow:auto;background:var(--surface-2);border:1px solid var(--rule);padding:12px;white-space:pre-wrap;font-size:13px;line-height:1.5">${esc(recTranscript(b))}</div>`};
+};
+ACTIONS.dltranscript = key => {
+  const b = BOOKINGS.find(x => x.id === key.split(':')[1]); if(!b) return;
+  try{
+    const blob = new Blob([recTranscript(b)], {type:'text/plain'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = `transcript-${b.cand.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }catch(e){}
+  audit('Downloaded transcript', `${b.cand} with ${b.agent}`, 'Marketplace & Interviews', 'info'); toast('Transcript downloaded');
+};
 
 V.market = () => modView({bookings:marketBookings, recordings:marketRecordings});
 
@@ -4337,9 +4366,11 @@ function financeReconciliation(){
   const matched = SETTLEMENTS.filter(s => s.status === 'reconciled').length;
   return `
   <section class="sec">
+    ${/* REMOVED (flow review, 11 Sep 2026): "Import Statement" was a no-op toast.
+         Stripe settlement batches sync automatically, so a hand-import button was
+         misleading. Run Auto-Match (which actually flips pending → reconciled) stays. */''}
     ${aiHead('Reconciliation', 'Stripe settles to the platform bank in batches; each is matched against our payout records.',
-      `<button class="btn btn-g btn-sm noic" data-act="toast:Bank statement imported — 0 new batches">${I.download} Import Statement</button>
-       <button class="btn btn-p btn-sm noic" data-act="automatch">${I.renew} Run Auto-Match</button>`)}
+      `<button class="btn btn-p btn-sm noic" data-act="automatch">${I.renew} Run Auto-Match</button>`)}
     ${stats([
       ['check', 'Reconciled', String(matched), 'matched batches'],
       ['time', 'Pending', String(SETTLEMENTS.filter(s => s.status === 'pending').length), 'awaiting match'],
@@ -5275,13 +5306,10 @@ function settingsPayments(){
     ])}
   </section>`;
 }
-SHEETS.addcard = () => ({title:'Add a card',
-  body:`<p class="t-body-02">Card details are entered on Stripe’s hosted form, so the number never touches this page. The card appears here once Stripe confirms it.</p>
-    ${fieldHtml({k:'brand', l:'Card brand (prototype)', t:'select', opts:['VISA', 'MASTERCARD', 'AMEX']}, 'VISA')}
-    ${fieldHtml({k:'last', l:'Last four (prototype)', t:'text', ph:'0000'})}
-    ${fieldHtml({k:'exp', l:'Expiry', t:'text', ph:'MM/YYYY'})}`,
-  ok:'Continue To Stripe', act:'doaddcard'});
-ACTIONS.doaddcard = () => { const v = readForm(); CARDS.push({id:newId('c', CARDS), brand:v.brand, last:(v.last || '0000').slice(-4), exp:v.exp || '—', def:false}); audit('Added card', `${v.brand} •••• ${(v.last || '0000').slice(-4)}`, 'Settings', 'notice'); toast('Card added'); };
+/* REMOVED (flow review, 11 Sep 2026): the `addcard` sheet + `doaddcard` were dead —
+   nothing opened them. The live "Add card" path is the shared Stripe modal
+   (`data-payopen="1"` → `dsPayForm`), so the sheet was a superseded pre-modal
+   implementation. Deleted rather than wired, per Maryam. */
 ACTIONS.defcard = key => { CARDS.forEach(c => { c.def = c.id === key.split(':')[1]; }); audit('Changed default card', 'Payments & Cards', 'Settings', 'notice'); toast('Default card changed'); };
 ACTIONS.askdelcard = key => { const c = CARDS.find(x => x.id === key.split(':')[1]); if(!c) return; askConfirm({mk:'warning', title:`Remove ${c.brand} •••• ${c.last}?`, body: c.def ? 'It is the default card — the next card on file becomes the default.' : 'Invoices already charged to it are unaffected.', ok:'Remove Card', danger:true, act:'dodelcard:' + c.id}); };
 ACTIONS.dodelcard = key => { const i = CARDS.findIndex(x => x.id === key.split(':')[1]); if(i >= 0){ const was = CARDS[i].def; CARDS.splice(i, 1); if(was && CARDS.length) CARDS[0].def = true; audit('Removed card', 'Payments & Cards', 'Settings', 'notice'); toast('Card removed'); } S.confirm = null; };
@@ -5341,7 +5369,15 @@ const authIdPanel = (label, email, back) => `
     </div>
   </div>`;
 function authView(){
-  const step = S.auth === 'code' ? authCode() : authLogin();
+  /* NEW (flow review, 11 Sep 2026): password reset and lost-device recovery were dead
+     (a toast and a ruling note). They are real flows now: reset -> resetsent, and
+     recover -> (backup code signs in) or requestrestore -> recoversent. */
+  const step = S.auth === 'code' ? authCode()
+    : S.auth === 'reset' ? authReset()
+    : S.auth === 'resetsent' ? authSent('Check your email', `A single-use reset link is on its way to <b>${esc(ME.email)}</b>. It expires in 24 hours; follow it to set a new password.`)
+    : S.auth === 'recover' ? authRecover()
+    : S.auth === 'recoversent' ? authSent('Request sent', 'A platform owner has been asked to restore your access. You will get an email once it is done.')
+    : authLogin();
   /* `.auth-card` is a CHILD of `.app` — §17/§57 key every rule on
      `.app:has(> .auth-card)` and `.auth-card > .auth-col`, the shape hifi's
      render writes; one element wearing both classes matches neither. */
@@ -5362,7 +5398,7 @@ function authLogin(){
     <div class="f last"><label for="lpw">Password</label>
       <div class="pw-wrap"><input class="inp fill" id="lpw" type="password" value="••••••••••••" autocomplete="current-password">
         <button class="pw-eye" data-eye="lpw" aria-label="Show password">${I.view}</button></div></div>
-    <p class="t-body-02 aux"><a data-act="toast:A single-use reset link is sent to ${esc(ME.email)} and expires in 24 hours">Forgotten your password?</a></p>
+    <p class="t-body-02 aux"><a data-act="goreset">Forgotten your password?</a></p>
   </div>
   <div class="sec sec-act">
     <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="signin">Log in ${I.arrowRight}</button></div>
@@ -5377,11 +5413,47 @@ function authCode(){
     <div class="f last"><label for="lcode">Authenticator code</label>
       <input class="inp fill" id="lcode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code" maxlength="6"></div>
   </div>
-  <div class="sec">
-    ${note('', 'Lost your device?', 'Recovery is an open ruling (SA-02 E1) — a standing backdoor is the risk it weighs. Until it lands, a platform owner restores access out of band. A break-glass credential for an SSO outage (E2) and alert-or-block on an anomalous sign-in (E3) are on the same register.')}
+  <div class="sec sec-act">
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="signin2">Continue ${I.arrowRight}</button></div>
+    <p class="t-body-02 aux mt5"><a data-act="gorecover">Lost your device?</a></p></div>
+  </div>`;
+}
+/* NEW: password-reset request screen. */
+function authReset(){
+  return `
+  ${dsPh('Reset your password', 'Enter the email on your staff account and we will send a single-use reset link.')}
+  ${authIdPanel('Resetting for', ME.email, 'authback')}
+  <div class="sec sec-rule">
+    <div class="f last"><label for="rem">Email address</label>
+      <input class="inp fill" id="rem" type="email" value="${esc(ME.email)}" autocomplete="username"></div>
   </div>
   <div class="sec sec-act">
-    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="signin2">Continue ${I.arrowRight}</button></div></div>
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="sendreset">Send Reset Link ${I.arrowRight}</button></div>
+    <p class="t-body-02 aux mt5"><a data-act="authback">Back to log in</a></p></div>
+  </div>`;
+}
+/* NEW: lost-device recovery — a one-time backup code signs you in, or a platform owner
+   is asked to restore access. */
+function authRecover(){
+  return `
+  ${dsPh('Restore access', 'Lost the device with your authenticator? Enter a one-time backup code, or ask a platform owner to restore access.')}
+  ${authIdPanel('Recovering', ME.email, 'authback')}
+  <div class="sec sec-rule">
+    <div class="f last"><label for="rbk">Backup code</label>
+      <input class="inp fill" id="rbk" inputmode="text" placeholder="xxxx-xxxx" maxlength="9"></div>
+  </div>
+  <div class="sec sec-act">
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="verifybackup">Verify Backup Code ${I.arrowRight}</button></div>
+    <p class="t-body-02 aux mt5"><a data-act="requestrestore">No backup code? Ask a platform owner to restore access</a></p></div>
+  </div>`;
+}
+/* NEW: shared confirmation screen for reset-sent / recovery-request-sent. */
+function authSent(title, body){
+  return `
+  ${dsPh(title, '')}
+  <div class="sec sec-rule">${note('succ', title, body)}</div>
+  <div class="sec sec-act">
+    <div class="foot-row foot-stack"><div><button class="btn btn-p btn-full" data-act="authback">Back To Log In ${I.arrowRight}</button></div></div>
   </div>`;
 }
 ACTIONS.signin = () => {
@@ -5390,6 +5462,18 @@ ACTIONS.signin = () => {
   S.auth = 'code';
 };
 ACTIONS.authback = () => { S.auth = 'login'; };
+/* NEW auth-recovery actions (11 Sep 2026). */
+ACTIONS.goreset = () => { S.auth = 'reset'; };
+ACTIONS.gorecover = () => { S.auth = 'recover'; };
+ACTIONS.sendreset = () => { const em = ((device.querySelector('#rem') || {}).value || '').trim(); if(!em){ toast('Enter your email address', 'warn'); return; } S.auth = 'resetsent'; toast('Reset link sent'); };
+ACTIONS.requestrestore = () => { S.auth = 'recoversent'; toast('Restore request sent to a platform owner'); };
+ACTIONS.verifybackup = () => {
+  const code = ((device.querySelector('#rbk') || {}).value || '').trim();
+  if(code.replace(/\W/g, '').length < 6){ toast('Enter a valid backup code', 'warn'); return; }
+  S.signedIn = true; S.auth = 'login';
+  AUDIT.unshift({when:'Just now', who:ME.name, role:'Super Admin', obj:'Email + password + backup code', act:'Signed in (device recovery)', mod:'System & Audit', cat:'Sign-in', sev:'notice', ip:'10.2.14.2'});
+  toast('Signed in with a backup code');
+};
 ACTIONS.signin2 = () => {
   const code = ((device.querySelector('#lcode') || {}).value || '').trim();
   if(!/^\d{6}$/.test(code)){ toast('Enter the 6-digit code from your authenticator', 'warn'); return; }
@@ -5591,7 +5675,7 @@ function detailListSub(m){
   const map = {users:'users', vetting:'applications', candidates:'candidates', agents:'agents',
     cohorts:'cohorts', employers:'employers', crm:'leads'};
   const dmap = {appdetail:'applications', staffdetail:'users', coursedetail:'catalogue',
-    leaddetail:'leads', campaigndetail:'campaigns', import:'users'};
+    leaddetail:'leads', campaigndetail:'campaigns', import:'users', empverifydetail:'empverify'};
   const k = dmap[S.sub] || map[m.k];
   return m._sub[k] || null;
 }
