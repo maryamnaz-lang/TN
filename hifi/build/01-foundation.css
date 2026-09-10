@@ -142,8 +142,16 @@
      describes. Not assumed, because the two-stop haze was asked for by
      name on 4 Sep and has not been retracted.
      ================================================================ */
-  --accent:#bd2a2a;
-  --accent-2:#9e2020;
+  /* ACCENT IS #F9423A NOW — Maryam, 9 Sep 2026 ("change the platform accent
+     colour to F9423A"), a warmer red-orange over the 7 Sep #bd2a2a. The whole
+     fill family is re-derived from it by an RGB multiply so the hue is held and
+     the deeper steps do not drift to pure red: --accent-2 is x0.86 (the haze's
+     one-step-deeper), --accent-text is x0.78 (#c2332d, 5.5:1 on white — still
+     the AA ink), --accent-hover is x0.62 (#9a2924, 7.7:1). --on-accent and
+     §10's --accent-on-dark (#ff7b79, 7.5:1 on the black card) are unchanged;
+     the new fill is 5.28:1 on #111 so it still reads on dark. */
+  --accent:#f9423a;
+  --accent-2:#d63932;
   --accent-grad:linear-gradient(90deg,
     var(--accent) 0%, var(--accent) 100%);
   /* THE STATES ARE GRADIENTS TOO. There is no solid secondary colour in this
@@ -159,8 +167,8 @@
     var(--accent-hover) 0%, var(--accent-hover) 100%);
   --accent-grad-active:linear-gradient(90deg,
     var(--accent-text) 0%, var(--accent-text) 100%);
-  --accent-text:#a52323;
-  --accent-hover:#a01f1f;
+  --accent-text:#c2332d;
+  --accent-hover:#9a2924;
   --on-accent:#ffffff;
 
   /* --- palette.auth — the sign-up card, from the Figma file (255:7673 and

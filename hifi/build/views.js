@@ -4086,7 +4086,14 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
            list (data-go=courses), the quiet btn-s. "View Course" (the card's own
            action) moved down into the stat row. On V.enrol act is passed
            ("Continue to payment"), so this default is the dashboard's alone. */
-        act:act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`
+        /* `act === false` HIDES THE ACTION ENTIRELY — the third caller, Maryam
+           9 Sep 2026. `V.payment` shows this same card on top of the payment
+           screen, and there the CTA has nowhere to go: the reader is already
+           paying. `undefined` still means "use the dashboard's default", a
+           string still overrides it (V.enrol's "Continue to payment"); only an
+           explicit `false` renders no `.aih-a` at all (aiHead drops the wrapper
+           on a falsy `act`). */
+        act:act === false ? '' : (act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`)
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -4200,6 +4207,14 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
            is on the FUNCTION and the call only happens when there is one. */
         const p = c.lead ? c.lead() : null;
         return `<div class="eo-course">
+        ${''/* "TAL RECOMMENDS" OVER THE COURSE NAME (Maryam, 9 Sep 2026: "just
+               like the agent black card i need you to add Tal recommends with the
+               star above the course name"). The same `.rec-lab` the agent
+               recommendation card wears — the 12px sparkle plus the label — so
+               the two black cards read as one voice making a pick. `.bare` is the
+               `.ai-label` opt-out for a mark outside the JS-assembled head band
+               (recipe note), which is what this hand-authored card is. */}
+        <span class="ai-label bare rec-lab">Tal recommends</span>
         ${''/* 28px, WHICH IS `--t-h1-size-lg` AND IS ALREADY IN THE SCALE
                (Maryam, 2 Sep 2026: "increase the course name font size to
                28px"). It shipped at 20 — `.t-h2` — and the role class is gone
@@ -4294,8 +4309,17 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
               makes `.btn-sm` 32px at desktop while the standard `.btn` is 40px
               (§10.298), so a `btn-sm` CTA read a step short of the card's own
               "View Other Courses" and every other button. Dropped to the plain
-              `.btn` height so it matches. */}
-        ${!act ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
+              `.btn` height so it matches.
+
+              DASHBOARD ONLY — `act === undefined`, NOT `!act` (Maryam, 9 Sep
+              2026: "remove the view course button from black card on this page",
+              the payment page). `V.payment` passes `act:false` for a card with no
+              head-row action, and `false` is falsy, so `!act` was drawing "View
+              Course" there too — on the one page where you have already chosen
+              the course and are paying for it. `undefined` is the dashboard's own
+              "no act passed"; `false` is the payment page saying "no action at
+              all", and now the two read apart. */}
+        ${act === undefined ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
           <button class="btn btn-p noic" data-go="enrol" style="white-space:nowrap">View Course ${I.arrowRight}</button></div>` : ''}
       </div>
     </div>`;
@@ -9203,7 +9227,9 @@ V.enrol = (f) => {
 </div></main>`;
 };
 
-V.payment = (f) => `<main class="main"><div class="page">
+V.payment = (f) => {
+  const lvl = f.complete ? 'E4' : 'E3';
+  return `<main class="main"><div class="page">
   ${crumb(['Course Enrollment','enrol'],'Payment')}
   ${''/* The last clause was a sentence spliced onto a `&middot;` row, and Tal
         below said it as one — "your cohort is assigned as soon as it clears".
@@ -9221,6 +9247,20 @@ V.payment = (f) => `<main class="main"><div class="page">
         borrowed facts come off this page has none left that the block under the
         heading does not already carry. Tal's summary is the opening line. */}
   ${ph('Payment')}
+  ${''/* THE PREVIOUS SCREEN'S BLACK CARD RIDES ON TOP, MINUS ITS CTA — Maryam,
+        9 Sep 2026 ("on the payment screen show the previous screen's black card
+        of the course; do not give the payment button in the card since the user
+        is already on the payment screen; show the payment details below in less
+        width, just like the payment screen of booking an agent"). So this now
+        MIRRORS `V.checkout`: the block the reader came from stays on top — there
+        the Calendly agent head, here the course's `enrolOffer` card — and the
+        paying happens in the narrower `.bks-w` column (§76.1b) rather than
+        rail-to-rail. `enrolOffer(lvl, false)` is the same card `V.enrol` draws
+        with its "Continue to payment" action SUPPRESSED (the `false` third state
+        at its call site), because the CTA's destination is the page it is on;
+        the card's own fee, chapters and cohort are what the reader is confirming
+        they are buying. */}
+  ${enrolOffer(lvl, false)}
   ${''/* PAY FROM A SAVED CARD, NOT A RE-TYPED ONE (Maryam, 6 Sep 2026: "we need
         to show the saved cards here as well"). The hand-drawn card form (number,
         name, expiry, CVC, ZIP, "save this card") is gone — `cardPicker` lists the
@@ -9233,11 +9273,10 @@ V.payment = (f) => `<main class="main"><div class="page">
         (its `PAGESUM.payment` entry removed), the order breakdown is gone, and
         the refund line is gone. "Add a card" rides the heading; the price is on
         the button. */}
-  <div class="sec">
+  <div class="sec sec-bk">
+    <div class="bks-w bkpay">
     <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
     ${cardPicker()}
-  </div>
-  <div class="sec">
     ${''/* PAYING LANDS ON WEEK 1 WITH THE RECEIPT AS A DIALOG OVER IT
           (Maryam, 3 Sep 2026: "instead of this screen, i want you to take the
           user on the next prototype that is Week 1 but on that view, a modal
@@ -9270,9 +9309,11 @@ V.payment = (f) => `<main class="main"><div class="page">
           rows in `PARENT` / `TALCTX` / ai4's crumb table and two entries in
           `respcheck.mjs` with it — a screen's worth of deletion that this ask
           does not name. */}
-    <div><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    </div>
   </div>
 </div></main>`;
+};
 
 /* ==========================================================================
    THE RECEIPT IS A DIALOG OVER WEEK 1 — `enrolSheet`
@@ -11946,8 +11987,12 @@ const PF_FORM = {general:pfFormGeneral, work:pfFormWork, edu:pfFormEdu,
    AND 3. What stays under the strip on every tab is `leadSec`'s invitation and
    Log out — the first because its own note asks for it above the ways out, the
    second because it belongs to no tab. */
-const PF_TABS = [['me','My Profile'], ['notif','Notifications'], ['priv','Privacy Settings'],
-                 ['lead','Become a Cohort Leader']];
+/* MY COURSES follows My Profile (Maryam, 9 Sep 2026); "Become a Cohort Leader"
+   is HIDDEN (Maryam, 9 Sep 2026: "hide become a cohort leader tab"). `pfLead`
+   and the `S.pfTab==='lead'` branch stay defined and unreachable, so restoring
+   the tab is one entry back in this list. */
+const PF_TABS = [['me','My Profile'], ['courses','My Courses'], ['notif','Notifications'],
+                 ['priv','Privacy Settings']];
 S.pfTab = 'me';
 
 /* ==========================================================================
@@ -12427,7 +12472,16 @@ const pfSecView = {
           <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
         </button>
         <div class="idhead-b">
-          <span class="idname">${g.name}</span>
+          ${''/* THE RANK CHIP RIDES BESIDE THE NAME (Maryam, 9 Sep 2026: a red
+                pill like Rank #2, light red with red accent text). The number is
+                the real star-rank index off GAME for this stage (the same figure
+                the dashboard standing block reads, so it cannot drift), drawn
+                only on stages that have a rank; pre-enrolment there is nothing to
+                rank yet. */}
+          <span class="idname-row">
+            <span class="idname">${g.name}</span>
+            ${GAME[S.stage] ? `<span class="rank-chip t-label">Rank #${GAME[S.stage].rank}</span>` : ''}
+          </span>
           ${''/* THE SUB-LINE IS THE NICKNAME (Maryam, 7 Sep 2026: "in place of the
                 saved view, the nickname should be shown instead of the email").
                 The email is a field on the form one press away, and the head band
@@ -12778,7 +12832,60 @@ function pfScroll(k){
   }, 0);
 }
 
+/* ==========================================================================
+   MY COURSES — the tab after My Profile (Maryam, 9 Sep 2026)
+
+   "the courses I have taken, completed, incomplete. each of these courses will
+   be in collapse form by default and opening them will show some insights about
+   the course." Each course is an accordion row — collapsed to its name and
+   status, open to the four-cell insight band the course pages already draw
+   (`statCell`: Chapters done, Assessment average, Time invested, Tasks on time).
+   The generic `.acc-h` handler toggles a row in place, so no new state or
+   handler is needed.
+
+   `MY_COURSES` IS AUTHORED PLACEHOLDER PROGRESS, flagged like `CH_SYL` (§74):
+   the seed carries no per-candidate, per-course chapter/assessment/time
+   telemetry, so these figures stand in. The completed row's numbers match the
+   reference; "Total courses taken" in the profile band counts COMPLETED courses
+   (one here), a different figure from this enrolled/attempted list. */
+const MY_COURSES = [
+  {name:'Business Fundamentals', level:'E3', status:'Completed', done:13, avg:83, mins:700, tasksDone:12, tasksTotal:13, tasksSub:'one overdue'},
+  {name:'Business Leadership', level:'E4', status:'In progress', done:6, avg:78, mins:330, tasksDone:5, tasksTotal:6, tasksSub:'on track'},
+  {name:'Business Essentials', level:'E1', status:'Not started', done:0, avg:0, mins:0, tasksDone:0, tasksTotal:0, tasksSub:'not started'},
+];
+const crsInsight = (c) => {
+  const pct = Math.round(c.done / 13 * 100);
+  const h = Math.floor(c.mins / 60), m = c.mins % 60;
+  return `<div class="stats">
+    ${statCell(I.book, 'Chapters done', `${c.done} <small>of 13</small>`, `${pct}%`)}
+    ${statCell(I.chart, 'Assessment average', c.avg ? `${c.avg}<small>%</small>` : '<small>Not yet</small>', c.avg ? 'cohort average 79%' : 'nothing assessed yet')}
+    ${statCell(I.time, 'Time invested', c.mins ? `${h}h <small>${m}m</small>` : '<small>None yet</small>', c.done ? `${Math.round(c.mins / c.done)} min per chapter` : 'not started')}
+    ${statCell(I.flag, 'Tasks on time', `${c.tasksDone} <small>of ${c.tasksTotal}</small>`, c.tasksSub)}
+  </div>`;
+};
+function pfCoursesView(){
+  return `<div class="sec sec-crs" data-pfsec="courses">
+    <div class="sec-h"><h2>My courses</h2></div>
+    <div class="acc ol crs-acc">
+      ${MY_COURSES.map(c => `<div class="acc-i">
+        <button class="acc-h ol-row crs-row">
+          ${''/* THE COURSE COVER ON THE LEFT (Maryam, 9 Sep 2026: "show course
+                 image on the left of each course"). `courseArt` keyed by the
+                 course's level — the same cover the all-courses list draws; an
+                 inline size because it is a lone image, and `onerror` hides it
+                 rather than 404-ing a broken frame (crow's rule). */}
+          <img class="crs-thumb" src="${courseArt(c.level)}" alt="" loading="lazy"
+            onerror="this.style.display='none'">
+          <span class="ttl"><span class="ol-t">${c.name}</span><span class="ol-m t-desc">${c.status}</span></span>
+          <span class="chev">${I.chevDown}</span></button>
+        <div class="acc-b">${crsInsight(c)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function pfPanel(f){
+  if(S.pfTab === 'courses') return pfCoursesView();
   if(S.pfTab === 'notif') return pfNotif();
   if(S.pfTab === 'priv')  return pfPrivacy();
   if(S.pfTab === 'lead')  return pfLead();

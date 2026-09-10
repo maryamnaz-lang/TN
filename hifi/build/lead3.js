@@ -689,7 +689,7 @@ V.leadSum = () => {
         <span class="idmeta">${lname(c)} &middot; 90 days complete</span>
         <span class="tag sm">${llevel(c)}</span>
       </div>
-      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidate Progress ${I.arrowRight}</button></div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidates Progress ${I.arrowRight}</button></div>
     </div>
   </div>
   ${''/* NO "read-only" HELPER AND NO FOOT DIVIDER (Maryam, 9 Sep 2026: "remove

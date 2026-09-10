@@ -1433,7 +1433,23 @@
    THE TYPING DOTS ARE A TURN TOO and take the same entrance, because they
    occupy the same slot Tal's reply is about to. */
 .app .ob-msgs > .ob-m:last-child{
-  animation:ob-msg-in 260ms cubic-bezier(.22,1,.36,1) both}
+  animation:ob-msg-in 300ms cubic-bezier(.22,1,.36,1) both}
+
+/* AND ITS CONTENT UNFOLDS ITS HEIGHT, so a tall question card does not pop
+   (Maryam, 9 Sep 2026: "the new question needs to smoothly appear not a jerk").
+   The fade+lift above moved the turn but a tall card still took its full height
+   in one frame, shoving the conversation above it up on the same paint — the
+   jerk. The turn's content cell now grows from zero over the same beat, so the
+   push is gradual and reads as one motion with the fade. `max-height` with a
+   ceiling above the tallest card (a six-option list is well under 700), NOT a
+   grid `0fr` collapse — `.ob-m-t` holds two children (the framing line and the
+   card) and the collapse wants one, and a wrapper to give it one would break
+   `.ob-m-t > p`'s spacing. `overflow:hidden` clips the growing box; it persists
+   on the resting last turn, which is harmless (the card fits). The typing dots
+   are excluded — one short row that only needs the fade. */
+.app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{
+  overflow:hidden;
+  animation:ob-unfold 300ms cubic-bezier(.22,1,.36,1) both}
 
 /* AND THE WELCOME LEAVES BEFORE THE CONVERSATION ARRIVES. `.ob-leave` is put
    on the stage by the press and the state change waits `OB_LEAVE` for it —
@@ -1451,6 +1467,9 @@
 @keyframes ob-msg-in{
   from{opacity:0;transform:translateY(14px)}
   to{opacity:1;transform:none}}
+@keyframes ob-unfold{
+  from{max-height:0}
+  to{max-height:700px}}
 @keyframes ob-leave{
   from{opacity:1;transform:none}
   to{opacity:0;transform:translateY(-12px)}}
@@ -1463,7 +1482,9 @@
    the honest cost of doing this in one place. */
 @media (prefers-reduced-motion:reduce){
   .app .ob-msgs > .ob-m:last-child,
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t,
   .app .ob-stage.ob-leave{animation:none}
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{overflow:visible}
   .app .ob-stage.ob-leave{opacity:0}
 }
 

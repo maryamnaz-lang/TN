@@ -22,8 +22,9 @@
   --brand-tint-2:#f0cece;
   
   
-  --accent:#bd2a2a;
-  --accent-2:#9e2020;
+  
+  --accent:#f9423a;
+  --accent-2:#d63932;
   --accent-grad:linear-gradient(90deg,
     var(--accent) 0%, var(--accent) 100%);
   
@@ -31,8 +32,8 @@
     var(--accent-hover) 0%, var(--accent-hover) 100%);
   --accent-grad-active:linear-gradient(90deg,
     var(--accent-text) 0%, var(--accent-text) 100%);
-  --accent-text:#a52323;
-  --accent-hover:#a01f1f;
+  --accent-text:#c2332d;
+  --accent-hover:#9a2924;
   --on-accent:#ffffff;
   
   --auth-o-1:#bd2a2a;
@@ -7155,7 +7156,7 @@ button.btn-p:active,
   font-size:13px;line-height:18px;font-weight:600;letter-spacing:.1px}
 .app .ldr-dm-t{
   display:flex;align-items:center;gap:var(--s04);width:100%;
-  padding:var(--s05) var(--s05);
+  padding:var(--s04) var(--s05);
   border:0;border-bottom:1px solid var(--border-subtle-01);
   background-color:transparent;text-align:left;cursor:pointer;
   transition:background-color var(--dur-short) var(--ease-standard)}
@@ -7194,6 +7195,8 @@ button.btn-p:active,
   font-size:12px;line-height:17px;color:var(--text-secondary)}
 .app .ldr-dm-thread > .msgs{padding:var(--s05)}
 .app .ldr-dm-thread > .composer{flex:none;margin:0 var(--s05) var(--s05)}
+.app .crs-card{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s03);text-align:left}
+.app .crs-card > .crs-name,.app .crs-card > .crs-desc{text-align:left;width:100%;margin:0}
 .app .sec.ldr-dm-sec{padding:0}
 .app .page > .sec.sec-cs:has(+ .sec.ldr-dm-sec){padding-bottom:0}
 @container app (min-width:900px){
@@ -8179,7 +8182,7 @@ button.btn-p:active,
 .app .ask-page .ask-sugg .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;
@@ -8220,7 +8223,7 @@ button.btn-p:active,
     linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
     linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%);
   
-  --askv-stroke:#ffa4a2;
+  --askv-stroke:var(--accent);
   --askv-stroke-hot:var(--accent-2);
   --askv-stroke-ramp:16%;
   
@@ -8365,13 +8368,14 @@ button.btn-p:active,
   border:1px solid transparent;
   overflow:visible;
   background-color:#fff;
+  
   background-image:radial-gradient(115% 338% at 80% -128%,
-    rgb(240 83 12 / calc(.183 * var(--askv-chip-glow))) 0%,
-    rgb(240 83 12 / calc(.124 * var(--askv-chip-glow))) 39%,
-    rgb(240 83 12 / calc(.056 * var(--askv-chip-glow))) 68%,
-    rgb(240 83 12 / calc(.021 * var(--askv-chip-glow))) 85%,
-    rgb(240 83 12 / calc(.006 * var(--askv-chip-glow))) 100%,
-    rgb(240 83 12 / 0) 115%);
+    rgb(249 66 58 / calc(.183 * var(--askv-chip-glow))) 0%,
+    rgb(249 66 58 / calc(.124 * var(--askv-chip-glow))) 39%,
+    rgb(249 66 58 / calc(.056 * var(--askv-chip-glow))) 68%,
+    rgb(249 66 58 / calc(.021 * var(--askv-chip-glow))) 85%,
+    rgb(249 66 58 / calc(.006 * var(--askv-chip-glow))) 100%,
+    rgb(249 66 58 / 0) 115%);
   background-repeat:no-repeat;
   font-size:12px;line-height:18px;letter-spacing:.16px;
   color:var(--askv-ink-2);white-space:nowrap}
@@ -8391,7 +8395,7 @@ button.btn-p:active,
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;
@@ -9547,7 +9551,8 @@ button.btn-p:active,
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls);
   text-transform:none;
   color:var(--on-dark)}
-.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+.app .rec-dark .ai-label.bare.rec-lab,
+.app .dark-card .ai-label.bare.rec-lab{color:var(--on-dark)}
 .app .rec-dark .rec-n{color:var(--on-dark)}
 .app .dark-card .dc-hd-r > .btn.dc-act{color:var(--on-dark)}
 .app .dark-card .dc-hd-r > .dc-when{
@@ -9754,6 +9759,7 @@ button.btn-p:active,
 .app .stats .stat-top > .l{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+.app .stats .l,.app .facts .l,.app .page .pf-facts .pf-l{color:var(--text-primary)}
 .app .bkc-fl{
   font-size:var(--t-eyebrow-size);line-height:var(--t-eyebrow-lh);
   font-weight:var(--t-w-book);letter-spacing:var(--t-eyebrow-ls);
@@ -10317,6 +10323,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
+.app .rank-chip{color:var(--accent-text)}
 .app .btn-s,.app .btn-t,.app .btn-g,
 .app .btn-s:hover:where(.__nh),.app .btn-t:hover:where(.__nh),.app .btn-g:hover:where(.__nh),
 .app .on-dark .btn-s,.app .sec.on-dark .btn-s,
@@ -10506,9 +10513,9 @@ button.btn-p:active,
 .app .page .sec.wpair > .tile > .lbl{display:block;margin-bottom:var(--s05)}
 .app{
   
-  --ai-1:#bd2a2a;
+  --ai-1:#f9423a;
   --ai-2:#dd8080;
-  --ai-3:#bd2a2a;
+  --ai-3:#f9423a;
   --ai-line-2:#cce7cb;
   --ai-amber:var(--ai-2);
   --ai-line-alpha:70%;
@@ -12242,6 +12249,15 @@ button.btn-p:active,
   .app .page .pf-facts{grid-template-columns:repeat(4, 1fr)}
 }
 .app .page .sec-out > .btn{padding-left:0}
+.app .page .idname-row{display:flex;align-items:center;gap:var(--s03)}
+.app .page .rank-chip{
+  display:inline-flex;align-items:center;
+  padding:1px var(--s03);border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
+.app .page .crs-row > .crs-thumb{
+  flex:none;width:56px;height:38px;object-fit:cover;
+  margin-right:var(--s04);border:1px solid var(--rule)}
 .app .page .pf-tgs{
   display:grid;gap:0;
   grid-template-columns:1fr}
@@ -12265,14 +12281,14 @@ button.btn-p:active,
 .app .cardrow .card-del svg{flex:none;width:18px;height:18px}
 .app .conf > .conf-b{
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:var(--s05);padding:var(--s07) var(--s06) var(--s06)}
+  gap:var(--s04);padding:var(--s06) var(--s05) var(--s05)}
 .app .conf .conf-mk{
   flex:none;display:grid;place-items:center;
-  width:48px;height:48px;margin-bottom:var(--s04);
+  width:48px;height:48px;margin-bottom:var(--s06);
   background:var(--support-error-bg);border-radius:999px;
   box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
              0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
-.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink)}
+.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink);margin:0}
 .app .conf .conf-t{margin:0}
 .app .conf .conf-x{margin:var(--sec-desc-gap) 0 0;max-width:42ch}
 .app .conf .conf-f{width:100%;margin:var(--s03) 0 0}
@@ -12656,19 +12672,27 @@ button.btn-p:active,
   background:var(--rule)}
 .app .ob-prog-seg.on{background:var(--accent)}
 .app .ob-msgs > .ob-m:last-child{
-  animation:ob-msg-in 260ms cubic-bezier(.22,1,.36,1) both}
+  animation:ob-msg-in 300ms cubic-bezier(.22,1,.36,1) both}
+.app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{
+  overflow:hidden;
+  animation:ob-unfold 300ms cubic-bezier(.22,1,.36,1) both}
 .app .ob-stage.ob-leave{
   animation:ob-leave 220ms ease-in forwards;
   pointer-events:none}
 @keyframes ob-msg-in{
   from{opacity:0;transform:translateY(14px)}
   to{opacity:1;transform:none}}
+@keyframes ob-unfold{
+  from{max-height:0}
+  to{max-height:700px}}
 @keyframes ob-leave{
   from{opacity:1;transform:none}
   to{opacity:0;transform:translateY(-12px)}}
 @media (prefers-reduced-motion:reduce){
   .app .ob-msgs > .ob-m:last-child,
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t,
   .app .ob-stage.ob-leave{animation:none}
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{overflow:visible}
   .app .ob-stage.ob-leave{opacity:0}
 }
 @keyframes ob-in{from{opacity:0}to{opacity:1}}
@@ -13207,7 +13231,7 @@ button.btn-p:active,
 .app .ask-sugg .chip-tal .sk-mark{
   width:10px;height:10px;
   background-color:transparent;
-  background-image:var(--ai-grad);
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;background-position:center;background-repeat:no-repeat;
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat}
@@ -13219,7 +13243,7 @@ button.btn-p:active,
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--rule), var(--rule));
+    linear-gradient(var(--accent), var(--accent));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 .app .ask-page .askfield:focus-within{
@@ -15838,7 +15862,7 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
         desc:ENROL_COURSE[lvl] ? ''
           : `${ENROL_DESC[lvl]}${ENROL_OPENS[lvl][1] ? ' ' + ENROL_OPENS[lvl][1] : ''}`,
         under:`<span class="eo-when">${I.calendar}<b>${ENROL_OPENS[lvl][0]}</b></span>`,
-        act:act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`
+        act:act === false ? '' : (act || `<button class="btn btn-s btn-sm noic" data-go="courses">View Other Courses ${I.arrowRight}</button>`)
       })}
       ${''/* THE ROW IS `.facts`, AND THE CLASS IS KEPT FOR ONE REASON: §10.15's
              label-column opt-out names it, so a headed section carrying one gets
@@ -15948,6 +15972,14 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
         if(!c) return '';
         const p = c.lead ? c.lead() : null;
         return `<div class="eo-course">
+        ${''/* "TAL RECOMMENDS" OVER THE COURSE NAME (Maryam, 9 Sep 2026: "just
+               like the agent black card i need you to add Tal recommends with the
+               star above the course name"). The same `.rec-lab` the agent
+               recommendation card wears — the 12px sparkle plus the label — so
+               the two black cards read as one voice making a pick. `.bare` is the
+               `.ai-label` opt-out for a mark outside the JS-assembled head band
+               (recipe note), which is what this hand-authored card is. */}
+        <span class="ai-label bare rec-lab">Tal recommends</span>
         ${''/* 28px, WHICH IS `--t-h1-size-lg` AND IS ALREADY IN THE SCALE
                (Maryam, 2 Sep 2026: "increase the course name font size to
                28px"). It shipped at 20 — `.t-h2` — and the role class is gone
@@ -16042,8 +16074,17 @@ const enrolOffer = (lvl, act) => `<div class="sec eo dark-card">
               makes `.btn-sm` 32px at desktop while the standard `.btn` is 40px
               (§10.298), so a `btn-sm` CTA read a step short of the card's own
               "View Other Courses" and every other button. Dropped to the plain
-              `.btn` height so it matches. */}
-        ${!act ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
+              `.btn` height so it matches.
+
+              DASHBOARD ONLY — `act === undefined`, NOT `!act` (Maryam, 9 Sep
+              2026: "remove the view course button from black card on this page",
+              the payment page). `V.payment` passes `act:false` for a card with no
+              head-row action, and `false` is falsy, so `!act` was drawing "View
+              Course" there too — on the one page where you have already chosen
+              the course and are paying for it. `undefined` is the dashboard's own
+              "no act passed"; `false` is the payment page saying "no action at
+              all", and now the two read apart. */}
+        ${act === undefined ? `<div class="eo-cta" style="display:flex;align-items:center;margin-left:auto">
           <button class="btn btn-p noic" data-go="enrol" style="white-space:nowrap">View Course ${I.arrowRight}</button></div>` : ''}
       </div>
     </div>`;
@@ -19117,7 +19158,9 @@ V.enrol = (f) => {
 </div></main>`;
 };
 
-V.payment = (f) => `<main class="main"><div class="page">
+V.payment = (f) => {
+  const lvl = f.complete ? 'E4' : 'E3';
+  return `<main class="main"><div class="page">
   ${crumb(['Course Enrollment','enrol'],'Payment')}
   ${''/* The last clause was a sentence spliced onto a `&middot;` row, and Tal
         below said it as one — "your cohort is assigned as soon as it clears".
@@ -19135,6 +19178,20 @@ V.payment = (f) => `<main class="main"><div class="page">
         borrowed facts come off this page has none left that the block under the
         heading does not already carry. Tal's summary is the opening line. */}
   ${ph('Payment')}
+  ${''/* THE PREVIOUS SCREEN'S BLACK CARD RIDES ON TOP, MINUS ITS CTA — Maryam,
+        9 Sep 2026 ("on the payment screen show the previous screen's black card
+        of the course; do not give the payment button in the card since the user
+        is already on the payment screen; show the payment details below in less
+        width, just like the payment screen of booking an agent"). So this now
+        MIRRORS `V.checkout`: the block the reader came from stays on top — there
+        the Calendly agent head, here the course's `enrolOffer` card — and the
+        paying happens in the narrower `.bks-w` column (§76.1b) rather than
+        rail-to-rail. `enrolOffer(lvl, false)` is the same card `V.enrol` draws
+        with its "Continue to payment" action SUPPRESSED (the `false` third state
+        at its call site), because the CTA's destination is the page it is on;
+        the card's own fee, chapters and cohort are what the reader is confirming
+        they are buying. */}
+  ${enrolOffer(lvl, false)}
   ${''/* PAY FROM A SAVED CARD, NOT A RE-TYPED ONE (Maryam, 6 Sep 2026: "we need
         to show the saved cards here as well"). The hand-drawn card form (number,
         name, expiry, CVC, ZIP, "save this card") is gone — `cardPicker` lists the
@@ -19147,11 +19204,10 @@ V.payment = (f) => `<main class="main"><div class="page">
         (its `PAGESUM.payment` entry removed), the order breakdown is gone, and
         the refund line is gone. "Add a card" rides the heading; the price is on
         the button. */}
-  <div class="sec">
+  <div class="sec sec-bk">
+    <div class="bks-w bkpay">
     <div class="sec-h"><h2>Pay with</h2>${addCardAct}</div>
     ${cardPicker()}
-  </div>
-  <div class="sec">
     ${''/* PAYING LANDS ON WEEK 1 WITH THE RECEIPT AS A DIALOG OVER IT
           (Maryam, 3 Sep 2026: "instead of this screen, i want you to take the
           user on the next prototype that is Week 1 but on that view, a modal
@@ -19184,9 +19240,11 @@ V.payment = (f) => `<main class="main"><div class="page">
           rows in `PARENT` / `TALCTX` / ai4's crumb table and two entries in
           `respcheck.mjs` with it — a screen's worth of deletion that this ask
           does not name. */}
-    <div><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    <div class="bkpay-go"><button class="btn btn-p" data-paid="1">Pay $595 and start ${I.arrowRight}</button></div>
+    </div>
   </div>
 </div></main>`;
+};
 
 const enrolSheet = () => {
   const c = S.cards.find(x => x.def) || S.cards[0];
@@ -20708,8 +20766,8 @@ const pfFormSkill = () => `
 const PF_FORM = {general:pfFormGeneral, work:pfFormWork, edu:pfFormEdu,
                  cert:pfFormCert, skill:pfFormSkill};
 
-const PF_TABS = [['me','My Profile'], ['notif','Notifications'], ['priv','Privacy Settings'],
-                 ['lead','Become a Cohort Leader']];
+const PF_TABS = [['me','My Profile'], ['courses','My Courses'], ['notif','Notifications'],
+                 ['priv','Privacy Settings']];
 S.pfTab = 'me';
 
 const CL_DO = [
@@ -20949,7 +21007,16 @@ const pfSecView = {
           <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
         </button>
         <div class="idhead-b">
-          <span class="idname">${g.name}</span>
+          ${''/* THE RANK CHIP RIDES BESIDE THE NAME (Maryam, 9 Sep 2026: a red
+                pill like Rank #2, light red with red accent text). The number is
+                the real star-rank index off GAME for this stage (the same figure
+                the dashboard standing block reads, so it cannot drift), drawn
+                only on stages that have a rank; pre-enrolment there is nothing to
+                rank yet. */}
+          <span class="idname-row">
+            <span class="idname">${g.name}</span>
+            ${GAME[S.stage] ? `<span class="rank-chip t-label">Rank #${GAME[S.stage].rank}</span>` : ''}
+          </span>
           ${''/* THE SUB-LINE IS THE NICKNAME (Maryam, 7 Sep 2026: "in place of the
                 saved view, the nickname should be shown instead of the email").
                 The email is a field on the form one press away, and the head band
@@ -21171,7 +21238,44 @@ function pfScroll(k){
   }, 0);
 }
 
+const MY_COURSES = [
+  {name:'Business Fundamentals', level:'E3', status:'Completed', done:13, avg:83, mins:700, tasksDone:12, tasksTotal:13, tasksSub:'one overdue'},
+  {name:'Business Leadership', level:'E4', status:'In progress', done:6, avg:78, mins:330, tasksDone:5, tasksTotal:6, tasksSub:'on track'},
+  {name:'Business Essentials', level:'E1', status:'Not started', done:0, avg:0, mins:0, tasksDone:0, tasksTotal:0, tasksSub:'not started'},
+];
+const crsInsight = (c) => {
+  const pct = Math.round(c.done / 13 * 100);
+  const h = Math.floor(c.mins / 60), m = c.mins % 60;
+  return `<div class="stats">
+    ${statCell(I.book, 'Chapters done', `${c.done} <small>of 13</small>`, `${pct}%`)}
+    ${statCell(I.chart, 'Assessment average', c.avg ? `${c.avg}<small>%</small>` : '<small>Not yet</small>', c.avg ? 'cohort average 79%' : 'nothing assessed yet')}
+    ${statCell(I.time, 'Time invested', c.mins ? `${h}h <small>${m}m</small>` : '<small>None yet</small>', c.done ? `${Math.round(c.mins / c.done)} min per chapter` : 'not started')}
+    ${statCell(I.flag, 'Tasks on time', `${c.tasksDone} <small>of ${c.tasksTotal}</small>`, c.tasksSub)}
+  </div>`;
+};
+function pfCoursesView(){
+  return `<div class="sec sec-crs" data-pfsec="courses">
+    <div class="sec-h"><h2>My courses</h2></div>
+    <div class="acc ol crs-acc">
+      ${MY_COURSES.map(c => `<div class="acc-i">
+        <button class="acc-h ol-row crs-row">
+          ${''/* THE COURSE COVER ON THE LEFT (Maryam, 9 Sep 2026: "show course
+                 image on the left of each course"). `courseArt` keyed by the
+                 course's level — the same cover the all-courses list draws; an
+                 inline size because it is a lone image, and `onerror` hides it
+                 rather than 404-ing a broken frame (crow's rule). */}
+          <img class="crs-thumb" src="${courseArt(c.level)}" alt="" loading="lazy"
+            onerror="this.style.display='none'">
+          <span class="ttl"><span class="ol-t">${c.name}</span><span class="ol-m t-desc">${c.status}</span></span>
+          <span class="chev">${I.chevDown}</span></button>
+        <div class="acc-b">${crsInsight(c)}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
 function pfPanel(f){
+  if(S.pfTab === 'courses') return pfCoursesView();
   if(S.pfTab === 'notif') return pfNotif();
   if(S.pfTab === 'priv')  return pfPrivacy();
   if(S.pfTab === 'lead')  return pfLead();
@@ -24189,6 +24293,16 @@ const llevel = c => 'Explorer &ndash; ' + c.level;
 const lintent = c => c.intent;
 const lcourse = c => courseOf(c.level);
 
+const LDR_LEVELS = ['E1', 'E2', 'E3', 'E4'];
+const mlevel = m => LDR_LEVELS[[...m.name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % LDR_LEVELS.length];
+const mcourse = m => courseOf(mlevel(m));
+
+const COURSE_DESC = {
+  E1: 'The everyday foundations of working in a business — how teams organise, how work moves through them, and the basic tools that keep it running. The first step before the deeper courses.',
+  E2: 'The software and working habits that make a modern team fast: documents, spreadsheets, planning and communication tools, and how to use them well together rather than one at a time.'
+};
+const courseDesc = lvl => (ENROL_COURSE[lvl] && ENROL_COURSE[lvl].desc) || COURSE_DESC[lvl] || '';
+
 const cohortArt = c => COHORT_ART[String(c.level).toLowerCase()] || COHORT_ART.e1;
 
 const lcall = c => ({
@@ -24295,7 +24409,13 @@ const leadCall = (k, second) => ({
 
 const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
+      ${''/* THE HEADER IS "Upcoming Cohort Session", NOT "Cohort 41 call" (Maryam,
+             9 Sep 2026: "in black cohort call cards, change the 'Cohort 41 call'
+             title to 'Upcoming Cohort Session'"). The crow below still names the
+             cohort ("Cohort 41" + the detail), so the header can be the generic
+             kind of appointment. `lcTitle` is untouched — the dashboard's
+             upcoming-calls cards still title themselves "Cohort N call". */}
+      <div class="dc-hd-r"><h2 class="dc-t">Upcoming Cohort Session</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
     ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
@@ -24377,6 +24497,19 @@ function faceRow(p, detail, go, at, cta){
   </button>`;
 }
 
+const leadCertBanner = () => `<div class="sec">
+  <div class="certban">
+    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
+    <span class="certban-b">
+      <span class="certban-t">Certified Cohort Leader</span>
+      <span class="certban-m">Verified by TalentNext &middot; Volunteer cohort leader</span>
+    </span>
+    <span class="certban-a">
+      <button class="btn btn-p btn-sm" data-go="leadProfile">View</button>
+    </span>
+  </div>
+</div>`;
+
 V.leadDash = () => {
   const att = lattention(), next = lnext(), pend = lpending();
   const severe = att.filter(x => x.m.flag.k === 'bad');
@@ -24438,6 +24571,9 @@ V.leadDash = () => {
          ends the band — written between the `.ph` and Tal's card it would
          leave the summary in the page body (trap 11's neighbourhood). */}
   ${leadCallsSec()}
+  ${''/* THE CERTIFIED COHORT LEADER BADGE sits right after the calls (Maryam,
+         9 Sep 2026) — `leadCertBanner` above. */}
+  ${leadCertBanner()}
   ${''/* THE FIGURE BAND IS PLAIN STAT CELLS, NOT A STICKY SCROLL-SPY (Maryam,
          9 Sep 2026: "hide the fix tabs interaction, go with the generic scroll
          just like other pages"). The cells used to be `data-jump` buttons that
@@ -24672,7 +24808,7 @@ S.ldrNotes = {
   'Lena Fischer':[{k:'general', t:'Quiet on calls, thorough on the board', b:'Rarely speaks up live, but her written feedback to peers is the most detailed in the cohort. Worth drawing out in the room.', w:'2 weeks ago'}]
 };
 
-S.ldrCTab = 'discussion';
+S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = 'general';
 
@@ -24844,32 +24980,32 @@ const cohortCard = c => {
   const wa   = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
   const pc   = lavg(c,'pc');
   const pace = lpace(c);
-  const pill = CCO_PILL[String(c.level).toLowerCase()] || '--mk-1';
   const row = (mk,ic,label,val) => `<span class="cco-r" style="--mk:var(${mk})">
       <span class="cco-ic">${ic}</span>
       <span class="cco-l">${label}</span>
       <span class="cco-v">${val}</span>
     </span>`;
   return `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
-    ${''/* NO COURSE COVER (Client, 9 Sep 2026: "since the cohorts are now not
-          dependant on course so remove the course images from cohorts"). The
-          `<img>` was `cohortArt(c)`, a course cover keyed by level; with cohorts
-          decoupled from courses the cover leaves and the cohort's own number
-          (`<i>`, already the fail-to-decode fallback) is the mark. */}
-    <span class="cco-art">
-      <i>${c.id}</i>
-      <span class="cco-pill" style="--pill:var(${pill})">${c.members.length} Candidates</span>
-    </span>
+    ${''/* NO IMAGE PLACEHOLDER AND NO COHORT-NUMBER DISC (Client 9 Sep: "remove
+          the course images from cohorts", then Maryam 9 Sep: "remove the image
+          placeholder as well where the number is right now"). The `.cco-art`
+          9:5 block held a course cover, then the cohort's own number over a grey
+          ground; it is gone, and the card opens on its own head block. */}
     <span class="cco-b">
       <span class="cco-hd">
         <span class="cco-hb">
           <span class="cco-n">${lname(c)}</span>
-          ${''/* THE COURSE LEADS THE DETAIL LINE (2 Sep 2026). The card is a
-                 cover with a name under it, so the first thing under the cohort
-                 number should say what the picture IS; the week is where the
-                 cohort has got to inside it. Same order the dashboard row's
-                 eyebrow takes, one component over. */}
-          <span class="cco-d">${lintent(c)} &middot; Week ${c.week} of 13</span>
+          ${''/* THE DETAIL LINE SHOWS THE LEVEL (Maryam, 9 Sep 2026: 'change the
+                 "Develop for ownership · Week 5 of 13" content to "Level E3 ·
+                 Week 5 of 13" means show the level in each card'). It was the
+                 intent (`lintent`); the level is the fact a leader scans by. */}
+          <span class="cco-d">Level ${c.level} &middot; Week ${c.week} of 13</span>
+          ${''/* THE CANDIDATE COUNT IS PLAIN DESC TEXT, NOT A CHIP (Maryam, 9 Sep
+                 2026: first moved off the cover's corner into a pill under the
+                 level line, then "remove the candidate count from chips and just
+                 show them as the desc text like above text"). A second `.cco-d`
+                 line, same grey as the level line above it. */}
+          <span class="cco-d">${c.members.length} candidates</span>
         </span>
         ${''/* THE "of 38%" CAPTION IS GONE (Maryam, 2 Sep 2026: "remove the
                'of n%' from the bottom of each progress circle"). It was the
@@ -24888,8 +25024,13 @@ const cohortCard = c => {
           ${ring(pc, `${pc}% of ${pace}% expected`)}
         </span>
       </span>
-      ${row('--mk-3', I.chart, 'Assessment',
-            lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>')}
+      ${''/* TOTAL COURSES, NOT ASSESSMENT (Maryam, 9 Sep 2026: "in place of
+             assessments show 'Total Courses' and the count against"). Follows
+             from candidates taking different courses (`mcourse`): the count is
+             the distinct courses running across this cohort's members. The
+             cohort's assessment average still lives on the cohort detail page's
+             figure band. */}
+      ${row('--mk-3', I.book, 'Total Courses', new Set(c.members.map(mcourse)).size)}
       ${row('--support-attention', I.warningAlt, 'Flagged',
             bad || wa
               ? `<span class="cco-tags">${bad ? `<span class="tag red sm">${bad} at risk</span>` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}</span>`
@@ -25031,51 +25172,8 @@ V.leadCohort = () => {
       ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
     </div>
   </div>
-  <div class="sec tint">
-    ${''/* THE ROSTER IS THE COURSE REPORTS TABLE WITH THE FLAG COLUMN ON IT
-           (Maryam, 2 Sep 2026: "instead of the roasters table, we should have
-           the discussions, ranking, and members against a cohort but before
-           that we need to show the candidate progress table just like we have
-           on the course report page but … we have the flags column in the
-           roaster table, add that").
-
-           IT IS ONE TABLE DRAWN TWICE, NOT TWO TABLES. Course Reports and this
-           page were reporting the same ten people in two column sets — Progress
-           against pace, a week task and a flag here; chapters, assessment,
-           attempts and time there — so a leader comparing the two saw the same
-           roster described two ways. The columns are Course Reports' now,
-           because they are the platform's own fields, plus the FLAG, which is
-           the one reading this page had that the other did not.
-           WHAT WENT WITH THE OLD COLUMNS: "Progress %+gap" is the figure band
-           two blocks up (it states the cohort's own average and its gap), and
-           the "Week N task" chip is `ltask`, which is derived from progress
-           against pace — the same reading the flag column makes, said twice.
-           `ltask` keeps its other reader on the member page.
-           THE ROW IS THE COURSE REPORTS ROW to the class: `.ldr-tbl.tbl-flag`
-           for §31's quiet treatment, a face in the first cell, and "View
-           Progress" in the last. */}
-    <div class="sec-h"><h2>Candidate Progress</h2><span class="t-helper-01">From the course platform</span></div>
-    <div class="tbl-wrap">
-      <table class="tbl ldr-tbl tbl-flag">
-        <tr><th>Candidate</th><th class="num">Chapters</th><th class="num">Assessment</th>
-            <th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th>Flag</th><th></th></tr>
-        ${c.members.slice().sort((a,b) => (a.pc - lpace(c)) - (b.pc - lpace(c))).map(m => `
-          <tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td><span class="ldr-who">
-              <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
-              <span class="ldr-who-n">${m.name}</span>
-            </span></td>
-            <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
-            <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td>${m.last.toLowerCase()}</td>
-            <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
-          </tr>`).join('')}
-      </table>
-    </div>
-  </div>
+  ${''/* THE CANDIDATE PROGRESS TABLE MOVED INTO THE TABS BELOW (Maryam, 9 Sep
+         2026) — it was a `.sec tint` table here, above the strip. */}
   ${''/* AND THE COHORT'S OWN THREE TABS, WHICH ARE THE CANDIDATE'S. The
          candidate's Cohort page has drawn Discussion / Ranking / Members since
          it existed, and this is the leader's view of the same cohort — so it is
@@ -25098,20 +25196,51 @@ V.leadCohort = () => {
          people who are not in it — the invented data §74 rules out — so 33 and
          47 get the empty state and the composer, which is what a board with
          nothing on it is. */}
+  ${''/* CANDIDATE PROGRESS IS THE FIRST OF FOUR TABS NOW (Maryam, 9 Sep 2026:
+         "make candidate progress part of the tabs below, means there will be 4
+         tabs, first Candidate Progress, then discussions, ranking and members").
+         It was a standalone `.sec tint` table above the strip; it is the strip's
+         default tab now, so `S.ldrCTab` defaults to `progress`. The table gained
+         a Course column and rounds Attempts to a whole number, same as Course
+         Reports (§ N/O this day). */}
   <div class="sec sec-cs">
     <div class="cs">
-      <button class="${(S.ldrCTab || 'discussion') === 'discussion' ? 'on' : ''}" data-ldrctab="discussion">Discussion</button>
+      <button class="${(S.ldrCTab || 'progress') === 'progress' ? 'on' : ''}" data-ldrctab="progress">Candidates Progress</button>
+      <button class="${S.ldrCTab === 'discussion' ? 'on' : ''}" data-ldrctab="discussion">Discussion</button>
       <button class="${S.ldrCTab === 'ranking' ? 'on' : ''}" data-ldrctab="ranking">Ranking</button>
       <button class="${S.ldrCTab === 'members' ? 'on' : ''}" data-ldrctab="members">Members</button>
     </div>
-    ${S.ldrCTab === 'members'
-      ? `<div class="tile-stack">${c.members.map(m => mem(m.name, m.ini, `${llevel(c)} &middot; ${m.pc}% of the course`, false, m.img)).join('')}</div>`
-      : S.ldrCTab === 'ranking' ? ldrRankBoard(c)
-      : c.id === 41 ? discussionRoom()
-      : `<div class="empty" style="border:0">${I.chat}
+    ${(() => {
+      const tab = S.ldrCTab || 'progress';
+      if(tab === 'members') return `<div class="tile-stack">${c.members.map(m => mem(m.name, m.ini, `${llevel(c)} &middot; ${m.pc}% of the course`, false, m.img)).join('')}</div>`;
+      if(tab === 'ranking') return ldrRankBoard(c);
+      if(tab === 'discussion') return c.id === 41 ? discussionRoom()
+        : `<div class="empty" style="border:0">${I.chat}
           <h3>Nothing posted yet</h3>
           <p>${lname(c)}&rsquo;s board is empty. Anything you post here, all ${c.members.length} of them read.</p>
-        </div>`}
+        </div>`;
+      return `<div class="tbl-wrap">
+        <table class="tbl ldr-tbl tbl-flag">
+          <tr><th>Candidate</th><th>Course</th><th class="num">Chapters</th><th class="num">Assessment</th>
+              <th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th>Flag</th><th></th></tr>
+          ${c.members.slice().sort((a,b) => (a.pc - lpace(c)) - (b.pc - lpace(c))).map(m => `
+            <tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
+              <td><span class="ldr-who">
+                <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
+                <span class="ldr-who-n">${m.name}</span>
+              </span></td>
+              <td>${mcourse(m)}</td>
+              <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
+              <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="num">${m.att ? Math.round(m.att) : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td>${m.last.toLowerCase()}</td>
+              <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
+            </tr>`).join('')}
+        </table>
+      </div>`;
+    })()}
   </div>
   ${''/* THE "ATTEMPTS" NOTE IS DELETED (Maryam, 2 Sep 2026: "remove the bottom
          Attempts section"). It defined the column — how many times a candidate
@@ -25266,10 +25395,32 @@ V.leadMember = () => {
   </div>
   <div class="sec">
     <div class="stats">
-      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', `${d >= 0 ? '+' + d : d} against pace`)}
-      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? (m.avg < 75 ? 'below the 75% pass mark' : 'above the pass mark') : 'nothing assessed yet')}
-      ${statCell(I.renew,  'Attempts',   m.att ? m.att.toFixed(1) : '<small>&mdash;</small>', m.att >= 2 ? 'going round twice' : 'first time through')}
+      ${''/* SHORT, PLAIN SUB-LINES, NOT INSIGHTS (Maryam, 9 Sep 2026: "i do not
+             want insights like -29 or +1 against pace, please make these line
+             simple and short"). Each sub is now a plain descriptor of what its
+             figure IS — the gap-to-pace judgement, the pass-mark comparison and
+             the "going round twice" reading all come off; the flag column and
+             the figure band above already carry the reading. Attempts rounds to
+             a whole number here too (§O). */}
+      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', 'of the course')}
+      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? 'course average' : 'not assessed yet')}
+      ${statCell(I.renew,  'Attempts',   m.att ? Math.round(m.att) : '<small>&mdash;</small>', m.att ? 'per chapter' : 'not started')}
       ${statCell(I.time,   'Time on the course', lhrs(lmins(m)), done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
+    </div>
+  </div>
+  ${''/* THE COURSE THIS CANDIDATE IS TAKING — name and description, as on the
+         enrolment card (Maryam, 9 Sep 2026: "show the course image, name and its
+         desc that we are showing on the black card while enrolling"). `mcourse` /
+         `courseDesc` read the candidate's own course (the same one the reports
+         table names), so the card matches the row. The enrolment card carries no
+         photographic cover in this build — it is a name over a description — so
+         this is that, in a tile. (`.tile` under a `.sec-h` stacks, as "Your
+         recommendation" on the evaluation screen does.) */}
+  <div class="sec">
+    <div class="sec-h"><h2>Course</h2></div>
+    <div class="tile crs-card">
+      <h3 class="t-h3 crs-name">${mcourse(m)}</h3>
+      <p class="t-desc crs-desc">${courseDesc(mlevel(m))}</p>
     </div>
   </div>
   ${''/* PROGRESS BY CHAPTER IS THE CANDIDATE'S OWN LIST (Maryam, 2 Sep 2026,
@@ -25499,10 +25650,10 @@ V.leadReports = () => {
          and the dashboard's queue does not have, because its rows are not
          links. The two classes answer two different questions. */}
   <div class="sec sec-rep">
-    <div class="sec-h"><h2>Candidate Progress</h2></div>
+    <div class="sec-h"><h2>Candidates Progress</h2></div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl tbl-flag">
-        <tr><th>Candidate</th><th class="num">Chapters</th>
+        <tr><th>Candidate</th><th>Course</th><th class="num">Chapters</th>
             <th class="num">Assessment</th><th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th></th></tr>
         ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
           const m = x.m;
@@ -25528,9 +25679,20 @@ V.leadReports = () => {
               <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
               <span class="ldr-who-n">${m.name}</span>
             </span></td>
+            ${''/* COURSE COLUMN, PER CANDIDATE (Maryam, 9 Sep 2026: add a Course
+                   column, then "the candidates could be taking different courses
+                   so please show different course names"). `mcourse(m)` reads the
+                   candidate rather than the cohort, so the column varies down the
+                   table instead of repeating the cohort's one course. */}
+            <td>${mcourse(m)}</td>
             <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
             <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
+            ${''/* ATTEMPTS AS A WHOLE NUMBER (Maryam, 9 Sep 2026: "the attempts
+                   cant be in points, they will be either 1 or 2 or a proper
+                   number not 1.1 etc"). `m.att` is the per-chapter average; the
+                   column reads it as the count a leader means by "attempts", so
+                   it rounds to the nearest whole. */}
+            <td class="num">${m.att ? Math.round(m.att) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
             ${''/* THE LAST CELL IS A NAMED LINK, NOT A CHEVRON (Maryam, 2 Sep
@@ -26029,7 +26191,7 @@ V.leadSum = () => {
         <span class="idmeta">${lname(c)} &middot; 90 days complete</span>
         <span class="tag sm">${llevel(c)}</span>
       </div>
-      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidate Progress ${I.arrowRight}</button></div>
+      <div class="idhead-a"><button class="btn btn-g" data-ldrco="${c.id}" data-ldrmem="${s.name}" data-go="leadMember">View Candidates Progress ${I.arrowRight}</button></div>
     </div>
   </div>
   ${''/* NO "read-only" HELPER AND NO FOOT DIVIDER (Maryam, 9 Sep 2026: "remove
@@ -26685,6 +26847,14 @@ V.leadProfile = () => `<main class="main"><div class="page">
   <div class="sec">
     <div class="sec-h"><h2>About</h2></div>
     <p class="t-body pfe-about">${LEADER.bio}</p>
+  </div>
+  ${''/* SPECIALITIES ON THE GENERAL TAB TOO (Maryam, 9 Sep 2026: "the cohort
+         leader profile should have specialities as well"). The same `.skl` chip
+         cloud and `LEADER.specs` the Public tab draws — the leader's own record
+         of what they lead on, on both tabs. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Specialities</h2></div>
+    <div class="skl">${LEADER.specs.map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
   </div>` : ''}
 
   ${S.ldrPfTab === 'public' ? `
@@ -29237,6 +29407,16 @@ const OB_Q = [
       ['school','In school','Studying, with the first role still ahead.'],
       ['own','Running my own thing','Founder, freelance, or your own small team.']]},
 
+  {k:'industry',
+   q:'What industry are you in?',
+   tal:'A couple more, so your profile is set up before you walk in.',
+   o:[['software','Software','Product, platforms, SaaS.'],
+      ['finance','Finance','Banking, insurance, fintech.'],
+      ['healthcare','Healthcare','Care, life sciences, medtech.'],
+      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
+      ['education','Education','Schools, training, ed-tech.'],
+      ['other','Something else','Tell me on your profile later.']]},
+
   {k:'years',
    q:'How long have you been working?',
    tal:'Roughly is fine — it helps me read where you are.',
@@ -29271,16 +29451,6 @@ const OB_Q = [
              ['ahead','Planning further ahead than this week','Everything is this week, so nothing is next quarter.'],
              ['up','Managing the people above me','The work is fine; the direction from above is not.']]}},
 
-  {k:'industry',
-   q:'What industry are you in?',
-   tal:'A couple more, so your profile is set up before you walk in.',
-   o:[['software','Software','Product, platforms, SaaS.'],
-      ['finance','Finance','Banking, insurance, fintech.'],
-      ['healthcare','Healthcare','Care, life sciences, medtech.'],
-      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
-      ['education','Education','Schools, training, ed-tech.'],
-      ['other','Something else','Tell me on your profile later.']]},
-
   {k:'intent',
    q:'What do you want out of the next 90 days? This will help choose you your course category.',
    tal:'Last one, and it is the one that groups you with the right people. It does not depend on your level.',
@@ -29309,7 +29479,7 @@ function obReady(){
   return !!S.ob[s.k];
 }
 
-const OB_SPINE = ['Where you are','Your experience','What is low','Why it is hard','Your industry','What you want'];
+const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
 
 function obPanel(){
   const step = S.obStep;
@@ -29652,12 +29822,12 @@ const obLabel = (k) => {
 
 const obHeard = () => [
   ['Where you are', obLabel('where'), 1],
-  ['Your experience', obLabel('years'), 2],
+  ['Your industry', obLabel('industry'), 2],
+  ['Your experience', obLabel('years'), 3],
   ['What is low', S.ob.band === 'other'
     ? 'Neither of the two the quiz found'
-    : obLabel('band'), 3],
-  ['Why it is hard', obLabel('why'), 4],
-  ['Your industry', obLabel('industry'), 5],
+    : obLabel('band'), 4],
+  ['Why it is hard', obLabel('why'), 5],
   ['What you want', obLabel('intent'), 6]
 ];
 

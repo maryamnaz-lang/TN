@@ -166,9 +166,17 @@
      magenta and a salmon since. Left rather than deleted in a colour
      pass, and flagged: it is the "gate nothing writes" tell.
      ============================================================== */
-  --ai-1:#bd2a2a;
+  /* THE RAMP'S ACCENT STOPS ARE THE NEW ACCENT — Maryam, 9 Sep 2026 ("change
+     these gradient values and borders as well, just update the accent colour and
+     keep the other values same"). `--ai-1` / `--ai-3` were the old #bd2a2a and
+     are the platform accent #F9423A now, which carries every gradient built from
+     them — `--ai-grad` (Tal's text ramp), `--ai-grad-alt` and `--ai-grad-line`
+     (the ask-dock edge and the chat field's focus border). The light middle
+     `--ai-2` (#dd8080) and the green line middle `--ai-line-2` (#cce7cb) are the
+     "other values" and are untouched, so only the accent hue moved. */
+  --ai-1:#f9423a;
   --ai-2:#dd8080;
-  --ai-3:#bd2a2a;
+  --ai-3:#f9423a;
   --ai-line-2:#cce7cb;
   --ai-amber:var(--ai-2);
   --ai-line-alpha:70%;

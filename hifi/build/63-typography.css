@@ -1777,7 +1777,14 @@
   font-weight:var(--t-w-strong);letter-spacing:var(--t-sec-lg-ls);
   text-transform:none;
   color:var(--on-dark)}
-.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+/* AND `.dark-card` TOO, not only `.rec-dark` (Maryam, 9 Sep 2026: "tal
+   recommends text is missing with the star"). The enrolment black card is a
+   `.dark-card` and now wears the same `.rec-lab` label; without this its words
+   kept the base `--text-primary` and set black on black, so only the accent
+   sparkle showed. Both selectors are (0,5,0), which beats the base (0,4,0) the
+   note above flags. */
+.app .rec-dark .ai-label.bare.rec-lab,
+.app .dark-card .ai-label.bare.rec-lab{color:var(--on-dark)}
 .app .rec-dark .rec-n{color:var(--on-dark)}
 /* THE WAY OUT OF THE SECTION IS WHITE (Maryam, 31 Aug 2026), and this ink has
    moved three times. §70.5 set 581:6548's #f47113 when the button was the quiet
@@ -2523,6 +2530,15 @@
 .app .stats .stat-top > .l{
   font-size:var(--t-h4-size);line-height:var(--t-h4-lh);
   font-weight:var(--t-w-strong);letter-spacing:var(--t-h4-ls)}
+/* THE FIGURE-CARD TITLE IS BLACK, NOT THE GREY EYEBROW (Maryam, 9 Sep 2026: "the
+   four card titles should be black always, please revise the 4 cards structure
+   everywhere"). §7's eyebrow rule sets `.stats .l` / `.facts .l` / `.pf-facts
+   .pf-l` to `--text-secondary`; the card TITLE is read, not scanned, so it takes
+   `--text-primary` while keeping the size and weight set above. The sub-line
+   (`.d`) under it stays `--text-secondary`, so the title/description split holds.
+   The dark-card ink rule (§6a, later) still wins on a black ground, so a figure
+   band on a dark card keeps `--on-dark`. All portals via the DS. */
+.app .stats .l,.app .facts .l,.app .page .pf-facts .pf-l{color:var(--text-primary)}
 
 /* THE BOOKING PICKER'S TYPE IS DELETED WITH THE PICKER (Maryam, 3 Sep 2026 —
    "calendly is the iframe we will be using so we do no need this design").
@@ -5425,3 +5441,9 @@
    ========================================================================== */
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
+
+/* THE RANK CHIP IS RED ACCENT INK (Maryam, 9 Sep 2026: "light red with red
+   accent text"). It carries `.t-label` for its size; §63 owns the colour, so it
+   is set here — `--accent-text`, the accent as ink, over §105's light-red pill.
+   `.t-label` inked `--text-secondary`, and this (0,2,0, later) overrides it. */
+.app .rank-chip{color:var(--accent-text)}

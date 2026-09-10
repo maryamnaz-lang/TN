@@ -52,18 +52,25 @@
 .app .ask-sugg .chip-tal .sk-mark{
   width:10px;height:10px;
   background-color:transparent;
-  background-image:var(--ai-grad);
+  /* SOLID ACCENT, NOT THE `--ai-grad` RAMP — Maryam, 9 Sep 2026 ("use solid
+     accent colour in the stars as well"). This is the (0,5,0) rule that wins the
+     star (§51.374 and §53.921 are the same change one layer down, now agreeing);
+     the flat `--accent` replaces the #bd2a2a→#dd8080→#bd2a2a Tal ramp, kept as a
+     one-colour gradient so the `--ai-star` mask still clips a background. */
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;background-position:center;background-repeat:no-repeat;
   -webkit-mask:var(--ai-star) center/contain no-repeat;
           mask:var(--ai-star) center/contain no-repeat}
 
-/* THE CHAT FIELD'S RESTING EDGE IS THE PLAIN HAIRLINE, LIKE THE FLOATING FIELD
-   (Maryam, 9 Sep 2026: "the default view of the tal field inside the tal chat
-   should be just like outside floating tal field but without a shadow and moving
-   gradient line"). It already carries no shadow and no `.ai-run` comet; the last
-   difference was this border, which was the `--ai-grad-line` gradient. It is a
-   flat `--rule` #efefef now, matching §117's floating pill. `:focus-within` still
-   swaps to the hot stroke below — that is the typing state, not the default. */
+/* THE CHAT FIELD'S RESTING EDGE IS THE ACCENT NOW — Maryam, 9 Sep 2026 ("this
+   border should also be of accent colour"). It had been the plain `--rule`
+   #efefef hairline to match §117's floating pill (her earlier same-day ask, kept
+   as the argument here); pointing at the chat, she wants the resting edge to read
+   as the accent like the suggestion chips beside it. So the second background
+   layer is a flat `--accent` instead of `--rule`. `:focus-within` still swaps to
+   `--ai-grad-line` below — the typing state — which is now the new accent too.
+   NOTE this diverges the chat field from the floating pill, which keeps its
+   #efefef edge; sync the pill (§117) if both should carry it. */
 .app .ask-page .askfield,
 .app .ask-page .askfield:focus-within{
   border-radius:999px;
@@ -72,7 +79,7 @@
   background-color:transparent;
   background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--rule), var(--rule));
+    linear-gradient(var(--accent), var(--accent));
   background-origin:padding-box, border-box;
   background-clip:padding-box, border-box}
 /* TYPING (focus) SWAPS THE EDGE TO THE GRADIENT (Maryam, 9 Sep 2026, off Figma

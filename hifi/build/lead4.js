@@ -563,6 +563,14 @@ V.leadProfile = () => `<main class="main"><div class="page">
   <div class="sec">
     <div class="sec-h"><h2>About</h2></div>
     <p class="t-body pfe-about">${LEADER.bio}</p>
+  </div>
+  ${''/* SPECIALITIES ON THE GENERAL TAB TOO (Maryam, 9 Sep 2026: "the cohort
+         leader profile should have specialities as well"). The same `.skl` chip
+         cloud and `LEADER.specs` the Public tab draws — the leader's own record
+         of what they lead on, on both tabs. */}
+  <div class="sec">
+    <div class="sec-h"><h2>Specialities</h2></div>
+    <div class="skl">${LEADER.specs.map(t => `<span class="skl-c">${t}</span>`).join('')}</div>
   </div>` : ''}
 
   ${S.ldrPfTab === 'public' ? `

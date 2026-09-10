@@ -287,6 +287,30 @@ const lintent = c => c.intent;
    parses first and lead.js reads back, never the other way. */
 const lcourse = c => courseOf(c.level);
 
+/* PER-CANDIDATE COURSE, BECAUSE CANDIDATES IN A COHORT NEED NOT SHARE ONE
+   (Maryam, 9 Sep 2026: "the candidates could be taking different courses so
+   please show different course names"). `lcourse(c)` is the cohort's own track
+   course and every member shared it, so the reports table's Course column read
+   the same name on every row. The seed has no per-member course, so `mcourse`
+   spreads the four catalog courses (`COURSE_NAME`, in views.js) across members
+   by a stable hash of the name — AUTHORED variety, flagged the same as the note
+   copy, not a real enrolment. Stable so a candidate keeps one course across
+   renders and both tables. */
+const LDR_LEVELS = ['E1', 'E2', 'E3', 'E4'];
+const mlevel = m => LDR_LEVELS[[...m.name].reduce((a, ch) => a + ch.charCodeAt(0), 0) % LDR_LEVELS.length];
+const mcourse = m => courseOf(mlevel(m));
+
+/* THE COURSE'S OWN DESCRIPTION, for the member page's course card (Maryam, 9 Sep
+   2026: "show the course image, name and its desc that we are showing on the
+   black card while enrolling"). ENROL_COURSE carries name + desc for E3/E4; E1
+   and E2 are names in COURSE_NAME only, so their descriptions are AUTHORED
+   PLACEHOLDERS here, flagged the same as the rest of the leader copy. */
+const COURSE_DESC = {
+  E1: 'The everyday foundations of working in a business — how teams organise, how work moves through them, and the basic tools that keep it running. The first step before the deeper courses.',
+  E2: 'The software and working habits that make a modern team fast: documents, spreadsheets, planning and communication tools, and how to use them well together rather than one at a time.'
+};
+const courseDesc = lvl => (ENROL_COURSE[lvl] && ENROL_COURSE[lvl].desc) || COURSE_DESC[lvl] || '';
+
 /* THE COVER IS KEYED BY LEVEL, NOT BY COHORT ID (Maryam, 1 Sep 2026, with three
    images). `COHORT_ART` is embedded by build.py — its note is the argument for
    the crop and the file order — and this is the whole of the lookup.
@@ -800,7 +824,13 @@ const leadCall = (k, second) => ({
 
 const leadCallCard = (k, o) => `<div class="sec dark-card crow-dark">
     <div class="dc-hd">
-      <div class="dc-hd-r"><h2 class="dc-t">${lcTitle(k)}</h2>
+      ${''/* THE HEADER IS "Upcoming Cohort Session", NOT "Cohort 41 call" (Maryam,
+             9 Sep 2026: "in black cohort call cards, change the 'Cohort 41 call'
+             title to 'Upcoming Cohort Session'"). The crow below still names the
+             cohort ("Cohort 41" + the detail), so the header can be the generic
+             kind of appointment. `lcTitle` is untouched — the dashboard's
+             upcoming-calls cards still title themselves "Cohort N call". */}
+      <div class="dc-hd-r"><h2 class="dc-t">Upcoming Cohort Session</h2>
         <span class="dc-when">${I.time}${k.when}</span></div>
     </div>
     ${''/* THE ACTION IS A GATED JOIN, NOT "GENERATE THE BRIEF" (Maryam, 9 Sep 2026:
@@ -1061,6 +1091,30 @@ function faceRow(p, detail, go, at, cta){
    "(intermediate value).tile is not a function", nowhere near the comment.
    Reasoning about a view belongs in a block like this one, above it.
    ========================================================================== */
+/* THE CERTIFIED-COHORT-LEADER BADGE — the candidate's completion banner
+   (`certBanner` / `.certban`, views.js) brought to the leader dashboard, after
+   the call cards (Maryam, 9 Sep 2026: "just like how we show the badge on
+   candidate portal ... show on the cohort leader dashboard after the call cards
+   ... this badge will be mostly about the Certified Cohort Leader badge"). The
+   `.certban` shape ships in the design system, so this is only the leader's copy
+   of it — the mark, the two lines and the View button, no dismiss (it is a
+   standing credential, not a one-off notice). `CERT_ART.explorer` is the
+   platform's certification-badge art, reused as a PLACEHOLDER because the seed
+   holds no Certified-Cohort-Leader asset (§74; a real badge WebP is the file to
+   drop in). "View" opens the leader profile, where the credential lives. */
+const leadCertBanner = () => `<div class="sec">
+  <div class="certban">
+    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
+    <span class="certban-b">
+      <span class="certban-t">Certified Cohort Leader</span>
+      <span class="certban-m">Verified by TalentNext &middot; Volunteer cohort leader</span>
+    </span>
+    <span class="certban-a">
+      <button class="btn btn-p btn-sm" data-go="leadProfile">View</button>
+    </span>
+  </div>
+</div>`;
+
 V.leadDash = () => {
   const att = lattention(), next = lnext(), pend = lpending();
   const severe = att.filter(x => x.m.flag.k === 'bad');
@@ -1143,6 +1197,9 @@ V.leadDash = () => {
          ends the band — written between the `.ph` and Tal's card it would
          leave the summary in the page body (trap 11's neighbourhood). */}
   ${leadCallsSec()}
+  ${''/* THE CERTIFIED COHORT LEADER BADGE sits right after the calls (Maryam,
+         9 Sep 2026) — `leadCertBanner` above. */}
+  ${leadCertBanner()}
   ${''/* THE FIGURE BAND IS PLAIN STAT CELLS, NOT A STICKY SCROLL-SPY (Maryam,
          9 Sep 2026: "hide the fix tabs interaction, go with the generic scroll
          just like other pages"). The cells used to be `data-jump` buttons that

@@ -14,15 +14,15 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5847.  Rules dropped as product-specific: 186.
+   Rules kept: 5858.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
 /* ---- 01-foundation.css ---- */
-:root{--brand-primary:#000000; --brand-primary-hover:#262625; --brand-primary-active:#393938; --on-brand:#ffffff; --brand-tint:#fcfcfc; --brand-tint-2:#f0cece; --accent:#bd2a2a; --accent-2:#9e2020; --accent-grad:linear-gradient(90deg,
+:root{--brand-primary:#000000; --brand-primary-hover:#262625; --brand-primary-active:#393938; --on-brand:#ffffff; --brand-tint:#fcfcfc; --brand-tint-2:#f0cece; --accent:#f9423a; --accent-2:#d63932; --accent-grad:linear-gradient(90deg,
     var(--accent) 0%, var(--accent) 100%); --accent-grad-hover:linear-gradient(90deg,
     var(--accent-hover) 0%, var(--accent-hover) 100%); --accent-grad-active:linear-gradient(90deg,
-    var(--accent-text) 0%, var(--accent-text) 100%); --accent-text:#a52323; --accent-hover:#a01f1f; --on-accent:#ffffff; --auth-o-1:#bd2a2a; --auth-o-2:#9e2020; --auth-o-3:#c02c2c; --auth-o-ink:#a52323; --auth-card-bg:#ffffff; --auth-shadow:rgba(149,149,149,.1); --auth-rule:rgba(17,17,17,.1); --auth-card-line:var(--rule); --auth-r:8px; --auth-wash-1:#ffcdcc; --auth-wash-1-blur:100px; --auth-wash-2:#ecd3de; --auth-wash-2-blur:167px; --auth-sub:#767676; --tal-chip-1:#ffe8e8; --tal-chip-2:#f4fef6; --background:#ffffff; --layer-01:#ffffff; --layer-02:#f7f7f7; --layer-accent-01:#dcdad3; --shell-bg:#ffffff; --surround:#dcdad3; --border-subtle-01:var(--rule); --border-subtle-02:#c7c6c3; --border-strong-01:#8e8d8a; --gray-10:#f5f4f0; --gray-20:#e1e0dc; --gray-30:#c7c6c3; --gray-40:#a9a8a5; --gray-50:#8e8d8a; --gray-60:#706f6d; --gray-70:#525250; --gray-80:#393938; --gray-90:#262625; --gray-100:#111111; --text-primary:#111111; --text-secondary:#828282; --text-helper:#666563; --text-placeholder:#a9a8a5; --text-disabled:#a9a8a5; --icon-primary:#111111; --icon-secondary:#525250; --surface-dark:#111111; --surface-dark-2:#262625; --on-dark:#ffffff; --on-dark-2:#c7c6c3; --overlay:rgba(17,17,17,.55); --support-error:#da1e28; --support-error-bg:#ffd7d9; --support-success:#24a148; --support-success-bg:#d7f0dd; --support-attention:#96540a; --danger-ink:#c21520; --star:#ffcb05; --support-success-ink:#1a7f37; --support-warning:#f1c21b; --support-warning-bg:#fcf4d6; --support-warning-ic:#b28600; --support-info:#111111; --support-info-bg:#f7f7f7; --support-info-ic:#0371a4; --support-orange-bg:#ffd9be; --cal-iv:#cce7cb; --cal-reiv:#e0c0ff; --cal-open:#e9dedc; --dv-1:#cfded4; --dv-2:#8fbca6; --dv-3:#3d8a6e; --dv-4:#1e5546; --dv-hi:#c2703d; --dv-gold:#a8791b; --dv-grad-a:#a54208; --dv-grad-b:#0d6f9e; --chart-ink:#111111; --state-hover:.04; --state-selected:.08; --state-focus:.12; --state-pressed:.12; --state-disabled:.38; --overlay-hover:rgba(17,17,17,.04); --overlay-selected:rgba(17,17,17,.08); --overlay-pressed:rgba(17,17,17,.12); --overlay-hover-dark:rgba(255,255,255,.08); --s01:2px; --s02:4px; --s03:8px; --s04:12px; --s05:16px; --s06:24px; --s07:32px; --s08:40px; --s09:48px; --s10:64px; --s11:80px; --s12:96px; --sec-h-gap:12px; --sec-desc-gap:8px; --radius:0px; --ease-standard:cubic-bezier(.4,0,.2,1); --ease-decelerate:cubic-bezier(0,0,.2,1); --ease-accelerate:cubic-bezier(.4,0,1,1); --dur-short:150ms; --dur-standard:250ms; --dur-long:375ms; --on-dark-border:rgba(255,255,255,.42); --on-dark-track:rgba(255,255,255,.24); --on-dark-rule:rgba(255,255,255,.16); --on-dark-fill:rgba(255,255,255,.12); --on-dark-fill-2:rgba(255,255,255,.28); --on-dark-dim:rgba(255,255,255,.3); --on-success-bg:#0b5c26; --on-error-bg:#a2191f; --on-warning-bg:#684e00; --error-hover:#b81922; --pure-white:#ffffff; --accent-shadow:rgba(160,31,31,.18); --thumb-scrim:rgba(0,0,0,.7); --pt-bar-bg:#000000; --pt-line:#4a4a48; --pt-hover:#333331; --appbar-h:56px; --drawer-w:260px; --content-max:960px; --gutter:16px}
+    var(--accent-text) 0%, var(--accent-text) 100%); --accent-text:#c2332d; --accent-hover:#9a2924; --on-accent:#ffffff; --auth-o-1:#bd2a2a; --auth-o-2:#9e2020; --auth-o-3:#c02c2c; --auth-o-ink:#a52323; --auth-card-bg:#ffffff; --auth-shadow:rgba(149,149,149,.1); --auth-rule:rgba(17,17,17,.1); --auth-card-line:var(--rule); --auth-r:8px; --auth-wash-1:#ffcdcc; --auth-wash-1-blur:100px; --auth-wash-2:#ecd3de; --auth-wash-2-blur:167px; --auth-sub:#767676; --tal-chip-1:#ffe8e8; --tal-chip-2:#f4fef6; --background:#ffffff; --layer-01:#ffffff; --layer-02:#f7f7f7; --layer-accent-01:#dcdad3; --shell-bg:#ffffff; --surround:#dcdad3; --border-subtle-01:var(--rule); --border-subtle-02:#c7c6c3; --border-strong-01:#8e8d8a; --gray-10:#f5f4f0; --gray-20:#e1e0dc; --gray-30:#c7c6c3; --gray-40:#a9a8a5; --gray-50:#8e8d8a; --gray-60:#706f6d; --gray-70:#525250; --gray-80:#393938; --gray-90:#262625; --gray-100:#111111; --text-primary:#111111; --text-secondary:#828282; --text-helper:#666563; --text-placeholder:#a9a8a5; --text-disabled:#a9a8a5; --icon-primary:#111111; --icon-secondary:#525250; --surface-dark:#111111; --surface-dark-2:#262625; --on-dark:#ffffff; --on-dark-2:#c7c6c3; --overlay:rgba(17,17,17,.55); --support-error:#da1e28; --support-error-bg:#ffd7d9; --support-success:#24a148; --support-success-bg:#d7f0dd; --support-attention:#96540a; --danger-ink:#c21520; --star:#ffcb05; --support-success-ink:#1a7f37; --support-warning:#f1c21b; --support-warning-bg:#fcf4d6; --support-warning-ic:#b28600; --support-info:#111111; --support-info-bg:#f7f7f7; --support-info-ic:#0371a4; --support-orange-bg:#ffd9be; --cal-iv:#cce7cb; --cal-reiv:#e0c0ff; --cal-open:#e9dedc; --dv-1:#cfded4; --dv-2:#8fbca6; --dv-3:#3d8a6e; --dv-4:#1e5546; --dv-hi:#c2703d; --dv-gold:#a8791b; --dv-grad-a:#a54208; --dv-grad-b:#0d6f9e; --chart-ink:#111111; --state-hover:.04; --state-selected:.08; --state-focus:.12; --state-pressed:.12; --state-disabled:.38; --overlay-hover:rgba(17,17,17,.04); --overlay-selected:rgba(17,17,17,.08); --overlay-pressed:rgba(17,17,17,.12); --overlay-hover-dark:rgba(255,255,255,.08); --s01:2px; --s02:4px; --s03:8px; --s04:12px; --s05:16px; --s06:24px; --s07:32px; --s08:40px; --s09:48px; --s10:64px; --s11:80px; --s12:96px; --sec-h-gap:12px; --sec-desc-gap:8px; --radius:0px; --ease-standard:cubic-bezier(.4,0,.2,1); --ease-decelerate:cubic-bezier(0,0,.2,1); --ease-accelerate:cubic-bezier(.4,0,1,1); --dur-short:150ms; --dur-standard:250ms; --dur-long:375ms; --on-dark-border:rgba(255,255,255,.42); --on-dark-track:rgba(255,255,255,.24); --on-dark-rule:rgba(255,255,255,.16); --on-dark-fill:rgba(255,255,255,.12); --on-dark-fill-2:rgba(255,255,255,.28); --on-dark-dim:rgba(255,255,255,.3); --on-success-bg:#0b5c26; --on-error-bg:#a2191f; --on-warning-bg:#684e00; --error-hover:#b81922; --pure-white:#ffffff; --accent-shadow:rgba(160,31,31,.18); --thumb-scrim:rgba(0,0,0,.7); --pt-bar-bg:#000000; --pt-line:#4a4a48; --pt-hover:#333331; --appbar-h:56px; --drawer-w:260px; --content-max:960px; --gutter:16px}
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0}
@@ -5815,7 +5815,7 @@ button.btn-p:active,
 .app .ldr-dm-thread{display:flex; flex-direction:column; min-width:0}
 .app .ldr-dm-list{display:flex; flex-direction:column; min-width:0}
 .app .ldr-dm-lh{display:flex; align-items:baseline; justify-content:space-between; gap:var(--s04); padding:var(--s04) var(--s05); border-bottom:1px solid var(--rule); font-size:13px; line-height:18px; font-weight:600; letter-spacing:.1px}
-.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s05) var(--s05); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
+.app .ldr-dm-t{display:flex; align-items:center; gap:var(--s04); width:100%; padding:var(--s04) var(--s05); border:0; border-bottom:1px solid var(--border-subtle-01); background-color:transparent; text-align:left; cursor:pointer; transition:background-color var(--dur-short) var(--ease-standard)}
 .app .ldr-dm-t:last-child{border-bottom:0}
 .app .ldr-dm-t.on{background-color:var(--surface-2); box-shadow:inset 2px 0 0 var(--text-primary)}
 .app .ldr-dm-t > .mem-av{width:36px; height:36px; flex:none; position:relative; overflow:hidden; background-color:var(--gray-80)}
@@ -5831,6 +5831,9 @@ button.btn-p:active,
 .app .ldr-dm-hb > span{font-size:12px; line-height:17px; color:var(--text-secondary)}
 .app .ldr-dm-thread > .msgs{padding:var(--s05)}
 .app .ldr-dm-thread > .composer{flex:none; margin:0 var(--s05) var(--s05)}
+.app .crs-card{display:flex; flex-direction:column; align-items:flex-start; gap:var(--s03); text-align:left}
+.app .crs-card > .crs-name,
+.app .crs-card > .crs-desc{text-align:left; width:100%; margin:0}
 .app .sec.ldr-dm-sec{padding:0}
 .app .page > .sec.sec-cs:has(+ .sec.ldr-dm-sec){padding-bottom:0}
 @container app (min-width:900px){
@@ -6379,7 +6382,7 @@ button.btn-p:active,
 .app .ask-page .askfield-send svg{width:20px; height:20px; fill:none; display:block}
 .app .ask-page .ask-sugg{display:flex; flex-wrap:wrap; gap:var(--s03); margin:0}
 .app .ask-page .ask-sugg .chip-tal{display:flex; flex-direction:column; align-items:flex-start; gap:var(--s03); height:auto; padding:var(--s03) var(--s05); background:#fff; border:1px solid var(--askv-rule); font-size:12px; line-height:18px; letter-spacing:.16px; color:var(--askv-ink-2); white-space:nowrap}
-.app .ask-page .ask-sugg .chip-tal .sk-mark{width:16px; height:16px; flex:none; background-color:transparent; background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%); background-size:100% 100%; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat; border-radius:0; animation:none}
+.app .ask-page .ask-sugg .chip-tal .sk-mark{width:16px; height:16px; flex:none; background-color:transparent; background-image:linear-gradient(var(--accent),var(--accent)); background-size:100% 100%; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat; border-radius:0; animation:none}
 @container app (max-width:899px){
   .app .ask-page .ask-sugg{flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none}
   .app .ask-page .ask-sugg::-webkit-scrollbar{display:none}
@@ -6399,7 +6402,7 @@ button.btn-p:active,
 /* ---- 53-talground.css ---- */
 :root{--askv-wash:245,75,135; --askv-ground-wash:
     linear-gradient(186.615deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%),
-    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%); --askv-stroke:#ffa4a2; --askv-stroke-hot:var(--accent-2); --askv-stroke-ramp:16%; --askv-chip-line:var(--accent); --askv-chip-glow:.5}
+    linear-gradient(353.385deg, rgba(189,42,42,.05) 11.018%, rgba(255,255,255,.05) 52.274%); --askv-stroke:var(--accent); --askv-stroke-hot:var(--accent-2); --askv-stroke-ramp:16%; --askv-chip-line:var(--accent); --askv-chip-glow:.5}
 :root{--askv-ground:#ffffff}
 .app:has(.ask-page) .view-col > .main{background-color:var(--askv-ground); background-image:var(--askv-ground-wash); background-position:top,bottom; background-size:100% 590px; background-repeat:no-repeat}
 .app .ask-page{background:transparent}
@@ -6445,17 +6448,17 @@ button.btn-p:active,
 .app .ask-page .ask-thread .tal-msg:not(.me) > .bb :is(.note, .tile, .gcard, .cardrow, .sec, .sec.tint, .tbl, .tbl-wrap, .kv, .kv > div, .facts, .facts > div, .stats, .stats > div, .bkw, .bk-card, .tw){background-color:transparent; background-image:none}
 .app .ask-page .ask-sugg .chip-tal,
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal{position:relative; flex-direction:row; align-items:center; gap:var(--s03); height:34px; padding:var(--s03) var(--s05); min-height:0; border-radius:30px; border:1px solid transparent; overflow:visible; background-color:#fff; background-image:radial-gradient(115% 338% at 80% -128%,
-    rgb(240 83 12 / calc(.183 * var(--askv-chip-glow))) 0%,
-    rgb(240 83 12 / calc(.124 * var(--askv-chip-glow))) 39%,
-    rgb(240 83 12 / calc(.056 * var(--askv-chip-glow))) 68%,
-    rgb(240 83 12 / calc(.021 * var(--askv-chip-glow))) 85%,
-    rgb(240 83 12 / calc(.006 * var(--askv-chip-glow))) 100%,
-    rgb(240 83 12 / 0) 115%); background-repeat:no-repeat; font-size:12px; line-height:18px; letter-spacing:.16px; color:var(--askv-ink-2); white-space:nowrap}
+    rgb(249 66 58 / calc(.183 * var(--askv-chip-glow))) 0%,
+    rgb(249 66 58 / calc(.124 * var(--askv-chip-glow))) 39%,
+    rgb(249 66 58 / calc(.056 * var(--askv-chip-glow))) 68%,
+    rgb(249 66 58 / calc(.021 * var(--askv-chip-glow))) 85%,
+    rgb(249 66 58 / calc(.006 * var(--askv-chip-glow))) 100%,
+    rgb(249 66 58 / 0) 115%); background-repeat:no-repeat; font-size:12px; line-height:18px; letter-spacing:.16px; color:var(--askv-ink-2); white-space:nowrap}
 .app .ask-page .ask-sugg .chip-tal::before,
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal::before{content:''; position:absolute; inset:-1px; z-index:0; pointer-events:none; padding:1px; border-radius:inherit; background:linear-gradient(121deg,
     var(--askv-chip-line) 0%,
     var(--accent-2) 100%); -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude}
-.app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{width:16px; height:16px; flex:none; background-color:transparent; background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%); background-size:100% 100%; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat; border-radius:0; animation:none}
+.app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{width:16px; height:16px; flex:none; background-color:transparent; background-image:linear-gradient(var(--accent),var(--accent)); background-size:100% 100%; -webkit-mask:var(--tal-star) center/contain no-repeat; mask:var(--tal-star) center/contain no-repeat; border-radius:0; animation:none}
 .app .ask-page .ask-thread .tal-msg > .bb .tw-chips{display:flex; flex-wrap:wrap; gap:var(--s03); margin-top:var(--s04)}
 .app .ask-page .ask-top-t{font-size:18px}
 .app .ask-page .ask-top .ph-back svg{width:20px; height:20px; fill:currentColor}
@@ -7257,7 +7260,8 @@ button.btn-p:active,
 .app .qa-b > span{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-compact-ls); color:var(--text-secondary)}
 .app .ai-label.bare.rec-lab{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--text-primary)}
 .app .dark-card .dc-t{font-size:var(--t-sec-lg-size); line-height:var(--t-sec-lg-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-sec-lg-ls); text-transform:none; color:var(--on-dark)}
-.app .rec-dark .ai-label.bare.rec-lab{color:var(--on-dark)}
+.app .rec-dark .ai-label.bare.rec-lab,
+.app .dark-card .ai-label.bare.rec-lab{color:var(--on-dark)}
 .app .rec-dark .rec-n{color:var(--on-dark)}
 .app .dark-card .dc-hd-r > .btn.dc-act{color:var(--on-dark)}
 .app .dark-card .dc-hd-r > .dc-when{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls); text-transform:none; color:var(--on-dark)}
@@ -7323,6 +7327,9 @@ button.btn-p:active,
 .app .sig-tag{font-size:var(--t-label-size); line-height:var(--t-label-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-label-ls); text-transform:none; color:var(--mk)}
 .app .sig-p{font-size:var(--t-body-size); line-height:var(--t-body-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-body-ls); text-transform:none; color:var(--text-primary)}
 .app .stats .stat-top > .l{font-size:var(--t-h4-size); line-height:var(--t-h4-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h4-ls)}
+.app .stats .l,
+.app .facts .l,
+.app .page .pf-facts .pf-l{color:var(--text-primary)}
 .app .bkc-fl{font-size:var(--t-eyebrow-size); line-height:var(--t-eyebrow-lh); font-weight:var(--t-w-book); letter-spacing:var(--t-eyebrow-ls); text-transform:none; color:var(--text-secondary)}
 .app .bkc-fv{font-size:var(--t-h3-size); line-height:var(--t-h3-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-h3-ls); text-transform:none; color:var(--accent-text); font-variant-numeric:tabular-nums}
 .app .crow-dark .crow-role,
@@ -7542,6 +7549,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
+.app .rank-chip{color:var(--accent-text)}
 
 /* ---- 64-quietbtn.css ---- */
 .app .btn-s,
@@ -7668,7 +7676,7 @@ button.btn-p:active,
 .app .page .sec.wpair > .tile > .lbl{display:block; margin-bottom:var(--s05)}
 
 /* ---- 70-ainative.css ---- */
-.app{--ai-1:#bd2a2a; --ai-2:#dd8080; --ai-3:#bd2a2a; --ai-line-2:#cce7cb; --ai-amber:var(--ai-2); --ai-line-alpha:70%; --ai-grad:linear-gradient(136.05deg,
+.app{--ai-1:#f9423a; --ai-2:#dd8080; --ai-3:#f9423a; --ai-line-2:#cce7cb; --ai-amber:var(--ai-2); --ai-line-alpha:70%; --ai-grad:linear-gradient(136.05deg,
     var(--ai-1) 33.67%, var(--ai-2) 49.47%, var(--ai-3) 68.46%); --ai-grad-alt:linear-gradient(113.05deg,
     var(--ai-1) 33.67%, var(--ai-2) 49.47%, var(--ai-3) 68.46%); --ai-grad-line:linear-gradient(90.13deg,
     color-mix(in srgb, var(--ai-1) var(--ai-line-alpha), transparent) 0%,
@@ -8707,6 +8715,10 @@ button.btn-p:active,
   .app .page .pf-facts{grid-template-columns:repeat(4, 1fr)}
 }
 .app .page .sec-out > .btn{padding-left:0}
+.app .page .idname-row{display:flex; align-items:center; gap:var(--s03)}
+.app .page .rank-chip{display:inline-flex; align-items:center; padding:1px var(--s03); border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
+.app .page .crs-row > .crs-thumb{flex:none; width:56px; height:38px; object-fit:cover; margin-right:var(--s04); border:1px solid var(--rule)}
 .app .page .pf-tgs{display:grid; gap:0; grid-template-columns:1fr}
 .app .page .pf-tgs > .tg{align-items:flex-start; gap:var(--s04); padding:var(--s05) 0; background-color:transparent; border:0; border-radius:var(--radius)}
 .app .page .pf-tgs > .tg + .tg{border-top:1px solid var(--rule)}
@@ -8718,10 +8730,10 @@ button.btn-p:active,
 .app .cardrow .card-del{display:inline-flex; align-items:center; gap:var(--s03); text-decoration:none}
 .app .cardrow .card-del:focus-visible{text-decoration:none}
 .app .cardrow .card-del svg{flex:none; width:18px; height:18px}
-.app .conf > .conf-b{display:flex; flex-direction:column; align-items:center; text-align:center; gap:var(--s05); padding:var(--s07) var(--s06) var(--s06)}
-.app .conf .conf-mk{flex:none; display:grid; place-items:center; width:48px; height:48px; margin-bottom:var(--s04); background:var(--support-error-bg); border-radius:999px; box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
+.app .conf > .conf-b{display:flex; flex-direction:column; align-items:center; text-align:center; gap:var(--s04); padding:var(--s06) var(--s05) var(--s05)}
+.app .conf .conf-mk{flex:none; display:grid; place-items:center; width:48px; height:48px; margin-bottom:var(--s06); background:var(--support-error-bg); border-radius:999px; box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
              0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
-.app .conf .conf-mk svg{width:24px; height:24px; fill:var(--danger-ink)}
+.app .conf .conf-mk svg{width:24px; height:24px; fill:var(--danger-ink); margin:0}
 .app .conf .conf-t{margin:0}
 .app .conf .conf-x{margin:var(--sec-desc-gap) 0 0; max-width:42ch}
 .app .conf .conf-f{width:100%; margin:var(--s03) 0 0}
@@ -8916,13 +8928,17 @@ button.btn-p:active,
 .app .ob-prog-bar{display:flex; gap:var(--s03); width:100%}
 .app .ob-prog-seg{flex:1; min-width:0; height:6px; border-radius:999px; background:var(--rule)}
 .app .ob-prog-seg.on{background:var(--accent)}
-.app .ob-msgs > .ob-m:last-child{animation:ob-msg-in 260ms cubic-bezier(.22,1,.36,1) both}
+.app .ob-msgs > .ob-m:last-child{animation:ob-msg-in 300ms cubic-bezier(.22,1,.36,1) both}
+.app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{overflow:hidden; animation:ob-unfold 300ms cubic-bezier(.22,1,.36,1) both}
 .app .ob-stage.ob-leave{animation:ob-leave 220ms ease-in forwards; pointer-events:none}
 @keyframes ob-msg-in{from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:none}}
+@keyframes ob-unfold{from{max-height:0} to{max-height:700px}}
 @keyframes ob-leave{from{opacity:1;transform:none} to{opacity:0;transform:translateY(-12px)}}
 @media (prefers-reduced-motion:reduce){
   .app .ob-msgs > .ob-m:last-child,
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t,
   .app .ob-stage.ob-leave{animation:none}
+  .app .ob-msgs > .ob-m:last-child:not(.ob-m-typing) .ob-m-t{overflow:visible}
   .app .ob-stage.ob-leave{opacity:0}
 }
 @keyframes ob-in{from{opacity:0}to{opacity:1}}
@@ -9237,11 +9253,11 @@ button.btn-p:active,
 /* ---- 118-askpage.css ---- */
 .app .ask-page .ask-sugg .chip-tal .sk-mark,
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark,
-.app .ask-sugg .chip-tal .sk-mark{width:10px; height:10px; background-color:transparent; background-image:var(--ai-grad); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat}
+.app .ask-sugg .chip-tal .sk-mark{width:10px; height:10px; background-color:transparent; background-image:linear-gradient(var(--accent),var(--accent)); background-size:100% 100%; background-position:center; background-repeat:no-repeat; -webkit-mask:var(--ai-star) center/contain no-repeat; mask:var(--ai-star) center/contain no-repeat}
 .app .ask-page .askfield,
 .app .ask-page .askfield:focus-within{border-radius:999px; border-color:transparent; padding:0 var(--s06); background-color:transparent; background-image:
     linear-gradient(var(--background), var(--background)),
-    linear-gradient(var(--rule), var(--rule)); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
+    linear-gradient(var(--accent), var(--accent)); background-origin:padding-box, border-box; background-clip:padding-box, border-box}
 .app .ask-page .askfield:focus-within{background-image:
     linear-gradient(var(--background), var(--background)),
     var(--ai-grad-line)}

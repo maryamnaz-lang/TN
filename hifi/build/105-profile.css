@@ -113,6 +113,33 @@
    whatever is beside it, and there is nothing beside it. */
 .app .page .sec-out > .btn{padding-left:0}
 
+/* ------------------------------------------------------------------ 105.1b ---
+   THE RANK CHIP RIDES BESIDE THE NAME (Maryam, 9 Sep 2026). The name and the
+   chip sit on one baseline in `.idname-row`; the chip is a light-red pill with
+   red accent ink — the ground a 12% mix of the accent over the page (a token
+   mix, not a typed pink), the ink `--accent-text` (§63 owns that colour). Round
+   like the other marks (§56). §63 sizes it via the `.t-label` it carries. */
+.app .page .idname-row{display:flex;align-items:center;gap:var(--s03)}
+.app .page .rank-chip{
+  display:inline-flex;align-items:center;
+  padding:1px var(--s03);border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+
+/* ------------------------------------------------------------------ 105.9 ---
+   MY COURSES — the accordion of taken courses (Maryam, 9 Sep 2026). It reuses
+   `.acc.ol` (the course-outline accordion) and drops the four-cell `.stats`
+   insight band into each open panel, so almost nothing is stated here: the row,
+   the chevron and the reveal are §04/§65's, and the band is §29's. The panel
+   gives the band a little breathing room from the row above it. */
+.app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
+/* THE COVER SITS ON THE LEFT OF THE ROW (Maryam, 9 Sep 2026). 56x38, the same
+   thumbnail the all-courses list draws, `flex:none` so the row's title takes the
+   slack; `--s04` of air to the title. A 1px `--rule` edge, like every framed
+   image in the product. */
+.app .page .crs-row > .crs-thumb{
+  flex:none;width:56px;height:38px;object-fit:cover;
+  margin-right:var(--s04);border:1px solid var(--rule)}
+
 /* ------------------------------------------------------------------ 105.2 ---
    WHAT YOU HOLD, BESIDE WHAT HAS HAPPENED — DELETED, 2 Sep 2026
 
@@ -267,16 +294,34 @@
    `h2`, a `<p>` and an `.f > label` — so this section sets no size, weight,
    case or colour. The only `color` is the mark's `fill`, which §85 settles is
    not text. */
+/* THE MODAL IS TIGHTER, AND THE ICON SITS IN THE MIDDLE OF ITS DISC — Maryam,
+   9 Sep 2026 ("for all the modals: reduce the padding from all sides, centre
+   the icon in the top circle, reduce the spacing between content a little, but
+   add space between the icon and the heading below it"). Four moves, and the
+   third and fourth pull in opposite directions on purpose:
+     - PADDING comes off all sides — --s06/--s05/--s05 (24/16/16) from
+       --s07/--s06/--s06 (32/24/24).
+     - THE COLUMN GAP drops one step, --s05 -> --s04 (16 -> 12), which is the
+       "a little" between the title, the description and the button.
+     - THE ICON-TO-HEADING GAP grows the other way — the disc's own
+       `margin-bottom` goes --s04 -> --s06 (12 -> 24), so with the smaller
+       column gap the mark still stands well clear of the heading (12 + 24 = 36
+       against the old 16 + 12 = 28) while everything below tightens.
+     - THE ICON IS RE-CENTRED. §03.461's base `.conf svg` carries
+       `margin:0 auto var(--s05)`, and §105.6's `.conf-mk svg` overrode the size
+       but not the margin — so a 16px bottom margin rode on the disc's own icon
+       and `place-items:center` balanced it by lifting the glyph ~8px. `margin:0`
+       here (0,3,0, over §03.461's 0,2,0) drops it back to the centre. */
 .app .conf > .conf-b{
   display:flex;flex-direction:column;align-items:center;text-align:center;
-  gap:var(--s05);padding:var(--s07) var(--s06) var(--s06)}
+  gap:var(--s04);padding:var(--s06) var(--s05) var(--s05)}
 .app .conf .conf-mk{
   flex:none;display:grid;place-items:center;
-  width:48px;height:48px;margin-bottom:var(--s04);
+  width:48px;height:48px;margin-bottom:var(--s06);
   background:var(--support-error-bg);border-radius:999px;
   box-shadow:0 0 0 12px color-mix(in srgb, var(--danger-ink) 12%, transparent),
              0 0 0 13px color-mix(in srgb, var(--danger-ink) 24%, transparent)}
-.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink)}
+.app .conf .conf-mk svg{width:24px;height:24px;fill:var(--danger-ink);margin:0}
 /* THE TITLE AND ITS DESCRIPTION ARE ONE OBJECT — `--sec-desc-gap`, §01's token
    for exactly this pair, against the `--s05` the column gives everything else.
    A heading and the sentence about it are closer to each other than either is

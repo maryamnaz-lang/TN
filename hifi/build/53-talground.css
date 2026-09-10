@@ -107,11 +107,14 @@
 
      `--accent-2` is #f0530c and this is the same orange, so the hot end is
      the token rather than a second copy of the brand colour. */
-  /* re-hued for the red accent, 4 Sep 2026: #FFC092 is the old accent at 45.3%
-     over white and this is the same 45.3% of #ff584a. The paragraph above is
-     unchanged — the shape of the gradient, its hot spot and its 16% ramp are
-     what that note describes and none of them moved. */
-  --askv-stroke:#ffa4a2;
+  /* THE STROKE IS THE ACCENT ITSELF NOW — Maryam, 9 Sep 2026 ("this border
+     should also be of accent colour"). It was a pale 45.3% tint of the accent
+     (#ffa4a2), so the composer's resting border read paler than the chips
+     beside it; reading `--accent` makes the whole field border the platform
+     accent, with `--askv-stroke-hot` (--accent-2, one step deeper) still walking
+     through it as the hot spot. The gradient's shape, its hot spot and its 16%
+     ramp are unchanged — only the cold stop's colour. */
+  --askv-stroke:var(--accent);
   --askv-stroke-hot:var(--accent-2);
   --askv-stroke-ramp:16%;
 
@@ -893,13 +896,18 @@
      about how loud it should be. At .5 the peak is 9% of one orange over
      white, which is about as far down as it can go and still be a glow rather
      than a rendering artefact. */
+  /* THE GLOW'S HUE IS THE NEW ACCENT — Maryam, 9 Sep 2026 ("change these
+     gradient values and borders as well, just update the accent colour and keep
+     the other values same"). The five measured alphas, the ellipse geometry and
+     the `--askv-chip-glow` dimmer are all unchanged; only the orange 240 83 12
+     (#F0530C) becomes #F9423A = 249 66 58, the platform accent. */
   background-image:radial-gradient(115% 338% at 80% -128%,
-    rgb(240 83 12 / calc(.183 * var(--askv-chip-glow))) 0%,
-    rgb(240 83 12 / calc(.124 * var(--askv-chip-glow))) 39%,
-    rgb(240 83 12 / calc(.056 * var(--askv-chip-glow))) 68%,
-    rgb(240 83 12 / calc(.021 * var(--askv-chip-glow))) 85%,
-    rgb(240 83 12 / calc(.006 * var(--askv-chip-glow))) 100%,
-    rgb(240 83 12 / 0) 115%);
+    rgb(249 66 58 / calc(.183 * var(--askv-chip-glow))) 0%,
+    rgb(249 66 58 / calc(.124 * var(--askv-chip-glow))) 39%,
+    rgb(249 66 58 / calc(.056 * var(--askv-chip-glow))) 68%,
+    rgb(249 66 58 / calc(.021 * var(--askv-chip-glow))) 85%,
+    rgb(249 66 58 / calc(.006 * var(--askv-chip-glow))) 100%,
+    rgb(249 66 58 / 0) 115%);
   background-repeat:no-repeat;
   font-size:12px;line-height:18px;letter-spacing:.16px;
   color:var(--askv-ink-2);white-space:nowrap}
@@ -921,10 +929,11 @@
 .app .ask-page .ask-thread .tal-msg > .bb .chip-tal .sk-mark{
   width:16px;height:16px;flex:none;
   background-color:transparent;
-  /* THE STAR'S OWN PINK-TO-ACCENT RAMP, re-hued 4 Sep 2026: the pink top stop
-     is the file's and stays, the bottom one was the accent's warm sibling
-     #E98B46 and is `--accent` now. §83 reached the same pair for the demo. */
-  background-image:linear-gradient(180deg,#FBB2D4 0%,var(--accent) 100%);
+  /* SOLID ACCENT — Maryam, 9 Sep 2026 ("use solid accent colour in the stars as
+     well"). Was the #FBB2D4 -> --accent ramp; now one flat `--accent`, written
+     as a one-colour gradient so the `--tal-star` mask still has a background to
+     clip. Matches the suggestion-chip star in §51. */
+  background-image:linear-gradient(var(--accent),var(--accent));
   background-size:100% 100%;
   -webkit-mask:var(--tal-star) center/contain no-repeat;
           mask:var(--tal-star) center/contain no-repeat;

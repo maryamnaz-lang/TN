@@ -106,7 +106,7 @@ S.ldrNotes = {
 /* Which of the cohort page's three tabs is open. Its own key, not the
    candidate's `S.ctab` — the two pages can both be open behind the portal
    switch, which resets neither. */
-S.ldrCTab = 'discussion';
+S.ldrCTab = 'progress';  /* Candidate Progress is the first of four tabs (9 Sep 2026) */
 S.ldrNoteAt = null;
 S.ldrNoteK = 'general';
 
@@ -514,7 +514,6 @@ const cohortCard = c => {
   const wa   = c.members.filter(m => m.flag && m.flag.k === 'wa').length;
   const pc   = lavg(c,'pc');
   const pace = lpace(c);
-  const pill = CCO_PILL[String(c.level).toLowerCase()] || '--mk-1';
   /* A row is a mark, a label and a figure. The mark is a BARE glyph (Maryam,
      2 Sep 2026: "remove the icons backgrounds") — the same subtraction §72 made
      for the pulse's column marks and §29 for `.stat`, and the same 20px it left
@@ -526,25 +525,26 @@ const cohortCard = c => {
       <span class="cco-v">${val}</span>
     </span>`;
   return `<button class="cco clk" data-go="leadCohort" data-ldrco="${c.id}">
-    ${''/* NO COURSE COVER (Client, 9 Sep 2026: "since the cohorts are now not
-          dependant on course so remove the course images from cohorts"). The
-          `<img>` was `cohortArt(c)`, a course cover keyed by level; with cohorts
-          decoupled from courses the cover leaves and the cohort's own number
-          (`<i>`, already the fail-to-decode fallback) is the mark. */}
-    <span class="cco-art">
-      <i>${c.id}</i>
-      <span class="cco-pill" style="--pill:var(${pill})">${c.members.length} Candidates</span>
-    </span>
+    ${''/* NO IMAGE PLACEHOLDER AND NO COHORT-NUMBER DISC (Client 9 Sep: "remove
+          the course images from cohorts", then Maryam 9 Sep: "remove the image
+          placeholder as well where the number is right now"). The `.cco-art`
+          9:5 block held a course cover, then the cohort's own number over a grey
+          ground; it is gone, and the card opens on its own head block. */}
     <span class="cco-b">
       <span class="cco-hd">
         <span class="cco-hb">
           <span class="cco-n">${lname(c)}</span>
-          ${''/* THE COURSE LEADS THE DETAIL LINE (2 Sep 2026). The card is a
-                 cover with a name under it, so the first thing under the cohort
-                 number should say what the picture IS; the week is where the
-                 cohort has got to inside it. Same order the dashboard row's
-                 eyebrow takes, one component over. */}
-          <span class="cco-d">${lintent(c)} &middot; Week ${c.week} of 13</span>
+          ${''/* THE DETAIL LINE SHOWS THE LEVEL (Maryam, 9 Sep 2026: 'change the
+                 "Develop for ownership · Week 5 of 13" content to "Level E3 ·
+                 Week 5 of 13" means show the level in each card'). It was the
+                 intent (`lintent`); the level is the fact a leader scans by. */}
+          <span class="cco-d">Level ${c.level} &middot; Week ${c.week} of 13</span>
+          ${''/* THE CANDIDATE COUNT IS PLAIN DESC TEXT, NOT A CHIP (Maryam, 9 Sep
+                 2026: first moved off the cover's corner into a pill under the
+                 level line, then "remove the candidate count from chips and just
+                 show them as the desc text like above text"). A second `.cco-d`
+                 line, same grey as the level line above it. */}
+          <span class="cco-d">${c.members.length} candidates</span>
         </span>
         ${''/* THE "of 38%" CAPTION IS GONE (Maryam, 2 Sep 2026: "remove the
                'of n%' from the bottom of each progress circle"). It was the
@@ -563,8 +563,13 @@ const cohortCard = c => {
           ${ring(pc, `${pc}% of ${pace}% expected`)}
         </span>
       </span>
-      ${row('--mk-3', I.chart, 'Assessment',
-            lassess(c) ? lassess(c) + '%' : '<span class="t-helper-01">not yet</span>')}
+      ${''/* TOTAL COURSES, NOT ASSESSMENT (Maryam, 9 Sep 2026: "in place of
+             assessments show 'Total Courses' and the count against"). Follows
+             from candidates taking different courses (`mcourse`): the count is
+             the distinct courses running across this cohort's members. The
+             cohort's assessment average still lives on the cohort detail page's
+             figure band. */}
+      ${row('--mk-3', I.book, 'Total Courses', new Set(c.members.map(mcourse)).size)}
       ${row('--support-attention', I.warningAlt, 'Flagged',
             bad || wa
               ? `<span class="cco-tags">${bad ? `<span class="tag red sm">${bad} at risk</span>` : ''}${wa ? `<span class="tag org sm">${wa} watch</span>` : ''}</span>`
@@ -732,51 +737,8 @@ V.leadCohort = () => {
       ${statCell(I.warningAlt, 'Flagged', flagged.length + `<small> of ${c.members.length}</small>`, `${severe.length} severe`)}
     </div>
   </div>
-  <div class="sec tint">
-    ${''/* THE ROSTER IS THE COURSE REPORTS TABLE WITH THE FLAG COLUMN ON IT
-           (Maryam, 2 Sep 2026: "instead of the roasters table, we should have
-           the discussions, ranking, and members against a cohort but before
-           that we need to show the candidate progress table just like we have
-           on the course report page but … we have the flags column in the
-           roaster table, add that").
-
-           IT IS ONE TABLE DRAWN TWICE, NOT TWO TABLES. Course Reports and this
-           page were reporting the same ten people in two column sets — Progress
-           against pace, a week task and a flag here; chapters, assessment,
-           attempts and time there — so a leader comparing the two saw the same
-           roster described two ways. The columns are Course Reports' now,
-           because they are the platform's own fields, plus the FLAG, which is
-           the one reading this page had that the other did not.
-           WHAT WENT WITH THE OLD COLUMNS: "Progress %+gap" is the figure band
-           two blocks up (it states the cohort's own average and its gap), and
-           the "Week N task" chip is `ltask`, which is derived from progress
-           against pace — the same reading the flag column makes, said twice.
-           `ltask` keeps its other reader on the member page.
-           THE ROW IS THE COURSE REPORTS ROW to the class: `.ldr-tbl.tbl-flag`
-           for §31's quiet treatment, a face in the first cell, and "View
-           Progress" in the last. */}
-    <div class="sec-h"><h2>Candidate Progress</h2><span class="t-helper-01">From the course platform</span></div>
-    <div class="tbl-wrap">
-      <table class="tbl ldr-tbl tbl-flag">
-        <tr><th>Candidate</th><th class="num">Chapters</th><th class="num">Assessment</th>
-            <th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th>Flag</th><th></th></tr>
-        ${c.members.slice().sort((a,b) => (a.pc - lpace(c)) - (b.pc - lpace(c))).map(m => `
-          <tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
-            <td><span class="ldr-who">
-              <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
-              <span class="ldr-who-n">${m.name}</span>
-            </span></td>
-            <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
-            <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td>${m.last.toLowerCase()}</td>
-            <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
-          </tr>`).join('')}
-      </table>
-    </div>
-  </div>
+  ${''/* THE CANDIDATE PROGRESS TABLE MOVED INTO THE TABS BELOW (Maryam, 9 Sep
+         2026) — it was a `.sec tint` table here, above the strip. */}
   ${''/* AND THE COHORT'S OWN THREE TABS, WHICH ARE THE CANDIDATE'S. The
          candidate's Cohort page has drawn Discussion / Ranking / Members since
          it existed, and this is the leader's view of the same cohort — so it is
@@ -799,20 +761,51 @@ V.leadCohort = () => {
          people who are not in it — the invented data §74 rules out — so 33 and
          47 get the empty state and the composer, which is what a board with
          nothing on it is. */}
+  ${''/* CANDIDATE PROGRESS IS THE FIRST OF FOUR TABS NOW (Maryam, 9 Sep 2026:
+         "make candidate progress part of the tabs below, means there will be 4
+         tabs, first Candidate Progress, then discussions, ranking and members").
+         It was a standalone `.sec tint` table above the strip; it is the strip's
+         default tab now, so `S.ldrCTab` defaults to `progress`. The table gained
+         a Course column and rounds Attempts to a whole number, same as Course
+         Reports (§ N/O this day). */}
   <div class="sec sec-cs">
     <div class="cs">
-      <button class="${(S.ldrCTab || 'discussion') === 'discussion' ? 'on' : ''}" data-ldrctab="discussion">Discussion</button>
+      <button class="${(S.ldrCTab || 'progress') === 'progress' ? 'on' : ''}" data-ldrctab="progress">Candidates Progress</button>
+      <button class="${S.ldrCTab === 'discussion' ? 'on' : ''}" data-ldrctab="discussion">Discussion</button>
       <button class="${S.ldrCTab === 'ranking' ? 'on' : ''}" data-ldrctab="ranking">Ranking</button>
       <button class="${S.ldrCTab === 'members' ? 'on' : ''}" data-ldrctab="members">Members</button>
     </div>
-    ${S.ldrCTab === 'members'
-      ? `<div class="tile-stack">${c.members.map(m => mem(m.name, m.ini, `${llevel(c)} &middot; ${m.pc}% of the course`, false, m.img)).join('')}</div>`
-      : S.ldrCTab === 'ranking' ? ldrRankBoard(c)
-      : c.id === 41 ? discussionRoom()
-      : `<div class="empty" style="border:0">${I.chat}
+    ${(() => {
+      const tab = S.ldrCTab || 'progress';
+      if(tab === 'members') return `<div class="tile-stack">${c.members.map(m => mem(m.name, m.ini, `${llevel(c)} &middot; ${m.pc}% of the course`, false, m.img)).join('')}</div>`;
+      if(tab === 'ranking') return ldrRankBoard(c);
+      if(tab === 'discussion') return c.id === 41 ? discussionRoom()
+        : `<div class="empty" style="border:0">${I.chat}
           <h3>Nothing posted yet</h3>
           <p>${lname(c)}&rsquo;s board is empty. Anything you post here, all ${c.members.length} of them read.</p>
-        </div>`}
+        </div>`;
+      return `<div class="tbl-wrap">
+        <table class="tbl ldr-tbl tbl-flag">
+          <tr><th>Candidate</th><th>Course</th><th class="num">Chapters</th><th class="num">Assessment</th>
+              <th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th>Flag</th><th></th></tr>
+          ${c.members.slice().sort((a,b) => (a.pc - lpace(c)) - (b.pc - lpace(c))).map(m => `
+            <tr class="ldr-tr${m.flag ? (m.flag.k === 'bad' ? ' sev' : ' mod') : ''}" data-ldrco="${c.id}" data-ldrmem="${m.name}" data-go="leadMember" tabindex="0" role="button">
+              <td><span class="ldr-who">
+                <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
+                <span class="ldr-who-n">${m.name}</span>
+              </span></td>
+              <td>${mcourse(m)}</td>
+              <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
+              <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="num">${m.att ? Math.round(m.att) : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td>${m.last.toLowerCase()}</td>
+              <td>${m.flag ? `<span class="flag-t">${I[m.flag.ic]}${m.flag.t}</span>` : '<span class="t-helper-01">&mdash;</span>'}</td>
+              <td class="ldr-go"><span class="ldr-view">View Progress ${I.arrowRight}</span></td>
+            </tr>`).join('')}
+        </table>
+      </div>`;
+    })()}
   </div>
   ${''/* THE "ATTEMPTS" NOTE IS DELETED (Maryam, 2 Sep 2026: "remove the bottom
          Attempts section"). It defined the column — how many times a candidate
@@ -1063,10 +1056,32 @@ V.leadMember = () => {
   </div>
   <div class="sec">
     <div class="stats">
-      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', `${d >= 0 ? '+' + d : d} against pace`)}
-      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? (m.avg < 75 ? 'below the 75% pass mark' : 'above the pass mark') : 'nothing assessed yet')}
-      ${statCell(I.renew,  'Attempts',   m.att ? m.att.toFixed(1) : '<small>&mdash;</small>', m.att >= 2 ? 'going round twice' : 'first time through')}
+      ${''/* SHORT, PLAIN SUB-LINES, NOT INSIGHTS (Maryam, 9 Sep 2026: "i do not
+             want insights like -29 or +1 against pace, please make these line
+             simple and short"). Each sub is now a plain descriptor of what its
+             figure IS — the gap-to-pace judgement, the pass-mark comparison and
+             the "going round twice" reading all come off; the flag column and
+             the figure band above already carry the reading. Attempts rounds to
+             a whole number here too (§O). */}
+      ${statCell(I.growth, 'Progress',   m.pc + '<small>%</small>', 'of the course')}
+      ${statCell(I.chart,  'Assessment', m.avg ? m.avg + '<small>%</small>' : '<small>Not yet</small>', m.avg ? 'course average' : 'not assessed yet')}
+      ${statCell(I.renew,  'Attempts',   m.att ? Math.round(m.att) : '<small>&mdash;</small>', m.att ? 'per chapter' : 'not started')}
       ${statCell(I.time,   'Time on the course', lhrs(lmins(m)), done ? Math.round(lmins(m)/done) + ' min a chapter' : 'not started')}
+    </div>
+  </div>
+  ${''/* THE COURSE THIS CANDIDATE IS TAKING — name and description, as on the
+         enrolment card (Maryam, 9 Sep 2026: "show the course image, name and its
+         desc that we are showing on the black card while enrolling"). `mcourse` /
+         `courseDesc` read the candidate's own course (the same one the reports
+         table names), so the card matches the row. The enrolment card carries no
+         photographic cover in this build — it is a name over a description — so
+         this is that, in a tile. (`.tile` under a `.sec-h` stacks, as "Your
+         recommendation" on the evaluation screen does.) */}
+  <div class="sec">
+    <div class="sec-h"><h2>Course</h2></div>
+    <div class="tile crs-card">
+      <h3 class="t-h3 crs-name">${mcourse(m)}</h3>
+      <p class="t-desc crs-desc">${courseDesc(mlevel(m))}</p>
     </div>
   </div>
   ${''/* PROGRESS BY CHAPTER IS THE CANDIDATE'S OWN LIST (Maryam, 2 Sep 2026,
@@ -1357,10 +1372,10 @@ V.leadReports = () => {
          and the dashboard's queue does not have, because its rows are not
          links. The two classes answer two different questions. */}
   <div class="sec sec-rep">
-    <div class="sec-h"><h2>Candidate Progress</h2></div>
+    <div class="sec-h"><h2>Candidates Progress</h2></div>
     <div class="tbl-wrap">
       <table class="tbl ldr-tbl tbl-flag">
-        <tr><th>Candidate</th><th class="num">Chapters</th>
+        <tr><th>Candidate</th><th>Course</th><th class="num">Chapters</th>
             <th class="num">Assessment</th><th class="num">Attempts</th><th class="num">Time</th><th>Last active</th><th></th></tr>
         ${rows.slice().sort((a,b) => (a.m.pc - lpace(a.c)) - (b.m.pc - lpace(b.c))).map(x => {
           const m = x.m;
@@ -1386,9 +1401,20 @@ V.leadReports = () => {
               <span class="mem-av mem-ph">${avatar({i:m.ini, img:AV[m.img]}, 24)}</span>
               <span class="ldr-who-n">${m.name}</span>
             </span></td>
+            ${''/* COURSE COLUMN, PER CANDIDATE (Maryam, 9 Sep 2026: add a Course
+                   column, then "the candidates could be taking different courses
+                   so please show different course names"). `mcourse(m)` reads the
+                   candidate rather than the cohort, so the column varies down the
+                   table instead of repeating the cohort's one course. */}
+            <td>${mcourse(m)}</td>
             <td class="num">${lchDone(m)} <span class="t-helper-01">of 13</span></td>
             <td class="num">${m.avg ? `${m.avg}%` : '<span class="t-helper-01">&mdash;</span>'}</td>
-            <td class="num">${m.att ? m.att.toFixed(1) : '<span class="t-helper-01">&mdash;</span>'}</td>
+            ${''/* ATTEMPTS AS A WHOLE NUMBER (Maryam, 9 Sep 2026: "the attempts
+                   cant be in points, they will be either 1 or 2 or a proper
+                   number not 1.1 etc"). `m.att` is the per-chapter average; the
+                   column reads it as the count a leader means by "attempts", so
+                   it rounds to the nearest whole. */}
+            <td class="num">${m.att ? Math.round(m.att) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td class="num">${lmins(m) ? lhrs(lmins(m)) : '<span class="t-helper-01">&mdash;</span>'}</td>
             <td>${m.last.toLowerCase()}</td>
             ${''/* THE LAST CELL IS A NAMED LINK, NOT A CHEVRON (Maryam, 2 Sep

@@ -182,11 +182,22 @@ const OB_Q = [
       ['school','In school','Studying, with the first role still ahead.'],
       ['own','Running my own thing','Founder, freelance, or your own small team.']]},
 
-  /* HOW LONG asks SECOND, right after where (Maryam, 9 Sep 2026: "ask the How
-     long have you been working? question after the Where are you right now?
-     question"). Moved up from its old fifth place; its tal and options are
-     untouched. The count, the spine and the read-back all derive their order
-     from `OB_Q`, so moving the block is the whole change. */
+  /* INDUSTRY asks SECOND and EXPERIENCE THIRD, right after where (Maryam, 9 Sep
+     2026: "the question What industry are you in? should come right after the
+     Where are you right now? question and then the experience will come after
+     the industry question"). Both moved up from their old places; their tal and
+     options are untouched. The count, the spine and the read-back all derive
+     their order from `OB_Q`, so moving the blocks is the whole change. */
+  {k:'industry',
+   q:'What industry are you in?',
+   tal:'A couple more, so your profile is set up before you walk in.',
+   o:[['software','Software','Product, platforms, SaaS.'],
+      ['finance','Finance','Banking, insurance, fintech.'],
+      ['healthcare','Healthcare','Care, life sciences, medtech.'],
+      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
+      ['education','Education','Schools, training, ed-tech.'],
+      ['other','Something else','Tell me on your profile later.']]},
+
   {k:'years',
    q:'How long have you been working?',
    tal:'Roughly is fine — it helps me read where you are.',
@@ -247,17 +258,8 @@ const OB_Q = [
      `obFree`). Intent is the primary COHORT grouping axis (Point 1): its options
      ARE `INTENTS`, built from that one list so the words match the profile
      select exactly. It is deliberately last — the aspiration is the note the
-     flow ends on. */
-  {k:'industry',
-   q:'What industry are you in?',
-   tal:'A couple more, so your profile is set up before you walk in.',
-   o:[['software','Software','Product, platforms, SaaS.'],
-      ['finance','Finance','Banking, insurance, fintech.'],
-      ['healthcare','Healthcare','Care, life sciences, medtech.'],
-      ['retail','Retail and consumer','Shops, brands, e-commerce.'],
-      ['education','Education','Schools, training, ed-tech.'],
-      ['other','Something else','Tell me on your profile later.']]},
-
+     flow ends on. (Industry and experience moved up to second and third, right
+     after `where` — see the note there; only intent stays here.) */
   /* THE INTENT QUESTION NOW ASKS THE 90-DAY QUESTION (Maryam, 9 Sep 2026:
      change "Where are you trying to go?" to "What do you want out of the next 90
      days? This will help choose you your course category."). It keeps its
@@ -350,9 +352,9 @@ function obReady(){
    spine is a narrow column, so each row is the SUBJECT of its question —
    which is also what makes a completed row readable as a thing that is now
    known rather than as a sentence that has been said. */
-/* IN THE NEW ORDER — where, years, band, why, industry, intent (Maryam, 9 Sep
+/* IN THE NEW ORDER — where, industry, years, band, why, intent (Maryam, 9 Sep
    2026). One label per question, positional, so it moves with `OB_Q`. */
-const OB_SPINE = ['Where you are','Your experience','What is low','Why it is hard','Your industry','What you want'];
+const OB_SPINE = ['Where you are','Your industry','Your experience','What is low','Why it is hard','What you want'];
 
 function obPanel(){
   const step = S.obStep;
@@ -1622,12 +1624,12 @@ const obLabel = (k) => {
    2026 reorder). `want` is gone; `intent` carries the "What you want" row now. */
 const obHeard = () => [
   ['Where you are', obLabel('where'), 1],
-  ['Your experience', obLabel('years'), 2],
+  ['Your industry', obLabel('industry'), 2],
+  ['Your experience', obLabel('years'), 3],
   ['What is low', S.ob.band === 'other'
     ? 'Neither of the two the quiz found'
-    : obLabel('band'), 3],
-  ['Why it is hard', obLabel('why'), 4],
-  ['Your industry', obLabel('industry'), 5],
+    : obLabel('band'), 4],
+  ['Why it is hard', obLabel('why'), 5],
   ['What you want', obLabel('intent'), 6]
 ];
 
