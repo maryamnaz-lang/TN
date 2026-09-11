@@ -1874,8 +1874,45 @@ function certGrid(list){
    excludes the newest is a collection with a hole in it, and at day 34 — where
    the list is two long — it would leave one card under a heading that says all.
    `certAll` is sorted by date, so `[0]` is the most recent at every stage. */
+
+/* A CERTIFICATE EXISTS ONLY ONCE A COURSE IS COMPLETE (Maryam, 11 Sep 2026:
+   "we will only certify the user when they will complete a course, so hide the
+   other certificates for now. if a user is first time taking a course then we
+   can just show a certificate that you will get this certificate once you are
+   done with the course. just like how coursera give that earn a career
+   certificate").
+
+   TWO CHANGES, ONE RULE. Until the course is done (`f.complete`, the promoted
+   stage) the tab is ONE Coursera-style "Earn a course certificate" panel — the
+   certificate is stated as a thing the candidate WILL hold, not one they do.
+   After completion the earned list is the COURSE-completion (level) certificate
+   only, drawn by `courseCerts`; the five gamification badge certs are hidden
+   FOR NOW. `certAll` and `CERTIFS` are RETAINED, unused, for when those badges
+   come back — the "for now" is the whole reason they are not deleted. */
+const courseCerts = (f) =>
+  certsFor(f).map(c => ({k:'explorer', n:`Explorer Track &ndash; ${c.lvl}`, on:c.on}))
+    .sort((a, b) => new Date(b.on) - new Date(a.on));
+
+/* THE UNEARNED PANEL. No black "Congratulations" card and no grid — one
+   bordered row naming the certificate the course leads to, so a first-time
+   candidate sees where the coursework is going rather than an empty tab. §96
+   owns the shape; §63 owns the `.t-h3` / `.t-desc` type. The name falls back
+   to the bare track where a pre-enrolment stage has no level, though the
+   Achievements module is only reached from `full`/`next`, where it is set. */
+function certEarn(f){
+  const name = f.level ? `the Explorer Track &ndash; ${f.level} certificate`
+                       : 'your Explorer Track certificate';
+  return `<div class="sec"><div class="crt-earn">
+    <span class="crt-earn-ic">${I.certificate}</span>
+    <div class="crt-earn-b">
+      <div class="t-h3">Earn a course certificate</div>
+      <p class="t-desc crt-earn-d">Complete the course to earn ${name}. You can add it to your LinkedIn profile, resume, or CV, and share it.</p>
+    </div>
+  </div></div>`;
+}
 function certsTab(f, g){
-  const all = certAll(f, g);
+  if(!f.complete) return certEarn(f);
+  const all = courseCerts(f);
   return certHero(all[0]) + `<div class="sec">
     <div class="sec-h"><h2>All certifications</h2></div>
     <div class="crt-grid">${certGrid(all)}</div>

@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=a518e571">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2e5861c5">
 
 <style>
 /* ==========================================================================
@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=a518e571"></script>
+<script src="design-system/talentnext-ds.js?b=2e5861c5"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -866,6 +866,7 @@ const S = {
   _pending:null,                          /* a sheet's values carried into a second confirmation */
   read:[],                                /* notifications marked read */
   tab:{}, filter:{}, sort:{}, pg:{}, pgOpen:null, fdOpen:null, /* per-page substate; pgOpen/fdOpen = open dropdowns */
+  attnPage:0,                             /* the "Needs your attention" black card shows one action item at a time; this is which (0..N-1) */
   tal:false, thread:[], typing:false, askFrom:'home',  /* Tal: the conversation is state, never DOM (trap 9) */
   editPerms:false,                        /* the permission matrix's edit mode */
   rowMenu:null                            /* the open row action menu's id (§125) */
@@ -1046,6 +1047,48 @@ function hbars(rows){
   }).join('')}</div>`;
 }
 
+/* THE REVENUE WATERFALL (Maryam, 11 Sep 2026: "I need this kind of revenue chart
+   but according to our data ... please do not use green only"). A self-contained
+   inline SVG — like `donut`/`hbars`, one function, no new stylesheet class — that
+   walks a P&L: each REVENUE line is a floating bar that builds the running total
+   up, a SUBTOTAL is a full bar from zero, each COST floats it back down. Every
+   figure reconciles because it is read off ONE seed (TXNS): gross = the three
+   `in` lines, net = gross − payouts − refunds.
+   COLOUR is assigned by CONTENT off Maryam's four (11 Sep 2026): the caller hands
+   each REVENUE bar a fill (the calendar pastels `--cal-reiv`/`--cal-iv`/`--cal-open`
+   — violet / green / warm-grey); COST bars are red `#FF4626`; SUBTOTAL bars stay
+   the neutral `--text-helper` grey so a total still reads as a total. All fills,
+   sizes and weights are inline on the SVG (a chart owns its own labels, §63 §5).
+   `rows` are {l:label, v:signed delta, k:'rev'|'cost'|'sub', c:fill for 'rev'}. */
+function waterfall(rows){
+  let run = 0;
+  const bars = rows.map(r => {
+    if(r.k === 'sub') return {...r, from:0, to:run, disp:run};
+    const from = run; run += r.v;
+    return {...r, from:Math.min(from, run), to:Math.max(from, run), disp:r.v};
+  });
+  const maxV = Math.max(...bars.map(b => b.to), 1) * 1.08;
+  const W = 560, L = 150, RM = 72, rowH = 34, barH = 19, padT = 10, padB = 10;
+  const H = bars.length * rowH + padT + padB;
+  const plotL = L, plotR = W - RM, plotW = plotR - plotL;
+  const x = v => plotL + v / maxV * plotW;
+  const grid = [0, .25, .5, .75, 1].map(f => {
+    const gx = (plotL + f * plotW).toFixed(1);
+    return `<line x1="${gx}" y1="${padT}" x2="${gx}" y2="${H - padB}" stroke="var(--rule)" stroke-width="1"/>`;
+  }).join('');
+  const body = bars.map((b, i) => {
+    const cy = padT + i * rowH + rowH / 2;
+    const bx = x(b.from), bw = Math.max(2, x(b.to) - x(b.from));
+    const fill = b.k === 'sub' ? 'var(--text-helper)' : b.k === 'cost' ? '#FF4626' : b.c;
+    const sign = b.k === 'rev' ? '+' : b.k === 'cost' ? '−' : '';
+    const lw = b.k === 'sub' ? 600 : 400;
+    return `<rect x="${bx.toFixed(1)}" y="${(cy - barH / 2).toFixed(1)}" width="${bw.toFixed(1)}" height="${barH}" rx="2" fill="${fill}"/>`
+      + `<text x="${L - 12}" y="${(cy + 4).toFixed(1)}" text-anchor="end" style="font-size:12px;font-weight:${lw};fill:var(--text-secondary)">${esc(b.l)}</text>`
+      + `<text x="${(x(b.to) + 8).toFixed(1)}" y="${(cy + 4).toFixed(1)}" style="font-size:12px;font-weight:600;fill:var(--text-primary)">${sign}${money(Math.abs(b.disp))}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Revenue waterfall" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:${W}px;height:auto;margin-top:var(--s04)">${grid}${body}</svg>`;
+}
+
 /* THE DATA TABLE — always inside `.tbl-wrap`, the one component that scrolls
    sideways. `cols` are [{label, num?, sort?, act?}] and `rows` are
    {cells:[…], go?, sv?:[…]} — `sv` is a row's raw sort values where the cell's
@@ -1185,11 +1228,12 @@ const ACT_COL = {label:'Actions', act:true};
    "no fine content structuring": the rows were unstyled on black. The
    `body`+`actions` shape (`.dc-b` > content + `.dc-a`) is §75's other body, for
    a sentence with a button beside it. */
-const darkCard = ({title, when, act, body, foot, actions, cls}) => `
+const darkCard = ({title, when, act, head, body, foot, actions, cls}) => `
   <section class="sec dark-card${cls ? ' ' + cls : ''}">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">${title}</h2>
-        ${when ? `<span class="dc-when">${ic('time')}${when}</span>`
+        ${head ? head
+          : when ? `<span class="dc-when">${ic('time')}${when}</span>`
           : act ? `<button class="btn btn-sm noic dc-act" ${act.attr || ''}>${act.label} ${I.arrowRight}</button>`
           : ''}</div>
     </div>
@@ -1375,6 +1419,11 @@ function saveRecord(kind, id){
   }
 }
 ACTIONS.save = key => { const [, kind, id] = key.split(':'); return saveRecord(kind, id); };
+/* THE "NEEDS YOUR ATTENTION" PAGER — `attn:prev` / `attn:next` walk the black
+   card's action items, wrapping at both ends. `attnItems().length` is the count;
+   doAction re-renders. */
+ACTIONS.attn = key => { const dir = key.split(':')[1]; const n = attnItems().length;
+  S.attnPage = (((S.attnPage + (dir === 'prev' ? -1 : 1)) % n) + n) % n; };
 ACTIONS.askdel = key => {
   const [, kind, id] = key.split(':'); const K = KINDS[kind]; const rec = K && K.find(id); if(!rec) return;
   if(K.guard){ const why = K.guard(rec); if(why){ toast(why, 'warn'); return; } }
@@ -1427,6 +1476,66 @@ const openRefunds = () => REFUNDS.filter(r => r.status === 'requested' || r.stat
 const contactLeads = () => LEADS.filter(l => l.stage === 'Contact captured').length;
 const unverifiedEmp = () => EMPLOYERS.filter(e => e.verify !== 'ok').length;
 const unmatchedSettle = () => SETTLEMENTS.filter(s => s.status === 'unmatched').length;
+
+/* THE "NEEDS YOUR ATTENTION" BLACK CARD — Maryam, 11 Sep 2026: "instead of being
+   in each row I need one action item with details at one time" — so the card is
+   PAGED, one action item shown at a time with its own requests listed as rows,
+   and a `‹ 1 of 4 ›` pager top-right of the header. Each item carries its live
+   count, its detail rows (built off the same seed the counts read) and the CTA
+   that opens its queue. The row VALUE is kept short (Maryam: "the desc content
+   should be short so it touches the right-side value") — one field, not a
+   sentence. `V` values like `verify` are humanised here, not in the seed. */
+const empVerifyLabel = v => v === 'review' ? 'In review' : v === 'unverified' ? 'Unverified' : v;
+function attnItems(){
+  /* Agents-awaiting-approval REMOVED (Maryam, 11 Sep 2026): agents are added
+     directly through the admin for now, so their vetting queue is not one of the
+     dashboard's attention steps. */
+  return [
+    { key:'payouts', label:'Payouts pending release', go:['finance/payouts', 'Release payouts'],
+      rows: PAYOUTS.filter(p => p.status === 'held' && p.net)
+        .map(p => [esc(p.agent), money(p.net)]) },
+    { key:'levels', label:'Level reviews to sign off', go:['candidates/levelling', 'Open level reviews'],
+      rows: LEVELQ.filter(l => l.status === 'pending')
+        .map(l => [esc(l.name), `${esc(l.from)} → ${esc(l.to)}`]) },
+    { key:'employers', label:'Unverified employers', go:['vetting/empverify', 'Verify employers'],
+      rows: EMPLOYERS.filter(e => e.verify !== 'ok')
+        .map(e => [esc(e.name), empVerifyLabel(e.verify)]) }
+  ];
+}
+/* THE PAGED BLACK CARD BODY — Maryam, 11 Sep 2026 (second pass). One attention
+   item's queue is "opened" in the card at a time: its LABEL row (no count) leads,
+   then every request under it as a `.kv` row (name left, one short field right),
+   then that queue's CTA. The top-right chevrons page BETWEEN the queues (Payouts /
+   Level reviews / Unverified employers — agents dropped, added straight through the
+   admin now); the count beside them, `1 of <rows in view>`, counts the rows shown,
+   the label row included (payouts = label + 3 = "1 of 4"). No count on the label. */
+function attnCard(){
+  const items = attnItems();
+  const n = items.length;
+  const i = ((S.attnPage % n) + n) % n;               /* clamp/wrap defensively */
+  const it = items[i];
+  const shown = 1 + it.rows.length;                   /* label row + its request rows */
+  /* THE PAGER reuses the dark card's own header-right slot `.dc-when` (right-
+     aligned, on-dark ink, 16px icons, gapped) so it needs no new CSS and sits
+     exactly on the heading line above the header divider. The chevrons carry
+     `data-act` so the shared click router walks them; `.dc-pg` / `.dc-pg-n`
+     are semantic hooks only. */
+  const pager = `<span class="dc-when dc-pager">
+    <span class="dc-pg" data-act="attn:prev" role="button" tabindex="0" aria-label="Previous queue">${I.chevLeft}</span>
+    <span class="dc-pg-n">1 of ${shown}</span>
+    <span class="dc-pg" data-act="attn:next" role="button" tabindex="0" aria-label="Next queue">${I.chevRight}</span>
+  </span>`;
+  const body = kv([
+    [`<b>${it.label}</b>`, '', ''],                    /* the queue label — no count (Maryam) */
+    ...it.rows.map(r => [r[0], r[1], 'n'])
+  ]);
+  return darkCard({
+    title:'Needs your attention',
+    head:pager,
+    body,
+    foot:`<button class="btn btn-p btn-sm noic" data-go="${it.go[0]}">${it.go[1]} ${I.arrowRight}</button>`
+  });
+}
 const openDsars = () => DSARS.filter(d => d.status === 'in progress').length;
 
 /* THE QUEUE COUNTS ON THE RAIL AND THE STRIP — `tn-admin.html:3600`'s `badge`
@@ -1730,12 +1839,14 @@ function homeOverview(){
   const inprog = inProgress();
   const highDec = DECISIONS.filter(d => d.sev === 'high').length;
   const medDec = DECISIONS.filter(d => d.sev === 'med').length;
-  const levelling = LEVELQ.length;
 
   /* revenue by fee line — the frozen file's dashboard chart, read as data */
   const courseRev = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const unlockRev = TXNS.filter(t => t.cat === 'unlock' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
+  /* costs OUT of the same ledger, so the waterfall reconciles: net = gross − these */
+  const payoutOut = TXNS.filter(t => t.cat === 'payout' && t.dir === 'out').reduce((n, t) => n + t.amt, 0);
+  const refundOut = TXNS.filter(t => t.cat === 'refund' && t.dir === 'out').reduce((n, t) => n + t.amt, 0);
 
   /* RESTORED DASHBOARD ANALYTICS — Maryam, 8 Sep 2026. The frozen file's
      dashboard (`tn-admin.html`, the data reference) carried payments/payouts,
@@ -1788,56 +1899,26 @@ function homeOverview(){
   <section class="sec">
     ${secHead('Platform at a glance')}
     ${stats([
-      ['candidates', 'Candidates', String(activeCands), `active, across ${activeCohorts} cohorts`],
-      ['group', 'Cohort leaders', String(cohortLeaderCount), 'volunteered to lead'],
-      ['shield', 'Moderators', String(moderatorCount), 'added by an admin'],
-      ['agents', 'Talent agents', String(agentCount), 'setting their own fee'],
-      ['cohorts', 'Cohorts', String(activeCohorts), `active, ${COHORTS.filter(c => c.status === 'draft').length} in draft`],
-      ['book', 'Courses', String(COURSES.length), `${liveCourses} live, ${draftCourses} in draft`],
-      ['money', 'Gross payment', money(gross), 'processed this window'],
-      ['bank', 'Payment in progress', money(inprog), 'held, not yet settled']
+      ['candidates', 'Candidates', String(activeCands), `in ${activeCohorts} cohorts`],
+      ['group', 'Cohort leaders', String(cohortLeaderCount), 'volunteered'],
+      ['shield', 'Moderators', String(moderatorCount), 'admin-added'],
+      ['agents', 'Talent agents', String(agentCount), 'set own fee'],
+      ['cohorts', 'Cohorts', String(activeCohorts), `${COHORTS.filter(c => c.status === 'draft').length} in draft`],
+      ['book', 'Courses', String(COURSES.length), `${liveCourses} live, ${draftCourses} draft`],
+      ['money', 'Gross payment', money(gross), 'this window'],
+      ['bank', 'Payment in progress', money(inprog), 'not yet settled']
     ])}
   </section>
 
-  ${/* THE ONE BLACK CARD ON THE PAGE — §75's recipe as the gallery writes it:
-        the head row, the `.kv` rows as direct children, the `.btn-row` at the
-        foot with the accent CTA and a quiet second. The labels are short on
-        purpose: at desktop `.kv` gives the key §10's 184px label column, and
-        "Talent agents awaiting approval" wrapped to two lines in it. */''}
-  ${darkCard({
-    title:'Needs your attention',
-    body:kv([
-      ['Agents awaiting approval', `<b>${openApps()}</b>`, 'n'],
-      ['Payouts pending release', `<b>${heldPayouts()}</b>`, 'n'],
-      ['Level reviews to sign off', `<b>${levelling}</b>`, 'n'],
-      ['Unverified employers', `<b>${unverifiedEmp()}</b>`, 'n']
-    ]),
-    foot:`<button class="btn btn-p btn-sm noic" data-go="vetting/applications">Open The Vetting Queue ${I.arrowRight}</button>
-      <button class="btn btn-sm noic" data-go="finance/payouts">Release Payouts</button>`
-  })}
+  ${/* THE ONE BLACK CARD ON THE PAGE — §75's recipe, now PAGED (Maryam, 11 Sep
+        2026): one action item at a time with its own requests listed as `.kv`
+        rows, a `‹ 1 of 4 ›` pager top-right of the header, and the item's own CTA
+        at the foot. Built by `attnCard()` off `attnItems()`. */''}
+  ${attnCard()}
 
-  ${/* QUICK ACTIONS AS A ROW OF FOUR CARDS — Maryam, 8 Sep 2026: "these 4 quick
-        actions should be in a row of 4 cards like the other quick actions we are
-        using on other platforms." The shared `.qa-c` card (agent/candidate), laid
-        4-up by `.qa.qa-4` (§70). The descriptions are short STATIC descriptors of
-        the destination (§98.3) — no live counts, and kept to one line so nothing
-        wraps at the narrower 4-up width. */''}
-  <section class="sec">
-    ${aiHead('Quick actions', 'The things a Super Admin does most, one press from here.')}
-    <div class="qa qa-4">
-      ${[
-        ['users', 'Add a user', 'Invite or add', 'users/users'],
-        ['cohorts', 'Start a cohort', 'New cohort', 'cohorts/cohorts'],
-        ['money', 'Set the fee', 'Placement', 'finance/feeconfig'],
-        ['doc', 'Audit log', 'Recent lines', 'system/audit']
-      ].map(([icon, title, desc, go]) => `
-      <button class="qa-c" data-go="${go}">
-        <span class="qa-ic">${ic(icon)}</span>
-        <span class="qa-b"><b>${title}</b><span>${desc}</span></span>
-        <span class="qa-go">${I.arrowRight}</span>
-      </button>`).join('')}
-    </div>
-  </section>
+  ${/* QUICK ACTIONS REMOVED — Maryam, 11 Sep 2026 ("remove this section"): the
+        four `.qa-c` quick-action cards (Add a user / Start a cohort / Set the fee
+        / Audit log) are gone from the dashboard; the rail is the navigator. */''}
 
   ${/* SIDE-BY-SIDE DATA BLOCKS — Maryam, 8 Sep 2026: "the side by side graphical
         interaction would be better at some of the places rather than putting
@@ -1847,30 +1928,38 @@ function homeOverview(){
         keep the full width. In a column each block is a bare heading + its data:
         the per-block description and action button are dropped (they crowd a
         narrow column, and the rail is the navigator). */''}
+  ${/* REVENUE BY LINE — Maryam, 11 Sep 2026: the "Revenue by line" list IS the
+        waterfall now (the kv is gone, the chart takes its place). The section is
+        plain-block (no `.sec-h`, so it never becomes a label-column grid): a
+        full-width heading and a full-width description, then the graph BELOW them.
+        Bar colours are assigned by CONTENT off Maryam's four: revenue lines take
+        the calendar pastels (violet / green / warm-grey), costs the red #FF4626;
+        the Gross/Net subtotal bars stay the neutral helper grey so the totals
+        still read as totals. No placement banner. */''}
   <section class="sec">
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Revenue by line')}
-        ${kv([
-          ['Course fees', `<b>${money(courseRev)}</b>`, 'n'],
-          ['Interview fees', `<b>${money(interviewRev)}</b>`, 'n'],
-          ['Employer unlocks', `<b>${money(unlockRev)}</b>`, 'n'],
-          ['Placement fees', FEES.find(f => f.k === 'placement').state === 'set' ? `<b>${money(PLACEMENTS.filter(p => p.feeState === 'paid').reduce((n, p) => n + p.fee, 0))}</b>` : 'Not set', 'n']
-        ])}
-        ${FEES.find(f => f.k === 'placement').state === 'set' ? '' : note('warn', 'Placement fee undefined', 'The single largest revenue line has no basis, trigger or detection — two placement invoices are stuck in draft.')}
-      </div>
-      <div class="dcol">
-        ${secHead('Payments & payouts')}
-        ${kv([
-          ['In-progress payments', `<b>${money(inprog)}</b>`, 'n'],
-          ['Platform earnings', `<b>${money(platTake)}</b>`, 'n'],
-          ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`, 'n'],
-          ['Payouts settled', `<b>${money(poSettled)}</b>`, 'n'],
-          ['Payouts pending release', `<b>${money(poPending)}</b>`, 'n'],
-          ['Blocked / at risk', `<b>${poBlocked}</b> payout${poBlocked === 1 ? '' : 's'}`, 'n']
-        ])}
-      </div>
-    </div>
+    <h2 class="t-sec" style="margin:0 0 var(--sec-desc-gap)">Revenue by line</h2>
+    <p class="t-desc" style="margin:0 0 var(--s05)">How gross revenue builds from each line, then payouts and refunds leave the platform net.</p>
+    ${waterfall([
+      {l:'Course fees', v:courseRev, k:'rev', c:'var(--cal-reiv)'},
+      {l:'Interview fees', v:interviewRev, k:'rev', c:'var(--cal-iv)'},
+      {l:'Employer unlocks', v:unlockRev, k:'rev', c:'var(--cal-open)'},
+      {l:'Gross revenue', v:0, k:'sub'},
+      {l:'Agent payouts', v:-payoutOut, k:'cost'},
+      {l:'Refunds', v:-refundOut, k:'cost'},
+      {l:'Net revenue', v:0, k:'sub'}
+    ])}
+  </section>
+
+  <section class="sec">
+    ${secHead('Payments & payouts')}
+    ${kv([
+      ['In-progress payments', `<b>${money(inprog)}</b>`, 'n'],
+      ['Platform earnings', `<b>${money(platTake)}</b>`, 'n'],
+      ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`, 'n'],
+      ['Payouts settled', `<b>${money(poSettled)}</b>`, 'n'],
+      ['Payouts pending release', `<b>${money(poPending)}</b>`, 'n'],
+      ['Blocked / at risk', `<b>${poBlocked}</b> payout${poBlocked === 1 ? '' : 's'}`, 'n']
+    ])}
   </section>
 
   <section class="sec">

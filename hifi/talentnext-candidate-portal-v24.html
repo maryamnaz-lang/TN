@@ -11371,7 +11371,8 @@ button.btn-p:active,
 .app .bkshot{
   display:block;
   width:100%;
-  height:auto}
+  height:auto;
+  border:1px solid var(--rule)}
 .app .bkc{
   display:flex;align-items:center;flex-wrap:wrap;
   gap:var(--s05)}
@@ -12035,6 +12036,17 @@ button.btn-p:active,
 .app .crt-card > .crt-art{
   --crt-art-w:120px;--crt-art-h:130px;
   align-self:center;margin-bottom:var(--s05)}
+.app .crt-earn{
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s05);
+  background:var(--layer-01);
+  border:1px solid var(--rule);border-radius:var(--radius)}
+.app .crt-earn-ic{
+  flex:none;display:grid;place-items:center;
+  width:40px;height:40px;color:var(--icon-primary)}
+.app .crt-earn-ic svg{width:32px;height:32px;fill:currentColor}
+.app .crt-earn-b{display:flex;flex-direction:column;gap:var(--s02)}
+.app .crt-earn-d{max-width:60ch}
 @container app (min-width:900px){
   .app .sec:has(> .crt-grid){display:block;padding-left:var(--pad-x)}
   .app .sec:has(> .crt-grid) > .sec-h{
@@ -15155,8 +15167,25 @@ function certGrid(list){
     <span class="crt-on">Issued ${c.on}</span>
   </div>`).join('');
 }
+
+const courseCerts = (f) =>
+  certsFor(f).map(c => ({k:'explorer', n:`Explorer Track &ndash; ${c.lvl}`, on:c.on}))
+    .sort((a, b) => new Date(b.on) - new Date(a.on));
+
+function certEarn(f){
+  const name = f.level ? `the Explorer Track &ndash; ${f.level} certificate`
+                       : 'your Explorer Track certificate';
+  return `<div class="sec"><div class="crt-earn">
+    <span class="crt-earn-ic">${I.certificate}</span>
+    <div class="crt-earn-b">
+      <div class="t-h3">Earn a course certificate</div>
+      <p class="t-desc crt-earn-d">Complete the course to earn ${name}. You can add it to your LinkedIn profile, resume, or CV, and share it.</p>
+    </div>
+  </div></div>`;
+}
 function certsTab(f, g){
-  const all = certAll(f, g);
+  if(!f.complete) return certEarn(f);
+  const all = courseCerts(f);
   return certHero(all[0]) + `<div class="sec">
     <div class="sec-h"><h2>All certifications</h2></div>
     <div class="crt-grid">${certGrid(all)}</div>

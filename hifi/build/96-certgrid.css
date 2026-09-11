@@ -189,6 +189,28 @@
   --crt-art-w:120px;--crt-art-h:130px;
   align-self:center;margin-bottom:var(--s05)}
 
+/* ---- the "earn a certificate" placeholder ----
+   BEFORE A COURSE IS COMPLETE THE TAB HOLDS ONE PANEL, NOT A GRID (Maryam,
+   11 Sep 2026, with Coursera's "Earn a career certificate" row as the
+   reference). The certificate the coursework leads to is stated as a thing the
+   candidate WILL hold, so a first-time taker sees where the course is going
+   rather than an empty tab. It is the platform's plain bordered row — the bare
+   certificate glyph left (§29: a mark is a bare glyph in ink, never a tinted
+   chip), a heading and a description right — understated so an unearned
+   certificate never reads as a second award shouting beside the earned ones.
+   `certEarn` (views.js) is the writer; §63 owns the `.t-h3` / `.t-desc` type. */
+.app .crt-earn{
+  display:flex;align-items:flex-start;gap:var(--s05);
+  padding:var(--s05);
+  background:var(--layer-01);
+  border:1px solid var(--rule);border-radius:var(--radius)}
+.app .crt-earn-ic{
+  flex:none;display:grid;place-items:center;
+  width:40px;height:40px;color:var(--icon-primary)}
+.app .crt-earn-ic svg{width:32px;height:32px;fill:currentColor}
+.app .crt-earn-b{display:flex;flex-direction:column;gap:var(--s02)}
+.app .crt-earn-d{max-width:60ch}
+
 /* ---- trap 13 ---- */
 @container app (min-width:900px){
   .app .sec:has(> .crt-grid){display:block;padding-left:var(--pad-x)}

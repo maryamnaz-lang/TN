@@ -246,11 +246,14 @@
    block that ends on the checkout row's hairline reads as a misaligned seam.
    `width:100%` with `height:auto` so the capture scales inside §76.1b's centred
    830 and keeps its own proportions at every width; a fixed height would crop
-   or stretch a screenshot, which is the one thing a screenshot must not do. */
+   or stretch a screenshot, which is the one thing a screenshot must not do.
+   The 1px `--rule` #efefef border (Maryam, 11 Sep 2026) is the platform's one
+   hairline, framing the capture the way every other card edge is drawn. */
 .app .bkshot{
   display:block;
   width:100%;
-  height:auto}
+  height:auto;
+  border:1px solid var(--rule)}
 
 /* ------------------------------------------------------------------ 76.5 ---
    THE SLOT UNDER THE LIST IS EMPTY, AND TWO BLOCKS HAVE BEEN REMOVED FROM IT

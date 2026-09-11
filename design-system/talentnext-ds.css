@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5858.  Rules dropped as product-specific: 186.
+   Rules kept: 5863.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -8121,7 +8121,7 @@ button.btn-p:active,
 .app .bks-w,
 .app .bkc{width:100%; max-width:min(100%, 830px); margin-left:auto; margin-right:auto}
 .app .bkp{display:grid; grid-template-columns:minmax(0,1fr); gap:var(--s06)}
-.app .bkshot{display:block; width:100%; height:auto}
+.app .bkshot{display:block; width:100%; height:auto; border:1px solid var(--rule)}
 .app .bkc{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s05)}
 .app .bkc-fee{flex:none; display:flex; flex-direction:column}
 .app .bkc > .btn{flex:none; margin-left:auto; min-height:44px}
@@ -8554,6 +8554,11 @@ button.btn-p:active,
 .app .crt-pop-i + .crt-pop-i{border-top:1px solid var(--rule)}
 .app .crt-pop-i svg{width:18px; height:18px; flex:none; fill:currentColor}
 .app .crt-card > .crt-art{--crt-art-w:120px; --crt-art-h:130px; align-self:center; margin-bottom:var(--s05)}
+.app .crt-earn{display:flex; align-items:flex-start; gap:var(--s05); padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .crt-earn-ic{flex:none; display:grid; place-items:center; width:40px; height:40px; color:var(--icon-primary)}
+.app .crt-earn-ic svg{width:32px; height:32px; fill:currentColor}
+.app .crt-earn-b{display:flex; flex-direction:column; gap:var(--s02)}
+.app .crt-earn-d{max-width:60ch}
 @container app (min-width:900px){
   .app .sec:has(> .crt-grid){display:block; padding-left:var(--pad-x)}
   .app .sec:has(> .crt-grid) > .sec-h{width:auto; border-right:0; padding:0; margin-bottom:var(--sec-h-gap)}
