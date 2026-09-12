@@ -556,6 +556,15 @@ textarea.inp{min-height:88px}
      not in a 184px spine that would take the width out of the card row. `> .qa`,
      a direct child like the other bleed-free members. */
   .sec:has(> .qa),
+  /* `.board` JOINS THEM (Maryam, 11 Sep 2026, when the ranking moved to My
+     Level under a heading). It is `.tbl-wrap`'s argument exactly — a full-width
+     ranked table whose #/candidate/earned/points columns are sized against each
+     other — plus the same bleed `.paytbl` has: §15 gives it
+     `margin:0 calc(var(--pad-x) * -1)`, so a 184px label column would fight a
+     table already pulled to the section edge. Its heading goes on top. On the
+     cohort page it never had a heading (it was a tab), so this is the first
+     board drawn under one. `> .board`, a direct child like the other members. */
+  .sec:has(> .board),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,.sec:has(.ag) > .sec-h,.sec:has(.aw) > .sec-h,
   .sec:has(.mem) > .sec-h,.sec:has(.gcard) > .sec-h,
@@ -567,6 +576,7 @@ textarea.inp{min-height:88px}
   .sec:has(.tx-lines) > .sec-h,
   .sec:has(> .skl) > .sec-h,.sec:has(> .pfe-about) > .sec-h,.sec:has(> .tg) > .sec-h,
   .sec:has(> .qa) > .sec-h,
+  .sec:has(> .board) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{
     border-right:0;min-height:0;margin-bottom:var(--sec-h-gap);
     padding:0 var(--pad-x)}

@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=2e5861c5">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=81a2164b">
 
 <style>
 /* ==========================================================================
@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=2e5861c5"></script>
+<script src="design-system/talentnext-ds.js?b=81a2164b"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -266,8 +266,8 @@ const USERS=[
  {id:'u1', name:'Dana Whitfield', email:'dana@talentnext.io', roles:['agent'], level:'—', job:'Engineering Manager, Stripe', rating:4.9, interviewed:64, status:'active', joined:'03-12-2026', origin:'individual', last:'2h ago', fee:180, cohorts:['Explorer 12']},
  {id:'u2', name:'Marcus Ozoro', email:'marcus@northgate.health', roles:['agent'], level:'—', job:'Clinical Lead, Northgate Health', rating:4.6, interviewed:28, status:'active', joined:'02-04-2026', origin:'individual', last:'1d ago', fee:160},
  {id:'u3', name:'Priya Raman', email:'priya@talentnext.io', roles:['agent','reviewer'], level:'—', job:'Product Director, Atlassian', rating:4.8, interviewed:52, status:'active', joined:'01-21-2026', origin:'individual', last:'20m ago', fee:225},
- {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)'], volunteer:false},
- {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)'], volunteer:true},
+ {id:'u4', name:'Maryam Naz', email:'maryam.naz@tkxel.io', roles:['candidate','leader'], level:'E2 · Explorer', status:'active', joined:'03-12-2026', origin:'individual', last:'just now', cohorts:['Explorer 12 (member)','Explorer 14 (leads)'], volunteer:false, addedBy:'u9'},
+ {id:'u40', name:'Bruno Sella', email:'bruno@sella.io', roles:['candidate','leader'], level:'B3 · Builder', status:'active', joined:'02-20-2026', origin:'individual', last:'3h ago', cohorts:['Explorer 12 (leads)'], volunteer:true, addedBy:'u8'},
  {id:'u5', name:'Jordan Vale', email:'jordan@vale.co', roles:['candidate'], level:'B1 · Builder', status:'active', joined:'04-02-2026', origin:'signal', last:'3d ago'},
  {id:'u6', name:'Amara Okafor', email:'amara@brightpath.io', roles:['employer'], level:'—', status:'ok', joined:'03-18-2026', origin:'individual', last:'5h ago', company:'BrightPath'},
  {id:'u7', name:'Tom Reeves', email:'tom@filtergo.com', roles:['candidate'], level:'Explorer', status:'active', joined:'03-29-2026', origin:'filtergo', last:'6d ago'},
@@ -818,10 +818,10 @@ const MODULES=[
  {k:'home', t:'Dashboard', ic:'home', subs:[{k:'home', t:'Overview'}, {k:'rulings', t:'Rulings Register'}]},
  {k:'users', t:'Users & Roles', ic:'users', subs:[
    {k:'users', t:'All Users'}, {k:'roles', t:'Roles & Permissions'}, {k:'import', t:'Bulk Import', hidden:true}, {k:'staffdetail', t:'Staff', hidden:true}]},
- {k:'vetting', t:'Vetting & Approvals', ic:'vetting', subs:[
+ {k:'vetting', t:'Vetting & Approvals', ic:'vetting', hidden:true, subs:[
    {k:'applications', t:'Agent Applications'}, {k:'appdetail', t:'Application', hidden:true}, {k:'empverify', t:'Employer Verification'}, {k:'empverifydetail', t:'Employer', hidden:true}]},
  {k:'candidates', t:'Candidates', ic:'candidates', subs:[
-   {k:'candidates', t:'All Candidates'}, {k:'levelling', t:'Levelling & Reviews'}, {k:'detail', t:'Candidate', hidden:true}]},
+   {k:'candidates', t:'All Candidates'}, {k:'levelling', t:'Levelling & Reviews', hidden:true}, {k:'detail', t:'Candidate', hidden:true}]},
  {k:'agents', t:'Talent Agents', ic:'agents', subs:[
    {k:'agents', t:'Talent Agents'}, {k:'detail', t:'Agent', hidden:true}]},
  {k:'cohorts', t:'Cohort Management', ic:'cohorts', subs:[
@@ -829,11 +829,16 @@ const MODULES=[
  {k:'market', t:'Marketplace & Interviews', ic:'market', subs:[
    {k:'bookings', t:'Bookings'}, {k:'recordings', t:'Recordings & Transcripts'}]},
  {k:'finance', t:'Finance & Settlement', ic:'finance', subs:[
-   {k:'overview', t:'Overview'}, {k:'transactions', t:'Transactions'}, {k:'payouts', t:'Payouts'}, {k:'invoices', t:'Invoices & Billing'}, {k:'refunds', t:'Refunds & Disputes'}, {k:'reconciliation', t:'Reconciliation'}, {k:'feeconfig', t:'Fee Configuration'}]},
+   {k:'overview', t:'Overview'}, {k:'transactions', t:'Transactions', hidden:true}, {k:'payouts', t:'Payouts', hidden:true}, {k:'invoices', t:'Invoices & Billing'}, {k:'refunds', t:'Refunds & Disputes'}, {k:'reconciliation', t:'Reconciliation'}, {k:'feeconfig', t:'Fee Configuration'}]},
  {k:'crm', t:'CRM & Attribution', ic:'crm', hidden:true, subs:[
    {k:'overview', t:'Overview'}, {k:'leads', t:'Leads'}, {k:'leaddetail', t:'Lead', hidden:true}, {k:'campaigns', t:'Campaigns'}, {k:'campaigndetail', t:'Campaign', hidden:true}, {k:'attribution', t:'Source & Attribution'}, {k:'referrals', t:'Referrals & Agents'}]},
- {k:'system', t:'System & Audit', ic:'system', subs:[
-   {k:'overview', t:'System Health'}, {k:'integrations', t:'Integrations'}, {k:'audit', t:'Audit Log'}, {k:'compliance', t:'Compliance & Safeguarding'}]},
+ /* System & Audit is now a FLAT "Integrations" module (Maryam, 11 Sep 2026:
+    "make Integrations the main module, we do not need system and audits").
+    `integrations` is the one visible sub, so the rail shows it flat (no tree,
+    like Talent Agents); System Health / Audit Log / Compliance stay as HIDDEN
+    subs so their views and every `system/*` route still resolve. */
+ {k:'system', t:'Integrations', ic:'link', subs:[
+   {k:'integrations', t:'Integrations'}, {k:'overview', t:'System Health', hidden:true}, {k:'audit', t:'Audit Log', hidden:true}, {k:'compliance', t:'Compliance & Safeguarding', hidden:true}]},
  {k:'reports', t:'Reports', ic:'chart', subs:[
    {k:'users', t:'Users & Roles'}, {k:'vetting', t:'Vetting & Approvals'}, {k:'candidates', t:'Candidates'},
    {k:'agents', t:'Talent Agents'}, {k:'cohorts', t:'Cohort Management'}, {k:'market', t:'Marketplace & Interviews'},
@@ -867,6 +872,9 @@ const S = {
   read:[],                                /* notifications marked read */
   tab:{}, filter:{}, sort:{}, pg:{}, pgOpen:null, fdOpen:null, /* per-page substate; pgOpen/fdOpen = open dropdowns */
   attnPage:0,                             /* the "Needs your attention" black card shows one action item at a time; this is which (0..N-1) */
+  revView:'year',                         /* the Revenue-by-line line chart's Year/Month/Week granularity */
+  imp:{step:'upload', rows:[], count:0, text:''}, /* the Bulk Import wizard: step, parsed+validated rows, imported count, paste-box text */
+  impRoleOpen:null,                       /* which review-row role dropdown (`.fdd`) is open */
   tal:false, thread:[], typing:false, askFrom:'home',  /* Tal: the conversation is state, never DOM (trap 9) */
   editPerms:false,                        /* the permission matrix's edit mode */
   rowMenu:null                            /* the open row action menu's id (§125) */
@@ -970,9 +978,10 @@ function searchHead(title, desc, act, ph){
 function lstTools(ph, filters){
   const q = getFilter('q', '');
   return `<div class="lst-tools">
-    <div class="srch">
+    <div class="srch${q ? ' srch-has' : ''}">
       <svg class="mag" viewBox="0 -960 960 960">${inner('search')}</svg>
       <input class="inp" data-srch="q" value="${esc(q)}" placeholder="${esc(ph || 'Search')}" aria-label="${esc(ph || 'Search')}" autocomplete="off">
+      ${q ? `<button type="button" class="srch-x" data-srchclear="q" aria-label="Clear search">${I.close}</button>` : ''}
     </div>
     ${filters ? `<div class="lst-filters">${filters}</div>` : ''}
   </div>`;
@@ -1089,6 +1098,50 @@ function waterfall(rows){
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Revenue waterfall" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:${W}px;height:auto;margin-top:var(--s04)">${grid}${body}</svg>`;
 }
 
+/* THE TREND LINE CHART — the platform's OWN `perfChart` line, reused (Maryam,
+   11 Sep 2026: "you could have used this component instead of what you created").
+   `perfChart` lives in hifi's views.js and is candidate-specific (perfParts, the
+   13-chapter %, the score ring), so it does not port whole — but its LOOK is all
+   in the design-system `.perf-*` CSS the admin already links: `.perf-line` /
+   `.perf-dot` / `.perf-avg-line` are one green (`--support-success-ink`), the
+   lowest point flips red (`.perf-lo`) and the highest carries a halo (`.perf-hi`).
+   So this is that component's markup, generalised to any series: straight-segment
+   line, a dashed benchmark, y labels through `fmt`, x labels from `axis`. No
+   inline colour — the DS classes paint it.
+   `data` numbers, `axis` labels, `target` the dashed benchmark, `fmt` the y/label
+   formatter (money or plain). Series are authored placeholder (§74). */
+function trendChart(data, {axis, target, fmt}){
+  fmt = fmt || (v => String(v));
+  const W = 900, H = 180, L = 44, R = 12, T = 12, B = 26;
+  const IW = W - L - R, IH = H - T - B, min = 0;
+  const max = Math.max(...data, target || 0) * 1.14 || 1;
+  const n = data.length;
+  const x = i => L + (n > 1 ? i * (IW / (n - 1)) : IW / 2);
+  const y = v => T + IH - ((v - min) / (max - min)) * IH;
+  const lo = data.indexOf(Math.min(...data)), hi = data.indexOf(Math.max(...data));
+  const path = data.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+  const grid = [0, .25, .5, .75, 1].map(f => { const v = min + (max - min) * f; return `
+    <line x1="${L}" x2="${W - R}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="var(--rule)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+    <text class="perf-yl" x="${L - 8}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${fmt(Math.round(v))}</text>`; }).join('');
+  const avg = target != null ? `<line class="perf-avg-line" x1="${L}" x2="${W - R}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>` : '';
+  const dots = data.map((v, i) => { const call = i === lo ? ' perf-lo' : i === hi ? ' perf-hi' : '';
+    return `${call ? `<circle class="perf-halo${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="9"/>` : ''}<circle class="perf-dot${call}" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4"/>`; }).join('');
+  const xl = axis.map((l, i) => `<text class="perf-xl" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${esc(l)}</text>`).join('');
+  return `<div class="perf-plot"><svg class="perf-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Trend">
+    ${grid}${avg}<path class="perf-line" d="${path}" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>${dots}${xl}</svg></div>`;
+}
+/* AUTHORED weekly new-lead counts (§74) — the seed's LEADS carry no capture date,
+   so the six-week trend the wireframe's "New leads" card shows is a placeholder;
+   the total and the start/end steps are read off it. */
+const LEADS_TREND = { axis:['Jun 30', 'Jul 7', 'Jul 14', 'Jul 21', 'Jul 28', 'Aug 4'], data:[19, 26, 23, 33, 29, 39] };
+function newLeadsCard(){
+  const d = LEADS_TREND, total = d.data.reduce((a, b) => a + b, 0);
+  const avg = Math.round(total / d.data.length);
+  return `
+    <div class="chart-read" style="margin:0 0 var(--s04)"><span class="v">${total} leads</span><span class="k">${esc(d.axis[0])} – ${esc(d.axis[d.axis.length - 1])} · ${d.data[0]}→${d.data[d.data.length - 1]} a week</span></div>
+    ${trendChart(d.data, {axis:d.axis, target:avg})}`;
+}
+
 /* THE DATA TABLE — always inside `.tbl-wrap`, the one component that scrolls
    sideways. `cols` are [{label, num?, sort?, act?}] and `rows` are
    {cells:[…], go?, sv?:[…]} — `sv` is a row's raw sort values where the cell's
@@ -1109,6 +1162,31 @@ function table(cols, rows, opts){
     return `<th${cls ? ` class="${cls}"` : ''}${sortable ? ` data-sort="${i}" aria-sort="${on ? (st.dir === 'desc' ? 'descending' : 'ascending') : 'none'}"` : ''}>${esc(c.label)}${on ? `<svg viewBox="0 -960 960 960" aria-hidden="true">${inner(st.dir === 'desc' ? 'chevDown' : 'chevUp')}</svg>` : ''}</th>`;
   }).join('');
   const ordered = sortRows(rows, st);
+  /* STABLE COLUMN WIDTHS ACROSS PAGES (Maryam 12 Sep 2026). A plain
+     `table-layout:auto` table sizes its columns to whichever rows are on the
+     current page, so paginating a list makes the columns jump width page to
+     page. We size them ONCE off the whole dataset (`ordered`, every row, not the
+     visible slice) and pin them with `table-layout:fixed` + a `<colgroup>`, so
+     every page draws the same grid — the page-1 layout, held steady. Widths are
+     a text-length estimate (longest line in the column, header included), so
+     they stay proportional to the content rather than going equal-width; the
+     table keeps its sideways scroll (`width:auto; min-width:100%`) so a wide
+     table behaves exactly as before, just without the per-page reflow. */
+  const colW = cols.map((c, i) => {
+    if(c.act) return 56;                                   // the kebab column
+    const strip = s => String(s == null ? '' : s)
+      .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(div|p|li|tr)>/gi, '\n')
+      .replace(/<[^>]*>/g, '').replace(/&[a-z]+;/gi, 'x').trim();
+    const lineMax = s => strip(s).split('\n').reduce((m, l) => Math.max(m, l.trim().length), 0);
+    let body = 0;
+    for(const r of ordered) body = Math.max(body, lineMax((r.cells || [])[i]));
+    const sortable = !c.act && c.sort !== false && c.label;
+    const head = String(c.label || '').length * 7.7 + (sortable ? 18 : 0);
+    const w = Math.max(body * 6.7, head) + 16 /* cell padding */ + 4;
+    return Math.round(Math.min(Math.max(w, 72), 340));
+  });
+  const colGroup = `<colgroup>${colW.map(w => `<col style="width:${w}px">`).join('')}</colgroup>`;
+  const colSum = colW.reduce((s, w) => s + w, 0);
   /* PAGINATION (§127, Maryam 7 Sep 2026). A table shows one page at a time —
      PAGE_DEFAULT rows, and the reader can change that. State is `S.pg[key]`,
      keyed by page AND a per-render table index (`TBL_SEQ`) so two tables on one
@@ -1133,7 +1211,7 @@ function table(cols, rows, opts){
       const cls = [col.num ? 'num' : '', col.act ? 'tbl-act' : ''].filter(Boolean).join(' ');
       return `<td${cls ? ` class="${cls}"` : ''}>${c}</td>`;
     }).join('')}</tr>`).join('');
-  return `<div class="tbl-wrap"><table class="tbl"><tr>${head}</tr>${body}</table></div>${pgBar}`;
+  return `<div class="tbl-wrap"><table class="tbl" style="table-layout:fixed;width:100%;min-width:${colSum}px">${colGroup}<tr>${head}</tr>${body}</table></div>${pgBar}`;
 }
 
 /* THE PAGINATION BAR — §127. Rows-per-page on the left (a set of sizes, the
@@ -1366,13 +1444,33 @@ const KINDS = {};
 const newId = (pfx, list) => { let n = list.length + 1; while(list.some(x => x.id === pfx + n)) n++; return pfx + n; };
 const today = () => { const d = new Date(); return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-${d.getFullYear()}`; };
 
+/* OUR form dropdown for a sheet/settings SELECT field — never a native <select>
+   anywhere in this portal (DESIGN.md §3, Maryam 11 Sep 2026: no system dropdowns
+   on the Super Admin portal). It is DOM-only: a `.fdd.fdd-form` with a hidden
+   `[data-f]` input that `readForm`/`readPageForm` read UNCHANGED, plus a
+   full-width trigger and an option menu. `data-formddtoggle`/`data-formddset`
+   are handled in the NON-rendering click listener, because the form is read from
+   the DOM on save — a render would rebuild it and lose every other in-progress
+   field. Reuses the existing `.fdd*` classes (like `impRoleCell`), so no new CSS. */
+function formDd(f, val){
+  const opts = (typeof f.opts === 'function' ? f.opts() : f.opts).map(o => Array.isArray(o) ? o : [o, o]);
+  const cur = opts.find(o => String(o[0]) === String(val)) || opts[0] || ['', ''];
+  return `<label class="f"><span class="lbl">${esc(f.l)}</span>
+    <div class="fdd fdd-form" style="display:block">
+      <input type="hidden" data-f="${f.k}" value="${esc(cur[0])}">
+      <button type="button" class="fdd-t" data-formddtoggle aria-haspopup="listbox" aria-expanded="false" style="width:100%;justify-content:space-between;min-height:40px">
+        <span class="fdd-val">${esc(cur[1])}</span>
+        <svg class="fdd-cx" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg></button>
+      <div class="fdd-menu" role="listbox" style="left:0;right:0;max-height:260px;overflow-y:auto">${opts.map(([ov, ol]) =>
+        `<button type="button" class="fdd-opt${String(ov) === String(cur[0]) ? ' on' : ''}" role="option" aria-selected="${String(ov) === String(cur[0]) ? 'true' : 'false'}" data-formddset="${esc(ov)}">${esc(ol)}</button>`).join('')}</div>
+    </div></label>`;
+}
 function fieldHtml(f, v){
   const def = typeof f.def === 'function' ? f.def() : f.def;
   const val = v == null ? (def == null ? '' : def) : v;
   if(typeof f.opts === 'function') f = Object.assign({}, f, {opts:f.opts()});
   const lbl = `<span class="lbl">${esc(f.l)}${f.req ? '' : ''}</span>`;
-  if(f.t === 'select') return `<label class="f">${lbl}<select class="inp" data-f="${f.k}">${
-    f.opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(ov)}"${String(ov) === String(val) ? ' selected' : ''}>${esc(ol)}</option>`; }).join('')}</select></label>`;
+  if(f.t === 'select') return formDd(f, val);
   if(f.t === 'textarea') return `<label class="f">${lbl}<textarea class="inp" data-f="${f.k}" rows="3" placeholder="${esc(f.ph || '')}">${esc(val)}</textarea></label>`;
   if(f.t === 'checks') return `<div class="f">${lbl}<div class="mt4">${f.opts.map(o => { const [ov, ol] = Array.isArray(o) ? o : [o, o];
     const on = Array.isArray(val) && val.includes(ov);
@@ -1424,6 +1522,8 @@ ACTIONS.save = key => { const [, kind, id] = key.split(':'); return saveRecord(k
    doAction re-renders. */
 ACTIONS.attn = key => { const dir = key.split(':')[1]; const n = attnItems().length;
   S.attnPage = (((S.attnPage + (dir === 'prev' ? -1 : 1)) % n) + n) % n; };
+/* THE REVENUE-BY-LINE CHART's Year/Month/Week toggle — sets the granularity; doAction re-renders. */
+ACTIONS.revview = key => { S.revView = key.split(':')[1]; };
 ACTIONS.askdel = key => {
   const [, kind, id] = key.split(':'); const K = KINDS[kind]; const rec = K && K.find(id); if(!rec) return;
   if(K.guard){ const why = K.guard(rec); if(why){ toast(why, 'warn'); return; } }
@@ -1840,13 +1940,12 @@ function homeOverview(){
   const highDec = DECISIONS.filter(d => d.sev === 'high').length;
   const medDec = DECISIONS.filter(d => d.sev === 'med').length;
 
-  /* revenue by fee line — the frozen file's dashboard chart, read as data */
+  /* revenue by fee line — the "Revenue streams · this cycle" card reads these */
   const courseRev = TXNS.filter(t => t.cat === 'course' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const interviewRev = TXNS.filter(t => t.cat === 'interview' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
   const unlockRev = TXNS.filter(t => t.cat === 'unlock' && t.dir === 'in').reduce((n, t) => n + t.amt, 0);
-  /* costs OUT of the same ledger, so the waterfall reconciles: net = gross − these */
-  const payoutOut = TXNS.filter(t => t.cat === 'payout' && t.dir === 'out').reduce((n, t) => n + t.amt, 0);
-  const refundOut = TXNS.filter(t => t.cat === 'refund' && t.dir === 'out').reduce((n, t) => n + t.amt, 0);
+  const revMax = Math.max(courseRev, interviewRev, unlockRev, 1);
+  const placementSet = FEES.find(f => f.k === 'placement').state === 'set';
 
   /* RESTORED DASHBOARD ANALYTICS — Maryam, 8 Sep 2026. The frozen file's
      dashboard (`tn-admin.html`, the data reference) carried payments/payouts,
@@ -1889,13 +1988,31 @@ function homeOverview(){
   /* cohort health (COHORTS) */
   const liveCohorts = COHORTS.filter(c => c.status === 'active');
 
+  /* NEEDS-YOUR-ATTENTION LIST (Pipeline & activity) — the four queues as clickable
+     rows (icon · title · count · arrow), the `.tile clk gcard` shape `decisionTile`
+     uses. Agents are added straight through the admin now, so their vetting queue
+     is not one of the rows. */
+  const cohortsNoLeader = COHORTS.filter(c => c.leader === 'Unassigned' && c.status === 'active').length;
+  const attnRows = [
+    ['user', 'Levelling reviews', `${LEVELQ.length} to sign off`, 'candidates/levelling'],
+    ['cohorts', 'Cohort leader', `${cohortsNoLeader} cohort${cohortsNoLeader === 1 ? '' : 's'} without a leader`, 'cohorts/assign'],
+    ['verified', 'Employer verification', `${unverifiedEmp()} awaiting checks`, 'vetting/empverify'],
+    ['bank', 'Payouts to release', `${heldPayouts()} pending`, 'finance/payouts']
+  ].map(([ic_, t, s, go]) => `<button class="tile clk gcard" data-go="${go}">
+      <span class="cardrow-ic">${ic(ic_)}</span>
+      <span class="gcard-b"><h3>${t}</h3><span class="sub">${esc(s)}</span></span>
+      <svg class="tile-arrow" viewBox="0 -960 960 960">${inner('arrowRight')}</svg></button>`).join('');
+  /* GROUP HEADING — the dashboard's section dividers (Maryam, 11 Sep 2026, off the
+     wireframes): a plain full-width heading leading each group of cards. It is set
+     to the SAME type as "Platform at a glance" (`secHead` renders its h2 at
+     `--t-sec` 16px / weight 500 / -.15px, `--text-primary`) — matched inline
+     because `.t-sec` is a token, not a class, and a bare `<h2>` falls to a smaller
+     base size. Plain (not `.sec-h`) so it never turns its section into a
+     label-column grid. */
+  const group = t => `<h2 style="margin:0 0 var(--s05);padding-left:0;font-size:var(--t-sec-size);line-height:var(--t-sec-lh);font-weight:500;letter-spacing:var(--t-sec-ls);color:var(--text-primary)">${t}</h2>`;
+
   return `
-  ${/* ONE ATTACHED 2×4 GRID (Maryam, 11 Sep 2026): "remove the money at glance
-        heading, remove the divider between both sections, join both card rows".
-        The two `.stats` bands become a single eight-cell `.stats` under the one
-        "Platform at a glance" heading — `.stats` is a fixed four-column grid
-        whose 1px gap paints the hairline, so eight cells read as two attached
-        rows of four (the profile's §105 pf-facts pattern). */''}
+  ${/* PLATFORM AT A GLANCE — the overview band, kept above the grouped sections. */''}
   <section class="sec">
     ${secHead('Platform at a glance')}
     ${stats([
@@ -1910,77 +2027,44 @@ function homeOverview(){
     ])}
   </section>
 
-  ${/* THE ONE BLACK CARD ON THE PAGE — §75's recipe, now PAGED (Maryam, 11 Sep
-        2026): one action item at a time with its own requests listed as `.kv`
-        rows, a `‹ 1 of 4 ›` pager top-right of the header, and the item's own CTA
-        at the foot. Built by `attnCard()` off `attnItems()`. */''}
-  ${attnCard()}
-
-  ${/* QUICK ACTIONS REMOVED — Maryam, 11 Sep 2026 ("remove this section"): the
-        four `.qa-c` quick-action cards (Add a user / Start a cohort / Set the fee
-        / Audit log) are gone from the dashboard; the rail is the navigator. */''}
-
-  ${/* SIDE-BY-SIDE DATA BLOCKS — Maryam, 8 Sep 2026: "the side by side graphical
-        interaction would be better at some of the places rather than putting
-        everything in a different row." The short key/value blocks pair into
-        `.dgrid` rows (§120.1e) instead of each taking a full-width band; the
-        wide stat rows (Marketplace, Where users come from) and the cohort table
-        keep the full width. In a column each block is a bare heading + its data:
-        the per-block description and action button are dropped (they crowd a
-        narrow column, and the rail is the navigator). */''}
-  ${/* REVENUE BY LINE — Maryam, 11 Sep 2026: the "Revenue by line" list IS the
-        waterfall now (the kv is gone, the chart takes its place). The section is
-        plain-block (no `.sec-h`, so it never becomes a label-column grid): a
-        full-width heading and a full-width description, then the graph BELOW them.
-        Bar colours are assigned by CONTENT off Maryam's four: revenue lines take
-        the calendar pastels (violet / green / warm-grey), costs the red #FF4626;
-        the Gross/Net subtotal bars stay the neutral helper grey so the totals
-        still read as totals. No placement banner. */''}
+  ${/* ══ REVENUE & SETTLEMENT ══ Revenue streams (bars) · payments/payouts (kv) · booking mix (donut) */''}
   <section class="sec">
-    <h2 class="t-sec" style="margin:0 0 var(--sec-desc-gap)">Revenue by line</h2>
-    <p class="t-desc" style="margin:0 0 var(--s05)">How gross revenue builds from each line, then payouts and refunds leave the platform net.</p>
-    ${waterfall([
-      {l:'Course fees', v:courseRev, k:'rev', c:'var(--cal-reiv)'},
-      {l:'Interview fees', v:interviewRev, k:'rev', c:'var(--cal-iv)'},
-      {l:'Employer unlocks', v:unlockRev, k:'rev', c:'var(--cal-open)'},
-      {l:'Gross revenue', v:0, k:'sub'},
-      {l:'Agent payouts', v:-payoutOut, k:'cost'},
-      {l:'Refunds', v:-refundOut, k:'cost'},
-      {l:'Net revenue', v:0, k:'sub'}
-    ])}
-  </section>
-
-  <section class="sec">
-    ${secHead('Payments & payouts')}
-    ${kv([
-      ['In-progress payments', `<b>${money(inprog)}</b>`, 'n'],
-      ['Platform earnings', `<b>${money(platTake)}</b>`, 'n'],
-      ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`, 'n'],
-      ['Payouts settled', `<b>${money(poSettled)}</b>`, 'n'],
-      ['Payouts pending release', `<b>${money(poPending)}</b>`, 'n'],
-      ['Blocked / at risk', `<b>${poBlocked}</b> payout${poBlocked === 1 ? '' : 's'}`, 'n']
-    ])}
-  </section>
-
-  <section class="sec">
-    ${aiHead('Marketplace this week', 'Interview bookings, what is still awaiting settlement, and the average fee.',
-      '<button class="btn btn-g btn-sm noic" data-go="market/bookings">Open Marketplace</button>')}
-    ${stats([
-      ['market', 'Confirmed', String(bkConfirmed), 'booked interviews'],
-      ['bank', 'Awaiting pay', String(bkAwaiting), 'unpaid or pending'],
-      ['money', 'Booked value', money(gmv), 'paid this window'],
-      ['agents', 'Avg fee', money(avgFee), 'per interview']
-    ])}
-  </section>
-
-  ${/* THE PROPORTIONS AS GRAPHS (§120.1f) — a donut for a 2–4 slice split, bars
-        for a ranked list or the funnel. The figures still ride the legend / bar
-        labels, so nothing the kv version said is lost. */''}
-  <section class="sec">
-    <div class="dgrid dgrid-2">
+    ${group('Revenue &amp; settlement')}
+    <div class="dgrid dgrid-3">
+      <div class="dcol">
+        ${secHead('Revenue streams · this cycle')}
+        ${hbars([
+          ['Course fees', money(courseRev), courseRev],
+          ['Interview fees', money(interviewRev), interviewRev],
+          ['Employer unlocks', money(unlockRev), unlockRev],
+          ['Placement fees', placementSet ? money(PLACEMENTS.filter(p => p.feeState === 'paid').reduce((n, p) => n + p.fee, 0)) : 'Not set', placementSet ? revMax : 0]
+        ])}
+      </div>
+      <div class="dcol">
+        ${secHead('In-progress payments & payouts')}
+        ${kv([
+          ['In-progress payments', `<b>${money(inprog)}</b>`, 'n'],
+          ['Platform earnings', `<b>${money(platTake)}</b>`, 'n'],
+          ['Agent payouts', `<b>${money(poSettled + poPending)}</b>`, 'n'],
+          ['Payouts settled', `<b>${money(poSettled)}</b>`, 'n'],
+          ['Payouts pending', `<b>${money(poPending)}</b>`, 'n'],
+          ['Blocked / at risk', `<b>${poBlocked}</b> txn${poBlocked === 1 ? '' : 's'}`, 'n']
+        ])}
+      </div>
       <div class="dcol">
         ${secHead('Booking mix')}
         ${donut(bkMixRows.map(([kind, n], i) => [kind, n, DV[i % DV.length]]))}
+      </div>
+    </div>
+  </section>
+
+  ${/* ══ GROWTH & ACQUISITION ══ leads by source (bars) · candidates by bucket (donut) · new leads (line) */''}
+  <section class="sec">
+    ${group('Growth &amp; acquisition')}
+    <div class="dgrid dgrid-2">
+      <div class="dcol">
+        ${secHead('Leads by source')}
+        ${hbars(srcRows.map(([s, n]) => [s, `${n} · ${pctOf(n, leadTot)}%`, n]))}
       </div>
       <div class="dcol">
         ${secHead('Candidates by bucket')}
@@ -1988,27 +2072,14 @@ function homeOverview(){
       </div>
     </div>
   </section>
-
   <section class="sec">
-    <div class="dgrid dgrid-2">
-      <div class="dcol">
-        ${secHead('Leads by source')}
-        ${hbars(srcRows.map(([s, n]) => [s, `${n} · ${pctOf(n, leadTot)}%`, n]))}
-      </div>
-      <div class="dcol">
-        ${secHead('Pipeline funnel')}
-        ${hbars([
-          ['Leads (quiz takers)', leadTot, leadTot],
-          ['Candidates on an account', CANDS.length, CANDS.length],
-          ['Candidates in a cohort', inCohort, inCohort],
-          ['Booked an interview', BOOKINGS.length, BOOKINGS.length],
-          ['Placed with an employer', PLACEMENTS.length, PLACEMENTS.length]
-        ])}
-      </div>
-    </div>
+    ${secHead('New leads')}
+    ${newLeadsCard()}
   </section>
 
+  ${/* ══ PEOPLE & ACCESS ══ users by role (bars) · users by status (bars) · where users come from (stats) */''}
   <section class="sec">
+    ${group('People &amp; access')}
     <div class="dgrid dgrid-2">
       <div class="dcol">
         ${secHead('Users by role')}
@@ -2023,7 +2094,6 @@ function homeOverview(){
       </div>
     </div>
   </section>
-
   <section class="sec">
     ${secHead('Where users come from')}
     ${stats([
@@ -2034,6 +2104,16 @@ function homeOverview(){
     ])}
   </section>
 
+  ${/* ══ COHORTS & MARKETPLACE ══ marketplace stats · cohort health (table) */''}
+  <section class="sec">
+    ${group('Cohorts &amp; marketplace')}
+    ${stats([
+      ['market', 'Confirmed', String(bkConfirmed), 'booked interviews'],
+      ['bank', 'Awaiting pay', String(bkAwaiting), 'unpaid or pending'],
+      ['money', 'Booked value', money(gmv), 'paid this window'],
+      ['agents', 'Avg fee', money(avgFee), 'per interview']
+    ])}
+  </section>
   <section class="sec">
     ${aiHead('Cohort health', 'Every running cohort, how far through the 90-day loop it is, and whether it has a leader.',
       '<button class="btn btn-g btn-sm noic" data-go="cohorts/cohorts">Cohorts</button>')}
@@ -2050,24 +2130,37 @@ function homeOverview(){
     ) : emptyState('cohorts', 'No active cohorts', 'Nothing is running this window.')}
   </section>
 
-  ${/* THE REGISTER'S BLOCKED LINES, HERE; THE WHOLE REGISTER IS ITS OWN PAGE.
-        The journey's rule — an open or blocked branch is not agreed scope — is
-        what this section carries onto the dashboard: the lines that BLOCK a
-        build, with the owner whose ruling unblocks them. `decisionTile` is the
-        one renderer both pages use. */''}
+  ${/* ══ PIPELINE & ACTIVITY ══ funnel (bars) · needs your attention (list) · recent activity (timeline) */''}
   <section class="sec">
-    ${aiHead('Blocked on a ruling', `${saCount('blocked')} of ${SA_CASES.length} use cases are blocked by an undecided upstream item; ${saCount('open')} more need a stakeholder ruling. ${highDec} high · ${medDec} medium across the register.`,
-      '<button class="btn btn-g btn-sm noic" data-go="home/rulings">Open The Register</button>')}
-    <div class="tile-stack">
-      ${DECISIONS.filter(d => d.kind === 'blocked').map(decisionTile).join('')}
+    ${group('Pipeline &amp; activity')}
+    <div class="dgrid dgrid-3">
+      <div class="dcol">
+        ${secHead('Pipeline funnel')}
+        ${hbars([
+          ['Leads (quiz takers)', leadTot, leadTot],
+          ['On an account', CANDS.length, CANDS.length],
+          ['In a cohort', inCohort, inCohort],
+          ['Booked an interview', BOOKINGS.length, BOOKINGS.length],
+          ['Placed', PLACEMENTS.length, PLACEMENTS.length]
+        ])}
+      </div>
+      <div class="dcol">
+        ${secHead('Needs your attention')}
+        <div class="tile-stack">${attnRows}</div>
+      </div>
+      <div class="dcol">
+        ${secHead('Recent activity')}
+        <div class="tile-stack">${AUDIT.slice(0, 5).map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, a.sev === 'high' ? 'High' : a.sev === 'notice' ? 'Notice' : 'Info'))).join('')}</div>
+      </div>
     </div>
   </section>
 
+  ${/* ══ OPEN DECISIONS & RISKS ══ the register's blocked lines (whole register is its own page) */''}
   <section class="sec">
-    ${aiHead('Recent activity', 'The newest lines from the immutable audit log.',
-      '<button class="btn btn-g btn-sm noic" data-go="system/audit">Open The Audit Log</button>')}
+    ${aiHead('Open decisions &amp; risks', `${saCount('blocked')} of ${SA_CASES.length} use cases are blocked by an undecided upstream item; ${saCount('open')} more need a stakeholder ruling. ${highDec} high · ${medDec} medium across the register.`,
+      '<button class="btn btn-g btn-sm noic" data-go="home/rulings">Open The Register</button>')}
     <div class="tile-stack">
-      ${AUDIT.slice(0, 6).map(a => memRow(a.who, `${esc(a.act)} · ${esc(a.obj)}`, tag(a.sev, a.sev === 'high' ? 'High' : a.sev === 'notice' ? 'Notice' : 'Info'))).join('')}
+      ${DECISIONS.filter(d => d.kind === 'blocked').map(decisionTile).join('')}
     </div>
   </section>`;
 }
@@ -2423,36 +2516,51 @@ function viewAsBar(){
   </div>`;
 }
 
-const ROLE_FILTERS = () => [
-  ['all', 'All', USERS.length],
-  ['candidate', 'Candidates', USERS.filter(u => u.roles.includes('candidate')).length],
-  ['agent', 'Agents', USERS.filter(u => u.roles.includes('agent')).length],
-  ['employer', 'Employers', USERS.filter(u => u.roles.includes('employer')).length],
-  ['leader', 'Cohort leaders', USERS.filter(u => u.roles.includes('leader')).length],
-  ['internal', 'Internal', USERS.filter(u => u.internal).length],
-  ['inactive', 'Deactivated', USERS.filter(u => u.status === 'inactive').length]
+/* THE ROLE FILTER (DESIGN.md admin list rule). The tab strip is gone — the role
+   is a `.fdd` dropdown in the toolbar beside Status, so both filters read the
+   same way. `admin` is the internal-account bucket (Admin / Super Admin); the
+   rest are a plain role membership. Deactivated is the Status filter's job, not a
+   role, so it is not here. */
+const ROLE_OPTS = [
+  ['all', 'All'],
+  ['candidate', 'Candidate'],
+  ['agent', 'Talent Agent'],
+  ['leader', 'Cohort Leader'],
+  ['admin', 'Admin'],
+  ['employer', 'Employer']
 ];
+/* A cohort leader an admin added is a MODERATOR (§ moderator, 11 Sep 2026).
+   `u.addedBy` is the id of the admin who added them, and the Cohort Leader filter
+   adds an "Added by" column reading it: the signed-in Super Admin (ME) reads
+   "You", any other admin by name — the "Added by" is the column header, so it is
+   not repeated in every cell. Authored placeholder on the two leader accounts —
+   the seed has no add-audit trail. */
+const addedByLabel = u => { const by = u.addedBy && USER_BY_ID[u.addedBy]; return by ? (by.id === ME.id ? 'You' : esc(by.name)) : '—'; };
 function usersAll(){
   const rf = getFilter('role', 'all'), q = getFilter('q', ''), sf = getFilter('status', 'all');
   const active = u => u.status === 'active' || u.status === 'ok';
-  const rows = USERS.filter(u => rf === 'all' ? true : rf === 'internal' ? u.internal : rf === 'inactive' ? u.status === 'inactive' : u.roles.includes(rf))
+  const rows = USERS.filter(u => rf === 'all' ? true : rf === 'admin' ? u.internal : u.roles.includes(rf))
     .filter(u => sf === 'all' ? true : sf === 'active' ? active(u) : !active(u))
     .filter(u => hit(q, u.name, u.email, u.job, u.company, u.level));
   const detailOf = u => u.job || (u.level !== '—' ? u.level : '') || u.company || '—';
+  const showAdded = rf === 'leader';
   return `
   <section class="sec">
     ${searchHead('All users', 'Every account on the platform. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-go="users/import">${I.download} Bulk Import</button>
        ${addBtn('user', 'Add User')}`)}
-    ${filterStrip('role', 'all', ROLE_FILTERS())}
     ${lstTools('Search by name, email or company',
+      filterDd('role', 'all', ROLE_OPTS, 'Role') +
       filterDd('status', 'all', [['all', 'All'], ['active', 'Active'], ['inactive', 'Inactive']], 'Status'))}
     ${rows.length ? table(
-      [{label:'User'}, {label:'Roles', sort:false}, {label:'Detail'}, {label:'Status'}, {label:'Joined'}, {label:'Last active'}, ACT_COL],
+      [{label:'User'}, {label:'Roles', sort:false}, {label:'Detail'},
+        ...(showAdded ? [{label:'Added by'}] : []),
+        {label:'Status'}, {label:'Joined'}, {label:'Last active'}, ACT_COL],
       rows.map(u => ({go:'users/staffdetail/' + u.id, sv:[u.name], cells:[
         idCell(u.name, u.email),
         roleChips(u.roles),
         esc(detailOf(u)),
+        ...(showAdded ? [addedByLabel(u)] : []),
         tag(active(u) ? 'active' : u.status),
         esc(u.joined),
         esc(u.last),
@@ -2558,28 +2666,149 @@ ACTIONS.doperm = key => {
   toast('Granted — breach logged');
 };
 
+/* ══ BULK IMPORT USERS — a three-step wizard (Maryam, 11 Sep 2026, off the
+   reference flow: Upload → Review → Done), built in OUR UI. Every row is parsed
+   and VALIDATED before anything is created; only Ready rows become accounts.
+   State is `S.imp` (never the DOM — trap 9). The role cell is a native
+   `<select class="inp">`, the admin's own form-field select (see `fieldHtml`). */
+const IMP_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const IMP_ROLE_KEYS = ROLES.map(r => r.k);
+/* sample rows the "Load sample data" button runs through the validator — four
+   clean, four each tripping a different rule (invalid email · missing role ·
+   duplicate of an existing account · unknown role key). Authored (§74). */
+const IMP_SAMPLE = [
+  ['Ava Stone', 'ava@brightpath.io', 'candidate'], ['Max Lee', 'max@northgate.health', 'agent'],
+  ['Joan Roy', 'joan@signal.co', 'employer'], ['Dev Kapoor', 'dev@talentnext.io', 'reviewer'],
+  ['Sam Poe', 'not-an-email', 'candidate'], ['No Role Here', 'norole@acme.io', ''],
+  ['Dupe Account', 'dana@talentnext.io', 'agent'], ['Zoe Fields', 'zoe@acme.io', 'wizard']
+];
+function impParse(text){
+  return (text || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+    .filter(l => !/^\s*name\s*,\s*email\s*,\s*role/i.test(l))
+    .map(l => { const c = l.split(','); return {name:(c[0] || '').trim(), email:(c[1] || '').trim(), role:(c[2] || '').trim()}; });
+}
+function impValidate(rows){
+  const seen = {}, existing = new Set(USERS.map(u => u.email.toLowerCase()));
+  return rows.map(r => {
+    const name = (r.name || '').trim(), email = (r.email || '').trim(), role = (r.role || '').trim().toLowerCase();
+    let st;
+    if(!name) st = {k:'err', t:'Missing name'};
+    else if(!IMP_EMAIL.test(email)) st = {k:'err', t:'Invalid email'};
+    else if(!role) st = {k:'warn', t:'Missing role'};
+    else if(!IMP_ROLE_KEYS.includes(role)) st = {k:'err', t:`Unknown role "${(r.role || '').trim()}"`};
+    else if(existing.has(email.toLowerCase()) || seen[email.toLowerCase()]) st = {k:'err', t:'Duplicate email'};
+    else st = {k:'ok', t:'Ready'};
+    if(email) seen[email.toLowerCase()] = true;
+    return {name:r.name, email:r.email, role:r.role, st};
+  });
+}
+const impTag = st => tag(st.k === 'ok' ? 'active' : st.k === 'warn' ? 'requested' : 'flagged', st.t);
+function impStepper(active){
+  const steps = ['Upload', 'Review', 'Done'];
+  return `<div style="display:flex;align-items:center;justify-content:center;gap:var(--s03);margin:var(--s06) 0 var(--s08);flex-wrap:wrap">
+    ${steps.map((s, i) => {
+      const done = i < active, on = i === active, fill = done || on;
+      const disc = `<span style="width:26px;height:26px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:500;flex:none;${fill ? 'background:var(--text-primary);color:var(--background)' : 'background:var(--surface-2);color:var(--text-helper);border:1px solid var(--border-subtle-02)'}">${done ? `<svg viewBox="0 -960 960 960" width="14" height="14" fill="currentColor" style="display:block">${inner('check')}</svg>` : i + 1}</span>`;
+      return `${i ? '<span style="width:36px;height:1px;background:var(--rule);flex:none"></span>' : ''}<span style="display:inline-flex;align-items:center;gap:var(--s03)">${disc}<span style="font-size:var(--t-body-size);${fill ? 'color:var(--text-primary);font-weight:500' : 'color:var(--text-helper)'}">${s}</span></span>`;
+    }).join('')}
+  </div>`;
+}
 function usersImport(){
+  const imp = S.imp, rows = imp.rows;
+  const ready = rows.filter(r => r.st.k === 'ok').length, needfix = rows.length - ready;
+  const stepN = imp.step === 'upload' ? 0 : imp.step === 'review' ? 1 : 2;
+
+  const upload = `
+    <section class="sec"><div style="max-width:680px;margin:0 auto">
+      <label for="impFile" style="display:block;border:1.5px dashed var(--border-subtle-02);padding:var(--s08) var(--s06);text-align:center;cursor:pointer;background:var(--surface-2)">
+        <span style="width:44px;height:44px;border-radius:999px;background:var(--background);border:1px solid var(--rule);display:inline-flex;align-items:center;justify-content:center">${I.download}</span>
+        <span class="t-h4" style="display:block;margin-top:var(--s04)">Choose a CSV file</span>
+        <span class="t-desc" style="display:block">Click to browse. Columns: <b>name</b>, <b>email</b>, <b>role</b>.</span>
+        <input type="file" id="impFile" accept=".csv,text/csv" hidden>
+      </label>
+      <div class="btn-row" style="justify-content:center;margin-top:var(--s05)">
+        <button class="btn btn-g btn-sm noic" data-act="imptemplate">${I.download} Download template</button>
+        <button class="btn btn-g btn-sm noic" data-act="impsample">Load sample data</button>
+      </div>
+      <div style="border-top:1px solid var(--rule);margin:var(--s06) 0"></div>
+      <h3 class="t-h4" style="margin:0 0 var(--s04)">Or paste CSV rows</h3>
+      <textarea class="inp" id="impText" data-imptext rows="4" style="min-height:96px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px" placeholder="name,email,role&#10;Ava Stone,ava@example.com,candidate">${esc(S.imp.text || '')}</textarea>
+      <p class="t-desc" style="margin:var(--s04) 0 0">Accepted roles: ${IMP_ROLE_KEYS.join(', ')}.</p>
+      <div class="btn-row" style="margin-top:var(--s05);justify-content:flex-end"><button class="btn btn-p noic" data-act="impparse"${(S.imp.text || '').trim() ? '' : ' disabled'}>Parse rows ${I.arrowRight}</button></div>
+    </div></section>`;
+
+  /* THE REVIEW TABLE follows our `.tbl` component (Maryam, 11 Sep 2026 — the same
+     class `table()` renders: header divider, row hairlines, aligned cells). It is
+     built directly rather than through `table()` for two reasons: the rows are
+     NOT sortable/paginated, and the role cell's `.fdd` menu must not be clipped —
+     so its wrapper is `overflow:visible`, not `.tbl-wrap`'s sideways scroll.
+     The editable cells are `.inp` given a full bordered box (radius 0) so a cell
+     READS as a field at rest. The role cell is OUR dropdown (`.fdd`, `impRoleCell`),
+     never a native <select>. */
+  const impFld = 'width:100%;min-height:38px;height:38px;padding:0 var(--s04);border:1px solid var(--border-subtle-02);border-bottom:1px solid var(--border-subtle-02);border-radius:var(--radius);background:var(--background)';
+  const impRoleCell = (i, role) => { const k = (role || '').trim().toLowerCase(), cur = ROLES.find(ro => ro.k === k), open = S.impRoleOpen === i;
+    return `<div class="fdd${open ? ' on' : ''}" style="display:block">
+      <button type="button" class="fdd-t" data-improleopen="${i}" aria-haspopup="listbox" aria-expanded="${open}" style="width:100%;justify-content:space-between;min-height:38px;height:38px;border-color:var(--border-subtle-02);background:var(--background)">
+        <span style="${cur ? '' : 'color:var(--text-helper)'}">${cur ? esc(cur.name) : 'Choose role…'}</span>
+        <svg class="fdd-cx" viewBox="0 -960 960 960" aria-hidden="true">${inner('chevDown')}</svg></button>
+      <div class="fdd-menu" role="listbox">${ROLES.map(ro => `<button type="button" class="fdd-opt${ro.k === k ? ' on' : ''}" role="option" aria-selected="${ro.k === k}" data-improleset="${i}:${ro.k}">${esc(ro.name)}</button>`).join('')}</div>
+    </div>`; };
+  const review = `
+    <section class="sec"><div style="padding:0 var(--s05)">
+      <div style="overflow:visible"><table class="tbl">
+        <tr><th style="width:52px">Sr. #</th><th>Name</th><th>Email</th><th style="width:210px">Role</th><th style="width:160px">Status</th></tr>
+        ${rows.map((r, i) => `<tr>
+          <td><span class="t-caption" style="color:var(--text-helper)">${i + 1}</span></td>
+          <td><input class="inp" data-impcell="${i}:name" value="${esc(r.name)}" style="${impFld}" aria-label="Row ${i + 1} name"></td>
+          <td><input class="inp" data-impcell="${i}:email" value="${esc(r.email)}" style="${impFld}" aria-label="Row ${i + 1} email"></td>
+          <td>${impRoleCell(i, r.role)}</td>
+          <td>${impTag(r.st)}</td>
+        </tr>`).join('')}
+      </table></div>
+      <div class="btn-row" style="margin-top:var(--s06);justify-content:space-between">
+        <button class="btn btn-g noic" data-act="impback">${I.arrowLeft} Previous Step</button>
+        <button class="btn btn-p noic" data-act="impdo"${ready ? '' : ' disabled'}>Import ${ready} user${ready === 1 ? '' : 's'} ${I.arrowRight}</button>
+      </div>
+    </div></section>`;
+
+  const done = `
+    <section class="sec">
+      <div style="text-align:center;padding:var(--s08) var(--s06)">
+        <span style="width:52px;height:52px;border-radius:999px;background:var(--support-success-ink);display:inline-flex;align-items:center;justify-content:center;color:var(--background)"><svg viewBox="0 -960 960 960" width="28" height="28" fill="currentColor" style="display:block">${inner('check')}</svg></span>
+        <h3 class="t-h3" style="margin:var(--s05) 0 var(--s03)">Imported ${imp.count} user${imp.count === 1 ? '' : 's'}</h3>
+        <p class="t-desc">Users have been successfully added to the platform.</p>
+        <div class="btn-row" style="justify-content:center;margin-top:var(--s06)">
+          <button class="btn btn-p noic" data-act="impmore">${I.download} Import more users</button>
+        </div>
+      </div>
+    </section>`;
+
   return `
   ${detailHead('users/users', pageSummary())}
-  <section class="sec">
-    ${aiHead('Import from a CSV', 'Four steps, and every row is matched to a role before anything is created.')}
-    <ol class="steps">
-      <li><span class="s-n">1</span><span class="s-b"><b>Download the template</b>
-        Name, email and role columns, with the accepted role keys listed.</span></li>
-      <li><span class="s-n">2</span><span class="s-b"><b>Load your file</b>
-        Or load the sample data to see the matcher run against real rows.</span></li>
-      <li><span class="s-n">3</span><span class="s-b"><b>Match roles</b>
-        Each row's role column is checked against the ${ROLES.length} roles; a bad key is flagged.</span></li>
-      <li><span class="s-n">4</span><span class="s-b"><b>Import</b>
-        Confirmed rows become accounts, and an invite email goes to each new address.</span></li>
-    </ol>
-    <div class="btn-row mt5">
-      <button class="btn btn-g noic" data-act="toast:Template downloaded (prototype)">${I.download} Download Template</button>
-      <button class="btn btn-s noic" data-act="toast:Sample data loaded — 6 rows matched">Load Sample Data</button>
-      <button class="btn btn-p noic" data-act="toast:6 users imported and invited">Import 6 Users ${I.arrowRight}</button>
-    </div>
-  </section>`;
+  ${impStepper(stepN)}
+  ${imp.step === 'upload' ? upload : imp.step === 'review' ? review : done}`;
 }
+ACTIONS.imptemplate = () => {
+  try { const csv = 'name,email,role\nAva Stone,ava@example.com,candidate\nMax Lee,max@example.com,agent\n';
+    const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'user-import-template.csv'; a.click(); } catch(e){}
+  toast('Template downloaded (name, email, role)');
+};
+ACTIONS.impsample = () => { S.imp.rows = impValidate(IMP_SAMPLE.map(r => ({name:r[0], email:r[1], role:r[2]}))); S.imp.step = 'review'; };
+ACTIONS.impparse = () => {
+  const rows = impParse(S.imp.text || '');
+  if(!rows.length){ toast('Nothing to parse — paste rows or load the sample', 'warn'); return 'keep'; }
+  S.imp.rows = impValidate(rows); S.imp.step = 'review';
+};
+ACTIONS.impback = () => { S.imp.step = 'upload'; };
+ACTIONS.impmore = () => { S.imp = {step:'upload', rows:[], count:0, text:''}; };
+ACTIONS.impdo = () => {
+  const ready = S.imp.rows.filter(r => r.st.k === 'ok');
+  if(!ready.length){ toast('No rows are ready to import', 'warn'); return 'keep'; }
+  ready.forEach(r => { const u = {id:newId('u', USERS), name:r.name.trim(), email:r.email.trim(), roles:[r.role.trim().toLowerCase()], level:'—', status:'active', joined:today(), origin:'individual', last:'invited'}; USERS.push(u); USER_BY_ID[u.id] = u; });
+  S.imp.count = ready.length;
+  audit('Bulk imported users', `${ready.length} account${ready.length === 1 ? '' : 's'} from CSV`, 'Users & Roles', 'high');
+  S.imp.step = 'done';
+};
 
 function usersStaffDetail(){
   const u = USER_BY_ID[S.id] || USERS[0];
@@ -5810,6 +6039,7 @@ const MO = {key:'', open:{}};
    does: the input handler records which field and where, the render puts it
    back. Consumed on use, so a later render never steals focus. */
 let SRCH_FOCUS = null;
+let IMP_FOCUS = null;   /* bulk-import cell caret restore, like SRCH_FOCUS */
 
 /* §125 — PLACE THE OPEN ROW MENU. The kebab's dropdown is emitted inside its
    table cell, but `.tbl-wrap` clips it (it scrolls sideways, which clips the
@@ -5957,6 +6187,11 @@ function render(){
     const el = device.querySelector(`[data-srch="${f.name}"]`);
     if(el){ el.focus(); try { el.setSelectionRange(f.pos, f.pos); } catch(e){} }
   }
+  if(IMP_FOCUS){
+    const f = IMP_FOCUS; IMP_FOCUS = null;
+    const el = device.querySelector(f.sel);
+    if(el){ el.focus(); try { el.setSelectionRange(f.pos, f.pos); } catch(e){} }
+  }
 
   try {
     if(typeof dsTypeSummary === 'function'){
@@ -6015,6 +6250,37 @@ function go(dest, keepNav){
 
 /* TAL'S OWN CONTROLS, IN A LISTENER OF THEIR OWN — the agent portal's shape. */
 device.addEventListener('click', e => {
+  /* OUR form dropdown (formDd) — DOM-only, no render (the form is read from the
+     DOM on save). Toggle the menu, set the hidden [data-f] input and the trigger
+     label; a pick never rebuilds the sheet, so other in-progress fields survive. */
+  const fdt = e.target.closest('[data-formddtoggle]');
+  if(fdt){
+    const fdd = fdt.closest('.fdd'), wasOpen = fdd.classList.contains('on');
+    device.querySelectorAll('.fdd.fdd-form.on').forEach(x => { x.classList.remove('on'); const s = x.closest('.sheet-b'); if(s) s.classList.remove('dd-open'); });
+    fdd.classList.toggle('on', !wasOpen);
+    fdt.setAttribute('aria-expanded', String(!wasOpen));
+    const sb = fdt.closest('.sheet-b'); if(sb) sb.classList.toggle('dd-open', !wasOpen);
+    return;
+  }
+  const fds = e.target.closest('[data-formddset]');
+  if(fds){
+    const fdd = fds.closest('.fdd'), hid = fdd.querySelector('input[data-f]'), vl = fdd.querySelector('.fdd-val');
+    if(hid) hid.value = fds.dataset.formddset;
+    if(vl) vl.textContent = fds.textContent;
+    fdd.querySelectorAll('.fdd-opt').forEach(o => { const on = o === fds; o.classList.toggle('on', on); o.setAttribute('aria-selected', String(on)); });
+    fdd.classList.remove('on');
+    const tr = fdd.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false');
+    const sb = fds.closest('.sheet-b'); if(sb) sb.classList.remove('dd-open');
+    return;
+  }
+  /* a click outside an open form dropdown closes it (DOM-only, no render) */
+  if(!e.target.closest('.fdd.fdd-form')){
+    device.querySelectorAll('.fdd.fdd-form.on').forEach(x => { x.classList.remove('on'); const s = x.closest('.sheet-b'); if(s) s.classList.remove('dd-open'); const tr = x.querySelector('[data-formddtoggle]'); if(tr) tr.setAttribute('aria-expanded', 'false'); });
+  }
+  /* THE SEARCH CLEAR (X) — empties the query and returns the full table; the
+     caret returns to the (now empty) field via SRCH_FOCUS. */
+  const sx = e.target.closest('[data-srchclear]');
+  if(sx){ setFilter(sx.dataset.srchclear, ''); SRCH_FOCUS = {name:sx.dataset.srchclear, pos:0}; return render(); }
   const eye = e.target.closest('[data-eye]');
   if(eye){
     const inp = device.querySelector('#' + eye.dataset.eye); if(!inp) return;
@@ -6043,14 +6309,31 @@ device.addEventListener('keydown', e => {
    state and the page re-renders; `SRCH_FOCUS` puts the caret back. */
 device.addEventListener('input', e => {
   const el = e.target.closest('[data-srch]');
-  if(!el) return;
-  setFilter(el.dataset.srch, el.value);
-  SRCH_FOCUS = {name:el.dataset.srch, pos:el.selectionStart};
-  render();
+  if(el){ setFilter(el.dataset.srch, el.value); SRCH_FOCUS = {name:el.dataset.srch, pos:el.selectionStart}; return render(); }
+  /* BULK IMPORT — a name/email cell edited live: update the row, re-validate the
+     batch so its status badge follows the fix, and put the caret back (trap 9 /
+     `SRCH_FOCUS`). */
+  const cell = e.target.closest('[data-impcell]');
+  if(cell){ const [i, f] = cell.dataset.impcell.split(':'); S.imp.rows[+i][f] = cell.value;
+    S.imp.rows = impValidate(S.imp.rows); IMP_FOCUS = {sel:`[data-impcell="${cell.dataset.impcell}"]`, pos:cell.selectionStart}; return render(); }
+  /* BULK IMPORT — the paste box: track its text so "Parse rows" enables/disables
+     with content (disabled while empty). Caret restored like the cells. */
+  const box = e.target.closest('[data-imptext]');
+  if(box){ S.imp.text = box.value; IMP_FOCUS = {sel:'[data-imptext]', pos:box.selectionStart}; return render(); }
+});
+/* BULK IMPORT — the role <select> chosen, or a CSV file picked. Both re-validate
+   and re-render (a `change` never needs a caret restored). */
+device.addEventListener('change', e => {
+  const rl = e.target.closest('[data-improle]');
+  if(rl){ S.imp.rows[+rl.dataset.improle].role = rl.value; S.imp.rows = impValidate(S.imp.rows); return render(); }
+  const f = e.target.closest('#impFile');
+  if(f && f.files && f.files[0]){ const rd = new FileReader();
+    rd.onload = () => { const rows = impParse(rd.result); if(!rows.length){ toast('That file had no rows', 'warn'); return; } S.imp.rows = impValidate(rows); S.imp.step = 'review'; render(); };
+    rd.readAsText(f.files[0]); }
 });
 
 device.addEventListener('click', e => {
-  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose]');
+  const t = e.target.closest('[data-go],[data-toggle],[data-close],[data-confirm],[data-do],[data-readall],[data-tab],[data-filter],[data-act],[data-sheet],[data-sort],[data-rowmenu],[data-pg],[data-pgsize],[data-pgddtoggle],[data-fdtoggle],[data-payopen],[data-paytab],[data-payclose],[data-improleopen],[data-improleset]');
 
   if(S.acct && !e.target.closest('.acct-t, .acct-menu')){ S.acct = false; render(); }
   /* §125 — an open row menu closes on any click outside its trigger or list.
@@ -6061,6 +6344,8 @@ device.addEventListener('click', e => {
   if(S.pgOpen && !e.target.closest('.pgn-dd')){ S.pgOpen = null; render(); }
   /* §128 — an open filter dropdown closes on any click outside it */
   if(S.fdOpen && !e.target.closest('.fdd')){ S.fdOpen = null; render(); }
+  /* a bulk-import role dropdown closes on any click outside a `.fdd` */
+  if(S.impRoleOpen != null && !e.target.closest('.fdd')){ S.impRoleOpen = null; render(); }
   if(!t) return;
   const d = t.dataset;
   /* a menu item was chosen — close the menu; the item's own handler re-renders */
@@ -6093,6 +6378,15 @@ device.addEventListener('click', e => {
   if(d.fdtoggle !== undefined){          /* §128 — open/close a filter dropdown */
     const k = pageKey() + ':' + d.fdtoggle;
     S.fdOpen = S.fdOpen === k ? null : k;
+    return render();
+  }
+  if(d.improleopen !== undefined){       /* bulk-import role dropdown open/close */
+    const i = +d.improleopen; S.impRoleOpen = S.impRoleOpen === i ? null : i;
+    return render();
+  }
+  if(d.improleset !== undefined){        /* a role chosen — set it, re-validate, close */
+    const ci = d.improleset.indexOf(':'); const i = +d.improleset.slice(0, ci);
+    S.imp.rows[i].role = d.improleset.slice(ci + 1); S.imp.rows = impValidate(S.imp.rows); S.impRoleOpen = null;
     return render();
   }
   if(d.filter !== undefined){

@@ -41,12 +41,50 @@
 /* ---- 1. the heading row's equal air -------------------------------------- */
 .app[data-portal="admin"] .page > .sec:has(> .hd-srch){padding-top:var(--s07)}
 .app[data-portal="admin"] .page .sec > .hd-srch{margin-bottom:var(--s07)}
+/* 1b. THE SAME AIR ON A SUB-MODULE whose heading is a plain `aiHead`, not a
+   `.hd-srch` (Maryam, 11 Sep 2026 — "walk through all the sub-modules and
+   correct the heading row padding just like we have on the module's first
+   page"). The first content section under the Tal band that LEADS WITH A HEADING
+   (`> .sec-h`) takes the same `--s07` top, so a sub-page heading (Roles &
+   Permissions, and every other secondary page) sits the same distance below the
+   band as a module's list page does. This OVERRIDES §16's
+   `.sec:has(> .cs){padding-top:0}`, which was zeroing the top of any section
+   that held a tab strip anywhere inside it — even one that opened with a heading,
+   pulling that heading tight against the band. A strip-only section (no
+   `.sec-h`) is not matched and still hugs the band. (0,5,0 beats §16's 0,4,0.)
+   The air is `--s06` (24) — top and bottom reduced equally from `--s07` (Maryam,
+   12 Sep 2026: "reduce both top and bottom spaces equally"). */
+.app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h){padding-top:var(--s06)}
+/* 1c. AND ITS AIR BELOW MATCHES ITS AIR ABOVE (Maryam, 12 Sep 2026: "the heading
+   row needs to have bottom space equal to the above space of that row"). The
+   heading's own bottom gap to the content it introduces is `--s07` too, not the
+   default `--sec-h-gap` (12) — so the row sits `--s07` below the Tal band and
+   `--s07` above its content, one rhythm both sides. Scoped to the same first
+   heading-led section, so section headings deeper down keep the tight
+   heading→content gap. `--s06` (24), matching the top. */
+.app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h) > .sec-h{margin-bottom:var(--s06)}
 
 /* ---- 2. search left, filters right, under the tabs ----------------------- */
+/* The toolbar's air ABOVE and BELOW must match (Maryam, 12 Sep 2026): the gap to
+   the table below equals the gap to the heading above. The heading→toolbar gap is
+   `--s07` (the `.hd-srch` margin-bottom collapses over the toolbar's own top
+   margin), so the toolbar→table gap is `--s07` too — one rhythm both sides. */
 .app .lst-tools{
   display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05);
-  margin-top:var(--s05); margin-bottom:var(--s05)}
+  margin-top:var(--s05); margin-bottom:var(--s07)}
 .app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
+/* THE SEARCH CLEAR (X) — shows only while the field has text (`.srch-has`),
+   clears the query and returns the full table (Maryam, 12 Sep 2026). Sits at the
+   field's right end; the input reserves room for it so the text never runs under
+   it. `.srch` is already position:relative. */
+.app .srch.srch-has .inp{padding-right:34px}
+.app .srch-x{position:absolute; right:0; top:50%; transform:translateY(-50%);
+  display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:28px; padding:0; background:none; border:0; cursor:pointer;
+  color:var(--icon-secondary); transition:color var(--dur-short) var(--ease-standard)}
+.app .srch-x svg{width:18px; height:18px; fill:currentColor; display:block}
+/* the one armed hover (build.py HOVER_KEEP) — the X is the control */
+.app .srch-x:hover{color:var(--text-primary)}
 .app .lst-tools > .lst-filters{display:flex; align-items:center; flex-wrap:wrap;
   gap:var(--s03); margin-left:auto}
 

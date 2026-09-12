@@ -102,6 +102,31 @@
   flex:none;display:grid;place-items:center;
   width:var(--crt-art-w);height:var(--crt-art-h)}
 .app .crt-art img{display:block;width:100%;height:100%;object-fit:contain}
+/* ON THE HERO THE BADGE MATCHES THE TEXT BESIDE IT (Maryam, 11 Sep 2026: "the
+   earned badge size should be equal to the right side content just like we did
+   with another badge" — the certEarn placeholder's 37x40 mark). The 70x76 hero
+   badge stood a head taller than the two type lines it sits with; the small
+   slot at the asset's own 70:76 ratio reads as a mark against the words rather
+   than over them. The grid card keeps its own larger override below. */
+.app .crt-hero .crt-art{--crt-art-w:37px;--crt-art-h:40px}
+
+/* ---- the hero's Share menu (the linked-account dropdown) ---- */
+.app .crt-share-wrap{position:relative;display:inline-flex}
+/* THE MENU OPENS TO THE RIGHT (Maryam, 11 Sep 2026) — its left edge on the
+   Share button's left, extending rightward, rather than hanging left under the
+   Download button beside it. */
+.app .crt-share-menu{
+  position:absolute;top:calc(100% + var(--s02));left:0;right:auto;z-index:5;min-width:220px;
+  display:flex;flex-direction:column;text-align:left;
+  background:var(--layer-01);border:1px solid var(--rule)}
+.app .crt-share-i{
+  display:flex;align-items:center;gap:var(--s04);
+  padding:var(--s04) var(--s05);
+  background:transparent;border:0;cursor:pointer;text-align:left}
+.app .crt-share-i + .crt-share-i{border-top:1px solid var(--rule)}
+.app .crt-share-ic{flex:none;display:grid;place-items:center;width:22px;height:22px;color:var(--brand)}
+.app .crt-share-ic svg{width:22px;height:22px;display:block;fill:currentColor}
+.app .crt-share-empty{padding:var(--s05);max-width:220px}
 
 /* ---- the grid ---- */
 .app .crt-grid{
@@ -150,8 +175,14 @@
   display:grid;place-items:center;width:32px;height:32px;
   background:transparent;border:0;cursor:pointer;color:var(--icon-secondary)}
 .app .crt-menu svg{width:20px;height:20px;fill:currentColor}
+/* THE POPUP OPENS TO THE RIGHT of the kebab (Maryam, 11 Sep 2026), its left
+   edge on the button's left rather than hanging left over the badge. The kebab
+   sits at `right:12px` and is 32 wide, so its left is `100% - 44px`; the menu
+   grows rightward from there. The grid only ever holds the two course
+   certificates, left-packed, so the overflow past the narrow card lands in the
+   empty grid track beside it, not off the frame. */
 .app .crt-pop{
-  position:absolute;top:44px;right:12px;z-index:3;min-width:168px;
+  position:absolute;top:44px;left:calc(100% - 44px);right:auto;z-index:3;min-width:168px;
   display:flex;flex-direction:column;
   background:var(--layer-01);border:1px solid var(--rule)}
 .app .crt-pop-i{
@@ -194,22 +225,32 @@
    11 Sep 2026, with Coursera's "Earn a career certificate" row as the
    reference). The certificate the coursework leads to is stated as a thing the
    candidate WILL hold, so a first-time taker sees where the course is going
-   rather than an empty tab. It is the platform's plain bordered row — the bare
-   certificate glyph left (§29: a mark is a bare glyph in ink, never a tinted
-   chip), a heading and a description right — understated so an unearned
-   certificate never reads as a second award shouting beside the earned ones.
-   `certEarn` (views.js) is the writer; §63 owns the `.t-h3` / `.t-desc` type. */
+   rather than an empty tab. It is the platform's plain bordered row — the REAL
+   Course Complete badge left (`CERT_ART.course`, Maryam 11 Sep 2026: "show real
+   course completion badge that we have" — the disc is the object the earned tab
+   shows, not a glyph standing in for it, so the slot is sized to the 70x76
+   asset the way §96 sizes every other badge), a heading and a description right,
+   understated so an unearned certificate never reads as a second award shouting
+   beside the earned ones. The description runs the panel's full width (no
+   measure cap, Maryam 11 Sep 2026: "the dec should of full width"). `certEarn`
+   (views.js) is the writer; §63 owns the `.t-h3` / `.t-desc` type. */
+/* THE BADGE IS A SMALL FIXED MARK, NOT SIZED TO THE TEXT (Maryam, 11 Sep 2026:
+   "you are using a very bigger badge", with the wanted size boxed at ~40px).
+   An earlier pass stretched it to the heading-over-description block, which read
+   as ~60px once the description wrapped — too loud for a placeholder. It is the
+   platform's small badge slot now, `.certban-mk`'s 37x40 at the asset's own
+   70x76 ratio (§96 sizes the slot to the picture, never the picture to the
+   slot), centred against the copy. */
 .app .crt-earn{
-  display:flex;align-items:flex-start;gap:var(--s05);
+  display:flex;align-items:center;gap:var(--s05);
   padding:var(--s05);
   background:var(--layer-01);
   border:1px solid var(--rule);border-radius:var(--radius)}
 .app .crt-earn-ic{
-  flex:none;display:grid;place-items:center;
-  width:40px;height:40px;color:var(--icon-primary)}
-.app .crt-earn-ic svg{width:32px;height:32px;fill:currentColor}
+  flex:none;width:37px;aspect-ratio:70 / 76;
+  display:grid;place-items:center}
+.app .crt-earn-ic img{display:block;width:100%;height:100%;object-fit:contain}
 .app .crt-earn-b{display:flex;flex-direction:column;gap:var(--s02)}
-.app .crt-earn-d{max-width:60ch}
 
 /* ---- trap 13 ---- */
 @container app (min-width:900px){

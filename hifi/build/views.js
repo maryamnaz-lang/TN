@@ -1830,9 +1830,28 @@ function certHero(c){
             Download and `V.transcript` is where it goes — and a share link is
             something you generate afterwards. The order swaps with the fill,
             because the accent button leads a pair. */}
+      ${''/* SHARE OPENS A MENU OF THE LINKED ACCOUNTS (Maryam, 11 Sep 2026:
+            "Share" with a share glyph, not "Share link" with a chain; on click,
+            a dropdown of the candidate's connected networks to post the
+            certificate to). It reads the SAME `S.linked` the profile's Linked
+            Accounts tab writes, so the two cannot disagree about what is
+            connected. A prototype, so picking a network is the whole flow — it
+            closes the menu (§121's rule: a control that would reach a real
+            service does not, here). The menu is a pure function of `S.certShare`
+            (trap 9) and the dark card does not clip, so it opens downward. */}
       <span class="crt-hero-a">
         <button class="btn btn-p btn-sm ic-l" data-go="transcript">${I.download} Download</button>
-        <button class="btn btn-sm ic-l">${I.link} Share link</button>
+        <span class="crt-share-wrap">
+          <button class="btn btn-sm ic-l" data-certshare aria-haspopup="true" aria-expanded="${!!S.certShare}">${I.share} Share</button>
+          ${S.certShare ? `<div class="crt-share-menu">
+            ${(() => {
+              const linked = SOCIAL.filter(s => S.linked[s.k]);
+              return linked.length
+                ? linked.map(s => `<button class="crt-share-i" data-shareto="${s.k}" style="--brand:${s.color}"><span class="crt-share-ic">${s.svg}</span><span class="t-body">Share on ${s.n}</span></button>`).join('')
+                : `<div class="crt-share-empty t-desc">No linked accounts yet. Connect one on the Linked Accounts tab of your profile.</div>`;
+            })()}
+          </div>` : ''}
+        </span>
       </span>
     </div>
   </div>`;
@@ -1861,7 +1880,7 @@ function certGrid(list){
       aria-expanded="${S.crtMenu === i}" aria-label="Actions for ${c.n}">${I.overflow}</button>
     ${S.crtMenu === i ? `<div class="crt-pop">
       <button class="crt-pop-i" data-go="transcript">${I.download} Download</button>
-      <button class="crt-pop-i">${I.link} Share link</button>
+      <button class="crt-pop-i">${I.share} Share</button>
     </div>` : ''}
     <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
     <span class="crt-n">${c.n}</span>
@@ -1895,15 +1914,17 @@ const courseCerts = (f) =>
 
 /* THE UNEARNED PANEL. No black "Congratulations" card and no grid — one
    bordered row naming the certificate the course leads to, so a first-time
-   candidate sees where the coursework is going rather than an empty tab. §96
-   owns the shape; §63 owns the `.t-h3` / `.t-desc` type. The name falls back
-   to the bare track where a pre-enrolment stage has no level, though the
-   Achievements module is only reached from `full`/`next`, where it is set. */
+   candidate sees where the coursework is going rather than an empty tab. The
+   mark is the REAL Course Complete badge (`CERT_ART.course`, Maryam 11 Sep
+   2026), the same disc the earned tab shows, not a stand-in glyph. §96 owns
+   the shape; §63 owns the `.t-h3` / `.t-desc` type. The name falls back to the
+   bare track where a pre-enrolment stage has no level, though the Achievements
+   module is only reached from `full`/`next`, where it is set. */
 function certEarn(f){
   const name = f.level ? `the Explorer Track &ndash; ${f.level} certificate`
                        : 'your Explorer Track certificate';
   return `<div class="sec"><div class="crt-earn">
-    <span class="crt-earn-ic">${I.certificate}</span>
+    <span class="crt-earn-ic"><img src="${CERT_ART.course}" alt=""></span>
     <div class="crt-earn-b">
       <div class="t-h3">Earn a course certificate</div>
       <p class="t-desc crt-earn-d">Complete the course to earn ${name}. You can add it to your LinkedIn profile, resume, or CV, and share it.</p>
@@ -6985,6 +7006,20 @@ V.level = (f) => {
         ai5's `DARK_CARD`, so `placeDark` leaves both in the page body. */}
   ${lvlWing(f)}
   ${f.done>0?certBanner(f,{close:true, key:'level'}):''}
+  ${''/* THE RANKING SITS UNDER THE BLACK CARD (Maryam, 11 Sep 2026: "remove the
+        ranking tab from [cohort] and take it to the My Level module ... after
+        the black card"). It moved off the cohort page because a cohort now
+        holds candidates at different levels, so ranking them together is unfair;
+        the board is the SAME-level standing across TALENTnext instead, from any
+        cohort. `boardList` is the same table the cohort tab drew, now on
+        anonymised data (`RANK`) — avatar and nickname only, never a real name
+        or face. It comes after the two blocks about YOUR level (the ladder, the
+        certificate) and before "How the ladder works", which is the only block
+        on this page that is not about you. */}
+  ${f.level ? `<div class="sec sec-rank">
+    <div class="sec-h"><h2>Ranking</h2><span class="t-desc">Candidates at your level across TALENTnext, from any cohort.</span></div>
+    ${boardList()}
+  </div>` : ''}
   ${''/* THE SIGNED REPORT BLOCK LEFT THIS PAGE (Maryam, 1 Sep 2026: "instead of
         this page, remove the report section above the How the ladder works and
         show this against the interview details in interviews module"). It was
@@ -10690,14 +10725,17 @@ V.cohort = (f) => `<main class="main"><div class="page">
         the `:has()` that would have detected it has to nest, and nested
         `:has()` is invalid CSS that takes its whole rule down with it. */''}
   <div class="sec sec-cs">
+    ${''/* RANKING LEFT THIS STRIP (Maryam, 11 Sep 2026) — it lives on My Level
+          now, over the same-level board, because a cohort mixes levels and
+          ranking cohort-mates on points would be unfair. Discussion and Members
+          are what a cohort page is: the people in it and the room they talk in. */}
     <div class="cs">
       <button class="${(S.ctab||'discussion')==='discussion'?'on':''}" data-ctab="discussion">Discussion</button>
-      <button class="${S.ctab==='ranking'?'on':''}" data-ctab="ranking">Ranking</button>
       <button class="${S.ctab==='members'?'on':''}" data-ctab="members">Members</button>
     </div>
     ${S.ctab==='members'
       ? `<div class="tile-stack">${COHORT.map(([n,i,img,meta,you])=>mem(n,i,meta,you,img)).join('')}</div>`
-      : S.ctab==='ranking' ? boardList() : discussionRoom()}
+      : discussionRoom()}
   </div>
 </div></main>`;
 
@@ -11822,7 +11860,7 @@ const pfFormGeneral = () => {
           stays a plain disc. */}
     <div class="idhead pfe-id">
       <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
-        <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
+        ${pfFlipAvatar()}
         <span class="idphoto-edit">${I.edit}</span>
       </button>
       <div class="idhead-b">
@@ -12028,8 +12066,8 @@ const PF_FORM = {general:pfFormGeneral, work:pfFormWork, edu:pfFormEdu,
    is HIDDEN (Maryam, 9 Sep 2026: "hide become a cohort leader tab"). `pfLead`
    and the `S.pfTab==='lead'` branch stay defined and unreachable, so restoring
    the tab is one entry back in this list. */
-const PF_TABS = [['me','My Profile'], ['courses','My Courses'], ['notif','Notifications'],
-                 ['priv','Privacy Settings']];
+const PF_TABS = [['me','My Profile'], ['linked','Linked Accounts'], ['courses','My Courses'],
+                 ['notif','Notifications'], ['priv','Privacy Settings']];
 S.pfTab = 'me';
 
 /* ==========================================================================
@@ -12506,7 +12544,7 @@ const pfSecView = {
     <div class="sec" data-pfsec="general">
       <div class="idhead">
         <button class="idphoto" data-editphoto="1" aria-label="Change your photo">
-          <span class="av-ph" style="width:72px;height:72px"><i>MN</i><img src="${AV.hana}" alt=""></span>
+          ${pfFlipAvatar()}
         </button>
         <div class="idhead-b">
           ${''/* THE RANK CHIP RIDES BESIDE THE NAME (Maryam, 9 Sep 2026: a red
@@ -12819,6 +12857,60 @@ const pfNotif = () => `
     </div>
   </div>`;
 
+/* THE LINKED-ACCOUNTS TAB — a vertical card per social network (Maryam, 11 Sep
+   2026, with a reference of stacked cards showing a linked/unlinked state). It
+   is BUILT IN OUR COMPONENTS at the reference's proportions, not its look: the
+   reference's coloured pills and avatar discs become the platform's radius-0
+   card on the one hairline, the state carried by a green tick (linked) or an
+   accent plus (to link), the brand icon full-colour when connected and grey
+   when not. `.pf-cs` stacks the heading (§111), so no label column to answer.
+
+   THE BRAND MARKS ARE LOGOS, NOT UI ICONS, so they are NOT Material Symbols and
+   NOT on the `0 -960 960 960` grid (trap 7's stated exception for brand marks
+   that carry their own box) — each is the network's own glyph on a `0 0 24 24`
+   viewBox, one path, tinted by `--brand` via `currentColor`. `S.linked` is the
+   connect state, an object toggled by `data-link`; it is a prototype, so the
+   toggle is all there is — no OAuth, nothing leaves the page. */
+const SOCIAL = [
+  {k:'linkedin',  n:'LinkedIn',  color:'#0A66C2', handle:'@maryamsss',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>'},
+  {k:'instagram', n:'Instagram', color:'#E4405F', handle:'@maryam.designs',
+   svg:'<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>'},
+  {k:'facebook',  n:'Facebook',  color:'#1877F2', handle:'Maryam Naz',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>'},
+  {k:'twitter',   n:'X',         color:'#000000', handle:'@maryamsss',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.451-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/></svg>'},
+  {k:'youtube',   n:'YouTube',   color:'#FF0000', handle:'@maryamnaz',
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'}
+];
+S.linked = S.linked || {linkedin:true, instagram:true, twitter:true};
+
+function pfLinkedView(){
+  return `<div class="sec sec-linked" data-pfsec="linked">
+    <div class="sec-h"><h2>Linked accounts</h2><span class="t-desc">Link a social network to show it on your TALENTnext profile. Tap a card to connect or disconnect.</span></div>
+    <div class="lacc-grid">
+      ${SOCIAL.map(s => {
+        const on = !!S.linked[s.k];
+        return `<button class="lacc${on ? ' on' : ''}" data-link="${s.k}" aria-pressed="${on}" style="--brand:${s.color}">
+          <span class="lacc-ic">${s.svg}</span>
+          <span class="lacc-n t-h4">${s.n}</span>
+          <span class="lacc-sub t-desc">${on ? (s.handle || 'Connected') : 'Not connected'}</span>
+          ${''/* THE AVATAR DISC gives the card its height and echoes the
+                reference: your profile photo when the account is connected, an
+                empty placeholder disc when it is not. A person's photo is a
+                disc (§106). */}
+          <span class="lacc-av">${on
+            ? avatar({i:'', img:AV.hana}, 64)
+            : `<span class="lacc-av-empty">${I.user}</span>`}</span>
+          <span class="lacc-cta t-label">${on
+            ? `<span class="lacc-mk lacc-on">${I.checkFilled}</span>Linked`
+            : `<span class="lacc-mk lacc-off">${I.add}</span>Link account`}</span>
+        </button>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
 /* PUT THE SECTION BEING EDITED ON SCREEN, AFTER THE PAINT THAT DREW IT.
 
    Six sections stacked on one tab is a long page, so an Edit pressed from the
@@ -12922,6 +13014,7 @@ function pfCoursesView(){
 }
 
 function pfPanel(f){
+  if(S.pfTab === 'linked') return pfLinkedView();
   if(S.pfTab === 'courses') return pfCoursesView();
   if(S.pfTab === 'notif') return pfNotif();
   if(S.pfTab === 'priv')  return pfPrivacy();
@@ -14016,28 +14109,42 @@ device.addEventListener('click', e => {
   }
 });
 
-/* The cohort standing. Points, badges earned and star rank per member;
-   the candidate's own row is marked wherever it lands. */
-const BOARD = [
-  ['Aisha Bello','AB','priya',   3420, 1, 2],
-  ['Ravi Chandran','RC','samuel',2980, 1, 2],
-  ['Daniel Kerr','DK','owen',    2610, 1, 1],
-  ['James Whitby','JW','owen',   2240, 0, 1],
-  ['Maryam Naz','MN','hana',     1095, 0, 1, true],
-  ['Sofia Marchetti','SM','lena',1040, 0, 1],
-  ['Chloe Ferreira','CF','priya',  920, 0, 1],
-  ['Nora Lindqvist','NL','lena',   780, 0, 1],
-  ['Tobias Mensah','TM','samuel',  610, 0, 1],
-  ['Yuki Tanaka','YT','hana',      240, 0, 1]];
+/* THE SAME-LEVEL RANKING — candidates at YOUR level across TALENTnext, from any
+   cohort (Maryam, 11 Sep 2026). It moved here off the cohort page because a
+   cohort now mixes levels, so ranking cohort-mates on points would rank an E1
+   against an E4 — unfair. Points, not level, set the order; everyone shown is
+   at the same level as you.
+
+   REAL NAMES AND FACES ARE NEVER SHOWN (Maryam, 11 Sep 2026): every candidate
+   here is an avatar + a nickname, the current user included — `You` on an
+   `av1` disc, the same avatar the profile photo flips to. The avatars are
+   gender-matched to the nickname (`AVATARS` boys b1..b4, girls g1..g5, embedded
+   by build.py). This is a privacy rule, not decoration: a leaderboard names
+   people you have never met, so it names none of them.
+
+   Row: [nickname, avatarKey, points, star-rank, badges, mine?]. The figures are
+   the ones the cohort board carried, so the candidate's own 1,095 still matches
+   `GAME`. */
+const RANK = [
+  ['@cobaltotter','b1', 3420, 2, 1],
+  ['@mossfinch','g2',   2980, 2, 1],
+  ['@slatefox','b2',    2610, 1, 1],
+  ['@dewlark','g3',     2240, 1, 0],
+  ['You','av1',         1095, 1, 0, true],
+  ['@emberkoi','g1',    1040, 1, 0],
+  ['@pinewren','b3',     920, 1, 0],
+  ['@fernquill','g4',    780, 1, 0],
+  ['@tidalram','b4',     610, 1, 0],
+  ['@plumjay','g5',      240, 1, 0]];
 
 function boardList(){
   return `<div class="board">
     <div class="brow bhead">
-      <span>#</span><span>Member</span><span>Earned</span><span class="num">Points</span>
+      <span>#</span><span>Candidate</span><span>Earned</span><span class="num">Points</span>
     </div>
-    ${BOARD.map(([n,i,img,pts,bdg,rank,mine],k)=>`<div class="brow${mine?' mine':''}">
+    ${RANK.map(([nick,av,pts,rank,bdg,mine],k)=>`<div class="brow${mine?' mine':''}">
       <span class="b-n">${k+1}</span>
-      <span class="b-who">${avatar({i, img:AV[img]}, 32)}<span class="b-nm">${mine?'You':n}</span></span>
+      <span class="b-who">${avatar({i:'', img:AVATARS[av]}, 32)}<span class="b-nm">${nick}</span></span>
       <span class="b-earn">
         <span class="b-mk" title="${rank}-Star"><img src="${AWARD['rank'+rank]}" alt="${rank}-Star"></span>
         ${bdg?`<span class="b-mk" title="Bronze"><img src="${AWARD.bronze}" alt="Bronze"></span>`:''}
@@ -14650,6 +14757,8 @@ device.addEventListener('click', e => {
   /* the certificate menu closes the same way and for the same reason — a press
      anywhere that is not the toggle or the panel itself */
   if(S.crtMenu !== null && !t.closest('.crt-menu, .crt-pop')){ S.crtMenu = null; render(); }
+  /* the certificate SHARE menu closes the same way */
+  if(S.certShare && !t.closest('.crt-share-wrap')){ S.certShare = false; render(); }
   /* and OUR dropdown (`dd()`, the Intent field) — a press outside `.dd` closes
      the open one, the agent portal's own click-away for `S.dd` */
   if(S.dd && !t.closest('.dd')){ S.dd = null; render(); }
@@ -15023,6 +15132,12 @@ device.addEventListener('click', e => {
   const pft = t.closest('[data-pftab]');
   if(pft){ S.pfTab = pft.dataset.pftab; S.pfEdit = null; render(); return; }
 
+  /* THE LINKED-ACCOUNTS CARD toggles one network's connect state. A prototype,
+     so the toggle IS the whole flow — there is no OAuth and nothing leaves the
+     page (§121's own rule for a control that would reach a real service). */
+  const lnk = t.closest('[data-link]');
+  if(lnk){ S.linked[lnk.dataset.link] = !S.linked[lnk.dataset.link]; render(); return; }
+
   const tog = t.closest('[data-toggle]');
   if(tog){
     const w = tog.dataset.toggle;
@@ -15184,6 +15299,10 @@ device.addEventListener('click', e => {
     S.crtMenu = S.crtMenu === i ? null : i;
     render(); return;
   }
+  /* the certificate hero's Share menu — toggle open, and picking a linked
+     account closes it (the prototype's whole share flow). */
+  if(t.closest('[data-certshare]')){ S.certShare = !S.certShare; render(); return; }
+  if(t.closest('[data-shareto]')){ S.certShare = false; render(); return; }
   /* the chapter record's own "show all" — a re-render, not a navigation, and it
      goes through `S` for trap 9's reason: the list is rebuilt from scratch on
      every render, so a class toggled on the button here would not survive the
@@ -15348,6 +15467,39 @@ document.addEventListener('keydown', e => {
    An unknown view is left to `V` and the renderer's own fallback rather than
    being validated here: `render` already answers a missing view, and a second
    opinion in the boot path is a second place to keep the list of views. */
+/* THE CANDIDATE'S PROFILE PHOTO IS A FLIP CARD (Maryam, 11 Sep 2026: "flip the
+   profile image ... every 3 seconds to their avatar" — a card-flip, the
+   interaction from her reference video, auto every 3s instead of by hand). The
+   real photo is the front, the ONE supplied avatar the back; `pfFlipAvatar`
+   draws the `.pf-flip` disc and `.pf-flip` (09-avatar) is the 3D card.
+
+   THE FLIP STATE IS A CLASS THAT THE TIMER TOGGLES, and it is also kept in
+   `pfFlipped` so a re-render lands on the current side rather than snapping
+   back to the photo (trap 9 — nothing interactive keeps its state in the DOM
+   here). A `setInterval`, NOT `requestAnimationFrame` (trap 17): this prototype
+   is usually read in a pane that reports itself hidden, where rAF never fires.
+   Created ONCE behind `window.__pfAvTimer`, it re-finds the live card each tick
+   (render replaces `device.innerHTML`) and no-ops when there is no avatar or no
+   card on screen. Defined before the boot `render()` so `pfFlipAvatar` is out
+   of its TDZ the first time a view calls it. */
+const PF_AV_BACK = (typeof AVATARS !== 'undefined' && AVATARS.av1) || null;
+let pfFlipped = false;
+function pfFlipAvatar(){
+  const inner = PF_AV_BACK
+    ? `<span class="pf-flip-in${pfFlipped ? ' flipped' : ''}" data-avflip>
+         <img class="pf-flip-f pf-flip-front" src="${AV.hana}" alt="">
+         <img class="pf-flip-f pf-flip-back" src="${PF_AV_BACK}" alt="">
+       </span>`
+    : `<img src="${AV.hana}" alt="">`;
+  return `<span class="av-ph pf-flip" style="width:72px;height:72px"><i>MN</i>${inner}</span>`;
+}
+if(typeof window !== 'undefined' && !window.__pfAvTimer && PF_AV_BACK){
+  window.__pfAvTimer = setInterval(() => {
+    pfFlipped = !pfFlipped;
+    document.querySelectorAll('[data-avflip]').forEach(el => el.classList.toggle('flipped', pfFlipped));
+  }, 3000);
+}
+
 const hash = location.hash.slice(1).split('/');
 if(hash[0] === 'leader'){
   S.portal = 'leader';

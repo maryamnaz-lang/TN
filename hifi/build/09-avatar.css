@@ -11,6 +11,30 @@
   font-weight:600;letter-spacing:.3px;line-height:1}
 .av-ph i{font-style:normal;display:block}
 .av-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none}
+
+/* THE CANDIDATE'S PROFILE PHOTO IS A FLIP CARD (Maryam, 11 Sep 2026: auto-flip
+   every 3s to the avatar — the card-flip interaction from her reference video,
+   run on a timer rather than by hand). `.pf-flip` turns the `.av-ph` disc into
+   a 3D scene: `.pf-flip-in` is the card that rotates 180deg on Y, carrying two
+   faces — the real photo front and the avatar back — and `pfAvFlip` (views.js)
+   toggles `.flipped` on it every 3s. `.av-ph` already clips the disc round and
+   holds the `<i>` initials fallback behind, so the two faces need only
+   `border-radius:inherit` to stay round and `backface-visibility:hidden` so the
+   hidden side does not show through mid-rotation. THE PERSPECTIVE IS ON
+   `.pf-flip` (the parent of the rotating card), not on the card itself — a
+   `preserve-3d` element that also carried `perspective` would flatten. */
+.app .pf-flip{perspective:600px}
+.app .pf-flip-in{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;
+  transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.app .pf-flip-in.flipped{transform:rotateY(180deg)}
+.app .pf-flip-f{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;max-width:none;
+  border-radius:inherit;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden}
+.app .pf-flip-back{transform:rotateY(180deg)}
 /* THE ACTIVE / ONLINE DOT — a green circle at an avatar's lower-right that sits
    ABOVE the photo (Maryam, 7 Sep 2026: on the agent and cohort-leader profiles,
    and "the green circle needs to come above not at background, correct this on

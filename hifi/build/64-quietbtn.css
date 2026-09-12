@@ -80,19 +80,29 @@
   background:var(--overlay-hover)}
 
 /* ------------------------------------------------------------------ 2 ---
-   THE ARROW
+   THE ARROW — AND IT IS FOR A DIRECTIONAL BUTTON ONLY, NEVER A `.noic` ONE.
 
    `I.arrowRight` from `icons.js`, verbatim — the same path the product draws
    when it writes the icon inline, so a button that gained its arrow here and
    one that always carried it are the same mark. Material filled, per trap 7.
    20px to match `.btn svg`, 18px inside `.btn-sm` to match `.btn-sm svg`.
+
+   `:not(.noic)` GATES IT (Maryam, 11 Sep 2026: "why do we even have arrows on
+   back and cancel and many more buttons? an arrow comes only where it directs
+   the user"). The arrow says "this quiet button takes you to a page", so it
+   belongs on the LEFT-ALIGNED `:not(.noic)` go-button §64.3 styles — never on a
+   `.noic` centred button, which is a Back / Cancel / a neutral action that
+   directs the reader nowhere. A `.noic` button that genuinely leads somewhere
+   carries `I.arrowRight` in its own markup (the `:has(svg)` case, untouched).
+   This retires the per-context opt-outs' reason (`.sheet-f`/`.conf-f`, whose
+   buttons are `.noic`); they stay, harmless, in case a footer button is not.
    ------------------------------------------------------------------------ */
-.app :is(.btn-s,.btn-t,.btn-g):not(:has(svg))::after{
+.app :is(.btn-s,.btn-t,.btn-g):not(.noic):not(:has(svg))::after{
   content:'';flex:none;width:20px;height:20px;
   background:currentColor;
   -webkit-mask:var(--btn-arrow) center/contain no-repeat;
           mask:var(--btn-arrow) center/contain no-repeat}
-.app :is(.btn-s,.btn-t,.btn-g).btn-sm:not(:has(svg))::after{
+.app :is(.btn-s,.btn-t,.btn-g).btn-sm:not(.noic):not(:has(svg))::after{
   width:18px;height:18px}
 
 /* A DIALOG FOOTER ACTION IS NOT A LINK, so it grows no arrow (Maryam, 6 Sep

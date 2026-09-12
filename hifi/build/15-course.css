@@ -1557,6 +1557,15 @@
    ========================================================================== */
 .app .board{
   margin-left:calc(var(--pad-x) * -1);margin-right:calc(var(--pad-x) * -1)}
+/* THE RANKING'S HEADING STACKS OVER ITS DESCRIPTION (Maryam, 11 Sep 2026, when
+   the board moved to My Level under a "Ranking" heading). The base `.sec-h` is
+   a flex ROW — a title with a short helper or action beside it — but this one
+   carries a full sentence ("Candidates at your level across TALENTnext…"), which
+   reads as a subtitle under the heading, not a chip beside it. Column here, the
+   product's 8px heading-to-description gap between them. `.sec-rank` names the
+   one section so no other headed board (there is none yet) is caught. */
+.app .sec-rank > .sec-h{
+  flex-direction:column;align-items:flex-start;gap:var(--sec-desc-gap)}
 .app .brow{
   display:grid;
   grid-template-columns:28px minmax(0,1fr) auto;
@@ -1589,11 +1598,20 @@
 .app .brow.mine .b-n{color:var(--accent-on-2)}
 
 @container app (min-width:672px){
+  /* THE POINTS COLUMN IS A FIXED WIDTH SO EVERY ROW'S COLUMNS LINE UP (Maryam,
+     11 Sep 2026: "the earned column header should be left aligned with the
+     column items"). Each `.brow` is its OWN grid, so an `auto` last column sized
+     to its own content made the header ("Points", ~45px) narrower than a data
+     row ("3,420" at `min-width:80px`); the flexible `1.2fr`/`1fr` tracks then
+     split a different remaining width per row, so the Earned column landed a few
+     px apart between the header and the rows. Pinning the last track to 88px
+     makes the remaining width — and every column edge — identical across the
+     header and every row. */
   .app .brow{
-    grid-template-columns:36px minmax(0,1.2fr) minmax(0,1fr) auto;
+    grid-template-columns:36px minmax(0,1.2fr) minmax(0,1fr) 88px;
     align-items:center}
   .app .b-earn{grid-column:3;justify-content:flex-start}
-  .app .b-pts{grid-column:4;min-width:80px}
+  .app .b-pts{grid-column:4}
   .app .bhead{
     display:grid;border-bottom:1px solid var(--rule);
     padding-top:var(--s04);padding-bottom:var(--s04)}

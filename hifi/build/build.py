@@ -1438,6 +1438,9 @@ HOVER_KEEP = ('sn-item', 'btn-p', 'tal-fab', 'tal-star',
               # §128 — the list-page filter dropdown's option row. Same argument;
               # `fdd-opt` is minted for this and written nowhere else.
               'fdd-opt',
+              # §128 — the list-page search field's clear (X) button darkens on
+              # hover; `srch-x` is minted for this and written nowhere else.
+              'srch-x',
               # §120.1c — the collapsed admin rail's sub-module flyout. The hover
               # is on the parent wrapper so the panel stays open as the pointer
               # crosses from the icon to it; `sn-node` is minted for this and
@@ -1872,6 +1875,27 @@ print('profile issuer marks embedded: %d of %d%s' % (
     '' if not _pf_miss else '  (missing, drop into hifi/build/logos/: ' +
     ', '.join(k + '.png' for k, _ in _pf_miss) + ')'))
 
+# AVATARS — anonymous character discs (Duolingo-style placeholders Maryam
+# supplied), embedded as one dict keyed by file stem and used two ways:
+#   av1        the profile photo's flip-card back (11 Sep 2026: the photo flips
+#              to this avatar every 3s — `.pf-flip` in 09-avatar, `pfFlipAvatar`
+#              in views.js).
+#   b1..b4     boys, g1..g5 girls — the same-level Ranking on My Level (11 Sep
+#              2026), where real names and faces are NEVER shown: other
+#              candidates at your level, from any cohort, appear only as an
+#              avatar + nickname. `RANK` (views.js) assigns one per nickname,
+#              gender-matched.
+# JPEG as supplied, not re-encoded; a real set is a drop-in — same names in
+# hifi/build/avatars/, rebuild. Every .jpg in that folder is embedded, so adding
+# one there and naming it in `RANK` is the whole of adding an avatar.
+_AV_DIR = here / 'avatars'
+AVATARS = sorted(p.stem for p in _AV_DIR.glob('*.jpg'))
+_avj = ',\n  '.join(
+    "%s:'data:image/jpeg;base64,%s'" % (k, base64.b64encode((_AV_DIR / (k + '.jpg')).read_bytes()).decode())
+    for k in AVATARS)
+avatars_js = 'const AVATARS = {\n  ' + _avj + '\n};\n'
+print(f'avatars embedded: {len(AVATARS)} files, {len(avatars_js)/1024:.0f} KB')
+
 AWARDS = ['points', 'bronze', 'silver', 'gold', 'involved', 'rank1', 'rank2', 'rank3']
 _aw = ',\n  '.join(
     "%s:'data:image/webp;base64,%s'" % (k, base64.b64encode((here / 'awards' / (k + '.webp')).read_bytes()).decode())
@@ -2001,7 +2025,7 @@ print(f'Tal greeting audio embedded: {_speech.stat().st_size/1024:.0f} KB')
 # after ai5's view stamp, not before it. It reads `AV` and `V` from data.js and
 # views.js, and calls nothing that nil.js declares, so nothing about its
 # position is load-bearing beyond being last.
-js = award_js + '\n\n' + payart_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
+js = award_js + '\n\n' + payart_js + '\n\n' + call_js + '\n\n' + cohort_js + '\n\n' + cert_js + '\n\n' + pfart_js + '\n\n' + avatars_js + '\n\n' + blob_js + '\n\n' + speech_js + '\n\n' + '\n\n'.join((here / f).read_text() for f in ['icons.js', 'data.js', 'views.js', 'ai.js', 'ai2.js', 'ai3.js', 'ai4.js', 'ai5.js', 'nil.js', 'lead.js',
                                                         # The leader's seven module pages, plus the four pages under
                                                         # them. After lead.js because they read its data
                                                         # (`LEAD_COHORTS`, `LEAD_EVALS`, `LEADER`, `lpace`, `lavg`)

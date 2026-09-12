@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5863.  Rules dropped as product-specific: 186.
+   Rules kept: 5902.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -1202,6 +1202,11 @@ textarea.inp,
 .av-ph{position:relative; display:grid; place-items:center; flex:none; width:40px; height:40px; overflow:hidden; background:var(--gray-80); color:var(--on-dark); font-weight:600; letter-spacing:.3px; line-height:1}
 .av-ph i{font-style:normal; display:block}
 .av-ph img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; max-width:none}
+.app .pf-flip{perspective:600px}
+.app .pf-flip-in{position:absolute; inset:0; transform-style:preserve-3d; transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+.app .pf-flip-in.flipped{transform:rotateY(180deg)}
+.app .pf-flip-f{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; max-width:none; border-radius:inherit; -webkit-backface-visibility:hidden; backface-visibility:hidden}
+.app .pf-flip-back{transform:rotateY(180deg)}
 .av-on{position:absolute; right:6%; bottom:6%; z-index:2; width:20%; height:20%; min-width:8px; min-height:8px; border-radius:999px; background:var(--support-success); box-shadow:0 0 0 2px var(--background)}
 .av,
 .mem-av{position:relative; display:grid; place-items:center; flex:none; width:32px; height:32px; overflow:hidden; background:var(--gray-80); color:var(--on-dark); font-size:11px; font-weight:600; letter-spacing:.3px}
@@ -1565,6 +1570,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .pfe-about),
   .sec:has(> .tg),
   .sec:has(> .qa),
+  .sec:has(> .board),
   .sec:has(.kv):not(:has(.chart-table)){display:block}
   .sec:has(.ch) > .sec-h,
   .sec:has(.ag) > .sec-h,
@@ -1586,6 +1592,7 @@ textarea.inp{min-height:88px}
   .sec:has(> .pfe-about) > .sec-h,
   .sec:has(> .tg) > .sec-h,
   .sec:has(> .qa) > .sec-h,
+  .sec:has(> .board) > .sec-h,
   .sec:has(.kv):not(:has(.chart-table)) > .sec-h{border-right:0; min-height:0; margin-bottom:var(--sec-h-gap); padding:0 var(--pad-x)}
 }
 .pb + .note,
@@ -3953,6 +3960,7 @@ button{font-family:var(--font-sans)}
 .app .mem-av.mem-ph{background:none; width:auto; height:auto; padding:0; border:0}
 .app .mem-av.mem-ph .av-ph{width:36px; height:36px}
 .app .board{margin-left:calc(var(--pad-x) * -1); margin-right:calc(var(--pad-x) * -1)}
+.app .sec-rank > .sec-h{flex-direction:column; align-items:flex-start; gap:var(--sec-desc-gap)}
 .app .brow{display:grid; grid-template-columns:28px minmax(0,1fr) auto; gap:var(--s02) var(--s05); align-items:center; padding:var(--s05) var(--pad-x); border-bottom:1px solid var(--rule)}
 .app .brow:last-child{border-bottom:0}
 .app .bhead{display:none}
@@ -3970,9 +3978,9 @@ button{font-family:var(--font-sans)}
 .app .brow.mine .b-pts{color:var(--accent-on-2)}
 .app .brow.mine .b-n{color:var(--accent-on-2)}
 @container app (min-width:672px){
-  .app .brow{grid-template-columns:36px minmax(0,1.2fr) minmax(0,1fr) auto; align-items:center}
+  .app .brow{grid-template-columns:36px minmax(0,1.2fr) minmax(0,1fr) 88px; align-items:center}
   .app .b-earn{grid-column:3; justify-content:flex-start}
-  .app .b-pts{grid-column:4; min-width:80px}
+  .app .b-pts{grid-column:4}
   .app .bhead{display:grid; border-bottom:1px solid var(--rule); padding-top:var(--s04); padding-bottom:var(--s04)}
   .app .bhead > span{font-size:11px; line-height:15px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:var(--text-helper)}
   .app .bhead > .num{text-align:right}
@@ -7096,6 +7104,8 @@ button.btn-p:active,
 .app .dark-card .l,
 .app .dark-card .d,
 .app .dark-card .note-d{color:var(--on-dark-2)}
+.app .dark-card .crt-share-menu .t-body{color:var(--text-primary)}
+.app .dark-card .crt-share-menu .t-desc{color:var(--text-secondary)}
 .app .dark-card .btn:not(.btn-p){color:var(--on-dark)}
 .app .dark-card .btn:not(.btn-p) svg{fill:var(--on-dark)}
 .app .dark-card a[data-go],
@@ -7564,8 +7574,8 @@ button.btn-p:active,
 .app .btn-s:hover:where(.__nh),
 .app .btn-t:hover:where(.__nh),
 .app .btn-g:hover:where(.__nh){background:var(--overlay-hover)}
-.app :is(.btn-s, .btn-t, .btn-g):not(:has(svg))::after{content:''; flex:none; width:20px; height:20px; background:currentColor; -webkit-mask:var(--btn-arrow) center/contain no-repeat; mask:var(--btn-arrow) center/contain no-repeat}
-.app :is(.btn-s, .btn-t, .btn-g).btn-sm:not(:has(svg))::after{width:18px; height:18px}
+.app :is(.btn-s, .btn-t, .btn-g):not(.noic):not(:has(svg))::after{content:''; flex:none; width:20px; height:20px; background:currentColor; -webkit-mask:var(--btn-arrow) center/contain no-repeat; mask:var(--btn-arrow) center/contain no-repeat}
+.app :is(.btn-s, .btn-t, .btn-g).btn-sm:not(.noic):not(:has(svg))::after{width:18px; height:18px}
 .app .sheet-f .btn::after,
 .app .conf-f .btn::after{content:none}
 :root{--btn-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m12 4-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z'/%3E%3C/svg%3E")}
@@ -8545,20 +8555,27 @@ button.btn-p:active,
 .app .crt-hero-a{flex:none; margin-left:auto; display:flex; align-items:center; gap:var(--s04)}
 .app .crt-art{flex:none; display:grid; place-items:center; width:var(--crt-art-w); height:var(--crt-art-h)}
 .app .crt-art img{display:block; width:100%; height:100%; object-fit:contain}
+.app .crt-hero .crt-art{--crt-art-w:37px; --crt-art-h:40px}
+.app .crt-share-wrap{position:relative; display:inline-flex}
+.app .crt-share-menu{position:absolute; top:calc(100% + var(--s02)); left:0; right:auto; z-index:5; min-width:220px; display:flex; flex-direction:column; text-align:left; background:var(--layer-01); border:1px solid var(--rule)}
+.app .crt-share-i{display:flex; align-items:center; gap:var(--s04); padding:var(--s04) var(--s05); background:transparent; border:0; cursor:pointer; text-align:left}
+.app .crt-share-i + .crt-share-i{border-top:1px solid var(--rule)}
+.app .crt-share-ic{flex:none; display:grid; place-items:center; width:22px; height:22px; color:var(--brand)}
+.app .crt-share-ic svg{width:22px; height:22px; display:block; fill:currentColor}
+.app .crt-share-empty{padding:var(--s05); max-width:220px}
 .app .crt-grid{display:grid; grid-template-columns:repeat(auto-fill,240px); justify-content:start; gap:var(--s05)}
 .app .crt-card{position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:var(--s07) var(--s05) var(--s05); text-align:left; background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
 .app .crt-menu{position:absolute; top:12px; right:12px; z-index:2; display:grid; place-items:center; width:32px; height:32px; background:transparent; border:0; cursor:pointer; color:var(--icon-secondary)}
 .app .crt-menu svg{width:20px; height:20px; fill:currentColor}
-.app .crt-pop{position:absolute; top:44px; right:12px; z-index:3; min-width:168px; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule)}
+.app .crt-pop{position:absolute; top:44px; left:calc(100% - 44px); right:auto; z-index:3; min-width:168px; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule)}
 .app .crt-pop-i{display:flex; align-items:center; gap:var(--s03); padding:var(--s04) var(--s05); background:transparent; border:0; cursor:pointer; text-align:left; color:var(--text-primary)}
 .app .crt-pop-i + .crt-pop-i{border-top:1px solid var(--rule)}
 .app .crt-pop-i svg{width:18px; height:18px; flex:none; fill:currentColor}
 .app .crt-card > .crt-art{--crt-art-w:120px; --crt-art-h:130px; align-self:center; margin-bottom:var(--s05)}
-.app .crt-earn{display:flex; align-items:flex-start; gap:var(--s05); padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
-.app .crt-earn-ic{flex:none; display:grid; place-items:center; width:40px; height:40px; color:var(--icon-primary)}
-.app .crt-earn-ic svg{width:32px; height:32px; fill:currentColor}
+.app .crt-earn{display:flex; align-items:center; gap:var(--s05); padding:var(--s05); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius)}
+.app .crt-earn-ic{flex:none; width:37px; aspect-ratio:70 / 76; display:grid; place-items:center}
+.app .crt-earn-ic img{display:block; width:100%; height:100%; object-fit:contain}
 .app .crt-earn-b{display:flex; flex-direction:column; gap:var(--s02)}
-.app .crt-earn-d{max-width:60ch}
 @container app (min-width:900px){
   .app .sec:has(> .crt-grid){display:block; padding-left:var(--pad-x)}
   .app .sec:has(> .crt-grid) > .sec-h{width:auto; border-right:0; padding:0; margin-bottom:var(--sec-h-gap)}
@@ -8776,6 +8793,26 @@ button.btn-p:active,
 .app .page > .sec:has(> .pf-facts)::after{display:none}
 .app .page > .sec.keep-place:has(> .lead-b){padding-top:0; padding-bottom:0}
 .app .page .lead-b{margin:var(--s06) var(--pad-x); padding:var(--s07)}
+.app .sec-linked > .sec-h{flex-direction:column; align-items:flex-start; gap:var(--sec-desc-gap)}
+.app .lacc-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:var(--s04)}
+@container app (min-width:900px){
+  .app .lacc-grid{grid-template-columns:repeat(5,1fr)}
+}
+.app .lacc{display:flex; flex-direction:column; align-items:center; gap:var(--s02); min-height:300px; padding:var(--s07) var(--s05); background:var(--layer-01); border:1px solid var(--rule); border-radius:var(--radius); cursor:pointer; text-align:center}
+.app .lacc-ic{display:grid; place-items:center; width:44px; height:44px; margin-bottom:var(--s02); color:var(--brand)}
+.app .lacc-ic svg{width:36px; height:36px; display:block; fill:currentColor}
+.app .lacc-av{margin-top:auto; display:block}
+.app .lacc-av .av-ph{width:64px; height:64px; border-radius:999px}
+.app .lacc-av-empty{display:grid; place-items:center; width:64px; height:64px; border-radius:999px; background:var(--gray-10); color:var(--gray-40)}
+.app .lacc-av-empty svg{width:30px; height:30px; fill:currentColor}
+.app .lacc-cta{display:inline-flex; align-items:center; gap:var(--s02); margin-top:auto}
+.app .lacc-mk{display:grid; place-items:center; width:16px; height:16px}
+.app .lacc-mk svg{width:16px; height:16px; display:block; fill:currentColor}
+.app .lacc-on{color:var(--support-success)}
+.app .lacc-off{color:var(--accent)}
+@container app (max-width:479.98px){
+  .app .lacc-grid{grid-template-columns:repeat(2,1fr)}
+}
 
 /* ---- 106-roundfaces.css ---- */
 .app .av-ph,
@@ -9372,6 +9409,11 @@ button.btn-p:active,
 @container app (max-width:899.98px){
   .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a{flex-direction:column; align-items:stretch; width:100%; margin-left:0}
 }
+.app[data-portal="admin"] .page .sec > .sec-h.aih > .aih-a,
+.app[data-portal="admin"] .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a,
+.app[data-portal="admin"] .sec-h > .sec-h-act{gap:var(--s05)}
+.app[data-portal="admin"] .btn-row,
+.app[data-portal="admin"] .btn-set{gap:var(--s05)}
 
 /* ---- 122-reqcard.css ---- */
 .rqc-list{display:flex; flex-direction:column; gap:var(--s05)}
@@ -9495,7 +9537,7 @@ button.btn-p:active,
 .app .pgn-dd-t{display:inline-flex; align-items:center; gap:var(--s02); min-height:32px; padding:0 var(--s03); background:var(--layer-01); border:1px solid var(--rule); cursor:pointer}
 .app .pgn-dd-cx{flex:none; width:16px; height:16px; fill:var(--icon-secondary); transition:transform var(--dur-short) var(--ease-standard)}
 .app .pgn-dd.on .pgn-dd-cx{transform:rotate(180deg)}
-.app .pgn-dd-menu{position:absolute; bottom:calc(100% + var(--s02)); left:0; z-index:30; min-width:100%; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule); opacity:0; visibility:hidden; transform:translateY(4px); transition:opacity var(--dur-short) var(--ease-standard),
+.app .pgn-dd-menu{position:absolute; top:calc(100% + var(--s02)); left:0; z-index:30; min-width:100%; display:flex; flex-direction:column; background:var(--layer-01); border:1px solid var(--rule); opacity:0; visibility:hidden; transform:translateY(-4px); transition:opacity var(--dur-short) var(--ease-standard),
              transform var(--dur-short) var(--ease-standard),
              visibility var(--dur-short)}
 .app .pgn-dd.on .pgn-dd-menu{opacity:1; visibility:visible; transform:translateY(0)}
@@ -9521,8 +9563,14 @@ button.btn-p:active,
 .app[data-portal="admin"] .page > .modhead + .sec > .cs{border-top:1px solid var(--rule)}
 .app[data-portal="admin"] .page > .sec:has(> .hd-srch){padding-top:var(--s07)}
 .app[data-portal="admin"] .page .sec > .hd-srch{margin-bottom:var(--s07)}
-.app .lst-tools{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-top:var(--s05); margin-bottom:var(--s05)}
+.app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h){padding-top:var(--s06)}
+.app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h) > .sec-h{margin-bottom:var(--s06)}
+.app .lst-tools{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-top:var(--s05); margin-bottom:var(--s07)}
 .app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
+.app .srch.srch-has .inp{padding-right:34px}
+.app .srch-x{position:absolute; right:0; top:50%; transform:translateY(-50%); display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; background:none; border:0; cursor:pointer; color:var(--icon-secondary); transition:color var(--dur-short) var(--ease-standard)}
+.app .srch-x svg{width:18px; height:18px; fill:currentColor; display:block}
+.app .srch-x:hover{color:var(--text-primary)}
 .app .lst-tools > .lst-filters{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s03); margin-left:auto}
 .app .fdd{position:relative}
 .app .fdd-t{display:inline-flex; align-items:center; gap:var(--s02); min-height:36px; padding:0 var(--s04); background:var(--layer-01); border:1px solid var(--rule); cursor:pointer; white-space:nowrap}

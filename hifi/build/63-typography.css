@@ -785,6 +785,11 @@
 .app .dark-card .k,.app .dark-card .l,.app .dark-card .d,
 .app .dark-card .note-d{
   color:var(--on-dark-2)}
+/* THE CERT HERO'S SHARE MENU IS A WHITE DROPDOWN INSIDE THE BLACK CARD, so its
+   rows take the PAGE's ink, not the on-dark flip above — which would set the
+   labels white on white. (0,4,0) beats §6a's (0,3,0). Maryam, 11 Sep 2026. */
+.app .dark-card .crt-share-menu .t-body{color:var(--text-primary)}
+.app .dark-card .crt-share-menu .t-desc{color:var(--text-secondary)}
 
 /* ------------------------------------------------------------------- 6c ---
    §87'S THREE FAMILIES WERE ADDED HERE AND ARE REMOVED WITH THE BLOCK THAT

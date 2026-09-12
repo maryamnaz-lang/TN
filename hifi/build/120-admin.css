@@ -254,3 +254,19 @@
 @container app (max-width:899.98px){
   .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a{flex-direction:column; align-items:stretch; width:100%; margin-left:0}
 }
+
+/* ------------------------------------------------------------------------
+   SPACE BETWEEN A PRIMARY AND ITS SECONDARY (Maryam, 11 Sep 2026: "on the
+   whole super admin platform, add spaces between primary and secondary
+   buttons"). The heading-action pair sat at --s03 (the "Bulk Import" /
+   "Add User" pair read cramped); every admin button group opens to --s05 so a
+   primary and its secondary breathe. Scoped by `[data-portal="admin"]` so only
+   the Super Admin portal changes — the candidate / leader / agent gaps are
+   untouched. Higher specificity than the base `.aih-a` / `.btn-row` rules, so
+   it wins wherever it applies.
+   ------------------------------------------------------------------------ */
+.app[data-portal="admin"] .page .sec > .sec-h.aih > .aih-a,
+.app[data-portal="admin"] .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-a,
+.app[data-portal="admin"] .sec-h > .sec-h-act{gap:var(--s05)}
+.app[data-portal="admin"] .btn-row,
+.app[data-portal="admin"] .btn-set{gap:var(--s05)}

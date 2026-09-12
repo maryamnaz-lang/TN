@@ -662,3 +662,83 @@
   padding-top:0;padding-bottom:0}
 .app .page .lead-b{
   margin:var(--s06) var(--pad-x);padding:var(--s07)}
+
+/* ==========================================================================
+   105.9 LINKED-ACCOUNTS CARDS — the profile's "Linked Accounts" tab (Maryam,
+   11 Sep 2026, with a reference of stacked social cards). A vertical card per
+   network, the REFERENCE'S PROPORTIONS IN OUR COMPONENTS, not its look: the
+   coloured pills and avatar discs become the platform's radius-0 card on the
+   one hairline, the connect state carried by a green tick or an accent plus
+   rather than a filled pill, the brand mark full-colour when linked and grey
+   when not.
+
+   TYPE IS §63'S AND SO IS EVERY INK — the name is `.t-h4`, the handle `.t-desc`,
+   the status `.t-label`, and this layer sets NONE of their colours (§63 is the
+   last layer and owns them). What it sets is layout, the card's ground, and the
+   MARK colours: a mark driving an icon fill through `currentColor` is a state
+   colour, which §63 §14 leaves to the component. `--brand` is the inline per
+   card. `.pf-cs` already stacks the heading (§111), so there is no label column
+   to answer here.
+   ========================================================================== */
+/* THE HEADING STACKS OVER ITS DESCRIPTION AT EVERY WIDTH. The base `.sec-h` is
+   a flex ROW, so a full-sentence description beside the title squeezed "Linked
+   accounts" into a wrap on a phone; column with the product's heading-to-
+   description gap reads it as a subtitle. `.sec-linked` names the one section. */
+.app .sec-linked > .sec-h{
+  flex-direction:column;align-items:flex-start;gap:var(--sec-desc-gap)}
+/* FULL WIDTH, AS PORTRAIT CARDS (Maryam, 11 Sep 2026: "I need this in full
+   width but the cards should be vertical rectangles"). `auto-FIT` (not
+   auto-fill) collapses the empty tracks a five-card row leaves in a wide column,
+   so the cards STRETCH to fill the whole width rather than stopping part-way
+   with dead space on the right. `min-height` makes each one taller than it is
+   wide — a vertical rectangle — and the avatar disc in the middle plus the
+   status pushed to the foot (`margin-top:auto`) is what fills that height
+   without the card reading as empty. */
+.app .lacc-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:var(--s04)}
+/* AT DESKTOP THE FIVE NETWORKS ARE ONE FULL-WIDTH ROW. `auto-fit` alone left a
+   card wrapping once the reading column could not fit five at the 150px floor,
+   so above the breakpoint the count is fixed at five equal columns that stretch
+   to the column's whole width — one card per network, no dead space. */
+@container app (min-width:900px){
+  .app .lacc-grid{grid-template-columns:repeat(5,1fr)}
+}
+.app .lacc{
+  display:flex;flex-direction:column;align-items:center;gap:var(--s02);
+  min-height:300px;
+  padding:var(--s07) var(--s05);
+  background:var(--layer-01);border:1px solid var(--rule);border-radius:var(--radius);
+  cursor:pointer;text-align:center}
+.app .lacc-ic{
+  display:grid;place-items:center;width:44px;height:44px;
+  margin-bottom:var(--s02);color:var(--brand)}
+.app .lacc-ic svg{width:36px;height:36px;display:block;fill:currentColor}
+/* THE BRAND MARK STAYS FULL-COLOUR EVEN WHEN UNLINKED (Maryam, 11 Sep 2026:
+   "used colored icons for even then unlinked platforms") — the "Not connected"
+   line, the empty placeholder disc and the accent "Link account" carry the
+   state, so the logo does not need to go grey to say it. */
+/* the avatar disc — the user's photo when linked, an empty placeholder when not.
+   It sits in the middle of the card, `margin:auto 0` centring it in the space
+   between the name and the foot status, which is what makes the height read. */
+/* the avatar and the status each take a `margin-top:auto`, so the free space in
+   the tall card splits into two equal gaps: the name group at the top, the
+   avatar centred, the status at the foot. */
+.app .lacc-av{margin-top:auto;display:block}
+.app .lacc-av .av-ph{width:64px;height:64px;border-radius:999px}
+.app .lacc-av-empty{
+  display:grid;place-items:center;width:64px;height:64px;border-radius:999px;
+  background:var(--gray-10);color:var(--gray-40)}
+.app .lacc-av-empty svg{width:30px;height:30px;fill:currentColor}
+/* the status line is a MARK plus a word; the colour is on the mark so the word
+   keeps §63's label ink. Green tick when linked, accent plus to link. */
+.app .lacc-cta{
+  display:inline-flex;align-items:center;gap:var(--s02);margin-top:auto}
+.app .lacc-mk{display:grid;place-items:center;width:16px;height:16px}
+.app .lacc-mk svg{width:16px;height:16px;display:block;fill:currentColor}
+.app .lacc-on{color:var(--support-success)}
+.app .lacc-off{color:var(--accent)}
+/* below 480 hold two per row rather than pinching to one full-width card */
+@container app (max-width:479.98px){
+  .app .lacc-grid{grid-template-columns:repeat(2,1fr)}
+}

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summary by Tal</title>
+<!--
+  Standalone "Summary by Tal" card — extracted for marketing / recording.
+  This is a COPY. It is not part of the TalentNext product build and no
+  product file was changed. Two intentional deviations from the product:
+    1. Name  : Maryam -> Aliana
+    2. Body ink: a step darker than the product's #828282 -> #5f5f5f
+  The text TYPES itself out (like the product's typing summary), keeping the
+  highlighted phrases as red-on-pink chips as they appear. Click the card or
+  the Replay button to run it again for a clean recording.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* --- the two changes you asked for live here --- */
+    --summary-ink:#5f5f5f;              /* a step darker than the product's #828282 */
+
+    /* --- everything else is copied from the product --- */
+    --accent-text:#c2332d;              /* highlighted-phrase ink */
+    --hl-bg:rgba(255,55,51,.05);        /* highlighted-phrase ground */
+    --label-ink:#111111;
+    --wash:linear-gradient(183.76deg, rgba(189,42,42,.05) 11.02%, rgba(255,255,255,.05) 52.27%);
+
+    /* --- typing speed: milliseconds per character (lower = faster) --- */
+    --type-ms:22;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;
+    display:grid;place-items:center;
+    background:#ffffff;
+    font-family:"Plus Jakarta Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* the card. Bump font-size here to scale the whole thing for recording. */
+  .tal-card{
+    font-size:16px;
+    width:min(460px,92vw);
+    padding:28px 32px 40px;
+    background:#ffffff;                 /* plain white card (wash removed) */
+    border:1px solid #efefef;           /* light edge so it reads on white; delete for edgeless */
+    border-radius:12px;
+    cursor:pointer;
+  }
+
+  .tal-label{
+    display:inline-flex;align-items:center;gap:6px;
+    color:var(--label-ink);
+    font-weight:600;
+    font-size:0.95em;
+    line-height:1;
+    margin:0 0 18px;
+  }
+  /* Tal's blob mark — the real animated asset (tal-blob.mp4). Sized to the
+     line and cropped round. object-fit:cover fills the disc; mix-blend-mode
+     lets a white-backed video sit on the wash without a hard square edge. */
+  .tal-mark{
+    width:2.75em;height:2.75em;flex:none;   /* larger blob */
+    border-radius:999px;overflow:hidden;
+    object-fit:cover;
+    background:transparent;
+    mix-blend-mode:multiply;   /* drops the white video background into the card */
+  }
+
+  .tal-body{
+    margin:0;
+    color:var(--summary-ink);
+    font-weight:500;                   /* medium body; highlighted chips are 600 */
+    font-size:1em;
+    line-height:1.62;
+  }
+  .tal-body + .tal-body{margin-top:0.6em}
+
+  /* the accent phrases */
+  .tal-body b{
+    font-weight:600;
+    color:var(--accent-text);
+    background-color:var(--hl-bg);
+    border-radius:4px;
+    padding:1px 4px;margin:0 -1px;
+    -webkit-box-decoration-break:clone;box-decoration-break:clone;
+  }
+  /* a chip caught mid-typing is drawn as two halves so its text can fill while
+     its box stays exactly the width of the finished chip — the middle padding,
+     margin and inner radius are dropped so the two halves measure as one. */
+  .tal-body b.hl-o{padding-right:0;margin-right:0;border-top-right-radius:0;border-bottom-right-radius:0}
+  .tal-body b.hl-c{padding-left:0;margin-left:0;border-top-left-radius:0;border-bottom-left-radius:0}
+
+  /* the whole sentence is laid out from the first frame; un-typed text is just
+     hidden, so line breaks and the card height never change while it types. */
+  .gh{visibility:hidden}
+
+  /* the typing caret — net-zero horizontal footprint (margin-right cancels its
+     own width + left margin) so it can never nudge a line to a new wrap. */
+  .caret{
+    display:inline-block;width:2px;height:1.05em;
+    margin-left:1px;margin-right:-3px;vertical-align:-0.16em;
+    background:var(--accent-text);
+    animation:blink 1s steps(1) infinite;
+  }
+  .tal-card.done .caret{display:none}
+  @keyframes blink{50%{opacity:0}}
+
+  /* replay control — sits out of the card so it can be cropped out of a recording */
+  .replay{
+    position:fixed;top:20px;right:20px;
+    font:inherit;font-size:13px;font-weight:500;
+    color:#6b6b6b;background:#fff;
+    border:1px solid #e6e6e6;border-radius:999px;
+    padding:6px 14px;cursor:pointer;
+  }
+  .replay:hover{color:#111;border-color:#cfcfcf}
+</style>
+</head>
+<body>
+  <button class="replay" type="button" id="replay">Replay ↺</button>
+
+  <div class="tal-card" id="card">
+    <p class="tal-label">
+      <video class="tal-mark" src="tal-blob.mp4" autoplay loop muted playsinline aria-hidden="true"></video>
+      Summary by Tal
+    </p>
+    <p class="tal-body" id="p0"></p>
+    <p class="tal-body" id="p1"></p>
+  </div>
+
+<script>
+(function(){
+  // Each paragraph is a list of segments; b:true = a highlighted accent phrase.
+  var PARAS = [
+    [
+      {t:"Good evening, Aliana! You’re "},
+      {t:"5 of 13 chapters", b:true},
+      {t:" in at 75%, with 260 minutes logged. "},
+      {t:"Chapter 4, “Delegation Without Drop-Off”", b:true},
+      {t:", is still unfinished after four attempts."}
+    ],
+    [
+      {t:"Completing its 70 minutes this week will get you back on track for the "},
+      {t:"55-minute weekly target", b:true},
+      {t:" before Week 6 begins."}
+    ]
+  ];
+
+  var els   = [document.getElementById("p0"), document.getElementById("p1")];
+  var card  = document.getElementById("card");
+  var total = PARAS.reduce(function(s,p){ return s + p.reduce(function(a,seg){ return a+seg.t.length; },0); },0);
+  var msPer = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--type-ms")) || 22;
+
+  function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  var CARET='<span class="caret"></span>';
+
+  // The FULL text is always in the DOM; the un-typed tail is just hidden. So
+  // every line break is fixed from the first frame — the card height never
+  // changes and no word ever jumps, which is what reads as "smooth".
+  function renderUpto(n){
+    var left=n, caretPlaced=false, typing=(n<total);
+    for(var i=0;i<PARAS.length;i++){
+      var html="";
+      for(var j=0;j<PARAS[i].length;j++){
+        var seg=PARAS[i][j], len=seg.t.length;
+        var take=Math.max(0,Math.min(len,left));
+        var caretHere=(!caretPlaced && typing && left>0 && left<=len);
+        if(seg.b){
+          if(take<=0){
+            html+='<b class="gh">'+esc(seg.t)+'</b>';
+          }else if(take>=len){
+            html+='<b>'+esc(seg.t)+'</b>';
+            if(caretHere){ html+=CARET; caretPlaced=true; }
+          }else{
+            // chip caught mid-fill: two halves that measure as the finished chip
+            html+='<b class="hl-o">'+esc(seg.t.slice(0,take))+'</b>';
+            if(caretHere){ html+=CARET; caretPlaced=true; }
+            html+='<b class="hl-c gh">'+esc(seg.t.slice(take))+'</b>';
+          }
+        }else{
+          html+=esc(seg.t.slice(0,take));
+          if(caretHere){ html+=CARET; caretPlaced=true; }
+          if(take<len){ html+='<span class="gh">'+esc(seg.t.slice(take))+'</span>'; }
+        }
+        left-=len;
+      }
+      els[i].innerHTML=html;
+    }
+    // a caret for the very first frame, before any character is due
+    if(typing && !caretPlaced){ els[0].insertAdjacentHTML("afterbegin", CARET); }
+  }
+
+  var start=null, timer=null;
+  function tick(){
+    var now=Date.now();
+    if(start===null) start=now;
+    var shown=Math.floor((now-start)/msPer);       // pace off ELAPSED time, not a counter
+    if(shown>=total){ renderUpto(total); card.classList.add("done"); return; }
+    renderUpto(shown);
+    timer=setTimeout(tick, 16);
+  }
+
+  function play(){
+    if(timer) clearTimeout(timer);
+    start=null; card.classList.remove("done");
+    els[0].innerHTML=""; els[1].innerHTML="";
+    tick();
+  }
+
+  document.getElementById("replay").addEventListener("click", play);
+  card.addEventListener("click", play);
+  play();
+})();
+</script>
+</body>
+</html>

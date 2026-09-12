@@ -26,7 +26,9 @@
 
 /* ---- rows-per-page: OUR dropdown, never a native <select> ----------------
    The trigger is a small bordered field with a rotating chevron; the menu opens
-   UPWARD (the bar is at the table's foot) and overlays the rows above. */
+   DOWNWARD, like every other dropdown on the portal (Maryam, 12 Sep 2026:
+   "dropdowns should always open below not above"). It was UPWARD because the bar
+   sits at the table's foot, but consistency wins — every dropdown drops down. */
 .app .pgn-dd{position:relative}
 .app .pgn-dd-t{display:inline-flex; align-items:center; gap:var(--s02);
   min-height:32px; padding:0 var(--s03); background:var(--layer-01);
@@ -35,10 +37,10 @@
   transition:transform var(--dur-short) var(--ease-standard)}
 .app .pgn-dd.on .pgn-dd-cx{transform:rotate(180deg)}
 .app .pgn-dd-menu{
-  position:absolute; bottom:calc(100% + var(--s02)); left:0; z-index:30;
+  position:absolute; top:calc(100% + var(--s02)); left:0; z-index:30;
   min-width:100%; display:flex; flex-direction:column;
   background:var(--layer-01); border:1px solid var(--rule);
-  opacity:0; visibility:hidden; transform:translateY(4px);
+  opacity:0; visibility:hidden; transform:translateY(-4px);
   transition:opacity var(--dur-short) var(--ease-standard),
              transform var(--dur-short) var(--ease-standard),
              visibility var(--dur-short)}
