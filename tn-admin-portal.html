@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=81a2164b">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=5412a339">
 
 <style>
 /* ==========================================================================
@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=81a2164b"></script>
+<script src="design-system/talentnext-ds.js?b=5412a339"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -2529,6 +2529,12 @@ const ROLE_OPTS = [
   ['admin', 'Admin'],
   ['employer', 'Employer']
 ];
+/* The role is a TAB STRIP again (Maryam, 13 Sep 2026: "take the role tabs as we
+   had before ... remove the roles filter since we are adding the tabs now"), on
+   the same role set as the old dropdown — with live counts in the tab. `admin` is
+   the internal-account bucket; every other tab is a plain role membership. */
+const roleCount = v => v === 'all' ? USERS.length : v === 'admin' ? USERS.filter(u => u.internal).length : USERS.filter(u => u.roles.includes(v)).length;
+const ROLE_TABS = () => ROLE_OPTS.map(([v, l]) => [v, l, roleCount(v)]);
 /* A cohort leader an admin added is a MODERATOR (§ moderator, 11 Sep 2026).
    `u.addedBy` is the id of the admin who added them, and the Cohort Leader filter
    adds an "Added by" column reading it: the signed-in Super Admin (ME) reads
@@ -2549,8 +2555,8 @@ function usersAll(){
     ${searchHead('All users', 'Every account on the platform. A row opens the full record.',
       `<button class="btn btn-g btn-sm noic" data-go="users/import">${I.download} Bulk Import</button>
        ${addBtn('user', 'Add User')}`)}
+    ${filterStrip('role', 'all', ROLE_TABS())}
     ${lstTools('Search by name, email or company',
-      filterDd('role', 'all', ROLE_OPTS, 'Role') +
       filterDd('status', 'all', [['all', 'All'], ['active', 'Active'], ['inactive', 'Inactive']], 'Status'))}
     ${rows.length ? table(
       [{label:'User'}, {label:'Roles', sort:false}, {label:'Detail'},
@@ -6147,12 +6153,19 @@ function render(){
         ${S.tal || S.sheet || S.confirm ? '' : askDock()}
       </div>
       ${notifPanel()}
-      ${confirmSheet()}
-      ${sheetView()}
-      ${/* THE SHARED STRIPE "ADD PAYMENT METHOD" MODAL (`dsPayForm`), opened by
-           `S.payModal` — the same component every portal uses. */''}
-      ${dsPayForm(S.payTab, S.payModal)}
     </div>
+    ${/* THE MODAL OVERLAYS ARE DIRECT CHILDREN OF `.app`, NOT `.shell-body`, so
+         their `inset:0` backdrop covers the WHOLE frame — the app bar included
+         (Maryam, 13 Sep 2026: "on opening a modal the top header should also have
+         the overlay"). In `.shell-body` they began below the 68px bar, leaving the
+         header undimmed. `.app` is positioned, `.modal` z-index (70) beats the
+         bar's (30). The notif panel stays inside `.shell-body` — it is a dropdown
+         from the bar, not a full-frame overlay. */''}
+    ${confirmSheet()}
+    ${sheetView()}
+    ${/* THE SHARED STRIPE "ADD PAYMENT METHOD" MODAL (`dsPayForm`), opened by
+         `S.payModal` — the same component every portal uses. */''}
+    ${dsPayForm(S.payTab, S.payModal)}
     <div class="pt-toasts" id="toasts"></div>
   </div>`;
 

@@ -455,7 +455,16 @@ svg.arrow,.tile-arrow,.card-go{
 .sheet-h .x{margin-left:auto;width:44px;height:44px;display:grid;place-items:center;flex:none}
 .sheet-h .x svg{width:22px;height:22px;fill:var(--icon-primary)}
 .sheet-h .x:hover{background:var(--overlay-hover)}
-.sheet-b{flex:1;overflow-y:auto;padding:var(--s06)}
+/* THE BODY SIZES TO ITS CONTENT, and scrolls only when the sheet hits its
+   max-height — it never RESERVES blank space (Maryam, 13 Sep 2026: "the modal has
+   extra space ... no need of leaving this fixed space"). `flex:1` here was
+   `1 1 0%`: flex-basis 0 with `overflow:auto` makes the body's height
+   flex-distributed rather than content-based, which some engines resolve by
+   leaving the body taller than its content inside an auto-height sheet — the
+   reserved gap. `flex:0 1 auto` bases the body on its content (no grow), so the
+   sheet is exactly header + content + footer, capped at max-height; a dropdown
+   just opens downward over the body, no space kept for it. */
+.sheet-b{flex:0 1 auto;overflow-y:auto;padding:var(--s06)}
 /* NO RULE ABOVE THE BUTTONS (Maryam, 6 Sep 2026: "remove the divider above the
    buttons row"). §02 used to give the footer a `border-top` to separate a fixed
    action bar from a scrolling body; the modal reads cleaner without it, the body
