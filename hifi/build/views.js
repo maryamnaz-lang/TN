@@ -12873,7 +12873,12 @@ const pfNotif = () => `
    toggle is all there is — no OAuth, nothing leaves the page. */
 const SOCIAL = [
   {k:'linkedin',  n:'LinkedIn',  color:'#0A66C2', handle:'@maryamsss',
-   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>'},
+   /* THE LINKEDIN SQUARE FILLS ITS FULL 0-24 BOX; every other social mark is
+      inset (Instagram's rect is 2..22, the glyphs sit inside), so at the shared
+      36px box LinkedIn read ~20% larger. Scaled to Instagram's 20-unit footprint
+      (translate 2, scale 20/24) so all five squares/marks measure equal.
+      (Maryam, 13 Sep 2026) */
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><g transform="translate(2 2) scale(0.83333)"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></g></svg>'},
   {k:'instagram', n:'Instagram', color:'#E4405F', handle:'@maryam.designs',
    svg:'<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>'},
   {k:'facebook',  n:'Facebook',  color:'#1877F2', handle:'Maryam Naz',
@@ -12992,6 +12997,35 @@ const crsInsight = (c) => {
     ${statCell(I.flag, 'Tasks on time', `${c.tasksDone} <small>of ${c.tasksTotal}</small>`, c.tasksSub)}
   </div>`;
 };
+/* THE COMPLETION CERTIFICATE BANNER on a completed course (Maryam, 13 Sep 2026:
+   "show the course completion certification banners — the one we are showing on
+   the achievements page — with the courses that are completed"). It is the exact
+   `.certban` the Achievements module draws (`certBanner` above), same badge
+   artwork (`CERT_ART.explorer`, the one asset every level certificate shares),
+   same "Explorer Track – {lvl}" title and "Completed {date} · {cohort}" meta,
+   same accent View button.
+
+   IT IS DRIVEN BY THE COURSE'S OWN LEVEL, not by `certsFor(f)`. `certBanner`
+   reads the stage's latest certificate, which at day 34 is E2 — wrong under an
+   E3 course row. Matching `CERTS` by `c.level` gives the certificate that course
+   actually earns (Business Fundamentals is E3 → the E3 certificate) and never
+   drifts with the stage. A completed course with no matching level certificate
+   draws nothing rather than inventing one (§74). No `.sec` wrapper — this sits
+   inside the accordion panel; §105.9 gives it its top air. */
+function crsCertBanner(c){
+  const cert = CERTS.find(x => x.lvl === c.level);
+  if(!cert) return '';
+  return `<div class="certban crs-certban">
+    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
+    <span class="certban-b">
+      <span class="certban-t">Explorer Track &ndash; ${cert.lvl}</span>
+      <span class="certban-m">Completed ${cert.on} &middot; ${cert.cohort}</span>
+    </span>
+    <span class="certban-a">
+      <button class="btn btn-p btn-sm" data-go="transcript">View</button>
+    </span>
+  </div>`;
+}
 function pfCoursesView(){
   return `<div class="sec sec-crs" data-pfsec="courses">
     <div class="sec-h"><h2>My courses</h2></div>
@@ -13007,7 +13041,7 @@ function pfCoursesView(){
             onerror="this.style.display='none'">
           <span class="ttl"><span class="ol-t">${c.name}</span><span class="ol-m t-desc">${c.status}</span></span>
           <span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b">${crsInsight(c)}</div>
+        <div class="acc-b">${c.status === 'Completed' ? crsCertBanner(c) : ''}${crsInsight(c)}</div>
       </div>`).join('')}
     </div>
   </div>`;

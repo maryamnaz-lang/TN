@@ -65,13 +65,19 @@
 .app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h) > .sec-h{margin-bottom:var(--s06)}
 
 /* ---- 2. search left, filters right, under the tabs ----------------------- */
-/* The toolbar's air ABOVE and BELOW must match (Maryam, 12 Sep 2026): the gap to
-   the table below equals the gap to the heading above. The heading→toolbar gap is
-   `--s07` (the `.hd-srch` margin-bottom collapses over the toolbar's own top
-   margin), so the toolbar→table gap is `--s07` too — one rhythm both sides. */
+/* The toolbar's air ABOVE and BELOW must match (Maryam, 12 Sep 2026; reaffirmed
+   13 Sep 2026: "the gap above the search row should be equal to the gap below").
+   Its OWN top margin is `--s07`, not `--s05` — the earlier `--s05` leaned on the
+   `.hd-srch` margin-bottom (--s07) collapsing over the toolbar's top margin to
+   land the gap at 32. That collapse only happens when the heading is the toolbar's
+   immediately-preceding sibling. On a list page the `.cs.lst-filt` TAB STRIP sits
+   between them, so nothing collapses and the gap above the search was the toolbar's
+   own `--s05` (16) against `--s07` (32) below — the mismatch this fixes. `--s07`
+   both sides is one rhythm on tab-strip and no-tab pages alike (on a no-tab page
+   the two --s07 margins collapse to 32, unchanged). */
 .app .lst-tools{
   display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05);
-  margin-top:var(--s05); margin-bottom:var(--s07)}
+  margin-top:var(--s07); margin-bottom:var(--s07)}
 .app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
 /* THE SEARCH CLEAR (X) — shows only while the field has text (`.srch-has`),
    clears the query and returns the full table (Maryam, 12 Sep 2026). Sits at the

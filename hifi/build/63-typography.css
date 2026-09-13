@@ -495,7 +495,7 @@
 .app .eyebrow,.app .stats .l,.app .stats .k,.app .stat .k,.app .facts .l,
 .app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
 .app .sn-cap,.app .pt-lab,.app .lvl-hero .eb,.app .ladder-lab,
-.app .tbl th,.app .chart-table th,.app .cert-eb,.app .plate-eb,
+.app .chart-table th,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
 .app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
@@ -5433,6 +5433,42 @@
    ========================================================================== */
 .app[data-portal="admin"] .tbl td:first-child{font-weight:var(--t-w-strong)}
 .app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
+
+/* ==========================================================================
+   56b. THE TABLE HEADER MATCHES THE BODY SIZE, IN BLACK STRONG; AND THE
+        NON-ANCHOR CELLS ARE THE DESCRIPTION GREY — every `.tbl`, all portals
+        (Maryam, 13 Sep 2026)
+
+   Three asks on every table:
+
+   1. "the table header font needs to be equal to the table items font." The
+      head WAS the eyebrow role (11.5px, §3); it moves to `--t-compact` — the
+      exact size / line-height / tracking `.tbl td` already uses — so the header
+      and the cell below it are one size. `.tbl th` is pulled out of §3's eyebrow
+      list for this; `.chart-table th` stays there (it labels a chart's data
+      readout, not a listing, and was not part of the ask).
+
+   2. "the table header text needs to be in black color and semibold weight."
+      `--text-primary` ink at `--t-w-strong` — the platform's heavier weight,
+      which is 500: two weights only (§63), so "semibold" is 500, never 600. It
+      was already 500; the read of "semibold" comes from the black ink and the
+      body size against the 400 grey cells beneath, not from a new weight.
+
+   3. "except the first column and the colored columns like status, the other
+      columns' text needs to be #828282." `.tbl td` defaults to
+      `--text-secondary`; the first cell — the name, the row's anchor — is pinned
+      back to `--text-primary`. A COLOURED cell carries its colour on its OWN
+      element, which already beats `.tbl td` (0,2,1) and is a child besides, so
+      nothing here has to name the exceptions: `.statw` (0,3,0, admin) keeps the
+      status green/amber/red, the `.t-caption` identity sub-line keeps its floor
+      grey, and a `.tag` chip keeps its own ink. Only the plain cell text greys.
+   ========================================================================== */
+.app .tbl th{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .tbl td{color:var(--text-secondary)}
+.app .tbl td:first-child{color:var(--text-primary)}
 
 /* ==========================================================================
    57. THE VIEW-AS BAR'S LINE — §129 (SA-11, 7 Sep 2026)

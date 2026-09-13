@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5902.  Rules dropped as product-specific: 186.
+   Rules kept: 5907.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -6986,7 +6986,6 @@ button.btn-p:active,
 .app .pt-lab,
 .app .lvl-hero .eb,
 .app .ladder-lab,
-.app .tbl th,
 .app .chart-table th,
 .app .cert-eb,
 .app .plate-eb,
@@ -7557,6 +7556,9 @@ button.btn-p:active,
 .app[data-portal="admin"][data-rail="open"] .sn-item .badge{font-size:10px}
 .app[data-portal="admin"] .tbl td:first-child{font-weight:var(--t-w-strong)}
 .app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
+.app .tbl th{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); font-weight:var(--t-w-strong); letter-spacing:var(--t-compact-ls); text-transform:none; color:var(--text-primary)}
+.app .tbl td{color:var(--text-secondary)}
+.app .tbl td:first-child{color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
@@ -8740,6 +8742,7 @@ button.btn-p:active,
 .app .page .idname-row{display:flex; align-items:center; gap:var(--s03)}
 .app .page .rank-chip{display:inline-flex; align-items:center; padding:1px var(--s03); border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
+.app .page .crs-acc .acc-b .certban{margin-top:var(--s04)}
 .app .page .crs-row > .crs-thumb{flex:none; width:56px; height:38px; object-fit:cover; margin-right:var(--s04); border:1px solid var(--rule)}
 .app .page .pf-tgs{display:grid; gap:0; grid-template-columns:1fr}
 .app .page .pf-tgs > .tg{align-items:flex-start; gap:var(--s04); padding:var(--s05) 0; background-color:transparent; border:0; border-radius:var(--radius)}
@@ -9400,7 +9403,7 @@ button.btn-p:active,
 .app .tbl:not(.tbl-flag) td.tbl-act .btn svg{width:18px; height:18px}
 .app .tbl:not(.tbl-flag) td.tbl-act .btn + .btn{margin-left:var(--s02)}
 .app .cs.lst-filt{margin-top:var(--s05)}
-.app .cs.lst-filt + *{margin-top:var(--s05)}
+.app .cs.lst-filt + *{margin-top:var(--s07)}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-bottom:0; border-right:0; min-height:0}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b{flex:1 1 220px; min-width:0; max-width:none; align-self:center; display:flex; flex-direction:column; gap:var(--sec-desc-gap)}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b > h2.aih-t{display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:0; flex:none; min-width:0}
@@ -9414,6 +9417,8 @@ button.btn-p:active,
 .app[data-portal="admin"] .sec-h > .sec-h-act{gap:var(--s05)}
 .app[data-portal="admin"] .btn-row,
 .app[data-portal="admin"] .btn-set{gap:var(--s05)}
+.app[data-portal="admin"] .sec-h.aih > .aih-a > :is(.btn-g, .btn-s, .btn-t).noic,
+.app[data-portal="admin"] .sec-h > .sec-h-act > :is(.btn-g, .btn-s, .btn-t).noic{padding-left:0; padding-right:0}
 
 /* ---- 122-reqcard.css ---- */
 .rqc-list{display:flex; flex-direction:column; gap:var(--s05)}
@@ -9565,7 +9570,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .page .sec > .hd-srch{margin-bottom:var(--s07)}
 .app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h){padding-top:var(--s06)}
 .app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h) > .sec-h{margin-bottom:var(--s06)}
-.app .lst-tools{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-top:var(--s05); margin-bottom:var(--s07)}
+.app .lst-tools{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-top:var(--s07); margin-bottom:var(--s07)}
 .app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
 .app .srch.srch-has .inp{padding-right:34px}
 .app .srch-x{position:absolute; right:0; top:50%; transform:translateY(-50%); display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; padding:0; background:none; border:0; cursor:pointer; color:var(--icon-secondary); transition:color var(--dur-short) var(--ease-standard)}

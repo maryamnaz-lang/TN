@@ -9208,7 +9208,7 @@ button.btn-p:active,
 .app .eyebrow,.app .stats .l,.app .stats .k,.app .stat .k,.app .facts .l,
 .app .path-facts .l,.app .prog-figs > span,.app .day .d,.app .notif-g,
 .app .sn-cap,.app .pt-lab,.app .lvl-hero .eb,.app .ladder-lab,
-.app .tbl th,.app .chart-table th,.app .cert-eb,.app .plate-eb,
+.app .chart-table th,.app .cert-eb,.app .plate-eb,
 .app .plate-when,.app .ivrow-eb,.app .sc-head > span,.app .m-day > span,
 .app .m-unread > span,.app .gen-src,.app .q-w,.app .ivt-col-h,.app .tq-w,
 .app .rp-src,.app .rp-opts-h,.app .stp-pop-h,.app .bkw .bk-h,
@@ -10339,6 +10339,12 @@ button.btn-p:active,
 .app[data-portal="admin"][data-rail="open"] .sn-item .badge{font-size:10px}
 .app[data-portal="admin"] .tbl td:first-child{font-weight:var(--t-w-strong)}
 .app[data-portal="admin"] .tbl td:first-child .t-caption{font-weight:var(--t-w-book)}
+.app .tbl th{
+  font-size:var(--t-compact-size);line-height:var(--t-compact-lh);
+  font-weight:var(--t-w-strong);letter-spacing:var(--t-compact-ls);
+  text-transform:none;color:var(--text-primary)}
+.app .tbl td{color:var(--text-secondary)}
+.app .tbl td:first-child{color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t{font-size:var(--t-compact-size); line-height:var(--t-compact-lh); color:var(--text-primary)}
 .app[data-portal="admin"] .viewas-t b{font-weight:var(--t-w-strong); color:var(--accent-text)}
 .app .rank-chip{color:var(--accent-text)}
@@ -12298,6 +12304,7 @@ button.btn-p:active,
   padding:1px var(--s03);border-radius:999px;
   background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
+.app .page .crs-acc .acc-b .certban{margin-top:var(--s04)}
 .app .page .crs-row > .crs-thumb{
   flex:none;width:56px;height:38px;object-fit:cover;
   margin-right:var(--s04);border:1px solid var(--rule)}
@@ -13461,7 +13468,7 @@ button.btn-p:active,
 .app .tbl:not(.tbl-flag) td.tbl-act .btn svg{width:18px; height:18px}
 .app .tbl:not(.tbl-flag) td.tbl-act .btn + .btn{margin-left:var(--s02)}
 .app .cs.lst-filt{margin-top:var(--s05)}
-.app .cs.lst-filt + *{margin-top:var(--s05)}
+.app .cs.lst-filt + *{margin-top:var(--s07)}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih{display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05); margin-bottom:0; border-right:0; min-height:0}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b{flex:1 1 220px; min-width:0; max-width:none; align-self:center; display:flex; flex-direction:column; gap:var(--sec-desc-gap)}
 .app .page .sec > .hd-srch > .hd-srch-t > .sec-h.aih > .aih-b > h2.aih-t{display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:0; flex:none; min-width:0}
@@ -13475,6 +13482,9 @@ button.btn-p:active,
 .app[data-portal="admin"] .sec-h > .sec-h-act{gap:var(--s05)}
 .app[data-portal="admin"] .btn-row,
 .app[data-portal="admin"] .btn-set{gap:var(--s05)}
+.app[data-portal="admin"] .sec-h.aih > .aih-a > :is(.btn-g,.btn-s,.btn-t).noic,
+.app[data-portal="admin"] .sec-h > .sec-h-act > :is(.btn-g,.btn-s,.btn-t).noic{
+  padding-left:0;padding-right:0}
 .app .ask-page .askfield.rec{
   padding:0 8px;
   gap:var(--s03)}
@@ -13750,7 +13760,7 @@ button.btn-p:active,
 .app[data-portal="admin"] .page > .modhead + .sec:has(> .sec-h) > .sec-h{margin-bottom:var(--s06)}
 .app .lst-tools{
   display:flex; align-items:center; flex-wrap:wrap; gap:var(--s04) var(--s05);
-  margin-top:var(--s05); margin-bottom:var(--s07)}
+  margin-top:var(--s07); margin-bottom:var(--s07)}
 .app .lst-tools > .srch{flex:1 1 260px; min-width:0; max-width:360px; margin:0; padding:0}
 .app .srch.srch-has .inp{padding-right:34px}
 .app .srch-x{position:absolute; right:0; top:50%; transform:translateY(-50%);
@@ -21385,7 +21395,7 @@ const pfNotif = () => `
 
 const SOCIAL = [
   {k:'linkedin',  n:'LinkedIn',  color:'#0A66C2', handle:'@maryamsss',
-   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>'},
+   svg:'<svg viewBox="0 0 24 24" fill="currentColor"><g transform="translate(2 2) scale(0.83333)"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></g></svg>'},
   {k:'instagram', n:'Instagram', color:'#E4405F', handle:'@maryam.designs',
    svg:'<svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="currentColor"/><circle cx="12" cy="12" r="4" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.3" fill="#fff"/></svg>'},
   {k:'facebook',  n:'Facebook',  color:'#1877F2', handle:'Maryam Naz',
@@ -21451,6 +21461,20 @@ const crsInsight = (c) => {
     ${statCell(I.flag, 'Tasks on time', `${c.tasksDone} <small>of ${c.tasksTotal}</small>`, c.tasksSub)}
   </div>`;
 };
+function crsCertBanner(c){
+  const cert = CERTS.find(x => x.lvl === c.level);
+  if(!cert) return '';
+  return `<div class="certban crs-certban">
+    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
+    <span class="certban-b">
+      <span class="certban-t">Explorer Track &ndash; ${cert.lvl}</span>
+      <span class="certban-m">Completed ${cert.on} &middot; ${cert.cohort}</span>
+    </span>
+    <span class="certban-a">
+      <button class="btn btn-p btn-sm" data-go="transcript">View</button>
+    </span>
+  </div>`;
+}
 function pfCoursesView(){
   return `<div class="sec sec-crs" data-pfsec="courses">
     <div class="sec-h"><h2>My courses</h2></div>
@@ -21466,7 +21490,7 @@ function pfCoursesView(){
             onerror="this.style.display='none'">
           <span class="ttl"><span class="ol-t">${c.name}</span><span class="ol-m t-desc">${c.status}</span></span>
           <span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b">${crsInsight(c)}</div>
+        <div class="acc-b">${c.status === 'Completed' ? crsCertBanner(c) : ''}${crsInsight(c)}</div>
       </div>`).join('')}
     </div>
   </div>`;

@@ -234,7 +234,13 @@
 
 /* ---- 4. the filter strip under a searched heading ------------------------ */
 .app .cs.lst-filt{margin-top:var(--s05)}
-.app .cs.lst-filt + *{margin-top:var(--s05)}
+/* THE GAP FROM THE TAB STRIP TO THE SEARCH ROW BELOW IT is `--s07`, matching the
+   search→table gap under it (Maryam, 13 Sep 2026: "the gap above the search row
+   should be equal to the gap below"). This `.cs.lst-filt + *` rule (0,3,0) is the
+   one that actually sets the search row's top on a list page — it beats
+   `.lst-tools` (0,2,0, also --s07), so the toolbar's own margin-top is not enough
+   on its own. `--s07` here = `--s07` below → equal air both sides of the search. */
+.app .cs.lst-filt + *{margin-top:var(--s07)}
 
 /* ---- 4a. aiHead INSIDE the searched heading -----------------------------
    §73's `aiHead` rules are all `.app .page .sec > .sec-h.aih > …` — direct
@@ -270,3 +276,23 @@
 .app[data-portal="admin"] .sec-h > .sec-h-act{gap:var(--s05)}
 .app[data-portal="admin"] .btn-row,
 .app[data-portal="admin"] .btn-set{gap:var(--s05)}
+
+/* ------------------------------------------------------------------------
+   AND THE NO-BACKGROUND BUTTON IN THAT ROW CARRIES NO SIDE PADDING (Maryam,
+   13 Sep 2026: "remove the paddings of the buttons with no bg and then give
+   them space the way it looks like in the reference between export and bulk
+   correction"). A quiet `.btn-g`/`.btn-s`/`.btn-t` has the SAME 16px side
+   padding as the filled `.btn-p` next to it (`.btn-sm{padding:0 --s04}`), but
+   its box is invisible — so the whitespace between two ghost labels (Export |
+   Bulk Correction) was the gap PLUS both buttons' padding (0 + 24 + 16 = 40),
+   reading wider than the gap between a ghost label and the filled box's edge
+   (Bulk Correction | Add Candidate, 0 + 24 = 24). With the ghost padding gone
+   the group's --s05 gap alone sets the space, so every visual gap in the row
+   is the one 24px value. Only the heading-action `.noic` ghosts (the Export /
+   Bulk Correction pattern) — §64's directional `:not(.noic)` go-button keeps
+   its shaped padding. §64.145 already zeroed padding-right on a `.sec-h` ghost;
+   this adds the left. (0,5,0) beats §64.145's (0,3,0) and §02's (0,1,0).
+   ------------------------------------------------------------------------ */
+.app[data-portal="admin"] .sec-h.aih > .aih-a > :is(.btn-g,.btn-s,.btn-t).noic,
+.app[data-portal="admin"] .sec-h > .sec-h-act > :is(.btn-g,.btn-s,.btn-t).noic{
+  padding-left:0;padding-right:0}
