@@ -1355,7 +1355,13 @@ css = '\n'.join((here / f).read_text() for f in
                  # platform as another account: ground, hairline, geometry and the
                  # 20px mark only — §63 §57 states its type. New class, nothing
                  # un-said, so last. Crosses to the DS (the admin is on the box).
-                 '129-viewas.css',])
+                 '129-viewas.css',
+                 # THE RATING + REVIEW CARD (§130) — 13 Sep 2026. Rate the talent
+                 # agent on the report, the cohort leader once the 90 days are
+                 # over, the course once it is finished. New classes only, type
+                 # and ink left to §63, so it lands last. Crosses to the DS so a
+                 # future portal can reuse the block.
+                 '130-review.css',])
 # ==========================================================================
 # NO HOVER
 # The state layer was fighting the layout everywhere it appeared: a wash on a

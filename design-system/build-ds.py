@@ -1048,6 +1048,11 @@ LAYERS = [
     # is its only writer: the bar that names an open View As session (SA-11).
     # Ground, hairline and geometry; §63 §57 carries the line's type.
     '129-viewas.css',
+    # THE RATING + REVIEW CARD (§130). Crosses whole — new classes only (`.review`,
+    # `.rev-*`), type and ink left to §63. Written by the candidate portal today
+    # (report, cohort, course), but a plain feedback block any portal can reuse,
+    # so it ships rather than being held back.
+    '130-review.css',
 ]
 
 # ==========================================================================

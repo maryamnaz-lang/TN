@@ -1,0 +1,58 @@
+/* ==========================================================================
+   130. THE RATING + REVIEW CARD — `reviewCard` (Maryam, 13 Sep 2026)
+
+   One component on three surfaces (views.js): the interview report rates the
+   talent agent, the finished cohort rates its leader, the finished course rates
+   itself. The reference is a plain white block — an icon disc and a title, a row
+   of stars, an optional note with a counter, then Submit and Maybe later. No
+   card chrome: it sits in its own `.sec` on the page ground.
+
+   TYPE AND INK ARE §63'S. Every string here wears a type role (`t-h2` on the
+   title, `t-desc` on the sub-line, `t-label` on the field labels, `t-caption` on
+   the counter), so this layer sets no size, weight or colour — only layout, the
+   two icon FILLS (the disc glyph and the stars, which are `fill` not `color`, the
+   same split §85's badge and §116's `.cl-ic` use) and the disc grounds.
+
+   THE STARS ARE THE ONE INTERACTION. `I.starOutline` at rest in a mid grey,
+   `I.star` gold (`--star`, the rating token, never the accent — §63 §14's rule
+   that a state colour is a set) once chosen. Click sets the score (ai3.js); there
+   is no hover preview, deliberately — the build disarms `:hover` (trap 6) and a
+   rating reads fine as a committed choice rather than a hover ghost.
+   ========================================================================== */
+.app .review{max-width:var(--measure)}
+
+/* THE HEADER — a tinted disc, the title and the sub-line. The disc echoes the
+   reference's accent-tint circle and §105.1's photo-edit badge ground. */
+.app .rev-head{
+  display:flex;align-items:flex-start;gap:var(--s04);
+  margin-bottom:var(--s06)}
+.app .rev-ic{
+  flex:none;display:grid;place-items:center;
+  width:40px;height:40px;border-radius:999px;
+  background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .rev-ic svg{width:20px;height:20px;fill:var(--accent-text)}
+.app .rev-ic-ok{background:color-mix(in srgb, var(--support-success) 14%, var(--background))}
+.app .rev-ic-ok svg{fill:var(--support-success)}
+.app .rev-head-b{display:flex;flex-direction:column;gap:var(--s02);min-width:0}
+
+/* THE STAR ROW. A bare button per star; the label sits above it. */
+.app .rev-rate{margin-bottom:var(--s06)}
+.app .rev-lbl{display:block;margin-bottom:var(--s03)}
+.app .rev-stars{display:flex;gap:var(--s03)}
+.app .rev-star{
+  background:none;border:0;padding:0;cursor:pointer;
+  line-height:0;display:inline-flex}
+.app .rev-star svg{width:34px;height:34px;fill:var(--border-strong-01);display:block}
+.app .rev-star.on svg{fill:var(--star)}
+
+/* THE NOTE — the shared `.inp` textarea, taller here, with a right-aligned
+   counter under it. */
+.app .rev-note{margin-bottom:var(--s05)}
+.app .rev-ta{width:100%;min-height:120px;resize:vertical}
+.app .rev-count{margin-top:var(--s02);text-align:right}
+
+/* THE ACTIONS — Submit (accent fill) leads, Maybe later is a quiet button. */
+.app .rev-acts{display:flex;align-items:center;gap:var(--s04)}
+
+/* THE SENT STATE — a green tick beside a line of thanks, the disc reused. */
+.app .review-done{display:flex;align-items:flex-start;gap:var(--s04)}

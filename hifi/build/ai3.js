@@ -89,6 +89,29 @@ render();
    -------------------------------------------------------------------------- */
 S.ledApplied = false; S.delAsk = false;
 
+/* THE RATING + REVIEW CARD (reviewCard, views.js). A star click sets the score
+   and re-renders; Submit stores whatever the note holds and flips to the sent
+   state; Maybe later dismisses. The note itself is kept in sync WITHOUT a render
+   by the input listener below, so typing does not lose focus and a star click
+   redraws the textarea from `S`. */
+device.addEventListener('click', e => {
+  const star = e.target.closest('[data-rate]');
+  if(star){ const [key, n] = star.dataset.rate.split(':'); (S.reviews[key] = S.reviews[key] || {}).stars = +n; render(); return; }
+  const sub = e.target.closest('[data-review-submit]');
+  if(sub){ const key = sub.dataset.reviewSubmit; const r = S.reviews[key] = S.reviews[key] || {};
+    if(!r.stars) return;
+    const ta = device.querySelector(`[data-revta="${key}"]`); if(ta) r.text = ta.value;
+    r.sent = true; render(); return; }
+  const later = e.target.closest('[data-review-later]');
+  if(later){ const key = later.dataset.reviewLater; (S.reviews[key] = S.reviews[key] || {}).later = true; render(); return; }
+});
+device.addEventListener('input', e => {
+  const ta = e.target.closest('[data-revta]'); if(!ta) return;
+  const key = ta.dataset.revta;
+  (S.reviews[key] = S.reviews[key] || {}).text = ta.value;
+  const c = device.querySelector(`[data-revcount="${key}"]`); if(c) c.textContent = ta.value.length;
+});
+
 device.addEventListener('click', e => {
   if(e.target.closest('[data-leadapply]')){ S.ledApplied = true; render(); return; }
   const d = e.target.closest('[data-del]');

@@ -14,7 +14,7 @@
      The <style> block is PROTOTYPE CHROME AND NOTHING ELSE (the device frame,
      the viewport picker, the wordmark size, a toast host) — no product rule.
      ========================================================================== -->
-<link rel="stylesheet" href="design-system/talentnext-ds.css?b=9cee2ee9">
+<link rel="stylesheet" href="design-system/talentnext-ds.css?b=e5f2c448">
 
 <style>
 /* ==========================================================================
@@ -51,6 +51,72 @@
   pointer-events:none}
 .pt-toasts .note{margin:0;box-shadow:0 6px 24px rgba(17,17,17,.12);background:var(--pure-white,#fff)}
 </style>
+<style id="pilot-side-sheet">
+/* PILOT (Maryam, 13 Sep 2026) — a record form opens as the candidate portal's
+   IN-FLOW `.peek` column (§44), NOT a centre modal and NOT an overlay: the
+   content column narrows and the panel takes the freed space beside it, no dim.
+   `render()` places `sidePeek()` as a `.peek.peek-form` column in `.shell-body`
+   after `.view-col`, and adds `peek` to `data-shown` so §44's `.main`
+   margin-drop fires; `sheetView()` renders nothing for these. The panel reuses
+   the sheet's `.sheet-h`/`.sheet-b`/`.sheet-f` inside the `.peek` shell so ALL
+   the form logic is untouched — `readForm`, the `.fdd` dropdown's `.sheet-b`
+   overflow toggle, and the two-step `_pending` flow. §44 already ships the
+   column, the mobile-overlay fallback and the margin-drop through the design
+   system; only these two panel-fit tweaks are portal-local. Scoped to Add/Edit
+   User (`sideSheet`); promote to a build layer if approved. */
+.peek.peek-form .sheet-b{flex:1 1 auto}
+.peek.peek-form .sheet-f{justify-content:space-between; border-top:1px solid var(--rule)}
+
+/* WIDER PANEL (Maryam, 13 Sep 2026, per the reference red box): the panel takes
+   a bit under half the frame and the content column reduces to fit. Overrides
+   §44's `.app .peek{width:min(420px,42%)}` — `.app .peek.peek-form` is (0,3,0) vs
+   (0,2,0), so it wins; below 900cqw §44 still makes it a full overlay. Capped at
+   820px so it does not stretch the form too wide on a large monitor. The -1px
+   margin is the seam fix below. */
+.app .peek.peek-form{width:min(40%, 720px); margin-left:-1px}
+
+/* ONE CLEAN SEAM LINE, CONTENT ATTACHED — NO GAP (Maryam, 13 Sep 2026: "the
+   content and the slider need to be attached, no gap between them; the border has
+   to look like one line, not two combined lines"). The panel's own `border-left`
+   (§44, 1px `--rule`) is the single divider; content sits flush against it. The
+   doubling was full-bleed content drawing its OWN border at the seam — the `.cs`
+   filter-tab strip's faint per-tab `border-right` dividers (invisible on white,
+   but a second hairline beside the panel's), and a bordered control at the
+   toolbar's right edge. Two fixes, no gutter:
+     1. switch the tab dividers off while the panel is open (they are not a
+        visible design element), so nothing draws a line a few px inside the seam;
+     2. pull the panel 1px onto the content edge (`margin-left:-1px`, above) so any
+        edge-control border coincides with the panel border instead of sitting
+        beside it — one line, still visually attached. */
+.app[data-shown~="peek"] .cs button{border-right-color:transparent}
+</style>
+<style id="admin-row-hover">
+/* A CLICKABLE TABLE ROW (`tr.clk`) LIGHTS ITS FIRST-COLUMN NAME ON HOVER
+   (Maryam, 13 Sep 2026: "the rows are clickable, so on hover I want the black
+   text in the first column to change to the accent — only the black text, not
+   the grey sub-line"). The first cell holds two kinds of text: the name (the
+   black anchor) and the `.t-caption` sub-line (the grey email). Colouring the
+   whole first `td` accent recolours the name only — `.t-caption` carries its own
+   colour rule, which beats the inherited value, so the sub-line stays grey with
+   nothing named here.
+
+   The accent as INK is `--accent-text` (#c2332d, AA on white), per DESIGN.md §3
+   — `--accent` on words is reserved for stated exceptions.
+
+   WRITTEN AS A PLAIN `:hover` HERE ON PURPOSE. The admin portal links the design
+   system, whose `:hover`s are disarmed (`:where(.__nh)`, trap 6) and never armed
+   in this file — so the DS's own `.clk:hover` row wash does not even fire here.
+   A portal-local rule fires natively. Admin-only. */
+.app .tbl tr.clk{cursor:pointer}
+.app .tbl tr.clk:hover td:first-child{color:var(--accent-text)}
+/* NO ROW BACKGROUND WASH (Maryam, 13 Sep 2026: "on clicking the menu icon the
+   whole row shows this bg, it should not show this"). The DS gives `.clk:active`
+   an `--overlay-pressed` grey; pressing anywhere in the row — including the kebab
+   — washed the whole row. The row's only hover affordance is the first-column
+   name turning accent (above), so the pressed wash is dropped. (0,4,1) beats the
+   DS `.clk:active` (0,2,0). */
+.app .tbl tr.clk:active{background:transparent}
+</style>
 </head>
 <body>
 
@@ -66,7 +132,7 @@
   </div>
 </div>
 
-<script src="design-system/talentnext-ds.js?b=9cee2ee9"></script>
+<script src="design-system/talentnext-ds.js?b=e5f2c448"></script>
 <script>
 /* ==========================================================================
    THE SUPER ADMIN PORTAL
@@ -1157,7 +1223,12 @@ function table(cols, rows, opts){
   const st = S.sort[pageKey()];
   const head = cols.map((c, i) => {
     const cls = [c.num ? 'num' : '', c.act ? 'tbl-act' : ''].filter(Boolean).join(' ');
-    const sortable = !c.act && c.sort !== false && c.label;
+    /* TABLE HEADERS ARE NOT CLICKABLE (Maryam, 13 Sep 2026: "table headers should
+       not be clickable"). Click-to-sort is off — no `data-sort`, no chevron; the
+       `S.sort` machinery stays dormant (st is always undefined, so rows keep their
+       given order). Flip this back to `!c.act && c.sort !== false && c.label` to
+       restore sorting. */
+    const sortable = false;
     const on = st && st.i === i;
     return `<th${cls ? ` class="${cls}"` : ''}${sortable ? ` data-sort="${i}" aria-sort="${on ? (st.dir === 'desc' ? 'descending' : 'ascending') : 'none'}"` : ''}>${esc(c.label)}${on ? `<svg viewBox="0 -960 960 960" aria-hidden="true">${inner(st.dir === 'desc' ? 'chevDown' : 'chevUp')}</svg>` : ''}</th>`;
   }).join('');
@@ -1491,7 +1562,9 @@ function recSheet(kind, id){
 }
 function readForm(){
   const out = {};
-  device.querySelectorAll('.modal.on .sheet [data-f]').forEach(el => {
+  /* the centre modal OR the in-flow side panel (sidePeek) — a record form lives
+     in whichever is open (`.peek-form` is the side panel; see sideSheet) */
+  device.querySelectorAll('.modal.on .sheet [data-f], .peek-form [data-f]').forEach(el => {
     const k = el.dataset.f;
     if(el.type === 'checkbox'){ (out[k] = out[k] || []); if(el.checked) out[k].push(el.value); return; }
     out[k] = el.type === 'number' ? (el.value === '' ? '' : Number(el.value)) : el.value.trim();
@@ -5953,7 +6026,29 @@ function askConfirm(o){ S._confirm = o; S.confirm = '_dyn'; }
 /* THE EDITING SHEETS — the design system's bottom `.sheet`. An entry in
    `SHEETS` is an object or a function of `S.id`; a `rec:<kind>:<id>` key is
    built by the record engine. */
-function sheetView(){
+/* PILOT — RECORD FORMS OPEN AS AN IN-FLOW SIDE PANEL, NOT A CENTRE MODAL
+   (Maryam, 13 Sep 2026: "for all such actions like adding user, open the side
+   slider instead of modal ... follow the one on the candidate portal — the
+   content window slides left, attached to the side nav, and the panel takes the
+   rest of the place. Implement this here first so I can decide.")
+
+   So it is the candidate portal's `.peek` (views.js / §44), NOT an overlay: the
+   panel is an IN-FLOW third column in `.shell-body` after `.view-col`, so the
+   content column genuinely narrows and both are legible at full contrast — no
+   dim, no covering. `render()` places `sidePeek()` and adds `peek` to
+   `data-shown` (so §44's `.main` margin-drop fires); `sheetView()` renders
+   nothing for these. The panel reuses the sheet's `.sheet-h`/`.sheet-b`/`.sheet-f`
+   inside the `.peek` shell, so ALL the form logic is untouched — `readForm`, the
+   `.fdd` dropdown's `.sheet-b` overflow toggle, and the two-step `_pending` flow.
+
+   SCOPED TO ADD / EDIT USER for the pilot (`rec:user:*`). To roll it out, widen
+   this test — e.g. `key.indexOf('rec:') === 0` for every record form. The one-off
+   confirm/action sheets (grant, view-as, …) stay centre modals until then. */
+const sideSheet = key => !!key && key.indexOf('rec:user:') === 0;
+
+/* resolve `S.sheet` to its `{title, body, ok, act, danger}` — shared by the
+   centre modal (`sheetView`) and the in-flow panel (`sidePeek`) */
+function resolveSheet(){
   let s = null;
   if(S.sheet && S.sheet.indexOf('rec:') === 0){ const [, kind, id] = S.sheet.split(':'); s = recSheet(kind, id); }
   else if(S.sheet){
@@ -5964,6 +6059,12 @@ function sheetView(){
     const name = i < 0 ? S.sheet : S.sheet.slice(0, i), arg = i < 0 ? undefined : S.sheet.slice(i + 1);
     s = SHEETS[name]; if(typeof s === 'function') s = s(arg);
   }
+  return s;
+}
+
+function sheetView(){
+  if(sideSheet(S.sheet)) return '';   /* side sheets render as an in-flow .peek column, see sidePeek() */
+  const s = resolveSheet();
   return `<div class="modal ${S.sheet ? 'on' : ''}" data-close="sheet">
     <div class="sheet" role="dialog" aria-modal="true" aria-label="${s ? esc(s.title) : ''}">
       <div class="sheet-h"><h2>${s ? esc(s.title) : ''}</h2>
@@ -5975,6 +6076,23 @@ function sheetView(){
       </div>
     </div>
   </div>`;
+}
+
+/* THE IN-FLOW SIDE PANEL — a `.peek` column (§44) carrying the SAME sheet
+   header/body/footer as the centre modal. Closes via `data-close="sheet"`
+   (the X and Cancel), like the candidate peek; no backdrop, so there is no
+   click-away — the way out is the header X, matching §44. */
+function sidePeek(){
+  const s = resolveSheet();
+  return `<aside class="peek peek-form" aria-label="${s ? esc(s.title) : ''}">
+    <div class="sheet-h"><h2>${s ? esc(s.title) : ''}</h2>
+      <button class="x" data-close="sheet" aria-label="Close">${I.close}</button></div>
+    <div class="sheet-b">${s ? s.body : ''}</div>
+    <div class="sheet-f">
+      <button class="btn btn-s noic" data-close="sheet">${s && !s.ok ? 'Close' : 'Cancel'}</button>
+      ${s && !s.ok ? '' : `<button class="btn btn-p noic${s && s.danger ? ' danger' : ''}" data-act="${s ? esc(s.act) : ''}">${s ? esc(s.ok) : ''}</button>`}
+    </div>
+  </aside>`;
 }
 
 /* ======================================================================
@@ -6121,6 +6239,9 @@ function render(){
   const OVER = ['nav', 'notif', 'confirm', 'sheet'];
   const opened = OVER.filter(k => S[k] && !MO.open[k]);
   const shown = OVER.filter(k => S[k]);
+  /* a side-panel record form (sidePeek) is an in-flow `.peek` column; flag it in
+     `data-shown` so §44's `.main` margin-drop fires and the page narrows */
+  if(sideSheet(S.sheet)) shown.push('peek');
   for(const k of OVER) MO.open[k] = !!S[k];
 
   const at = ` data-rail="${S.nav ? 'open' : 'shut'}" data-view="${S.mod}"`
@@ -6152,6 +6273,7 @@ function render(){
         <main class="main">${S.tal ? askView() : `<div class="page">${view()}</div>`}</main>
         ${S.tal || S.sheet || S.confirm ? '' : askDock()}
       </div>
+      ${sideSheet(S.sheet) ? sidePeek() : ''}
       ${notifPanel()}
     </div>
     ${/* THE MODAL OVERLAYS ARE DIRECT CHILDREN OF `.app`, NOT `.shell-body`, so

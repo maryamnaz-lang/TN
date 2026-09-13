@@ -14,7 +14,7 @@
 
        cd design-system && python3 build-ds.py
 
-   Rules kept: 5907.  Rules dropped as product-specific: 186.
+   Rules kept: 5925.  Rules dropped as product-specific: 186.
    Fonts are embedded, so this one file is the whole dependency.
    Hover state layers are disarmed, as in the portal.
    ========================================================================== */
@@ -8742,7 +8742,7 @@ button.btn-p:active,
 .app .page .idname-row{display:flex; align-items:center; gap:var(--s03)}
 .app .page .rank-chip{display:inline-flex; align-items:center; padding:1px var(--s03); border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
-.app .page .crs-acc .acc-b .certban{margin-top:var(--s04)}
+.app .page .crs-acc .acc-b .dark-card{margin:var(--s04) 0 0}
 .app .page .crs-row > .crs-thumb{flex:none; width:56px; height:38px; object-fit:cover; margin-right:var(--s04); border:1px solid var(--rule)}
 .app .page .pf-tgs{display:grid; gap:0; grid-template-columns:1fr}
 .app .page .pf-tgs > .tg{align-items:flex-start; gap:var(--s04); padding:var(--s05) 0; background-color:transparent; border:0; border-radius:var(--radius)}
@@ -9601,3 +9601,23 @@ button.btn-p:active,
 @container app (min-width:900px){
   .app .viewas{padding-left:clamp(var(--s06), 12cqw, 200px); padding-right:clamp(var(--s06), 12cqw, 200px)}
 }
+
+/* ---- 130-review.css ---- */
+.app .review{max-width:var(--measure)}
+.app .rev-head{display:flex; align-items:flex-start; gap:var(--s04); margin-bottom:var(--s06)}
+.app .rev-ic{flex:none; display:grid; place-items:center; width:40px; height:40px; border-radius:999px; background:color-mix(in srgb, var(--accent) 12%, var(--background))}
+.app .rev-ic svg{width:20px; height:20px; fill:var(--accent-text)}
+.app .rev-ic-ok{background:color-mix(in srgb, var(--support-success) 14%, var(--background))}
+.app .rev-ic-ok svg{fill:var(--support-success)}
+.app .rev-head-b{display:flex; flex-direction:column; gap:var(--s02); min-width:0}
+.app .rev-rate{margin-bottom:var(--s06)}
+.app .rev-lbl{display:block; margin-bottom:var(--s03)}
+.app .rev-stars{display:flex; gap:var(--s03)}
+.app .rev-star{background:none; border:0; padding:0; cursor:pointer; line-height:0; display:inline-flex}
+.app .rev-star svg{width:34px; height:34px; fill:var(--border-strong-01); display:block}
+.app .rev-star.on svg{fill:var(--star)}
+.app .rev-note{margin-bottom:var(--s05)}
+.app .rev-ta{width:100%; min-height:120px; resize:vertical}
+.app .rev-count{margin-top:var(--s02); text-align:right}
+.app .rev-acts{display:flex; align-items:center; gap:var(--s04)}
+.app .review-done{display:flex; align-items:flex-start; gap:var(--s04)}

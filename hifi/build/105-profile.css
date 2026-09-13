@@ -132,13 +132,16 @@
    the chevron and the reveal are §04/§65's, and the band is §29's. The panel
    gives the band a little breathing room from the row above it. */
 .app .page .crs-acc .acc-b .stats{margin-top:var(--s04)}
-/* A COMPLETED COURSE SHOWS ITS COMPLETION-CERTIFICATE BANNER above the insight
-   band (Maryam, 13 Sep 2026 — the `.certban` the Achievements module draws,
-   `crsCertBanner`). It leads the panel, so it takes the same `--s04` of air from
-   the row that the `.stats` band takes; the band below it then keeps its own
-   `--s04`, so the two stack evenly. `.certban` carries its own tinted ground and
-   padding (§85), so nothing else is needed here. */
-.app .page .crs-acc .acc-b .certban{margin-top:var(--s04)}
+/* A COMPLETED COURSE SHOWS ITS COMPLETION-CERTIFICATE CARD above the insight
+   band (Maryam, 13 Sep 2026 — the `certHero` black card the Achievements module
+   draws). §75's recipe insets the card from the page rails with
+   `margin:var(--s06) var(--pad-x)`; inside the accordion panel there are no rails
+   to clear and the insight band below runs full width, so the inset is zeroed and
+   the card spans the panel like the band. It leads the panel, so it takes the
+   same `--s04` of air from the row the band takes; the band keeps its own `--s04`
+   below, so the two stack evenly. The card carries its own ground and 32px frame
+   (§75), so nothing else is needed here. */
+.app .page .crs-acc .acc-b .dark-card{margin:var(--s04) 0 0}
 /* THE COVER SITS ON THE LEFT OF THE ROW (Maryam, 9 Sep 2026). 56x38, the same
    thumbnail the all-courses list draws, `flex:none` so the row's title takes the
    slack; `--s04` of air to the title. A 1px `--rule` edge, like every framed

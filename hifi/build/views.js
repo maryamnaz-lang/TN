@@ -1799,7 +1799,16 @@ const certAll = (f, g) => [
    `data-go="transcript"` target instead — the page that already holds the
    certificate and its download — so the row that is not featured is still one
    press from the thing it names, and there is no dead control (§60). */
-function certHero(c){
+/* `title` is the card's heading and `c` its certificate. The heading defaults to
+   the Credly-shaped congratulation the Achievements module has always used; the
+   My Courses card passes "Course Completion Certificate" instead (Maryam, 13 Sep
+   2026). THE CERTIFICATE NAME IS THE COURSE the candidate earned it for, not the
+   level credential — `courseOf(c.lvl)` (Business Fundamentals, not "Explorer
+   Track – E3"), on both the Achievements card and the My Courses card (Maryam,
+   13 Sep 2026). `c.n` is the fallback for a certificate whose level has no course
+   name. */
+function certHero(c, {title = 'Congratulations on your most recent certification &#127881;'} = {}){
+  const name = courseOf(c.lvl) || c.n;
   /* `.dark-card` GOES ON THE `.sec` ITSELF, not on a child of one. §75.123
      states the whole recipe as `.app .sec.dark-card` — the inset margin, the
      32px frame and the section's own `::after` all key on that — and every
@@ -1808,12 +1817,12 @@ function certHero(c){
      hairline the section is supposed to have suppressed. */
   return `<div class="sec dark-card crt-dark">
     <div class="dc-hd"><div class="dc-hd-r">
-      <h2 class="dc-t">Congratulations on your most recent certification &#127881;</h2>
+      <h2 class="dc-t">${title}</h2>
     </div></div>
     <div class="crt-hero">
       <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
       <span class="crt-hero-b">
-        <span class="crt-hero-n">${c.n}</span>
+        <span class="crt-hero-n">${name}</span>
         <span class="crt-hero-i">TALENTnext</span>
       </span>
       ${''/* ON THE CARD THE PAIR LOSES ITS TWO HUES AND TAKES THE CARD'S.
@@ -1883,7 +1892,7 @@ function certGrid(list){
       <button class="crt-pop-i">${I.share} Share</button>
     </div>` : ''}
     <span class="crt-art"><img src="${CERT_ART[c.k]}" alt=""></span>
-    <span class="crt-n">${c.n}</span>
+    <span class="crt-n">${courseOf(c.lvl) || c.n}</span>
     <span class="crt-i">TALENTnext</span>
     <span class="crt-on">Issued ${c.on}</span>
   </div>`).join('');
@@ -1909,7 +1918,7 @@ function certGrid(list){
    FOR NOW. `certAll` and `CERTIFS` are RETAINED, unused, for when those badges
    come back — the "for now" is the whole reason they are not deleted. */
 const courseCerts = (f) =>
-  certsFor(f).map(c => ({k:'explorer', n:`Explorer Track &ndash; ${c.lvl}`, on:c.on}))
+  certsFor(f).map(c => ({k:'explorer', lvl:c.lvl, n:`Explorer Track &ndash; ${c.lvl}`, on:c.on}))
     .sort((a, b) => new Date(b.on) - new Date(a.on));
 
 /* THE UNEARNED PANEL. No black "Congratulations" card and no grid — one
@@ -2090,6 +2099,61 @@ function certBanner(f, {close = false, key = 'cert'} = {}){
       ${close?`<button class="certban-x" data-certban="${key}" aria-label="Dismiss">${I.close}</button>`:''}
     </div>
   </div>`;
+}
+
+/* ==========================================================================
+   THE RATING + REVIEW CARD — `reviewCard`, one component on three surfaces
+   (Maryam, 13 Sep 2026, with a reference)
+
+   The interview report rates the talent agent who assessed you; the cohort page,
+   once the 90 days are over, rates the cohort leader; Course Progress, once the
+   course is finished, rates the course. A star row, an optional note capped at
+   500, Submit and Maybe later. The sent state is a green confirmation; Maybe
+   later dismisses the card for the session.
+
+   IT IS A PURE FUNCTION OF `S.reviews[key]` (trap 9). A star click re-renders,
+   so the typed note has to survive the paint: ai3.js's input handler writes the
+   text into `S` on every keystroke WITHOUT a render, and the textarea is redrawn
+   from `S` here. Submit reads the same `S` value. The note is escaped because it
+   is dropped back into `innerHTML`. No em dashes in the copy. */
+S.reviews = S.reviews || {};
+const REV_MAX = 500;
+function reviewCard({key, title, sub}){
+  const r = S.reviews[key] || {};
+  if(r.later) return '';
+  if(r.sent) return `<div class="sec"><div class="review review-done">
+    <span class="rev-ic rev-ic-ok">${I.checkFilled}</span>
+    <div class="rev-head-b">
+      <h2 class="t-h2">Thanks for your review</h2>
+      <p class="rev-sub t-desc">${r.stars ? `You rated ${r.stars} out of 5. ` : ''}Your feedback helps us keep raising the bar.</p>
+    </div>
+  </div></div>`;
+  const stars = r.stars || 0;
+  const text = (r.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return `<div class="sec"><div class="review">
+    <div class="rev-head">
+      <span class="rev-ic">${I.chat}</span>
+      <div class="rev-head-b">
+        <h2 class="t-h2">${title}</h2>
+        <p class="rev-sub t-desc">${sub}</p>
+      </div>
+    </div>
+    <div class="rev-rate">
+      <span class="rev-lbl t-label">Rate your experience</span>
+      <div class="rev-stars" role="radiogroup" aria-label="Rate your experience">
+        ${[1, 2, 3, 4, 5].map(n => `<button type="button" class="rev-star${n <= stars ? ' on' : ''}" data-rate="${key}:${n}" aria-label="${n} star${n > 1 ? 's' : ''}" aria-pressed="${n <= stars}">${n <= stars ? I.star : I.starOutline}</button>`).join('')}
+      </div>
+    </div>
+    <div class="rev-note">
+      <label class="rev-lbl t-label" for="revta-${key}">Share a few words about your experience (optional)</label>
+      <textarea id="revta-${key}" class="inp rev-ta" data-revta="${key}" maxlength="${REV_MAX}" placeholder="Share a few words about your experience (optional)">${text}</textarea>
+      <div class="rev-count t-caption"><span data-revcount="${key}">${(r.text || '').length}</span>/${REV_MAX}</div>
+    </div>
+    <div class="rev-acts">
+      <button class="btn btn-p noic" data-review-submit="${key}"${stars ? '' : ' disabled'}>Submit review</button>
+      <button class="btn btn-t noic" data-review-later="${key}">Maybe later</button>
+    </div>
+  </div></div>`;
 }
 
 /* progress strip: one percentage, thirteen chapter blocks, three figures */
@@ -7645,6 +7709,12 @@ V.report = (f) => `<main class="main"><div class="page">
   <div class="sec">
     ${askChip('What does Explorer E3 mean in practice?','Ask Tal what E3 means')}
   </div>
+  ${''/* RATE THE TALENT AGENT — the last thing on the report (Maryam, 13 Sep
+        2026: "put at the end of the page so the candidate could rate and give
+        review to the talent agent"). The subject is who assessed and signed the
+        interview, named in `signedSummary` above — Priya. `reviewCard` carries
+        its own `.sec`. */}
+  ${reviewCard({key:'agent', title:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`, sub:'Your feedback helps us improve every interview.'})}
   ${''/* "DOWNLOAD REPORT AS PDF" IS GONE (Maryam, 2 Sep 2026) AND THE SECTION
         GOES WITH IT WHEN IT IS EMPTY. On `week1` and after, the enrol button is
         already suppressed, so what was left would have been a `.sec` holding an
@@ -10417,7 +10487,12 @@ V.transcript = (f) => {
 
         `pulseCols` KEEPS ITS CALLER at week 1, day 34 and day 90 — the three
         stages the note over it was written for. */}
-  ${f.complete ? enrolOffer('E4') : (g?pulseCols(f,g):'')}
+  ${''/* AND AT `day90` THE LEARNING-PULSE CARD BECOMES THE COURSE RATING (Maryam,
+        13 Sep 2026: "the course already finished ... we will remove the learning
+        pulse black card from course progress page ... and we will show the rating
+        section here"). `f.finished` is day90 only; `promoted` (`f.complete`) keeps
+        the enrolment offer, every running stage keeps the pulse. */}
+  ${f.complete ? enrolOffer('E4') : (f.finished ? reviewCard({key:'course', title:'How was this course?', sub:'Your feedback helps us improve every course.'}) : (g?pulseCols(f,g):''))}
   ${''/* THE FOUR FIGURES ARE THE ARCHIVE'S RECAP NOW, so at `promoted` they are
         inside `pastSec`'s panel rather than a section of their own. Same
         `courseStats` either way. */}
@@ -10713,13 +10788,20 @@ V.cohort = (f) => `<main class="main"><div class="page">
         the disc at the top of this page's own leader card is now that control.
         Two ways to message one person on one page is what §77 removed from the
         interview card for the same reason. */}
-  <div class="sec sec-call dark-card crow-dark">
+  ${''/* ONCE THE 90 DAYS ARE OVER THE CALL CARD BECOMES THE LEADER RATING
+        (Maryam, 13 Sep 2026: "the rating could be given when the cohort is
+        completed ... instead of the black call card i need the rating section
+        here"). `f.finished` is the day90 stage only; every earlier stage still
+        has a next call, so it keeps the black card. */}
+  ${f.finished
+    ? reviewCard({key:'leader', title:`How was your experience with ${COHORT_LEAD.n.split(' ')[0]}?`, sub:'Your feedback helps us improve every cohort.'})
+    : `<div class="sec sec-call dark-card crow-dark">
     <div class="dc-hd">
       <div class="dc-hd-r"><h2 class="dc-t">Your Next Call</h2>
         <span class="dc-when">${I.time}${callLeft(WEEK_CALL.when)}</span></div>
     </div>
     ${crow('cohort', {when:false, second:false})}
-  </div>
+  </div>`}
   ${/* sec-cs: this section holds a full-bleed tab strip, and §20 needs to know
         so the call plate above it can sit flush. Named rather than sniffed —
         the `:has()` that would have detected it has to nest, and nested
@@ -12063,11 +12145,22 @@ const PF_FORM = {general:pfFormGeneral, work:pfFormWork, edu:pfFormEdu,
    Log out — the first because its own note asks for it above the ways out, the
    second because it belongs to no tab. */
 /* MY COURSES follows My Profile (Maryam, 9 Sep 2026); "Become a Cohort Leader"
-   is HIDDEN (Maryam, 9 Sep 2026: "hide become a cohort leader tab"). `pfLead`
-   and the `S.pfTab==='lead'` branch stay defined and unreachable, so restoring
-   the tab is one entry back in this list. */
+   was HIDDEN (Maryam, 9 Sep 2026: "hide become a cohort leader tab"). `pfLead`
+   and the `S.pfTab==='lead'` branch stayed defined and unreachable for exactly
+   this restore. */
 const PF_TABS = [['me','My Profile'], ['linked','Linked Accounts'], ['courses','My Courses'],
                  ['notif','Notifications'], ['priv','Privacy Settings']];
+/* THE VOLUNTEER TAB RETURNS ON THE PROMOTED STAGE ONLY (Maryam, 13 Sep 2026:
+   "on promoted to e4 prototype only i want another tab"). The label matches the
+   card's own button, "Volunteer to lead a Cohort" (Maryam, 13 Sep 2026: "i like
+   the button text ... use this as tab name as well"), kept in her casing (a tab
+   is not a `.btn`, so it renders the string as written). The base five are
+   everyone's; the sixth is added on the one stage where the candidate has
+   finished the 90 days and been promoted, when volunteering to lead is a real
+   next step. */
+const pfTabList = () => S.stage === 'promoted'
+  ? [...PF_TABS, ['lead', 'Volunteer to lead a Cohort']]
+  : PF_TABS;
 S.pfTab = 'me';
 
 /* ==========================================================================
@@ -12118,6 +12211,23 @@ const CL_DUTY = ['Commit 2&ndash;3 hours per week',
   'Uphold community guidelines and values',
   'Communicate updates and feedback to the team'];
 
+/* THE PROCESS — volunteer, interview, decision (Maryam, 13 Sep 2026: "the cohort
+   leader will volunteer for the position and then get interviewed with a talent
+   agent and got selected or rejected"). Three steps in the SAME `.cl-do` card
+   grid the duties use, so the tab reads as one component and the order left to
+   right is the sequence. The middle step is the one thing this tab adds to the
+   role the product already models: a talent agent — the person who runs
+   interviews everywhere else in the candidate journey — vets the volunteer. No
+   em dashes in the copy (the Tal-voice rule read as house style here too). */
+const CL_STEPS = [
+  ['add','--mk-1','Volunteer',
+   'Put your name forward to lead a cohort. It is a volunteer role, open to you now that your 90 days are complete.'],
+  ['chat','--mk-2','Interview with a talent agent',
+   'A talent agent meets you for a short interview to understand your strengths and how you support other learners.'],
+  ['checkFilled','--mk-3','Selection decision',
+   'If you are selected, you are matched with a cohort to lead. If not, you get feedback and can volunteer again next cohort.']
+];
+
 /* THE TICK LIST IS §87's `.lrn`, WHICH IS ALREADY WHAT THIS IS. That component
    is "What you'll learn" on the course outline — a checked line per claim — and
    the only thing §116 has to say about it is that it is one column in a
@@ -12129,20 +12239,34 @@ const clList = (items) => `<ul class="lrn">
 const pfLead = () => `
   <div class="sec">
     ${aiHead({
-      title:'Become a cohort leader',
-      desc:'Cohort leaders are experienced learners who guide and support peers on their leadership journey. It&rsquo;s a volunteer role that helps you give back, grow your skills, and earn recognition.',
+      title:'Volunteer for cohort leader',
+      desc:'Cohort leaders are experienced learners who volunteer to guide and support their peers. Volunteer for the role, meet a talent agent for a short interview, and if you are selected you will be matched with a cohort to lead.',
       act:S.ledApplied
         ? `<button class="btn btn-p noic" disabled>Request sent ${I.checkFilled}</button>`
-        : `<button class="btn btn-p noic" data-leadapply="1">Apply to lead a cohort ${I.arrowRight}</button>`})}
-    ${''/* THE CONFIRMATION IS GREEN AND THE WORDS ARE MARYAM'S, 4 Sep 2026:
-          "change the tick icon color to green. also change the text next to it
-          to …". §02's `.note` marks itself with `I.info` in the information
-          blue, and a tick in that blue is a state drawn in the colour of a
-          remark — `.cl-ok` re-points the mark to §02.440's success pair, which
-          is the same hue §109 gives the enrolment dialog's ringed tick. The
-          words are verbatim, including "TALENTnext" set the way the wordmark
-          is (§63 §2's capitals exception is the wordmark, and this is it). */}
-    ${S.ledApplied ? `<div class="note cl-ok"><span>${I.checkFilled}</span><div class="nb">Thank you for applying! Your request has been moved forward. You will be notified further on your email by TALENTnext team.</div></div>` : ''}
+        : `<button class="btn btn-p noic" data-leadapply="1">Volunteer to lead a cohort ${I.arrowRight}</button>`})}
+    ${''/* THE CONFIRMATION IS GREEN AND NAMES THE NEXT STEP (Maryam, 13 Sep 2026:
+          volunteering now leads to a talent-agent interview, so the sent state
+          says the agent will be in touch rather than "moved forward"). `.cl-ok`
+          re-points §02's `.note` mark from the information blue to §02.440's
+          success pair, the same hue §109 gives the enrolment dialog's tick.
+          "TALENTnext" stays set the way the wordmark is (§63 §2's capitals
+          exception is the wordmark). No em dashes (Tal-voice/house rule). */}
+    ${S.ledApplied ? `<div class="note cl-ok"><span>${I.checkFilled}</span><div class="nb">Thanks for volunteering. A talent agent will reach out on your email to schedule your interview, and you will hear whether you have been selected after it. Sent by the TALENTnext team.</div></div>` : ''}
+  </div>
+  <div class="sec sec-noline">
+    ${''/* HOW IT WORKS — the volunteer → interview → decision flow, in the same
+          card grid as the duties below (`CL_STEPS`, 13 Sep 2026). `sec-noline`
+          drops this section's foot hairline so it reads as one band with "What
+          does a cohort leader do?" below it — no divider between the two (Maryam,
+          13 Sep 2026: "remove the line above What does a cohort leader do?"). */}
+    <div class="sec-h"><h2>How volunteering works</h2></div>
+    <div class="cl-do">
+      ${CL_STEPS.map(([ic, mk, t, d]) => `<div class="cl-c" style="--mk:var(${mk})">
+        <span class="cl-ic">${I[ic]}</span>
+        <span class="cl-t t-h4">${t}</span>
+        <span class="cl-d t-desc">${d}</span>
+      </div>`).join('')}
+    </div>
   </div>
   <div class="sec">
     <div class="sec-h"><h2>What does a cohort leader do?</h2></div>
@@ -12191,10 +12315,15 @@ const pfLead = () => `
    when all six were finished, which is the state the reader is trying to reach
    and the least useful thing to tell them about. */
 const pfTabs = () => {
+  /* THE VOLUNTEER TAB IS PROMOTED-ONLY, so a reader who left `S.pfTab` on it and
+     then changed stage would land on a tab that is no longer in the strip. Clamp
+     back to My Profile here — `pfTabs` renders before `pfPanel`, so the strip and
+     the panel agree in the same paint. */
+  if(S.pfTab === 'lead' && S.stage !== 'promoted') S.pfTab = 'me';
   const d = pfDone();
   return `<div class="sec sec-cs pf-cs">
   <div class="cs" role="tablist" aria-label="Profile sections">
-    ${PF_TABS.map(([k, lab]) => `<button class="${S.pfTab === k ? 'on' : ''}" role="tab"
+    ${pfTabList().map(([k, lab]) => `<button class="${S.pfTab === k ? 'on' : ''}" role="tab"
       aria-selected="${S.pfTab === k}" data-pftab="${k}">${lab}${
       k === 'me' ? `<span class="lf-n">${d.done}/${d.total}</span>` : ''}</button>`).join('')}
   </div>
@@ -12997,34 +13126,19 @@ const crsInsight = (c) => {
     ${statCell(I.flag, 'Tasks on time', `${c.tasksDone} <small>of ${c.tasksTotal}</small>`, c.tasksSub)}
   </div>`;
 };
-/* THE COMPLETION CERTIFICATE BANNER on a completed course (Maryam, 13 Sep 2026:
-   "show the course completion certification banners — the one we are showing on
-   the achievements page — with the courses that are completed"). It is the exact
-   `.certban` the Achievements module draws (`certBanner` above), same badge
-   artwork (`CERT_ART.explorer`, the one asset every level certificate shares),
-   same "Explorer Track – {lvl}" title and "Completed {date} · {cohort}" meta,
-   same accent View button.
-
-   IT IS DRIVEN BY THE COURSE'S OWN LEVEL, not by `certsFor(f)`. `certBanner`
-   reads the stage's latest certificate, which at day 34 is E2 — wrong under an
-   E3 course row. Matching `CERTS` by `c.level` gives the certificate that course
-   actually earns (Business Fundamentals is E3 → the E3 certificate) and never
-   drifts with the stage. A completed course with no matching level certificate
-   draws nothing rather than inventing one (§74). No `.sec` wrapper — this sits
-   inside the accordion panel; §105.9 gives it its top air. */
-function crsCertBanner(c){
-  const cert = CERTS.find(x => x.lvl === c.level);
-  if(!cert) return '';
-  return `<div class="certban crs-certban">
-    <span class="certban-mk"><img src="${CERT_ART.explorer}" alt=""></span>
-    <span class="certban-b">
-      <span class="certban-t">Explorer Track &ndash; ${cert.lvl}</span>
-      <span class="certban-m">Completed ${cert.on} &middot; ${cert.cohort}</span>
-    </span>
-    <span class="certban-a">
-      <button class="btn btn-p btn-sm" data-go="transcript">View</button>
-    </span>
-  </div>`;
+/* THE COMPLETION-CERTIFICATE CARD on a completed course (Maryam, 13 Sep 2026:
+   "not this grey banner, the black card with certificate and the share icon").
+   It is the exact `certHero` black card the Achievements module draws — badge,
+   name, TALENTnext, Download and Share — with two things set for this surface:
+   the heading is "Course Completion Certificate" (not the achievements
+   congratulation), and the certificate is keyed to the course's OWN level so its
+   name reads the course the candidate finished (`courseOf(c.level)`), never a
+   stage-drifted credential. No date is shown on the card, so no `CERTS` lookup
+   is needed; `k:'explorer'` is the one badge asset every level certificate
+   shares. It renders inside the accordion panel; §105.9 zeroes the card's page
+   inset there and gives it its top air. */
+function crsCertCard(c){
+  return certHero({k:'explorer', lvl:c.level, n:c.name}, {title:'Course Completion Certificate'});
 }
 function pfCoursesView(){
   return `<div class="sec sec-crs" data-pfsec="courses">
@@ -13041,7 +13155,7 @@ function pfCoursesView(){
             onerror="this.style.display='none'">
           <span class="ttl"><span class="ol-t">${c.name}</span><span class="ol-m t-desc">${c.status}</span></span>
           <span class="chev">${I.chevDown}</span></button>
-        <div class="acc-b">${c.status === 'Completed' ? crsCertBanner(c) : ''}${crsInsight(c)}</div>
+        <div class="acc-b">${c.status === 'Completed' ? crsCertCard(c) : ''}${crsInsight(c)}</div>
       </div>`).join('')}
     </div>
   </div>`;
